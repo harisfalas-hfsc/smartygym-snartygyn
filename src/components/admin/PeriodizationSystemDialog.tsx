@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,13 +12,11 @@ import { useQueryClient } from "@tanstack/react-query";
 import { format, addDays } from "date-fns";
 import type { Json } from "@/integrations/supabase/types";
 import {
-  PERIODIZATION_28DAY,
+  PERIODIZATION_84DAY,
   FORMATS_BY_CATEGORY,
   CYCLE_START_DATE,
   getWODInfoForDate,
-  getDifficultyBadgeClass,
-  STRENGTH_DAY_FOCUS,
-  STRENGTH_84DAY_ROTATION
+  getDifficultyBadgeClass
 } from "@/lib/wodCycle";
 
 interface PeriodizationSystemDialogProps {
@@ -42,61 +40,11 @@ export const PeriodizationSystemDialog = ({
   const queryClient = useQueryClient();
   const [isSaving, setIsSaving] = useState(false);
 
-  // Get today's and tomorrow's date-based info (source of truth)
+  // Get today's and tomorrow's info
   const todayDateStr = format(new Date(), "yyyy-MM-dd");
   const tomorrowDateStr = format(addDays(new Date(), 1), "yyyy-MM-dd");
   const todayInfo = getWODInfoForDate(todayDateStr);
   const tomorrowInfo = getWODInfoForDate(tomorrowDateStr);
-
-  // Generate full 84-day super-cycle with Strength rotation
-  const PERIODIZATION_84DAY = useMemo(() => {
-    const fullCycle: Array<{
-      globalDay: number;
-      dayInCycle: number;
-      cycle: number;
-      category: string;
-      difficulty: string | null;
-      difficultyStars: [number, number] | null;
-      focus?: string;
-    }> = [];
-
-    for (let cycle = 1; cycle <= 3; cycle++) {
-      for (let day = 1; day <= 28; day++) {
-        const base = PERIODIZATION_28DAY[day - 1];
-        const globalDay = (cycle - 1) * 28 + day;
-
-        // For Strength days, apply the 84-day rotation
-        let difficulty = base.difficulty;
-        let difficultyStars = base.difficultyStars;
-
-        if (base.category === "STRENGTH" && STRENGTH_84DAY_ROTATION[day]) {
-          const rotationIndex = (cycle - 1) % 3;
-          const rotation = STRENGTH_84DAY_ROTATION[day][rotationIndex];
-          difficulty = rotation.difficulty;
-          difficultyStars = rotation.stars;
-        }
-
-        fullCycle.push({
-          globalDay,
-          dayInCycle: day,
-          cycle,
-          category: base.category,
-          difficulty,
-          difficultyStars,
-          focus: base.category === "STRENGTH" ? STRENGTH_DAY_FOCUS[day]?.focus : undefined
-        });
-      }
-    }
-    return fullCycle;
-  }, []);
-
-  // Calculate global day for today and tomorrow
-  // The table shows cycles 1, 2, 3 with globalDay = (cycle-1)*28 + dayInCycle
-  // We need to map the actual cycleNumber to the rotation phase (1, 2, or 3)
-  const todayRotationPhase = ((todayInfo.cycleNumber - 1) % 3) + 1; // Maps to 1, 2, or 3
-  const tomorrowRotationPhase = ((tomorrowInfo.cycleNumber - 1) % 3) + 1;
-  const todayGlobalDay = (todayRotationPhase - 1) * 28 + todayInfo.dayInCycle;
-  const tomorrowGlobalDay = (tomorrowRotationPhase - 1) * 28 + tomorrowInfo.dayInCycle;
 
   const handleClearFormatUsage = async () => {
     if (!wodState?.id) return;
@@ -128,10 +76,10 @@ export const PeriodizationSystemDialog = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Settings className="h-5 w-5 text-primary" />
-            WOD Periodization System (84-Day Super-Cycle)
+            WOD Periodization System (84-Day Cycle)
           </DialogTitle>
           <DialogDescription>
-            Complete 84-day super-cycle with Strength difficulty rotation across 3 cycles
+            Simple 84-day cycle: Day 1 to Day 84, then restart. No complex rotation.
           </DialogDescription>
         </DialogHeader>
 
@@ -143,23 +91,23 @@ export const PeriodizationSystemDialog = ({
             <TabsTrigger value="overrides">Overrides</TabsTrigger>
           </TabsList>
 
-          {/* 84-Day Super-Cycle Tab */}
+          {/* 84-Day Cycle Tab */}
           <TabsContent value="periodization" className="space-y-4">
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
-                  84-Day Super-Cycle Periodization
+                  84-Day Periodization Cycle
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="p-3 bg-green-500/10 border border-green-500/30 rounded-lg mb-4">
                   <p className="text-sm text-green-400">
-                    <strong>✓ 84-Day Super-Cycle:</strong> 3 × 28-day cycles with Strength difficulty rotation.
-                    <br />
-                    <span className="text-yellow-400">★ Strength Days (2, 5, 12, 15, 20, 23):</span> Difficulty rotates every 28 days through Beginner → Intermediate → Advanced.
+                    <strong>✓ Simple 84-Day Cycle:</strong> Day 1 to Day 84, then restart from Day 1.
                     <br />
                     Reference: <code className="bg-muted px-1 rounded">{CYCLE_START_DATE}</code> = Day 1 (CARDIO/Beginner)
+                    <br />
+                    <span className="text-yellow-400">★ Today: Day {todayInfo.dayIn84}/84 - {todayInfo.category}</span>
                   </p>
                 </div>
 
@@ -167,7 +115,7 @@ export const PeriodizationSystemDialog = ({
                 <div className="flex flex-wrap gap-3 mb-4 text-xs">
                   <div className="flex items-center gap-1">
                     <div className="w-3 h-3 rounded bg-yellow-500/30 border border-yellow-500/50"></div>
-                    <span>Strength Day (rotating difficulty)</span>
+                    <span>Strength Day</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <div className="w-3 h-3 rounded bg-green-500/30 border border-green-500/50"></div>
@@ -187,9 +135,7 @@ export const PeriodizationSystemDialog = ({
                   <Table>
                     <TableHeader className="sticky top-0 bg-background z-10">
                       <TableRow>
-                        <TableHead className="w-16">Day</TableHead>
-                        <TableHead className="w-16">Cycle</TableHead>
-                        <TableHead className="w-20">Day 1-28</TableHead>
+                        <TableHead className="w-20">Day</TableHead>
                         <TableHead>Category</TableHead>
                         <TableHead>Focus</TableHead>
                         <TableHead>Difficulty</TableHead>
@@ -198,14 +144,14 @@ export const PeriodizationSystemDialog = ({
                     </TableHeader>
                     <TableBody>
                       {PERIODIZATION_84DAY.map((entry) => {
-                        const isToday = entry.globalDay === todayGlobalDay;
-                        const isTomorrow = entry.globalDay === tomorrowGlobalDay;
+                        const isToday = entry.day === todayInfo.dayIn84;
+                        const isTomorrow = entry.day === tomorrowInfo.dayIn84;
                         const isRecovery = entry.category === "RECOVERY";
                         const isStrength = entry.category === "STRENGTH";
                         
                         return (
                           <TableRow 
-                            key={entry.globalDay} 
+                            key={entry.day} 
                             className={`
                               ${isTomorrow ? "bg-primary/10" : ""}
                               ${isToday ? "bg-blue-500/10" : ""}
@@ -213,15 +159,7 @@ export const PeriodizationSystemDialog = ({
                               ${isStrength && !isToday && !isTomorrow ? "bg-yellow-500/5" : ""}
                             `}
                           >
-                            <TableCell className="font-bold text-primary">Day {entry.globalDay}</TableCell>
-                            <TableCell>
-                              <Badge variant="outline" className="text-xs">
-                                C{entry.cycle}
-                              </Badge>
-                            </TableCell>
-                            <TableCell className="text-muted-foreground text-sm">
-                              {entry.dayInCycle}
-                            </TableCell>
+                            <TableCell className="font-bold text-primary">Day {entry.day}</TableCell>
                             <TableCell>
                               <Badge 
                                 variant="secondary" 
@@ -232,9 +170,9 @@ export const PeriodizationSystemDialog = ({
                               </Badge>
                             </TableCell>
                             <TableCell>
-                              {entry.focus ? (
+                              {entry.strengthFocus ? (
                                 <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/30">
-                                  {entry.focus}
+                                  {entry.strengthFocus}
                                 </Badge>
                               ) : (
                                 <span className="text-muted-foreground text-sm">—</span>
@@ -270,22 +208,9 @@ export const PeriodizationSystemDialog = ({
                     </TableBody>
                   </Table>
                 </div>
-                
-                <div className="mt-4 p-3 bg-muted/30 rounded-lg space-y-2">
-                  <p className="text-sm font-medium">Strength Day Rotation Pattern:</p>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
-                    <div><strong>Day 2 (Lower Body):</strong> Adv → Int → Beg</div>
-                    <div><strong>Day 5 (Upper Body):</strong> Int → Beg → Adv</div>
-                    <div><strong>Day 12 (Full Body):</strong> Adv → Beg → Int</div>
-                    <div><strong>Day 15 (Push/Pull):</strong> Beg → Adv → Int</div>
-                    <div><strong>Day 20 (Pull/Push):</strong> Int → Beg → Adv</div>
-                    <div><strong>Day 23 (Core/Glutes):</strong> Adv → Int → Beg</div>
-                  </div>
-                </div>
 
                 <p className="text-sm text-muted-foreground mt-3">
-                  The super-cycle repeats every 84 days. Non-Strength categories maintain fixed difficulty.
-                  Days 10, 28, 38, 56, 66, and 84 are recovery days.
+                  The cycle repeats every 84 days. Recovery days (10, 28, 38, 56, 66, 84) have no difficulty level.
                 </p>
               </CardContent>
             </Card>
@@ -354,132 +279,95 @@ export const PeriodizationSystemDialog = ({
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* Calendar-derived source of truth */}
                 <div className="p-4 bg-green-500/10 border border-green-500/30 rounded-lg space-y-3">
                   <div className="flex items-center gap-2">
                     <CalendarDays className="h-5 w-5 text-green-400" />
-                    <p className="text-sm font-medium text-green-400">Calendar-Derived (Source of Truth)</p>
+                    <p className="text-sm font-medium text-green-400">84-Day Cycle Status</p>
                   </div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <div className="p-2 bg-background/50 rounded">
                       <p className="text-xs text-muted-foreground">Today ({todayDateStr})</p>
-                      <p className="font-bold">Day {todayInfo.dayInCycle}/28</p>
+                      <p className="font-bold">Day {todayInfo.dayIn84}/84</p>
                       <Badge variant="secondary" className="mt-1 text-xs">{todayInfo.category}</Badge>
                     </div>
                     <div className="p-2 bg-background/50 rounded">
                       <p className="text-xs text-muted-foreground">Tomorrow ({tomorrowDateStr})</p>
-                      <p className="font-bold">Day {tomorrowInfo.dayInCycle}/28</p>
+                      <p className="font-bold">Day {tomorrowInfo.dayIn84}/84</p>
                       <Badge variant="secondary" className="mt-1 text-xs">{tomorrowInfo.category}</Badge>
                     </div>
                     <div className="p-2 bg-background/50 rounded">
-                      <p className="text-xs text-muted-foreground">Current Cycle</p>
-                      <p className="font-bold">Cycle {tomorrowInfo.cycleNumber}</p>
+                      <p className="text-xs text-muted-foreground">Today's Difficulty</p>
+                      {todayInfo.difficulty.level ? (
+                        <Badge className={`mt-1 ${getDifficultyBadgeClass(todayInfo.difficulty.level)}`}>
+                          {todayInfo.difficulty.level}
+                        </Badge>
+                      ) : (
+                        <p className="font-bold text-muted-foreground">Recovery</p>
+                      )}
                     </div>
                     <div className="p-2 bg-background/50 rounded">
                       <p className="text-xs text-muted-foreground">Tomorrow's Difficulty</p>
                       {tomorrowInfo.difficulty.level ? (
-                        <Badge className={`mt-1 text-xs ${getDifficultyBadgeClass(tomorrowInfo.difficulty.level)}`}>
-                          {tomorrowInfo.difficulty.level} ({tomorrowInfo.difficulty.range?.[0]}-{tomorrowInfo.difficulty.range?.[1]}★)
+                        <Badge className={`mt-1 ${getDifficultyBadgeClass(tomorrowInfo.difficulty.level)}`}>
+                          {tomorrowInfo.difficulty.level}
                         </Badge>
                       ) : (
-                        <Badge className="mt-1 text-xs bg-gray-500/20 text-gray-400">
-                          Recovery Day
-                        </Badge>
+                        <p className="font-bold text-muted-foreground">Recovery</p>
                       )}
                     </div>
                   </div>
                 </div>
 
                 {/* Quick Actions */}
-                <div className="p-3 bg-muted/30 rounded-lg space-y-3">
-                  <p className="text-sm font-medium">Quick Actions:</p>
-                  <div className="flex gap-2 pt-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleClearFormatUsage}
-                      disabled={isSaving}
-                    >
-                      Clear Format Usage
-                    </Button>
-                  </div>
+                <div className="flex flex-wrap gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={handleClearFormatUsage}
+                    disabled={isSaving}
+                  >
+                    Clear Format Usage Tracking
+                  </Button>
                 </div>
 
-                <div className="p-3 bg-muted/30 rounded-lg">
-                  <p className="text-sm font-medium mb-2">Format Usage Tracking:</p>
-                  <div className="flex flex-wrap gap-2">
-                    {wodState?.format_usage && typeof wodState.format_usage === 'object' && !Array.isArray(wodState.format_usage) && Object.keys(wodState.format_usage).length > 0 ? (
-                      Object.entries(wodState.format_usage as Record<string, unknown>).map(([category, formats]) => (
-                        <div key={category} className="text-xs">
-                          <Badge variant="outline" className="mr-1">{category}:</Badge>
-                          <span className="text-muted-foreground">
-                            {Array.isArray(formats) ? formats.join(', ') : String(formats)}
-                          </span>
-                        </div>
-                      ))
-                    ) : (
-                      <span className="text-sm text-muted-foreground">No format usage tracked yet</span>
-                    )}
+                {/* Format Usage */}
+                {wodState?.format_usage && Object.keys(wodState.format_usage as Record<string, any>).length > 0 && (
+                  <div className="p-3 bg-muted/30 rounded-lg">
+                    <p className="text-sm font-medium mb-2">Tracked Format Usage:</p>
+                    <div className="text-xs text-muted-foreground font-mono">
+                      {JSON.stringify(wodState.format_usage, null, 2)}
+                    </div>
                   </div>
-                </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
 
-          {/* Manual Overrides Tab */}
+          {/* Overrides Tab */}
           <TabsContent value="overrides" className="space-y-4">
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm flex items-center gap-2">
-                  <Settings className="h-4 w-4" />
-                  Manual Overrides
-                </CardTitle>
+                <CardTitle className="text-sm">Manual Overrides</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
-                  <p className="text-sm font-medium text-blue-400 mb-2">How Manual Overrides Work:</p>
-                  <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1">
-                    <li>Overrides only affect specific dates</li>
-                    <li>They do NOT break the fixed 28-day cycle</li>
-                    <li>After an override, the next day resumes normal calendar-based rotation</li>
-                    <li>Use overrides for special occasions or theme days</li>
-                  </ul>
-                </div>
-
-                <div className="p-3 bg-muted/30 rounded-lg">
-                  <p className="text-sm font-medium mb-2">Active Overrides:</p>
-                  {wodState?.manual_overrides && typeof wodState.manual_overrides === 'object' && !Array.isArray(wodState.manual_overrides) && Object.keys(wodState.manual_overrides).length > 0 ? (
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Date</TableHead>
-                          <TableHead>Override Settings</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {Object.entries(wodState.manual_overrides as Record<string, unknown>).map(([date, settings]) => (
-                          <TableRow key={date}>
-                            <TableCell>{date}</TableCell>
-                            <TableCell>
-                              <pre className="text-xs bg-muted p-2 rounded">
-                                {JSON.stringify(settings, null, 2)}
-                              </pre>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  ) : (
-                    <span className="text-sm text-muted-foreground">No active overrides</span>
-                  )}
-                </div>
-
-                <div className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
-                  <p className="text-sm text-yellow-400">
-                    To add a manual override, use the "Upcoming WOD Schedule" section in the WOD Manager 
-                    or update the <code className="bg-muted px-1 rounded">manual_overrides</code> field directly.
-                  </p>
-                </div>
+              <CardContent>
+                {wodState?.manual_overrides && Object.keys(wodState.manual_overrides as Record<string, any>).length > 0 ? (
+                  <div className="space-y-2">
+                    {Object.entries(wodState.manual_overrides as Record<string, any>).map(([date, override]) => (
+                      <div key={date} className="p-2 bg-muted/30 rounded flex justify-between items-center">
+                        <div>
+                          <span className="font-medium">{date}</span>
+                          <span className="text-muted-foreground ml-2">→ {override.category || 'Custom'}</span>
+                        </div>
+                        <Badge variant="outline">Override Active</Badge>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground">No manual overrides configured.</p>
+                )}
+                <p className="text-xs text-muted-foreground mt-4">
+                  Set overrides in the WOD Schedule Preview section.
+                </p>
               </CardContent>
             </Card>
           </TabsContent>

@@ -13,7 +13,7 @@ import { format, addDays } from "date-fns";
 import {
   ALL_CATEGORIES,
   FORMATS_BY_CATEGORY,
-  getDayInCycleFromDate,
+  getDayIn84Cycle,
   getPeriodizationForDay,
   getDifficultyBadgeClass
 } from "@/lib/wodCycle";
@@ -41,7 +41,7 @@ export const WODSchedulePreview = () => {
     },
   });
 
-  // Calculate next 28 days schedule using DATE-BASED 28-day fixed periodization
+  // Calculate next 28 days schedule using 84-day cycle
   const getUpcomingSchedule = () => {
     if (!wodState) return [];
     
@@ -49,12 +49,12 @@ export const WODSchedulePreview = () => {
     const manualOverrides = (wodState.manual_overrides as Record<string, any>) || {};
     
     for (let i = 0; i < 28; i++) {
-      const futureDate = addDays(new Date(), i + 1); // i+1 because i=0 is tomorrow
+      const futureDate = addDays(new Date(), i + 1);
       const dateStr = format(futureDate, "yyyy-MM-dd");
       
-      // DATE-BASED calculation - 28-day fixed cycle
-      const futureDayInCycle = getDayInCycleFromDate(dateStr);
-      const periodization = getPeriodizationForDay(futureDayInCycle);
+      // Get day in 84-day cycle
+      const dayIn84 = getDayIn84Cycle(dateStr);
+      const periodization = getPeriodizationForDay(dayIn84);
       
       const override = manualOverrides[dateStr];
       
@@ -69,14 +69,15 @@ export const WODSchedulePreview = () => {
       schedule.push({
         date: futureDate,
         dateStr,
-        dayInCycle: futureDayInCycle,
+        dayIn84,
         category,
         difficultyLevel,
         difficultyRange,
         formats,
         selectedFormat: override?.format || null,
         hasOverride: !!override,
-        isRecoveryDay
+        isRecoveryDay,
+        strengthFocus: periodization.strengthFocus
       });
     }
     
@@ -162,11 +163,11 @@ export const WODSchedulePreview = () => {
         <CardHeader>
         <CardTitle className="flex items-center gap-2 text-sm">
             <Calendar className="h-4 w-4 text-primary" />
-            Upcoming WOD Schedule (28-Day Cycle)
+            Upcoming WOD Schedule (84-Day Cycle)
           </CardTitle>
           <CardDescription>
-            <span className="block">Preview future WODs and set overrides. Fixed 28-day periodization - no shifts, just repeats.</span>
-            <span className="block mt-1 text-xs">💡 <strong>Days 10 & 28 are RECOVERY days</strong> with no difficulty level.</span>
+            <span className="block">Preview future WODs and set overrides. Simple 84-day cycle - Day 1 to 84, then restart.</span>
+            <span className="block mt-1 text-xs">💡 <strong>Days 10, 28, 38, 56, 66, 84 are RECOVERY days</strong> with no difficulty level.</span>
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3 max-h-[600px] overflow-y-auto">
@@ -182,7 +183,7 @@ export const WODSchedulePreview = () => {
                       {format(day.date, "EEEE, MMM d")}
                     </span>
                     <Badge variant="outline" className="text-xs">
-                      Day {day.dayInCycle}/28
+                      Day {day.dayIn84}/84
                     </Badge>
                     {day.hasOverride && (
                       <Badge className="bg-primary/20 text-primary border-primary/30 text-xs">
@@ -202,6 +203,11 @@ export const WODSchedulePreview = () => {
                       <Flame className="h-3 w-3 mr-1" />
                       {day.category}
                     </Badge>
+                    {day.strengthFocus && (
+                      <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30 text-xs">
+                        {day.strengthFocus}
+                      </Badge>
+                    )}
                     <Badge variant="outline">
                       {day.selectedFormat || day.formats[0]} {!day.selectedFormat && day.formats.length > 1 && "(AI selected)"}
                     </Badge>
@@ -260,7 +266,7 @@ export const WODSchedulePreview = () => {
           
           <p className="text-xs text-muted-foreground pt-2">
             <Clock className="h-3 w-3 inline mr-1" />
-            WODs generate daily at 7:00 AM UTC. Overrides are applied during generation. Showing first 14 of 28 days.
+            WODs generate daily at 00:30 UTC. Overrides are applied during generation. Showing first 14 days.
           </p>
         </CardContent>
       </Card>
@@ -270,7 +276,7 @@ export const WODSchedulePreview = () => {
           <DialogHeader>
             <DialogTitle>Override WOD for {selectedDate}</DialogTitle>
             <DialogDescription>
-              Customize the WOD settings for this day. This override will NOT affect the fixed 28-day rotation.
+              Customize the WOD settings for this day.
             </DialogDescription>
           </DialogHeader>
           
