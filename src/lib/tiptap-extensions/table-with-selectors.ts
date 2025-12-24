@@ -1,6 +1,6 @@
 import { Table } from '@tiptap/extension-table';
-import { Plugin, PluginKey } from '@tiptap/pm/state';
-import { TextSelection } from '@tiptap/pm/state';
+import { Plugin, PluginKey, TextSelection } from 'prosemirror-state';
+import type { Node as ProseMirrorNode } from 'prosemirror-model';
 
 // Helper to convert number to letter (1=A, 2=B, etc.)
 function numberToLetter(num: number): string {
@@ -20,10 +20,11 @@ export const TableWithSelectors = Table.extend({
       const wrapper = document.createElement('div');
       wrapper.className = 'table-with-selectors';
       
-      // Get table dimensions
-      const firstRow = node.firstChild;
+      // Get table dimensions - cast node to ProseMirrorNode for proper typing
+      const tableNode = node as ProseMirrorNode;
+      const firstRow = tableNode.firstChild;
       const colCount = firstRow?.childCount || 0;
-      const rowCount = node.childCount;
+      const rowCount = tableNode.childCount;
       
       // Create column header row (A, B, C...)
       const colHeader = document.createElement('div');
@@ -43,9 +44,11 @@ export const TableWithSelectors = Table.extend({
         const clickHandler = (e: MouseEvent) => {
           e.preventDefault();
           e.stopPropagation();
-          const pos = getPos();
-          if (typeof pos === 'number') {
-            selectColumn(editor.view, pos, colIndex);
+          if (typeof getPos === 'function') {
+            const pos = getPos();
+            if (typeof pos === 'number') {
+              selectColumn(editor.view, pos, colIndex);
+            }
           }
         };
         colSelector.addEventListener('mousedown', clickHandler);
@@ -76,9 +79,11 @@ export const TableWithSelectors = Table.extend({
         const clickHandler = (e: MouseEvent) => {
           e.preventDefault();
           e.stopPropagation();
-          const pos = getPos();
-          if (typeof pos === 'number') {
-            selectRow(editor.view, pos, rowIndex);
+          if (typeof getPos === 'function') {
+            const pos = getPos();
+            if (typeof pos === 'number') {
+              selectRow(editor.view, pos, rowIndex);
+            }
           }
         };
         rowSelector.addEventListener('mousedown', clickHandler);

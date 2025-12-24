@@ -1,5 +1,5 @@
-import { Plugin, PluginKey } from '@tiptap/pm/state';
-import { Decoration, DecorationSet } from '@tiptap/pm/view';
+import { Plugin, PluginKey } from 'prosemirror-state';
+import { Decoration, DecorationSet } from 'prosemirror-view';
 
 export const tableSelectionPluginKey = new PluginKey('tableSelection');
 
