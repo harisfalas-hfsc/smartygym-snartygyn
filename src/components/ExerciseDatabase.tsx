@@ -338,8 +338,17 @@ const ExerciseDatabase = () => {
         )}
       </div>
 
-      {/* Filters - 5 column grid */}
-      <div className="flex flex-col gap-4">
+      {/* Mobile: Clear button only when there's a search term */}
+      {nameSearch.trim() && (
+        <div className="md:hidden flex justify-end">
+          <Button variant="ghost" size="sm" onClick={clearFilters}>
+            <X className="h-4 w-4 mr-1" /> Clear
+          </Button>
+        </div>
+      )}
+
+      {/* Filters - Hidden on mobile, visible on md+ */}
+      <div className="hidden md:flex flex-col gap-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
           {/* Body Part Filter */}
           <div className="space-y-1">
@@ -467,7 +476,7 @@ const ExerciseDatabase = () => {
           </div>
         </div>
 
-        {/* Search Actions */}
+        {/* Search Actions - Desktop only */}
         <div className="flex gap-2">
           <Button onClick={handleSearch} disabled={loading} className="flex-1 sm:flex-none">
             {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Search className="h-4 w-4 mr-2" />}
