@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
 import { Calendar, CalendarOff, Check, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -112,25 +113,23 @@ export function RitualCalendarSync({ compact = false }: RitualCalendarSyncProps)
     return null;
   }
 
-  // Compact mode: Simple toggle button
+  // Compact mode: Toggle switch with label
   if (compact) {
     return (
-      <Button
-        variant={isSynced ? "outline" : "ghost"}
-        size="sm"
-        onClick={toggleSync}
-        disabled={updating}
-        className="flex items-center gap-2"
-      >
+      <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-card/50 border border-border/50">
+        <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+        <span className="text-sm font-medium">Calendar Sync</span>
         {updating ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : isSynced ? (
-          <Check className="h-4 w-4 text-primary" />
+          <Loader2 className="h-4 w-4 animate-spin ml-auto" />
         ) : (
-          <Calendar className="h-4 w-4" />
+          <Switch
+            checked={isSynced}
+            onCheckedChange={toggleSync}
+            disabled={updating}
+            className="ml-auto"
+          />
         )}
-        Calendar {isSynced ? "On" : "Off"}
-      </Button>
+      </div>
     );
   }
 
