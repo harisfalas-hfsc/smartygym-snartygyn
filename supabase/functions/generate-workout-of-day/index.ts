@@ -35,25 +35,12 @@ function logStep(step: string, details?: any) {
   console.log(`[GENERATE-WOD] ${step}${detailsStr}`);
 }
 
-// Compatibility functions - map old 28-day functions to new 84-day system
-function getDayInCycleFromDate(dateStr: string): number {
-  // For compatibility, return day 1-28 (mapped from day 1-84)
-  const dayIn84 = getDayIn84Cycle(dateStr);
-  return ((dayIn84 - 1) % 28) + 1;
-}
+// ═══════════════════════════════════════════════════════════════════════════════
+// SIMPLIFIED 84-DAY PERIODIZATION - Direct lookup, no compatibility layers
+// ═══════════════════════════════════════════════════════════════════════════════
 
-function getCycleNumberFromDate(dateStr: string): number {
-  const startDate = new Date(CYCLE_START_DATE + 'T00:00:00Z');
-  const targetDate = new Date(dateStr + 'T00:00:00Z');
-  const daysDiff = Math.floor((targetDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000));
-  return Math.floor(daysDiff / 28) + 1;
-}
-
-// Get difficulty info for the day using 84-day cycle
-function getDifficultyForDay(dayInCycle: number, cycleNumber: number): { name: string | null; stars: number | null; range: [number, number] | null } {
-  // Calculate the actual day in 84-day cycle
-  const phase = ((cycleNumber - 1) % 3) + 1;
-  const dayIn84 = (phase - 1) * 28 + dayInCycle;
+// Get difficulty info directly from 84-day periodization
+function getDifficultyForDay(dayIn84: number): { name: string | null; stars: number | null; range: [number, number] | null } {
   const periodization = getPeriodizationForDay(dayIn84);
   
   if (!periodization.difficulty || !periodization.difficultyStars) {
@@ -62,10 +49,7 @@ function getDifficultyForDay(dayInCycle: number, cycleNumber: number): { name: s
   
   const range: [number, number] = [periodization.difficultyStars, periodization.difficultyStars];
   
-  logStep("Difficulty calculation (84-day)", {
-    dayInCycle,
-    cycleNumber,
-    phase,
+  logStep("Difficulty lookup (84-day)", {
     dayIn84,
     category: periodization.category,
     difficulty: periodization.difficulty,
@@ -131,9 +115,10 @@ function checkManualOverride(
 }
 
 // Calculate future WOD schedule for admin preview (28-day fixed cycle)
+// Calculate future WOD schedule using 84-day cycle
 export function calculateFutureWODSchedule(
-  daysAhead: number = 28
-): Array<{ date: string; dayInCycle: number; category: string; difficulty: { name: string | null; stars: number | null }; formats: string[]; isRecoveryDay: boolean }> {
+  daysAhead: number = 84
+): Array<{ date: string; dayIn84: number; category: string; difficulty: { name: string | null; stars: number | null }; formats: string[]; isRecoveryDay: boolean }> {
   const schedule = [];
   
   for (let i = 1; i <= daysAhead; i++) {
@@ -141,19 +126,18 @@ export function calculateFutureWODSchedule(
     futureDate.setDate(futureDate.getDate() + i);
     const futureDateStr = futureDate.toISOString().split('T')[0];
     
-    const futureDayInCycle = getDayInCycleFromDate(futureDateStr);
-    const futureCycleNumber = getCycleNumberFromDate(futureDateStr);
-    const periodization = getPeriodizationForDay(futureDayInCycle);
+    const dayIn84 = getDayIn84Cycle(futureDateStr);
+    const periodization = getPeriodizationForDay(dayIn84);
     const category = periodization.category;
     const isRecoveryDay = category === "RECOVERY";
     
-    // Get difficulty (null for RECOVERY days) - uses 84-day rotation for Strength
-    const difficulty = getDifficultyForDay(futureDayInCycle, futureCycleNumber);
+    // Get difficulty directly from 84-day periodization
+    const difficulty = getDifficultyForDay(dayIn84);
     const formats = FORMATS_BY_CATEGORY[category] || ["CIRCUIT"];
     
     schedule.push({
       date: futureDateStr,
-      dayInCycle: futureDayInCycle,
+      dayIn84,
       category,
       difficulty: { name: difficulty.name, stars: difficulty.stars },
       formats,
@@ -233,10 +217,10 @@ serve(async (req) => {
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
 
     // ═══════════════════════════════════════════════════════════════════════════════
-    // EARLY RECOVERY DAY CHECK: Needed for determining equipment types to generate
+    // EARLY RECOVERY DAY CHECK: Using simplified 84-day cycle
     // ═══════════════════════════════════════════════════════════════════════════════
-    const earlyDayInCycle = getDayInCycleFromDate(effectiveDate);
-    const earlyPeriodization = getPeriodizationForDay(earlyDayInCycle);
+    const dayIn84 = getDayIn84Cycle(effectiveDate);
+    const earlyPeriodization = getPeriodizationForDay(dayIn84);
     const isRecoveryDayEarly = earlyPeriodization.category === "RECOVERY";
     
     // Check what already exists for this date (idempotent + supports retryMissing)
@@ -406,21 +390,19 @@ serve(async (req) => {
 
     // ═══════════════════════════════════════════════════════════════════════════════
     // CALCULATE TODAY'S WOD PARAMETERS (28-DAY FIXED CYCLE - DATE-BASED)
-    // CRITICAL: Categories and difficulties are FIXED per day - no shifts, just repeats
+    // CRITICAL: Categories and difficulties are FIXED per day in 84-day cycle
     // ═══════════════════════════════════════════════════════════════════════════════
     
-    // Use DATE-BASED calculation - this always gives correct category for the calendar day
-    // Note: dayInCycle and periodization were calculated earlier for early recovery check
-    const dayInCycle = earlyDayInCycle;
+    // Use DATE-BASED calculation - dayIn84 was calculated earlier for early recovery check
     const periodization = earlyPeriodization;
     const manualOverrides = state.manual_overrides || {};
     
-    // Check if this is a RECOVERY day (days 10 & 28) - reuse early check
+    // Check if this is a RECOVERY day (days 10, 28, 38, 56, 66, 84) - reuse early check
     const isRecoveryDay = isRecoveryDayEarly;
     
-    logStep("28-Day Fixed Cycle Parameters (DATE-BASED)", { 
+    logStep("84-Day Cycle Parameters", { 
       effectiveDate,
-      dayInCycle,
+      dayIn84,
       expectedCategory: periodization.category,
       expectedDifficulty: periodization.difficulty,
       isRecoveryDay,
@@ -446,25 +428,23 @@ serve(async (req) => {
       selectedDifficulty = forcedParameters.difficulty;
     } else if (override) {
       logStep("USING MANUAL OVERRIDE", override);
-      category = override.category || getCategoryForDay(dayInCycle);
+      category = override.category || getCategoryForDay(dayIn84);
       if (override.difficulty) {
         selectedDifficulty = { 
           name: override.difficulty <= 2 ? "Beginner" : override.difficulty <= 4 ? "Intermediate" : "Advanced",
           stars: override.difficulty 
         };
       } else {
-        const cycleNum = getCycleNumberFromDate(effectiveDate);
-        const diffResult = getDifficultyForDay(dayInCycle, cycleNum);
+        const diffResult = getDifficultyForDay(dayIn84);
         selectedDifficulty = {
           name: diffResult.name || "Beginner",
           stars: diffResult.stars || 1
         };
       }
     } else {
-      // Normal calculation from 28-day fixed periodization + 84-day Strength rotation
-      category = getCategoryForDay(dayInCycle);
-      const cycleNum = getCycleNumberFromDate(effectiveDate);
-      const diffResult = getDifficultyForDay(dayInCycle, cycleNum);
+      // Normal calculation from 84-day periodization
+      category = getCategoryForDay(dayIn84);
+      const diffResult = getDifficultyForDay(dayIn84);
       // Handle RECOVERY days (null difficulty)
       if (isRecoveryDay || !diffResult.name || !diffResult.stars) {
         selectedDifficulty = { name: "Recovery", stars: 0 };
@@ -473,7 +453,8 @@ serve(async (req) => {
       }
     }
     
-    logStep("Today's WOD specs (shared)", { 
+    logStep("Today's WOD specs (84-day cycle)", { 
+      dayIn84,
       category, 
       difficulty: selectedDifficulty,
       isOverride: !!override,
@@ -576,14 +557,13 @@ serve(async (req) => {
     const yesterdayEquipment = yesterdayWod?.equipment || "Unknown";
     const yesterdayFormat = yesterdayWod?.format || "Unknown";
     
-    // Calculate tomorrow's expected specs (28-day fixed cycle + 84-day Strength rotation)
+    // Calculate tomorrow's expected specs (84-day cycle)
     const tomorrow = new Date(effectiveDate + 'T00:00:00Z');
     tomorrow.setDate(tomorrow.getDate() + 1);
     const tomorrowDateStr = tomorrow.toISOString().split('T')[0];
-    const tomorrowDayInCycle = getDayInCycleFromDate(tomorrowDateStr);
-    const tomorrowCycleNumber = getCycleNumberFromDate(tomorrowDateStr);
-    const tomorrowCategory = getCategoryForDay(tomorrowDayInCycle);
-    const tomorrowDiffResult = getDifficultyForDay(tomorrowDayInCycle, tomorrowCycleNumber);
+    const tomorrowDayIn84 = getDayIn84Cycle(tomorrowDateStr);
+    const tomorrowCategory = getCategoryForDay(tomorrowDayIn84);
+    const tomorrowDiffResult = getDifficultyForDay(tomorrowDayIn84);
     const tomorrowDifficulty = { 
       name: tomorrowDiffResult.name || "Recovery", 
       stars: tomorrowDiffResult.stars || 0 
@@ -992,7 +972,9 @@ YOUR WORKOUT SPECIFICATIONS FOR THIS GENERATION:
 • Format: ${format}
 
 ${category === "STRENGTH" ? (() => {
-  const strengthFocus = STRENGTH_DAY_FOCUS[dayInCycle];
+  // Map dayIn84 to dayIn28 position for strength focus lookup (pattern repeats every 28 days)
+  const dayIn28 = ((dayIn84 - 1) % 28) + 1;
+  const strengthFocus = STRENGTH_DAY_FOCUS[dayIn28];
   if (strengthFocus) {
     const focusNamingExamples: Record<string, string[]> = {
       "LOWER BODY": ["Lower Body Iron Foundation", "Leg Day Power Builder", "Lower Body Forge", "Quad & Ham Strength"],
@@ -1006,7 +988,7 @@ ${category === "STRENGTH" ? (() => {
     
     return `
 ═══════════════════════════════════════════════════════════════════════════════
-STRENGTH DAY FOCUS: ${strengthFocus.focus} (Day ${dayInCycle})
+STRENGTH DAY FOCUS: ${strengthFocus.focus} (Day ${dayIn84}/84)
 ═══════════════════════════════════════════════════════════════════════════════
 
 🎯 TARGET MUSCLE GROUPS: ${strengthFocus.muscleGroups.join(", ")}
@@ -1929,18 +1911,18 @@ INSTRUCTIONS FORMAT: Plain paragraphs with clear guidance
       delete newManualOverrides[effectiveDate];
     }
     
-    // Calculate next day's info for state (28-day fixed cycle)
+    // Calculate next day's info for state (84-day cycle)
     const nextDayDate = new Date(effectiveDate + 'T00:00:00Z');
     nextDayDate.setDate(nextDayDate.getDate() + 1);
     const nextDayDateStr = nextDayDate.toISOString().split('T')[0];
-    const nextDayInCycle = getDayInCycleFromDate(nextDayDateStr);
+    const nextDayIn84 = getDayIn84Cycle(nextDayDateStr);
     
     const newState = {
       day_count: state.day_count + 1, // Legacy counter for stats
-      week_number: Math.ceil(dayInCycle / 7), // Legacy - approximate week in cycle
+      week_number: Math.ceil(dayIn84 / 7), // Approximate week in cycle
       used_stars_in_week: {}, // No longer used - stars are fixed per day
       manual_overrides: newManualOverrides,
-      current_category: getCategoryForDay(nextDayInCycle),
+      current_category: getCategoryForDay(nextDayIn84),
       last_equipment: "BOTH",
       last_difficulty: selectedDifficulty.name,
       format_usage: updatedUsage,
@@ -1970,9 +1952,9 @@ INSTRUCTIONS FORMAT: Plain paragraphs with clear guidance
         } else {
           logStep("State updated BEFORE notifications", { 
             newDayCount: newState.day_count,
-            nextDayInCycle,
+            nextDayIn84,
             nextCategory: newState.current_category,
-            cycleDay: dayInCycle
+            dayIn84
           });
         }
       } else {
@@ -1998,12 +1980,12 @@ INSTRUCTIONS FORMAT: Plain paragraphs with clear guidance
         workouts: generatedWorkouts,
         shared: {
           category: category,
-          dayInCycle: dayInCycle,
-          cycleNumber: Math.floor((dayInCycle - 1) / 28) + 1,
+          dayIn84: dayIn84,
+          phase: Math.floor((dayIn84 - 1) / 28) + 1, // 1, 2, or 3
           difficulty: selectedDifficulty.name,
           difficulty_stars: selectedDifficulty.stars,
           isRecoveryDay,
-          note: "28-day fixed periodization - Format and duration vary per equipment type (except STRENGTH, MOBILITY & STABILITY, and PILATES which are always REPS & SETS)"
+          note: "84-day periodization cycle - Format and duration vary per equipment type (except STRENGTH, MOBILITY & STABILITY, and PILATES which are always REPS & SETS)"
         }
       }),
       {
