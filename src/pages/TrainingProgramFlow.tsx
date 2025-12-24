@@ -330,27 +330,13 @@ const TrainingProgramFlow = () => {
                           <h3 className={`font-semibold text-lg mb-2 ${hasBackground ? 'text-white' : ''}`} itemProp="name">
                             {program.title}
                           </h3>
-                          <p className={`text-sm mb-3 ${hasBackground ? 'text-white/90' : 'text-muted-foreground'}`} itemProp="description">
-                            {program.description}
-                          </p>
-                          <p className={`text-xs italic mb-3 ${hasBackground ? 'text-white/80' : 'text-muted-foreground/80'}`}>
+                          <p className={`text-xs italic ${hasBackground ? 'text-white/80' : 'text-muted-foreground/80'}`}>
                             Crafted by{" "}
                             <a href="/coach-profile" className="text-primary hover:underline font-medium whitespace-nowrap" onClick={e => e.stopPropagation()}>
                               Haris Falas
                             </a>
                             {" "}BSc Sports Science, EXOS Specialist, CSCS
                           </p>
-                          <div className="flex gap-1 text-[10px] mt-2">
-                            <span className="bg-primary/20 text-primary border border-primary/40 px-1.5 py-0.5 rounded-full whitespace-nowrap">
-                              4-8 weeks
-                            </span>
-                            <span className="bg-green-500/20 text-green-700 dark:text-green-400 border border-green-500/40 px-1.5 py-0.5 rounded-full whitespace-nowrap">
-                              {program.level}
-                            </span>
-                            <span className="bg-orange-500/20 text-orange-700 dark:text-orange-400 border border-orange-500/40 px-1.5 py-0.5 rounded-full whitespace-nowrap">
-                              {program.equipment}
-                            </span>
-                          </div>
                         </div>
                       </div>
                     </Card>
