@@ -136,18 +136,26 @@ const Tools = () => {
             className="w-full"
           >
             <CarouselContent className="-ml-2">
-              {tools.map((tool) => (
-                <CarouselItem key={tool.id} className="pl-2 basis-[85%]">
-                  <Card
-                    onClick={() => navigate(tool.route)}
-                    className="group p-6 cursor-pointer transition-all duration-300 hover:border-primary/60 bg-card border-2 border-border"
-                  >
-                    <h3 className="font-semibold text-lg text-center whitespace-nowrap">
-                      {tool.title}
-                    </h3>
-                  </Card>
-                </CarouselItem>
-              ))}
+              {tools.map((tool) => {
+                const Icon = tool.icon;
+                return (
+                  <CarouselItem key={tool.id} className="pl-2 basis-[85%]">
+                    <Card
+                      onClick={() => navigate(tool.route)}
+                      className="group p-6 cursor-pointer transition-all duration-300 hover:border-primary/60 bg-card border-2 border-border"
+                    >
+                      <div className="flex flex-col items-center gap-3">
+                        <div className="p-3 rounded-xl bg-primary/10 text-primary">
+                          <Icon className="w-8 h-8" />
+                        </div>
+                        <h3 className="font-semibold text-lg text-center whitespace-nowrap">
+                          {tool.title}
+                        </h3>
+                      </div>
+                    </Card>
+                  </CarouselItem>
+                );
+              })}
             </CarouselContent>
             <CarouselPrevious className="left-2 h-8 w-8 bg-background/80 border-primary/20" />
             <CarouselNext className="right-2 h-8 w-8 bg-background/80 border-primary/20" />
