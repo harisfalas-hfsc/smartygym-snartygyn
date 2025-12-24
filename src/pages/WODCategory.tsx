@@ -135,8 +135,8 @@ const WODCategory = () => {
             {wod.name}
           </h3>
 
-          {/* Description */}
-          {wod.description && <p className="text-muted-foreground text-sm mb-2 line-clamp-2">
+          {/* Description - Fixed 2-line height for carousel alignment */}
+          {wod.description && <p className="text-muted-foreground text-sm mb-2 line-clamp-2 min-h-[2.5rem]">
               {stripHtml(wod.description).substring(0, 120)}...
             </p>}
 
