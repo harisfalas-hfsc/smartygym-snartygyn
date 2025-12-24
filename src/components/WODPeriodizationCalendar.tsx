@@ -120,9 +120,20 @@ const WODPeriodizationCalendar = () => {
         </div>
 
         {/* Mobile: Carousel */}
-        <div className="md:hidden">
+        <div className="md:hidden relative">
+          {/* Left Arrow - visible when not on Yesterday */}
+          {currentSlide > 0 && (
+            <button 
+              onClick={() => carouselApi?.scrollTo(currentSlide - 1)}
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 p-1 text-muted-foreground hover:text-primary transition-colors"
+              aria-label="Previous day"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+          )}
+
           <Carousel
-            className="w-full"
+            className="w-full px-6"
             opts={{
               align: "center",
               loop: false,
@@ -138,6 +149,17 @@ const WODPeriodizationCalendar = () => {
               ))}
             </CarouselContent>
           </Carousel>
+
+          {/* Right Arrow - visible when not on Tomorrow */}
+          {currentSlide < 2 && (
+            <button 
+              onClick={() => carouselApi?.scrollTo(currentSlide + 1)}
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 p-1 text-muted-foreground hover:text-primary transition-colors"
+              aria-label="Next day"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
+          )}
 
           {/* Navigation Dots */}
           <div className="flex justify-center gap-2 mt-3">
@@ -157,8 +179,8 @@ const WODPeriodizationCalendar = () => {
           </div>
         </div>
 
-        {/* Legend */}
-        <div className="flex flex-wrap items-center justify-center gap-1.5 mt-2 text-[9px]">
+        {/* Legend - Desktop only */}
+        <div className="hidden md:flex flex-wrap items-center justify-center gap-1.5 mt-2 text-[9px]">
           <div className="flex items-center gap-0.5">
             <div className="w-1.5 h-1.5 rounded-full bg-yellow-500" />
             <span className="text-muted-foreground">Beginner</span>
