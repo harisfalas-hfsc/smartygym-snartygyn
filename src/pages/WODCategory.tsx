@@ -319,7 +319,7 @@ const WODCategory = () => {
                       Today's Workouts are Being Prepared
                     </h2>
                     <p className="text-muted-foreground">
-                      Check back at <span className="text-primary font-semibold">midnight (00:00)</span> for your fresh Workouts of the Day!
+                      Check back <span className="text-primary font-semibold">soon</span> for your fresh Workouts of the Day!
                     </p>
                   </CardContent>
                 </Card>
