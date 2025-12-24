@@ -206,7 +206,7 @@ export const WorkoutOfTheDay = () => {
               No Workouts of the Day available yet.
             </p>
             <p className="text-sm text-muted-foreground/70">
-              Check back at <span className="text-primary font-semibold">midnight (00:00)</span> for today's fresh workouts!
+              Check back <span className="text-primary font-semibold">soon</span> for today's fresh workouts!
             </p>
           </div>
         )}
