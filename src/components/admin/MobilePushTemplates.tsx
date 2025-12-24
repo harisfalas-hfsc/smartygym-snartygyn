@@ -112,7 +112,7 @@ export const MobilePushTemplates = () => {
 
   const getFullUrl = (link: string) => {
     // Use your production URL
-    return `https://smarty-gym.lovable.app${link}`;
+    return `https://smartygym.com${link}`;
   };
 
   const CopyButton = ({ text, fieldId }: { text: string; fieldId: string }) => (
