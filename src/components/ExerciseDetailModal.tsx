@@ -63,7 +63,7 @@ const ExerciseDetailModal = ({ exercise, open, onOpenChange }: ExerciseDetailMod
           <div className="space-y-6">
             {/* Exercise GIF */}
             {exercise.gif_url ? (
-              <div className="w-full aspect-video rounded-lg overflow-hidden bg-muted flex items-center justify-center">
+              <div className="w-full aspect-square rounded-lg overflow-hidden bg-white border-2 border-border flex items-center justify-center">
                 <img
                   src={exercise.gif_url}
                   alt={`${exercise.name} exercise GIF`}
@@ -73,7 +73,7 @@ const ExerciseDetailModal = ({ exercise, open, onOpenChange }: ExerciseDetailMod
                 />
               </div>
             ) : (
-              <div className="w-full aspect-video rounded-lg overflow-hidden bg-muted flex items-center justify-center">
+              <div className="w-full aspect-square rounded-lg overflow-hidden bg-white border-2 border-border flex items-center justify-center">
                 <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground">
                   <ImageOff className="h-6 w-6" />
                   <p className="text-sm">GIF not available yet</p>
