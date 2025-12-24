@@ -225,8 +225,19 @@ const WODCategory = () => {
               <Card className="mb-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-primary">
                 <div className="p-4 sm:p-6">
                   <h1 className="text-xl sm:text-2xl font-bold mb-3 text-center">About Workout of the Day</h1>
-                  <p className="text-sm sm:text-base text-center text-muted-foreground max-w-3xl mx-auto">
+                  {/* Desktop description */}
+                  <p className="hidden sm:block text-base text-center text-muted-foreground max-w-3xl mx-auto">
                     Every day <span className="text-primary font-semibold">SmartyGym</span> delivers TWO fresh, expertly designed workouts following a strategic periodization cycle — one with equipment and one without. Each day focuses on a different category - type and difficulty level. Our workouts follow a science-based periodization approach designed by{" "}
+                    <a href="/coach-profile" className="text-primary hover:underline font-semibold">
+                      Coach Haris Falas
+                    </a>
+                    , ensuring that within each weekly cycle, you train all fitness parameters. Unlike random workouts you find on YouTube or Instagram, following{" "}
+                    <span className="text-primary font-semibold">SmartyGym</span>'s structured program means you can rest assured that your training is reliable, professionally organized, and designed to systematically improve all aspects of your fitness.
+                  </p>
+                  
+                  {/* Mobile description - shorter version */}
+                  <p className="block sm:hidden text-sm text-center text-muted-foreground max-w-3xl mx-auto">
+                    Our WOD's follow a science-based periodization approach designed by{" "}
                     <a href="/coach-profile" className="text-primary hover:underline font-semibold">
                       Coach Haris Falas
                     </a>
