@@ -12,9 +12,24 @@ import { useWorkoutInteractions } from "@/hooks/useWorkoutInteractions";
 import { supabase } from "@/integrations/supabase/client";
 import WODPeriodizationCalendar from "@/components/WODPeriodizationCalendar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
 
 const WODCategory = () => {
   const navigate = useNavigate();
+  const [wodCarouselApi, setWodCarouselApi] = useState<CarouselApi>();
+  const [wodCurrentSlide, setWodCurrentSlide] = useState(0);
+
+  // Track WOD carousel slide changes
+  useEffect(() => {
+    if (!wodCarouselApi) return;
+    
+    const onSelect = () => {
+      setWodCurrentSlide(wodCarouselApi.selectedScrollSnap());
+    };
+    
+    wodCarouselApi.on('select', onSelect);
+    return () => { wodCarouselApi.off('select', onSelect); };
+  }, [wodCarouselApi]);
   const [userId, setUserId] = useState<string | undefined>();
 
   // Fetch current user
@@ -250,12 +265,54 @@ const WODCategory = () => {
               {/* Periodization Calendar - Pure Calendar-Based */}
               <WODPeriodizationCalendar />
 
-              {/* Two WOD Cards Side by Side */}
-              {bodyweightWOD || equipmentWOD ? <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {renderWODCard(bodyweightWOD, true)}
-                  {renderWODCard(equipmentWOD, false)}
-                </div> : (/* No WOD Available */
-          <Card className="border-2 border-dashed border-primary/30">
+              {/* Two WOD Cards */}
+              {bodyweightWOD || equipmentWOD ? (
+                <>
+                  {/* Mobile Carousel */}
+                  <div className="md:hidden">
+                    <Carousel 
+                      setApi={setWodCarouselApi}
+                      opts={{ align: "center", loop: true, startIndex: 0 }}
+                      className="w-full"
+                    >
+                      <CarouselContent className="-ml-2">
+                        {bodyweightWOD && (
+                          <CarouselItem className="pl-2 basis-[85%]">
+                            {renderWODCard(bodyweightWOD, true)}
+                          </CarouselItem>
+                        )}
+                        {equipmentWOD && (
+                          <CarouselItem className="pl-2 basis-[85%]">
+                            {renderWODCard(equipmentWOD, false)}
+                          </CarouselItem>
+                        )}
+                      </CarouselContent>
+                      <CarouselPrevious className="left-2 h-8 w-8 bg-background/80 backdrop-blur-sm border-primary/20 hover:bg-primary hover:text-primary-foreground" />
+                      <CarouselNext className="right-2 h-8 w-8 bg-background/80 backdrop-blur-sm border-primary/20 hover:bg-primary hover:text-primary-foreground" />
+                    </Carousel>
+                    {/* Navigation dots */}
+                    <div className="flex justify-center gap-2 mt-4">
+                      {[bodyweightWOD, equipmentWOD].filter(Boolean).map((_, index) => (
+                        <button
+                          key={index}
+                          onClick={() => wodCarouselApi?.scrollTo(index)}
+                          className={`w-2 h-2 rounded-full transition-colors ${
+                            wodCurrentSlide === index ? 'bg-primary' : 'bg-muted-foreground/30'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Desktop Grid (unchanged) */}
+                  <div className="hidden md:grid md:grid-cols-2 gap-6">
+                    {renderWODCard(bodyweightWOD, true)}
+                    {renderWODCard(equipmentWOD, false)}
+                  </div>
+                </>
+              ) : (
+                /* No WOD Available */
+                <Card className="border-2 border-dashed border-primary/30">
                   <CardContent className="p-12 text-center">
                     <Clock className="w-16 h-16 text-primary/50 mx-auto mb-4" />
                     <h2 className="text-2xl font-bold text-foreground mb-2">
@@ -265,7 +322,8 @@ const WODCategory = () => {
                       Check back at <span className="text-primary font-semibold">midnight (00:00)</span> for your fresh Workouts of the Day!
                     </p>
                   </CardContent>
-                </Card>)}
+                </Card>
+              )}
 
               {/* The Science Behind Your Daily Workout */}
               <Card className="mt-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40">
