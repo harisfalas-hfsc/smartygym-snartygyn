@@ -321,68 +321,10 @@ serve(async (req) => {
 
     logStep("Current state", state);
 
-    // Move ONLY previous WODs to their categories (exclude today's WODs)
-    // This prevents race condition where today's WODs get moved before new generation
-    const { data: previousWODs } = await supabase
-      .from("admin_workouts")
-      .select("*")
-      .eq("is_workout_of_day", true)
-      .neq("generated_for_date", effectiveDate); // Exclude WODs for today/target date
-
-    if (previousWODs && previousWODs.length > 0) {
-      for (const previousWOD of previousWODs) {
-        logStep("Moving previous WOD to category", { id: previousWOD.id, category: previousWOD.category, generated_for_date: previousWOD.generated_for_date });
-        
-        // Use persistent counter from system_settings
-        const { data: counterSettings, error: counterError } = await supabase
-          .from("system_settings")
-          .select("setting_value")
-          .eq("setting_key", "serial_number_counters")
-          .single();
-        
-        let nextSerialNumber = 1;
-        
-        if (!counterError && counterSettings) {
-          const counters = counterSettings.setting_value as { workouts?: Record<string, number>, programs?: Record<string, number> } || { workouts: {} };
-          nextSerialNumber = counters.workouts?.[previousWOD.category] || 1;
-          
-          // Increment counter for next use
-          counters.workouts = counters.workouts || {};
-          counters.workouts[previousWOD.category] = nextSerialNumber + 1;
-          
-          await supabase
-            .from("system_settings")
-            .update({ setting_value: counters, updated_at: new Date().toISOString() })
-            .eq("setting_key", "serial_number_counters");
-          
-          logStep("Counter incremented for category", { 
-            category: previousWOD.category, 
-            nextSerial: nextSerialNumber + 1 
-          });
-        } else {
-          // Fallback to old logic if counter not found
-          const { data: existingWorkouts } = await supabase
-            .from("admin_workouts")
-            .select("serial_number")
-            .eq("category", previousWOD.category)
-            .eq("is_workout_of_day", false)
-            .order("serial_number", { ascending: false })
-            .limit(1);
-
-          nextSerialNumber = (existingWorkouts?.[0]?.serial_number || 0) + 1;
-        }
-
-        await supabase
-          .from("admin_workouts")
-          .update({ 
-            is_workout_of_day: false,
-            serial_number: nextSerialNumber
-          })
-          .eq("id", previousWOD.id);
-
-        logStep("Previous WOD moved", { id: previousWOD.id, serialNumber: nextSerialNumber });
-      }
-    }
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // NOTE: Archiving now happens in separate archive-old-wods function at 00:00 UTC
+    // This generator runs at 00:30 UTC and only creates new WODs
+    // ═══════════════════════════════════════════════════════════════════════════════
 
     // ═══════════════════════════════════════════════════════════════════════════════
     // CALCULATE TODAY'S WOD PARAMETERS (28-DAY FIXED CYCLE - DATE-BASED)
