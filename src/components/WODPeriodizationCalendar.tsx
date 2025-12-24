@@ -1,9 +1,12 @@
 import { format, subDays, addDays } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getWODInfoForDate, getDifficultyBadgeClass, getDifficultyBorderClass } from "@/lib/wodCycle";
+import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
+import { cn } from "@/lib/utils";
 
 const TIMEZONE = "Europe/Athens";
 
@@ -14,6 +17,8 @@ const TIMEZONE = "Europe/Athens";
  */
 const WODPeriodizationCalendar = () => {
   const now = new Date();
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
+  const [currentSlide, setCurrentSlide] = useState(1); // Start on Today (index 1)
   
   // Get today's date in Cyprus timezone (Europe/Athens)
   const todayStr = formatInTimeZone(now, TIMEZONE, "yyyy-MM-dd");
@@ -27,6 +32,23 @@ const WODPeriodizationCalendar = () => {
   const yesterdayInfo = getWODInfoForDate(yesterdayStr);
   const todayInfo = getWODInfoForDate(todayStr);
   const tomorrowInfo = getWODInfoForDate(tomorrowStr);
+
+  // Carousel state management - start on Today
+  useEffect(() => {
+    if (!carouselApi) return;
+    
+    // Start on Today (index 1)
+    carouselApi.scrollTo(1, false);
+    
+    const onSelect = () => {
+      setCurrentSlide(carouselApi.selectedScrollSnap());
+    };
+    
+    carouselApi.on("select", onSelect);
+    return () => {
+      carouselApi.off("select", onSelect);
+    };
+  }, [carouselApi]);
 
   const renderDayCell = (
     label: string,
@@ -81,14 +103,58 @@ const WODPeriodizationCalendar = () => {
     );
   };
 
+  const days = [
+    { label: "Yesterday", dateStr: yesterdayStr, info: yesterdayInfo, isToday: false },
+    { label: "Today", dateStr: todayStr, info: todayInfo, isToday: true },
+    { label: "Tomorrow", dateStr: tomorrowStr, info: tomorrowInfo, isToday: false },
+  ];
+
   return (
     <Card className="mb-4 border-border/50 bg-gradient-to-r from-muted/20 via-background to-muted/20">
       <CardContent className="p-2 sm:p-3">
-        {/* 3-Column Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-1.5 sm:gap-2">
+        {/* Desktop/Tablet: 3-Column Grid */}
+        <div className="hidden md:grid grid-cols-3 gap-1.5 sm:gap-2">
           {renderDayCell("Yesterday", yesterdayStr, yesterdayInfo)}
           {renderDayCell("Today", todayStr, todayInfo, true)}
           {renderDayCell("Tomorrow", tomorrowStr, tomorrowInfo)}
+        </div>
+
+        {/* Mobile: Carousel */}
+        <div className="md:hidden">
+          <Carousel
+            className="w-full"
+            opts={{
+              align: "center",
+              loop: false,
+              startIndex: 1,
+            }}
+            setApi={setCarouselApi}
+          >
+            <CarouselContent className="-ml-2">
+              {days.map((day, index) => (
+                <CarouselItem key={index} className="pl-2 basis-full">
+                  {renderDayCell(day.label, day.dateStr, day.info, day.isToday)}
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </Carousel>
+
+          {/* Navigation Dots */}
+          <div className="flex justify-center gap-2 mt-3">
+            {days.map((day, index) => (
+              <button
+                key={index}
+                onClick={() => carouselApi?.scrollTo(index)}
+                className={cn(
+                  "w-2.5 h-2.5 rounded-full border-2 transition-all duration-300",
+                  currentSlide === index
+                    ? "border-primary bg-transparent scale-125"
+                    : "border-primary/40 bg-transparent hover:border-primary/60"
+                )}
+                aria-label={`Go to ${day.label}`}
+              />
+            ))}
+          </div>
         </div>
 
         {/* Legend */}
