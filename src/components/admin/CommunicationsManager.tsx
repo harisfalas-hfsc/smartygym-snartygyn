@@ -7,7 +7,8 @@ import { TestMessageSender } from "./TestMessageSender";
 import { UnifiedAnnouncementSender } from "./UnifiedAnnouncementSender";
 import { AutomationRulesManager } from "./AutomationRulesManager";
 import { MessagingMonitoringDashboard } from "./MessagingMonitoringDashboard";
-import { MessageSquare, Calendar, Bell, Send, Megaphone, Settings, BarChart3 } from "lucide-react";
+import { MobileAppPushManager } from "./MobileAppPushManager";
+import { MessageSquare, Calendar, Bell, Send, Megaphone, Settings, BarChart3, Smartphone } from "lucide-react";
 
 export const CommunicationsManager = () => {
   return (
@@ -24,11 +25,16 @@ export const CommunicationsManager = () => {
       <CardContent>
         <Tabs defaultValue="monitoring" className="w-full">
           <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent pb-2">
-            <TabsList className="inline-flex w-auto min-w-full lg:grid lg:w-full lg:grid-cols-7 gap-1">
+            <TabsList className="inline-flex w-auto min-w-full lg:grid lg:w-full lg:grid-cols-8 gap-1">
               <TabsTrigger value="monitoring" className="flex items-center gap-1 lg:gap-2 whitespace-nowrap text-xs lg:text-sm px-2 lg:px-3">
                 <BarChart3 className="w-3 h-3 lg:w-4 lg:h-4 flex-shrink-0" />
                 <span className="hidden lg:inline">Monitoring</span>
                 <span className="lg:hidden">Monitor</span>
+              </TabsTrigger>
+              <TabsTrigger value="mobile-push" className="flex items-center gap-1 lg:gap-2 whitespace-nowrap text-xs lg:text-sm px-2 lg:px-3">
+                <Smartphone className="w-3 h-3 lg:w-4 lg:h-4 flex-shrink-0" />
+                <span className="hidden lg:inline">Mobile App Push</span>
+                <span className="lg:hidden">Mobile</span>
               </TabsTrigger>
               <TabsTrigger value="automation-rules" className="flex items-center gap-1 lg:gap-2 whitespace-nowrap text-xs lg:text-sm px-2 lg:px-3">
                 <Settings className="w-3 h-3 lg:w-4 lg:h-4 flex-shrink-0" />
@@ -65,6 +71,10 @@ export const CommunicationsManager = () => {
           
           <TabsContent value="monitoring">
             <MessagingMonitoringDashboard />
+          </TabsContent>
+
+          <TabsContent value="mobile-push">
+            <MobileAppPushManager />
           </TabsContent>
           
           <TabsContent value="automation-rules">
