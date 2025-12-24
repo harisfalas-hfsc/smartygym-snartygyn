@@ -70,13 +70,21 @@ const SCHEDULED_JOBS: Record<string, ScheduledJob> = {
     messageTypes: ['new_workout', 'new_program', 'new_article'],
     description: 'Sends notifications when new content is published'
   },
+  'wod_archiving': {
+    name: 'WOD Archiving',
+    cronHourUTC: 0, // 00:00 UTC → 02:00 Cyprus winter, 03:00 summer
+    cronMinuteUTC: 0,
+    frequency: 'daily',
+    messageTypes: [], // Doesn't send messages, archives previous WODs
+    description: 'Archives previous WODs at midnight UTC (00:00 UTC)'
+  },
   'wod_generation': {
     name: 'Workout of Day Generation',
     cronHourUTC: 0, // 00:30 UTC → 02:30 Cyprus winter, 03:30 summer
     cronMinuteUTC: 30,
     frequency: 'daily',
     messageTypes: [], // Doesn't send messages, generates content
-    description: 'Generates the daily workout variations (with retry at 01:00 UTC)'
+    description: 'Generates new daily workout variations (00:30 UTC, 30 min after archiving)'
   },
   'ritual_generation': {
     name: 'Daily Ritual Generation',
@@ -429,6 +437,12 @@ const handler = async (req: Request): Promise<Response> => {
     // ============================================
     console.log("🏋️ Checking WOD system...");
 
+    // Check if we're in the WOD preparation gap (00:00-00:30 UTC)
+    // During this window, WODs are being archived (00:00) and new ones generated (00:30)
+    const currentHourUTC = now.getUTCHours();
+    const currentMinuteUTC = now.getUTCMinutes();
+    const isInWodPreparationGap = currentHourUTC === 0 && currentMinuteUTC < 30;
+
     const {
       data: todayWods,
       count: todayWodCount,
@@ -446,15 +460,37 @@ const handler = async (req: Request): Promise<Response> => {
       new Set((todayWods ?? []).map((w) => w.generated_for_date).filter(Boolean))
     );
 
-    addCheck(
-      'WOD System',
-      'Active WODs Exist',
-      `${todayWodCount || 0} active WODs (today: ${today})`,
-      todayWodCount === 2 ? 'pass' : todayWodCount === 0 ? 'fail' : 'warning',
-      todayWodCount === 2
-        ? `Both variants exist. generated_for_date: ${activeWodDates.join(', ') || 'n/a'}`
-        : `Expected 2 active WODs, found ${todayWodCount || 0}. generated_for_date: ${activeWodDates.join(', ') || 'n/a'}`
-    );
+    // Handle WOD preparation gap period (00:00-00:30 UTC)
+    if (isInWodPreparationGap) {
+      addCheck(
+        'WOD System',
+        'WOD Preparation Gap',
+        `Currently in WOD preparation window (00:00-00:30 UTC)`,
+        'pass',
+        `Archiving completed at 00:00, generation in progress at 00:30. Current: ${currentHourUTC}:${currentMinuteUTC.toString().padStart(2, '0')} UTC`
+      );
+      
+      // During gap, 0 WODs is expected
+      addCheck(
+        'WOD System',
+        'Active WODs Exist',
+        `${todayWodCount || 0} active WODs (gap period - expected)`,
+        todayWodCount === 0 ? 'pass' : 'pass',
+        todayWodCount === 0 
+          ? 'No active WODs during preparation gap (expected behavior)'
+          : `${todayWodCount} WOD(s) still active during gap`
+      );
+    } else {
+      addCheck(
+        'WOD System',
+        'Active WODs Exist',
+        `${todayWodCount || 0} active WODs (today: ${today})`,
+        todayWodCount === 2 ? 'pass' : todayWodCount === 0 ? 'fail' : 'warning',
+        todayWodCount === 2
+          ? `Both variants exist. generated_for_date: ${activeWodDates.join(', ') || 'n/a'}`
+          : `Expected 2 active WODs, found ${todayWodCount || 0}. generated_for_date: ${activeWodDates.join(', ') || 'n/a'}`
+      );
+    }
 
     // Check WODs have unique images
     if (todayWods && todayWods.length === 2) {
