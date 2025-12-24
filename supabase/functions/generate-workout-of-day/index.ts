@@ -16,193 +16,32 @@ const corsHeaders = {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// FIXED 28-DAY PERIODIZATION SYSTEM - NO SHIFTS, JUST REPEATS
+// SIMPLIFIED 84-DAY PERIODIZATION CYCLE
+// Single cycle from Day 1 to Day 84, then restarts. Each day has fixed category & difficulty.
 // ═══════════════════════════════════════════════════════════════════════════════
-const PERIODIZATION_28DAY: Array<{
-  day: number;
-  category: string;
-  difficulty: "Beginner" | "Intermediate" | "Advanced" | null;
-  difficultyStars: [number, number] | null;
-}> = [
-  { day: 1,  category: "CARDIO",              difficulty: "Beginner",     difficultyStars: [1, 2] },
-  { day: 2,  category: "STRENGTH",            difficulty: "Advanced",     difficultyStars: [5, 6] },
-  { day: 3,  category: "MOBILITY & STABILITY", difficulty: "Intermediate", difficultyStars: [3, 4] },
-  { day: 4,  category: "CHALLENGE",           difficulty: "Advanced",     difficultyStars: [5, 6] },
-  { day: 5,  category: "STRENGTH",            difficulty: "Intermediate", difficultyStars: [3, 4] },
-  { day: 6,  category: "PILATES",             difficulty: "Advanced",     difficultyStars: [5, 6] },
-  { day: 7,  category: "CALORIE BURNING",     difficulty: "Intermediate", difficultyStars: [3, 4] },
-  { day: 8,  category: "METABOLIC",           difficulty: "Beginner",     difficultyStars: [1, 2] },
-  { day: 9,  category: "CHALLENGE",           difficulty: "Advanced",     difficultyStars: [5, 6] },
-  { day: 10, category: "RECOVERY",            difficulty: null,           difficultyStars: null },
-  { day: 11, category: "CARDIO",              difficulty: "Intermediate", difficultyStars: [3, 4] },
-  { day: 12, category: "STRENGTH",            difficulty: "Intermediate", difficultyStars: [3, 4] },
-  { day: 13, category: "MOBILITY & STABILITY", difficulty: "Advanced",     difficultyStars: [5, 6] },
-  { day: 14, category: "CHALLENGE",           difficulty: "Intermediate", difficultyStars: [3, 4] },
-  { day: 15, category: "STRENGTH",            difficulty: "Intermediate", difficultyStars: [3, 4] },
-  { day: 16, category: "PILATES",             difficulty: "Beginner",     difficultyStars: [1, 2] },
-  { day: 17, category: "CALORIE BURNING",     difficulty: "Advanced",     difficultyStars: [5, 6] },
-  { day: 18, category: "METABOLIC",           difficulty: "Intermediate", difficultyStars: [3, 4] },
-  { day: 19, category: "CARDIO",              difficulty: "Advanced",     difficultyStars: [5, 6] },
-  { day: 20, category: "STRENGTH",            difficulty: "Beginner",     difficultyStars: [1, 2] },
-  { day: 21, category: "MOBILITY & STABILITY", difficulty: "Beginner",     difficultyStars: [1, 2] },
-  { day: 22, category: "CHALLENGE",           difficulty: "Intermediate", difficultyStars: [3, 4] },
-  { day: 23, category: "STRENGTH",            difficulty: "Advanced",     difficultyStars: [5, 6] },
-  { day: 24, category: "PILATES",             difficulty: "Intermediate", difficultyStars: [3, 4] },
-  { day: 25, category: "CALORIE BURNING",     difficulty: "Beginner",     difficultyStars: [1, 2] },
-  { day: 26, category: "METABOLIC",           difficulty: "Advanced",     difficultyStars: [5, 6] },
-  { day: 27, category: "CHALLENGE",           difficulty: "Intermediate", difficultyStars: [3, 4] },
-  { day: 28, category: "RECOVERY",            difficulty: null,           difficultyStars: null },
-];
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// STRENGTH CATEGORY FOCUS BY CYCLE DAY
-// Each strength day has a specific muscle group/movement pattern focus
-// ═══════════════════════════════════════════════════════════════════════════════
-const STRENGTH_DAY_FOCUS: Record<number, {
-  focus: string;
-  description: string;
-  muscleGroups: string[];
-  movementPatterns: string[];
-  forbiddenPatterns: string[];
-}> = {
-  2: {
-    focus: "LOWER BODY",
-    description: "Quads, hamstrings, calves, glutes, adductors, abductors",
-    muscleGroups: ["quads", "hamstrings", "calves", "glutes", "adductors", "abductors"],
-    movementPatterns: ["squats", "lunges", "leg press", "hip thrusts", "leg curls", "leg extensions", "calf raises", "step-ups", "Bulgarian splits"],
-    forbiddenPatterns: ["chest press", "bench press", "shoulder press", "rows", "pull-ups", "bicep curls", "tricep extensions", "any upper body exercise"]
-  },
-  5: {
-    focus: "UPPER BODY",
-    description: "Chest, back, shoulders, biceps, triceps",
-    muscleGroups: ["chest", "back", "shoulders", "biceps", "triceps"],
-    movementPatterns: ["pressing", "pulling", "curls", "extensions", "rows", "flys", "pulldowns", "push-ups", "dips"],
-    forbiddenPatterns: ["squats", "lunges", "leg press", "deadlifts", "hip thrusts", "leg curls", "calf raises", "any lower body exercise"]
-  },
-  12: {
-    focus: "FULL BODY",
-    description: "Upper + Lower + Core combination - balanced across all muscle groups",
-    muscleGroups: ["full body", "compound movements"],
-    movementPatterns: ["upper push", "upper pull", "lower push", "lower pull", "core stability"],
-    forbiddenPatterns: []
-  },
-  15: {
-    focus: "LOW PUSH & UPPER PULL",
-    description: "Lower body pushing patterns + Upper body pulling patterns",
-    muscleGroups: ["quads", "glutes", "back", "biceps", "rear delts"],
-    movementPatterns: ["squats", "lunges", "leg press", "step-ups", "hip thrusts", "rows", "pull-ups", "pulldowns", "curls", "face pulls"],
-    forbiddenPatterns: ["deadlifts", "RDLs", "leg curls", "bench press", "shoulder press", "push-ups", "tricep work", "chest exercises"]
-  },
-  20: {
-    focus: "LOW PULL & UPPER PUSH",
-    description: "Lower body pulling patterns + Upper body pushing patterns",
-    muscleGroups: ["hamstrings", "glutes", "chest", "shoulders", "triceps"],
-    movementPatterns: ["deadlifts", "RDLs", "leg curls", "hip hinges", "glute-ham raises", "bench press", "shoulder press", "push-ups", "tricep work", "dips", "flys"],
-    forbiddenPatterns: ["squats", "lunges", "leg press", "step-ups", "rows", "pull-ups", "bicep curls", "back exercises"]
-  },
-  23: {
-    focus: "CORE & GLUTES",
-    description: "Core stability + Glute-focused exercises",
-    muscleGroups: ["core", "glutes", "hip stabilizers"],
-    movementPatterns: ["anti-rotation", "planks", "dead bugs", "pallof press", "bird dogs", "hip thrusts", "glute bridges", "banded work", "kickbacks", "clamshells"],
-    forbiddenPatterns: ["squats", "bench press", "rows", "shoulder press", "any compound lift", "arm isolation"]
-  }
-};
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// FORMAT RULES BY CATEGORY (STRICT)
-// ═══════════════════════════════════════════════════════════════════════════════
-const FORMATS_BY_CATEGORY: Record<string, string[]> = {
-  "STRENGTH": ["REPS & SETS"], // ONLY Reps & Sets
-  "MOBILITY & STABILITY": ["REPS & SETS"], // ONLY Reps & Sets
-  "PILATES": ["REPS & SETS"], // ONLY Reps & Sets - controlled Pilates movements
-  "CARDIO": ["CIRCUIT", "EMOM", "FOR TIME", "AMRAP", "TABATA"], // NO Reps & Sets
-  "METABOLIC": ["CIRCUIT", "AMRAP", "EMOM", "FOR TIME", "TABATA"], // NO Reps & Sets
-  "CALORIE BURNING": ["CIRCUIT", "TABATA", "AMRAP", "FOR TIME", "EMOM"], // NO Reps & Sets
-  "CHALLENGE": ["CIRCUIT", "TABATA", "AMRAP", "EMOM", "FOR TIME", "MIX"], // Any except Reps & Sets
-  "RECOVERY": ["FLOW"] // RECOVERY uses FLOW format - one mixed workout, no difficulty level
-};
-
-// All difficulty levels available (6 levels)
-const DIFFICULTY_LEVELS = [
-  { name: "Beginner", stars: 1 },
-  { name: "Beginner", stars: 2 },
-  { name: "Intermediate", stars: 3 },
-  { name: "Intermediate", stars: 4 },
-  { name: "Advanced", stars: 5 },
-  { name: "Advanced", stars: 6 }
-];
+import { 
+  PERIODIZATION_84DAY, 
+  getDayIn84Cycle, 
+  getPeriodizationForDay, 
+  getCategoryForDay,
+  CYCLE_START_DATE,
+  FORMATS_BY_CATEGORY,
+  STRENGTH_DAY_FOCUS
+} from "../_shared/periodization-84day.ts";
 
 function logStep(step: string, details?: any) {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
   console.log(`[GENERATE-WOD] ${step}${detailsStr}`);
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// DATE-BASED ROTATION LOGIC (28-DAY FIXED CYCLE + 84-DAY STRENGTH ROTATION)
-// CRITICAL: Categories are FIXED per day - no shifts
-// STRENGTH days use 84-day rotation for difficulty variation
-// ═══════════════════════════════════════════════════════════════════════════════
-
-// Reference date: December 24, 2024 = Day 1 (CARDIO/Beginner)
-const CYCLE_START_DATE = '2024-12-24';
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// 84-DAY STRENGTH DIFFICULTY ROTATION (3 x 28-day cycles)
-// Only affects Strength days - all other categories use base periodization
-// ═══════════════════════════════════════════════════════════════════════════════
-const STRENGTH_84DAY_ROTATION: Record<number, Array<{
-  difficulty: "Beginner" | "Intermediate" | "Advanced";
-  stars: [number, number];
-}>> = {
-  // Day 2 - LOWER BODY: Advanced → Intermediate → Beginner
-  2: [
-    { difficulty: "Advanced", stars: [5, 6] },
-    { difficulty: "Intermediate", stars: [3, 4] },
-    { difficulty: "Beginner", stars: [1, 2] }
-  ],
-  // Day 5 - UPPER BODY: Intermediate → Beginner → Advanced
-  5: [
-    { difficulty: "Intermediate", stars: [3, 4] },
-    { difficulty: "Beginner", stars: [1, 2] },
-    { difficulty: "Advanced", stars: [5, 6] }
-  ],
-  // Day 12 - FULL BODY: Advanced → Beginner → Intermediate
-  12: [
-    { difficulty: "Advanced", stars: [5, 6] },
-    { difficulty: "Beginner", stars: [1, 2] },
-    { difficulty: "Intermediate", stars: [3, 4] }
-  ],
-  // Day 15 - LOW PUSH & UPPER PULL: Beginner → Advanced → Intermediate
-  15: [
-    { difficulty: "Beginner", stars: [1, 2] },
-    { difficulty: "Advanced", stars: [5, 6] },
-    { difficulty: "Intermediate", stars: [3, 4] }
-  ],
-  // Day 20 - LOW PULL & UPPER PUSH: Intermediate → Beginner → Advanced
-  20: [
-    { difficulty: "Intermediate", stars: [3, 4] },
-    { difficulty: "Beginner", stars: [1, 2] },
-    { difficulty: "Advanced", stars: [5, 6] }
-  ],
-  // Day 23 - CORE & GLUTES: Advanced → Intermediate → Beginner
-  23: [
-    { difficulty: "Advanced", stars: [5, 6] },
-    { difficulty: "Intermediate", stars: [3, 4] },
-    { difficulty: "Beginner", stars: [1, 2] }
-  ]
-};
-
-// Get day 1-28 in cycle based on calendar date
+// Compatibility functions - map old 28-day functions to new 84-day system
 function getDayInCycleFromDate(dateStr: string): number {
-  const startDate = new Date(CYCLE_START_DATE + 'T00:00:00Z');
-  const targetDate = new Date(dateStr + 'T00:00:00Z');
-  const daysDiff = Math.floor((targetDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000));
-  const normalizedDays = ((daysDiff % 28) + 28) % 28;
-  return normalizedDays + 1; // 1-28
+  // For compatibility, return day 1-28 (mapped from day 1-84)
+  const dayIn84 = getDayIn84Cycle(dateStr);
+  return ((dayIn84 - 1) % 28) + 1;
 }
 
-// Get cycle number from a date string (1, 2, 3, 4, ...)
 function getCycleNumberFromDate(dateStr: string): number {
   const startDate = new Date(CYCLE_START_DATE + 'T00:00:00Z');
   const targetDate = new Date(dateStr + 'T00:00:00Z');
@@ -210,64 +49,33 @@ function getCycleNumberFromDate(dateStr: string): number {
   return Math.floor(daysDiff / 28) + 1;
 }
 
-// Get periodization for a specific day (1-28)
-function getPeriodizationForDay(dayInCycle: number): typeof PERIODIZATION_28DAY[0] {
-  const index = Math.max(0, Math.min(27, dayInCycle - 1));
-  return PERIODIZATION_28DAY[index];
-}
-
-// Get category for a specific day in cycle (1-28)
-function getCategoryForDay(dayInCycle: number): string {
-  return getPeriodizationForDay(dayInCycle).category;
-}
-
-// Get difficulty for day - applies 84-day rotation for STRENGTH days
+// Get difficulty info for the day using 84-day cycle
 function getDifficultyForDay(dayInCycle: number, cycleNumber: number): { name: string | null; stars: number | null; range: [number, number] | null } {
-  const periodization = getPeriodizationForDay(dayInCycle);
+  // Calculate the actual day in 84-day cycle
+  const phase = ((cycleNumber - 1) % 3) + 1;
+  const dayIn84 = (phase - 1) * 28 + dayInCycle;
+  const periodization = getPeriodizationForDay(dayIn84);
   
   if (!periodization.difficulty || !periodization.difficultyStars) {
     return { name: null, stars: null, range: null };
   }
   
-  let difficulty = periodization.difficulty;
-  let difficultyRange = periodization.difficultyStars;
+  const range: [number, number] = [periodization.difficultyStars, periodization.difficultyStars];
   
-  // Apply 84-day rotation for STRENGTH days only
-  if (periodization.category === "STRENGTH" && STRENGTH_84DAY_ROTATION[dayInCycle]) {
-    const rotationIndex = (cycleNumber - 1) % 3; // 0, 1, or 2
-    const rotation = STRENGTH_84DAY_ROTATION[dayInCycle][rotationIndex];
-    difficulty = rotation.difficulty;
-    difficultyRange = rotation.stars;
-    
-    logStep("Strength 84-day rotation applied", {
-      dayInCycle,
-      cycleNumber,
-      rotationIndex,
-      focus: STRENGTH_DAY_FOCUS[dayInCycle]?.focus,
-      baseDifficulty: periodization.difficulty,
-      rotatedDifficulty: difficulty,
-      rotatedRange: difficultyRange
-    });
-  }
-  
-  // Randomly pick one star from the range
-  const [star1, star2] = difficultyRange;
-  const selectedStars = Math.random() < 0.5 ? star1 : star2;
-  
-  logStep("Difficulty calculation", {
+  logStep("Difficulty calculation (84-day)", {
     dayInCycle,
     cycleNumber,
+    phase,
+    dayIn84,
     category: periodization.category,
-    difficulty,
-    range: difficultyRange,
-    selectedStars,
-    isStrengthRotation: periodization.category === "STRENGTH"
+    difficulty: periodization.difficulty,
+    stars: periodization.difficultyStars
   });
   
   return { 
-    name: difficulty, 
-    stars: selectedStars,
-    range: difficultyRange
+    name: periodization.difficulty, 
+    stars: periodization.difficultyStars,
+    range
   };
 }
 
