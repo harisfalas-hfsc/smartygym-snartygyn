@@ -29,7 +29,11 @@ interface Testimonial {
   updated_at: string;
 }
 
-export const TestimonialsSection = () => {
+interface TestimonialsSectionProps {
+  compact?: boolean;
+}
+
+export const TestimonialsSection = ({ compact = false }: TestimonialsSectionProps) => {
   const { user, userTier } = useAccessControl();
   const isPremium = userTier === "premium";
   
@@ -206,6 +210,102 @@ export const TestimonialsSection = () => {
   const getTopTestimonials = () => {
     return testimonials.slice(0, 6);
   };
+
+  // Compact mode for mobile carousel
+  if (compact) {
+    return (
+      <Card className="border-2 border-primary/30 shadow-lg h-full">
+        <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Quote className="h-5 w-5 text-primary" />
+            Community Testimonials
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-3">
+          {isLoading ? (
+            <div className="space-y-2">
+              {[...Array(6)].map((_, i) => (
+                <Skeleton key={i} className="h-16 w-full" />
+              ))}
+            </div>
+          ) : testimonials.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <Quote className="h-8 w-8 mx-auto mb-2 opacity-30" />
+              <p className="text-sm">No testimonials yet</p>
+            </div>
+          ) : (
+            <>
+              <div className="space-y-2">
+                {getTopTestimonials().map((testimonial) => (
+                  <div
+                    key={testimonial.id}
+                    className="p-2 rounded-lg border border-primary/20 bg-gradient-to-r from-background to-primary/5"
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="flex items-center gap-1">
+                        <User className="h-3 w-3 text-primary flex-shrink-0" />
+                        <span className="font-semibold text-xs truncate max-w-[80px]">
+                          {testimonial.display_name}
+                        </span>
+                        {renderStars(testimonial.rating)}
+                      </div>
+                    </div>
+                    <p className="text-xs leading-relaxed line-clamp-2 text-foreground/90">
+                      "{testimonial.testimonial_text}"
+                    </p>
+                  </div>
+                ))}
+              </div>
+              {testimonials.length > 6 && (
+                <div className="mt-3 text-center">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowViewAllModal(true)}
+                    className="gap-1 text-xs h-8"
+                  >
+                    <Eye className="h-3 w-3" />
+                    View All ({testimonials.length})
+                  </Button>
+                </div>
+              )}
+            </>
+          )}
+        </CardContent>
+
+        {/* View All Testimonials Modal - for compact mode */}
+        <Dialog open={showViewAllModal} onOpenChange={setShowViewAllModal}>
+          <DialogContent className="max-w-2xl max-h-[80vh]">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Quote className="h-5 w-5 text-primary" />
+                All Community Testimonials
+              </DialogTitle>
+            </DialogHeader>
+            <ScrollArea className="h-[60vh] pr-4">
+              <div className="space-y-3">
+                {testimonials.map((testimonial) => (
+                  <div
+                    key={testimonial.id}
+                    className="p-3 rounded-lg border-2 border-primary/20 bg-gradient-to-r from-background to-primary/5"
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <User className="h-4 w-4 text-primary flex-shrink-0" />
+                      <span className="font-semibold text-sm">{testimonial.display_name}</span>
+                      {renderStars(testimonial.rating)}
+                    </div>
+                    <p className="text-sm leading-relaxed text-foreground/90">
+                      "{testimonial.testimonial_text}"
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+          </DialogContent>
+        </Dialog>
+      </Card>
+    );
+  }
 
   return (
     <Card className="border-2 border-primary/30 shadow-lg">
