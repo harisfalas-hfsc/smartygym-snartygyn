@@ -8,8 +8,8 @@
  * Reference date: December 24, 2024 = Day 1 (CARDIO/Beginner)
  */
 
-// Reference date: December 24, 2024 = Day 1
-export const CYCLE_START_DATE = '2024-12-24';
+// Reference date: November 25, 2024 = Day 1 (so December 24, 2024 = Day 30)
+export const CYCLE_START_DATE = '2024-11-25';
 
 // FORMAT RULES BY CATEGORY (STRICT)
 export const FORMATS_BY_CATEGORY: Record<string, string[]> = {

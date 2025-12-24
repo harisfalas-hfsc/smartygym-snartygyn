@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { MESSAGE_TYPES, MESSAGE_TYPE_SOURCES } from "../_shared/notification-types.ts";
+import { CYCLE_START_DATE, PERIODIZATION_84DAY, getDayIn84Cycle, getPeriodizationForDay } from "../_shared/periodization-84day.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -484,118 +485,7 @@ const handler = async (req: Request): Promise<Response> => {
     // WOD State - using simplified 84-day cycle (Day 1-84, then restarts)
     const { data: wodState } = await supabase.from('workout_of_day_state').select('*').single();
     
-    // ═══════════════════════════════════════════════════════════════════════════════
-    // SIMPLIFIED 84-DAY PERIODIZATION CYCLE
-    // Single cycle from Day 1 to Day 84, then restarts. Each day has fixed category & difficulty.
-    // ═══════════════════════════════════════════════════════════════════════════════
-    const CYCLE_START_DATE = '2024-12-24';
-    
-    // Pre-computed 84-day periodization (matches src/lib/wodCycle.ts and _shared/periodization-84day.ts)
-    const PERIODIZATION_84DAY: Array<{ day: number; category: string; difficulty: string | null; strengthFocus?: string }> = [
-      // Phase 1 (Days 1-28)
-      { day: 1, category: 'CARDIO', difficulty: 'Beginner' },
-      { day: 2, category: 'STRENGTH', difficulty: 'Advanced', strengthFocus: 'LOWER BODY' },
-      { day: 3, category: 'MOBILITY & STABILITY', difficulty: 'Intermediate' },
-      { day: 4, category: 'CHALLENGE', difficulty: 'Advanced' },
-      { day: 5, category: 'STRENGTH', difficulty: 'Intermediate', strengthFocus: 'UPPER BODY' },
-      { day: 6, category: 'PILATES', difficulty: 'Advanced' },
-      { day: 7, category: 'CALORIE BURNING', difficulty: 'Intermediate' },
-      { day: 8, category: 'METABOLIC', difficulty: 'Beginner' },
-      { day: 9, category: 'CHALLENGE', difficulty: 'Intermediate' },
-      { day: 10, category: 'RECOVERY', difficulty: null },
-      { day: 11, category: 'CARDIO', difficulty: 'Intermediate' },
-      { day: 12, category: 'STRENGTH', difficulty: 'Advanced', strengthFocus: 'FULL BODY' },
-      { day: 13, category: 'MOBILITY & STABILITY', difficulty: 'Advanced' },
-      { day: 14, category: 'CHALLENGE', difficulty: 'Intermediate' },
-      { day: 15, category: 'STRENGTH', difficulty: 'Beginner', strengthFocus: 'LOW PUSH & UPPER PULL' },
-      { day: 16, category: 'PILATES', difficulty: 'Beginner' },
-      { day: 17, category: 'CALORIE BURNING', difficulty: 'Advanced' },
-      { day: 18, category: 'METABOLIC', difficulty: 'Intermediate' },
-      { day: 19, category: 'CARDIO', difficulty: 'Advanced' },
-      { day: 20, category: 'STRENGTH', difficulty: 'Intermediate', strengthFocus: 'LOW PULL & UPPER PUSH' },
-      { day: 21, category: 'MOBILITY & STABILITY', difficulty: 'Beginner' },
-      { day: 22, category: 'CHALLENGE', difficulty: 'Intermediate' },
-      { day: 23, category: 'STRENGTH', difficulty: 'Advanced', strengthFocus: 'CORE & GLUTES' },
-      { day: 24, category: 'PILATES', difficulty: 'Intermediate' },
-      { day: 25, category: 'CALORIE BURNING', difficulty: 'Beginner' },
-      { day: 26, category: 'METABOLIC', difficulty: 'Advanced' },
-      { day: 27, category: 'CHALLENGE', difficulty: 'Intermediate' },
-      { day: 28, category: 'RECOVERY', difficulty: null },
-      // Phase 2 (Days 29-56)
-      { day: 29, category: 'CARDIO', difficulty: 'Intermediate' },
-      { day: 30, category: 'STRENGTH', difficulty: 'Intermediate', strengthFocus: 'LOWER BODY' },
-      { day: 31, category: 'MOBILITY & STABILITY', difficulty: 'Advanced' },
-      { day: 32, category: 'CHALLENGE', difficulty: 'Intermediate' },
-      { day: 33, category: 'STRENGTH', difficulty: 'Beginner', strengthFocus: 'UPPER BODY' },
-      { day: 34, category: 'PILATES', difficulty: 'Beginner' },
-      { day: 35, category: 'CALORIE BURNING', difficulty: 'Advanced' },
-      { day: 36, category: 'METABOLIC', difficulty: 'Intermediate' },
-      { day: 37, category: 'CHALLENGE', difficulty: 'Intermediate' },
-      { day: 38, category: 'RECOVERY', difficulty: null },
-      { day: 39, category: 'CARDIO', difficulty: 'Advanced' },
-      { day: 40, category: 'STRENGTH', difficulty: 'Beginner', strengthFocus: 'FULL BODY' },
-      { day: 41, category: 'MOBILITY & STABILITY', difficulty: 'Beginner' },
-      { day: 42, category: 'CHALLENGE', difficulty: 'Intermediate' },
-      { day: 43, category: 'STRENGTH', difficulty: 'Advanced', strengthFocus: 'LOW PUSH & UPPER PULL' },
-      { day: 44, category: 'PILATES', difficulty: 'Intermediate' },
-      { day: 45, category: 'CALORIE BURNING', difficulty: 'Beginner' },
-      { day: 46, category: 'METABOLIC', difficulty: 'Advanced' },
-      { day: 47, category: 'CARDIO', difficulty: 'Beginner' },
-      { day: 48, category: 'STRENGTH', difficulty: 'Beginner', strengthFocus: 'LOW PULL & UPPER PUSH' },
-      { day: 49, category: 'MOBILITY & STABILITY', difficulty: 'Intermediate' },
-      { day: 50, category: 'CHALLENGE', difficulty: 'Intermediate' },
-      { day: 51, category: 'STRENGTH', difficulty: 'Intermediate', strengthFocus: 'CORE & GLUTES' },
-      { day: 52, category: 'PILATES', difficulty: 'Advanced' },
-      { day: 53, category: 'CALORIE BURNING', difficulty: 'Intermediate' },
-      { day: 54, category: 'METABOLIC', difficulty: 'Beginner' },
-      { day: 55, category: 'CHALLENGE', difficulty: 'Intermediate' },
-      { day: 56, category: 'RECOVERY', difficulty: null },
-      // Phase 3 (Days 57-84)
-      { day: 57, category: 'CARDIO', difficulty: 'Advanced' },
-      { day: 58, category: 'STRENGTH', difficulty: 'Beginner', strengthFocus: 'LOWER BODY' },
-      { day: 59, category: 'MOBILITY & STABILITY', difficulty: 'Beginner' },
-      { day: 60, category: 'CHALLENGE', difficulty: 'Intermediate' },
-      { day: 61, category: 'STRENGTH', difficulty: 'Advanced', strengthFocus: 'UPPER BODY' },
-      { day: 62, category: 'PILATES', difficulty: 'Intermediate' },
-      { day: 63, category: 'CALORIE BURNING', difficulty: 'Beginner' },
-      { day: 64, category: 'METABOLIC', difficulty: 'Advanced' },
-      { day: 65, category: 'CHALLENGE', difficulty: 'Intermediate' },
-      { day: 66, category: 'RECOVERY', difficulty: null },
-      { day: 67, category: 'CARDIO', difficulty: 'Beginner' },
-      { day: 68, category: 'STRENGTH', difficulty: 'Intermediate', strengthFocus: 'FULL BODY' },
-      { day: 69, category: 'MOBILITY & STABILITY', difficulty: 'Intermediate' },
-      { day: 70, category: 'CHALLENGE', difficulty: 'Intermediate' },
-      { day: 71, category: 'STRENGTH', difficulty: 'Intermediate', strengthFocus: 'LOW PUSH & UPPER PULL' },
-      { day: 72, category: 'PILATES', difficulty: 'Advanced' },
-      { day: 73, category: 'CALORIE BURNING', difficulty: 'Advanced' },
-      { day: 74, category: 'METABOLIC', difficulty: 'Intermediate' },
-      { day: 75, category: 'CARDIO', difficulty: 'Intermediate' },
-      { day: 76, category: 'STRENGTH', difficulty: 'Advanced', strengthFocus: 'LOW PULL & UPPER PUSH' },
-      { day: 77, category: 'MOBILITY & STABILITY', difficulty: 'Advanced' },
-      { day: 78, category: 'CHALLENGE', difficulty: 'Intermediate' },
-      { day: 79, category: 'STRENGTH', difficulty: 'Beginner', strengthFocus: 'CORE & GLUTES' },
-      { day: 80, category: 'PILATES', difficulty: 'Beginner' },
-      { day: 81, category: 'CALORIE BURNING', difficulty: 'Intermediate' },
-      { day: 82, category: 'METABOLIC', difficulty: 'Beginner' },
-      { day: 83, category: 'CHALLENGE', difficulty: 'Intermediate' },
-      { day: 84, category: 'RECOVERY', difficulty: null }
-    ];
-    
-    // Calculate day 1-84 in cycle based on calendar date
-    const getDayIn84Cycle = (dateStr: string): number => {
-      const startDate = new Date(CYCLE_START_DATE + 'T00:00:00Z');
-      const targetDate = new Date(dateStr + 'T00:00:00Z');
-      const diffTime = targetDate.getTime() - startDate.getTime();
-      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-      const normalized = ((diffDays % 84) + 84) % 84;
-      return normalized + 1; // Returns 1-84
-    };
-
-    // Get periodization for a specific day (1-84)
-    const getPeriodizationForDay = (dayIn84: number) => {
-      const index = ((dayIn84 - 1) % 84 + 84) % 84;
-      return PERIODIZATION_84DAY[index];
-    };
+    // Uses shared periodization module imported at top of file
     
     const dayIn84 = getDayIn84Cycle(today);
     const periodization = getPeriodizationForDay(dayIn84);
