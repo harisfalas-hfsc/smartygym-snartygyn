@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import WODPeriodizationCalendar from "@/components/WODPeriodizationCalendar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
+import { getCyprusTodayStr } from "@/lib/cyprusDate";
 
 const WODCategory = () => {
   const navigate = useNavigate();
@@ -52,8 +53,11 @@ const WODCategory = () => {
     data: interactions = []
   } = useWorkoutInteractions(userId);
 
-  // Get BOTH current WODs (is_workout_of_day = true)
-  const currentWODs = allWorkouts.filter(workout => workout.is_workout_of_day === true);
+  // Get BOTH current WODs (is_workout_of_day = true AND generated_for_date = Cyprus today)
+  const cyprusToday = getCyprusTodayStr();
+  const currentWODs = allWorkouts.filter(
+    workout => workout.is_workout_of_day === true && workout.generated_for_date === cyprusToday
+  );
   const bodyweightWOD = currentWODs.find(w => w.equipment === "BODYWEIGHT");
   const equipmentWOD = currentWODs.find(w => w.equipment === "EQUIPMENT");
 

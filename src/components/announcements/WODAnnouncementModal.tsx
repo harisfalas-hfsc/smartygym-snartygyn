@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CalendarCheck, Clock, Dumbbell, Home, Crown, ShoppingBag, X, TrendingUp, Layers, Target } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { getCyprusTodayStr } from "@/lib/cyprusDate";
 
 interface WODAnnouncementModalProps {
   open: boolean;
@@ -21,10 +22,14 @@ export const WODAnnouncementModal = ({ open, onClose }: WODAnnouncementModalProp
   const { data: wods } = useQuery({
     queryKey: ["wod-announcement"],
     queryFn: async () => {
+      // Use Cyprus date for consistent filtering with other WOD components
+      const cyprusToday = getCyprusTodayStr();
+      
       const { data, error } = await supabase
         .from("admin_workouts")
         .select("*")
-        .eq("is_workout_of_day", true);
+        .eq("is_workout_of_day", true)
+        .eq("generated_for_date", cyprusToday); // Only today's WODs (Cyprus date)
       
       if (error && error.code !== "PGRST116") {
         console.error("Error fetching WODs:", error);
@@ -192,7 +197,7 @@ export const WODAnnouncementModal = ({ open, onClose }: WODAnnouncementModalProp
               🔥 Fresh Workouts Just Dropped!
             </h2>
             <p className="text-sm text-muted-foreground max-w-sm">
-              Every day at midnight, <span className="text-primary font-semibold">SmartyGym</span> delivers <strong>TWO</strong> fresh workouts — pick based on your location!
+              Every day, <span className="text-primary font-semibold">SmartyGym</span> delivers <strong>TWO</strong> fresh workouts — pick based on your location!
             </p>
           </div>
         </div>
