@@ -170,28 +170,24 @@ serve(async (req) => {
 
     // ═══════════════════════════════════════════════════════════════════════════════
     // CRITICAL: Use Cyprus timezone (Europe/Athens, UTC+2/+3) for date calculation
-    // The cron runs at 22:00 UTC which is midnight in Cyprus - we need the NEW day's date
+    // The cron runs at 00:30 UTC - we use Intl.DateTimeFormat for proper DST handling
     // ═══════════════════════════════════════════════════════════════════════════════
     const now = new Date();
     
-    // Calculate Cyprus time (UTC+2 in winter, UTC+3 in summer)
-    // Cyprus is in EET/EEST timezone
-    const cyprusOffset = 2; // Base offset (winter). In summer it's +3
-    const cyprusTime = new Date(now.getTime() + cyprusOffset * 60 * 60 * 1000);
-    
-    // Check if daylight saving time applies (rough check for EET/EEST)
-    const month = cyprusTime.getUTCMonth();
-    const isDST = month >= 2 && month <= 9; // March-October roughly
-    const actualOffset = isDST ? 3 : 2;
-    
-    const cyprusDate = new Date(now.getTime() + actualOffset * 60 * 60 * 1000);
-    const cyprusDateStr = cyprusDate.toISOString().split('T')[0];
+    // Use Intl.DateTimeFormat to get the correct date in Europe/Athens timezone
+    // This automatically handles DST transitions correctly
+    const cyprusFormatter = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Europe/Athens',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    });
+    const cyprusDateStr = cyprusFormatter.format(now); // Returns YYYY-MM-DD format
     
     logStep("Timezone calculation", {
       utcNow: now.toISOString(),
-      cyprusOffset: actualOffset,
       cyprusDateStr,
-      isDST
+      timezone: 'Europe/Athens'
     });
     
     // Determine the effective date for generation

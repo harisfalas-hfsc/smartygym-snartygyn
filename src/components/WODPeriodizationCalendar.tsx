@@ -1,20 +1,27 @@
 import { format, subDays, addDays } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getWODInfoForDate, getDifficultyBadgeClass, getDifficultyBorderClass } from "@/lib/wodCycle";
 
+const TIMEZONE = "Europe/Athens";
+
 /**
  * Compact Periodization Calendar - 84-Day Cycle
  * Shows Yesterday, Today, Tomorrow with category and difficulty level
+ * Uses Europe/Athens timezone to match backend WOD generation
  */
 const WODPeriodizationCalendar = () => {
-  const today = new Date();
+  const now = new Date();
+  
+  // Get today's date in Cyprus timezone (Europe/Athens)
+  const todayStr = formatInTimeZone(now, TIMEZONE, "yyyy-MM-dd");
+  const today = new Date(todayStr + "T00:00:00Z");
   const yesterday = subDays(today, 1);
   const tomorrow = addDays(today, 1);
 
   const yesterdayStr = format(yesterday, "yyyy-MM-dd");
-  const todayStr = format(today, "yyyy-MM-dd");
   const tomorrowStr = format(tomorrow, "yyyy-MM-dd");
 
   const yesterdayInfo = getWODInfoForDate(yesterdayStr);

@@ -4,7 +4,7 @@
 // Shared between generate-workout-of-day and run-system-health-audit
 // ═══════════════════════════════════════════════════════════════════════════════
 
-export const CYCLE_START_DATE = '2024-11-25'; // Day 1 of the 84-day cycle (Dec 24, 2024 = Day 30)
+export const CYCLE_START_DATE = '2025-11-25'; // Day 1 of the 84-day cycle (Dec 24, 2025 = Day 30)
 
 // Base 28-day category pattern (repeated 3 times with different Strength difficulties)
 const BASE_28_CATEGORIES = [
