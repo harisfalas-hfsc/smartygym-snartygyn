@@ -120,20 +120,9 @@ const WODPeriodizationCalendar = () => {
         </div>
 
         {/* Mobile: Carousel */}
-        <div className="md:hidden relative">
-          {/* Left Arrow - visible when not on Yesterday */}
-          {currentSlide > 0 && (
-            <button 
-              onClick={() => carouselApi?.scrollTo(currentSlide - 1)}
-              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 p-1 text-muted-foreground hover:text-primary transition-colors"
-              aria-label="Previous day"
-            >
-              <ChevronLeft className="w-6 h-6" />
-            </button>
-          )}
-
+        <div className="md:hidden">
           <Carousel
-            className="w-full px-6"
+            className="w-full"
             opts={{
               align: "center",
               loop: false,
@@ -143,23 +132,12 @@ const WODPeriodizationCalendar = () => {
           >
             <CarouselContent className="-ml-2">
               {days.map((day, index) => (
-                <CarouselItem key={index} className="pl-2 basis-full">
+                <CarouselItem key={index} className="pl-2 basis-[75%]">
                   {renderDayCell(day.label, day.dateStr, day.info, day.isToday)}
                 </CarouselItem>
               ))}
             </CarouselContent>
           </Carousel>
-
-          {/* Right Arrow - visible when not on Tomorrow */}
-          {currentSlide < 2 && (
-            <button 
-              onClick={() => carouselApi?.scrollTo(currentSlide + 1)}
-              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 p-1 text-muted-foreground hover:text-primary transition-colors"
-              aria-label="Next day"
-            >
-              <ChevronRight className="w-6 h-6" />
-            </button>
-          )}
 
           {/* Navigation Dots */}
           <div className="flex justify-center gap-2 mt-3">
