@@ -26,6 +26,13 @@ const Tools = () => {
     return () => { toolsCarouselApi.off('select', onSelect); };
   }, [toolsCarouselApi]);
 
+  // Extended descriptions for mobile carousel
+  const toolDescriptions: Record<string, string> = {
+    "1rm-calculator": "Calculate your one-rep maximum using the scientifically validated Brzycki formula. Essential for programming strength training and tracking progress over time.",
+    "bmr-calculator": "Determine your Basal Metabolic Rate using the Mifflin-St Jeor equation — the most accurate formula for estimating the calories you burn at rest.",
+    "macro-calculator": "Get personalized nutrition recommendations including daily calories, macronutrients (protein, carbs, fats), fiber intake, hydration needs, and optimal meal frequency.",
+  };
+
   const tools = [
     {
       id: "1rm-calculator",
@@ -127,6 +134,17 @@ const Tools = () => {
             </div>
           </div>
         </Card>
+
+        {/* Mobile: Dynamic Description Card */}
+        <div className="md:hidden mb-4">
+          <Card className="bg-card border border-primary/20">
+            <div className="p-4 text-center">
+              <p className="text-sm text-muted-foreground transition-opacity duration-300">
+                {toolDescriptions[tools[toolsCurrentSlide]?.id] || ""}
+              </p>
+            </div>
+          </Card>
+        </div>
 
         {/* Mobile Carousel - Title only */}
         <div className="md:hidden">
