@@ -47,6 +47,16 @@ const TrainingProgramFlow = () => {
     "mobility-stability": "/images/programs/mobility-stability-bg.jpg",
   };
 
+  // Extended descriptions for mobile carousel
+  const programDescriptions: Record<string, string> = {
+    "cardio-endurance": "Structured multi-week programs designed to improve your cardiovascular endurance, VO2 max, and both aerobic and anaerobic thresholds. Build a stronger, more efficient heart.",
+    "functional-strength": "Programs focused on developing the strength every adult needs for better performance in daily life, hobbies, and sports. Real-world strength for real-world demands.",
+    "muscle-hypertrophy": "Strategic programs designed for muscle growth. Understand the importance of lean muscle mass for metabolism, strength, and long-term health.",
+    "weight-loss": "Comprehensive programs combining calorie burning, metabolic enhancement, and muscle building. A sustainable approach to losing weight and keeping it off.",
+    "low-back-pain": "Targeted programs addressing the modern epidemic of low back pain. Whether from office work, tactical jobs, or daily stress, these plans provide relief and prevention.",
+    "mobility-stability": "Programs designed to improve joint mobility, stability, and overall movement quality. Essential for injury prevention and optimal physical function.",
+  };
+
   const programTypes = [{
     id: "cardio-endurance",
     title: "Cardio Endurance",
@@ -278,6 +288,17 @@ const TrainingProgramFlow = () => {
               </ScrollReveal>
             );
           })}
+        </div>
+
+        {/* Mobile: Dynamic Description Card */}
+        <div className="md:hidden mb-4">
+          <Card className="bg-card border border-primary/20">
+            <div className="p-4 text-center">
+              <p className="text-sm text-muted-foreground transition-opacity duration-300">
+                {programDescriptions[programTypes[currentSlide]?.id] || ""}
+              </p>
+            </div>
+          </Card>
         </div>
 
         {/* Mobile: Carousel Layout */}

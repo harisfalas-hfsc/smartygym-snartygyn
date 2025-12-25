@@ -77,6 +77,19 @@ const WorkoutFlow = () => {
     "recovery": "/images/workouts/recovery-category-bg.jpg",
   };
 
+  // Extended descriptions for mobile carousel
+  const workoutDescriptions: Record<string, string> = {
+    "wod": "Your daily dose of expertly programmed fitness. The Workout of the Day follows science-based periodization for optimal results and safety.",
+    "strength": "Standalone single-session workouts designed to develop general strength. Using bodyweight or equipment, these sessions build foundational power and muscular endurance.",
+    "calorie-burning": "High-intensity interval training formats designed to maximize calorie expenditure. Various workout structures keep you challenged while achieving your fat-burning goals.",
+    "metabolic": "High-intensity interval training focused on boosting your metabolic rate. These sessions are designed to enhance how efficiently your body burns energy.",
+    "cardio": "Workouts dedicated to improving cardiovascular endurance and aerobic capacity. Build a stronger heart and better stamina for everyday activities.",
+    "mobility": "Sessions focused on joint health, mobility, and stability. Improve how your joints move and stabilize during dynamic movements.",
+    "challenge": "Push beyond your comfort zone with gamification-style workouts. Challenge yourself to break personal boundaries and discover your true potential.",
+    "pilates": "Controlled movements focused on core strength, spinal alignment, and body awareness. Develop stability and flexibility through precise technique.",
+    "recovery": "Active recovery and regeneration sessions designed to help your body repair and rebuild. Essential for long-term performance and injury prevention.",
+  };
+
   const workoutTypes = [{
     id: "wod",
     title: "WOD",
@@ -361,6 +374,17 @@ const WorkoutFlow = () => {
                 </ScrollReveal>
               );
             })}
+          </div>
+
+          {/* Mobile: Dynamic Description Card */}
+          <div className="md:hidden mb-4">
+            <Card className="bg-card border border-primary/20">
+              <div className="p-4 text-center">
+                <p className="text-sm text-muted-foreground transition-opacity duration-300">
+                  {workoutDescriptions[workoutTypes[currentSlide]?.id] || ""}
+                </p>
+              </div>
+            </Card>
           </div>
 
           {/* Mobile: Carousel Layout */}
