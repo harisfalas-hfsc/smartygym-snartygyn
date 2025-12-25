@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Download, Printer, Copy, FileText, ExternalLink, Apple, Smartphone, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 import { generateWordDocument, nativePushNotificationsContent, firebaseConsoleSetupContent, appPublishingCostChecklistContent, wodPhilosophyContent, workoutsPhilosophyContent, trainingProgramsPhilosophyContent } from "@/utils/wordExport";
+import { portabilityDocContent, getPortabilityDocText } from "@/utils/portabilityDocContent";
 import { Dumbbell } from "lucide-react";
 import { IndividualBrochure } from "./IndividualBrochure";
 import { CorporateBrochure } from "./CorporateBrochure";
@@ -1072,6 +1073,83 @@ Contact: corporate@smartygym.com`;
             </div>
           </div>
 
+        </CardContent>
+      </Card>
+
+      {/* Portability & Self-Hosting Guide */}
+      <Card className="border-emerald-500/30 bg-gradient-to-r from-emerald-500/5 to-transparent">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-xl">
+            🚀 Portability & Self-Hosting Guide
+          </CardTitle>
+          <CardDescription>
+            Complete documentation for exporting, migrating, and self-hosting SmartyGym if you ever decide to leave Lovable
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="border rounded-lg p-4 space-y-3 border-emerald-500/30 bg-gradient-to-r from-emerald-500/5 to-transparent">
+            <div>
+              <h3 className="font-semibold text-lg flex items-center gap-2">
+                📦 Full Portability Documentation
+              </h3>
+              <p className="text-sm text-muted-foreground">Source code export, frontend deployment, database migration, AI feature migration, cron jobs, and what happens on subscription cancellation</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="default" size="sm" className="gap-2">
+                    <ExternalLink className="h-4 w-4" />
+                    View Guide
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl max-h-[80vh]">
+                  <DialogHeader>
+                    <DialogTitle>🚀 Portability & Self-Hosting Guide</DialogTitle>
+                  </DialogHeader>
+                  <ScrollArea className="h-[60vh] pr-4">
+                    <div className="space-y-4 text-sm">
+                      {portabilityDocContent.map((section, index) => {
+                        if (section.type === 'heading') {
+                          const HeadingTag = section.level === 1 ? 'h2' : section.level === 2 ? 'h3' : 'h4';
+                          const headingClass = section.level === 1 
+                            ? 'text-xl font-bold mt-6 mb-2 text-primary' 
+                            : section.level === 2 
+                            ? 'text-lg font-semibold mt-4 mb-2' 
+                            : 'text-base font-medium mt-3 mb-1';
+                          return <HeadingTag key={index} className={headingClass}>{section.content}</HeadingTag>;
+                        } else if (section.type === 'paragraph') {
+                          return <p key={index} className="text-muted-foreground leading-relaxed whitespace-pre-wrap">{section.content}</p>;
+                        } else if (section.type === 'bullet') {
+                          return <p key={index} className="text-muted-foreground pl-4">• {section.content}</p>;
+                        } else if (section.type === 'code') {
+                          return <pre key={index} className="bg-muted p-3 rounded text-xs overflow-x-auto">{section.content}</pre>;
+                        }
+                        return null;
+                      })}
+                    </div>
+                  </ScrollArea>
+                </DialogContent>
+              </Dialog>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => downloadAsText(getPortabilityDocText(), 'SmartyGym-Portability-Guide.txt')}
+                className="gap-2"
+              >
+                <Download className="h-4 w-4" />
+                Download TXT
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => printDocument(getPortabilityDocText(), 'SmartyGym Portability & Self-Hosting Guide')}
+                className="gap-2"
+              >
+                <Printer className="h-4 w-4" />
+                Print / PDF
+              </Button>
+            </div>
+          </div>
         </CardContent>
       </Card>
 

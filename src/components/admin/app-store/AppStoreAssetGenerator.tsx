@@ -2,9 +2,20 @@ import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Download, CheckCircle2, XCircle, Image, Monitor, RefreshCw, Upload } from "lucide-react";
+import { Loader2, Download, CheckCircle2, XCircle, Image, Monitor, RefreshCw, Upload, Trash2, History, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface Asset {
   id: string;
@@ -40,6 +51,8 @@ export const AppStoreAssetGenerator = () => {
   const [isGeneratingIcons, setIsGeneratingIcons] = useState(false);
   const [isUploadingIcon, setIsUploadingIcon] = useState(false);
   const [isUploadingFeatureGraphic, setIsUploadingFeatureGraphic] = useState(false);
+  const [isDeletingAsset, setIsDeletingAsset] = useState<string | null>(null);
+  const [showAssetHistory, setShowAssetHistory] = useState(false);
 
   const [iconFile, setIconFile] = useState<File | null>(null);
   const [featureGraphicFile, setFeatureGraphicFile] = useState<File | null>(null);
@@ -190,6 +203,10 @@ export const AppStoreAssetGenerator = () => {
   // Latest assets
   const masterIcon = assets.find((a) => a.asset_type === "master-icon" && a.storage_url);
   const featureGraphic = assets.find((a) => a.asset_type === "feature-graphic" && a.storage_url);
+  
+  // Asset history (all assets of each type)
+  const allIcons = assets.filter((a) => a.asset_type === "master-icon" && a.storage_url);
+  const allFeatureGraphics = assets.filter((a) => a.asset_type === "feature-graphic" && a.storage_url);
 
   const downloadAsset = (url: string, fileName: string) => {
     const a = document.createElement("a");
@@ -200,6 +217,57 @@ export const AppStoreAssetGenerator = () => {
     a.click();
     document.body.removeChild(a);
     toast.success(`Downloading ${fileName}`);
+  };
+
+  const deleteAsset = async (assetId: string) => {
+    setIsDeletingAsset(assetId);
+    try {
+      const { data, error } = await supabase.functions.invoke("delete-app-store-asset", {
+        body: { asset_id: assetId },
+      });
+
+      if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || "Delete failed");
+
+      toast.success("Asset deleted", {
+        description: "The asset has been permanently removed.",
+      });
+      
+      // Refresh assets list
+      await fetchAssets();
+    } catch (error) {
+      console.error("Error deleting asset:", error);
+      toast.error("Delete failed", {
+        description: error instanceof Error ? error.message : "Unknown error",
+      });
+    } finally {
+      setIsDeletingAsset(null);
+    }
+  };
+
+  const deleteAllOfType = async (assetType: string) => {
+    setIsDeletingAsset(assetType);
+    try {
+      const { data, error } = await supabase.functions.invoke("delete-app-store-asset", {
+        body: { asset_type: assetType, delete_all_of_type: true },
+      });
+
+      if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || "Delete failed");
+
+      toast.success(`All ${assetType === 'feature-graphic' ? 'feature graphics' : 'icons'} deleted`, {
+        description: `Removed ${data.deleted_count} asset(s).`,
+      });
+      
+      await fetchAssets();
+    } catch (error) {
+      console.error("Error deleting assets:", error);
+      toast.error("Delete failed", {
+        description: error instanceof Error ? error.message : "Unknown error",
+      });
+    } finally {
+      setIsDeletingAsset(null);
+    }
   };
 
   return (
@@ -320,7 +388,7 @@ export const AppStoreAssetGenerator = () => {
                 />
                 <div className="flex-1">
                   <p className="text-sm font-medium mb-1">Stored App Icon</p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-muted-foreground mb-2">
                     For store submission, resize using{" "}
                     <a
                       href="https://appicon.co/"
@@ -332,6 +400,37 @@ export const AppStoreAssetGenerator = () => {
                     </a>
                     .
                   </p>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button 
+                        variant="destructive" 
+                        size="sm" 
+                        className="gap-1"
+                        disabled={isDeletingAsset === masterIcon.id}
+                      >
+                        {isDeletingAsset === masterIcon.id ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : (
+                          <Trash2 className="h-3 w-3" />
+                        )}
+                        Remove
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete App Icon?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This will permanently delete this app icon from storage. This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => deleteAsset(masterIcon.id)}>
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </div>
             </div>
@@ -387,16 +486,196 @@ export const AppStoreAssetGenerator = () => {
 
           {featureGraphic?.storage_url && (
             <div className="mt-3 p-3 bg-muted/50 rounded-lg">
-              <img
-                src={`${featureGraphic.storage_url}?t=${Date.now()}`}
-                alt="SmartyGym feature graphic (1024×500)"
-                className="w-full max-w-md rounded-lg shadow-md"
-                loading="lazy"
-              />
-              <p className="text-xs text-muted-foreground mt-2">1024×500 Feature Graphic - Stored</p>
+              <div className="flex items-start gap-4">
+                <img
+                  src={`${featureGraphic.storage_url}?t=${Date.now()}`}
+                  alt="SmartyGym feature graphic (1024×500)"
+                  className="w-full max-w-xs rounded-lg shadow-md"
+                  loading="lazy"
+                />
+                <div className="flex flex-col gap-2">
+                  <p className="text-xs text-muted-foreground">1024×500 Feature Graphic - Stored</p>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button 
+                        variant="destructive" 
+                        size="sm" 
+                        className="gap-1"
+                        disabled={isDeletingAsset === featureGraphic.id}
+                      >
+                        {isDeletingAsset === featureGraphic.id ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : (
+                          <Trash2 className="h-3 w-3" />
+                        )}
+                        Remove
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Feature Graphic?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This will permanently delete this feature graphic from storage. This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => deleteAsset(featureGraphic.id)}>
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              </div>
             </div>
           )}
         </section>
+
+        {/* Asset History */}
+        {(allIcons.length > 1 || allFeatureGraphics.length > 1) && (
+          <section className="pt-4 border-t space-y-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowAssetHistory(!showAssetHistory)}
+              className="gap-2"
+            >
+              <History className="h-4 w-4" />
+              {showAssetHistory ? "Hide" : "Show"} Asset History ({allIcons.length + allFeatureGraphics.length} total)
+            </Button>
+
+            {showAssetHistory && (
+              <div className="space-y-4">
+                {/* Icon History */}
+                {allIcons.length > 0 && (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <h5 className="text-sm font-medium">App Icons ({allIcons.length})</h5>
+                      {allIcons.length > 1 && (
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="ghost" size="sm" className="text-destructive gap-1">
+                              <Trash2 className="h-3 w-3" />
+                              Clear All
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete All App Icons?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This will permanently delete all {allIcons.length} app icons. This action cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => deleteAllOfType("master-icon")}>
+                                Delete All
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      )}
+                    </div>
+                    <div className="grid gap-2">
+                      {allIcons.map((icon) => (
+                        <div key={icon.id} className="flex items-center justify-between p-2 bg-muted/30 rounded text-sm">
+                          <div className="flex items-center gap-2">
+                            <img
+                              src={`${icon.storage_url}?t=${Date.now()}`}
+                              alt={icon.file_name}
+                              className="w-8 h-8 rounded"
+                            />
+                            <span className="truncate max-w-[150px]">{icon.file_name}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(icon.created_at).toLocaleDateString()}
+                            </span>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => deleteAsset(icon.id)}
+                            disabled={isDeletingAsset === icon.id}
+                            className="text-destructive"
+                          >
+                            {isDeletingAsset === icon.id ? (
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : (
+                              <Trash2 className="h-3 w-3" />
+                            )}
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Feature Graphic History */}
+                {allFeatureGraphics.length > 0 && (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <h5 className="text-sm font-medium">Feature Graphics ({allFeatureGraphics.length})</h5>
+                      {allFeatureGraphics.length > 1 && (
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="ghost" size="sm" className="text-destructive gap-1">
+                              <Trash2 className="h-3 w-3" />
+                              Clear All
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete All Feature Graphics?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This will permanently delete all {allFeatureGraphics.length} feature graphics. This action cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => deleteAllOfType("feature-graphic")}>
+                                Delete All
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      )}
+                    </div>
+                    <div className="grid gap-2">
+                      {allFeatureGraphics.map((fg) => (
+                        <div key={fg.id} className="flex items-center justify-between p-2 bg-muted/30 rounded text-sm">
+                          <div className="flex items-center gap-2">
+                            <img
+                              src={`${fg.storage_url}?t=${Date.now()}`}
+                              alt={fg.file_name}
+                              className="w-12 h-6 rounded object-cover"
+                            />
+                            <span className="truncate max-w-[150px]">{fg.file_name}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(fg.created_at).toLocaleDateString()}
+                            </span>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => deleteAsset(fg.id)}
+                            disabled={isDeletingAsset === fg.id}
+                            className="text-destructive"
+                          >
+                            {isDeletingAsset === fg.id ? (
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : (
+                              <Trash2 className="h-3 w-3" />
+                            )}
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </section>
+        )}
 
         {/* Refresh */}
         <div className="pt-4 border-t">
