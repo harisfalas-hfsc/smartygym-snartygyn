@@ -68,9 +68,14 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
     let filtered = programs;
 
     if (searchTerm) {
+      const term = searchTerm.toLowerCase();
       filtered = filtered.filter(p => 
-        p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.id.toLowerCase().includes(searchTerm.toLowerCase())
+        p.name.toLowerCase().includes(term) ||
+        p.id.toLowerCase().includes(term) ||
+        (p.category?.toLowerCase() || '').includes(term) ||
+        (p.difficulty?.toLowerCase() || '').includes(term) ||
+        (p.equipment?.toLowerCase() || '').includes(term) ||
+        (p.duration?.toLowerCase() || '').includes(term)
       );
     }
 
@@ -450,7 +455,7 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search programs..."
+                  placeholder="Search by name, category, difficulty..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-9"

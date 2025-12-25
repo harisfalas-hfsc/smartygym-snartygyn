@@ -57,10 +57,35 @@ export const RitualsManager = ({ externalDialog, setExternalDialog }: RitualsMan
     let filtered = rituals;
 
     if (searchTerm) {
-      filtered = filtered.filter(r => 
-        r.ritual_date.includes(searchTerm) ||
-        r.day_number.toString().includes(searchTerm)
-      );
+      const term = searchTerm.toLowerCase();
+      filtered = filtered.filter(r => {
+        // Match raw date (YYYY-MM-DD)
+        if (r.ritual_date.toLowerCase().includes(term)) return true;
+        
+        // Match formatted date (e.g., "Dec 25, 2024" or "December 25, 2024")
+        try {
+          const dateObj = new Date(r.ritual_date);
+          const formattedShort = format(dateObj, 'MMM dd, yyyy').toLowerCase();
+          const formattedFull = format(dateObj, 'MMMM dd, yyyy').toLowerCase();
+          const formattedMonthOnly = format(dateObj, 'MMMM').toLowerCase();
+          const formattedMonthShort = format(dateObj, 'MMM').toLowerCase();
+          if (formattedShort.includes(term) || formattedFull.includes(term) ||
+              formattedMonthOnly.includes(term) || formattedMonthShort.includes(term)) return true;
+        } catch (e) {
+          // Skip date parsing errors
+        }
+        
+        // Match day number
+        if (r.day_number.toString().includes(term)) return true;
+        
+        // Match content (morning, midday, evening)
+        const morningText = stripHtml(r.morning_content || '').toLowerCase();
+        const middayText = stripHtml(r.midday_content || '').toLowerCase();
+        const eveningText = stripHtml(r.evening_content || '').toLowerCase();
+        if (morningText.includes(term) || middayText.includes(term) || eveningText.includes(term)) return true;
+        
+        return false;
+      });
     }
 
     setFilteredRituals(filtered);
@@ -259,7 +284,7 @@ export const RitualsManager = ({ externalDialog, setExternalDialog }: RitualsMan
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search by date or day number..."
+                  placeholder="Search by date, month, day #, or content..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-9"
