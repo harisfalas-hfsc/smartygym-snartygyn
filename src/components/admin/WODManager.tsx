@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
-import { Flame, Play, RefreshCw, Calendar, Dumbbell, Star, TrendingUp, Clock, ExternalLink, ImageIcon, BookOpen, Edit, Settings, HeartPulse, CheckCircle, AlertTriangle, XCircle } from "lucide-react";
+import { Flame, Play, RefreshCw, Calendar, Dumbbell, Star, TrendingUp, Clock, ExternalLink, ImageIcon, BookOpen, Edit, Settings, HeartPulse, CheckCircle, AlertTriangle, XCircle, Archive } from "lucide-react";
 import { format, addDays } from "date-fns";
 import { WODSchedulePreview } from "./WODSchedulePreview";
 import { PeriodizationSystemDialog } from "./PeriodizationSystemDialog";
@@ -34,6 +34,7 @@ export const WODManager = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSyncingImages, setIsSyncingImages] = useState(false);
   const [isRunningHealthCheck, setIsRunningHealthCheck] = useState(false);
+  const [isArchiving, setIsArchiving] = useState(false);
   const [periodizationDialogOpen, setPeriodizationDialogOpen] = useState(false);
   const [generateDialogOpen, setGenerateDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -105,9 +106,53 @@ export const WODManager = () => {
     },
   });
 
-  const handleGenerateWOD = async (targetDate?: string) => {
+  // Archive current WODs
+  const handleArchiveCurrentWODs = async () => {
+    setIsArchiving(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("archive-old-wods", {});
+
+      if (error) throw error;
+
+      const archivedCount = data?.archived || 0;
+      if (archivedCount > 0) {
+        toast.success(`Archived ${archivedCount} WOD(s)`, {
+          description: "WODs moved to their categories. 'Preparing' message now showing.",
+        });
+      } else {
+        toast.info("No WODs to archive", {
+          description: "No active WODs found for archival",
+        });
+      }
+
+      // Refresh all queries
+      queryClient.invalidateQueries({ queryKey: ["wod-state"] });
+      queryClient.invalidateQueries({ queryKey: ["current-wod"] });
+      queryClient.invalidateQueries({ queryKey: ["wod-history"] });
+      queryClient.invalidateQueries({ queryKey: ["workoutOfDay"] });
+      queryClient.invalidateQueries({ queryKey: ["wod-schedule"] });
+    } catch (error: any) {
+      console.error("Archive error:", error);
+      toast.error("Failed to archive WODs", {
+        description: error.message || "Please try again",
+      });
+    } finally {
+      setIsArchiving(false);
+    }
+  };
+
+  const handleGenerateWOD = async (targetDate?: string, archiveFirst?: boolean) => {
     setIsGenerating(true);
     try {
+      // If archiveFirst is true, archive existing WODs first
+      if (archiveFirst) {
+        const { error: archiveError } = await supabase.functions.invoke("archive-old-wods", {});
+        if (archiveError) {
+          console.warn("Archive before generate failed:", archiveError);
+          // Continue with generation even if archive fails
+        }
+      }
+
       const { data, error } = await supabase.functions.invoke("generate-workout-of-day", {
         body: { targetDate },
       });
@@ -393,6 +438,29 @@ export const WODManager = () => {
             )}
             {isSyncingImages ? "Syncing..." : "Sync Stripe Images"}
           </Button>
+
+          <Button 
+            variant="outline"
+            className="flex items-center gap-2 border-orange-500"
+            disabled={isArchiving}
+            onClick={handleArchiveCurrentWODs}
+          >
+            {isArchiving ? (
+              <RefreshCw className="h-4 w-4 animate-spin" />
+            ) : (
+              <Archive className="h-4 w-4 text-orange-500" />
+            )}
+            {isArchiving ? "Archiving..." : "Archive Current WODs"}
+          </Button>
+
+          <Button 
+            variant="outline"
+            className="flex items-center gap-2"
+            onClick={() => setCronDialogOpen(true)}
+          >
+            <Settings className="h-4 w-4" />
+            Schedule
+          </Button>
           
           <Button 
             className="flex items-center gap-2"
@@ -414,6 +482,11 @@ export const WODManager = () => {
             isGenerating={isGenerating}
             nextCategory={getTomorrowCategory()}
             dayInCycle={getDayInCycle()}
+          />
+          
+          <CronTimeConfigDialog
+            open={cronDialogOpen}
+            onOpenChange={setCronDialogOpen}
           />
         </div>
       </div>
