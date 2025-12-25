@@ -2447,6 +2447,36 @@ export type Database = {
         }
         Relationships: []
       }
+      wod_auto_generation_config: {
+        Row: {
+          created_at: string
+          generation_hour_utc: number
+          id: string
+          is_enabled: boolean
+          pause_reason: string | null
+          paused_until: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          generation_hour_utc?: number
+          id?: string
+          is_enabled?: boolean
+          pause_reason?: string | null
+          paused_until?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          generation_hour_utc?: number
+          id?: string
+          is_enabled?: boolean
+          pause_reason?: string | null
+          paused_until?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       workout_comments: {
         Row: {
           comment_text: string
