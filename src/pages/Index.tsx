@@ -25,11 +25,6 @@ import { HeroThreeColumns } from "@/components/HeroThreeColumns";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-// PWA install prompt event interface
-interface BeforeInstallPromptEvent extends Event {
-  prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
-}
 
 const Index = () => {
   const navigate = useNavigate();
@@ -51,12 +46,6 @@ const Index = () => {
   // Auto-cycling state for tablet hero cards
   const [highlightedCardIndex, setHighlightedCardIndex] = useState(0);
   const [isHoveringTablet, setIsHoveringTablet] = useState(false);
-
-  // PWA installation state
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-  const [isPwaInstalled, setIsPwaInstalled] = useState(true); // Default true to hide until checked
-  const isIOS = typeof navigator !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent);
-  const isAndroid = typeof navigator !== 'undefined' && /Android/.test(navigator.userAgent);
 
   // Fetch WODs for mobile card - using Cyprus date filter
   const { data: mobileWods } = useQuery({
@@ -141,22 +130,6 @@ const Index = () => {
     icon: Video,
     route: "/exerciselibrary"
   }];
-  // PWA detection and install prompt listener
-  useEffect(() => {
-    // Check if running as installed PWA
-    const installed = window.matchMedia('(display-mode: standalone)').matches || 
-                     (window.navigator as any).standalone === true;
-    setIsPwaInstalled(installed);
-    
-    // Listen for install prompt (Android only)
-    const handler = (e: Event) => {
-      e.preventDefault();
-      setDeferredPrompt(e as BeforeInstallPromptEvent);
-    };
-    window.addEventListener("beforeinstallprompt", handler);
-    
-    return () => window.removeEventListener("beforeinstallprompt", handler);
-  }, []);
 
   useEffect(() => {
     // Check current session
@@ -210,44 +183,6 @@ const Index = () => {
     }
   };
 
-  // PWA Install Handler
-  const handleInstallPWA = async () => {
-    if (isAndroid) {
-      if (deferredPrompt) {
-        // Android: Use native prompt
-        try {
-          await deferredPrompt.prompt();
-          const { outcome } = await deferredPrompt.userChoice;
-          if (outcome === "accepted") {
-            toast({ title: "Success!", description: "SmartyGym has been installed" });
-            setIsPwaInstalled(true);
-          }
-          setDeferredPrompt(null);
-        } catch (error) {
-          console.error("Error installing PWA:", error);
-          toast({
-            title: "Installation",
-            description: "Use your browser's menu to add SmartyGym to your home screen",
-            duration: 5000,
-          });
-        }
-      } else {
-        // Android but no prompt - app may already be installed
-        toast({
-          title: "Already Available",
-          description: "SmartyGym may already be installed. Check your home screen or use the browser menu to add it.",
-          duration: 5000,
-        });
-      }
-    } else if (isIOS) {
-      // iOS: Show instructions (no native API)
-      toast({
-        title: "Install SmartyGym",
-        description: "Tap the Share button (□↑) at the bottom of Safari, then select 'Add to Home Screen'",
-        duration: 8000,
-      });
-    }
-  };
   const services = [{
     id: "workout",
     icon: Dumbbell,
@@ -705,42 +640,6 @@ const Index = () => {
           </Card>
         </div>
 
-        {/* Mobile Only: Download App Icon - Only shows on mobile when not installed as PWA */}
-        {isMobile && !isPwaInstalled && (isIOS || isAndroid) && (
-          <div className="mt-6 mb-2 px-4 text-center">
-            {/* Single icon based on device */}
-            <div className="flex justify-center items-center">
-              {isAndroid && (
-                <button
-                  onClick={handleInstallPWA}
-                  className="w-12 h-12 rounded-xl bg-green-500/10 hover:bg-green-500/20 flex items-center justify-center transition-colors"
-                  aria-label="Download from Google Play"
-                >
-                  <svg className="w-7 h-7 text-green-600" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z"/>
-                  </svg>
-                </button>
-              )}
-              
-              {isIOS && (
-                <button
-                  onClick={handleInstallPWA}
-                  className="w-12 h-12 rounded-xl bg-muted/50 hover:bg-muted flex items-center justify-center transition-colors"
-                  aria-label="Download from App Store"
-                >
-                  <svg className="w-7 h-7 text-foreground" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M18.71,19.5C17.88,20.74 17,21.95 15.66,21.97C14.32,22 13.89,21.18 12.37,21.18C10.84,21.18 10.37,21.95 9.1,22C7.79,22.05 6.8,20.68 5.96,19.47C4.25,17 2.94,12.45 4.7,9.39C5.57,7.87 7.13,6.91 8.82,6.88C10.1,6.86 11.32,7.75 12.11,7.75C12.89,7.75 14.37,6.68 15.92,6.84C16.57,6.87 18.39,7.1 19.56,8.82C19.47,8.88 17.39,10.1 17.41,12.63C17.44,15.65 20.06,16.66 20.09,16.67C20.06,16.74 19.67,18.11 18.71,19.5M13,3.5C13.73,2.67 14.94,2.04 15.94,2C16.07,3.17 15.6,4.35 14.9,5.19C14.21,6.04 13.07,6.7 11.95,6.61C11.8,5.46 12.36,4.26 13,3.5Z"/>
-                  </svg>
-                </button>
-              )}
-            </div>
-
-            {/* Simple text below icon */}
-            <p className="mt-3 text-sm font-medium text-muted-foreground">
-              Download SmartyGym app
-            </p>
-          </div>
-        )}
           </section> : <>
             {/* Desktop: Hero Section */}
             <section className="relative py-2 sm:py-2 bg-background overflow-hidden my-0">
