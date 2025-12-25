@@ -24,77 +24,142 @@ interface ScheduledJob {
   description: string;
 }
 
-const SCHEDULED_JOBS: Record<string, ScheduledJob> = {
-  'morning_notifications': {
-    name: 'Morning WOD & Ritual Notifications',
-    cronHourUTC: 5, // 7:00 AM Cyprus winter, 8:00 AM summer
-    frequency: 'daily',
-    messageTypes: ['wod_notification', 'daily_ritual', 'morning_notification'],
-    description: 'Sends daily WOD and Ritual notifications to users'
-  },
-  'checkin_reminders': {
-    name: 'Check-in Reminders',
-    cronHourUTC: 6, // Morning: 8:00 AM Cyprus
-    secondRunHourUTC: 18, // Night: 8:00 PM Cyprus
-    frequency: 'twice_daily',
-    messageTypes: ['checkin_reminder'],
-    description: 'Sends morning and evening check-in reminders'
-  },
-  'weekly_activity_report': {
-    name: 'Weekly Activity Report',
-    cronHourUTC: 7, // 9:00 AM Cyprus
-    frequency: 'weekly',
-    dayOfWeek: 1, // Monday
-    messageTypes: ['weekly_activity_report'],
-    description: 'Sends weekly activity summary to users'
-  },
-  'monday_motivation': {
-    name: 'Monday Motivation',
-    cronHourUTC: 8, // 10:00 AM Cyprus
-    frequency: 'weekly',
-    dayOfWeek: 1, // Monday
-    messageTypes: ['motivational_weekly'],
-    description: 'Sends motivational message every Monday'
-  },
-  'renewal_reminders': {
-    name: 'Subscription Renewal Reminders',
-    cronHourUTC: 7, // 9:00 AM Cyprus winter, 10:00 AM summer
-    frequency: 'daily',
-    messageTypes: ['renewal_reminder'],
-    description: 'Checks for expiring subscriptions and sends reminders'
-  },
-  'new_content_notifications': {
-    name: 'New Content Notifications',
-    cronHourUTC: -1, // Event-based, not scheduled
-    frequency: 'daily', // Runs every 5 minutes but we check daily
-    messageTypes: ['new_workout', 'new_program', 'new_article'],
-    description: 'Sends notifications when new content is published'
-  },
-  'wod_archiving': {
-    name: 'WOD Archiving',
-    cronHourUTC: 0, // 00:00 UTC → 02:00 Cyprus winter, 03:00 summer
-    cronMinuteUTC: 0,
-    frequency: 'daily',
-    messageTypes: [], // Doesn't send messages, archives previous WODs
-    description: 'Archives previous WODs at midnight UTC (00:00 UTC)'
-  },
-  'wod_generation': {
-    name: 'Workout of Day Generation',
-    cronHourUTC: 0, // 00:30 UTC → 02:30 Cyprus winter, 03:30 summer
-    cronMinuteUTC: 30,
-    frequency: 'daily',
-    messageTypes: [], // Doesn't send messages, generates content
-    description: 'Generates new daily workout variations (00:30 UTC, 30 min after archiving)'
-  },
-  'ritual_generation': {
-    name: 'Daily Ritual Generation',
-    cronHourUTC: 22, // 22:05 UTC (previous day) → 00:05 Cyprus winter
-    cronMinuteUTC: 5,
-    frequency: 'daily',
-    messageTypes: [], // Doesn't send messages, generates content
-    description: 'Generates the daily Smarty Ritual content'
+// Dynamic configuration for WOD generation - fetched from database
+interface WodAutoGenConfig {
+  is_enabled: boolean;
+  generation_hour_utc: number;
+  paused_until: string | null;
+  pause_reason: string | null;
+}
+
+// Dynamic configuration for automation rules - fetched from database
+interface AutomationRuleConfig {
+  automation_key: string;
+  is_active: boolean;
+  message_type: string;
+  sends_email: boolean;
+  sends_dashboard_message: boolean;
+}
+
+// Build scheduled jobs dynamically based on database configuration
+function buildScheduledJobs(wodConfig: WodAutoGenConfig | null, automationRules: AutomationRuleConfig[]): Record<string, ScheduledJob & { isDisabled?: boolean; disabledReason?: string }> {
+  // Build a map of automation rule status
+  const ruleStatusMap: Record<string, { isActive: boolean; sendsEmail: boolean; sendsDashboard: boolean }> = {};
+  for (const rule of automationRules) {
+    ruleStatusMap[rule.automation_key] = {
+      isActive: rule.is_active,
+      sendsEmail: rule.sends_email,
+      sendsDashboard: rule.sends_dashboard_message
+    };
   }
-};
+
+  // WOD generation hour from database (default to 3 if not configured)
+  const wodHour = wodConfig?.generation_hour_utc ?? 3;
+  const wodEnabled = wodConfig?.is_enabled ?? true;
+  const wodPausedUntil = wodConfig?.paused_until;
+  
+  // Check if WOD generation is currently paused
+  let wodPaused = false;
+  let wodPauseReason = '';
+  if (!wodEnabled) {
+    wodPaused = true;
+    wodPauseReason = 'Disabled by admin';
+  } else if (wodPausedUntil) {
+    const pauseDate = new Date(wodPausedUntil);
+    if (pauseDate > new Date()) {
+      wodPaused = true;
+      wodPauseReason = `Paused until ${pauseDate.toLocaleDateString('en-GB')}`;
+    }
+  }
+
+  return {
+    'morning_notifications': {
+      name: 'Morning WOD & Ritual Notifications',
+      cronHourUTC: 5, // 7:00 AM Cyprus winter, 8:00 AM summer
+      frequency: 'daily',
+      messageTypes: ['wod_notification', 'daily_ritual', 'morning_notification'],
+      description: 'Sends daily WOD and Ritual notifications to users',
+      isDisabled: !ruleStatusMap['wod_notification']?.isActive && !ruleStatusMap['daily_ritual']?.isActive,
+      disabledReason: 'Disabled in automation rules'
+    },
+    'checkin_reminders': {
+      name: 'Check-in Reminders',
+      cronHourUTC: 6, // Morning: 8:00 AM Cyprus
+      secondRunHourUTC: 18, // Night: 8:00 PM Cyprus
+      frequency: 'twice_daily',
+      messageTypes: ['checkin_reminder'],
+      description: 'Sends morning and evening check-in reminders',
+      isDisabled: !ruleStatusMap['checkin_reminder']?.isActive,
+      disabledReason: 'Disabled in automation rules'
+    },
+    'weekly_activity_report': {
+      name: 'Weekly Activity Report',
+      cronHourUTC: 7, // 9:00 AM Cyprus
+      frequency: 'weekly',
+      dayOfWeek: 1, // Monday
+      messageTypes: ['weekly_activity_report'],
+      description: 'Sends weekly activity summary to users',
+      isDisabled: !ruleStatusMap['weekly_activity']?.isActive,
+      disabledReason: 'Disabled in automation rules'
+    },
+    'monday_motivation': {
+      name: 'Monday Motivation',
+      cronHourUTC: 8, // 10:00 AM Cyprus
+      frequency: 'weekly',
+      dayOfWeek: 1, // Monday
+      messageTypes: ['motivational_weekly'],
+      description: 'Sends motivational message every Monday',
+      isDisabled: !ruleStatusMap['monday_motivation']?.isActive,
+      disabledReason: 'Disabled in automation rules'
+    },
+    'renewal_reminders': {
+      name: 'Subscription Renewal Reminders',
+      cronHourUTC: 7, // 9:00 AM Cyprus winter, 10:00 AM summer
+      frequency: 'daily',
+      messageTypes: ['renewal_reminder'],
+      description: 'Checks for expiring subscriptions and sends reminders',
+      isDisabled: !ruleStatusMap['renewal_reminder']?.isActive,
+      disabledReason: 'Disabled in automation rules'
+    },
+    'new_content_notifications': {
+      name: 'New Content Notifications',
+      cronHourUTC: -1, // Event-based, not scheduled
+      frequency: 'daily', // Runs every 5 minutes but we check daily
+      messageTypes: ['new_workout', 'new_program', 'new_article'],
+      description: 'Sends notifications when new content is published',
+      isDisabled: !ruleStatusMap['new_content']?.isActive,
+      disabledReason: 'Disabled in automation rules'
+    },
+    'wod_archiving': {
+      name: 'WOD Archiving',
+      cronHourUTC: 0, // 00:00 UTC → 02:00 Cyprus winter, 03:00 summer
+      cronMinuteUTC: 0,
+      frequency: 'daily',
+      messageTypes: [], // Doesn't send messages, archives previous WODs
+      description: 'Archives previous WODs at midnight UTC (00:00 UTC)',
+      isDisabled: wodPaused,
+      disabledReason: wodPaused ? wodPauseReason : undefined
+    },
+    'wod_generation': {
+      name: 'Workout of Day Generation',
+      cronHourUTC: wodHour, // Dynamic from database!
+      cronMinuteUTC: 0,
+      frequency: 'daily',
+      messageTypes: [], // Doesn't send messages, generates content
+      description: `Generates new daily workout at ${wodHour}:00 UTC`,
+      isDisabled: wodPaused,
+      disabledReason: wodPaused ? wodPauseReason : undefined
+    },
+    'ritual_generation': {
+      name: 'Daily Ritual Generation',
+      cronHourUTC: 22, // 22:05 UTC (previous day) → 00:05 Cyprus winter
+      cronMinuteUTC: 5,
+      frequency: 'daily',
+      messageTypes: [], // Doesn't send messages, generates content
+      description: 'Generates the daily Smarty Ritual content'
+    }
+  };
+}
 
 // Helper function to get Cyprus time from UTC
 function getCyprusTime(utcDate: Date): Date {
@@ -368,6 +433,32 @@ const handler = async (req: Request): Promise<Response> => {
     console.log(`📅 Audit time: ${now.toISOString()} (Cyprus: ${cyprusNow.toLocaleTimeString('en-GB')})`);
 
     // ============================================
+    // FETCH DYNAMIC CONFIGURATION
+    // ============================================
+    console.log("⚙️ Fetching dynamic configuration...");
+    
+    // Fetch WOD auto-generation config
+    const { data: wodAutoGenConfig } = await supabase
+      .from('wod_auto_generation_config')
+      .select('is_enabled, generation_hour_utc, paused_until, pause_reason')
+      .limit(1)
+      .maybeSingle();
+    
+    // Fetch automation rules
+    const { data: automationRulesData } = await supabase
+      .from('automation_rules')
+      .select('automation_key, is_active, message_type, sends_email, sends_dashboard_message');
+    
+    // Build scheduled jobs dynamically based on configuration
+    const SCHEDULED_JOBS = buildScheduledJobs(
+      wodAutoGenConfig as WodAutoGenConfig | null,
+      (automationRulesData || []) as AutomationRuleConfig[]
+    );
+    
+    console.log(`📋 WOD Config: ${wodAutoGenConfig ? `Hour=${wodAutoGenConfig.generation_hour_utc}, Enabled=${wodAutoGenConfig.is_enabled}` : 'Not configured (using defaults)'}`);
+    console.log(`📋 Automation Rules: ${automationRulesData?.length || 0} rules loaded`);
+
+    // ============================================
     // CATEGORY 1: DATABASE & TABLES
     // ============================================
     console.log("📊 Checking database tables...");
@@ -437,10 +528,38 @@ const handler = async (req: Request): Promise<Response> => {
     // ============================================
     console.log("🏋️ Checking WOD system...");
 
-    // Check if we're in the WOD preparation gap (00:00-00:30 UTC)
-    // During this window, WODs are being archived (00:00) and new ones generated (00:30)
+    // Check WOD generation config status
+    const wodGenHour = wodAutoGenConfig?.generation_hour_utc ?? 3;
+    const wodGenEnabled = wodAutoGenConfig?.is_enabled ?? true;
+    const wodGenPausedUntil = wodAutoGenConfig?.paused_until;
+    
+    // Determine if WOD generation is currently paused
+    let isWodGenPaused = false;
+    let wodPauseMessage = '';
+    if (!wodGenEnabled) {
+      isWodGenPaused = true;
+      wodPauseMessage = 'WOD auto-generation is disabled';
+    } else if (wodGenPausedUntil) {
+      const pauseDate = new Date(wodGenPausedUntil);
+      if (pauseDate > now) {
+        isWodGenPaused = true;
+        wodPauseMessage = `WOD generation paused until ${pauseDate.toLocaleDateString('en-GB')}`;
+      }
+    }
+    
+    // Add WOD generation config status check
+    addCheck(
+      'WOD System',
+      'WOD Auto-Generation Config',
+      isWodGenPaused ? 'PAUSED' : `Active at ${wodGenHour}:00 UTC (${formatCyprusTime(wodGenHour)} Cyprus)`,
+      'pass', // Paused is intentional, not a failure
+      isWodGenPaused ? wodPauseMessage : `Reading from database configuration`
+    );
+
+    // Check if we're in the WOD preparation gap (around generation time)
     const currentHourUTC = now.getUTCHours();
     const currentMinuteUTC = now.getUTCMinutes();
+    // Gap is at the generation hour (dynamic from config)
     const isInWodPreparationGap = currentHourUTC === 0 && currentMinuteUTC < 30;
 
     const {
@@ -460,8 +579,17 @@ const handler = async (req: Request): Promise<Response> => {
       new Set((todayWods ?? []).map((w) => w.generated_for_date).filter(Boolean))
     );
 
-    // Handle WOD preparation gap period (00:00-00:30 UTC)
-    if (isInWodPreparationGap) {
+    // Handle WOD preparation gap period OR paused generation
+    if (isWodGenPaused) {
+      // WOD generation is paused - don't report missing WODs as failures
+      addCheck(
+        'WOD System',
+        'Active WODs Exist',
+        `${todayWodCount || 0} active WODs (generation paused)`,
+        'pass', // Paused is intentional
+        wodPauseMessage + '. No new WODs will be generated until resumed.'
+      );
+    } else if (isInWodPreparationGap) {
       addCheck(
         'WOD System',
         'WOD Preparation Gap',
@@ -696,6 +824,18 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Check each scheduled job
     for (const [jobKey, job] of Object.entries(SCHEDULED_JOBS)) {
+      // Handle disabled jobs - show as DISABLED, not as failure
+      if (job.isDisabled) {
+        addCheck(
+          'Scheduled Jobs',
+          job.name,
+          'DISABLED',
+          'pass', // Disabled is intentional, not a failure
+          job.disabledReason || 'Disabled by configuration'
+        );
+        continue;
+      }
+      
       // Count messages for this job
       let messageCount = 0;
       let latestMessageTime: Date | null = null;
