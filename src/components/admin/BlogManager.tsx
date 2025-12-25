@@ -41,10 +41,13 @@ export function BlogManager() {
     let filtered = articles;
     
     if (searchQuery) {
+      const term = searchQuery.toLowerCase();
       filtered = filtered.filter(article =>
-        article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        article.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        article.excerpt.toLowerCase().includes(searchQuery.toLowerCase())
+        article.title.toLowerCase().includes(term) ||
+        article.category.toLowerCase().includes(term) ||
+        (article.excerpt?.toLowerCase() || '').includes(term) ||
+        (article.author_name?.toLowerCase() || '').includes(term) ||
+        (article.content?.substring(0, 500).toLowerCase() || '').includes(term)
       );
     }
 
@@ -314,7 +317,7 @@ export function BlogManager() {
             <div className="relative w-[200px]">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search..."
+                placeholder="Search by title, author, content..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-9"

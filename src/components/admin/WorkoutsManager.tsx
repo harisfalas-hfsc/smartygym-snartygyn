@@ -75,9 +75,14 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
     let filtered = workouts;
 
     if (searchTerm) {
+      const term = searchTerm.toLowerCase();
       filtered = filtered.filter(w => 
-        w.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        w.id.toLowerCase().includes(searchTerm.toLowerCase())
+        w.name.toLowerCase().includes(term) ||
+        w.id.toLowerCase().includes(term) ||
+        (w.category?.toLowerCase() || '').includes(term) ||
+        (w.format?.toLowerCase() || '').includes(term) ||
+        (w.equipment?.toLowerCase() || '').includes(term) ||
+        (w.difficulty?.toLowerCase() || '').includes(term)
       );
     }
 
@@ -534,7 +539,7 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search workouts..."
+                  placeholder="Search by name, category, format, equipment..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-9"
