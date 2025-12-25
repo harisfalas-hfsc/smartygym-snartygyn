@@ -176,21 +176,21 @@ export function CompletionAnalytics() {
     <div className="space-y-6" ref={chartRef}>
       {/* Overview */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card className="bg-blue-50/50 border-blue-200">
+        <Card className="bg-blue-500/10 border-blue-500/30 dark:bg-blue-500/20">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm">Workout Completion Rate</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-blue-600">{overallWorkoutRate}%</div>
+            <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{overallWorkoutRate}%</div>
             <p className="text-xs text-muted-foreground">Average across all workouts</p>
           </CardContent>
         </Card>
-        <Card className="bg-green-50/50 border-green-200">
+        <Card className="bg-green-500/10 border-green-500/30 dark:bg-green-500/20">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm">Program Completion Rate</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-green-600">{overallProgramRate}%</div>
+            <div className="text-3xl font-bold text-green-600 dark:text-green-400">{overallProgramRate}%</div>
             <p className="text-xs text-muted-foreground">Average across all programs</p>
           </CardContent>
         </Card>
