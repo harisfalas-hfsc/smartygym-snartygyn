@@ -108,7 +108,8 @@ export const Footer = () => {
               Privacy Policy
             </button>
             <button onClick={() => navigate("/termsofservice")} className="hover:text-primary transition-colors">
-              Terms of Service
+              <span className="md:hidden">T&Cs</span>
+              <span className="hidden md:inline">Terms of Service</span>
             </button>
             <button onClick={() => navigate("/disclaimer")} className="hover:text-primary transition-colors">
               Disclaimer

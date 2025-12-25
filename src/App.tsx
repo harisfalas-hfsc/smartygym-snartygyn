@@ -80,7 +80,6 @@ import BrochureCorporate from "./pages/BrochureCorporate";
 import BrochureCronJobs from "./pages/BrochureCronJobs";
 import { AccessGate } from "./components/AccessGate";
 
-import { InstallPWA } from "./components/InstallPWA";
 import { PageTransition } from "./components/PageTransition";
 import { LoadingBar } from "./components/LoadingBar";
 import { AnnouncementManager } from "./components/announcements/AnnouncementManager";
@@ -99,8 +98,6 @@ const AppContent = () => {
   return (
     <>
       <LoadingBar />
-      
-      <InstallPWA />
       <AccessControlProvider>
         <AnnouncementManager />
         <ScrollToTop />
