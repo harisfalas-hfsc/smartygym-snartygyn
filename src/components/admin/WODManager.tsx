@@ -14,7 +14,7 @@ import { WODSchedulePreview } from "./WODSchedulePreview";
 import { PeriodizationSystemDialog } from "./PeriodizationSystemDialog";
 import { WorkoutEditDialog } from "./WorkoutEditDialog";
 import { GenerateWODDialog } from "./GenerateWODDialog";
-import { CronTimeConfigDialog } from "./CronTimeConfigDialog";
+import { WODAutoGenConfigDialog } from "./WODAutoGenConfigDialog";
 
 // 7-DAY CATEGORY CYCLE
 const CATEGORY_CYCLE_7DAY = [
@@ -103,6 +103,24 @@ export const WODManager = () => {
       
       if (error) throw error;
       return data || [];
+    },
+  });
+
+  // Fetch WOD auto-generation config
+  const { data: wodAutoGenConfig } = useQuery({
+    queryKey: ["wod-auto-gen-config"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("wod_auto_generation_config")
+        .select("*")
+        .limit(1)
+        .single();
+      
+      if (error) {
+        console.error("Error fetching WOD auto-gen config:", error);
+        return null;
+      }
+      return data;
     },
   });
 
@@ -484,10 +502,6 @@ export const WODManager = () => {
             dayInCycle={getDayInCycle()}
           />
           
-          <CronTimeConfigDialog
-            open={cronDialogOpen}
-            onOpenChange={setCronDialogOpen}
-          />
         </div>
       </div>
 
@@ -562,19 +576,25 @@ export const WODManager = () => {
           </CardContent>
         </Card>
 
-        {/* Cron Status with Change Button */}
+        {/* WOD Auto-Generation Status */}
         <Card>
           <CardHeader className="pb-2">
             <CardDescription className="flex items-center gap-2">
               <RefreshCw className="h-4 w-4" />
-              Auto-Generation
+              WOD Auto-Generation
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-                <p className="text-sm font-medium">05:00 UTC</p>
+                {wodAutoGenConfig?.is_enabled && !wodAutoGenConfig?.paused_until ? (
+                  <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                ) : (
+                  <div className="h-2 w-2 rounded-full bg-orange-500" />
+                )}
+                <p className="text-sm font-medium">
+                  {wodAutoGenConfig?.generation_hour_utc?.toString().padStart(2, '0') || '03'}:00 UTC
+                </p>
               </div>
               <Button 
                 variant="ghost" 
@@ -585,7 +605,18 @@ export const WODManager = () => {
                 <Settings className="h-3 w-3" />
               </Button>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">07:00 Cyprus</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              {((wodAutoGenConfig?.generation_hour_utc || 3) + 2) % 24 < 10 ? '0' : ''}
+              {((wodAutoGenConfig?.generation_hour_utc || 3) + 2) % 24}:00 Cyprus
+            </p>
+            {wodAutoGenConfig?.paused_until && (
+              <p className="text-xs text-orange-500 mt-1">
+                Paused until {format(new Date(wodAutoGenConfig.paused_until), "MMM dd")}
+              </p>
+            )}
+            {!wodAutoGenConfig?.is_enabled && !wodAutoGenConfig?.paused_until && (
+              <p className="text-xs text-orange-500 mt-1">Disabled</p>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -917,11 +948,10 @@ export const WODManager = () => {
         }}
       />
 
-      {/* Cron Time Configuration Dialog */}
-      <CronTimeConfigDialog
+      {/* WOD Auto-Generation Configuration Dialog */}
+      <WODAutoGenConfigDialog
         open={cronDialogOpen}
         onOpenChange={setCronDialogOpen}
-        currentHour={5}
       />
     </div>
   );
