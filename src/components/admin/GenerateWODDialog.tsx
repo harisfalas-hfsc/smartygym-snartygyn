@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import {
   getDayInCycleFromDate,
@@ -17,7 +18,7 @@ import {
 interface GenerateWODDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onGenerate: (targetDate?: string) => Promise<void>;
+  onGenerate: (targetDate?: string, archiveFirst?: boolean) => Promise<void>;
   isGenerating: boolean;
   nextCategory: string;
   dayInCycle: number;
@@ -33,6 +34,7 @@ export const GenerateWODDialog = ({
 }: GenerateWODDialogProps) => {
   const [dateMode, setDateMode] = useState<"today" | "future">("today");
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [archiveFirst, setArchiveFirst] = useState(true);
   
   const today = new Date();
   const maxDate = addDays(today, 7);
@@ -53,10 +55,11 @@ export const GenerateWODDialog = ({
       ? format(selectedDate, "yyyy-MM-dd")
       : undefined;
     
-    await onGenerate(targetDate);
+    await onGenerate(targetDate, archiveFirst);
     onOpenChange(false);
     setDateMode("today");
     setSelectedDate(undefined);
+    setArchiveFirst(true);
   };
   
   const canGenerate = dateMode === "today" || (dateMode === "future" && selectedDate);
@@ -137,6 +140,21 @@ export const GenerateWODDialog = ({
             </div>
           )}
           
+          {/* Archive First Option */}
+          <div className="flex items-center space-x-3 p-3 rounded-lg border bg-orange-500/10 border-orange-500/30">
+            <Checkbox 
+              id="archive-first" 
+              checked={archiveFirst}
+              onCheckedChange={(checked) => setArchiveFirst(checked === true)}
+            />
+            <Label htmlFor="archive-first" className="flex-1 cursor-pointer">
+              <div className="font-medium text-orange-400">Archive existing WODs first</div>
+              <div className="text-sm text-muted-foreground">
+                Move current WODs to their categories before generating new ones
+              </div>
+            </Label>
+          </div>
+
           <div className="bg-muted/50 p-4 rounded-lg space-y-2">
             <div className="text-sm font-medium">Generation Preview</div>
             <div className="flex flex-wrap gap-2">
@@ -147,8 +165,16 @@ export const GenerateWODDialog = ({
                   : "Today"
                 }
               </Badge>
+              {archiveFirst && (
+                <Badge variant="outline" className="border-orange-500/50 text-orange-400">
+                  Archive First
+                </Badge>
+              )}
             </div>
             <ul className="text-sm text-muted-foreground space-y-1 mt-2">
+              {archiveFirst && (
+                <li>• Archive existing WODs to their categories</li>
+              )}
               <li>• Generate BODYWEIGHT + EQUIPMENT versions</li>
               <li>• Create Stripe products at €3.99</li>
               <li>• Generate unique workout images</li>
