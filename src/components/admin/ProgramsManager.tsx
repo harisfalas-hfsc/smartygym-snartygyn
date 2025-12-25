@@ -45,6 +45,7 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
   const [equipmentFilter, setEquipmentFilter] = useState("all");
   const [accessFilter, setAccessFilter] = useState("all");
   const [sourceFilter, setSourceFilter] = useState("all");
+  const [sortOrder, setSortOrder] = useState("newest");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -53,7 +54,7 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
 
   useEffect(() => {
     filterPrograms();
-  }, [programs, searchTerm, categoryFilter, difficultyFilter, equipmentFilter, accessFilter, sourceFilter]);
+  }, [programs, searchTerm, categoryFilter, difficultyFilter, equipmentFilter, accessFilter, sourceFilter, sortOrder]);
 
   // Watch for external dialog trigger
   useEffect(() => {
@@ -95,6 +96,19 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
       filtered = filtered.filter(p => p.is_ai_generated);
     } else if (sourceFilter === "manual") {
       filtered = filtered.filter(p => !p.is_ai_generated);
+    }
+
+    // Apply sorting
+    if (sortOrder === "newest") {
+      filtered = [...filtered].sort((a, b) => 
+        new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
+      );
+    } else if (sortOrder === "oldest") {
+      filtered = [...filtered].sort((a, b) => 
+        new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime()
+      );
+    } else if (sortOrder === "alphabetical") {
+      filtered = [...filtered].sort((a, b) => a.name.localeCompare(b.name));
     }
 
     setFilteredPrograms(filtered);
@@ -444,17 +458,17 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
               </div>
             </div>
             <Select value={sourceFilter} onValueChange={setSourceFilter}>
-              <SelectTrigger className="w-[150px]">
+              <SelectTrigger className="w-[120px]">
                 <SelectValue placeholder="Source" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Sources</SelectItem>
-                <SelectItem value="ai">🤖 AI Generated</SelectItem>
+                <SelectItem value="ai">🤖 AI</SelectItem>
                 <SelectItem value="manual">👤 Manual</SelectItem>
               </SelectContent>
             </Select>
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[140px]">
                 <Filter className="h-4 w-4 mr-2" />
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
@@ -469,7 +483,7 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
               </SelectContent>
             </Select>
             <Select value={difficultyFilter} onValueChange={setDifficultyFilter}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[130px]">
                 <SelectValue placeholder="Difficulty" />
               </SelectTrigger>
               <SelectContent>
@@ -480,7 +494,7 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
               </SelectContent>
             </Select>
             <Select value={equipmentFilter} onValueChange={setEquipmentFilter}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[130px]">
                 <SelectValue placeholder="Equipment" />
               </SelectTrigger>
               <SelectContent>
@@ -490,13 +504,23 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
               </SelectContent>
             </Select>
             <Select value={accessFilter} onValueChange={setAccessFilter}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[120px]">
                 <SelectValue placeholder="Access" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Access</SelectItem>
                 <SelectItem value="free">Free</SelectItem>
                 <SelectItem value="premium">Premium</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={sortOrder} onValueChange={setSortOrder}>
+              <SelectTrigger className="w-[120px]">
+                <SelectValue placeholder="Sort" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="newest">🕐 Newest</SelectItem>
+                <SelectItem value="oldest">⏰ Oldest</SelectItem>
+                <SelectItem value="alphabetical">📝 A-Z</SelectItem>
               </SelectContent>
             </Select>
           </div>

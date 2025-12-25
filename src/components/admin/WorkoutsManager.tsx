@@ -52,6 +52,7 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
   const [durationFilter, setDurationFilter] = useState("all");
   const [accessFilter, setAccessFilter] = useState("all");
   const [sourceFilter, setSourceFilter] = useState("all");
+  const [sortOrder, setSortOrder] = useState("newest");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -60,7 +61,7 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
 
   useEffect(() => {
     filterWorkouts();
-  }, [workouts, searchTerm, categoryFilter, formatFilter, equipmentFilter, difficultyFilter, durationFilter, accessFilter, sourceFilter]);
+  }, [workouts, searchTerm, categoryFilter, formatFilter, equipmentFilter, difficultyFilter, durationFilter, accessFilter, sourceFilter, sortOrder]);
 
   // Watch for external dialog trigger
   useEffect(() => {
@@ -128,6 +129,19 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
       filtered = filtered.filter(w => w.id.startsWith("WOD-"));
     } else if (sourceFilter === "manual") {
       filtered = filtered.filter(w => !w.is_ai_generated);
+    }
+
+    // Apply sorting
+    if (sortOrder === "newest") {
+      filtered = [...filtered].sort((a, b) => 
+        new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
+      );
+    } else if (sortOrder === "oldest") {
+      filtered = [...filtered].sort((a, b) => 
+        new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime()
+      );
+    } else if (sortOrder === "alphabetical") {
+      filtered = [...filtered].sort((a, b) => a.name.localeCompare(b.name));
     }
 
     setFilteredWorkouts(filtered);
@@ -528,18 +542,18 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
               </div>
             </div>
             <Select value={sourceFilter} onValueChange={setSourceFilter}>
-              <SelectTrigger className="w-[150px]">
+              <SelectTrigger className="w-[120px]">
                 <SelectValue placeholder="Source" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Sources</SelectItem>
-                <SelectItem value="ai">🤖 AI Generated</SelectItem>
-                <SelectItem value="wod">📅 WOD Only</SelectItem>
+                <SelectItem value="ai">🤖 AI</SelectItem>
+                <SelectItem value="wod">📅 WOD</SelectItem>
                 <SelectItem value="manual">👤 Manual</SelectItem>
               </SelectContent>
             </Select>
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[140px]">
                 <Filter className="h-4 w-4 mr-2" />
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
@@ -554,7 +568,7 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
               </SelectContent>
             </Select>
             <Select value={formatFilter} onValueChange={setFormatFilter}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[130px]">
                 <SelectValue placeholder="Format" />
               </SelectTrigger>
               <SelectContent>
@@ -569,7 +583,7 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
               </SelectContent>
             </Select>
             <Select value={equipmentFilter} onValueChange={setEquipmentFilter}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[130px]">
                 <SelectValue placeholder="Equipment" />
               </SelectTrigger>
               <SelectContent>
@@ -579,7 +593,7 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
               </SelectContent>
             </Select>
             <Select value={difficultyFilter} onValueChange={setDifficultyFilter}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[130px]">
                 <SelectValue placeholder="Difficulty" />
               </SelectTrigger>
               <SelectContent>
@@ -590,7 +604,7 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
               </SelectContent>
             </Select>
             <Select value={durationFilter} onValueChange={setDurationFilter}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[130px]">
                 <SelectValue placeholder="Duration" />
               </SelectTrigger>
               <SelectContent>
@@ -604,13 +618,23 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
               </SelectContent>
             </Select>
             <Select value={accessFilter} onValueChange={setAccessFilter}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[120px]">
                 <SelectValue placeholder="Access" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Access</SelectItem>
                 <SelectItem value="free">Free</SelectItem>
                 <SelectItem value="premium">Premium</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={sortOrder} onValueChange={setSortOrder}>
+              <SelectTrigger className="w-[120px]">
+                <SelectValue placeholder="Sort" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="newest">🕐 Newest</SelectItem>
+                <SelectItem value="oldest">⏰ Oldest</SelectItem>
+                <SelectItem value="alphabetical">📝 A-Z</SelectItem>
               </SelectContent>
             </Select>
           </div>
