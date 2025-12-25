@@ -25,6 +25,7 @@ export function BlogManager() {
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [sourceFilter, setSourceFilter] = useState("all");
+  const [sortOrder, setSortOrder] = useState("newest");
   const [selectedArticle, setSelectedArticle] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -57,8 +58,21 @@ export function BlogManager() {
       filtered = filtered.filter(article => !article.is_ai_generated);
     }
 
+    // Apply sorting
+    if (sortOrder === "newest") {
+      filtered = [...filtered].sort((a, b) => 
+        new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
+      );
+    } else if (sortOrder === "oldest") {
+      filtered = [...filtered].sort((a, b) => 
+        new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime()
+      );
+    } else if (sortOrder === "alphabetical") {
+      filtered = [...filtered].sort((a, b) => a.title.localeCompare(b.title));
+    }
+
     setFilteredArticles(filtered);
-  }, [searchQuery, categoryFilter, sourceFilter, articles]);
+  }, [searchQuery, categoryFilter, sourceFilter, sortOrder, articles]);
 
   const fetchArticles = async () => {
     try {
@@ -296,18 +310,18 @@ export function BlogManager() {
         </div>
       </CardHeader>
         <CardContent>
-          <div className="mb-6 flex gap-4 flex-wrap">
-            <div className="relative flex-1 min-w-[150px]">
+          <div className="mb-6 flex gap-3 flex-wrap">
+            <div className="relative w-[200px]">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search articles..."
+                placeholder="Search..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-9"
               />
             </div>
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-[150px]">
+              <SelectTrigger className="w-[130px]">
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
               <SelectContent>
@@ -318,13 +332,23 @@ export function BlogManager() {
               </SelectContent>
             </Select>
             <Select value={sourceFilter} onValueChange={setSourceFilter}>
-              <SelectTrigger className="w-[150px]">
+              <SelectTrigger className="w-[130px]">
                 <SelectValue placeholder="Source" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Sources</SelectItem>
-                <SelectItem value="ai">🤖 AI Generated</SelectItem>
+                <SelectItem value="ai">🤖 AI</SelectItem>
                 <SelectItem value="manual">👤 Manual</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={sortOrder} onValueChange={setSortOrder}>
+              <SelectTrigger className="w-[130px]">
+                <SelectValue placeholder="Sort" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="newest">🕐 Newest</SelectItem>
+                <SelectItem value="oldest">⏰ Oldest</SelectItem>
+                <SelectItem value="alphabetical">📝 A-Z</SelectItem>
               </SelectContent>
             </Select>
           </div>
