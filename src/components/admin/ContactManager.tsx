@@ -10,7 +10,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Mail, MessageSquare, Eye, CheckCircle, X, ArrowLeft, Send, Search, Filter, FileText, Paperclip, Download, Upload, BarChart3 } from "lucide-react";
+import { Mail, MessageSquare, Eye, CheckCircle, X, ArrowLeft, Send, Search, Filter, FileText, Paperclip, Download, Upload, BarChart3, Trash2 } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { format } from "date-fns";
 import { ContactAnalytics } from "./ContactAnalytics";
 
@@ -54,6 +55,8 @@ export const ContactManager = () => {
   const [selectedTemplate, setSelectedTemplate] = useState<string>("");
   const [uploadingAttachments, setUploadingAttachments] = useState(false);
   const [isAdminVerified, setIsAdminVerified] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [messageToDelete, setMessageToDelete] = useState<ContactMessage | null>(null);
 
   useEffect(() => {
     verifyAdminAccess();
@@ -500,6 +503,46 @@ export const ContactManager = () => {
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
+  const handleDeleteClick = (message: ContactMessage) => {
+    setMessageToDelete(message);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!messageToDelete) return;
+    
+    try {
+      const { error } = await supabase
+        .from('contact_messages')
+        .delete()
+        .eq('id', messageToDelete.id);
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: "Failed to delete message",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Success",
+        description: "Message deleted successfully",
+      });
+      fetchMessages();
+    } catch (e) {
+      toast({
+        title: "Error",
+        description: "Failed to delete message",
+        variant: "destructive",
+      });
+    } finally {
+      setDeleteDialogOpen(false);
+      setMessageToDelete(null);
+    }
+  };
+
   const newMessages = messages.filter(m => m.status === 'new');
   const readMessages = messages.filter(m => m.status === 'read');
   const respondedMessages = messages.filter(m => m.status === 'responded');
@@ -539,6 +582,9 @@ export const ContactManager = () => {
             <Button size="sm" variant="outline" onClick={() => handleViewMessage(message)}>
               <Eye className="h-4 w-4 mr-1" />
               View
+            </Button>
+            <Button size="sm" variant="destructive" onClick={() => handleDeleteClick(message)}>
+              <Trash2 className="h-4 w-4" />
             </Button>
           </div>
         </div>
@@ -923,6 +969,24 @@ export const ContactManager = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Message</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this message from {messageToDelete?.name}? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
