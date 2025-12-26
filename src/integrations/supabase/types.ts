@@ -825,9 +825,14 @@ export type Database = {
           display_name: string
           edge_function_name: string | null
           id: string
+          is_active: boolean | null
           is_critical: boolean | null
           job_name: string
+          next_run_estimate: string | null
           request_body: Json | null
+          schedule: string | null
+          schedule_human_readable: string | null
+          timezone: string | null
           updated_at: string | null
         }
         Insert: {
@@ -837,9 +842,14 @@ export type Database = {
           display_name: string
           edge_function_name?: string | null
           id?: string
+          is_active?: boolean | null
           is_critical?: boolean | null
           job_name: string
+          next_run_estimate?: string | null
           request_body?: Json | null
+          schedule?: string | null
+          schedule_human_readable?: string | null
+          timezone?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -849,9 +859,14 @@ export type Database = {
           display_name?: string
           edge_function_name?: string | null
           id?: string
+          is_active?: boolean | null
           is_critical?: boolean | null
           job_name?: string
+          next_run_estimate?: string | null
           request_body?: Json | null
+          schedule?: string | null
+          schedule_human_readable?: string | null
+          timezone?: string | null
           updated_at?: string | null
         }
         Relationships: []
