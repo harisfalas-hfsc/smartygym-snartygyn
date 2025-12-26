@@ -1631,7 +1631,7 @@ INSTRUCTIONS FORMAT: Plain paragraphs with clear guidance
         name: workoutContent.name,
         description: `${category} Workout (${equipment})`,
         images: imageUrl ? [imageUrl] : [],
-        metadata: { workout_id: workoutId, type: "wod", category: category, equipment: equipment }
+        metadata: { project: "SMARTYGYM", workout_id: workoutId, type: "wod", category: category, equipment: equipment }
       });
 
       // ═══════════════════════════════════════════════════════════════════════════════
