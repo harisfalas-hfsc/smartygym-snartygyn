@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, Star, Upload, X, ShoppingCart, ExternalLink } from "lucide-react";
+import { Plus, Pencil, Trash2, Star, Upload, X, ShoppingCart, ExternalLink, Tag, Loader2, CheckCircle, AlertCircle } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,6 +22,17 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
+interface TaggingResult {
+  dryRun: boolean;
+  totalProducts: number;
+  tagged: number;
+  skippedHFSC: number;
+  alreadyTagged: number;
+  errors?: string[];
+  taggedProducts?: { id: string; name: string }[];
+  skippedHFSCProducts?: { id: string; name: string }[];
+}
+
 export const ShopManager = () => {
   const [isCreating, setIsCreating] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -29,6 +40,8 @@ export const ShopManager = () => {
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isTagging, setIsTagging] = useState(false);
+  const [taggingPreview, setTaggingPreview] = useState<TaggingResult | null>(null);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -261,8 +274,121 @@ export const ShopManager = () => {
     }
   };
 
+  const handleTagProducts = async (dryRun: boolean) => {
+    setIsTagging(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('tag-smartygym-products', {
+        body: { dryRun }
+      });
+
+      if (error) throw error;
+
+      if (dryRun) {
+        setTaggingPreview(data);
+        toast.success("Preview loaded! Review the changes below.");
+      } else {
+        setTaggingPreview(null);
+        toast.success(`Tagged ${data.tagged} products with SMARTYGYM. Skipped ${data.skippedHFSC} HFSC products.`);
+      }
+    } catch (error: any) {
+      toast.error("Failed to tag products: " + error.message);
+    } finally {
+      setIsTagging(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
+      {/* Stripe Product Tagging Section */}
+      <Card className="border-dashed border-2 border-primary/30 bg-primary/5">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Tag className="h-5 w-5" />
+            Tag SmartyGym Products in Stripe
+          </CardTitle>
+          <CardDescription>
+            Tag all Stripe products with "SMARTYGYM" metadata (skips HFSC products)
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex gap-3">
+            <Button 
+              variant="outline" 
+              onClick={() => handleTagProducts(true)}
+              disabled={isTagging}
+            >
+              {isTagging ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Tag className="mr-2 h-4 w-4" />}
+              Preview Changes
+            </Button>
+            <Button 
+              onClick={() => handleTagProducts(false)}
+              disabled={isTagging || !taggingPreview}
+              variant="default"
+            >
+              {isTagging ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle className="mr-2 h-4 w-4" />}
+              Tag All Products
+            </Button>
+            {taggingPreview && (
+              <Button 
+                variant="ghost" 
+                onClick={() => setTaggingPreview(null)}
+              >
+                <X className="mr-2 h-4 w-4" />
+                Clear Preview
+              </Button>
+            )}
+          </div>
+
+          {taggingPreview && (
+            <div className="rounded-lg border bg-card p-4 space-y-3">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">Total Products:</span>
+                  <span>{taggingPreview.totalProducts}</span>
+                </div>
+                <div className="flex items-center gap-2 text-green-600">
+                  <CheckCircle className="h-4 w-4" />
+                  <span>Will Tag: {taggingPreview.tagged}</span>
+                </div>
+                <div className="flex items-center gap-2 text-yellow-600">
+                  <AlertCircle className="h-4 w-4" />
+                  <span>Skip (HFSC): {taggingPreview.skippedHFSC}</span>
+                </div>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Tag className="h-4 w-4" />
+                  <span>Already Tagged: {taggingPreview.alreadyTagged}</span>
+                </div>
+              </div>
+
+              {taggingPreview.taggedProducts && taggingPreview.taggedProducts.length > 0 && (
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-green-600">Products to be tagged:</p>
+                  <div className="max-h-32 overflow-y-auto text-xs space-y-0.5">
+                    {taggingPreview.taggedProducts.map((p) => (
+                      <div key={p.id} className="text-muted-foreground">{p.name}</div>
+                    ))}
+                    {taggingPreview.tagged > 20 && (
+                      <div className="text-muted-foreground italic">...and {taggingPreview.tagged - 20} more</div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {taggingPreview.skippedHFSCProducts && taggingPreview.skippedHFSCProducts.length > 0 && (
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-yellow-600">HFSC products (will skip):</p>
+                  <div className="max-h-24 overflow-y-auto text-xs space-y-0.5">
+                    {taggingPreview.skippedHFSCProducts.map((p) => (
+                      <div key={p.id} className="text-muted-foreground">{p.name}</div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-3xl font-bold">Shop Management</h2>
