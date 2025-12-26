@@ -13,9 +13,59 @@ interface CronJobRequest {
   description?: string;
   category?: string;
   schedule?: string;
+  schedule_human_readable?: string;
   edge_function_name?: string;
   request_body?: Record<string, unknown>;
   is_critical?: boolean;
+  is_active?: boolean;
+}
+
+// Convert cron expression to human-readable format with Cyprus time
+function cronToHumanReadable(cron: string): string {
+  const parts = cron.split(' ');
+  if (parts.length !== 5) return cron;
+  
+  const [minute, hour, dayOfMonth, month, dayOfWeek] = parts;
+  
+  // Every X minutes
+  if (minute.startsWith('*/') && hour === '*') {
+    const mins = minute.replace('*/', '');
+    return `Every ${mins} minutes`;
+  }
+  
+  // Every X hours
+  if (minute !== '*' && hour.startsWith('*/')) {
+    const hrs = hour.replace('*/', '');
+    return `Every ${hrs} hours at :${minute.padStart(2, '0')}`;
+  }
+  
+  // Daily at specific time
+  if (dayOfMonth === '*' && month === '*' && dayOfWeek === '*') {
+    const utcHour = parseInt(hour);
+    const cyprusHour = (utcHour + 3) % 24; // Cyprus is UTC+3 (simplified)
+    const minStr = minute.padStart(2, '0');
+    return `Daily at ${cyprusHour.toString().padStart(2, '0')}:${minStr} Cyprus (${hour}:${minStr} UTC)`;
+  }
+  
+  // Weekly
+  if (dayOfMonth === '*' && month === '*' && dayOfWeek !== '*') {
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const dayNum = parseInt(dayOfWeek);
+    const utcHour = parseInt(hour);
+    const cyprusHour = (utcHour + 3) % 24;
+    const minStr = minute.padStart(2, '0');
+    return `Every ${days[dayNum]} at ${cyprusHour.toString().padStart(2, '0')}:${minStr} Cyprus (${hour}:${minStr} UTC)`;
+  }
+  
+  // Monthly
+  if (dayOfMonth !== '*' && month === '*' && dayOfWeek === '*') {
+    const utcHour = parseInt(hour);
+    const cyprusHour = (utcHour + 3) % 24;
+    const minStr = minute.padStart(2, '0');
+    return `Monthly on day ${dayOfMonth} at ${cyprusHour.toString().padStart(2, '0')}:${minStr} Cyprus`;
+  }
+  
+  return cron;
 }
 
 serve(async (req: Request) => {
@@ -67,68 +117,27 @@ serve(async (req: Request) => {
 
     // LIST - Get all cron jobs with metadata
     if (action === 'list') {
-      // Get cron jobs from cron.job table
-      const { data: cronJobs, error: cronError } = await serviceClient.rpc('get_cron_jobs');
-      
-      // If RPC doesn't exist, query directly
-      let jobs = cronJobs;
-      if (cronError) {
-        console.log("RPC not available, querying cron.job directly...");
-        // Try direct query - this requires pg_cron extension
-        const { data, error } = await serviceClient
-          .from('cron_job_metadata')
-          .select('*')
-          .order('created_at', { ascending: true });
-        
-        if (error) {
-          throw new Error(`Failed to fetch jobs: ${error.message}`);
-        }
-        jobs = data;
-      }
-
-      // Get metadata for display names and descriptions
-      const { data: metadata } = await serviceClient
+      // Get metadata from our table
+      const { data: metadata, error: metaError } = await serviceClient
         .from('cron_job_metadata')
-        .select('*');
+        .select('*')
+        .order('category', { ascending: true })
+        .order('display_name', { ascending: true });
 
-      // Merge metadata with cron jobs
-      const metadataMap = new Map(metadata?.map(m => [m.job_name, m]) || []);
-      
-      // Try to get actual cron.job data if available
-      let actualCronJobs: any[] = [];
-      try {
-        const cronResult = await serviceClient.rpc('pg_cron_enabled');
-        if (cronResult.data) {
-          // Extension is enabled, try to query cron.job
-          const { data: cronData } = await serviceClient
-            .from('cron' as any)
-            .select('*');
-          if (cronData) {
-            actualCronJobs = cronData;
-          }
-        }
-      } catch (e) {
-        console.log("Could not query cron.job table directly");
+      if (metaError) {
+        throw new Error(`Failed to fetch jobs: ${metaError.message}`);
       }
 
-      // Build combined response
-      const enrichedJobs = (jobs || []).map((job: any) => {
-        const meta = metadataMap.get(job.job_name);
-        return {
-          ...job,
-          display_name: meta?.display_name || job.job_name,
-          description: meta?.description || '',
-          category: meta?.category || 'general',
-          edge_function_name: meta?.edge_function_name || '',
-          is_critical: meta?.is_critical || false
-        };
-      });
+      // Enrich with human-readable schedule if not set
+      const enrichedJobs = (metadata || []).map((job: any) => ({
+        ...job,
+        schedule_human_readable: job.schedule_human_readable || cronToHumanReadable(job.schedule || ''),
+      }));
 
       return new Response(
         JSON.stringify({ 
           success: true, 
-          jobs: enrichedJobs,
-          metadata: metadata || []
+          jobs: enrichedJobs
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
@@ -148,8 +157,9 @@ serve(async (req: Request) => {
       // Build the HTTP post command for the cron job
       const functionUrl = `${supabaseUrl}/functions/v1/${edge_function_name}`;
       const requestBodyJson = JSON.stringify(request_body || {});
+      const humanReadable = cronToHumanReadable(schedule);
       
-      // Create cron job using cron.schedule
+      // Create cron job using cron.schedule (requires pg_cron extension)
       const cronSql = `
         SELECT cron.schedule(
           '${job_name}',
@@ -166,12 +176,15 @@ serve(async (req: Request) => {
       
       console.log("Creating cron job with SQL:", cronSql);
       
-      // Execute via raw SQL (requires admin privileges)
-      const { error: cronCreateError } = await serviceClient.rpc('exec_sql', { sql: cronSql });
-      
-      if (cronCreateError) {
-        console.error("Cron creation failed:", cronCreateError);
-        // Still save metadata even if cron creation fails (user can add manually)
+      // Try to execute via raw SQL
+      let cronCreated = false;
+      try {
+        const { error: cronCreateError } = await serviceClient.rpc('exec_sql', { sql: cronSql });
+        if (!cronCreateError) {
+          cronCreated = true;
+        }
+      } catch (e) {
+        console.log("Direct cron.schedule failed, saving metadata only");
       }
 
       // Save metadata
@@ -182,9 +195,12 @@ serve(async (req: Request) => {
           display_name: display_name || job_name,
           description: description || '',
           category: category || 'general',
+          schedule,
+          schedule_human_readable: humanReadable,
           edge_function_name,
           request_body: request_body || {},
-          is_critical: is_critical || false
+          is_critical: is_critical || false,
+          is_active: true
         }, { onConflict: 'job_name' });
 
       if (metaError) {
@@ -194,16 +210,16 @@ serve(async (req: Request) => {
       return new Response(
         JSON.stringify({ 
           success: true, 
-          message: "Cron job created",
-          note: cronCreateError ? "Metadata saved, but cron.schedule may need manual SQL execution" : undefined
+          message: cronCreated ? "Cron job created and scheduled" : "Metadata saved - run SQL manually to schedule",
+          cron_sql: cronCreated ? undefined : cronSql
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // EDIT - Update cron job schedule
+    // EDIT - Update cron job schedule and metadata
     if (action === 'edit') {
-      const { job_name, display_name, description, category, schedule, edge_function_name, request_body, is_critical } = body;
+      const { job_name, display_name, description, category, schedule, edge_function_name, request_body, is_critical, is_active } = body;
       
       if (!job_name) {
         return new Response(
@@ -212,42 +228,7 @@ serve(async (req: Request) => {
         );
       }
 
-      // If schedule is changing, need to unschedule and reschedule
-      if (schedule && edge_function_name) {
-        const functionUrl = `${supabaseUrl}/functions/v1/${edge_function_name}`;
-        const requestBodyJson = JSON.stringify(request_body || {});
-        
-        // Unschedule existing job
-        const unscheduleSql = `SELECT cron.unschedule('${job_name}');`;
-        try {
-          await serviceClient.rpc('exec_sql', { sql: unscheduleSql });
-        } catch (_) {
-          // Job may not exist
-        }
-        
-        // Reschedule with new settings
-        const rescheduleSql = `
-          SELECT cron.schedule(
-            '${job_name}',
-            '${schedule}',
-            $$
-            SELECT net.http_post(
-              url:='${functionUrl}',
-              headers:='{"Content-Type": "application/json", "Authorization": "Bearer ${supabaseAnonKey}"}'::jsonb,
-              body:='${requestBodyJson}'::jsonb
-            ) as request_id;
-            $$
-          );
-        `;
-        
-        try {
-          await serviceClient.rpc('exec_sql', { sql: rescheduleSql });
-        } catch (e) {
-          console.error("Reschedule failed:", e);
-        }
-      }
-
-      // Update metadata
+      // Build update object
       const updateData: Record<string, unknown> = { updated_at: new Date().toISOString() };
       if (display_name !== undefined) updateData.display_name = display_name;
       if (description !== undefined) updateData.description = description;
@@ -255,7 +236,67 @@ serve(async (req: Request) => {
       if (edge_function_name !== undefined) updateData.edge_function_name = edge_function_name;
       if (request_body !== undefined) updateData.request_body = request_body;
       if (is_critical !== undefined) updateData.is_critical = is_critical;
+      if (is_active !== undefined) updateData.is_active = is_active;
+      
+      // If schedule is changing, update schedule and human-readable
+      let cronSql: string | undefined;
+      if (schedule) {
+        updateData.schedule = schedule;
+        updateData.schedule_human_readable = cronToHumanReadable(schedule);
+        
+        // Get the edge function name to use
+        const funcName = edge_function_name || (await serviceClient
+          .from('cron_job_metadata')
+          .select('edge_function_name')
+          .eq('job_name', job_name)
+          .single()).data?.edge_function_name;
+        
+        if (funcName) {
+          const functionUrl = `${supabaseUrl}/functions/v1/${funcName}`;
+          const bodyJson = JSON.stringify(request_body || {});
+          
+          // Build SQL for manual execution if needed
+          cronSql = `
+-- First unschedule existing job
+SELECT cron.unschedule('${job_name}');
 
+-- Then reschedule with new schedule
+SELECT cron.schedule(
+  '${job_name}',
+  '${schedule}',
+  $$
+  SELECT net.http_post(
+    url:='${functionUrl}',
+    headers:='{"Content-Type": "application/json", "Authorization": "Bearer ${supabaseAnonKey}"}'::jsonb,
+    body:='${bodyJson}'::jsonb
+  ) as request_id;
+  $$
+);`;
+          
+          // Try to execute
+          try {
+            await serviceClient.rpc('exec_sql', { sql: `SELECT cron.unschedule('${job_name}');` });
+            await serviceClient.rpc('exec_sql', { sql: `
+              SELECT cron.schedule(
+                '${job_name}',
+                '${schedule}',
+                $$
+                SELECT net.http_post(
+                  url:='${functionUrl}',
+                  headers:='{"Content-Type": "application/json", "Authorization": "Bearer ${supabaseAnonKey}"}'::jsonb,
+                  body:='${bodyJson}'::jsonb
+                ) as request_id;
+                $$
+              );
+            ` });
+            cronSql = undefined; // Successfully executed
+          } catch (e) {
+            console.log("Could not update cron schedule directly, SQL provided for manual execution");
+          }
+        }
+      }
+
+      // Update metadata
       const { error: updateError } = await serviceClient
         .from('cron_job_metadata')
         .update(updateData)
@@ -266,7 +307,11 @@ serve(async (req: Request) => {
       }
 
       return new Response(
-        JSON.stringify({ success: true, message: "Cron job updated" }),
+        JSON.stringify({ 
+          success: true, 
+          message: cronSql ? "Metadata updated - run SQL manually to update schedule" : "Cron job updated",
+          cron_sql: cronSql
+        }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -283,9 +328,10 @@ serve(async (req: Request) => {
       }
 
       // Unschedule the cron job
-      const unscheduleSql = `SELECT cron.unschedule('${job_name}');`;
+      let unscheduled = false;
       try {
-        await serviceClient.rpc('exec_sql', { sql: unscheduleSql });
+        await serviceClient.rpc('exec_sql', { sql: `SELECT cron.unschedule('${job_name}');` });
+        unscheduled = true;
       } catch (e) {
         console.log("Unschedule may have failed (job might not exist in cron):", e);
       }
@@ -301,7 +347,10 @@ serve(async (req: Request) => {
       }
 
       return new Response(
-        JSON.stringify({ success: true, message: "Cron job deleted" }),
+        JSON.stringify({ 
+          success: true, 
+          message: unscheduled ? "Cron job stopped and removed" : "Metadata removed - run SQL manually: SELECT cron.unschedule('" + job_name + "');"
+        }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -330,7 +379,7 @@ serve(async (req: Request) => {
       }
 
       return new Response(
-        JSON.stringify({ success: true, message: "Function executed", result: data }),
+        JSON.stringify({ success: true, message: "Function executed successfully (one-time test)", result: data }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
