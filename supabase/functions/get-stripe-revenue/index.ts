@@ -58,20 +58,59 @@ serve(async (req) => {
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
     logStep("Stripe initialized");
 
-    // Fetch all active subscriptions
-    const subscriptions = await stripe.subscriptions.list({
-      status: "active",
-      limit: 100,
-    });
+    // Fetch all active subscriptions (with pagination)
+    let allSubscriptions: any[] = [];
+    let hasMore = true;
+    let startingAfter: string | undefined = undefined;
 
-    logStep("Fetched subscriptions", { count: subscriptions.data.length });
+    while (hasMore) {
+      const params: any = { status: "active", limit: 100 };
+      if (startingAfter) {
+        params.starting_after = startingAfter;
+      }
+      
+      const subscriptions = await stripe.subscriptions.list(params);
+      allSubscriptions = allSubscriptions.concat(subscriptions.data);
+      hasMore = subscriptions.has_more;
+      
+      if (subscriptions.data.length > 0) {
+        startingAfter = subscriptions.data[subscriptions.data.length - 1].id;
+      }
+    }
 
-    // Calculate total monthly recurring revenue
+    logStep("Fetched all subscriptions", { count: allSubscriptions.length });
+
+    // Calculate total monthly recurring revenue - ONLY for SMARTYGYM products
     let totalRevenue = 0;
     const revenueByPlan: { [key: string]: number } = {};
     const subscriptionDetails: any[] = [];
+    let skippedNonSmartyGym = 0;
 
-    for (const subscription of subscriptions.data) {
+    for (const subscription of allSubscriptions) {
+      // Get the product ID to check metadata
+      const productId = subscription.items.data[0].price.product as string;
+      
+      // Fetch the product to check its metadata
+      let product;
+      try {
+        product = await stripe.products.retrieve(productId);
+      } catch (error) {
+        logStep("Failed to fetch product, skipping", { productId });
+        skippedNonSmartyGym++;
+        continue;
+      }
+      
+      // FILTER: Only include SMARTYGYM products
+      if (product.metadata?.project !== "SMARTYGYM") {
+        logStep("Skipping non-SMARTYGYM product", { 
+          productId, 
+          productName: product.name,
+          projectTag: product.metadata?.project || "none"
+        });
+        skippedNonSmartyGym++;
+        continue;
+      }
+
       // Get the price amount (in cents) and convert to dollars/euros
       const amount = subscription.items.data[0].price.unit_amount || 0;
       const currency = subscription.items.data[0].price.currency;
@@ -81,7 +120,6 @@ serve(async (req) => {
 
       // Get product name for grouping
       const priceId = subscription.items.data[0].price.id;
-      const productId = subscription.items.data[0].price.product as string;
       
       if (!revenueByPlan[productId]) {
         revenueByPlan[productId] = 0;
@@ -100,20 +138,25 @@ serve(async (req) => {
         currency: currency.toUpperCase(),
         priceId,
         productId,
+        productName: product.name,
         status: subscription.status,
         currentPeriodEnd: periodEnd,
       });
     }
 
-    logStep("Revenue calculated", { 
+    logStep("Revenue calculated (SMARTYGYM only)", { 
       totalRevenue, 
-      subscriptionCount: subscriptions.data.length 
+      smartyGymSubscriptions: subscriptionDetails.length,
+      skippedNonSmartyGym,
+      totalSubscriptions: allSubscriptions.length
     });
 
     return new Response(
       JSON.stringify({
         totalRevenue,
-        subscriptionCount: subscriptions.data.length,
+        subscriptionCount: subscriptionDetails.length,
+        skippedNonSmartyGym,
+        totalSubscriptionsChecked: allSubscriptions.length,
         revenueByPlan,
         subscriptions: subscriptionDetails,
       }),

@@ -94,6 +94,10 @@ serve(async (req) => {
     const productData: any = {
       name: name,
       description: `${contentType}: ${name}`,
+      metadata: {
+        project: "SMARTYGYM",
+        content_type: contentType
+      }
     };
 
     if (validatedImageUrl) {

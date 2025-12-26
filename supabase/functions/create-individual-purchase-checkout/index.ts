@@ -80,6 +80,7 @@ serve(async (req) => {
       const product = await stripe.products.create({
         name: contentName,
         metadata: {
+          project: "SMARTYGYM",
           content_type: contentType,
           content_id: contentId,
         },
