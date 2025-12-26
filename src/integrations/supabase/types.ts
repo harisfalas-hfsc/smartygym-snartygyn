@@ -817,6 +817,45 @@ export type Database = {
         }
         Relationships: []
       }
+      cron_job_metadata: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          description: string | null
+          display_name: string
+          edge_function_name: string | null
+          id: string
+          is_critical: boolean | null
+          job_name: string
+          request_body: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          display_name: string
+          edge_function_name?: string | null
+          id?: string
+          is_critical?: boolean | null
+          job_name: string
+          request_body?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          display_name?: string
+          edge_function_name?: string | null
+          id?: string
+          is_critical?: boolean | null
+          job_name?: string
+          request_body?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       daily_smarty_rituals: {
         Row: {
           created_at: string | null

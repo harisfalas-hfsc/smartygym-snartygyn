@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { ArrowLeft, Folder, Users, Mail, FileText, Settings, BarChart3, BookOpen, MessageSquare, Inbox, Megaphone, TrendingUp, Plus, Dumbbell, Calendar, Bell, ShoppingBag, Sparkles, Building2, Video, Smartphone } from "lucide-react";
+import { ArrowLeft, Folder, Users, Mail, FileText, Settings, BarChart3, BookOpen, MessageSquare, Inbox, Megaphone, TrendingUp, Plus, Dumbbell, Calendar, Bell, ShoppingBag, Sparkles, Building2, Video, Smartphone, Clock } from "lucide-react";
 import { ContentManager } from "@/components/admin/ContentManager";
 import { CommunicationsManager } from "@/components/admin/CommunicationsManager";
 import { EmailManager } from "@/components/admin/EmailManager";
@@ -26,6 +26,7 @@ import { AdminDocumentationManager } from "@/components/admin/AdminDocumentation
 import { CorporateDashboard } from "@/components/admin/CorporateDashboard";
 import ExerciseLibraryManager from "@/components/admin/ExerciseLibraryManager";
 import SmartyGymAppVault from "@/pages/admin/SmartyGymAppVault";
+import { CronJobsManager } from "@/components/admin/CronJobsManager";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function AdminBackoffice() {
@@ -224,6 +225,11 @@ export default function AdminBackoffice() {
               <span className="hidden sm:inline">Email</span>
             </TabsTrigger>
             
+            <TabsTrigger value="cron-jobs" className="flex items-center justify-center gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-2.5 whitespace-nowrap flex-shrink-0">
+              <Clock className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
+              <span className="hidden sm:inline">Cron Jobs</span>
+            </TabsTrigger>
+            
             <TabsTrigger value="users" className="flex items-center justify-center gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-2.5 whitespace-nowrap flex-shrink-0">
               <Users className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
               <span className="hidden sm:inline">Users</span>
@@ -323,6 +329,10 @@ export default function AdminBackoffice() {
 
             <TabsContent value="email" className="mt-0">
               <EmailManager />
+            </TabsContent>
+
+            <TabsContent value="cron-jobs" className="mt-0">
+              <CronJobsManager />
             </TabsContent>
 
             <TabsContent value="users" className="mt-0">

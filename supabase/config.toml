@@ -1,5 +1,8 @@
 project_id = "cvccrvyimyzrxcwzmxwk"
 
+[functions.manage-cron-jobs]
+verify_jwt = true
+
 [functions.auto-generate-workout-image]
 verify_jwt = false
 
