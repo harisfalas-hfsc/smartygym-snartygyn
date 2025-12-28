@@ -115,7 +115,7 @@ serve(async (req: Request) => {
 
     console.log(`🔧 Cron job management: ${action}`, body);
 
-    // LIST - Get all cron jobs with metadata
+    // LIST - Get all cron jobs with metadata AND real scheduler jobs
     if (action === 'list') {
       // Get metadata from our table
       const { data: metadata, error: metaError } = await serviceClient
@@ -128,16 +128,56 @@ serve(async (req: Request) => {
         throw new Error(`Failed to fetch jobs: ${metaError.message}`);
       }
 
-      // Enrich with human-readable schedule if not set
-      const enrichedJobs = (metadata || []).map((job: any) => ({
-        ...job,
-        schedule_human_readable: job.schedule_human_readable || cronToHumanReadable(job.schedule || ''),
-      }));
+      // Try to get real scheduler jobs from cron.job table
+      let schedulerJobs: Array<{ jobname: string; schedule: string; active: boolean }> = [];
+      try {
+        const { data: cronJobs, error: cronError } = await serviceClient
+          .rpc('get_cron_jobs');
+        
+        if (!cronError && cronJobs) {
+          schedulerJobs = cronJobs;
+        }
+      } catch (e) {
+        console.log("Could not fetch cron.job table (function may not exist):", e);
+      }
+
+      // Create a map of scheduler jobs by name
+      const schedulerMap = new Map(schedulerJobs.map(j => [j.jobname, j]));
+
+      // Enrich metadata with scheduler info
+      const enrichedJobs = (metadata || []).map((job: any) => {
+        const schedulerJob = schedulerMap.get(job.job_name);
+        return {
+          ...job,
+          schedule_human_readable: job.schedule_human_readable || cronToHumanReadable(job.schedule || ''),
+          scheduler_schedule: schedulerJob?.schedule || null,
+          scheduler_active: schedulerJob?.active ?? null,
+          in_scheduler: !!schedulerJob,
+          schedule_mismatch: schedulerJob ? (schedulerJob.schedule !== job.schedule) : false,
+        };
+      });
+
+      // Also report scheduler jobs that aren't in metadata
+      const metadataNames = new Set((metadata || []).map((j: any) => j.job_name));
+      const orphanSchedulerJobs = schedulerJobs
+        .filter(j => !metadataNames.has(j.jobname))
+        .map(j => ({
+          job_name: j.jobname,
+          display_name: j.jobname,
+          schedule: j.schedule,
+          scheduler_schedule: j.schedule,
+          scheduler_active: j.active,
+          in_scheduler: true,
+          in_metadata: false,
+          schedule_mismatch: false,
+          is_orphan: true,
+        }));
 
       return new Response(
         JSON.stringify({ 
           success: true, 
-          jobs: enrichedJobs
+          jobs: enrichedJobs,
+          orphan_scheduler_jobs: orphanSchedulerJobs,
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
