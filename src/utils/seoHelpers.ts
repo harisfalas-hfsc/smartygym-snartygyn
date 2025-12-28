@@ -584,3 +584,223 @@ export const generateCommunityLeaderboardSchema = (type: 'workouts' | 'programs'
     "name": "SmartyGym"
   }
 });
+
+/**
+ * Generate individual Review JSON-LD schema
+ */
+export const generateReviewSchema = (review: {
+  author: string;
+  rating: number;
+  text: string;
+  datePublished: string;
+  itemReviewed?: string;
+}) => ({
+  "@context": "https://schema.org",
+  "@type": "Review",
+  "author": {
+    "@type": "Person",
+    "name": review.author
+  },
+  "reviewRating": {
+    "@type": "Rating",
+    "ratingValue": review.rating,
+    "bestRating": 5,
+    "worstRating": 1
+  },
+  "reviewBody": review.text,
+  "datePublished": review.datePublished,
+  "itemReviewed": {
+    "@type": "Product",
+    "name": review.itemReviewed || "SmartyGym Premium Membership",
+    "brand": {
+      "@type": "Organization",
+      "name": "SmartyGym"
+    }
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SmartyGym",
+    "url": "https://smartygym.com"
+  }
+});
+
+/**
+ * Generate Testimonials Collection with AggregateRating and Reviews
+ */
+export const generateTestimonialsSchema = (testimonials: Array<{
+  author: string;
+  rating: number;
+  text: string;
+  datePublished: string;
+}>) => {
+  const totalRating = testimonials.reduce((sum, t) => sum + t.rating, 0);
+  const averageRating = Math.round((totalRating / testimonials.length) * 100) / 100;
+  
+  return {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "@id": "https://smartygym.com/#product",
+    "name": "SmartyGym - Online Fitness Platform",
+    "description": "Premier online fitness platform with 500+ expert-designed workouts and training programs by Sports Scientist Haris Falas. 100% Human. Zero AI.",
+    "brand": {
+      "@type": "Organization",
+      "name": "SmartyGym",
+      "url": "https://smartygym.com"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": averageRating,
+      "reviewCount": testimonials.length,
+      "bestRating": 5,
+      "worstRating": 1
+    },
+    "review": testimonials.map(t => ({
+      "@type": "Review",
+      "author": {
+        "@type": "Person",
+        "name": t.author
+      },
+      "reviewRating": {
+        "@type": "Rating",
+        "ratingValue": t.rating,
+        "bestRating": 5
+      },
+      "reviewBody": t.text,
+      "datePublished": t.datePublished
+    })),
+    "offers": {
+      "@type": "AggregateOffer",
+      "lowPrice": "0",
+      "highPrice": "89.99",
+      "priceCurrency": "EUR",
+      "offerCount": 3
+    },
+    "url": "https://smartygym.com",
+    "image": "https://smartygym.com/smarty-gym-logo.png"
+  };
+};
+
+/**
+ * Generate Enhanced Coach Person Schema with Reviews
+ */
+export const generateEnhancedCoachSchema = (reviewCount?: number, averageRating?: number) => ({
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "@id": "https://smartygym.com/coach-profile#person",
+  "name": "Haris Falas",
+  "alternateName": ["Coach Haris", "HFSC", "Haris Falas CSCS", "Haris Falas Sports Scientist"],
+  "givenName": "Haris",
+  "familyName": "Falas",
+  "jobTitle": "Sports Scientist & Strength and Conditioning Coach",
+  "description": "Founder of SmartyGym. BSc Sports Science and CSCS certified coach with 20+ years experience in functional training, strength conditioning, and online fitness coaching. Creator of 500+ workouts and 25+ training programs. 100% Human-designed content.",
+  "image": {
+    "@type": "ImageObject",
+    "url": "https://smartygym.com/haris-falas-coach.png",
+    "caption": "Haris Falas - Sports Scientist and Founder of SmartyGym - Professional Fitness Coach with 20+ years experience"
+  },
+  "hasCredential": [
+    {
+      "@type": "EducationalOccupationalCredential",
+      "credentialCategory": "degree",
+      "name": "Bachelor of Science in Sports Science",
+      "educationalLevel": "Bachelor's Degree"
+    },
+    {
+      "@type": "EducationalOccupationalCredential",
+      "credentialCategory": "certificate",
+      "name": "Certified Strength and Conditioning Specialist (CSCS)",
+      "recognizedBy": { "@type": "Organization", "name": "NSCA" }
+    },
+    {
+      "@type": "EducationalOccupationalCredential",
+      "credentialCategory": "certificate",
+      "name": "EXOS Performance Specialist",
+      "recognizedBy": { "@type": "Organization", "name": "EXOS" }
+    }
+  ],
+  "hasOccupation": {
+    "@type": "Occupation",
+    "name": "Personal Trainer & Fitness Coach",
+    "occupationalCategory": "29-9091.00",
+    "skills": ["Program Design", "Strength Training", "Sports Science", "Online Coaching", "Functional Fitness"]
+  },
+  "knowsAbout": [
+    "Strength Training", "Sports Science", "Functional Fitness", "Exercise Physiology",
+    "Program Design", "Metabolic Conditioning", "Mobility Training", "Evidence-Based Training",
+    "HIIT Training", "Athletic Performance", "Periodization", "Progressive Overload",
+    "Bodyweight Training", "Weight Loss Programming", "Muscle Hypertrophy",
+    "Cardio Endurance", "Low Back Rehabilitation", "Online Coaching",
+    "AMRAP Workouts", "TABATA Training", "Circuit Training"
+  ],
+  "memberOf": [
+    { "@type": "Organization", "name": "National Strength and Conditioning Association (NSCA)" }
+  ],
+  "worksFor": {
+    "@type": "Organization",
+    "name": "SmartyGym",
+    "url": "https://smartygym.com",
+    "founder": { "@type": "Person", "name": "Haris Falas" }
+  },
+  "founder": {
+    "@type": "Organization",
+    "name": "SmartyGym",
+    "url": "https://smartygym.com"
+  },
+  "url": "https://smartygym.com/coach-profile",
+  "sameAs": [
+    "https://www.instagram.com/smartygymcy/",
+    "https://www.youtube.com/@TheSmartyGym",
+    "https://www.facebook.com/smartygym"
+  ],
+  "award": ["20+ Years Coaching Experience", "Creator of 500+ Expert Workouts", "Founder of SmartyGym"],
+  "publishingPrinciples": "100% Human-designed content. Zero AI. Evidence-based training methods.",
+  ...(reviewCount && averageRating ? {
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": averageRating,
+      "reviewCount": reviewCount,
+      "bestRating": 5,
+      "worstRating": 1
+    }
+  } : {})
+});
+
+/**
+ * Generate Organization with AggregateRating schema
+ */
+export const generateOrganizationWithRatingSchema = (reviewCount: number, averageRating: number) => ({
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "@id": "https://smartygym.com/#organization",
+  "name": "SmartyGym",
+  "alternateName": ["Smarty Gym", "smartygym.com", "HFSC Performance"],
+  "url": "https://smartygym.com",
+  "logo": "https://smartygym.com/smarty-gym-logo.png",
+  "description": "Leading global online fitness platform. 500+ expert-designed workouts and training programs by Sports Scientist Haris Falas. 100% Human. Zero AI.",
+  "slogan": "100% Human. 0% AI.",
+  "founder": {
+    "@type": "Person",
+    "name": "Haris Falas",
+    "jobTitle": "Sports Scientist & Strength and Conditioning Coach"
+  },
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": averageRating,
+    "reviewCount": reviewCount,
+    "bestRating": 5,
+    "worstRating": 1
+  },
+  "areaServed": { "@type": "Place", "name": "Worldwide" },
+  "serviceType": ["Online Fitness Training", "Workout Programs", "Training Programs", "Fitness Tools"],
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "Customer Support",
+    "email": "info@smartygym.com",
+    "availableLanguage": ["English", "Greek"]
+  },
+  "sameAs": [
+    "https://www.instagram.com/smartygymcy/",
+    "https://www.facebook.com/smartygym",
+    "https://www.youtube.com/@TheSmartyGym"
+  ]
+});
