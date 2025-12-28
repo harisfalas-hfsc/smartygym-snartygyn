@@ -47,6 +47,7 @@ export const ArticleEditDialog = ({ article, open, onOpenChange, onSave }: Artic
     author_name: '',
     author_credentials: '',
   });
+  const [sendNotification, setSendNotification] = useState(false);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [imageUniqueness, setImageUniqueness] = useState<{
     isUnique: boolean;
@@ -362,41 +363,28 @@ export const ArticleEditDialog = ({ article, open, onOpenChange, onSave }: Artic
 
         if (error) throw error;
 
-        // Schedule notification for new published blog article (5 minutes from now)
-        if (formData.is_published && formData.title && formData.title.trim()) {
+        // Only schedule notification if admin explicitly enabled it
+        // Skip notifications for test articles (names containing "test", "TEST", etc.)
+        const isTestArticle = formData.title && /test/i.test(formData.title.trim());
+        
+        if (sendNotification && formData.is_published && formData.title && formData.title.trim() && !isTestArticle) {
           try {
-            const scheduledTime = new Date(Date.now() + 5 * 60 * 1000).toISOString();
-            
-            // Compose notification body
-            let notificationBody = `New article published: "${formData.title}". `;
-            if (formData.excerpt) {
-              const excerptPreview = formData.excerpt.length > 100 
-                ? formData.excerpt.substring(0, 100) + '...'
-                : formData.excerpt;
-              notificationBody += excerptPreview;
-            }
-            
-            // Insert scheduled notification
+            // Use the pending_content_notifications table which has an actual processor
             await supabase
-              .from('scheduled_notifications')
+              .from('pending_content_notifications')
               .insert([{
-                title: '📚 New Blog Article!',
-                body: notificationBody,
-                url: `/blog/${formData.slug}`,
-                icon: formData.image_url || '/smarty-gym-logo.png',
-                target_audience: 'all',
-                scheduled_time: scheduledTime,
-                timezone: 'UTC',
-                status: 'pending',
-                recurrence_pattern: 'once'
+                content_type: 'article',
+                content_id: formData.slug,
+                content_name: formData.title,
+                content_category: formData.category || null,
               }]);
             
             if (import.meta.env.DEV) {
-              console.log('✅ Notification scheduled for new article:', formData.title);
+              console.log('✅ Notification queued for new article:', formData.title);
             }
           } catch (notifError) {
             if (import.meta.env.DEV) {
-              console.error('Error scheduling notification:', notifError);
+              console.error('Error queueing notification:', notifError);
             }
             // Don't fail the article creation if notification fails
           }
@@ -637,6 +625,42 @@ export const ArticleEditDialog = ({ article, open, onOpenChange, onSave }: Artic
                 Publish article
               </Label>
             </div>
+
+            {/* Notification Toggle - Only show for new articles */}
+            {!article && (
+              <div className="space-y-2 pt-4 border-t border-orange-200 bg-orange-50/50 p-4 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <Label htmlFor="send_notification" className="text-orange-800 font-semibold">
+                      📢 Send Notification to Users
+                    </Label>
+                    <p className="text-sm text-orange-700">
+                      Enable to notify all users about this new article via email and dashboard
+                    </p>
+                  </div>
+                  <Switch
+                    id="send_notification"
+                    checked={sendNotification}
+                    onCheckedChange={setSendNotification}
+                  />
+                </div>
+                {sendNotification && !formData.is_published && (
+                  <p className="text-sm text-amber-600 bg-amber-100 p-2 rounded mt-2">
+                    ⚠️ Article must be published for notifications to be sent
+                  </p>
+                )}
+                {sendNotification && formData.is_published && (
+                  <p className="text-sm text-orange-600 bg-orange-100 p-2 rounded mt-2">
+                    ⚠️ Users will receive a notification about this article. Make sure content is ready!
+                  </p>
+                )}
+                {formData.title && /test/i.test(formData.title) && (
+                  <p className="text-sm text-amber-600 bg-amber-100 p-2 rounded mt-2">
+                    🧪 Test article detected - notifications will be automatically skipped
+                  </p>
+                )}
+              </div>
+            )}
 
             <div className="flex justify-end gap-2 pt-4">
               <Button variant="outline" onClick={() => onOpenChange(false)}>
