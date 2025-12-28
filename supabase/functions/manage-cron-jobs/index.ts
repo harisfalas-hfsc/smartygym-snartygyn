@@ -20,12 +20,28 @@ interface CronJobRequest {
   is_active?: boolean;
 }
 
+// Get Cyprus timezone offset (UTC+2 in winter, UTC+3 in summer)
+function getCyprusOffset(): number {
+  const now = new Date();
+  const month = now.getUTCMonth() + 1; // 1-12
+  const day = now.getUTCDate();
+  
+  // DST in Cyprus: Last Sunday of March to Last Sunday of October
+  // Simplified: April-October = summer (UTC+3), November-March = winter (UTC+2)
+  if (month >= 4 && month <= 10) {
+    return 3; // Summer time (EEST)
+  }
+  return 2; // Winter time (EET)
+}
+
 // Convert cron expression to human-readable format with Cyprus time
 function cronToHumanReadable(cron: string): string {
   const parts = cron.split(' ');
   if (parts.length !== 5) return cron;
   
   const [minute, hour, dayOfMonth, month, dayOfWeek] = parts;
+  const cyprusOffset = getCyprusOffset();
+  const offsetLabel = cyprusOffset === 3 ? 'UTC+3' : 'UTC+2';
   
   // Every X minutes
   if (minute.startsWith('*/') && hour === '*') {
@@ -42,9 +58,9 @@ function cronToHumanReadable(cron: string): string {
   // Daily at specific time
   if (dayOfMonth === '*' && month === '*' && dayOfWeek === '*') {
     const utcHour = parseInt(hour);
-    const cyprusHour = (utcHour + 3) % 24; // Cyprus is UTC+3 (simplified)
+    const cyprusHour = (utcHour + cyprusOffset) % 24;
     const minStr = minute.padStart(2, '0');
-    return `Daily at ${cyprusHour.toString().padStart(2, '0')}:${minStr} Cyprus (${hour}:${minStr} UTC)`;
+    return `Daily at ${cyprusHour.toString().padStart(2, '0')}:${minStr} Cyprus (${hour}:${minStr} UTC, ${offsetLabel})`;
   }
   
   // Weekly
@@ -52,7 +68,7 @@ function cronToHumanReadable(cron: string): string {
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const dayNum = parseInt(dayOfWeek);
     const utcHour = parseInt(hour);
-    const cyprusHour = (utcHour + 3) % 24;
+    const cyprusHour = (utcHour + cyprusOffset) % 24;
     const minStr = minute.padStart(2, '0');
     return `Every ${days[dayNum]} at ${cyprusHour.toString().padStart(2, '0')}:${minStr} Cyprus (${hour}:${minStr} UTC)`;
   }
@@ -60,7 +76,7 @@ function cronToHumanReadable(cron: string): string {
   // Monthly
   if (dayOfMonth !== '*' && month === '*' && dayOfWeek === '*') {
     const utcHour = parseInt(hour);
-    const cyprusHour = (utcHour + 3) % 24;
+    const cyprusHour = (utcHour + cyprusOffset) % 24;
     const minStr = minute.padStart(2, '0');
     return `Monthly on day ${dayOfMonth} at ${cyprusHour.toString().padStart(2, '0')}:${minStr} Cyprus`;
   }
