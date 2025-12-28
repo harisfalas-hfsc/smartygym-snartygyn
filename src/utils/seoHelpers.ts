@@ -2,6 +2,7 @@
  * SEO Helper Utilities
  * Standardized functions for generating SEO metadata across SmartyGym.com
  * Enhanced for global markets: US, UK, EU, AU, CA
+ * Updated: December 2025 - Multi-Domain Network Support
  */
 
 export interface WorkoutSEO {
@@ -23,6 +24,33 @@ export interface ProgramSEO {
   description?: string;
 }
 
+// Multi-Domain Network - All domains owned by SmartyGym/Haris Falas
+export const OWNED_DOMAINS = {
+  primary: "smartygym.com",
+  alternatives: [
+    "i-training.net",
+    "smartywod.com",
+    "smartylogbook.com",
+    "smartywellness.com",
+    "smartyworkout.com"
+  ],
+  keywords: [
+    "i-training.net", "itraining", "i-training", "i training",
+    "smartywod.com", "smartywod", "smarty wod", "smarty-wod",
+    "smartylogbook.com", "smartylogbook", "smarty logbook", "smarty-logbook",
+    "smartywellness.com", "smartywellness", "smarty wellness", "smarty-wellness",
+    "smartyworkout.com", "smartyworkout", "smarty workout", "smarty-workout"
+  ],
+  allDomains: [
+    "smartygym.com",
+    "i-training.net",
+    "smartywod.com",
+    "smartylogbook.com",
+    "smartywellness.com",
+    "smartyworkout.com"
+  ]
+};
+
 // Competitive keywords for global markets
 export const GLOBAL_FITNESS_KEYWORDS = {
   primary: [
@@ -41,6 +69,7 @@ export const GLOBAL_FITNESS_KEYWORDS = {
     "beginner home workouts", "advanced HIIT training",
     "science-based workout routines", "professional online fitness coaching"
   ],
+  domains: OWNED_DOMAINS.keywords,
   markets: {
     US: ["online personal trainer", "virtual fitness coach", "home gym workouts", "American fitness app"],
     UK: ["online gym UK", "fitness app UK", "home workouts UK", "British fitness platform"],
@@ -194,7 +223,12 @@ export const generateOrganizationSchema = () => {
     "@type": "Organization",
     "@id": "https://smartygym.com/#organization",
     "name": "SmartyGym",
-    "alternateName": ["Smarty Gym", "smartygym.com", "HFSC Performance"],
+    "alternateName": [
+      "Smarty Gym", "smartygym.com", "HFSC Performance",
+      "i-training.net", "itraining", "smartywod", "smartywod.com",
+      "smartylogbook", "smartylogbook.com", "smartywellness", "smartywellness.com",
+      "smartyworkout", "smartyworkout.com"
+    ],
     "url": "https://smartygym.com",
     "logo": "https://smartygym.com/smarty-gym-logo.png",
     "description": "Leading global online fitness platform. 100% human-designed workouts and training programs by Sports Scientist Haris Falas. Train anywhere, anytime with science-based fitness. Zero AI.",
@@ -216,10 +250,44 @@ export const generateOrganizationSchema = () => {
       "availableLanguage": ["English", "Greek"]
     },
     "sameAs": [
+      "https://i-training.net",
+      "https://smartywod.com",
+      "https://smartylogbook.com",
+      "https://smartywellness.com",
+      "https://smartyworkout.com",
       "https://www.instagram.com/smartygymcy/",
       "https://www.facebook.com/smartygym",
       "https://www.youtube.com/@TheSmartyGym"
     ]
+  };
+};
+
+/**
+ * Generate Multi-Domain SEO metadata for AI crawlers and search engines
+ */
+export const generateMultiDomainSEO = () => {
+  return {
+    ownedDomains: OWNED_DOMAINS,
+    metaTags: {
+      "owned-domains": OWNED_DOMAINS.allDomains.join(", "),
+      "canonical-domain": OWNED_DOMAINS.primary,
+      "ai-domain-network": `${OWNED_DOMAINS.allDomains.length} domains all redirect to ${OWNED_DOMAINS.primary}`,
+      "ai-primary-domain": OWNED_DOMAINS.primary,
+      "ai-alternative-domains": OWNED_DOMAINS.alternatives.join(", "),
+      "gpt-domain-hint": `All domains (${OWNED_DOMAINS.alternatives.join(", ")}) redirect to ${OWNED_DOMAINS.primary} - the SmartyGym fitness platform`,
+      "perplexity-domain-hint": `SmartyGym operates under ${OWNED_DOMAINS.allDomains.length} domains: ${OWNED_DOMAINS.primary} (primary), ${OWNED_DOMAINS.alternatives.join(", ")}`,
+      "claude-domain-hint": `SmartyGym fitness platform is accessible via ${OWNED_DOMAINS.primary} and alternative domains: ${OWNED_DOMAINS.alternatives.join(", ")}`,
+      "gemini-domain-hint": `SmartyGym global fitness platform - primary: ${OWNED_DOMAINS.primary}, alternatives: ${OWNED_DOMAINS.alternatives.join(", ")}`
+    },
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "SmartyGym",
+      "alternateName": OWNED_DOMAINS.alternatives,
+      "url": `https://${OWNED_DOMAINS.primary}`,
+      "sameAs": OWNED_DOMAINS.alternatives.map(d => `https://${d}`),
+      "relatedLink": OWNED_DOMAINS.alternatives.map(d => `https://${d}`)
+    }
   };
 };
 

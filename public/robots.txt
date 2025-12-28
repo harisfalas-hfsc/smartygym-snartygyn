@@ -1,6 +1,17 @@
 # SmartyGym Robots.txt - Global Online Fitness Platform
 # Website: https://smartygym.com
-# Last Updated: 2025-12-04
+# Last Updated: 2025-12-28
+#
+# MULTI-DOMAIN NETWORK
+# All the following domains redirect to smartygym.com (canonical):
+# - i-training.net → smartygym.com
+# - smartywod.com → smartygym.com
+# - smartylogbook.com → smartygym.com
+# - smartywellness.com → smartygym.com
+# - smartyworkout.com → smartygym.com
+#
+# This is a unified domain network for the SmartyGym fitness platform
+# by Sports Scientist Haris Falas - 100% Human. 0% AI.
 
 # Google Crawlers
 User-agent: Googlebot
@@ -136,5 +147,15 @@ Disallow: /api/
 # Sitemaps
 Sitemap: https://smartygym.com/sitemap.xml
 
-# Host
+# Canonical Host (all domains redirect here)
 Host: https://smartygym.com
+
+# Domain Network Information for AI Crawlers
+# Primary Domain: smartygym.com
+# Alternative Domains (all redirect to primary):
+# - i-training.net
+# - smartywod.com
+# - smartylogbook.com
+# - smartywellness.com
+# - smartyworkout.com
+# All 6 domains are owned by SmartyGym / Haris Falas
