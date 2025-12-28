@@ -1,6 +1,8 @@
 import { Card } from "@/components/ui/card";
 import { Star } from "lucide-react";
 
+// SEO-optimized testimonials for homepage slider
+// Full testimonials available at /community - SmartyGym reviews, HFM reviews, smartygym.com reviews
 const testimonials = [
   {
     id: 1,
@@ -23,6 +25,27 @@ const testimonials = [
     rating: 5,
     date: "2025-11-19",
   },
+  {
+    id: 4,
+    text: "Coach Haris knows exactly what works. SmartyGym is the best online fitness platform.",
+    author: "Dimitra G.",
+    rating: 5,
+    date: "2025-10-22",
+  },
+  {
+    id: 5,
+    text: "After 3 months with SmartyGym, I feel 10 years younger. Amazing results!",
+    author: "Konstantinos D.",
+    rating: 5,
+    date: "2025-11-01",
+  },
+  {
+    id: 6,
+    text: "The science-based approach is refreshing. Real results backed by sports science.",
+    author: "Eleni A.",
+    rating: 5,
+    date: "2025-11-05",
+  },
 ];
 
 export const TestimonialsSlider = () => {
@@ -35,12 +58,13 @@ export const TestimonialsSlider = () => {
       <meta itemProp="name" content="SmartyGym - Online Fitness Platform" />
       <meta itemProp="brand" content="SmartyGym" />
       
-      {/* Hidden AggregateRating for SEO */}
+      {/* Hidden AggregateRating for SEO - SmartyGym reviews, HFM reviews, Haris Falas reviews, smartygym.com reviews */}
       <div itemProp="aggregateRating" itemScope itemType="https://schema.org/AggregateRating" className="sr-only">
-        <meta itemProp="ratingValue" content="5" />
-        <meta itemProp="reviewCount" content="12" />
+        <meta itemProp="ratingValue" content="4.59" />
+        <meta itemProp="reviewCount" content="22" />
         <meta itemProp="bestRating" content="5" />
         <meta itemProp="worstRating" content="1" />
+        <span>SmartyGym reviews - 22 verified reviews with 4.59 average rating. Read HFM reviews, Smarty Gym reviews, and smartygym.com reviews from real users.</span>
       </div>
       
       <h3 className="text-xl font-semibold text-center">What Our Members Say</h3>

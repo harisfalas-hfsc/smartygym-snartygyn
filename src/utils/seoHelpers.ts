@@ -636,15 +636,18 @@ export const generateTestimonialsSchema = (testimonials: Array<{
   const totalRating = testimonials.reduce((sum, t) => sum + t.rating, 0);
   const averageRating = Math.round((totalRating / testimonials.length) * 100) / 100;
   
+  // SEO keywords: SmartyGym reviews, HFM reviews, Haris Falas reviews, smartygym.com reviews, Smarty Gym reviews
   return {
     "@context": "https://schema.org",
     "@type": "Product",
     "@id": "https://smartygym.com/#product",
     "name": "SmartyGym - Online Fitness Platform",
-    "description": "Premier online fitness platform with 500+ expert-designed workouts and training programs by Sports Scientist Haris Falas. 100% Human. Zero AI.",
+    "alternateName": ["Smarty Gym", "SmartyGym.com", "HFM Fitness", "Haris Falas Fitness"],
+    "description": "Premier online fitness platform with 500+ expert-designed workouts and training programs by Sports Scientist Haris Falas. Read verified SmartyGym reviews and testimonials. 100% Human. Zero AI.",
     "brand": {
       "@type": "Organization",
       "name": "SmartyGym",
+      "alternateName": ["Smarty Gym", "smartygym.com", "HFM"],
       "url": "https://smartygym.com"
     },
     "aggregateRating": {
@@ -652,7 +655,8 @@ export const generateTestimonialsSchema = (testimonials: Array<{
       "ratingValue": averageRating,
       "reviewCount": testimonials.length,
       "bestRating": 5,
-      "worstRating": 1
+      "worstRating": 1,
+      "description": `SmartyGym reviews - ${testimonials.length} verified member reviews. Read HFM reviews, Smarty Gym reviews, smartygym.com reviews.`
     },
     "review": testimonials.map(t => ({
       "@type": "Review",
@@ -663,10 +667,19 @@ export const generateTestimonialsSchema = (testimonials: Array<{
       "reviewRating": {
         "@type": "Rating",
         "ratingValue": t.rating,
-        "bestRating": 5
+        "bestRating": 5,
+        "worstRating": 1
       },
       "reviewBody": t.text,
-      "datePublished": t.datePublished
+      "datePublished": t.datePublished,
+      "itemReviewed": {
+        "@type": "Product",
+        "name": "SmartyGym Premium Membership"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "SmartyGym"
+      }
     })),
     "offers": {
       "@type": "AggregateOffer",
@@ -676,7 +689,12 @@ export const generateTestimonialsSchema = (testimonials: Array<{
       "offerCount": 3
     },
     "url": "https://smartygym.com",
-    "image": "https://smartygym.com/smarty-gym-logo.png"
+    "image": "https://smartygym.com/smarty-gym-logo.png",
+    "sameAs": [
+      "https://www.instagram.com/smartygymcy/",
+      "https://www.youtube.com/@TheSmartyGym",
+      "https://www.facebook.com/smartygym"
+    ]
   };
 };
 

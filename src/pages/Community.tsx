@@ -515,15 +515,17 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
   return (
     <>
       <Helmet>
-        <title>Community | Leaderboards & Reviews | SmartyGym</title>
-        <meta name="description" content="Join the SmartyGym community. View leaderboards, member reviews, and connect with fellow fitness enthusiasts. Share your progress and get inspired by others' success stories." />
-        <meta name="keywords" content="fitness community, workout leaderboards, member reviews, fitness social, training community, SmartyGym community, fitness motivation, workout reviews, online fitness community, Haris Falas reviews, SmartyGym testimonials" />
+        <title>SmartyGym Reviews | HFM Reviews | Haris Falas Testimonials | Community</title>
+        <meta name="description" content="Read 22+ verified SmartyGym reviews and testimonials. Real member feedback on Coach Haris Falas fitness programs. HFM reviews, Smarty Gym reviews, smartygym.com reviews. 4.59/5 average rating." />
+        <meta name="keywords" content="SmartyGym reviews, smartygym reviews, Smarty Gym reviews, smartygym.com reviews, HFM reviews, Haris Falas reviews, Haris Falas testimonials, gym reviews, online fitness reviews, fitness platform reviews, Haris Falas fitness reviews, SmartyGym testimonials, SmartyGym member reviews, online gym reviews, fitness community, workout leaderboards, member reviews, fitness social, training community, SmartyGym community, fitness motivation, workout reviews, online fitness community" />
         <link rel="canonical" href="https://smartygym.com/community" />
         
-        {/* AI Search Optimization */}
-        <meta name="ai-content-type" content="community-platform" />
-        <meta name="ai-reviews" content={`${testimonials.length} verified member reviews`} />
-        <meta name="ai-rating" content={testimonials.length > 0 ? `${(testimonials.reduce((sum, t) => sum + t.rating, 0) / testimonials.length).toFixed(2)} out of 5 stars` : ''} />
+        {/* AI Search Optimization - Reviews Focus */}
+        <meta name="ai-content-type" content="reviews-testimonials" />
+        <meta name="ai-reviews" content={`${testimonials.length} verified SmartyGym member reviews`} />
+        <meta name="ai-rating" content={testimonials.length > 0 ? `${(testimonials.reduce((sum, t) => sum + t.rating, 0) / testimonials.length).toFixed(2)} out of 5 stars from ${testimonials.length} reviews` : ''} />
+        <meta name="ai-brand-reviews" content="SmartyGym reviews, HFM reviews, Haris Falas reviews, smartygym.com reviews, Smarty Gym reviews" />
+        <meta name="ai-review-summary" content={`SmartyGym has ${testimonials.length} verified reviews with an average rating of ${testimonials.length > 0 ? (testimonials.reduce((sum, t) => sum + t.rating, 0) / testimonials.length).toFixed(2) : '0'}/5. Read real member testimonials about Coach Haris Falas fitness programs.`} />
         
         {/* Community Leaderboard Schema */}
         <script type="application/ld+json">
@@ -578,15 +580,15 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
       </Helmet>
       
       <SEOEnhancer 
-        entities={["SmartyGym", "Fitness Community", "Community Leaderboards"]}
-        topics={["fitness community", "workout leaderboards", "member reviews", "fitness motivation", "social fitness"]}
-        expertise={["Community Building", "Fitness Motivation"]}
-        contentType="community-platform"
-        aiSummary="SmartyGym community platform features leaderboards tracking workout and program completions, member reviews and ratings, and community comments. Connect with fellow fitness enthusiasts and share your progress."
-        aiKeywords={["fitness community", "workout leaderboards", "member reviews", "fitness social", "training community", "online fitness community", "fitness motivation"]}
-        relatedContent={["Workout Library", "Training Programs", "Premium Membership", "Blog"]}
-        targetAudience="fitness enthusiasts, competitive athletes, community members"
-        pageType="CommunityPage"
+        entities={["SmartyGym", "SmartyGym Reviews", "HFM Reviews", "Haris Falas", "Fitness Community"]}
+        topics={["SmartyGym reviews", "HFM reviews", "Haris Falas reviews", "smartygym.com reviews", "Smarty Gym reviews", "fitness community", "workout leaderboards", "member reviews", "fitness motivation"]}
+        expertise={["Fitness Reviews", "Member Testimonials", "Community Building"]}
+        contentType="reviews-testimonials"
+        aiSummary={`SmartyGym reviews page with ${testimonials.length} verified member testimonials. Read real feedback about Coach Haris Falas fitness programs. HFM reviews, Smarty Gym reviews, smartygym.com reviews. Average rating: ${testimonials.length > 0 ? (testimonials.reduce((sum, t) => sum + t.rating, 0) / testimonials.length).toFixed(2) : '0'}/5 stars.`}
+        aiKeywords={["SmartyGym reviews", "smartygym reviews", "HFM reviews", "Haris Falas reviews", "smartygym.com reviews", "Smarty Gym reviews", "gym reviews", "online fitness reviews", "fitness platform reviews", "fitness community", "workout leaderboards", "member reviews"]}
+        relatedContent={["Workout Library", "Training Programs", "Premium Membership", "Coach Profile"]}
+        targetAudience="fitness enthusiasts looking for SmartyGym reviews, people researching Haris Falas, potential members"
+        pageType="ReviewsPage"
       />
 
       <div className="min-h-screen bg-background">
