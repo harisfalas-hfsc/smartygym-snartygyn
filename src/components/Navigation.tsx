@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useLayoutEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
@@ -46,6 +46,26 @@ export const Navigation = () => {
   const { data: unreadCount = 0, refetch: refetchUnread } = useUnreadMessages();
   const isMobile = useIsMobile();
   const { isAdmin } = useAdminRole();
+  const headerRef = useRef<HTMLElement>(null);
+
+  // Dynamically set --app-header-h CSS variable based on actual header height
+  useLayoutEffect(() => {
+    const updateHeaderHeight = () => {
+      if (headerRef.current) {
+        const height = headerRef.current.offsetHeight;
+        document.documentElement.style.setProperty('--app-header-h', `${height}px`);
+      }
+    };
+
+    updateHeaderHeight();
+
+    const resizeObserver = new ResizeObserver(updateHeaderHeight);
+    if (headerRef.current) {
+      resizeObserver.observe(headerRef.current);
+    }
+
+    return () => resizeObserver.disconnect();
+  }, []);
 
   // Listen for messages being read to update badge immediately
   useEffect(() => {
@@ -227,7 +247,7 @@ export const Navigation = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background py-1 px-4">
+    <header ref={headerRef} className="fixed top-0 left-0 right-0 z-50 bg-background py-0.5 px-4">
       <div className="mx-auto max-w-7xl">
         <div className="flex justify-between items-center gap-4">
           {/* LEFT SECTION - Hamburger Menu + Social Media Icons */}
@@ -399,10 +419,10 @@ export const Navigation = () => {
               onClick={() => handleNavigate("/")}
               className="cursor-pointer flex-shrink-0"
             >
-              <img
+            <img
                 src={smartyGymLogo}
                 alt="SmartyGym"
-                className="h-20 xs:h-24 sm:h-28 md:h-32 lg:h-36 w-auto object-contain dark:mix-blend-lighten"
+                className="h-14 xs:h-16 sm:h-20 md:h-24 lg:h-28 w-auto object-contain dark:mix-blend-lighten"
               />
             </div>
           </div>
