@@ -9,8 +9,22 @@ import { useTrainingProgramData } from "@/hooks/useTrainingProgramData";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { ContentNotFound } from "@/components/ContentNotFound";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
+import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { ReaderModeDialog } from "@/components/ReaderModeDialog";
 import { HTMLContent } from "@/components/ui/html-content";
+
+// Helper function to generate SEO-optimized alt text
+const generateProgramAltText = (program: any): string => {
+  const parts = [
+    program.name,
+    program.weeks ? `${program.weeks} week` : '',
+    program.difficulty ? `${program.difficulty} level` : '',
+    program.category || '',
+    'training program by Sports Scientist Haris Falas',
+    'SmartyGym'
+  ].filter(Boolean);
+  return parts.join(' - ');
+};
 
 const IndividualTrainingProgram = () => {
   const [readerModeOpen, setReaderModeOpen] = useState(false);
@@ -53,30 +67,97 @@ const IndividualTrainingProgram = () => {
     const canPurchase = dbProgram.is_standalone_purchase && dbProgram.price && isPremium;
     const alreadyPurchased = hasPurchased(dbProgram.id, "program");
     const hasAccess = userTier === "premium" || alreadyPurchased || !isPremium;
+    
+    const programUrl = `https://smartygym.com/individualtrainingprogram/${dbProgram.id}`;
+    const imageAlt = generateProgramAltText(dbProgram);
 
     return (
       <>
         <Helmet>
           <title>{dbProgram.name} | Online Training Program by Haris Falas | SmartyGym</title>
-          <meta name="description" content={`${dbProgram.description || dbProgram.name} - ${dbProgram.weeks} week online training program by Sports Scientist Haris Falas. ${dbProgram.category} program. ${dbProgram.days_per_week} days per week. ${dbProgram.equipment}.`} />
+          <meta name="description" content={`${dbProgram.description || dbProgram.name} - ${dbProgram.weeks} week online training program by Sports Scientist Haris Falas. ${dbProgram.category} program. ${dbProgram.days_per_week} days per week. ${dbProgram.equipment}. 100% Human-Designed.`} />
           <meta name="keywords" content={`${dbProgram.name}, online training programs, ${dbProgram.category} program, ${dbProgram.weeks} week program, Haris Falas, online fitness programs, online personal training, structured training program`} />
           
           {/* Open Graph */}
           <meta property="og:type" content="article" />
-          <meta property="og:url" content={window.location.href} />
+          <meta property="og:url" content={programUrl} />
           <meta property="og:title" content={`${dbProgram.name} | Online Training Program by Haris Falas`} />
           <meta property="og:description" content={dbProgram.description || `${dbProgram.weeks} week ${dbProgram.category} program designed by Sports Scientist Haris Falas`} />
           <meta property="og:image" content={dbProgram.image_url} />
+          <meta property="og:image:alt" content={imageAlt} />
+          <meta property="og:site_name" content="SmartyGym" />
           
           {/* Twitter */}
           <meta name="twitter:card" content="summary_large_image" />
           <meta name="twitter:title" content={`${dbProgram.name} | Training Program`} />
           <meta name="twitter:description" content={dbProgram.description || dbProgram.name} />
           <meta name="twitter:image" content={dbProgram.image_url} />
+          <meta name="twitter:image:alt" content={imageAlt} />
           
-          <link rel="canonical" href={window.location.href} />
+          <link rel="canonical" href={programUrl} />
           
-          {/* Structured Data - ExercisePlan */}
+          {/* AI Search Optimization */}
+          <meta name="ai-content-type" content="training-program" />
+          <meta name="ai-duration" content={`${dbProgram.weeks} weeks`} />
+          <meta name="ai-frequency" content={`${dbProgram.days_per_week} days per week`} />
+          <meta name="ai-equipment" content={dbProgram.equipment || 'Various'} />
+          <meta name="ai-category" content={dbProgram.category || ''} />
+          <meta name="ai-author" content="Haris Falas - Sports Scientist" />
+          
+          {/* Structured Data - Course Schema for training programs */}
+          <script type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Course",
+              "@id": programUrl,
+              "name": dbProgram.name,
+              "description": dbProgram.description,
+              "image": {
+                "@type": "ImageObject",
+                "url": dbProgram.image_url,
+                "caption": imageAlt
+              },
+              "provider": {
+                "@type": "Organization",
+                "name": "SmartyGym",
+                "url": "https://smartygym.com"
+              },
+              "instructor": {
+                "@type": "Person",
+                "@id": "https://smartygym.com/coach-profile#person",
+                "name": "Haris Falas",
+                "jobTitle": "Sports Scientist & Strength and Conditioning Coach",
+                "description": "BSc Sports Science, CSCS certified with 20+ years experience",
+                "url": "https://smartygym.com/coach-profile",
+                "hasCredential": [
+                  {"@type": "EducationalOccupationalCredential", "name": "BSc Sports Science"},
+                  {"@type": "EducationalOccupationalCredential", "name": "CSCS"},
+                  {"@type": "EducationalOccupationalCredential", "name": "EXOS Performance Specialist"}
+                ]
+              },
+              "courseMode": "Online",
+              "isAccessibleForFree": !isPremium,
+              "timeRequired": `P${dbProgram.weeks}W`,
+              "educationalLevel": dbProgram.difficulty_stars ? (dbProgram.difficulty_stars <= 2 ? "Beginner" : dbProgram.difficulty_stars <= 4 ? "Intermediate" : "Advanced") : "Intermediate",
+              "hasCourseInstance": {
+                "@type": "CourseInstance",
+                "courseMode": "Online",
+                "courseSchedule": {
+                  "@type": "Schedule",
+                  "repeatFrequency": "P1W",
+                  "repeatCount": dbProgram.weeks
+                }
+              },
+              "offers": dbProgram.is_standalone_purchase && dbProgram.price ? {
+                "@type": "Offer",
+                "price": dbProgram.price,
+                "priceCurrency": "EUR",
+                "availability": "https://schema.org/InStock"
+              } : undefined
+            })}
+          </script>
+          
+          {/* ExercisePlan Schema */}
           <script type="application/ld+json">
             {JSON.stringify({
               "@context": "https://schema.org",
@@ -86,22 +167,44 @@ const IndividualTrainingProgram = () => {
               "image": dbProgram.image_url,
               "duration": `P${dbProgram.weeks}W`,
               "category": dbProgram.category,
-               "exerciseType": dbProgram.category,
-              "intensity": dbProgram.difficulty_stars ? `${dbProgram.difficulty_stars} stars` : undefined,
-              "repetitions": `${dbProgram.days_per_week} days per week`,
+              "exerciseType": dbProgram.category,
+              "intensity": dbProgram.difficulty_stars ? `${dbProgram.difficulty_stars}/6 stars` : "Intermediate",
+              "repetitions": `${dbProgram.days_per_week} days per week for ${dbProgram.weeks} weeks`,
               "workLocation": "Online / Home / Gym",
               "author": {
                 "@type": "Person",
                 "name": "Haris Falas",
-                "jobTitle": "Sports Scientist & Strength Coach",
-                "description": "Online personal trainer specializing in structured training programs"
+                "jobTitle": "Sports Scientist & Strength and Conditioning Coach"
               },
-              "identifier": dbProgram.id,
-              "offers": dbProgram.is_standalone_purchase ? {
-                "@type": "Offer",
-                "price": dbProgram.price,
-                "priceCurrency": "EUR"
-              } : undefined
+              "identifier": dbProgram.id
+            })}
+          </script>
+          
+          {/* Breadcrumb Schema */}
+          <script type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "position": 1,
+                  "name": "Home",
+                  "item": "https://smartygym.com"
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 2,
+                  "name": "Smarty Programs",
+                  "item": "https://smartygym.com/trainingprogram"
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 3,
+                  "name": dbProgram.name,
+                  "item": programUrl
+                }
+              ]
             })}
           </script>
         </Helmet>
@@ -128,6 +231,12 @@ const IndividualTrainingProgram = () => {
                 </Button>
               )}
             </div>
+
+            <PageBreadcrumbs items={[
+              { label: "Home", href: "/" },
+              { label: "Smarty Programs", href: "/trainingprogram" },
+              { label: dbProgram.name }
+            ]} />
 
             {hasAccess && (
               <ReaderModeDialog

@@ -13,6 +13,20 @@ import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { ReaderModeDialog } from "@/components/ReaderModeDialog";
 import { HTMLContent } from "@/components/ui/html-content";
 
+// Helper function to generate SEO-optimized alt text
+const generateWorkoutAltText = (workout: any): string => {
+  const parts = [
+    workout.name,
+    workout.difficulty ? `${workout.difficulty} level` : '',
+    workout.format ? `${workout.format} format` : '',
+    workout.duration ? `${workout.duration}` : '',
+    workout.category || '',
+    'workout by Sports Scientist Haris Falas',
+    'SmartyGym'
+  ].filter(Boolean);
+  return parts.join(' - ');
+};
+
 const IndividualWorkout = () => {
   const [readerModeOpen, setReaderModeOpen] = useState(false);
   const { type, id } = useParams();
@@ -56,47 +70,141 @@ const IndividualWorkout = () => {
   }
 
   if (dbWorkout) {
+    const workoutUrl = `https://smartygym.com/individualworkout/${dbWorkout.id}`;
+    const imageAlt = generateWorkoutAltText(dbWorkout);
+    
+    // Generate HowTo steps from workout sections
+    const howToSteps = [];
+    if (dbWorkout.warm_up) howToSteps.push({ name: "Warm Up", text: "Complete the warm-up exercises to prepare your body" });
+    if (dbWorkout.activation) howToSteps.push({ name: "Activation", text: "Perform activation exercises to engage target muscles" });
+    if (dbWorkout.main_workout) howToSteps.push({ name: "Main Workout", text: "Execute the main workout following the prescribed format" });
+    if (dbWorkout.finisher) howToSteps.push({ name: "Finisher", text: "Complete the finisher for extra conditioning" });
+    if (dbWorkout.cool_down) howToSteps.push({ name: "Cool Down", text: "Finish with cool-down stretches for recovery" });
+
     return (
       <>
         <Helmet>
           <title>{dbWorkout.name} | Online Workout by Haris Falas | SmartyGym</title>
-          <meta name="description" content={`${dbWorkout.description || dbWorkout.name} - Professional online workout by Sports Scientist Haris Falas. ${dbWorkout.duration} ${dbWorkout.format} workout. ${dbWorkout.equipment}.`} />
-          <meta name="keywords" content={`${dbWorkout.name}, online workouts, ${dbWorkout.format} workout, ${dbWorkout.category} training, Haris Falas, online fitness, ${dbWorkout.equipment} workout`} />
+          <meta name="description" content={`${dbWorkout.description || dbWorkout.name} - Professional online workout by Sports Scientist Haris Falas. ${dbWorkout.duration} ${dbWorkout.format} workout. ${dbWorkout.equipment}. 100% Human-Designed.`} />
+          <meta name="keywords" content={`${dbWorkout.name}, online workouts, ${dbWorkout.format} workout, ${dbWorkout.category} training, Haris Falas, online fitness, ${dbWorkout.equipment} workout, ${dbWorkout.difficulty} workout, SmartyGym workout`} />
           
           {/* Open Graph */}
           <meta property="og:type" content="article" />
-          <meta property="og:url" content={window.location.href} />
+          <meta property="og:url" content={workoutUrl} />
           <meta property="og:title" content={`${dbWorkout.name} | Online Workout by Haris Falas`} />
           <meta property="og:description" content={dbWorkout.description || `Professional ${dbWorkout.format} workout designed by Sports Scientist`} />
           <meta property="og:image" content={dbWorkout.image_url} />
+          <meta property="og:image:alt" content={imageAlt} />
+          <meta property="og:site_name" content="SmartyGym" />
           
           {/* Twitter */}
           <meta name="twitter:card" content="summary_large_image" />
           <meta name="twitter:title" content={`${dbWorkout.name} | Online Workout`} />
           <meta name="twitter:description" content={dbWorkout.description || dbWorkout.name} />
           <meta name="twitter:image" content={dbWorkout.image_url} />
+          <meta name="twitter:image:alt" content={imageAlt} />
           
-          <link rel="canonical" href={window.location.href} />
+          <link rel="canonical" href={workoutUrl} />
           
-          {/* Structured Data - ExercisePlan */}
+          {/* AI Search Optimization */}
+          <meta name="ai-content-type" content="workout" />
+          <meta name="ai-difficulty" content={dbWorkout.difficulty || 'Intermediate'} />
+          <meta name="ai-duration" content={dbWorkout.duration || ''} />
+          <meta name="ai-equipment" content={dbWorkout.equipment || 'Various'} />
+          <meta name="ai-category" content={dbWorkout.category || ''} />
+          <meta name="ai-author" content="Haris Falas - Sports Scientist" />
+          
+          {/* Structured Data - ExercisePlan with enhanced details */}
           <script type="application/ld+json">
             {JSON.stringify({
               "@context": "https://schema.org",
               "@type": "ExercisePlan",
+              "@id": workoutUrl,
               "name": dbWorkout.name,
               "description": dbWorkout.description,
-              "image": dbWorkout.image_url,
+              "image": {
+                "@type": "ImageObject",
+                "url": dbWorkout.image_url,
+                "caption": imageAlt
+              },
               "duration": dbWorkout.duration,
               "category": dbWorkout.category,
               "activityDuration": dbWorkout.duration,
+              "exerciseType": dbWorkout.format,
+              "intensity": dbWorkout.difficulty_stars ? `${dbWorkout.difficulty_stars}/6 stars` : dbWorkout.difficulty,
               "workLocation": "Online / Home / Gym",
+              "isAccessibleForFree": !dbWorkout.is_premium,
               "author": {
                 "@type": "Person",
+                "@id": "https://smartygym.com/coach-profile#person",
                 "name": "Haris Falas",
-                "jobTitle": "Sports Scientist & Strength Coach",
-                "description": "Fitness expert and personal trainer"
+                "jobTitle": "Sports Scientist & Strength and Conditioning Coach",
+                "description": "BSc Sports Science, CSCS certified with 20+ years experience",
+                "url": "https://smartygym.com/coach-profile",
+                "hasCredential": [
+                  {"@type": "EducationalOccupationalCredential", "name": "BSc Sports Science"},
+                  {"@type": "EducationalOccupationalCredential", "name": "CSCS"},
+                  {"@type": "EducationalOccupationalCredential", "name": "EXOS Performance Specialist"}
+                ]
+              },
+              "provider": {
+                "@type": "Organization",
+                "name": "SmartyGym",
+                "url": "https://smartygym.com"
               },
               "identifier": dbWorkout.id
+            })}
+          </script>
+          
+          {/* HowTo Schema for workout instructions */}
+          {howToSteps.length > 0 && (
+            <script type="application/ld+json">
+              {JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "HowTo",
+                "name": `How to complete: ${dbWorkout.name}`,
+                "description": `Step-by-step guide to complete the ${dbWorkout.name} workout by Haris Falas`,
+                "totalTime": dbWorkout.duration,
+                "image": dbWorkout.image_url,
+                "step": howToSteps.map((step, index) => ({
+                  "@type": "HowToStep",
+                  "position": index + 1,
+                  "name": step.name,
+                  "text": step.text
+                })),
+                "author": {
+                  "@type": "Person",
+                  "name": "Haris Falas"
+                }
+              })}
+            </script>
+          )}
+          
+          {/* Breadcrumb Schema */}
+          <script type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "position": 1,
+                  "name": "Home",
+                  "item": "https://smartygym.com"
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 2,
+                  "name": "Smarty Workouts",
+                  "item": "https://smartygym.com/workout"
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 3,
+                  "name": dbWorkout.name,
+                  "item": workoutUrl
+                }
+              ]
             })}
           </script>
         </Helmet>

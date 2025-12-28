@@ -37,13 +37,29 @@ serve(async (req) => {
       { loc: '/community', priority: '0.7', changefreq: 'daily' },
       { loc: '/exercise-library', priority: '0.7', changefreq: 'weekly' },
       { loc: '/wod-archive', priority: '0.7', changefreq: 'daily' },
+      { loc: '/coach-profile', priority: '0.8', changefreq: 'monthly' },
+      { loc: '/faq', priority: '0.6', changefreq: 'monthly' },
+      { loc: '/terms', priority: '0.3', changefreq: 'yearly' },
+      { loc: '/privacy', priority: '0.3', changefreq: 'yearly' },
     ];
 
-    // Fetch all dynamic content in parallel
+    // Workout category pages
+    const workoutCategories = [
+      'strength', 'calorie-burning', 'metabolic', 'cardio', 
+      'mobility', 'challenge', 'pilates', 'recovery'
+    ];
+    
+    // Program category pages
+    const programCategories = [
+      'cardio-endurance', 'functional-strength', 'muscle-hypertrophy',
+      'weight-loss', 'low-back-pain', 'mobility-stability'
+    ];
+
+    // Fetch all dynamic content in parallel with images
     const [workoutsResult, programsResult, blogsResult, ritualsResult] = await Promise.all([
-      supabase.from('admin_workouts').select('id, updated_at').eq('is_visible', true),
-      supabase.from('admin_training_programs').select('id, updated_at').eq('is_visible', true),
-      supabase.from('blog_articles').select('slug, updated_at').eq('is_published', true),
+      supabase.from('admin_workouts').select('id, name, description, category, format, duration, equipment, difficulty, image_url, updated_at, created_at').eq('is_visible', true),
+      supabase.from('admin_training_programs').select('id, name, description, category, weeks, days_per_week, equipment, difficulty, image_url, updated_at, created_at').eq('is_visible', true),
+      supabase.from('blog_articles').select('slug, title, excerpt, category, image_url, updated_at, created_at, author_name').eq('is_published', true),
       supabase.from('daily_smarty_rituals').select('ritual_date, created_at').eq('is_visible', true)
     ]);
 
@@ -61,51 +77,129 @@ serve(async (req) => {
   </url>`);
     });
 
-    // Workouts
+    // Workout category pages
+    workoutCategories.forEach(category => {
+      urls.push(`
+  <url>
+    <loc>${baseUrl}/workout/${category}</loc>
+    <lastmod>${now}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>`);
+    });
+
+    // Program category pages
+    programCategories.forEach(category => {
+      urls.push(`
+  <url>
+    <loc>${baseUrl}/trainingprogram/${category}</loc>
+    <lastmod>${now}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>`);
+    });
+
+    // Individual Workouts with image sitemaps
     if (workoutsResult.data) {
       workoutsResult.data.forEach((workout: any) => {
         const lastmod = workout.updated_at 
           ? new Date(workout.updated_at).toISOString().split('T')[0] 
-          : now;
-        urls.push(`
+          : workout.created_at 
+            ? new Date(workout.created_at).toISOString().split('T')[0]
+            : now;
+        
+        // Generate SEO-optimized alt text for image
+        const imageAlt = `${workout.name} - ${workout.difficulty || 'Professional'} ${workout.format || ''} ${workout.category || ''} workout by Haris Falas | SmartyGym`.trim();
+        const imageCaption = `${workout.duration || ''} ${workout.equipment || ''} workout designed by Sports Scientist Haris Falas`.trim();
+        
+        let urlEntry = `
   <url>
-    <loc>${baseUrl}/workout/${workout.id}</loc>
+    <loc>${baseUrl}/individualworkout/${workout.id}</loc>
     <lastmod>${lastmod}</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>`);
+    <priority>0.7</priority>`;
+        
+        // Add image sitemap if image exists
+        if (workout.image_url) {
+          urlEntry += `
+    <image:image>
+      <image:loc>${workout.image_url}</image:loc>
+      <image:title>${escapeXml(imageAlt)}</image:title>
+      <image:caption>${escapeXml(imageCaption)}</image:caption>
+    </image:image>`;
+        }
+        
+        urlEntry += `
+  </url>`;
+        urls.push(urlEntry);
       });
     }
 
-    // Training Programs
+    // Individual Training Programs with image sitemaps
     if (programsResult.data) {
       programsResult.data.forEach((program: any) => {
         const lastmod = program.updated_at 
           ? new Date(program.updated_at).toISOString().split('T')[0] 
-          : now;
-        urls.push(`
+          : program.created_at
+            ? new Date(program.created_at).toISOString().split('T')[0]
+            : now;
+        
+        // Generate SEO-optimized alt text for image
+        const imageAlt = `${program.name} - ${program.weeks || ''} week ${program.category || ''} training program by Haris Falas | SmartyGym`.trim();
+        const imageCaption = `${program.days_per_week || ''} days/week ${program.equipment || ''} program designed by Sports Scientist Haris Falas`.trim();
+        
+        let urlEntry = `
   <url>
-    <loc>${baseUrl}/trainingprogram/${program.id}</loc>
+    <loc>${baseUrl}/individualtrainingprogram/${program.id}</loc>
     <lastmod>${lastmod}</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>`);
+    <priority>0.7</priority>`;
+        
+        // Add image sitemap if image exists
+        if (program.image_url) {
+          urlEntry += `
+    <image:image>
+      <image:loc>${program.image_url}</image:loc>
+      <image:title>${escapeXml(imageAlt)}</image:title>
+      <image:caption>${escapeXml(imageCaption)}</image:caption>
+    </image:image>`;
+        }
+        
+        urlEntry += `
+  </url>`;
+        urls.push(urlEntry);
       });
     }
 
-    // Blog Articles
+    // Blog Articles with image sitemaps
     if (blogsResult.data) {
       blogsResult.data.forEach((blog: any) => {
         const lastmod = blog.updated_at 
           ? new Date(blog.updated_at).toISOString().split('T')[0] 
-          : now;
-        urls.push(`
+          : blog.created_at
+            ? new Date(blog.created_at).toISOString().split('T')[0]
+            : now;
+        
+        let urlEntry = `
   <url>
     <loc>${baseUrl}/blog/${blog.slug}</loc>
     <lastmod>${lastmod}</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>`);
+    <priority>0.6</priority>`;
+        
+        // Add image sitemap if image exists
+        if (blog.image_url) {
+          const imageAlt = `${blog.title} - ${blog.category || 'Fitness'} article by ${blog.author_name || 'Haris Falas'} | SmartyGym Blog`.trim();
+          urlEntry += `
+    <image:image>
+      <image:loc>${blog.image_url}</image:loc>
+      <image:title>${escapeXml(imageAlt)}</image:title>
+    </image:image>`;
+        }
+        
+        urlEntry += `
+  </url>`;
+        urls.push(urlEntry);
       });
     }
 
@@ -122,9 +216,10 @@ serve(async (req) => {
       });
     }
 
-    // Build final XML
+    // Build final XML with image namespace
     const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 ${urls.join('')}
 </urlset>`;
 
@@ -140,6 +235,8 @@ ${urls.join('')}
         total_urls: urls.length,
         breakdown: {
           static_pages: staticPages.length,
+          workout_categories: workoutCategories.length,
+          program_categories: programCategories.length,
           workouts: workoutsResult.data?.length || 0,
           programs: programsResult.data?.length || 0,
           blogs: blogsResult.data?.length || 0,
@@ -170,3 +267,13 @@ ${urls.join('')}
     });
   }
 });
+
+// Helper function to escape XML special characters
+function escapeXml(unsafe: string): string {
+  return unsafe
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
