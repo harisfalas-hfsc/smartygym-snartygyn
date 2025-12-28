@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { ArrowLeft, Folder, Users, Mail, FileText, Settings, BarChart3, BookOpen, MessageSquare, Inbox, Megaphone, TrendingUp, Plus, Dumbbell, Calendar, Bell, ShoppingBag, Sparkles, Building2, Video, Smartphone, Clock } from "lucide-react";
+import { ArrowLeft, Folder, Users, Mail, FileText, Settings, BarChart3, BookOpen, MessageSquare, Inbox, Megaphone, TrendingUp, Plus, Dumbbell, Calendar, Bell, ShoppingBag, Sparkles, Building2, Video, Smartphone, Clock, WifiOff } from "lucide-react";
 import { ContentManager } from "@/components/admin/ContentManager";
 import { CommunicationsManager } from "@/components/admin/CommunicationsManager";
 import { EmailManager } from "@/components/admin/EmailManager";
@@ -28,6 +28,8 @@ import ExerciseLibraryManager from "@/components/admin/ExerciseLibraryManager";
 import SmartyGymAppVault from "@/pages/admin/SmartyGymAppVault";
 import { CronJobsManager } from "@/components/admin/CronJobsManager";
 import { supabase } from "@/integrations/supabase/client";
+import { useNetworkStatus } from "@/hooks/useNetworkStatus";
+import { OfflineBanner } from "@/components/OfflineBanner";
 
 export default function AdminBackoffice() {
   const navigate = useNavigate();
@@ -38,6 +40,7 @@ export default function AdminBackoffice() {
   const [showProgramDialog, setShowProgramDialog] = useState(false);
   const [showRitualDialog, setShowRitualDialog] = useState(false);
   const [newContactCount, setNewContactCount] = useState(0);
+  const { isOffline } = useNetworkStatus();
 
   useEffect(() => {
     if (isAdmin) {
@@ -113,7 +116,22 @@ export default function AdminBackoffice() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto py-4 sm:py-8 px-2 sm:px-4">
+      <OfflineBanner />
+      
+      {/* Offline Read-Only Mode Banner */}
+      {isOffline && (
+        <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-3 mt-8">
+          <div className="container mx-auto flex items-center gap-3">
+            <WifiOff className="h-5 w-5 text-amber-500" />
+            <div>
+              <p className="text-sm font-medium text-amber-500">Offline Mode - Read Only</p>
+              <p className="text-xs text-muted-foreground">You're viewing cached data. Changes will not be saved until you're back online.</p>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      <div className={`container mx-auto py-4 sm:py-8 px-2 sm:px-4 ${isOffline ? '' : ''}`}>
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
           <div className="flex items-center gap-2 sm:gap-4">
@@ -135,13 +153,14 @@ export default function AdminBackoffice() {
               variant="outline"
               onClick={() => navigate("/admin/migrate")}
               className="gap-2"
+              disabled={isOffline}
             >
               Import Content
             </Button>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="default" className="gap-2">
+                <Button variant="default" className="gap-2" disabled={isOffline}>
                   <Plus className="h-4 w-4" />
                   <span className="hidden sm:inline">Create Content</span>
                 </Button>
