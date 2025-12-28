@@ -2722,6 +2722,14 @@ export type Database = {
         Returns: boolean
       }
       ensure_cron_jobs: { Args: never; Returns: Json }
+      get_cron_jobs: {
+        Args: never
+        Returns: {
+          active: boolean
+          jobname: string
+          schedule: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
