@@ -2722,6 +2722,7 @@ export type Database = {
         Returns: boolean
       }
       ensure_cron_jobs: { Args: never; Returns: Json }
+      exec_sql: { Args: { sql: string }; Returns: undefined }
       get_cron_jobs: {
         Args: never
         Returns: {
