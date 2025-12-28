@@ -104,7 +104,7 @@ const AppContent = () => {
         <ScrollToTop />
         <div className="flex flex-col min-h-screen">
           <Navigation />
-            <div className="flex-1 pt-[120px] xs:pt-[136px] sm:pt-[152px] md:pt-[168px] lg:pt-[184px]">
+            <div className="flex-1 pt-[90px] xs:pt-[102px] sm:pt-[152px] md:pt-[168px] lg:pt-[184px]">
             <PageTransition>
                 <Routes>
                   <Route path="/" element={<Index />} />
