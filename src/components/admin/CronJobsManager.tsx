@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { CronTimeInput } from "./CronTimeInput";
 import { CronIntervalInput } from "./CronIntervalInput";
 import { BuildVersionIndicator } from "./BuildVersionIndicator";
+import { getCyprusOffset, cyprusToUtc, utcToCyprus } from "@/lib/cyprusDate";
 
 interface CronJobMetadata {
   id: string;
@@ -86,10 +87,6 @@ const DAY_OF_WEEK_OPTIONS = [
 ];
 const DAY_OF_MONTH_OPTIONS = Array.from({ length: 28 }, (_, i) => i + 1);
 const INTERVAL_MINUTES = [1, 5, 10, 15, 30];
-
-// Convert UTC hour to Cyprus hour (simplified: UTC+3)
-const utcToCyprus = (utcHour: number): number => (utcHour + 3) % 24;
-const cyprusToUtc = (cyprusHour: number): number => (cyprusHour - 3 + 24) % 24;
 
 // Build cron expression from visual picker
 const buildCronExpression = (
@@ -206,6 +203,8 @@ const getSchedulePreview = (
   dayOfMonth: number,
   intervalMinutes: number
 ): string => {
+  const cyprusOffset = getCyprusOffset();
+  const offsetLabel = `UTC+${cyprusOffset}`;
   const timeStr = `${cyprusHour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
   const utcHour = cyprusToUtc(cyprusHour);
   const utcTimeStr = `${utcHour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
@@ -216,12 +215,12 @@ const getSchedulePreview = (
     case 'hourly':
       return `Every hour at :${minute.toString().padStart(2, '0')}`;
     case 'daily':
-      return `Daily at ${timeStr} Cyprus time (${utcTimeStr} UTC)`;
+      return `Daily at ${timeStr} Cyprus time (${utcTimeStr} UTC, ${offsetLabel})`;
     case 'weekly':
       const dayName = DAY_OF_WEEK_OPTIONS.find(d => d.value === dayOfWeek)?.label || dayOfWeek;
-      return `Every ${dayName} at ${timeStr} Cyprus time (${utcTimeStr} UTC)`;
+      return `Every ${dayName} at ${timeStr} Cyprus time (${utcTimeStr} UTC, ${offsetLabel})`;
     case 'monthly':
-      return `Monthly on day ${dayOfMonth} at ${timeStr} Cyprus time (${utcTimeStr} UTC)`;
+      return `Monthly on day ${dayOfMonth} at ${timeStr} Cyprus time (${utcTimeStr} UTC, ${offsetLabel})`;
     default:
       return 'Unknown schedule';
   }

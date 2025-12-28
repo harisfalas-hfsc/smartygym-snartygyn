@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ChevronUp, ChevronDown } from "lucide-react";
+import { getCyprusOffset, cyprusToUtc } from "@/lib/cyprusDate";
 
 interface CronTimeInputProps {
   hour: number;
@@ -11,9 +12,6 @@ interface CronTimeInputProps {
   label?: string;
   showTimezonePreview?: boolean;
 }
-
-// Cyprus is UTC+3 (simplified - summer time)
-const cyprusToUtc = (cyprusHour: number): number => (cyprusHour - 3 + 24) % 24;
 
 export function CronTimeInput({
   hour,
@@ -55,8 +53,9 @@ export function CronTimeInput({
     }
   };
 
+  const cyprusOffset = getCyprusOffset();
   const utcHour = cyprusToUtc(hour);
-  const timePreview = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')} Cyprus`;
+  const timePreview = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')} Cyprus (UTC+${cyprusOffset})`;
   const utcPreview = `${utcHour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')} UTC`;
 
   return (
