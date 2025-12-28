@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Calendar, Dumbbell, Info, Settings, CalendarDays, Heart } from "lucide-react";
+import { Calendar, Dumbbell, Info, Settings, CalendarDays, Heart, Download } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
@@ -67,14 +67,56 @@ export const PeriodizationSystemDialog = ({
     }
   };
 
+  const handleDownloadCycleStructure = () => {
+    const exportData = {
+      metadata: {
+        exportedAt: new Date().toISOString(),
+        cycleStartDate: CYCLE_START_DATE,
+        currentDay: todayInfo.dayIn84,
+        currentDate: todayDateStr,
+        totalDays: 84
+      },
+      periodization84Day: PERIODIZATION_84DAY.map(entry => ({
+        day: entry.day,
+        category: entry.category,
+        difficulty: entry.difficulty,
+        difficultyStars: entry.difficultyStars,
+        strengthFocus: entry.strengthFocus || null
+      })),
+      formatsByCategory: FORMATS_BY_CATEGORY
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "wod-84-day-cycle.json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success("84-day cycle structure downloaded");
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-5xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Settings className="h-5 w-5 text-primary" />
-            WOD Periodization System (84-Day Cycle)
-          </DialogTitle>
+          <div className="flex items-center justify-between">
+            <DialogTitle className="flex items-center gap-2">
+              <Settings className="h-5 w-5 text-primary" />
+              WOD Periodization System (84-Day Cycle)
+            </DialogTitle>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleDownloadCycleStructure}
+              className="flex items-center gap-2"
+            >
+              <Download className="h-4 w-4" />
+              Download Structure
+            </Button>
+          </div>
           <DialogDescription>
             Simple 84-day cycle: Day 1 to Day 84, then restart. No complex rotation.
           </DialogDescription>
