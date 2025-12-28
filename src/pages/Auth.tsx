@@ -9,13 +9,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, AlertTriangle, Loader2 } from "lucide-react";
+import { ArrowLeft, AlertTriangle, Loader2, WifiOff } from "lucide-react";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { AvatarSetupDialog } from "@/components/AvatarSetupDialog";
 import { ForgotPasswordDialog } from "@/components/auth/ForgotPasswordDialog";
 import { trackSocialMediaEvent } from "@/utils/socialMediaTracking";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { checkPasswordBreach } from "@/utils/passwordBreachCheck";
+import { useNetworkStatus } from "@/hooks/useNetworkStatus";
+import { OfflineBanner } from "@/components/OfflineBanner";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -26,6 +28,7 @@ export default function Auth() {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [newUserId, setNewUserId] = useState<string | null>(null);
   const { goBack } = useShowBackButton();
+  const { isOffline } = useNetworkStatus();
   
   // Get the mode from URL params, default to login
   const defaultTab = searchParams.get("mode") === "signup" ? "signup" : "login";
@@ -73,6 +76,15 @@ export default function Auth() {
   const [googleLoading, setGoogleLoading] = useState(false);
 
   const handleGoogleSignIn = async () => {
+    if (isOffline) {
+      toast({
+        title: "No Internet Connection",
+        description: "Please connect to the internet to sign in with Google.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setGoogleLoading(true);
     try {
       const { error } = await supabase.auth.signInWithOAuth({
@@ -102,6 +114,15 @@ export default function Auth() {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (isOffline) {
+      toast({
+        title: "No Internet Connection",
+        description: "Please connect to the internet to create an account.",
+        variant: "destructive",
+      });
+      return;
+    }
     
     if (signUpData.password !== signUpData.confirmPassword) {
       toast({
@@ -220,6 +241,16 @@ export default function Auth() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (isOffline) {
+      toast({
+        title: "No Internet Connection",
+        description: "Please connect to the internet to sign in.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setLoading(true);
 
     try {
@@ -271,6 +302,7 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <OfflineBanner />
       {showAvatarSetup && newUserId && (
         <AvatarSetupDialog
           open={showAvatarSetup}
