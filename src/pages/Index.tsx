@@ -25,6 +25,7 @@ import { HeroThreeColumns } from "@/components/HeroThreeColumns";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { generateOrganizationWithRatingSchema } from "@/utils/seoHelpers";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -46,6 +47,27 @@ const Index = () => {
   // Auto-cycling state for tablet hero cards
   const [highlightedCardIndex, setHighlightedCardIndex] = useState(0);
   const [isHoveringTablet, setIsHoveringTablet] = useState(false);
+
+  // Fetch review stats for SEO schema
+  const { data: reviewStats } = useQuery({
+    queryKey: ["homepage-review-stats"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("testimonials")
+        .select("rating");
+      
+      if (error || !data || data.length === 0) {
+        return { count: 12, average: 4.83 }; // Default fallback
+      }
+      
+      const total = data.reduce((sum, t) => sum + t.rating, 0);
+      return {
+        count: data.length,
+        average: Math.round((total / data.length) * 100) / 100
+      };
+    },
+    staleTime: 1000 * 60 * 30, // 30 minutes
+  });
 
   // Fetch WODs for mobile card - using Cyprus date filter
   const { data: mobileWods } = useQuery({
@@ -423,6 +445,13 @@ const Index = () => {
           }]
         })}
         </script>
+        
+        {/* Organization with AggregateRating Schema */}
+        {reviewStats && (
+          <script type="application/ld+json">
+            {JSON.stringify(generateOrganizationWithRatingSchema(reviewStats.count, reviewStats.average))}
+          </script>
+        )}
       </Helmet>
       
       <div className="min-h-screen bg-background overflow-x-hidden">

@@ -34,6 +34,7 @@ import { Trophy, MessageSquare, Star, User, Calendar, ClipboardCheck, ArrowLeft,
 import { TestimonialsSection } from "@/components/community/TestimonialsSection";
 import { formatDistanceToNow } from "date-fns";
 import { CompactFilters } from "@/components/CompactFilters";
+import { generateTestimonialsSchema, generateCommunityLeaderboardSchema } from "@/utils/seoHelpers";
 
 // Mapping for fake comment user IDs to display names
 const FAKE_USER_DISPLAY_NAMES: Record<string, string> = {
@@ -75,7 +76,13 @@ interface Comment {
   created_at: string;
   display_name: string;
 }
-
+interface Testimonial {
+  id: string;
+  display_name: string;
+  rating: number;
+  testimonial_text: string;
+  created_at: string;
+}
 
 const Community = () => {
   const { canGoBack, goBack } = useShowBackButton();
@@ -84,6 +91,7 @@ const Community = () => {
   const [checkinLeaderboard, setCheckinLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [ratedContent, setRatedContent] = useState<RatedContent[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(true);
   const [isLoadingRatings, setIsLoadingRatings] = useState(true);
   const [isLoadingComments, setIsLoadingComments] = useState(true);
@@ -120,11 +128,26 @@ const Community = () => {
   useEffect(() => {
     fetchLeaderboards();
     fetchRatedContent();
+    fetchTestimonials();
   }, []);
 
   useEffect(() => {
     fetchComments();
   }, [sortOrder, commentsFilter]);
+
+  const fetchTestimonials = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("testimonials")
+        .select("id, display_name, rating, testimonial_text, created_at")
+        .order("created_at", { ascending: false });
+      
+      if (error) throw error;
+      setTestimonials(data || []);
+    } catch (error) {
+      console.error("Error fetching testimonials for SEO:", error);
+    }
+  };
 
   const fetchLeaderboards = async () => {
     try {
@@ -494,29 +517,64 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
       <Helmet>
         <title>Community | Leaderboards & Reviews | SmartyGym</title>
         <meta name="description" content="Join the SmartyGym community. View leaderboards, member reviews, and connect with fellow fitness enthusiasts. Share your progress and get inspired by others' success stories." />
-        <meta name="keywords" content="fitness community, workout leaderboards, member reviews, fitness social, training community, SmartyGym community, fitness motivation, workout reviews, online fitness community" />
+        <meta name="keywords" content="fitness community, workout leaderboards, member reviews, fitness social, training community, SmartyGym community, fitness motivation, workout reviews, online fitness community, Haris Falas reviews, SmartyGym testimonials" />
         <link rel="canonical" href="https://smartygym.com/community" />
         
+        {/* AI Search Optimization */}
+        <meta name="ai-content-type" content="community-platform" />
+        <meta name="ai-reviews" content={`${testimonials.length} verified member reviews`} />
+        <meta name="ai-rating" content={testimonials.length > 0 ? `${(testimonials.reduce((sum, t) => sum + t.rating, 0) / testimonials.length).toFixed(2)} out of 5 stars` : ''} />
+        
+        {/* Community Leaderboard Schema */}
         <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "ItemList",
-            "name": "SmartyGym Community Leaderboards",
-            "description": "Community leaderboards showcasing member achievements, workout completions, and training program progress",
-            "itemListElement": [
-              {
-                "@type": "ListItem",
-                "position": 1,
-                "name": "Workout Completions Leaderboard"
-              },
-              {
-                "@type": "ListItem",
-                "position": 2,
-                "name": "Program Completions Leaderboard"
-              }
-            ]
-          })}
+          {JSON.stringify(generateCommunityLeaderboardSchema('workouts'))}
         </script>
+        
+        {/* Testimonials with AggregateRating Schema */}
+        {testimonials.length > 0 && (
+          <script type="application/ld+json">
+            {JSON.stringify(generateTestimonialsSchema(
+              testimonials.map(t => ({
+                author: t.display_name,
+                rating: t.rating,
+                text: t.testimonial_text,
+                datePublished: t.created_at.split('T')[0]
+              }))
+            ))}
+          </script>
+        )}
+        
+        {/* Individual Review Schemas for Rich Results */}
+        {testimonials.slice(0, 5).map((testimonial, index) => (
+          <script key={testimonial.id} type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Review",
+              "author": {
+                "@type": "Person",
+                "name": testimonial.display_name
+              },
+              "reviewRating": {
+                "@type": "Rating",
+                "ratingValue": testimonial.rating,
+                "bestRating": 5,
+                "worstRating": 1
+              },
+              "reviewBody": testimonial.testimonial_text,
+              "datePublished": testimonial.created_at.split('T')[0],
+              "itemReviewed": {
+                "@type": "Product",
+                "name": "SmartyGym Premium Membership",
+                "brand": { "@type": "Organization", "name": "SmartyGym" },
+                "url": "https://smartygym.com"
+              },
+              "publisher": {
+                "@type": "Organization",
+                "name": "SmartyGym"
+              }
+            })}
+          </script>
+        ))}
       </Helmet>
       
       <SEOEnhancer 

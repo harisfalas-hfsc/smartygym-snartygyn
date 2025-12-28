@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -6,19 +7,53 @@ import { ArrowLeft, Award, GraduationCap, Building2, Target, CheckCircle, Smartp
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
+import { supabase } from "@/integrations/supabase/client";
+import { generateEnhancedCoachSchema } from "@/utils/seoHelpers";
+import harisPhoto from "@/assets/haris-falas-coach.png";
 
 const CoachProfile = () => {
   const navigate = useNavigate();
   const { canGoBack, goBack } = useShowBackButton();
   const { userTier } = useAccessControl();
   const isPremium = userTier === "premium";
+  const [reviewStats, setReviewStats] = useState({ count: 0, average: 0 });
+
+  useEffect(() => {
+    const fetchReviewStats = async () => {
+      const { data, error } = await supabase
+        .from("testimonials")
+        .select("rating");
+      
+      if (!error && data && data.length > 0) {
+        const total = data.reduce((sum, t) => sum + t.rating, 0);
+        setReviewStats({
+          count: data.length,
+          average: Math.round((total / data.length) * 100) / 100
+        });
+      }
+    };
+    fetchReviewStats();
+  }, []);
 
   return (
     <>
       <Helmet>
         <title>Haris Falas | Online Personal Trainer | Sports Scientist HFSC | SmartyGym</title>
         <meta name="description" content="Haris Falas - online personal trainer & Sports Scientist with 20+ years experience at HFSC Performance. Expert online workouts, training programs, and personal training worldwide. Strength & conditioning coach at smartygym.com" />
-        <meta name="keywords" content="Haris Falas, personal trainer, online personal trainer, Sports Scientist, HFSC, HFSC Performance, strength and conditioning coach, fitness expert, online fitness professional, gym coach, training specialist, smartygym.com" />
+        <meta name="keywords" content="Haris Falas, Haris Falas reviews, Haris Falas trainer, personal trainer, online personal trainer, Sports Scientist, HFSC, HFSC Performance, strength and conditioning coach, fitness expert, online fitness professional, gym coach, training specialist, smartygym.com, SmartyGym coach, Haris Falas CSCS" />
+        
+        {/* AI Search Optimization */}
+        <meta name="ai-content-type" content="professional-profile" />
+        <meta name="ai-entity-type" content="Person" />
+        <meta name="ai-expertise" content="Sports Science, Strength and Conditioning, Online Fitness Coaching" />
+        <meta name="ai-credentials" content="BSc Sports Science, CSCS, EXOS Performance Specialist" />
+        <meta name="ai-experience" content="20+ years in fitness coaching and sports science" />
+        {reviewStats.count > 0 && (
+          <>
+            <meta name="ai-reviews" content={`${reviewStats.count} verified reviews`} />
+            <meta name="ai-rating" content={`${reviewStats.average} out of 5 stars`} />
+          </>
+        )}
         
         {/* Greek Language */}
         <link rel="alternate" hrefLang="el" href="https://smartygym.com/coach-profile" />
@@ -28,62 +63,34 @@ const CoachProfile = () => {
         <meta property="og:title" content="Haris Falas | Online Personal Trainer & Sports Scientist" />
         <meta property="og:description" content="Online personal trainer with 20+ years experience in strength and conditioning, sports science, and online fitness training." />
         <meta property="og:type" content="profile" />
-        <meta property="og:url" content={window.location.href} />
-        <meta property="og:image" content="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=1200" />
+        <meta property="og:url" content="https://smartygym.com/coach-profile" />
+        <meta property="og:image" content={harisPhoto} />
         <meta property="og:site_name" content="SmartyGym" />
         
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Haris Falas | Online Personal Trainer" />
         <meta name="twitter:description" content="Online personal trainer and Sports Scientist with 20+ years experience" />
-        <meta name="twitter:image" content="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=1200" />
+        <meta name="twitter:image" content={harisPhoto} />
         
-        <link rel="canonical" href={window.location.href} />
+        <link rel="canonical" href="https://smartygym.com/coach-profile" />
         
-        {/* Structured Data - Person */}
+        {/* Enhanced Person Schema with Reviews */}
+        <script type="application/ld+json">
+          {JSON.stringify(generateEnhancedCoachSchema(
+            reviewStats.count > 0 ? reviewStats.count : undefined,
+            reviewStats.average > 0 ? reviewStats.average : undefined
+          ))}
+        </script>
+        
+        {/* Breadcrumb Schema */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
-            "@type": "Person",
-            "name": "Haris Falas",
-            "jobTitle": "Sports Scientist & Personal Trainer",
-            "description": "Online personal trainer and Sports Scientist with over 20 years of experience in strength and conditioning, online fitness training, and athletic performance",
-            "knowsAbout": ["Strength Training", "Sports Science", "Functional Training", "Human Performance", "Online Personal Training", "Athletic Conditioning"],
-            "hasCredential": {
-              "@type": "EducationalOccupationalCredential",
-              "credentialCategory": "Sports Science Certification"
-            },
-            "worksFor": {
-              "@type": "Organization",
-              "name": "SmartyGym",
-              "url": "https://smartygym.com"
-            },
-            "alumniOf": "Sports Science Certification",
-            "offers": [
-              {
-                "@type": "Offer",
-                "itemOffered": {
-                  "@type": "Service",
-                  "name": "Online Personal Training",
-                  "description": "Customized online personal training programs"
-                }
-              },
-              {
-                "@type": "Offer",
-                "itemOffered": {
-                  "@type": "Service",
-                  "name": "Online Workouts",
-                  "description": "Professional online workout programs"
-                }
-              },
-              {
-                "@type": "Offer",
-                "itemOffered": {
-                  "@type": "Service",
-                  "name": "Online Training Programs",
-                  "description": "Structured training programs for all fitness levels"
-                }
-              }
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://smartygym.com" },
+              { "@type": "ListItem", "position": 2, "name": "Coach Profile", "item": "https://smartygym.com/coach-profile" }
             ]
           })}
         </script>
@@ -113,8 +120,8 @@ const CoachProfile = () => {
             <header className="text-center mb-12">
               <div className="w-40 h-40 mx-auto mb-6 rounded-full overflow-hidden">
                 <img 
-                  src={new URL("@/assets/haris-falas-coach.png", import.meta.url).href}
-                  alt="Haris Falas - Head Coach" 
+                  src={harisPhoto}
+                  alt="Haris Falas - Sports Scientist and Founder of SmartyGym - Professional Fitness Coach with 20+ years experience in strength and conditioning" 
                   className="w-full h-full object-cover"
                 />
               </div>
