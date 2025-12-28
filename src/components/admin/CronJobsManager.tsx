@@ -739,7 +739,7 @@ export function CronJobsManager() {
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent side="bottom" align="start">
                     {FREQUENCY_OPTIONS.map(opt => (
                       <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
                     ))}
@@ -758,7 +758,7 @@ export function CronJobsManager() {
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent side="bottom" align="start">
                       {INTERVAL_MINUTES.map(m => (
                         <SelectItem key={m} value={m.toString()}>{m} minutes</SelectItem>
                       ))}
@@ -778,7 +778,7 @@ export function CronJobsManager() {
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent side="bottom" align="start">
                       {MINUTE_OPTIONS.map(m => (
                         <SelectItem key={m} value={m.toString()}>:{m.toString().padStart(2, '0')}</SelectItem>
                       ))}
@@ -799,7 +799,7 @@ export function CronJobsManager() {
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent side="bottom" align="start">
                         {HOUR_OPTIONS.map(h => (
                           <SelectItem key={h} value={h.toString()}>
                             {h.toString().padStart(2, '0')}:00
@@ -817,11 +817,11 @@ export function CronJobsManager() {
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
-                        {MINUTE_OPTIONS.map(m => (
-                          <SelectItem key={m} value={m.toString()}>:{m.toString().padStart(2, '0')}</SelectItem>
-                        ))}
-                      </SelectContent>
+                    <SelectContent side="bottom" align="start">
+                      {MINUTE_OPTIONS.map(m => (
+                        <SelectItem key={m} value={m.toString()}>:{m.toString().padStart(2, '0')}</SelectItem>
+                      ))}
+                    </SelectContent>
                     </Select>
                   </div>
                 </div>
@@ -838,7 +838,7 @@ export function CronJobsManager() {
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent side="bottom" align="start">
                       {DAY_OF_WEEK_OPTIONS.map(d => (
                         <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
                       ))}
@@ -858,7 +858,7 @@ export function CronJobsManager() {
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent side="bottom" align="start">
                       {DAY_OF_MONTH_OPTIONS.map(d => (
                         <SelectItem key={d} value={d.toString()}>Day {d}</SelectItem>
                       ))}
@@ -1001,7 +1001,7 @@ export function CronJobsManager() {
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent side="bottom" align="start">
                     {FREQUENCY_OPTIONS.map(opt => (
                       <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
                     ))}
@@ -1019,7 +1019,7 @@ export function CronJobsManager() {
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent side="bottom" align="start">
                       {INTERVAL_MINUTES.map(m => (
                         <SelectItem key={m} value={m.toString()}>{m} minutes</SelectItem>
                       ))}
@@ -1038,7 +1038,7 @@ export function CronJobsManager() {
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent side="bottom" align="start">
                       {MINUTE_OPTIONS.map(m => (
                         <SelectItem key={m} value={m.toString()}>:{m.toString().padStart(2, '0')}</SelectItem>
                       ))}
@@ -1058,7 +1058,7 @@ export function CronJobsManager() {
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent side="bottom" align="start">
                         {HOUR_OPTIONS.map(h => (
                           <SelectItem key={h} value={h.toString()}>
                             {h.toString().padStart(2, '0')}:00
@@ -1076,11 +1076,11 @@ export function CronJobsManager() {
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
-                        {MINUTE_OPTIONS.map(m => (
-                          <SelectItem key={m} value={m.toString()}>:{m.toString().padStart(2, '0')}</SelectItem>
-                        ))}
-                      </SelectContent>
+                    <SelectContent side="bottom" align="start">
+                      {MINUTE_OPTIONS.map(m => (
+                        <SelectItem key={m} value={m.toString()}>:{m.toString().padStart(2, '0')}</SelectItem>
+                      ))}
+                    </SelectContent>
                     </Select>
                   </div>
                 </div>
@@ -1096,7 +1096,7 @@ export function CronJobsManager() {
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent side="bottom" align="start">
                       {DAY_OF_WEEK_OPTIONS.map(d => (
                         <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
                       ))}
@@ -1115,7 +1115,7 @@ export function CronJobsManager() {
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent side="bottom" align="start">
                       {DAY_OF_MONTH_OPTIONS.map(d => (
                         <SelectItem key={d} value={d.toString()}>Day {d}</SelectItem>
                       ))}
@@ -1151,7 +1151,7 @@ export function CronJobsManager() {
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent side="bottom" align="start">
                     {CATEGORIES.map(cat => (
                       <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
                     ))}
