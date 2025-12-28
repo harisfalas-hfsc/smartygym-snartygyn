@@ -67,7 +67,7 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
     stripe_price_id: '',
   });
   const [weekDayContents, setWeekDayContents] = useState<WeekDayContent[]>([]);
-
+  const [sendNotification, setSendNotification] = useState(false);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
 
   const getCategoryPrefix = (category: string) => {
@@ -443,59 +443,36 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
           }
         }
 
-        // Schedule notification for new program
-        if (formData.name && formData.name.trim()) {
+        // Only schedule notification if admin explicitly enabled it
+        // Skip notifications for test programs (names containing "test", "TEST", etc.)
+        const isTestProgram = formData.name && /test/i.test(formData.name.trim());
+        
+        if (sendNotification && formData.name && formData.name.trim() && !isTestProgram) {
           try {
-            const scheduledTime = new Date(Date.now() + 5 * 60 * 1000).toISOString();
-            const stripHtml = (html: string) => html.replace(/<[^>]*>/g, '').trim();
-            
-            let notificationBody = `New training program available: ${formData.name}. `;
-            
-            if (formData.program_description) {
-              const cleanDescription = stripHtml(formData.program_description);
-              const descPreview = cleanDescription.length > 100 
-                ? cleanDescription.substring(0, 100) + '...'
-                : cleanDescription;
-              notificationBody += descPreview + ' ';
-            }
-            
-            notificationBody += `${formData.weeks} weeks, ${formData.days_per_week} days per week. `;
-            
-            if (baseData.is_premium) {
-              if (baseData.is_standalone_purchase && baseData.price) {
-                notificationBody += `Available as standalone purchase for €${baseData.price.toFixed(2)} or included in Premium subscription.`;
-              } else {
-                notificationBody += 'Exclusive for Premium subscribers.';
-              }
-            } else {
-              notificationBody += 'Free for all users!';
-            }
-            
+            // Use the pending_content_notifications table which has an actual processor
             await supabase
-              .from('scheduled_notifications')
+              .from('pending_content_notifications')
               .insert([{
-                title: '💪 New Training Program Added!',
-                body: notificationBody,
-                url: `/training-program/${baseData.id}`,
-                icon: imageUrl || '/smarty-gym-logo.png',
-                target_audience: 'all',
-                scheduled_time: scheduledTime,
-                timezone: 'UTC',
-                status: 'pending',
-                recurrence_pattern: 'once'
+                content_type: 'program',
+                content_id: baseData.id,
+                content_name: formData.name,
+                content_category: formData.category || null,
               }]);
             
             if (import.meta.env.DEV) {
-              console.log('✅ Notification scheduled for new program:', formData.name);
+              console.log('✅ Notification queued for new program:', formData.name);
             }
+            toast({ title: "Success", description: "Program created and notification queued!" });
           } catch (notifError) {
             if (import.meta.env.DEV) {
-              console.error('Error scheduling notification:', notifError);
+              console.error('Error queueing notification:', notifError);
             }
+            toast({ title: "Success", description: "Program created successfully!" });
           }
+        } else {
+          const reason = isTestProgram ? ' (test program - no notification)' : '';
+          toast({ title: "Success", description: `Program created successfully!${reason}` });
         }
-
-        toast({ title: "Success", description: "Program created successfully and notification scheduled!" });
       }
       onSave();
       onOpenChange(false);
@@ -732,6 +709,37 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
               </div>
             )}
           </div>
+
+          {/* Notification Toggle - Only show for new programs */}
+          {!program && (
+            <div className="space-y-2 pt-4 border-t border-orange-200 bg-orange-50/50 p-4 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <Label htmlFor="send_notification" className="text-orange-800 font-semibold">
+                    📢 Send Notification to Users
+                  </Label>
+                  <p className="text-sm text-orange-700">
+                    Enable to notify all users about this new program via email and dashboard
+                  </p>
+                </div>
+                <Switch
+                  id="send_notification"
+                  checked={sendNotification}
+                  onCheckedChange={setSendNotification}
+                />
+              </div>
+              {sendNotification && (
+                <p className="text-sm text-orange-600 bg-orange-100 p-2 rounded mt-2">
+                  ⚠️ Users will receive a notification about this program. Make sure content is ready!
+                </p>
+              )}
+              {formData.name && /test/i.test(formData.name) && (
+                <p className="text-sm text-amber-600 bg-amber-100 p-2 rounded mt-2">
+                  🧪 Test program detected - notifications will be automatically skipped
+                </p>
+              )}
+            </div>
+          )}
 
           {/* Free Content Toggle */}
           <div className="space-y-2">

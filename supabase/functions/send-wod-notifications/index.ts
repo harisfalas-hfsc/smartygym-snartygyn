@@ -33,9 +33,11 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const resendClient = new Resend(resendApiKey);
 
-    // Get today's date in Cyprus timezone
+    // Get today's date in Cyprus timezone with dynamic DST handling
     const now = new Date();
-    const cyprusOffset = 2;
+    const month = now.getUTCMonth() + 1; // 1-12
+    // Cyprus DST: April-October = UTC+3, November-March = UTC+2
+    const cyprusOffset = (month >= 4 && month <= 10) ? 3 : 2;
     const cyprusTime = new Date(now.getTime() + cyprusOffset * 60 * 60 * 1000);
     const todayStr = cyprusTime.toISOString().split('T')[0];
 
