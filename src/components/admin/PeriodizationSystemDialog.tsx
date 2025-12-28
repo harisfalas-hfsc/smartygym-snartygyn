@@ -11,8 +11,7 @@ import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { format, addDays } from "date-fns";
 import type { Json } from "@/integrations/supabase/types";
-import { Document, Packer, Paragraph, Table as DocxTable, TableRow as DocxTableRow, TableCell as DocxTableCell, TextRun, HeadingLevel, WidthType, BorderStyle, AlignmentType } from "docx";
-import { saveAs } from "file-saver";
+import { Document, Packer, Paragraph, Table as DocxTable, TableRow as DocxTableRow, TableCell as DocxTableCell, TextRun, HeadingLevel, WidthType, AlignmentType } from "docx";
 import {
   PERIODIZATION_84DAY,
   FORMATS_BY_CATEGORY,
@@ -164,8 +163,18 @@ export const PeriodizationSystemDialog = ({
       });
 
       const blob = await Packer.toBlob(doc);
-      saveAs(blob, "SmartyGym-84-Day-Cycle.docx");
-      toast.success("Word document downloaded");
+      
+      // Create download link and trigger it programmatically
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = "SmartyGym-84-Day-Cycle.docx";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      toast.success(`Document downloaded (${(blob.size / 1024).toFixed(1)} KB)`);
     } catch (error: any) {
       console.error("Failed to generate document:", error);
       toast.error("Failed to generate document", { description: error.message });
