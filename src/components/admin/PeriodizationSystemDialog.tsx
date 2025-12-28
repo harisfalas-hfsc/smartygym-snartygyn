@@ -176,11 +176,23 @@ export const PeriodizationSystemDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-5xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <div className="flex items-center justify-between">
-            <DialogTitle className="flex items-center gap-2">
-              <Settings className="h-5 w-5 text-primary" />
-              WOD Periodization System (84-Day Cycle)
-            </DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            <Settings className="h-5 w-5 text-primary" />
+            WOD Periodization System (84-Day Cycle)
+          </DialogTitle>
+          <DialogDescription>
+            Simple 84-day cycle: Day 1 to Day 84, then restart. No complex rotation.
+          </DialogDescription>
+        </DialogHeader>
+
+        <Tabs defaultValue="periodization" className="mt-4">
+          <div className="flex items-center justify-between mb-4">
+            <TabsList className="grid w-fit grid-cols-4">
+              <TabsTrigger value="periodization">84-Day Cycle</TabsTrigger>
+              <TabsTrigger value="formats">Formats</TabsTrigger>
+              <TabsTrigger value="state">Current State</TabsTrigger>
+              <TabsTrigger value="overrides">Overrides</TabsTrigger>
+            </TabsList>
             <Button 
               variant="outline" 
               size="sm" 
@@ -188,21 +200,9 @@ export const PeriodizationSystemDialog = ({
               className="flex items-center gap-2"
             >
               <Download className="h-4 w-4" />
-              Download Structure
+              Download
             </Button>
           </div>
-          <DialogDescription>
-            Simple 84-day cycle: Day 1 to Day 84, then restart. No complex rotation.
-          </DialogDescription>
-        </DialogHeader>
-
-        <Tabs defaultValue="periodization" className="mt-4">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="periodization">84-Day Cycle</TabsTrigger>
-            <TabsTrigger value="formats">Formats</TabsTrigger>
-            <TabsTrigger value="state">Current State</TabsTrigger>
-            <TabsTrigger value="overrides">Overrides</TabsTrigger>
-          </TabsList>
 
           {/* 84-Day Cycle Tab */}
           <TabsContent value="periodization" className="space-y-4">
