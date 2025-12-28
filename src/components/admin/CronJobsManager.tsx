@@ -10,9 +10,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Clock, Play, Pencil, Trash2, Plus, RefreshCw, AlertCircle, CheckCircle, Zap, Info, Power, PowerOff } from "lucide-react";
+import { Clock, Play, Pencil, Trash2, Plus, RefreshCw, AlertCircle, CheckCircle, Zap, Info, Power, PowerOff, AlertTriangle, Link2Off, Link2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { CronTimeInput } from "./CronTimeInput";
+import { CronIntervalInput } from "./CronIntervalInput";
+import { BuildVersionIndicator } from "./BuildVersionIndicator";
 
 interface CronJobMetadata {
   id: string;
@@ -30,6 +33,12 @@ interface CronJobMetadata {
   next_run_estimate: string | null;
   created_at: string;
   updated_at: string;
+  // Enriched fields from scheduler
+  scheduler_schedule?: string | null;
+  scheduler_active?: boolean | null;
+  in_scheduler?: boolean;
+  schedule_mismatch?: boolean;
+  is_orphan?: boolean;
 }
 
 const CATEGORIES = [
@@ -229,7 +238,8 @@ export function CronJobsManager() {
   const [testing, setTesting] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [cronEnabled, setCronEnabled] = useState(false);
-
+  const [syncing, setSyncing] = useState(false);
+  const [orphanJobs, setOrphanJobs] = useState<CronJobMetadata[]>([]);
   // Edit form state
   const [editForm, setEditForm] = useState({
     display_name: '',
@@ -280,19 +290,65 @@ export function CronJobsManager() {
   const fetchJobs = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      // Use edge function to get enriched job data including scheduler info
+      const { data, error } = await supabase.functions.invoke('manage-cron-jobs', {
+        body: { action: 'list' }
+      });
+
+      if (error) throw error;
+      
+      if (data?.jobs) {
+        setJobs(data.jobs as CronJobMetadata[]);
+      }
+      if (data?.orphan_scheduler_jobs) {
+        setOrphanJobs(data.orphan_scheduler_jobs as CronJobMetadata[]);
+      }
+    } catch (error: any) {
+      console.error("Failed to fetch cron jobs:", error);
+      // Fallback to direct table query
+      const { data: fallbackData, error: fallbackError } = await supabase
         .from('cron_job_metadata')
         .select('*')
         .order('category', { ascending: true })
         .order('display_name', { ascending: true });
 
-      if (error) throw error;
-      setJobs((data || []) as CronJobMetadata[]);
-    } catch (error: any) {
-      console.error("Failed to fetch cron jobs:", error);
-      toast.error("Failed to load cron jobs");
+      if (!fallbackError && fallbackData) {
+        setJobs(fallbackData as CronJobMetadata[]);
+      } else {
+        toast.error("Failed to load cron jobs");
+      }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSyncJob = async (job: CronJobMetadata) => {
+    setSyncing(true);
+    try {
+      // Re-create the scheduler job from metadata
+      const { data, error } = await supabase.functions.invoke('manage-cron-jobs', {
+        body: {
+          action: 'add',
+          job_name: job.job_name,
+          display_name: job.display_name,
+          description: job.description,
+          category: job.category,
+          schedule: job.schedule,
+          schedule_human_readable: job.schedule_human_readable,
+          edge_function_name: job.edge_function_name,
+          request_body: job.request_body,
+          is_critical: job.is_critical,
+        }
+      });
+
+      if (error) throw error;
+      
+      toast.success(`✅ ${job.display_name} synced to scheduler`);
+      fetchJobs();
+    } catch (error: any) {
+      toast.error(`Sync failed: ${error.message}`);
+    } finally {
+      setSyncing(false);
     }
   };
 
@@ -515,9 +571,10 @@ export function CronJobsManager() {
             Manage scheduled tasks and automated functions
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={fetchJobs}>
-            <RefreshCw className="h-4 w-4 mr-2" />
+        <div className="flex items-center gap-2 flex-wrap">
+          <BuildVersionIndicator />
+          <Button variant="outline" onClick={fetchJobs} disabled={loading}>
+            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
           <Button onClick={() => setShowAddDialog(true)}>
@@ -566,10 +623,12 @@ export function CronJobsManager() {
                 key={job.job_name}
                 job={job}
                 testing={testing}
+                syncing={syncing}
                 onView={() => { setSelectedJob(job); setShowDetailsDialog(true); }}
                 onEdit={() => openEditDialog(job)}
                 onDelete={() => { setSelectedJob(job); setShowDeleteConfirm(true); }}
                 onTest={() => handleTest(job)}
+                onSync={() => handleSyncJob(job)}
                 getCategoryBadge={getCategoryBadge}
               />
             ))}
@@ -584,10 +643,12 @@ export function CronJobsManager() {
                   key={job.job_name}
                   job={job}
                   testing={testing}
+                  syncing={syncing}
                   onView={() => { setSelectedJob(job); setShowDetailsDialog(true); }}
                   onEdit={() => openEditDialog(job)}
                   onDelete={() => { setSelectedJob(job); setShowDeleteConfirm(true); }}
                   onTest={() => handleTest(job)}
+                  onSync={() => handleSyncJob(job)}
                   getCategoryBadge={getCategoryBadge}
                 />
               ))}
@@ -749,82 +810,40 @@ export function CronJobsManager() {
 
               {/* Interval (for every_x_minutes) */}
               {editForm.frequency === 'every_x_minutes' && (
-                <div>
-                  <Label className="text-sm">Run every</Label>
-                  <Select 
-                    value={editForm.intervalMinutes.toString()}
-                    onValueChange={(v) => setEditForm({...editForm, intervalMinutes: parseInt(v)})}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent side="bottom" align="start">
-                      {INTERVAL_MINUTES.map(m => (
-                        <SelectItem key={m} value={m.toString()}>{m} minutes</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                <CronIntervalInput
+                  value={editForm.intervalMinutes}
+                  onChange={(v) => setEditForm({...editForm, intervalMinutes: v})}
+                  min={1}
+                  max={60}
+                  step={5}
+                  label="Run every"
+                  suffix="minutes"
+                />
               )}
 
               {/* Time Picker (for hourly - just minute) */}
               {editForm.frequency === 'hourly' && (
-                <div>
-                  <Label className="text-sm">At minute</Label>
-                  <Select 
-                    value={editForm.minute.toString()}
-                    onValueChange={(v) => setEditForm({...editForm, minute: parseInt(v)})}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent side="bottom" align="start">
-                      {MINUTE_OPTIONS.map(m => (
-                        <SelectItem key={m} value={m.toString()}>:{m.toString().padStart(2, '0')}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                <CronIntervalInput
+                  value={editForm.minute}
+                  onChange={(v) => setEditForm({...editForm, minute: v})}
+                  min={0}
+                  max={59}
+                  step={5}
+                  label="At minute"
+                  suffix=""
+                />
               )}
 
               {/* Time Picker (for daily/weekly/monthly) */}
               {['daily', 'weekly', 'monthly'].includes(editForm.frequency) && (
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <Label className="text-sm">Hour (Cyprus time)</Label>
-                    <Select 
-                      value={editForm.cyprusHour.toString()}
-                      onValueChange={(v) => setEditForm({...editForm, cyprusHour: parseInt(v)})}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent side="bottom" align="start">
-                        {HOUR_OPTIONS.map(h => (
-                          <SelectItem key={h} value={h.toString()}>
-                            {h.toString().padStart(2, '0')}:00
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label className="text-sm">Minute</Label>
-                    <Select 
-                      value={editForm.minute.toString()}
-                      onValueChange={(v) => setEditForm({...editForm, minute: parseInt(v)})}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                    <SelectContent side="bottom" align="start">
-                      {MINUTE_OPTIONS.map(m => (
-                        <SelectItem key={m} value={m.toString()}>:{m.toString().padStart(2, '0')}</SelectItem>
-                      ))}
-                    </SelectContent>
-                    </Select>
-                  </div>
-                </div>
+                <CronTimeInput
+                  hour={editForm.cyprusHour}
+                  minute={editForm.minute}
+                  onHourChange={(h) => setEditForm({...editForm, cyprusHour: h})}
+                  onMinuteChange={(m) => setEditForm({...editForm, minute: m})}
+                  label="Time (Cyprus timezone)"
+                  showTimezonePreview={true}
+                />
               )}
 
               {/* Day of Week (for weekly) */}
@@ -1010,80 +1029,38 @@ export function CronJobsManager() {
               </div>
 
               {addForm.frequency === 'every_x_minutes' && (
-                <div>
-                  <Label className="text-sm">Run every</Label>
-                  <Select 
-                    value={addForm.intervalMinutes.toString()}
-                    onValueChange={(v) => setAddForm({...addForm, intervalMinutes: parseInt(v)})}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent side="bottom" align="start">
-                      {INTERVAL_MINUTES.map(m => (
-                        <SelectItem key={m} value={m.toString()}>{m} minutes</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                <CronIntervalInput
+                  value={addForm.intervalMinutes}
+                  onChange={(v) => setAddForm({...addForm, intervalMinutes: v})}
+                  min={1}
+                  max={60}
+                  step={5}
+                  label="Run every"
+                  suffix="minutes"
+                />
               )}
 
               {addForm.frequency === 'hourly' && (
-                <div>
-                  <Label className="text-sm">At minute</Label>
-                  <Select 
-                    value={addForm.minute.toString()}
-                    onValueChange={(v) => setAddForm({...addForm, minute: parseInt(v)})}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent side="bottom" align="start">
-                      {MINUTE_OPTIONS.map(m => (
-                        <SelectItem key={m} value={m.toString()}>:{m.toString().padStart(2, '0')}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                <CronIntervalInput
+                  value={addForm.minute}
+                  onChange={(v) => setAddForm({...addForm, minute: v})}
+                  min={0}
+                  max={59}
+                  step={5}
+                  label="At minute"
+                  suffix=""
+                />
               )}
 
               {['daily', 'weekly', 'monthly'].includes(addForm.frequency) && (
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <Label className="text-sm">Hour (Cyprus time)</Label>
-                    <Select 
-                      value={addForm.cyprusHour.toString()}
-                      onValueChange={(v) => setAddForm({...addForm, cyprusHour: parseInt(v)})}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent side="bottom" align="start">
-                        {HOUR_OPTIONS.map(h => (
-                          <SelectItem key={h} value={h.toString()}>
-                            {h.toString().padStart(2, '0')}:00
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label className="text-sm">Minute</Label>
-                    <Select 
-                      value={addForm.minute.toString()}
-                      onValueChange={(v) => setAddForm({...addForm, minute: parseInt(v)})}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                    <SelectContent side="bottom" align="start">
-                      {MINUTE_OPTIONS.map(m => (
-                        <SelectItem key={m} value={m.toString()}>:{m.toString().padStart(2, '0')}</SelectItem>
-                      ))}
-                    </SelectContent>
-                    </Select>
-                  </div>
-                </div>
+                <CronTimeInput
+                  hour={addForm.cyprusHour}
+                  minute={addForm.minute}
+                  onHourChange={(h) => setAddForm({...addForm, cyprusHour: h})}
+                  onMinuteChange={(m) => setAddForm({...addForm, minute: m})}
+                  label="Time (Cyprus timezone)"
+                  showTimezonePreview={true}
+                />
               )}
 
               {addForm.frequency === 'weekly' && (
@@ -1224,20 +1201,27 @@ export function CronJobsManager() {
 function JobCard({ 
   job, 
   testing, 
+  syncing,
   onView, 
   onEdit, 
   onDelete, 
   onTest,
+  onSync,
   getCategoryBadge 
 }: {
   job: CronJobMetadata;
   testing: string | null;
+  syncing?: boolean;
   onView: () => void;
   onEdit: () => void;
   onDelete: () => void;
   onTest: () => void;
+  onSync?: () => void;
   getCategoryBadge: (cat: string | null) => JSX.Element;
 }) {
+  const showSyncButton = job.in_scheduler === false && onSync;
+  const hasMismatch = job.schedule_mismatch === true;
+
   return (
     <Card className={`hover:shadow-md transition-shadow ${job.is_active === false ? 'opacity-60' : ''}`}>
       <CardContent className="p-4">
@@ -1258,6 +1242,25 @@ function JobCard({
                   Paused
                 </Badge>
               )}
+              {/* Scheduler status badges */}
+              {job.in_scheduler === false && (
+                <Badge variant="outline" className="border-orange-500 text-orange-600">
+                  <Link2Off className="h-3 w-3 mr-1" />
+                  Not in scheduler
+                </Badge>
+              )}
+              {job.in_scheduler === true && !hasMismatch && (
+                <Badge variant="outline" className="border-green-500 text-green-600">
+                  <Link2 className="h-3 w-3 mr-1" />
+                  Active
+                </Badge>
+              )}
+              {hasMismatch && (
+                <Badge variant="outline" className="border-red-500 text-red-600">
+                  <AlertTriangle className="h-3 w-3 mr-1" />
+                  Schedule mismatch
+                </Badge>
+              )}
             </div>
             
             {/* Schedule Display - THE MOST IMPORTANT INFO */}
@@ -1267,12 +1270,36 @@ function JobCard({
                 {job.schedule_human_readable || 'Not scheduled'}
               </span>
             </div>
+
+            {/* Show mismatch details */}
+            {hasMismatch && job.scheduler_schedule && (
+              <div className="text-xs text-orange-600 mt-1">
+                Scheduler has: <code className="bg-muted px-1 rounded">{job.scheduler_schedule}</code> 
+                {' '}vs metadata: <code className="bg-muted px-1 rounded">{job.schedule}</code>
+              </div>
+            )}
             
             <p className="text-sm text-muted-foreground mt-1 line-clamp-1">
               {job.description || 'No description'}
             </p>
           </div>
           <div className="flex items-center gap-1 shrink-0">
+            {showSyncButton && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={onSync}
+                disabled={syncing}
+                className="text-orange-600 border-orange-500 hover:bg-orange-50"
+                title="Sync to scheduler"
+              >
+                {syncing ? (
+                  <RefreshCw className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Link2 className="h-4 w-4" />
+                )}
+              </Button>
+            )}
             <Button variant="ghost" size="sm" onClick={onView} title="View Details">
               <Info className="h-4 w-4" />
             </Button>
