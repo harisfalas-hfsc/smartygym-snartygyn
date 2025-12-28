@@ -104,7 +104,7 @@ const AppContent = () => {
         <ScrollToTop />
         <div className="flex flex-col min-h-screen">
           <Navigation />
-            <div className="flex-1 pt-[90px] xs:pt-[102px] sm:pt-[114px] md:pt-[126px] lg:pt-[138px]">
+            <div className="flex-1" style={{ paddingTop: 'calc(var(--app-header-h, 100px) + 8px)' }}>
             <PageTransition>
                 <Routes>
                   <Route path="/" element={<Index />} />
