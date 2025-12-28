@@ -23,10 +23,7 @@ interface PeriodizationSystemDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   wodState: {
-    id: string;
-    day_count: number;
-    week_number?: number | null;
-    used_stars_in_week?: Json | null;
+    id?: string;
     manual_overrides?: Json | null;
     format_usage?: Json | null;
   } | null;

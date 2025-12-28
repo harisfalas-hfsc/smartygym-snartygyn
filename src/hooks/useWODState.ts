@@ -7,13 +7,13 @@ export const useWODState = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("workout_of_day_state")
-        .select("day_count, week_number")
+        .select("manual_overrides, format_usage, last_generated_at")
         .limit(1)
         .single();
 
       if (error) {
         console.error("Error fetching WOD state:", error);
-        return { day_count: 1, week_number: 1 };
+        return { manual_overrides: {}, format_usage: {}, last_generated_at: null };
       }
 
       return data;

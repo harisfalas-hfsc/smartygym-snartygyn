@@ -1856,11 +1856,9 @@ INSTRUCTIONS FORMAT: Plain paragraphs with clear guidance
     const nextDayIn84 = getDayIn84Cycle(nextDayDateStr);
     
     const newState = {
-      day_count: state.day_count + 1, // Legacy counter for stats
-      week_number: Math.ceil(dayIn84 / 7), // Approximate week in cycle
-      used_stars_in_week: {}, // No longer used - stars are fixed per day
+      // Note: day_count, week_number, used_stars_in_week, current_category were removed
+      // The 84-day cycle is now calculated purely from date in wodCycle.ts
       manual_overrides: newManualOverrides,
-      current_category: getCategoryForDay(nextDayIn84),
       last_equipment: "BOTH",
       last_difficulty: selectedDifficulty.name,
       format_usage: updatedUsage,
@@ -1889,10 +1887,9 @@ INSTRUCTIONS FORMAT: Plain paragraphs with clear guidance
           logStep("ERROR updating state", { error: updateError.message });
         } else {
           logStep("State updated BEFORE notifications", { 
-            newDayCount: newState.day_count,
+            dayIn84,
             nextDayIn84,
-            nextCategory: newState.current_category,
-            dayIn84
+            category
           });
         }
       } else {

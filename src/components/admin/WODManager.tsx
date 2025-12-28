@@ -15,17 +15,7 @@ import { PeriodizationSystemDialog } from "./PeriodizationSystemDialog";
 import { WorkoutEditDialog } from "./WorkoutEditDialog";
 import { GenerateWODDialog } from "./GenerateWODDialog";
 import { WODAutoGenConfigDialog } from "./WODAutoGenConfigDialog";
-
-// 7-DAY CATEGORY CYCLE
-const CATEGORY_CYCLE_7DAY = [
-  "CHALLENGE",
-  "STRENGTH", 
-  "CARDIO",
-  "MOBILITY & STABILITY",
-  "STRENGTH",
-  "METABOLIC",
-  "CALORIE BURNING"
-];
+import { getWODInfoForDate, getDayIn84Cycle, getCategoryForDay } from "@/lib/wodCycle";
 
 export const WODManager = () => {
   // 🏥 DIAGNOSTIC: v3 - Health Check button should be visible
@@ -303,9 +293,10 @@ export const WODManager = () => {
       } else if (!stateData) {
         issues.push("WOD state not found");
       } else {
-        const dayInCycle = ((stateData.day_count || 0) % 7) + 1;
-        const expectedCategory = CATEGORY_CYCLE_7DAY[(stateData.day_count - 1 + 7) % 7];
-        passed.push(`✅ State valid: Day ${stateData.day_count} (${dayInCycle}/7), Week ${stateData.week_number}`);
+        // Use 84-day cycle for validation
+        const dayIn84 = getDayIn84Cycle(today);
+        const expectedCategory = getCategoryForDay(dayIn84);
+        passed.push(`✅ State valid: Day ${dayIn84}/84 in cycle`);
         
         // Verify category matches
         if (todayWods && todayWods.length > 0) {
@@ -363,23 +354,24 @@ export const WODManager = () => {
     }
   };
 
-  // Get tomorrow's category (what will be generated next)
+  // Get tomorrow's category using 84-day cycle
   const getTomorrowCategory = () => {
-    if (!wodState) return CATEGORY_CYCLE_7DAY[0];
-    const tomorrowDayInCycle = ((wodState.day_count || 0) % 7);
-    return CATEGORY_CYCLE_7DAY[tomorrowDayInCycle];
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowStr = format(tomorrow, "yyyy-MM-dd");
+    return getWODInfoForDate(tomorrowStr).category;
   };
   
+  // Get today's day in 84-day cycle
   const getDayInCycle = () => {
-    if (!wodState) return 1;
-    return ((wodState.day_count || 0) % 7) + 1;
+    const today = format(new Date(), "yyyy-MM-dd");
+    return getDayIn84Cycle(today);
   };
 
-  // Get current day's category (what was generated today)
+  // Get current day's category using 84-day cycle
   const getTodayCategory = () => {
-    if (!wodState || !wodState.day_count) return null;
-    const todayDayInCycle = ((wodState.day_count - 1 + 7) % 7);
-    return CATEGORY_CYCLE_7DAY[todayDayInCycle];
+    const today = format(new Date(), "yyyy-MM-dd");
+    return getWODInfoForDate(today).category;
   };
 
   const getDifficultyColor = (stars: number | null) => {

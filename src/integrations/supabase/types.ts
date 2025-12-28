@@ -2618,8 +2618,6 @@ export type Database = {
       workout_of_day_state: {
         Row: {
           created_at: string | null
-          current_category: string
-          day_count: number
           difficulty_advanced_count: number | null
           difficulty_beginner_count: number | null
           difficulty_intermediate_count: number | null
@@ -2632,13 +2630,9 @@ export type Database = {
           last_generated_at: string | null
           manual_overrides: Json | null
           updated_at: string | null
-          used_stars_in_week: Json | null
-          week_number: number | null
         }
         Insert: {
           created_at?: string | null
-          current_category?: string
-          day_count?: number
           difficulty_advanced_count?: number | null
           difficulty_beginner_count?: number | null
           difficulty_intermediate_count?: number | null
@@ -2651,13 +2645,9 @@ export type Database = {
           last_generated_at?: string | null
           manual_overrides?: Json | null
           updated_at?: string | null
-          used_stars_in_week?: Json | null
-          week_number?: number | null
         }
         Update: {
           created_at?: string | null
-          current_category?: string
-          day_count?: number
           difficulty_advanced_count?: number | null
           difficulty_beginner_count?: number | null
           difficulty_intermediate_count?: number | null
@@ -2670,8 +2660,6 @@ export type Database = {
           last_generated_at?: string | null
           manual_overrides?: Json | null
           updated_at?: string | null
-          used_stars_in_week?: Json | null
-          week_number?: number | null
         }
         Relationships: []
       }
