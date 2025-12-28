@@ -421,9 +421,7 @@ export const Navigation = () => {
                 Admin
               </Button>
             )}
-            {/* Theme toggle hidden - dark mode only for now
             <ThemeToggle />
-            */}
             
             {user && unreadCount > 0 && (
               <Button
