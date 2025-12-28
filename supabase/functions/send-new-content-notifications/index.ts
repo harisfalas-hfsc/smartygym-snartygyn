@@ -76,17 +76,124 @@ serve(async (req) => {
     // Group by content type
     const workouts = pendingItems.filter(item => item.content_type === 'workout');
     const programs = pendingItems.filter(item => item.content_type === 'program');
+    const articles = pendingItems.filter(item => item.content_type === 'article');
 
-    // Build notification content
+    const workoutCount = workouts.length;
+    const programCount = programs.length;
+    const articleCount = articles.length;
+
+    logStep("📊 Content breakdown", { workoutCount, programCount, articleCount });
+
+    // Get all users with their preferences FIRST (needed for all content types)
+    logStep("🔍 Fetching all users with preferences");
+    const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
+    
+    if (authError) {
+      logStep("❌ Error fetching users", { error: authError.message });
+      throw new Error(`Failed to fetch users: ${authError.message}`);
+    }
+
+    const users = authUsers?.users || [];
+    
+    // Get all user preferences from profiles
+    const { data: allProfiles } = await supabase
+      .from('profiles')
+      .select('user_id, notification_preferences');
+    
+    const prefsMap = new Map(allProfiles?.map(p => [p.user_id, p.notification_preferences as Record<string, any>]) || []);
+    
+    logStep("👥 Found users to notify", { count: users.length });
+
+    // Track statistics
+    let dashboardSuccess = 0;
+    let emailSuccess = 0;
+    let dashboardFailed = 0;
+    let dashboardSkipped = 0;
+    let emailFailed = 0;
+    let emailSkipped = 0;
+    const emailErrors: { email: string; error: string }[] = [];
+
+    // Handle articles
+    if (articleCount > 0) {
+      const articleSubject = articleCount === 1 
+        ? `📖 New Article: ${articles[0].content_name}`
+        : `📖 ${articleCount} New Articles on SmartyGym!`;
+      
+      const articleDashboardContent = articleCount === 1
+        ? `
+          <p class="tiptap-paragraph">A new article has been published on the SmartyGym blog!</p>
+          <p class="tiptap-paragraph"><strong>${articles[0].content_name}</strong></p>
+          <p class="tiptap-paragraph">Expert insights on fitness, nutrition, and athletic performance.</p>
+          <p class="tiptap-paragraph"><a href="/blog" style="color: #29B6D2; text-decoration: underline;">Read Article →</a></p>
+        `
+        : `
+          <p class="tiptap-paragraph">${articleCount} new articles have been published on the SmartyGym blog!</p>
+          <p class="tiptap-paragraph">Expert insights on fitness, nutrition, and athletic performance.</p>
+          <p class="tiptap-paragraph"><a href="/blog" style="color: #29B6D2; text-decoration: underline;">Browse Articles →</a></p>
+        `;
+      
+      const articleEmailHtml = buildEmailHtml(
+        articleCount === 1 ? "New Article Published!" : `${articleCount} New Articles Published!`,
+        articleCount === 1
+          ? `<p style="font-size: 16px; line-height: 1.6; color: #333; margin-bottom: 15px;">A new article has been published on the SmartyGym blog!</p>
+            <p style="font-size: 18px; font-weight: bold; color: #29B6D2; margin-bottom: 15px;">${articles[0].content_name}</p>
+            <p style="font-size: 16px; line-height: 1.6; color: #333; margin-bottom: 20px;">Expert insights on fitness, nutrition, and athletic performance.</p>`
+          : `<p style="font-size: 16px; line-height: 1.6; color: #333; margin-bottom: 15px;"><strong>${articleCount} new articles</strong> have been published on the SmartyGym blog!</p>
+            <p style="font-size: 16px; line-height: 1.6; color: #333; margin-bottom: 20px;">Expert insights on fitness, nutrition, and athletic performance.</p>`,
+        [{ text: "Read Articles", url: "https://smartygym.com/blog" }]
+      );
+
+      // Send article notifications to users
+      for (const user of users) {
+        const prefs = prefsMap.get(user.id) || {};
+        
+        if (prefs.opt_out_all === true) {
+          dashboardSkipped++;
+          emailSkipped++;
+          continue;
+        }
+
+        // Check dashboard_new_article preference (default true)
+        if (prefs.dashboard_new_article !== false) {
+          const { error: msgError } = await supabase.from("user_system_messages").insert({
+            user_id: user.id,
+            message_type: MESSAGE_TYPES.NEW_ARTICLE,
+            subject: articleSubject,
+            content: articleDashboardContent,
+            is_read: false,
+          });
+          if (msgError) {
+            dashboardFailed++;
+          } else {
+            dashboardSuccess++;
+          }
+        } else {
+          dashboardSkipped++;
+        }
+
+        // Check email_new_article preference (default true)
+        if (user.email && prefs.email_new_article !== false) {
+          const result = await sendEmail(user.email, articleSubject, articleEmailHtml);
+          if (result.success) {
+            emailSuccess++;
+            await new Promise(resolve => setTimeout(resolve, 600));
+          } else {
+            emailFailed++;
+            emailErrors.push({ email: user.email, error: result.error || "Unknown error" });
+          }
+        } else {
+          emailSkipped++;
+        }
+      }
+
+      logStep("📰 Article notifications sent", { articleCount, dashboardSuccess, emailSuccess });
+    }
+
+    // Build notification content for workouts/programs
     let subject = "";
     let dashboardContent = "";
     let emailHtml = "";
     let messageType: string = MESSAGE_TYPES.CONTENT_UPDATE;
-
-    const workoutCount = workouts.length;
-    const programCount = programs.length;
-
-    logStep("📊 Content breakdown", { workoutCount, programCount });
 
     if (workoutCount > 0 && programCount > 0) {
       // Mixed content
@@ -192,103 +299,78 @@ serve(async (req) => {
       }
     }
 
-    // Get all users with their preferences
-    logStep("🔍 Fetching all users with preferences");
-    const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
-    
-    if (authError) {
-      logStep("❌ Error fetching users", { error: authError.message });
-      throw new Error(`Failed to fetch users: ${authError.message}`);
-    }
-
-    const users = authUsers?.users || [];
-    
-    // Get all user preferences from profiles
-    const { data: allProfiles } = await supabase
-      .from('profiles')
-      .select('user_id, notification_preferences');
-    
-    const prefsMap = new Map(allProfiles?.map(p => [p.user_id, p.notification_preferences as Record<string, any>]) || []);
-    
-    logStep("👥 Found users to notify", { count: users.length });
-
-    let dashboardSuccess = 0;
-    let emailSuccess = 0;
-    let dashboardFailed = 0;
-    let dashboardSkipped = 0;
-    let emailFailed = 0;
-    let emailSkipped = 0;
-    const emailErrors: { email: string; error: string }[] = [];
-
-    // Determine which dashboard preference to check
-    const dashboardPrefKey = workoutCount > 0 && programCount > 0 
-      ? ['dashboard_new_workout', 'dashboard_new_program'] // Check either
-      : workoutCount > 0 
-        ? ['dashboard_new_workout']
-        : ['dashboard_new_program'];
-    
-    // Determine which email preference to check
-    const emailPrefKey = workoutCount > 0 && programCount > 0 
-      ? ['email_new_workout', 'email_new_program']
-      : workoutCount > 0 
-        ? ['email_new_workout']
-        : ['email_new_program'];
-
-    // Send notifications to all users
-    for (const user of users) {
-      const prefs = prefsMap.get(user.id) || {};
+    // Send workout/program notifications if there are any
+    if (workoutCount > 0 || programCount > 0) {
+      // Determine which dashboard preference to check
+      const dashboardPrefKey = workoutCount > 0 && programCount > 0 
+        ? ['dashboard_new_workout', 'dashboard_new_program']
+        : workoutCount > 0 
+          ? ['dashboard_new_workout']
+          : ['dashboard_new_program'];
       
-      // Check if user has opted out of all notifications
-      if (prefs.opt_out_all === true) {
-        logStep("⏭️ User opted out of all notifications", { userId: user.id });
-        dashboardSkipped++;
-        emailSkipped++;
-        continue;
-      }
+      // Determine which email preference to check
+      const emailPrefKey = workoutCount > 0 && programCount > 0 
+        ? ['email_new_workout', 'email_new_program']
+        : workoutCount > 0 
+          ? ['email_new_workout']
+          : ['email_new_program'];
 
-      // Check dashboard preferences - if ANY of the relevant prefs are enabled (default true)
-      const dashboardEnabled = dashboardPrefKey.some(key => prefs[key] !== false);
-      
-      if (dashboardEnabled) {
-        const { error: msgError } = await supabase
-          .from("user_system_messages")
-          .insert({
-            user_id: user.id,
-            message_type: messageType,
-            subject: subject,
-            content: dashboardContent,
-            is_read: false,
-          });
-
-        if (msgError) {
-          logStep("❌ Dashboard message failed", { userId: user.id, error: msgError.message });
-          dashboardFailed++;
-        } else {
-          dashboardSuccess++;
+      // Send notifications to all users
+      for (const user of users) {
+        const prefs = prefsMap.get(user.id) || {};
+        
+        // Check if user has opted out of all notifications
+        if (prefs.opt_out_all === true) {
+          logStep("⏭️ User opted out of all notifications", { userId: user.id });
+          dashboardSkipped++;
+          emailSkipped++;
+          continue;
         }
-      } else {
-        logStep("⏭️ Dashboard disabled for user", { userId: user.id, prefs: dashboardPrefKey });
-        dashboardSkipped++;
-      }
 
-      // Check email preferences
-      if (user.email) {
-        const emailEnabled = emailPrefKey.some(key => prefs[key] !== false);
+        // Check dashboard preferences - if ANY of the relevant prefs are enabled (default true)
+        const dashboardEnabled = dashboardPrefKey.some(key => prefs[key] !== false);
+        
+        if (dashboardEnabled) {
+          const { error: msgError } = await supabase
+            .from("user_system_messages")
+            .insert({
+              user_id: user.id,
+              message_type: messageType,
+              subject: subject,
+              content: dashboardContent,
+              is_read: false,
+            });
 
-        if (emailEnabled) {
-          const result = await sendEmail(user.email, subject, emailHtml);
-          if (result.success) {
-            emailSuccess++;
-            // Rate limiting: 600ms delay to respect Resend's 2 requests/second limit
-            await new Promise(resolve => setTimeout(resolve, 600));
+          if (msgError) {
+            logStep("❌ Dashboard message failed", { userId: user.id, error: msgError.message });
+            dashboardFailed++;
           } else {
-            emailFailed++;
-            emailErrors.push({ email: user.email, error: result.error || "Unknown error" });
-            logStep("❌ Email failed", { email: user.email, error: result.error });
+            dashboardSuccess++;
           }
         } else {
-          logStep("⏭️ Email disabled for user", { userId: user.id, prefs: emailPrefKey });
-          emailSkipped++;
+          logStep("⏭️ Dashboard disabled for user", { userId: user.id, prefs: dashboardPrefKey });
+          dashboardSkipped++;
+        }
+
+        // Check email preferences
+        if (user.email) {
+          const emailEnabled = emailPrefKey.some(key => prefs[key] !== false);
+
+          if (emailEnabled) {
+            const result = await sendEmail(user.email, subject, emailHtml);
+            if (result.success) {
+              emailSuccess++;
+              // Rate limiting: 600ms delay to respect Resend's 2 requests/second limit
+              await new Promise(resolve => setTimeout(resolve, 600));
+            } else {
+              emailFailed++;
+              emailErrors.push({ email: user.email, error: result.error || "Unknown error" });
+              logStep("❌ Email failed", { email: user.email, error: result.error });
+            }
+          } else {
+            logStep("⏭️ Email disabled for user", { userId: user.id, prefs: emailPrefKey });
+            emailSkipped++;
+          }
         }
       }
     }
@@ -310,15 +392,16 @@ serve(async (req) => {
     logStep("📝 Logging to audit");
     await supabase.from("notification_audit_log").insert({
       notification_type: "automated",
-      message_type: messageType,
-      subject: subject,
-      content: dashboardContent,
+      message_type: messageType || MESSAGE_TYPES.CONTENT_UPDATE,
+      subject: subject || `Content notification (${articleCount} articles)`,
+      content: dashboardContent || "Article notifications sent",
       recipient_count: users.length,
       success_count: dashboardSuccess,
       failed_count: dashboardFailed,
       metadata: {
         workouts_count: workoutCount,
         programs_count: programCount,
+        articles_count: articleCount,
         dashboard_skipped: dashboardSkipped,
         email_success: emailSuccess,
         email_failed: emailFailed,
@@ -343,6 +426,7 @@ serve(async (req) => {
         processed: pendingItems.length,
         workouts: workoutCount,
         programs: programCount,
+        articles: articleCount,
         dashboardSent: dashboardSuccess,
         dashboardFailed,
         dashboardSkipped,
@@ -391,25 +475,26 @@ function buildEmailHtml(
               <tr>
                 <td style="background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); padding: 30px; text-align: center;">
                   <h1 style="color: #29B6D2; margin: 0; font-size: 28px; font-weight: bold;">SmartyGym</h1>
-                  <p style="color: #999; margin: 8px 0 0 0; font-size: 14px;">Expert Fitness by Haris Falas</p>
+                  <p style="color: #888888; margin: 5px 0 0 0; font-size: 14px;">Train Smarter, Live Stronger</p>
                 </td>
               </tr>
+              
               <!-- Content -->
               <tr>
                 <td style="padding: 40px 30px;">
                   <h2 style="color: #1a1a1a; margin: 0 0 20px 0; font-size: 24px;">${title}</h2>
                   ${bodyContent}
-                  <div style="margin-top: 30px;">
+                  <div style="text-align: center; margin-top: 30px;">
                     ${buttonHtml}
                   </div>
                 </td>
               </tr>
+              
               <!-- Footer -->
               <tr>
-                <td style="background-color: #f9f9f9; padding: 25px 30px; border-top: 1px solid #eee;">
-                  <p style="color: #666; font-size: 13px; margin: 0; line-height: 1.5;">
-                    You're receiving this email because you're a SmartyGym member.<br>
-                    <a href="https://smartygym.com/userdashboard" style="color: #29B6D2;">Manage your notification preferences</a>
+                <td style="background-color: #f8f8f8; padding: 20px 30px; text-align: center; border-top: 1px solid #eee;">
+                  <p style="color: #888888; margin: 0; font-size: 12px;">
+                    You're receiving this email because you're subscribed to SmartyGym notifications.
                   </p>
                 </td>
               </tr>
