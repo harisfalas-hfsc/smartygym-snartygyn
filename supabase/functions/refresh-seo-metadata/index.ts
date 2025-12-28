@@ -14,9 +14,16 @@ const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
 const ADMIN_EMAIL = 'info@smartygym.com';
 
 const KEYWORD_FAMILY = [
+  // Core fitness keywords
   'online fitness platform', 'fitness', 'online gym', 'workouts', 'training programs',
   'functional training', 'strength training', 'weight loss training', 'mobility',
-  'exercise at home', 'workout anywhere', 'Haris Falas', 'SmartyGym', 'online coach', 'training plans'
+  'exercise at home', 'workout anywhere', 'Haris Falas', 'SmartyGym', 'online coach', 'training plans',
+  // Multi-domain keywords (owned domains that redirect to smartygym.com)
+  'smartygym.com', 'i-training.net', 'itraining', 'i-training',
+  'smartywod.com', 'smartywod', 'smarty wod',
+  'smartylogbook.com', 'smartylogbook', 'smarty logbook',
+  'smartywellness.com', 'smartywellness', 'smarty wellness',
+  'smartyworkout.com', 'smartyworkout', 'smarty workout'
 ];
 
 interface ContentItem {
@@ -65,7 +72,7 @@ async function generateSEOMetadata(item: ContentItem): Promise<{
         messages: [
           {
             role: 'system',
-            content: `You are an SEO expert for SmartyGym, an online fitness platform by expert coach Haris Falas. Generate SEO metadata in JSON format only, no markdown.`
+            content: `You are an SEO expert for SmartyGym (smartygym.com), an online fitness platform by expert coach Haris Falas. The platform is also accessible via these owned domains that redirect to smartygym.com: i-training.net, smartywod.com, smartylogbook.com, smartywellness.com, smartyworkout.com. Generate SEO metadata in JSON format only, no markdown.`
           },
           {
             role: 'user',
@@ -147,7 +154,15 @@ function generateJsonLD(item: ContentItem): object {
     "provider": {
       "@type": "Organization",
       "name": "SmartyGym",
-      "url": "https://smartygym.com"
+      "url": "https://smartygym.com",
+      "sameAs": [
+        "https://i-training.net",
+        "https://smartywod.com",
+        "https://smartylogbook.com",
+        "https://smartywellness.com",
+        "https://smartyworkout.com"
+      ],
+      "alternateName": ["SmartyGym", "itraining", "smartywod", "smartylogbook", "smartywellness", "smartyworkout"]
     },
     "author": {
       "@type": "Person",
