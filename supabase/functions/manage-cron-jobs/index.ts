@@ -7,7 +7,7 @@ const corsHeaders = {
 };
 
 interface CronJobRequest {
-  action: 'list' | 'add' | 'edit' | 'delete' | 'test';
+  action: 'list' | 'add' | 'edit' | 'delete' | 'test' | 'sync';
   job_name?: string;
   display_name?: string;
   description?: string;
@@ -68,6 +68,26 @@ function cronToHumanReadable(cron: string): string {
   return cron;
 }
 
+// Helper to execute SQL with proper error handling
+async function executeCronSql(serviceClient: any, sql: string, operation: string): Promise<{ success: boolean; error?: string }> {
+  console.log(`🔧 [${operation}] Executing SQL:`, sql.substring(0, 200) + '...');
+  
+  try {
+    const { data, error } = await serviceClient.rpc('exec_sql', { sql });
+    
+    if (error) {
+      console.error(`❌ [${operation}] exec_sql RPC error:`, error);
+      return { success: false, error: `Database error: ${error.message}` };
+    }
+    
+    console.log(`✅ [${operation}] SQL executed successfully`);
+    return { success: true };
+  } catch (e: any) {
+    console.error(`❌ [${operation}] Exception:`, e);
+    return { success: false, error: `Exception: ${e.message || 'Unknown error'}` };
+  }
+}
+
 serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -113,7 +133,7 @@ serve(async (req: Request) => {
     const body: CronJobRequest = await req.json();
     const { action } = body;
 
-    console.log(`🔧 Cron job management: ${action}`, body);
+    console.log(`🔧 Cron job management: ${action}`, JSON.stringify(body, null, 2));
 
     // LIST - Get all cron jobs with metadata AND real scheduler jobs
     if (action === 'list') {
@@ -183,6 +203,84 @@ serve(async (req: Request) => {
       );
     }
 
+    // SYNC - Sync all metadata jobs to pg_cron scheduler
+    if (action === 'sync') {
+      const { job_name } = body;
+      
+      console.log('🔄 Starting sync operation', job_name ? `for job: ${job_name}` : 'for all jobs');
+      
+      // Get metadata for jobs to sync
+      let query = serviceClient.from('cron_job_metadata').select('*');
+      if (job_name) {
+        query = query.eq('job_name', job_name);
+      }
+      
+      const { data: jobsToSync, error: fetchError } = await query;
+      
+      if (fetchError) {
+        throw new Error(`Failed to fetch jobs for sync: ${fetchError.message}`);
+      }
+      
+      if (!jobsToSync || jobsToSync.length === 0) {
+        return new Response(
+          JSON.stringify({ success: true, message: 'No jobs to sync', synced: 0, failed: 0 }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      
+      const results: Array<{ job_name: string; success: boolean; error?: string }> = [];
+      
+      for (const job of jobsToSync) {
+        const funcName = job.edge_function_name;
+        const schedule = job.schedule;
+        
+        if (!funcName || !schedule) {
+          results.push({ job_name: job.job_name, success: false, error: 'Missing edge_function_name or schedule' });
+          continue;
+        }
+        
+        const functionUrl = `${supabaseUrl}/functions/v1/${funcName}`;
+        const bodyJson = JSON.stringify(job.request_body || {});
+        
+        // First unschedule (ignore errors - job might not exist)
+        await executeCronSql(serviceClient, `SELECT cron.unschedule('${job.job_name}');`, `unschedule-${job.job_name}`);
+        
+        // Then schedule with current metadata
+        const scheduleSql = `
+          SELECT cron.schedule(
+            '${job.job_name}',
+            '${schedule}',
+            $$
+            SELECT net.http_post(
+              url:='${functionUrl}',
+              headers:='{"Content-Type": "application/json", "Authorization": "Bearer ${supabaseAnonKey}"}'::jsonb,
+              body:='${bodyJson}'::jsonb
+            ) as request_id;
+            $$
+          );
+        `;
+        
+        const result = await executeCronSql(serviceClient, scheduleSql, `schedule-${job.job_name}`);
+        results.push({ job_name: job.job_name, success: result.success, error: result.error });
+      }
+      
+      const synced = results.filter(r => r.success).length;
+      const failed = results.filter(r => !r.success).length;
+      
+      console.log(`🔄 Sync complete: ${synced} synced, ${failed} failed`);
+      
+      return new Response(
+        JSON.stringify({ 
+          success: failed === 0, 
+          message: `Synced ${synced}/${results.length} jobs`,
+          synced,
+          failed,
+          results
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     // ADD - Create new cron job
     if (action === 'add') {
       const { job_name, display_name, description, category, schedule, edge_function_name, request_body, is_critical } = body;
@@ -199,7 +297,7 @@ serve(async (req: Request) => {
       const requestBodyJson = JSON.stringify(request_body || {});
       const humanReadable = cronToHumanReadable(schedule);
       
-      // Create cron job using cron.schedule (requires pg_cron extension)
+      // Create cron job using cron.schedule
       const cronSql = `
         SELECT cron.schedule(
           '${job_name}',
@@ -214,18 +312,9 @@ serve(async (req: Request) => {
         );
       `;
       
-      console.log("Creating cron job with SQL:", cronSql);
+      console.log("📝 Creating cron job:", job_name);
       
-      // Try to execute via raw SQL
-      let cronCreated = false;
-      try {
-        const { error: cronCreateError } = await serviceClient.rpc('exec_sql', { sql: cronSql });
-        if (!cronCreateError) {
-          cronCreated = true;
-        }
-      } catch (e) {
-        console.log("Direct cron.schedule failed, saving metadata only");
-      }
+      const cronResult = await executeCronSql(serviceClient, cronSql, `add-${job_name}`);
 
       // Save metadata
       const { error: metaError } = await serviceClient
@@ -247,11 +336,24 @@ serve(async (req: Request) => {
         throw new Error(`Failed to save metadata: ${metaError.message}`);
       }
 
+      if (!cronResult.success) {
+        return new Response(
+          JSON.stringify({ 
+            success: false, 
+            error: `Metadata saved but scheduler failed: ${cronResult.error}`,
+            metadata_saved: true,
+            scheduler_updated: false
+          }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
       return new Response(
         JSON.stringify({ 
           success: true, 
-          message: cronCreated ? "Cron job created and scheduled" : "Metadata saved - run SQL manually to schedule",
-          cron_sql: cronCreated ? undefined : cronSql
+          message: "Cron job created and scheduled successfully",
+          metadata_saved: true,
+          scheduler_updated: true
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
@@ -268,6 +370,15 @@ serve(async (req: Request) => {
         );
       }
 
+      console.log(`📝 Editing cron job: ${job_name}`);
+
+      // Get current job data to merge with updates
+      const { data: currentJob } = await serviceClient
+        .from('cron_job_metadata')
+        .select('*')
+        .eq('job_name', job_name)
+        .single();
+
       // Build update object
       const updateData: Record<string, unknown> = { updated_at: new Date().toISOString() };
       if (display_name !== undefined) updateData.display_name = display_name;
@@ -278,60 +389,52 @@ serve(async (req: Request) => {
       if (is_critical !== undefined) updateData.is_critical = is_critical;
       if (is_active !== undefined) updateData.is_active = is_active;
       
-      // If schedule is changing, update schedule and human-readable
-      let cronSql: string | undefined;
+      let schedulerUpdated = true;
+      let schedulerError: string | undefined;
+      
+      // If schedule is changing, update the cron scheduler
       if (schedule) {
         updateData.schedule = schedule;
         updateData.schedule_human_readable = cronToHumanReadable(schedule);
         
-        // Get the edge function name to use
-        const funcName = edge_function_name || (await serviceClient
-          .from('cron_job_metadata')
-          .select('edge_function_name')
-          .eq('job_name', job_name)
-          .single()).data?.edge_function_name;
+        // Get the edge function name to use (new or existing)
+        const funcName = edge_function_name || currentJob?.edge_function_name;
+        const bodyJson = JSON.stringify(request_body ?? currentJob?.request_body ?? {});
         
         if (funcName) {
           const functionUrl = `${supabaseUrl}/functions/v1/${funcName}`;
-          const bodyJson = JSON.stringify(request_body || {});
           
-          // Build SQL for manual execution if needed
-          cronSql = `
--- First unschedule existing job
-SELECT cron.unschedule('${job_name}');
-
--- Then reschedule with new schedule
-SELECT cron.schedule(
-  '${job_name}',
-  '${schedule}',
-  $$
-  SELECT net.http_post(
-    url:='${functionUrl}',
-    headers:='{"Content-Type": "application/json", "Authorization": "Bearer ${supabaseAnonKey}"}'::jsonb,
-    body:='${bodyJson}'::jsonb
-  ) as request_id;
-  $$
-);`;
+          // Unschedule existing job first
+          const unscheduleResult = await executeCronSql(
+            serviceClient, 
+            `SELECT cron.unschedule('${job_name}');`, 
+            `edit-unschedule-${job_name}`
+          );
           
-          // Try to execute
-          try {
-            await serviceClient.rpc('exec_sql', { sql: `SELECT cron.unschedule('${job_name}');` });
-            await serviceClient.rpc('exec_sql', { sql: `
-              SELECT cron.schedule(
-                '${job_name}',
-                '${schedule}',
-                $$
-                SELECT net.http_post(
-                  url:='${functionUrl}',
-                  headers:='{"Content-Type": "application/json", "Authorization": "Bearer ${supabaseAnonKey}"}'::jsonb,
-                  body:='${bodyJson}'::jsonb
-                ) as request_id;
-                $$
-              );
-            ` });
-            cronSql = undefined; // Successfully executed
-          } catch (e) {
-            console.log("Could not update cron schedule directly, SQL provided for manual execution");
+          if (!unscheduleResult.success) {
+            console.log(`⚠️ Unschedule warning (may not exist): ${unscheduleResult.error}`);
+          }
+          
+          // Schedule with new configuration
+          const scheduleSql = `
+            SELECT cron.schedule(
+              '${job_name}',
+              '${schedule}',
+              $$
+              SELECT net.http_post(
+                url:='${functionUrl}',
+                headers:='{"Content-Type": "application/json", "Authorization": "Bearer ${supabaseAnonKey}"}'::jsonb,
+                body:='${bodyJson}'::jsonb
+              ) as request_id;
+              $$
+            );
+          `;
+          
+          const scheduleResult = await executeCronSql(serviceClient, scheduleSql, `edit-schedule-${job_name}`);
+          
+          if (!scheduleResult.success) {
+            schedulerUpdated = false;
+            schedulerError = scheduleResult.error;
           }
         }
       }
@@ -346,11 +449,24 @@ SELECT cron.schedule(
         throw new Error(`Failed to update metadata: ${updateError.message}`);
       }
 
+      if (!schedulerUpdated) {
+        return new Response(
+          JSON.stringify({ 
+            success: false, 
+            error: `Metadata updated but scheduler failed: ${schedulerError}`,
+            metadata_saved: true,
+            scheduler_updated: false
+          }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
       return new Response(
         JSON.stringify({ 
           success: true, 
-          message: cronSql ? "Metadata updated - run SQL manually to update schedule" : "Cron job updated",
-          cron_sql: cronSql
+          message: "Cron job updated successfully",
+          metadata_saved: true,
+          scheduler_updated: schedulerUpdated
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
@@ -367,14 +483,14 @@ SELECT cron.schedule(
         );
       }
 
+      console.log(`🗑️ Deleting cron job: ${job_name}`);
+
       // Unschedule the cron job
-      let unscheduled = false;
-      try {
-        await serviceClient.rpc('exec_sql', { sql: `SELECT cron.unschedule('${job_name}');` });
-        unscheduled = true;
-      } catch (e) {
-        console.log("Unschedule may have failed (job might not exist in cron):", e);
-      }
+      const unscheduleResult = await executeCronSql(
+        serviceClient, 
+        `SELECT cron.unschedule('${job_name}');`, 
+        `delete-${job_name}`
+      );
 
       // Delete metadata
       const { error: deleteError } = await serviceClient
@@ -386,10 +502,24 @@ SELECT cron.schedule(
         throw new Error(`Failed to delete metadata: ${deleteError.message}`);
       }
 
+      if (!unscheduleResult.success) {
+        return new Response(
+          JSON.stringify({ 
+            success: true, 
+            message: `Metadata deleted. Scheduler warning: ${unscheduleResult.error}`,
+            metadata_deleted: true,
+            scheduler_updated: false
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
       return new Response(
         JSON.stringify({ 
           success: true, 
-          message: unscheduled ? "Cron job stopped and removed" : "Metadata removed - run SQL manually: SELECT cron.unschedule('" + job_name + "');"
+          message: "Cron job stopped and removed successfully",
+          metadata_deleted: true,
+          scheduler_updated: true
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
@@ -405,6 +535,8 @@ SELECT cron.schedule(
           { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
+
+      console.log(`🧪 Testing edge function: ${edge_function_name}`);
 
       // Call the edge function
       const { data, error } = await supabase.functions.invoke(edge_function_name, {
@@ -430,7 +562,7 @@ SELECT cron.schedule(
     );
 
   } catch (error: any) {
-    console.error("Error in manage-cron-jobs:", error);
+    console.error("❌ Error in manage-cron-jobs:", error);
     return new Response(
       JSON.stringify({ error: error.message || "Internal server error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
