@@ -11,6 +11,8 @@ import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { format, addDays } from "date-fns";
 import type { Json } from "@/integrations/supabase/types";
+import { Document, Packer, Paragraph, Table as DocxTable, TableRow as DocxTableRow, TableCell as DocxTableCell, TextRun, HeadingLevel, WidthType, BorderStyle, AlignmentType } from "docx";
+import { saveAs } from "file-saver";
 import {
   PERIODIZATION_84DAY,
   FORMATS_BY_CATEGORY,
@@ -67,35 +69,107 @@ export const PeriodizationSystemDialog = ({
     }
   };
 
-  const handleDownloadCycleStructure = () => {
-    const exportData = {
-      metadata: {
-        exportedAt: new Date().toISOString(),
-        cycleStartDate: CYCLE_START_DATE,
-        currentDay: todayInfo.dayIn84,
-        currentDate: todayDateStr,
-        totalDays: 84
-      },
-      periodization84Day: PERIODIZATION_84DAY.map(entry => ({
-        day: entry.day,
-        category: entry.category,
-        difficulty: entry.difficulty,
-        difficultyStars: entry.difficultyStars,
-        strengthFocus: entry.strengthFocus || null
-      })),
-      formatsByCategory: FORMATS_BY_CATEGORY
-    };
+  const handleDownloadCycleStructure = async () => {
+    try {
+      // Create table rows for the 84-day cycle
+      const tableRows = [
+        // Header row
+        new DocxTableRow({
+          children: [
+            new DocxTableCell({ children: [new Paragraph({ children: [new TextRun({ text: "Day", bold: true })] })], width: { size: 1000, type: WidthType.DXA } }),
+            new DocxTableCell({ children: [new Paragraph({ children: [new TextRun({ text: "Category", bold: true })] })], width: { size: 2500, type: WidthType.DXA } }),
+            new DocxTableCell({ children: [new Paragraph({ children: [new TextRun({ text: "Difficulty", bold: true })] })], width: { size: 1500, type: WidthType.DXA } }),
+            new DocxTableCell({ children: [new Paragraph({ children: [new TextRun({ text: "Stars", bold: true })] })], width: { size: 1000, type: WidthType.DXA } }),
+            new DocxTableCell({ children: [new Paragraph({ children: [new TextRun({ text: "Strength Focus", bold: true })] })], width: { size: 3000, type: WidthType.DXA } }),
+          ],
+        }),
+        // Data rows
+        ...PERIODIZATION_84DAY.map((entry) => 
+          new DocxTableRow({
+            children: [
+              new DocxTableCell({ children: [new Paragraph({ text: `Day ${entry.day}` })] }),
+              new DocxTableCell({ children: [new Paragraph({ text: entry.category })] }),
+              new DocxTableCell({ children: [new Paragraph({ text: entry.difficulty || "—" })] }),
+              new DocxTableCell({ children: [new Paragraph({ text: entry.difficultyStars ? `${entry.difficultyStars[0]}-${entry.difficultyStars[1]}` : "—" })] }),
+              new DocxTableCell({ children: [new Paragraph({ text: entry.strengthFocus || "—" })] }),
+            ],
+          })
+        ),
+      ];
 
-    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "wod-84-day-cycle.json";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    toast.success("84-day cycle structure downloaded");
+      // Create format rules paragraphs
+      const formatParagraphs = Object.entries(FORMATS_BY_CATEGORY).flatMap(([category, formats]) => [
+        new Paragraph({
+          children: [
+            new TextRun({ text: `${category}: `, bold: true }),
+            new TextRun({ text: formats.join(", ") }),
+          ],
+          spacing: { after: 100 },
+        }),
+      ]);
+
+      const doc = new Document({
+        sections: [{
+          properties: {},
+          children: [
+            // Title
+            new Paragraph({
+              text: "SmartyGym 84-Day WOD Cycle",
+              heading: HeadingLevel.TITLE,
+              alignment: AlignmentType.CENTER,
+              spacing: { after: 400 },
+            }),
+            
+            // Metadata section
+            new Paragraph({
+              text: "Cycle Information",
+              heading: HeadingLevel.HEADING_1,
+              spacing: { before: 200, after: 200 },
+            }),
+            new Paragraph({ children: [new TextRun({ text: "Cycle Start Date: ", bold: true }), new TextRun({ text: CYCLE_START_DATE })], spacing: { after: 100 } }),
+            new Paragraph({ children: [new TextRun({ text: "Current Day: ", bold: true }), new TextRun({ text: `Day ${todayInfo.dayIn84} of 84` })], spacing: { after: 100 } }),
+            new Paragraph({ children: [new TextRun({ text: "Today's Date: ", bold: true }), new TextRun({ text: todayDateStr })], spacing: { after: 100 } }),
+            new Paragraph({ children: [new TextRun({ text: "Export Date: ", bold: true }), new TextRun({ text: format(new Date(), "MMMM d, yyyy 'at' h:mm a") })], spacing: { after: 400 } }),
+            
+            // 84-Day Schedule
+            new Paragraph({
+              text: "84-Day Schedule",
+              heading: HeadingLevel.HEADING_1,
+              spacing: { before: 200, after: 200 },
+            }),
+            new DocxTable({
+              rows: tableRows,
+              width: { size: 100, type: WidthType.PERCENTAGE },
+            }),
+            
+            // Format Rules
+            new Paragraph({
+              text: "Format Rules by Category",
+              heading: HeadingLevel.HEADING_1,
+              spacing: { before: 400, after: 200 },
+            }),
+            ...formatParagraphs,
+            
+            // Notes
+            new Paragraph({
+              text: "Notes",
+              heading: HeadingLevel.HEADING_1,
+              spacing: { before: 400, after: 200 },
+            }),
+            new Paragraph({ text: "• The cycle repeats every 84 days automatically.", spacing: { after: 100 } }),
+            new Paragraph({ text: "• Recovery days (10, 28, 38, 56, 66, 84) have no difficulty level.", spacing: { after: 100 } }),
+            new Paragraph({ text: "• STRENGTH, MOBILITY & STABILITY, and PILATES use only 'Reps & Sets' format.", spacing: { after: 100 } }),
+          ],
+        }],
+      });
+
+      const blob = await Packer.toBlob(doc);
+      saveAs(blob, "SmartyGym-84-Day-Cycle.docx");
+      toast.success("Word document downloaded");
+    } catch (error: any) {
+      console.error("Failed to generate document:", error);
+      toast.error("Failed to generate document", { description: error.message });
+    }
   };
 
   return (
