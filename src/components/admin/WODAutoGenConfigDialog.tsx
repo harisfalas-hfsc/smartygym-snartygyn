@@ -196,7 +196,7 @@ export const WODAutoGenConfigDialog = ({ open, onOpenChange }: WODAutoGenConfigD
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="max-h-60">
+                <SelectContent side="bottom" align="start" className="max-h-60">
                   {HOUR_OPTIONS.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       <span className="flex items-center justify-between gap-4">

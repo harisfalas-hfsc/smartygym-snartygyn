@@ -81,7 +81,7 @@ export const CronTimeConfigDialog = ({ open, onOpenChange, currentHour = 5 }: Cr
               <SelectTrigger>
                 <SelectValue placeholder="Select time" />
               </SelectTrigger>
-              <SelectContent className="max-h-60">
+              <SelectContent side="bottom" align="start" className="max-h-60">
                 {HOUR_OPTIONS.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     <div className="flex flex-col">
