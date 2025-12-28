@@ -80,6 +80,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
     stripe_product_id: '',
     stripe_price_id: '',
   });
+  const [sendNotification, setSendNotification] = useState(false);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
 
   const getCategoryPrefix = (category: string) => {
@@ -104,6 +105,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
   useEffect(() => {
     if (workout) {
       setFormData(workout);
+      setSendNotification(false); // Don't send notifications for edits by default
     } else {
       setFormData({
         id: '',
@@ -132,6 +134,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
         stripe_product_id: '',
         stripe_price_id: '',
       });
+      setSendNotification(false); // Default to NOT sending notifications
     }
   }, [workout]);
 
@@ -379,57 +382,36 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
           }
         }
 
-        // Schedule notification for new workout
-        if (formData.name && formData.name.trim()) {
+        // Only schedule notification if admin explicitly enabled it
+        // Skip notifications for test workouts (names containing "test", "TEST", etc.)
+        const isTestWorkout = formData.name && /test/i.test(formData.name.trim());
+        
+        if (sendNotification && formData.name && formData.name.trim() && !isTestWorkout) {
           try {
-            const scheduledTime = new Date(Date.now() + 5 * 60 * 1000).toISOString();
-            const stripHtml = (html: string) => html.replace(/<[^>]*>/g, '').trim();
-            
-            let notificationBody = `New workout available: ${formData.name}. `;
-            
-            if (dataToSave.description) {
-              const cleanDescription = stripHtml(dataToSave.description);
-              const descPreview = cleanDescription.length > 100 
-                ? cleanDescription.substring(0, 100) + '...'
-                : cleanDescription;
-              notificationBody += descPreview + ' ';
-            }
-            
-            if (dataToSave.is_premium) {
-              if (dataToSave.is_standalone_purchase && dataToSave.price) {
-                notificationBody += `Available as standalone purchase for €${dataToSave.price} or included in Premium subscription.`;
-              } else {
-                notificationBody += 'Exclusive for Premium subscribers.';
-              }
-            } else {
-              notificationBody += 'Free for all users!';
-            }
-            
+            // Use the pending_content_notifications table which has an actual processor
             await supabase
-              .from('scheduled_notifications')
+              .from('pending_content_notifications')
               .insert([{
-                title: '🔥 New Workout Added!',
-                body: notificationBody,
-                url: `/workout/${dataToSave.id}`,
-                icon: imageUrl || '/smarty-gym-logo.png',
-                target_audience: 'all',
-                scheduled_time: scheduledTime,
-                timezone: 'UTC',
-                status: 'pending',
-                recurrence_pattern: 'once'
+                content_type: 'workout',
+                content_id: dataToSave.id,
+                content_name: formData.name,
+                content_category: formData.category || null,
               }]);
             
             if (import.meta.env.DEV) {
-              console.log('✅ Notification scheduled for new workout:', formData.name);
+              console.log('✅ Notification queued for new workout:', formData.name);
             }
+            toast({ title: "Success", description: "Workout created and notification queued!" });
           } catch (notifError) {
             if (import.meta.env.DEV) {
-              console.error('Error scheduling notification:', notifError);
+              console.error('Error queueing notification:', notifError);
             }
+            toast({ title: "Success", description: "Workout created successfully!" });
           }
+        } else {
+          const reason = isTestWorkout ? ' (test workout - no notification)' : '';
+          toast({ title: "Success", description: `Workout created successfully!${reason}` });
         }
-
-        toast({ title: "Success", description: "Workout created successfully and notification scheduled!" });
       }
       onSave();
     } catch (error) {
@@ -663,6 +645,37 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
               </div>
             )}
           </div>
+
+          {/* Notification Toggle - Only for NEW workouts */}
+          {!workout && (
+            <div className="space-y-2 pt-4 border-t border-orange-200 bg-orange-50/50 p-4 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <Label htmlFor="send_notification" className="text-orange-800 font-semibold">
+                    📢 Send Notification to Users
+                  </Label>
+                  <p className="text-sm text-orange-700">
+                    Enable to notify all users about this new workout via email and dashboard
+                  </p>
+                </div>
+                <Switch
+                  id="send_notification"
+                  checked={sendNotification}
+                  onCheckedChange={setSendNotification}
+                />
+              </div>
+              {sendNotification && (
+                <p className="text-sm text-orange-600 bg-orange-100 p-2 rounded mt-2">
+                  ⚠️ Users will receive a notification about this workout. Make sure content is ready!
+                </p>
+              )}
+              {formData.name && /test/i.test(formData.name) && (
+                <p className="text-sm text-amber-600 bg-amber-100 p-2 rounded mt-2">
+                  🧪 Test workout detected - notifications will be automatically skipped
+                </p>
+              )}
+            </div>
+          )}
 
           {/* 13. Free Content Toggle */}
           <div className="space-y-4 pt-4 border-t">
