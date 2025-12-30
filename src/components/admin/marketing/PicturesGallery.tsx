@@ -235,7 +235,7 @@ export const PicturesGallery = () => {
           return (
             <Card key={template.id} className="overflow-hidden">
               <div 
-                id={`export-${template.id}`} 
+                id={`preview-${template.id}`} 
                 className="h-40 bg-muted relative group cursor-pointer overflow-hidden"
                 onClick={() => setPreviewTemplate(template)}
               >
@@ -296,7 +296,7 @@ export const PicturesGallery = () => {
           </DialogHeader>
           <div className="flex justify-center">
             {previewTemplate && (
-              <div id={`export-${previewTemplate.id}`} className="max-w-full overflow-auto">
+              <div className="max-w-full overflow-auto">
                 <previewTemplate.component />
               </div>
             )}
@@ -332,6 +332,37 @@ export const PicturesGallery = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Hidden full-size templates for export - positioned off-screen */}
+      <div 
+        className="fixed"
+        style={{ 
+          left: '-9999px', 
+          top: '0', 
+          width: '1px', 
+          height: '1px', 
+          overflow: 'hidden' 
+        }}
+        aria-hidden="true"
+      >
+        {allTemplates.map((template) => {
+          const TemplateComponent = template.component;
+          const size = selectedSizes[template.id] || INSTAGRAM_SIZES[0];
+          return (
+            <div 
+              key={template.id} 
+              id={`export-${template.id}`}
+              style={{ 
+                width: `${size.width}px`,
+                height: `${size.height}px`,
+                overflow: 'hidden'
+              }}
+            >
+              <TemplateComponent />
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };
