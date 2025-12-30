@@ -1,3 +1,5 @@
+import { saveAs } from "file-saver";
+
 export interface InstagramSize {
   name: string;
   width: number;
@@ -18,7 +20,7 @@ export const exportToInstagram = async (
 ): Promise<void> => {
   const element = document.getElementById(elementId);
   if (!element) {
-    throw new Error("Element not found");
+    throw new Error(`Element not found: ${elementId}`);
   }
 
   // Use html2canvas to render the element at its native size
@@ -32,19 +34,19 @@ export const exportToInstagram = async (
     height: size.height,
   });
 
-  // Convert to JPEG and download
-  canvas.toBlob(
-    (blob) => {
-      if (blob) {
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `${filename}-${size.name}-${Date.now()}.jpg`;
-        link.click();
-        URL.revokeObjectURL(url);
-      }
-    },
-    "image/jpeg",
-    0.95
-  );
+  // Convert to JPEG and download using file-saver for better cross-browser/mobile support
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => {
+        if (blob) {
+          saveAs(blob, `${filename}-${Date.now()}.jpg`);
+          resolve();
+        } else {
+          reject(new Error("Failed to create image blob"));
+        }
+      },
+      "image/jpeg",
+      0.95
+    );
+  });
 };
