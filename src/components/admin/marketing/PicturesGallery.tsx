@@ -203,10 +203,20 @@ export const PicturesGallery = () => {
 
   const handleDownloadAll = async () => {
     toast.loading("Downloading all pictures...", { id: "download-all" });
+    let successCount = 0;
+    
     for (const template of allTemplates) {
-      await handleDownload(template.id, template.name);
+      try {
+        await handleDownload(template.id, template.name);
+        successCount++;
+        // Small delay between downloads to prevent browser throttling
+        await new Promise(resolve => setTimeout(resolve, 300));
+      } catch (error) {
+        console.error(`Failed to download ${template.name}:`, error);
+      }
     }
-    toast.success("All pictures downloaded!", { id: "download-all" });
+    
+    toast.success(`Downloaded ${successCount}/${allTemplates.length} pictures!`, { id: "download-all" });
   };
 
   return (
@@ -225,7 +235,7 @@ export const PicturesGallery = () => {
           return (
             <Card key={template.id} className="overflow-hidden">
               <div 
-                id={`template-${template.id}`} 
+                id={`export-${template.id}`} 
                 className="h-40 bg-muted relative group cursor-pointer overflow-hidden"
                 onClick={() => setPreviewTemplate(template)}
               >
