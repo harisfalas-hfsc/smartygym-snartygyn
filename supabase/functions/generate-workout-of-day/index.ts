@@ -1500,10 +1500,31 @@ INSTRUCTIONS FORMAT: Plain paragraphs with clear guidance
       
       try {
         let content = aiData.choices[0].message.content;
-        content = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        
+        // More robust markdown stripping - handle all variations
+        // Step 1: Remove code block markers with any language identifier
+        content = content.replace(/^```(?:json|JSON)?\s*\n?/gm, '');
+        content = content.replace(/\n?```\s*$/gm, '');
+        
+        // Step 2: Find the JSON object boundaries (first { to last })
+        const firstBrace = content.indexOf('{');
+        const lastBrace = content.lastIndexOf('}');
+        if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+          content = content.substring(firstBrace, lastBrace + 1);
+        }
+        
+        // Step 3: Trim any remaining whitespace
+        content = content.trim();
+        
         workoutContent = JSON.parse(content);
       } catch (parseError) {
-        logStep("Error parsing AI response", { error: parseError, raw: aiData.choices[0].message.content });
+        // Log the raw content for debugging
+        const rawContent = aiData.choices[0]?.message?.content || 'No content';
+        logStep("Error parsing AI response", { 
+          error: parseError instanceof Error ? parseError.message : String(parseError), 
+          rawLength: rawContent.length,
+          rawPreview: rawContent.substring(0, 500) 
+        });
         throw new Error("Failed to parse workout content");
       }
 
