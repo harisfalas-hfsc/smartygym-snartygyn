@@ -7,7 +7,10 @@
  * 
  * Each message_type MUST be unique and descriptive of its source.
  * 
- * Last updated: 2025-12-15
+ * IMPORTANT: The daily WOD and Smarty Ritual are sent TOGETHER in one notification
+ * via `send-morning-notifications` at 07:00 Cyprus time. Use MORNING_NOTIFICATION type.
+ * 
+ * Last updated: 2025-12-31
  */
 
 /**
