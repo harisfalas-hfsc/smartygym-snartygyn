@@ -197,3 +197,6 @@ verify_jwt = true
 
 [functions.tag-smartygym-products]
 verify_jwt = true
+
+[functions.send-holiday-notifications]
+verify_jwt = false
