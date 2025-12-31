@@ -1985,6 +1985,40 @@ INSTRUCTIONS FORMAT: Plain paragraphs with clear guidance
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
     logStep("ERROR", { message: errorMessage });
     
+    // Log failure to notification_audit_log for visibility
+    try {
+      const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+      const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+      const supabase = createClient(supabaseUrl, supabaseServiceKey);
+      
+      // Get today's date in Cyprus timezone
+      const now = new Date();
+      const cyprusFormatter = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Europe/Athens',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
+      const cyprusDateStr = cyprusFormatter.format(now);
+      
+      await supabase.from('notification_audit_log').insert({
+        notification_type: 'wod_generation_failure',
+        message_type: 'wod_generation_failure',
+        subject: `WOD Generation Failed - ${cyprusDateStr}`,
+        content: errorMessage,
+        sent_at: new Date().toISOString(),
+        metadata: {
+          effectiveDate: cyprusDateStr,
+          error: errorMessage,
+          timestamp: new Date().toISOString()
+        }
+      });
+      
+      logStep("Failure logged to notification_audit_log");
+    } catch (logError) {
+      logStep("Failed to log failure to audit log", { error: logError });
+    }
+    
     return new Response(
       JSON.stringify({ error: errorMessage }),
       {
