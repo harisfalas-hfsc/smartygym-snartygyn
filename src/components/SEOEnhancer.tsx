@@ -1,8 +1,8 @@
 /**
  * SEO Enhancer Component
  * Adds AI-search optimization metadata to pages
- * Enhanced for global markets: US, UK, EU, AU, CA
- * Updated: December 2025 - Multi-Domain Network Support
+ * Enhanced for global markets: US, UK, EU, AU, CA, Asia, Middle East, Africa
+ * Updated: December 2025 - Aggressive Global SEO Enhancement
  */
 
 import { Helmet } from "react-helmet";
@@ -75,6 +75,9 @@ const LONG_TAIL_KEYWORDS = [
   "science-based workout routines", "100 percent human designed workouts"
 ];
 
+// 45+ Target Countries
+const GLOBAL_TARGET_COUNTRIES = "US,GB,DE,FR,NL,BE,ES,IT,GR,CY,PT,PL,SE,NO,DK,FI,CA,AU,IE,AT,CH,RU,CN,IN,JP,KR,BR,MX,AE,SA,ZA,SG,MY,TH,VN,PH,ID,TR,EG,NG,NZ,HK,TW,IL";
+
 export const SEOEnhancer = ({
   entities = [],
   topics = [],
@@ -132,6 +135,19 @@ export const SEOEnhancer = ({
       <meta name="AI2Bot" content="index, follow" />
       <meta name="Diffbot" content="index, follow" />
       <meta name="Omgilibot" content="index, follow" />
+      
+      {/* Asian & Regional Search Engine Crawlers */}
+      <meta name="Baiduspider" content="index, follow" />
+      <meta name="Sogou" content="index, follow" />
+      <meta name="YandexBot" content="index, follow" />
+      <meta name="NaverBot" content="index, follow" />
+      <meta name="Yeti" content="index, follow" />
+      <meta name="DuckDuckBot" content="index, follow" />
+      <meta name="Qwantify" content="index, follow" />
+      <meta name="coccoc" content="index, follow" />
+      <meta name="360Spider" content="index, follow" />
+      <meta name="Daumoa" content="index, follow" />
+      <meta name="Mail.RU_Bot" content="index, follow" />
       
       {/* Entity Recognition Tags */}
       {entities.map((entity, index) => (
@@ -195,11 +211,11 @@ export const SEOEnhancer = ({
       <meta name="publisher-type" content="Global Online Fitness Platform" />
       <meta name="content-authenticity" content="100% Human-Designed, Zero AI-Generated Content" />
       
-      {/* Global Positioning & International Markets */}
+      {/* Global Positioning & International Markets - 45+ Countries */}
       <meta name="geo.coverage" content="global" />
       <meta name="distribution" content="global" />
       <meta name="target" content="worldwide" />
-      <meta name="target-country" content="US,GB,DE,FR,NL,BE,ES,IT,GR,SE,NO,DK,FI,CA,AU,IE,AT,CH" />
+      <meta name="target-country" content={GLOBAL_TARGET_COUNTRIES} />
       
       {/* Market-specific signals */}
       {targetMarkets.length > 0 && (
