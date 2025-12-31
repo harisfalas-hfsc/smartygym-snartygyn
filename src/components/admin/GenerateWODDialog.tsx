@@ -98,8 +98,8 @@ export const GenerateWODDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-md max-h-[85vh] flex flex-col overflow-hidden">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-yellow-500" />
             Generate Workout of the Day
@@ -109,7 +109,7 @@ export const GenerateWODDialog = ({
           </DialogDescription>
         </DialogHeader>
         
-        <div className="space-y-4 py-4">
+        <div className="space-y-4 py-4 overflow-y-auto flex-1 min-h-0">
           {/* Warning: Today's WOD is MISSING */}
           {!hasTodayWOD && (
             <Alert variant="destructive" className="border-red-500/50 bg-red-500/10">
@@ -256,7 +256,7 @@ export const GenerateWODDialog = ({
           </div>
         </div>
         
-        <DialogFooter>
+        <DialogFooter className="flex-shrink-0">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
