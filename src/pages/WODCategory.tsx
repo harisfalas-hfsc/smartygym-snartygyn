@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { getDifficultyColorClasses } from "@/lib/wodCycle";
 import { useNavigate, Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
@@ -163,8 +164,8 @@ const WODCategory = () => {
               </div>
               <span className="text-muted-foreground/50">•</span>
               <div className="flex items-center gap-1">
-                <TrendingUp className="w-3 h-3 text-green-600 dark:text-green-400" />
-                <span className="text-green-600 dark:text-green-400 font-medium capitalize">
+                <TrendingUp className={`w-3 h-3 ${getDifficultyColorClasses(wod.difficulty_stars || wod.difficulty).icon}`} />
+                <span className={`font-medium capitalize ${getDifficultyColorClasses(wod.difficulty_stars || wod.difficulty).text}`}>
                   {wod.difficulty || (wod.difficulty_stars ? (wod.difficulty_stars <= 2 ? "Beginner" : wod.difficulty_stars <= 4 ? "Intermediate" : "Advanced") : "Beginner")} {wod.difficulty_stars && `(${wod.difficulty_stars}★)`}
                 </span>
               </div>
