@@ -54,14 +54,15 @@ const WODCategory = () => {
     data: interactions = []
   } = useWorkoutInteractions(userId);
 
-  // Get BOTH current WODs (is_workout_of_day = true AND generated_for_date = Cyprus today)
+  // Get current WODs (is_workout_of_day = true AND generated_for_date = Cyprus today)
   const cyprusToday = getCyprusTodayStr();
   const currentWODs = allWorkouts.filter(
     workout => workout.is_workout_of_day === true && workout.generated_for_date === cyprusToday
   );
   const bodyweightWOD = currentWODs.find(w => w.equipment === "BODYWEIGHT");
   const equipmentWOD = currentWODs.find(w => w.equipment === "EQUIPMENT");
-
+  const variousWOD = currentWODs.find(w => w.equipment === "VARIOUS");
+  const isRecoveryDay = !!variousWOD && !bodyweightWOD && !equipmentWOD;
   // Get interactions for current WODs
   const getInteraction = (workoutId: string | undefined) => {
     if (!workoutId) return null;
@@ -166,7 +167,9 @@ const WODCategory = () => {
               <div className="flex items-center gap-1">
                 <TrendingUp className={`w-3 h-3 ${getDifficultyColorClasses(wod.difficulty_stars || wod.difficulty).icon}`} />
                 <span className={`font-medium capitalize ${getDifficultyColorClasses(wod.difficulty_stars || wod.difficulty).text}`}>
-                  {wod.difficulty || (wod.difficulty_stars ? (wod.difficulty_stars <= 2 ? "Beginner" : wod.difficulty_stars <= 4 ? "Intermediate" : "Advanced") : "Beginner")} {wod.difficulty_stars && `(${wod.difficulty_stars}★)`}
+                  {wod.category?.toUpperCase() === "RECOVERY" 
+                    ? "All Levels" 
+                    : (wod.difficulty || (wod.difficulty_stars ? (wod.difficulty_stars <= 2 ? "Beginner" : wod.difficulty_stars <= 4 ? "Intermediate" : "Advanced") : "Beginner"))} {wod.difficulty_stars && wod.category?.toUpperCase() !== "RECOVERY" && `(${wod.difficulty_stars}★)`}
                 </span>
               </div>
               <span className="text-muted-foreground/50">•</span>
@@ -247,7 +250,7 @@ const WODCategory = () => {
                   <h1 className="text-xl sm:text-2xl font-bold mb-3 text-center">About Workout of the Day</h1>
                   {/* Desktop description */}
                   <p className="hidden sm:block text-base text-center text-muted-foreground max-w-3xl mx-auto">
-                    Every day <span className="text-primary font-semibold">SmartyGym</span> delivers TWO fresh, expertly designed workouts following a strategic periodization cycle — one with equipment and one without. Each day focuses on a different category - type and difficulty level. Our workouts follow a science-based periodization approach designed by{" "}
+                    Every training day <span className="text-primary font-semibold">SmartyGym</span> delivers TWO fresh, expertly designed workouts following a strategic periodization cycle — one with equipment and one without. On recovery days, we provide a single guided recovery session. Each day focuses on a different category and difficulty level. Our workouts follow a science-based periodization approach designed by{" "}
                     <a href="/coach-profile" className="text-primary hover:underline font-semibold">
                       Coach Haris Falas
                     </a>
@@ -270,8 +273,70 @@ const WODCategory = () => {
               {/* Periodization Calendar - Pure Calendar-Based */}
               <WODPeriodizationCalendar />
 
-              {/* Two WOD Cards */}
-              {bodyweightWOD || equipmentWOD ? (
+              {/* WOD Cards - Training days show 2 cards, Recovery shows 1 */}
+              {isRecoveryDay && variousWOD ? (
+                /* Recovery Day - Single Card */
+                <Card 
+                  className="group cursor-pointer overflow-hidden hover:shadow-xl transition-all duration-300 hover:border-green-500/60 max-w-2xl mx-auto bg-gradient-to-br from-green-500/5 via-background to-emerald-500/5 border-2 border-green-500/30" 
+                  onClick={() => navigate(`/workout/wod/${variousWOD.id}`)}
+                >
+                  <div className="relative aspect-video overflow-hidden">
+                    <img 
+                      src={variousWOD.image_url || "/placeholder.svg"} 
+                      alt={variousWOD.name} 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                    />
+                    <Badge className="absolute top-3 left-3 bg-green-500 text-white border-0">
+                      <RefreshCw className="w-4 h-4 mr-1" />
+                      Recovery Day
+                    </Badge>
+                    {isNew(variousWOD.created_at) && (
+                      <Badge className="absolute top-3 right-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white border-0">
+                        NEW
+                      </Badge>
+                    )}
+                    <div className="absolute bottom-3 right-3">
+                      {variousWOD.is_premium ? (
+                        <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0 shadow-lg">
+                          <Crown className="w-3 h-3 mr-1" />
+                          Premium
+                        </Badge>
+                      ) : (
+                        <Badge className="bg-gradient-to-r from-blue-500 to-cyan-600 text-white border-0 shadow-lg">
+                          <Check className="w-3 h-3 mr-1" />
+                          Free
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                  <CardContent className="p-4 sm:p-6">
+                    <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-2 group-hover:text-green-500 transition-colors">
+                      {variousWOD.name}
+                    </h3>
+                    {variousWOD.description && (
+                      <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
+                        {stripHtml(variousWOD.description)}
+                      </p>
+                    )}
+                    <div className="flex flex-wrap items-center gap-2 mb-4 text-sm">
+                      <Badge variant="outline" className="bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/30">
+                        <RefreshCw className="w-3 h-3 mr-1" />
+                        Recovery
+                      </Badge>
+                      <Badge variant="outline" className="text-muted-foreground">
+                        <Clock className="w-3 h-3 mr-1" />
+                        {variousWOD.duration || "30-45 min"}
+                      </Badge>
+                      <Badge variant="outline" className="text-muted-foreground">
+                        All Levels
+                      </Badge>
+                    </div>
+                    <Button className="w-full bg-green-500 hover:bg-green-600">
+                      Start Recovery Session
+                    </Button>
+                  </CardContent>
+                </Card>
+              ) : bodyweightWOD || equipmentWOD ? (
                 <>
                   {/* Mobile Carousel */}
                   <div className="md:hidden">
@@ -309,7 +374,7 @@ const WODCategory = () => {
                     </div>
                   </div>
                   
-                  {/* Desktop Grid (unchanged) */}
+                  {/* Desktop Grid */}
                   <div className="hidden md:grid md:grid-cols-2 gap-6">
                     {renderWODCard(bodyweightWOD, true)}
                     {renderWODCard(equipmentWOD, false)}
