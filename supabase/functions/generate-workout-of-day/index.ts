@@ -239,7 +239,8 @@ serve(async (req) => {
     // ═══════════════════════════════════════════════════════════════════════════════
     const bodyweightAlreadyExists = existingWODsForDate?.some((w) => w.equipment === "BODYWEIGHT") ?? false;
     const equipmentAlreadyExists = existingWODsForDate?.some((w) => w.equipment === "EQUIPMENT") ?? false;
-    const mixedAlreadyExists = existingWODsForDate?.some((w) => w.equipment === "MIXED") ?? false;
+    // CRITICAL FIX: Recovery uses VARIOUS (not MIXED) to match database constraint valid_equipment
+    const variousAlreadyExists = existingWODsForDate?.some((w) => w.equipment === "VARIOUS") ?? false;
 
     // For non-recovery days, determine what needs to be generated
     const allEquipmentTypes = ["BODYWEIGHT", "EQUIPMENT"] as const;
@@ -251,7 +252,7 @@ serve(async (req) => {
       isRecoveryDayEarly,
       bodyweightAlreadyExists,
       equipmentAlreadyExists,
-      mixedAlreadyExists,
+      variousAlreadyExists,
       equipmentTypesToGenerate
     });
 
@@ -541,9 +542,10 @@ serve(async (req) => {
     let equipmentTypes: string[];
     
     if (isRecoveryDay) {
-      // RECOVERY: Only generate ONE mixed workout (use early check from line ~312)
-      equipmentTypes = mixedAlreadyExists ? [] : ["MIXED"];
-      logStep("RECOVERY day - generating single MIXED workout", { mixedAlreadyExists, equipmentTypes });
+      // RECOVERY: Only generate ONE VARIOUS workout (use early check from line ~312)
+      // CRITICAL: Use VARIOUS (not MIXED) to match database constraint valid_equipment
+      equipmentTypes = variousAlreadyExists ? [] : ["VARIOUS"];
+      logStep("RECOVERY day - generating single VARIOUS workout", { variousAlreadyExists, equipmentTypes });
     } else {
       // Normal days: Generate BODYWEIGHT and EQUIPMENT versions
       equipmentTypes = equipmentTypesToGenerate;
@@ -1233,7 +1235,7 @@ Recovery is NOT about intensity - it's about healing and preparing for future wo
 
 FORMAT: FLOW (combination of modalities, not classic CIRCUIT or REPS & SETS)
 DURATION: 30-45 minutes
-EQUIPMENT: MIXED (may use bicycle, treadmill, fit ball, foam roller - these are TOOLS, not "gym equipment")
+EQUIPMENT: VARIOUS (may use bicycle, treadmill, fit ball, foam roller - these are TOOLS, not "gym equipment")
 
 ═══════════════════════════════════════════════════════════════════════════════
 CRITICAL - NO DIFFICULTY LEVEL:
@@ -1243,10 +1245,10 @@ Recovery is ONE workout suitable for EVERYONE - beginners to advanced.
 The intensity is ALWAYS LOW - suitable for anyone.
 
 ═══════════════════════════════════════════════════════════════════════════════
-CRITICAL - ONE MIXED WORKOUT:
+CRITICAL - ONE VARIOUS WORKOUT:
 ═══════════════════════════════════════════════════════════════════════════════
 Recovery does NOT follow the "Equipment/No Equipment" distinction.
-We generate ONE MIXED workout that may include:
+We generate ONE VARIOUS workout that may include:
 • Bicycle (indoor or outdoor), elliptical, treadmill (walking)
 • Fit ball, foam roller, yoga mat
 • No equipment at all (just body movement)
@@ -1745,20 +1747,34 @@ Return JSON with these exact fields:
         logStep(`✅ Image validated for Stripe`, { imageUrl: imageUrl.substring(0, 80) });
       }
 
-      // Create Stripe product
+      // Create Stripe product with IDEMPOTENCY KEY to prevent duplicates
       const workoutId = `WOD-${prefix}-${equipment.charAt(0)}-${timestamp}`;
       
-      logStep(`Creating Stripe product`, { 
+      // CRITICAL: Idempotency key prevents duplicate Stripe products on retries
+      // Key format: wod:{date}:{equipment} ensures same date+equipment = same product
+      const stripeIdempotencyKey = `wod:${effectiveDate}:${equipment}:${timestamp}`;
+      
+      logStep(`Creating Stripe product with idempotency`, { 
         name: workoutContent.name, 
         hasImage: !!imageUrl, 
-        imageUrl: imageUrl ? imageUrl.substring(0, 80) : 'NONE' 
+        imageUrl: imageUrl ? imageUrl.substring(0, 80) : 'NONE',
+        idempotencyKey: stripeIdempotencyKey
       });
       
       const stripeProduct = await stripe.products.create({
         name: workoutContent.name,
         description: `${category} Workout (${equipment})`,
         images: imageUrl ? [imageUrl] : [],
-        metadata: { project: "SMARTYGYM", workout_id: workoutId, type: "wod", category: category, equipment: equipment }
+        metadata: { 
+          project: "SMARTYGYM", 
+          workout_id: workoutId, 
+          type: "wod", 
+          category: category, 
+          equipment: equipment,
+          generated_for_date: effectiveDate  // Track date in Stripe metadata
+        }
+      }, {
+        idempotencyKey: stripeIdempotencyKey
       });
 
       // ═══════════════════════════════════════════════════════════════════════════════
@@ -1794,7 +1810,8 @@ Return JSON with these exact fields:
         productId: stripeProductId, 
         priceId: stripePriceId,
         hasImage: stripeProduct.images && stripeProduct.images.length > 0,
-        imageVerified: 'YES'
+        imageVerified: 'YES',
+        idempotencyKey: stripeIdempotencyKey
       });
 
       // Insert workout with generated_for_date for pre-generation tracking
@@ -1953,32 +1970,32 @@ Return JSON with these exact fields:
       .eq("is_workout_of_day", true);
     
     if (isRecoveryDay) {
-      // RECOVERY: Check for single MIXED workout
-      const mixedExists = finalVerification?.some(w => w.equipment === "MIXED");
+      // RECOVERY: Check for single VARIOUS workout (not MIXED)
+      const variousExists = finalVerification?.some(w => w.equipment === "VARIOUS");
       
       logStep("Final verification before state update (RECOVERY)", {
         effectiveDate,
         totalFound: finalVerification?.length || 0,
-        mixedExists,
+        variousExists,
         workouts: finalVerification?.map(w => ({ id: w.id, name: w.name, equipment: w.equipment }))
       });
       
-      if (!mixedExists) {
-        logStep("CRITICAL ERROR: RECOVERY MIXED workout not generated", { 
+      if (!variousExists) {
+        logStep("CRITICAL ERROR: RECOVERY VARIOUS workout not generated", { 
           generated: generatedWorkouts.map(w => w.equipment)
         });
         
         return new Response(
           JSON.stringify({
             success: false,
-            error: `Failed to generate RECOVERY WOD. Missing: MIXED`,
+            error: `Failed to generate RECOVERY WOD. Missing: VARIOUS`,
             generated: generatedWorkouts.map(w => ({ name: w.name, equipment: w.equipment }))
           }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
         );
       }
       
-      logStep("✅ RECOVERY MIXED workout verified - proceeding with state update");
+      logStep("✅ RECOVERY VARIOUS workout verified - proceeding with state update");
     } else {
       // Normal days: Check for BOTH BODYWEIGHT and EQUIPMENT
       const bodyweightExists = finalVerification?.some(w => w.equipment === "BODYWEIGHT");

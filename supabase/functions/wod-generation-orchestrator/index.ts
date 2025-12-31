@@ -65,10 +65,10 @@ async function verifyWodsExist(
   const missing: string[] = [];
   
   if (recoveryDay) {
-    // Recovery day: expect 1 MIXED workout
-    const hasMixed = wods?.some((w: any) => w.equipment === "MIXED");
-    if (hasMixed) found.push("MIXED");
-    else missing.push("MIXED");
+    // Recovery day: expect 1 VARIOUS workout (not MIXED - matches DB constraint)
+    const hasVarious = wods?.some((w: any) => w.equipment === "VARIOUS");
+    if (hasVarious) found.push("VARIOUS");
+    else missing.push("VARIOUS");
   } else {
     // Normal day: expect BODYWEIGHT + EQUIPMENT
     const hasBodyweight = wods?.some((w: any) => w.equipment === "BODYWEIGHT");
@@ -146,7 +146,8 @@ async function sendAdminAlert(
     .map((a) => `<li>Attempt ${a.attempt}: ${a.error || "No specific error"}</li>`)
     .join("");
   
-  const expectedWorkouts = isRecoveryDay ? "MIXED" : "BODYWEIGHT + EQUIPMENT";
+  // Recovery = 1 VARIOUS workout, Normal = BODYWEIGHT + EQUIPMENT
+  const expectedWorkouts = isRecoveryDay ? "VARIOUS" : "BODYWEIGHT + EQUIPMENT";
   
   const emailHtml = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">

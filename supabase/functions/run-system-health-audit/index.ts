@@ -132,21 +132,21 @@ function buildScheduledJobs(wodConfig: WodAutoGenConfig | null, automationRules:
     },
     'wod_archiving': {
       name: 'WOD Archiving',
-      cronHourUTC: 0, // 00:00 UTC → 02:00 Cyprus winter, 03:00 summer
+      cronHourUTC: 22, // 22:00 UTC → 00:00 Cyprus winter, 01:00 summer
       cronMinuteUTC: 0,
       frequency: 'daily',
       messageTypes: [], // Doesn't send messages, archives previous WODs
-      description: 'Archives previous WODs at midnight UTC (00:00 UTC)',
+      description: 'Archives previous WODs at 22:00 UTC (00:00 Cyprus)',
       isDisabled: wodPaused,
       disabledReason: wodPaused ? wodPauseReason : undefined
     },
     'wod_generation': {
       name: 'Workout of Day Generation',
-      cronHourUTC: wodHour, // Dynamic from database!
-      cronMinuteUTC: 0,
+      cronHourUTC: wodHour, // Dynamic from database (should be 22)
+      cronMinuteUTC: 30,    // Runs at :30 past the hour
       frequency: 'daily',
       messageTypes: [], // Doesn't send messages, generates content
-      description: `Generates new daily workout at ${wodHour}:00 UTC`,
+      description: `Generates new daily workout at ${wodHour}:30 UTC (00:30 Cyprus)`,
       isDisabled: wodPaused,
       disabledReason: wodPaused ? wodPauseReason : undefined
     },
