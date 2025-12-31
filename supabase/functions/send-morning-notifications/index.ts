@@ -100,11 +100,49 @@ serve(async (req) => {
     const hasRitual = !!todaysRitual;
     logStep("Ritual found", { hasRitual, dayNumber: todaysRitual?.day_number });
 
+    // ============================================
+    // ALERT ADMIN IF NO WODs FOR TODAY
+    // ============================================
+    if (!hasWods) {
+      logStep("⚠️ ALERT: No WODs found for today! WOD generation may have failed.", { 
+        todayStr,
+        message: "The scheduled WOD generation at 00:30 UTC may have failed. Check generate-workout-of-day logs."
+      });
+      
+      // Insert admin alert as a system message for admin users
+      const { data: adminRoles } = await supabase
+        .from("user_roles")
+        .select("user_id")
+        .eq("role", "admin");
+      
+      if (adminRoles && adminRoles.length > 0) {
+        const adminAlerts = adminRoles.map(admin => ({
+          user_id: admin.user_id,
+          message_type: "admin_alert",
+          subject: `⚠️ WOD Generation Failed - ${todayStr}`,
+          content: `<p class="tiptap-paragraph"><strong>⚠️ ALERT: No WODs generated for today (${todayStr})</strong></p>
+<p class="tiptap-paragraph"></p>
+<p class="tiptap-paragraph">The scheduled WOD generation at 00:30 UTC appears to have failed.</p>
+<p class="tiptap-paragraph"></p>
+<p class="tiptap-paragraph"><strong>Action Required:</strong></p>
+<p class="tiptap-paragraph">1. Go to Admin → WOD Manager</p>
+<p class="tiptap-paragraph">2. Click "Generate New WOD" → "Generate for Today"</p>
+<p class="tiptap-paragraph">3. After generation, click "Send Notifications" to notify users</p>
+<p class="tiptap-paragraph"></p>
+<p class="tiptap-paragraph">Check edge function logs for details about the failure.</p>`,
+          is_read: false,
+        }));
+        
+        await supabase.from('user_system_messages').insert(adminAlerts);
+        logStep("Admin alert sent about missing WODs", { adminCount: adminRoles.length });
+      }
+    }
+
     // If neither WOD nor Ritual exists, skip
     if (!hasWods && !hasRitual) {
-      logStep("No WODs or Ritual found for today - skipping notifications");
+      logStep("No WODs or Ritual found for today - skipping notifications (admin alerted)");
       return new Response(
-        JSON.stringify({ success: true, sent: false, reason: "No content for today" }),
+        JSON.stringify({ success: true, sent: false, reason: "No content for today", adminAlerted: true }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
       );
     }

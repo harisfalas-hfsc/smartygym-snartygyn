@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
-import { Flame, Play, RefreshCw, Calendar, Dumbbell, Star, TrendingUp, Clock, ExternalLink, ImageIcon, BookOpen, Edit, Settings, HeartPulse, CheckCircle, AlertTriangle, XCircle, Archive } from "lucide-react";
+import { Flame, Play, RefreshCw, Calendar, Dumbbell, Star, TrendingUp, Clock, ExternalLink, ImageIcon, BookOpen, Edit, Settings, HeartPulse, CheckCircle, AlertTriangle, XCircle, Archive, Bell } from "lucide-react";
 import { format, addDays } from "date-fns";
 import { WODSchedulePreview } from "./WODSchedulePreview";
 import { PeriodizationSystemDialog } from "./PeriodizationSystemDialog";
@@ -25,6 +25,7 @@ export const WODManager = () => {
   const [isSyncingImages, setIsSyncingImages] = useState(false);
   const [isRunningHealthCheck, setIsRunningHealthCheck] = useState(false);
   const [isArchiving, setIsArchiving] = useState(false);
+  const [isSendingNotifications, setIsSendingNotifications] = useState(false);
   const [periodizationDialogOpen, setPeriodizationDialogOpen] = useState(false);
   const [generateDialogOpen, setGenerateDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -192,6 +193,33 @@ export const WODManager = () => {
       });
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  // Manually trigger WOD notifications
+  const handleSendWODNotifications = async () => {
+    setIsSendingNotifications(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("send-wod-notifications", {});
+
+      if (error) throw error;
+
+      if (data?.sent === false) {
+        toast.info("Notifications not sent", {
+          description: data.reason || "Already sent today or no WODs to notify about",
+        });
+      } else {
+        toast.success("WOD Notifications Sent!", {
+          description: `${data?.dashboardNotifications || 0} dashboard messages, ${data?.emailsSent || 0} emails sent`,
+        });
+      }
+    } catch (error: any) {
+      console.error("Send notifications error:", error);
+      toast.error("Failed to send notifications", {
+        description: error.message || "Please try again",
+      });
+    } finally {
+      setIsSendingNotifications(false);
     }
   };
 
@@ -554,6 +582,21 @@ export const WODManager = () => {
               <Archive className="h-4 w-4 text-orange-500" />
             )}
             {isArchiving ? "Archiving..." : "Archive Current WODs"}
+          </Button>
+
+          <Button 
+            variant="outline"
+            className="flex items-center gap-2 border-blue-500"
+            disabled={isSendingNotifications || !currentWODs || currentWODs.length === 0}
+            onClick={handleSendWODNotifications}
+            title={!currentWODs || currentWODs.length === 0 ? "No WODs to notify about" : "Send WOD notifications now"}
+          >
+            {isSendingNotifications ? (
+              <RefreshCw className="h-4 w-4 animate-spin" />
+            ) : (
+              <Bell className="h-4 w-4 text-blue-500" />
+            )}
+            {isSendingNotifications ? "Sending..." : "Send Notifications"}
           </Button>
 
           <Button 
