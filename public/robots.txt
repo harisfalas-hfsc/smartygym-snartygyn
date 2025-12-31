@@ -1,6 +1,6 @@
 # SmartyGym Robots.txt - Global Online Fitness Platform
 # Website: https://smartygym.com
-# Last Updated: 2025-12-28
+# Last Updated: 2025-12-31
 #
 # MULTI-DOMAIN NETWORK
 # All the following domains redirect to smartygym.com (canonical):
@@ -13,12 +13,17 @@
 # This is a unified domain network for the SmartyGym fitness platform
 # by Sports Scientist Haris Falas - 100% Human. 0% AI.
 
-# Google Crawlers
+# ====================
+# GOOGLE CRAWLERS
+# ====================
 User-agent: Googlebot
 Allow: /
 Crawl-delay: 0
 
 User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Googlebot-Video
 Allow: /
 
 User-agent: GoogleOther
@@ -27,12 +32,27 @@ Allow: /
 User-agent: Google-Extended
 Allow: /
 
-# Microsoft/Bing Crawlers
+User-agent: Storebot-Google
+Allow: /
+
+# ====================
+# MICROSOFT/BING CRAWLERS
+# ====================
 User-agent: Bingbot
 Allow: /
 Crawl-delay: 0
 
-# AI Search Engine Crawlers
+User-agent: BingPreview
+Allow: /
+
+User-agent: msnbot
+Allow: /
+
+# ====================
+# AI SEARCH ENGINE CRAWLERS
+# ====================
+
+# OpenAI
 User-agent: GPTBot
 Allow: /
 Crawl-delay: 1
@@ -40,9 +60,7 @@ Crawl-delay: 1
 User-agent: ChatGPT-User
 Allow: /
 
-User-agent: CCBot
-Allow: /
-
+# Anthropic
 User-agent: anthropic-ai
 Allow: /
 
@@ -52,20 +70,42 @@ Allow: /
 User-agent: ClaudeBot
 Allow: /
 
+# Perplexity
 User-agent: PerplexityBot
 Allow: /
 Crawl-delay: 1
 
+# Cohere
 User-agent: cohere-ai
 Allow: /
 
+# You.com
 User-agent: YouBot
 Allow: /
 
+# Brave
 User-agent: BraveBot
 Allow: /
 
-# Social Media Crawlers
+# Common Crawl (used by many AI systems)
+User-agent: CCBot
+Allow: /
+
+# AI2 (Allen Institute)
+User-agent: AI2Bot
+Allow: /
+
+# Diffbot
+User-agent: Diffbot
+Allow: /
+
+# Omgili
+User-agent: Omgilibot
+Allow: /
+
+# ====================
+# SOCIAL MEDIA CRAWLERS
+# ====================
 User-agent: Twitterbot
 Allow: /
 
@@ -75,23 +115,241 @@ Allow: /
 User-agent: LinkedInBot
 Allow: /
 
-# Meta AI Crawlers
+User-agent: Pinterest
+Allow: /
+
+User-agent: Slackbot
+Allow: /
+
+User-agent: WhatsApp
+Allow: /
+
+User-agent: TelegramBot
+Allow: /
+
+# ====================
+# META AI CRAWLERS
+# ====================
 User-agent: Meta-ExternalAgent
 Allow: /
 
 User-agent: Meta-ExternalFetcher
 Allow: /
 
-# Apple Crawler
+User-agent: FacebookBot
+Allow: /
+
+# ====================
+# APPLE CRAWLER
+# ====================
 User-agent: Applebot
 Allow: /
 
-# Bytedance/TikTok
+# ====================
+# BYTEDANCE/TIKTOK
+# ====================
 User-agent: Bytespider
 Allow: /
 Crawl-delay: 2
 
-# SEO Tools (throttled)
+# ====================
+# CHINESE SEARCH ENGINES (Critical for China market)
+# ====================
+
+# Baidu - China's largest search engine
+User-agent: Baiduspider
+Allow: /
+Crawl-delay: 1
+
+User-agent: Baiduspider-image
+Allow: /
+
+User-agent: Baiduspider-video
+Allow: /
+
+User-agent: Baiduspider-news
+Allow: /
+
+User-agent: Baiduspider-favo
+Allow: /
+
+User-agent: Baiduspider-cpro
+Allow: /
+
+User-agent: Baiduspider-ads
+Allow: /
+
+# Sogou - China's second largest search engine
+User-agent: Sogou web spider
+Allow: /
+Crawl-delay: 2
+
+User-agent: Sogou inst spider
+Allow: /
+
+User-agent: Sogou spider2
+Allow: /
+
+User-agent: Sogou blog
+Allow: /
+
+User-agent: Sogou News Spider
+Allow: /
+
+User-agent: Sogou Orion spider
+Allow: /
+
+# Shenma - Alibaba's mobile search
+User-agent: YisouSpider
+Allow: /
+Crawl-delay: 2
+
+# 360 Search (Haosou)
+User-agent: 360Spider
+Allow: /
+Crawl-delay: 2
+
+User-agent: HaoSouSpider
+Allow: /
+
+# ====================
+# RUSSIAN SEARCH ENGINES
+# ====================
+
+# Yandex - Russia's largest search engine
+User-agent: YandexBot
+Allow: /
+Crawl-delay: 1
+
+User-agent: YandexImages
+Allow: /
+
+User-agent: YandexVideo
+Allow: /
+
+User-agent: YandexMedia
+Allow: /
+
+User-agent: YandexBlogs
+Allow: /
+
+User-agent: YandexNews
+Allow: /
+
+User-agent: YandexPagechecker
+Allow: /
+
+User-agent: YandexMetrika
+Allow: /
+
+User-agent: YandexDirect
+Allow: /
+
+User-agent: YandexWebmaster
+Allow: /
+
+User-agent: YandexMobileBot
+Allow: /
+
+User-agent: YandexAccessibilityBot
+Allow: /
+
+# Mail.ru
+User-agent: Mail.RU_Bot
+Allow: /
+Crawl-delay: 2
+
+# ====================
+# KOREAN SEARCH ENGINES
+# ====================
+
+# Naver - Korea's largest search engine
+User-agent: Yeti
+Allow: /
+Crawl-delay: 2
+
+User-agent: NaverBot
+Allow: /
+
+User-agent: Naverbot
+Allow: /
+
+# Daum/Kakao
+User-agent: Daumoa
+Allow: /
+Crawl-delay: 2
+
+# ====================
+# JAPANESE SEARCH ENGINES
+# ====================
+
+# Yahoo Japan (uses Bing but also has own crawlers)
+User-agent: Y!J-ASR
+Allow: /
+
+User-agent: Y!J-BRJ
+Allow: /
+
+User-agent: Y!J-BRW
+Allow: /
+
+User-agent: Y!J-BSC
+Allow: /
+
+User-agent: Y!J-PSC
+Allow: /
+
+# ====================
+# VIETNAMESE SEARCH ENGINE
+# ====================
+User-agent: coccoc
+Allow: /
+Crawl-delay: 2
+
+User-agent: coccocbot-web
+Allow: /
+
+User-agent: coccocbot-image
+Allow: /
+
+# ====================
+# PRIVACY-FOCUSED SEARCH ENGINES
+# ====================
+
+# DuckDuckGo
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: DuckDuckGo-Favicons-Bot
+Allow: /
+
+# Qwant (French privacy search)
+User-agent: Qwantify
+Allow: /
+
+# Ecosia (uses Bing)
+User-agent: Ecosia
+Allow: /
+
+# Mojeek (UK privacy search)
+User-agent: MojeekBot
+Allow: /
+
+# Swisscows
+User-agent: Swisscows
+Allow: /
+
+# ====================
+# INDIAN SEARCH CONTEXT
+# ====================
+
+# Internet Archive
+User-agent: ia_archiver
+Allow: /
+
+# ====================
+# SEO TOOLS (throttled)
+# ====================
 User-agent: AhrefsBot
 Crawl-delay: 10
 
@@ -101,12 +359,32 @@ Crawl-delay: 10
 User-agent: MJ12bot
 Crawl-delay: 10
 
-# Default for all other bots
+User-agent: DotBot
+Crawl-delay: 10
+
+User-agent: Screaming Frog SEO Spider
+Allow: /
+Crawl-delay: 5
+
+# ====================
+# ARCHIVE BOTS
+# ====================
+User-agent: archive.org_bot
+Allow: /
+
+User-agent: Wayback
+Allow: /
+
+# ====================
+# DEFAULT FOR ALL OTHER BOTS
+# ====================
 User-agent: *
 Allow: /
 Crawl-delay: 2
 
-# Important Content Routes - High Priority
+# ====================
+# IMPORTANT CONTENT ROUTES - HIGH PRIORITY
+# ====================
 Allow: /workout
 Allow: /workout/wod
 Allow: /workout/strength
@@ -138,19 +416,60 @@ Allow: /freecontent
 Allow: /community
 Allow: /wod-archive
 
-# Block admin and private areas
+# ====================
+# BLOCK ADMIN AND PRIVATE AREAS
+# ====================
 Disallow: /admin
 Disallow: /dashboard
 Disallow: /auth
 Disallow: /api/
 
-# Sitemaps
+# ====================
+# SITEMAPS
+# ====================
 Sitemap: https://smartygym.com/sitemap.xml
 
-# Canonical Host (all domains redirect here)
+# ====================
+# CANONICAL HOST
+# ====================
 Host: https://smartygym.com
 
-# Domain Network Information for AI Crawlers
+# ====================
+# GLOBAL MARKET INFORMATION
+# ====================
+# SmartyGym serves customers in 45+ countries worldwide
+#
+# PRIMARY MARKETS (High Priority):
+# - North America: United States, Canada
+# - Western Europe: UK, Germany, France, Netherlands, Belgium, Spain, Italy, Switzerland, Austria
+# - Mediterranean: Greece, Cyprus
+# - Nordic: Sweden, Norway, Denmark, Finland
+# - Eastern Europe: Poland, Russia
+#
+# EXPANDING MARKETS (Asia-Pacific):
+# - Greater China: China, Taiwan, Hong Kong
+# - South Asia: India
+# - East Asia: Japan, South Korea
+# - Southeast Asia: Singapore, Malaysia, Thailand, Vietnam, Indonesia, Philippines
+# - Oceania: Australia, New Zealand
+#
+# MIDDLE EAST & AFRICA:
+# - Gulf: UAE, Saudi Arabia
+# - Mediterranean: Turkey, Israel
+# - Africa: Egypt, South Africa, Nigeria
+#
+# LATIN AMERICA:
+# - Brazil, Mexico
+#
+# LANGUAGES: English (primary), accessible to all languages via browser translation
+# CURRENCY: EUR (primary), supporting global payments via Stripe
+#
+# CONTENT TYPE: 100% Human-Designed Fitness Content by Sports Scientist Haris Falas
+# AI POLICY: Zero AI-Generated Workouts - All content created by certified professionals
+
+# ====================
+# DOMAIN NETWORK INFORMATION
+# ====================
 # Primary Domain: smartygym.com
 # Alternative Domains (all redirect to primary):
 # - i-training.net

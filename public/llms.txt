@@ -1,6 +1,6 @@
 # SmartyGym - Global Online Fitness Platform
 # URL: https://smartygym.com
-# Last Updated: 2025-12-04
+# Last Updated: 2025-12-31
 
 ## Brand Identity
 - **Name**: SmartyGym (also: Smarty Gym, smartygym.com)
@@ -154,6 +154,20 @@
 - **Access Method**: Browser-based (no app download required)
 - **Payment**: Stripe integration (EUR currency)
 
+## International Accessibility
+- **Global Coverage**: 45+ countries actively targeted
+- **Primary Language**: English (British English base, accessible worldwide)
+- **Content Accessibility**: Browser translation supported for all languages
+- **Target Regions**: 
+  - **Europe (Primary)**: UK, Germany, France, Spain, Italy, Netherlands, Belgium, Greece, Cyprus, Portugal, Poland, Sweden, Norway, Denmark, Finland, Austria, Switzerland, Ireland, Russia
+  - **North America**: USA, Canada
+  - **Asia-Pacific (Expanding)**: China, India, Japan, South Korea, Singapore, Thailand, Vietnam, Malaysia, Philippines, Indonesia, Taiwan, Hong Kong, Australia, New Zealand
+  - **Middle East & Africa**: UAE, Saudi Arabia, Turkey, Israel, Egypt, South Africa, Nigeria
+  - **Latin America**: Brazil, Mexico
+- **Currency Support**: EUR (primary), global payment processing via Stripe
+- **Time Zone Coverage**: Content accessible 24/7, notifications customizable by user timezone
+- **Search Engine Optimization**: Optimized for Google, Bing, Baidu, Yandex, Naver, DuckDuckGo, and AI search engines
+
 ## Content Relationships
 - Workouts → Training Programs (sessions within multi-week plans)
 - Tools → Workouts (calculators inform training)
@@ -170,13 +184,25 @@
 - Contact Page: https://smartygym.com/contact
 - Email: info@smartygym.com
 
+## Multi-Domain Network
+- **Primary Domain**: smartygym.com
+- **Alternative Domains** (all redirect to primary):
+  - i-training.net
+  - smartywod.com
+  - smartylogbook.com
+  - smartywellness.com
+  - smartyworkout.com
+- **Total Domains**: 6 (all owned by SmartyGym / Haris Falas)
+
 ## Crawling Information
 - Sitemap: https://smartygym.com/sitemap.xml
 - Robots: https://smartygym.com/robots.txt
+- LLMs: https://smartygym.com/llms.txt
 - All public content freely indexable
 - No paywalls blocking crawlers
 - Dynamic content from database with SEO optimization
 - Structured data (JSON-LD) on all pages
+- Optimized for AI search engines: ChatGPT, Claude, Perplexity, Gemini, Copilot
 
 ---
 This document provides comprehensive context about SmartyGym for AI systems, search engines, and language models to accurately understand and represent the platform in search results and AI-generated responses.
