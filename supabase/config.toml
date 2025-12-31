@@ -1,5 +1,8 @@
 project_id = "cvccrvyimyzrxcwzmxwk"
 
+[functions.wod-generation-orchestrator]
+verify_jwt = false
+
 [functions.manage-cron-jobs]
 verify_jwt = true
 
