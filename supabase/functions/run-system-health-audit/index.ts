@@ -609,14 +609,36 @@ const handler = async (req: Request): Promise<Response> => {
           : `${todayWodCount} WOD(s) still active during gap`
       );
     } else {
+      // Build detailed failure message
+      let detailMessage = '';
+      if (todayWodCount === 0) {
+        detailMessage = `ISSUE: 0 active WODs found. Expected: 2 (bodyweight + equipment) for ${today} (Cyprus).\n\n` +
+          `POSSIBLE CAUSES:\n` +
+          `• Automatic generation at ${wodAutoGenConfig?.generation_hour_utc ?? 3}:00 UTC failed or timed out\n` +
+          `• Edge function 'generate-workout-of-day' returned an error\n` +
+          `• Workouts were created but not tagged with is_workout_of_day=true\n` +
+          `• Workouts created with wrong generated_for_date\n\n` +
+          `SOLUTION: Go to Admin → WOD Manager → click 'Generate New WOD' → select 'Generate for Today'`;
+      } else if (todayWodCount === 1) {
+        detailMessage = `ISSUE: Only 1 active WOD found. Expected: 2 (bodyweight + equipment).\n\n` +
+          `POSSIBLE CAUSES:\n` +
+          `• Generation partially failed (one variant created, one failed)\n` +
+          `• Stripe product creation timed out for second variant\n` +
+          `• Image generation failed for second variant\n\n` +
+          `SOLUTION: Regenerate today's WOD to create both variants. generated_for_date: ${activeWodDates.join(', ') || 'n/a'}`;
+      } else {
+        detailMessage = `${todayWodCount} active WODs found (more than expected). generated_for_date: ${activeWodDates.join(', ') || 'n/a'}. ` +
+          `This may indicate old WODs were not properly archived. Use 'Archive Current WODs' button.`;
+      }
+
       addCheck(
         'WOD System',
         'Active WODs Exist',
         `${todayWodCount || 0} active WODs (today: ${today})`,
         todayWodCount === 2 ? 'pass' : todayWodCount === 0 ? 'fail' : 'warning',
         todayWodCount === 2
-          ? `Both variants exist. generated_for_date: ${activeWodDates.join(', ') || 'n/a'}`
-          : `Expected 2 active WODs, found ${todayWodCount || 0}. generated_for_date: ${activeWodDates.join(', ') || 'n/a'}`
+          ? `✅ Both variants exist. generated_for_date: ${activeWodDates.join(', ') || 'n/a'}`
+          : detailMessage
       );
     }
 

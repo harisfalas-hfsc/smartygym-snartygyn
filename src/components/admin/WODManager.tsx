@@ -236,12 +236,26 @@ export const WODManager = () => {
     }
   };
 
+  // Helper: Get Cyprus date (timezone-aware)
+  const getCyprusDate = () => {
+    const now = new Date();
+    const formatter = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Europe/Nicosia',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    });
+    return formatter.format(now); // Returns YYYY-MM-DD
+  };
+
   // Health Check: Verify WOD system integrity
   const handleHealthCheck = async () => {
     setIsRunningHealthCheck(true);
     try {
-      const today = format(new Date(), "yyyy-MM-dd");
-      const issues: string[] = [];
+      const today = getCyprusDate(); // Use Cyprus date
+      const expectedInfo = getWODInfoForDate(today);
+      const dayIn84 = getDayIn84Cycle(today);
+      const issues: { issue: string; reason: string; solution: string }[] = [];
       const passed: string[] = [];
 
       // Check 1: Today's WODs exist
@@ -252,20 +266,36 @@ export const WODManager = () => {
         .eq("generated_for_date", today);
 
       if (wodError) {
-        issues.push(`Database error: ${wodError.message}`);
+        issues.push({
+          issue: `Database error: ${wodError.message}`,
+          reason: "Could not query the database for today's WODs.",
+          solution: "Check Supabase connection and try again."
+        });
       } else if (!todayWods || todayWods.length === 0) {
-        issues.push("No WODs found for today");
+        issues.push({
+          issue: `No WODs found for today (${today} Cyprus)`,
+          reason: `The automatic generation at 03:00 UTC (05:00 Cyprus) may have failed, or workouts were created but not correctly tagged with is_workout_of_day=true and generated_for_date='${today}'.`,
+          solution: "Click 'Generate New WOD' → select 'Generate for Today' to create today's workout manually."
+        });
       } else if (todayWods.length < 2) {
-        issues.push(`Only ${todayWods.length} WOD(s) found - expected 2 (bodyweight + equipment)`);
+        issues.push({
+          issue: `Only ${todayWods.length} WOD found - expected 2 (bodyweight + equipment)`,
+          reason: "The generation might have partially failed, creating only one variant instead of both.",
+          solution: "Check edge function logs or regenerate today's WOD."
+        });
       } else {
-        passed.push(`✅ Today's WODs exist: ${todayWods.length} workouts`);
+        passed.push(`✅ Today's WODs exist: ${todayWods.length} workouts for ${today}`);
       }
 
       // Check 2: All WODs have images
       if (todayWods && todayWods.length > 0) {
         const wodsWithoutImages = todayWods.filter(w => !w.image_url);
         if (wodsWithoutImages.length > 0) {
-          issues.push(`${wodsWithoutImages.length} WOD(s) missing images: ${wodsWithoutImages.map(w => w.name).join(", ")}`);
+          issues.push({
+            issue: `${wodsWithoutImages.length} WOD(s) missing images: ${wodsWithoutImages.map(w => w.name).join(", ")}`,
+            reason: "Image generation may have failed or timed out during WOD creation.",
+            solution: "Edit the WOD and manually add an image, or click 'Sync Stripe Images' to pull images from Stripe."
+          });
         } else {
           passed.push("✅ All WODs have images in database");
         }
@@ -275,7 +305,11 @@ export const WODManager = () => {
       if (todayWods && todayWods.length > 0) {
         const wodsWithoutStripe = todayWods.filter(w => !w.stripe_product_id || !w.stripe_price_id);
         if (wodsWithoutStripe.length > 0) {
-          issues.push(`${wodsWithoutStripe.length} WOD(s) missing Stripe products: ${wodsWithoutStripe.map(w => w.name).join(", ")}`);
+          issues.push({
+            issue: `${wodsWithoutStripe.length} WOD(s) missing Stripe products: ${wodsWithoutStripe.map(w => w.name).join(", ")}`,
+            reason: "Stripe product creation failed during WOD generation (API error or timeout).",
+            solution: "Edit the WOD or regenerate it to create Stripe products."
+          });
         } else {
           passed.push("✅ All WODs have Stripe products");
         }
@@ -289,22 +323,31 @@ export const WODManager = () => {
         .single();
 
       if (stateError) {
-        issues.push(`State error: ${stateError.message}`);
+        issues.push({
+          issue: `State error: ${stateError.message}`,
+          reason: "The workout_of_day_state table might be empty or inaccessible.",
+          solution: "Check database tables in the backend settings."
+        });
       } else if (!stateData) {
-        issues.push("WOD state not found");
+        issues.push({
+          issue: "WOD state not found",
+          reason: "No tracking record exists for WOD generation.",
+          solution: "Generate a WOD to initialize the state tracking."
+        });
       } else {
-        // Use 84-day cycle for validation
-        const dayIn84 = getDayIn84Cycle(today);
-        const expectedCategory = getCategoryForDay(dayIn84);
-        passed.push(`✅ State valid: Day ${dayIn84}/84 in cycle`);
+        passed.push(`✅ State valid: Day ${dayIn84}/84 in cycle, expected ${expectedInfo.category}`);
         
         // Verify category matches
         if (todayWods && todayWods.length > 0) {
           const wodCategory = todayWods[0].category;
-          if (wodCategory !== expectedCategory) {
-            issues.push(`Category mismatch: WOD is ${wodCategory}, expected ${expectedCategory}`);
-          } else {
-            passed.push(`✅ Category matches: ${expectedCategory}`);
+          if (wodCategory && wodCategory.toUpperCase() !== expectedInfo.category.toUpperCase()) {
+            issues.push({
+              issue: `Category mismatch: WOD is ${wodCategory}, expected ${expectedInfo.category}`,
+              reason: "The WOD was generated with a different category than the periodization schedule expects.",
+              solution: "This may be intentional (manual override). If not, regenerate the WOD."
+            });
+          } else if (wodCategory) {
+            passed.push(`✅ Category matches: ${expectedInfo.category}`);
           }
         }
       }
@@ -318,7 +361,11 @@ export const WODManager = () => {
       if (allActiveWods && allActiveWods.length > 2) {
         const oldWods = allActiveWods.filter(w => w.generated_for_date !== today);
         if (oldWods.length > 0) {
-          issues.push(`${oldWods.length} old WOD(s) still marked as active: ${oldWods.map(w => `${w.name} (${w.generated_for_date})`).join(", ")}`);
+          issues.push({
+            issue: `${oldWods.length} old WOD(s) still marked as active: ${oldWods.map(w => `${w.name} (${w.generated_for_date})`).join(", ")}`,
+            reason: "The archiving job at 00:00 UTC may have failed to mark old WODs as inactive.",
+            solution: "Click 'Archive Current WODs' to manually archive old workouts."
+          });
         }
       } else {
         passed.push("✅ No duplicate active WODs from previous days");
@@ -327,22 +374,33 @@ export const WODManager = () => {
       // Display results
       if (issues.length === 0) {
         toast.success("WOD Health Check Passed!", {
-          description: passed.join("\n"),
+          description: `All ${passed.length} checks passed. System is healthy.`,
           duration: 8000,
         });
       } else {
-        toast.error(`Health Check: ${issues.length} issue(s) found`, {
-          description: issues.join("\n"),
+        // Format issues with reasons and solutions
+        const issueMessages = issues.map((i, idx) => 
+          `${idx + 1}. ${i.issue}\n   WHY: ${i.reason}\n   FIX: ${i.solution}`
+        ).join("\n\n");
+        
+        toast.error(`WOD Health Check: ${issues.length} issue(s) found`, {
+          description: issues[0].issue + (issues.length > 1 ? ` (+${issues.length - 1} more)` : ""),
           duration: 10000,
         });
-        // Also log passed items
-        if (passed.length > 0) {
-          console.log("[WOD Health Check] Passed items:", passed);
-        }
+        
+        // Show detailed modal or console for full info
+        console.log("=== WOD HEALTH CHECK RESULTS ===");
+        console.log("ISSUES:");
+        issues.forEach((i, idx) => {
+          console.log(`\n${idx + 1}. ${i.issue}`);
+          console.log(`   WHY: ${i.reason}`);
+          console.log(`   FIX: ${i.solution}`);
+        });
+        console.log("\nPASSED:", passed);
+        
+        // Also show in alert for visibility
+        alert(`WOD Health Check Issues:\n\n${issueMessages}\n\nFor full system check, go to Settings → System Health Audit`);
       }
-
-      console.log("[WOD Health Check] Issues:", issues);
-      console.log("[WOD Health Check] Passed:", passed);
 
     } catch (error: any) {
       console.error("Health check error:", error);
@@ -423,7 +481,7 @@ export const WODManager = () => {
             ) : (
               <HeartPulse className="h-4 w-4 text-green-500" />
             )}
-            {isRunningHealthCheck ? "Checking..." : "🏥 Health Check"}
+            {isRunningHealthCheck ? "Checking..." : "WOD Health Check"}
           </Button>
           
           <Button 
@@ -490,8 +548,10 @@ export const WODManager = () => {
             onOpenChange={setGenerateDialogOpen}
             onGenerate={handleGenerateWOD}
             isGenerating={isGenerating}
+            todayCategory={getTodayCategory()}
             nextCategory={getTomorrowCategory()}
             dayInCycle={getDayInCycle()}
+            hasTodayWOD={currentWODs && currentWODs.length > 0}
           />
           
         </div>
