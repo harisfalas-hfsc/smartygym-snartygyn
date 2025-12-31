@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { getDifficultyColorClasses } from "@/lib/wodCycle";
 import { useNavigate, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
@@ -556,8 +557,8 @@ const WorkoutDetail = () => {
                     {workout.difficulty && (
                       <>
                         <div className="flex items-center gap-1">
-                          <TrendingUp className="h-3 w-3 shrink-0 text-green-600 dark:text-green-400" />
-                          <span className="capitalize text-green-600 dark:text-green-400 font-medium">{workout.difficulty}</span>
+                          <TrendingUp className={`h-3 w-3 shrink-0 ${getDifficultyColorClasses(workout.difficulty_stars || workout.difficulty).icon}`} />
+                          <span className={`capitalize font-medium ${getDifficultyColorClasses(workout.difficulty_stars || workout.difficulty).text}`}>{workout.difficulty}</span>
                           {workout.difficulty_stars && (
                             <span className="text-yellow-500">({workout.difficulty_stars}★)</span>
                           )}

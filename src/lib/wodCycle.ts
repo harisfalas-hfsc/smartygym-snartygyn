@@ -273,11 +273,12 @@ export const getWODInfoForDate = (dateStr: string): {
 
 /**
  * Get difficulty badge class based on level
+ * Colors: Beginner=Yellow, Intermediate=Green, Advanced=Red, Recovery/null=Blue
  */
 export const getDifficultyBadgeClass = (level: string | null): string => {
   if (!level) return "bg-blue-500/20 text-blue-400 border-blue-500/30";
-  if (level === "Beginner") return "bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 border-yellow-500/30";
-  if (level === "Intermediate") return "bg-green-500/20 text-green-700 dark:text-green-400 border-green-500/30";
+  if (level.toLowerCase() === "beginner") return "bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 border-yellow-500/30";
+  if (level.toLowerCase() === "intermediate") return "bg-green-500/20 text-green-700 dark:text-green-400 border-green-500/30";
   return "bg-red-500/20 text-red-700 dark:text-red-400 border-red-500/30";
 };
 
@@ -286,9 +287,65 @@ export const getDifficultyBadgeClass = (level: string | null): string => {
  */
 export const getDifficultyBorderClass = (level: string | null): string => {
   if (!level) return "border-blue-500";
-  if (level === "Beginner") return "border-yellow-500";
-  if (level === "Intermediate") return "border-green-500";
+  if (level.toLowerCase() === "beginner") return "border-yellow-500";
+  if (level.toLowerCase() === "intermediate") return "border-green-500";
   return "border-red-500";
+};
+
+/**
+ * Get difficulty color classes - works with BOTH stars (number) OR level (string)
+ * SINGLE SOURCE OF TRUTH for difficulty colors across the entire app
+ * Colors: Beginner (1-2★) = Yellow, Intermediate (3-4★) = Green, Advanced (5-6★) = Red, Recovery/null = Blue
+ */
+export const getDifficultyColorClasses = (
+  starsOrLevel: number | string | null | undefined
+): { text: string; bg: string; border: string; icon: string } => {
+  // Determine the level from stars or string
+  let level: string | null = null;
+  
+  if (typeof starsOrLevel === 'number') {
+    if (starsOrLevel <= 2) level = "beginner";
+    else if (starsOrLevel <= 4) level = "intermediate";
+    else level = "advanced";
+  } else if (typeof starsOrLevel === 'string') {
+    level = starsOrLevel.toLowerCase();
+  }
+  
+  // Return color classes based on level
+  // Recovery / null = Blue
+  if (!level || level === 'recovery') {
+    return {
+      text: "text-blue-600 dark:text-blue-400",
+      bg: "bg-blue-500/20",
+      border: "border-blue-500/30",
+      icon: "text-blue-600 dark:text-blue-400"
+    };
+  }
+  // Beginner = Yellow
+  if (level === 'beginner') {
+    return {
+      text: "text-yellow-700 dark:text-yellow-400",
+      bg: "bg-yellow-500/20",
+      border: "border-yellow-500/30",
+      icon: "text-yellow-600 dark:text-yellow-400"
+    };
+  }
+  // Intermediate = Green
+  if (level === 'intermediate') {
+    return {
+      text: "text-green-700 dark:text-green-400",
+      bg: "bg-green-500/20",
+      border: "border-green-500/30",
+      icon: "text-green-600 dark:text-green-400"
+    };
+  }
+  // Advanced = Red (default for 5-6 stars or "advanced")
+  return {
+    text: "text-red-700 dark:text-red-400",
+    bg: "bg-red-500/20",
+    border: "border-red-500/30",
+    icon: "text-red-600 dark:text-red-400"
+  };
 };
 
 /**

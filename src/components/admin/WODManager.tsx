@@ -468,10 +468,10 @@ export const WODManager = () => {
   };
 
   const getDifficultyColor = (stars: number | null) => {
-    if (!stars) return "bg-muted text-muted-foreground";
-    if (stars <= 2) return "bg-green-500/20 text-green-400 border-green-500/30";
-    if (stars <= 4) return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
-    return "bg-red-500/20 text-red-400 border-red-500/30";
+    if (!stars) return "bg-blue-500/20 text-blue-400 border-blue-500/30"; // Recovery = Blue
+    if (stars <= 2) return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"; // Beginner = Yellow
+    if (stars <= 4) return "bg-green-500/20 text-green-400 border-green-500/30"; // Intermediate = Green
+    return "bg-red-500/20 text-red-400 border-red-500/30"; // Advanced = Red
   };
 
   const getDifficultyLabel = (stars: number | null) => {
