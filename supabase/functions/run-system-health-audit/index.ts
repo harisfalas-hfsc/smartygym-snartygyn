@@ -423,15 +423,29 @@ const handler = async (req: Request): Promise<Response> => {
       });
     };
 
-    // Get current time info
+    // Get current time info - USE CYPRUS DATE as single source of truth
     const now = new Date();
     const cyprusNow = getCyprusTime(now);
     const todayStart = new Date(now);
     todayStart.setUTCHours(0, 0, 0, 0);
-    const today = now.toISOString().split('T')[0];
-    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+    
+    // CRITICAL: Use Cyprus date for all WOD checks (matches how WODs are generated)
+    const cyprusParts = new Intl.DateTimeFormat('en-CA', { 
+      timeZone: 'Europe/Nicosia', 
+      year: 'numeric', 
+      month: '2-digit', 
+      day: '2-digit' 
+    }).format(now);
+    const today = cyprusParts; // Cyprus date in YYYY-MM-DD format
+    const yesterdayDate = new Date(cyprusNow.getTime() - 86400000);
+    const yesterday = new Intl.DateTimeFormat('en-CA', { 
+      timeZone: 'Europe/Nicosia', 
+      year: 'numeric', 
+      month: '2-digit', 
+      day: '2-digit' 
+    }).format(yesterdayDate);
 
-    console.log(`📅 Audit time: ${now.toISOString()} (Cyprus: ${cyprusNow.toLocaleTimeString('en-GB')})`);
+    console.log(`📅 Audit time: ${now.toISOString()} | Cyprus: ${cyprusNow.toLocaleTimeString('en-GB')} | Cyprus date: ${today}`);
 
     // ============================================
     // FETCH DYNAMIC CONFIGURATION
@@ -562,6 +576,15 @@ const handler = async (req: Request): Promise<Response> => {
     const currentMinuteUTC = now.getUTCMinutes();
     // Gap is at the generation hour (dynamic from config)
     const isInWodPreparationGap = currentHourUTC === 0 && currentMinuteUTC < 30;
+    
+    // CRITICAL: Check periodization to determine expected WOD count
+    // Recovery days expect 1 WOD (VARIOUS), training days expect 2 (BODYWEIGHT + EQUIPMENT)
+    const dayIn84 = getDayIn84Cycle(today);
+    const periodization = getPeriodizationForDay(dayIn84);
+    const expectedCategory = periodization.category;
+    const isRecoveryDay = expectedCategory === 'RECOVERY';
+    const expectedWodCount = isRecoveryDay ? 1 : 2;
+    const expectedEquipmentTypes = isRecoveryDay ? ['VARIOUS'] : ['BODYWEIGHT', 'EQUIPMENT'];
 
     const {
       data: todayWods,
@@ -570,7 +593,8 @@ const handler = async (req: Request): Promise<Response> => {
     } = await supabase
       .from('admin_workouts')
       .select('id, name, image_url, category, difficulty_stars, equipment, generated_for_date', { count: 'exact' })
-      .eq('is_workout_of_day', true);
+      .eq('is_workout_of_day', true)
+      .eq('generated_for_date', today); // Filter by Cyprus date!
 
     if (todayWodsError) {
       addCheck('WOD System', 'Active WOD Query', 'Fetch active WODs', 'fail', todayWodsError.message);
@@ -610,59 +634,99 @@ const handler = async (req: Request): Promise<Response> => {
           : `${todayWodCount} WOD(s) still active during gap`
       );
     } else {
-      // Build detailed failure message
+      // Build detailed failure message based on Recovery vs Training day
       let detailMessage = '';
-      if (todayWodCount === 0) {
-        detailMessage = `ISSUE: 0 active WODs found. Expected: 2 (bodyweight + equipment) for ${today} (Cyprus).\n\n` +
-          `POSSIBLE CAUSES:\n` +
-          `• Automatic generation at ${wodAutoGenConfig?.generation_hour_utc ?? 3}:00 UTC failed or timed out\n` +
-          `• Edge function 'generate-workout-of-day' returned an error\n` +
-          `• Workouts were created but not tagged with is_workout_of_day=true\n` +
-          `• Workouts created with wrong generated_for_date\n\n` +
-          `SOLUTION: Go to Admin → WOD Manager → click 'Generate New WOD' → select 'Generate for Today'`;
-      } else if (todayWodCount === 1) {
-        detailMessage = `ISSUE: Only 1 active WOD found. Expected: 2 (bodyweight + equipment).\n\n` +
-          `POSSIBLE CAUSES:\n` +
-          `• Generation partially failed (one variant created, one failed)\n` +
-          `• Stripe product creation timed out for second variant\n` +
-          `• Image generation failed for second variant\n\n` +
-          `SOLUTION: Regenerate today's WOD to create both variants. generated_for_date: ${activeWodDates.join(', ') || 'n/a'}`;
-      } else {
-        detailMessage = `${todayWodCount} active WODs found (more than expected). generated_for_date: ${activeWodDates.join(', ') || 'n/a'}. ` +
-          `This may indicate old WODs were not properly archived. Use 'Archive Current WODs' button.`;
+      const actualCount = todayWodCount || 0;
+      
+      if (actualCount === 0) {
+        detailMessage = isRecoveryDay
+          ? `ISSUE: 0 active WODs found. Expected: 1 Recovery WOD (VARIOUS) for ${today} (Cyprus).\n\n` +
+            `POSSIBLE CAUSES:\n` +
+            `• Automatic generation at ${wodAutoGenConfig?.generation_hour_utc ?? 22}:30 UTC failed\n` +
+            `• Edge function 'generate-workout-of-day' returned an error\n` +
+            `• Recovery WOD was created but not tagged correctly\n\n` +
+            `SOLUTION: Go to Admin → WOD Manager → click 'Generate New WOD' → select 'Generate for Today'`
+          : `ISSUE: 0 active WODs found. Expected: 2 (bodyweight + equipment) for ${today} (Cyprus).\n\n` +
+            `POSSIBLE CAUSES:\n` +
+            `• Automatic generation at ${wodAutoGenConfig?.generation_hour_utc ?? 22}:30 UTC failed\n` +
+            `• Edge function 'generate-workout-of-day' returned an error\n` +
+            `• Workouts were created but not tagged with is_workout_of_day=true\n` +
+            `• Workouts created with wrong generated_for_date\n\n` +
+            `SOLUTION: Go to Admin → WOD Manager → click 'Generate New WOD' → select 'Generate for Today'`;
+      } else if (actualCount < expectedWodCount) {
+        detailMessage = isRecoveryDay
+          ? `Recovery day should have 1 VARIOUS WOD. Found: ${actualCount}. generated_for_date: ${activeWodDates.join(', ') || 'n/a'}`
+          : `ISSUE: Only ${actualCount} active WOD found. Expected: 2 (bodyweight + equipment).\n\n` +
+            `POSSIBLE CAUSES:\n` +
+            `• Generation partially failed (one variant created, one failed)\n` +
+            `• Stripe product creation timed out for second variant\n\n` +
+            `SOLUTION: Regenerate today's WOD. generated_for_date: ${activeWodDates.join(', ') || 'n/a'}`;
+      } else if (actualCount > expectedWodCount) {
+        detailMessage = `${actualCount} active WODs found, expected ${expectedWodCount}${isRecoveryDay ? ' (Recovery day)' : ' (training day)'}. ` +
+          `generated_for_date: ${activeWodDates.join(', ') || 'n/a'}. ` +
+          `This may indicate old WODs were not properly archived.`;
       }
 
+      const statusPass = actualCount === expectedWodCount;
+      
       addCheck(
         'WOD System',
         'Active WODs Exist',
-        `${todayWodCount || 0} active WODs (today: ${today})`,
-        todayWodCount === 2 ? 'pass' : todayWodCount === 0 ? 'fail' : 'warning',
-        todayWodCount === 2
-          ? `✅ Both variants exist. generated_for_date: ${activeWodDates.join(', ') || 'n/a'}`
+        `${actualCount} active WOD${actualCount !== 1 ? 's' : ''} for ${today} (Cyprus)${isRecoveryDay ? ' - Recovery Day' : ''}`,
+        statusPass ? 'pass' : actualCount === 0 ? 'fail' : 'warning',
+        statusPass
+          ? isRecoveryDay 
+            ? `✅ Recovery day: 1 VARIOUS WOD exists as expected`
+            : `✅ Both variants exist (bodyweight + equipment)`
           : detailMessage
       );
     }
 
-    // Check WODs have unique images
-    if (todayWods && todayWods.length === 2) {
-      const hasUniqueImages = todayWods[0].image_url !== todayWods[1].image_url;
-      addCheck('WOD System', 'WOD Unique Images', 'Each WOD has a different image', 
-        hasUniqueImages ? 'pass' : 'fail',
-        hasUniqueImages ? 'Images are unique' : 'CRITICAL: Both WODs have the same image!'
-      );
+    // Check WODs have unique images - only for training days (2 WODs)
+    if (todayWods && todayWods.length === expectedWodCount) {
+      if (isRecoveryDay) {
+        // Recovery day - single WOD checks
+        const hasImage = todayWods[0]?.image_url;
+        addCheck('WOD System', 'WOD Image Exists', 'Recovery WOD has an image', 
+          hasImage ? 'pass' : 'warning',
+          hasImage ? 'Image present' : 'Missing image for recovery WOD'
+        );
+        
+        const hasVarious = todayWods[0]?.equipment?.toUpperCase() === 'VARIOUS';
+        addCheck('WOD System', 'WOD Equipment Type', 'Recovery WOD uses VARIOUS equipment', 
+          hasVarious ? 'pass' : 'warning',
+          hasVarious ? 'VARIOUS equipment type - correct for recovery' : `Unexpected equipment: ${todayWods[0]?.equipment}`
+        );
+        
+        // Skip unique images and variants check on recovery days
+        addCheck('WOD System', 'WOD Unique Images', 'N/A - Recovery day (1 WOD only)', 'pass', 'Recovery days have 1 WOD, no uniqueness check needed');
+        addCheck('WOD System', 'WOD Equipment Variants', 'N/A - Recovery day (1 WOD only)', 'pass', 'Recovery days do not have bodyweight/equipment variants');
+      } else {
+        // Training day - 2 WODs expected
+        const hasUniqueImages = todayWods[0].image_url !== todayWods[1].image_url;
+        addCheck('WOD System', 'WOD Unique Images', 'Each WOD has a different image', 
+          hasUniqueImages ? 'pass' : 'fail',
+          hasUniqueImages ? 'Images are unique' : 'CRITICAL: Both WODs have the same image!'
+        );
 
-      const bothHaveImages = todayWods[0].image_url && todayWods[1].image_url;
-      addCheck('WOD System', 'WOD Images Exist', 'Both WODs have images assigned', 
-        bothHaveImages ? 'pass' : 'fail',
-        bothHaveImages ? 'All images present' : 'Missing image(s)'
-      );
+        const bothHaveImages = todayWods[0].image_url && todayWods[1].image_url;
+        addCheck('WOD System', 'WOD Images Exist', 'Both WODs have images assigned', 
+          bothHaveImages ? 'pass' : 'fail',
+          bothHaveImages ? 'All images present' : 'Missing image(s)'
+        );
 
-      const hasBodyweight = todayWods.some(w => w.equipment?.toLowerCase().includes('bodyweight') || w.equipment?.toLowerCase().includes('no equipment'));
-      const hasEquipment = todayWods.some(w => !w.equipment?.toLowerCase().includes('bodyweight') && !w.equipment?.toLowerCase().includes('no equipment'));
-      addCheck('WOD System', 'WOD Equipment Variants', 'One bodyweight, one with equipment', 
-        hasBodyweight && hasEquipment ? 'pass' : 'warning',
-        hasBodyweight && hasEquipment ? 'Both variants exist' : 'Missing variant'
-      );
+        const hasBodyweight = todayWods.some(w => w.equipment?.toUpperCase() === 'BODYWEIGHT');
+        const hasEquipment = todayWods.some(w => w.equipment?.toUpperCase() === 'EQUIPMENT');
+        addCheck('WOD System', 'WOD Equipment Variants', 'One bodyweight, one with equipment', 
+          hasBodyweight && hasEquipment ? 'pass' : 'warning',
+          hasBodyweight && hasEquipment ? 'Both variants exist' : `Missing variant - found: ${todayWods.map(w => w.equipment).join(', ')}`
+        );
+      }
+    } else if (todayWods && todayWods.length > 0) {
+      // Some WODs exist but wrong count
+      addCheck('WOD System', 'WOD Unique Images', `Cannot validate - ${todayWods.length} WODs exist, expected ${expectedWodCount}`, 'warning');
+      addCheck('WOD System', 'WOD Images Exist', `Cannot validate - ${todayWods.length} WODs exist, expected ${expectedWodCount}`, 'warning');
+      addCheck('WOD System', 'WOD Equipment Variants', `Cannot validate - ${todayWods.length} WODs exist, expected ${expectedWodCount}`, 'warning');
     } else {
       addCheck('WOD System', 'WOD Unique Images', 'Cannot check - WODs missing', 'skip');
       addCheck('WOD System', 'WOD Images Exist', 'Cannot check - WODs missing', 'skip');
@@ -672,13 +736,8 @@ const handler = async (req: Request): Promise<Response> => {
     // WOD State - using simplified 84-day cycle (Day 1-84, then restarts)
     const { data: wodState } = await supabase.from('workout_of_day_state').select('*').single();
     
-    // Uses shared periodization module imported at top of file
-    
-    const dayIn84 = getDayIn84Cycle(today);
-    const periodization = getPeriodizationForDay(dayIn84);
-    const expectedCategory = periodization.category;
+    // Uses periodization variables already declared above (dayIn84, periodization, expectedCategory, isRecoveryDay)
     const expectedDifficulty = periodization.difficulty;
-    const isRecoveryDay = expectedCategory === 'RECOVERY';
     const isStrengthDay = expectedCategory === 'STRENGTH';
     const strengthFocus = periodization.strengthFocus;
     
@@ -693,9 +752,9 @@ const handler = async (req: Request): Promise<Response> => {
         addCheck(
           'WOD System',
           'Periodization Cycle (84-Day)',
-          `Day ${dayIn84}/84 should be ${expectedCategory}${isRecoveryDay ? ' (rest day)' : ''}${isStrengthDay ? ` [${expectedDifficulty}]` : ''}`,
+          `Day ${dayIn84}/84 should be ${expectedCategory}${isRecoveryDay ? ' (Recovery day - 1 WOD expected)' : ''}${isStrengthDay ? ` [${expectedDifficulty}]` : ''}`,
           isRecoveryDay ? 'pass' : 'skip',
-          isRecoveryDay ? 'Recovery day - no WOD required' : 'Cannot determine active WOD category'
+          isRecoveryDay ? 'Recovery day - 1 VARIOUS WOD expected (no difficulty rating)' : 'Cannot determine active WOD category'
         );
       } else {
         const categoryMatch = actualWodCategory

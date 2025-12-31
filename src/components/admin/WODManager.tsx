@@ -297,19 +297,35 @@ export const WODManager = () => {
         const genMinute = 30;
         // Approximate Cyprus time (UTC+2 winter, UTC+3 summer)
         const cyprusHour = (genHour + 2) % 24;
+        const isRecovery = expectedInfo.category === "RECOVERY";
+        const expectedCount = isRecovery ? 1 : 2;
         issues.push({
           issue: `No WODs found for today (${today} Cyprus)`,
           reason: `The automatic generation at ${genHour}:${genMinute.toString().padStart(2, '0')} UTC (${cyprusHour.toString().padStart(2, '0')}:${genMinute.toString().padStart(2, '0')} Cyprus) may have failed, or workouts were created but not correctly tagged with is_workout_of_day=true and generated_for_date='${today}'.`,
           solution: "Click 'Generate New WOD' → select 'Generate for Today' to create today's workout manually."
         });
-      } else if (todayWods.length < 2 && expectedInfo.category !== "RECOVERY") {
-        issues.push({
-          issue: `Only ${todayWods.length} WOD found - expected 2 (bodyweight + equipment)`,
-          reason: "The generation might have partially failed, creating only one variant instead of both.",
-          solution: "Check edge function logs or regenerate today's WOD."
-        });
       } else {
-        passed.push(`✅ Today's WODs exist: ${todayWods.length} workouts for ${today}`);
+        // Check expected count based on day type
+        const isRecovery = expectedInfo.category === "RECOVERY";
+        const expectedCount = isRecovery ? 1 : 2;
+        
+        if (todayWods.length < expectedCount) {
+          issues.push({
+            issue: `Only ${todayWods.length} WOD found - expected ${expectedCount} (${isRecovery ? 'VARIOUS recovery' : 'bodyweight + equipment'})`,
+            reason: isRecovery 
+              ? "Recovery WOD may not have been generated correctly."
+              : "The generation might have partially failed, creating only one variant instead of both.",
+            solution: "Check edge function logs or regenerate today's WOD."
+          });
+        } else if (todayWods.length > expectedCount) {
+          issues.push({
+            issue: `${todayWods.length} WODs found - expected ${expectedCount}`,
+            reason: "Old WODs may not have been archived properly.",
+            solution: "Click 'Archive Current WODs' to clean up."
+          });
+        } else {
+          passed.push(`✅ Today's WODs exist: ${todayWods.length} workout${todayWods.length > 1 ? 's' : ''} for ${today}${isRecovery ? ' (Recovery day)' : ''}`);
+        }
       }
 
       // Check 2: All WODs have images
