@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
@@ -14,6 +15,8 @@ import { ScrollReveal } from "@/components/ScrollReveal";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, type CarouselApi } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import { CategoryCountBadge } from "@/components/ui/category-count-badge";
 
 const TrainingProgramFlow = () => {
   const navigate = useNavigate();
@@ -36,6 +39,34 @@ const TrainingProgramFlow = () => {
       carouselApi.off("select", onSelect);
     };
   }, [carouselApi]);
+
+  // Fetch program counts by category
+  const { data: programCounts = {} } = useQuery({
+    queryKey: ["program-category-counts"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("admin_training_programs")
+        .select("category");
+      
+      const counts: Record<string, number> = {};
+      data?.forEach(p => {
+        if (p.category) {
+          // Map DB category to card ID
+          const cat = p.category.toLowerCase()
+            .replace("cardio endurance", "cardio-endurance")
+            .replace("functional strength", "functional-strength")
+            .replace("muscle hypertrophy", "muscle-hypertrophy")
+            .replace("weight loss", "weight-loss")
+            .replace("low back pain", "low-back-pain")
+            .replace("mobility & stability", "mobility-stability")
+            .replace(/\s+/g, "-");
+          counts[cat] = (counts[cat] || 0) + 1;
+        }
+      });
+      return counts;
+    },
+    staleTime: 1000 * 60 * 5,
+  });
 
   // Category background images for programs
   const programBackgrounds: Record<string, string> = {
@@ -234,6 +265,9 @@ const TrainingProgramFlow = () => {
                   data-program-category={program.id} 
                   data-keywords="online gym training programs, workout training programs, smarty gym, online fitness programs, smartygym.com, Haris Falas"
                 >
+                  {/* Counter Badge */}
+                  <CategoryCountBadge count={programCounts[program.id] || 0} />
+                  
                   {/* Background Image */}
                   {hasBackground && (
                     <>
@@ -328,6 +362,9 @@ const TrainingProgramFlow = () => {
                       role="button" 
                       aria-label={`${program.title} training program`}
                     >
+                      {/* Counter Badge */}
+                      <CategoryCountBadge count={programCounts[program.id] || 0} size="sm" />
+                      
                       {/* Background Image */}
                       {hasBackground && (
                         <>

@@ -16,6 +16,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, type CarouselApi } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
+import { CategoryCountBadge } from "@/components/ui/category-count-badge";
 
 const WorkoutFlow = () => {
   const navigate = useNavigate();
@@ -39,6 +40,31 @@ const WorkoutFlow = () => {
         .eq("is_workout_of_day", true)
         .eq("generated_for_date", today);
       return (data || []).filter(w => w.image_url).map(w => w.image_url as string);
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+
+  // Fetch workout counts by category (excluding WOD)
+  const { data: workoutCounts = {} } = useQuery({
+    queryKey: ["workout-category-counts"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("admin_workouts")
+        .select("category")
+        .or("is_workout_of_day.is.null,is_workout_of_day.eq.false");
+      
+      const counts: Record<string, number> = {};
+      data?.forEach(w => {
+        if (w.category) {
+          // Map DB category to card ID
+          const cat = w.category.toLowerCase()
+            .replace("calorie burning", "calorie-burning")
+            .replace("mobility & stability", "mobility")
+            .replace(/\s+/g, "-");
+          counts[cat] = (counts[cat] || 0) + 1;
+        }
+      });
+      return counts;
     },
     staleTime: 1000 * 60 * 5,
   });
@@ -294,6 +320,9 @@ const WorkoutFlow = () => {
                     data-workout-category={workout.id} 
                     data-keywords="online gym workouts, smarty gym, online fitness, smartygym.com, Haris Falas workouts"
                   >
+                    {/* Counter Badge - Only show for non-WOD cards */}
+                    {!isWodCard && <CategoryCountBadge count={workoutCounts[workout.id] || 0} />}
+                    
                     {/* WOD Card Background Images with Crossfade */}
                     {isWodCard && wodImages.length > 0 && (
                       <>
@@ -415,6 +444,9 @@ const WorkoutFlow = () => {
                         role="button" 
                         aria-label={`${workout.title} workouts`}
                       >
+                        {/* Counter Badge - Only show for non-WOD cards */}
+                        {!isWodCard && <CategoryCountBadge count={workoutCounts[workout.id] || 0} size="sm" />}
+                        
                         {/* WOD Card Background Images with Crossfade */}
                         {isWodCard && wodImages.length > 0 && (
                           <>
