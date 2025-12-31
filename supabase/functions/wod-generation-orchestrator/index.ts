@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { getDayIn84Cycle, getPeriodizationForDay } from "../_shared/periodization-84day.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -18,15 +19,15 @@ interface WodVerificationResult {
   isRecoveryDay: boolean;
 }
 
-// Calculate the 84-day cycle to determine if it's a recovery day
+/**
+ * Determines if a date is a recovery day using the shared periodization data.
+ * Recovery days are Days 10, 28, 38, 56, 66, 84 in the 84-day cycle.
+ */
 function isRecoveryDay(dateStr: string): boolean {
-  const CYCLE_START = new Date("2024-10-16");
-  const targetDate = new Date(dateStr);
-  const diffDays = Math.floor((targetDate.getTime() - CYCLE_START.getTime()) / (24 * 60 * 60 * 1000));
-  const dayIn84 = ((diffDays % 84) + 84) % 84;
-  
-  // Recovery days are every 7th day in the cycle (days 6, 13, 20, 27, 34, 41, 48, 55, 62, 69, 76, 83)
-  return (dayIn84 + 1) % 7 === 0;
+  const dayIn84 = getDayIn84Cycle(dateStr);
+  const periodization = getPeriodizationForDay(dayIn84);
+  console.log(`[ORCHESTRATOR] Date ${dateStr} = Day ${dayIn84} in cycle, category: ${periodization.category}`);
+  return periodization.category === "RECOVERY";
 }
 
 // Get Cyprus date string
