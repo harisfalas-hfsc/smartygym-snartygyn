@@ -16,6 +16,7 @@ import { WorkoutEditDialog } from "./WorkoutEditDialog";
 import { GenerateWODDialog } from "./GenerateWODDialog";
 import { WODAutoGenConfigDialog } from "./WODAutoGenConfigDialog";
 import { getWODInfoForDate, getDayIn84Cycle, getCategoryForDay } from "@/lib/wodCycle";
+import { getCyprusTodayStr } from "@/lib/cyprusDate";
 
 export const WODManager = () => {
   // 🏥 DIAGNOSTIC: v3 - Health Check button should be visible
@@ -65,16 +66,16 @@ export const WODManager = () => {
     },
   });
 
-  // Fetch current WODs (both bodyweight and equipment versions)
+  // Fetch current WODs (both bodyweight and equipment versions) using Cyprus date
+  const cyprusTodayForWods = getCyprusTodayStr();
   const { data: currentWODs, isLoading: wodLoading } = useQuery({
-    queryKey: ["current-wod"],
+    queryKey: ["current-wod", cyprusTodayForWods],
     queryFn: async () => {
-      const today = format(new Date(), "yyyy-MM-dd");
       const { data, error } = await supabase
         .from("admin_workouts")
         .select("*")
         .eq("is_workout_of_day", true)
-        .eq("generated_for_date", today);
+        .eq("generated_for_date", cyprusTodayForWods);
       
       if (error) throw error;
       return data || [];
@@ -264,17 +265,8 @@ export const WODManager = () => {
     }
   };
 
-  // Helper: Get Cyprus date (timezone-aware)
-  const getCyprusDate = () => {
-    const now = new Date();
-    const formatter = new Intl.DateTimeFormat('en-CA', {
-      timeZone: 'Europe/Nicosia',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    });
-    return formatter.format(now); // Returns YYYY-MM-DD
-  };
+  // Helper: Get Cyprus date (timezone-aware) - uses shared utility
+  const getCyprusDate = () => getCyprusTodayStr();
 
   // Health Check: Verify WOD system integrity
   const handleHealthCheck = async () => {
@@ -300,9 +292,14 @@ export const WODManager = () => {
           solution: "Check Supabase connection and try again."
         });
       } else if (!todayWods || todayWods.length === 0) {
+        // Get dynamic generation time from config
+        const genHour = wodAutoGenConfig?.generation_hour_utc ?? 22;
+        const genMinute = 30;
+        // Approximate Cyprus time (UTC+2 winter, UTC+3 summer)
+        const cyprusHour = (genHour + 2) % 24;
         issues.push({
           issue: `No WODs found for today (${today} Cyprus)`,
-          reason: `The automatic generation at 03:00 UTC (05:00 Cyprus) may have failed, or workouts were created but not correctly tagged with is_workout_of_day=true and generated_for_date='${today}'.`,
+          reason: `The automatic generation at ${genHour}:${genMinute.toString().padStart(2, '0')} UTC (${cyprusHour.toString().padStart(2, '0')}:${genMinute.toString().padStart(2, '0')} Cyprus) may have failed, or workouts were created but not correctly tagged with is_workout_of_day=true and generated_for_date='${today}'.`,
           solution: "Click 'Generate New WOD' → select 'Generate for Today' to create today's workout manually."
         });
       } else if (todayWods.length < 2 && expectedInfo.category !== "RECOVERY") {
@@ -528,7 +525,7 @@ export const WODManager = () => {
             Workout of the Day Management
           </h3>
           <p className="text-sm text-muted-foreground">
-            Generate, edit, and manage daily workouts. WODs auto-generate at 7:00 AM UTC (9:00 AM Cyprus).
+            Generate, edit, and manage daily workouts. WODs auto-generate at {wodAutoGenConfig?.generation_hour_utc ?? 22}:30 UTC ({((wodAutoGenConfig?.generation_hour_utc ?? 22) + 2) % 24}:30 Cyprus).
           </p>
         </div>
         
