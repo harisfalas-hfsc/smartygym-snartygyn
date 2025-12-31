@@ -307,7 +307,7 @@ function getJobStatus(
     const hoursUntil = (timeInMinutesScheduled - timeInMinutesNow) / 60;
     return {
       status: 'pending',
-      description: `Scheduled for ${formatCyprusTime(job.cronHourUTC)} Cyprus`,
+      description: `Scheduled for ${formatCyprusTime(job.cronHourUTC, scheduledMinute)} Cyprus`,
       details: hoursUntil >= 1 
         ? `Will run in ${Math.round(hoursUntil)} hour${Math.round(hoursUntil) !== 1 ? 's' : ''}`
         : `Will run in ${Math.round(hoursUntil * 60)} minutes`,
@@ -319,7 +319,7 @@ function getJobStatus(
   if (messageCount > 0 || lastMessageTime) {
     return {
       status: 'ran',
-      description: `Ran at ${lastMessageTime ? formatCyprusTime(lastMessageTime.getUTCHours(), lastMessageTime.getUTCMinutes()) : formatCyprusTime(job.cronHourUTC)} Cyprus`,
+      description: `Ran at ${lastMessageTime ? formatCyprusTime(lastMessageTime.getUTCHours(), lastMessageTime.getUTCMinutes()) : formatCyprusTime(job.cronHourUTC, scheduledMinute)} Cyprus`,
       details: `${messageCount} notification${messageCount !== 1 ? 's' : ''} delivered`,
       lastRunTime: lastMessageTime?.toISOString(),
       messageCount
@@ -329,10 +329,11 @@ function getJobStatus(
   // Job should have run but we found no messages
   // For content generation jobs (no messageTypes), check differently
   if (job.messageTypes.length === 0) {
+    // Content generation doesn't create messages - we need actual verification later
     return {
-      status: 'ran', // Content generation doesn't create messages
-      description: `Generation ran at ${formatCyprusTime(job.cronHourUTC)} Cyprus`,
-      details: 'Check content tables for generated data'
+      status: 'pending', // Mark as pending - actual verification will be done by caller
+      description: `Scheduled at ${formatCyprusTime(job.cronHourUTC, scheduledMinute)} Cyprus`,
+      details: 'Content verification required (see content-specific checks)'
     };
   }
   
@@ -340,7 +341,7 @@ function getJobStatus(
   if (job.messageTypes.includes('renewal_reminder') && hasExpiringSubs === false) {
     return {
       status: 'ran',
-      description: `Ran at ${formatCyprusTime(job.cronHourUTC)} Cyprus`,
+      description: `Ran at ${formatCyprusTime(job.cronHourUTC, scheduledMinute)} Cyprus`,
       details: 'No expiring subscriptions to notify (expected behavior)',
       messageCount: 0
     };
@@ -348,7 +349,7 @@ function getJobStatus(
   
   return {
     status: 'missed',
-    description: `Expected at ${formatCyprusTime(job.cronHourUTC)} Cyprus, not found`,
+    description: `Expected at ${formatCyprusTime(job.cronHourUTC, scheduledMinute)} Cyprus, not found`,
     details: 'No notifications found - check edge function logs for errors'
   };
 }
