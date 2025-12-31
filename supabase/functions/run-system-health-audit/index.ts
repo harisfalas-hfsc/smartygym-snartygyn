@@ -710,6 +710,27 @@ const handler = async (req: Request): Promise<Response> => {
             ? `Actual WOD category matches: ${actualWodCategory}${strengthFocus ? ` (${strengthFocus})` : ''}`
             : `Expected ${expectedCategory}, actual WOD: ${actualWodCategory} (may be from previous system)`
         );
+        
+        // Difficulty validation check
+        const expectedRange = periodization.difficultyStars;
+        const actualStars = todayWods?.[0]?.difficulty_stars;
+        
+        if (expectedRange && actualStars) {
+          const isWithinRange = actualStars >= expectedRange[0] && actualStars <= expectedRange[1];
+          addCheck(
+            'WOD System',
+            'Difficulty Validation',
+            `Expected ${expectedDifficulty} (${expectedRange[0]}-${expectedRange[1]} stars)`,
+            isWithinRange ? 'pass' : 'fail',
+            isWithinRange 
+              ? `✅ Actual: ${actualStars} stars (within range)`
+              : `MISMATCH: Actual ${actualStars} stars, expected ${expectedRange[0]}-${expectedRange[1]}. Regenerate WOD to fix.`
+          );
+        } else if (!expectedRange && !isRecoveryDay) {
+          addCheck('WOD System', 'Difficulty Validation', 'No expected range defined', 'skip');
+        } else if (isRecoveryDay) {
+          addCheck('WOD System', 'Difficulty Validation', 'Recovery day - no difficulty expected', 'pass');
+        }
       }
 
       addCheck('WOD System', 'Last Generation Time', wodState.last_generated_at ? `Last generated: ${wodState.last_generated_at}` : 'Never generated', 
