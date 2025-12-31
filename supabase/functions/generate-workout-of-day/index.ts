@@ -550,9 +550,16 @@ serve(async (req) => {
     }
     
     const generatedWorkouts: any[] = [];
+    const failedEquipmentTypes: string[] = [];
     let firstWorkoutName = "";
 
     for (const equipment of equipmentTypes) {
+      // ═══════════════════════════════════════════════════════════════════════════════
+      // PER-EQUIPMENT ERROR ISOLATION: Each equipment type generates independently
+      // If BODYWEIGHT fails, we still try EQUIPMENT (and vice versa)
+      // This prevents one AI failure from destroying the entire run
+      // ═══════════════════════════════════════════════════════════════════════════════
+      try {
       // ═══════════════════════════════════════════════════════════════════════════════
       // GET FORMAT AND DURATION FOR THIS SPECIFIC WORKOUT
       // STRENGTH, MOBILITY & STABILITY, and PILATES = always REPS & SETS (both workouts same)
@@ -1433,17 +1440,93 @@ INSTRUCTIONS FORMAT: Plain paragraphs with clear guidance
   "tips": "2-4 coaching tips as separate paragraphs or with <br> line breaks"
 }`;
 
-      // Retry mechanism: 3 attempts with 2-second delays
-      let aiResponse: Response | null = null;
-      let lastError: Error | null = null;
-      const maxRetries = 3;
-      const retryDelayMs = 2000;
+      // ═══════════════════════════════════════════════════════════════════════════════
+      // ROBUST AI CALL WITH TOOL CALLING FOR GUARANTEED STRUCTURED OUTPUT
+      // Phase 1: Tool calling for reliable JSON structure
+      // Phase 2: Fallback to text parsing if tool calling unavailable
+      // Phase 3: Single retry with minimal prompt if both fail
+      // ═══════════════════════════════════════════════════════════════════════════════
+      
+      // Define the tool for structured workout output
+      const wodTool = {
+        type: "function",
+        function: {
+          name: "generate_workout",
+          description: "Generate a structured workout with all required fields",
+          parameters: {
+            type: "object",
+            properties: {
+              name: { type: "string", description: "Creative 2-4 word workout name" },
+              description: { type: "string", description: "2-3 sentence HTML description with <p class='tiptap-paragraph'> tags" },
+              main_workout: { type: "string", description: "HTML workout content with Warm Up, Main Workout, Finisher, Cool Down sections" },
+              instructions: { type: "string", description: "Step-by-step guidance in HTML paragraph tags" },
+              tips: { type: "string", description: "2-4 coaching tips as HTML paragraphs" }
+            },
+            required: ["name", "description", "main_workout", "instructions", "tips"],
+            additionalProperties: false
+          }
+        }
+      };
+      
+      let workoutContent: { name: string; description: string; main_workout: string; instructions: string; tips: string } | null = null;
+      let parseMethod = "unknown";
+      
+      // Attempt 1: Tool calling (most reliable)
+      try {
+        logStep(`AI API call with tool calling`, { equipment });
+        
+        const toolResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${lovableApiKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "google/gemini-2.5-flash",
+            messages: [
+              { role: "system", content: "You are an expert fitness coach. Generate workouts using the provided tool." },
+              { role: "user", content: workoutPrompt }
+            ],
+            tools: [wodTool],
+            tool_choice: { type: "function", function: { name: "generate_workout" } }
+          }),
+        });
 
-      for (let attempt = 1; attempt <= maxRetries; attempt++) {
-        try {
-          logStep(`AI API call attempt ${attempt}/${maxRetries}`, { equipment });
+        if (toolResponse.ok) {
+          const toolData = await toolResponse.json();
+          const toolCall = toolData.choices?.[0]?.message?.tool_calls?.[0];
           
-          aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          if (toolCall?.function?.arguments) {
+            try {
+              workoutContent = JSON.parse(toolCall.function.arguments);
+              parseMethod = "tool_calling";
+              logStep(`✅ Tool calling succeeded`, { equipment, name: workoutContent?.name });
+            } catch (toolParseError) {
+              logStep(`Tool calling returned invalid JSON`, { 
+                error: toolParseError instanceof Error ? toolParseError.message : String(toolParseError),
+                argsPreview: toolCall.function.arguments?.substring(0, 200)
+              });
+            }
+          } else {
+            logStep(`Tool calling response missing tool_calls`, { 
+              hasChoices: !!toolData.choices?.length,
+              hasMessage: !!toolData.choices?.[0]?.message
+            });
+          }
+        } else {
+          const errorText = await toolResponse.text();
+          logStep(`Tool calling API error`, { status: toolResponse.status, errorPreview: errorText.substring(0, 200) });
+        }
+      } catch (toolError: any) {
+        logStep(`Tool calling network error`, { error: toolError.message });
+      }
+      
+      // Attempt 2: Regular text parsing with explicit JSON instruction (fallback)
+      if (!workoutContent) {
+        logStep(`Falling back to text-based JSON parsing`, { equipment });
+        
+        try {
+          const textResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
             method: "POST",
             headers: {
               "Authorization": `Bearer ${lovableApiKey}`,
@@ -1452,81 +1535,101 @@ INSTRUCTIONS FORMAT: Plain paragraphs with clear guidance
             body: JSON.stringify({
               model: "google/gemini-2.5-flash",
               messages: [
-                { role: "system", content: "You are an expert fitness coach. Return ONLY valid JSON, no markdown." },
+                { role: "system", content: "You are an expert fitness coach. Return ONLY valid JSON with no markdown, no code blocks, no explanation. Start with { and end with }." },
                 { role: "user", content: workoutPrompt }
               ],
             }),
           });
 
-          if (aiResponse.ok) {
-            logStep(`AI API call succeeded on attempt ${attempt}`, { equipment });
-            break;
+          if (textResponse.ok) {
+            const textData = await textResponse.json();
+            let content = textData.choices?.[0]?.message?.content || '';
+            
+            // Robust markdown stripping
+            content = content.replace(/^```(?:json|JSON)?\s*\n?/gm, '');
+            content = content.replace(/\n?```\s*$/gm, '');
+            
+            const firstBrace = content.indexOf('{');
+            const lastBrace = content.lastIndexOf('}');
+            if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+              content = content.substring(firstBrace, lastBrace + 1);
+            }
+            content = content.trim();
+            
+            workoutContent = JSON.parse(content);
+            parseMethod = "text_fallback";
+            logStep(`✅ Text parsing succeeded`, { equipment, name: workoutContent?.name });
           } else {
-            const errorText = await aiResponse.text();
-            lastError = new Error(`AI API error: ${aiResponse.status} - ${errorText}`);
-            logStep(`AI API call failed on attempt ${attempt}`, { 
-              status: aiResponse.status, 
-              error: errorText,
-              willRetry: attempt < maxRetries 
-            });
+            const errorText = await textResponse.text();
+            logStep(`Text-based API error`, { status: textResponse.status, errorPreview: errorText.substring(0, 200) });
           }
-        } catch (fetchError: any) {
-          lastError = fetchError;
-          logStep(`AI API network error on attempt ${attempt}`, { 
-            error: fetchError.message,
-            willRetry: attempt < maxRetries 
-          });
-        }
-
-        // Wait before retry (except on last attempt)
-        if (attempt < maxRetries) {
-          logStep(`Waiting ${retryDelayMs}ms before retry...`);
-          await new Promise(resolve => setTimeout(resolve, retryDelayMs));
+        } catch (textError: any) {
+          logStep(`Text parsing failed`, { error: textError.message });
         }
       }
-
-      if (!aiResponse || !aiResponse.ok) {
-        logStep("AI API failed after all retries", { 
-          maxRetries, 
-          lastError: lastError?.message,
-          equipment,
-          category 
-        });
-        throw lastError || new Error("AI API failed after all retries");
-      }
-
-      const aiData = await aiResponse.json();
-      let workoutContent;
       
-      try {
-        let content = aiData.choices[0].message.content;
+      // Attempt 3: Minimal prompt retry (saves credits by using shorter prompt)
+      if (!workoutContent) {
+        logStep(`Final retry with minimal prompt`, { equipment });
         
-        // More robust markdown stripping - handle all variations
-        // Step 1: Remove code block markers with any language identifier
-        content = content.replace(/^```(?:json|JSON)?\s*\n?/gm, '');
-        content = content.replace(/\n?```\s*$/gm, '');
+        const minimalPrompt = `Generate a ${category} workout for ${equipment === "BODYWEIGHT" ? "bodyweight only" : "gym equipment"}.
+Difficulty: ${selectedDifficulty.name} (${selectedDifficulty.stars}/6 stars)
+Format: ${format}
+
+Return JSON with these exact fields:
+{
+  "name": "2-4 word creative name",
+  "description": "<p class='tiptap-paragraph'>Brief description</p>",
+  "main_workout": "<p class='tiptap-paragraph'><strong><u>Warm Up</u></strong></p><ul class='tiptap-bullet-list'><li class='tiptap-list-item'><p class='tiptap-paragraph'>Exercise 1</p></li></ul><p class='tiptap-paragraph'></p><p class='tiptap-paragraph'><strong><u>Main Workout</u></strong></p>...<p class='tiptap-paragraph'><strong><u>Finisher</u></strong></p>...<p class='tiptap-paragraph'><strong><u>Cool Down</u></strong></p>...",
+  "instructions": "<p class='tiptap-paragraph'>How to perform</p>",
+  "tips": "<p class='tiptap-paragraph'>Coaching tips</p>"
+}`;
         
-        // Step 2: Find the JSON object boundaries (first { to last })
-        const firstBrace = content.indexOf('{');
-        const lastBrace = content.lastIndexOf('}');
-        if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
-          content = content.substring(firstBrace, lastBrace + 1);
+        try {
+          const retryResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${lovableApiKey}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              model: "google/gemini-2.5-flash",
+              messages: [
+                { role: "system", content: "Return ONLY valid JSON. No markdown. No explanation." },
+                { role: "user", content: minimalPrompt }
+              ],
+            }),
+          });
+
+          if (retryResponse.ok) {
+            const retryData = await retryResponse.json();
+            let content = retryData.choices?.[0]?.message?.content || '';
+            
+            content = content.replace(/^```(?:json|JSON)?\s*\n?/gm, '');
+            content = content.replace(/\n?```\s*$/gm, '');
+            
+            const firstBrace = content.indexOf('{');
+            const lastBrace = content.lastIndexOf('}');
+            if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+              content = content.substring(firstBrace, lastBrace + 1);
+            }
+            content = content.trim();
+            
+            workoutContent = JSON.parse(content);
+            parseMethod = "minimal_retry";
+            logStep(`✅ Minimal retry succeeded`, { equipment, name: workoutContent?.name });
+          }
+        } catch (retryError: any) {
+          logStep(`Minimal retry failed`, { error: retryError.message });
         }
-        
-        // Step 3: Trim any remaining whitespace
-        content = content.trim();
-        
-        workoutContent = JSON.parse(content);
-      } catch (parseError) {
-        // Log the raw content for debugging
-        const rawContent = aiData.choices[0]?.message?.content || 'No content';
-        logStep("Error parsing AI response", { 
-          error: parseError instanceof Error ? parseError.message : String(parseError), 
-          rawLength: rawContent.length,
-          rawPreview: rawContent.substring(0, 500) 
-        });
-        throw new Error("Failed to parse workout content");
       }
+      
+      // If all attempts failed, throw to trigger per-equipment error handling
+      if (!workoutContent) {
+        throw new Error(`All AI parsing attempts failed for ${equipment} workout`);
+      }
+      
+      logStep(`Workout content acquired via ${parseMethod}`, { equipment, name: workoutContent.name });
 
       if (equipment === "BODYWEIGHT") {
         firstWorkoutName = workoutContent.name;
@@ -1787,6 +1890,54 @@ INSTRUCTIONS FORMAT: Plain paragraphs with clear guidance
         name: workoutContent.name,
         equipment: equipment,
         image_url: imageUrl
+      });
+      
+      } catch (equipmentError: any) {
+        // ═══════════════════════════════════════════════════════════════════════════════
+        // PER-EQUIPMENT ERROR HANDLING: Log failure but continue to next equipment type
+        // ═══════════════════════════════════════════════════════════════════════════════
+        failedEquipmentTypes.push(equipment);
+        logStep(`❌ FAILED to generate ${equipment} workout`, { 
+          error: equipmentError.message,
+          equipment,
+          category,
+          willContinue: true
+        });
+        
+        // Log the failure to notification_audit_log for visibility
+        try {
+          await supabase.from('notification_audit_log').insert({
+            notification_type: 'wod_equipment_failure',
+            message_type: 'wod_equipment_failure',
+            subject: `${equipment} WOD Generation Failed - ${effectiveDate}`,
+            content: equipmentError.message,
+            sent_at: new Date().toISOString(),
+            metadata: {
+              effectiveDate,
+              equipment,
+              category,
+              error: equipmentError.message,
+              timestamp: new Date().toISOString()
+            }
+          });
+          logStep(`${equipment} failure logged to audit`, { equipment });
+        } catch (logErr) {
+          logStep(`Failed to log ${equipment} failure`, { error: logErr });
+        }
+        
+        // Continue to next equipment type instead of throwing
+        continue;
+      }
+    }
+    
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // POST-LOOP SUMMARY: Report what was generated and what failed
+    // ═══════════════════════════════════════════════════════════════════════════════
+    if (failedEquipmentTypes.length > 0) {
+      logStep(`⚠️ Generation completed with failures`, {
+        generated: generatedWorkouts.map(w => w.equipment),
+        failed: failedEquipmentTypes,
+        effectiveDate
       });
     }
 
