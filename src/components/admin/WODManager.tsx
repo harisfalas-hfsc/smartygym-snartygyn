@@ -261,7 +261,7 @@ export const WODManager = () => {
       // Check 1: Today's WODs exist
       const { data: todayWods, error: wodError } = await supabase
         .from("admin_workouts")
-        .select("id, name, image_url, stripe_product_id, stripe_price_id, equipment, generated_for_date, is_workout_of_day, category")
+        .select("id, name, image_url, stripe_product_id, stripe_price_id, equipment, generated_for_date, is_workout_of_day, category, difficulty, difficulty_stars")
         .eq("is_workout_of_day", true)
         .eq("generated_for_date", today);
 
@@ -277,7 +277,7 @@ export const WODManager = () => {
           reason: `The automatic generation at 03:00 UTC (05:00 Cyprus) may have failed, or workouts were created but not correctly tagged with is_workout_of_day=true and generated_for_date='${today}'.`,
           solution: "Click 'Generate New WOD' → select 'Generate for Today' to create today's workout manually."
         });
-      } else if (todayWods.length < 2) {
+      } else if (todayWods.length < 2 && expectedInfo.category !== "RECOVERY") {
         issues.push({
           issue: `Only ${todayWods.length} WOD found - expected 2 (bodyweight + equipment)`,
           reason: "The generation might have partially failed, creating only one variant instead of both.",
@@ -348,6 +348,41 @@ export const WODManager = () => {
             });
           } else if (wodCategory) {
             passed.push(`✅ Category matches: ${expectedInfo.category}`);
+          }
+          
+          // Check 4b: Verify difficulty matches expected range
+          const expectedRange = expectedInfo.difficulty.range;
+          const expectedLevel = expectedInfo.difficulty.level;
+          
+          if (expectedRange && expectedLevel) {
+            // Check all WODs for difficulty validation
+            const difficultyMismatches = todayWods.filter(wod => {
+              if (!wod.difficulty_stars) return false;
+              return wod.difficulty_stars < expectedRange[0] || wod.difficulty_stars > expectedRange[1];
+            });
+            
+            if (difficultyMismatches.length > 0) {
+              const mismatchDetails = difficultyMismatches.map(w => 
+                `${w.name}: ${w.difficulty_stars} stars (${w.difficulty})`
+              ).join(", ");
+              issues.push({
+                issue: `Difficulty mismatch: Expected ${expectedLevel} (${expectedRange[0]}-${expectedRange[1]} stars), got: ${mismatchDetails}`,
+                reason: "The WOD was generated with a difficulty level outside the expected range for today's periodization schedule.",
+                solution: "Click 'Generate New WOD' → 'Regenerate Today (Archive first)' to create a correctly-difficulty WOD."
+              });
+            } else {
+              const actualStars = todayWods[0].difficulty_stars;
+              passed.push(`✅ Difficulty matches: ${expectedLevel} (${actualStars} stars, expected ${expectedRange[0]}-${expectedRange[1]})`);
+            }
+          } else if (!expectedRange && todayWods[0].difficulty_stars) {
+            // Recovery day should have no difficulty
+            issues.push({
+              issue: `Unexpected difficulty on Recovery day: ${todayWods[0].difficulty_stars} stars`,
+              reason: "Recovery days should not have a difficulty rating.",
+              solution: "This is unusual - consider regenerating the WOD."
+            });
+          } else if (!expectedRange) {
+            passed.push(`✅ Recovery day: No difficulty expected`);
           }
         }
       }

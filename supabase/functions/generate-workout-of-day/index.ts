@@ -39,7 +39,7 @@ function logStep(step: string, details?: any) {
 // SIMPLIFIED 84-DAY PERIODIZATION - Direct lookup, no compatibility layers
 // ═══════════════════════════════════════════════════════════════════════════════
 
-// Get difficulty info directly from 84-day periodization
+// Get difficulty info directly from 84-day periodization (now uses ranges)
 function getDifficultyForDay(dayIn84: number): { name: string | null; stars: number | null; range: [number, number] | null } {
   const periodization = getPeriodizationForDay(dayIn84);
   
@@ -47,18 +47,21 @@ function getDifficultyForDay(dayIn84: number): { name: string | null; stars: num
     return { name: null, stars: null, range: null };
   }
   
-  const range: [number, number] = [periodization.difficultyStars, periodization.difficultyStars];
+  // difficultyStars is now [min, max] range - pick a random star from range
+  const range = periodization.difficultyStars;
+  const selectedStar = Math.random() < 0.5 ? range[0] : range[1];
   
   logStep("Difficulty lookup (84-day)", {
     dayIn84,
     category: periodization.category,
     difficulty: periodization.difficulty,
-    stars: periodization.difficultyStars
+    range,
+    selectedStar
   });
   
   return { 
     name: periodization.difficulty, 
-    stars: periodization.difficultyStars,
+    stars: selectedStar,
     range
   };
 }
@@ -1705,11 +1708,11 @@ INSTRUCTIONS FORMAT: Plain paragraphs with clear guidance
       }
 
       // ═══════════════════════════════════════════════════════════════════════════════
-      // CRITICAL SAFETY CHECK: Verify workout was actually inserted into database
+      // CRITICAL SAFETY CHECK: Verify workout was actually inserted with correct data
       // ═══════════════════════════════════════════════════════════════════════════════
       const { data: verifyWorkout, error: verifyError } = await supabase
         .from("admin_workouts")
-        .select("id, name, equipment, generated_for_date")
+        .select("id, name, equipment, generated_for_date, category, difficulty, difficulty_stars")
         .eq("id", workoutId)
         .single();
       
@@ -1722,11 +1725,40 @@ INSTRUCTIONS FORMAT: Plain paragraphs with clear guidance
         throw new Error(`${equipment} WOD verification failed - workout not found in database after insert`);
       }
       
+      // Verify category matches expected
+      if (verifyWorkout.category !== category) {
+        logStep(`WARNING: Category mismatch after insert`, {
+          expected: category,
+          actual: verifyWorkout.category,
+          workoutId
+        });
+      }
+      
+      // Verify difficulty is within expected range
+      const expectedPeriodization = getPeriodizationForDay(dayIn84);
+      const expectedRange = expectedPeriodization.difficultyStars;
+      const actualStars = verifyWorkout.difficulty_stars;
+      
+      if (expectedRange && actualStars) {
+        const isWithinRange = actualStars >= expectedRange[0] && actualStars <= expectedRange[1];
+        if (!isWithinRange) {
+          logStep(`WARNING: Difficulty stars outside expected range`, {
+            expected: expectedRange,
+            actual: actualStars,
+            workoutId,
+            dayIn84
+          });
+        }
+      }
+      
       logStep(`✅ ${equipment} WOD verified in database`, { 
         id: verifyWorkout.id, 
         name: verifyWorkout.name,
         equipment: verifyWorkout.equipment,
-        generated_for_date: verifyWorkout.generated_for_date
+        generated_for_date: verifyWorkout.generated_for_date,
+        category: verifyWorkout.category,
+        difficulty: verifyWorkout.difficulty,
+        difficulty_stars: verifyWorkout.difficulty_stars
       });
 
       generatedWorkouts.push({
