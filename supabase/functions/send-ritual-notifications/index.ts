@@ -240,8 +240,9 @@ ${getEmailFooter(authUser.email, 'ritual')}
     }
 
     // Add audit log entry with automation_key for proper history tracking
+    // Use 'daily_ritual' which matches the database constraint
     const { error: auditError } = await supabase.from('notification_audit_log').insert({
-      notification_type: MESSAGE_TYPES.DAILY_RITUAL,
+      notification_type: 'daily_ritual',
       message_type: MESSAGE_TYPES.DAILY_RITUAL,
       recipient_count: usersForDashboard.length,
       success_count: emailsSent,
