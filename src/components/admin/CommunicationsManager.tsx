@@ -36,7 +36,7 @@ export const CommunicationsManager = () => {
               </TabsTrigger>
               <TabsTrigger value="automation-rules" className="flex-shrink-0 flex items-center gap-2 whitespace-nowrap text-xs px-3 py-2">
                 <Settings className="w-4 h-4 flex-shrink-0" />
-                <span>Rules</span>
+                <span>Auto Messages</span>
               </TabsTrigger>
               <TabsTrigger value="automated" className="flex-shrink-0 flex items-center gap-2 whitespace-nowrap text-xs px-3 py-2">
                 <MessageSquare className="w-4 h-4 flex-shrink-0" />

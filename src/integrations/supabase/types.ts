@@ -2817,6 +2817,9 @@ export type Database = {
         | "new_program"
         | "new_article"
         | "program_delivered"
+        | "morning_wod"
+        | "morning_wod_recovery"
+        | "morning_ritual"
       plan_type: "free" | "gold" | "platinum"
       subscription_status: "active" | "canceled" | "past_due"
     }
@@ -2977,6 +2980,9 @@ export const Constants = {
         "new_program",
         "new_article",
         "program_delivered",
+        "morning_wod",
+        "morning_wod_recovery",
+        "morning_ritual",
       ],
       plan_type: ["free", "gold", "platinum"],
       subscription_status: ["active", "canceled", "past_due"],
