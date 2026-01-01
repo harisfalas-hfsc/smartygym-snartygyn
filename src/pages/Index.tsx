@@ -531,58 +531,63 @@ const Index = () => {
             </div>
             
             {mobileWods && mobileWods.length > 0 ? (
-              /* Two workout images side by side */
-              <div className="grid grid-cols-2 gap-3">
-                {/* Bodyweight workout */}
-                {bodyweightWod && (
-                  <div className="relative rounded-lg overflow-hidden border border-border">
-                    <img 
-                      src={bodyweightWod.image_url || '/placeholder.svg'} 
-                      alt={bodyweightWod.name}
-                      className="w-full h-28 object-cover"
-                      onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
-                    />
-                    <Badge className="absolute top-1 left-1 bg-green-500 hover:bg-green-500 text-white text-[10px] px-1.5 py-0.5">No Equipment</Badge>
-                    <div className="p-2 bg-background/90">
-                      <p className="text-xs font-semibold line-clamp-1">{bodyweightWod.name}</p>
-                      <div className="flex items-center gap-1 text-[9px] text-muted-foreground">
-                        <span className="text-red-500">{bodyweightWod.category}</span>
-                        {bodyweightWod.format && (
-                          <>
-                            <span>•</span>
-                            <span>{bodyweightWod.format}</span>
-                          </>
-                        )}
+              /* Workout images - dynamic columns based on count */
+              (() => {
+                const wodCount = [bodyweightWod, equipmentWod].filter(Boolean).length;
+                return (
+                  <div className={`grid ${wodCount === 1 ? 'grid-cols-1' : 'grid-cols-2'} gap-3`}>
+                    {/* Bodyweight workout */}
+                    {bodyweightWod && (
+                      <div className="relative rounded-lg overflow-hidden border border-border">
+                        <img 
+                          src={bodyweightWod.image_url || '/placeholder.svg'} 
+                          alt={bodyweightWod.name}
+                          className={`w-full ${wodCount === 1 ? 'h-36' : 'h-28'} object-cover`}
+                          onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
+                        />
+                        <Badge className="absolute top-1 left-1 bg-green-500 hover:bg-green-500 text-white text-[10px] px-1.5 py-0.5">No Equipment</Badge>
+                        <div className="p-2 bg-background/90">
+                          <p className="text-xs font-semibold line-clamp-1">{bodyweightWod.name}</p>
+                          <div className="flex items-center gap-1 text-[9px] text-muted-foreground">
+                            <span className="text-red-500">{bodyweightWod.category}</span>
+                            {bodyweightWod.format && (
+                              <>
+                                <span>•</span>
+                                <span>{bodyweightWod.format}</span>
+                              </>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                )}
-                
-                {/* Equipment workout */}
-                {equipmentWod && (
-                  <div className="relative rounded-lg overflow-hidden border border-border">
-                    <img 
-                      src={equipmentWod.image_url || '/placeholder.svg'} 
-                      alt={equipmentWod.name}
-                      className="w-full h-28 object-cover"
-                      onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
-                    />
-                    <Badge className="absolute top-1 left-1 bg-orange-500 hover:bg-orange-500 text-white text-[10px] px-1.5 py-0.5">With Equipment</Badge>
-                    <div className="p-2 bg-background/90">
-                      <p className="text-xs font-semibold line-clamp-1">{equipmentWod.name}</p>
-                      <div className="flex items-center gap-1 text-[9px] text-muted-foreground">
-                        <span className="text-red-500">{equipmentWod.category}</span>
-                        {equipmentWod.format && (
-                          <>
-                            <span>•</span>
-                            <span>{equipmentWod.format}</span>
-                          </>
-                        )}
+                    )}
+                    
+                    {/* Equipment workout */}
+                    {equipmentWod && (
+                      <div className="relative rounded-lg overflow-hidden border border-border">
+                        <img 
+                          src={equipmentWod.image_url || '/placeholder.svg'} 
+                          alt={equipmentWod.name}
+                          className={`w-full ${wodCount === 1 ? 'h-36' : 'h-28'} object-cover`}
+                          onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
+                        />
+                        <Badge className="absolute top-1 left-1 bg-orange-500 hover:bg-orange-500 text-white text-[10px] px-1.5 py-0.5">With Equipment</Badge>
+                        <div className="p-2 bg-background/90">
+                          <p className="text-xs font-semibold line-clamp-1">{equipmentWod.name}</p>
+                          <div className="flex items-center gap-1 text-[9px] text-muted-foreground">
+                            <span className="text-red-500">{equipmentWod.category}</span>
+                            {equipmentWod.format && (
+                              <>
+                                <span>•</span>
+                                <span>{equipmentWod.format}</span>
+                              </>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
-                )}
-              </div>
+                );
+              })()
             ) : (
               /* Being Prepared fallback */
               <div className="text-center py-4">
