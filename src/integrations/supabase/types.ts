@@ -2835,6 +2835,7 @@ export type Database = {
         | "morning_wod"
         | "morning_wod_recovery"
         | "morning_ritual"
+        | "morning_daily_digest"
       plan_type: "free" | "gold" | "platinum"
       subscription_status: "active" | "canceled" | "past_due"
     }
@@ -2998,6 +2999,7 @@ export const Constants = {
         "morning_wod",
         "morning_wod_recovery",
         "morning_ritual",
+        "morning_daily_digest",
       ],
       plan_type: ["free", "gold", "platinum"],
       subscription_status: ["active", "canceled", "past_due"],
