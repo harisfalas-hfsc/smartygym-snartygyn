@@ -146,30 +146,38 @@ export const AutomationRuleEditDialog = ({
   });
 
   // Auto-select the correct template when templates load
-  // Priority: 1) match automation_key, 2) is_default, 3) first available
+  // Priority: 1) match automation_key + is_default, 2) match automation_key, 3) is_default, 4) first available
   useEffect(() => {
     if (templates && templates.length > 0) {
-      // First try to find a template that matches the rule's automation_key
-      const matchByAutomationKey = templates.find(t => 
-        t.automation_key === rule.automation_key && t.is_active
-      );
+      // Filter to only active templates
+      const activeTemplates = templates.filter(t => t.is_active);
       
-      if (matchByAutomationKey) {
-        setSelectedTemplateId(matchByAutomationKey.id);
-        setTemplateData(matchByAutomationKey);
+      // Filter templates that match this rule's automation_key
+      const matchingKey = activeTemplates.filter(t => t.automation_key === rule.automation_key);
+      
+      if (matchingKey.length > 0) {
+        // Among templates with matching automation_key, prefer the default one
+        const defaultInKey = matchingKey.find(t => t.is_default);
+        // Otherwise pick the most recently updated
+        const sortedByDate = [...matchingKey].sort((a, b) => 
+          new Date(b.updated_at || 0).getTime() - new Date(a.updated_at || 0).getTime()
+        );
+        const selected = defaultInKey || sortedByDate[0];
+        setSelectedTemplateId(selected.id);
+        setTemplateData(selected);
         return;
       }
       
-      // Fallback to the default template
-      const defaultTemplate = templates.find(t => t.is_default && t.is_active);
+      // No matching automation_key, fallback to any default
+      const defaultTemplate = activeTemplates.find(t => t.is_default);
       if (defaultTemplate) {
         setSelectedTemplateId(defaultTemplate.id);
         setTemplateData(defaultTemplate);
         return;
       }
       
-      // Final fallback to the first active template, or just first
-      const firstActive = templates.find(t => t.is_active) || templates[0];
+      // Final fallback to the first active template
+      const firstActive = activeTemplates[0] || templates[0];
       setSelectedTemplateId(firstActive.id);
       setTemplateData(firstActive);
     } else {
@@ -300,11 +308,22 @@ export const AutomationRuleEditDialog = ({
 
   const setAsDefaultMutation = useMutation({
     mutationFn: async (templateId: string) => {
-      // First unset all defaults for this message_type
-      await supabase
+      // Get the template we're setting as default to know its automation_key
+      const targetTemplate = templates?.find(t => t.id === templateId);
+      const targetAutomationKey = targetTemplate?.automation_key || rule.automation_key;
+
+      // CRITICAL FIX: Only unset defaults for templates with the SAME (message_type, automation_key)
+      // This prevents breaking other automations that share the same message_type
+      let unsetQuery = supabase
         .from("automated_message_templates")
         .update({ is_default: false })
         .eq("message_type", rule.message_type as any);
+      
+      if (targetAutomationKey) {
+        unsetQuery = unsetQuery.eq("automation_key", targetAutomationKey);
+      }
+      
+      await unsetQuery;
 
       // Then set the new default
       const { error } = await supabase

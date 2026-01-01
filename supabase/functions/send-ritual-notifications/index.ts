@@ -14,6 +14,46 @@ function logStep(step: string, details?: any) {
   console.log(`[SEND-RITUAL-NOTIFICATIONS] ${step}${detailsStr}`);
 }
 
+// Default fallback content
+const DEFAULT_DASHBOARD_SUBJECT = "🌅 Your Daily Smarty Ritual is Ready!";
+const DEFAULT_EMAIL_SUBJECT = "🌅 Good Morning, Smarty!";
+
+function buildDefaultDashboardContent(dayNumber: number): string {
+  return `<p class="tiptap-paragraph"><strong>🌅 Good Morning, Smarty!</strong></p>
+<p class="tiptap-paragraph"></p>
+<p class="tiptap-paragraph">Your Day ${dayNumber} Smarty Ritual is ready!</p>
+<p class="tiptap-paragraph"></p>
+<p class="tiptap-paragraph">Start your day with intention through our three wellness rituals:</p>
+<p class="tiptap-paragraph">☀️ <strong>Morning</strong> - Energize your start</p>
+<p class="tiptap-paragraph">🌤️ <strong>Midday</strong> - Recharge and refocus</p>
+<p class="tiptap-paragraph">🌙 <strong>Evening</strong> - Wind down peacefully</p>
+<p class="tiptap-paragraph"></p>
+<p class="tiptap-paragraph"><a href="https://smartygym.com/daily-ritual">View Today's Ritual →</a></p>`;
+}
+
+function buildDefaultEmailHtml(dayNumber: number, email: string): string {
+  return `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+<h1 style="color: #29B6D2;">🌅 Good Morning, Smarty!</h1>
+<p style="font-size: 16px;">Your <strong>Day ${dayNumber}</strong> Smarty Ritual is ready!</p>
+<p style="color: #666;">Start your day with intention through our three wellness rituals:</p>
+<div style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin: 20px 0;">
+  <p style="margin: 10px 0;">☀️ <strong>Morning</strong> - Energize your start</p>
+  <p style="margin: 10px 0;">🌤️ <strong>Midday</strong> - Recharge and refocus</p>
+  <p style="margin: 10px 0;">🌙 <strong>Evening</strong> - Wind down peacefully</p>
+</div>
+<p style="margin-top: 20px;"><a href="https://smartygym.com/daily-ritual" style="background: #29B6D2; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;">View Today's Ritual →</a></p>
+${getEmailFooter(email, 'ritual')}
+</div>`;
+}
+
+function replacePlaceholders(content: string, replacements: Record<string, string>): string {
+  let result = content;
+  for (const [key, value] of Object.entries(replacements)) {
+    result = result.replace(new RegExp(`\\{${key}\\}`, 'g'), value);
+  }
+  return result;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -35,7 +75,8 @@ serve(async (req) => {
 
     // Get today's date in Cyprus timezone
     const now = new Date();
-    const cyprusOffset = 2;
+    const month = now.getUTCMonth() + 1;
+    const cyprusOffset = (month >= 4 && month <= 10) ? 3 : 2;
     const cyprusTime = new Date(now.getTime() + cyprusOffset * 60 * 60 * 1000);
     const todayStr = cyprusTime.toISOString().split('T')[0];
 
@@ -56,7 +97,10 @@ serve(async (req) => {
       );
     }
 
-    logStep("Ritual found", { dayNumber: todaysRitual.day_number, ritualDate: todaysRitual.ritual_date });
+    const dayNumber = todaysRitual.day_number;
+    const ritualDate = todaysRitual.ritual_date;
+
+    logStep("Ritual found", { dayNumber, ritualDate });
 
     // Check if notification was already sent today
     const todayStart = new Date(cyprusTime.getFullYear(), cyprusTime.getMonth(), cyprusTime.getDate()).toISOString();
@@ -73,6 +117,47 @@ serve(async (req) => {
         JSON.stringify({ success: true, sent: false, reason: "Already sent today" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
       );
+    }
+
+    // FETCH EDITABLE TEMPLATE from automated_message_templates
+    // Look for templates with message_type = 'daily_ritual' or automation_key = 'daily_ritual'
+    const { data: templates } = await supabase
+      .from("automated_message_templates")
+      .select("*")
+      .or("message_type.eq.daily_ritual,automation_key.eq.daily_ritual")
+      .eq("is_active", true)
+      .order("is_default", { ascending: false })
+      .order("updated_at", { ascending: false });
+
+    let template = templates && templates.length > 0 ? (templates.find(t => t.is_default) || templates[0]) : null;
+
+    logStep("Template selection", { 
+      found: !!template, 
+      templateName: template?.template_name,
+      templateId: template?.id
+    });
+
+    // Prepare placeholder replacements
+    const placeholders = {
+      day_number: String(dayNumber),
+      ritual_date: ritualDate,
+    };
+
+    // Build notification content - USE TEMPLATE if available
+    let dashboardSubject: string;
+    let dashboardContent: string;
+    let emailSubject: string;
+
+    if (template) {
+      dashboardSubject = replacePlaceholders(template.dashboard_subject || template.subject || DEFAULT_DASHBOARD_SUBJECT, placeholders);
+      dashboardContent = replacePlaceholders(template.dashboard_content || template.content || buildDefaultDashboardContent(dayNumber), placeholders);
+      emailSubject = replacePlaceholders(template.email_subject || template.subject || DEFAULT_EMAIL_SUBJECT, placeholders);
+      logStep("Using template content", { subject: dashboardSubject });
+    } else {
+      dashboardSubject = `🌅 Day ${dayNumber} Smarty Ritual is Ready!`;
+      dashboardContent = buildDefaultDashboardContent(dayNumber);
+      emailSubject = DEFAULT_EMAIL_SUBJECT;
+      logStep("Using default hardcoded content (no template found)");
     }
 
     // Get all users with their preferences
@@ -94,25 +179,13 @@ serve(async (req) => {
       logStep(`Sending Ritual dashboard notifications to ${usersForDashboard.length} users`);
     }
 
-    const notificationTitle = `🌅 Day ${todaysRitual.day_number} Smarty Ritual is Ready!`;
-    const notificationContent = `<p class="tiptap-paragraph"><strong>🌅 Good Morning, Smarty!</strong></p>
-<p class="tiptap-paragraph"></p>
-<p class="tiptap-paragraph">Your Day ${todaysRitual.day_number} Smarty Ritual is ready!</p>
-<p class="tiptap-paragraph"></p>
-<p class="tiptap-paragraph">Start your day with intention through our three wellness rituals:</p>
-<p class="tiptap-paragraph">☀️ <strong>Morning</strong> - Energize your start</p>
-<p class="tiptap-paragraph">🌤️ <strong>Midday</strong> - Recharge and refocus</p>
-<p class="tiptap-paragraph">🌙 <strong>Evening</strong> - Wind down peacefully</p>
-<p class="tiptap-paragraph"></p>
-<p class="tiptap-paragraph"><a href="https://smartygym.com/daily-ritual">View Today's Ritual →</a></p>`;
-
-    // Insert dashboard notifications only for subscribed users
+    // Insert dashboard notifications
     if (usersForDashboard.length > 0) {
       await supabase.from('user_system_messages').insert(usersForDashboard.map(userId => ({
         user_id: userId,
         message_type: MESSAGE_TYPES.DAILY_RITUAL,
-        subject: notificationTitle,
-        content: notificationContent,
+        subject: dashboardSubject,
+        content: dashboardContent,
         is_read: false,
       })));
 
@@ -130,7 +203,6 @@ serve(async (req) => {
 
       const prefs = profilesMap.get(authUser.id) || {};
 
-      // Check if user has opted out or disabled Ritual emails
       if (prefs.opt_out_all === true || prefs.email_ritual === false) {
         logStep(`Skipping Ritual email for ${authUser.email} (opted out)`);
         emailsSkipped++;
@@ -138,23 +210,22 @@ serve(async (req) => {
       }
 
       try {
+        let emailHtml: string;
+        if (template && template.email_content) {
+          emailHtml = `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+${replacePlaceholders(template.email_content, placeholders)}
+${getEmailFooter(authUser.email, 'ritual')}
+</div>`;
+        } else {
+          emailHtml = buildDefaultEmailHtml(dayNumber, authUser.email);
+        }
+
         const emailResult = await resendClient.emails.send({
           from: 'SmartyGym <notifications@smartygym.com>',
           to: [authUser.email],
-          subject: notificationTitle,
+          subject: emailSubject,
           headers: getEmailHeaders(authUser.email, 'ritual'),
-          html: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-<h1 style="color: #29B6D2;">🌅 Good Morning, Smarty!</h1>
-<p style="font-size: 16px;">Your <strong>Day ${todaysRitual.day_number}</strong> Smarty Ritual is ready!</p>
-<p style="color: #666;">Start your day with intention through our three wellness rituals:</p>
-<div style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin: 20px 0;">
-  <p style="margin: 10px 0;">☀️ <strong>Morning</strong> - Energize your start</p>
-  <p style="margin: 10px 0;">🌤️ <strong>Midday</strong> - Recharge and refocus</p>
-  <p style="margin: 10px 0;">🌙 <strong>Evening</strong> - Wind down peacefully</p>
-</div>
-<p style="margin-top: 20px;"><a href="https://smartygym.com/daily-ritual" style="background: #29B6D2; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;">View Today's Ritual →</a></p>
-${getEmailFooter(authUser.email, 'ritual')}
-</div>`,
+          html: emailHtml,
         });
 
         if (emailResult.error) {
@@ -169,16 +240,20 @@ ${getEmailFooter(authUser.email, 'ritual')}
     }
 
     // Add audit log entry
-    await supabase.from('notification_audit_log').insert({
+    const { error: auditError } = await supabase.from('notification_audit_log').insert({
       notification_type: MESSAGE_TYPES.DAILY_RITUAL,
       message_type: MESSAGE_TYPES.DAILY_RITUAL,
       recipient_count: usersForDashboard.length,
       success_count: emailsSent,
       failed_count: emailsSkipped,
-      subject: notificationTitle,
-      content: `Ritual notification sent - ${emailsSent} emails, ${usersForDashboard.length} dashboard messages`,
+      subject: dashboardSubject,
+      content: `Ritual notification sent - ${emailsSent} emails, ${usersForDashboard.length} dashboard messages. Template: ${template?.template_name || 'default'}`,
       sent_at: new Date().toISOString(),
     });
+
+    if (auditError) {
+      logStep("WARNING: Failed to insert audit log", { error: auditError.message });
+    }
 
     logStep(`✅ Notifications complete: ${usersForDashboard.length} dashboard, ${emailsSent} emails sent`);
 
@@ -188,10 +263,8 @@ ${getEmailFooter(authUser.email, 'ritual')}
         dashboardNotifications: usersForDashboard.length,
         emailsSent,
         emailsSkipped,
-        ritual: {
-          dayNumber: todaysRitual.day_number,
-          date: todaysRitual.ritual_date
-        }
+        templateUsed: template?.template_name || 'default',
+        ritual: { dayNumber, date: ritualDate }
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
     );

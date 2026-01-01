@@ -31,6 +31,23 @@ export const NotificationHistoryManager = () => {
   const [filterType, setFilterType] = useState<string>("all");
   const [selectedLog, setSelectedLog] = useState<NotificationAuditLog | null>(null);
 
+  // Fetch distinct notification types for the filter dropdown
+  const { data: notificationTypes } = useQuery({
+    queryKey: ['notification-types-distinct'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('notification_audit_log')
+        .select('notification_type')
+        .order('notification_type');
+      
+      if (error) throw error;
+      
+      // Get unique types
+      const types = [...new Set(data?.map(d => d.notification_type) || [])];
+      return types;
+    }
+  });
+
   const { data: auditLogs, isLoading } = useQuery({
     queryKey: ['notification-audit-logs', filterType],
     queryFn: async () => {
@@ -81,11 +98,18 @@ export const NotificationHistoryManager = () => {
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'manual': return 'bg-blue-500/10 text-blue-500';
+      case 'wod_notification': return 'bg-orange-500/10 text-orange-500';
+      case 'daily_ritual': return 'bg-purple-500/10 text-purple-500';
+      case 'monday_motivation': return 'bg-pink-500/10 text-pink-500';
       case 'automated': return 'bg-green-500/10 text-green-500';
-      case 'scheduled': return 'bg-purple-500/10 text-purple-500';
+      case 'manual': return 'bg-blue-500/10 text-blue-500';
+      case 'scheduled': return 'bg-indigo-500/10 text-indigo-500';
       default: return 'bg-muted text-muted-foreground';
     }
+  };
+
+  const formatTypeName = (type: string) => {
+    return type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
   };
 
   const getSuccessRate = (log: NotificationAuditLog) => {
@@ -117,14 +141,16 @@ export const NotificationHistoryManager = () => {
               />
             </div>
             <Select value={filterType} onValueChange={setFilterType}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[200px]">
                 <SelectValue placeholder="Filter by type" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="manual">Manual</SelectItem>
-                <SelectItem value="automated">Automated</SelectItem>
-                <SelectItem value="scheduled">Scheduled</SelectItem>
+                {notificationTypes?.map(type => (
+                  <SelectItem key={type} value={type}>
+                    {formatTypeName(type)}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             <Button onClick={exportToCSV} variant="outline" disabled={!filteredLogs?.length}>
@@ -159,11 +185,11 @@ export const NotificationHistoryManager = () => {
                       </TableCell>
                       <TableCell>
                         <Badge className={getTypeColor(log.notification_type)}>
-                          {log.notification_type}
+                          {formatTypeName(log.notification_type)}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">
-                        {log.message_type.replace(/_/g, ' ')}
+                        {formatTypeName(log.message_type)}
                       </TableCell>
                       <TableCell className="max-w-xs truncate">
                         {log.subject}
@@ -222,12 +248,12 @@ export const NotificationHistoryManager = () => {
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Type</p>
                   <Badge className={getTypeColor(selectedLog.notification_type)}>
-                    {selectedLog.notification_type}
+                    {formatTypeName(selectedLog.notification_type)}
                   </Badge>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Message Type</p>
-                  <p className="text-sm">{selectedLog.message_type.replace(/_/g, ' ')}</p>
+                  <p className="text-sm">{formatTypeName(selectedLog.message_type)}</p>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Recipient Filter</p>
