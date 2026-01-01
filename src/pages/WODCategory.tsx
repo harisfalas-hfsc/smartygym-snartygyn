@@ -275,149 +275,67 @@ const WODCategory = () => {
 
               {/* WOD Cards - Training days show 2 cards, Recovery shows 1 */}
               {isRecoveryDay && variousWOD ? (
-                /* Recovery Day - Single Card with consistent layout */
-                <>
-                  {/* Mobile Carousel - consistent with training days */}
-                  <div className="md:hidden">
-                    <Carousel 
-                      opts={{ align: "center", loop: false }}
-                      className="w-full"
-                    >
-                      <CarouselContent className="-ml-2">
-                        <CarouselItem className="pl-2 basis-[92%]">
-                          <Card 
-                            className="group cursor-pointer overflow-hidden hover:shadow-xl transition-all duration-300 hover:border-green-500/60 bg-gradient-to-br from-green-500/5 via-background to-emerald-500/5 border-2 border-green-500/30" 
-                            onClick={() => navigate(`/workout/wod/${variousWOD.id}`)}
-                          >
-                            <div className="relative aspect-[16/10] overflow-hidden">
-                              <img 
-                                src={variousWOD.image_url || "/placeholder.svg"} 
-                                alt={variousWOD.name} 
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                              />
-                              <Badge className="absolute top-3 left-3 bg-green-500 text-white border-0">
-                                <RefreshCw className="w-4 h-4 mr-1" />
-                                Recovery Day
-                              </Badge>
-                              {isNew(variousWOD.created_at) && (
-                                <Badge className="absolute top-3 right-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white border-0">
-                                  NEW
-                                </Badge>
-                              )}
-                              <div className="absolute bottom-3 right-3">
-                                {variousWOD.is_premium ? (
-                                  <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0 shadow-lg">
-                                    <Crown className="w-3 h-3 mr-1" />
-                                    Premium
-                                  </Badge>
-                                ) : (
-                                  <Badge className="bg-gradient-to-r from-blue-500 to-cyan-600 text-white border-0 shadow-lg">
-                                    <Check className="w-3 h-3 mr-1" />
-                                    Free
-                                  </Badge>
-                                )}
-                              </div>
-                            </div>
-                            <CardContent className="p-4">
-                              <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-green-500 transition-colors">
-                                {variousWOD.name}
-                              </h3>
-                              {variousWOD.description && (
-                                <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
-                                  {stripHtml(variousWOD.description)}
-                                </p>
-                              )}
-                              <div className="flex flex-wrap items-center gap-2 mb-4 text-sm">
-                                <Badge variant="outline" className="bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/30">
-                                  <RefreshCw className="w-3 h-3 mr-1" />
-                                  Recovery
-                                </Badge>
-                                <Badge variant="outline" className="text-muted-foreground">
-                                  <Clock className="w-3 h-3 mr-1" />
-                                  {variousWOD.duration || "30-45 min"}
-                                </Badge>
-                                <Badge variant="outline" className="text-muted-foreground">
-                                  All Levels
-                                </Badge>
-                              </div>
-                              <Button className="w-full bg-green-500 hover:bg-green-600">
-                                Start Recovery Session
-                              </Button>
-                            </CardContent>
-                          </Card>
-                        </CarouselItem>
-                      </CarouselContent>
-                    </Carousel>
-                    {/* Single dot indicator for consistency */}
-                    <div className="flex justify-center gap-2 mt-4">
-                      <div className="w-2 h-2 rounded-full bg-green-500" />
+                /* Recovery Day - Single Card */
+                <Card 
+                  className="group cursor-pointer overflow-hidden hover:shadow-xl transition-all duration-300 hover:border-green-500/60 max-w-2xl mx-auto bg-gradient-to-br from-green-500/5 via-background to-emerald-500/5 border-2 border-green-500/30" 
+                  onClick={() => navigate(`/workout/wod/${variousWOD.id}`)}
+                >
+                  <div className="relative aspect-video overflow-hidden">
+                    <img 
+                      src={variousWOD.image_url || "/placeholder.svg"} 
+                      alt={variousWOD.name} 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                    />
+                    <Badge className="absolute top-3 left-3 bg-green-500 text-white border-0">
+                      <RefreshCw className="w-4 h-4 mr-1" />
+                      Recovery Day
+                    </Badge>
+                    {isNew(variousWOD.created_at) && (
+                      <Badge className="absolute top-3 right-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white border-0">
+                        NEW
+                      </Badge>
+                    )}
+                    <div className="absolute bottom-3 right-3">
+                      {variousWOD.is_premium ? (
+                        <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0 shadow-lg">
+                          <Crown className="w-3 h-3 mr-1" />
+                          Premium
+                        </Badge>
+                      ) : (
+                        <Badge className="bg-gradient-to-r from-blue-500 to-cyan-600 text-white border-0 shadow-lg">
+                          <Check className="w-3 h-3 mr-1" />
+                          Free
+                        </Badge>
+                      )}
                     </div>
                   </div>
-                  
-                  {/* Tablet/Desktop - Wider centered card */}
-                  <div className="hidden md:block">
-                    <Card 
-                      className="group cursor-pointer overflow-hidden hover:shadow-xl transition-all duration-300 hover:border-green-500/60 max-w-4xl mx-auto bg-gradient-to-br from-green-500/5 via-background to-emerald-500/5 border-2 border-green-500/30" 
-                      onClick={() => navigate(`/workout/wod/${variousWOD.id}`)}
-                    >
-                      <div className="relative aspect-[16/9] overflow-hidden">
-                        <img 
-                          src={variousWOD.image_url || "/placeholder.svg"} 
-                          alt={variousWOD.name} 
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                        />
-                        <Badge className="absolute top-3 left-3 bg-green-500 text-white border-0">
-                          <RefreshCw className="w-4 h-4 mr-1" />
-                          Recovery Day
-                        </Badge>
-                        {isNew(variousWOD.created_at) && (
-                          <Badge className="absolute top-3 right-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white border-0">
-                            NEW
-                          </Badge>
-                        )}
-                        <div className="absolute bottom-3 right-3">
-                          {variousWOD.is_premium ? (
-                            <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0 shadow-lg">
-                              <Crown className="w-3 h-3 mr-1" />
-                              Premium
-                            </Badge>
-                          ) : (
-                            <Badge className="bg-gradient-to-r from-blue-500 to-cyan-600 text-white border-0 shadow-lg">
-                              <Check className="w-3 h-3 mr-1" />
-                              Free
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                      <CardContent className="p-6">
-                        <h3 className="text-2xl font-bold text-foreground mb-2 group-hover:text-green-500 transition-colors">
-                          {variousWOD.name}
-                        </h3>
-                        {variousWOD.description && (
-                          <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
-                            {stripHtml(variousWOD.description)}
-                          </p>
-                        )}
-                        <div className="flex flex-wrap items-center gap-2 mb-4 text-sm">
-                          <Badge variant="outline" className="bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/30">
-                            <RefreshCw className="w-3 h-3 mr-1" />
-                            Recovery
-                          </Badge>
-                          <Badge variant="outline" className="text-muted-foreground">
-                            <Clock className="w-3 h-3 mr-1" />
-                            {variousWOD.duration || "30-45 min"}
-                          </Badge>
-                          <Badge variant="outline" className="text-muted-foreground">
-                            All Levels
-                          </Badge>
-                        </div>
-                        <Button className="w-full bg-green-500 hover:bg-green-600">
-                          Start Recovery Session
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </>
+                  <CardContent className="p-4 sm:p-6">
+                    <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-2 group-hover:text-green-500 transition-colors">
+                      {variousWOD.name}
+                    </h3>
+                    {variousWOD.description && (
+                      <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
+                        {stripHtml(variousWOD.description)}
+                      </p>
+                    )}
+                    <div className="flex flex-wrap items-center gap-2 mb-4 text-sm">
+                      <Badge variant="outline" className="bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/30">
+                        <RefreshCw className="w-3 h-3 mr-1" />
+                        Recovery
+                      </Badge>
+                      <Badge variant="outline" className="text-muted-foreground">
+                        <Clock className="w-3 h-3 mr-1" />
+                        {variousWOD.duration || "30-45 min"}
+                      </Badge>
+                      <Badge variant="outline" className="text-muted-foreground">
+                        All Levels
+                      </Badge>
+                    </div>
+                    <Button className="w-full bg-green-500 hover:bg-green-600">
+                      Start Recovery Session
+                    </Button>
+                  </CardContent>
+                </Card>
               ) : bodyweightWOD || equipmentWOD ? (
                 <>
                   {/* Mobile Carousel */}
