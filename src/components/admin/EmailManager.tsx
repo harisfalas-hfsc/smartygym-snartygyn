@@ -56,14 +56,7 @@ export const EmailManager = () => {
           </TabsContent>
           
           <TabsContent value="automated">
-            <div className="p-6 text-center border rounded-lg bg-muted/50">
-              <p className="text-muted-foreground mb-4">
-                Automated emails use the same rules as <strong>Auto Messages</strong> in the Communications Center.
-              </p>
-              <p className="text-sm text-muted-foreground">
-                Configure your automation rules in Communications → Auto Messages to manage both dashboard notifications and email delivery.
-              </p>
-            </div>
+            <AutomationRulesManager />
           </TabsContent>
           
           <TabsContent value="scheduled">

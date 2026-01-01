@@ -16,7 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Settings, FileText, Info } from "lucide-react";
+import { Loader2, Settings, FileText, Info, Plus } from "lucide-react";
 
 interface AutomationRule {
   id: string;
@@ -149,6 +149,41 @@ export const AutomationRuleEditDialog = ({
     },
   });
 
+  const createTemplateMutation = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase
+        .from("automated_message_templates")
+        .insert({
+          message_type: rule.message_type as any,
+          template_name: rule.name,
+          subject: `${rule.name} - Notification`,
+          content: `This is the default content for ${rule.name}. Edit this message to customize what users receive.`,
+          is_active: true,
+          is_default: true,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data as MessageTemplate;
+    },
+    onSuccess: (data) => {
+      setTemplateData(data);
+      queryClient.invalidateQueries({ queryKey: ["message-template", rule.message_type] });
+      toast({
+        title: "Template Created",
+        description: "You can now edit the content for this automation",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: `Failed to create template: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -177,7 +212,7 @@ export const AutomationRuleEditDialog = ({
     }
   };
 
-  const isLoading = updateRuleMutation.isPending || updateTemplateMutation.isPending;
+  const isLoading = updateRuleMutation.isPending || updateTemplateMutation.isPending || createTemplateMutation.isPending;
   const hints = placeholderHints[rule.message_type] || placeholderHints.default;
 
   return (
@@ -364,12 +399,25 @@ export const AutomationRuleEditDialog = ({
               ) : (
                 <div className="bg-muted/50 border rounded-lg p-6 text-center">
                   <FileText className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-muted-foreground mb-2">
                     No template found for message type: <code className="bg-background px-1 rounded">{rule.message_type}</code>
                   </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Content for this automation may be generated dynamically.
+                  <p className="text-xs text-muted-foreground mb-4">
+                    Create a template to customize the content for this automation.
                   </p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => createTemplateMutation.mutate()}
+                    disabled={createTemplateMutation.isPending}
+                  >
+                    {createTemplateMutation.isPending ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Plus className="mr-2 h-4 w-4" />
+                    )}
+                    Create Template
+                  </Button>
                 </div>
               )}
             </TabsContent>
