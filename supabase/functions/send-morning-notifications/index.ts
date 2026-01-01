@@ -186,10 +186,11 @@ serve(async (req) => {
     // ============================================
     // PREVENT DUPLICATE NOTIFICATIONS
     // ============================================
+    // Check for existing WOD or ritual audit entries (using constraint-valid types)
     const { data: existingAudit } = await supabase
       .from("notification_audit_log")
       .select("id")
-      .eq("notification_type", "morning_combined")
+      .in("notification_type", ["wod", "daily_ritual"])
       .gte("sent_at", todayStr)
       .lt("sent_at", todayStr + "T23:59:59")
       .limit(1);
@@ -573,7 +574,7 @@ ${getEmailFooter(authUser.email, 'wod')}
     
     if (hasWods) {
       auditEntries.push({
-        notification_type: "morning_combined",
+        notification_type: 'wod', // Use 'wod' which matches the database constraint
         message_type: isRecoveryDay ? "morning_wod_recovery" : "morning_wod",
         subject: wodDashboardSubject,
         content: `WOD: ${category}, ${todaysWods.length} workout(s)`,
@@ -593,7 +594,7 @@ ${getEmailFooter(authUser.email, 'wod')}
 
     if (hasRitual) {
       auditEntries.push({
-        notification_type: "morning_combined",
+        notification_type: 'daily_ritual', // Use 'daily_ritual' which matches the database constraint
         message_type: "morning_ritual",
         subject: ritualDashboardSubject,
         content: `Ritual: Day ${todaysRitual?.day_number}`,

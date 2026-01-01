@@ -287,8 +287,9 @@ ${getEmailFooter(authUser.email, 'wod')}
     }
 
     // Add audit log entry with automation_key for proper history tracking
+    // Use 'wod' which matches the database constraint (not 'wod_notification')
     const { error: auditError } = await supabase.from('notification_audit_log').insert({
-      notification_type: MESSAGE_TYPES.WOD_NOTIFICATION,
+      notification_type: 'wod',
       message_type: MESSAGE_TYPES.WOD_NOTIFICATION,
       recipient_count: usersForDashboard.length,
       success_count: emailsSent,
