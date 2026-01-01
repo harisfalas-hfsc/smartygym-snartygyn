@@ -311,8 +311,13 @@ serve(async (req) => {
       const startDate = new Date(startDateTime);
       const endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // 1 hour duration
 
+      // Detect if this is a completed activity (past event) by checking the emoji prefix
+      const isCompletedActivity = content_name.startsWith('✅') || 
+                                  content_name.startsWith('🏆') || 
+                                  content_name.startsWith('📊');
+
       const calendarEvent = {
-        summary: content_name.startsWith('✅') || content_name.startsWith('🏆') || content_name.startsWith('📊')
+        summary: isCompletedActivity
           ? content_name
           : `🏋️ ${content_name}`,
         description: notes || `SmartyGym ${content_type === 'workout' ? 'Workout' : content_type === 'program' ? 'Program' : 'Activity'}`,
@@ -324,12 +329,15 @@ serve(async (req) => {
           dateTime: endDate.toISOString(),
           timeZone: 'Europe/Nicosia'
         },
-        reminders: {
-          useDefault: false,
-          overrides: [
-            { method: 'popup', minutes: 30 }
-          ]
-        }
+        // Only add reminders for future scheduled events, not completed activities
+        reminders: isCompletedActivity 
+          ? { useDefault: false, overrides: [] }  // No reminders for completed activities
+          : {
+              useDefault: false,
+              overrides: [
+                { method: 'popup', minutes: 30 }
+              ]
+            }
       };
 
       const { id: eventId, error: createError } = await createCalendarEvent(accessToken, calendarEvent);
