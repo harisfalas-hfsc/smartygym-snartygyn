@@ -1820,7 +1820,7 @@ Return JSON with these exact fields:
         .insert({
           id: workoutId,
           name: workoutContent.name,
-          type: format,
+          type: isRecoveryDay ? "recovery" : "WOD",
           category: category,
           format: format,
           equipment: equipment,
