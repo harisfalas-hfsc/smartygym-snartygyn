@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -115,19 +116,30 @@ export const AutomationRuleEditDialog = ({
     enabled: open,
   });
 
-  // Fetch send history for this message_type
+  // Fetch send history for this message_type (also check morning_combined for WOD/ritual)
   const { data: sendHistory } = useQuery({
     queryKey: ["notification-history", rule.message_type],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // For morning templates, also search for morning_combined notification_type
+      const isMorningType = ['morning_wod', 'morning_wod_recovery', 'morning_ritual'].includes(rule.message_type);
+      
+      let query = supabase
         .from("notification_audit_log")
-        .select("id, sent_at, subject, recipient_count, success_count, failed_count")
-        .eq("message_type", rule.message_type)
+        .select("id, sent_at, subject, recipient_count, success_count, failed_count, message_type, notification_type")
         .order("sent_at", { ascending: false })
-        .limit(10);
+        .limit(15);
+      
+      if (isMorningType) {
+        // Search by message_type OR notification_type for morning notifications
+        query = query.or(`message_type.eq.${rule.message_type},notification_type.eq.morning_combined`);
+      } else {
+        query = query.eq("message_type", rule.message_type);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
-      return (data || []) as AuditLogEntry[];
+      return (data || []).slice(0, 10) as AuditLogEntry[];
     },
     enabled: open && activeTab === "history",
   });
@@ -215,30 +227,29 @@ export const AutomationRuleEditDialog = ({
 
   const createTemplateMutation = useMutation({
     mutationFn: async () => {
-      // Find existing default to copy content from
+      // Find existing default to copy content from (so user never starts from scratch)
       const existingDefault = templates?.find(t => t.is_default);
-      const defaultSubject = existingDefault?.subject || `${rule.name} - Notification`;
-      const defaultContent = existingDefault?.content || `This is the default content for ${rule.name}. Edit this message to customize what users receive.`;
+      const copySubject = existingDefault?.subject || `${rule.name} - Notification`;
+      const copyContent = existingDefault?.content || `Content for ${rule.name}. Edit to customize.`;
+      const copyDashboardSubject = existingDefault?.dashboard_subject || copySubject;
+      const copyDashboardContent = existingDefault?.dashboard_content || copyContent;
+      const copyEmailSubject = existingDefault?.email_subject || copySubject;
+      const copyEmailContent = existingDefault?.email_content || copyContent;
 
-      // First, unset any existing defaults for this message_type
-      await supabase
-        .from("automated_message_templates")
-        .update({ is_default: false })
-        .eq("message_type", rule.message_type as any);
-
+      // Create as DRAFT: NOT active, NOT default - user must explicitly save and activate
       const { data, error } = await supabase
         .from("automated_message_templates")
         .insert({
           message_type: rule.message_type as any,
-          template_name: rule.name,
-          subject: defaultSubject,
-          content: defaultContent,
-          dashboard_subject: defaultSubject,
-          dashboard_content: defaultContent,
-          email_subject: defaultSubject,
-          email_content: defaultContent,
-          is_active: true,
-          is_default: true,
+          template_name: `${rule.name} (Draft)`,
+          subject: copySubject,
+          content: copyContent,
+          dashboard_subject: copyDashboardSubject,
+          dashboard_content: copyDashboardContent,
+          email_subject: copyEmailSubject,
+          email_content: copyEmailContent,
+          is_active: false,  // DRAFT - not active
+          is_default: false, // DRAFT - not default
         })
         .select()
         .single();
@@ -251,8 +262,8 @@ export const AutomationRuleEditDialog = ({
       setSelectedTemplateId(data.id);
       queryClient.invalidateQueries({ queryKey: ["message-templates-list", rule.message_type] });
       toast({
-        title: "Template Created",
-        description: "You can now edit the content for this automation",
+        title: "Draft Template Created",
+        description: "Edit the content, then click 'Set as Default' to make it live.",
       });
     },
     onError: (error: any) => {
@@ -620,12 +631,9 @@ export const AutomationRuleEditDialog = ({
                     <Label htmlFor="content">
                       {contentChannel === "email" ? "Email Content" : "Message Content"}
                     </Label>
-                    <Textarea
-                      id="content"
+                    <RichTextEditor
                       value={getCurrentContent()}
-                      onChange={(e) => updateChannelContent("content", e.target.value)}
-                      rows={12}
-                      className="font-mono text-sm"
+                      onChange={(value) => updateChannelContent("content", value)}
                       placeholder={contentChannel === "email" 
                         ? "Email content (supports HTML formatting)" 
                         : "Dashboard message content"
@@ -633,7 +641,7 @@ export const AutomationRuleEditDialog = ({
                     />
                     <p className="text-xs text-muted-foreground">
                       {contentChannel === "email" 
-                        ? "HTML formatting is supported for emails." 
+                        ? "Rich formatting is supported for emails." 
                         : "This content appears in the user's dashboard notification panel."
                       }
                     </p>
@@ -659,8 +667,11 @@ export const AutomationRuleEditDialog = ({
                     ) : (
                       <Plus className="mr-2 h-4 w-4" />
                     )}
-                    Create Template
+                    Create Draft Template
                   </Button>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    A draft will be created. Edit it, then use "Set as Default" to activate.
+                  </p>
                 </div>
               )}
             </TabsContent>
