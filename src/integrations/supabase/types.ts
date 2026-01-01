@@ -364,6 +364,7 @@ export type Database = {
       }
       automated_message_templates: {
         Row: {
+          automation_key: string | null
           content: string
           created_at: string | null
           dashboard_content: string | null
@@ -387,6 +388,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          automation_key?: string | null
           content: string
           created_at?: string | null
           dashboard_content?: string | null
@@ -410,6 +412,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          automation_key?: string | null
           content?: string
           created_at?: string | null
           dashboard_content?: string | null

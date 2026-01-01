@@ -51,6 +51,7 @@ interface MessageTemplate {
   content: string;
   is_active: boolean;
   is_default: boolean;
+  automation_key?: string;
   dashboard_subject?: string;
   dashboard_content?: string;
   email_subject?: string;
@@ -144,18 +145,38 @@ export const AutomationRuleEditDialog = ({
     enabled: open && activeTab === "history",
   });
 
-  // Auto-select the default template when templates load
+  // Auto-select the correct template when templates load
+  // Priority: 1) match automation_key, 2) is_default, 3) first available
   useEffect(() => {
     if (templates && templates.length > 0) {
-      // Find the default template, or fallback to most recent
-      const defaultTemplate = templates.find(t => t.is_default) || templates[0];
-      setSelectedTemplateId(defaultTemplate.id);
-      setTemplateData(defaultTemplate);
+      // First try to find a template that matches the rule's automation_key
+      const matchByAutomationKey = templates.find(t => 
+        t.automation_key === rule.automation_key && t.is_active
+      );
+      
+      if (matchByAutomationKey) {
+        setSelectedTemplateId(matchByAutomationKey.id);
+        setTemplateData(matchByAutomationKey);
+        return;
+      }
+      
+      // Fallback to the default template
+      const defaultTemplate = templates.find(t => t.is_default && t.is_active);
+      if (defaultTemplate) {
+        setSelectedTemplateId(defaultTemplate.id);
+        setTemplateData(defaultTemplate);
+        return;
+      }
+      
+      // Final fallback to the first active template, or just first
+      const firstActive = templates.find(t => t.is_active) || templates[0];
+      setSelectedTemplateId(firstActive.id);
+      setTemplateData(firstActive);
     } else {
       setSelectedTemplateId(null);
       setTemplateData(null);
     }
-  }, [templates]);
+  }, [templates, rule.automation_key]);
 
   // Update templateData when selection changes
   useEffect(() => {
@@ -237,6 +258,7 @@ export const AutomationRuleEditDialog = ({
       const copyEmailContent = existingDefault?.email_content || copyContent;
 
       // Create as DRAFT: NOT active, NOT default - user must explicitly save and activate
+      // Link to this rule's automation_key for deterministic selection
       const { data, error } = await supabase
         .from("automated_message_templates")
         .insert({
@@ -248,6 +270,7 @@ export const AutomationRuleEditDialog = ({
           dashboard_content: copyDashboardContent,
           email_subject: copyEmailSubject,
           email_content: copyEmailContent,
+          automation_key: rule.automation_key, // Link to this rule
           is_active: false,  // DRAFT - not active
           is_default: false, // DRAFT - not default
         })
@@ -530,6 +553,15 @@ export const AutomationRuleEditDialog = ({
                 </div>
               ) : templates && templates.length > 0 && templateData ? (
                 <>
+                  {/* Context header showing which rule/template is being edited */}
+                  <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 text-sm">
+                    <div className="grid grid-cols-2 gap-2 text-muted-foreground">
+                      <div><span className="font-medium text-foreground">Rule:</span> {rule.name}</div>
+                      <div><span className="font-medium text-foreground">Template:</span> {templateData.template_name}</div>
+                      <div><span className="font-medium text-foreground">Message Type:</span> <code className="bg-background px-1 rounded text-xs">{rule.message_type}</code></div>
+                      <div><span className="font-medium text-foreground">Key:</span> <code className="bg-background px-1 rounded text-xs">{rule.automation_key}</code></div>
+                    </div>
+                  </div>
                   {/* Template selector if multiple exist */}
                   {templates.length > 1 && (
                     <div className="space-y-2">
