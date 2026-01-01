@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Dialog,
@@ -14,29 +14,26 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
 import { format, addDays } from "date-fns";
-import { CalendarIcon, Clock, Pause, Play, AlertCircle } from "lucide-react";
+import { CalendarIcon, Clock, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { CronTimeInput } from "./CronTimeInput";
+import { utcToCyprus, cyprusToUtc } from "@/lib/cyprusDate";
 
 interface WODAutoGenConfigDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-const HOUR_OPTIONS = Array.from({ length: 24 }, (_, i) => ({
-  value: i.toString(),
-  label: `${i.toString().padStart(2, '0')}:00 UTC`,
-  cyprusTime: `${((i + 2) % 24).toString().padStart(2, '0')}:00 Cyprus`
-}));
-
 export const WODAutoGenConfigDialog = ({ open, onOpenChange }: WODAutoGenConfigDialogProps) => {
   const queryClient = useQueryClient();
   
+  // Store time in Cyprus timezone for the UI
   const [isEnabled, setIsEnabled] = useState(true);
-  const [generationHour, setGenerationHour] = useState("3");
+  const [cyprusHour, setCyprusHour] = useState(0); // 00:30 Cyprus = 22:30 UTC
+  const [cyprusMinute, setCyprusMinute] = useState(30);
   const [pauseMode, setPauseMode] = useState<"none" | "tomorrow" | "days" | "indefinite">("none");
   const [pauseUntilDate, setPauseUntilDate] = useState<Date | undefined>(undefined);
   const [isSaving, setIsSaving] = useState(false);
@@ -56,11 +53,16 @@ export const WODAutoGenConfigDialog = ({ open, onOpenChange }: WODAutoGenConfigD
     },
   });
 
-  // Initialize form from config
+  // Initialize form from config (convert UTC to Cyprus)
   useEffect(() => {
     if (config) {
       setIsEnabled(config.is_enabled);
-      setGenerationHour(config.generation_hour_utc.toString());
+      
+      // Convert stored UTC time to Cyprus time for display
+      const utcHour = config.generation_hour_utc ?? 22;
+      const utcMinute = (config as any).generation_minute_utc ?? 30;
+      setCyprusHour(utcToCyprus(utcHour));
+      setCyprusMinute(utcMinute);
       
       if (config.paused_until) {
         const pausedDate = new Date(config.paused_until);
@@ -103,23 +105,28 @@ export const WODAutoGenConfigDialog = ({ open, onOpenChange }: WODAutoGenConfigD
         pauseReason = "indefinite";
       }
 
+      // Convert Cyprus time to UTC for storage
+      const utcHour = cyprusToUtc(cyprusHour);
+
       // Update config in database
       const { error: configError } = await supabase
         .from("wod_auto_generation_config")
         .update({
           is_enabled: enabled,
-          generation_hour_utc: parseInt(generationHour),
+          generation_hour_utc: utcHour,
+          generation_minute_utc: cyprusMinute,
           paused_until: pausedUntil,
           pause_reason: pauseReason,
-        })
+        } as any)
         .eq("id", config?.id);
 
       if (configError) throw configError;
 
-      // Update the cron job time if enabled and time changed
+      // Update the cron job time if enabled and not paused
       if (enabled && pauseMode === "none") {
         const { error: cronError } = await supabase.rpc("update_wod_cron_schedule", {
-          new_hour: parseInt(generationHour),
+          new_hour: utcHour,
+          new_minute: cyprusMinute,
         });
 
         if (cronError) {
@@ -128,15 +135,19 @@ export const WODAutoGenConfigDialog = ({ open, onOpenChange }: WODAutoGenConfigD
         }
       }
 
+      const utcTimeStr = `${utcHour.toString().padStart(2, '0')}:${cyprusMinute.toString().padStart(2, '0')}`;
+      const cyprusTimeStr = `${cyprusHour.toString().padStart(2, '0')}:${cyprusMinute.toString().padStart(2, '0')}`;
+
       toast.success("WOD auto-generation settings saved", {
         description: enabled && pauseMode === "none" 
-          ? `Generation scheduled at ${generationHour.padStart(2, '0')}:00 UTC daily`
+          ? `Generation scheduled at ${cyprusTimeStr} Cyprus (${utcTimeStr} UTC)`
           : pauseMode === "indefinite" 
             ? "Auto-generation disabled until manually resumed"
-            : `Paused until ${pauseReason}`,
+            : `Paused: ${pauseReason}`,
       });
 
       queryClient.invalidateQueries({ queryKey: ["wod-auto-gen-config"] });
+      queryClient.invalidateQueries({ queryKey: ["cron-jobs"] });
       onOpenChange(false);
     } catch (error: any) {
       console.error("Error saving WOD config:", error);
@@ -189,28 +200,15 @@ export const WODAutoGenConfigDialog = ({ open, onOpenChange }: WODAutoGenConfigD
               />
             </div>
 
-            {/* Generation Time */}
-            <div className="space-y-2">
-              <Label>Generation Time</Label>
-              <Select value={generationHour} onValueChange={setGenerationHour}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent side="bottom" align="start" className="max-h-60">
-                  {HOUR_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      <span className="flex items-center justify-between gap-4">
-                        <span>{option.label}</span>
-                        <span className="text-xs text-muted-foreground">{option.cyprusTime}</span>
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-muted-foreground">
-                WOD will be generated daily at this time
-              </p>
-            </div>
+            {/* Generation Time - Using CronTimeInput for proper hour+minute */}
+            <CronTimeInput
+              hour={cyprusHour}
+              minute={cyprusMinute}
+              onHourChange={setCyprusHour}
+              onMinuteChange={setCyprusMinute}
+              label="Generation Time"
+              showTimezonePreview={true}
+            />
 
             {/* Pause Options */}
             <div className="space-y-3">

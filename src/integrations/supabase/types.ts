@@ -2520,6 +2520,7 @@ export type Database = {
         Row: {
           created_at: string
           generation_hour_utc: number
+          generation_minute_utc: number
           id: string
           is_enabled: boolean
           pause_reason: string | null
@@ -2529,6 +2530,7 @@ export type Database = {
         Insert: {
           created_at?: string
           generation_hour_utc?: number
+          generation_minute_utc?: number
           id?: string
           is_enabled?: boolean
           pause_reason?: string | null
@@ -2538,6 +2540,7 @@ export type Database = {
         Update: {
           created_at?: string
           generation_hour_utc?: number
+          generation_minute_utc?: number
           id?: string
           is_enabled?: boolean
           pause_reason?: string | null
@@ -2798,7 +2801,9 @@ export type Database = {
       }
       is_user_banned: { Args: { user_id_param: string }; Returns: boolean }
       pg_cron_enabled: { Args: never; Returns: boolean }
-      update_wod_cron_schedule: { Args: { new_hour: number }; Returns: Json }
+      update_wod_cron_schedule:
+        | { Args: { new_hour: number }; Returns: Json }
+        | { Args: { new_hour: number; new_minute?: number }; Returns: Json }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"

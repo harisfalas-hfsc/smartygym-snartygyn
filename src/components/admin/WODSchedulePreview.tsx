@@ -17,6 +17,7 @@ import {
   getPeriodizationForDay,
   getDifficultyBadgeClass
 } from "@/lib/wodCycle";
+import { utcToCyprus } from "@/lib/cyprusDate";
 
 export const WODSchedulePreview = () => {
   const queryClient = useQueryClient();
@@ -32,6 +33,21 @@ export const WODSchedulePreview = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("workout_of_day_state")
+        .select("*")
+        .limit(1)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Fetch WOD auto-generation config for schedule time
+  const { data: wodConfig } = useQuery({
+    queryKey: ["wod-auto-gen-config"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("wod_auto_generation_config")
         .select("*")
         .limit(1)
         .single();
@@ -266,7 +282,12 @@ export const WODSchedulePreview = () => {
           
           <p className="text-xs text-muted-foreground pt-2">
             <Clock className="h-3 w-3 inline mr-1" />
-            WODs generate daily at 00:30 UTC. Overrides are applied during generation. Showing first 14 days.
+            {(() => {
+              const utcHour = wodConfig?.generation_hour_utc ?? 22;
+              const utcMinute = (wodConfig as any)?.generation_minute_utc ?? 30;
+              const cyprusHour = utcToCyprus(utcHour);
+              return `WODs generate daily at ${cyprusHour.toString().padStart(2, '0')}:${utcMinute.toString().padStart(2, '0')} Cyprus (${utcHour.toString().padStart(2, '0')}:${utcMinute.toString().padStart(2, '0')} UTC)`;
+            })()}. Overrides are applied during generation. Showing first 14 days.
           </p>
         </CardContent>
       </Card>

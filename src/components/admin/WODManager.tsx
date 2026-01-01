@@ -16,7 +16,7 @@ import { WorkoutEditDialog } from "./WorkoutEditDialog";
 import { GenerateWODDialog } from "./GenerateWODDialog";
 import { WODAutoGenConfigDialog } from "./WODAutoGenConfigDialog";
 import { getWODInfoForDate, getDayIn84Cycle, getCategoryForDay } from "@/lib/wodCycle";
-import { getCyprusTodayStr } from "@/lib/cyprusDate";
+import { getCyprusTodayStr, utcToCyprus } from "@/lib/cyprusDate";
 
 export const WODManager = () => {
   // 🏥 DIAGNOSTIC: v3 - Health Check button should be visible
@@ -53,14 +53,14 @@ export const WODManager = () => {
     },
   });
 
-  // Fetch total WOD count from admin_workouts
+  // Fetch total WOD count from admin_workouts - count ALL WODs ever generated (by id pattern)
   const { data: totalWodCount } = useQuery({
     queryKey: ["total-wod-count"],
     queryFn: async () => {
       const { count, error } = await supabase
         .from("admin_workouts")
         .select("*", { count: "exact", head: true })
-        .eq("is_workout_of_day", true);
+        .like("id", "WOD-%");
       
       if (error) throw error;
       return count || 0;
@@ -116,6 +116,33 @@ export const WODManager = () => {
       return data;
     },
   });
+
+  // Fetch cron job metadata for schedule consistency check
+  const { data: cronJobMetadata } = useQuery({
+    queryKey: ["cron-job-generate-wod"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("cron_job_metadata")
+        .select("schedule, is_active")
+        .eq("job_name", "generate-workout-of-day")
+        .single();
+      
+      if (error) {
+        console.error("Error fetching cron job metadata:", error);
+        return null;
+      }
+      return data;
+    },
+  });
+
+  // Check if schedule is out of sync
+  const isScheduleOutOfSync = (() => {
+    if (!wodAutoGenConfig || !cronJobMetadata?.schedule) return false;
+    const configHour = wodAutoGenConfig.generation_hour_utc ?? 22;
+    const configMinute = (wodAutoGenConfig as any).generation_minute_utc ?? 30;
+    const expectedCron = `${configMinute} ${configHour} * * *`;
+    return cronJobMetadata.schedule !== expectedCron;
+  })();
 
   // Archive current WODs
   const handleArchiveCurrentWODs = async () => {
@@ -295,14 +322,13 @@ export const WODManager = () => {
       } else if (!todayWods || todayWods.length === 0) {
         // Get dynamic generation time from config
         const genHour = wodAutoGenConfig?.generation_hour_utc ?? 22;
-        const genMinute = 30;
-        // Approximate Cyprus time (UTC+2 winter, UTC+3 summer)
-        const cyprusHour = (genHour + 2) % 24;
+        const genMinute = (wodAutoGenConfig as any)?.generation_minute_utc ?? 30;
+        const cyprusHour = utcToCyprus(genHour);
         const isRecovery = expectedInfo.category === "RECOVERY";
         const expectedCount = isRecovery ? 1 : 2;
         issues.push({
           issue: `No WODs found for today (${today} Cyprus)`,
-          reason: `The automatic generation at ${genHour}:${genMinute.toString().padStart(2, '0')} UTC (${cyprusHour.toString().padStart(2, '0')}:${genMinute.toString().padStart(2, '0')} Cyprus) may have failed, or workouts were created but not correctly tagged with is_workout_of_day=true and generated_for_date='${today}'.`,
+          reason: `The automatic generation at ${genHour.toString().padStart(2, '0')}:${genMinute.toString().padStart(2, '0')} UTC (${cyprusHour.toString().padStart(2, '0')}:${genMinute.toString().padStart(2, '0')} Cyprus) may have failed, or workouts were created but not correctly tagged with is_workout_of_day=true and generated_for_date='${today}'.`,
           solution: "Click 'Generate New WOD' → select 'Generate for Today' to create today's workout manually."
         });
       } else {
@@ -665,7 +691,12 @@ export const WODManager = () => {
             Workout of the Day Management
           </h3>
           <p className="text-sm text-muted-foreground">
-            Generate, edit, and manage daily workouts. WODs auto-generate at {wodAutoGenConfig?.generation_hour_utc ?? 22}:30 UTC ({((wodAutoGenConfig?.generation_hour_utc ?? 22) + 2) % 24}:30 Cyprus).
+            {(() => {
+              const utcHour = wodAutoGenConfig?.generation_hour_utc ?? 22;
+              const utcMinute = (wodAutoGenConfig as any)?.generation_minute_utc ?? 30;
+              const cyprusHour = utcToCyprus(utcHour);
+              return `Generate, edit, and manage daily workouts. WODs auto-generate at ${cyprusHour.toString().padStart(2, '0')}:${utcMinute.toString().padStart(2, '0')} Cyprus (${utcHour.toString().padStart(2, '0')}:${utcMinute.toString().padStart(2, '0')} UTC).`;
+            })()}
           </p>
         </div>
         
@@ -786,6 +817,22 @@ export const WODManager = () => {
         </div>
       </div>
 
+      {/* Schedule Consistency Warning */}
+      {isScheduleOutOfSync && (
+        <div className="flex items-center gap-3 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+          <AlertTriangle className="h-5 w-5 text-yellow-500 shrink-0" />
+          <div className="flex-1">
+            <p className="text-sm font-medium text-yellow-500">Schedule Out of Sync</p>
+            <p className="text-xs text-muted-foreground">
+              The cron scheduler and config are showing different times. Click "Schedule" to fix.
+            </p>
+          </div>
+          <Button variant="outline" size="sm" onClick={() => setCronDialogOpen(true)}>
+            Fix Now
+          </Button>
+        </div>
+      )}
+
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Generated */}
@@ -874,7 +921,11 @@ export const WODManager = () => {
                   <div className="h-2 w-2 rounded-full bg-orange-500" />
                 )}
                 <p className="text-sm font-medium">
-                  {wodAutoGenConfig?.generation_hour_utc?.toString().padStart(2, '0') || '03'}:00 UTC
+                  {(() => {
+                    const utcHour = wodAutoGenConfig?.generation_hour_utc ?? 22;
+                    const utcMinute = (wodAutoGenConfig as any)?.generation_minute_utc ?? 30;
+                    return `${utcHour.toString().padStart(2, '0')}:${utcMinute.toString().padStart(2, '0')} UTC`;
+                  })()}
                 </p>
               </div>
               <Button 
@@ -887,8 +938,12 @@ export const WODManager = () => {
               </Button>
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {((wodAutoGenConfig?.generation_hour_utc || 3) + 2) % 24 < 10 ? '0' : ''}
-              {((wodAutoGenConfig?.generation_hour_utc || 3) + 2) % 24}:00 Cyprus
+              {(() => {
+                const utcHour = wodAutoGenConfig?.generation_hour_utc ?? 22;
+                const utcMinute = (wodAutoGenConfig as any)?.generation_minute_utc ?? 30;
+                const cyprusHour = utcToCyprus(utcHour);
+                return `${cyprusHour.toString().padStart(2, '0')}:${utcMinute.toString().padStart(2, '0')} Cyprus`;
+              })()}
             </p>
             {wodAutoGenConfig?.paused_until && (
               <p className="text-xs text-orange-500 mt-1">
