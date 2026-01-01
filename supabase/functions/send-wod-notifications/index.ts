@@ -286,7 +286,7 @@ ${getEmailFooter(authUser.email, 'wod')}
       }
     }
 
-    // Add audit log entry
+    // Add audit log entry with automation_key for proper history tracking
     const { error: auditError } = await supabase.from('notification_audit_log').insert({
       notification_type: MESSAGE_TYPES.WOD_NOTIFICATION,
       message_type: MESSAGE_TYPES.WOD_NOTIFICATION,
@@ -296,6 +296,12 @@ ${getEmailFooter(authUser.email, 'wod')}
       subject: dashboardSubject,
       content: `WOD notification sent - ${emailsSent} emails, ${usersForDashboard.length} dashboard messages. Template: ${template?.template_name || 'default'}`,
       sent_at: new Date().toISOString(),
+      metadata: {
+        automation_key: 'morning_wod_notification',
+        template_id: template?.id || null,
+        template_name: template?.template_name || 'default',
+        wods: { bodyweight: bodyweightName, equipment: equipmentName, category, format }
+      }
     });
 
     if (auditError) {

@@ -239,7 +239,7 @@ ${getEmailFooter(authUser.email, 'ritual')}
       }
     }
 
-    // Add audit log entry
+    // Add audit log entry with automation_key for proper history tracking
     const { error: auditError } = await supabase.from('notification_audit_log').insert({
       notification_type: MESSAGE_TYPES.DAILY_RITUAL,
       message_type: MESSAGE_TYPES.DAILY_RITUAL,
@@ -249,6 +249,12 @@ ${getEmailFooter(authUser.email, 'ritual')}
       subject: dashboardSubject,
       content: `Ritual notification sent - ${emailsSent} emails, ${usersForDashboard.length} dashboard messages. Template: ${template?.template_name || 'default'}`,
       sent_at: new Date().toISOString(),
+      metadata: {
+        automation_key: 'morning_ritual_notification',
+        template_id: template?.id || null,
+        template_name: template?.template_name || 'default',
+        ritual: { dayNumber, date: ritualDate }
+      }
     });
 
     if (auditError) {
