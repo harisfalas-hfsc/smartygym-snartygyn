@@ -329,7 +329,7 @@ const IndividualWorkout = () => {
                 title={dbWorkout.name}
                 serial={dbWorkout.id}
                 focus={getCategoryLabel(dbWorkout.category)}
-                difficulty={dbWorkout.difficulty_stars || 3}
+                difficulty={dbWorkout.difficulty_stars ?? 0}
                 workoutType={dbWorkout.format}
                 imageUrl={dbWorkout.image_url}
                 duration={dbWorkout.duration}
