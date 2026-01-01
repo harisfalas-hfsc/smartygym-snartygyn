@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
-import { Flame, Play, RefreshCw, Calendar, Dumbbell, Star, TrendingUp, Clock, ExternalLink, ImageIcon, BookOpen, Edit, Settings, HeartPulse, CheckCircle, AlertTriangle, XCircle, Archive, Bell } from "lucide-react";
+import { Flame, Play, RefreshCw, Calendar, Dumbbell, Star, TrendingUp, Clock, ExternalLink, ImageIcon, BookOpen, Edit, Settings, HeartPulse, CheckCircle, AlertTriangle, XCircle, Archive, Bell, Rocket } from "lucide-react";
 import { format, addDays } from "date-fns";
 import { WODSchedulePreview } from "./WODSchedulePreview";
 import { PeriodizationSystemDialog } from "./PeriodizationSystemDialog";
@@ -25,6 +25,7 @@ export const WODManager = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSyncingImages, setIsSyncingImages] = useState(false);
   const [isRunningHealthCheck, setIsRunningHealthCheck] = useState(false);
+  const [isCheckingTomorrow, setIsCheckingTomorrow] = useState(false);
   const [isArchiving, setIsArchiving] = useState(false);
   const [isSendingNotifications, setIsSendingNotifications] = useState(false);
   const [periodizationDialogOpen, setPeriodizationDialogOpen] = useState(false);
@@ -488,6 +489,129 @@ export const WODManager = () => {
     }
   };
 
+  // Tomorrow Readiness Check: Verify system is ready for tomorrow's WOD generation
+  const handleTomorrowReadinessCheck = async () => {
+    setIsCheckingTomorrow(true);
+    try {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const tomorrowStr = format(tomorrow, "yyyy-MM-dd");
+      const tomorrowInfo = getWODInfoForDate(tomorrowStr);
+      const issues: string[] = [];
+      const ready: string[] = [];
+
+      // Check 1: Cron job is active
+      const { data: cronData } = await supabase
+        .from("cron_job_metadata")
+        .select("is_active, schedule")
+        .eq("job_name", "generate-workout-of-day")
+        .single();
+
+      if (cronData?.is_active) {
+        ready.push("✅ WOD generation cron job is active");
+      } else {
+        issues.push("❌ WOD generation cron job is NOT active");
+      }
+
+      // Check 2: Archive job is active
+      const { data: archiveCron } = await supabase
+        .from("cron_job_metadata")
+        .select("is_active")
+        .ilike("job_name", "%archive%")
+        .limit(1);
+
+      if (archiveCron && archiveCron.length > 0 && archiveCron[0].is_active) {
+        ready.push("✅ Archive job is active");
+      } else {
+        issues.push("⚠️ No active archive job found");
+      }
+
+      // Check 3: Morning notifications job is active
+      const { data: notifCron } = await supabase
+        .from("cron_job_metadata")
+        .select("is_active")
+        .eq("job_name", "send-morning-notifications-job")
+        .single();
+
+      if (notifCron?.is_active) {
+        ready.push("✅ Morning notifications job is active");
+      } else {
+        issues.push("⚠️ Morning notifications job is NOT active");
+      }
+
+      // Check 4: Expected periodization for tomorrow
+      const isRecovery = tomorrowInfo.category === "RECOVERY";
+      const expectedCount = isRecovery ? 1 : 2;
+      ready.push(`📅 Tomorrow (${tomorrowStr}): ${tomorrowInfo.category} - expect ${expectedCount} WOD(s)`);
+
+      // Check 5: Recent generation runs (last 3 days)
+      const { data: recentRuns } = await supabase
+        .from("wod_generation_runs")
+        .select("cyprus_date, status, found_count, expected_count")
+        .order("created_at", { ascending: false })
+        .limit(3);
+
+      if (recentRuns && recentRuns.length > 0) {
+        const successRuns = recentRuns.filter(r => r.status === "success").length;
+        const failedRuns = recentRuns.filter(r => r.status === "failed").length;
+        if (failedRuns > 0) {
+          issues.push(`⚠️ ${failedRuns} of last ${recentRuns.length} generation runs failed`);
+        } else {
+          ready.push(`✅ Last ${recentRuns.length} generation runs successful`);
+        }
+      } else {
+        ready.push("ℹ️ No recent generation run logs (new feature)");
+      }
+
+      // Check 6: Today's WOD exists (yesterday's generation worked)
+      const todayStr = getCyprusTodayStr();
+      const { data: todayWods } = await supabase
+        .from("admin_workouts")
+        .select("id")
+        .eq("generated_for_date", todayStr)
+        .eq("is_workout_of_day", true);
+
+      const todayInfo = getWODInfoForDate(todayStr);
+      const todayExpected = todayInfo.category === "RECOVERY" ? 1 : 2;
+
+      if (todayWods && todayWods.length >= todayExpected) {
+        ready.push(`✅ Today's WOD exists (${todayWods.length} workout${todayWods.length > 1 ? 's' : ''})`);
+      } else {
+        issues.push(`❌ Today's WOD missing or incomplete (${todayWods?.length || 0}/${todayExpected})`);
+      }
+
+      // Display results
+      const message = [...ready, ...issues].join("\n");
+      
+      if (issues.length === 0) {
+        toast.success("Tomorrow Readiness: ALL SYSTEMS GO! ✅", {
+          description: `${tomorrowInfo.category} WOD will generate tonight`,
+          duration: 6000,
+        });
+      } else {
+        toast.warning(`Tomorrow Readiness: ${issues.length} issue(s)`, {
+          description: issues[0],
+          duration: 8000,
+        });
+      }
+
+      console.log("=== TOMORROW READINESS CHECK ===");
+      console.log(message);
+      
+      if (issues.length > 0) {
+        alert(`Tomorrow Readiness Check:\n\n${message}`);
+      }
+
+    } catch (error: any) {
+      console.error("Tomorrow readiness check error:", error);
+      toast.error("Readiness check failed", {
+        description: error.message || "Please try again",
+      });
+    } finally {
+      setIsCheckingTomorrow(false);
+    }
+  };
+
   // Get tomorrow's category using 84-day cycle
   const getTomorrowCategory = () => {
     const tomorrow = new Date();
@@ -558,6 +682,20 @@ export const WODManager = () => {
               <HeartPulse className="h-4 w-4 text-green-500" />
             )}
             {isRunningHealthCheck ? "Checking..." : "WOD Health Check"}
+          </Button>
+
+          <Button 
+            variant="outline"
+            className="flex items-center gap-2 border-purple-500"
+            disabled={isCheckingTomorrow}
+            onClick={handleTomorrowReadinessCheck}
+          >
+            {isCheckingTomorrow ? (
+              <RefreshCw className="h-4 w-4 animate-spin" />
+            ) : (
+              <Rocket className="h-4 w-4 text-purple-500" />
+            )}
+            {isCheckingTomorrow ? "Checking..." : "Tomorrow Ready?"}
           </Button>
           
           <Button 

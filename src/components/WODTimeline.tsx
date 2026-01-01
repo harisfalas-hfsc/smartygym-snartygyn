@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ChevronLeft, ChevronRight, Star } from "lucide-react";
-import { format, subDays, addDays } from "date-fns";
+import { format, subDays, addDays, parseISO } from "date-fns";
 import {
   getWODInfoForDate,
   getDifficultyBadgeClass,
@@ -11,22 +11,38 @@ import {
   starsToLevel,
   FORMATS_BY_CATEGORY
 } from "@/lib/wodCycle";
+import { getCyprusTodayStr } from "@/lib/cyprusDate";
+
+/**
+ * Helper to get Cyprus date strings for yesterday/today/tomorrow
+ * Uses the shared Cyprus timezone utility for consistency
+ */
+const getCyprusDateStrings = () => {
+  const todayStr = getCyprusTodayStr(); // YYYY-MM-DD in Cyprus timezone
+  const today = parseISO(todayStr);
+  const yesterday = subDays(today, 1);
+  const tomorrow = addDays(today, 1);
+  
+  return {
+    yesterdayStr: format(yesterday, "yyyy-MM-dd"),
+    todayStr,
+    tomorrowStr: format(tomorrow, "yyyy-MM-dd"),
+    yesterdayDisplay: format(yesterday, "MMM d"),
+    tomorrowDisplay: format(tomorrow, "MMM d"),
+  };
+};
 
 export const WODTimeline = () => {
-  const yesterday = subDays(new Date(), 1);
-  const tomorrow = addDays(new Date(), 1);
-  const tomorrowDateStr = format(tomorrow, "yyyy-MM-dd");
+  const { yesterdayStr, todayStr, tomorrowStr, yesterdayDisplay, tomorrowDisplay } = getCyprusDateStrings();
   
-  // Fetch yesterday's WOD using generated_for_date
+  // Fetch yesterday's WOD using Cyprus date
   const { data: yesterdayWOD, isLoading: loadingYesterday } = useQuery({
-    queryKey: ["yesterday-wod", format(yesterday, "yyyy-MM-dd")],
+    queryKey: ["yesterday-wod", yesterdayStr],
     queryFn: async () => {
-      const yesterdayDateStr = format(yesterday, "yyyy-MM-dd");
-      
       const { data, error } = await supabase
         .from("admin_workouts")
         .select("category, format, difficulty, difficulty_stars")
-        .eq("generated_for_date", yesterdayDateStr)
+        .eq("generated_for_date", yesterdayStr)
         .limit(1);
       
       if (error) throw error;
@@ -36,15 +52,14 @@ export const WODTimeline = () => {
     refetchOnWindowFocus: false,
   });
 
-  // Fetch current WODs (today) - FILTER BY generated_for_date
+  // Fetch current WODs (today) using Cyprus date
   const { data: todayWODs, isLoading: loadingToday } = useQuery({
-    queryKey: ["today-wods-timeline", format(new Date(), "yyyy-MM-dd")],
+    queryKey: ["today-wods-timeline", todayStr],
     queryFn: async () => {
-      const todayDateStr = format(new Date(), "yyyy-MM-dd");
       const { data, error } = await supabase
         .from("admin_workouts")
         .select("category, format, difficulty, difficulty_stars")
-        .eq("generated_for_date", todayDateStr)
+        .eq("generated_for_date", todayStr)
         .limit(1);
       
       if (error) throw error;
@@ -71,14 +86,14 @@ export const WODTimeline = () => {
     refetchOnWindowFocus: false,
   });
 
-  // Calculate tomorrow's WOD info using DATE-BASED calculation
+  // Calculate tomorrow's WOD info using DATE-BASED calculation with Cyprus dates
   const getTomorrowInfo = () => {
-    // Use date-based calculation - always correct
-    const wodInfo = getWODInfoForDate(tomorrowDateStr);
+    // Use date-based calculation with Cyprus timezone - always correct
+    const wodInfo = getWODInfoForDate(tomorrowStr);
     
     // Check for manual overrides
     const overrides = (wodState?.manual_overrides as Record<string, any>) || {};
-    const override = overrides[tomorrowDateStr];
+    const override = overrides[tomorrowStr];
     
     const category = override?.category || wodInfo.category;
     const formats = FORMATS_BY_CATEGORY[category] || ["CIRCUIT"];
@@ -119,7 +134,7 @@ export const WODTimeline = () => {
         <div className={`p-2 md:p-3 bg-primary/10 dark:bg-primary/20 border-2 ${getDifficultyBorderClass(yesterdayDifficulty)} opacity-80`}>
           <div className="flex items-center gap-1 mb-1 text-muted-foreground">
             <ChevronLeft className="h-3 w-3" />
-            <span className="text-[10px] md:text-xs uppercase tracking-wide">Yesterday ({format(yesterday, "MMM d")})</span>
+            <span className="text-[10px] md:text-xs uppercase tracking-wide">Yesterday ({yesterdayDisplay})</span>
           </div>
           {yesterdayWOD ? (
             <div>
@@ -158,14 +173,14 @@ export const WODTimeline = () => {
               </div>
             </div>
           ) : (
-            <p className="text-xs text-muted-foreground text-center">@ 7:00 AM</p>
+            <p className="text-xs text-muted-foreground text-center">Being prepared...</p>
           )}
         </div>
 
         {/* Tomorrow */}
         <div className={`p-2 md:p-3 bg-primary/10 dark:bg-primary/20 border-2 opacity-80 ${getDifficultyBorderClass(tomorrowInfo.difficultyLevel)}`}>
           <div className="flex items-center justify-end gap-1 mb-1 text-muted-foreground">
-            <span className="text-[10px] md:text-xs uppercase tracking-wide">Tomorrow</span>
+            <span className="text-[10px] md:text-xs uppercase tracking-wide">Tomorrow ({tomorrowDisplay})</span>
             <ChevronRight className="h-3 w-3" />
           </div>
           <div className="text-right">

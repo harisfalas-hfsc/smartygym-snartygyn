@@ -240,6 +240,32 @@ serve(async (req) => {
   const effectiveDate = getCyprusDateStr();
   console.log(`[ORCHESTRATOR] Effective date: ${effectiveDate}`);
 
+  // Determine expected count based on day type
+  const recoveryDay = isRecoveryDay(effectiveDate);
+  const expectedCount = recoveryDay ? 1 : 2;
+  const dayIn84 = getDayIn84Cycle(effectiveDate);
+  const periodization = getPeriodizationForDay(dayIn84);
+
+  // Create run log entry at start
+  const { data: runLog, error: runLogError } = await supabase
+    .from("wod_generation_runs")
+    .insert({
+      cyprus_date: effectiveDate,
+      status: "running",
+      expected_count: expectedCount,
+      is_recovery_day: recoveryDay,
+      expected_category: periodization.category,
+      trigger_source: "orchestrator",
+    })
+    .select()
+    .single();
+
+  if (runLogError) {
+    console.error("[ORCHESTRATOR] Failed to create run log:", runLogError);
+  } else {
+    console.log(`[ORCHESTRATOR] Created run log: ${runLog.id}`);
+  }
+
   const attempts: { attempt: number; error?: string }[] = [];
   let finalResult: WodVerificationResult | null = null;
 
@@ -267,6 +293,19 @@ serve(async (req) => {
       console.log(`[ORCHESTRATOR] ✅ SUCCESS on attempt ${attempt} - All required WODs exist`);
       console.log(`[ORCHESTRATOR] Found: ${verification.found.join(", ")}`);
 
+      // Update run log with success
+      if (runLog?.id) {
+        await supabase
+          .from("wod_generation_runs")
+          .update({
+            status: "success",
+            completed_at: new Date().toISOString(),
+            found_count: verification.found.length,
+            wods_created: verification.found,
+          })
+          .eq("id", runLog.id);
+      }
+
       return new Response(
         JSON.stringify({
           success: true,
@@ -274,6 +313,7 @@ serve(async (req) => {
           date: effectiveDate,
           found: verification.found,
           attempts: attempt,
+          runLogId: runLog?.id,
         }),
         {
           status: 200,
@@ -301,6 +341,19 @@ serve(async (req) => {
     finalResult?.isRecoveryDay || false
   );
 
+  // Update run log with failure
+  if (runLog?.id) {
+    await supabase
+      .from("wod_generation_runs")
+      .update({
+        status: "failed",
+        completed_at: new Date().toISOString(),
+        found_count: finalResult?.found.length || 0,
+        error_message: `All ${MAX_ATTEMPTS} attempts failed. Missing: ${finalResult?.missing.join(", ")}`,
+      })
+      .eq("id", runLog.id);
+  }
+
   // Log to notification_audit_log
   await supabase.from("notification_audit_log").insert({
     notification_type: "wod_generation_failure",
@@ -316,6 +369,7 @@ serve(async (req) => {
       found: finalResult?.found,
       attempts: attempts,
       isRecoveryDay: finalResult?.isRecoveryDay,
+      runLogId: runLog?.id,
     },
   });
 
@@ -328,6 +382,7 @@ serve(async (req) => {
       found: finalResult?.found,
       attempts: attempts,
       adminAlerted: true,
+      runLogId: runLog?.id,
     }),
     {
       status: 500,

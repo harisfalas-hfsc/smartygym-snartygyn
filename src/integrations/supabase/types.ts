@@ -2531,6 +2531,54 @@ export type Database = {
         }
         Relationships: []
       }
+      wod_generation_runs: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          cyprus_date: string
+          error_message: string | null
+          expected_category: string | null
+          expected_count: number
+          found_count: number | null
+          id: string
+          is_recovery_day: boolean | null
+          started_at: string
+          status: string
+          trigger_source: string | null
+          wods_created: Json | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          cyprus_date: string
+          error_message?: string | null
+          expected_category?: string | null
+          expected_count: number
+          found_count?: number | null
+          id?: string
+          is_recovery_day?: boolean | null
+          started_at?: string
+          status?: string
+          trigger_source?: string | null
+          wods_created?: Json | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          cyprus_date?: string
+          error_message?: string | null
+          expected_category?: string | null
+          expected_count?: number
+          found_count?: number | null
+          id?: string
+          is_recovery_day?: boolean | null
+          started_at?: string
+          status?: string
+          trigger_source?: string | null
+          wods_created?: Json | null
+        }
+        Relationships: []
+      }
       workout_comments: {
         Row: {
           comment_text: string
