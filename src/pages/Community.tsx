@@ -821,6 +821,29 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                                     {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
                                   </span>
                                 </div>
+                                <p className="text-[10px] text-primary font-medium mb-1">
+                                  {comment.workout_name ? (
+                                    <>
+                                      Workout:{" "}
+                                      <Link
+                                        to={`/workout/${comment.workout_type}/${comment.workout_id}`}
+                                        className="hover:underline font-semibold"
+                                      >
+                                        {comment.workout_name}
+                                      </Link>
+                                    </>
+                                  ) : (
+                                    <>
+                                      Program:{" "}
+                                      <Link
+                                        to={`/trainingprogram/${comment.program_type}/${comment.program_id}`}
+                                        className="hover:underline font-semibold"
+                                      >
+                                        {comment.program_name}
+                                      </Link>
+                                    </>
+                                  )}
+                                </p>
                                 <p className="text-xs leading-relaxed line-clamp-2">{comment.comment_text}</p>
                               </div>
                             ))}
