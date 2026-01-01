@@ -117,7 +117,7 @@ export const HeroThreeColumns = () => {
     queryFn: async () => {
       const { data } = await supabase
         .from("admin_workouts")
-        .select("id, name, category, focus, difficulty_stars, duration, image_url, equipment, is_premium, type")
+        .select("id, name, category, focus, difficulty_stars, duration, image_url, equipment, is_premium, type, format")
         .eq("is_workout_of_day", true)
         .eq("generated_for_date", cyprusToday)
         .limit(2);
@@ -291,23 +291,21 @@ export const HeroThreeColumns = () => {
                         <Dumbbell className="w-8 h-8 text-muted-foreground/50" />
                       </div>
                     )}
-                    {/* Equipment Badge */}
-                    <div className="absolute top-2 left-2">
-                      <span className={cn(
-                        "text-[10px] font-bold px-1.5 py-0.5 rounded-full",
-                        isRecoveryWod(wod)
-                          ? "bg-cyan-500 text-white"
-                          : wod.equipment?.toLowerCase().includes("none") || wod.equipment?.toLowerCase().includes("bodyweight")
+                    {/* Equipment Badge - Only show for non-recovery workouts */}
+                    {!isRecoveryWod(wod) && (
+                      <div className="absolute top-2 left-2">
+                        <span className={cn(
+                          "text-[10px] font-bold px-1.5 py-0.5 rounded-full",
+                          wod.equipment?.toLowerCase().includes("none") || wod.equipment?.toLowerCase().includes("bodyweight")
                             ? "bg-emerald-500 text-white"
                             : "bg-blue-500 text-white"
-                      )}>
-                        {isRecoveryWod(wod) 
-                          ? "Recovery"
-                          : wod.equipment?.toLowerCase().includes("none") || wod.equipment?.toLowerCase().includes("bodyweight") 
+                        )}>
+                          {wod.equipment?.toLowerCase().includes("none") || wod.equipment?.toLowerCase().includes("bodyweight") 
                             ? "Bodyweight" 
                             : "Equipment"}
-                      </span>
-                    </div>
+                        </span>
+                      </div>
+                    )}
                     {/* Premium Badge */}
                     {wod.is_premium && (
                       <div className="absolute top-2 right-2">
@@ -333,11 +331,11 @@ export const HeroThreeColumns = () => {
                           <span className="text-orange-600 dark:text-orange-400 font-semibold uppercase">{wod.category}</span>
                         </div>
                       )}
-                      {/* Show format from focus field if available, otherwise don't show type for recovery */}
-                      {wod.focus && !isRecoveryWod(wod) && (
+                      {/* Show format for all workouts */}
+                      {wod.format && (
                         <div className="flex items-center gap-1 text-[10px]">
                           <Target className="w-3 h-3 text-primary" />
-                          <span className="text-primary font-semibold uppercase">{wod.focus}</span>
+                          <span className="text-primary font-semibold uppercase">{wod.format}</span>
                         </div>
                       )}
                       
