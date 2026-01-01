@@ -148,9 +148,6 @@ export const WorkoutOfTheDay = () => {
           <div className="relative w-full h-32 rounded-md overflow-hidden mb-3">
             <img src={wod.image_url} alt={wod.name || "Recovery"} className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-            <Badge className="absolute top-2 left-2 bg-cyan-500 text-white border-0 text-xs py-0.5">
-              🧘 Recovery Day
-            </Badge>
           </div>
         )}
         <h4 className="text-base font-bold text-foreground mb-2">{wod.name}</h4>
