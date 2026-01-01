@@ -473,6 +473,12 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
         <Award className="h-4 w-4 text-primary" />
       </span>
     );
+    // Positions 7-10 (indices 6-9) - gray badges
+    if (index >= 6 && index <= 9) return (
+      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700">
+        <Award className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+      </span>
+    );
     return null;
   };
 
@@ -490,9 +496,9 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
     // Always sort by most completions (descending)
     const sorted = [...data].sort((a, b) => b.total_completions - a.total_completions);
     
-    // Fill with placeholders for 6 positions
+    // Fill with placeholders for 10 positions
     const result: (LeaderboardEntry | null)[] = [];
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 10; i++) {
       result.push(sorted[i] || null);
     }
     return result;
@@ -512,9 +518,9 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
       return b.rating_count - a.rating_count;
     });
     
-    // Fill with placeholders for 6 positions
+    // Fill with placeholders for 10 positions
     const result: (RatedContent | null)[] = [];
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 10; i++) {
       result.push(sorted[i] || null);
     }
     return result;
@@ -668,7 +674,7 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                     <CardContent className="p-3">
                       {isLoadingLeaderboard ? (
                         <div className="space-y-2">
-                          {[...Array(6)].map((_, i) => (
+                          {[...Array(10)].map((_, i) => (
                             <Skeleton key={i} className="h-10 w-full" />
                           ))}
                         </div>
@@ -741,7 +747,7 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                     <CardContent className="p-3">
                       {isLoadingRatings ? (
                         <div className="space-y-2">
-                          {[...Array(6)].map((_, i) => (
+                          {[...Array(10)].map((_, i) => (
                             <Skeleton key={i} className="h-10 w-full" />
                           ))}
                         </div>
@@ -952,7 +958,7 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
             <CardContent className="p-4 md:pt-6">
               {isLoadingLeaderboard ? (
                 <div className="space-y-3">
-                  {[...Array(6)].map((_, i) => (
+                  {[...Array(10)].map((_, i) => (
                     <Skeleton key={i} className="h-12 w-full" />
                   ))}
                 </div>
@@ -1030,7 +1036,7 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
             <CardContent className="p-4 md:pt-6">
               {isLoadingRatings ? (
                 <div className="space-y-3">
-                  {[...Array(6)].map((_, i) => (
+                  {[...Array(10)].map((_, i) => (
                     <Skeleton key={i} className="h-12 w-full" />
                   ))}
                 </div>
