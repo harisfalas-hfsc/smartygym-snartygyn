@@ -117,30 +117,49 @@ export const AutomationRuleEditDialog = ({
     enabled: open,
   });
 
-  // Fetch send history for this message_type (also check morning_combined for WOD/ritual)
+  // Fetch send history - prioritize automation_key for accurate history
   const { data: sendHistory } = useQuery({
-    queryKey: ["notification-history", rule.message_type],
+    queryKey: ["notification-history", rule.automation_key, rule.message_type],
     queryFn: async () => {
-      // For morning templates, also search for morning_combined notification_type
-      const isMorningType = ['morning_wod', 'morning_wod_recovery', 'morning_ritual'].includes(rule.message_type);
+      // Build query to find relevant audit entries
+      // Priority 1: Match by automation_key in metadata (most accurate)
+      // Priority 2: Match by message_type/notification_type (legacy fallback)
       
-      let query = supabase
+      const { data: allEntries, error } = await supabase
         .from("notification_audit_log")
-        .select("id, sent_at, subject, recipient_count, success_count, failed_count, message_type, notification_type")
+        .select("id, sent_at, subject, recipient_count, success_count, failed_count, message_type, notification_type, metadata")
         .order("sent_at", { ascending: false })
-        .limit(15);
-      
-      if (isMorningType) {
-        // Search by message_type OR notification_type for morning notifications
-        query = query.or(`message_type.eq.${rule.message_type},notification_type.eq.morning_combined`);
-      } else {
-        query = query.eq("message_type", rule.message_type);
-      }
-
-      const { data, error } = await query;
+        .limit(50);
 
       if (error) throw error;
-      return (data || []).slice(0, 10) as AuditLogEntry[];
+      
+      const entries = allEntries || [];
+      
+      // Filter entries that match this rule
+      const matchingEntries = entries.filter(entry => {
+        // Check if metadata contains matching automation_key
+        const metadata = entry.metadata as Record<string, any> | null;
+        if (metadata?.automation_key === rule.automation_key) {
+          return true;
+        }
+        
+        // Fallback: match by message_type or notification_type
+        // Map automation_keys to their corresponding notification types
+        const automationKeyToTypes: Record<string, string[]> = {
+          'morning_wod_notification': ['wod_notification', 'morning_wod'],
+          'morning_ritual_notification': ['daily_ritual', 'morning_ritual'],
+          'morning_wod_recovery_notification': ['wod_recovery_notification', 'morning_wod_recovery'],
+          'welcome_notification': ['welcome', 'welcome_email'],
+          'workout_of_day': ['announcement_update', 'wod_notification'],
+          'daily_ritual': ['daily_ritual'],
+          'checkin_reminders': ['checkin_reminder'],
+        };
+        
+        const matchTypes = automationKeyToTypes[rule.automation_key] || [rule.message_type];
+        return matchTypes.includes(entry.message_type) || matchTypes.includes(entry.notification_type);
+      });
+      
+      return matchingEntries.slice(0, 10) as AuditLogEntry[];
     },
     enabled: open && activeTab === "history",
   });
