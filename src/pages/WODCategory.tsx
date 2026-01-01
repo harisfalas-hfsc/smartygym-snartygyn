@@ -277,7 +277,7 @@ const WODCategory = () => {
               {isRecoveryDay && variousWOD ? (
                 /* Recovery Day - Single Card */
                 <Card 
-                  className="group cursor-pointer overflow-hidden hover:shadow-xl transition-all duration-300 hover:border-green-500/60 max-w-2xl mx-auto bg-gradient-to-br from-green-500/5 via-background to-emerald-500/5 border-2 border-green-500/30" 
+                  className="group cursor-pointer overflow-hidden hover:shadow-xl transition-all duration-300 hover:border-green-500/60 bg-gradient-to-br from-green-500/5 via-background to-emerald-500/5 border-2 border-green-500/30"
                   onClick={() => navigate(`/workout/wod/${variousWOD.id}`)}
                 >
                   <div className="relative aspect-video overflow-hidden">
