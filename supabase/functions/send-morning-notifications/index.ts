@@ -14,6 +14,15 @@ function logStep(step: string, details?: any) {
   console.log(`[SEND-MORNING-NOTIFICATIONS] ${step}${detailsStr}`);
 }
 
+// Replace placeholders in template content
+function replacePlaceholders(template: string, data: Record<string, string | number>): string {
+  let result = template;
+  for (const [key, value] of Object.entries(data)) {
+    result = result.replace(new RegExp(`\\{${key}\\}`, 'g'), String(value));
+  }
+  return result;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -42,6 +51,25 @@ serve(async (req) => {
     const todayStr = cyprusTime.toISOString().split('T')[0];
 
     logStep("Looking for today's content", { todayStr });
+
+    // ============================================
+    // FETCH TEMPLATES FROM DATABASE
+    // ============================================
+    const { data: templates } = await supabase
+      .from("automated_message_templates")
+      .select("*")
+      .in("message_type", ["morning_wod", "morning_wod_recovery", "morning_ritual"])
+      .eq("is_active", true);
+
+    const wodTemplate = templates?.find(t => t.message_type === "morning_wod");
+    const wodRecoveryTemplate = templates?.find(t => t.message_type === "morning_wod_recovery");
+    const ritualTemplate = templates?.find(t => t.message_type === "morning_ritual");
+
+    logStep("Templates loaded", { 
+      hasWodTemplate: !!wodTemplate, 
+      hasWodRecoveryTemplate: !!wodRecoveryTemplate,
+      hasRitualTemplate: !!ritualTemplate 
+    });
 
     // ============================================
     // FETCH TODAY'S WODs
@@ -76,8 +104,13 @@ serve(async (req) => {
     const difficultyStars = todaysWods[0]?.difficulty_stars || 3;
     const hasWods = todaysWods.length > 0;
 
+    // Determine if this is a recovery day (only 1 workout OR category is RECOVERY)
+    const isRecoveryDay = todaysWods.length === 1 || category?.toUpperCase() === "RECOVERY";
+
     logStep("WODs found", { 
       hasWods,
+      isRecoveryDay,
+      workoutCount: todaysWods.length,
       bodyweight: bodyweightWod?.name, 
       equipment: equipmentWod?.name,
       category
@@ -98,85 +131,71 @@ serve(async (req) => {
     }
 
     const hasRitual = !!todaysRitual;
+
     logStep("Ritual found", { hasRitual, dayNumber: todaysRitual?.day_number });
 
     // ============================================
-    // ALERT ADMIN IF NO WODs FOR TODAY
+    // ALERT ADMIN IF NO WODs
     // ============================================
     if (!hasWods) {
-      logStep("⚠️ ALERT: No WODs found for today! WOD generation may have failed.", { 
-        todayStr,
-        message: "The scheduled WOD generation at 00:30 UTC may have failed. Check generate-workout-of-day logs."
+      logStep("⚠️ No WODs found for today - alerting admin");
+      
+      await supabase.from("user_system_messages").insert({
+        user_id: "00000000-0000-0000-0000-000000000000",
+        message_type: "admin_alert",
+        subject: "⚠️ No WOD Found for Today",
+        content: `No Workout of the Day was found for ${todayStr}. Please check the WOD generator.`,
+        is_read: false,
       });
-      
-      // Insert admin alert as a system message for admin users
-      const { data: adminRoles } = await supabase
-        .from("user_roles")
-        .select("user_id")
-        .eq("role", "admin");
-      
-      if (adminRoles && adminRoles.length > 0) {
-        const adminAlerts = adminRoles.map(admin => ({
-          user_id: admin.user_id,
-          message_type: "admin_alert",
-          subject: `⚠️ WOD Generation Failed - ${todayStr}`,
-          content: `<p class="tiptap-paragraph"><strong>⚠️ ALERT: No WODs generated for today (${todayStr})</strong></p>
-<p class="tiptap-paragraph"></p>
-<p class="tiptap-paragraph">The scheduled WOD generation at 00:30 UTC appears to have failed.</p>
-<p class="tiptap-paragraph"></p>
-<p class="tiptap-paragraph"><strong>Action Required:</strong></p>
-<p class="tiptap-paragraph">1. Go to Admin → WOD Manager</p>
-<p class="tiptap-paragraph">2. Click "Generate New WOD" → "Generate for Today"</p>
-<p class="tiptap-paragraph">3. After generation, click "Send Notifications" to notify users</p>
-<p class="tiptap-paragraph"></p>
-<p class="tiptap-paragraph">Check edge function logs for details about the failure.</p>`,
-          is_read: false,
-        }));
-        
-        await supabase.from('user_system_messages').insert(adminAlerts);
-        logStep("Admin alert sent about missing WODs", { adminCount: adminRoles.length });
-      }
     }
 
-    // If neither WOD nor Ritual exists, skip
+    // Skip if neither WODs nor Ritual exists
     if (!hasWods && !hasRitual) {
-      logStep("No WODs or Ritual found for today - skipping notifications (admin alerted)");
+      logStep("No content found for today - skipping notifications");
       return new Response(
-        JSON.stringify({ success: true, sent: false, reason: "No content for today", adminAlerted: true }),
+        JSON.stringify({ 
+          success: true, 
+          message: "No content found for today - no notifications sent",
+          todayStr 
+        }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
       );
     }
 
     // ============================================
-    // CHECK FOR DUPLICATE NOTIFICATIONS
+    // PREVENT DUPLICATE NOTIFICATIONS
     // ============================================
-    const todayStart = new Date(cyprusTime.getFullYear(), cyprusTime.getMonth(), cyprusTime.getDate()).toISOString();
-    const { data: existingNotification } = await supabase
+    const { data: existingAudit } = await supabase
       .from("notification_audit_log")
       .select("id")
-      .eq("notification_type", MESSAGE_TYPES.MORNING_NOTIFICATION)
-      .gte("sent_at", todayStart)
+      .eq("notification_type", "morning_combined")
+      .gte("sent_at", todayStr)
+      .lt("sent_at", todayStr + "T23:59:59")
       .limit(1);
 
-    if (existingNotification && existingNotification.length > 0) {
-      logStep("Morning notification already sent today, skipping");
+    if (existingAudit && existingAudit.length > 0) {
+      logStep("⚠️ Morning notifications already sent today - skipping to prevent duplicates");
       return new Response(
-        JSON.stringify({ success: true, sent: false, reason: "Already sent today" }),
+        JSON.stringify({ 
+          success: true, 
+          message: "Morning notifications already sent today - skipping duplicates",
+          todayStr 
+        }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
       );
     }
 
     // ============================================
-    // GET ALL USERS WITH PREFERENCES
+    // GET ALL USER PROFILES
     // ============================================
     const { data: allProfiles } = await supabase
-      .from('profiles')
-      .select('user_id, notification_preferences');
+      .from("profiles")
+      .select("user_id, notification_preferences");
 
     if (!allProfiles || allProfiles.length === 0) {
-      logStep("No users to notify");
+      logStep("No user profiles found");
       return new Response(
-        JSON.stringify({ success: true, sent: false, reason: "No users" }),
+        JSON.stringify({ success: true, message: "No user profiles found" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
       );
     }
@@ -184,12 +203,61 @@ serve(async (req) => {
     logStep(`Processing morning notifications for ${allProfiles.length} users`);
 
     // ============================================
-    // BUILD NOTIFICATION CONTENT
+    // BUILD NOTIFICATION CONTENT FROM TEMPLATES
     // ============================================
-    const notificationTitle = `🌅 Good Morning, Smarty! Today's Workouts & Ritual Are Ready`;
     
-    // Build dashboard notification content for WOD
-    const wodDashboardContent = `<p class="tiptap-paragraph"><strong>🌅 Good Morning, Smarty!</strong></p>
+    // Prepare placeholder data for WOD
+    const wodPlaceholders = {
+      category: category,
+      bodyweight_name: bodyweightWod?.name || "Bodyweight Workout",
+      equipment_name: equipmentWod?.name || "Equipment Workout",
+      workout_name: todaysWods[0]?.name || "Today's Workout",
+      format: format,
+      difficulty: difficulty,
+      difficulty_stars: difficultyStars,
+    };
+
+    // Prepare placeholder data for Ritual
+    const ritualPlaceholders = {
+      day_number: todaysRitual?.day_number || 1,
+    };
+
+    // Choose the appropriate WOD template based on recovery day
+    let wodDashboardContent: string;
+    let wodSubject: string;
+
+    if (isRecoveryDay && wodRecoveryTemplate) {
+      // Use recovery template
+      wodDashboardContent = replacePlaceholders(wodRecoveryTemplate.content, wodPlaceholders);
+      wodSubject = replacePlaceholders(wodRecoveryTemplate.subject, wodPlaceholders);
+      logStep("Using RECOVERY template for WOD notification");
+    } else if (wodTemplate) {
+      // Use regular 2-workout template
+      wodDashboardContent = replacePlaceholders(wodTemplate.content, wodPlaceholders);
+      wodSubject = replacePlaceholders(wodTemplate.subject, wodPlaceholders);
+      logStep("Using REGULAR template for WOD notification");
+    } else {
+      // Fallback to hardcoded content if no template exists
+      logStep("No template found - using fallback content");
+      if (isRecoveryDay) {
+        wodDashboardContent = `<p class="tiptap-paragraph"><strong>🌅 Good Morning, Smarty!</strong></p>
+<p class="tiptap-paragraph"></p>
+<p class="tiptap-paragraph">Your daily recovery workout is ready!</p>
+<p class="tiptap-paragraph"></p>
+<p class="tiptap-paragraph"><strong>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</strong></p>
+<p class="tiptap-paragraph"><strong>🧘 TODAY'S RECOVERY WORKOUT</strong></p>
+<p class="tiptap-paragraph"><strong>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</strong></p>
+<p class="tiptap-paragraph"></p>
+<p class="tiptap-paragraph">Today is <strong>Recovery</strong> day with one gentle workout:</p>
+<p class="tiptap-paragraph"></p>
+<p class="tiptap-paragraph"><strong>🧘 Recovery:</strong> ${todaysWods[0]?.name || "Recovery Workout"}</p>
+<p class="tiptap-paragraph"></p>
+<p class="tiptap-paragraph">${format} | All Levels</p>
+<p class="tiptap-paragraph"></p>
+<p class="tiptap-paragraph"><a href="https://smartygym.com/workout/wod">View Today's Workout →</a></p>`;
+        wodSubject = `🧘 Today's Recovery Workout: ${todaysWods[0]?.name || "Recovery"}`;
+      } else {
+        wodDashboardContent = `<p class="tiptap-paragraph"><strong>🌅 Good Morning, Smarty!</strong></p>
 <p class="tiptap-paragraph"></p>
 <p class="tiptap-paragraph">Your daily fitness content is ready!</p>
 <p class="tiptap-paragraph"></p>
@@ -205,9 +273,21 @@ serve(async (req) => {
 <p class="tiptap-paragraph">${format} | ${difficulty} (${difficultyStars}⭐)</p>
 <p class="tiptap-paragraph"></p>
 <p class="tiptap-paragraph"><a href="https://smartygym.com/workout/wod">View Today's Workouts →</a></p>`;
+        wodSubject = `🏆 Today's Workout of the Day: ${category}`;
+      }
+    }
 
-    // Build dashboard notification content for Ritual
-    const ritualDashboardContent = `<p class="tiptap-paragraph"><strong>🌅 Good Morning, Smarty!</strong></p>
+    // Build ritual content from template or fallback
+    let ritualDashboardContent: string;
+    let ritualSubject: string;
+
+    if (ritualTemplate) {
+      ritualDashboardContent = replacePlaceholders(ritualTemplate.content, ritualPlaceholders);
+      ritualSubject = replacePlaceholders(ritualTemplate.subject, ritualPlaceholders);
+      logStep("Using template for Ritual notification");
+    } else {
+      // Fallback content
+      ritualDashboardContent = `<p class="tiptap-paragraph"><strong>🌅 Good Morning, Smarty!</strong></p>
 <p class="tiptap-paragraph"></p>
 <p class="tiptap-paragraph"><strong>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</strong></p>
 <p class="tiptap-paragraph"><strong>🌅 YOUR DAILY SMARTY RITUAL</strong></p>
@@ -221,6 +301,8 @@ serve(async (req) => {
 <p class="tiptap-paragraph">🌙 <strong>Evening</strong> - Wind down peacefully</p>
 <p class="tiptap-paragraph"></p>
 <p class="tiptap-paragraph"><a href="https://smartygym.com/daily-ritual">View Today's Ritual →</a></p>`;
+      ritualSubject = `🌅 Day ${todaysRitual?.day_number} Smarty Ritual`;
+    }
 
     // ============================================
     // INSERT DASHBOARD NOTIFICATIONS (PREFERENCE-AWARE)
@@ -245,7 +327,7 @@ serve(async (req) => {
         dashboardInserts.push({
           user_id: profile.user_id,
           message_type: MESSAGE_TYPES.WOD_NOTIFICATION,
-          subject: `🏆 Today's Workout of the Day: ${category}`,
+          subject: wodSubject,
           content: wodDashboardContent,
           is_read: false,
         });
@@ -257,7 +339,7 @@ serve(async (req) => {
         dashboardInserts.push({
           user_id: profile.user_id,
           message_type: MESSAGE_TYPES.DAILY_RITUAL,
-          subject: `🌅 Day ${todaysRitual.day_number} Smarty Ritual`,
+          subject: ritualSubject,
           content: ritualDashboardContent,
           is_read: false,
         });
@@ -312,7 +394,21 @@ serve(async (req) => {
         let ritualSection = '';
 
         if (wantsWodEmail) {
-          wodSection = `
+          if (isRecoveryDay) {
+            // Recovery day email content
+            wodSection = `
+<div style="margin: 30px 0; padding: 25px; background: #f8f9fa; border-radius: 12px; border-left: 4px solid #29B6D2;">
+  <h2 style="color: #29B6D2; margin: 0 0 15px 0; font-size: 20px;">🧘 TODAY'S RECOVERY WORKOUT</h2>
+  <p style="margin: 10px 0; color: #333;">Today is <strong>Recovery</strong> day with one gentle workout:</p>
+  <div style="margin: 15px 0;">
+    <p style="margin: 8px 0; color: #333;"><strong>🧘 Recovery:</strong> ${todaysWods[0]?.name || "Recovery Workout"}</p>
+  </div>
+  <p style="margin: 10px 0; color: #666;"><strong>Format:</strong> ${format} | <strong>Difficulty:</strong> All Levels</p>
+  <p style="margin: 15px 0 0 0;"><a href="https://smartygym.com/workout/wod" style="background: #29B6D2; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">View Today's Workout →</a></p>
+</div>`;
+          } else {
+            // Regular day with 2 workouts
+            wodSection = `
 <div style="margin: 30px 0; padding: 25px; background: #f8f9fa; border-radius: 12px; border-left: 4px solid #29B6D2;">
   <h2 style="color: #29B6D2; margin: 0 0 15px 0; font-size: 20px;">🏆 TODAY'S WORKOUTS OF THE DAY</h2>
   <p style="margin: 10px 0; color: #333;">Today is <strong>${category}</strong> day with TWO workout options:</p>
@@ -323,6 +419,7 @@ serve(async (req) => {
   <p style="margin: 10px 0; color: #666;"><strong>Format:</strong> ${format} | <strong>Difficulty:</strong> ${difficulty} (${difficultyStars}⭐)</p>
   <p style="margin: 15px 0 0 0;"><a href="https://smartygym.com/workout/wod" style="background: #29B6D2; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">View Today's Workouts →</a></p>
 </div>`;
+          }
         }
 
         if (wantsRitualEmail) {
@@ -349,77 +446,85 @@ ${ritualSection}
 ${getEmailFooter(authUser.email, 'wod')}
 </div>`;
 
-        const emailResult = await resendClient.emails.send({
-          from: 'SmartyGym <notifications@smartygym.com>',
-          to: [authUser.email],
-          subject: notificationTitle,
-          headers: getEmailHeaders(authUser.email, 'wod'),
+        const emailSubject = isRecoveryDay 
+          ? `🌅 Good Morning! Today's Recovery Workout & Ritual Are Ready`
+          : `🌅 Good Morning! Today's Workouts & Ritual Are Ready`;
+
+        await resendClient.emails.send({
+          from: "SmartyGym <notifications@smartygym.com>",
+          to: authUser.email,
+          subject: emailSubject,
           html: emailHtml,
+          headers: getEmailHeaders(authUser.email, 'wod'),
         });
 
-        if (emailResult.error) {
-          logStep("Email API error", { email: authUser.email, error: emailResult.error });
-        } else {
-          emailsSent++;
-          // Rate limiting: 600ms delay
-          await new Promise(resolve => setTimeout(resolve, 600));
-        }
-      } catch (e) {
-        logStep("Email send error", { email: authUser.email, error: e });
+        emailsSent++;
+        logStep(`Email sent to ${authUser.email}`);
+        
+        // Small delay to avoid rate limiting
+        await new Promise(resolve => setTimeout(resolve, 100));
+      } catch (emailError) {
+        logStep(`Failed to send email to ${authUser.email}`, { error: emailError });
       }
     }
 
+    logStep("Email sending complete", { emailsSent, emailsSkipped });
+
     // ============================================
-    // AUDIT LOG
+    // CREATE AUDIT LOG
     // ============================================
-    await supabase.from('notification_audit_log').insert({
-      notification_type: MESSAGE_TYPES.MORNING_NOTIFICATION,
-      message_type: MESSAGE_TYPES.MORNING_NOTIFICATION,
-      recipient_count: allProfiles.length,
-      success_count: emailsSent,
-      failed_count: emailsSkipped,
-      subject: notificationTitle,
-      content: `Morning notification sent - ${emailsSent} emails, ${wodDashboardSent} WOD dashboard, ${ritualDashboardSent} Ritual dashboard`,
-      sent_at: new Date().toISOString(),
+    await supabase.from("notification_audit_log").insert({
+      notification_type: "morning_combined",
+      message_type: isRecoveryDay ? "morning_wod_recovery" : "morning_wod",
+      subject: "Morning WOD + Ritual Notifications",
+      content: `WOD: ${category}, Ritual: Day ${todaysRitual?.day_number || "N/A"}`,
+      recipient_count: wodDashboardSent + ritualDashboardSent + emailsSent,
+      success_count: wodDashboardSent + ritualDashboardSent + emailsSent,
+      failed_count: dashboardSkipped + emailsSkipped,
       metadata: {
-        hasWods,
-        hasRitual,
-        wodCategory: category,
-        ritualDay: todaysRitual?.day_number,
+        todayStr,
+        isRecoveryDay,
+        workoutCount: todaysWods.length,
         wodDashboardSent,
         ritualDashboardSent,
         dashboardSkipped,
+        emailsSent,
+        emailsSkipped,
+        usedTemplates: {
+          wod: isRecoveryDay ? !!wodRecoveryTemplate : !!wodTemplate,
+          ritual: !!ritualTemplate
+        }
       }
     });
 
-    logStep(`✅ Morning notifications complete: ${wodDashboardSent + ritualDashboardSent} dashboard, ${emailsSent} emails`);
+    logStep("✅ Morning notifications complete", {
+      isRecoveryDay,
+      wodDashboardSent,
+      ritualDashboardSent,
+      dashboardSkipped,
+      emailsSent,
+      emailsSkipped
+    });
 
     return new Response(
       JSON.stringify({
         success: true,
-        dashboardNotifications: {
-          wod: wodDashboardSent,
-          ritual: ritualDashboardSent,
-          skipped: dashboardSkipped,
-        },
+        isRecoveryDay,
+        wodDashboardSent,
+        ritualDashboardSent,
+        dashboardSkipped,
         emailsSent,
         emailsSkipped,
-        content: {
-          hasWods,
-          hasRitual,
-          wodCategory: category,
-          ritualDay: todaysRitual?.day_number
-        }
+        todayStr
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
     );
 
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
-    logStep("ERROR", { message: errorMessage });
-
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logStep("❌ Error in morning notifications", { error: errorMessage });
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify({ success: false, error: errorMessage }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
     );
   }
