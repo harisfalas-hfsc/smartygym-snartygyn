@@ -55,6 +55,19 @@ export const TestimonialsSection = ({ compact = false }: TestimonialsSectionProp
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [testimonialToDelete, setTestimonialToDelete] = useState<string | null>(null);
   const [showViewAllModal, setShowViewAllModal] = useState(false);
+  const [expandedTestimonials, setExpandedTestimonials] = useState<Set<string>>(new Set());
+
+  const toggleTestimonialExpanded = (testimonialId: string) => {
+    setExpandedTestimonials(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(testimonialId)) {
+        newSet.delete(testimonialId);
+      } else {
+        newSet.add(testimonialId);
+      }
+      return newSet;
+    });
+  };
 
   useEffect(() => {
     fetchTestimonials();
@@ -236,25 +249,32 @@ export const TestimonialsSection = ({ compact = false }: TestimonialsSectionProp
           ) : (
             <>
               <div className="space-y-2">
-                {getTopTestimonials().map((testimonial) => (
-                  <div
-                    key={testimonial.id}
-                    className="p-2 rounded-lg border border-primary/20 bg-gradient-to-r from-background to-primary/5"
-                  >
-                    <div className="flex items-center justify-between mb-1">
-                      <div className="flex items-center gap-1">
-                        <User className="h-3 w-3 text-primary flex-shrink-0" />
-                        <span className="font-semibold text-xs truncate max-w-[80px]">
-                          {testimonial.display_name}
-                        </span>
-                        {renderStars(testimonial.rating)}
+                {getTopTestimonials().map((testimonial) => {
+                  const isExpanded = expandedTestimonials.has(testimonial.id);
+                  return (
+                    <div
+                      key={testimonial.id}
+                      onClick={() => toggleTestimonialExpanded(testimonial.id)}
+                      className="p-2 rounded-lg border border-primary/20 bg-gradient-to-r from-background to-primary/5 cursor-pointer active:bg-primary/10 transition-colors"
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-1">
+                          <User className="h-3 w-3 text-primary flex-shrink-0" />
+                          <span className="font-semibold text-xs truncate max-w-[80px]">
+                            {testimonial.display_name}
+                          </span>
+                          {renderStars(testimonial.rating)}
+                        </div>
                       </div>
+                      <p className={`text-xs leading-relaxed text-foreground/90 ${isExpanded ? '' : 'line-clamp-2'}`}>
+                        "{testimonial.testimonial_text}"
+                      </p>
+                      {!isExpanded && testimonial.testimonial_text.length > 80 && (
+                        <p className="text-[10px] text-muted-foreground mt-1">Tap to read more</p>
+                      )}
                     </div>
-                    <p className="text-xs leading-relaxed line-clamp-2 text-foreground/90">
-                      "{testimonial.testimonial_text}"
-                    </p>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
               {testimonials.length > 6 && (
                 <div className="mt-3 text-center">
