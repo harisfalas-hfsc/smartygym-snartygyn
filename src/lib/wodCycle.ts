@@ -20,7 +20,7 @@ export const FORMATS_BY_CATEGORY: Record<string, string[]> = {
   "METABOLIC": ["CIRCUIT", "AMRAP", "EMOM", "FOR TIME", "TABATA"],
   "CALORIE BURNING": ["CIRCUIT", "TABATA", "AMRAP", "FOR TIME", "EMOM"],
   "CHALLENGE": ["CIRCUIT", "TABATA", "AMRAP", "EMOM", "FOR TIME", "MIX"],
-  "RECOVERY": ["CIRCUIT", "REPS & SETS"]
+  "RECOVERY": ["MIX"]
 };
 
 // All valid categories
