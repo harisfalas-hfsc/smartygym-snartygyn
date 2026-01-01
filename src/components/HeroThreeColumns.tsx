@@ -87,10 +87,16 @@ const AnimatedBullet = ({ icon, text, delay, onClick, isLink, isVisible, highlig
 };
 
 // Helper to convert star count to difficulty label
-const getDifficultyLabel = (stars: number): string => {
+const getDifficultyLabel = (stars: number | null | undefined, isRecovery: boolean): string => {
+  if (isRecovery || !stars || stars === 0) return "All Levels";
   if (stars <= 2) return "Beginner";
   if (stars <= 4) return "Intermediate";
   return "Advanced"; // 5-6 stars
+};
+
+// Check if WOD is recovery type
+const isRecoveryWod = (wod: { equipment?: string | null; category?: string | null }): boolean => {
+  return wod.equipment?.toUpperCase() === "VARIOUS" || wod.category?.toUpperCase() === "RECOVERY";
 };
 
 export const HeroThreeColumns = () => {
@@ -289,13 +295,17 @@ export const HeroThreeColumns = () => {
                     <div className="absolute top-2 left-2">
                       <span className={cn(
                         "text-[10px] font-bold px-1.5 py-0.5 rounded-full",
-                        wod.equipment?.toLowerCase().includes("none") || wod.equipment?.toLowerCase().includes("bodyweight")
-                          ? "bg-emerald-500 text-white"
-                          : "bg-blue-500 text-white"
+                        isRecoveryWod(wod)
+                          ? "bg-cyan-500 text-white"
+                          : wod.equipment?.toLowerCase().includes("none") || wod.equipment?.toLowerCase().includes("bodyweight")
+                            ? "bg-emerald-500 text-white"
+                            : "bg-blue-500 text-white"
                       )}>
-                        {wod.equipment?.toLowerCase().includes("none") || wod.equipment?.toLowerCase().includes("bodyweight") 
-                          ? "Bodyweight" 
-                          : "Equipment"}
+                        {isRecoveryWod(wod) 
+                          ? "Recovery"
+                          : wod.equipment?.toLowerCase().includes("none") || wod.equipment?.toLowerCase().includes("bodyweight") 
+                            ? "Bodyweight" 
+                            : "Equipment"}
                       </span>
                     </div>
                     {/* Premium Badge */}
@@ -316,29 +326,28 @@ export const HeroThreeColumns = () => {
                     
                     {/* Metadata Grid - 2 columns */}
                     <div className="grid grid-cols-2 gap-x-3 gap-y-0.5">
-                      {/* Row 1: Type + Category */}
-                      {wod.type && (
-                        <div className="flex items-center gap-1 text-[10px]">
-                          <Target className="w-3 h-3 text-primary" />
-                          <span className="text-primary font-semibold uppercase">{wod.type}</span>
-                        </div>
-                      )}
+                      {/* Row 1: Category + Format (not type) */}
                       {wod.category && (
                         <div className="flex items-center gap-1 text-[10px]">
                           <Flame className="w-3 h-3 text-orange-500" />
                           <span className="text-orange-600 dark:text-orange-400 font-semibold uppercase">{wod.category}</span>
                         </div>
                       )}
-                      
-                      {/* Row 2: Difficulty + Duration */}
-                      {wod.difficulty_stars && (
+                      {/* Show format from focus field if available, otherwise don't show type for recovery */}
+                      {wod.focus && !isRecoveryWod(wod) && (
                         <div className="flex items-center gap-1 text-[10px]">
-                          <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
-                          <span className="text-yellow-600 dark:text-yellow-400 font-semibold uppercase">
-                            {getDifficultyLabel(wod.difficulty_stars)}
-                          </span>
+                          <Target className="w-3 h-3 text-primary" />
+                          <span className="text-primary font-semibold uppercase">{wod.focus}</span>
                         </div>
                       )}
+                      
+                      {/* Row 2: Difficulty + Duration */}
+                      <div className="flex items-center gap-1 text-[10px]">
+                        <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+                        <span className="text-yellow-600 dark:text-yellow-400 font-semibold uppercase">
+                          {getDifficultyLabel(wod.difficulty_stars, isRecoveryWod(wod))}
+                        </span>
+                      </div>
                       {wod.duration && (
                         <div className="flex items-center gap-1 text-[10px]">
                           <Clock className="w-3 h-3 text-purple-500" />

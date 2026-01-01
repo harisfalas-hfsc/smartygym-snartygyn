@@ -109,7 +109,11 @@ export const WorkoutOfTheDay = () => {
           <span className="text-muted-foreground/50">•</span>
           <div className="flex items-center gap-1">
             <TrendingUp className="w-2.5 h-2.5 text-primary" />
-            <span className="text-muted-foreground">{wod.difficulty_stars}⭐</span>
+            <span className="text-muted-foreground">
+              {wod.difficulty_stars && wod.difficulty_stars > 0 
+                ? `${wod.difficulty_stars}⭐` 
+                : "All Levels"}
+            </span>
           </div>
           <span className="text-muted-foreground/50">•</span>
           <div className="flex items-center gap-1">
@@ -159,6 +163,9 @@ export const WorkoutOfTheDay = () => {
               {wod.format}
             </Badge>
           )}
+          <Badge variant="outline" className="bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 border-yellow-500/40">
+            All Levels
+          </Badge>
           <div className="flex items-center gap-1 text-muted-foreground">
             <Clock className="w-3 h-3" />
             {wod.duration || "30-45 min"}
