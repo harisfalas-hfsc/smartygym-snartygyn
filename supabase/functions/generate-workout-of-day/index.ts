@@ -426,13 +426,13 @@ serve(async (req) => {
     
     // ═══════════════════════════════════════════════════════════════════════════════
     // FORMAT SELECTION: STRENGTH, MOBILITY & STABILITY, and PILATES = always REPS & SETS
-    // RECOVERY = always FLOW format (one mixed workout)
+    // RECOVERY = always MIX format (one mixed workout, no difficulty)
     // Other categories can have different formats per equipment type
     // ═══════════════════════════════════════════════════════════════════════════════
     const getFormatForWorkout = (cat: string, equipType: string): { format: string; duration: string } => {
-      // RECOVERY: Always FLOW format, 30-45 min duration (no difficulty stars)
+      // RECOVERY: Always MIX format, 30-45 min duration (no difficulty stars)
       if (cat === "RECOVERY") {
-        return { format: "FLOW", duration: "30-45 min" };
+        return { format: "MIX", duration: "30-45 min" };
       }
       
       // STRENGTH, MOBILITY & STABILITY, and PILATES: MUST be REPS & SETS for both workouts
