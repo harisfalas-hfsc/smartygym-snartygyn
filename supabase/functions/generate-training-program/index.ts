@@ -432,49 +432,9 @@ Available exercises: ${exerciseList}`;
 
     console.log(`[TrainingProgram] Generated ${type} successfully (${generatedPlan.length} chars)`);
 
-    // Exercise matching - process the generated content
-    try {
-      const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-      const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-      const supabaseClient = createClient(supabaseUrl, supabaseKey);
-
-      // Fetch exercise library for matching
-      const { data: exerciseLibrary, error: exError } = await supabaseClient
-        .from('exercises')
-        .select('id, name, body_part, equipment, target');
-
-      if (exError) {
-        console.error('[TrainingProgram] Error fetching exercise library:', exError);
-      } else if (exerciseLibrary && exerciseLibrary.length > 0) {
-        console.log(`[TrainingProgram] Loaded ${exerciseLibrary.length} exercises for matching`);
-        
-        // Process content with exercise matching
-        const { processedContent, matched, unmatched } = processContentWithExerciseMatching(
-          generatedPlan,
-          exerciseLibrary as ExerciseBasic[],
-          '[TrainingProgram]'
-        );
-        
-        generatedPlan = processedContent;
-        
-        console.log(`[TrainingProgram] Matched ${matched.length} exercises, ${unmatched.length} unmatched`);
-        
-        // Log unmatched exercises to database for admin review
-        if (unmatched.length > 0) {
-          await logUnmatchedExercises(
-            supabaseClient,
-            unmatched,
-            type === 'workout' ? 'workout' : 'program',
-            null,
-            `AI Generated ${type}`,
-            '[TrainingProgram]'
-          );
-        }
-      }
-    } catch (matchError) {
-      console.error('[TrainingProgram] Exercise matching error (non-fatal):', matchError);
-      // Continue with unprocessed content if matching fails
-    }
+    // Exercise matching - DISABLED
+    // The exercise linking feature has been disabled per user request.
+    // The exercise library remains available for admin use in the back office.
 
     return new Response(JSON.stringify({ plan: generatedPlan }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
