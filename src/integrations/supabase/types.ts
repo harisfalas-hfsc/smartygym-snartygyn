@@ -366,6 +366,10 @@ export type Database = {
         Row: {
           content: string
           created_at: string | null
+          dashboard_content: string | null
+          dashboard_subject: string | null
+          email_content: string | null
+          email_subject: string | null
           id: string
           is_active: boolean | null
           is_default: boolean | null
@@ -385,6 +389,10 @@ export type Database = {
         Insert: {
           content: string
           created_at?: string | null
+          dashboard_content?: string | null
+          dashboard_subject?: string | null
+          email_content?: string | null
+          email_subject?: string | null
           id?: string
           is_active?: boolean | null
           is_default?: boolean | null
@@ -404,6 +412,10 @@ export type Database = {
         Update: {
           content?: string
           created_at?: string | null
+          dashboard_content?: string | null
+          dashboard_subject?: string | null
+          email_content?: string | null
+          email_subject?: string | null
           id?: string
           is_active?: boolean | null
           is_default?: boolean | null

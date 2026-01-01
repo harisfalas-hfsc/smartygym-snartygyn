@@ -15,8 +15,17 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Settings, FileText, Info, Plus } from "lucide-react";
+import { Loader2, Settings, FileText, Info, Plus, History, Mail, MessageSquare, Check } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { format } from "date-fns";
 
 interface AutomationRule {
   id: string;
@@ -40,6 +49,21 @@ interface MessageTemplate {
   subject: string;
   content: string;
   is_active: boolean;
+  is_default: boolean;
+  dashboard_subject?: string;
+  dashboard_content?: string;
+  email_subject?: string;
+  email_content?: string;
+  updated_at?: string;
+}
+
+interface AuditLogEntry {
+  id: string;
+  sent_at: string;
+  subject: string;
+  recipient_count: number;
+  success_count: number;
+  failed_count: number;
 }
 
 interface AutomationRuleEditDialogProps {
@@ -68,32 +92,68 @@ export const AutomationRuleEditDialog = ({
     rule.trigger_config?.delay_minutes?.toString() || "0"
   );
   const [templateData, setTemplateData] = useState<MessageTemplate | null>(null);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("settings");
+  const [contentChannel, setContentChannel] = useState<"dashboard" | "email">("dashboard");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Fetch associated template
-  const { data: template, isLoading: templateLoading } = useQuery({
-    queryKey: ["message-template", rule.message_type],
+  // Fetch ALL templates for this message_type (not just one)
+  const { data: templates, isLoading: templateLoading, error: templateError } = useQuery({
+    queryKey: ["message-templates-list", rule.message_type],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("automated_message_templates")
         .select("*")
         .eq("message_type", rule.message_type as any)
-        .maybeSingle();
+        .order("is_default", { ascending: false })
+        .order("updated_at", { ascending: false });
 
       if (error) throw error;
-      return data as MessageTemplate | null;
+      return (data || []) as MessageTemplate[];
     },
     enabled: open,
   });
 
-  // Update local template state when fetched
+  // Fetch send history for this message_type
+  const { data: sendHistory } = useQuery({
+    queryKey: ["notification-history", rule.message_type],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("notification_audit_log")
+        .select("id, sent_at, subject, recipient_count, success_count, failed_count")
+        .eq("message_type", rule.message_type)
+        .order("sent_at", { ascending: false })
+        .limit(10);
+
+      if (error) throw error;
+      return (data || []) as AuditLogEntry[];
+    },
+    enabled: open && activeTab === "history",
+  });
+
+  // Auto-select the default template when templates load
   useEffect(() => {
-    if (template) {
-      setTemplateData(template);
+    if (templates && templates.length > 0) {
+      // Find the default template, or fallback to most recent
+      const defaultTemplate = templates.find(t => t.is_default) || templates[0];
+      setSelectedTemplateId(defaultTemplate.id);
+      setTemplateData(defaultTemplate);
+    } else {
+      setSelectedTemplateId(null);
+      setTemplateData(null);
     }
-  }, [template]);
+  }, [templates]);
+
+  // Update templateData when selection changes
+  useEffect(() => {
+    if (selectedTemplateId && templates) {
+      const selected = templates.find(t => t.id === selectedTemplateId);
+      if (selected) {
+        setTemplateData(selected);
+      }
+    }
+  }, [selectedTemplateId, templates]);
 
   // Reset form when rule changes
   useEffect(() => {
@@ -135,6 +195,10 @@ export const AutomationRuleEditDialog = ({
         .update({
           subject: data.subject,
           content: data.content,
+          dashboard_subject: data.dashboard_subject,
+          dashboard_content: data.dashboard_content,
+          email_subject: data.email_subject,
+          email_content: data.email_content,
           updated_at: new Date().toISOString(),
         })
         .eq("id", templateData.id);
@@ -142,7 +206,7 @@ export const AutomationRuleEditDialog = ({
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["message-template", rule.message_type] });
+      queryClient.invalidateQueries({ queryKey: ["message-templates-list", rule.message_type] });
     },
     onError: (error) => {
       throw error;
@@ -151,13 +215,28 @@ export const AutomationRuleEditDialog = ({
 
   const createTemplateMutation = useMutation({
     mutationFn: async () => {
+      // Find existing default to copy content from
+      const existingDefault = templates?.find(t => t.is_default);
+      const defaultSubject = existingDefault?.subject || `${rule.name} - Notification`;
+      const defaultContent = existingDefault?.content || `This is the default content for ${rule.name}. Edit this message to customize what users receive.`;
+
+      // First, unset any existing defaults for this message_type
+      await supabase
+        .from("automated_message_templates")
+        .update({ is_default: false })
+        .eq("message_type", rule.message_type as any);
+
       const { data, error } = await supabase
         .from("automated_message_templates")
         .insert({
           message_type: rule.message_type as any,
           template_name: rule.name,
-          subject: `${rule.name} - Notification`,
-          content: `This is the default content for ${rule.name}. Edit this message to customize what users receive.`,
+          subject: defaultSubject,
+          content: defaultContent,
+          dashboard_subject: defaultSubject,
+          dashboard_content: defaultContent,
+          email_subject: defaultSubject,
+          email_content: defaultContent,
           is_active: true,
           is_default: true,
         })
@@ -169,7 +248,8 @@ export const AutomationRuleEditDialog = ({
     },
     onSuccess: (data) => {
       setTemplateData(data);
-      queryClient.invalidateQueries({ queryKey: ["message-template", rule.message_type] });
+      setSelectedTemplateId(data.id);
+      queryClient.invalidateQueries({ queryKey: ["message-templates-list", rule.message_type] });
       toast({
         title: "Template Created",
         description: "You can now edit the content for this automation",
@@ -184,6 +264,38 @@ export const AutomationRuleEditDialog = ({
     },
   });
 
+  const setAsDefaultMutation = useMutation({
+    mutationFn: async (templateId: string) => {
+      // First unset all defaults for this message_type
+      await supabase
+        .from("automated_message_templates")
+        .update({ is_default: false })
+        .eq("message_type", rule.message_type as any);
+
+      // Then set the new default
+      const { error } = await supabase
+        .from("automated_message_templates")
+        .update({ is_default: true })
+        .eq("id", templateId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["message-templates-list", rule.message_type] });
+      toast({
+        title: "Default Updated",
+        description: "This template is now the default for this automation",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: `Failed to set default: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -192,10 +304,8 @@ export const AutomationRuleEditDialog = ({
       await updateRuleMutation.mutateAsync(formData);
 
       // Update template content if changed
-      if (templateData && template) {
-        if (templateData.subject !== template.subject || templateData.content !== template.content) {
-          await updateTemplateMutation.mutateAsync(templateData);
-        }
+      if (templateData) {
+        await updateTemplateMutation.mutateAsync(templateData);
       }
 
       toast({
@@ -212,8 +322,54 @@ export const AutomationRuleEditDialog = ({
     }
   };
 
-  const isLoading = updateRuleMutation.isPending || updateTemplateMutation.isPending || createTemplateMutation.isPending;
+  const handleTemplateSelect = (templateId: string) => {
+    setSelectedTemplateId(templateId);
+    const selected = templates?.find(t => t.id === templateId);
+    if (selected) {
+      setTemplateData(selected);
+    }
+  };
+
+  const isLoading = updateRuleMutation.isPending || updateTemplateMutation.isPending || createTemplateMutation.isPending || setAsDefaultMutation.isPending;
   const hints = placeholderHints[rule.message_type] || placeholderHints.default;
+
+  // Get current channel content
+  const getCurrentSubject = () => {
+    if (!templateData) return "";
+    if (contentChannel === "dashboard") {
+      return templateData.dashboard_subject || templateData.subject || "";
+    }
+    return templateData.email_subject || templateData.subject || "";
+  };
+
+  const getCurrentContent = () => {
+    if (!templateData) return "";
+    if (contentChannel === "dashboard") {
+      return templateData.dashboard_content || templateData.content || "";
+    }
+    return templateData.email_content || templateData.content || "";
+  };
+
+  const updateChannelContent = (field: "subject" | "content", value: string) => {
+    if (!templateData) return;
+    
+    if (contentChannel === "dashboard") {
+      setTemplateData({
+        ...templateData,
+        dashboard_subject: field === "subject" ? value : templateData.dashboard_subject,
+        dashboard_content: field === "content" ? value : templateData.dashboard_content,
+        // Also update legacy fields for backward compatibility
+        subject: field === "subject" ? value : templateData.subject,
+        content: field === "content" ? value : templateData.content,
+      });
+    } else {
+      setTemplateData({
+        ...templateData,
+        email_subject: field === "subject" ? value : templateData.email_subject,
+        email_content: field === "content" ? value : templateData.email_content,
+      });
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -227,7 +383,7 @@ export const AutomationRuleEditDialog = ({
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="settings" className="flex items-center gap-2">
                 <Settings className="h-4 w-4" />
                 Settings
@@ -235,6 +391,10 @@ export const AutomationRuleEditDialog = ({
               <TabsTrigger value="content" className="flex items-center gap-2">
                 <FileText className="h-4 w-4" />
                 Content
+              </TabsTrigger>
+              <TabsTrigger value="history" className="flex items-center gap-2">
+                <History className="h-4 w-4" />
+                History
               </TabsTrigger>
             </TabsList>
 
@@ -351,8 +511,85 @@ export const AutomationRuleEditDialog = ({
                 <div className="flex items-center justify-center py-8">
                   <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                 </div>
-              ) : templateData ? (
+              ) : templateError ? (
+                <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 text-center">
+                  <p className="text-sm text-destructive">
+                    Error loading templates: {(templateError as Error).message}
+                  </p>
+                </div>
+              ) : templates && templates.length > 0 && templateData ? (
                 <>
+                  {/* Template selector if multiple exist */}
+                  {templates.length > 1 && (
+                    <div className="space-y-2">
+                      <Label>Select Template</Label>
+                      <div className="flex gap-2">
+                        <Select value={selectedTemplateId || ""} onValueChange={handleTemplateSelect}>
+                          <SelectTrigger className="flex-1">
+                            <SelectValue placeholder="Select a template" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {templates.map((t) => (
+                              <SelectItem key={t.id} value={t.id}>
+                                <div className="flex items-center gap-2">
+                                  {t.template_name}
+                                  {t.is_default && (
+                                    <Badge variant="secondary" className="text-xs">Default</Badge>
+                                  )}
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {templateData && !templateData.is_default && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setAsDefaultMutation.mutate(templateData.id)}
+                            disabled={setAsDefaultMutation.isPending}
+                          >
+                            <Check className="h-4 w-4 mr-1" />
+                            Set as Default
+                          </Button>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        The default template is the one used when sending notifications.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Channel tabs for separate email/dashboard content */}
+                  <div className="border rounded-lg p-1 bg-muted/30">
+                    <div className="flex gap-1">
+                      {formData.sends_dashboard_message && (
+                        <Button
+                          type="button"
+                          variant={contentChannel === "dashboard" ? "secondary" : "ghost"}
+                          size="sm"
+                          className="flex-1"
+                          onClick={() => setContentChannel("dashboard")}
+                        >
+                          <MessageSquare className="h-4 w-4 mr-2" />
+                          Dashboard Message
+                        </Button>
+                      )}
+                      {formData.sends_email && (
+                        <Button
+                          type="button"
+                          variant={contentChannel === "email" ? "secondary" : "ghost"}
+                          size="sm"
+                          className="flex-1"
+                          onClick={() => setContentChannel("email")}
+                        >
+                          <Mail className="h-4 w-4 mr-2" />
+                          Email
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+
                   <div className="bg-muted/50 border rounded-lg p-3 flex items-start gap-2">
                     <Info className="h-4 w-4 mt-0.5 text-muted-foreground shrink-0" />
                     <div className="text-xs text-muted-foreground">
@@ -368,31 +605,37 @@ export const AutomationRuleEditDialog = ({
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="subject">Subject Line</Label>
+                    <Label htmlFor="subject">
+                      {contentChannel === "email" ? "Email Subject Line" : "Message Title"}
+                    </Label>
                     <Input
                       id="subject"
-                      value={templateData.subject}
-                      onChange={(e) =>
-                        setTemplateData({ ...templateData, subject: e.target.value })
-                      }
-                      placeholder="Email subject line"
+                      value={getCurrentSubject()}
+                      onChange={(e) => updateChannelContent("subject", e.target.value)}
+                      placeholder={contentChannel === "email" ? "Email subject line" : "Dashboard message title"}
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="content">Message Content</Label>
+                    <Label htmlFor="content">
+                      {contentChannel === "email" ? "Email Content" : "Message Content"}
+                    </Label>
                     <Textarea
                       id="content"
-                      value={templateData.content}
-                      onChange={(e) =>
-                        setTemplateData({ ...templateData, content: e.target.value })
-                      }
+                      value={getCurrentContent()}
+                      onChange={(e) => updateChannelContent("content", e.target.value)}
                       rows={12}
                       className="font-mono text-sm"
-                      placeholder="Message content (supports HTML for emails)"
+                      placeholder={contentChannel === "email" 
+                        ? "Email content (supports HTML formatting)" 
+                        : "Dashboard message content"
+                      }
                     />
                     <p className="text-xs text-muted-foreground">
-                      This content is used for both dashboard messages and emails. HTML formatting is supported for emails.
+                      {contentChannel === "email" 
+                        ? "HTML formatting is supported for emails." 
+                        : "This content appears in the user's dashboard notification panel."
+                      }
                     </p>
                   </div>
                 </>
@@ -418,6 +661,47 @@ export const AutomationRuleEditDialog = ({
                     )}
                     Create Template
                   </Button>
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="history" className="space-y-4 mt-4">
+              <div className="space-y-2">
+                <h4 className="font-semibold text-sm flex items-center gap-2">
+                  <History className="h-4 w-4" />
+                  Recent Sends
+                </h4>
+                <p className="text-xs text-muted-foreground">
+                  Last 10 notifications sent for this automation
+                </p>
+              </div>
+
+              {sendHistory && sendHistory.length > 0 ? (
+                <div className="space-y-2">
+                  {sendHistory.map((entry) => (
+                    <div key={entry.id} className="border rounded-lg p-3 text-sm">
+                      <div className="flex justify-between items-start mb-1">
+                        <span className="font-medium truncate flex-1">{entry.subject}</span>
+                        <span className="text-xs text-muted-foreground ml-2">
+                          {format(new Date(entry.sent_at), "MMM d, HH:mm")}
+                        </span>
+                      </div>
+                      <div className="flex gap-3 text-xs text-muted-foreground">
+                        <span>Recipients: {entry.recipient_count || 0}</span>
+                        <span className="text-green-600">Sent: {entry.success_count || 0}</span>
+                        {(entry.failed_count || 0) > 0 && (
+                          <span className="text-destructive">Failed: {entry.failed_count}</span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="bg-muted/50 border rounded-lg p-6 text-center">
+                  <History className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground">
+                    No send history found for this automation
+                  </p>
                 </div>
               )}
             </TabsContent>
