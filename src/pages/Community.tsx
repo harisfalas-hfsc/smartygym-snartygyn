@@ -98,6 +98,19 @@ const Community = () => {
   const [leaderboardFilter, setLeaderboardFilter] = useState<"workouts" | "programs" | "checkins">("workouts");
   const [ratingsFilter, setRatingsFilter] = useState<"workouts" | "programs">("workouts");
   const [commentsFilter, setCommentsFilter] = useState<"all" | "workouts" | "programs">("all");
+  const [expandedComments, setExpandedComments] = useState<Set<string>>(new Set());
+
+  const toggleCommentExpanded = (commentId: string) => {
+    setExpandedComments(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(commentId)) {
+        newSet.delete(commentId);
+      } else {
+        newSet.add(commentId);
+      }
+      return newSet;
+    });
+  };
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
   
   
@@ -805,48 +818,59 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                       ) : (
                         <>
                           <div className="space-y-2">
-                            {getTopComments().map((comment) => (
-                              <div
-                                key={comment.id}
-                                className="p-2 rounded-lg border border-primary/20 bg-gradient-to-r from-background to-primary/5"
-                              >
-                                <div className="flex items-center justify-between mb-1">
-                                  <div className="flex items-center gap-1">
-                                    <User className="h-3 w-3 text-primary flex-shrink-0" />
-                                    <span className="font-semibold text-xs truncate max-w-[100px]">
-                                      {comment.display_name}
+                            {getTopComments().map((comment) => {
+                              const isExpanded = expandedComments.has(comment.id);
+                              return (
+                                <div
+                                  key={comment.id}
+                                  onClick={() => toggleCommentExpanded(comment.id)}
+                                  className="p-2 rounded-lg border border-primary/20 bg-gradient-to-r from-background to-primary/5 cursor-pointer active:bg-primary/10 transition-colors"
+                                >
+                                  <div className="flex items-center justify-between mb-1">
+                                    <div className="flex items-center gap-1">
+                                      <User className="h-3 w-3 text-primary flex-shrink-0" />
+                                      <span className="font-semibold text-xs truncate max-w-[100px]">
+                                        {comment.display_name}
+                                      </span>
+                                    </div>
+                                    <span className="text-[10px] text-muted-foreground">
+                                      {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
                                     </span>
                                   </div>
-                                  <span className="text-[10px] text-muted-foreground">
-                                    {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
-                                  </span>
-                                </div>
-                                <p className="text-[10px] text-primary font-medium mb-1">
-                                  {comment.workout_name ? (
-                                    <>
-                                      Workout:{" "}
-                                      <Link
-                                        to={`/workout/${comment.workout_type}/${comment.workout_id}`}
-                                        className="hover:underline font-semibold"
-                                      >
-                                        {comment.workout_name}
-                                      </Link>
-                                    </>
-                                  ) : (
-                                    <>
-                                      Program:{" "}
-                                      <Link
-                                        to={`/trainingprogram/${comment.program_type}/${comment.program_id}`}
-                                        className="hover:underline font-semibold"
-                                      >
-                                        {comment.program_name}
-                                      </Link>
-                                    </>
+                                  <p className="text-[10px] text-primary font-medium mb-1">
+                                    {comment.workout_name ? (
+                                      <>
+                                        Workout:{" "}
+                                        <Link
+                                          to={`/workout/${comment.workout_type}/${comment.workout_id}`}
+                                          className="hover:underline font-semibold"
+                                          onClick={(e) => e.stopPropagation()}
+                                        >
+                                          {comment.workout_name}
+                                        </Link>
+                                      </>
+                                    ) : (
+                                      <>
+                                        Program:{" "}
+                                        <Link
+                                          to={`/trainingprogram/${comment.program_type}/${comment.program_id}`}
+                                          className="hover:underline font-semibold"
+                                          onClick={(e) => e.stopPropagation()}
+                                        >
+                                          {comment.program_name}
+                                        </Link>
+                                      </>
+                                    )}
+                                  </p>
+                                  <p className={`text-xs leading-relaxed ${isExpanded ? '' : 'line-clamp-2'}`}>
+                                    {comment.comment_text}
+                                  </p>
+                                  {!isExpanded && comment.comment_text.length > 80 && (
+                                    <p className="text-[10px] text-muted-foreground mt-1">Tap to read more</p>
                                   )}
-                                </p>
-                                <p className="text-xs leading-relaxed line-clamp-2">{comment.comment_text}</p>
-                              </div>
-                            ))}
+                                </div>
+                              );
+                            })}
                           </div>
                           {comments.length > 6 && (
                             <div className="mt-3 text-center">
