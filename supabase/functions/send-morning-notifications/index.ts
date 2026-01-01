@@ -53,24 +53,43 @@ serve(async (req) => {
     logStep("Looking for today's content", { todayStr });
 
     // ============================================
-    // FETCH TEMPLATES FROM DATABASE (DETERMINISTIC: is_active=true AND is_default=true)
+    // FETCH TEMPLATES FROM DATABASE
+    // Priority: 1) automation_key match + is_active, 2) is_default + is_active
     // ============================================
     const { data: templates } = await supabase
       .from("automated_message_templates")
       .select("*")
       .in("message_type", ["morning_wod", "morning_wod_recovery", "morning_ritual"])
-      .eq("is_active", true)
-      .eq("is_default", true);
+      .eq("is_active", true);
 
-    // Get the SINGLE default template for each type
-    const wodTemplate = templates?.find(t => t.message_type === "morning_wod");
-    const wodRecoveryTemplate = templates?.find(t => t.message_type === "morning_wod_recovery");
-    const ritualTemplate = templates?.find(t => t.message_type === "morning_ritual");
+    // Helper to find best template: prioritize automation_key match, then is_default
+    const findBestTemplate = (messageType: string, automationKey: string) => {
+      const templatesForType = templates?.filter(t => t.message_type === messageType) || [];
+      
+      // First: find by automation_key match
+      const byAutomationKey = templatesForType.find(t => t.automation_key === automationKey);
+      if (byAutomationKey) return byAutomationKey;
+      
+      // Second: find by is_default
+      const defaultTemplate = templatesForType.find(t => t.is_default === true);
+      if (defaultTemplate) return defaultTemplate;
+      
+      // Third: any active template for this type
+      return templatesForType[0] || null;
+    };
 
-    logStep("Templates loaded (default only)", { 
+    // Get the BEST template for each type (prioritizing automation_key match)
+    const wodTemplate = findBestTemplate("morning_wod", "morning_wod");
+    const wodRecoveryTemplate = findBestTemplate("morning_wod_recovery", "morning_wod_recovery");
+    const ritualTemplate = findBestTemplate("morning_ritual", "morning_ritual");
+
+    logStep("Templates loaded (automation_key priority)", { 
       hasWodTemplate: !!wodTemplate, 
       hasWodRecoveryTemplate: !!wodRecoveryTemplate,
-      hasRitualTemplate: !!ritualTemplate 
+      hasRitualTemplate: !!ritualTemplate,
+      wodTemplateId: wodTemplate?.id,
+      wodRecoveryTemplateId: wodRecoveryTemplate?.id,
+      ritualTemplateId: ritualTemplate?.id
     });
 
     // ============================================
