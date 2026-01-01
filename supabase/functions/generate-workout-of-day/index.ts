@@ -1640,58 +1640,10 @@ Return JSON with these exact fields:
       logStep(`${equipment} workout generated`, { name: workoutContent.name });
 
       // ═══════════════════════════════════════════════════════════════════════════════
-      // EXERCISE LIBRARY MATCHING - Post-process AI content to link exercises
+      // EXERCISE LIBRARY MATCHING - DISABLED
+      // The exercise linking feature has been disabled per user request.
+      // The exercise library remains available for admin use in the back office.
       // ═══════════════════════════════════════════════════════════════════════════════
-      try {
-        // Fetch exercise library for matching
-        const { data: exerciseLibrary, error: exerciseError } = await supabase
-          .from('exercises')
-          .select('id, name, body_part, equipment, target');
-        
-        if (exerciseLibrary && exerciseLibrary.length > 0) {
-          logStep(`Exercise library loaded for matching`, { count: exerciseLibrary.length });
-          
-          // Process main_workout content to match exercises
-          const exercisesForMatching: ExerciseBasic[] = exerciseLibrary.map(e => ({
-            id: e.id,
-            name: e.name,
-            body_part: e.body_part,
-            equipment: e.equipment,
-            target: e.target
-          }));
-          
-          const { processedContent, matched, unmatched } = 
-            processContentWithExerciseMatching(workoutContent.main_workout, exercisesForMatching);
-          
-          // Update main_workout with exercise markup
-          workoutContent.main_workout = processedContent;
-          
-          logStep(`Exercise matching completed for ${equipment}`, {
-            matchedCount: matched.length,
-            unmatchedCount: unmatched.length,
-            matchedNames: matched.map((m: { original: string; matched: string; id: string; confidence: number }) => m.matched),
-            unmatchedNames: unmatched
-          });
-          
-          // Log unmatched exercises to database for admin review
-          if (unmatched.length > 0) {
-            const workoutId = `WOD-${prefix}-${equipment.charAt(0)}-${timestamp}`;
-            await logUnmatchedExercises(
-              supabase,
-              unmatched,
-              'wod',
-              workoutId,
-              workoutContent.name
-            );
-            logStep(`Unmatched exercises logged to database`, { count: unmatched.length });
-          }
-        } else {
-          logStep(`No exercise library found or error`, { error: exerciseError?.message });
-        }
-      } catch (matchError: any) {
-        logStep(`Exercise matching error (non-fatal)`, { error: matchError.message });
-        // Continue without matching - non-fatal error
-      }
 
       // ═══════════════════════════════════════════════════════════════════════════════
       // IMAGE GENERATION WITH RETRY LOGIC - CRITICAL FOR WOD INTEGRITY
