@@ -42,7 +42,7 @@ import CorporateAdmin from "./pages/CorporateAdmin";
 import CalculatorHistory from "./pages/CalculatorHistory";
 
 import Tools from "./pages/Tools";
-import FreeContent from "./pages/FreeContent";
+
 import Blog from "./pages/Blog";
 import About from "./pages/About";
 import FAQ from "./pages/FAQ";
@@ -116,8 +116,6 @@ const AppContent = () => {
                   <Route path="/about" element={<About />} />
                   <Route path="/faq" element={<FAQ />} />
                 
-                {/* Public free content page */}
-                <Route path="/freecontent" element={<FreeContent />} />
                 <Route path="/newsletter-thank-you" element={<NewsletterThankYou />} />
                 <Route path="/unsubscribe" element={<Unsubscribe />} />
                 <Route path="/blog" element={<Blog />} />
