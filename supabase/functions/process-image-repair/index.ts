@@ -9,53 +9,51 @@ const corsHeaders = {
 
 const BATCH_SIZE = 5; // Process 5 items at a time to avoid timeouts
 
-async function storageObjectExists(supabase: any, path: string): Promise<boolean> {
-  try {
-    const { data, error } = await supabase.storage
-      .from('avatars')
-      .list(path.split('/').slice(0, -1).join('/'), {
-        search: path.split('/').pop(),
-      });
-    
-    if (error) return false;
-    const fileName = path.split('/').pop();
-    return data?.some((file: any) => file.name === fileName) || false;
-  } catch {
+// Simple and reliable: Just do a HEAD request to check if the image URL is accessible
+async function isImageValid(imageUrl: string | null): Promise<boolean> {
+  if (!imageUrl || imageUrl.trim() === '') {
+    console.log(`isImageValid: URL is empty or null`);
     return false;
   }
-}
-
-async function isImageValid(supabase: any, supabaseUrl: string, imageUrl: string | null): Promise<boolean> {
-  if (!imageUrl || imageUrl.trim() === '') return false;
   
-  // Check if it's a Supabase storage URL
-  if (imageUrl.includes(supabaseUrl) && imageUrl.includes('/storage/v1/object/public/')) {
-    const pathMatch = imageUrl.match(/\/storage\/v1\/object\/public\/avatars\/(.+)/);
-    if (pathMatch) {
-      return await storageObjectExists(supabase, pathMatch[1]);
-    }
-  }
-  
-  // For external URLs, do a quick HEAD request
   try {
+    console.log(`isImageValid: Checking URL: ${imageUrl}`);
     const response = await fetch(imageUrl, { method: 'HEAD' });
-    return response.ok;
-  } catch {
+    const isValid = response.ok && response.status === 200;
+    console.log(`isImageValid: ${imageUrl} -> ${isValid ? 'VALID' : 'INVALID'} (status: ${response.status})`);
+    return isValid;
+  } catch (error) {
+    console.log(`isImageValid: ${imageUrl} -> INVALID (fetch error: ${error})`);
     return false;
   }
 }
 
 async function generateAndUploadImage(
-  supabase: any,
   supabaseUrl: string,
   type: 'workout' | 'program',
   item: any
 ): Promise<string | null> {
   try {
     const functionName = type === 'workout' ? 'generate-workout-image' : 'generate-program-image';
+    
+    // FIXED: Use correct parameter names matching what each function expects
+    // generate-workout-image expects: { name, category, format, difficulty_stars }
+    // generate-program-image expects: { name, category, difficulty_stars, weeks }
     const body = type === 'workout' 
-      ? { workoutId: item.id, workoutName: item.name, workoutType: item.type, difficulty: item.difficulty }
-      : { programName: item.name, category: item.category, difficulty: item.difficulty, weeks: item.weeks };
+      ? { 
+          name: item.name, 
+          category: item.category, 
+          format: item.format,
+          difficulty_stars: item.difficulty_stars 
+        }
+      : { 
+          name: item.name, 
+          category: item.category, 
+          difficulty_stars: item.difficulty_stars, 
+          weeks: item.weeks 
+        };
+
+    console.log(`Generating ${type} image for "${item.name}" with params:`, JSON.stringify(body));
 
     const response = await fetch(`${supabaseUrl}/functions/v1/${functionName}`, {
       method: 'POST',
@@ -68,14 +66,16 @@ async function generateAndUploadImage(
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`Image generation failed for ${type} ${item.id}:`, errorText);
+      console.error(`Image generation failed for ${type} ${item.id} "${item.name}":`, errorText);
       return null;
     }
 
     const data = await response.json();
-    return data.imageUrl || data.image_url || null;
+    const newUrl = data.imageUrl || data.image_url || null;
+    console.log(`Successfully generated image for ${type} "${item.name}": ${newUrl}`);
+    return newUrl;
   } catch (error) {
-    console.error(`Error generating image for ${type} ${item.id}:`, error);
+    console.error(`Error generating image for ${type} ${item.id} "${item.name}":`, error);
     return null;
   }
 }
@@ -156,13 +156,16 @@ serve(async (req) => {
     
     for (const item of itemsToProcess) {
       try {
-        const isValid = await isImageValid(supabase, supabaseUrl, item.image_url);
+        console.log(`Processing ${item._type} "${item.name}" (id: ${item.id}), current image_url: ${item.image_url}`);
+        const isValid = await isImageValid(item.image_url);
         
         if (isValid) {
+          console.log(`Skipping ${item._type} "${item.name}" - image is valid`);
           skippedItems++;
         } else {
+          console.log(`Repairing ${item._type} "${item.name}" - image is invalid or missing`);
           // Generate new image
-          const newImageUrl = await generateAndUploadImage(supabase, supabaseUrl, item._type, item);
+          const newImageUrl = await generateAndUploadImage(supabaseUrl, item._type, item);
           
           if (newImageUrl) {
             // Update database
@@ -172,6 +175,7 @@ serve(async (req) => {
               .update({ image_url: newImageUrl })
               .eq('id', item.id);
 
+            console.log(`Updated ${tableName} "${item.name}" with new image: ${newImageUrl}`);
             repairedItems++;
 
             // Sync to Stripe if applicable
