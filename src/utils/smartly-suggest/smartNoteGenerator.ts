@@ -83,14 +83,6 @@ export const generateSmartNote = (
     }
   }
 
-  // 7. Active program reminder
-  const ongoingProgram = context.programInteractions.find(p => p.is_ongoing);
-  if (ongoingProgram && suggestion.type !== 'program') {
-    return {
-      message: `${ongoingProgram.program_name} is ready when you want to continue.`,
-      type: 'info'
-    };
-  }
 
   // 8. First workout encouragement
   if (context.completedWorkoutIds.length === 0) {
