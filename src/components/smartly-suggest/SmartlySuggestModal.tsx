@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { ChevronRight, Clock, Dumbbell, Zap, Link as LinkIcon } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { ChevronRight, ChevronLeft, Clock, Dumbbell, Zap } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -106,6 +106,63 @@ export const SmartlySuggestModal = ({ isOpen, onClose }: SmartlySuggestModalProp
     enabled: isOpen,
   });
 
+  // Fetch user measurement goals to determine if user has goals set
+  const { data: measurementGoals } = useQuery({
+    queryKey: ['smartly-suggest-measurement-goals', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data } = await supabase
+        .from('user_measurement_goals')
+        .select('target_weight, target_body_fat, target_muscle_mass')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      return data;
+    },
+    enabled: isOpen && !!user?.id,
+  });
+
+  // Determine if user has any goals (fitness goals or measurement goals)
+  const hasFitnessGoals = !!context.userGoal?.primary_goal;
+  const hasMeasurementGoals = !!(
+    measurementGoals?.target_weight ||
+    measurementGoals?.target_body_fat ||
+    measurementGoals?.target_muscle_mass
+  );
+  const hasAnyGoals = hasFitnessGoals || hasMeasurementGoals;
+
+  // Compute default goal based on existing goals
+  const defaultGoal = useMemo(() => {
+    // Priority: fitness goals first, then infer from measurement goals
+    if (context.userGoal?.primary_goal) {
+      return context.userGoal.primary_goal;
+    }
+    
+    // Infer from measurement goals
+    if (measurementGoals) {
+      // If user has weight or body fat targets → fat loss
+      if (measurementGoals.target_weight || measurementGoals.target_body_fat) {
+        return 'fat_loss';
+      }
+      // If user has muscle mass target → muscle gain
+      if (measurementGoals.target_muscle_mass) {
+        return 'muscle_gain';
+      }
+    }
+    
+    return null;
+  }, [context.userGoal?.primary_goal, measurementGoals]);
+
+  // Get goal source for reasoning
+  const goalSource = useMemo(() => {
+    if (context.userGoal?.primary_goal) return 'fitnessGoals';
+    if (measurementGoals?.target_weight || measurementGoals?.target_body_fat || measurementGoals?.target_muscle_mass) {
+      return 'measurementGoals';
+    }
+    return 'manual';
+  }, [context.userGoal?.primary_goal, measurementGoals]);
+
   // Log interaction mutation
   const logInteraction = useMutation({
     mutationFn: async (data: {
@@ -117,7 +174,7 @@ export const SmartlySuggestModal = ({ isOpen, onClose }: SmartlySuggestModalProp
         user_id: user.id,
         suggested_content_type: 'workout',
         suggested_content_id: data.suggested_content_id,
-        confidence_level: 'direct', // Fixed flow, no confidence levels
+        confidence_level: 'direct',
         questions_asked: ['mood', 'energy', 'goal', 'duration', 'equipment'] as unknown as any,
         user_responses: answers as unknown as any,
         action_taken: data.action_taken,
@@ -134,6 +191,15 @@ export const SmartlySuggestModal = ({ isOpen, onClose }: SmartlySuggestModalProp
     }
   }, [isOpen]);
 
+  // Back navigation handler
+  const goBack = () => {
+    if (currentStep === 2) setCurrentStep(1);
+    else if (currentStep === 3) setCurrentStep(2);
+    else if (currentStep === 4) setCurrentStep(3);
+    else if (currentStep === 5) setCurrentStep(4);
+    else if (currentStep === 'result') setCurrentStep(5);
+  };
+
   // Handle mood selection
   const handleMoodSelect = (value: number) => {
     setAnswers(prev => ({ ...prev, mood: value }));
@@ -148,7 +214,7 @@ export const SmartlySuggestModal = ({ isOpen, onClose }: SmartlySuggestModalProp
 
   // Handle goal selection
   const handleGoalSelect = (value: string) => {
-    setAnswers(prev => ({ ...prev, goal: value }));
+    setAnswers(prev => ({ ...prev, goal: value, goalSource }));
     setCurrentStep(4);
   };
 
@@ -173,7 +239,6 @@ export const SmartlySuggestModal = ({ isOpen, onClose }: SmartlySuggestModalProp
 
     onClose();
     
-    // Fix: Use proper route with category slug
     const categorySlug = getCategorySlug(item.category);
     navigate(`/workout/${categorySlug}/${item.id}`);
   };
@@ -215,11 +280,17 @@ export const SmartlySuggestModal = ({ isOpen, onClose }: SmartlySuggestModalProp
   const totalSteps = 5;
   const currentStepNum = currentStep === 'result' ? 5 : currentStep;
 
-  // Check if user has goals set
-  const userHasGoals = !!context.userGoal?.primary_goal;
-  const userGoalLabel = context.userGoal?.primary_goal
-    ? goalOptions.find(g => g.value === context.userGoal?.primary_goal)?.label || context.userGoal.primary_goal
+  // Get default goal label
+  const defaultGoalLabel = defaultGoal
+    ? goalOptions.find(g => g.value === defaultGoal)?.label || defaultGoal
     : null;
+
+  // Determine goal source label for display
+  const goalSourceLabel = goalSource === 'fitnessGoals' 
+    ? 'Based on your fitness goals' 
+    : goalSource === 'measurementGoals' 
+      ? 'Based on your active goals (weight/body composition)' 
+      : null;
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleDismiss()}>
@@ -301,9 +372,15 @@ export const SmartlySuggestModal = ({ isOpen, onClose }: SmartlySuggestModalProp
                       step={1}
                       className="w-full"
                     />
-                    <Button onClick={handleEnergyConfirm} className="w-full">
-                      Continue
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button variant="outline" onClick={goBack} className="flex items-center gap-1">
+                        <ChevronLeft className="h-4 w-4" />
+                        Back
+                      </Button>
+                      <Button onClick={handleEnergyConfirm} className="flex-1">
+                        Continue
+                      </Button>
+                    </div>
                   </div>
                 </div>
               )}
@@ -315,32 +392,31 @@ export const SmartlySuggestModal = ({ isOpen, onClose }: SmartlySuggestModalProp
                     What's your focus?
                   </h3>
                   
-                  {/* Show user's goals if set */}
-                  {userHasGoals && (
+                  {/* Show pre-selected goal if user has goals */}
+                  {defaultGoal && (
                     <div className="p-3 rounded-lg bg-primary/10 border border-primary/20">
                       <p className="text-sm text-muted-foreground mb-2">
-                        According to your goals:
+                        {goalSourceLabel}:
                       </p>
                       <Button
                         variant="default"
                         className="w-full"
-                        onClick={() => handleGoalSelect(context.userGoal!.primary_goal)}
+                        onClick={() => handleGoalSelect(defaultGoal)}
                       >
-                        {userGoalLabel}
+                        {defaultGoalLabel}
                       </Button>
                     </div>
                   )}
 
                   <div className="space-y-2">
-                    {!userHasGoals && (
-                      <p className="text-sm text-muted-foreground">Choose your focus:</p>
-                    )}
-                    {userHasGoals && (
+                    {defaultGoal ? (
                       <p className="text-sm text-muted-foreground">Or choose different focus:</p>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">Choose your focus:</p>
                     )}
                     <div className="flex flex-wrap gap-2">
                       {goalOptions
-                        .filter(g => !userHasGoals || g.value !== context.userGoal?.primary_goal)
+                        .filter(g => !defaultGoal || g.value !== defaultGoal)
                         .map((goal) => (
                           <Button
                             key={goal.value}
@@ -354,16 +430,22 @@ export const SmartlySuggestModal = ({ isOpen, onClose }: SmartlySuggestModalProp
                     </div>
                   </div>
 
-                  {!userHasGoals && (
+                  {/* Show "Set your goals now" only if user has NO goals at all */}
+                  {!hasAnyGoals && (
                     <Link 
-                      to="/fitnessgoals" 
+                      to="/userdashboard?scroll=active-goals" 
                       className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
                       onClick={onClose}
                     >
-                      <LinkIcon className="h-3 w-3" />
                       Set your goals now
                     </Link>
                   )}
+
+                  {/* Back button for step 3 */}
+                  <Button variant="outline" onClick={goBack} className="flex items-center gap-1">
+                    <ChevronLeft className="h-4 w-4" />
+                    Back
+                  </Button>
                 </div>
               )}
 
@@ -388,6 +470,10 @@ export const SmartlySuggestModal = ({ isOpen, onClose }: SmartlySuggestModalProp
                       </Button>
                     ))}
                   </div>
+                  <Button variant="outline" onClick={goBack} className="flex items-center gap-1">
+                    <ChevronLeft className="h-4 w-4" />
+                    Back
+                  </Button>
                 </div>
               )}
 
@@ -412,6 +498,10 @@ export const SmartlySuggestModal = ({ isOpen, onClose }: SmartlySuggestModalProp
                       </Button>
                     ))}
                   </div>
+                  <Button variant="outline" onClick={goBack} className="flex items-center gap-1">
+                    <ChevronLeft className="h-4 w-4" />
+                    Back
+                  </Button>
                 </div>
               )}
             </div>
@@ -500,18 +590,28 @@ export const SmartlySuggestModal = ({ isOpen, onClose }: SmartlySuggestModalProp
                 <SmartNoteDisplay note={smartNote} />
               )}
 
-              {/* CTA Button */}
-              <Button 
-                className="w-full" 
-                onClick={() => handleSelectSuggestion(suggestion.item)}
-              >
-                Start Workout
-                <ChevronRight className="h-4 w-4 ml-1" />
-              </Button>
+              {/* Back and CTA Buttons */}
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={goBack} className="flex items-center gap-1">
+                  <ChevronLeft className="h-4 w-4" />
+                  Back
+                </Button>
+                <Button 
+                  className="flex-1" 
+                  onClick={() => handleSelectSuggestion(suggestion.item)}
+                >
+                  Start Workout
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              </div>
             </>
           ) : (
             <div className="text-center py-6 text-muted-foreground">
               <p>No workouts available to suggest at the moment.</p>
+              <Button variant="outline" onClick={goBack} className="mt-4 flex items-center gap-1 mx-auto">
+                <ChevronLeft className="h-4 w-4" />
+                Back
+              </Button>
             </div>
           )}
         </div>

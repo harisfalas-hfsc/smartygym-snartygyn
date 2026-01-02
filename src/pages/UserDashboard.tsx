@@ -246,6 +246,20 @@ export default function UserDashboard() {
     window.addEventListener('purchase-verified', handlePurchaseVerified);
     return () => window.removeEventListener('purchase-verified', handlePurchaseVerified);
   }, [user]);
+
+  // Handle scroll to active-goals section from URL param
+  useEffect(() => {
+    const scrollTarget = searchParams.get('scroll');
+    if (scrollTarget === 'active-goals' && !loading) {
+      // Small delay to ensure the element is rendered
+      setTimeout(() => {
+        const element = document.getElementById('active-goals');
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    }
+  }, [searchParams, loading]);
   const initDashboard = async () => {
     try {
       const {
@@ -1016,7 +1030,7 @@ export default function UserDashboard() {
 
         {/* Goals Summary Card - Show for premium users */}
         {isPremium && user && (
-          <div className="mb-6">
+          <div id="active-goals" className="mb-6">
             <GoalsSummaryCard userId={user.id} />
           </div>
         )}
