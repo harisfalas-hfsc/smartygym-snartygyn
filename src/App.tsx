@@ -14,7 +14,6 @@ import { ScrollToTop } from "./components/ScrollToTop";
 
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { useSessionExpiry } from "./hooks/useSessionExpiry";
-import InstallPWA from "./components/InstallPWA";
 
 import { AccessControlProvider } from "./contexts/AccessControlContext";
 import { NavigationHistoryProvider } from "./contexts/NavigationHistoryContext";
@@ -242,7 +241,6 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <InstallPWA />
         <BrowserRouter>
           <NavigationHistoryProvider>
             <AppContent />
