@@ -166,7 +166,7 @@ export default function SmartyCorporate() {
       <SEOEnhancer entities={["Corporate Fitness", "Team Membership", "Business Wellness"]} topics={["corporate fitness plans", "team training", "business wellness programs"]} expertise={["corporate wellness", "team fitness management"]} contentType="Corporate Plans" aiSummary="SmartyGym Corporate: Premium fitness access for teams and organizations. Plans from €399/year (10 users) to €699/year (unlimited). All members get Platinum access with admin dashboard for team management." aiKeywords={["corporate fitness", "team membership", "business wellness", "group fitness"]} relatedContent={["Premium Benefits", "Workout Library", "Training Programs"]} targetAudience="businesses and organizations seeking team fitness solutions" pageType="Product" />
 
       <div className="min-h-screen bg-background">
-        <main className="container mx-auto max-w-7xl p-4 pb-8">
+        <main className="container mx-auto max-w-6xl px-4 pb-8">
           {canGoBack && <Button variant="ghost" size="sm" onClick={goBack} className="mb-4">
               <ArrowLeft className="mr-2 h-4 w-4" />
               <span className="text-xs sm:text-sm">Back</span>
@@ -191,7 +191,7 @@ export default function SmartyCorporate() {
           </div>
 
           {/* About Card */}
-          <Card className="mb-8">
+          <Card className="mb-8 bg-white dark:bg-card border-2 border-primary/40 shadow-primary">
             <CardHeader className="text-center">
               <CardTitle className="flex items-center justify-center gap-2">
                 <Building2 className="h-5 w-5 text-primary" />
@@ -215,7 +215,7 @@ export default function SmartyCorporate() {
           </Card>
 
           {/* Benefits Card */}
-          <Card className="mb-8">
+          <Card className="mb-8 bg-white dark:bg-card border-2 border-primary/40 shadow-primary">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Crown className="h-5 w-5 text-primary" />
