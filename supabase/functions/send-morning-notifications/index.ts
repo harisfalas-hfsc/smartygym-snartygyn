@@ -277,11 +277,7 @@ serve(async (req) => {
       // Fallback to hardcoded content if no template exists
       logStep("No WOD template found - using fallback dashboard content");
       if (isRecoveryDay) {
-        wodDashboardContent = `<p class="tiptap-paragraph"><strong>🌅 Good Morning, Smarty!</strong></p>
-<p class="tiptap-paragraph"></p>
-<p class="tiptap-paragraph">Your daily recovery workout is ready!</p>
-<p class="tiptap-paragraph"></p>
-<p class="tiptap-paragraph"><strong>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</strong></p>
+        wodDashboardContent = `<p class="tiptap-paragraph"><strong>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</strong></p>
 <p class="tiptap-paragraph"><strong>🧘 TODAY'S RECOVERY WORKOUT</strong></p>
 <p class="tiptap-paragraph"><strong>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</strong></p>
 <p class="tiptap-paragraph"></p>
@@ -294,12 +290,8 @@ serve(async (req) => {
 <p class="tiptap-paragraph"><a href="https://smartygym.com/workout/wod">View Today's Workout →</a></p>`;
         wodDashboardSubject = `🧘 Today's Recovery Workout: ${todaysWods[0]?.name || "Recovery"}`;
       } else {
-        wodDashboardContent = `<p class="tiptap-paragraph"><strong>🌅 Good Morning, Smarty!</strong></p>
-<p class="tiptap-paragraph"></p>
-<p class="tiptap-paragraph">Your daily fitness content is ready!</p>
-<p class="tiptap-paragraph"></p>
-<p class="tiptap-paragraph"><strong>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</strong></p>
-<p class="tiptap-paragraph"><strong>🏆 TODAY'S WORKOUTS OF THE DAY</strong></p>
+        wodDashboardContent = `<p class="tiptap-paragraph"><strong>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</strong></p>
+<p class="tiptap-paragraph"><strong>🏆 TODAY'S WORKOUT OF THE DAY</strong></p>
 <p class="tiptap-paragraph"><strong>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</strong></p>
 <p class="tiptap-paragraph"></p>
 <p class="tiptap-paragraph">Today is <strong>${category}</strong> day with TWO workout options:</p>
@@ -364,14 +356,12 @@ serve(async (req) => {
       );
       logStep("Using template for Ritual notification");
     } else {
-      // Fallback content
-      ritualDashboardContent = `<p class="tiptap-paragraph"><strong>🌅 Good Morning, Smarty!</strong></p>
-<p class="tiptap-paragraph"></p>
-<p class="tiptap-paragraph"><strong>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</strong></p>
+      // Fallback content - no greeting as main email wrapper has it
+      ritualDashboardContent = `<p class="tiptap-paragraph"><strong>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</strong></p>
 <p class="tiptap-paragraph"><strong>🌅 YOUR DAILY SMARTY RITUAL</strong></p>
 <p class="tiptap-paragraph"><strong>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</strong></p>
 <p class="tiptap-paragraph"></p>
-<p class="tiptap-paragraph">Your <strong>Day ${todaysRitual?.day_number}</strong> Smarty Ritual is ready!</p>
+<p class="tiptap-paragraph">Your Smarty Ritual is ready!</p>
 <p class="tiptap-paragraph"></p>
 <p class="tiptap-paragraph">Start your day with intention through our three wellness rituals:</p>
 <p class="tiptap-paragraph">☀️ <strong>Morning</strong> - Energize your start</p>
@@ -379,7 +369,7 @@ serve(async (req) => {
 <p class="tiptap-paragraph">🌙 <strong>Evening</strong> - Wind down peacefully</p>
 <p class="tiptap-paragraph"></p>
 <p class="tiptap-paragraph"><a href="https://smartygym.com/daily-ritual">View Today's Ritual →</a></p>`;
-      ritualDashboardSubject = `🌅 Day ${todaysRitual?.day_number} Smarty Ritual`;
+      ritualDashboardSubject = `🌅 Your Daily Smarty Ritual`;
       ritualEmailContent = ""; // Will be built inline
       ritualEmailSubject = ritualDashboardSubject;
     }
@@ -519,7 +509,7 @@ serve(async (req) => {
             ritualSection = `
 <div style="margin: 30px 0; padding: 25px; background: #f8f9fa; border-radius: 12px; border-left: 4px solid #29B6D2;">
   <h2 style="color: #29B6D2; margin: 0 0 15px 0; font-size: 20px;">🌅 YOUR DAILY SMARTY RITUAL</h2>
-  <p style="margin: 10px 0; color: #333;">Your <strong>Day ${todaysRitual?.day_number}</strong> Smarty Ritual is ready!</p>
+  <p style="margin: 10px 0; color: #333;">Your Smarty Ritual is ready!</p>
   <p style="margin: 10px 0; color: #666;">Start your day with intention through our three wellness rituals:</p>
   <div style="margin: 15px 0;">
     <p style="margin: 8px 0; color: #333;">☀️ <strong>Morning</strong> - Energize your start</p>
@@ -540,12 +530,12 @@ ${ritualSection}
 ${getEmailFooter(authUser.email, 'wod')}
 </div>`;
 
-        // Use template email subject if available
+        // Use template email subject if available - include both WOD and Ritual in subject
         const finalEmailSubject = (wantsWodEmail && wodEmailSubject) 
           ? wodEmailSubject 
           : (isRecoveryDay 
-            ? `🌅 Good Morning! Today's Recovery Workout & Ritual Are Ready`
-            : `🌅 Good Morning! Today's Workouts & Ritual Are Ready`);
+            ? `🌅 Today's Recovery Workout & Smarty Ritual Are Ready`
+            : `🌅 Today's Workout of the Day & Smarty Ritual Are Ready`);
 
         await resendClient.emails.send({
           from: "SmartyGym <notifications@smartygym.com>",
@@ -597,7 +587,7 @@ ${getEmailFooter(authUser.email, 'wod')}
         notification_type: 'daily_ritual', // Use 'daily_ritual' which matches the database constraint
         message_type: "morning_ritual",
         subject: ritualDashboardSubject,
-        content: `Ritual: Day ${todaysRitual?.day_number}`,
+        content: `Ritual for ${todayStr}`,
         recipient_count: ritualDashboardSent + emailsSent,
         success_count: ritualDashboardSent + emailsSent,
         failed_count: 0,

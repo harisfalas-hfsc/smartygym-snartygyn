@@ -157,7 +157,97 @@ const handler = async (req: Request): Promise<Response> => {
       `,
     });
 
-    console.log("Email sent successfully:", emailResponse);
+    console.log("Email sent successfully to admin:", emailResponse);
+
+    // Send auto-reply confirmation to the sender
+    try {
+      await resend.emails.send({
+        from: "SmartyGym <notifications@smartygym.com>",
+        to: [email],
+        subject: "Thank you for contacting SmartyGym!",
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #29B6D2; border-bottom: 2px solid #29B6D2; padding-bottom: 10px;">Thank You for Your Message!</h2>
+            
+            <p style="font-size: 16px; color: #333;">Hi ${safeName},</p>
+            
+            <p style="color: #333;">We have received your inquiry regarding "<strong>${safeSubject}</strong>" and will review it promptly.</p>
+            
+            <p style="color: #333;">Our team typically responds within 24-48 hours.</p>
+            
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #666; font-size: 12px;">
+              <p>Best regards,<br><strong>The SmartyGym Team</strong></p>
+              <p style="margin-top: 15px;">This is an automated confirmation. Please do not reply to this email.</p>
+            </div>
+          </div>
+        `,
+      });
+      console.log("Auto-reply sent to:", email);
+    } catch (autoReplyError) {
+      console.error("Failed to send auto-reply:", autoReplyError);
+      // Don't fail the whole request if auto-reply fails
+    }
+
+    // Forward to admin's personal email with categorization
+    try {
+      const categoryLabel = safeUserStatus || 'Guest';
+      await resend.emails.send({
+        from: "SmartyGym Contact <notifications@smartygym.com>",
+        to: ["harisfalas@gmail.com"],
+        replyTo: email,
+        subject: `[SmartyGym ${categoryLabel}] ${safeSubject}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background-color: #29B6D2; color: white; padding: 15px; border-radius: 5px 5px 0 0;">
+              <h2 style="margin: 0;">New Contact Form Submission</h2>
+              <p style="margin: 5px 0 0 0; opacity: 0.9;">User Type: <strong>${categoryLabel}</strong></p>
+            </div>
+            
+            <div style="background-color: #f5f5f5; padding: 20px; border-radius: 0 0 5px 5px;">
+              <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                  <td style="padding: 8px 0; font-weight: bold; color: #333; width: 100px;">From:</td>
+                  <td style="padding: 8px 0; color: #333;">${safeName}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; font-weight: bold; color: #333;">Email:</td>
+                  <td style="padding: 8px 0;"><a href="mailto:${safeEmail}" style="color: #29B6D2;">${safeEmail}</a></td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; font-weight: bold; color: #333;">Subject:</td>
+                  <td style="padding: 8px 0; color: #333;">${safeSubject}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; font-weight: bold; color: #333;">Status:</td>
+                  <td style="padding: 8px 0;"><span style="background-color: #d4af37; color: white; padding: 2px 8px; border-radius: 3px; font-size: 12px;">${categoryLabel}</span></td>
+                </tr>
+              </table>
+            </div>
+            
+            <div style="margin: 20px 0;">
+              <p style="font-weight: bold; color: #333; margin-bottom: 10px;">Message:</p>
+              <div style="background-color: #fff; padding: 15px; border-left: 4px solid #29B6D2; border-radius: 0 5px 5px 0;">
+                ${safeMessage}
+              </div>
+            </div>
+            
+            <div style="margin-top: 20px; padding: 15px; background-color: #f0f0f0; border-radius: 5px;">
+              <p style="margin: 0; font-size: 14px; color: #666;">
+                <strong>Quick Actions:</strong> Reply directly to this email to respond to the user.
+              </p>
+            </div>
+            
+            <div style="margin-top: 20px; color: #999; font-size: 11px;">
+              <p>Forwarded from SmartyGym Contact Form • ${new Date().toLocaleString('en-CY', { timeZone: 'Europe/Nicosia' })} Cyprus Time</p>
+            </div>
+          </div>
+        `,
+      });
+      console.log("Forward email sent to harisfalas@gmail.com");
+    } catch (forwardError) {
+      console.error("Failed to forward email:", forwardError);
+      // Don't fail the whole request if forward fails
+    }
 
     return new Response(JSON.stringify({ success: true, data: emailResponse }), {
       status: 200,

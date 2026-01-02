@@ -47,11 +47,17 @@ export const RitualShareDialog = ({
     }
   };
 
+  const formattedDate = new Date(ritualDate).toLocaleDateString('en-US', { 
+    weekday: 'long', 
+    month: 'long', 
+    day: 'numeric' 
+  });
+
   const handleNativeShare = async () => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `Daily Smarty Ritual - Day ${dayNumber}`,
+          title: `Daily Smarty Ritual - ${formattedDate}`,
           text: "Check out today's Daily Smarty Ritual from SmartyGym!",
           url: shareUrl,
         });
