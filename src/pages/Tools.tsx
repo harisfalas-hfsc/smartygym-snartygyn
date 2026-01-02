@@ -102,7 +102,7 @@ const Tools = () => {
         />
 
         {/* Info Section */}
-        <Card className="mb-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-primary">
+        <Card className="mb-8 bg-white dark:bg-card border-2 border-primary/40 shadow-primary">
           <div className="p-5">
             <h2 className="text-2xl font-bold mb-3 text-center">About Smarty Tools</h2>
             <div className="text-muted-foreground max-w-3xl mx-auto">

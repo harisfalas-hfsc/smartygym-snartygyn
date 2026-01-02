@@ -53,7 +53,7 @@ export default function HumanPerformance() {
       />
 
       <div className="min-h-screen bg-background">
-        <main className="container mx-auto max-w-4xl p-4 pb-8">
+        <main className="container mx-auto max-w-6xl px-4 pb-8">
           {canGoBack && (
             <Button
               variant="ghost"

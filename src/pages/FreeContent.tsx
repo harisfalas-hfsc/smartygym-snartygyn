@@ -182,13 +182,23 @@ const FreeContent = () => {
           { label: "Home", href: "/" },
           { label: "Free Content" }
         ]} />
-        
-        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2">Free Workouts & Programs</h1>
-        <p className="text-center text-muted-foreground mb-8">
+
+        {/* About Free Content Card */}
+        <Card className="mb-8 bg-white dark:bg-card border-2 border-primary/40 shadow-primary">
+          <div className="p-4 sm:p-5">
+            <h2 className="text-xl sm:text-2xl font-bold mb-3 text-center">About Free Content</h2>
+            <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
+              <p className="text-sm sm:text-base text-center">
+                <span className="text-primary font-semibold">Free Workouts & Programs</span> are accessible to everyone — no login required. 
+                Try these workouts designed by Sports Scientist <a href="/coach-profile" className="text-primary hover:underline font-semibold">Haris Falas</a> and 
+                experience what <span className="text-primary font-semibold">SmartyGym</span> has to offer.
+              </p>
+            </div>
+          </div>
+        </Card>
+        <p className="text-center text-muted-foreground mb-6">
           Filter by your goal and start training today. No login required.
         </p>
-        
-        {/* Info Ribbon */}
         {!isPremium && (
           <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-8 text-center">
             <p className="text-sm text-muted-foreground mb-2">

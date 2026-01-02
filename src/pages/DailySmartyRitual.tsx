@@ -150,7 +150,7 @@ const DailySmartyRitual = () => {
       />
 
       <div className="min-h-screen bg-background">
-        <div className="container mx-auto max-w-4xl px-4 pb-8">
+        <div className="container mx-auto max-w-6xl px-4 pb-8">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             {canGoBack && (
