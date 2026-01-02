@@ -9,94 +9,89 @@ const corsHeaders = {
 /**
  * Process Pending Notifications
  * 
- * This function processes pending content notifications that were queued
- * when new workouts or programs were created. It checks the pending_content_notifications
- * table and dispatches actual notifications to users.
+ * This function is a TRIGGER ONLY - it calls send-new-content-notifications
+ * which handles:
+ * 1. Fetching items older than 5 minutes (the buffer period)
+ * 2. Sending notifications
+ * 3. Deleting processed items
+ * 
+ * IMPORTANT: This function does NOT delete any items itself.
+ * The send-new-content-notifications function is the single source of truth
+ * for deletion after successful processing.
  */
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
-  console.log("[PROCESS-PENDING] Starting pending notifications processing");
+  console.log("[PROCESS-PENDING] Starting - triggering send-new-content-notifications");
 
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Fetch pending notifications
-    const { data: pendingNotifications, error: fetchError } = await supabase
+    // Check how many pending notifications exist (for logging only)
+    const { data: pendingItems, error: countError } = await supabase
       .from("pending_content_notifications")
-      .select("*")
-      .order("created_at", { ascending: true })
-      .limit(50);
+      .select("id, content_name, content_type, created_at");
 
-    if (fetchError) {
-      console.error("[PROCESS-PENDING] Error fetching pending notifications:", fetchError);
-      throw fetchError;
+    if (countError) {
+      console.error("[PROCESS-PENDING] Error checking pending count:", countError);
     }
 
-    if (!pendingNotifications || pendingNotifications.length === 0) {
-      console.log("[PROCESS-PENDING] No pending notifications to process");
+    const totalPending = pendingItems?.length || 0;
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+    const eligibleItems = pendingItems?.filter(item => new Date(item.created_at) < fiveMinutesAgo) || [];
+    
+    console.log(`[PROCESS-PENDING] Status: ${totalPending} total pending, ${eligibleItems.length} eligible (older than 5 min)`);
+    
+    if (eligibleItems.length > 0) {
+      console.log("[PROCESS-PENDING] Eligible items:", eligibleItems.map(i => `${i.content_type}: ${i.content_name}`));
+    }
+
+    // Call send-new-content-notifications ONCE
+    // That function handles the 5-minute buffer, sends notifications, and deletes processed items
+    const response = await fetch(`${supabaseUrl}/functions/v1/send-new-content-notifications`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${supabaseServiceKey}`,
+      },
+      body: JSON.stringify({}),
+    });
+
+    const responseText = await response.text();
+    let responseData;
+    try {
+      responseData = JSON.parse(responseText);
+    } catch {
+      responseData = { raw: responseText };
+    }
+
+    if (response.ok) {
+      console.log("[PROCESS-PENDING] send-new-content-notifications completed successfully:", responseData);
       return new Response(
-        JSON.stringify({ success: true, message: "No pending notifications", processed: 0 }),
+        JSON.stringify({
+          success: true,
+          message: "Triggered notification processing",
+          totalPending,
+          eligibleForProcessing: eligibleItems.length,
+          senderResponse: responseData,
+        }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
+    } else {
+      console.error("[PROCESS-PENDING] send-new-content-notifications failed:", response.status, responseData);
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: `Sender returned ${response.status}`,
+          details: responseData,
+        }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
-
-    console.log(`[PROCESS-PENDING] Found ${pendingNotifications.length} pending notifications`);
-
-    let processed = 0;
-    let failed = 0;
-
-    for (const notification of pendingNotifications) {
-      try {
-        // Call send-new-content-notifications for each pending item
-        const response = await fetch(`${supabaseUrl}/functions/v1/send-new-content-notifications`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${Deno.env.get("SUPABASE_ANON_KEY")}`,
-          },
-          body: JSON.stringify({
-            contentId: notification.content_id,
-            contentType: notification.content_type,
-            contentName: notification.content_name,
-            contentCategory: notification.content_category,
-          }),
-        });
-
-        if (response.ok) {
-          // Delete processed notification
-          await supabase
-            .from("pending_content_notifications")
-            .delete()
-            .eq("id", notification.id);
-          
-          processed++;
-          console.log(`[PROCESS-PENDING] Processed notification for ${notification.content_name}`);
-        } else {
-          console.error(`[PROCESS-PENDING] Failed to process ${notification.content_name}: ${response.status}`);
-          failed++;
-        }
-      } catch (error) {
-        console.error(`[PROCESS-PENDING] Error processing ${notification.content_name}:`, error);
-        failed++;
-      }
-    }
-
-    console.log(`[PROCESS-PENDING] Completed: ${processed} processed, ${failed} failed`);
-
-    return new Response(
-      JSON.stringify({
-        success: true,
-        processed,
-        failed,
-        total: pendingNotifications.length,
-      }),
-      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
   } catch (error) {
     console.error("[PROCESS-PENDING] Fatal error:", error);
     return new Response(

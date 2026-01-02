@@ -357,104 +357,64 @@ export const SettingsManager = () => {
   };
 
   const handleGenerateMissingImages = async () => {
-    if (!confirm("This will generate AI images for workouts AND programs that don't have one. This may take several minutes. Continue?")) {
+    if (!confirm("This will scan ALL workouts and programs, detect broken/missing images (including URLs that point to non-existent files), generate new AI images, update the database, and sync to Stripe. This may take several minutes. Continue?")) {
       return;
     }
     
     setGenerateImagesLoading(true);
     setGenerateImagesResult(null);
     try {
-      let workoutsGenerated = 0;
-      let programsGenerated = 0;
-
-      // First, find workouts without images
-      const { data: workoutsWithoutImages, error: workoutsFetchError } = await supabase
-        .from('admin_workouts')
-        .select('id, name, category, format, difficulty_stars, stripe_product_id')
-        .or('image_url.is.null,image_url.eq.')
-        .limit(5);
+      // Call the new repair-missing-images function that properly detects broken images
+      const { data, error } = await supabase.functions.invoke('repair-missing-images');
       
-      if (workoutsFetchError) throw workoutsFetchError;
+      if (error) throw error;
 
-      // Generate images for workouts
-      for (const workout of workoutsWithoutImages || []) {
-        try {
-          const { data, error } = await supabase.functions.invoke('generate-workout-image', {
-            body: {
-              name: workout.name,
-              category: workout.category,
-              format: workout.format,
-              difficulty_stars: workout.difficulty_stars,
-            },
-          });
-          
-          if (!error && data?.image_url) {
-            await supabase
-              .from('admin_workouts')
-              .update({ image_url: data.image_url })
-              .eq('id', workout.id);
-            workoutsGenerated++;
-          }
-        } catch (e) {
-          console.error(`Failed to generate image for workout ${workout.name}:`, e);
-        }
+      const result = data as {
+        success: boolean;
+        workoutsScanned: number;
+        programsScanned: number;
+        workoutsRepaired: number;
+        programsRepaired: number;
+        workoutsSkipped: number;
+        programsSkipped: number;
+        stripeUpdated: number;
+        errors: string[];
+        summary: string;
+      };
+
+      if (!result.success) {
+        throw new Error('Repair function returned unsuccessful');
       }
 
-      // Find programs without images
-      const { data: programsWithoutImages, error: programsFetchError } = await supabase
-        .from('admin_training_programs')
-        .select('id, name, category, difficulty_stars, weeks, stripe_product_id')
-        .or('image_url.is.null,image_url.eq.')
-        .limit(5);
+      const totalRepaired = result.workoutsRepaired + result.programsRepaired;
       
-      if (programsFetchError) throw programsFetchError;
-
-      // Generate images for programs
-      for (const program of programsWithoutImages || []) {
-        try {
-          const { data, error } = await supabase.functions.invoke('generate-program-image', {
-            body: {
-              name: program.name,
-              category: program.category,
-              difficulty_stars: program.difficulty_stars || 3,
-              weeks: program.weeks || 6,
-            },
-          });
-          
-          if (!error && (data?.imageUrl || data?.image_url)) {
-            const imageUrl = data.imageUrl || data.image_url;
-            await supabase
-              .from('admin_training_programs')
-              .update({ image_url: imageUrl })
-              .eq('id', program.id);
-            programsGenerated++;
-          }
-        } catch (e) {
-          console.error(`Failed to generate image for program ${program.name}:`, e);
-        }
-      }
-
-      const totalWorkouts = workoutsWithoutImages?.length || 0;
-      const totalPrograms = programsWithoutImages?.length || 0;
-
-      if (totalWorkouts === 0 && totalPrograms === 0) {
-        setGenerateImagesResult("All items already have images!");
+      if (totalRepaired === 0) {
+        setGenerateImagesResult(`Scanned ${result.workoutsScanned} workouts, ${result.programsScanned} programs. All images are valid!`);
         toast({
-          title: "No Images Needed",
-          description: "All workouts and programs already have images.",
+          title: "All Images Valid",
+          description: `Scanned ${result.workoutsScanned} workouts and ${result.programsScanned} programs. No broken or missing images found.`,
         });
-        return;
+      } else {
+        const errorSummary = result.errors.length > 0 ? ` (${result.errors.length} errors)` : '';
+        setGenerateImagesResult(
+          `Repaired: ${result.workoutsRepaired} workouts, ${result.programsRepaired} programs. Synced ${result.stripeUpdated} to Stripe.${errorSummary}`
+        );
+        toast({
+          title: "Image Repair Complete",
+          description: result.summary,
+        });
       }
 
-      setGenerateImagesResult(`Generated ${workoutsGenerated} workout, ${programsGenerated} program images`);
-      toast({
-        title: "Image Generation Complete",
-        description: `Generated ${workoutsGenerated} workout and ${programsGenerated} program images. Run "Audit Stripe" to sync to Stripe.`,
-      });
+      // Log any errors
+      if (result.errors.length > 0) {
+        console.error("Repair errors:", result.errors);
+      }
     } catch (error: any) {
+      console.error("Image repair error:", error);
+      setGenerateImagesResult(`Error: ${error.message}`);
       toast({
-        title: "Generation Failed",
-        description: error.message || "Failed to generate images.",
+        title: "Repair Failed",
+        description: error.message || "Failed to repair images.",
         variant: "destructive",
       });
     } finally {
@@ -892,14 +852,14 @@ export const SettingsManager = () => {
                     )}
                   </div>
 
-                  {/* Generate Missing Images */}
+                  {/* Repair Missing/Broken Images */}
                   <div className="p-4 border rounded-lg space-y-3">
                     <div className="flex items-center gap-2">
                       <ImagePlus className="h-5 w-5 text-green-500" />
-                      <h4 className="font-medium text-sm">Generate Images</h4>
+                      <h4 className="font-medium text-sm">Repair Images</h4>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      Generate AI images for workouts & programs missing them
+                      Detect & fix broken/missing images, then sync to Stripe
                     </p>
                     <Button 
                       onClick={handleGenerateMissingImages} 
@@ -908,10 +868,12 @@ export const SettingsManager = () => {
                       size="sm"
                       className="w-full"
                     >
-                      {generateImagesLoading ? "Generating..." : "Generate Images"}
+                      {generateImagesLoading ? "Repairing..." : "Repair Images"}
                     </Button>
                     {generateImagesResult && (
-                      <p className="text-xs text-green-600">✅ {generateImagesResult}</p>
+                      <p className={`text-xs ${generateImagesResult.startsWith('Error') ? 'text-red-600' : 'text-green-600'}`}>
+                        {generateImagesResult.startsWith('Error') ? '❌' : '✅'} {generateImagesResult}
+                      </p>
                     )}
                   </div>
 
@@ -1153,14 +1115,14 @@ export const SettingsManager = () => {
                         <div className="font-medium text-muted-foreground mb-1">📌 RECOMMENDED WORKFLOW:</div>
                         <ol className="list-decimal list-inside space-y-0.5 text-muted-foreground">
                           <li><strong>Check Status</strong> (see what needs action)</li>
-                          <li>Generate Images (creates missing website images)</li>
-                          <li>Audit Stripe (website → Stripe)</li>
-                          <li>Pull from Stripe (Stripe → website)</li>
+                          <li><strong>Repair Images</strong> (detects broken URLs + generates + syncs to Stripe)</li>
+                          <li>Audit Stripe (additional sync: website → Stripe)</li>
+                          <li>Pull from Stripe (Stripe → website, if needed)</li>
                         </ol>
                       </div>
                       
                       <div className="text-amber-600 pt-1 border-t border-amber-200">
-                        ⚠️ Safe to run multiple times - only updates missing images
+                        ⚠️ Safe to run multiple times - only repairs broken/missing images
                       </div>
                     </div>
                   </div>
