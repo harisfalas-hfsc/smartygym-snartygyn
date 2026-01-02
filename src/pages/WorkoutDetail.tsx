@@ -631,7 +631,7 @@ const WorkoutDetail = () => {
       </div>
 
       {/* Smartly Suggest Button - Premium Only */}
-      <SmartlySuggestButton contentType="workout" />
+      <SmartlySuggestButton />
       </div>
       </>
       )}

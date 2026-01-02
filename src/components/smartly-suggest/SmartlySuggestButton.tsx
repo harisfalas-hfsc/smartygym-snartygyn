@@ -12,11 +12,10 @@ import {
 } from "@/components/ui/tooltip";
 
 interface SmartlySuggestButtonProps {
-  contentType: 'workout' | 'program';
   className?: string;
 }
 
-export const SmartlySuggestButton = ({ contentType, className }: SmartlySuggestButtonProps) => {
+export const SmartlySuggestButton = ({ className }: SmartlySuggestButtonProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const { userTier, isLoading } = useAccessControl();
 
@@ -53,7 +52,6 @@ export const SmartlySuggestButton = ({ contentType, className }: SmartlySuggestB
       <SmartlySuggestModal 
         isOpen={isOpen} 
         onClose={() => setIsOpen(false)} 
-        contentType={contentType}
       />
     </>
   );
