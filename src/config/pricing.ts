@@ -29,4 +29,8 @@ export const OUR_STRIPE_PRODUCT_IDS = [
   'prod_TZATDsKcDvMtHc', // Smarty Power
   'prod_TZATGTAsKalmCn', // Smarty Elite
   'prod_TZATUtaS2jhgtK', // Smarty Enterprise
+  // Standalone Training Programs
+  'prod_TiX1jpVVZtLG9C', // Run Your First 5K
+  'prod_TiX1ILxJNwxNyv', // 90-Day Shred Challenge
+  'prod_TiX1Bj3U8PC1Po', // 90-Day Mass Protocol
 ] as const;
