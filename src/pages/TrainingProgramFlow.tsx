@@ -17,6 +17,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { CategoryCountBadge } from "@/components/ui/category-count-badge";
+import { SmartlySuggestButton } from "@/components/smartly-suggest";
 
 const TrainingProgramFlow = () => {
   const navigate = useNavigate();
@@ -440,6 +441,9 @@ const TrainingProgramFlow = () => {
             </div>
           </ScrollReveal>
         )}
+
+        {/* Smartly Suggest Button - Premium Only */}
+        <SmartlySuggestButton contentType="program" />
       </div>
     </>
   );

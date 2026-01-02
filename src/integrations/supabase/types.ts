@@ -2006,6 +2006,42 @@ export type Database = {
         }
         Relationships: []
       }
+      smartly_suggest_interactions: {
+        Row: {
+          action_taken: string | null
+          confidence_level: string
+          created_at: string
+          id: string
+          questions_asked: Json | null
+          suggested_content_id: string
+          suggested_content_type: string
+          user_id: string
+          user_responses: Json | null
+        }
+        Insert: {
+          action_taken?: string | null
+          confidence_level: string
+          created_at?: string
+          id?: string
+          questions_asked?: Json | null
+          suggested_content_id: string
+          suggested_content_type: string
+          user_id: string
+          user_responses?: Json | null
+        }
+        Update: {
+          action_taken?: string | null
+          confidence_level?: string
+          created_at?: string
+          id?: string
+          questions_asked?: Json | null
+          suggested_content_id?: string
+          suggested_content_type?: string
+          user_id?: string
+          user_responses?: Json | null
+        }
+        Relationships: []
+      }
       smarty_checkins: {
         Row: {
           checkin_date: string
@@ -2383,6 +2419,42 @@ export type Database = {
           ritual_reminder_event_ids?: Json | null
           token_expires_at?: string
           updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_fitness_goals: {
+        Row: {
+          created_at: string
+          equipment_available: string | null
+          experience_level: string | null
+          id: string
+          primary_goal: string
+          secondary_goal: string | null
+          time_availability_default: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          equipment_available?: string | null
+          experience_level?: string | null
+          id?: string
+          primary_goal?: string
+          secondary_goal?: string | null
+          time_availability_default?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          equipment_available?: string | null
+          experience_level?: string | null
+          id?: string
+          primary_goal?: string
+          secondary_goal?: string | null
+          time_availability_default?: number | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -2829,6 +2901,10 @@ export type Database = {
           jobname: string
           schedule: string
         }[]
+      }
+      has_premium_subscription: {
+        Args: { check_user_id: string }
+        Returns: boolean
       }
       has_role: {
         Args: {

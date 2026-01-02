@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { ArrowLeft, Calendar, Eye, CheckCircle, Search, X, Sparkles, Star, Crown, ShoppingCart, Check, Home, Dumbbell, TrendingUp, Layers } from "lucide-react";
+import { SmartlySuggestButton } from "@/components/smartly-suggest";
 
 // Helper function to get category color
 const getCategoryColor = (category: string): string => {
@@ -592,6 +593,9 @@ const TrainingProgramDetail = () => {
           </Card>
         )}
       </div>
+
+      {/* Smartly Suggest Button - Premium Only */}
+      <SmartlySuggestButton contentType="program" />
       </div>
       </>
       )}
