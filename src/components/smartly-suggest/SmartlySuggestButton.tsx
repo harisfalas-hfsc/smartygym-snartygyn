@@ -2,8 +2,14 @@ import { useState } from "react";
 import { Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAccessControl } from "@/contexts/AccessControlContext";
-import { SmartlySuggestSheet } from "./SmartlySuggestSheet";
+import { SmartlySuggestModal } from "./SmartlySuggestModal";
 import { cn } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface SmartlySuggestButtonProps {
   contentType: 'workout' | 'program';
@@ -21,22 +27,30 @@ export const SmartlySuggestButton = ({ contentType, className }: SmartlySuggestB
 
   return (
     <>
-      <Button
-        onClick={() => setIsOpen(true)}
-        className={cn(
-          "fixed bottom-20 right-4 z-40 shadow-lg",
-          "bg-primary hover:bg-primary/90 text-primary-foreground",
-          "rounded-full px-4 py-2 h-auto",
-          "flex items-center gap-2",
-          "animate-in slide-in-from-bottom-5 duration-300",
-          className
-        )}
-      >
-        <Lightbulb className="h-4 w-4" />
-        <span className="text-sm font-medium">Smartly Suggest</span>
-      </Button>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              onClick={() => setIsOpen(true)}
+              size="icon"
+              className={cn(
+                "fixed top-32 right-4 z-40",
+                "h-14 w-14 rounded-full shadow-xl",
+                "bg-primary hover:bg-primary/90 text-primary-foreground",
+                "animate-in slide-in-from-right-5 duration-300",
+                className
+              )}
+            >
+              <Lightbulb className="h-6 w-6" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="left">
+            <p>Smartly Suggest</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
 
-      <SmartlySuggestSheet 
+      <SmartlySuggestModal 
         isOpen={isOpen} 
         onClose={() => setIsOpen(false)} 
         contentType={contentType}

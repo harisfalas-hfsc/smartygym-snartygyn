@@ -57,66 +57,62 @@ export const calculateScore = (
   // 1. GOAL ALIGNMENT (+30 max)
   const userGoal = answers.goal || context.userGoal?.primary_goal || 'general_fitness';
   const targetCategories = GOAL_CATEGORY_MAP[userGoal] || [];
+  const goalLabel = userGoal.replace(/_/g, ' ');
   
   if (targetCategories.length === 0) {
-    // General fitness - all categories get base score
     score += 15;
-    reasons.push('Good for general fitness');
+    reasons.push('A solid choice for overall fitness');
   } else if (targetCategories.some(cat => item.category?.toUpperCase().includes(cat))) {
     score += 30;
-    reasons.push(`Aligns with ${userGoal.replace('_', ' ')} goal`);
+    reasons.push(`Your goal is ${goalLabel} — this ${item.category} workout is designed for exactly that`);
   }
 
   // 2. ENERGY/READINESS ALIGNMENT (+25 max)
   const readiness = context.todayCheckin?.readiness_score || answers.energy || 3;
+  const energyLabel = readiness <= 2 ? 'low' : readiness >= 4 ? 'high' : 'moderate';
   
   if (readiness <= 2) {
-    // Low energy - prefer easier options
     if (item.difficulty === 'Beginner') {
       score += 25;
-      reasons.push('Beginner level matches your energy');
+      reasons.push(`Your energy is ${energyLabel} today — this Beginner workout won't drain you`);
     }
     if (RECOVERY_CATEGORIES.some(cat => item.category?.toUpperCase().includes(cat))) {
       score += 20;
-      reasons.push('Recovery-focused for low energy');
+      reasons.push('A recovery-focused session to match your energy');
     }
     if (item.difficulty === 'Advanced') {
       score -= 15;
     }
   } else if (readiness >= 4) {
-    // High energy - can handle challenges
     if (item.difficulty === 'Advanced') {
       score += 20;
-      reasons.push('Advanced level for high energy');
+      reasons.push(`Energy is ${energyLabel} — you can handle this Advanced workout`);
     }
     if (CHALLENGE_CATEGORIES.some(cat => item.category?.toUpperCase().includes(cat))) {
       score += 15;
-      reasons.push('Challenging workout for your energy level');
+      reasons.push('A challenging workout to match your energy level');
     }
   } else {
-    // Medium energy - intermediate is ideal
     if (item.difficulty === 'Intermediate') {
       score += 15;
-      reasons.push('Intermediate matches your energy');
+      reasons.push(`Energy is ${energyLabel} — Intermediate difficulty is just right`);
     }
   }
 
   // 3. MOOD CONSIDERATION (+15 max)
   const mood = context.todayCheckin?.mood_rating;
   if (mood && mood <= 2) {
-    // Low mood - calming or energizing
     if (RECOVERY_CATEGORIES.some(cat => item.category?.toUpperCase().includes(cat))) {
       score += 15;
-      reasons.push('Calming session for low mood');
+      reasons.push('A calming session to ease your mind');
     }
-    // Challenge can lift mood too
     if (CHALLENGE_CATEGORIES.some(cat => item.category?.toUpperCase().includes(cat)) && readiness >= 3) {
       score += 10;
-      reasons.push('Challenge to lift your spirits');
+      reasons.push('A challenge can boost your mood');
     }
   }
 
-  // 4. VARIETY BONUS (+15 max) - Avoid repeating same category too often
+  // 4. VARIETY BONUS (+15 max)
   const recentCategories = context.recentCategories || [];
   const categoryCount = recentCategories.filter(c => 
     c?.toUpperCase() === item.category?.toUpperCase()
@@ -124,7 +120,8 @@ export const calculateScore = (
   
   if (categoryCount === 0) {
     score += 15;
-    reasons.push('Fresh category for variety');
+    const daysSinceCategory = 7; // Approximate
+    reasons.push(`You haven't done ${item.category} recently — adds variety`);
   } else if (categoryCount <= 1) {
     score += 10;
   } else if (categoryCount >= 3) {
@@ -134,23 +131,22 @@ export const calculateScore = (
   // 5. FRESHNESS - Not done this workout before (+10)
   if (!context.completedWorkoutIds.includes(item.id)) {
     score += 10;
-    reasons.push('New workout to try');
+    reasons.push("You haven't tried this one yet");
   }
 
   // 6. TIME FIT (+20 max)
   const availableTime = answers.time || context.userGoal?.time_availability_default || 30;
   if (item.duration) {
-    // Parse duration like "30 min" or "45 minutes"
     const durationMatch = item.duration.match(/(\d+)/);
     const itemDuration = durationMatch ? parseInt(durationMatch[1]) : 30;
     
     if (itemDuration <= availableTime) {
       score += 20;
-      reasons.push('Fits your available time');
+      reasons.push(`Fits your ${availableTime} min window perfectly`);
     } else if (itemDuration <= availableTime + 10) {
       score += 10;
     } else {
-      score -= 20; // Too long, penalize heavily
+      score -= 20;
     }
   }
 
@@ -160,14 +156,14 @@ export const calculateScore = (
     const itemEquip = item.equipment.toUpperCase();
     if (userEquipment === 'bodyweight' && itemEquip === 'BODYWEIGHT') {
       score += 15;
-      reasons.push('No equipment needed');
+      reasons.push('No equipment needed — bodyweight only');
     } else if (userEquipment === 'equipment' && itemEquip !== 'BODYWEIGHT') {
       score += 15;
-      reasons.push('Uses your equipment');
+      reasons.push('Uses the equipment you have');
     } else if (userEquipment === 'various') {
-      score += 10; // Any equipment works
+      score += 10;
     } else if (userEquipment === 'bodyweight' && itemEquip !== 'BODYWEIGHT') {
-      score -= 20; // User has no equipment but workout needs it
+      score -= 20;
     }
   }
 
@@ -176,7 +172,7 @@ export const calculateScore = (
   if (soreness && soreness >= 4) {
     if (RECOVERY_CATEGORIES.some(cat => item.category?.toUpperCase().includes(cat))) {
       score += 15;
-      reasons.push('Gentle on sore muscles');
+      reasons.push('Gentle on your sore muscles');
     }
     if (item.difficulty === 'Beginner') {
       score += 10;
@@ -191,7 +187,7 @@ export const calculateScore = (
   if (sleepHours && sleepHours < 6) {
     if (item.difficulty === 'Beginner') {
       score += 10;
-      reasons.push('Light workout for low sleep');
+      reasons.push(`Only ${sleepHours}h sleep — a lighter workout is smarter`);
     }
     if (RECOVERY_CATEGORIES.some(cat => item.category?.toUpperCase().includes(cat))) {
       score += 10;
@@ -205,7 +201,7 @@ export const calculateScore = (
   if (context.daysSinceLastWorkout >= 3 && context.daysSinceLastWorkout < 999) {
     if (item.difficulty === 'Beginner' || item.difficulty === 'Intermediate') {
       score += 10;
-      reasons.push('Good for getting back into it');
+      reasons.push(`${context.daysSinceLastWorkout} days since your last workout — this eases you back in`);
     }
   }
 
@@ -217,8 +213,7 @@ export const generateSuggestions = (
   context: SmartyContext,
   answers: QuestionAnswers,
   contentType: 'workout' | 'program' = 'workout'
-): { main: ScoredContent; alternatives: ScoredContent[] } => {
-  // Filter content that the user can access (we'll show all, access gates handle restrictions)
+): { main: ScoredContent } => {
   let pool = [...allContent];
 
   // Apply hard filter: equipment if bodyweight only
@@ -229,14 +224,14 @@ export const generateSuggestions = (
     );
   }
 
-  // Apply hard filter: time constraint (only show workouts that fit)
+  // Apply hard filter: time constraint
   const availableTime = answers.time || context.userGoal?.time_availability_default;
   if (availableTime) {
     pool = pool.filter(item => {
       if (!item.duration) return true;
       const durationMatch = item.duration.match(/(\d+)/);
       const itemDuration = durationMatch ? parseInt(durationMatch[1]) : 30;
-      return itemDuration <= availableTime + 15; // Allow 15 min buffer
+      return itemDuration <= availableTime + 15;
     });
   }
 
@@ -246,14 +241,8 @@ export const generateSuggestions = (
   // Sort by score descending
   const sorted = scored.sort((a, b) => b.score - a.score);
 
-  // Ensure we have at least 3 items (or all if less than 3)
+  // Return only the top suggestion
   const main = sorted[0] || { item: pool[0], score: 0, reasons: [] };
-  const alternatives = sorted.slice(1, 3);
 
-  // If we don't have enough alternatives, pad with remaining
-  while (alternatives.length < 2 && sorted.length > alternatives.length + 1) {
-    alternatives.push(sorted[alternatives.length + 1]);
-  }
-
-  return { main, alternatives };
+  return { main };
 };

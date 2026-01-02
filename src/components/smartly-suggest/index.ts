@@ -1,6 +1,4 @@
 export { SmartlySuggestButton } from './SmartlySuggestButton';
-export { SmartlySuggestSheet } from './SmartlySuggestSheet';
+export { SmartlySuggestModal } from './SmartlySuggestModal';
 export { QuestionStep } from './QuestionStep';
-export { SuggestionCard } from './SuggestionCard';
-export { AlternativeCard } from './AlternativeCard';
 export { SmartNoteDisplay } from './SmartNote';
