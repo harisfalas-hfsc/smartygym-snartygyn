@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ChevronRight, Clock, Dumbbell, Zap } from "lucide-react";
+import { ChevronRight, Clock, Dumbbell, Zap, Link as LinkIcon } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -8,16 +8,14 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Slider } from "@/components/ui/slider";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useSmartyContext } from "@/hooks/useSmartyContext";
-import { useConfidenceLevel } from "@/hooks/useConfidenceLevel";
-import { selectQuestions, Question } from "@/utils/smartly-suggest/questionSelector";
 import { generateSuggestions, ContentItem, QuestionAnswers } from "@/utils/smartly-suggest/suggestionEngine";
 import { generateSmartNote } from "@/utils/smartly-suggest/smartNoteGenerator";
-import { QuestionStep } from "./QuestionStep";
 import { SmartNoteDisplay } from "./SmartNote";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAccessControl } from "@/contexts/AccessControlContext";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
@@ -25,45 +23,85 @@ import { cn } from "@/lib/utils";
 interface SmartlySuggestModalProps {
   isOpen: boolean;
   onClose: () => void;
-  contentType: 'workout' | 'program';
 }
 
-export const SmartlySuggestModal = ({ isOpen, onClose, contentType }: SmartlySuggestModalProps) => {
+// Mood emojis matching MorningCheckInForm
+const moodEmojis = [
+  { value: 1, emoji: "😰", label: "Very stressed" },
+  { value: 2, emoji: "😔", label: "Low" },
+  { value: 3, emoji: "😐", label: "Neutral" },
+  { value: 4, emoji: "🙂", label: "Good" },
+  { value: 5, emoji: "😁", label: "Very positive" },
+];
+
+// Energy labels
+const energyLabels: Record<number, string> = {
+  0: "Exhausted",
+  1: "Exhausted",
+  2: "Very tired",
+  3: "Very tired",
+  4: "Tired",
+  5: "OK",
+  6: "OK",
+  7: "Good",
+  8: "Good",
+  9: "On fire",
+  10: "On fire",
+};
+
+// Goal options
+const goalOptions = [
+  { label: "Burn fat", value: "fat_loss" },
+  { label: "Build muscle", value: "muscle_gain" },
+  { label: "Get stronger", value: "strength" },
+  { label: "Improve mobility", value: "flexibility" },
+  { label: "Just move", value: "general_fitness" },
+];
+
+// Duration options
+const durationOptions = [
+  { label: "15 min", value: 15 },
+  { label: "30 min", value: 30 },
+  { label: "45 min", value: 45 },
+  { label: "60+ min", value: 60 },
+];
+
+// Equipment options
+const equipmentOptions = [
+  { label: "No equipment", value: "bodyweight" },
+  { label: "Equipment available", value: "equipment" },
+];
+
+// Category slug helper
+const getCategorySlug = (category: string) => {
+  return category?.toLowerCase().replace(/\s+/g, "-").replace(/&/g, "and") || "strength";
+};
+
+// Steps: 1=Mood, 2=Energy, 3=Goal, 4=Duration, 5=Equipment
+type Step = 1 | 2 | 3 | 4 | 5 | 'result';
+
+export const SmartlySuggestModal = ({ isOpen, onClose }: SmartlySuggestModalProps) => {
   const navigate = useNavigate();
   const { user } = useAccessControl();
   const context = useSmartyContext();
-  const confidenceResult = useConfidenceLevel(context);
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  
+  const [currentStep, setCurrentStep] = useState<Step>(1);
   const [answers, setAnswers] = useState<QuestionAnswers>({});
-  const [showResults, setShowResults] = useState(false);
+  const [energyValue, setEnergyValue] = useState(5);
 
-  // Fetch all workouts or programs
+  // Fetch all workouts only
   const { data: allContent = [], isLoading: contentLoading } = useQuery({
-    queryKey: ['smartly-suggest-content', contentType],
+    queryKey: ['smartly-suggest-workouts'],
     queryFn: async () => {
-      if (contentType === 'workout') {
-        const { data } = await supabase
-          .from('admin_workouts')
-          .select('id, name, category, difficulty, duration, equipment, format, image_url, description, is_premium, type')
-          .eq('is_visible', true)
-          .order('created_at', { ascending: false });
-        return (data || []).map(w => ({
-          ...w,
-          category: w.category || w.type || 'General',
-        })) as ContentItem[];
-      } else {
-        const { data } = await supabase
-          .from('admin_training_programs')
-          .select('id, name, category, difficulty, duration, equipment, image_url, description, is_premium')
-          .eq('is_visible', true)
-          .order('created_at', { ascending: false });
-        return (data || []).map(p => ({
-          ...p,
-          format: null,
-          type: 'program',
-        })) as ContentItem[];
-      }
+      const { data } = await supabase
+        .from('admin_workouts')
+        .select('id, name, category, difficulty, duration, equipment, format, image_url, description, is_premium, type')
+        .eq('is_visible', true)
+        .order('created_at', { ascending: false });
+      return (data || []).map(w => ({
+        ...w,
+        category: w.category || w.type || 'General',
+      })) as ContentItem[];
     },
     enabled: isOpen,
   });
@@ -77,38 +115,56 @@ export const SmartlySuggestModal = ({ isOpen, onClose, contentType }: SmartlySug
       if (!user?.id) return;
       await supabase.from('smartly_suggest_interactions').insert([{
         user_id: user.id,
-        suggested_content_type: contentType,
+        suggested_content_type: 'workout',
         suggested_content_id: data.suggested_content_id,
-        confidence_level: confidenceResult.level,
-        questions_asked: questions.map(q => q.id) as unknown as any,
+        confidence_level: 'direct', // Fixed flow, no confidence levels
+        questions_asked: ['mood', 'energy', 'goal', 'duration', 'equipment'] as unknown as any,
         user_responses: answers as unknown as any,
         action_taken: data.action_taken,
       }]);
     },
   });
 
-  // Initialize questions when modal opens
+  // Reset on open
   useEffect(() => {
-    if (isOpen && !context.isLoading) {
-      const selectedQuestions = selectQuestions(confidenceResult.level, context);
-      setQuestions(selectedQuestions);
-      setCurrentQuestionIndex(0);
+    if (isOpen) {
+      setCurrentStep(1);
       setAnswers({});
-      setShowResults(selectedQuestions.length === 0);
+      setEnergyValue(5);
     }
-  }, [isOpen, context.isLoading, confidenceResult.level]);
+  }, [isOpen]);
 
-  const handleAnswer = (questionId: string, value: string | number) => {
-    const newAnswers = { ...answers, [questionId]: value };
-    setAnswers(newAnswers);
-
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(prev => prev + 1);
-    } else {
-      setShowResults(true);
-    }
+  // Handle mood selection
+  const handleMoodSelect = (value: number) => {
+    setAnswers(prev => ({ ...prev, mood: value }));
+    setCurrentStep(2);
   };
 
+  // Handle energy confirm
+  const handleEnergyConfirm = () => {
+    setAnswers(prev => ({ ...prev, energy: energyValue }));
+    setCurrentStep(3);
+  };
+
+  // Handle goal selection
+  const handleGoalSelect = (value: string) => {
+    setAnswers(prev => ({ ...prev, goal: value }));
+    setCurrentStep(4);
+  };
+
+  // Handle duration selection
+  const handleDurationSelect = (value: number) => {
+    setAnswers(prev => ({ ...prev, time: value }));
+    setCurrentStep(5);
+  };
+
+  // Handle equipment selection
+  const handleEquipmentSelect = (value: string) => {
+    setAnswers(prev => ({ ...prev, equipment: value }));
+    setCurrentStep('result');
+  };
+
+  // Handle selecting the suggestion
   const handleSelectSuggestion = (item: ContentItem) => {
     logInteraction.mutate({
       suggested_content_id: item.id,
@@ -117,30 +173,28 @@ export const SmartlySuggestModal = ({ isOpen, onClose, contentType }: SmartlySug
 
     onClose();
     
-    if (contentType === 'workout') {
-      navigate(`/workout/${item.id}`);
-    } else {
-      navigate(`/trainingprogram/${item.id}`);
-    }
+    // Fix: Use proper route with category slug
+    const categorySlug = getCategorySlug(item.category);
+    navigate(`/workout/${categorySlug}/${item.id}`);
   };
 
   const handleDismiss = () => {
-    if (suggestions?.main) {
+    if (suggestion) {
       logInteraction.mutate({
-        suggested_content_id: suggestions.main.item.id,
+        suggested_content_id: suggestion.item.id,
         action_taken: 'dismissed',
       });
     }
     onClose();
   };
 
-  // Generate suggestion when showing results
-  const suggestions = showResults && allContent.length > 0
-    ? generateSuggestions(allContent, context, answers, contentType)
+  // Generate suggestion when on result step
+  const suggestion = currentStep === 'result' && allContent.length > 0
+    ? generateSuggestions(allContent, context, answers)
     : null;
 
-  const smartNote = suggestions?.main
-    ? generateSmartNote(context, suggestions.main.item)
+  const smartNote = suggestion
+    ? generateSmartNote(context, suggestion.item)
     : null;
 
   const isLoading = context.isLoading || contentLoading;
@@ -158,15 +212,24 @@ export const SmartlySuggestModal = ({ isOpen, onClose, contentType }: SmartlySug
     }
   };
 
+  const totalSteps = 5;
+  const currentStepNum = currentStep === 'result' ? 5 : currentStep;
+
+  // Check if user has goals set
+  const userHasGoals = !!context.userGoal?.primary_goal;
+  const userGoalLabel = context.userGoal?.primary_goal
+    ? goalOptions.find(g => g.value === context.userGoal?.primary_goal)?.label || context.userGoal.primary_goal
+    : null;
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleDismiss()}>
-      <DialogContent className="max-w-md mx-auto">
+      <DialogContent className="max-w-md mx-auto max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold">
             Smartly Suggest
           </DialogTitle>
           <p className="text-sm text-muted-foreground">
-            Based on your activity and goals
+            Let's find the perfect workout
           </p>
         </DialogHeader>
 
@@ -176,14 +239,183 @@ export const SmartlySuggestModal = ({ isOpen, onClose, contentType }: SmartlySug
               <Skeleton className="h-20 w-full rounded-xl" />
               <Skeleton className="h-32 w-full rounded-xl" />
             </div>
-          ) : !showResults && questions.length > 0 ? (
-            <QuestionStep
-              question={questions[currentQuestionIndex]}
-              currentStep={currentQuestionIndex + 1}
-              totalSteps={questions.length}
-              onAnswer={(value) => handleAnswer(questions[currentQuestionIndex].id, value)}
-            />
-          ) : suggestions ? (
+          ) : currentStep !== 'result' ? (
+            <div className="space-y-6 animate-in fade-in slide-in-from-right-5 duration-300">
+              {/* Progress indicator */}
+              <div className="flex items-center gap-2">
+                {Array.from({ length: totalSteps }).map((_, i) => (
+                  <div
+                    key={i}
+                    className={cn(
+                      "h-1 flex-1 rounded-full transition-colors",
+                      i < currentStepNum ? "bg-primary" : "bg-muted"
+                    )}
+                  />
+                ))}
+              </div>
+
+              {/* Step 1: Mood */}
+              {currentStep === 1 && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium text-foreground">
+                    How is your mood?
+                  </h3>
+                  <div className="flex justify-between gap-2">
+                    {moodEmojis.map((mood) => (
+                      <button
+                        key={mood.value}
+                        onClick={() => handleMoodSelect(mood.value)}
+                        className={cn(
+                          "flex flex-col items-center gap-1 p-3 rounded-xl transition-all",
+                          "border-2 border-border hover:border-primary hover:bg-primary/5",
+                          "focus:outline-none focus:ring-2 focus:ring-primary"
+                        )}
+                      >
+                        <span className="text-2xl">{mood.emoji}</span>
+                        <span className="text-xs text-muted-foreground">{mood.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Step 2: Energy */}
+              {currentStep === 2 && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium text-foreground">
+                    How's your energy?
+                  </h3>
+                  <div className="space-y-4">
+                    <div className="flex justify-between text-sm text-muted-foreground">
+                      <span>0</span>
+                      <span className="font-medium text-foreground">
+                        {energyValue} - {energyLabels[energyValue]}
+                      </span>
+                      <span>10</span>
+                    </div>
+                    <Slider
+                      value={[energyValue]}
+                      onValueChange={(val) => setEnergyValue(val[0])}
+                      min={0}
+                      max={10}
+                      step={1}
+                      className="w-full"
+                    />
+                    <Button onClick={handleEnergyConfirm} className="w-full">
+                      Continue
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 3: Goal */}
+              {currentStep === 3 && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium text-foreground">
+                    What's your focus?
+                  </h3>
+                  
+                  {/* Show user's goals if set */}
+                  {userHasGoals && (
+                    <div className="p-3 rounded-lg bg-primary/10 border border-primary/20">
+                      <p className="text-sm text-muted-foreground mb-2">
+                        According to your goals:
+                      </p>
+                      <Button
+                        variant="default"
+                        className="w-full"
+                        onClick={() => handleGoalSelect(context.userGoal!.primary_goal)}
+                      >
+                        {userGoalLabel}
+                      </Button>
+                    </div>
+                  )}
+
+                  <div className="space-y-2">
+                    {!userHasGoals && (
+                      <p className="text-sm text-muted-foreground">Choose your focus:</p>
+                    )}
+                    {userHasGoals && (
+                      <p className="text-sm text-muted-foreground">Or choose different focus:</p>
+                    )}
+                    <div className="flex flex-wrap gap-2">
+                      {goalOptions
+                        .filter(g => !userHasGoals || g.value !== context.userGoal?.primary_goal)
+                        .map((goal) => (
+                          <Button
+                            key={goal.value}
+                            variant="outline"
+                            onClick={() => handleGoalSelect(goal.value)}
+                            className="h-auto py-2 px-3 text-sm"
+                          >
+                            {goal.label}
+                          </Button>
+                        ))}
+                    </div>
+                  </div>
+
+                  {!userHasGoals && (
+                    <Link 
+                      to="/fitnessgoals" 
+                      className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+                      onClick={onClose}
+                    >
+                      <LinkIcon className="h-3 w-3" />
+                      Set your goals now
+                    </Link>
+                  )}
+                </div>
+              )}
+
+              {/* Step 4: Duration */}
+              {currentStep === 4 && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium text-foreground">
+                    How much time do you have?
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {durationOptions.map((dur) => (
+                      <Button
+                        key={dur.value}
+                        variant="outline"
+                        onClick={() => handleDurationSelect(dur.value)}
+                        className={cn(
+                          "h-auto py-3 px-4 text-sm font-medium",
+                          "border-2 border-border hover:border-primary hover:bg-primary/5"
+                        )}
+                      >
+                        {dur.label}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Step 5: Equipment */}
+              {currentStep === 5 && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium text-foreground">
+                    What equipment do you have?
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {equipmentOptions.map((eq) => (
+                      <Button
+                        key={eq.value}
+                        variant="outline"
+                        onClick={() => handleEquipmentSelect(eq.value)}
+                        className={cn(
+                          "h-auto py-3 px-4 text-sm font-medium flex-1",
+                          "border-2 border-border hover:border-primary hover:bg-primary/5"
+                        )}
+                      >
+                        {eq.label}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : suggestion ? (
             <>
               {/* Suggestion Card */}
               <div 
@@ -192,13 +424,13 @@ export const SmartlySuggestModal = ({ isOpen, onClose, contentType }: SmartlySug
                   "border-2 border-primary/20 hover:border-primary/40",
                   "transition-all duration-200 hover:shadow-lg"
                 )}
-                onClick={() => handleSelectSuggestion(suggestions.main.item)}
+                onClick={() => handleSelectSuggestion(suggestion.item)}
               >
-                {suggestions.main.item.image_url && (
+                {suggestion.item.image_url && (
                   <div className="relative h-32 overflow-hidden">
                     <img
-                      src={suggestions.main.item.image_url}
-                      alt={suggestions.main.item.name}
+                      src={suggestion.item.image_url}
+                      alt={suggestion.item.name}
                       className="w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
@@ -207,36 +439,36 @@ export const SmartlySuggestModal = ({ isOpen, onClose, contentType }: SmartlySug
 
                 <div className="p-4 space-y-2">
                   <h4 className="font-semibold text-foreground line-clamp-2">
-                    {suggestions.main.item.name}
+                    {suggestion.item.name}
                   </h4>
 
                   <div className="flex flex-wrap items-center gap-2">
-                    {suggestions.main.item.category && (
+                    {suggestion.item.category && (
                       <Badge variant="secondary" className="text-xs">
-                        {suggestions.main.item.category}
+                        {suggestion.item.category}
                       </Badge>
                     )}
                     
-                    {suggestions.main.item.difficulty && (
+                    {suggestion.item.difficulty && (
                       <Badge 
                         variant="outline" 
-                        className={cn("text-xs", getDifficultyColor(suggestions.main.item.difficulty))}
+                        className={cn("text-xs", getDifficultyColor(suggestion.item.difficulty))}
                       >
-                        {suggestions.main.item.difficulty}
+                        {suggestion.item.difficulty}
                       </Badge>
                     )}
 
-                    {suggestions.main.item.duration && (
+                    {suggestion.item.duration && (
                       <div className="flex items-center gap-1 text-xs text-muted-foreground">
                         <Clock className="h-3 w-3" />
-                        {suggestions.main.item.duration}
+                        {suggestion.item.duration}
                       </div>
                     )}
 
-                    {suggestions.main.item.equipment && (
+                    {suggestion.item.equipment && (
                       <div className="flex items-center gap-1 text-xs text-muted-foreground">
                         <Dumbbell className="h-3 w-3" />
-                        {suggestions.main.item.equipment}
+                        {suggestion.item.equipment}
                       </div>
                     )}
                   </div>
@@ -244,7 +476,7 @@ export const SmartlySuggestModal = ({ isOpen, onClose, contentType }: SmartlySug
               </div>
 
               {/* Why This For You */}
-              {suggestions.main.reasons.length > 0 && (
+              {suggestion.reasons.length > 0 && (
                 <div className="space-y-2 p-3 rounded-lg bg-muted/50">
                   <div className="flex items-center gap-2">
                     <Zap className="h-4 w-4 text-primary" />
@@ -253,7 +485,7 @@ export const SmartlySuggestModal = ({ isOpen, onClose, contentType }: SmartlySug
                     </span>
                   </div>
                   <ul className="space-y-1.5">
-                    {suggestions.main.reasons.slice(0, 4).map((reason, index) => (
+                    {suggestion.reasons.slice(0, 4).map((reason, index) => (
                       <li key={index} className="text-sm text-foreground flex items-start gap-2">
                         <span className="text-primary mt-1">•</span>
                         <span>{reason}</span>
@@ -271,15 +503,15 @@ export const SmartlySuggestModal = ({ isOpen, onClose, contentType }: SmartlySug
               {/* CTA Button */}
               <Button 
                 className="w-full" 
-                onClick={() => handleSelectSuggestion(suggestions.main.item)}
+                onClick={() => handleSelectSuggestion(suggestion.item)}
               >
-                {contentType === 'workout' ? 'Start Workout' : 'View Program'}
+                Start Workout
                 <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             </>
           ) : (
             <div className="text-center py-6 text-muted-foreground">
-              <p>No {contentType}s available to suggest at the moment.</p>
+              <p>No workouts available to suggest at the moment.</p>
             </div>
           )}
         </div>
