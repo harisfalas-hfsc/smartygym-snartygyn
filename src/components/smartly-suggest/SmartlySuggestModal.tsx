@@ -294,7 +294,7 @@ export const SmartlySuggestModal = ({ isOpen, onClose }: SmartlySuggestModalProp
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleDismiss()}>
-      <DialogContent className="max-w-md mx-auto max-h-[85vh] overflow-y-auto">
+      <DialogContent className="w-[calc(100vw-2rem)] max-w-md mx-auto max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold">
             Smartly Suggest
@@ -331,19 +331,19 @@ export const SmartlySuggestModal = ({ isOpen, onClose }: SmartlySuggestModalProp
                   <h3 className="text-lg font-medium text-foreground">
                     How is your mood?
                   </h3>
-                  <div className="flex justify-between gap-2">
+                  <div className="grid grid-cols-5 gap-1 sm:flex sm:justify-between sm:gap-2">
                     {moodEmojis.map((mood) => (
                       <button
                         key={mood.value}
                         onClick={() => handleMoodSelect(mood.value)}
                         className={cn(
-                          "flex flex-col items-center gap-1 p-3 rounded-xl transition-all",
+                          "flex flex-col items-center gap-0.5 p-2 sm:p-3 rounded-xl transition-all",
                           "border-2 border-border hover:border-primary hover:bg-primary/5",
                           "focus:outline-none focus:ring-2 focus:ring-primary"
                         )}
                       >
-                        <span className="text-2xl">{mood.emoji}</span>
-                        <span className="text-xs text-muted-foreground">{mood.label}</span>
+                        <span className="text-xl sm:text-2xl">{mood.emoji}</span>
+                        <span className="text-[10px] sm:text-xs text-muted-foreground text-center leading-tight">{mood.label}</span>
                       </button>
                     ))}
                   </div>
@@ -462,7 +462,7 @@ export const SmartlySuggestModal = ({ isOpen, onClose }: SmartlySuggestModalProp
                         variant="outline"
                         onClick={() => handleDurationSelect(dur.value)}
                         className={cn(
-                          "h-auto py-3 px-4 text-sm font-medium",
+                          "h-auto py-2 px-3 sm:py-3 sm:px-4 text-sm font-medium",
                           "border-2 border-border hover:border-primary hover:bg-primary/5"
                         )}
                       >
@@ -490,7 +490,7 @@ export const SmartlySuggestModal = ({ isOpen, onClose }: SmartlySuggestModalProp
                         variant="outline"
                         onClick={() => handleEquipmentSelect(eq.value)}
                         className={cn(
-                          "h-auto py-3 px-4 text-sm font-medium flex-1",
+                          "h-auto py-2 px-3 sm:py-3 sm:px-4 text-sm font-medium flex-1",
                           "border-2 border-border hover:border-primary hover:bg-primary/5"
                         )}
                       >
