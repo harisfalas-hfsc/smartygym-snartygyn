@@ -207,21 +207,22 @@ const TrainingProgramFlow = () => {
       />
       
       <div className="min-h-screen bg-background">
-        {canGoBack && (
-          <div className="mb-6">
-            <Button variant="ghost" size="sm" onClick={goBack}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              <span className="text-xs sm:text-sm">Back</span>
-            </Button>
-          </div>
-        )}
-        
-        <PageBreadcrumbs items={[{
-          label: "Home",
-          href: "/"
-        }, {
-          label: "Smarty Programs"
-        }]} />
+        <div className="container mx-auto max-w-6xl px-4 pb-8">
+          {canGoBack && (
+            <div className="mb-6">
+              <Button variant="ghost" size="sm" onClick={goBack}>
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                <span className="text-xs sm:text-sm">Back</span>
+              </Button>
+            </div>
+          )}
+          
+          <PageBreadcrumbs items={[{
+            label: "Home",
+            href: "/"
+          }, {
+            label: "Smarty Programs"
+          }]} />
 
         {/* Info Section - About Smarty Programs */}
         <Card className="mb-8 bg-white dark:bg-card border-2 border-primary/40 shadow-primary">
@@ -442,6 +443,7 @@ const TrainingProgramFlow = () => {
           </ScrollReveal>
         )}
 
+        </div>
       </div>
     </>
   );
