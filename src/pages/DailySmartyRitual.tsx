@@ -421,7 +421,7 @@ const DailySmartyRitual = () => {
         <ReaderModeDialog
           open={showReaderMode}
           onOpenChange={setShowReaderMode}
-          title={`Daily Smarty Ritual - Day ${ritual.day_number}`}
+          title={`Daily Smarty Ritual - ${new Date(ritual.ritual_date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}`}
           content={`
             <h2>🌅 Morning Ritual</h2>
             ${ritual.morning_content}
