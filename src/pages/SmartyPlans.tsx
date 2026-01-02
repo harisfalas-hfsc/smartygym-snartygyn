@@ -152,7 +152,7 @@ export default function SmartyPlans() {
       </Helmet>
 
       <div className="min-h-screen bg-background">
-        <main className="container mx-auto max-w-7xl p-4 py-8">
+        <main className="container mx-auto max-w-6xl px-4 pb-8">
           {canGoBack && (
             <Button variant="ghost" size="sm" onClick={goBack} className="mb-4">
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -174,7 +174,7 @@ export default function SmartyPlans() {
           </div>
 
           {/* What You Get with Premium */}
-          <Card className="mb-8">
+          <Card className="mb-8 bg-white dark:bg-card border-2 border-primary/40 shadow-primary">
             <CardHeader>
               <CardTitle className="text-2xl">What You Get with Premium</CardTitle>
             </CardHeader>
