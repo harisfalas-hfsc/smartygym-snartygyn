@@ -1,5 +1,8 @@
 project_id = "cvccrvyimyzrxcwzmxwk"
 
+[functions.fix-stripe-metadata]
+verify_jwt = true
+
 [functions.wod-generation-orchestrator]
 verify_jwt = false
 

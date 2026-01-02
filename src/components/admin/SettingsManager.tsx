@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Settings, Bell, Mail, Database, Shield, Download, HeartPulse, Wrench, Image, RefreshCw, Search, ImagePlus, Send, Trash2, ShoppingCart, HelpCircle, ClipboardCheck } from "lucide-react";
+import { Settings, Bell, Mail, Database, Shield, Download, HeartPulse, Wrench, Image, RefreshCw, Search, ImagePlus, Send, Trash2, ShoppingCart, HelpCircle, ClipboardCheck, Tag } from "lucide-react";
 import { SystemHealthAudit } from "./SystemHealthAudit";
 
 export const SettingsManager = () => {
@@ -62,6 +62,8 @@ export const SettingsManager = () => {
   const [pullStripeImagesResult, setPullStripeImagesResult] = useState<string | null>(null);
   const [checkImageStatusLoading, setCheckImageStatusLoading] = useState(false);
   const [checkImageStatusResult, setCheckImageStatusResult] = useState<any | null>(null);
+  const [fixMetadataLoading, setFixMetadataLoading] = useState(false);
+  const [fixMetadataResult, setFixMetadataResult] = useState<any | null>(null);
 
   // Load inactivity timeout on mount
   useEffect(() => {
@@ -557,6 +559,34 @@ export const SettingsManager = () => {
     }
   };
 
+  const handleFixStripeMetadata = async () => {
+    if (!confirm("This will add SMARTYGYM metadata to all Stripe products that are missing it. Continue?")) {
+      return;
+    }
+    
+    setFixMetadataLoading(true);
+    setFixMetadataResult(null);
+    try {
+      const { data, error } = await supabase.functions.invoke('fix-stripe-metadata');
+      
+      if (error) throw error;
+
+      setFixMetadataResult(data);
+      toast({
+        title: "Metadata Fix Complete",
+        description: data.message,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Fix Failed",
+        description: error.message || "Failed to fix Stripe metadata.",
+        variant: "destructive",
+      });
+    } finally {
+      setFixMetadataLoading(false);
+    }
+  };
+
   const handlePullStripeImages = async () => {
     if (!confirm("This will download images from Stripe to your website for items that are missing website images but have Stripe images. Continue?")) {
       return;
@@ -981,6 +1011,43 @@ export const SettingsManager = () => {
                     </Button>
                     {pullStripeImagesResult && (
                       <p className="text-xs text-green-600">✅ {pullStripeImagesResult}</p>
+                    )}
+                  </div>
+
+                  {/* Fix Stripe Metadata */}
+                  <div className="p-4 border rounded-lg space-y-3 border-yellow-200 bg-yellow-50/50 dark:bg-yellow-950/20 dark:border-yellow-800">
+                    <div className="flex items-center gap-2">
+                      <Tag className="h-5 w-5 text-yellow-600" />
+                      <h4 className="font-medium text-sm">Fix Stripe Metadata</h4>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Add SMARTYGYM tags to Stripe products missing metadata
+                    </p>
+                    <Button 
+                      onClick={handleFixStripeMetadata} 
+                      disabled={fixMetadataLoading}
+                      variant="outline"
+                      size="sm"
+                      className="w-full border-yellow-300 hover:bg-yellow-100 dark:border-yellow-700 dark:hover:bg-yellow-900"
+                    >
+                      {fixMetadataLoading ? "Fixing..." : "Fix Metadata"}
+                    </Button>
+                    {fixMetadataResult && (
+                      <div className="text-xs space-y-1 pt-2 border-t border-yellow-200 dark:border-yellow-800">
+                        <p className={fixMetadataResult.success ? "text-green-600" : "text-red-600"}>
+                          {fixMetadataResult.success ? "✅" : "❌"} {fixMetadataResult.message}
+                        </p>
+                        {fixMetadataResult.fixed_items?.length > 0 && (
+                          <details className="mt-1">
+                            <summary className="cursor-pointer text-muted-foreground">Fixed items:</summary>
+                            <ul className="pl-3 mt-1">
+                              {fixMetadataResult.fixed_items.map((item: string, i: number) => (
+                                <li key={i}>• {item}</li>
+                              ))}
+                            </ul>
+                          </details>
+                        )}
+                      </div>
                     )}
                   </div>
 
