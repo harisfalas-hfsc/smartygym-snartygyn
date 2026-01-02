@@ -1081,6 +1081,51 @@ export type Database = {
         }
         Relationships: []
       }
+      image_repair_jobs: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          created_by: string | null
+          errors: Json | null
+          id: string
+          processed_items: number | null
+          repaired_items: number | null
+          skipped_items: number | null
+          started_at: string | null
+          status: string
+          stripe_synced: number | null
+          total_items: number | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          errors?: Json | null
+          id?: string
+          processed_items?: number | null
+          repaired_items?: number | null
+          skipped_items?: number | null
+          started_at?: string | null
+          status?: string
+          stripe_synced?: number | null
+          total_items?: number | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          errors?: Json | null
+          id?: string
+          processed_items?: number | null
+          repaired_items?: number | null
+          skipped_items?: number | null
+          started_at?: string | null
+          status?: string
+          stripe_synced?: number | null
+          total_items?: number | null
+        }
+        Relationships: []
+      }
       mismatched_exercises: {
         Row: {
           created_at: string | null

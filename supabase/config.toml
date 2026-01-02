@@ -206,3 +206,12 @@ verify_jwt = false
 
 [functions.repair-missing-images]
 verify_jwt = false
+
+[functions.start-image-repair]
+verify_jwt = true
+
+[functions.process-image-repair]
+verify_jwt = false
+
+[functions.get-repair-job-status]
+verify_jwt = false

@@ -50,6 +50,8 @@ export const SettingsManager = () => {
   const [refreshSeoResult, setRefreshSeoResult] = useState<string | null>(null);
   const [generateImagesLoading, setGenerateImagesLoading] = useState(false);
   const [generateImagesResult, setGenerateImagesResult] = useState<string | null>(null);
+  const [repairJobId, setRepairJobId] = useState<string | null>(null);
+  const [repairJobStatus, setRepairJobStatus] = useState<any | null>(null);
   const [reengagementLoading, setReengagementLoading] = useState(false);
   const [reengagementResult, setReengagementResult] = useState<string | null>(null);
   const [cleanupRateLimitsLoading, setCleanupRateLimitsLoading] = useState(false);
@@ -356,69 +358,86 @@ export const SettingsManager = () => {
     }
   };
 
+  // Poll for repair job status
+  useEffect(() => {
+    if (!repairJobId) return;
+    
+    const pollStatus = async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke('get-repair-job-status', {
+          body: null,
+        });
+        
+        if (error) {
+          console.error('Failed to get job status:', error);
+          return;
+        }
+        
+        setRepairJobStatus(data);
+        
+        if (data?.status === 'completed') {
+          setGenerateImagesLoading(false);
+          const result = `Repaired: ${data.repaired_items} items. Skipped: ${data.skipped_items}. Stripe synced: ${data.stripe_synced}.`;
+          setGenerateImagesResult(result);
+          toast({
+            title: "Image Repair Complete",
+            description: result,
+          });
+          setRepairJobId(null);
+        } else if (data?.status === 'failed') {
+          setGenerateImagesLoading(false);
+          setGenerateImagesResult(`Failed: ${data.errors?.join(', ') || 'Unknown error'}`);
+          toast({
+            title: "Image Repair Failed",
+            description: "Check the errors for details.",
+            variant: "destructive",
+          });
+          setRepairJobId(null);
+        }
+      } catch (err) {
+        console.error('Poll error:', err);
+      }
+    };
+    
+    const interval = setInterval(pollStatus, 3000);
+    pollStatus(); // Initial check
+    
+    return () => clearInterval(interval);
+  }, [repairJobId, toast]);
+
   const handleGenerateMissingImages = async () => {
-    if (!confirm("This will scan ALL workouts and programs, detect broken/missing images (including URLs that point to non-existent files), generate new AI images, update the database, and sync to Stripe. This may take several minutes. Continue?")) {
+    if (!confirm("This will scan ALL workouts and programs, detect broken/missing images, generate new AI images, update the database, and sync to Stripe. Continue?")) {
       return;
     }
     
     setGenerateImagesLoading(true);
     setGenerateImagesResult(null);
+    setRepairJobStatus(null);
+    
     try {
-      // Call the new repair-missing-images function that properly detects broken images
-      const { data, error } = await supabase.functions.invoke('repair-missing-images');
+      const { data, error } = await supabase.functions.invoke('start-image-repair');
       
       if (error) throw error;
 
-      const result = data as {
-        success: boolean;
-        workoutsScanned: number;
-        programsScanned: number;
-        workoutsRepaired: number;
-        programsRepaired: number;
-        workoutsSkipped: number;
-        programsSkipped: number;
-        stripeUpdated: number;
-        errors: string[];
-        summary: string;
-      };
-
-      if (!result.success) {
-        throw new Error('Repair function returned unsuccessful');
-      }
-
-      const totalRepaired = result.workoutsRepaired + result.programsRepaired;
-      
-      if (totalRepaired === 0) {
-        setGenerateImagesResult(`Scanned ${result.workoutsScanned} workouts, ${result.programsScanned} programs. All images are valid!`);
+      if (data?.success && data?.jobId) {
+        setRepairJobId(data.jobId);
+        setGenerateImagesResult(`Job started: Processing ${data.totalItems} items...`);
         toast({
-          title: "All Images Valid",
-          description: `Scanned ${result.workoutsScanned} workouts and ${result.programsScanned} programs. No broken or missing images found.`,
+          title: "Repair Job Started",
+          description: `Processing ${data.totalItems} items. This runs in the background.`,
         });
       } else {
-        const errorSummary = result.errors.length > 0 ? ` (${result.errors.length} errors)` : '';
-        setGenerateImagesResult(
-          `Repaired: ${result.workoutsRepaired} workouts, ${result.programsRepaired} programs. Synced ${result.stripeUpdated} to Stripe.${errorSummary}`
-        );
-        toast({
-          title: "Image Repair Complete",
-          description: result.summary,
-        });
-      }
-
-      // Log any errors
-      if (result.errors.length > 0) {
-        console.error("Repair errors:", result.errors);
+        throw new Error(data?.error || 'Failed to start repair job');
       }
     } catch (error: any) {
       console.error("Image repair error:", error);
       setGenerateImagesResult(`Error: ${error.message}`);
+      setGenerateImagesLoading(false);
       toast({
         title: "Repair Failed",
-        description: error.message || "Failed to repair images.",
+        description: error.message || "Failed to start image repair.",
         variant: "destructive",
       });
-    } finally {
-      setGenerateImagesLoading(false);
     }
   };
 
@@ -870,9 +889,28 @@ export const SettingsManager = () => {
                     >
                       {generateImagesLoading ? "Repairing..." : "Repair Images"}
                     </Button>
+                    {/* Progress indicator */}
+                    {repairJobStatus && generateImagesLoading && (
+                      <div className="space-y-1">
+                        <div className="w-full bg-muted rounded-full h-2">
+                          <div 
+                            className="bg-primary h-2 rounded-full transition-all duration-300"
+                            style={{ 
+                              width: `${repairJobStatus.total_items > 0 
+                                ? (repairJobStatus.processed_items / repairJobStatus.total_items) * 100 
+                                : 0}%` 
+                            }}
+                          />
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          {repairJobStatus.processed_items}/{repairJobStatus.total_items} items processed
+                          {repairJobStatus.repaired_items > 0 && ` • ${repairJobStatus.repaired_items} repaired`}
+                        </p>
+                      </div>
+                    )}
                     {generateImagesResult && (
-                      <p className={`text-xs ${generateImagesResult.startsWith('Error') ? 'text-red-600' : 'text-green-600'}`}>
-                        {generateImagesResult.startsWith('Error') ? '❌' : '✅'} {generateImagesResult}
+                      <p className={`text-xs ${generateImagesResult.startsWith('Error') || generateImagesResult.startsWith('Failed') ? 'text-red-600' : 'text-green-600'}`}>
+                        {generateImagesResult.startsWith('Error') || generateImagesResult.startsWith('Failed') ? '❌' : '✅'} {generateImagesResult}
                       </p>
                     )}
                   </div>
