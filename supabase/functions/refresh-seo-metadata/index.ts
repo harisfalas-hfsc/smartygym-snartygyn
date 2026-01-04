@@ -11,20 +11,42 @@ const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
-const ADMIN_EMAIL = 'info@smartygym.com';
+const ADMIN_EMAIL = 'harisfalas@gmail.com';
 
-const KEYWORD_FAMILY = [
-  // Core fitness keywords
-  'online fitness platform', 'fitness', 'online gym', 'workouts', 'training programs',
+// PRIORITY KEYWORDS - Strongly emphasized in ALL SEO generation
+const PRIORITY_KEYWORDS = [
+  'online fitness',
+  'online workout',
+  'online training programs',
+  'online gym',
+  'online personal training',
+  'online fitness coach',
+  'online exercise',
+  'online exercise weight loss',
+  'online strength',
+  'online fitness strength',
+  'online fitness workout',
+  'online strength workout'
+];
+
+// Brand and platform keywords
+const BRAND_KEYWORDS = [
+  'SmartyGym', 'Haris Falas', 'online coach', 'training plans',
   'functional training', 'strength training', 'weight loss training', 'mobility',
-  'exercise at home', 'workout anywhere', 'Haris Falas', 'SmartyGym', 'online coach', 'training plans',
-  // Multi-domain keywords (owned domains that redirect to smartygym.com)
+  'exercise at home', 'workout anywhere'
+];
+
+// Multi-domain keywords (owned domains that redirect to smartygym.com)
+const DOMAIN_KEYWORDS = [
   'smartygym.com', 'i-training.net', 'itraining', 'i-training',
   'smartywod.com', 'smartywod', 'smarty wod',
   'smartylogbook.com', 'smartylogbook', 'smarty logbook',
   'smartywellness.com', 'smartywellness', 'smarty wellness',
   'smartyworkout.com', 'smartyworkout', 'smarty workout'
 ];
+
+// Combined - priority keywords come FIRST
+const KEYWORD_FAMILY = [...PRIORITY_KEYWORDS, ...BRAND_KEYWORDS, ...DOMAIN_KEYWORDS];
 
 interface ContentItem {
   id: string;
@@ -52,11 +74,11 @@ async function generateSEOMetadata(item: ContentItem): Promise<{
   if (!LOVABLE_API_KEY) {
     // Fallback without AI
     return {
-      meta_title: `${item.name} | SmartyGym`,
-      meta_description: item.description?.substring(0, 155) || `${item.name} - Expert-designed ${item.content_type} by Haris Falas on SmartyGym`,
-      keywords: [item.name.toLowerCase(), item.category?.toLowerCase() || '', ...KEYWORD_FAMILY.slice(0, 5)].filter(Boolean),
+      meta_title: `${item.name} | SmartyGym Online Fitness`,
+      meta_description: item.description?.substring(0, 155) || `${item.name} - Online fitness ${item.content_type} by Haris Falas on SmartyGym`,
+      keywords: [item.name.toLowerCase(), item.category?.toLowerCase() || '', ...PRIORITY_KEYWORDS.slice(0, 6), ...BRAND_KEYWORDS.slice(0, 3)].filter(Boolean),
       json_ld: generateJsonLD(item),
-      image_alt_text: `${item.name} - SmartyGym ${item.content_type}`
+      image_alt_text: `${item.name} - SmartyGym online ${item.content_type}`
     };
   }
 
@@ -72,7 +94,17 @@ async function generateSEOMetadata(item: ContentItem): Promise<{
         messages: [
           {
             role: 'system',
-            content: `You are an SEO expert for SmartyGym (smartygym.com), an online fitness platform by expert coach Haris Falas. The platform is also accessible via these owned domains that redirect to smartygym.com: i-training.net, smartywod.com, smartylogbook.com, smartywellness.com, smartyworkout.com. Generate SEO metadata in JSON format only, no markdown.`
+            content: `You are an SEO expert for SmartyGym (smartygym.com), an online fitness platform by expert coach Haris Falas.
+
+CRITICAL - PRIORITY KEYWORDS (MUST include at least 2-3 in every meta title and description):
+- online fitness, online workout, online training programs, online gym
+- online personal training, online fitness coach, online exercise
+- online exercise weight loss, online strength, online fitness strength
+- online fitness workout, online strength workout
+
+The platform is also accessible via these owned domains that redirect to smartygym.com: i-training.net, smartywod.com, smartylogbook.com, smartywellness.com, smartyworkout.com.
+
+Generate SEO metadata in JSON format only, no markdown. Always prioritize the PRIORITY KEYWORDS above in meta_title and meta_description.`
           },
           {
             role: 'user',
@@ -136,11 +168,11 @@ Return ONLY valid JSON with these fields:
     console.error(`AI SEO generation failed for ${item.name}:`, error);
     // Fallback
     return {
-      meta_title: `${item.name} | SmartyGym`,
-      meta_description: item.description?.substring(0, 155) || `${item.name} - Expert-designed ${item.content_type} by Haris Falas`,
-      keywords: [item.name.toLowerCase(), item.category?.toLowerCase() || '', ...KEYWORD_FAMILY.slice(0, 5)].filter(Boolean),
+      meta_title: `${item.name} | SmartyGym Online Fitness`,
+      meta_description: item.description?.substring(0, 155) || `${item.name} - Online fitness ${item.content_type} by Haris Falas on SmartyGym`,
+      keywords: [item.name.toLowerCase(), item.category?.toLowerCase() || '', ...PRIORITY_KEYWORDS.slice(0, 6), ...BRAND_KEYWORDS.slice(0, 3)].filter(Boolean),
       json_ld: generateJsonLD(item),
-      image_alt_text: `${item.name} - SmartyGym ${item.content_type}`
+      image_alt_text: `${item.name} - SmartyGym online ${item.content_type}`
     };
   }
 }
