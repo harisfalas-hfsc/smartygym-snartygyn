@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Gift, Crown, Sparkles, Check } from "lucide-react";
+import { Gift, Crown, Sparkles, Check, X } from "lucide-react";
 
 interface FirstSubscriptionPromoModalProps {
   open: boolean;
@@ -33,9 +33,17 @@ export const FirstSubscriptionPromoModal = ({ open, onClose }: FirstSubscription
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleClose()}>
-      <DialogContent className="w-[calc(100vw-2rem)] max-w-md mx-auto max-h-[90vh] overflow-y-auto p-0">
+      <DialogContent className="w-[calc(100vw-2rem)] max-w-md mx-auto max-h-[90vh] overflow-y-auto p-0 [&>button]:hidden">
         {/* Header with gradient background */}
-        <div className="bg-gradient-to-br from-primary/20 via-primary/10 to-background p-6 pb-4 rounded-t-lg">
+        <div className="relative bg-gradient-to-br from-primary/20 via-primary/10 to-background p-4 sm:p-6 pb-4 rounded-t-lg">
+          {/* Custom close button */}
+          <button 
+            onClick={handleClose}
+            className="absolute right-3 top-3 p-1.5 rounded-full hover:bg-muted transition-colors z-10"
+            aria-label="Close"
+          >
+            <X className="w-4 h-4 text-muted-foreground" />
+          </button>
           <DialogHeader>
             <div className="flex items-center justify-center mb-3">
               <div className="relative">
