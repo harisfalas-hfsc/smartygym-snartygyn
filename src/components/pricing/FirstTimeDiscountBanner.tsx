@@ -13,24 +13,38 @@ export const FirstTimeDiscountBanner = () => {
   // Don't show if discount is already applied via URL
   const isDiscountAlreadyApplied = searchParams.get('discount') === 'first35';
 
-  // Don't show if loading
-  if (isLoading) {
+  // Show for visitors (user === null) OR logged-in eligible users
+  const isVisitor = user === null;
+  const shouldShow = isVisitor || isEligible;
+
+  console.log('[FirstTimeDiscountBanner] Render check:', {
+    isLoading,
+    isVisitor,
+    isEligible,
+    shouldShow,
+    isDiscountAlreadyApplied,
+    isDismissed,
+    userId: user?.id || 'visitor'
+  });
+
+  // Don't show if still loading (but only for logged-in users - visitors show immediately)
+  if (isLoading && !isVisitor) {
+    console.log('[FirstTimeDiscountBanner] Still loading for logged-in user, waiting...');
     return null;
   }
 
   // Don't show if discount already applied or dismissed
   if (isDiscountAlreadyApplied || isDismissed) {
+    console.log('[FirstTimeDiscountBanner] Hidden: discount applied or dismissed');
     return null;
   }
-
-  // Show for visitors (user === null) OR logged-in eligible users
-  // Hide for logged-in ineligible users (already subscribed)
-  const isVisitor = user === null;
-  const shouldShow = isVisitor || isEligible;
 
   if (!shouldShow) {
+    console.log('[FirstTimeDiscountBanner] Hidden: not eligible');
     return null;
   }
+
+  console.log('[FirstTimeDiscountBanner] RENDERING BANNER!');
 
   const handleClaimDiscount = () => {
     // Reload the page with the discount parameter

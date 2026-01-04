@@ -16,18 +16,37 @@ export const FirstTimeDiscountInlineCallout = () => {
   // Don't show if discount is already applied via URL
   const isDiscountAlreadyApplied = searchParams.get('discount') === 'first35';
 
-  // Don't show if loading or discount already applied
-  if (isLoading || isDiscountAlreadyApplied) {
-    return null;
-  }
-
   // Show for visitors (user === null) OR logged-in eligible users
   const isVisitor = user === null;
   const shouldShow = isVisitor || isEligible;
 
-  if (!shouldShow) {
+  console.log('[FirstTimeDiscountInlineCallout] Render check:', {
+    isLoading,
+    isVisitor,
+    isEligible,
+    shouldShow,
+    isDiscountAlreadyApplied,
+    userId: user?.id || 'visitor'
+  });
+
+  // Don't show if still loading (but only for logged-in users - visitors show immediately)
+  if (isLoading && !isVisitor) {
+    console.log('[FirstTimeDiscountInlineCallout] Still loading for logged-in user, waiting...');
     return null;
   }
+
+  // Don't show if discount already applied
+  if (isDiscountAlreadyApplied) {
+    console.log('[FirstTimeDiscountInlineCallout] Hidden: discount already applied');
+    return null;
+  }
+
+  if (!shouldShow) {
+    console.log('[FirstTimeDiscountInlineCallout] Hidden: not eligible');
+    return null;
+  }
+
+  console.log('[FirstTimeDiscountInlineCallout] RENDERING CALLOUT!');
 
   const handleApplyDiscount = () => {
     const newSearchParams = new URLSearchParams(searchParams);
