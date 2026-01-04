@@ -218,3 +218,6 @@ verify_jwt = false
 
 [functions.get-repair-job-status]
 verify_jwt = false
+
+[functions.ai-contact-response]
+verify_jwt = false
