@@ -98,6 +98,16 @@ export default function SmartyPlans() {
         }
       });
 
+      // Handle already subscribed response from backend
+      if (data?.hasActiveSubscription) {
+        toast({
+          title: "You're Already Subscribed!",
+          description: "You already have an active premium subscription.",
+        });
+        navigate('/userdashboard');
+        return;
+      }
+
       if (error) throw error;
 
       if (data?.url) {
