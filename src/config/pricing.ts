@@ -18,12 +18,12 @@ export const CORPORATE_PRICES = {
   enterprise: 699,   // €699/year
 } as const;
 
-// Stripe Product IDs for YOUR products only
-// Used to filter Stripe revenue to only YOUR website's sales
+// Stripe Product IDs for SmartyGym products only
+// Used to filter Stripe revenue to only SmartyGym sales
 export const OUR_STRIPE_PRODUCT_IDS = [
   // Subscription products
-  'prod_gold',           // Gold subscription (update with real ID)
-  'prod_platinum',       // Platinum subscription (update with real ID)
+  'prod_TFfAcybp438BH6', // Smarty Gym Gold Plan
+  'prod_TFfAPp1tq7RdUk', // Smarty Gym Platinum Plan
   // Corporate products
   'prod_TZATAcAlqgc1P7', // Smarty Dynamic
   'prod_TZATDsKcDvMtHc', // Smarty Power

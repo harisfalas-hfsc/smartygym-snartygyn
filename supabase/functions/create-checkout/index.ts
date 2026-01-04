@@ -10,6 +10,12 @@ const corsHeaders = {
 // First-time subscriber coupon ID (35% off)
 const FIRST_TIME_COUPON_ID = "TnTNe1uX";
 
+// SmartyGym subscription price IDs - ONLY these qualify for first-time discount
+const SMARTYGYM_PRICE_IDS = [
+  "price_1SJ9q1IxQYg9inGKZzxxqPbD",  // Gold Monthly (€9.99/mo)
+  "price_1SJ9qGIxQYg9inGKFbgqVRjj",  // Platinum Yearly (€89.89/yr)
+];
+
 const logStep = (step: string, details?: unknown) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
   console.log(`[CREATE-CHECKOUT] ${step}${detailsStr}`);
@@ -56,17 +62,24 @@ serve(async (req) => {
       logStep("Found existing customer", { customerId });
     }
 
-    // CRITICAL: Check if user already has an active subscription (prevent double billing)
+    // CRITICAL: Check if user already has an active SmartyGym subscription (prevent double billing)
     if (customerId) {
       const activeSubscriptions = await stripe.subscriptions.list({
         customer: customerId,
         status: 'active',
-        limit: 1
+        limit: 100,
+        expand: ['data.items.data.price']
       });
       
-      if (activeSubscriptions.data.length > 0) {
-        logStep("User already has active subscription - blocking checkout", {
-          subscriptionId: activeSubscriptions.data[0].id
+      // Filter to only SmartyGym subscriptions
+      const activeSmartyGymSubs = activeSubscriptions.data.filter((sub: { items: { data: { price?: { id?: string } }[] } }) => {
+        const priceId = sub.items.data[0]?.price?.id;
+        return priceId && SMARTYGYM_PRICE_IDS.includes(priceId);
+      });
+      
+      if (activeSmartyGymSubs.length > 0) {
+        logStep("User already has active SmartyGym subscription - blocking checkout", {
+          subscriptionId: activeSmartyGymSubs[0].id
         });
         return new Response(JSON.stringify({ 
           error: "You already have an active subscription. Please manage your existing subscription instead.",
@@ -78,20 +91,29 @@ serve(async (req) => {
       }
     }
 
-    // Check if user is truly a first-time subscriber (server-side validation)
+    // Check if user is truly a first-time SmartyGym subscriber (server-side validation)
     let shouldApplyCoupon = false;
     if (applyFirstTimeDiscount && customerId) {
-      // Check if customer has EVER had any subscription (including cancelled ones)
+      // Check if customer has EVER had any SmartyGym subscription (including cancelled ones)
       const subscriptions = await stripe.subscriptions.list({
         customer: customerId,
         status: 'all', // Include all statuses: active, cancelled, past_due, etc.
-        limit: 1
+        limit: 100,
+        expand: ['data.items.data.price']
       });
       
-      const isFirstTimeSubscriber = subscriptions.data.length === 0;
+      // Filter to ONLY SmartyGym subscriptions
+      const smartyGymSubscriptions = subscriptions.data.filter((sub: { items: { data: { price?: { id?: string } }[] } }) => {
+        const priceId = sub.items.data[0]?.price?.id;
+        return priceId && SMARTYGYM_PRICE_IDS.includes(priceId);
+      });
+      
+      const isFirstTimeSubscriber = smartyGymSubscriptions.length === 0;
       shouldApplyCoupon = isFirstTimeSubscriber;
-      logStep("First-time subscriber check", { 
-        hasSubscriptionHistory: subscriptions.data.length > 0,
+      logStep("First-time SmartyGym subscriber check", { 
+        totalSubscriptions: subscriptions.data.length,
+        smartyGymSubscriptions: smartyGymSubscriptions.length,
+        isFirstTimeSubscriber,
         shouldApplyCoupon 
       });
     } else if (applyFirstTimeDiscount && !customerId) {
@@ -115,6 +137,13 @@ serve(async (req) => {
       cancel_url: `${req.headers.get("origin")}/`,
       metadata: {
         user_id: user.id,
+        project: "SMARTYGYM",
+      },
+      subscription_data: {
+        metadata: {
+          project: "SMARTYGYM",
+          user_id: user.id,
+        }
       },
       // Apply first-time discount coupon if eligible
       ...(shouldApplyCoupon && { discounts: [{ coupon: FIRST_TIME_COUPON_ID }] }),
