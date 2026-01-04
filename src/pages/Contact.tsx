@@ -190,6 +190,25 @@ const Contact = () => {
 
       if (error) throw error;
 
+      // Send auto-reply to customer AND forward to admin
+      try {
+        await supabase.functions.invoke('send-contact-email', {
+          body: {
+            name: validatedData.name,
+            email: validatedData.email,
+            subject: validatedData.subject,
+            message: validatedData.message,
+            recipientEmail: 'harisfalas@gmail.com',
+            userStatus: isAuthenticated 
+              ? (hasSubscription ? 'Premium Subscriber' : 'Free Member')
+              : 'Guest'
+          }
+        });
+      } catch (emailError) {
+        console.error('Email notification error:', emailError);
+        // Don't fail the whole submission if email fails
+      }
+
       toast({
         title: "Message sent!",
         description: "We'll get back to you as soon as possible.",
@@ -285,6 +304,23 @@ const Contact = () => {
         }]);
 
       if (error) throw error;
+
+      // Send auto-reply to customer AND forward to admin
+      try {
+        await supabase.functions.invoke('send-contact-email', {
+          body: {
+            name: formData.name,
+            email: formData.email,
+            subject: validatedData.subject,
+            message: validatedData.message,
+            recipientEmail: 'harisfalas@gmail.com',
+            userStatus: 'Premium Subscriber (Direct to Coach)'
+          }
+        });
+      } catch (emailError) {
+        console.error('Email notification error:', emailError);
+        // Don't fail the whole submission if email fails
+      }
 
       toast({
         title: "Message sent to coach!",
