@@ -91,6 +91,47 @@ export const AnnouncementManager = () => {
     }
   }, [stopPolling]);
 
+  // Trigger Promo modal directly (when previous modals are skipped)
+  const triggerPromoModalIfNeeded = useCallback(() => {
+    if (!isPromoEligible || isPromoLoading) {
+      console.log("[AnnouncementManager] Promo not eligible or still loading", { isPromoEligible, isPromoLoading });
+      return;
+    }
+
+    const promoShownKey = getTodayKey("first_subscription_promo_shown");
+    const promoAlreadyShown = localStorage.getItem(promoShownKey) === "true";
+    const promoDontShow = localStorage.getItem(getTodayKey("first_subscription_promo_dont_show")) === "true";
+
+    if (promoAlreadyShown || promoDontShow) {
+      console.log("[AnnouncementManager] Promo already shown or don't show - skipping");
+      return;
+    }
+
+    console.log("[AnnouncementManager] Triggering Promo modal directly");
+    setTimeout(() => {
+      setShowPromoModal(true);
+    }, 2000);
+  }, [isPromoEligible, isPromoLoading]);
+
+  // Trigger Ritual modal (when WOD is skipped or not available)
+  const triggerRitualModalIfNeeded = useCallback(() => {
+    const ritualShownKey = getTodayKey("ritual_announcement_shown");
+    const ritualAlreadyShown = localStorage.getItem(ritualShownKey) === "true";
+    const ritualDontShow = localStorage.getItem(getTodayKey("ritual_dont_show")) === "true";
+
+    if (ritualAlreadyShown || ritualDontShow) {
+      console.log("[AnnouncementManager] Ritual already shown or don't show - skipping");
+      // Check if we should show promo instead
+      triggerPromoModalIfNeeded();
+      return;
+    }
+
+    console.log("[AnnouncementManager] Triggering Ritual modal (WOD was skipped/unavailable)");
+    setTimeout(() => {
+      setShowRitualModal(true);
+    }, 2000); // Short delay when no WOD
+  }, [triggerPromoModalIfNeeded]);
+
   // Initialize on mount
   useEffect(() => {
     if (hasStartedRef.current) return;
@@ -100,34 +141,35 @@ export const AnnouncementManager = () => {
       const wodShownKey = getTodayKey("wod_announcement_shown");
       const wodAlreadyShown = localStorage.getItem(wodShownKey) === "true";
       
-      if (wodAlreadyShown) {
-        // Already shown today, don't do anything for WOD modal
-        return;
-      }
-
       // Small delay to let page render first
       await new Promise(resolve => setTimeout(resolve, 1000));
 
+      if (wodAlreadyShown) {
+        // WOD already shown today, check if Ritual/Promo should show
+        console.log("[AnnouncementManager] WOD already shown today - checking Ritual/Promo");
+        triggerRitualModalIfNeeded();
+        return;
+      }
+
       // Check if WODs exist now
       const wodsExist = await checkTodaysWODsExist();
+      const cyprusHour = getCyprusHour();
       
       if (wodsExist) {
         // WODs exist, show modal immediately
+        console.log("[AnnouncementManager] WODs exist - showing WOD modal");
         setShowWODModal(true);
-      } else {
-        // WODs don't exist yet - check if we're past cutoff
-        const cyprusHour = getCyprusHour();
+      } else if (cyprusHour < WOD_CHECK_CUTOFF_HOUR) {
+        // Before cutoff, start polling
+        console.log("[AnnouncementManager] Starting WOD polling - WODs not ready yet, hour:", cyprusHour);
         
-        if (cyprusHour < WOD_CHECK_CUTOFF_HOUR) {
-          // Before cutoff, start polling
-          console.log("Starting WOD polling - WODs not ready yet, hour:", cyprusHour);
-          
-          pollingIntervalRef.current = setInterval(async () => {
-            await tryShowWODModal();
-          }, WOD_CHECK_INTERVAL_MS);
-        } else {
-          console.log("Not starting WOD polling - past cutoff hour:", cyprusHour);
-        }
+        pollingIntervalRef.current = setInterval(async () => {
+          await tryShowWODModal();
+        }, WOD_CHECK_INTERVAL_MS);
+      } else {
+        // Past cutoff, WOD generation likely failed - still show Ritual/Promo
+        console.log("[AnnouncementManager] Past cutoff hour, no WOD - triggering Ritual/Promo flow");
+        triggerRitualModalIfNeeded();
       }
     };
 
@@ -136,7 +178,7 @@ export const AnnouncementManager = () => {
     return () => {
       stopPolling();
     };
-  }, [tryShowWODModal, stopPolling]);
+  }, [tryShowWODModal, stopPolling, triggerRitualModalIfNeeded]);
 
   // Handle WOD modal close - mark as shown and start timer for Ritual modal
   const handleWODClose = useCallback((dontShowAgain?: boolean) => {
