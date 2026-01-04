@@ -73,6 +73,19 @@ interface TrackEventParams {
   userId?: string;
 }
 
+// Bot/crawler user agent patterns to exclude from tracking
+const BOT_PATTERNS = [
+  'bot', 'crawler', 'spider', 'scraper',
+  'googlebot', 'bingbot', 'facebookexternalhit',
+  'meta-externalagent', 'meta-externalads',
+  'adsbot', 'bytespider', 'slurp', 'duckduckbot',
+  'baidu', 'yandex', 'sogou', 'exabot', 'facebot',
+  'ia_archiver', 'mj12bot', 'semrushbot', 'ahrefsbot',
+  'headlesschrome', 'phantomjs', 'prerender',
+  'petalbot', 'applebot', 'twitterbot', 'linkedinbot',
+  'whatsapp', 'telegrambot', 'discordbot', 'slackbot'
+];
+
 // Check if current context should be excluded from tracking
 const shouldExcludeFromTracking = (): boolean => {
   // Exclude Lovable preview iframe
@@ -84,6 +97,12 @@ const shouldExcludeFromTracking = (): boolean => {
   
   // Exclude if admin exclusion cookie is set
   if (document.cookie.includes('sm_exclude_tracking=true')) {
+    return true;
+  }
+  
+  // Exclude bots and crawlers
+  const ua = navigator.userAgent.toLowerCase();
+  if (BOT_PATTERNS.some(pattern => ua.includes(pattern))) {
     return true;
   }
   
