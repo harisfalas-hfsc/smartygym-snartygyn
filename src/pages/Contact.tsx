@@ -174,8 +174,8 @@ const Contact = () => {
         }
       }
 
-      // Save to database instead of sending email
-      const { error } = await supabase
+      // Save to database and get the message ID
+      const { data: insertedMessage, error } = await supabase
         .from('contact_messages')
         .insert([{
           user_id: userId,
@@ -186,14 +186,17 @@ const Contact = () => {
           category: 'general',
           status: 'new',
           attachments: attachmentData
-        }]);
+        }])
+        .select('id')
+        .single();
 
       if (error) throw error;
 
-      // Send auto-reply to customer AND forward to admin
+      // Send auto-reply to customer AND forward to admin (with messageId for history logging)
       try {
         await supabase.functions.invoke('send-contact-email', {
           body: {
+            messageId: insertedMessage?.id, // Pass message ID for history logging
             name: validatedData.name,
             email: validatedData.email,
             subject: validatedData.subject,
@@ -289,8 +292,8 @@ const Contact = () => {
         }
       }
 
-      // Save to database instead of sending email
-      const { error } = await supabase
+      // Save to database and get the message ID
+      const { data: insertedMessage, error } = await supabase
         .from('contact_messages')
         .insert([{
           user_id: session?.user?.id || null,
@@ -301,14 +304,17 @@ const Contact = () => {
           category: 'coach_direct',
           status: 'new',
           attachments: attachmentData
-        }]);
+        }])
+        .select('id')
+        .single();
 
       if (error) throw error;
 
-      // Send auto-reply to customer AND forward to admin
+      // Send auto-reply to customer AND forward to admin (with messageId for history logging)
       try {
         await supabase.functions.invoke('send-contact-email', {
           body: {
+            messageId: insertedMessage?.id, // Pass message ID for history logging
             name: formData.name,
             email: formData.email,
             subject: validatedData.subject,

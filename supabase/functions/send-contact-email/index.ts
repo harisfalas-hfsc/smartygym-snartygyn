@@ -17,6 +17,7 @@ interface ContactEmailRequest {
   message: string;
   recipientEmail: string;
   userStatus?: string;
+  messageId?: string; // ID of the contact_messages record to link history
 }
 
 // Simple HTML sanitizer to prevent XSS
@@ -80,7 +81,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { name, email, subject, message, recipientEmail, userStatus }: ContactEmailRequest = await req.json();
+    const { name, email, subject, message, recipientEmail, userStatus, messageId }: ContactEmailRequest = await req.json();
 
     // Input validation
     if (!name || !email || !subject || !message || !recipientEmail) {
@@ -127,6 +128,12 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Sending email from ${email} to ${recipientEmail}`);
 
+    // Create Supabase client for logging history
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
     const emailResponse = await resend.emails.send({
       from: "SmartyGym Contact <notifications@smartygym.com>",
       to: [recipientEmail],
@@ -159,6 +166,9 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("Email sent successfully to admin:", emailResponse);
 
+    // Auto-reply content that will be logged to history
+    const autoReplyContent = `Thank you for contacting SmartyGym! We have received your inquiry regarding "${subject}" and will review it promptly. Our team typically responds within 24-48 hours.`;
+
     // Send auto-reply confirmation to the sender
     try {
       await resend.emails.send({
@@ -183,6 +193,28 @@ const handler = async (req: Request): Promise<Response> => {
         `,
       });
       console.log("Auto-reply sent to:", email);
+
+      // Log auto-reply to message history if messageId is provided
+      if (messageId) {
+        try {
+          const { error: historyError } = await supabaseAdmin
+            .from('contact_message_history')
+            .insert({
+              contact_message_id: messageId,
+              message_type: 'auto_reply',
+              content: autoReplyContent,
+              sender: 'system'
+            });
+
+          if (historyError) {
+            console.error("Failed to log auto-reply to history:", historyError);
+          } else {
+            console.log("Auto-reply logged to message history for messageId:", messageId);
+          }
+        } catch (historyErr) {
+          console.error("Error logging auto-reply to history:", historyErr);
+        }
+      }
     } catch (autoReplyError) {
       console.error("Failed to send auto-reply:", autoReplyError);
       // Don't fail the whole request if auto-reply fails
