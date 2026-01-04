@@ -113,13 +113,53 @@ export function WebsiteAnalytics() {
       const { startDate, endDate } = getDateRange();
       const { prevStartDate, prevEndDate } = getPreviousPeriodRange();
 
-      // Build query with filters - exclude admin/preview traffic and bots
+      // Use RPC function for summary stats (bypasses 1000 row limit)
+      const { data: summaryData, error: summaryError } = await supabase
+        .rpc('get_website_analytics_summary', {
+          start_date: startDate.toISOString(),
+          end_date: endDate.toISOString()
+        });
+
+      if (summaryError) {
+        console.error("RPC error:", summaryError);
+        throw summaryError;
+      }
+
+      // Get previous period summary
+      const { data: prevSummaryData } = await supabase
+        .rpc('get_website_analytics_summary', {
+          start_date: prevStartDate.toISOString(),
+          end_date: prevEndDate.toISOString()
+        });
+
+      // Extract summary values
+      const currentSummary = summaryData?.[0] || { total_visits: 0, unique_sessions: 0, signups: 0 };
+      const prevSummary = prevSummaryData?.[0] || { total_visits: 0, unique_sessions: 0, signups: 0 };
+
+      // Set period summary (bounce rate removed - not meaningful for SPAs)
+      setPeriodSummary({
+        totalVisits: Number(currentSummary.total_visits) || 0,
+        uniqueSessions: Number(currentSummary.unique_sessions) || 0,
+        avgEventsPerSession: currentSummary.unique_sessions > 0 
+          ? Math.round((Number(currentSummary.total_visits) / Number(currentSummary.unique_sessions)) * 10) / 10 
+          : 0,
+        bounceRate: 0, // Not meaningful for SPAs
+        prevTotalVisits: Number(prevSummary.total_visits) || 0,
+        prevUniqueSessions: Number(prevSummary.unique_sessions) || 0,
+        prevAvgEventsPerSession: prevSummary.unique_sessions > 0 
+          ? Math.round((Number(prevSummary.total_visits) / Number(prevSummary.unique_sessions)) * 10) / 10 
+          : 0,
+        prevBounceRate: 0,
+      });
+
+      // Fetch row-level data for charts (with extended range to get more data)
       let query = supabase
         .from("social_media_analytics")
         .select("*")
         .gte("created_at", startDate.toISOString())
         .lte("created_at", endDate.toISOString())
-        .order("created_at", { ascending: true });
+        .order("created_at", { ascending: true })
+        .range(0, 9999); // Fetch up to 10,000 rows
 
       // Exclude preview/sandbox visits and bots/crawlers
       query = query
@@ -143,31 +183,6 @@ export function WebsiteAnalytics() {
       const { data: analyticsData, error } = await query;
       if (error) throw error;
 
-      // Fetch previous period data for comparison
-      let prevQuery = supabase
-        .from("social_media_analytics")
-        .select("*")
-        .gte("created_at", prevStartDate.toISOString())
-        .lte("created_at", prevEndDate.toISOString())
-        .not("browser_info", "ilike", "%lovable%")
-        .not("browser_info", "ilike", "%bot%")
-        .not("browser_info", "ilike", "%crawler%")
-        .not("browser_info", "ilike", "%spider%")
-        .not("browser_info", "ilike", "%meta-external%")
-        .not("browser_info", "ilike", "%adsbot%")
-        .not("browser_info", "ilike", "%facebookexternalhit%")
-        .not("browser_info", "ilike", "%semrush%")
-        .not("browser_info", "ilike", "%ahrefs%");
-
-      if (sourceFilter !== "all") {
-        prevQuery = prevQuery.eq("referral_source", sourceFilter);
-      }
-      if (deviceFilter !== "all") {
-        prevQuery = prevQuery.eq("device_type", deviceFilter);
-      }
-
-      const { data: prevData } = await prevQuery;
-
       // Get available filters
       const { data: allSourcesData } = await supabase
         .from("social_media_analytics")
@@ -180,42 +195,8 @@ export function WebsiteAnalytics() {
       setAvailableSources(uniqueSources);
       setAvailableDevices(uniqueDevices);
 
-      // Calculate current period metrics
+      // Page views - calculate from row-level data
       const visits = analyticsData?.filter(d => d.event_type === "visit") || [];
-      const uniqueSessionIds = new Set(analyticsData?.map(d => d.session_id));
-      const allEvents = analyticsData?.length || 0;
-      const sessionsCount = uniqueSessionIds.size || 1;
-      const singleEventSessions = analyticsData 
-        ? new Set(analyticsData.filter((_, i, arr) => 
-            arr.filter(a => a.session_id === analyticsData[i].session_id).length === 1
-          ).map(d => d.session_id)).size
-        : 0;
-      const bounceRate = uniqueSessionIds.size > 0 ? Math.round((singleEventSessions / uniqueSessionIds.size) * 100) : 0;
-
-      // Calculate previous period metrics
-      const prevVisits = prevData?.filter(d => d.event_type === "visit") || [];
-      const prevUniqueSessionIds = new Set(prevData?.map(d => d.session_id));
-      const prevAllEvents = prevData?.length || 0;
-      const prevSessionsCount = prevUniqueSessionIds.size || 1;
-      const prevSingleEventSessions = prevData 
-        ? new Set(prevData.filter((_, i, arr) => 
-            arr.filter(a => a.session_id === prevData[i].session_id).length === 1
-          ).map(d => d.session_id)).size
-        : 0;
-      const prevBounceRate = prevUniqueSessionIds.size > 0 ? Math.round((prevSingleEventSessions / prevUniqueSessionIds.size) * 100) : 0;
-
-      setPeriodSummary({
-        totalVisits: visits.length,
-        uniqueSessions: uniqueSessionIds.size,
-        avgEventsPerSession: Math.round((allEvents / sessionsCount) * 10) / 10,
-        bounceRate,
-        prevTotalVisits: prevVisits.length,
-        prevUniqueSessions: prevUniqueSessionIds.size,
-        prevAvgEventsPerSession: Math.round((prevAllEvents / prevSessionsCount) * 10) / 10,
-        prevBounceRate,
-      });
-
-      // Page views
       const pageViewCounts: { [key: string]: number } = {};
       visits.forEach(v => {
         const page = v.landing_page || "/";

@@ -2902,6 +2902,15 @@ export type Database = {
           schedule: string
         }[]
       }
+      get_website_analytics_summary: {
+        Args: { end_date: string; start_date: string }
+        Returns: {
+          signups: number
+          total_revenue: number
+          total_visits: number
+          unique_sessions: number
+        }[]
+      }
       has_premium_subscription: {
         Args: { check_user_id: string }
         Returns: boolean
