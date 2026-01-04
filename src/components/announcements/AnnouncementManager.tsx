@@ -28,7 +28,17 @@ export const AnnouncementManager = () => {
   const { isEligible: isPromoEligible, isLoading: isPromoLoading, user } = useFirstSubscriptionPromoEligibility();
   
   // Can show promo if: not loading AND (visitor OR eligible logged-in user)
-  const canShowPromo = !isPromoLoading && isPromoEligible;
+  // For visitors, we allow showing even while "loading" since we know they're eligible
+  const isVisitor = user === null;
+  const canShowPromo = isPromoEligible && (!isPromoLoading || isVisitor);
+
+  console.log('[AnnouncementManager] Promo eligibility:', { 
+    isPromoEligible, 
+    isPromoLoading, 
+    isVisitor,
+    canShowPromo,
+    userId: user?.id || 'visitor'
+  });
 
   const getTodayKey = (prefix: string) => {
     // Use Cyprus date for localStorage keys to ensure consistency

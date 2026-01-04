@@ -27,8 +27,11 @@ export const useFirstSubscriptionPromoEligibility = (): EligibilityResult => {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
 
+  console.log('[PromoEligibility] Hook render:', { isEligible, isLoading, user: user?.id || 'visitor', isVisitor: user === null });
+
   useEffect(() => {
     const checkEligibility = async () => {
+      console.log('[PromoEligibility] Starting eligibility check...');
       try {
         // Get current session
         const { data: { session } } = await supabase.auth.getSession();
