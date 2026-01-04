@@ -35,6 +35,7 @@ import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { FirstTimeDiscountBanner } from "@/components/pricing/FirstTimeDiscountBanner";
+import { FirstTimeDiscountInlineCallout } from "@/components/pricing/FirstTimeDiscountInlineCallout";
 
 export default function SmartyPlans() {
   const navigate = useNavigate();
@@ -473,6 +474,9 @@ export default function SmartyPlans() {
                   </CardContent>
                 </Card>
               </div>
+
+              {/* First-Time Discount Inline Callout - shown below pricing cards */}
+              <FirstTimeDiscountInlineCallout />
 
               {/* Why Choose Yearly - Compact */}
               <Card className="mb-6 border-2 border-primary">

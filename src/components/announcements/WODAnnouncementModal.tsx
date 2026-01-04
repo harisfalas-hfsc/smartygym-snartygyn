@@ -19,7 +19,7 @@ export const WODAnnouncementModal = ({ open, onClose }: WODAnnouncementModalProp
   const [countdown, setCountdown] = useState(15);
   const [dontShowAgain, setDontShowAgain] = useState(false);
 
-  const { data: wods } = useQuery({
+  const { data: wods, isLoading } = useQuery({
     queryKey: ["wod-announcement"],
     queryFn: async () => {
       // Use Cyprus date for consistent filtering with other WOD components
@@ -43,13 +43,7 @@ export const WODAnnouncementModal = ({ open, onClose }: WODAnnouncementModalProp
 
   const bodyweightWOD = wods?.find(w => w.equipment === "BODYWEIGHT");
   const equipmentWOD = wods?.find(w => w.equipment === "EQUIPMENT");
-
-  // Close modal immediately if no WODs exist
-  useEffect(() => {
-    if (open && wods !== undefined && wods.length === 0) {
-      onClose();
-    }
-  }, [open, wods, onClose]);
+  const hasWODs = wods && wods.length > 0;
 
   // Countdown timer - auto close after 15 seconds
   useEffect(() => {
@@ -202,14 +196,30 @@ export const WODAnnouncementModal = ({ open, onClose }: WODAnnouncementModalProp
           </div>
         </div>
 
-        {/* WOD Cards */}
+        {/* WOD Cards or Fallback */}
         <div className="px-4 pb-4 max-h-[60vh] overflow-y-auto">
-          {(bodyweightWOD || equipmentWOD) ? (
+          {isLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          ) : hasWODs ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
               {renderWODCard(bodyweightWOD, true)}
               {renderWODCard(equipmentWOD, false)}
             </div>
-          ) : null}
+          ) : (
+            <div className="text-center py-6 mb-4">
+              <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+                <CalendarCheck className="w-8 h-8 text-muted-foreground" />
+              </div>
+              <h3 className="text-lg font-semibold text-foreground mb-2">
+                Today's Workouts Are Being Prepared!
+              </h3>
+              <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+                Our fitness experts are crafting today's WODs. Browse our workout library in the meantime!
+              </p>
+            </div>
+          )}
 
           {/* CTA Button */}
           <Button 
@@ -217,7 +227,7 @@ export const WODAnnouncementModal = ({ open, onClose }: WODAnnouncementModalProp
             className="w-full cta-button"
           >
             <CalendarCheck className="w-4 h-4 mr-2" />
-            View All Today's Workouts
+            {hasWODs ? "View All Today's Workouts" : "Browse Workouts"}
           </Button>
 
           {/* Don't show again checkbox */}

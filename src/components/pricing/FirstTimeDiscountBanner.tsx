@@ -7,14 +7,28 @@ import { useState } from "react";
 export const FirstTimeDiscountBanner = () => {
   const [searchParams] = useSearchParams();
   const location = useLocation();
-  const { isEligible, isLoading } = useFirstSubscriptionPromoEligibility();
+  const { isEligible, isLoading, user } = useFirstSubscriptionPromoEligibility();
   const [isDismissed, setIsDismissed] = useState(false);
 
   // Don't show if discount is already applied via URL
   const isDiscountAlreadyApplied = searchParams.get('discount') === 'first35';
 
-  // Don't show if loading, not eligible, already applied, or dismissed
-  if (isLoading || !isEligible || isDiscountAlreadyApplied || isDismissed) {
+  // Don't show if loading
+  if (isLoading) {
+    return null;
+  }
+
+  // Don't show if discount already applied or dismissed
+  if (isDiscountAlreadyApplied || isDismissed) {
+    return null;
+  }
+
+  // Show for visitors (user === null) OR logged-in eligible users
+  // Hide for logged-in ineligible users (already subscribed)
+  const isVisitor = user === null;
+  const shouldShow = isVisitor || isEligible;
+
+  if (!shouldShow) {
     return null;
   }
 
@@ -49,6 +63,7 @@ export const FirstTimeDiscountBanner = () => {
             </div>
             <p className="text-sm text-muted-foreground">
               Get <span className="font-bold text-primary">35% off</span> your first subscription
+              {isVisitor && <span className="text-xs"> (log in at checkout)</span>}
             </p>
           </div>
         </div>
