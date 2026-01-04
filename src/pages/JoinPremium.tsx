@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,7 +16,8 @@ import {
   Sparkles,
   Heart,
   TrendingUp,
-  Target
+  Target,
+  Gift
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
@@ -27,10 +28,20 @@ import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 
 export default function JoinPremium() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const { canGoBack, goBack } = useShowBackButton();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
+  
+  // Check if first-time discount is active
+  const isDiscountActive = searchParams.get('discount') === 'first35';
+  
+  // Pricing
+  const goldOriginal = 9.99;
+  const platinumOriginal = 89.99;
+  const goldDiscounted = parseFloat((goldOriginal * 0.65).toFixed(2));
+  const platinumDiscounted = parseFloat((platinumOriginal * 0.65).toFixed(2));
 
   useEffect(() => {
     // Check current session
@@ -62,7 +73,10 @@ export default function JoinPremium() {
 
     try {
       const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: { priceId: priceIds[plan] }
+        body: { 
+          priceId: priceIds[plan],
+          applyFirstTimeDiscount: isDiscountActive 
+        }
       });
 
       if (error) throw error;
@@ -70,7 +84,7 @@ export default function JoinPremium() {
       if (data?.url) {
         window.open(data.url, '_blank');
         toast({
-          title: "Checkout opened",
+          title: isDiscountActive ? "35% discount applied!" : "Checkout opened",
           description: "Complete your purchase in the new tab",
         });
       }
@@ -221,6 +235,24 @@ export default function JoinPremium() {
             Unlock your full fitness potential with unlimited access to all premium features
           </p>
 
+          {/* First-Time Discount Banner */}
+          {isDiscountActive && (
+            <Card className="mb-6 bg-gradient-to-r from-primary/20 via-primary/10 to-background border-primary/30 shadow-lg">
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex items-center justify-center gap-3 mb-2">
+                  <Gift className="h-6 w-6 text-primary animate-pulse" />
+                  <h3 className="text-lg sm:text-xl font-bold text-primary">
+                    First-Time Subscriber Discount Applied!
+                  </h3>
+                  <Gift className="h-6 w-6 text-primary animate-pulse" />
+                </div>
+                <p className="text-center text-sm text-muted-foreground">
+                  You're getting <span className="font-bold text-primary">35% off</span> your first billing cycle. This discount will be automatically applied at checkout!
+                </p>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Info Ribbon */}
           <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-8 text-center">
             <p className="text-sm text-muted-foreground">
@@ -288,8 +320,20 @@ export default function JoinPremium() {
                 <Badge className="bg-[#D4AF37] text-white mx-auto mb-3 sm:mb-4 text-xs sm:text-sm">
                   MONTHLY
                 </Badge>
-                <CardTitle className="text-2xl sm:text-3xl font-bold" itemProp="offers">€9.99</CardTitle>
-                <p className="text-xs sm:text-sm text-muted-foreground h-4 sm:h-5" itemProp="description">per month</p>
+                {isDiscountActive ? (
+                  <>
+                    <div className="flex items-center justify-center gap-2">
+                      <span className="text-lg text-muted-foreground line-through">€{goldOriginal}</span>
+                      <CardTitle className="text-2xl sm:text-3xl font-bold text-primary" itemProp="offers">€{goldDiscounted}</CardTitle>
+                    </div>
+                    <p className="text-xs sm:text-sm text-primary font-semibold" itemProp="description">per month (35% off!)</p>
+                  </>
+                ) : (
+                  <>
+                    <CardTitle className="text-2xl sm:text-3xl font-bold" itemProp="offers">€{goldOriginal}</CardTitle>
+                    <p className="text-xs sm:text-sm text-muted-foreground h-4 sm:h-5" itemProp="description">per month</p>
+                  </>
+                )}
                 <div className="h-10 sm:h-14 flex flex-col justify-center">
                   <p className="text-xs text-[#D4AF37] font-semibold">
                     🔄 Auto-renews monthly
@@ -363,8 +407,20 @@ export default function JoinPremium() {
                 <Badge className="bg-[#A8A9AD] text-white mx-auto mb-3 sm:mb-4 text-xs sm:text-sm">
                   YEARLY
                 </Badge>
-                <CardTitle className="text-2xl sm:text-3xl font-bold">€89.99</CardTitle>
-                <p className="text-xs sm:text-sm text-muted-foreground h-4 sm:h-5">per year</p>
+                {isDiscountActive ? (
+                  <>
+                    <div className="flex items-center justify-center gap-2">
+                      <span className="text-lg text-muted-foreground line-through">€{platinumOriginal}</span>
+                      <CardTitle className="text-2xl sm:text-3xl font-bold text-primary">€{platinumDiscounted}</CardTitle>
+                    </div>
+                    <p className="text-xs sm:text-sm text-primary font-semibold">per year (35% off!)</p>
+                  </>
+                ) : (
+                  <>
+                    <CardTitle className="text-2xl sm:text-3xl font-bold">€{platinumOriginal}</CardTitle>
+                    <p className="text-xs sm:text-sm text-muted-foreground h-4 sm:h-5">per year</p>
+                  </>
+                )}
                 <div className="h-10 sm:h-14 flex flex-col justify-center">
                   <p className="text-sm sm:text-base text-green-600 font-bold">
                     Save €29.89!

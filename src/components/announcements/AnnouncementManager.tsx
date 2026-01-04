@@ -2,18 +2,28 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { WODAnnouncementModal } from "./WODAnnouncementModal";
 import { RitualAnnouncementModal } from "./RitualAnnouncementModal";
+import { FirstSubscriptionPromoModal } from "./FirstSubscriptionPromoModal";
 import { getCyprusTodayStr, getCyprusHour } from "@/lib/cyprusDate";
+import { useFirstSubscriptionPromoEligibility } from "@/hooks/useFirstSubscriptionPromoEligibility";
 
 // Polling interval for checking if WODs exist (3 minutes)
 const WOD_CHECK_INTERVAL_MS = 3 * 60 * 1000;
 // Stop checking after 06:00 Cyprus time (failsafe)
 const WOD_CHECK_CUTOFF_HOUR = 6;
+// Delay for Ritual modal after WOD modal closes (20 seconds)
+const RITUAL_DELAY_MS = 20 * 1000;
+// Delay for First Subscription Promo modal after Ritual modal closes (20 seconds)
+const PROMO_DELAY_MS = 20 * 1000;
 
 export const AnnouncementManager = () => {
   const [showWODModal, setShowWODModal] = useState(false);
   const [showRitualModal, setShowRitualModal] = useState(false);
+  const [showPromoModal, setShowPromoModal] = useState(false);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const hasStartedRef = useRef(false);
+  
+  // Check if user is eligible for first-time subscription promo
+  const { isEligible: isPromoEligible, isLoading: isPromoLoading } = useFirstSubscriptionPromoEligibility();
 
   const getTodayKey = (prefix: string) => {
     // Use Cyprus date for localStorage keys to ensure consistency
@@ -149,13 +159,13 @@ export const AnnouncementManager = () => {
 
     if (ritualAlreadyShown || ritualDontShow) return;
 
-    // Start 40 second timer for Ritual popup
+    // Start 20 second timer for Ritual popup
     setTimeout(() => {
       setShowRitualModal(true);
-    }, 40000);
+    }, RITUAL_DELAY_MS);
   }, [stopPolling]);
 
-  // Handle Ritual modal close
+  // Handle Ritual modal close - start timer for First Subscription Promo modal
   const handleRitualClose = useCallback((dontShowAgain?: boolean) => {
     setShowRitualModal(false);
     
@@ -166,6 +176,34 @@ export const AnnouncementManager = () => {
     if (dontShowAgain) {
       const ritualDontShowKey = getTodayKey("ritual_dont_show");
       localStorage.setItem(ritualDontShowKey, "true");
+    }
+
+    // Check if Promo modal should show (only if user is eligible)
+    if (!isPromoEligible || isPromoLoading) return;
+
+    const promoShownKey = getTodayKey("first_subscription_promo_shown");
+    const promoAlreadyShown = localStorage.getItem(promoShownKey) === "true";
+    const promoDontShow = localStorage.getItem(getTodayKey("first_subscription_promo_dont_show")) === "true";
+
+    if (promoAlreadyShown || promoDontShow) return;
+
+    // Start 20 second timer for First Subscription Promo popup
+    setTimeout(() => {
+      setShowPromoModal(true);
+    }, PROMO_DELAY_MS);
+  }, [isPromoEligible, isPromoLoading]);
+
+  // Handle Promo modal close
+  const handlePromoClose = useCallback((dontShowAgain?: boolean) => {
+    setShowPromoModal(false);
+    
+    // Mark Promo modal as shown today (using Cyprus date)
+    const promoShownKey = getTodayKey("first_subscription_promo_shown");
+    localStorage.setItem(promoShownKey, "true");
+    
+    if (dontShowAgain) {
+      const promoDontShowKey = getTodayKey("first_subscription_promo_dont_show");
+      localStorage.setItem(promoDontShowKey, "true");
     }
   }, []);
 
@@ -178,6 +216,10 @@ export const AnnouncementManager = () => {
       <RitualAnnouncementModal 
         open={showRitualModal} 
         onClose={handleRitualClose} 
+      />
+      <FirstSubscriptionPromoModal 
+        open={showPromoModal} 
+        onClose={handlePromoClose} 
       />
     </>
   );
