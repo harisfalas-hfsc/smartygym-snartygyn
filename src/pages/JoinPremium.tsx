@@ -25,6 +25,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
+import { FirstTimeDiscountBanner } from "@/components/pricing/FirstTimeDiscountBanner";
 
 export default function JoinPremium() {
   const navigate = useNavigate();
@@ -234,6 +235,9 @@ export default function JoinPremium() {
           <p className="text-center text-muted-foreground mb-4">
             Unlock your full fitness potential with unlimited access to all premium features
           </p>
+
+          {/* Persistent First-Time Discount Banner for eligible users */}
+          <FirstTimeDiscountBanner />
 
           {/* First-Time Discount Banner */}
           {isDiscountActive && (
