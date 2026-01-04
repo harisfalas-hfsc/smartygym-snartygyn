@@ -42,7 +42,7 @@ interface ResponseTemplate {
 interface MessageHistoryItem {
   id: string;
   contact_message_id: string;
-  message_type: 'original' | 'auto_reply' | 'admin_response' | 'customer_reply';
+  message_type: 'original' | 'auto_reply' | 'admin_response' | 'customer_reply' | 'ai_response';
   content: string;
   sender: 'customer' | 'system' | 'admin';
   created_at: string;
@@ -874,6 +874,21 @@ export const ContactManager = () => {
                     <div key={h.id} className="bg-blue-50 dark:bg-blue-950/30 p-4 rounded-lg border-l-4 border-blue-500">
                       <div className="flex items-center gap-2 mb-2">
                         <Badge className="bg-blue-500 hover:bg-blue-600">Auto-Reply</Badge>
+                        <span className="text-xs text-muted-foreground">
+                          {format(new Date(h.created_at), 'MMM dd, yyyy HH:mm')}
+                        </span>
+                      </div>
+                      <p className="text-sm whitespace-pre-wrap">{h.content}</p>
+                    </div>
+                  ))}
+
+                {/* AI Response (if exists in history) */}
+                {messageHistory
+                  .filter(h => h.message_type === 'ai_response')
+                  .map(h => (
+                    <div key={h.id} className="bg-purple-50 dark:bg-purple-950/30 p-4 rounded-lg border-l-4 border-purple-500">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge className="bg-purple-500 hover:bg-purple-600">AI Response</Badge>
                         <span className="text-xs text-muted-foreground">
                           {format(new Date(h.created_at), 'MMM dd, yyyy HH:mm')}
                         </span>
