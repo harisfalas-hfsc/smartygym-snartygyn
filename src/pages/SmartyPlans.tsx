@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,7 +25,8 @@ import {
   MessageCircle,
   Flame,
   Building2,
-  CircleMinus
+  CircleMinus,
+  Gift
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
@@ -36,12 +37,22 @@ import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 
 export default function SmartyPlans() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const { canGoBack, goBack } = useShowBackButton();
   const { userTier } = useAccessControl();
   const isPremium = userTier === "premium";
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
+  
+  // Check for first-time discount
+  const hasFirstTimeDiscount = searchParams.get('discount') === 'first35';
+  
+  // Original and discounted prices
+  const goldOriginal = 9.99;
+  const platinumOriginal = 89.99;
+  const goldDiscounted = Number((goldOriginal * 0.65).toFixed(2));
+  const platinumDiscounted = Number((platinumOriginal * 0.65).toFixed(2));
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -78,7 +89,10 @@ export default function SmartyPlans() {
 
     try {
       const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: { priceId: priceIds[plan] }
+        body: { 
+          priceId: priceIds[plan],
+          applyFirstTimeDiscount: hasFirstTimeDiscount
+        }
       });
 
       if (error) throw error;
@@ -161,6 +175,21 @@ export default function SmartyPlans() {
           )}
 
           <PageBreadcrumbs items={[{ label: "Home", href: "/" }, { label: "Smarty Plans" }]} />
+
+          {/* First-Time Discount Banner */}
+          {hasFirstTimeDiscount && !isPremium && (
+            <div className="mb-6 bg-gradient-to-r from-green-500/10 via-emerald-500/10 to-green-500/10 border-2 border-green-500 rounded-xl p-4 sm:p-6">
+              <div className="flex items-center justify-center gap-3 mb-2">
+                <Gift className="h-6 w-6 sm:h-8 sm:w-8 text-green-600" />
+                <h2 className="text-xl sm:text-2xl font-bold text-green-600">
+                  First-Time Subscriber Discount Applied!
+                </h2>
+              </div>
+              <p className="text-center text-green-700 dark:text-green-400 text-sm sm:text-base">
+                Welcome! Enjoy <span className="font-bold">35% off</span> your first billing cycle on any plan below.
+              </p>
+            </div>
+          )}
 
           {/* Header */}
           <div className="text-center mb-8">
@@ -344,12 +373,28 @@ export default function SmartyPlans() {
               {/* Pricing Cards - Full width to align with Compare Access Levels */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 {/* Gold Plan */}
-                <Card className="relative border-2 border-[#D4AF37] shadow-lg flex flex-col">
+                <Card className={`relative border-2 border-[#D4AF37] shadow-lg flex flex-col ${hasFirstTimeDiscount ? 'ring-2 ring-green-500 ring-offset-2' : ''}`}>
+                  {hasFirstTimeDiscount && (
+                    <Badge className="absolute -top-2 left-2 bg-green-600 text-white px-2 py-0.5 z-10">
+                      35% OFF
+                    </Badge>
+                  )}
                   <CardHeader className="text-center pb-2 sm:pb-4">
                     <h2 className="text-xl sm:text-2xl font-bold text-[#D4AF37]">Gold Plan</h2>
                     <Badge className="bg-[#D4AF37] text-white mx-auto mb-3 sm:mb-4">MONTHLY</Badge>
-                    <CardTitle className="text-2xl sm:text-3xl font-bold">€9.99</CardTitle>
-                    <p className="text-xs sm:text-sm text-muted-foreground">per month</p>
+                    {hasFirstTimeDiscount ? (
+                      <>
+                        <p className="text-lg text-muted-foreground line-through">€{goldOriginal.toFixed(2)}</p>
+                        <CardTitle className="text-2xl sm:text-3xl font-bold text-green-600">€{goldDiscounted.toFixed(2)}</CardTitle>
+                        <p className="text-xs sm:text-sm text-muted-foreground">first month</p>
+                        <p className="text-xs text-green-600 font-semibold mt-1">Then €{goldOriginal.toFixed(2)}/month</p>
+                      </>
+                    ) : (
+                      <>
+                        <CardTitle className="text-2xl sm:text-3xl font-bold">€{goldOriginal.toFixed(2)}</CardTitle>
+                        <p className="text-xs sm:text-sm text-muted-foreground">per month</p>
+                      </>
+                    )}
                     <p className="text-xs text-[#D4AF37] font-semibold mt-2">🔄 Auto-renews monthly</p>
                   </CardHeader>
                   <CardContent className="space-y-2 sm:space-y-4 flex-1 flex flex-col">
@@ -363,11 +408,11 @@ export default function SmartyPlans() {
                     </div>
                     <div className="space-y-3 mt-auto">
                       <Button 
-                        className="w-full py-4 sm:py-6 bg-[#D4AF37] hover:bg-[#C9A431] text-white" 
+                        className={`w-full py-4 sm:py-6 text-white ${hasFirstTimeDiscount ? 'bg-green-600 hover:bg-green-700' : 'bg-[#D4AF37] hover:bg-[#C9A431]'}`}
                         onClick={() => handleSubscribe('gold')}
                         disabled={loading}
                       >
-                        {loading ? "Processing..." : "Start Monthly Plan"}
+                        {loading ? "Processing..." : hasFirstTimeDiscount ? "Claim 35% Off" : "Start Monthly Plan"}
                       </Button>
                       <p className="text-xs text-center text-muted-foreground">Auto-renews each month</p>
                     </div>
@@ -375,9 +420,9 @@ export default function SmartyPlans() {
                 </Card>
 
                 {/* Platinum Plan */}
-                <Card className="relative border-2 border-[#A8A9AD] shadow-lg flex flex-col bg-gradient-to-br from-[#A8A9AD]/5 to-[#C0C0C0]/10">
+                <Card className={`relative border-2 border-[#A8A9AD] shadow-lg flex flex-col bg-gradient-to-br from-[#A8A9AD]/5 to-[#C0C0C0]/10 ${hasFirstTimeDiscount ? 'ring-2 ring-green-500 ring-offset-2' : ''}`}>
                   <Badge className="absolute -top-2 right-2 sm:-top-3 sm:right-3 bg-green-600 text-white px-2 sm:px-3 py-1 z-10">
-                    BEST VALUE
+                    {hasFirstTimeDiscount ? '35% OFF + BEST VALUE' : 'BEST VALUE'}
                   </Badge>
                   <CardHeader className="text-center pb-2 sm:pb-4 pt-4 sm:pt-6">
                     <div className="flex items-center justify-center gap-2 mb-2">
@@ -385,10 +430,22 @@ export default function SmartyPlans() {
                       <h2 className="text-xl sm:text-2xl font-bold text-[#A8A9AD]">Platinum</h2>
                     </div>
                     <Badge className="bg-[#A8A9AD] text-white mx-auto mb-3 sm:mb-4">YEARLY</Badge>
-                    <CardTitle className="text-2xl sm:text-3xl font-bold">€89.99</CardTitle>
-                    <p className="text-xs sm:text-sm text-muted-foreground">per year</p>
-                    <p className="text-sm text-green-600 font-bold mt-2">Save €29.89!</p>
-                    <p className="text-xs text-muted-foreground">Just €7.50/month • 🔄 Auto-renews yearly</p>
+                    {hasFirstTimeDiscount ? (
+                      <>
+                        <p className="text-lg text-muted-foreground line-through">€{platinumOriginal.toFixed(2)}</p>
+                        <CardTitle className="text-2xl sm:text-3xl font-bold text-green-600">€{platinumDiscounted.toFixed(2)}</CardTitle>
+                        <p className="text-xs sm:text-sm text-muted-foreground">first year</p>
+                        <p className="text-xs text-green-600 font-semibold mt-1">Then €{platinumOriginal.toFixed(2)}/year</p>
+                        <p className="text-xs text-muted-foreground">Just €{(platinumDiscounted / 12).toFixed(2)}/month first year • 🔄 Auto-renews yearly</p>
+                      </>
+                    ) : (
+                      <>
+                        <CardTitle className="text-2xl sm:text-3xl font-bold">€{platinumOriginal.toFixed(2)}</CardTitle>
+                        <p className="text-xs sm:text-sm text-muted-foreground">per year</p>
+                        <p className="text-sm text-green-600 font-bold mt-2">Save €29.89!</p>
+                        <p className="text-xs text-muted-foreground">Just €7.50/month • 🔄 Auto-renews yearly</p>
+                      </>
+                    )}
                   </CardHeader>
                   <CardContent className="space-y-2 sm:space-y-4 flex-1 flex flex-col">
                     <div className="space-y-1.5 sm:space-y-2 flex-1">
@@ -401,11 +458,11 @@ export default function SmartyPlans() {
                     </div>
                     <div className="space-y-3 mt-auto">
                       <Button 
-                        className="w-full py-4 sm:py-6 bg-[#A8A9AD] hover:bg-[#9A9B9F] text-white" 
+                        className={`w-full py-4 sm:py-6 text-white ${hasFirstTimeDiscount ? 'bg-green-600 hover:bg-green-700' : 'bg-[#A8A9AD] hover:bg-[#9A9B9F]'}`}
                         onClick={() => handleSubscribe('platinum')}
                         disabled={loading}
                       >
-                        {loading ? "Processing..." : "Start Yearly Plan"}
+                        {loading ? "Processing..." : hasFirstTimeDiscount ? "Claim 35% Off" : "Start Yearly Plan"}
                       </Button>
                       <p className="text-xs text-center text-muted-foreground">Auto-renews each year</p>
                     </div>
