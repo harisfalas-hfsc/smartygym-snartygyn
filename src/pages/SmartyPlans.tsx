@@ -34,6 +34,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
+import { FirstTimeDiscountBanner } from "@/components/pricing/FirstTimeDiscountBanner";
 
 export default function SmartyPlans() {
   const navigate = useNavigate();
@@ -175,6 +176,9 @@ export default function SmartyPlans() {
           )}
 
           <PageBreadcrumbs items={[{ label: "Home", href: "/" }, { label: "Smarty Plans" }]} />
+
+          {/* Persistent First-Time Discount Banner for eligible users */}
+          <FirstTimeDiscountBanner />
 
           {/* First-Time Discount Banner */}
           {hasFirstTimeDiscount && !isPremium && (
