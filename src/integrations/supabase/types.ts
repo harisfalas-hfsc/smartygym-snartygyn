@@ -659,6 +659,41 @@ export type Database = {
         }
         Relationships: []
       }
+      contact_message_history: {
+        Row: {
+          contact_message_id: string
+          content: string
+          created_at: string | null
+          id: string
+          message_type: string
+          sender: string
+        }
+        Insert: {
+          contact_message_id: string
+          content: string
+          created_at?: string | null
+          id?: string
+          message_type: string
+          sender: string
+        }
+        Update: {
+          contact_message_id?: string
+          content?: string
+          created_at?: string | null
+          id?: string
+          message_type?: string
+          sender?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contact_message_history_contact_message_id_fkey"
+            columns: ["contact_message_id"]
+            isOneToOne: false
+            referencedRelation: "contact_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contact_messages: {
         Row: {
           attachments: Json | null

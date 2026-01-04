@@ -39,11 +39,21 @@ interface ResponseTemplate {
   category: string;
 }
 
+interface MessageHistoryItem {
+  id: string;
+  contact_message_id: string;
+  message_type: 'original' | 'auto_reply' | 'admin_response' | 'customer_reply';
+  content: string;
+  sender: 'customer' | 'system' | 'admin';
+  created_at: string;
+}
+
 export const ContactManager = () => {
   const { toast } = useToast();
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [filteredMessages, setFilteredMessages] = useState<ContactMessage[]>([]);
   const [templates, setTemplates] = useState<ResponseTemplate[]>([]);
+  const [messageHistory, setMessageHistory] = useState<MessageHistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedMessage, setSelectedMessage] = useState<ContactMessage | null>(null);
   const [showMessageDialog, setShowMessageDialog] = useState(false);
@@ -193,10 +203,28 @@ export const ContactManager = () => {
     setLoading(false);
   };
 
+  const fetchMessageHistory = async (messageId: string) => {
+    const { data, error } = await supabase
+      .from('contact_message_history')
+      .select('*')
+      .eq('contact_message_id', messageId)
+      .order('created_at', { ascending: true });
+
+    if (!error && data) {
+      setMessageHistory(data as MessageHistoryItem[]);
+    } else {
+      setMessageHistory([]);
+    }
+  };
+
   const handleViewMessage = async (message: ContactMessage) => {
     setSelectedMessage(message);
     setResponseText(message.response || "");
+    setMessageHistory([]); // Reset history while loading
     setShowMessageDialog(true);
+
+    // Fetch conversation history
+    fetchMessageHistory(message.id);
 
     // Mark as read if not already read
     if (!message.read_at) {
@@ -427,6 +455,22 @@ export const ContactManager = () => {
         });
         setIsResponding(false);
         return;
+      }
+
+      // Log admin response to message history
+      try {
+        await supabase
+          .from('contact_message_history')
+          .insert({
+            contact_message_id: selectedMessage.id,
+            message_type: 'admin_response',
+            content: responseText,
+            sender: 'admin'
+          });
+      } catch (historyError) {
+        if (import.meta.env.DEV) {
+          console.error('[ContactManager] Error logging response to history:', historyError);
+        }
       }
 
       // Send email notification and push notification
@@ -808,11 +852,65 @@ export const ContactManager = () => {
                 <p className="text-sm">{selectedMessage.subject}</p>
               </div>
 
-              <div>
-                <p className="text-sm font-semibold mb-2">Message</p>
-                <div className="bg-muted p-4 rounded-lg text-display break-words-safe content-container text-sm">
-                  {selectedMessage.message}
+              {/* Conversation History Section */}
+              <div className="space-y-4">
+                <p className="text-sm font-semibold">Conversation History</p>
+                
+                {/* Original Customer Message */}
+                <div className="bg-muted p-4 rounded-lg border-l-4 border-muted-foreground/30">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Badge variant="outline">Customer</Badge>
+                    <span className="text-xs text-muted-foreground">
+                      {format(new Date(selectedMessage.created_at), 'MMM dd, yyyy HH:mm')}
+                    </span>
+                  </div>
+                  <p className="text-sm whitespace-pre-wrap">{selectedMessage.message}</p>
                 </div>
+
+                {/* Auto-Reply (if exists in history) */}
+                {messageHistory
+                  .filter(h => h.message_type === 'auto_reply')
+                  .map(h => (
+                    <div key={h.id} className="bg-blue-50 dark:bg-blue-950/30 p-4 rounded-lg border-l-4 border-blue-500">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge className="bg-blue-500 hover:bg-blue-600">Auto-Reply</Badge>
+                        <span className="text-xs text-muted-foreground">
+                          {format(new Date(h.created_at), 'MMM dd, yyyy HH:mm')}
+                        </span>
+                      </div>
+                      <p className="text-sm whitespace-pre-wrap">{h.content}</p>
+                    </div>
+                  ))}
+
+                {/* Admin Responses from history */}
+                {messageHistory
+                  .filter(h => h.message_type === 'admin_response')
+                  .map(h => (
+                    <div key={h.id} className="bg-primary/10 p-4 rounded-lg border-l-4 border-primary">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge className="bg-primary hover:bg-primary/90">Admin Response</Badge>
+                        <span className="text-xs text-muted-foreground">
+                          {format(new Date(h.created_at), 'MMM dd, yyyy HH:mm')}
+                        </span>
+                      </div>
+                      <p className="text-sm whitespace-pre-wrap">{h.content}</p>
+                    </div>
+                  ))}
+
+                {/* Legacy response display (for messages without history) */}
+                {selectedMessage.response && messageHistory.filter(h => h.message_type === 'admin_response').length === 0 && (
+                  <div className="bg-primary/10 p-4 rounded-lg border-l-4 border-primary">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Badge className="bg-primary hover:bg-primary/90">Admin Response</Badge>
+                      {selectedMessage.responded_at && (
+                        <span className="text-xs text-muted-foreground">
+                          {format(new Date(selectedMessage.responded_at), 'MMM dd, yyyy HH:mm')}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm whitespace-pre-wrap">{selectedMessage.response}</p>
+                  </div>
+                )}
               </div>
 
               {selectedMessage.attachments && selectedMessage.attachments.length > 0 && (
@@ -833,20 +931,6 @@ export const ContactManager = () => {
                       </div>
                     ))}
                   </div>
-                </div>
-              )}
-
-              {selectedMessage.response && (
-                <div>
-                  <p className="text-sm font-semibold mb-2">Your Response</p>
-                  <div className="bg-primary/10 p-4 rounded-lg text-display break-words-safe content-container text-sm">
-                    {selectedMessage.response}
-                  </div>
-                  {selectedMessage.responded_at && (
-                    <p className="text-xs text-muted-foreground mt-2">
-                      Responded on {format(new Date(selectedMessage.responded_at), 'MMM dd, yyyy HH:mm')}
-                    </p>
-                  )}
                 </div>
               )}
 
