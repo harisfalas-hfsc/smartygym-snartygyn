@@ -20,7 +20,7 @@ export const FirstSubscriptionPromoModal = ({ open, onClose }: FirstSubscription
 
   const handleClaimDiscount = () => {
     onClose(false);
-    navigate('/join-premium?discount=first35');
+    navigate('/joinpremium?discount=first35');
   };
 
   // Original prices

@@ -110,6 +110,7 @@ const AppContent = () => {
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/joinpremium" element={<JoinPremium />} />
+                  <Route path="/join-premium" element={<JoinPremium />} />
                   <Route path="/premiumbenefits" element={<PremiumBenefits />} />
                   <Route path="/premium-comparison" element={<PremiumComparison />} />
                   <Route path="/smarty-plans" element={<SmartyPlans />} />

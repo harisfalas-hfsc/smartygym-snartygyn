@@ -53,20 +53,26 @@ export const useFirstSubscriptionPromoEligibility = (): EligibilityResult => {
         // User is eligible if:
         // 1. No subscription record exists, OR
         // 2. They have a record but stripe_subscription_id is null AND plan_type is 'free'
+        let eligible = false;
         if (!data) {
           // No subscription record - they're eligible
-          setIsEligible(true);
+          eligible = true;
+          console.log('[PromoEligibility] No subscription record - eligible');
         } else if (data.stripe_subscription_id === null && data.plan_type === 'free') {
           // Has record but never subscribed to a plan
-          setIsEligible(true);
+          eligible = true;
+          console.log('[PromoEligibility] Free plan, no stripe subscription - eligible');
         } else if (data.plan_type === 'gold' || data.plan_type === 'platinum') {
           // Already has an active plan subscription
-          setIsEligible(false);
+          eligible = false;
+          console.log('[PromoEligibility] Has active subscription - not eligible', { plan: data.plan_type });
         } else {
           // Has had a subscription before (stripe_subscription_id is not null)
-          setIsEligible(false);
+          eligible = false;
+          console.log('[PromoEligibility] Has previous subscription - not eligible', { stripe_id: data.stripe_subscription_id });
         }
 
+        setIsEligible(eligible);
         setIsLoading(false);
       } catch (err) {
         console.error('Error in eligibility check:', err);
