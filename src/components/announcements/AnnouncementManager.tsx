@@ -10,10 +10,10 @@ import { useFirstSubscriptionPromoEligibility } from "@/hooks/useFirstSubscripti
 const WOD_CHECK_INTERVAL_MS = 3 * 60 * 1000;
 // Stop checking after 06:00 Cyprus time (failsafe)
 const WOD_CHECK_CUTOFF_HOUR = 6;
-// Delay for Ritual modal after WOD modal closes (20 seconds)
-const RITUAL_DELAY_MS = 20 * 1000;
-// Delay for First Subscription Promo modal after Ritual modal closes (20 seconds)
-const PROMO_DELAY_MS = 20 * 1000;
+// Delay for Ritual modal after WOD modal closes (10 seconds)
+const RITUAL_DELAY_MS = 10 * 1000;
+// Delay for First Subscription Promo modal after Ritual modal closes (10 seconds)
+const PROMO_DELAY_MS = 10 * 1000;
 
 export const AnnouncementManager = () => {
   const [showWODModal, setShowWODModal] = useState(false);
