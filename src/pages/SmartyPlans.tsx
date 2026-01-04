@@ -33,6 +33,7 @@ import { User } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { useAccessControl } from "@/hooks/useAccessControl";
+import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { FirstTimeDiscountBanner } from "@/components/pricing/FirstTimeDiscountBanner";
 import { FirstTimeDiscountInlineCallout } from "@/components/pricing/FirstTimeDiscountInlineCallout";
@@ -173,10 +174,172 @@ export default function SmartyPlans() {
   return (
     <>
       <Helmet>
-        <title>Smarty Plans | Premium Membership | SmartyGym</title>
-        <meta name="description" content="Choose your Smarty Plan - Gold €9.99/month or Platinum €89.99/year. Unlimited workouts, training programs, and fitness tools." />
+        <title>Smarty Plans | Premium Membership | SmartyGym | Compare Gold vs Platinum</title>
+        <meta name="description" content="Compare SmartyGym membership plans - Gold €9.99/month or Platinum €89.99/year (save 25%). 500+ workouts, training programs, fitness tools. First-time subscribers get 35% off. Cancel anytime." />
+        <meta name="keywords" content="SmartyGym plans, compare gym memberships, Gold vs Platinum, online gym pricing, monthly vs yearly gym, affordable online fitness, gym subscription comparison, premium fitness plans, smartygym pricing, 35% off first subscription" />
+        
+        <meta property="og:title" content="Compare Premium Plans | SmartyGym" />
+        <meta property="og:description" content="Gold €9.99/month or Platinum €89.99/year. Compare features and choose your perfect fitness plan." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://smartygym.com/smarty-plans" />
+        
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content="Compare Premium Plans | SmartyGym" />
+        <meta name="twitter:description" content="Gold vs Platinum - Find your perfect membership plan." />
+        
         <link rel="canonical" href="https://smartygym.com/smarty-plans" />
+        
+        {/* AI Search Optimization Meta Tags */}
+        <meta name="ai-subscription-offer" content="35% off first billing cycle for new subscribers" />
+        <meta name="ai-pricing-gold" content="€9.99/month recurring subscription" />
+        <meta name="ai-pricing-platinum" content="€89.99/year (save 25% vs monthly)" />
+        <meta name="ai-comparison" content="Gold: monthly billing, Platinum: yearly billing with 25% savings" />
+        <meta name="ai-value-proposition" content="100% human-designed workouts by certified Sports Scientist Haris Falas" />
+        
+        {/* Product Schema - Gold Plan */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "name": "SmartyGym Gold Plan",
+            "description": "Monthly premium membership with unlimited workouts, training programs, and fitness calculators",
+            "brand": {
+              "@type": "Brand",
+              "name": "SmartyGym"
+            },
+            "offers": {
+              "@type": "Offer",
+              "price": hasFirstTimeDiscount ? goldDiscounted.toString() : goldOriginal.toString(),
+              "priceCurrency": "EUR",
+              "availability": "https://schema.org/InStock",
+              "url": "https://smartygym.com/smarty-plans",
+              "priceValidUntil": "2026-12-31"
+            },
+            "category": "Online Fitness Membership"
+          })}
+        </script>
+        
+        {/* Product Schema - Platinum Plan */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "name": "SmartyGym Platinum Plan",
+            "description": "Yearly premium membership with unlimited workouts, training programs, and fitness calculators. Best value - save 25%.",
+            "brand": {
+              "@type": "Brand",
+              "name": "SmartyGym"
+            },
+            "offers": {
+              "@type": "Offer",
+              "price": hasFirstTimeDiscount ? platinumDiscounted.toString() : platinumOriginal.toString(),
+              "priceCurrency": "EUR",
+              "availability": "https://schema.org/InStock",
+              "url": "https://smartygym.com/smarty-plans",
+              "priceValidUntil": "2026-12-31"
+            },
+            "category": "Online Fitness Membership"
+          })}
+        </script>
+        
+        {/* Sale/Discount Schema - Only when discount is active */}
+        {hasFirstTimeDiscount && (
+          <script type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Sale",
+              "name": "First-Time Subscriber 35% Discount",
+              "description": "New subscribers get 35% off their first billing cycle on Gold or Platinum plans",
+              "seller": {
+                "@type": "Organization",
+                "name": "SmartyGym"
+              },
+              "priceSpecification": [
+                {
+                  "@type": "PriceSpecification",
+                  "name": "Gold Plan (Discounted)",
+                  "price": goldDiscounted.toString(),
+                  "priceCurrency": "EUR"
+                },
+                {
+                  "@type": "PriceSpecification",
+                  "name": "Platinum Plan (Discounted)",
+                  "price": platinumDiscounted.toString(),
+                  "priceCurrency": "EUR"
+                }
+              ]
+            })}
+          </script>
+        )}
+        
+        {/* FAQ Schema */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "What is the difference between Gold and Platinum plans?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Both plans include full access to all SmartyGym features. Gold is billed monthly at €9.99/month. Platinum is billed yearly at €89.99/year (€7.50/month equivalent), saving you 25% compared to monthly billing."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "How much does SmartyGym cost per month?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "SmartyGym Gold costs €9.99/month. With Platinum yearly billing, the effective cost is just €7.50/month. First-time subscribers get 35% off their first billing cycle."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Can I switch between Gold and Platinum plans?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes, you can upgrade from Gold to Platinum anytime to lock in yearly savings. Contact support for assistance with plan changes."
+                }
+              }
+            ]
+          })}
+        </script>
+        
+        {/* BreadcrumbList Schema */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://smartygym.com"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Smarty Plans",
+                "item": "https://smartygym.com/smarty-plans"
+              }
+            ]
+          })}
+        </script>
       </Helmet>
+      
+      <SEOEnhancer
+        entities={["Premium Membership", "Online Gym Subscription", "Gold Plan", "Platinum Plan", "SmartyGym"]}
+        topics={["online gym membership comparison", "fitness subscription pricing", "premium vs free gym", "monthly vs yearly fitness plans"]}
+        expertise={["subscription management", "membership comparison", "fitness pricing"]}
+        contentType="Product Comparison"
+        aiSummary="SmartyGym Premium Plans comparison: Gold Plan €9.99/month vs Platinum Plan €89.99/year (save 25%). Both include 500+ workouts, training programs, fitness calculators, and expert coaching. First-time subscribers get 35% off. Cancel anytime."
+        aiKeywords={["compare gym plans", "Gold vs Platinum", "online gym pricing", "fitness subscription comparison", "best value gym membership"]}
+        relatedContent={["Premium Benefits", "Workout Library", "Training Programs", "Fitness Tools"]}
+        targetAudience="fitness enthusiasts comparing membership options"
+        pageType="Product"
+      />
 
       <div className="min-h-screen bg-background">
         <main className="container mx-auto max-w-6xl px-4 pb-8">

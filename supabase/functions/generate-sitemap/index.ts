@@ -20,11 +20,13 @@ serve(async (req) => {
     const baseUrl = 'https://smartygym.com';
     const now = new Date().toISOString().split('T')[0];
 
-    // Static pages with priorities
+    // Static pages with priorities - subscription pages have high priority for conversion
     const staticPages = [
       { loc: '/', priority: '1.0', changefreq: 'daily' },
       { loc: '/workout', priority: '0.9', changefreq: 'daily' },
       { loc: '/trainingprogram', priority: '0.9', changefreq: 'weekly' },
+      { loc: '/join-premium', priority: '0.95', changefreq: 'weekly' }, // High priority - subscription page
+      { loc: '/smarty-plans', priority: '0.95', changefreq: 'weekly' }, // High priority - plan comparison page
       { loc: '/blog', priority: '0.8', changefreq: 'weekly' },
       { loc: '/smartyritual', priority: '0.8', changefreq: 'daily' },
       { loc: '/about', priority: '0.7', changefreq: 'monthly' },

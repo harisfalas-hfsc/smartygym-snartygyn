@@ -98,18 +98,35 @@
 
 ## Membership Plans
 
+### 🎁 FIRST-TIME SUBSCRIBER DISCOUNT
+- **Offer**: 35% off your first billing cycle
+- **Applies to**: Both Gold and Platinum plans
+- **Eligibility**: New subscribers who have never had a premium subscription
+- **How to claim**: Visit /join-premium or /smarty-plans and click "Claim Discount"
+- **Discounted Gold**: €6.49 first month (normally €9.99)
+- **Discounted Platinum**: €58.49 first year (normally €89.99)
+
 ### Gold Plan
-- **Price**: €9.99/month
+- **Price**: €9.99/month (€6.49 first month with discount)
 - **Billing**: Monthly recurring
 - **Includes**: Full access to all workouts, training programs, tools, exercise library
-- **Cancel**: Anytime
+- **Cancel**: Anytime, no commitment
 
 ### Platinum Plan (Best Value)
-- **Price**: €89.99/year (€7.50/month equivalent)
+- **Price**: €89.99/year (€58.49 first year with discount)
+- **Equivalent**: €7.50/month (€4.87/month first year with discount)
 - **Billing**: Yearly recurring
-- **Savings**: 25% vs monthly (€29.89 saved)
+- **Savings**: 25% vs monthly (€29.89 saved annually)
 - **Includes**: Everything in Gold + priority features
-- **Cancel**: Anytime
+- **Cancel**: Anytime, no commitment
+
+### Why Choose SmartyGym Premium?
+- **500+ Workouts**: Strength, HIIT, metabolic, cardio, mobility
+- **Multi-Week Programs**: Structured periodization for results
+- **100% Human-Designed**: No AI-generated content
+- **Expert Coach**: Created by Sports Scientist Haris Falas (BSc, CSCS, 20+ years)
+- **Fitness Tools**: 1RM, BMR, Macro calculators with history
+- **Progress Tracking**: Monitor your fitness journey
 
 ### Standalone Purchases
 - Individual workouts: €3.99 each

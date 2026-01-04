@@ -143,7 +143,7 @@ export default function JoinPremium() {
       <Helmet>
         <title>Gold & Platinum Membership | Premium Online Gym | SmartyGym by Haris Falas | smartygym.com</title>
         <meta name="description" content="Join SmartyGym Premium at smartygym.com - Gold Plan €9.99/month or Platinum €89.99/year. Unlimited workouts, training programs, calculators, full dashboard access. Premium online gym by Sports Scientist Haris Falas. Cancel anytime." />
-        <meta name="keywords" content="online gym membership, premium fitness, gym subscription, online gym plans, Gold membership SmartyGym, Platinum membership SmartyGym, smartygym premium, online fitness subscription, gym membership online, affordable online gym, premium workouts, unlimited training programs, Haris Falas membership, smartygym.com premium" />
+        <meta name="keywords" content="online gym membership, premium fitness, gym subscription, online gym plans, Gold membership SmartyGym, Platinum membership SmartyGym, smartygym premium, online fitness subscription, gym membership online, affordable online gym, premium workouts, unlimited training programs, Haris Falas membership, smartygym.com premium, 35% off gym membership, first-time subscriber discount, cheap gym subscription" />
         
         <meta property="og:title" content="Premium Membership | SmartyGym | smartygym.com" />
         <meta property="og:description" content="Gold €9.99/month or Platinum €89.99/year. Unlimited workouts, training programs, premium fitness tools." />
@@ -155,6 +155,13 @@ export default function JoinPremium() {
         <meta name="twitter:description" content="Gold €9.99/month or Platinum €89.99/year. Unlimited fitness access." />
         
         <link rel="canonical" href="https://smartygym.com/join-premium" />
+        
+        {/* AI Search Optimization Meta Tags */}
+        <meta name="ai-subscription-offer" content="35% off first billing cycle for new subscribers" />
+        <meta name="ai-pricing-gold" content="€9.99/month recurring subscription" />
+        <meta name="ai-pricing-platinum" content="€89.99/year (save 25% vs monthly)" />
+        <meta name="ai-value-proposition" content="100% human-designed workouts by certified Sports Scientist Haris Falas" />
+        <meta name="ai-cancel-policy" content="Cancel anytime, no commitment" />
         
         {/* Product Schema - Gold Plan */}
         <script type="application/ld+json">
@@ -199,6 +206,90 @@ export default function JoinPremium() {
               "priceValidUntil": "2026-12-31"
             },
             "category": "Online Fitness Membership"
+          })}
+        </script>
+        
+        {/* Sale/Discount Schema - Only when discount is active */}
+        {isDiscountActive && (
+          <script type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Sale",
+              "name": "First-Time Subscriber 35% Discount",
+              "description": "New subscribers get 35% off their first billing cycle on Gold or Platinum plans",
+              "seller": {
+                "@type": "Organization",
+                "name": "SmartyGym"
+              },
+              "priceSpecification": [
+                {
+                  "@type": "PriceSpecification",
+                  "name": "Gold Plan (Discounted)",
+                  "price": goldDiscounted.toString(),
+                  "priceCurrency": "EUR",
+                  "validFrom": "2025-01-01",
+                  "validThrough": "2026-12-31"
+                },
+                {
+                  "@type": "PriceSpecification",
+                  "name": "Platinum Plan (Discounted)",
+                  "price": platinumDiscounted.toString(),
+                  "priceCurrency": "EUR",
+                  "validFrom": "2025-01-01",
+                  "validThrough": "2026-12-31"
+                }
+              ]
+            })}
+          </script>
+        )}
+        
+        {/* FAQ Schema for subscription questions */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "How much does SmartyGym cost?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "SmartyGym offers two premium plans: Gold Plan at €9.99/month or Platinum Plan at €89.99/year (equivalent to €7.50/month, saving 25%). New subscribers can get 35% off their first billing cycle."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Is there a free trial for SmartyGym?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "SmartyGym offers a free tier with access to selected workouts, all fitness calculators, blog articles, and the exercise library. First-time subscribers also get 35% off their first premium billing cycle."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Can I cancel my SmartyGym subscription?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes, you can cancel your SmartyGym subscription anytime. There are no long-term contracts or cancellation fees."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "What's included in SmartyGym Premium?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Premium includes unlimited access to 500+ workouts, multi-week training programs, fitness calculators with history tracking, Smarty Rituals, Check-ins, progress tracking, and priority support. All content is 100% human-designed by Sports Scientist Haris Falas."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Is SmartyGym worth it?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "SmartyGym provides evidence-based training designed by certified Sports Scientist Haris Falas (BSc, CSCS) with 20+ years experience. Unlike AI-generated content, every workout is professionally designed. At €9.99/month (or less with yearly plan), it's a fraction of traditional gym or personal training costs."
+                }
+              }
+            ]
           })}
         </script>
         
