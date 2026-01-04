@@ -26,7 +26,7 @@ export const RitualAnnouncementModal = ({ open, onClose }: RitualAnnouncementMod
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleClose()}>
-      <DialogContent className="max-w-sm w-[95vw] sm:w-full max-h-[90vh] border-2 border-purple-500/60 bg-gradient-to-br from-purple-500/5 via-background to-purple-500/5 shadow-[0_0_40px_rgba(168,85,247,0.15)] p-0 gap-0 animate-scale-in overflow-hidden">
+      <DialogContent className="max-w-sm w-[95vw] sm:w-full max-h-[90vh] border-2 border-purple-500/60 bg-gradient-to-br from-purple-500/5 via-background to-purple-500/5 shadow-[0_0_40px_rgba(168,85,247,0.15)] p-0 gap-0 animate-scale-in overflow-hidden [&>button]:hidden">
         {/* Header */}
         <div className="relative p-4 pb-2">
           {/* Close button */}

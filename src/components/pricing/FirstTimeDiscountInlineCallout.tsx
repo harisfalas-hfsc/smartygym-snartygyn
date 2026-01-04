@@ -55,13 +55,13 @@ export const FirstTimeDiscountInlineCallout = () => {
   };
 
   return (
-    <div className="mt-8 p-6 bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 border-2 border-primary/30 rounded-xl text-center">
-      <div className="flex items-center justify-center gap-2 mb-3">
-        <Gift className="h-6 w-6 text-primary" />
-        <h3 className="text-xl font-bold text-primary">
+    <div className="mt-6 sm:mt-8 p-4 sm:p-6 bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 border-2 border-primary/30 rounded-xl text-center">
+      <div className="flex flex-wrap items-center justify-center gap-2 mb-3">
+        <Gift className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+        <h3 className="text-lg sm:text-xl font-bold text-primary">
           First-Time Subscriber?
         </h3>
-        <Sparkles className="h-5 w-5 text-primary" />
+        <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
       </div>
       <p className="text-muted-foreground mb-4 max-w-lg mx-auto">
         Get <span className="font-bold text-primary text-lg">35% off</span> your first billing cycle! 

@@ -164,7 +164,7 @@ export const WODAnnouncementModal = ({ open, onClose }: WODAnnouncementModalProp
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleClose()}>
-      <DialogContent className="max-w-lg w-[95vw] sm:w-full max-h-[90vh] border-2 border-primary/60 bg-gradient-to-br from-primary/5 via-background to-primary/5 shadow-[0_0_40px_rgba(212,175,55,0.15)] p-0 gap-0 animate-scale-in overflow-hidden">
+      <DialogContent className="max-w-lg w-[95vw] sm:w-full max-h-[90vh] border-2 border-primary/60 bg-gradient-to-br from-primary/5 via-background to-primary/5 shadow-[0_0_40px_rgba(212,175,55,0.15)] p-0 gap-0 animate-scale-in overflow-hidden [&>button]:hidden">
         {/* Header */}
         <div className="relative p-4 pb-2">
           {/* Close button */}
