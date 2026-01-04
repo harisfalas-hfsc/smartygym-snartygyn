@@ -6,14 +6,21 @@ interface EligibilityResult {
   isEligible: boolean;
   isLoading: boolean;
   user: User | null;
+  isVisitor: boolean;
 }
 
 /**
  * Hook to check if user is eligible for the first-time subscription discount.
  * A user is eligible if:
- * 1. They are logged in
- * 2. They have NEVER had a plan subscription (stripe_subscription_id is null)
- * 3. Their current plan_type is 'free' or they have no subscription record
+ * 1. They are a visitor (not logged in) - we assume they might be eligible
+ * 2. They are logged in AND have NEVER had a plan subscription (stripe_subscription_id is null)
+ * 3. Their current plan_type is 'free' or null, or they have no subscription record
+ * 
+ * Returns:
+ * - isEligible: true if eligible (visitors are treated as eligible)
+ * - isLoading: true while checking
+ * - user: the current user or null if visitor
+ * - isVisitor: true if not logged in
  */
 export const useFirstSubscriptionPromoEligibility = (): EligibilityResult => {
   const [isEligible, setIsEligible] = useState(false);
@@ -29,9 +36,11 @@ export const useFirstSubscriptionPromoEligibility = (): EligibilityResult => {
         setUser(currentUser);
 
         if (!currentUser) {
-          // Not logged in - not eligible for the popup (they need to be logged in first)
-          setIsEligible(false);
+          // Visitor (not logged in) - treat as eligible for marketing purposes
+          // They'll need to log in to actually use the discount
+          setIsEligible(true);
           setIsLoading(false);
+          console.log('[PromoEligibility] Visitor - treating as eligible');
           return;
         }
 
@@ -52,24 +61,28 @@ export const useFirstSubscriptionPromoEligibility = (): EligibilityResult => {
 
         // User is eligible if:
         // 1. No subscription record exists, OR
-        // 2. They have a record but stripe_subscription_id is null AND plan_type is 'free'
+        // 2. They have a record but stripe_subscription_id is null AND (plan_type is 'free' or null)
         let eligible = false;
         if (!data) {
           // No subscription record - they're eligible
           eligible = true;
           console.log('[PromoEligibility] No subscription record - eligible');
-        } else if (data.stripe_subscription_id === null && data.plan_type === 'free') {
-          // Has record but never subscribed to a plan
+        } else if (data.stripe_subscription_id === null && (data.plan_type === 'free' || data.plan_type === null)) {
+          // Has record but never subscribed to a paid plan
           eligible = true;
-          console.log('[PromoEligibility] Free plan, no stripe subscription - eligible');
+          console.log('[PromoEligibility] Free/null plan, no stripe subscription - eligible');
         } else if (data.plan_type === 'gold' || data.plan_type === 'platinum') {
-          // Already has an active plan subscription
+          // Already has an active paid plan subscription
           eligible = false;
           console.log('[PromoEligibility] Has active subscription - not eligible', { plan: data.plan_type });
-        } else {
-          // Has had a subscription before (stripe_subscription_id is not null)
+        } else if (data.stripe_subscription_id !== null) {
+          // Has had a subscription before (stripe_subscription_id exists)
           eligible = false;
           console.log('[PromoEligibility] Has previous subscription - not eligible', { stripe_id: data.stripe_subscription_id });
+        } else {
+          // Edge case: treat as eligible
+          eligible = true;
+          console.log('[PromoEligibility] Edge case - treating as eligible');
         }
 
         setIsEligible(eligible);
@@ -91,5 +104,5 @@ export const useFirstSubscriptionPromoEligibility = (): EligibilityResult => {
     return () => subscription.unsubscribe();
   }, []);
 
-  return { isEligible, isLoading, user };
+  return { isEligible, isLoading, user, isVisitor: user === null };
 };

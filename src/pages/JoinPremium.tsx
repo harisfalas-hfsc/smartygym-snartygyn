@@ -26,6 +26,7 @@ import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { FirstTimeDiscountBanner } from "@/components/pricing/FirstTimeDiscountBanner";
+import { FirstTimeDiscountInlineCallout } from "@/components/pricing/FirstTimeDiscountInlineCallout";
 
 export default function JoinPremium() {
   const navigate = useNavigate();
@@ -486,8 +487,11 @@ export default function JoinPremium() {
             </Card>
           </div>
 
+          {/* First-Time Discount Inline Callout - shown below pricing cards */}
+          <FirstTimeDiscountInlineCallout />
+
           {/* Subscription Notice */}
-          <div className="text-center mb-8">
+          <div className="text-center mb-8 mt-8">
             <p className="text-xs text-muted-foreground">
               🔄 All plans are recurring subscriptions
             </p>
