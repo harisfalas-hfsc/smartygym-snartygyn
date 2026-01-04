@@ -168,9 +168,29 @@ export const AnnouncementManager = () => {
         return;
       }
 
-      // Always show WOD modal first (even if no WODs exist, it will show fallback)
-      console.log("[AnnouncementManager] Showing WOD modal");
-      setShowWODModal(true);
+      // Check if WODs exist before showing the modal
+      const wodsExist = await checkTodaysWODsExist();
+
+      if (wodsExist) {
+        // WODs exist - show the WOD modal
+        console.log("[AnnouncementManager] WODs found - showing WOD modal");
+        setShowWODModal(true);
+      } else {
+        // No WODs yet - check Cyprus time
+        const cyprusHour = getCyprusHour();
+        
+        if (cyprusHour < WOD_CHECK_CUTOFF_HOUR) {
+          // Before 6 AM - WODs might still be generating, start polling
+          console.log("[AnnouncementManager] No WODs yet, starting polling until", WOD_CHECK_CUTOFF_HOUR);
+          pollingIntervalRef.current = setInterval(tryShowWODModal, WOD_CHECK_INTERVAL_MS);
+          // Skip WOD modal for now, show Ritual/Promo
+          triggerRitualModalIfNeeded();
+        } else {
+          // After 6 AM - WODs aren't coming today, skip to Ritual/Promo
+          console.log("[AnnouncementManager] No WODs and past cutoff - skipping to Ritual/Promo");
+          triggerRitualModalIfNeeded();
+        }
+      }
     };
 
     init();
