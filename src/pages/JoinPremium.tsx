@@ -23,16 +23,20 @@ import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
+import { useAccessControl } from "@/contexts/AccessControlContext";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { FirstTimeDiscountBanner } from "@/components/pricing/FirstTimeDiscountBanner";
 import { FirstTimeDiscountInlineCallout } from "@/components/pricing/FirstTimeDiscountInlineCallout";
+import { AlreadyPremiumCard } from "@/components/pricing/AlreadyPremiumCard";
 
 export default function JoinPremium() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const { canGoBack, goBack } = useShowBackButton();
+  const { userTier } = useAccessControl();
+  const isPremium = userTier === "premium";
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
   
@@ -62,6 +66,16 @@ export default function JoinPremium() {
   }, []);
 
   const handleSubscribe = async (plan: 'gold' | 'platinum') => {
+    // Prevent premium users from subscribing again
+    if (isPremium) {
+      toast({
+        title: "Already Premium",
+        description: "You already have an active premium subscription!",
+      });
+      navigate('/userdashboard');
+      return;
+    }
+
     if (!user) {
       navigate('/auth');
       return;
@@ -237,8 +251,13 @@ export default function JoinPremium() {
             Unlock your full fitness potential with unlimited access to all premium features
           </p>
 
-          {/* Persistent First-Time Discount Banner for eligible users */}
-          <FirstTimeDiscountBanner />
+          {/* Show Already Premium Card for premium users */}
+          {isPremium && (
+            <AlreadyPremiumCard className="mb-8" />
+          )}
+
+          {/* Persistent First-Time Discount Banner for eligible users - only show if not premium */}
+          {!isPremium && <FirstTimeDiscountBanner />}
 
           {/* First-Time Discount Banner */}
           {isDiscountActive && (
