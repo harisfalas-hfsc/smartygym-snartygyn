@@ -113,7 +113,7 @@ export function WebsiteAnalytics() {
       const { startDate, endDate } = getDateRange();
       const { prevStartDate, prevEndDate } = getPreviousPeriodRange();
 
-      // Build query with filters - exclude admin/preview traffic
+      // Build query with filters - exclude admin/preview traffic and bots
       let query = supabase
         .from("social_media_analytics")
         .select("*")
@@ -121,8 +121,17 @@ export function WebsiteAnalytics() {
         .lte("created_at", endDate.toISOString())
         .order("created_at", { ascending: true });
 
-      // Exclude preview/sandbox visits (Lovable preview iframe)
-      query = query.not("browser_info", "ilike", "%lovable%");
+      // Exclude preview/sandbox visits and bots/crawlers
+      query = query
+        .not("browser_info", "ilike", "%lovable%")
+        .not("browser_info", "ilike", "%bot%")
+        .not("browser_info", "ilike", "%crawler%")
+        .not("browser_info", "ilike", "%spider%")
+        .not("browser_info", "ilike", "%meta-external%")
+        .not("browser_info", "ilike", "%adsbot%")
+        .not("browser_info", "ilike", "%facebookexternalhit%")
+        .not("browser_info", "ilike", "%semrush%")
+        .not("browser_info", "ilike", "%ahrefs%");
       
       if (sourceFilter !== "all") {
         query = query.eq("referral_source", sourceFilter);
@@ -140,7 +149,15 @@ export function WebsiteAnalytics() {
         .select("*")
         .gte("created_at", prevStartDate.toISOString())
         .lte("created_at", prevEndDate.toISOString())
-        .not("browser_info", "ilike", "%lovable%");
+        .not("browser_info", "ilike", "%lovable%")
+        .not("browser_info", "ilike", "%bot%")
+        .not("browser_info", "ilike", "%crawler%")
+        .not("browser_info", "ilike", "%spider%")
+        .not("browser_info", "ilike", "%meta-external%")
+        .not("browser_info", "ilike", "%adsbot%")
+        .not("browser_info", "ilike", "%facebookexternalhit%")
+        .not("browser_info", "ilike", "%semrush%")
+        .not("browser_info", "ilike", "%ahrefs%");
 
       if (sourceFilter !== "all") {
         prevQuery = prevQuery.eq("referral_source", sourceFilter);
@@ -234,13 +251,21 @@ export function WebsiteAnalytics() {
         .sort((a, b) => b.count - a.count);
       setDeviceData(deviceDataArray);
 
-      // Traffic sources - fetch unfiltered to show all sources
+      // Traffic sources - fetch with bot filtering
       const { data: allTrafficData } = await supabase
         .from("social_media_analytics")
         .select("*")
         .gte("created_at", startDate.toISOString())
         .lte("created_at", endDate.toISOString())
-        .not("browser_info", "ilike", "%lovable%");
+        .not("browser_info", "ilike", "%lovable%")
+        .not("browser_info", "ilike", "%bot%")
+        .not("browser_info", "ilike", "%crawler%")
+        .not("browser_info", "ilike", "%spider%")
+        .not("browser_info", "ilike", "%meta-external%")
+        .not("browser_info", "ilike", "%adsbot%")
+        .not("browser_info", "ilike", "%facebookexternalhit%")
+        .not("browser_info", "ilike", "%semrush%")
+        .not("browser_info", "ilike", "%ahrefs%");
 
       // All tracked social platforms - always show these
       const allTrackedSources = [
