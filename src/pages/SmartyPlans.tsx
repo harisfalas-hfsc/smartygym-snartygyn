@@ -36,6 +36,7 @@ import { useAccessControl } from "@/hooks/useAccessControl";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { FirstTimeDiscountBanner } from "@/components/pricing/FirstTimeDiscountBanner";
 import { FirstTimeDiscountInlineCallout } from "@/components/pricing/FirstTimeDiscountInlineCallout";
+import { AlreadyPremiumCard } from "@/components/pricing/AlreadyPremiumCard";
 
 export default function SmartyPlans() {
   const navigate = useNavigate();
@@ -178,8 +179,13 @@ export default function SmartyPlans() {
 
           <PageBreadcrumbs items={[{ label: "Home", href: "/" }, { label: "Smarty Plans" }]} />
 
-          {/* Persistent First-Time Discount Banner for eligible users */}
-          <FirstTimeDiscountBanner />
+          {/* Show Already Premium Card for premium users */}
+          {isPremium && (
+            <AlreadyPremiumCard className="mb-8" />
+          )}
+
+          {/* Persistent First-Time Discount Banner for eligible users - only show if not premium */}
+          {!isPremium && <FirstTimeDiscountBanner />}
 
           {/* First-Time Discount Banner */}
           {hasFirstTimeDiscount && !isPremium && (

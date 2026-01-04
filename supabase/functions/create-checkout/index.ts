@@ -56,6 +56,28 @@ serve(async (req) => {
       logStep("Found existing customer", { customerId });
     }
 
+    // CRITICAL: Check if user already has an active subscription (prevent double billing)
+    if (customerId) {
+      const activeSubscriptions = await stripe.subscriptions.list({
+        customer: customerId,
+        status: 'active',
+        limit: 1
+      });
+      
+      if (activeSubscriptions.data.length > 0) {
+        logStep("User already has active subscription - blocking checkout", {
+          subscriptionId: activeSubscriptions.data[0].id
+        });
+        return new Response(JSON.stringify({ 
+          error: "You already have an active subscription. Please manage your existing subscription instead.",
+          hasActiveSubscription: true
+        }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 400,
+        });
+      }
+    }
+
     // Check if user is truly a first-time subscriber (server-side validation)
     let shouldApplyCoupon = false;
     if (applyFirstTimeDiscount && customerId) {
