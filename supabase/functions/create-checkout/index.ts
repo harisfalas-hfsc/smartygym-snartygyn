@@ -7,6 +7,14 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// First-time subscriber coupon ID (35% off)
+const FIRST_TIME_COUPON_ID = "TnTNe1uX";
+
+const logStep = (step: string, details?: unknown) => {
+  const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
+  console.log(`[CREATE-CHECKOUT] ${step}${detailsStr}`);
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -18,7 +26,8 @@ serve(async (req) => {
   );
 
   try {
-    const { priceId } = await req.json();
+    const { priceId, applyFirstTimeDiscount } = await req.json();
+    logStep("Request received", { priceId, applyFirstTimeDiscount });
     
     if (!priceId) {
       throw new Error("Price ID is required");
@@ -32,6 +41,7 @@ serve(async (req) => {
     if (!user?.email) {
       throw new Error("User not authenticated or email not available");
     }
+    logStep("User authenticated", { userId: user.id, email: user.email });
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
@@ -43,6 +53,29 @@ serve(async (req) => {
     
     if (customers.data.length > 0) {
       customerId = customers.data[0].id;
+      logStep("Found existing customer", { customerId });
+    }
+
+    // Check if user is truly a first-time subscriber (server-side validation)
+    let shouldApplyCoupon = false;
+    if (applyFirstTimeDiscount && customerId) {
+      // Check if customer has EVER had any subscription (including cancelled ones)
+      const subscriptions = await stripe.subscriptions.list({
+        customer: customerId,
+        status: 'all', // Include all statuses: active, cancelled, past_due, etc.
+        limit: 1
+      });
+      
+      const isFirstTimeSubscriber = subscriptions.data.length === 0;
+      shouldApplyCoupon = isFirstTimeSubscriber;
+      logStep("First-time subscriber check", { 
+        hasSubscriptionHistory: subscriptions.data.length > 0,
+        shouldApplyCoupon 
+      });
+    } else if (applyFirstTimeDiscount && !customerId) {
+      // No customer record means they've never purchased anything
+      shouldApplyCoupon = true;
+      logStep("New customer - applying first-time discount");
     }
 
     // Create checkout session
@@ -61,6 +94,13 @@ serve(async (req) => {
       metadata: {
         user_id: user.id,
       },
+      // Apply first-time discount coupon if eligible
+      ...(shouldApplyCoupon && { discounts: [{ coupon: FIRST_TIME_COUPON_ID }] }),
+    });
+
+    logStep("Checkout session created", { 
+      sessionId: session.id, 
+      discountApplied: shouldApplyCoupon 
     });
 
     return new Response(JSON.stringify({ url: session.url }), {
