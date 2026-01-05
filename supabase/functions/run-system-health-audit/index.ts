@@ -1231,6 +1231,69 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // ============================================
+    // CATEGORY 15: FORMAT INTEGRITY
+    // ============================================
+    console.log("📋 Checking workout format integrity...");
+
+    // Category format rules
+    const formatRules: Record<string, string> = {
+      'STRENGTH': 'REPS & SETS',
+      'MOBILITY & STABILITY': 'REPS & SETS',
+      'PILATES': 'REPS & SETS',
+      'RECOVERY': 'MIX'
+    };
+
+    // Check for format violations
+    const { data: formatViolations } = await supabase
+      .from('admin_workouts')
+      .select('id, name, category, format')
+      .or(`and(category.eq.STRENGTH,format.neq.REPS & SETS),and(category.eq.MOBILITY & STABILITY,format.neq.REPS & SETS),and(category.eq.PILATES,format.neq.REPS & SETS),and(category.eq.RECOVERY,format.neq.MIX)`)
+      .eq('is_visible', true);
+
+    if (formatViolations && formatViolations.length > 0) {
+      addCheck(
+        'Format Integrity',
+        'Category Format Rules',
+        `${formatViolations.length} workout(s) violate category format rules`,
+        'fail',
+        `Violations: ${formatViolations.slice(0, 3).map(v => `${v.name} (${v.category}: ${v.format})`).join(', ')}${formatViolations.length > 3 ? '...' : ''}`
+      );
+    } else {
+      addCheck(
+        'Format Integrity',
+        'Category Format Rules',
+        'All fixed-category workouts have correct formats',
+        'pass',
+        'STRENGTH, MOBILITY & STABILITY, PILATES, RECOVERY all verified'
+      );
+    }
+
+    // Check for null formats on visible workouts
+    const { data: nullFormats } = await supabase
+      .from('admin_workouts')
+      .select('id, name, category')
+      .is('format', null)
+      .eq('is_visible', true);
+
+    if (nullFormats && nullFormats.length > 0) {
+      addCheck(
+        'Format Integrity',
+        'Missing Formats',
+        `${nullFormats.length} visible workout(s) have no format set`,
+        'warning',
+        `Missing: ${nullFormats.slice(0, 3).map(v => v.name).join(', ')}${nullFormats.length > 3 ? '...' : ''}`
+      );
+    } else {
+      addCheck(
+        'Format Integrity',
+        'Missing Formats',
+        'All visible workouts have formats assigned',
+        'pass',
+        'No null formats found'
+      );
+    }
+
+    // ============================================
     // COMPILE RESULTS
     // ============================================
     const duration = Date.now() - startTime;
