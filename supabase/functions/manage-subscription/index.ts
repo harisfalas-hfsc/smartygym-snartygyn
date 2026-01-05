@@ -150,7 +150,7 @@ serve(async (req) => {
         .upsert({
           user_id,
           plan_type: 'free',
-          status: 'canceled',
+          status: 'revoked',  // Use 'revoked' to distinguish from natural expiration
           current_period_end: nowISO,
           cancel_at_period_end: false,
           updated_at: nowISO
