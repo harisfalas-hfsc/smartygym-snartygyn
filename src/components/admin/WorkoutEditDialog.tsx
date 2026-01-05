@@ -31,6 +31,19 @@ const FORMATS = [
   "MIX"
 ];
 
+// Categories with FIXED formats - auto-set and disable dropdown
+const FIXED_FORMAT_CATEGORIES: Record<string, string> = {
+  'STRENGTH': 'REPS & SETS',
+  'MOBILITY & STABILITY': 'REPS & SETS',
+  'PILATES': 'REPS & SETS',
+  'RECOVERY': 'MIX'
+};
+
+// Helper to get required format for a category
+const getRequiredFormat = (category: string): string | null => {
+  return FIXED_FORMAT_CATEGORIES[category] || null;
+};
+
 const EQUIPMENT_OPTIONS = ["BODYWEIGHT", "EQUIPMENT"];
 
 const DURATION_OPTIONS = [
@@ -442,7 +455,15 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
             <Label htmlFor="category">1. Category *</Label>
             <Select 
               value={formData.category} 
-              onValueChange={(value) => setFormData({ ...formData, category: value })}
+              onValueChange={(value) => {
+                const requiredFormat = getRequiredFormat(value);
+                setFormData({ 
+                  ...formData, 
+                  category: value,
+                  // Auto-set format for restricted categories
+                  ...(requiredFormat ? { format: requiredFormat } : {})
+                });
+              }}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select category" />
@@ -531,16 +552,29 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
           {/* 7. Format */}
           <div className="space-y-2">
             <Label htmlFor="format">7. Format *</Label>
-            <Select value={formData.format} onValueChange={(value) => setFormData({ ...formData, format: value })}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select format" />
-              </SelectTrigger>
-              <SelectContent>
-                {FORMATS.map(format => (
-                  <SelectItem key={format} value={format}>{format}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {getRequiredFormat(formData.category) ? (
+              <>
+                <Input 
+                  value={formData.format} 
+                  disabled 
+                  className="bg-muted cursor-not-allowed"
+                />
+                <p className="text-xs text-amber-600 font-medium">
+                  ⚠️ {formData.category} category requires "{getRequiredFormat(formData.category)}" format (auto-set)
+                </p>
+              </>
+            ) : (
+              <Select value={formData.format} onValueChange={(value) => setFormData({ ...formData, format: value })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select format" />
+                </SelectTrigger>
+                <SelectContent>
+                  {FORMATS.map(format => (
+                    <SelectItem key={format} value={format}>{format}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
 
           {/* 8. Duration */}

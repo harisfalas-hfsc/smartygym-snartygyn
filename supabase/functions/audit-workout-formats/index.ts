@@ -77,10 +77,10 @@ serve(async (req) => {
         continue;
       }
 
-      const classification: FormatClassificationResult = classifyWorkoutFormat(workout.main_workout);
+      const classification: FormatClassificationResult = classifyWorkoutFormat(workout.category, workout.main_workout);
 
       // Only report as mismatch if we're confident enough to suggest a fix
-      const needsFix = shouldFixFormat(workout.format, classification);
+      const needsFix = shouldFixFormat(workout.category, workout.format, classification);
 
       if (needsFix && classification.inferredFormat) {
         byCategory[category].mismatches++;
