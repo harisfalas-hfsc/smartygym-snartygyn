@@ -166,15 +166,22 @@ export function wrapInEmailTemplateWithFooter(
     <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="x-apple-disable-message-reformatting">
       <title>${subject}</title>
+      <style>
+        @media only screen and (max-width: 600px) {
+          .email-container { width: 100% !important; }
+          .email-content { padding: 20px !important; }
+        }
+      </style>
     </head>
-    <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f5f5f5;">
+    <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f5f5f5; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">
       <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f5f5f5;">
         <tr>
           <td style="padding: 20px;">
-            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="margin: 0 auto; background-color: #ffffff; border-radius: 8px;">
+            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px;" class="email-container">
               <tr>
-                <td style="padding: 32px;">
+                <td style="padding: 32px;" class="email-content">
                   <h1 style="color: #29B6D2; margin: 0 0 24px 0; font-size: 24px; font-weight: bold;">${subject}</h1>
                   <div style="font-size: 16px; line-height: 1.6; color: #333333;">
                     ${emailContent}
@@ -215,23 +222,32 @@ export function buildCompleteEmailHtml(
     <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="x-apple-disable-message-reformatting">
       <title>${title}</title>
+      <style>
+        @media only screen and (max-width: 600px) {
+          .email-container { width: 100% !important; }
+          .email-content { padding: 24px 16px !important; }
+          .email-header { padding: 24px 16px !important; }
+        }
+        img { max-width: 100%; height: auto; }
+      </style>
     </head>
-    <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5;">
+    <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">
       <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f5f5f5;">
         <tr>
           <td style="padding: 40px 20px;">
-            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1);" class="email-container">
               <!-- Header -->
               <tr>
-                <td style="background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); padding: 30px; text-align: center;">
+                <td style="background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); padding: 30px; text-align: center;" class="email-header">
                   <h1 style="color: #29B6D2; margin: 0; font-size: 28px; font-weight: bold;">SmartyGym</h1>
                   <p style="color: #999; margin: 8px 0 0 0; font-size: 14px;">Expert Fitness by Haris Falas</p>
                 </td>
               </tr>
               <!-- Content -->
               <tr>
-                <td style="padding: 40px 30px;">
+                <td style="padding: 40px 30px;" class="email-content">
                   <h2 style="color: #1a1a1a; margin: 0 0 20px 0; font-size: 24px;">${title}</h2>
                   ${bodyContent}
                   ${buttonHtml ? `<div style="margin-top: 30px;">${buttonHtml}</div>` : ""}
