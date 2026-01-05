@@ -185,7 +185,7 @@ const WorkoutFlow = () => {
   }, {
     id: "micro-workouts",
     title: "Micro-Workouts",
-    description: "Get fit in 5 minutes with quick exercise snacks",
+    description: "Get fit in 5' with quick exercise snacks",
     icon: Timer,
     level: "All Levels",
     equipment: "Bodyweight/Minimal"
