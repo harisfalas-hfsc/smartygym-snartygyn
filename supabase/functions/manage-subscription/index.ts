@@ -98,6 +98,8 @@ serve(async (req) => {
           cancel_at_period_end: false,
           stripe_customer_id: null,
           stripe_subscription_id: null,
+          subscription_source: 'admin_grant',
+          granted_by: user.id,
           updated_at: now
         }, { 
           onConflict: 'user_id',

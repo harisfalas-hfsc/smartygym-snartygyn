@@ -45,6 +45,7 @@ interface UserData {
   subscription_updated_at?: string | null; // Last subscription modification
   stripe_customer_id?: string | null;
   stripe_subscription_id?: string | null;
+  subscription_source?: string | null;
 }
 
 interface CorporateInfo {
@@ -311,6 +312,11 @@ export function UserDetailModal({
                 <Badge variant={user.plan_type === 'platinum' ? 'default' : user.plan_type === 'gold' ? 'secondary' : 'outline'}>
                   {user.plan_type.toUpperCase()}
                 </Badge>
+                {user.subscription_source === 'admin_grant' && (
+                  <Badge variant="secondary" className="bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300">
+                    Complimentary
+                  </Badge>
+                )}
                 {isCorporateAdmin && (
                   <Badge className="bg-blue-600">🏢 Corp Admin ({corporateInfo.adminPlanType})</Badge>
                 )}
