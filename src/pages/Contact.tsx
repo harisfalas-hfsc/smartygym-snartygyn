@@ -44,7 +44,6 @@ const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCoachSubmitting, setIsCoachSubmitting] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [hasSubscription, setHasSubscription] = useState(false);
   const [userProfile, setUserProfile] = useState<{ full_name: string; } | null>(null);
   const [attachments, setAttachments] = useState<File[]>([]);
   const [coachAttachments, setCoachAttachments] = useState<File[]>([]);
@@ -74,9 +73,9 @@ const Contact = () => {
     return uploadedUrls;
   };
 
-  // Check authentication and subscription status
+  // Check authentication and get user profile
   useEffect(() => {
-    const checkAuthAndSubscription = async () => {
+    const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       
       if (session?.user) {
@@ -103,24 +102,14 @@ const Contact = () => {
             email: session.user.email || ""
           }));
         }
-        
-        // Check subscription
-        try {
-          const { data: subscriptionData } = await supabase.functions.invoke('check-subscription');
-          if (subscriptionData?.subscribed) {
-            setHasSubscription(true);
-          }
-        } catch (error) {
-          console.error('Error checking subscription:', error);
-        }
       }
     };
 
-    checkAuthAndSubscription();
+    checkAuth();
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
-      checkAuthAndSubscription();
+      checkAuth();
     });
 
     return () => subscription.unsubscribe();
@@ -203,7 +192,7 @@ const Contact = () => {
             message: validatedData.message,
             recipientEmail: 'harisfalas@gmail.com',
             userStatus: isAuthenticated 
-              ? (hasSubscription ? 'Premium Subscriber' : 'Free Member')
+              ? (isPremium ? 'Premium Subscriber' : 'Free Member')
               : 'Guest'
           }
         });
@@ -253,10 +242,10 @@ const Contact = () => {
     e.preventDefault();
     setCoachErrors({});
     
-    if (!isAuthenticated || !hasSubscription) {
+    if (!isAuthenticated || !isPremium) {
       toast({
         title: "Access Denied",
-        description: "You need an active subscription to contact the coach directly.",
+        description: "You need an active Premium subscription to contact the coach directly.",
         variant: "destructive",
       });
       return;
@@ -270,9 +259,6 @@ const Contact = () => {
     try {
       const validatedData = coachSchema.parse(coachFormData);
       setIsCoachSubmitting(true);
-
-      // Get current user session
-      const { data: { session } } = await supabase.auth.getSession();
 
       // Upload attachments if any
       let attachmentData: any[] = [];
@@ -292,45 +278,22 @@ const Contact = () => {
         }
       }
 
-      // Save to database and get the message ID
-      const { data: insertedMessage, error } = await supabase
-        .from('contact_messages')
-        .insert([{
-          user_id: session?.user?.id || null,
-          name: formData.name,
+      // Send DIRECT email to coach (no database save, no AI reply)
+      const { error } = await supabase.functions.invoke('send-direct-coach-email', {
+        body: {
+          name: userProfile?.full_name || formData.name,
           email: formData.email,
           subject: validatedData.subject,
           message: validatedData.message,
-          category: 'coach_direct',
-          status: 'new',
           attachments: attachmentData
-        }])
-        .select('id')
-        .single();
+        }
+      });
 
       if (error) throw error;
 
-      // Send auto-reply to customer AND forward to admin (with messageId for history logging)
-      try {
-        await supabase.functions.invoke('send-contact-email', {
-          body: {
-            messageId: insertedMessage?.id, // Pass message ID for history logging
-            name: formData.name,
-            email: formData.email,
-            subject: validatedData.subject,
-            message: validatedData.message,
-            recipientEmail: 'harisfalas@gmail.com',
-            userStatus: 'Premium Subscriber (Direct to Coach)'
-          }
-        });
-      } catch (emailError) {
-        console.error('Email notification error:', emailError);
-        // Don't fail the whole submission if email fails
-      }
-
       toast({
-        title: "Message sent to coach!",
-        description: "Haris will get back to you soon.",
+        title: "Message sent directly to Haris!",
+        description: "Your coach will respond to your email soon.",
       });
 
       setCoachFormData({ subject: "", message: "" });
@@ -602,19 +565,41 @@ const Contact = () => {
             {/* Contact Info */}
             <div className="space-y-6 flex flex-col h-full">
 
-              {hasSubscription ? (
+              {isPremium ? (
                 <form onSubmit={handleCoachSubmit} className="h-full">
                   <Card className="flex flex-col h-full bg-gradient-to-br from-primary/5 to-accent/10 border-primary/20">
                     <CardHeader>
                       <CardTitle className="text-lg flex items-center gap-2">
                         Direct Access to Your Coach
-                        {!hasSubscription && <Lock className="h-4 w-4" />}
+                        <Crown className="h-4 w-4 text-yellow-500" />
                       </CardTitle>
                       <CardDescription>
-                        Send a message directly to <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>
+                        Send a message directly to <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> — no automated responses, just real human support
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="flex-1 space-y-3">
+                      {/* Name field - auto-filled and disabled */}
+                      <div className="space-y-1.5">
+                        <Label htmlFor="coach-name">Name</Label>
+                        <Input
+                          id="coach-name"
+                          value={userProfile?.full_name || formData.name || ''}
+                          disabled
+                          className="bg-muted/50"
+                        />
+                      </div>
+
+                      {/* Email field - auto-filled and disabled */}
+                      <div className="space-y-1.5">
+                        <Label htmlFor="coach-email">Email</Label>
+                        <Input
+                          id="coach-email"
+                          value={formData.email}
+                          disabled
+                          className="bg-muted/50"
+                        />
+                      </div>
+
                       <div className="space-y-1.5">
                         <Label htmlFor="coach-subject">Subject *</Label>
                         <Input

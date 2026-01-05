@@ -221,3 +221,6 @@ verify_jwt = false
 
 [functions.ai-contact-response]
 verify_jwt = false
+
+[functions.send-direct-coach-email]
+verify_jwt = true
