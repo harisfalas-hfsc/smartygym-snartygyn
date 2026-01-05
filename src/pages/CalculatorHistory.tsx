@@ -14,6 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { MeasurementDialog } from "@/components/logbook/MeasurementDialog";
+import { useAccessControl } from "@/hooks/useAccessControl";
 
 import { MeasurementGoalDialog } from "@/components/logbook/MeasurementGoalDialog";
 import { RecordDetailDialog } from "@/components/calculators/RecordDetailDialog";
@@ -170,6 +171,8 @@ export default function CalculatorHistory() {
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const { goBack } = useShowBackButton();
+  const { userTier, isLoading: accessLoading } = useAccessControl();
+  const isPremium = userTier === "premium";
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "1rm");
@@ -209,6 +212,32 @@ export default function CalculatorHistory() {
   useEffect(() => {
     checkAuth();
   }, []);
+
+  // Premium gate - redirect non-premium users
+  useEffect(() => {
+    if (!accessLoading && !isPremium) {
+      toast({
+        title: "Premium Feature",
+        description: "Calculator History is available for Gold and Platinum members only.",
+        variant: "destructive"
+      });
+      navigate("/userdashboard");
+    }
+  }, [accessLoading, isPremium, navigate, toast]);
+
+  // Show loading while checking access
+  if (accessLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+      </div>
+    );
+  }
+
+  // If not premium, don't render anything (redirect will happen)
+  if (!isPremium) {
+    return null;
+  }
 
   const checkAuth = async () => {
     const { data: { user } } = await supabase.auth.getUser();

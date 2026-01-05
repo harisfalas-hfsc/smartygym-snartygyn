@@ -26,7 +26,8 @@ import {
   Flame,
   Building2,
   CircleMinus,
-  Gift
+  Gift,
+  FileText
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
@@ -136,6 +137,7 @@ export default function SmartyPlans() {
     { category: "Daily Smarty Ritual", icon: Sparkles, visitor: false, subscriber: true, premium: true },
     { category: "Smarty Check-ins", icon: ClipboardCheck, visitor: false, subscriber: false, premium: true },
     { category: "Dashboard", icon: LayoutDashboard, visitor: false, subscriber: "limited", premium: true },
+    { category: "LogBook", icon: FileText, visitor: false, subscriber: false, premium: true },
     { category: "Exercise Library", icon: BookOpen, visitor: true, subscriber: true, premium: true },
     { category: "Calculators (1RM, BMR, Macro)", icon: Calculator, visitor: false, subscriber: true, premium: true },
     { category: "Blog", icon: BookOpen, visitor: true, subscriber: true, premium: true },
