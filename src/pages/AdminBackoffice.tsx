@@ -68,6 +68,43 @@ export default function AdminBackoffice() {
     if (isAdmin) {
       fetchNewContactCount();
 
+      // AUTO-RUN: Fix Stripe metadata once per 24 hours (no button needed)
+      const runStripeMetadataFix = async () => {
+        const STORAGE_KEY = 'lastStripeMetadataFix';
+        const lastRun = localStorage.getItem(STORAGE_KEY);
+        const now = Date.now();
+        const ONE_DAY = 24 * 60 * 60 * 1000;
+        
+        if (lastRun && now - parseInt(lastRun) < ONE_DAY) {
+          console.log('[AdminBackoffice] Stripe metadata fix already ran today, skipping');
+          return;
+        }
+        
+        try {
+          console.log('[AdminBackoffice] Running automatic Stripe metadata fix...');
+          const { data: { session } } = await supabase.auth.getSession();
+          if (!session) return;
+          
+          const { data, error } = await supabase.functions.invoke('fix-stripe-metadata', {
+            body: { dryRun: false }
+          });
+          
+          if (error) {
+            console.error('[AdminBackoffice] Stripe metadata fix failed:', error);
+          } else if (data?.fixed > 0) {
+            console.log(`[AdminBackoffice] Stripe metadata fix complete: ${data.fixed} products fixed`);
+          } else {
+            console.log('[AdminBackoffice] Stripe metadata check complete: all products correctly tagged');
+          }
+          
+          localStorage.setItem(STORAGE_KEY, now.toString());
+        } catch (err) {
+          console.error('[AdminBackoffice] Stripe metadata fix error:', err);
+        }
+      };
+      
+      runStripeMetadataFix();
+
       // Subscribe to real-time updates
       const channel = supabase
         .channel('contact_messages_admin')
