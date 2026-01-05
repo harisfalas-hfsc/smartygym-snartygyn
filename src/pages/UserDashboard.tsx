@@ -450,7 +450,7 @@ export default function UserDashboard() {
       const {
         data: dbData,
         error: dbError
-      } = await supabase.from('user_subscriptions').select('plan_type, status, current_period_end, current_period_start, stripe_subscription_id, cancel_at_period_end').eq('user_id', uid).maybeSingle();
+      } = await supabase.from('user_subscriptions').select('plan_type, status, current_period_end, current_period_start, stripe_subscription_id, cancel_at_period_end, subscription_source').eq('user_id', uid).maybeSingle();
       if (dbError) {
         if (import.meta.env.DEV) {
           console.error("Dashboard subscription error:", dbError);
@@ -790,7 +790,8 @@ export default function UserDashboard() {
                     </div>
 
                     {/* Subscription Details */}
-                    {subscriptionInfo.subscription_end && <div className="space-y-1 text-sm">
+                    {subscriptionInfo.subscription_end ? (
+                      <div className="space-y-1 text-sm">
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">
                             {stripeDetails?.cancel_at_period_end ? "Expires:" : "Next Billing:"}
@@ -807,7 +808,17 @@ export default function UserDashboard() {
                             {stripeDetails?.cancel_at_period_end ? "One-time" : "Auto-renewing"}
                           </span>
                         </div>
-                      </div>}
+                      </div>
+                    ) : (
+                      <div className="space-y-2 text-sm">
+                        <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300">
+                          Lifetime Access
+                        </Badge>
+                        <p className="text-xs text-muted-foreground">
+                          Your membership has no expiration date
+                        </p>
+                      </div>
+                    )}
 
                     {/* Action Buttons */}
                     <div className="flex gap-2 pt-1">

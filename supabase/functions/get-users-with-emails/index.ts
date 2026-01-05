@@ -59,7 +59,7 @@ serve(async (req) => {
     // Fetch all subscriptions with all needed fields
     const { data: subscriptions, error: subsError } = await supabaseAdmin
       .from('user_subscriptions')
-      .select('user_id, plan_type, status, current_period_start, current_period_end, created_at, updated_at, stripe_customer_id, stripe_subscription_id');
+      .select('user_id, plan_type, status, current_period_start, current_period_end, created_at, updated_at, stripe_customer_id, stripe_subscription_id, subscription_source');
 
     if (subsError) throw subsError;
 
@@ -111,6 +111,7 @@ serve(async (req) => {
         subscription_updated_at: subscription?.updated_at || null,
         stripe_customer_id: subscription?.stripe_customer_id || null,
         stripe_subscription_id: subscription?.stripe_subscription_id || null,
+        subscription_source: subscription?.subscription_source || null,
         // Corporate admin info
         is_corporate_admin: !!corporateAdmin,
         corporate_admin_org: corporateAdmin?.organization_name || null,

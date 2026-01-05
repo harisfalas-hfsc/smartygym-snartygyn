@@ -2602,11 +2602,14 @@ export type Database = {
           created_at: string
           current_period_end: string | null
           current_period_start: string | null
+          grant_notes: string | null
+          granted_by: string | null
           id: string
           plan_type: Database["public"]["Enums"]["plan_type"]
           status: Database["public"]["Enums"]["subscription_status"]
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
+          subscription_source: string | null
           updated_at: string
           user_id: string
         }
@@ -2615,11 +2618,14 @@ export type Database = {
           created_at?: string
           current_period_end?: string | null
           current_period_start?: string | null
+          grant_notes?: string | null
+          granted_by?: string | null
           id?: string
           plan_type?: Database["public"]["Enums"]["plan_type"]
           status?: Database["public"]["Enums"]["subscription_status"]
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
+          subscription_source?: string | null
           updated_at?: string
           user_id: string
         }
@@ -2628,11 +2634,14 @@ export type Database = {
           created_at?: string
           current_period_end?: string | null
           current_period_start?: string | null
+          grant_notes?: string | null
+          granted_by?: string | null
           id?: string
           plan_type?: Database["public"]["Enums"]["plan_type"]
           status?: Database["public"]["Enums"]["subscription_status"]
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
+          subscription_source?: string | null
           updated_at?: string
           user_id?: string
         }

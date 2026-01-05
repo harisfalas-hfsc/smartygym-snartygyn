@@ -36,6 +36,7 @@ interface UserData {
   subscription_updated_at?: string | null;
   stripe_customer_id?: string | null;
   stripe_subscription_id?: string | null;
+  subscription_source?: string | null;
 }
 
 interface SubscriptionAction {
@@ -735,9 +736,16 @@ export function UsersManager() {
                       </TableCell>
                       <TableCell className="text-sm">{user.email || 'N/A'}</TableCell>
                       <TableCell>
-                        <Badge variant={getPlanBadgeVariant(user.plan_type)}>
-                          {user.plan_type}
-                        </Badge>
+                        <div className="flex items-center gap-1">
+                          <Badge variant={getPlanBadgeVariant(user.plan_type)}>
+                            {user.plan_type}
+                          </Badge>
+                          {user.subscription_source === 'admin_grant' && (
+                            <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300">
+                              Complimentary
+                            </Badge>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-wrap items-center gap-1">
@@ -786,7 +794,9 @@ export function UsersManager() {
                       <TableCell className="text-sm">
                         {user.current_period_end
                           ? format(new Date(user.current_period_end), 'MMM d, yyyy')
-                          : 'N/A'}
+                          : user.subscription_source === 'admin_grant' && (user.plan_type === 'gold' || user.plan_type === 'platinum')
+                            ? <span className="text-green-600 dark:text-green-400 font-medium">Lifetime</span>
+                            : 'N/A'}
                       </TableCell>
                       <TableCell className="text-sm">
                         {format(new Date(user.created_at), 'MMM d, yyyy')}
