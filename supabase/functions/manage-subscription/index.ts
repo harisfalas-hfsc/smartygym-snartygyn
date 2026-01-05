@@ -82,10 +82,29 @@ serve(async (req) => {
       throw new Error('Cannot modify super admin subscription');
     }
 
-    const now = new Date().toISOString();
+    const now = new Date();
+    const nowISO = now.toISOString();
 
     if (action === 'grant') {
       logStep("Granting subscription", { user_id, plan_type });
+      
+      // Calculate expiration based on plan type
+      // Gold = 1 month, Platinum = 12 months
+      let periodEnd: Date;
+      if (plan_type === 'gold') {
+        periodEnd = new Date(now);
+        periodEnd.setMonth(periodEnd.getMonth() + 1);
+      } else {
+        // Platinum = 12 months
+        periodEnd = new Date(now);
+        periodEnd.setFullYear(periodEnd.getFullYear() + 1);
+      }
+      
+      logStep("Calculated expiration", { 
+        plan_type, 
+        duration: plan_type === 'gold' ? '1 month' : '12 months',
+        expires: periodEnd.toISOString() 
+      });
       
       const { error: upsertError } = await supabaseAdmin
         .from('user_subscriptions')
@@ -93,14 +112,14 @@ serve(async (req) => {
           user_id,
           plan_type: plan_type,
           status: 'active',
-          current_period_start: now,
-          current_period_end: null, // No expiry for manual grants
-          cancel_at_period_end: false,
+          current_period_start: nowISO,
+          current_period_end: periodEnd.toISOString(), // Expires based on plan duration
+          cancel_at_period_end: true, // Will not auto-renew
           stripe_customer_id: null,
           stripe_subscription_id: null,
           subscription_source: 'admin_grant',
           granted_by: user.id,
-          updated_at: now
+          updated_at: nowISO
         }, { 
           onConflict: 'user_id',
           ignoreDuplicates: false 
@@ -111,11 +130,13 @@ serve(async (req) => {
         throw new Error(`Failed to grant subscription: ${upsertError.message}`);
       }
 
-      logStep("Subscription granted successfully");
+      const durationText = plan_type === 'gold' ? '1 month' : '12 months';
+      logStep("Subscription granted successfully", { expires: periodEnd.toISOString() });
       return new Response(
         JSON.stringify({ 
           success: true, 
-          message: `${plan_type.charAt(0).toUpperCase() + plan_type.slice(1)} subscription granted successfully` 
+          message: `${plan_type.charAt(0).toUpperCase() + plan_type.slice(1)} subscription granted for ${durationText} (expires ${periodEnd.toLocaleDateString()})`,
+          expires: periodEnd.toISOString()
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
@@ -130,9 +151,9 @@ serve(async (req) => {
           user_id,
           plan_type: 'free',
           status: 'canceled',
-          current_period_end: now,
+          current_period_end: nowISO,
           cancel_at_period_end: false,
-          updated_at: now
+          updated_at: nowISO
         }, { 
           onConflict: 'user_id',
           ignoreDuplicates: false 

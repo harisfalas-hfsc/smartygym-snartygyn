@@ -142,6 +142,16 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
         purchases?.map(p => `${p.content_type}:${p.content_id}`) || []
       );
 
+      // Check if user is an admin (admins bypass all access locks)
+      const { data: adminRole } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .maybeSingle();
+      
+      const isAdmin = !!adminRole;
+
       // Check if user is a corporate admin (has active corporate subscription)
       const { data: corpAdmin } = await supabase
         .from('corporate_subscriptions')
@@ -172,11 +182,12 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
       // User is premium if they have:
       // 1. Gold or Platinum plan with active status, OR
       // 2. Active corporate admin subscription, OR
-      // 3. Active corporate member status
+      // 3. Active corporate member status, OR
+      // 4. Admin role (admins bypass all access locks)
       const isPersonalPremium = dbData?.status === 'active' && 
                          (dbData?.plan_type === 'gold' || dbData?.plan_type === 'platinum');
       const isCorporatePremium = !!corpAdmin || isCorporateMemberActive;
-      const isPremium = isPersonalPremium || isCorporatePremium;
+      const isPremium = isPersonalPremium || isCorporatePremium || isAdmin;
       
       setState({
         user,
