@@ -224,3 +224,6 @@ verify_jwt = false
 
 [functions.send-direct-coach-email]
 verify_jwt = true
+
+[functions.expire-subscriptions]
+verify_jwt = false
