@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { InfoRibbon } from "@/components/InfoRibbon";
-import { ArrowLeft, Dumbbell, Flame, Zap, Heart, Move, Activity, CalendarCheck, Flower2, RefreshCw } from "lucide-react";
+import { ArrowLeft, Dumbbell, Flame, Zap, Heart, Move, Activity, CalendarCheck, Flower2, RefreshCw, Timer } from "lucide-react";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { generateBreadcrumbSchema } from "@/utils/seoHelpers";
 import { useAccessControl } from "@/hooks/useAccessControl";
@@ -102,6 +102,7 @@ const WorkoutFlow = () => {
     "challenge": "/images/workouts/challenge-category-bg.jpg",
     "pilates": "/images/workouts/pilates-category-bg.jpg",
     "recovery": "/images/workouts/recovery-category-bg.jpg",
+    "micro-workouts": "/images/workouts/micro-workouts-category-bg.jpg",
   };
 
   // Extended descriptions for mobile carousel
@@ -115,6 +116,7 @@ const WorkoutFlow = () => {
     "challenge": "Push beyond your comfort zone with gamification-style workouts. Challenge yourself to break personal boundaries and discover your true potential.",
     "pilates": "Controlled movements focused on core strength, spinal alignment, and body awareness. Develop stability and flexibility through precise technique.",
     "recovery": "Active recovery and regeneration sessions designed to help your body repair and rebuild. Essential for long-term performance and injury prevention.",
+    "micro-workouts": "No time for a run or a trip to the gym? Exercise 'snacks' are the answer. All you need is some stairs, a chair, a wall or just your body and 5 minutes away from your desk or sofa!",
   };
 
   const workoutTypes = [{
@@ -180,6 +182,13 @@ const WorkoutFlow = () => {
     icon: RefreshCw,
     level: "All Levels",
     equipment: "Various"
+  }, {
+    id: "micro-workouts",
+    title: "Micro-Workouts",
+    description: "Get fit in 5 minutes with quick exercise snacks",
+    icon: Timer,
+    level: "All Levels",
+    equipment: "Bodyweight/Minimal"
   }];
 
   const handleWorkoutSelect = (workoutId: string) => {
@@ -227,7 +236,8 @@ const WorkoutFlow = () => {
                 { "@type": "ListItem", "position": 5, "name": "Cardio Workouts", "url": "https://smartygym.com/workout/cardio" },
                 { "@type": "ListItem", "position": 6, "name": "Mobility & Stability", "url": "https://smartygym.com/workout/mobility" },
                 { "@type": "ListItem", "position": 7, "name": "Challenge Workouts", "url": "https://smartygym.com/workout/challenge" },
-                { "@type": "ListItem", "position": 8, "name": "Pilates Workouts", "url": "https://smartygym.com/workout/pilates" }
+                { "@type": "ListItem", "position": 8, "name": "Pilates Workouts", "url": "https://smartygym.com/workout/pilates" },
+                { "@type": "ListItem", "position": 9, "name": "Micro-Workouts", "url": "https://smartygym.com/workout/micro-workouts" }
               ]
             },
             "author": { "@type": "Person", "name": "Haris Falas", "jobTitle": "Sports Scientist" },

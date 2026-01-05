@@ -46,7 +46,8 @@ export const WORKOUT_CATEGORIES = [
   'Cardio',
   'Mobility and Stability',
   'Challenge',
-  'Recovery'
+  'Recovery',
+  'Micro-Workouts'
 ] as const;
 
 export const PROGRAM_CATEGORIES = [
