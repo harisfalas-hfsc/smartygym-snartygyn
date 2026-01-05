@@ -34,13 +34,35 @@ import { OfflineBanner } from "@/components/OfflineBanner";
 export default function AdminBackoffice() {
   const navigate = useNavigate();
   const { isAdmin, loading } = useAdminRole();
-  const [activeTab, setActiveTab] = useState("content");
+  const [activeTab, setActiveTab] = useState<string | null>(null);
   const [contentInnerTab, setContentInnerTab] = useState("workouts");
   const [showWorkoutDialog, setShowWorkoutDialog] = useState(false);
   const [showProgramDialog, setShowProgramDialog] = useState(false);
   const [showRitualDialog, setShowRitualDialog] = useState(false);
   const [newContactCount, setNewContactCount] = useState(0);
   const { isOffline } = useNetworkStatus();
+
+  // Admin sections configuration with colorful icons
+  const adminSections = [
+    { id: "content", label: "Content", description: "Workouts, programs & rituals", icon: Folder, color: "text-blue-500", bgColor: "bg-blue-500/10" },
+    { id: "community", label: "Community", description: "Moderation & comments", icon: Users, color: "text-purple-500", bgColor: "bg-purple-500/10" },
+    { id: "contact", label: "Contact", description: "User messages & support", icon: Inbox, color: "text-red-500", bgColor: "bg-red-500/10", badge: newContactCount },
+    { id: "communications", label: "Auto-Messages", description: "Automated notifications", icon: MessageSquare, color: "text-green-500", bgColor: "bg-green-500/10" },
+    { id: "email", label: "Email", description: "Campaigns & templates", icon: Mail, color: "text-amber-500", bgColor: "bg-amber-500/10" },
+    { id: "cron-jobs", label: "Cron Jobs", description: "Scheduled tasks", icon: Clock, color: "text-cyan-500", bgColor: "bg-cyan-500/10" },
+    { id: "users", label: "Users", description: "User management", icon: Users, color: "text-indigo-500", bgColor: "bg-indigo-500/10" },
+    { id: "corporate", label: "Corporate", description: "Business accounts", icon: Building2, color: "text-emerald-500", bgColor: "bg-emerald-500/10" },
+    { id: "blog", label: "Blog", description: "Articles & posts", icon: BookOpen, color: "text-orange-500", bgColor: "bg-orange-500/10" },
+    { id: "marketing", label: "Marketing", description: "Campaigns & promos", icon: Megaphone, color: "text-pink-500", bgColor: "bg-pink-500/10" },
+    { id: "analytics", label: "Analytics", description: "Stats & reports", icon: BarChart3, color: "text-violet-500", bgColor: "bg-violet-500/10" },
+    { id: "social", label: "Social", description: "Social media tracking", icon: TrendingUp, color: "text-sky-500", bgColor: "bg-sky-500/10" },
+    { id: "settings", label: "Settings", description: "System configuration", icon: Settings, color: "text-slate-500", bgColor: "bg-slate-500/10" },
+    { id: "notification-history", label: "Notifications", description: "Push notification logs", icon: Bell, color: "text-yellow-500", bgColor: "bg-yellow-500/10" },
+    { id: "shop", label: "Shop", description: "Products & orders", icon: ShoppingBag, color: "text-rose-500", bgColor: "bg-rose-500/10" },
+    { id: "exercise-library", label: "Exercise Library", description: "Video tutorials", icon: Video, color: "text-teal-500", bgColor: "bg-teal-500/10" },
+    { id: "docs", label: "Docs", description: "Documentation", icon: FileText, color: "text-lime-600", bgColor: "bg-lime-500/10" },
+    { id: "smartygym-app", label: "SmartyGym App", description: "App vault & settings", icon: Smartphone, color: "text-fuchsia-500", bgColor: "bg-fuchsia-500/10" },
+  ];
 
   useEffect(() => {
     if (isAdmin) {
@@ -212,106 +234,51 @@ export default function AdminBackoffice() {
         </div>
 
         {/* Main Content */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="h-auto p-1 sm:p-2 flex flex-nowrap overflow-x-auto gap-0.5 sm:gap-1 bg-background border border-border rounded-lg scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent justify-start min-w-full scroll-smooth" style={{ scrollbarWidth: 'thin' }}>
-            <TabsTrigger value="content" className="flex items-center justify-center gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-2.5 whitespace-nowrap flex-shrink-0">
-              <Folder className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
-              <span>Content</span>
-            </TabsTrigger>
-            
-            <TabsTrigger value="community" className="flex items-center justify-center gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-2.5 whitespace-nowrap flex-shrink-0">
-              <Users className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
-              <span className="hidden sm:inline">Community</span>
-            </TabsTrigger>
-            
-            <TabsTrigger value="contact" className="flex items-center justify-center gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-2.5 whitespace-nowrap flex-shrink-0 relative">
-              <Inbox className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
-              <span className="hidden sm:inline">Contact</span>
-              {newContactCount > 0 && (
-                <Badge variant="destructive" className="absolute -top-0.5 -right-0.5 h-3 w-3 sm:h-4 sm:w-4 rounded-full p-0 flex items-center justify-center text-[8px] sm:text-[10px]">
-                  {newContactCount}
-                </Badge>
-              )}
-            </TabsTrigger>
-            
-            <TabsTrigger value="communications" className="flex items-center justify-center gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-2.5 whitespace-nowrap flex-shrink-0">
-              <MessageSquare className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
-              <span className="hidden sm:inline">Auto-Messages</span>
-            </TabsTrigger>
-            
-            <TabsTrigger value="email" className="flex items-center justify-center gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-2.5 whitespace-nowrap flex-shrink-0">
-              <Mail className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
-              <span className="hidden sm:inline">Email</span>
-            </TabsTrigger>
-            
-            <TabsTrigger value="cron-jobs" className="flex items-center justify-center gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-2.5 whitespace-nowrap flex-shrink-0">
-              <Clock className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
-              <span className="hidden sm:inline">Cron Jobs</span>
-            </TabsTrigger>
-            
-            <TabsTrigger value="users" className="flex items-center justify-center gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-2.5 whitespace-nowrap flex-shrink-0">
-              <Users className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
-              <span className="hidden sm:inline">Users</span>
-            </TabsTrigger>
-            
-            <TabsTrigger value="corporate" className="flex items-center justify-center gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-2.5 whitespace-nowrap flex-shrink-0">
-              <Building2 className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
-              <span className="hidden sm:inline">Corporate</span>
-            </TabsTrigger>
-            
-            <TabsTrigger value="blog" className="flex items-center justify-center gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-2.5 whitespace-nowrap flex-shrink-0">
-              <BookOpen className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
-              <span className="hidden sm:inline">Blog</span>
-            </TabsTrigger>
-            
-            <TabsTrigger value="marketing" className="flex items-center justify-center gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-2.5 whitespace-nowrap flex-shrink-0">
-              <Megaphone className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
-              <span className="hidden sm:inline">Marketing</span>
-            </TabsTrigger>
-            
-            <TabsTrigger value="analytics" className="flex items-center justify-center gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-2.5 whitespace-nowrap flex-shrink-0">
-              <BarChart3 className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
-              <span className="hidden sm:inline">Analytics</span>
-            </TabsTrigger>
-            
-            <TabsTrigger value="social" className="flex items-center justify-center gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-2.5 whitespace-nowrap flex-shrink-0">
-              <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
-              <span className="hidden sm:inline">Social</span>
-            </TabsTrigger>
-            
-            <TabsTrigger value="settings" className="flex items-center justify-center gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-2.5 whitespace-nowrap flex-shrink-0">
-              <Settings className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
-              <span className="hidden sm:inline">Settings</span>
-            </TabsTrigger>
+        {activeTab === null ? (
+          /* Grid Navigation View */
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+            {adminSections.map((section) => {
+              const IconComponent = section.icon;
+              return (
+                <Card 
+                  key={section.id}
+                  onClick={() => setActiveTab(section.id)}
+                  className="cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all duration-200 group relative"
+                >
+                  <CardContent className="p-4 sm:p-6 flex flex-col items-center text-center gap-2 sm:gap-3">
+                    <div className={`p-3 sm:p-4 rounded-full ${section.bgColor} group-hover:scale-110 transition-transform duration-200`}>
+                      <IconComponent className={`h-6 w-6 sm:h-8 sm:w-8 ${section.color}`} />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-sm sm:text-base">{section.label}</h3>
+                      <p className="text-xs text-muted-foreground hidden sm:block mt-1">
+                        {section.description}
+                      </p>
+                    </div>
+                    {section.badge && section.badge > 0 && (
+                      <Badge variant="destructive" className="absolute top-2 right-2">
+                        {section.badge} new
+                      </Badge>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        ) : (
+          /* Section Content View */
+          <div>
+            <Button 
+              variant="ghost" 
+              onClick={() => setActiveTab(null)}
+              className="mb-4 gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to sections
+            </Button>
 
-            <TabsTrigger value="notification-history" className="flex items-center justify-center gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-2.5 whitespace-nowrap flex-shrink-0">
-              <Bell className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
-              <span className="hidden sm:inline">Notifications</span>
-            </TabsTrigger>
-
-            <TabsTrigger value="shop" className="flex items-center justify-center gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-2.5 whitespace-nowrap flex-shrink-0">
-              <ShoppingBag className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
-              <span className="hidden sm:inline">Shop</span>
-            </TabsTrigger>
-
-            <TabsTrigger value="exercise-library" className="flex items-center justify-center gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-2.5 whitespace-nowrap flex-shrink-0">
-              <Video className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
-              <span className="hidden sm:inline">Exercise Library</span>
-            </TabsTrigger>
-
-            <TabsTrigger value="docs" className="flex items-center justify-center gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-2.5 whitespace-nowrap flex-shrink-0">
-              <FileText className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
-              <span className="hidden sm:inline">Docs</span>
-            </TabsTrigger>
-
-            <TabsTrigger value="smartygym-app" className="flex items-center justify-center gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-2.5 whitespace-nowrap flex-shrink-0">
-              <Smartphone className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
-              <span className="hidden sm:inline">SmartyGym App</span>
-            </TabsTrigger>
-          </TabsList>
-
-          <div className="mt-6">
-            <TabsContent value="content" className="mt-0">
+            {/* Content Section */}
+            {activeTab === "content" && (
               <ContentManager 
                 externalWorkoutDialog={showWorkoutDialog}
                 setExternalWorkoutDialog={setShowWorkoutDialog}
@@ -321,9 +288,10 @@ export default function AdminBackoffice() {
                 setExternalRitualDialog={setShowRitualDialog}
                 activeInnerTab={contentInnerTab}
               />
-            </TabsContent>
+            )}
 
-            <TabsContent value="community" className="mt-0">
+            {/* Community Section */}
+            {activeTab === "community" && (
               <Tabs defaultValue="moderation" className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="moderation">Moderation</TabsTrigger>
@@ -336,86 +304,70 @@ export default function AdminBackoffice() {
                   <CommentModerationPanel />
                 </TabsContent>
               </Tabs>
-            </TabsContent>
+            )}
 
-            <TabsContent value="contact" className="mt-0">
-              <ContactManager />
-            </TabsContent>
+            {/* Contact Section */}
+            {activeTab === "contact" && <ContactManager />}
 
-            <TabsContent value="communications" className="mt-0">
-              <CommunicationsManager />
-            </TabsContent>
+            {/* Communications Section */}
+            {activeTab === "communications" && <CommunicationsManager />}
 
-            <TabsContent value="email" className="mt-0">
-              <EmailManager />
-            </TabsContent>
+            {/* Email Section */}
+            {activeTab === "email" && <EmailManager />}
 
-            <TabsContent value="cron-jobs" className="mt-0">
-              <CronJobsManager />
-            </TabsContent>
+            {/* Cron Jobs Section */}
+            {activeTab === "cron-jobs" && <CronJobsManager />}
 
-            <TabsContent value="users" className="mt-0">
-              <UsersManager />
-            </TabsContent>
+            {/* Users Section */}
+            {activeTab === "users" && <UsersManager />}
 
-            <TabsContent value="corporate" className="mt-0">
-              <CorporateDashboard />
-            </TabsContent>
+            {/* Corporate Section */}
+            {activeTab === "corporate" && <CorporateDashboard />}
 
-            <TabsContent value="blog" className="mt-0">
-              <BlogManager />
-            </TabsContent>
+            {/* Blog Section */}
+            {activeTab === "blog" && <BlogManager />}
 
-            <TabsContent value="marketing" className="mt-0">
-              <MarketingManager />
-            </TabsContent>
+            {/* Marketing Section */}
+            {activeTab === "marketing" && <MarketingManager />}
 
-            <TabsContent value="analytics" className="mt-0">
-              <AnalyticsDashboard />
-            </TabsContent>
+            {/* Analytics Section */}
+            {activeTab === "analytics" && <AnalyticsDashboard />}
 
-            <TabsContent value="social" className="mt-0">
-              <SocialMediaAnalytics />
-            </TabsContent>
+            {/* Social Section */}
+            {activeTab === "social" && <SocialMediaAnalytics />}
 
-            <TabsContent value="settings" className="mt-0">
-              <SettingsManager />
-            </TabsContent>
+            {/* Settings Section */}
+            {activeTab === "settings" && <SettingsManager />}
 
-            <TabsContent value="notification-history" className="mt-0">
-              <NotificationHistoryManager />
-            </TabsContent>
+            {/* Notification History Section */}
+            {activeTab === "notification-history" && <NotificationHistoryManager />}
 
-            <TabsContent value="shop" className="mt-0">
+            {/* Shop Section */}
+            {activeTab === "shop" && (
               <Tabs defaultValue="products" className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="products">Products</TabsTrigger>
                   <TabsTrigger value="orders">Orders</TabsTrigger>
                 </TabsList>
-                
                 <TabsContent value="products" className="mt-4">
                   <ShopManager />
                 </TabsContent>
-                
                 <TabsContent value="orders" className="mt-4">
                   <ShopOrdersManager />
                 </TabsContent>
               </Tabs>
-            </TabsContent>
+            )}
 
-            <TabsContent value="exercise-library" className="mt-0">
-              <ExerciseLibraryManager />
-            </TabsContent>
+            {/* Exercise Library Section */}
+            {activeTab === "exercise-library" && <ExerciseLibraryManager />}
 
-            <TabsContent value="docs" className="mt-0">
-              <AdminDocumentationManager />
-            </TabsContent>
+            {/* Docs Section */}
+            {activeTab === "docs" && <AdminDocumentationManager />}
 
-            <TabsContent value="smartygym-app" className="mt-0">
-              <SmartyGymAppVault />
-            </TabsContent>
+            {/* SmartyGym App Section */}
+            {activeTab === "smartygym-app" && <SmartyGymAppVault />}
           </div>
-        </Tabs>
+        )}
       </div>
     </div>
   );
