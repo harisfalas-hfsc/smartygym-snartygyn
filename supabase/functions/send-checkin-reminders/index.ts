@@ -131,37 +131,53 @@ serve(async (req: Request) => {
             <head>
               <meta charset="utf-8">
               <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <meta name="x-apple-disable-message-reformatting">
+              <style>
+                @media only screen and (max-width: 600px) {
+                  .email-container { width: 100% !important; padding: 16px !important; }
+                  .email-content { padding: 24px 16px !important; }
+                }
+                img { max-width: 100%; height: auto; }
+              </style>
             </head>
-            <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f5f5f5;">
-              <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-                <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 16px; padding: 40px; text-align: center;">
-                  <img src="https://smartygym.com/smarty-gym-logo.png" alt="SmartyGym" style="height: 60px; margin-bottom: 20px;" />
-                  <p style="color: #29B6D2; font-size: 14px; margin: 0 0 30px 0;">Your Gym Re-imagined. Anywhere, Anytime.</p>
-                  
-                  <h1 style="color: #ffffff; font-size: 24px; margin: 0 0 20px 0;">
-                    ${reminderIcon} ${reminderType === 'morning' ? 'Morning' : 'Night'} Check-in Time!
-                  </h1>
-                  
-                  <div style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 24px; margin: 20px 0; text-align: left;">
-                    <p style="color: #ffffff; font-size: 16px; margin: 0 0 16px 0;">Hey ${userName}!</p>
-                    <p style="color: #cccccc; font-size: 14px; line-height: 1.6; margin: 0 0 16px 0;">
-                      Your ${reminderType} check-in window opens soon at <strong style="color: #29B6D2;">${windowTime}</strong>.
-                    </p>
-                    <p style="color: #cccccc; font-size: 14px; line-height: 1.6; margin: 0;">
-                      Take a moment to track your wellness and keep your streak going!
-                    </p>
-                  </div>
-                  
-                  <a href="https://smartygym.com/userdashboard" style="display: inline-block; background: linear-gradient(135deg, #29B6D2 0%, #1E9CB8 100%); color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 14px; margin: 20px 0;">
-                    Go to Dashboard
-                  </a>
-                  
-                  <p style="color: #888888; font-size: 12px; margin: 30px 0 0 0;">
-                    You're receiving this because you subscribed to check-in reminders.<br/>
-                    <a href="https://smartygym.com/unsubscribe" style="color: #29B6D2;">Unsubscribe</a>
-                  </p>
-                </div>
-              </div>
+            <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f5f5f5; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f5f5f5;">
+                <tr>
+                  <td style="padding: 20px;" class="email-container">
+                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 16px;">
+                      <tr>
+                        <td style="padding: 40px; text-align: center;" class="email-content">
+                          <img src="https://smartygym.com/smarty-gym-logo.png" alt="SmartyGym" style="height: 60px; margin-bottom: 20px; max-width: 100%;" />
+                          <p style="color: #29B6D2; font-size: 14px; margin: 0 0 30px 0;">Your Gym Re-imagined. Anywhere, Anytime.</p>
+                          
+                          <h1 style="color: #ffffff; font-size: 24px; margin: 0 0 20px 0;">
+                            ${reminderIcon} ${reminderType === 'morning' ? 'Morning' : 'Night'} Check-in Time!
+                          </h1>
+                          
+                          <div style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 24px; margin: 20px 0; text-align: left;">
+                            <p style="color: #ffffff; font-size: 16px; margin: 0 0 16px 0;">Hey ${userName}!</p>
+                            <p style="color: #cccccc; font-size: 14px; line-height: 1.6; margin: 0 0 16px 0;">
+                              Your ${reminderType} check-in window opens soon at <strong style="color: #29B6D2;">${windowTime}</strong>.
+                            </p>
+                            <p style="color: #cccccc; font-size: 14px; line-height: 1.6; margin: 0;">
+                              Take a moment to track your wellness and keep your streak going!
+                            </p>
+                          </div>
+                          
+                          <a href="https://smartygym.com/userdashboard" style="display: inline-block; background: linear-gradient(135deg, #29B6D2 0%, #1E9CB8 100%); color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 14px; margin: 20px 0;">
+                            Go to Dashboard
+                          </a>
+                          
+                          <p style="color: #888888; font-size: 12px; margin: 30px 0 0 0;">
+                            You're receiving this because you subscribed to check-in reminders.<br/>
+                            <a href="https://smartygym.com/unsubscribe" style="color: #29B6D2;">Unsubscribe</a>
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
             </body>
             </html>
           `

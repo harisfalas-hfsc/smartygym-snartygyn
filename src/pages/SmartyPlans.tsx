@@ -92,6 +92,9 @@ export default function SmartyPlans() {
       platinum: 'price_1SJ9qGIxQYg9inGKFbgqVRjj'
     };
 
+    // CRITICAL: Open window BEFORE async call to avoid Safari/iOS popup blocker
+    const checkoutWindow = window.open('', '_blank');
+
     try {
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: { 
@@ -102,6 +105,7 @@ export default function SmartyPlans() {
 
       // Handle already subscribed response from backend
       if (data?.hasActiveSubscription) {
+        checkoutWindow?.close();
         toast({
           title: "You're Already Subscribed!",
           description: "You already have an active premium subscription.",
@@ -110,14 +114,20 @@ export default function SmartyPlans() {
         return;
       }
 
-      if (error) throw error;
+      if (error) {
+        checkoutWindow?.close();
+        throw error;
+      }
 
-      if (data?.url) {
-        window.open(data.url, '_blank');
+      if (data?.url && checkoutWindow) {
+        checkoutWindow.location.href = data.url;
         toast({
           title: "Checkout opened",
-          description: "Complete your purchase in the new tab",
+          description: "Complete your purchase in the opened window",
         });
+      } else if (checkoutWindow) {
+        checkoutWindow.close();
+        throw new Error("No checkout URL returned");
       }
     } catch (error) {
       console.error('Error creating checkout:', error);
