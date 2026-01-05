@@ -33,4 +33,15 @@ export const OUR_STRIPE_PRODUCT_IDS = [
   'prod_TiX1jpVVZtLG9C', // Run Your First 5K
   'prod_TiX1ILxJNwxNyv', // 90-Day Shred Challenge
   'prod_TiX1Bj3U8PC1Po', // 90-Day Mass Protocol
+  // Micro-Workouts (5-min premium workouts)
+  'prod_TjopnTQosm7AUQ', // Desk Breaker
+  'prod_TjopExBHYK3UhQ', // Stairway Sprint
+  'prod_Tjopvzgs8icm3z', // Burpee Blitz
+  'prod_TjopTldP5F5Xwf', // Squat Storm
+  'prod_TjopWbmTI878ef', // Climber Chaos
+  'prod_TjopAbpxfOd6sE', // Jump Starter
+  'prod_Tjopn2AbGW0NfY', // Push-Up Power
+  'prod_TjoppqilBxhY6O', // Sofa Surge
+  'prod_Tjop4dLWFq3KND', // Core Crusher
+  'prod_TjopcVZXEkguxn', // Wall Warrior
 ] as const;
