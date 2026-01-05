@@ -381,8 +381,8 @@ const WorkoutDetail = () => {
                 <p className="text-sm sm:text-base text-muted-foreground text-center mb-4">
                   {categoryDescriptions[type || ""]?.description}
                 </p>
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-xs text-muted-foreground">
-                  <span className="italic">
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-xs text-muted-foreground text-center">
+                  <span className="italic text-center">
                     Crafted by{" "}
                     <a href="/coach-profile" className="text-primary font-semibold hover:underline">
                       Haris Falas
@@ -390,7 +390,7 @@ const WorkoutDetail = () => {
                     {" "}BSc, Sport Science
                   </span>
                   <span className="hidden sm:inline">•</span>
-                  <span className="font-medium text-primary">
+                  <span className="font-medium text-primary text-center">
                     {categoryDescriptions[type || ""]?.meta}
                   </span>
                 </div>
