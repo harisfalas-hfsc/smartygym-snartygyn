@@ -6,16 +6,25 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
+function logStep(step: string, details?: Record<string, unknown>) {
+  console.log(`[GENERATE-AD-IMAGE] ${step}`, details ? JSON.stringify(details) : '');
+}
+
 serve(async (req: Request) => {
+  logStep("Function invoked", { method: req.method });
+  
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { prompt, aspectRatio } = await req.json();
+    const body = await req.json();
+    const { prompt, aspectRatio } = body;
+    logStep("Request parsed", { promptLength: prompt?.length, aspectRatio });
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
+      logStep("ERROR: LOVABLE_API_KEY not configured");
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
@@ -112,8 +121,11 @@ YOUR JOB: Create ONLY a beautiful, clean background image showing the ONLINE FIT
     const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
 
     if (!imageUrl) {
+      logStep("ERROR: No image in response");
       throw new Error("No image generated");
     }
+
+    logStep("Image generated successfully", { imageUrlLength: imageUrl.length });
 
     return new Response(
       JSON.stringify({ imageUrl }),
