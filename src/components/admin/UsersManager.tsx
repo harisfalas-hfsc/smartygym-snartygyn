@@ -75,6 +75,7 @@ export function UsersManager() {
   } | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [organizationFilter, setOrganizationFilter] = useState<string>("all");
+  const [sourceFilter, setSourceFilter] = useState<string>("all");
   const [organizations, setOrganizations] = useState<string[]>([]);
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
@@ -361,8 +362,17 @@ export function UsersManager() {
       filtered = filtered.filter(user => corporateInfo[user.user_id]?.organizationName === organizationFilter);
     }
 
+    // Source filter
+    if (sourceFilter === "stripe") {
+      filtered = filtered.filter(user => user.stripe_subscription_id);
+    } else if (sourceFilter === "admin_grant") {
+      filtered = filtered.filter(user => user.subscription_source === 'admin_grant');
+    } else if (sourceFilter === "corporate") {
+      filtered = filtered.filter(user => corporateInfo[user.user_id]?.memberPlanType || corporateInfo[user.user_id]?.adminPlanType);
+    }
+
     setFilteredUsers(filtered);
-  }, [searchTerm, planFilter, statusFilter, organizationFilter, users, userPurchases, userRoles, corporateInfo]);
+  }, [searchTerm, planFilter, statusFilter, organizationFilter, sourceFilter, users, userPurchases, userRoles, corporateInfo]);
 
   const exportToCSV = () => {
     const headers = ["User ID", "Name", "Email", "Is Admin", "Plan", "Status", "Period Start", "Period End", "Joined"];
@@ -398,15 +408,23 @@ export function UsersManager() {
       if (user.plan_type === 'platinum') return 'Platinum Subscriber';
     }
     if (hasPurchases) return 'Purchase Only';
-    if (user.status === 'canceled') return 'Expired Subscriber';
+    if (user.status === 'revoked') return 'Revoked';
+    if (user.status === 'canceled' || user.status === 'expired') return 'Expired Subscriber';
     return 'Free User';
   };
 
   const getStatusBadgeVariant = (statusLabel: string) => {
     if (statusLabel.includes('Subscriber') && !statusLabel.includes('Expired')) return 'default';
     if (statusLabel === 'Purchase Only') return 'secondary';
+    if (statusLabel === 'Revoked') return 'outline';  // Orange styling via className
     if (statusLabel === 'Expired Subscriber') return 'destructive';
     return 'outline';
+  };
+
+  const getCorporatePlanLabel = (planType: string | null) => {
+    if (!planType) return 'Unknown';
+    if (planType === 'dynamic') return 'Full Access';
+    return planType.charAt(0).toUpperCase() + planType.slice(1);
   };
 
   const getPlanBadgeVariant = (plan: string) => {
@@ -607,6 +625,17 @@ export function UsersManager() {
               <SelectItem value="corporate_members">Corporate Members</SelectItem>
             </SelectContent>
           </Select>
+          <Select value={sourceFilter} onValueChange={setSourceFilter}>
+            <SelectTrigger className="w-full sm:w-[160px]">
+              <SelectValue placeholder="Source" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Sources</SelectItem>
+              <SelectItem value="stripe">Stripe (Paid)</SelectItem>
+              <SelectItem value="admin_grant">Admin Granted</SelectItem>
+              <SelectItem value="corporate">Corporate</SelectItem>
+            </SelectContent>
+          </Select>
           {organizations.length > 0 && (
             <Select value={organizationFilter} onValueChange={setOrganizationFilter}>
               <SelectTrigger className="w-full sm:w-[200px]">
@@ -736,20 +765,37 @@ export function UsersManager() {
                       </TableCell>
                       <TableCell className="text-sm">{user.email || 'N/A'}</TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-1">
-                          <Badge variant={getPlanBadgeVariant(user.plan_type)}>
-                            {user.plan_type}
-                          </Badge>
-                          {user.subscription_source === 'admin_grant' && (
-                            <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300">
-                              Complimentary
+                        <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-1">
+                          {/* Show corporate platinum badge for corp members instead of personal plan */}
+                          {isCorporateMember && !user.stripe_subscription_id && user.subscription_source !== 'admin_grant' ? (
+                            <Badge className="bg-teal-600 hover:bg-teal-700 text-white">
+                              Platinum (Corporate)
                             </Badge>
+                          ) : (
+                            <>
+                              <Badge variant={getPlanBadgeVariant(user.plan_type)}>
+                                {user.plan_type}
+                              </Badge>
+                              {user.subscription_source === 'admin_grant' && (
+                                <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300">
+                                  Complimentary
+                                </Badge>
+                              )}
+                              {user.stripe_subscription_id && (
+                                <Badge variant="outline" className="text-xs border-green-600 text-green-600">
+                                  Paid
+                                </Badge>
+                              )}
+                            </>
                           )}
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="flex flex-wrap items-center gap-1">
-                          <Badge variant={getStatusBadgeVariant(statusLabel)}>
+                        <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-1">
+                          <Badge 
+                            variant={getStatusBadgeVariant(statusLabel)}
+                            className={statusLabel === 'Revoked' ? 'bg-orange-500 text-white hover:bg-orange-600' : ''}
+                          >
                             {statusLabel}
                           </Badge>
                           {hasPurchases && (
@@ -760,13 +806,16 @@ export function UsersManager() {
                           {isCorporateAdmin && (
                             <>
                               <Badge variant="default" className="text-xs bg-blue-600">
-                                🏢 Corp Admin ({corpInfo.adminPlanType})
+                                🏢 Corp Admin ({getCorporatePlanLabel(corpInfo.adminPlanType)})
                               </Badge>
                               {corpInfo.organizationName && (
                                 <Badge 
                                   variant="outline" 
-                                  className="text-xs border-teal-600 text-teal-600 cursor-pointer hover:bg-teal-50"
-                                  onClick={() => setOrganizationFilter(corpInfo.organizationName!)}
+                                  className="text-xs border-teal-600 text-teal-600 cursor-pointer hover:bg-teal-50 dark:hover:bg-teal-950"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setOrganizationFilter(corpInfo.organizationName!);
+                                  }}
                                 >
                                   🏛️ {corpInfo.organizationName}
                                 </Badge>
@@ -775,14 +824,17 @@ export function UsersManager() {
                           )}
                           {isCorporateMember && (
                             <>
-                              <Badge variant="outline" className="text-xs border-blue-600 text-blue-600">
-                                👥 Corp Member ({corpInfo.memberPlanType})
+                              <Badge className="text-xs bg-teal-600 hover:bg-teal-700 text-white">
+                                👥 Platinum (Corporate)
                               </Badge>
                               {corpInfo.organizationName && (
                                 <Badge 
                                   variant="outline" 
-                                  className="text-xs border-teal-600 text-teal-600 cursor-pointer hover:bg-teal-50"
-                                  onClick={() => setOrganizationFilter(corpInfo.organizationName!)}
+                                  className="text-xs border-teal-600 text-teal-600 cursor-pointer hover:bg-teal-50 dark:hover:bg-teal-950"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setOrganizationFilter(corpInfo.organizationName!);
+                                  }}
                                 >
                                   🏛️ {corpInfo.organizationName}
                                 </Badge>
