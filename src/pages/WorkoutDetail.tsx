@@ -128,7 +128,8 @@ const WorkoutDetail = () => {
     "mobility": "MOBILITY & STABILITY",
     "challenge": "CHALLENGE",
     "pilates": "PILATES",
-    "recovery": "RECOVERY"
+    "recovery": "RECOVERY",
+    "micro-workouts": "MICRO-WORKOUTS"
   };
 
   const workoutTitles: { [key: string]: string } = {
@@ -139,7 +140,48 @@ const WorkoutDetail = () => {
     "mobility": "Mobility & Stability Workouts",
     "challenge": "Challenge Workouts",
     "pilates": "Pilates Workouts",
-    "recovery": "Recovery Workouts"
+    "recovery": "Recovery Workouts",
+    "micro-workouts": "Micro-Workouts"
+  };
+
+  // Category descriptions for the description card
+  const categoryDescriptions: { [key: string]: { description: string; meta: string } } = {
+    "strength": {
+      description: "Build foundational power and muscular endurance with these single-session strength workouts. Whether using bodyweight or equipment, develop the strength that supports all aspects of fitness and daily life.",
+      meta: "Single Session | Beginner-Advanced | Various Durations"
+    },
+    "calorie-burning": {
+      description: "High-intensity interval training formats designed to maximize calorie expenditure. Various workout structures keep you challenged while achieving your fat-burning and metabolic goals.",
+      meta: "Single Session | Beginner-Advanced | Various Durations"
+    },
+    "metabolic": {
+      description: "Boost your metabolic rate with high-intensity conditioning sessions. These workouts are designed to enhance how efficiently your body burns energy, both during and after exercise.",
+      meta: "Single Session | Beginner-Advanced | Various Durations"
+    },
+    "cardio": {
+      description: "Improve cardiovascular endurance and aerobic capacity with dedicated cardio sessions. Build a stronger heart, better stamina, and enhanced endurance for everyday activities.",
+      meta: "Single Session | Beginner-Advanced | Various Durations"
+    },
+    "mobility": {
+      description: "Focus on joint health, mobility, and stability with sessions designed to improve how your joints move and stabilize during dynamic movements. Essential for injury prevention and movement quality.",
+      meta: "Single Session | All Levels | Various Durations"
+    },
+    "challenge": {
+      description: "Push beyond your comfort zone with gamification-style workouts. Challenge yourself to break personal boundaries, test your limits, and discover your true athletic potential.",
+      meta: "Single Session | Intermediate-Advanced | Various Durations"
+    },
+    "pilates": {
+      description: "Controlled movements focused on core strength, spinal alignment, and body awareness. Develop stability, flexibility, and precise body control through focused technique.",
+      meta: "Single Session | Beginner-Advanced | Various Durations"
+    },
+    "recovery": {
+      description: "Active recovery and regeneration sessions designed to help your body repair and rebuild. Essential for long-term performance, injury prevention, and overall wellness.",
+      meta: "Single Session | All Levels | Various Durations"
+    },
+    "micro-workouts": {
+      description: "No time for a run or a trip to the gym? Exercise 'snacks' are the answer. All you need is some stairs, a chair, a wall or just your body and 5 minutes away from your desk or sofa! Get fit in 5 minutes with these life-changing micro-workouts.",
+      meta: "Single Session | All Levels | 5 Minutes"
+    }
   };
 
   const handleWorkoutClick = (workoutId: string) => {
@@ -330,6 +372,32 @@ const WorkoutDetail = () => {
           ]} 
         />
         
+        {/* Category Description Card */}
+        {categoryDescriptions[type || ""] && (
+          <Card className="mb-6 bg-white dark:bg-card border-2 border-primary/40 shadow-primary">
+            <div className="p-4 sm:p-5">
+              <h1 className="text-xl sm:text-2xl font-bold mb-3 text-center">{title}</h1>
+              <div className="max-w-3xl mx-auto">
+                <p className="text-sm sm:text-base text-muted-foreground text-center mb-4">
+                  {categoryDescriptions[type || ""]?.description}
+                </p>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-xs text-muted-foreground">
+                  <span className="italic">
+                    Crafted by{" "}
+                    <a href="/coach-profile" className="text-primary font-semibold hover:underline">
+                      Haris Falas
+                    </a>
+                    {" "}BSc, Sport Science
+                  </span>
+                  <span className="hidden sm:inline">•</span>
+                  <span className="font-medium text-primary">
+                    {categoryDescriptions[type || ""]?.meta}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </Card>
+        )}
         {/* Search Bar */}
         <div className="mb-4">
           <div className="relative">
