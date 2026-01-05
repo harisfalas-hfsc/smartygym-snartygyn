@@ -129,6 +129,33 @@ const TrainingProgramDetail = () => {
     "mobility-stability": "Mobility & Stability Programs"
   };
 
+  const categoryDescriptions: { [key: string]: { description: string; meta: string } } = {
+    "cardio-endurance": {
+      description: "Structured multi-week programs designed to improve your cardiovascular endurance, VO2 max, and both aerobic and anaerobic thresholds. Build a stronger, more efficient heart.",
+      meta: "Multi-Week Program | Beginner-Advanced | 4-8 Weeks"
+    },
+    "functional-strength": {
+      description: "Programs focused on developing the strength every adult needs for better performance in daily life, hobbies, and sports. Real-world strength for real-world demands.",
+      meta: "Multi-Week Program | Beginner-Advanced | 4-8 Weeks"
+    },
+    "muscle-hypertrophy": {
+      description: "Strategic programs designed for muscle growth. Understand the importance of lean muscle mass for metabolism, strength, and long-term health.",
+      meta: "Multi-Week Program | Beginner-Advanced | 4-8 Weeks"
+    },
+    "weight-loss": {
+      description: "Comprehensive programs combining calorie burning, metabolic enhancement, and muscle building. A sustainable approach to losing weight and keeping it off.",
+      meta: "Multi-Week Program | Beginner-Advanced | 4-8 Weeks"
+    },
+    "low-back-pain": {
+      description: "Targeted programs addressing the modern epidemic of low back pain. Whether from office work, tactical jobs, or daily stress, these plans provide relief and prevention.",
+      meta: "Multi-Week Program | All Levels | 4-8 Weeks"
+    },
+    "mobility-stability": {
+      description: "Programs designed to improve joint mobility, stability, and overall movement quality. Essential for injury prevention and optimal physical function.",
+      meta: "Multi-Week Program | All Levels | 4-8 Weeks"
+    }
+  };
+
   const programInfo: { [key: string]: { title: string; content: string } } = {
     "muscle-hypertrophy": {
       title: "Muscle Hypertrophy",
@@ -318,6 +345,33 @@ const TrainingProgramDetail = () => {
             { label: title }
           ]} 
         />
+
+        {/* Category Description Card */}
+        {categoryDescriptions[type || ""] && (
+          <Card className="mb-6 bg-white dark:bg-card border-2 border-primary/40 shadow-primary">
+            <div className="p-4 sm:p-5">
+              <h1 className="text-xl sm:text-2xl font-bold mb-3 text-center">{title}</h1>
+              <div className="max-w-3xl mx-auto">
+                <p className="text-sm sm:text-base text-muted-foreground text-center mb-4">
+                  {categoryDescriptions[type || ""]?.description}
+                </p>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-xs text-muted-foreground text-center">
+                  <span className="italic text-center">
+                    Crafted by{" "}
+                    <a href="/coach-profile" className="text-primary font-semibold hover:underline">
+                      Haris Falas
+                    </a>
+                    {" "}BSc, Sport Science
+                  </span>
+                  <span className="hidden sm:inline">•</span>
+                  <span className="font-medium text-primary text-center">
+                    {categoryDescriptions[type || ""]?.meta}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </Card>
+        )}
         
         {/* Search Bar */}
         <div className="mb-4">
