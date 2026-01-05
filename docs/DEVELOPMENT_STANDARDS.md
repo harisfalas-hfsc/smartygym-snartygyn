@@ -242,4 +242,49 @@ For critical issues:
 
 ---
 
+## 10. Stripe Product Standards (CRITICAL)
+
+### 10.1 SMARTYGYM Metadata (MANDATORY)
+
+**ALL Stripe products MUST include this metadata:**
+
+```typescript
+metadata: {
+  project: "SMARTYGYM",
+  content_type: "..." // Workout, Training Program, Micro-Workout, etc.
+}
+```
+
+**This is NON-NEGOTIABLE.** Without this tag:
+- Revenue reports will be incorrect (mixing with other Stripe projects)
+- Product filtering will fail
+- Customer purchases may not be attributed correctly
+
+### 10.2 When Creating Stripe Products
+
+**ALWAYS use the edge functions:**
+- `create-stripe-product` - for manual product creation
+- `create-individual-purchase-checkout` - for checkout flows
+- `generate-workout-of-day` - for WOD generation with Stripe products
+
+**NEVER use direct Stripe API/MCP tools** without including the metadata.
+
+### 10.3 Verification & Repair
+
+The `fix-stripe-metadata` edge function can audit and fix missing tags:
+- Run with `dryRun: true` to preview what would be fixed
+- Run with `dryRun: false` to apply fixes
+
+The `tag-smartygym-products` function can bulk-tag existing products.
+
+### 10.4 Automatic Monitoring
+
+The system health audit automatically checks for:
+- Stripe products linked to workouts/programs missing SMARTYGYM metadata
+- Missing content_type metadata
+
+Any violations appear as WARNINGS in the daily health report.
+
+---
+
 *This document must be updated when new patterns are established.*
