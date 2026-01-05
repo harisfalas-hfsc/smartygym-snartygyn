@@ -364,11 +364,14 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
             stripeImageUrl = `${window.location.origin}${imageUrl}`;
           }
           
+          // CRITICAL: Set contentType dynamically - Micro-Workouts get "Micro-Workout"
+          const contentType = formData.category === "MICRO-WORKOUTS" ? "Micro-Workout" : "Workout";
+          
           const { data: stripeData, error: stripeError } = await supabase.functions.invoke('create-stripe-product', {
             body: {
               name: formData.name,
               price: formData.price,
-              contentType: "Workout",
+              contentType: contentType,
               imageUrl: stripeImageUrl
             }
           });

@@ -80,7 +80,7 @@ serve(async (req) => {
 
     const { data: workouts, error: workoutsError } = await supabaseClient
       .from("admin_workouts")
-      .select("id, name, stripe_product_id, type")
+      .select("id, name, stripe_product_id, type, category")
       .not("stripe_product_id", "is", null);
 
     if (workoutsError) {
@@ -88,7 +88,7 @@ serve(async (req) => {
     }
     log("Fetched workouts", { count: workouts?.length || 0 });
 
-    // Combine all items
+    // Combine all items - CORRECTLY determine content_type based on category
     const allItems = [
       ...(programs || []).map(p => ({
         id: p.id,
@@ -100,7 +100,8 @@ serve(async (req) => {
         id: w.id,
         name: w.name,
         stripe_product_id: w.stripe_product_id,
-        content_type: w.type || "Workout",
+        // CRITICAL: Micro-workouts must be labeled as "Micro-Workout", not "Workout"
+        content_type: w.type === "MICRO-WORKOUTS" || w.category === "MICRO-WORKOUTS" ? "Micro-Workout" : "Workout",
       })),
     ];
 

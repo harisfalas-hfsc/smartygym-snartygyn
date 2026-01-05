@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import Stripe from "https://esm.sh/stripe@14.21.0";
 import { MESSAGE_TYPES, MESSAGE_TYPE_SOURCES } from "../_shared/notification-types.ts";
 import { CYCLE_START_DATE, PERIODIZATION_84DAY, getDayIn84Cycle, getPeriodizationForDay } from "../_shared/periodization-84day.ts";
 
@@ -1294,52 +1295,116 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // ============================================
-    // CATEGORY 16: STRIPE METADATA INTEGRITY
+    // CATEGORY 16: STRIPE METADATA INTEGRITY (REAL VERIFICATION)
     // ============================================
-    console.log("💳 Checking Stripe metadata integrity...");
+    console.log("💳 Checking Stripe metadata integrity with REAL Stripe API verification...");
 
-    // Get all products with stripe_product_id from workouts and programs
-    const { data: workoutsWithStripe } = await supabase
-      .from('admin_workouts')
-      .select('id, name, stripe_product_id, type')
-      .not('stripe_product_id', 'is', null);
-
-    const { data: programsWithStripe } = await supabase
-      .from('admin_training_programs')
-      .select('id, name, stripe_product_id, category')
-      .not('stripe_product_id', 'is', null);
-
-    const totalStripeProducts = (workoutsWithStripe?.length || 0) + (programsWithStripe?.length || 0);
-
-    if (totalStripeProducts > 0) {
-      // Note: We can't directly query Stripe from here without importing Stripe SDK
-      // The fix-stripe-metadata function handles the actual verification
-      // Here we just report how many products should have metadata
+    const stripeKeyForMetadata = Deno.env.get("STRIPE_SECRET_KEY");
+    
+    if (!stripeKeyForMetadata) {
       addCheck(
         'Stripe Metadata',
-        'Linked Products Count',
-        `${totalStripeProducts} products linked to Stripe`,
-        'pass',
-        `Workouts: ${workoutsWithStripe?.length || 0}, Programs: ${programsWithStripe?.length || 0}. Run fix-stripe-metadata to verify SMARTYGYM tags.`
+        'API Configuration',
+        'STRIPE_SECRET_KEY not configured',
+        'fail',
+        'Cannot verify Stripe product metadata without API key'
       );
     } else {
-      addCheck(
-        'Stripe Metadata',
-        'Linked Products Count',
-        'No products with Stripe links found',
-        'pass',
-        'No verification needed'
-      );
-    }
+      const stripeClient = new Stripe(stripeKeyForMetadata, { apiVersion: "2023-10-16" });
 
-    // Add reminder check for metadata rule
-    addCheck(
-      'Stripe Metadata',
-      'SMARTYGYM Tag Rule',
-      'All Stripe products must have project: "SMARTYGYM" metadata',
-      'pass',
-      'Use fix-stripe-metadata function to audit and fix. This is a MANDATORY requirement per DEVELOPMENT_STANDARDS.md Section 10.'
-    );
+      // Get all products with stripe_product_id from workouts and programs
+      const { data: workoutsWithStripe } = await supabase
+        .from('admin_workouts')
+        .select('id, name, stripe_product_id, type, category')
+        .not('stripe_product_id', 'is', null);
+
+      const { data: programsWithStripe } = await supabase
+        .from('admin_training_programs')
+        .select('id, name, stripe_product_id, category')
+        .not('stripe_product_id', 'is', null);
+
+      const totalStripeProducts = (workoutsWithStripe?.length || 0) + (programsWithStripe?.length || 0);
+
+      if (totalStripeProducts === 0) {
+        addCheck(
+          'Stripe Metadata',
+          'Linked Products Count',
+          'No products with Stripe links found',
+          'pass',
+          'No verification needed'
+        );
+      } else {
+        // Actually verify Stripe products have SMARTYGYM metadata
+        let missingMetadata: string[] = [];
+        let correctMetadata = 0;
+        let verificationErrors: string[] = [];
+
+        // Check workouts
+        for (const workout of (workoutsWithStripe || [])) {
+          try {
+            const product = await stripeClient.products.retrieve(workout.stripe_product_id);
+            if (product.metadata?.project === "SMARTYGYM") {
+              correctMetadata++;
+            } else {
+              missingMetadata.push(`Workout: ${workout.name}`);
+            }
+          } catch (err: any) {
+            verificationErrors.push(`${workout.name}: ${err.message}`);
+          }
+        }
+
+        // Check programs
+        for (const program of (programsWithStripe || [])) {
+          try {
+            const product = await stripeClient.products.retrieve(program.stripe_product_id);
+            if (product.metadata?.project === "SMARTYGYM") {
+              correctMetadata++;
+            } else {
+              missingMetadata.push(`Program: ${program.name}`);
+            }
+          } catch (err: any) {
+            verificationErrors.push(`${program.name}: ${err.message}`);
+          }
+        }
+
+        // Report results
+        addCheck(
+          'Stripe Metadata',
+          'Linked Products Count',
+          `${totalStripeProducts} products linked to Stripe`,
+          'pass',
+          `Workouts: ${workoutsWithStripe?.length || 0}, Programs: ${programsWithStripe?.length || 0}`
+        );
+
+        if (missingMetadata.length === 0 && verificationErrors.length === 0) {
+          addCheck(
+            'Stripe Metadata',
+            'SMARTYGYM Tag Verification',
+            `All ${correctMetadata} products have correct metadata`,
+            'pass',
+            'All Stripe products are correctly tagged with project: "SMARTYGYM"'
+          );
+        } else if (missingMetadata.length > 0) {
+          addCheck(
+            'Stripe Metadata',
+            'SMARTYGYM Tag Verification',
+            `${missingMetadata.length} products MISSING SMARTYGYM metadata`,
+            'fail',
+            `MISSING: ${missingMetadata.slice(0, 5).join(', ')}${missingMetadata.length > 5 ? ` and ${missingMetadata.length - 5} more` : ''}. Run fix-stripe-metadata function to fix.`
+          );
+        }
+
+        if (verificationErrors.length > 0) {
+          addCheck(
+            'Stripe Metadata',
+            'Verification Errors',
+            `${verificationErrors.length} products could not be verified`,
+            'warning',
+            `Errors: ${verificationErrors.slice(0, 3).join('; ')}${verificationErrors.length > 3 ? '...' : ''}`
+          );
+        }
+      }
+    }
 
     // ============================================
     // COMPILE RESULTS
