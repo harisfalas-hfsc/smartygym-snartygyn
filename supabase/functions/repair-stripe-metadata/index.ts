@@ -51,8 +51,8 @@ serve(async (req) => {
 
     logStep("Starting automatic Stripe metadata repair");
 
-    // Fetch all workouts with stripe_product_id
-    const { data: workouts, error: workoutsError } = await supabase
+    // Fetch ALL workouts (including those with NULL stripe_product_id to create products for them)
+    const { data: workoutsWithId, error: workoutsError } = await supabase
       .from("admin_workouts")
       .select("id, name, stripe_product_id, stripe_price_id, type, category, is_workout_of_day, image_url, price, description")
       .not("stripe_product_id", "is", null);
@@ -61,8 +61,19 @@ serve(async (req) => {
       throw new Error(`Failed to fetch workouts: ${workoutsError.message}`);
     }
 
-    // Fetch all programs with stripe_product_id
-    const { data: programs, error: programsError } = await supabase
+    // Fetch workouts with NULL stripe_product_id (need to create products)
+    const { data: workoutsWithoutId, error: workoutsNullError } = await supabase
+      .from("admin_workouts")
+      .select("id, name, stripe_product_id, stripe_price_id, type, category, is_workout_of_day, image_url, price, description, is_standalone_purchase")
+      .is("stripe_product_id", null)
+      .eq("is_standalone_purchase", true);
+
+    if (workoutsNullError) {
+      throw new Error(`Failed to fetch workouts without stripe: ${workoutsNullError.message}`);
+    }
+
+    // Fetch ALL programs (including those with NULL stripe_product_id)
+    const { data: programsWithId, error: programsError } = await supabase
       .from("admin_training_programs")
       .select("id, name, stripe_product_id, stripe_price_id, category, image_url, price, description")
       .not("stripe_product_id", "is", null);
@@ -71,20 +82,141 @@ serve(async (req) => {
       throw new Error(`Failed to fetch programs: ${programsError.message}`);
     }
 
+    // Fetch programs with NULL stripe_product_id (need to create products)
+    const { data: programsWithoutId, error: programsNullError } = await supabase
+      .from("admin_training_programs")
+      .select("id, name, stripe_product_id, stripe_price_id, category, image_url, price, description, is_standalone_purchase")
+      .is("stripe_product_id", null)
+      .eq("is_standalone_purchase", true);
+
+    if (programsNullError) {
+      throw new Error(`Failed to fetch programs without stripe: ${programsNullError.message}`);
+    }
+
+    const workouts = workoutsWithId || [];
+    const programs = programsWithId || [];
+    const workoutsNeedingProduct = workoutsWithoutId || [];
+    const programsNeedingProduct = programsWithoutId || [];
+
     logStep("Fetched items", { 
-      workouts: workouts?.length || 0, 
-      programs: programs?.length || 0 
+      workoutsWithStripe: workouts.length, 
+      workoutsNeedingProduct: workoutsNeedingProduct.length,
+      programsWithStripe: programs.length,
+      programsNeedingProduct: programsNeedingProduct.length
     });
 
     const results = {
       fixed: 0,
       alreadyCorrect: 0,
       recreated: 0,
+      created: 0,
       errors: [] as string[],
       details: [] as { name: string; action: string; productId: string }[]
     };
 
-    // Process workouts
+    // PHASE 1: Create products for workouts that have NULL stripe_product_id
+    for (const workout of workoutsNeedingProduct) {
+      try {
+        const contentType = getContentType(workout, false);
+        logStep(`Creating NEW product for workout`, { name: workout.name });
+        
+        const newProduct = await stripe.products.create({
+          name: workout.name,
+          description: workout.description || `${workout.category || workout.type} Workout`,
+          images: workout.image_url ? [workout.image_url] : [],
+          metadata: {
+            project: "SMARTYGYM",
+            content_type: contentType,
+            content_id: workout.id
+          }
+        });
+
+        const newPrice = await stripe.prices.create({
+          product: newProduct.id,
+          unit_amount: Math.round((workout.price || 3.99) * 100),
+          currency: "eur"
+        });
+
+        const { error: updateError } = await supabase
+          .from("admin_workouts")
+          .update({
+            stripe_product_id: newProduct.id,
+            stripe_price_id: newPrice.id
+          })
+          .eq("id", workout.id);
+
+        if (updateError) {
+          results.errors.push(`Failed to update DB for new ${workout.name}: ${updateError.message}`);
+        } else {
+          results.created++;
+          results.details.push({
+            name: workout.name,
+            action: "created_new",
+            productId: newProduct.id
+          });
+          logStep(`Created NEW product`, { 
+            name: workout.name, 
+            productId: newProduct.id,
+            priceId: newPrice.id
+          });
+        }
+      } catch (err: any) {
+        results.errors.push(`New Workout ${workout.name}: ${err.message}`);
+        logStep(`Error creating workout product`, { name: workout.name, error: err.message });
+      }
+    }
+
+    // PHASE 2: Create products for programs that have NULL stripe_product_id
+    for (const program of programsNeedingProduct) {
+      try {
+        logStep(`Creating NEW product for program`, { name: program.name });
+        
+        const newProduct = await stripe.products.create({
+          name: program.name,
+          description: program.description || `${program.category} Training Program`,
+          images: program.image_url ? [program.image_url] : [],
+          metadata: {
+            project: "SMARTYGYM",
+            content_type: "Training Program",
+            content_id: program.id
+          }
+        });
+
+        const newPrice = await stripe.prices.create({
+          product: newProduct.id,
+          unit_amount: Math.round((program.price || 9.99) * 100),
+          currency: "eur"
+        });
+
+        const { error: updateError } = await supabase
+          .from("admin_training_programs")
+          .update({
+            stripe_product_id: newProduct.id,
+            stripe_price_id: newPrice.id
+          })
+          .eq("id", program.id);
+
+        if (updateError) {
+          results.errors.push(`Failed to update DB for new program ${program.name}: ${updateError.message}`);
+        } else {
+          results.created++;
+          results.details.push({
+            name: program.name,
+            action: "created_new",
+            productId: newProduct.id
+          });
+          logStep(`Created NEW program product`, { 
+            name: program.name, 
+            productId: newProduct.id
+          });
+        }
+      } catch (err: any) {
+        results.errors.push(`New Program ${program.name}: ${err.message}`);
+        logStep(`Error creating program product`, { name: program.name, error: err.message });
+      }
+    }
+
+    // PHASE 3: Process workouts that already have stripe_product_id (fix metadata/recreate)
     for (const workout of (workouts || [])) {
       try {
         const contentType = getContentType(workout, false);
@@ -178,7 +310,7 @@ serve(async (req) => {
       }
     }
 
-    // Process programs
+    // PHASE 4: Process programs that already have stripe_product_id (fix metadata/recreate)
     for (const program of (programs || [])) {
       try {
         const contentType = "Training Program";
@@ -268,6 +400,7 @@ serve(async (req) => {
     
     logStep("Repair complete", {
       duration_ms: duration,
+      created: results.created,
       fixed: results.fixed,
       recreated: results.recreated,
       alreadyCorrect: results.alreadyCorrect,
@@ -278,6 +411,7 @@ serve(async (req) => {
       JSON.stringify({
         success: true,
         duration_ms: duration,
+        created: results.created,
         fixed: results.fixed,
         recreated: results.recreated,
         alreadyCorrect: results.alreadyCorrect,
