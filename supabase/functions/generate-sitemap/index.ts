@@ -45,10 +45,10 @@ serve(async (req) => {
       { loc: '/privacy', priority: '0.3', changefreq: 'yearly' },
     ];
 
-    // Workout category pages
+    // Workout category pages (including micro-workouts)
     const workoutCategories = [
       'strength', 'calorie-burning', 'metabolic', 'cardio', 
-      'mobility', 'challenge', 'pilates', 'recovery'
+      'mobility', 'challenge', 'pilates', 'recovery', 'micro-workouts'
     ];
     
     // Program category pages
@@ -110,9 +110,11 @@ serve(async (req) => {
             ? new Date(workout.created_at).toISOString().split('T')[0]
             : now;
         
-        // Generate SEO-optimized alt text for image
-        const imageAlt = `${workout.name} - ${workout.difficulty || 'Professional'} ${workout.format || ''} ${workout.category || ''} workout by Haris Falas | SmartyGym`.trim();
-        const imageCaption = `${workout.duration || ''} ${workout.equipment || ''} workout designed by Sports Scientist Haris Falas`.trim();
+        // Generate SEO-optimized alt text for image with micro-workout enhancements
+        const isMicroWorkout = workout.category?.toLowerCase().includes('micro');
+        const microKeywords = isMicroWorkout ? '5 minute workout - quick exercise snack - office workout - desk workout - ' : '';
+        const imageAlt = `${workout.name} - ${microKeywords}${workout.difficulty || 'Professional'} ${workout.format || ''} ${workout.category || ''} workout by Sports Scientist Haris Falas | SmartyGym.com`.trim();
+        const imageCaption = `${microKeywords}${workout.duration || ''} ${workout.equipment || ''} ${isMicroWorkout ? 'micro-workout - mini workout - small workout - ' : ''}designed by Sports Scientist Haris Falas - smartygym.com`.trim();
         
         let urlEntry = `
   <url>

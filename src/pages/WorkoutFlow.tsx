@@ -200,7 +200,7 @@ const WorkoutFlow = () => {
       <Helmet>
         <title>Online Workouts | AMRAP TABATA HIIT Strength Cardio | Haris Falas | SmartyGym</title>
         <meta name="description" content="500+ online gym workouts at smartygym.com. AMRAP, TABATA, HIIT, circuit training, strength, cardio, metabolic, mobility workouts by Sports Scientist Haris Falas. Home workouts, bodyweight training, equipment workouts. Train anywhere, anytime." />
-        <meta name="keywords" content="online gym, online workouts, gym workouts, home workouts, online fitness, HFSC, Haris Falas, Sports Scientist, AMRAP workouts, TABATA training, HIIT workouts, circuit training, strength training workouts, cardio workouts, bodyweight training, metabolic training, mobility training, calorie burning workouts, challenge workouts, Pilates, Reformer Pilates, Mat Pilates, smartygym.com, workout of the day, WOD" />
+        <meta name="keywords" content="online gym, online workouts, gym workouts, home workouts, online fitness, HFSC, Haris Falas, Sports Scientist, AMRAP workouts, TABATA training, HIIT workouts, circuit training, strength training workouts, cardio workouts, bodyweight training, metabolic training, mobility training, calorie burning workouts, challenge workouts, Pilates, Reformer Pilates, Mat Pilates, smartygym.com, workout of the day, WOD, micro workouts, mini workouts, small workouts, 5 minute workouts, quick workouts, exercise snacks, office workout, desk workout, outdoor workout, EMOM workout" />
         
         <link rel="alternate" hrefLang="el" href="https://smartygym.com/workout" />
         <link rel="alternate" hrefLang="en-GB" href="https://smartygym.com/workout" />
@@ -251,13 +251,13 @@ const WorkoutFlow = () => {
       </Helmet>
       
       <SEOEnhancer 
-        entities={["SmartyGym", "Haris Falas", "Online Workouts", "AMRAP", "HIIT", "Tabata", "Circuit Training"]} 
-        topics={["online gym workouts", "AMRAP", "HIIT", "Tabata", "circuit training", "strength training", "cardio workouts", "metabolic conditioning", "mobility training"]} 
-        expertise={["sports science", "strength conditioning", "functional fitness", "exercise programming"]} 
+        entities={["SmartyGym", "Haris Falas", "Online Workouts", "AMRAP", "HIIT", "Tabata", "Circuit Training", "Micro-Workouts"]} 
+        topics={["online gym workouts", "AMRAP", "HIIT", "Tabata", "circuit training", "strength training", "cardio workouts", "metabolic conditioning", "mobility training", "micro workouts", "5 minute workouts", "exercise snacks"]} 
+        expertise={["sports science", "strength conditioning", "functional fitness", "exercise programming", "office fitness", "quick workouts"]} 
         contentType="workout-collection" 
-        aiSummary="SmartyGym Workout Library: 500+ online gym workouts by Sports Scientist Haris Falas. Categories include Workout of the Day (WOD), Strength, Calorie Burning, Metabolic, Cardio, Mobility & Stability, and Challenge. Formats include AMRAP, TABATA, HIIT, Circuit, EMOM, For Time. Suitable for all levels worldwide." 
-        aiKeywords={["online gym", "AMRAP workouts", "HIIT training", "Tabata", "strength workouts", "cardio training", "home workouts", "bodyweight workouts", "gym workouts"]} 
-        relatedContent={["training programs", "fitness tools", "exercise library", "workout of the day"]} 
+        aiSummary="SmartyGym Workout Library: 500+ online gym workouts by Sports Scientist Haris Falas. Categories include Workout of the Day (WOD), Strength, Calorie Burning, Metabolic, Cardio, Mobility & Stability, Challenge, and Micro-Workouts (5-minute exercise snacks). Formats include AMRAP, TABATA, HIIT, Circuit, EMOM, For Time. Suitable for all levels worldwide. Office workouts, desk exercises, outdoor workouts, bodyweight training." 
+        aiKeywords={["online gym", "AMRAP workouts", "HIIT training", "Tabata", "strength workouts", "cardio training", "home workouts", "bodyweight workouts", "gym workouts", "micro workouts", "mini workouts", "small workouts", "5 minute workouts", "quick workouts", "exercise snacks", "office workout", "desk workout", "outdoor workout", "EMOM workout", "circuit workout"]} 
+        relatedContent={["training programs", "fitness tools", "exercise library", "workout of the day", "micro-workouts"]} 
       />
       
       <div className="min-h-screen bg-background">

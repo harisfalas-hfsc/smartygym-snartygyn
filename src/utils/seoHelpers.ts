@@ -890,3 +890,88 @@ export const generateOrganizationWithRatingSchema = (reviewCount: number, averag
     "https://www.youtube.com/@TheSmartyGym"
   ]
 });
+
+/**
+ * Micro-Workout specific keywords for SEO
+ */
+export const MICRO_WORKOUT_KEYWORDS = {
+  primary: [
+    "micro workouts", "mini workouts", "small workouts", "5 minute workouts",
+    "quick workouts", "exercise snacks", "office workout", "desk workout"
+  ],
+  secondary: [
+    "short workouts", "fast workouts", "busy schedule workouts", "desk exercise",
+    "office exercise", "quick fitness", "5 min workout", "under 10 minute workout"
+  ],
+  formats: [
+    "circuit workout", "HIIT workout", "AMRAP workout", "EMOM workout",
+    "strength workout", "cardio workout", "outdoor workout", "bodyweight workout"
+  ],
+  longTail: [
+    "5 minute workout for busy people", "quick office exercise routine",
+    "exercise snacks for weight loss", "mini workouts at work",
+    "small workouts for beginners", "micro workouts for busy schedules"
+  ]
+};
+
+/**
+ * Generate SEO-optimized alt text for micro-workouts
+ */
+export const generateMicroWorkoutAltText = (workout: {
+  name: string;
+  format?: string;
+  duration?: string;
+  difficulty?: string;
+  equipment?: string;
+}): string => {
+  return `${workout.name} - 5 minute micro workout - quick office exercise - ${workout.format || ''} ${workout.difficulty || ''} - bodyweight ${workout.equipment === 'BODYWEIGHT' ? 'no equipment' : ''} workout by Sports Scientist Haris Falas - SmartyGym.com`;
+};
+
+/**
+ * Generate Micro-Workout JSON-LD schema
+ */
+export const generateMicroWorkoutSchema = (workout: {
+  id: string;
+  name: string;
+  description?: string;
+  format?: string;
+  difficulty?: string;
+  imageUrl?: string;
+}) => ({
+  "@context": "https://schema.org",
+  "@type": "ExercisePlan",
+  "@id": `https://smartygym.com/individualworkout/${workout.id}`,
+  "name": workout.name,
+  "alternateName": `${workout.name} - 5 Minute Micro Workout`,
+  "description": workout.description || `Quick 5-minute micro workout designed by Sports Scientist Haris Falas. Perfect for office, home, or anywhere. No equipment needed.`,
+  "duration": "PT5M",
+  "estimatedDuration": "5 minutes",
+  "exerciseType": workout.format || "Micro-Workout",
+  "intensity": workout.difficulty || "All Levels",
+  "workLocation": ["Office", "Home", "Anywhere", "Hotel Room", "Outdoors"],
+  "category": "Micro-Workouts",
+  "keywords": MICRO_WORKOUT_KEYWORDS.primary.concat(MICRO_WORKOUT_KEYWORDS.formats).join(", "),
+  "audience": {
+    "@type": "Audience",
+    "audienceType": "Busy professionals, office workers, travelers, anyone short on time"
+  },
+  "author": {
+    "@type": "Person",
+    "name": "Haris Falas",
+    "jobTitle": "Sports Scientist & Strength and Conditioning Coach",
+    "url": "https://smartygym.com/coach-profile"
+  },
+  "provider": {
+    "@type": "Organization",
+    "name": "SmartyGym",
+    "url": "https://smartygym.com"
+  },
+  "image": workout.imageUrl,
+  "isAccessibleForFree": false,
+  "offers": {
+    "@type": "Offer",
+    "price": "2.99",
+    "priceCurrency": "EUR",
+    "availability": "https://schema.org/InStock"
+  }
+});

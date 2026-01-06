@@ -60,7 +60,11 @@ const GLOBAL_COMPETITIVE_KEYWORDS = [
   "follow-along workouts", "expert-designed fitness", "evidence-based training",
   "human-made workouts", "real coach fitness platform", "online gym membership",
   "virtual fitness coach", "digital gym", "online personal trainer",
-  "science-based workouts", "professional fitness coaching", "train anywhere anytime"
+  "science-based workouts", "professional fitness coaching", "train anywhere anytime",
+  // Workout format keywords
+  "circuit workout", "HIIT workout", "AMRAP workout", "EMOM workout",
+  "strength workout", "cardio workout", "office workout", "outdoor workout",
+  "bodyweight workout", "Tabata workout", "For Time workout"
 ];
 
 // Long-tail keywords for better search targeting
@@ -72,7 +76,12 @@ const LONG_TAIL_KEYWORDS = [
   "functional mobility routines", "fitness platform for adults",
   "no-equipment cardio workouts", "hypertrophy programs online",
   "beginner home workouts", "advanced HIIT training",
-  "science-based workout routines", "100 percent human designed workouts"
+  "science-based workout routines", "100 percent human designed workouts",
+  // Micro-workout keywords
+  "micro workouts", "mini workouts", "small workouts", "5 minute workouts",
+  "quick workouts", "exercise snacks", "desk workout", "desk exercise",
+  "office exercise", "quick fitness", "short workouts", "fast workouts",
+  "busy schedule workouts", "5 min workout", "under 10 minute workout"
 ];
 
 // 45+ Target Countries

@@ -156,6 +156,33 @@
   </url>
   
   <url>
+    <loc>https://smartygym.com/workout/pilates</loc>
+    <lastmod>2025-12-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  
+  <url>
+    <loc>https://smartygym.com/workout/recovery</loc>
+    <lastmod>2025-12-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  
+  <!-- Micro-Workouts - 5 Minute Quick Exercise Snacks -->
+  <url>
+    <loc>https://smartygym.com/workout/micro-workouts</loc>
+    <lastmod>2026-01-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://smartygym.com/images/workouts/micro-workouts-category-bg.jpg</image:loc>
+      <image:title>Micro-Workouts - 5 Minute Quick Workouts by Haris Falas | SmartyGym</image:title>
+      <image:caption>Premium 5-minute exercise snacks - office workouts, desk exercises, quick fitness routines, mini workouts, small workouts by Sports Scientist Haris Falas - micro workouts for busy people - smartygym.com</image:caption>
+    </image:image>
+  </url>
+  
+  <url>
     <loc>https://smartygym.com/wod-archive</loc>
     <lastmod>2025-12-31</lastmod>
     <changefreq>daily</changefreq>

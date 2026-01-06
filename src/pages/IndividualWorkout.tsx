@@ -92,7 +92,7 @@ const IndividualWorkout = () => {
         <Helmet>
           <title>{dbWorkout.name} | Online Workout by Haris Falas | SmartyGym</title>
           <meta name="description" content={`${dbWorkout.description || dbWorkout.name} - Professional online workout by Sports Scientist Haris Falas. ${dbWorkout.duration} ${dbWorkout.format} workout. ${dbWorkout.equipment}. 100% Human-Designed.`} />
-          <meta name="keywords" content={`${dbWorkout.name}, online workouts, ${dbWorkout.format} workout, ${dbWorkout.category} training, Haris Falas, online fitness, ${dbWorkout.equipment} workout, ${dbWorkout.difficulty} workout, SmartyGym workout`} />
+          <meta name="keywords" content={`${dbWorkout.name}, online workouts, ${dbWorkout.format} workout, ${dbWorkout.category} training, Haris Falas, online fitness, ${dbWorkout.equipment} workout, ${dbWorkout.difficulty} workout, SmartyGym workout, circuit workout, HIIT workout, AMRAP workout, EMOM workout, strength workout, cardio workout, office workout, outdoor workout, bodyweight workout${dbWorkout.category?.includes('MICRO') ? ', micro workouts, mini workouts, small workouts, 5 minute workout, quick workout, exercise snacks, desk workout' : ''}`} />
           
           {/* Open Graph */}
           <meta property="og:type" content="article" />
@@ -113,12 +113,21 @@ const IndividualWorkout = () => {
           <link rel="canonical" href={workoutUrl} />
           
           {/* AI Search Optimization */}
-          <meta name="ai-content-type" content="workout" />
+          <meta name="ai-content-type" content={dbWorkout.category?.includes('MICRO') ? 'micro-workout' : 'workout'} />
           <meta name="ai-difficulty" content={dbWorkout.difficulty || 'Intermediate'} />
           <meta name="ai-duration" content={dbWorkout.duration || ''} />
           <meta name="ai-equipment" content={dbWorkout.equipment || 'Various'} />
           <meta name="ai-category" content={dbWorkout.category || ''} />
           <meta name="ai-author" content="Haris Falas - Sports Scientist" />
+          <meta name="ai-workout-format" content={dbWorkout.format || ''} />
+          {dbWorkout.category?.includes('MICRO') && (
+            <>
+              <meta name="ai-workout-type" content="micro-workout - 5 minute exercise snack" />
+              <meta name="ai-time-commitment" content="5 minutes" />
+              <meta name="ai-workout-location" content="office, home, anywhere" />
+              <meta name="ai-micro-workout-keywords" content="micro workouts, mini workouts, small workouts, 5 minute workout, quick workout, exercise snacks, desk workout, office exercise" />
+            </>
+          )}
           
           {/* Structured Data - ExercisePlan with enhanced details */}
           <script type="application/ld+json">

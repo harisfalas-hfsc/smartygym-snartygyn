@@ -104,7 +104,7 @@ export const WODAnnouncementModal = ({ open, onClose }: WODAnnouncementModalProp
           <div className="relative w-full h-24 rounded-lg overflow-hidden mb-2">
             <img 
               src={wod.image_url} 
-              alt={wod.name || "Workout"} 
+              alt={`${wod.name || "Workout"} - ${wod.format || ''} ${wod.category || ''} workout - ${wod.difficulty_stars}★ - ${wod.duration || ''} - by Sports Scientist Haris Falas - SmartyGym.com`}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
