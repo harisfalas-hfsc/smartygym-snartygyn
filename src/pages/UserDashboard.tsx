@@ -15,6 +15,7 @@ import { MyOrders } from "@/components/MyOrders";
 import { useQuery } from "@tanstack/react-query";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
+import { useAdminRole } from "@/hooks/useAdminRole";
 import { Heart, CheckCircle, Clock, Star, Play, Dumbbell, Calendar, Crown, ArrowLeft, Calculator, ShoppingBag, MessageSquare, Loader2, RefreshCw, ExternalLink, ClipboardList, TrendingUp, BookOpen, Headphones, Sparkles, Quote, User as UserIcon, Scale, Building2, Users, ClipboardCheck, FileText, Trash2 } from "lucide-react";
 import {
   AlertDialog,
@@ -141,6 +142,7 @@ export default function UserDashboard() {
   const {
     userTier
   } = useAccessControl();
+  const { isAdmin, loading: adminLoading } = useAdminRole();
   const isPremium = userTier === "premium";
   const [stripeDetails, setStripeDetails] = useState<StripeSubscription | null>(null);
   const [corporateSubscription, setCorporateSubscription] = useState<CorporateSubscriptionInfo | null>(null);
@@ -666,7 +668,7 @@ export default function UserDashboard() {
       return "strength"; // default fallback
     }
   };
-  if (loading) {
+  if (loading || adminLoading) {
     return <div className="min-h-screen flex items-center justify-center">
         <div className="animate-pulse text-lg">Loading dashboard...</div>
       </div>;
@@ -727,8 +729,42 @@ export default function UserDashboard() {
         {/* Subscription Info */}
         {subscriptionInfo && <Card className="mb-6 border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
             <CardContent className="p-4">
-              {/* Free Plan with Purchases */}
-              {!subscriptionInfo.subscribed && purchases && purchases.length > 0 && !isPremium && <div className="space-y-3">
+              {/* Administrator Card - Show first if user is admin */}
+              {isAdmin && <div className="space-y-3">
+                  <h2 className="flex items-center gap-2 text-lg font-bold">
+                    <Crown className="h-5 w-5 text-amber-500" />
+                    Administrator Access
+                  </h2>
+                  <div>
+                    <div className="flex flex-wrap gap-1.5 mb-2">
+                      <Badge variant="outline" className="text-xs h-5 px-1.5 bg-gradient-to-r from-amber-500/20 to-amber-600/20 text-amber-600 dark:text-amber-400 border-amber-500/30">
+                        <Crown className="h-3 w-3 mr-1" />
+                        Administrator
+                      </Badge>
+                      <Badge variant="outline" className="text-xs h-5 px-1.5 bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20">
+                        Full Access
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      As an administrator, you have full access to all premium features and content.
+                    </p>
+                  </div>
+                  <div className="flex gap-2 pt-1">
+                    <Button onClick={handleRefreshSubscription} disabled={loading} variant="outline" className="h-7 px-2 text-xs">
+                      {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <>
+                          <RefreshCw className="h-3 w-3 mr-1" />
+                          Refresh
+                        </>}
+                    </Button>
+                    <Button onClick={() => navigate("/admin")} className="h-7 px-2 text-xs bg-amber-500 hover:bg-amber-600">
+                      <Crown className="h-3 w-3 mr-1" />
+                      Admin Panel
+                    </Button>
+                  </div>
+                </div>}
+
+              {/* Free Plan with Purchases - Only show if not admin */}
+              {!isAdmin && !subscriptionInfo.subscribed && purchases && purchases.length > 0 && !isPremium && <div className="space-y-3">
                   <h2 className="flex items-center gap-2 text-lg font-bold">
                     <ShoppingBag className="h-5 w-5 text-primary" />
                     Your Active Membership
@@ -745,8 +781,8 @@ export default function UserDashboard() {
                   </Button>
                 </div>}
 
-              {/* Free Plan without Purchases */}
-              {!subscriptionInfo.subscribed && (!purchases || purchases.length === 0) && !isPremium && <div className="space-y-3">
+              {/* Free Plan without Purchases - Only show if not admin */}
+              {!isAdmin && !subscriptionInfo.subscribed && (!purchases || purchases.length === 0) && !isPremium && <div className="space-y-3">
                   <h2 className="flex items-center gap-2 text-lg font-bold">
                     <UserIcon className="h-5 w-5 text-muted-foreground" />
                     Your Free Membership
@@ -762,8 +798,8 @@ export default function UserDashboard() {
                   </Button>
                 </div>}
 
-              {/* Premium Plan - Two Column Layout with Title in Left Column */}
-            {subscriptionInfo.subscribed && <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+              {/* Premium Plan - Two Column Layout with Title in Left Column - Only show if not admin */}
+            {!isAdmin && subscriptionInfo.subscribed && <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                   {/* LEFT COLUMN - Title + Plan Info & Actions */}
                   <div className="col-span-1 md:col-span-2 space-y-3">
                     {/* Title at top of left column */}
