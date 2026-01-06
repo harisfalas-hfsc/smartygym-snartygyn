@@ -3,7 +3,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, Building2, Users } from "lucide-react";
+import { Search, Building2, Users, Shield, ShieldCheck } from "lucide-react";
 
 interface UserData {
   user_id: string;
@@ -11,6 +11,10 @@ interface UserData {
   full_name: string | null;
   plan_type: string;
   status: string;
+  // Admin role fields
+  is_admin?: boolean;
+  is_moderator?: boolean;
+  user_role?: string;
   // Corporate fields
   is_corporate_admin?: boolean;
   corporate_admin_org?: string | null;
@@ -90,6 +94,43 @@ export function UserSelectionTable({ users, selectedUserIds, onSelectionChange }
     }
   };
 
+  const getStatusBadgeStyle = (status: string) => {
+    switch (status) {
+      case 'active':
+        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+      case 'canceled':
+        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+      case 'revoked':
+        return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
+      case 'registered':
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+      default:
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
+    }
+  };
+
+  const renderRoleBadges = (user: UserData) => {
+    const badges = [];
+    
+    if (user.is_admin) {
+      badges.push(
+        <Badge key="admin" className="text-xs bg-purple-600 hover:bg-purple-700 text-white flex items-center gap-1">
+          <ShieldCheck className="h-3 w-3" />
+          Admin
+        </Badge>
+      );
+    } else if (user.is_moderator) {
+      badges.push(
+        <Badge key="moderator" className="text-xs bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-1">
+          <Shield className="h-3 w-3" />
+          Moderator
+        </Badge>
+      );
+    }
+    
+    return badges;
+  };
+
   const renderCorporateBadges = (user: UserData) => {
     const badges = [];
     
@@ -144,6 +185,7 @@ export function UserSelectionTable({ users, selectedUserIds, onSelectionChange }
                 </TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Email</TableHead>
+                <TableHead className="text-center">Role</TableHead>
                 <TableHead className="text-center">Plan</TableHead>
                 <TableHead className="text-center">Status</TableHead>
               </TableRow>
@@ -151,7 +193,7 @@ export function UserSelectionTable({ users, selectedUserIds, onSelectionChange }
             <TableBody>
               {filteredUsers.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                  <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
                     {searchTerm ? "No users found matching your search" : "No users available"}
                   </TableCell>
                 </TableRow>
@@ -172,6 +214,14 @@ export function UserSelectionTable({ users, selectedUserIds, onSelectionChange }
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col items-center gap-1">
+                        {renderRoleBadges(user)}
+                        {!user.is_admin && !user.is_moderator && (
+                          <span className="text-xs text-muted-foreground">User</span>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-col items-center gap-1">
                         <Badge variant={getPlanBadgeVariant(user.plan_type)}>
                           {user.plan_type.charAt(0).toUpperCase() + user.plan_type.slice(1)}
                         </Badge>
@@ -179,7 +229,7 @@ export function UserSelectionTable({ users, selectedUserIds, onSelectionChange }
                       </div>
                     </TableCell>
                     <TableCell className="text-center">
-                      <Badge variant={user.status === 'active' ? 'default' : 'secondary'}>
+                      <Badge className={getStatusBadgeStyle(user.status)}>
                         {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
                       </Badge>
                     </TableCell>

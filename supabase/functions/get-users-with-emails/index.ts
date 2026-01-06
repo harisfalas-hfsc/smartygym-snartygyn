@@ -63,6 +63,16 @@ serve(async (req) => {
 
     if (subsError) throw subsError;
 
+    // Fetch all user roles (admin, moderator, etc.)
+    const { data: userRoles, error: rolesError } = await supabaseAdmin
+      .from('user_roles')
+      .select('user_id, role');
+
+    if (rolesError) {
+      logStep("Warning: Could not fetch user roles", { error: rolesError.message });
+    }
+    logStep("User roles fetched", { count: userRoles?.length || 0 });
+
     // Fetch corporate subscriptions (for corporate admins)
     const { data: corporateSubs, error: corpSubsError } = await supabaseAdmin
       .from('corporate_subscriptions')
@@ -83,10 +93,11 @@ serve(async (req) => {
     const { data: { users: authUsers }, error: authError } = await supabaseAdmin.auth.admin.listUsers();
     if (authError) throw authError;
 
-    // Combine data with corporate info
+    // Combine data with corporate info and user roles
     const combinedData = profiles.map(profile => {
       const subscription = subscriptions?.find(sub => sub.user_id === profile.user_id);
       const authUser = authUsers.find(u => u.id === profile.user_id);
+      const userRole = userRoles?.find(r => r.user_id === profile.user_id);
       
       // Check if user is corporate admin
       const corporateAdmin = corporateSubs?.find(cs => cs.admin_user_id === profile.user_id);
@@ -97,13 +108,16 @@ serve(async (req) => {
         ? corporateSubs?.find(cs => cs.id === corporateMember.corporate_subscription_id)
         : null;
       
+      // Determine status: 'registered' for users without subscription instead of 'inactive'
+      const status = subscription?.status || 'registered';
+      
       return {
         user_id: profile.user_id,
         full_name: profile.full_name,
         avatar_url: profile.avatar_url,
         email: authUser?.email || null,
         plan_type: subscription?.plan_type || 'free',
-        status: subscription?.status || 'inactive',
+        status: status,
         current_period_start: subscription?.current_period_start || null,
         current_period_end: subscription?.current_period_end || null,
         created_at: profile.created_at,
@@ -112,6 +126,10 @@ serve(async (req) => {
         stripe_customer_id: subscription?.stripe_customer_id || null,
         stripe_subscription_id: subscription?.stripe_subscription_id || null,
         subscription_source: subscription?.subscription_source || null,
+        // User role info
+        is_admin: userRole?.role === 'admin',
+        is_moderator: userRole?.role === 'moderator',
+        user_role: userRole?.role || 'user',
         // Corporate admin info
         is_corporate_admin: !!corporateAdmin,
         corporate_admin_org: corporateAdmin?.organization_name || null,

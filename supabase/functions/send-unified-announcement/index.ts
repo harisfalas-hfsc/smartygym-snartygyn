@@ -58,19 +58,42 @@ serve(async (req) => {
     // Prepare email HTML once (same for all recipients)
     const emailHtml = wrapInEmailTemplate(subject, content);
 
+    // Valid message types from the database enum
+    const validMessageTypes = [
+      'daily_motivation', 'weekly_summary', 'subscription_welcome', 'subscription_renewal',
+      'subscription_expiring', 'subscription_expired', 'subscription_canceled',
+      'account_welcome', 'account_inactive', 'feature_announcement', 'new_content_available',
+      'support_response', 'support_followup', 'announcement_general', 'announcement_update',
+      'announcement_maintenance', 'announcement_new_service', 'trial_ending', 'trial_expired',
+      'trial_started', 'new_category_announcement'
+    ];
+
+    // Use provided messageType if valid, otherwise fallback to announcement_new_service
+    const safeMessageType = validMessageTypes.includes(messageType) 
+      ? messageType 
+      : 'announcement_new_service';
+    
+    logStep("Using message type", { provided: messageType, using: safeMessageType });
+
     for (const userId of userIds) {
       try {
         // Send dashboard message
         try {
-          await supabaseAdmin
+          const { error: insertError } = await supabaseAdmin
             .from("user_system_messages")
             .insert({
               user_id: userId,
-              message_type: messageType,
+              message_type: safeMessageType,
               subject: subject,
               content: content,
               is_read: false,
             });
+          
+          if (insertError) {
+            logStep("ERROR inserting dashboard message", { userId, error: insertError.message });
+          } else {
+            logStep("Dashboard message inserted", { userId });
+          }
         } catch (msgError) {
           logStep("ERROR sending dashboard message", { userId, error: msgError });
         }
