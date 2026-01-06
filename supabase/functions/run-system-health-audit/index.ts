@@ -1324,9 +1324,23 @@ const handler = async (req: Request): Promise<Response> => {
         .select('id, name, stripe_product_id, stripe_price_id, category, image_url, price, description')
         .not('stripe_product_id', 'is', null);
 
-      const totalStripeProducts = (workoutsWithStripe?.length || 0) + (programsWithStripe?.length || 0);
+      // Also get standalone items WITHOUT stripe_product_id - we need to create products for these
+      const { data: workoutsNeedingProduct } = await supabase
+        .from('admin_workouts')
+        .select('id, name, stripe_product_id, stripe_price_id, type, category, is_workout_of_day, image_url, price, description, is_standalone_purchase')
+        .is('stripe_product_id', null)
+        .eq('is_standalone_purchase', true);
 
-      if (totalStripeProducts === 0) {
+      const { data: programsNeedingProduct } = await supabase
+        .from('admin_training_programs')
+        .select('id, name, stripe_product_id, stripe_price_id, category, image_url, price, description, is_standalone_purchase')
+        .is('stripe_product_id', null)
+        .eq('is_standalone_purchase', true);
+
+      const totalStripeProducts = (workoutsWithStripe?.length || 0) + (programsWithStripe?.length || 0);
+      const totalNeedingProducts = (workoutsNeedingProduct?.length || 0) + (programsNeedingProduct?.length || 0);
+
+      if (totalStripeProducts === 0 && totalNeedingProducts === 0) {
         addCheck(
           'Stripe Metadata',
           'Linked Products Count',
@@ -1335,9 +1349,10 @@ const handler = async (req: Request): Promise<Response> => {
           'No verification needed'
         );
       } else {
-        // SELF-HEALING: Automatically fix metadata issues
+        // SELF-HEALING: Automatically fix metadata issues AND create missing products
         let fixedCount = 0;
         let recreatedCount = 0;
+        let createdCount = 0;
         let correctMetadata = 0;
         let repairErrors: string[] = [];
 
@@ -1348,7 +1363,82 @@ const handler = async (req: Request): Promise<Response> => {
           return "Workout";
         };
 
-        // Process workouts with SELF-HEALING
+        // PHASE 1: Create products for standalone workouts that need them
+        for (const workout of (workoutsNeedingProduct || [])) {
+          try {
+            const contentType = getContentType(workout, false);
+            console.log(`🆕 CREATING missing Stripe product for: ${workout.name}`);
+            
+            const newProduct = await stripeClient.products.create({
+              name: workout.name,
+              description: workout.description || `${workout.category || workout.type} Workout`,
+              images: workout.image_url ? [workout.image_url] : [],
+              metadata: {
+                project: "SMARTYGYM",
+                content_type: contentType,
+                content_id: workout.id
+              }
+            });
+
+            const newPrice = await stripeClient.prices.create({
+              product: newProduct.id,
+              unit_amount: Math.round((workout.price || 3.99) * 100),
+              currency: "eur"
+            });
+
+            await supabase
+              .from("admin_workouts")
+              .update({
+                stripe_product_id: newProduct.id,
+                stripe_price_id: newPrice.id
+              })
+              .eq("id", workout.id);
+
+            createdCount++;
+            console.log(`✅ Created NEW product: ${workout.name} → ${newProduct.id}`);
+          } catch (err: any) {
+            repairErrors.push(`Create ${workout.name}: ${err.message}`);
+          }
+        }
+
+        // PHASE 2: Create products for standalone programs that need them
+        for (const program of (programsNeedingProduct || [])) {
+          try {
+            console.log(`🆕 CREATING missing Stripe product for program: ${program.name}`);
+            
+            const newProduct = await stripeClient.products.create({
+              name: program.name,
+              description: program.description || `${program.category} Training Program`,
+              images: program.image_url ? [program.image_url] : [],
+              metadata: {
+                project: "SMARTYGYM",
+                content_type: "Training Program",
+                content_id: program.id
+              }
+            });
+
+            const newPrice = await stripeClient.prices.create({
+              product: newProduct.id,
+              unit_amount: Math.round((program.price || 9.99) * 100),
+              currency: "eur"
+            });
+
+            await supabase
+              .from("admin_training_programs")
+              .update({
+                stripe_product_id: newProduct.id,
+                stripe_price_id: newPrice.id
+              })
+              .eq("id", program.id);
+
+            createdCount++;
+            console.log(`✅ Created NEW program product: ${program.name} → ${newProduct.id}`);
+          } catch (err: any) {
+            repairErrors.push(`Create ${program.name}: ${err.message}`);
+          }
+        }
+
+        // PHASE 3: Process workouts with SELF-HEALING (existing products)
         for (const workout of (workoutsWithStripe || [])) {
           try {
             const contentType = getContentType(workout, false);
@@ -1487,16 +1577,17 @@ const handler = async (req: Request): Promise<Response> => {
         }
 
         // Report results AFTER self-healing
+        const totalFixed = fixedCount + recreatedCount + createdCount;
+        const totalCorrect = correctMetadata + totalFixed;
+        const totalProducts = totalStripeProducts + createdCount;
+
         addCheck(
           'Stripe Metadata',
           'Linked Products Count',
-          `${totalStripeProducts} products linked to Stripe`,
+          `${totalProducts} products now linked to Stripe`,
           'pass',
-          `Workouts: ${workoutsWithStripe?.length || 0}, Programs: ${programsWithStripe?.length || 0}`
+          `Existing: ${totalStripeProducts}, Newly created: ${createdCount}`
         );
-
-        const totalFixed = fixedCount + recreatedCount;
-        const totalCorrect = correctMetadata + totalFixed;
 
         if (repairErrors.length === 0) {
           if (totalFixed > 0) {
@@ -1505,7 +1596,7 @@ const handler = async (req: Request): Promise<Response> => {
               'SMARTYGYM Tag Verification',
               `All ${totalCorrect} products now have correct metadata`,
               'pass',
-              `✅ AUTO-HEALED: ${fixedCount} fixed, ${recreatedCount} recreated, ${correctMetadata} were already correct`
+              `✅ AUTO-HEALED: ${createdCount} created new, ${fixedCount} metadata fixed, ${recreatedCount} recreated, ${correctMetadata} were already correct`
             );
           } else {
             addCheck(
