@@ -273,7 +273,14 @@ export const WorkoutDisplay = ({
             <div className="flex items-center gap-2">
               <div className="flex">
                 {[1, 2, 3, 4, 5, 6].map((i) => (
-                  <Star key={i} className={`w-4 h-4 ${difficulty > 0 && i <= difficulty ? 'fill-primary text-primary' : 'text-gray-300'}`} />
+                  <Star 
+                    key={i} 
+                    className={`w-4 h-4 ${
+                      difficulty > 0 && i <= difficulty 
+                        ? 'fill-primary text-primary' 
+                        : 'text-gray-300 dark:text-gray-600'
+                    }`} 
+                  />
                 ))}
               </div>
               <span className="font-medium">{difficulty === 0 ? 'All Levels' : getDifficultyText(difficulty)}</span>

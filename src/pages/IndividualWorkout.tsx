@@ -33,7 +33,7 @@ const IndividualWorkout = () => {
   const { userTier, hasPurchased } = useAccessControl();
   const { goBack } = useShowBackButton();
   
-  // Helper function to get category label from database category field
+  // Use centralized category labels
   const getCategoryLabel = (category: string | undefined | null): string => {
     if (!category) return '';
     const categoryMap: { [key: string]: string } = {
@@ -44,6 +44,9 @@ const IndividualWorkout = () => {
       'CARDIO ENDURANCE': 'Cardio Endurance',
       'MOBILITY & STABILITY': 'Mobility & Stability',
       'CHALLENGE': 'Challenge',
+      'PILATES': 'Pilates',
+      'RECOVERY': 'Recovery',
+      'MICRO-WORKOUTS': 'Micro-Workouts',
       // Lowercase versions for focus field
       'strength': 'Strength',
       'calorie-burning': 'Calorie Burning',
@@ -51,7 +54,10 @@ const IndividualWorkout = () => {
       'cardio': 'Cardio',
       'cardio-endurance': 'Cardio Endurance',
       'mobility-stability': 'Mobility & Stability',
-      'challenge': 'Challenge'
+      'challenge': 'Challenge',
+      'pilates': 'Pilates',
+      'recovery': 'Recovery',
+      'micro-workouts': 'Micro-Workouts'
     };
     return categoryMap[category] || category;
   };

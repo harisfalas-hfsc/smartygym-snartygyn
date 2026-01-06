@@ -10,17 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { A4Container } from "@/components/ui/a4-container";
 
-const CATEGORIES = [
-  "STRENGTH",
-  "CALORIE BURNING",
-  "METABOLIC",
-  "CARDIO",
-  "MOBILITY & STABILITY",
-  "CHALLENGE",
-  "PILATES",
-  "RECOVERY",
-  "MICRO-WORKOUTS"
-];
+import { WORKOUT_CATEGORIES, getDifficultyFromStars } from "@/constants/workoutCategories";
 
 // Micro-workout fixed values (enforced by DB trigger too)
 const MICRO_WORKOUT_RULES = {
@@ -64,7 +54,8 @@ const DURATION_OPTIONS = [
   "VARIOUS"
 ];
 
-const DIFFICULTY_STARS = [1, 2, 3, 4, 5, 6];
+// 0 = All Levels, 1-6 = stars
+const DIFFICULTY_STARS = [0, 1, 2, 3, 4, 5, 6];
 
 interface WorkoutEditDialogProps {
   workout: any;
@@ -212,6 +203,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
   }, [formData.category, workout]);
 
   const getDifficultyLabel = (stars: number) => {
+    if (stars === 0) return "All Levels";
     if (stars <= 2) return "Beginner";
     if (stars <= 4) return "Intermediate";
     return "Advanced";
@@ -495,8 +487,8 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
               <SelectTrigger>
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
-              <SelectContent>
-                {CATEGORIES.map(cat => (
+              <SelectContent className="bg-popover z-50">
+                {WORKOUT_CATEGORIES.map(cat => (
                   <SelectItem key={cat} value={cat}>{cat}</SelectItem>
                 ))}
               </SelectContent>
@@ -543,20 +535,22 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
               <Select 
                 value={formData.difficulty_stars.toString()} 
                 onValueChange={(value) => setFormData({ ...formData, difficulty_stars: parseInt(value) })}
+                disabled={isMicroWorkout}
               >
-                <SelectTrigger className="w-32">
+                <SelectTrigger className="w-40">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-popover z-50">
                   {DIFFICULTY_STARS.map(stars => (
                     <SelectItem key={stars} value={stars.toString()}>
-                      {"⭐".repeat(stars)}
+                      {stars === 0 ? "All Levels" : `${"⭐".repeat(stars)} (${stars})`}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
               <span className="text-sm text-muted-foreground">
                 {getDifficultyLabel(formData.difficulty_stars)}
+                {isMicroWorkout && " (locked for Micro-Workouts)"}
               </span>
             </div>
           </div>
