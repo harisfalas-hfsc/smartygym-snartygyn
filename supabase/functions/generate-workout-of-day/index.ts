@@ -1718,12 +1718,14 @@ Return JSON with these exact fields:
         description: `${category} Workout (${equipment})`,
         images: imageUrl ? [imageUrl] : [],
         metadata: { 
-          project: "SMARTYGYM", 
+          project: "SMARTYGYM",
+          content_type: "Workout",  // CRITICAL: Required for revenue tracking
+          content_id: workoutId,
           workout_id: workoutId, 
           type: "wod", 
           category: category, 
           equipment: equipment,
-          generated_for_date: effectiveDate  // Track date in Stripe metadata
+          generated_for_date: effectiveDate
         }
       }, {
         idempotencyKey: stripeIdempotencyKey
