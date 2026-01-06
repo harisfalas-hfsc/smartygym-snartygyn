@@ -10,10 +10,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Mail, MessageSquare, Eye, CheckCircle, X, ArrowLeft, Send, Search, Filter, FileText, Paperclip, Download, Upload, BarChart3, Trash2 } from "lucide-react";
+import { Mail, MessageSquare, Eye, CheckCircle, X, ArrowLeft, Send, Search, Filter, FileText, Paperclip, Download, Upload, BarChart3, Trash2, History, SendHorizonal } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { format } from "date-fns";
 import { ContactAnalytics } from "./ContactAnalytics";
+import { SentMessagesTab } from "./SentMessagesTab";
+import { UserCommunicationHistory } from "./UserCommunicationHistory";
 
 interface ContactMessage {
   id: string;
@@ -67,6 +69,8 @@ export const ContactManager = () => {
   const [isAdminVerified, setIsAdminVerified] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [messageToDelete, setMessageToDelete] = useState<ContactMessage | null>(null);
+  const [showHistoryDialog, setShowHistoryDialog] = useState(false);
+  const [historyUser, setHistoryUser] = useState<{ userId: string | null; email: string; name: string } | null>(null);
 
   useEffect(() => {
     verifyAdminAccess();
@@ -723,7 +727,7 @@ export const ContactManager = () => {
 
           <Tabs defaultValue="all">
             <div className="w-full overflow-x-auto">
-              <TabsList className="w-full inline-flex sm:grid sm:grid-cols-6 min-w-max sm:min-w-0">
+              <TabsList className="w-full inline-flex sm:grid sm:grid-cols-7 min-w-max sm:min-w-0">
                 <TabsTrigger value="all" className="flex-shrink-0 whitespace-nowrap">
                   All ({messages.length})
                 </TabsTrigger>
@@ -738,6 +742,10 @@ export const ContactManager = () => {
                 </TabsTrigger>
                 <TabsTrigger value="new" className="flex-shrink-0 whitespace-nowrap">
                   New ({newMessages.length})
+                </TabsTrigger>
+                <TabsTrigger value="sent" className="flex-shrink-0 whitespace-nowrap flex items-center gap-1">
+                  <SendHorizonal className="h-4 w-4" />
+                  Sent
                 </TabsTrigger>
                 <TabsTrigger value="analytics" className="flex-shrink-0 whitespace-nowrap flex items-center gap-1">
                   <BarChart3 className="h-4 w-4" />
@@ -784,6 +792,10 @@ export const ContactManager = () => {
               ) : (
                 newMessages.map(message => <MessageCard key={message.id} message={message} />)
               )}
+            </TabsContent>
+
+            <TabsContent value="sent" className="mt-4">
+              <SentMessagesTab />
             </TabsContent>
 
             <TabsContent value="analytics" className="mt-4">
@@ -1013,7 +1025,22 @@ export const ContactManager = () => {
                 </div>
               )}
 
-              <div className="flex gap-2 pt-4">
+              <div className="flex gap-2 pt-4 flex-wrap">
+                {/* View Full History Button */}
+                <Button 
+                  variant="outline"
+                  onClick={() => {
+                    setHistoryUser({
+                      userId: selectedMessage.user_id,
+                      email: selectedMessage.email,
+                      name: selectedMessage.name,
+                    });
+                    setShowHistoryDialog(true);
+                  }}
+                >
+                  <History className="h-4 w-4 mr-2" />
+                  View Full History
+                </Button>
                 {selectedMessage.status === 'new' && (
                   <Button 
                     variant="outline"
@@ -1086,6 +1113,15 @@ export const ContactManager = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* User Communication History Dialog */}
+      <UserCommunicationHistory
+        open={showHistoryDialog}
+        onOpenChange={setShowHistoryDialog}
+        userId={historyUser?.userId || null}
+        userEmail={historyUser?.email || ''}
+        userName={historyUser?.name || ''}
+      />
     </div>
   );
 };
