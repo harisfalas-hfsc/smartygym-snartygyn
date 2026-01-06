@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Mail, MessageSquare, Bell, Send, User, ArrowDownLeft, ArrowUpRight } from "lucide-react";
+import { Mail, MessageSquare, Bell, Send, User, ArrowDownLeft, ArrowUpRight, AlertCircle } from "lucide-react";
 import { format } from "date-fns";
 
 interface CommunicationItem {
@@ -34,6 +34,7 @@ export const UserCommunicationHistory = ({
 }: UserCommunicationHistoryProps) => {
   const [communications, setCommunications] = useState<CommunicationItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [errors, setErrors] = useState<string[]>([]);
 
   useEffect(() => {
     if (open && (userId || userEmail)) {
@@ -43,7 +44,9 @@ export const UserCommunicationHistory = ({
 
   const fetchAllCommunications = async () => {
     setLoading(true);
+    setErrors([]);
     const allCommunications: CommunicationItem[] = [];
+    const fetchErrors: string[] = [];
 
     try {
       // 1. Fetch contact messages (user-initiated)
@@ -58,9 +61,12 @@ export const UserCommunicationHistory = ({
         contactQuery.eq('email', userEmail);
       }
 
-      const { data: contactMessages } = await contactQuery;
+      const { data: contactMessages, error: contactError } = await contactQuery;
 
-      if (contactMessages) {
+      if (contactError) {
+        console.error('Error fetching contact messages:', contactError);
+        fetchErrors.push('Failed to load contact messages');
+      } else if (contactMessages) {
         contactMessages.forEach(msg => {
           // Add incoming message
           allCommunications.push({
@@ -91,13 +97,16 @@ export const UserCommunicationHistory = ({
 
       // 2. Fetch system messages (admin-initiated dashboard messages)
       if (userId) {
-        const { data: systemMessages } = await supabase
+        const { data: systemMessages, error: systemError } = await supabase
           .from('user_system_messages')
           .select('id, subject, content, message_type, created_at, is_read')
           .eq('user_id', userId)
           .order('created_at', { ascending: false });
 
-        if (systemMessages) {
+        if (systemError) {
+          console.error('Error fetching system messages:', systemError);
+          fetchErrors.push('Failed to load dashboard messages');
+        } else if (systemMessages) {
           systemMessages.forEach(msg => {
             allCommunications.push({
               id: `system-${msg.id}`,
@@ -114,14 +123,16 @@ export const UserCommunicationHistory = ({
       }
 
       // 3. Fetch email audit log entries for this user
-      // Note: notification_audit_log stores batch sends, so we check metadata for individual users
-      const { data: auditLogs } = await supabase
+      const { data: auditLogs, error: auditError } = await supabase
         .from('notification_audit_log')
         .select('id, subject, content, message_type, notification_type, sent_at, metadata')
         .order('sent_at', { ascending: false })
         .limit(50);
 
-      if (auditLogs) {
+      if (auditError) {
+        console.error('Error fetching audit logs:', auditError);
+        fetchErrors.push('Failed to load email audit logs');
+      } else if (auditLogs) {
         auditLogs.forEach(log => {
           // Check if this user was a recipient (stored in metadata)
           const metadata = log.metadata as any;
@@ -132,8 +143,8 @@ export const UserCommunicationHistory = ({
             (userId && recipients.includes(userId)) ||
             recipientEmails.includes(userEmail);
 
-          if (wasRecipient || recipients.length === 0) {
-            // If no specific recipients tracked, show announcements to all
+          // Only show if user was explicitly a recipient
+          if (wasRecipient) {
             allCommunications.push({
               id: `audit-${log.id}`,
               source: 'email_audit',
@@ -153,8 +164,10 @@ export const UserCommunicationHistory = ({
       );
 
       setCommunications(allCommunications);
+      setErrors(fetchErrors);
     } catch (error) {
       console.error('Error fetching communications:', error);
+      setErrors(['An unexpected error occurred while fetching communications']);
     }
 
     setLoading(false);
@@ -205,6 +218,18 @@ export const UserCommunicationHistory = ({
             All communications with {userName} ({userEmail})
           </DialogDescription>
         </DialogHeader>
+
+        {/* Error warnings */}
+        {errors.length > 0 && (
+          <div className="bg-yellow-50 dark:bg-yellow-950/30 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 space-y-1">
+            {errors.map((err, i) => (
+              <p key={i} className="text-sm text-yellow-800 dark:text-yellow-200 flex items-center gap-2">
+                <AlertCircle className="h-4 w-4" />
+                {err}
+              </p>
+            ))}
+          </div>
+        )}
 
         <ScrollArea className="max-h-[65vh]">
           {loading ? (

@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Mail, MessageSquare, Eye, CheckCircle, X, ArrowLeft, Send, Search, Filter, FileText, Paperclip, Download, Upload, BarChart3, Trash2, History, SendHorizonal } from "lucide-react";
+import { Mail, MessageSquare, Eye, CheckCircle, X, ArrowLeft, Send, Search, Filter, FileText, Paperclip, Download, Upload, BarChart3, Trash2, History, SendHorizonal, Bell } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { format } from "date-fns";
 import { ContactAnalytics } from "./ContactAnalytics";
@@ -56,6 +56,8 @@ export const ContactManager = () => {
   const [filteredMessages, setFilteredMessages] = useState<ContactMessage[]>([]);
   const [templates, setTemplates] = useState<ResponseTemplate[]>([]);
   const [messageHistory, setMessageHistory] = useState<MessageHistoryItem[]>([]);
+  const [otherCommunications, setOtherCommunications] = useState<{ systemMessages: any[]; emailLogs: any[] }>({ systemMessages: [], emailLogs: [] });
+  const [loadingOtherComms, setLoadingOtherComms] = useState(false);
   const [loading, setLoading] = useState(true);
   const [selectedMessage, setSelectedMessage] = useState<ContactMessage | null>(null);
   const [showMessageDialog, setShowMessageDialog] = useState(false);
@@ -226,14 +228,61 @@ export const ContactManager = () => {
     }
   };
 
+  const fetchOtherCommunications = async (userId: string | null, email: string) => {
+    setLoadingOtherComms(true);
+    setOtherCommunications({ systemMessages: [], emailLogs: [] });
+
+    try {
+      // Fetch system messages (dashboard announcements sent to this user)
+      let systemMessages: any[] = [];
+      if (userId) {
+        const { data, error } = await supabase
+          .from('user_system_messages')
+          .select('id, subject, content, message_type, created_at, is_read')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false })
+          .limit(5);
+        
+        if (!error && data) {
+          systemMessages = data;
+        }
+      }
+
+      // Fetch email audit logs that may include this user
+      const { data: auditData, error: auditError } = await supabase
+        .from('notification_audit_log')
+        .select('id, subject, content, message_type, notification_type, sent_at, metadata')
+        .order('sent_at', { ascending: false })
+        .limit(20);
+
+      let emailLogs: any[] = [];
+      if (!auditError && auditData) {
+        emailLogs = auditData.filter(log => {
+          const metadata = log.metadata as any;
+          const recipients = metadata?.recipients || metadata?.userIds || [];
+          const recipientEmails = metadata?.emails || [];
+          return (userId && recipients.includes(userId)) || recipientEmails.includes(email);
+        }).slice(0, 5);
+      }
+
+      setOtherCommunications({ systemMessages, emailLogs });
+    } catch (error) {
+      console.error('Error fetching other communications:', error);
+    }
+
+    setLoadingOtherComms(false);
+  };
+
   const handleViewMessage = async (message: ContactMessage) => {
     setSelectedMessage(message);
     setResponseText(message.response || "");
     setMessageHistory([]); // Reset history while loading
+    setOtherCommunications({ systemMessages: [], emailLogs: [] });
     setShowMessageDialog(true);
 
-    // Fetch conversation history
+    // Fetch conversation history and other communications in parallel
     fetchMessageHistory(message.id);
+    fetchOtherCommunications(message.user_id, message.email);
 
     // Mark as read if not already read
     if (!message.read_at) {
@@ -815,9 +864,28 @@ export const ContactManager = () => {
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Contact Message Details</DialogTitle>
-            <DialogDescription>
-              View and respond to this message
-            </DialogDescription>
+            <div className="flex items-center justify-between">
+              <DialogDescription>
+                View and respond to this message
+              </DialogDescription>
+              {selectedMessage && (
+                <Button 
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setHistoryUser({
+                      userId: selectedMessage.user_id,
+                      email: selectedMessage.email,
+                      name: selectedMessage.name,
+                    });
+                    setShowHistoryDialog(true);
+                  }}
+                >
+                  <History className="h-4 w-4 mr-2" />
+                  View Full History
+                </Button>
+              )}
+            </div>
           </DialogHeader>
           {selectedMessage && (
             <div className="space-y-6">
@@ -945,6 +1013,75 @@ export const ContactManager = () => {
                 )}
               </div>
 
+              {/* Other Communications Section - Dashboard Messages + Email Logs */}
+              <div className="space-y-4 border-t pt-4">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-semibold flex items-center gap-2">
+                    <Bell className="h-4 w-4" />
+                    Other Communications (Dashboard + Emails)
+                  </p>
+                  {otherCommunications.systemMessages.some(msg => 
+                    msg.subject?.toLowerCase().includes('micro-workout') || 
+                    msg.content?.toLowerCase().includes('micro-workout')
+                  ) && (
+                    <Badge className="bg-green-500 text-white text-xs">
+                      ✓ Micro-Workouts Found
+                    </Badge>
+                  )}
+                </div>
+
+                {loadingOtherComms ? (
+                  <div className="flex items-center justify-center py-4">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
+                  </div>
+                ) : !selectedMessage.user_id ? (
+                  <p className="text-sm text-muted-foreground italic">No dashboard messages (visitor account)</p>
+                ) : otherCommunications.systemMessages.length === 0 && otherCommunications.emailLogs.length === 0 ? (
+                  <p className="text-sm text-muted-foreground italic">No other communications found</p>
+                ) : (
+                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                    {/* Dashboard/System Messages */}
+                    {otherCommunications.systemMessages.map(msg => (
+                      <div key={msg.id} className="bg-purple-50 dark:bg-purple-950/30 p-3 rounded-lg border-l-4 border-purple-500">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Badge className="bg-purple-500 text-white text-xs">Dashboard</Badge>
+                          <Badge variant="outline" className="text-xs capitalize">{msg.message_type?.replace(/_/g, ' ')}</Badge>
+                          {msg.is_read ? (
+                            <Badge variant="outline" className="text-xs">Read</Badge>
+                          ) : (
+                            <Badge className="bg-orange-500 text-white text-xs">Unread</Badge>
+                          )}
+                        </div>
+                        <p className="text-sm font-medium">{msg.subject}</p>
+                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                          {msg.content?.replace(/<[^>]*>/g, '').substring(0, 100)}...
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {msg.created_at && format(new Date(msg.created_at), 'MMM dd, yyyy HH:mm')}
+                        </p>
+                      </div>
+                    ))}
+
+                    {/* Email Audit Logs */}
+                    {otherCommunications.emailLogs.map(log => (
+                      <div key={log.id} className="bg-green-50 dark:bg-green-950/30 p-3 rounded-lg border-l-4 border-green-500">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Badge className="bg-green-500 text-white text-xs">Email</Badge>
+                          <Badge variant="outline" className="text-xs capitalize">{log.message_type?.replace(/_/g, ' ')}</Badge>
+                        </div>
+                        <p className="text-sm font-medium">{log.subject}</p>
+                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                          {log.content?.replace(/<[^>]*>/g, '').substring(0, 100)}...
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {log.sent_at && format(new Date(log.sent_at), 'MMM dd, yyyy HH:mm')}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               {selectedMessage.attachments && selectedMessage.attachments.length > 0 && (
                 <div>
                   <p className="text-sm font-semibold mb-2">Attachments</p>
@@ -1031,21 +1168,6 @@ export const ContactManager = () => {
               )}
 
               <div className="flex gap-2 pt-4 flex-wrap">
-                {/* View Full History Button */}
-                <Button 
-                  variant="outline"
-                  onClick={() => {
-                    setHistoryUser({
-                      userId: selectedMessage.user_id,
-                      email: selectedMessage.email,
-                      name: selectedMessage.name,
-                    });
-                    setShowHistoryDialog(true);
-                  }}
-                >
-                  <History className="h-4 w-4 mr-2" />
-                  View Full History
-                </Button>
                 {selectedMessage.status === 'new' && (
                   <Button 
                     variant="outline"
