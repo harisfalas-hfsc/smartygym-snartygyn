@@ -628,9 +628,11 @@ const WorkoutDetail = () => {
                         <div className="flex items-center gap-1">
                           <TrendingUp className={`h-3 w-3 shrink-0 ${getDifficultyColorClasses(workout.difficulty_stars || workout.difficulty).icon}`} />
                           <span className={`capitalize font-medium ${getDifficultyColorClasses(workout.difficulty_stars || workout.difficulty).text}`}>{workout.difficulty}</span>
-                          {workout.difficulty_stars && (
+                          {workout.difficulty_stars && workout.difficulty_stars > 0 ? (
                             <span className="text-yellow-500">({workout.difficulty_stars}★)</span>
-                          )}
+                          ) : workout.difficulty?.toLowerCase() === 'all levels' ? (
+                            <span className="text-muted-foreground">(All Levels)</span>
+                          ) : null}
                         </div>
                         <span>•</span>
                       </>

@@ -562,7 +562,7 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
                 <Filter className="h-4 w-4 mr-2" />
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-popover z-50">
                 <SelectItem value="all">All Categories</SelectItem>
                 <SelectItem value="STRENGTH">STRENGTH</SelectItem>
                 <SelectItem value="CALORIE BURNING">CALORIE BURNING</SelectItem>
@@ -570,6 +570,9 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
                 <SelectItem value="CARDIO">CARDIO</SelectItem>
                 <SelectItem value="MOBILITY & STABILITY">MOBILITY & STABILITY</SelectItem>
                 <SelectItem value="CHALLENGE">CHALLENGE</SelectItem>
+                <SelectItem value="PILATES">PILATES</SelectItem>
+                <SelectItem value="RECOVERY">RECOVERY</SelectItem>
+                <SelectItem value="MICRO-WORKOUTS">MICRO-WORKOUTS</SelectItem>
               </SelectContent>
             </Select>
             <Select value={formatFilter} onValueChange={setFormatFilter}>
