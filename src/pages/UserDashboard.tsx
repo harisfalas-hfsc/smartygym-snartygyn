@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -175,9 +175,9 @@ export default function UserDashboard() {
     nightWindowEnd
   } = useCheckInWindow();
 
-  // Get tab from URL or default to "workouts"
+  // Get tab from URL or default to null (grid view)
   const tabParam = searchParams.get('tab');
-  const [activeTab, setActiveTab] = useState(tabParam || 'workouts');
+  const [activeTab, setActiveTab] = useState<string | null>(tabParam || null);
 
   // LogBook filter state
   const [logBookFilter, setLogBookFilter] = useState<'all' | 'workout' | 'program' | 'tool' | 'measurement'>('all');
@@ -213,6 +213,57 @@ export default function UserDashboard() {
     },
     enabled: !!user
   });
+
+  // Dashboard sections configuration for card grid (must be after unreadCount hook)
+  const dashboardSections = [
+    { 
+      id: "workouts", 
+      label: "Workouts", 
+      description: "Favorites, completed & rated",
+      icon: Dumbbell, 
+      color: "text-orange-500", 
+      bgColor: "bg-orange-500/10",
+      hoverBorder: "hover:border-orange-500/50"
+    },
+    { 
+      id: "programs", 
+      label: "Programs", 
+      description: "Training programs progress",
+      icon: Calendar, 
+      color: "text-blue-500", 
+      bgColor: "bg-blue-500/10",
+      hoverBorder: "hover:border-blue-500/50"
+    },
+    { 
+      id: "purchases", 
+      label: "My Purchases", 
+      description: "Bought content & orders",
+      icon: ShoppingBag, 
+      color: "text-emerald-500", 
+      bgColor: "bg-emerald-500/10",
+      hoverBorder: "hover:border-emerald-500/50"
+    },
+    { 
+      id: "messages", 
+      label: "Messages", 
+      description: "Inbox & notifications",
+      icon: MessageSquare, 
+      color: "text-purple-500", 
+      bgColor: "bg-purple-500/10",
+      hoverBorder: "hover:border-purple-500/50",
+      badge: unreadCount
+    },
+    { 
+      id: "logbook", 
+      label: "My LogBook", 
+      description: "Activity history & stats",
+      icon: BookOpen, 
+      color: "text-amber-500", 
+      bgColor: "bg-amber-500/10",
+      hoverBorder: "hover:border-amber-500/50"
+    },
+  ];
+
   useEffect(() => {
     initDashboard();
 
@@ -1082,38 +1133,53 @@ export default function UserDashboard() {
           </div>
         )}
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <div className="w-full overflow-x-auto">
-            <TabsList className="w-full inline-flex sm:grid sm:grid-cols-6 min-w-max sm:min-w-0">
-              <TabsTrigger value="workouts" className="flex-shrink-0">
-                <Dumbbell className="mr-2 h-4 w-4" />
-                <span className="whitespace-nowrap">Workouts</span>
-              </TabsTrigger>
-              <TabsTrigger value="programs" className="flex-shrink-0">
-                <Calendar className="mr-2 h-4 w-4" />
-                <span className="whitespace-nowrap">Programs</span>
-              </TabsTrigger>
-              <TabsTrigger value="purchases" className="flex-shrink-0">
-                <ShoppingBag className="mr-2 h-4 w-4" />
-                <span className="whitespace-nowrap">My Purchases</span>
-              </TabsTrigger>
-              <TabsTrigger value="messages" className="flex-shrink-0">
-                <MessageSquare className="mr-2 h-4 w-4" />
-                <span className="whitespace-nowrap">Messages</span>
-                {unreadCount > 0 && <Badge variant="destructive" className="ml-2 h-5 min-w-5 flex items-center justify-center rounded-full p-1 text-xs">
-                    {unreadCount}
-                  </Badge>}
-              </TabsTrigger>
-              <TabsTrigger value="logbook" className="flex-shrink-0">
-                <BookOpen className="mr-2 h-4 w-4" />
-                <span className="whitespace-nowrap">My LogBook</span>
-              </TabsTrigger>
-            </TabsList>
+        {/* Dashboard Navigation - Card Grid or Section Content */}
+        {activeTab === null ? (
+          /* Card Grid View */
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+            {dashboardSections.map((section) => {
+              const IconComponent = section.icon;
+              return (
+                <Card 
+                  key={section.id}
+                  onClick={() => setActiveTab(section.id)}
+                  className={`cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all duration-200 group relative ${section.hoverBorder}`}
+                >
+                  <CardContent className="p-4 sm:p-6 flex flex-col items-center text-center gap-2 sm:gap-3">
+                    <div className={`p-3 sm:p-4 rounded-full ${section.bgColor} group-hover:scale-110 transition-transform duration-200`}>
+                      <IconComponent className={`h-6 w-6 sm:h-8 sm:w-8 ${section.color}`} />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-sm sm:text-base">{section.label}</h3>
+                      <p className="text-xs text-muted-foreground hidden sm:block mt-1">
+                        {section.description}
+                      </p>
+                    </div>
+                    {section.badge && section.badge > 0 && (
+                      <Badge variant="destructive" className="absolute top-2 right-2 h-5 min-w-5 flex items-center justify-center rounded-full p-1 text-xs">
+                        {section.badge}
+                      </Badge>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
+        ) : (
+          /* Section Content View */
+          <div className="space-y-6">
+            <Button 
+              variant="ghost" 
+              onClick={() => setActiveTab(null)}
+              className="mb-4 gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to sections
+            </Button>
 
 
-          {/* Workouts Tab */}
-          <TabsContent value="workouts" className="space-y-6">
+            {/* Workouts Section */}
+            {activeTab === "workouts" && <div className="space-y-6">
             {!isPremium ? <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
                 <CardContent className="text-center py-12">
                   <Crown className="h-12 w-12 text-primary mx-auto mb-4" />
@@ -1238,10 +1304,10 @@ export default function UserDashboard() {
               </Card>
             </div>
             </>}
-          </TabsContent>
+            </div>}
 
-          {/* Programs Tab */}
-          <TabsContent value="programs" className="space-y-6">
+            {/* Programs Section */}
+            {activeTab === "programs" && <div className="space-y-6">
             {!isPremium ? <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
                 <CardContent className="text-center py-12">
                   <Crown className="h-12 w-12 text-primary mx-auto mb-4" />
@@ -1363,10 +1429,10 @@ export default function UserDashboard() {
               </Card>
             </div>
             </>}
-          </TabsContent>
+            </div>}
 
-          {/* My Purchases Tab */}
-          <TabsContent value="purchases" className="space-y-6">
+            {/* My Purchases Section */}
+            {activeTab === "purchases" && <div className="space-y-6">
             {/* Premium Member Special Message */}
             {hasActivePlan && <Card className="border-primary bg-gradient-to-br from-primary/10 via-primary/5 to-background overflow-hidden">
                 <CardContent className="text-center py-12 px-6 relative">
@@ -1465,16 +1531,15 @@ export default function UserDashboard() {
                   </div>}
               </CardContent>
             </Card>
-          </TabsContent>
+            </div>}
 
-          {/* Messages Tab */}
-          <TabsContent value="messages" className="space-y-6">
-            <UserMessagesPanel />
-          </TabsContent>
+            {/* Messages Section */}
+            {activeTab === "messages" && <div className="space-y-6">
+              <UserMessagesPanel />
+            </div>}
 
-
-          {/* LogBook Tab */}
-          <TabsContent value="logbook" className="space-y-6">
+            {/* LogBook Section */}
+            {activeTab === "logbook" && <div className="space-y-6">
             {!isPremium ? <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
                 <CardContent className="text-center py-12">
                   <Crown className="h-12 w-12 text-primary mx-auto mb-4" />
@@ -1836,8 +1901,9 @@ export default function UserDashboard() {
 
                 <LogBookAdvancedExport userId={user!.id} />
               </>}
-          </TabsContent>
-        </Tabs>
+            </div>}
+          </div>
+        )}
       </main>
 
       <MeasurementDialog isOpen={isMeasurementDialogOpen} onClose={() => setIsMeasurementDialogOpen(false)} userId={user?.id || ''} onSaved={() => user && fetchMeasurementHistory(user.id)} />
