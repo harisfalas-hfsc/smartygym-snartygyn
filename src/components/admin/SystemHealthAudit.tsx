@@ -24,7 +24,8 @@ import {
   CreditCard,
   FileText,
   Clock,
-  Bell
+  Bell,
+  Wrench
 } from "lucide-react";
 
 interface HealthCheck {
@@ -64,6 +65,53 @@ export const SystemHealthAudit = () => {
   const [progress, setProgress] = useState(0);
   const [result, setResult] = useState<AuditResult | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [isFixingMetadata, setIsFixingMetadata] = useState(false);
+
+  const fixStripeMetadata = async () => {
+    setIsFixingMetadata(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast({
+          title: "Authentication Required",
+          description: "Please log in as admin to fix metadata",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke('fix-stripe-metadata', {
+        body: { dryRun: false }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Stripe Metadata Fixed",
+        description: `Fixed ${data.fixed || 0} products. ${data.alreadyTagged || 0} were already tagged.`,
+      });
+
+      // Re-run audit to show updated status
+      if (result) {
+        runAudit(false);
+      }
+    } catch (error: any) {
+      console.error("Fix metadata failed:", error);
+      toast({
+        title: "Fix Failed",
+        description: error.message || "Could not fix Stripe metadata",
+        variant: "destructive",
+      });
+    } finally {
+      setIsFixingMetadata(false);
+    }
+  };
+
+  const hasStripeMetadataWarnings = result?.summary.warnings.some(
+    w => w.category === 'Stripe' && w.name.toLowerCase().includes('metadata')
+  ) || result?.summary.critical_issues.some(
+    c => c.category === 'Stripe' && c.name.toLowerCase().includes('metadata')
+  );
 
   const runAudit = async (sendEmail: boolean = false) => {
     setIsRunning(true);
@@ -324,6 +372,37 @@ export const SystemHealthAudit = () => {
                       <ScrollArea className="h-[400px]">
                         {result.summary.warnings.length > 0 ? (
                           <div className="space-y-2">
+                            {/* Quick Fix Button for Stripe Metadata */}
+                            {hasStripeMetadataWarnings && (
+                              <Card className="border-blue-300 bg-blue-50 dark:bg-blue-950 mb-3">
+                                <CardContent className="p-4">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                      <Wrench className="h-5 w-5 text-blue-500" />
+                                      <div>
+                                        <div className="font-medium">Quick Fix Available</div>
+                                        <div className="text-sm text-muted-foreground">
+                                          Automatically add SMARTYGYM metadata to Stripe products
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <Button 
+                                      onClick={fixStripeMetadata} 
+                                      disabled={isFixingMetadata}
+                                      size="sm"
+                                      className="gap-2"
+                                    >
+                                      {isFixingMetadata ? (
+                                        <RefreshCw className="h-4 w-4 animate-spin" />
+                                      ) : (
+                                        <Wrench className="h-4 w-4" />
+                                      )}
+                                      {isFixingMetadata ? "Fixing..." : "Fix Metadata Now"}
+                                    </Button>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            )}
                             {result.summary.warnings.map(check => (
                               <Card key={check.id} className="border-yellow-300 bg-yellow-50 dark:bg-yellow-950">
                                 <CardContent className="p-4">
