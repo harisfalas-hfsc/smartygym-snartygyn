@@ -18,8 +18,17 @@ const CATEGORIES = [
   "MOBILITY & STABILITY",
   "CHALLENGE",
   "PILATES",
-  "RECOVERY"
+  "RECOVERY",
+  "MICRO-WORKOUTS"
 ];
+
+// Micro-workout fixed values (enforced by DB trigger too)
+const MICRO_WORKOUT_RULES = {
+  equipment: 'BODYWEIGHT',
+  difficulty: 'All Levels',
+  difficulty_stars: null as number | null,
+  duration: '5 min'
+};
 
 const FORMATS = [
   "TABATA",
@@ -106,6 +115,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
       'CHALLENGE': 'CH',
       'PILATES': 'PIL',
       'RECOVERY': 'REC',
+      'MICRO-WORKOUTS': 'MW',
       // Legacy support for old values still in DB
       'MOBILITY': 'M',
       'CALORIE_BURNING': 'CB',
@@ -114,6 +124,9 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
     };
     return prefixMap[category] || 'W';
   };
+
+  // Check if current category is micro-workout (fields should be locked)
+  const isMicroWorkout = formData.category === 'MICRO-WORKOUTS';
 
   useEffect(() => {
     if (workout) {
@@ -460,12 +473,23 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
               value={formData.category} 
               onValueChange={(value) => {
                 const requiredFormat = getRequiredFormat(value);
-                setFormData({ 
-                  ...formData, 
-                  category: value,
-                  // Auto-set format for restricted categories
-                  ...(requiredFormat ? { format: requiredFormat } : {})
-                });
+                // If micro-workout, auto-set all fixed fields
+                if (value === 'MICRO-WORKOUTS') {
+                  setFormData(prev => ({ 
+                    ...prev, 
+                    category: value,
+                    equipment: MICRO_WORKOUT_RULES.equipment,
+                    difficulty_stars: 0, // Will be set to NULL by DB trigger, 0 means "All Levels"
+                    duration: MICRO_WORKOUT_RULES.duration,
+                  }));
+                } else {
+                  setFormData(prev => ({ 
+                    ...prev, 
+                    category: value,
+                    // Auto-set format for restricted categories
+                    ...(requiredFormat ? { format: requiredFormat } : {})
+                  }));
+                }
               }}
             >
               <SelectTrigger>

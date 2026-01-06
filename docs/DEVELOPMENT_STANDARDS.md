@@ -287,4 +287,36 @@ Any violations appear as WARNINGS in the daily health report.
 
 ---
 
+## 11. Micro-Workout Standards (CRITICAL)
+
+### 11.1 Fixed Attributes (Non-Negotiable)
+
+ALL micro-workouts MUST have these exact values:
+
+| Field | Required Value | Reason |
+|-------|---------------|--------|
+| Equipment | BODYWEIGHT | User should never see "equipment required" |
+| Difficulty | All Levels | Accessible to everyone |
+| Difficulty Stars | NULL (hidden) | No star rating displayed |
+| Duration | 5 min | Marketing promise |
+
+### 11.2 Why "Without Equipment"
+
+Even if the workout uses a chair, desk, stairs, or wall:
+- These are found EVERYWHERE (office, home, outdoors)
+- Labeling as "equipment" makes users think they need gym equipment
+- Users at work will skip workouts labeled "equipment required"
+
+### 11.3 Enforcement
+
+- **Admin UI**: Fields auto-set and locked when MICRO-WORKOUTS category is selected
+- **Database Trigger**: `enforce_micro_workout_rules_trigger` enforces rules on INSERT/UPDATE
+- Any bypass attempts are auto-corrected by the trigger
+
+### 11.4 Focus Field
+
+Micro-workouts use the `focus` field (Core, Full Body, Legs, etc.) to describe target area. This is intentional for marketing purposes and is the ONLY category that uses this field.
+
+---
+
 *This document must be updated when new patterns are established.*
