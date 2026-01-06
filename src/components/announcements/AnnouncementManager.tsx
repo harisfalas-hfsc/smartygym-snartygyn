@@ -2,9 +2,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { WODAnnouncementModal } from "./WODAnnouncementModal";
 import { RitualAnnouncementModal } from "./RitualAnnouncementModal";
-import { FirstSubscriptionPromoModal } from "./FirstSubscriptionPromoModal";
 import { getCyprusTodayStr, getCyprusHour } from "@/lib/cyprusDate";
-import { useFirstSubscriptionPromoEligibility } from "@/hooks/useFirstSubscriptionPromoEligibility";
 
 // Polling interval for checking if WODs exist (3 minutes)
 const WOD_CHECK_INTERVAL_MS = 3 * 60 * 1000;
@@ -12,33 +10,12 @@ const WOD_CHECK_INTERVAL_MS = 3 * 60 * 1000;
 const WOD_CHECK_CUTOFF_HOUR = 6;
 // Delay for Ritual modal after WOD modal closes (10 seconds)
 const RITUAL_DELAY_MS = 10 * 1000;
-// Delay for First Subscription Promo modal after Ritual modal closes (10 seconds)
-const PROMO_DELAY_MS = 10 * 1000;
 
 export const AnnouncementManager = () => {
   const [showWODModal, setShowWODModal] = useState(false);
   const [showRitualModal, setShowRitualModal] = useState(false);
-  const [showPromoModal, setShowPromoModal] = useState(false);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const hasStartedRef = useRef(false);
-  
-  // Check if user is eligible for first-time subscription promo
-  // For visitors (user === null), isEligible will be true
-  // For logged-in users, isEligible reflects their actual eligibility
-  const { isEligible: isPromoEligible, isLoading: isPromoLoading, user } = useFirstSubscriptionPromoEligibility();
-  
-  // Can show promo if: not loading AND (visitor OR eligible logged-in user)
-  // For visitors, we allow showing even while "loading" since we know they're eligible
-  const isVisitor = user === null;
-  const canShowPromo = isPromoEligible && (!isPromoLoading || isVisitor);
-
-  console.log('[AnnouncementManager] Promo eligibility:', { 
-    isPromoEligible, 
-    isPromoLoading, 
-    isVisitor,
-    canShowPromo,
-    userId: user?.id || 'visitor'
-  });
 
   const getTodayKey = (prefix: string) => {
     // Use Cyprus date for localStorage keys to ensure consistency
@@ -106,29 +83,6 @@ export const AnnouncementManager = () => {
     }
   }, [stopPolling]);
 
-  // Trigger Promo modal directly (when previous modals are skipped)
-  const triggerPromoModalIfNeeded = useCallback(() => {
-    // Check if we can show promo (visitor or eligible logged-in user)
-    if (!canShowPromo) {
-      console.log("[AnnouncementManager] Promo not allowed", { isPromoEligible, isPromoLoading, user: user?.id });
-      return;
-    }
-
-    const promoShownKey = getTodayKey("first_subscription_promo_shown");
-    const promoAlreadyShown = localStorage.getItem(promoShownKey) === "true";
-    const promoDontShow = localStorage.getItem(getTodayKey("first_subscription_promo_dont_show")) === "true";
-
-    if (promoAlreadyShown || promoDontShow) {
-      console.log("[AnnouncementManager] Promo already shown or don't show - skipping");
-      return;
-    }
-
-    console.log("[AnnouncementManager] Triggering Promo modal directly");
-    setTimeout(() => {
-      setShowPromoModal(true);
-    }, 2000);
-  }, [canShowPromo, isPromoEligible, isPromoLoading, user]);
-
   // Trigger Ritual modal (when WOD is skipped or not available)
   const triggerRitualModalIfNeeded = useCallback(() => {
     const ritualShownKey = getTodayKey("ritual_announcement_shown");
@@ -137,8 +91,6 @@ export const AnnouncementManager = () => {
 
     if (ritualAlreadyShown || ritualDontShow) {
       console.log("[AnnouncementManager] Ritual already shown or don't show - skipping");
-      // Check if we should show promo instead
-      triggerPromoModalIfNeeded();
       return;
     }
 
@@ -146,7 +98,7 @@ export const AnnouncementManager = () => {
     setTimeout(() => {
       setShowRitualModal(true);
     }, 2000); // Short delay when no WOD
-  }, [triggerPromoModalIfNeeded]);
+  }, []);
 
   // Initialize on mount
   useEffect(() => {
@@ -162,8 +114,8 @@ export const AnnouncementManager = () => {
       await new Promise(resolve => setTimeout(resolve, 1000));
 
       if (wodAlreadyShown || wodDontShow) {
-        // WOD already shown today, check if Ritual/Promo should show
-        console.log("[AnnouncementManager] WOD already shown today - checking Ritual/Promo");
+        // WOD already shown today, check if Ritual should show
+        console.log("[AnnouncementManager] WOD already shown today - checking Ritual");
         triggerRitualModalIfNeeded();
         return;
       }
@@ -183,11 +135,11 @@ export const AnnouncementManager = () => {
           // Before 6 AM - WODs might still be generating, start polling
           console.log("[AnnouncementManager] No WODs yet, starting polling until", WOD_CHECK_CUTOFF_HOUR);
           pollingIntervalRef.current = setInterval(tryShowWODModal, WOD_CHECK_INTERVAL_MS);
-          // Skip WOD modal for now, show Ritual/Promo
+          // Skip WOD modal for now, show Ritual
           triggerRitualModalIfNeeded();
         } else {
-          // After 6 AM - WODs aren't coming today, skip to Ritual/Promo
-          console.log("[AnnouncementManager] No WODs and past cutoff - skipping to Ritual/Promo");
+          // After 6 AM - WODs aren't coming today, skip to Ritual
+          console.log("[AnnouncementManager] No WODs and past cutoff - skipping to Ritual");
           triggerRitualModalIfNeeded();
         }
       }
@@ -227,7 +179,7 @@ export const AnnouncementManager = () => {
     }, RITUAL_DELAY_MS);
   }, [stopPolling]);
 
-  // Handle Ritual modal close - start timer for First Subscription Promo modal
+  // Handle Ritual modal close
   const handleRitualClose = useCallback((dontShowAgain?: boolean) => {
     setShowRitualModal(false);
     
@@ -238,37 +190,6 @@ export const AnnouncementManager = () => {
     if (dontShowAgain) {
       const ritualDontShowKey = getTodayKey("ritual_dont_show");
       localStorage.setItem(ritualDontShowKey, "true");
-    }
-
-    // Check if Promo modal should show (visitor or eligible logged-in user)
-    if (!canShowPromo) {
-      console.log("[AnnouncementManager] Promo not allowed after Ritual", { isPromoEligible, user: user?.id });
-      return;
-    }
-
-    const promoShownKey = getTodayKey("first_subscription_promo_shown");
-    const promoAlreadyShown = localStorage.getItem(promoShownKey) === "true";
-    const promoDontShow = localStorage.getItem(getTodayKey("first_subscription_promo_dont_show")) === "true";
-
-    if (promoAlreadyShown || promoDontShow) return;
-
-    // Start 10 second timer for First Subscription Promo popup
-    setTimeout(() => {
-      setShowPromoModal(true);
-    }, PROMO_DELAY_MS);
-  }, [canShowPromo, isPromoEligible, user]);
-
-  // Handle Promo modal close
-  const handlePromoClose = useCallback((dontShowAgain?: boolean) => {
-    setShowPromoModal(false);
-    
-    // Mark Promo modal as shown today (using Cyprus date)
-    const promoShownKey = getTodayKey("first_subscription_promo_shown");
-    localStorage.setItem(promoShownKey, "true");
-    
-    if (dontShowAgain) {
-      const promoDontShowKey = getTodayKey("first_subscription_promo_dont_show");
-      localStorage.setItem(promoDontShowKey, "true");
     }
   }, []);
 
@@ -281,10 +202,6 @@ export const AnnouncementManager = () => {
       <RitualAnnouncementModal 
         open={showRitualModal} 
         onClose={handleRitualClose} 
-      />
-      <FirstSubscriptionPromoModal 
-        open={showPromoModal} 
-        onClose={handlePromoClose} 
       />
     </>
   );

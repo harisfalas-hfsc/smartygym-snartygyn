@@ -7,10 +7,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// First-time subscriber coupon ID (35% off)
-const FIRST_TIME_COUPON_ID = "TnTNe1uX";
-
-// SmartyGym subscription price IDs - ONLY these qualify for first-time discount
+// SmartyGym subscription price IDs
 const SMARTYGYM_PRICE_IDS = [
   "price_1SJ9q1IxQYg9inGKZzxxqPbD",  // Gold Monthly (€9.99/mo)
   "price_1SJ9qGIxQYg9inGKFbgqVRjj",  // Platinum Yearly (€89.89/yr)
@@ -32,8 +29,8 @@ serve(async (req) => {
   );
 
   try {
-    const { priceId, applyFirstTimeDiscount } = await req.json();
-    logStep("Request received", { priceId, applyFirstTimeDiscount });
+    const { priceId } = await req.json();
+    logStep("Request received", { priceId });
     
     if (!priceId) {
       throw new Error("Price ID is required");
@@ -91,37 +88,6 @@ serve(async (req) => {
       }
     }
 
-    // Check if user is truly a first-time SmartyGym subscriber (server-side validation)
-    let shouldApplyCoupon = false;
-    if (applyFirstTimeDiscount && customerId) {
-      // Check if customer has EVER had any SmartyGym subscription (including cancelled ones)
-      const subscriptions = await stripe.subscriptions.list({
-        customer: customerId,
-        status: 'all', // Include all statuses: active, cancelled, past_due, etc.
-        limit: 100,
-        expand: ['data.items.data.price']
-      });
-      
-      // Filter to ONLY SmartyGym subscriptions
-      const smartyGymSubscriptions = subscriptions.data.filter((sub: { items: { data: { price?: { id?: string } }[] } }) => {
-        const priceId = sub.items.data[0]?.price?.id;
-        return priceId && SMARTYGYM_PRICE_IDS.includes(priceId);
-      });
-      
-      const isFirstTimeSubscriber = smartyGymSubscriptions.length === 0;
-      shouldApplyCoupon = isFirstTimeSubscriber;
-      logStep("First-time SmartyGym subscriber check", { 
-        totalSubscriptions: subscriptions.data.length,
-        smartyGymSubscriptions: smartyGymSubscriptions.length,
-        isFirstTimeSubscriber,
-        shouldApplyCoupon 
-      });
-    } else if (applyFirstTimeDiscount && !customerId) {
-      // No customer record means they've never purchased anything
-      shouldApplyCoupon = true;
-      logStep("New customer - applying first-time discount");
-    }
-
     // Create checkout session
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
@@ -145,14 +111,9 @@ serve(async (req) => {
           user_id: user.id,
         }
       },
-      // Apply first-time discount coupon if eligible
-      ...(shouldApplyCoupon && { discounts: [{ coupon: FIRST_TIME_COUPON_ID }] }),
     });
 
-    logStep("Checkout session created", { 
-      sessionId: session.id, 
-      discountApplied: shouldApplyCoupon 
-    });
+    logStep("Checkout session created", { sessionId: session.id });
 
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
