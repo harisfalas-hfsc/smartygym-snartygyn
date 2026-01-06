@@ -25,6 +25,10 @@ interface UserData {
   full_name: string | null;
   plan_type: string;
   status: string;
+  // Admin role fields
+  is_admin?: boolean;
+  is_moderator?: boolean;
+  user_role?: string;
   // Corporate fields
   is_corporate_admin?: boolean;
   corporate_admin_org?: string | null;
@@ -81,7 +85,10 @@ export function EmailComposer() {
         email: user.email,
         full_name: user.full_name || user.email,
         plan_type: user.plan_type || 'free',
-        status: user.status || 'inactive',
+        status: user.status || 'registered',
+        is_admin: user.is_admin || false,
+        is_moderator: user.is_moderator || false,
+        user_role: user.user_role || 'user',
         is_corporate_admin: user.is_corporate_admin || false,
         corporate_admin_org: user.corporate_admin_org || null,
         corporate_admin_plan: user.corporate_admin_plan || null,
@@ -357,7 +364,7 @@ export function EmailComposer() {
                   <SelectItem value="all">All Statuses</SelectItem>
                   <SelectItem value="active">Active</SelectItem>
                   <SelectItem value="canceled">Canceled</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
+                  <SelectItem value="registered">Registered (No Plan)</SelectItem>
                 </SelectContent>
               </Select>
 
