@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,8 +16,7 @@ import {
   Sparkles,
   Heart,
   TrendingUp,
-  Target,
-  Gift
+  Target
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
@@ -26,13 +25,10 @@ import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { useAccessControl } from "@/contexts/AccessControlContext";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
-import { FirstTimeDiscountBanner } from "@/components/pricing/FirstTimeDiscountBanner";
-import { FirstTimeDiscountInlineCallout } from "@/components/pricing/FirstTimeDiscountInlineCallout";
 import { AlreadyPremiumCard } from "@/components/pricing/AlreadyPremiumCard";
 
 export default function JoinPremium() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const { canGoBack, goBack } = useShowBackButton();
   const { userTier } = useAccessControl();
@@ -40,14 +36,9 @@ export default function JoinPremium() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
   
-  // Check if first-time discount is active
-  const isDiscountActive = searchParams.get('discount') === 'first35';
-  
   // Pricing
   const goldOriginal = 9.99;
   const platinumOriginal = 89.99;
-  const goldDiscounted = parseFloat((goldOriginal * 0.65).toFixed(2));
-  const platinumDiscounted = parseFloat((platinumOriginal * 0.65).toFixed(2));
 
   useEffect(() => {
     // Check current session
@@ -92,10 +83,7 @@ export default function JoinPremium() {
 
     try {
       const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: { 
-          priceId: priceIds[plan],
-          applyFirstTimeDiscount: isDiscountActive 
-        }
+        body: { priceId: priceIds[plan] }
       });
 
       // Handle already subscribed response from backend
@@ -117,7 +105,7 @@ export default function JoinPremium() {
       if (data?.url && checkoutWindow) {
         checkoutWindow.location.href = data.url;
         toast({
-          title: isDiscountActive ? "35% discount applied!" : "Checkout opened",
+          title: "Checkout opened",
           description: "Complete your purchase in the opened window",
         });
       } else if (checkoutWindow) {
@@ -153,7 +141,7 @@ export default function JoinPremium() {
       <Helmet>
         <title>Gold & Platinum Membership | Premium Online Gym | SmartyGym by Haris Falas | smartygym.com</title>
         <meta name="description" content="Join SmartyGym Premium at smartygym.com - Gold Plan €9.99/month or Platinum €89.99/year. Unlimited workouts, training programs, calculators, full dashboard access. Premium online gym by Sports Scientist Haris Falas. Cancel anytime." />
-        <meta name="keywords" content="online gym membership, premium fitness, gym subscription, online gym plans, Gold membership SmartyGym, Platinum membership SmartyGym, smartygym premium, online fitness subscription, gym membership online, affordable online gym, premium workouts, unlimited training programs, Haris Falas membership, smartygym.com premium, 35% off gym membership, first-time subscriber discount, cheap gym subscription" />
+        <meta name="keywords" content="online gym membership, premium fitness, gym subscription, online gym plans, Gold membership SmartyGym, Platinum membership SmartyGym, smartygym premium, online fitness subscription, gym membership online, affordable online gym, premium workouts, unlimited training programs, Haris Falas membership, smartygym.com premium" />
         
         <meta property="og:title" content="Premium Membership | SmartyGym | smartygym.com" />
         <meta property="og:description" content="Gold €9.99/month or Platinum €89.99/year. Unlimited workouts, training programs, premium fitness tools." />
@@ -167,7 +155,6 @@ export default function JoinPremium() {
         <link rel="canonical" href="https://smartygym.com/join-premium" />
         
         {/* AI Search Optimization Meta Tags */}
-        <meta name="ai-subscription-offer" content="35% off first billing cycle for new subscribers" />
         <meta name="ai-pricing-gold" content="€9.99/month recurring subscription" />
         <meta name="ai-pricing-platinum" content="€89.99/year (save 25% vs monthly)" />
         <meta name="ai-value-proposition" content="100% human-designed workouts by certified Sports Scientist Haris Falas" />
@@ -219,40 +206,6 @@ export default function JoinPremium() {
           })}
         </script>
         
-        {/* Sale/Discount Schema - Only when discount is active */}
-        {isDiscountActive && (
-          <script type="application/ld+json">
-            {JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Sale",
-              "name": "First-Time Subscriber 35% Discount",
-              "description": "New subscribers get 35% off their first billing cycle on Gold or Platinum plans",
-              "seller": {
-                "@type": "Organization",
-                "name": "SmartyGym"
-              },
-              "priceSpecification": [
-                {
-                  "@type": "PriceSpecification",
-                  "name": "Gold Plan (Discounted)",
-                  "price": goldDiscounted.toString(),
-                  "priceCurrency": "EUR",
-                  "validFrom": "2025-01-01",
-                  "validThrough": "2026-12-31"
-                },
-                {
-                  "@type": "PriceSpecification",
-                  "name": "Platinum Plan (Discounted)",
-                  "price": platinumDiscounted.toString(),
-                  "priceCurrency": "EUR",
-                  "validFrom": "2025-01-01",
-                  "validThrough": "2026-12-31"
-                }
-              ]
-            })}
-          </script>
-        )}
-        
         {/* FAQ Schema for subscription questions */}
         <script type="application/ld+json">
           {JSON.stringify({
@@ -264,7 +217,7 @@ export default function JoinPremium() {
                 "name": "How much does SmartyGym cost?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "SmartyGym offers two premium plans: Gold Plan at €9.99/month or Platinum Plan at €89.99/year (equivalent to €7.50/month, saving 25%). New subscribers can get 35% off their first billing cycle."
+                  "text": "SmartyGym offers two premium plans: Gold Plan at €9.99/month or Platinum Plan at €89.99/year (equivalent to €7.50/month, saving 25%)."
                 }
               },
               {
@@ -272,7 +225,7 @@ export default function JoinPremium() {
                 "name": "Is there a free trial for SmartyGym?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "SmartyGym offers a free tier with access to selected workouts, all fitness calculators, blog articles, and the exercise library. First-time subscribers also get 35% off their first premium billing cycle."
+                  "text": "SmartyGym offers a free tier with access to selected workouts, all fitness calculators, blog articles, and the exercise library."
                 }
               },
               {
@@ -367,27 +320,6 @@ export default function JoinPremium() {
             <AlreadyPremiumCard className="mb-8" />
           )}
 
-          {/* Persistent First-Time Discount Banner for eligible users - only show if not premium */}
-          {!isPremium && <FirstTimeDiscountBanner />}
-
-          {/* First-Time Discount Banner */}
-          {isDiscountActive && (
-            <Card className="mb-6 bg-gradient-to-r from-primary/20 via-primary/10 to-background border-primary/30 shadow-lg">
-              <CardContent className="p-4 sm:p-6">
-                <div className="flex items-center justify-center gap-3 mb-2">
-                  <Gift className="h-6 w-6 text-primary animate-pulse" />
-                  <h3 className="text-lg sm:text-xl font-bold text-primary">
-                    First-Time Subscriber Discount Applied!
-                  </h3>
-                  <Gift className="h-6 w-6 text-primary animate-pulse" />
-                </div>
-                <p className="text-center text-sm text-muted-foreground">
-                  You're getting <span className="font-bold text-primary">35% off</span> your first billing cycle. This discount will be automatically applied at checkout!
-                </p>
-              </CardContent>
-            </Card>
-          )}
-
           {/* Info Ribbon */}
           <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-8 text-center">
             <p className="text-sm text-muted-foreground">
@@ -455,20 +387,8 @@ export default function JoinPremium() {
                 <Badge className="bg-[#D4AF37] text-white mx-auto mb-3 sm:mb-4 text-xs sm:text-sm">
                   MONTHLY
                 </Badge>
-                {isDiscountActive ? (
-                  <>
-                    <div className="flex items-center justify-center gap-2">
-                      <span className="text-lg text-muted-foreground line-through">€{goldOriginal}</span>
-                      <CardTitle className="text-2xl sm:text-3xl font-bold text-primary" itemProp="offers">€{goldDiscounted}</CardTitle>
-                    </div>
-                    <p className="text-xs sm:text-sm text-primary font-semibold" itemProp="description">per month (35% off!)</p>
-                  </>
-                ) : (
-                  <>
-                    <CardTitle className="text-2xl sm:text-3xl font-bold" itemProp="offers">€{goldOriginal}</CardTitle>
-                    <p className="text-xs sm:text-sm text-muted-foreground h-4 sm:h-5" itemProp="description">per month</p>
-                  </>
-                )}
+                <CardTitle className="text-2xl sm:text-3xl font-bold" itemProp="offers">€{goldOriginal}</CardTitle>
+                <p className="text-xs sm:text-sm text-muted-foreground h-4 sm:h-5" itemProp="description">per month</p>
                 <div className="h-10 sm:h-14 flex flex-col justify-center">
                   <p className="text-xs text-[#D4AF37] font-semibold">
                     🔄 Auto-renews monthly
@@ -542,20 +462,8 @@ export default function JoinPremium() {
                 <Badge className="bg-[#A8A9AD] text-white mx-auto mb-3 sm:mb-4 text-xs sm:text-sm">
                   YEARLY
                 </Badge>
-                {isDiscountActive ? (
-                  <>
-                    <div className="flex items-center justify-center gap-2">
-                      <span className="text-lg text-muted-foreground line-through">€{platinumOriginal}</span>
-                      <CardTitle className="text-2xl sm:text-3xl font-bold text-primary">€{platinumDiscounted}</CardTitle>
-                    </div>
-                    <p className="text-xs sm:text-sm text-primary font-semibold">per year (35% off!)</p>
-                  </>
-                ) : (
-                  <>
-                    <CardTitle className="text-2xl sm:text-3xl font-bold">€{platinumOriginal}</CardTitle>
-                    <p className="text-xs sm:text-sm text-muted-foreground h-4 sm:h-5">per year</p>
-                  </>
-                )}
+                <CardTitle className="text-2xl sm:text-3xl font-bold">€{platinumOriginal}</CardTitle>
+                <p className="text-xs sm:text-sm text-muted-foreground h-4 sm:h-5">per year</p>
                 <div className="h-10 sm:h-14 flex flex-col justify-center">
                   <p className="text-sm sm:text-base text-green-600 font-bold">
                     Save €29.89!
@@ -616,9 +524,6 @@ export default function JoinPremium() {
               </CardContent>
             </Card>
           </div>
-
-          {/* First-Time Discount Inline Callout - shown below pricing cards */}
-          <FirstTimeDiscountInlineCallout />
 
           {/* Subscription Notice */}
           <div className="text-center mb-8 mt-8">
