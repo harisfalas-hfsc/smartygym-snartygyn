@@ -83,7 +83,7 @@ export const WorkoutOfTheDay = () => {
       >
         {wod.image_url && (
           <div className="relative w-full h-20 rounded-md overflow-hidden mb-2">
-            <img src={wod.image_url} alt={wod.name || "Workout"} className="w-full h-full object-cover" />
+            <img src={wod.image_url} alt={`${wod.name || "Workout"} - ${wod.format || ''} ${wod.category || ''} workout - ${wod.difficulty_stars}★ ${wod.difficulty || ''} - ${wod.duration || ''} - by Sports Scientist Haris Falas - SmartyGym.com`} className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
             <Badge className={`absolute top-2 left-2 ${bgColor} text-white border-0 text-xs py-0.5`}>
               {equipmentIcon}

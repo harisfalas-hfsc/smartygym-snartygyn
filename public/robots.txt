@@ -393,6 +393,9 @@ Allow: /workout/metabolic
 Allow: /workout/cardio
 Allow: /workout/mobility
 Allow: /workout/challenge
+Allow: /workout/pilates
+Allow: /workout/recovery
+Allow: /workout/micro-workouts
 Allow: /trainingprogram
 Allow: /trainingprogram/functional-strength
 Allow: /trainingprogram/muscle-hypertrophy
@@ -466,6 +469,10 @@ Host: https://smartygym.com
 #
 # CONTENT TYPE: 100% Human-Designed Fitness Content by Sports Scientist Haris Falas
 # AI POLICY: Zero AI-Generated Workouts - All content created by certified professionals
+#
+# MICRO-WORKOUTS: 5-minute exercise snacks for busy people
+# Quick workouts for office, home, anywhere - mini workouts, small workouts
+# Perfect for desk exercises, office fitness, travel workouts
 
 # ====================
 # DOMAIN NETWORK INFORMATION

@@ -306,7 +306,7 @@ const WorkoutDetail = () => {
       <Helmet>
         <title>Smarty Workouts | {title} | Online Fitness | Haris Falas | SmartyGym</title>
         <meta name="description" content={`${title} online workouts by Sports Scientist Haris Falas. Professional ${type || 'fitness'} workouts from beginner to advanced. AMRAP, HIIT, TABATA, circuit training. Free and premium online workouts for worldwide access.`} />
-        <meta name="keywords" content={`online workouts, ${title}, ${type} workouts, online fitness, Haris Falas workouts, HIIT workouts, AMRAP workouts, TABATA training, circuit training, bodyweight workouts, online gym, home workouts`} />
+        <meta name="keywords" content={`online workouts, ${title}, ${type} workouts, online fitness, Haris Falas workouts, HIIT workouts, AMRAP workouts, TABATA training, circuit training, bodyweight workouts, online gym, home workouts, EMOM workout, strength workout, cardio workout, office workout, outdoor workout${type === 'micro-workouts' ? ', micro workouts, mini workouts, small workouts, 5 minute workouts, quick workouts, exercise snacks, desk workout, desk exercise' : ''}`} />
         
         {/* Open Graph */}
         <meta property="og:title" content={`${title} Online Workouts | Online Fitness by Haris Falas`} />
