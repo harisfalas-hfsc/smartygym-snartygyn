@@ -158,7 +158,12 @@ export const ContactManager = () => {
     }
 
     if (filterStatus !== "all") {
-      filtered = filtered.filter(msg => msg.status === filterStatus);
+      if (filterStatus === "unread") {
+        // Unread = no read_at timestamp OR status is 'new'
+        filtered = filtered.filter(msg => !msg.read_at || msg.status === 'new');
+      } else {
+        filtered = filtered.filter(msg => msg.status === filterStatus);
+      }
     }
 
     if (filterCategory !== "all") {
@@ -541,7 +546,7 @@ export const ContactManager = () => {
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { variant: any; label: string }> = {
-      new: { variant: "default", label: "New" },
+      new: { variant: "default", label: "Unread" },
       read: { variant: "secondary", label: "Read" },
       responded: { variant: "outline", label: "Responded" },
       closed: { variant: "outline", label: "Closed" }
@@ -591,7 +596,7 @@ export const ContactManager = () => {
     }
   };
 
-  const newMessages = messages.filter(m => m.status === 'new');
+  const unreadMessages = messages.filter(m => !m.read_at || m.status === 'new');
   const readMessages = messages.filter(m => m.status === 'read');
   const respondedMessages = messages.filter(m => m.status === 'responded');
   const closedMessages = messages.filter(m => m.status === 'closed');
@@ -608,7 +613,7 @@ export const ContactManager = () => {
             <div className="flex items-center gap-2 mb-2">
               <div className={`w-2 h-2 rounded-full ${getCategoryColor(message.category)}`} />
               <h3 className="font-semibold">{message.name}</h3>
-              {message.status === 'new' && <Badge variant="destructive">New</Badge>}
+              {(!message.read_at || message.status === 'new') && <Badge variant="destructive">Unread</Badge>}
               {message.user_id && <Badge variant="outline">Has Account</Badge>}
               {!message.user_id && <Badge variant="secondary">Visitor</Badge>}
             </div>
@@ -670,7 +675,7 @@ export const ContactManager = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="new">New</SelectItem>
+                <SelectItem value="unread">Unread</SelectItem>
                 <SelectItem value="read">Read</SelectItem>
                 <SelectItem value="responded">Responded</SelectItem>
                 <SelectItem value="closed">Closed</SelectItem>
@@ -694,8 +699,8 @@ export const ContactManager = () => {
             <Card>
               <CardContent className="pt-6">
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-red-600">{newMessages.length}</p>
-                  <p className="text-sm text-muted-foreground">New</p>
+                  <p className="text-2xl font-bold text-red-600">{unreadMessages.length}</p>
+                  <p className="text-sm text-muted-foreground">Unread</p>
                 </div>
               </CardContent>
             </Card>
@@ -740,8 +745,8 @@ export const ContactManager = () => {
                 <TabsTrigger value="coach" className="flex-shrink-0 whitespace-nowrap">
                   Coach ({coachMessages.length})
                 </TabsTrigger>
-                <TabsTrigger value="new" className="flex-shrink-0 whitespace-nowrap">
-                  New ({newMessages.length})
+                <TabsTrigger value="unread" className="flex-shrink-0 whitespace-nowrap">
+                  Unread ({unreadMessages.length})
                 </TabsTrigger>
                 <TabsTrigger value="sent" className="flex-shrink-0 whitespace-nowrap flex items-center gap-1">
                   <SendHorizonal className="h-4 w-4" />
@@ -786,11 +791,11 @@ export const ContactManager = () => {
               )}
             </TabsContent>
 
-            <TabsContent value="new" className="space-y-4 mt-4">
-              {newMessages.length === 0 ? (
-                <p className="text-center text-muted-foreground py-8">No new messages</p>
+            <TabsContent value="unread" className="space-y-4 mt-4">
+              {unreadMessages.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">No unread messages</p>
               ) : (
-                newMessages.map(message => <MessageCard key={message.id} message={message} />)
+                unreadMessages.map(message => <MessageCard key={message.id} message={message} />)
               )}
             </TabsContent>
 

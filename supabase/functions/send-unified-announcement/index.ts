@@ -139,20 +139,30 @@ serve(async (req) => {
       }
     }
 
-    // Log to audit table
+    // Log to audit table with proper metadata
     try {
-      await supabaseAdmin
+      const { error: auditError } = await supabaseAdmin
         .from("notification_audit_log")
         .insert({
           notification_type: "unified_announcement",
-          message_type: messageType,
+          message_type: safeMessageType,
           subject: subject,
           content: content,
           recipient_count: userIds.length,
           success_count: sentCount,
           failed_count: failedCount,
           sent_at: new Date().toISOString(),
+          metadata: {
+            userIds: userIds,
+            originalMessageType: messageType,
+          },
         });
+      
+      if (auditError) {
+        logStep("ERROR inserting audit log", { error: auditError.message });
+      } else {
+        logStep("Audit log inserted successfully");
+      }
     } catch (auditError) {
       logStep("ERROR logging to audit", { error: auditError });
     }
