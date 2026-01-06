@@ -1295,9 +1295,10 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // ============================================
-    // CATEGORY 16: STRIPE METADATA INTEGRITY (REAL VERIFICATION)
+    // CATEGORY 16: STRIPE METADATA INTEGRITY (SELF-HEALING)
+    // Automatically fixes metadata issues BEFORE reporting
     // ============================================
-    console.log("💳 Checking Stripe metadata integrity with REAL Stripe API verification...");
+    console.log("💳 Checking Stripe metadata integrity with SELF-HEALING...");
 
     const stripeKeyForMetadata = Deno.env.get("STRIPE_SECRET_KEY");
     
@@ -1315,12 +1316,12 @@ const handler = async (req: Request): Promise<Response> => {
       // Get all products with stripe_product_id from workouts and programs
       const { data: workoutsWithStripe } = await supabase
         .from('admin_workouts')
-        .select('id, name, stripe_product_id, type, category')
+        .select('id, name, stripe_product_id, stripe_price_id, type, category, is_workout_of_day, image_url, price, description')
         .not('stripe_product_id', 'is', null);
 
       const { data: programsWithStripe } = await supabase
         .from('admin_training_programs')
-        .select('id, name, stripe_product_id, category')
+        .select('id, name, stripe_product_id, stripe_price_id, category, image_url, price, description')
         .not('stripe_product_id', 'is', null);
 
       const totalStripeProducts = (workoutsWithStripe?.length || 0) + (programsWithStripe?.length || 0);
@@ -1334,40 +1335,158 @@ const handler = async (req: Request): Promise<Response> => {
           'No verification needed'
         );
       } else {
-        // Actually verify Stripe products have SMARTYGYM metadata
-        let missingMetadata: string[] = [];
+        // SELF-HEALING: Automatically fix metadata issues
+        let fixedCount = 0;
+        let recreatedCount = 0;
         let correctMetadata = 0;
-        let verificationErrors: string[] = [];
+        let repairErrors: string[] = [];
 
-        // Check workouts
+        // Helper to determine content_type
+        const getContentType = (item: any, isProgram: boolean): string => {
+          if (isProgram) return "Training Program";
+          if (item.type === "MICRO-WORKOUTS" || item.category === "MICRO-WORKOUTS") return "Micro-Workout";
+          return "Workout";
+        };
+
+        // Process workouts with SELF-HEALING
         for (const workout of (workoutsWithStripe || [])) {
           try {
-            const product = await stripeClient.products.retrieve(workout.stripe_product_id);
-            if (product.metadata?.project === "SMARTYGYM") {
-              correctMetadata++;
-            } else {
-              missingMetadata.push(`Workout: ${workout.name}`);
+            const contentType = getContentType(workout, false);
+            let product: Stripe.Product;
+            
+            try {
+              product = await stripeClient.products.retrieve(workout.stripe_product_id);
+            } catch (retrieveError: any) {
+              // Product doesn't exist - AUTO-RECREATE
+              console.log(`🔧 AUTO-RECREATING missing product for: ${workout.name}`);
+              
+              const newProduct = await stripeClient.products.create({
+                name: workout.name,
+                description: workout.description || `${workout.category} Workout`,
+                images: workout.image_url ? [workout.image_url] : [],
+                metadata: {
+                  project: "SMARTYGYM",
+                  content_type: contentType,
+                  content_id: workout.id
+                }
+              });
+
+              const newPrice = await stripeClient.prices.create({
+                product: newProduct.id,
+                unit_amount: Math.round((workout.price || 3.99) * 100),
+                currency: "eur"
+              });
+
+              await supabase
+                .from("admin_workouts")
+                .update({
+                  stripe_product_id: newProduct.id,
+                  stripe_price_id: newPrice.id
+                })
+                .eq("id", workout.id);
+
+              recreatedCount++;
+              console.log(`✅ Auto-recreated: ${workout.name} → ${newProduct.id}`);
+              continue;
             }
+
+            // Check if metadata is correct
+            const hasCorrectProject = product.metadata?.project === "SMARTYGYM";
+            const hasCorrectContentType = product.metadata?.content_type === contentType;
+
+            if (hasCorrectProject && hasCorrectContentType) {
+              correctMetadata++;
+              continue;
+            }
+
+            // AUTO-FIX metadata
+            console.log(`🔧 AUTO-FIXING metadata for: ${workout.name}`);
+            await stripeClient.products.update(workout.stripe_product_id, {
+              metadata: {
+                ...product.metadata,
+                project: "SMARTYGYM",
+                content_type: contentType,
+                content_id: workout.id
+              }
+            });
+            fixedCount++;
+            console.log(`✅ Auto-fixed: ${workout.name}`);
+
           } catch (err: any) {
-            verificationErrors.push(`${workout.name}: ${err.message}`);
+            repairErrors.push(`${workout.name}: ${err.message}`);
           }
         }
 
-        // Check programs
+        // Process programs with SELF-HEALING
         for (const program of (programsWithStripe || [])) {
           try {
-            const product = await stripeClient.products.retrieve(program.stripe_product_id);
-            if (product.metadata?.project === "SMARTYGYM") {
-              correctMetadata++;
-            } else {
-              missingMetadata.push(`Program: ${program.name}`);
+            const contentType = "Training Program";
+            let product: Stripe.Product;
+            
+            try {
+              product = await stripeClient.products.retrieve(program.stripe_product_id);
+            } catch (retrieveError: any) {
+              // Product doesn't exist - AUTO-RECREATE
+              console.log(`🔧 AUTO-RECREATING missing program product: ${program.name}`);
+              
+              const newProduct = await stripeClient.products.create({
+                name: program.name,
+                description: program.description || `${program.category} Training Program`,
+                images: program.image_url ? [program.image_url] : [],
+                metadata: {
+                  project: "SMARTYGYM",
+                  content_type: contentType,
+                  content_id: program.id
+                }
+              });
+
+              const newPrice = await stripeClient.prices.create({
+                product: newProduct.id,
+                unit_amount: Math.round((program.price || 9.99) * 100),
+                currency: "eur"
+              });
+
+              await supabase
+                .from("admin_training_programs")
+                .update({
+                  stripe_product_id: newProduct.id,
+                  stripe_price_id: newPrice.id
+                })
+                .eq("id", program.id);
+
+              recreatedCount++;
+              console.log(`✅ Auto-recreated program: ${program.name} → ${newProduct.id}`);
+              continue;
             }
+
+            // Check metadata
+            const hasCorrectProject = product.metadata?.project === "SMARTYGYM";
+            const hasCorrectContentType = product.metadata?.content_type === contentType;
+
+            if (hasCorrectProject && hasCorrectContentType) {
+              correctMetadata++;
+              continue;
+            }
+
+            // AUTO-FIX
+            console.log(`🔧 AUTO-FIXING program metadata: ${program.name}`);
+            await stripeClient.products.update(program.stripe_product_id, {
+              metadata: {
+                ...product.metadata,
+                project: "SMARTYGYM",
+                content_type: contentType,
+                content_id: program.id
+              }
+            });
+            fixedCount++;
+            console.log(`✅ Auto-fixed program: ${program.name}`);
+
           } catch (err: any) {
-            verificationErrors.push(`${program.name}: ${err.message}`);
+            repairErrors.push(`${program.name}: ${err.message}`);
           }
         }
 
-        // Report results
+        // Report results AFTER self-healing
         addCheck(
           'Stripe Metadata',
           'Linked Products Count',
@@ -1376,31 +1495,34 @@ const handler = async (req: Request): Promise<Response> => {
           `Workouts: ${workoutsWithStripe?.length || 0}, Programs: ${programsWithStripe?.length || 0}`
         );
 
-        if (missingMetadata.length === 0 && verificationErrors.length === 0) {
-          addCheck(
-            'Stripe Metadata',
-            'SMARTYGYM Tag Verification',
-            `All ${correctMetadata} products have correct metadata`,
-            'pass',
-            'All Stripe products are correctly tagged with project: "SMARTYGYM"'
-          );
-        } else if (missingMetadata.length > 0) {
-          addCheck(
-            'Stripe Metadata',
-            'SMARTYGYM Tag Verification',
-            `${missingMetadata.length} products MISSING SMARTYGYM metadata`,
-            'fail',
-            `MISSING: ${missingMetadata.slice(0, 5).join(', ')}${missingMetadata.length > 5 ? ` and ${missingMetadata.length - 5} more` : ''}. Run fix-stripe-metadata function to fix.`
-          );
-        }
+        const totalFixed = fixedCount + recreatedCount;
+        const totalCorrect = correctMetadata + totalFixed;
 
-        if (verificationErrors.length > 0) {
+        if (repairErrors.length === 0) {
+          if (totalFixed > 0) {
+            addCheck(
+              'Stripe Metadata',
+              'SMARTYGYM Tag Verification',
+              `All ${totalCorrect} products now have correct metadata`,
+              'pass',
+              `✅ AUTO-HEALED: ${fixedCount} fixed, ${recreatedCount} recreated, ${correctMetadata} were already correct`
+            );
+          } else {
+            addCheck(
+              'Stripe Metadata',
+              'SMARTYGYM Tag Verification',
+              `All ${correctMetadata} products have correct metadata`,
+              'pass',
+              'All Stripe products are correctly tagged with project: "SMARTYGYM"'
+            );
+          }
+        } else {
           addCheck(
             'Stripe Metadata',
-            'Verification Errors',
-            `${verificationErrors.length} products could not be verified`,
+            'Auto-Repair Status',
+            `${repairErrors.length} products could not be auto-repaired`,
             'warning',
-            `Errors: ${verificationErrors.slice(0, 3).join('; ')}${verificationErrors.length > 3 ? '...' : ''}`
+            `Auto-healed: ${totalFixed}. Errors: ${repairErrors.slice(0, 3).join('; ')}${repairErrors.length > 3 ? '...' : ''}`
           );
         }
       }
