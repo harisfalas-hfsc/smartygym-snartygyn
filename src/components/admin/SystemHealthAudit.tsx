@@ -125,7 +125,7 @@ export const SystemHealthAudit = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke('run-system-health-audit', {
-        body: { sendEmail, adminEmail: 'harisfalas@gmail.com' }
+        body: { sendEmail, adminEmail: 'smartygym@outlook.com' }
       });
 
       clearInterval(progressInterval);
@@ -517,7 +517,7 @@ export const SystemHealthAudit = () => {
           </Dialog>
 
           <p className="text-xs text-muted-foreground">
-            Auto-runs daily at 22:00 Cyprus time with email to harisfalas@gmail.com
+            Auto-runs daily at 22:00 Cyprus time with email to smartygym@outlook.com
           </p>
         </div>
       </CardContent>

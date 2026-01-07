@@ -9,7 +9,7 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-const COACH_EMAIL = "harisfalas@gmail.com";
+const COACH_EMAIL = "smartygym@outlook.com";
 
 interface DirectCoachEmailRequest {
   name: string;

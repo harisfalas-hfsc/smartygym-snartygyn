@@ -190,7 +190,7 @@ const Contact = () => {
             email: validatedData.email,
             subject: validatedData.subject,
             message: validatedData.message,
-            recipientEmail: 'harisfalas@gmail.com',
+            recipientEmail: 'smartygym@outlook.com',
             userStatus: isAuthenticated 
               ? (isPremium ? 'Premium Subscriber' : 'Free Member')
               : 'Guest'
