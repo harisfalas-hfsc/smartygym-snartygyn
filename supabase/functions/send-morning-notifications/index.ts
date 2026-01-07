@@ -530,12 +530,22 @@ ${ritualSection}
 ${getEmailFooter(authUser.email, 'wod')}
 </div>`;
 
-        // Use template email subject if available - include both WOD and Ritual in subject
-        const finalEmailSubject = (wantsWodEmail && wodEmailSubject) 
-          ? wodEmailSubject 
-          : (isRecoveryDay 
-            ? `🌅 Today's Recovery Workout & Smarty Ritual Are Ready`
-            : `🌅 Today's Workout of the Day & Smarty Ritual Are Ready`);
+        // Build subject based on what content is included
+        let finalEmailSubject: string;
+        if (wantsWodEmail && wantsRitualEmail) {
+          // Combined subject when both are included
+          finalEmailSubject = isRecoveryDay 
+            ? `🌅 Today's Recovery Workout and Daily Ritual`
+            : `🌅 Today's Workout of the Day and Daily Ritual`;
+        } else if (wantsWodEmail) {
+          // WOD only - use template subject or generate one
+          finalEmailSubject = wodEmailSubject || (isRecoveryDay 
+            ? `🧘 Today's Recovery Workout: ${todaysWods[0]?.name || 'Recovery'}`
+            : `🏆 Today's Workout of the Day: ${category}`);
+        } else {
+          // Ritual only
+          finalEmailSubject = ritualEmailSubject || `🌅 Your Daily Smarty Ritual`;
+        }
 
         await resendClient.emails.send({
           from: "SmartyGym <notifications@smartygym.com>",
