@@ -61,7 +61,15 @@ serve(async (req) => {
       throw new Error(`Invalid plan type: ${plan_type}. Must be one of: ${validPlanTypes.join(', ')}`);
     }
 
-    logStep("Granting corporate admin", { user_id, plan_type });
+    // Get target user info for logging
+    const { data: targetUser } = await supabaseAdmin.auth.admin.getUserById(user_id);
+    const superAdminEmail = 'harisfalas@gmail.com';
+    
+    if (targetUser?.user?.email === superAdminEmail) {
+      logStep("Granting corporate admin to super admin", { email: superAdminEmail, plan_type });
+    } else {
+      logStep("Granting corporate admin", { user_id, plan_type });
+    }
 
     // Check if user already has a corporate subscription as admin
     const { data: existingCorp } = await supabaseAdmin

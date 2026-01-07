@@ -56,6 +56,13 @@ serve(async (req) => {
       throw new Error("Missing required field: user_id");
     }
 
+    // Prevent revoking super admin corporate status
+    const superAdminEmail = 'harisfalas@gmail.com';
+    const { data: targetUser } = await supabaseAdmin.auth.admin.getUserById(user_id);
+    if (targetUser?.user?.email === superAdminEmail) {
+      throw new Error('Cannot revoke super admin corporate status');
+    }
+
     logStep("Revoking corporate admin", { user_id });
 
     // Get the corporate subscription
