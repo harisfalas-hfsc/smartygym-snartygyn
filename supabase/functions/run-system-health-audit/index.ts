@@ -402,7 +402,7 @@ const handler = async (req: Request): Promise<Response> => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { sendEmail = false, adminEmail = "harisfalas@gmail.com" } = await req.json().catch(() => ({}));
+    const { sendEmail = false, adminEmail = "smartygym@outlook.com" } = await req.json().catch(() => ({}));
 
     // Helper function to add check
     const addCheck = (

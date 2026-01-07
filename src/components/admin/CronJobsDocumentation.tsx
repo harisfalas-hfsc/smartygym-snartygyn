@@ -136,7 +136,7 @@ export const CronJobsDocumentation = () => {
                   <span className="text-gray-600 text-xs">245+ checks across platform</span>
                 </td>
                 <td className="border border-gray-300 p-3">Daily at 22:00</td>
-                <td className="border border-gray-300 p-3">Admin email only (harisfalas@gmail.com)</td>
+                <td className="border border-gray-300 p-3">Admin email only (smartygym@outlook.com)</td>
               </tr>
             </tbody>
           </table>

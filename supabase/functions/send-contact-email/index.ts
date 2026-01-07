@@ -258,7 +258,7 @@ const handler = async (req: Request): Promise<Response> => {
             await resend.emails.send({
               from: "SmartyGym <notifications@smartygym.com>",
               to: [email],
-              replyTo: "harisfalas@gmail.com",
+              replyTo: "smartygym@outlook.com",
               subject: `Re: ${subject}`,
               html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -326,7 +326,7 @@ const handler = async (req: Request): Promise<Response> => {
 
         await resend.emails.send({
           from: "SmartyGym Contact <notifications@smartygym.com>",
-          to: ["harisfalas@gmail.com"],
+          to: ["smartygym@outlook.com"],
           replyTo: email,
           subject: `[SmartyGym ${categoryLabel}] ${safeSubject}`,
           html: `
@@ -378,7 +378,7 @@ const handler = async (req: Request): Promise<Response> => {
             </div>
           `,
         });
-        console.log("Forward email sent to harisfalas@gmail.com with AI response included");
+        console.log("Forward email sent to smartygym@outlook.com with AI response included");
       } catch (forwardError) {
         console.error("Failed to forward email:", forwardError);
         // Don't fail the whole request if forward fails
