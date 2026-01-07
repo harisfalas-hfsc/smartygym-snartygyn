@@ -238,7 +238,7 @@ All scheduled functions must be registered in pg_cron:
 
 For critical issues:
 - Admin Email: admin@smartygym.com
-- Support Email: harisfalas@gmail.com
+- Support Email: smartygym@outlook.com
 
 ---
 

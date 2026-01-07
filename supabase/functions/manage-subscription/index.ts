@@ -76,7 +76,7 @@ serve(async (req) => {
     }
 
     // Prevent modifying super admin (the main admin account)
-    const superAdminEmail = 'haris.falas@gmail.com';
+    const superAdminEmail = 'harisfalas@gmail.com';
     const { data: targetUser } = await supabaseAdmin.auth.admin.getUserById(user_id);
     if (targetUser?.user?.email === superAdminEmail && action === 'revoke') {
       throw new Error('Cannot modify super admin subscription');

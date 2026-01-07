@@ -10,7 +10,7 @@ const corsHeaders = {
 
 const MAX_ATTEMPTS = 3;
 const RETRY_DELAY_MS = 30000; // 30 seconds between retries
-const ADMIN_EMAIL = "stavrosdel@gmail.com";
+const ADMIN_EMAIL = "smartygym@outlook.com";
 
 interface WodVerificationResult {
   success: boolean;
@@ -208,7 +208,7 @@ async function sendAdminAlert(
   
   try {
     const result = await resend.emails.send({
-      from: "SmartyGym Alerts <onboarding@resend.dev>",
+      from: "SmartyGym Alerts <notifications@smartygym.com>",
       to: [ADMIN_EMAIL],
       subject: `🚨 URGENT: WOD Generation Failed After ${MAX_ATTEMPTS} Attempts - ${dateStr}`,
       html: emailHtml,

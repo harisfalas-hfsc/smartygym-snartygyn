@@ -79,7 +79,7 @@ export function UsersManager() {
   const [organizations, setOrganizations] = useState<string[]>([]);
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const SUPER_ADMIN_EMAIL = "harisfallas@gmail.com";
+  const SUPER_ADMIN_EMAIL = "harisfalas@gmail.com";
 
   const fetchUsers = async () => {
     setLoading(true);
