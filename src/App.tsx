@@ -51,7 +51,6 @@ import CoachCV from "./pages/CoachCV";
 import Contact from "./pages/Contact";
 import TakeATour from "./pages/TakeATour";
 import Shop from "./pages/Shop";
-import TableTest from "./pages/TableTest";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import Disclaimer from "./pages/Disclaimer";
@@ -214,7 +213,6 @@ const AppContent = () => {
                 <Route path="/disclaimer" element={<Disclaimer />} />
                 <Route path="/tools" element={<Tools />} />
                 <Route path="/shop" element={<Shop />} />
-                <Route path="/table-test" element={<TableTest />} />
                 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
