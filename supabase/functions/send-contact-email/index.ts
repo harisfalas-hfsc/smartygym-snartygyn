@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@4.0.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+import { getAdminNotificationEmail } from "../_shared/admin-settings.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -81,10 +82,11 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { name, email, subject, message, recipientEmail, userStatus, messageId }: ContactEmailRequest = await req.json();
+    // Note: recipientEmail from frontend is ignored - we always use database setting
+    const { name, email, subject, message, userStatus, messageId }: ContactEmailRequest = await req.json();
 
     // Input validation
-    if (!name || !email || !subject || !message || !recipientEmail) {
+    if (!name || !email || !subject || !message) {
       return new Response(
         JSON.stringify({ error: 'All fields are required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -126,18 +128,20 @@ const handler = async (req: Request): Promise<Response> => {
     const safeMessage = sanitizeHtml(message.trim()).replace(/\n/g, '<br>');
     const safeUserStatus = userStatus ? sanitizeHtml(userStatus) : '';
 
-    console.log(`Sending email from ${email} to ${recipientEmail}`);
-
     // Create Supabase client for logging history
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Send initial email to admin (notifications@smartygym.com)
+    // Get admin notification email from database - ALWAYS use this, never trust frontend
+    const adminEmail = await getAdminNotificationEmail(supabaseAdmin);
+    console.log(`Sending email from ${email} to ${adminEmail} (resolved from database)`);
+
+    // Send initial email to admin
     const emailResponse = await resend.emails.send({
       from: "SmartyGym Contact <notifications@smartygym.com>",
-      to: [recipientEmail],
+      to: [adminEmail],
       replyTo: email,
       subject: `[Smarty Gym Contact] ${safeSubject}`,
       html: `
@@ -326,7 +330,7 @@ const handler = async (req: Request): Promise<Response> => {
 
         await resend.emails.send({
           from: "SmartyGym Contact <notifications@smartygym.com>",
-          to: ["smartygym@outlook.com"],
+          to: [adminEmail],
           replyTo: email,
           subject: `[SmartyGym ${categoryLabel}] ${safeSubject}`,
           html: `
@@ -378,7 +382,7 @@ const handler = async (req: Request): Promise<Response> => {
             </div>
           `,
         });
-        console.log("Forward email sent to smartygym@outlook.com with AI response included");
+        console.log(`Forward email sent to ${adminEmail} with AI response included`);
       } catch (forwardError) {
         console.error("Failed to forward email:", forwardError);
         // Don't fail the whole request if forward fails

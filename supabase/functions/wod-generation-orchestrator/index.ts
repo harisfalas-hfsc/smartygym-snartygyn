@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { getDayIn84Cycle, getPeriodizationForDay } from "../_shared/periodization-84day.ts";
+import { getAdminNotificationEmail } from "../_shared/admin-settings.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -10,7 +11,6 @@ const corsHeaders = {
 
 const MAX_ATTEMPTS = 3;
 const RETRY_DELAY_MS = 30000; // 30 seconds between retries
-const ADMIN_EMAIL = "smartygym@outlook.com";
 
 interface WodVerificationResult {
   success: boolean;
@@ -129,6 +129,7 @@ async function callGenerateWod(
 }
 
 async function sendAdminAlert(
+  supabase: any,
   dateStr: string,
   missing: string[],
   attempts: { attempt: number; error?: string }[],
@@ -139,6 +140,10 @@ async function sendAdminAlert(
     console.error("[ORCHESTRATOR] RESEND_API_KEY not configured, cannot send admin alert");
     return;
   }
+  
+  // Get admin email from database settings
+  const adminEmail = await getAdminNotificationEmail(supabase);
+  console.log(`[ORCHESTRATOR] Sending admin alert to: ${adminEmail}`);
   
   const resend = new Resend(resendApiKey);
   
@@ -209,7 +214,7 @@ async function sendAdminAlert(
   try {
     const result = await resend.emails.send({
       from: "SmartyGym Alerts <notifications@smartygym.com>",
-      to: [ADMIN_EMAIL],
+      to: [adminEmail],
       subject: `🚨 URGENT: WOD Generation Failed After ${MAX_ATTEMPTS} Attempts - ${dateStr}`,
       html: emailHtml,
     });
@@ -335,6 +340,7 @@ serve(async (req) => {
   console.log(`[ORCHESTRATOR] 🚨 ALL ${MAX_ATTEMPTS} ATTEMPTS FAILED - Sending admin alert`);
 
   await sendAdminAlert(
+    supabase,
     effectiveDate,
     finalResult?.missing || ["UNKNOWN"],
     attempts,

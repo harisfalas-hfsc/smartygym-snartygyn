@@ -4,6 +4,7 @@ import { Resend } from "https://esm.sh/resend@2.0.0";
 import Stripe from "https://esm.sh/stripe@14.21.0";
 import { MESSAGE_TYPES, MESSAGE_TYPE_SOURCES } from "../_shared/notification-types.ts";
 import { CYCLE_START_DATE, PERIODIZATION_84DAY, getDayIn84Cycle, getPeriodizationForDay } from "../_shared/periodization-84day.ts";
+import { getAdminNotificationEmail } from "../_shared/admin-settings.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -402,7 +403,11 @@ const handler = async (req: Request): Promise<Response> => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { sendEmail = false, adminEmail = "smartygym@outlook.com" } = await req.json().catch(() => ({}));
+    const { sendEmail = false } = await req.json().catch(() => ({}));
+    
+    // ALWAYS resolve admin email from database - never trust request body
+    const adminEmail = await getAdminNotificationEmail(supabase);
+    console.log(`📧 Admin notification email resolved to: ${adminEmail}`);
 
     // Helper function to add check
     const addCheck = (
