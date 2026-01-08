@@ -45,10 +45,10 @@ serve(async (req: Request) => {
       throw profilesError;
     }
 
-    // Filter users with checkin_reminders enabled for email AND dashboard
+    // Filter users with checkin_reminders enabled for email (opt-out model like all other emails)
     const usersForEmail = profiles?.filter(p => {
       const prefs = p.notification_preferences as Record<string, any> || {};
-      return prefs.opt_out_all !== true && (prefs.email_checkin_reminders === true || prefs.checkin_reminders === true);
+      return prefs.opt_out_all !== true && prefs.email_checkin_reminders !== false;
     }) || [];
 
     const usersForDashboard = profiles?.filter(p => {
