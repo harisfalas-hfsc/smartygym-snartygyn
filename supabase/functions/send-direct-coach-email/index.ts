@@ -1,5 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { getCoachInboxEmail } from "../_shared/admin-settings.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -8,8 +10,6 @@ const corsHeaders = {
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
 };
-
-const COACH_EMAIL = "smartygym@outlook.com";
 
 interface DirectCoachEmailRequest {
   name: string;
@@ -28,10 +28,18 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    
     const { name, email, subject, message, attachments }: DirectCoachEmailRequest = await req.json();
 
     console.log(`Processing direct coach email from: ${name} (${email})`);
     console.log(`Subject: ${subject}`);
+
+    // Get coach email from database settings
+    const coachEmail = await getCoachInboxEmail(supabase);
+    console.log(`Coach inbox email resolved to: ${coachEmail}`);
 
     // Build attachments HTML if any
     let attachmentsHtml = "";
@@ -58,7 +66,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Send direct email to coach
     const emailResponse = await resend.emails.send({
       from: "SmartyGym <noreply@smartygym.com>",
-      to: [COACH_EMAIL],
+      to: [coachEmail],
       reply_to: email,
       subject: `[Direct from Premium] ${subject}`,
       html: `

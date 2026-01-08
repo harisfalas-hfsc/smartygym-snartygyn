@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { getAdminNotificationEmail } from "../_shared/admin-settings.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -11,7 +12,6 @@ const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
-const ADMIN_EMAIL = 'smartygym@outlook.com';
 
 // PRIORITY KEYWORDS - Strongly emphasized in ALL SEO generation
 const PRIORITY_KEYWORDS = [
@@ -587,7 +587,9 @@ function generateEmailReport(data: {
   return { subject, html: emailHtml, downloadableHtml };
 }
 
-async function sendEmailReport(reportData: {
+async function sendEmailReport(
+  supabase: any,
+  reportData: {
   runDate: string;
   durationSeconds: number;
   totalScanned: number;
@@ -603,6 +605,9 @@ async function sendEmailReport(reportData: {
   }
 
   try {
+    // Get admin email from database settings
+    const adminEmail = await getAdminNotificationEmail(supabase);
+    
     const resend = new Resend(RESEND_API_KEY);
     const { subject, html, downloadableHtml } = generateEmailReport(reportData);
 
@@ -613,7 +618,7 @@ async function sendEmailReport(reportData: {
 
     const { error } = await resend.emails.send({
       from: 'SmartyGym SEO <info@smartygym.com>',
-      to: [ADMIN_EMAIL],
+      to: [adminEmail],
       subject: subject,
       html: html,
       attachments: [
@@ -629,7 +634,7 @@ async function sendEmailReport(reportData: {
       return false;
     }
 
-    console.log('✅ Email report sent successfully to', ADMIN_EMAIL);
+    console.log('✅ Email report sent successfully to', adminEmail);
     return true;
   } catch (error) {
     console.error('Error sending email report:', error);
@@ -850,7 +855,7 @@ serve(async (req) => {
     }
 
     // Send email report
-    const emailSent = await sendEmailReport({
+    const emailSent = await sendEmailReport(supabase, {
       runDate,
       durationSeconds,
       totalScanned: itemsScanned,
