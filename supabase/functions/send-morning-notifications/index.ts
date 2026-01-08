@@ -23,6 +23,38 @@ function replacePlaceholders(template: string, data: Record<string, string | num
   return result;
 }
 
+// Strip "Good Morning, Smarty!" greeting from template content to prevent duplicates
+// The main email wrapper already includes this greeting, so we remove it from sections
+function stripMorningGreeting(html: string): string {
+  if (!html) return html;
+  
+  // Remove various patterns of the morning greeting
+  const patterns = [
+    // Tiptap style: <p class="tiptap-paragraph"><strong>🌅 Good Morning, Smarty!</strong></p>
+    /<p[^>]*class="[^"]*tiptap-paragraph[^"]*"[^>]*>\s*<strong>\s*🌅?\s*Good\s*Morning,?\s*Smarty!?\s*<\/strong>\s*<\/p>\s*/gi,
+    // Email style: <h1...>🌅 Good Morning, Smarty!</h1>
+    /<h1[^>]*>\s*🌅?\s*Good\s*Morning,?\s*Smarty!?\s*<\/h1>\s*/gi,
+    // Plain heading without emoji
+    /<h1[^>]*>\s*Good\s*Morning,?\s*Smarty!?\s*<\/h1>\s*/gi,
+    // Paragraph style with strong
+    /<p[^>]*>\s*<strong>\s*🌅?\s*Good\s*Morning,?\s*Smarty!?\s*<\/strong>\s*<\/p>\s*/gi,
+    // Paragraph style without strong
+    /<p[^>]*>\s*🌅?\s*Good\s*Morning,?\s*Smarty!?\s*<\/p>\s*/gi,
+    // Just the text in a div
+    /<div[^>]*>\s*🌅?\s*Good\s*Morning,?\s*Smarty!?\s*<\/div>\s*/gi,
+  ];
+  
+  let result = html;
+  for (const pattern of patterns) {
+    result = result.replace(pattern, '');
+  }
+  
+  // Clean up any resulting double empty paragraphs or excess whitespace at the start
+  result = result.replace(/^(\s*<p[^>]*>\s*<\/p>\s*)+/gi, '');
+  
+  return result.trim();
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -465,10 +497,12 @@ serve(async (req) => {
 
         if (wantsWodEmail) {
           // If template provided email_content, wrap it in a styled div
-          if (wodEmailContent && wodEmailContent.trim() !== '') {
+          // Strip any "Good Morning, Smarty!" greeting to prevent duplicates (wrapper already has it)
+          const cleanedWodContent = stripMorningGreeting(wodEmailContent);
+          if (cleanedWodContent && cleanedWodContent.trim() !== '') {
             wodSection = `
 <div style="margin: 30px 0; padding: 25px; background: #f8f9fa; border-radius: 12px; border-left: 4px solid #29B6D2;">
-  ${wodEmailContent}
+  ${cleanedWodContent}
 </div>`;
           } else {
             // Fallback to hardcoded email content
@@ -500,10 +534,12 @@ serve(async (req) => {
         }
 
         if (wantsRitualEmail) {
-          if (ritualEmailContent && ritualEmailContent.trim() !== '') {
+          // Strip any "Good Morning, Smarty!" greeting to prevent duplicates (wrapper already has it)
+          const cleanedRitualContent = stripMorningGreeting(ritualEmailContent);
+          if (cleanedRitualContent && cleanedRitualContent.trim() !== '') {
             ritualSection = `
 <div style="margin: 30px 0; padding: 25px; background: #f8f9fa; border-radius: 12px; border-left: 4px solid #29B6D2;">
-  ${ritualEmailContent}
+  ${cleanedRitualContent}
 </div>`;
           } else {
             ritualSection = `
