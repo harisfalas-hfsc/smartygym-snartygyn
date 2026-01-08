@@ -681,6 +681,21 @@ export const ContactManager = () => {
             </div>
           </div>
           <div className="flex gap-2">
+            <Button 
+              size="sm" 
+              variant="ghost" 
+              onClick={() => {
+                setHistoryUser({
+                  userId: message.user_id,
+                  email: message.email,
+                  name: message.name,
+                });
+                setShowHistoryDialog(true);
+              }}
+              title="View full communication history"
+            >
+              <History className="h-4 w-4" />
+            </Button>
             <Button size="sm" variant="outline" onClick={() => handleViewMessage(message)}>
               <Eye className="h-4 w-4 mr-1" />
               View
