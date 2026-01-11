@@ -78,11 +78,13 @@ serve(async (req) => {
     logStep("Generating ritual", { dayNumber, theme: theme.focus });
 
     // Generate content using AI
-    const prompt = `Generate a Daily Smarty Ritual for Day ${dayNumber} with theme focus: "${theme.focus}"
+    const prompt = `Generate a Daily Smarty Ritual with theme focus: "${theme.focus}"
 
 Morning Theme: "${theme.morning}"
 Midday Theme: "${theme.midday}"  
 Evening Theme: "${theme.evening}"
+
+CRITICAL RULE: DO NOT mention any day numbers anywhere in the content. Never say "Day X" or reference which day it is.
 
 STRICT FORMATTING RULES:
 - Use emojis for visual appeal
@@ -97,7 +99,7 @@ NUTRITION PHILOSOPHY (mention in Smarty Tips):
 STRUCTURE FOR EACH PHASE:
 
 MORNING RITUAL:
-1. 🌅 MUST start with: "Good morning, Smarty!" followed by a warm greeting (1 sentence)
+1. 🌅 MUST start with: "Good morning, Smarty!" followed by a warm, motivational greeting (1 sentence) - DO NOT mention day numbers
 2. 🏋️ Joint Unlock (4 movements, 20-30s each)
 3. 🔑 Light Activation (3 exercises)
 4. 💡 Smarty Tip (nutrition/hydration for morning)
