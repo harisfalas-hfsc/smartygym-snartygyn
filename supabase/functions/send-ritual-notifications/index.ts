@@ -18,10 +18,10 @@ function logStep(step: string, details?: any) {
 const DEFAULT_DASHBOARD_SUBJECT = "🌅 Your Daily Smarty Ritual is Ready!";
 const DEFAULT_EMAIL_SUBJECT = "🌅 Good Morning, Smarty!";
 
-function buildDefaultDashboardContent(dayNumber: number): string {
+function buildDefaultDashboardContent(): string {
   return `<p class="tiptap-paragraph"><strong>🌅 Good Morning, Smarty!</strong></p>
 <p class="tiptap-paragraph"></p>
-<p class="tiptap-paragraph">Your Day ${dayNumber} Smarty Ritual is ready!</p>
+<p class="tiptap-paragraph">Your Daily Smarty Ritual is ready!</p>
 <p class="tiptap-paragraph"></p>
 <p class="tiptap-paragraph">Start your day with intention through our three wellness rituals:</p>
 <p class="tiptap-paragraph">☀️ <strong>Morning</strong> - Energize your start</p>
@@ -31,10 +31,10 @@ function buildDefaultDashboardContent(dayNumber: number): string {
 <p class="tiptap-paragraph"><a href="https://smartygym.com/daily-ritual">View Today's Ritual →</a></p>`;
 }
 
-function buildDefaultEmailHtml(dayNumber: number, email: string): string {
+function buildDefaultEmailHtml(email: string): string {
   return `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
 <h1 style="color: #29B6D2;">🌅 Good Morning, Smarty!</h1>
-<p style="font-size: 16px;">Your <strong>Day ${dayNumber}</strong> Smarty Ritual is ready!</p>
+<p style="font-size: 16px;">Your <strong>Daily Smarty Ritual</strong> is ready!</p>
 <p style="color: #666;">Start your day with intention through our three wellness rituals:</p>
 <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin: 20px 0;">
   <p style="margin: 10px 0;">☀️ <strong>Morning</strong> - Energize your start</p>
@@ -150,12 +150,12 @@ serve(async (req) => {
 
     if (template) {
       dashboardSubject = replacePlaceholders(template.dashboard_subject || template.subject || DEFAULT_DASHBOARD_SUBJECT, placeholders);
-      dashboardContent = replacePlaceholders(template.dashboard_content || template.content || buildDefaultDashboardContent(dayNumber), placeholders);
+      dashboardContent = replacePlaceholders(template.dashboard_content || template.content || buildDefaultDashboardContent(), placeholders);
       emailSubject = replacePlaceholders(template.email_subject || template.subject || DEFAULT_EMAIL_SUBJECT, placeholders);
       logStep("Using template content", { subject: dashboardSubject });
     } else {
-      dashboardSubject = `🌅 Day ${dayNumber} Smarty Ritual is Ready!`;
-      dashboardContent = buildDefaultDashboardContent(dayNumber);
+      dashboardSubject = DEFAULT_DASHBOARD_SUBJECT;
+      dashboardContent = buildDefaultDashboardContent();
       emailSubject = DEFAULT_EMAIL_SUBJECT;
       logStep("Using default hardcoded content (no template found)");
     }
@@ -217,7 +217,7 @@ ${replacePlaceholders(template.email_content, placeholders)}
 ${getEmailFooter(authUser.email, 'ritual')}
 </div>`;
         } else {
-          emailHtml = buildDefaultEmailHtml(dayNumber, authUser.email);
+          emailHtml = buildDefaultEmailHtml(authUser.email);
         }
 
         const emailResult = await resendClient.emails.send({
