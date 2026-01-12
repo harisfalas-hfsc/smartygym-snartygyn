@@ -978,6 +978,42 @@ export type Database = {
         }
         Relationships: []
       }
+      email_delivery_log: {
+        Row: {
+          error_message: string | null
+          id: string
+          message_type: string
+          metadata: Json | null
+          resend_id: string | null
+          sent_at: string
+          status: string
+          to_email: string
+          user_id: string | null
+        }
+        Insert: {
+          error_message?: string | null
+          id?: string
+          message_type: string
+          metadata?: Json | null
+          resend_id?: string | null
+          sent_at?: string
+          status: string
+          to_email: string
+          user_id?: string | null
+        }
+        Update: {
+          error_message?: string | null
+          id?: string
+          message_type?: string
+          metadata?: Json | null
+          resend_id?: string | null
+          sent_at?: string
+          status?: string
+          to_email?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       email_templates: {
         Row: {
           body: string

@@ -23,6 +23,26 @@ function replacePlaceholders(template: string, data: Record<string, string | num
   return result;
 }
 
+// CRITICAL: Strip any "Day X" references from content (safety sanitizer)
+// This ensures users NEVER see "Day 43", "Day {day_number}", etc.
+function stripDayReferences(text: string): string {
+  if (!text) return text;
+  
+  let result = text;
+  
+  // Remove patterns like "Day 43", "Day 1", "Day {day_number}"
+  result = result.replace(/Day\s*\{day_number\}/gi, 'Daily');
+  result = result.replace(/Day\s*\d+/gi, 'Daily');
+  
+  // Remove patterns like "for Day 43", "on Day 1"
+  result = result.replace(/(for|on|is)\s+Daily/gi, '$1 Today');
+  
+  // Clean up any double spaces
+  result = result.replace(/\s{2,}/g, ' ');
+  
+  return result;
+}
+
 // Strip "Good Morning, Smarty!" greeting from template content to prevent duplicates
 // The main email wrapper already includes this greeting, so we remove it from sections
 function stripMorningGreeting(html: string): string {
@@ -429,8 +449,8 @@ serve(async (req) => {
         dashboardInserts.push({
           user_id: profile.user_id,
           message_type: MESSAGE_TYPES.WOD_NOTIFICATION,
-          subject: wodDashboardSubject,
-          content: wodDashboardContent,
+          subject: stripDayReferences(wodDashboardSubject),
+          content: stripDayReferences(wodDashboardContent),
           is_read: false,
         });
         wodDashboardSent++;
@@ -441,8 +461,8 @@ serve(async (req) => {
         dashboardInserts.push({
           user_id: profile.user_id,
           message_type: MESSAGE_TYPES.DAILY_RITUAL,
-          subject: ritualDashboardSubject,
-          content: ritualDashboardContent,
+          subject: stripDayReferences(ritualDashboardSubject),
+          content: stripDayReferences(ritualDashboardContent),
           is_read: false,
         });
         ritualDashboardSent++;
@@ -467,7 +487,19 @@ serve(async (req) => {
     const profilesMap = new Map(allProfiles?.map(p => [p.user_id, p.notification_preferences]) || []);
 
     let emailsSent = 0;
+    let emailsFailed = 0;
     let emailsSkipped = 0;
+    
+    // Track email delivery for debugging
+    const emailDeliveryLogs: { 
+      message_type: string; 
+      to_email: string; 
+      user_id: string | null; 
+      status: string; 
+      error_message: string | null;
+      resend_id: string | null;
+      metadata: any;
+    }[] = [];
 
     for (const authUser of usersData?.users || []) {
       if (!authUser.email) continue;
@@ -567,6 +599,7 @@ ${getEmailFooter(authUser.email, 'wod')}
 </div>`;
 
         // Build subject based on what content is included
+        // Apply day sanitizer to ensure no "Day X" leaks through
         let finalEmailSubject: string;
         if (wantsWodEmail && wantsRitualEmail) {
           // Combined subject when both are included
@@ -582,26 +615,80 @@ ${getEmailFooter(authUser.email, 'wod')}
           // Ritual only
           finalEmailSubject = ritualEmailSubject || `🌅 Your Daily Smarty Ritual`;
         }
+        
+        // CRITICAL: Apply day sanitizer to subject and HTML to prevent any "Day X" from leaking
+        finalEmailSubject = stripDayReferences(finalEmailSubject);
+        const sanitizedEmailHtml = stripDayReferences(emailHtml);
 
-        await resendClient.emails.send({
+        const emailResult = await resendClient.emails.send({
           from: "SmartyGym <notifications@smartygym.com>",
           to: authUser.email,
           subject: finalEmailSubject,
-          html: emailHtml,
+          html: sanitizedEmailHtml,
           headers: getEmailHeaders(authUser.email, 'wod'),
         });
 
-        emailsSent++;
-        logStep(`Email sent to ${authUser.email}`);
+        // Check for Resend API errors
+        if (emailResult.error) {
+          emailsFailed++;
+          logStep(`Failed to send email to ${authUser.email}`, { error: emailResult.error });
+          
+          // Log failure for debugging
+          emailDeliveryLogs.push({
+            message_type: 'morning_combined',
+            to_email: authUser.email,
+            user_id: authUser.id,
+            status: 'failed',
+            error_message: emailResult.error.message || JSON.stringify(emailResult.error),
+            resend_id: null,
+            metadata: { wantsWodEmail, wantsRitualEmail, isRecoveryDay }
+          });
+        } else {
+          emailsSent++;
+          logStep(`Email sent to ${authUser.email}`, { resendId: emailResult.data?.id });
+          
+          // Log success for watched addresses (e.g., harisfalas@gmail.com for debugging)
+          const watchedEmails = ['harisfalas@gmail.com'];
+          if (watchedEmails.includes(authUser.email.toLowerCase())) {
+            emailDeliveryLogs.push({
+              message_type: 'morning_combined',
+              to_email: authUser.email,
+              user_id: authUser.id,
+              status: 'success',
+              error_message: null,
+              resend_id: emailResult.data?.id || null,
+              metadata: { wantsWodEmail, wantsRitualEmail, isRecoveryDay }
+            });
+          }
+        }
         
         // Small delay to avoid rate limiting
         await new Promise(resolve => setTimeout(resolve, 100));
       } catch (emailError) {
-        logStep(`Failed to send email to ${authUser.email}`, { error: emailError });
+        emailsFailed++;
+        const errorMsg = emailError instanceof Error ? emailError.message : String(emailError);
+        logStep(`Exception sending email to ${authUser.email}`, { error: errorMsg });
+        
+        // Log exception
+        emailDeliveryLogs.push({
+          message_type: 'morning_combined',
+          to_email: authUser.email,
+          user_id: authUser.id,
+          status: 'failed',
+          error_message: errorMsg,
+          resend_id: null,
+          metadata: { exception: true }
+        });
       }
     }
+    
+    // Insert email delivery logs for debugging
+    if (emailDeliveryLogs.length > 0) {
+      await supabase.from('email_delivery_log').insert(emailDeliveryLogs);
+      logStep("Email delivery logs inserted", { count: emailDeliveryLogs.length });
+    }
 
-    logStep("Email sending complete", { emailsSent, emailsSkipped });
+    logStep("Email sending complete", { emailsSent, emailsFailed, emailsSkipped });
 
     // ============================================
     // CREATE AUDIT LOG (log each message_type separately for better history tracking)
