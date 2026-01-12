@@ -23,18 +23,24 @@ function replacePlaceholders(template: string, data: Record<string, string | num
   return result;
 }
 
-// CRITICAL: Strip any "Day X" references from content (safety sanitizer)
+// CRITICAL: Strip any "Day X" references from content (AGGRESSIVE sanitizer)
 // This ensures users NEVER see "Day 43", "Day {day_number}", etc.
+// Catches plain text, HTML-wrapped, and placeholder patterns
 function stripDayReferences(text: string): string {
   if (!text) return text;
   
   let result = text;
   
-  // Remove patterns like "Day 43", "Day 1", "Day {day_number}"
-  result = result.replace(/Day\s*\{day_number\}/gi, 'Daily');
-  result = result.replace(/Day\s*\d+/gi, 'Daily');
+  // Remove HTML-wrapped patterns like "<strong>Day 43</strong>"
+  result = result.replace(/<strong>\s*Day\s*\d+\s*<\/strong>/gi, '<strong>Daily</strong>');
+  result = result.replace(/<strong>\s*Day\s*\{day_number\}\s*<\/strong>/gi, '<strong>Daily</strong>');
   
-  // Remove patterns like "for Day 43", "on Day 1"
+  // Remove patterns like "Day 43", "Day 1", "Day {day_number}" (plain text)
+  result = result.replace(/Day\s*\{day_number\}/gi, 'Daily');
+  result = result.replace(/Day\s+\d+/gi, 'Daily');
+  result = result.replace(/Day\d+/gi, 'Daily');
+  
+  // Fix resulting grammar: "for Daily" -> "for Today", etc.
   result = result.replace(/(for|on|is)\s+Daily/gi, '$1 Today');
   
   // Clean up any double spaces
@@ -501,13 +507,33 @@ serve(async (req) => {
       metadata: any;
     }[] = [];
 
+    // DEBUG: Track harisfalas@gmail.com specifically
+    const debugEmail = 'harisfalas@gmail.com';
+    
     for (const authUser of usersData?.users || []) {
       if (!authUser.email) continue;
+      
+      const isDebugUser = authUser.email.toLowerCase() === debugEmail.toLowerCase();
 
       const prefs = (profilesMap.get(authUser.id) as Record<string, any>) || {};
+      
+      // DEBUG: Log all steps for harisfalas@gmail.com
+      if (isDebugUser) {
+        logStep(`🔍 DEBUG: Processing ${debugEmail}`, { 
+          userId: authUser.id,
+          hasProfile: profilesMap.has(authUser.id),
+          rawPrefs: prefs,
+          opt_out_all: prefs.opt_out_all,
+          email_wod: prefs.email_wod,
+          email_ritual: prefs.email_ritual,
+          hasWods,
+          hasRitual
+        });
+      }
 
       // Check if user has opted out of all emails
       if (prefs.opt_out_all === true) {
+        if (isDebugUser) logStep(`🔍 DEBUG: ${debugEmail} skipped - opt_out_all=true`);
         emailsSkipped++;
         continue;
       }
@@ -516,7 +542,17 @@ serve(async (req) => {
       const wantsWodEmail = prefs.email_wod !== false && hasWods;
       const wantsRitualEmail = prefs.email_ritual !== false && hasRitual;
       
+      if (isDebugUser) {
+        logStep(`🔍 DEBUG: ${debugEmail} email preferences`, { 
+          wantsWodEmail, 
+          wantsRitualEmail,
+          email_wod_raw: prefs.email_wod,
+          email_ritual_raw: prefs.email_ritual
+        });
+      }
+      
       if (!wantsWodEmail && !wantsRitualEmail) {
+        if (isDebugUser) logStep(`🔍 DEBUG: ${debugEmail} skipped - no email preferences enabled`);
         logStep(`Skipping morning email for ${authUser.email} (preferences disabled)`);
         emailsSkipped++;
         continue;
@@ -628,12 +664,22 @@ ${getEmailFooter(authUser.email, 'wod')}
           headers: getEmailHeaders(authUser.email, 'wod'),
         });
 
+        // DEBUG: Log for harisfalas@gmail.com before checking result
+        if (isDebugUser) {
+          logStep(`🔍 DEBUG: ${debugEmail} Resend API response`, { 
+            hasError: !!emailResult.error,
+            hasData: !!emailResult.data,
+            resendId: emailResult.data?.id,
+            error: emailResult.error
+          });
+        }
+
         // Check for Resend API errors
         if (emailResult.error) {
           emailsFailed++;
           logStep(`Failed to send email to ${authUser.email}`, { error: emailResult.error });
           
-          // Log failure for debugging
+          // Log failure for debugging - ALWAYS log for debug user
           emailDeliveryLogs.push({
             message_type: 'morning_combined',
             to_email: authUser.email,
@@ -641,15 +687,15 @@ ${getEmailFooter(authUser.email, 'wod')}
             status: 'failed',
             error_message: emailResult.error.message || JSON.stringify(emailResult.error),
             resend_id: null,
-            metadata: { wantsWodEmail, wantsRitualEmail, isRecoveryDay }
+            metadata: { wantsWodEmail, wantsRitualEmail, isRecoveryDay, isDebugUser }
           });
         } else {
           emailsSent++;
           logStep(`Email sent to ${authUser.email}`, { resendId: emailResult.data?.id });
           
-          // Log success for watched addresses (e.g., harisfalas@gmail.com for debugging)
-          const watchedEmails = ['harisfalas@gmail.com'];
-          if (watchedEmails.includes(authUser.email.toLowerCase())) {
+          // ALWAYS log for debug user (harisfalas@gmail.com)
+          if (isDebugUser) {
+            logStep(`🔍 DEBUG: ${debugEmail} email sent SUCCESSFULLY`, { resendId: emailResult.data?.id });
             emailDeliveryLogs.push({
               message_type: 'morning_combined',
               to_email: authUser.email,
@@ -657,7 +703,7 @@ ${getEmailFooter(authUser.email, 'wod')}
               status: 'success',
               error_message: null,
               resend_id: emailResult.data?.id || null,
-              metadata: { wantsWodEmail, wantsRitualEmail, isRecoveryDay }
+              metadata: { wantsWodEmail, wantsRitualEmail, isRecoveryDay, isDebugUser: true }
             });
           }
         }
