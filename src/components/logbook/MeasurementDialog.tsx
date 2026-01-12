@@ -131,7 +131,7 @@ export const MeasurementDialog = ({ isOpen, onClose, userId, onSaved }: Measurem
           content_type: 'measurement',
           item_id: 'body_measurement',
           item_name: 'Body Measurements',
-          action_type: 'recorded',
+          action_type: 'calculated',
           tool_result: toolResult,
           activity_date: activityDate,
         });
