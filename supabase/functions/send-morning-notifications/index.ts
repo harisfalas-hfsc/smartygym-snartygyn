@@ -82,8 +82,7 @@ function stripMorningGreeting(html: string): string {
 }
 
 // Resend has strict rate limits (commonly ~2 req/sec on some plans).
-// We throttle + retry rate-limit errors so a single user (e.g. harisfalas@gmail.com)
-// doesn't get randomly skipped due to 429s.
+// We throttle + retry rate-limit errors so users don't get randomly skipped due to 429s.
 const BASE_SEND_DELAY_MS = 650; // ~1.5 req/sec
 const MAX_RESEND_ATTEMPTS = 3;
 
@@ -550,33 +549,13 @@ serve(async (req) => {
       metadata: any;
     }[] = [];
 
-    // DEBUG: Track harisfalas@gmail.com specifically
-    const debugEmail = 'harisfalas@gmail.com';
-    
     for (const authUser of usersData?.users || []) {
       if (!authUser.email) continue;
-      
-      const isDebugUser = authUser.email.toLowerCase() === debugEmail.toLowerCase();
 
       const prefs = (profilesMap.get(authUser.id) as Record<string, any>) || {};
-      
-      // DEBUG: Log all steps for harisfalas@gmail.com
-      if (isDebugUser) {
-        logStep(`🔍 DEBUG: Processing ${debugEmail}`, { 
-          userId: authUser.id,
-          hasProfile: profilesMap.has(authUser.id),
-          rawPrefs: prefs,
-          opt_out_all: prefs.opt_out_all,
-          email_wod: prefs.email_wod,
-          email_ritual: prefs.email_ritual,
-          hasWods,
-          hasRitual
-        });
-      }
 
       // Check if user has opted out of all emails
       if (prefs.opt_out_all === true) {
-        if (isDebugUser) logStep(`🔍 DEBUG: ${debugEmail} skipped - opt_out_all=true`);
         emailsSkipped++;
         continue;
       }
@@ -585,18 +564,7 @@ serve(async (req) => {
       const wantsWodEmail = prefs.email_wod !== false && hasWods;
       const wantsRitualEmail = prefs.email_ritual !== false && hasRitual;
       
-      if (isDebugUser) {
-        logStep(`🔍 DEBUG: ${debugEmail} email preferences`, { 
-          wantsWodEmail, 
-          wantsRitualEmail,
-          email_wod_raw: prefs.email_wod,
-          email_ritual_raw: prefs.email_ritual
-        });
-      }
-      
       if (!wantsWodEmail && !wantsRitualEmail) {
-        if (isDebugUser) logStep(`🔍 DEBUG: ${debugEmail} skipped - no email preferences enabled`);
-        logStep(`Skipping morning email for ${authUser.email} (preferences disabled)`);
         emailsSkipped++;
         continue;
       }
@@ -711,22 +679,12 @@ ${getEmailFooter(authUser.email, 'wod')}
           { toEmail: authUser.email }
         );
 
-        // DEBUG: Log for harisfalas@gmail.com before checking result
-        if (isDebugUser) {
-          logStep(`🔍 DEBUG: ${debugEmail} Resend API response`, {
-            hasError: !!emailResult?.error,
-            hasData: !!emailResult?.data,
-            resendId: emailResult?.data?.id,
-            error: emailResult?.error,
-          });
-        }
-
         // Check for Resend API errors
         if (emailResult?.error) {
           emailsFailed++;
           logStep(`Failed to send email to ${authUser.email}`, { error: emailResult.error });
 
-          // Log failure for debugging
+          // Log ALL failures for debugging
           emailDeliveryLogs.push({
             message_type: 'morning_combined',
             to_email: authUser.email,
@@ -734,25 +692,11 @@ ${getEmailFooter(authUser.email, 'wod')}
             status: 'failed',
             error_message: emailResult.error.message || JSON.stringify(emailResult.error),
             resend_id: null,
-            metadata: { wantsWodEmail, wantsRitualEmail, isRecoveryDay, isDebugUser },
+            metadata: { wantsWodEmail, wantsRitualEmail, isRecoveryDay },
           });
         } else {
           emailsSent++;
           logStep(`Email sent to ${authUser.email}`, { resendId: emailResult?.data?.id });
-
-          // ALWAYS log for debug user (harisfalas@gmail.com)
-          if (isDebugUser) {
-            logStep(`🔍 DEBUG: ${debugEmail} email sent SUCCESSFULLY`, { resendId: emailResult?.data?.id });
-            emailDeliveryLogs.push({
-              message_type: 'morning_combined',
-              to_email: authUser.email,
-              user_id: authUser.id,
-              status: 'success',
-              error_message: null,
-              resend_id: emailResult?.data?.id || null,
-              metadata: { wantsWodEmail, wantsRitualEmail, isRecoveryDay, isDebugUser: true },
-            });
-          }
         }
 
         // Throttle to stay under provider rate limits
