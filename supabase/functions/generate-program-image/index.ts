@@ -45,6 +45,26 @@ serve(async (req) => {
 
 CRITICAL REQUIREMENT: Generate ONLY a photograph with NO TEXT whatsoever. Absolutely NO words, NO labels, NO titles, NO overlays, NO watermarks, NO captions of any kind. Pure photography only.
 
+PHYSICAL REALITY CONSTRAINTS (CRITICAL - MUST FOLLOW):
+- All humans MUST obey gravity - feet firmly on ground unless mid-jump with realistic trajectory
+- NO levitating, floating, or hovering people in mid-air
+- NO impossible body positions (holding weights with feet, handstands with loaded barbells, etc.)
+- All exercises shown must be REAL exercises that exist in fitness - movements a real trainer would teach
+- Anatomically correct poses only - natural human joint ranges of motion
+- People must be doing ONE clear, identifiable exercise - not impossible hybrid movements
+- All equipment must be used in the way it's designed to be used (barbells held by hands, not feet)
+- If showing jumping, the person should have feet recently left ground or about to land
+- NO abstract "artistic" poses - only real, recognizable fitness exercises
+- Body parts must connect naturally - no disconnected limbs or impossible angles
+
+BANNED POSES (NEVER GENERATE THESE):
+- People floating at angles with nothing supporting them (like Superman flying)
+- Handstands while holding barbells or weights
+- Multiple impossible things happening at once
+- People defying gravity or physics in any way
+- Holding equipment with body parts not designed for that purpose
+- Bodies twisted in anatomically impossible ways
+
 Visual Direction:
 - Show an inspiring ${difficultyLabel}-level fitness journey scene that captures the essence of "${name}"
 - The training style should visually reflect ${category.toLowerCase()} programming with a sense of ${weeks}-week progression
@@ -52,9 +72,10 @@ Visual Direction:
 - Professional fitness or gym setting with excellent lighting
 - Clean, vibrant, energetic colors
 - 16:9 landscape aspect ratio suitable for a program cover image
+- Show a SINGLE, CLEAR exercise that anyone can recognize
 - Completely unique composition, different from: ${existingImagePrompts.slice(0, 10).join(", ")}
 
-Remember: ZERO text or writing of any kind on the image. Only show people training, fitness equipment, or inspiring gym/workout environments.`;
+Remember: ZERO text on the image. Only show people training with PHYSICALLY POSSIBLE poses and movements.`;
 
     console.log("Generating program image with prompt:", imagePrompt);
 

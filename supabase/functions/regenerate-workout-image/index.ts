@@ -12,13 +12,13 @@ serve(async (req) => {
   }
 
   try {
-    const { workout_id } = await req.json();
+    const { workout_id, force = false } = await req.json();
     
     if (!workout_id) {
       throw new Error("workout_id is required");
     }
 
-    console.log(`[auto-generate-workout-image] Starting for workout: ${workout_id}`);
+    console.log(`[regenerate-workout-image] Starting for workout: ${workout_id}, force: ${force}`);
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -32,7 +32,7 @@ serve(async (req) => {
       .single();
 
     if (fetchError) {
-      console.error(`[auto-generate-workout-image] Failed to fetch workout:`, fetchError);
+      console.error(`[regenerate-workout-image] Failed to fetch workout:`, fetchError);
       throw fetchError;
     }
 
@@ -40,18 +40,17 @@ serve(async (req) => {
       throw new Error(`Workout not found: ${workout_id}`);
     }
 
-    // Skip if image already exists
-    if (workout.image_url) {
-      console.log(`[auto-generate-workout-image] Workout ${workout_id} already has an image, skipping`);
-      return new Response(
-        JSON.stringify({ success: true, skipped: true, message: "Image already exists" }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    // Delete old image from storage if it exists
+    if (workout.image_url && force) {
+      const oldImagePath = workout.image_url.split('/avatars/')[1];
+      if (oldImagePath) {
+        console.log(`[regenerate-workout-image] Deleting old image: ${oldImagePath}`);
+        await supabase.storage.from("avatars").remove([oldImagePath]);
+      }
     }
 
-    console.log(`[auto-generate-workout-image] Generating image for: ${workout.name}`);
+    console.log(`[regenerate-workout-image] Generating NEW image for: ${workout.name}`);
 
-    // Call the generate-workout-image function
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY not configured");
@@ -81,7 +80,6 @@ serve(async (req) => {
 - NO heavy weights, NO cardio machines, NO intense gym equipment, NO sweaty high-intensity scenes
 - Show elegant, controlled Pilates poses: planks, leg lifts, spine stretches, reformer exercises`;
     } else if (isRecovery) {
-      // NOTE: Recovery workouts have NO difficulty level - suitable for everyone
       visualDirection = `
 - Show a gentle recovery/regeneration scene that captures the essence of "${workout.name}"
 - PRIMARY FOCUS: Stretching and flexibility - this should be the dominant visual element
@@ -135,7 +133,7 @@ ${visualDirection}
 
 Remember: ZERO text on the image. Only show people exercising with PHYSICALLY POSSIBLE poses and movements.`;
 
-    console.log(`[auto-generate-workout-image] Calling AI gateway for image generation`);
+    console.log(`[regenerate-workout-image] Calling AI gateway for image generation`);
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -157,7 +155,7 @@ Remember: ZERO text on the image. Only show people exercising with PHYSICALLY PO
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`[auto-generate-workout-image] AI gateway error:`, response.status, errorText);
+      console.error(`[regenerate-workout-image] AI gateway error:`, response.status, errorText);
       throw new Error(`AI gateway error: ${response.status}`);
     }
 
@@ -168,10 +166,10 @@ Remember: ZERO text on the image. Only show people exercising with PHYSICALLY PO
       throw new Error("No image generated from AI");
     }
 
-    console.log(`[auto-generate-workout-image] Image generated, uploading to storage`);
+    console.log(`[regenerate-workout-image] Image generated, uploading to storage`);
 
-    // Upload to Supabase Storage
-    const fileName = `workout-${Date.now()}-${Math.random().toString(36).substring(7)}.png`;
+    // Upload to Supabase Storage with unique name
+    const fileName = `workout-regen-${Date.now()}-${Math.random().toString(36).substring(7)}.png`;
     const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, "");
     const buffer = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0));
 
@@ -183,7 +181,7 @@ Remember: ZERO text on the image. Only show people exercising with PHYSICALLY PO
       });
 
     if (uploadError) {
-      console.error(`[auto-generate-workout-image] Upload error:`, uploadError);
+      console.error(`[regenerate-workout-image] Upload error:`, uploadError);
       throw uploadError;
     }
 
@@ -193,7 +191,7 @@ Remember: ZERO text on the image. Only show people exercising with PHYSICALLY PO
       .getPublicUrl(`workout-covers/${fileName}`);
 
     const imageUrl = urlData.publicUrl;
-    console.log(`[auto-generate-workout-image] Image uploaded: ${imageUrl}`);
+    console.log(`[regenerate-workout-image] Image uploaded: ${imageUrl}`);
 
     // Update the workout with the new image URL
     const { error: updateError } = await supabase
@@ -202,15 +200,15 @@ Remember: ZERO text on the image. Only show people exercising with PHYSICALLY PO
       .eq("id", workout_id);
 
     if (updateError) {
-      console.error(`[auto-generate-workout-image] Failed to update workout:`, updateError);
+      console.error(`[regenerate-workout-image] Failed to update workout:`, updateError);
       throw updateError;
     }
 
-    console.log(`[auto-generate-workout-image] Workout ${workout_id} updated with image`);
+    console.log(`[regenerate-workout-image] Workout ${workout_id} updated with new image`);
 
     // If workout has a Stripe product, sync the image
     if (workout.stripe_product_id) {
-      console.log(`[auto-generate-workout-image] Syncing image to Stripe product: ${workout.stripe_product_id}`);
+      console.log(`[regenerate-workout-image] Syncing image to Stripe product: ${workout.stripe_product_id}`);
       
       const stripeSecretKey = Deno.env.get("STRIPE_SECRET_KEY");
       if (stripeSecretKey) {
@@ -228,13 +226,13 @@ Remember: ZERO text on the image. Only show people exercising with PHYSICALLY PO
           );
 
           if (stripeResponse.ok) {
-            console.log(`[auto-generate-workout-image] Stripe product image updated`);
+            console.log(`[regenerate-workout-image] Stripe product image updated`);
           } else {
             const stripeError = await stripeResponse.text();
-            console.error(`[auto-generate-workout-image] Stripe update failed:`, stripeError);
+            console.error(`[regenerate-workout-image] Stripe update failed:`, stripeError);
           }
         } catch (stripeErr) {
-          console.error(`[auto-generate-workout-image] Stripe sync error:`, stripeErr);
+          console.error(`[regenerate-workout-image] Stripe sync error:`, stripeErr);
         }
       }
     }
@@ -243,13 +241,15 @@ Remember: ZERO text on the image. Only show people exercising with PHYSICALLY PO
       JSON.stringify({ 
         success: true, 
         workout_id, 
-        image_url: imageUrl 
+        old_image_url: workout.image_url,
+        new_image_url: imageUrl,
+        message: `Successfully regenerated image for "${workout.name}"`
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
 
   } catch (error) {
-    console.error("[auto-generate-workout-image] Error:", error);
+    console.error("[regenerate-workout-image] Error:", error);
     return new Response(
       JSON.stringify({ 
         success: false, 

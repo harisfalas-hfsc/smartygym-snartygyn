@@ -2273,6 +2273,145 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // ============================================
+    // IMAGE QUALITY AUDIT (NEW)
+    // ============================================
+    console.log("🖼️ Checking image quality...");
+
+    // Check for workouts with missing images
+    const { data: workoutsNoImage, count: workoutsNoImageCount } = await supabase
+      .from('admin_workouts')
+      .select('id, name, category', { count: 'exact' })
+      .eq('is_visible', true)
+      .is('image_url', null);
+    
+    addCheck('Image Quality', 'Workouts Missing Images',
+      workoutsNoImageCount && workoutsNoImageCount > 0
+        ? `${workoutsNoImageCount} visible workouts have no image`
+        : 'All visible workouts have images',
+      workoutsNoImageCount && workoutsNoImageCount > 0 ? 'fail' : 'pass',
+      workoutsNoImageCount && workoutsNoImageCount > 0
+        ? `Missing: ${workoutsNoImage?.slice(0, 5).map(w => w.name).join(', ')}${workoutsNoImageCount > 5 ? ` (+${workoutsNoImageCount - 5} more)` : ''}`
+        : 'All workouts have cover images'
+    );
+
+    // Check for programs with missing images
+    const { data: programsNoImage, count: programsNoImageCount } = await supabase
+      .from('admin_training_programs')
+      .select('id, name, category', { count: 'exact' })
+      .eq('is_visible', true)
+      .is('image_url', null);
+    
+    addCheck('Image Quality', 'Programs Missing Images',
+      programsNoImageCount && programsNoImageCount > 0
+        ? `${programsNoImageCount} visible programs have no image`
+        : 'All visible programs have images',
+      programsNoImageCount && programsNoImageCount > 0 ? 'fail' : 'pass',
+      programsNoImageCount && programsNoImageCount > 0
+        ? `Missing: ${programsNoImage?.slice(0, 5).map(p => p.name).join(', ')}${programsNoImageCount > 5 ? ` (+${programsNoImageCount - 5} more)` : ''}`
+        : 'All programs have cover images'
+    );
+
+    // Check for broken image URLs (URLs that don't point to valid storage paths)
+    const { data: workoutsWithImages } = await supabase
+      .from('admin_workouts')
+      .select('id, name, image_url')
+      .eq('is_visible', true)
+      .not('image_url', 'is', null)
+      .limit(50);
+    
+    let brokenImageCount = 0;
+    const brokenImages: string[] = [];
+    
+    if (workoutsWithImages) {
+      for (const workout of workoutsWithImages.slice(0, 10)) { // Check first 10 for performance
+        if (workout.image_url) {
+          // Check if URL has valid format (should be a proper Supabase storage URL)
+          const isValidFormat = workout.image_url.includes('/storage/v1/object/public/') || 
+                               workout.image_url.startsWith('http');
+          if (!isValidFormat) {
+            brokenImageCount++;
+            brokenImages.push(workout.name);
+          }
+        }
+      }
+    }
+    
+    addCheck('Image Quality', 'Image URL Validation',
+      brokenImageCount > 0
+        ? `${brokenImageCount} workouts have invalid image URLs`
+        : 'All checked image URLs are valid format',
+      brokenImageCount > 0 ? 'warning' : 'pass',
+      brokenImageCount > 0
+        ? `Invalid URLs: ${brokenImages.slice(0, 3).join(', ')}. May need regeneration.`
+        : 'Image URLs follow correct storage path format'
+    );
+
+    // Check for recently generated AI images (for review tracking)
+    const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
+    const { data: recentAIWorkouts, count: recentAICount } = await supabase
+      .from('admin_workouts')
+      .select('id, name, image_url, updated_at', { count: 'exact' })
+      .eq('is_ai_generated', true)
+      .gte('updated_at', oneDayAgo);
+    
+    addCheck('Image Quality', 'Recent AI Images',
+      recentAICount && recentAICount > 0
+        ? `${recentAICount} AI-generated images created in last 24h`
+        : 'No new AI images in last 24 hours',
+      'pass', // This is informational, not a failure
+      recentAICount && recentAICount > 0
+        ? `Review for quality: ${recentAIWorkouts?.slice(0, 3).map(w => w.name).join(', ')}`
+        : 'No new images to review'
+    );
+
+    // Check for duplicate images across workouts and programs
+    const { data: allWorkoutImages } = await supabase
+      .from('admin_workouts')
+      .select('id, name, image_url')
+      .eq('is_visible', true)
+      .not('image_url', 'is', null);
+    
+    const { data: allProgramImages } = await supabase
+      .from('admin_training_programs')
+      .select('id, name, image_url')
+      .eq('is_visible', true)
+      .not('image_url', 'is', null);
+    
+    // Find duplicates
+    const imageUrlCounts: Record<string, string[]> = {};
+    
+    if (allWorkoutImages) {
+      for (const w of allWorkoutImages) {
+        if (w.image_url) {
+          if (!imageUrlCounts[w.image_url]) imageUrlCounts[w.image_url] = [];
+          imageUrlCounts[w.image_url].push(`Workout: ${w.name}`);
+        }
+      }
+    }
+    
+    if (allProgramImages) {
+      for (const p of allProgramImages) {
+        if (p.image_url) {
+          if (!imageUrlCounts[p.image_url]) imageUrlCounts[p.image_url] = [];
+          imageUrlCounts[p.image_url].push(`Program: ${p.name}`);
+        }
+      }
+    }
+    
+    const duplicateImages = Object.entries(imageUrlCounts)
+      .filter(([_, items]) => items.length > 1);
+    
+    addCheck('Image Quality', 'Image Uniqueness',
+      duplicateImages.length > 0
+        ? `${duplicateImages.length} images are shared across multiple items`
+        : 'All images are unique',
+      duplicateImages.length > 0 ? 'warning' : 'pass',
+      duplicateImages.length > 0
+        ? `Shared images: ${duplicateImages.slice(0, 2).map(([_, items]) => items.join(' + ')).join('; ')}`
+        : 'Each workout/program has a unique image'
+    );
+
+    // ============================================
     // COMPILE RESULTS
     // ============================================
     const duration = Date.now() - startTime;
