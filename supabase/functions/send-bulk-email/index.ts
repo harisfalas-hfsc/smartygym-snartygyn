@@ -134,75 +134,75 @@ serve(async (req) => {
     // Convert tiptap HTML to email-compatible HTML
     const emailContent = convertTiptapToEmailHtml(message);
 
-    // Send emails (in batches to avoid rate limits)
+    // Send emails SEQUENTIALLY to respect Resend rate limits (2 req/sec max)
+    // CRITICAL: Do NOT use Promise.all - it causes rate limit errors
     const results = [];
-    const batchSize = 10;
+    const DELAY_BETWEEN_EMAILS = 600; // ~1.6 req/sec (safe margin below 2 req/sec limit)
     
-    for (let i = 0; i < recipients.length; i += batchSize) {
-      const batch = recipients.slice(i, i + batchSize);
-      logStep(`Sending batch ${Math.floor(i / batchSize) + 1}`, { count: batch.length });
+    logStep(`Sending ${recipients.length} emails with rate limiting`, { delay: DELAY_BETWEEN_EMAILS });
 
-      const batchPromises = batch.map(async (recipient) => {
-        try {
-          const footer = getEmailFooter(recipient.email!);
-          
-          const emailResponse = await resend.emails.send({
-            from: "SmartyGym <notifications@smartygym.com>",
-            reply_to: "support@smartygym.com",
-            to: [recipient.email!],
-            subject: subject,
-            headers: getEmailHeaders(recipient.email!),
-            html: `
-              <!DOCTYPE html>
-              <html>
-              <head>
-                <meta charset="utf-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              </head>
-              <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f5f5f5;">
-                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f5f5f5;">
-                  <tr>
-                    <td style="padding: 20px;">
-                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="margin: 0 auto; background-color: #ffffff; border-radius: 8px;">
-                        <tr>
-                          <td style="padding: 32px;">
-                            <h2 style="color: #d4af37; margin-bottom: 16px;">Hello ${recipient.name}</h2>
-                            <div style="line-height: 1.6; color: #333333; font-size: 16px;">
-                              ${emailContent}
-                            </div>
-                            ${footer}
-                          </td>
-                        </tr>
-                      </table>
-                    </td>
-                  </tr>
-                </table>
-              </body>
-              </html>
-            `,
-          });
+    for (let i = 0; i < recipients.length; i++) {
+      const recipient = recipients[i];
+      
+      // Delay before sending (except for first email)
+      if (i > 0) {
+        await new Promise(resolve => setTimeout(resolve, DELAY_BETWEEN_EMAILS));
+      }
+      
+      try {
+        const footer = getEmailFooter(recipient.email!);
+        
+        logStep(`Sending email ${i + 1}/${recipients.length}`, { to: recipient.email });
+        
+        const emailResponse = await resend.emails.send({
+          from: "SmartyGym <notifications@smartygym.com>",
+          reply_to: "support@smartygym.com",
+          to: [recipient.email!],
+          subject: subject,
+          headers: getEmailHeaders(recipient.email!),
+          html: `
+            <!DOCTYPE html>
+            <html>
+            <head>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            </head>
+            <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f5f5f5;">
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f5f5f5;">
+                <tr>
+                  <td style="padding: 20px;">
+                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="margin: 0 auto; background-color: #ffffff; border-radius: 8px;">
+                      <tr>
+                        <td style="padding: 32px;">
+                          <h2 style="color: #d4af37; margin-bottom: 16px;">Hello ${recipient.name}</h2>
+                          <div style="line-height: 1.6; color: #333333; font-size: 16px;">
+                            ${emailContent}
+                          </div>
+                          ${footer}
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </body>
+            </html>
+          `,
+        });
 
-          return { 
-            email: recipient.email, 
-            success: true, 
-            id: emailResponse.data?.id 
-          };
-        } catch (error) {
-          console.error(`Failed to send to ${recipient.email}:`, error);
-          return { 
-            email: recipient.email, 
-            success: false, 
-            error: error instanceof Error ? error.message : String(error)
-          };
-        }
-      });
-
-      const batchResults = await Promise.all(batchPromises);
-      results.push(...batchResults);
-
-      // Add delay between batches to respect rate limits
-      if (i + batchSize < recipients.length) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        results.push({ 
+          email: recipient.email, 
+          success: true, 
+          id: emailResponse.data?.id 
+        });
+        
+      } catch (error) {
+        console.error(`Failed to send to ${recipient.email}:`, error);
+        results.push({ 
+          email: recipient.email, 
+          success: false, 
+          error: error instanceof Error ? error.message : String(error)
+        });
       }
     }
 

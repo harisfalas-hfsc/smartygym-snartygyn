@@ -81,10 +81,13 @@ function stripMorningGreeting(html: string): string {
   return result.trim();
 }
 
-// Resend has strict rate limits (commonly ~2 req/sec on some plans).
-// We throttle + retry rate-limit errors so users don't get randomly skipped due to 429s.
-const BASE_SEND_DELAY_MS = 650; // ~1.5 req/sec
+// Resend has strict rate limits (2 req/sec on free tier, sometimes stricter).
+// We MUST throttle BEFORE each request + retry rate-limit errors.
+// CRITICAL: 650ms was NOT enough - all emails failed at same timestamp.
+// Increasing to 1000ms minimum to ensure we never exceed 1 req/sec.
+const BASE_SEND_DELAY_MS = 1000; // 1 request per second (safe margin)
 const MAX_RESEND_ATTEMPTS = 3;
+const INITIAL_BACKOFF_MS = 2000; // Start with 2 second backoff on rate limit
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -102,6 +105,17 @@ async function sendResendEmailWithRetry(
   let lastResult: any = null;
 
   for (let attempt = 1; attempt <= MAX_RESEND_ATTEMPTS; attempt++) {
+    // CRITICAL: Wait BEFORE sending to prevent rate limit burst
+    if (attempt > 1) {
+      const backoffMs = INITIAL_BACKOFF_MS * attempt;
+      logStep("⏳ Rate limited, waiting before retry", {
+        to: context.toEmail,
+        attempt,
+        backoffMs,
+      });
+      await sleep(backoffMs);
+    }
+    
     const result = await resendClient.emails.send(payload as any);
     lastResult = result;
 
@@ -110,14 +124,6 @@ async function sendResendEmailWithRetry(
     if (!isRateLimitError(result.error) || attempt === MAX_RESEND_ATTEMPTS) {
       return result;
     }
-
-    const backoffMs = 1200 * attempt;
-    logStep("⏳ Rate limited by email provider, retrying", {
-      to: context.toEmail,
-      attempt,
-      backoffMs,
-    });
-    await sleep(backoffMs);
   }
 
   return lastResult;
@@ -549,7 +555,11 @@ serve(async (req) => {
       metadata: any;
     }[] = [];
 
+    let userIndex = 0;
+    const totalUsers = usersData?.users?.length || 0;
+    
     for (const authUser of usersData?.users || []) {
+      userIndex++;
       if (!authUser.email) continue;
 
       const prefs = (profilesMap.get(authUser.id) as Record<string, any>) || {};
@@ -568,6 +578,14 @@ serve(async (req) => {
         emailsSkipped++;
         continue;
       }
+
+      // CRITICAL: Throttle BEFORE sending each email to prevent rate limit bursts
+      // This delay happens before the email is sent, not after
+      if (emailsSent > 0 || emailsFailed > 0) {
+        await sleep(BASE_SEND_DELAY_MS);
+      }
+      
+      logStep(`Processing email ${userIndex}/${totalUsers}`, { email: authUser.email });
 
       try {
         // Build email HTML - use template email_content if available
@@ -696,11 +714,10 @@ ${getEmailFooter(authUser.email, 'wod')}
           });
         } else {
           emailsSent++;
-          logStep(`Email sent to ${authUser.email}`, { resendId: emailResult?.data?.id });
+          logStep(`✅ Email sent to ${authUser.email}`, { resendId: emailResult?.data?.id, index: userIndex });
         }
-
-        // Throttle to stay under provider rate limits
-        await sleep(BASE_SEND_DELAY_MS);
+        
+        // Note: Delay is now BEFORE the next email, not after this one
       } catch (emailError) {
         emailsFailed++;
         const errorMsg = emailError instanceof Error ? emailError.message : String(emailError);
