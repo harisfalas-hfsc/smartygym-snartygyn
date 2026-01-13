@@ -464,7 +464,7 @@ const Index = () => {
                   <span className="font-normal text-foreground">Welcome to </span>
                   <span className="font-bold text-primary">SmartyGym</span>
                 </h2>
-                <p className="text-base text-muted-foreground">
+                <p className="text-sm text-muted-foreground whitespace-nowrap">
                   Your gym Re-imagined. Anywhere. Anytime.
                 </p>
                 <p className="hidden sm:block text-sm mt-3 px-1 font-medium" style={{ color: 'hsl(195, 85%, 45%)' }}>
