@@ -1054,9 +1054,57 @@ const handler = async (req: Request): Promise<Response> => {
       .eq('status', 'failed')
       .gte('created_at', weekAgo);
     
-    addCheck('Email System', 'Recent Email Failures', `${failedEmails?.length || 0} failed emails in last 7 days`, 
+    addCheck('Email System', 'Scheduled Email Failures', `${failedEmails?.length || 0} failed scheduled emails in last 7 days`, 
       (failedEmails?.length || 0) === 0 ? 'pass' : 'warning',
       failedEmails?.length ? `Errors: ${failedEmails.slice(0, 3).map(e => e.error_message).join('; ')}` : 'No failures'
+    );
+
+    // ============================================
+    // NEW: CHECK EMAIL DELIVERY LOG FOR RATE LIMITING / DELIVERY FAILURES
+    // This catches Resend rate-limit errors that were previously invisible
+    // ============================================
+    const { data: emailDeliveryFailures, count: deliveryFailureCount } = await supabase
+      .from('email_delivery_log')
+      .select('to_email, error_message, message_type', { count: 'exact' })
+      .eq('status', 'failed')
+      .gte('sent_at', weekAgo);
+    
+    const rateLimitErrors = emailDeliveryFailures?.filter(e => 
+      e.error_message?.toLowerCase().includes('rate') || 
+      e.error_message?.toLowerCase().includes('too many')
+    ) || [];
+
+    addCheck('Email System', 'Email Delivery Failures', 
+      `${deliveryFailureCount || 0} delivery failures in last 7 days`,
+      (deliveryFailureCount || 0) === 0 ? 'pass' : (deliveryFailureCount || 0) <= 5 ? 'warning' : 'fail',
+      deliveryFailureCount && deliveryFailureCount > 0
+        ? `Rate-limit errors: ${rateLimitErrors.length}. Affected emails: ${emailDeliveryFailures?.slice(0, 5).map(e => e.to_email).join(', ')}${(deliveryFailureCount || 0) > 5 ? '...' : ''}`
+        : 'All emails delivered successfully'
+    );
+
+    // Check today's email success rate
+    const { count: todayEmailsSent } = await supabase
+      .from('email_delivery_log')
+      .select('*', { count: 'exact', head: true })
+      .gte('sent_at', todayStart.toISOString());
+    
+    const { count: todayEmailsFailed } = await supabase
+      .from('email_delivery_log')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'failed')
+      .gte('sent_at', todayStart.toISOString());
+    
+    const todayTotal = (todayEmailsSent || 0);
+    const todayFailed = (todayEmailsFailed || 0);
+    const todaySuccess = todayTotal - todayFailed;
+    const successRate = todayTotal > 0 ? Math.round((todaySuccess / todayTotal) * 100) : 100;
+
+    addCheck('Email System', "Today's Delivery Rate", 
+      `${successRate}% success rate (${todaySuccess}/${todayTotal} emails)`,
+      successRate >= 95 ? 'pass' : successRate >= 80 ? 'warning' : 'fail',
+      todayFailed > 0 
+        ? `${todayFailed} emails failed today - check rate limiting or Resend quota`
+        : 'All emails delivered successfully today'
     );
 
     // ============================================
