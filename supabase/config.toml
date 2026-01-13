@@ -230,3 +230,6 @@ verify_jwt = false
 
 [functions.repair-stripe-metadata]
 verify_jwt = false
+
+[functions.regenerate-workout-image]
+verify_jwt = true
