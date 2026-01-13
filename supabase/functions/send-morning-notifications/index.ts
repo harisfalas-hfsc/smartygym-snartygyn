@@ -81,6 +81,49 @@ function stripMorningGreeting(html: string): string {
   return result.trim();
 }
 
+// Resend has strict rate limits (commonly ~2 req/sec on some plans).
+// We throttle + retry rate-limit errors so a single user (e.g. harisfalas@gmail.com)
+// doesn't get randomly skipped due to 429s.
+const BASE_SEND_DELAY_MS = 650; // ~1.5 req/sec
+const MAX_RESEND_ATTEMPTS = 3;
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+function isRateLimitError(err: any): boolean {
+  const msg = (err?.message ?? "").toString().toLowerCase();
+  const status = err?.statusCode ?? err?.status ?? err?.code;
+  return status === 429 || msg.includes("too many requests") || msg.includes("rate limit");
+}
+
+async function sendResendEmailWithRetry(
+  resendClient: Resend,
+  payload: Record<string, any>,
+  context: { toEmail: string }
+): Promise<any> {
+  let lastResult: any = null;
+
+  for (let attempt = 1; attempt <= MAX_RESEND_ATTEMPTS; attempt++) {
+    const result = await resendClient.emails.send(payload as any);
+    lastResult = result;
+
+    if (!result?.error) return result;
+
+    if (!isRateLimitError(result.error) || attempt === MAX_RESEND_ATTEMPTS) {
+      return result;
+    }
+
+    const backoffMs = 1200 * attempt;
+    logStep("⏳ Rate limited by email provider, retrying", {
+      to: context.toEmail,
+      attempt,
+      backoffMs,
+    });
+    await sleep(backoffMs);
+  }
+
+  return lastResult;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -656,30 +699,34 @@ ${getEmailFooter(authUser.email, 'wod')}
         finalEmailSubject = stripDayReferences(finalEmailSubject);
         const sanitizedEmailHtml = stripDayReferences(emailHtml);
 
-        const emailResult = await resendClient.emails.send({
-          from: "SmartyGym <notifications@smartygym.com>",
-          to: authUser.email,
-          subject: finalEmailSubject,
-          html: sanitizedEmailHtml,
-          headers: getEmailHeaders(authUser.email, 'wod'),
-        });
+        const emailResult = await sendResendEmailWithRetry(
+          resendClient,
+          {
+            from: "SmartyGym <notifications@smartygym.com>",
+            to: authUser.email,
+            subject: finalEmailSubject,
+            html: sanitizedEmailHtml,
+            headers: getEmailHeaders(authUser.email, 'wod'),
+          },
+          { toEmail: authUser.email }
+        );
 
         // DEBUG: Log for harisfalas@gmail.com before checking result
         if (isDebugUser) {
-          logStep(`🔍 DEBUG: ${debugEmail} Resend API response`, { 
-            hasError: !!emailResult.error,
-            hasData: !!emailResult.data,
-            resendId: emailResult.data?.id,
-            error: emailResult.error
+          logStep(`🔍 DEBUG: ${debugEmail} Resend API response`, {
+            hasError: !!emailResult?.error,
+            hasData: !!emailResult?.data,
+            resendId: emailResult?.data?.id,
+            error: emailResult?.error,
           });
         }
 
         // Check for Resend API errors
-        if (emailResult.error) {
+        if (emailResult?.error) {
           emailsFailed++;
           logStep(`Failed to send email to ${authUser.email}`, { error: emailResult.error });
-          
-          // Log failure for debugging - ALWAYS log for debug user
+
+          // Log failure for debugging
           emailDeliveryLogs.push({
             message_type: 'morning_combined',
             to_email: authUser.email,
@@ -687,29 +734,29 @@ ${getEmailFooter(authUser.email, 'wod')}
             status: 'failed',
             error_message: emailResult.error.message || JSON.stringify(emailResult.error),
             resend_id: null,
-            metadata: { wantsWodEmail, wantsRitualEmail, isRecoveryDay, isDebugUser }
+            metadata: { wantsWodEmail, wantsRitualEmail, isRecoveryDay, isDebugUser },
           });
         } else {
           emailsSent++;
-          logStep(`Email sent to ${authUser.email}`, { resendId: emailResult.data?.id });
-          
+          logStep(`Email sent to ${authUser.email}`, { resendId: emailResult?.data?.id });
+
           // ALWAYS log for debug user (harisfalas@gmail.com)
           if (isDebugUser) {
-            logStep(`🔍 DEBUG: ${debugEmail} email sent SUCCESSFULLY`, { resendId: emailResult.data?.id });
+            logStep(`🔍 DEBUG: ${debugEmail} email sent SUCCESSFULLY`, { resendId: emailResult?.data?.id });
             emailDeliveryLogs.push({
               message_type: 'morning_combined',
               to_email: authUser.email,
               user_id: authUser.id,
               status: 'success',
               error_message: null,
-              resend_id: emailResult.data?.id || null,
-              metadata: { wantsWodEmail, wantsRitualEmail, isRecoveryDay, isDebugUser: true }
+              resend_id: emailResult?.data?.id || null,
+              metadata: { wantsWodEmail, wantsRitualEmail, isRecoveryDay, isDebugUser: true },
             });
           }
         }
-        
-        // Small delay to avoid rate limiting
-        await new Promise(resolve => setTimeout(resolve, 100));
+
+        // Throttle to stay under provider rate limits
+        await sleep(BASE_SEND_DELAY_MS);
       } catch (emailError) {
         emailsFailed++;
         const errorMsg = emailError instanceof Error ? emailError.message : String(emailError);
@@ -747,15 +794,16 @@ ${getEmailFooter(authUser.email, 'wod')}
         message_type: isRecoveryDay ? "morning_wod_recovery" : "morning_wod",
         subject: wodDashboardSubject,
         content: `WOD: ${category}, ${todaysWods.length} workout(s)`,
-        recipient_count: wodDashboardSent + emailsSent,
+        recipient_count: wodDashboardSent + emailsSent + emailsFailed,
         success_count: wodDashboardSent + emailsSent,
-        failed_count: 0,
+        failed_count: emailsFailed,
         metadata: {
           todayStr,
           isRecoveryDay,
           workoutCount: todaysWods.length,
           wodDashboardSent,
           emailsSent,
+          emailsFailed,
           usedTemplate: isRecoveryDay ? !!wodRecoveryTemplate : !!wodTemplate
         }
       });
@@ -767,14 +815,15 @@ ${getEmailFooter(authUser.email, 'wod')}
         message_type: "morning_ritual",
         subject: ritualDashboardSubject,
         content: `Ritual for ${todayStr}`,
-        recipient_count: ritualDashboardSent + emailsSent,
+        recipient_count: ritualDashboardSent + emailsSent + emailsFailed,
         success_count: ritualDashboardSent + emailsSent,
-        failed_count: 0,
+        failed_count: emailsFailed,
         metadata: {
           todayStr,
           dayNumber: todaysRitual?.day_number,
           ritualDashboardSent,
           emailsSent,
+          emailsFailed,
           usedTemplate: !!ritualTemplate
         }
       });
@@ -790,6 +839,7 @@ ${getEmailFooter(authUser.email, 'wod')}
       ritualDashboardSent,
       dashboardSkipped,
       emailsSent,
+      emailsFailed,
       emailsSkipped
     });
 
@@ -801,6 +851,7 @@ ${getEmailFooter(authUser.email, 'wod')}
         ritualDashboardSent,
         dashboardSkipped,
         emailsSent,
+        emailsFailed,
         emailsSkipped,
         todayStr
       }),
