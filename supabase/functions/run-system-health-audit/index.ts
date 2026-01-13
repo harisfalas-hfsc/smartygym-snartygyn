@@ -2538,6 +2538,281 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // ============================================
+    // SEO GAPS CHECK (Auto-Fix)
+    // ============================================
+    console.log("🔍 Checking SEO metadata gaps...");
+
+    try {
+      // Get all visible workouts and programs
+      const { data: allWorkouts } = await supabase
+        .from('admin_workouts')
+        .select('id, name')
+        .eq('is_visible', true);
+
+      const { data: allPrograms } = await supabase
+        .from('admin_training_programs')
+        .select('id, name')
+        .eq('is_visible', true);
+
+      // Get existing SEO metadata
+      const { data: existingSeo } = await supabase
+        .from('seo_metadata')
+        .select('content_id, content_type');
+
+      const seoSet = new Set(
+        (existingSeo || []).map(s => `${s.content_type}:${s.content_id}`)
+      );
+
+      const workoutsMissingSeo = (allWorkouts || []).filter(w => !seoSet.has(`workout:${w.id}`));
+      const programsMissingSeo = (allPrograms || []).filter(p => !seoSet.has(`program:${p.id}`));
+      const totalMissing = workoutsMissingSeo.length + programsMissingSeo.length;
+
+      if (totalMissing > 0) {
+        // Auto-fix: Call refresh-seo-metadata edge function
+        console.log(`[SEO-GAPS] Found ${totalMissing} items missing SEO metadata. Auto-generating...`);
+        
+        try {
+          const seoResponse = await fetch(`${supabaseUrl}/functions/v1/refresh-seo-metadata`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${supabaseServiceKey}`
+            },
+            body: JSON.stringify({ force: false })
+          });
+          
+          if (seoResponse.ok) {
+            const seoResult = await seoResponse.json();
+            addCheck('SEO', 'SEO Metadata Coverage',
+              `Auto-generated SEO for ${totalMissing} items`,
+              'warning',
+              `Fixed: ${workoutsMissingSeo.length} workouts, ${programsMissingSeo.length} programs`
+            );
+          } else {
+            addCheck('SEO', 'SEO Metadata Coverage',
+              `${totalMissing} items missing SEO metadata`,
+              'warning',
+              `Auto-fix attempted but failed. Missing: ${workoutsMissingSeo.slice(0, 3).map(w => w.name).join(', ')}`
+            );
+          }
+        } catch (seoError) {
+          addCheck('SEO', 'SEO Metadata Coverage',
+            `${totalMissing} items missing SEO metadata`,
+            'warning',
+            `Auto-fix failed: ${seoError instanceof Error ? seoError.message : 'Unknown error'}`
+          );
+        }
+      } else {
+        addCheck('SEO', 'SEO Metadata Coverage',
+          `All ${(allWorkouts?.length || 0) + (allPrograms?.length || 0)} visible items have SEO metadata`,
+          'pass',
+          'Complete SEO coverage for all workouts and programs'
+        );
+      }
+    } catch (seoCheckError) {
+      console.error("[SEO-GAPS] Error:", seoCheckError);
+      addCheck('SEO', 'SEO Metadata Coverage',
+        'Failed to check SEO metadata',
+        'fail',
+        seoCheckError instanceof Error ? seoCheckError.message : 'Unknown error'
+      );
+    }
+
+    // ============================================
+    // BROKEN IMAGE URLs CHECK (Flag for Review)
+    // ============================================
+    console.log("🖼️ Checking for broken image URLs...");
+
+    try {
+      // Get all image URLs from workouts and programs
+      const { data: workoutsWithImages } = await supabase
+        .from('admin_workouts')
+        .select('id, name, image_url')
+        .eq('is_visible', true)
+        .not('image_url', 'is', null);
+
+      const { data: programsWithImages } = await supabase
+        .from('admin_training_programs')
+        .select('id, name, image_url')
+        .eq('is_visible', true)
+        .not('image_url', 'is', null);
+
+      const allItems = [
+        ...(workoutsWithImages || []).map(w => ({ ...w, type: 'workout' })),
+        ...(programsWithImages || []).map(p => ({ ...p, type: 'program' }))
+      ];
+
+      // Only check Supabase storage URLs (skip external URLs like unsplash, etc.)
+      const supabaseStorageItems = allItems.filter(item => 
+        item.image_url && (
+          item.image_url.includes('supabase') || 
+          item.image_url.startsWith('/')
+        )
+      );
+
+      const brokenImages: Array<{ name: string; type: string; url: string }> = [];
+      
+      console.log(`[BROKEN-IMAGES] Checking ${supabaseStorageItems.length} Supabase storage URLs`);
+
+      for (const item of supabaseStorageItems) {
+        try {
+          const response = await fetch(item.image_url, { method: 'HEAD' });
+          if (!response.ok) {
+            brokenImages.push({ name: item.name, type: item.type, url: item.image_url });
+            console.log(`[BROKEN-IMAGES] ❌ ${item.name}: HTTP ${response.status}`);
+          }
+          // Rate limit protection
+          await new Promise(r => setTimeout(r, 100));
+        } catch (fetchError) {
+          brokenImages.push({ name: item.name, type: item.type, url: item.image_url });
+          console.log(`[BROKEN-IMAGES] ❌ ${item.name}: Failed to fetch`);
+        }
+      }
+
+      const externalCount = allItems.length - supabaseStorageItems.length;
+      
+      if (brokenImages.length > 0) {
+        addCheck('Image Quality', 'Broken Image URLs',
+          `${brokenImages.length} broken image URL${brokenImages.length !== 1 ? 's' : ''} found`,
+          'warning',
+          `Broken: ${brokenImages.slice(0, 3).map(b => b.name).join(', ')}${brokenImages.length > 3 ? ` +${brokenImages.length - 3} more` : ''}`
+        );
+      } else {
+        addCheck('Image Quality', 'Broken Image URLs',
+          `All ${supabaseStorageItems.length} storage images are accessible`,
+          'pass',
+          externalCount > 0 ? `${externalCount} external URLs skipped (not checked)` : 'All image URLs return valid responses'
+        );
+      }
+    } catch (brokenImageError) {
+      console.error("[BROKEN-IMAGES] Error:", brokenImageError);
+      addCheck('Image Quality', 'Broken Image URLs',
+        'Failed to check image URLs',
+        'fail',
+        brokenImageError instanceof Error ? brokenImageError.message : 'Unknown error'
+      );
+    }
+
+    // ============================================
+    // MISSING STRIPE PRODUCTS CHECK (Flag for Manual Fix)
+    // ============================================
+    console.log("💳 Checking for missing Stripe products...");
+
+    try {
+      // Find paid workouts without Stripe product
+      const { data: paidWorkoutsNoStripe } = await supabase
+        .from('admin_workouts')
+        .select('id, name, price')
+        .eq('is_free', false)
+        .eq('is_visible', true)
+        .or('stripe_product_id.is.null,stripe_product_id.eq.');
+
+      // Find paid programs without Stripe product
+      const { data: paidProgramsNoStripe } = await supabase
+        .from('admin_training_programs')
+        .select('id, name, price')
+        .eq('is_free', false)
+        .eq('is_visible', true)
+        .or('stripe_product_id.is.null,stripe_product_id.eq.');
+
+      const missingWorkouts = paidWorkoutsNoStripe || [];
+      const missingPrograms = paidProgramsNoStripe || [];
+      const totalMissing = missingWorkouts.length + missingPrograms.length;
+
+      if (totalMissing > 0) {
+        const missingDetails = [
+          ...missingWorkouts.map(w => `${w.name} (€${w.price || '?'})`),
+          ...missingPrograms.map(p => `${p.name} (€${p.price || '?'})`)
+        ];
+
+        addCheck('Stripe Integration', 'Missing Stripe Products',
+          `${totalMissing} paid item${totalMissing !== 1 ? 's' : ''} missing Stripe product`,
+          'warning',
+          `Need Stripe products: ${missingDetails.slice(0, 3).join(', ')}${missingDetails.length > 3 ? ` +${missingDetails.length - 3} more` : ''}`
+        );
+      } else {
+        addCheck('Stripe Integration', 'Missing Stripe Products',
+          'All paid items have Stripe products configured',
+          'pass',
+          'No missing Stripe products found'
+        );
+      }
+    } catch (stripeProductError) {
+      console.error("[MISSING-STRIPE] Error:", stripeProductError);
+      addCheck('Stripe Integration', 'Missing Stripe Products',
+        'Failed to check Stripe products',
+        'fail',
+        stripeProductError instanceof Error ? stripeProductError.message : 'Unknown error'
+      );
+    }
+
+    // ============================================
+    // EMAIL DELIVERY HEALTH CHECK (Alert Admin)
+    // ============================================
+    console.log("📧 Checking email delivery health...");
+
+    try {
+      const last24Hours = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
+      
+      // Get all emails from last 24 hours
+      const { data: recentEmails, count: totalEmails } = await supabase
+        .from('email_delivery_log')
+        .select('status, error_message, message_type', { count: 'exact' })
+        .gte('sent_at', last24Hours);
+
+      if (!recentEmails || totalEmails === 0) {
+        addCheck('Email Delivery', 'Email Delivery Health',
+          'No emails sent in last 24 hours',
+          'pass',
+          'No email activity to analyze'
+        );
+      } else {
+        const failedEmails = recentEmails.filter(e => e.status === 'failed');
+        const total = totalEmails || recentEmails.length;
+        const successCount = total - failedEmails.length;
+        const failureRate = (failedEmails.length / total) * 100;
+
+        // Group errors by type
+        const errorGroups: Record<string, number> = {};
+        for (const email of failedEmails) {
+          const errorType = email.error_message?.includes('rate limit') ? 'Rate limit'
+            : email.error_message?.includes('invalid') ? 'Invalid email'
+            : email.error_message?.includes('bounced') ? 'Bounced'
+            : 'Other';
+          errorGroups[errorType] = (errorGroups[errorType] || 0) + 1;
+        }
+
+        const errorSummary = Object.entries(errorGroups)
+          .map(([type, count]) => `${count} ${type}`)
+          .join(', ');
+
+        let status: 'pass' | 'warning' | 'fail' = 'pass';
+        if (failureRate > 20) {
+          status = 'fail';
+        } else if (failureRate > 5) {
+          status = 'warning';
+        }
+
+        addCheck('Email Delivery', 'Email Delivery Health',
+          failedEmails.length === 0 
+            ? `${successCount} emails sent successfully (100% success)`
+            : `${successCount}/${totalEmails} emails delivered (${(100 - failureRate).toFixed(1)}% success)`,
+          status,
+          failedEmails.length > 0 
+            ? `${failedEmails.length} failed: ${errorSummary}`
+            : '24-hour delivery report: All emails delivered'
+        );
+      }
+    } catch (emailHealthError) {
+      console.error("[EMAIL-HEALTH] Error:", emailHealthError);
+      addCheck('Email Delivery', 'Email Delivery Health',
+        'Failed to check email delivery health',
+        'fail',
+        emailHealthError instanceof Error ? emailHealthError.message : 'Unknown error'
+      );
+    }
+
+    // ============================================
     // COMPILE RESULTS
     // ============================================
     const duration = Date.now() - startTime;
