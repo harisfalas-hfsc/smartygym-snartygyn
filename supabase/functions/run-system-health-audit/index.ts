@@ -2412,6 +2412,132 @@ const handler = async (req: Request): Promise<Response> => {
     );
 
     // ============================================
+    // STRIPE IMAGE SYNC
+    // ============================================
+    console.log("🔗 Checking Stripe image sync...");
+
+    const stripeSecretForImageSync = Deno.env.get("STRIPE_SECRET_KEY");
+    if (stripeSecretForImageSync) {
+      try {
+        const stripeForImageSync = new Stripe(stripeSecretForImageSync, { apiVersion: "2023-10-16" });
+        
+        let syncedCount = 0;
+        let alreadySyncedCount = 0;
+        let missingWebsiteImageCount = 0;
+        let errorCount = 0;
+        const issues: string[] = [];
+
+        // Get paid workouts with Stripe products
+        const { data: paidWorkouts } = await supabase
+          .from('admin_workouts')
+          .select('id, name, stripe_product_id, image_url')
+          .not('stripe_product_id', 'is', null)
+          .eq('is_free', false);
+
+        // Get paid programs with Stripe products  
+        const { data: paidPrograms } = await supabase
+          .from('admin_training_programs')
+          .select('id, name, stripe_product_id, image_url')
+          .not('stripe_product_id', 'is', null)
+          .eq('is_free', false);
+
+        const allStripeItems = [
+          ...(paidWorkouts || []).map(w => ({ ...w, type: 'workout' })),
+          ...(paidPrograms || []).map(p => ({ ...p, type: 'program' }))
+        ];
+
+        console.log(`[STRIPE-SYNC] Checking ${allStripeItems.length} paid items with Stripe products`);
+
+        for (const item of allStripeItems) {
+          try {
+            const product = await stripeForImageSync.products.retrieve(item.stripe_product_id);
+            const stripeImage = product.images?.[0];
+            const websiteImage = item.image_url;
+
+            // Check if website has a valid image
+            const hasValidWebsiteImage = websiteImage && (websiteImage.startsWith('http') || websiteImage.startsWith('/'));
+
+            if (!hasValidWebsiteImage) {
+              missingWebsiteImageCount++;
+              issues.push(`${item.name}: No website image to sync`);
+              console.log(`[STRIPE-SYNC] ${item.name}: Missing website image`);
+            } else if (!stripeImage) {
+              // Stripe has no image, website does - auto-sync
+              await stripeForImageSync.products.update(item.stripe_product_id, {
+                images: [websiteImage]
+              });
+              syncedCount++;
+              console.log(`[STRIPE-SYNC] ✓ Synced image for ${item.name} (was missing)`);
+            } else if (stripeImage !== websiteImage) {
+              // Images don't match - auto-sync website to Stripe
+              await stripeForImageSync.products.update(item.stripe_product_id, {
+                images: [websiteImage]
+              });
+              syncedCount++;
+              console.log(`[STRIPE-SYNC] ✓ Updated image for ${item.name} (was mismatched)`);
+            } else {
+              // Already in sync
+              alreadySyncedCount++;
+            }
+            
+            // Rate limit protection - 300ms delay between Stripe API calls
+            await new Promise(r => setTimeout(r, 300));
+          } catch (e) {
+            errorCount++;
+            const errorMsg = e instanceof Error ? e.message : String(e);
+            issues.push(`${item.name}: ${errorMsg}`);
+            console.error(`[STRIPE-SYNC] Error for ${item.name}:`, errorMsg);
+          }
+        }
+
+        // Determine status based on results
+        let status: 'pass' | 'warning' | 'fail' = 'pass';
+        let description = '';
+        
+        if (syncedCount > 0) {
+          description = `Auto-synced ${syncedCount} image${syncedCount !== 1 ? 's' : ''} to Stripe`;
+          status = 'warning'; // Warning because we had to fix something
+        } else if (alreadySyncedCount === allStripeItems.length) {
+          description = `All ${allStripeItems.length} Stripe products have matching images`;
+        } else {
+          description = `${alreadySyncedCount} of ${allStripeItems.length} images in sync`;
+        }
+
+        if (errorCount > 0) {
+          status = 'fail';
+          description += ` (${errorCount} errors)`;
+        }
+
+        if (missingWebsiteImageCount > 0) {
+          status = status === 'pass' ? 'warning' : status;
+        }
+
+        addCheck('Stripe Integration', 'Stripe Image Sync',
+          description,
+          status,
+          issues.length > 0 
+            ? issues.slice(0, 3).join('; ') + (issues.length > 3 ? `... +${issues.length - 3} more` : '')
+            : syncedCount > 0 ? 'Images synchronized to match website' : 'Website and Stripe images match'
+        );
+
+        console.log(`[STRIPE-SYNC] Complete: ${syncedCount} synced, ${alreadySyncedCount} already in sync, ${missingWebsiteImageCount} missing website image, ${errorCount} errors`);
+      } catch (stripeError) {
+        console.error("[STRIPE-SYNC] Failed to check Stripe images:", stripeError);
+        addCheck('Stripe Integration', 'Stripe Image Sync',
+          'Failed to check Stripe images',
+          'fail',
+          stripeError instanceof Error ? stripeError.message : 'Unknown error'
+        );
+      }
+    } else {
+      addCheck('Stripe Integration', 'Stripe Image Sync',
+        'Stripe not configured',
+        'skip',
+        'No STRIPE_SECRET_KEY found in environment'
+      );
+    }
+
+    // ============================================
     // COMPILE RESULTS
     // ============================================
     const duration = Date.now() - startTime;
