@@ -518,7 +518,7 @@ export const EmailSubscriptionManager = () => {
             )}
             {!isCalendarLoading && (
               isCalendarConnected ? (
-                <div className="flex items-center gap-3">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
                   <div className="flex items-center gap-2">
                     <Switch
                       id="auto-sync-toggle"
@@ -530,34 +530,36 @@ export const EmailSubscriptionManager = () => {
                       Auto-sync
                     </Label>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={syncAllToCalendar}
-                    disabled={isCalendarSaving || isExporting}
-                    className="text-xs"
-                  >
-                    {isExporting ? (
-                      <Loader2 className="h-3 w-3 animate-spin mr-1" />
-                    ) : (
-                      <RefreshCw className="h-3 w-3 mr-1" />
-                    )}
-                    Sync Now
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleCalendarDisconnect}
-                    disabled={isCalendarSaving || isExporting}
-                    className="text-xs text-destructive hover:text-destructive"
-                  >
-                    {isCalendarSaving ? (
-                      <Loader2 className="h-3 w-3 animate-spin mr-1" />
-                    ) : (
-                      <Unlink className="h-3 w-3 mr-1" />
-                    )}
-                    Disconnect
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={syncAllToCalendar}
+                      disabled={isCalendarSaving || isExporting}
+                      className="text-xs h-7 px-2"
+                    >
+                      {isExporting ? (
+                        <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                      ) : (
+                        <RefreshCw className="h-3 w-3 mr-1" />
+                      )}
+                      Sync
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleCalendarDisconnect}
+                      disabled={isCalendarSaving || isExporting}
+                      className="text-xs text-destructive hover:text-destructive h-7 px-2"
+                    >
+                      {isCalendarSaving ? (
+                        <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                      ) : (
+                        <Unlink className="h-3 w-3 mr-1" />
+                      )}
+                      Disconnect
+                    </Button>
+                  </div>
                 </div>
               ) : (
                 <Button
