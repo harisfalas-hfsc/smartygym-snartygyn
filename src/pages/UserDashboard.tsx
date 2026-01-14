@@ -16,7 +16,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { useAdminRole } from "@/hooks/useAdminRole";
-import { Heart, CheckCircle, Clock, Star, Play, Dumbbell, Calendar, Crown, ArrowLeft, Calculator, ShoppingBag, MessageSquare, Loader2, RefreshCw, ExternalLink, ClipboardList, TrendingUp, BookOpen, Headphones, Sparkles, Quote, User as UserIcon, Scale, Building2, Users, ClipboardCheck, FileText, Trash2 } from "lucide-react";
+import { Heart, CheckCircle, Clock, Star, Play, Dumbbell, Calendar, Crown, ArrowLeft, Calculator, ShoppingBag, MessageSquare, Loader2, RefreshCw, ExternalLink, ClipboardList, TrendingUp, BookOpen, Headphones, Sparkles, Quote, User as UserIcon, Scale, Building2, Users, ClipboardCheck, FileText, Trash2, Settings } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -46,6 +46,7 @@ import { useCheckInWindow } from "@/hooks/useCheckInWindow";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 
 import { ExportActivitiesDialog } from "@/components/ExportActivitiesDialog";
+import { AccountSettingsSection } from "@/components/dashboard/AccountSettingsSection";
 interface WorkoutInteraction {
   id: string;
   workout_id: string;
@@ -261,6 +262,15 @@ export default function UserDashboard() {
       color: "text-amber-500", 
       bgColor: "bg-amber-500/10",
       hoverBorder: "hover:border-amber-500/50"
+    },
+    { 
+      id: "account", 
+      label: "Account", 
+      description: "Privacy & data settings",
+      icon: Settings, 
+      color: "text-slate-500", 
+      bgColor: "bg-slate-500/10",
+      hoverBorder: "hover:border-slate-500/50"
     },
   ];
 
@@ -1902,6 +1912,20 @@ export default function UserDashboard() {
                 <LogBookAdvancedExport userId={user!.id} />
               </>}
             </div>}
+
+            {/* Account Section */}
+            {activeTab === "account" && (
+              <div className="space-y-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <Settings className="h-6 w-6 text-slate-500" />
+                  <h2 className="text-2xl font-bold">Account & Privacy</h2>
+                </div>
+                <AccountSettingsSection 
+                  userEmail={user?.email || ""} 
+                  onAccountDeleted={() => navigate("/")} 
+                />
+              </div>
+            )}
           </div>
         )}
       </main>
