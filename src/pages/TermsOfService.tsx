@@ -514,7 +514,7 @@ const TermsOfService = () => {
                   <div className="text-muted-foreground space-y-1">
                     <p><strong>Smarty Gym</strong></p>
                     <p><strong>Owner:</strong> Haris Falas</p>
-                    <p>📩 Email: <a href="mailto:admin@smartygym.com" className="text-primary hover:underline">admin@smartygym.com</a></p>
+                    <p>📩 Email: <a href="mailto:smartygym@outlook.com" className="text-primary hover:underline">smartygym@outlook.com</a></p>
                     <p>🌐 Website: <a href="https://smartygym.com" className="text-primary hover:underline">smartygym.com</a></p>
                   </div>
                 </div>

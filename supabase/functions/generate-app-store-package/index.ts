@@ -43,7 +43,7 @@ serve(async (req) => {
       marketing_url: "https://smartygym.com",
       privacy_policy_url: "https://smartygym.com/privacy-policy",
       terms_of_service_url: "https://smartygym.com/terms-of-service",
-      support_email: "support@smartygym.com",
+      support_email: "smartygym@outlook.com",
       category: "Health & Fitness",
       content_rating: "4+ (Apple) / Everyone (Google)",
     };

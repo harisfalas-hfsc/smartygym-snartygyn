@@ -120,7 +120,7 @@ serve(async (req: Request) => {
           from: "SmartyGym <notifications@smartygym.com>",
           to: [email],
           subject: `${reminderIcon} ${reminderType === 'morning' ? 'Morning' : 'Night'} Check-in Reminder`,
-          reply_to: "admin@smartygym.com",
+          reply_to: "smartygym@outlook.com",
           headers: {
             "List-Unsubscribe": "<https://smartygym.com/unsubscribe-help>",
             "List-Unsubscribe-Post": "List-Unsubscribe=One-Click"

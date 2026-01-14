@@ -91,7 +91,7 @@ export const AppStoreTextContent = ({ platform }: AppStoreTextContentProps) => {
     },
     {
       label: "Support Email",
-      value: "support@smartygym.com",
+      value: "smartygym@outlook.com",
       description: "Contact email for users"
     },
     {
@@ -173,7 +173,7 @@ Your gym re-imagined. Anywhere, anytime. 100% human expertise.
 
 Start your transformation today with genuine coaching from Sports Scientist Haris Falas.
 
-Support: support@smartygym.com
+Support: smartygym@outlook.com
 Website: https://smartygym.com
 Privacy Policy: https://smartygym.com/privacy-policy`;
 

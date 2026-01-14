@@ -249,10 +249,10 @@ export const CorporateBrochure = () => {
                 <strong>Website:</strong> <a href="https://smartygym.com/corporate" className="text-[#29B6D2]">smartygym.com/corporate</a>
               </p>
               <p className="text-sm text-gray-600 mb-1">
-                <strong>Email:</strong> <a href="mailto:corporate@smartygym.com" className="text-[#29B6D2]">corporate@smartygym.com</a>
+                <strong>Email:</strong> <a href="mailto:smartygym@outlook.com" className="text-[#29B6D2]">smartygym@outlook.com</a>
               </p>
               <p className="text-sm text-gray-600">
-                <strong>Support:</strong> <a href="mailto:support@smartygym.com" className="text-[#29B6D2]">support@smartygym.com</a>
+                <strong>Support:</strong> <a href="mailto:smartygym@outlook.com" className="text-[#29B6D2]">smartygym@outlook.com</a>
               </p>
             </div>
             <div className="text-right">

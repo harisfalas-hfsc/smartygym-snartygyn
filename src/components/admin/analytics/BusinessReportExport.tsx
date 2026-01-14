@@ -329,7 +329,7 @@ export function BusinessReportExport({ dashboardRef }: BusinessReportExportProps
         <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; color: #999; font-size: 12px;">
           <p>SmartyGym Business Analytics Report</p>
           <p>This report is confidential and intended for internal use only.</p>
-          <p>Contact: admin@smartygym.com | www.smartygym.com</p>
+          <p>Contact: smartygym@outlook.com | www.smartygym.com</p>
         </div>
       </div>
     `;

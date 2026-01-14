@@ -85,7 +85,7 @@ const PrivacyPolicy = () => {
               <div className="bg-muted/50 p-4 rounded-lg mb-6">
                 <p className="text-sm text-muted-foreground mb-2"><strong>Last Updated:</strong> January 14, 2025</p>
                 <p className="text-sm text-muted-foreground mb-2"><strong>Data Controller:</strong> SmartyGym (smartygym.com)</p>
-                <p className="text-sm text-muted-foreground"><strong>Contact:</strong> admin@smartygym.com</p>
+                <p className="text-sm text-muted-foreground"><strong>Contact:</strong> smartygym@outlook.com</p>
               </div>
 
               <p className="text-lg text-muted-foreground">
@@ -254,7 +254,7 @@ const PrivacyPolicy = () => {
                       <li>📊 <strong>Download Data:</strong> Dashboard → Settings → "Download My Data"</li>
                       <li>🗑️ <strong>Delete Account:</strong> Dashboard → Settings → "Delete My Account"</li>
                       <li>🔌 <strong>Disconnect Services:</strong> Dashboard → Settings → Connected Services</li>
-                      <li>📧 <strong>Other Requests:</strong> Email <a href="mailto:admin@smartygym.com" className="text-primary hover:underline">admin@smartygym.com</a></li>
+                      <li>📧 <strong>Other Requests:</strong> Email <a href="mailto:smartygym@outlook.com" className="text-primary hover:underline">smartygym@outlook.com</a></li>
                     </ul>
                   </div>
 
@@ -444,7 +444,7 @@ const PrivacyPolicy = () => {
                 <div>
                   <h2 className="text-2xl font-bold mb-3">14. Children's Privacy</h2>
                   <p className="text-muted-foreground">
-                    SmartyGym is not intended for children under 16 years of age. We do not knowingly collect personal data from children under 16. If you believe we have inadvertently collected such data, please contact us at <a href="mailto:admin@smartygym.com" className="text-primary hover:underline">admin@smartygym.com</a> and we will promptly delete it.
+                    SmartyGym is not intended for children under 16 years of age. We do not knowingly collect personal data from children under 16. If you believe we have inadvertently collected such data, please contact us at <a href="mailto:smartygym@outlook.com" className="text-primary hover:underline">smartygym@outlook.com</a> and we will promptly delete it.
                   </p>
                 </div>
               </div>
@@ -469,7 +469,7 @@ const PrivacyPolicy = () => {
                   <div className="text-muted-foreground space-y-1">
                     <p><strong>Smarty Gym</strong></p>
                     <p><strong>Data Controller:</strong> Haris Falas</p>
-                    <p>Email: <a href="mailto:admin@smartygym.com" className="text-primary hover:underline">admin@smartygym.com</a></p>
+                    <p>Email: <a href="mailto:smartygym@outlook.com" className="text-primary hover:underline">smartygym@outlook.com</a></p>
                   </div>
                   <p className="text-muted-foreground mt-4">
                     We aim to respond to all data protection inquiries within 30 days.

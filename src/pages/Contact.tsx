@@ -365,7 +365,7 @@ const Contact = () => {
               "@type": "LocalBusiness",
               "name": "SmartyGym",
               "url": "https://smartygym.com",
-              "email": "admin@smartygym.com",
+              "email": "smartygym@outlook.com",
               "founder": {
                 "@type": "Person",
                 "name": "Haris Falas",

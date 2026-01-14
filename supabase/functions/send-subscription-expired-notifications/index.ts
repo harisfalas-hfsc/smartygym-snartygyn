@@ -165,7 +165,7 @@ serve(async (req) => {
           html: emailHtml,
           headers: {
             "List-Unsubscribe": "<https://smartygym.com/unsubscribe-help>",
-            "Reply-To": "admin@smartygym.com"
+            "Reply-To": "smartygym@outlook.com"
           }
         });
 
