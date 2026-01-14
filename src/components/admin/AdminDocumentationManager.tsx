@@ -204,7 +204,7 @@ DATA SECURITY:
 • Regular security audits
 
 Full Privacy Policy: https://smartygym.com/privacy-policy
-Contact: support@smartygym.com`;
+Contact: smartygym@outlook.com`;
 
   // QA Testing Checklist
   const qaTestingChecklist = `SmartyGym - QA Testing Checklist
@@ -276,7 +276,7 @@ BENEFITS:
 • Team management dashboard
 • Priority support
 
-Contact: corporate@smartygym.com`;
+Contact: smartygym@outlook.com`;
 
   return (
     <div className="space-y-6">

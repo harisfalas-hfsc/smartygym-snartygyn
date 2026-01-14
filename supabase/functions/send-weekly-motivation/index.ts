@@ -393,7 +393,7 @@ serve(async (req) => {
 
               const emailResult = await resend.emails.send({
                 from: "SmartyGym <notifications@smartygym.com>",
-                reply_to: "admin@smartygym.com",
+                reply_to: "smartygym@outlook.com",
                 to: [userEmail],
                 subject: subject,
                 headers: getEmailHeaders(userEmail),

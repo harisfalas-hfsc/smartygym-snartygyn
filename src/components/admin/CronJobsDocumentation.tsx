@@ -337,7 +337,7 @@ export const CronJobsDocumentation = () => {
               <ul className="text-sm text-gray-600 space-y-1">
                 <li>• All notifications use dual-channel delivery (dashboard + email)</li>
                 <li>• Email sender: notifications@smartygym.com</li>
-                <li>• Reply-to: admin@smartygym.com</li>
+                <li>• Reply-to: smartygym@outlook.com</li>
                 <li>• Rate limiting: 600ms between email sends</li>
               </ul>
             </div>

@@ -211,7 +211,7 @@ export const IndividualBrochure = () => {
                 <strong>Website:</strong> <a href="https://smartygym.com" className="text-[#29B6D2]">smartygym.com</a>
               </p>
               <p className="text-sm text-gray-600 mb-2">
-                <strong>Email:</strong> <a href="mailto:support@smartygym.com" className="text-[#29B6D2]">support@smartygym.com</a>
+                <strong>Email:</strong> <a href="mailto:smartygym@outlook.com" className="text-[#29B6D2]">smartygym@outlook.com</a>
               </p>
             </div>
             <div className="text-right">

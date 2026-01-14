@@ -246,7 +246,7 @@ export const generateOrganizationSchema = () => {
     "contactPoint": {
       "@type": "ContactPoint",
       "contactType": "Customer Support",
-      "email": "info@smartygym.com",
+      "email": "smartygym@outlook.com",
       "availableLanguage": ["English", "Greek"]
     },
     "sameAs": [
@@ -881,7 +881,7 @@ export const generateOrganizationWithRatingSchema = (reviewCount: number, averag
   "contactPoint": {
     "@type": "ContactPoint",
     "contactType": "Customer Support",
-    "email": "info@smartygym.com",
+    "email": "smartygym@outlook.com",
     "availableLanguage": ["English", "Greek"]
   },
   "sameAs": [
