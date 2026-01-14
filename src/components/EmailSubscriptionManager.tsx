@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Loader2, Dumbbell, Sun, Zap, Plus, BookOpen, FileText, BarChart3, Bell, Calendar, RefreshCw } from "lucide-react";
+import { Loader2, Dumbbell, Sun, Zap, Plus, BookOpen, FileText, BarChart3, Bell, Calendar, RefreshCw, Unlink } from "lucide-react";
 import { toast } from "sonner";
 import { Progress } from "@/components/ui/progress";
 
@@ -530,10 +530,10 @@ export const EmailSubscriptionManager = () => {
                       Auto-sync
                     </Label>
                   </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={syncAllToCalendar}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={syncAllToCalendar}
                     disabled={isCalendarSaving || isExporting}
                     className="text-xs"
                   >
@@ -543,6 +543,20 @@ export const EmailSubscriptionManager = () => {
                       <RefreshCw className="h-3 w-3 mr-1" />
                     )}
                     Sync Now
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleCalendarDisconnect}
+                    disabled={isCalendarSaving || isExporting}
+                    className="text-xs text-destructive hover:text-destructive"
+                  >
+                    {isCalendarSaving ? (
+                      <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                    ) : (
+                      <Unlink className="h-3 w-3 mr-1" />
+                    )}
+                    Disconnect
                   </Button>
                 </div>
               ) : (
