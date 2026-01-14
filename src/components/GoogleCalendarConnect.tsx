@@ -39,9 +39,26 @@ export const GoogleCalendarConnect = ({ onConnectionChange }: GoogleCalendarConn
     }
 
     if (calendarError) {
+      // Provide user-friendly error messages based on error type
+      let errorTitle = "Connection Failed";
+      let errorDescription = "Could not connect to Google Calendar.";
+      
+      if (calendarError.includes('redirect_uri_mismatch') || calendarError.includes('400')) {
+        errorTitle = "Configuration Issue";
+        errorDescription = "There's a temporary issue with the calendar connection. Please try again later or contact support.";
+      } else if (calendarError.includes('access_denied')) {
+        errorTitle = "Access Denied";
+        errorDescription = "You cancelled the connection or didn't grant permission.";
+      } else if (calendarError.includes('disallowed_useragent')) {
+        errorTitle = "Browser Not Supported";
+        errorDescription = "Please open this page in Safari or Chrome (not in-app browser).";
+      } else if (calendarError !== 'unknown') {
+        errorDescription = `Could not connect: ${calendarError}`;
+      }
+      
       toast({
-        title: "Connection Failed",
-        description: `Could not connect to Google Calendar: ${calendarError}`,
+        title: errorTitle,
+        description: errorDescription,
         variant: "destructive",
       });
       window.history.replaceState({}, '', window.location.pathname);
