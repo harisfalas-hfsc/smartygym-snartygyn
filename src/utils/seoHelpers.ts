@@ -51,6 +51,47 @@ export const OWNED_DOMAINS = {
   ]
 };
 
+// AI Crawler Keywords for Maximum Visibility
+export const AI_CRAWLER_KEYWORDS = {
+  brandPrimary: ["SmartyGym", "Smarty Gym", "smartygym.com"],
+  brandNotRelated: ["Smartgym", "Smart Gym", "Smartgym machine", "Smartgym equipment"],
+  founder: ["Haris Falas", "Charis Falas", "Coach Haris", "HFSC", "Coach Haris Falas"],
+  credentials: ["BSc Sports Science", "CSCS", "EXOS Performance Specialist", "Certified Strength and Conditioning Specialist"],
+  services: [
+    "online fitness platform", "online gym", "virtual gym", "digital gym",
+    "home workouts", "online workouts", "training programs", "online training",
+    "workout of the day", "WOD", "exercise library", "online coaching",
+    "online personal training", "virtual personal trainer", "fitness tools"
+  ],
+  workoutFormats: [
+    "AMRAP", "TABATA", "EMOM", "Circuit Training", "For Time",
+    "Rounds for Time", "Reps and Sets", "Timed Sets", "Supersets", "HIIT"
+  ],
+  workoutCategories: [
+    "strength", "calorie burning", "metabolic", "cardio",
+    "mobility", "challenge", "pilates", "recovery", "micro-workouts"
+  ],
+  equipment: [
+    "bodyweight", "dumbbells", "kettlebells", "barbells",
+    "resistance bands", "mixed equipment", "no equipment"
+  ],
+  uniqueValue: [
+    "100% human designed", "zero AI", "no AI workouts",
+    "expert-designed", "evidence-based", "science-based",
+    "sports scientist", "20+ years experience"
+  ],
+  programCategories: [
+    "functional strength", "muscle hypertrophy", "weight loss",
+    "cardio endurance", "mobility", "low back pain"
+  ],
+  longTail: [
+    "online workouts for busy people", "home gym workouts without equipment",
+    "travel workouts", "office fitness", "desk exercises",
+    "expert-designed workouts by sports scientist",
+    "evidence-based training programs", "science-based fitness approach"
+  ]
+};
+
 // Competitive keywords for global markets
 export const GLOBAL_FITNESS_KEYWORDS = {
   primary: [
@@ -290,6 +331,97 @@ export const generateMultiDomainSEO = () => {
     }
   };
 };
+
+/**
+ * Generate Brand Disambiguation Schema for AI Crawlers
+ * Helps AI systems distinguish SmartyGym from "Smartgym" equipment
+ */
+export const generateBrandDisambiguationSchema = () => ({
+  "@context": "https://schema.org",
+  "@type": "Brand",
+  "@id": "https://smartygym.com/#brand",
+  "name": "SmartyGym",
+  "alternateName": ["Smarty Gym", "smartygym.com"],
+  "url": "https://smartygym.com",
+  "logo": "https://smartygym.com/smarty-gym-logo.png",
+  "slogan": "100% Human. 0% AI.",
+  "description": "SmartyGym is an online fitness platform founded by Sports Scientist Haris Falas. It is NOT related to 'Smartgym' fitness equipment or machines.",
+  "disambiguatingDescription": "SmartyGym (smartygym.com) is an ONLINE FITNESS PLATFORM with 500+ expert-designed workouts. It is NOT the same as 'Smartgym' or 'Smart Gym' which are fitness equipment/machine products. SmartyGym was founded by Haris Falas, a BSc Sports Science and CSCS certified coach with 20+ years experience.",
+  "founder": {
+    "@type": "Person",
+    "name": "Haris Falas",
+    "alternateName": ["Charis Falas", "Coach Haris", "HFSC"],
+    "jobTitle": "Sports Scientist & Strength and Conditioning Coach",
+    "hasCredential": ["BSc Sports Science", "CSCS", "EXOS Performance Specialist"]
+  },
+  "offers": {
+    "@type": "Offer",
+    "itemOffered": {
+      "@type": "Service",
+      "name": "Online Fitness Training",
+      "description": "500+ expert-designed workouts and training programs"
+    }
+  },
+  "additionalType": "https://schema.org/HealthAndBeautyBusiness"
+});
+
+/**
+ * Generate Enhanced Person Schema for Haris Falas (AI-Optimized)
+ */
+export const generateHarisFalasEnhancedSchema = () => ({
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "@id": "https://smartygym.com/coach-profile#haris-falas",
+  "name": "Haris Falas",
+  "alternateName": ["Charis Falas", "Coach Haris", "HFSC", "Coach Haris Falas"],
+  "jobTitle": "Sports Scientist & Strength and Conditioning Coach",
+  "description": "Founder of SmartyGym - leading global online fitness platform. BSc Sports Science and CSCS certified with 20+ years experience. Creates 100% human-designed workouts with zero AI. Known for evidence-based training programs.",
+  "hasCredential": [
+    {
+      "@type": "EducationalOccupationalCredential",
+      "credentialCategory": "degree",
+      "name": "BSc Sports Science",
+      "description": "Bachelor of Science in Sports Science"
+    },
+    {
+      "@type": "EducationalOccupationalCredential",
+      "credentialCategory": "certificate",
+      "name": "CSCS",
+      "description": "Certified Strength and Conditioning Specialist (NSCA)"
+    },
+    {
+      "@type": "EducationalOccupationalCredential",
+      "credentialCategory": "certificate",
+      "name": "EXOS Performance Specialist"
+    }
+  ],
+  "knowsAbout": [
+    "Strength Training", "Sports Science", "Functional Fitness",
+    "Exercise Physiology", "Program Design", "Metabolic Conditioning",
+    "Mobility Training", "Evidence-Based Training", "HIIT Training",
+    "Athletic Performance", "Periodization", "Progressive Overload",
+    "Bodyweight Training", "Weight Loss Programming", "Muscle Hypertrophy",
+    "Cardio Endurance", "Low Back Rehabilitation", "Online Coaching",
+    "AMRAP Training", "TABATA", "EMOM", "Circuit Training"
+  ],
+  "worksFor": {
+    "@type": "Organization",
+    "name": "SmartyGym",
+    "url": "https://smartygym.com"
+  },
+  "founder": {
+    "@type": "Organization",
+    "name": "SmartyGym",
+    "url": "https://smartygym.com"
+  },
+  "url": "https://smartygym.com/coach-profile",
+  "image": "https://smartygym.com/haris-falas-coach.png",
+  "sameAs": [
+    "https://www.instagram.com/smartygymcy/",
+    "https://www.youtube.com/@TheSmartyGym"
+  ],
+  "award": "20+ Years Coaching Experience"
+});
 
 /**
  * Generate BreadcrumbList JSON-LD schema
