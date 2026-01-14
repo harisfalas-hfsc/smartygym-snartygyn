@@ -67,6 +67,7 @@ import SmartyPlans from "./pages/SmartyPlans";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import NewsletterThankYou from "./pages/NewsletterThankYou";
 import Unsubscribe from "./pages/Unsubscribe";
+import UnsubscribeHelp from "./pages/UnsubscribeHelp";
 import Community from "./pages/Community";
 import AdminBackoffice from "./pages/AdminBackoffice";
 import ExportVideoPage from "./pages/admin/ExportVideoPage";
@@ -118,6 +119,7 @@ const AppContent = () => {
                 
                 <Route path="/newsletter-thank-you" element={<NewsletterThankYou />} />
                 <Route path="/unsubscribe" element={<Unsubscribe />} />
+                <Route path="/unsubscribe-help" element={<UnsubscribeHelp />} />
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/coach-profile" element={<CoachProfile />} />
                 <Route path="/coach-cv" element={<CoachCV />} />

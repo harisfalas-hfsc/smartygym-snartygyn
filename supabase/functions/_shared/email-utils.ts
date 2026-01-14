@@ -34,8 +34,7 @@ export function getEmailHeaders(userEmail: string, emailType?: EmailType): Recor
  * Required for CAN-SPAM and GDPR compliance
  */
 export function getEmailFooter(userEmail: string, emailType?: EmailType): string {
-  const typeParam = emailType ? `&type=${emailType}` : '';
-  const unsubscribeUrl = `https://smartygym.com/unsubscribe?email=${encodeURIComponent(userEmail)}${typeParam}`;
+  const unsubscribeHelpUrl = `https://smartygym.com/unsubscribe-help`;
   const manageUrl = `https://smartygym.com/userdashboard?tab=messages`;
   
   return `
@@ -47,7 +46,7 @@ export function getEmailFooter(userEmail: string, emailType?: EmailType): string
             Designed by Haris Falas, Sports Scientist (CSCS Certified)
           </p>
           <p style="font-size: 12px; color: #999999; line-height: 1.5; margin: 0; text-align: center;">
-            <a href="${unsubscribeUrl}" style="color: #999999; text-decoration: underline;">Unsubscribe from this email</a> · 
+            <a href="${unsubscribeHelpUrl}" style="color: #999999; text-decoration: underline;">Unsubscribe from this email</a> · 
             <a href="${manageUrl}" style="color: #999999; text-decoration: underline;">Manage all preferences</a> · 
             <a href="https://smartygym.com/privacy-policy" style="color: #999999; text-decoration: underline;">Privacy Policy</a>
           </p>

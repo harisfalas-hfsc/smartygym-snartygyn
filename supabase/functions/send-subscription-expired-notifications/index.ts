@@ -152,7 +152,7 @@ serve(async (req) => {
             
             <p style="color: #666; font-size: 12px; text-align: center;">
               SmartyGym - Expert Fitness<br/>
-              <a href="https://smartygym.com/unsubscribe" style="color: #666;">Unsubscribe</a> from notifications
+              <a href="https://smartygym.com/unsubscribe-help" style="color: #666;">Unsubscribe</a> from notifications
             </p>
           </body>
           </html>
@@ -164,7 +164,7 @@ serve(async (req) => {
           subject: "Your SmartyGym Subscription Has Ended",
           html: emailHtml,
           headers: {
-            "List-Unsubscribe": "<https://smartygym.com/unsubscribe>",
+            "List-Unsubscribe": "<https://smartygym.com/unsubscribe-help>",
             "Reply-To": "admin@smartygym.com"
           }
         });
