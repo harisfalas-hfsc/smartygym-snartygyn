@@ -122,7 +122,7 @@ serve(async (req: Request) => {
           subject: `${reminderIcon} ${reminderType === 'morning' ? 'Morning' : 'Night'} Check-in Reminder`,
           reply_to: "admin@smartygym.com",
           headers: {
-            "List-Unsubscribe": "<https://smartygym.com/unsubscribe>",
+            "List-Unsubscribe": "<https://smartygym.com/unsubscribe-help>",
             "List-Unsubscribe-Post": "List-Unsubscribe=One-Click"
           },
           html: `
@@ -170,7 +170,7 @@ serve(async (req: Request) => {
                           
                           <p style="color: #888888; font-size: 12px; margin: 30px 0 0 0;">
                             You're receiving this because you subscribed to check-in reminders.<br/>
-                            <a href="https://smartygym.com/unsubscribe" style="color: #29B6D2;">Unsubscribe</a>
+                            <a href="https://smartygym.com/unsubscribe-help" style="color: #29B6D2;">Unsubscribe</a>
                           </p>
                         </td>
                       </tr>
