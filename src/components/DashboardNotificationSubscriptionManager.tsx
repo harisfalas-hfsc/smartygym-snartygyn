@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Loader2, Dumbbell, Sun, Zap, Plus, BookOpen, FileText, BarChart3, Bell } from "lucide-react";
+import { Loader2, Dumbbell, Sun, Zap, Plus, BookOpen, FileText, BarChart3, Bell, CalendarClock } from "lucide-react";
 import { toast } from "sonner";
 
 interface DashboardNotificationPreferences {
@@ -15,6 +15,8 @@ interface DashboardNotificationPreferences {
   dashboard_new_article: boolean;
   dashboard_weekly_activity: boolean;
   dashboard_checkin_reminders: boolean;
+  dashboard_scheduled_workout_reminders: boolean;
+  dashboard_scheduled_program_reminders: boolean;
 }
 
 const DEFAULT_PREFERENCES: DashboardNotificationPreferences = {
@@ -26,6 +28,8 @@ const DEFAULT_PREFERENCES: DashboardNotificationPreferences = {
   dashboard_new_article: true,
   dashboard_weekly_activity: true,
   dashboard_checkin_reminders: true,
+  dashboard_scheduled_workout_reminders: true,
+  dashboard_scheduled_program_reminders: true,
 };
 
 const NOTIFICATION_OPTIONS = [
@@ -77,6 +81,18 @@ const NOTIFICATION_OPTIONS = [
     description: "Morning and evening check-in reminders",
     icon: Bell,
   },
+  {
+    key: "dashboard_scheduled_workout_reminders" as keyof DashboardNotificationPreferences,
+    label: "Scheduled Workout Reminders",
+    description: "Get reminded about your scheduled workouts",
+    icon: CalendarClock,
+  },
+  {
+    key: "dashboard_scheduled_program_reminders" as keyof DashboardNotificationPreferences,
+    label: "Scheduled Program Reminders",
+    description: "Get reminded about your scheduled training programs",
+    icon: CalendarClock,
+  },
 ];
 
 export const DashboardNotificationSubscriptionManager = () => {
@@ -115,6 +131,8 @@ export const DashboardNotificationSubscriptionManager = () => {
           dashboard_new_article: prefs.dashboard_new_article !== false,
           dashboard_weekly_activity: prefs.dashboard_weekly_activity !== false,
           dashboard_checkin_reminders: prefs.dashboard_checkin_reminders !== false,
+          dashboard_scheduled_workout_reminders: prefs.dashboard_scheduled_workout_reminders !== false,
+          dashboard_scheduled_program_reminders: prefs.dashboard_scheduled_program_reminders !== false,
         });
       }
     } catch (err) {

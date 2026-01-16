@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { HTMLContent } from "@/components/HTMLContent";
-import { RitualCalendarSync } from "@/components/ritual/RitualCalendarSync";
+
 import { RitualShareDialog } from "@/components/ritual/RitualShareDialog";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { SEOEnhancer } from "@/components/SEOEnhancer";

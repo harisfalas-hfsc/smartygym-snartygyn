@@ -45,7 +45,7 @@ import { useCheckins } from "@/hooks/useCheckins";
 import { useCheckInWindow } from "@/hooks/useCheckInWindow";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 
-import { ExportActivitiesDialog } from "@/components/ExportActivitiesDialog";
+
 import { AccountSettingsSection } from "@/components/dashboard/AccountSettingsSection";
 interface WorkoutInteraction {
   id: string;
