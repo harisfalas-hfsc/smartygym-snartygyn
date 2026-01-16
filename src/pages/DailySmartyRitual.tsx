@@ -263,12 +263,6 @@ const DailySmartyRitual = () => {
               </div>
             </Card>
             
-            {/* Mobile: Compact Calendar Sync button outside main card */}
-            {isAuthenticated && ritual && (
-              <div className="mt-4 flex justify-center">
-                <RitualCalendarSync compact />
-              </div>
-            )}
           </div>
 
           {/* Desktop: Full Card with all content */}
@@ -341,10 +335,6 @@ const DailySmartyRitual = () => {
               {/* Ritual Content */}
               {isAuthenticated && ritual && (
                 <CardContent className="p-6 space-y-8">
-                  {/* Calendar Integration - Google Calendar sync */}
-                  <RitualCalendarSync />
-
-                  <Separator />
 
                   {/* Morning Ritual */}
                   <div className="space-y-4">

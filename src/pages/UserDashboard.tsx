@@ -1562,11 +1562,6 @@ export default function UserDashboard() {
                   </Button>
                 </CardContent>
               </Card> : <>
-                {/* Export to Google Calendar */}
-                <div className="mb-4">
-                  <ExportActivitiesDialog />
-                </div>
-
                 {/* Workout Activity Stats */}
                 <div>
             <h3 className="text-lg font-semibold mb-2">Workout Activity</h3>
