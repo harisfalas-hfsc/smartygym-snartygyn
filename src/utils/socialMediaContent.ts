@@ -2135,10 +2135,10 @@ Chronological history
 Filter by type
 Search your records
 
-🔗 GOOGLE CALENDAR SYNC
-Auto-sync workouts
-Reminders on your phone
+🔔 SMART REMINDERS
+Workout notifications
 Never miss a session
+Stay on track
 
 Your journey, documented. 💪
 

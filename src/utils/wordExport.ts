@@ -522,7 +522,7 @@ export const smartyGymConceptContent: ContentSection[] = [
   { type: 'paragraph', content: 'Your complete activity history:' },
   { type: 'bullet', content: 'Calendar view of all completed workouts and activities' },
   { type: 'bullet', content: 'Activity timeline with filtering' },
-  { type: 'bullet', content: 'Google Calendar integration for auto-sync' },
+  { type: 'bullet', content: 'Smart reminders for scheduled workouts and programs' },
   { type: 'bullet', content: 'Progress visualization' },
   
   { type: 'heading', content: '🧮 SMARTY TOOLS', level: 1 },
