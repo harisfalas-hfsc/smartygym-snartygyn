@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Play, Pause, RotateCcw, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import workoutHero from "@/assets/workout-hero.jpg";
-import { ParQQuestionnaire } from "@/components/ParQQuestionnaire";
+import { ParQReminder } from "@/components/ParQReminder";
 import { WorkoutInfoBar } from "@/components/WorkoutInfoBar";
 import { ShareButtons } from "@/components/ShareButtons";
 import { WorkoutInteractions } from "@/components/WorkoutInteractions";
@@ -600,8 +600,8 @@ export const WorkoutDisplay = ({
           />
         )}
 
-        {/* PAR-Q Questionnaire */}
-        <ParQQuestionnaire />
+        {/* PAR-Q Reminder */}
+        <ParQReminder />
       </div>
       
       {/* Bottom CTA Banner */}

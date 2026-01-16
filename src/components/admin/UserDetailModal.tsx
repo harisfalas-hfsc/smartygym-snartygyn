@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { UserParQHistoryTab } from "./UserParQHistoryTab";
 
 interface UserData {
   user_id: string;
@@ -345,9 +346,10 @@ export function UserDetailModal({
           <Separator className="my-4" />
 
           <Tabs defaultValue="subscription" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="subscription">Subscription</TabsTrigger>
               <TabsTrigger value="purchases">Purchases</TabsTrigger>
+              <TabsTrigger value="parq">PAR-Q</TabsTrigger>
               <TabsTrigger value="actions">Actions</TabsTrigger>
             </TabsList>
 
@@ -488,6 +490,18 @@ export function UserDetailModal({
                       ))}
                     </div>
                   )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* PAR-Q Tab */}
+            <TabsContent value="parq" className="mt-4">
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm">PAR-Q Assessment History</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <UserParQHistoryTab userId={user.user_id} />
                 </CardContent>
               </Card>
             </TabsContent>
