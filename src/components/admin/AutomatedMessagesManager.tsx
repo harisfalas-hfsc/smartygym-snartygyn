@@ -44,7 +44,9 @@ const MESSAGE_TYPES = {
   purchase_subscription: { label: "Subscription Purchase", icon: Crown, color: "text-yellow-600", description: "Sent after subscribing" },
   renewal_reminder: { label: "Renewal Reminder", icon: Bell, color: "text-cyan-600", description: "Sent before subscription expires" },
   renewal_thank_you: { label: "Renewal Thank You", icon: ThumbsUp, color: "text-emerald-600", description: "Sent after successful renewal" },
-  cancellation: { label: "Cancellation Notice", icon: UserX, color: "text-red-600", description: "Sent when subscription is cancelled" }
+  cancellation: { label: "Cancellation Notice", icon: UserX, color: "text-red-600", description: "Sent when subscription is cancelled" },
+  checkin_reminder_morning: { label: "Morning Check-in Reminder", icon: Bell, color: "text-amber-500", description: "Sent at 8:00 AM Cyprus (before 9:00 AM window)" },
+  checkin_reminder_evening: { label: "Evening Check-in Reminder", icon: Bell, color: "text-indigo-500", description: "Sent at 8:00 PM Cyprus (before 9:00 PM window)" }
 };
 
 export const AutomatedMessagesManager = () => {
