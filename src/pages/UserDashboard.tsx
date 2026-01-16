@@ -311,6 +311,14 @@ export default function UserDashboard() {
     return () => window.removeEventListener('purchase-verified', handlePurchaseVerified);
   }, [user]);
 
+  // Sync activeTab with URL tab parameter changes
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam !== activeTab) {
+      setActiveTab(tabParam || null);
+    }
+  }, [searchParams]);
+
   // Handle scroll to active-goals section from URL param
   useEffect(() => {
     const scrollTarget = searchParams.get('scroll');
