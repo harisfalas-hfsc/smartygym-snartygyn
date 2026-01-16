@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { CheckCircle2, AlertTriangle } from "lucide-react";
+import { CheckCircle2, AlertTriangle, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import logo from "@/assets/smarty-gym-logo.png";
 
 const questions = [
@@ -18,9 +20,20 @@ const questions = [
 ];
 
 export const ParQQuestionnaire = () => {
+  const { toast } = useToast();
   const [answers, setAnswers] = useState<{ [key: number]: string }>({});
   const [showResult, setShowResult] = useState(false);
   const [isCleared, setIsCleared] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setIsAuthenticated(!!user);
+    };
+    checkAuth();
+  }, []);
 
   const handleAnswerChange = (questionIndex: number, value: string) => {
     setAnswers(prev => ({
@@ -30,15 +43,52 @@ export const ParQQuestionnaire = () => {
     setShowResult(false);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const allAnswered = questions.every((_, index) => answers[index]);
     if (!allAnswered) {
-      alert("Please answer all questions before submitting.");
+      toast({
+        title: "Incomplete Assessment",
+        description: "Please answer all questions before submitting.",
+        variant: "destructive",
+      });
       return;
     }
 
     const hasYes = Object.values(answers).some(answer => answer === "yes");
-    setIsCleared(!hasYes);
+    const cleared = !hasYes;
+
+    // Save to database if authenticated
+    if (isAuthenticated) {
+      setIsSubmitting(true);
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { error } = await supabase.from("parq_responses").insert({
+            user_id: user.id,
+            responses: answers,
+            is_cleared: cleared,
+          });
+
+          if (error) throw error;
+
+          toast({
+            title: "Assessment Saved",
+            description: "Your PAR-Q assessment has been recorded to your account.",
+          });
+        }
+      } catch (error) {
+        console.error("Error saving PAR-Q:", error);
+        toast({
+          title: "Note",
+          description: "Assessment completed but couldn't be saved to your account.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
+
+    setIsCleared(cleared);
     setShowResult(true);
   };
 
@@ -85,8 +135,16 @@ export const ParQQuestionnaire = () => {
             onClick={handleSubmit}
             className="flex-1"
             size="lg"
+            disabled={isSubmitting}
           >
-            Submit Assessment
+            {isSubmitting ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              "Submit Assessment"
+            )}
           </Button>
           <Button 
             onClick={handleReset}

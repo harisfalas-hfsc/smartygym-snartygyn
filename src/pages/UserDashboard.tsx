@@ -47,6 +47,7 @@ import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 
 
 import { AccountSettingsSection } from "@/components/dashboard/AccountSettingsSection";
+import { ParQAssessmentSection } from "@/components/dashboard/ParQAssessmentSection";
 interface WorkoutInteraction {
   id: string;
   workout_id: string;
@@ -1915,6 +1916,7 @@ export default function UserDashboard() {
                   <Settings className="h-6 w-6 text-slate-500" />
                   <h2 className="text-2xl font-bold">Account & Privacy</h2>
                 </div>
+                <ParQAssessmentSection />
                 <AccountSettingsSection 
                   userEmail={user?.email || ""} 
                   onAccountDeleted={() => navigate("/")} 
