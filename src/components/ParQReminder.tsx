@@ -8,7 +8,7 @@ export function ParQReminder() {
       <p className="text-sm text-muted-foreground">
         Before starting any exercise program,{" "}
         <Link 
-          to="/dashboard?tab=account" 
+          to="/userdashboard?tab=account" 
           className="font-medium text-primary hover:underline"
         >
           ensure your PAR-Q health assessment

@@ -4,7 +4,7 @@ import { DeviceThemeDefault } from "./components/DeviceThemeDefault";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AuthenticatedLayout } from "./components/AuthenticatedLayout";
@@ -84,6 +84,12 @@ import { PageTransition } from "./components/PageTransition";
 import { LoadingBar } from "./components/LoadingBar";
 import { AnnouncementManager } from "./components/announcements/AnnouncementManager";
 
+// Redirect component for /dashboard to /userdashboard
+const DashboardRedirect = () => {
+  const location = useLocation();
+  return <Navigate to={`/userdashboard${location.search}`} replace />;
+};
+
 const queryClient = new QueryClient();
 
 const AppContent = () => {
@@ -146,7 +152,6 @@ const AppContent = () => {
                 <Route path="/exerciselibrary" element={<ExerciseLibrary />} />
                 <Route path="/blog/:slug" element={<ArticleDetail />} />
                 
-                {/* Authenticated routes with motivational banner */}
                 <Route element={<ProtectedRoute><AuthenticatedLayout /></ProtectedRoute>}>
                   <Route path="/userdashboard" element={<UserDashboard />} />
                   <Route path="/1rmcalculator" element={<OneRMCalculator />} />
@@ -155,6 +160,9 @@ const AppContent = () => {
                   <Route path="/caloriecalculator" element={<MacroTrackingCalculator />} />
                   <Route path="/calculator-history" element={<CalculatorHistory />} />
                 </Route>
+                
+                {/* Redirect /dashboard to /userdashboard */}
+                <Route path="/dashboard" element={<DashboardRedirect />} />
                 
                 {/* Admin Routes with Role Check */}
                 <Route path="/admin" element={
