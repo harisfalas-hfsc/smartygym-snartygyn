@@ -2,16 +2,11 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useActivitiesByDate } from "@/hooks/useActivityLog";
 import { useCheckinScoresByDate } from "@/hooks/useCheckinScoresByDate";
 import { useScheduledWorkouts } from "@/hooks/useScheduledWorkouts";
-import { useGoogleCalendarConnection } from "@/hooks/useGoogleCalendarConnection";
 import { DailyActivityModal } from "./DailyActivityModal";
-import { useToast } from "@/hooks/use-toast";
-import { Link } from "react-router-dom";
 
 interface LogBookCalendarProps {
   userId: string;
@@ -22,12 +17,9 @@ interface LogBookCalendarProps {
 export const LogBookCalendar = ({ userId, filter }: LogBookCalendarProps) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [isTogglingSync, setIsTogglingSync] = useState(false);
   const { activitiesByDate, isLoading } = useActivitiesByDate(userId, filter);
   const { scoresByDate } = useCheckinScoresByDate(userId);
   const { scheduledByDate, isLoading: isLoadingScheduled } = useScheduledWorkouts(userId);
-  const { isConnected, autoSyncEnabled, isLoading: isCalendarLoading, setAutoSync } = useGoogleCalendarConnection();
-  const { toast } = useToast();
 
   const getDaysInMonth = (date: Date) => {
     const year = date.getFullYear();
@@ -150,27 +142,6 @@ export const LogBookCalendar = ({ userId, filter }: LogBookCalendarProps) => {
   const handleDayClick = (day: number) => {
     const date = new Date(year, currentDate.getMonth(), day);
     setSelectedDate(date);
-  };
-
-  const handleAutoSyncToggle = async (enabled: boolean) => {
-    setIsTogglingSync(true);
-    const success = await setAutoSync(enabled);
-    setIsTogglingSync(false);
-    
-    if (success) {
-      toast({
-        title: enabled ? "Auto-sync enabled" : "Auto-sync disabled",
-        description: enabled 
-          ? "Scheduled workouts will automatically sync to Google Calendar" 
-          : "Workouts will no longer auto-sync to Google Calendar",
-      });
-    } else {
-      toast({
-        title: "Error",
-        description: "Failed to update auto-sync setting",
-        variant: "destructive",
-      });
-    }
   };
 
   if (isLoading || isLoadingScheduled) {
@@ -389,43 +360,6 @@ export const LogBookCalendar = ({ userId, filter }: LogBookCalendarProps) => {
                 <div className="w-3 h-3 rounded-full bg-cyan-500" />
                 <span>Check-in</span>
               </div>
-            </div>
-          </div>
-
-          {/* Google Calendar Auto-Sync Section */}
-          <div className="mt-6 pt-6 border-t">
-            <div className="flex items-center justify-end gap-3">
-              <Calendar className="h-5 w-5 text-primary" />
-              <span className="text-sm font-medium">Google Calendar</span>
-              
-              {isCalendarLoading ? (
-                <div className="h-5 w-10 bg-muted animate-pulse rounded" />
-              ) : isConnected ? (
-                <div className="flex items-center gap-2">
-                  <Switch
-                    id="calendar-auto-sync"
-                    checked={autoSyncEnabled}
-                    onCheckedChange={handleAutoSyncToggle}
-                    disabled={isTogglingSync}
-                  />
-                  <Label 
-                    htmlFor="calendar-auto-sync" 
-                    className="text-xs text-muted-foreground cursor-pointer"
-                  >
-                    Auto-sync
-                  </Label>
-                </div>
-              ) : (
-                <span className="text-xs text-muted-foreground">
-                  Connect in{" "}
-                  <Link 
-                    to="/userdashboard" 
-                    className="text-primary hover:underline"
-                  >
-                    Messages → Subscriptions
-                  </Link>
-                </span>
-              )}
             </div>
           </div>
         </CardContent>

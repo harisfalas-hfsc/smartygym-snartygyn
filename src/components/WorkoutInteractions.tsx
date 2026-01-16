@@ -8,7 +8,6 @@ import { useNavigate } from "react-router-dom";
 import { CommentDialog } from "@/components/CommentDialog";
 import { ScheduleWorkoutDialog } from "@/components/ScheduleWorkoutDialog";
 import { useScheduledWorkoutForContent } from "@/hooks/useScheduledWorkouts";
-import { useGoogleCalendarConnection } from "@/hooks/useGoogleCalendarConnection";
 import { format } from "date-fns";
 
 interface WorkoutInteractionsProps {
@@ -27,7 +26,6 @@ export const WorkoutInteractions = ({ workoutId, workoutType, workoutName, isFre
   const { toast } = useToast();
   const { userTier, canInteract } = useAccessControl();
   const navigate = useNavigate();
-  const { syncCompletedActivity, isConnected: isCalendarConnected, autoSyncEnabled } = useGoogleCalendarConnection();
 
   const { scheduledWorkout, refetch: refetchScheduled } = useScheduledWorkoutForContent(workoutId, 'workout');
 
@@ -201,15 +199,6 @@ export const WorkoutInteractions = ({ workoutId, workoutType, workoutName, isFre
             .update({ status: 'completed' })
             .eq('id', scheduledWorkout.id);
           refetchScheduled();
-        }
-
-        // Sync to Google Calendar if connected and auto-sync enabled
-        if (isCalendarConnected && autoSyncEnabled) {
-          syncCompletedActivity({
-            name: workoutName,
-            type: 'workout',
-            completed_at: new Date().toISOString()
-          });
         }
       }
 

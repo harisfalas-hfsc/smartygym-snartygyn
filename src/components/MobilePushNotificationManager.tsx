@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Loader2, Dumbbell, Sun, Zap, Plus, BookOpen, FileText, BarChart3, Bell, Smartphone } from "lucide-react";
+import { Loader2, Dumbbell, Sun, Zap, Plus, BookOpen, FileText, BarChart3, Bell, Smartphone, CalendarClock } from "lucide-react";
 import { toast } from "sonner";
 
 interface MobilePushPreferences {
@@ -15,6 +15,8 @@ interface MobilePushPreferences {
   mobile_push_new_article: boolean;
   mobile_push_weekly_activity: boolean;
   mobile_push_checkin_reminders: boolean;
+  mobile_push_scheduled_workout_reminders: boolean;
+  mobile_push_scheduled_program_reminders: boolean;
   mobile_push_master: boolean;
 }
 
@@ -27,6 +29,8 @@ const DEFAULT_PREFERENCES: MobilePushPreferences = {
   mobile_push_new_article: true,
   mobile_push_weekly_activity: true,
   mobile_push_checkin_reminders: true,
+  mobile_push_scheduled_workout_reminders: true,
+  mobile_push_scheduled_program_reminders: true,
   mobile_push_master: true,
 };
 
@@ -79,6 +83,18 @@ const NOTIFICATION_OPTIONS = [
     description: "Morning and evening check-in reminders",
     icon: Bell,
   },
+  {
+    key: "mobile_push_scheduled_workout_reminders" as keyof MobilePushPreferences,
+    label: "Scheduled Workout Reminders",
+    description: "Get reminded about your scheduled workouts",
+    icon: CalendarClock,
+  },
+  {
+    key: "mobile_push_scheduled_program_reminders" as keyof MobilePushPreferences,
+    label: "Scheduled Program Reminders",
+    description: "Get reminded about your scheduled training programs",
+    icon: CalendarClock,
+  },
 ];
 
 export const MobilePushNotificationManager = () => {
@@ -117,6 +133,8 @@ export const MobilePushNotificationManager = () => {
           mobile_push_new_article: prefs.mobile_push_new_article !== false,
           mobile_push_weekly_activity: prefs.mobile_push_weekly_activity !== false,
           mobile_push_checkin_reminders: prefs.mobile_push_checkin_reminders !== false,
+          mobile_push_scheduled_workout_reminders: prefs.mobile_push_scheduled_workout_reminders !== false,
+          mobile_push_scheduled_program_reminders: prefs.mobile_push_scheduled_program_reminders !== false,
           mobile_push_master: prefs.mobile_push_master !== false,
         });
       }
@@ -202,6 +220,8 @@ export const MobilePushNotificationManager = () => {
         mobile_push_new_article: enable,
         mobile_push_weekly_activity: enable,
         mobile_push_checkin_reminders: enable,
+        mobile_push_scheduled_workout_reminders: enable,
+        mobile_push_scheduled_program_reminders: enable,
       };
 
       const { error } = await supabase
@@ -225,6 +245,8 @@ export const MobilePushNotificationManager = () => {
         mobile_push_new_article: enable,
         mobile_push_weekly_activity: enable,
         mobile_push_checkin_reminders: enable,
+        mobile_push_scheduled_workout_reminders: enable,
+        mobile_push_scheduled_program_reminders: enable,
       });
       
       toast.success(enable ? "All mobile notifications enabled" : "All mobile notifications disabled");

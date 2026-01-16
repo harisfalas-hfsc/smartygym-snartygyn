@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,12 +7,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Checkbox } from "@/components/ui/checkbox";
 import { CalendarIcon, Clock, Bell } from "lucide-react";
 import { format, addDays, isBefore, startOfDay } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useGoogleCalendarConnection } from "@/hooks/useGoogleCalendarConnection";
 import { cn } from "@/lib/utils";
 
 interface ScheduleWorkoutDialogProps {
@@ -37,16 +35,7 @@ export const ScheduleWorkoutDialog = ({
   const [reminderMinutes, setReminderMinutes] = useState<string>("30");
   const [notes, setNotes] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [addToGoogleCalendar, setAddToGoogleCalendar] = useState(false);
   const { toast } = useToast();
-  const { isConnected, autoSyncEnabled, syncToCalendar } = useGoogleCalendarConnection();
-
-  // Auto-enable Google Calendar if auto-sync is enabled
-  useEffect(() => {
-    if (autoSyncEnabled) {
-      setAddToGoogleCalendar(true);
-    }
-  }, [autoSyncEnabled]);
 
   const handleSchedule = async () => {
     if (!selectedDate) {
@@ -74,7 +63,7 @@ export const ScheduleWorkoutDialog = ({
       const scheduledDate = format(selectedDate, 'yyyy-MM-dd');
 
       // Insert scheduled workout
-      const { data: scheduledWorkout, error } = await supabase
+      const { error } = await supabase
         .from('scheduled_workouts')
         .insert({
           user_id: session.user.id,
@@ -86,37 +75,13 @@ export const ScheduleWorkoutDialog = ({
           reminder_before_minutes: parseInt(reminderMinutes),
           notes: notes || null,
           status: 'scheduled'
-        })
-        .select()
-        .single();
+        });
 
       if (error) throw error;
 
-      // Sync to Google Calendar if requested
-      let calendarSynced = false;
-      if (addToGoogleCalendar && isConnected) {
-        const syncResult = await syncToCalendar({
-          scheduled_date: scheduledDate,
-          scheduled_time: selectedTime,
-          content_name: contentName,
-          content_type: contentType,
-          notes: notes || undefined
-        }, scheduledWorkout?.id);
-
-        calendarSynced = syncResult.synced;
-
-        // Update the scheduled workout with Google Calendar event ID if synced
-        if (syncResult.event_id && scheduledWorkout) {
-          await supabase
-            .from('scheduled_workouts')
-            .update({ google_calendar_event_id: syncResult.event_id })
-            .eq('id', scheduledWorkout.id);
-        }
-      }
-
       toast({
         title: "Workout Scheduled! 📅",
-        description: `${contentName} scheduled for ${format(selectedDate, 'MMMM d, yyyy')}${selectedTime ? ` at ${selectedTime}` : ''}${calendarSynced ? ' (synced to Google Calendar)' : ''}`,
+        description: `${contentName} scheduled for ${format(selectedDate, 'MMMM d, yyyy')}${selectedTime ? ` at ${selectedTime}` : ''}`,
       });
 
       onScheduled?.();
@@ -127,7 +92,6 @@ export const ScheduleWorkoutDialog = ({
       setSelectedTime("09:00");
       setReminderMinutes("30");
       setNotes("");
-      setAddToGoogleCalendar(autoSyncEnabled);
     } catch (error) {
       console.error('Error scheduling workout:', error);
       toast({
@@ -218,23 +182,6 @@ export const ScheduleWorkoutDialog = ({
               </SelectContent>
             </Select>
           </div>
-
-          {/* Google Calendar Sync */}
-          {isConnected && (
-            <div className="flex items-center space-x-2 py-2">
-              <Checkbox
-                id="google-calendar"
-                checked={addToGoogleCalendar}
-                onCheckedChange={(checked) => setAddToGoogleCalendar(checked === true)}
-              />
-              <label
-                htmlFor="google-calendar"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-              >
-                Add to Google Calendar
-              </label>
-            </div>
-          )}
 
           {/* Notes */}
           <div className="space-y-2">

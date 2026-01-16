@@ -3,10 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { Loader2, Dumbbell, Sun, Zap, Plus, BookOpen, FileText, BarChart3, Bell, Calendar, RefreshCw, Unlink } from "lucide-react";
+import { Loader2, Dumbbell, Sun, Zap, Plus, BookOpen, FileText, BarChart3, Bell, CalendarClock } from "lucide-react";
 import { toast } from "sonner";
-import { Progress } from "@/components/ui/progress";
 
 interface EmailPreferences {
   email_wod: boolean;
@@ -17,6 +15,8 @@ interface EmailPreferences {
   email_new_article: boolean;
   email_weekly_activity: boolean;
   email_checkin_reminders: boolean;
+  email_scheduled_workout_reminders: boolean;
+  email_scheduled_program_reminders: boolean;
   opt_out_all: boolean;
 }
 
@@ -29,6 +29,8 @@ const DEFAULT_PREFERENCES: EmailPreferences = {
   email_new_article: true,
   email_weekly_activity: true,
   email_checkin_reminders: true,
+  email_scheduled_workout_reminders: true,
+  email_scheduled_program_reminders: true,
   opt_out_all: false,
 };
 
@@ -89,25 +91,29 @@ const EMAIL_OPTIONS = [
     timing: "Sent at 8:00 AM & 8:00 PM daily",
     icon: Bell,
   },
+  {
+    key: "email_scheduled_workout_reminders" as keyof EmailPreferences,
+    label: "Scheduled Workout Reminders",
+    description: "Get reminded about your scheduled workouts",
+    timing: "Sent based on your scheduled time",
+    icon: CalendarClock,
+  },
+  {
+    key: "email_scheduled_program_reminders" as keyof EmailPreferences,
+    label: "Scheduled Program Reminders",
+    description: "Get reminded about your scheduled training programs",
+    timing: "Sent based on your scheduled time",
+    icon: CalendarClock,
+  },
 ];
 
 export const EmailSubscriptionManager = () => {
   const [preferences, setPreferences] = useState<EmailPreferences>(DEFAULT_PREFERENCES);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState<string | null>(null);
-  
-  // Google Calendar state
-  const [isCalendarConnected, setIsCalendarConnected] = useState(false);
-  const [autoSyncEnabled, setAutoSyncEnabled] = useState(false);
-  const [isCalendarLoading, setIsCalendarLoading] = useState(true);
-  const [isCalendarSaving, setIsCalendarSaving] = useState(false);
-  const [isExporting, setIsExporting] = useState(false);
-  const [exportProgress, setExportProgress] = useState(0);
-  const [exportMessage, setExportMessage] = useState("");
 
   useEffect(() => {
     fetchPreferences();
-    checkCalendarConnection();
   }, []);
 
   const fetchPreferences = async () => {
@@ -137,6 +143,8 @@ export const EmailSubscriptionManager = () => {
           email_new_article: prefs.email_new_article !== false,
           email_weekly_activity: prefs.email_weekly_activity !== false,
           email_checkin_reminders: prefs.email_checkin_reminders !== false || prefs.checkin_reminders === true,
+          email_scheduled_workout_reminders: prefs.email_scheduled_workout_reminders !== false,
+          email_scheduled_program_reminders: prefs.email_scheduled_program_reminders !== false,
           opt_out_all: prefs.opt_out_all === true,
         });
       }
@@ -144,242 +152,6 @@ export const EmailSubscriptionManager = () => {
       console.error("Error fetching preferences:", err);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const checkCalendarConnection = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        setIsCalendarLoading(false);
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from("user_calendar_connections")
-        .select("is_active, auto_sync_enabled")
-        .eq("user_id", user.id)
-        .eq("provider", "google")
-        .maybeSingle();
-
-      if (error) {
-        console.error("Error checking calendar connection:", error);
-        setIsCalendarLoading(false);
-        return;
-      }
-
-      if (data) {
-        setIsCalendarConnected(data.is_active ?? false);
-        setAutoSyncEnabled(data.auto_sync_enabled ?? false);
-      }
-    } catch (err) {
-      console.error("Error checking calendar connection:", err);
-    } finally {
-      setIsCalendarLoading(false);
-    }
-  };
-
-  const handleCalendarConnect = async () => {
-    setIsCalendarSaving(true);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        toast.error("Please log in to connect your calendar");
-        return;
-      }
-
-      const currentUrl = window.location.origin + window.location.pathname;
-
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/google-calendar-oauth?action=connect&redirect_url=${encodeURIComponent(currentUrl)}`,
-        {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${session.access_token}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-
-      const data = await response.json();
-
-      if (data.auth_url) {
-        window.location.href = data.auth_url;
-      } else {
-        throw new Error(data.error || 'Failed to get authorization URL');
-      }
-    } catch (err) {
-      console.error("Error connecting calendar:", err);
-      toast.error("Failed to connect Google Calendar");
-    } finally {
-      setIsCalendarSaving(false);
-    }
-  };
-
-  const handleCalendarDisconnect = async () => {
-    setIsCalendarSaving(true);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { error } = await supabase
-        .from("user_calendar_connections")
-        .delete()
-        .eq("user_id", user.id)
-        .eq("provider", "google");
-
-      if (error) {
-        console.error("Error disconnecting calendar:", error);
-        toast.error("Failed to disconnect calendar");
-        return;
-      }
-
-      setIsCalendarConnected(false);
-      setAutoSyncEnabled(false);
-      toast.success("Google Calendar disconnected");
-    } catch (err) {
-      console.error("Error disconnecting calendar:", err);
-      toast.error("Failed to disconnect calendar");
-    } finally {
-      setIsCalendarSaving(false);
-    }
-  };
-
-  const syncAllToCalendar = async () => {
-    setIsExporting(true);
-    setExportProgress(0);
-    setExportMessage("Starting sync...");
-    
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        toast.error("Please log in to sync activities");
-        return;
-      }
-
-      let totalSynced = 0;
-      let totalFailed = 0;
-
-      // Step 1: Sync scheduled workouts (future)
-      setExportProgress(20);
-      setExportMessage("Syncing scheduled workouts...");
-      console.log('Starting sync-scheduled-workouts...');
-
-      const scheduledResponse = await supabase.functions.invoke('sync-google-calendar', {
-        body: { action: 'sync-scheduled-workouts' }
-      });
-
-      console.log('sync-scheduled-workouts response:', scheduledResponse);
-
-      if (scheduledResponse.error) {
-        console.error('Scheduled workouts sync error:', scheduledResponse.error);
-        if (scheduledResponse.data?.reconnect_required) {
-          toast.error('Please reconnect your Google Calendar');
-          setIsCalendarConnected(false);
-          return;
-        }
-      } else {
-        totalSynced += scheduledResponse.data?.synced || 0;
-        totalFailed += scheduledResponse.data?.failed || 0;
-      }
-
-      // Step 2: Export past activities
-      setExportProgress(50);
-      setExportMessage("Syncing past activities...");
-      console.log('Starting bulk-export...');
-
-      const endDate = new Date().toISOString().split('T')[0];
-      const startDate = new Date();
-      startDate.setMonth(startDate.getMonth() - 6);
-      const startDateStr = startDate.toISOString().split('T')[0];
-
-      const exportResponse = await supabase.functions.invoke('sync-google-calendar', {
-        body: {
-          action: 'bulk-export',
-          activities: {
-            activity_types: ['workouts', 'programs', 'checkins'],
-            start_date: startDateStr,
-            end_date: endDate
-          }
-        }
-      });
-
-      console.log('bulk-export response:', exportResponse);
-
-      if (exportResponse.error) {
-        console.error('Bulk export error:', exportResponse.error);
-        if (exportResponse.data?.reconnect_required) {
-          toast.error('Please reconnect your Google Calendar');
-          setIsCalendarConnected(false);
-          return;
-        }
-      } else {
-        totalSynced += exportResponse.data?.exported || 0;
-        totalFailed += exportResponse.data?.failed || 0;
-      }
-
-      setExportProgress(100);
-      setExportMessage("Sync complete!");
-
-      if (totalSynced > 0) {
-        toast.success(`Synced ${totalSynced} items to Google Calendar`, {
-          description: totalFailed > 0 ? `${totalFailed} failed` : 'All items synced successfully!'
-        });
-      } else if (totalFailed > 0) {
-        toast.error(`Failed to sync ${totalFailed} items`);
-      } else {
-        toast.info('No items to sync', {
-          description: 'Schedule workouts or complete activities first'
-        });
-      }
-    } catch (err) {
-      console.error("Error syncing to calendar:", err);
-      toast.error("Failed to sync to calendar");
-    } finally {
-      setIsExporting(false);
-      setExportProgress(0);
-      setExportMessage("");
-    }
-  };
-
-  const handleAutoSyncToggle = async (enabled: boolean) => {
-    setIsCalendarSaving(true);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { error } = await supabase
-        .from("user_calendar_connections")
-        .update({ auto_sync_enabled: enabled })
-        .eq("user_id", user.id)
-        .eq("provider", "google");
-
-      if (error) {
-        console.error("Error updating auto-sync:", error);
-        toast.error("Failed to update auto-sync setting");
-        return;
-      }
-
-      setAutoSyncEnabled(enabled);
-      
-      if (enabled) {
-        toast.success("Auto-sync enabled", {
-          description: "New activities will automatically sync to your calendar"
-        });
-        
-        // Auto-export past activities when enabling
-        toast.info("Syncing your activities...", {
-          description: "This may take a moment"
-        });
-        await syncAllToCalendar();
-      } else {
-        toast.success("Auto-sync disabled");
-      }
-    } catch (err) {
-      console.error("Error updating auto-sync:", err);
-      toast.error("Failed to update auto-sync setting");
-    } finally {
-      setIsCalendarSaving(false);
     }
   };
 
@@ -490,101 +262,6 @@ export const EmailSubscriptionManager = () => {
             </div>
           );
         })}
-
-        {/* Google Calendar Integration Row */}
-        <div className="flex items-center justify-between py-4 border-b">
-          <div className="flex items-start gap-3">
-            <div className="mt-0.5 p-2 rounded-lg bg-primary/10">
-              <Calendar className="h-4 w-4 text-primary" />
-            </div>
-            <div className="space-y-0.5">
-              <Label className="text-sm font-medium">
-                Google Calendar Integration
-              </Label>
-              <p className="text-xs text-muted-foreground">
-                {isCalendarConnected 
-                  ? "Sync your workouts and activities with Google Calendar"
-                  : "Connect to sync scheduled workouts with your Google Calendar"
-                }
-              </p>
-              <p className="text-xs text-primary font-medium">
-                {isCalendarLoading ? "Checking..." : isCalendarConnected ? "✓ Connected" : "Not connected"}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            {(isCalendarLoading || isCalendarSaving) && (
-              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-            )}
-            {!isCalendarLoading && (
-              isCalendarConnected ? (
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-                  <div className="flex items-center gap-2">
-                    <Switch
-                      id="auto-sync-toggle"
-                      checked={autoSyncEnabled}
-                      onCheckedChange={handleAutoSyncToggle}
-                      disabled={isCalendarSaving || isExporting}
-                    />
-                    <Label htmlFor="auto-sync-toggle" className="text-xs text-muted-foreground cursor-pointer">
-                      Auto-sync
-                    </Label>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={syncAllToCalendar}
-                      disabled={isCalendarSaving || isExporting}
-                      className="text-xs h-7 px-2"
-                    >
-                      {isExporting ? (
-                        <Loader2 className="h-3 w-3 animate-spin mr-1" />
-                      ) : (
-                        <RefreshCw className="h-3 w-3 mr-1" />
-                      )}
-                      Sync
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleCalendarDisconnect}
-                      disabled={isCalendarSaving || isExporting}
-                      className="text-xs text-destructive hover:text-destructive h-7 px-2"
-                    >
-                      {isCalendarSaving ? (
-                        <Loader2 className="h-3 w-3 animate-spin mr-1" />
-                      ) : (
-                        <Unlink className="h-3 w-3 mr-1" />
-                      )}
-                      Disconnect
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleCalendarConnect}
-                  disabled={isCalendarSaving}
-                >
-                  Connect
-                </Button>
-              )
-            )}
-          </div>
-        </div>
-
-        {/* Export Progress */}
-        {isExporting && (
-          <div className="py-4 space-y-2">
-            <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>{exportMessage}</span>
-              <span>{exportProgress}%</span>
-            </div>
-            <Progress value={exportProgress} className="h-2" />
-          </div>
-        )}
 
         {preferences.opt_out_all && (
           <div className="mt-4 p-4 bg-destructive/10 rounded-lg">
