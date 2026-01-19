@@ -26,13 +26,6 @@ const Tools = () => {
     return () => { toolsCarouselApi.off('select', onSelect); };
   }, [toolsCarouselApi]);
 
-  // Extended descriptions for mobile carousel
-  const toolDescriptions: Record<string, string> = {
-    "1rm-calculator": "Calculate your one-rep maximum using the scientifically validated Brzycki formula. Essential for programming strength training and tracking progress over time.",
-    "bmr-calculator": "Determine your Basal Metabolic Rate using the Mifflin-St Jeor equation — the most accurate formula for estimating the calories you burn at rest.",
-    "macro-calculator": "Get personalized nutrition recommendations including daily calories, macronutrients (protein, carbs, fats), fiber intake, hydration needs, and optimal meal frequency.",
-  };
-
   const tools = [
     {
       id: "1rm-calculator",
@@ -45,7 +38,7 @@ const Tools = () => {
       id: "bmr-calculator",
       icon: Activity,
       title: "BMR Calculator",
-      description: "Calculate your basal metabolic rate",
+      description: "Calculate your basal metabolic rate using the Mifflin-St Jeor formula",
       route: "/bmrcalculator"
     },
     {
@@ -135,18 +128,7 @@ const Tools = () => {
           </div>
         </Card>
 
-        {/* Mobile: Dynamic Description Card */}
-        <div className="md:hidden mb-4">
-          <Card className="bg-card border border-primary/20">
-            <div className="p-4 text-center">
-              <p className="text-sm text-muted-foreground transition-opacity duration-300">
-                {toolDescriptions[tools[toolsCurrentSlide]?.id] || ""}
-              </p>
-            </div>
-          </Card>
-        </div>
-
-        {/* Mobile Carousel - Title only */}
+        {/* Mobile Carousel - With descriptions in cards */}
         <div className="md:hidden">
           <Carousel 
             setApi={setToolsCarouselApi}
@@ -162,13 +144,18 @@ const Tools = () => {
                       onClick={() => navigate(tool.route)}
                       className="group p-6 cursor-pointer transition-all duration-300 hover:border-primary/60 bg-card border-2 border-border"
                     >
-                      <div className="flex flex-col items-center gap-3">
+                      <div className="flex flex-col items-center gap-3 text-center">
                         <div className="p-3 rounded-xl bg-primary/10 text-primary">
                           <Icon className="w-8 h-8" />
                         </div>
-                        <h3 className="font-semibold text-lg text-center whitespace-nowrap">
-                          {tool.title}
-                        </h3>
+                        <div>
+                          <h3 className="font-semibold text-lg mb-2">
+                            {tool.title}
+                          </h3>
+                          <p className="text-sm text-muted-foreground">
+                            {tool.description}
+                          </p>
+                        </div>
                       </div>
                     </Card>
                   </CarouselItem>
