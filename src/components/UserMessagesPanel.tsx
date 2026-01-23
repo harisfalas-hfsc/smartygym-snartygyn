@@ -273,6 +273,21 @@ export const UserMessagesPanel = () => {
 
         toast.success("Message deleted");
         refetchSystem();
+      } else if (messageToDelete.type === 'contact') {
+        const { error } = await supabase
+          .from('contact_messages')
+          .delete()
+          .eq('id', messageToDelete.id)
+          .eq('user_id', user.id);
+
+        if (error) {
+          console.error('[UserMessagesPanel] Delete contact message failed:', error);
+          toast.error(`Failed to delete: ${error.message}`);
+          return;
+        }
+
+        toast.success("Message deleted");
+        refetchContact();
       }
 
       queryClient.invalidateQueries({ queryKey: ['unread-messages-count'] });
@@ -423,9 +438,8 @@ export const UserMessagesPanel = () => {
   };
 
   const handleBulkDeleteClick = () => {
-    const systemIdsToDelete = [...validSelectedMessages].filter(key => key.startsWith('system-'));
-    if (systemIdsToDelete.length === 0) {
-      toast.error("No deletable messages selected. Contact messages cannot be deleted.");
+    if (validSelectedMessages.size === 0) {
+      toast.error("No messages selected");
       return;
     }
     setBulkDeleteDialogOpen(true);
@@ -441,28 +455,55 @@ export const UserMessagesPanel = () => {
     try {
       const systemIds = [...validSelectedMessages]
         .filter(key => key.startsWith('system-'))
-        .map(key => key.replace('system-', ''));
+        .map(key => key.substring(7)); // 'system-'.length = 7
 
-      if (systemIds.length === 0) {
-        toast.error("No deletable messages selected");
+      const contactIds = [...validSelectedMessages]
+        .filter(key => key.startsWith('contact-'))
+        .map(key => key.substring(8)); // 'contact-'.length = 8
+
+      if (systemIds.length === 0 && contactIds.length === 0) {
+        toast.error("No messages selected");
         setBulkDeleteDialogOpen(false);
         return;
       }
 
-      const { error } = await supabase
-        .from('user_system_messages')
-        .delete()
-        .in('id', systemIds)
-        .eq('user_id', user.id);
+      let deletedCount = 0;
 
-      if (error) {
-        console.error('[UserMessagesPanel] Bulk delete failed:', error);
-        toast.error(`Failed to delete: ${error.message}`);
-        return;
+      // Delete system messages
+      if (systemIds.length > 0) {
+        const { error } = await supabase
+          .from('user_system_messages')
+          .delete()
+          .in('id', systemIds)
+          .eq('user_id', user.id);
+
+        if (error) {
+          console.error('[UserMessagesPanel] Bulk delete system messages failed:', error);
+          toast.error(`Failed to delete system messages: ${error.message}`);
+          return;
+        }
+        deletedCount += systemIds.length;
       }
 
-      toast.success(`Deleted ${systemIds.length} messages`);
+      // Delete contact messages
+      if (contactIds.length > 0) {
+        const { error } = await supabase
+          .from('contact_messages')
+          .delete()
+          .in('id', contactIds)
+          .eq('user_id', user.id);
+
+        if (error) {
+          console.error('[UserMessagesPanel] Bulk delete contact messages failed:', error);
+          toast.error(`Failed to delete contact messages: ${error.message}`);
+          return;
+        }
+        deletedCount += contactIds.length;
+      }
+
+      toast.success(`Deleted ${deletedCount} messages`);
       refetchSystem();
+      refetchContact();
       setSelectedMessages(new Set());
       queryClient.invalidateQueries({ queryKey: ['unread-messages-count'] });
     } catch (e: any) {
@@ -638,21 +679,32 @@ export const UserMessagesPanel = () => {
                   <User className="h-3 w-3 mr-1" />
                   Your Message
                 </Badge>
-                {message.response && (
+                <div className="ml-auto flex items-center gap-1">
+                  {message.response && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7"
+                      onClick={() => handleToggleRead(message.id, 'contact', !!message.response_read_at)}
+                      title={message.response_read_at ? "Mark response as unread" : "Mark response as read"}
+                    >
+                      {message.response_read_at ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </Button>
+                  )}
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="ml-auto h-7 w-7"
-                    onClick={() => handleToggleRead(message.id, 'contact', !!message.response_read_at)}
-                    title={message.response_read_at ? "Mark response as unread" : "Mark response as read"}
+                    className="h-7 w-7 text-destructive hover:text-destructive"
+                    onClick={() => handleDeleteClick(message.id, 'contact')}
+                    title="Delete message"
                   >
-                    {message.response_read_at ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
+                    <Trash2 className="h-4 w-4" />
                   </Button>
-                )}
+                </div>
               </div>
               <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
                 {message.message}
