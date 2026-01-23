@@ -700,107 +700,122 @@ export const WODManager = () => {
           </p>
         </div>
         
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
           <Button 
             variant="outline"
-            className="flex items-center gap-2 border-green-500"
+            size="sm"
+            className="flex items-center gap-1 sm:gap-2 border-green-500 text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3"
             disabled={isRunningHealthCheck}
             onClick={handleHealthCheck}
           >
             {isRunningHealthCheck ? (
-              <RefreshCw className="h-4 w-4 animate-spin" />
+              <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
             ) : (
-              <HeartPulse className="h-4 w-4 text-green-500" />
+              <HeartPulse className="h-3 w-3 sm:h-4 sm:w-4 text-green-500" />
             )}
-            {isRunningHealthCheck ? "Checking..." : "WOD Health Check"}
+            <span className="hidden sm:inline">{isRunningHealthCheck ? "Checking..." : "WOD Health Check"}</span>
+            <span className="sm:hidden">{isRunningHealthCheck ? "..." : "Health"}</span>
           </Button>
 
           <Button 
             variant="outline"
-            className="flex items-center gap-2 border-purple-500"
+            size="sm"
+            className="flex items-center gap-1 sm:gap-2 border-purple-500 text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3"
             disabled={isCheckingTomorrow}
             onClick={handleTomorrowReadinessCheck}
           >
             {isCheckingTomorrow ? (
-              <RefreshCw className="h-4 w-4 animate-spin" />
+              <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
             ) : (
-              <Rocket className="h-4 w-4 text-purple-500" />
+              <Rocket className="h-3 w-3 sm:h-4 sm:w-4 text-purple-500" />
             )}
-            {isCheckingTomorrow ? "Checking..." : "Tomorrow Ready?"}
+            <span className="hidden sm:inline">{isCheckingTomorrow ? "Checking..." : "Tomorrow Ready?"}</span>
+            <span className="sm:hidden">{isCheckingTomorrow ? "..." : "Ready?"}</span>
           </Button>
           
           <Button 
             variant="outline"
-            className="flex items-center gap-2"
+            size="sm"
+            className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3"
             onClick={() => setPeriodizationDialogOpen(true)}
           >
-            <BookOpen className="h-4 w-4" />
-            View Periodization
+            <BookOpen className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">View Periodization</span>
+            <span className="sm:hidden">Period.</span>
           </Button>
           
           <Button 
             variant="outline"
-            className="flex items-center gap-2"
+            size="sm"
+            className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3"
             disabled={isSyncingImages}
             onClick={handleSyncStripeImages}
           >
             {isSyncingImages ? (
-              <RefreshCw className="h-4 w-4 animate-spin" />
+              <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
             ) : (
-              <ImageIcon className="h-4 w-4" />
+              <ImageIcon className="h-3 w-3 sm:h-4 sm:w-4" />
             )}
-            {isSyncingImages ? "Syncing..." : "Sync Stripe Images"}
+            <span className="hidden sm:inline">{isSyncingImages ? "Syncing..." : "Sync Stripe Images"}</span>
+            <span className="sm:hidden">{isSyncingImages ? "..." : "Sync"}</span>
           </Button>
 
           <Button 
             variant="outline"
-            className="flex items-center gap-2 border-orange-500"
+            size="sm"
+            className="flex items-center gap-1 sm:gap-2 border-orange-500 text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3"
             disabled={isArchiving}
             onClick={handleArchiveCurrentWODs}
           >
             {isArchiving ? (
-              <RefreshCw className="h-4 w-4 animate-spin" />
+              <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
             ) : (
-              <Archive className="h-4 w-4 text-orange-500" />
+              <Archive className="h-3 w-3 sm:h-4 sm:w-4 text-orange-500" />
             )}
-            {isArchiving ? "Archiving..." : "Archive Current WODs"}
+            <span className="hidden sm:inline">{isArchiving ? "Archiving..." : "Archive Current WODs"}</span>
+            <span className="sm:hidden">{isArchiving ? "..." : "Archive"}</span>
           </Button>
 
           <Button 
             variant="outline"
-            className="flex items-center gap-2 border-blue-500"
+            size="sm"
+            className="flex items-center gap-1 sm:gap-2 border-blue-500 text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3"
             disabled={isSendingNotifications || !currentWODs || currentWODs.length === 0}
             onClick={handleSendWODNotifications}
             title={!currentWODs || currentWODs.length === 0 ? "No WODs to notify about" : "Send WOD notifications now"}
           >
             {isSendingNotifications ? (
-              <RefreshCw className="h-4 w-4 animate-spin" />
+              <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
             ) : (
-              <Bell className="h-4 w-4 text-blue-500" />
+              <Bell className="h-3 w-3 sm:h-4 sm:w-4 text-blue-500" />
             )}
-            {isSendingNotifications ? "Sending..." : "Send Notifications"}
+            <span className="hidden sm:inline">{isSendingNotifications ? "Sending..." : "Send Notifications"}</span>
+            <span className="sm:hidden">{isSendingNotifications ? "..." : "Notify"}</span>
           </Button>
 
           <Button 
             variant="outline"
-            className="flex items-center gap-2"
+            size="sm"
+            className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3"
             onClick={() => setCronDialogOpen(true)}
           >
-            <Settings className="h-4 w-4" />
-            Schedule
+            <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Schedule</span>
           </Button>
           
           <Button 
-            className="flex items-center gap-2"
+            size="sm"
+            className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3"
             disabled={isGenerating}
             onClick={() => setGenerateDialogOpen(true)}
           >
             {isGenerating ? (
-              <RefreshCw className="h-4 w-4 animate-spin" />
+              <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
             ) : (
-              <Play className="h-4 w-4" />
+              <Play className="h-3 w-3 sm:h-4 sm:w-4" />
             )}
-            {isGenerating ? "Generating..." : "Generate New WOD"}
+            <span className="hidden sm:inline">{isGenerating ? "Generating..." : "Generate New WOD"}</span>
+            <span className="sm:hidden">{isGenerating ? "..." : "Generate"}</span>
           </Button>
           
           <GenerateWODDialog

@@ -728,47 +728,52 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-1">
+                      <div className="flex items-center justify-end gap-0.5 sm:gap-1">
                         <Button
                           variant="ghost"
                           size="icon"
+                          className="h-7 w-7 sm:h-8 sm:w-8"
                           onClick={() => window.open(`/workout/${workout.category.toLowerCase().replace(/\s+/g, '-')}/${workout.id}`, '_blank')}
                           title="Preview"
                         >
-                          <Eye className="h-4 w-4" />
+                          <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
                         </Button>
                         <Button
                           variant="ghost"
                           size="icon"
+                          className="h-7 w-7 sm:h-8 sm:w-8"
                           onClick={() => handleDuplicate(workout)}
                           title="Duplicate"
                         >
-                          <Copy className="h-4 w-4" />
+                          <Copy className="h-3 w-3 sm:h-4 sm:w-4" />
                         </Button>
                         <Button
                           variant="ghost"
                           size="icon"
+                          className="h-7 w-7 sm:h-8 sm:w-8"
                           onClick={() => handleToggleVisibility(workout.id, workout.is_visible)}
                           title={workout.is_visible ? 'Hide' : 'Show'}
                         >
-                          {workout.is_visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
+                          {workout.is_visible ? <EyeOff className="h-3 w-3 sm:h-4 sm:w-4" /> : <Eye className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />}
                         </Button>
                         <Button
                           variant="ghost"
                           size="icon"
+                          className="h-7 w-7 sm:h-8 sm:w-8"
                           onClick={() => handleEdit(workout)}
                           title="Edit"
                           disabled={editLoading}
                         >
-                          {editLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Edit className="h-4 w-4" />}
+                          {editLoading ? <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" /> : <Edit className="h-3 w-3 sm:h-4 sm:w-4" />}
                         </Button>
                         <Button
                           variant="ghost"
                           size="icon"
+                          className="h-7 w-7 sm:h-8 sm:w-8"
                           onClick={() => handleDelete(workout.id)}
                           title="Delete"
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                         </Button>
                       </div>
                     </TableCell>
