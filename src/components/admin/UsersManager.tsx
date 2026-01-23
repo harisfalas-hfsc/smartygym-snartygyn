@@ -854,19 +854,24 @@ export function UsersManager() {
                         {format(new Date(user.created_at), 'MMM d, yyyy')}
                       </TableCell>
                       <TableCell>
-                        <div className="flex flex-wrap items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-1 sm:gap-2">
                           {/* Admin Toggle */}
                           <Button
                             variant={userRoles[user.user_id]?.includes('admin') ? "destructive" : "default"}
                             size="sm"
-                            onClick={() => toggleAdminRole(
-                              user.user_id, 
-                              user.email, 
-                              userRoles[user.user_id]?.includes('admin') || false
-                            )}
+                            className="h-7 sm:h-8 text-xs sm:text-sm px-2 sm:px-3"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleAdminRole(
+                                user.user_id, 
+                                user.email, 
+                                userRoles[user.user_id]?.includes('admin') || false
+                              );
+                            }}
                             disabled={user.email === SUPER_ADMIN_EMAIL && userRoles[user.user_id]?.includes('admin')}
                           >
-                            {userRoles[user.user_id]?.includes('admin') ? "Remove Admin" : "Make Admin"}
+                            <span className="hidden sm:inline">{userRoles[user.user_id]?.includes('admin') ? "Remove Admin" : "Make Admin"}</span>
+                            <span className="sm:hidden">{userRoles[user.user_id]?.includes('admin') ? "Remove" : "Admin"}</span>
                           </Button>
 
                           {/* Subscription Management */}
@@ -875,30 +880,36 @@ export function UsersManager() {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => setPendingAction({
-                                  userId: user.user_id,
-                                  userName,
-                                  action: 'grant',
-                                  planType: 'gold'
-                                })}
-                                className="text-primary border-primary hover:bg-primary/10"
+                                className="h-7 sm:h-8 text-xs sm:text-sm px-2 sm:px-3 text-primary border-primary hover:bg-primary/10"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setPendingAction({
+                                    userId: user.user_id,
+                                    userName,
+                                    action: 'grant',
+                                    planType: 'gold'
+                                  });
+                                }}
                               >
-                                <Crown className="h-4 w-4 mr-1" />
-                                Gold
+                                <Crown className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                                <span className="hidden sm:inline">Gold</span>
                               </Button>
                               <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => setPendingAction({
-                                  userId: user.user_id,
-                                  userName,
-                                  action: 'grant',
-                                  planType: 'platinum'
-                                })}
-                                className="text-purple-600 border-purple-600 hover:bg-purple-50"
+                                className="h-7 sm:h-8 text-xs sm:text-sm px-2 sm:px-3 text-purple-600 border-purple-600 hover:bg-purple-50"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setPendingAction({
+                                    userId: user.user_id,
+                                    userName,
+                                    action: 'grant',
+                                    planType: 'platinum'
+                                  });
+                                }}
                               >
-                                <Gem className="h-4 w-4 mr-1" />
-                                Platinum
+                                <Gem className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                                <span className="hidden sm:inline">Platinum</span>
                               </Button>
                             </>
                           ) : (
@@ -907,45 +918,56 @@ export function UsersManager() {
                                 <Button
                                   variant="outline"
                                   size="sm"
-                                  onClick={() => setPendingAction({
-                                    userId: user.user_id,
-                                    userName,
-                                    action: 'grant',
-                                    planType: 'platinum'
-                                  })}
-                                  className="text-purple-600 border-purple-600 hover:bg-purple-50"
+                                  className="h-7 sm:h-8 text-xs sm:text-sm px-2 sm:px-3 text-purple-600 border-purple-600 hover:bg-purple-50"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setPendingAction({
+                                      userId: user.user_id,
+                                      userName,
+                                      action: 'grant',
+                                      planType: 'platinum'
+                                    });
+                                  }}
                                 >
-                                  <Gem className="h-4 w-4 mr-1" />
-                                  Upgrade
+                                  <Gem className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                                  <span className="hidden sm:inline">Upgrade</span>
                                 </Button>
                               )}
                               {user.plan_type === 'platinum' && (
                                 <Button
                                   variant="outline"
                                   size="sm"
-                                  onClick={() => setPendingAction({
-                                    userId: user.user_id,
-                                    userName,
-                                    action: 'grant',
-                                    planType: 'gold'
-                                  })}
-                                  className="text-primary border-primary hover:bg-primary/10"
+                                  className="h-7 sm:h-8 text-xs sm:text-sm px-2 sm:px-3 text-primary border-primary hover:bg-primary/10"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setPendingAction({
+                                      userId: user.user_id,
+                                      userName,
+                                      action: 'grant',
+                                      planType: 'gold'
+                                    });
+                                  }}
                                 >
-                                  <Crown className="h-4 w-4 mr-1" />
-                                  Downgrade
+                                  <Crown className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                                  <span className="hidden sm:inline">Downgrade</span>
                                 </Button>
                               )}
                               <Button
                                 variant="destructive"
                                 size="sm"
-                                onClick={() => setPendingAction({
-                                  userId: user.user_id,
-                                  userName,
-                                  action: 'revoke',
-                                  planType: 'free'
-                                })}
+                                className="h-7 sm:h-8 text-xs sm:text-sm px-2 sm:px-3"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setPendingAction({
+                                    userId: user.user_id,
+                                    userName,
+                                    action: 'revoke',
+                                    planType: 'free'
+                                  });
+                                }}
                               >
-                                Revoke
+                                <span className="hidden sm:inline">Revoke</span>
+                                <span className="sm:hidden">✕</span>
                               </Button>
                             </>
                           )}
@@ -954,7 +976,9 @@ export function UsersManager() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => {
+                            className="h-7 sm:h-8 px-2 sm:px-3"
+                            onClick={(e) => {
+                              e.stopPropagation();
                               if (user.email) {
                                 window.location.href = `mailto:${user.email}`;
                               }

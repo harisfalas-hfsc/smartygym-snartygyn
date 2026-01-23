@@ -49,21 +49,21 @@ export const ContentManager = ({
       <CardContent>
         <Tabs value={innerTab} onValueChange={setInnerTab} className="w-full">
           <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="workouts" className="flex items-center gap-2">
-              <Dumbbell className="w-4 h-4" />
-              Workouts
+            <TabsTrigger value="workouts" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-1 sm:px-3">
+              <Dumbbell className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+              <span className="truncate">Workouts</span>
             </TabsTrigger>
-            <TabsTrigger value="programs" className="flex items-center gap-2">
-              <Calendar className="w-4 h-4" />
-              Programs
+            <TabsTrigger value="programs" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-1 sm:px-3">
+              <Calendar className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+              <span className="truncate">Programs</span>
             </TabsTrigger>
-            <TabsTrigger value="wod" className="flex items-center gap-2">
-              <Flame className="w-4 h-4" />
-              WOD
+            <TabsTrigger value="wod" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-1 sm:px-3">
+              <Flame className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+              <span className="truncate">WOD</span>
             </TabsTrigger>
-            <TabsTrigger value="rituals" className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4" />
-              Rituals
+            <TabsTrigger value="rituals" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-1 sm:px-3">
+              <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+              <span className="truncate">Rituals</span>
             </TabsTrigger>
           </TabsList>
           

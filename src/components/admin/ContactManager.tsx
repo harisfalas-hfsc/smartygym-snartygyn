@@ -656,34 +656,35 @@ export const ContactManager = () => {
 
   const MessageCard = ({ message }: { message: ContactMessage }) => (
     <Card key={message.id} className={`${message.status === 'new' ? 'border-primary' : ''}`}>
-      <CardContent className="pt-6">
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
-              <div className={`w-2 h-2 rounded-full ${getCategoryColor(message.category)}`} />
-              <h3 className="font-semibold">{message.name}</h3>
-              {(!message.read_at || message.status === 'new') && <Badge variant="destructive">Unread</Badge>}
-              {message.user_id && <Badge variant="outline">Has Account</Badge>}
-              {!message.user_id && <Badge variant="secondary">Visitor</Badge>}
+      <CardContent className="pt-4 sm:pt-6">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-2 flex-wrap">
+              <div className={`w-2 h-2 rounded-full flex-shrink-0 ${getCategoryColor(message.category)}`} />
+              <h3 className="font-semibold text-sm sm:text-base truncate">{message.name}</h3>
+              {(!message.read_at || message.status === 'new') && <Badge variant="destructive" className="text-xs">Unread</Badge>}
+              {message.user_id && <Badge variant="outline" className="text-xs hidden sm:inline-flex">Has Account</Badge>}
+              {!message.user_id && <Badge variant="secondary" className="text-xs hidden sm:inline-flex">Visitor</Badge>}
             </div>
-            <p className="text-sm text-muted-foreground">{message.email}</p>
-            <p className="font-medium mt-2">{message.subject}</p>
-            <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{message.message}</p>
-            <div className="flex items-center gap-4 mt-3">
+            <p className="text-xs sm:text-sm text-muted-foreground truncate">{message.email}</p>
+            <p className="font-medium mt-2 text-sm sm:text-base line-clamp-1">{message.subject}</p>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1 line-clamp-2">{message.message}</p>
+            <div className="flex items-center gap-2 sm:gap-4 mt-3 flex-wrap">
               <span className="text-xs text-muted-foreground">
                 {format(new Date(message.created_at), 'MMM dd, yyyy HH:mm')}
               </span>
               {getStatusBadge(message.status)}
-              <Badge variant="outline" className="flex items-center gap-1">
+              <Badge variant="outline" className="flex items-center gap-1 text-xs">
                 {getCategoryIcon(message.category)}
-                <span className="capitalize">{message.category.replace('_', ' ')}</span>
+                <span className="capitalize hidden sm:inline">{message.category.replace('_', ' ')}</span>
               </Badge>
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-1 sm:gap-2 flex-shrink-0 justify-end sm:justify-start">
             <Button 
               size="sm" 
               variant="ghost" 
+              className="h-8 w-8 sm:h-9 sm:w-auto sm:px-3 p-0"
               onClick={() => {
                 setHistoryUser({
                   userId: message.user_id,
@@ -695,12 +696,25 @@ export const ContactManager = () => {
               title="View full communication history"
             >
               <History className="h-4 w-4" />
+              <span className="hidden sm:inline ml-1">History</span>
             </Button>
-            <Button size="sm" variant="outline" onClick={() => handleViewMessage(message)}>
-              <Eye className="h-4 w-4 mr-1" />
-              View
+            <Button 
+              size="sm" 
+              variant="outline" 
+              className="h-8 w-8 sm:h-9 sm:w-auto sm:px-3 p-0"
+              onClick={() => handleViewMessage(message)}
+              title="View message"
+            >
+              <Eye className="h-4 w-4" />
+              <span className="hidden sm:inline ml-1">View</span>
             </Button>
-            <Button size="sm" variant="destructive" onClick={() => handleDeleteClick(message)}>
+            <Button 
+              size="sm" 
+              variant="destructive" 
+              className="h-8 w-8 sm:h-9 sm:w-auto sm:px-3 p-0"
+              onClick={() => handleDeleteClick(message)}
+              title="Delete message"
+            >
               <Trash2 className="h-4 w-4" />
             </Button>
           </div>
@@ -759,36 +773,36 @@ export const ContactManager = () => {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 mb-6">
             <Card>
-              <CardContent className="pt-6">
+              <CardContent className="pt-4 sm:pt-6">
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-red-600">{unreadMessages.length}</p>
-                  <p className="text-sm text-muted-foreground">Unread</p>
+                  <p className="text-xl sm:text-2xl font-bold text-red-600">{unreadMessages.length}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Unread</p>
                 </div>
               </CardContent>
             </Card>
             <Card>
-              <CardContent className="pt-6">
+              <CardContent className="pt-4 sm:pt-6">
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-blue-600">{readMessages.length}</p>
-                  <p className="text-sm text-muted-foreground">Read</p>
+                  <p className="text-xl sm:text-2xl font-bold text-blue-600">{readMessages.length}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Read</p>
                 </div>
               </CardContent>
             </Card>
             <Card>
-              <CardContent className="pt-6">
+              <CardContent className="pt-4 sm:pt-6">
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-green-600">{respondedMessages.length}</p>
-                  <p className="text-sm text-muted-foreground">Responded</p>
+                  <p className="text-xl sm:text-2xl font-bold text-green-600">{respondedMessages.length}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Responded</p>
                 </div>
               </CardContent>
             </Card>
             <Card>
-              <CardContent className="pt-6">
+              <CardContent className="pt-4 sm:pt-6">
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-gray-600">{closedMessages.length}</p>
-                  <p className="text-sm text-muted-foreground">Closed</p>
+                  <p className="text-xl sm:text-2xl font-bold text-gray-600">{closedMessages.length}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Closed</p>
                 </div>
               </CardContent>
             </Card>
