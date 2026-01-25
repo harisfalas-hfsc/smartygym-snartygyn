@@ -616,7 +616,7 @@ async function sendEmailReport(
     const htmlBytes = encoder.encode(downloadableHtml);
     const base64Html = btoa(String.fromCharCode(...htmlBytes));
 
-    const { error } = await resend.emails.send({
+    const emailResult = await resend.emails.send({
       from: 'SmartyGym SEO <info@smartygym.com>',
       to: [adminEmail],
       subject: subject,
@@ -629,10 +629,27 @@ async function sendEmailReport(
       ]
     });
 
-    if (error) {
-      console.error('Failed to send email report:', error);
+    if (emailResult.error) {
+      console.error('Failed to send email report:', emailResult.error);
+      // Log failure
+      await supabase.from('email_delivery_log').insert({
+        message_type: 'seo_weekly_report',
+        to_email: adminEmail,
+        status: 'failed',
+        error_message: emailResult.error.message || 'Unknown error',
+        metadata: { source: 'seo_refresh' }
+      });
       return false;
     }
+
+    // Log success
+    await supabase.from('email_delivery_log').insert({
+      message_type: 'seo_weekly_report',
+      to_email: adminEmail,
+      status: 'sent',
+      resend_id: emailResult.data?.id || null,
+      metadata: { source: 'seo_refresh', items_optimized: reportData.newItemsOptimized }
+    });
 
     console.log('✅ Email report sent successfully to', adminEmail);
     return true;

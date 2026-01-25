@@ -387,6 +387,12 @@ interface AuditResult {
   };
 }
 
+// Maximum execution time in ms (50 seconds to leave buffer for Edge Function 60s limit)
+const MAX_EXECUTION_TIME_MS = 50000;
+
+// Maximum number of image URLs to check per run (to prevent timeouts)
+const MAX_IMAGE_URL_CHECKS = 20;
+
 const handler = async (req: Request): Promise<Response> => {
   console.log("🏥 System Health Audit starting...");
   
@@ -398,12 +404,28 @@ const handler = async (req: Request): Promise<Response> => {
   const checks: HealthCheck[] = [];
   let checkId = 1;
 
+  // Helper to check if we're running out of time
+  const isApproachingTimeout = () => Date.now() - startTime > MAX_EXECUTION_TIME_MS;
+
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { sendEmail = false } = await req.json().catch(() => ({}));
+    const { sendEmail = false, runId } = await req.json().catch(() => ({}));
+    
+    console.log(`📋 Audit params: sendEmail=${sendEmail}, runId=${runId || 'none'}`);
+    
+    // If runId provided, update the existing row to mark as actually running
+    if (runId) {
+      await supabase
+        .from('system_health_audits')
+        .update({
+          results: { status: 'running', started_at: new Date().toISOString() }
+        })
+        .eq('id', runId);
+      console.log(`✅ Updated runId ${runId} to running status`);
+    }
     
     // ALWAYS resolve admin email from database - never trust request body
     const adminEmail = await getAdminNotificationEmail(supabase);
@@ -2578,7 +2600,7 @@ const handler = async (req: Request): Promise<Response> => {
               'Content-Type': 'application/json',
               'Authorization': `Bearer ${supabaseServiceKey}`
             },
-            body: JSON.stringify({ force: false })
+            body: JSON.stringify({ force: false, sendEmail: false }) // Don't send SEO email during auto-fix
           });
           
           if (seoResponse.ok) {
@@ -2620,77 +2642,108 @@ const handler = async (req: Request): Promise<Response> => {
 
     // ============================================
     // BROKEN IMAGE URLs CHECK (Flag for Review)
+    // Time-budget aware: skip if running low on time, sample if many URLs
     // ============================================
     console.log("🖼️ Checking for broken image URLs...");
 
-    try {
-      // Get all image URLs from workouts and programs
-      const { data: workoutsWithImages } = await supabase
-        .from('admin_workouts')
-        .select('id, name, image_url')
-        .eq('is_visible', true)
-        .not('image_url', 'is', null);
-
-      const { data: programsWithImages } = await supabase
-        .from('admin_training_programs')
-        .select('id, name, image_url')
-        .eq('is_visible', true)
-        .not('image_url', 'is', null);
-
-      const allItems = [
-        ...(workoutsWithImages || []).map(w => ({ ...w, type: 'workout' })),
-        ...(programsWithImages || []).map(p => ({ ...p, type: 'program' }))
-      ];
-
-      // Only check Supabase storage URLs (skip external URLs like unsplash, etc.)
-      const supabaseStorageItems = allItems.filter(item => 
-        item.image_url && (
-          item.image_url.includes('supabase') || 
-          item.image_url.startsWith('/')
-        )
-      );
-
-      const brokenImages: Array<{ name: string; type: string; url: string }> = [];
-      
-      console.log(`[BROKEN-IMAGES] Checking ${supabaseStorageItems.length} Supabase storage URLs`);
-
-      for (const item of supabaseStorageItems) {
-        try {
-          const response = await fetch(item.image_url, { method: 'HEAD' });
-          if (!response.ok) {
-            brokenImages.push({ name: item.name, type: item.type, url: item.image_url });
-            console.log(`[BROKEN-IMAGES] ❌ ${item.name}: HTTP ${response.status}`);
-          }
-          // Rate limit protection
-          await new Promise(r => setTimeout(r, 100));
-        } catch (fetchError) {
-          brokenImages.push({ name: item.name, type: item.type, url: item.image_url });
-          console.log(`[BROKEN-IMAGES] ❌ ${item.name}: Failed to fetch`);
-        }
-      }
-
-      const externalCount = allItems.length - supabaseStorageItems.length;
-      
-      if (brokenImages.length > 0) {
-        addCheck('Image Quality', 'Broken Image URLs',
-          `${brokenImages.length} broken image URL${brokenImages.length !== 1 ? 's' : ''} found`,
-          'warning',
-          `Broken: ${brokenImages.slice(0, 3).map(b => b.name).join(', ')}${brokenImages.length > 3 ? ` +${brokenImages.length - 3} more` : ''}`
-        );
-      } else {
-        addCheck('Image Quality', 'Broken Image URLs',
-          `All ${supabaseStorageItems.length} storage images are accessible`,
-          'pass',
-          externalCount > 0 ? `${externalCount} external URLs skipped (not checked)` : 'All image URLs return valid responses'
-        );
-      }
-    } catch (brokenImageError) {
-      console.error("[BROKEN-IMAGES] Error:", brokenImageError);
+    // Check time budget before heavy operation
+    if (isApproachingTimeout()) {
+      console.log("[BROKEN-IMAGES] ⏱️ Skipping - approaching timeout");
       addCheck('Image Quality', 'Broken Image URLs',
-        'Failed to check image URLs',
-        'fail',
-        brokenImageError instanceof Error ? brokenImageError.message : 'Unknown error'
+        'Skipped - audit approaching time limit',
+        'skip',
+        'Heavy image scan skipped to ensure audit completes. Run dedicated image check separately.'
       );
+    } else {
+      try {
+        // Get all image URLs from workouts and programs
+        const { data: workoutsWithImagesForBroken } = await supabase
+          .from('admin_workouts')
+          .select('id, name, image_url')
+          .eq('is_visible', true)
+          .not('image_url', 'is', null);
+
+        const { data: programsWithImagesForBroken } = await supabase
+          .from('admin_training_programs')
+          .select('id, name, image_url')
+          .eq('is_visible', true)
+          .not('image_url', 'is', null);
+
+        const allItemsForBroken = [
+          ...(workoutsWithImagesForBroken || []).map(w => ({ ...w, type: 'workout' })),
+          ...(programsWithImagesForBroken || []).map(p => ({ ...p, type: 'program' }))
+        ];
+
+        // Only check Supabase storage URLs (skip external URLs like unsplash, etc.)
+        const supabaseStorageItemsBroken = allItemsForBroken.filter(item => 
+          item.image_url && (
+            item.image_url.includes('supabase') || 
+            item.image_url.startsWith('/')
+          )
+        );
+
+        const totalStorageItems = supabaseStorageItemsBroken.length;
+        
+        // Sample if too many URLs to check (to prevent timeouts)
+        let itemsToCheck = supabaseStorageItemsBroken;
+        let isSampled = false;
+        if (totalStorageItems > MAX_IMAGE_URL_CHECKS) {
+          // Random sample
+          const shuffled = [...supabaseStorageItemsBroken].sort(() => Math.random() - 0.5);
+          itemsToCheck = shuffled.slice(0, MAX_IMAGE_URL_CHECKS);
+          isSampled = true;
+          console.log(`[BROKEN-IMAGES] Sampling ${MAX_IMAGE_URL_CHECKS} of ${totalStorageItems} URLs`);
+        } else {
+          console.log(`[BROKEN-IMAGES] Checking all ${totalStorageItems} Supabase storage URLs`);
+        }
+
+        const brokenImagesResult: Array<{ name: string; type: string; url: string }> = [];
+
+        for (const item of itemsToCheck) {
+          // Check timeout mid-loop
+          if (isApproachingTimeout()) {
+            console.log("[BROKEN-IMAGES] ⏱️ Stopping early - timeout approaching");
+            break;
+          }
+          
+          try {
+            const response = await fetch(item.image_url, { method: 'HEAD' });
+            if (!response.ok) {
+              brokenImagesResult.push({ name: item.name, type: item.type, url: item.image_url });
+              console.log(`[BROKEN-IMAGES] ❌ ${item.name}: HTTP ${response.status}`);
+            }
+            // Rate limit protection
+            await new Promise(r => setTimeout(r, 100));
+          } catch (fetchError) {
+            brokenImagesResult.push({ name: item.name, type: item.type, url: item.image_url });
+            console.log(`[BROKEN-IMAGES] ❌ ${item.name}: Failed to fetch`);
+          }
+        }
+
+        const externalCountBroken = allItemsForBroken.length - totalStorageItems;
+        const sampledNote = isSampled ? ` (sampled ${MAX_IMAGE_URL_CHECKS} of ${totalStorageItems})` : '';
+        
+        if (brokenImagesResult.length > 0) {
+          addCheck('Image Quality', 'Broken Image URLs',
+            `${brokenImagesResult.length} broken image URL${brokenImagesResult.length !== 1 ? 's' : ''} found${sampledNote}`,
+            'warning',
+            `Broken: ${brokenImagesResult.slice(0, 3).map(b => b.name).join(', ')}${brokenImagesResult.length > 3 ? ` +${brokenImagesResult.length - 3} more` : ''}`
+          );
+        } else {
+          addCheck('Image Quality', 'Broken Image URLs',
+            `All ${itemsToCheck.length} checked images are accessible${sampledNote}`,
+            'pass',
+            externalCountBroken > 0 ? `${externalCountBroken} external URLs skipped (not checked)` : 'All image URLs return valid responses'
+          );
+        }
+      } catch (brokenImageError) {
+        console.error("[BROKEN-IMAGES] Error:", brokenImageError);
+        addCheck('Image Quality', 'Broken Image URLs',
+          'Failed to check image URLs',
+          'fail',
+          brokenImageError instanceof Error ? brokenImageError.message : 'Unknown error'
+        );
+      }
     }
 
     // ============================================
@@ -2822,7 +2875,7 @@ const handler = async (req: Request): Promise<Response> => {
     const failed = checks.filter(c => c.status === 'fail').length;
     const skipped = checks.filter(c => c.status === 'skip').length;
 
-    const result: AuditResult = {
+    const result: AuditResult & { status?: string; completed_at?: string } = {
       timestamp: new Date().toISOString(),
       duration_ms: duration,
       total_checks: checks.length,
@@ -2834,21 +2887,43 @@ const handler = async (req: Request): Promise<Response> => {
       summary: {
         critical_issues: checks.filter(c => c.status === 'fail'),
         warnings: checks.filter(c => c.status === 'warning')
-      }
+      },
+      status: 'completed',
+      completed_at: new Date().toISOString()
     };
 
-    // Save to database
-    await supabase.from('system_health_audits').insert({
-      audit_date: new Date().toISOString(),
-      total_checks: checks.length,
-      passed_checks: passed,
-      warning_checks: warnings,
-      failed_checks: failed,
-      skipped_checks: skipped,
-      duration_ms: duration,
-      results: result,
-      critical_issues: result.summary.critical_issues.map(c => c.name)
-    });
+    // Save to database - UPDATE if runId provided, INSERT otherwise
+    if (runId) {
+      // Update the existing row created by trigger-full-audit
+      await supabase
+        .from('system_health_audits')
+        .update({
+          audit_date: new Date().toISOString(),
+          total_checks: checks.length,
+          passed_checks: passed,
+          warning_checks: warnings,
+          failed_checks: failed,
+          skipped_checks: skipped,
+          duration_ms: duration,
+          results: result,
+          critical_issues: result.summary.critical_issues.map(c => c.name)
+        })
+        .eq('id', runId);
+      console.log(`✅ Updated runId ${runId} with completed audit results`);
+    } else {
+      // Insert new row (legacy behavior for cron jobs)
+      await supabase.from('system_health_audits').insert({
+        audit_date: new Date().toISOString(),
+        total_checks: checks.length,
+        passed_checks: passed,
+        warning_checks: warnings,
+        failed_checks: failed,
+        skipped_checks: skipped,
+        duration_ms: duration,
+        results: result,
+        critical_issues: result.summary.critical_issues.map(c => c.name)
+      });
+    }
 
     console.log(`✅ Audit complete: ${passed}/${checks.length} passed, ${warnings} warnings, ${failed} failed`);
 
@@ -2996,16 +3071,34 @@ const handler = async (req: Request): Promise<Response> => {
           </html>
         `;
 
-        await resend.emails.send({
+        const emailResult = await resend.emails.send({
           from: "SmartyGym System <notifications@smartygym.com>",
           to: [adminEmail],
           subject: `${statusEmoji} SmartyGym Health Audit: ${statusText}`,
           html: emailHtml,
         });
 
+        // Log email delivery success
+        await supabase.from('email_delivery_log').insert({
+          message_type: 'system_health_audit',
+          to_email: adminEmail,
+          status: 'sent',
+          resend_id: emailResult?.data?.id || null,
+          metadata: { source: 'daily_audit', runId: runId || null, passed, warnings, failed }
+        });
+
         console.log(`📧 Audit email sent to ${adminEmail}`);
       } catch (emailError) {
         console.error("Failed to send audit email:", emailError);
+        
+        // Log email delivery failure
+        await supabase.from('email_delivery_log').insert({
+          message_type: 'system_health_audit',
+          to_email: adminEmail,
+          status: 'failed',
+          error_message: emailError instanceof Error ? emailError.message : String(emailError),
+          metadata: { source: 'daily_audit', runId: runId || null }
+        });
       }
     }
 
