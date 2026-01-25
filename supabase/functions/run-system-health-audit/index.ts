@@ -1996,11 +1996,12 @@ const handler = async (req: Request): Promise<Response> => {
       skipped: []
     };
 
-    // AUTO-FIX 1: Check for "Day X" patterns in ritual content (should show actual content)
+    // AUTO-FIX 1: Check for "Day X" placeholder patterns in ritual content (e.g. "Day 1:", "Day 2 -")
+    // Using specific pattern to avoid matching legitimate content like "Midday Reset" or "the day ahead"
     const { data: ritualWithDayPattern } = await supabase
       .from('daily_smarty_rituals')
       .select('id, ritual_date, morning_content, midday_content, evening_content')
-      .or('morning_content.ilike.%Day %,midday_content.ilike.%Day %,evening_content.ilike.%Day %')
+      .or('morning_content.ilike.%Day X%,midday_content.ilike.%Day X%,evening_content.ilike.%Day X%')
       .eq('is_visible', true)
       .limit(5);
     
@@ -2772,20 +2773,23 @@ const allStripeItems = [
     console.log("💳 Checking for missing Stripe products...");
 
     try {
-      // Find paid workouts without Stripe product
+      // Find standalone purchasable workouts without Stripe product
+      // Only check items that NEED Stripe products (is_standalone_purchase = true)
       const { data: paidWorkoutsNoStripe } = await supabase
         .from('admin_workouts')
         .select('id, name, price')
         .eq('is_free', false)
         .eq('is_visible', true)
+        .eq('is_standalone_purchase', true)
         .or('stripe_product_id.is.null,stripe_product_id.eq.');
 
-      // Find paid programs without Stripe product
+      // Find standalone purchasable programs without Stripe product
       const { data: paidProgramsNoStripe } = await supabase
         .from('admin_training_programs')
         .select('id, name, price')
         .eq('is_free', false)
         .eq('is_visible', true)
+        .eq('is_standalone_purchase', true)
         .or('stripe_product_id.is.null,stripe_product_id.eq.');
 
       const missingWorkouts = paidWorkoutsNoStripe || [];
