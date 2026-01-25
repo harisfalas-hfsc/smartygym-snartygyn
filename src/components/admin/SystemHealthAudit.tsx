@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -25,7 +25,8 @@ import {
   FileText,
   Clock,
   Bell,
-  Wrench
+  Wrench,
+  Loader2
 } from "lucide-react";
 
 interface HealthCheck {
@@ -59,13 +60,44 @@ interface AuditResult {
   };
 }
 
+interface QuickCheck {
+  name: string;
+  status: 'pass' | 'warning' | 'fail';
+  details?: string;
+}
+
+interface QuickAuditResult {
+  timestamp: string;
+  duration_ms: number;
+  cyprus_date: string;
+  total_checks: number;
+  passed: number;
+  warnings: number;
+  failed: number;
+  checks: QuickCheck[];
+  overall_status: 'healthy' | 'warning' | 'critical';
+}
+
 export const SystemHealthAudit = () => {
   const { toast } = useToast();
   const [isRunning, setIsRunning] = useState(false);
+  const [isRunningFull, setIsRunningFull] = useState(false);
   const [progress, setProgress] = useState(0);
   const [result, setResult] = useState<AuditResult | null>(null);
+  const [quickResult, setQuickResult] = useState<QuickAuditResult | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [isFixingMetadata, setIsFixingMetadata] = useState(false);
+  const [fullAuditRunId, setFullAuditRunId] = useState<string | null>(null);
+  const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Clean up polling on unmount
+  useEffect(() => {
+    return () => {
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+      }
+    };
+  }, []);
 
   const fixStripeMetadata = async () => {
     setIsFixingMetadata(true);
@@ -91,9 +123,9 @@ export const SystemHealthAudit = () => {
         description: `Fixed ${data.fixed || 0} products. ${data.alreadyTagged || 0} were already tagged.`,
       });
 
-      // Re-run audit to show updated status
-      if (result) {
-        runAudit(false);
+      // Re-run quick audit to show updated status
+      if (quickResult) {
+        runQuickAudit();
       }
     } catch (error: any) {
       console.error("Fix metadata failed:", error);
@@ -113,19 +145,118 @@ export const SystemHealthAudit = () => {
     c => c.category === 'Stripe' && c.name.toLowerCase().includes('metadata')
   );
 
-  const runAudit = async (sendEmail: boolean = false) => {
+  // Quick audit - fast essential checks
+  const runQuickAudit = async () => {
+    setIsRunning(true);
+    setQuickResult(null);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('run-quick-health-audit');
+
+      if (error) throw error;
+
+      setQuickResult(data);
+      
+      toast({
+        title: "Quick Audit Complete",
+        description: `${data.passed}/${data.total_checks} checks passed`,
+        variant: data.failed > 0 ? "destructive" : "default",
+      });
+    } catch (error) {
+      console.error("Quick audit failed:", error);
+      toast({
+        title: "Audit Failed",
+        description: "Could not complete quick health check",
+        variant: "destructive",
+      });
+    } finally {
+      setIsRunning(false);
+    }
+  };
+
+  // Poll for full audit completion
+  const pollAuditStatus = async (runId: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('get-audit-status', {
+        body: { runId }
+      });
+
+      if (error) throw error;
+
+      if (data.status === 'completed' && data.results) {
+        // Audit complete
+        if (pollIntervalRef.current) {
+          clearInterval(pollIntervalRef.current);
+          pollIntervalRef.current = null;
+        }
+        
+        setResult(data.results);
+        setProgress(100);
+        setIsRunningFull(false);
+        setFullAuditRunId(null);
+
+        toast({
+          title: "Full Audit Complete",
+          description: `${data.summary.passed}/${data.summary.total_checks} checks passed`,
+          variant: data.summary.failed > 0 ? "destructive" : "default",
+        });
+      } else {
+        // Still running - increment progress
+        setProgress(prev => Math.min(prev + 3, 95));
+      }
+    } catch (error) {
+      console.error("Poll failed:", error);
+    }
+  };
+
+  // Full audit - comprehensive checks (runs in background)
+  const runFullAudit = async (sendEmail: boolean = false) => {
+    setIsRunningFull(true);
+    setProgress(0);
+    setResult(null);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('trigger-full-audit', {
+        body: { sendEmail }
+      });
+
+      if (error) throw error;
+
+      if (data.runId) {
+        setFullAuditRunId(data.runId);
+        
+        // Start polling
+        pollIntervalRef.current = setInterval(() => {
+          pollAuditStatus(data.runId);
+        }, 3000);
+
+        toast({
+          title: "Full Audit Started",
+          description: "Running comprehensive checks in background...",
+        });
+      }
+    } catch (error) {
+      console.error("Failed to trigger full audit:", error);
+      setIsRunningFull(false);
+      
+      // Fallback to direct call for backward compatibility
+      runDirectAudit(sendEmail);
+    }
+  };
+
+  // Direct audit call (fallback)
+  const runDirectAudit = async (sendEmail: boolean = false) => {
     setIsRunning(true);
     setProgress(0);
     setResult(null);
 
-    // Simulate progress
     const progressInterval = setInterval(() => {
-      setProgress(prev => Math.min(prev + 5, 90));
-    }, 200);
+      setProgress(prev => Math.min(prev + 2, 90));
+    }, 500);
 
     try {
       const { data, error } = await supabase.functions.invoke('run-system-health-audit', {
-        body: { sendEmail, adminEmail: 'smartygym@outlook.com' }
+        body: { sendEmail }
       });
 
       clearInterval(progressInterval);
@@ -135,15 +266,9 @@ export const SystemHealthAudit = () => {
 
       setResult(data);
       
-      const statusMessage = data.failed > 0 
-        ? `${data.failed} critical issues found!`
-        : data.warnings > 0 
-        ? `${data.warnings} warnings detected`
-        : 'All systems healthy!';
-
       toast({
         title: sendEmail ? "Audit Complete & Email Sent" : "Audit Complete",
-        description: `${data.passed}/${data.total_checks} checks passed. ${statusMessage}`,
+        description: `${data.passed}/${data.total_checks} checks passed`,
         variant: data.failed > 0 ? "destructive" : "default",
       });
     } catch (error) {
@@ -212,7 +337,7 @@ export const SystemHealthAudit = () => {
           System Health Audit
         </CardTitle>
         <CardDescription>
-          Comprehensive platform audit with 100+ checks across all systems
+          Quick check (instant) or full audit (100+ checks, runs in background)
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -222,14 +347,14 @@ export const SystemHealthAudit = () => {
               <Button 
                 className="flex items-center gap-2 border-green-500"
                 variant="outline"
-                disabled={isRunning}
+                disabled={isRunning || isRunningFull}
               >
-                {isRunning ? (
+                {(isRunning || isRunningFull) ? (
                   <RefreshCw className="h-4 w-4 animate-spin" />
                 ) : (
                   <HeartPulse className="h-4 w-4 text-green-500" />
                 )}
-                {isRunning ? "Running Audit..." : "🏥 Check System Health"}
+                🏥 Check System Health
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
@@ -240,36 +365,156 @@ export const SystemHealthAudit = () => {
                 </DialogTitle>
               </DialogHeader>
 
-              {!result && !isRunning && (
-                <div className="space-y-4 py-8">
+              {!result && !quickResult && !isRunning && !isRunningFull && (
+                <div className="space-y-6 py-8">
                   <p className="text-center text-muted-foreground">
-                    Run a comprehensive audit of all platform systems
+                    Choose an audit type:
                   </p>
-                  <div className="flex justify-center gap-4">
-                    <Button onClick={() => runAudit(false)} className="gap-2">
-                      <HeartPulse className="h-4 w-4" />
-                      Run Audit
-                    </Button>
-                    <Button onClick={() => runAudit(true)} variant="outline" className="gap-2">
-                      <Mail className="h-4 w-4" />
-                      Run & Send Email Report
-                    </Button>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                    <Card className="border-2 border-green-200 dark:border-green-800">
+                      <CardContent className="p-4 space-y-3">
+                        <div className="flex items-center gap-2">
+                          <Zap className="h-5 w-5 text-green-500" />
+                          <span className="font-semibold">Quick Check</span>
+                          <Badge variant="secondary">~5 sec</Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          Essential checks: WOD, Ritual, Subscriptions, Cron, Emails
+                        </p>
+                        <Button onClick={runQuickAudit} className="w-full gap-2" variant="outline">
+                          <HeartPulse className="h-4 w-4" />
+                          Run Quick Check
+                        </Button>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card className="border-2 border-blue-200 dark:border-blue-800">
+                      <CardContent className="p-4 space-y-3">
+                        <div className="flex items-center gap-2">
+                          <Database className="h-5 w-5 text-blue-500" />
+                          <span className="font-semibold">Full Audit</span>
+                          <Badge variant="secondary">2-5 min</Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          100+ checks: Content, Stripe sync, Images, Access control
+                        </p>
+                        <div className="flex gap-2">
+                          <Button onClick={() => runFullAudit(false)} className="flex-1 gap-2" variant="outline">
+                            <RefreshCw className="h-4 w-4" />
+                            Run
+                          </Button>
+                          <Button onClick={() => runFullAudit(true)} className="flex-1 gap-2">
+                            <Mail className="h-4 w-4" />
+                            Run + Email
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
                   </div>
                 </div>
               )}
 
-              {isRunning && (
+              {/* Quick Check Running */}
+              {isRunning && !isRunningFull && (
+                <div className="space-y-4 py-8 text-center">
+                  <Loader2 className="h-8 w-8 animate-spin mx-auto text-green-500" />
+                  <p className="text-muted-foreground">Running quick health check...</p>
+                </div>
+              )}
+
+              {/* Full Audit Running */}
+              {isRunningFull && (
                 <div className="space-y-4 py-8">
                   <p className="text-center text-muted-foreground">
-                    Running comprehensive system audit...
+                    Full audit running in background...
                   </p>
                   <Progress value={progress} className="w-full" />
                   <p className="text-center text-sm text-muted-foreground">
-                    Checking databases, content, integrations, and access controls...
+                    Checking databases, content, Stripe sync, images, access controls...
+                  </p>
+                  <p className="text-center text-xs text-muted-foreground">
+                    This takes 2-5 minutes. You can close this dialog and check back later.
                   </p>
                 </div>
               )}
 
+              {/* Quick Result Display */}
+              {quickResult && !result && !isRunning && !isRunningFull && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-3 gap-3">
+                    <Card className="bg-green-50 dark:bg-green-950 border-green-200">
+                      <CardContent className="p-4 text-center">
+                        <div className="text-2xl font-bold text-green-600">{quickResult.passed}</div>
+                        <div className="text-sm text-green-700 dark:text-green-300">Passed</div>
+                      </CardContent>
+                    </Card>
+                    <Card className="bg-yellow-50 dark:bg-yellow-950 border-yellow-200">
+                      <CardContent className="p-4 text-center">
+                        <div className="text-2xl font-bold text-yellow-600">{quickResult.warnings}</div>
+                        <div className="text-sm text-yellow-700 dark:text-yellow-300">Warnings</div>
+                      </CardContent>
+                    </Card>
+                    <Card className="bg-red-50 dark:bg-red-950 border-red-200">
+                      <CardContent className="p-4 text-center">
+                        <div className="text-2xl font-bold text-red-600">{quickResult.failed}</div>
+                        <div className="text-sm text-red-700 dark:text-red-300">Failed</div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  <div className={`p-4 rounded-lg text-center ${
+                    quickResult.overall_status === 'critical' ? 'bg-red-100 dark:bg-red-900' : 
+                    quickResult.overall_status === 'warning' ? 'bg-yellow-100 dark:bg-yellow-900' : 
+                    'bg-green-100 dark:bg-green-900'
+                  }`}>
+                    <span className="font-semibold">
+                      {quickResult.overall_status === 'critical' ? '🚨 ISSUES DETECTED' : 
+                       quickResult.overall_status === 'warning' ? '⚠️ WARNINGS' : 
+                       '✅ SYSTEMS HEALTHY'}
+                    </span>
+                    <span className="text-muted-foreground ml-2">
+                      - Completed in {quickResult.duration_ms}ms
+                    </span>
+                  </div>
+
+                  <div className="space-y-2">
+                    {quickResult.checks.map((check, idx) => (
+                      <div 
+                        key={idx} 
+                        className={`flex items-center justify-between p-3 rounded-lg ${
+                          check.status === 'fail' ? 'bg-red-50 dark:bg-red-950' :
+                          check.status === 'warning' ? 'bg-yellow-50 dark:bg-yellow-950' :
+                          'bg-green-50 dark:bg-green-950'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          {getStatusIcon(check.status)}
+                          <span className="font-medium">{check.name}</span>
+                        </div>
+                        <span className="text-sm text-muted-foreground">{check.details}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex justify-between pt-4">
+                    <Button variant="outline" onClick={() => setQuickResult(null)}>
+                      ← Back
+                    </Button>
+                    <div className="flex gap-2">
+                      <Button variant="outline" onClick={runQuickAudit}>
+                        <RefreshCw className="h-4 w-4 mr-2" />
+                        Quick Again
+                      </Button>
+                      <Button onClick={() => { setQuickResult(null); runFullAudit(false); }}>
+                        <Database className="h-4 w-4 mr-2" />
+                        Run Full Audit
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Full Result Display */}
               {result && (
                 <div className="space-y-4">
                   {/* Summary Cards */}
@@ -501,15 +746,20 @@ export const SystemHealthAudit = () => {
                     </div>
                   )}
 
-                  <div className="flex justify-end gap-2 pt-4">
-                    <Button variant="outline" onClick={() => runAudit(false)}>
-                      <RefreshCw className="h-4 w-4 mr-2" />
-                      Run Again
+                  <div className="flex justify-between pt-4">
+                    <Button variant="outline" onClick={() => setResult(null)}>
+                      ← Back
                     </Button>
-                    <Button onClick={() => runAudit(true)}>
-                      <Mail className="h-4 w-4 mr-2" />
-                      Send Email Report
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button variant="outline" onClick={() => runFullAudit(false)}>
+                        <RefreshCw className="h-4 w-4 mr-2" />
+                        Run Again
+                      </Button>
+                      <Button onClick={() => runFullAudit(true)}>
+                        <Mail className="h-4 w-4 mr-2" />
+                        Send Email Report
+                      </Button>
+                    </div>
                   </div>
                 </div>
               )}
@@ -517,7 +767,7 @@ export const SystemHealthAudit = () => {
           </Dialog>
 
           <p className="text-xs text-muted-foreground">
-            Auto-runs daily at 22:00 Cyprus time with email to smartygym@outlook.com
+            Daily full audit at 17:00 Cyprus → smartygym@outlook.com
           </p>
         </div>
       </CardContent>

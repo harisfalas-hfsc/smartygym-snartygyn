@@ -651,13 +651,16 @@ serve(async (req) => {
   const startTime = Date.now();
 
   try {
-    console.log('Starting weekly SEO refresh...');
+    // Parse request body for sendEmail flag (default: true for backward compatibility)
+    const { sendEmail = true } = await req.json().catch(() => ({ sendEmail: true }));
+    
+    console.log(`Starting SEO refresh... (sendEmail: ${sendEmail})`);
 
     // Create refresh log entry
     const { data: logEntry, error: logError } = await supabase
       .from('seo_refresh_log')
       .insert({
-        refresh_type: 'weekly',
+        refresh_type: sendEmail ? 'weekly' : 'auto_fix',
         started_at: new Date().toISOString()
       })
       .select()
@@ -854,24 +857,29 @@ serve(async (req) => {
         .eq('id', logEntry.id);
     }
 
-    // Send email report
-    const emailSent = await sendEmailReport(supabase, {
-      runDate,
-      durationSeconds,
-      totalScanned: itemsScanned,
-      alreadyOptimized,
-      newItemsOptimized: itemsUpdated,
-      optimizedItems,
-      unchangedByType,
-      sitemapStats: {
-        totalUrls: sitemapResult.totalUrls,
-        staticUrls: sitemapResult.staticUrls,
-        dynamicUrls: sitemapResult.dynamicUrls
-      }
-    });
+    // Send email report only if sendEmail flag is true
+    let emailSent = false;
+    if (sendEmail) {
+      emailSent = await sendEmailReport(supabase, {
+        runDate,
+        durationSeconds,
+        totalScanned: itemsScanned,
+        alreadyOptimized,
+        newItemsOptimized: itemsUpdated,
+        optimizedItems,
+        unchangedByType,
+        sitemapStats: {
+          totalUrls: sitemapResult.totalUrls,
+          staticUrls: sitemapResult.staticUrls,
+          dynamicUrls: sitemapResult.dynamicUrls
+        }
+      });
+      console.log(`Email report ${emailSent ? 'sent' : 'failed'}`);
+    } else {
+      console.log('Email report skipped (sendEmail=false, triggered by auto-fix)');
+    }
 
     console.log(`SEO refresh complete: ${itemsScanned} total, ${alreadyOptimized} already optimized, ${itemsUpdated} NEW items processed`);
-    console.log(`Email report ${emailSent ? 'sent' : 'skipped'}`);
 
     return new Response(JSON.stringify({
       success: true,
