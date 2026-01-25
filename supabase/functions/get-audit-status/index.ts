@@ -40,12 +40,13 @@ serve(async (req: Request): Promise<Response> => {
       }
 
       const isRunning = audit.results?.status === 'running';
+      const completedAt = audit.results?.completed_at || (isRunning ? null : audit.audit_date);
       
       return new Response(JSON.stringify({
         runId,
         status: isRunning ? 'running' : 'completed',
         startedAt: audit.results?.started_at || audit.audit_date,
-        completedAt: isRunning ? null : audit.audit_date,
+        completedAt,
         duration_ms: audit.duration_ms,
         summary: isRunning ? null : {
           total_checks: audit.total_checks,
@@ -85,12 +86,13 @@ serve(async (req: Request): Promise<Response> => {
     }
 
     const isRunning = latestAudit.results?.status === 'running';
+    const completedAt = latestAudit.results?.completed_at || (isRunning ? null : latestAudit.audit_date);
 
     return new Response(JSON.stringify({
       runId: latestAudit.id,
       status: isRunning ? 'running' : 'completed',
       startedAt: latestAudit.results?.started_at || latestAudit.audit_date,
-      completedAt: isRunning ? null : latestAudit.audit_date,
+      completedAt,
       duration_ms: latestAudit.duration_ms,
       summary: isRunning ? null : {
         total_checks: latestAudit.total_checks,

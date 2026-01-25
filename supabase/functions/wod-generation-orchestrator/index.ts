@@ -212,16 +212,34 @@ async function sendAdminAlert(
   `;
   
   try {
-    const result = await resend.emails.send({
+    const emailResult = await resend.emails.send({
       from: "SmartyGym Alerts <notifications@smartygym.com>",
       to: [adminEmail],
       subject: `🚨 URGENT: WOD Generation Failed After ${MAX_ATTEMPTS} Attempts - ${dateStr}`,
       html: emailHtml,
     });
     
-    console.log(`[ORCHESTRATOR] Admin alert email sent successfully:`, result);
+    // Log email delivery success
+    await supabase.from('email_delivery_log').insert({
+      message_type: 'wod_generation_failure',
+      to_email: adminEmail,
+      status: 'sent',
+      resend_id: emailResult?.data?.id || null,
+      metadata: { source: 'orchestrator', date: dateStr, missing, attempts: attempts.length }
+    });
+    
+    console.log(`[ORCHESTRATOR] Admin alert email sent successfully:`, emailResult);
   } catch (error) {
     console.error(`[ORCHESTRATOR] Failed to send admin alert email:`, error);
+    
+    // Log email delivery failure
+    await supabase.from('email_delivery_log').insert({
+      message_type: 'wod_generation_failure',
+      to_email: adminEmail,
+      status: 'failed',
+      error_message: error instanceof Error ? error.message : String(error),
+      metadata: { source: 'orchestrator', date: dateStr }
+    });
   }
 }
 
