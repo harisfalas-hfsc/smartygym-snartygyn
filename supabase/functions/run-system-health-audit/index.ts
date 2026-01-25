@@ -2463,14 +2463,29 @@ const handler = async (req: Request): Promise<Response> => {
           .not('stripe_product_id', 'is', null)
           .eq('is_free', false);
 
-        const allStripeItems = [
+const allStripeItems = [
           ...(paidWorkouts || []).map(w => ({ ...w, type: 'workout' })),
           ...(paidPrograms || []).map(p => ({ ...p, type: 'program' }))
         ];
 
-        console.log(`[STRIPE-SYNC] Checking ${allStripeItems.length} paid items with Stripe products`);
+        // Limit to 30 items max to prevent timeout (183 items × 300ms = 55+ seconds)
+        const MAX_STRIPE_ITEMS = 30;
+        const itemsToCheck = allStripeItems.length > MAX_STRIPE_ITEMS 
+          ? allStripeItems.slice(0, MAX_STRIPE_ITEMS)
+          : allStripeItems;
+        const wasLimited = allStripeItems.length > MAX_STRIPE_ITEMS;
 
-        for (const item of allStripeItems) {
+        console.log(`[STRIPE-SYNC] Checking ${itemsToCheck.length}/${allStripeItems.length} paid items with Stripe products${wasLimited ? ' (sampled)' : ''}`);
+
+        let stoppedEarly = false;
+        for (const item of itemsToCheck) {
+          // Check timeout before each iteration
+          if (isApproachingTimeout()) {
+            console.log(`[STRIPE-SYNC] ⏱️ Stopping early - timeout approaching`);
+            stoppedEarly = true;
+            break;
+          }
+          
           try {
             const product = await stripeForImageSync.products.retrieve(item.stripe_product_id);
             const stripeImage = product.images?.[0];
@@ -2510,6 +2525,11 @@ const handler = async (req: Request): Promise<Response> => {
             issues.push(`${item.name}: ${errorMsg}`);
             console.error(`[STRIPE-SYNC] Error for ${item.name}:`, errorMsg);
           }
+        }
+        
+        // Add info about sampling/early stop
+        if (wasLimited || stoppedEarly) {
+          issues.push(`Note: Checked ${itemsToCheck.length} of ${allStripeItems.length} items (${wasLimited ? 'sampled' : 'timeout'})`);
         }
 
         // Determine status based on results
@@ -3109,6 +3129,31 @@ const handler = async (req: Request): Promise<Response> => {
 
   } catch (error) {
     console.error("❌ Audit failed:", error);
+    
+    // Mark runId as failed if we have one
+    try {
+      const supabaseUrl = Deno.env.get("SUPABASE_URL");
+      const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+      const body = await req.clone().json().catch(() => ({}));
+      const runId = body?.runId;
+      
+      if (runId && supabaseUrl && supabaseServiceKey) {
+        const supabase = createClient(supabaseUrl, supabaseServiceKey);
+        await supabase.from('system_health_audits')
+          .update({
+            results: { 
+              status: 'failed', 
+              error: String(error),
+              failed_at: new Date().toISOString()
+            }
+          })
+          .eq('id', runId);
+        console.log(`✅ Marked runId ${runId} as failed`);
+      }
+    } catch (updateError) {
+      console.error("Failed to update runId status:", updateError);
+    }
+    
     return new Response(JSON.stringify({ error: String(error) }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
