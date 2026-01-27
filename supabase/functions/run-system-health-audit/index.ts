@@ -3026,6 +3026,10 @@ const allStripeItems = [
                   <div style="color: #6b7280;">Failed</div>
                 </div>
                 <div style="padding: 15px;">
+                  <div style="font-size: 36px; font-weight: bold; color: #6b7280;">${skipped}</div>
+                  <div style="color: #6b7280;">Skipped</div>
+                </div>
+                <div style="padding: 15px;">
                   <div style="font-size: 36px; font-weight: bold; color: #1f2937;">${checks.length}</div>
                   <div style="color: #6b7280;">Total</div>
                 </div>
