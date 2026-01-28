@@ -950,6 +950,27 @@ li.tiptap-list-item p {
   margin-bottom: 0.25rem;
 }
 
+/* Workout display: force NO extra vertical spacing between bullet exercises (match Gold Standard template) */
+.workout-content .prose li,
+.workout-content .prose-sm li,
+.workout-content .prose-invert li,
+.workout-content .text-display li,
+.workout-content li.tiptap-list-item,
+.workout-content .prose li.tiptap-list-item,
+.workout-content .prose-sm li.tiptap-list-item,
+.workout-content .text-display li.tiptap-list-item {
+  margin: 0;
+}
+
+.workout-content .prose ul,
+.workout-content .prose-sm ul,
+.workout-content .text-display ul,
+.workout-content .prose ul.tiptap-bullet-list,
+.workout-content .prose-sm ul.tiptap-bullet-list,
+.workout-content .text-display ul.tiptap-bullet-list {
+  margin: 0;
+}
+
 /* Global smooth scrolling */
 html,
 body,
