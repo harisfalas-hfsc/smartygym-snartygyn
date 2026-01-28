@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
@@ -64,7 +64,13 @@ const IndividualWorkout = () => {
 
 
   // Fetch from database
-  const { data: dbWorkout, isLoading: isLoadingDb } = useWorkoutData(id);
+  const { data: dbWorkout, isLoading: isLoadingDb, refetch } = useWorkoutData(id);
+
+  // Force a refetch when opening this page so backend content updates appear immediately
+  useEffect(() => {
+    if (!id) return;
+    refetch();
+  }, [id, refetch]);
 
   // If we have database workout, use it directly
   if (isLoadingDb) {
