@@ -46,6 +46,11 @@ export const useWorkoutData = (workoutId: string | undefined) => {
       return data as WorkoutData;
     },
     enabled: !!workoutId,
+    // Ensure detail pages always reflect latest backend content updates
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
   });
 };
 
