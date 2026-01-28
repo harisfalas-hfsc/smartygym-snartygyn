@@ -33,13 +33,13 @@ export const ParQReminderModal = ({ open, onClose }: ParQReminderModalProps) => 
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose(dontShowAgain)}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-destructive/10 rounded-full">
-              <HeartPulse className="h-6 w-6 text-destructive" />
+          <div className="flex items-center gap-2 sm:gap-3 mb-2">
+            <div className="p-2 bg-destructive/10 rounded-full flex-shrink-0">
+              <HeartPulse className="h-5 w-5 sm:h-6 sm:w-6 text-destructive" />
             </div>
-            <DialogTitle className="text-xl">Complete Your Health Assessment</DialogTitle>
+            <DialogTitle className="text-lg sm:text-xl leading-tight">Complete Your Health Assessment</DialogTitle>
           </div>
           <DialogDescription asChild>
             <div className="space-y-4 pt-2">
@@ -68,34 +68,35 @@ export const ParQReminderModal = ({ open, onClose }: ParQReminderModalProps) => 
           </DialogDescription>
         </DialogHeader>
 
-        <DialogFooter className="flex-col gap-4 sm:flex-col">
-          <div className="flex gap-3 w-full">
+        <DialogFooter className="flex-col gap-3 sm:gap-4 sm:flex-col">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full">
             <Button 
               variant="outline" 
               onClick={handleLater}
-              className="flex-1"
+              className="flex-1 text-sm sm:text-base py-2"
             >
               Remind Me Later
             </Button>
             <Button 
               onClick={handleGoToParQ}
-              className="flex-1 bg-primary hover:bg-primary/90"
+              className="flex-1 bg-primary hover:bg-primary/90 text-sm sm:text-base py-2"
             >
-              <HeartPulse className="mr-2 h-4 w-4" />
+              <HeartPulse className="mr-1.5 sm:mr-2 h-4 w-4" />
               Take PAR-Q Test
-              <ExternalLink className="ml-2 h-3 w-3" />
+              <ExternalLink className="ml-1.5 sm:ml-2 h-3 w-3" />
             </Button>
           </div>
           
-          <div className="flex items-center space-x-2 pt-2 border-t w-full justify-center">
+          <div className="flex items-start sm:items-center gap-2 pt-2 border-t w-full justify-center">
             <Checkbox 
               id="dont-show-parq" 
               checked={dontShowAgain} 
               onCheckedChange={(checked) => setDontShowAgain(checked === true)}
+              className="mt-0.5 sm:mt-0"
             />
             <Label 
               htmlFor="dont-show-parq" 
-              className="text-xs text-muted-foreground cursor-pointer"
+              className="text-xs text-muted-foreground cursor-pointer leading-tight"
             >
               I've already completed the PAR-Q test, don't show this again
             </Label>
