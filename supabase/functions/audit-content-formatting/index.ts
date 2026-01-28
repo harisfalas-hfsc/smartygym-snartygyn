@@ -39,9 +39,15 @@ interface AuditResult {
   // List issues
   exercisesNotInBulletLists: number;
   
-  // Format issues (quoting, empty paragraphs)
+  // Format issues
   singleQuoteAttributes: number;
   leadingEmptyParagraphs: number;
+  
+  // NEW: Spacing issues (Gold Standard V3)
+  blankAfterSectionTitle: number;
+  missingSectionSeparator: number;
+  multipleSectionSeparators: number;
+  exercisesOutsideLists: number;
   
   // Overall
   totalIssues: number;
@@ -69,30 +75,7 @@ const ICON_PATTERNS = {
   coolDown: /🧘/,
 };
 
-// Detect if content has proper bullet lists for exercises
-function hasBulletListIssues(content: string): boolean {
-  if (!content) return false;
-  
-  // Check for patterns that should be bullet lists but aren't:
-  // 1. Numbered lists like "1. Exercise<br>2. Exercise"
-  const numberedPattern = /(?:^|\n|<br\s*\/?>)\s*\d+\.\s*[A-Z][a-z]/;
-  
-  // 2. Lines starting with "• " or "- " inside paragraphs
-  const inlineBulletPattern = /<p[^>]*>(?:•|-)\s+[A-Za-z]/;
-  
-  // 3. Multiple exercise-like lines in sequence without <ul>/<li>
-  const exerciseSequencePattern = /<p[^>]*>[A-Z][a-z]+(?:\s+[A-Za-z]+){0,4}(?:\s*-\s*\d+\s*(?:reps?|sets?|min|sec))?<\/p>\s*<p[^>]*>[A-Z][a-z]+/;
-  
-  // Check if content has <ul> at all
-  const hasUl = /<ul[^>]*>/.test(content);
-  
-  // If no <ul> and content has exercise patterns, it's an issue
-  if (!hasUl && exerciseSequencePattern.test(content)) {
-    return true;
-  }
-  
-  return numberedPattern.test(content) || inlineBulletPattern.test(content);
-}
+const SECTION_ICONS = ['🔥', '💪', '⚡', '🧘'];
 
 // Check for section presence
 function hasSection(content: string, pattern: RegExp): boolean {
@@ -101,23 +84,103 @@ function hasSection(content: string, pattern: RegExp): boolean {
 
 // Check for icon presence with section
 function hasSectionIcon(content: string, sectionPattern: RegExp, iconPattern: RegExp): boolean {
-  // Find the section and check if icon is nearby
   const match = content.match(sectionPattern);
   if (!match) return true; // Section doesn't exist, so icon issue doesn't apply
-  
-  // Check if icon exists anywhere in content (simplified check)
   return iconPattern.test(content);
 }
 
 // Check for single-quote HTML attributes
 function hasSingleQuoteAttributes(content: string): boolean {
-  // Match class=' or id=' or other common attributes with single quotes
   return /\s(?:class|id|style|data-\w+)='[^']*'/i.test(content);
 }
 
 // Check for leading empty paragraphs
 function hasLeadingEmptyParagraphs(content: string): boolean {
   return /^(?:\s*<p[^>]*>\s*<\/p>\s*)+<p/.test(content);
+}
+
+// NEW: Check for blank paragraph immediately after section header
+function hasBlankAfterSectionTitle(content: string): boolean {
+  for (const icon of SECTION_ICONS) {
+    // Pattern: section header followed by empty paragraph
+    const pattern = new RegExp(
+      `<p[^>]*>${icon}[^<]*(?:<[^>]*>[^<]*)*<\\/p>\\s*<p[^>]*>\\s*<\\/p>`,
+      'i'
+    );
+    if (pattern.test(content)) return true;
+  }
+  return false;
+}
+
+// NEW: Check for missing separator between sections
+function hasMissingSectionSeparator(content: string): boolean {
+  for (const icon of SECTION_ICONS) {
+    // Pattern: content (not empty p) immediately followed by section header
+    const pattern = new RegExp(
+      `</(?:ul|li)>\\s*<p[^>]*>${icon}`,
+      'i'
+    );
+    if (pattern.test(content)) return true;
+  }
+  return false;
+}
+
+// NEW: Check for multiple separators between sections
+function hasMultipleSectionSeparators(content: string): boolean {
+  for (const icon of SECTION_ICONS) {
+    // Pattern: two or more empty paragraphs before section header
+    const pattern = new RegExp(
+      `(<p[^>]*>\\s*<\\/p>\\s*){2,}<p[^>]*>${icon}`,
+      'i'
+    );
+    if (pattern.test(content)) return true;
+  }
+  return false;
+}
+
+// NEW: Check for exercise paragraphs outside bullet lists
+function hasExercisesOutsideLists(content: string): boolean {
+  if (!content) return false;
+  
+  // If content has section icons, check for plain paragraphs between sections
+  // that look like exercises (not empty, not headers)
+  for (const icon of SECTION_ICONS) {
+    if (!content.includes(icon)) continue;
+    
+    // Find paragraphs between section headers that aren't in lists
+    const exercisePattern = /<p class="tiptap-paragraph">(?!<strong>)[A-Z][^<]{10,}<\/p>/;
+    const afterSectionPattern = new RegExp(
+      `<p[^>]*>${icon}[^<]*<\\/p>\\s*<p class="tiptap-paragraph">(?!<strong>)[A-Z]`,
+      'i'
+    );
+    
+    if (afterSectionPattern.test(content)) return true;
+  }
+  
+  return false;
+}
+
+// Detect if content has proper bullet lists for exercises
+function hasBulletListIssues(content: string): boolean {
+  if (!content) return false;
+  
+  // Numbered lists like "1. Exercise"
+  const numberedPattern = /(?:^|\n|<br\s*\/?>)\s*\d+\.\s*[A-Z][a-z]/;
+  
+  // Lines starting with "• " or "- " inside paragraphs
+  const inlineBulletPattern = /<p[^>]*>(?:•|-)\s+[A-Za-z]/;
+  
+  // Check if content has <ul> at all
+  const hasUl = /<ul[^>]*>/.test(content);
+  
+  // Exercise sequences without <ul>
+  const exerciseSequencePattern = /<p[^>]*>[A-Z][a-z]+(?:\s+[A-Za-z]+){0,4}(?:\s*-\s*\d+\s*(?:reps?|sets?|min|sec))?<\/p>\s*<p[^>]*>[A-Z][a-z]+/;
+  
+  if (!hasUl && exerciseSequencePattern.test(content)) {
+    return true;
+  }
+  
+  return numberedPattern.test(content) || inlineBulletPattern.test(content);
 }
 
 function auditWorkout(workout: any): FormatIssue | null {
@@ -165,6 +228,20 @@ function auditWorkout(workout: any): FormatIssue | null {
     issues.push('Leading empty paragraphs');
   }
   
+  // NEW: Gold Standard V3 spacing checks
+  if (hasBlankAfterSectionTitle(content)) {
+    issues.push('Blank line after section title');
+  }
+  if (hasMissingSectionSeparator(content)) {
+    issues.push('Missing separator between sections');
+  }
+  if (hasMultipleSectionSeparators(content)) {
+    issues.push('Multiple separators between sections');
+  }
+  if (hasExercisesOutsideLists(content)) {
+    issues.push('Exercises outside bullet lists');
+  }
+  
   if (issues.length === 0) return null;
   
   return {
@@ -180,16 +257,20 @@ function auditWorkout(workout: any): FormatIssue | null {
 function auditProgram(program: any): FormatIssue | null {
   const issues: string[] = [];
   
-  // Check weekly_schedule and program_structure for list issues
   const fieldsToCheck = [program.weekly_schedule, program.program_structure].filter(Boolean);
   
   for (const content of fieldsToCheck) {
     if (hasBulletListIssues(content)) {
       issues.push('Exercises not in proper bullet lists');
-      break;
     }
     if (hasSingleQuoteAttributes(content)) {
       issues.push('Single-quote HTML attributes');
+    }
+    if (hasBlankAfterSectionTitle(content)) {
+      issues.push('Blank line after section title');
+    }
+    if (hasMultipleSectionSeparators(content)) {
+      issues.push('Multiple separators between sections');
     }
   }
   
@@ -200,7 +281,7 @@ function auditProgram(program: any): FormatIssue | null {
     name: program.name,
     category: program.category,
     type: 'program',
-    issues: [...new Set(issues)], // Dedupe
+    issues: [...new Set(issues)],
     mainWorkoutExtract: (program.weekly_schedule || program.program_structure || '').substring(0, 300),
   };
 }
@@ -215,7 +296,7 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    console.log("[AUDIT] Starting content formatting audit...");
+    console.log("[AUDIT-V3] Starting content formatting audit...");
 
     // Fetch all workouts
     const { data: workouts, error: workoutsError } = await supabase
@@ -231,7 +312,7 @@ serve(async (req) => {
 
     if (programsError) throw programsError;
 
-    console.log(`[AUDIT] Scanning ${workouts?.length || 0} workouts and ${programs?.length || 0} programs`);
+    console.log(`[AUDIT-V3] Scanning ${workouts?.length || 0} workouts and ${programs?.length || 0} programs`);
 
     // Initialize counters
     const result: AuditResult = {
@@ -243,6 +324,10 @@ serve(async (req) => {
       exercisesNotInBulletLists: 0,
       singleQuoteAttributes: 0,
       leadingEmptyParagraphs: 0,
+      blankAfterSectionTitle: 0,
+      missingSectionSeparator: 0,
+      multipleSectionSeparators: 0,
+      exercisesOutsideLists: 0,
       totalIssues: 0,
       compliantItems: 0,
       topOffenders: [],
@@ -270,6 +355,12 @@ serve(async (req) => {
       if (hasSingleQuoteAttributes(content)) result.singleQuoteAttributes++;
       if (hasLeadingEmptyParagraphs(content)) result.leadingEmptyParagraphs++;
       
+      // NEW: Gold Standard V3 spacing counts
+      if (hasBlankAfterSectionTitle(content)) result.blankAfterSectionTitle++;
+      if (hasMissingSectionSeparator(content)) result.missingSectionSeparator++;
+      if (hasMultipleSectionSeparators(content)) result.multipleSectionSeparators++;
+      if (hasExercisesOutsideLists(content)) result.exercisesOutsideLists++;
+      
       const issue = auditWorkout(workout);
       if (issue) {
         allIssues.push(issue);
@@ -295,14 +386,15 @@ serve(async (req) => {
       .sort((a, b) => b.issues.length - a.issues.length)
       .slice(0, 20);
 
-    console.log(`[AUDIT] Complete. Found ${result.totalIssues} items with issues, ${result.compliantItems} compliant`);
+    console.log(`[AUDIT-V3] Complete. Found ${result.totalIssues} items with issues, ${result.compliantItems} compliant`);
+    console.log(`[AUDIT-V3] Spacing issues: blankAfterHeader=${result.blankAfterSectionTitle}, missingSeparator=${result.missingSectionSeparator}, multipleSeparators=${result.multipleSectionSeparators}`);
 
     return new Response(JSON.stringify(result), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
   } catch (error) {
-    console.error("[AUDIT] Error:", error);
+    console.error("[AUDIT-V3] Error:", error);
     const errorMessage = error instanceof Error ? error.message : String(error);
     return new Response(JSON.stringify({ error: errorMessage }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

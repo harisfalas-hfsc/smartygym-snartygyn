@@ -127,48 +127,83 @@ All colors MUST be HSL.
   }
 
   /* ═══════════════════════════════════════════════════════════════════════════════
-   * WORKOUT CONTENT - Compact formatting matching Gold Standard template
-   * NO extra spacing between exercises, only between sections
+   * WORKOUT CONTENT - Gold Standard V3 Compact Formatting
+   * Rules:
+   * 1. NO spacing between exercises (bullets)
+   * 2. Exactly ONE blank line between sections (via empty paragraph)
+   * 3. NO blank line after section headers
    * ═══════════════════════════════════════════════════════════════════════════════ */
   .workout-content {
     line-height: 1.6;
   }
   
-  .workout-content p {
-    margin: 0;
+  /* Force zero margin on ALL paragraphs inside workout content */
+  .workout-content p,
+  .workout-content .prose p,
+  .workout-content .prose-sm p,
+  .workout-content .prose-invert p,
+  .workout-content .text-display p {
+    margin: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
   }
   
-  .workout-content ul {
-    margin: 0;
+  /* Force zero margin on ALL lists inside workout content */
+  .workout-content ul,
+  .workout-content ol,
+  .workout-content .prose ul,
+  .workout-content .prose-sm ul,
+  .workout-content .prose-invert ul,
+  .workout-content .text-display ul {
+    margin: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
     padding-left: 1.25rem;
     list-style-type: disc;
   }
   
-  .workout-content li {
-    margin: 0;
+  /* Force zero margin on ALL list items inside workout content */
+  .workout-content li,
+  .workout-content .prose li,
+  .workout-content .prose-sm li,
+  .workout-content .prose-invert li,
+  .workout-content .text-display li {
+    margin: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
     padding: 0;
   }
   
   .workout-content li p {
-    margin: 0;
+    margin: 0 !important;
   }
   
-  /* Section separators - empty paragraphs between major sections */
-  .workout-content p.tiptap-paragraph:empty {
-    height: 0.75rem;
-    min-height: 0.75rem;
+  /* Section separators - empty paragraphs between major sections ONLY */
+  .workout-content p.tiptap-paragraph:empty,
+  .workout-content .prose p.tiptap-paragraph:empty,
+  .workout-content .text-display p.tiptap-paragraph:empty {
+    height: 0.75rem !important;
+    min-height: 0.75rem !important;
+    margin: 0 !important;
   }
   
-  /* Ensure bullet points are visible */
-  .workout-content .tiptap-bullet-list {
+  /* TipTap-specific classes with forced zero margin */
+  .workout-content .tiptap-bullet-list,
+  .workout-content ul.tiptap-bullet-list {
     list-style-type: disc;
     padding-left: 1.25rem;
-    margin: 0;
+    margin: 0 !important;
   }
   
-  .workout-content .tiptap-list-item {
+  .workout-content .tiptap-list-item,
+  .workout-content li.tiptap-list-item {
     display: list-item;
-    margin: 0;
+    margin: 0 !important;
+  }
+  
+  .workout-content .tiptap-list-item p,
+  .workout-content li.tiptap-list-item p {
+    margin: 0 !important;
   }
 
   .gradient-primary {
