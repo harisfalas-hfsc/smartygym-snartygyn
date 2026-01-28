@@ -398,9 +398,9 @@ export const WorkoutDisplay = ({
 
 
       {/* CONTENT SECTIONS - Display exactly as written, no automatic headers */}
-      <div className="space-y-6 mt-8">
+      <div className="mt-8">
         
-        {/* WORKOUT CONTENT - All workout fields displayed without automatic headers */}
+        {/* WORKOUT CONTENT - All workout fields displayed as single combined block */}
         {(activation || warm_up || main_workout || finisher || cool_down) && (
           <Card className="border-2 border-primary/30">
             <CardHeader className="bg-primary/5">
@@ -410,22 +410,18 @@ export const WorkoutDisplay = ({
             </CardHeader>
             <CardContent className="content-container pt-6">
               <A4Container>
-                <div className="space-y-6">
-                  {activation && (
-                    <ExerciseHTMLContent content={activation} className="text-base" enableExerciseLinking={false} />
-                  )}
-                  {warm_up && (
-                    <ExerciseHTMLContent content={warm_up} className="text-base" enableExerciseLinking={false} />
-                  )}
-                  {main_workout && (
-                    <ExerciseHTMLContent content={main_workout} className="text-base" enableExerciseLinking={false} />
-                  )}
-                  {finisher && (
-                    <ExerciseHTMLContent content={finisher} className="text-base" enableExerciseLinking={false} />
-                  )}
-                  {cool_down && (
-                    <ExerciseHTMLContent content={cool_down} className="text-base" enableExerciseLinking={false} />
-                  )}
+                <div className="workout-content">
+                  <ExerciseHTMLContent 
+                    content={[
+                      activation,
+                      warm_up,
+                      main_workout,
+                      finisher,
+                      cool_down
+                    ].filter(Boolean).join('<p class="tiptap-paragraph"></p>')} 
+                    className="text-base" 
+                    enableExerciseLinking={false} 
+                  />
                 </div>
               </A4Container>
             </CardContent>

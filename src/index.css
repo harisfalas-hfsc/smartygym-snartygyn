@@ -126,6 +126,51 @@ All colors MUST be HSL.
     display: block;
   }
 
+  /* ═══════════════════════════════════════════════════════════════════════════════
+   * WORKOUT CONTENT - Compact formatting matching Gold Standard template
+   * NO extra spacing between exercises, only between sections
+   * ═══════════════════════════════════════════════════════════════════════════════ */
+  .workout-content {
+    line-height: 1.6;
+  }
+  
+  .workout-content p {
+    margin: 0;
+  }
+  
+  .workout-content ul {
+    margin: 0;
+    padding-left: 1.25rem;
+    list-style-type: disc;
+  }
+  
+  .workout-content li {
+    margin: 0;
+    padding: 0;
+  }
+  
+  .workout-content li p {
+    margin: 0;
+  }
+  
+  /* Section separators - empty paragraphs between major sections */
+  .workout-content p.tiptap-paragraph:empty {
+    height: 0.75rem;
+    min-height: 0.75rem;
+  }
+  
+  /* Ensure bullet points are visible */
+  .workout-content .tiptap-bullet-list {
+    list-style-type: disc;
+    padding-left: 1.25rem;
+    margin: 0;
+  }
+  
+  .workout-content .tiptap-list-item {
+    display: list-item;
+    margin: 0;
+  }
+
   .gradient-primary {
     background: var(--gradient-primary);
   }
