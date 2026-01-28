@@ -1379,8 +1379,9 @@ RESPONSE FORMAT (JSON ONLY - NO MARKDOWN):
 
 CRITICAL HTML FORMATTING RULES (FOLLOW EXACTLY - THIS IS NON-NEGOTIABLE):
 
-1. SECTION TITLES: Bold + Underlined with duration in title
-   Format: <p class="tiptap-paragraph"><strong><u>Warm Up 15'</u></strong></p>
+1. SECTION TITLES: Icon + Bold + Underlined with duration in title
+   Format: <p class="tiptap-paragraph">🔥 <strong><u>Warm Up 15'</u></strong></p>
+   Icons: 🔥 for Warm Up/Activation, 💪 for Main Workout, ⚡ for Finisher, 🧘 for Cool Down
    
 2. EXERCISE LISTS: MUST use bullet lists, NOT numbered lists or <br> separators
    Format:
@@ -1401,31 +1402,38 @@ CRITICAL HTML FORMATTING RULES (FOLLOW EXACTLY - THIS IS NON-NEGOTIABLE):
 6. FOUR SECTIONS REQUIRED in main_workout: Warm Up, Main Workout, Finisher, Cool Down
 
 GOLD STANDARD TEMPLATE (FOLLOW THIS EXACTLY):
-<p class="tiptap-paragraph"><strong><u>Warm Up 15'</u></strong></p>
+<p class="tiptap-paragraph">🔥 <strong><u>Warm Up 15'</u></strong></p>
 <ul class="tiptap-bullet-list">
 <li class="tiptap-list-item"><p class="tiptap-paragraph">Run 5 minutes</p></li>
 <li class="tiptap-list-item"><p class="tiptap-paragraph">Jumping Rope 5 Minutes</p></li>
 <li class="tiptap-list-item"><p class="tiptap-paragraph">Hip Circles - Arm Circles 5 minutes</p></li>
 </ul>
 <p class="tiptap-paragraph"></p>
-<p class="tiptap-paragraph"><strong><u>Main Workout</u></strong></p>
+<p class="tiptap-paragraph">💪 <strong><u>Main Workout</u></strong></p>
 <p class="tiptap-paragraph"></p>
 <ul class="tiptap-bullet-list">
 <li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>8 Rounds of:</strong></p></li>
 </ul>
 <p class="tiptap-paragraph">12 Goblet Squats - 12 Upright Row - 24 Jump Squats</p>
 <p class="tiptap-paragraph"></p>
-<p class="tiptap-paragraph"><strong><u>Finisher</u></strong></p>
+<p class="tiptap-paragraph">⚡ <strong><u>Finisher</u></strong></p>
 <p class="tiptap-paragraph"></p>
 <ul class="tiptap-bullet-list">
 <li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Tabata:</strong></p></li>
 </ul>
 <p class="tiptap-paragraph">Burpees - 20 sec work / 10 sec rest x 8 rounds</p>
 <p class="tiptap-paragraph"></p>
-<p class="tiptap-paragraph"><strong><u>Cool Down:</u></strong></p>
+<p class="tiptap-paragraph">🧘 <strong><u>Cool Down:</u></strong></p>
 <ul class="tiptap-bullet-list">
 <li class="tiptap-list-item"><p class="tiptap-paragraph">Foam Rolling & Stretching</p></li>
 </ul>
+
+SECTION ICON RULES (MANDATORY):
+- 🔥 for Warm Up, Activation, Soft Tissue Prep sections
+- 💪 for Main Workout section
+- ⚡ for Finisher section
+- 🧘 for Cool Down section
+Icons go BEFORE the <strong><u>Section Title</u></strong> with a space after the emoji.
 
 TIPS FORMAT: Separate paragraphs OR single paragraph with <br> line breaks
 <p class="tiptap-paragraph">Pace yourself early. Five minutes is longer than it sounds.</p>

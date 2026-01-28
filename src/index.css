@@ -820,6 +820,40 @@ All colors MUST be HSL.
   }
 }
 
+/* Tiptap bullet list styling for public workout display */
+.prose ul.tiptap-bullet-list,
+.prose-sm ul.tiptap-bullet-list,
+.text-display ul.tiptap-bullet-list,
+ul.tiptap-bullet-list {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin: 0.5rem 0;
+}
+
+.prose li.tiptap-list-item,
+.prose-sm li.tiptap-list-item,
+.text-display li.tiptap-list-item,
+li.tiptap-list-item {
+  margin: 0.25rem 0;
+  display: list-item;
+}
+
+.prose li.tiptap-list-item p,
+.prose-sm li.tiptap-list-item p,
+.text-display li.tiptap-list-item p,
+li.tiptap-list-item p {
+  margin: 0;
+  display: inline;
+}
+
+/* Nested bullet lists for sub-items */
+.prose ul.tiptap-bullet-list ul.tiptap-bullet-list,
+.text-display ul.tiptap-bullet-list ul.tiptap-bullet-list {
+  list-style-type: circle;
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
 /* Global smooth scrolling */
 html,
 body,
