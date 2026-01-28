@@ -186,9 +186,19 @@ The exercise banks above are GUIDELINES and EXAMPLES. You should:
 1. NO WORKOUT TITLE - Users already know which workout they're viewing. Start directly with content.
 
 2. SECTION TITLES (Warm-Up, Main Workout, Cool-Down, Notes):
-   <p class="tiptap-paragraph"><strong><u>Section Title (X minutes)</u></strong></p>
+   <p class="tiptap-paragraph">🔥 <strong><u>Warm-Up (X minutes)</u></strong></p>
+   <p class="tiptap-paragraph">💪 <strong><u>Main Workout</u></strong></p>
+   <p class="tiptap-paragraph">⚡ <strong><u>Finisher</u></strong></p>
+   <p class="tiptap-paragraph">🧘 <strong><u>Cool-Down (X minutes)</u></strong></p>
    <p class="tiptap-paragraph"></p>
    [Content starts immediately after ONE empty line]
+   
+   SECTION ICON RULES (MANDATORY):
+   - 🔥 for Warm Up, Activation, Soft Tissue Prep sections
+   - 💪 for Main Workout section
+   - ⚡ for Finisher section
+   - 🧘 for Cool Down section
+   Icons go BEFORE the <strong><u>Section Title</u></strong> with a space after the emoji.
 
 3. SUB-HEADERS (Block 1, Block 2, Circuit, Round, etc.):
    <p class="tiptap-paragraph"></p>
