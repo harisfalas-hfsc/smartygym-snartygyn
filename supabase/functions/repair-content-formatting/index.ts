@@ -264,41 +264,31 @@ function enforceSectionSeparators(content: string): { content: string; sectionSe
   let sectionSeparatorsFixed = 0;
   let result = content;
   
+  // STEP 1: Collapse ALL consecutive empty paragraphs to exactly one (anywhere in the document)
+  // This is the most important fix - catches the MULTIPLE_SEPARATORS issue
+  const consecutiveEmptyPattern = /(<p[^>]*>\s*<\/p>\s*){2,}/gi;
+  result = result.replace(consecutiveEmptyPattern, () => {
+    sectionSeparatorsFixed++;
+    return CANONICAL_EMPTY_P;
+  });
+  
+  // STEP 2: For section headers, ensure there's exactly one empty paragraph before (not after the first)
   for (const icon of SECTION_ICONS) {
-    // Pattern: content followed by section header without separator
-    // We need exactly one empty paragraph before each section header (except the first)
-    
-    // First, remove multiple consecutive empty paragraphs between sections
-    const multiEmptyPattern = new RegExp(
-      `(</(?:ul|p)>)` + // End of previous block
-      `(\\s*<p[^>]*>\\s*<\\/p>){2,}` + // Two or more empty paragraphs
-      `(\\s*<p[^>]*>${icon})`, // Section header with icon
-      'gi'
-    );
-    
-    result = result.replace(multiEmptyPattern, (_, endTag, _empties, headerStart) => {
-      sectionSeparatorsFixed++;
-      return `${endTag}${CANONICAL_EMPTY_P}${headerStart}`;
-    });
-    
-    // Then, add missing separator before section headers
+    // Add missing separator before section headers (if not the first element)
     const missingSeparatorPattern = new RegExp(
-      `(</(?:ul|li|p)>)` + // End of previous block (not empty)
+      `(</(?:ul|li)>)` + // End of list (not paragraph - those already have separators)
       `(?!\\s*<p[^>]*>\\s*<\\/p>)` + // NOT followed by empty paragraph
-      `(\\s*<p[^>]*>${icon})`, // Directly followed by section header
+      `(\\s*<p[^>]*>[^<]*${icon})`, // Directly followed by section header
       'gi'
     );
     
     result = result.replace(missingSeparatorPattern, (_, endTag, headerStart) => {
-      // Check if the endTag is from a section header (we don't want separator after headers)
-      // This is handled by removeBlankAfterHeaders already
       sectionSeparatorsFixed++;
       return `${endTag}${CANONICAL_EMPTY_P}${headerStart}`;
     });
   }
   
-  // Don't add separator before the FIRST section header
-  // Remove leading separator if present
+  // STEP 3: Remove separator before the FIRST section header (start of document)
   result = result.replace(/^<p class="tiptap-paragraph"><\/p>/, '');
   
   return { content: result, sectionSeparatorsFixed };
@@ -420,7 +410,13 @@ function repairContent(content: string): {
   }
   
   // Final cleanup: remove any doubled-up empty paragraphs that may have been created
-  result = result.replace(new RegExp(`(${CANONICAL_EMPTY_P}\\s*){2,}`, 'gi'), CANONICAL_EMPTY_P);
+  // This is a literal string match, not regex - must properly match the actual content
+  let prevLength = 0;
+  while (result.length !== prevLength) {
+    prevLength = result.length;
+    // Replace two consecutive empty paragraphs with one
+    result = result.replace(/<p class="tiptap-paragraph"><\/p>\s*<p class="tiptap-paragraph"><\/p>/gi, CANONICAL_EMPTY_P);
+  }
   
   // Final: ensure proper TipTap classes again after all transformations
   const finalClassResult = addTipTapClasses(result);
