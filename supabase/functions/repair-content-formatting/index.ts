@@ -343,6 +343,8 @@ function repairContent(content: string): {
     quotesFixed: 0,
     blankAfterHeaderFixed: 0,
     sectionSeparatorsFixed: 0,
+    newlinesStripped: 0,
+    listsMerged: 0,
   };
   
   if (!content || !content.trim()) {
@@ -350,6 +352,27 @@ function repairContent(content: string): {
   }
   
   let result = content;
+  
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // STEP 0 (NEW): STRIP ALL NEWLINE CHARACTERS - This is the root cause of spacing issues
+  // The "Crucible Test" has 0 newlines, broken workouts have 20+ newlines
+  // ═══════════════════════════════════════════════════════════════════════════════
+  const originalNewlines = (result.match(/[\n\r]/g) || []).length;
+  result = result.replace(/[\n\r]+/g, ''); // Remove all newlines
+  result = result.replace(/\s{2,}/g, ' '); // Collapse multiple spaces to single
+  stats.newlinesStripped = originalNewlines;
+  
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // STEP 0.5 (NEW): MERGE CONSECUTIVE <ul> BLOCKS
+  // Some workouts have fragmented lists: </ul><ul> which should be one list
+  // ═══════════════════════════════════════════════════════════════════════════════
+  let mergeCount = 0;
+  // Merge consecutive lists (with or without empty paragraphs between them)
+  result = result.replace(/<\/ul>\s*(?:<p[^>]*>\s*<\/p>\s*)*<ul[^>]*>/gi, () => {
+    mergeCount++;
+    return ''; // Remove the boundary, merging lists
+  });
+  stats.listsMerged = mergeCount;
   
   // Step 1: Fix quote attributes
   const quoteResult = fixQuoteAttributes(result);
