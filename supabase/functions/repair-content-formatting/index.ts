@@ -20,8 +20,11 @@ interface RepairResult {
   timestamp: string;
 }
 
-// Categories that should NOT have sections injected (standalone formats)
-const STANDALONE_CATEGORIES = ['CHALLENGE'];
+// ═══════════════════════════════════════════════════════════════════════════════
+// GOLD STANDARD FORMAT REPAIR V2
+// Fixes: duplicate icons, excessive spacing, quote attributes
+// Does NOT inject sections - only cleans existing content
+// ═══════════════════════════════════════════════════════════════════════════════
 
 // Fix single-quote attributes to double quotes
 function fixQuoteAttributes(content: string): { content: string; quotesFixed: number } {
@@ -38,25 +41,116 @@ function fixQuoteAttributes(content: string): { content: string; quotesFixed: nu
   return { content: result, quotesFixed };
 }
 
-// Remove leading empty paragraphs
+// Remove leading empty paragraphs (content should start with actual content)
 function removeLeadingEmptyParagraphs(content: string): string {
   return content.replace(/^(?:\s*<p[^>]*>\s*<\/p>\s*)+/, '');
 }
 
-// Remove excessive consecutive empty paragraphs (keep max 1)
-function removeExcessiveEmptyParagraphs(content: string): { content: string; spacingFixed: number } {
+// Remove trailing empty paragraphs
+function removeTrailingEmptyParagraphs(content: string): string {
+  return content.replace(/(?:\s*<p[^>]*>\s*<\/p>\s*)+$/, '');
+}
+
+// Collapse excessive consecutive empty paragraphs to max 1
+function collapseExcessiveEmptyParagraphs(content: string): { content: string; spacingFixed: number } {
   let spacingFixed = 0;
   let result = content;
   
-  // Keep replacing double empty paragraphs with single until no more doubles exist
-  const pattern = /<p class="tiptap-paragraph"><\/p>\s*<p class="tiptap-paragraph"><\/p>/gi;
-  while (pattern.test(result)) {
-    result = result.replace(pattern, '<p class="tiptap-paragraph"></p>');
+  // Replace 2+ consecutive empty paragraphs with just one
+  const pattern = /(<p[^>]*>\s*<\/p>\s*){2,}/gi;
+  result = result.replace(pattern, (match) => {
     spacingFixed++;
-    pattern.lastIndex = 0; // Reset regex for next test
-  }
+    return '<p class="tiptap-paragraph"></p>';
+  });
   
   return { content: result, spacingFixed };
+}
+
+// Remove empty paragraphs between exercises within a section
+// Keep only empty paragraphs that appear after section headers (indicated by icons)
+function removeIntraSectionEmptyParagraphs(content: string): { content: string; spacingFixed: number } {
+  let spacingFixed = 0;
+  let result = content;
+  
+  // Remove empty paragraphs that appear between list items or between plain exercise lines
+  // Pattern: </li> followed by empty paragraph followed by <li>
+  result = result.replace(/<\/li>\s*<p class="tiptap-paragraph"><\/p>\s*<li/gi, () => {
+    spacingFixed++;
+    return '</li><li';
+  });
+  
+  // Pattern: </ul> followed by empty paragraph followed by <p> that doesn't have an icon
+  // (empty paragraphs after lists but before non-section-header paragraphs)
+  result = result.replace(/<\/ul>\s*<p class="tiptap-paragraph"><\/p>\s*<p class="tiptap-paragraph">(?![🔥💪⚡🧘])/gi, () => {
+    spacingFixed++;
+    return '</ul><p class="tiptap-paragraph">';
+  });
+  
+  return { content: result, spacingFixed };
+}
+
+// Fix duplicate icons - handles multiple patterns:
+// 1. 🔥 <strong>🔥 → 🔥 <strong>
+// 2. 🔥 <p><strong>🔥 → <p>🔥 <strong>
+// 3. 💪 <p class="tiptap-paragraph">🔥 → <p class="tiptap-paragraph">💪
+function fixDuplicateIcons(content: string): { content: string; iconsFixed: number } {
+  let iconsFixed = 0;
+  let result = content;
+  
+  const icons = ['🔥', '💪', '⚡', '🧘'];
+  
+  for (const icon of icons) {
+    // Pattern 1: icon directly before <strong> or <b> followed by same icon inside
+    // e.g., 🔥 <strong>🔥 → 🔥 <strong>
+    const p1 = new RegExp(`${icon}\\s*<(strong|b)>\\s*${icon}`, 'gi');
+    result = result.replace(p1, (match, tag) => {
+      iconsFixed++;
+      return `${icon} <${tag}>`;
+    });
+    
+    // Pattern 2: icon before paragraph tag, same icon inside paragraph
+    // e.g., 💪 <p class="tiptap-paragraph">💪 → <p class="tiptap-paragraph">💪
+    const p2 = new RegExp(`${icon}\\s*<p([^>]*)>\\s*${icon}`, 'gi');
+    result = result.replace(p2, (match, attrs) => {
+      iconsFixed++;
+      return `<p${attrs}>${icon}`;
+    });
+    
+    // Pattern 3: Stray icon outside paragraph followed by same icon inside
+    // e.g., 🔥 <p class="tiptap-paragraph"><strong><u>🔥 → <p class="tiptap-paragraph">🔥 <strong><u>
+    const p3 = new RegExp(`${icon}\\s*<p([^>]*)><(strong|b)><u>\\s*${icon}`, 'gi');
+    result = result.replace(p3, (match, pAttrs, tag) => {
+      iconsFixed++;
+      return `<p${pAttrs}>${icon} <${tag}><u>`;
+    });
+    
+    // Pattern 4: icon inside strong AND inside underline
+    // e.g., <strong><u>🔥 Warm → <strong>🔥 <u>Warm (but we want icon before strong)
+    // Actually for this pattern: ensure icon is before <strong><u>
+    const p4 = new RegExp(`<(strong|b)><u>\\s*${icon}`, 'gi');
+    result = result.replace(p4, (match, tag) => {
+      // Only fix if there's no icon already before the strong
+      return `${icon} <${tag}><u>`;
+    });
+    
+    // Pattern 5: Now clean up any double icons that might have been created
+    const p5 = new RegExp(`${icon}\\s*${icon}`, 'gi');
+    result = result.replace(p5, () => {
+      iconsFixed++;
+      return icon;
+    });
+  }
+  
+  // Clean up any stray icons that ended up outside paragraph tags at line start
+  for (const icon of icons) {
+    const strayPattern = new RegExp(`^${icon}\\s*(?=<p)`, 'gim');
+    result = result.replace(strayPattern, () => {
+      iconsFixed++;
+      return '';
+    });
+  }
+  
+  return { content: result, iconsFixed };
 }
 
 // Normalize lists - add TipTap classes to plain ul/li
@@ -84,32 +178,15 @@ function normalizeLists(content: string): { content: string; listsNormalized: nu
     return '<li class="tiptap-list-item"';
   });
   
+  // Add tiptap-paragraph class to <p> without it
+  result = result.replace(/<p(?![^>]*class)/gi, () => {
+    return '<p class="tiptap-paragraph"';
+  });
+  
   return { content: result, listsNormalized };
 }
 
-// Fix duplicate icons (icon outside AND inside tags)
-function fixDuplicateIcons(content: string): { content: string; iconsFixed: number } {
-  let iconsFixed = 0;
-  let result = content;
-  
-  const iconPatterns = [
-    { icon: '🔥', pattern: /🔥\s*<(strong|b)>\s*🔥/gi },
-    { icon: '💪', pattern: /💪\s*<(strong|b)>\s*💪/gi },
-    { icon: '⚡', pattern: /⚡\s*<(strong|b)>\s*⚡/gi },
-    { icon: '🧘', pattern: /🧘\s*<(strong|b)>\s*🧘/gi },
-  ];
-  
-  for (const { icon, pattern } of iconPatterns) {
-    result = result.replace(pattern, (match, tag) => {
-      iconsFixed++;
-      return `${icon} <${tag}>`;
-    });
-  }
-  
-  return { content: result, iconsFixed };
-}
-
-// Main repair function for a workout - DOES NOT inject sections
+// Main repair function for a workout - GOLD STANDARD V2
 function repairWorkout(workout: { id: string; name: string; main_workout: string | null; category?: string }): { 
   repaired: boolean; 
   newContent: string | null;
@@ -122,42 +199,41 @@ function repairWorkout(workout: { id: string; name: string; main_workout: string
     return { repaired: false, newContent: null, stats };
   }
   
-  let modified = false;
   const originalContent = content;
   
-  // 1. Fix quote attributes
+  // Step 1: Fix quote attributes (single quotes → double quotes)
   const quoteResult = fixQuoteAttributes(content);
-  if (quoteResult.quotesFixed > 0) {
-    content = quoteResult.content;
-    stats.quotesFixed = quoteResult.quotesFixed;
-  }
+  content = quoteResult.content;
+  stats.quotesFixed = quoteResult.quotesFixed;
   
-  // 2. Remove leading empty paragraphs
+  // Step 2: Fix duplicate icons FIRST (before any spacing changes)
+  const iconResult = fixDuplicateIcons(content);
+  content = iconResult.content;
+  stats.iconsFixed = iconResult.iconsFixed;
+  
+  // Step 3: Remove leading empty paragraphs
   content = removeLeadingEmptyParagraphs(content);
   
-  // 3. Fix duplicate icons
-  const iconResult = fixDuplicateIcons(content);
-  if (iconResult.iconsFixed > 0) {
-    content = iconResult.content;
-    stats.iconsFixed = iconResult.iconsFixed;
-  }
+  // Step 4: Remove trailing empty paragraphs
+  content = removeTrailingEmptyParagraphs(content);
   
-  // 4. Remove excessive empty paragraphs
-  const spacingResult = removeExcessiveEmptyParagraphs(content);
-  if (spacingResult.spacingFixed > 0) {
-    content = spacingResult.content;
-    stats.spacingFixed = spacingResult.spacingFixed;
-  }
+  // Step 5: Collapse excessive consecutive empty paragraphs
+  const spacingResult = collapseExcessiveEmptyParagraphs(content);
+  content = spacingResult.content;
+  stats.spacingFixed = spacingResult.spacingFixed;
   
-  // 5. Normalize lists (add TipTap classes)
+  // Step 6: Remove empty paragraphs between exercises within sections
+  const intraSectionResult = removeIntraSectionEmptyParagraphs(content);
+  content = intraSectionResult.content;
+  stats.spacingFixed += intraSectionResult.spacingFixed;
+  
+  // Step 7: Normalize lists (add TipTap classes)
   const listResult = normalizeLists(content);
-  if (listResult.listsNormalized > 0) {
-    content = listResult.content;
-    stats.listsNormalized = listResult.listsNormalized;
-  }
+  content = listResult.content;
+  stats.listsNormalized = listResult.listsNormalized;
   
   // Check if any actual changes were made
-  modified = content !== originalContent;
+  const modified = content !== originalContent;
   
   return {
     repaired: modified,
@@ -190,7 +266,7 @@ serve(async (req) => {
       // Use defaults
     }
 
-    console.log(`[REPAIR] Starting content repair. Batch: ${batchSize}, Offset: ${offset}, Target: ${targetId || 'all'}`);
+    console.log(`[REPAIR-V2] Starting content repair. Batch: ${batchSize}, Offset: ${offset}, Target: ${targetId || 'all'}`);
 
     const result: RepairResult = {
       totalProcessed: 0,
@@ -244,6 +320,8 @@ serve(async (req) => {
         result.skippedIds.push(targetId);
       }
 
+      console.log(`[REPAIR-V2] Single target complete`, result);
+
       return new Response(JSON.stringify(result), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
@@ -259,7 +337,7 @@ serve(async (req) => {
 
     if (workoutsError) throw workoutsError;
 
-    console.log(`[REPAIR] Processing ${workouts?.length || 0} workouts`);
+    console.log(`[REPAIR-V2] Processing ${workouts?.length || 0} workouts`);
 
     for (const workout of workouts || []) {
       result.totalProcessed++;
@@ -292,14 +370,19 @@ serve(async (req) => {
       }
     }
 
-    console.log(`[REPAIR] Complete. Repaired ${result.workoutsRepaired} workouts`);
+    console.log(`[REPAIR-V2] Complete. Repaired ${result.workoutsRepaired} workouts`, {
+      iconsFixed: result.iconsFixed,
+      spacingFixed: result.spacingFixed,
+      listsNormalized: result.listsNormalized,
+      quotesFixed: result.quotesFixed
+    });
 
     return new Response(JSON.stringify(result), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
   } catch (error) {
-    console.error("[REPAIR] Error:", error);
+    console.error("[REPAIR-V2] Error:", error);
     const errorMessage = error instanceof Error ? error.message : String(error);
     return new Response(JSON.stringify({ error: errorMessage }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
