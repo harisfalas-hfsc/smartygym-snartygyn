@@ -88,7 +88,22 @@ interface WorkoutDisplayProps {
   isFreeContent?: boolean;
 }
 
-export const WorkoutDisplay = ({ 
+/**
+ * Join workout sections with exactly ONE separator between them.
+ * Removes trailing/leading empty paragraphs from each section to prevent double spacing.
+ */
+function joinWorkoutSections(sections: (string | undefined | null)[]): string {
+  const EMPTY_P = '<p class="tiptap-paragraph"></p>';
+  const EMPTY_P_PATTERN = /^(?:\s*<p[^>]*>\s*<\/p>\s*)+|(?:\s*<p[^>]*>\s*<\/p>\s*)+$/gi;
+  
+  return sections
+    .filter((s): s is string => Boolean(s && s.trim()))
+    .map(section => section.replace(EMPTY_P_PATTERN, '').trim())
+    .filter(s => s.length > 0)
+    .join(EMPTY_P);
+}
+
+export const WorkoutDisplay = ({
   exercises, 
   planContent, 
   title = "Workout", 
@@ -412,13 +427,7 @@ export const WorkoutDisplay = ({
               <A4Container>
                 <div className="workout-content">
                   <ExerciseHTMLContent 
-                    content={[
-                      activation,
-                      warm_up,
-                      main_workout,
-                      finisher,
-                      cool_down
-                    ].filter(Boolean).join('<p class="tiptap-paragraph"></p>')} 
+                    content={joinWorkoutSections([activation, warm_up, main_workout, finisher, cool_down])} 
                     className="text-base" 
                     enableExerciseLinking={false} 
                   />
