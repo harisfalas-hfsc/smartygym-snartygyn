@@ -142,10 +142,11 @@ serve(async (req) => {
     let dashboardSent = false;
     let emailSent = false;
 
-    // Send dashboard message immediately
+    // Send dashboard message immediately using upsert to prevent duplicates
+    // The database has a unique index on (user_id, message_type) WHERE message_type = 'welcome'
     if (automationRule.sends_dashboard_message) {
-      logStep("Sending dashboard message");
-      const { error: msgError } = await supabaseAdmin
+      logStep("Sending dashboard message (with conflict handling)");
+      const { data: insertData, error: msgError } = await supabaseAdmin
         .from("user_system_messages")
         .insert({
           user_id: record.user_id,
@@ -153,13 +154,29 @@ serve(async (req) => {
           subject: template.subject,
           content: template.content,
           is_read: false,
-        });
+        })
+        .select('id')
+        .maybeSingle();
 
       if (msgError) {
+        // Check if it's a duplicate key error (race condition - another instance won)
+        if (msgError.code === '23505') {
+          logStep("Welcome message already exists (race condition prevented)", { userId: record.user_id });
+          return new Response(
+            JSON.stringify({ success: false, reason: "Welcome message already sent (concurrent request)" }),
+            { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
         logStep("Error inserting dashboard message", { error: msgError.message });
-      } else {
+      } else if (insertData) {
         dashboardSent = true;
         logStep("Dashboard message sent successfully");
+      } else {
+        logStep("No insert occurred (duplicate prevented)");
+        return new Response(
+          JSON.stringify({ success: false, reason: "Welcome message already sent" }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
       }
     }
 
@@ -195,9 +212,18 @@ serve(async (req) => {
                       <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="margin: 0 auto; background-color: #ffffff; border-radius: 8px;">
                         <tr>
                           <td style="padding: 32px;">
-                            <h1 style="color: #29B6D2; margin-bottom: 20px;">Welcome to SmartyGym</h1>
+                            <h1 style="color: #29B6D2; margin-bottom: 20px;">Welcome to SmartyGym! 🎉</h1>
                             <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Hi ${userName},</p>
-                            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">We're glad to have you join our community of fitness enthusiasts.</p>
+                            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">We're thrilled to have you join our community of fitness enthusiasts!</p>
+                            
+                            <div style="background-color: #FEE2E2; border: 2px solid #EF4444; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+                              <p style="font-size: 16px; font-weight: bold; color: #DC2626; margin: 0 0 8px 0;">⚠️ IMPORTANT: Complete Your Health Assessment</p>
+                              <p style="font-size: 14px; color: #7F1D1D; margin: 0 0 12px 0;">Before starting any workout, please complete the <strong>PAR-Q (Physical Activity Readiness Questionnaire)</strong> to ensure you can exercise safely. This is a <strong>mandatory</strong> health assessment that takes only 2 minutes.</p>
+                              <p style="margin: 0;">
+                                <a href="https://smartygym.com/disclaimer#parq" style="display: inline-block; background: #DC2626; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 14px;">👉 Complete Your PAR-Q Test Now</a>
+                              </p>
+                            </div>
+                            
                             <p style="font-size: 16px; line-height: 1.6; margin-bottom: 12px;"><strong>Here's what you can explore:</strong></p>
                             <ul style="font-size: 16px; line-height: 1.8; margin-bottom: 24px; padding-left: 20px;">
                               <li><strong>Browse 500+ Expert Workouts</strong> – From strength to cardio, we have everything</li>
@@ -205,11 +231,11 @@ serve(async (req) => {
                               <li><strong>Track Your Progress</strong> – Save favorites, mark completed workouts</li>
                               <li><strong>Get Daily Workout of the Day</strong> – Fresh workout every morning at 7:00 AM</li>
                             </ul>
-                            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">Ready to start your fitness journey?</p>
+                            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">Ready to start your fitness journey safely?</p>
                             <p style="margin-top: 24px;">
                               <a href="https://smartygym.com/userdashboard" style="display: inline-block; background: #29B6D2; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Go to Your Dashboard</a>
                             </p>
-                            <p style="font-size: 16px; line-height: 1.6; margin-top: 24px;">Let's make every workout count.</p>
+                            <p style="font-size: 16px; line-height: 1.6; margin-top: 24px;">Let's make every workout count! 💪</p>
                             <p style="font-size: 16px; font-weight: bold; margin-top: 20px;">– The SmartyGym Team</p>
                             ${footer}
                           </td>
