@@ -1384,11 +1384,11 @@ CRITICAL HTML FORMATTING RULES (FOLLOW EXACTLY - THIS IS NON-NEGOTIABLE):
    Icons: 🔥 Warm Up, 💪 Main Workout, ⚡ Finisher, 🧘 Cool Down
    ONLY ONE ICON PER SECTION - Never duplicate icons!
    
-2. EXERCISE LINES: Plain text paragraphs (NOT bullet lists) for most exercises
-   Format: <p class="tiptap-paragraph">5 minutes on Assault Bike (moderate pace)</p>
+2. EXERCISE LINES: Use BULLET LISTS for exercises
+   Format: <ul class="tiptap-bullet-list"><li class="tiptap-list-item"><p class="tiptap-paragraph">Exercise name</p></li></ul>
    
-3. TIMING LABELS: Bold for minute/round indicators
-   Format: <p class="tiptap-paragraph"><strong>Minute 1:</strong> 15 Kettlebell Swings (moderate weight)</p>
+3. TIMING LABELS: Bold for minute/round indicators within list items
+   Format: <li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Minute 1:</strong> 15 Kettlebell Swings</p></li>
 
 4. SECTION SEPARATORS: ONE empty paragraph between major sections ONLY
    Format: <p class="tiptap-paragraph"></p>
@@ -1396,26 +1396,32 @@ CRITICAL HTML FORMATTING RULES (FOLLOW EXACTLY - THIS IS NON-NEGOTIABLE):
 
 5. FOUR SECTIONS REQUIRED: Warm Up, Main Workout, Finisher, Cool Down
 
-GOLD STANDARD TEMPLATE (YOUR REFERENCE IMAGE - FOLLOW EXACTLY):
+GOLD STANDARD TEMPLATE (FOLLOW EXACTLY):
 <p class="tiptap-paragraph">🔥 <strong><u>Warm Up 10'</u></strong></p>
-<p class="tiptap-paragraph">5 minutes on Assault Bike (moderate pace)</p>
-<p class="tiptap-paragraph">2 rounds of: 10 Air Squats, 8 Push-ups, 6 Lunges (each leg)</p>
+<ul class="tiptap-bullet-list">
+<li class="tiptap-list-item"><p class="tiptap-paragraph">5 minutes on Assault Bike (moderate pace)</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph">2 rounds of: 10 Air Squats, 8 Push-ups, 6 Lunges (each leg)</p></li>
+</ul>
 <p class="tiptap-paragraph"></p>
 <p class="tiptap-paragraph">💪 <strong><u>Main Workout: The Grind (20-minute EMOM)</u></strong></p>
-<p class="tiptap-paragraph"></p>
-<p class="tiptap-paragraph"><strong>Minute 1:</strong> 15 Kettlebell Swings (moderate weight)</p>
-<p class="tiptap-paragraph"><strong>Minute 2:</strong> 12 Box Jumps (20-24 inch box)</p>
-<p class="tiptap-paragraph"><strong>Minute 3:</strong> 10 Goblet Squats (moderate weight)</p>
-<p class="tiptap-paragraph"><strong>Minute 4:</strong> 10 Burpees</p>
-<p class="tiptap-paragraph">Repeat this 4-minute sequence for a total of 5 rounds.</p>
+<ul class="tiptap-bullet-list">
+<li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Minute 1:</strong> 15 Kettlebell Swings (moderate weight)</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Minute 2:</strong> 12 Box Jumps (20-24 inch box)</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Minute 3:</strong> 10 Goblet Squats (moderate weight)</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Minute 4:</strong> 10 Burpees</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph">Repeat this 4-minute sequence for a total of 5 rounds.</p></li>
+</ul>
 <p class="tiptap-paragraph"></p>
 <p class="tiptap-paragraph">⚡ <strong><u>Finisher: Calorie Reactor (5-minute AMRAP)</u></strong></p>
-<p class="tiptap-paragraph"></p>
-<p class="tiptap-paragraph">Max Calories on Ski Erg or Rower (continuous effort for 5 minutes)</p>
+<ul class="tiptap-bullet-list">
+<li class="tiptap-list-item"><p class="tiptap-paragraph">Max Calories on Ski Erg or Rower (continuous effort for 5 minutes)</p></li>
+</ul>
 <p class="tiptap-paragraph"></p>
 <p class="tiptap-paragraph">🧘 <strong><u>Cool Down 5'</u></strong></p>
-<p class="tiptap-paragraph">2 minutes light jogging</p>
-<p class="tiptap-paragraph">Static stretching for hamstrings, quads, and chest.</p>
+<ul class="tiptap-bullet-list">
+<li class="tiptap-list-item"><p class="tiptap-paragraph">2 minutes light jogging</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph">Static stretching for hamstrings, quads, and chest.</p></li>
+</ul>
 
 SECTION ICON RULES (MANDATORY):
 - 🔥 for Warm Up (ONLY ONE - never duplicate)
@@ -1425,14 +1431,14 @@ SECTION ICON RULES (MANDATORY):
 Icons go BEFORE <strong><u>Section Title</u></strong> with a space after the emoji.
 
 COMPACT SPACING RULES:
-- NO empty paragraphs between exercise lines within a section
+- NO empty paragraphs between exercises within a section
 - ONE empty paragraph between sections only
 - NO leading empty paragraphs at the start
 
 {
   "name": "Creative, motivating workout name (2-4 words, unique)",
   "description": "2-3 sentence HTML description with <p class='tiptap-paragraph'> tags",
-  "main_workout": "MUST follow the gold standard template - plain text exercises, single icons, compact spacing",
+  "main_workout": "MUST follow the gold standard template - bullet lists for exercises, single icons, compact spacing",
   "instructions": "Step-by-step guidance in <p class='tiptap-paragraph'> tags",
   "tips": "2-4 coaching tips as separate paragraphs"
 }`;

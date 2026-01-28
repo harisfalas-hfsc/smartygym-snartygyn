@@ -186,7 +186,81 @@ function normalizeLists(content: string): { content: string; listsNormalized: nu
   return { content: result, listsNormalized };
 }
 
-// Main repair function for a workout - GOLD STANDARD V2
+// Convert plain paragraph exercises to bullet list format
+// This identifies exercise lines (lines that contain exercise descriptions) and wraps them in ul/li
+function convertExercisesToBulletLists(content: string): { content: string; listsCreated: number } {
+  let listsCreated = 0;
+  
+  // Don't convert if already has bullet lists
+  if (content.includes('<ul') && content.includes('<li')) {
+    return { content, listsCreated: 0 };
+  }
+  
+  // Split content into lines
+  const lines = content.split(/(<p[^>]*>.*?<\/p>)/gi).filter(Boolean);
+  const result: string[] = [];
+  let inExerciseBlock = false;
+  let exerciseLines: string[] = [];
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+    
+    // Check if this is a section header (has icon or is a bold header)
+    const isSectionHeader = /^<p[^>]*>(?:🔥|💪|⚡|🧘|<strong>)/.test(line);
+    const isEmpty = /<p[^>]*>\s*<\/p>/.test(line);
+    
+    // Check if this is an exercise line (plain paragraph with exercise content)
+    const isExerciseLine = /<p class="tiptap-paragraph">([^<]+)<\/p>/.test(line) && 
+                           !isSectionHeader && 
+                           !isEmpty &&
+                           !/<strong>.*?:.*?<\/strong>/.test(line); // Not a round/minute header
+    
+    if (isExerciseLine && !inExerciseBlock) {
+      // Start collecting exercise lines
+      inExerciseBlock = true;
+      exerciseLines = [line];
+    } else if (isExerciseLine && inExerciseBlock) {
+      // Continue collecting
+      exerciseLines.push(line);
+    } else {
+      // Not an exercise line - flush collected exercises as bullet list
+      if (exerciseLines.length > 0) {
+        listsCreated++;
+        const listItems = exerciseLines.map(ex => {
+          const match = ex.match(/<p class="tiptap-paragraph">([^<]+)<\/p>/i);
+          if (match) {
+            return `<li class="tiptap-list-item"><p class="tiptap-paragraph">${match[1].trim()}</p></li>`;
+          }
+          return '';
+        }).filter(Boolean).join('\n');
+        
+        result.push(`<ul class="tiptap-bullet-list">\n${listItems}\n</ul>`);
+        exerciseLines = [];
+        inExerciseBlock = false;
+      }
+      result.push(line);
+    }
+  }
+  
+  // Flush any remaining exercises
+  if (exerciseLines.length > 0) {
+    listsCreated++;
+    const listItems = exerciseLines.map(ex => {
+      const match = ex.match(/<p class="tiptap-paragraph">([^<]+)<\/p>/i);
+      if (match) {
+        return `<li class="tiptap-list-item"><p class="tiptap-paragraph">${match[1].trim()}</p></li>`;
+      }
+      return '';
+    }).filter(Boolean).join('\n');
+    
+    result.push(`<ul class="tiptap-bullet-list">\n${listItems}\n</ul>`);
+  }
+  
+  return { content: result.join('\n'), listsCreated };
+}
+
+// Main repair function for a workout - GOLD STANDARD V2 WITH BULLETS
 function repairWorkout(workout: { id: string; name: string; main_workout: string | null; category?: string }): { 
   repaired: boolean; 
   newContent: string | null;
@@ -227,10 +301,15 @@ function repairWorkout(workout: { id: string; name: string; main_workout: string
   content = intraSectionResult.content;
   stats.spacingFixed += intraSectionResult.spacingFixed;
   
-  // Step 7: Normalize lists (add TipTap classes)
+  // Step 7: Convert plain paragraph exercises to bullet lists
+  const bulletResult = convertExercisesToBulletLists(content);
+  content = bulletResult.content;
+  stats.listsNormalized += bulletResult.listsCreated;
+  
+  // Step 8: Normalize lists (add TipTap classes to any remaining plain lists)
   const listResult = normalizeLists(content);
   content = listResult.content;
-  stats.listsNormalized = listResult.listsNormalized;
+  stats.listsNormalized += listResult.listsNormalized;
   
   // Check if any actual changes were made
   const modified = content !== originalContent;
