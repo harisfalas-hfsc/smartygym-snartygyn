@@ -36,12 +36,12 @@ const Disclaimer = () => {
             { label: "Disclaimer" }
           ]} />
 
-          <div className="flex items-center gap-3 mb-8">
-            <AlertTriangle className="h-10 w-10 text-primary" />
-            <h1 className="text-4xl font-bold">Disclaimer - SmartyGym.com</h1>
+          <div className="flex items-center gap-2 sm:gap-3 mb-6 sm:mb-8">
+            <AlertTriangle className="h-8 w-8 sm:h-10 sm:w-10 text-primary flex-shrink-0" />
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight">Disclaimer - SmartyGym.com</h1>
           </div>
 
-          <Card className="p-8 space-y-8">
+          <Card className="p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8">
             <div className="prose dark:prose-invert max-w-none">
               <div className="bg-destructive/10 border-2 border-destructive/30 p-6 rounded-lg mb-6">
                 <p className="text-base font-bold text-destructive mb-3">
@@ -250,8 +250,8 @@ const Disclaimer = () => {
           </Card>
 
           {/* PAR-Q+ Questionnaire */}
-          <div className="mt-8">
-            <h2 className="text-3xl font-bold mb-4 text-center">Complete Your <span className="whitespace-nowrap">PAR-Q</span> Assessment</h2>
+          <div className="mt-6 sm:mt-8">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 text-center">Complete Your <span className="whitespace-nowrap">PAR-Q</span> Assessment</h2>
             <p className="text-center text-muted-foreground mb-6">
               This health assessment is mandatory before starting any workout program. Please answer all questions truthfully.
             </p>
