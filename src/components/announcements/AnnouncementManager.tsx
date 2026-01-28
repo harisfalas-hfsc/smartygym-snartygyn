@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { WODAnnouncementModal } from "./WODAnnouncementModal";
 import { RitualAnnouncementModal } from "./RitualAnnouncementModal";
+import { ParQReminderModal } from "./ParQReminderModal";
 import { getCyprusTodayStr, getCyprusHour } from "@/lib/cyprusDate";
 
 // Polling interval for checking if WODs exist (3 minutes)
@@ -10,11 +11,19 @@ const WOD_CHECK_INTERVAL_MS = 3 * 60 * 1000;
 const WOD_CHECK_CUTOFF_HOUR = 6;
 // Delay for Ritual modal after WOD modal closes (10 seconds)
 const RITUAL_DELAY_MS = 10 * 1000;
+// Delay for PAR-Q popup after first sign-in (30 seconds)
+const PARQ_POPUP_DELAY_MS = 30 * 1000;
+
+// Key to track if this is user's first session ever
+const FIRST_SIGNIN_KEY = "smartygym_first_signin_completed";
+const PARQ_REMINDER_SHOWN_KEY = "smartygym_parq_reminder_shown";
 
 export const AnnouncementManager = () => {
   const [showWODModal, setShowWODModal] = useState(false);
   const [showRitualModal, setShowRitualModal] = useState(false);
+  const [showParQModal, setShowParQModal] = useState(false);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const parqTimerRef = useRef<NodeJS.Timeout | null>(null);
   const hasStartedRef = useRef(false);
 
   const getTodayKey = (prefix: string) => {
@@ -52,6 +61,27 @@ export const AnnouncementManager = () => {
       clearInterval(pollingIntervalRef.current);
       pollingIntervalRef.current = null;
     }
+  }, []);
+
+  // Check if this is user's first sign-in and schedule PAR-Q popup
+  const checkFirstSignInAndScheduleParQ = useCallback(() => {
+    const firstSignInCompleted = localStorage.getItem(FIRST_SIGNIN_KEY);
+    const parqReminderShown = localStorage.getItem(PARQ_REMINDER_SHOWN_KEY);
+    
+    // If this is NOT the first sign-in, or PAR-Q reminder already shown, skip
+    if (firstSignInCompleted || parqReminderShown) {
+      console.log("[AnnouncementManager] Not first sign-in or PAR-Q already shown");
+      return;
+    }
+
+    // Mark first sign-in as happening now
+    localStorage.setItem(FIRST_SIGNIN_KEY, new Date().toISOString());
+    
+    // Schedule PAR-Q popup for 30 seconds later
+    console.log("[AnnouncementManager] First sign-in detected - scheduling PAR-Q popup in 30 seconds");
+    parqTimerRef.current = setTimeout(() => {
+      setShowParQModal(true);
+    }, PARQ_POPUP_DELAY_MS);
   }, []);
 
   // Handle showing the WOD modal when WODs are available
@@ -106,6 +136,9 @@ export const AnnouncementManager = () => {
     hasStartedRef.current = true;
 
     const init = async () => {
+      // Check for first sign-in PAR-Q popup
+      checkFirstSignInAndScheduleParQ();
+
       const wodShownKey = getTodayKey("wod_announcement_shown");
       const wodAlreadyShown = localStorage.getItem(wodShownKey) === "true";
       const wodDontShow = localStorage.getItem(getTodayKey("wod_dont_show")) === "true";
@@ -149,8 +182,11 @@ export const AnnouncementManager = () => {
 
     return () => {
       stopPolling();
+      if (parqTimerRef.current) {
+        clearTimeout(parqTimerRef.current);
+      }
     };
-  }, [tryShowWODModal, stopPolling, triggerRitualModalIfNeeded]);
+  }, [tryShowWODModal, stopPolling, triggerRitualModalIfNeeded, checkFirstSignInAndScheduleParQ]);
 
   // Handle WOD modal close - mark as shown and start timer for Ritual modal
   const handleWODClose = useCallback((dontShowAgain?: boolean) => {
@@ -193,6 +229,19 @@ export const AnnouncementManager = () => {
     }
   }, []);
 
+  // Handle PAR-Q modal close
+  const handleParQClose = useCallback((dontShowAgain?: boolean) => {
+    setShowParQModal(false);
+    
+    // Always mark as shown (we only show once ever)
+    localStorage.setItem(PARQ_REMINDER_SHOWN_KEY, new Date().toISOString());
+    
+    if (parqTimerRef.current) {
+      clearTimeout(parqTimerRef.current);
+      parqTimerRef.current = null;
+    }
+  }, []);
+
   return (
     <>
       <WODAnnouncementModal 
@@ -202,6 +251,10 @@ export const AnnouncementManager = () => {
       <RitualAnnouncementModal 
         open={showRitualModal} 
         onClose={handleRitualClose} 
+      />
+      <ParQReminderModal
+        open={showParQModal}
+        onClose={handleParQClose}
       />
     </>
   );
