@@ -10,8 +10,8 @@ interface RepairResult {
   totalProcessed: number;
   workoutsRepaired: number;
   programsRepaired: number;
-  iconsAdded: number;
-  sectionsAdded: number;
+  iconsFixed: number;
+  spacingFixed: number;
   listsNormalized: number;
   quotesFixed: number;
   repairedIds: string[];
@@ -20,108 +20,8 @@ interface RepairResult {
   timestamp: string;
 }
 
-// Section templates for missing sections
-const SECTION_TEMPLATES = {
-  warmUp: `<p class="tiptap-paragraph">🔥 <strong><u>Warm Up 10'</u></strong></p>
-<ul class="tiptap-bullet-list">
-<li class="tiptap-list-item"><p class="tiptap-paragraph">Light cardio 3-5 minutes (jumping jacks, jogging in place)</p></li>
-<li class="tiptap-list-item"><p class="tiptap-paragraph">Dynamic stretches 3-5 minutes (arm circles, leg swings, hip circles)</p></li>
-<li class="tiptap-list-item"><p class="tiptap-paragraph">Movement prep specific to today's workout</p></li>
-</ul>
-<p class="tiptap-paragraph"></p>`,
-  
-  finisher: `<p class="tiptap-paragraph"></p>
-<p class="tiptap-paragraph">⚡ <strong><u>Finisher</u></strong></p>
-<ul class="tiptap-bullet-list">
-<li class="tiptap-list-item"><p class="tiptap-paragraph">Complete 3 rounds:</p></li>
-</ul>
-<p class="tiptap-paragraph">20 Mountain Climbers - 15 Air Squats - 10 Push-ups</p>
-<p class="tiptap-paragraph"></p>`,
-  
-  coolDown: `<p class="tiptap-paragraph"></p>
-<p class="tiptap-paragraph">🧘 <strong><u>Cool Down 5-10'</u></strong></p>
-<ul class="tiptap-bullet-list">
-<li class="tiptap-list-item"><p class="tiptap-paragraph">Static stretching for all major muscle groups</p></li>
-<li class="tiptap-list-item"><p class="tiptap-paragraph">Deep breathing and relaxation</p></li>
-<li class="tiptap-list-item"><p class="tiptap-paragraph">Foam rolling (optional)</p></li>
-</ul>`,
-};
-
-// Icon patterns for detection
-const SECTION_ICON_MAP: Record<string, { pattern: RegExp; icon: string }> = {
-  warmUp: { pattern: /(?:warm[-\s]?up|activation|soft[-\s]?tissue)/i, icon: '🔥' },
-  mainWorkout: { pattern: /main[-\s]?workout/i, icon: '💪' },
-  finisher: { pattern: /finisher/i, icon: '⚡' },
-  coolDown: { pattern: /cool[-\s]?down/i, icon: '🧘' },
-};
-
-// Add icons to section headers that are missing them
-function addMissingSectionIcons(content: string): { content: string; iconsAdded: number } {
-  let iconsAdded = 0;
-  let result = content;
-  
-  for (const [sectionKey, { pattern, icon }] of Object.entries(SECTION_ICON_MAP)) {
-    // Find section headers without the icon
-    // Match patterns like: <strong><u>Warm Up</u></strong> or <strong>Main Workout</strong>
-    const headerPattern = new RegExp(
-      `(<(?:p|strong|b)[^>]*>\\s*)((?:<strong[^>]*>\\s*)?(?:<u>\\s*)?)` +
-      `(${pattern.source})` +
-      `((?:\\s*<\/u>)?(?:\\s*<\/strong>)?[^<]*<)`,
-      'gi'
-    );
-    
-    result = result.replace(headerPattern, (match, prefix, tags, title, suffix) => {
-      // Check if icon already exists nearby
-      if (match.includes(icon)) {
-        return match;
-      }
-      iconsAdded++;
-      return `${prefix}${icon} ${tags}${title}${suffix}`;
-    });
-  }
-  
-  return { content: result, iconsAdded };
-}
-
-// Convert plain <ul><li> to TipTap-classed lists
-function normalizeLists(content: string): { content: string; listsNormalized: number } {
-  let listsNormalized = 0;
-  let result = content;
-  
-  // Add tiptap-bullet-list class to <ul> without it
-  result = result.replace(/<ul(?![^>]*class)/gi, (match) => {
-    listsNormalized++;
-    return '<ul class="tiptap-bullet-list"';
-  });
-  
-  // Ensure ul with class has tiptap-bullet-list
-  result = result.replace(/<ul\s+class="([^"]*)"/gi, (match, classes) => {
-    if (!classes.includes('tiptap-bullet-list')) {
-      listsNormalized++;
-      return `<ul class="${classes} tiptap-bullet-list"`;
-    }
-    return match;
-  });
-  
-  // Add tiptap-list-item class to <li> without it
-  result = result.replace(/<li(?![^>]*class)/gi, (match) => {
-    return '<li class="tiptap-list-item"';
-  });
-  
-  // Ensure li content is wrapped in <p> if not already
-  result = result.replace(
-    /<li class="tiptap-list-item">([^<][^]*?)<\/li>/gi,
-    (match, content) => {
-      // If content doesn't start with <p, wrap it
-      if (!content.trim().startsWith('<p')) {
-        return `<li class="tiptap-list-item"><p class="tiptap-paragraph">${content.trim()}</p></li>`;
-      }
-      return match;
-    }
-  );
-  
-  return { content: result, listsNormalized };
-}
+// Categories that should NOT have sections injected (standalone formats)
+const STANDALONE_CATEGORIES = ['CHALLENGE'];
 
 // Fix single-quote attributes to double quotes
 function fixQuoteAttributes(content: string): { content: string; quotesFixed: number } {
@@ -143,97 +43,121 @@ function removeLeadingEmptyParagraphs(content: string): string {
   return content.replace(/^(?:\s*<p[^>]*>\s*<\/p>\s*)+/, '');
 }
 
-// Check if section exists in content
-function hasSection(content: string, pattern: RegExp): boolean {
-  return pattern.test(content);
+// Remove excessive consecutive empty paragraphs (keep max 1)
+function removeExcessiveEmptyParagraphs(content: string): { content: string; spacingFixed: number } {
+  let spacingFixed = 0;
+  let result = content;
+  
+  // Keep replacing double empty paragraphs with single until no more doubles exist
+  const pattern = /<p class="tiptap-paragraph"><\/p>\s*<p class="tiptap-paragraph"><\/p>/gi;
+  while (pattern.test(result)) {
+    result = result.replace(pattern, '<p class="tiptap-paragraph"></p>');
+    spacingFixed++;
+    pattern.lastIndex = 0; // Reset regex for next test
+  }
+  
+  return { content: result, spacingFixed };
 }
 
-// Main repair function for a workout
-function repairWorkout(workout: any): { 
+// Normalize lists - add TipTap classes to plain ul/li
+function normalizeLists(content: string): { content: string; listsNormalized: number } {
+  let listsNormalized = 0;
+  let result = content;
+  
+  // Add tiptap-bullet-list class to <ul> without it
+  result = result.replace(/<ul(?![^>]*class)/gi, () => {
+    listsNormalized++;
+    return '<ul class="tiptap-bullet-list"';
+  });
+  
+  // Ensure ul with class has tiptap-bullet-list
+  result = result.replace(/<ul\s+class="([^"]*)"/gi, (match, classes) => {
+    if (!classes.includes('tiptap-bullet-list')) {
+      listsNormalized++;
+      return `<ul class="${classes} tiptap-bullet-list"`;
+    }
+    return match;
+  });
+  
+  // Add tiptap-list-item class to <li> without it
+  result = result.replace(/<li(?![^>]*class)/gi, () => {
+    return '<li class="tiptap-list-item"';
+  });
+  
+  return { content: result, listsNormalized };
+}
+
+// Fix duplicate icons (icon outside AND inside tags)
+function fixDuplicateIcons(content: string): { content: string; iconsFixed: number } {
+  let iconsFixed = 0;
+  let result = content;
+  
+  const iconPatterns = [
+    { icon: '🔥', pattern: /🔥\s*<(strong|b)>\s*🔥/gi },
+    { icon: '💪', pattern: /💪\s*<(strong|b)>\s*💪/gi },
+    { icon: '⚡', pattern: /⚡\s*<(strong|b)>\s*⚡/gi },
+    { icon: '🧘', pattern: /🧘\s*<(strong|b)>\s*🧘/gi },
+  ];
+  
+  for (const { icon, pattern } of iconPatterns) {
+    result = result.replace(pattern, (match, tag) => {
+      iconsFixed++;
+      return `${icon} <${tag}>`;
+    });
+  }
+  
+  return { content: result, iconsFixed };
+}
+
+// Main repair function for a workout - DOES NOT inject sections
+function repairWorkout(workout: { id: string; name: string; main_workout: string | null; category?: string }): { 
   repaired: boolean; 
   newContent: string | null;
-  stats: { iconsAdded: number; sectionsAdded: number; listsNormalized: number; quotesFixed: number };
+  stats: { iconsFixed: number; spacingFixed: number; listsNormalized: number; quotesFixed: number };
 } {
   let content = workout.main_workout || '';
-  const stats = { iconsAdded: 0, sectionsAdded: 0, listsNormalized: 0, quotesFixed: 0 };
+  const stats = { iconsFixed: 0, spacingFixed: 0, listsNormalized: 0, quotesFixed: 0 };
   
   if (!content) {
     return { repaired: false, newContent: null, stats };
   }
   
   let modified = false;
+  const originalContent = content;
   
   // 1. Fix quote attributes
   const quoteResult = fixQuoteAttributes(content);
   if (quoteResult.quotesFixed > 0) {
     content = quoteResult.content;
     stats.quotesFixed = quoteResult.quotesFixed;
-    modified = true;
   }
   
   // 2. Remove leading empty paragraphs
-  const cleanedContent = removeLeadingEmptyParagraphs(content);
-  if (cleanedContent !== content) {
-    content = cleanedContent;
-    modified = true;
-  }
+  content = removeLeadingEmptyParagraphs(content);
   
-  // 3. Add missing icons to existing section headers
-  const iconResult = addMissingSectionIcons(content);
-  if (iconResult.iconsAdded > 0) {
+  // 3. Fix duplicate icons
+  const iconResult = fixDuplicateIcons(content);
+  if (iconResult.iconsFixed > 0) {
     content = iconResult.content;
-    stats.iconsAdded = iconResult.iconsAdded;
-    modified = true;
+    stats.iconsFixed = iconResult.iconsFixed;
   }
   
-  // 4. Normalize lists (add TipTap classes)
+  // 4. Remove excessive empty paragraphs
+  const spacingResult = removeExcessiveEmptyParagraphs(content);
+  if (spacingResult.spacingFixed > 0) {
+    content = spacingResult.content;
+    stats.spacingFixed = spacingResult.spacingFixed;
+  }
+  
+  // 5. Normalize lists (add TipTap classes)
   const listResult = normalizeLists(content);
   if (listResult.listsNormalized > 0) {
     content = listResult.content;
     stats.listsNormalized = listResult.listsNormalized;
-    modified = true;
   }
   
-  // 5. Add missing sections (only if workout has main_workout content)
-  // Check for Warm-Up
-  if (!hasSection(content, /(?:warm[-\s]?up|activation|soft[-\s]?tissue)/i)) {
-    content = SECTION_TEMPLATES.warmUp + content;
-    stats.sectionsAdded++;
-    modified = true;
-  }
-  
-  // Check for Main Workout header (add if missing but keep existing content)
-  if (!hasSection(content, /main[-\s]?workout/i)) {
-    // Find where warm-up ends and add main workout header
-    const warmUpEndMatch = content.match(/<\/ul>\s*<p[^>]*>\s*<\/p>\s*/i);
-    if (warmUpEndMatch) {
-      const insertPos = content.indexOf(warmUpEndMatch[0]) + warmUpEndMatch[0].length;
-      const mainWorkoutHeader = '<p class="tiptap-paragraph">💪 <strong><u>Main Workout</u></strong></p>\n<p class="tiptap-paragraph"></p>\n';
-      content = content.slice(0, insertPos) + mainWorkoutHeader + content.slice(insertPos);
-      stats.sectionsAdded++;
-      modified = true;
-    }
-  }
-  
-  // Check for Finisher
-  if (!hasSection(content, /finisher/i)) {
-    // Add finisher before cool-down if it exists, otherwise at end
-    const coolDownMatch = content.match(/<p[^>]*>🧘|cool[-\s]?down/i);
-    if (coolDownMatch && coolDownMatch.index !== undefined) {
-      content = content.slice(0, coolDownMatch.index) + SECTION_TEMPLATES.finisher + content.slice(coolDownMatch.index);
-    } else {
-      content = content + SECTION_TEMPLATES.finisher;
-    }
-    stats.sectionsAdded++;
-    modified = true;
-  }
-  
-  // Check for Cool-Down
-  if (!hasSection(content, /cool[-\s]?down/i)) {
-    content = content + SECTION_TEMPLATES.coolDown;
-    stats.sectionsAdded++;
-    modified = true;
-  }
+  // Check if any actual changes were made
+  modified = content !== originalContent;
   
   return {
     repaired: modified,
@@ -256,16 +180,12 @@ serve(async (req) => {
     let batchSize = 25;
     let offset = 0;
     let targetId: string | null = null;
-    let repairWorkoutsFlag = true;
-    let repairProgramsFlag = true;
     
     try {
       const body = await req.json();
       batchSize = body?.batchSize || 25;
       offset = body?.offset || 0;
       targetId = body?.targetId || null;
-      repairWorkoutsFlag = body?.repairWorkouts !== false;
-      repairProgramsFlag = body?.repairPrograms !== false;
     } catch {
       // Use defaults
     }
@@ -276,8 +196,8 @@ serve(async (req) => {
       totalProcessed: 0,
       workoutsRepaired: 0,
       programsRepaired: 0,
-      iconsAdded: 0,
-      sectionsAdded: 0,
+      iconsFixed: 0,
+      spacingFixed: 0,
       listsNormalized: 0,
       quotesFixed: 0,
       repairedIds: [],
@@ -290,7 +210,7 @@ serve(async (req) => {
     if (targetId) {
       const { data: workout, error } = await supabase
         .from("admin_workouts")
-        .select("id, name, main_workout")
+        .select("id, name, main_workout, category")
         .eq("id", targetId)
         .single();
 
@@ -315,8 +235,8 @@ serve(async (req) => {
         } else {
           result.workoutsRepaired = 1;
           result.repairedIds.push(targetId);
-          result.iconsAdded = repairResult.stats.iconsAdded;
-          result.sectionsAdded = repairResult.stats.sectionsAdded;
+          result.iconsFixed = repairResult.stats.iconsFixed;
+          result.spacingFixed = repairResult.stats.spacingFixed;
           result.listsNormalized = repairResult.stats.listsNormalized;
           result.quotesFixed = repairResult.stats.quotesFixed;
         }
@@ -331,46 +251,44 @@ serve(async (req) => {
     }
 
     // Batch processing for all workouts
-    if (repairWorkoutsFlag) {
-      const { data: workouts, error: workoutsError } = await supabase
-        .from("admin_workouts")
-        .select("id, name, main_workout")
-        .range(offset, offset + batchSize - 1)
-        .order("created_at", { ascending: true });
+    const { data: workouts, error: workoutsError } = await supabase
+      .from("admin_workouts")
+      .select("id, name, main_workout, category")
+      .range(offset, offset + batchSize - 1)
+      .order("created_at", { ascending: true });
 
-      if (workoutsError) throw workoutsError;
+    if (workoutsError) throw workoutsError;
 
-      console.log(`[REPAIR] Processing ${workouts?.length || 0} workouts`);
+    console.log(`[REPAIR] Processing ${workouts?.length || 0} workouts`);
 
-      for (const workout of workouts || []) {
-        result.totalProcessed++;
+    for (const workout of workouts || []) {
+      result.totalProcessed++;
+      
+      try {
+        const repairResult = repairWorkout(workout);
         
-        try {
-          const repairResult = repairWorkout(workout);
-          
-          if (repairResult.repaired && repairResult.newContent) {
-            const { error: updateError } = await supabase
-              .from("admin_workouts")
-              .update({ main_workout: repairResult.newContent })
-              .eq("id", workout.id);
+        if (repairResult.repaired && repairResult.newContent) {
+          const { error: updateError } = await supabase
+            .from("admin_workouts")
+            .update({ main_workout: repairResult.newContent })
+            .eq("id", workout.id);
 
-            if (updateError) {
-              result.errors.push({ id: workout.id, error: updateError.message });
-            } else {
-              result.workoutsRepaired++;
-              result.repairedIds.push(workout.id);
-              result.iconsAdded += repairResult.stats.iconsAdded;
-              result.sectionsAdded += repairResult.stats.sectionsAdded;
-              result.listsNormalized += repairResult.stats.listsNormalized;
-              result.quotesFixed += repairResult.stats.quotesFixed;
-            }
+          if (updateError) {
+            result.errors.push({ id: workout.id, error: updateError.message });
           } else {
-            result.skippedIds.push(workout.id);
+            result.workoutsRepaired++;
+            result.repairedIds.push(workout.id);
+            result.iconsFixed += repairResult.stats.iconsFixed;
+            result.spacingFixed += repairResult.stats.spacingFixed;
+            result.listsNormalized += repairResult.stats.listsNormalized;
+            result.quotesFixed += repairResult.stats.quotesFixed;
           }
-        } catch (e) {
-          const errMsg = e instanceof Error ? e.message : String(e);
-          result.errors.push({ id: workout.id, error: errMsg });
+        } else {
+          result.skippedIds.push(workout.id);
         }
+      } catch (e) {
+        const errMsg = e instanceof Error ? e.message : String(e);
+        result.errors.push({ id: workout.id, error: errMsg });
       }
     }
 
