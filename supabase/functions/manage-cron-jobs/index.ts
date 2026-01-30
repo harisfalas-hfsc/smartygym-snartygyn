@@ -20,6 +20,77 @@ interface CronJobRequest {
   is_active?: boolean;
 }
 
+// ============================================
+// SECURITY: Input Validation & Sanitization
+// ============================================
+
+/**
+ * Validates job_name format to prevent SQL injection
+ * Only allows alphanumeric characters, dashes, and underscores
+ */
+function validateJobName(jobName: string): { valid: boolean; error?: string } {
+  if (!jobName || typeof jobName !== 'string') {
+    return { valid: false, error: 'job_name is required and must be a string' };
+  }
+  if (jobName.length > 100) {
+    return { valid: false, error: 'job_name must be 100 characters or less' };
+  }
+  if (!/^[a-zA-Z0-9_-]+$/.test(jobName)) {
+    return { valid: false, error: 'job_name can only contain letters, numbers, dashes, and underscores' };
+  }
+  return { valid: true };
+}
+
+/**
+ * Validates cron schedule format to prevent SQL injection
+ * Only allows standard cron characters: digits, *, /, -, ,, and spaces
+ */
+function validateCronSchedule(schedule: string): { valid: boolean; error?: string } {
+  if (!schedule || typeof schedule !== 'string') {
+    return { valid: false, error: 'schedule is required and must be a string' };
+  }
+  if (schedule.length > 50) {
+    return { valid: false, error: 'schedule must be 50 characters or less' };
+  }
+  // Standard cron format: minute hour day month weekday
+  // Allowed chars: digits 0-9, *, /, -, ,, and spaces
+  if (!/^[\d\*\/\-,\s]+$/.test(schedule)) {
+    return { valid: false, error: 'schedule contains invalid characters. Only digits, *, /, -, , and spaces allowed' };
+  }
+  // Must have exactly 5 parts (standard cron format)
+  const parts = schedule.trim().split(/\s+/);
+  if (parts.length !== 5) {
+    return { valid: false, error: 'schedule must be in standard cron format with 5 parts (minute hour day month weekday)' };
+  }
+  return { valid: true };
+}
+
+/**
+ * Validates edge function name to prevent SQL injection
+ * Only allows alphanumeric characters, dashes, and underscores
+ */
+function validateEdgeFunctionName(funcName: string): { valid: boolean; error?: string } {
+  if (!funcName || typeof funcName !== 'string') {
+    return { valid: false, error: 'edge_function_name is required and must be a string' };
+  }
+  if (funcName.length > 100) {
+    return { valid: false, error: 'edge_function_name must be 100 characters or less' };
+  }
+  if (!/^[a-zA-Z0-9_-]+$/.test(funcName)) {
+    return { valid: false, error: 'edge_function_name can only contain letters, numbers, dashes, and underscores' };
+  }
+  return { valid: true };
+}
+
+/**
+ * Escapes a string for safe use in SQL by doubling single quotes
+ * This is a last-resort sanitization for values that must be interpolated
+ */
+function escapeSqlString(str: string): string {
+  if (typeof str !== 'string') return '';
+  return str.replace(/'/g, "''");
+}
+
 // Get Cyprus timezone offset (UTC+2 in winter, UTC+3 in summer)
 function getCyprusOffset(): number {
   const now = new Date();
@@ -223,6 +294,17 @@ serve(async (req: Request) => {
     if (action === 'sync') {
       const { job_name } = body;
       
+      // Validate job_name if provided
+      if (job_name) {
+        const validation = validateJobName(job_name);
+        if (!validation.valid) {
+          return new Response(
+            JSON.stringify({ error: validation.error }),
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+      }
+      
       console.log('🔄 Starting sync operation', job_name ? `for job: ${job_name}` : 'for all jobs');
       
       // Get metadata for jobs to sync
@@ -255,8 +337,23 @@ serve(async (req: Request) => {
           continue;
         }
         
+        // Validate stored values before using in SQL
+        const jobNameValidation = validateJobName(job.job_name);
+        const scheduleValidation = validateCronSchedule(schedule);
+        const funcNameValidation = validateEdgeFunctionName(funcName);
+        
+        if (!jobNameValidation.valid || !scheduleValidation.valid || !funcNameValidation.valid) {
+          results.push({ 
+            job_name: job.job_name, 
+            success: false, 
+            error: jobNameValidation.error || scheduleValidation.error || funcNameValidation.error 
+          });
+          continue;
+        }
+        
         const functionUrl = `${supabaseUrl}/functions/v1/${funcName}`;
         const bodyJson = JSON.stringify(job.request_body || {});
+        const escapedBodyJson = escapeSqlString(bodyJson);
         
         // First unschedule (ignore errors - job might not exist)
         await executeCronSql(serviceClient, `SELECT cron.unschedule('${job.job_name}');`, `unschedule-${job.job_name}`);
@@ -270,7 +367,7 @@ serve(async (req: Request) => {
             SELECT net.http_post(
               url:='${functionUrl}',
               headers:='{"Content-Type": "application/json", "Authorization": "Bearer ${supabaseAnonKey}"}'::jsonb,
-              body:='${bodyJson}'::jsonb
+              body:='${escapedBodyJson}'::jsonb
             ) as request_id;
             $$
           );
@@ -308,9 +405,35 @@ serve(async (req: Request) => {
         );
       }
 
+      // SECURITY: Validate all inputs before using in SQL
+      const jobNameValidation = validateJobName(job_name);
+      if (!jobNameValidation.valid) {
+        return new Response(
+          JSON.stringify({ error: jobNameValidation.error }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      
+      const scheduleValidation = validateCronSchedule(schedule);
+      if (!scheduleValidation.valid) {
+        return new Response(
+          JSON.stringify({ error: scheduleValidation.error }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      
+      const funcNameValidation = validateEdgeFunctionName(edge_function_name);
+      if (!funcNameValidation.valid) {
+        return new Response(
+          JSON.stringify({ error: funcNameValidation.error }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
       // Build the HTTP post command for the cron job
       const functionUrl = `${supabaseUrl}/functions/v1/${edge_function_name}`;
       const requestBodyJson = JSON.stringify(request_body || {});
+      const escapedRequestBodyJson = escapeSqlString(requestBodyJson);
       const humanReadable = cronToHumanReadable(schedule);
       
       // Create cron job using cron.schedule
@@ -322,7 +445,7 @@ serve(async (req: Request) => {
           SELECT net.http_post(
             url:='${functionUrl}',
             headers:='{"Content-Type": "application/json", "Authorization": "Bearer ${supabaseAnonKey}"}'::jsonb,
-            body:='${requestBodyJson}'::jsonb
+            body:='${escapedRequestBodyJson}'::jsonb
           ) as request_id;
           $$
         );
@@ -386,6 +509,37 @@ serve(async (req: Request) => {
         );
       }
 
+      // SECURITY: Validate job_name
+      const jobNameValidation = validateJobName(job_name);
+      if (!jobNameValidation.valid) {
+        return new Response(
+          JSON.stringify({ error: jobNameValidation.error }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      
+      // SECURITY: Validate schedule if provided
+      if (schedule) {
+        const scheduleValidation = validateCronSchedule(schedule);
+        if (!scheduleValidation.valid) {
+          return new Response(
+            JSON.stringify({ error: scheduleValidation.error }),
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+      }
+      
+      // SECURITY: Validate edge_function_name if provided
+      if (edge_function_name) {
+        const funcNameValidation = validateEdgeFunctionName(edge_function_name);
+        if (!funcNameValidation.valid) {
+          return new Response(
+            JSON.stringify({ error: funcNameValidation.error }),
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+      }
+
       console.log(`📝 Editing cron job: ${job_name}`);
 
       // Get current job data to merge with updates
@@ -415,7 +569,20 @@ serve(async (req: Request) => {
         
         // Get the edge function name to use (new or existing)
         const funcName = edge_function_name || currentJob?.edge_function_name;
+        
+        // Validate existing funcName from database
+        if (funcName) {
+          const existingFuncValidation = validateEdgeFunctionName(funcName);
+          if (!existingFuncValidation.valid) {
+            return new Response(
+              JSON.stringify({ error: `Stored edge_function_name is invalid: ${existingFuncValidation.error}` }),
+              { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+          }
+        }
+        
         const bodyJson = JSON.stringify(request_body ?? currentJob?.request_body ?? {});
+        const escapedBodyJson = escapeSqlString(bodyJson);
         
         if (funcName) {
           const functionUrl = `${supabaseUrl}/functions/v1/${funcName}`;
@@ -440,7 +607,7 @@ serve(async (req: Request) => {
               SELECT net.http_post(
                 url:='${functionUrl}',
                 headers:='{"Content-Type": "application/json", "Authorization": "Bearer ${supabaseAnonKey}"}'::jsonb,
-                body:='${bodyJson}'::jsonb
+                body:='${escapedBodyJson}'::jsonb
               ) as request_id;
               $$
             );
@@ -499,6 +666,15 @@ serve(async (req: Request) => {
         );
       }
 
+      // SECURITY: Validate job_name
+      const jobNameValidation = validateJobName(job_name);
+      if (!jobNameValidation.valid) {
+        return new Response(
+          JSON.stringify({ error: jobNameValidation.error }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
       console.log(`🗑️ Deleting cron job: ${job_name}`);
 
       // Unschedule the cron job
@@ -548,6 +724,15 @@ serve(async (req: Request) => {
       if (!edge_function_name) {
         return new Response(
           JSON.stringify({ error: "Missing edge_function_name" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      // SECURITY: Validate edge_function_name
+      const funcNameValidation = validateEdgeFunctionName(edge_function_name);
+      if (!funcNameValidation.valid) {
+        return new Response(
+          JSON.stringify({ error: funcNameValidation.error }),
           { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
