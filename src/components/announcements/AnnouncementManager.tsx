@@ -17,6 +17,8 @@ const PARQ_POPUP_DELAY_MS = 30 * 1000;
 // Key to track if this is user's first session ever
 const FIRST_SIGNIN_KEY = "smartygym_first_signin_completed";
 const PARQ_REMINDER_SHOWN_KEY = "smartygym_parq_reminder_shown";
+// Key to track if user was EVER authenticated (prevents false triggers)
+const USER_AUTHENTICATED_KEY = "smartygym_user_authenticated";
 
 export const AnnouncementManager = () => {
   const [showWODModal, setShowWODModal] = useState(false);
@@ -64,7 +66,19 @@ export const AnnouncementManager = () => {
   }, []);
 
   // Check if this is user's first sign-in and schedule PAR-Q popup
-  const checkFirstSignInAndScheduleParQ = useCallback(() => {
+  // IMPORTANT: Only runs for AUTHENTICATED users
+  const checkFirstSignInAndScheduleParQ = useCallback(async () => {
+    // First, verify user is actually authenticated
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session?.user) {
+      console.log("[AnnouncementManager] No authenticated user - skipping PAR-Q check");
+      return;
+    }
+    
+    // Mark that this browser has had an authenticated user
+    localStorage.setItem(USER_AUTHENTICATED_KEY, "true");
+    
     const firstSignInCompleted = localStorage.getItem(FIRST_SIGNIN_KEY);
     const parqReminderShown = localStorage.getItem(PARQ_REMINDER_SHOWN_KEY);
     
