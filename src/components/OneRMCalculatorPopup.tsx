@@ -149,7 +149,7 @@ export const OneRMCalculatorPopup = ({ open, onOpenChange }: OneRMCalculatorPopu
                 type="number"
                 value={weight}
                 onChange={(e) => setWeight(e.target.value)}
-                placeholder="100"
+                placeholder=""
                 step="0.5"
                 className="h-10"
               />
@@ -161,7 +161,7 @@ export const OneRMCalculatorPopup = ({ open, onOpenChange }: OneRMCalculatorPopu
                 type="number"
                 value={reps}
                 onChange={(e) => setReps(e.target.value)}
-                placeholder="8"
+                placeholder=""
                 max="12"
                 min="1"
                 className="h-10"
