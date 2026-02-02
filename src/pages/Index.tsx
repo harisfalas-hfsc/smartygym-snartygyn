@@ -457,22 +457,6 @@ const Index = () => {
       <div className="min-h-screen bg-background overflow-x-hidden">
         
         {isMobile ? <section className="pt-2 pb-2 px-4">
-            {/* Mobile Carousel Headline */}
-            <Card className="border-[3px] border-primary/40 bg-transparent mb-6 p-4">
-              <div className="text-center">
-                <h2 className="text-2xl mb-2">
-                  <span className="font-normal text-foreground">Welcome to </span>
-                  <span className="font-bold text-primary">SmartyGym</span>
-                </h2>
-                <p className="text-sm text-muted-foreground whitespace-nowrap">
-                  Your gym Re-imagined. Anywhere. Anytime.
-                </p>
-                <p className="hidden sm:block text-sm mt-3 px-1 font-medium" style={{ color: 'hsl(195, 85%, 45%)' }}>
-                  Where Science Meets Convenience. Where Real Coaches Guide Real People.
-                </p>
-              </div>
-            </Card>
-
             <Carousel className="w-full" opts={{
           align: "center",
           loop: true
