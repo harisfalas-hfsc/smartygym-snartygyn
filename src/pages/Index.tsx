@@ -692,10 +692,10 @@ const Index = () => {
                         <h3 className="text-xl font-bold">
                           Your Gym Re-imagined Anywhere, Anytime
                         </h3>
-                        <p className="text-sm font-semibold text-primary">
+                        <p className="text-base font-semibold text-primary">
                           We are not here to replace your gym. We are here to back you up when life gets in the way.
                         </p>
-                        <p className="text-sm text-muted-foreground leading-relaxed">
+                        <p className="text-base text-muted-foreground leading-relaxed">
                           Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed — 
                           SmartyGym is your backup plan. Or, if you prefer training from home entirely, we've got you covered. 
                           Or, if you go to your gym but want to follow a professional, science-based workout or training program designed by{' '}
@@ -706,7 +706,7 @@ const Index = () => {
                             Haris Falas
                           </a>, we provide that expert guidance.
                         </p>
-                        <p className="text-sm font-semibold text-primary">
+                        <p className="text-base font-semibold text-primary">
                           Wherever you are, your gym comes with you.
                         </p>
                       </div>
