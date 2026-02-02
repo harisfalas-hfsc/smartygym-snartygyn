@@ -785,35 +785,35 @@ const Index = () => {
                     </Card>
                     
                     {/* Who is SmartyGym For? - Audience Badges */}
-                    <div className="mt-4 p-4 rounded-xl border-2 border-primary/30 bg-gradient-to-r from-primary/5 to-accent/5">
-                      <h3 className="text-sm font-bold text-foreground mb-3 text-center">
+                    <div className="mt-4 p-6 rounded-xl border-2 border-primary/30 bg-gradient-to-r from-primary/5 to-accent/5">
+                      <h3 className="text-base font-bold text-foreground mb-4 text-center">
                         Who is <span className="text-primary">SmartyGym</span> For?
                       </h3>
-                      <div className="flex flex-wrap justify-center gap-2">
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30 text-xs font-medium text-blue-600 dark:text-blue-400">
-                          <Users className="w-3 h-3" />
-                          Busy Adults
-                        </span>
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-pink-500/10 border border-pink-500/30 text-xs font-medium text-pink-600 dark:text-pink-400">
-                          <Heart className="w-3 h-3" />
-                          Parents
-                        </span>
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-xs font-medium text-emerald-600 dark:text-emerald-400">
-                          <GraduationCap className="w-3 h-3" />
-                          Beginners
-                        </span>
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/30 text-xs font-medium text-orange-600 dark:text-orange-400">
-                          <Target className="w-3 h-3" />
-                          Intermediate Lifters
-                        </span>
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-xs font-medium text-cyan-600 dark:text-cyan-400">
-                          <Plane className="w-3 h-3" />
-                          Travelers
-                        </span>
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/30 text-xs font-medium text-purple-600 dark:text-purple-400">
-                          <Dumbbell className="w-3 h-3" />
-                          Gym-Goers
-                        </span>
+                      <div className="grid grid-cols-6 gap-4">
+                        <div className="flex flex-col items-center gap-2">
+                          <Users className="w-6 h-6 text-blue-500" />
+                          <span className="text-sm font-medium text-foreground text-center">Busy Adults</span>
+                        </div>
+                        <div className="flex flex-col items-center gap-2">
+                          <Heart className="w-6 h-6 text-pink-500" />
+                          <span className="text-sm font-medium text-foreground text-center">Parents</span>
+                        </div>
+                        <div className="flex flex-col items-center gap-2">
+                          <GraduationCap className="w-6 h-6 text-emerald-500" />
+                          <span className="text-sm font-medium text-foreground text-center">Beginners</span>
+                        </div>
+                        <div className="flex flex-col items-center gap-2">
+                          <Target className="w-6 h-6 text-orange-500" />
+                          <span className="text-sm font-medium text-foreground text-center">Intermediate Lifters</span>
+                        </div>
+                        <div className="flex flex-col items-center gap-2">
+                          <Plane className="w-6 h-6 text-cyan-500" />
+                          <span className="text-sm font-medium text-foreground text-center">Travelers</span>
+                        </div>
+                        <div className="flex flex-col items-center gap-2">
+                          <Dumbbell className="w-6 h-6 text-purple-500" />
+                          <span className="text-sm font-medium text-foreground text-center">Gym-Goers</span>
+                        </div>
                       </div>
                     </div>
                   </div>
