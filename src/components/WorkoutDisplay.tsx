@@ -1,10 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Play, Pause, RotateCcw, Star } from "lucide-react";
+import { Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { WorkoutToolsCards } from "@/components/WorkoutToolsCards";
 import workoutHero from "@/assets/workout-hero.jpg";
 import { ParQReminder } from "@/components/ParQReminder";
 import { WorkoutInfoBar } from "@/components/WorkoutInfoBar";
@@ -143,87 +142,6 @@ export const WorkoutDisplay = ({
   const { userTier } = useAccessControl();
   const isPremium = userTier === "premium";
   const [currentVideoId, setCurrentVideoId] = useState<string>(exercises[0]?.video_id || "");
-  const [workTime, setWorkTime] = useState(20);
-  const [restTime, setRestTime] = useState(10);
-  const [rounds, setRounds] = useState(8);
-  const [currentRound, setCurrentRound] = useState(0);
-  const [totalRounds, setTotalRounds] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(20);
-  const [isWorking, setIsWorking] = useState(true);
-  const [isRunning, setIsRunning] = useState(false);
-  const [volume, setVolume] = useState(1.0);
-  const [weight, setWeight] = useState(100);
-  const [reps, setReps] = useState(8);
-  const [oneRM, setOneRM] = useState<number | null>(null);
-
-  // Play beep sound
-  const playBeep = () => {
-    const audioContext = new AudioContext();
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-    
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-    
-    oscillator.frequency.value = 800;
-    oscillator.type = 'sine';
-    
-    gainNode.gain.setValueAtTime(volume * 0.3, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1.5);
-    
-    oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 1.5);
-  };
-
-  // Timer logic
-  useEffect(() => {
-    if (!isRunning) return;
-
-    const interval = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          playBeep();
-          
-          if (isWorking) {
-            setIsWorking(false);
-            return restTime;
-          } else {
-            if (currentRound < rounds) {
-              setCurrentRound((r) => r + 1);
-              setIsWorking(true);
-              return workTime;
-            } else {
-              setIsRunning(false);
-              return 0;
-            }
-          }
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [isRunning, isWorking, currentRound, rounds, workTime, restTime, volume]);
-
-  const handleStartStop = () => {
-    if (!isRunning && currentRound === 0) {
-      setCurrentRound(1);
-    }
-    setIsRunning(!isRunning);
-  };
-
-  const handleReset = () => {
-    setIsRunning(false);
-    setCurrentRound(0);
-    setIsWorking(true);
-    setTimeLeft(workTime);
-  };
-
-  const calculate1RM = () => {
-    // Brzycki formula: 1RM = weight × (36 / (37 - reps))
-    const calculated = weight * (36 / (37 - reps));
-    setOneRM(Math.round(calculated * 10) / 10);
-  };
 
   const getDifficultyText = (diff: number) => {
     if (diff <= 2) return 'Beginner';
@@ -341,75 +259,8 @@ export const WorkoutDisplay = ({
         </div>
       </div>
 
-      {/* Workout Timer - Centered */}
-      <div className="flex justify-center">
-        <Card className="border-2 border-primary/30 w-full max-w-2xl">
-          <CardHeader className="pb-3 bg-primary/5">
-            <CardTitle className="text-center text-primary">Workout Timer</CardTitle>
-          </CardHeader>
-          <CardContent className="pt-4">
-            <div className="grid grid-cols-3 gap-3 mb-3">
-              <div>
-                <Label className="text-xs font-semibold">Work</Label>
-                <div className="flex items-center gap-1">
-                  <Input
-                    type="number"
-                    value={workTime}
-                    onChange={(e) => setWorkTime(parseInt(e.target.value) || 20)}
-                    disabled={isRunning}
-                    className="h-8 text-center border-2 border-primary/40"
-                  />
-                  <span className="text-xs">s</span>
-                </div>
-              </div>
-              <div>
-                <Label className="text-xs font-semibold">Rest</Label>
-                <div className="flex items-center gap-1">
-                  <Input
-                    type="number"
-                    value={restTime}
-                    onChange={(e) => setRestTime(parseInt(e.target.value) || 10)}
-                    disabled={isRunning}
-                    className="h-8 text-center border-2 border-primary/40"
-                  />
-                  <span className="text-xs">s</span>
-                </div>
-              </div>
-              <div>
-                <Label className="text-xs font-semibold">Rounds</Label>
-                <Input
-                  type="number"
-                  value={rounds}
-                  onChange={(e) => setRounds(parseInt(e.target.value) || 8)}
-                  disabled={isRunning}
-                  className="h-8 text-center border-2 border-primary/40"
-                />
-              </div>
-            </div>
-
-            <div className="text-center py-2 bg-muted rounded-lg mb-3">
-              <div className="text-3xl font-bold text-primary mb-1">
-                {timeLeft}s
-              </div>
-              <div className="text-sm font-semibold">
-                {isRunning ? (isWorking ? 'Work' : 'Rest') : 'Ready'} • Round {currentRound}/{rounds}
-              </div>
-            </div>
-
-            <div className="flex gap-2">
-              <Button 
-                onClick={handleStartStop}
-                className="flex-1 h-9"
-              >
-                {isRunning ? <><Pause className="w-4 h-4 mr-2" /> Stop</> : <><Play className="w-4 h-4 mr-2" /> Start</>}
-              </Button>
-              <Button onClick={handleReset} variant="outline" className="h-9 px-4">
-                <RotateCcw className="w-4 h-4" />
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Workout Tools - Timer, 1RM Calculator, Exercise Library */}
+      <WorkoutToolsCards />
 
 
       {/* CONTENT SECTIONS - Display exactly as written, no automatic headers */}

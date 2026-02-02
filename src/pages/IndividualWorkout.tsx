@@ -12,10 +12,6 @@ import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { ReaderModeDialog } from "@/components/ReaderModeDialog";
 import { HTMLContent } from "@/components/ui/html-content";
-import { WorkoutToolbar } from "@/components/WorkoutToolbar";
-
-// Summit Forge workout ID for testing toolbar
-const SUMMIT_FORGE_ID = "WOD-CH-B-1769985007209";
 
 // Helper function to generate SEO-optimized alt text
 const generateWorkoutAltText = (workout: any): string => {
@@ -268,13 +264,6 @@ const IndividualWorkout = () => {
                     { label: "Smarty Workouts", href: "/workout" },
                     { label: dbWorkout.name }
                   ]} />
-
-                  {/* Workout Assistant Toolbar - Testing on Summit Forge only */}
-                  {hasAccess && dbWorkout.id === SUMMIT_FORGE_ID && (
-                    <div className="my-4">
-                      <WorkoutToolbar />
-                    </div>
-                  )}
 
                   {hasAccess && (
                     <ReaderModeDialog
