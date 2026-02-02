@@ -63,7 +63,7 @@ export const ExerciseLibraryPopup = ({ open, onOpenChange }: ExerciseLibraryPopu
   return (
     <>
       <Dialog open={open} onOpenChange={handleOpenChange}>
-        <DialogContent className="max-w-[95vw] sm:max-w-lg max-h-[85vh]">
+        <DialogContent className="max-w-[95vw] sm:max-w-lg max-h-[70vh] sm:max-h-[85vh] border-2 border-border">
           <DialogHeader>
             <DialogTitle className="text-center text-primary flex items-center justify-center gap-2">
               <Dumbbell className="h-5 w-5" />
@@ -100,7 +100,7 @@ export const ExerciseLibraryPopup = ({ open, onOpenChange }: ExerciseLibraryPopu
             )}
 
             {!isLoading && (
-              <ScrollArea className="h-[50vh] pr-4">
+              <ScrollArea className="h-[35vh] sm:h-[50vh] pr-4">
                 <div className="space-y-2">
                   {searchResults.map((exercise) => (
                     <div
