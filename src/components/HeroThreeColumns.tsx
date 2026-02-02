@@ -205,8 +205,8 @@ export const HeroThreeColumns = () => {
                       {/* Title with Icon */}
                       <div className="flex items-center justify-between">
                         <h3 className="text-sm font-semibold text-white">{card.title}</h3>
-                        <div className="w-7 h-7 rounded-full bg-background/90 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
-                          <Icon className="w-4 h-4 text-primary" />
+                        <div className="w-10 h-10 rounded-full bg-background/90 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
+                          <Icon className="w-6 h-6 text-primary" />
                         </div>
                       </div>
                       
