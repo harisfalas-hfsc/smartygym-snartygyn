@@ -826,7 +826,7 @@ const Index = () => {
 
         <div className="container mx-auto max-w-6xl px-4">
           {/* Mission Statement with Cards */}
-          <section className="mb-16">
+          <section className="mb-16 mt-8">
             {/* Your Gym Anywhere Card */}
             <Card className="bg-gradient-to-r from-primary/10 to-accent/10 border-2 border-primary/20 mb-8">
               <CardContent className="p-6">
