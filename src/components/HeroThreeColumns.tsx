@@ -9,6 +9,8 @@ import {
   FileText, 
   Video,
   ChevronRight,
+  Star,
+  Clock,
   Calendar,
   Sparkles
 } from "lucide-react";
@@ -17,6 +19,8 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
   type CarouselApi
 } from "@/components/ui/carousel";
 
@@ -29,7 +33,20 @@ import heroToolsImage from "@/assets/hero-tools.jpg";
 import heroBlogImage from "@/assets/hero-blog.jpg";
 import heroLibraryImage from "@/assets/hero-exercise-library-new.jpg";
 
-// Define hero cards
+// Helper to convert star count to difficulty label
+const getDifficultyLabel = (stars: number | null | undefined, isRecovery: boolean): string => {
+  if (isRecovery || !stars || stars === 0) return "All Levels";
+  if (stars <= 2) return "Beginner";
+  if (stars <= 4) return "Intermediate";
+  return "Advanced";
+};
+
+// Check if WOD is recovery type
+const isRecoveryWod = (wod: { equipment?: string | null; category?: string | null }): boolean => {
+  return wod.equipment?.toUpperCase() === "VARIOUS" || wod.category?.toUpperCase() === "RECOVERY";
+};
+
+// Define hero cards matching mobile design
 const heroCards = [
   {
     id: "wod",
@@ -161,11 +178,6 @@ export const HeroThreeColumns = () => {
               const Icon = card.icon;
               const isWodCard = card.isWod;
               
-              // Dynamic title for WOD card showing today's category
-              const displayTitle = isWodCard && currentWod?.category 
-                ? `WOD: ${currentWod.category}` 
-                : card.title;
-              
               return (
                 <CarouselItem key={card.id} className="pl-4 basis-[45%]">
                   <div
@@ -173,43 +185,51 @@ export const HeroThreeColumns = () => {
                     className={cn(
                       "cursor-pointer group border-2 border-primary/40 rounded-xl overflow-hidden",
                       "hover:border-primary hover:shadow-lg hover:scale-[1.02]",
-                      "transition-all duration-300 h-[180px]",
-                      "relative bg-card"
+                      "transition-all duration-300 h-[220px]",
+                      "flex flex-col bg-card"
                     )}
                   >
-                    {/* Full Image Background */}
-                    <img 
-                      src={card.image} 
-                      alt={card.title}
-                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                    
-                    {/* Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/30 to-black/70" />
-                    
-                    {/* Content Overlay */}
-                    <div className="relative z-10 h-full flex flex-col justify-between p-4">
-                      {/* Top: Title with Icon */}
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-primary/90 flex items-center justify-center">
-                          <Icon className="w-4 h-4 text-primary-foreground" />
-                        </div>
-                        <h3 className="text-base font-bold text-white drop-shadow-lg">
-                          {displayTitle}
-                        </h3>
+                    {/* Image Section */}
+                    <div className="relative h-[120px] overflow-hidden">
+                      <img 
+                        src={card.image} 
+                        alt={card.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                      {/* Icon overlay */}
+                      <div className="absolute bottom-2 left-2 w-10 h-10 rounded-full bg-background/90 flex items-center justify-center shadow-lg">
+                        <Icon className="w-5 h-5 text-primary" />
                       </div>
+                    </div>
+                    
+                    {/* Content Section */}
+                    <div className="flex-1 p-3 flex flex-col justify-between">
+                      {/* Title */}
+                      <h3 className="text-sm font-semibold text-foreground">{card.title}</h3>
                       
-                      {/* Bottom: Description & CTA */}
-                      <div>
-                        <p className="text-sm text-white/90 mb-2 drop-shadow-md">
-                          {card.description}
-                        </p>
-                        
-                        {/* CTA indicator */}
-                        <div className="flex items-center gap-1 text-primary text-xs font-medium group-hover:gap-2 transition-all">
-                          Explore
-                          <ChevronRight className="w-3 h-3" />
+                      {/* Description - show WOD info if available */}
+                      {isWodCard && currentWod ? (
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <span className="text-primary font-medium">{currentWod.category}</span>
+                          <span className="flex items-center gap-0.5">
+                            <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+                            {getDifficultyLabel(currentWod.difficulty_stars, isRecoveryWod(currentWod))}
+                          </span>
+                          {currentWod.duration && (
+                            <span className="flex items-center gap-0.5">
+                              <Clock className="w-3 h-3 text-muted-foreground" />
+                              {currentWod.duration}
+                            </span>
+                          )}
                         </div>
+                      ) : (
+                        <p className="text-xs text-muted-foreground line-clamp-1">{card.description}</p>
+                      )}
+                      
+                      {/* CTA indicator */}
+                      <div className="flex items-center justify-center gap-1 text-primary text-[10px] font-medium group-hover:gap-2 transition-all">
+                        Explore
+                        <ChevronRight className="w-3 h-3" />
                       </div>
                     </div>
                   </div>
