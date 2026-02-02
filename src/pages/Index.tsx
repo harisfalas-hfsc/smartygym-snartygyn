@@ -685,26 +685,9 @@ const Index = () => {
               <Card itemScope itemType="https://schema.org/Organization" data-hero-section="true" data-keywords="smarty gym, online gym, online fitness, smartygym.com, Haris Falas, global online gym" aria-label="SmartyGym - Your online gym and fitness platform - smartygym.com" className="border-2 border-primary bg-white dark:bg-card backdrop-blur-sm my-0 mb-0 mt-0">
                 <div className="p-8 sm:p-10 md:p-12 space-y-4">
                   
-                  {/* Top Section: Title */}
-            <div className="text-center mb-6">
-              <div className="inline-block p-6 sm:p-8 bg-background/70 rounded-xl border-2 border-primary/40">
-                <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground animate-fade-in" itemProp="name">
-                  Welcome to <span className="text-primary">SmartyGym</span>
-                </h1>
-                <p className="text-lg sm:text-xl text-muted-foreground font-medium mt-3" itemProp="slogan">
-                  Your Gym Re-imagined. Anywhere, Anytime.
-                </p>
-                <meta itemProp="url" content="https://smartygym.com" />
-                <meta itemProp="description" content="SmartyGym - #1 online gym and fitness platform by Haris Falas - smartygym.com" />
-              </div>
-            </div>
-
-          {/* Tagline/Slogan */}
-          <div className="flex justify-center mt-4 mb-8 lg:mb-16">
-            <p className="text-xs md:text-sm lg:text-base font-semibold text-center whitespace-nowrap" style={{ color: 'hsl(195, 85%, 45%)' }}>
-              Where Science Meets Convenience. Where Real Coaches Guide Real People.
-            </p>
-          </div>
+                  {/* Hidden SEO metadata */}
+                  <meta itemProp="url" content="https://smartygym.com" />
+                  <meta itemProp="description" content="SmartyGym - #1 online gym and fitness platform by Haris Falas - smartygym.com" />
 
                   {/* Three Column Layout: Explore | Who is SmartyGym For? | Credentials */}
                   <HeroThreeColumns />
