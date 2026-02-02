@@ -718,11 +718,26 @@ const Index = () => {
 
                   {/* 100% Human. 0% AI Section */}
                   <div className="pt-6 space-y-4">
-                    <Card className="border-2 border-primary bg-gradient-to-br from-primary/5 to-accent/10 overflow-hidden relative">
-                      <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -mr-16 -mt-16" aria-hidden="true"></div>
-                      <div className="absolute bottom-0 left-0 w-24 h-24 bg-accent/20 rounded-full -ml-12 -mb-12" aria-hidden="true"></div>
+                    <Card className="border-2 border-primary overflow-hidden relative">
+                      {/* Background Video */}
+                      <video
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        className="absolute inset-0 w-full h-full object-cover z-0"
+                      >
+                        <source src="/videos/human-not-ai-background.mp4" type="video/mp4" />
+                      </video>
                       
-                      <CardContent className="p-8 md:p-12 relative">
+                      {/* Semi-transparent overlay for readability */}
+                      <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10" />
+                      
+                      {/* Decorative circles */}
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -mr-16 -mt-16 z-20" aria-hidden="true"></div>
+                      <div className="absolute bottom-0 left-0 w-24 h-24 bg-accent/20 rounded-full -ml-12 -mb-12 z-20" aria-hidden="true"></div>
+                      
+                      <CardContent className="p-8 md:p-12 relative z-20">
                         {/* CTA Button for non-premium users - positioned top left */}
                         {!isPremium && (
                           <Button 
