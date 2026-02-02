@@ -88,7 +88,7 @@ const FeatureCard = ({
       
       {/* Content Section */}
       <div className="flex-1 p-3 flex flex-col justify-between">
-        <p className="text-xs text-muted-foreground line-clamp-2">{description}</p>
+        <p className="text-xs text-muted-foreground line-clamp-1">{description}</p>
         
         {/* CTA */}
         <div className="flex items-center justify-center gap-1 text-primary text-[10px] font-medium 
@@ -140,7 +140,7 @@ export const HeroThreeColumns = () => {
       borderColor: "border-orange-500 hover:border-primary",
       headerGradient: "bg-gradient-to-r from-orange-500/10 to-primary/10 border-orange-500/30",
       imageUrl: heroToolsImage,
-      description: "Fitness calculators for BMR, calories, 1RM & more",
+      description: "Fitness calculators",
       ctaText: "Explore Tools",
       route: "/tools"
     },
@@ -150,7 +150,7 @@ export const HeroThreeColumns = () => {
       borderColor: "border-emerald-500 hover:border-primary",
       headerGradient: "bg-gradient-to-r from-emerald-500/10 to-primary/10 border-emerald-500/30",
       imageUrl: heroLibraryImage,
-      description: "Video demonstrations for every exercise",
+      description: "Exercise demonstrations",
       ctaText: "Browse Library",
       route: "/exerciselibrary"
     },
