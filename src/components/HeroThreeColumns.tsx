@@ -118,7 +118,7 @@ export const HeroThreeColumns = () => {
   const navigate = useNavigate();
   const [api, setApi] = useState<CarouselApi>();
   const autoplayRef = useRef(
-    Autoplay({ delay: 3000, stopOnInteraction: true, stopOnMouseEnter: true })
+    Autoplay({ delay: 3000, stopOnInteraction: false })
   );
   const [current, setCurrent] = useState(0);
 
@@ -177,6 +177,8 @@ export const HeroThreeColumns = () => {
           }}
           plugins={[autoplayRef.current]}
           className="flex-1 overflow-hidden"
+          onMouseEnter={() => autoplayRef.current.stop()}
+          onMouseLeave={() => autoplayRef.current.play()}
         >
           <CarouselContent className="-ml-4">
             {heroCards.map((card) => {
