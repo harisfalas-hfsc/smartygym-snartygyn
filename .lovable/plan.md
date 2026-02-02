@@ -1,75 +1,36 @@
 
 
-# Hero Section Redesign - Desktop Grid Layout
+# Desktop Hero Carousel Implementation
 
-## Overview
+## Summary
 
-This plan redesigns the desktop hero section from a carousel-based layout to a **3-row × 2-column grid layout** as shown in your sketch. The new layout will feature six distinct cards arranged in a fixed grid, replacing the current sliding carousel.
-
----
-
-## Proposed Layout
-
-```text
-+---------------------------+----------------------------------+
-| ROW 1                                                        |
-+---------------------------+----------------------------------+
-| Workout of the Day (WOD)  | Your Gym Re-imagined,            |
-| [Image card with overlay] | Anywhere, Anytime                |
-|                           | [Text card with Join Now button] |
-+---------------------------+----------------------------------+
-| ROW 2                                                        |
-+---------------------------+----------------------------------+
-| 100% Human. 0% AI.        | Smarty Workouts                  |
-| [Text card with icons]    | [Image card with overlay]        |
-+---------------------------+----------------------------------+
-| ROW 3                                                        |
-+---------------------------+----------------------------------+
-| Blog & Insights           | The SmartyGym Promise            |
-| [Image card with overlay] | [Text card]                      |
-+---------------------------+----------------------------------+
-```
+Replace the current 4-column grid layout in the desktop hero section with a carousel that matches the mobile design. The carousel will display **2 cards centered** with partial visibility of adjacent cards on the sides, plus navigation arrows.
 
 ---
 
-## Card Details
+## Current vs. New Design
 
-### Row 1
-1. **Workout of the Day (Left)** - Image-based card with:
-   - Full-bleed hero image (`hero-wod.jpg`)
-   - Dark gradient overlay
-   - Dynamic WOD info (category, difficulty, duration)
-   - Click navigates to `/workout/wod`
+| Aspect | Current Desktop | New Desktop |
+|--------|-----------------|-------------|
+| Layout | 4-column grid (static) | Carousel (2 cards visible + peek) |
+| Cards shown | All 4 at once | 2 centered + partial view of neighbors |
+| Navigation | None | Left/Right arrows |
+| Card design | Images with headers | Icons + text (matching mobile) |
+| Cards | WOD, Tools, Library, Blog | WOD, Workouts, Programs, Ritual, Tools, Blog, Library |
 
-2. **Your Gym Re-imagined (Right)** - Text-based card with:
-   - Current "Your Gym Anywhere" content
-   - "Join Now" button (top-right, for non-premium users)
-   - Gradient background
+---
 
-### Row 2
-3. **100% Human. 0% AI. (Left)** - Text-based card with:
-   - UserCheck/Ban/Brain icon trio
-   - Current messaging about human-designed workouts
-   - "Transform Your Fitness" button (non-premium)
-   - Three feature boxes (Real Expertise, Personal Touch, Not a Robot)
+## Cards to Display (Same as Mobile)
 
-4. **Smarty Workouts (Right)** - Image-based card with:
-   - Full-bleed hero image (`hero-workouts.jpg`)
-   - Dark gradient overlay
-   - Dumbbell icon in circular container
-   - Click navigates to `/workout`
+The carousel will include these 7 cards in order (matching the mobile `heroCards` array):
 
-### Row 3
-5. **Blog & Insights (Left)** - Image-based card with:
-   - Full-bleed hero image (`hero-blog.jpg`)
-   - Dark gradient overlay
-   - FileText icon in circular container
-   - Click navigates to `/blog`
-
-6. **The SmartyGym Promise (Right)** - Text-based card with:
-   - Current promise messaging
-   - Gradient background
-   - Centered text layout
+1. **Workout of the Day** - Icon: Dumbbell, Route: /workout/wod
+2. **Smarty Workouts** - Icon: Dumbbell, Route: /workout
+3. **Smarty Programs** - Icon: Calendar, Route: /trainingprogram
+4. **Smarty Ritual** - Icon: Sparkles, Route: /daily-ritual
+5. **Smarty Tools** - Icon: Calculator, Route: /tools
+6. **Blog & Insights** - Icon: FileText, Route: /blog
+7. **Exercise Library** - Icon: Video, Route: /exerciselibrary
 
 ---
 
@@ -77,82 +38,109 @@ This plan redesigns the desktop hero section from a carousel-based layout to a *
 
 ### File Changes
 
-**File:** `src/pages/Index.tsx`
+**1. Update `src/components/HeroThreeColumns.tsx`**
 
-1. **Replace HeroThreeColumns usage** with new inline 3×2 grid
-2. **Move existing cards** into the grid structure:
-   - "Your Gym Anywhere" card (already exists at lines 677-714)
-   - "100% Human" section (already exists at lines 721-794)
-   - "SmartyGym Promise" (currently outside hero at lines 898-913)
-3. **Add new image-based cards** for WOD, Workouts, and Blog using the same visual style as `HeroThreeColumns.tsx`:
-   - Full-bleed images with `bg-gradient-to-t from-black/90` overlay
-   - Circular icon containers
-   - Hover effects (`hover:scale-[1.08]`, `hover:shadow-2xl`)
-4. **Remove** the `<HeroThreeColumns />` component from the desktop hero section
-5. **Reorganize layout** using CSS Grid:
-   ```
-   grid grid-cols-2 gap-4
-   ```
+Transform from a 4-column grid to a carousel component:
 
-### Component Structure
+- Import `Carousel`, `CarouselContent`, `CarouselItem`, `CarouselNext`, `CarouselPrevious` from the existing carousel component
+- Replace the grid layout with a carousel
+- Use `basis-[42%]` for each carousel item to show 2 cards (~84% total) with partial peek of adjacent cards
+- Display navigation arrows on the left and right sides
+- Remove image-based cards in favor of icon-based cards matching mobile design
+- Remove unused image imports
+
+### Card Design (Matching Mobile)
+
+Each card will have:
+- Icon in a circular primary/10 background (larger than mobile for desktop)
+- Title text (larger font for desktop)
+- Description text (larger for readability)
+- ChevronRight indicator
+- Border styling with primary/40 default, primary on hover
+- Height: approximately 180px for desktop readability
+
+### Carousel Configuration
 
 ```text
-<div className="grid grid-cols-2 gap-4">
-  {/* Row 1 */}
-  <WODCard />           {/* Image card - navigates to /workout/wod */}
-  <YourGymAnywhereCard />  {/* Text card - existing content */}
-  
-  {/* Row 2 */}
-  <HumanNotAICard />       {/* Text card - existing content (condensed) */}
-  <SmartyWorkoutsCard />   {/* Image card - navigates to /workout */}
-  
-  {/* Row 3 */}
-  <BlogInsightsCard />     {/* Image card - navigates to /blog */}
-  <SmartyGymPromiseCard /> {/* Text card - existing content (moved up) */}
-</div>
+Options:
+- align: "center" (centers the active group)
+- loop: true (infinite scrolling)
+- slidesToScroll: 1 (scroll one card at a time)
+
+Item sizing:
+- basis-[42%] shows roughly 2 cards with ~8% peek on each side
 ```
-
-### Visual Consistency
-
-- **Image cards** will use the same styling as the current carousel cards:
-  - Height: ~220px to match carousel card height
-  - Border: `border-2 border-primary/40 rounded-xl`
-  - Hover: `hover:border-primary hover:shadow-2xl hover:scale-[1.02]` (slightly reduced scale for grid)
-  - Icon container: `w-10 h-10 rounded-full bg-background/90`
-  - Gradient: `bg-gradient-to-t from-black/90 via-black/50 to-transparent`
-
-- **Text cards** will maintain current styling:
-  - Gradient backgrounds
-  - Primary color accents
-  - Consistent padding and typography
-
-### Mobile Impact
-
-- No changes to mobile layout
-- The grid will only apply to desktop view (already controlled by existing responsive logic)
-- Mobile will continue to use its current carousel/card structure
 
 ---
 
-## Files Modified
+## Visual Layout
 
-| File | Changes |
-|------|---------|
-| `src/pages/Index.tsx` | Replace carousel with 3×2 grid, reorganize existing cards, add 3 new image-based cards |
+```text
+Desktop Hero Carousel:
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│  [<]  ▌ Card 6 ▌  │  Card 1  │  Card 2  │  ▌ Card 3 ▌  [>]  │
+│       (partial)     (full)     (full)      (partial)        │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+         ●   ○   ○   ○   ○   ○   ○  (navigation dots)
+```
+
+---
+
+## Technical Details
+
+### Changes to `src/components/HeroThreeColumns.tsx`
+
+1. **Remove unused imports**: Delete image imports (heroToolsImage, heroLibraryImage, heroBlogImage)
+
+2. **Remove FeatureCard component**: No longer needed since we're using the mobile-style card layout
+
+3. **Add carousel-specific state**:
+   - `carouselApi` for controlling the carousel
+   - `currentSlide` for tracking active slide (optional for dots)
+
+4. **Define cards array** with all 7 cards:
+   ```
+   - Workout of the Day (special handling for dynamic WOD data)
+   - Smarty Workouts
+   - Smarty Programs  
+   - Smarty Ritual
+   - Smarty Tools
+   - Blog & Insights
+   - Exercise Library
+   ```
+
+5. **Carousel structure**:
+   - Container with padding for arrow space
+   - CarouselContent with centered alignment
+   - CarouselItem with `basis-[42%]` for 2-card view with peek
+   - Card component matching mobile style (icon, title, description, chevron)
+   - Navigation arrows positioned outside the cards
+   - Optional: Navigation dots below
+
+### WOD Card Handling
+
+The "Workout of the Day" card will remain special:
+- Shows dynamic WOD info when available (name, category, difficulty)
+- Falls back to "Being Prepared" message when no WOD exists
+- Uses the existing WOD query already in the component
 
 ---
 
 ## What Stays the Same
 
-- All existing content text remains unchanged
-- Mobile layout is unaffected
-- All navigation routes stay the same
-- Existing images (`hero-wod.jpg`, `hero-workouts.jpg`, `hero-blog.jpg`) are reused
-- "Join Now" and "Transform Your Fitness" buttons remain for non-premium users
+- Mobile view is **completely unchanged** (this only affects desktop)
+- The existing `heroCards` array in Index.tsx defines the card content
+- WOD fetching logic remains in HeroThreeColumns
 
 ---
 
-## Expected Result
+## Benefits
 
-The desktop hero section will transform from a horizontal sliding carousel to a clean, scannable 3-row grid where users can see all six key sections at a glance without needing to scroll through a carousel.
+1. **Consistency** - Desktop and mobile use the same card design language
+2. **More content** - Shows 7 service cards instead of 4
+3. **Better UX** - Carousel provides intuitive navigation
+4. **Cleaner design** - Icon-based cards without images look more modern
+5. **Peek effect** - Shows users there's more content to discover
 
