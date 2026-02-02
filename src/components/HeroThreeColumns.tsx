@@ -118,7 +118,7 @@ export const HeroThreeColumns = () => {
   const navigate = useNavigate();
   const [api, setApi] = useState<CarouselApi>();
   const autoplayRef = useRef(
-    Autoplay({ delay: 2000, stopOnInteraction: true, stopOnMouseEnter: true })
+    Autoplay({ delay: 3000, stopOnInteraction: true, stopOnMouseEnter: true })
   );
   const [current, setCurrent] = useState(0);
 
