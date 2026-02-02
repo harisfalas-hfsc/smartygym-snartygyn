@@ -731,7 +731,7 @@ const Index = () => {
                       </video>
                       
                       {/* Semi-transparent overlay for readability */}
-                      <div className="absolute inset-0 bg-background/50 z-10" />
+                      <div className="absolute inset-0 bg-background/65 z-10" />
                       
                       {/* Decorative circles */}
                       <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -mr-16 -mt-16 z-20" aria-hidden="true"></div>
@@ -770,7 +770,7 @@ const Index = () => {
                           <p className="text-base leading-relaxed text-muted-foreground">
                             That's why they work — safe and efficient design by <a href="/coach-profile" className="text-primary hover:underline font-medium"><strong>Haris Falas</strong></a>, crafted by hand with care to deliver effective results at <strong>smartygym.com</strong>, <strong className="text-foreground">NOT by AI</strong>.
                           </p>
-                          <div className="bg-background/40 backdrop-blur-sm p-6 rounded-lg border-2 border-primary/30 mt-6">
+                          <div className="bg-background/60 backdrop-blur-sm p-6 rounded-lg border-2 border-primary/30 mt-6">
                             <p className="text-lg font-bold text-primary mb-2">
                               Every workout and training program is science-based and personally created by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>.
                             </p>
