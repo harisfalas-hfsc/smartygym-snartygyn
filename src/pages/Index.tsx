@@ -457,25 +457,6 @@ const Index = () => {
       <div className="min-h-screen bg-background overflow-x-hidden">
         
         {isMobile ? <section className="pt-12 pb-2 px-4">
-            {/* Your Gym Re-imagined Card - Mobile */}
-            <Card className="bg-gradient-to-r from-primary/10 to-accent/10 border-2 border-primary/20 mb-6">
-              <CardContent className="p-5">
-                <h3 className="text-xl font-bold text-center mb-3">
-                  Your Gym Re-imagined Anywhere, Anytime
-                </h3>
-                <p className="text-sm text-muted-foreground text-center leading-relaxed">
-                  We are not here to replace your gym. We are here to back you up when life gets in the way. Wherever you are, your gym comes with you.
-                </p>
-                {!isPremium && (
-                  <div className="flex justify-center mt-4">
-                    <Button onClick={() => navigate("/joinpremium", { state: { from: location.pathname } })} className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-md">
-                      Join Now
-                    </Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
             <Carousel className="w-full" opts={{
           align: "center",
           loop: true
