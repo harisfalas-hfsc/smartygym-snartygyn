@@ -21,7 +21,7 @@ import { cn } from "@/lib/utils";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { HeroThreeColumns } from "@/components/HeroThreeColumns";
+import { DesktopHeroGrid } from "@/components/DesktopHeroGrid";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -673,156 +673,41 @@ const Index = () => {
                   <meta itemProp="url" content="https://smartygym.com" />
                   <meta itemProp="description" content="SmartyGym - #1 online gym and fitness platform by Haris Falas - smartygym.com" />
 
-                  {/* Your Gym Anywhere Card - Above Hero */}
-                  <Card className="bg-gradient-to-r from-primary/10 to-accent/10 border-2 border-primary/20 mb-0 relative">
-                    {!isPremium && (
-                      <Button 
-                        onClick={() => navigate("/joinpremium", {
-                          state: {
-                            from: location.pathname
-                          }
-                        })} 
-                        className="absolute top-3 right-3 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
-                      >
-                        Join Now
-                      </Button>
-                    )}
-                    <CardContent className="p-4">
-                      <div className="space-y-2 text-center">
-                        <h3 className="text-xl font-bold">
-                          Your Gym Re-imagined Anywhere, Anytime
-                        </h3>
-                        <p className="text-base font-semibold text-primary">
-                          We are not here to replace your gym. We are here to back you up when life gets in the way.
-                        </p>
-                        <p className="text-base text-muted-foreground leading-relaxed">
-                          Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed — 
-                          SmartyGym is your backup plan. Or, if you prefer training from home entirely, we've got you covered. 
-                          Or, if you go to your gym but want to follow a professional, science-based workout or training program designed by{' '}
-                          <a href="/coach-profile" onClick={e => {
-                              e.preventDefault();
-                              navigate('/coach-profile');
-                            }} className="text-primary hover:underline font-medium cursor-pointer">
-                            Haris Falas
-                          </a>, we provide that expert guidance.
-                        </p>
-                        <p className="text-base font-semibold text-primary">
-                          Wherever you are, your gym comes with you.
-                        </p>
+                  {/* Desktop Hero Grid - 3x2 Layout */}
+                  <DesktopHeroGrid 
+                    isPremium={isPremium} 
+                    onNavigate={(path) => navigate(path, { state: { from: location.pathname } })} 
+                  />
+
+                  {/* Who is SmartyGym For? - Audience Badges */}
+                  <div className="mt-4 p-6 rounded-xl border-2 border-primary/30 bg-gradient-to-r from-primary/5 to-accent/5">
+                    <h3 className="text-base font-bold text-foreground mb-4 text-center">
+                      Who is <span className="text-primary">SmartyGym</span> For?
+                    </h3>
+                    <div className="grid grid-cols-6 gap-4">
+                      <div className="flex flex-col items-center gap-2">
+                        <Users className="w-6 h-6 text-blue-500" />
+                        <span className="text-sm font-medium text-foreground text-center">Busy Adults</span>
                       </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Three Column Layout: Explore | Who is SmartyGym For? | Credentials */}
-                  <div className="pt-4">
-                    <HeroThreeColumns />
-                  </div>
-
-                  {/* 100% Human. 0% AI Section */}
-                  <div className="pt-6 space-y-4">
-                    <Card className="border-2 border-primary bg-gradient-to-br from-primary/5 to-accent/10 overflow-hidden relative">
-                      <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -mr-16 -mt-16" aria-hidden="true"></div>
-                      <div className="absolute bottom-0 left-0 w-24 h-24 bg-accent/20 rounded-full -ml-12 -mb-12" aria-hidden="true"></div>
-                      
-                      <CardContent className="p-8 md:p-12 relative">
-                        {/* CTA Button for non-premium users - positioned top left */}
-                        {!isPremium && (
-                          <Button 
-                            onClick={() => navigate("/smarty-plans")} 
-                            className="absolute top-4 left-4 bg-primary text-primary-foreground hover:bg-primary/90 text-sm"
-                          >
-                            <Crown className="mr-2 h-4 w-4" />
-                            Transform Your Fitness
-                          </Button>
-                        )}
-                        
-                        <div className="flex items-center justify-center gap-3 mb-6">
-                          <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center">
-                            <UserCheck className="w-8 h-8 text-primary" />
-                          </div>
-                          <Ban className="w-12 h-12 text-destructive" />
-                          <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center">
-                            <Brain className="w-8 h-8 text-destructive" />
-                          </div>
-                        </div>
-                        
-                        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 text-center">
-                          100% Human. 0% AI.
-                        </h2>
-                        
-                        <div className="max-w-3xl mx-auto space-y-4 text-center mb-8">
-                          <p className="text-lg font-semibold text-foreground">
-                            <span className="text-primary font-semibold">SmartyGym</span> workouts and programs are built to fit YOUR life.
-                          </p>
-                          <p className="text-base leading-relaxed text-muted-foreground">
-                            That's why they work — safe and efficient design by <a href="/coach-profile" className="text-primary hover:underline font-medium"><strong>Haris Falas</strong></a>, crafted by hand with care to deliver effective results at <strong>smartygym.com</strong>, <strong className="text-foreground">NOT by AI</strong>.
-                          </p>
-                          <div className="bg-background/80 backdrop-blur-sm p-6 rounded-lg border-2 border-primary/30 mt-6">
-                            <p className="text-lg font-bold text-primary mb-2">
-                              Every workout and training program is science-based and personally created by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>.
-                            </p>
-                            <p className="text-base text-muted-foreground">
-                              Never by AI. Never by algorithms. Always by a real human expert who understands YOUR needs. Training designed by humans, for humans.
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
-                          <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20" itemScope itemType="https://schema.org/Thing" data-feature="smarty-gym-expertise" data-keywords="smarty gym, online gym, online fitness, smartygym.com, Haris Falas Cyprus, sports scientist" role="article" aria-label="Real expertise - SmartyGym Cyprus online fitness - smartygym.com by Haris Falas">
-                            <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1" aria-hidden="true" />
-                            <div>
-                              <p className="font-semibold text-sm mb-1" itemProp="name">Real Expertise</p>
-                              <p className="text-xs text-muted-foreground" itemProp="description">Sports science degree & years of coaching</p>
-                            </div>
-                          </article>
-                          <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20" itemScope itemType="https://schema.org/Thing" data-feature="smarty-gym-personal-touch" data-keywords="online personal training Cyprus, smartygym, Haris Falas, online fitness, real coaching" role="article" aria-label="Personal touch - SmartyGym Cyprus online training - smartygym.com with real client feedback">
-                            <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1" aria-hidden="true" />
-                            <div>
-                              <p className="font-semibold text-sm mb-1" itemProp="name">Personal Touch</p>
-                              <p className="text-xs text-muted-foreground" itemProp="description">Every program refined through real client feedback</p>
-                            </div>
-                          </article>
-                          <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20" itemScope itemType="https://schema.org/Thing" data-feature="smarty-gym-no-ai" data-keywords="human-designed workouts, no AI fitness, smartygym.com, online gym Cyprus, real coaching" role="article" aria-label="Not a robot - SmartyGym Cyprus online gym - human-designed at smartygym.com">
-                            <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1" aria-hidden="true" />
-                            <div>
-                              <p className="font-semibold text-sm mb-1" itemProp="name">Not a Robot</p>
-                              <p className="text-xs text-muted-foreground" itemProp="description">Human-designed workouts backed by science, not AI</p>
-                            </div>
-                          </article>
-                        </div>
-                      </CardContent>
-                    </Card>
-                    
-                    {/* Who is SmartyGym For? - Audience Badges */}
-                    <div className="mt-4 p-6 rounded-xl border-2 border-primary/30 bg-gradient-to-r from-primary/5 to-accent/5">
-                      <h3 className="text-base font-bold text-foreground mb-4 text-center">
-                        Who is <span className="text-primary">SmartyGym</span> For?
-                      </h3>
-                      <div className="grid grid-cols-6 gap-4">
-                        <div className="flex flex-col items-center gap-2">
-                          <Users className="w-6 h-6 text-blue-500" />
-                          <span className="text-sm font-medium text-foreground text-center">Busy Adults</span>
-                        </div>
-                        <div className="flex flex-col items-center gap-2">
-                          <Heart className="w-6 h-6 text-pink-500" />
-                          <span className="text-sm font-medium text-foreground text-center">Parents</span>
-                        </div>
-                        <div className="flex flex-col items-center gap-2">
-                          <GraduationCap className="w-6 h-6 text-emerald-500" />
-                          <span className="text-sm font-medium text-foreground text-center">Beginners</span>
-                        </div>
-                        <div className="flex flex-col items-center gap-2">
-                          <Target className="w-6 h-6 text-orange-500" />
-                          <span className="text-sm font-medium text-foreground text-center">Intermediate Lifters</span>
-                        </div>
-                        <div className="flex flex-col items-center gap-2">
-                          <Plane className="w-6 h-6 text-cyan-500" />
-                          <span className="text-sm font-medium text-foreground text-center">Travelers</span>
-                        </div>
-                        <div className="flex flex-col items-center gap-2">
-                          <Dumbbell className="w-6 h-6 text-purple-500" />
-                          <span className="text-sm font-medium text-foreground text-center">Gym-Goers</span>
-                        </div>
+                      <div className="flex flex-col items-center gap-2">
+                        <Heart className="w-6 h-6 text-pink-500" />
+                        <span className="text-sm font-medium text-foreground text-center">Parents</span>
+                      </div>
+                      <div className="flex flex-col items-center gap-2">
+                        <GraduationCap className="w-6 h-6 text-emerald-500" />
+                        <span className="text-sm font-medium text-foreground text-center">Beginners</span>
+                      </div>
+                      <div className="flex flex-col items-center gap-2">
+                        <Target className="w-6 h-6 text-orange-500" />
+                        <span className="text-sm font-medium text-foreground text-center">Intermediate Lifters</span>
+                      </div>
+                      <div className="flex flex-col items-center gap-2">
+                        <Plane className="w-6 h-6 text-cyan-500" />
+                        <span className="text-sm font-medium text-foreground text-center">Travelers</span>
+                      </div>
+                      <div className="flex flex-col items-center gap-2">
+                        <Dumbbell className="w-6 h-6 text-purple-500" />
+                        <span className="text-sm font-medium text-foreground text-center">Gym-Goers</span>
                       </div>
                     </div>
                   </div>
