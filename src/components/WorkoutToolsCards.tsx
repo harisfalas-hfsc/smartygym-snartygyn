@@ -129,15 +129,16 @@ const TimerCard = () => {
   };
 
   return (
-    <Card className="border-2 border-primary/30">
+    <Card className="border-2 border-primary/30 flex flex-col">
       <CardHeader className="pb-2 bg-primary/5">
         <CardTitle className="text-center text-primary flex items-center justify-center gap-2 text-base">
           <Timer className="h-4 w-4" />
           Workout Timer
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-3">
-        <div className="grid grid-cols-3 gap-2 mb-2">
+      <CardContent className="pt-3 flex flex-col flex-1">
+        {/* Input section - aligned with 1RM exercise selector */}
+        <div className="grid grid-cols-3 gap-2">
           <div>
             <Label className="text-xs font-semibold">Work</Label>
             <div className="flex items-center gap-1">
@@ -176,7 +177,11 @@ const TimerCard = () => {
           </div>
         </div>
 
-        <div className="text-center py-2 bg-muted rounded-lg mb-2">
+        {/* Separator line */}
+        <div className="border-t border-border my-3" />
+
+        {/* Timer display */}
+        <div className="text-center py-2 bg-muted rounded-lg flex-1 flex flex-col justify-center">
           <div className={`text-3xl font-bold mb-1 ${isWorking ? 'text-primary' : 'text-orange-500'}`}>
             {timeLeft}s
           </div>
@@ -185,7 +190,8 @@ const TimerCard = () => {
           </div>
         </div>
 
-        <div className="flex gap-2">
+        {/* Buttons - aligned with 1RM Calculate button */}
+        <div className="flex gap-2 mt-3">
           <Button 
             onClick={handleStartStop}
             className="flex-1 h-8 text-sm"
@@ -270,15 +276,17 @@ const OneRMCard = () => {
   };
 
   return (
-    <Card className="border-2 border-primary/30">
+    <Card className="border-2 border-primary/30 flex flex-col">
       <CardHeader className="pb-2 bg-primary/5">
         <CardTitle className="text-center text-primary flex items-center justify-center gap-2 text-base">
           <Calculator className="h-4 w-4" />
           1RM Calculator
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-3">
-        <div className="space-y-2">
+      <CardContent className="pt-3 flex flex-col flex-1">
+        {/* Exercise selector - aligned with Timer Work/Rest/Rounds */}
+        <div>
+          <Label className="text-xs font-semibold">Exercise</Label>
           <Select value={exerciseName} onValueChange={setExerciseName}>
             <SelectTrigger className="h-7 text-sm">
               <SelectValue placeholder="Select exercise..." />
@@ -291,39 +299,42 @@ const OneRMCard = () => {
               ))}
             </SelectContent>
           </Select>
+        </div>
 
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <Label className="text-xs font-semibold">Weight (kg)</Label>
-              <Input
-                type="number"
-                value={weight}
-                onChange={(e) => setWeight(e.target.value)}
-                placeholder="100"
-                step="0.5"
-                className="h-7 text-sm"
-              />
-            </div>
-            <div>
-              <Label className="text-xs font-semibold">Reps</Label>
-              <Input
-                type="number"
-                value={reps}
-                onChange={(e) => setReps(e.target.value)}
-                placeholder="8"
-                max="12"
-                min="1"
-                className="h-7 text-sm"
-              />
-            </div>
+        {/* Separator line */}
+        <div className="border-t border-border my-3" />
+
+        {/* Weight and Reps inputs */}
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <Label className="text-xs font-semibold">Weight (kg)</Label>
+            <Input
+              type="number"
+              value={weight}
+              onChange={(e) => setWeight(e.target.value)}
+              placeholder="100"
+              step="0.5"
+              className="h-7 text-sm"
+            />
           </div>
+          <div>
+            <Label className="text-xs font-semibold">Reps</Label>
+            <Input
+              type="number"
+              value={reps}
+              onChange={(e) => setReps(e.target.value)}
+              placeholder="8"
+              max="12"
+              min="1"
+              className="h-7 text-sm"
+            />
+          </div>
+        </div>
 
-          <Button onClick={calculateOneRM} className="w-full h-8 text-sm">
-            Calculate
-          </Button>
-
+        {/* Results area - takes remaining space */}
+        <div className="flex-1 mt-2">
           {result && (
-            <div className="space-y-2 pt-1">
+            <div className="space-y-2">
               <div className="bg-primary/10 p-2 rounded-lg text-center">
                 <p className="text-xs text-muted-foreground">Your 1RM</p>
                 <p className="text-2xl font-bold text-primary">{result} kg</p>
@@ -347,6 +358,11 @@ const OneRMCard = () => {
             </div>
           )}
         </div>
+
+        {/* Calculate button - aligned with Timer Start button */}
+        <Button onClick={calculateOneRM} className="w-full h-8 text-sm mt-3">
+          Calculate
+        </Button>
       </CardContent>
     </Card>
   );
