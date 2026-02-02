@@ -10,6 +10,11 @@ import { useAccessControl } from "@/hooks/useAccessControl";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
 
+// Import tool background images
+import oneRmBg from "@/assets/tools/1rm-calculator-bg.jpg";
+import bmrBg from "@/assets/tools/bmr-calculator-bg.jpg";
+import macroBg from "@/assets/tools/macro-calculator-bg.jpg";
+
 const Tools = () => {
   const navigate = useNavigate();
   const { canGoBack, goBack } = useShowBackButton();
@@ -32,21 +37,24 @@ const Tools = () => {
       icon: Calculator,
       title: "1RM Calculator",
       description: "Calculate your one-rep maximum for any exercise",
-      route: "/1rmcalculator"
+      route: "/1rmcalculator",
+      image: oneRmBg
     },
     {
       id: "bmr-calculator",
       icon: Activity,
       title: "BMR Calculator",
       description: "Calculate your basal metabolic rate using the Mifflin-St Jeor formula",
-      route: "/bmrcalculator"
+      route: "/bmrcalculator",
+      image: bmrBg
     },
     {
       id: "macro-calculator",
       icon: Flame,
       title: "Macro Tracking Calculator",
       description: "Get personalized nutrition and macro recommendations",
-      route: "/macrocalculator"
+      route: "/macrocalculator",
+      image: macroBg
     }
   ];
 
@@ -140,24 +148,30 @@ const Tools = () => {
                 const Icon = tool.icon;
                 return (
                   <CarouselItem key={tool.id} className="pl-2 basis-[85%]">
-                    <Card
+                    <div
                       onClick={() => navigate(tool.route)}
-                      className="group p-6 cursor-pointer transition-all duration-300 hover:border-primary/60 bg-card border-2 border-border"
+                      className="group relative h-48 rounded-xl overflow-hidden cursor-pointer transition-all duration-500 ease-out transform-gpu hover:scale-[1.02] hover:shadow-xl"
                     >
-                      <div className="flex flex-col items-center gap-3 text-center">
-                        <div className="p-3 rounded-xl bg-primary/10 text-primary">
-                          <Icon className="w-8 h-8" />
+                      {/* Background Image */}
+                      <img 
+                        src={tool.image} 
+                        alt={tool.title}
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                      {/* Gradient Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20 group-hover:from-black/95" />
+                      
+                      {/* Content */}
+                      <div className="relative h-full flex flex-col justify-end p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="text-base font-semibold text-white">{tool.title}</h3>
+                          <div className="w-9 h-9 rounded-full bg-background/90 flex items-center justify-center shadow-md">
+                            <Icon className="w-5 h-5 text-primary" />
+                          </div>
                         </div>
-                        <div>
-                          <h3 className="font-semibold text-lg mb-2">
-                            {tool.title}
-                          </h3>
-                          <p className="text-sm text-muted-foreground">
-                            {tool.description}
-                          </p>
-                        </div>
+                        <p className="text-xs text-white/80 line-clamp-2">{tool.description}</p>
                       </div>
-                    </Card>
+                    </div>
                   </CarouselItem>
                 );
               })}
@@ -179,26 +193,36 @@ const Tools = () => {
           </div>
         </div>
 
-        {/* Desktop Grid - Full cards */}
+        {/* Desktop Grid - Image cards */}
         <div className="hidden md:grid md:grid-cols-3 gap-6">
           {tools.map((tool) => {
             const Icon = tool.icon;
             return (
-              <Card
+              <div
                 key={tool.id}
                 onClick={() => navigate(tool.route)}
-                className="group p-6 cursor-pointer transition-all duration-500 ease-out transform-gpu hover:scale-110 hover:-translate-y-3 hover:shadow-2xl hover:shadow-primary/40 hover:border-primary/60 bg-card border-2 border-border"
+                className="group relative h-64 rounded-xl overflow-hidden cursor-pointer transition-all duration-500 ease-out transform-gpu hover:scale-[1.08] hover:-translate-y-3 hover:shadow-2xl hover:shadow-primary/40 hover:z-10"
               >
-                <div className="flex flex-col items-center text-center space-y-4">
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
-                    <Icon className="w-8 h-8 text-primary transition-transform duration-300 group-hover:rotate-3" />
+                {/* Background Image */}
+                <img 
+                  src={tool.image} 
+                  alt={tool.title}
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                {/* Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20 group-hover:from-black/95 transition-all duration-300" />
+                
+                {/* Content */}
+                <div className="relative h-full flex flex-col justify-end p-5">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-lg font-semibold text-white">{tool.title}</h3>
+                    <div className="w-10 h-10 rounded-full bg-background/90 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
+                      <Icon className="w-6 h-6 text-primary" />
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2">{tool.title}</h3>
-                    <p className="text-sm text-muted-foreground">{tool.description}</p>
-                  </div>
+                  <p className="text-sm text-white/80">{tool.description}</p>
                 </div>
-              </Card>
+              </div>
             );
           })}
         </div>
