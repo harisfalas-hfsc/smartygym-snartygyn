@@ -168,22 +168,7 @@ export const HeroThreeColumns = () => {
 
   return (
     <div className="grid grid-cols-4 gap-4 mt-6">
-      {/* Static Feature Cards */}
-      {featureCards.map((card) => (
-        <FeatureCard
-          key={card.title}
-          title={card.title}
-          headerIcon={card.headerIcon}
-          borderColor={card.borderColor}
-          headerGradient={card.headerGradient}
-          imageUrl={card.imageUrl}
-          description={card.description}
-          ctaText={card.ctaText}
-          onClick={() => navigate(card.route)}
-        />
-      ))}
-
-      {/* WOD Card - Dynamic */}
+      {/* WOD Card - Dynamic (First Position) */}
       <div 
         onClick={() => navigate("/workout/wod")}
         className="cursor-pointer group border-2 border-green-500 rounded-xl 
@@ -306,6 +291,21 @@ export const HeroThreeColumns = () => {
           )}
         </div>
       </div>
+
+      {/* Static Feature Cards (Smarty Tools, Exercise Library, Blog & News) */}
+      {featureCards.map((card) => (
+        <FeatureCard
+          key={card.title}
+          title={card.title}
+          headerIcon={card.headerIcon}
+          borderColor={card.borderColor}
+          headerGradient={card.headerGradient}
+          imageUrl={card.imageUrl}
+          description={card.description}
+          ctaText={card.ctaText}
+          onClick={() => navigate(card.route)}
+        />
+      ))}
     </div>
   );
 };
