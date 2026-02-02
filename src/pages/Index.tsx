@@ -666,54 +666,44 @@ const Index = () => {
           
           <div className="container mx-auto max-w-6xl px-4 relative z-10 overflow-x-hidden">
             <ScrollReveal>
-              <Card itemScope itemType="https://schema.org/Organization" data-hero-section="true" data-keywords="smarty gym, online gym, online fitness, smartygym.com, Haris Falas, global online gym" aria-label="SmartyGym - Your online gym and fitness platform - smartygym.com" className="border-2 border-primary bg-white dark:bg-card backdrop-blur-sm my-0 mb-0 mt-0">
-                <div className="p-4 sm:p-6 md:p-8 space-y-4">
-                  
-                  {/* Hidden SEO metadata */}
-                  <meta itemProp="url" content="https://smartygym.com" />
-                  <meta itemProp="description" content="SmartyGym - #1 online gym and fitness platform by Haris Falas - smartygym.com" />
+              {/* Desktop Hero Grid - 3x2 Layout - Outside card borders */}
+              <DesktopHeroGrid 
+                isPremium={isPremium} 
+                onNavigate={(path) => navigate(path, { state: { from: location.pathname } })} 
+              />
 
-                  {/* Desktop Hero Grid - 3x2 Layout */}
-                  <DesktopHeroGrid 
-                    isPremium={isPremium} 
-                    onNavigate={(path) => navigate(path, { state: { from: location.pathname } })} 
-                  />
-
-                  {/* Who is SmartyGym For? - Audience Badges */}
-                  <div className="mt-4 p-6 rounded-xl border-2 border-primary/30 bg-gradient-to-r from-primary/5 to-accent/5">
-                    <h3 className="text-base font-bold text-foreground mb-4 text-center">
-                      Who is <span className="text-primary">SmartyGym</span> For?
-                    </h3>
-                    <div className="grid grid-cols-6 gap-4">
-                      <div className="flex flex-col items-center gap-2">
-                        <Users className="w-6 h-6 text-blue-500" />
-                        <span className="text-sm font-medium text-foreground text-center">Busy Adults</span>
-                      </div>
-                      <div className="flex flex-col items-center gap-2">
-                        <Heart className="w-6 h-6 text-pink-500" />
-                        <span className="text-sm font-medium text-foreground text-center">Parents</span>
-                      </div>
-                      <div className="flex flex-col items-center gap-2">
-                        <GraduationCap className="w-6 h-6 text-emerald-500" />
-                        <span className="text-sm font-medium text-foreground text-center">Beginners</span>
-                      </div>
-                      <div className="flex flex-col items-center gap-2">
-                        <Target className="w-6 h-6 text-orange-500" />
-                        <span className="text-sm font-medium text-foreground text-center">Intermediate Lifters</span>
-                      </div>
-                      <div className="flex flex-col items-center gap-2">
-                        <Plane className="w-6 h-6 text-cyan-500" />
-                        <span className="text-sm font-medium text-foreground text-center">Travelers</span>
-                      </div>
-                      <div className="flex flex-col items-center gap-2">
-                        <Dumbbell className="w-6 h-6 text-purple-500" />
-                        <span className="text-sm font-medium text-foreground text-center">Gym-Goers</span>
-                      </div>
-                    </div>
+              {/* Who is SmartyGym For? - Audience Badges */}
+              <div className="mt-4 p-6 rounded-xl border-2 border-primary/30 bg-gradient-to-r from-primary/5 to-accent/5">
+                <h3 className="text-base font-bold text-foreground mb-4 text-center">
+                  Who is <span className="text-primary">SmartyGym</span> For?
+                </h3>
+                <div className="grid grid-cols-6 gap-4">
+                  <div className="flex flex-col items-center gap-2">
+                    <Users className="w-6 h-6 text-blue-500" />
+                    <span className="text-sm font-medium text-foreground text-center">Busy Adults</span>
                   </div>
-
+                  <div className="flex flex-col items-center gap-2">
+                    <Heart className="w-6 h-6 text-pink-500" />
+                    <span className="text-sm font-medium text-foreground text-center">Parents</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-2">
+                    <GraduationCap className="w-6 h-6 text-emerald-500" />
+                    <span className="text-sm font-medium text-foreground text-center">Beginners</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-2">
+                    <Target className="w-6 h-6 text-orange-500" />
+                    <span className="text-sm font-medium text-foreground text-center">Intermediate Lifters</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-2">
+                    <Plane className="w-6 h-6 text-cyan-500" />
+                    <span className="text-sm font-medium text-foreground text-center">Travelers</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-2">
+                    <Dumbbell className="w-6 h-6 text-purple-500" />
+                    <span className="text-sm font-medium text-foreground text-center">Gym-Goers</span>
+                  </div>
                 </div>
-              </Card>
+              </div>
             </ScrollReveal>
           </div>
         </section>
