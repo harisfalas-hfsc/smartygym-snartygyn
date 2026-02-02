@@ -1,84 +1,58 @@
 
 
-# Verification Report: Workout Tools Already Applied Globally
+# Make Exercise Library Popup More Compact on Mobile
 
 ## Summary
 
-After exploring the codebase, I can confirm that **the workout tools update is already complete and applied to ALL content** - existing and future. No additional updates are required.
+Two changes to improve the Exercise Library tool in workout pages:
+
+1. **More compact popup on mobile** - Reduce the popup height so it doesn't take the full screen, making it clearer where the popup ends and the workout content is
+2. **Rename button** - Change "Exercises" to "Exercise Library" for clarity
 
 ---
 
-## Current Architecture (Already Implemented)
+## Changes
 
-```text
-WorkoutDisplay.tsx
-       │
-       ├──────────────────────────────────┐
-       │                                  │
-       ▼                                  ▼
-IndividualWorkout.tsx          IndividualTrainingProgram.tsx
-       │                                  │
-       ▼                                  ▼
-   184 Workouts                     28 Programs
-   (all visible)                   (all visible)
-```
+### 1. Make Exercise Library Popup More Compact (Mobile Only)
 
-The **WorkoutToolsCards** component is embedded inside **WorkoutDisplay** at line 263, meaning:
+**File:** `src/components/ExerciseLibraryPopup.tsx`
 
-| Content Type | Count | Uses WorkoutDisplay | Has New Tools |
-|--------------|-------|---------------------|---------------|
-| Workouts (WOD, Categories) | 184 | Yes | Yes |
-| Training Programs | 28 | Yes | Yes |
-| Future AI-generated WODs | All | Yes | Yes |
-| Future manually-created content | All | Yes | Yes |
+Current styling takes too much screen space on mobile:
+- `max-h-[85vh]` - Uses 85% of screen height
+- `h-[50vh]` for ScrollArea - Uses 50% of screen height
 
----
+New responsive styling for mobile only:
+- `max-h-[70vh] sm:max-h-[85vh]` - Reduces to 70% on mobile, keeps 85% on desktop
+- `h-[35vh] sm:h-[50vh]` for ScrollArea - Reduces to 35% on mobile, keeps 50% on desktop
+- Add visible border styling to make the popup boundaries clearer in dark mode
 
-## Why No Individual Updates Are Needed
+### 2. Rename Button from "Exercises" to "Exercise Library"
 
-The workout tools (Timer, 1RM Calculator, Exercise Library) are:
+**File:** `src/components/WorkoutToolsMobile.tsx`
 
-1. **Component-based, not data-stored** - The tools are rendered by React components, not stored in the database
-2. **Centrally located** - `WorkoutToolsCards` lives inside `WorkoutDisplay.tsx`
-3. **Universally applied** - Every workout and program page uses `WorkoutDisplay`
-
-This means:
-- Opening **any workout** shows the sticky toolbar with popup tools
-- Opening **any training program** shows the same toolbar
-- **Future content** will automatically inherit this UI
+Change the button text:
+- From: `<span className="text-xs sm:text-sm">Exercises</span>`
+- To: `<span className="text-xs sm:text-sm">Exercise Library</span>`
 
 ---
 
-## Verification Results
+## Why This Works Globally
 
-| Check | Status |
-|-------|--------|
-| WorkoutToolsCards in WorkoutDisplay.tsx | Line 263 |
-| IndividualWorkout.tsx uses WorkoutDisplay | Line 347 |
-| IndividualTrainingProgram.tsx uses WorkoutDisplay | Line 317 |
-| Sticky toolbar with popup behavior | Active (WorkoutToolsMobile.tsx) |
-| Persistent transparent Timer | Active (WorkoutTimerPopup.tsx) |
-| Popup 1RM Calculator with history saving | Active (OneRMCalculatorPopup.tsx) |
-| Popup Exercise Library with GIFs | Active (ExerciseLibraryPopup.tsx) |
+Since both files are shared components used by `WorkoutDisplay.tsx`, these changes automatically apply to:
+
+- All 184 existing workouts
+- All 28 existing training programs
+- All future AI-generated or manually-created content
+
+No individual updates needed - the component-based architecture handles this.
 
 ---
 
-## What You Can Test Now
+## Technical Details
 
-1. **Any Workout**: Navigate to any workout (e.g., the current "Summit Forge") - you'll see the sticky toolbar
-2. **Any Training Program**: Navigate to any program - same toolbar appears
-3. **AI-Generated WODs**: Future WODs will automatically have the toolbar
-4. **Admin-Created Content**: Any workout/program you create will have the toolbar
-
----
-
-## Conclusion
-
-No code changes are required. The implementation is already:
-
-- Applied to **all 184 existing workouts**
-- Applied to **all 28 existing training programs**  
-- Set as the **default for all future content**
-
-The architecture ensures that any content using `WorkoutDisplay` (which is all workouts and programs) automatically gets the new tools UI.
+| Change | File | Line(s) |
+|--------|------|---------|
+| Compact popup height | `ExerciseLibraryPopup.tsx` | Line 66 (DialogContent), Line 103 (ScrollArea) |
+| Button rename | `WorkoutToolsMobile.tsx` | Line 47 |
+| Dark mode visibility | `ExerciseLibraryPopup.tsx` | Line 66 (add border styling) |
 
