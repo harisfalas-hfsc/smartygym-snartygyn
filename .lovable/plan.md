@@ -1,76 +1,128 @@
 
-# Gold Standard V3 Complete Formatting Fix
+# Homepage Hero Section Redesign (Desktop Only)
 
-## Problem Identified
+## Overview
 
-After database analysis, I found the exact cause of the formatting differences:
+This plan redesigns the `HeroThreeColumns` component to replace the current three text columns (Explore, Who is SmartyGym For, Why SmartyGym) with a modern 4-card layout matching the existing Workout of the Day card styling. **All changes apply to desktop view only** - mobile layout remains completely unchanged.
 
-| Workout | Status | Newlines in HTML |
-|---------|--------|------------------|
-| Crucible Test | CORRECT | 0 |
-| Gluteal Anchor | CORRECT | 0 |
-| Iron Will Endurance Test | WRONG | 20 |
-| Iron Chest & Back | WRONG | 22 |
+## Current vs New Layout (Desktop Only)
 
-The workouts with incorrect spacing have **literal newline characters** embedded in their HTML strings. These newlines cause rendering whitespace that the current repair function does not remove.
+```text
+CURRENT DESKTOP LAYOUT:
+┌────────────┬────────────┬────────────┬────────────┐
+│  Explore   │ Who Is For │ Why Smarty │  WOD Card  │
+│  (6 links) │ (6 items)  │ (4 items)  │  (banner)  │
+└────────────┴────────────┴────────────┴────────────┘
 
-## Solution
+NEW DESKTOP LAYOUT:
+┌──────────┬──────────┬──────────┬──────────┐
+│  Smarty  │ Exercise │   Blog   │   WOD    │
+│  Tools   │ Library  │  & News  │  Banner  │
+│  (card)  │  (card)  │  (card)  │  (card)  │
+└──────────┴──────────┴──────────┴──────────┘
 
-### 1. Update Repair Function
-Add a critical step to the repair function that:
-- Strips all literal newline characters (`\n`, `\r`) from the HTML
-- Collapses multiple spaces into single spaces
-- Ensures the output is compact like "Crucible Test"
-
-### 2. Re-run Repair on All Workouts
-Execute the updated repair function across all existing workouts to:
-- Remove newlines from HTML
-- Verify proper section separators exist
-- Ensure no extra spacing between exercises
-
-### 3. Verify "Crucible Test" Pattern
-The target format (from Crucible Test) is:
+BELOW "100% Human. 0% AI." section:
+┌─────────────────────────────────────────────────────┐
+│    "Who is SmartyGym For?" - 6 audience badges      │
+│  [Busy Adults] [Parents] [Beginners] [Intermediate] │
+│  [Travelers] [Gym-Goers]                            │
+└─────────────────────────────────────────────────────┘
 ```
-<p class="tiptap-paragraph">🔥 <strong><u>Warm Up 10'</u></strong></p><ul class="tiptap-bullet-list"><li class="tiptap-list-item">...
-```
-Key characteristics:
-- No newlines anywhere in the HTML
-- Header tag immediately followed by `<ul>` (no blank line)
-- Single `<p class="tiptap-paragraph"></p>` between sections
-- All list items in one continuous `<ul>` block
 
-## Files to Modify
+## Mobile View: No Changes
 
-1. `supabase/functions/repair-content-formatting/index.ts`
-   - Add `stripNewlines()` function
-   - Add `mergeConsecutiveLists()` function to combine separate `<ul>` blocks within same section
-   - Call these at the start of the repair pipeline
+The mobile view in `Index.tsx` (lines 459-677) uses a completely separate layout with:
+- Carousel for navigation cards
+- Separate "What We Stand For" card
+- Different WOD display
 
-2. Database updates via edge function execution
-   - Run repair on all workouts after function update
+**This mobile code will remain completely untouched.**
+
+## Design Specifications
+
+### Card Dimensions
+All 4 cards will use identical sizing based on the current WOD card:
+- Height: 220px
+- Width: Calculated to fit 4 cards evenly with gaps
+- Cards will be perfectly aligned in a single row
+
+### Card Design Pattern
+Each promotional card will match the WOD card structure:
+1. **Header bar** with icon + title (gradient background)
+2. **Image section** (130px height, object-cover)
+3. **Content section** with title + brief description
+4. **CTA link** with hover animation and arrow icon
+
+### Card-Specific Details
+
+| Card | Border Color | Header Icon | Image | CTA Text |
+|------|-------------|-------------|-------|----------|
+| Smarty Tools | orange-500 | Calculator | Static fitness tools image | Explore Tools |
+| Exercise Library | emerald-500 | Video | Static exercise demo image | Browse Library |
+| Blog & News | red-500 | FileText | Static blog/reading image | Read Articles |
+| WOD | green-500 | Dumbbell | Dynamic from database | View Today's WOD |
+
+### "Who is SmartyGym For" Section
+- Small card/section positioned below the "100% Human. 0% AI." card
+- Displays 6 audience types as inline badges with icons:
+  - Busy Adults (Users icon, blue)
+  - Parents (Heart icon, pink)
+  - Beginners (GraduationCap icon, emerald)
+  - Intermediate Lifters (Target icon, orange)
+  - Travelers (Plane icon, cyan)
+  - Gym-Goers (Dumbbell icon, purple)
 
 ## Technical Implementation
 
+### Files to Modify
+
+1. **`src/components/HeroThreeColumns.tsx`**
+   - Complete redesign of the component
+   - Remove the three text-based columns (Explore, Who Is For, Why)
+   - Create a reusable `FeatureCard` sub-component
+   - Implement 4-card horizontal grid layout
+   - Keep WOD card logic intact (database query, rotation, etc.)
+   - Add three static cards for Tools, Library, Blog
+   - Use Unsplash images for static cards
+
+2. **`src/pages/Index.tsx`**
+   - Add "Who is SmartyGym For" badge section below the "100% Human. 0% AI." card
+   - Uses existing icons and color scheme from the removed column
+   - Simple horizontal badge layout
+
+### Component Structure
+
 ```text
-Repair Pipeline Order:
-1. STRIP NEWLINES (NEW) - Remove \n, \r, collapse spaces
-2. MERGE LISTS (NEW) - Combine consecutive <ul> blocks
-3. Fix quote attributes
-4. Fix duplicate icons
-5. Normalize empty paragraphs
-6. Remove leading/trailing empties
-7. Add TipTap classes
-8. Remove blank after headers
-9. Enforce section separators
-10. Remove intra-list spacing
-11. Convert stray paragraphs to bullets
-12. Final cleanup
+HeroThreeColumns (renamed internally to HeroFeatureCards)
+├── FeatureCard (reusable component)
+│   ├── Header (icon + title with gradient)
+│   ├── Image (static or dynamic)
+│   ├── Content (description text)
+│   └── CTA (link + chevron icon)
+│
+├── Tools Card (static image)
+├── Library Card (static image)
+├── Blog Card (static image)
+└── WOD Card (dynamic, existing logic preserved)
 ```
 
-## Verification Steps
+### Static Images
 
-After implementation:
-1. Confirm Iron Will Endurance Test has `newline_count: 0`
-2. Confirm Iron Chest & Back has `newline_count: 0`
-3. Visually verify both match Crucible Test formatting
-4. Check 5 random workouts across categories for consistency
+High-quality Unsplash images representing:
+- **Tools**: Fitness equipment/calculator theme
+- **Library**: Exercise demonstration/gym theme
+- **Blog**: Reading/learning/education theme
+
+## Summary of Changes
+
+| What | Action |
+|------|--------|
+| "Explore" column | DELETE - replaced by three cards |
+| "Who is SmartyGym For" column | DELETE - moved to badge section |
+| "Why SmartyGym" column | DELETE - links moved elsewhere or removed |
+| WOD Card | KEEP - unchanged in logic, resized to match |
+| Smarty Tools card | ADD - new static card |
+| Exercise Library card | ADD - new static card |
+| Blog & News card | ADD - new static card |
+| Audience badges | ADD - new section below Human/AI card |
+| Mobile view | UNCHANGED - completely untouched |
