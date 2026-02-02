@@ -309,8 +309,8 @@ export default function TakeATour() {
                   <h4 className="font-semibold mb-1">Morning Ritual</h4>
                   <p className="text-xs text-muted-foreground">Start your day with intention, movement, and mindset</p>
                 </div>
-                <div className="p-4 bg-yellow-500/10 rounded-lg border border-yellow-500/30 text-center">
-                  <Sun className="h-6 w-6 text-yellow-500 mx-auto mb-2" />
+                <div className="p-4 bg-sky-500/10 rounded-lg border border-sky-500/30 text-center">
+                  <Sun className="h-6 w-6 text-sky-500 mx-auto mb-2" />
                   <h4 className="font-semibold mb-1">Midday Ritual</h4>
                   <p className="text-xs text-muted-foreground">Reset, refocus, and maintain energy throughout</p>
                 </div>
