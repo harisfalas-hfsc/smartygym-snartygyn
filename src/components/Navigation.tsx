@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User as UserIcon, Settings, LogOut, LayoutDashboard, Crown, Menu, Bell, Facebook, Instagram, Youtube, ShoppingBag, Info, Dumbbell, ListChecks, Wrench, BookOpen, Users, Newspaper, Mail, Sparkles, Building2, Shield } from "lucide-react";
+import { User as UserIcon, Settings, LogOut, LayoutDashboard, Crown, Menu, Bell, Facebook, Instagram, Youtube, ShoppingBag, Info, Dumbbell, ListChecks, Wrench, BookOpen, Users, Newspaper, Mail, Sparkles, Building2, Shield, HelpCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -344,6 +344,14 @@ export const Navigation = () => {
                   >
                     <Building2 className="mr-2 h-4 w-4 text-sky-500" />
                     Smarty Corporate
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleNavigate("/faq")}
+                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/faq' ? 'text-primary underline underline-offset-4 bg-primary/10' : 'text-foreground hover:bg-primary/10 hover:text-foreground'}`}
+                  >
+                    <HelpCircle className="mr-2 h-4 w-4 text-purple-500" />
+                    FAQ
                   </Button>
                   <Button
                     variant="ghost"
