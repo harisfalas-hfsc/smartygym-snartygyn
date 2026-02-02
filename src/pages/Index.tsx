@@ -673,7 +673,7 @@ const Index = () => {
                   <meta itemProp="url" content="https://smartygym.com" />
                   <meta itemProp="description" content="SmartyGym - #1 online gym and fitness platform by Haris Falas - smartygym.com" />
 
-                  {/* Your Gym Anywhere Card - Above Hero */}
+                  {/* Your Gym Anywhere Card - Above Hero with Carousel */}
                   <Card className="bg-gradient-to-r from-primary/10 to-accent/10 border-2 border-primary/20 mb-0 relative">
                     {!isPremium && (
                       <Button 
@@ -682,7 +682,7 @@ const Index = () => {
                             from: location.pathname
                           }
                         })} 
-                        className="absolute top-3 right-3 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
+                        className="absolute top-3 right-3 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md z-10"
                       >
                         Join Now
                       </Button>
@@ -710,13 +710,11 @@ const Index = () => {
                           Wherever you are, your gym comes with you.
                         </p>
                       </div>
+                      
+                      {/* Carousel inside the card */}
+                      <HeroThreeColumns />
                     </CardContent>
                   </Card>
-
-                  {/* Three Column Layout: Explore | Who is SmartyGym For? | Credentials */}
-                  <div className="pt-4">
-                    <HeroThreeColumns />
-                  </div>
 
                   {/* 100% Human. 0% AI Section */}
                   <div className="pt-6 space-y-4">
