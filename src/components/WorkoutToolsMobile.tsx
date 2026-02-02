@@ -44,7 +44,7 @@ export const WorkoutToolsMobile = () => {
           className="gap-1.5 h-9 px-3 sm:px-4"
         >
           <Dumbbell className="h-4 w-4" />
-          <span className="text-xs sm:text-sm">Exercises</span>
+          <span className="text-xs sm:text-sm">Exercise Library</span>
         </Button>
       </div>
 
