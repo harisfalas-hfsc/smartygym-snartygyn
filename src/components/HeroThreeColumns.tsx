@@ -5,93 +5,29 @@ import { supabase } from "@/integrations/supabase/client";
 import { getCyprusTodayStr } from "@/lib/cyprusDate";
 import { 
   Dumbbell,
-  Calendar, 
-  Sparkles, 
   Calculator, 
   FileText, 
   Video,
-  Users,
-  Heart,
-  GraduationCap,
-  Target,
-  Plane,
-  Smartphone,
-  UserCheck,
-  CalendarCheck,
   ChevronRight,
   Star,
-  CircleDollarSign,
   Crown,
   Flame,
-  Clock
+  Clock,
+  Target
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useAccessControl } from "@/contexts/AccessControlContext";
 
-interface AnimatedBulletProps {
-  icon: React.ReactNode;
-  text: string;
-  delay: number;
-  onClick?: () => void;
-  isLink?: boolean;
-  isVisible: boolean;
-  highlight?: boolean;
-  subtitle?: string;
-}
-
-const AnimatedBullet = ({ icon, text, delay, onClick, isLink, isVisible, highlight, subtitle }: AnimatedBulletProps) => {
-  const [show, setShow] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
-
-  useEffect(() => {
-    if (isVisible) {
-      const timer = setTimeout(() => setShow(true), delay);
-      return () => clearTimeout(timer);
-    }
-  }, [isVisible, delay]);
-
-  return (
-    <div 
-      className={cn(
-        "flex items-center gap-2 transition-all duration-300 rounded-md px-2 py-1 -mx-2",
-        isLink && "cursor-pointer hover:text-primary hover:bg-primary/10 group",
-        !isLink && "hover:bg-muted/50",
-        show ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2",
-        isHovered && "bg-primary/10 scale-[1.02]"
-      )}
-      onClick={onClick}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <span className="flex-shrink-0">{icon}</span>
-      <div className="flex flex-col">
-        <span className={cn(
-          "text-sm font-medium",
-          isLink && "group-hover:text-primary transition-colors",
-          highlight && "text-red-600",
-          isHovered && "text-primary"
-        )}>
-          {text}
-        </span>
-        {subtitle && (
-          <span className={cn(
-            "text-xs text-muted-foreground transition-all duration-300",
-            isHovered ? "opacity-100 max-h-5" : "opacity-0 max-h-0 overflow-hidden"
-          )}>
-            {subtitle}
-          </span>
-        )}
-      </div>
-    </div>
-  );
-};
+// Import static images
+import heroToolsImage from "@/assets/hero-tools.jpg";
+import heroLibraryImage from "@/assets/hero-exercise-library.jpg";
+import heroBlogImage from "@/assets/hero-blog.jpg";
 
 // Helper to convert star count to difficulty label
 const getDifficultyLabel = (stars: number | null | undefined, isRecovery: boolean): string => {
   if (isRecovery || !stars || stars === 0) return "All Levels";
   if (stars <= 2) return "Beginner";
   if (stars <= 4) return "Intermediate";
-  return "Advanced"; // 5-6 stars
+  return "Advanced";
 };
 
 // Check if WOD is recovery type
@@ -99,16 +35,75 @@ const isRecoveryWod = (wod: { equipment?: string | null; category?: string | nul
   return wod.equipment?.toUpperCase() === "VARIOUS" || wod.category?.toUpperCase() === "RECOVERY";
 };
 
+// Reusable Feature Card component
+interface FeatureCardProps {
+  title: string;
+  headerIcon: React.ReactNode;
+  borderColor: string;
+  headerGradient: string;
+  imageUrl: string;
+  description: string;
+  ctaText: string;
+  onClick: () => void;
+}
+
+const FeatureCard = ({
+  title,
+  headerIcon,
+  borderColor,
+  headerGradient,
+  imageUrl,
+  description,
+  ctaText,
+  onClick
+}: FeatureCardProps) => {
+  return (
+    <div 
+      onClick={onClick}
+      className={cn(
+        "cursor-pointer group border-2 rounded-xl",
+        "hover:shadow-xl hover:scale-105 hover:-translate-y-1",
+        "transition-all duration-300",
+        "flex flex-col h-[220px] w-full overflow-hidden",
+        borderColor
+      )}
+    >
+      {/* Header */}
+      <div className={cn(
+        "flex items-center justify-center gap-2 py-2 border-b",
+        headerGradient
+      )}>
+        {headerIcon}
+        <span className="text-xs font-bold text-primary uppercase tracking-wide">{title}</span>
+      </div>
+      
+      {/* Image Section */}
+      <div className="relative h-[130px] overflow-hidden bg-muted">
+        <img 
+          src={imageUrl} 
+          alt={title}
+          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+        />
+      </div>
+      
+      {/* Content Section */}
+      <div className="flex-1 p-3 flex flex-col justify-between">
+        <p className="text-xs text-muted-foreground line-clamp-2">{description}</p>
+        
+        {/* CTA */}
+        <div className="flex items-center justify-center gap-1 text-primary text-[10px] font-medium 
+                        group-hover:gap-2 transition-all mt-1">
+          {ctaText}
+          <ChevronRight className="w-3 h-3" />
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export const HeroThreeColumns = () => {
   const navigate = useNavigate();
-  const [isVisible, setIsVisible] = useState(false);
   const [currentWodIndex, setCurrentWodIndex] = useState(0);
-  const { userTier } = useAccessControl();
-  const isPremium = userTier === "premium";
-
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
 
   // Fetch both WODs for the banner with full card data - filtered by Cyprus date
   const cyprusToday = getCyprusTodayStr();
@@ -138,241 +133,177 @@ export const HeroThreeColumns = () => {
 
   const currentWod = wods?.[currentWodIndex] || wods?.[0];
 
-  const exploreLinks = [
-    { text: "Smarty Workouts", subtitle: "500+ workouts", icon: <Dumbbell className="w-4 h-4 text-primary" />, route: "/workout" },
-    { text: "Smarty Programs", subtitle: "structured long-term plans", icon: <Calendar className="w-4 h-4 text-blue-500" />, route: "/trainingprogram" },
-    { text: "Smarty Ritual", subtitle: "daily wellness guide", icon: <Sparkles className="w-4 h-4 text-purple-500" />, route: "/daily-ritual" },
-    { text: "Smarty Tools", subtitle: "fitness calculators", icon: <Calculator className="w-4 h-4 text-orange-500" />, route: "/tools" },
-    { text: "Blog & Insights", subtitle: "designed by Haris Falas", icon: <FileText className="w-4 h-4 text-red-500" />, route: "/blog" },
-    { text: "Exercise Library", subtitle: "demonstration videos", icon: <Video className="w-4 h-4 text-emerald-500" />, route: "/exerciselibrary" },
+  const featureCards = [
+    {
+      title: "Smarty Tools",
+      headerIcon: <Calculator className="w-4 h-4 text-primary" />,
+      borderColor: "border-orange-500 hover:border-primary",
+      headerGradient: "bg-gradient-to-r from-orange-500/10 to-primary/10 border-orange-500/30",
+      imageUrl: heroToolsImage,
+      description: "Fitness calculators for BMR, calories, 1RM & more",
+      ctaText: "Explore Tools",
+      route: "/tools"
+    },
+    {
+      title: "Exercise Library",
+      headerIcon: <Video className="w-4 h-4 text-primary" />,
+      borderColor: "border-emerald-500 hover:border-primary",
+      headerGradient: "bg-gradient-to-r from-emerald-500/10 to-primary/10 border-emerald-500/30",
+      imageUrl: heroLibraryImage,
+      description: "Video demonstrations for every exercise",
+      ctaText: "Browse Library",
+      route: "/exerciselibrary"
+    },
+    {
+      title: "Blog & News",
+      headerIcon: <FileText className="w-4 h-4 text-primary" />,
+      borderColor: "border-red-500 hover:border-primary",
+      headerGradient: "bg-gradient-to-r from-red-500/10 to-primary/10 border-red-500/30",
+      imageUrl: heroBlogImage,
+      description: "Expert insights by Haris Falas",
+      ctaText: "Read Articles",
+      route: "/blog"
+    }
   ];
-
-  const whoIsFor = [
-    { text: "Busy Adults", icon: <Users className="w-4 h-4 text-blue-500" /> },
-    { text: "Parents", icon: <Heart className="w-4 h-4 text-pink-500" /> },
-    { text: "Beginners", icon: <GraduationCap className="w-4 h-4 text-emerald-500" /> },
-    { text: "Intermediate Lifters", icon: <Target className="w-4 h-4 text-orange-500" /> },
-    { text: "Travelers", icon: <Plane className="w-4 h-4 text-cyan-500" /> },
-    { text: "Gym-Goers", icon: <Dumbbell className="w-4 h-4 text-purple-500" /> },
-  ];
-
-  const credentials = [
-    { text: "Online Fitness Redefined", icon: <Sparkles className="w-4 h-4 text-purple-500" /> },
-    { text: "Your Gym In Your Pocket", icon: <Smartphone className="w-4 h-4 text-cyan-500" /> },
-    { text: "100% Human. 0% AI.", icon: <UserCheck className="w-4 h-4 text-red-500" />, highlight: true },
-    { text: "Train Anywhere, Anytime", icon: <Plane className="w-4 h-4 text-emerald-500" /> },
-  ];
-
-  const renderStars = (count: number) => {
-    return Array.from({ length: count }, (_, i) => (
-      <Star key={i} className="w-3 h-3 fill-primary text-primary" />
-    ));
-  };
 
   return (
-    <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 lg:gap-4 mt-6">
-      {/* Column 1: Explore */}
-      <div className="pt-8">
-        <h3 className="text-lg font-bold text-foreground mb-4">
-          Explore
-        </h3>
-        <div className="space-y-1.5">
-          {exploreLinks.map((item, index) => (
-            <AnimatedBullet
-              key={item.text}
-              icon={item.icon}
-              text={item.text}
-              subtitle={item.subtitle}
-              delay={100 + index * 100}
-              onClick={() => navigate(item.route)}
-              isLink
-              isVisible={isVisible}
-            />
-          ))}
-        </div>
-      </div>
+    <div className="grid grid-cols-4 gap-4 mt-6">
+      {/* Static Feature Cards */}
+      {featureCards.map((card) => (
+        <FeatureCard
+          key={card.title}
+          title={card.title}
+          headerIcon={card.headerIcon}
+          borderColor={card.borderColor}
+          headerGradient={card.headerGradient}
+          imageUrl={card.imageUrl}
+          description={card.description}
+          ctaText={card.ctaText}
+          onClick={() => navigate(card.route)}
+        />
+      ))}
 
-      {/* Column 2: Who is SmartyGym For? */}
-      <div className="pt-8">
-        <h3 className="text-lg font-bold text-foreground mb-4">
-          Who is <span className="text-primary">SmartyGym</span> For
-        </h3>
-        <div className="space-y-1.5">
-          {whoIsFor.map((item, index) => (
-            <AnimatedBullet
-              key={item.text}
-              icon={item.icon}
-              text={item.text}
-              delay={200 + index * 100}
-              isVisible={isVisible}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* Column 3: Why SmartyGym */}
-      <div className="pt-8">
-        <h3 className="text-lg font-bold text-foreground mb-4">
-          Why SmartyGym
-        </h3>
-        <div className="space-y-1.5">
-          {credentials.map((item, index) => (
-            <AnimatedBullet
-              key={item.text}
-              icon={item.icon}
-              text={item.text}
-              delay={300 + index * 100}
-              isVisible={isVisible}
-              highlight={item.highlight}
-            />
-          ))}
+      {/* WOD Card - Dynamic */}
+      <div 
+        onClick={() => navigate("/workout/wod")}
+        className="cursor-pointer group border-2 border-green-500 rounded-xl 
+                   hover:border-primary hover:shadow-xl hover:scale-105 hover:-translate-y-1 
+                   transition-all duration-300
+                   flex flex-col h-[220px] w-full overflow-hidden"
+      >
+        {/* Header: Workout of the Day with icon */}
+        <div className="flex items-center justify-center gap-2 py-2 bg-gradient-to-r from-green-500/10 to-primary/10 border-b border-green-500/30">
+          <Dumbbell className="w-4 h-4 text-primary" />
+          <span className="text-xs font-bold text-primary uppercase tracking-wide">Workout of the Day</span>
         </div>
         
-        {/* Simple CTA Link */}
-        <div 
-          onClick={() => navigate("/human-performance")}
-          className="mt-1.5 flex items-center gap-2 cursor-pointer group hover:text-primary transition-colors rounded-md px-2 py-1 -mx-2 hover:bg-primary/10"
-        >
-          <CircleDollarSign className="w-4 h-4 text-green-500 flex-shrink-0" />
-          <span className="text-sm font-bold text-green-500 group-hover:text-primary transition-colors">Why SmartyGym?</span>
-        </div>
-        
-        {/* Join SmartyGym Now - Only for non-premium users */}
-        {!isPremium && (
-          <div 
-            onClick={() => navigate("/joinpremium")}
-            className="mt-1.5 flex items-center gap-2 cursor-pointer group hover:text-primary transition-colors rounded-md px-2 py-1 -mx-2 hover:bg-primary/10"
-          >
-            <Crown className="w-4 h-4 text-sky-500 flex-shrink-0" />
-            <span className="text-sm font-bold text-sky-500 group-hover:text-primary transition-colors">Join SmartyGym Now</span>
-          </div>
-        )}
-      </div>
-
-      {/* Column 4: WOD Promotional Banner */}
-      <div className="pt-8">
-        <div 
-          onClick={() => navigate("/workout/wod")}
-          className="cursor-pointer group border-2 border-green-500 rounded-xl 
-                     hover:border-primary hover:shadow-xl hover:scale-105 hover:-translate-y-1 
-                     transition-all duration-300
-                     flex flex-col h-[220px] w-[250px] overflow-hidden"
-        >
-          {/* Header: Workout of the Day with icon */}
-          <div className="flex items-center justify-center gap-2 py-2 bg-gradient-to-r from-green-500/10 to-primary/10 border-b border-green-500/30">
-            <Dumbbell className="w-4 h-4 text-primary" />
-            <span className="text-xs font-bold text-primary uppercase tracking-wide">Workout of the Day</span>
-          </div>
-          
-          {/* WOD Card Content - smooth crossfade between WODs OR preparing message */}
-          <div className="flex-1 relative overflow-hidden">
-            {wods && wods.length > 0 ? (
-              wods.slice(0, 2).map((wod, index) => (
-                <div 
-                  key={wod.id}
-                  className={cn(
-                    "absolute inset-0 flex flex-col transition-opacity duration-700 ease-in-out",
-                    index === currentWodIndex ? "opacity-100 z-10" : "opacity-0 z-0"
+        {/* WOD Card Content - smooth crossfade between WODs OR preparing message */}
+        <div className="flex-1 relative overflow-hidden">
+          {wods && wods.length > 0 ? (
+            wods.slice(0, 2).map((wod, index) => (
+              <div 
+                key={wod.id}
+                className={cn(
+                  "absolute inset-0 flex flex-col transition-opacity duration-700 ease-in-out",
+                  index === currentWodIndex ? "opacity-100 z-10" : "opacity-0 z-0"
+                )}
+              >
+                {/* Image Section */}
+                <div className="relative h-[130px] overflow-hidden bg-muted">
+                  {wod.image_url ? (
+                    <img 
+                      src={wod.image_url} 
+                      alt={wod.name}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <Dumbbell className="w-8 h-8 text-muted-foreground/50" />
+                    </div>
                   )}
-                >
-                  {/* Image Section */}
-                  <div className="relative h-[130px] overflow-hidden bg-muted">
-                    {wod.image_url ? (
-                      <img 
-                        src={wod.image_url} 
-                        alt={wod.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                        }}
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <Dumbbell className="w-8 h-8 text-muted-foreground/50" />
+                  {/* Equipment Badge - Only show for non-recovery workouts */}
+                  {!isRecoveryWod(wod) && (
+                    <div className="absolute top-2 left-2">
+                      <span className={cn(
+                        "text-[10px] font-bold px-1.5 py-0.5 rounded-full",
+                        wod.equipment?.toLowerCase().includes("none") || wod.equipment?.toLowerCase().includes("bodyweight")
+                          ? "bg-emerald-500 text-white"
+                          : "bg-blue-500 text-white"
+                      )}>
+                        {wod.equipment?.toLowerCase().includes("none") || wod.equipment?.toLowerCase().includes("bodyweight") 
+                          ? "Bodyweight" 
+                          : "Equipment"}
+                      </span>
+                    </div>
+                  )}
+                  {/* Premium Badge */}
+                  {wod.is_premium && (
+                    <div className="absolute top-2 right-2">
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500 text-white flex items-center gap-0.5">
+                        <Crown className="w-2.5 h-2.5" />
+                        Premium
+                      </span>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Content Section */}
+                <div className="flex-1 p-2 flex flex-col justify-between">
+                  {/* Workout Name */}
+                  <p className="text-xs font-bold text-foreground line-clamp-1">{wod.name}</p>
+                  
+                  {/* Metadata Grid - 2 columns */}
+                  <div className="grid grid-cols-2 gap-x-3 gap-y-0.5">
+                    {/* Row 1: Category + Format */}
+                    {wod.category && (
+                      <div className="flex items-center gap-1 text-[10px]">
+                        <Flame className="w-3 h-3 text-orange-500" />
+                        <span className="text-orange-600 dark:text-orange-400 font-semibold uppercase">{wod.category}</span>
                       </div>
                     )}
-                    {/* Equipment Badge - Only show for non-recovery workouts */}
-                    {!isRecoveryWod(wod) && (
-                      <div className="absolute top-2 left-2">
-                        <span className={cn(
-                          "text-[10px] font-bold px-1.5 py-0.5 rounded-full",
-                          wod.equipment?.toLowerCase().includes("none") || wod.equipment?.toLowerCase().includes("bodyweight")
-                            ? "bg-emerald-500 text-white"
-                            : "bg-blue-500 text-white"
-                        )}>
-                          {wod.equipment?.toLowerCase().includes("none") || wod.equipment?.toLowerCase().includes("bodyweight") 
-                            ? "Bodyweight" 
-                            : "Equipment"}
-                        </span>
+                    {wod.format && (
+                      <div className="flex items-center gap-1 text-[10px]">
+                        <Target className="w-3 h-3 text-primary" />
+                        <span className="text-primary font-semibold uppercase">{wod.format}</span>
                       </div>
                     )}
-                    {/* Premium Badge */}
-                    {wod.is_premium && (
-                      <div className="absolute top-2 right-2">
-                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500 text-white flex items-center gap-0.5">
-                          <Crown className="w-2.5 h-2.5" />
-                          Premium
-                        </span>
+                    
+                    {/* Row 2: Difficulty + Duration */}
+                    <div className="flex items-center gap-1 text-[10px]">
+                      <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+                      <span className="text-yellow-600 dark:text-yellow-400 font-semibold uppercase">
+                        {getDifficultyLabel(wod.difficulty_stars, isRecoveryWod(wod))}
+                      </span>
+                    </div>
+                    {wod.duration && (
+                      <div className="flex items-center gap-1 text-[10px]">
+                        <Clock className="w-3 h-3 text-purple-500" />
+                        <span className="text-purple-600 dark:text-purple-400 font-semibold uppercase">{wod.duration}</span>
                       </div>
                     )}
                   </div>
                   
-                  {/* Content Section */}
-                  <div className="flex-1 p-2 flex flex-col justify-between">
-                    {/* Workout Name */}
-                    <p className="text-xs font-bold text-foreground line-clamp-1">{wod.name}</p>
-                    
-                    {/* Metadata Grid - 2 columns */}
-                    <div className="grid grid-cols-2 gap-x-3 gap-y-0.5">
-                      {/* Row 1: Category + Format (not type) */}
-                      {wod.category && (
-                        <div className="flex items-center gap-1 text-[10px]">
-                          <Flame className="w-3 h-3 text-orange-500" />
-                          <span className="text-orange-600 dark:text-orange-400 font-semibold uppercase">{wod.category}</span>
-                        </div>
-                      )}
-                      {/* Show format for all workouts */}
-                      {wod.format && (
-                        <div className="flex items-center gap-1 text-[10px]">
-                          <Target className="w-3 h-3 text-primary" />
-                          <span className="text-primary font-semibold uppercase">{wod.format}</span>
-                        </div>
-                      )}
-                      
-                      {/* Row 2: Difficulty + Duration */}
-                      <div className="flex items-center gap-1 text-[10px]">
-                        <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
-                        <span className="text-yellow-600 dark:text-yellow-400 font-semibold uppercase">
-                          {getDifficultyLabel(wod.difficulty_stars, isRecoveryWod(wod))}
-                        </span>
-                      </div>
-                      {wod.duration && (
-                        <div className="flex items-center gap-1 text-[10px]">
-                          <Clock className="w-3 h-3 text-purple-500" />
-                          <span className="text-purple-600 dark:text-purple-400 font-semibold uppercase">{wod.duration}</span>
-                        </div>
-                      )}
-                    </div>
-                    
-                    {/* CTA */}
-                    <div className="flex items-center justify-center gap-1 text-primary text-[10px] font-medium 
-                                    group-hover:gap-2 transition-all mt-1">
-                      View Today's WOD
-                      <ChevronRight className="w-3 h-3" />
-                    </div>
+                  {/* CTA */}
+                  <div className="flex items-center justify-center gap-1 text-primary text-[10px] font-medium 
+                                  group-hover:gap-2 transition-all mt-1">
+                    View Today's WOD
+                    <ChevronRight className="w-3 h-3" />
                   </div>
                 </div>
-              ))
-            ) : (
-              /* Preparing message when no WODs are available */
-              <div className="flex flex-col items-center justify-center h-full p-4 text-center">
-                <Clock className="w-8 h-8 text-primary/50 mb-2 animate-pulse" />
-                <p className="text-xs font-medium text-foreground">Today's Workouts</p>
-                <p className="text-[10px] text-muted-foreground">Being Prepared</p>
-                <p className="text-[10px] text-primary mt-1">Check back soon!</p>
               </div>
-            )}
-          </div>
+            ))
+          ) : (
+            /* Preparing message when no WODs are available */
+            <div className="flex flex-col items-center justify-center h-full p-4 text-center">
+              <Clock className="w-8 h-8 text-primary/50 mb-2 animate-pulse" />
+              <p className="text-xs font-medium text-foreground">Today's Workouts</p>
+              <p className="text-[10px] text-muted-foreground">Being Prepared</p>
+              <p className="text-[10px] text-primary mt-1">Check back soon!</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
