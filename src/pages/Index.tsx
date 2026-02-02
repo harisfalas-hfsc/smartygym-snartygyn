@@ -692,7 +692,7 @@ const Index = () => {
                         <h3 className="text-xl font-bold">
                           Your Gym Re-imagined Anywhere, Anytime
                         </h3>
-                        <p className="text-sm font-semibold bg-primary/10 text-primary px-3 py-2 rounded-lg border border-primary/20">
+                        <p className="text-sm font-semibold text-primary">
                           We are not here to replace your gym. We are here to back you up when life gets in the way.
                         </p>
                         <p className="text-sm text-muted-foreground leading-relaxed">
