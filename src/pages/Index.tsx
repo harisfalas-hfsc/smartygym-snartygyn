@@ -456,7 +456,7 @@ const Index = () => {
       
       <div className="min-h-screen bg-background overflow-x-hidden">
         
-        {isMobile ? <section className="pt-2 pb-2 px-4">
+        {isMobile ? <section className="pt-12 pb-2 px-4">
             <Carousel className="w-full" opts={{
           align: "center",
           loop: true
