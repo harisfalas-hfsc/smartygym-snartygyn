@@ -675,41 +675,38 @@ const Index = () => {
 
                   {/* Your Gym Anywhere Card - Above Hero */}
                   <Card className="bg-gradient-to-r from-primary/10 to-accent/10 border-2 border-primary/20 mb-6">
-                    <CardContent className="p-6">
-                      <div className="flex items-center justify-center mb-4">
-                        <h3 className="text-2xl font-bold text-center">
-                          Your Gym Re-imagined Anywhere, Anytime
-                        </h3>
-                      </div>
-                      <div className="space-y-4 max-w-3xl mx-auto">
-                        <p className="text-base font-semibold text-center">
-                          We are not here to replace your gym. We are here to back you up when life gets in the way.
-                        </p>
-                        <p className="text-base text-muted-foreground text-center leading-relaxed">
-                          Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed — 
-                          SmartyGym is your backup plan. Or, if you prefer training from home entirely, we've got you covered. 
-                          Or, if you go to your gym but want to follow a professional, science-based workout or training program designed by{' '}
-                          <a href="/coach-profile" onClick={e => {
-                              e.preventDefault();
-                              navigate('/coach-profile');
-                            }} className="text-primary hover:underline font-medium cursor-pointer">
-                            Haris Falas
-                          </a>, we provide that expert guidance.
-                          Expert workouts, professional programs, and practical tools — all designed by real coaches, not algorithms.
-                        </p>
-                        <p className="text-base font-semibold text-center text-primary">
-                          Wherever you are, your gym comes with you.
-                        </p>
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="flex-1 space-y-2">
+                          <h3 className="text-xl font-bold">
+                            Your Gym Re-imagined Anywhere, Anytime
+                          </h3>
+                          <p className="text-sm font-semibold">
+                            We are not here to replace your gym. We are here to back you up when life gets in the way.
+                          </p>
+                          <p className="text-sm text-muted-foreground leading-relaxed">
+                            Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed — 
+                            SmartyGym is your backup plan. Or, if you prefer training from home entirely, we've got you covered. 
+                            Or, if you go to your gym but want to follow a professional, science-based workout or training program designed by{' '}
+                            <a href="/coach-profile" onClick={e => {
+                                e.preventDefault();
+                                navigate('/coach-profile');
+                              }} className="text-primary hover:underline font-medium cursor-pointer">
+                              Haris Falas
+                            </a>, we provide that expert guidance.
+                          </p>
+                          <p className="text-sm font-semibold text-primary">
+                            Wherever you are, your gym comes with you.
+                          </p>
+                        </div>
                         {!isPremium && (
-                          <div className="flex justify-center mt-4">
-                            <Button onClick={() => navigate("/joinpremium", {
-                                state: {
-                                  from: location.pathname
-                                }
-                              })} className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-md">
-                              Join Now
-                            </Button>
-                          </div>
+                          <Button onClick={() => navigate("/joinpremium", {
+                              state: {
+                                from: location.pathname
+                              }
+                            })} className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shrink-0">
+                            Join Now
+                          </Button>
                         )}
                       </div>
                     </CardContent>
