@@ -152,55 +152,70 @@ export const DesktopHeroGrid = ({ isPremium, onNavigate }: DesktopHeroGridProps)
 
       {/* Row 2: 100% Human (Left) + Smarty Workouts (Right) */}
       
-      {/* 100% Human. 0% AI Card - Text-based */}
-      <Card className="border-2 border-primary bg-gradient-to-br from-primary/5 to-accent/10 h-[220px] relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-20 h-20 bg-primary/10 rounded-full -mr-10 -mt-10" aria-hidden="true"></div>
+      {/* 100% Human. 0% AI Card - Text-based - Full content restored */}
+      <Card className="border-2 border-primary bg-gradient-to-br from-primary/5 to-accent/10 overflow-hidden relative">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -mr-16 -mt-16" aria-hidden="true"></div>
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-accent/20 rounded-full -ml-12 -mb-12" aria-hidden="true"></div>
         
-        {!isPremium && (
-          <Button 
-            onClick={(e) => {
-              e.stopPropagation();
-              onNavigate("/smarty-plans");
-            }} 
-            size="sm"
-            className="absolute top-2 left-2 bg-primary text-primary-foreground hover:bg-primary/90 text-xs z-10"
-          >
-            <Crown className="mr-1 h-3 w-3" />
-            Transform Your Fitness
-          </Button>
-        )}
-        
-        <CardContent className="p-4 h-full flex flex-col justify-center pt-8">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-              <UserCheck className="w-4 h-4 text-primary" />
+        <CardContent className="p-6 relative">
+          {/* CTA Button for non-premium users - positioned top left */}
+          {!isPremium && (
+            <Button 
+              onClick={(e) => {
+                e.stopPropagation();
+                onNavigate("/smarty-plans");
+              }} 
+              className="absolute top-3 left-3 bg-primary text-primary-foreground hover:bg-primary/90 text-sm z-10"
+            >
+              <Crown className="mr-2 h-4 w-4" />
+              Transform Your Fitness
+            </Button>
+          )}
+          
+          <div className="flex items-center justify-center gap-3 mb-4 mt-8">
+            <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+              <UserCheck className="w-6 h-6 text-primary" />
             </div>
-            <Ban className="w-6 h-6 text-destructive" />
-            <div className="w-8 h-8 rounded-full bg-destructive/10 flex items-center justify-center">
-              <Brain className="w-4 h-4 text-destructive" />
+            <Ban className="w-10 h-10 text-destructive" />
+            <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center">
+              <Brain className="w-6 h-6 text-destructive" />
             </div>
           </div>
           
-          <h3 className="text-lg font-bold text-center mb-2">
+          <h3 className="text-2xl font-bold text-center mb-3">
             100% Human. 0% AI.
           </h3>
           
-          <p className="text-xs text-center text-muted-foreground mb-3">
-            Every workout is science-based and personally created by Haris Falas. Never by AI.
-          </p>
-          
-          <div className="grid grid-cols-3 gap-2">
-            <div className="flex items-center gap-1 p-1.5 bg-background/50 rounded border border-primary/20">
-              <CheckCircle2 className="w-3 h-3 text-primary flex-shrink-0" />
-              <span className="text-[10px] font-medium">Real Expertise</span>
+          <div className="max-w-xl mx-auto space-y-3 text-center mb-4">
+            <p className="text-sm font-semibold text-foreground">
+              <span className="text-primary font-semibold">SmartyGym</span> workouts and programs are built to fit YOUR life.
+            </p>
+            <p className="text-xs leading-relaxed text-muted-foreground">
+              That's why they work — safe and efficient design by <span className="text-primary font-medium">Haris Falas</span>, crafted by hand with care to deliver effective results, <strong className="text-foreground">NOT by AI</strong>.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-3 gap-3 max-w-xl mx-auto">
+            <div className="flex items-start gap-2 p-3 bg-background/50 rounded-lg border border-primary/20">
+              <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-xs mb-0.5">Real Expertise</p>
+                <p className="text-[10px] text-muted-foreground">Sports science degree & years of coaching</p>
+              </div>
             </div>
-            <div className="flex items-center gap-1 p-1.5 bg-background/50 rounded border border-primary/20">
-              <CheckCircle2 className="w-3 h-3 text-primary flex-shrink-0" />
-              <span className="text-[10px] font-medium">Personal Touch</span>
+            <div className="flex items-start gap-2 p-3 bg-background/50 rounded-lg border border-primary/20">
+              <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-xs mb-0.5">Personal Touch</p>
+                <p className="text-[10px] text-muted-foreground">Every program refined through real client feedback</p>
+              </div>
             </div>
-            <div className="flex items-center gap-1 p-1.5 bg-background/50 rounded border border-primary/20">
-              <CheckCircle2 className="w-3 h-3 text-primary flex-shrink-0" />
-              <span className="text-[10px] font-medium">Not a Robot</span>
+            <div className="flex items-start gap-2 p-3 bg-background/50 rounded-lg border border-primary/20">
+              <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-xs mb-0.5">Not a Robot</p>
+                <p className="text-[10px] text-muted-foreground">Human-designed workouts backed by science</p>
+              </div>
             </div>
           </div>
         </CardContent>
