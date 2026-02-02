@@ -184,8 +184,8 @@ export const HeroThreeColumns = () => {
                     onClick={() => navigate(card.route)}
                     className={cn(
                       "cursor-pointer group border-2 border-primary/40 rounded-xl overflow-hidden",
-                      "hover:border-primary hover:shadow-lg hover:scale-[1.02]",
-                      "transition-all duration-300 h-[220px]",
+                      "hover:border-primary hover:shadow-2xl hover:scale-[1.08] hover:z-10",
+                      "transition-all duration-300 ease-out h-[220px]",
                       "relative bg-card"
                     )}
                   >
@@ -197,17 +197,20 @@ export const HeroThreeColumns = () => {
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                       />
                       {/* Gradient overlay for text readability */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent group-hover:from-black/95 transition-colors duration-300" />
                     </div>
                     
                     {/* Content Section - Positioned at bottom */}
                     <div className="absolute bottom-0 left-0 right-0 p-3 flex flex-col justify-end z-10">
-                      {/* Title */}
-                      <h3 className="text-sm font-semibold text-white">{card.title}</h3>
+                      {/* Title with Icon */}
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-sm font-semibold text-white">{card.title}</h3>
+                        <Icon className="w-4 h-4 text-primary group-hover:scale-110 transition-transform duration-300" />
+                      </div>
                       
                       {/* Description - show WOD info if available */}
                       {isWodCard && currentWod ? (
-                        <div className="flex items-center gap-2 text-xs text-white/80">
+                        <div className="flex items-center gap-2 text-xs text-white/80 mt-0.5">
                           <span className="text-primary font-medium">{currentWod.category}</span>
                           <span className="flex items-center gap-0.5">
                             <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
@@ -221,11 +224,11 @@ export const HeroThreeColumns = () => {
                           )}
                         </div>
                       ) : (
-                        <p className="text-xs text-white/80 line-clamp-1">{card.description}</p>
+                        <p className="text-xs text-white/80 line-clamp-1 mt-0.5">{card.description}</p>
                       )}
                       
                       {/* CTA indicator */}
-                      <div className="flex items-center justify-center gap-1 text-primary text-[10px] font-medium group-hover:gap-2 transition-all mt-1">
+                      <div className="flex items-center justify-center gap-1 text-primary text-[10px] font-medium group-hover:gap-2 transition-all mt-1.5">
                         Explore
                         <ChevronRight className="w-3 h-3" />
                       </div>
