@@ -1,14 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Play, Pause, RotateCcw } from "lucide-react";
+import { Play, Pause, RotateCcw, X, Minimize2, Maximize2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface WorkoutTimerPopupProps {
   open: boolean;
@@ -23,6 +18,7 @@ export const WorkoutTimerPopup = ({ open, onOpenChange }: WorkoutTimerPopupProps
   const [timeLeft, setTimeLeft] = useState(20);
   const [isWorking, setIsWorking] = useState(true);
   const [isRunning, setIsRunning] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
 
   const playBeep = useCallback(() => {
     try {
@@ -89,76 +85,149 @@ export const WorkoutTimerPopup = ({ open, onOpenChange }: WorkoutTimerPopupProps
     setTimeLeft(workTime);
   };
 
+  const handleClose = () => {
+    setIsRunning(false);
+    handleReset();
+    onOpenChange(false);
+  };
+
+  if (!open) return null;
+
+  // Minimized floating timer - just shows time and controls
+  if (isMinimized) {
+    return (
+      <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-2 rounded-full bg-background/80 backdrop-blur-md border-2 border-primary/50 shadow-lg">
+        <div className={cn(
+          "text-xl font-bold tabular-nums",
+          isWorking ? 'text-primary' : 'text-orange-500'
+        )}>
+          {timeLeft}s
+        </div>
+        <span className="text-xs text-muted-foreground">
+          {isRunning ? (isWorking ? '💪' : '😮‍💨') : '⏸️'} R{currentRound}/{rounds}
+        </span>
+        <Button 
+          size="icon" 
+          variant="ghost" 
+          className="h-7 w-7"
+          onClick={handleStartStop}
+        >
+          {isRunning ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+        </Button>
+        <Button 
+          size="icon" 
+          variant="ghost" 
+          className="h-7 w-7"
+          onClick={() => setIsMinimized(false)}
+        >
+          <Maximize2 className="h-4 w-4" />
+        </Button>
+        <Button 
+          size="icon" 
+          variant="ghost" 
+          className="h-7 w-7"
+          onClick={handleClose}
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      </div>
+    );
+  }
+
+  // Expanded floating timer - transparent overlay
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[95vw] sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="text-center text-primary">Workout Timer</DialogTitle>
-        </DialogHeader>
-
-        <div className="space-y-4">
-          <div className="grid grid-cols-3 gap-3">
-            <div>
-              <Label className="text-xs font-semibold">Work</Label>
-              <div className="flex items-center gap-1">
-                <Input
-                  type="number"
-                  value={workTime}
-                  onChange={(e) => setWorkTime(parseInt(e.target.value) || 20)}
-                  disabled={isRunning}
-                  className="h-9 text-center border-2 border-primary/40"
-                />
-                <span className="text-xs">s</span>
-              </div>
-            </div>
-            <div>
-              <Label className="text-xs font-semibold">Rest</Label>
-              <div className="flex items-center gap-1">
-                <Input
-                  type="number"
-                  value={restTime}
-                  onChange={(e) => setRestTime(parseInt(e.target.value) || 10)}
-                  disabled={isRunning}
-                  className="h-9 text-center border-2 border-primary/40"
-                />
-                <span className="text-xs">s</span>
-              </div>
-            </div>
-            <div>
-              <Label className="text-xs font-semibold">Rounds</Label>
-              <Input
-                type="number"
-                value={rounds}
-                onChange={(e) => setRounds(parseInt(e.target.value) || 8)}
-                disabled={isRunning}
-                className="h-9 text-center border-2 border-primary/40"
-              />
-            </div>
-          </div>
-
-          <div className="text-center py-4 bg-muted rounded-lg">
-            <div className={`text-5xl font-bold mb-2 ${isWorking ? 'text-primary' : 'text-orange-500'}`}>
-              {timeLeft}s
-            </div>
-            <div className="text-sm font-semibold">
-              {isRunning ? (isWorking ? '💪 Work' : '😮‍💨 Rest') : 'Ready'} • Round {currentRound}/{rounds}
-            </div>
-          </div>
-
-          <div className="flex gap-2">
+    <div className="fixed inset-x-0 bottom-16 z-50 mx-auto max-w-sm px-4">
+      <div className="bg-background/85 backdrop-blur-md border-2 border-primary/50 rounded-xl shadow-2xl p-4">
+        {/* Header with minimize/close */}
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-semibold text-primary">Workout Timer</h3>
+          <div className="flex gap-1">
             <Button 
-              onClick={handleStartStop}
-              className="flex-1 h-11"
-              variant={isRunning ? "destructive" : "default"}
+              size="icon" 
+              variant="ghost" 
+              className="h-6 w-6"
+              onClick={() => setIsMinimized(true)}
             >
-              {isRunning ? <><Pause className="w-4 h-4 mr-2" /> Pause</> : <><Play className="w-4 h-4 mr-2" /> Start</>}
+              <Minimize2 className="h-3 w-3" />
             </Button>
-            <Button onClick={handleReset} variant="outline" className="h-11 px-4">
-              <RotateCcw className="w-4 h-4" />
+            <Button 
+              size="icon" 
+              variant="ghost" 
+              className="h-6 w-6"
+              onClick={handleClose}
+            >
+              <X className="h-3 w-3" />
             </Button>
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
+
+        {/* Settings row */}
+        <div className="grid grid-cols-3 gap-2 mb-3">
+          <div>
+            <Label className="text-[10px] font-semibold">Work</Label>
+            <div className="flex items-center gap-0.5">
+              <Input
+                type="number"
+                value={workTime}
+                onChange={(e) => setWorkTime(parseInt(e.target.value) || 20)}
+                disabled={isRunning}
+                className="h-7 text-xs text-center border border-primary/40 bg-background/50"
+              />
+              <span className="text-[10px]">s</span>
+            </div>
+          </div>
+          <div>
+            <Label className="text-[10px] font-semibold">Rest</Label>
+            <div className="flex items-center gap-0.5">
+              <Input
+                type="number"
+                value={restTime}
+                onChange={(e) => setRestTime(parseInt(e.target.value) || 10)}
+                disabled={isRunning}
+                className="h-7 text-xs text-center border border-primary/40 bg-background/50"
+              />
+              <span className="text-[10px]">s</span>
+            </div>
+          </div>
+          <div>
+            <Label className="text-[10px] font-semibold">Rounds</Label>
+            <Input
+              type="number"
+              value={rounds}
+              onChange={(e) => setRounds(parseInt(e.target.value) || 8)}
+              disabled={isRunning}
+              className="h-7 text-xs text-center border border-primary/40 bg-background/50"
+            />
+          </div>
+        </div>
+
+        {/* Timer display */}
+        <div className="text-center py-2 bg-muted/50 rounded-lg mb-3">
+          <div className={cn(
+            "text-4xl font-bold tabular-nums",
+            isWorking ? 'text-primary' : 'text-orange-500'
+          )}>
+            {timeLeft}s
+          </div>
+          <div className="text-xs font-medium">
+            {isRunning ? (isWorking ? '💪 Work' : '😮‍💨 Rest') : 'Ready'} • Round {currentRound}/{rounds}
+          </div>
+        </div>
+
+        {/* Controls */}
+        <div className="flex gap-2">
+          <Button 
+            onClick={handleStartStop}
+            className="flex-1 h-9"
+            variant={isRunning ? "destructive" : "default"}
+          >
+            {isRunning ? <><Pause className="w-4 h-4 mr-1" /> Pause</> : <><Play className="w-4 h-4 mr-1" /> Start</>}
+          </Button>
+          <Button onClick={handleReset} variant="outline" className="h-9 px-3">
+            <RotateCcw className="w-4 h-4" />
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 };
