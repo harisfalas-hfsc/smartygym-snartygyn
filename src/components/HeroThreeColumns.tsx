@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { getCyprusTodayStr } from "@/lib/cyprusDate";
@@ -23,6 +23,7 @@ import {
   CarouselPrevious,
   type CarouselApi
 } from "@/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
 
 // Import images
 import heroWodImage from "@/assets/hero-wod.jpg";
@@ -116,6 +117,9 @@ const heroCards = [
 export const HeroThreeColumns = () => {
   const navigate = useNavigate();
   const [api, setApi] = useState<CarouselApi>();
+  const autoplayRef = useRef(
+    Autoplay({ delay: 2000, stopOnInteraction: true, stopOnMouseEnter: true })
+  );
   const [current, setCurrent] = useState(0);
 
   // Fetch WOD for the dynamic card
@@ -171,6 +175,7 @@ export const HeroThreeColumns = () => {
             align: "center",
             loop: true,
           }}
+          plugins={[autoplayRef.current]}
           className="flex-1 overflow-hidden"
         >
           <CarouselContent className="-ml-4">
