@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { User } from "@supabase/supabase-js";
 import { useExerciseLibrary, useExerciseDetails, Exercise } from "@/hooks/useExerciseLibrary";
 import ExerciseDetailModal from "@/components/ExerciseDetailModal";
+import { WorkoutToolsMobile } from "@/components/WorkoutToolsMobile";
 import {
   Select,
   SelectContent,
@@ -45,11 +46,19 @@ const formatLabel = (str: string) => {
 
 export const WorkoutToolsCards = () => {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-      <TimerCard />
-      <OneRMCard />
-      <ExerciseLibraryCard />
-    </div>
+    <>
+      {/* Mobile: Compact button bar with popups */}
+      <div className="lg:hidden">
+        <WorkoutToolsMobile />
+      </div>
+      
+      {/* Desktop: Full inline cards */}
+      <div className="hidden lg:grid lg:grid-cols-3 gap-4">
+        <TimerCard />
+        <OneRMCard />
+        <ExerciseLibraryCard />
+      </div>
+    </>
   );
 };
 
