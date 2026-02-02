@@ -304,8 +304,8 @@ export default function TakeATour() {
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="p-4 bg-amber-500/10 rounded-lg border border-amber-500/30 text-center">
-                  <Sunrise className="h-6 w-6 text-amber-500 mx-auto mb-2" />
+                <div className="p-4 bg-orange-500/10 rounded-lg border border-orange-500/30 text-center">
+                  <Sunrise className="h-6 w-6 text-orange-500 mx-auto mb-2" />
                   <h4 className="font-semibold mb-1">Morning Ritual</h4>
                   <p className="text-xs text-muted-foreground">Start your day with intention, movement, and mindset</p>
                 </div>
