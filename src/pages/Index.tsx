@@ -673,6 +673,48 @@ const Index = () => {
                   <meta itemProp="url" content="https://smartygym.com" />
                   <meta itemProp="description" content="SmartyGym - #1 online gym and fitness platform by Haris Falas - smartygym.com" />
 
+                  {/* Your Gym Anywhere Card - Above Hero */}
+                  <Card className="bg-gradient-to-r from-primary/10 to-accent/10 border-2 border-primary/20 mb-6">
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-center mb-4">
+                        <h3 className="text-2xl font-bold text-center">
+                          Your Gym Re-imagined Anywhere, Anytime
+                        </h3>
+                      </div>
+                      <div className="space-y-4 max-w-3xl mx-auto">
+                        <p className="text-base font-semibold text-center">
+                          We are not here to replace your gym. We are here to back you up when life gets in the way.
+                        </p>
+                        <p className="text-base text-muted-foreground text-center leading-relaxed">
+                          Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed — 
+                          SmartyGym is your backup plan. Or, if you prefer training from home entirely, we've got you covered. 
+                          Or, if you go to your gym but want to follow a professional, science-based workout or training program designed by{' '}
+                          <a href="/coach-profile" onClick={e => {
+                              e.preventDefault();
+                              navigate('/coach-profile');
+                            }} className="text-primary hover:underline font-medium cursor-pointer">
+                            Haris Falas
+                          </a>, we provide that expert guidance.
+                          Expert workouts, professional programs, and practical tools — all designed by real coaches, not algorithms.
+                        </p>
+                        <p className="text-base font-semibold text-center text-primary">
+                          Wherever you are, your gym comes with you.
+                        </p>
+                        {!isPremium && (
+                          <div className="flex justify-center mt-4">
+                            <Button onClick={() => navigate("/joinpremium", {
+                                state: {
+                                  from: location.pathname
+                                }
+                              })} className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-md">
+                              Join Now
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+
                   {/* Three Column Layout: Explore | Who is SmartyGym For? | Credentials */}
                   <HeroThreeColumns />
 
@@ -794,43 +836,6 @@ const Index = () => {
         <div className="container mx-auto max-w-6xl px-4">
           {/* Mission Statement with Cards */}
           <section className="mb-16 mt-8">
-            {/* Your Gym Anywhere Card */}
-            <Card className="bg-gradient-to-r from-primary/10 to-accent/10 border-2 border-primary/20 mb-8">
-              <CardContent className="p-6">
-              <div className="flex items-start justify-between mb-4">
-                <h3 className="text-2xl font-bold flex-1">
-                  Your Gym Re-imagined Anywhere, Anytime
-                </h3>
-                {!isPremium && <Button onClick={() => navigate("/joinpremium", {
-                    state: {
-                      from: location.pathname
-                    }
-                  })} className="ml-4 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md">
-                    Join Now
-                  </Button>}
-              </div>
-              <div className="space-y-4 max-w-3xl mx-auto">
-                <p className="text-base font-semibold text-center">
-                  We are not here to replace your gym. We are here to back you up when life gets in the way.
-                </p>
-                <p className="text-base text-muted-foreground text-center leading-relaxed">
-                  Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed — 
-                  SmartyGym is your backup plan. Or, if you prefer training from home entirely, we've got you covered. 
-                  Or, if you go to your gym but want to follow a professional, science-based workout or training program designed by{' '}
-                  <a href="/coach-profile" onClick={e => {
-                      e.preventDefault();
-                      navigate('/coach-profile');
-                    }} className="text-primary hover:underline font-medium cursor-pointer">
-                    Haris Falas
-                  </a>, we provide that expert guidance.
-                  Expert workouts, professional programs, and practical tools — all designed by real coaches, not algorithms.
-                </p>
-                <p className="text-base font-semibold text-center text-primary">
-                  Wherever you are, your gym comes with you.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
             <Card className="border-2 border-border text-center hover:shadow-lg transition-all hover:-translate-y-1">
