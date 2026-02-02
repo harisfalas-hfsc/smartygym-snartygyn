@@ -24,6 +24,15 @@ import {
   type CarouselApi
 } from "@/components/ui/carousel";
 
+// Import images
+import heroWodImage from "@/assets/hero-wod.jpg";
+import heroWorkoutsImage from "@/assets/hero-workouts.jpg";
+import heroProgramsImage from "@/assets/hero-programs.jpg";
+import heroRitualImage from "@/assets/hero-ritual.jpg";
+import heroToolsImage from "@/assets/hero-tools.jpg";
+import heroBlogImage from "@/assets/hero-blog.jpg";
+import heroLibraryImage from "@/assets/hero-exercise-library-new.jpg";
+
 // Helper to convert star count to difficulty label
 const getDifficultyLabel = (stars: number | null | undefined, isRecovery: boolean): string => {
   if (isRecovery || !stars || stars === 0) return "All Levels";
@@ -45,6 +54,7 @@ const heroCards = [
     description: "Fresh daily workouts crafted by experts",
     icon: Dumbbell,
     route: "/workout/wod",
+    image: heroWodImage,
     isWod: true
   },
   {
@@ -53,6 +63,7 @@ const heroCards = [
     description: "Complete workout library for every goal",
     icon: Dumbbell,
     route: "/workout",
+    image: heroWorkoutsImage,
     isWod: false
   },
   {
@@ -61,6 +72,7 @@ const heroCards = [
     description: "Structured multi-week training plans",
     icon: Calendar,
     route: "/trainingprogram",
+    image: heroProgramsImage,
     isWod: false
   },
   {
@@ -69,6 +81,7 @@ const heroCards = [
     description: "Daily wellness habits and routines",
     icon: Sparkles,
     route: "/daily-ritual",
+    image: heroRitualImage,
     isWod: false
   },
   {
@@ -77,6 +90,7 @@ const heroCards = [
     description: "Calculators for fitness metrics",
     icon: Calculator,
     route: "/tools",
+    image: heroToolsImage,
     isWod: false
   },
   {
@@ -85,6 +99,7 @@ const heroCards = [
     description: "Expert articles and fitness tips",
     icon: FileText,
     route: "/blog",
+    image: heroBlogImage,
     isWod: false
   },
   {
@@ -93,6 +108,7 @@ const heroCards = [
     description: "Video demos for every exercise",
     icon: Video,
     route: "/exerciselibrary",
+    image: heroLibraryImage,
     isWod: false
   }
 ];
@@ -136,74 +152,102 @@ export const HeroThreeColumns = () => {
   }, [api, onSelect]);
 
   return (
-    <div className="mt-6 px-12 relative">
-      <Carousel
-        setApi={setApi}
-        opts={{
-          align: "center",
-          loop: true,
-        }}
-        className="w-full"
-      >
-        <CarouselContent className="-ml-4">
-          {heroCards.map((card) => {
-            const Icon = card.icon;
-            const isWodCard = card.isWod;
-            
-            return (
-              <CarouselItem key={card.id} className="pl-4 basis-[42%]">
-                <div
-                  onClick={() => navigate(card.route)}
-                  className={cn(
-                    "cursor-pointer group border-2 border-primary/40 rounded-xl p-6",
-                    "hover:border-primary hover:shadow-lg hover:scale-[1.02]",
-                    "transition-all duration-300 h-[180px]",
-                    "flex flex-col items-center justify-center text-center gap-4",
-                    "bg-card"
-                  )}
-                >
-                  {/* Icon */}
-                  <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                    <Icon className="w-7 h-7 text-primary" />
-                  </div>
-                  
-                  {/* Title */}
-                  <h3 className="text-lg font-semibold text-foreground">{card.title}</h3>
-                  
-                  {/* Description - show WOD info if available */}
-                  {isWodCard && currentWod ? (
-                    <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                      <span className="text-primary font-medium">{currentWod.category}</span>
-                      <span className="flex items-center gap-1">
-                        <Star className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" />
-                        {getDifficultyLabel(currentWod.difficulty_stars, isRecoveryWod(currentWod))}
-                      </span>
-                      {currentWod.duration && (
-                        <span className="flex items-center gap-1">
-                          <Clock className="w-3.5 h-3.5 text-muted-foreground" />
-                          {currentWod.duration}
-                        </span>
-                      )}
+    <div className="mt-6 relative">
+      {/* Container with padding for arrows outside */}
+      <div className="flex items-center gap-4">
+        {/* Left Arrow - Outside carousel */}
+        <button
+          onClick={() => api?.scrollPrev()}
+          className="flex-shrink-0 w-10 h-10 rounded-full border border-border bg-background hover:bg-accent flex items-center justify-center transition-colors"
+          aria-label="Previous slide"
+        >
+          <ChevronRight className="w-5 h-5 rotate-180" />
+        </button>
+
+        {/* Carousel */}
+        <Carousel
+          setApi={setApi}
+          opts={{
+            align: "center",
+            loop: true,
+          }}
+          className="flex-1 overflow-hidden"
+        >
+          <CarouselContent className="-ml-4">
+            {heroCards.map((card) => {
+              const Icon = card.icon;
+              const isWodCard = card.isWod;
+              
+              return (
+                <CarouselItem key={card.id} className="pl-4 basis-[45%]">
+                  <div
+                    onClick={() => navigate(card.route)}
+                    className={cn(
+                      "cursor-pointer group border-2 border-primary/40 rounded-xl overflow-hidden",
+                      "hover:border-primary hover:shadow-lg hover:scale-[1.02]",
+                      "transition-all duration-300 h-[220px]",
+                      "flex flex-col bg-card"
+                    )}
+                  >
+                    {/* Image Section */}
+                    <div className="relative h-[120px] overflow-hidden">
+                      <img 
+                        src={card.image} 
+                        alt={card.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                      {/* Icon overlay */}
+                      <div className="absolute bottom-2 left-2 w-10 h-10 rounded-full bg-background/90 flex items-center justify-center shadow-lg">
+                        <Icon className="w-5 h-5 text-primary" />
+                      </div>
                     </div>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">{card.description}</p>
-                  )}
-                  
-                  {/* CTA indicator */}
-                  <div className="flex items-center gap-1 text-primary text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                    Explore
-                    <ChevronRight className="w-4 h-4" />
+                    
+                    {/* Content Section */}
+                    <div className="flex-1 p-3 flex flex-col justify-between">
+                      {/* Title */}
+                      <h3 className="text-sm font-semibold text-foreground">{card.title}</h3>
+                      
+                      {/* Description - show WOD info if available */}
+                      {isWodCard && currentWod ? (
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <span className="text-primary font-medium">{currentWod.category}</span>
+                          <span className="flex items-center gap-0.5">
+                            <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+                            {getDifficultyLabel(currentWod.difficulty_stars, isRecoveryWod(currentWod))}
+                          </span>
+                          {currentWod.duration && (
+                            <span className="flex items-center gap-0.5">
+                              <Clock className="w-3 h-3 text-muted-foreground" />
+                              {currentWod.duration}
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <p className="text-xs text-muted-foreground line-clamp-1">{card.description}</p>
+                      )}
+                      
+                      {/* CTA indicator */}
+                      <div className="flex items-center justify-center gap-1 text-primary text-[10px] font-medium group-hover:gap-2 transition-all">
+                        Explore
+                        <ChevronRight className="w-3 h-3" />
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </CarouselItem>
-            );
-          })}
-        </CarouselContent>
-        
-        {/* Navigation arrows */}
-        <CarouselPrevious className="left-0" />
-        <CarouselNext className="right-0" />
-      </Carousel>
+                </CarouselItem>
+              );
+            })}
+          </CarouselContent>
+        </Carousel>
+
+        {/* Right Arrow - Outside carousel */}
+        <button
+          onClick={() => api?.scrollNext()}
+          className="flex-shrink-0 w-10 h-10 rounded-full border border-border bg-background hover:bg-accent flex items-center justify-center transition-colors"
+          aria-label="Next slide"
+        >
+          <ChevronRight className="w-5 h-5" />
+        </button>
+      </div>
       
       {/* Navigation dots */}
       <div className="flex justify-center gap-2 mt-4">
