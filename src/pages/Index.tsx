@@ -714,7 +714,7 @@ const Index = () => {
                   </Card>
 
                   {/* Three Column Layout: Explore | Who is SmartyGym For? | Credentials */}
-                  <div className="pt-6">
+                  <div className="pt-4">
                     <HeroThreeColumns />
                   </div>
 
