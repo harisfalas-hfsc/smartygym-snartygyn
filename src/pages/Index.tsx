@@ -48,7 +48,7 @@ const Index = () => {
   const [highlightedCardIndex, setHighlightedCardIndex] = useState(0);
   const [isHoveringTablet, setIsHoveringTablet] = useState(false);
 
-  // Fetch review stats for SEO schema
+  // Fetch review stats for SEO schema - low priority, don't block render
   const { data: reviewStats } = useQuery({
     queryKey: ["homepage-review-stats"],
     queryFn: async () => {
@@ -66,7 +66,9 @@ const Index = () => {
         average: Math.round((total / data.length) * 100) / 100
       };
     },
-    staleTime: 1000 * 60 * 30, // 30 minutes
+    staleTime: 1000 * 60 * 60, // 1 hour - this data rarely changes
+    gcTime: 1000 * 60 * 60 * 2, // Keep in cache for 2 hours
+    refetchOnWindowFocus: false, // Don't refetch on tab focus
   });
 
   // Fetch WODs for mobile card - using Cyprus date filter
@@ -82,7 +84,10 @@ const Index = () => {
         .limit(2);
       return data || [];
     },
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 10, // 10 minutes
+    gcTime: 1000 * 60 * 30, // Keep in cache for 30 minutes
+    refetchOnWindowFocus: false,
+    enabled: isMobile, // Only fetch on mobile - not needed for desktop
   });
 
   // Separate bodyweight and equipment WODs
@@ -100,13 +105,13 @@ const Index = () => {
     };
   }, [carouselApi]);
 
-  // Auto-cycle through tablet hero cards every 2.5 seconds
+  // Auto-cycle through tablet hero cards every 4 seconds (slower to reduce re-renders)
   useEffect(() => {
     if (isHoveringTablet) return; // Pause when hovering
 
     const interval = setInterval(() => {
       setHighlightedCardIndex(prev => (prev + 1) % 6);
-    }, 2500);
+    }, 4000);
     return () => clearInterval(interval);
   }, [isHoveringTablet]);
   const heroCards = [{
@@ -676,12 +681,13 @@ const Index = () => {
                   {/* 100% Human. 0% AI Section - Now First */}
                   <div className="space-y-4">
                     <Card className="border-2 border-primary overflow-hidden relative">
-                      {/* Background Video */}
+                      {/* Background Video - lazy loaded */}
                       <video
                         autoPlay
                         muted
                         loop
                         playsInline
+                        preload="none"
                         className="absolute inset-0 w-full h-full object-cover z-0"
                       >
                         <source src="/videos/human-not-ai-background.mp4" type="video/mp4" />
