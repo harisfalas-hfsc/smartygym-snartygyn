@@ -770,39 +770,6 @@ const Index = () => {
                           </article>
                         </div>
                         
-                        {/* Who is SmartyGym For? - Now inside the card */}
-                        <div className="mt-6 pt-4 border-t border-primary/20">
-                          <h4 className="text-sm font-semibold text-muted-foreground mb-3 text-center">
-                            Who is <span className="text-primary">SmartyGym</span> For?
-                          </h4>
-                          <div className="grid grid-cols-6 gap-2 max-w-2xl mx-auto">
-                            <div className="flex flex-col items-center gap-1">
-                              <Users className="w-4 h-4 text-blue-500" />
-                              <span className="text-xs font-medium text-foreground text-center">Busy Adults</span>
-                            </div>
-                            <div className="flex flex-col items-center gap-1">
-                              <Heart className="w-4 h-4 text-pink-500" />
-                              <span className="text-xs font-medium text-foreground text-center">Parents</span>
-                            </div>
-                            <div className="flex flex-col items-center gap-1">
-                              <GraduationCap className="w-4 h-4 text-emerald-500" />
-                              <span className="text-xs font-medium text-foreground text-center">Beginners</span>
-                            </div>
-                            <div className="flex flex-col items-center gap-1">
-                              <Target className="w-4 h-4 text-orange-500" />
-                              <span className="text-xs font-medium text-foreground text-center">Intermediate</span>
-                            </div>
-                            <div className="flex flex-col items-center gap-1">
-                              <Plane className="w-4 h-4 text-cyan-500" />
-                              <span className="text-xs font-medium text-foreground text-center">Travelers</span>
-                            </div>
-                            <div className="flex flex-col items-center gap-1">
-                              <Dumbbell className="w-4 h-4 text-purple-500" />
-                              <span className="text-xs font-medium text-foreground text-center">Gym-Goers</span>
-                            </div>
-                          </div>
-                        </div>
-                        
                         {/* Science-based training text */}
                         <div className="space-y-2 text-center mt-6 pt-4 border-t border-primary/20">
                           <p className="text-base font-semibold text-primary">
@@ -899,6 +866,39 @@ const Index = () => {
                                 </div>
                               </div>
                               <p className="text-[10px] sm:text-xs text-white/80 line-clamp-1 mt-0.5">Articles & Insights</p>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Who is SmartyGym For? - Now at the bottom */}
+                        <div className="mt-6 pt-4 border-t border-primary/20">
+                          <h4 className="text-sm font-semibold text-muted-foreground mb-3 text-center">
+                            Who is <span className="text-primary">SmartyGym</span> For?
+                          </h4>
+                          <div className="grid grid-cols-6 gap-2 max-w-2xl mx-auto">
+                            <div className="flex flex-col items-center gap-1">
+                              <Users className="w-4 h-4 text-blue-500" />
+                              <span className="text-xs font-medium text-foreground text-center">Busy Adults</span>
+                            </div>
+                            <div className="flex flex-col items-center gap-1">
+                              <Heart className="w-4 h-4 text-pink-500" />
+                              <span className="text-xs font-medium text-foreground text-center">Parents</span>
+                            </div>
+                            <div className="flex flex-col items-center gap-1">
+                              <GraduationCap className="w-4 h-4 text-emerald-500" />
+                              <span className="text-xs font-medium text-foreground text-center">Beginners</span>
+                            </div>
+                            <div className="flex flex-col items-center gap-1">
+                              <Target className="w-4 h-4 text-orange-500" />
+                              <span className="text-xs font-medium text-foreground text-center">Intermediate</span>
+                            </div>
+                            <div className="flex flex-col items-center gap-1">
+                              <Plane className="w-4 h-4 text-cyan-500" />
+                              <span className="text-xs font-medium text-foreground text-center">Travelers</span>
+                            </div>
+                            <div className="flex flex-col items-center gap-1">
+                              <Dumbbell className="w-4 h-4 text-purple-500" />
+                              <span className="text-xs font-medium text-foreground text-center">Gym-Goers</span>
                             </div>
                           </div>
                         </div>
