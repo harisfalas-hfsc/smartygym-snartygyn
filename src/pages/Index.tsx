@@ -802,114 +802,109 @@ const Index = () => {
                             </div>
                           </div>
                         </div>
+                        
+                        {/* Science-based training text */}
+                        <div className="space-y-2 text-center mt-6 pt-4 border-t border-primary/20">
+                          <p className="text-base font-semibold text-primary">
+                            Every workout and training program is science-based and personally created by{' '}
+                            <a href="/coach-profile" onClick={e => {
+                                e.preventDefault();
+                                navigate('/coach-profile');
+                              }} className="text-primary hover:underline font-medium cursor-pointer">
+                              Haris Falas
+                            </a>.
+                          </p>
+                          <p className="text-base text-muted-foreground leading-relaxed">
+                            Never by AI. Never by algorithms. Always by a real human expert who understands YOUR needs. Training designed by humans, for humans.
+                          </p>
+                        </div>
+                        
+                        {/* 3 Static Cards: WOD, Workouts, Blog */}
+                        <div className="grid grid-cols-3 gap-3 mt-6">
+                          {/* WOD Card */}
+                          <div
+                            onClick={() => navigate('/workout/wod')}
+                            className="cursor-pointer group border-2 border-primary/40 rounded-xl overflow-hidden hover:border-primary hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[160px] sm:h-[200px] relative bg-card"
+                          >
+                            <div className="absolute inset-0 overflow-hidden">
+                              <img 
+                                src={heroWodImage}
+                                alt="Workout of the Day"
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                onError={(e) => {
+                                  e.currentTarget.src = '/placeholder.svg';
+                                }}
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
+                            </div>
+                            <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 z-10">
+                              <div className="flex items-center justify-between">
+                                <h3 className="text-xs sm:text-sm font-semibold text-white">WOD</h3>
+                                <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-background/90 flex items-center justify-center">
+                                  <Dumbbell className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                                </div>
+                              </div>
+                              <p className="text-[10px] sm:text-xs text-white/80 line-clamp-1 mt-0.5">Expertly designed Workout of the Day</p>
+                            </div>
+                          </div>
+
+                          {/* Workouts Card */}
+                          <div
+                            onClick={() => navigate('/workout')}
+                            className="cursor-pointer group border-2 border-primary/40 rounded-xl overflow-hidden hover:border-primary hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[160px] sm:h-[200px] relative bg-card"
+                          >
+                            <div className="absolute inset-0 overflow-hidden">
+                              <img 
+                                src={heroWorkoutsImage}
+                                alt="Smarty Workouts"
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                onError={(e) => {
+                                  e.currentTarget.src = '/placeholder.svg';
+                                }}
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
+                            </div>
+                            <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 z-10">
+                              <div className="flex items-center justify-between">
+                                <h3 className="text-xs sm:text-sm font-semibold text-white">Smarty Workouts</h3>
+                                <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-background/90 flex items-center justify-center">
+                                  <Dumbbell className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                                </div>
+                              </div>
+                              <p className="text-[10px] sm:text-xs text-white/80 line-clamp-1 mt-0.5">Complete workout library for every goal</p>
+                            </div>
+                          </div>
+
+                          {/* Blog Card */}
+                          <div
+                            onClick={() => navigate('/blog')}
+                            className="cursor-pointer group border-2 border-primary/40 rounded-xl overflow-hidden hover:border-primary hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[160px] sm:h-[200px] relative bg-card"
+                          >
+                            <div className="absolute inset-0 overflow-hidden">
+                              <img 
+                                src={heroBlogImage}
+                                alt="Blog & Insights"
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                onError={(e) => {
+                                  e.currentTarget.src = '/placeholder.svg';
+                                }}
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
+                            </div>
+                            <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 z-10">
+                              <div className="flex items-center justify-between">
+                                <h3 className="text-xs sm:text-sm font-semibold text-white">Blog</h3>
+                                <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-background/90 flex items-center justify-center">
+                                  <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                                </div>
+                              </div>
+                              <p className="text-[10px] sm:text-xs text-white/80 line-clamp-1 mt-0.5">Articles & Insights</p>
+                            </div>
+                          </div>
+                        </div>
                       </CardContent>
                     </Card>
                   </div>
-
-                  {/* Your Gym Anywhere Card - Now Second with Carousel */}
-                  <Card className="bg-gradient-to-r from-primary/10 to-accent/10 border-2 border-primary/20 mb-0 relative mt-4">
-                    <CardContent className="p-4">
-                      {/* Text content first */}
-                      <div className="space-y-2 text-center">
-                        <p className="text-base font-semibold text-primary">
-                          Every workout and training program is science-based and personally created by{' '}
-                          <a href="/coach-profile" onClick={e => {
-                              e.preventDefault();
-                              navigate('/coach-profile');
-                            }} className="text-primary hover:underline font-medium cursor-pointer">
-                            Haris Falas
-                          </a>.
-                        </p>
-                        <p className="text-base text-muted-foreground leading-relaxed">
-                          Never by AI. Never by algorithms. Always by a real human expert who understands YOUR needs. Training designed by humans, for humans.
-                        </p>
-                      </div>
-                      
-                      {/* 3 Static Cards: WOD, Workouts, Blog */}
-                      <div className="grid grid-cols-3 gap-3 mt-6">
-                        {/* WOD Card */}
-                        <div
-                          onClick={() => navigate('/workout/wod')}
-                          className="cursor-pointer group border-2 border-primary/40 rounded-xl overflow-hidden hover:border-primary hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[160px] sm:h-[200px] relative bg-card"
-                        >
-                          <div className="absolute inset-0 overflow-hidden">
-                            <img 
-                              src={heroWodImage}
-                              alt="Workout of the Day"
-                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                              onError={(e) => {
-                                e.currentTarget.src = '/placeholder.svg';
-                              }}
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
-                          </div>
-                          <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 z-10">
-                            <div className="flex items-center justify-between">
-                              <h3 className="text-xs sm:text-sm font-semibold text-white">WOD</h3>
-                              <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-background/90 flex items-center justify-center">
-                                <Dumbbell className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-                              </div>
-                            </div>
-                            <p className="text-[10px] sm:text-xs text-white/80 line-clamp-1 mt-0.5">Expertly designed Workout of the Day</p>
-                          </div>
-                        </div>
-
-                        {/* Workouts Card */}
-                        <div
-                          onClick={() => navigate('/workout')}
-                          className="cursor-pointer group border-2 border-primary/40 rounded-xl overflow-hidden hover:border-primary hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[160px] sm:h-[200px] relative bg-card"
-                        >
-                          <div className="absolute inset-0 overflow-hidden">
-                            <img 
-                              src={heroWorkoutsImage}
-                              alt="Smarty Workouts"
-                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                              onError={(e) => {
-                                e.currentTarget.src = '/placeholder.svg';
-                              }}
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
-                          </div>
-                          <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 z-10">
-                            <div className="flex items-center justify-between">
-                              <h3 className="text-xs sm:text-sm font-semibold text-white">Smarty Workouts</h3>
-                              <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-background/90 flex items-center justify-center">
-                                <Dumbbell className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-                              </div>
-                            </div>
-                            <p className="text-[10px] sm:text-xs text-white/80 line-clamp-1 mt-0.5">Complete workout library for every goal</p>
-                          </div>
-                        </div>
-
-                        {/* Blog Card */}
-                        <div
-                          onClick={() => navigate('/blog')}
-                          className="cursor-pointer group border-2 border-primary/40 rounded-xl overflow-hidden hover:border-primary hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[160px] sm:h-[200px] relative bg-card"
-                        >
-                          <div className="absolute inset-0 overflow-hidden">
-                            <img 
-                              src={heroBlogImage}
-                              alt="Blog & Insights"
-                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                              onError={(e) => {
-                                e.currentTarget.src = '/placeholder.svg';
-                              }}
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
-                          </div>
-                          <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 z-10">
-                            <div className="flex items-center justify-between">
-                              <h3 className="text-xs sm:text-sm font-semibold text-white">Blog</h3>
-                              <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-background/90 flex items-center justify-center">
-                                <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-                              </div>
-                            </div>
-                            <p className="text-[10px] sm:text-xs text-white/80 line-clamp-1 mt-0.5">Articles & Insights</p>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
 
                 </div>
               </Card>
