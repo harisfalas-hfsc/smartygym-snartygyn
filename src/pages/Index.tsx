@@ -766,7 +766,7 @@ const Index = () => {
                           100% Human. <span className="text-destructive">0% AI.</span>
                         </h2>
                         
-                        <div className="max-w-3xl mx-auto space-y-5 text-center mb-10">
+						<div className="max-w-4xl mx-auto space-y-5 text-center mb-10">
                           <p className="text-xl font-semibold text-foreground">
                             <span className="text-primary font-semibold">SmartyGym</span> workouts and programs are built to fit YOUR life.
                           </p>
@@ -828,8 +828,8 @@ const Index = () => {
                         
                         {/* Desktop navigation carousel (compact cards, arrows centered in gap) */}
                           <div className="mt-8">
-                          {/* padding creates space for arrows centered between card edge and container edge */}
-                          <div className="relative px-14">
+							{/* padding creates space for arrows centered between card edge and container edge */}
+							<div className="relative px-24">
                             <Carousel
                               className="w-full"
                               setApi={setDesktopNavApi}
@@ -877,9 +877,9 @@ const Index = () => {
                                 })}
                               </CarouselContent>
 
-                              {/* Arrows centered between card edge and container edge */}
-                              <CarouselPrevious className="z-20 -left-11 w-8 h-8 bg-background/90 border-2 border-primary/40 shadow-lg hover:border-primary" />
-                              <CarouselNext className="z-20 -right-11 w-8 h-8 bg-background/90 border-2 border-primary/40 shadow-lg hover:border-primary" />
+								{/* Arrows centered between card edge and container edge */}
+								<CarouselPrevious className="z-20 -left-16 w-8 h-8 bg-background/90 border-2 border-primary/40 shadow-lg hover:border-primary" />
+								<CarouselNext className="z-20 -right-16 w-8 h-8 bg-background/90 border-2 border-primary/40 shadow-lg hover:border-primary" />
                             </Carousel>
                           </div>
 
