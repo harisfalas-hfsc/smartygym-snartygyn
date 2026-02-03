@@ -808,18 +808,6 @@ const Index = () => {
 
                   {/* Your Gym Anywhere Card - Now Second with Carousel */}
                   <Card className="bg-gradient-to-r from-primary/10 to-accent/10 border-2 border-primary/20 mb-0 relative mt-4">
-                    {!isPremium && (
-                      <Button 
-                        onClick={() => navigate("/joinpremium", {
-                          state: {
-                            from: location.pathname
-                          }
-                        })} 
-                        className="absolute top-3 right-3 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md z-10"
-                      >
-                        Join Now
-                      </Button>
-                    )}
                     <CardContent className="p-4">
                       {/* Text content first */}
                       <div className="space-y-2 text-center">
