@@ -826,10 +826,10 @@ const Index = () => {
                           </p>
                         </div>
                         
-                        {/* Desktop navigation carousel (2 cards visible + peeking sides) */}
+                        {/* Desktop navigation carousel (compact cards, arrows just outside) */}
                           <div className="mt-8">
-                          {/* padding creates space for arrows OUTSIDE the carousel track */}
-                          <div className="relative px-24">
+                          {/* padding creates space for arrows just outside the cards */}
+                          <div className="relative px-12">
                             <Carousel
                               className="w-full"
                               setApi={setDesktopNavApi}
@@ -838,39 +838,38 @@ const Index = () => {
                                 loop: true,
                               }}
                             >
-                              {/* NOTE: no extra padding on the track to avoid uneven loop gaps */}
-                              <CarouselContent className="-ml-4">
+                              <CarouselContent className="-ml-3">
                                 {desktopNavCards.map((card) => {
                                   const Icon = card.icon;
                                   return (
                                     <CarouselItem
                                       key={card.id}
-                                      className="pl-4 basis-[78%] md:basis-[52%] lg:basis-[45%] xl:basis-[42%]"
+                                      className="pl-3 basis-[45%] lg:basis-[42%]"
                                     >
                                       <Card
                                         onClick={() => navigate(card.route)}
                                         className={cn(
-                                          "h-[220px] border-[3px] border-primary/35 bg-primary/10",
+                                          "h-[160px] border-[3px] border-primary/40 bg-primary/5",
                                           "cursor-pointer overflow-hidden rounded-xl",
-                                          "hover:border-primary/60 hover:shadow-xl hover:scale-[1.02]",
+                                          "hover:border-primary hover:shadow-xl hover:scale-[1.02]",
                                           "transition-all duration-300"
                                         )}
                                       >
-                                        <CardContent className="h-full flex flex-row items-center p-6 gap-6">
-                                          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/15 flex-shrink-0">
-                                            <Icon className="w-10 h-10 text-primary" />
+                                        <CardContent className="h-full flex flex-row items-center p-4 gap-4">
+                                          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary/10 flex-shrink-0">
+                                            <Icon className="w-7 h-7 text-primary" />
                                           </div>
 
-                                          <div className="flex-1 flex flex-col justify-center gap-3">
-                                            <h3 className="text-xl font-bold text-foreground leading-tight">
+                                          <div className="flex-1 flex flex-col justify-center gap-1.5">
+                                            <h3 className="text-base font-bold text-foreground leading-tight">
                                               {card.title}
                                             </h3>
-                                            <p className="text-base text-muted-foreground leading-relaxed min-h-[3rem]">
+                                            <p className="text-xs text-muted-foreground leading-snug line-clamp-2">
                                               {card.description}
                                             </p>
                                           </div>
 
-                                          <ChevronRight className="w-7 h-7 text-primary/50 flex-shrink-0" />
+                                          <ChevronRight className="w-5 h-5 text-primary/50 flex-shrink-0" />
                                         </CardContent>
                                       </Card>
                                     </CarouselItem>
@@ -878,22 +877,22 @@ const Index = () => {
                                 })}
                               </CarouselContent>
 
-                              {/* Arrows far OUTSIDE the slide area */}
-                              <CarouselPrevious className="z-20 -left-20 w-10 h-10 bg-background/90 border-2 border-primary/40 shadow-lg hover:border-primary" />
-                              <CarouselNext className="z-20 -right-20 w-10 h-10 bg-background/90 border-2 border-primary/40 shadow-lg hover:border-primary" />
+                              {/* Arrows just outside the card edges */}
+                              <CarouselPrevious className="z-20 -left-10 w-8 h-8 bg-background/90 border-2 border-primary/40 shadow-lg hover:border-primary" />
+                              <CarouselNext className="z-20 -right-10 w-8 h-8 bg-background/90 border-2 border-primary/40 shadow-lg hover:border-primary" />
                             </Carousel>
                           </div>
 
                           {/* Dots */}
-                          <div className="flex justify-center gap-2.5 mt-5">
+                          <div className="flex justify-center gap-2 mt-4">
                             {desktopNavCards.map((_, index) => (
                               <button
                                 key={index}
                                 onClick={() => desktopNavApi?.scrollTo(index)}
                                 className={cn(
-                                  "w-3 h-3 rounded-full border-2 transition-all duration-300",
+                                  "w-2.5 h-2.5 rounded-full border-2 transition-all duration-300",
                                   desktopNavSlide === index
-                                    ? "border-primary bg-primary/30 scale-125"
+                                    ? "border-primary bg-transparent scale-125"
                                     : "border-primary/40 bg-transparent hover:border-primary/60"
                                 )}
                                 aria-label={`Go to slide ${index + 1}`}
