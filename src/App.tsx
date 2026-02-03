@@ -18,6 +18,7 @@ import { useSessionExpiry } from "./hooks/useSessionExpiry";
 import { AccessControlProvider } from "./contexts/AccessControlContext";
 import { NavigationHistoryProvider } from "./contexts/NavigationHistoryContext";
 import { Navigation } from "./components/Navigation";
+import { FixedBackButton } from "./components/FixedBackButton";
 import { Footer } from "./components/Footer";
 import { useAdminRole } from "./hooks/useAdminRole";
 import { ArticleDetail } from "./pages/ArticleDetail";
@@ -109,6 +110,7 @@ const AppContent = () => {
         <ScrollToTop />
         <div className="flex flex-col min-h-screen">
           <Navigation />
+          <FixedBackButton />
             <div className="flex-1" style={{ paddingTop: 'calc(var(--app-header-h, 100px) + 8px)' }}>
             <PageTransition>
                 <Routes>

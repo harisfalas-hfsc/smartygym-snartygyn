@@ -9,12 +9,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, AlertTriangle, Loader2, WifiOff } from "lucide-react";
+import { AlertTriangle, Loader2, WifiOff } from "lucide-react";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { AvatarSetupDialog } from "@/components/AvatarSetupDialog";
 import { ForgotPasswordDialog } from "@/components/auth/ForgotPasswordDialog";
 import { trackSocialMediaEvent } from "@/utils/socialMediaTracking";
-import { useShowBackButton } from "@/hooks/useShowBackButton";
+
 import { checkPasswordBreach } from "@/utils/passwordBreachCheck";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { OfflineBanner } from "@/components/OfflineBanner";
@@ -27,7 +27,6 @@ export default function Auth() {
   const [showAvatarSetup, setShowAvatarSetup] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [newUserId, setNewUserId] = useState<string | null>(null);
-  const { goBack } = useShowBackButton();
   const { isOffline } = useNetworkStatus();
   
   // Get the mode from URL params, default to login
@@ -318,15 +317,6 @@ export default function Auth() {
       )}
 
       <div className="w-full max-w-md">
-        <Button
-          variant="ghost"
-          onClick={goBack}
-          className="mb-4"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
-        </Button>
-        
         <Card className="w-full">
           <CardHeader className="space-y-1 flex flex-col items-center">
             <img src={smartyGymLogo} alt="SmartyGym" className="h-20 w-auto mb-2" />

@@ -102,18 +102,6 @@ const Shop = () => {
       />
       
       <main className="container mx-auto px-4 pb-6 max-w-7xl">
-        {canGoBack && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={goBack}
-            className="mb-4"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
-          </Button>
-        )}
-        
         <PageBreadcrumbs 
           items={[
             { label: "Home", href: "/" },

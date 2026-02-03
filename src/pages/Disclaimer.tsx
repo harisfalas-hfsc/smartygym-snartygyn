@@ -1,13 +1,11 @@
 import { Helmet } from "react-helmet";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, Heart, Scale, Shield, Users, FileCheck, ArrowLeft } from "lucide-react";
+import { AlertTriangle, Heart, Scale, Shield, Users, FileCheck } from "lucide-react";
 import { ParQQuestionnaire } from "@/components/ParQQuestionnaire";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
-import { useShowBackButton } from "@/hooks/useShowBackButton";
 
 const Disclaimer = () => {
-  const { canGoBack, goBack } = useShowBackButton();
 
   return (
     <>
@@ -24,13 +22,6 @@ const Disclaimer = () => {
 
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8 max-w-4xl">
-          {canGoBack && (
-            <Button variant="ghost" size="sm" onClick={goBack} className="mb-4">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back
-            </Button>
-          )}
-          
           <PageBreadcrumbs items={[
             { label: "Home", href: "/" },
             { label: "Disclaimer" }

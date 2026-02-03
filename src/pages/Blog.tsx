@@ -5,8 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { InfoRibbon } from "@/components/InfoRibbon";
-import { ArrowLeft, Clock, Calendar } from "lucide-react";
-import { useShowBackButton } from "@/hooks/useShowBackButton";
+import { Clock, Calendar } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { CompactFilters } from "@/components/CompactFilters";
 import { Link } from "react-router-dom";
@@ -24,10 +23,6 @@ interface Article {
 }
 const Blog = () => {
   const navigate = useNavigate();
-  const {
-    canGoBack,
-    goBack
-  } = useShowBackButton();
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [sortFilter, setSortFilter] = useState<string>("newest");
   const [allArticles, setAllArticles] = useState<Article[]>([]);
@@ -116,13 +111,6 @@ const Blog = () => {
 
       <div className="min-h-screen bg-gradient-to-b from-background to-accent/20">
         <div className="container mx-auto max-w-6xl px-4 pb-8">
-          {canGoBack && <div className="mb-6">
-              <Button variant="ghost" size="sm" onClick={goBack}>
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back
-              </Button>
-            </div>}
-
           <PageBreadcrumbs items={[{
           label: "Home",
           href: "/"

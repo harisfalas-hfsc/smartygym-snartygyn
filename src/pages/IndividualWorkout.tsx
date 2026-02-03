@@ -2,13 +2,12 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, BookOpen } from "lucide-react";
+import { BookOpen } from "lucide-react";
 import { WorkoutDisplay } from "@/components/WorkoutDisplay";
 import { AccessGate } from "@/components/AccessGate";
 import { useWorkoutData } from "@/hooks/useWorkoutData";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { ContentNotFound } from "@/components/ContentNotFound";
-import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { ReaderModeDialog } from "@/components/ReaderModeDialog";
 import { HTMLContent } from "@/components/ui/html-content";
@@ -31,7 +30,6 @@ const IndividualWorkout = () => {
   const [readerModeOpen, setReaderModeOpen] = useState(false);
   const { type, id } = useParams();
   const { userTier, hasPurchased } = useAccessControl();
-  const { goBack } = useShowBackButton();
   
   // Use centralized category labels
   const getCategoryLabel = (category: string | undefined | null): string => {
@@ -236,16 +234,7 @@ const IndividualWorkout = () => {
               const hasAccess = userTier === "premium" || hasPurchased(dbWorkout.id, "workout") || !dbWorkout.is_premium;
               return (
                 <>
-                  <div className="mb-4 flex items-center justify-between">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={goBack}
-                      className="gap-2"
-                    >
-                      <ArrowLeft className="mr-2 h-4 w-4" />
-                      <span className="text-xs sm:text-sm">Back</span>
-                    </Button>
+                  <div className="mb-4 flex items-center justify-end">
                     {hasAccess && (
                       <Button
                         variant="outline"

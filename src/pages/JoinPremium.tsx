@@ -293,18 +293,6 @@ export default function JoinPremium() {
 
       <div className="min-h-screen bg-background">
         <main className="container mx-auto max-w-7xl p-4 py-8">
-          {canGoBack && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={goBack}
-              className="mb-4"
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              <span className="text-xs sm:text-sm">Back</span>
-            </Button>
-          )}
-
           <PageBreadcrumbs items={[
             { label: "Home", href: "/" },
             { label: "Premium Plans" }
