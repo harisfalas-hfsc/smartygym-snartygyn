@@ -871,7 +871,7 @@ const Index = () => {
                                 <Dumbbell className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                               </div>
                             </div>
-                            <p className="text-[10px] sm:text-xs text-white/80 line-clamp-1 mt-0.5">Daily expert workouts</p>
+                            <p className="text-[10px] sm:text-xs text-white/80 line-clamp-1 mt-0.5">Expertly designed Workout of the Day</p>
                           </div>
                         </div>
 
@@ -893,12 +893,12 @@ const Index = () => {
                           </div>
                           <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 z-10">
                             <div className="flex items-center justify-between">
-                              <h3 className="text-xs sm:text-sm font-semibold text-white">Workouts</h3>
+                              <h3 className="text-xs sm:text-sm font-semibold text-white">Smarty Workouts</h3>
                               <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-background/90 flex items-center justify-center">
                                 <Dumbbell className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                               </div>
                             </div>
-                            <p className="text-[10px] sm:text-xs text-white/80 line-clamp-1 mt-0.5">500+ workout library</p>
+                            <p className="text-[10px] sm:text-xs text-white/80 line-clamp-1 mt-0.5">Complete workout library for every goal</p>
                           </div>
                         </div>
 
@@ -925,7 +925,7 @@ const Index = () => {
                                 <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                               </div>
                             </div>
-                            <p className="text-[10px] sm:text-xs text-white/80 line-clamp-1 mt-0.5">Expert fitness articles</p>
+                            <p className="text-[10px] sm:text-xs text-white/80 line-clamp-1 mt-0.5">Articles & Insights</p>
                           </div>
                         </div>
                       </div>
