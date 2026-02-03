@@ -20,6 +20,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { cn } from "@/lib/utils";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { ScrollReveal } from "@/components/ScrollReveal";
+import { LazySection } from "@/components/LazySection";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { HeroBackgroundVideo } from "@/components/HeroBackgroundVideo";
 import heroWodImage from "@/assets/hero-wod.jpg";
@@ -867,6 +868,7 @@ const Index = () => {
           </div>
         </section>
 
+        <LazySection minHeight="400px" rootMargin="300px">
         <div className="container mx-auto max-w-6xl px-4">
           {/* Mission Statement with Cards */}
           <section className="mb-16 mt-8">
@@ -1116,6 +1118,7 @@ const Index = () => {
           </Card>
         </section>
       </div>
+        </LazySection>
           </>}
 
     </div>
