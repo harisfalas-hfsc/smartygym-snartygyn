@@ -773,45 +773,39 @@ const Index = () => {
                           <p className="text-lg leading-relaxed text-muted-foreground">
                             That's why they work — safe and efficient design by <a href="/coach-profile" className="text-primary hover:underline font-medium"><strong>Haris Falas</strong></a>, crafted by hand with care to deliver effective results at <strong>smartygym.com</strong>, <strong className="text-foreground">NOT by AI</strong>.
                           </p>
-                          <div className="bg-background/60 backdrop-blur-sm p-8 rounded-lg border-2 border-primary/30 mt-8">
-                            <p className="text-xl font-bold text-primary mb-3">
+                          <div className="bg-background/60 backdrop-blur-sm p-6 rounded-lg border-2 border-primary/30 mt-8 max-w-5xl mx-auto">
+                            <p className="text-xl font-bold text-primary mb-2">
                               Your Gym Re-imagined Anywhere, Anytime
                             </p>
-                            <p className="text-lg text-muted-foreground mb-3">
-                              We are not here to replace your gym. We are here to back you up when life gets in the way.
-                            </p>
-                            <p className="text-base text-muted-foreground mb-3">
-                              Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed — SmartyGym is your backup plan. Or, if you prefer training from home entirely, we've got you covered. Or, if you go to your gym but want to follow a professional, science-based workout or training program designed by{' '}
-                              <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>, we provide that expert guidance.
-                            </p>
-                            <p className="text-lg font-semibold text-primary">
-                              Wherever you are, your gym comes with you.
+                            <p className="text-base text-muted-foreground leading-relaxed">
+                              We are not here to replace your gym. We are here to back you up when life gets in the way. Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed — SmartyGym is your backup plan. Or, if you prefer training from home entirely, we've got you covered. Or, if you go to your gym but want to follow a professional, science-based workout or training program designed by{' '}
+                              <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>, we provide that expert guidance. <span className="font-semibold text-primary">Wherever you are, your gym comes with you.</span>
                             </p>
                           </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
-                          <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20" itemScope itemType="https://schema.org/Thing" data-feature="smarty-gym-expertise" data-keywords="smarty gym, online gym, online fitness, smartygym.com, Haris Falas Cyprus, sports scientist" role="article" aria-label="Real expertise - SmartyGym Cyprus online fitness - smartygym.com by Haris Falas">
-                            <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1" aria-hidden="true" />
-                            <div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+                          <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20 h-full min-h-[88px]" itemScope itemType="https://schema.org/Thing" data-feature="smarty-gym-expertise" data-keywords="smarty gym, online gym, online fitness, smartygym.com, Haris Falas Cyprus, sports scientist" role="article" aria-label="Real expertise - SmartyGym Cyprus online fitness - smartygym.com by Haris Falas">
+                            <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
+                            <div className="flex-1">
                               <p className="font-semibold text-sm mb-1" itemProp="name">Real Expertise</p>
-                              <p className="text-xs text-muted-foreground" itemProp="description">Sports science degree & years of coaching</p>
+                              <p className="text-xs text-muted-foreground leading-relaxed" itemProp="description">Sports science degree & years of professional coaching experience</p>
                             </div>
                           </article>
                           
-                          <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20" itemScope itemType="https://schema.org/Thing" data-feature="smarty-gym-personalized" data-keywords="smarty gym, online gym, online fitness, smartygym.com, personalized workouts Cyprus" role="article" aria-label="Personal touch - SmartyGym personalized workouts - smartygym.com">
-                            <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1" aria-hidden="true" />
-                            <div>
+                          <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20 h-full min-h-[88px]" itemScope itemType="https://schema.org/Thing" data-feature="smarty-gym-personalized" data-keywords="smarty gym, online gym, online fitness, smartygym.com, personalized workouts Cyprus" role="article" aria-label="Personal touch - SmartyGym personalized workouts - smartygym.com">
+                            <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
+                            <div className="flex-1">
                               <p className="font-semibold text-sm mb-1" itemProp="name">Personal Touch</p>
-                              <p className="text-xs text-muted-foreground" itemProp="description">Workouts that fit YOUR schedule</p>
+                              <p className="text-xs text-muted-foreground leading-relaxed" itemProp="description">Workouts designed to fit YOUR unique schedule and lifestyle</p>
                             </div>
                           </article>
                           
-                          <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20" itemScope itemType="https://schema.org/Thing" data-feature="smarty-gym-science" data-keywords="smarty gym, online gym, online fitness, smartygym.com, science-based training, no AI" role="article" aria-label="Not a robot - SmartyGym science-based no AI training - smartygym.com">
-                            <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1" aria-hidden="true" />
-                            <div>
+                          <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20 h-full min-h-[88px]" itemScope itemType="https://schema.org/Thing" data-feature="smarty-gym-science" data-keywords="smarty gym, online gym, online fitness, smartygym.com, science-based training, no AI" role="article" aria-label="Not a robot - SmartyGym science-based no AI training - smartygym.com">
+                            <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
+                            <div className="flex-1">
                               <p className="font-semibold text-sm mb-1" itemProp="name">Not a Robot</p>
-                              <p className="text-xs text-muted-foreground" itemProp="description">Human-designed workouts backed by science, not AI</p>
+                              <p className="text-xs text-muted-foreground leading-relaxed" itemProp="description">Human-designed workouts backed by science, never by AI</p>
                             </div>
                           </article>
                         </div>
@@ -835,7 +829,7 @@ const Index = () => {
                         {/* Desktop navigation carousel (2 cards visible + peeking sides) */}
                           <div className="mt-8">
                           {/* padding creates space for arrows OUTSIDE the carousel track */}
-                          <div className="relative px-16">
+                          <div className="relative px-20">
                             <Carousel
                               className="w-full"
                               setApi={setDesktopNavApi}
@@ -884,9 +878,9 @@ const Index = () => {
                                 })}
                               </CarouselContent>
 
-                              {/* Arrows OUTSIDE the slide area (in the padded gutter) */}
-                              <CarouselPrevious className="z-20 -left-14 w-10 h-10 bg-background/90 border-2 border-primary/40 shadow-lg hover:border-primary" />
-                              <CarouselNext className="z-20 -right-14 w-10 h-10 bg-background/90 border-2 border-primary/40 shadow-lg hover:border-primary" />
+                              {/* Arrows further OUTSIDE the slide area */}
+                              <CarouselPrevious className="z-20 -left-16 w-10 h-10 bg-background/90 border-2 border-primary/40 shadow-lg hover:border-primary" />
+                              <CarouselNext className="z-20 -right-16 w-10 h-10 bg-background/90 border-2 border-primary/40 shadow-lg hover:border-primary" />
                             </Carousel>
                           </div>
 
