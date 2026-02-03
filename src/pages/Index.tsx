@@ -791,7 +791,7 @@ const Index = () => {
                           {/* WOD Card */}
                           <div
                             onClick={() => navigate('/workout/wod')}
-                            className="cursor-pointer group rounded-full overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[120px] w-[120px] sm:h-[160px] sm:w-[160px] relative bg-card mx-auto"
+                            className="cursor-pointer group rounded-xl overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[160px] sm:h-[200px] relative bg-card"
                           >
                             <div className="absolute inset-0 overflow-hidden">
                               <img 
@@ -818,7 +818,7 @@ const Index = () => {
                           {/* Workouts Card */}
                           <div
                             onClick={() => navigate('/workout')}
-                            className="cursor-pointer group rounded-full overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[120px] w-[120px] sm:h-[160px] sm:w-[160px] relative bg-card mx-auto"
+                            className="cursor-pointer group rounded-xl overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[160px] sm:h-[200px] relative bg-card"
                           >
                             <div className="absolute inset-0 overflow-hidden">
                               <img 
@@ -845,7 +845,7 @@ const Index = () => {
                           {/* Blog Card */}
                           <div
                             onClick={() => navigate('/blog')}
-                            className="cursor-pointer group rounded-full overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[120px] w-[120px] sm:h-[160px] sm:w-[160px] relative bg-card mx-auto"
+                            className="cursor-pointer group rounded-xl overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[160px] sm:h-[200px] relative bg-card"
                           >
                             <div className="absolute inset-0 overflow-hidden">
                               <img 
