@@ -877,9 +877,9 @@ const Index = () => {
                                 })}
                               </CarouselContent>
 
-								{/* Arrows centered between card edge and container edge */}
-								<CarouselPrevious className="z-20 -left-16 w-8 h-8 bg-background/90 border-2 border-primary/40 shadow-lg hover:border-primary" />
-								<CarouselNext className="z-20 -right-16 w-8 h-8 bg-background/90 border-2 border-primary/40 shadow-lg hover:border-primary" />
+                              {/* Arrows at far edges per user request */}
+                              <CarouselPrevious className="z-20 -left-[88px] w-8 h-8 bg-background/90 border-2 border-primary/40 shadow-lg hover:border-primary" />
+                              <CarouselNext className="z-20 -right-[88px] w-8 h-8 bg-background/90 border-2 border-primary/40 shadow-lg hover:border-primary" />
                             </Carousel>
                           </div>
 
