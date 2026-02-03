@@ -729,10 +729,17 @@ const Index = () => {
                           </p>
                           <div className="bg-background/60 backdrop-blur-sm p-6 rounded-lg border-2 border-primary/30 mt-6">
                             <p className="text-lg font-bold text-primary mb-2">
-                              Every workout and training program is science-based and personally created by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>.
+                              Your Gym Re-imagined Anywhere, Anytime
                             </p>
-                            <p className="text-base text-muted-foreground">
-                              Never by AI. Never by algorithms. Always by a real human expert who understands YOUR needs. Training designed by humans, for humans.
+                            <p className="text-base text-muted-foreground mb-2">
+                              We are not here to replace your gym. We are here to back you up when life gets in the way.
+                            </p>
+                            <p className="text-sm text-muted-foreground mb-2">
+                              Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed — SmartyGym is your backup plan. Or, if you prefer training from home entirely, we've got you covered. Or, if you go to your gym but want to follow a professional, science-based workout or training program designed by{' '}
+                              <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>, we provide that expert guidance.
+                            </p>
+                            <p className="text-base font-semibold text-primary">
+                              Wherever you are, your gym comes with you.
                             </p>
                           </div>
                         </div>
@@ -817,24 +824,19 @@ const Index = () => {
                       {/* Text content first */}
                       <div className="space-y-2 text-center">
                         <h3 className="text-xl font-bold">
-                          Your Gym Re-imagined Anywhere, Anytime
+                          100% Human. 0% AI.
                         </h3>
                         <p className="text-base font-semibold text-primary">
-                          We are not here to replace your gym. We are here to back you up when life gets in the way.
-                        </p>
-                        <p className="text-base text-muted-foreground leading-relaxed">
-                          Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed — 
-                          SmartyGym is your backup plan. Or, if you prefer training from home entirely, we've got you covered. 
-                          Or, if you go to your gym but want to follow a professional, science-based workout or training program designed by{' '}
+                          Every workout and training program is science-based and personally created by{' '}
                           <a href="/coach-profile" onClick={e => {
                               e.preventDefault();
                               navigate('/coach-profile');
                             }} className="text-primary hover:underline font-medium cursor-pointer">
                             Haris Falas
-                          </a>, we provide that expert guidance.
+                          </a>.
                         </p>
-                        <p className="text-base font-semibold text-primary">
-                          Wherever you are, your gym comes with you.
+                        <p className="text-base text-muted-foreground leading-relaxed">
+                          Never by AI. Never by algorithms. Always by a real human expert who understands YOUR needs. Training designed by humans, for humans.
                         </p>
                       </div>
                       
