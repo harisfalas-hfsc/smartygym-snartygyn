@@ -1,18 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useCallback, useRef } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { getCyprusTodayStr } from "@/lib/cyprusDate";
 import { 
   Dumbbell,
   Calculator, 
   FileText, 
   Video,
   ChevronRight,
-  Star,
-  Clock,
-  Calendar,
-  Sparkles
+  Calendar
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -26,46 +20,21 @@ import {
 import Autoplay from "embla-carousel-autoplay";
 
 // Import images
-import heroWodImage from "@/assets/hero-wod.jpg";
 import heroWorkoutsImage from "@/assets/hero-workouts.jpg";
 import heroProgramsImage from "@/assets/hero-programs.jpg";
-import heroRitualImage from "@/assets/hero-ritual.jpg";
 import heroToolsImage from "@/assets/hero-tools.jpg";
 import heroBlogImage from "@/assets/hero-blog.jpg";
 import heroLibraryImage from "@/assets/hero-exercise-library-new.jpg";
 
-// Helper to convert star count to difficulty label
-const getDifficultyLabel = (stars: number | null | undefined, isRecovery: boolean): string => {
-  if (isRecovery || !stars || stars === 0) return "All Levels";
-  if (stars <= 2) return "Beginner";
-  if (stars <= 4) return "Intermediate";
-  return "Advanced";
-};
-
-// Check if WOD is recovery type
-const isRecoveryWod = (wod: { equipment?: string | null; category?: string | null }): boolean => {
-  return wod.equipment?.toUpperCase() === "VARIOUS" || wod.category?.toUpperCase() === "RECOVERY";
-};
-
-// Define hero cards matching mobile design
+// Define hero cards - ordered: Workouts, Programs, Library, Blog, Tools
 const heroCards = [
-  {
-    id: "wod",
-    title: "Workout of the Day",
-    description: "Fresh daily workouts crafted by experts",
-    icon: Dumbbell,
-    route: "/workout/wod",
-    image: heroWodImage,
-    isWod: true
-  },
   {
     id: "workouts",
     title: "Smarty Workouts",
     description: "Complete workout library for every goal",
     icon: Dumbbell,
     route: "/workout",
-    image: heroWorkoutsImage,
-    isWod: false
+    image: heroWorkoutsImage
   },
   {
     id: "programs",
@@ -73,35 +42,7 @@ const heroCards = [
     description: "Structured multi-week training plans",
     icon: Calendar,
     route: "/trainingprogram",
-    image: heroProgramsImage,
-    isWod: false
-  },
-  {
-    id: "ritual",
-    title: "Smarty Ritual",
-    description: "Daily wellness habits and routines",
-    icon: Sparkles,
-    route: "/daily-ritual",
-    image: heroRitualImage,
-    isWod: false
-  },
-  {
-    id: "tools",
-    title: "Smarty Tools",
-    description: "Calculators for fitness metrics",
-    icon: Calculator,
-    route: "/tools",
-    image: heroToolsImage,
-    isWod: false
-  },
-  {
-    id: "blog",
-    title: "Blog & Insights",
-    description: "Expert articles and fitness tips",
-    icon: FileText,
-    route: "/blog",
-    image: heroBlogImage,
-    isWod: false
+    image: heroProgramsImage
   },
   {
     id: "library",
@@ -109,8 +50,23 @@ const heroCards = [
     description: "Video demos for every exercise",
     icon: Video,
     route: "/exerciselibrary",
-    image: heroLibraryImage,
-    isWod: false
+    image: heroLibraryImage
+  },
+  {
+    id: "blog",
+    title: "Blog & Insights",
+    description: "Expert articles and fitness tips",
+    icon: FileText,
+    route: "/blog",
+    image: heroBlogImage
+  },
+  {
+    id: "tools",
+    title: "Smarty Tools",
+    description: "Calculators for fitness metrics",
+    icon: Calculator,
+    route: "/tools",
+    image: heroToolsImage
   }
 ];
 
@@ -118,29 +74,9 @@ export const HeroThreeColumns = () => {
   const navigate = useNavigate();
   const [api, setApi] = useState<CarouselApi>();
   const autoplayRef = useRef(
-    Autoplay({ delay: 4000, stopOnInteraction: true }) // Slower autoplay, stop on interaction
+    Autoplay({ delay: 4000, stopOnInteraction: true })
   );
   const [current, setCurrent] = useState(0);
-
-  // Fetch WOD for the dynamic card - optimized query
-  const cyprusToday = getCyprusTodayStr();
-  const { data: wods } = useQuery({
-    queryKey: ["wod-hero-banner", cyprusToday],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("admin_workouts")
-        .select("id, name, category, focus, difficulty_stars, duration, equipment, is_premium, type, format")
-        .eq("is_workout_of_day", true)
-        .eq("generated_for_date", cyprusToday)
-        .limit(2);
-      return data || [];
-    },
-    staleTime: 1000 * 60 * 10, // 10 minutes
-    gcTime: 1000 * 60 * 30, // Keep in cache for 30 minutes
-    refetchOnWindowFocus: false,
-  });
-
-  const currentWod = wods?.[0];
 
   // Track current slide for dots
   const onSelect = useCallback(() => {
@@ -159,118 +95,84 @@ export const HeroThreeColumns = () => {
 
   return (
     <div className="mt-6 relative">
-      {/* Container with padding for arrows outside */}
-      <div className="flex items-center gap-4">
-        {/* Left Arrow - Outside carousel */}
-        <button
-          onClick={() => api?.scrollPrev()}
-          className="flex-shrink-0 w-10 h-10 rounded-full border border-border bg-background hover:bg-accent flex items-center justify-center transition-colors"
-          aria-label="Previous slide"
-        >
-          <ChevronRight className="w-5 h-5 rotate-180" />
-        </button>
-
-        {/* Carousel */}
-        <Carousel
-          setApi={setApi}
-          opts={{
-            align: "center",
-            loop: true,
-          }}
-          plugins={[autoplayRef.current]}
-          className="flex-1 overflow-hidden"
-          onMouseEnter={() => autoplayRef.current.stop()}
-          onMouseLeave={() => autoplayRef.current.play()}
-        >
-          <CarouselContent className="-ml-4">
-            {heroCards.map((card) => {
-              const Icon = card.icon;
-              const isWodCard = card.isWod;
-              
-              return (
-                <CarouselItem key={card.id} className="pl-4 basis-[45%]">
-                  <div
-                    onClick={() => navigate(card.route)}
-                    className={cn(
-                      "cursor-pointer group border-2 border-primary/40 rounded-xl overflow-hidden",
-                      "hover:border-primary hover:shadow-2xl hover:scale-[1.08] hover:z-10",
-                      "transition-all duration-300 ease-out h-[220px]",
-                      "relative bg-card"
-                    )}
-                  >
-                    {/* Image Section - Full height */}
-                    <div className="absolute inset-0 overflow-hidden">
-                      <img 
-                        src={card.image} 
-                        alt={card.title}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                      />
-                      {/* Gradient overlay for text readability */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent group-hover:from-black/95 transition-colors duration-300" />
+      {/* Carousel container */}
+      <Carousel
+        setApi={setApi}
+        opts={{
+          align: "center",
+          loop: true,
+        }}
+        plugins={[autoplayRef.current]}
+        className="w-full"
+        onMouseEnter={() => autoplayRef.current.stop()}
+        onMouseLeave={() => autoplayRef.current.play()}
+      >
+        <CarouselContent className="-ml-3">
+          {heroCards.map((card) => {
+            const Icon = card.icon;
+            
+            return (
+              <CarouselItem key={card.id} className="pl-3 basis-[32%]">
+                <div
+                  onClick={() => navigate(card.route)}
+                  className={cn(
+                    "cursor-pointer group border-2 border-primary/40 rounded-xl overflow-hidden",
+                    "hover:border-primary hover:shadow-2xl hover:scale-[1.05] hover:z-10",
+                    "transition-all duration-300 ease-out h-[180px]",
+                    "relative bg-card"
+                  )}
+                >
+                  {/* Image Section - Full height */}
+                  <div className="absolute inset-0 overflow-hidden">
+                    <img 
+                      src={card.image} 
+                      alt={card.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                    {/* Gradient overlay for text readability */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent group-hover:from-black/95 transition-colors duration-300" />
+                  </div>
+                  
+                  {/* Content Section - Positioned at bottom */}
+                  <div className="absolute bottom-0 left-0 right-0 p-2.5 flex flex-col justify-end z-10">
+                    {/* Title with Icon */}
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-xs font-semibold text-white">{card.title}</h3>
+                      <div className="w-8 h-8 rounded-full bg-background/90 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
+                        <Icon className="w-4 h-4 text-primary" />
+                      </div>
                     </div>
                     
-                    {/* Content Section - Positioned at bottom */}
-                    <div className="absolute bottom-0 left-0 right-0 p-3 flex flex-col justify-end z-10">
-                      {/* Title with Icon */}
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-sm font-semibold text-white">{card.title}</h3>
-                        <div className="w-10 h-10 rounded-full bg-background/90 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
-                          <Icon className="w-6 h-6 text-primary" />
-                        </div>
-                      </div>
-                      
-                      {/* Description - show WOD info if available */}
-                      {isWodCard && currentWod ? (
-                        <div className="flex items-center gap-2 text-xs text-white/80 mt-0.5">
-                          <span className="text-primary font-medium">{currentWod.category}</span>
-                          <span className="flex items-center gap-0.5">
-                            <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
-                            {getDifficultyLabel(currentWod.difficulty_stars, isRecoveryWod(currentWod))}
-                          </span>
-                          {currentWod.duration && (
-                            <span className="flex items-center gap-0.5">
-                              <Clock className="w-3 h-3 text-white/80" />
-                              {currentWod.duration}
-                            </span>
-                          )}
-                        </div>
-                      ) : (
-                        <p className="text-xs text-white/80 line-clamp-1 mt-0.5">{card.description}</p>
-                      )}
-                      
-                      {/* CTA indicator */}
-                      <div className="flex items-center justify-center gap-1 text-primary text-[10px] font-medium group-hover:gap-2 transition-all mt-1.5">
-                        Explore
-                        <ChevronRight className="w-3 h-3" />
-                      </div>
+                    {/* Description */}
+                    <p className="text-[10px] text-white/80 line-clamp-1 mt-0.5">{card.description}</p>
+                    
+                    {/* CTA indicator */}
+                    <div className="flex items-center justify-center gap-1 text-primary text-[9px] font-medium group-hover:gap-2 transition-all mt-1">
+                      Explore
+                      <ChevronRight className="w-2.5 h-2.5" />
                     </div>
                   </div>
-                </CarouselItem>
-              );
-            })}
-          </CarouselContent>
-        </Carousel>
-
-        {/* Right Arrow - Outside carousel */}
-        <button
-          onClick={() => api?.scrollNext()}
-          className="flex-shrink-0 w-10 h-10 rounded-full border border-border bg-background hover:bg-accent flex items-center justify-center transition-colors"
-          aria-label="Next slide"
-        >
-          <ChevronRight className="w-5 h-5" />
-        </button>
-      </div>
+                </div>
+              </CarouselItem>
+            );
+          })}
+        </CarouselContent>
+        
+        {/* Arrows positioned behind cards */}
+        <CarouselPrevious className="-left-4 w-8 h-8 border-border bg-background/80 hover:bg-accent" />
+        <CarouselNext className="-right-4 w-8 h-8 border-border bg-background/80 hover:bg-accent" />
+      </Carousel>
       
-      {/* Navigation dots */}
-      <div className="flex justify-center gap-2 mt-4">
+      {/* Navigation dots - below cards */}
+      <div className="flex justify-center gap-2 mt-3">
         {heroCards.map((_, index) => (
           <button
             key={index}
             onClick={() => api?.scrollTo(index)}
             className={cn(
-              "w-2 h-2 rounded-full transition-all",
+              "w-1.5 h-1.5 rounded-full transition-all",
               current === index 
-                ? "bg-primary w-4" 
+                ? "bg-primary w-3" 
                 : "bg-primary/30 hover:bg-primary/50"
             )}
             aria-label={`Go to slide ${index + 1}`}
