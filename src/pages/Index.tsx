@@ -791,82 +791,37 @@ const Index = () => {
                           {/* WOD Card */}
                           <div
                             onClick={() => navigate('/workout/wod')}
-                            className="cursor-pointer group rounded-xl overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[160px] sm:h-[200px] relative bg-card"
+                            className="cursor-pointer group rounded-xl overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[140px] sm:h-[180px] bg-primary/10 border-2 border-primary/20 hover:border-primary/40 p-3 sm:p-4 flex flex-col items-center justify-center text-center"
                           >
-                            <div className="absolute inset-0 overflow-hidden">
-                              <img 
-                                src={heroWodImage}
-                                alt="Workout of the Day"
-                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                                onError={(e) => {
-                                  e.currentTarget.src = '/placeholder.svg';
-                                }}
-                              />
-                              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
+                            <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-primary/20 flex items-center justify-center mb-2 sm:mb-3 group-hover:bg-primary/30 transition-colors">
+                              <Dumbbell className="w-5 h-5 sm:w-7 sm:h-7 text-primary" />
                             </div>
-                            <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 z-10">
-                              <div className="flex items-center justify-between">
-                                <h3 className="text-xs sm:text-sm font-semibold text-white">WOD</h3>
-                                <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-background/90 flex items-center justify-center">
-                                  <Dumbbell className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-                                </div>
-                              </div>
-                              <p className="text-[10px] sm:text-xs text-white/80 line-clamp-1 mt-0.5">Expertly designed Workout of the Day</p>
-                            </div>
+                            <h3 className="text-sm sm:text-base font-semibold text-foreground">WOD</h3>
+                            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1 line-clamp-2">Expertly designed Workout of the Day</p>
                           </div>
 
                           {/* Workouts Card */}
                           <div
                             onClick={() => navigate('/workout')}
-                            className="cursor-pointer group rounded-xl overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[160px] sm:h-[200px] relative bg-card"
+                            className="cursor-pointer group rounded-xl overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[140px] sm:h-[180px] bg-primary/10 border-2 border-primary/20 hover:border-primary/40 p-3 sm:p-4 flex flex-col items-center justify-center text-center"
                           >
-                            <div className="absolute inset-0 overflow-hidden">
-                              <img 
-                                src={heroWorkoutsImage}
-                                alt="Smarty Workouts"
-                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                                onError={(e) => {
-                                  e.currentTarget.src = '/placeholder.svg';
-                                }}
-                              />
-                              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
+                            <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-primary/20 flex items-center justify-center mb-2 sm:mb-3 group-hover:bg-primary/30 transition-colors">
+                              <Dumbbell className="w-5 h-5 sm:w-7 sm:h-7 text-primary" />
                             </div>
-                            <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 z-10">
-                              <div className="flex items-center justify-between">
-                                <h3 className="text-xs sm:text-sm font-semibold text-white">Smarty Workouts</h3>
-                                <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-background/90 flex items-center justify-center">
-                                  <Dumbbell className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-                                </div>
-                              </div>
-                              <p className="text-[10px] sm:text-xs text-white/80 line-clamp-1 mt-0.5">Complete workout library for every goal</p>
-                            </div>
+                            <h3 className="text-sm sm:text-base font-semibold text-foreground">Smarty Workouts</h3>
+                            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1 line-clamp-2">Complete workout library for every goal</p>
                           </div>
 
                           {/* Blog Card */}
                           <div
                             onClick={() => navigate('/blog')}
-                            className="cursor-pointer group rounded-xl overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[160px] sm:h-[200px] relative bg-card"
+                            className="cursor-pointer group rounded-xl overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[140px] sm:h-[180px] bg-primary/10 border-2 border-primary/20 hover:border-primary/40 p-3 sm:p-4 flex flex-col items-center justify-center text-center"
                           >
-                            <div className="absolute inset-0 overflow-hidden">
-                              <img 
-                                src={heroBlogImage}
-                                alt="Blog & Insights"
-                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                                onError={(e) => {
-                                  e.currentTarget.src = '/placeholder.svg';
-                                }}
-                              />
-                              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
+                            <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-primary/20 flex items-center justify-center mb-2 sm:mb-3 group-hover:bg-primary/30 transition-colors">
+                              <FileText className="w-5 h-5 sm:w-7 sm:h-7 text-primary" />
                             </div>
-                            <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 z-10">
-                              <div className="flex items-center justify-between">
-                                <h3 className="text-xs sm:text-sm font-semibold text-white">Blog</h3>
-                                <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-background/90 flex items-center justify-center">
-                                  <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-                                </div>
-                              </div>
-                              <p className="text-[10px] sm:text-xs text-white/80 line-clamp-1 mt-0.5">Articles & Insights</p>
-                            </div>
+                            <h3 className="text-sm sm:text-base font-semibold text-foreground">Blog</h3>
+                            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1 line-clamp-2">Articles & Insights</p>
                           </div>
                         </div>
                         
