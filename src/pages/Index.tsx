@@ -206,7 +206,7 @@ const Index = () => {
     route: "/blog"
   }, {
     id: "tools",
-    title: "Smart Eat Tools",
+    title: "Smarty Tools",
     description: "Fitness calculators and tools",
     icon: Calculator,
     route: "/tools"
@@ -832,59 +832,63 @@ const Index = () => {
                           </p>
                         </div>
                         
-                        {/* Desktop navigation carousel (2 cards + peeking sides) */}
-                        <div className="mt-6 relative">
-                          <Carousel
-                            className="w-full"
-                            setApi={setDesktopNavApi}
-                            opts={{
-                              align: "center",
-                              loop: true,
-                            }}
-                          >
-                            <CarouselContent className="-ml-4 px-12">
-                              {desktopNavCards.map((card) => {
-                                const Icon = card.icon;
-                                return (
-                                  <CarouselItem
-                                    key={card.id}
-                                    className="pl-4 basis-[42%] lg:basis-[38%]"
-                                  >
-                                    <Card
-                                      onClick={() => navigate(card.route)}
-                                      className={cn(
-                                        "relative z-10 h-[190px] border-[3px] border-primary/35 bg-primary/10",
-                                        "cursor-pointer overflow-hidden rounded-xl",
-                                        "hover:border-primary/60 hover:shadow-xl hover:scale-[1.02]",
-                                        "transition-all duration-300"
-                                      )}
+                        {/* Desktop navigation carousel (2 cards visible + peeking sides) */}
+                          <div className="mt-6">
+                          {/* padding creates space for arrows OUTSIDE the carousel track */}
+                          <div className="relative px-12">
+                            <Carousel
+                              className="w-full"
+                              setApi={setDesktopNavApi}
+                              opts={{
+                                align: "center",
+                                loop: true,
+                              }}
+                            >
+                              {/* NOTE: no extra padding on the track to avoid uneven loop gaps */}
+                              <CarouselContent className="-ml-4">
+                                {desktopNavCards.map((card) => {
+                                  const Icon = card.icon;
+                                  return (
+                                    <CarouselItem
+                                      key={card.id}
+                                      className="basis-[78%] md:basis-[52%] lg:basis-[45%] xl:basis-[42%]"
                                     >
-                                      <CardContent className="h-full flex flex-row items-center p-5 gap-5">
-                                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/15 flex-shrink-0">
-                                          <Icon className="w-8 h-8 text-primary" />
-                                        </div>
+                                      <Card
+                                        onClick={() => navigate(card.route)}
+                                        className={cn(
+                                          "h-[200px] border-[3px] border-primary/35 bg-primary/10",
+                                          "cursor-pointer overflow-hidden rounded-xl",
+                                          "hover:border-primary/60 hover:shadow-xl hover:scale-[1.02]",
+                                          "transition-all duration-300"
+                                        )}
+                                      >
+                                        <CardContent className="h-full flex flex-row items-center p-6 gap-6">
+                                          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/15 flex-shrink-0">
+                                            <Icon className="w-8 h-8 text-primary" />
+                                          </div>
 
-                                        <div className="flex-1 flex flex-col justify-center gap-2">
-                                          <h3 className="text-lg font-bold text-foreground leading-tight">
-                                            {card.title}
-                                          </h3>
-                                          <p className="text-sm text-muted-foreground leading-snug line-clamp-2">
-                                            {card.description}
-                                          </p>
-                                        </div>
+                                          <div className="flex-1 flex flex-col justify-center gap-2">
+                                            <h3 className="text-lg font-bold text-foreground leading-tight">
+                                              {card.title}
+                                            </h3>
+                                            <p className="text-sm text-muted-foreground leading-snug line-clamp-2">
+                                              {card.description}
+                                            </p>
+                                          </div>
 
-                                        <ChevronRight className="w-6 h-6 text-primary/50 flex-shrink-0" />
-                                      </CardContent>
-                                    </Card>
-                                  </CarouselItem>
-                                );
-                              })}
-                            </CarouselContent>
+                                          <ChevronRight className="w-6 h-6 text-primary/50 flex-shrink-0" />
+                                        </CardContent>
+                                      </Card>
+                                    </CarouselItem>
+                                  );
+                                })}
+                              </CarouselContent>
 
-                            {/* Arrows behind cards, not touching */}
-                            <CarouselPrevious className="left-2 z-0 bg-background/80 border-2 border-border shadow-lg" />
-                            <CarouselNext className="right-2 z-0 bg-background/80 border-2 border-border shadow-lg" />
-                          </Carousel>
+                              {/* Arrows OUTSIDE the slide area (in the padded gutter) */}
+                              <CarouselPrevious className="z-20 -left-10 bg-background/80 border-2 border-border shadow-lg" />
+                              <CarouselNext className="z-20 -right-10 bg-background/80 border-2 border-border shadow-lg" />
+                            </Carousel>
+                          </div>
 
                           {/* Dots */}
                           <div className="flex justify-center gap-2 mt-4">
