@@ -155,17 +155,14 @@ function getSoftTissuePrepExercises(category: string, index: number): string[] {
   return categoryExercises[variationIndex];
 }
 
-// Generate the Soft Tissue Preparation HTML section
+// Generate the Soft Tissue Preparation HTML section - NO NEWLINES (Gold Standard format)
 function generateSoftTissuePrepHTML(exercises: string[]): string {
   const listItems = exercises
     .map(exercise => `<li class="tiptap-list-item"><p class="tiptap-paragraph">${exercise}</p></li>`)
     .join("");
   
-  return `<p class="tiptap-paragraph">🧽 <strong><u>Soft Tissue Preparation 5'</u></strong></p>
-<ul class="tiptap-bullet-list">
-${listItems}
-</ul>
-<p class="tiptap-paragraph"></p>`;
+  // Single line - no newlines between elements to match Gold Standard formatting
+  return `<p class="tiptap-paragraph">🧽 <strong><u>Soft Tissue Preparation 5'</u></strong></p><ul class="tiptap-bullet-list">${listItems}</ul><p class="tiptap-paragraph"></p>`;
 }
 
 // Rename "Warm Up" to "Activation" in the content
@@ -184,6 +181,25 @@ interface UpdateResult {
   reason?: string;
 }
 
+// Fix existing workouts that have bad formatting (newlines in Soft Tissue section)
+function cleanupSoftTissueFormatting(content: string): string {
+  // Fix pattern: </p>\n<ul or </p> \n <ul etc - remove newlines between closing p and opening ul
+  // Also fix newlines before </ul> and within the list items area
+  
+  // Pattern to find the Soft Tissue section with bad formatting
+  const softTissuePattern = /<p class="tiptap-paragraph">🧽[^<]*<\/p>\s*\n\s*<ul/g;
+  let fixed = content.replace(softTissuePattern, (match) => {
+    return match.replace(/\s*\n\s*/g, '');
+  });
+  
+  // Also fix any newlines before list items within the Soft Tissue ul
+  // Match from 🧽 title through its closing </ul>
+  const fullSectionPattern = /(<p class="tiptap-paragraph">🧽[^<]*<\/p>)(\s*\n\s*)(<ul class="tiptap-bullet-list">)(\s*\n\s*)?(<li[\s\S]*?<\/ul>)/g;
+  fixed = fixed.replace(fullSectionPattern, '$1$3$5');
+  
+  return fixed;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -197,13 +213,112 @@ serve(async (req) => {
     // Parse request body for options
     let dryRun = false;
     let limitCount: number | null = null;
+    let mode = "add"; // "add" = add new sections, "cleanup" = fix existing formatting
     
     try {
       const body = await req.json();
       dryRun = body.dryRun === true;
       limitCount = body.limit ? parseInt(body.limit) : null;
+      mode = body.mode || "add";
     } catch {
       // No body or invalid JSON, use defaults
+    }
+    
+    // CLEANUP MODE: Fix existing workouts with bad Soft Tissue formatting
+    if (mode === "cleanup") {
+      console.log(`[CLEANUP] Starting formatting cleanup. DryRun: ${dryRun}`);
+      
+      // Find all workouts that have the 🧽 emoji (already have Soft Tissue section)
+      const { data: workouts, error: fetchError } = await supabase
+        .from("admin_workouts")
+        .select("id, name, category, main_workout")
+        .like("main_workout", "%🧽%")
+        .not("main_workout", "is", null);
+      
+      if (fetchError) {
+        throw new Error(`Failed to fetch workouts: ${fetchError.message}`);
+      }
+      
+      console.log(`[CLEANUP] Found ${workouts?.length || 0} workouts with 🧽 to check`);
+      
+      const results: UpdateResult[] = [];
+      
+      for (const workout of workouts || []) {
+        const { id, name, category, main_workout } = workout;
+        
+        // Check if it has bad formatting (newlines after the 🧽 title)
+        if (!main_workout.includes("🧽") || !main_workout.match(/<\/p>\s*\n\s*<ul/)) {
+          results.push({
+            id,
+            name,
+            category: category || "unknown",
+            status: 'skipped',
+            reason: 'Already has correct formatting'
+          });
+          continue;
+        }
+        
+        try {
+          const cleanedContent = cleanupSoftTissueFormatting(main_workout);
+          
+          if (dryRun) {
+            console.log(`[CLEANUP-DRY] Would fix: ${name}`);
+            results.push({
+              id,
+              name,
+              category: category || "unknown",
+              status: 'updated',
+              reason: 'Dry run - formatting would be fixed'
+            });
+          } else {
+            const { error: updateError } = await supabase
+              .from("admin_workouts")
+              .update({ 
+                main_workout: cleanedContent,
+                updated_at: new Date().toISOString()
+              })
+              .eq("id", id);
+            
+            if (updateError) {
+              throw new Error(`Update failed: ${updateError.message}`);
+            }
+            
+            results.push({
+              id,
+              name,
+              category: category || "unknown",
+              status: 'updated'
+            });
+            console.log(`[CLEANUP] Fixed formatting: ${name}`);
+          }
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          results.push({
+            id,
+            name,
+            category: category || "unknown",
+            status: 'error',
+            reason: errorMessage
+          });
+        }
+      }
+      
+      const summary = {
+        mode: "cleanup",
+        totalProcessed: results.length,
+        updated: results.filter(r => r.status === 'updated').length,
+        skipped: results.filter(r => r.status === 'skipped').length,
+        errors: results.filter(r => r.status === 'error').length,
+        dryRun,
+        results
+      };
+      
+      console.log(`[CLEANUP] Complete. Fixed: ${summary.updated}, Skipped: ${summary.skipped}, Errors: ${summary.errors}`);
+      
+      return new Response(JSON.stringify(summary), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
     }
 
     console.log(`[UPDATE-STRUCTURE] Starting workout structure update. DryRun: ${dryRun}, Limit: ${limitCount || 'none'}`);
