@@ -133,19 +133,12 @@ const Index = () => {
     icon: Calendar,
     route: "/trainingprogram"
   }, {
-    id: "ritual",
-    title: "Smarty Ritual",
-    description: "Your daily movement ritual for optimal performance - Morning, Midday, and Evening phases",
-    buttonText: "View Ritual",
-    icon: Sparkles,
-    route: "/daily-ritual"
-  }, {
-    id: "tools",
-    title: "Smarty Tools",
-    description: "Professional fitness calculators and tracking tools to optimize your training",
-    buttonText: "Explore Tools",
-    icon: Calculator,
-    route: "/tools"
+    id: "exerciselibrary",
+    title: "Exercise Library",
+    description: "Comprehensive video library with proper form demonstrations and technique guides",
+    buttonText: "Browse Library",
+    icon: Video,
+    route: "/exerciselibrary"
   }, {
     id: "blog",
     title: "Blog & Insights",
@@ -154,12 +147,12 @@ const Index = () => {
     icon: FileText,
     route: "/blog"
   }, {
-    id: "exerciselibrary",
-    title: "Exercise Library",
-    description: "Comprehensive video library with proper form demonstrations and technique guides",
-    buttonText: "Browse Library",
-    icon: Video,
-    route: "/exerciselibrary"
+    id: "tools",
+    title: "Smarty Tools",
+    description: "Professional fitness calculators and tracking tools to optimize your training",
+    buttonText: "Explore Tools",
+    icon: Calculator,
+    route: "/tools"
   }];
 
   useEffect(() => {
@@ -782,42 +775,66 @@ const Index = () => {
                           </p>
                         </div>
                         
-                        {/* 3 Static Cards: WOD, Workouts, Blog */}
-                        <div className="grid grid-cols-3 gap-6 mt-6 px-2">
-                          {/* WOD Card */}
-                          <div
-                            onClick={() => navigate('/workout/wod')}
-                            className="cursor-pointer group rounded-xl overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[140px] sm:h-[180px] bg-primary/25 border-2 border-primary/30 hover:border-primary/50 p-3 sm:p-4 flex flex-col items-center justify-center text-center"
-                          >
-                            <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-primary/30 flex items-center justify-center mb-2 sm:mb-3 group-hover:bg-primary/40 transition-colors">
-                              <Dumbbell className="w-5 h-5 sm:w-7 sm:h-7 text-primary" />
-                            </div>
-                            <h3 className="text-sm sm:text-base font-semibold text-foreground">WOD</h3>
-                            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1 line-clamp-2">Expertly designed Workout of the Day</p>
-                          </div>
-
+                        {/* 5 Static Cards: Workouts, Programs, Library, Blog, Tools */}
+                        <div className="grid grid-cols-5 gap-3 mt-6 px-2">
                           {/* Workouts Card */}
                           <div
                             onClick={() => navigate('/workout')}
-                            className="cursor-pointer group rounded-xl overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[140px] sm:h-[180px] bg-primary/25 border-2 border-primary/30 hover:border-primary/50 p-3 sm:p-4 flex flex-col items-center justify-center text-center"
+                            className="cursor-pointer group rounded-xl overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[120px] sm:h-[140px] bg-primary/25 border-2 border-primary/30 hover:border-primary/50 p-2 sm:p-3 flex flex-col items-center justify-center text-center"
                           >
-                            <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-primary/30 flex items-center justify-center mb-2 sm:mb-3 group-hover:bg-primary/40 transition-colors">
-                              <Dumbbell className="w-5 h-5 sm:w-7 sm:h-7 text-primary" />
+                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/30 flex items-center justify-center mb-1.5 sm:mb-2 group-hover:bg-primary/40 transition-colors">
+                              <Dumbbell className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                             </div>
-                            <h3 className="text-sm sm:text-base font-semibold text-foreground">Smarty Workouts</h3>
-                            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1 line-clamp-2">Complete workout library for every goal</p>
+                            <h3 className="text-[10px] sm:text-xs font-semibold text-foreground">Smarty Workouts</h3>
+                            <p className="text-[8px] sm:text-[10px] text-muted-foreground mt-0.5 line-clamp-2">Workout library</p>
+                          </div>
+
+                          {/* Programs Card */}
+                          <div
+                            onClick={() => navigate('/trainingprogram')}
+                            className="cursor-pointer group rounded-xl overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[120px] sm:h-[140px] bg-primary/25 border-2 border-primary/30 hover:border-primary/50 p-2 sm:p-3 flex flex-col items-center justify-center text-center"
+                          >
+                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/30 flex items-center justify-center mb-1.5 sm:mb-2 group-hover:bg-primary/40 transition-colors">
+                              <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                            </div>
+                            <h3 className="text-[10px] sm:text-xs font-semibold text-foreground">Smarty Programs</h3>
+                            <p className="text-[8px] sm:text-[10px] text-muted-foreground mt-0.5 line-clamp-2">Training plans</p>
+                          </div>
+
+                          {/* Exercise Library Card */}
+                          <div
+                            onClick={() => navigate('/exerciselibrary')}
+                            className="cursor-pointer group rounded-xl overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[120px] sm:h-[140px] bg-primary/25 border-2 border-primary/30 hover:border-primary/50 p-2 sm:p-3 flex flex-col items-center justify-center text-center"
+                          >
+                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/30 flex items-center justify-center mb-1.5 sm:mb-2 group-hover:bg-primary/40 transition-colors">
+                              <Video className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                            </div>
+                            <h3 className="text-[10px] sm:text-xs font-semibold text-foreground">Exercise Library</h3>
+                            <p className="text-[8px] sm:text-[10px] text-muted-foreground mt-0.5 line-clamp-2">Video demos</p>
                           </div>
 
                           {/* Blog Card */}
                           <div
                             onClick={() => navigate('/blog')}
-                            className="cursor-pointer group rounded-xl overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[140px] sm:h-[180px] bg-primary/25 border-2 border-primary/30 hover:border-primary/50 p-3 sm:p-4 flex flex-col items-center justify-center text-center"
+                            className="cursor-pointer group rounded-xl overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[120px] sm:h-[140px] bg-primary/25 border-2 border-primary/30 hover:border-primary/50 p-2 sm:p-3 flex flex-col items-center justify-center text-center"
                           >
-                            <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-primary/30 flex items-center justify-center mb-2 sm:mb-3 group-hover:bg-primary/40 transition-colors">
-                              <FileText className="w-5 h-5 sm:w-7 sm:h-7 text-primary" />
+                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/30 flex items-center justify-center mb-1.5 sm:mb-2 group-hover:bg-primary/40 transition-colors">
+                              <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                             </div>
-                            <h3 className="text-sm sm:text-base font-semibold text-foreground">Blog</h3>
-                            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1 line-clamp-2">Articles & Insights</p>
+                            <h3 className="text-[10px] sm:text-xs font-semibold text-foreground">Blog</h3>
+                            <p className="text-[8px] sm:text-[10px] text-muted-foreground mt-0.5 line-clamp-2">Articles & Insights</p>
+                          </div>
+
+                          {/* Tools Card */}
+                          <div
+                            onClick={() => navigate('/tools')}
+                            className="cursor-pointer group rounded-xl overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[120px] sm:h-[140px] bg-primary/25 border-2 border-primary/30 hover:border-primary/50 p-2 sm:p-3 flex flex-col items-center justify-center text-center"
+                          >
+                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/30 flex items-center justify-center mb-1.5 sm:mb-2 group-hover:bg-primary/40 transition-colors">
+                              <Calculator className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                            </div>
+                            <h3 className="text-[10px] sm:text-xs font-semibold text-foreground">Smarty Tools</h3>
+                            <p className="text-[8px] sm:text-[10px] text-muted-foreground mt-0.5 line-clamp-2">Calculators</p>
                           </div>
                         </div>
                         
