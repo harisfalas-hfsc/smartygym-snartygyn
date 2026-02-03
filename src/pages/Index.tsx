@@ -829,7 +829,7 @@ const Index = () => {
                         {/* Desktop navigation carousel (2 cards visible + peeking sides) */}
                           <div className="mt-8">
                           {/* padding creates space for arrows OUTSIDE the carousel track */}
-                          <div className="relative px-16">
+                          <div className="relative px-24">
                             <Carousel
                               className="w-full"
                               setApi={setDesktopNavApi}
@@ -878,9 +878,9 @@ const Index = () => {
                                 })}
                               </CarouselContent>
 
-                              {/* Arrows OUTSIDE the slide area (in the padded gutter) */}
-                              <CarouselPrevious className="z-20 -left-14 w-10 h-10 bg-background/90 border-2 border-primary/40 shadow-lg hover:border-primary" />
-                              <CarouselNext className="z-20 -right-14 w-10 h-10 bg-background/90 border-2 border-primary/40 shadow-lg hover:border-primary" />
+                              {/* Arrows far OUTSIDE the slide area */}
+                              <CarouselPrevious className="z-20 -left-20 w-10 h-10 bg-background/90 border-2 border-primary/40 shadow-lg hover:border-primary" />
+                              <CarouselNext className="z-20 -right-20 w-10 h-10 bg-background/90 border-2 border-primary/40 shadow-lg hover:border-primary" />
                             </Carousel>
                           </div>
 
