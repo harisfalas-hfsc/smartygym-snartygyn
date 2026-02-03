@@ -791,13 +791,13 @@ const Index = () => {
                           {/* WOD Card */}
                           <div
                             onClick={() => navigate('/workout/wod')}
-                            className="cursor-pointer group rounded-xl overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[160px] sm:h-[200px] relative bg-card"
+                            className="cursor-pointer group rounded-full overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[120px] w-[120px] sm:h-[160px] sm:w-[160px] relative bg-card mx-auto"
                           >
                             <div className="absolute inset-0 overflow-hidden">
                               <img 
                                 src={heroWodImage}
                                 alt="Workout of the Day"
-                                className="w-full h-full object-cover opacity-60 group-hover:opacity-80 group-hover:scale-110 transition-all duration-500"
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                 onError={(e) => {
                                   e.currentTarget.src = '/placeholder.svg';
                                 }}
@@ -818,13 +818,13 @@ const Index = () => {
                           {/* Workouts Card */}
                           <div
                             onClick={() => navigate('/workout')}
-                            className="cursor-pointer group rounded-xl overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[160px] sm:h-[200px] relative bg-card"
+                            className="cursor-pointer group rounded-full overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[120px] w-[120px] sm:h-[160px] sm:w-[160px] relative bg-card mx-auto"
                           >
                             <div className="absolute inset-0 overflow-hidden">
                               <img 
                                 src={heroWorkoutsImage}
                                 alt="Smarty Workouts"
-                                className="w-full h-full object-cover opacity-60 group-hover:opacity-80 group-hover:scale-110 transition-all duration-500"
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                 onError={(e) => {
                                   e.currentTarget.src = '/placeholder.svg';
                                 }}
@@ -845,13 +845,13 @@ const Index = () => {
                           {/* Blog Card */}
                           <div
                             onClick={() => navigate('/blog')}
-                            className="cursor-pointer group rounded-xl overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[160px] sm:h-[200px] relative bg-card"
+                            className="cursor-pointer group rounded-full overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[120px] w-[120px] sm:h-[160px] sm:w-[160px] relative bg-card mx-auto"
                           >
                             <div className="absolute inset-0 overflow-hidden">
                               <img 
                                 src={heroBlogImage}
                                 alt="Blog & Insights"
-                                className="w-full h-full object-cover opacity-60 group-hover:opacity-80 group-hover:scale-110 transition-all duration-500"
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                 onError={(e) => {
                                   e.currentTarget.src = '/placeholder.svg';
                                 }}
