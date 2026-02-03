@@ -773,7 +773,7 @@ const Index = () => {
                           <p className="text-lg leading-relaxed text-muted-foreground">
                             That's why they work — safe and efficient design by <a href="/coach-profile" className="text-primary hover:underline font-medium"><strong>Haris Falas</strong></a>, crafted by hand with care to deliver effective results at <strong>smartygym.com</strong>, <strong className="text-foreground">NOT by AI</strong>.
                           </p>
-                          <div className="bg-background/60 backdrop-blur-sm p-6 rounded-lg border-2 border-primary/30 mt-8 max-w-5xl mx-auto">
+                          <div className="bg-background/60 backdrop-blur-sm p-6 rounded-lg border-2 border-primary/30 mt-8 max-w-4xl mx-auto">
                             <p className="text-xl font-bold text-primary mb-2">
                               Your Gym Re-imagined Anywhere, Anytime
                             </p>
@@ -826,10 +826,10 @@ const Index = () => {
                           </p>
                         </div>
                         
-                        {/* Desktop navigation carousel (compact cards, arrows just outside) */}
+                        {/* Desktop navigation carousel (compact cards, arrows centered in gap) */}
                           <div className="mt-8">
-                          {/* padding creates space for arrows just outside the cards */}
-                          <div className="relative px-12">
+                          {/* padding creates space for arrows centered between card edge and container edge */}
+                          <div className="relative px-14">
                             <Carousel
                               className="w-full"
                               setApi={setDesktopNavApi}
@@ -877,9 +877,9 @@ const Index = () => {
                                 })}
                               </CarouselContent>
 
-                              {/* Arrows just outside the card edges */}
-                              <CarouselPrevious className="z-20 -left-10 w-8 h-8 bg-background/90 border-2 border-primary/40 shadow-lg hover:border-primary" />
-                              <CarouselNext className="z-20 -right-10 w-8 h-8 bg-background/90 border-2 border-primary/40 shadow-lg hover:border-primary" />
+                              {/* Arrows centered between card edge and container edge */}
+                              <CarouselPrevious className="z-20 -left-11 w-8 h-8 bg-background/90 border-2 border-primary/40 shadow-lg hover:border-primary" />
+                              <CarouselNext className="z-20 -right-11 w-8 h-8 bg-background/90 border-2 border-primary/40 shadow-lg hover:border-primary" />
                             </Carousel>
                           </div>
 
