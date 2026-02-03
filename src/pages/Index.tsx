@@ -48,6 +48,10 @@ const Index = () => {
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = useState(0);
 
+  // Carousel state for desktop hero navigation carousel
+  const [desktopNavApi, setDesktopNavApi] = useState<CarouselApi>();
+  const [desktopNavSlide, setDesktopNavSlide] = useState(0);
+
   // Auto-cycling state for tablet hero cards
   const [highlightedCardIndex, setHighlightedCardIndex] = useState(0);
   const [isHoveringTablet, setIsHoveringTablet] = useState(false);
@@ -109,6 +113,18 @@ const Index = () => {
     };
   }, [carouselApi]);
 
+  useEffect(() => {
+    if (!desktopNavApi) return;
+    const onSelect = () => {
+      setDesktopNavSlide(desktopNavApi.selectedScrollSnap());
+    };
+    desktopNavApi.on("select", onSelect);
+    onSelect();
+    return () => {
+      desktopNavApi.off("select", onSelect);
+    };
+  }, [desktopNavApi]);
+
   // Auto-cycle through tablet hero cards every 4 seconds (slower to reduce re-renders)
   useEffect(() => {
     if (isHoveringTablet) return; // Pause when hovering
@@ -118,6 +134,7 @@ const Index = () => {
     }, 4000);
     return () => clearInterval(interval);
   }, [isHoveringTablet]);
+  // Mobile hero carousel cards (leave as previously)
   const heroCards = [{
     id: "workouts",
     title: "Smarty Workouts",
@@ -133,12 +150,19 @@ const Index = () => {
     icon: Calendar,
     route: "/trainingprogram"
   }, {
-    id: "exerciselibrary",
-    title: "Exercise Library",
-    description: "Comprehensive video library with proper form demonstrations and technique guides",
-    buttonText: "Browse Library",
-    icon: Video,
-    route: "/exerciselibrary"
+    id: "ritual",
+    title: "Smarty Ritual",
+    description: "Your daily movement ritual for optimal performance - Morning, Midday, and Evening phases",
+    buttonText: "View Ritual",
+    icon: Sparkles,
+    route: "/daily-ritual"
+  }, {
+    id: "tools",
+    title: "Smarty Tools",
+    description: "Professional fitness calculators and tracking tools to optimize your training",
+    buttonText: "Explore Tools",
+    icon: Calculator,
+    route: "/tools"
   }, {
     id: "blog",
     title: "Blog & Insights",
@@ -147,10 +171,43 @@ const Index = () => {
     icon: FileText,
     route: "/blog"
   }, {
+    id: "exerciselibrary",
+    title: "Exercise Library",
+    description: "Comprehensive video library with proper form demonstrations and technique guides",
+    buttonText: "Browse Library",
+    icon: Video,
+    route: "/exerciselibrary"
+  }];
+
+  // Desktop hero navigation carousel cards (desktop-only section)
+  const desktopNavCards = [{
+    id: "workouts",
+    title: "Smarty Workouts",
+    description: "Complete workout library for every goal",
+    icon: Dumbbell,
+    route: "/workout"
+  }, {
+    id: "programs",
+    title: "Smarty Programs",
+    description: "Structured multi-week training plans",
+    icon: Calendar,
+    route: "/trainingprogram"
+  }, {
+    id: "exerciselibrary",
+    title: "Exercise Library",
+    description: "Video demos for every exercise",
+    icon: Video,
+    route: "/exerciselibrary"
+  }, {
+    id: "blog",
+    title: "Blog & Insights",
+    description: "Articles, insights, and coaching tips",
+    icon: FileText,
+    route: "/blog"
+  }, {
     id: "tools",
-    title: "Smarty Tools",
-    description: "Professional fitness calculators and tracking tools to optimize your training",
-    buttonText: "Explore Tools",
+    title: "Smart Eat Tools",
+    description: "Fitness calculators and tools",
     icon: Calculator,
     route: "/tools"
   }];
@@ -775,66 +832,75 @@ const Index = () => {
                           </p>
                         </div>
                         
-                        {/* 5 Static Cards: Workouts, Programs, Library, Blog, Tools */}
-                        <div className="grid grid-cols-5 gap-3 mt-6 px-2">
-                          {/* Workouts Card */}
-                          <div
-                            onClick={() => navigate('/workout')}
-                            className="cursor-pointer group rounded-xl overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[120px] sm:h-[140px] bg-primary/25 border-2 border-primary/30 hover:border-primary/50 p-2 sm:p-3 flex flex-col items-center justify-center text-center"
+                        {/* Desktop navigation carousel (2 cards + peeking sides) */}
+                        <div className="mt-6 relative">
+                          <Carousel
+                            className="w-full"
+                            setApi={setDesktopNavApi}
+                            opts={{
+                              align: "center",
+                              loop: true,
+                            }}
                           >
-                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/30 flex items-center justify-center mb-1.5 sm:mb-2 group-hover:bg-primary/40 transition-colors">
-                              <Dumbbell className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-                            </div>
-                            <h3 className="text-[10px] sm:text-xs font-semibold text-foreground">Smarty Workouts</h3>
-                            <p className="text-[8px] sm:text-[10px] text-muted-foreground mt-0.5 line-clamp-2">Workout library</p>
-                          </div>
+                            <CarouselContent className="-ml-4 px-12">
+                              {desktopNavCards.map((card) => {
+                                const Icon = card.icon;
+                                return (
+                                  <CarouselItem
+                                    key={card.id}
+                                    className="pl-4 basis-[42%] lg:basis-[38%]"
+                                  >
+                                    <Card
+                                      onClick={() => navigate(card.route)}
+                                      className={cn(
+                                        "relative z-10 h-[190px] border-[3px] border-primary/35 bg-primary/10",
+                                        "cursor-pointer overflow-hidden rounded-xl",
+                                        "hover:border-primary/60 hover:shadow-xl hover:scale-[1.02]",
+                                        "transition-all duration-300"
+                                      )}
+                                    >
+                                      <CardContent className="h-full flex flex-row items-center p-5 gap-5">
+                                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/15 flex-shrink-0">
+                                          <Icon className="w-8 h-8 text-primary" />
+                                        </div>
 
-                          {/* Programs Card */}
-                          <div
-                            onClick={() => navigate('/trainingprogram')}
-                            className="cursor-pointer group rounded-xl overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[120px] sm:h-[140px] bg-primary/25 border-2 border-primary/30 hover:border-primary/50 p-2 sm:p-3 flex flex-col items-center justify-center text-center"
-                          >
-                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/30 flex items-center justify-center mb-1.5 sm:mb-2 group-hover:bg-primary/40 transition-colors">
-                              <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-                            </div>
-                            <h3 className="text-[10px] sm:text-xs font-semibold text-foreground">Smarty Programs</h3>
-                            <p className="text-[8px] sm:text-[10px] text-muted-foreground mt-0.5 line-clamp-2">Training plans</p>
-                          </div>
+                                        <div className="flex-1 flex flex-col justify-center gap-2">
+                                          <h3 className="text-lg font-bold text-foreground leading-tight">
+                                            {card.title}
+                                          </h3>
+                                          <p className="text-sm text-muted-foreground leading-snug line-clamp-2">
+                                            {card.description}
+                                          </p>
+                                        </div>
 
-                          {/* Exercise Library Card */}
-                          <div
-                            onClick={() => navigate('/exerciselibrary')}
-                            className="cursor-pointer group rounded-xl overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[120px] sm:h-[140px] bg-primary/25 border-2 border-primary/30 hover:border-primary/50 p-2 sm:p-3 flex flex-col items-center justify-center text-center"
-                          >
-                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/30 flex items-center justify-center mb-1.5 sm:mb-2 group-hover:bg-primary/40 transition-colors">
-                              <Video className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-                            </div>
-                            <h3 className="text-[10px] sm:text-xs font-semibold text-foreground">Exercise Library</h3>
-                            <p className="text-[8px] sm:text-[10px] text-muted-foreground mt-0.5 line-clamp-2">Video demos</p>
-                          </div>
+                                        <ChevronRight className="w-6 h-6 text-primary/50 flex-shrink-0" />
+                                      </CardContent>
+                                    </Card>
+                                  </CarouselItem>
+                                );
+                              })}
+                            </CarouselContent>
 
-                          {/* Blog Card */}
-                          <div
-                            onClick={() => navigate('/blog')}
-                            className="cursor-pointer group rounded-xl overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[120px] sm:h-[140px] bg-primary/25 border-2 border-primary/30 hover:border-primary/50 p-2 sm:p-3 flex flex-col items-center justify-center text-center"
-                          >
-                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/30 flex items-center justify-center mb-1.5 sm:mb-2 group-hover:bg-primary/40 transition-colors">
-                              <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-                            </div>
-                            <h3 className="text-[10px] sm:text-xs font-semibold text-foreground">Blog</h3>
-                            <p className="text-[8px] sm:text-[10px] text-muted-foreground mt-0.5 line-clamp-2">Articles & Insights</p>
-                          </div>
+                            {/* Arrows behind cards, not touching */}
+                            <CarouselPrevious className="left-2 z-0 bg-background/80 border-2 border-border shadow-lg" />
+                            <CarouselNext className="right-2 z-0 bg-background/80 border-2 border-border shadow-lg" />
+                          </Carousel>
 
-                          {/* Tools Card */}
-                          <div
-                            onClick={() => navigate('/tools')}
-                            className="cursor-pointer group rounded-xl overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[120px] sm:h-[140px] bg-primary/25 border-2 border-primary/30 hover:border-primary/50 p-2 sm:p-3 flex flex-col items-center justify-center text-center"
-                          >
-                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/30 flex items-center justify-center mb-1.5 sm:mb-2 group-hover:bg-primary/40 transition-colors">
-                              <Calculator className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-                            </div>
-                            <h3 className="text-[10px] sm:text-xs font-semibold text-foreground">Smarty Tools</h3>
-                            <p className="text-[8px] sm:text-[10px] text-muted-foreground mt-0.5 line-clamp-2">Calculators</p>
+                          {/* Dots */}
+                          <div className="flex justify-center gap-2 mt-4">
+                            {desktopNavCards.map((_, index) => (
+                              <button
+                                key={index}
+                                onClick={() => desktopNavApi?.scrollTo(index)}
+                                className={cn(
+                                  "w-2.5 h-2.5 rounded-full border-2 transition-all duration-300",
+                                  desktopNavSlide === index
+                                    ? "border-primary bg-transparent scale-125"
+                                    : "border-primary/40 bg-transparent hover:border-primary/60"
+                                )}
+                                aria-label={`Go to slide ${index + 1}`}
+                              />
+                            ))}
                           </div>
                         </div>
                         
