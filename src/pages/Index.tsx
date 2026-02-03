@@ -675,27 +675,22 @@ const Index = () => {
           
           <div className="container mx-auto max-w-6xl px-4 relative z-10 overflow-x-hidden">
             <ScrollReveal>
-              <Card itemScope itemType="https://schema.org/Organization" data-hero-section="true" data-keywords="smarty gym, online gym, online fitness, smartygym.com, Haris Falas, global online gym" aria-label="SmartyGym - Your online gym and fitness platform - smartygym.com" className="border-2 border-primary bg-white dark:bg-card backdrop-blur-sm my-0 mb-0 mt-0">
-                <div className="p-4 sm:p-6 md:p-8 space-y-4">
-                  
-                  {/* Hidden SEO metadata */}
-                  <meta itemProp="url" content="https://smartygym.com" />
-                  <meta itemProp="description" content="SmartyGym - #1 online gym and fitness platform by Haris Falas - smartygym.com" />
-
-                  {/* 100% Human. 0% AI Section - Now First */}
-                  <div className="space-y-4">
-                    <Card className="border-2 border-primary overflow-hidden relative">
-                      {/* Background Video */}
-                      <HeroBackgroundVideo src="/videos/human-not-ai-background.mp4" />
-                      
-                      {/* Semi-transparent overlay for readability */}
-                      <div className="absolute inset-0 bg-background/65 z-10" />
-                      
-                      {/* Decorative circles */}
-                      <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -mr-16 -mt-16 z-20" aria-hidden="true"></div>
-                      <div className="absolute bottom-0 left-0 w-24 h-24 bg-accent/20 rounded-full -ml-12 -mb-12 z-20" aria-hidden="true"></div>
-                      
-                      <CardContent className="p-8 md:p-12 relative z-20">
+              <Card itemScope itemType="https://schema.org/Organization" data-hero-section="true" data-keywords="smarty gym, online gym, online fitness, smartygym.com, Haris Falas, global online gym" aria-label="SmartyGym - Your online gym and fitness platform - smartygym.com" className="border-2 border-primary overflow-hidden relative">
+                {/* Background Video */}
+                <HeroBackgroundVideo src="/videos/human-not-ai-background.mp4" />
+                
+                {/* Semi-transparent overlay for readability */}
+                <div className="absolute inset-0 bg-background/65 z-10" />
+                
+                {/* Decorative circles */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -mr-16 -mt-16 z-20" aria-hidden="true"></div>
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-accent/20 rounded-full -ml-12 -mb-12 z-20" aria-hidden="true"></div>
+                
+                {/* Hidden SEO metadata */}
+                <meta itemProp="url" content="https://smartygym.com" />
+                <meta itemProp="description" content="SmartyGym - #1 online gym and fitness platform by Haris Falas - smartygym.com" />
+                
+                <CardContent className="p-8 md:p-12 relative z-20">
                         {/* CTA Button for non-premium users - positioned top left */}
                         {!isPremium && (
                           <Button 
@@ -858,11 +853,7 @@ const Index = () => {
                             </div>
                           </div>
                         </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-
-                </div>
+                </CardContent>
               </Card>
             </ScrollReveal>
           </div>
