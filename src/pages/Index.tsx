@@ -762,41 +762,41 @@ const Index = () => {
                             </div>
                           </article>
                         </div>
+                        
+                        {/* Who is SmartyGym For? - Now inside the card */}
+                        <div className="mt-6 pt-4 border-t border-primary/20">
+                          <h4 className="text-sm font-semibold text-muted-foreground mb-3 text-center">
+                            Who is <span className="text-primary">SmartyGym</span> For?
+                          </h4>
+                          <div className="grid grid-cols-6 gap-2 max-w-2xl mx-auto">
+                            <div className="flex flex-col items-center gap-1">
+                              <Users className="w-4 h-4 text-blue-500" />
+                              <span className="text-xs font-medium text-foreground text-center">Busy Adults</span>
+                            </div>
+                            <div className="flex flex-col items-center gap-1">
+                              <Heart className="w-4 h-4 text-pink-500" />
+                              <span className="text-xs font-medium text-foreground text-center">Parents</span>
+                            </div>
+                            <div className="flex flex-col items-center gap-1">
+                              <GraduationCap className="w-4 h-4 text-emerald-500" />
+                              <span className="text-xs font-medium text-foreground text-center">Beginners</span>
+                            </div>
+                            <div className="flex flex-col items-center gap-1">
+                              <Target className="w-4 h-4 text-orange-500" />
+                              <span className="text-xs font-medium text-foreground text-center">Intermediate</span>
+                            </div>
+                            <div className="flex flex-col items-center gap-1">
+                              <Plane className="w-4 h-4 text-cyan-500" />
+                              <span className="text-xs font-medium text-foreground text-center">Travelers</span>
+                            </div>
+                            <div className="flex flex-col items-center gap-1">
+                              <Dumbbell className="w-4 h-4 text-purple-500" />
+                              <span className="text-xs font-medium text-foreground text-center">Gym-Goers</span>
+                            </div>
+                          </div>
+                        </div>
                       </CardContent>
                     </Card>
-                    
-                    {/* Who is SmartyGym For? - Audience Badges */}
-                    <div className="mt-4 p-6 rounded-xl border-2 border-primary/30 bg-gradient-to-r from-primary/5 to-accent/5">
-                      <h3 className="text-base font-bold text-foreground mb-4 text-center">
-                        Who is <span className="text-primary">SmartyGym</span> For?
-                      </h3>
-                      <div className="grid grid-cols-6 gap-4">
-                        <div className="flex flex-col items-center gap-2">
-                          <Users className="w-6 h-6 text-blue-500" />
-                          <span className="text-sm font-medium text-foreground text-center">Busy Adults</span>
-                        </div>
-                        <div className="flex flex-col items-center gap-2">
-                          <Heart className="w-6 h-6 text-pink-500" />
-                          <span className="text-sm font-medium text-foreground text-center">Parents</span>
-                        </div>
-                        <div className="flex flex-col items-center gap-2">
-                          <GraduationCap className="w-6 h-6 text-emerald-500" />
-                          <span className="text-sm font-medium text-foreground text-center">Beginners</span>
-                        </div>
-                        <div className="flex flex-col items-center gap-2">
-                          <Target className="w-6 h-6 text-orange-500" />
-                          <span className="text-sm font-medium text-foreground text-center">Intermediate Lifters</span>
-                        </div>
-                        <div className="flex flex-col items-center gap-2">
-                          <Plane className="w-6 h-6 text-cyan-500" />
-                          <span className="text-sm font-medium text-foreground text-center">Travelers</span>
-                        </div>
-                        <div className="flex flex-col items-center gap-2">
-                          <Dumbbell className="w-6 h-6 text-purple-500" />
-                          <span className="text-sm font-medium text-foreground text-center">Gym-Goers</span>
-                        </div>
-                      </div>
-                    </div>
                   </div>
 
                   {/* Your Gym Anywhere Card - Now Second with Carousel */}
