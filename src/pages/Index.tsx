@@ -820,7 +820,10 @@ const Index = () => {
                       </Button>
                     )}
                     <CardContent className="p-4">
-                      <div className="space-y-2 text-center">
+                      {/* Carousel at top of the card */}
+                      <HeroThreeColumns />
+                      
+                      <div className="space-y-2 text-center mt-4">
                         <h3 className="text-xl font-bold">
                           Your Gym Re-imagined Anywhere, Anytime
                         </h3>
@@ -842,9 +845,6 @@ const Index = () => {
                           Wherever you are, your gym comes with you.
                         </p>
                       </div>
-                      
-                      {/* Carousel inside the card */}
-                      <HeroThreeColumns />
                     </CardContent>
                   </Card>
 
