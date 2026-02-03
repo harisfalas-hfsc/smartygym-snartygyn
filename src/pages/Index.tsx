@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { HeroBackgroundVideo } from "@/components/HeroBackgroundVideo";
 import heroWodImage from "@/assets/hero-wod.jpg";
 import heroWorkoutsImage from "@/assets/hero-workouts.jpg";
 import heroBlogImage from "@/assets/hero-blog.jpg";
@@ -683,17 +684,8 @@ const Index = () => {
                   {/* 100% Human. 0% AI Section - Now First */}
                   <div className="space-y-4">
                     <Card className="border-2 border-primary overflow-hidden relative">
-                      {/* Background Video - lazy loaded */}
-                      <video
-                        autoPlay
-                        muted
-                        loop
-                        playsInline
-                        preload="none"
-                        className="absolute inset-0 w-full h-full object-cover z-0"
-                      >
-                        <source src="/videos/human-not-ai-background.mp4" type="video/mp4" />
-                      </video>
+                      {/* Background Video */}
+                      <HeroBackgroundVideo src="/videos/human-not-ai-background.mp4" />
                       
                       {/* Semi-transparent overlay for readability */}
                       <div className="absolute inset-0 bg-background/65 z-10" />
