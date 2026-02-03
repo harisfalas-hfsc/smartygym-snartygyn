@@ -8,51 +8,47 @@ interface ScrollRevealProps {
 
 export const ScrollReveal = ({ children, delay = 0, className = "" }: ScrollRevealProps) => {
   const elementRef = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  // Start visible immediately to prevent blank page - animation is progressive enhancement
+  const [hasAnimated, setHasAnimated] = useState(false);
 
   useEffect(() => {
     const element = elementRef.current;
     if (!element) return;
 
-    // Fallback timeout to ensure content is always visible (especially on mobile)
-    const fallbackTimer = setTimeout(() => {
-      setIsVisible(true);
-      if (element) {
-        element.classList.add("animate-fade-in");
-        element.classList.remove("opacity-0");
-      }
-    }, delay + 500); // Show after delay + 500ms max
+    // Skip animation entirely if user prefers reduced motion
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setHasAnimated(true);
+      return;
+    }
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            clearTimeout(fallbackTimer);
+          if (entry.isIntersecting && !hasAnimated) {
             setTimeout(() => {
-              setIsVisible(true);
+              setHasAnimated(true);
               entry.target.classList.add("animate-fade-in");
-              entry.target.classList.remove("opacity-0");
             }, delay);
             observer.unobserve(entry.target);
           }
         });
       },
       {
-        threshold: 0.01, // Lower threshold for better mobile support
-        rootMargin: "0px 0px 0px 0px", // Simplified for mobile
+        threshold: 0.01,
+        rootMargin: "50px",
       }
     );
 
     observer.observe(element);
 
     return () => {
-      clearTimeout(fallbackTimer);
       observer.disconnect();
     };
-  }, [delay]);
+  }, [delay, hasAnimated]);
 
+  // Always render content visible - animation is just an enhancement
   return (
-    <div ref={elementRef} className={`${isVisible ? '' : 'opacity-0'} transition-opacity duration-500 ${className}`}>
+    <div ref={elementRef} className={`transition-opacity duration-300 ${className}`}>
       {children}
     </div>
   );

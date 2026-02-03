@@ -118,11 +118,11 @@ export const HeroThreeColumns = () => {
   const navigate = useNavigate();
   const [api, setApi] = useState<CarouselApi>();
   const autoplayRef = useRef(
-    Autoplay({ delay: 3000, stopOnInteraction: false })
+    Autoplay({ delay: 4000, stopOnInteraction: true }) // Slower autoplay, stop on interaction
   );
   const [current, setCurrent] = useState(0);
 
-  // Fetch WOD for the dynamic card
+  // Fetch WOD for the dynamic card - optimized query
   const cyprusToday = getCyprusTodayStr();
   const { data: wods } = useQuery({
     queryKey: ["wod-hero-banner", cyprusToday],
@@ -135,7 +135,9 @@ export const HeroThreeColumns = () => {
         .limit(2);
       return data || [];
     },
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 10, // 10 minutes
+    gcTime: 1000 * 60 * 30, // Keep in cache for 30 minutes
+    refetchOnWindowFocus: false,
   });
 
   const currentWod = wods?.[0];
