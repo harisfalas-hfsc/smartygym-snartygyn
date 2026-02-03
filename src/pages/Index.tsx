@@ -791,9 +791,9 @@ const Index = () => {
                           {/* WOD Card */}
                           <div
                             onClick={() => navigate('/workout/wod')}
-                            className="cursor-pointer group rounded-xl overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[140px] sm:h-[180px] bg-primary/10 border-2 border-primary/20 hover:border-primary/40 p-3 sm:p-4 flex flex-col items-center justify-center text-center"
+                            className="cursor-pointer group rounded-xl overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[140px] sm:h-[180px] bg-primary/25 border-2 border-primary/30 hover:border-primary/50 p-3 sm:p-4 flex flex-col items-center justify-center text-center"
                           >
-                            <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-primary/20 flex items-center justify-center mb-2 sm:mb-3 group-hover:bg-primary/30 transition-colors">
+                            <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-primary/30 flex items-center justify-center mb-2 sm:mb-3 group-hover:bg-primary/40 transition-colors">
                               <Dumbbell className="w-5 h-5 sm:w-7 sm:h-7 text-primary" />
                             </div>
                             <h3 className="text-sm sm:text-base font-semibold text-foreground">WOD</h3>
@@ -803,9 +803,9 @@ const Index = () => {
                           {/* Workouts Card */}
                           <div
                             onClick={() => navigate('/workout')}
-                            className="cursor-pointer group rounded-xl overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[140px] sm:h-[180px] bg-primary/10 border-2 border-primary/20 hover:border-primary/40 p-3 sm:p-4 flex flex-col items-center justify-center text-center"
+                            className="cursor-pointer group rounded-xl overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[140px] sm:h-[180px] bg-primary/25 border-2 border-primary/30 hover:border-primary/50 p-3 sm:p-4 flex flex-col items-center justify-center text-center"
                           >
-                            <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-primary/20 flex items-center justify-center mb-2 sm:mb-3 group-hover:bg-primary/30 transition-colors">
+                            <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-primary/30 flex items-center justify-center mb-2 sm:mb-3 group-hover:bg-primary/40 transition-colors">
                               <Dumbbell className="w-5 h-5 sm:w-7 sm:h-7 text-primary" />
                             </div>
                             <h3 className="text-sm sm:text-base font-semibold text-foreground">Smarty Workouts</h3>
@@ -815,9 +815,9 @@ const Index = () => {
                           {/* Blog Card */}
                           <div
                             onClick={() => navigate('/blog')}
-                            className="cursor-pointer group rounded-xl overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[140px] sm:h-[180px] bg-primary/10 border-2 border-primary/20 hover:border-primary/40 p-3 sm:p-4 flex flex-col items-center justify-center text-center"
+                            className="cursor-pointer group rounded-xl overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[140px] sm:h-[180px] bg-primary/25 border-2 border-primary/30 hover:border-primary/50 p-3 sm:p-4 flex flex-col items-center justify-center text-center"
                           >
-                            <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-primary/20 flex items-center justify-center mb-2 sm:mb-3 group-hover:bg-primary/30 transition-colors">
+                            <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-primary/30 flex items-center justify-center mb-2 sm:mb-3 group-hover:bg-primary/40 transition-colors">
                               <FileText className="w-5 h-5 sm:w-7 sm:h-7 text-primary" />
                             </div>
                             <h3 className="text-sm sm:text-base font-semibold text-foreground">Blog</h3>
