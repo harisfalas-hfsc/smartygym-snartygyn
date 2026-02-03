@@ -722,22 +722,62 @@ Rules:
 • Never mix maximal strength loading with metabolic density
 
 ═══════════════════════════════════════════════════════════════════════════════
-WORKOUT STRUCTURE WITH FINISHER (MANDATORY):
+5-SECTION WORKOUT STRUCTURE (MANDATORY)
 ═══════════════════════════════════════════════════════════════════════════════
 
-Every workout MUST include four sequential parts inside the workout content:
+APPLIES TO: STRENGTH, CALORIE BURNING, METABOLIC, CARDIO, MOBILITY & STABILITY, CHALLENGE
+DOES NOT APPLY TO: PILATES, RECOVERY, MICRO-WORKOUTS (keep their existing structures)
 
-1. WARM-UP
-   Standard preparation phase
+Every workout in the above categories MUST include 5 sections in this order:
 
-2. MAIN WORKOUT
-   The core training block that defines the workout's FORMAT label
+1. 🧽 SOFT TISSUE PREPARATION (5 min)
+   Purpose: Foam rolling, trigger point release, tissue prep
+   Examples (vary these, not limited to):
+   • Foam roll quads, hamstrings, calves, glutes, lats, upper back (30-45 sec per area)
+   • Lacrosse ball or spiky ball work for feet and hips
+   • Focus on areas relevant to the workout category
+   AI Guidance: Vary exercises to keep fresh, adjust focus based on category
+   
+2. 🔥 ACTIVATION (10-15 min)
+   Purpose: Mobility drills, stability work, glute activation, dynamic warm-up, movement prep
+   Examples (vary these, not limited to):
+   • Mobility: Cat-Cow, Thoracic Rotations, Ankle Circles, Hip Circles
+   • Stability: Bird-Dog, Glute Bridge, Clamshells, Dead Bug
+   • Dynamic: Jumping Jacks, High Knees, Butt Kicks, Walking Lunges, A-Skips, Light Jog
+   • Inchworms, Lateral Shuffles, Leg Swings, World's Greatest Stretch
+   AI Guidance: Select exercises that progressively increase heart rate and prepare body for the specific category's demands
 
-3. FINISHER
-   A complementary workout block that completes the session
+3. 💪 MAIN WORKOUT (category-specific duration)
+   Purpose: Core training block - MUST FOLLOW EXISTING CATEGORY LOGIC
+   • STRENGTH: Strength exercises, controlled tempo, progressive overload
+   • CARDIO: Cardiovascular work, heart rate training, endurance
+   • METABOLIC: High-intensity, full-body conditioning
+   • CALORIE BURNING: High-effort, simple, maintain high output
+   • MOBILITY & STABILITY: Joint mobility, core stability, controlled movement
+   • CHALLENGE: Tough sessions, test limits
+   
+   *** CRITICAL: Use all existing category reasoning - this is NOT changing ***
 
-4. COOL DOWN
-   Recovery and stretching phase
+4. ⚡ FINISHER (10-25 min)
+   Purpose: Complement the category with DIFFERENT format/structure/intensity
+   • Must be RELATED to the category theme
+   • Must have DIFFERENT format than main workout
+   • Must have DIFFERENT intensity level than main workout
+   Examples:
+   • STRENGTH main (heavy compounds) → Finisher (lighter volume, higher reps)
+   • CARDIO main (intervals) → Finisher (AMRAP or EMOM)
+   • METABOLIC main (EMOM) → Finisher (Tabata or For Time)
+
+5. 🧘 COOL DOWN (10 min)
+   Purpose: Static stretching + diaphragmatic breathing
+   Static Stretching (8 min) - Examples (vary these):
+   • Quad stretch, Hamstring stretch, Calf stretch
+   • Glute stretch, Hip flexor stretch, Chest/shoulder stretch
+   • Child's Pose, Spinal twist, Pigeon pose
+   Diaphragmatic Breathing (2 min) - ALWAYS INCLUDE:
+   • Supine position, one hand on chest, one on belly
+   • Slow inhale through nose (belly rises), slow exhale through mouth
+   • Focus on calming nervous system, slowing heart rate
 
 FINISHER RULES BY CATEGORY:
 
@@ -1016,18 +1056,53 @@ ${equipment === "EQUIPMENT" ? `
 })() : ""}
 
 ${category === "CARDIO" ? `
-CARDIO CATEGORY - ALLOWED EXERCISES:
+═══════════════════════════════════════════════════════════════════════════════
+CARDIO CATEGORY - ENHANCED EXERCISE OPTIONS
+═══════════════════════════════════════════════════════════════════════════════
+
+CARDIO PHILOSOPHY:
+Heart rate and cardiovascular development. Think like a coach for runners, swimmers, track athletes.
+Focus on aerobic/anaerobic threshold work, pacing strategies, and breathing.
+
 ${equipment === "EQUIPMENT" ? `
-• Treadmill running/sprints/incline walks
-• Assault bike / Air bike intervals
-• Spin bike / Stationary bike intervals
-• Elliptical, Ski erg sprints, Rowing machine sprints/intervals
-• Stair climber / Stepper, Jump rope
-• Wall balls, Med ball slams, Kettlebell swings, Battle ropes, Sled pushes/pulls` : `
+EQUIPMENT CARDIO - CARDIO MACHINES AS PRIMARY:
+• Treadmill: Running, sprints (200m-400m), incline walks/runs
+• Rowing machine: Intervals (500m repeats), distance work, sprint rows
+• Stationary/Spin bike: Intervals, sustained tempo, hill climbs
+• Elliptical: Low-impact cardio intervals, steady state
+• Air bike / Assault bike: High-intensity intervals, calorie targets
+• Ski Erg: Sprint intervals, sustained efforts
+• Stair Climber: Intervals, steady state
+
+EQUIPMENT CARDIO - ENHANCEMENT EXERCISES:
+• Box jumps, Wall balls, Med ball slams
+• Kettlebell swings, Battle ropes, Jump rope
+• Sled pushes/pulls, Weight vest exercises
+
+COMBINATIONS ALLOWED:
+Equipment cardio workouts CAN combine machines with floor exercises.
+Example: 500m Row + 20 KB Swings + 400m Bike + 15 Box Jumps + 200m Run
+` : `
+BODYWEIGHT CARDIO - RUNNING-BASED FOCUS:
+• Sprints: 50m, 100m, 200m distances (full effort)
+• Interval Running: Alternating sprint/jog patterns
+• Shuttle Runs: 10m-20m-10m agility patterns, touch lines
+• Tempo Runs: 200m-400m sustained pace efforts
+• Hill sprints (if available), Stair runs
+
+BODYWEIGHT CARDIO - ADDITIONAL EXERCISES:
 • Jogging in place, High knees, Butt kicks, Jumping jacks
 • Burpees, Mountain climbers, Box jumps
 • Skaters, Bear crawls, Lateral shuffles, Star jumps
-• Tuck jumps, Broad jumps, Squat jumps, Frog jumps`}
+• Tuck jumps, Broad jumps, Squat jumps, Frog jumps
+• A-Skips, B-Skips, Carioca, Bounding
+
+BODYWEIGHT CARDIO MAIN WORKOUT EXAMPLE (Interval Running ~35 min):
+Perform 4-5 rounds:
+• Sprint 50m (full effort) → 60 sec active rest (walk back)
+• Shuttle Run: 10m-20m-10m pattern → 90 sec complete rest
+• Tempo Run 200m (sustained pace) → 120 sec active rest
+`}
 ❌ FORBIDDEN: Heavy lifting, slow strength exercises, Reps & Sets format.
 ` : ""}
 
@@ -1380,8 +1455,8 @@ RESPONSE FORMAT (JSON ONLY - NO MARKDOWN):
 CRITICAL HTML FORMATTING RULES (FOLLOW EXACTLY - THIS IS NON-NEGOTIABLE):
 
 1. SECTION TITLES: Icon + Bold + Underlined with duration
-   Format: <p class="tiptap-paragraph">🔥 <strong><u>Warm Up 10'</u></strong></p>
-   Icons: 🔥 Warm Up, 💪 Main Workout, ⚡ Finisher, 🧘 Cool Down
+   Format: <p class="tiptap-paragraph">🧽 <strong><u>Soft Tissue Preparation 5'</u></strong></p>
+   Icons: 🧽 Soft Tissue Preparation, 🔥 Activation, 💪 Main Workout, ⚡ Finisher, 🧘 Cool Down
    ONLY ONE ICON PER SECTION - Never duplicate icons!
    
 2. EXERCISE LINES: Use BULLET LISTS for exercises
@@ -1394,13 +1469,24 @@ CRITICAL HTML FORMATTING RULES (FOLLOW EXACTLY - THIS IS NON-NEGOTIABLE):
    Format: <p class="tiptap-paragraph"></p>
    NO empty paragraphs between exercise lines within a section!
 
-5. FOUR SECTIONS REQUIRED: Warm Up, Main Workout, Finisher, Cool Down
+5. FIVE SECTIONS REQUIRED (for Strength, Calorie Burning, Metabolic, Cardio, Mobility & Stability, Challenge):
+   Soft Tissue Preparation, Activation, Main Workout, Finisher, Cool Down
 
-GOLD STANDARD TEMPLATE (FOLLOW EXACTLY):
-<p class="tiptap-paragraph">🔥 <strong><u>Warm Up 10'</u></strong></p>
+GOLD STANDARD 5-SECTION TEMPLATE (FOLLOW EXACTLY):
+<p class="tiptap-paragraph">🧽 <strong><u>Soft Tissue Preparation 5'</u></strong></p>
 <ul class="tiptap-bullet-list">
-<li class="tiptap-list-item"><p class="tiptap-paragraph">5 minutes on Assault Bike (moderate pace)</p></li>
-<li class="tiptap-list-item"><p class="tiptap-paragraph">2 rounds of: 10 Air Squats, 8 Push-ups, 6 Lunges (each leg)</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph">Foam roll quads, hamstrings, calves (30-45 sec per area)</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph">Foam roll glutes, lats, upper back (30-45 sec per area)</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph">Lacrosse ball work for feet and hips (focus on tension spots)</p></li>
+</ul>
+<p class="tiptap-paragraph"></p>
+<p class="tiptap-paragraph">🔥 <strong><u>Activation 15'</u></strong></p>
+<ul class="tiptap-bullet-list">
+<li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Mobility (2 min):</strong> Cat-Cow (10 reps), Thoracic Rotations (5 per side), Ankle Circles (10 per direction)</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Stability (5 min):</strong> Bird-Dog (8 per side), Glute Bridge (12 reps, squeeze at top), Clamshells (10 per side)</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Dynamic Warm-up (8 min):</strong> Jumping Jacks (30 sec), High Knees (30 sec), Butt Kicks (30 sec)</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph">Inchworms with push-up (5 reps), Walking Lunges with Torso Twist (8 per leg)</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph">Lateral Shuffles (10m each way x 2), A-Skips (10m x 2), Light Jog (2 min)</p></li>
 </ul>
 <p class="tiptap-paragraph"></p>
 <p class="tiptap-paragraph">💪 <strong><u>Main Workout: The Grind (20-minute EMOM)</u></strong></p>
@@ -1417,14 +1503,18 @@ GOLD STANDARD TEMPLATE (FOLLOW EXACTLY):
 <li class="tiptap-list-item"><p class="tiptap-paragraph">Max Calories on Ski Erg or Rower (continuous effort for 5 minutes)</p></li>
 </ul>
 <p class="tiptap-paragraph"></p>
-<p class="tiptap-paragraph">🧘 <strong><u>Cool Down 5'</u></strong></p>
+<p class="tiptap-paragraph">🧘 <strong><u>Cool Down 10'</u></strong></p>
 <ul class="tiptap-bullet-list">
-<li class="tiptap-list-item"><p class="tiptap-paragraph">2 minutes light jogging</p></li>
-<li class="tiptap-list-item"><p class="tiptap-paragraph">Static stretching for hamstrings, quads, and chest.</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Static Stretching (8 min):</strong> Standing Quad Stretch (each leg), Hamstring Stretch (30 sec each)</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph">Calf Stretch, Figure-Four Glute Stretch, Tricep/Overhead Reach Stretch</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph">Child's Pose, Supine Spinal Twist (60 sec per side)</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Diaphragmatic Breathing (2 min):</strong> Lie supine, one hand on chest, one on belly</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph">Slow inhale through nose (belly rises), slow exhale through mouth. Focus on calming nervous system.</p></li>
 </ul>
 
 SECTION ICON RULES (MANDATORY):
-- 🔥 for Warm Up (ONLY ONE - never duplicate)
+- 🧽 for Soft Tissue Preparation (ONLY ONE - never duplicate)
+- 🔥 for Activation (ONLY ONE - never duplicate)
 - 💪 for Main Workout (ONLY ONE - never duplicate)
 - ⚡ for Finisher (ONLY ONE - never duplicate)
 - 🧘 for Cool Down (ONLY ONE - never duplicate)

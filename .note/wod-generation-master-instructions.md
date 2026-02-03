@@ -92,21 +92,42 @@ Available durations: **15 min, 20 min, 30 min, 45 min, 60 min, or Various**
 - **Reps & Sets**: Classic strength format (e.g., 4 sets x 8 reps) with defined rest
 - **Mix**: Combination of two or more formats
 
-## Workout Structure with Finisher (MANDATORY)
+## Workout Structure (MANDATORY - 5 SECTIONS)
 
-Every workout MUST include four sequential parts inside the workout content:
+For categories: STRENGTH, CALORIE BURNING, METABOLIC, CARDIO, MOBILITY & STABILITY, CHALLENGE
 
-### 1. WARM-UP
-Standard preparation phase
+Every workout MUST include five sequential parts:
 
-### 2. MAIN WORKOUT
-The core training block that defines the workout's FORMAT label
+### 1. 🧽 SOFT TISSUE PREPARATION (5 min)
+- Foam rolling major muscle groups (30-45 sec per area)
+- Trigger point release for feet and hips
+- Exercises are examples - AI should vary
 
-### 3. FINISHER
-A complementary workout block that completes the session
+### 2. 🔥 ACTIVATION (10-15 min)
+- Mobility drills, stability work, glute activation
+- Dynamic warm-up, movement preparation
+- Examples: Cat-Cow, Bird-Dog, Glute Bridge, High Knees, Walking Lunges, A-Skips
+- NOT limited to these - AI adds variety
 
-### 4. COOL DOWN
-Recovery and stretching phase
+### 3. 💪 MAIN WORKOUT (Category-Specific)
+- Follows existing category logic (Strength = strength, Cardio = cardio, etc.)
+- All existing AI reasoning per category is PRESERVED
+- Format determined by category rules
+
+### 4. ⚡ FINISHER
+- Related to the category theme
+- DIFFERENT format/structure/intensity than main workout
+- Complements the main workout
+
+### 5. 🧘 COOL DOWN (10 min)
+- Static stretching (8 min): Examples include quad, hamstring, calf, glute stretches
+- Diaphragmatic breathing (2 min): ALWAYS include this
+- Exercises are examples - AI can add more
+
+**EXCLUDED FROM 5-SECTION STRUCTURE:**
+- PILATES: Uses classical Pilates sequence
+- RECOVERY: Uses existing gentle structure
+- MICRO-WORKOUTS: Uses abbreviated 5-minute structure
 
 ### Finisher Rules by Category
 
@@ -127,6 +148,28 @@ Recovery and stretching phase
 The FORMAT label of the entire workout is determined ONLY by the Main Workout.
 The Finisher format does NOT affect the workout's FORMAT classification.
 Example: Main Workout = AMRAP, Finisher = Tabata → Workout FORMAT = AMRAP
+
+## Cardio Category Enhancements
+
+### Bodyweight Cardio - Running-Based Work
+- **Sprints**: 50m, 100m, 200m distances (full effort)
+- **Interval Running**: Alternating sprint/jog patterns
+- **Shuttle Runs**: 10m-20m-10m agility patterns, touch lines
+- **Tempo Runs**: 200m-400m sustained pace efforts
+- **Plus existing**: High knees, burpees, mountain climbers, squat jumps, etc.
+
+### Equipment Cardio - Cardio Machines
+- **Treadmill**: Running, sprints, incline work
+- **Rowing Machine**: Intervals (500m repeats), distance work, sprint rows
+- **Elliptical**: Low-impact cardio intervals, steady state
+- **Air Bike / Assault Bike**: High-intensity intervals, calorie targets
+- **Spin Bike / Stationary Bike**: Sustained efforts, intervals
+- **Ski Erg**: Sprint intervals, sustained efforts
+- **Stair Climber**: Intervals, steady state
+
+### Combination Allowed
+Equipment cardio workouts CAN combine machines + floor exercises.
+Example: 500m Row + 20 Kettlebell Swings + 400m Bike + 15 Box Jumps + 200m Run
 
 ## Category-Specific Rules
 
