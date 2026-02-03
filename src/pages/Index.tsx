@@ -183,31 +183,31 @@ const Index = () => {
   const desktopNavCards = [{
     id: "workouts",
     title: "Smarty Workouts",
-    description: "Complete workout library for every goal",
+    description: "Complete workout library with 500+ expert-designed routines for every goal",
     icon: Dumbbell,
     route: "/workout"
   }, {
     id: "programs",
     title: "Smarty Programs",
-    description: "Structured multi-week training plans",
+    description: "Structured multi-week training plans to transform your fitness journey",
     icon: Calendar,
     route: "/trainingprogram"
   }, {
     id: "exerciselibrary",
     title: "Exercise Library",
-    description: "Video demos for every exercise",
+    description: "Comprehensive video demos with proper form and technique guides",
     icon: Video,
     route: "/exerciselibrary"
   }, {
     id: "blog",
     title: "Blog & Insights",
-    description: "Articles, insights, and coaching tips",
+    description: "Evidence-based articles and expert coaching tips for your training",
     icon: FileText,
     route: "/blog"
   }, {
     id: "tools",
     title: "Smarty Tools",
-    description: "Fitness calculators and tools",
+    description: "Professional fitness calculators and tracking tools for optimization",
     icon: Calculator,
     route: "/tools"
   }];
@@ -766,25 +766,25 @@ const Index = () => {
                           100% Human. <span className="text-destructive">0% AI.</span>
                         </h2>
                         
-                        <div className="max-w-3xl mx-auto space-y-4 text-center mb-8">
-                          <p className="text-lg font-semibold text-foreground">
+                        <div className="max-w-3xl mx-auto space-y-5 text-center mb-10">
+                          <p className="text-xl font-semibold text-foreground">
                             <span className="text-primary font-semibold">SmartyGym</span> workouts and programs are built to fit YOUR life.
                           </p>
-                          <p className="text-base leading-relaxed text-muted-foreground">
+                          <p className="text-lg leading-relaxed text-muted-foreground">
                             That's why they work — safe and efficient design by <a href="/coach-profile" className="text-primary hover:underline font-medium"><strong>Haris Falas</strong></a>, crafted by hand with care to deliver effective results at <strong>smartygym.com</strong>, <strong className="text-foreground">NOT by AI</strong>.
                           </p>
-                          <div className="bg-background/60 backdrop-blur-sm p-6 rounded-lg border-2 border-primary/30 mt-6">
-                            <p className="text-lg font-bold text-primary mb-2">
+                          <div className="bg-background/60 backdrop-blur-sm p-8 rounded-lg border-2 border-primary/30 mt-8">
+                            <p className="text-xl font-bold text-primary mb-3">
                               Your Gym Re-imagined Anywhere, Anytime
                             </p>
-                            <p className="text-base text-muted-foreground mb-2">
+                            <p className="text-lg text-muted-foreground mb-3">
                               We are not here to replace your gym. We are here to back you up when life gets in the way.
                             </p>
-                            <p className="text-sm text-muted-foreground mb-2">
+                            <p className="text-base text-muted-foreground mb-3">
                               Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed — SmartyGym is your backup plan. Or, if you prefer training from home entirely, we've got you covered. Or, if you go to your gym but want to follow a professional, science-based workout or training program designed by{' '}
                               <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>, we provide that expert guidance.
                             </p>
-                            <p className="text-base font-semibold text-primary">
+                            <p className="text-lg font-semibold text-primary">
                               Wherever you are, your gym comes with you.
                             </p>
                           </div>
@@ -833,9 +833,9 @@ const Index = () => {
                         </div>
                         
                         {/* Desktop navigation carousel (2 cards visible + peeking sides) */}
-                          <div className="mt-6">
+                          <div className="mt-8">
                           {/* padding creates space for arrows OUTSIDE the carousel track */}
-                          <div className="relative px-12">
+                          <div className="relative px-16">
                             <Carousel
                               className="w-full"
                               setApi={setDesktopNavApi}
@@ -851,32 +851,32 @@ const Index = () => {
                                   return (
                                     <CarouselItem
                                       key={card.id}
-                                      className="basis-[78%] md:basis-[52%] lg:basis-[45%] xl:basis-[42%]"
+                                      className="pl-4 basis-[78%] md:basis-[52%] lg:basis-[45%] xl:basis-[42%]"
                                     >
                                       <Card
                                         onClick={() => navigate(card.route)}
                                         className={cn(
-                                          "h-[200px] border-[3px] border-primary/35 bg-primary/10",
+                                          "h-[220px] border-[3px] border-primary/35 bg-primary/10",
                                           "cursor-pointer overflow-hidden rounded-xl",
                                           "hover:border-primary/60 hover:shadow-xl hover:scale-[1.02]",
                                           "transition-all duration-300"
                                         )}
                                       >
                                         <CardContent className="h-full flex flex-row items-center p-6 gap-6">
-                                          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/15 flex-shrink-0">
-                                            <Icon className="w-8 h-8 text-primary" />
+                                          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/15 flex-shrink-0">
+                                            <Icon className="w-10 h-10 text-primary" />
                                           </div>
 
-                                          <div className="flex-1 flex flex-col justify-center gap-2">
-                                            <h3 className="text-lg font-bold text-foreground leading-tight">
+                                          <div className="flex-1 flex flex-col justify-center gap-3">
+                                            <h3 className="text-xl font-bold text-foreground leading-tight">
                                               {card.title}
                                             </h3>
-                                            <p className="text-sm text-muted-foreground leading-snug line-clamp-2">
+                                            <p className="text-base text-muted-foreground leading-relaxed min-h-[3rem]">
                                               {card.description}
                                             </p>
                                           </div>
 
-                                          <ChevronRight className="w-6 h-6 text-primary/50 flex-shrink-0" />
+                                          <ChevronRight className="w-7 h-7 text-primary/50 flex-shrink-0" />
                                         </CardContent>
                                       </Card>
                                     </CarouselItem>
@@ -885,21 +885,21 @@ const Index = () => {
                               </CarouselContent>
 
                               {/* Arrows OUTSIDE the slide area (in the padded gutter) */}
-                              <CarouselPrevious className="z-20 -left-10 bg-background/80 border-2 border-border shadow-lg" />
-                              <CarouselNext className="z-20 -right-10 bg-background/80 border-2 border-border shadow-lg" />
+                              <CarouselPrevious className="z-20 -left-14 w-10 h-10 bg-background/90 border-2 border-primary/40 shadow-lg hover:border-primary" />
+                              <CarouselNext className="z-20 -right-14 w-10 h-10 bg-background/90 border-2 border-primary/40 shadow-lg hover:border-primary" />
                             </Carousel>
                           </div>
 
                           {/* Dots */}
-                          <div className="flex justify-center gap-2 mt-4">
+                          <div className="flex justify-center gap-2.5 mt-5">
                             {desktopNavCards.map((_, index) => (
                               <button
                                 key={index}
                                 onClick={() => desktopNavApi?.scrollTo(index)}
                                 className={cn(
-                                  "w-2.5 h-2.5 rounded-full border-2 transition-all duration-300",
+                                  "w-3 h-3 rounded-full border-2 transition-all duration-300",
                                   desktopNavSlide === index
-                                    ? "border-primary bg-transparent scale-125"
+                                    ? "border-primary bg-primary/30 scale-125"
                                     : "border-primary/40 bg-transparent hover:border-primary/60"
                                 )}
                                 aria-label={`Go to slide ${index + 1}`}
