@@ -9,6 +9,7 @@ import {
   logUnmatchedExercises,
   type ExerciseBasic 
 } from "../_shared/exercise-matching.ts";
+import { normalizeWorkoutHtml, validateWorkoutHtml } from "../_shared/html-normalizer.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -1859,6 +1860,21 @@ Return JSON with these exact fields:
         idempotencyKey: stripeIdempotencyKey
       });
 
+      // ═══════════════════════════════════════════════════════════════════════════════
+      // GOLD STANDARD V3 NORMALIZATION - Critical for consistent spacing
+      // Normalize main_workout HTML before insert to prevent spacing issues
+      // ═══════════════════════════════════════════════════════════════════════════════
+      const normalizedMainWorkout = normalizeWorkoutHtml(workoutContent.main_workout || '');
+      const validation = validateWorkoutHtml(normalizedMainWorkout);
+      
+      if (!validation.isValid) {
+        console.error(`[WOD-GENERATION] ⚠️ HTML validation issues after normalization:`, validation.issues);
+        logStep(`⚠️ HTML validation issues`, { issues: validation.issues, equipment });
+        // Log but don't reject - normalization should have fixed it
+      } else {
+        logStep(`✅ HTML normalized and validated`, { equipment, originalLength: workoutContent.main_workout?.length, normalizedLength: normalizedMainWorkout.length });
+      }
+
       // Insert workout with generated_for_date for pre-generation tracking
       const { error: insertError } = await supabase
         .from("admin_workouts")
@@ -1873,7 +1889,7 @@ Return JSON with these exact fields:
           difficulty_stars: selectedDifficulty.stars,
           duration: duration,
           description: workoutContent.description,
-          main_workout: workoutContent.main_workout,
+          main_workout: normalizedMainWorkout,  // Use normalized content
           instructions: workoutContent.instructions,
           tips: workoutContent.tips,
           image_url: imageUrl,

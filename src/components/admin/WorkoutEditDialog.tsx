@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { A4Container } from "@/components/ui/a4-container";
+import { normalizeWorkoutHtml } from "@/utils/htmlNormalizer";
 
 import { WORKOUT_CATEGORIES, getDifficultyFromStars } from "@/constants/workoutCategories";
 
@@ -267,10 +268,17 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
         }
       }
 
+      // ═══════════════════════════════════════════════════════════════════════════════
+      // GOLD STANDARD V3: Normalize main_workout HTML before saving
+      // This prevents spacing issues from rich text editor output
+      // ═══════════════════════════════════════════════════════════════════════════════
+      const normalizedMainWorkout = normalizeWorkoutHtml(formData.main_workout || '');
+
       // Prepare data with backward compatibility
       const saveData = {
         ...formData,
         image_url: imageUrl,
+        main_workout: normalizedMainWorkout,  // Use normalized content
         type: formData.format || formData.category,
         difficulty: getDifficultyLabel(formData.difficulty_stars),
         price: formData.price ? parseFloat(formData.price) : null,
