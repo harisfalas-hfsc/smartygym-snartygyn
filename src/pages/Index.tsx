@@ -787,17 +787,17 @@ const Index = () => {
                         </div>
                         
                         {/* 3 Static Cards: WOD, Workouts, Blog */}
-                        <div className="grid grid-cols-3 gap-3 mt-6">
+                        <div className="grid grid-cols-3 gap-6 mt-6 px-2">
                           {/* WOD Card */}
                           <div
                             onClick={() => navigate('/workout/wod')}
-                            className="cursor-pointer group border-2 border-primary/40 rounded-xl overflow-hidden hover:border-primary hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[160px] sm:h-[200px] relative bg-card"
+                            className="cursor-pointer group rounded-xl overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[160px] sm:h-[200px] relative bg-card"
                           >
                             <div className="absolute inset-0 overflow-hidden">
                               <img 
                                 src={heroWodImage}
                                 alt="Workout of the Day"
-                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                className="w-full h-full object-cover opacity-60 group-hover:opacity-80 group-hover:scale-110 transition-all duration-500"
                                 onError={(e) => {
                                   e.currentTarget.src = '/placeholder.svg';
                                 }}
@@ -818,13 +818,13 @@ const Index = () => {
                           {/* Workouts Card */}
                           <div
                             onClick={() => navigate('/workout')}
-                            className="cursor-pointer group border-2 border-primary/40 rounded-xl overflow-hidden hover:border-primary hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[160px] sm:h-[200px] relative bg-card"
+                            className="cursor-pointer group rounded-xl overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[160px] sm:h-[200px] relative bg-card"
                           >
                             <div className="absolute inset-0 overflow-hidden">
                               <img 
                                 src={heroWorkoutsImage}
                                 alt="Smarty Workouts"
-                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                className="w-full h-full object-cover opacity-60 group-hover:opacity-80 group-hover:scale-110 transition-all duration-500"
                                 onError={(e) => {
                                   e.currentTarget.src = '/placeholder.svg';
                                 }}
@@ -845,13 +845,13 @@ const Index = () => {
                           {/* Blog Card */}
                           <div
                             onClick={() => navigate('/blog')}
-                            className="cursor-pointer group border-2 border-primary/40 rounded-xl overflow-hidden hover:border-primary hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[160px] sm:h-[200px] relative bg-card"
+                            className="cursor-pointer group rounded-xl overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 h-[160px] sm:h-[200px] relative bg-card"
                           >
                             <div className="absolute inset-0 overflow-hidden">
                               <img 
                                 src={heroBlogImage}
                                 alt="Blog & Insights"
-                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                className="w-full h-full object-cover opacity-60 group-hover:opacity-80 group-hover:scale-110 transition-all duration-500"
                                 onError={(e) => {
                                   e.currentTarget.src = '/placeholder.svg';
                                 }}
