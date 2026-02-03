@@ -1,12 +1,10 @@
 import { Helmet } from "react-helmet";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Shield, Lock, Eye, FileText, Users, AlertCircle, ArrowLeft, Globe, Bell, Smartphone, Brain, Cloud, Trash2, Download } from "lucide-react";
+import { Shield, Lock, Eye, FileText, Users, AlertCircle, Globe, Bell, Smartphone, Brain, Cloud, Trash2, Download } from "lucide-react";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
-import { useShowBackButton } from "@/hooks/useShowBackButton";
 
 const PrivacyPolicy = () => {
-  const { canGoBack, goBack } = useShowBackButton();
 
   return (
     <>
@@ -63,13 +61,6 @@ const PrivacyPolicy = () => {
 
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8 max-w-4xl">
-          {canGoBack && (
-            <Button variant="ghost" size="sm" onClick={goBack} className="mb-4">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back
-            </Button>
-          )}
-          
           <PageBreadcrumbs items={[
             { label: "Home", href: "/" },
             { label: "Privacy Policy" }

@@ -194,14 +194,6 @@ export default function AdminBackoffice() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
           <div className="flex items-center gap-2 sm:gap-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate("/")}
-              className="rounded-full shrink-0"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
             <div>
               <h1 className="text-2xl sm:text-4xl font-bold">Admin Backoffice</h1>
               <p className="text-xs sm:text-base text-muted-foreground">Manage your platform</p>

@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { AlertCircle, ArrowLeft, Search } from "lucide-react";
-import { useShowBackButton } from "@/hooks/useShowBackButton";
+import { AlertCircle, Search } from "lucide-react";
 
 interface ContentNotFoundProps {
   contentType: "workout" | "program";
@@ -9,7 +8,6 @@ interface ContentNotFoundProps {
 }
 
 export const ContentNotFound = ({ contentType, contentId }: ContentNotFoundProps) => {
-  const { goBack } = useShowBackButton();
   
   const contentTypeLabel = contentType === "workout" ? "Workout" : "Training Program";
   const libraryPath = contentType === "workout" ? "/workout" : "/trainingprogram";
@@ -41,14 +39,6 @@ export const ContentNotFound = ({ contentType, contentId }: ContentNotFoundProps
               Browse {contentType === "workout" ? "Workouts" : "Programs"}
             </Button>
             
-            <Button 
-              onClick={goBack} 
-              variant="outline" 
-              className="w-full max-w-sm"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Go Back
-            </Button>
           </div>
 
           <div className="pt-6 border-t">

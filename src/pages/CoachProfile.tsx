@@ -3,8 +3,7 @@ import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, Award, GraduationCap, Building2, Target, CheckCircle, Smartphone, Shield } from "lucide-react";
-import { useShowBackButton } from "@/hooks/useShowBackButton";
+import { Award, GraduationCap, Building2, Target, CheckCircle, Smartphone, Shield } from "lucide-react";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,7 +12,6 @@ import harisPhoto from "@/assets/haris-falas-coach.png";
 
 const CoachProfile = () => {
   const navigate = useNavigate();
-  const { canGoBack, goBack } = useShowBackButton();
   const { userTier } = useAccessControl();
   const isPremium = userTier === "premium";
   const [reviewStats, setReviewStats] = useState({ count: 0, average: 0 });
@@ -98,18 +96,6 @@ const CoachProfile = () => {
 
       <div className="min-h-screen bg-gradient-to-b from-background to-accent/20">
         <div className="container mx-auto max-w-4xl px-4 py-8">
-          {canGoBack && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={goBack}
-              className="mb-4"
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back
-            </Button>
-          )}
-
           <PageBreadcrumbs items={[
             { label: "Home", href: "/" },
             { label: "Coach Profile" }

@@ -2,13 +2,12 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, BookOpen } from "lucide-react";
+import { BookOpen } from "lucide-react";
 import { WorkoutDisplay } from "@/components/WorkoutDisplay";
 import { AccessGate } from "@/components/AccessGate";
 import { useTrainingProgramData } from "@/hooks/useTrainingProgramData";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { ContentNotFound } from "@/components/ContentNotFound";
-import { useShowBackButton } from "@/hooks/useShowBackButton";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { ReaderModeDialog } from "@/components/ReaderModeDialog";
 import { HTMLContent } from "@/components/ui/html-content";
@@ -30,7 +29,6 @@ const IndividualTrainingProgram = () => {
   const [readerModeOpen, setReaderModeOpen] = useState(false);
   const { type, id } = useParams();
   const { userTier, hasPurchased } = useAccessControl();
-  const { goBack } = useShowBackButton();
   
   // Helper function to format focus label
   const getFocusLabel = (type: string | undefined): string => {
@@ -210,15 +208,7 @@ const IndividualTrainingProgram = () => {
         </Helmet>
         <div className="min-h-screen bg-background">
           <div className="container mx-auto px-4 py-8">
-            <div className="mb-6 flex items-center justify-between">
-              <Button
-                variant="outline"
-                onClick={goBack}
-                className="gap-2"
-              >
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                <span className="text-xs sm:text-sm">Back</span>
-              </Button>
+            <div className="mb-6 flex items-center justify-end">
               {hasAccess && (
                 <Button
                   variant="outline"

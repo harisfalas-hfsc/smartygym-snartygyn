@@ -3,15 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollReveal } from "@/components/ScrollReveal";
-import { CheckCircle2, Target, Heart, Users, Shield, Award, Compass, ArrowLeft, GraduationCap, Plane, Dumbbell, UserCheck } from "lucide-react";
-import { useShowBackButton } from "@/hooks/useShowBackButton";
+import { CheckCircle2, Target, Heart, Users, Shield, Award, Compass, GraduationCap, Plane, Dumbbell, UserCheck } from "lucide-react";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 
 const About = () => {
   const navigate = useNavigate();
-  const showBackButton = useShowBackButton();
   const { userTier } = useAccessControl();
   const isPremium = userTier === "premium";
 
@@ -96,18 +94,6 @@ const About = () => {
       <div className="min-h-screen bg-background">
         <div className="container mx-auto max-w-6xl px-4 py-8">
           
-          {/* Back Button */}
-          {showBackButton.canGoBack && (
-            <Button 
-              variant="ghost" 
-              onClick={showBackButton.goBack}
-              className="mb-4 gap-2"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back
-            </Button>
-          )}
-
           <PageBreadcrumbs items={[
             { label: "Home", href: "/" },
             { label: "About" }

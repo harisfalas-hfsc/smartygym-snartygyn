@@ -328,16 +328,6 @@ const TrainingProgramDetail = () => {
       
       <div className="min-h-screen bg-background">
       <div className="container mx-auto max-w-6xl px-4 py-8">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => navigate("/trainingprogram")}
-          className="mb-6"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          <span className="text-xs sm:text-sm">Back</span>
-        </Button>
-        
         <PageBreadcrumbs 
           items={[
             { label: "Home", href: "/" },

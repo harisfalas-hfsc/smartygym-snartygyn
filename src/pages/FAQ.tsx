@@ -9,14 +9,12 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { HelpCircle, ArrowLeft, MessageCircle } from "lucide-react";
-import { useShowBackButton } from "@/hooks/useShowBackButton";
+import { HelpCircle, MessageCircle } from "lucide-react";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 
 const FAQ = () => {
   const navigate = useNavigate();
-  const showBackButton = useShowBackButton();
 
   return (
     <>
@@ -159,18 +157,6 @@ const FAQ = () => {
       <div className="min-h-screen bg-background">
         <div className="container mx-auto max-w-4xl px-4 py-8">
           
-          {/* Back Button */}
-          {showBackButton.canGoBack && (
-            <Button 
-              variant="ghost" 
-              onClick={showBackButton.goBack}
-              className="mb-4 gap-2"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back
-            </Button>
-          )}
-
           <PageBreadcrumbs items={[
             { label: "Home", href: "/" },
             { label: "FAQ" }

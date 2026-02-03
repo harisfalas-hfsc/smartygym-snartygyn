@@ -7,11 +7,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { InfoRibbon } from "@/components/InfoRibbon";
-import { ArrowLeft, MessageSquare, Send, MapPin, Phone, Lock, MessageCircle, Paperclip, X, Crown } from "lucide-react";
+import { MessageSquare, Send, MapPin, Phone, Lock, MessageCircle, Paperclip, X, Crown } from "lucide-react";
 
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
-import { useShowBackButton } from "@/hooks/useShowBackButton";
+
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAccessControl } from "@/hooks/useAccessControl";
@@ -28,7 +28,6 @@ const contactSchema = z.object({
 const Contact = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { canGoBack, goBack } = useShowBackButton();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -396,19 +395,6 @@ const Contact = () => {
       <div className="min-h-screen bg-background">
         
         <div className="container mx-auto max-w-6xl px-4 pb-8">
-          {canGoBack && (
-            <div className="mb-6">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={goBack}
-              >
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back
-              </Button>
-            </div>
-          )}
-
           {/* Breadcrumbs */}
           <PageBreadcrumbs 
             items={[
