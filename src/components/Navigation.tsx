@@ -421,8 +421,8 @@ export const Navigation = () => {
             </div>
           </div>
 
-          {/* CENTER SECTION - Logo + Tagline */}
-          <div className="flex-1 flex flex-col items-center justify-center max-w-[50%] sm:max-w-none">
+          {/* CENTER SECTION - Logo */}
+          <div className="flex-1 flex justify-center max-w-[50%] sm:max-w-none">
             <div
               onClick={() => handleNavigate("/")}
               className="cursor-pointer flex-shrink-0"
@@ -433,9 +433,6 @@ export const Navigation = () => {
                 className="h-12 xs:h-14 sm:h-[68px] md:h-20 lg:h-24 w-auto object-contain dark:mix-blend-lighten"
               />
             </div>
-            <p className="text-[8px] xs:text-[9px] sm:text-xs text-white font-medium tracking-wide text-center mt-0.5 whitespace-nowrap">
-              Your Gym Re-imagined Anywhere, Anytime
-            </p>
           </div>
 
           {/* Right Side - Auth */}
