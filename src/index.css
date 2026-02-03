@@ -254,6 +254,22 @@ All colors MUST be HSL.
     max-width: 100%;
   }
   
+  /* ═══════════════════════════════════════════════════════════════════════════════
+   * CRITICAL FIX: Disable pre-wrap inside workout content ONLY
+   * This prevents newline characters in stored HTML from creating visible gaps
+   * The actual spacing is controlled by empty <p> separators in the HTML structure
+   * ═══════════════════════════════════════════════════════════════════════════════ */
+  .workout-content .text-display {
+    white-space: normal !important;
+  }
+  
+  /* Also collapse any whitespace between tags that might slip through */
+  .workout-content .prose,
+  .workout-content .prose-sm,
+  .workout-content .prose-invert {
+    white-space: normal !important;
+  }
+  
   /* CTA Button Enhanced Animations */
   .cta-button {
     position: relative;

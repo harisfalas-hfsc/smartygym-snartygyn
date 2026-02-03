@@ -61,21 +61,34 @@ interface AuditResult {
 
 // Section detection patterns
 const SECTION_PATTERNS = {
-  warmUp: /(?:warm[-\s]?up|activation|soft[-\s]?tissue)/i,
+  softTissue: /soft[-\s]?tissue/i,
+  warmUp: /(?:warm[-\s]?up|activation)/i,
   mainWorkout: /main[-\s]?workout/i,
   finisher: /finisher/i,
   coolDown: /cool[-\s]?down/i,
 };
 
-// Icon patterns
+// Icon patterns (5 sections for 6 target categories)
 const ICON_PATTERNS = {
+  softTissue: /🧽/,
   warmUp: /🔥/,
   mainWorkout: /💪/,
   finisher: /⚡/,
   coolDown: /🧘/,
 };
 
-const SECTION_ICONS = ['🔥', '💪', '⚡', '🧘'];
+// 5 section icons for Gold Standard V3
+const SECTION_ICONS = ['🧽', '🔥', '💪', '⚡', '🧘'];
+
+// Categories that require 5-section structure
+const FIVE_SECTION_CATEGORIES = [
+  'STRENGTH',
+  'CALORIE BURNING', 
+  'METABOLIC',
+  'CARDIO',
+  'MOBILITY & STABILITY',
+  'CHALLENGE'
+];
 
 // Check for section presence
 function hasSection(content: string, pattern: RegExp): boolean {
@@ -186,8 +199,36 @@ function hasBulletListIssues(content: string): boolean {
 function auditWorkout(workout: any): FormatIssue | null {
   const issues: string[] = [];
   const content = workout.main_workout || '';
+  const category = workout.category || '';
   
-  // Check sections
+  // Determine if this workout should have the 5-section structure
+  const requiresFiveSections = FIVE_SECTION_CATEGORIES.includes(category);
+  
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // NEW: Check for literal newlines/carriage returns (the #1 cause of spacing bugs)
+  // ═══════════════════════════════════════════════════════════════════════════════
+  if (/[\n\r]/.test(content)) {
+    issues.push('Contains newline characters (causes visible gaps)');
+  }
+  
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // NEW: Check for whitespace between tags (the #2 cause of spacing bugs)
+  // ═══════════════════════════════════════════════════════════════════════════════
+  if (/>\s+</.test(content)) {
+    issues.push('Whitespace between HTML tags');
+  }
+  
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // 5-SECTION STRUCTURE CHECK (only for 6 target categories)
+  // ═══════════════════════════════════════════════════════════════════════════════
+  if (requiresFiveSections) {
+    // Check for 🧽 Soft Tissue Preparation
+    if (!hasSection(content, SECTION_PATTERNS.softTissue) && !ICON_PATTERNS.softTissue.test(content)) {
+      issues.push('Missing 🧽 Soft Tissue Preparation section');
+    }
+  }
+  
+  // Check sections (applies to all categories)
   if (!hasSection(content, SECTION_PATTERNS.warmUp)) {
     issues.push('Missing Warm-Up section');
   }
@@ -202,6 +243,9 @@ function auditWorkout(workout: any): FormatIssue | null {
   }
   
   // Check icons
+  if (requiresFiveSections && SECTION_PATTERNS.softTissue.test(content) && !ICON_PATTERNS.softTissue.test(content)) {
+    issues.push('Missing 🧽 icon for Soft Tissue');
+  }
   if (hasSection(content, SECTION_PATTERNS.warmUp) && !hasSectionIcon(content, SECTION_PATTERNS.warmUp, ICON_PATTERNS.warmUp)) {
     issues.push('Missing 🔥 icon for Warm-Up');
   }
@@ -228,7 +272,7 @@ function auditWorkout(workout: any): FormatIssue | null {
     issues.push('Leading empty paragraphs');
   }
   
-  // NEW: Gold Standard V3 spacing checks
+  // Gold Standard V3 spacing checks
   if (hasBlankAfterSectionTitle(content)) {
     issues.push('Blank line after section title');
   }
@@ -240,6 +284,13 @@ function auditWorkout(workout: any): FormatIssue | null {
   }
   if (hasExercisesOutsideLists(content)) {
     issues.push('Exercises outside bullet lists');
+  }
+  
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // NEW: Check for empty paragraphs between list items (intra-list spacing)
+  // ═══════════════════════════════════════════════════════════════════════════════
+  if (/<\/li>\s*<p[^>]*>\s*<\/p>\s*<li/i.test(content)) {
+    issues.push('Empty paragraph between list items');
   }
   
   if (issues.length === 0) return null;

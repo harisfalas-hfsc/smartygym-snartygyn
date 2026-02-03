@@ -35,7 +35,8 @@ interface RepairResult {
 // 6. Proper TipTap classes on all elements
 // ═══════════════════════════════════════════════════════════════════════════════
 
-const SECTION_ICONS = ['🔥', '💪', '⚡', '🧘'];
+// GOLD STANDARD V3 - 5 section icons (including 🧽 Soft Tissue Preparation)
+const SECTION_ICONS = ['🧽', '🔥', '💪', '⚡', '🧘'];
 const SECTION_HEADER_PATTERN = new RegExp(`^<p[^>]*>\\s*(${SECTION_ICONS.join('|')})`, 'i');
 const EMPTY_P_PATTERN = /<p[^>]*>\s*<\/p>/gi;
 const CANONICAL_EMPTY_P = '<p class="tiptap-paragraph"></p>';
@@ -344,16 +345,23 @@ function repairContent(content: string): {
   let result = content;
   
   // ═══════════════════════════════════════════════════════════════════════════════
-  // STEP 0 (NEW): STRIP ALL NEWLINE CHARACTERS - This is the root cause of spacing issues
+  // STEP 0 (CRITICAL): STRIP ALL NEWLINE CHARACTERS
+  // This is THE root cause of spacing issues - CSS pre-wrap renders \n as visible gaps
   // The "Crucible Test" has 0 newlines, broken workouts have 20+ newlines
   // ═══════════════════════════════════════════════════════════════════════════════
   const originalNewlines = (result.match(/[\n\r]/g) || []).length;
   result = result.replace(/[\n\r]+/g, ''); // Remove all newlines
-  result = result.replace(/\s{2,}/g, ' '); // Collapse multiple spaces to single
   stats.newlinesStripped = originalNewlines;
   
   // ═══════════════════════════════════════════════════════════════════════════════
-  // STEP 0.5 (NEW): MERGE CONSECUTIVE <ul> BLOCKS
+  // STEP 0.5 (CRITICAL): COLLAPSE ALL WHITESPACE BETWEEN TAGS
+  // Even after \n removal, patterns like "</p> <ul" create whitespace text nodes
+  // This is THE SECOND root cause of visible gaps
+  // ═══════════════════════════════════════════════════════════════════════════════
+  result = result.replace(/>\s+</g, '><');
+  
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // STEP 0.6: MERGE CONSECUTIVE <ul> BLOCKS
   // Some workouts have fragmented lists: </ul><ul> which should be one list
   // ═══════════════════════════════════════════════════════════════════════════════
   let mergeCount = 0;
@@ -363,6 +371,18 @@ function repairContent(content: string): {
     return ''; // Remove the boundary, merging lists
   });
   stats.listsMerged = mergeCount;
+  
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // STEP 0.7: NORMALIZE HEADER MARKUP VARIANTS
+  // Data has <u><b>...</b></u>, <b><u>...</u></b> → canonical <strong><u>...</u></strong>
+  // ═══════════════════════════════════════════════════════════════════════════════
+  result = result.replace(/<u><b>/gi, '<strong><u>');
+  result = result.replace(/<\/b><\/u>/gi, '</u></strong>');
+  result = result.replace(/<b><u>/gi, '<strong><u>');
+  result = result.replace(/<\/u><\/b>/gi, '</u></strong>');
+  // Also convert standalone <b> to <strong>
+  result = result.replace(/<b>/gi, '<strong>');
+  result = result.replace(/<\/b>/gi, '</strong>');
   
   // Step 1: Fix quote attributes
   const quoteResult = fixQuoteAttributes(result);
