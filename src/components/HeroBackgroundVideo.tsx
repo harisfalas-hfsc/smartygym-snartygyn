@@ -23,7 +23,7 @@ export function HeroBackgroundVideo({
   src,
   className,
   posterSrc = heroPoster,
-  preload = "auto",
+  preload = "metadata", // Changed default to metadata for faster initial load
 }: HeroBackgroundVideoProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [ready, setReady] = useState(false);
