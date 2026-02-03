@@ -717,7 +717,7 @@ const Index = () => {
                         </div>
                         
                         <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 text-center">
-                          100% Human. 0% AI.
+                          100% Human. <span className="text-destructive">0% AI.</span>
                         </h2>
                         
                         <div className="max-w-3xl mx-auto space-y-4 text-center mb-8">
@@ -823,9 +823,6 @@ const Index = () => {
                     <CardContent className="p-4">
                       {/* Text content first */}
                       <div className="space-y-2 text-center">
-                        <h3 className="text-xl font-bold">
-                          100% Human. 0% AI.
-                        </h3>
                         <p className="text-base font-semibold text-primary">
                           Every workout and training program is science-based and personally created by{' '}
                           <a href="/coach-profile" onClick={e => {
