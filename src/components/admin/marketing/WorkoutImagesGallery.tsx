@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -69,6 +69,7 @@ const downloadImageAsInstagramSize = async (
 };
 
 export const WorkoutImagesGallery = () => {
+  const queryClient = useQueryClient();
   const [selectedSizes, setSelectedSizes] = useState<Record<string, InstagramSize>>({});
 
   const { data: workouts, isLoading } = useQuery({
@@ -84,6 +85,28 @@ export const WorkoutImagesGallery = () => {
       return (data || []) as Workout[];
     },
   });
+
+  // Real-time subscription for instant updates
+  useEffect(() => {
+    const channel = supabase
+      .channel('admin-workout-images-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'admin_workouts',
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["admin-workout-images"] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
 
   const handleDownload = async (workout: Workout) => {
     if (!workout.image_url) return;
