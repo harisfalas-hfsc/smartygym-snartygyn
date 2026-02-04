@@ -68,6 +68,9 @@ import { BlogNavCardTemplate } from "../instagram/hero/BlogNavCardTemplate";
 import { CoachNavCardTemplate } from "../instagram/hero/CoachNavCardTemplate";
 import { TabletWithSixCardsTemplate } from "../instagram/hero/TabletWithSixCardsTemplate";
 import { WelcomeHeroCompositeTemplate } from "../instagram/hero/WelcomeHeroCompositeTemplate";
+import { CompleteHeroGymGroupTemplate } from "../instagram/hero/CompleteHeroGymGroupTemplate";
+import { CompleteHeroHomeCoupleTemplate } from "../instagram/hero/CompleteHeroHomeCoupleTemplate";
+import { CompleteHeroParkCoupleTemplate } from "../instagram/hero/CompleteHeroParkCoupleTemplate";
 import { WhoIsForCompositeTemplate } from "../instagram/audience/WhoIsForCompositeTemplate";
 import { BusyAdultsCardTemplate } from "../instagram/audience/BusyAdultsCardTemplate";
 import { ParentsCardTemplate } from "../instagram/audience/ParentsCardTemplate";
@@ -102,6 +105,9 @@ const allTemplates: Template[] = [
   { id: "program-categories", name: "Program Categories", component: ProgramCategoriesCompositeTemplate },
   { id: "fitness-tools", name: "Fitness Tools", component: FitnessToolsCompositeTemplate },
   // Hero
+  { id: "complete-hero-gym-group", name: "Complete Hero (Gym Group)", component: CompleteHeroGymGroupTemplate },
+  { id: "complete-hero-home-couple", name: "Complete Hero (Home Couple)", component: CompleteHeroHomeCoupleTemplate },
+  { id: "complete-hero-park-couple", name: "Complete Hero (Park Couple)", component: CompleteHeroParkCoupleTemplate },
   { id: "welcome-hero-composite", name: "Welcome Hero", component: WelcomeHeroCompositeTemplate },
   { id: "tablet-six-cards", name: "Tablet with 6 Cards", component: TabletWithSixCardsTemplate },
   { id: "online-fitness-redefined", name: "Online Fitness Redefined", component: OnlineFitnessRedefinedCardTemplate },
