@@ -848,7 +848,7 @@ const Index = () => {
                                       <Card
                                         onClick={() => navigate(card.route)}
                                         className={cn(
-                                          "h-[160px] border-[3px] border-primary/40 bg-primary/5",
+                                          "h-[160px] border-[3px] border-primary/40 bg-background/50",
                                           "cursor-pointer overflow-hidden rounded-xl",
                                           "hover:border-primary hover:shadow-xl hover:scale-[1.02]",
                                           "transition-all duration-300"
