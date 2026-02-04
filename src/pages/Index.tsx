@@ -877,8 +877,8 @@ const Index = () => {
                               </CarouselContent>
 
                               {/* Arrows at far edges per user request */}
-                              <CarouselPrevious className="z-20 -left-[88px] w-8 h-8 bg-background/90 border-2 border-primary/40 shadow-lg hover:border-primary" />
-                              <CarouselNext className="z-20 -right-[88px] w-8 h-8 bg-background/90 border-2 border-primary/40 shadow-lg hover:border-primary" />
+                              <CarouselPrevious className="z-20 -left-[88px] w-14 h-14 bg-background/90 border-2 border-primary/40 shadow-lg hover:border-primary [&>svg]:h-7 [&>svg]:w-7" />
+                              <CarouselNext className="z-20 -right-[88px] w-14 h-14 bg-background/90 border-2 border-primary/40 shadow-lg hover:border-primary [&>svg]:h-7 [&>svg]:w-7" />
                             </Carousel>
                           </div>
 
