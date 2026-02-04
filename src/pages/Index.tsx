@@ -557,7 +557,7 @@ const Index = () => {
 
             {/* Carousel Dots */}
             <div className="flex justify-center gap-2 mt-4">
-              {heroCards.map((_, index) => <button key={index} onClick={() => carouselApi?.scrollTo(index)} className={cn("w-2.5 h-2.5 rounded-full border-2 transition-all duration-300", currentSlide === index ? "border-primary bg-transparent scale-125" : "border-primary/40 bg-transparent hover:border-primary/60")} aria-label={`Go to slide ${index + 1}`} />)}
+              {heroCards.map((_, index) => <button key={index} onClick={() => carouselApi?.scrollTo(index)} className={cn("w-2.5 h-2.5 rounded-full transition-all duration-300", currentSlide === index ? "bg-primary scale-125" : "bg-primary/30 hover:bg-primary/50")} aria-label={`Go to slide ${index + 1}`} />)}
             </div>
 
         {/* Quick Access Menu */}
@@ -889,10 +889,10 @@ const Index = () => {
                                 key={index}
                                 onClick={() => desktopNavApi?.scrollTo(index)}
                                 className={cn(
-                                  "w-2.5 h-2.5 rounded-full border-2 transition-all duration-300",
+                                  "w-2.5 h-2.5 rounded-full transition-all duration-300",
                                   desktopNavSlide === index
-                                    ? "border-primary bg-transparent scale-125"
-                                    : "border-primary/40 bg-transparent hover:border-primary/60"
+                                    ? "bg-primary scale-125"
+                                    : "bg-primary/30 hover:bg-primary/50"
                                 )}
                                 aria-label={`Go to slide ${index + 1}`}
                               />
