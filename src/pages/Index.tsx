@@ -22,7 +22,7 @@ import { useAccessControl } from "@/hooks/useAccessControl";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { LazySection } from "@/components/LazySection";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { HeroBackgroundVideo } from "@/components/HeroBackgroundVideo";
+import { HeroBackgroundImages } from "@/components/HeroBackgroundImages";
 import heroWodImage from "@/assets/hero-wod.jpg";
 import heroWorkoutsImage from "@/assets/hero-workouts.jpg";
 import heroBlogImage from "@/assets/hero-blog.jpg";
@@ -725,8 +725,8 @@ const Index = () => {
           <div className="container mx-auto max-w-6xl px-4 relative z-10 overflow-x-hidden">
             <ScrollReveal>
               <Card itemScope itemType="https://schema.org/Organization" data-hero-section="true" data-keywords="smarty gym, online gym, online fitness, smartygym.com, Haris Falas, global online gym" aria-label="SmartyGym - Your online gym and fitness platform - smartygym.com" className="border-2 border-primary overflow-hidden relative">
-                {/* Background Video */}
-                <HeroBackgroundVideo src="/videos/human-not-ai-background.mp4" />
+                {/* Background Images - Rotating every 2.5 seconds */}
+                <HeroBackgroundImages />
                 
                 {/* Semi-transparent overlay for readability */}
                 <div className="absolute inset-0 bg-background/65 z-10" />
