@@ -134,7 +134,7 @@ const Index = () => {
     }, 4000);
     return () => clearInterval(interval);
   }, [isHoveringTablet]);
-  // Mobile hero carousel cards (leave as previously)
+  // Mobile hero carousel cards - Order: Workouts, Programs, Tools, Library, Blog
   const heroCards = [{
     id: "workouts",
     title: "Smarty Workouts",
@@ -150,13 +150,6 @@ const Index = () => {
     icon: Calendar,
     route: "/trainingprogram"
   }, {
-    id: "ritual",
-    title: "Smarty Ritual",
-    description: "Your daily movement ritual for optimal performance - Morning, Midday, and Evening phases",
-    buttonText: "View Ritual",
-    icon: Sparkles,
-    route: "/daily-ritual"
-  }, {
     id: "tools",
     title: "Smarty Tools",
     description: "Professional fitness calculators and tracking tools to optimize your training",
@@ -164,23 +157,29 @@ const Index = () => {
     icon: Calculator,
     route: "/tools"
   }, {
-    id: "blog",
-    title: "Blog & Insights",
-    description: "Evidence-based fitness articles and expert insights from professional coaches",
-    buttonText: "Read Articles",
-    icon: FileText,
-    route: "/blog"
-  }, {
     id: "exerciselibrary",
     title: "Exercise Library",
     description: "Comprehensive video library with proper form demonstrations and technique guides",
     buttonText: "Browse Library",
     icon: Video,
     route: "/exerciselibrary"
+  }, {
+    id: "blog",
+    title: "Blog & Insights",
+    description: "Evidence-based fitness articles and expert insights from professional coaches",
+    buttonText: "Read Articles",
+    icon: FileText,
+    route: "/blog"
   }];
 
-  // Desktop hero navigation carousel cards (desktop-only section)
+  // Desktop hero navigation carousel cards - Order: WOD, Workouts, Programs, Tools, Library, Blog
   const desktopNavCards = [{
+    id: "wod",
+    title: "Workout of the Day",
+    description: "Today's featured workout designed fresh by Coach Haris",
+    icon: Flame,
+    route: "/wod"
+  }, {
     id: "workouts",
     title: "Smarty Workouts",
     description: "Complete workout library with 500+ expert-designed routines for every goal",
@@ -193,6 +192,12 @@ const Index = () => {
     icon: Calendar,
     route: "/trainingprogram"
   }, {
+    id: "tools",
+    title: "Smarty Tools",
+    description: "Professional fitness calculators and tracking tools for optimization",
+    icon: Calculator,
+    route: "/tools"
+  }, {
     id: "exerciselibrary",
     title: "Exercise Library",
     description: "Comprehensive video demos with proper form and technique guides",
@@ -204,12 +209,6 @@ const Index = () => {
     description: "Evidence-based articles and expert coaching tips for your training",
     icon: FileText,
     route: "/blog"
-  }, {
-    id: "tools",
-    title: "Smarty Tools",
-    description: "Professional fitness calculators and tracking tools for optimization",
-    icon: Calculator,
-    route: "/tools"
   }];
 
   useEffect(() => {
