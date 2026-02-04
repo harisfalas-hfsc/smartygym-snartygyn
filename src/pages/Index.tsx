@@ -5,7 +5,7 @@ import { ServiceCard } from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap, Check, Crown, ChevronDown, ChevronRight, Move, Ban, Brain, CheckCircle2, Award, Shield, Compass, Sparkles, Info, User, HelpCircle, ShoppingBag, Star, TrendingUp, Clock } from "lucide-react";
+import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap, Check, Crown, ChevronDown, ChevronRight, Move, Ban, Brain, CheckCircle2, Award, Shield, Compass, Sparkles, Info, User, HelpCircle, ShoppingBag, Star, TrendingUp, Clock, CalendarCheck } from "lucide-react";
 import { getCyprusTodayStr } from "@/lib/cyprusDate";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -55,6 +55,9 @@ const Index = () => {
   // Auto-cycling state for tablet hero cards
   const [highlightedCardIndex, setHighlightedCardIndex] = useState(0);
   const [isHoveringTablet, setIsHoveringTablet] = useState(false);
+  
+  // Auto-cycling state for desktop navigation carousel
+  const [isHoveringDesktopNav, setIsHoveringDesktopNav] = useState(false);
 
   // Fetch review stats for SEO schema - low priority, don't block render
   const { data: reviewStats } = useQuery({
@@ -134,6 +137,16 @@ const Index = () => {
     }, 4000);
     return () => clearInterval(interval);
   }, [isHoveringTablet]);
+  
+  // Auto-cycle through desktop navigation carousel every 2.5 seconds
+  useEffect(() => {
+    if (!desktopNavApi || isHoveringDesktopNav) return; // Pause when hovering
+
+    const interval = setInterval(() => {
+      desktopNavApi.scrollNext();
+    }, 2500);
+    return () => clearInterval(interval);
+  }, [desktopNavApi, isHoveringDesktopNav]);
   // Mobile hero carousel cards - Order: Workouts, Programs, Tools, Library, Blog
   const heroCards = [{
     id: "workouts",
@@ -177,7 +190,7 @@ const Index = () => {
     id: "wod",
     title: "Workout of the Day",
     description: "Today's featured workout designed fresh by Coach Haris",
-    icon: Flame,
+    icon: CalendarCheck,
     route: "/workout/wod"
   }, {
     id: "workouts",
@@ -826,7 +839,11 @@ const Index = () => {
                         </div>
                         
                         {/* Desktop navigation carousel (compact cards, arrows centered in gap) */}
-                          <div className="mt-8">
+                          <div 
+                            className="mt-8"
+                            onMouseEnter={() => setIsHoveringDesktopNav(true)}
+                            onMouseLeave={() => setIsHoveringDesktopNav(false)}
+                          >
 							{/* padding creates space for arrows centered between card edge and container edge */}
 							<div className="relative px-24">
                             <Carousel
