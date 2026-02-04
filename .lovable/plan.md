@@ -1,162 +1,142 @@
 
-# Persistent Fixed Back Button - Implementation Plan
+# Implementation Plan
 
-## Goal
-Add a persistent, fixed back button that stays visible while scrolling on ALL pages (public website and admin backoffice), without changing the existing navigation logic.
-
----
-
-## Current State
-- Back buttons are inline within page content - they scroll away with the page
-- Each page implements its own back button (40+ pages use `useShowBackButton`)
-- Navigation logic is centralized in `useShowBackButton` hook (works correctly)
-- Header is already fixed at top (`z-50`)
+## Overview
+This plan addresses 4 distinct updates to the SmartyGym platform:
+1. Match the WOD icon in the homepage carousel with the Workouts page
+2. Replace the Pilates category background image with a more realistic one
+3. Enhance the admin Pictures section with dynamic workout/program images
+4. Add auto-rotation to the desktop hero carousel
 
 ---
 
-## Solution: Create a Global Fixed Back Button Component
+## 1. WOD Icon Consistency
 
-### Architecture
-```text
-┌─────────────────────────────────────────────────────────────┐
-│  Header (fixed top-0 z-50)                                   │
-└─────────────────────────────────────────────────────────────┘
-┌──────────────┐
-│ ← Back       │  ← NEW: FixedBackButton (fixed, left side)
-│ (fixed)      │     Positioned below header, always visible
-└──────────────┘
-┌─────────────────────────────────────────────────────────────┐
-│  Page Content (scrollable)                                   │
-│    - Remove inline back buttons from individual pages        │
-└─────────────────────────────────────────────────────────────┘
-```
+**Current State**: The homepage desktop carousel uses the `Flame` icon for "Workout of the Day", while the Workouts page (`WorkoutFlow.tsx`) uses the `CalendarCheck` icon.
+
+**Change**: Update `Index.tsx` to use the `CalendarCheck` icon for the WOD card (line 180), ensuring visual consistency across the platform.
+
+**Files to modify**:
+- `src/pages/Index.tsx` - Change the WOD card icon from `Flame` to `CalendarCheck`
+- Import `CalendarCheck` from lucide-react (already imported: Calendar, but not CalendarCheck)
 
 ---
 
-## Implementation Steps
+## 2. Pilates Category Background Image
 
-### Step 1: Create `FixedBackButton` Component
-Create a new component: `src/components/FixedBackButton.tsx`
+**Current State**: The current image shows a woman on a reformer in an extended/aerial pose that appears unrealistic.
 
-**Design:**
-- Uses existing `useShowBackButton()` hook (no logic change)
-- Fixed position: `fixed left-4` below the header
-- Semi-transparent background with backdrop blur (matches hfsc.eu style)
-- Z-index below header but above content (`z-40`)
-- Hidden on homepage (`/`) where back navigation doesn't make sense
-- Responsive sizing (smaller on mobile)
+**Change**: Generate a new, more realistic Pilates image showing a woman performing a grounded exercise on a reformer machine in a professional studio setting.
 
-**Style matching hfsc.eu:**
-```css
-/* Pill-shaped button, semi-transparent */
-position: fixed;
-left: 1rem;
-top: calc(var(--app-header-h) + 0.5rem);
-z-index: 40;
-background: rgba(background, 0.8);
-backdrop-filter: blur(8px);
-border: 1px solid primary/50;
-border-radius: 9999px;
-```
+**Files to modify**:
+- `public/images/workouts/pilates-category-bg.jpg` - Replace with a realistic reformer image
 
-### Step 2: Add to App Layout
-Add `FixedBackButton` in `src/App.tsx` inside `AppContent`, positioned after `<Navigation />`.
+---
 
-This ensures:
-- Single source of truth for back button
-- Appears on ALL pages automatically
-- Works in both public site and admin backoffice
+## 3. Admin Marketing Pictures Section Enhancement
 
-### Step 3: Remove Inline Back Buttons from Pages
-Remove the redundant inline back buttons from all pages that currently have them:
+**Current State**: The "Pictures" tab in Marketing contains only marketing/Instagram templates. It does not include:
+- Workout images from the database
+- Program images from the database
+- Hero card background images
 
-| File | Change |
-|------|--------|
-| `src/pages/IndividualWorkout.tsx` | Remove back button JSX |
-| `src/pages/WorkoutDetail.tsx` | Remove back button JSX |
-| `src/pages/TrainingProgramDetail.tsx` | Remove back button JSX |
-| `src/pages/IndividualTrainingProgram.tsx` | Remove back button JSX |
-| `src/pages/Blog.tsx` | Remove back button JSX |
-| `src/pages/FAQ.tsx` | Remove back button JSX |
-| `src/pages/Contact.tsx` | Remove back button JSX |
-| `src/pages/TermsOfService.tsx` | Remove back button JSX |
-| `src/pages/PrivacyPolicy.tsx` | Remove back button JSX |
-| `src/pages/Disclaimer.tsx` | Remove back button JSX |
-| `src/pages/CoachProfile.tsx` | Remove back button JSX |
-| `src/pages/About.tsx` | Remove back button JSX |
-| `src/pages/Auth.tsx` | Remove back button JSX |
-| `src/pages/ArticleDetail.tsx` | Remove back button JSX |
-| `src/pages/AdminBackoffice.tsx` | Remove back button JSX |
-| `src/components/ContentNotFound.tsx` | Remove back button JSX |
-| ... (and any other pages with inline back buttons) |
+**New Features**:
+- Create a new tabbed interface within Pictures: "Templates" (existing), "Workouts", "Programs", "Hero Cards"
+- Fetch workout images dynamically from `admin_workouts` table
+- Fetch program images from `admin_training_programs` table
+- Include hero background images (gym group, home couple, park couple)
+- All images downloadable in Instagram sizes (1080x1080 Square, 1080x1350 Portrait, 1080x608 Landscape)
+- Images auto-update as new content is added to the database
 
-### Step 4: Homepage Exception
-The `FixedBackButton` component will automatically hide on the homepage (`/`) since going "back" from home doesn't make sense.
+**Database tables used**:
+- `admin_workouts` - columns: id, name, category, image_url
+- `admin_training_programs` - columns: id, name, category, image_url
+
+**Files to create/modify**:
+- `src/components/admin/marketing/PicturesGallery.tsx` - Restructure with tabs
+- `src/components/admin/marketing/WorkoutImagesGallery.tsx` - New component for workout images
+- `src/components/admin/marketing/ProgramImagesGallery.tsx` - New component for program images
+- `src/components/admin/marketing/HeroImagesGallery.tsx` - New component for hero images
+- `src/components/admin/marketing/TemplatesGallery.tsx` - Refactor existing templates
+
+---
+
+## 4. Desktop Carousel Auto-Rotation
+
+**Current State**: The desktop hero navigation carousel (6 cards: WOD, Workouts, Programs, Tools, Library, Blog) requires manual navigation - no auto-rotation.
+
+**Change**: Add auto-rotation every 2.5 seconds with pause-on-hover functionality.
+
+**Implementation**:
+- Add state to track if user is hovering
+- Use `useEffect` with `setInterval` to auto-advance carousel
+- Pause the interval when hovering
+- Resume when hover ends
+
+**Files to modify**:
+- `src/pages/Index.tsx` - Add auto-rotation logic to the desktop carousel section (around lines 828-901)
 
 ---
 
 ## Technical Details
 
-### FixedBackButton Component Structure
-```tsx
-// src/components/FixedBackButton.tsx
-const FixedBackButton = () => {
-  const location = useLocation();
-  const { goBack } = useShowBackButton();
-  
-  // Hide on homepage
-  if (location.pathname === '/') return null;
-  
-  return (
-    <Button
-      variant="ghost"
-      size="sm"
-      onClick={goBack}
-      className="fixed left-4 z-40 gap-2 
-        bg-background/80 backdrop-blur-md 
-        border border-primary/30 
-        rounded-full shadow-lg
-        hover:bg-background/90"
-      style={{ top: 'calc(var(--app-header-h, 100px) + 0.5rem)' }}
-    >
-      <ArrowLeft className="h-4 w-4" />
-      <span className="text-xs sm:text-sm">Back</span>
-    </Button>
-  );
-};
+### Icon Change (Item 1)
+```text
+Line 180 in Index.tsx:
+Before: icon: Flame,
+After:  icon: CalendarCheck,
 ```
 
-### App.tsx Integration
-```tsx
-// In AppContent, after <Navigation />
-<Navigation />
-<FixedBackButton />
+### Auto-Rotation Logic (Item 4)
+```text
+New state variables:
+- isHoveringDesktopCarousel: boolean
+
+New useEffect:
+- Auto-advance desktopNavApi every 2500ms
+- Clear interval on hover
+- Resume on mouse leave
+
+Carousel wrapper:
+- onMouseEnter: set isHoveringDesktopCarousel = true
+- onMouseLeave: set isHoveringDesktopCarousel = false
+```
+
+### Pictures Gallery Structure (Item 3)
+```text
+PicturesGallery (restructured)
+├── Tabs
+│   ├── "Templates" - Existing Instagram templates
+│   ├── "Workouts" - Database workout images
+│   ├── "Programs" - Database program images
+│   └── "Hero Cards" - Hero background images
+└── Each tab has:
+    - Grid of image cards
+    - Size selector (Square/Portrait/Landscape)
+    - Individual download button
+    - Download All button
 ```
 
 ---
 
-## Files to Create/Modify
+## Summary of No-Change Areas
 
-| File | Action |
-|------|--------|
-| `src/components/FixedBackButton.tsx` | **CREATE** - New fixed back button component |
-| `src/App.tsx` | **MODIFY** - Add FixedBackButton after Navigation |
-| 20+ page files | **MODIFY** - Remove inline back button code |
-
----
-
-## What Stays the Same
-- `useShowBackButton` hook logic (unchanged)
-- `NavigationHistoryContext` (unchanged)
-- Back navigation behavior (goes to previous page or home)
-- Mobile/desktop responsiveness
-- Dark/light mode support
+- No visual changes to the public website layout or styling
+- No changes to SEO configuration
+- No changes to user-facing functionality
+- Only the Pilates category card background will be updated (still a reformer image, just more realistic)
+- Admin panel changes are internal-only
 
 ---
 
-## Expected Outcome
-1. **Persistent visibility**: Back button stays fixed while scrolling on ALL pages
-2. **Consistent placement**: Always in same position (below header, left side)
-3. **Same behavior**: Navigation logic unchanged (previous page or home)
-4. **Universal coverage**: Works on public pages, workout pages, admin backoffice - everywhere
-5. **Clean code**: Single component instead of 40+ inline implementations
+## Files Changed Summary
+
+| File | Change Type | Description |
+|------|-------------|-------------|
+| `src/pages/Index.tsx` | Modify | WOD icon + desktop carousel auto-rotation |
+| `public/images/workouts/pilates-category-bg.jpg` | Replace | More realistic Pilates image |
+| `src/components/admin/marketing/PicturesGallery.tsx` | Restructure | Add tabs for different image sources |
+| `src/components/admin/marketing/WorkoutImagesGallery.tsx` | Create | Workout images from database |
+| `src/components/admin/marketing/ProgramImagesGallery.tsx` | Create | Program images from database |
+| `src/components/admin/marketing/HeroImagesGallery.tsx` | Create | Hero background images |
+| `src/components/admin/marketing/TemplatesGallery.tsx` | Create | Move existing templates here |
