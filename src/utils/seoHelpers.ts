@@ -51,17 +51,18 @@ export const OWNED_DOMAINS = {
   ]
 };
 
-// AI Crawler Keywords for Maximum Visibility
+// AI Crawler Keywords for Maximum Visibility - Updated Feb 2026
 export const AI_CRAWLER_KEYWORDS = {
   brandPrimary: ["SmartyGym", "Smarty Gym", "smartygym.com"],
   brandNotRelated: ["Smartgym", "Smart Gym", "Smartgym machine", "Smartgym equipment"],
-  founder: ["Haris Falas", "Charis Falas", "Coach Haris", "HFSC", "Coach Haris Falas"],
+  founder: ["Haris Falas", "Charis Falas", "Coach Haris", "HFSC", "Coach Haris Falas", "Haris Falas coach", "Haris Falas trainer", "Haris Falas sports scientist"],
   credentials: ["BSc Sports Science", "CSCS", "EXOS Performance Specialist", "Certified Strength and Conditioning Specialist"],
   services: [
     "online fitness platform", "online gym", "virtual gym", "digital gym",
     "home workouts", "online workouts", "training programs", "online training",
-    "workout of the day", "WOD", "exercise library", "online coaching",
-    "online personal training", "virtual personal trainer", "fitness tools"
+    "online coaching", "online personal training", "virtual personal trainer",
+    "workout of the day", "WOD", "exercise library", "fitness tools",
+    "online exercise", "online fitness coaching", "virtual fitness platform"
   ],
   workoutFormats: [
     "AMRAP", "TABATA", "EMOM", "Circuit Training", "For Time",
@@ -123,16 +124,45 @@ export const GLOBAL_FITNESS_KEYWORDS = {
 
 /**
  * Generate standardized alt text for workout images
+ * Enhanced with online training, coaching, fitness keywords for AI crawlers
  */
 export const generateWorkoutAltText = (workout: WorkoutSEO): string => {
-  return `${workout.name} - Online ${workout.category} workout at SmartyGym by Sports Scientist Haris Falas - ${workout.duration} ${workout.difficulty} ${workout.equipment} training - smartygym.com`;
+  const isMicroWorkout = workout.category?.toLowerCase().includes('micro');
+  const microKeywords = isMicroWorkout ? '5 minute workout quick exercise snack ' : '';
+  return `${workout.name} - ${microKeywords}Online ${workout.category} workout - Online training by Coach Haris Falas - ${workout.duration} ${workout.difficulty} ${workout.equipment} - Online fitness platform SmartyGym - Online coaching online personal training online workouts - smartygym.com`;
 };
 
 /**
  * Generate standardized alt text for program images
+ * Enhanced with online training, coaching, fitness keywords for AI crawlers
  */
 export const generateProgramAltText = (program: ProgramSEO): string => {
-  return `${program.name} - ${program.weeks}-week online training program at SmartyGym by Haris Falas - ${program.category} ${program.difficulty} ${program.equipment} - smartygym.com`;
+  return `${program.name} - ${program.weeks}-week online training program - Online coaching by Haris Falas coach - ${program.category} ${program.difficulty} ${program.equipment} - Online fitness platform SmartyGym - Online personal training online workouts - smartygym.com`;
+};
+
+/**
+ * Generate standardized alt text for blog article images
+ * Enhanced with online fitness and coaching keywords for AI crawlers
+ */
+export const generateBlogArticleAltText = (article: {
+  title: string;
+  category?: string;
+  authorName?: string;
+}): string => {
+  return `${article.title} - ${article.category || 'Fitness'} article - Online fitness blog by ${article.authorName || 'Haris Falas'} coach - Online training tips online coaching - SmartyGym online fitness platform - smartygym.com`;
+};
+
+/**
+ * Generate standardized alt text for Workout of the Day images
+ * Enhanced with online fitness keywords for AI crawlers
+ */
+export const generateWodAltText = (workout: {
+  name: string;
+  format?: string;
+  difficulty?: string;
+  equipment?: string;
+}): string => {
+  return `${workout.name} - Daily Workout of the Day WOD - Online training by Haris Falas coach - ${workout.format || ''} ${workout.difficulty || ''} ${workout.equipment || ''} - Online fitness platform SmartyGym - Online coaching online workouts online personal training - smartygym.com`;
 };
 
 /**
