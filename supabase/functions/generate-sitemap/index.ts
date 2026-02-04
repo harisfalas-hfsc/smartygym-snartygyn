@@ -101,7 +101,7 @@ serve(async (req) => {
   </url>`);
     });
 
-    // Individual Workouts with image sitemaps
+    // Individual Workouts with enhanced image sitemaps for AI crawlers
     if (workoutsResult.data) {
       workoutsResult.data.forEach((workout: any) => {
         const lastmod = workout.updated_at 
@@ -110,11 +110,11 @@ serve(async (req) => {
             ? new Date(workout.created_at).toISOString().split('T')[0]
             : now;
         
-        // Generate SEO-optimized alt text for image with micro-workout enhancements
+        // Enhanced SEO-optimized alt text with online training/coaching/fitness keywords
         const isMicroWorkout = workout.category?.toLowerCase().includes('micro');
-        const microKeywords = isMicroWorkout ? '5 minute workout - quick exercise snack - office workout - desk workout - ' : '';
-        const imageAlt = `${workout.name} - ${microKeywords}${workout.difficulty || 'Professional'} ${workout.format || ''} ${workout.category || ''} workout by Sports Scientist Haris Falas | SmartyGym.com`.trim();
-        const imageCaption = `${microKeywords}${workout.duration || ''} ${workout.equipment || ''} ${isMicroWorkout ? 'micro-workout - mini workout - small workout - ' : ''}designed by Sports Scientist Haris Falas - smartygym.com`.trim();
+        const microKeywords = isMicroWorkout ? '5 minute workout quick exercise snack office workout desk workout ' : '';
+        const imageAlt = `${workout.name} - ${microKeywords}Online ${workout.category || ''} workout - Online training by Coach Haris Falas - ${workout.duration || ''} ${workout.difficulty || 'Professional'} ${workout.equipment || ''} - Online fitness platform SmartyGym - Online coaching online personal training online workouts smartygym.com`.trim();
+        const imageCaption = `${microKeywords}${workout.duration || ''} ${workout.format || ''} ${workout.equipment || ''} - Online training program designed by Sports Scientist Haris Falas coach - Online coaching online fitness platform SmartyGym smartygym.com`.trim();
         
         let urlEntry = `
   <url>
@@ -139,7 +139,7 @@ serve(async (req) => {
       });
     }
 
-    // Individual Training Programs with image sitemaps
+    // Individual Training Programs with enhanced image sitemaps for AI crawlers
     if (programsResult.data) {
       programsResult.data.forEach((program: any) => {
         const lastmod = program.updated_at 
@@ -148,9 +148,9 @@ serve(async (req) => {
             ? new Date(program.created_at).toISOString().split('T')[0]
             : now;
         
-        // Generate SEO-optimized alt text for image
-        const imageAlt = `${program.name} - ${program.weeks || ''} week ${program.category || ''} training program by Haris Falas | SmartyGym`.trim();
-        const imageCaption = `${program.days_per_week || ''} days/week ${program.equipment || ''} program designed by Sports Scientist Haris Falas`.trim();
+        // Enhanced SEO-optimized alt text with online training/coaching/fitness keywords
+        const imageAlt = `${program.name} - ${program.weeks || ''} week online training program - Online coaching by Haris Falas coach - ${program.category || ''} ${program.difficulty || ''} ${program.equipment || ''} - Online fitness platform SmartyGym - Online personal training online workouts smartygym.com`.trim();
+        const imageCaption = `${program.days_per_week || ''} days/week ${program.weeks || ''} week online training program - Online coaching by Sports Scientist Haris Falas coach - Online fitness platform SmartyGym online personal training smartygym.com`.trim();
         
         let urlEntry = `
   <url>
@@ -175,7 +175,7 @@ serve(async (req) => {
       });
     }
 
-    // Blog Articles with image sitemaps
+    // Blog Articles with enhanced image sitemaps for AI crawlers
     if (blogsResult.data) {
       blogsResult.data.forEach((blog: any) => {
         const lastmod = blog.updated_at 
@@ -191,13 +191,15 @@ serve(async (req) => {
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>`;
         
-        // Add image sitemap if image exists
+        // Add image sitemap if image exists with enhanced SEO keywords
         if (blog.image_url) {
-          const imageAlt = `${blog.title} - ${blog.category || 'Fitness'} article by ${blog.author_name || 'Haris Falas'} | SmartyGym Blog`.trim();
+          const imageAlt = `${blog.title} - ${blog.category || 'Fitness'} article - Online fitness blog by ${blog.author_name || 'Haris Falas'} coach - Online training tips online coaching - SmartyGym online fitness platform smartygym.com`.trim();
+          const imageCaption = `${blog.category || 'Fitness'} blog article by ${blog.author_name || 'Haris Falas'} coach - Online training online coaching online fitness - SmartyGym smartygym.com`.trim();
           urlEntry += `
     <image:image>
       <image:loc>${blog.image_url}</image:loc>
       <image:title>${escapeXml(imageAlt)}</image:title>
+      <image:caption>${escapeXml(imageCaption)}</image:caption>
     </image:image>`;
         }
         
