@@ -178,7 +178,7 @@ const Index = () => {
     title: "Workout of the Day",
     description: "Today's featured workout designed fresh by Coach Haris",
     icon: Flame,
-    route: "/wod"
+    route: "/workout/wod"
   }, {
     id: "workouts",
     title: "Smarty Workouts",
