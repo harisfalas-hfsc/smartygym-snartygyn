@@ -923,30 +923,59 @@ const Index = () => {
                             Who is <span className="text-primary">SmartyGym</span> For?
                           </h4>
                           <div className="grid grid-cols-6 gap-2 max-w-2xl mx-auto">
-                            <div className="flex flex-col items-center gap-1">
-                              <Users className="w-4 h-4 text-blue-500" />
-                              <span className="text-xs font-medium text-foreground text-center">Busy Adults</span>
-                            </div>
-                            <div className="flex flex-col items-center gap-1">
-                              <Heart className="w-4 h-4 text-pink-500" />
-                              <span className="text-xs font-medium text-foreground text-center">Parents</span>
-                            </div>
-                            <div className="flex flex-col items-center gap-1">
-                              <GraduationCap className="w-4 h-4 text-emerald-500" />
-                              <span className="text-xs font-medium text-foreground text-center">Beginners</span>
-                            </div>
-                            <div className="flex flex-col items-center gap-1">
-                              <Target className="w-4 h-4 text-orange-500" />
-                              <span className="text-xs font-medium text-foreground text-center">Intermediate</span>
-                            </div>
-                            <div className="flex flex-col items-center gap-1">
-                              <Plane className="w-4 h-4 text-cyan-500" />
-                              <span className="text-xs font-medium text-foreground text-center">Travelers</span>
-                            </div>
-                            <div className="flex flex-col items-center gap-1">
-                              <Dumbbell className="w-4 h-4 text-purple-500" />
-                              <span className="text-xs font-medium text-foreground text-center">Gym-Goers</span>
-                            </div>
+                            {[
+                              {
+                                icon: Users,
+                                label: "Busy Adults",
+                                color: "text-blue-500",
+                                description: "Perfect for professionals juggling work and life. Get effective workouts that fit your schedule—no commute, no waiting for equipment. Train when you have time, not when the gym is open."
+                              },
+                              {
+                                icon: Heart,
+                                label: "Parents",
+                                color: "text-pink-500",
+                                description: "Train at home while kids nap or play nearby. No babysitter needed, no guilt about \"me time.\" Quick, focused sessions that work around your family's schedule."
+                              },
+                              {
+                                icon: GraduationCap,
+                                label: "Beginners",
+                                color: "text-emerald-500",
+                                description: "Start your fitness journey with confidence. Clear instructions, proper form guidance, and progressive programs designed to build your foundation safely."
+                              },
+                              {
+                                icon: Target,
+                                label: "Intermediate",
+                                color: "text-orange-500",
+                                description: "Break through plateaus with structured periodization. Challenge yourself with varied programming that keeps you progressing without the guesswork."
+                              },
+                              {
+                                icon: Plane,
+                                label: "Travelers",
+                                color: "text-cyan-500",
+                                description: "Stay consistent no matter where you are. Hotel room, Airbnb, or park—these workouts adapt to any space with minimal or no equipment needed."
+                              },
+                              {
+                                icon: Dumbbell,
+                                label: "Gym-Goers",
+                                color: "text-purple-500",
+                                description: "Enhance your gym routine with expert programming. Follow structured plans that maximize your gym time and ensure balanced, progressive training."
+                              }
+                            ].map((audience) => {
+                              const Icon = audience.icon;
+                              return (
+                                <Tooltip key={audience.label}>
+                                  <TooltipTrigger asChild>
+                                    <div className="flex flex-col items-center gap-1 cursor-pointer">
+                                      <Icon className={`w-6 h-6 ${audience.color}`} />
+                                      <span className="text-xs font-medium text-foreground text-center">{audience.label}</span>
+                                    </div>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="top" className="max-w-xs text-center">
+                                    {audience.description}
+                                  </TooltipContent>
+                                </Tooltip>
+                              );
+                            })}
                           </div>
                         </div>
                 </CardContent>
