@@ -703,6 +703,13 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
             <ChevronRight className="h-4 w-4" />
           </div>
 
+          {/* Desktop: Swipe indicator (same placement as mobile) */}
+          <div className="hidden md:flex items-center justify-center gap-2 mb-6 text-muted-foreground animate-pulse">
+            <ChevronLeft className="h-4 w-4" />
+            <span className="text-xs">Swipe to explore</span>
+            <ChevronRight className="h-4 w-4" />
+          </div>
+
           {/* Mobile: Carousel of all community cards with peek effect */}
           <div className="md:hidden mb-6 px-4">
             <Carousel setApi={setCarouselApi} className="w-full">
@@ -1012,7 +1019,7 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                         itemProp="name"
                       >
                         <Trophy className="h-5 w-5 md:h-6 md:w-6 text-primary" />
-                        Community Leaderboard
+                        Leaderboard
                       </CardTitle>
                       <CompactFilters
                         filters={[
@@ -1093,7 +1100,7 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                     <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4 md:p-6">
                       <CardTitle className="flex items-center gap-2 text-xl md:text-2xl mb-4">
                         <Star className="h-5 w-5 md:h-6 md:w-6 text-primary" />
-                        Community Ratings
+                        Ratings
                       </CardTitle>
                       <CompactFilters
                         filters={[
@@ -1189,7 +1196,7 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                     <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4 md:p-6">
                       <CardTitle className="flex items-center gap-2 text-xl md:text-2xl mb-4">
                         <MessageSquare className="h-5 w-5 md:h-6 md:w-6 text-primary" />
-                        Community Comments
+                        Comments
                       </CardTitle>
                       <CompactFilters
                         filters={[
@@ -1313,7 +1320,7 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                     <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4 md:p-6">
                       <CardTitle className="flex items-center gap-2 text-xl md:text-2xl">
                         <Quote className="h-5 w-5 md:h-6 md:w-6 text-primary" />
-                        Community Testimonials
+                        Testimonials
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="p-4 md:pt-6 flex-1 overflow-auto">
@@ -1323,17 +1330,10 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                 </CarouselItem>
               </CarouselContent>
               
-              <CarouselPrevious className="-left-20 h-14 w-14" />
-              <CarouselNext className="-right-20 h-14 w-14" />
+              <CarouselPrevious className="-left-24 lg:-left-28 xl:-left-32 h-14 w-14 z-20" />
+              <CarouselNext className="-right-24 lg:-right-28 xl:-right-32 h-14 w-14 z-20" />
             </Carousel>
-            
-            {/* Swipe indicator for desktop */}
-            <div className="flex items-center justify-center gap-2 mt-4 text-muted-foreground">
-              <ChevronLeft className="h-4 w-4" />
-              <span className="text-xs">Swipe to explore</span>
-              <ChevronRight className="h-4 w-4" />
-            </div>
-            
+
             {/* Dot navigation */}
             <div className="flex justify-center gap-2 mt-2">
               {[0, 1, 2, 3].map((index) => (
