@@ -586,9 +586,12 @@ export const Navigation = () => {
             ) : (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button size="sm" className="text-xs sm:text-sm px-2 sm:px-4">
-                    Login / Sign Up
-                  </Button>
+                  <button
+                    className="p-2 rounded-full border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+                    aria-label="Login or Sign Up"
+                  >
+                    <UserIcon className="h-5 w-5" />
+                  </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-48 max-w-[calc(100vw-2rem)] bg-background" align="end">
                   <DropdownMenuItem 
