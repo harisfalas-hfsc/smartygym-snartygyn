@@ -881,6 +881,31 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                         <MessageSquare className="h-5 w-5 text-primary" />
                         Comments
                       </CardTitle>
+                      <CompactFilters
+                        filters={[
+                          {
+                            name: "Type",
+                            value: commentsFilter,
+                            onChange: (value) => setCommentsFilter(value as "all" | "workouts" | "programs"),
+                            options: [
+                              { value: "all", label: "All" },
+                              { value: "workouts", label: "Workouts" },
+                              { value: "programs", label: "Programs" }
+                            ],
+                            placeholder: "Type"
+                          },
+                          {
+                            name: "Sort",
+                            value: sortOrder,
+                            onChange: (value) => setSortOrder(value as "newest" | "oldest"),
+                            options: [
+                              { value: "newest", label: "Newest" },
+                              { value: "oldest", label: "Oldest" }
+                            ],
+                            placeholder: "Sort"
+                          }
+                        ]}
+                      />
                     </CardHeader>
                     <CardContent className="p-3 flex-1 overflow-auto">
                       {isLoadingComments ? (

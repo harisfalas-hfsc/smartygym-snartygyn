@@ -229,6 +229,24 @@ export const TestimonialsSection = ({ compact = false, desktopCarouselMode = fal
   if (desktopCarouselMode) {
     return (
       <>
+        {/* Sort filter for desktop carousel mode */}
+        <div className="mb-4">
+          <CompactFilters
+            filters={[
+              {
+                name: "Sort",
+                value: sortOrder,
+                onChange: (value) => setSortOrder(value as "newest" | "oldest"),
+                options: [
+                  { value: "newest", label: "Newest First" },
+                  { value: "oldest", label: "Oldest First" }
+                ],
+                placeholder: "Sort by"
+              }
+            ]}
+          />
+        </div>
+        
         {isLoading ? (
           <div className="space-y-4">
             {[...Array(6)].map((_, i) => (
@@ -324,6 +342,20 @@ export const TestimonialsSection = ({ compact = false, desktopCarouselMode = fal
             <Quote className="h-5 w-5 text-primary" />
             Testimonials
           </CardTitle>
+          <CompactFilters
+            filters={[
+              {
+                name: "Sort",
+                value: sortOrder,
+                onChange: (value) => setSortOrder(value as "newest" | "oldest"),
+                options: [
+                  { value: "newest", label: "Newest" },
+                  { value: "oldest", label: "Oldest" }
+                ],
+                placeholder: "Sort"
+              }
+            ]}
+          />
         </CardHeader>
         <CardContent className="p-3 flex-1 overflow-auto">
           {isLoading ? (
