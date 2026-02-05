@@ -6,6 +6,7 @@ import {
   FileText, 
   Video,
   ChevronRight,
+  ChevronLeft,
   Calendar
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -95,6 +96,25 @@ export const HeroThreeColumns = () => {
 
   return (
     <div className="mt-6 relative">
+      {/* Mobile swipe indicator */}
+      <div className="flex md:hidden items-center justify-center gap-3 mb-3">
+        <button
+          onClick={() => api?.scrollPrev()}
+          className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors"
+          aria-label="Previous slide"
+        >
+          <ChevronLeft className="w-4 h-4 text-primary" />
+        </button>
+        <span className="text-xs text-muted-foreground font-medium">Swipe to explore</span>
+        <button
+          onClick={() => api?.scrollNext()}
+          className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors"
+          aria-label="Next slide"
+        >
+          <ChevronRight className="w-4 h-4 text-primary" />
+        </button>
+      </div>
+
       {/* Carousel container */}
       <Carousel
         setApi={setApi}
