@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { Helmet } from "react-helmet";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -121,6 +121,10 @@ const Community = () => {
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [selectedSlide, setSelectedSlide] = useState(0);
 
+  // Keep all mobile carousel cards the same height as the Leaderboard card
+  const leaderboardCardRef = useRef<HTMLDivElement | null>(null);
+  const [mobileCarouselCardHeight, setMobileCarouselCardHeight] = useState<number | null>(null);
+
   // Update selected slide when carousel changes
   useEffect(() => {
     if (!carouselApi) return;
@@ -147,6 +151,33 @@ const Community = () => {
   useEffect(() => {
     fetchComments();
   }, [sortOrder, commentsFilter]);
+
+  useEffect(() => {
+    const el = leaderboardCardRef.current;
+    if (!el) return;
+
+    let raf = 0;
+    const update = () => {
+      if (!leaderboardCardRef.current) return;
+      const h = Math.round(leaderboardCardRef.current.getBoundingClientRect().height);
+      if (h > 0) {
+        setMobileCarouselCardHeight((prev) => (prev === h ? prev : h));
+      }
+    };
+
+    raf = window.requestAnimationFrame(update);
+
+    const ro = new ResizeObserver(() => {
+      window.cancelAnimationFrame(raf);
+      raf = window.requestAnimationFrame(update);
+    });
+    ro.observe(el);
+
+    return () => {
+      window.cancelAnimationFrame(raf);
+      ro.disconnect();
+    };
+  }, []);
 
   const fetchTestimonials = async () => {
     try {
@@ -526,31 +557,6 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
     return result;
   };
 
-  // Mobile versions - no placeholders, just actual data (max 6 items)
-  const getMobileLeaderboard = (): LeaderboardEntry[] => {
-    let data: LeaderboardEntry[];
-    if (leaderboardFilter === "workouts") {
-      data = workoutLeaderboard;
-    } else if (leaderboardFilter === "programs") {
-      data = programLeaderboard;
-    } else {
-      data = checkinLeaderboard;
-    }
-    return [...data].sort((a, b) => b.total_completions - a.total_completions).slice(0, 6);
-  };
-
-  const getMobileRatings = (): RatedContent[] => {
-    const data = ratedContent.filter(item => 
-      item.content_type === (ratingsFilter === "workouts" ? "workout" : "program")
-    );
-    return [...data].sort((a, b) => {
-      if (b.average_rating !== a.average_rating) {
-        return b.average_rating - a.average_rating;
-      }
-      return b.rating_count - a.rating_count;
-    }).slice(0, 6);
-  };
-
   // Get top 6 comments
   const getTopComments = () => {
     return comments.slice(0, 6);
@@ -674,7 +680,7 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
               <CarouselContent className="-ml-2">
                 {/* Slide 1: Leaderboard */}
                 <CarouselItem className="pl-2 basis-[88%]">
-                  <Card className="border-2 border-primary/30 shadow-lg h-[400px] flex flex-col">
+                  <Card ref={leaderboardCardRef} className="border-2 border-primary/30 shadow-lg flex flex-col">
                     <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4">
                       <CardTitle className="flex items-center gap-2 text-lg">
                         <Trophy className="h-5 w-5 text-primary" />
@@ -696,17 +702,12 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                         ]}
                       />
                     </CardHeader>
-                    <CardContent className="p-3 flex-1 overflow-auto">
+                    <CardContent className="p-3 flex-1">
                       {isLoadingLeaderboard ? (
                         <div className="space-y-2">
-                          {[...Array(6)].map((_, i) => (
+                          {[...Array(10)].map((_, i) => (
                             <Skeleton key={i} className="h-10 w-full" />
                           ))}
-                        </div>
-                      ) : getMobileLeaderboard().length === 0 ? (
-                        <div className="text-center py-8 text-muted-foreground">
-                          <Trophy className="h-8 w-8 mx-auto mb-2 opacity-30" />
-                          <p className="text-sm">No entries yet</p>
                         </div>
                       ) : (
                         <Table>
@@ -718,21 +719,29 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                             </TableRow>
                           </TableHeader>
                           <TableBody>
-                            {getMobileLeaderboard().map((entry, index) => (
-                              <TableRow key={entry.user_id} className="border-primary/20">
+                            {getLeaderboardWithPlaceholders().map((entry, index) => (
+                              <TableRow key={entry?.user_id || `empty-${index}`} className="border-primary/20">
                                 <TableCell className="p-2">
                                   <span className="text-sm">{getMedalIcon(index)}</span>
                                 </TableCell>
                                 <TableCell className="p-2">
-                                  <div className="flex items-center gap-1">
-                                    <User className="h-3 w-3 text-muted-foreground flex-shrink-0" />
-                                    <span className="text-xs truncate max-w-[100px]">{entry.display_name}</span>
-                                  </div>
+                                  {entry ? (
+                                    <div className="flex items-center gap-1">
+                                      <User className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+                                      <span className="text-xs truncate max-w-[100px]">{entry.display_name}</span>
+                                    </div>
+                                  ) : (
+                                    <span className="text-muted-foreground italic text-xs">Awaiting...</span>
+                                  )}
                                 </TableCell>
                                 <TableCell className="text-right p-2">
-                                  <span className="inline-flex px-2 py-0.5 rounded-full bg-primary/10 text-primary font-semibold text-xs">
-                                    {entry.total_completions}
-                                  </span>
+                                  {entry ? (
+                                    <span className="inline-flex px-2 py-0.5 rounded-full bg-primary/10 text-primary font-semibold text-xs">
+                                      {entry.total_completions}
+                                    </span>
+                                  ) : (
+                                    <span className="text-muted-foreground">---</span>
+                                  )}
                                 </TableCell>
                               </TableRow>
                             ))}
@@ -745,7 +754,10 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
 
                 {/* Slide 2: Ratings */}
                 <CarouselItem className="pl-2 basis-[88%]">
-                  <Card className="border-2 border-primary/30 shadow-lg h-[400px] flex flex-col">
+                  <Card
+                    style={mobileCarouselCardHeight ? { height: mobileCarouselCardHeight } : undefined}
+                    className="border-2 border-primary/30 shadow-lg flex flex-col"
+                  >
                     <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4">
                       <CardTitle className="flex items-center gap-2 text-lg">
                         <Star className="h-5 w-5 text-primary" />
@@ -766,17 +778,12 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                         ]}
                       />
                     </CardHeader>
-                    <CardContent className="p-3 flex-1 overflow-auto">
+                    <CardContent className="p-3 flex-1">
                       {isLoadingRatings ? (
                         <div className="space-y-2">
-                          {[...Array(6)].map((_, i) => (
+                          {[...Array(10)].map((_, i) => (
                             <Skeleton key={i} className="h-10 w-full" />
                           ))}
-                        </div>
-                      ) : getMobileRatings().length === 0 ? (
-                        <div className="text-center py-8 text-muted-foreground">
-                          <Star className="h-8 w-8 mx-auto mb-2 opacity-30" />
-                          <p className="text-sm">No ratings yet</p>
                         </div>
                       ) : (
                         <Table>
@@ -788,27 +795,35 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                             </TableRow>
                           </TableHeader>
                           <TableBody>
-                            {getMobileRatings().map((item, index) => (
-                              <TableRow key={item.content_id} className="border-primary/20">
+                            {getRatingsWithPlaceholders().map((item, index) => (
+                              <TableRow key={item?.content_id || `empty-${index}`} className="border-primary/20">
                                 <TableCell className="p-2">
                                   <span className="text-sm">{getMedalIcon(index)}</span>
                                 </TableCell>
                                 <TableCell className="p-2">
-                                  <Link 
-                                    to={item.content_type === "workout" 
-                                      ? `/workout/${item.workout_type}/${item.content_id}`
-                                      : `/trainingprogram/${item.program_type}/${item.content_id}`
-                                    }
-                                    className="text-xs truncate text-primary hover:underline max-w-[100px] block"
-                                  >
-                                    {item.content_name}
-                                  </Link>
+                                  {item ? (
+                                    <Link 
+                                      to={item.content_type === "workout" 
+                                        ? `/workout/${item.workout_type}/${item.content_id}`
+                                        : `/trainingprogram/${item.program_type}/${item.content_id}`
+                                      }
+                                      className="text-xs truncate text-primary hover:underline max-w-[100px] block"
+                                    >
+                                      {item.content_name}
+                                    </Link>
+                                  ) : (
+                                    <span className="text-muted-foreground italic text-xs">Awaiting...</span>
+                                  )}
                                 </TableCell>
                                 <TableCell className="text-center p-2">
-                                  <div className="flex items-center justify-center gap-1">
-                                    <Star className="h-3 w-3 fill-primary text-primary" />
-                                    <span className="font-semibold text-xs">{item.average_rating.toFixed(1)}</span>
-                                  </div>
+                                  {item ? (
+                                    <div className="flex items-center justify-center gap-1">
+                                      <Star className="h-3 w-3 fill-primary text-primary" />
+                                      <span className="font-semibold text-xs">{item.average_rating.toFixed(1)}</span>
+                                    </div>
+                                  ) : (
+                                    <span className="text-muted-foreground">---</span>
+                                  )}
                                 </TableCell>
                               </TableRow>
                             ))}
@@ -821,7 +836,10 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
 
                 {/* Slide 3: Comments */}
                 <CarouselItem className="pl-2 basis-[88%]">
-                  <Card className="border-2 border-primary/30 shadow-lg h-[400px] flex flex-col">
+                  <Card
+                    style={mobileCarouselCardHeight ? { height: mobileCarouselCardHeight } : undefined}
+                    className="border-2 border-primary/30 shadow-lg flex flex-col"
+                  >
                     <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4">
                       <CardTitle className="flex items-center gap-2 text-lg">
                         <MessageSquare className="h-5 w-5 text-primary" />
@@ -918,7 +936,7 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
 
                 {/* Slide 4: Testimonials */}
                 <CarouselItem className="pl-2 basis-[88%]">
-                  <div className="h-[400px]">
+                  <div style={mobileCarouselCardHeight ? { height: mobileCarouselCardHeight } : undefined}>
                     <TestimonialsSection compact />
                   </div>
                 </CarouselItem>
