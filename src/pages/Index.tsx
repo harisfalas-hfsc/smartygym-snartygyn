@@ -60,7 +60,7 @@ const Index = () => {
   const [isHoveringDesktopNav, setIsHoveringDesktopNav] = useState(false);
 
   // State for pinned audience tooltip (click to toggle)
-  const [pinnedAudienceTooltip, setPinnedAudienceTooltip] = useState<string | null>(null);
+  const [activeAudienceTooltip, setActiveAudienceTooltip] = useState<string | null>(null);
 
   // Fetch review stats for SEO schema - low priority, don't block render
   const { data: reviewStats } = useQuery({
@@ -968,14 +968,14 @@ const Index = () => {
                               return (
                                 <Tooltip 
                                   key={audience.label}
-                                  open={pinnedAudienceTooltip === audience.label ? true : undefined}
+                                  open={activeAudienceTooltip === audience.label}
                                 >
                                   <TooltipTrigger asChild>
                                     <div 
                                       className="flex flex-col items-center gap-1 cursor-pointer"
-                                      onClick={() => setPinnedAudienceTooltip(
-                                        pinnedAudienceTooltip === audience.label ? null : audience.label
-                                      )}
+                                      onMouseEnter={() => setActiveAudienceTooltip(audience.label)}
+                                      onMouseLeave={() => setActiveAudienceTooltip(null)}
+                                      onClick={() => setActiveAudienceTooltip(audience.label)}
                                     >
                                       <Icon className={`w-6 h-6 ${audience.color}`} />
                                       <span className="text-xs font-medium text-foreground text-center">{audience.label}</span>
@@ -984,7 +984,6 @@ const Index = () => {
                                   <TooltipContent 
                                     side="top" 
                                     className="max-w-xs text-center"
-                                    onPointerDownOutside={() => setPinnedAudienceTooltip(null)}
                                   >
                                     {audience.description}
                                   </TooltipContent>
