@@ -32,15 +32,27 @@ interface Testimonial {
 interface TestimonialsSectionProps {
   compact?: boolean;
   desktopCarouselMode?: boolean;
+  /** External sort order control for desktop carousel mode */
+  externalSortOrder?: "newest" | "oldest";
+  onSortOrderChange?: (value: "newest" | "oldest") => void;
 }
 
-export const TestimonialsSection = ({ compact = false, desktopCarouselMode = false }: TestimonialsSectionProps) => {
+export const TestimonialsSection = ({ 
+  compact = false, 
+  desktopCarouselMode = false,
+  externalSortOrder,
+  onSortOrderChange
+}: TestimonialsSectionProps) => {
   const { user, userTier } = useAccessControl();
   const isPremium = userTier === "premium";
   
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
+  const [internalSortOrder, setInternalSortOrder] = useState<"newest" | "oldest">("newest");
+  
+  // Use external sort order if provided, otherwise use internal
+  const sortOrder = externalSortOrder ?? internalSortOrder;
+  const setSortOrder = onSortOrderChange ?? setInternalSortOrder;
   
   // Form state
   const [showForm, setShowForm] = useState(false);
@@ -72,7 +84,8 @@ export const TestimonialsSection = ({ compact = false, desktopCarouselMode = fal
 
   useEffect(() => {
     fetchTestimonials();
-  }, [sortOrder]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sortOrder, internalSortOrder]);
 
   useEffect(() => {
     if (user?.id && testimonials.length > 0) {
@@ -226,27 +239,10 @@ export const TestimonialsSection = ({ compact = false, desktopCarouselMode = fal
   };
 
   // Desktop carousel mode - content only, no Card wrapper (rendered inside parent Card)
+  // Filter is now controlled by parent via externalSortOrder prop
   if (desktopCarouselMode) {
     return (
       <>
-        {/* Sort filter for desktop carousel mode */}
-        <div className="mb-4">
-          <CompactFilters
-            filters={[
-              {
-                name: "Sort",
-                value: sortOrder,
-                onChange: (value) => setSortOrder(value as "newest" | "oldest"),
-                options: [
-                  { value: "newest", label: "Newest First" },
-                  { value: "oldest", label: "Oldest First" }
-                ],
-                placeholder: "Sort by"
-              }
-            ]}
-          />
-        </div>
-        
         {isLoading ? (
           <div className="space-y-4">
             {[...Array(6)].map((_, i) => (
