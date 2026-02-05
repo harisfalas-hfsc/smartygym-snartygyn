@@ -713,7 +713,7 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                     <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4">
                       <CardTitle className="flex items-center gap-2 text-lg">
                         <Trophy className="h-5 w-5 text-primary" />
-                        Community Leaderboard
+                        Leaderboard
                       </CardTitle>
                       <CompactFilters
                         filters={[
@@ -790,7 +790,7 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                     <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4">
                       <CardTitle className="flex items-center gap-2 text-lg">
                         <Star className="h-5 w-5 text-primary" />
-                        Community Ratings
+                        Ratings
                       </CardTitle>
                       <CompactFilters
                         filters={[
@@ -872,7 +872,7 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                     <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4">
                       <CardTitle className="flex items-center gap-2 text-lg">
                         <MessageSquare className="h-5 w-5 text-primary" />
-                        Community Comments
+                        Comments
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="p-3 flex-1 overflow-auto">
@@ -1323,12 +1323,19 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                 </CarouselItem>
               </CarouselContent>
               
-              <CarouselPrevious className="-left-6 h-14 w-14" />
-              <CarouselNext className="-right-6 h-14 w-14" />
+              <CarouselPrevious className="-left-20 h-14 w-14" />
+              <CarouselNext className="-right-20 h-14 w-14" />
             </Carousel>
             
+            {/* Swipe indicator for desktop */}
+            <div className="flex items-center justify-center gap-2 mt-4 text-muted-foreground">
+              <ChevronLeft className="h-4 w-4" />
+              <span className="text-xs">Swipe to explore</span>
+              <ChevronRight className="h-4 w-4" />
+            </div>
+            
             {/* Dot navigation */}
-            <div className="flex justify-center gap-2 mt-4">
+            <div className="flex justify-center gap-2 mt-2">
               {[0, 1, 2, 3].map((index) => (
                 <button
                   key={index}
