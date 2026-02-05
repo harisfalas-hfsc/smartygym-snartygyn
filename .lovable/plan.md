@@ -1,85 +1,129 @@
 
-# Hero Section Audience Icons Enhancement
+# Mobile Community Page Carousel Enhancement
 
 ## Overview
-Enhance the "Who is SmartyGym For?" section in the desktop hero card by making icons 50% larger and adding informative hover tooltips with descriptions for each audience segment.
+Improve the mobile user experience on the Community page by making the carousel swipeable nature visually obvious. Currently, all 4 slides (Leaderboard, Ratings, Comments, Testimonials) take full width with no visual hint that more content exists. Users cannot intuit they should swipe.
 
-## Current State
-- Icons are `w-4 h-4` (16px)
-- No hover descriptions
-- Section located in `src/pages/Index.tsx` (lines 920-951)
+## Current State Analysis
+- **File**: `src/pages/Community.tsx` (lines 646-922)
+- **Current carousel setup**: Uses Embla carousel with `CarouselItem` at full width (`basis-full` default)
+- **Visual indicator**: Only dot indicators at the bottom - not visible until scrolling
+- **Problem**: Cards fill the entire viewport width, giving no hint of adjacent cards
 
-## Changes
+## Solution: Peek Effect + Enhanced Visual Cues
 
-### 1. Increase Icon Size by 50%
-- Change icon size from `w-4 h-4` to `w-6 h-6` (24px)
-- This provides a 50% increase in size for better visibility
+### 1. Partial Card Visibility ("Peek" Effect)
+Change the carousel item width from `basis-full` (100%) to approximately `basis-[88%]` or `basis-[90%]`, which will:
+- Show the current card centered
+- Reveal a small portion (~5-6%) of the previous and next cards on each side
+- Immediately communicate "there's more to see"
 
-### 2. Add Hover Tooltips with Descriptions
-Wrap each audience item in the existing Tooltip component (already imported in Index.tsx) with customized descriptions:
+This pattern is already successfully used elsewhere in the codebase:
+- `WorkoutFlow.tsx`: `basis-[80%]`
+- `TrainingProgramFlow.tsx`: `basis-[80%]`
+- `Tools.tsx`: `basis-[85%]`
+- `Index.tsx` hero carousel: `basis-[75%]`
 
-| Audience | Description |
-|----------|-------------|
-| **Busy Adults** | Perfect for professionals juggling work and life. Get effective workouts that fit your schedule—no commute, no waiting for equipment. Train when you have time, not when the gym is open. |
-| **Parents** | Train at home while kids nap or play nearby. No babysitter needed, no guilt about "me time." Quick, focused sessions that work around your family's schedule. |
-| **Beginners** | Start your fitness journey with confidence. Clear instructions, proper form guidance, and progressive programs designed to build your foundation safely. |
-| **Intermediate** | Break through plateaus with structured periodization. Challenge yourself with varied programming that keeps you progressing without the guesswork. |
-| **Travelers** | Stay consistent no matter where you are. Hotel room, Airbnb, or park—these workouts adapt to any space with minimal or no equipment needed. |
-| **Gym-Goers** | Enhance your gym routine with expert programming. Follow structured plans that maximize your gym time and ensure balanced, progressive training. |
+### 2. Carousel Container Adjustments
+- Add left/right padding to the carousel container so peeking cards are visible at edges
+- Adjust `CarouselContent` negative margin from `-ml-4` to something smaller (or custom for this use case)
+- Add `px-4` or similar padding to the wrapper to create space for peek visibility
 
-### 3. Tooltip Styling
-The existing tooltip has a primary-colored gradient background which ensures visibility regardless of the changing hero background images. The tooltips will:
-- Appear on hover with a smooth animation
-- Have a light/consistent background for readability
-- Show immediately (quick open delay)
-- Be positioned above the icon to avoid overlapping
+### 3. Visual Polish
+- Keep the existing dot indicators (they work well once users understand the carousel)
+- Optionally add a subtle "swipe" hint on first view (can be a simple animated arrow or text that fades after a few seconds)
 
 ---
 
-## Technical Details
+## Technical Implementation
 
 ### File to Modify
-`src/pages/Index.tsx`
+`src/pages/Community.tsx`
 
-### Implementation Approach
-1. Create an `audienceData` array with icon, label, color, and description for each segment
-2. Replace the current 6 hardcoded `<div>` blocks with a `.map()` over the array
-3. Wrap each item in `<Tooltip>` → `<TooltipTrigger>` → `<TooltipContent>` structure
-4. Update icon classes from `w-4 h-4` to `w-6 h-6`
-5. Add max-width to tooltip content for proper paragraph formatting
-6. Add cursor-pointer to indicate interactivity
+### Changes Required
 
-### Code Structure Example
+**Step 1: Update CarouselItem basis width**
 ```tsx
-const audienceData = [
-  {
-    icon: Users,
-    label: "Busy Adults",
-    color: "text-blue-500",
-    description: "Perfect for professionals juggling work and life..."
-  },
-  // ... other segments
-];
+// Current:
+<CarouselItem>
 
-{audienceData.map((audience) => (
-  <Tooltip key={audience.label}>
-    <TooltipTrigger asChild>
-      <div className="flex flex-col items-center gap-1 cursor-pointer">
-        <audience.icon className={`w-6 h-6 ${audience.color}`} />
-        <span className="text-xs font-medium">{audience.label}</span>
-      </div>
-    </TooltipTrigger>
-    <TooltipContent className="max-w-xs text-center">
-      {audience.description}
-    </TooltipContent>
-  </Tooltip>
-))}
+// Change to:
+<CarouselItem className="basis-[88%]">
 ```
+
+Apply to all 4 CarouselItems:
+- Slide 1: Leaderboard (line ~651)
+- Slide 2: Ratings (line ~725)
+- Slide 3: Comments (line ~804)
+- Slide 4: Testimonials (line ~901)
+
+**Step 2: Add container padding for peek visibility**
+```tsx
+// Current:
+<div className="md:hidden mb-6">
+  <Carousel setApi={setCarouselApi} className="w-full">
+    <CarouselContent>
+
+// Change to:
+<div className="md:hidden mb-6 px-4">
+  <Carousel setApi={setCarouselApi} className="w-full">
+    <CarouselContent className="-ml-2">
+```
+
+The `-ml-2` counteracts the default `-ml-4` for tighter spacing, and `px-4` on the wrapper provides edge visibility.
+
+**Step 3: Add gap adjustment to CarouselItems**
+```tsx
+<CarouselItem className="pl-2 basis-[88%]">
+```
+
+The `pl-2` creates consistent spacing between cards (matching the `-ml-2` on CarouselContent).
 
 ---
 
 ## Visual Result
-- Icons will be 50% larger (16px → 24px)
-- Hovering over any audience icon immediately shows a tooltip with helpful description
-- Tooltip has a consistent primary-colored background that stays visible over changing hero images
-- Clean, non-intrusive presentation that adds value without clutter
+
+```text
+Before (current):
++---------------------------+
+|                           |
+|     [Leaderboard Card]    |  <- Full width, no hint of other cards
+|                           |
++---------------------------+
+         ●  ○  ○  ○
+
+After (with peek effect):
++---------------------------+
+|   |                   |   |
+| ← | [Leaderboard Card]| → |  <- Partial cards visible on sides
+|   |                   |   |
++---------------------------+
+         ●  ○  ○  ○
+```
+
+---
+
+## Mobile Optimization Verification
+Per project guidelines, all changes will be verified across mobile states:
+
+- **Width 320px** (iPhone SE): Cards still fit, ~10% visible on sides
+- **Width 375px** (iPhone 13 mini): Good balance of main card and peek
+- **Width 390px** (iPhone 14): Optimal display
+- **Width 414px** (iPhone Plus models): Slightly more peek visible
+
+The `basis-[88%]` value ensures:
+- Main card has ~88% of container width (readable content)
+- ~6% visible on each side (clear swipe affordance)
+- Cards remain touch-friendly (min 44px tap targets preserved)
+
+---
+
+## Summary of Changes
+
+| Location | Current | After |
+|----------|---------|-------|
+| Container div | `className="md:hidden mb-6"` | `className="md:hidden mb-6 px-4"` |
+| CarouselContent | (default) | `className="-ml-2"` |
+| All 4 CarouselItems | (no custom class) | `className="pl-2 basis-[88%]"` |
+
+This maintains full mobile optimization while clearly signaling swipeable content through partial card visibility.
