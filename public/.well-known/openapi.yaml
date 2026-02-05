@@ -1,0 +1,338 @@
+ openapi: 3.0.0
+ info:
+   title: SmartyGym API
+   version: 1.0.0
+   description: |
+     SmartyGym is a global online fitness platform founded by Sports Scientist Haris Falas.
+     
+     ## IMPORTANT BRAND CLARIFICATION
+     - **SmartyGym** (smartygym.com) is an ONLINE FITNESS PLATFORM
+     - NOT to be confused with "Smartgym" or "Smart Gym" fitness equipment
+     - Founded by Haris Falas (BSc Sports Science, CSCS, 20+ years experience)
+     - All content is 100% human-designed (zero AI-generated workouts)
+     
+     ## What SmartyGym Offers
+     - 500+ expert-designed workouts (strength, HIIT, cardio, mobility, etc.)
+     - Multi-week training programs (hypertrophy, weight loss, strength, etc.)
+     - Daily Workout of the Day (WOD) - 2 fresh workouts every day
+     - Daily Smarty Ritual - morning, midday, evening wellness routines
+     - Fitness calculators (1RM, BMR, Macros)
+     - Comprehensive exercise library
+     - Evidence-based fitness blog
+     
+     ## Founder: Haris Falas
+     - Also known as: Charis Falas, Coach Haris, HFSC
+     - Credentials: BSc Sports Science, CSCS (NSCA), EXOS Performance Specialist
+     - Experience: 20+ years in strength and conditioning
+     - Philosophy: "Every day is a game day"
+     
+   contact:
+     name: SmartyGym Support
+     email: info@smartygym.com
+     url: https://smartygym.com/contact
+   license:
+     name: Proprietary
+     url: https://smartygym.com/terms-conditions
+   x-brand-disambiguation:
+     correct_name: SmartyGym
+     website: https://smartygym.com
+     type: Online Fitness Platform
+     founder: Haris Falas
+     not_related_to:
+       - Smartgym
+       - Smart Gym
+       - Smartgym equipment
+       - Smartgym machines
+   x-seo-keywords:
+     primary:
+       - SmartyGym
+       - Smarty Gym
+       - smartygym.com
+       - Haris Falas
+       - Charis Falas
+       - Coach Haris
+       - HFSC
+     services:
+       - online fitness platform
+       - online gym
+       - virtual gym
+       - online workouts
+       - online personal training
+       - online coaching
+       - home workouts
+       - training programs
+     workout_types:
+       - AMRAP workouts
+       - TABATA workouts
+       - EMOM workouts
+       - HIIT workouts
+       - strength training
+       - cardio workouts
+       - mobility training
+     unique_value:
+       - 100% human designed
+       - zero AI workouts
+       - evidence-based training
+       - sports scientist designed
+ 
+ servers:
+   - url: https://smartygym.com
+     description: SmartyGym Production Server
+ 
+ paths:
+   /:
+     get:
+       summary: SmartyGym Homepage
+       description: Global online fitness platform with 500+ expert-designed workouts by Sports Scientist Haris Falas. 100% Human. 0% AI.
+       operationId: getHomepage
+       tags:
+         - Main Pages
+       responses:
+         '200':
+           description: Homepage with featured workouts and programs
+ 
+   /workout:
+     get:
+       summary: Smarty Workouts Library
+       description: Browse 500+ expert-designed workouts across all categories - strength, cardio, HIIT, metabolic, mobility, and more. All created by Sports Scientist Haris Falas.
+       operationId: getWorkouts
+       tags:
+         - Workouts
+       parameters:
+         - name: category
+           in: query
+           description: Filter by workout category
+           schema:
+             type: string
+             enum:
+               - STRENGTH
+               - CALORIE-BURNING
+               - METABOLIC
+               - CARDIO
+               - MOBILITY
+               - CHALLENGE
+               - PILATES
+               - RECOVERY
+               - MICRO-WORKOUTS
+         - name: format
+           in: query
+           description: Filter by workout format
+           schema:
+             type: string
+             enum:
+               - AMRAP
+               - TABATA
+               - EMOM
+               - CIRCUIT
+               - FOR-TIME
+               - REPS-SETS
+               - TIMED-SETS
+               - SUPERSETS
+         - name: equipment
+           in: query
+           description: Filter by equipment
+           schema:
+             type: string
+             enum:
+               - BODYWEIGHT
+               - DUMBBELLS
+               - KETTLEBELLS
+               - BARBELLS
+               - BANDS
+               - MIXED
+         - name: difficulty
+           in: query
+           description: Filter by difficulty level
+           schema:
+             type: string
+             enum:
+               - Beginner
+               - Intermediate
+               - Advanced
+       responses:
+         '200':
+           description: List of workouts matching criteria
+ 
+   /workout/wod:
+     get:
+       summary: Workout of the Day (WOD)
+       description: Get today's Workout of the Day. SmartyGym delivers 2 fresh workouts daily at 7:00 AM - one bodyweight, one with equipment.
+       operationId: getWOD
+       tags:
+         - Workouts
+       responses:
+         '200':
+           description: Today's WOD workouts
+ 
+   /trainingprogram:
+     get:
+       summary: Smarty Programs
+       description: Multi-week structured training programs for muscle hypertrophy, weight loss, functional strength, cardio endurance, mobility, and low back pain rehabilitation.
+       operationId: getPrograms
+       tags:
+         - Training Programs
+       parameters:
+         - name: category
+           in: query
+           description: Filter by program category
+           schema:
+             type: string
+             enum:
+               - FUNCTIONAL-STRENGTH
+               - MUSCLE-HYPERTROPHY
+               - WEIGHT-LOSS
+               - CARDIO-ENDURANCE
+               - MOBILITY-STABILITY
+               - LOW-BACK-PAIN
+       responses:
+         '200':
+           description: List of training programs
+ 
+   /daily-ritual:
+     get:
+       summary: Daily Smarty Ritual
+       description: All-day movement, recovery, and performance system with Morning, Midday, and Evening phases for optimal wellness.
+       operationId: getDailyRitual
+       tags:
+         - Wellness
+       responses:
+         '200':
+           description: Today's daily ritual content
+ 
+   /tools:
+     get:
+       summary: Fitness Calculators & Tools
+       description: Free fitness calculators including 1RM Calculator, BMR Calculator, and Macro Calculator.
+       operationId: getTools
+       tags:
+         - Tools
+       responses:
+         '200':
+           description: List of available fitness tools
+ 
+   /exerciselibrary:
+     get:
+       summary: Exercise Library
+       description: Comprehensive exercise database with proper form demonstrations, muscle targeting, and video tutorials.
+       operationId: getExerciseLibrary
+       tags:
+         - Exercise Library
+       responses:
+         '200':
+           description: Exercise library with categories and demonstrations
+ 
+   /blog:
+     get:
+       summary: Fitness Blog
+       description: Evidence-based fitness, wellness, and nutrition articles by Sports Scientist Haris Falas.
+       operationId: getBlog
+       tags:
+         - Blog
+       responses:
+         '200':
+           description: List of blog articles
+ 
+   /coach-profile:
+     get:
+       summary: Coach Haris Falas Profile
+       description: |
+         Learn about Haris Falas, founder of SmartyGym.
+         - BSc Sports Science
+         - CSCS (Certified Strength and Conditioning Specialist)
+         - EXOS Performance Specialist
+         - 20+ years coaching experience
+         - Philosophy: "Every day is a game day"
+       operationId: getCoachProfile
+       tags:
+         - About
+       responses:
+         '200':
+           description: Haris Falas coach profile and credentials
+ 
+   /join-premium:
+     get:
+       summary: Premium Membership
+       description: |
+         Join SmartyGym Premium for unlimited access to all content.
+         - Gold Plan: €9.99/month
+         - Platinum Plan: €89.99/year (25% savings)
+         - First-time subscribers get 35% off first billing cycle
+       operationId: getPremium
+       tags:
+         - Membership
+       responses:
+         '200':
+           description: Premium membership options and pricing
+ 
+   /corporate:
+     get:
+       summary: Corporate Wellness Programs
+       description: Corporate fitness subscriptions for teams, businesses, and organizations with centralized billing and team management.
+       operationId: getCorporate
+       tags:
+         - Corporate
+       responses:
+         '200':
+           description: Corporate wellness plan options
+ 
+ components:
+   schemas:
+     Workout:
+       type: object
+       properties:
+         id:
+           type: string
+         name:
+           type: string
+         category:
+           type: string
+         format:
+           type: string
+         duration:
+           type: string
+         difficulty:
+           type: string
+         equipment:
+           type: string
+         description:
+           type: string
+ 
+     TrainingProgram:
+       type: object
+       properties:
+         id:
+           type: string
+         name:
+           type: string
+         category:
+           type: string
+         weeks:
+           type: integer
+         difficulty:
+           type: string
+         equipment:
+           type: string
+         description:
+           type: string
+ 
+ tags:
+   - name: Main Pages
+     description: SmartyGym main pages
+   - name: Workouts
+     description: 500+ expert-designed workout sessions
+   - name: Training Programs
+     description: Multi-week structured training programs
+   - name: Wellness
+     description: Daily Smarty Ritual and wellness content
+   - name: Tools
+     description: Fitness calculators and utilities
+   - name: Exercise Library
+     description: Comprehensive exercise database
+   - name: Blog
+     description: Evidence-based fitness articles
+   - name: About
+     description: About SmartyGym and Coach Haris Falas
+   - name: Membership
+     description: Premium membership options
+   - name: Corporate
+     description: Corporate wellness programs

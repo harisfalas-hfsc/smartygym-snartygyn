@@ -279,7 +279,9 @@ export const generatePersonSchema = () => {
     "image": "https://smartygym.com/haris-falas-coach.png",
     "sameAs": [
       "https://www.instagram.com/smartygymcy/",
-      "https://www.youtube.com/@TheSmartyGym"
+       "https://www.youtube.com/@TheSmartyGym"
+       // PLACEHOLDER: Add Wikidata URL once created
+       // "https://www.wikidata.org/wiki/Q_HARIS_FALAS"
     ],
     "award": "20+ Years Coaching Experience"
   };
@@ -328,7 +330,9 @@ export const generateOrganizationSchema = () => {
       "https://smartyworkout.com",
       "https://www.instagram.com/smartygymcy/",
       "https://www.facebook.com/smartygym",
-      "https://www.youtube.com/@TheSmartyGym"
+       "https://www.youtube.com/@TheSmartyGym"
+       // PLACEHOLDER: Add Wikidata URL once created
+       // "https://www.wikidata.org/wiki/Q_SMARTYGYM"
     ]
   };
 };
