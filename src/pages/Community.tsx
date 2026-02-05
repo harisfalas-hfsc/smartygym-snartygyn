@@ -643,12 +643,12 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
             </CardContent>
           </Card>
 
-          {/* Mobile: Carousel of all community cards */}
-          <div className="md:hidden mb-6">
+          {/* Mobile: Carousel of all community cards with peek effect */}
+          <div className="md:hidden mb-6 px-4">
             <Carousel setApi={setCarouselApi} className="w-full">
-              <CarouselContent>
+              <CarouselContent className="-ml-2">
                 {/* Slide 1: Leaderboard */}
-                <CarouselItem>
+                <CarouselItem className="pl-2 basis-[88%]">
                   <Card className="border-2 border-primary/30 shadow-lg h-full">
                     <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4">
                       <CardTitle className="flex items-center gap-2 text-lg">
@@ -722,7 +722,7 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                 </CarouselItem>
 
                 {/* Slide 2: Ratings */}
-                <CarouselItem>
+                <CarouselItem className="pl-2 basis-[88%]">
                   <Card className="border-2 border-primary/30 shadow-lg h-full">
                     <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4">
                       <CardTitle className="flex items-center gap-2 text-lg">
@@ -801,7 +801,7 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                 </CarouselItem>
 
                 {/* Slide 3: Comments */}
-                <CarouselItem>
+                <CarouselItem className="pl-2 basis-[88%]">
                   <Card className="border-2 border-primary/30 shadow-lg h-full">
                     <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4">
                       <CardTitle className="flex items-center gap-2 text-lg">
@@ -898,7 +898,7 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                 </CarouselItem>
 
                 {/* Slide 4: Testimonials */}
-                <CarouselItem>
+                <CarouselItem className="pl-2 basis-[88%]">
                   <TestimonialsSection compact />
                 </CarouselItem>
               </CarouselContent>
