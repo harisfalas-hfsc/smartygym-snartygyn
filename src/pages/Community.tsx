@@ -114,6 +114,7 @@ const Community = () => {
     });
   };
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
+  const [testimonialsSortOrder, setTestimonialsSortOrder] = useState<"newest" | "oldest">("newest");
   
   
   // Modal state for comments only (Leaderboard and Ratings are top 6 competitions)
@@ -696,18 +697,42 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
             </CardContent>
           </Card>
 
-          {/* Mobile: Swipe indicator */}
-          <div className="md:hidden flex items-center justify-center gap-2 mb-4 text-muted-foreground animate-pulse">
-            <ChevronLeft className="h-4 w-4" />
-            <span className="text-xs">Swipe to explore</span>
-            <ChevronRight className="h-4 w-4" />
+          {/* Mobile: Swipe indicator - clickable arrows */}
+          <div className="md:hidden flex items-center justify-center gap-3 mb-4 text-muted-foreground">
+            <button 
+              onClick={() => carouselApi?.scrollPrev()}
+              className="p-1 hover:text-primary transition-colors active:scale-95"
+              aria-label="Previous slide"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <span className="text-xs animate-pulse">Swipe to explore</span>
+            <button 
+              onClick={() => carouselApi?.scrollNext()}
+              className="p-1 hover:text-primary transition-colors active:scale-95"
+              aria-label="Next slide"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
           </div>
 
-          {/* Desktop: Swipe indicator (same placement as mobile) */}
-          <div className="hidden md:flex items-center justify-center gap-2 mb-6 text-muted-foreground animate-pulse">
-            <ChevronLeft className="h-4 w-4" />
-            <span className="text-xs">Swipe to explore</span>
-            <ChevronRight className="h-4 w-4" />
+          {/* Desktop: Swipe indicator - clickable arrows */}
+          <div className="hidden md:flex items-center justify-center gap-3 mb-6 text-muted-foreground">
+            <button 
+              onClick={() => desktopCarouselApi?.scrollPrev()}
+              className="p-1 hover:text-primary transition-colors active:scale-95"
+              aria-label="Previous slide"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <span className="text-xs animate-pulse">Swipe to explore</span>
+            <button 
+              onClick={() => desktopCarouselApi?.scrollNext()}
+              className="p-1 hover:text-primary transition-colors active:scale-95"
+              aria-label="Next slide"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
           </div>
 
           {/* Mobile: Carousel of all community cards with peek effect */}
@@ -882,6 +907,7 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                         Comments
                       </CardTitle>
                       <CompactFilters
+                        compact
                         filters={[
                           {
                             name: "Type",
@@ -899,8 +925,8 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                             value: sortOrder,
                             onChange: (value) => setSortOrder(value as "newest" | "oldest"),
                             options: [
-                              { value: "newest", label: "Newest" },
-                              { value: "oldest", label: "Oldest" }
+                              { value: "newest", label: "New" },
+                              { value: "oldest", label: "Old" }
                             ],
                             placeholder: "Sort"
                           }
@@ -1343,13 +1369,31 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
                 <CarouselItem className="pl-4 basis-[70%]">
                   <Card className="h-[600px] border-2 border-primary/30 shadow-lg flex flex-col">
                     <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4 md:p-6">
-                      <CardTitle className="flex items-center gap-2 text-xl md:text-2xl">
+                      <CardTitle className="flex items-center gap-2 text-xl md:text-2xl mb-4">
                         <Quote className="h-5 w-5 md:h-6 md:w-6 text-primary" />
                         Testimonials
                       </CardTitle>
+                      <CompactFilters
+                        filters={[
+                          {
+                            name: "Sort",
+                            value: testimonialsSortOrder,
+                            onChange: (value) => setTestimonialsSortOrder(value as "newest" | "oldest"),
+                            options: [
+                              { value: "newest", label: "Newest First" },
+                              { value: "oldest", label: "Oldest First" }
+                            ],
+                            placeholder: "Sort by"
+                          }
+                        ]}
+                      />
                     </CardHeader>
                     <CardContent className="p-4 md:pt-6 flex-1 overflow-auto">
-                      <TestimonialsSection desktopCarouselMode />
+                      <TestimonialsSection 
+                        desktopCarouselMode 
+                        externalSortOrder={testimonialsSortOrder}
+                        onSortOrderChange={setTestimonialsSortOrder}
+                      />
                     </CardContent>
                   </Card>
                 </CarouselItem>
