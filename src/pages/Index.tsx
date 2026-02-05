@@ -5,7 +5,7 @@ import { ServiceCard } from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap, Check, Crown, ChevronDown, ChevronRight, Move, Ban, Brain, CheckCircle2, Award, Shield, Compass, Sparkles, Info, User, HelpCircle, ShoppingBag, Star, TrendingUp, Clock, CalendarCheck } from "lucide-react";
+import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap, Check, Crown, ChevronDown, ChevronLeft, ChevronRight, Move, Ban, Brain, CheckCircle2, Award, Shield, Compass, Sparkles, Info, User, HelpCircle, ShoppingBag, Star, TrendingUp, Clock, CalendarCheck } from "lucide-react";
 import { getCyprusTodayStr } from "@/lib/cyprusDate";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -531,6 +531,27 @@ const Index = () => {
       <div className="min-h-screen bg-background overflow-x-hidden">
         
         {isMobile ? <section className="pt-12 pb-2 px-4">
+            {/* Mobile swipe indicator (homepage carousel) */}
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <button
+                type="button"
+                onClick={() => carouselApi?.scrollPrev()}
+                className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors"
+                aria-label="Previous card"
+              >
+                <ChevronLeft className="h-4 w-4 text-primary" />
+              </button>
+              <span className="text-xs text-muted-foreground font-medium">Swipe to explore</span>
+              <button
+                type="button"
+                onClick={() => carouselApi?.scrollNext()}
+                className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors"
+                aria-label="Next card"
+              >
+                <ChevronRight className="h-4 w-4 text-primary" />
+              </button>
+            </div>
+
             <Carousel className="w-full" opts={{
           align: "center",
           loop: true
