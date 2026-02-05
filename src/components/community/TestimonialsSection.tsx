@@ -322,7 +322,7 @@ export const TestimonialsSection = ({ compact = false, desktopCarouselMode = fal
         <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4">
           <CardTitle className="flex items-center gap-2 text-lg">
             <Quote className="h-5 w-5 text-primary" />
-            Community Testimonials
+            Testimonials
           </CardTitle>
         </CardHeader>
         <CardContent className="p-3 flex-1 overflow-auto">
