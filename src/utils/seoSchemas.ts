@@ -104,7 +104,15 @@ export const generateFitnessCenterSchemaFull = () => ({
   "sameAs": [
     "https://www.instagram.com/smartygymcy/",
     "https://www.youtube.com/@TheSmartyGym",
-    "https://www.facebook.com/smartygym"
+     "https://www.facebook.com/smartygym",
+     // Multi-domain network - all redirect to smartygym.com
+     "https://i-training.net",
+     "https://smartywod.com",
+     "https://smartylogbook.com",
+     "https://smartywellness.com",
+     "https://smartyworkout.com"
+     // PLACEHOLDER: Add Wikidata URL once created
+     // "https://www.wikidata.org/wiki/Q_SMARTYGYM"
   ],
   "contactPoint": {
     "@type": "ContactPoint",

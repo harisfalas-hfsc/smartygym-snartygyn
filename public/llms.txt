@@ -422,12 +422,41 @@
 - Robots: https://smartygym.com/robots.txt
 - LLMs: https://smartygym.com/llms.txt
 - AI Plugin: https://smartygym.com/.well-known/ai-plugin.json
+- OpenAPI: https://smartygym.com/.well-known/openapi.yaml
 - AI Knowledge: https://smartygym.com/ai.txt
 - All public content freely indexable
 - No paywalls blocking crawlers
 - Dynamic content from database with SEO optimization
 - Structured data (JSON-LD) on all pages
 - Optimized for AI search engines: ChatGPT, Claude, Perplexity, Gemini, Copilot, Grok
+- IndexNow integration for instant Bing/Yandex indexing
+
+---
+
+## Knowledge Graph & Authority Signals
+
+### Wikidata References (PLACEHOLDER - TO BE CREATED)
+- **SmartyGym Organization**: https://www.wikidata.org/wiki/Q_PLACEHOLDER_SMARTYGYM
+- **Haris Falas Person**: https://www.wikidata.org/wiki/Q_PLACEHOLDER_HARIS
+
+### Official Social Profiles
+- **Instagram**: https://www.instagram.com/smartygymcy/
+- **YouTube**: https://www.youtube.com/@TheSmartyGym
+- **Facebook**: https://www.facebook.com/smartygym
+
+### Multi-Domain Network (All redirect to smartygym.com)
+- smartygym.com (primary)
+- i-training.net
+- smartywod.com
+- smartylogbook.com
+- smartywellness.com
+- smartyworkout.com
+
+### Search Engine Verification
+- **Bing Webmaster Tools**: Verified (primary for ChatGPT web search)
+- **Google Search Console**: Verified
+- **Brave Search**: Submitted (primary for Claude web search)
+- **IndexNow**: Active (instant indexing to Bing/Yandex)
 
 ---
 
