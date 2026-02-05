@@ -28,9 +28,11 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
   type CarouselApi,
 } from "@/components/ui/carousel";
-import { Trophy, MessageSquare, Star, User, Calendar, ClipboardCheck, ArrowLeft, Eye, Award, Quote } from "lucide-react";
+import { Trophy, MessageSquare, Star, User, Calendar, ClipboardCheck, ArrowLeft, Eye, Award, Quote, ChevronLeft, ChevronRight } from "lucide-react";
 import { TestimonialsSection } from "@/components/community/TestimonialsSection";
 import { formatDistanceToNow } from "date-fns";
 import { CompactFilters } from "@/components/CompactFilters";
@@ -121,11 +123,15 @@ const Community = () => {
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [selectedSlide, setSelectedSlide] = useState(0);
 
+  // Desktop carousel state
+  const [desktopCarouselApi, setDesktopCarouselApi] = useState<CarouselApi>();
+  const [desktopSelectedSlide, setDesktopSelectedSlide] = useState(0);
+
   // Keep all mobile carousel cards the same height as the Leaderboard card
   const leaderboardCardRef = useRef<HTMLDivElement | null>(null);
   const [mobileCarouselCardHeight, setMobileCarouselCardHeight] = useState<number | null>(null);
 
-  // Update selected slide when carousel changes
+  // Update selected slide when mobile carousel changes
   useEffect(() => {
     if (!carouselApi) return;
     
@@ -140,6 +146,22 @@ const Community = () => {
       carouselApi.off("select", onSelect);
     };
   }, [carouselApi]);
+
+  // Update selected slide when desktop carousel changes
+  useEffect(() => {
+    if (!desktopCarouselApi) return;
+    
+    const onSelect = () => {
+      setDesktopSelectedSlide(desktopCarouselApi.selectedScrollSnap());
+    };
+    
+    desktopCarouselApi.on("select", onSelect);
+    onSelect();
+    
+    return () => {
+      desktopCarouselApi.off("select", onSelect);
+    };
+  }, [desktopCarouselApi]);
 
 
   useEffect(() => {
@@ -674,6 +696,13 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
             </CardContent>
           </Card>
 
+          {/* Mobile: Swipe indicator */}
+          <div className="md:hidden flex items-center justify-center gap-2 mb-4 text-muted-foreground animate-pulse">
+            <ChevronLeft className="h-4 w-4" />
+            <span className="text-xs">Swipe to explore</span>
+            <ChevronRight className="h-4 w-4" />
+          </div>
+
           {/* Mobile: Carousel of all community cards with peek effect */}
           <div className="md:hidden mb-6 px-4">
             <Carousel setApi={setCarouselApi} className="w-full">
@@ -960,316 +989,359 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
             </div>
           </div>
 
-          {/* Desktop: Original stacked layout */}
-          <div className="hidden md:block">
-            {/* Unified Leaderboard Section */}
-          <Card 
-            itemScope
-            itemType="https://schema.org/ItemList"
-            className="mb-6 md:mb-8 border-2 border-primary/30 shadow-lg"
-            data-keywords="smarty gym community, online gym leaderboard, online fitness community, smartygym.com, Haris Falas"
-            aria-label="Community Leaderboard - SmartyGym online fitness community - smartygym.com"
-          >
-            <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4 md:p-6">
-              <CardTitle 
-                className="flex items-center gap-2 text-xl md:text-2xl mb-4"
-                itemProp="name"
-              >
-                <Trophy className="h-5 w-5 md:h-6 md:w-6 text-primary" />
-                Community Leaderboard
-              </CardTitle>
-              <CompactFilters
-                filters={[
-                  {
-                    name: "Type",
-                    value: leaderboardFilter,
-                    onChange: (value) => setLeaderboardFilter(value as "workouts" | "programs" | "checkins"),
-                    options: [
-                      { value: "workouts", label: "Workouts" },
-                      { value: "programs", label: "Training Programs" },
-                      { value: "checkins", label: "Check-ins" }
-                    ],
-                    placeholder: "Select type"
-                  }
-                ]}
-              />
-            </CardHeader>
-            <CardContent className="p-4 md:pt-6">
-              {isLoadingLeaderboard ? (
-                <div className="space-y-3">
-                  {[...Array(10)].map((_, i) => (
-                    <Skeleton key={i} className="h-12 w-full" />
-                  ))}
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="border-primary/30">
-                        <TableHead className="w-12 md:w-16 text-xs md:text-sm">Rank</TableHead>
-                        <TableHead className="text-xs md:text-sm">Member</TableHead>
-                        <TableHead className="text-right text-xs md:text-sm">{leaderboardFilter === "checkins" ? "Consistency Score" : "Completions"}</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {getLeaderboardWithPlaceholders().map((entry, index) => (
-                        <TableRow
-                          key={entry?.user_id || `empty-${index}`}
-                          className="border-primary/20 hover:bg-primary/5"
-                        >
-                          <TableCell className="font-medium text-xs md:text-sm py-2 md:py-3">
-                            <div className="flex items-center gap-1 md:gap-2">
-                              <span className="text-base md:text-lg">{getMedalIcon(index)}</span>
-                            </div>
-                          </TableCell>
-                          <TableCell className="py-2 md:py-3">
-                            {entry ? (
-                              <div className="flex items-center gap-1 md:gap-2">
-                                <User className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground flex-shrink-0" />
-                                <span className="font-medium text-xs md:text-sm truncate">{entry.display_name}</span>
-                              </div>
-                            ) : (
-                              <span className="text-muted-foreground italic text-xs md:text-sm">Awaiting competitor...</span>
-                            )}
-                          </TableCell>
-                          <TableCell className="text-right py-2 md:py-3">
-                            {entry ? (
-                              <span className="inline-flex items-center gap-1 px-2 md:px-3 py-0.5 md:py-1 rounded-full bg-primary/10 text-primary font-semibold text-xs md:text-sm whitespace-nowrap">
-                                {entry.total_completions}
-                              </span>
-                            ) : (
-                              <span className="text-muted-foreground">---</span>
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Most Rated Section */}
-          <Card className="mb-6 md:mb-8 border-2 border-primary/30 shadow-lg">
-            <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4 md:p-6">
-              <CardTitle className="flex items-center gap-2 text-xl md:text-2xl mb-4">
-                <Star className="h-5 w-5 md:h-6 md:w-6 text-primary" />
-                Community Ratings
-              </CardTitle>
-              <CompactFilters
-                filters={[
-                  {
-                    name: "Type",
-                    value: ratingsFilter,
-                    onChange: (value) => setRatingsFilter(value as "workouts" | "programs"),
-                    options: [
-                      { value: "workouts", label: "Workouts" },
-                      { value: "programs", label: "Training Programs" }
-                    ],
-                    placeholder: "Select type"
-                  }
-                ]}
-              />
-            </CardHeader>
-            <CardContent className="p-4 md:pt-6">
-              {isLoadingRatings ? (
-                <div className="space-y-3">
-                  {[...Array(10)].map((_, i) => (
-                    <Skeleton key={i} className="h-12 w-full" />
-                  ))}
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="border-primary/30">
-                        <TableHead className="w-12 md:w-16 text-xs md:text-sm">Rank</TableHead>
-                        <TableHead className="text-xs md:text-sm">Name</TableHead>
-                        <TableHead className="text-center text-xs md:text-sm">Rating</TableHead>
-                        <TableHead className="text-right text-xs md:text-sm">Reviews</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {getRatingsWithPlaceholders().map((item, index) => (
-                        <TableRow
-                          key={item?.content_id || `empty-${index}`}
-                          className="border-primary/20 hover:bg-primary/5"
-                        >
-                          <TableCell className="font-medium text-xs md:text-sm py-2 md:py-3">
-                            <div className="flex items-center gap-1 md:gap-2">
-                              <span className="text-base md:text-lg">{getMedalIcon(index)}</span>
-                            </div>
-                          </TableCell>
-                          <TableCell className="py-2 md:py-3">
-                            {item ? (
-                              <Link 
-                                to={item.content_type === "workout" 
-                                  ? `/workout/${item.workout_type}/${item.content_id}`
-                                  : `/trainingprogram/${item.program_type}/${item.content_id}`
-                                }
-                                className="font-medium text-xs md:text-sm truncate text-primary hover:underline"
-                              >
-                                {item.content_name}
-                              </Link>
-                            ) : (
-                              <span className="text-muted-foreground italic text-xs md:text-sm">Awaiting rating...</span>
-                            )}
-                          </TableCell>
-                          <TableCell className="text-center py-2 md:py-3">
-                            {item ? (
-                              <div className="flex items-center justify-center gap-1">
-                                <Star className="h-3 w-3 md:h-4 md:w-4 fill-primary text-primary" />
-                                <span className="font-semibold text-xs md:text-sm">{item.average_rating.toFixed(1)}</span>
-                              </div>
-                            ) : (
-                              <span className="text-muted-foreground">---</span>
-                            )}
-                          </TableCell>
-                          <TableCell className="text-right py-2 md:py-3">
-                            {item ? (
-                              <span className="inline-flex items-center gap-1 px-2 md:px-3 py-0.5 md:py-1 rounded-full bg-primary/10 text-primary font-semibold text-xs md:text-sm whitespace-nowrap">
-                                {item.rating_count}
-                              </span>
-                            ) : (
-                              <span className="text-muted-foreground">---</span>
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Comments Section */}
-          <Card className="border-2 border-primary/30 shadow-lg">
-            <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4 md:p-6">
-              <CardTitle className="flex items-center gap-2 text-xl md:text-2xl mb-4">
-                <MessageSquare className="h-5 w-5 md:h-6 md:w-6 text-primary" />
-                Community Comments
-              </CardTitle>
-              <CompactFilters
-                filters={[
-                  {
-                    name: "Type",
-                    value: commentsFilter,
-                    onChange: (value) => setCommentsFilter(value as "all" | "workouts" | "programs"),
-                    options: [
-                      { value: "all", label: "All Comments" },
-                      { value: "workouts", label: "Workouts" },
-                      { value: "programs", label: "Training Programs" }
-                    ],
-                    placeholder: "Select type"
-                  },
-                  {
-                    name: "Sort",
-                    value: sortOrder,
-                    onChange: (value) => setSortOrder(value as "newest" | "oldest"),
-                    options: [
-                      { value: "newest", label: "Newest First" },
-                      { value: "oldest", label: "Oldest First" }
-                    ],
-                    placeholder: "Sort by"
-                  }
-                ]}
-              />
-            </CardHeader>
-            <CardContent className="p-4 md:pt-6">
-              {isLoadingComments ? (
-                <div className="space-y-4">
-                  {[...Array(6)].map((_, i) => (
-                    <div key={i} className="space-y-2">
-                      <Skeleton className="h-6 w-3/4" />
-                      <Skeleton className="h-16 w-full" />
-                    </div>
-                  ))}
-                </div>
-              ) : comments.length === 0 ? (
-                <div className="text-center py-12 text-muted-foreground">
-                  <MessageSquare className="h-12 w-12 mx-auto mb-4 opacity-30" />
-                  <p className="text-lg font-medium mb-2">
-                    No comments yet
-                  </p>
-                  <p className="text-sm">
-                    Be the first premium member to share your experience!
-                  </p>
-                </div>
-              ) : (
-                <>
-                  <div className="space-y-3 md:space-y-4">
-                    {getTopComments().map((comment) => (
-                      <div
-                        key={comment.id}
-                        className="p-3 md:p-4 rounded-lg border-2 border-primary/20 bg-gradient-to-r from-background to-primary/5 hover:border-primary/40 transition-colors"
+          {/* Desktop: Carousel with peek effect */}
+          <div className="hidden md:block mb-6">
+            <Carousel 
+              setApi={setDesktopCarouselApi} 
+              opts={{ align: "center", loop: true }}
+              className="w-full"
+            >
+              <CarouselContent className="-ml-4">
+                {/* Slide 1: Leaderboard */}
+                <CarouselItem className="pl-4 basis-[70%]">
+                  <Card 
+                    itemScope
+                    itemType="https://schema.org/ItemList"
+                    className="h-[600px] border-2 border-primary/30 shadow-lg flex flex-col"
+                    data-keywords="smarty gym community, online gym leaderboard, online fitness community, smartygym.com, Haris Falas"
+                    aria-label="Community Leaderboard - SmartyGym online fitness community - smartygym.com"
+                  >
+                    <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4 md:p-6">
+                      <CardTitle 
+                        className="flex items-center gap-2 text-xl md:text-2xl mb-4"
+                        itemProp="name"
                       >
-                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-2">
-                          <div className="flex items-center gap-2">
-                            <User className="h-3 w-3 md:h-4 md:w-4 text-primary flex-shrink-0" />
-                            <span className="font-semibold text-xs md:text-sm truncate">
-                              {comment.display_name}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-1 text-xs text-muted-foreground whitespace-nowrap">
-                            <Calendar className="h-3 w-3" />
-                            <span className="text-[10px] md:text-xs">
-                              {formatDistanceToNow(new Date(comment.created_at), {
-                                addSuffix: true,
-                              })}
-                            </span>
-                          </div>
+                        <Trophy className="h-5 w-5 md:h-6 md:w-6 text-primary" />
+                        Community Leaderboard
+                      </CardTitle>
+                      <CompactFilters
+                        filters={[
+                          {
+                            name: "Type",
+                            value: leaderboardFilter,
+                            onChange: (value) => setLeaderboardFilter(value as "workouts" | "programs" | "checkins"),
+                            options: [
+                              { value: "workouts", label: "Workouts" },
+                              { value: "programs", label: "Training Programs" },
+                              { value: "checkins", label: "Check-ins" }
+                            ],
+                            placeholder: "Select type"
+                          }
+                        ]}
+                      />
+                    </CardHeader>
+                    <CardContent className="p-4 md:pt-6 flex-1 overflow-auto">
+                      {isLoadingLeaderboard ? (
+                        <div className="space-y-3">
+                          {[...Array(10)].map((_, i) => (
+                            <Skeleton key={i} className="h-12 w-full" />
+                          ))}
                         </div>
-                        <p className="text-[10px] md:text-xs text-primary font-medium mb-2">
-                          {comment.workout_name ? (
-                            <>
-                              Workout:{" "}
-                              <Link
-                                to={`/workout/${comment.workout_type}/${comment.workout_id}`}
-                                className="hover:underline font-semibold"
-                              >
-                                {comment.workout_name}
-                              </Link>
-                            </>
-                          ) : (
-                            <>
-                              Program:{" "}
-                              <Link
-                                to={`/trainingprogram/${comment.program_type}/${comment.program_id}`}
-                                className="hover:underline font-semibold"
-                              >
-                                {comment.program_name}
-                              </Link>
-                            </>
-                          )}
-                        </p>
-                        <p className="text-xs md:text-sm leading-relaxed">{comment.comment_text}</p>
-                      </div>
-                    ))}
-                  </div>
-                  {comments.length > 6 && (
-                    <div className="mt-4 text-center">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setShowCommentsModal(true)}
-                        className="gap-2"
-                      >
-                        <Eye className="h-4 w-4" />
-                        View All ({comments.length})
-                      </Button>
-                    </div>
-                  )}
-                </>
-              )}
-            </CardContent>
-          </Card>
+                      ) : (
+                        <div className="overflow-x-auto">
+                          <Table>
+                            <TableHeader>
+                              <TableRow className="border-primary/30">
+                                <TableHead className="w-12 md:w-16 text-xs md:text-sm">Rank</TableHead>
+                                <TableHead className="text-xs md:text-sm">Member</TableHead>
+                                <TableHead className="text-right text-xs md:text-sm">{leaderboardFilter === "checkins" ? "Consistency Score" : "Completions"}</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {getLeaderboardWithPlaceholders().map((entry, index) => (
+                                <TableRow
+                                  key={entry?.user_id || `empty-${index}`}
+                                  className="border-primary/20 hover:bg-primary/5"
+                                >
+                                  <TableCell className="font-medium text-xs md:text-sm py-2 md:py-3">
+                                    <div className="flex items-center gap-1 md:gap-2">
+                                      <span className="text-base md:text-lg">{getMedalIcon(index)}</span>
+                                    </div>
+                                  </TableCell>
+                                  <TableCell className="py-2 md:py-3">
+                                    {entry ? (
+                                      <div className="flex items-center gap-1 md:gap-2">
+                                        <User className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground flex-shrink-0" />
+                                        <span className="font-medium text-xs md:text-sm truncate">{entry.display_name}</span>
+                                      </div>
+                                    ) : (
+                                      <span className="text-muted-foreground italic text-xs md:text-sm">Awaiting competitor...</span>
+                                    )}
+                                  </TableCell>
+                                  <TableCell className="text-right py-2 md:py-3">
+                                    {entry ? (
+                                      <span className="inline-flex items-center gap-1 px-2 md:px-3 py-0.5 md:py-1 rounded-full bg-primary/10 text-primary font-semibold text-xs md:text-sm whitespace-nowrap">
+                                        {entry.total_completions}
+                                      </span>
+                                    ) : (
+                                      <span className="text-muted-foreground">---</span>
+                                    )}
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </CarouselItem>
 
-          {/* Testimonials Section */}
-          <div className="mt-6 md:mt-8">
-            <TestimonialsSection />
-          </div>
+                {/* Slide 2: Ratings */}
+                <CarouselItem className="pl-4 basis-[70%]">
+                  <Card className="h-[600px] border-2 border-primary/30 shadow-lg flex flex-col">
+                    <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4 md:p-6">
+                      <CardTitle className="flex items-center gap-2 text-xl md:text-2xl mb-4">
+                        <Star className="h-5 w-5 md:h-6 md:w-6 text-primary" />
+                        Community Ratings
+                      </CardTitle>
+                      <CompactFilters
+                        filters={[
+                          {
+                            name: "Type",
+                            value: ratingsFilter,
+                            onChange: (value) => setRatingsFilter(value as "workouts" | "programs"),
+                            options: [
+                              { value: "workouts", label: "Workouts" },
+                              { value: "programs", label: "Training Programs" }
+                            ],
+                            placeholder: "Select type"
+                          }
+                        ]}
+                      />
+                    </CardHeader>
+                    <CardContent className="p-4 md:pt-6 flex-1 overflow-auto">
+                      {isLoadingRatings ? (
+                        <div className="space-y-3">
+                          {[...Array(10)].map((_, i) => (
+                            <Skeleton key={i} className="h-12 w-full" />
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="overflow-x-auto">
+                          <Table>
+                            <TableHeader>
+                              <TableRow className="border-primary/30">
+                                <TableHead className="w-12 md:w-16 text-xs md:text-sm">Rank</TableHead>
+                                <TableHead className="text-xs md:text-sm">Name</TableHead>
+                                <TableHead className="text-center text-xs md:text-sm">Rating</TableHead>
+                                <TableHead className="text-right text-xs md:text-sm">Reviews</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {getRatingsWithPlaceholders().map((item, index) => (
+                                <TableRow
+                                  key={item?.content_id || `empty-${index}`}
+                                  className="border-primary/20 hover:bg-primary/5"
+                                >
+                                  <TableCell className="font-medium text-xs md:text-sm py-2 md:py-3">
+                                    <div className="flex items-center gap-1 md:gap-2">
+                                      <span className="text-base md:text-lg">{getMedalIcon(index)}</span>
+                                    </div>
+                                  </TableCell>
+                                  <TableCell className="py-2 md:py-3">
+                                    {item ? (
+                                      <Link 
+                                        to={item.content_type === "workout" 
+                                          ? `/workout/${item.workout_type}/${item.content_id}`
+                                          : `/trainingprogram/${item.program_type}/${item.content_id}`
+                                        }
+                                        className="font-medium text-xs md:text-sm truncate text-primary hover:underline"
+                                      >
+                                        {item.content_name}
+                                      </Link>
+                                    ) : (
+                                      <span className="text-muted-foreground italic text-xs md:text-sm">Awaiting rating...</span>
+                                    )}
+                                  </TableCell>
+                                  <TableCell className="text-center py-2 md:py-3">
+                                    {item ? (
+                                      <div className="flex items-center justify-center gap-1">
+                                        <Star className="h-3 w-3 md:h-4 md:w-4 fill-primary text-primary" />
+                                        <span className="font-semibold text-xs md:text-sm">{item.average_rating.toFixed(1)}</span>
+                                      </div>
+                                    ) : (
+                                      <span className="text-muted-foreground">---</span>
+                                    )}
+                                  </TableCell>
+                                  <TableCell className="text-right py-2 md:py-3">
+                                    {item ? (
+                                      <span className="inline-flex items-center gap-1 px-2 md:px-3 py-0.5 md:py-1 rounded-full bg-primary/10 text-primary font-semibold text-xs md:text-sm whitespace-nowrap">
+                                        {item.rating_count}
+                                      </span>
+                                    ) : (
+                                      <span className="text-muted-foreground">---</span>
+                                    )}
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </CarouselItem>
+
+                {/* Slide 3: Comments */}
+                <CarouselItem className="pl-4 basis-[70%]">
+                  <Card className="h-[600px] border-2 border-primary/30 shadow-lg flex flex-col">
+                    <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4 md:p-6">
+                      <CardTitle className="flex items-center gap-2 text-xl md:text-2xl mb-4">
+                        <MessageSquare className="h-5 w-5 md:h-6 md:w-6 text-primary" />
+                        Community Comments
+                      </CardTitle>
+                      <CompactFilters
+                        filters={[
+                          {
+                            name: "Type",
+                            value: commentsFilter,
+                            onChange: (value) => setCommentsFilter(value as "all" | "workouts" | "programs"),
+                            options: [
+                              { value: "all", label: "All Comments" },
+                              { value: "workouts", label: "Workouts" },
+                              { value: "programs", label: "Training Programs" }
+                            ],
+                            placeholder: "Select type"
+                          },
+                          {
+                            name: "Sort",
+                            value: sortOrder,
+                            onChange: (value) => setSortOrder(value as "newest" | "oldest"),
+                            options: [
+                              { value: "newest", label: "Newest First" },
+                              { value: "oldest", label: "Oldest First" }
+                            ],
+                            placeholder: "Sort by"
+                          }
+                        ]}
+                      />
+                    </CardHeader>
+                    <CardContent className="p-4 md:pt-6 flex-1 overflow-auto">
+                      {isLoadingComments ? (
+                        <div className="space-y-4">
+                          {[...Array(6)].map((_, i) => (
+                            <div key={i} className="space-y-2">
+                              <Skeleton className="h-6 w-3/4" />
+                              <Skeleton className="h-16 w-full" />
+                            </div>
+                          ))}
+                        </div>
+                      ) : comments.length === 0 ? (
+                        <div className="text-center py-12 text-muted-foreground">
+                          <MessageSquare className="h-12 w-12 mx-auto mb-4 opacity-30" />
+                          <p className="text-lg font-medium mb-2">
+                            No comments yet
+                          </p>
+                          <p className="text-sm">
+                            Be the first premium member to share your experience!
+                          </p>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="space-y-3 md:space-y-4">
+                            {getTopComments().map((comment) => (
+                              <div
+                                key={comment.id}
+                                className="p-3 md:p-4 rounded-lg border-2 border-primary/20 bg-gradient-to-r from-background to-primary/5 hover:border-primary/40 transition-colors"
+                              >
+                                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-2">
+                                  <div className="flex items-center gap-2">
+                                    <User className="h-3 w-3 md:h-4 md:w-4 text-primary flex-shrink-0" />
+                                    <span className="font-semibold text-xs md:text-sm truncate">
+                                      {comment.display_name}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center gap-1 text-xs text-muted-foreground whitespace-nowrap">
+                                    <Calendar className="h-3 w-3" />
+                                    <span className="text-[10px] md:text-xs">
+                                      {formatDistanceToNow(new Date(comment.created_at), {
+                                        addSuffix: true,
+                                      })}
+                                    </span>
+                                  </div>
+                                </div>
+                                <p className="text-[10px] md:text-xs text-primary font-medium mb-2">
+                                  {comment.workout_name ? (
+                                    <>
+                                      Workout:{" "}
+                                      <Link
+                                        to={`/workout/${comment.workout_type}/${comment.workout_id}`}
+                                        className="hover:underline font-semibold"
+                                      >
+                                        {comment.workout_name}
+                                      </Link>
+                                    </>
+                                  ) : (
+                                    <>
+                                      Program:{" "}
+                                      <Link
+                                        to={`/trainingprogram/${comment.program_type}/${comment.program_id}`}
+                                        className="hover:underline font-semibold"
+                                      >
+                                        {comment.program_name}
+                                      </Link>
+                                    </>
+                                  )}
+                                </p>
+                                <p className="text-xs md:text-sm leading-relaxed">{comment.comment_text}</p>
+                              </div>
+                            ))}
+                          </div>
+                          {comments.length > 6 && (
+                            <div className="mt-4 text-center">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setShowCommentsModal(true)}
+                                className="gap-2"
+                              >
+                                <Eye className="h-4 w-4" />
+                                View All ({comments.length})
+                              </Button>
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </CardContent>
+                  </Card>
+                </CarouselItem>
+
+                {/* Slide 4: Testimonials */}
+                <CarouselItem className="pl-4 basis-[70%]">
+                  <Card className="h-[600px] border-2 border-primary/30 shadow-lg flex flex-col">
+                    <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4 md:p-6">
+                      <CardTitle className="flex items-center gap-2 text-xl md:text-2xl">
+                        <Quote className="h-5 w-5 md:h-6 md:w-6 text-primary" />
+                        Community Testimonials
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-4 md:pt-6 flex-1 overflow-auto">
+                      <TestimonialsSection desktopCarouselMode />
+                    </CardContent>
+                  </Card>
+                </CarouselItem>
+              </CarouselContent>
+              
+              <CarouselPrevious className="-left-6 h-14 w-14" />
+              <CarouselNext className="-right-6 h-14 w-14" />
+            </Carousel>
+            
+            {/* Dot navigation */}
+            <div className="flex justify-center gap-2 mt-4">
+              {[0, 1, 2, 3].map((index) => (
+                <button
+                  key={index}
+                  onClick={() => desktopCarouselApi?.scrollTo(index)}
+                  className={`h-2.5 w-2.5 rounded-full transition-all ${
+                    desktopSelectedSlide === index 
+                      ? "bg-primary scale-110" 
+                      : "bg-muted-foreground/30 hover:bg-muted-foreground/50"
+                  }`}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </div>
