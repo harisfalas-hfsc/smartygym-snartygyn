@@ -227,14 +227,14 @@ export const TestimonialsSection = ({ compact = false }: TestimonialsSectionProp
   // Compact mode for mobile carousel
   if (compact) {
     return (
-      <Card className="border-2 border-primary/30 shadow-lg h-full">
+      <Card className="border-2 border-primary/30 shadow-lg h-full flex flex-col">
         <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4">
           <CardTitle className="flex items-center gap-2 text-lg">
             <Quote className="h-5 w-5 text-primary" />
             Community Testimonials
           </CardTitle>
         </CardHeader>
-        <CardContent className="p-3">
+        <CardContent className="p-3 flex-1 overflow-auto">
           {isLoading ? (
             <div className="space-y-2">
               {[...Array(6)].map((_, i) => (
