@@ -1,9 +1,22 @@
-import { useEffect, useState } from "react";
-import { useNavigation } from "react-router-dom";
+import { useEffect, useState, useRef } from "react";
+import { useLocation } from "react-router-dom";
 
 export const LoadingBar = () => {
+  const location = useLocation();
   const [progress, setProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const prevPathRef = useRef(location.pathname);
+
+  // Detect route changes via useLocation
+  useEffect(() => {
+    if (location.pathname !== prevPathRef.current) {
+      prevPathRef.current = location.pathname;
+      setIsLoading(true);
+      // Route has changed, briefly show loading then complete
+      const timer = setTimeout(() => setIsLoading(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [location.pathname]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -25,41 +38,6 @@ export const LoadingBar = () => {
 
     return () => clearInterval(interval);
   }, [isLoading]);
-
-  // Listen to route changes
-  useEffect(() => {
-    const handleStart = () => setIsLoading(true);
-    const handleComplete = () => setIsLoading(false);
-
-    window.addEventListener("beforeunload", handleStart);
-    
-    // Monitor navigation
-    const originalPushState = window.history.pushState;
-    const originalReplaceState = window.history.replaceState;
-
-    window.history.pushState = function(...args) {
-      handleStart();
-      originalPushState.apply(window.history, args);
-      setTimeout(handleComplete, 300);
-    };
-
-    window.history.replaceState = function(...args) {
-      handleStart();
-      originalReplaceState.apply(window.history, args);
-      setTimeout(handleComplete, 300);
-    };
-
-    window.addEventListener("popstate", () => {
-      handleStart();
-      setTimeout(handleComplete, 300);
-    });
-
-    return () => {
-      window.removeEventListener("beforeunload", handleStart);
-      window.history.pushState = originalPushState;
-      window.history.replaceState = originalReplaceState;
-    };
-  }, []);
 
   if (!isLoading && progress === 0) return null;
 
