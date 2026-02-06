@@ -769,6 +769,23 @@ Every workout in the above categories MUST include 5 sections in this order:
    • CARDIO main (intervals) → Finisher (AMRAP or EMOM)
    • METABOLIC main (EMOM) → Finisher (Tabata or For Time)
 
+   FINISHER DURATION RULES (CRITICAL - NON-NEGOTIABLE):
+   • "For Time" finishers: Do NOT prescribe a fixed duration in the section title.
+     "For Time" means the athlete completes the work as fast as possible and records their time.
+     Writing "Finisher (8')" with "For Time" is CONTRADICTORY and UNPROFESSIONAL.
+     CORRECT: "Finisher: Power Burn (For Time)" — no minutes in title.
+   • AMRAP finishers: DO prescribe a time cap (e.g., "Finisher: Burn Out (8-minute AMRAP)")
+   • Circuit/Tabata finishers: Prescribe rounds, not arbitrary minute totals
+   • The finisher duration must EMERGE from the work prescribed, not be artificially set to fill remaining workout time. Think like a coach, not a calculator.
+
+   FINISHER MINIMUM VOLUME (MANDATORY):
+   • Every finisher must include at least 3-5 distinct exercises or exercise rounds
+   • A finisher with only 2 exercises (e.g., "500m row + 20 thrusters") is UNACCEPTABLE — it lacks training substance and looks unprofessional
+   • For Time finishers: 3-5 exercises, potentially repeated in rounds
+   • AMRAP finishers: 3-4 exercises per round
+   • Tabata finishers: 4 exercises minimum (each gets 8 rounds of 20/10)
+   • The finisher must deliver REAL training value, not filler
+
 5. 🧘 COOL DOWN (10 min)
    Purpose: Static stretching + diaphragmatic breathing
    Static Stretching (8 min) - Examples (vary these):
@@ -1473,6 +1490,32 @@ CRITICAL HTML FORMATTING RULES (FOLLOW EXACTLY - THIS IS NON-NEGOTIABLE):
 5. FIVE SECTIONS REQUIRED (for Strength, Calorie Burning, Metabolic, Cardio, Mobility & Stability, Challenge):
    Soft Tissue Preparation, Activation, Main Workout, Finisher, Cool Down
 
+BULLET POINT RULE (ABSOLUTE - NON-NEGOTIABLE):
+- Bullet points (<li>) are EXCLUSIVELY for exercises and exercise sets
+- NEVER use bullets for: format labels ("For Time:", "AMRAP 10 min:"), instructions ("Focus on form"), rest periods as standalone items, coaching cues, or any non-exercise text
+- If it's not something a person physically DOES, it does NOT get a bullet
+- Format labels go in the SECTION TITLE (e.g., "⚡ Finisher: Power Burn (For Time)")
+- Instructions and coaching cues go in the "instructions" field, NOT inside main_workout content
+
+EXERCISE DESCRIPTION CLARITY (MANDATORY):
+- Every exercise must specify the EQUIPMENT explicitly:
+  WRONG: "500m Row sprint" (row what? rowing machine? sprint where?)
+  CORRECT: "500m Rowing Machine" or "500m on Rower"
+- Unilateral exercises MUST specify "each side/arm/leg" or "total":
+  WRONG: "20 Thrusters (light dumbbell)"
+  CORRECT: "20 Dumbbell Thrusters (10 each arm, moderate weight)" or "20 Barbell Thrusters (light load)"
+- Weight guidance must be specific:
+  WRONG: "light dumbbell/kettlebell"
+  CORRECT: "moderate dumbbell (8-12kg)" or "light kettlebell (8-12kg)"
+- Machine exercises: Always name the specific machine (Rowing Machine, Ski Erg, Assault Bike)
+- Free weight exercises: Always name the specific implement (barbell, dumbbell, kettlebell)
+- "Sprint" is ONLY for running. On a rowing machine, it's "max effort" or "fast pace"
+
+CONTENT SEPARATION RULE (CRITICAL):
+- The "main_workout" field contains ONLY: section titles + exercise lists
+- Coaching cues like "Focus on completing as fast as possible with good form" belong in the "instructions" field, NOT as bullet points inside main_workout
+- Rest period guidance (e.g., "Rest 60 seconds between rounds") can appear as a plain text line between exercise blocks, but NEVER as a bullet point
+
 GOLD STANDARD 5-SECTION TEMPLATE (FOLLOW EXACTLY):
 <p class="tiptap-paragraph">🧽 <strong><u>Soft Tissue Preparation 5'</u></strong></p>
 <ul class="tiptap-bullet-list">
@@ -1499,10 +1542,22 @@ GOLD STANDARD 5-SECTION TEMPLATE (FOLLOW EXACTLY):
 <li class="tiptap-list-item"><p class="tiptap-paragraph">Repeat this 4-minute sequence for a total of 5 rounds.</p></li>
 </ul>
 <p class="tiptap-paragraph"></p>
-<p class="tiptap-paragraph">⚡ <strong><u>Finisher: Calorie Reactor (5-minute AMRAP)</u></strong></p>
+<p class="tiptap-paragraph">⚡ <strong><u>Finisher: Metabolic Surge (For Time)</u></strong></p>
 <ul class="tiptap-bullet-list">
-<li class="tiptap-list-item"><p class="tiptap-paragraph">Max Calories on Ski Erg or Rower (continuous effort for 5 minutes)</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph">500m Rowing Machine (max effort pace)</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph">20 Dumbbell Thrusters (moderate weight, 8-12kg each hand)</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph">30 Box Jumps (20-inch box)</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph">20 Kettlebell Swings (16-20kg)</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph">400m Run</p></li>
 </ul>
+
+BAD FINISHER EXAMPLE (NEVER DO THIS):
+⚡ Finisher: Metabolic Melt (8') ← WRONG: "For Time" with fixed 8-minute duration
+  * For Time: ← WRONG: format label with a bullet point
+  * 500m Row sprint ← WRONG: vague equipment, "sprint" is for running only
+  * 20 Thrusters (light dumbbell/kettlebell) ← WRONG: each arm? total? vague weight
+  * Focus on completing as fast as possible ← WRONG: instruction with a bullet, belongs in instructions field
+Problems: bullets on non-exercises, only 2 exercises, vague equipment, instructions mixed in, contradictory duration
 <p class="tiptap-paragraph"></p>
 <p class="tiptap-paragraph">🧘 <strong><u>Cool Down 10'</u></strong></p>
 <ul class="tiptap-bullet-list">
