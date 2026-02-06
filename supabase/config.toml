@@ -239,3 +239,6 @@ verify_jwt = true
 
 [functions.export-user-data]
 verify_jwt = true
+
+[functions.audit-workout-durations]
+verify_jwt = false

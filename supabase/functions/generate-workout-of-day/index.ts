@@ -404,21 +404,22 @@ serve(async (req) => {
       hasForcedParameters: !!forcedParameters
     });
 
-    // Duration calculation function (called per-workout now)
+    // Duration calculation function - returns TOTAL workout time (all 5 sections combined)
+    // Soft Tissue (5) + Activation (10-15) + Main Workout + Finisher (8-15) + Cool Down (10) = TOTAL
     const getDuration = (fmt: string, stars: number): string => {
       const baseDurations: Record<string, number[]> = {
-        "REPS & SETS": [45, 50, 60],
-        "CIRCUIT": [20, 30, 45],
-        "TABATA": [15, 20, 30],
-        "AMRAP": [15, 25, 45],
-        "EMOM": [15, 20, 30],
+        "REPS & SETS": [50, 60, 75],
+        "CIRCUIT": [45, 55, 70],
+        "TABATA": [40, 50, 60],
+        "AMRAP": [40, 50, 65],
+        "EMOM": [40, 50, 60],
         "FOR TIME": [0, 0, 0],
-        "MIX": [30, 40, 60]
+        "MIX": [45, 55, 70]
       };
       
       if (fmt === "FOR TIME") return "Various";
       
-      const [minDuration, midDuration, maxDuration] = baseDurations[fmt] || [20, 30, 45];
+      const [minDuration, midDuration, maxDuration] = baseDurations[fmt] || [45, 55, 70];
       
       if (stars <= 2) return `${minDuration} min`;
       if (stars <= 4) return `${midDuration} min`;
@@ -1581,6 +1582,24 @@ COMPACT SPACING RULES:
 - ONE empty paragraph between sections only
 - NO leading empty paragraphs at the start
 
+TOTAL DURATION RULE (CRITICAL - NON-NEGOTIABLE):
+The workout duration represents the TOTAL time for ALL 5 sections combined:
+  Soft Tissue (5 min) + Activation (10-15 min) + Main Workout + Finisher + Cool Down (10 min)
+
+The duration you are given (e.g., "50 min") is the TARGET TOTAL for all sections.
+Design your section durations so they ADD UP to the target total.
+
+EXAMPLE for 50 min total target:
+  5' (soft tissue) + 10' (activation) + 17' (main) + 8' (finisher) + 10' (cool down) = 50 min
+
+NEVER design a 20-minute main workout + 15-minute activation + 10-minute finisher 
+and then label the workout as "20 minutes." That is basic math failure.
+
+For "For Time" finishers: Do not write a minute count in the title, but internally
+estimate the completion time (typically 8-15 min) and include it in your total calculation.
+
+YOUR TARGET TOTAL DURATION: ${duration}
+
 {
   "name": "Creative, motivating workout name (2-4 words, unique)",
   "description": "2-3 sentence HTML description with <p class='tiptap-paragraph'> tags",
@@ -1916,6 +1935,105 @@ Return JSON with these exact fields:
       });
 
       // ═══════════════════════════════════════════════════════════════════════════════
+      // POST-GENERATION DURATION CALCULATION - Parse actual section durations from HTML
+      // Overrides the getDuration() estimate with the real sum from generated content
+      // ═══════════════════════════════════════════════════════════════════════════════
+      const calculateActualDuration = (html: string): string | null => {
+        if (!html) return null;
+        
+        let totalMinutes = 0;
+        let foundSections = 0;
+        let hasForTimeSectionWithoutDuration = false;
+        
+        // Match patterns like: 5', 10', 24', (20'), (15-minute AMRAP), (8-minute AMRAP)
+        // Also match ranges like 10-15' or "30-45 min"
+        const sectionPatterns = [
+          // "Soft Tissue Preparation 5'" or "Cool Down 10'"
+          /(?:Soft Tissue|Activation|Main Workout|Finisher|Cool Down)[^<]*?(\d+)'/gi,
+          // "(24')" or "(20')" in parentheses
+          /\((\d+)'\)/g,
+          // "(8-minute AMRAP)" or "(15-minute AMRAP)"
+          /\((\d+)-minute\s+(?:AMRAP|EMOM|Tabata|Circuit)\)/gi,
+          // "(20-minute EMOM)" pattern
+          /\((\d+)\s*-\s*minute/gi,
+        ];
+        
+        // Extract all duration numbers from section headers
+        const headerMatches: number[] = [];
+        
+        // Get all section header lines (paragraphs with strong/u tags or emoji headers)
+        const headerRegex = /<p[^>]*>(?:🧽|🔥|💪|⚡|🧘)[^<]*?(?:<[^>]*>)*[^<]*?<\/p>/gi;
+        const headers = html.match(headerRegex) || [];
+        
+        for (const header of headers) {
+          // Look for minute markers: 5', 10', (24'), (8-minute AMRAP), etc.
+          const minuteMatch = header.match(/(\d+)'/);
+          if (minuteMatch) {
+            headerMatches.push(parseInt(minuteMatch[1]));
+            foundSections++;
+            continue;
+          }
+          
+          const parenMinuteMatch = header.match(/\((\d+)(?:'|-minute)/i);
+          if (parenMinuteMatch) {
+            headerMatches.push(parseInt(parenMinuteMatch[1]));
+            foundSections++;
+            continue;
+          }
+          
+          // Check for "For Time" without duration - estimate based on content
+          if (/for\s*time/i.test(header) && !/\d+/.test(header)) {
+            hasForTimeSectionWithoutDuration = true;
+            headerMatches.push(12); // Estimate 12 min for "For Time" finishers
+            foundSections++;
+            continue;
+          }
+          
+          // Check for range like "30-45 min" in recovery
+          const rangeMatch = header.match(/(\d+)-(\d+)\s*(?:min|')/i);
+          if (rangeMatch) {
+            // Use average of range
+            const avg = Math.round((parseInt(rangeMatch[1]) + parseInt(rangeMatch[2])) / 2);
+            headerMatches.push(avg);
+            foundSections++;
+            continue;
+          }
+        }
+        
+        if (foundSections < 3) {
+          // Not enough sections found to calculate meaningful duration
+          return null;
+        }
+        
+        totalMinutes = headerMatches.reduce((sum, m) => sum + m, 0);
+        
+        if (totalMinutes < 10 || totalMinutes > 120) {
+          // Sanity check - something went wrong with parsing
+          return null;
+        }
+        
+        // Round to nearest 5 for cleaner display
+        const rounded = Math.round(totalMinutes / 5) * 5;
+        return `${rounded} min`;
+      };
+      
+      const actualDuration = calculateActualDuration(workoutContent.main_workout || '');
+      const finalDuration = actualDuration || duration;
+      
+      if (actualDuration) {
+        logStep(`Duration override: ${duration} → ${actualDuration}`, { 
+          equipment, 
+          originalDuration: duration, 
+          calculatedDuration: actualDuration 
+        });
+      } else {
+        logStep(`Using estimated duration (parsing found insufficient data)`, { 
+          equipment, 
+          duration 
+        });
+      }
+
+      // ═══════════════════════════════════════════════════════════════════════════════
       // GOLD STANDARD V3 NORMALIZATION - Critical for consistent spacing
       // Normalize main_workout HTML before insert to prevent spacing issues
       // ═══════════════════════════════════════════════════════════════════════════════
@@ -1942,7 +2060,7 @@ Return JSON with these exact fields:
           equipment: equipment,
           difficulty: selectedDifficulty.name,
           difficulty_stars: selectedDifficulty.stars,
-          duration: duration,
+          duration: finalDuration,
           description: workoutContent.description,
           main_workout: normalizedMainWorkout,  // Use normalized content
           instructions: workoutContent.instructions,
