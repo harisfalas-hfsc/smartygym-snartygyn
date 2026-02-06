@@ -1,42 +1,53 @@
 
 
-## Fix: Logo Not Navigating to Homepage
+## Fix: Logo Navigation + Remove Duplicate Back Buttons
 
-### Problem
-Clicking the logo from the dashboard (and potentially other pages) does not navigate to the homepage. The user must refresh the page manually.
+### Problem 1: Logo not navigating to homepage from dashboard
+The `Link to="/"` was correctly added to the logo, but there is an **infinite render loop** in `CheckInModalManager.tsx` (visible in console logs: "Maximum update depth exceeded"). This happens because the `useEffect` on lines 74-82 calls `onBannerStateChange` which is not memoized by the parent (`UserDashboard`), causing a new function reference on every render, which re-triggers the effect endlessly. This infinite loop can block React from processing the `Link` navigation properly.
 
-### Root Cause
-Two interconnected issues:
+**Fix**: Wrap the `onBannerStateChange` callback in `UserDashboard.tsx` with `useCallback` so it has a stable reference, breaking the infinite loop. This will allow the logo `Link` to navigate correctly from the dashboard.
 
-1. **LoadingBar monkey-patching breaks React Router navigation**: The `LoadingBar` component overrides `window.history.pushState` and `window.history.replaceState` with wrappers that call `setIsLoading(true)` synchronously. React Router v7 uses these browser APIs internally for navigation. The synchronous state update during navigation can block or interfere with React Router's route transition -- particularly when moving between a layout route (dashboard inside ProtectedRoute/AuthenticatedLayout) and a standalone route (homepage).
+### Problem 2: Two back buttons on every page
+The global `FixedBackButton` component was added in `App.tsx` to show a persistent, fixed back button on every page (except homepage). However, **24 individual pages** still have their own inline back buttons using `useShowBackButton`. This creates two overlapping back buttons.
 
-2. **Logo uses a `<div>` with `onClick` instead of a `<Link>`**: Programmatic `navigate("/")` via `onClick` is more fragile than React Router's `<Link>` component, which handles navigation through its own internal pipeline.
+**Fix**: Remove all inline back buttons from every page that has one, since the global `FixedBackButton` already handles this everywhere.
 
-### Solution
+### Pages with inline back buttons to clean up (all 24 files)
 
-**Step 1: Fix the Logo (Navigation.tsx)**
-- Replace the `<div onClick={() => handleNavigate("/")}>` wrapper around the logo with a React Router `<Link to="/">` component
-- This is the standard, most reliable way to handle navigation in React Router
-- Import `Link` from `react-router-dom`
+Each page needs its inline back button JSX removed, and if `useShowBackButton`/`ArrowLeft` imports become unused, those imports should also be cleaned up:
 
-**Step 2: Fix the LoadingBar (LoadingBar.tsx)**
-- Remove the dangerous `history.pushState` and `history.replaceState` monkey-patching entirely
-- Replace with React Router's built-in `useNavigation()` hook, which safely tracks navigation state without interfering with the router's internals
-- The component already imports `useNavigation` but doesn't use it for the actual loading detection
+1. `UserDashboard.tsx` - Button at line 774
+2. `Community.tsx` - Button at line 670
+3. `WorkoutFlow.tsx` - Button at line 265
+4. `TrainingProgramFlow.tsx` - Button at line 211
+5. `DailySmartyRitual.tsx` - Button at line 155
+6. `CalculatorHistory.tsx` - Button at line 549
+7. `SmartyCorporate.tsx` - Button at line 170
+8. `SmartyPlans.tsx` - Button at line 315
+9. `PremiumBenefits.tsx` - Button at line 170
+10. `PremiumComparison.tsx` - Button at line 171
+11. `CoachCV.tsx` - Button at line 33
+12. `PaymentSuccess.tsx` - Button at line 95
+13. `NewsletterThankYou.tsx` - Button at line 23
+14. `CorporateWellness.tsx` - Button at line 189
+15. `HumanPerformance.tsx` - back button section
+16. `WhyInvestInSmartyGym.tsx` - back button section
+17. `TakeATour.tsx` - back button section
+18. `ExerciseLibrary.tsx` - uses hook but need to check for button
+19. `JoinPremium.tsx` - uses hook, need to check for button
+20. `Shop.tsx` - uses hook, need to check for button
+21. `OneRMCalculator.tsx` - uses hook, need to check for button
+22. `BMRCalculator.tsx` - uses hook, need to check for button
+23. `MacroTrackingCalculator.tsx` - uses hook, need to check for button (shared with caloriecalculator route)
+24. `Tools.tsx` - uses hook, need to check for button
 
-### Technical Details
+### Files to modify
 
-**Navigation.tsx changes:**
-- Import `Link` from `react-router-dom`
-- Replace lines 425-434 (the logo `<div>` wrapper) with a `<Link to="/" className="cursor-pointer flex-shrink-0">` wrapper
-- Keep the same `<img>` tag inside
+- `src/components/checkins/CheckInModalManager.tsx` or `src/pages/UserDashboard.tsx` -- fix infinite loop by memoizing `onBannerStateChange` with `useCallback`
+- All 24 page files listed above -- remove inline back button JSX and unused imports
 
-**LoadingBar.tsx changes:**
-- Use `useNavigation()` hook's `state` property (returns `"idle"`, `"loading"`, or `"submitting"`) to determine loading state
-- Remove the `useEffect` that patches `pushState`/`replaceState` -- this eliminates the interference with React Router
-- Simpler, cleaner, and follows React Router v7 best practices
-
-### Files to Modify
-- `src/components/Navigation.tsx` -- Logo wrapper change (2 lines)
-- `src/components/LoadingBar.tsx` -- Replace monkey-patching with proper hook usage
+### What stays
+- `src/components/FixedBackButton.tsx` -- the global fixed back button (no changes needed)
+- `src/hooks/useShowBackButton.ts` -- keep the hook file since `FixedBackButton` uses it
+- `src/contexts/NavigationHistoryContext.tsx` -- keeps working as-is
 
