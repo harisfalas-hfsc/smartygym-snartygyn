@@ -3,8 +3,8 @@ import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, X, ArrowLeft, Eye, UserCheck, Crown, Dumbbell, BookOpen, Calculator, Users, Heart, Sparkles, Flame, LayoutDashboard, MessageCircle, ClipboardCheck } from "lucide-react";
-import { useShowBackButton } from "@/hooks/useShowBackButton";
+import { Check, X, Eye, UserCheck, Crown, Dumbbell, BookOpen, Calculator, Users, Heart, Sparkles, Flame, LayoutDashboard, MessageCircle, ClipboardCheck } from "lucide-react";
+
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
@@ -13,7 +13,7 @@ import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 
 const PremiumComparison = () => {
   const navigate = useNavigate();
-  const { goBack } = useShowBackButton();
+  
   const [user, setUser] = useState<User | null>(null);
   const { userTier } = useAccessControl();
   const isPremium = userTier === "premium";
@@ -167,16 +167,6 @@ const PremiumComparison = () => {
 
       <div className="min-h-screen bg-background py-8 px-4">
         <div className="container mx-auto max-w-6xl">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={goBack}
-            className="mb-4"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
-          </Button>
-
           <PageBreadcrumbs items={[
             { label: "Home", href: "/" },
             { label: "Compare Plans" }

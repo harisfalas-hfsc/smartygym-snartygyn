@@ -21,7 +21,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
-import { useShowBackButton } from "@/hooks/useShowBackButton";
+
 import { useAccessControl } from "@/contexts/AccessControlContext";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
@@ -30,7 +30,7 @@ import { AlreadyPremiumCard } from "@/components/pricing/AlreadyPremiumCard";
 export default function JoinPremium() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { canGoBack, goBack } = useShowBackButton();
+  
   const { userTier } = useAccessControl();
   const isPremium = userTier === "premium";
   const [user, setUser] = useState<User | null>(null);

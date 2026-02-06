@@ -6,14 +6,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Save } from "lucide-react";
+import { Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { User } from "@supabase/supabase-js";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { generateSoftwareApplicationSchema, generateBreadcrumbSchema } from "@/utils/seoHelpers";
-import { useShowBackButton } from "@/hooks/useShowBackButton";
+
 import {
   Select,
   SelectContent,
@@ -41,7 +41,7 @@ const EXERCISES = [
 const OneRMCalculator = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { goBack } = useShowBackButton();
+  
   const [weight, setWeight] = useState("");
   const [reps, setReps] = useState("");
   const [exerciseName, setExerciseName] = useState("");

@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
-import { ArrowLeft, Calculator, Activity, Flame } from "lucide-react";
-import { useShowBackButton } from "@/hooks/useShowBackButton";
+import { Calculator, Activity, Flame } from "lucide-react";
+
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
@@ -17,7 +17,7 @@ import macroBg from "@/assets/tools/macro-calculator-bg.jpg";
 
 const Tools = () => {
   const navigate = useNavigate();
-  const { canGoBack, goBack } = useShowBackButton();
+  
   const { userTier } = useAccessControl();
   const isPremium = userTier === "premium";
 
@@ -82,20 +82,7 @@ const Tools = () => {
       
       <div className="min-h-screen bg-background">
       <div className="container mx-auto max-w-6xl px-4 pb-8">
-        {canGoBack && (
-          <div className="mb-6">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={goBack}
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back
-            </Button>
-          </div>
-        )}
-
-        <PageBreadcrumbs 
+        <PageBreadcrumbs
           items={[
             { label: "Home", href: "/" },
             { label: "Tools" }

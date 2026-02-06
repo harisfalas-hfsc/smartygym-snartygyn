@@ -7,12 +7,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Trash2, Calculator, Scale, TrendingUp, Target, Plus, ChevronDown, CalendarIcon } from "lucide-react";
+import { Trash2, Calculator, Scale, TrendingUp, Target, Plus, ChevronDown, CalendarIcon } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
-import { useShowBackButton } from "@/hooks/useShowBackButton";
+
 import { MeasurementDialog } from "@/components/logbook/MeasurementDialog";
 import { useAccessControl } from "@/hooks/useAccessControl";
 
@@ -170,7 +170,7 @@ export default function CalculatorHistory() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
-  const { goBack } = useShowBackButton();
+  
   const { userTier, isLoading: accessLoading } = useAccessControl();
   const isPremium = userTier === "premium";
   const [user, setUser] = useState<User | null>(null);
@@ -546,12 +546,7 @@ export default function CalculatorHistory() {
         ]}
       />
 
-      <div className="flex items-center gap-4 mb-6">
-        <Button variant="ghost" size="icon" onClick={goBack}>
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-        <h1 className="text-2xl font-bold">Calculator & Measurement History</h1>
-      </div>
+      <h1 className="text-2xl font-bold mb-6">Calculator & Measurement History</h1>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 mb-6 h-auto">
