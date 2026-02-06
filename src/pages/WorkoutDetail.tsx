@@ -35,7 +35,7 @@ import { stripHtmlTags } from "@/lib/text";
 type EquipmentFilter = "all" | "bodyweight" | "equipment";
 type LevelFilter = "all" | "beginner" | "intermediate" | "advanced";
 type FormatFilter = "all" | "circuit" | "amrap" | "for time" | "tabata" | "reps & sets" | "emom" | "mix";
-type DurationFilter = "all" | "15" | "20" | "30" | "45" | "60" | "various";
+type DurationFilter = "all" | "30" | "40" | "50" | "60" | "75" | "various";
 type StatusFilter = "all" | "viewed" | "completed" | "not-viewed" | "favorites";
 type SortByFilter = "newest" | "oldest" | "name-asc" | "name-desc";
 type AccessFilter = "all" | "free" | "premium" | "purchasable";
@@ -228,22 +228,20 @@ const WorkoutDetail = () => {
         if (formatFilter !== "reps & sets" && formatFilter !== "for time" && workoutFormat !== formatFilter) return false;
       }
       
-      // Duration filter
+      // Duration filter (range matching)
       if (durationFilter !== "all") {
-        const durationNumber = workout.duration?.match(/\d+/)?.[0];
-        const standardDurations = ["15", "20", "30", "45", "60"];
+        const durationNum = parseInt(workout.duration?.match(/\d+/)?.[0] || "0");
+        const workoutDuration = workout.duration?.toLowerCase();
+        const hasVariousText = workoutDuration?.includes("various") || workoutDuration?.includes("varies");
         
         if (durationFilter === "various") {
-          // Show workouts that DON'T match any standard duration
-          // This catches 50 min, 25 min, 40 min, or workouts with "various"/"varies" in text
-          const workoutDuration = workout.duration?.toLowerCase();
-          const isStandardDuration = durationNumber && standardDurations.includes(durationNumber);
-          const hasVariousText = workoutDuration?.includes("various") || workoutDuration?.includes("varies");
-          
-          if (isStandardDuration && !hasVariousText) return false;
+          if (!hasVariousText && durationNum > 0) return false;
         } else {
-          // For specific durations (15, 20, 30, 45, 60), match exactly
-          if (durationNumber !== durationFilter) return false;
+          if (hasVariousText) return false;
+          const filterNum = parseInt(durationFilter);
+          const rangeMin = filterNum - 5;
+          const rangeMax = filterNum + 4;
+          if (durationNum < rangeMin || durationNum > rangeMax) return false;
         }
       }
       
@@ -461,11 +459,11 @@ const WorkoutDetail = () => {
               placeholder: "Duration",
               options: [
                 { value: "all", label: "All Durations" },
-                { value: "15", label: "15 min" },
-                { value: "20", label: "20 min" },
                 { value: "30", label: "30 min" },
-                { value: "45", label: "45 min" },
+                { value: "40", label: "40 min" },
+                { value: "50", label: "50 min" },
                 { value: "60", label: "60 min" },
+                { value: "75", label: "75 min" },
                 { value: "various", label: "Various" },
               ],
             },
