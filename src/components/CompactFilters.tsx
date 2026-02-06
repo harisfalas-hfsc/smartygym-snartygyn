@@ -27,7 +27,7 @@ interface CompactFiltersProps {
 export const CompactFilters = ({ filters, compact = false }: CompactFiltersProps) => {
   return (
     <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 border-2 border-primary/40 rounded-lg p-2 sm:p-3">
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <Filter className={compact ? "h-3 w-3 text-primary flex-shrink-0" : "h-4 w-4 text-primary flex-shrink-0"} />
         {filters.map((filter) => (
           <Select

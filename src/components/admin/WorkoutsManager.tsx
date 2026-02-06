@@ -104,20 +104,22 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
 
     if (durationFilter !== "all") {
       if (durationFilter === "various") {
-        // Show workouts that DON'T match any standard duration
-        const standardDurations = ["15", "20", "30", "45", "60"];
         filtered = filtered.filter(w => {
-          const durationNumber = w.duration?.match(/\d+/)?.[0];
           const workoutDuration = w.duration?.toLowerCase();
-          const isStandardDuration = durationNumber && standardDurations.includes(durationNumber);
           const hasVariousText = workoutDuration?.includes("various") || workoutDuration?.includes("varies");
-          return !isStandardDuration || hasVariousText;
+          const durationNum = parseInt(w.duration?.match(/\d+/)?.[0] || "0");
+          return hasVariousText || durationNum === 0;
         });
       } else {
-        // For specific durations, match the number
+        const filterNum = parseInt(durationFilter);
+        const rangeMin = filterNum - 5;
+        const rangeMax = filterNum + 4;
         filtered = filtered.filter(w => {
-          const durationNumber = w.duration?.match(/\d+/)?.[0];
-          return durationNumber === durationFilter;
+          const workoutDuration = w.duration?.toLowerCase();
+          const hasVariousText = workoutDuration?.includes("various") || workoutDuration?.includes("varies");
+          if (hasVariousText) return false;
+          const durationNum = parseInt(w.duration?.match(/\d+/)?.[0] || "0");
+          return durationNum >= rangeMin && durationNum <= rangeMax;
         });
       }
     }
@@ -617,11 +619,11 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Durations</SelectItem>
-                <SelectItem value="15">15 Minutes</SelectItem>
-                <SelectItem value="20">20 Minutes</SelectItem>
-                <SelectItem value="30">30 Minutes</SelectItem>
-                <SelectItem value="45">45 Minutes</SelectItem>
-                <SelectItem value="60">60 Minutes</SelectItem>
+                <SelectItem value="30">30 min</SelectItem>
+                <SelectItem value="40">40 min</SelectItem>
+                <SelectItem value="50">50 min</SelectItem>
+                <SelectItem value="60">60 min</SelectItem>
+                <SelectItem value="75">75 min</SelectItem>
                 <SelectItem value="various">Various</SelectItem>
               </SelectContent>
             </Select>

@@ -23,7 +23,7 @@ export const WorkoutFilters = ({
 }: WorkoutFiltersProps) => {
   const goals = ["All", "Strength", "Fat Loss", "Mobility", "Stability", "Wellness"];
   const equipment = ["All", "Bodyweight", "Dumbbells", "Bands", "Gym"];
-  const durations = ["All", "30", "45", "50", "60", "75"];
+  const durations = ["All", "30", "40", "50", "60", "75", "Various"];
   const formats = ["All", "TABATA", "CIRCUIT", "AMRAP", "FOR TIME", "EMOM", "REPS & SETS"];
 
   return (
