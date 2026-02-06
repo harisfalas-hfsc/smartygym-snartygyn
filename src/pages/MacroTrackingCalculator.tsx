@@ -7,19 +7,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Save } from "lucide-react";
+import { Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { User } from "@supabase/supabase-js";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { generateSoftwareApplicationSchema, generateBreadcrumbSchema } from "@/utils/seoHelpers";
-import { useShowBackButton } from "@/hooks/useShowBackButton";
+
 
 const MacroTrackingCalculator = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { goBack } = useShowBackButton();
+  
   const [age, setAge] = useState("");
   const [weight, setWeight] = useState("");
   const [height, setHeight] = useState("");
@@ -208,17 +208,7 @@ const MacroTrackingCalculator = () => {
       
       <div className="min-h-screen bg-background p-4">
       <div className="max-w-2xl mx-auto py-4 sm:py-8">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={goBack}
-          className="mb-4"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          <span className="text-xs sm:text-sm">Back</span>
-        </Button>
-
-        <PageBreadcrumbs 
+        <PageBreadcrumbs
           items={[
             { label: "Home", href: "/" },
             { label: "Smarty Tools", href: "/tools" },

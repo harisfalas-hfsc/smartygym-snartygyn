@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { CheckInModal } from './CheckInModal';
 import { CheckInBanner } from './CheckInBanner';
 import { MorningCheckInForm } from './MorningCheckInForm';
@@ -183,9 +183,9 @@ export function useCheckInBanner() {
     type: 'morning' | 'night' | null;
   }>({ show: false, type: null });
 
-  const handleBannerStateChange = (show: boolean, type: 'morning' | 'night' | null) => {
+  const handleBannerStateChange = useCallback((show: boolean, type: 'morning' | 'night' | null) => {
     setBannerState({ show, type });
-  };
+  }, []);
 
   return { bannerState, handleBannerStateChange };
 }

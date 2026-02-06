@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { InfoRibbon } from "@/components/InfoRibbon";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
-import { useShowBackButton } from "@/hooks/useShowBackButton";
+
 import {
   Table,
   TableBody,
@@ -32,7 +32,7 @@ import {
   CarouselNext,
   type CarouselApi,
 } from "@/components/ui/carousel";
-import { Trophy, MessageSquare, Star, User, Calendar, ClipboardCheck, ArrowLeft, Eye, Award, Quote, ChevronLeft, ChevronRight } from "lucide-react";
+import { Trophy, MessageSquare, Star, User, Calendar, ClipboardCheck, Eye, Award, Quote, ChevronLeft, ChevronRight } from "lucide-react";
 import { TestimonialsSection } from "@/components/community/TestimonialsSection";
 import { formatDistanceToNow } from "date-fns";
 import { CompactFilters } from "@/components/CompactFilters";
@@ -87,7 +87,7 @@ interface Testimonial {
 }
 
 const Community = () => {
-  const { canGoBack, goBack } = useShowBackButton();
+  
   const [workoutLeaderboard, setWorkoutLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [programLeaderboard, setProgramLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [checkinLeaderboard, setCheckinLeaderboard] = useState<LeaderboardEntry[]>([]);
@@ -667,16 +667,7 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
       <div className="min-h-screen bg-background">
         <div className="container mx-auto max-w-6xl px-4 pb-8">
           
-          {canGoBack && (
-            <div className="mb-6">
-              <Button variant="ghost" size="sm" onClick={goBack}>
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                <span className="text-xs sm:text-sm">Back</span>
-              </Button>
-            </div>
-          )}
-
-          <PageBreadcrumbs 
+          <PageBreadcrumbs
             items={[
               { label: "Home", href: "/" },
               { label: "Community" }

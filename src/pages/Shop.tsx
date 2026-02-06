@@ -10,15 +10,15 @@ import { PersonalRecommendation } from "@/components/shop/PersonalRecommendation
 import { MinimalDisclosure } from "@/components/shop/MinimalDisclosure";
 import { ContentLoadingSkeleton } from "@/components/ContentLoadingSkeleton";
 import { CompactFilters } from "@/components/CompactFilters";
-import { ShoppingBag, ArrowLeft } from "lucide-react";
+import { ShoppingBag } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { useShowBackButton } from "@/hooks/useShowBackButton";
+
 
 const Shop = () => {
   const [sortBy, setSortBy] = useState<string>("featured");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
-  const { canGoBack, goBack } = useShowBackButton();
+  
 
   // Handle redirect after authentication
   useEffect(() => {

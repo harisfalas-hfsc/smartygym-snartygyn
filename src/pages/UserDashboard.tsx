@@ -14,7 +14,7 @@ import { UserMessagesPanel } from "@/components/UserMessagesPanel";
 import { MyOrders } from "@/components/MyOrders";
 import { useQuery } from "@tanstack/react-query";
 import { useAccessControl } from "@/hooks/useAccessControl";
-import { useShowBackButton } from "@/hooks/useShowBackButton";
+
 import { useAdminRole } from "@/hooks/useAdminRole";
 import { Heart, CheckCircle, Clock, Star, Play, Dumbbell, Calendar, Crown, ArrowLeft, Calculator, ShoppingBag, MessageSquare, Loader2, RefreshCw, ExternalLink, ClipboardList, TrendingUp, BookOpen, Headphones, Sparkles, Quote, User as UserIcon, Scale, Building2, Users, ClipboardCheck, FileText, Trash2, Settings } from "lucide-react";
 import {
@@ -131,9 +131,6 @@ export default function UserDashboard() {
   const {
     toast
   } = useToast();
-  const {
-    goBack
-  } = useShowBackButton();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [managingSubscription, setManagingSubscription] = useState(false);
@@ -770,11 +767,6 @@ export default function UserDashboard() {
           if (bannerState.type === 'morning') setShowMorningForm(true);else setShowNightForm(true);
         }} />
           </div>}
-
-        <Button variant="ghost" size="sm" onClick={goBack} className="mb-4">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          <span className="text-xs sm:text-sm">Back</span>
-        </Button>
 
         <PageBreadcrumbs items={[
           { label: "Home", href: "/" },

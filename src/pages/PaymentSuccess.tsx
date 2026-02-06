@@ -2,19 +2,19 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Loader2, ArrowLeft } from "lucide-react";
+import { CheckCircle, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { trackSocialMediaEvent } from "@/utils/socialMediaTracking";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
-import { useShowBackButton } from "@/hooks/useShowBackButton";
+
 
 const PaymentSuccess = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
-  const { canGoBack, goBack } = useShowBackButton();
+  
   const [verifying, setVerifying] = useState(true);
   const [verified, setVerified] = useState(false);
 
@@ -92,13 +92,6 @@ const PaymentSuccess = () => {
 
       <div className="min-h-screen bg-background py-8 px-4">
         <div className="container mx-auto max-w-2xl">
-          {canGoBack && (
-            <Button variant="ghost" size="sm" onClick={goBack} className="mb-4">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back
-            </Button>
-          )}
-          
           <PageBreadcrumbs items={[
             { label: "Home", href: "/" },
             { label: "Payment Success" }

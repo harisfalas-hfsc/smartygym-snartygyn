@@ -7,12 +7,12 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Building2, Check, Users, Crown, ArrowLeft, CreditCard, Shield, Headphones, Lightbulb } from "lucide-react";
+import { Building2, Check, Users, Crown, CreditCard, Shield, Headphones, Lightbulb } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
-import { useShowBackButton } from "@/hooks/useShowBackButton";
+
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 
@@ -52,10 +52,6 @@ export default function SmartyCorporate() {
   const {
     toast
   } = useToast();
-  const {
-    canGoBack,
-    goBack
-  } = useShowBackButton();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<string | null>(null);
   const [orgDialogOpen, setOrgDialogOpen] = useState(false);
@@ -167,11 +163,6 @@ export default function SmartyCorporate() {
 
       <div className="min-h-screen bg-background">
         <main className="container mx-auto max-w-6xl px-4 pb-8">
-          {canGoBack && <Button variant="ghost" size="sm" onClick={goBack} className="mb-4">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              <span className="text-xs sm:text-sm">Back</span>
-            </Button>}
-
           <PageBreadcrumbs items={[{
           label: "Home",
           href: "/"

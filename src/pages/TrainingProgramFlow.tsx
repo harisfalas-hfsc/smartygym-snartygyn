@@ -6,11 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { InfoRibbon } from "@/components/InfoRibbon";
-import { ArrowLeft, Heart, Dumbbell, Activity, Flame, User, Move, Scale } from "lucide-react";
+import { Heart, Dumbbell, Activity, Flame, User, Move, Scale } from "lucide-react";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { generateBreadcrumbSchema } from "@/utils/seoHelpers";
 import { useAccessControl } from "@/hooks/useAccessControl";
-import { useShowBackButton } from "@/hooks/useShowBackButton";
+
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, type CarouselApi } from "@/components/ui/carousel";
@@ -21,7 +21,7 @@ import { CategoryCountBadge } from "@/components/ui/category-count-badge";
 
 const TrainingProgramFlow = () => {
   const navigate = useNavigate();
-  const { canGoBack, goBack } = useShowBackButton();
+  
   const { userTier } = useAccessControl();
   const isPremium = userTier === "premium";
   const isMobile = useIsMobile();
@@ -208,14 +208,6 @@ const TrainingProgramFlow = () => {
       
       <div className="min-h-screen bg-background">
         <div className="container mx-auto max-w-6xl px-4 pb-8">
-          {canGoBack && (
-            <div className="mb-6">
-              <Button variant="ghost" size="sm" onClick={goBack}>
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                <span className="text-xs sm:text-sm">Back</span>
-              </Button>
-            </div>
-          )}
           
           <PageBreadcrumbs items={[{
             label: "Home",

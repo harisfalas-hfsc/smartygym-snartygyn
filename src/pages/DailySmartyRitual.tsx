@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, Sunrise, Sun, Moon, Share2, Lock, Crown, Loader2, BookOpen, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAccessControl } from "@/hooks/useAccessControl";
-import { useShowBackButton } from "@/hooks/useShowBackButton";
+
 import { HTMLContent } from "@/components/HTMLContent";
 
 import { RitualShareDialog } from "@/components/ritual/RitualShareDialog";
@@ -30,7 +30,7 @@ interface DailyRitual {
 const DailySmartyRitual = () => {
   const navigate = useNavigate();
   const { userTier, isLoading: accessLoading } = useAccessControl();
-  const { canGoBack, goBack } = useShowBackButton();
+  
   
   const [ritual, setRitual] = useState<DailyRitual | null>(null);
   const [loading, setLoading] = useState(true);
@@ -152,13 +152,7 @@ const DailySmartyRitual = () => {
       <div className="min-h-screen bg-background">
         <div className="container mx-auto max-w-6xl px-4 pb-8">
           {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            {canGoBack && (
-              <Button variant="ghost" size="sm" onClick={goBack}>
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back
-              </Button>
-            )}
+          <div className="flex items-center justify-end mb-6">
             <div className="flex items-center gap-2">
               {isAuthenticated && ritual && (
                 <>

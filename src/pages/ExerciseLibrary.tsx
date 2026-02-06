@@ -3,15 +3,15 @@ import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
-import { ArrowLeft, Youtube, Video, Dumbbell } from "lucide-react";
-import { useShowBackButton } from "@/hooks/useShowBackButton";
+import { Youtube, Video, Dumbbell } from "lucide-react";
+
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import ExerciseVideoGrid from "@/components/ExerciseVideoGrid";
 import ExerciseDatabase from "@/components/ExerciseDatabase";
 
 const ExerciseLibrary = () => {
   const navigate = useNavigate();
-  const { canGoBack, goBack } = useShowBackButton();
+  
 
   return (
     <>
@@ -66,18 +66,6 @@ const ExerciseLibrary = () => {
       <div className="min-h-screen bg-background">
         
         <div className="container mx-auto max-w-6xl px-4 pb-8">
-          {canGoBack && (
-            <div className="mb-6">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={goBack}
-              >
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                <span className="text-xs sm:text-sm">Back</span>
-              </Button>
-            </div>
-          )}
           
           <PageBreadcrumbs 
             items={[
