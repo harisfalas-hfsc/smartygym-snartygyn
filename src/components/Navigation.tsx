@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useLayoutEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
@@ -422,8 +422,8 @@ export const Navigation = () => {
 
           {/* CENTER SECTION - Logo */}
           <div className="flex-1 flex justify-center max-w-[50%] sm:max-w-none">
-            <div
-              onClick={() => handleNavigate("/")}
+            <Link
+              to="/"
               className="cursor-pointer flex-shrink-0"
             >
               <img
@@ -431,7 +431,7 @@ export const Navigation = () => {
                 alt="SmartyGym"
                 className="h-12 xs:h-14 sm:h-[68px] md:h-20 lg:h-24 w-auto object-contain dark:mix-blend-lighten"
               />
-            </div>
+            </Link>
           </div>
 
           {/* Right Side - Auth */}
