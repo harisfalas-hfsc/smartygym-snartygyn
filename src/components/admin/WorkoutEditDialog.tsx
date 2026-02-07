@@ -47,15 +47,15 @@ const getRequiredFormat = (category: string): string | null => {
 const EQUIPMENT_OPTIONS = ["BODYWEIGHT", "EQUIPMENT"];
 
 const DURATION_OPTIONS = [
-  "15 MINUTES",
-  "20 MINUTES",
-  "25 MINUTES",
-  "30 MINUTES",
-  "35 MINUTES",
-  "40 MINUTES",
-  "45 MINUTES",
-  "50 MINUTES",
-  "VARIOUS"
+  "15 min",
+  "20 min",
+  "25 min",
+  "30 min",
+  "35 min",
+  "40 min",
+  "45 min",
+  "50 min",
+  "Various"
 ];
 
 // 0 = All Levels, 1-6 = stars
