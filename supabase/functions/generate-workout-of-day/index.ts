@@ -761,10 +761,10 @@ Every workout in the above categories MUST include 5 sections in this order:
    *** CRITICAL: Use all existing category reasoning - this is NOT changing ***
 
 4. ⚡ FINISHER (10-25 min)
-   Purpose: Complement the category with DIFFERENT format/structure/intensity
+   Purpose: Complement the main workout with a DIFFERENT format/structure
    • Must be RELATED to the category theme
    • Must have DIFFERENT format than main workout
-   • Must have DIFFERENT intensity level than main workout
+   • Intensity is governed by the RPE BALANCING RULE below
    Examples:
    • STRENGTH main (heavy compounds) → Finisher (lighter volume, higher reps)
    • CARDIO main (intervals) → Finisher (AMRAP or EMOM)
@@ -774,8 +774,8 @@ Every workout in the above categories MUST include 5 sections in this order:
    • "For Time" finishers: Do NOT prescribe a fixed duration in the section title.
      "For Time" means the athlete completes the work as fast as possible and records their time.
      Writing "Finisher (8')" with "For Time" is CONTRADICTORY and UNPROFESSIONAL.
-     CORRECT: "Finisher: Power Burn (For Time)" — no minutes in title.
-   • AMRAP finishers: DO prescribe a time cap (e.g., "Finisher: Burn Out (8-minute AMRAP)")
+     CORRECT: "Finisher (For Time)" — no minutes in title, no sub-name.
+   • AMRAP finishers: DO prescribe a time cap (e.g., "Finisher (8-minute AMRAP)")
    • Circuit/Tabata finishers: Prescribe rounds, not arbitrary minute totals
    • The finisher duration must EMERGE from the work prescribed, not be artificially set to fill remaining workout time. Think like a coach, not a calculator.
 
@@ -785,7 +785,46 @@ Every workout in the above categories MUST include 5 sections in this order:
    • For Time finishers: 3-5 exercises, potentially repeated in rounds
    • AMRAP finishers: 3-4 exercises per round
    • Tabata finishers: 4 exercises minimum (each gets 8 rounds of 20/10)
-   • The finisher must deliver REAL training value, not filler
+    • The finisher must deliver REAL training value, not filler
+
+RPE INTENSITY BALANCING RULE (MANDATORY):
+
+The main workout and finisher form ONE training session. Their combined intensity 
+must be balanced and humanly achievable, with a recovery break between them.
+
+Use the RPE (Rate of Perceived Exertion) scale to govern this balance:
+
+  RPE 1-3: Very light (walking, gentle movement)
+  RPE 4-5: Light to moderate (can hold a full conversation)
+  RPE 6-7: Moderate to hard (short sentences only)
+  RPE 8-9: Very hard (few words between breaths)
+  RPE 10:  Maximum effort (cannot speak)
+
+COMBINED RPE TARGETS BY DIFFICULTY:
+  Beginner (1-2 stars):       Combined Main + Finisher RPE = 8 to 11
+  Intermediate (3-4 stars):   Combined Main + Finisher RPE = 11 to 14
+  Advanced (5-6 stars):       Combined Main + Finisher RPE = 13 to 17
+
+KEY PRINCIPLE: There is a rest period between the main workout and finisher.
+The athlete recovers some energy. This means the finisher RPE does NOT need 
+to be the simple remainder (10 minus main). The athlete has more capacity 
+after resting.
+
+EXAMPLES:
+  Main RPE 7 (hard) --> Finisher RPE 5-7 (NOT 3 — rest gives recovery)
+  Main RPE 5 (moderate) --> Finisher RPE 7-8 (finisher can push harder)
+  Main RPE 9 (very hard) --> Finisher RPE 5-6 (NOT 1 — still meaningful work)
+  Main RPE 6 (moderate) --> Finisher RPE 6-7 (balanced session)
+
+WHAT THIS MEANS IN PRACTICE:
+  - If the main workout destroys the athlete (RPE 8-9), the finisher should 
+    allow quality movement at RPE 4-6, not push them to failure again
+  - If the main workout is moderate (RPE 5-6), the finisher can be the 
+    intense part of the session at RPE 7-8
+  - Never make both main workout AND finisher RPE 9+ (that is overtraining)
+  - Never make both main workout AND finisher RPE 3-4 (that wastes the session)
+  - The session should feel COMPLETE — the athlete finishes feeling worked 
+    but not destroyed
 
 5. 🧘 COOL DOWN (10 min)
    Purpose: Static stretching + diaphragmatic breathing
@@ -1534,7 +1573,7 @@ GOLD STANDARD 5-SECTION TEMPLATE (FOLLOW EXACTLY):
 <li class="tiptap-list-item"><p class="tiptap-paragraph">Lateral Shuffles (10m each way x 2), A-Skips (10m x 2), Light Jog (2 min)</p></li>
 </ul>
 <p class="tiptap-paragraph"></p>
-<p class="tiptap-paragraph">💪 <strong><u>Main Workout: The Grind (20-minute EMOM)</u></strong></p>
+<p class="tiptap-paragraph">💪 <strong><u>Main Workout (20-minute EMOM)</u></strong></p>
 <ul class="tiptap-bullet-list">
 <li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Minute 1:</strong> 15 Kettlebell Swings (moderate weight)</p></li>
 <li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Minute 2:</strong> 12 Box Jumps (20-24 inch box)</p></li>
@@ -1543,7 +1582,7 @@ GOLD STANDARD 5-SECTION TEMPLATE (FOLLOW EXACTLY):
 <li class="tiptap-list-item"><p class="tiptap-paragraph">Repeat this 4-minute sequence for a total of 5 rounds.</p></li>
 </ul>
 <p class="tiptap-paragraph"></p>
-<p class="tiptap-paragraph">⚡ <strong><u>Finisher: Metabolic Surge (For Time)</u></strong></p>
+<p class="tiptap-paragraph">⚡ <strong><u>Finisher (For Time)</u></strong></p>
 <ul class="tiptap-bullet-list">
 <li class="tiptap-list-item"><p class="tiptap-paragraph">500m Rowing Machine (max effort pace)</p></li>
 <li class="tiptap-list-item"><p class="tiptap-paragraph">20 Dumbbell Thrusters (moderate weight, 8-12kg each hand)</p></li>
@@ -1553,7 +1592,7 @@ GOLD STANDARD 5-SECTION TEMPLATE (FOLLOW EXACTLY):
 </ul>
 
 BAD FINISHER EXAMPLE (NEVER DO THIS):
-⚡ Finisher: Metabolic Melt (8') ← WRONG: "For Time" with fixed 8-minute duration
+⚡ Finisher (8') ← WRONG: "For Time" with fixed 8-minute duration is contradictory
   * For Time: ← WRONG: format label with a bullet point
   * 500m Row sprint ← WRONG: vague equipment, "sprint" is for running only
   * 20 Thrusters (light dumbbell/kettlebell) ← WRONG: each arm? total? vague weight
@@ -1576,6 +1615,18 @@ SECTION ICON RULES (MANDATORY):
 - ⚡ for Finisher (ONLY ONE - never duplicate)
 - 🧘 for Cool Down (ONLY ONE - never duplicate)
 Icons go BEFORE <strong><u>Section Title</u></strong> with a space after the emoji.
+
+SECTION NAMING RULE (MANDATORY):
+- Soft Tissue Preparation, Activation, Cool Down: Keep simple names with duration
+    Example: "Soft Tissue Preparation 5'", "Activation 15'", "Cool Down 10'"
+- Main Workout: Label as "Main Workout (FORMAT DURATION')" — NO creative sub-name
+    CORRECT: "Main Workout (TABATA 24')" or "Main Workout (CIRCUIT 30')"
+    WRONG: "Main Workout: Iron Forge (TABATA 24')" — no sub-names allowed
+- Finisher: Label as "Finisher (FORMAT DURATION')" or "Finisher (For Time)" — NO creative sub-name
+    CORRECT: "Finisher (8-minute AMRAP)" or "Finisher (For Time)"
+    WRONG: "Finisher: Burn Out (8-minute AMRAP)" — no sub-names allowed
+- The creative workout name belongs ONLY in the "name" field of the JSON response
+- The ENTIRE workout shares ONE name. Sections do not get their own names.
 
 COMPACT SPACING RULES:
 - NO empty paragraphs between exercises within a section
