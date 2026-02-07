@@ -1,230 +1,139 @@
 
 
-## Redefine Duration: Main + Finisher Only, Smarter AI, Better Filters
+## Fix All Existing Durations + Smart Duration Distribution for AI Generation
 
-### The Core Problem
+### Part 1: Fix All 185 Existing Workout Durations
 
-Currently, the `duration` field stored in the database represents the **total routine time** (Soft Tissue 5' + Activation 10-15' + Main Workout + Finisher + Cool Down 10' = everything). This means:
-- The shortest possible workout is already ~30 minutes even with a tiny main workout
-- Filters like "20 min" or "30 min" never match meaningful short workouts
-- Customers looking for quick sessions see nothing, or see misleading durations
+The audit function code is already correct (sums Main + Finisher only). We need to:
 
-### The New Rule
+1. **Redeploy** the `audit-workout-durations` edge function to ensure the live version matches the code
+2. **Run a dry-run** first to preview all changes across 185 workouts
+3. **Apply the changes** to update all durations in the database
+4. **Normalize format strings** -- 6 Pilates workouts use "X minutes" instead of "X min" (the audit will fix these automatically since it writes "X min" format)
 
-**Duration = Main Workout + Finisher ONLY.** The warm-up (Soft Tissue + Activation) and Cool Down are constants that exist in every routine. Customers care about "how long is the actual work?" -- not the total routine time including foam rolling and stretching.
-
----
-
-### Change 1: Redefine `getDuration()` function
-
-**File:** `supabase/functions/generate-workout-of-day/index.ts`, lines 407-427
-
-The `getDuration()` function currently returns total routine time (50-75 min). It needs to return **Main + Finisher time only**.
-
-**Current values (total time):**
-```
-REPS & SETS: [50, 60, 75]
-CIRCUIT:     [45, 55, 70]
-TABATA:      [40, 50, 60]
-AMRAP:       [40, 50, 65]
-EMOM:        [40, 50, 60]
-```
-
-**New values (Main + Finisher only, subtracting ~25 min of warm-up/cool-down):**
-```
-REPS & SETS: [25, 35, 50]    (Beginner / Intermediate / Advanced)
-CIRCUIT:     [20, 30, 45]
-TABATA:      [15, 25, 35]
-AMRAP:       [15, 25, 40]
-EMOM:        [15, 25, 35]
-FOR TIME:    "Various"       (unchanged -- depends on the athlete)
-MIX:         [20, 30, 45]
-```
-
-These are starting estimates. The post-generation parser will override with the actual calculated sum from the HTML.
+After the fix, the current distribution (all stored as total routine time: 25-75 min range) will shift down to the Main + Finisher only range (~10-50 min), correctly populating the short-duration filter categories (15 min, 20 min) that were previously empty.
 
 ---
 
-### Change 2: Redefine `calculateActualDuration()` post-generation parser
+### Part 2: Fix Admin Panel Duration Format Inconsistency
 
-**File:** `supabase/functions/generate-workout-of-day/index.ts`, lines 1992-2068
+**Problem found:** When you manually create a workout in the admin panel, the duration dropdown stores values like `"15 MINUTES"`, `"20 MINUTES"`, etc. But the AI-generated workouts store `"15 min"`, `"30 min"`, etc. The filters use regex to extract numbers, so they work -- but the format inconsistency is messy and could cause edge cases.
 
-Currently this function sums ALL 5 sections. It needs to sum **only Main Workout + Finisher** sections.
+**Fix in `src/components/admin/WorkoutEditDialog.tsx`:**
 
-**How it will work:**
-- Parse the HTML for section headers as before
-- Identify which sections are Main Workout (icon 💪) and Finisher (icon ⚡) 
-- Sum ONLY those two sections
-- Ignore Soft Tissue, Activation, and Cool Down durations
-- For "For Time" finishers (no duration in header), set the workout duration to "Various"
-- Sanity check: result should be between 10 and 60 minutes (not 120 as before)
-- Rounding to nearest 5 minutes for clean display
-
----
-
-### Change 3: Update the AI prompt -- Duration and Finisher Philosophy
-
-**File:** `supabase/functions/generate-workout-of-day/index.ts`
-
-**a) Replace the TOTAL DURATION RULE (lines 1636-1652)** with a new DURATION PHILOSOPHY block:
-
-```
-DURATION RULE (CRITICAL - NEW DEFINITION):
-
-The "duration" of a workout refers to the MAIN WORKOUT + FINISHER time ONLY.
-Soft Tissue (5'), Activation (10-15'), and Cool Down (10') are CONSTANT overhead 
-that every routine includes -- they are NOT part of the advertised duration.
-
-When you see "Target Duration: 30 min", that means:
-  Main Workout + Finisher = 30 minutes
-  The full routine will be ~55 minutes (25' overhead + 30' work)
-
-This is like a restaurant menu showing "cooking time" not "total visit time."
-Customers want to know how long the ACTUAL TRAINING is.
-
-YOUR TARGET MAIN+FINISHER DURATION: ${duration}
-
-DURATION-RPE-DIFFICULTY RELATIONSHIP (THINK LIKE AN EXPERT COACH):
-
-Short duration + Advanced difficulty = MAXIMUM intensity (RPE ceiling)
-  A 15-minute advanced workout must be absolutely brutal. Every second counts.
-
-Long duration + Advanced difficulty = High but NOT maximum intensity (RPE 1-2 below ceiling)
-  A 50-minute advanced session sustains high effort but allows pacing.
-
-Short duration + Beginner difficulty = Still meaningful stimulus
-  A 15-minute beginner workout must still deliver real training value. 
-  Not filler. Not "just stretching." Real work at appropriate intensity.
-
-Long duration + Beginner difficulty = Gentle but complete programming
-  More exercises, more rest, more technique focus. Low RPE but full session.
-
-VARIETY IS ESSENTIAL:
-  Your platform serves thousands of customers with different schedules.
-  Some want 15-minute sessions. Some want 50-minute sessions.
-  Generate VARIETY in duration across days. Not every workout should be 30 minutes.
-  Short workouts are just as valuable as long ones when designed properly.
-
-INTERNAL TOTAL ROUTINE AWARENESS:
-  While the advertised duration is Main + Finisher only, you must still ensure
-  the TOTAL routine (all 5 sections) does not exceed 90 minutes.
-  A typical total routine: 25' overhead + Main + Finisher = total.
-```
-
-**b) Add FINISHER OPTIONALITY RULE** (new block after the RPE section, around line 828):
-
-```
-FINISHER OPTIONALITY RULE (INTELLIGENT DECISION-MAKING):
-
-The finisher is NOT always mandatory. Think like an experienced head coach:
-
-WHEN TO SKIP THE FINISHER:
-- Beginner workouts (1-2 stars) with short target duration (15-20 min):
-  If the main workout delivers complete stimulus, no finisher needed.
-- Challenge category where the main workout IS the entire challenge
-  (e.g., "Complete 100 burpees + 1km run" -- adding a finisher is absurd)
-- When the main workout RPE is 9+ and the target duration is short:
-  The athlete is already destroyed. A finisher adds nothing.
-- When the combined RPE would exceed the difficulty bracket ceiling
-
-WHEN TO ALWAYS INCLUDE THE FINISHER:
-- Intermediate and Advanced workouts with target duration >= 30 min
-- Strength workouts (the finisher provides volume completion at lighter load)
-- When the main workout alone doesn't reach the target duration
-
-THE GOLDEN RULE:
-If the main workout is FULL ENOUGH to deliver the required stimulus for the 
-category, difficulty, and duration -- you MAY skip the finisher.
-But this is a COACHING DECISION, not a default. Most workouts WILL have finishers.
-The finisher is a tool, not a checkbox.
-
-WHEN THERE IS NO FINISHER:
-- The workout still has 4 sections: Soft Tissue, Activation, Main Workout, Cool Down
-- The duration = Main Workout time only
-- The ⚡ Finisher section is simply omitted from the HTML
-```
-
-**c) Update the "Various" duration logic:**
-
-Currently `FOR TIME` format always returns "Various". This should be expanded:
-- If the main workout is "For Time" format AND the finisher is also time-dependent, use "Various"
-- Challenge workouts that are user-pace-dependent should also use "Various"
-- The AI prompt should explain that "Various" means "depends on the athlete's pace"
-
----
-
-### Change 4: Update Duration Filter Options
-
-The new duration range (Main + Finisher only) will produce workouts in the 15-50 minute range instead of 40-75. The filter options need to match.
-
-**Files to update:**
-
-**a) `src/pages/WorkoutDetail.tsx`** (line 38 and lines 460-468):
-```
-Type:    "all" | "15" | "20" | "30" | "40" | "50" | "various"
-Options: All Durations, 15 min, 20 min, 30 min, 40 min, 50 min, Various
-```
-
-**b) `src/components/admin/WorkoutsManager.tsx`** (lines 619-626):
-```
-Same filter options: 15, 20, 30, 40, 50, Various
-```
-
-**c) `src/components/WorkoutFilters.tsx`** (line 26):
-```
-const durations = ["All", "15", "20", "30", "40", "50", "Various"];
-```
-
-**d) `src/components/smartly-suggest/SmartlySuggestModal.tsx`** (lines 62-67):
-```
-{ label: "15 min", value: 15 },
-{ label: "20 min", value: 20 },
-{ label: "30 min", value: 30 },
-{ label: "45 min", value: 45 },
-```
-
-**e) `src/components/admin/WorkoutEditDialog.tsx`** (lines 49-60):
+Change `DURATION_OPTIONS` from:
 ```
 "15 MINUTES", "20 MINUTES", "25 MINUTES", "30 MINUTES", 
 "35 MINUTES", "40 MINUTES", "45 MINUTES", "50 MINUTES", "VARIOUS"
 ```
 
-The range-matching filter logic (rangeMin = filterNum - 5, rangeMax = filterNum + 4) remains the same -- it already works correctly.
+To match the AI format exactly:
+```
+"15 min", "20 min", "25 min", "30 min", 
+"35 min", "40 min", "45 min", "50 min", "Various"
+```
+
+This ensures all manually created workouts use the same format as AI-generated ones.
 
 ---
 
-### Change 5: Update the `calculateActualDuration` to sum Main + Finisher only
+### Part 3: Verify All Filters Work Correctly
 
-**File:** `supabase/functions/generate-workout-of-day/index.ts`, lines 1992-2068
+The duration filters are already updated to the new range (15, 20, 30, 40, 50, Various) in all locations:
 
-The parser currently collects ALL section durations. The change:
-- Still parse all headers (needed for internal validation)
-- But only SUM the durations from 💪 (Main Workout) and ⚡ (Finisher) headers
-- If the finisher is "For Time" with no duration, set the workout duration to "Various"
-- Sanity check range: 10-60 minutes (instead of current 10-120)
+| Location | Current State | Action Needed |
+|---|---|---|
+| `WorkoutDetail.tsx` (visitor page) | 15, 20, 30, 40, 50, Various | Already correct |
+| `WorkoutsManager.tsx` (admin panel) | 15, 20, 30, 40, 50, Various | Already correct |
+| `WorkoutFilters.tsx` (general) | 15, 20, 30, 40, 50, Various | Already correct |
+| `SmartlySuggestModal.tsx` | 15, 20, 30, 45 | Already correct |
+| `WorkoutEditDialog.tsx` (admin create) | 15-50 range + Various | Fix format only (Part 2) |
+
+The filter range-matching logic (`filterNum - 5` to `filterNum + 4`) is already in place and works correctly:
+- "15 min" filter matches workouts with duration 10-19 min
+- "20 min" filter matches workouts with duration 15-24 min
+- "30 min" filter matches workouts with duration 25-34 min
+- "40 min" filter matches workouts with duration 35-44 min
+- "50 min" filter matches workouts with duration 45-54 min
+
+This means a workout with duration "35 min" will appear under both "30 min" and "40 min" filters -- providing good overlap and coverage.
 
 ---
 
-### Summary of All File Changes
+### Part 4: Smart Duration Distribution Awareness for AI Generation
+
+This is the new feature. Before generating each day's workout, the AI will query the current duration distribution from the database and use it to make smarter decisions about which durations to target.
+
+**Where:** `supabase/functions/generate-workout-of-day/index.ts`
+
+**Step 1: Query the distribution** (add after the periodization context fetch, around line 530)
+
+Before generating, query the database for:
+```sql
+SELECT category, duration, COUNT(*) as count 
+FROM admin_workouts 
+WHERE category = [today's category] 
+AND is_workout_of_day IS NOT NULL
+GROUP BY category, duration
+```
+
+This produces a snapshot like:
+```
+STRENGTH: 15 min (0), 20 min (2), 30 min (5), 40 min (8), 50 min (3)
+```
+
+**Step 2: Calculate gaps and inject into the AI prompt**
+
+From the distribution, identify which duration brackets are underrepresented for the current category and difficulty level. Format this as a prompt injection:
+
+```
+DURATION DISTRIBUTION AWARENESS:
+Current ${category} workouts in your library:
+  15 min: 0 workouts (UNDERREPRESENTED - consider targeting this duration)
+  20 min: 2 workouts
+  30 min: 5 workouts
+  40 min: 8 workouts (well represented)
+  50 min: 3 workouts
+
+The platform needs VARIETY. If a duration bracket has fewer workouts, 
+you are ENCOURAGED (not forced) to target it -- but ONLY if it makes 
+sense for the current difficulty level and category.
+
+Remember: Short duration + Advanced = maximum intensity.
+Long duration + Beginner = gentle but complete.
+Never sacrifice workout quality just to fill a gap.
+```
+
+**Step 3: Optionally adjust the `getDuration()` base estimate**
+
+The `getDuration()` function currently returns fixed values per format and difficulty. We can add light randomization weighted toward underrepresented durations:
+
+- If the distribution shows "15 min" is underrepresented for this category, and the difficulty allows it (beginner or intermediate short sessions are valid), occasionally return 15 min instead of the default
+- This is a suggestion to the AI, not a hard override -- the `calculateActualDuration()` post-parser will still compute the real value from the generated HTML
+
+**Key constraints:**
+- The AI must NEVER sacrifice quality to fill a gap
+- The distribution guidance is a "nudge," not a mandate
+- The combined RPE rules still apply -- a short advanced workout must be brutal, a long beginner workout must still deliver value
+- The AI prompt already includes the DURATION-RPE-DIFFICULTY relationship rules, so this adds distribution context on top
+
+---
+
+### Part 5: Summary of All Changes
 
 | File | What Changes | Why |
 |---|---|---|
-| `generate-workout-of-day/index.ts` (getDuration) | New base durations for Main+Finisher only | Duration definition change |
-| `generate-workout-of-day/index.ts` (calculateActualDuration) | Sum only Main+Finisher sections | Duration definition change |
-| `generate-workout-of-day/index.ts` (AI prompt) | New DURATION RULE, FINISHER OPTIONALITY, Duration-RPE relationship | AI coaching intelligence |
-| `WorkoutDetail.tsx` | New filter options (15-50 instead of 30-75) | Match new duration range |
-| `WorkoutsManager.tsx` | New filter options | Match new duration range |
-| `WorkoutFilters.tsx` | New durations array | Match new duration range |
-| `SmartlySuggestModal.tsx` | New duration options | Match new duration range |
-| `WorkoutEditDialog.tsx` | New DURATION_OPTIONS | Match new duration range |
+| `audit-workout-durations/index.ts` | Redeploy (no code changes) | Ensure live version uses Main+Finisher logic |
+| `generate-workout-of-day/index.ts` | Add DB query for duration distribution + inject into prompt | Smart gap-filling over time |
+| `WorkoutEditDialog.tsx` | Fix DURATION_OPTIONS format from "X MINUTES" to "X min" | Consistent format with AI-generated workouts |
 
 ### What Will NOT Change
 
-- The 5-section structure (all workouts still have Soft Tissue, Activation, Main, optional Finisher, Cool Down)
+- The 5-section workout structure
 - HTML formatting, icons, spacing rules
-- Category-specific exercise rules, RPE balancing logic, equipment governance
-- The filter range-matching logic (already works: filterNum +/- 5)
-- How duration is displayed to users on workout cards and detail pages
-- Database schema (the `duration` column stays as-is, just stores different values going forward)
-- Existing workouts in the database (they keep their current durations -- only NEW generated workouts use the new logic)
+- Category-specific exercise rules, RPE balancing logic
+- The filter range-matching logic (already works correctly)
+- Filter options in visitor pages and admin panel (already updated to 15-50 range)
+- Equipment governance, format rules
+- How duration is displayed to users on workout cards
 
