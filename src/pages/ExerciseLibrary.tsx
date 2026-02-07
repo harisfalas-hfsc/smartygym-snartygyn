@@ -108,8 +108,8 @@ const ExerciseLibrary = () => {
             </CardContent>
           </Card>
 
-          {/* SmartyGym Video Gallery Card - Hidden on mobile */}
-          <Card className="hidden md:block border-2 border-primary/30 shadow-lg mb-6">
+          {/* SmartyGym Video Gallery Card - Temporarily hidden, keep code for future use */}
+          {/* <Card className="hidden md:block border-2 border-primary/30 shadow-lg mb-6">
             <CardContent className="p-6">
               <div className="flex items-center gap-3 mb-4">
                 <Video className="h-6 w-6 text-primary" />
@@ -119,7 +119,7 @@ const ExerciseLibrary = () => {
               </div>
               <ExerciseVideoGrid />
             </CardContent>
-          </Card>
+          </Card> */}
 
           {/* YouTube Channel Card - Hidden on mobile */}
           <Card className="hidden md:block border-2 border-primary/30 shadow-lg">
