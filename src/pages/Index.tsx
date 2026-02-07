@@ -1178,7 +1178,7 @@ const Index = () => {
               </div>
                 <div>
                   <CardTitle className="text-2xl md:text-3xl">Message from Haris Falas</CardTitle>
-                  <p className="text-muted-foreground">Your Personal Coach & Program Designer</p>
+                  <p className="text-muted-foreground">SmartyGym Founder & Your Personal Coach</p>
                 </div>
               </div>
             </CardHeader>
