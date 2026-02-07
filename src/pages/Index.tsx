@@ -813,8 +813,8 @@ const Index = () => {
                             <p className="text-xl font-bold text-primary mb-2">
                               Your Gym Re-imagined Anywhere, Anytime
                             </p>
-                            <p className="text-sm text-muted-foreground leading-relaxed mb-3">
-                              Expert-crafted workouts, structured training programs, a comprehensive exercise library, science-based articles, and a personal logbook — everything a complete gym must offer, built by real professionals, all in your pocket at <strong>smartygym.com</strong>.
+                            <p className="text-base text-muted-foreground leading-relaxed mb-3">
+                              <strong className="text-foreground">Expert-crafted workouts</strong>, <strong className="text-foreground">structured training programs</strong>, a comprehensive <strong className="text-foreground">exercise library</strong>, science-based <strong className="text-foreground">articles</strong>, and a personal <strong className="text-foreground">logbook</strong>, everything a complete gym must offer, built by real professionals, all in your pocket at <strong className="text-foreground">smartygym.com</strong>.
                             </p>
                             <p className="text-base text-muted-foreground leading-relaxed">
                               We are not here to replace your gym. We are here to back you up when life gets in the way. Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed — SmartyGym is your backup plan. Or, if you prefer training from home entirely, we've got you covered. Or, if you go to your gym but want to follow a professional, science-based workout or training program designed by{' '}
