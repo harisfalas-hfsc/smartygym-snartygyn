@@ -619,11 +619,11 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Durations</SelectItem>
+                <SelectItem value="15">15 min</SelectItem>
+                <SelectItem value="20">20 min</SelectItem>
                 <SelectItem value="30">30 min</SelectItem>
                 <SelectItem value="40">40 min</SelectItem>
                 <SelectItem value="50">50 min</SelectItem>
-                <SelectItem value="60">60 min</SelectItem>
-                <SelectItem value="75">75 min</SelectItem>
                 <SelectItem value="various">Various</SelectItem>
               </SelectContent>
             </Select>

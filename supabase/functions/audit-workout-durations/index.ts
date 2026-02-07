@@ -146,11 +146,19 @@ function parseSectionDurations(html: string, category: string | null): {
     }
   }
 
+  // Duration = Main Workout + Finisher ONLY (not total routine)
+  const mainSection = sections.find(s => s.section === 'Main Workout');
+  const finisherSection = sections.find(s => s.section === 'Finisher');
+  
+  const mainMinutes = mainSection?.minutes || 0;
+  const finisherMinutes = finisherSection?.minutes || 0;
+  const workDuration = mainMinutes + finisherMinutes;
+  
   const total = sections.reduce((sum, s) => sum + s.minutes, 0);
   const confidence: 'high' | 'medium' | 'low' =
     parsedCount >= 4 ? 'high' : parsedCount >= 2 && sections.length >= 4 ? 'medium' : 'low';
 
-  return { sections, total, confidence };
+  return { sections, total: workDuration, confidence };
 }
 
 serve(async (req) => {

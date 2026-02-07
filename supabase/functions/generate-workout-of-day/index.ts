@@ -404,22 +404,23 @@ serve(async (req) => {
       hasForcedParameters: !!forcedParameters
     });
 
-    // Duration calculation function - returns TOTAL workout time (all 5 sections combined)
-    // Soft Tissue (5) + Activation (10-15) + Main Workout + Finisher (8-15) + Cool Down (10) = TOTAL
+    // Duration calculation function - returns MAIN WORKOUT + FINISHER time ONLY
+    // Warm-up (Soft Tissue 5' + Activation 10-15') and Cool Down (10') are constant overhead
+    // and NOT included in the advertised duration. Customers care about "how long is the work?"
     const getDuration = (fmt: string, stars: number): string => {
       const baseDurations: Record<string, number[]> = {
-        "REPS & SETS": [50, 60, 75],
-        "CIRCUIT": [45, 55, 70],
-        "TABATA": [40, 50, 60],
-        "AMRAP": [40, 50, 65],
-        "EMOM": [40, 50, 60],
+        "REPS & SETS": [25, 35, 50],
+        "CIRCUIT": [20, 30, 45],
+        "TABATA": [15, 25, 35],
+        "AMRAP": [15, 25, 40],
+        "EMOM": [15, 25, 35],
         "FOR TIME": [0, 0, 0],
-        "MIX": [45, 55, 70]
+        "MIX": [20, 30, 45]
       };
       
       if (fmt === "FOR TIME") return "Various";
       
-      const [minDuration, midDuration, maxDuration] = baseDurations[fmt] || [45, 55, 70];
+      const [minDuration, midDuration, maxDuration] = baseDurations[fmt] || [20, 30, 45];
       
       if (stars <= 2) return `${minDuration} min`;
       if (stars <= 4) return `${midDuration} min`;
@@ -825,6 +826,35 @@ WHAT THIS MEANS IN PRACTICE:
   - Never make both main workout AND finisher RPE 3-4 (that wastes the session)
   - The session should feel COMPLETE — the athlete finishes feeling worked 
     but not destroyed
+
+FINISHER OPTIONALITY RULE (INTELLIGENT DECISION-MAKING):
+
+The finisher is NOT always mandatory. Think like an experienced head coach:
+
+WHEN TO SKIP THE FINISHER:
+- Beginner workouts (1-2 stars) with short target duration (15-20 min):
+  If the main workout delivers complete stimulus, no finisher needed.
+- Challenge category where the main workout IS the entire challenge
+  (e.g., "Complete 100 burpees + 1km run" -- adding a finisher is absurd)
+- When the main workout RPE is 9+ and the target duration is short:
+  The athlete is already destroyed. A finisher adds nothing.
+- When the combined RPE would exceed the difficulty bracket ceiling
+
+WHEN TO ALWAYS INCLUDE THE FINISHER:
+- Intermediate and Advanced workouts with target duration >= 30 min
+- Strength workouts (the finisher provides volume completion at lighter load)
+- When the main workout alone doesn't reach the target duration
+
+THE GOLDEN RULE:
+If the main workout is FULL ENOUGH to deliver the required stimulus for the 
+category, difficulty, and duration -- you MAY skip the finisher.
+But this is a COACHING DECISION, not a default. Most workouts WILL have finishers.
+The finisher is a tool, not a checkbox.
+
+WHEN THERE IS NO FINISHER:
+- The workout still has 4 sections: Soft Tissue, Activation, Main Workout, Cool Down
+- The duration = Main Workout time only
+- The ⚡ Finisher section is simply omitted from the HTML
 
 5. 🧘 COOL DOWN (10 min)
    Purpose: Static stretching + diaphragmatic breathing
@@ -1633,23 +1663,46 @@ COMPACT SPACING RULES:
 - ONE empty paragraph between sections only
 - NO leading empty paragraphs at the start
 
-TOTAL DURATION RULE (CRITICAL - NON-NEGOTIABLE):
-The workout duration represents the TOTAL time for ALL 5 sections combined:
-  Soft Tissue (5 min) + Activation (10-15 min) + Main Workout + Finisher + Cool Down (10 min)
+DURATION RULE (CRITICAL - NEW DEFINITION):
 
-The duration you are given (e.g., "50 min") is the TARGET TOTAL for all sections.
-Design your section durations so they ADD UP to the target total.
+The "duration" of a workout refers to the MAIN WORKOUT + FINISHER time ONLY.
+Soft Tissue (5'), Activation (10-15'), and Cool Down (10') are CONSTANT overhead 
+that every routine includes -- they are NOT part of the advertised duration.
 
-EXAMPLE for 50 min total target:
-  5' (soft tissue) + 10' (activation) + 17' (main) + 8' (finisher) + 10' (cool down) = 50 min
+When you see "Target Duration: 30 min", that means:
+  Main Workout + Finisher = 30 minutes
+  The full routine will be ~55 minutes (25' overhead + 30' work)
 
-NEVER design a 20-minute main workout + 15-minute activation + 10-minute finisher 
-and then label the workout as "20 minutes." That is basic math failure.
+This is like a restaurant menu showing "cooking time" not "total visit time."
+Customers want to know how long the ACTUAL TRAINING is.
 
-For "For Time" finishers: Do not write a minute count in the title, but internally
-estimate the completion time (typically 8-15 min) and include it in your total calculation.
+YOUR TARGET MAIN+FINISHER DURATION: ${duration}
 
-YOUR TARGET TOTAL DURATION: ${duration}
+DURATION-RPE-DIFFICULTY RELATIONSHIP (THINK LIKE AN EXPERT COACH):
+
+Short duration + Advanced difficulty = MAXIMUM intensity (RPE ceiling)
+  A 15-minute advanced workout must be absolutely brutal. Every second counts.
+
+Long duration + Advanced difficulty = High but NOT maximum intensity (RPE 1-2 below ceiling)
+  A 50-minute advanced session sustains high effort but allows pacing.
+
+Short duration + Beginner difficulty = Still meaningful stimulus
+  A 15-minute beginner workout must still deliver real training value. 
+  Not filler. Not "just stretching." Real work at appropriate intensity.
+
+Long duration + Beginner difficulty = Gentle but complete programming
+  More exercises, more rest, more technique focus. Low RPE but full session.
+
+VARIETY IS ESSENTIAL:
+  Your platform serves thousands of customers with different schedules.
+  Some want 15-minute sessions. Some want 50-minute sessions.
+  Generate VARIETY in duration across days. Not every workout should be 30 minutes.
+  Short workouts are just as valuable as long ones when designed properly.
+
+INTERNAL TOTAL ROUTINE AWARENESS:
+  While the advertised duration is Main + Finisher only, you must still ensure
+  the TOTAL routine (all 5 sections) does not exceed 90 minutes.
+  A typical total routine: 25' overhead + Main + Finisher = total.
 
 {
   "name": "Creative, motivating workout name (2-4 words, unique)",
@@ -1992,79 +2045,81 @@ Return JSON with these exact fields:
       const calculateActualDuration = (html: string): string | null => {
         if (!html) return null;
         
-        let totalMinutes = 0;
-        let foundSections = 0;
-        let hasForTimeSectionWithoutDuration = false;
+        let mainMinutes = 0;
+        let finisherMinutes = 0;
+        let foundMainOrFinisher = false;
+        let hasForTimeFinisher = false;
         
-        // Match patterns like: 5', 10', 24', (20'), (15-minute AMRAP), (8-minute AMRAP)
-        // Also match ranges like 10-15' or "30-45 min"
-        const sectionPatterns = [
-          // "Soft Tissue Preparation 5'" or "Cool Down 10'"
-          /(?:Soft Tissue|Activation|Main Workout|Finisher|Cool Down)[^<]*?(\d+)'/gi,
-          // "(24')" or "(20')" in parentheses
-          /\((\d+)'\)/g,
-          // "(8-minute AMRAP)" or "(15-minute AMRAP)"
-          /\((\d+)-minute\s+(?:AMRAP|EMOM|Tabata|Circuit)\)/gi,
-          // "(20-minute EMOM)" pattern
-          /\((\d+)\s*-\s*minute/gi,
-        ];
-        
-        // Extract all duration numbers from section headers
-        const headerMatches: number[] = [];
-        
-        // Get all section header lines (paragraphs with strong/u tags or emoji headers)
+        // Get all section header lines (paragraphs with emoji headers)
         const headerRegex = /<p[^>]*>(?:🧽|🔥|💪|⚡|🧘)[^<]*?(?:<[^>]*>)*[^<]*?<\/p>/gi;
         const headers = html.match(headerRegex) || [];
         
         for (const header of headers) {
+          const isMainWorkout = header.includes('💪');
+          const isFinisher = header.includes('⚡');
+          
+          // Only sum Main Workout and Finisher sections
+          if (!isMainWorkout && !isFinisher) continue;
+          
           // Look for minute markers: 5', 10', (24'), (8-minute AMRAP), etc.
+          let minutes = 0;
+          
           const minuteMatch = header.match(/(\d+)'/);
           if (minuteMatch) {
-            headerMatches.push(parseInt(minuteMatch[1]));
-            foundSections++;
-            continue;
+            minutes = parseInt(minuteMatch[1]);
           }
           
-          const parenMinuteMatch = header.match(/\((\d+)(?:'|-minute)/i);
-          if (parenMinuteMatch) {
-            headerMatches.push(parseInt(parenMinuteMatch[1]));
-            foundSections++;
-            continue;
+          if (!minutes) {
+            const parenMinuteMatch = header.match(/\((\d+)(?:'|-minute)/i);
+            if (parenMinuteMatch) {
+              minutes = parseInt(parenMinuteMatch[1]);
+            }
           }
           
-          // Check for "For Time" without duration - estimate based on content
-          if (/for\s*time/i.test(header) && !/\d+/.test(header)) {
-            hasForTimeSectionWithoutDuration = true;
-            headerMatches.push(12); // Estimate 12 min for "For Time" finishers
-            foundSections++;
-            continue;
+          if (!minutes) {
+            // Check for range like "20-30'" 
+            const rangeMatch = header.match(/(\d+)-(\d+)\s*(?:min|')/i);
+            if (rangeMatch) {
+              minutes = Math.round((parseInt(rangeMatch[1]) + parseInt(rangeMatch[2])) / 2);
+            }
           }
           
-          // Check for range like "30-45 min" in recovery
-          const rangeMatch = header.match(/(\d+)-(\d+)\s*(?:min|')/i);
-          if (rangeMatch) {
-            // Use average of range
-            const avg = Math.round((parseInt(rangeMatch[1]) + parseInt(rangeMatch[2])) / 2);
-            headerMatches.push(avg);
-            foundSections++;
-            continue;
+          // Check for "For Time" without duration
+          if (!minutes && /for\s*time/i.test(header) && !/\d+/.test(header)) {
+            if (isFinisher) {
+              hasForTimeFinisher = true;
+              minutes = 12; // Internal estimate for calculation
+            }
+          }
+          
+          if (isMainWorkout) {
+            mainMinutes = minutes;
+            foundMainOrFinisher = true;
+          } else if (isFinisher) {
+            finisherMinutes = minutes;
+            foundMainOrFinisher = true;
           }
         }
         
-        if (foundSections < 3) {
-          // Not enough sections found to calculate meaningful duration
+        if (!foundMainOrFinisher || mainMinutes === 0) {
+          // Could not parse main workout duration
           return null;
         }
         
-        totalMinutes = headerMatches.reduce((sum, m) => sum + m, 0);
+        // If finisher is "For Time" with no explicit duration, use "Various"
+        if (hasForTimeFinisher) {
+          return "Various";
+        }
         
-        if (totalMinutes < 10 || totalMinutes > 120) {
-          // Sanity check - something went wrong with parsing
+        const totalWorkMinutes = mainMinutes + finisherMinutes;
+        
+        if (totalWorkMinutes < 10 || totalWorkMinutes > 60) {
+          // Sanity check - Main+Finisher should be 10-60 min
           return null;
         }
         
         // Round to nearest 5 for cleaner display
-        const rounded = Math.round(totalMinutes / 5) * 5;
+        const rounded = Math.round(totalWorkMinutes / 5) * 5;
         return `${rounded} min`;
       };
       

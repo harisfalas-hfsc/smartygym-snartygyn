@@ -35,7 +35,7 @@ import { stripHtmlTags } from "@/lib/text";
 type EquipmentFilter = "all" | "bodyweight" | "equipment";
 type LevelFilter = "all" | "beginner" | "intermediate" | "advanced";
 type FormatFilter = "all" | "circuit" | "amrap" | "for time" | "tabata" | "reps & sets" | "emom" | "mix";
-type DurationFilter = "all" | "30" | "40" | "50" | "60" | "75" | "various";
+type DurationFilter = "all" | "15" | "20" | "30" | "40" | "50" | "various";
 type StatusFilter = "all" | "viewed" | "completed" | "not-viewed" | "favorites";
 type SortByFilter = "newest" | "oldest" | "name-asc" | "name-desc";
 type AccessFilter = "all" | "free" | "premium" | "purchasable";
@@ -459,11 +459,11 @@ const WorkoutDetail = () => {
               placeholder: "Duration",
               options: [
                 { value: "all", label: "All Durations" },
+                { value: "15", label: "15 min" },
+                { value: "20", label: "20 min" },
                 { value: "30", label: "30 min" },
                 { value: "40", label: "40 min" },
                 { value: "50", label: "50 min" },
-                { value: "60", label: "60 min" },
-                { value: "75", label: "75 min" },
                 { value: "various", label: "Various" },
               ],
             },
