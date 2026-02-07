@@ -1,140 +1,145 @@
 
 
-## Fix: Duration Filters, Mobile Layout, and Dark Mode -- All Files
+## Update WOD Generation: RPE-Based Finisher Logic + Remove Section Sub-Names
 
-### What's Wrong (Nothing Was Fixed)
+### Change 1: RPE-Based Intensity Balancing
 
-All 7 files still have the old, incorrect values. Here is exactly what needs to change:
+**Where:** `supabase/functions/generate-workout-of-day/index.ts`, lines 763-788 (Finisher section in 5-SECTION WORKOUT STRUCTURE)
 
----
-
-### File 1: `src/pages/WorkoutDetail.tsx`
-
-**a) Line 38 -- Update DurationFilter type:**
+**Current text (lines 763-767):**
 ```
-Old: type DurationFilter = "all" | "15" | "20" | "30" | "45" | "60" | "various";
-New: type DurationFilter = "all" | "30" | "40" | "50" | "60" | "75" | "various";
-```
-
-**b) Lines 231-248 -- Replace duration filter logic with range matching:**
-```typescript
-// Duration filter
-if (durationFilter !== "all") {
-  const durationNumber = parseInt(workout.duration?.match(/\d+/)?.[0] || "0");
-  const workoutDuration = workout.duration?.toLowerCase();
-  const hasVariousText = workoutDuration?.includes("various") || workoutDuration?.includes("varies");
-  
-  if (durationFilter === "various") {
-    // Show workouts with "various"/"varies" text or no parseable duration
-    if (!hasVariousText && durationNumber > 0) return false;
-  } else {
-    if (hasVariousText) return false;
-    const filterNum = parseInt(durationFilter);
-    // Range matching: 30 = 25-34, 40 = 35-44, 50 = 45-54, 60 = 55-64, 75 = 65-79
-    const rangeMin = filterNum - 5;
-    const rangeMax = filterNum + (filterNum === 75 ? 4 : 4);
-    if (durationNumber < rangeMin || durationNumber > rangeMax) return false;
-  }
-}
+4. ⚡ FINISHER (10-25 min)
+   Purpose: Complement the category with DIFFERENT format/structure/intensity
+   • Must be RELATED to the category theme
+   • Must have DIFFERENT format than main workout
+   • Must have DIFFERENT intensity level than main workout
 ```
 
-**c) Find where duration filter options are passed to CompactFilters and update them:**
-Options should be: `All Durations, 30 min, 40 min, 50 min, 60 min, 75 min, Various`
-
----
-
-### File 2: `src/components/admin/WorkoutsManager.tsx`
-
-**a) Lines 105-122 -- Replace duration filter logic with range matching** (same logic as above)
-
-**b) Lines 619-626 -- Replace duration select items:**
+**Replace with:**
 ```
-Old: 15, 20, 30, 45, 60, Various
-New: 30, 40, 50, 60, 75, Various
+4. ⚡ FINISHER (10-25 min)
+   Purpose: Complement the main workout with a DIFFERENT format/structure
+   • Must be RELATED to the category theme
+   • Must have DIFFERENT format than main workout
+   • Intensity is governed by the RPE BALANCING RULE below
 ```
 
----
+Then **add** a new RPE block directly after the FINISHER MINIMUM VOLUME section (after line 788), before section 5 (Cool Down):
 
-### File 3: `src/components/admin/WorkoutEditDialog.tsx`
+```
+RPE INTENSITY BALANCING RULE (MANDATORY):
 
-**Lines 49-56 -- Replace DURATION_OPTIONS with realistic values:**
-```typescript
-const DURATION_OPTIONS = [
-  "30 MINUTES",
-  "35 MINUTES",
-  "40 MINUTES",
-  "45 MINUTES",
-  "50 MINUTES",
-  "55 MINUTES",
-  "60 MINUTES",
-  "65 MINUTES",
-  "70 MINUTES",
-  "75 MINUTES",
-  "VARIOUS"
-];
+The main workout and finisher form ONE training session. Their combined intensity 
+must be balanced and humanly achievable, with a recovery break between them.
+
+Use the RPE (Rate of Perceived Exertion) scale to govern this balance:
+
+  RPE 1-3: Very light (walking, gentle movement)
+  RPE 4-5: Light to moderate (can hold a full conversation)
+  RPE 6-7: Moderate to hard (short sentences only)
+  RPE 8-9: Very hard (few words between breaths)
+  RPE 10:  Maximum effort (cannot speak)
+
+COMBINED RPE TARGETS BY DIFFICULTY:
+  Beginner (1-2 stars):       Combined Main + Finisher RPE = 8 to 11
+  Intermediate (3-4 stars):   Combined Main + Finisher RPE = 11 to 14
+  Advanced (5-6 stars):       Combined Main + Finisher RPE = 13 to 17
+
+KEY PRINCIPLE: There is a rest period between the main workout and finisher.
+The athlete recovers some energy. This means the finisher RPE does NOT need 
+to be the simple remainder (10 minus main). The athlete has more capacity 
+after resting.
+
+EXAMPLES:
+  Main RPE 7 (hard) --> Finisher RPE 5-7 (NOT 3 — rest gives recovery)
+  Main RPE 5 (moderate) --> Finisher RPE 7-8 (finisher can push harder)
+  Main RPE 9 (very hard) --> Finisher RPE 5-6 (NOT 1 — still meaningful work)
+  Main RPE 6 (moderate) --> Finisher RPE 6-7 (balanced session)
+
+WHAT THIS MEANS IN PRACTICE:
+  - If the main workout destroys the athlete (RPE 8-9), the finisher should 
+    allow quality movement at RPE 4-6, not push them to failure again
+  - If the main workout is moderate (RPE 5-6), the finisher can be the 
+    intense part of the session at RPE 7-8
+  - Never make both main workout AND finisher RPE 9+ (that is overtraining)
+  - Never make both main workout AND finisher RPE 3-4 (that wastes the session)
+  - The session should feel COMPLETE — the athlete finishes feeling worked 
+    but not destroyed
 ```
 
 ---
 
-### File 4: `src/components/WorkoutFilters.tsx`
+### Change 2: Remove Creative Sub-Names from Section Headers
 
-**Line 26 -- Add "Various" back and update values:**
-```typescript
-Old: const durations = ["All", "30", "45", "50", "60", "75"];
-New: const durations = ["All", "30", "40", "50", "60", "75", "Various"];
+The creative workout name belongs ONLY in the `name` JSON field. Section headers should be plain labels with format and duration.
+
+**Where:** Same file, multiple locations in the prompt string.
+
+**a) Add a new SECTION NAMING RULE** after the SECTION ICON RULES block (after line 1578):
+
+```
+SECTION NAMING RULE (MANDATORY):
+- Soft Tissue Preparation, Activation, Cool Down: Keep simple names with duration
+    Example: "Soft Tissue Preparation 5'", "Activation 15'", "Cool Down 10'"
+- Main Workout: Label as "Main Workout (FORMAT DURATION')" — NO creative sub-name
+    CORRECT: "Main Workout (TABATA 24')" or "Main Workout (CIRCUIT 30')"
+    WRONG: "Main Workout: Iron Forge (TABATA 24')" — no sub-names allowed
+- Finisher: Label as "Finisher (FORMAT DURATION')" or "Finisher (For Time)" — NO creative sub-name
+    CORRECT: "Finisher (8-minute AMRAP)" or "Finisher (For Time)"
+    WRONG: "Finisher: Burn Out (8-minute AMRAP)" — no sub-names allowed
+- The creative workout name belongs ONLY in the "name" field of the JSON response
+- The ENTIRE workout shares ONE name. Sections do not get their own names.
+```
+
+**b) Update Gold Standard Template** (lines 1537 and 1546):
+
+```
+Old line 1537: 💪 Main Workout: The Grind (20-minute EMOM)
+New line 1537: 💪 Main Workout (20-minute EMOM)
+
+Old line 1546: ⚡ Finisher: Metabolic Surge (For Time)
+New line 1546: ⚡ Finisher (For Time)
+```
+
+**c) Update Bad Finisher Example** (lines 1555-1561):
+
+```
+Old line 1556: ⚡ Finisher: Metabolic Melt (8') ← WRONG: "For Time" with fixed 8-minute duration
+New line 1556: ⚡ Finisher (8') ← WRONG: "For Time" with fixed 8-minute duration is contradictory
+```
+
+**d) Update Finisher Duration Rules** (line 777):
+
+```
+Old line 777: CORRECT: "Finisher: Power Burn (For Time)" — no minutes in title.
+New line 777: CORRECT: "Finisher (For Time)" — no minutes in title, no sub-name.
 ```
 
 ---
 
-### File 5: `src/components/smartly-suggest/SmartlySuggestModal.tsx`
+### Files to Modify
 
-**Lines 62-67 -- Update durationOptions:**
-```typescript
-const durationOptions = [
-  { label: "30 min", value: 30 },
-  { label: "45 min", value: 45 },
-  { label: "60 min", value: 60 },
-  { label: "75 min", value: 75 },
-];
-```
+**1 file only:** `supabase/functions/generate-workout-of-day/index.ts`
 
----
-
-### File 6: `src/components/CompactFilters.tsx`
-
-**Line 30 -- Add `flex-wrap` so filters wrap on mobile instead of overflowing:**
-```
-Old: <div className="flex items-center gap-2">
-New: <div className="flex flex-wrap items-center gap-2">
-```
-
----
-
-### File 7: `src/index.css`
-
-**Line 76 -- Fix dark mode accent-foreground so selected dropdown items show white text (not black-on-blue):**
-```
-Old: --accent-foreground: 0 0% 15%;
-New: --accent-foreground: 0 0% 100%;
-```
-
----
-
-### Summary
-
-| File | What Changes | Why |
-|---|---|---|
-| WorkoutDetail.tsx | Duration type + filter logic + filter options | Public pages show wrong durations, exact matching fails |
-| WorkoutsManager.tsx | Filter logic + select items | Admin shows wrong durations |
-| WorkoutEditDialog.tsx | DURATION_OPTIONS | Admin create/edit form has wrong options |
-| WorkoutFilters.tsx | Durations array | Standalone component needs consistency |
-| SmartlySuggestModal.tsx | Duration options | AI suggest shows wrong time ranges |
-| CompactFilters.tsx | Add flex-wrap | Filters overflow off-screen on mobile |
-| index.css | accent-foreground dark mode | Black text on dark blue = unreadable |
+| Location | What Changes |
+|---|---|
+| Lines 763-767 | Update finisher purpose, remove "DIFFERENT intensity" (replaced by RPE rule) |
+| After line 788 | Add RPE INTENSITY BALANCING RULE block |
+| Line 777 | Update finisher duration rule example to remove sub-name |
+| Lines 1537, 1546 | Gold standard template: remove "The Grind" and "Metabolic Surge" sub-names |
+| Lines 1555-1556 | Bad example: update to match new naming convention |
+| After line 1578 | Add SECTION NAMING RULE block |
 
 ### What Will NOT Change
-- Database workout data (already fixed by the audit)
-- Generation logic (already updated)
-- Training program filters (use weeks, not minutes)
-- Filter component structure or design pattern
 
+- The 5-section structure (Soft Tissue, Activation, Main, Finisher, Cool Down)
+- Category-specific exercise rules and forbidden exercises
+- Format rules (which formats allowed per category)
+- Finisher format rules by category (Strength = Reps and Sets only, etc.)
+- Finisher minimum volume requirements
+- Finisher duration rules (For Time = no fixed time, AMRAP = time cap, etc.)
+- HTML formatting, icons, spacing rules
+- Equipment governance
+- The `name` field behavior (still the creative workout name)
+- Duration calculation logic
+- Any frontend code
