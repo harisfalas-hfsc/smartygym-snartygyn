@@ -539,6 +539,85 @@ serve(async (req) => {
     });
 
     // ═══════════════════════════════════════════════════════════════════════════════
+    // DURATION DISTRIBUTION AWARENESS: Query current workout library for this category
+    // Used to nudge the AI toward underrepresented duration brackets
+    // ═══════════════════════════════════════════════════════════════════════════════
+    let durationDistributionPrompt = "";
+    try {
+      const { data: durationCounts } = await supabase
+        .from("admin_workouts")
+        .select("duration")
+        .eq("category", category)
+        .eq("is_workout_of_day", true);
+      
+      if (durationCounts && durationCounts.length > 0) {
+        // Count durations by bucket (extract number from "X min" strings)
+        const buckets: Record<number, number> = { 15: 0, 20: 0, 25: 0, 30: 0, 35: 0, 40: 0, 45: 0, 50: 0 };
+        let variousCount = 0;
+        
+        for (const row of durationCounts) {
+          const dur = row.duration || "";
+          if (/various/i.test(dur)) {
+            variousCount++;
+            continue;
+          }
+          const numMatch = dur.match(/(\d+)/);
+          if (numMatch) {
+            const mins = parseInt(numMatch[1]);
+            // Find nearest bucket
+            const bucketKeys = Object.keys(buckets).map(Number).sort((a, b) => a - b);
+            let nearestBucket = bucketKeys[0];
+            let minDiff = Math.abs(mins - nearestBucket);
+            for (const bk of bucketKeys) {
+              const diff = Math.abs(mins - bk);
+              if (diff < minDiff) { minDiff = diff; nearestBucket = bk; }
+            }
+            buckets[nearestBucket]++;
+          }
+        }
+        
+        // Build distribution text
+        const totalWods = durationCounts.length;
+        const avgPerBucket = totalWods / Object.keys(buckets).length;
+        const lines: string[] = [];
+        
+        for (const [bucket, count] of Object.entries(buckets)) {
+          let label = `  ${bucket} min: ${count} workouts`;
+          if (count === 0) {
+            label += " (EMPTY - strongly consider targeting this duration)";
+          } else if (count < avgPerBucket * 0.5) {
+            label += " (UNDERREPRESENTED - consider targeting this duration)";
+          } else if (count > avgPerBucket * 1.5) {
+            label += " (well represented)";
+          }
+          lines.push(label);
+        }
+        if (variousCount > 0) {
+          lines.push(`  Various: ${variousCount} workouts`);
+        }
+        
+        durationDistributionPrompt = `
+DURATION DISTRIBUTION AWARENESS:
+Current ${category} WOD library (${totalWods} total workouts):
+${lines.join("\n")}
+
+The platform needs VARIETY across all duration brackets. If a duration bracket 
+has fewer workouts, you are ENCOURAGED (not forced) to target it -- but ONLY 
+if it makes sense for the current difficulty level and category.
+
+Remember: Short duration + Advanced = maximum intensity (RPE ceiling).
+Long duration + Beginner = gentle but complete.
+Never sacrifice workout quality just to fill a gap.
+This is a NUDGE, not a mandate.
+`;
+        
+        logStep("Duration distribution", { category, buckets, variousCount, totalWods });
+      }
+    } catch (distError) {
+      logStep("Duration distribution query failed (non-critical)", { error: String(distError) });
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════════
     // RECOVERY DAYS: Generate only ONE MIXED workout (not BODYWEIGHT + EQUIPMENT)
     // Other categories: Generate both BODYWEIGHT and EQUIPMENT versions
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -1703,6 +1782,8 @@ INTERNAL TOTAL ROUTINE AWARENESS:
   While the advertised duration is Main + Finisher only, you must still ensure
   the TOTAL routine (all 5 sections) does not exceed 90 minutes.
   A typical total routine: 25' overhead + Main + Finisher = total.
+
+${durationDistributionPrompt}
 
 {
   "name": "Creative, motivating workout name (2-4 words, unique)",
