@@ -1,52 +1,37 @@
 
 
-## Add "What We Offer" Introduction to the Hero Card
+## Fix Workout Scheduling Calendar
 
-### What Changes
+### Problems Found
 
-Inside the hero card on the homepage (`src/pages/Index.tsx`, lines 812-820), a new introductory paragraph will be inserted between the "Your Gym Re-imagined Anywhere, Anytime" title and the existing "We are not here to replace your gym..." paragraph.
+1. **Calendar not clickable inside the dialog** — The calendar component is missing a required `pointer-events-auto` class, which causes it to not respond properly to clicks when rendered inside a Dialog/Popover. This is why the "today" date appears persistently selected and clicking other dates feels broken.
 
-### Current Structure
+2. **"Today" looks the same as "selected"** — The calendar styles today's date with a background highlight that looks almost identical to the selected date highlight. When you open the calendar, today is always visually prominent, making it confusing to tell which date you've actually picked.
 
-```
-"Your Gym Re-imagined Anywhere, Anytime" (title)
-   |
-   v
-"We are not here to replace your gym..." (paragraph)
-```
+3. **Past dates** — The code already prevents selecting past dates (they appear grayed out), but this will be verified and kept intact.
 
-### New Structure
+### What Will Change
 
-```
-"Your Gym Re-imagined Anywhere, Anytime" (title)
-   |
-   v
-NEW: 2-line "what we offer" paragraph (workouts, programs, blog, 
-     exercise library, logbook -- everything a perfect gym must offer, 
-     all in your pocket)
-   |
-   v
-"We are not here to replace your gym..." (existing paragraph, unchanged)
-```
+**File 1: `src/components/ui/calendar.tsx`**
+- Add `pointer-events-auto` to the Calendar's root className so it works correctly inside dialogs and popovers
+- Adjust the `day_today` style to be subtler (e.g., just an underline or a light ring instead of a full background fill) so today is distinguishable from the selected date
 
-### The New Paragraph
+**File 2: `src/components/ScheduleWorkoutDialog.tsx`**
+- No logic changes needed — the date disabling and selection already work correctly in code
+- The fix in the Calendar component will resolve the interaction and visual issues
 
-A concise, professional 2-line introduction like:
+### Visual Before/After
 
-> Expert-crafted workouts, structured training programs, a comprehensive exercise library, science-based articles, and a personal logbook -- everything a complete gym must offer, built by real professionals, all in your pocket at smartygym.com.
+**Before:** Today has a colored background, selected date has a colored background -- they look the same, and clicks may not register properly inside the dialog.
 
-This gives first-time visitors an immediate understanding of what SmartyGym is before they read the "backup plan" philosophy below it.
+**After:** Today has a subtle indicator (small underline or dotted ring), the selected date has a clear colored background, and all clicks work reliably.
 
 ### Technical Details
 
-**File:** `src/pages/Index.tsx` (1 file only)
+**Calendar component change (calendar.tsx, line 14):**
+- Change `className={cn("p-3", className)}` to `className={cn("p-3 pointer-events-auto", className)}`
 
-**Location:** Between line 814 (the title) and line 816 (the existing paragraph)
+**Today style change (calendar.tsx, line 36):**
+- Change `day_today: "bg-accent text-accent-foreground"` to a subtler style like `day_today: "text-accent-foreground font-bold underline underline-offset-4"` so today is marked but not confused with the selected date
 
-**What gets added:** A single `<p>` element with `text-sm text-muted-foreground leading-relaxed` styling (matching the card's existing text style), with a small bottom margin (`mb-3`) to visually separate it from the "We are not here to replace your gym" paragraph below.
-
-**What stays unchanged:**
-- The "Your Gym Re-imagined Anywhere, Anytime" title
-- The "We are not here to replace your gym..." paragraph (word for word)
-- The card's border, background, padding, and layout
-- Everything else on the homepage
+Both changes are small, targeted, and only affect the calendar's appearance and interactivity. No other files or features are impacted.
