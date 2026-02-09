@@ -1,112 +1,124 @@
 
 
-## Fix Broken Blog Links and Prevent Future Issues
+## Create Three New Blog Articles (Fitness, Nutrition, Wellness)
 
-### Problems Found
+Three manually crafted, SEO-optimized articles will be written and inserted directly into the `blog_articles` table, each with an AI-generated featured image. All articles will be published immediately (`is_published = true`) and fully editable from your back office content management.
 
-After auditing every link in all 13 blog articles and the automated generation system, two broken links were identified:
-
-1. **`/dailyritual`** -- This path does not exist. The correct route is `/daily-ritual` (with a hyphen). Appears in the "Exercise After 50" article and in the edge function's link templates for Nutrition and Wellness categories.
-
-2. **`/parq`** -- This path does not exist as a standalone page. The PAR-Q questionnaire is embedded inside the User Dashboard and the Disclaimer page. Appears in the "Exercise After 50" article and in the edge function's link templates for Fitness and Wellness categories.
-
-All blog-to-blog cross-links (e.g., `/blog/science-of-sleep-why-rest-secret-weapon`) were verified and are correct.
+Additionally, the automated weekly generation edge function will be updated to ensure future articles avoid duplicating topics already covered.
 
 ---
 
-### Fix 1: Update Existing Articles in the Database
+### Article 1 -- Fitness
 
-Run SQL UPDATE statements to fix the two broken links across all articles that contain them:
+**Title:** Data-Driven Fitness: How Wearable Technology Is Changing the Way We Train
 
-- Replace `/dailyritual"` with `/daily-ritual"` in all article content
-- Replace `/parq"` with `/disclaimer"` in all article content (the Disclaimer page contains the PAR-Q questionnaire and is publicly accessible, unlike the user dashboard)
+**Slug:** `data-driven-fitness-wearable-technology-changing-training`
 
-This is a bulk find-and-replace on the `content` column of `blog_articles`.
+**Topics covered:**
+- Wearable tech as the number one global fitness trend (ACSM 2026 survey)
+- What modern devices track: heart rate, sleep, recovery, blood pressure, glucose, temperature
+- How 70%+ of users actively adjust training and recovery based on their data
+- The shift from "train hard" to "train smart and measurable"
+- How coaches and individuals use wearable data for performance, fat loss, recovery, and injury prevention
+- Personalized programming and reduced injury risk through data-driven decisions
 
----
+**Internal links used (all verified valid):**
+- `/workout` -- workout library
+- `/trainingprogram` -- training programs
+- `/1rmcalculator` -- One Rep Max Calculator
+- `/exerciselibrary` -- exercise library
+- `/disclaimer` -- health disclaimer
 
-### Fix 2: Update the Edge Function Link Templates
-
-**File: `supabase/functions/generate-weekly-blog-articles/index.ts`**
-
-Update the `INTERNAL_LINKS` object to use the correct paths:
-
-- Change `href="/dailyritual"` to `href="/daily-ritual"` (in Nutrition and Wellness arrays)
-- Change `href="/parq"` to `href="/disclaimer"` and update the label to "health disclaimer and PAR-Q screening" (in Fitness and Wellness arrays)
-
----
-
-### Fix 3: Add a Valid Links Reference to the AI Prompt
-
-Add a "VALID INTERNAL LINKS" section to the AI prompt inside the edge function so the AI model only uses verified, working links when writing articles. This acts as a safeguard: even if the AI tries to create a link on its own, the prompt explicitly lists the only paths it should use.
-
-The valid links list:
-
-```text
-/workout - Workout library
-/trainingprogram - Training programs
-/1rmcalculator - One Rep Max Calculator
-/bmrcalculator - BMR Calculator
-/caloriecalculator - Calorie Calculator
-/exerciselibrary - Exercise library
-/daily-ritual - Daily Smarty Ritual
-/disclaimer - Health disclaimer and PAR-Q
-/blog - Blog articles
-```
-
-The prompt will include an instruction like: "ONLY use links from the provided list. Do NOT invent or guess any URLs."
+**Image prompt direction:** Person wearing a fitness tracker/smartwatch during a workout, modern gym setting, data/metrics visible on the watch screen, vibrant and professional photography.
 
 ---
 
-### Fix 4: Add Link Validation After AI Generation
+### Article 2 -- Nutrition
 
-In the edge function, after the AI generates article content and before inserting into the database, add a validation step that:
+**Title:** High Protein, High Fiber, and Gut Health: The New Nutrition Blueprint
 
-1. Extracts all `href` values from the generated HTML
-2. Checks each against a whitelist of valid internal paths (plus `/blog/` prefix for cross-article links)
-3. Removes or corrects any links that do not match valid routes
+**Slug:** `high-protein-fiber-gut-health-new-nutrition-blueprint`
 
-This ensures that even if the AI model ignores the prompt instructions, broken links never make it into the database.
+**Topics covered:**
+- The shift away from extreme diets toward practical, functional eating
+- Growing consumer demand for high-protein and high-fiber foods
+- Fiber layering: diversifying plant fibers for gut microbiome health
+- Functional foods and drinks gaining traction
+- Why gut health is becoming the new body composition strategy
+- High protein plus gut-friendly nutrition as a fat loss and longevity approach for adults over 30
+
+**Internal links used (all verified valid):**
+- `/caloriecalculator` -- Calorie Calculator
+- `/bmrcalculator` -- BMR Calculator
+- `/workout` -- workout library
+- `/trainingprogram` -- training programs
+- `/daily-ritual` -- Daily Smarty Ritual
+
+**Image prompt direction:** Colorful spread of high-protein and high-fiber whole foods (Greek yogurt, legumes, lean proteins, vegetables, nuts, fermented foods), modern kitchen or meal prep setting.
 
 ---
 
-### Summary of Changes
+### Article 3 -- Wellness
 
-| What | Action |
-|------|--------|
-| Existing articles in database | SQL UPDATE to fix `/dailyritual` and `/parq` |
-| Edge function `INTERNAL_LINKS` | Fix `/dailyritual` to `/daily-ritual`, `/parq` to `/disclaimer` |
-| Edge function AI prompt | Add explicit valid links list with "only use these" instruction |
-| Edge function post-processing | Add link validation before database insert |
+**Title:** Mental Health and Longevity: Why the Future of Fitness Is Preventive
+
+**Slug:** `mental-health-longevity-future-fitness-preventive`
+
+**Topics covered:**
+- Mental wellbeing and happiness as the top health goals globally
+- Growing focus on longevity, healthy aging, sleep, and preventive health
+- Exercise for mental health climbing in global fitness trends
+- 78% of exercisers cite mental and emotional wellbeing as their main reason to train
+- Moving beyond aesthetics toward stress management, better sleep, and functional aging
+- Practical strategies for stress, sleep, and longevity performance
+
+**Internal links used (all verified valid):**
+- `/daily-ritual` -- Daily Smarty Ritual
+- `/workout` -- workout library
+- `/trainingprogram` -- training programs
+- `/disclaimer` -- health disclaimer
+- `/blog/science-of-sleep-why-rest-secret-weapon` -- cross-link to existing sleep article
+
+**Image prompt direction:** Person in a calm, natural setting (sunrise, park, or peaceful outdoor space) doing mindful exercise like yoga or stretching, conveying tranquility, mental clarity, and wellbeing.
+
+---
+
+### Edge Function Topic Update
+
+The `CATEGORY_TOPICS` array in `generate-weekly-blog-articles/index.ts` will be expanded with new trending topics to ensure future automated articles cover fresh ground and don't overlap with the topics now covered. New additions include:
+
+- **Fitness:** "wearable technology and data-driven training", "fitness trends and industry shifts", "training for longevity after 40"
+- **Nutrition:** "gut microbiome and fiber diversity", "high-protein functional eating", "nutrition for longevity and aging"
+- **Wellness:** "exercise for mental health", "longevity and preventive health strategies", "stress resilience and emotional fitness"
+
+---
+
+### Link Safety
+
+Every article uses only verified valid internal paths from the whitelist:
+- `/workout`, `/trainingprogram`, `/1rmcalculator`, `/bmrcalculator`, `/caloriecalculator`, `/exerciselibrary`, `/daily-ritual`, `/disclaimer`, `/blog`
+- Cross-article links use `/blog/[existing-slug]` format, verified against the database
+
+No external links or invented paths will be used.
+
+---
 
 ### Technical Details
 
-**Database update (via insert tool, not migration):**
-```sql
-UPDATE blog_articles 
-SET content = REPLACE(content, 'href="/dailyritual"', 'href="/daily-ritual"')
-WHERE content LIKE '%href="/dailyritual"%';
+**Database operations:**
+- Insert 3 new rows into `blog_articles` with full HTML content, SEO excerpts, author attribution, read time, and AI-generated images
+- Each article: `is_published = true`, `is_ai_generated = false` (manually written), attributed to Haris Falas
 
-UPDATE blog_articles 
-SET content = REPLACE(content, 'href="/parq"', 'href="/disclaimer"')
-WHERE content LIKE '%href="/parq"%';
-```
+**Edge function image generation:**
+- Call `generate-blog-image` for each article to create a topic-appropriate featured image
+- Images stored in `blog-images` storage bucket
 
-**Edge function changes (`generate-weekly-blog-articles/index.ts`):**
-- Lines 49-63: Update `INTERNAL_LINKS` paths
-- Lines ~130-160: Add valid links reference to the AI prompt
-- After JSON parsing (~line 190): Add `validateAndFixLinks()` function that strips or fixes invalid hrefs
+**File modified:**
+- `supabase/functions/generate-weekly-blog-articles/index.ts` -- add new topics to `CATEGORY_TOPICS` arrays to prevent future automated articles from repeating topics already covered
 
-**Link validation function logic:**
-```text
-VALID_PATHS = ["/workout", "/trainingprogram", "/1rmcalculator", "/bmrcalculator", 
-               "/caloriecalculator", "/exerciselibrary", "/daily-ritual", 
-               "/disclaimer", "/blog"]
+**What stays untouched:**
+- All existing 13 blog articles
+- BlogManager component and content editing workflow
+- Blog page rendering
+- All other edge functions and cron jobs
 
-For each <a href="..."> in content:
-  - If href starts with "/blog/" -> allow (cross-article link)
-  - If href is in VALID_PATHS -> allow
-  - Otherwise -> remove the <a> tag but keep the text inside it
-```
-
-No other files or features are affected.
