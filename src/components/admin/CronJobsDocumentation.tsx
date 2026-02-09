@@ -138,6 +138,14 @@ export const CronJobsDocumentation = () => {
                 <td className="border border-gray-300 p-3">Daily at 22:00</td>
                 <td className="border border-gray-300 p-3">Admin email only (smartygym@outlook.com)</td>
               </tr>
+              <tr className="bg-gray-50">
+                <td className="border border-gray-300 p-3">
+                  <strong>Weekly Blog Generation</strong><br/>
+                  <span className="text-gray-600 text-xs">3 AI-generated articles (Fitness, Nutrition, Wellness)</span>
+                </td>
+                <td className="border border-gray-300 p-3">Mondays at 06:00</td>
+                <td className="border border-gray-300 p-3">System (articles saved as drafts for admin review)</td>
+              </tr>
             </tbody>
           </table>
         </div>

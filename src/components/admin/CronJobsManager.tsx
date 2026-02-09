@@ -52,6 +52,7 @@ const CATEGORIES = [
 const AVAILABLE_FUNCTIONS = [
   'generate-workout-of-day',
   'generate-daily-ritual',
+  'generate-weekly-blog-articles',
   'send-scheduled-notifications',
   'send-scheduled-emails',
   'send-automated-messages',
