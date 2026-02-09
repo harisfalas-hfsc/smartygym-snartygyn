@@ -44,7 +44,7 @@ const INTERNAL_LINKS: Record<string, string[]> = {
     '<a href="/workout" class="text-primary hover:underline font-medium">workout library</a>',
     '<a href="/trainingprogram" class="text-primary hover:underline font-medium">training programs</a>',
     '<a href="/1rmcalculator" class="text-primary hover:underline font-medium">One Rep Max Calculator</a>',
-    '<a href="/parq" class="text-primary hover:underline font-medium">PAR-Q health screening</a>',
+    '<a href="/disclaimer" class="text-primary hover:underline font-medium">health disclaimer and PAR-Q screening</a>',
     '<a href="/exerciselibrary" class="text-primary hover:underline font-medium">exercise library</a>',
   ],
   Nutrition: [
@@ -52,16 +52,22 @@ const INTERNAL_LINKS: Record<string, string[]> = {
     '<a href="/bmrcalculator" class="text-primary hover:underline font-medium">BMR Calculator</a>',
     '<a href="/workout" class="text-primary hover:underline font-medium">workout library</a>',
     '<a href="/trainingprogram" class="text-primary hover:underline font-medium">training programs</a>',
-    '<a href="/dailyritual" class="text-primary hover:underline font-medium">Daily Smarty Ritual</a>',
+    '<a href="/daily-ritual" class="text-primary hover:underline font-medium">Daily Smarty Ritual</a>',
   ],
   Wellness: [
-    '<a href="/dailyritual" class="text-primary hover:underline font-medium">Daily Smarty Ritual</a>',
+    '<a href="/daily-ritual" class="text-primary hover:underline font-medium">Daily Smarty Ritual</a>',
     '<a href="/workout" class="text-primary hover:underline font-medium">workout library</a>',
     '<a href="/trainingprogram" class="text-primary hover:underline font-medium">training programs</a>',
-    '<a href="/parq" class="text-primary hover:underline font-medium">PAR-Q health screening</a>',
+    '<a href="/disclaimer" class="text-primary hover:underline font-medium">health disclaimer and PAR-Q screening</a>',
     '<a href="/blog" class="text-primary hover:underline font-medium">blog articles</a>',
   ]
 };
+
+const VALID_PATHS = [
+  "/workout", "/trainingprogram", "/1rmcalculator", "/bmrcalculator",
+  "/caloriecalculator", "/exerciselibrary", "/daily-ritual",
+  "/disclaimer", "/blog"
+];
 
 function generateSlug(title: string): string {
   return title
@@ -78,6 +84,41 @@ function estimateReadTime(content: string): string {
   const wordCount = textOnly.split(/\s+/).length;
   const minutes = Math.max(3, Math.ceil(wordCount / 200));
   return `${minutes} min read`;
+}
+
+/**
+ * Validates all internal links in the generated HTML content.
+ * - Allows links whose href is in VALID_PATHS
+ * - Allows links starting with "/blog/" (cross-article links)
+ * - Allows external links (http://, https://, mailto:, tel:)
+ * - Strips invalid internal links but keeps the anchor text
+ */
+function validateAndFixLinks(content: string): string {
+  return content.replace(/<a\s+([^>]*?)>(.*?)<\/a>/gi, (fullMatch, attrs, innerText) => {
+    const hrefMatch = attrs.match(/href=["']([^"']*)["']/i);
+    if (!hrefMatch) return innerText; // No href — strip the tag, keep text
+
+    const href = hrefMatch[1];
+
+    // Allow external links
+    if (href.startsWith("http://") || href.startsWith("https://") || href.startsWith("mailto:") || href.startsWith("tel:")) {
+      return fullMatch;
+    }
+
+    // Allow valid internal paths
+    if (VALID_PATHS.includes(href)) {
+      return fullMatch;
+    }
+
+    // Allow cross-article blog links (e.g. /blog/some-article-slug)
+    if (href.startsWith("/blog/")) {
+      return fullMatch;
+    }
+
+    // Invalid internal link — remove the <a> tag but keep the text
+    console.warn(`Removed invalid internal link: ${href}`);
+    return innerText;
+  });
 }
 
 async function generateBlogImage(
@@ -152,6 +193,8 @@ serve(async (req: Request) => {
         const links = INTERNAL_LINKS[category] || [];
         const linksStr = links.map((l: string) => `  ${l}`).join("\n");
 
+        const validLinksReference = VALID_PATHS.map(p => `  ${p}`).join("\n");
+
         const prompt = `You are a professional fitness content writer for SmartyGym, a premium fitness platform. Write a comprehensive, SEO-optimized blog article for the "${category}" category.
 
 TOPIC INSPIRATION (pick one or combine): ${topicHints}
@@ -170,6 +213,12 @@ ${linksStr}
 9. Make content evidence-based, citing studies or scientific principles where relevant
 10. Write in a professional but accessible tone
 11. Do NOT include the title as an H1 in the content — it's displayed separately
+
+VALID INTERNAL LINKS — ONLY use links from this list. Do NOT invent or guess any URLs:
+${validLinksReference}
+  /blog/[slug] — for linking to other blog articles (only if you know the exact slug)
+
+Any link not on this list will be automatically removed. Do NOT create links to paths like /dailyritual, /parq, /programs, /tools, or any other made-up paths.
 
 AUTHOR CONTEXT: Written by Haris Falas, Sports Scientist with CSCS certification and 20+ years experience.
 
@@ -221,6 +270,9 @@ RESPOND WITH EXACTLY THIS JSON FORMAT (no markdown, no code blocks, just raw JSO
           results.push({ category, title: "", slug: "", status: "Missing title or content" });
           continue;
         }
+
+        // Validate and fix all internal links before saving
+        parsed.content = validateAndFixLinks(parsed.content);
 
         const slug = generateSlug(parsed.title);
         const readTime = estimateReadTime(parsed.content);
