@@ -17,7 +17,10 @@ const CATEGORY_TOPICS: Record<string, string[]> = {
     "exercise form and technique", "high-intensity interval training", "low-impact exercises",
     "training for endurance", "bodyweight training progressions", "compound vs isolation exercises",
     "fitness for beginners", "advanced training methods", "sport-specific conditioning",
-    "postural correction exercises", "training frequency and volume"
+    "postural correction exercises", "training frequency and volume",
+    "wearable technology and data-driven training", "fitness trends and industry shifts",
+    "training for longevity after 40", "heart rate zone training methods",
+    "recovery monitoring and biometric feedback", "progressive overload science"
   ],
   Nutrition: [
     "protein requirements for muscle growth", "meal timing and performance", "hydration science",
@@ -26,7 +29,10 @@ const CATEGORY_TOPICS: Record<string, string[]> = {
     "carbohydrate cycling", "supplement science", "plant-based protein sources",
     "meal prep strategies", "nutrition myths debunked", "vitamins for active adults",
     "balanced macronutrients", "nutrition for fat loss", "superfoods science",
-    "eating for energy", "nutrition and immune system"
+    "eating for energy", "nutrition and immune system",
+    "gut microbiome and fiber diversity", "high-protein functional eating",
+    "nutrition for longevity and aging", "fiber layering strategies",
+    "fermented foods and probiotics", "metabolic health through nutrition"
   ],
   Wellness: [
     "sleep optimization strategies", "stress management techniques", "mindfulness and meditation",
@@ -35,7 +41,10 @@ const CATEGORY_TOPICS: Record<string, string[]> = {
     "digital detox strategies", "gratitude and mental wellness", "social connection and health",
     "nature and wellbeing", "journaling for mental clarity", "habit building science",
     "burnout prevention", "self-care routines", "emotional resilience training",
-    "recovery day activities", "holistic health approaches"
+    "recovery day activities", "holistic health approaches",
+    "exercise for mental health", "longevity and preventive health strategies",
+    "stress resilience and emotional fitness", "functional aging and independence",
+    "morning routines for mental clarity", "community and social fitness"
   ]
 };
 
