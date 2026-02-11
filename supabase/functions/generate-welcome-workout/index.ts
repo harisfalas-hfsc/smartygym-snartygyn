@@ -56,6 +56,32 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
 
+    // SECURITY: Verify the user_id actually exists in auth.users and was created recently (within last 10 minutes)
+    const { data: userData, error: userError } = await supabase.auth.admin.getUserById(user_id);
+    if (userError || !userData?.user) {
+      logStep("❌ Invalid user_id - user does not exist", { user_id });
+      return new Response(
+        JSON.stringify({ error: "Invalid user_id - user does not exist" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
+      );
+    }
+
+    const userCreatedAt = new Date(userData.user.created_at);
+    const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
+    if (userCreatedAt < tenMinutesAgo) {
+      logStep("❌ User is not a new signup - created too long ago", { 
+        user_id, 
+        created_at: userData.user.created_at,
+        threshold: tenMinutesAgo.toISOString()
+      });
+      return new Response(
+        JSON.stringify({ error: "Welcome workout only available for new signups", skipped: true }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    logStep("✅ User verified as new signup", { user_id, created_at: userData.user.created_at });
+
     // Check if user already has a welcome workout (prevent duplicates)
     const { data: existingPurchase } = await supabase
       .from("user_purchases")
