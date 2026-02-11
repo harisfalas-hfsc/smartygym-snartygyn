@@ -221,30 +221,25 @@ export default function Auth() {
           console.error('Failed to send welcome message:', msgError);
         }
         
-        // Trigger welcome workout generation if user came from exit-intent popup
-        const welcomeWorkout = searchParams.get("welcome_workout");
-        if (welcomeWorkout === "true") {
-          try {
-            console.log("Triggering welcome workout generation for new user:", data.user.id);
-            supabase.functions.invoke('generate-welcome-workout', {
-              body: { user_id: data.user.id }
-            }).then(({ data: wData, error: wError }) => {
-              if (wError) {
-                console.error('Welcome workout generation failed:', wError);
-              } else {
-                console.log('Welcome workout generated successfully:', wData);
-              }
-            });
-          } catch (welcomeErr) {
-            console.error('Failed to trigger welcome workout:', welcomeErr);
-          }
+        // Trigger welcome workout generation for all new signups
+        try {
+          console.log("Triggering welcome workout generation for new user:", data.user.id);
+          supabase.functions.invoke('generate-welcome-workout', {
+            body: { user_id: data.user.id }
+          }).then(({ data: wData, error: wError }) => {
+            if (wError) {
+              console.error('Welcome workout generation failed:', wError);
+            } else {
+              console.log('Welcome workout generated successfully:', wData);
+            }
+          });
+        } catch (welcomeErr) {
+          console.error('Failed to trigger welcome workout:', welcomeErr);
         }
         
         toast({
           title: "Success!",
-          description: welcomeWorkout === "true" 
-            ? "Account created! Your free workout is being prepared 🎁" 
-            : "Account created successfully!",
+          description: "Account created! Your free workout is being prepared 🎁",
         });
         setShowAvatarSetup(true);
       }
