@@ -116,9 +116,8 @@ const AppContent = () => {
         <ScrollToTop />
         <div className="flex flex-col min-h-screen">
           <Navigation />
-          <PromoBanner />
           <FixedBackButton />
-            <div className="flex-1" style={{ paddingTop: 'calc(var(--app-header-h, 100px) + 52px)' }}>
+            <div className="flex-1" style={{ paddingTop: 'var(--app-header-h, 100px)' }}>
             <PageTransition>
                 <Routes>
                   <Route path="/" element={<Index />} />
