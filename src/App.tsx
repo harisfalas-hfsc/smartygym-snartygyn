@@ -85,7 +85,7 @@ import { PageTransition } from "./components/PageTransition";
 import { LoadingBar } from "./components/LoadingBar";
 import { AnnouncementManager } from "./components/announcements/AnnouncementManager";
 import { ExitIntentPopup } from "./components/growth/ExitIntentPopup";
-import { FirstVisitBanner } from "./components/growth/FirstVisitBanner";
+
 import { SocialProofToast } from "./components/growth/SocialProofToast";
 import { PromoBanner } from "./components/growth/PromoBanner";
 
@@ -238,7 +238,7 @@ const AppContent = () => {
             </PageTransition>
           </div>
         <Footer />
-        <FirstVisitBanner />
+        
       </div>
     </AccessControlProvider>
     </>
