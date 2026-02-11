@@ -39,6 +39,7 @@ export const Navigation = () => {
   const { toast } = useToast();
   const [user, setUser] = useState<User | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [profileName, setProfileName] = useState<string | null>(null);
   const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo | null>(null);
   const [corporateSubscription, setCorporateSubscription] = useState<CorporateSubscriptionInfo | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -109,12 +110,13 @@ export const Navigation = () => {
   const loadUserData = async (userId: string) => {
     const { data: profile } = await supabase
       .from("profiles")
-      .select("avatar_url")
+      .select("avatar_url, full_name")
       .eq("user_id", userId)
       .maybeSingle();
 
     if (profile) {
       setAvatarUrl(profile.avatar_url);
+      setProfileName(profile.full_name || null);
     }
 
     // Check for corporate subscription
@@ -214,7 +216,8 @@ export const Navigation = () => {
   };
 
   const getUserInitials = () => {
-    const name = user?.user_metadata?.full_name;
+    // Prefer profile name from DB, fall back to auth metadata, then email
+    const name = profileName || user?.user_metadata?.full_name;
     if (name) {
       const parts = name.split(" ");
       return parts.length > 1 ? `${parts[0][0]}${parts[1][0]}` : parts[0][0];
