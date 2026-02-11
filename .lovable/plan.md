@@ -1,37 +1,28 @@
 
 
-# Four Fixes
+# Suppress Notifications for Complimentary Welcome Workouts
 
-## 1. Back button no longer hides the page title on mobile
-The fixed back button will be repositioned so it does not overlap the page title. On mobile, it will move to a position that does not cover any content -- shifting it down or making the page content start lower to leave room.
+## Problem
+Every time a new user signs up, a complimentary workout is created and inserted into the `admin_workouts` table. The database trigger `queue_workout_notification` fires on every insert and queues a notification to ALL users. If 100 people sign up in one day, all existing users would receive 100 emails about workouts they didn't ask about.
 
-## 2. Back button respects dashboard history
-When you are inside the dashboard and navigate between tabs (Messages, Orders, etc.), pressing back will take you to the previous dashboard tab or the main dashboard grid -- not to the homepage. The back button will detect when you are in `/userdashboard?tab=X` and navigate to `/userdashboard` instead of leaving the dashboard entirely. On the main dashboard grid (no tab selected), the back button will be hidden (same as homepage).
-
-## 3. Avatar name fixed
-The avatar currently reads the name from the auth session metadata, which can be wrong or stale. It will be updated to read the name from the `profiles` database table instead (where "Maria" is correctly stored). The `loadUserData` function already queries the profiles table for the avatar -- it will now also fetch `full_name` and use that for the initials.
-
-## 4. Complimentary welcome workout for all new signups
-Currently, the welcome workout is only generated when someone signs up through the exit-intent popup (which adds `?welcome_workout=true` to the URL). This will be changed so that **every new signup** gets a complimentary welcome workout, regardless of how they signed up. The `welcome_workout=true` check in `Auth.tsx` will be removed -- the welcome workout function will be called for all new users.
-
----
+## Fix
+Update the `queue_workout_notification` database trigger function to also skip workouts where `type = 'welcome'`. Currently it only skips WOD workouts (`is_workout_of_day = true`). Adding one condition solves the problem at its root.
 
 ## Technical Details
 
-### Files to change:
+### Database migration (single SQL change)
+Update the `queue_workout_notification()` function to add a check:
 
-**`src/components/FixedBackButton.tsx`**
-- Add dashboard-aware logic: if on `/userdashboard?tab=X`, back goes to `/userdashboard`
-- If on `/userdashboard` (no tab), hide the button (treat as user's home)
-- Adjust top position to avoid overlapping page titles (increase offset)
+```text
+IF NEW.is_visible = true 
+   AND (NEW.is_workout_of_day IS NULL OR NEW.is_workout_of_day = false)
+   AND (NEW.type IS NULL OR NEW.type != 'welcome')   <-- NEW CONDITION
+THEN ...
+```
 
-**`src/components/Navigation.tsx`**
-- In `loadUserData()`: also fetch `full_name` from profiles table (currently only fetches `avatar_url`)
-- Store profile name in state
-- In `getUserInitials()`: use profile name first, fall back to `user_metadata`, then email
+This means:
+- Regular workouts created manually or via prompts: notifications sent as usual
+- WOD workouts: skipped (existing behavior)
+- Welcome/complimentary workouts (type = 'welcome'): skipped (new behavior)
 
-**`src/pages/Auth.tsx`**
-- Remove the `if (welcomeWorkout === "true")` condition around the welcome workout generation
-- Call `generate-welcome-workout` for every new signup
-- Always show the "Your free workout is being prepared" toast on signup
-
+No other files need to change. The welcome workout's own personal notification to the new user (sent directly in the edge function at line 361) is unaffected -- that one only goes to the specific new user, not to everyone.
