@@ -84,6 +84,10 @@ import { AccessGate } from "./components/AccessGate";
 import { PageTransition } from "./components/PageTransition";
 import { LoadingBar } from "./components/LoadingBar";
 import { AnnouncementManager } from "./components/announcements/AnnouncementManager";
+import { ExitIntentPopup } from "./components/growth/ExitIntentPopup";
+import { FirstVisitBanner } from "./components/growth/FirstVisitBanner";
+import { SocialProofToast } from "./components/growth/SocialProofToast";
+import { PromoBanner } from "./components/growth/PromoBanner";
 
 // Redirect component for /dashboard to /userdashboard
 const DashboardRedirect = () => {
@@ -107,8 +111,11 @@ const AppContent = () => {
       <LoadingBar />
       <AccessControlProvider>
         <AnnouncementManager />
+        <ExitIntentPopup />
+        <SocialProofToast />
         <ScrollToTop />
         <div className="flex flex-col min-h-screen">
+          <PromoBanner />
           <Navigation />
           <FixedBackButton />
             <div className="flex-1" style={{ paddingTop: 'calc(var(--app-header-h, 100px) + 52px)' }}>
@@ -232,6 +239,7 @@ const AppContent = () => {
             </PageTransition>
           </div>
         <Footer />
+        <FirstVisitBanner />
       </div>
     </AccessControlProvider>
     </>

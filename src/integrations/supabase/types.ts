@@ -1551,6 +1551,36 @@ export type Database = {
         }
         Relationships: []
       }
+      promo_banners: {
+        Row: {
+          bg_color: string
+          created_at: string
+          id: string
+          is_active: boolean
+          link_text: string
+          link_url: string
+          title: string
+        }
+        Insert: {
+          bg_color?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          link_text?: string
+          link_url?: string
+          title: string
+        }
+        Update: {
+          bg_color?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          link_text?: string
+          link_url?: string
+          title?: string
+        }
+        Relationships: []
+      }
       promotional_videos: {
         Row: {
           component_code: string | null
