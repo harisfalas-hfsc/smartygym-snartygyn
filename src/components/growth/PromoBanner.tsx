@@ -42,14 +42,13 @@ export function PromoBanner() {
 
   return (
     <div
-      className="w-full text-white text-center text-sm py-2 px-4 relative z-[60]"
-      style={{ backgroundColor: banner.bg_color }}
+      className="w-full text-center text-xs py-1.5 px-4 relative bg-muted/60 backdrop-blur-sm text-muted-foreground border-b border-border/30"
     >
       <div className="container mx-auto flex items-center justify-center gap-2 flex-wrap">
         <span>{banner.title}</span>
         <Link
           to={banner.link_url}
-          className="font-bold underline hover:no-underline whitespace-nowrap"
+          className="font-bold underline hover:no-underline whitespace-nowrap text-primary"
         >
           {banner.link_text}
         </Link>
@@ -58,10 +57,10 @@ export function PromoBanner() {
             localStorage.setItem(STORAGE_KEY, banner.id);
             setDismissed(true);
           }}
-          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-white/20 transition-colors"
+          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-muted transition-colors"
           aria-label="Dismiss banner"
         >
-          <X className="w-3.5 h-3.5" />
+          <X className="w-3 h-3" />
         </button>
       </div>
     </div>
