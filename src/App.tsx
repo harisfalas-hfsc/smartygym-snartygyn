@@ -115,8 +115,8 @@ const AppContent = () => {
         <SocialProofToast />
         <ScrollToTop />
         <div className="flex flex-col min-h-screen">
-          <PromoBanner />
           <Navigation />
+          <PromoBanner />
           <FixedBackButton />
             <div className="flex-1" style={{ paddingTop: 'calc(var(--app-header-h, 100px) + 52px)' }}>
             <PageTransition>
