@@ -245,3 +245,6 @@ verify_jwt = false
 
 [functions.generate-weekly-blog-articles]
 verify_jwt = false
+
+[functions.generate-welcome-workout]
+verify_jwt = false
