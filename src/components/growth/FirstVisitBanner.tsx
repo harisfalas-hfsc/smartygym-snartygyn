@@ -34,14 +34,14 @@ export function FirstVisitBanner() {
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-primary text-primary-foreground shadow-lg border-t border-primary/20 animate-in slide-in-from-bottom duration-500">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md text-foreground shadow-[0_-2px_10px_rgba(0,0,0,0.1)] border-t border-border/40 animate-in slide-in-from-bottom duration-500">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between gap-4 flex-wrap sm:flex-nowrap">
-        <p className="text-sm sm:text-base font-medium flex-1">
+        <p className="text-sm sm:text-base font-medium flex-1 text-muted-foreground">
           🏋️ Join 500+ fitness enthusiasts — Sign up free and unlock personalized workouts
         </p>
         <div className="flex items-center gap-2">
           <Button
-            variant="secondary"
+            variant="default"
             size="sm"
             onClick={() => navigate("/auth?mode=signup")}
           >
@@ -52,10 +52,10 @@ export function FirstVisitBanner() {
               localStorage.setItem(STORAGE_KEY, Date.now().toString());
               setVisible(false);
             }}
-            className="p-1 rounded-full hover:bg-primary-foreground/10 transition-colors"
+            className="p-1 rounded-full hover:bg-muted transition-colors"
             aria-label="Dismiss"
           >
-            <X className="w-4 h-4" />
+            <X className="w-4 h-4 text-muted-foreground" />
           </button>
         </div>
       </div>
