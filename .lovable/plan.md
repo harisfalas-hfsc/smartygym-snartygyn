@@ -1,26 +1,31 @@
 
-# Fix: Avatar Name Still Showing Wrong Value
 
-## What's wrong
-The previous fix only updated the **avatar initials** to use the database name. But the **dropdown menu** that appears when you click your avatar still shows the name from auth metadata (line 496 in Navigation.tsx):
+# Fix: Avatar Showing "Mundefined" Due to Trailing Space in Name
 
-```
-{user.user_metadata?.full_name || "User"}
-```
+## Root Cause
+The profile name for `you@example.com` is stored as "Maria " (with a trailing space). When `getUserInitials()` splits this by space, it gets `["Maria", ""]`. It then tries `""[0]` which is `undefined`, producing the string "Mundefined" as the avatar initials.
 
-This is why you still see "Jean Defin" instead of "Maria".
+## Two-Part Fix
 
-## Fix
-One line change in `src/components/Navigation.tsx` (line 496):
+### 1. Fix `getUserInitials()` in Navigation.tsx
+Trim the name and filter out empty parts from the split result before extracting initials:
 
-Change from:
-```
-{user.user_metadata?.full_name || "User"}
-```
-
-To:
-```
-{profileName || user.user_metadata?.full_name || "User"}
+```typescript
+const getUserInitials = () => {
+  const name = (profileName || user?.user_metadata?.full_name || "").trim();
+  if (name) {
+    const parts = name.split(" ").filter(p => p.length > 0);
+    return parts.length > 1 ? `${parts[0][0]}${parts[1][0]}` : parts[0][0];
+  }
+  return user?.email?.[0].toUpperCase() || "U";
+};
 ```
 
-This uses the database name ("Maria") first, same as the initials fix. One file, one line.
+### 2. Fix the stored data
+Run a database migration to trim trailing spaces from all profile names so this edge case doesn't recur:
+
+```sql
+UPDATE profiles SET full_name = TRIM(full_name) WHERE full_name != TRIM(full_name);
+```
+
+This fixes the immediate visual bug and prevents it from happening with any other users who might have trailing spaces in their names.
