@@ -42,14 +42,52 @@ export default function Auth() {
     });
 
     // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_OUT') {
-        // User signed out, stay on auth page
         if (import.meta.env.DEV) {
           console.log("User signed out");
         }
       } else if (session) {
-        // User signed in
+        // Check if this is a first-time verified user (no welcome message yet)
+        const { data: existingWelcome } = await supabase
+          .from('user_system_messages')
+          .select('id')
+          .eq('user_id', session.user.id)
+          .eq('message_type', 'welcome')
+          .limit(1);
+
+        if (!existingWelcome || existingWelcome.length === 0) {
+          // First-time verified user — fire post-signup actions
+          console.log("First-time verified user detected, triggering post-signup actions");
+          
+          setNewUserId(session.user.id);
+
+          // Send welcome message
+          try {
+            await supabase.functions.invoke('send-system-message', {
+              body: { userId: session.user.id, messageType: 'welcome' }
+            });
+          } catch (msgError) {
+            console.error('Failed to send welcome message:', msgError);
+          }
+
+          // Generate welcome workout
+          try {
+            const { error: wwError } = await supabase.functions.invoke('generate-welcome-workout', {
+              body: { user_id: session.user.id }
+            });
+            if (wwError) console.error('Welcome workout generation failed:', wwError);
+          } catch (wwErr) {
+            console.error('Failed to trigger welcome workout:', wwErr);
+          }
+
+          // Track signup event
+          trackSocialMediaEvent({ eventType: 'signup', userId: session.user.id });
+
+          setShowAvatarSetup(true);
+          return; // Don't navigate yet — avatar setup dialog will handle it
+        }
+
         navigate("/");
       }
     });
@@ -201,46 +239,11 @@ export default function Auth() {
           });
         }
       } else if (data.user) {
-        setNewUserId(data.user.id);
-        
-        // Track signup event
-        trackSocialMediaEvent({
-          eventType: 'signup',
-          userId: data.user.id,
-        });
-        
-        // Send welcome message
-        try {
-          await supabase.functions.invoke('send-system-message', {
-            body: {
-              userId: data.user.id,
-              messageType: 'welcome'
-            }
-          });
-        } catch (msgError) {
-          console.error('Failed to send welcome message:', msgError);
-        }
-        
-        // Trigger welcome workout generation for all new signups
-        try {
-          console.log("Triggering welcome workout generation for new user:", data.user.id);
-          const { data: wData, error: welcomeWorkoutError } = await supabase.functions.invoke('generate-welcome-workout', {
-            body: { user_id: data.user.id }
-          });
-          if (welcomeWorkoutError) {
-            console.error('Welcome workout generation failed:', welcomeWorkoutError);
-          } else {
-            console.log('Welcome workout generated successfully:', wData);
-          }
-        } catch (welcomeErr) {
-          console.error('Failed to trigger welcome workout:', welcomeErr);
-        }
-        
         toast({
-          title: "Success!",
-          description: "Account created! Your free workout is being prepared 🎁",
+          title: "Check your email! 📧",
+          description: "We've sent a verification link to your email. Please verify to activate your account.",
+          duration: 10000,
         });
-        setShowAvatarSetup(true);
       }
     } catch (error: any) {
       toast({
