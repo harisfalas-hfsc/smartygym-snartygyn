@@ -1,31 +1,37 @@
 
 
-# Fix: Avatar Showing "Mundefined" Due to Trailing Space in Name
+# Fix: Welcome Workout Not Being Generated for New Users
 
 ## Root Cause
-The profile name for `you@example.com` is stored as "Maria " (with a trailing space). When `getUserInitials()` splits this by space, it gets `["Maria", ""]`. It then tries `""[0]` which is `undefined`, producing the string "Mundefined" as the avatar initials.
 
-## Two-Part Fix
+The `generate-welcome-workout` function call in `Auth.tsx` (line 227) is **fire-and-forget** -- it's not `await`ed. Immediately after (line 244), `setShowAvatarSetup(true)` triggers a React state change and re-render. The browser likely cancels the outgoing HTTP request before it completes, so the function is never actually invoked on the server.
 
-### 1. Fix `getUserInitials()` in Navigation.tsx
-Trim the name and filter out empty parts from the split result before extracting initials:
+Evidence: analytics logs show literally **zero** calls to `generate-welcome-workout` -- ever. The function itself works fine when called directly.
+
+## Fix
+
+### 1. `await` the welcome workout call in `Auth.tsx`
+
+Change the fire-and-forget pattern to an awaited call, just like the welcome message above it:
 
 ```typescript
-const getUserInitials = () => {
-  const name = (profileName || user?.user_metadata?.full_name || "").trim();
-  if (name) {
-    const parts = name.split(" ").filter(p => p.length > 0);
-    return parts.length > 1 ? `${parts[0][0]}${parts[1][0]}` : parts[0][0];
-  }
-  return user?.email?.[0].toUpperCase() || "U";
-};
+// Before (fire-and-forget, gets cancelled by re-render):
+supabase.functions.invoke('generate-welcome-workout', {
+  body: { user_id: data.user.id }
+}).then(...)
+
+// After (properly awaited):
+const { error: welcomeWorkoutError } = await supabase.functions.invoke('generate-welcome-workout', {
+  body: { user_id: data.user.id }
+});
+if (welcomeWorkoutError) {
+  console.error('Welcome workout generation failed:', welcomeWorkoutError);
+}
 ```
 
-### 2. Fix the stored data
-Run a database migration to trim trailing spaces from all profile names so this edge case doesn't recur:
+### 2. Fix `send-system-message` to not return 500 on duplicates
 
-```sql
-UPDATE profiles SET full_name = TRIM(full_name) WHERE full_name != TRIM(full_name);
-```
+Currently this function throws a 500 when the welcome message already exists (inserted by the DB trigger). It should handle the duplicate key error gracefully and return 200 instead, since this is expected behavior.
 
-This fixes the immediate visual bug and prevents it from happening with any other users who might have trailing spaces in their names.
+These are the only two changes needed. One file (Auth.tsx) and one edge function (send-system-message).
+
