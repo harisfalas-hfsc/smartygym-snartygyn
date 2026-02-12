@@ -218,153 +218,36 @@ const Community = () => {
 
   const fetchLeaderboards = async () => {
     try {
-      // Get workout completions
-      const { data: workoutData, error: workoutError } = await supabase
-        .from("workout_interactions")
-        .select("user_id")
-        .eq("is_completed", true);
+      // Use secure RPC functions that bypass RLS to aggregate across all users
+      const [workoutResult, programResult, checkinResult] = await Promise.all([
+        supabase.rpc('get_workout_leaderboard'),
+        supabase.rpc('get_program_leaderboard'),
+        supabase.rpc('get_checkin_leaderboard'),
+      ]);
 
-      if (workoutError) throw workoutError;
+      if (workoutResult.error) console.error("Workout leaderboard error:", workoutResult.error);
+      if (programResult.error) console.error("Program leaderboard error:", programResult.error);
+      if (checkinResult.error) console.error("Checkin leaderboard error:", checkinResult.error);
 
-      // Get program completions
-      const { data: programData, error: programError } = await supabase
-        .from("program_interactions")
-        .select("user_id")
-        .eq("is_completed", true);
-
-      if (programError) throw programError;
-
-      // Count workout completions per user
-      const workoutCounts: { [key: string]: number } = {};
-      (workoutData || []).forEach((item) => {
-        workoutCounts[item.user_id] = (workoutCounts[item.user_id] || 0) + 1;
-      });
-
-      // Count program completions per user
-      const programCounts: { [key: string]: number } = {};
-      (programData || []).forEach((item) => {
-        programCounts[item.user_id] = (programCounts[item.user_id] || 0) + 1;
-      });
-
-      // Get check-in data for consistency leaderboard
-      const { data: checkinData, error: checkinError } = await supabase
-        .from("smarty_checkins")
-        .select("user_id, morning_completed, night_completed, checkin_date")
-        .order("checkin_date", { ascending: true });
-
-      if (checkinError) throw checkinError;
-
-      // Calculate consistency score per user
-      // Score = (full days * 2) + (partial days * 1) + (streak bonus)
-      // Full day = both morning AND night completed
-      // Partial day = only morning OR only night completed
-      // Streak bonus = consecutive days with at least one check-in
-      const checkinCounts: { [key: string]: number } = {};
-      const userCheckinsByDate: { [userId: string]: { [date: string]: { morning: boolean; night: boolean } } } = {};
-      
-      (checkinData || []).forEach((item) => {
-        if (!userCheckinsByDate[item.user_id]) {
-          userCheckinsByDate[item.user_id] = {};
-        }
-        if (!userCheckinsByDate[item.user_id][item.checkin_date]) {
-          userCheckinsByDate[item.user_id][item.checkin_date] = { morning: false, night: false };
-        }
-        if (item.morning_completed) userCheckinsByDate[item.user_id][item.checkin_date].morning = true;
-        if (item.night_completed) userCheckinsByDate[item.user_id][item.checkin_date].night = true;
-      });
-
-      // Calculate consistency score for each user
-      Object.entries(userCheckinsByDate).forEach(([userId, dateMap]) => {
-        let consistencyScore = 0;
-        const dates = Object.keys(dateMap).sort();
-        let currentStreak = 0;
-        let maxStreak = 0;
-        let prevDate: Date | null = null;
-
-        dates.forEach((dateStr) => {
-          const { morning, night } = dateMap[dateStr];
-          const currentDate = new Date(dateStr);
-          
-          // Points for completions
-          if (morning && night) {
-            consistencyScore += 3; // Full day bonus
-          } else if (morning || night) {
-            consistencyScore += 1; // Partial day
-          }
-
-          // Track streaks (consecutive days)
-          if (prevDate) {
-            const dayDiff = Math.round((currentDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24));
-            if (dayDiff === 1) {
-              currentStreak++;
-            } else {
-              maxStreak = Math.max(maxStreak, currentStreak);
-              currentStreak = 1;
-            }
-          } else {
-            currentStreak = 1;
-          }
-          prevDate = currentDate;
-        });
-        
-        maxStreak = Math.max(maxStreak, currentStreak);
-        
-        // Add streak bonus (1 point per day in longest streak)
-        consistencyScore += Math.floor(maxStreak * 0.5);
-        
-        if (consistencyScore > 0) {
-          checkinCounts[userId] = consistencyScore;
-        }
-      });
-
-      // Get user profiles
-      const allUserIds = [...new Set([...Object.keys(workoutCounts), ...Object.keys(programCounts), ...Object.keys(checkinCounts)])];
-      const { data: profilesData, error: profilesError } = await supabase
-        .from("profiles")
-        .select("user_id, full_name")
-        .in("user_id", allUserIds);
-
-      if (profilesError) {
-        console.error("Error fetching profiles for leaderboard:", profilesError);
-      }
-
-      // Create workout leaderboard with real data only
-      const workoutEntries: LeaderboardEntry[] = Object.entries(workoutCounts).map(([userId, count]) => {
-        const profile = profilesData?.find((p) => p.user_id === userId);
-        return {
-          user_id: userId,
-          display_name: profile?.full_name || "Anonymous User",
-          total_completions: count,
-        };
-      });
-
-      workoutEntries.sort((a, b) => b.total_completions - a.total_completions);
+      const workoutEntries: LeaderboardEntry[] = (workoutResult.data || []).map((item: any) => ({
+        user_id: item.user_id,
+        display_name: item.display_name || "Anonymous User",
+        total_completions: Number(item.completed_count),
+      }));
       setWorkoutLeaderboard(workoutEntries);
 
-      // Create program leaderboard with real data only
-      const programEntries: LeaderboardEntry[] = Object.entries(programCounts).map(([userId, count]) => {
-        const profile = profilesData?.find((p) => p.user_id === userId);
-        return {
-          user_id: userId,
-          display_name: profile?.full_name || "Anonymous User",
-          total_completions: count,
-        };
-      });
-
-programEntries.sort((a, b) => b.total_completions - a.total_completions);
+      const programEntries: LeaderboardEntry[] = (programResult.data || []).map((item: any) => ({
+        user_id: item.user_id,
+        display_name: item.display_name || "Anonymous User",
+        total_completions: Number(item.completed_count),
+      }));
       setProgramLeaderboard(programEntries);
 
-      // Create check-in leaderboard with real data only
-      const checkinEntries: LeaderboardEntry[] = Object.entries(checkinCounts).map(([userId, count]) => {
-        const profile = profilesData?.find((p) => p.user_id === userId);
-        return {
-          user_id: userId,
-          display_name: profile?.full_name || "Anonymous User",
-          total_completions: count,
-        };
-      });
-
-      checkinEntries.sort((a, b) => b.total_completions - a.total_completions);
+      const checkinEntries: LeaderboardEntry[] = (checkinResult.data || []).map((item: any) => ({
+        user_id: item.user_id,
+        display_name: item.display_name || "Anonymous User",
+        total_completions: Number(item.consistency_score),
+      }));
       setCheckinLeaderboard(checkinEntries);
       
     } catch (error) {
@@ -376,72 +259,41 @@ programEntries.sort((a, b) => b.total_completions - a.total_completions);
 
   const fetchRatedContent = async () => {
     try {
-      // Get workout ratings
-      const { data: workoutRatings, error: workoutError } = await supabase
-        .from("workout_interactions")
-        .select("workout_id, workout_name, workout_type, rating")
-        .not("rating", "is", null);
+      // Use secure RPC functions that bypass RLS to aggregate ratings across all users
+      const [workoutResult, programResult] = await Promise.all([
+        supabase.rpc('get_workout_ratings'),
+        supabase.rpc('get_program_ratings'),
+      ]);
 
-      if (workoutError) throw workoutError;
+      if (workoutResult.error) console.error("Workout ratings error:", workoutResult.error);
+      if (programResult.error) console.error("Program ratings error:", programResult.error);
 
-      // Get program ratings
-      const { data: programRatings, error: programError } = await supabase
-        .from("program_interactions")
-        .select("program_id, program_name, program_type, rating")
-        .not("rating", "is", null);
-
-      if (programError) throw programError;
-
-      // Calculate workout averages
-      const workoutRatingMap: { [key: string]: { name: string; type: string; ratings: number[] } } = {};
-      (workoutRatings || []).forEach((item) => {
-        if (!workoutRatingMap[item.workout_id]) {
-          workoutRatingMap[item.workout_id] = { name: item.workout_name, type: item.workout_type, ratings: [] };
-        }
-        workoutRatingMap[item.workout_id].ratings.push(item.rating);
-      });
-
-      // Calculate program averages
-      const programRatingMap: { [key: string]: { name: string; type: string; ratings: number[] } } = {};
-      (programRatings || []).forEach((item) => {
-        if (!programRatingMap[item.program_id]) {
-          programRatingMap[item.program_id] = { name: item.program_name, type: item.program_type, ratings: [] };
-        }
-        programRatingMap[item.program_id].ratings.push(item.rating);
-      });
-
-      // Create rated content array
       const allRatedContent: RatedContent[] = [];
 
-      Object.entries(workoutRatingMap).forEach(([id, data]) => {
-        const avg = data.ratings.reduce((sum, r) => sum + r, 0) / data.ratings.length;
+      (workoutResult.data || []).forEach((item: any) => {
         allRatedContent.push({
-          content_id: id,
-          content_name: data.name,
+          content_id: item.workout_id,
+          content_name: item.workout_name,
           content_type: "workout",
-          workout_type: data.type,
-          average_rating: Math.round(avg * 10) / 10,
-          rating_count: data.ratings.length,
+          workout_type: item.workout_type,
+          average_rating: Number(item.average_rating),
+          rating_count: Number(item.rating_count),
         });
       });
 
-      Object.entries(programRatingMap).forEach(([id, data]) => {
-        const avg = data.ratings.reduce((sum, r) => sum + r, 0) / data.ratings.length;
+      (programResult.data || []).forEach((item: any) => {
         allRatedContent.push({
-          content_id: id,
-          content_name: data.name,
+          content_id: item.program_id,
+          content_name: item.program_name,
           content_type: "program",
-          program_type: data.type,
-          average_rating: Math.round(avg * 10) / 10,
-          rating_count: data.ratings.length,
+          program_type: item.program_type,
+          average_rating: Number(item.average_rating),
+          rating_count: Number(item.rating_count),
         });
       });
 
-      // Sort by average rating (desc), then by count (desc)
       allRatedContent.sort((a, b) => {
-        if (b.average_rating !== a.average_rating) {
-          return b.average_rating - a.average_rating;
-        }
+        if (b.average_rating !== a.average_rating) return b.average_rating - a.average_rating;
         return b.rating_count - a.rating_count;
       });
 
