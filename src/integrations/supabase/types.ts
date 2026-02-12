@@ -3028,12 +3028,40 @@ export type Database = {
       }
       ensure_cron_jobs: { Args: never; Returns: Json }
       exec_sql: { Args: { sql: string }; Returns: undefined }
+      get_checkin_leaderboard: {
+        Args: never
+        Returns: {
+          avatar_url: string
+          consistency_score: number
+          display_name: string
+          user_id: string
+        }[]
+      }
       get_cron_jobs: {
         Args: never
         Returns: {
           active: boolean
           jobname: string
           schedule: string
+        }[]
+      }
+      get_program_leaderboard: {
+        Args: never
+        Returns: {
+          avatar_url: string
+          completed_count: number
+          display_name: string
+          user_id: string
+        }[]
+      }
+      get_program_ratings: {
+        Args: never
+        Returns: {
+          average_rating: number
+          program_id: string
+          program_name: string
+          program_type: string
+          rating_count: number
         }[]
       }
       get_website_analytics_summary: {
@@ -3043,6 +3071,25 @@ export type Database = {
           total_revenue: number
           total_visits: number
           unique_sessions: number
+        }[]
+      }
+      get_workout_leaderboard: {
+        Args: never
+        Returns: {
+          avatar_url: string
+          completed_count: number
+          display_name: string
+          user_id: string
+        }[]
+      }
+      get_workout_ratings: {
+        Args: never
+        Returns: {
+          average_rating: number
+          rating_count: number
+          workout_id: string
+          workout_name: string
+          workout_type: string
         }[]
       }
       has_premium_subscription: {
