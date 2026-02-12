@@ -51,7 +51,7 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
-    // Get user email
+    // Get user email and check confirmation status
     logStep("Fetching user email from auth");
     const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserById(record.user_id);
     if (userError) {
@@ -63,6 +63,15 @@ serve(async (req) => {
     if (!userEmail) {
       logStep("User email not found");
       throw new Error("User email not found");
+    }
+
+    // Safety net: skip if user email is not confirmed
+    if (!userData.user.email_confirmed_at) {
+      logStep("User email not confirmed yet, skipping welcome email", { email: userEmail });
+      return new Response(
+        JSON.stringify({ success: false, reason: "Email not confirmed" }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
     
     const userName = record.full_name || "there";
