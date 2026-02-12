@@ -217,9 +217,9 @@ export const Navigation = () => {
 
   const getUserInitials = () => {
     // Prefer profile name from DB, fall back to auth metadata, then email
-    const name = profileName || user?.user_metadata?.full_name;
+    const name = (profileName || user?.user_metadata?.full_name || "").trim();
     if (name) {
-      const parts = name.split(" ");
+      const parts = name.split(" ").filter(p => p.length > 0);
       return parts.length > 1 ? `${parts[0][0]}${parts[1][0]}` : parts[0][0];
     }
     return user?.email?.[0].toUpperCase() || "U";
