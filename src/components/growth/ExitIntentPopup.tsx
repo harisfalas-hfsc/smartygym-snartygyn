@@ -10,6 +10,13 @@ import { Dumbbell, X } from "lucide-react";
 import exitPopupBg from "@/assets/exit-popup-bg.jpg";
 
 const STORAGE_KEY = "smarty_exit_popup_shown";
+const THREE_HOURS_MS = 3 * 60 * 60 * 1000;
+
+function wasShownRecently(): boolean {
+  const lastShown = localStorage.getItem(STORAGE_KEY);
+  if (!lastShown) return false;
+  return Date.now() - parseInt(lastShown, 10) < THREE_HOURS_MS;
+}
 
 export function ExitIntentPopup() {
   const [show, setShow] = useState(false);
@@ -24,14 +31,14 @@ export function ExitIntentPopup() {
 
   const triggerPopup = useCallback(() => {
     if (session) return;
-    if (localStorage.getItem(STORAGE_KEY)) return;
+    if (wasShownRecently()) return;
     setShow(true);
     localStorage.setItem(STORAGE_KEY, Date.now().toString());
   }, [session]);
 
   useEffect(() => {
     if (session) return;
-    if (localStorage.getItem(STORAGE_KEY)) return;
+    if (wasShownRecently()) return;
 
     const handleMouseLeave = (e: MouseEvent) => {
       if (e.clientY <= 5) triggerPopup();
