@@ -224,15 +224,14 @@ export default function Auth() {
         // Trigger welcome workout generation for all new signups
         try {
           console.log("Triggering welcome workout generation for new user:", data.user.id);
-          supabase.functions.invoke('generate-welcome-workout', {
+          const { data: wData, error: welcomeWorkoutError } = await supabase.functions.invoke('generate-welcome-workout', {
             body: { user_id: data.user.id }
-          }).then(({ data: wData, error: wError }) => {
-            if (wError) {
-              console.error('Welcome workout generation failed:', wError);
-            } else {
-              console.log('Welcome workout generated successfully:', wData);
-            }
           });
+          if (welcomeWorkoutError) {
+            console.error('Welcome workout generation failed:', welcomeWorkoutError);
+          } else {
+            console.log('Welcome workout generated successfully:', wData);
+          }
         } catch (welcomeErr) {
           console.error('Failed to trigger welcome workout:', welcomeErr);
         }

@@ -91,6 +91,14 @@ serve(async (req) => {
       });
 
     if (insertError) {
+      // Handle duplicate welcome messages gracefully (DB trigger may have already inserted one)
+      if (insertError.code === '23505' && messageType === 'welcome') {
+        console.log('[SEND-SYSTEM-MESSAGE] Welcome message already exists for user, skipping:', userId);
+        return new Response(
+          JSON.stringify({ success: true, message: "Welcome message already exists", duplicate: true }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
+        );
+      }
       console.error('[SEND-SYSTEM-MESSAGE] Insert error:', insertError);
       throw insertError;
     }
