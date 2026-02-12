@@ -1,28 +1,26 @@
 
+# Fix: Avatar Name Still Showing Wrong Value
 
-# Suppress Notifications for Complimentary Welcome Workouts
+## What's wrong
+The previous fix only updated the **avatar initials** to use the database name. But the **dropdown menu** that appears when you click your avatar still shows the name from auth metadata (line 496 in Navigation.tsx):
 
-## Problem
-Every time a new user signs up, a complimentary workout is created and inserted into the `admin_workouts` table. The database trigger `queue_workout_notification` fires on every insert and queues a notification to ALL users. If 100 people sign up in one day, all existing users would receive 100 emails about workouts they didn't ask about.
-
-## Fix
-Update the `queue_workout_notification` database trigger function to also skip workouts where `type = 'welcome'`. Currently it only skips WOD workouts (`is_workout_of_day = true`). Adding one condition solves the problem at its root.
-
-## Technical Details
-
-### Database migration (single SQL change)
-Update the `queue_workout_notification()` function to add a check:
-
-```text
-IF NEW.is_visible = true 
-   AND (NEW.is_workout_of_day IS NULL OR NEW.is_workout_of_day = false)
-   AND (NEW.type IS NULL OR NEW.type != 'welcome')   <-- NEW CONDITION
-THEN ...
+```
+{user.user_metadata?.full_name || "User"}
 ```
 
-This means:
-- Regular workouts created manually or via prompts: notifications sent as usual
-- WOD workouts: skipped (existing behavior)
-- Welcome/complimentary workouts (type = 'welcome'): skipped (new behavior)
+This is why you still see "Jean Defin" instead of "Maria".
 
-No other files need to change. The welcome workout's own personal notification to the new user (sent directly in the edge function at line 361) is unaffected -- that one only goes to the specific new user, not to everyone.
+## Fix
+One line change in `src/components/Navigation.tsx` (line 496):
+
+Change from:
+```
+{user.user_metadata?.full_name || "User"}
+```
+
+To:
+```
+{profileName || user.user_metadata?.full_name || "User"}
+```
+
+This uses the database name ("Maria") first, same as the initials fix. One file, one line.
