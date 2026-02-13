@@ -120,17 +120,14 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
 
       const newFavoriteStatus = !isFavorite;
       
-      await supabase
+      const { error } = await supabase
         .from('program_interactions')
-        .upsert({
-          user_id: session.user.id,
-          program_id: programId,
-          program_type: programType,
-          program_name: programName,
-          is_favorite: newFavoriteStatus,
-        }, {
-          onConflict: 'user_id,program_id,program_type'
-        });
+        .update({ is_favorite: newFavoriteStatus })
+        .eq('user_id', session.user.id)
+        .eq('program_id', programId)
+        .eq('program_type', programType);
+
+      if (error) throw error;
 
       setIsFavorite(newFavoriteStatus);
       toast({
@@ -157,18 +154,14 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
-      await supabase
+      const { error } = await supabase
         .from('program_interactions')
-        .upsert({
-          user_id: session.user.id,
-          program_id: programId,
-          program_type: programType,
-          program_name: programName,
-          is_ongoing: true,
-          is_completed: false,
-        }, {
-          onConflict: 'user_id,program_id,program_type'
-        });
+        .update({ is_ongoing: true, is_completed: false })
+        .eq('user_id', session.user.id)
+        .eq('program_id', programId)
+        .eq('program_type', programType);
+
+      if (error) throw error;
 
       await supabase.from('user_activity_log').insert({
         user_id: session.user.id,
@@ -206,18 +199,14 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
-      await supabase
+      const { error } = await supabase
         .from('program_interactions')
-        .upsert({
-          user_id: session.user.id,
-          program_id: programId,
-          program_type: programType,
-          program_name: programName,
-          is_completed: true,
-          is_ongoing: false,
-        }, {
-          onConflict: 'user_id,program_id,program_type'
-        });
+        .update({ is_completed: true, is_ongoing: false })
+        .eq('user_id', session.user.id)
+        .eq('program_id', programId)
+        .eq('program_type', programType);
+
+      if (error) throw error;
 
       // Mark scheduled program as completed if exists
       if (scheduledWorkout) {
@@ -255,18 +244,14 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
-      await supabase
+      const { error } = await supabase
         .from('program_interactions')
-        .upsert({
-          user_id: session.user.id,
-          program_id: programId,
-          program_type: programType,
-          program_name: programName,
-          is_completed: false,
-          is_ongoing: false,
-        }, {
-          onConflict: 'user_id,program_id,program_type'
-        });
+        .update({ is_completed: false, is_ongoing: false })
+        .eq('user_id', session.user.id)
+        .eq('program_id', programId)
+        .eq('program_type', programType);
+
+      if (error) throw error;
 
       setIsCompleted(false);
       setIsOngoing(false);
@@ -295,17 +280,14 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
-      await supabase
+      const { error } = await supabase
         .from('program_interactions')
-        .upsert({
-          user_id: session.user.id,
-          program_id: programId,
-          program_type: programType,
-          program_name: programName,
-          rating: newRating,
-        }, {
-          onConflict: 'user_id,program_id,program_type'
-        });
+        .update({ rating: newRating })
+        .eq('user_id', session.user.id)
+        .eq('program_id', programId)
+        .eq('program_type', programType);
+
+      if (error) throw error;
 
       setRating(newRating);
       toast({
