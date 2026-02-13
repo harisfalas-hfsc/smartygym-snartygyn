@@ -1,62 +1,85 @@
 
 
-# Enable Email Verification Before Account Activation
+# Fix: Community Leaderboard Not Showing Free Users + Interaction Issues
 
-## What Changes
+## Root Cause Analysis
 
-Right now, when someone signs up, the account is created instantly -- welcome email sent, welcome workout generated, dashboard notification created -- even if the email is completely fake. This wastes Resend credits and creates ghost accounts.
+I investigated the database and found the real problem. The new user (Elsa) has a workout interaction row but `is_completed` is still `false` in the database -- even though she may have clicked the "Complete" button. Here's why:
 
-After this change, the flow will be:
+### Problem 1: Upsert fails silently for free users
 
-1. User fills in signup form and submits
-2. A verification email is sent to the provided email address (this is the welcome email, with a "Verify Your Account" button)
-3. **Nothing else happens yet** -- no account activation, no welcome workout, no dashboard notification
-4. User clicks the "Verify" button in the email
-5. Account is confirmed and the user lands on the app
-6. **Only then** do all the post-signup actions fire: welcome workout generation, dashboard welcome notification, avatar setup, etc.
+The `workout_interactions` table has an INSERT RLS policy that only allows free users to insert rows where `is_completed IS NOT TRUE AND is_favorite IS NOT TRUE AND rating IS NULL`. This was designed to prevent free users from interacting with premium content they haven't purchased.
 
-## Technical Details
+However, the code uses **upsert** (INSERT ... ON CONFLICT DO UPDATE) to toggle completion, favorites, and ratings. In PostgreSQL, when an upsert is attempted:
+- The INSERT WITH CHECK policy is evaluated first
+- If it fails, the **entire operation fails** -- it does NOT fall through to the UPDATE path
+- The code does not check for errors from the upsert, so the UI updates locally (shows "completed") but the database never changes
+- On page reload, the true state (not completed) is shown
 
-### 1. Disable auto-confirm for email signups
-Use the configure-auth tool to turn off `autoconfirm` for email signups. This makes the authentication system require email verification before the account is usable.
+So when Elsa clicks "Mark as Complete", the UI briefly shows it as completed, but the database silently rejects the change. That's why she doesn't appear on the leaderboard.
 
-### 2. Restructure `Auth.tsx` signup flow
-Currently, right after `supabase.auth.signUp()`, the code immediately fires:
-- `send-system-message` (welcome notification)
-- `generate-welcome-workout` (complimentary workout)
-- Avatar setup dialog
-- Success toast
+### Problem 2: INSERT policy doesn't account for purchased content
 
-All of this needs to move to **after email verification**. On signup, the only thing that happens is a toast telling the user to check their email.
+The INSERT policy checks for premium subscription, admin role, and corporate membership -- but it does NOT check the `user_purchases` table. So even users who legitimately purchased (or received as a complimentary gift) a premium workout cannot fully interact with it at the database level.
 
-### 3. Move post-signup actions to the auth state listener
-When the user clicks the verification link and lands back on the app, the `onAuthStateChange` listener fires. At that point, we detect it's a first-time verified user and trigger:
-- Welcome workout generation
-- Welcome dashboard notification
-- Avatar setup dialog
-- Redirect to tour
+### About Dashboard/Logbook for Free Users
 
-### 4. Modify the welcome email to include a verification button
-Update the `send-welcome-email` edge function (which is triggered by a database trigger on profile creation) to include the verification/confirmation link. Since the authentication system sends its own confirmation email, we have two options:
-- **Option A**: Use the authentication system's built-in confirmation email (simplest, most reliable) and keep the welcome email as a separate follow-up after verification
-- **Option B**: Customize the confirmation email template to look like the current welcome email with a verify button
+Free users (subscribers) DO have access to the dashboard -- it's behind `ProtectedRoute` which only requires authentication, not premium status. The logbook tab is accessible to all authenticated users. However, the SmartyPlans comparison page incorrectly shows LogBook as "premium only" -- it should show as available to all authenticated users (at minimum for their purchased content).
 
-We'll go with **Option A** -- the authentication system handles the verification email automatically. The existing welcome email trigger will be adjusted to only fire after the user is confirmed.
+## Fix Plan
 
-### 5. Prevent the database trigger from firing prematurely
-The `trigger_welcome_email` trigger fires on profile creation (which happens via `handle_new_user` trigger on `auth.users` insert). Since the profile is created even for unverified users, this trigger currently sends the welcome email immediately to potentially fake addresses. We need to either:
-- Remove the DB trigger and handle the welcome email only after confirmation
-- Or add a check in the trigger to skip unverified users
+### 1. Fix the INSERT RLS policy on `workout_interactions` (Database Migration)
 
-### 6. Handle the `handle_new_user` trigger
-The profile is still created on signup (this is fine -- the authentication system needs the profile row). But the welcome email and welcome workout should not fire until verification.
+Update the policy to also allow users who have purchased the content:
 
-## Summary of File Changes
+```sql
+-- Add purchased content check to the INSERT policy
+DROP POLICY "Users can insert workout interactions based on tier" ON workout_interactions;
 
-| File | Change |
-|------|--------|
-| Auth config | Disable auto-confirm for email signups |
-| `src/pages/Auth.tsx` | Remove post-signup actions from `handleSignUp`; add post-verification logic in `onAuthStateChange` |
-| Database migration | Modify `trigger_welcome_email` to check if user email is confirmed before firing |
-| `supabase/functions/send-welcome-email/index.ts` | Add email confirmation check as safety net |
+CREATE POLICY "Users can insert workout interactions based on tier"
+ON workout_interactions FOR INSERT TO authenticated
+WITH CHECK (
+  auth.uid() = user_id 
+  AND (
+    -- Admins can do anything
+    has_role(auth.uid(), 'admin'::app_role)
+    -- Premium subscribers
+    OR EXISTS (SELECT 1 FROM user_subscriptions WHERE user_id = auth.uid() AND status = 'active' AND plan_type IN ('gold', 'platinum'))
+    -- Corporate admins
+    OR EXISTS (SELECT 1 FROM corporate_subscriptions WHERE admin_user_id = auth.uid() AND status = 'active')
+    -- Corporate members
+    OR EXISTS (SELECT 1 FROM corporate_members cm JOIN corporate_subscriptions cs ON cm.corporate_subscription_id = cs.id WHERE cm.user_id = auth.uid() AND cs.status = 'active')
+    -- Users who purchased this specific workout
+    OR EXISTS (SELECT 1 FROM user_purchases WHERE user_id = auth.uid() AND content_id = workout_interactions.workout_id AND content_type = 'workout' AND content_deleted = false)
+    -- Free users on free content (view-only interactions)
+    OR (is_favorite IS NOT TRUE AND is_completed IS NOT TRUE AND rating IS NULL)
+  )
+);
+```
 
+### 2. Fix the same issue on `program_interactions` (Database Migration)
+
+Apply the equivalent fix for programs too, adding a check for purchased programs.
+
+### 3. Fix `WorkoutInteractions.tsx` -- use UPDATE instead of upsert for existing rows
+
+Change the `toggleCompleted`, `toggleFavorite`, and `handleRating` functions to:
+- First check if a row already exists (which it does, since `markAsViewed` creates it)
+- If it exists, use UPDATE (which has a simpler RLS policy: `auth.uid() = user_id`)
+- If it doesn't exist, use INSERT
+- Also add proper error handling for the database operations
+
+### 4. Fix `ProgramInteractions.tsx` -- same pattern
+
+Apply the same update-vs-upsert fix for program interactions.
+
+### 5. Fix `WorkoutInteractions.tsx` error handling
+
+The current code silently ignores upsert failures. Add proper error checking so users see a meaningful error if something goes wrong.
+
+## What This Fixes
+
+- New users who receive complimentary workouts can mark them as completed, favorite them, and rate them
+- Users who purchase standalone workouts/programs get full interaction parity with premium users
+- Completed workouts from these users will appear on the community leaderboard
+- The UI won't show false "completed" states that revert on page reload
