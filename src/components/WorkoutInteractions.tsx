@@ -128,17 +128,13 @@ export const WorkoutInteractions = ({ workoutId, workoutType, workoutName, isFre
 
       const newFavoriteStatus = !isFavorite;
       
-      await supabase
+      const { error } = await supabase
         .from('workout_interactions')
-        .upsert({
-          user_id: session.user.id,
-          workout_id: workoutId,
-          workout_type: workoutType,
-          workout_name: workoutName,
-          is_favorite: newFavoriteStatus,
-        }, {
-          onConflict: 'user_id,workout_id'
-        });
+        .update({ is_favorite: newFavoriteStatus })
+        .eq('user_id', session.user.id)
+        .eq('workout_id', workoutId);
+
+      if (error) throw error;
 
       setIsFavorite(newFavoriteStatus);
       toast({
@@ -167,17 +163,13 @@ export const WorkoutInteractions = ({ workoutId, workoutType, workoutName, isFre
 
       const newCompletedStatus = !isCompleted;
       
-      await supabase
+      const { error } = await supabase
         .from('workout_interactions')
-        .upsert({
-          user_id: session.user.id,
-          workout_id: workoutId,
-          workout_type: workoutType,
-          workout_name: workoutName,
-          is_completed: newCompletedStatus,
-        }, {
-          onConflict: 'user_id,workout_id'
-        });
+        .update({ is_completed: newCompletedStatus })
+        .eq('user_id', session.user.id)
+        .eq('workout_id', workoutId);
+
+      if (error) throw error;
 
       // Log to activity log
       if (newCompletedStatus) {
@@ -227,17 +219,13 @@ export const WorkoutInteractions = ({ workoutId, workoutType, workoutName, isFre
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
-      await supabase
+      const { error } = await supabase
         .from('workout_interactions')
-        .upsert({
-          user_id: session.user.id,
-          workout_id: workoutId,
-          workout_type: workoutType,
-          workout_name: workoutName,
-          rating: newRating,
-        }, {
-          onConflict: 'user_id,workout_id'
-        });
+        .update({ rating: newRating })
+        .eq('user_id', session.user.id)
+        .eq('workout_id', workoutId);
+
+      if (error) throw error;
 
       setRating(newRating);
       toast({
