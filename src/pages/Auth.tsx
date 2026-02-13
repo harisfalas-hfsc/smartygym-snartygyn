@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { AlertTriangle, Loader2, WifiOff } from "lucide-react";
+import { AlertTriangle, Loader2, WifiOff, Mail, ArrowLeft } from "lucide-react";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { AvatarSetupDialog } from "@/components/AvatarSetupDialog";
 import { ForgotPasswordDialog } from "@/components/auth/ForgotPasswordDialog";
@@ -94,6 +94,8 @@ export default function Auth() {
 
     return () => subscription.unsubscribe();
   }, [navigate]);
+
+  const [showVerificationMessage, setShowVerificationMessage] = useState(false);
 
   // Sign Up State
   const [signUpData, setSignUpData] = useState({
@@ -239,11 +241,7 @@ export default function Auth() {
           });
         }
       } else if (data.user) {
-        toast({
-          title: "Check your email! 📧",
-          description: "We've sent a verification link to your email. Please verify to activate your account.",
-          duration: 10000,
-        });
+        setShowVerificationMessage(true);
       }
     } catch (error: any) {
       toast({
@@ -320,6 +318,42 @@ export default function Auth() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <OfflineBanner />
+
+      {showVerificationMessage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur-sm p-4">
+          <Card className="w-full max-w-md text-center">
+            <CardHeader className="space-y-4 flex flex-col items-center pb-2">
+              <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-full bg-primary/10 flex items-center justify-center">
+                <Mail className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
+              </div>
+              <CardTitle className="text-xl sm:text-2xl font-bold">Check Your Email! 📧</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4 sm:space-y-6">
+              <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
+                We've sent a <span className="font-semibold text-foreground">verification link</span> to{" "}
+                <span className="font-semibold text-primary break-all">{signUpData.email}</span>.
+              </p>
+              <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 sm:p-4">
+                <p className="text-sm sm:text-base font-medium text-foreground">
+                  You must verify your email before you can sign in.
+                </p>
+                <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+                  Check your inbox (and spam folder) for the verification email and click the link inside.
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                className="w-full mt-2"
+                onClick={() => setShowVerificationMessage(false)}
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Login
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       {showAvatarSetup && newUserId && (
         <AvatarSetupDialog
           open={showAvatarSetup}
