@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { WorkoutToolsCards } from "@/components/WorkoutToolsCards";
 import workoutHero from "@/assets/workout-hero.jpg";
 import { ParQReminder } from "@/components/ParQReminder";
-import { WorkoutInfoBar } from "@/components/WorkoutInfoBar";
+
 import { ShareButtons } from "@/components/ShareButtons";
 import { WorkoutInteractions } from "@/components/WorkoutInteractions";
 import { ProgramInteractions } from "@/components/ProgramInteractions";
@@ -178,16 +178,6 @@ export const WorkoutDisplay = ({
           Created by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> — Sports Scientist & Strength and Conditioning Coach
         </p>
 
-        {/* Info Bar */}
-        {focus && duration && equipment && difficulty && (
-          <WorkoutInfoBar 
-            duration={duration}
-            equipment={equipment}
-            difficulty={getDifficultyText(difficulty)}
-            focus={focus}
-            category={workoutCategory}
-          />
-        )}
 
         {/* Info Bar: Serial, Focus, Difficulty with Stars, Type, Duration, Equipment - ABOVE IMAGE */}
         <div className="flex flex-wrap items-center gap-6 text-sm mb-6">
