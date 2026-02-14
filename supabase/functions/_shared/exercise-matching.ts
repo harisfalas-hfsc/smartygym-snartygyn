@@ -32,8 +32,11 @@ export function normalizeExerciseName(name: string): string {
     .replace(/[''`]/g, '')
     .replace(/\s+/g, ' ')
     .trim()
-    .replace(/s\b/g, '')
-    .replace(/\s+/g, '');
+    // Only remove trailing 's' for pluralization (e.g. "squats" -> "squat", "lunges" -> "lunge")
+    // But not from words where 's' is part of the word (e.g. "press", "ross")
+    .split(' ')
+    .map(word => word.length > 3 && word.endsWith('s') && !word.endsWith('ss') ? word.slice(0, -1) : word)
+    .join('');
 }
 
 /**
@@ -75,7 +78,9 @@ export function calculateConfidence(searchNorm: string, exerciseNorm: string): n
   if (exerciseNorm.includes(searchNorm) || searchNorm.includes(exerciseNorm)) {
     const longer = Math.max(searchNorm.length, exerciseNorm.length);
     const shorter = Math.min(searchNorm.length, exerciseNorm.length);
-    return shorter / longer;
+    // Boost confidence when the search term is fully contained in the library name
+    // e.g. "goblet squat" inside "dumbbell goblet squat" should score high
+    return 0.80 + (shorter / longer * 0.20);
   }
   
   const distance = levenshteinDistance(searchNorm, exerciseNorm);
@@ -123,7 +128,19 @@ const STRUCTURAL_HEADERS = [
   'block', 'circuit', 'station', 'phase',
   'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday',
   'day 1', 'day 2', 'day 3', 'day 4', 'day 5', 'day 6', 'day 7',
-  'week 1', 'week 2', 'week 3', 'week 4'
+  'week 1', 'week 2', 'week 3', 'week 4', 'week 5', 'week 6', 'week 7', 'week 8',
+  'duration', 'frequency', 'session', 'session length', 'focus', 'format',
+  'protein', 'carbs', 'hydration', 'electrolytes', 'deficit', 'timing',
+  'pre-workout', 'post-workout', 'pre-cardio', 'post-cardio',
+  'volume progression', 'intensity progression', 'density progression', 'complexity progression',
+  'cardiovascular', 'metabolism', 'mental strength', 'energy',
+  'calorie burn', 'fat loss', 'conditioning', 'strength', 'movement', 'daily life',
+  'daily goal', 'daily hydration', 'electrolyte balance', 'carbohydrate needs',
+  'race day nutrition', 'rest days', 'heart rate monitoring', 'weekly progression',
+  'total weekly calorie targets', 'caloric deficit', 'carb cycling', 'collagen',
+  'machine setup tips', 'treadmill', 'rower', 'by week',
+  'cardiovascular fitness', 'expected results', 'nutrition tips',
+  'soft tissue preparation'
 ];
 
 // Prefix patterns that indicate a header with exercise after colon
@@ -164,6 +181,11 @@ export function extractExerciseNames(htmlContent: string): string[] {
   let match;
   while ((match = boldPattern.exec(htmlContent)) !== null) {
     let text = match[1].trim();
+    
+    // Skip already-matched exercises ({{exercise:id:name}} markup)
+    if (/\{\{exercise:/.test(text)) {
+      continue;
+    }
     
     // Skip if too short or just numbers
     if (text.length < 3 || /^\d+\.?\s*$/.test(text)) {
@@ -213,7 +235,12 @@ export function extractExerciseNames(htmlContent: string): string[] {
     }
     
     // Clean up any trailing/leading punctuation or numbers
-    const cleaned = text.replace(/^\d+\.\s*/, '').replace(/\s*[-–—]\s*$/, '').trim();
+    let cleaned = text.replace(/^\d+\.\s*/, '').replace(/\s*[-–—]\s*$/, '').trim();
+    // Strip trailing colons, semicolons, periods
+    cleaned = cleaned.replace(/[:;.]+$/, '');
+    // Remove generic "Machine" suffix that hurts matching
+    cleaned = cleaned.replace(/\s+machine\s*$/i, '');
+    cleaned = cleaned.trim();
     if (cleaned.length >= 3) {
       exercises.push(cleaned);
     }
@@ -233,27 +260,29 @@ function escapeRegExp(string: string): string {
  */
 function buildReplacementPatterns(exerciseName: string): RegExp[] {
   const escaped = escapeRegExp(exerciseName);
+  // Also match the original name with trailing colon/period, optional "Machine" suffix, and optional whitespace
+  const escapedWithSuffix = escaped + '(?:\\s+[Mm]achine)?(?:[:;.])?\\s*';
   return [
-    // Direct match: <strong>Exercise Name</strong>
-    new RegExp(`(<strong>)(\\d+\\.\\s*)?${escaped}(</strong>)`, 'gi'),
+    // Direct match: <strong>Exercise Name</strong> (with optional colon/Machine/spaces)
+    new RegExp(`(<strong>)(\\d+\\.\\s*)?${escapedWithSuffix}(</strong>)`, 'gi'),
     
-    // Match with Tabata prefix: <strong>Tabata N: Exercise Name</strong>
-    new RegExp(`(<strong>)(Tabata\\s*\\d*:\\s*)${escaped}(</strong>)`, 'gi'),
+    // Match with Tabata prefix
+    new RegExp(`(<strong>)(Tabata\\s*\\d*:\\s*)${escapedWithSuffix}(</strong>)`, 'gi'),
     
-    // Match with Station prefix: <strong>Station N: Exercise Name</strong>
-    new RegExp(`(<strong>)(Station\\s*\\d*:\\s*)${escaped}(</strong>)`, 'gi'),
+    // Match with Station prefix
+    new RegExp(`(<strong>)(Station\\s*\\d*:\\s*)${escapedWithSuffix}(</strong>)`, 'gi'),
     
-    // Match with Exercise prefix: <strong>Exercise N: Exercise Name</strong>
-    new RegExp(`(<strong>)(Exercise\\s*\\d*:\\s*)${escaped}(</strong>)`, 'gi'),
+    // Match with Exercise prefix
+    new RegExp(`(<strong>)(Exercise\\s*\\d*:\\s*)${escapedWithSuffix}(</strong>)`, 'gi'),
     
-    // Match with Movement prefix: <strong>Movement N: Exercise Name</strong>
-    new RegExp(`(<strong>)(Movement\\s*\\d*:\\s*)${escaped}(</strong>)`, 'gi'),
+    // Match with Movement prefix
+    new RegExp(`(<strong>)(Movement\\s*\\d*:\\s*)${escapedWithSuffix}(</strong>)`, 'gi'),
     
-    // Match with Block prefix: <strong>Block N: Exercise Name</strong>
-    new RegExp(`(<strong>)(Block\\s*\\d*:\\s*)${escaped}(</strong>)`, 'gi'),
+    // Match with Block prefix
+    new RegExp(`(<strong>)(Block\\s*\\d*:\\s*)${escapedWithSuffix}(</strong>)`, 'gi'),
     
-    // Match inside list item without bold: <li><p>Exercise Name
-    new RegExp(`(<li[^>]*><p[^>]*>)(\\d+\\.\\s*)?${escaped}(?=\\s*[-–—]|\\s*<|$)`, 'gi'),
+    // Match inside list item without bold
+    new RegExp(`(<li[^>]*><p[^>]*>)(\\d+\\.\\s*)?${escapedWithSuffix}(?=\\s*[-–—]|\\s*<|$)`, 'gi'),
   ];
 }
 
@@ -420,7 +449,8 @@ export async function fetchAndBuildExerciseReference(
 ): Promise<{ exercises: ExerciseBasic[]; referenceList: string }> {
   const { data: exercises, error } = await supabaseClient
     .from("exercises")
-    .select("id, name, body_part, equipment, target");
+    .select("id, name, body_part, equipment, target")
+    .limit(2000);
   
   if (error || !exercises) {
     console.error(`${logPrefix} Failed to fetch exercise library:`, error);

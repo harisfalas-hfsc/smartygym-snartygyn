@@ -67,7 +67,8 @@ Deno.serve(async (req) => {
     // Fetch exercise library
     const { data: exerciseLibrary, error: libraryError } = await supabase
       .from("exercises")
-      .select("id, name, body_part, equipment, target");
+      .select("id, name, body_part, equipment, target")
+      .limit(2000);
 
     if (libraryError || !exerciseLibrary) {
       console.error(`${LOG_PREFIX} ❌ Error fetching exercise library:`, libraryError);
