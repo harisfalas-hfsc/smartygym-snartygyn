@@ -248,3 +248,6 @@ verify_jwt = false
 
 [functions.generate-welcome-workout]
 verify_jwt = false
+
+[functions.ai-exercise-linker]
+verify_jwt = false
