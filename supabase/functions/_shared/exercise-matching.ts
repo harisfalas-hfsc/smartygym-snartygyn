@@ -91,7 +91,7 @@ export function calculateConfidence(searchNorm: string, exerciseNorm: string): n
 export function findBestMatch(
   searchTerm: string,
   exercises: ExerciseBasic[],
-  confidenceThreshold: number = 0.75
+  confidenceThreshold: number = 0.65
 ): MatchResult | null {
   const searchNorm = normalizeExerciseName(searchTerm);
   
@@ -342,7 +342,6 @@ export async function logUnmatchedExercises(
   
   for (const exerciseName of unmatchedNames) {
     try {
-      // Use upsert to avoid duplicate entries (unique constraint on exercise_name)
       const { error } = await supabaseClient
         .from('mismatched_exercises')
         .upsert(
@@ -355,7 +354,7 @@ export async function logUnmatchedExercises(
           },
           { 
             onConflict: 'exercise_name',
-            ignoreDuplicates: true // Don't update if already exists
+            ignoreDuplicates: true
           }
         );
       
@@ -368,4 +367,69 @@ export async function logUnmatchedExercises(
       console.log(`${logPrefix} Error logging "${exerciseName}":`, err);
     }
   }
+}
+
+/**
+ * Build a condensed exercise reference list for AI prompts.
+ * Groups exercises by body_part and equipment for efficient token usage.
+ */
+export function buildExerciseReferenceList(exercises: ExerciseBasic[]): string {
+  // Group by body_part, then by equipment
+  const grouped: Record<string, Record<string, string[]>> = {};
+  
+  for (const ex of exercises) {
+    const bodyPart = (ex.body_part || 'other').toUpperCase();
+    const equip = (ex.equipment || 'body weight').toLowerCase();
+    
+    if (!grouped[bodyPart]) grouped[bodyPart] = {};
+    if (!grouped[bodyPart][equip]) grouped[bodyPart][equip] = [];
+    grouped[bodyPart][equip].push(ex.name);
+  }
+  
+  // Build condensed string
+  const lines: string[] = [
+    'EXERCISE LIBRARY REFERENCE (MANDATORY - USE EXACT NAMES):',
+    'You MUST use exercises from this library. Write the exercise name EXACTLY as listed below.',
+    'Choose exercises that match the workout category, equipment type, difficulty, and focus.',
+    'If you need an exercise not on this list, write it clearly but PREFER listed exercises.',
+    ''
+  ];
+  
+  // Sort body parts for consistency
+  const sortedBodyParts = Object.keys(grouped).sort();
+  
+  for (const bodyPart of sortedBodyParts) {
+    const equipmentGroups = grouped[bodyPart];
+    const sortedEquipment = Object.keys(equipmentGroups).sort();
+    
+    for (const equip of sortedEquipment) {
+      const names = equipmentGroups[equip].sort();
+      lines.push(`${bodyPart} / ${equip}: ${names.join(', ')}`);
+    }
+  }
+  
+  return lines.join('\n');
+}
+
+/**
+ * Fetch exercise library from Supabase and build reference list.
+ */
+export async function fetchAndBuildExerciseReference(
+  supabaseClient: any,
+  logPrefix: string = "[EXERCISE-REF]"
+): Promise<{ exercises: ExerciseBasic[]; referenceList: string }> {
+  const { data: exercises, error } = await supabaseClient
+    .from("exercises")
+    .select("id, name, body_part, equipment, target");
+  
+  if (error || !exercises) {
+    console.error(`${logPrefix} Failed to fetch exercise library:`, error);
+    return { exercises: [], referenceList: '' };
+  }
+  
+  console.log(`${logPrefix} Loaded ${exercises.length} exercises from library`);
+  const referenceList = buildExerciseReferenceList(exercises as ExerciseBasic[]);
+  console.log(`${logPrefix} Reference list built (${referenceList.length} chars)`);
+  
+  return { exercises: exercises as ExerciseBasic[], referenceList };
 }

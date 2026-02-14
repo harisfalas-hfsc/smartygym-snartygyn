@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════════════════════
-// REPROCESS WOD EXERCISES
-// Re-runs exercise matching on existing WODs to fix broken/missing links
+// REPROCESS PROGRAM EXERCISES
+// Re-runs exercise matching on existing training programs to fix broken/missing links
 // ═══════════════════════════════════════════════════════════════════════════════
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
@@ -16,13 +16,12 @@ const corsHeaders = {
 };
 
 Deno.serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
-  const LOG_PREFIX = "[REPROCESS-WOD]";
-  console.log(`${LOG_PREFIX} 🔄 Starting WOD exercise reprocessing...`);
+  const LOG_PREFIX = "[REPROCESS-PROGRAM]";
+  console.log(`${LOG_PREFIX} 🔄 Starting training program exercise reprocessing...`);
 
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -31,47 +30,39 @@ Deno.serve(async (req) => {
 
     // Parse request body
     const body = await req.json().catch(() => ({}));
-    const { wodIds, targetDate, processAll } = body;
+    const { programIds } = body;
 
-    console.log(`${LOG_PREFIX} Request params:`, { wodIds, targetDate, processAll });
+    console.log(`${LOG_PREFIX} Request params:`, { programIds });
 
-    // Fetch WODs to reprocess
-    let wodsQuery = supabase
-      .from("admin_workouts")
-      .select("id, name, main_workout, warm_up, cool_down, finisher, activation");
+    // Fetch programs to reprocess
+    let programsQuery = supabase
+      .from("admin_training_programs")
+      .select("id, name, overview, program_structure, weekly_schedule, progression_plan, nutrition_tips, expected_results");
 
-    if (wodIds && Array.isArray(wodIds) && wodIds.length > 0) {
-      wodsQuery = wodsQuery.in("id", wodIds);
-    } else if (targetDate) {
-      wodsQuery = wodsQuery.eq("generated_for_date", targetDate);
-    } else if (processAll) {
-      // Process ALL workouts - no filter
-      console.log(`${LOG_PREFIX} Processing ALL workouts`);
-    } else {
-      // Default: today's WODs
-      const today = new Date().toISOString().split("T")[0];
-      wodsQuery = wodsQuery.eq("generated_for_date", today);
+    if (programIds && Array.isArray(programIds) && programIds.length > 0) {
+      programsQuery = programsQuery.in("id", programIds);
     }
+    // Default: process ALL programs
 
-    const { data: wods, error: wodsError } = await wodsQuery;
+    const { data: programs, error: programsError } = await programsQuery;
 
-    if (wodsError) {
-      console.error(`${LOG_PREFIX} ❌ Error fetching WODs:`, wodsError);
+    if (programsError) {
+      console.error(`${LOG_PREFIX} ❌ Error fetching programs:`, programsError);
       return new Response(
-        JSON.stringify({ error: "Failed to fetch WODs", details: wodsError.message }),
+        JSON.stringify({ error: "Failed to fetch programs", details: programsError.message }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    if (!wods || wods.length === 0) {
-      console.log(`${LOG_PREFIX} ⚠️ No WODs found to reprocess`);
+    if (!programs || programs.length === 0) {
+      console.log(`${LOG_PREFIX} ⚠️ No programs found to reprocess`);
       return new Response(
-        JSON.stringify({ message: "No WODs found to reprocess", processed: 0 }),
+        JSON.stringify({ message: "No programs found to reprocess", processed: 0 }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    console.log(`${LOG_PREFIX} Found ${wods.length} WODs to reprocess:`, wods.map(w => w.name));
+    console.log(`${LOG_PREFIX} Found ${programs.length} programs to reprocess:`, programs.map(p => p.name));
 
     // Fetch exercise library
     const { data: exerciseLibrary, error: libraryError } = await supabase
@@ -96,17 +87,17 @@ Deno.serve(async (req) => {
       unmatchedNames: string[];
     }> = [];
 
-    // Process each WOD
-    for (const wod of wods) {
-      console.log(`${LOG_PREFIX} 📋 Processing: "${wod.name}" (${wod.id})`);
+    // Process each program
+    for (const program of programs) {
+      console.log(`${LOG_PREFIX} 📋 Processing: "${program.name}" (${program.id})`);
 
-      const contentFields = ["main_workout", "warm_up", "cool_down", "finisher", "activation"];
+      const contentFields = ["overview", "program_structure", "weekly_schedule", "progression_plan", "nutrition_tips", "expected_results"];
       const updates: Record<string, string> = {};
       let totalMatched = 0;
       const allUnmatched: string[] = [];
 
       for (const field of contentFields) {
-        const content = wod[field as keyof typeof wod] as string | null;
+        const content = program[field as keyof typeof program] as string | null;
         if (!content) continue;
 
         console.log(`${LOG_PREFIX} Processing field: ${field}`);
@@ -122,28 +113,28 @@ Deno.serve(async (req) => {
         allUnmatched.push(...result.unmatched);
       }
 
-      // Update the WOD with processed content
-      const { error: updateError } = await supabase
-        .from("admin_workouts")
-        .update(updates)
-        .eq("id", wod.id);
+      // Update the program with processed content
+      if (Object.keys(updates).length > 0) {
+        const { error: updateError } = await supabase
+          .from("admin_training_programs")
+          .update(updates)
+          .eq("id", program.id);
 
-      if (updateError) {
-        console.error(`${LOG_PREFIX} ❌ Failed to update WOD "${wod.name}":`, updateError);
-      } else {
-        console.log(`${LOG_PREFIX} ✅ Updated WOD "${wod.name}" - ${totalMatched} exercises matched`);
+        if (updateError) {
+          console.error(`${LOG_PREFIX} ❌ Failed to update program "${program.name}":`, updateError);
+        } else {
+          console.log(`${LOG_PREFIX} ✅ Updated program "${program.name}" - ${totalMatched} exercises matched`);
+        }
       }
 
-      // Clear old mismatched entries for this WOD
+      // Clear old mismatched entries for this program
       const { error: deleteError } = await supabase
         .from("mismatched_exercises")
         .delete()
-        .eq("source_id", wod.id);
+        .eq("source_id", program.id);
 
       if (deleteError) {
         console.log(`${LOG_PREFIX} ⚠️ Failed to clear old mismatches:`, deleteError.message);
-      } else {
-        console.log(`${LOG_PREFIX} 🗑️ Cleared old mismatched entries for "${wod.name}"`);
       }
 
       // Log new unmatched exercises
@@ -152,28 +143,28 @@ Deno.serve(async (req) => {
         await logUnmatchedExercises(
           supabase,
           uniqueUnmatched,
-          "wod",
-          wod.id,
-          wod.name,
+          "program",
+          program.id,
+          program.name,
           LOG_PREFIX
         );
       }
 
       results.push({
-        id: wod.id,
-        name: wod.name,
+        id: program.id,
+        name: program.name,
         matched: totalMatched,
         unmatched: uniqueUnmatched.length,
         unmatchedNames: uniqueUnmatched,
       });
     }
 
-    console.log(`${LOG_PREFIX} ✅ Completed reprocessing ${wods.length} WODs`);
+    console.log(`${LOG_PREFIX} ✅ Completed reprocessing ${programs.length} programs`);
 
     return new Response(
       JSON.stringify({
         success: true,
-        processed: wods.length,
+        processed: programs.length,
         results,
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
