@@ -32,8 +32,6 @@ export function normalizeExerciseName(name: string): string {
     .replace(/[''`]/g, '')
     .replace(/\s+/g, ' ')
     .trim()
-    // Only remove trailing 's' for pluralization (e.g. "squats" -> "squat", "lunges" -> "lunge")
-    // But not from words where 's' is part of the word (e.g. "press", "ross")
     .split(' ')
     .map(word => word.length > 3 && word.endsWith('s') && !word.endsWith('ss') ? word.slice(0, -1) : word)
     .join('');
@@ -78,8 +76,6 @@ export function calculateConfidence(searchNorm: string, exerciseNorm: string): n
   if (exerciseNorm.includes(searchNorm) || searchNorm.includes(exerciseNorm)) {
     const longer = Math.max(searchNorm.length, exerciseNorm.length);
     const shorter = Math.min(searchNorm.length, exerciseNorm.length);
-    // Boost confidence when the search term is fully contained in the library name
-    // e.g. "goblet squat" inside "dumbbell goblet squat" should score high
     return 0.80 + (shorter / longer * 0.20);
   }
   
@@ -140,24 +136,31 @@ const STRUCTURAL_HEADERS = [
   'total weekly calorie targets', 'caloric deficit', 'carb cycling', 'collagen',
   'machine setup tips', 'treadmill', 'rower', 'by week',
   'cardiovascular fitness', 'expected results', 'nutrition tips',
-  'soft tissue preparation'
+  'soft tissue preparation', 'perform each exercise', 'complete', 'repeat',
+  'foam roll', 'lacrosse ball', 'gentle jogging',
+];
+
+// Words that indicate structural/instructional text, not exercise names
+const STRUCTURAL_WORD_STARTS = [
+  'perform', 'complete', 'repeat', 'rest', 'foam roll', 'lacrosse ball',
+  'gentle jogging', 'seconds', 'minute', 'round', 'set',
 ];
 
 // Prefix patterns that indicate a header with exercise after colon
 const PREFIX_PATTERNS = [
-  /^tabata\s*\d*:\s*/i,           // "Tabata 1: High Knees" → "High Knees"
-  /^tabata\s+round\s*\d*:\s*/i,   // "Tabata Round 1: Kettlebell Swings" → "Kettlebell Swings"
-  /^\d+\s*rounds?\s*(?:of)?:\s*/i, // "3 Rounds of: Burpees" → "Burpees"
-  /^for\s*time:\s*/i,              // "For Time: ..." → skip
-  /^amrap\s*(?:\d+)?:\s*/i,        // "AMRAP 10: ..." → skip  
-  /^emom\s*(?:\d+)?:\s*/i,         // "EMOM 12: ..." → skip
-  /^accumulation\s*challenge:\s*/i, // "Accumulation Challenge: ..." → skip
-  /^station\s*\d*:\s*/i,           // "Station 1: ..." → extract after
-  /^exercise\s*\d*:\s*/i,          // "Exercise 1: ..." → extract after
-  /^movement\s*\d*:\s*/i,          // "Movement 1: ..." → extract after
-  /^block\s*\d*:\s*/i,             // "Block 1: ..." → extract after
-  /^[A-D]\d*[\.:]\s*/i,            // "A1: Barbell Squat", "B2. Incline Press" → extract after
-  /^[A-D]\d*\)\s*/i,               // "A1) Barbell Squat" → extract after
+  /^tabata\s*\d*:\s*/i,
+  /^tabata\s+round\s*\d*:\s*/i,
+  /^\d+\s*rounds?\s*(?:of)?:\s*/i,
+  /^for\s*time:\s*/i,
+  /^amrap\s*(?:\d+)?:\s*/i,
+  /^emom\s*(?:\d+)?:\s*/i,
+  /^accumulation\s*challenge:\s*/i,
+  /^station\s*\d*:\s*/i,
+  /^exercise\s*\d*:\s*/i,
+  /^movement\s*\d*:\s*/i,
+  /^block\s*\d*:\s*/i,
+  /^[A-D]\d*[\.:]?\s*/i,
+  /^[A-D]\d*\)\s*/i,
 ];
 
 // Patterns that are purely structural (no exercise follows)
@@ -173,92 +176,151 @@ const PURE_STRUCTURAL_PATTERNS = [
 ];
 
 /**
- * Extract exercise names from HTML content (bold text patterns)
- * Handles headers like "Tabata 1: High Knees" by extracting just "High Knees"
+ * Check if a string looks like an exercise name (not structural/instructional text)
+ */
+function isLikelyExerciseName(text: string): boolean {
+  const lower = text.toLowerCase().trim();
+  
+  if (lower.length < 3 || lower.length > 60) return false;
+  if (/^\d+\.?\s*$/.test(text)) return false;
+  
+  // Skip structural patterns
+  if (PURE_STRUCTURAL_PATTERNS.some(p => p.test(text))) return false;
+  if (STRUCTURAL_HEADERS.some(h => lower === h || lower.startsWith(h + ' '))) return false;
+  if (STRUCTURAL_WORD_STARTS.some(w => lower.startsWith(w))) return false;
+  
+  // Skip lines that are instructions/descriptions (contain certain verbs)
+  if (/^(perform|complete|repeat|do|hold|maintain|keep|breathe|inhale|exhale)\s/i.test(lower)) return false;
+  
+  // Skip timing instructions
+  if (/^\d+\s*(seconds?|minutes?|mins?|secs?)\s/i.test(lower)) return false;
+  
+  // Skip "X rounds of" style
+  if (/^\d+\s*rounds?\s/i.test(lower)) return false;
+  
+  // Must start with a letter (exercise names start with letters)
+  if (!/^[A-Za-z]/.test(text)) return false;
+  
+  return true;
+}
+
+/**
+ * Clean an exercise name by stripping metadata, qualifiers, etc.
+ */
+function cleanExerciseName(text: string): string {
+  let cleaned = text;
+  // Strip leading numbers with dot (e.g., "1. Burpees")
+  cleaned = cleaned.replace(/^\d+\.\s*/, '');
+  // Strip trailing colons, semicolons, periods
+  cleaned = cleaned.replace(/[:;.]+$/, '');
+  // Remove trailing dashes
+  cleaned = cleaned.replace(/\s*[-–—]\s*$/, '');
+  // Remove generic "Machine" suffix
+  cleaned = cleaned.replace(/\s+machine\s*$/i, '');
+  // Strip sets/reps info after colon
+  cleaned = cleaned.replace(/:\s*\d+\s*(?:sets?|rounds?|reps?|x\s|×\s|min|sec).*/i, '').trim();
+  // Strip trailing sets/reps info without colon
+  cleaned = cleaned.replace(/\s+\d+\s*(?:sets?\s*(?:x|×)\s*\d+|reps?|rounds?|min(?:utes?)?|sec(?:onds?)?).*$/i, '').trim();
+  // Remove parenthetical qualifiers
+  cleaned = cleaned.replace(/\s*\([^)]*\)\s*/g, '').trim();
+  return cleaned;
+}
+
+/**
+ * Extract exercise names from HTML content
+ * Now handles: bold text, text after bold prefixes, and plain text in list items
  */
 export function extractExerciseNames(htmlContent: string): string[] {
   const exercises: string[] = [];
+  const seen = new Set<string>();
   
-  // Pattern 1: Bold text (often exercise names)
+  function addExercise(name: string) {
+    const cleaned = cleanExerciseName(name);
+    if (cleaned.length >= 3 && isLikelyExerciseName(cleaned) && !seen.has(cleaned.toLowerCase())) {
+      seen.add(cleaned.toLowerCase());
+      exercises.push(cleaned);
+    }
+  }
+  
+  // Skip content that already has exercise markup
+  if (!htmlContent) return [];
+  
+  // ─── Pattern 1: Bold text (exercise name fully inside bold tags) ───
   const boldPattern = /<(?:strong|b)>([^<]+)<\/(?:strong|b)>/gi;
   let match;
   while ((match = boldPattern.exec(htmlContent)) !== null) {
     let text = match[1].trim();
-    
-    // Skip already-matched exercises ({{exercise:id:name}} markup)
-    if (/\{\{exercise:/.test(text)) {
-      continue;
-    }
-    
-    // Skip if too short or just numbers
-    if (text.length < 3 || /^\d+\.?\s*$/.test(text)) {
-      continue;
-    }
-    
-    // Skip pure structural patterns
-    if (PURE_STRUCTURAL_PATTERNS.some(pattern => pattern.test(text))) {
-      continue;
-    }
-    
-    // Check if text is a structural header
-    const normalizedText = text.toLowerCase().replace(/[-_]/g, ' ').trim();
-    if (STRUCTURAL_HEADERS.some(header => normalizedText === header || normalizedText.startsWith(header + ' '))) {
-      continue;
-    }
+    if (/\{\{exercise:/.test(text)) continue;
     
     // Handle prefix patterns - extract exercise name after colon
-    let extractedFromPrefix = false;
     for (const prefixPattern of PREFIX_PATTERNS) {
       const prefixMatch = text.match(prefixPattern);
       if (prefixMatch) {
         const afterPrefix = text.substring(prefixMatch[0].length).trim();
         if (afterPrefix.length >= 3) {
           text = afterPrefix;
-          extractedFromPrefix = true;
-          break;
         } else {
-          // Prefix with nothing useful after - skip this entry
-          extractedFromPrefix = true;
           text = '';
-          break;
         }
+        break;
       }
     }
     
-    // Skip if empty after prefix extraction
-    if (!text) continue;
+    if (text) addExercise(text);
+  }
+  
+  // ─── Pattern 2: Text AFTER a closing bold tag in the same element ───
+  // e.g., <strong>Station 1:</strong> Burpees
+  // This captures the plain text "Burpees" that follows the bold prefix
+  const afterBoldPattern = /<\/(?:strong|b)>\s*([^<]+)/gi;
+  while ((match = afterBoldPattern.exec(htmlContent)) !== null) {
+    let text = match[1].trim();
+    if (!text || /\{\{exercise:/.test(text)) continue;
     
-    // Additional filters
-    if (
-      /^(set|rep|rest|round|min|sec|x\s|×\s)/i.test(text) ||
-      /minutes?$/i.test(text) ||
-      /^\d+\s*(x|×)/i.test(text)
-    ) {
+    // Strip leading duration/reps numbers (e.g., "20 seconds Burpees" or just "Burpees")
+    // But keep "Air Squats" which starts with a letter
+    const cleaned = cleanExerciseName(text);
+    if (cleaned) addExercise(cleaned);
+  }
+  
+  // ─── Pattern 3: Plain text in list items ───
+  // Handles: <li...><p...>30 seconds Jumping Jacks</p></li>
+  // Handles: <li...><p...>Burpees</p></li>  
+  // Handles: <li...><p...>20 Air Squats</p></li>
+  const listItemPattern = /<li[^>]*>\s*<p[^>]*>([^<]+)<\/p>/gi;
+  while ((match = listItemPattern.exec(htmlContent)) !== null) {
+    let text = match[1].trim();
+    if (!text || /\{\{exercise:/.test(text)) continue;
+    
+    // Skip if this text was already captured by bold patterns
+    // (list items that contain bold will be caught by Pattern 1/2)
+    
+    // Try to extract exercise name from various formats:
+    
+    // Format: "30 seconds Jumping Jacks" or "1 minute Child's Pose"
+    const durationFirst = text.match(/^\d+\s*(?:seconds?|secs?|minutes?|mins?)\s+(.+)/i);
+    if (durationFirst && durationFirst[1]) {
+      const candidate = cleanExerciseName(durationFirst[1]);
+      if (candidate) addExercise(candidate);
       continue;
     }
     
-    // Clean up any trailing/leading punctuation or numbers
-    let cleaned = text.replace(/^\d+\.\s*/, '').replace(/\s*[-–—]\s*$/, '').trim();
-    // Strip trailing colons, semicolons, periods
-    cleaned = cleaned.replace(/[:;.]+$/, '');
-    // Remove generic "Machine" suffix that hurts matching
-    cleaned = cleaned.replace(/\s+machine\s*$/i, '');
-    // Strip sets/reps/tempo info after colon (e.g., "Incline Press: 4 sets x 5-7 reps")
-    cleaned = cleaned.replace(/:\s*\d+\s*(?:sets?|rounds?|reps?|x\s|×\s|min|sec).*/i, '').trim();
-    // Strip trailing sets/reps info without colon (e.g., "Incline Press 4 sets x 5-7 reps")
-    cleaned = cleaned.replace(/\s+\d+\s*(?:sets?\s*(?:x|×)\s*\d+|reps?|rounds?|min(?:utes?)?|sec(?:onds?)?).*$/i, '').trim();
-    // Remove parenthetical qualifiers like "(American)", "(Cable)", "(each arm)", "(left leg)"
-    cleaned = cleaned.replace(/\s*\([^)]*\)\s*$/, '').trim();
-    // Also strip inline parenthetical qualifiers
-    cleaned = cleaned.replace(/\s*\([^)]{1,30}\)/g, '').trim();
-    cleaned = cleaned.trim();
-    if (cleaned.length >= 3) {
-      exercises.push(cleaned);
+    // Format: "20 Air Squats" (number + exercise name)
+    const numberFirst = text.match(/^(\d+)\s+([A-Za-z][A-Za-z\s'-]+)/);
+    if (numberFirst && numberFirst[2]) {
+      const candidate = cleanExerciseName(numberFirst[2]);
+      if (candidate) addExercise(candidate);
+      continue;
+    }
+    
+    // Format: plain exercise name "Burpees" or "High Knees"
+    if (/^[A-Za-z]/.test(text)) {
+      const candidate = cleanExerciseName(text);
+      if (candidate) addExercise(candidate);
     }
   }
   
-  // Remove duplicates
-  return [...new Set(exercises)];
+  return exercises;
 }
 
 function escapeRegExp(string: string): string {
@@ -266,41 +328,62 @@ function escapeRegExp(string: string): string {
 }
 
 /**
- * Build replacement patterns for exercise name in bold tags
- * Handles both direct "Exercise Name" and prefixed "Tabata 1: Exercise Name"
+ * Replace an exercise name with markup in content
+ * Handles all the different locations where exercise names appear
  */
-function buildReplacementPatterns(exerciseName: string): RegExp[] {
+function replaceExerciseInContent(content: string, exerciseName: string, markup: string): string {
   const escaped = escapeRegExp(exerciseName);
-  // Also match the original name with trailing colon/period, optional "Machine" suffix, and optional whitespace
   const escapedWithSuffix = escaped + '(?:\\s+[Mm]achine)?(?:[:;.])?\\s*';
-  return [
-    // Direct match: <strong>Exercise Name</strong> (with optional colon/Machine/spaces)
-    new RegExp(`(<strong>)(\\d+\\.\\s*)?${escapedWithSuffix}(</strong>)`, 'gi'),
+  let result = content;
+  
+  // Strategy: try specific patterns first, then broader ones
+  
+  const patterns = [
+    // 1. Exercise name fully inside bold tags (direct or with prefix)
+    new RegExp(`(<(?:strong|b)>(?:\\d+\\.\\s*)?)${escapedWithSuffix}(<\/(?:strong|b)>)`, 'gi'),
     
-    // Match with Tabata prefix (including "Tabata Round N:")
-    new RegExp(`(<strong>)(Tabata\\s*(?:Round\\s*)?\\d*:\\s*)${escapedWithSuffix}(</strong>)`, 'gi'),
+    // 2. Exercise name with Tabata/Station/Exercise/Movement/Block prefix inside bold
+    new RegExp(`(<(?:strong|b)>(?:(?:Tabata|Station|Exercise|Movement|Block)\\s*(?:Round\\s*)?\\d*:\\s*))${escapedWithSuffix}(<\/(?:strong|b)>)`, 'gi'),
     
-    // Match with Station prefix
-    new RegExp(`(<strong>)(Station\\s*\\d*:\\s*)${escapedWithSuffix}(</strong>)`, 'gi'),
+    // 3. Exercise name with A1:/B2: prefix inside bold
+    new RegExp(`(<(?:strong|b)>[A-D]\\d*[\\.:]\\s*)${escapedWithSuffix}(<\/(?:strong|b)>)`, 'gi'),
     
-    // Match with Exercise prefix
-    new RegExp(`(<strong>)(Exercise\\s*\\d*:\\s*)${escapedWithSuffix}(</strong>)`, 'gi'),
+    // 4. Exercise name with parenthetical qualifiers inside bold
+    new RegExp(`(<(?:strong|b)>(?:\\d+\\.\\s*)?)${escaped}(?:\\s+[Mm]achine)?(?:\\s*\\([^)]*\\))?(?:[:;.])?\\s*(<\/(?:strong|b)>)`, 'gi'),
     
-    // Match with Movement prefix
-    new RegExp(`(<strong>)(Movement\\s*\\d*:\\s*)${escapedWithSuffix}(</strong>)`, 'gi'),
+    // 5. Exercise name AFTER a closing bold tag (e.g., </strong> Burpees)
+    new RegExp(`(<\/(?:strong|b)>\\s*)${escapedWithSuffix}`, 'gi'),
     
-    // Match with Block prefix
-    new RegExp(`(<strong>)(Block\\s*\\d*:\\s*)${escapedWithSuffix}(</strong>)`, 'gi'),
+    // 6. Exercise name after duration in list item (e.g., "30 seconds Jumping Jacks")
+    new RegExp(`(\\d+\\s*(?:seconds?|secs?|minutes?|mins?)\\s+)${escapedWithSuffix}`, 'gi'),
     
-    // Match with A1:/B2:/C1: prefix patterns
-    new RegExp(`(<strong>)([A-D]\\d*[\\.:)]\\s*)${escapedWithSuffix}(</strong>)`, 'gi'),
+    // 7. Exercise name after a number in list item (e.g., "20 Air Squats")
+    new RegExp(`(\\d+\\s+)${escapedWithSuffix}`, 'gi'),
     
-    // Match exercise name with parenthetical qualifiers (e.g., "Kettlebell Swings (American)")
-    new RegExp(`(<strong>)(\\d+\\.\\s*)?${escaped}(?:\\s+[Mm]achine)?(?:\\s*\\([^)]*\\))?(?:[:;.])?\\s*(</strong>)`, 'gi'),
-    
-    // Match inside list item without bold
-    new RegExp(`(<li[^>]*><p[^>]*>)(\\d+\\.\\s*)?${escapedWithSuffix}(?=\\s*[-–—]|\\s*<|$)`, 'gi'),
+    // 8. Standalone exercise name in a paragraph inside a list item
+    new RegExp(`(<p[^>]*>\\s*)${escapedWithSuffix}(\\s*<\/p>)`, 'gi'),
   ];
+  
+  let anyReplaced = false;
+  for (const pattern of patterns) {
+    const before = result;
+    const captureCount = (pattern.source.match(/\((?!\?)/g) || []).length;
+    
+    if (captureCount === 2) {
+      result = result.replace(pattern, `$1${markup}$2`);
+    } else if (captureCount === 1) {
+      result = result.replace(pattern, `$1${markup}`);
+    } else {
+      result = result.replace(pattern, markup);
+    }
+    
+    if (result !== before) {
+      anyReplaced = true;
+      // Don't return early — continue to catch ALL occurrences with different patterns
+    }
+  }
+  
+  return result;
 }
 
 /**
@@ -321,29 +404,22 @@ export function processContentWithExerciseMatching(
   
   // Extract exercise names from content
   const extractedNames = extractExerciseNames(content);
-  console.log(`${logPrefix} Extracted ${extractedNames.length} potential exercises:`, extractedNames.slice(0, 10));
+  console.log(`${logPrefix} Extracted ${extractedNames.length} potential exercises:`, extractedNames.slice(0, 15));
   
   let processedContent = content;
   
   for (const exerciseName of extractedNames) {
+    // Don't skip — the same exercise name may appear multiple times in different sections
+    // The replacement function will only replace un-marked occurrences
+    
     const matchResult = findBestMatch(exerciseName, exerciseLibrary, 0.65);
     
     if (matchResult) {
-      // Replace the exercise name with markup (inside bold tags)
       const markup = `{{exercise:${matchResult.exercise.id}:${matchResult.exercise.name}}}`;
-      
-      // Try multiple replacement patterns
-      const patterns = buildReplacementPatterns(exerciseName);
       const beforeReplace = processedContent;
       
-      for (const pattern of patterns) {
-        processedContent = processedContent.replace(pattern, `$1$2${markup}$3`);
-        if (processedContent !== beforeReplace) {
-          break; // Stop once we've made a replacement
-        }
-      }
+      processedContent = replaceExerciseInContent(processedContent, exerciseName, markup);
       
-      // Only count as matched if we actually replaced something
       if (beforeReplace !== processedContent) {
         matched.push({
           original: exerciseName,
@@ -353,9 +429,8 @@ export function processContentWithExerciseMatching(
         });
         console.log(`${logPrefix} ✓ MATCHED: "${exerciseName}" → "${matchResult.exercise.name}" (${(matchResult.confidence * 100).toFixed(0)}%)`);
       } else {
-        // Match found but pattern didn't match - add to unmatched
         unmatched.push(exerciseName);
-        console.log(`${logPrefix} ⚠ Pattern mismatch: "${exerciseName}"`);
+        console.log(`${logPrefix} ⚠ Pattern mismatch: "${exerciseName}" (found match but couldn't replace in HTML)`);
       }
     } else {
       unmatched.push(exerciseName);
@@ -406,8 +481,6 @@ export async function logUnmatchedExercises(
       
       if (error) {
         console.log(`${logPrefix} Failed to log "${exerciseName}": ${error.message}`);
-      } else {
-        console.log(`${logPrefix} Logged: "${exerciseName}"`);
       }
     } catch (err) {
       console.log(`${logPrefix} Error logging "${exerciseName}":`, err);
@@ -417,10 +490,8 @@ export async function logUnmatchedExercises(
 
 /**
  * Build a condensed exercise reference list for AI prompts.
- * Groups exercises by body_part and equipment for efficient token usage.
  */
 export function buildExerciseReferenceList(exercises: ExerciseBasic[]): string {
-  // Group by body_part, then by equipment
   const grouped: Record<string, Record<string, string[]>> = {};
   
   for (const ex of exercises) {
@@ -432,7 +503,6 @@ export function buildExerciseReferenceList(exercises: ExerciseBasic[]): string {
     grouped[bodyPart][equip].push(ex.name);
   }
   
-  // Build condensed string
   const lines: string[] = [
     'EXERCISE LIBRARY REFERENCE (MANDATORY - USE EXACT NAMES):',
     'You MUST use exercises from this library. Write the exercise name EXACTLY as listed below.',
@@ -441,7 +511,6 @@ export function buildExerciseReferenceList(exercises: ExerciseBasic[]): string {
     ''
   ];
   
-  // Sort body parts for consistency
   const sortedBodyParts = Object.keys(grouped).sort();
   
   for (const bodyPart of sortedBodyParts) {
@@ -475,8 +544,7 @@ export async function fetchAndBuildExerciseReference(
   }
   
   console.log(`${logPrefix} Loaded ${exercises.length} exercises from library`);
-  const referenceList = buildExerciseReferenceList(exercises as ExerciseBasic[]);
-  console.log(`${logPrefix} Reference list built (${referenceList.length} chars)`);
+  const referenceList = buildExerciseReferenceList(exercises);
   
-  return { exercises: exercises as ExerciseBasic[], referenceList };
+  return { exercises, referenceList };
 }
