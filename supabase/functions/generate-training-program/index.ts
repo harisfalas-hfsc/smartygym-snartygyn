@@ -4,6 +4,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.75.0';
 import { 
   processContentWithExerciseMatching, 
   logUnmatchedExercises,
+  fetchAndBuildExerciseReference,
   type ExerciseBasic 
 } from "../_shared/exercise-matching.ts";
 
@@ -18,6 +19,10 @@ serve(async (req) => {
   }
 
   try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    
     const { type, data } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     
@@ -25,26 +30,24 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
-    // Use fallback exercises since exercise library has been moved to YouTube
-    const fallbackExercises = [
-      'Push-ups', 'Pull-ups', 'Squats', 'Lunges', 'Planks', 'Mountain Climbers',
-      'Burpees', 'Jumping Jacks', 'High Knees', 'Dumbbell Rows', 'Bench Press',
-      'Shoulder Press', 'Bicep Curls', 'Tricep Dips', 'Leg Press', 'Deadlifts',
-      'Romanian Deadlifts', 'Hip Thrusts', 'Calf Raises', 'Lat Pulldowns',
-      'Chest Flyes', 'Lateral Raises', 'Front Raises', 'Russian Twists',
-      'Bicycle Crunches', 'Leg Raises', 'Superman', 'Bird Dog', 'Glute Bridges',
-      'Wall Sits', 'Step-ups', 'Box Jumps', 'Kettlebell Swings', 'Farmer Walks'
-    ];
+    // Fetch real exercise library from database
+    const { exercises: exerciseLibrary, referenceList: exerciseReferenceList } = 
+      await fetchAndBuildExerciseReference(supabase, "[TrainingProgram]");
     
-    const exerciseList = fallbackExercises.join(', ');
+    // Build a simple comma-separated list for backward compatibility in prompts
+    const exerciseList = exerciseLibrary.length > 0 
+      ? exerciseLibrary.map(e => e.name).join(', ')
+      : 'Push-ups, Pull-ups, Squats, Lunges, Planks, Mountain Climbers, Burpees';
     
-    console.log(`[TrainingProgram] Available exercises (${fallbackExercises.length}):`, exerciseList);
+    console.log(`[TrainingProgram] Available exercises (${exerciseLibrary.length}):`, exerciseList.substring(0, 200) + '...');
 
     let systemPrompt = '';
     let userPrompt = '';
 
     if (type === 'workout') {
       systemPrompt = `You are an expert fitness coach. Create a detailed workout plan.
+
+${exerciseReferenceList}
 
 The user will select: CATEGORY, EQUIPMENT TYPE, DIFFICULTY, FORMAT, DURATION, and MUSCLE FOCUS.
 
@@ -256,8 +259,9 @@ SPACING RULES (CRITICAL - KEEP CONTENT COMPACT):
       
 Available exercises: ${exerciseList}`;
     } else if (type === 'training-program') {
-      systemPrompt = `You are an expert fitness coach. Create a detailed multi-week training program using ONLY the exercises from this list:
-${exerciseList}
+      systemPrompt = `You are an expert fitness coach. Create a detailed multi-week training program.
+
+${exerciseReferenceList}
 
 CRITICAL RULES:
 1. You MUST ONLY use exercises from the list above
@@ -463,9 +467,33 @@ Available exercises: ${exerciseList}`;
 
     console.log(`[TrainingProgram] Generated ${type} successfully (${generatedPlan.length} chars)`);
 
-    // Exercise matching - DISABLED
-    // The exercise linking feature has been disabled per user request.
-    // The exercise library remains available for admin use in the back office.
+    // Exercise matching - Post-processing safety net
+    // Scans generated content, fuzzy-matches to exercise library, adds View buttons
+    if (exerciseLibrary.length > 0) {
+      console.log(`[TrainingProgram] Running exercise matching on generated ${type}...`);
+      
+      const result = processContentWithExerciseMatching(
+        generatedPlan,
+        exerciseLibrary,
+        `[TrainingProgram-MATCH]`
+      );
+      
+      generatedPlan = result.processedContent;
+      console.log(`[TrainingProgram] Exercise matching: ${result.matched.length} matched, ${result.unmatched.length} unmatched`);
+      
+      // Log unmatched exercises
+      const uniqueUnmatched = [...new Set(result.unmatched)];
+      if (uniqueUnmatched.length > 0) {
+        await logUnmatchedExercises(
+          supabase,
+          uniqueUnmatched,
+          'program',
+          null,
+          null,
+          '[TrainingProgram-MISMATCH]'
+        );
+      }
+    }
 
     return new Response(JSON.stringify({ plan: generatedPlan }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

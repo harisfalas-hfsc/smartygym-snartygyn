@@ -7,6 +7,7 @@ import { MESSAGE_TYPES } from "../_shared/notification-types.ts";
 import { 
   processContentWithExerciseMatching, 
   logUnmatchedExercises,
+  fetchAndBuildExerciseReference,
   type ExerciseBasic 
 } from "../_shared/exercise-matching.ts";
 import { normalizeWorkoutHtml, validateWorkoutHtml } from "../_shared/html-normalizer.ts";
@@ -637,6 +638,18 @@ This is a NUDGE, not a mandate.
     const failedEquipmentTypes: string[] = [];
     let firstWorkoutName = "";
 
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // EXERCISE LIBRARY: Fetch and build reference list for AI prompt
+    // This ensures the AI uses exact exercise names from our library
+    // ═══════════════════════════════════════════════════════════════════════════════
+    const { exercises: exerciseLibrary, referenceList: exerciseReferenceList } = 
+      await fetchAndBuildExerciseReference(supabase, "[GENERATE-WOD]");
+    
+    logStep("Exercise library loaded for prompt injection", { 
+      exerciseCount: exerciseLibrary.length,
+      referenceListLength: exerciseReferenceList.length 
+    });
+
     for (const equipment of equipmentTypes) {
       // ═══════════════════════════════════════════════════════════════════════════════
       // PER-EQUIPMENT ERROR ISOLATION: Each equipment type generates independently
@@ -694,6 +707,10 @@ Generate a complete workout with these specifications:
 - Difficulty: ${selectedDifficulty.name} (${selectedDifficulty.stars} stars out of 6)
 - Format: ${format}
 
+${exerciseReferenceList ? `
+${exerciseReferenceList}
+
+` : ''}
 ═══════════════════════════════════════════════════════════════════════════════
 FORMAT DEFINITIONS (MUST FOLLOW EXACTLY):
 ═══════════════════════════════════════════════════════════════════════════════
@@ -1991,10 +2008,49 @@ Return JSON with these exact fields:
       logStep(`${equipment} workout generated`, { name: workoutContent.name });
 
       // ═══════════════════════════════════════════════════════════════════════════════
-      // EXERCISE LIBRARY MATCHING - DISABLED
-      // The exercise linking feature has been disabled per user request.
-      // The exercise library remains available for admin use in the back office.
+      // EXERCISE LIBRARY MATCHING - Post-processing safety net
+      // Scans generated content, fuzzy-matches to exercise library, adds View buttons
       // ═══════════════════════════════════════════════════════════════════════════════
+      if (exerciseLibrary.length > 0) {
+        logStep(`Running exercise matching for ${equipment} workout...`);
+        
+        const contentFields = ['main_workout'] as const;
+        let totalMatched = 0;
+        const allUnmatched: string[] = [];
+        
+        for (const field of contentFields) {
+          const content = workoutContent[field];
+          if (!content) continue;
+          
+          const result = processContentWithExerciseMatching(
+            content,
+            exerciseLibrary,
+            `[WOD-MATCH][${equipment}][${field}]`
+          );
+          
+          (workoutContent as any)[field] = result.processedContent;
+          totalMatched += result.matched.length;
+          allUnmatched.push(...result.unmatched);
+        }
+        
+        logStep(`Exercise matching complete for ${equipment}`, { 
+          totalMatched, 
+          unmatched: allUnmatched.length 
+        });
+        
+        // Log unmatched exercises
+        const uniqueUnmatched = [...new Set(allUnmatched)];
+        if (uniqueUnmatched.length > 0) {
+          await logUnmatchedExercises(
+            supabase,
+            uniqueUnmatched,
+            'wod',
+            `WOD-${prefix}-${equipment.charAt(0)}-${timestamp}`,
+            workoutContent.name,
+            `[WOD-MISMATCH][${equipment}]`
+          );
+        }
+      }
 
       // ═══════════════════════════════════════════════════════════════════════════════
       // IMAGE GENERATION WITH RETRY LOGIC - CRITICAL FOR WOD INTEGRITY
