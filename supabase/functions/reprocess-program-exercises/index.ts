@@ -1,11 +1,13 @@
 // ═══════════════════════════════════════════════════════════════════════════════
 // REPROCESS PROGRAM EXERCISES
 // Re-runs exercise matching on existing training programs to fix broken/missing links
+// Programs have NO section filtering — ALL exercises get View buttons
 // ═══════════════════════════════════════════════════════════════════════════════
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import {
   processContentWithExerciseMatching,
+  stripExerciseMarkup,
   logUnmatchedExercises,
   type ExerciseBasic,
 } from "../_shared/exercise-matching.ts";
@@ -21,20 +23,18 @@ Deno.serve(async (req) => {
   }
 
   const LOG_PREFIX = "[REPROCESS-PROGRAM]";
-  console.log(`${LOG_PREFIX} 🔄 Starting training program exercise reprocessing...`);
+  console.log(`${LOG_PREFIX} 🔄 Starting training program exercise reprocessing (force-match)...`);
 
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Parse request body
     const body = await req.json().catch(() => ({}));
     const { programIds } = body;
 
     console.log(`${LOG_PREFIX} Request params:`, { programIds });
 
-    // Fetch programs to reprocess
     let programsQuery = supabase
       .from("admin_training_programs")
       .select("id, name, overview, program_structure, weekly_schedule, progression_plan, nutrition_tips, expected_results");
@@ -42,7 +42,6 @@ Deno.serve(async (req) => {
     if (programIds && Array.isArray(programIds) && programIds.length > 0) {
       programsQuery = programsQuery.in("id", programIds);
     }
-    // Default: process ALL programs
 
     const { data: programs, error: programsError } = await programsQuery;
 
@@ -64,7 +63,6 @@ Deno.serve(async (req) => {
 
     console.log(`${LOG_PREFIX} Found ${programs.length} programs to reprocess:`, programs.map(p => p.name));
 
-    // Fetch exercise library
     const { data: exerciseLibrary, error: libraryError } = await supabase
       .from("exercises")
       .select("id, name, body_part, equipment, target")
@@ -88,23 +86,28 @@ Deno.serve(async (req) => {
       unmatchedNames: string[];
     }> = [];
 
-    // Process each program
+    // Only process fields that contain actual exercise content
+    // overview, nutrition_tips, expected_results are informational — skip them
+    const exerciseContentFields = ["program_structure", "weekly_schedule", "progression_plan"];
+
     for (const program of programs) {
       console.log(`${LOG_PREFIX} 📋 Processing: "${program.name}" (${program.id})`);
 
-      const contentFields = ["overview", "program_structure", "weekly_schedule", "progression_plan", "nutrition_tips", "expected_results"];
       const updates: Record<string, string> = {};
       let totalMatched = 0;
       const allUnmatched: string[] = [];
 
-      for (const field of contentFields) {
+      for (const field of exerciseContentFields) {
         const content = program[field as keyof typeof program] as string | null;
         if (!content) continue;
 
-        console.log(`${LOG_PREFIX} Processing field: ${field}`);
+        console.log(`${LOG_PREFIX} Processing field: ${field} (${content.length} chars)`);
+        
+        // Strip old markup first, then re-process
+        const strippedContent = stripExerciseMarkup(content);
         
         const result = processContentWithExerciseMatching(
-          content,
+          strippedContent,
           exerciseLibrary as ExerciseBasic[],
           `${LOG_PREFIX}[${field}]`
         );
