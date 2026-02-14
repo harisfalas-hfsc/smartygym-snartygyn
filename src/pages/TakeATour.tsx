@@ -234,6 +234,28 @@ export default function TakeATour() {
                 </div>
               </div>
 
+              {/* Access Info */}
+              <div className="bg-muted/30 rounded-lg p-4 border border-border">
+                <h4 className="font-semibold mb-2 flex items-center gap-2">
+                  <Crown className="h-4 w-4 text-primary" />
+                  Access Levels
+                </h4>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                    <span><strong>Subscribers (Free):</strong> Access all free workouts at no cost</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                    <span><strong>Premium Members:</strong> Full access to all workouts (free & premium)</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                    <span><strong>Standalone Purchase:</strong> Buy individual premium workouts without a subscription</span>
+                  </li>
+                </ul>
+              </div>
+
               <div className="text-center">
                 <Link to="/workouts">
                   <Button variant="outline" size="sm">
@@ -277,6 +299,28 @@ export default function TakeATour() {
                   increase of stress on the body over time. This is the #1 principle for building strength, endurance, 
                   and transforming your physique.
                 </p>
+              </div>
+
+              {/* Access Info */}
+              <div className="bg-muted/30 rounded-lg p-4 border border-border">
+                <h4 className="font-semibold mb-2 flex items-center gap-2">
+                  <Crown className="h-4 w-4 text-primary" />
+                  Access Levels
+                </h4>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                    <span><strong>Subscribers (Free):</strong> Access all free training programs at no cost</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                    <span><strong>Premium Members:</strong> Full access to all programs (free & premium)</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                    <span><strong>Standalone Purchase:</strong> Buy individual premium programs without a subscription</span>
+                  </li>
+                </ul>
               </div>
 
               <div className="text-center">
