@@ -130,8 +130,8 @@ export default function SmartyPlans() {
   };
 
   const comparisonFeatures = [
-    { category: "Workouts", icon: Dumbbell, visitor: false, subscriber: true, premium: true },
-    { category: "Training Programs", icon: Flame, visitor: false, subscriber: true, premium: true },
+    { category: "Workouts", icon: Dumbbell, visitor: false, subscriber: "limited", premium: true },
+    { category: "Training Programs", icon: Flame, visitor: false, subscriber: "limited", premium: true },
     { category: "Daily Smarty Ritual", icon: Sparkles, visitor: false, subscriber: true, premium: true },
     { category: "Smarty Check-ins", icon: ClipboardCheck, visitor: false, subscriber: false, premium: true },
     { category: "Dashboard", icon: LayoutDashboard, visitor: false, subscriber: "limited", premium: true },
