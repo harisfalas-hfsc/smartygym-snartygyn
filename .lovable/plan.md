@@ -1,85 +1,123 @@
 
 
-# Fix: Community Leaderboard Not Showing Free Users + Interaction Issues
+# Exercise Library Integration: AI Uses Your Library First
 
-## Root Cause Analysis
+## The Problem
 
-I investigated the database and found the real problem. The new user (Elsa) has a workout interaction row but `is_completed` is still `false` in the database -- even though she may have clicked the "Complete" button. Here's why:
+The AI generates exercise names freely (e.g., "Cable Glute Kickbacks") while your exercise library has 1,330 exercises with specific names (e.g., "cable glute kickback"). Users can't find exercises when searching, and View buttons don't appear because names don't match.
 
-### Problem 1: Upsert fails silently for free users
+## The Solution
 
-The `workout_interactions` table has an INSERT RLS policy that only allows free users to insert rows where `is_completed IS NOT TRUE AND is_favorite IS NOT TRUE AND rating IS NULL`. This was designed to prevent free users from interacting with premium content they haven't purchased.
+A two-part approach: (1) Make the AI pick exercises directly from your library, and (2) retroactively fix all 209 existing workouts and training programs.
 
-However, the code uses **upsert** (INSERT ... ON CONFLICT DO UPDATE) to toggle completion, favorites, and ratings. In PostgreSQL, when an upsert is attempted:
-- The INSERT WITH CHECK policy is evaluated first
-- If it fails, the **entire operation fails** -- it does NOT fall through to the UPDATE path
-- The code does not check for errors from the upsert, so the UI updates locally (shows "completed") but the database never changes
-- On page reload, the true state (not completed) is shown
+---
 
-So when Elsa clicks "Mark as Complete", the UI briefly shows it as completed, but the database silently rejects the change. That's why she doesn't appear on the leaderboard.
+## How It Will Work
 
-### Problem 2: INSERT policy doesn't account for purchased content
+### Part 1: AI Picks From Your Exercise Library (Future Content)
 
-The INSERT policy checks for premium subscription, admin role, and corporate membership -- but it does NOT check the `user_purchases` table. So even users who legitimately purchased (or received as a complimentary gift) a premium workout cannot fully interact with it at the database level.
+Before the AI generates any workout or training program, the system will:
 
-### About Dashboard/Logbook for Free Users
+1. Query the exercise library (1,330 exercises) and group them by body part and equipment type
+2. Inject a condensed reference list into the AI prompt, organized like this:
+   - BACK / body weight: pull-up, chin-up, inverted row, ...
+   - BACK / cable: cable seated row, cable lat pulldown, ...
+   - CHEST / dumbbell: dumbbell bench press, dumbbell fly, ...
+   - UPPER LEGS / body weight: bodyweight squat, lunge, ...
+3. Instruct the AI: "You MUST use exercises from this library. Write the name EXACTLY as listed. Choose exercises that match the category, equipment type, difficulty, and focus."
+4. After the AI generates content, run the existing post-processing fuzzy matching as a safety net to catch any exercises the AI might have written slightly differently
+5. Add `{{exercise:id:name}}` markup for every matched exercise
 
-Free users (subscribers) DO have access to the dashboard -- it's behind `ProtectedRoute` which only requires authentication, not premium status. The logbook tab is accessible to all authenticated users. However, the SmartyPlans comparison page incorrectly shows LogBook as "premium only" -- it should show as available to all authenticated users (at minimum for their purchased content).
+This applies to:
+- Workout of the Day generation (automatic and manual)
+- Training program generation (from admin prompts)
 
-## Fix Plan
+### Part 2: View Button + Popup (Already Built, Just Needs Data)
 
-### 1. Fix the INSERT RLS policy on `workout_interactions` (Database Migration)
+The frontend already has everything needed:
+- `ExerciseHTMLContent` component already parses `{{exercise:id:name}}` markup and renders View buttons inline
+- `ExerciseLinkButton` already shows the eye icon that opens a popup
+- `ExerciseDetailModal` already displays exercise details in a mobile-optimized modal
+- The frontend also does client-side fuzzy matching on bold text as a second pass
 
-Update the policy to also allow users who have purchased the content:
+The only thing missing is the `{{exercise:id:name}}` markup in the stored workout content. Once the AI writes exact library names and the post-processing adds the markup, View buttons will appear automatically.
 
-```sql
--- Add purchased content check to the INSERT policy
-DROP POLICY "Users can insert workout interactions based on tier" ON workout_interactions;
+### Part 3: Fix All Existing Content (Retroactive)
 
-CREATE POLICY "Users can insert workout interactions based on tier"
-ON workout_interactions FOR INSERT TO authenticated
-WITH CHECK (
-  auth.uid() = user_id 
-  AND (
-    -- Admins can do anything
-    has_role(auth.uid(), 'admin'::app_role)
-    -- Premium subscribers
-    OR EXISTS (SELECT 1 FROM user_subscriptions WHERE user_id = auth.uid() AND status = 'active' AND plan_type IN ('gold', 'platinum'))
-    -- Corporate admins
-    OR EXISTS (SELECT 1 FROM corporate_subscriptions WHERE admin_user_id = auth.uid() AND status = 'active')
-    -- Corporate members
-    OR EXISTS (SELECT 1 FROM corporate_members cm JOIN corporate_subscriptions cs ON cm.corporate_subscription_id = cs.id WHERE cm.user_id = auth.uid() AND cs.status = 'active')
-    -- Users who purchased this specific workout
-    OR EXISTS (SELECT 1 FROM user_purchases WHERE user_id = auth.uid() AND content_id = workout_interactions.workout_id AND content_type = 'workout' AND content_deleted = false)
-    -- Free users on free content (view-only interactions)
-    OR (is_favorite IS NOT TRUE AND is_completed IS NOT TRUE AND rating IS NULL)
-  )
-);
-```
+Run the reprocess functions across all existing workouts and training programs:
+- `reprocess-wod-exercises` (already exists) -- will scan all 209+ workouts, fuzzy-match exercise names to the library, and add `{{exercise:id:name}}` markup
+- Create `reprocess-program-exercises` -- same logic for training programs
+- Unmatched exercises get logged to the `mismatched_exercises` table (currently has 49 entries) for admin review
 
-### 2. Fix the same issue on `program_interactions` (Database Migration)
+---
 
-Apply the equivalent fix for programs too, adding a check for purchased programs.
+## Technical Implementation
 
-### 3. Fix `WorkoutInteractions.tsx` -- use UPDATE instead of upsert for existing rows
+### Step 1: Build Exercise Reference List Builder
 
-Change the `toggleCompleted`, `toggleFavorite`, and `handleRating` functions to:
-- First check if a row already exists (which it does, since `markAsViewed` creates it)
-- If it exists, use UPDATE (which has a simpler RLS policy: `auth.uid() = user_id`)
-- If it doesn't exist, use INSERT
-- Also add proper error handling for the database operations
+Create a shared utility function in `supabase/functions/_shared/exercise-matching.ts` that:
+- Queries all 1,330 exercises from the database
+- Groups them by body_part and equipment
+- Formats into a condensed string for the AI prompt (~8-10K tokens)
 
-### 4. Fix `ProgramInteractions.tsx` -- same pattern
+### Step 2: Update Workout Generation (`generate-workout-of-day`)
 
-Apply the same update-vs-upsert fix for program interactions.
+- Before the AI call, fetch and build the exercise reference list
+- Add to the workout prompt: "EXERCISE LIBRARY REFERENCE: You MUST use exercises from this list. Write names EXACTLY as shown."
+- Re-enable the exercise matching post-processing (currently disabled at line 1993-1997)
+- After AI response, run `processContentWithExerciseMatching()` to add `{{exercise:id:name}}` markup
+- Log unmatched exercises to `mismatched_exercises` table
 
-### 5. Fix `WorkoutInteractions.tsx` error handling
+### Step 3: Update Training Program Generation (`generate-training-program`)
 
-The current code silently ignores upsert failures. Add proper error checking so users see a meaningful error if something goes wrong.
+- Same changes as Step 2 but for training programs
+- Re-enable matching at line 466-468
 
-## What This Fixes
+### Step 4: Lower Matching Threshold
 
-- New users who receive complimentary workouts can mark them as completed, favorite them, and rate them
-- Users who purchase standalone workouts/programs get full interaction parity with premium users
-- Completed workouts from these users will appear on the community leaderboard
-- The UI won't show false "completed" states that revert on page reload
+- Change confidence threshold from 0.75 to 0.65 in the shared matching code to catch more variations (e.g., "Push-Ups" vs "push up")
+
+### Step 5: Fix Existing Content
+
+- Update `reprocess-wod-exercises` to process ALL workouts (not just WODs)
+- Create `reprocess-program-exercises` for training programs
+- Both functions will scan content, fuzzy-match, add markup, and log mismatches
+- Trigger both to run across all existing content
+
+### Step 6: Admin Visibility
+
+The admin panel already has a "Mismatched Exercises" section showing exercises that couldn't be matched. After reprocessing, this will show which exercises in existing content need manual attention (adding to the library or creating aliases).
+
+---
+
+## What Users Will See
+
+After implementation:
+- Every exercise in a workout will have a small View (eye) button next to it
+- Tapping the View button opens a mobile-optimized popup showing:
+  - Exercise name
+  - Body part, target muscle, equipment
+  - Description and instructions
+  - GIF animation (when available)
+- The popup works exactly like the current Exercise Library detail view
+- No need to copy exercise names and search manually
+
+---
+
+## Files to Modify
+
+1. `supabase/functions/_shared/exercise-matching.ts` -- Add exercise reference list builder, lower threshold
+2. `supabase/functions/generate-workout-of-day/index.ts` -- Add exercise library to prompt, re-enable post-processing
+3. `supabase/functions/generate-training-program/index.ts` -- Same changes
+4. `supabase/functions/reprocess-wod-exercises/index.ts` -- Expand to process all workouts (not just today's WODs)
+5. New: `supabase/functions/reprocess-program-exercises/index.ts` -- Reprocess all training programs
+
+No frontend changes needed -- `ExerciseHTMLContent`, `ExerciseLinkButton`, and `ExerciseDetailModal` already handle everything.
+
+---
+
+## Cost Impact
+
+- Extra ~8-10K tokens per AI generation call for the exercise reference list
+- Estimated additional cost: ~$0.01-0.03 per workout generation
+- One-time reprocessing of existing content: no AI cost (just database queries and fuzzy matching)
