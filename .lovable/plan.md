@@ -1,72 +1,35 @@
 
-# Fix Exercise Matching and Reprocess This Workout (Then All)
 
-## What's Broken
+# Fix Exercise View Buttons (Two Frontend Bugs)
 
-The exercise extraction and matching has three bugs preventing matches:
+## What's Actually Wrong
 
-1. **Trailing colons not stripped**: The bold text `<strong>Goblet Squats:</strong>` extracts as "Goblet Squats:" instead of "Goblet Squats"
-2. **Equipment prefixes kill matches**: The AI writes "Standing Calf Raises" but the library has "dumbbell standing calf raise". The substring match gives only 0.52 confidence (below the 0.65 threshold) because the library name is much longer
-3. **"Machine" suffix confuses matching**: "Leg Press Machine" vs "sled 45 leg press" -- the word "Machine" adds noise
+The database content is correct. The "Leg Anchor Builder" workout has proper exercise markup for all 6 exercises (barbell bench squat, dumbbell romanian deadlift, smith leg press, lever leg extension, cable standing calf raise, dumbbell goblet squat). The problem is entirely in the frontend rendering.
 
-## The Fix (3 Parts)
+**Two bugs are blocking View buttons from appearing:**
 
-### Part 1: Improve extraction (strip colons and "Machine")
+1. In `WorkoutDisplay.tsx` (the card-based workout view), `ExerciseHTMLContent` is used but with `enableExerciseLinking={false}` -- this explicitly disables all exercise matching and View button rendering.
 
-In `_shared/exercise-matching.ts`, update the `extractExerciseNames` function:
-- Strip trailing colons and periods from extracted bold text
-- Remove generic suffixes like "Machine" before matching (e.g., "Leg Press Machine" becomes "Leg Press")
+2. In `IndividualWorkout.tsx` (the individual workout page you're looking at), it uses plain `HTMLContent` instead of `ExerciseHTMLContent`. Plain `HTMLContent` has no idea what `{{exercise:id:name}}` means, so it renders the raw markup text like "exercise:0026:barbell bench squat" on screen.
 
-### Part 2: Improve matching confidence for substring matches
+## The Fix
 
-The current formula for substring matches is `shorter / longer`. When the search term is "goblet squat" (11 chars) and the library name is "dumbbell goblet squat" (21 chars), confidence = 0.52 which fails.
+### File 1: `src/pages/IndividualWorkout.tsx`
 
-New approach: If the search term is fully contained within the library name, boost the confidence. The exercise IS a goblet squat -- it just has an equipment prefix. Change the formula so that when the search is a full substring of the library name, confidence = 0.85 (high match). This captures cases like:
-- "Goblet Squats" matching "dumbbell goblet squat" or "kettlebell goblet squat"
-- "Calf Raises" matching "dumbbell standing calf raise"
-- "Leg Press" matching "sled 45 leg press"
-- "Leg Extension" matching "lever leg extension"
+Replace all `HTMLContent` components for workout sections (activation, warm_up, main_workout, finisher, cool_down) with `ExerciseHTMLContent` with `enableExerciseLinking={true}`. This will parse the `{{exercise:id:name}}` markup and render View buttons.
 
-### Part 3: Auto-reprocess this workout, then ALL workouts and programs
+### File 2: `src/components/WorkoutDisplay.tsx`
 
-After deploying the improved matching:
-1. Call `reprocess-wod-exercises` with this specific workout ID to verify it works
-2. Then call it with `processAll: true` to fix all existing workouts
-3. Then call `reprocess-program-exercises` to fix all existing training programs
+Change `enableExerciseLinking={false}` to `enableExerciseLinking={true}` on line 283 for the workout content section. Same for training program content on lines 301 and 317.
 
-No manual action required from you -- I will trigger everything automatically.
+## No Backend Changes Needed
 
-## Technical Details
+The reprocessing already worked -- the database has the correct markup. This is purely a frontend display fix.
 
-### File: `supabase/functions/_shared/exercise-matching.ts`
+## Expected Result
 
-**extractExerciseNames function** (around line 216):
-- Add colon/period stripping: `.replace(/[:;.]+$/, '')` before the existing cleanup line
-- Add "Machine" suffix removal: `.replace(/\s+machine\s*$/i, '')`
+After this fix, every exercise in the "Leg Anchor Builder" (and all other workouts/programs) will show:
+- The exercise name as text
+- A small eye icon (View button) next to it
+- Clicking the eye opens the mobile-optimized exercise detail popup with name, body part, target, equipment, instructions, and GIF (when available)
 
-**calculateConfidence function** (around line 72):
-- When search term is a full substring of the library name (normalized), return a boosted confidence of `0.80 + (shorter/longer * 0.20)` instead of just `shorter/longer`
-- This ensures "goblet squat" inside "dumbbell goblet squat" gets ~0.90 confidence instead of 0.52
-
-**buildReplacementPatterns function** (around line 234):
-- Add a pattern that matches the exercise name followed by a colon: `<strong>Exercise Name:</strong>` so the replacement works even when the original text had a colon
-
-### File: `supabase/functions/reprocess-wod-exercises/index.ts`
-
-No code changes needed -- the function already supports `wodIds` and `processAll` parameters. I will call it after deploying the matching fix.
-
-### File: `supabase/functions/reprocess-program-exercises/index.ts`
-
-Already created in previous step. Will be called after the workout reprocessing.
-
-## Expected Results for "Leg Anchor Builder"
-
-After the fix, all 6 exercises should match:
-- "Barbell Back Squats" --> barbell full squat (or barbell high bar squat)
-- "Dumbbell Romanian Deadlifts" --> dumbbell romanian deadlift
-- "Leg Press Machine" --> sled 45 leg press
-- "Leg Extension Machine" --> lever leg extension
-- "Standing Calf Raises" --> dumbbell standing calf raise (or similar)
-- "Goblet Squats" --> dumbbell goblet squat (or kettlebell goblet squat)
-
-Each will get a View button that opens the mobile-optimized exercise detail popup.
