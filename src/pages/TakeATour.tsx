@@ -234,7 +234,30 @@ export default function TakeATour() {
                 </div>
               </div>
 
-              {/* Access Info */}
+              <div className="text-center">
+                <Link to="/workouts">
+                  <Button variant="outline" size="sm">
+                    Explore Today's Workouts
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Section 2b: Smarty Workouts */}
+          <Card className="mb-6 border border-border">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Dumbbell className="h-5 w-5 text-primary" />
+                Smarty Workouts
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-muted-foreground">
+                Beyond the daily WOD, <strong>Smarty Workouts</strong> is our full library of standalone workouts. 
+                Browse by category, difficulty, format, and equipment to find the perfect session for your goals.
+              </p>
+
               <div className="bg-muted/30 rounded-lg p-4 border border-border">
                 <h4 className="font-semibold mb-2 flex items-center gap-2">
                   <Crown className="h-4 w-4 text-primary" />
@@ -259,7 +282,7 @@ export default function TakeATour() {
               <div className="text-center">
                 <Link to="/workouts">
                   <Button variant="outline" size="sm">
-                    Explore Smarty Workouts
+                    Browse All Workouts
                   </Button>
                 </Link>
               </div>
