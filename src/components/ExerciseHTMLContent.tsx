@@ -187,6 +187,55 @@ function domToReact(
  * - Uses fuzzy matching to find exercises in bold text
  * - Renders exercises INLINE within their containing elements
  */
+/**
+ * Check if a position in HTML is within a Main Workout or Finisher section.
+ * Sections are delimited by emoji headers: 🧽 (skip), 🔥 (skip), 💪 (process), ⚡ (process), 🧘 (skip)
+ */
+function isInProcessableSection(html: string, position: number): boolean {
+  const sectionEmojis = [
+    { emoji: '🧽', process: false },
+    { emoji: '🔥', process: false },
+    { emoji: '💪', process: true },
+    { emoji: '⚡', process: true },
+    { emoji: '🧘', process: false },
+  ];
+  
+  // Find which section this position falls in
+  let currentProcess = true; // Default: if no sections found, process everything
+  let hasAnySections = false;
+  
+  for (const { emoji, process } of sectionEmojis) {
+    const idx = html.indexOf(emoji);
+    if (idx !== -1) {
+      hasAnySections = true;
+    }
+  }
+  
+  if (!hasAnySections) return true; // No section markers = process everything
+  
+  // Build a list of all section starts sorted by position
+  const sectionStarts: Array<{ index: number; process: boolean }> = [];
+  for (const { emoji, process } of sectionEmojis) {
+    let searchFrom = 0;
+    while (true) {
+      const idx = html.indexOf(emoji, searchFrom);
+      if (idx === -1) break;
+      sectionStarts.push({ index: idx, process });
+      searchFrom = idx + 1;
+    }
+  }
+  sectionStarts.sort((a, b) => a.index - b.index);
+  
+  // Find which section contains our position
+  let inProcessable = false; // Before first section = not processable
+  for (const ss of sectionStarts) {
+    if (ss.index > position) break;
+    inProcessable = ss.process;
+  }
+  
+  return inProcessable;
+}
+
 export const ExerciseHTMLContent: React.FC<ExerciseHTMLContentProps> = ({ 
   content, 
   className,
@@ -207,16 +256,9 @@ export const ExerciseHTMLContent: React.FC<ExerciseHTMLContentProps> = ({
 
     const exercisesToRender: ProcessedExercise[] = [];
 
-    // Step 1: Parse admin-added exercise markup {{exercise:id:name}} (does NOT depend on library loading)
+    // Step 1: Parse admin-added exercise markup {{exercise:id:name}}
+    // These are ONLY in Main Workout and Finisher sections (backend guarantees this)
     const markupExercises = parseExerciseMarkup(processedHtml);
-
-    if (import.meta.env.DEV) {
-      const hasExerciseMarkup = processedHtml.toLowerCase().includes('{{exercise:');
-      if (hasExerciseMarkup && markupExercises.length === 0) {
-        // eslint-disable-next-line no-console
-        console.warn('ExerciseHTMLContent: found exercise markup but parsed 0 tags');
-      }
-    }
 
     markupExercises.forEach(({ fullMatch, id, name }) => {
       const placeholder = `__EXERCISE_${exercisesToRender.length}__`;
@@ -225,25 +267,26 @@ export const ExerciseHTMLContent: React.FC<ExerciseHTMLContentProps> = ({
     });
 
     // Step 2: Find bold text and try to match to exercises (depends on library loading)
+    // SECTION-AWARE: Only match in 💪 Main Workout and ⚡ Finisher sections
     if (!isLoading && exercises.length) {
       const boldPattern = /<(strong|b)>([^<]+)<\/(strong|b)>/gi;
       let match;
-      const boldMatches: Array<{ fullMatch: string; text: string; tag: string }> = [];
+      const boldMatches: Array<{ fullMatch: string; text: string; tag: string; index: number }> = [];
 
       while ((match = boldPattern.exec(processedHtml)) !== null) {
-        // Skip if already a placeholder
         if (match[2].includes('__EXERCISE_')) continue;
-
         boldMatches.push({
           fullMatch: match[0],
           text: match[2].trim(),
           tag: match[1],
+          index: match.index,
         });
       }
 
-      // Process bold matches
-      boldMatches.forEach(({ fullMatch, text, tag }) => {
-        // Skip short text, numbers-only, or common non-exercise terms
+      boldMatches.forEach(({ fullMatch, text, tag, index }) => {
+        // SECTION CHECK: skip if not in processable section
+        if (!isInProcessableSection(processedHtml, index)) return;
+        
         if (
           text.length < 3 ||
           /^\d+$/.test(text) ||
@@ -254,7 +297,6 @@ export const ExerciseHTMLContent: React.FC<ExerciseHTMLContentProps> = ({
           return;
         }
 
-        // Try to find a matching exercise
         const matchResult = findMatchingExercise(text, 0.8);
 
         if (matchResult) {
@@ -268,8 +310,7 @@ export const ExerciseHTMLContent: React.FC<ExerciseHTMLContentProps> = ({
         }
       });
 
-      // Step 3: Match plain-text exercise mentions (e.g. list items: "Jumping Jacks - 1 minute")
-      // We do this by rewriting text nodes to include __EXERCISE_n__ placeholders.
+      // Step 3: Match plain-text exercise mentions - SECTION-AWARE
       try {
         const parser = new DOMParser();
         const doc = parser.parseFromString(`<div>${processedHtml}</div>`, 'text/html');
@@ -294,6 +335,11 @@ export const ExerciseHTMLContent: React.FC<ExerciseHTMLContentProps> = ({
             if (!raw.trim()) return;
             if (raw.includes('__EXERCISE_')) return;
             if (raw.toLowerCase().includes('{{exercise:')) return;
+
+            // SECTION CHECK: Find position of this text node in the original HTML
+            // Use the text content to approximate position
+            const posInHtml = processedHtml.indexOf(raw);
+            if (posInHtml !== -1 && !isInProcessableSection(processedHtml, posInHtml)) return;
 
             const candidate = extractExerciseCandidate(raw);
             if (!candidate) return;

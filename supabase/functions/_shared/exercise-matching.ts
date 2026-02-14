@@ -443,6 +443,132 @@ export function processContentWithExerciseMatching(
   return { processedContent, matched, unmatched };
 }
 
+// ═══════════════════════════════════════════════════════════════════════════════
+// SECTION-AWARE PROCESSING
+// Only applies exercise matching to Main Workout and Finisher sections.
+// Strips any existing exercise markup from other sections.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Section header patterns using emoji markers
+const SECTION_PATTERNS = [
+  { emoji: '🧽', name: 'soft_tissue', process: false },
+  { emoji: '🔥', name: 'warm_up', process: false },
+  { emoji: '💪', name: 'main_workout', process: true },
+  { emoji: '⚡', name: 'finisher', process: true },
+  { emoji: '🧘', name: 'cool_down', process: false },
+];
+
+/**
+ * Strip all exercise markup from content, restoring plain exercise names
+ */
+export function stripExerciseMarkup(content: string): string {
+  // Replace {{exercise:id:name}} with just the name
+  return content.replace(/\{\{(?:exercise|exrcise|excersize|excercise):([^:]+):([^}]+)\}\}/gi, '$2');
+}
+
+interface SectionBlock {
+  name: string;
+  content: string;
+  process: boolean;
+  startIndex: number;
+}
+
+/**
+ * Split HTML content into sections based on emoji headers.
+ * Returns sections with their content and whether they should be processed.
+ */
+function splitIntoSections(htmlContent: string): SectionBlock[] {
+  const sections: SectionBlock[] = [];
+  
+  // Find all emoji header positions
+  const headerPositions: Array<{ index: number; emoji: string; name: string; process: boolean }> = [];
+  
+  for (const sp of SECTION_PATTERNS) {
+    let searchFrom = 0;
+    while (true) {
+      const idx = htmlContent.indexOf(sp.emoji, searchFrom);
+      if (idx === -1) break;
+      headerPositions.push({ index: idx, emoji: sp.emoji, name: sp.name, process: sp.process });
+      searchFrom = idx + 1;
+    }
+  }
+  
+  if (headerPositions.length === 0) {
+    // No sections found - treat entire content as main workout
+    return [{ name: 'main_workout', content: htmlContent, process: true, startIndex: 0 }];
+  }
+  
+  // Sort by position
+  headerPositions.sort((a, b) => a.index - b.index);
+  
+  // Content before first header (if any)
+  if (headerPositions[0].index > 0) {
+    const preContent = htmlContent.substring(0, headerPositions[0].index);
+    if (preContent.trim()) {
+      sections.push({ name: 'pre_header', content: preContent, process: false, startIndex: 0 });
+    }
+  }
+  
+  // Build sections
+  for (let i = 0; i < headerPositions.length; i++) {
+    const start = headerPositions[i].index;
+    const end = i + 1 < headerPositions.length ? headerPositions[i + 1].index : htmlContent.length;
+    const content = htmlContent.substring(start, end);
+    
+    sections.push({
+      name: headerPositions[i].name,
+      content,
+      process: headerPositions[i].process,
+      startIndex: start,
+    });
+  }
+  
+  return sections;
+}
+
+/**
+ * Process main_workout field with section awareness.
+ * Only applies exercise matching to Main Workout and Finisher sections.
+ * Strips exercise markup from all other sections.
+ */
+export function processContentSectionAware(
+  content: string,
+  exerciseLibrary: ExerciseBasic[],
+  logPrefix: string = "[SECTION-AWARE]"
+): ProcessingResult {
+  const allMatched: ProcessingResult['matched'] = [];
+  const allUnmatched: string[] = [];
+  
+  if (!content || !exerciseLibrary || exerciseLibrary.length === 0) {
+    return { processedContent: content || '', matched: allMatched, unmatched: allUnmatched };
+  }
+  
+  const sections = splitIntoSections(content);
+  console.log(`${logPrefix} Found ${sections.length} sections: ${sections.map(s => `${s.name}(process=${s.process})`).join(', ')}`);
+  
+  let rebuiltContent = '';
+  
+  for (const section of sections) {
+    if (section.process) {
+      // MAIN WORKOUT or FINISHER: strip old markup, then re-match
+      console.log(`${logPrefix} ✅ Processing section: ${section.name}`);
+      const strippedContent = stripExerciseMarkup(section.content);
+      const result = processContentWithExerciseMatching(strippedContent, exerciseLibrary, `${logPrefix}[${section.name}]`);
+      rebuiltContent += result.processedContent;
+      allMatched.push(...result.matched);
+      allUnmatched.push(...result.unmatched);
+    } else {
+      // WARM UP, COOL DOWN, SOFT TISSUE, etc.: strip any exercise markup
+      console.log(`${logPrefix} 🚫 Stripping markup from section: ${section.name}`);
+      rebuiltContent += stripExerciseMarkup(section.content);
+    }
+  }
+  
+  console.log(`${logPrefix} Section-aware summary: ${allMatched.length} matched, ${allUnmatched.length} unmatched`);
+  
+  return { processedContent: rebuiltContent, matched: allMatched, unmatched: allUnmatched };
+}
+
 /**
  * Log unmatched exercises to the mismatched_exercises table
  */
