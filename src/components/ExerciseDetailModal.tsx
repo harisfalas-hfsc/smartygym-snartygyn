@@ -66,7 +66,7 @@ const ExerciseDetailModal = ({ exercise, open, onOpenChange }: ExerciseDetailMod
               <div className="w-full aspect-square rounded-lg overflow-hidden bg-white border-2 border-border flex items-center justify-center">
                 <img
                   src={exercise.gif_url}
-                  alt={`${exercise.name} exercise GIF`}
+                  alt={`SmartyGym ${exercise.name} exercise demonstration - Haris Falas online fitness platform smartygym.com`}
                   className="w-full h-full object-contain"
                   loading="lazy"
                   decoding="async"
