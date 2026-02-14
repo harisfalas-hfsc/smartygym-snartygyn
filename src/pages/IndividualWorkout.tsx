@@ -10,7 +10,7 @@ import { useAccessControl } from "@/hooks/useAccessControl";
 import { ContentNotFound } from "@/components/ContentNotFound";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { ReaderModeDialog } from "@/components/ReaderModeDialog";
-import { HTMLContent } from "@/components/ui/html-content";
+import { ExerciseHTMLContent } from "@/components/ExerciseHTMLContent";
 
 // Helper function to generate SEO-optimized alt text
 const generateWorkoutAltText = (workout: any): string => {
@@ -266,52 +266,52 @@ const IndividualWorkout = () => {
                       }}
                       content={
                         <div className="space-y-6">
-                          {dbWorkout.description && (
+                            {dbWorkout.description && (
                             <div>
                               <h2 className="text-lg font-semibold mb-2">Description</h2>
-                              <HTMLContent content={dbWorkout.description} />
+                              <ExerciseHTMLContent content={dbWorkout.description} enableExerciseLinking={true} />
                             </div>
                           )}
                           {dbWorkout.warm_up && (
                             <div>
                               <h2 className="text-lg font-semibold mb-2">Warm Up</h2>
-                              <HTMLContent content={dbWorkout.warm_up} />
+                              <ExerciseHTMLContent content={dbWorkout.warm_up} enableExerciseLinking={true} />
                             </div>
                           )}
                           {dbWorkout.activation && (
                             <div>
                               <h2 className="text-lg font-semibold mb-2">Activation</h2>
-                              <HTMLContent content={dbWorkout.activation} />
+                              <ExerciseHTMLContent content={dbWorkout.activation} enableExerciseLinking={true} />
                             </div>
                           )}
                           {dbWorkout.main_workout && (
                             <div>
                               <h2 className="text-lg font-semibold mb-2">Main Workout</h2>
-                              <HTMLContent content={dbWorkout.main_workout} />
+                              <ExerciseHTMLContent content={dbWorkout.main_workout} enableExerciseLinking={true} />
                             </div>
                           )}
                           {dbWorkout.finisher && (
                             <div>
                               <h2 className="text-lg font-semibold mb-2">Finisher</h2>
-                              <HTMLContent content={dbWorkout.finisher} />
+                              <ExerciseHTMLContent content={dbWorkout.finisher} enableExerciseLinking={true} />
                             </div>
                           )}
                           {dbWorkout.cool_down && (
                             <div>
                               <h2 className="text-lg font-semibold mb-2">Cool Down</h2>
-                              <HTMLContent content={dbWorkout.cool_down} />
+                              <ExerciseHTMLContent content={dbWorkout.cool_down} enableExerciseLinking={true} />
                             </div>
                           )}
                           {dbWorkout.instructions && (
                             <div>
                               <h2 className="text-lg font-semibold mb-2">Instructions</h2>
-                              <HTMLContent content={dbWorkout.instructions} />
+                              <ExerciseHTMLContent content={dbWorkout.instructions} enableExerciseLinking={true} />
                             </div>
                           )}
                           {dbWorkout.tips && (
                             <div>
                               <h2 className="text-lg font-semibold mb-2">Tips</h2>
-                              <HTMLContent content={dbWorkout.tips} />
+                              <ExerciseHTMLContent content={dbWorkout.tips} enableExerciseLinking={true} />
                             </div>
                           )}
                         </div>
