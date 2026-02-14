@@ -146,6 +146,7 @@ const STRUCTURAL_HEADERS = [
 // Prefix patterns that indicate a header with exercise after colon
 const PREFIX_PATTERNS = [
   /^tabata\s*\d*:\s*/i,           // "Tabata 1: High Knees" → "High Knees"
+  /^tabata\s+round\s*\d*:\s*/i,   // "Tabata Round 1: Kettlebell Swings" → "Kettlebell Swings"
   /^\d+\s*rounds?\s*(?:of)?:\s*/i, // "3 Rounds of: Burpees" → "Burpees"
   /^for\s*time:\s*/i,              // "For Time: ..." → skip
   /^amrap\s*(?:\d+)?:\s*/i,        // "AMRAP 10: ..." → skip  
@@ -155,6 +156,8 @@ const PREFIX_PATTERNS = [
   /^exercise\s*\d*:\s*/i,          // "Exercise 1: ..." → extract after
   /^movement\s*\d*:\s*/i,          // "Movement 1: ..." → extract after
   /^block\s*\d*:\s*/i,             // "Block 1: ..." → extract after
+  /^[A-D]\d*[\.:]\s*/i,            // "A1: Barbell Squat", "B2. Incline Press" → extract after
+  /^[A-D]\d*\)\s*/i,               // "A1) Barbell Squat" → extract after
 ];
 
 // Patterns that are purely structural (no exercise follows)
@@ -240,6 +243,14 @@ export function extractExerciseNames(htmlContent: string): string[] {
     cleaned = cleaned.replace(/[:;.]+$/, '');
     // Remove generic "Machine" suffix that hurts matching
     cleaned = cleaned.replace(/\s+machine\s*$/i, '');
+    // Strip sets/reps/tempo info after colon (e.g., "Incline Press: 4 sets x 5-7 reps")
+    cleaned = cleaned.replace(/:\s*\d+\s*(?:sets?|rounds?|reps?|x\s|×\s|min|sec).*/i, '').trim();
+    // Strip trailing sets/reps info without colon (e.g., "Incline Press 4 sets x 5-7 reps")
+    cleaned = cleaned.replace(/\s+\d+\s*(?:sets?\s*(?:x|×)\s*\d+|reps?|rounds?|min(?:utes?)?|sec(?:onds?)?).*$/i, '').trim();
+    // Remove parenthetical qualifiers like "(American)", "(Cable)", "(each arm)", "(left leg)"
+    cleaned = cleaned.replace(/\s*\([^)]*\)\s*$/, '').trim();
+    // Also strip inline parenthetical qualifiers
+    cleaned = cleaned.replace(/\s*\([^)]{1,30}\)/g, '').trim();
     cleaned = cleaned.trim();
     if (cleaned.length >= 3) {
       exercises.push(cleaned);
@@ -266,8 +277,8 @@ function buildReplacementPatterns(exerciseName: string): RegExp[] {
     // Direct match: <strong>Exercise Name</strong> (with optional colon/Machine/spaces)
     new RegExp(`(<strong>)(\\d+\\.\\s*)?${escapedWithSuffix}(</strong>)`, 'gi'),
     
-    // Match with Tabata prefix
-    new RegExp(`(<strong>)(Tabata\\s*\\d*:\\s*)${escapedWithSuffix}(</strong>)`, 'gi'),
+    // Match with Tabata prefix (including "Tabata Round N:")
+    new RegExp(`(<strong>)(Tabata\\s*(?:Round\\s*)?\\d*:\\s*)${escapedWithSuffix}(</strong>)`, 'gi'),
     
     // Match with Station prefix
     new RegExp(`(<strong>)(Station\\s*\\d*:\\s*)${escapedWithSuffix}(</strong>)`, 'gi'),
@@ -280,6 +291,12 @@ function buildReplacementPatterns(exerciseName: string): RegExp[] {
     
     // Match with Block prefix
     new RegExp(`(<strong>)(Block\\s*\\d*:\\s*)${escapedWithSuffix}(</strong>)`, 'gi'),
+    
+    // Match with A1:/B2:/C1: prefix patterns
+    new RegExp(`(<strong>)([A-D]\\d*[\\.:)]\\s*)${escapedWithSuffix}(</strong>)`, 'gi'),
+    
+    // Match exercise name with parenthetical qualifiers (e.g., "Kettlebell Swings (American)")
+    new RegExp(`(<strong>)(\\d+\\.\\s*)?${escaped}(?:\\s+[Mm]achine)?(?:\\s*\\([^)]*\\))?(?:[:;.])?\\s*(</strong>)`, 'gi'),
     
     // Match inside list item without bold
     new RegExp(`(<li[^>]*><p[^>]*>)(\\d+\\.\\s*)?${escapedWithSuffix}(?=\\s*[-–—]|\\s*<|$)`, 'gi'),
@@ -309,7 +326,7 @@ export function processContentWithExerciseMatching(
   let processedContent = content;
   
   for (const exerciseName of extractedNames) {
-    const matchResult = findBestMatch(exerciseName, exerciseLibrary, 0.75);
+    const matchResult = findBestMatch(exerciseName, exerciseLibrary, 0.65);
     
     if (matchResult) {
       // Replace the exercise name with markup (inside bold tags)
