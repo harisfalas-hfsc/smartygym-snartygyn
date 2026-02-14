@@ -1,99 +1,111 @@
 
-# Fix ALL Exercise View Buttons - Final Comprehensive Fix
+# AI-Powered Exercise Replacement and Linking
 
-## Root Causes Found
+## Why Previous Approaches Failed
 
-1. **Frontend re-adds View buttons to warm-up/cool-down**: `ExerciseHTMLContent.tsx` does live fuzzy matching on ALL rendered text, overriding the clean DB data. Even if the DB has no markup in warm-up, the frontend matches "Jumping Jacks" and "High Knees" and adds View buttons at render time.
+The regex-based extraction and replacement has been attempted twice and keeps failing because:
+- HTML structures vary wildly (bold tags, br-separated lines, list items, comma-separated, inline text)
+- Replacement patterns can't handle all edge cases (artifacts like "push-up -Ups")
+- 41 out of 211 workouts still have ZERO markup after two passes
+- Training programs have partial/broken markup
 
-2. **Training programs have ZERO exercise markup**: Program content uses `<br>`-separated lines (`1. Squat to Press - 40 sec work`) which the extraction logic doesn't handle. It only handles `<strong>` tags and `<li>` items.
+## The New Approach: Use AI to Do It Right
 
-3. **Some workout exercises missed despite existing in library**: "decline push-up" (id: 0279), "diamond push-up" (id: 0283) exist in the library but were not marked up. Likely a replacement pattern bug.
+Instead of fragile regex patterns, we will use a Lovable AI supported model (Gemini 2.5 Flash) to process each workout and program. The AI will:
 
-4. **Missing exercises left as plain text**: User's requirement is clear: if an exercise doesn't match the library, REPLACE the exercise name with the closest library match. Every exercise in main workout/finisher MUST have a View button.
+1. Receive the full exercise library (1,329 exercises with id, name, body_part, equipment, target)
+2. Receive the workout/program HTML content
+3. Identify every exercise in the content
+4. For each exercise, find the exact match from the library OR the closest substitute following the user's hierarchy (category, equipment, movement pattern)
+5. Return structured JSON with the replacements
+6. The edge function applies the replacements to the HTML
 
-## The Fix
+This guarantees 100% coverage because the AI understands context, handles name variations, and makes intelligent biomechanical substitutions.
 
-### Step 1: Remove Live Frontend Matching (ExerciseHTMLContent.tsx)
+## Implementation Steps
 
-Remove Steps 2 and 3 (bold matching and plain-text matching) from the frontend component entirely. The frontend will ONLY:
-- Parse `{{exercise:id:name}}` markup (Step 1) and render View buttons for those
-- Render everything else as plain HTML
+### Step 1: Create New Edge Function `ai-exercise-linker`
 
-This eliminates ALL frontend section-awareness bugs permanently. The backend reprocessor is the single source of truth for exercise linking.
+A new backend function that:
+- Accepts a content type (`workout` or `program`) and content ID(s)
+- Fetches the exercise library from the database
+- Fetches the workout/program content
+- For workouts: extracts only Main Workout and Finisher sections (using emoji section headers)
+- For programs: processes `program_structure`, `weekly_schedule`, and `progression_plan` fields
+- Sends the content + library to the AI model with a strict prompt
+- AI returns JSON array: `[{original_text, exercise_id, exercise_name, was_replaced}]`
+- Applies replacements: wraps each exercise with `{{exercise:id:name}}` markup
+- Strips any existing broken markup first
+- Saves the updated content back to the database
+- Reports results
 
-### Step 2: Fix Backend Extraction for Training Programs (exercise-matching.ts)
+### Step 2: AI Prompt Design
 
-Add new extraction patterns to `extractExerciseNames`:
+The prompt will instruct the AI to:
+- Read the HTML and identify every exercise name (in bold, in lists, in br-separated lines, etc.)
+- For each exercise, search the provided library for an exact or near-exact match
+- If no match exists, find the closest substitute using: same body_part, same equipment type, similar target muscle, similar movement pattern
+- Return the original text as it appears in the HTML (so we can do exact string replacement) and the matched library exercise
+- Never invent exercises, only use ones from the provided library
 
-- **`<br>`-separated numbered lines**: `1. Squat to Press - 40 sec work` extracts "Squat to Press"
-- **`<br>`-separated plain lines**: `Goblet Squats, RDL, Rows, Press - 3x12 each` extracts each comma-separated exercise
-- **Lines after `<br>` tags**: Many programs use `<br>` instead of `<li>` for line breaks
+### Step 3: Process All 211 Workouts
 
-Add corresponding replacement patterns in `replaceExerciseInContent` for `<br>`-prefixed lines.
+Run the function in batches of 5-10 workouts at a time (to stay within compute limits). For each workout:
+- Strip ALL existing markup from the entire `main_workout` field
+- Parse sections using emoji headers
+- Send ONLY Main Workout and Finisher sections to the AI
+- Apply AI's exercise mappings as `{{exercise:id:name}}` markup
+- Leave Warm Up, Cool Down, Activation sections as plain text (no markup)
+- Save back to DB
 
-### Step 3: Fix Replacement Pattern Bugs (exercise-matching.ts)
+### Step 4: Process All 28 Training Programs
 
-Fix why "decline push-up" in `<strong>decline push-up</strong>` wasn't replaced. Review and fix the regex replacement patterns to handle:
-- Exercise names that contain hyphens (push-up, push-ups)
-- Exercise names followed by sets/reps metadata in the same bold tag
-- Exercise names with prefix patterns like "C2:" or "B2:"
+Same approach but:
+- Process `program_structure`, `weekly_schedule`, and `progression_plan` fields
+- No section filtering (all exercises get View buttons in programs)
+- Strip existing broken markup first, then re-process with AI
 
-### Step 4: Force-Match Unmatched Exercises (exercise-matching.ts)
+### Step 5: Fix Text Artifacts
 
-New behavior for the reprocessor: when an exercise name doesn't match above the 0.65 threshold, instead of leaving it as plain text:
+The AI-based replacement will cleanly replace exercise names without leaving artifacts like "push-up -Ups" because:
+- It identifies the EXACT text span in the HTML
+- It replaces the full span with the markup, not just a substring
 
-1. Lower threshold to 0.45 and try again
-2. If a match is found, REPLACE the exercise name in the content with the matched library exercise name AND add the markup
-3. If still no match (below 0.45), leave as plain text and log to mismatched_exercises
+### Step 6: Verification
 
-This means "Plank Jacks" will be replaced with the closest plank exercise from the library, "Single-Leg Glute Bridges" will match to "glute bridge march" or similar, etc.
-
-### Step 5: Fix Training Program Reprocessor (reprocess-program-exercises)
-
-Update to handle the program HTML format properly. Programs don't have emoji section headers, so ALL exercises in the program should get View buttons (no section filtering needed for programs).
-
-### Step 6: Reprocess ALL 211 Workouts and 28 Training Programs
-
-Deploy fixed edge functions and run full reprocessing on everything.
-
-### Step 7: Verify
-
-Query the database to confirm:
-- No workout has exercise markup in warm-up/cool-down sections (emojis before 💪)
-- Every main workout and finisher exercise has `{{exercise:...}}` markup
-- Every training program exercise has `{{exercise:...}}` markup
-- Frontend renders View buttons ONLY from markup, not from live matching
+After all processing:
+- Query every workout to confirm Main Workout and Finisher sections have markup
+- Query every workout to confirm Warm Up, Cool Down, Activation have NO markup
+- Query every program to confirm exercise fields have markup
+- Report total counts
 
 ## Technical Details
 
-### Frontend changes (ExerciseHTMLContent.tsx)
+### Edge Function Structure
 
-Remove the entire Step 2 (bold matching block) and Step 3 (plain-text DOM walking block). Keep only Step 1 (markup parsing) and the DOM-to-React rendering. The `isInProcessableSection` function and `extractExerciseCandidate` function become unused and should be removed.
+```text
+supabase/functions/ai-exercise-linker/index.ts
+```
 
-The `useExerciseLibrary` hook import can be simplified since `findMatchingExercise` is no longer needed.
+The function will:
+1. Accept POST with `{type: "workout"|"program", ids: string[], batchSize?: number}`
+2. Fetch exercise library (compact format: id, name, body_part, equipment, target)
+3. For each item, call the AI model via Lovable AI gateway
+4. Parse the AI response (JSON array of exercise mappings)
+5. Apply mappings to the HTML content
+6. Save to database
+7. Return results summary
 
-### Backend extraction additions (exercise-matching.ts)
+### AI Model
 
-New Pattern 4 for `extractExerciseNames`:
-- Split HTML by `<br>` and `<br/>` tags
-- For each line, try numbered format: `N. Exercise Name - duration/reps`
-- For each line, try plain format: `Exercise Name - duration/reps`
-- For comma-separated lists: split by comma and try each
+Using `google/gemini-2.5-flash` via the Lovable AI gateway (no API key needed). This model is fast, cost-effective, and handles the structured extraction task well.
 
-New replacement patterns in `replaceExerciseInContent`:
-- Pattern for `<br>` preceded exercises: handle replacement in `<br>`-delimited content
+### Section Handling for Workouts
 
-### Force-match logic (exercise-matching.ts)
-
-New function `forceMatchExercise`:
-- First try normal matching at 0.65 threshold
-- If no match, try at 0.45 threshold
-- If match found at lower threshold, return the library exercise name as the replacement name (not the original name)
-- The reprocessor will then replace both the name AND add markup
+Reuses the existing `splitIntoSections()` function from `exercise-matching.ts` to identify sections by emoji headers. Only sends processable sections (Main Workout and Finisher) to the AI.
 
 ### Files Changed
 
-1. `src/components/ExerciseHTMLContent.tsx` - Remove live matching (Steps 2 and 3), keep only markup parsing
-2. `supabase/functions/_shared/exercise-matching.ts` - Add `<br>` extraction, fix replacement bugs, add force-match logic
-3. `supabase/functions/reprocess-wod-exercises/index.ts` - Use force-match for main workout and finisher
-4. `supabase/functions/reprocess-program-exercises/index.ts` - Use force-match for all program content
+1. `supabase/functions/ai-exercise-linker/index.ts` -- NEW: AI-powered exercise matching and replacement
+2. `supabase/functions/_shared/exercise-matching.ts` -- Minor: ensure `stripExerciseMarkup` and `splitIntoSections` are exported properly (they already are)
+3. No frontend changes needed -- the frontend already correctly renders `{{exercise:id:name}}` markup as View buttons
