@@ -117,6 +117,14 @@ const PremiumComparison = () => {
     if (value === true) {
       return <Check className="w-5 h-5 text-primary mx-auto" />;
     }
+    if (value === "Limited access") {
+      return (
+        <div className="flex items-center justify-center gap-1">
+          <Eye className="w-4 h-4 text-yellow-500" />
+          <span className="text-xs text-yellow-500 font-medium">Limited</span>
+        </div>
+      );
+    }
     return <span className="text-sm text-center">{value}</span>;
   };
 
