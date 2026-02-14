@@ -32,19 +32,31 @@ function escapeRegExp(str: string): string {
  * Returns null if text doesn't look like an exercise mention
  */
 function extractExerciseCandidate(text: string): string | null {
-  // Common patterns: "Exercise Name - duration", "Exercise Name x reps", "Exercise Name (notes)"
+  // Skip structural/instructional text
+  if (/^(perform|complete|repeat|do|hold|maintain|keep|breathe|foam roll|lacrosse ball|gentle jogging)/i.test(text.trim())) {
+    return null;
+  }
+  
+  // Skip timing-only lines like "30 seconds rest"
+  if (/^\d+\s*(seconds?|minutes?|mins?|secs?)\s*(rest|recovery|break)/i.test(text.trim())) {
+    return null;
+  }
+
   const patterns = [
-    /^([A-Za-z][A-Za-z\s'-]+?)\s*[-–—]\s*\d/i,   // "Jumping Jacks - 1 minute"
-    /^([A-Za-z][A-Za-z\s'-]+?)\s*[x×]\s*\d/i,     // "Burpees x 10"
-    /^([A-Za-z][A-Za-z\s'-]+?)\s*\(\d/i,          // "Mountain Climbers (30 sec)"
-    /^([A-Za-z][A-Za-z\s'-]+?)\s*:\s*\d/i,        // "Push-ups: 20 reps"
+    // "Jumping Jacks - 1 minute"
+    /^([A-Za-z][A-Za-z\s'-]+?)\s*[-–—]\s*\d/i,
+    // "Burpees x 10"
+    /^([A-Za-z][A-Za-z\s'-]+?)\s*[x×]\s*\d/i,
+    // "Mountain Climbers (30 sec)"
+    /^([A-Za-z][A-Za-z\s'-]+?)\s*\(\d/i,
+    // "Push-ups: 20 reps"
+    /^([A-Za-z][A-Za-z\s'-]+?)\s*:\s*\d/i,
   ];
 
   for (const pattern of patterns) {
     const match = text.match(pattern);
     if (match && match[1]) {
       const candidate = match[1].trim();
-      // Skip structural words
       if (/^(warm|cool|rest|set|rep|round|block|station|circuit|phase|day|week)/i.test(candidate)) {
         return null;
       }
@@ -53,6 +65,35 @@ function extractExerciseCandidate(text: string): string | null {
       }
     }
   }
+  
+  // NEW: "30 seconds Jumping Jacks" or "1 minute Child's Pose"
+  const durationFirst = text.trim().match(/^\d+\s*(?:seconds?|secs?|minutes?|mins?)\s+([A-Za-z][A-Za-z\s'-]+)/i);
+  if (durationFirst && durationFirst[1]) {
+    const candidate = durationFirst[1].replace(/\s*\([^)]*\)/, '').trim();
+    if (candidate.length >= 4 && candidate.length <= 50 &&
+        !/^(rest|recovery|break|each|per)/i.test(candidate)) {
+      return candidate;
+    }
+  }
+  
+  // NEW: "20 Air Squats" (number + exercise name)
+  const numberFirst = text.trim().match(/^(\d+)\s+([A-Za-z][A-Za-z\s'-]+)/);
+  if (numberFirst && numberFirst[2]) {
+    const candidate = numberFirst[2].replace(/\s*\([^)]*\)/, '').trim();
+    if (candidate.length >= 4 && candidate.length <= 50 &&
+        !/^(rounds?|sets?|reps?|seconds?|minutes?|mins?|secs?)/i.test(candidate)) {
+      return candidate;
+    }
+  }
+  
+  // NEW: Plain exercise name (no prefix/suffix) - for standalone lines like "Burpees" or "High Knees"
+  const plainText = text.trim();
+  if (/^[A-Za-z][A-Za-z\s'-]{3,50}$/.test(plainText)) {
+    if (!/^(warm|cool|rest|set|rep|round|block|station|circuit|phase|day|week|perform|complete|repeat|do|hold|maintain)/i.test(plainText)) {
+      return plainText;
+    }
+  }
+  
   return null;
 }
 
