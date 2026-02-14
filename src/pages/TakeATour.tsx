@@ -258,6 +258,30 @@ export default function TakeATour() {
                 Browse by category, difficulty, format, and equipment to find the perfect session for your goals.
               </p>
 
+              {/* Workout Categories */}
+              <div className="bg-muted/30 rounded-lg p-4 border border-border">
+                <h4 className="font-semibold mb-3">Workout Categories</h4>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  {workoutCategories.map((cat) => (
+                    <div key={cat.name} className="flex items-center gap-2 p-2 bg-background rounded-lg text-sm border border-border">
+                      <span className="text-primary">{cat.icon}</span>
+                      <span>{cat.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* The Purpose */}
+              <div className="p-4 bg-primary/10 rounded-lg border border-primary/30">
+                <h4 className="font-semibold mb-2">The Purpose</h4>
+                <p className="text-sm text-muted-foreground">
+                  Each workout is designed with a specific training goal in mind—whether it's building <strong>strength</strong>, 
+                  burning <strong>calories</strong>, improving <strong>mobility</strong>, or pushing your limits with a <strong>challenge</strong>. 
+                  Every session follows proven sports science principles.
+                </p>
+              </div>
+
+              {/* Access Levels */}
               <div className="bg-muted/30 rounded-lg p-4 border border-border">
                 <h4 className="font-semibold mb-2 flex items-center gap-2">
                   <Crown className="h-4 w-4 text-primary" />
