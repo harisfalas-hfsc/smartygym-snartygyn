@@ -1,11 +1,13 @@
 // ═══════════════════════════════════════════════════════════════════════════════
 // REPROCESS WOD EXERCISES
 // Re-runs exercise matching on existing WODs to fix broken/missing links
+// SECTION-AWARE: Only processes Main Workout and Finisher sections
 // ═══════════════════════════════════════════════════════════════════════════════
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import {
-  processContentWithExerciseMatching,
+  processContentSectionAware,
+  stripExerciseMarkup,
   logUnmatchedExercises,
   type ExerciseBasic,
 } from "../_shared/exercise-matching.ts";
@@ -16,39 +18,37 @@ const corsHeaders = {
 };
 
 Deno.serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   const LOG_PREFIX = "[REPROCESS-WOD]";
-  console.log(`${LOG_PREFIX} 🔄 Starting WOD exercise reprocessing...`);
+  console.log(`${LOG_PREFIX} 🔄 Starting WOD exercise reprocessing (section-aware)...`);
 
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Parse request body
     const body = await req.json().catch(() => ({}));
-    const { wodIds, targetDate, processAll } = body;
+    const { wodIds, targetDate, processAll, batchOffset = 0, batchSize = 50 } = body;
 
-    console.log(`${LOG_PREFIX} Request params:`, { wodIds, targetDate, processAll });
+    console.log(`${LOG_PREFIX} Request params:`, { wodIds, targetDate, processAll, batchOffset, batchSize });
 
     // Fetch WODs to reprocess
     let wodsQuery = supabase
       .from("admin_workouts")
-      .select("id, name, main_workout, warm_up, cool_down, finisher, activation");
+      .select("id, name, main_workout, warm_up, cool_down, finisher, activation")
+      .order("id");
 
     if (wodIds && Array.isArray(wodIds) && wodIds.length > 0) {
       wodsQuery = wodsQuery.in("id", wodIds);
     } else if (targetDate) {
       wodsQuery = wodsQuery.eq("generated_for_date", targetDate);
     } else if (processAll) {
-      // Process ALL workouts - no filter
-      console.log(`${LOG_PREFIX} Processing ALL workouts`);
+      wodsQuery = wodsQuery.range(batchOffset, batchOffset + batchSize - 1);
+      console.log(`${LOG_PREFIX} Processing batch: offset=${batchOffset}, size=${batchSize}`);
     } else {
-      // Default: today's WODs
       const today = new Date().toISOString().split("T")[0];
       wodsQuery = wodsQuery.eq("generated_for_date", today);
     }
@@ -71,7 +71,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log(`${LOG_PREFIX} Found ${wods.length} WODs to reprocess:`, wods.map(w => w.name));
+    console.log(`${LOG_PREFIX} Found ${wods.length} WODs to reprocess`);
 
     // Fetch exercise library
     const { data: exerciseLibrary, error: libraryError } = await supabase
@@ -101,63 +101,72 @@ Deno.serve(async (req) => {
     for (const wod of wods) {
       console.log(`${LOG_PREFIX} 📋 Processing: "${wod.name}" (${wod.id})`);
 
-      const contentFields = ["main_workout", "warm_up", "cool_down", "finisher", "activation"];
       const updates: Record<string, string> = {};
       let totalMatched = 0;
       const allUnmatched: string[] = [];
 
-      for (const field of contentFields) {
-        const content = wod[field as keyof typeof wod] as string | null;
-        if (!content) continue;
-
-        console.log(`${LOG_PREFIX} Processing field: ${field}`);
-        
-        const result = processContentWithExerciseMatching(
-          content,
+      // ── main_workout: Section-aware processing ──
+      // This field contains all sections (🧽 Soft Tissue, 🔥 Warm Up, 💪 Main Workout, ⚡ Finisher, 🧘 Cool Down)
+      // Only Main Workout and Finisher get exercise links; everything else gets markup STRIPPED
+      if (wod.main_workout) {
+        const result = processContentSectionAware(
+          wod.main_workout,
           exerciseLibrary as ExerciseBasic[],
-          `${LOG_PREFIX}[${field}]`
+          `${LOG_PREFIX}[main_workout]`
         );
-
-        updates[field] = result.processedContent;
+        updates.main_workout = result.processedContent;
         totalMatched += result.matched.length;
         allUnmatched.push(...result.unmatched);
       }
 
-      // Update the WOD with processed content
-      const { error: updateError } = await supabase
-        .from("admin_workouts")
-        .update(updates)
-        .eq("id", wod.id);
-
-      if (updateError) {
-        console.error(`${LOG_PREFIX} ❌ Failed to update WOD "${wod.name}":`, updateError);
-      } else {
-        console.log(`${LOG_PREFIX} ✅ Updated WOD "${wod.name}" - ${totalMatched} exercises matched`);
+      // ── warm_up, cool_down, activation: STRIP all exercise markup ──
+      // These separate fields should NEVER have exercise links
+      for (const field of ["warm_up", "cool_down", "activation"] as const) {
+        const content = wod[field] as string | null;
+        if (content && content.includes("{{exercise:")) {
+          updates[field] = stripExerciseMarkup(content);
+          console.log(`${LOG_PREFIX} 🧹 Stripped markup from ${field}`);
+        }
       }
 
-      // Clear old mismatched entries for this WOD
-      const { error: deleteError } = await supabase
+      // ── finisher (separate field): Process normally ──
+      if (wod.finisher) {
+        const strippedFinisher = stripExerciseMarkup(wod.finisher);
+        const { processContentWithExerciseMatching } = await import("../_shared/exercise-matching.ts");
+        const result = processContentWithExerciseMatching(
+          strippedFinisher,
+          exerciseLibrary as ExerciseBasic[],
+          `${LOG_PREFIX}[finisher]`
+        );
+        updates.finisher = result.processedContent;
+        totalMatched += result.matched.length;
+        allUnmatched.push(...result.unmatched);
+      }
+
+      // Update the WOD
+      if (Object.keys(updates).length > 0) {
+        const { error: updateError } = await supabase
+          .from("admin_workouts")
+          .update(updates)
+          .eq("id", wod.id);
+
+        if (updateError) {
+          console.error(`${LOG_PREFIX} ❌ Failed to update WOD "${wod.name}":`, updateError);
+        } else {
+          console.log(`${LOG_PREFIX} ✅ Updated WOD "${wod.name}" - ${totalMatched} exercises matched`);
+        }
+      }
+
+      // Clear old mismatched entries
+      await supabase
         .from("mismatched_exercises")
         .delete()
         .eq("source_id", wod.id);
 
-      if (deleteError) {
-        console.log(`${LOG_PREFIX} ⚠️ Failed to clear old mismatches:`, deleteError.message);
-      } else {
-        console.log(`${LOG_PREFIX} 🗑️ Cleared old mismatched entries for "${wod.name}"`);
-      }
-
-      // Log new unmatched exercises
+      // Log new unmatched
       const uniqueUnmatched = [...new Set(allUnmatched)];
       if (uniqueUnmatched.length > 0) {
-        await logUnmatchedExercises(
-          supabase,
-          uniqueUnmatched,
-          "wod",
-          wod.id,
-          wod.name,
-          LOG_PREFIX
-        );
+        await logUnmatchedExercises(supabase, uniqueUnmatched, "wod", wod.id, wod.name, LOG_PREFIX);
       }
 
       results.push({
@@ -175,6 +184,7 @@ Deno.serve(async (req) => {
       JSON.stringify({
         success: true,
         processed: wods.length,
+        batchOffset,
         results,
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }

@@ -269,19 +269,19 @@ const IndividualWorkout = () => {
                             {dbWorkout.description && (
                             <div>
                               <h2 className="text-lg font-semibold mb-2">Description</h2>
-                              <ExerciseHTMLContent content={dbWorkout.description} enableExerciseLinking={true} />
+                              <ExerciseHTMLContent content={dbWorkout.description} enableExerciseLinking={false} />
                             </div>
                           )}
                           {dbWorkout.warm_up && (
                             <div>
                               <h2 className="text-lg font-semibold mb-2">Warm Up</h2>
-                              <ExerciseHTMLContent content={dbWorkout.warm_up} enableExerciseLinking={true} />
+                              <ExerciseHTMLContent content={dbWorkout.warm_up} enableExerciseLinking={false} />
                             </div>
                           )}
                           {dbWorkout.activation && (
                             <div>
                               <h2 className="text-lg font-semibold mb-2">Activation</h2>
-                              <ExerciseHTMLContent content={dbWorkout.activation} enableExerciseLinking={true} />
+                              <ExerciseHTMLContent content={dbWorkout.activation} enableExerciseLinking={false} />
                             </div>
                           )}
                           {dbWorkout.main_workout && (
@@ -299,19 +299,19 @@ const IndividualWorkout = () => {
                           {dbWorkout.cool_down && (
                             <div>
                               <h2 className="text-lg font-semibold mb-2">Cool Down</h2>
-                              <ExerciseHTMLContent content={dbWorkout.cool_down} enableExerciseLinking={true} />
+                              <ExerciseHTMLContent content={dbWorkout.cool_down} enableExerciseLinking={false} />
                             </div>
                           )}
                           {dbWorkout.instructions && (
                             <div>
                               <h2 className="text-lg font-semibold mb-2">Instructions</h2>
-                              <ExerciseHTMLContent content={dbWorkout.instructions} enableExerciseLinking={true} />
+                              <ExerciseHTMLContent content={dbWorkout.instructions} enableExerciseLinking={false} />
                             </div>
                           )}
                           {dbWorkout.tips && (
                             <div>
                               <h2 className="text-lg font-semibold mb-2">Tips</h2>
-                              <ExerciseHTMLContent content={dbWorkout.tips} enableExerciseLinking={true} />
+                              <ExerciseHTMLContent content={dbWorkout.tips} enableExerciseLinking={false} />
                             </div>
                           )}
                         </div>
