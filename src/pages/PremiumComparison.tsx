@@ -35,14 +35,14 @@ const PremiumComparison = () => {
       category: "Workouts",
       icon: Dumbbell,
       visitor: false,
-      subscriber: "Free workouts",
+      subscriber: "Free workouts only",
       premium: "All workouts"
     },
     {
       category: "Training Programs",
       icon: Flame,
       visitor: false,
-      subscriber: "Free programs",
+      subscriber: "Free programs only",
       premium: "Full access"
     },
     {
