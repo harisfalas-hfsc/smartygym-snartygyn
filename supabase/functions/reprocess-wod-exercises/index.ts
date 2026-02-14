@@ -7,6 +7,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import {
   processContentSectionAware,
+  processContentWithExerciseMatching,
   stripExerciseMarkup,
   logUnmatchedExercises,
   type ExerciseBasic,
@@ -23,7 +24,7 @@ Deno.serve(async (req) => {
   }
 
   const LOG_PREFIX = "[REPROCESS-WOD]";
-  console.log(`${LOG_PREFIX} 🔄 Starting WOD exercise reprocessing (section-aware)...`);
+  console.log(`${LOG_PREFIX} 🔄 Starting WOD exercise reprocessing (section-aware + force-match)...`);
 
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -35,7 +36,6 @@ Deno.serve(async (req) => {
 
     console.log(`${LOG_PREFIX} Request params:`, { wodIds, targetDate, processAll, batchOffset, batchSize });
 
-    // Fetch WODs to reprocess
     let wodsQuery = supabase
       .from("admin_workouts")
       .select("id, name, main_workout, warm_up, cool_down, finisher, activation")
@@ -73,7 +73,6 @@ Deno.serve(async (req) => {
 
     console.log(`${LOG_PREFIX} Found ${wods.length} WODs to reprocess`);
 
-    // Fetch exercise library
     const { data: exerciseLibrary, error: libraryError } = await supabase
       .from("exercises")
       .select("id, name, body_part, equipment, target")
@@ -97,7 +96,6 @@ Deno.serve(async (req) => {
       unmatchedNames: string[];
     }> = [];
 
-    // Process each WOD
     for (const wod of wods) {
       console.log(`${LOG_PREFIX} 📋 Processing: "${wod.name}" (${wod.id})`);
 
@@ -106,8 +104,6 @@ Deno.serve(async (req) => {
       const allUnmatched: string[] = [];
 
       // ── main_workout: Section-aware processing ──
-      // This field contains all sections (🧽 Soft Tissue, 🔥 Warm Up, 💪 Main Workout, ⚡ Finisher, 🧘 Cool Down)
-      // Only Main Workout and Finisher get exercise links; everything else gets markup STRIPPED
       if (wod.main_workout) {
         const result = processContentSectionAware(
           wod.main_workout,
@@ -120,7 +116,6 @@ Deno.serve(async (req) => {
       }
 
       // ── warm_up, cool_down, activation: STRIP all exercise markup ──
-      // These separate fields should NEVER have exercise links
       for (const field of ["warm_up", "cool_down", "activation"] as const) {
         const content = wod[field] as string | null;
         if (content && content.includes("{{exercise:")) {
@@ -129,10 +124,9 @@ Deno.serve(async (req) => {
         }
       }
 
-      // ── finisher (separate field): Process normally ──
+      // ── finisher (separate field): Process with force-matching ──
       if (wod.finisher) {
         const strippedFinisher = stripExerciseMarkup(wod.finisher);
-        const { processContentWithExerciseMatching } = await import("../_shared/exercise-matching.ts");
         const result = processContentWithExerciseMatching(
           strippedFinisher,
           exerciseLibrary as ExerciseBasic[],
