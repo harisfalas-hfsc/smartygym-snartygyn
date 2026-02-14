@@ -1,108 +1,99 @@
 
-# Fix Exercise View Buttons - Do It Right This Time
+# Fix ALL Exercise View Buttons - Final Comprehensive Fix
 
-## What Went Wrong
+## Root Causes Found
 
-1. **6 fake exercises were added to the library** with no GIFs, no proper descriptions. These must be deleted: `jumping-lunges`, `tuck-jumps`, `air-squats`, `plank-shoulder-taps`, `bodyweight-crunches`, `butt-kicks`
-2. **Warm-up and cool-down exercises got View buttons** because the reprocessor doesn't distinguish between sections within the `main_workout` field -- it processes the entire field blindly
-3. **159 out of 210 workouts** store warm-up, main workout, finisher, AND cool-down ALL inside the single `main_workout` database field, so the reprocessor can't just skip fields -- it needs to parse sections WITHIN the HTML
+1. **Frontend re-adds View buttons to warm-up/cool-down**: `ExerciseHTMLContent.tsx` does live fuzzy matching on ALL rendered text, overriding the clean DB data. Even if the DB has no markup in warm-up, the frontend matches "Jumping Jacks" and "High Knees" and adds View buttons at render time.
+
+2. **Training programs have ZERO exercise markup**: Program content uses `<br>`-separated lines (`1. Squat to Press - 40 sec work`) which the extraction logic doesn't handle. It only handles `<strong>` tags and `<li>` items.
+
+3. **Some workout exercises missed despite existing in library**: "decline push-up" (id: 0279), "diamond push-up" (id: 0283) exist in the library but were not marked up. Likely a replacement pattern bug.
+
+4. **Missing exercises left as plain text**: User's requirement is clear: if an exercise doesn't match the library, REPLACE the exercise name with the closest library match. Every exercise in main workout/finisher MUST have a View button.
 
 ## The Fix
 
-### Step 1: Delete the 6 Fake Exercises from Library
+### Step 1: Remove Live Frontend Matching (ExerciseHTMLContent.tsx)
 
-Remove `jumping-lunges`, `tuck-jumps`, `air-squats`, `plank-shoulder-taps`, `bodyweight-crunches`, `butt-kicks` from the `exercises` table. These have no GIFs and no real content.
+Remove Steps 2 and 3 (bold matching and plain-text matching) from the frontend component entirely. The frontend will ONLY:
+- Parse `{{exercise:id:name}}` markup (Step 1) and render View buttons for those
+- Render everything else as plain HTML
 
-### Step 2: Make the Reprocessor Section-Aware
+This eliminates ALL frontend section-awareness bugs permanently. The backend reprocessor is the single source of truth for exercise linking.
 
-Update `supabase/functions/_shared/exercise-matching.ts` to add a new function `processMainWorkoutAndFinisherOnly()` that:
+### Step 2: Fix Backend Extraction for Training Programs (exercise-matching.ts)
 
-- Parses the HTML content to detect section headers (by looking for patterns like "Main Workout", "Finisher" in bold/underlined text)
-- ONLY applies exercise matching within Main Workout and Finisher sections
-- Leaves Warm Up, Cool Down, Soft Tissue Preparation, and Activation sections completely untouched
-- Strips any existing exercise markup (`{{exercise:...}}`) from non-Main/Finisher sections
+Add new extraction patterns to `extractExerciseNames`:
 
-### Step 3: Update the Reprocess Edge Function
+- **`<br>`-separated numbered lines**: `1. Squat to Press - 40 sec work` extracts "Squat to Press"
+- **`<br>`-separated plain lines**: `Goblet Squats, RDL, Rows, Press - 3x12 each` extracts each comma-separated exercise
+- **Lines after `<br>` tags**: Many programs use `<br>` instead of `<li>` for line breaks
 
-Update `supabase/functions/reprocess-wod-exercises/index.ts` to:
+Add corresponding replacement patterns in `replaceExerciseInContent` for `<br>`-prefixed lines.
 
-- Use the new section-aware processing for the `main_workout` field
-- For separate `finisher` fields (if they exist), process normally
-- For `warm_up`, `cool_down`, and `activation` fields: STRIP any exercise markup instead of adding it
+### Step 3: Fix Replacement Pattern Bugs (exercise-matching.ts)
 
-### Step 4: Handle Missing Exercises Properly
+Fix why "decline push-up" in `<strong>decline push-up</strong>` wasn't replaced. Review and fix the regex replacement patterns to handle:
+- Exercise names that contain hyphens (push-up, push-ups)
+- Exercise names followed by sets/reps metadata in the same bold tag
+- Exercise names with prefix patterns like "C2:" or "B2:"
 
-When an exercise name in a workout doesn't match any existing library exercise (above 0.65 confidence), the system will:
-- Leave it as plain text (no View button)
-- Log it to `mismatched_exercises` table for admin review
-- NOT add fake exercises to the library
+### Step 4: Force-Match Unmatched Exercises (exercise-matching.ts)
 
-For the exercises that were previously linked to the 6 fake IDs, the reprocessor will try to match them to real existing exercises:
-- "jumping lunge" should match to something like "lunge" or "jump squat" from the real library
-- "air squat" should match to "bodyweight squat" (id: 3533) 
-- "butt kicks" should match to an existing cardio exercise if one exists
-- If no good match exists (below threshold), it stays as plain text
+New behavior for the reprocessor: when an exercise name doesn't match above the 0.65 threshold, instead of leaving it as plain text:
 
-### Step 5: Strip Existing Bad Markup from All Content
+1. Lower threshold to 0.45 and try again
+2. If a match is found, REPLACE the exercise name in the content with the matched library exercise name AND add the markup
+3. If still no match (below 0.45), leave as plain text and log to mismatched_exercises
 
-Before reprocessing, scan all 210 workouts and:
-- Remove any `{{exercise:jumping-lunges:...}}`, `{{exercise:tuck-jumps:...}}`, `{{exercise:air-squats:...}}`, `{{exercise:plank-shoulder-taps:...}}`, `{{exercise:bodyweight-crunches:...}}`, `{{exercise:butt-kicks:...}}` markup (references to deleted exercises)
-- Remove ALL exercise markup from warm-up, cool-down, and activation sections within `main_workout`
-- Then re-run matching ONLY on main workout and finisher sections
+This means "Plank Jacks" will be replaced with the closest plank exercise from the library, "Single-Leg Glute Bridges" will match to "glute bridge march" or similar, etc.
 
-### Step 6: Reprocess All 210 Workouts and 28 Programs
+### Step 5: Fix Training Program Reprocessor (reprocess-program-exercises)
 
-Deploy and run the fixed reprocessor on everything. Then verify.
+Update to handle the program HTML format properly. Programs don't have emoji section headers, so ALL exercises in the program should get View buttons (no section filtering needed for programs).
 
-### Step 7: Update Frontend (IndividualWorkout.tsx)
+### Step 6: Reprocess ALL 211 Workouts and 28 Training Programs
 
-Change `enableExerciseLinking` to `false` for Warm Up, Cool Down, Activation, Description, Instructions, and Tips sections. Only keep it `true` for Main Workout and Finisher.
+Deploy fixed edge functions and run full reprocessing on everything.
 
-### Step 8: Verify and Report
+### Step 7: Verify
 
-- Query every workout to confirm no exercise markup exists in warm-up/cool-down sections
-- Confirm all main workout and finisher exercises either have valid View buttons (linking to real exercises with GIFs) or are plain text
-- Confirm the 6 fake exercises are deleted
-- Provide full report
+Query the database to confirm:
+- No workout has exercise markup in warm-up/cool-down sections (emojis before 💪)
+- Every main workout and finisher exercise has `{{exercise:...}}` markup
+- Every training program exercise has `{{exercise:...}}` markup
+- Frontend renders View buttons ONLY from markup, not from live matching
 
 ## Technical Details
 
-### Section Detection Logic
+### Frontend changes (ExerciseHTMLContent.tsx)
 
-The `main_workout` field uses emoji headers to separate sections:
+Remove the entire Step 2 (bold matching block) and Step 3 (plain-text DOM walking block). Keep only Step 1 (markup parsing) and the DOM-to-React rendering. The `isInProcessableSection` function and `extractExerciseCandidate` function become unused and should be removed.
 
-```text
-Soft Tissue Preparation 5'  (skip)
-Warm Up 5'                   (skip)
-Main Workout: ...            (PROCESS - add View buttons)
-Finisher: ...                (PROCESS - add View buttons)  
-Cool Down 5'                 (skip)
-```
+The `useExerciseLibrary` hook import can be simplified since `findMatchingExercise` is no longer needed.
 
-The code will split HTML by these header patterns and only process the "Main Workout" and "Finisher" blocks.
+### Backend extraction additions (exercise-matching.ts)
 
-### Frontend Changes (IndividualWorkout.tsx)
+New Pattern 4 for `extractExerciseNames`:
+- Split HTML by `<br>` and `<br/>` tags
+- For each line, try numbered format: `N. Exercise Name - duration/reps`
+- For each line, try plain format: `Exercise Name - duration/reps`
+- For comma-separated lists: split by comma and try each
 
-```text
-Warm Up:      enableExerciseLinking={false}
-Activation:   enableExerciseLinking={false}
-Main Workout: enableExerciseLinking={true}
-Finisher:     enableExerciseLinking={true}
-Cool Down:    enableExerciseLinking={false}
-Instructions: enableExerciseLinking={false}
-Tips:         enableExerciseLinking={false}
-Description:  enableExerciseLinking={false}
-```
+New replacement patterns in `replaceExerciseInContent`:
+- Pattern for `<br>` preceded exercises: handle replacement in `<br>`-delimited content
 
-### Database Changes
+### Force-match logic (exercise-matching.ts)
 
-- DELETE 6 fake exercises from `exercises` table
-- UPDATE all `admin_workouts` to strip bad markup from warm-up/cool-down sections
-- UPDATE all `admin_workouts` main workout and finisher sections with correct exercise markup
+New function `forceMatchExercise`:
+- First try normal matching at 0.65 threshold
+- If no match, try at 0.45 threshold
+- If match found at lower threshold, return the library exercise name as the replacement name (not the original name)
+- The reprocessor will then replace both the name AND add markup
 
 ### Files Changed
 
-1. `supabase/functions/_shared/exercise-matching.ts` - Add section-aware processing
-2. `supabase/functions/reprocess-wod-exercises/index.ts` - Use section-aware processing, strip warm-up/cool-down markup
-3. `src/pages/IndividualWorkout.tsx` - Disable exercise linking for non-main-workout sections
-4. `src/components/WorkoutDisplay.tsx` - Same frontend fix for workout display component
+1. `src/components/ExerciseHTMLContent.tsx` - Remove live matching (Steps 2 and 3), keep only markup parsing
+2. `supabase/functions/_shared/exercise-matching.ts` - Add `<br>` extraction, fix replacement bugs, add force-match logic
+3. `supabase/functions/reprocess-wod-exercises/index.ts` - Use force-match for main workout and finisher
+4. `supabase/functions/reprocess-program-exercises/index.ts` - Use force-match for all program content
