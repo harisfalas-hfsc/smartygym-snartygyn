@@ -31,15 +31,17 @@ serve(async (req) => {
     }
 
     // Fetch real exercise library from database
+    // Determine equipment filter: if user selected bodyweight-only, filter library
+    const equipmentFilter = data?.equipment?.toLowerCase() === 'bodyweight' ? 'body weight' : undefined;
     const { exercises: exerciseLibrary, referenceList: exerciseReferenceList } = 
-      await fetchAndBuildExerciseReference(supabase, "[TrainingProgram]");
+      await fetchAndBuildExerciseReference(supabase, "[TrainingProgram]", equipmentFilter);
     
     // Build a simple comma-separated list for backward compatibility in prompts
     const exerciseList = exerciseLibrary.length > 0 
       ? exerciseLibrary.map(e => e.name).join(', ')
       : 'Push-ups, Pull-ups, Squats, Lunges, Planks, Mountain Climbers, Burpees';
     
-    console.log(`[TrainingProgram] Available exercises (${exerciseLibrary.length}):`, exerciseList.substring(0, 200) + '...');
+    console.log(`[TrainingProgram] Available exercises (${exerciseLibrary.length}, filter: ${equipmentFilter || 'none'}):`, exerciseList.substring(0, 200) + '...');
 
     let systemPrompt = '';
     let userPrompt = '';
