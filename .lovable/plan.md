@@ -1,53 +1,83 @@
 
 
-# Fix Equipment Exercises in Bodyweight Workouts + Missing View Buttons
+# Fix Missing View Buttons + Enforce Exercise Library for AI Generation
 
-## The Problem
+## Equipment Rule (Crystal Clear)
 
-1. **Equipment exercises inside BODYWEIGHT workouts**: The exercise matching engine matched text to the closest library name without checking equipment compatibility. "Squat" matched to "Smith Chair Squat" instead of "Bodyweight Squat." Found in 70+ bodyweight workouts.
-2. **Missing View buttons**: Some exercises like "Mountain Climbers" were left as plain text without the `{{exercise:id:name}}` markup needed for View buttons.
+- **BODYWEIGHT workouts**: AI sees ONLY exercises where `equipment = 'body weight'`. No kettlebells, no barbells, no dumbbells, no machines -- period.
+- **EQUIPMENT workouts**: AI sees the ENTIRE 1,329-exercise library (bodyweight exercises ARE allowed inside equipment workouts, plus all equipment exercises). No filtering.
 
-## The Fix
+## Two Problems to Fix
 
-### Step 1: Create a new backend function `audit-fix-bodyweight-workouts`
+### Problem 1: Missing View Buttons on Existing Workouts
+Some exercises in existing workouts are plain text without `{{exercise:id:name}}` markup. The `ai-exercise-linker` needs to run across ALL workouts to add View buttons.
 
-This function will:
-- Fetch ALL workouts where `equipment = 'BODYWEIGHT'`
-- Scan `main_workout` and `finisher` HTML for every `{{exercise:ID:NAME}}` tag
-- For each matched exercise, look up its `equipment` field in the exercise library
-- If the exercise requires equipment (not "body weight"), find the closest bodyweight alternative from the library using the same body part and target muscle
-- Replace the equipment exercise markup with the correct bodyweight exercise markup
-- Also scan for unlinked exercise text (like "Mountain Climbers") and add proper `{{exercise:id:name}}` markup
-- Process all 70+ affected workouts in one run without stopping
+### Problem 2: AI Generates Exercises Not in the Library
+Current prompt says "PREFER listed exercises" -- too permissive. Must change to "ONLY use exercises from this library. NEVER invent exercises."
 
-### Step 2: Update the shared exercise-matching module
+## Implementation Steps
 
-Add an equipment-compatibility check to `processContentWithExerciseMatching` so that when a workout is tagged as BODYWEIGHT, only exercises with `equipment = 'body weight'` can be matched. This prevents the problem from recurring in future processing.
+### Step 1: Update shared exercise-matching module
 
-### Step 3: Run the function on all bodyweight workouts
+File: `supabase/functions/_shared/exercise-matching.ts`
 
-Process every single bodyweight workout (estimated ~100+), fix all equipment mismatches, fix all missing View buttons, and generate a full report showing:
-- Which workouts were fixed
-- Which exercises were swapped (old exercise -> new exercise)
-- Which exercises got new View buttons
-- Any exercises that could not be matched
+- Add `equipmentFilter` parameter to `buildExerciseReferenceList` and `fetchAndBuildExerciseReference`
+- When `equipmentFilter = 'body weight'`, filter library to bodyweight-only exercises
+- When no filter (equipment workouts), pass full library
+- Change prompt from "PREFER listed exercises" to: **"You MUST ONLY use exercises from this list. Using ANY exercise not on this list is FORBIDDEN."**
 
-### Step 4: Verification
+### Step 2: Update workout-of-day generation
 
-Query the database to confirm zero bodyweight workouts contain equipment exercises, and all exercises in Main Workout and Finisher sections have View button markup.
+File: `supabase/functions/generate-workout-of-day/index.ts`
 
-## What Will NOT Change
-- Exercise names displayed to users stay natural (the replacement will be a biomechanically equivalent bodyweight exercise)
-- Workout structure, formatting, and layout remain untouched
-- Equipment workouts are not affected
-- Training programs are not affected by this fix
+- When generating BODYWEIGHT workout: pass `equipmentFilter: 'body weight'`
+- When generating EQUIPMENT workout: pass no filter (full library)
 
-## Technical Details
+### Step 3: Update training program generation
 
-- New edge function: `supabase/functions/audit-fix-bodyweight-workouts/index.ts`
-- Modified shared module: `supabase/functions/_shared/exercise-matching.ts` (add equipment filter parameter)
-- Database tables read: `exercises` (for equipment field lookup), `admin_workouts` (for content)
-- Database tables written: `admin_workouts` (corrected content)
-- No frontend changes needed
-- No AI balance consumed (pure string matching, no LLM calls)
+File: `supabase/functions/generate-training-program/index.ts`
+
+- Same equipment filter logic as workout generation
+
+### Step 4: Create batch-relink function and run on ALL workouts
+
+File: `supabase/functions/batch-relink-exercises/index.ts`
+
+- Fetches ALL workout IDs from `admin_workouts` (both bodyweight AND equipment)
+- Calls `ai-exercise-linker` in batches of 3-5 workouts
+- Processes `main_workout` and `finisher` fields
+- Adds `{{exercise:id:name}}` markup to every exercise that matches the library
+- Reports which workouts were updated and how many View buttons were added
+
+### Step 5: Store uploaded JSON as reference
+
+File: `public/data/exerciseData_complete.json`
+
+- Copy of the uploaded exercise library as documented reference
+- Actual exercise data still comes from the `exercises` database table
+
+### Step 6: Verification
+
+- Query database to confirm all exercises in Main Workout and Finisher sections have View button markup
+- Confirm zero bodyweight workouts contain equipment-only exercises
+- Full report with counts
+
+## What Changes
+
+| File | Change |
+|------|--------|
+| `_shared/exercise-matching.ts` | Add equipment filter + strict prompt language |
+| `generate-workout-of-day/index.ts` | Pass equipment type for filtering |
+| `generate-training-program/index.ts` | Same equipment filter |
+| `batch-relink-exercises/index.ts` | New function to relink all workouts |
+| `public/data/exerciseData_complete.json` | Reference copy of exercise library |
+
+## Cost Estimate
+- Running ai-exercise-linker on ~213 workouts: approximately $0.50-$1.50 one-time (Gemini 2.5 Flash)
+
+## What Does NOT Change
+- Exercise names displayed to users
+- Workout structure, formatting, layout
+- Training programs (not relinked in this batch -- can be done separately)
+- Frontend components
 
