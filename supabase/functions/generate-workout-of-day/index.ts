@@ -640,14 +640,18 @@ This is a NUDGE, not a mandate.
 
     // ═══════════════════════════════════════════════════════════════════════════════
     // EXERCISE LIBRARY: Fetch and build reference list for AI prompt
-    // This ensures the AI uses exact exercise names from our library
+    // BODYWEIGHT workouts → only bodyweight exercises visible to AI
+    // EQUIPMENT workouts → full library (bodyweight + all equipment)
     // ═══════════════════════════════════════════════════════════════════════════════
-    const { exercises: exerciseLibrary, referenceList: exerciseReferenceList } = 
-      await fetchAndBuildExerciseReference(supabase, "[GENERATE-WOD]");
+    // We fetch BOTH versions so each equipment type gets the right library
+    const { exercises: bodyweightExercises, referenceList: bodyweightReferenceList } = 
+      await fetchAndBuildExerciseReference(supabase, "[GENERATE-WOD-BW]", "body weight");
+    const { exercises: fullExercises, referenceList: fullReferenceList } = 
+      await fetchAndBuildExerciseReference(supabase, "[GENERATE-WOD-FULL]");
     
-    logStep("Exercise library loaded for prompt injection", { 
-      exerciseCount: exerciseLibrary.length,
-      referenceListLength: exerciseReferenceList.length 
+    logStep("Exercise libraries loaded", { 
+      bodyweightCount: bodyweightExercises.length,
+      fullCount: fullExercises.length
     });
 
     for (const equipment of equipmentTypes) {
@@ -707,8 +711,8 @@ Generate a complete workout with these specifications:
 - Difficulty: ${selectedDifficulty.name} (${selectedDifficulty.stars} stars out of 6)
 - Format: ${format}
 
-${exerciseReferenceList ? `
-${exerciseReferenceList}
+${(equipment === "BODYWEIGHT" ? bodyweightReferenceList : fullReferenceList) ? `
+${equipment === "BODYWEIGHT" ? bodyweightReferenceList : fullReferenceList}
 
 ` : ''}
 ═══════════════════════════════════════════════════════════════════════════════
@@ -2011,8 +2015,9 @@ Return JSON with these exact fields:
       // EXERCISE LIBRARY MATCHING - Post-processing safety net
       // Scans generated content, fuzzy-matches to exercise library, adds View buttons
       // ═══════════════════════════════════════════════════════════════════════════════
-      if (exerciseLibrary.length > 0) {
-        logStep(`Running exercise matching for ${equipment} workout...`);
+      const currentExerciseLibrary = equipment === "BODYWEIGHT" ? bodyweightExercises : fullExercises;
+      if (currentExerciseLibrary.length > 0) {
+        logStep(`Running exercise matching for ${equipment} workout (${currentExerciseLibrary.length} exercises)...`);
         
         const contentFields = ['main_workout'] as const;
         let totalMatched = 0;
@@ -2024,7 +2029,7 @@ Return JSON with these exact fields:
           
           const result = processContentWithExerciseMatching(
             content,
-            exerciseLibrary,
+            currentExerciseLibrary,
             `[WOD-MATCH][${equipment}][${field}]`
           );
           

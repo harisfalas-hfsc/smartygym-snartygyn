@@ -685,11 +685,19 @@ export async function logUnmatchedExercises(
 
 /**
  * Build a condensed exercise reference list for AI prompts.
+ * @param exercises - The exercise library to build from
+ * @param equipmentFilter - Optional: when set to 'body weight', only bodyweight exercises are included.
+ *                          When undefined/null, the FULL library is used (for EQUIPMENT workouts).
  */
-export function buildExerciseReferenceList(exercises: ExerciseBasic[]): string {
+export function buildExerciseReferenceList(exercises: ExerciseBasic[], equipmentFilter?: string): string {
+  // Apply equipment filter if specified
+  const filtered = equipmentFilter
+    ? exercises.filter(ex => (ex.equipment || '').toLowerCase() === equipmentFilter.toLowerCase())
+    : exercises;
+
   const grouped: Record<string, Record<string, string[]>> = {};
   
-  for (const ex of exercises) {
+  for (const ex of filtered) {
     const bodyPart = (ex.body_part || 'other').toUpperCase();
     const equip = (ex.equipment || 'body weight').toLowerCase();
     
@@ -699,10 +707,17 @@ export function buildExerciseReferenceList(exercises: ExerciseBasic[]): string {
   }
   
   const lines: string[] = [
-    'EXERCISE LIBRARY REFERENCE (MANDATORY - USE EXACT NAMES):',
-    'You MUST use exercises from this library. Write the exercise name EXACTLY as listed below.',
-    'Choose exercises that match the workout category, equipment type, difficulty, and focus.',
-    'If you need an exercise not on this list, write it clearly but PREFER listed exercises.',
+    '═══════════════════════════════════════════════════════════════════════════════',
+    'EXERCISE LIBRARY (ABSOLUTE CONSTRAINT — READ CAREFULLY):',
+    '═══════════════════════════════════════════════════════════════════════════════',
+    '',
+    'You MUST ONLY use exercises from this list. Using ANY exercise not on this list is FORBIDDEN.',
+    'Write the exercise name EXACTLY as listed below — no variations, no inventions, no synonyms.',
+    'If the exercise you want is not here, pick the closest biomechanical equivalent FROM THIS LIST.',
+    'NEVER invent, rename, or create exercises that are not listed below.',
+    equipmentFilter
+      ? `This is a BODYWEIGHT workout. ONLY bodyweight exercises are available (${filtered.length} exercises).`
+      : `Full exercise library available (${filtered.length} exercises — bodyweight + all equipment).`,
     ''
   ];
   
@@ -723,23 +738,45 @@ export function buildExerciseReferenceList(exercises: ExerciseBasic[]): string {
 
 /**
  * Fetch exercise library from Supabase and build reference list.
+ * @param supabaseClient - Supabase client instance
+ * @param logPrefix - Log prefix for debugging
+ * @param equipmentFilter - Optional: 'body weight' to filter to bodyweight-only exercises.
+ *                          Undefined = full library (for EQUIPMENT workouts).
  */
 export async function fetchAndBuildExerciseReference(
   supabaseClient: any,
-  logPrefix: string = "[EXERCISE-REF]"
+  logPrefix: string = "[EXERCISE-REF]",
+  equipmentFilter?: string
 ): Promise<{ exercises: ExerciseBasic[]; referenceList: string }> {
-  const { data: exercises, error } = await supabaseClient
-    .from("exercises")
-    .select("id, name, body_part, equipment, target")
-    .limit(2000);
+  // Paginate to get ALL exercises (Supabase default limit is 1000)
+  const allExercises: ExerciseBasic[] = [];
+  let from = 0;
+  const pageSize = 1000;
   
-  if (error || !exercises) {
-    console.error(`${logPrefix} Failed to fetch exercise library:`, error);
-    return { exercises: [], referenceList: '' };
+  while (true) {
+    const { data, error } = await supabaseClient
+      .from("exercises")
+      .select("id, name, body_part, equipment, target")
+      .range(from, from + pageSize - 1);
+    
+    if (error) {
+      console.error(`${logPrefix} Failed to fetch exercise library:`, error);
+      return { exercises: [], referenceList: '' };
+    }
+    
+    if (!data || data.length === 0) break;
+    allExercises.push(...data);
+    if (data.length < pageSize) break;
+    from += pageSize;
   }
   
-  console.log(`${logPrefix} Loaded ${exercises.length} exercises from library`);
-  const referenceList = buildExerciseReferenceList(exercises);
+  console.log(`${logPrefix} Loaded ${allExercises.length} exercises from library${equipmentFilter ? ` (filter: ${equipmentFilter})` : ' (full library)'}`);
+  const referenceList = buildExerciseReferenceList(allExercises, equipmentFilter);
   
-  return { exercises, referenceList };
+  // Return filtered exercises for post-processing matching too
+  const exercisesForMatching = equipmentFilter
+    ? allExercises.filter(ex => (ex.equipment || '').toLowerCase() === equipmentFilter.toLowerCase())
+    : allExercises;
+  
+  return { exercises: exercisesForMatching, referenceList };
 }
