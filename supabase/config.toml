@@ -251,3 +251,6 @@ verify_jwt = false
 
 [functions.ai-exercise-linker]
 verify_jwt = false
+
+[functions.audit-fix-bodyweight-workouts]
+verify_jwt = false
