@@ -1,55 +1,53 @@
 
 
-# SEO Optimization for All 1,329 Exercises (Backend Only)
+# Fix Equipment Exercises in Bodyweight Workouts + Missing View Buttons
 
-## Visual Impact: NONE
+## The Problem
 
-No visible changes for users or visitors. Exercise names, card layouts, filters, modal designs -- everything stays exactly the same. All changes happen in database fields used only by search engines and AI crawlers.
+1. **Equipment exercises inside BODYWEIGHT workouts**: The exercise matching engine matched text to the closest library name without checking equipment compatibility. "Squat" matched to "Smith Chair Squat" instead of "Bodyweight Squat." Found in 70+ bodyweight workouts.
+2. **Missing View buttons**: Some exercises like "Mountain Climbers" were left as plain text without the `{{exercise:id:name}}` markup needed for View buttons.
 
-## What Changes (Backend Only)
+## The Fix
 
-### 1. `exercises.description` field (database)
-Append branded keywords after a ` | ` separator at the end of each exercise's existing description. The original description text is fully preserved.
+### Step 1: Create a new backend function `audit-fix-bodyweight-workouts`
 
-**Example for "Dumbbell Bicep Curl":**
-> [existing description text...] | SmartyGym Dumbbell Bicep Curl, SmartyGym Haris Falas, SmartyGym Online Exercise, SmartyGym Online Workout, smartygym.com Online Fitness Platform, SmartyGym Online Coaching, SmartyGym Online Personal Training, Haris Falas Coach, Haris Falas Personal Training
+This function will:
+- Fetch ALL workouts where `equipment = 'BODYWEIGHT'`
+- Scan `main_workout` and `finisher` HTML for every `{{exercise:ID:NAME}}` tag
+- For each matched exercise, look up its `equipment` field in the exercise library
+- If the exercise requires equipment (not "body weight"), find the closest bodyweight alternative from the library using the same body part and target muscle
+- Replace the equipment exercise markup with the correct bodyweight exercise markup
+- Also scan for unlinked exercise text (like "Mountain Climbers") and add proper `{{exercise:id:name}}` markup
+- Process all 70+ affected workouts in one run without stopping
 
-### 2. `seo_metadata` table (database) -- never rendered to users
-Insert 1,329 rows with:
-- `meta_title`: "SmartyGym [Exercise Name] - Online Exercise Library"
-- `meta_description`: Branded summary
-- `keywords`: Array of branded terms + exercise-specific terms
-- `image_alt_text`: Branded alt text for search engines
+### Step 2: Update the shared exercise-matching module
 
-### 3. GIF `alt` attribute in `ExerciseDetailModal.tsx`
-Update the alt text to use branded text from the description. This is invisible to sighted users -- only read by search engines and screen readers.
+Add an equipment-compatibility check to `processContentWithExerciseMatching` so that when a workout is tagged as BODYWEIGHT, only exercises with `equipment = 'body weight'` can be matched. This prevents the problem from recurring in future processing.
 
-## Implementation Steps
+### Step 3: Run the function on all bodyweight workouts
 
-### Step 1: Create backend function `seo-exercise-optimizer`
-- Fetches exercises in batches of 50
-- For each exercise, builds the keyword string using exercise name + all branded keywords
-- Appends to existing description (preserving original)
-- Updates database
-- Processes all 1,329 exercises without stopping
-
-### Step 2: Populate `seo_metadata` entries
-- Insert SEO metadata rows for each exercise (content_type = 'exercise')
-- Completely backend -- no frontend rendering
-
-### Step 3: Minor frontend update
-- In `ExerciseDetailModal.tsx`, enhance the `alt` attribute on the GIF image to include "SmartyGym" branding (invisible to users, helps image SEO)
+Process every single bodyweight workout (estimated ~100+), fix all equipment mismatches, fix all missing View buttons, and generate a full report showing:
+- Which workouts were fixed
+- Which exercises were swapped (old exercise -> new exercise)
+- Which exercises got new View buttons
+- Any exercises that could not be matched
 
 ### Step 4: Verification
-- Query all 1,329 exercises to confirm every description contains "SmartyGym"
-- Confirm 1,329 `seo_metadata` entries exist
-- Final report with counts
 
-## What Does NOT Change
-- Exercise names (displayed on cards and modal titles)
-- Exercise card layout and design
-- Filter dropdowns and search
-- Modal structure and content layout
-- Any existing SEO on other pages
-- Workout/program exercise linking and View buttons
+Query the database to confirm zero bodyweight workouts contain equipment exercises, and all exercises in Main Workout and Finisher sections have View button markup.
+
+## What Will NOT Change
+- Exercise names displayed to users stay natural (the replacement will be a biomechanically equivalent bodyweight exercise)
+- Workout structure, formatting, and layout remain untouched
+- Equipment workouts are not affected
+- Training programs are not affected by this fix
+
+## Technical Details
+
+- New edge function: `supabase/functions/audit-fix-bodyweight-workouts/index.ts`
+- Modified shared module: `supabase/functions/_shared/exercise-matching.ts` (add equipment filter parameter)
+- Database tables read: `exercises` (for equipment field lookup), `admin_workouts` (for content)
+- Database tables written: `admin_workouts` (corrected content)
+- No frontend changes needed
+- No AI balance consumed (pure string matching, no LLM calls)
 
