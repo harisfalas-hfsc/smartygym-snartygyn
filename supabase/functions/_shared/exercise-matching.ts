@@ -215,9 +215,9 @@ const PREFIX_PATTERNS = [
   /^exercise\s*\d*:\s*/i,
   /^movement\s*\d*:\s*/i,
   /^block\s*\d*:\s*/i,
-  /^[A-D]\d+[\.:]?\s*/i,
-  /^[A-D]\d*[\.:]\s*/i,
-  /^[A-D]\d*\)\s*/i,
+  /^[A-D]\d+[\.:]?\s*/,
+  /^[A-D]\d*[\.:]\s*/,
+  /^[A-D]\d*\)\s*/,
 ];
 
 // Patterns that are purely structural (no exercise follows)
@@ -266,6 +266,8 @@ function isLikelyExerciseName(text: string): boolean {
 function cleanExerciseName(text: string): string {
   let cleaned = text;
   cleaned = cleaned.replace(/^\d+\.\s*/, '');
+  // Strip superset labels like "A1:", "B:", "C2.", "D)" at the start
+  cleaned = cleaned.replace(/^[A-D]\d*[\.\:\)]\s*/i, '').trim();
   cleaned = cleaned.replace(/[:;.]+$/, '');
   cleaned = cleaned.replace(/\s+machine\s*$/i, '');
   cleaned = cleaned.replace(/:\s*\d+\s*(?:sets?|rounds?|reps?|x\s|×\s|min|sec).*/i, '').trim();
@@ -466,7 +468,9 @@ function replaceExerciseInContent(
   replacementName?: string
 ): string {
   const escaped = escapeRegExp(exerciseName);
-  const escapedWithSuffix = escaped + '(?:s)?(?:\\s+[Mm]achine)?(?:[:;.])?\\s*';
+  // Use word boundary after the name to prevent partial matches on hyphenated names
+  // e.g. "chin-up" should not leave trailing "-up" after replacement
+  const escapedWithSuffix = escaped + '(?=[^a-zA-Z0-9-]|$)' + '(?:s)?(?:\\s+[Mm]achine)?(?:[:;.])?\\s*';
   let result = content;
   
   const patterns = [
@@ -475,7 +479,7 @@ function replaceExerciseInContent(
     // 2. With Tabata/Station/Exercise prefix inside bold
     new RegExp(`(<(?:strong|b)>(?:(?:Tabata|Station|Exercise|Movement|Block)\\s*(?:Round\\s*)?\\d*:\\s*))${escapedWithSuffix}(<\/(?:strong|b)>)`, 'gi'),
     // 3. With A1:/B2: prefix inside bold
-    new RegExp(`(<(?:strong|b)>[A-D]\\d*[\\.:]\\s*)${escapedWithSuffix}(<\/(?:strong|b)>)`, 'gi'),
+    new RegExp(`(<(?:strong|b)>[A-Da-d]\\d*[\\.:]\\s*)${escapedWithSuffix}(<\/(?:strong|b)>)`, 'g'),
     // 4. With parenthetical qualifiers inside bold
     new RegExp(`(<(?:strong|b)>(?:\\d+\\.\\s*)?)${escaped}(?:s)?(?:\\s+[Mm]achine)?(?:\\s*\\([^)]*\\))?(?:[:;.])?\\s*(<\/(?:strong|b)>)`, 'gi'),
     // 5. After a closing bold tag
