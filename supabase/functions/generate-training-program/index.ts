@@ -3,6 +3,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.75.0';
 import { 
   processContentWithExerciseMatching, 
+  processContentSectionAware,
   logUnmatchedExercises,
   fetchAndBuildExerciseReference,
   type ExerciseBasic 
@@ -50,6 +51,10 @@ serve(async (req) => {
       systemPrompt = `You are an expert fitness coach. Create a detailed workout plan.
 
 ${exerciseReferenceList}
+
+MANDATORY: For EVERY exercise you include in the Main Workout and Finisher sections, you MUST write it as:
+{{exercise:ID:Exact Name}}
+Pick the ID and Name EXACTLY from the library above.
 
 The user will select: CATEGORY, EQUIPMENT TYPE, DIFFICULTY, FORMAT, DURATION, and MUSCLE FOCUS.
 
@@ -265,9 +270,14 @@ Available exercises: ${exerciseList}`;
 
 ${exerciseReferenceList}
 
+MANDATORY: For EVERY exercise you include, you MUST write it as:
+{{exercise:ID:Exact Name}}
+Pick the ID and Name EXACTLY from the library above.
+If you write ANY exercise without {{exercise:ID:Name}} format, the program will be REJECTED.
+
 CRITICAL RULES:
-1. You MUST ONLY use exercises from the list above
-2. Format each exercise name EXACTLY as it appears in the list
+1. You MUST ONLY use exercises from the list above — browse by TARGET MUSCLE to find what you need
+2. Write each exercise using {{exercise:ID:Exact Name}} format with the correct ID
 3. Do NOT suggest any exercises not in the list
 4. If the list doesn't have enough exercises, use available exercises creatively with progressive overload
 
@@ -469,11 +479,41 @@ Available exercises: ${exerciseList}`;
 
     console.log(`[TrainingProgram] Generated ${type} successfully (${generatedPlan.length} chars)`);
 
-    // Exercise matching - Post-processing safety net
-    // Scans generated content, fuzzy-matches to exercise library, adds View buttons
+    // Exercise matching - Library-first validation + safety net
+    // Step 1: Validate any {{exercise:ID:Name}} markup the AI generated
+    // Step 2: Section-aware matching as safety net for plain text exercises
     if (exerciseLibrary.length > 0) {
-      console.log(`[TrainingProgram] Running exercise matching on generated ${type}...`);
+      console.log(`[TrainingProgram] Running library-first validation on generated ${type}...`);
       
+      // Build ID lookup map
+      const libraryById = new Map(exerciseLibrary.map(ex => [ex.id, ex]));
+      
+      // Validate existing markup IDs
+      const markupValidationPattern = /\{\{(?:exercise|exrcise|excersize|excercise):([^:]+):([^}]+)\}\}/gi;
+      let markupMatch;
+      let validMarkupCount = 0;
+      const invalidIds: string[] = [];
+      
+      while ((markupMatch = markupValidationPattern.exec(generatedPlan)) !== null) {
+        if (libraryById.has(markupMatch[1])) {
+          validMarkupCount++;
+        } else {
+          invalidIds.push(`${markupMatch[1]}:${markupMatch[2]}`);
+        }
+      }
+      
+      // Strip invalid markup
+      if (invalidIds.length > 0) {
+        for (const invalidId of invalidIds) {
+          const [id, name] = invalidId.split(':');
+          generatedPlan = generatedPlan.replace(
+            new RegExp(`\\{\\{(?:exercise|exrcise|excersize|excercise):${id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}:[^}]+\\}\\}`, 'gi'),
+            name
+          );
+        }
+      }
+      
+      // Safety net: fuzzy-match any plain text exercises
       const result = processContentWithExerciseMatching(
         generatedPlan,
         exerciseLibrary,
@@ -481,7 +521,7 @@ Available exercises: ${exerciseList}`;
       );
       
       generatedPlan = result.processedContent;
-      console.log(`[TrainingProgram] Exercise matching: ${result.matched.length} matched, ${result.unmatched.length} unmatched`);
+      console.log(`[TrainingProgram] Library validation: ${validMarkupCount} pre-linked, ${result.matched.length} safety-net matched, ${result.unmatched.length} unmatched`);
       
       // Log unmatched exercises
       const uniqueUnmatched = [...new Set(result.unmatched)];
