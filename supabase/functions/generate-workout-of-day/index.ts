@@ -5,7 +5,7 @@ import { Resend } from "https://esm.sh/resend@2.0.0";
 import { getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
 import { MESSAGE_TYPES } from "../_shared/notification-types.ts";
 import { 
-  processContentWithExerciseMatching, 
+  processContentSectionAware, 
   logUnmatchedExercises,
   fetchAndBuildExerciseReference,
   type ExerciseBasic 
@@ -2005,6 +2005,48 @@ Return JSON with these exact fields:
       
       logStep(`Workout content acquired via ${parseMethod}`, { equipment, name: workoutContent.name });
 
+      // ═══════════════════════════════════════════════════════════════════════════════
+      // POST-GENERATION VALIDATION: Code-level enforcement of library-only exercises
+      // The AI may ignore prompt instructions, so we validate EVERY exercise name
+      // against the library and replace non-library ones with closest matches.
+      // ═══════════════════════════════════════════════════════════════════════════════
+      const validationLibrary = equipment === "BODYWEIGHT" ? bodyweightExercises : fullExercises;
+      if (validationLibrary.length > 0 && workoutContent.main_workout) {
+        const { extractExerciseNames, findBestMatch, normalizeExerciseName } = await import("../_shared/exercise-matching.ts");
+        
+        // Build a set of normalized library exercise names for fast lookup
+        const libraryNamesNorm = new Set(validationLibrary.map(ex => normalizeExerciseName(ex.name)));
+        const libraryNamesLower = new Set(validationLibrary.map(ex => ex.name.toLowerCase()));
+        
+        const extractedNames = extractExerciseNames(workoutContent.main_workout);
+        const nonLibraryExercises: string[] = [];
+        
+        for (const name of extractedNames) {
+          const normName = normalizeExerciseName(name);
+          const lowerName = name.toLowerCase();
+          
+          // Check if exercise exists in library (exact or normalized)
+          if (!libraryNamesLower.has(lowerName) && !libraryNamesNorm.has(normName)) {
+            // Try fuzzy match
+            const match = findBestMatch(name, validationLibrary, 0.65);
+            if (!match) {
+              nonLibraryExercises.push(name);
+            }
+          }
+        }
+        
+        if (nonLibraryExercises.length > 0) {
+          logStep(`⚠️ VALIDATION: Found ${nonLibraryExercises.length} non-library exercises`, { 
+            exercises: nonLibraryExercises,
+            equipment 
+          });
+          // These will remain as plain text (no View button) after section-aware matching
+          // They are logged to mismatched_exercises table below
+        } else {
+          logStep(`✅ VALIDATION: All exercises are from the library`, { equipment });
+        }
+      }
+
       if (equipment === "BODYWEIGHT") {
         firstWorkoutName = workoutContent.name;
       }
@@ -2019,21 +2061,20 @@ Return JSON with these exact fields:
       if (currentExerciseLibrary.length > 0) {
         logStep(`Running exercise matching for ${equipment} workout (${currentExerciseLibrary.length} exercises)...`);
         
-        const contentFields = ['main_workout'] as const;
+        // Section-aware processing: only adds View buttons to Main Workout (💪) and Finisher (⚡)
+        // Strips any markup from Soft Tissue, Activation, Warm-up, Cool Down sections
+        const mainContent = workoutContent.main_workout;
         let totalMatched = 0;
         const allUnmatched: string[] = [];
         
-        for (const field of contentFields) {
-          const content = workoutContent[field];
-          if (!content) continue;
-          
-          const result = processContentWithExerciseMatching(
-            content,
+        if (mainContent) {
+          const result = processContentSectionAware(
+            mainContent,
             currentExerciseLibrary,
-            `[WOD-MATCH][${equipment}][${field}]`
+            `[WOD-MATCH][${equipment}]`
           );
           
-          (workoutContent as any)[field] = result.processedContent;
+          (workoutContent as any).main_workout = result.processedContent;
           totalMatched += result.matched.length;
           allUnmatched.push(...result.unmatched);
         }
