@@ -166,6 +166,33 @@ const STRUCTURAL_HEADERS = [
   'overview', 'target audience', 'program structure', 'progression plan',
   'equipment needed', 'training days', 'workout duration', 'rest between exercises',
   'weekly schedule', 'important notes', 'safety first', 'progressive overload',
+  // Structural section titles
+  'tabata 1', 'tabata 2', 'tabata 3', 'tabata 4',
+  'tabata block 1', 'tabata block 2', 'tabata block 3',
+  'tabata round 1', 'tabata round 2', 'tabata round 3',
+  'tabata protocol', 'tabata',
+  'flow sequence', 'flow sequence 1', 'flow sequence 2', 'flow sequence 3',
+  'practice round', 'practice rounds', 'practice combos',
+  'progressive build', 'build', 'foundation',
+  'dynamic warm', 'stability warm', 'spine and core warm',
+  'full body flow', 'full body boost', 'full body finisher',
+  'full body stretching', 'full body shake out', 'full body scan',
+  'hip mobility', 'hip flexor focus', 'hip liberation sequence',
+  'spine mobility flow', 'spine articulation', 'joint mobility',
+  'mobilization', 'dynamic mobility flow', 'relaxation pose',
+  'core endurance', 'stability and core', 'lower body',
+  'upper body', 'ascending triad', 'forge gauntlet',
+  'metabolic amrap circuit', 'emom of power',
+  'advanced cardiovascular emom', 'dynamic balance',
+  'gentle full body shakedown', 'gentle aerobic',
+  'light cardio', 'light cooldown cardio',
+  'walk down recovery', 'slow walking', 'stretching',
+  'savasana', 'breathing', 'deep abdominal breathing',
+  'safety', 'record total rounds', 'record your total time',
+  'intensity technique progression', 'key movement principles',
+  'training to failure', 'power, olympic lifts',
+  'for energy boost', 'after 6 weeks', 'retest 1rm',
+  'fartlek', 'steady ride', 'sun salutation',
 ];
 
 // Words that indicate structural/instructional text, not exercise names
@@ -215,13 +242,20 @@ function isLikelyExerciseName(text: string): boolean {
   if (/^\d+\.?\s*$/.test(text)) return false;
   
   if (PURE_STRUCTURAL_PATTERNS.some(p => p.test(text))) return false;
-  if (STRUCTURAL_HEADERS.some(h => lower === h || lower.startsWith(h + ' '))) return false;
+  if (STRUCTURAL_HEADERS.some(h => lower === h || lower.startsWith(h + ' ') || lower.startsWith(h + ':'))) return false;
   if (STRUCTURAL_WORD_STARTS.some(w => lower.startsWith(w))) return false;
   
-  if (/^(perform|complete|repeat|do|hold|maintain|keep|breathe|inhale|exhale)\s/i.test(lower)) return false;
+  if (/^(perform|complete|repeat|do|hold|maintain|keep|breathe|inhale|exhale|record|retest|practice|simply|include|stop|start|add|test|target|focus|intensity|rep range|reps|both|after|immediately|as many|for max|for time|for energy)\s/i.test(lower)) return false;
   if (/^\d+\s*(seconds?|minutes?|mins?|secs?)\s/i.test(lower)) return false;
   if (/^\d+\s*rounds?\s/i.test(lower)) return false;
   if (!/^[A-Za-z]/.test(text)) return false;
+  // Filter out instructional/description text
+  if (/^(static stretch|gentle stretch|dynamic stretch|light jog|easy pace|smooth transition)/i.test(lower)) return false;
+  if (/^(cardio|fat burning|high intensity|intervals|steady):/i.test(lower)) return false;
+  if (/\d+%\s*(max|of|hr|1rm)/i.test(lower)) return false;
+  if (/^(target|intensity|rep range|reps|hold|both legs|after \d|immediately into)/i.test(lower)) return false;
+  // Filter out anything that looks like a sentence (has 6+ words)
+  if (lower.split(/\s+/).length > 6) return false;
   
   return true;
 }
@@ -243,6 +277,12 @@ function cleanExerciseName(text: string): string {
   cleaned = cleaned.replace(/\s*[-–—]\s*[a-z].*$/i, '').trim();
   // Strip trailing dash
   cleaned = cleaned.replace(/\s*[-–—]\s*$/, '');
+  // Strip trailing "x" or "x \d+" (common artifact: "burpeex 5", "Walkouts x")
+  cleaned = cleaned.replace(/\s*x\s*\d*\s*$/i, '').trim();
+  // Strip trailing "v" (typo artifact: "jump squatv")
+  cleaned = cleaned.replace(/[vx]\s*$/i, '').trim();
+  // Strip leading/trailing whitespace again
+  cleaned = cleaned.trim();
   return cleaned;
 }
 
@@ -255,6 +295,20 @@ export function extractExerciseNames(htmlContent: string): string[] {
   const seen = new Set<string>();
   
   function addExercise(name: string) {
+    // Split comma-separated exercise lists: "Bird, Dead Bug" → ["Bird", "Dead Bug"]
+    if (name.includes(',') && !name.includes('{{')) {
+      const parts = name.split(',');
+      if (parts.length >= 2 && parts.length <= 8) {
+        for (const part of parts) {
+          const cleaned = cleanExerciseName(part.trim());
+          if (cleaned && cleaned.length >= 3 && isLikelyExerciseName(cleaned) && !seen.has(cleaned.toLowerCase())) {
+            seen.add(cleaned.toLowerCase());
+            exercises.push(cleaned);
+          }
+        }
+        return;
+      }
+    }
     const cleaned = cleanExerciseName(name);
     if (cleaned.length >= 3 && isLikelyExerciseName(cleaned) && !seen.has(cleaned.toLowerCase())) {
       seen.add(cleaned.toLowerCase());
