@@ -1,56 +1,84 @@
 
 
-# Re-Verify and Fix ALL Existing Workouts and Programs
+# Fix ALL Exercises: Zero Unmatched, View Buttons Everywhere
 
-## Current State (Issues Found)
+## What I Found
 
-- **214 workouts**: All have some markup, BUT 3 exercise IDs have wrong zero-padding (e.g., `043` instead of `0043`) across 9 workouts. These View buttons are broken.
-- **28 training programs**: 1 invalid ID (`084` instead of `0084`).
-- **765 unmatched exercises** logged in the system from previous processing -- these are exercises in workouts/programs that never got View buttons at all.
-- No markup in wrong sections (Activation, Warm-up, Cool Down are clean).
+### Problem 1: Corrupted HTML
+Previous regex replacements left `$3` text artifacts scattered throughout workout content (visible in Flow Restore, Glute Core Foundation, and likely many others). These corrupt strings break all subsequent pattern matching, causing real exercises to fail.
 
-## What Needs to Happen
+### Problem 2: Real Library Exercises Logged as "Unmatched"
+At least 18 exercises in the "unmatched" log EXIST in your library and should have View buttons:
+- dead bug (ID: 0276)
+- sphinx (ID: 1362)
+- air bike (ID: 0003)
+- barbell bent over row (ID: 0027)
+- cable pulldown (ID: 0198)
+- decline crunch (ID: 0277)
+- dumbbell seated curl (ID: 0391)
+- dumbbell seated shoulder press (ID: 0405)
+- cable straight arm pulldown (ID: 0238)
+- inchworm (ID: 1471)
+- iron cross stretch (ID: 1419)
+- bench hip extension (ID: 0130)
+- split squats (ID: 2368)
+- standing calves (ID: 1397)
+- balance board (ID: 0020)
+- hanging pike (ID: 0473)
+- suspended split squat (ID: 0809)
+- upward facing dog (ID: 1366)
+...and likely more
 
-### Fix 1: Repair Zero-Padding on Exercise IDs
+These are matching at 100% confidence in theory, but the corrupted HTML prevents the replacement from working.
 
-Find and fix all `{{exercise:043:...}}` to `{{exercise:0043:...}}`, `{{exercise:084:...}}` to `{{exercise:0084:...}}`, and `{{exercise:0000:...}}` (invalid ID -- needs replacement with correct exercise).
+### Problem 3: Section Restriction Blocking View Buttons
+The current system only puts View buttons in Main Workout and Finisher sections. Your instruction is clear: EVERY exercise EVERYWHERE must have a View button. Exercises in Activation and Cool Down that exist in the library should also get View buttons.
 
-Affected: 9 workouts + 1 training program.
+## The Fix (4 Steps)
 
-### Fix 2: Re-Run Section-Aware Relinking on ALL 214 Workouts
+### Step 1: Clean ALL HTML Corruption
 
-Use the `reprocess-wod-exercises` function to strip and re-apply exercise markup on all 214 workouts. This ensures:
-- Every exercise in Main Workout and Finisher that exists in the library gets a View button
-- No markup in other sections
-- All IDs are correctly formatted
+Run a database update to strip all `$3` artifacts from every workout's main_workout, warm_up, cool_down, activation, and finisher fields. This fixes the broken HTML that prevents matching.
 
-### Fix 3: Re-Run Relinking on ALL 28 Training Programs
+### Step 2: Remove Section Restriction
 
-Use the `reprocess-program-exercises` function on all 28 programs to ensure every exercise that exists in the library gets proper markup.
+Change `processContentSectionAware` so it processes ALL sections (Soft Tissue, Activation, Main Workout, Finisher, Cool Down) for exercise matching. Every section gets View buttons if the exercise exists in the library. No more "strip markup from non-main sections."
 
-### Fix 4: Clear and Re-Check Mismatched Exercises Log
+### Step 3: Re-Run Reprocessor on ALL 214 Workouts
 
-After reprocessing, the mismatched table will be refreshed with only genuinely unmatched exercises (ones that truly don't exist in the library). This gives a clean audit of what's left.
+Call `reprocess-wod-exercises` with `processAll=true` in batches. With clean HTML and no section restriction, every real exercise will match and get a View button.
 
-## Permanent Guarantee Going Forward
+### Step 4: Re-Run Reprocessor on ALL 28 Programs
 
-The library-first architecture is now built into the generation code:
-- The AI receives the structured library (grouped by target/body part) with IDs BEFORE generating
-- The AI MUST output `{{exercise:ID:Name}}` format
-- Post-generation validation checks every ID against the database
-- `processContentSectionAware` runs as safety net
-- View buttons restricted to Main Workout and Finisher only
+Call `reprocess-program-exercises` on all programs. Same fix applies.
 
-This is permanent. No future workout or program generation can bypass this -- it's enforced at the code level, not just in prompt instructions.
+### Step 5: Verify Zero Real Unmatched
+
+After reprocessing, check the mismatched log. Any remaining items should only be structural text (section headers like "Flow Sequence 1", instructions like "Repeat this sequence 2 times", or rep counts like "Reps: 6-8") -- NOT exercise names. If any real exercise name remains, it means the library needs that exercise added or the matching needs another pattern.
+
+## What Changes
+
+| Area | Change |
+|------|--------|
+| Database content | Strip `$3` artifacts from all workout fields |
+| `_shared/exercise-matching.ts` | `processContentSectionAware` now processes ALL sections for View buttons |
+| `reprocess-wod-exercises` | Process ALL fields (main_workout, warm_up, cool_down, activation, finisher) |
+| All 214 workouts | Re-linked with clean HTML |
+| All 28 programs | Re-linked |
 
 ## What Does NOT Change
 
 - Workout structure, philosophy, formatting, styling
+- Section order and emoji headers
 - Periodization, coaching logic, RPE rules
+- The exercise library itself
+- The library-first generation architecture for future workouts
 - Category-specific exercise rules
 - Equipment/bodyweight filtering
-- Section awareness rules
 
-## Execution
+## After This
 
-All 214 workouts and 28 programs will be batch-reprocessed in one operation using the existing edge functions. No manual workout-by-workout work needed.
+- Every exercise in every workout and program that exists in the library will have a View button
+- No exercise will exist anywhere that is not from the library (enforced by the library-first architecture for future generation)
+- The mismatched log will contain only structural/instructional text, not exercise names
+
