@@ -521,7 +521,8 @@ function replaceExerciseInContent(
   let anyReplaced = false;
   for (const pattern of patterns) {
     const before = result;
-    const captureCount = (pattern.source.match(/\((?!\?)/g) || []).length;
+    // Count REAL capture groups: exclude escaped parens \( and non-capturing (?:
+    const captureCount = (pattern.source.match(/(?<!\\)\((?!\?)/g) || []).length;
     
     if (captureCount === 3) {
       result = result.replace(pattern, `$1${markup}$2$3`);
@@ -598,6 +599,11 @@ export function processContentWithExerciseMatching(
       console.log(`${logPrefix} ✗ UNMATCHED: "${exerciseName}"`);
     }
   }
+  
+  // ── POST-PROCESSING: Strip superset labels (A1:, B:, C2., D)) before exercise markup ──
+  // Handles: "A1: {{exercise:..." → "{{exercise:..."
+  // Inside bold: "<strong>A1: {{exercise:..." → "<strong>{{exercise:..."
+  processedContent = processedContent.replace(/([A-Da-d]\d*[\.\:\)]\s*)(\{\{exercise:)/g, '$2');
   
   console.log(`${logPrefix} Summary: ${matched.length} matched, ${unmatched.length} unmatched`);
   
