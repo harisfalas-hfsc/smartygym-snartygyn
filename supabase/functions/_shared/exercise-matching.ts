@@ -432,10 +432,14 @@ function replaceExerciseInContent(
     new RegExp(`(\\d+\\s+)${escapedWithSuffix}`, 'gi'),
     // 8a. Exercise name as ENTIRE <p> content (exact)
     new RegExp(`(<p[^>]*>\\s*)${escapedWithSuffix}(\\s*<\/p>)`, 'gi'),
-    // 8b. Exercise name followed by parenthetical/trailing text inside <p> (e.g., "Sphinx (60 sec hold)")
+    // 8b. Exercise name followed by parenthetical/trailing text inside <p>
     new RegExp(`(<p[^>]*>\\s*)${escaped}(\\s*\\([^)]*\\)[^<]*<\/p>)`, 'gi'),
-    // 8c. Exercise name followed by trailing text inside <p> (e.g., "Sphinx - 45 sec per side")
+    // 8c. Exercise name followed by trailing text after dash inside <p>
     new RegExp(`(<p[^>]*>\\s*)${escaped}(\\s*[-–—][^<]*<\/p>)`, 'gi'),
+    // 8d. Exercise name followed by colon and details inside <p>
+    new RegExp(`(<p[^>]*>\\s*)${escaped}(\\s*:[^<]*<\/p>)`, 'gi'),
+    // 8e. Exercise name after number prefix inside <p> (e.g. "20 mountain climber...")
+    new RegExp(`(<p[^>]*>\\s*\\d+[\\s\\.\\)]+)${escaped}([^<]*<\/p>)`, 'gi'),
     // 9. After <br> tag or at line start with numbered prefix
     new RegExp(`(<br\\s*\\/?>\\s*\\d+[\\.\\)]\\s*)${escapedWithSuffix}`, 'gi'),
     // 10. Plain text after <br>
@@ -444,6 +448,8 @@ function replaceExerciseInContent(
     new RegExp(`(>)\\s*${escaped}\\s*(<)`, 'gi'),
     // 12. Exercise name followed by parenthetical between tags
     new RegExp(`(>)\\s*${escaped}(\\s*\\([^)]*\\)[^<]*)(<)`, 'gi'),
+    // 13. CATCH-ALL: Exercise name anywhere inside tag content (preceded by > or text, followed by text or <)
+    new RegExp(`(>[^<]*?)\\b${escaped}\\b([^<]*<)`, 'gi'),
   ];
   
   let anyReplaced = false;
@@ -534,16 +540,15 @@ export function processContentWithExerciseMatching(
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // SECTION-AWARE PROCESSING
-// Only applies exercise matching to Main Workout and Finisher sections.
-// Strips any existing exercise markup from other sections.
+// Applies exercise matching to ALL sections — every library exercise gets a View button.
 // ═══════════════════════════════════════════════════════════════════════════════
 
 const SECTION_PATTERNS = [
-  { emoji: '🧽', name: 'soft_tissue', process: false },
-  { emoji: '🔥', name: 'warm_up', process: false },
+  { emoji: '🧽', name: 'soft_tissue', process: true },
+  { emoji: '🔥', name: 'warm_up', process: true },
   { emoji: '💪', name: 'main_workout', process: true },
   { emoji: '⚡', name: 'finisher', process: true },
-  { emoji: '🧘', name: 'cool_down', process: false },
+  { emoji: '🧘', name: 'cool_down', process: true },
 ];
 
 /**
@@ -576,7 +581,7 @@ function splitIntoSections(htmlContent: string): SectionBlock[] {
   }
   
   if (headerPositions.length === 0) {
-    return [{ name: 'main_workout', content: htmlContent, process: true, startIndex: 0 }];
+    return [{ name: 'full_content', content: htmlContent, process: true, startIndex: 0 }];
   }
   
   headerPositions.sort((a, b) => a.index - b.index);
@@ -584,7 +589,7 @@ function splitIntoSections(htmlContent: string): SectionBlock[] {
   if (headerPositions[0].index > 0) {
     const preContent = htmlContent.substring(0, headerPositions[0].index);
     if (preContent.trim()) {
-      sections.push({ name: 'pre_header', content: preContent, process: false, startIndex: 0 });
+      sections.push({ name: 'pre_header', content: preContent, process: true, startIndex: 0 });
     }
   }
   
@@ -605,9 +610,8 @@ function splitIntoSections(htmlContent: string): SectionBlock[] {
 }
 
 /**
- * Process main_workout field with section awareness.
- * Only applies exercise matching to Main Workout and Finisher sections.
- * Strips exercise markup from all other sections.
+ * Process content with section awareness.
+ * Applies exercise matching to ALL sections — every library exercise gets a View button.
  */
 export function processContentSectionAware(
   content: string,
@@ -635,8 +639,13 @@ export function processContentSectionAware(
       allMatched.push(...result.matched);
       allUnmatched.push(...result.unmatched);
     } else {
-      console.log(`${logPrefix} 🚫 Stripping markup from section: ${section.name}`);
-      rebuiltContent += stripExerciseMarkup(section.content);
+      // All sections are now processed — this branch should not be reached
+      console.log(`${logPrefix} ✅ Processing section: ${section.name}`);
+      const strippedContent = stripExerciseMarkup(section.content);
+      const result = processContentWithExerciseMatching(strippedContent, exerciseLibrary, `${logPrefix}[${section.name}]`);
+      rebuiltContent += result.processedContent;
+      allMatched.push(...result.matched);
+      allUnmatched.push(...result.unmatched);
     }
   }
   
@@ -733,8 +742,8 @@ export function buildExerciseReferenceList(exercises: ExerciseBasic[], equipment
     '',
     'RULES:',
     '- The ID and Name MUST come from this library exactly as listed.',
-    '- If you write ANY exercise WITHOUT the {{exercise:ID:Name}} format in Main Workout or Finisher, the workout will be REJECTED.',
-    '- Soft Tissue (🧽), Activation (🔥), and Cool Down (🧘) sections do NOT use this format — write plain text there.',
+    '- If you write ANY exercise WITHOUT the {{exercise:ID:Name}} format, the workout will be REJECTED.',
+    '- Use {{exercise:ID:Name}} format in ALL sections — Main Workout (💪), Finisher (⚡), Activation (🔥), Warm-Up, and Cool Down (🧘).',
     '- NEVER invent, rename, or create exercises not listed below.',
     '- If the exercise you want does not exist here, pick the closest biomechanical equivalent FROM THIS LIST.',
     '',
@@ -764,7 +773,7 @@ export function buildExerciseReferenceList(exercises: ExerciseBasic[], equipment
   lines.push('');
   lines.push('───────────────────────────────────────────────────────────────────────────────');
   lines.push('END OF EXERCISE LIBRARY');
-  lines.push('Remember: {{exercise:ID:Name}} format is MANDATORY for 💪 Main Workout and ⚡ Finisher exercises.');
+  lines.push('Remember: {{exercise:ID:Name}} format is MANDATORY for ALL exercises in ALL sections.');
   
   return lines.join('\n');
 }

@@ -103,7 +103,8 @@ Deno.serve(async (req) => {
       let totalMatched = 0;
       const allUnmatched: string[] = [];
 
-      // ── main_workout: Section-aware processing ──
+      // ── Process ALL fields with exercise matching ──
+      // main_workout uses section-aware processing (handles emoji headers)
       if (wod.main_workout) {
         const result = processContentSectionAware(
           wod.main_workout,
@@ -115,16 +116,23 @@ Deno.serve(async (req) => {
         allUnmatched.push(...result.unmatched);
       }
 
-      // ── warm_up, cool_down, activation: STRIP all exercise markup ──
+      // ── warm_up, cool_down, activation: Process with exercise matching ──
       for (const field of ["warm_up", "cool_down", "activation"] as const) {
         const content = wod[field] as string | null;
-        if (content && content.includes("{{exercise:")) {
-          updates[field] = stripExerciseMarkup(content);
-          console.log(`${LOG_PREFIX} 🧹 Stripped markup from ${field}`);
+        if (content) {
+          const strippedContent = stripExerciseMarkup(content);
+          const result = processContentWithExerciseMatching(
+            strippedContent,
+            exerciseLibrary as ExerciseBasic[],
+            `${LOG_PREFIX}[${field}]`
+          );
+          updates[field] = result.processedContent;
+          totalMatched += result.matched.length;
+          allUnmatched.push(...result.unmatched);
         }
       }
 
-      // ── finisher (separate field): Process with force-matching ──
+      // ── finisher: Process with force-matching ──
       if (wod.finisher) {
         const strippedFinisher = stripExerciseMarkup(wod.finisher);
         const result = processContentWithExerciseMatching(
