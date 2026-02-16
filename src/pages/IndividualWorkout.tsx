@@ -275,13 +275,13 @@ const IndividualWorkout = () => {
                           {dbWorkout.warm_up && (
                             <div>
                               <h2 className="text-lg font-semibold mb-2">Warm Up</h2>
-                              <ExerciseHTMLContent content={dbWorkout.warm_up} enableExerciseLinking={false} />
+                              <ExerciseHTMLContent content={dbWorkout.warm_up} enableExerciseLinking={true} />
                             </div>
                           )}
                           {dbWorkout.activation && (
                             <div>
                               <h2 className="text-lg font-semibold mb-2">Activation</h2>
-                              <ExerciseHTMLContent content={dbWorkout.activation} enableExerciseLinking={false} />
+                              <ExerciseHTMLContent content={dbWorkout.activation} enableExerciseLinking={true} />
                             </div>
                           )}
                           {dbWorkout.main_workout && (
@@ -299,7 +299,7 @@ const IndividualWorkout = () => {
                           {dbWorkout.cool_down && (
                             <div>
                               <h2 className="text-lg font-semibold mb-2">Cool Down</h2>
-                              <ExerciseHTMLContent content={dbWorkout.cool_down} enableExerciseLinking={false} />
+                              <ExerciseHTMLContent content={dbWorkout.cool_down} enableExerciseLinking={true} />
                             </div>
                           )}
                           {dbWorkout.instructions && (
