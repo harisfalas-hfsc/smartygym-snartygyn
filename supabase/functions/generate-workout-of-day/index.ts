@@ -2006,86 +2006,76 @@ Return JSON with these exact fields:
       logStep(`Workout content acquired via ${parseMethod}`, { equipment, name: workoutContent.name });
 
       // ═══════════════════════════════════════════════════════════════════════════════
-      // POST-GENERATION VALIDATION: Code-level enforcement of library-only exercises
-      // The AI may ignore prompt instructions, so we validate EVERY exercise name
-      // against the library and replace non-library ones with closest matches.
+      // LIBRARY-FIRST VALIDATION + SAFETY NET
+      // Step 1: Check if the AI used {{exercise:ID:Name}} markup correctly
+      // Step 2: Validate that every ID exists in the library
+      // Step 3: Run section-aware matching as SAFETY NET for any exercises
+      //         the AI failed to mark up (post-processing catches stragglers)
       // ═══════════════════════════════════════════════════════════════════════════════
-      const validationLibrary = equipment === "BODYWEIGHT" ? bodyweightExercises : fullExercises;
-      if (validationLibrary.length > 0 && workoutContent.main_workout) {
-        const { extractExerciseNames, findBestMatch, normalizeExerciseName } = await import("../_shared/exercise-matching.ts");
+      const currentExerciseLibrary = equipment === "BODYWEIGHT" ? bodyweightExercises : fullExercises;
+      
+      if (currentExerciseLibrary.length > 0 && workoutContent.main_workout) {
+        // Build ID lookup map
+        const libraryById = new Map(currentExerciseLibrary.map(ex => [ex.id, ex]));
         
-        // Build a set of normalized library exercise names for fast lookup
-        const libraryNamesNorm = new Set(validationLibrary.map(ex => normalizeExerciseName(ex.name)));
-        const libraryNamesLower = new Set(validationLibrary.map(ex => ex.name.toLowerCase()));
+        // Step 1: Validate all {{exercise:ID:Name}} markup IDs
+        const markupValidationPattern = /\{\{(?:exercise|exrcise|excersize|excercise):([^:]+):([^}]+)\}\}/gi;
+        let markupMatch;
+        let validMarkupCount = 0;
+        let invalidMarkupCount = 0;
+        const invalidIds: string[] = [];
         
-        const extractedNames = extractExerciseNames(workoutContent.main_workout);
-        const nonLibraryExercises: string[] = [];
-        
-        for (const name of extractedNames) {
-          const normName = normalizeExerciseName(name);
-          const lowerName = name.toLowerCase();
-          
-          // Check if exercise exists in library (exact or normalized)
-          if (!libraryNamesLower.has(lowerName) && !libraryNamesNorm.has(normName)) {
-            // Try fuzzy match
-            const match = findBestMatch(name, validationLibrary, 0.65);
-            if (!match) {
-              nonLibraryExercises.push(name);
-            }
+        const mainContent = workoutContent.main_workout;
+        while ((markupMatch = markupValidationPattern.exec(mainContent)) !== null) {
+          const id = markupMatch[1];
+          if (libraryById.has(id)) {
+            validMarkupCount++;
+          } else {
+            invalidMarkupCount++;
+            invalidIds.push(`${id}:${markupMatch[2]}`);
           }
         }
         
-        if (nonLibraryExercises.length > 0) {
-          logStep(`⚠️ VALIDATION: Found ${nonLibraryExercises.length} non-library exercises`, { 
-            exercises: nonLibraryExercises,
-            equipment 
-          });
-          // These will remain as plain text (no View button) after section-aware matching
-          // They are logged to mismatched_exercises table below
-        } else {
-          logStep(`✅ VALIDATION: All exercises are from the library`, { equipment });
-        }
-      }
-
-      if (equipment === "BODYWEIGHT") {
-        firstWorkoutName = workoutContent.name;
-      }
-
-      logStep(`${equipment} workout generated`, { name: workoutContent.name });
-
-      // ═══════════════════════════════════════════════════════════════════════════════
-      // EXERCISE LIBRARY MATCHING - Post-processing safety net
-      // Scans generated content, fuzzy-matches to exercise library, adds View buttons
-      // ═══════════════════════════════════════════════════════════════════════════════
-      const currentExerciseLibrary = equipment === "BODYWEIGHT" ? bodyweightExercises : fullExercises;
-      if (currentExerciseLibrary.length > 0) {
-        logStep(`Running exercise matching for ${equipment} workout (${currentExerciseLibrary.length} exercises)...`);
+        logStep(`Library-first validation`, {
+          equipment,
+          validMarkup: validMarkupCount,
+          invalidMarkup: invalidMarkupCount,
+          invalidIds: invalidIds.slice(0, 5)
+        });
         
-        // Section-aware processing: only adds View buttons to Main Workout (💪) and Finisher (⚡)
-        // Strips any markup from Soft Tissue, Activation, Warm-up, Cool Down sections
-        const mainContent = workoutContent.main_workout;
-        let totalMatched = 0;
-        const allUnmatched: string[] = [];
-        
-        if (mainContent) {
-          const result = processContentSectionAware(
-            mainContent,
-            currentExerciseLibrary,
-            `[WOD-MATCH][${equipment}]`
-          );
-          
-          (workoutContent as any).main_workout = result.processedContent;
-          totalMatched += result.matched.length;
-          allUnmatched.push(...result.unmatched);
+        // Step 2: Strip invalid markup (wrong IDs) so safety net can re-match
+        if (invalidIds.length > 0) {
+          let cleaned = workoutContent.main_workout;
+          for (const invalidId of invalidIds) {
+            const [id, name] = invalidId.split(':');
+            cleaned = cleaned.replace(
+              new RegExp(`\\{\\{(?:exercise|exrcise|excersize|excercise):${id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}:[^}]+\\}\\}`, 'gi'),
+              name
+            );
+          }
+          workoutContent.main_workout = cleaned;
         }
+        
+        // Step 3: Section-aware matching as SAFETY NET
+        // This catches any exercises the AI wrote as plain text (without markup)
+        logStep(`Running section-aware safety net for ${equipment} workout (${currentExerciseLibrary.length} exercises)...`);
+        
+        const result = processContentSectionAware(
+          workoutContent.main_workout,
+          currentExerciseLibrary,
+          `[WOD-MATCH][${equipment}]`
+        );
+        
+        workoutContent.main_workout = result.processedContent;
         
         logStep(`Exercise matching complete for ${equipment}`, { 
-          totalMatched, 
-          unmatched: allUnmatched.length 
+          preExistingMarkup: validMarkupCount,
+          safetyNetMatched: result.matched.length, 
+          unmatched: result.unmatched.length 
         });
         
         // Log unmatched exercises
-        const uniqueUnmatched = [...new Set(allUnmatched)];
+        const uniqueUnmatched = [...new Set(result.unmatched)];
         if (uniqueUnmatched.length > 0) {
           await logUnmatchedExercises(
             supabase,

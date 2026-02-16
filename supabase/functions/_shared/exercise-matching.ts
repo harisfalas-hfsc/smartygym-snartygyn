@@ -702,43 +702,69 @@ export function buildExerciseReferenceList(exercises: ExerciseBasic[], equipment
     ? exercises.filter(ex => (ex.equipment || '').toLowerCase() === equipmentFilter.toLowerCase())
     : exercises;
 
-  const grouped: Record<string, Record<string, string[]>> = {};
+  // Group by TARGET MUSCLE → BODY PART for structured browsing
+  const grouped: Record<string, Record<string, Array<{ id: string; name: string; equipment: string }>>> = {};
   
   for (const ex of filtered) {
-    const bodyPart = (ex.body_part || 'other').toUpperCase();
+    const target = (ex.target || 'other').toLowerCase();
+    const bodyPart = (ex.body_part || 'other').toLowerCase();
+    const key = `${target} / ${bodyPart}`;
     const equip = (ex.equipment || 'body weight').toLowerCase();
     
-    if (!grouped[bodyPart]) grouped[bodyPart] = {};
-    if (!grouped[bodyPart][equip]) grouped[bodyPart][equip] = [];
-    grouped[bodyPart][equip].push(ex.name);
+    if (!grouped[key]) grouped[key] = {};
+    if (!grouped[key][equip]) grouped[key][equip] = [];
+    grouped[key][equip].push({ id: ex.id, name: ex.name, equipment: equip });
   }
   
   const lines: string[] = [
     '═══════════════════════════════════════════════════════════════════════════════',
-    'EXERCISE LIBRARY (ABSOLUTE CONSTRAINT — READ CAREFULLY):',
+    'EXERCISE LIBRARY — LIBRARY-FIRST SELECTION (ABSOLUTE CONSTRAINT)',
     '═══════════════════════════════════════════════════════════════════════════════',
     '',
-    'You MUST ONLY use exercises from this list. Using ANY exercise not on this list is FORBIDDEN.',
-    'Write the exercise name EXACTLY as listed below — no variations, no inventions, no synonyms.',
-    'If the exercise you want is not here, pick the closest biomechanical equivalent FROM THIS LIST.',
-    'NEVER invent, rename, or create exercises that are not listed below.',
+    '🚨 MANDATORY PROCESS: You MUST browse this library FIRST, then select exercises.',
+    'You are FORBIDDEN from generating exercises and matching later.',
+    '',
+    'STEP 1: Read the library below grouped by TARGET MUSCLE / BODY PART.',
+    'STEP 2: For each exercise you need, find it in the appropriate muscle group.',
+    'STEP 3: Write EVERY exercise in Main Workout (💪) and Finisher (⚡) sections using this EXACT format:',
+    '        {{exercise:ID:Exact Name}}',
+    '',
+    'EXAMPLE: {{exercise:0043:Barbell Full Squat}}',
+    '',
+    'RULES:',
+    '- The ID and Name MUST come from this library exactly as listed.',
+    '- If you write ANY exercise WITHOUT the {{exercise:ID:Name}} format in Main Workout or Finisher, the workout will be REJECTED.',
+    '- Soft Tissue (🧽), Activation (🔥), and Cool Down (🧘) sections do NOT use this format — write plain text there.',
+    '- NEVER invent, rename, or create exercises not listed below.',
+    '- If the exercise you want does not exist here, pick the closest biomechanical equivalent FROM THIS LIST.',
+    '',
     equipmentFilter
       ? `This is a BODYWEIGHT workout. ONLY bodyweight exercises are available (${filtered.length} exercises).`
       : `Full exercise library available (${filtered.length} exercises — bodyweight + all equipment).`,
-    ''
+    '',
+    '───────────────────────────────────────────────────────────────────────────────',
   ];
   
-  const sortedBodyParts = Object.keys(grouped).sort();
+  const sortedKeys = Object.keys(grouped).sort();
   
-  for (const bodyPart of sortedBodyParts) {
-    const equipmentGroups = grouped[bodyPart];
+  for (const key of sortedKeys) {
+    lines.push('');
+    lines.push(`TARGET: ${key.toUpperCase()}`);
+    const equipmentGroups = grouped[key];
     const sortedEquipment = Object.keys(equipmentGroups).sort();
     
     for (const equip of sortedEquipment) {
-      const names = equipmentGroups[equip].sort();
-      lines.push(`${bodyPart} / ${equip}: ${names.join(', ')}`);
+      const exercises = equipmentGroups[equip].sort((a, b) => a.name.localeCompare(b.name));
+      for (const ex of exercises) {
+        lines.push(`  [ID:${ex.id}] ${ex.name} (${equip})`);
+      }
     }
   }
+  
+  lines.push('');
+  lines.push('───────────────────────────────────────────────────────────────────────────────');
+  lines.push('END OF EXERCISE LIBRARY');
+  lines.push('Remember: {{exercise:ID:Name}} format is MANDATORY for 💪 Main Workout and ⚡ Finisher exercises.');
   
   return lines.join('\n');
 }
