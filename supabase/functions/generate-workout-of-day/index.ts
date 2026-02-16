@@ -1295,29 +1295,20 @@ Perform 4-5 rounds:
 ` : ""}
 
 ${category === "MOBILITY & STABILITY" ? `
-MOBILITY & STABILITY CATEGORY - ALLOWED EXERCISES:
-• World's greatest stretch, Cat-cow, Thread the needle, Hip circles
-• Shoulder CARs, Deep squats, Yoga flows, Core stability holds, Balance work
+MOBILITY & STABILITY CATEGORY:
+EXERCISE SELECTION: Browse the EXERCISE LIBRARY by TARGET: spine stabilizers, hip flexors, rotator cuff, abductors, adductors. Select controlled mobility and stability exercises FROM THE LIBRARY ONLY.
 ❌ FORBIDDEN: High-intensity intervals, explosive movements, speed work.
 ` : ""}
 
 ${category === "METABOLIC" ? `
-METABOLIC CATEGORY - ALLOWED EXERCISES:
-• Burpees, Thrusters, Kettlebell swings, Box jumps
-• Battle ropes, Sled work, Rowing sprints, Assault bike intervals
+METABOLIC CATEGORY:
+EXERCISE SELECTION: Browse the EXERCISE LIBRARY by TARGET: full body, cardiovascular system. Select explosive, power, and compound exercises FROM THE LIBRARY ONLY.
 ❌ FORBIDDEN: Reps & Sets format, long rest periods, isolation exercises.
 ` : ""}
 
 ${category === "CALORIE BURNING" ? `
-CALORIE BURNING CATEGORY - ALLOWED EXERCISES:
-${equipment === "EQUIPMENT" ? `
-• Treadmill sprints/incline walks, Assault bike calories, Rowing machine intervals
-• Ski erg sprints, Spin bike sprints, Elliptical HIIT, Stair climber intervals
-• Wall balls, Med ball slams, Kettlebell swings/snatches, Dumbbell thrusters
-• Weight vest exercises, Battle ropes, Sled pushes/pulls, Box jumps, Farmer carries` : `
-• Mountain climbers, Burpees, Jump squats, High knees
-• Jumping lunges, Speed skaters, Tuck jumps, Plank jacks
-• Bear crawls, Lateral shuffles, Squat jumps, Star jumps`}
+CALORIE BURNING CATEGORY:
+EXERCISE SELECTION: Browse the EXERCISE LIBRARY for high-rep, high-output exercises. ${equipment === "EQUIPMENT" ? `Filter for cardio machines, kettlebells, battle ropes, plyometric exercises.` : `Filter equipment='body weight' for bodyweight plyometric and locomotion exercises.`} Select exercises FROM THE LIBRARY ONLY.
 ❌ FORBIDDEN: Reps & Sets format, long rest periods, isolated strength work.
 ` : ""}
 
