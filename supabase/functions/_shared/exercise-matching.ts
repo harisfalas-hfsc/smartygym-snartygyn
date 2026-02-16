@@ -600,10 +600,20 @@ export function processContentWithExerciseMatching(
     }
   }
   
-  // ── POST-PROCESSING: Strip superset labels (A1:, B:, C2., D)) before exercise markup ──
-  // Handles: "A1: {{exercise:..." → "{{exercise:..."
-  // Inside bold: "<strong>A1: {{exercise:..." → "<strong>{{exercise:..."
-  processedContent = processedContent.replace(/([A-Da-d]\d*[\.\:\)]\s*)(\{\{exercise:)/g, '$2');
+  // ── POST-PROCESSING ──
+
+  // 1. Strip superset labels (A1:, B:, C2., D), I:, etc.) before exercise markup
+  // Handles ANY single uppercase letter (A-Z) with optional digit, followed by punctuation
+  processedContent = processedContent.replace(/(?<=>|\s)([A-Za-z]\d*[\.\:\)]\s*)(\{\{exercise:)/g, '$2');
+  // Also strip inside bold tags: "<strong>A1: {{exercise:..." → "<strong>{{exercise:..."
+  processedContent = processedContent.replace(/(<(?:strong|b)>)\s*[A-Za-z]\d*[\.\:\)]\s*(\{\{exercise:)/g, '$1$2');
+
+  // 2. Fix suffix duplication: "{{exercise:ID:Name with (qualifier)}} (qualifier) (qualifier)..."
+  // After markup insertion, the original parenthetical text may remain, causing repeats
+  processedContent = processedContent.replace(/(\{\{exercise:[^}]+\}\})\s*(?:\([^)]*\)\s*){1,}/g, (match, markup) => {
+    // Keep just the markup, strip trailing duplicated parentheticals
+    return markup;
+  });
   
   console.log(`${logPrefix} Summary: ${matched.length} matched, ${unmatched.length} unmatched`);
   
