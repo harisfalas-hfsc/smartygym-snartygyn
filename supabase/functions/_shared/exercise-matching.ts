@@ -94,8 +94,16 @@ export function findBestMatch(
   exercises: ExerciseBasic[],
   confidenceThreshold: number = 0.65
 ): MatchResult | null {
-  const searchNorm = normalizeExerciseName(searchTerm);
+  const searchLower = searchTerm.toLowerCase().trim();
   
+  // EXACT name match first (case-insensitive) — guarantees exercises like "balance board" always match
+  for (const exercise of exercises) {
+    if (exercise.name.toLowerCase().trim() === searchLower) {
+      return { exercise, confidence: 1.0 };
+    }
+  }
+  
+  const searchNorm = normalizeExerciseName(searchTerm);
   if (searchNorm.length < 3) return null;
   
   let bestMatch: MatchResult | null = null;
@@ -266,24 +274,24 @@ function isLikelyExerciseName(text: string): boolean {
 function cleanExerciseName(text: string): string {
   let cleaned = text;
   cleaned = cleaned.replace(/^\d+\.\s*/, '');
-  // Strip superset labels like "A1:", "B:", "C2.", "D)" at the start
-  cleaned = cleaned.replace(/^[A-D]\d*[\.\:\)]\s*/i, '').trim();
+  // Strip superset labels like "A1:", "B:", "C2.", "D)" at the start (case-sensitive: A-D only uppercase)
+  cleaned = cleaned.replace(/^[A-D]\d*[\.\:\)]\s*/, '').trim();
   cleaned = cleaned.replace(/[:;.]+$/, '');
   cleaned = cleaned.replace(/\s+machine\s*$/i, '');
   cleaned = cleaned.replace(/:\s*\d+\s*(?:sets?|rounds?|reps?|x\s|×\s|min|sec).*/i, '').trim();
   cleaned = cleaned.replace(/\s+\d+\s*(?:sets?\s*(?:x|×)\s*\d+|reps?|rounds?|min(?:utes?)?|sec(?:onds?)?).*$/i, '').trim();
   cleaned = cleaned.replace(/\s*\([^)]*\)\s*/g, '').trim();
-  // Strip trailing duration like "- 40 sec work"
-  cleaned = cleaned.replace(/\s*[-–—]\s*\d+\s*(?:sec|min|seconds?|minutes?).*$/i, '').trim();
-  // Strip trailing description after dash: "Battle Rope Slams – full body power" → "Battle Rope Slams"
-  cleaned = cleaned.replace(/\s*[-–—]\s*[a-z].*$/i, '').trim();
-  // Strip trailing dash
+  // Strip trailing duration like " - 40 sec work" (require space before dash)
+  cleaned = cleaned.replace(/\s+[-–—]\s*\d+\s*(?:sec|min|seconds?|minutes?).*$/i, '').trim();
+  // Strip trailing description after dash with SPACE: "Battle Rope Slams – full body power" → "Battle Rope Slams"
+  // IMPORTANT: requires whitespace before dash to preserve hyphenated names like "chin-up", "l-pull-up"
+  cleaned = cleaned.replace(/\s+[-–—]\s+[a-z].*$/i, '').trim();
+  // Strip trailing dash (with or without space)
   cleaned = cleaned.replace(/\s*[-–—]\s*$/, '');
   // Strip trailing "x" or "x \d+" (common artifact: "burpeex 5", "Walkouts x")
   cleaned = cleaned.replace(/\s*x\s*\d*\s*$/i, '').trim();
   // Strip trailing "v" (typo artifact: "jump squatv")
   cleaned = cleaned.replace(/[vx]\s*$/i, '').trim();
-  // Strip leading/trailing whitespace again
   cleaned = cleaned.trim();
   return cleaned;
 }
@@ -468,9 +476,9 @@ function replaceExerciseInContent(
   replacementName?: string
 ): string {
   const escaped = escapeRegExp(exerciseName);
-  // Use word boundary after the name to prevent partial matches on hyphenated names
-  // e.g. "chin-up" should not leave trailing "-up" after replacement
-  const escapedWithSuffix = escaped + '(?=[^a-zA-Z0-9-]|$)' + '(?:s)?(?:\\s+[Mm]achine)?(?:[:;.])?\\s*';
+  // Match the exercise name followed by optional plural 's', optional 'machine', optional punctuation
+  // The word boundary prevents partial matches: "chin-up" won't match inside "chin-up-up-up"
+  const escapedWithSuffix = escaped + '(?:s)?(?:\\s+[Mm]achine)?(?:[:;.])?\\s*';
   let result = content;
   
   const patterns = [
@@ -479,7 +487,7 @@ function replaceExerciseInContent(
     // 2. With Tabata/Station/Exercise prefix inside bold
     new RegExp(`(<(?:strong|b)>(?:(?:Tabata|Station|Exercise|Movement|Block)\\s*(?:Round\\s*)?\\d*:\\s*))${escapedWithSuffix}(<\/(?:strong|b)>)`, 'gi'),
     // 3. With A1:/B2: prefix inside bold
-    new RegExp(`(<(?:strong|b)>[A-Da-d]\\d*[\\.:]\\s*)${escapedWithSuffix}(<\/(?:strong|b)>)`, 'g'),
+    new RegExp(`(<(?:strong|b)>[A-Da-d]\\d*[\\.:]\\s*)${escapedWithSuffix}(<\/(?:strong|b)>)`, 'gi'),
     // 4. With parenthetical qualifiers inside bold
     new RegExp(`(<(?:strong|b)>(?:\\d+\\.\\s*)?)${escaped}(?:s)?(?:\\s+[Mm]achine)?(?:\\s*\\([^)]*\\))?(?:[:;.])?\\s*(<\/(?:strong|b)>)`, 'gi'),
     // 5. After a closing bold tag

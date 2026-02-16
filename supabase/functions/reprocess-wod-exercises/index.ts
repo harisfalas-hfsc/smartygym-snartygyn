@@ -73,15 +73,32 @@ Deno.serve(async (req) => {
 
     console.log(`${LOG_PREFIX} Found ${wods.length} WODs to reprocess`);
 
-    const { data: exerciseLibrary, error: libraryError } = await supabase
-      .from("exercises")
-      .select("id, name, body_part, equipment, target")
-      .limit(2000);
+    // Paginate to load ALL exercises (Supabase caps at 1000 per request)
+    const exerciseLibrary: Array<{ id: string; name: string; body_part: string; equipment: string; target: string }> = [];
+    let exFrom = 0;
+    const exPageSize = 1000;
+    while (true) {
+      const { data, error: libraryError } = await supabase
+        .from("exercises")
+        .select("id, name, body_part, equipment, target")
+        .range(exFrom, exFrom + exPageSize - 1);
 
-    if (libraryError || !exerciseLibrary) {
-      console.error(`${LOG_PREFIX} ❌ Error fetching exercise library:`, libraryError);
+      if (libraryError) {
+        console.error(`${LOG_PREFIX} ❌ Error fetching exercise library:`, libraryError);
+        return new Response(
+          JSON.stringify({ error: "Failed to fetch exercise library" }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      if (!data || data.length === 0) break;
+      exerciseLibrary.push(...data);
+      if (data.length < exPageSize) break;
+      exFrom += exPageSize;
+    }
+
+    if (exerciseLibrary.length === 0) {
       return new Response(
-        JSON.stringify({ error: "Failed to fetch exercise library" }),
+        JSON.stringify({ error: "Exercise library is empty" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
