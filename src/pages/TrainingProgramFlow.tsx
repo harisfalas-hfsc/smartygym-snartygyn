@@ -17,6 +17,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { CategoryCountBadge } from "@/components/ui/category-count-badge";
+import { SwipeToExplore } from "@/components/ui/SwipeToExplore";
 
 
 const TrainingProgramFlow = () => {
@@ -331,6 +332,7 @@ const TrainingProgramFlow = () => {
 
         {/* Mobile: Carousel Layout */}
         <div className="md:hidden relative">
+          <SwipeToExplore onPrev={() => carouselApi?.scrollPrev()} onNext={() => carouselApi?.scrollNext()} />
           <Carousel
             className="w-full"
             opts={{

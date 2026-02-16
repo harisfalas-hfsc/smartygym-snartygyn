@@ -17,6 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, type CarouselApi } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
 import { CategoryCountBadge } from "@/components/ui/category-count-badge";
+import { SwipeToExplore } from "@/components/ui/SwipeToExplore";
 import { SmartlySuggestButton } from "@/components/smartly-suggest";
 
 const WorkoutFlow = () => {
@@ -421,6 +422,7 @@ const WorkoutFlow = () => {
 
           {/* Mobile: Carousel Layout */}
           <div className="md:hidden relative">
+            <SwipeToExplore onPrev={() => carouselApi?.scrollPrev()} onNext={() => carouselApi?.scrollNext()} />
             <Carousel
               className="w-full"
               opts={{

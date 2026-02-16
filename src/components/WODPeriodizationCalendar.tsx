@@ -7,6 +7,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getWODInfoForDate, getDifficultyBadgeClass, getDifficultyBorderClass } from "@/lib/wodCycle";
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, type CarouselApi } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
+import { SwipeToExplore } from "@/components/ui/SwipeToExplore";
 
 const TIMEZONE = "Europe/Athens";
 
@@ -121,6 +122,7 @@ const WODPeriodizationCalendar = () => {
 
         {/* Mobile: Carousel - full bleed to card edges */}
         <div className="md:hidden -mx-2 sm:-mx-3">
+          <SwipeToExplore onPrev={() => carouselApi?.scrollPrev()} onNext={() => carouselApi?.scrollNext()} />
           <Carousel
             className="w-full"
             opts={{
