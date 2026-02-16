@@ -32,7 +32,8 @@ import {
   CarouselNext,
   type CarouselApi,
 } from "@/components/ui/carousel";
-import { Trophy, MessageSquare, Star, User, Calendar, ClipboardCheck, Eye, Award, Quote, ChevronLeft, ChevronRight } from "lucide-react";
+import { Trophy, MessageSquare, Star, User, Calendar, ClipboardCheck, Eye, Award, Quote } from "lucide-react";
+import { SwipeToExplore } from "@/components/ui/SwipeToExplore";
 import { TestimonialsSection } from "@/components/community/TestimonialsSection";
 import { formatDistanceToNow } from "date-fns";
 import { CompactFilters } from "@/components/CompactFilters";
@@ -540,42 +541,14 @@ const Community = () => {
             </CardContent>
           </Card>
 
-          {/* Mobile: Swipe indicator - clickable arrows */}
-          <div className="md:hidden flex items-center justify-center gap-3 mb-4 text-muted-foreground">
-            <button 
-              onClick={() => carouselApi?.scrollPrev()}
-              className="p-1 hover:text-primary transition-colors active:scale-95"
-              aria-label="Previous slide"
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </button>
-            <span className="text-xs animate-pulse">Swipe to explore</span>
-            <button 
-              onClick={() => carouselApi?.scrollNext()}
-              className="p-1 hover:text-primary transition-colors active:scale-95"
-              aria-label="Next slide"
-            >
-              <ChevronRight className="h-5 w-5" />
-            </button>
+          {/* Mobile: Swipe indicator */}
+          <div className="md:hidden">
+            <SwipeToExplore onPrev={() => carouselApi?.scrollPrev()} onNext={() => carouselApi?.scrollNext()} />
           </div>
 
-          {/* Desktop: Swipe indicator - clickable arrows */}
-          <div className="hidden md:flex items-center justify-center gap-3 mb-6 text-muted-foreground">
-            <button 
-              onClick={() => desktopCarouselApi?.scrollPrev()}
-              className="p-1 hover:text-primary transition-colors active:scale-95"
-              aria-label="Previous slide"
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </button>
-            <span className="text-xs animate-pulse">Swipe to explore</span>
-            <button 
-              onClick={() => desktopCarouselApi?.scrollNext()}
-              className="p-1 hover:text-primary transition-colors active:scale-95"
-              aria-label="Next slide"
-            >
-              <ChevronRight className="h-5 w-5" />
-            </button>
+          {/* Desktop: Swipe indicator */}
+          <div className="hidden md:block">
+            <SwipeToExplore onPrev={() => desktopCarouselApi?.scrollPrev()} onNext={() => desktopCarouselApi?.scrollNext()} />
           </div>
 
           {/* Mobile: Carousel of all community cards with peek effect */}

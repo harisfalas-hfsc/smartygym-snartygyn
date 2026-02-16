@@ -9,6 +9,7 @@ import { Calculator, Activity, Flame } from "lucide-react";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
+import { SwipeToExplore } from "@/components/ui/SwipeToExplore";
 
 // Import tool background images
 import oneRmBg from "@/assets/tools/1rm-calculator-bg.jpg";
@@ -125,6 +126,7 @@ const Tools = () => {
 
         {/* Mobile Carousel - With descriptions in cards */}
         <div className="md:hidden">
+          <SwipeToExplore onPrev={() => toolsCarouselApi?.scrollPrev()} onNext={() => toolsCarouselApi?.scrollNext()} />
           <Carousel 
             setApi={setToolsCarouselApi}
             opts={{ align: "center", loop: true, startIndex: 0 }}
