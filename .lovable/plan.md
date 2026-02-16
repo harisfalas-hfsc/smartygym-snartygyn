@@ -1,78 +1,31 @@
 
 
-# Demo: Create Exercise "X" (Bodyweight Squat) with Two-Frame Animation
+# Rename Exercise "X" to "Air Squats" and Fix Start Frame
 
-## What You Will See
+## What Will Change
 
-A new exercise called **"X"** will appear in your Exercise Library. When you open it, instead of a GIF, you will see two sketch-style illustrations alternating every 1.2 seconds:
-- **Frame 1**: Standing position (start of squat)
-- **Frame 2**: Bottom squat position (end of squat)
+1. **Rename**: Update the exercise name from "x" to "Air Squats" and change the ID from `demo-x-bw-squat` to `air-squats` for cleanliness.
 
-Below the animation, you will see the same badges, description, secondary muscles, and step-by-step instructions as any other exercise.
+2. **Fix Starting Position Image**: Regenerate ONLY the start frame with an improved prompt emphasizing a fully upright standing position (straight legs, no knee bend). The end frame (bottom squat) stays as-is.
 
-## Implementation Steps
+3. **Storage Cleanup**: Upload the new start frame image, replacing the old one. Rename files to match the new ID (`air-squats_start.png`, `air-squats_end.png`).
 
-### Step 1: Add Two New Columns to `exercises` Table
+## Steps
 
-Add `frame_start_url` and `frame_end_url` (both nullable text) so exercises can store individual frame images when no GIF exists.
+### Step 1: Update Database Record
+- Change `name` from `x` to `Air Squats`
+- Change `id` from `demo-x-bw-squat` to `air-squats`
+- Update `frame_start_url` and `frame_end_url` to point to the renamed files
 
-### Step 2: Create Edge Function `generate-exercise-frames`
+### Step 2: Regenerate Start Frame
+- Call the `generate-exercise-frames` edge function with an updated prompt specifically for the starting position: a figure standing fully upright with straight legs, arms relaxed at sides
+- Upload the new image to `exercise-gifs/air-squats_start.png`
+- Copy/rename the end frame to `exercise-gifs/air-squats_end.png`
 
-A backend function that:
-1. Takes exercise name and ID as input
-2. Calls the Lovable AI image generation API (google/gemini-2.5-flash-image) twice:
-   - "Simple clean anatomical line-art sketch on white background: bodyweight squat STARTING position (standing upright). Gender-neutral human figure, no text, no labels, minimal style."
-   - "Simple clean anatomical line-art sketch on white background: bodyweight squat BOTTOM position (deep squat). Gender-neutral human figure, no text, no labels, minimal style."
-3. Uploads both images to the existing `exercise-gifs` storage bucket as `X_start.png` and `X_end.png`
-4. Returns the public URLs
+### Step 3: Update URLs in Database
+- Set the new `frame_start_url` and `frame_end_url` pointing to the renamed files
 
-### Step 3: Insert Exercise "X" into Database
+## About AI Discovery
 
-Insert the exercise with:
-- **id**: `demo-x-bw-squat`
-- **name**: `x`
-- **body_part**: `upper legs`
-- **equipment**: `body weight`
-- **target**: `glutes`
-- **difficulty**: `beginner`
-- **category**: `strength`
-- **secondary_muscles**: `["quadriceps", "hamstrings", "calves", "core"]`
-- **instructions**: Full step-by-step squat instructions (6-7 steps)
-- **description**: Science-based description matching the existing exercise style and SmartyGym branding
-- **frame_start_url / frame_end_url**: URLs from the generated images
-- **gif_url**: null (since we use frames instead)
-
-### Step 4: Create `ExerciseFrameAnimation` Component
-
-A small React component that:
-- Accepts `frameStartUrl` and `frameEndUrl` props
-- Alternates between the two images every 1.2 seconds using `setInterval`
-- Uses a CSS fade transition for smooth switching
-- Renders in the same container style as GIFs (white background, aspect-square, rounded-lg, border-2)
-
-### Step 5: Update `ExerciseDetailModal` and `ExerciseDatabase`
-
-Add a third display condition:
-
-```
-if gif_url exists --> show GIF (unchanged)
-else if frame_start_url AND frame_end_url exist --> show ExerciseFrameAnimation
-else --> show "GIF not available yet" placeholder (unchanged)
-```
-
-## How to Verify
-
-1. Go to Exercise Library page
-2. Search for "X"
-3. Click on the exercise card
-4. You should see two sketches alternating in the image area
-5. Below: badges (Upper Legs, Body Weight, Glutes, Beginner, Strength)
-6. Below: description, secondary muscles, instructions
-
-## What Does NOT Change
-
-- All existing exercises with GIFs remain exactly as they are
-- No changes to exercise filtering, searching, or matching logic
-- No changes to workout/program generation code
-- The exercise library source-of-truth rule is unaffected
+No additional changes are needed for AI discovery. The exercise library hook (`useExerciseLibrary`) fetches ALL exercises from the database. The fuzzy matching system (`exerciseMatching.ts`) will automatically match searches like "squat", "air squat", "bodyweight squat" to "Air Squats". The Smartly Suggest engine also pulls from the same database, so this exercise will appear in personalized recommendations too.
 
