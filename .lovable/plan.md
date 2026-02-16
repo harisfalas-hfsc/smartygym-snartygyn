@@ -1,124 +1,56 @@
 
 
-# Library-First Exercise Selection: Permanent Architecture Change
+# Re-Verify and Fix ALL Existing Workouts and Programs
 
-## The Problem (Why It Keeps Failing)
+## Current State (Issues Found)
 
-The current system sends the AI a giant wall of 1,329 exercise names as text, then hopes it picks from them. It doesn't. The AI ignores the list and invents exercises like "Child's Pose", "Bird-Dog", and "Happy Baby" which don't exist in the library. Post-processing then tries to fix this -- but that's backwards.
+- **214 workouts**: All have some markup, BUT 3 exercise IDs have wrong zero-padding (e.g., `043` instead of `0043`) across 9 workouts. These View buttons are broken.
+- **28 training programs**: 1 invalid ID (`084` instead of `0084`).
+- **765 unmatched exercises** logged in the system from previous processing -- these are exercises in workouts/programs that never got View buttons at all.
+- No markup in wrong sections (Activation, Warm-up, Cool Down are clean).
 
-## The Solution: Library-First Architecture
+## What Needs to Happen
 
-Restructure the entire flow so the AI CANNOT generate exercises outside the library. The library becomes the INPUT, not a post-check.
+### Fix 1: Repair Zero-Padding on Exercise IDs
 
-### How It Will Work
+Find and fix all `{{exercise:043:...}}` to `{{exercise:0043:...}}`, `{{exercise:084:...}}` to `{{exercise:0084:...}}`, and `{{exercise:0000:...}}` (invalid ID -- needs replacement with correct exercise).
 
-```text
-CURRENT (BROKEN):
-  AI generates workout freely --> tries to match exercises --> fails --> no View buttons
+Affected: 9 workouts + 1 training program.
 
-NEW (CORRECT):
-  Load library --> Filter by equipment/target/body_part --> 
-  Give AI ONLY filtered exercises with IDs --> 
-  AI picks from filtered list --> 
-  Output includes exercise IDs --> 
-  View buttons are guaranteed
-```
+### Fix 2: Re-Run Section-Aware Relinking on ALL 214 Workouts
 
-## Implementation Steps
+Use the `reprocess-wod-exercises` function to strip and re-apply exercise markup on all 214 workouts. This ensures:
+- Every exercise in Main Workout and Finisher that exists in the library gets a View button
+- No markup in other sections
+- All IDs are correctly formatted
 
-### Step 1: Restructure the Exercise Reference List Format
+### Fix 3: Re-Run Relinking on ALL 28 Training Programs
 
-File: `supabase/functions/_shared/exercise-matching.ts`
+Use the `reprocess-program-exercises` function on all 28 programs to ensure every exercise that exists in the library gets proper markup.
 
-Change `buildExerciseReferenceList` to output a STRUCTURED, BROWSABLE format grouped by TARGET MUSCLE and BODY PART, with exercise IDs included. Instead of a flat dump, the AI sees:
+### Fix 4: Clear and Re-Check Mismatched Exercises Log
 
-```text
-TARGET: quads / BODY PART: upper legs
-  [ID:0043] Barbell Full Squat (barbell)
-  [ID:0044] Barbell Hack Squat (barbell)
-  [ID:1502] Air Squat (body weight)
-  [ID:1503] Bodyweight Lunge (body weight)
+After reprocessing, the mismatched table will be refreshed with only genuinely unmatched exercises (ones that truly don't exist in the library). This gives a clean audit of what's left.
 
-TARGET: glutes / BODY PART: upper legs
-  [ID:0560] Barbell Hip Thrust (barbell)
-  [ID:3561] Glute Bridge March (body weight)
-  ...
-```
+## Permanent Guarantee Going Forward
 
-This lets the AI "browse" by muscle/movement pattern exactly like the user described.
+The library-first architecture is now built into the generation code:
+- The AI receives the structured library (grouped by target/body part) with IDs BEFORE generating
+- The AI MUST output `{{exercise:ID:Name}}` format
+- Post-generation validation checks every ID against the database
+- `processContentSectionAware` runs as safety net
+- View buttons restricted to Main Workout and Finisher only
 
-### Step 2: Update the AI Prompt to Mandate ID-Based Selection
-
-File: `supabase/functions/generate-workout-of-day/index.ts`
-
-Change the prompt instructions so the AI MUST output exercise names with their IDs from the library. The prompt will say:
-
-```text
-MANDATORY: For EVERY exercise you include, you MUST write it as:
-{{exercise:ID:Exact Name}}
-
-Example: {{exercise:0043:Barbell Full Squat}}
-
-You MUST pick the ID and name EXACTLY from the library above.
-If you write ANY exercise without {{exercise:ID:Name}} format, 
-the workout will be REJECTED.
-```
-
-This means exercises come out of the AI already marked up with View buttons. No post-processing matching needed.
-
-### Step 3: Add Code-Level Validation That REJECTS Non-Library Exercises
-
-File: `supabase/functions/generate-workout-of-day/index.ts`
-
-After the AI returns the workout JSON, scan for:
-1. Any exercise text that is NOT wrapped in `{{exercise:ID:Name}}` markup in Main Workout and Finisher sections
-2. Any `{{exercise:ID:Name}}` where the ID does not exist in the library
-
-If violations are found: RE-PROMPT the AI with the specific violations, asking it to fix them using only library exercises. This is the safety net -- not the primary mechanism.
-
-### Step 4: Apply Same Changes to Training Program Generation
-
-File: `supabase/functions/generate-training-program/index.ts`
-
-Same restructured library format, same ID-based output requirement, same validation. Training programs will also output exercises with `{{exercise:ID:Name}}` markup directly from the AI.
-
-### Step 5: Remove Post-Processing Matching as Primary Mechanism
-
-The `processContentSectionAware` and `processContentWithExerciseMatching` calls after AI generation become a SAFETY NET only (for edge cases), not the primary linking mechanism. The AI itself outputs the markup.
-
-## What Changes
-
-| File | Change |
-|------|--------|
-| `_shared/exercise-matching.ts` | `buildExerciseReferenceList` outputs structured format with IDs grouped by target/body_part |
-| `generate-workout-of-day/index.ts` | Prompt restructured to require `{{exercise:ID:Name}}` output; validation added; post-processing becomes safety net |
-| `generate-training-program/index.ts` | Same prompt and validation changes |
+This is permanent. No future workout or program generation can bypass this -- it's enforced at the code level, not just in prompt instructions.
 
 ## What Does NOT Change
 
-- Workout philosophy, periodization, coaching logic, RPE rules
-- 5-section structure (Soft Tissue, Activation, Main Workout, Finisher, Cool Down)
-- Section awareness (View buttons only in Main Workout and Finisher)
-- Category-specific exercise rules (strength, cardio, metabolic, etc.)
-- Equipment/bodyweight filtering logic
-- Formatting, styling, design, typography
-- Naming rules, difficulty system, format definitions
-- All existing generation instructions and science
+- Workout structure, philosophy, formatting, styling
+- Periodization, coaching logic, RPE rules
+- Category-specific exercise rules
+- Equipment/bodyweight filtering
+- Section awareness rules
 
-## Technical Detail: The AI's Internal Thinking Process
+## Execution
 
-With the new structured library, the AI will follow this exact logic:
-
-1. "I need a STRENGTH workout, EQUIPMENT, Intermediate difficulty"
-2. "Let me look at the library for compound movements..."
-3. "TARGET: quads -- I see Barbell Full Squat [0043], Barbell Hack Squat [0044]..."
-4. "TARGET: glutes -- I see Barbell Hip Thrust [0560]..."
-5. "I'll use `{{exercise:0043:Barbell Full Squat}}` for the main lift"
-6. "For the finisher, TARGET: hamstrings -- `{{exercise:0581:Romanian Deadlift}}`"
-
-The exercises come out pre-linked. View buttons are guaranteed.
-
-## Permanent Rule
-
-This architecture becomes the permanent standard for ALL future workout and training program generation. The library is ALWAYS loaded first. Exercises are ALWAYS selected from it. No exceptions.
-
+All 214 workouts and 28 programs will be batch-reprocessed in one operation using the existing edge functions. No manual workout-by-workout work needed.
