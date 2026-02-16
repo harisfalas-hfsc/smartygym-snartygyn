@@ -430,14 +430,20 @@ function replaceExerciseInContent(
     new RegExp(`(\\d+\\s*(?:seconds?|secs?|minutes?|mins?)\\s+)${escapedWithSuffix}`, 'gi'),
     // 7. After a number
     new RegExp(`(\\d+\\s+)${escapedWithSuffix}`, 'gi'),
-    // 8. Inside a paragraph in a list item
+    // 8a. Exercise name as ENTIRE <p> content (exact)
     new RegExp(`(<p[^>]*>\\s*)${escapedWithSuffix}(\\s*<\/p>)`, 'gi'),
+    // 8b. Exercise name followed by parenthetical/trailing text inside <p> (e.g., "Sphinx (60 sec hold)")
+    new RegExp(`(<p[^>]*>\\s*)${escaped}(\\s*\\([^)]*\\)[^<]*<\/p>)`, 'gi'),
+    // 8c. Exercise name followed by trailing text inside <p> (e.g., "Sphinx - 45 sec per side")
+    new RegExp(`(<p[^>]*>\\s*)${escaped}(\\s*[-–—][^<]*<\/p>)`, 'gi'),
     // 9. After <br> tag or at line start with numbered prefix
     new RegExp(`(<br\\s*\\/?>\\s*\\d+[\\.\\)]\\s*)${escapedWithSuffix}`, 'gi'),
     // 10. Plain text after <br>
     new RegExp(`(<br\\s*\\/?>\\s*)${escapedWithSuffix}`, 'gi'),
-    // 11. Standalone in content (last resort, more specific)
-    new RegExp(`(>\\s*)${escaped}(\\s*<)`, 'gi'),
+    // 11. Standalone in content between tags (ensures > is preserved)
+    new RegExp(`(>)\\s*${escaped}\\s*(<)`, 'gi'),
+    // 12. Exercise name followed by parenthetical between tags
+    new RegExp(`(>)\\s*${escaped}(\\s*\\([^)]*\\)[^<]*)(<)`, 'gi'),
   ];
   
   let anyReplaced = false;
@@ -445,18 +451,19 @@ function replaceExerciseInContent(
     const before = result;
     const captureCount = (pattern.source.match(/\((?!\?)/g) || []).length;
     
-    const actualMarkup = replacementName ? markup : markup;
-    
-    if (captureCount === 2) {
-      result = result.replace(pattern, `$1${actualMarkup}$2`);
+    if (captureCount === 3) {
+      result = result.replace(pattern, `$1${markup}$2$3`);
+    } else if (captureCount === 2) {
+      result = result.replace(pattern, `$1${markup}$2`);
     } else if (captureCount === 1) {
-      result = result.replace(pattern, `$1${actualMarkup}`);
+      result = result.replace(pattern, `$1${markup}`);
     } else {
-      result = result.replace(pattern, actualMarkup);
+      result = result.replace(pattern, markup);
     }
     
     if (result !== before) {
       anyReplaced = true;
+      break; // Stop after first successful replacement to avoid double-matching
     }
   }
   
