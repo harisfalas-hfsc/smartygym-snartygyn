@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dumbbell, Target, Activity, ListOrdered, Info, Gauge, ImageOff } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import ExerciseFrameAnimation from "./ExerciseFrameAnimation";
 
 // Interface matching ExerciseDB schema in database
 interface Exercise {
@@ -23,6 +24,8 @@ interface Exercise {
   description: string | null;
   difficulty: string | null;
   category: string | null;
+  frame_start_url?: string | null;
+  frame_end_url?: string | null;
 }
 
 interface ExerciseDetailModalProps {
@@ -61,7 +64,7 @@ const ExerciseDetailModal = ({ exercise, open, onOpenChange }: ExerciseDetailMod
 
         <ScrollArea ref={scrollRootRef} className="max-h-[70vh] pr-4">
           <div className="space-y-6">
-            {/* Exercise GIF */}
+            {/* Exercise GIF or Frame Animation */}
             {exercise.gif_url ? (
               <div className="w-full aspect-square rounded-lg overflow-hidden bg-white border-2 border-border flex items-center justify-center">
                 <img
@@ -72,6 +75,12 @@ const ExerciseDetailModal = ({ exercise, open, onOpenChange }: ExerciseDetailMod
                   decoding="async"
                 />
               </div>
+            ) : exercise.frame_start_url && exercise.frame_end_url ? (
+              <ExerciseFrameAnimation
+                frameStartUrl={exercise.frame_start_url}
+                frameEndUrl={exercise.frame_end_url}
+                altText={`SmartyGym ${exercise.name} exercise demonstration`}
+              />
             ) : (
               <div className="w-full aspect-square rounded-lg overflow-hidden bg-white border-2 border-border flex items-center justify-center">
                 <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground">
