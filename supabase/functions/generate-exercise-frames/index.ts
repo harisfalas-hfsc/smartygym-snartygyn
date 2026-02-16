@@ -22,17 +22,26 @@ Deno.serve(async (req) => {
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const lovableApiKey = Deno.env.get('LOVABLE_API_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Generate two frame images using Lovable AI
+    // Generate image via Lovable AI gateway
     const generateImage = async (prompt: string): Promise<Uint8Array> => {
-      const response = await fetch("https://api.lovable.dev/v1/ai/image", {
+      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Authorization": `Bearer ${lovableApiKey}`,
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           model: "google/gemini-2.5-flash-image",
-          prompt,
-          aspect_ratio: "1:1",
+          messages: [
+            {
+              role: "user",
+              content: prompt,
+            },
+          ],
+          modalities: ["image", "text"],
         }),
       });
 
@@ -41,16 +50,29 @@ Deno.serve(async (req) => {
         throw new Error(`Image generation failed: ${response.status} - ${errorText}`);
       }
 
-      const arrayBuffer = await response.arrayBuffer();
-      return new Uint8Array(arrayBuffer);
+      const data = await response.json();
+      const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+
+      if (!imageUrl) {
+        throw new Error("No image returned from AI");
+      }
+
+      // Convert base64 data URL to Uint8Array
+      const base64Data = imageUrl.replace(/^data:image\/\w+;base64,/, '');
+      const binaryString = atob(base64Data);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      return bytes;
     };
 
     console.log(`Generating start frame for "${exerciseName}"...`);
-    const startPrompt = `Simple clean anatomical line-art sketch on plain white background: ${exerciseName} STARTING position (standing upright, feet shoulder-width apart). Gender-neutral human figure shown from the side. No text, no labels, no background elements, minimal black line-art style. Exercise illustration for a fitness app.`;
+    const startPrompt = `Generate an image: Simple minimalist fitness exercise icon illustration on white background. A stick figure standing upright with feet apart, arms at sides, ready to perform a ${exerciseName}. Black line drawing, no face details, geometric style like a technical manual diagram. Clean vector art style.`;
     const startImage = await generateImage(startPrompt);
 
     console.log(`Generating end frame for "${exerciseName}"...`);
-    const endPrompt = `Simple clean anatomical line-art sketch on plain white background: ${exerciseName} BOTTOM position (deep squat, thighs parallel to ground, arms extended forward). Gender-neutral human figure shown from the side. No text, no labels, no background elements, minimal black line-art style. Exercise illustration for a fitness app.`;
+    const endPrompt = `Generate an image: Simple minimalist fitness exercise icon illustration on white background. A stick figure in the bottom position of a ${exerciseName} with bent knees, thighs parallel to ground, arms extended forward. Black line drawing, no face details, geometric style like a technical manual diagram. Clean vector art style.`;
     const endImage = await generateImage(endPrompt);
 
     // Upload to exercise-gifs bucket
