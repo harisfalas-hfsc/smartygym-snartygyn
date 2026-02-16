@@ -68,7 +68,7 @@ Deno.serve(async (req) => {
     };
 
     console.log(`Generating start frame for "${exerciseName}"...`);
-    const startPrompt = `Generate an image: Simple minimalist fitness exercise icon illustration on white background. A stick figure standing upright with feet apart, arms at sides, ready to perform a ${exerciseName}. Black line drawing, no face details, geometric style like a technical manual diagram. Clean vector art style.`;
+    const startPrompt = `Generate an image: Simple minimalist fitness exercise icon illustration on white background. A human figure standing FULLY UPRIGHT in the starting position for ${exerciseName}. Legs completely straight, feet shoulder-width apart, arms relaxed at sides. The figure should be in a neutral standing position with NO knee bend whatsoever. Black line drawing, anatomical proportions, no face details, clean vector art style like a fitness manual diagram.`;
     const startImage = await generateImage(startPrompt);
 
     console.log(`Generating end frame for "${exerciseName}"...`);
