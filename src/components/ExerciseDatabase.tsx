@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Loader2, Search, X, Dumbbell, Activity, Target, Gauge, FolderOpen } from "lucide-react";
 import ExerciseDetailModal from "./ExerciseDetailModal";
+import ExerciseFrameAnimation from "./ExerciseFrameAnimation";
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -28,6 +29,8 @@ interface Exercise {
   description: string | null;
   difficulty: string | null;
   category: string | null;
+  frame_start_url: string | null;
+  frame_end_url: string | null;
 }
 
 const ExerciseDatabase = () => {
@@ -547,8 +550,8 @@ const ExerciseDatabase = () => {
               onClick={() => handleExerciseClick(exercise)}
               className="group cursor-pointer bg-card border border-border rounded-lg p-4 hover:border-primary/50 hover:shadow-lg transition-all duration-200"
             >
-              {/* GIF Preview if available */}
-              {exercise.gif_url && (
+              {/* GIF or Frame Animation Preview */}
+              {exercise.gif_url ? (
                 <div className="w-full aspect-square rounded-md overflow-hidden bg-muted mb-3">
                   <img 
                     src={exercise.gif_url} 
@@ -557,7 +560,15 @@ const ExerciseDatabase = () => {
                     loading="lazy"
                   />
                 </div>
-              )}
+              ) : exercise.frame_start_url && exercise.frame_end_url ? (
+                <div className="mb-3">
+                  <ExerciseFrameAnimation
+                    frameStartUrl={exercise.frame_start_url}
+                    frameEndUrl={exercise.frame_end_url}
+                    altText={exercise.name}
+                  />
+                </div>
+              ) : null}
               
               {/* Exercise Info */}
               <div className="space-y-2">

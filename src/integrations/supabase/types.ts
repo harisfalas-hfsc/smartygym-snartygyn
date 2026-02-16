@@ -1115,6 +1115,8 @@ export type Database = {
           description: string | null
           difficulty: string | null
           equipment: string
+          frame_end_url: string | null
+          frame_start_url: string | null
           gif_url: string | null
           id: string
           instructions: string[] | null
@@ -1129,6 +1131,8 @@ export type Database = {
           description?: string | null
           difficulty?: string | null
           equipment: string
+          frame_end_url?: string | null
+          frame_start_url?: string | null
           gif_url?: string | null
           id: string
           instructions?: string[] | null
@@ -1143,6 +1147,8 @@ export type Database = {
           description?: string | null
           difficulty?: string | null
           equipment?: string
+          frame_end_url?: string | null
+          frame_start_url?: string | null
           gif_url?: string | null
           id?: string
           instructions?: string[] | null
