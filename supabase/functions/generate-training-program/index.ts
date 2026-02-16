@@ -61,39 +61,36 @@ The user will select: CATEGORY, EQUIPMENT TYPE, DIFFICULTY, FORMAT, DURATION, an
 === CATEGORY-SPECIFIC EXERCISE RULES (CRITICAL - RESPECT CATEGORY PURPOSE) ===
 
 **STRENGTH Category:**
-ALLOWED EXERCISES:
-- Equipment: Barbell Back Squat, Front Squat, Deadlift, Romanian Deadlift, Bench Press, Incline Bench Press, Overhead Press, Barbell Row, Pull-ups (Weighted), Dips (Weighted), Hip Thrust, Lunges (Weighted), Step-ups, Farmer's Walk, Kettlebell Goblet Squat
-- Bodyweight: Push-ups (all variations), Pull-ups, Chin-ups, Dips, Pistol Squats, Nordic Curls, Handstand Push-ups, Archer Push-ups, Diamond Push-ups, Pike Push-ups, Inverted Rows, Single-leg Squats, Bulgarian Split Squats, Glute Bridges
+EXERCISE SELECTION: Browse the EXERCISE LIBRARY above. Filter by TARGET: quads, glutes, hamstrings, pecs, lats, delts, triceps, biceps. Select compound and isolation movements FROM THE LIBRARY ONLY.
 FORBIDDEN: Burpees, Mountain Climbers, High Knees, Jumping Jacks, Box Jumps (for cardio), any time-based cardio circuits
 REST: 60-120 seconds between sets
 
 **CARDIO Category:**
-BODYWEIGHT ALLOWED: Sprints (50m, 100m, 200m), Interval Running (sprint/jog patterns), Shuttle Runs (10m-20m-10m patterns), Tempo Runs, Running, Jogging, High Knees, Butt Kicks, Skipping, Jump Rope, Bear Crawl, Crab Walk, Inchworms, Box Jumps, Jumping Jacks, Lateral Shuffles, A-Skips, B-Skips, Carioca, Bounding, Stair Running, Plyometric Jumps
-EQUIPMENT ALLOWED: Treadmill (running/sprints/incline), Rowing Machine (intervals/distance), Stationary Bike, Air Bike/Assault Bike, Elliptical, Ski Erg, Stair Climber, Jump Rope, Box Jumps, Kettlebell Swings, Battle Ropes
-COMBINATIONS: Equipment workouts CAN combine machines with floor exercises (e.g., 500m Row + 20 KB Swings + 400m Bike)
+EXERCISE SELECTION: Browse the EXERCISE LIBRARY above. Filter by TARGET: cardiovascular system, full body movements. For bodyweight workouts, filter equipment='body weight'. Select running, jumping, locomotion, and machine-based exercises FROM THE LIBRARY ONLY.
+COMBINATIONS: Equipment workouts CAN combine machines with floor exercises
 FORBIDDEN: Heavy barbell lifts, slow strength movements, exercises requiring long rest
 REST: 15-30 seconds between exercises
 
 **METABOLIC Category:**
-ALLOWED EXERCISES: Kettlebell Swings, Thrusters, Dumbbell Snatches, Battle Ropes, Medicine Ball Slams, Wall Balls, Rowing, Burpees, Box Jumps, Push Press, Clean and Press, Renegade Rows, Devil's Press, Man Makers
+EXERCISE SELECTION: Browse the EXERCISE LIBRARY above. Filter by TARGET: full body, explosive/power movements. Select exercises that combine strength AND cardio elements FROM THE LIBRARY ONLY.
 RULE: Must combine strength AND cardio elements in circuits, stations, EMOM, or Tabata format
 FORBIDDEN: Pure cardio (just running), pure strength (heavy sets with long rest), isolation exercises
 REST: 20-40 seconds, ratio 40 work/20 rest preferred
 
 **CALORIE BURNING Category:**
-ALLOWED EXERCISES: Burpees, Squat Jumps, High Knees, Mountain Climbers, Jumping Jacks, Lunge Jumps, Kettlebell Swings, Battle Ropes, Box Jumps, Skaters, Plyo Lunges, Tuck Jumps, Star Jumps, Speed Skaters
+EXERCISE SELECTION: Browse the EXERCISE LIBRARY above. Filter for high-rep bodyweight and plyometric exercises. Select exercises suitable for sustained high output FROM THE LIBRARY ONLY.
 FORMATS: Circuits, AMRAP, Tabata, For Time
 FORBIDDEN: Technical Olympic lifts, heavy loading requiring perfect form, slow strength
 REST: 15-30 seconds maximum
 
 **MOBILITY & STABILITY Category:**
-ALLOWED EXERCISES: Cat-Cow, Thoracic Rotations, 90/90 Hip Rotations, Dead Bugs, Bird Dogs, Planks (all variations), Side Planks, Shoulder CARs, Hip CARs, World's Greatest Stretch, Pigeon Pose, Child's Pose, Thread the Needle, Foam Rolling, Breathing Exercises
+EXERCISE SELECTION: Browse the EXERCISE LIBRARY above. Filter by TARGET: spine stabilizers, hip flexors, rotator cuff, core, glutes. Select controlled movement and stability exercises FROM THE LIBRARY ONLY.
 FORBIDDEN: Burpees, Jumps, Running, anything explosive or heavy, heart rate elevation exercises
 HOLDS: 30-60 seconds controlled movements
 
 **CHALLENGE Category:**
-EXAMPLE FORMATS: "100 Burpees for Time", "Descending Ladder 10-1", "Death by Push-ups", "EMOM + AMRAP Combo", "Race Against Clock", "Pyramid Sets"
-ALLOWED: Any high-intensity exercise, mental toughness tests, benchmark workouts
+EXERCISE SELECTION: Browse the EXERCISE LIBRARY above. Select any exercises suitable for high-rep fatigue work, mental toughness tests, and benchmark workouts FROM THE LIBRARY ONLY.
+EXAMPLE FORMATS: "100 [exercise] for Time", "Descending Ladder 10-1", "Death by [exercise]", "EMOM + AMRAP Combo"
 FORBIDDEN: Mobility exercises, slow technical lifts, low-intensity movements
 
 === CATEGORY PHILOSOPHY & MINDSET (UNDERSTAND THE PURPOSE) ===
@@ -190,11 +187,12 @@ Make people question themselves: "Can I accomplish this?" This is NOT a normal w
 
 === EXERCISE VARIETY RULE ===
 
-The exercise banks above are GUIDELINES and EXAMPLES. You should:
-- Use similar exercises, variations, and alternatives to keep workouts fresh
+You MUST select exercises ONLY from the EXERCISE LIBRARY provided above. You should:
+- Browse the library by TARGET MUSCLE and BODY PART to find variety
 - Create variety while respecting the category's purpose and intensity level
 - NEVER violate category purpose (no burpees in Strength, no heavy lifts in Cardio)
 - Strictly adhere to FORBIDDEN exercises for each category
+- NEVER invent, rename, or use exercises not in the library
 
 === DURATION-FORMAT MATCHING ===
 
@@ -276,10 +274,11 @@ Pick the ID and Name EXACTLY from the library above.
 If you write ANY exercise without {{exercise:ID:Name}} format, the program will be REJECTED.
 
 CRITICAL RULES:
-1. You MUST ONLY use exercises from the list above — browse by TARGET MUSCLE to find what you need
+1. You MUST ONLY use exercises from the EXERCISE LIBRARY above — browse by TARGET MUSCLE and BODY PART to find what you need
 2. Write each exercise using {{exercise:ID:Exact Name}} format with the correct ID
-3. Do NOT suggest any exercises not in the list
-4. If the list doesn't have enough exercises, use available exercises creatively with progressive overload
+3. Do NOT suggest, invent, rename, or create any exercises not in the library
+4. If the exercise you want does not exist, adapt using the closest available exercise FROM THE LIBRARY
+5. Selection must ALWAYS start from the library — NEVER generate first and match later
 
 === TRAINING PROGRAM CATEGORY PHILOSOPHY (UNDERSTAND THE PURPOSE - MANDATORY) ===
 
