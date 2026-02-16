@@ -1,84 +1,108 @@
 
 
-# Fix ALL Exercises: Zero Unmatched, View Buttons Everywhere
+# Permanent Global Rule: Exercise Library as Single Source of Truth
 
-## What I Found
+## What This Does
 
-### Problem 1: Corrupted HTML
-Previous regex replacements left `$3` text artifacts scattered throughout workout content (visible in Flow Restore, Glute Core Foundation, and likely many others). These corrupt strings break all subsequent pattern matching, causing real exercises to fail.
+Embeds your exact rule — word for word — into the AI generation code so that every workout, WOD, and training program generated from this moment forward can ONLY use exercises from the exercise library database (the equivalent of exerciseData_complete.json). No exceptions, no inventions, no synonyms.
 
-### Problem 2: Real Library Exercises Logged as "Unmatched"
-At least 18 exercises in the "unmatched" log EXIST in your library and should have View buttons:
-- dead bug (ID: 0276)
-- sphinx (ID: 1362)
-- air bike (ID: 0003)
-- barbell bent over row (ID: 0027)
-- cable pulldown (ID: 0198)
-- decline crunch (ID: 0277)
-- dumbbell seated curl (ID: 0391)
-- dumbbell seated shoulder press (ID: 0405)
-- cable straight arm pulldown (ID: 0238)
-- inchworm (ID: 1471)
-- iron cross stretch (ID: 1419)
-- bench hip extension (ID: 0130)
-- split squats (ID: 2368)
-- standing calves (ID: 1397)
-- balance board (ID: 0020)
-- hanging pike (ID: 0473)
-- suspended split squat (ID: 0809)
-- upward facing dog (ID: 1366)
-...and likely more
+## What Needs to Change
 
-These are matching at 100% confidence in theory, but the corrupted HTML prevents the replacement from working.
+### Problem: Hardcoded Exercise Names in Prompts
 
-### Problem 3: Section Restriction Blocking View Buttons
-The current system only puts View buttons in Main Workout and Finisher sections. Your instruction is clear: EVERY exercise EVERYWHERE must have a View button. Exercises in Activation and Cool Down that exist in the library should also get View buttons.
+The current prompts contain dozens of hardcoded exercise name examples that tell the AI things like:
 
-## The Fix (4 Steps)
+- "ALLOWED EXERCISES: Burpees, Squat Jumps, High Knees, Mountain Climbers..."
+- "Cat-Cow, Thoracic Rotations, 90/90 Hip Rotations, Dead Bugs..."
+- "Kettlebell Swings, Thrusters, Dumbbell Snatches..."
 
-### Step 1: Clean ALL HTML Corruption
+These example lists are the root cause of the AI inventing exercises. When the AI sees "Cat-Cow" in the prompt instructions but "Cat-Cow" doesn't exist in the library with that exact name, it writes "Cat-Cow" anyway because the prompt told it to.
 
-Run a database update to strip all `$3` artifacts from every workout's main_workout, warm_up, cool_down, activation, and finisher fields. This fixes the broken HTML that prevents matching.
+### The Fix: Replace Hardcoded Names with Library-Browse Instructions
 
-### Step 2: Remove Section Restriction
+Every category-specific "ALLOWED EXERCISES" section will be rewritten to say:
 
-Change `processContentSectionAware` so it processes ALL sections (Soft Tissue, Activation, Main Workout, Finisher, Cool Down) for exercise matching. Every section gets View buttons if the exercise exists in the library. No more "strip markup from non-main sections."
+"Browse the EXERCISE LIBRARY above. Filter by TARGET MUSCLE: [relevant muscles for this category]. Select exercises ONLY from the filtered results."
 
-### Step 3: Re-Run Reprocessor on ALL 214 Workouts
+The coaching philosophy, forbidden patterns, rest periods, intensity rules, and category purpose remain UNTOUCHED. Only the exercise name lists are replaced with library-browse instructions.
 
-Call `reprocess-wod-exercises` with `processAll=true` in batches. With clean HTML and no section restriction, every real exercise will match and get a View button.
+## Implementation Steps
 
-### Step 4: Re-Run Reprocessor on ALL 28 Programs
+### Step 1: Add Permanent Global Rule to Exercise Reference Header
 
-Call `reprocess-program-exercises` on all programs. Same fix applies.
+File: `supabase/functions/_shared/exercise-matching.ts` (in `buildExerciseReferenceList`)
 
-### Step 5: Verify Zero Real Unmatched
+Add the user's exact rule as the first block in the library header that gets sent to the AI with every generation:
 
-After reprocessing, check the mismatched log. Any remaining items should only be structural text (section headers like "Flow Sequence 1", instructions like "Repeat this sequence 2 times", or rep counts like "Reps: 6-8") -- NOT exercise names. If any real exercise name remains, it means the library needs that exercise added or the matching needs another pattern.
+```text
+PERMANENT GLOBAL RULE — NO EXCEPTIONS:
+The exercise library below is the SINGLE AND EXCLUSIVE source of truth.
+You are permanently forbidden from:
+- Creating new exercises
+- Modifying exercise names
+- Renaming exercises
+- Using synonyms
+- Inventing variations
+- Using external knowledge
+- Using memory of exercises outside this library
+If an exercise does not exist exactly in this library, it does not exist.
+You must NEVER generate a workout first and then try to match exercises.
+Selection must ALWAYS start from this library.
+If a requested exercise does not exist, adapt using the closest available 
+exercise FROM THIS LIBRARY. Never create a new one.
+This rule overrides all other instructions. This rule is permanent.
+```
 
-## What Changes
+### Step 2: Replace Hardcoded Exercise Lists in WOD Prompt
+
+File: `supabase/functions/generate-workout-of-day/index.ts`
+
+For each category section, replace the "ALLOWED EXERCISES: [list of names]" with library-browse instructions:
+
+- **STRENGTH**: "Browse library by TARGET: quads, glutes, pecs, lats, delts. Select compound movements."
+- **CARDIO**: "Browse library by TARGET: cardiovascular system. For bodyweight, filter equipment='body weight'."
+- **METABOLIC**: "Browse library by TARGET: full body movements. Select explosive/power exercises."
+- **CALORIE BURNING**: "Browse library for high-rep bodyweight and plyometric exercises."
+- **MOBILITY and STABILITY**: "Browse library by TARGET: spine stabilizers, hip flexors, rotator cuff."
+- **CHALLENGE**: "Browse library for any exercises suitable for high-rep fatigue work."
+
+What stays the same in each category: philosophy, forbidden patterns, rest periods, RPE targets, format rules, coaching mindset, intensity governance.
+
+### Step 3: Replace Hardcoded Exercise Lists in Training Program Prompt
+
+File: `supabase/functions/generate-training-program/index.ts`
+
+Same replacement: remove hardcoded exercise name examples from category philosophy sections. Replace with "Browse the exercise library by TARGET MUSCLE and BODY PART."
+
+### Step 4: Strengthen Post-Generation Validation
+
+File: `supabase/functions/generate-workout-of-day/index.ts`
+
+The existing validation already checks IDs. Add a final check: scan for any exercise-like text in Main Workout/Finisher that does NOT have `{{exercise:ID:Name}}` markup. If found, run the safety-net matcher one more time. This is already partially in place but will be made more explicit.
+
+## What Does NOT Change (Untouched)
+
+- Workout philosophy, periodization, coaching logic
+- 84-day cycle, difficulty system, RPE rules
+- 5-section structure (Soft Tissue, Activation, Main Workout, Finisher, Cool Down)
+- Category philosophy and mindset descriptions
+- Format definitions and rules
+- Equipment governance
+- Volume and value-for-money standards
+- Challenge gamification concepts
+- Recovery/Pilates special structures
+- Naming rules
+- HTML formatting rules
+- Strength day focus system
+- All training program category philosophies (Functional Strength, Hypertrophy, Weight Loss, Low Back Pain, Mobility)
+- Periodization context (yesterday/tomorrow awareness)
+
+## Summary
 
 | Area | Change |
 |------|--------|
-| Database content | Strip `$3` artifacts from all workout fields |
-| `_shared/exercise-matching.ts` | `processContentSectionAware` now processes ALL sections for View buttons |
-| `reprocess-wod-exercises` | Process ALL fields (main_workout, warm_up, cool_down, activation, finisher) |
-| All 214 workouts | Re-linked with clean HTML |
-| All 28 programs | Re-linked |
-
-## What Does NOT Change
-
-- Workout structure, philosophy, formatting, styling
-- Section order and emoji headers
-- Periodization, coaching logic, RPE rules
-- The exercise library itself
-- The library-first generation architecture for future workouts
-- Category-specific exercise rules
-- Equipment/bodyweight filtering
-
-## After This
-
-- Every exercise in every workout and program that exists in the library will have a View button
-- No exercise will exist anywhere that is not from the library (enforced by the library-first architecture for future generation)
-- The mismatched log will contain only structural/instructional text, not exercise names
+| `_shared/exercise-matching.ts` | Add permanent global rule text to library header |
+| `generate-workout-of-day/index.ts` | Replace hardcoded exercise name lists with library-browse instructions in all 6+ category sections |
+| `generate-training-program/index.ts` | Same replacement for training program category sections |
+| Philosophy/coaching/formatting | Zero changes |
 
