@@ -121,13 +121,11 @@ const About = () => {
                     Your Gym Re-imagined. Anywhere, Anytime.
                   </h2>
                   <div className="space-y-4 max-w-4xl mx-auto">
-          <p className="text-base font-semibold text-center text-primary md:text-foreground">
-            We are not here to replace your gym. We are here to back you up when life gets in the way.
-          </p>
                     <p className="text-base text-muted-foreground text-center leading-relaxed">
-                      Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed — 
-                      <span className="text-primary font-semibold">SmartyGym</span> is your backup plan. Or, if you prefer training from home entirely, we've got you covered.
-                      Or, if you go to your gym but want to follow a professional, science-based workout or training program designed by{' '}
+                      <strong className="text-foreground">Expert-crafted workouts</strong>, <strong className="text-foreground">structured training programs</strong>, a comprehensive <strong className="text-foreground">exercise library</strong>, powerful <strong className="text-foreground">Smarty Tools</strong>, science-based <strong className="text-foreground">articles</strong>, and a personal <strong className="text-foreground">logbook</strong>, everything a complete gym must offer, built by real professionals, all in your pocket at <strong className="text-foreground">smartygym.com</strong>.
+                    </p>
+                    <p className="text-base text-muted-foreground text-center leading-relaxed">
+                      We are not here to replace your gym. We are here to back you up when life gets in the way. Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed — <span className="text-primary font-semibold">SmartyGym</span> is your backup plan. Or, if you prefer training from home entirely, we've got you covered. Or, if you go to your gym but want to follow a professional, science-based workout or training program designed by{' '}
                       <a 
                         href="/coach-profile" 
                         onClick={(e) => {
@@ -137,10 +135,7 @@ const About = () => {
                         className="text-primary hover:underline font-medium cursor-pointer"
                       >
                         Haris Falas
-                      </a>, we provide that expert guidance.
-                    </p>
-                    <p className="text-base font-semibold text-center text-primary">
-                      Wherever you are, your gym comes with you.
+                      </a>, we provide that expert guidance. <span className="font-semibold text-primary">Wherever you are, your gym comes with you.</span>
                     </p>
                   </div>
                 </div>
