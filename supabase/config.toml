@@ -260,3 +260,6 @@ verify_jwt = false
 
 [functions.generate-exercise-frames]
 verify_jwt = false
+
+[functions.regenerate-broken-programs]
+verify_jwt = false
