@@ -33,7 +33,7 @@ export const FixedBackButton = () => {
       variant="ghost"
       size="sm"
       onClick={handleBack}
-      className="fixed left-4 z-40 gap-2 
+      className="hidden md:inline-flex fixed left-4 z-40 gap-2 
         bg-background/80 backdrop-blur-md 
         border border-primary/30 
         rounded-full shadow-lg
