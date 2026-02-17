@@ -105,7 +105,7 @@ const About = () => {
         <h1 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">
           About <span className="text-primary">SmartyGym</span>
         </h1>
-              <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              <p className="hidden md:block text-lg text-muted-foreground max-w-3xl mx-auto">
                 We're redefining online fitness — making quality training accessible, flexible, and designed for real life.
               </p>
             </div>
