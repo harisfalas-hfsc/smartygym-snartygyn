@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollReveal } from "@/components/ScrollReveal";
-import { CheckCircle2, Target, Heart, Users, Shield, Award, Compass, GraduationCap, Plane, Dumbbell, UserCheck } from "lucide-react";
+import { CheckCircle2, Target, Heart, Users, Shield, Award, Compass, GraduationCap, Plane, Dumbbell, UserCheck, Smartphone } from "lucide-react";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
@@ -112,8 +112,9 @@ const About = () => {
           </ScrollReveal>
 
           {/* Mission Statement */}
+          {/* Desktop: Single card with both paragraphs */}
           <ScrollReveal>
-            <Card className="mb-12 border-2 border-primary">
+            <Card className="mb-12 border-2 border-primary hidden md:block">
               <CardContent className="p-6">
                 <div className="text-center space-y-4">
                   <Target className="w-12 h-12 text-primary mx-auto" />
@@ -122,7 +123,7 @@ const About = () => {
                   </h2>
                   <div className="space-y-4 max-w-4xl mx-auto">
                     <p className="text-base text-muted-foreground text-center leading-relaxed">
-                      <strong className="text-primary md:text-foreground">Expert-crafted workouts</strong>, <strong className="text-primary md:text-foreground">structured training programs</strong>, a comprehensive <strong className="text-primary md:text-foreground">exercise library</strong>, powerful <strong className="text-primary md:text-foreground">Smarty Tools</strong>, science-based <strong className="text-primary md:text-foreground">articles</strong>, and a personal <strong className="text-primary md:text-foreground">logbook</strong>, everything a complete gym must offer, built by real professionals, all in your pocket at <strong className="text-primary md:text-foreground">smartygym.com</strong>.
+                      <strong className="text-foreground">Expert-crafted workouts</strong>, <strong className="text-foreground">structured training programs</strong>, a comprehensive <strong className="text-foreground">exercise library</strong>, powerful <strong className="text-foreground">Smarty Tools</strong>, science-based <strong className="text-foreground">articles</strong>, and a personal <strong className="text-foreground">logbook</strong>, everything a complete gym must offer, built by real professionals, all in your pocket at <strong className="text-foreground">smartygym.com</strong>.
                     </p>
                     <p className="text-base text-muted-foreground text-center leading-relaxed">
                       We are not here to replace your gym. We are here to back you up when life gets in the way. Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed — <span className="text-primary font-semibold">SmartyGym</span> is your backup plan. Or, if you prefer training from home entirely, we've got you covered. Or, if you go to your gym but want to follow a professional, science-based workout or training program designed by{' '}
@@ -142,6 +143,45 @@ const About = () => {
               </CardContent>
             </Card>
           </ScrollReveal>
+
+          {/* Mobile: Two separate cards */}
+          <div className="md:hidden space-y-6 mb-12">
+            <Card className="border-2 border-primary">
+              <CardContent className="p-6">
+                <div className="text-center space-y-4">
+                  <Target className="w-12 h-12 text-primary mx-auto" />
+                  <h2 className="text-2xl font-bold text-foreground">
+                    Your Gym Re-imagined. Anywhere, Anytime.
+                  </h2>
+                  <p className="text-base text-muted-foreground text-center leading-relaxed">
+                    <strong className="text-primary">Expert-crafted workouts</strong>, <strong className="text-primary">structured training programs</strong>, a comprehensive <strong className="text-primary">exercise library</strong>, powerful <strong className="text-primary">Smarty Tools</strong>, science-based <strong className="text-primary">articles</strong>, and a personal <strong className="text-primary">logbook</strong>, everything a complete gym must offer, built by real professionals, all in your pocket at <strong className="text-primary">smartygym.com</strong>.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 border-primary">
+              <CardContent className="p-6">
+                <div className="text-center space-y-4">
+                  <Smartphone className="w-12 h-12 text-primary mx-auto" />
+                  <h3 className="text-xl font-bold text-foreground">Your Gym Comes With You</h3>
+                  <p className="text-base text-muted-foreground text-center leading-relaxed">
+                    We are not here to replace your gym. We are here to back you up when life gets in the way. Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed — <span className="text-primary font-semibold">SmartyGym</span> is your backup plan. Or, if you prefer training from home entirely, we've got you covered. Or, if you go to your gym but want to follow a professional, science-based workout or training program designed by{' '}
+                    <a 
+                      href="/coach-profile" 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        navigate('/coach-profile');
+                      }}
+                      className="text-primary hover:underline font-medium cursor-pointer"
+                    >
+                      Haris Falas
+                    </a>, we provide that expert guidance. <span className="font-semibold text-primary">Wherever you are, your gym comes with you.</span>
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
           {/* Core Values */}
           <ScrollReveal>
