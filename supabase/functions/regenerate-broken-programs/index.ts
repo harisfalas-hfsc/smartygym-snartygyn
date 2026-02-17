@@ -266,7 +266,10 @@ Deno.serve(async (req) => {
         // Combine all week chunks
         let fullSchedule = weekChunks.join('\n<p class="tiptap-paragraph"></p>\n');
 
-        // Run exercise matching as safety net
+        // Step 1: Fix malformed exercise tags from AI output
+        fullSchedule = fixMalformedExerciseTags(fullSchedule, allExercises);
+
+        // Step 2: Run exercise matching on remaining untagged exercises
         const matchResult = processContentWithExerciseMatching(
           fullSchedule,
           allExercises,
@@ -286,13 +289,8 @@ Deno.serve(async (req) => {
         }
 
         if (!progressionPlan || progressionPlan.length < 200) {
-          progressionPlan = await generateProgressionPlan(LOVABLE_API_KEY, program, philosophy, allExercises);
-          if (progressionPlan) {
-            const progResult = processContentWithExerciseMatching(
-              progressionPlan, allExercises, `${LOG}[PROG-MATCH]`
-            );
-            progressionPlan = progResult.processedContent;
-          }
+          progressionPlan = await generateProgressionPlan(LOVABLE_API_KEY, program, philosophy);
+          // NOTE: Do NOT run exercise matching on progression plan - it's prose, not exercise lists
           console.log(`${LOG}   Generated progression plan: ${progressionPlan?.length || 0} chars`);
         }
 
@@ -522,7 +520,6 @@ async function generateProgressionPlan(
   apiKey: string,
   program: ProgramRow,
   philosophy: string,
-  exercises: ExerciseBasic[]
 ): Promise<string | null> {
   const prompt = `Write a detailed progression plan for this training program:
 Name: "${program.name}"
@@ -540,7 +537,74 @@ Include:
 5. How to adapt if exercises are too easy/hard
 
 Format as HTML using <p class="tiptap-paragraph"> and <ul class="tiptap-bullet-list"> tags.
-You MAY reference exercises using {{exercise:ID:Name}} format if relevant.`;
+Do NOT include any {{exercise:}} markup - this is a prose guidelines section, not an exercise list.`;
 
   return callAI(apiKey, "You are an expert fitness coach writing training progression guidelines.", prompt);
+}
+
+// ─── Fix Malformed Exercise Tags ──────────────────────────────────────────────
+
+function fixMalformedExerciseTags(html: string, exercises: ExerciseBasic[]): string {
+  const idMap = new Map<string, ExerciseBasic>();
+  for (const ex of exercises) {
+    idMap.set(ex.id, ex);
+    idMap.set(ex.id.toLowerCase(), ex);
+  }
+  const nameMap = new Map<string, ExerciseBasic>();
+  for (const ex of exercises) {
+    nameMap.set(ex.name.toLowerCase().trim(), ex);
+  }
+
+  let fixed = html;
+  let fixCount = 0;
+
+  // Pattern 1: {{exercise:ID:Name}} with invalid ID → find by name
+  fixed = fixed.replace(/\{\{exercise:([^:}]+):([^}]+)\}\}/g, (_m, id, name) => {
+    const trimId = id.trim();
+    const trimName = name.trim();
+    if (idMap.has(trimId)) {
+      const ex = idMap.get(trimId)!;
+      return `{{exercise:${ex.id}:${ex.name}}}`;
+    }
+    const byName = nameMap.get(trimName.toLowerCase());
+    if (byName) { fixCount++; return `{{exercise:${byName.id}:${byName.name}}}`; }
+    const match = findBestMatch(trimName, exercises, 0.70);
+    if (match) { fixCount++; return `{{exercise:${match.exercise.id}:${match.exercise.name}}}`; }
+    fixCount++;
+    return trimName;
+  });
+
+  // Pattern 2: {{ID:Name}} without "exercise:" prefix
+  fixed = fixed.replace(/\{\{(\d{4}):([^}]+)\}\}/g, (_m, id, name) => {
+    const trimId = id.trim();
+    const trimName = name.trim();
+    if (idMap.has(trimId)) {
+      const ex = idMap.get(trimId)!;
+      fixCount++;
+      return `{{exercise:${ex.id}:${ex.name}}}`;
+    }
+    const byName = nameMap.get(trimName.toLowerCase());
+    if (byName) { fixCount++; return `{{exercise:${byName.id}:${byName.name}}}`; }
+    return trimName;
+  });
+
+  // Pattern 3: {{slug-name:ID:Display Name}}
+  fixed = fixed.replace(/\{\{([a-z0-9-]+):ID:([^}]+)\}\}/gi, (_m, slug, name) => {
+    const trimName = name.trim();
+    const byName = nameMap.get(trimName.toLowerCase());
+    if (byName) { fixCount++; return `{{exercise:${byName.id}:${byName.name}}}`; }
+    if (idMap.has(slug)) {
+      const ex = idMap.get(slug)!;
+      fixCount++;
+      return `{{exercise:${ex.id}:${ex.name}}}`;
+    }
+    const match = findBestMatch(trimName, exercises, 0.70);
+    if (match) { fixCount++; return `{{exercise:${match.exercise.id}:${match.exercise.name}}}`; }
+    return trimName;
+  });
+
+  if (fixCount > 0) {
+    console.log(`${LOG}   🔧 Fixed ${fixCount} malformed exercise tags`);
+  }
+  return fixed;
 }
