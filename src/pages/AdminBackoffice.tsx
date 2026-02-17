@@ -300,7 +300,7 @@ export default function AdminBackoffice() {
             <Button 
               variant="ghost" 
               onClick={() => setActiveTab(null)}
-              className="mb-4 gap-2"
+              className="hidden md:inline-flex mb-4 gap-2"
             >
               <ArrowLeft className="h-4 w-4" />
               Back to sections

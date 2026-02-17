@@ -41,7 +41,7 @@ const NewsletterThankYou = () => {
             <Button onClick={() => navigate("/workout")} size="lg" className="w-full">
               Explore Workouts
             </Button>
-            <Button onClick={() => navigate("/")} variant="outline" size="lg" className="w-full">
+            <Button onClick={() => navigate("/")} variant="outline" size="lg" className="hidden md:inline-flex w-full">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Home
             </Button>

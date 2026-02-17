@@ -96,7 +96,7 @@ export default function ExportVideoPage() {
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">
-          <Button asChild variant="ghost" size="icon">
+          <Button asChild variant="ghost" size="icon" className="hidden md:inline-flex">
             <Link to="/admin">
               <ArrowLeft className="h-5 w-5" />
             </Link>

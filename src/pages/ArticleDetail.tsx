@@ -48,7 +48,7 @@ export const ArticleDetail = () => {
             <p className="text-muted-foreground mb-6">
               The article you're looking for doesn't exist or has been unpublished.
             </p>
-            <Button onClick={() => navigate('/blog')}>
+            <Button onClick={() => navigate('/blog')} className="hidden md:inline-flex">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Blog
             </Button>
@@ -170,7 +170,7 @@ export const ArticleDetail = () => {
           </Card>
 
           <div className="mt-8 flex gap-4">
-            <Button variant="outline" onClick={() => navigate('/blog')} className="flex-1">
+            <Button variant="outline" onClick={() => navigate('/blog')} className="hidden md:inline-flex flex-1">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Blog
             </Button>

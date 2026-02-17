@@ -356,7 +356,7 @@ export default function CorporateAdmin() {
             variant="ghost"
             size="sm"
             onClick={() => navigate('/dashboard')}
-            className="mb-6"
+            className="hidden md:inline-flex mb-6"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             <span>Back to Dashboard</span>
