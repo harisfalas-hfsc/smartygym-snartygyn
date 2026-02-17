@@ -1,59 +1,28 @@
 
 
-## Upgrade Macro Calculator: Smart Deficit/Surplus with Aggressiveness Control
+## Upload Exercise GIFs for 4 Exercises
 
-### What changes
+### What this does
+Upload the 4 GIF files you provided to the file storage and update the exercise database records so the proper GIF displays instead of "GIF not available" or the AI-generated frame animation.
 
-Add an **"Intensity"** selector that appears after the Goal field (only when goal is "lose" or "gain"). This lets each user choose how aggressive their calorie adjustment should be.
+### Exercise-to-GIF mapping
 
-### New "Intensity" field
+| Exercise | Database IDs to update | GIF file |
+|----------|----------------------|----------|
+| Jumping Jacks | `jumping-jacks`, `jumping-jacks-cardio` | Jumping-jack.gif |
+| Butt Kicks | `butt-kicks-cardio` | Butt-Kicks.gif |
+| High Knees | `high-knees`, `high-knees-cardio` | HIGH_KNESS.gif |
+| Air Squats | `air-squats` | Air_Squat.gif (replaces current frame animation) |
 
-Three options:
-- **Conservative** -- gentle approach, easier to sustain long-term
-- **Moderate** -- balanced approach, standard recommendation
-- **Aggressive** -- faster results, harder to maintain
+### Steps
 
-### Deficit/Surplus percentages
+1. **Copy GIF files** from uploads into `src/assets/exercises/` directory
+2. **Upload each GIF** to the `exercise-gifs` storage bucket using the exercise ID as filename (e.g., `jumping-jacks.gif`)
+3. **Update the `gif_url`** column in the `exercises` table for all 6 exercise records listed above
+4. **Air Squats**: The existing frame animation (`frame_start_url`/`frame_end_url`) will be superseded since `gif_url` takes priority in the display logic
 
-| Intensity | Weight Loss (deficit from TDEE) | Weight Gain (surplus to TDEE) |
-|-----------|-------------------------------|-------------------------------|
-| Conservative | 10% | 10% |
-| Moderate | 20% | 15% |
-| Aggressive | 30% | 20% |
+### How the display works
+The exercise detail modal checks `gif_url` first -- if it has a value, it shows that GIF. If `gif_url` is null, it falls back to the two-frame animation. By setting `gif_url` for these exercises, the proper animated GIFs will show immediately.
 
-### Safety floors
-
-Regardless of aggressiveness, the calculator will never go below:
-- **1,200 kcal** for women
-- **1,500 kcal** for men
-
-If the safety floor is hit, the note will warn the user.
-
-### Updated results note
-
-Replace the current generic note with a full breakdown showing:
-- Protocol name: Mifflin-St Jeor Equation
-- User's BMR value (calories at rest)
-- User's TDEE value (BMR x activity multiplier)
-- The percentage adjustment applied and why
-- Whether a safety floor was applied
-- Standard disclaimer to consult a professional
-
-### Example with your numbers (Male, 50y, 95kg, 177cm, Very Active, Lose Weight)
-
-| Intensity | BMR | TDEE | Deficit | Target |
-|-----------|-----|------|---------|--------|
-| Conservative (10%) | 1,811 | 3,124 | -312 | 2,812 kcal |
-| Moderate (20%) | 1,811 | 3,124 | -625 | 2,499 kcal |
-| Aggressive (30%) | 1,811 | 3,124 | -937 | 2,187 kcal |
-
-### Technical details
-
-**File**: `src/pages/MacroTrackingCalculator.tsx`
-
-1. **New state variable**: `intensity` with values `"conservative"`, `"moderate"`, `"aggressive"` (default: `"moderate"`)
-2. **New UI element**: A `Select` dropdown after the Goal field, conditionally rendered only when goal is `"lose"` or `"gain"`. Hidden for "maintain".
-3. **Updated result state**: Add `bmr`, `tdee`, `deficitPercent`, and `safetyFloorApplied` fields
-4. **Updated calculation logic** (lines 75-83): Replace fixed `tdee - 500` with percentage-based logic using the intensity mapping, plus safety floor check
-5. **Updated note card** (lines 397-402): Show full BMR -> TDEE -> percentage adjustment -> target breakdown with the user's actual numbers
-
+### Result
+All 4 exercises will display proper anatomical GIF illustrations when users tap the [VIEW] button in any workout.
