@@ -2,6 +2,7 @@
 // REGENERATE BROKEN PROGRAMS
 // Fixes training programs with corrupted/incomplete content by regenerating
 // week-by-week using AI with full exercise library integration
+// Uses M-3 (Hypertrophy Accelerator) as the GOLD STANDARD format
 // ═══════════════════════════════════════════════════════════════════════════════
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
@@ -9,6 +10,7 @@ import {
   processContentWithExerciseMatching,
   fetchAndBuildExerciseReference,
   logUnmatchedExercises,
+  findBestMatch,
   type ExerciseBasic,
 } from "../_shared/exercise-matching.ts";
 
@@ -156,7 +158,7 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json().catch(() => ({}));
-    const { programIds, dryRun = false } = body;
+    const { programIds, dryRun = false, fixOnly = false } = body;
 
     if (!programIds || !Array.isArray(programIds) || programIds.length === 0) {
       return new Response(JSON.stringify({ error: "programIds array is required" }), {
@@ -164,7 +166,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    console.log(`${LOG} 🔄 Starting regeneration for ${programIds.length} programs (dryRun=${dryRun})`);
+    console.log(`${LOG} 🔄 Starting ${fixOnly ? 'FIX-ONLY' : 'regeneration'} for ${programIds.length} programs (dryRun=${dryRun})`);
 
     // Load FULL exercise library (we'll filter per-program)
     const allExercises: ExerciseBasic[] = [];
@@ -213,10 +215,57 @@ Deno.serve(async (req) => {
     // Process each program sequentially (AI calls are heavy)
     for (const program of programs as ProgramRow[]) {
       console.log(`${LOG} ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
-      console.log(`${LOG} 📋 Regenerating: "${program.name}" (${program.id})`);
+      console.log(`${LOG} 📋 ${fixOnly ? 'Fix-only' : 'Regenerating'}: "${program.name}" (${program.id})`);
       console.log(`${LOG}    Category: ${program.category}, Weeks: ${program.weeks}, Days/wk: ${program.days_per_week}`);
 
       try {
+        // ══════════════════════════════════════════════════════════════
+        // FIX-ONLY MODE: Clean existing content without regeneration
+        // ══════════════════════════════════════════════════════════════
+        if (fixOnly) {
+          let content = program.weekly_schedule || '';
+          if (!content) {
+            results.push({ id: program.id, name: program.name, status: "skipped_empty", weeksGenerated: 0, totalChars: 0 });
+            continue;
+          }
+
+          // Step 1: Fix malformed tags
+          content = fixMalformedExerciseTags(content, allExercises);
+
+          // Step 2: Run exercise matching on untagged exercises
+          const matchResult = processContentWithExerciseMatching(content, allExercises, `${LOG}[FIX]`);
+          content = matchResult.processedContent;
+
+          // Step 3: Clean corrupted text patterns
+          content = cleanCorruptedText(content);
+
+          console.log(`${LOG}   Fix-only: ${matchResult.matched.length} matched, ${matchResult.unmatched.length} unmatched`);
+
+          if (!dryRun) {
+            const { error: updateErr } = await supabase
+              .from("admin_training_programs")
+              .update({ weekly_schedule: content })
+              .eq("id", program.id);
+
+            if (updateErr) throw new Error(`DB update failed: ${updateErr.message}`);
+
+            const uniqueUnmatched = [...new Set(matchResult.unmatched)];
+            if (uniqueUnmatched.length > 0) {
+              await supabase.from("mismatched_exercises").delete().eq("source_id", program.id);
+              await logUnmatchedExercises(supabase, uniqueUnmatched, "program", program.id, program.name, LOG);
+            }
+          }
+
+          results.push({
+            id: program.id, name: program.name, status: dryRun ? "dry_run_fix" : "fixed",
+            weeksGenerated: program.weeks || 0, totalChars: content.length,
+          });
+          continue;
+        }
+
+        // ══════════════════════════════════════════════════════════════
+        // FULL REGENERATION MODE
+        // ══════════════════════════════════════════════════════════════
         const totalWeeks = program.weeks || 6;
         const daysPerWeek = program.days_per_week || 4;
         const difficulty = program.difficulty_stars || 3;
@@ -277,6 +326,9 @@ Deno.serve(async (req) => {
         );
         fullSchedule = matchResult.processedContent;
 
+        // Step 3: Clean corrupted text
+        fullSchedule = cleanCorruptedText(fullSchedule);
+
         console.log(`${LOG}   Exercise matching: ${matchResult.matched.length} matched, ${matchResult.unmatched.length} unmatched`);
 
         // Generate overview and progression if missing/short
@@ -290,7 +342,6 @@ Deno.serve(async (req) => {
 
         if (!progressionPlan || progressionPlan.length < 200) {
           progressionPlan = await generateProgressionPlan(LOVABLE_API_KEY, program, philosophy);
-          // NOTE: Do NOT run exercise matching on progression plan - it's prose, not exercise lists
           console.log(`${LOG}   Generated progression plan: ${progressionPlan?.length || 0} chars`);
         }
 
@@ -343,7 +394,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    const successCount = results.filter(r => r.status === "regenerated" || r.status === "dry_run").length;
+    const successCount = results.filter(r => r.status !== "error").length;
     console.log(`${LOG} ✅ Completed: ${successCount}/${results.length} successful`);
 
     return new Response(
@@ -395,7 +446,7 @@ async function callAI(apiKey: string, systemPrompt: string, userPrompt: string):
   return result.choices?.[0]?.message?.content || null;
 }
 
-// ─── System Prompt Builder ────────────────────────────────────────────────────
+// ─── System Prompt Builder (M-3 GOLD STANDARD FORMAT) ─────────────────────────
 
 function buildSystemPrompt(exerciseRef: string, philosophy: string, category: string): string {
   return `You are an expert fitness coach creating a PROFESSIONAL, COMPLETE training program.
@@ -408,50 +459,55 @@ If you write ANY exercise without {{exercise:ID:Name}} format, the program will 
 
 ${philosophy}
 
-=== OUTPUT FORMAT (CRITICAL - FOLLOW EXACTLY) ===
+=== OUTPUT FORMAT (CRITICAL - FOLLOW THE M-3 GOLD STANDARD EXACTLY) ===
 
-For EACH day of EACH week, you MUST provide:
-1. The day's focus (e.g., "Day 1: Upper Body Push")
-2. Warm-Up: 3-5 exercises with specific instructions
-3. Main Workout: 4-8 exercises with sets, reps, rest periods
-4. Cool-Down: 3-5 exercises/stretches
+You MUST follow this EXACT HTML structure. This is the ONLY acceptable format:
 
-HTML format:
-<p class="tiptap-paragraph"><strong><u>Week X: [Theme Name]</u></strong></p>
+**WEEK HEADERS:**
+<p class="tiptap-paragraph"><strong><u>Week 1-2 (Phase Name - Intensity):</u></strong></p>
 <p class="tiptap-paragraph"></p>
-<p class="tiptap-paragraph"><strong>Day 1: [Focus]</strong></p>
-<ul class="tiptap-bullet-list">
-<li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Warm-Up (5-10 min):</strong></p></li>
-</ul>
-<ul class="tiptap-bullet-list">
-<li class="tiptap-list-item"><p class="tiptap-paragraph">{{exercise:ID:Name}} – 2x10</p></li>
-</ul>
-<ul class="tiptap-bullet-list">
-<li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Main Workout:</strong></p></li>
-</ul>
-<ul class="tiptap-bullet-list">
-<li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>1.</strong> {{exercise:ID:Name}} – 3x10 – rest 60s</p></li>
-<li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>2.</strong> {{exercise:ID:Name}} – 3x12 – rest 60s</p></li>
-</ul>
-<ul class="tiptap-bullet-list">
-<li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Cool-Down (5 min):</strong></p></li>
-</ul>
-<ul class="tiptap-bullet-list">
-<li class="tiptap-list-item"><p class="tiptap-paragraph">{{exercise:ID:Name}} – 30s hold each side</p></li>
-</ul>
 
-SPACING RULES:
-- ONE empty paragraph after section titles
-- NO empty paragraphs between exercises in a list
-- ONE empty paragraph before new day/section
-- Include REST DAYS explicitly (e.g., "Day 5: Rest & Recovery")
+**DAY HEADERS:**
+<p class="tiptap-paragraph"><strong><u>Day 1 - Focus Area:</u></strong></p>
 
-CRITICAL:
-- You MUST write EVERY single day for EVERY week asked
-- Do NOT use placeholder text like "Continue with similar exercises" or "Progress to heavier loads"
-- EVERY day must have SPECIFIC exercise names with {{exercise:ID:Name}} format
-- Vary exercises across weeks to provide proper periodization
-- Match difficulty and volume to the program's difficulty level`;
+**EXERCISES (CRITICAL - USE THIS EXACT FORMAT):**
+Exercises are NUMBERED inside a SINGLE <p> tag, separated by <br> tags. NOT bullet lists. NOT <ul>/<li>.
+
+<p class="tiptap-paragraph"><br>1. {{exercise:ID:Name}}– sets × reps @ intensity<br>2. {{exercise:ID:Name}}– sets × reps<br>3. {{exercise:ID:Name}}– sets × reps</p>
+
+**SEPARATORS:**
+One empty paragraph between days:
+<p class="tiptap-paragraph"></p>
+
+**1RM REFERENCES (for strength/hypertrophy programs):**
+When exercises use percentage-based loading, add a calculator link:
+{{exercise:ID:Name}}– 4 sets × 10 reps @ 70% 1RM (<a href="/1rmcalculator">calculate</a>)
+
+=== COMPLETE EXAMPLE (FOLLOW THIS EXACTLY) ===
+
+<p class="tiptap-paragraph"><strong><u>Week 1-2 (Volume Phase - 70% 1RM):</u></strong></p>
+<p class="tiptap-paragraph"></p>
+<p class="tiptap-paragraph"><strong><u>Day 1 - Push:</u></strong></p>
+<p class="tiptap-paragraph"><br>1. {{exercise:0025:barbell bench press}}– 4 sets × 10 reps @ 70% 1RM (<a href="/1rmcalculator">calculate</a>)<br>2. {{exercise:0438:dumbbell w-press}}– 4 sets × 12 reps<br>3. {{exercise:0868:cable curl}}– 3 sets × 15 reps<br>4. {{exercise:0426:dumbbell standing overhead press}}– 4 sets × 10 reps<br>5. {{exercise:0584:lever lateral raise}}– 4 sets × 15 reps<br>6. {{exercise:1723:cable one arm tricep pushdown}}– 3 sets × 12 reps</p>
+<p class="tiptap-paragraph"></p>
+<p class="tiptap-paragraph"><strong><u>Day 2 - Pull:</u></strong></p>
+<p class="tiptap-paragraph"><br>1. {{exercise:0095:barbell shrug}}– 4 sets × 10 reps @ 70% 1RM<br>2. {{exercise:0198:cable pulldown}}– 4 sets × 12 reps<br>3. {{exercise:0139:biceps narrow pull-ups}}– 3 sets × 15 reps</p>
+<p class="tiptap-paragraph"></p>
+
+=== ABSOLUTE RULES ===
+- NEVER use <ul>, <li>, or bullet lists. ONLY use <p> with <br> for exercises.
+- NEVER use <strong> around exercise numbers (no "<strong>1.</strong>"). Just plain "1."
+- EVERY exercise MUST use {{exercise:ID:Name}} format from the library.
+- Day headers use <strong><u>Day X - Focus:</u></strong> in a <p> tag.
+- Week headers use <strong><u>Week X-Y (Phase):</u></strong> in a <p> tag.
+- Include REST DAYS explicitly (e.g., "Day 5 - Rest & Recovery")
+- Each exercise line starts with <br> followed by number and period.
+- One empty <p class="tiptap-paragraph"></p> between each day section.
+- Use the × symbol (multiplication sign) for sets/reps, NOT "x".
+- Include Smarty Tools references: 1RM Calculator (<a href="/1rmcalculator">calculate</a>).
+- EVERY day must have SPECIFIC exercises - NO placeholder text.
+- Vary exercises across weeks for proper periodization.
+- Match volume and intensity to the program's difficulty level.`;
 }
 
 // ─── User Prompt Builder ──────────────────────────────────────────────────────
@@ -474,7 +530,7 @@ function buildUserPrompt(
 PROGRAM: "${program.name}"
 CATEGORY: ${program.category}
 TOTAL DURATION: ${totalWeeks} weeks
-DAYS PER WEEK: ${daysPerWeek} training days (include rest days)
+DAYS PER WEEK: ${daysPerWeek} training days (include rest days to fill 7 days)
 DIFFICULTY: ${difficulty}/6 stars
 EQUIPMENT: ${equipment}
 TARGET AUDIENCE: ${program.target_audience || "General fitness enthusiasts"}
@@ -484,15 +540,23 @@ CURRENT PHASE (Weeks ${startWeek}-${endWeek} of ${totalWeeks}): ${phase}
 
 REQUIREMENTS:
 1. Write EVERY SINGLE DAY for weeks ${startWeek} through ${endWeek}
-2. Each day MUST have: Warm-Up (3-5 exercises), Main Workout (4-8 exercises), Cool-Down (3-5 exercises)
+2. Each training day MUST have 4-8 exercises with sets, reps, and rest periods
 3. Use {{exercise:ID:Name}} format for ALL exercises - pick from the library
-4. Include appropriate rest days based on ${daysPerWeek} training days per week
+4. Include rest days based on ${daysPerWeek} training days per week
 5. Progressive overload from week to week (increase reps, sets, or reduce rest)
 6. Difficulty ${difficulty}/6: ${difficulty <= 2 ? "Beginner-friendly, basic movements, longer rest" : difficulty <= 4 ? "Intermediate, moderate complexity, balanced rest" : "Advanced, complex movements, shorter rest, higher volume"}
-7. NO placeholder text - EVERY exercise must be specifically named
+7. NO placeholder text - EVERY exercise must be specifically named from the library
 8. Vary exercises between days and across weeks for proper stimulus
 
-Generate the FULL content now for weeks ${startWeek}-${endWeek}:`;
+FORMAT REMINDER - USE THIS EXACT STRUCTURE:
+<p class="tiptap-paragraph"><strong><u>Week ${startWeek}${startWeek !== endWeek ? `-${endWeek}` : ''} (${phase}):</u></strong></p>
+<p class="tiptap-paragraph"></p>
+<p class="tiptap-paragraph"><strong><u>Day 1 - Focus:</u></strong></p>
+<p class="tiptap-paragraph"><br>1. {{exercise:ID:Name}}– sets × reps<br>2. {{exercise:ID:Name}}– sets × reps</p>
+<p class="tiptap-paragraph"></p>
+
+DO NOT use <ul>, <li>, or bullet lists. Use <p> with <br> for exercises.
+Generate the FULL content now:`;
 }
 
 // ─── Overview Generator ───────────────────────────────────────────────────────
@@ -536,10 +600,24 @@ Include:
 4. Signs of overtraining to watch for
 5. How to adapt if exercises are too easy/hard
 
-Format as HTML using <p class="tiptap-paragraph"> and <ul class="tiptap-bullet-list"> tags.
+Format as HTML using <p class="tiptap-paragraph"> tags. Use <strong> for sub-headers.
 Do NOT include any {{exercise:}} markup - this is a prose guidelines section, not an exercise list.`;
 
   return callAI(apiKey, "You are an expert fitness coach writing training progression guidelines.", prompt);
+}
+
+// ─── Clean Corrupted Text ─────────────────────────────────────────────────────
+
+function cleanCorruptedText(html: string): string {
+  let cleaned = html;
+
+  // Remove repeated parenthetical qualifiers like "(male)(male)(male)"
+  cleaned = cleaned.replace(/(\([^)]+\))\s*(?:\1\s*){1,}/g, '$1');
+
+  // Remove excessive repeated words/phrases
+  cleaned = cleaned.replace(/(\b\w{3,}\b)\s+(?:\1\s+){2,}/gi, '$1 ');
+
+  return cleaned;
 }
 
 // ─── Fix Malformed Exercise Tags ──────────────────────────────────────────────
@@ -558,23 +636,26 @@ function fixMalformedExerciseTags(html: string, exercises: ExerciseBasic[]): str
   let fixed = html;
   let fixCount = 0;
 
-  // Pattern 1: {{exercise:ID:Name}} with invalid ID → find by name
+  // Pattern 1: {{exercise:ID:Name}} - validate and fix ID/Name
   fixed = fixed.replace(/\{\{exercise:([^:}]+):([^}]+)\}\}/g, (_m, id, name) => {
     const trimId = id.trim();
     const trimName = name.trim();
+    // Valid ID exists in library
     if (idMap.has(trimId)) {
       const ex = idMap.get(trimId)!;
       return `{{exercise:${ex.id}:${ex.name}}}`;
     }
+    // Try by name
     const byName = nameMap.get(trimName.toLowerCase());
     if (byName) { fixCount++; return `{{exercise:${byName.id}:${byName.name}}}`; }
+    // Fuzzy match by name
     const match = findBestMatch(trimName, exercises, 0.70);
     if (match) { fixCount++; return `{{exercise:${match.exercise.id}:${match.exercise.name}}}`; }
     fixCount++;
     return trimName;
   });
 
-  // Pattern 2: {{ID:Name}} without "exercise:" prefix
+  // Pattern 2: {{ID:Name}} without "exercise:" prefix (e.g., {{0025:barbell bench press}})
   fixed = fixed.replace(/\{\{(\d{4}):([^}]+)\}\}/g, (_m, id, name) => {
     const trimId = id.trim();
     const trimName = name.trim();
@@ -588,17 +669,72 @@ function fixMalformedExerciseTags(html: string, exercises: ExerciseBasic[]): str
     return trimName;
   });
 
-  // Pattern 3: {{slug-name:ID:Display Name}}
-  fixed = fixed.replace(/\{\{([a-z0-9-]+):ID:([^}]+)\}\}/gi, (_m, slug, name) => {
+  // Pattern 3: {{slug-name:numericID:Display Name}} (e.g., {{walking-on-incline-treadmill:3666:walking on incline treadmill}})
+  fixed = fixed.replace(/\{\{([a-z][a-z0-9-]+):(\d{1,5}):([^}]+)\}\}/gi, (_m, _slug, numId, name) => {
     const trimName = name.trim();
-    const byName = nameMap.get(trimName.toLowerCase());
-    if (byName) { fixCount++; return `{{exercise:${byName.id}:${byName.name}}}`; }
-    if (idMap.has(slug)) {
-      const ex = idMap.get(slug)!;
+    // Try the numeric ID (pad to 4 digits)
+    const paddedId = numId.padStart(4, '0');
+    if (idMap.has(paddedId)) {
+      const ex = idMap.get(paddedId)!;
       fixCount++;
       return `{{exercise:${ex.id}:${ex.name}}}`;
     }
-    const match = findBestMatch(trimName, exercises, 0.70);
+    if (idMap.has(numId)) {
+      const ex = idMap.get(numId)!;
+      fixCount++;
+      return `{{exercise:${ex.id}:${ex.name}}}`;
+    }
+    const byName = nameMap.get(trimName.toLowerCase());
+    if (byName) { fixCount++; return `{{exercise:${byName.id}:${byName.name}}}`; }
+    const match = findBestMatch(trimName, exercises, 0.65);
+    if (match) { fixCount++; return `{{exercise:${match.exercise.id}:${match.exercise.name}}}`; }
+    fixCount++;
+    return trimName;
+  });
+
+  // Pattern 4: {{slug:slug:Name}} (e.g., {{butt-kicks-cardio:butt-kicks-cardio:Butt Kicks}})
+  fixed = fixed.replace(/\{\{([a-z][a-z0-9-]+):([a-z][a-z0-9-]+):([^}]+)\}\}/gi, (_m, slug1, slug2, name) => {
+    // Already handled by pattern 1 if it starts with "exercise:"
+    if (slug1 === 'exercise') return _m;
+    const trimName = name.trim();
+    const byName = nameMap.get(trimName.toLowerCase());
+    if (byName) { fixCount++; return `{{exercise:${byName.id}:${byName.name}}}`; }
+    // Try slug as name (convert hyphens to spaces)
+    const slugAsName = slug1.replace(/-/g, ' ');
+    const bySlug = nameMap.get(slugAsName.toLowerCase());
+    if (bySlug) { fixCount++; return `{{exercise:${bySlug.id}:${bySlug.name}}}`; }
+    const match = findBestMatch(trimName, exercises, 0.65);
+    if (match) { fixCount++; return `{{exercise:${match.exercise.id}:${match.exercise.name}}}`; }
+    // Try matching on slug
+    const slugMatch = findBestMatch(slugAsName, exercises, 0.65);
+    if (slugMatch) { fixCount++; return `{{exercise:${slugMatch.exercise.id}:${slugMatch.exercise.name}}}`; }
+    fixCount++;
+    return trimName;
+  });
+
+  // Pattern 5: {{slug:Name}} without ID (e.g., {{cat-cow-stretch:Cat-Cow Stretch}})
+  fixed = fixed.replace(/\{\{([a-z][a-z0-9-]+):([A-Z][^}]+)\}\}/g, (_m, slug, name) => {
+    if (slug === 'exercise') return _m;
+    const trimName = name.trim();
+    const byName = nameMap.get(trimName.toLowerCase());
+    if (byName) { fixCount++; return `{{exercise:${byName.id}:${byName.name}}}`; }
+    const match = findBestMatch(trimName, exercises, 0.65);
+    if (match) { fixCount++; return `{{exercise:${match.exercise.id}:${match.exercise.name}}}`; }
+    fixCount++;
+    return trimName;
+  });
+
+  // Pattern 6: Remaining {{anything:anything}} that isn't exercise format
+  fixed = fixed.replace(/\{\{(?!exercise:)([^:}]+):([^}]+)\}\}/g, (_m, part1, part2) => {
+    // Try part2 as name
+    const trimName = part2.trim();
+    const byName = nameMap.get(trimName.toLowerCase());
+    if (byName) { fixCount++; return `{{exercise:${byName.id}:${byName.name}}}`; }
+    // Try part1 as slug-name
+    const slugName = part1.replace(/-/g, ' ').trim();
+    const bySlug = nameMap.get(slugName.toLowerCase());
+    if (bySlug) { fixCount++; return `{{exercise:${bySlug.id}:${bySlug.name}}}`; }
+    const match = findBestMatch(trimName, exercises, 0.65);
     if (match) { fixCount++; return `{{exercise:${match.exercise.id}:${match.exercise.name}}}`; }
     return trimName;
   });
