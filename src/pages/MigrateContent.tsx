@@ -42,7 +42,7 @@ export default function MigrateContent() {
           <Button
             variant="ghost"
             onClick={() => navigate("/admin")}
-            className="gap-2"
+            className="hidden md:inline-flex gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to Admin

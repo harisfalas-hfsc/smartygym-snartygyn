@@ -21,7 +21,7 @@ const NotFound = () => {
         <h1 className="mb-4 text-4xl sm:text-6xl font-bold">404</h1>
         <p className="mb-4 text-lg sm:text-xl text-muted-foreground">Oops! Page not found</p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Button variant="outline" onClick={handleGoBack} className="flex items-center gap-2">
+          <Button variant="outline" onClick={handleGoBack} className="hidden md:flex items-center gap-2">
             <ChevronLeft className="h-4 w-4" />
             Go Back
           </Button>
