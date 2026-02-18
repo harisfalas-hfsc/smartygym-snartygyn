@@ -113,6 +113,11 @@ export const ExerciseHTMLContent: React.FC<ExerciseHTMLContentProps> = ({
       .replace(/\{\{excersize:/gi, '{{exercise:')
       .replace(/\{\{excercise:/gi, '{{exercise:');
 
+    // Strip superset/sequence labels (A1:, B1:, C2., etc.) wrapped in HTML tags
+    processedHtml = processedHtml.replace(/<(?:strong|b)>[A-Za-z]\d*[\.\:\)]\s*<\/(?:strong|b)>\s*/gi, '');
+    // Strip plain-text labels before exercise placeholders
+    processedHtml = processedHtml.replace(/(?<=>)\s*[A-Za-z]\d*[\.\:\)]\s*(?=\{\{exercise:)/g, '');
+
     const exercisesToRender: ProcessedExercise[] = [];
 
     // Parse {{exercise:id:name}} markup and replace with placeholders
