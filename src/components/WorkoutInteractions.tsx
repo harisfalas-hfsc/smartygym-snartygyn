@@ -9,6 +9,8 @@ import { CommentDialog } from "@/components/CommentDialog";
 import { ScheduleWorkoutDialog } from "@/components/ScheduleWorkoutDialog";
 import { useScheduledWorkoutForContent } from "@/hooks/useScheduledWorkouts";
 import { format } from "date-fns";
+import { GoalAchievementCelebration } from "@/components/dashboard/GoalAchievementCelebration";
+import { checkCompletionGoalAchievement, sendGoalAchievementNotification } from "@/hooks/useGoalAchievementCheck";
 
 interface WorkoutInteractionsProps {
   workoutId: string;
@@ -23,6 +25,8 @@ export const WorkoutInteractions = ({ workoutId, workoutType, workoutName, isFre
   const [rating, setRating] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
   const [isScheduleDialogOpen, setIsScheduleDialogOpen] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [achievedGoals, setAchievedGoals] = useState<Array<{ type: "weight" | "body_fat" | "muscle_mass" | "workouts_completed" | "programs_completed"; target: number; current: number }>>([]);
   const { toast } = useToast();
   const { userTier, canInteract } = useAccessControl();
   const navigate = useNavigate();
@@ -192,6 +196,14 @@ export const WorkoutInteractions = ({ workoutId, workoutType, workoutName, isFre
             .eq('id', scheduledWorkout.id);
           refetchScheduled();
         }
+
+        // Check for goal achievement
+        const achieved = await checkCompletionGoalAchievement(session.user.id, "workouts_completed");
+        if (achieved) {
+          setAchievedGoals([achieved]);
+          setShowCelebration(true);
+          await sendGoalAchievementNotification(session.user.id, achieved);
+        }
       }
 
       setIsCompleted(newCompletedStatus);
@@ -347,6 +359,12 @@ export const WorkoutInteractions = ({ workoutId, workoutType, workoutName, isFre
         contentName={workoutName}
         contentType="workout"
         onScheduled={refetchScheduled}
+      />
+
+      <GoalAchievementCelebration
+        isOpen={showCelebration}
+        onClose={() => setShowCelebration(false)}
+        achievedGoals={achievedGoals}
       />
     </>
   );

@@ -4,7 +4,7 @@ import { Trophy, PartyPopper, Star } from "lucide-react";
 import { Confetti } from "@/components/ui/confetti";
 
 interface AchievedGoal {
-  type: "weight" | "body_fat" | "muscle_mass";
+  type: "weight" | "body_fat" | "muscle_mass" | "workouts_completed" | "programs_completed";
   target: number;
   current: number;
 }
@@ -19,13 +19,19 @@ const GOAL_LABELS: Record<string, string> = {
   weight: "Target Weight",
   body_fat: "Body Fat Goal",
   muscle_mass: "Muscle Mass Goal",
+  workouts_completed: "Workouts Completed Goal",
+  programs_completed: "Programs Completed Goal",
 };
 
 const GOAL_UNITS: Record<string, string> = {
   weight: "kg",
   body_fat: "%",
   muscle_mass: "kg",
+  workouts_completed: " workouts",
+  programs_completed: " programs",
 };
+
+const INTEGER_GOALS = ["workouts_completed", "programs_completed"];
 
 export const GoalAchievementCelebration = ({ 
   isOpen, 
@@ -70,7 +76,7 @@ export const GoalAchievementCelebration = ({
                   <span className="font-medium">{GOAL_LABELS[goal.type]}</span>
                   <div className="flex items-center gap-2">
                     <span className="text-primary font-bold">
-                      {goal.current.toFixed(1)}{GOAL_UNITS[goal.type]}
+                      {INTEGER_GOALS.includes(goal.type) ? goal.current.toFixed(0) : goal.current.toFixed(1)}{GOAL_UNITS[goal.type]}
                     </span>
                     <Trophy className="h-4 w-4 text-yellow-500" />
                   </div>
