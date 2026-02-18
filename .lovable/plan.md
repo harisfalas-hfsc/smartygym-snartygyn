@@ -1,77 +1,57 @@
 
-# Fix Dashboard Scroll Consistency + Universal Back Navigation
+# Fix: Goal Achievement Sends Wrong WOD Email
 
-## Problem 1: Scroll Inconsistency
+## What Went Wrong (Simple Explanation)
 
-Currently:
-- **Favorite Workouts** and **Completed Workouts** have `ScrollArea` with `max-h-[400px]`
-- **Favorite Programs** and **Completed Programs** have **no** `ScrollArea` at all -- they grow unbounded
+Your goal achievement triggered a notification, but it was labeled as "announcement_update" -- the same label used by the Workout of the Day. The backend found the WOD template and sent that instead of a congratulations message. Your custom text was ignored because the backend didn't know how to use it.
 
-All four lists need the same treatment.
+## The Fix (3 Steps)
 
-## Problem 2: Back Navigation
+### Step 1: Create a dedicated "Goal Achievement" notification type
 
-Currently, tapping a dashboard section card calls `setActiveTab("workouts")` which only updates React state without changing the URL. The browser has no history entry for it, so swiping back skips the dashboard entirely.
+Register a new `GOAL_ACHIEVEMENT: 'goal_achievement'` in the central notification types registry. This gives goal achievements their own identity -- completely separate from WOD or any other notification.
 
-This same principle should work **everywhere** in the app -- swipe back always goes one step back in browser history. If there's no history, go to homepage. Simple.
+**File:** `supabase/functions/_shared/notification-types.ts`
 
-## Changes
+### Step 2: Update the backend function to accept custom subject and content
 
-### 1. Consistent Scroll Areas (UserDashboard.tsx)
+Right now the `send-system-message` function only knows how to replace `[Plan]`, `[Date]`, `[Amount]`, `[Content]` placeholders. It ignores `subject` and `content` in customData.
 
-All four lists get the exact same treatment:
+The fix: after loading the template, check if customData includes `subject` or `content`. If yes, use those instead of the template values. This way the congratulations text actually gets through.
 
-| List | Current | After |
-|------|---------|-------|
-| Favorite Workouts | `ScrollArea max-h-[400px]` | `ScrollArea max-h-[300px]` |
-| Completed Workouts | `ScrollArea max-h-[400px]` | `ScrollArea max-h-[300px]` |
-| Favorite Programs | No ScrollArea | `ScrollArea max-h-[300px]` |
-| Completed Programs | No ScrollArea | `ScrollArea max-h-[300px]` |
+**File:** `supabase/functions/send-system-message/index.ts`
+- Add `subject?: string` and `content?: string` to the `customData` interface
+- After template lookup, override with custom values if provided
+- Update the email CTA link to `/calculator-history?tab=measurements` when messageType is `goal_achievement` (so the button says "Set New Goals" and goes to the right page)
 
-All four cards: identical `ScrollArea` with `max-h-[300px]` and `pr-4` for scrollbar padding.
+### Step 3: Update the goal achievement code to use the new type
 
-### 2. Dashboard Tab Navigation via URL (UserDashboard.tsx)
+Change `messageType` from `'announcement_update'` to `'goal_achievement'` so it never touches the WOD template again.
 
-- Change card clicks from `setActiveTab(section.id)` to `navigate('/userdashboard?tab=' + section.id)` -- this creates a browser history entry
-- Change desktop "Back to sections" button from `setActiveTab(null)` to `navigate('/userdashboard')` -- pops back to grid
-- The existing `useEffect` that reads `searchParams.get('tab')` already syncs URL to state, so this just works
+**File:** `src/hooks/useGoalAchievementCheck.ts` (line 111)
 
-Result: tapping "Workouts" pushes `/userdashboard?tab=workouts` to history. Swiping back goes to `/userdashboard` (the grid). Swiping back again goes to wherever they came from (e.g., homepage).
+### Step 4: Create a database template for goal achievements
 
-### 3. Universal Back Behavior Verification
+Insert a new template row so the backend has a fallback even if custom text isn't provided:
+- **message_type:** `goal_achievement`
+- **template_name:** `Goal Achievement Celebration`
+- **subject:** `Goal Achieved! You did it!`
+- **content:** Congratulations message with a gold "Set New Goals" button linking to `/calculator-history?tab=measurements`
+- **is_default:** true
+- **is_active:** true
 
-The `NavigationHistoryContext` already tracks navigation history app-wide. The `FixedBackButton` (desktop only) uses it. On mobile, users rely on native swipe-back which uses browser history. By ensuring all in-page navigation uses `navigate()` instead of local state changes, swipe-back naturally works everywhere -- dashboard tabs, messages, workouts, programs, all pages.
+## Summary of Changes
 
-No changes needed to the navigation system itself -- it already works correctly. The only fix is making dashboard tab changes go through `navigate()` so they appear in browser history.
+| File | What Changes |
+|------|-------------|
+| `supabase/functions/_shared/notification-types.ts` | Add `GOAL_ACHIEVEMENT` constant |
+| `supabase/functions/send-system-message/index.ts` | Support `subject`/`content` overrides in customData; use goals link for goal_achievement type |
+| `src/hooks/useGoalAchievementCheck.ts` | Change messageType from `announcement_update` to `goal_achievement` |
+| Database migration | Insert new `goal_achievement` template |
 
-## Technical Details
+## What This Fixes
 
-### File: `src/pages/UserDashboard.tsx`
-
-**Line 1156** -- Card grid click handler:
-```
-// Before
-onClick={() => setActiveTab(section.id)}
-// After
-onClick={() => navigate('/userdashboard?tab=' + section.id)}
-```
-
-**Line 1184** -- Back to sections button:
-```
-// Before
-onClick={() => setActiveTab(null)}
-// After
-onClick={() => navigate('/userdashboard')}
-```
-
-**Lines 1264, 1294** -- Workout ScrollAreas:
-```
-// Before
-<ScrollArea className="max-h-[400px] pr-4">
-// After
-<ScrollArea className="max-h-[300px] pr-4">
-```
-
-**Lines 1392, 1410** -- Favorite Programs list: wrap in `ScrollArea className="max-h-[300px] pr-4"`
-
-**Lines 1420, 1438** -- Completed Programs list: wrap in `ScrollArea className="max-h-[300px] pr-4"`
+- Goal achievements will NEVER trigger the WOD email again
+- Your custom congratulations text will actually be delivered
+- The email and dashboard message will say "Congratulations!" with a "Set New Goals" button
+- The morning WOD email remains completely untouched and unaffected
