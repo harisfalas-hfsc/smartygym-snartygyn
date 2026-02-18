@@ -1,93 +1,64 @@
 
 
-# Fix Structural Labels and Content Quality Across All Workouts
+# Add Workouts & Programs Completed to Active Goals
 
-## Problems Found
+## Why This Is Easy
 
-### 1. "Set X:" Labels Not Being Stripped
-15 workouts have `<strong>Set 1:</strong>`, `<strong>Set 2:</strong>` etc. labels displayed to users. The existing regex only catches single-letter labels (A1:, B:, C2.) but NOT multi-word patterns like "Set 1:", "Station 2:", "Exercise 3:".
+The data already exists in the database:
+- **Workouts completed**: counted from `workout_interactions` where `is_completed = true`
+- **Programs completed**: counted from `program_interactions` where `is_completed = true`
 
-**Affected workouts:**
-- WOD-S-E-1771367407134 (Leg Day Power Builder -- today's WOD)
-- WOD-S-B-1771367407134 (Lower Body Iron Builder -- today's WOD)
-- WOD-PIL-B-1769293803193 (Align Core Precision)
-- WOD-MS-B-1769898605155 (Align Flow Foundation)
-- WOD-MS-B-1767479405871 (Align Flow Restore)
-- WOD-PIL-E-1766881802343 (Anchor Balance Flow)
-- WOD-MS-B-1766622604142 (Anchor Flow Restore)
-- WOD-MS-E-1770589804488 (Balance & Ground Flow)
-- WOD-PIL-E-1770849008078 (Center Balance Flow)
-- WOD-PIL-E-1769293803193 (Centrum Pilates Form)
-- WOD-PIL-E-1767738619158 (Core Restore Sequence)
-- WOD-S-E-1766527205118 (Foundation Forge)
-- WOD-S-B-1768084204024 (Foundation Push Hinge)
-- WOD-S-B-1770762603515 (Glute Core Foundation)
-- WOD-MS-B-1770589804488 (Align & Restore Flow -- superset labels)
-- WOD-S-E-1770503406959 (Foundation Press Forge -- superset labels)
+No new database tables or columns are needed. We just need to:
+1. Add target fields to the existing `user_measurement_goals` table
+2. Add input fields to the goal-setting dialog
+3. Fetch the actual counts and display them in the Active Goals card
 
-### 2. Missing Section Spacing
-"Lower Body Iron Builder" is missing empty paragraph separators before Finisher and Cool Down headers.
+## Changes
 
-### 3. Unmatched Exercise
-"Lower Body Iron Builder" has a plain-text exercise "single leg squat (pistol) male" that was not matched to the exercise library.
+### 1. Database Migration
+Add two new nullable columns to `user_measurement_goals`:
+- `target_workouts_completed` (integer, nullable)
+- `target_programs_completed` (integer, nullable)
 
-## Fix Strategy (Three Parts)
+### 2. Goal-Setting Dialog (`src/components/logbook/MeasurementGoalDialog.tsx`)
+Add two new input fields:
+- "Target Workouts Completed" (number input)
+- "Target Programs Completed" (number input)
 
-### Part 1: Expand Label-Stripping Regex (Permanent Prevention)
+These appear alongside the existing weight/body fat/muscle mass fields.
 
-**Frontend** (`src/components/ExerciseHTMLContent.tsx`):
-Add new regex patterns to strip multi-word structural labels wrapped in bold tags:
-- `<strong>Set 1:</strong>` --> stripped
-- `<strong>Station 2:</strong>` --> stripped
-- `<strong>Exercise 3:</strong>` --> stripped
-- `<strong>Block 1:</strong>` --> stripped
-- `<strong>Round 2:</strong>` --> stripped
+### 3. Goals Summary Card (`src/components/dashboard/GoalsSummaryCard.tsx`)
+- Fetch actual completed counts from `workout_interactions` and `program_interactions` (where `is_completed = true`)
+- Add "Workouts" and "Programs" rows to the active goals list with a Dumbbell and Calendar icon
+- Progress bar shows current completed count vs target (e.g., "12 / 20")
+- Trophy icon appears when target is reached
 
-Pattern: `/<(?:strong|b)>(?:Set|Station|Exercise|Block|Round|Circuit)\s*\d*[\.\:\)]\s*<\/(?:strong|b)>\s*/gi`
+### 4. Update Type Definitions
+- Update the `MeasurementGoal` interface in `GoalsSummaryCard.tsx` to include the new fields
+- Update the `MeasurementGoalDialog` props interface accordingly
 
-This will NOT strip descriptive headers like `<strong>Mobility (5 min):</strong>` or `<strong>Static Stretching (8 min):</strong>` which are legitimate section descriptors.
-
-**Backend** (`supabase/functions/_shared/exercise-matching.ts`):
-Add the same expanded pattern to the post-processing pipeline so future AI-generated content is cleaned at the source.
-
-### Part 2: Database Cleanup (All 15 Affected Workouts)
-
-Run SQL UPDATE statements on all 15 affected workouts to:
-1. Remove `<strong>Set X:</strong>` labels from the HTML
-2. Remove any remaining single-letter superset labels
-3. Ensure proper spacing exists before each section header
-4. Match the unmatched "single leg squat (pistol) male" exercise
-
-### Part 3: Reprocess Both Today's WODs
-
-After database cleanup, trigger the reprocess function to ensure exercise matching is up to date and all formatting is correct.
+## How It Works
+- User sets a target like "Complete 20 workouts" and "Complete 3 programs" in the goal dialog
+- The dashboard card counts how many workouts/programs they've marked as completed
+- Progress bar fills up as they complete more
+- Same target date applies to all goals
 
 ## Technical Details
 
-### File: `src/components/ExerciseHTMLContent.tsx`
-- Add regex after the existing superset-label stripping (around line 117):
-```
-processedHtml = processedHtml.replace(
-  /<(?:strong|b)>(?:Set|Station|Exercise|Block|Round|Circuit)\s*\d*[\.\:\)]\s*<\/(?:strong|b)>\s*/gi, 
-  ''
-);
+### Database
+```sql
+ALTER TABLE user_measurement_goals 
+  ADD COLUMN target_workouts_completed integer,
+  ADD COLUMN target_programs_completed integer;
 ```
 
-### File: `supabase/functions/_shared/exercise-matching.ts`
-- Add the same pattern to the post-processing section (around line 611):
-```
-processedContent = processedContent.replace(
-  /<(?:strong|b)>(?:Set|Station|Exercise|Block|Round|Circuit)\s*\d*[\.\:\)]\s*<\/(?:strong|b)>\s*/gi,
-  ''
-);
-```
+### GoalsSummaryCard.tsx
+- Add two new queries counting `workout_interactions` and `program_interactions` where `is_completed = true`
+- Add entries to the `activeGoals` array for workouts and programs
+- Progress calculation: simple `(current / target) * 100`
 
-### Database: Bulk cleanup
-- Run regex-based UPDATE on all 15 workout IDs to remove structural labels from main_workout, finisher, warm_up, cool_down, and activation fields
-- Verify spacing enforcement via the normalizer
-
-## What This Prevents Going Forward
-- The expanded regex catches ALL common structural label patterns (Set, Station, Exercise, Block, Round, Circuit) in addition to the existing single-letter patterns
-- Three independent layers (database, backend, frontend) all strip these labels
-- No manual checking required -- any label pattern will be automatically removed before reaching users
+### MeasurementGoalDialog.tsx
+- Add state for `targetWorkoutsCompleted` and `targetProgramsCompleted`
+- Add two number input fields
+- Include in the save payload
 
