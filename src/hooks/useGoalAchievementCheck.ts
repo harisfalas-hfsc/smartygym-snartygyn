@@ -105,6 +105,19 @@ export const sendGoalAchievementNotification = async (
 ) => {
   const label = achieved.type === "workouts_completed" ? "workouts" : "programs";
   try {
+    // Check user preference before calling backend
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('notification_preferences')
+      .eq('user_id', userId)
+      .single();
+
+    const prefs = (profile?.notification_preferences as Record<string, any>) || {};
+    if (prefs.dashboard_goal_achievement === false) {
+      console.log('User has disabled goal achievement notifications, skipping');
+      return;
+    }
+
     await supabase.functions.invoke('send-system-message', {
       body: {
         userId,

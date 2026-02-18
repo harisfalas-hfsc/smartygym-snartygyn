@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Loader2, Users, Dumbbell, Sun, Zap, Plus, BookOpen, FileText, BarChart3, Bell, Smartphone, RefreshCw, Copy, Check } from "lucide-react";
+import { Loader2, Users, Dumbbell, Sun, Zap, Plus, BookOpen, FileText, BarChart3, Bell, Smartphone, RefreshCw, Copy, Check, Trophy, CalendarClock } from "lucide-react";
 import { toast } from "sonner";
 
 interface PushStats {
@@ -17,6 +17,9 @@ interface PushStats {
   mobile_push_new_article: number;
   mobile_push_weekly_activity: number;
   mobile_push_checkin_reminders: number;
+  mobile_push_goal_achievement: number;
+  mobile_push_scheduled_workout_reminders: number;
+  mobile_push_scheduled_program_reminders: number;
 }
 
 const PREFERENCE_OPTIONS = [
@@ -59,6 +62,21 @@ const PREFERENCE_OPTIONS = [
     key: "mobile_push_checkin_reminders",
     label: "Check-in Reminders",
     icon: Bell,
+  },
+  {
+    key: "mobile_push_goal_achievement",
+    label: "Goal Achievements",
+    icon: Trophy,
+  },
+  {
+    key: "mobile_push_scheduled_workout_reminders",
+    label: "Scheduled Workout Reminders",
+    icon: CalendarClock,
+  },
+  {
+    key: "mobile_push_scheduled_program_reminders",
+    label: "Scheduled Program Reminders",
+    icon: CalendarClock,
   },
 ];
 
@@ -107,6 +125,9 @@ export const MobilePushTargetingPanel = () => {
         mobile_push_new_article: countEnabled("mobile_push_new_article"),
         mobile_push_weekly_activity: countEnabled("mobile_push_weekly_activity"),
         mobile_push_checkin_reminders: countEnabled("mobile_push_checkin_reminders"),
+        mobile_push_goal_achievement: countEnabled("mobile_push_goal_achievement"),
+        mobile_push_scheduled_workout_reminders: countEnabled("mobile_push_scheduled_workout_reminders"),
+        mobile_push_scheduled_program_reminders: countEnabled("mobile_push_scheduled_program_reminders"),
       });
     } catch (err) {
       console.error("Error fetching stats:", err);
