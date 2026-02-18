@@ -607,6 +607,8 @@ export function processContentWithExerciseMatching(
   processedContent = processedContent.replace(/(?<=>|\s)([A-Za-z]\d*[\.\:\)]\s*)(\{\{exercise:)/g, '$2');
   // Also strip inside bold tags: "<strong>A1: {{exercise:..." → "<strong>{{exercise:..."
   processedContent = processedContent.replace(/(<(?:strong|b)>)\s*[A-Za-z]\d*[\.\:\)]\s*(\{\{exercise:)/g, '$1$2');
+  // Strip standalone HTML-wrapped labels: "<strong>A1:</strong> {{exercise:..." → "{{exercise:..."
+  processedContent = processedContent.replace(/<(?:strong|b)>[A-Za-z]\d*[\.\:\)]\s*<\/(?:strong|b)>\s*(?=\{\{exercise:)/gi, '');
 
   // 2. Fix suffix duplication: "{{exercise:ID:Name with (qualifier)}} (qualifier) (qualifier)..."
   // After markup insertion, the original parenthetical text may remain, causing repeats
