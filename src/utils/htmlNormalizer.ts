@@ -64,13 +64,22 @@ export function normalizeWorkoutHtml(content: string): string {
     result = result.replace(pattern, '$1');
   }
   
-  // STEP 9: Collapse multiple consecutive empty paragraphs to exactly one
+  // STEP 9: Ensure empty paragraph BEFORE section headers (icon-based)
+  for (const icon of SECTION_ICONS) {
+    const insertPattern = new RegExp(
+      `(<\\/(?:ul|p)>)(?!<p class="tiptap-paragraph"><\\/p>)(<p[^>]*>[^<]*${icon})`,
+      'gi'
+    );
+    result = result.replace(insertPattern, `$1${CANONICAL_EMPTY_P}$2`);
+  }
+  
+  // STEP 10: Collapse multiple consecutive empty paragraphs to exactly one
   result = result.replace(/(<p class="tiptap-paragraph"><\/p>){2,}/gi, CANONICAL_EMPTY_P);
   
-  // STEP 10: Remove empty paragraphs between list items
+  // STEP 11: Remove empty paragraphs between list items
   result = result.replace(/<\/li><p class="tiptap-paragraph"><\/p><li/gi, '</li><li');
   
-  // STEP 11: Remove leading/trailing empty paragraphs
+  // STEP 12: Remove leading/trailing empty paragraphs
   result = result.replace(/^(<p class="tiptap-paragraph"><\/p>)+/, '');
   result = result.replace(/(<p class="tiptap-paragraph"><\/p>)+$/, '');
   
