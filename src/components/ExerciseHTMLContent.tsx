@@ -115,6 +115,8 @@ export const ExerciseHTMLContent: React.FC<ExerciseHTMLContentProps> = ({
 
     // Strip superset/sequence labels (A1:, B1:, C2., etc.) wrapped in HTML tags
     processedHtml = processedHtml.replace(/<(?:strong|b)>[A-Za-z]\d*[\.\:\)]\s*<\/(?:strong|b)>\s*/gi, '');
+    // Strip multi-word structural labels (Set 1:, Station 2:, Exercise 3:, Block 1:, Round 2:, Circuit 1:)
+    processedHtml = processedHtml.replace(/<(?:strong|b)>(?:Set|Station|Exercise|Block|Round|Circuit)\s*\d*[\.\:\)]\s*<\/(?:strong|b)>\s*/gi, '');
     // Strip plain-text labels before exercise placeholders
     processedHtml = processedHtml.replace(/(?<=>)\s*[A-Za-z]\d*[\.\:\)]\s*(?=\{\{exercise:)/g, '');
 
