@@ -167,12 +167,8 @@ serve(async (req) => {
           } else {
           // Send email with headers and footer
           // Use goals link for goal_achievement notifications
-          const ctaLink = messageType === 'goal_achievement'
-            ? 'https://smartygym.com/calculator-history?tab=measurements'
-            : 'https://smartygym.com/userdashboard';
-          const ctaText = messageType === 'goal_achievement'
-            ? 'Set New Goals'
-            : 'Go to Dashboard';
+          const ctaLink = 'https://smartygym.lovable.app/userdashboard';
+          const ctaText = 'Set New Goals';
 
           const emailHtml = wrapInEmailTemplateWithFooter(
             subject,
