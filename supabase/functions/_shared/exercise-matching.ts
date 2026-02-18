@@ -609,6 +609,8 @@ export function processContentWithExerciseMatching(
   processedContent = processedContent.replace(/(<(?:strong|b)>)\s*[A-Za-z]\d*[\.\:\)]\s*(\{\{exercise:)/g, '$1$2');
   // Strip standalone HTML-wrapped labels: "<strong>A1:</strong> {{exercise:..." → "{{exercise:..."
   processedContent = processedContent.replace(/<(?:strong|b)>[A-Za-z]\d*[\.\:\)]\s*<\/(?:strong|b)>\s*(?=\{\{exercise:)/gi, '');
+  // Strip multi-word structural labels: "<strong>Set 1:</strong>", "<strong>Station 2:</strong>", etc.
+  processedContent = processedContent.replace(/<(?:strong|b)>(?:Set|Station|Exercise|Block|Round|Circuit)\s*\d*[\.\:\)]\s*<\/(?:strong|b)>\s*/gi, '');
 
   // 2. Fix suffix duplication: "{{exercise:ID:Name with (qualifier)}} (qualifier) (qualifier)..."
   // After markup insertion, the original parenthetical text may remain, causing repeats
