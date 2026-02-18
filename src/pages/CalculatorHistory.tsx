@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Calculator, Scale, TrendingUp, Target, Plus, ChevronDown, CalendarIcon } from "lucide-react";
+import { Trash2, Calculator, Scale, TrendingUp, Target, Plus, ChevronDown, CalendarIcon, Dumbbell, BookOpen } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
@@ -205,6 +205,8 @@ export default function CalculatorHistory() {
   const [calorieHistory, setCalorieHistory] = useState<CalorieRecord[]>([]);
   const [measurementHistory, setMeasurementHistory] = useState<MeasurementRecord[]>([]);
   const [measurementGoal, setMeasurementGoal] = useState<MeasurementGoal | null>(null);
+  const [workoutsCompleted, setWorkoutsCompleted] = useState(0);
+  const [programsCompleted, setProgramsCompleted] = useState(0);
   
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; type: string; id: string } | null>(null);
   const [isMeasurementDialogOpen, setIsMeasurementDialogOpen] = useState(false);
@@ -264,6 +266,7 @@ export default function CalculatorHistory() {
       fetchCalorieHistory(userId),
       fetchMeasurementHistory(userId),
       fetchMeasurementGoal(userId),
+      fetchActivityCounts(userId),
     ]);
   };
 
@@ -326,6 +329,23 @@ export default function CalculatorHistory() {
       .limit(1)
       .single();
     if (data) setMeasurementGoal(data);
+  };
+
+  const fetchActivityCounts = async (userId: string) => {
+    const [{ count: wCount }, { count: pCount }] = await Promise.all([
+      supabase
+        .from("workout_interactions")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", userId)
+        .eq("is_completed", true),
+      supabase
+        .from("program_interactions")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", userId)
+        .eq("is_completed", true),
+    ]);
+    setWorkoutsCompleted(wCount || 0);
+    setProgramsCompleted(pCount || 0);
   };
 
   const handleDelete = async () => {
@@ -1048,7 +1068,7 @@ export default function CalculatorHistory() {
           </div>
 
           {/* Goal Progress Section */}
-          {measurementGoal && (measurementGoal.target_weight || measurementGoal.target_body_fat || measurementGoal.target_muscle_mass) && (
+          {measurementGoal && (measurementGoal.target_weight || measurementGoal.target_body_fat || measurementGoal.target_muscle_mass || measurementGoal.target_workouts_completed || measurementGoal.target_programs_completed) && (
             <Card className="border-primary/30 bg-primary/5">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2">
@@ -1147,6 +1167,50 @@ export default function CalculatorHistory() {
                           : `${(measurementGoal.target_muscle_mass - currentMuscleMass).toFixed(1)} kg to gain`}
                       </p>
                     )}
+                  </div>
+                )}
+
+                {measurementGoal.target_workouts_completed && (
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground flex items-center gap-1">
+                        <Dumbbell className="h-3.5 w-3.5" /> Workouts Completed
+                      </span>
+                      <span className="font-medium">
+                        {workoutsCompleted} / {measurementGoal.target_workouts_completed}
+                      </span>
+                    </div>
+                    <Progress 
+                      value={Math.min(100, (workoutsCompleted / measurementGoal.target_workouts_completed) * 100)} 
+                      className="h-2"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      {workoutsCompleted >= measurementGoal.target_workouts_completed 
+                        ? "🎉 Target reached!" 
+                        : `${measurementGoal.target_workouts_completed - workoutsCompleted} more to go`}
+                    </p>
+                  </div>
+                )}
+
+                {measurementGoal.target_programs_completed && (
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground flex items-center gap-1">
+                        <BookOpen className="h-3.5 w-3.5" /> Programs Completed
+                      </span>
+                      <span className="font-medium">
+                        {programsCompleted} / {measurementGoal.target_programs_completed}
+                      </span>
+                    </div>
+                    <Progress 
+                      value={Math.min(100, (programsCompleted / measurementGoal.target_programs_completed) * 100)} 
+                      className="h-2"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      {programsCompleted >= measurementGoal.target_programs_completed 
+                        ? "🎉 Target reached!" 
+                        : `${measurementGoal.target_programs_completed - programsCompleted} more to go`}
+                    </p>
                   </div>
                 )}
               </CardContent>
