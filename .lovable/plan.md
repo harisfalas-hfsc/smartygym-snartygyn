@@ -1,104 +1,106 @@
 
-# Wire Up Celebration Animation and Notifications for Workout/Program Completion Goals
 
-## Overview
+# Fire-Once Goal Celebrations + Post-Achievement "Set New Goals" Prompt
 
-When a user marks a workout or program as completed and that action causes them to reach their target goal (e.g., "Complete 20 workouts"), the system will:
-1. Show the confetti celebration animation with a trophy dialog
-2. Send a dashboard notification and email via the `send-system-message` edge function
+## Problem
 
-Currently, celebrations only fire for body measurement goals (weight, body fat, muscle mass) inside `MeasurementDialog.tsx`. We need to add the same logic to `WorkoutInteractions.tsx` and `ProgramInteractions.tsx`.
+Currently, when a user achieves any goal (weight, body fat, muscle mass, workouts, or programs):
+- The celebration fires on **every** subsequent completion, not just the first time
+- There is no prompt asking the user to set new goals
+- The progress bar just stays at 100% with a trophy icon indefinitely
+- The notification email/dashboard message has no link to set new goals
 
-## Changes
+## Solution
 
-### 1. Expand GoalAchievementCelebration types
+### Part 1: Fire-Once Safeguard
 
-**File:** `src/components/dashboard/GoalAchievementCelebration.tsx`
+Add a `goal_achieved_at` timestamp column to `user_measurement_goals`. When a goal is achieved for the first time, record the timestamp. On subsequent completions, skip the celebration and notification if the timestamp is already set.
 
-- Expand the `AchievedGoal` type to include `"workouts_completed"` and `"programs_completed"`
-- Add labels: "Workouts Completed Goal", "Programs Completed Goal"
-- Add units: "workouts", "programs"
-- Use `.toFixed(0)` instead of `.toFixed(1)` for integer-based goals (workouts/programs)
+**Database migration:**
+- Add columns: `workouts_goal_achieved_at`, `programs_goal_achieved_at`, `weight_goal_achieved_at`, `body_fat_goal_achieved_at`, `muscle_mass_goal_achieved_at` (all nullable timestamps) to `user_measurement_goals`
 
-### 2. Add goal-check logic to WorkoutInteractions
+**Logic change in all achievement checks:**
+1. Before triggering celebration, check if the corresponding `*_goal_achieved_at` is already set
+2. If not set: trigger celebration + notification + update the timestamp
+3. If already set: skip entirely
 
-**File:** `src/components/WorkoutInteractions.tsx`
+### Part 2: Post-Achievement Prompt
 
-Inside the `toggleCompleted` function, after the workout is successfully marked as completed:
-- Fetch the user's active goal from `user_measurement_goals` (specifically `target_workouts_completed`)
-- If a target exists, count all `workout_interactions` where `is_completed = true` for this user
-- If the count equals or exceeds the target, show the celebration dialog and send a notification via `send-system-message`
-- Add `GoalAchievementCelebration` component to the render output
-- Add state for `showCelebration` and `achievedGoals`
+When a goal is achieved, enhance the experience:
 
-### 3. Add goal-check logic to ProgramInteractions
+**A. Celebration Dialog Enhancement**
+- Change the "Continue Your Journey" button to "Set New Goals"
+- Add a clickable link/button that navigates to `/calculator-history?tab=measurements` (the goals section)
+- Show a motivational message like "Ready for your next challenge? Set new goals to keep pushing forward!"
 
-**File:** `src/components/ProgramInteractions.tsx`
+**B. Dashboard GoalsSummaryCard Enhancement**
+- When a goal is at 100% (achieved), show an "Achieved" badge and a "Set New Goal" button next to it
+- This gives the user a persistent visual cue on the dashboard
 
-Inside the `markComplete` function, after the program is successfully marked as completed:
-- Same pattern as workouts: fetch goal, count completions, trigger celebration if target met
-- Add `GoalAchievementCelebration` component to the render output
-- Add state for `showCelebration` and `achievedGoals`
+**C. Notification/Email Enhancement**
+- Update the notification content to include a call-to-action: "Set your next goals and keep upgrading your life!"
+- The dashboard CTA button in the email already links to `/userdashboard` -- update it to link to `/calculator-history?tab=measurements` so users land directly on the goals section
 
-### 4. Create a shared helper hook (optional but clean)
+### Part 3: Goal Reset Flow
 
-**File:** `src/hooks/useGoalAchievementCheck.ts` (new file)
+When a user edits goals (changes a target value after achieving it), the corresponding `*_goal_achieved_at` timestamp is cleared, allowing the celebration to fire again when the new target is reached.
 
-A small reusable hook that:
-- Takes `userId` and `goalType` ("workouts_completed" or "programs_completed")
-- Fetches the target from `user_measurement_goals`
-- Counts actual completions from the relevant table
-- Returns a function `checkAndCelebrate()` that compares and returns achieved goals if target is met
+## Files to Change
 
-This avoids duplicating the fetch/count/compare logic in both interaction components.
+1. **Database migration** -- add 5 `*_goal_achieved_at` columns to `user_measurement_goals`
+
+2. **`src/hooks/useGoalAchievementCheck.ts`** -- check `workouts_goal_achieved_at` / `programs_goal_achieved_at` before firing; update timestamp after firing
+
+3. **`src/components/logbook/MeasurementDialog.tsx`** -- check `weight_goal_achieved_at` / `body_fat_goal_achieved_at` / `muscle_mass_goal_achieved_at` before firing; update timestamp after firing
+
+4. **`src/components/dashboard/GoalAchievementCelebration.tsx`** -- change button text to "Set New Goals", navigate to goals page on click
+
+5. **`src/components/dashboard/GoalsSummaryCard.tsx`** -- show "Achieved" badge + "Set New Goal" button for 100% goals
+
+6. **`src/components/logbook/MeasurementGoalDialog.tsx`** -- clear the relevant `*_goal_achieved_at` timestamp when a user changes a target value
+
+7. **`src/hooks/useGoalAchievementCheck.ts`** (notification content) -- update the message to include "Set your next goals!" with a link to the goals section
 
 ## Technical Details
 
-### GoalAchievementCelebration.tsx changes
-```
-// Expand type
-type: "weight" | "body_fat" | "muscle_mass" | "workouts_completed" | "programs_completed"
-
-// Add to GOAL_LABELS
-workouts_completed: "Workouts Completed Goal"
-programs_completed: "Programs Completed Goal"
-
-// Add to GOAL_UNITS
-workouts_completed: " workouts"
-programs_completed: " programs"
-
-// Use conditional formatting for integer vs decimal display
+### Database Migration
+```sql
+ALTER TABLE user_measurement_goals
+  ADD COLUMN weight_goal_achieved_at timestamptz,
+  ADD COLUMN body_fat_goal_achieved_at timestamptz,
+  ADD COLUMN muscle_mass_goal_achieved_at timestamptz,
+  ADD COLUMN workouts_goal_achieved_at timestamptz,
+  ADD COLUMN programs_goal_achieved_at timestamptz;
 ```
 
-### useGoalAchievementCheck.ts (new hook)
-```typescript
-// Fetches user goal target and current count
-// Returns { checkGoalAchievement } function
-// On match, returns AchievedGoal object for celebration
+### Fire-Once Check (pseudocode)
+```text
+1. Fetch goal row including *_goal_achieved_at
+2. If target exists AND achieved_at is NULL:
+   a. Check if current count >= target
+   b. If yes: show celebration, send notification, SET achieved_at = now()
+3. If achieved_at is already set: skip
 ```
 
-### WorkoutInteractions.tsx flow (inside toggleCompleted, after success)
-```
-1. Fetch user_measurement_goals.target_workouts_completed
-2. If target exists, count workout_interactions where is_completed = true
-3. If count >= target --> setAchievedGoals, setShowCelebration(true)
-4. Call send-system-message with goal achievement details
-```
-
-### ProgramInteractions.tsx flow (inside markComplete, after success)
-```
-1. Fetch user_measurement_goals.target_programs_completed
-2. If target exists, count program_interactions where is_completed = true
-3. If count >= target --> setAchievedGoals, setShowCelebration(true)
-4. Call send-system-message with goal achievement details
+### Celebration Dialog Button Change
+```text
+Current:  "Continue Your Journey" (just closes dialog)
+New:      "Set New Goals" (navigates to /calculator-history?tab=measurements)
+          + secondary "Close" button for dismissal
 ```
 
-### Notification message format
-Same pattern as existing body measurement goals:
-- Subject: "Goal Achieved!"
-- Content: "Congratulations! You've completed X workouts, reaching your target of Y! Keep up the amazing work!"
+### Goal Reset on Edit
+```text
+When saving MeasurementGoalDialog:
+- If target_weight changed -> SET weight_goal_achieved_at = NULL
+- If target_body_fat changed -> SET body_fat_goal_achieved_at = NULL
+- (same for all 5 goal types)
+```
 
-## What Won't Change
-- The existing body measurement celebration in `MeasurementDialog.tsx` stays exactly as-is
-- The `send-system-message` edge function needs no changes (it already supports custom content)
-- No database migration needed
+### Notification Content Update
+```text
+Current:  "Congratulations! You've completed 8 workouts, reaching your target of 2!"
+New:      "Congratulations! You've completed 8 workouts, reaching your target of 2!
+           Ready for your next challenge? Set new goals and keep upgrading your life!"
+```
+
