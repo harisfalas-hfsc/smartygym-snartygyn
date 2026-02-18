@@ -1153,7 +1153,7 @@ export default function UserDashboard() {
               return (
                 <Card 
                   key={section.id}
-                  onClick={() => setActiveTab(section.id)}
+                  onClick={() => navigate('/userdashboard?tab=' + section.id)}
                   className={`cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all duration-200 group relative ${section.hoverBorder}`}
                 >
                   <CardContent className="p-4 sm:p-6 flex flex-col items-center text-center gap-2 sm:gap-3">
@@ -1181,7 +1181,7 @@ export default function UserDashboard() {
           <div className="space-y-6">
             <Button 
               variant="ghost" 
-              onClick={() => setActiveTab(null)}
+              onClick={() => navigate('/userdashboard')}
               className="hidden md:inline-flex mb-4 gap-2"
             >
               <ArrowLeft className="h-4 w-4" />
@@ -1261,7 +1261,7 @@ export default function UserDashboard() {
                   <CardTitle>Favorite Workouts</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {favoriteWorkouts.length === 0 ? <p className="text-sm text-muted-foreground">No favorite workouts yet</p> : <ScrollArea className="max-h-[400px] pr-4">
+                  {favoriteWorkouts.length === 0 ? <p className="text-sm text-muted-foreground">No favorite workouts yet</p> : <ScrollArea className="max-h-[300px] pr-4">
                       <div className="space-y-2">
                         {favoriteWorkouts.map(workout => <div key={workout.id} className="p-3 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleNavigateToWorkout(workout.workout_type, workout.workout_id)}>
                             <div className="flex items-center justify-between">
@@ -1291,7 +1291,7 @@ export default function UserDashboard() {
                   <CardTitle>Completed Workouts</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {completedWorkouts.length === 0 ? <p className="text-sm text-muted-foreground">No completed workouts yet</p> : <ScrollArea className="max-h-[400px] pr-4">
+                  {completedWorkouts.length === 0 ? <p className="text-sm text-muted-foreground">No completed workouts yet</p> : <ScrollArea className="max-h-[300px] pr-4">
                       <div className="space-y-2">
                         {completedWorkouts.map(workout => <div key={workout.id} className="p-3 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleNavigateToWorkout(workout.workout_type, workout.workout_id)}>
                             <div className="flex items-center justify-between">
@@ -1389,7 +1389,7 @@ export default function UserDashboard() {
                   <CardTitle>Favorite Programs</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {favoritePrograms.length === 0 ? <p className="text-sm text-muted-foreground">No favorite programs yet</p> : <div className="space-y-2">
+{favoritePrograms.length === 0 ? <p className="text-sm text-muted-foreground">No favorite programs yet</p> : <ScrollArea className="max-h-[300px] pr-4"><div className="space-y-2">
                       {favoritePrograms.map(program => <div key={program.id} className="p-3 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleNavigateToProgram(program.program_type, program.program_id)}>
                           <div className="flex items-center justify-between">
                             <div className="flex-1">
@@ -1407,7 +1407,7 @@ export default function UserDashboard() {
                             {program.is_completed && <CheckCircle className="h-4 w-4 text-green-500 ml-2" />}
                           </div>
                         </div>)}
-                    </div>}
+                    </div></ScrollArea>}
                 </CardContent>
               </Card>
 
@@ -1417,7 +1417,7 @@ export default function UserDashboard() {
                   <CardTitle>Completed Programs</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {completedPrograms.length === 0 ? <p className="text-sm text-muted-foreground">No completed programs yet</p> : <div className="space-y-2">
+{completedPrograms.length === 0 ? <p className="text-sm text-muted-foreground">No completed programs yet</p> : <ScrollArea className="max-h-[300px] pr-4"><div className="space-y-2">
                       {completedPrograms.map(program => <div key={program.id} className="p-3 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleNavigateToProgram(program.program_type, program.program_id)}>
                           <div className="flex items-center justify-between">
                             <div className="flex-1">
@@ -1435,7 +1435,7 @@ export default function UserDashboard() {
                             {program.is_favorite && <Heart className="h-4 w-4 fill-red-500 text-red-500 ml-2" />}
                           </div>
                         </div>)}
-                    </div>}
+                    </div></ScrollArea>}
                 </CardContent>
               </Card>
             </div>
