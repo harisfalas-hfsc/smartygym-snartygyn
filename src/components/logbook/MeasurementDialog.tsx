@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { GoalAchievementCelebration } from "@/components/dashboard/GoalAchievementCelebration";
+import { markMeasurementGoalAchieved } from "@/hooks/useGoalAchievementCheck";
 
 interface MeasurementDialogProps {
   isOpen: boolean;
@@ -21,6 +22,9 @@ interface MeasurementGoal {
   target_weight: number | null;
   target_body_fat: number | null;
   target_muscle_mass: number | null;
+  weight_goal_achieved_at: string | null;
+  body_fat_goal_achieved_at: string | null;
+  muscle_mass_goal_achieved_at: string | null;
 }
 
 interface AchievedGoal {
@@ -49,13 +53,13 @@ export const MeasurementDialog = ({ isOpen, onClose, userId, onSaved }: Measurem
   const fetchCurrentGoal = async () => {
     const { data } = await supabase
       .from("user_measurement_goals")
-      .select("target_weight, target_body_fat, target_muscle_mass")
+      .select("target_weight, target_body_fat, target_muscle_mass, weight_goal_achieved_at, body_fat_goal_achieved_at, muscle_mass_goal_achieved_at")
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
       .limit(1)
       .single();
     
-    if (data) setCurrentGoal(data);
+    if (data) setCurrentGoal(data as MeasurementGoal);
   };
 
   const checkGoalAchievement = (
@@ -67,25 +71,22 @@ export const MeasurementDialog = ({ isOpen, onClose, userId, onSaved }: Measurem
     
     const achieved: AchievedGoal[] = [];
 
-    // Check weight goal (can be increase or decrease)
-    if (newWeight && currentGoal.target_weight) {
-      // Consider goal achieved if within 0.5kg of target
+    // Check weight goal (fire-once: skip if already achieved)
+    if (newWeight && currentGoal.target_weight && !currentGoal.weight_goal_achieved_at) {
       if (Math.abs(newWeight - currentGoal.target_weight) <= 0.5) {
         achieved.push({ type: "weight", target: currentGoal.target_weight, current: newWeight });
       }
     }
 
-    // Check body fat goal (typically decrease)
-    if (newBodyFat && currentGoal.target_body_fat) {
-      // Consider goal achieved if at or below target (with 0.5% tolerance)
+    // Check body fat goal (fire-once)
+    if (newBodyFat && currentGoal.target_body_fat && !currentGoal.body_fat_goal_achieved_at) {
       if (newBodyFat <= currentGoal.target_body_fat + 0.5) {
         achieved.push({ type: "body_fat", target: currentGoal.target_body_fat, current: newBodyFat });
       }
     }
 
-    // Check muscle mass goal (typically increase)
-    if (newMuscleMass && currentGoal.target_muscle_mass) {
-      // Consider goal achieved if at or above target (with 0.5kg tolerance)
+    // Check muscle mass goal (fire-once)
+    if (newMuscleMass && currentGoal.target_muscle_mass && !currentGoal.muscle_mass_goal_achieved_at) {
       if (newMuscleMass >= currentGoal.target_muscle_mass - 0.5) {
         achieved.push({ type: "muscle_mass", target: currentGoal.target_muscle_mass, current: newMuscleMass });
       }
@@ -144,6 +145,13 @@ export const MeasurementDialog = ({ isOpen, onClose, userId, onSaved }: Measurem
       if (achieved.length > 0) {
         setAchievedGoals(achieved);
         setShowCelebration(true);
+
+        // Mark each achieved goal in the database
+        for (const goal of achieved) {
+          if (goal.type === "weight" || goal.type === "body_fat" || goal.type === "muscle_mass") {
+            await markMeasurementGoalAchieved(userId, goal.type);
+          }
+        }
         
         // Send notification for goal achievement
         try {
@@ -153,7 +161,7 @@ export const MeasurementDialog = ({ isOpen, onClose, userId, onSaved }: Measurem
               messageType: 'announcement_update',
               customData: {
                 subject: '🎉 Goal Achieved!',
-                content: `Congratulations! You've achieved ${achieved.length > 1 ? 'your fitness goals' : 'your fitness goal'}! ${achieved.map(g => `${g.type === 'weight' ? 'Target Weight' : g.type === 'body_fat' ? 'Body Fat Goal' : 'Muscle Mass Goal'}: ${g.current.toFixed(1)}${g.type === 'body_fat' ? '%' : 'kg'}`).join(', ')}. Keep up the amazing work!`
+                content: `Congratulations! You've achieved ${achieved.length > 1 ? 'your fitness goals' : 'your fitness goal'}! ${achieved.map(g => `${g.type === 'weight' ? 'Target Weight' : g.type === 'body_fat' ? 'Body Fat Goal' : 'Muscle Mass Goal'}: ${g.current.toFixed(1)}${g.type === 'body_fat' ? '%' : 'kg'}`).join(', ')}. Ready for your next challenge? Set new goals and keep upgrading your life!`
               }
             }
           });

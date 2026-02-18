@@ -2592,8 +2592,11 @@ export type Database = {
       }
       user_measurement_goals: {
         Row: {
+          body_fat_goal_achieved_at: string | null
           created_at: string
           id: string
+          muscle_mass_goal_achieved_at: string | null
+          programs_goal_achieved_at: string | null
           target_body_fat: number | null
           target_date: string | null
           target_muscle_mass: number | null
@@ -2602,10 +2605,15 @@ export type Database = {
           target_workouts_completed: number | null
           updated_at: string
           user_id: string
+          weight_goal_achieved_at: string | null
+          workouts_goal_achieved_at: string | null
         }
         Insert: {
+          body_fat_goal_achieved_at?: string | null
           created_at?: string
           id?: string
+          muscle_mass_goal_achieved_at?: string | null
+          programs_goal_achieved_at?: string | null
           target_body_fat?: number | null
           target_date?: string | null
           target_muscle_mass?: number | null
@@ -2614,10 +2622,15 @@ export type Database = {
           target_workouts_completed?: number | null
           updated_at?: string
           user_id: string
+          weight_goal_achieved_at?: string | null
+          workouts_goal_achieved_at?: string | null
         }
         Update: {
+          body_fat_goal_achieved_at?: string | null
           created_at?: string
           id?: string
+          muscle_mass_goal_achieved_at?: string | null
+          programs_goal_achieved_at?: string | null
           target_body_fat?: number | null
           target_date?: string | null
           target_muscle_mass?: number | null
@@ -2626,6 +2639,8 @@ export type Database = {
           target_workouts_completed?: number | null
           updated_at?: string
           user_id?: string
+          weight_goal_achieved_at?: string | null
+          workouts_goal_achieved_at?: string | null
         }
         Relationships: []
       }

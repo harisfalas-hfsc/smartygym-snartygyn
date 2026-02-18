@@ -19,6 +19,11 @@ interface MeasurementGoalDialogProps {
     target_workouts_completed: number | null;
     target_programs_completed: number | null;
     target_date: string | null;
+    weight_goal_achieved_at: string | null;
+    body_fat_goal_achieved_at: string | null;
+    muscle_mass_goal_achieved_at: string | null;
+    workouts_goal_achieved_at: string | null;
+    programs_goal_achieved_at: string | null;
   } | null;
   onSaved: () => void;
 }
@@ -65,7 +70,7 @@ export const MeasurementGoalDialog = ({
     setIsSubmitting(true);
 
     try {
-      const goalData = {
+      const goalData: any = {
         user_id: userId,
         target_weight: targetWeight ? parseFloat(targetWeight) : null,
         target_body_fat: targetBodyFat ? parseFloat(targetBodyFat) : null,
@@ -74,6 +79,21 @@ export const MeasurementGoalDialog = ({
         target_programs_completed: targetProgramsCompleted ? parseInt(targetProgramsCompleted) : null,
         target_date: targetDate || null
       };
+
+      // Clear achieved_at timestamps when targets change (allow re-celebration)
+      if (currentGoal) {
+        const newWeight = targetWeight ? parseFloat(targetWeight) : null;
+        const newBodyFat = targetBodyFat ? parseFloat(targetBodyFat) : null;
+        const newMuscleMass = targetMuscleMass ? parseFloat(targetMuscleMass) : null;
+        const newWorkouts = targetWorkoutsCompleted ? parseInt(targetWorkoutsCompleted) : null;
+        const newPrograms = targetProgramsCompleted ? parseInt(targetProgramsCompleted) : null;
+
+        if (newWeight !== currentGoal.target_weight) goalData.weight_goal_achieved_at = null;
+        if (newBodyFat !== currentGoal.target_body_fat) goalData.body_fat_goal_achieved_at = null;
+        if (newMuscleMass !== currentGoal.target_muscle_mass) goalData.muscle_mass_goal_achieved_at = null;
+        if (newWorkouts !== currentGoal.target_workouts_completed) goalData.workouts_goal_achieved_at = null;
+        if (newPrograms !== currentGoal.target_programs_completed) goalData.programs_goal_achieved_at = null;
+      }
 
       if (currentGoal?.id) {
         const { error } = await supabase
