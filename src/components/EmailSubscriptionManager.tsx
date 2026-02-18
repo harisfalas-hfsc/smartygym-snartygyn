@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Loader2, Dumbbell, Sun, Zap, Plus, BookOpen, FileText, BarChart3, Bell, CalendarClock } from "lucide-react";
+import { Loader2, Dumbbell, Sun, Zap, Plus, BookOpen, FileText, BarChart3, Bell, CalendarClock, Trophy } from "lucide-react";
 import { toast } from "sonner";
 
 interface EmailPreferences {
@@ -17,6 +17,7 @@ interface EmailPreferences {
   email_checkin_reminders: boolean;
   email_scheduled_workout_reminders: boolean;
   email_scheduled_program_reminders: boolean;
+  email_goal_achievement: boolean;
   opt_out_all: boolean;
 }
 
@@ -31,6 +32,7 @@ const DEFAULT_PREFERENCES: EmailPreferences = {
   email_checkin_reminders: true,
   email_scheduled_workout_reminders: true,
   email_scheduled_program_reminders: true,
+  email_goal_achievement: true,
   opt_out_all: false,
 };
 
@@ -105,6 +107,13 @@ const EMAIL_OPTIONS = [
     timing: "Sent based on your scheduled time",
     icon: CalendarClock,
   },
+  {
+    key: "email_goal_achievement" as keyof EmailPreferences,
+    label: "Goal Achievements",
+    description: "Get notified when you reach your fitness goals",
+    timing: "Sent when you achieve a goal",
+    icon: Trophy,
+  },
 ];
 
 export const EmailSubscriptionManager = () => {
@@ -145,6 +154,7 @@ export const EmailSubscriptionManager = () => {
           email_checkin_reminders: prefs.email_checkin_reminders !== false || prefs.checkin_reminders === true,
           email_scheduled_workout_reminders: prefs.email_scheduled_workout_reminders !== false,
           email_scheduled_program_reminders: prefs.email_scheduled_program_reminders !== false,
+          email_goal_achievement: prefs.email_goal_achievement !== false,
           opt_out_all: prefs.opt_out_all === true,
         });
       }
