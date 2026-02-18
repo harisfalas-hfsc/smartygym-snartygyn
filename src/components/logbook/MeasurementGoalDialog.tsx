@@ -16,6 +16,8 @@ interface MeasurementGoalDialogProps {
     target_weight: number | null;
     target_body_fat: number | null;
     target_muscle_mass: number | null;
+    target_workouts_completed: number | null;
+    target_programs_completed: number | null;
     target_date: string | null;
   } | null;
   onSaved: () => void;
@@ -31,6 +33,8 @@ export const MeasurementGoalDialog = ({
   const [targetWeight, setTargetWeight] = useState("");
   const [targetBodyFat, setTargetBodyFat] = useState("");
   const [targetMuscleMass, setTargetMuscleMass] = useState("");
+  const [targetWorkoutsCompleted, setTargetWorkoutsCompleted] = useState("");
+  const [targetProgramsCompleted, setTargetProgramsCompleted] = useState("");
   const [targetDate, setTargetDate] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -39,17 +43,21 @@ export const MeasurementGoalDialog = ({
       setTargetWeight(currentGoal.target_weight?.toString() || "");
       setTargetBodyFat(currentGoal.target_body_fat?.toString() || "");
       setTargetMuscleMass(currentGoal.target_muscle_mass?.toString() || "");
+      setTargetWorkoutsCompleted(currentGoal.target_workouts_completed?.toString() || "");
+      setTargetProgramsCompleted(currentGoal.target_programs_completed?.toString() || "");
       setTargetDate(currentGoal.target_date || "");
     } else {
       setTargetWeight("");
       setTargetBodyFat("");
       setTargetMuscleMass("");
+      setTargetWorkoutsCompleted("");
+      setTargetProgramsCompleted("");
       setTargetDate("");
     }
   }, [currentGoal, isOpen]);
 
   const handleSubmit = async () => {
-    if (!targetWeight && !targetBodyFat && !targetMuscleMass) {
+    if (!targetWeight && !targetBodyFat && !targetMuscleMass && !targetWorkoutsCompleted && !targetProgramsCompleted) {
       toast.error("Please set at least one goal");
       return;
     }
@@ -62,6 +70,8 @@ export const MeasurementGoalDialog = ({
         target_weight: targetWeight ? parseFloat(targetWeight) : null,
         target_body_fat: targetBodyFat ? parseFloat(targetBodyFat) : null,
         target_muscle_mass: targetMuscleMass ? parseFloat(targetMuscleMass) : null,
+        target_workouts_completed: targetWorkoutsCompleted ? parseInt(targetWorkoutsCompleted) : null,
+        target_programs_completed: targetProgramsCompleted ? parseInt(targetProgramsCompleted) : null,
         target_date: targetDate || null
       };
 
@@ -138,6 +148,30 @@ export const MeasurementGoalDialog = ({
               placeholder="e.g., 40"
               value={targetMuscleMass}
               onChange={(e) => setTargetMuscleMass(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="targetWorkouts">Target Workouts Completed</Label>
+            <Input
+              id="targetWorkouts"
+              type="number"
+              min="1"
+              placeholder="e.g., 20"
+              value={targetWorkoutsCompleted}
+              onChange={(e) => setTargetWorkoutsCompleted(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="targetPrograms">Target Programs Completed</Label>
+            <Input
+              id="targetPrograms"
+              type="number"
+              min="1"
+              placeholder="e.g., 3"
+              value={targetProgramsCompleted}
+              onChange={(e) => setTargetProgramsCompleted(e.target.value)}
             />
           </div>
 
