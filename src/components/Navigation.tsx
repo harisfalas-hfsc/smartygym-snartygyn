@@ -18,7 +18,7 @@ import { User as UserIcon, Settings, LogOut, LayoutDashboard, Crown, Menu, Bell,
 import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
-import { ThemeToggle } from "@/components/ThemeToggle";
+
 import { SafeNotificationBadge } from "@/components/NotificationBadge";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAdminRole } from "@/hooks/useAdminRole";
@@ -452,8 +452,6 @@ export const Navigation = () => {
                 Admin
               </Button>
             )}
-            
-            <ThemeToggle />
             
             {user && unreadCount > 0 && (
               <Button
