@@ -160,6 +160,11 @@ serve(async (req) => {
         } else if (prefs.email === false) {
           console.log('[SEND-SYSTEM-MESSAGE] User has disabled email notifications, skipping email');
         } else {
+          // Check per-message-type email preference (e.g. email_goal_achievement for goal_achievement)
+          const emailPrefKey = `email_${messageType}`;
+          if (prefs[emailPrefKey] === false) {
+            console.log(`[SEND-SYSTEM-MESSAGE] User has disabled ${emailPrefKey}, skipping email`);
+          } else {
           // Send email with headers and footer
           // Use goals link for goal_achievement notifications
           const ctaLink = messageType === 'goal_achievement'
@@ -187,6 +192,7 @@ serve(async (req) => {
 
           console.log('[SEND-SYSTEM-MESSAGE] Email sent successfully:', emailResponse.data?.id);
           emailSent = true;
+          }
         }
       }
     } catch (emailError) {
