@@ -1,27 +1,22 @@
 
+# Fix Goal Achievement Email Link
 
-# Add Goal Achievements Toggle to Email Notification Settings
+## Problem
+The goal achievement email contains a "Set New Goals" button that links to `/calculator-history?tab=measurements`, which loads a blank/black page. The link should instead direct to the main dashboard (`/userdashboard`) where the Active Goals card is visible.
 
-## Current State
+## Fix
 
-I verified all three files:
-- Dashboard Notification Settings: has Goal Achievements toggle -- DONE
-- Mobile App Push Notification Settings: has Goal Achievements toggle -- DONE
-- Email Notification Settings: MISSING Goal Achievements toggle -- needs fix
+### File: `supabase/functions/send-system-message/index.ts` (line 171)
 
-## The Fix
+Change the CTA link for goal achievement emails from:
+```
+https://smartygym.com/calculator-history?tab=measurements
+```
+to:
+```
+https://smartygym.lovable.app/userdashboard
+```
 
-### File: `src/components/EmailSubscriptionManager.tsx`
+This is a one-line change. The "Set New Goals" button in the email will take the user directly to the dashboard where the Goals Summary Card is displayed, and from there they can click through to update their goals.
 
-1. Import `Trophy` icon from lucide-react (line 6)
-2. Add `email_goal_achievement: boolean` to the `EmailPreferences` interface (after line 19)
-3. Add `email_goal_achievement: true` to `DEFAULT_PREFERENCES` (after line 33)
-4. Add a new entry to the `EMAIL_OPTIONS` array (after the scheduled program reminders entry, before the closing bracket):
-   - Key: `email_goal_achievement`
-   - Label: "Goal Achievements"
-   - Description: "Get notified when you reach your fitness goals"
-   - Timing: "Sent when you achieve a goal"
-   - Icon: Trophy
-5. Add `email_goal_achievement: prefs.email_goal_achievement !== false` to `fetchPreferences` (after line 147)
-
-One file. One toggle. After this, all three cards will have the same 11 notification types.
+Also updating the CTA button text to stay as "Set New Goals" since the goals card on the dashboard has its own "Set New Goal" link.
