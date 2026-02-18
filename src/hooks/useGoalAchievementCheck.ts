@@ -108,10 +108,10 @@ export const sendGoalAchievementNotification = async (
     await supabase.functions.invoke('send-system-message', {
       body: {
         userId,
-        messageType: 'announcement_update',
+        messageType: 'goal_achievement',
         customData: {
-          subject: '🎉 Goal Achieved!',
-          content: `Congratulations! You've completed ${achieved.current} ${label}, reaching your target of ${achieved.target}! Ready for your next challenge? Set new goals and keep upgrading your life! Visit your Goals section to set new targets.`
+          subject: '🎉 Goal Achieved! You did it!',
+          content: `Congratulations! You've completed ${achieved.current} ${label}, reaching your target of ${achieved.target}! Your dedication and hard work have paid off. Ready for your next challenge? Set new goals and keep upgrading your life!`
         }
       }
     });

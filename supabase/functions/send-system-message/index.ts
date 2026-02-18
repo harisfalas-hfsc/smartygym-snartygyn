@@ -18,6 +18,8 @@ interface SendMessageRequest {
     date?: string;
     amount?: string;
     contentName?: string;
+    subject?: string;
+    content?: string;
   };
 }
 
@@ -79,6 +81,14 @@ serve(async (req) => {
       content = content.replace(/\[Content\]/g, customData.contentName);
     }
 
+    // Allow full override of subject/content from customData
+    if (customData.subject) {
+      subject = customData.subject;
+    }
+    if (customData.content) {
+      content = customData.content;
+    }
+
     // Insert system message for the user (dashboard)
     const { error: insertError } = await supabaseAdmin
       .from('user_system_messages')
@@ -132,12 +142,20 @@ serve(async (req) => {
           console.log('[SEND-SYSTEM-MESSAGE] User has disabled email notifications, skipping email');
         } else {
           // Send email with headers and footer
+          // Use goals link for goal_achievement notifications
+          const ctaLink = messageType === 'goal_achievement'
+            ? 'https://smartygym.com/calculator-history?tab=measurements'
+            : 'https://smartygym.com/userdashboard';
+          const ctaText = messageType === 'goal_achievement'
+            ? 'Set New Goals'
+            : 'Go to Dashboard';
+
           const emailHtml = wrapInEmailTemplateWithFooter(
             subject,
             content,
             userEmail,
-            'https://smartygym.com/userdashboard',
-            'Go to Dashboard'
+            ctaLink,
+            ctaText
           );
 
           const emailResponse = await resend.emails.send({
