@@ -160,7 +160,14 @@ export const MESSAGE_TYPES = {
   
   /** Corporate subscription created */
   CORPORATE_SUBSCRIPTION: 'corporate_subscription',
+
+  // ============================================
+  // GOAL ACHIEVEMENT NOTIFICATIONS
+  // ============================================
   
+  /** Goal achievement celebration */
+  GOAL_ACHIEVEMENT: 'goal_achievement',
+
 } as const;
 
 /**

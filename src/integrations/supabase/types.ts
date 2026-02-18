@@ -3182,6 +3182,7 @@ export type Database = {
         | "new_category_announcement"
         | "checkin_reminder_morning"
         | "checkin_reminder_evening"
+        | "goal_achievement"
       plan_type: "free" | "gold" | "platinum"
       subscription_status: "active" | "canceled" | "past_due"
     }
@@ -3349,6 +3350,7 @@ export const Constants = {
         "new_category_announcement",
         "checkin_reminder_morning",
         "checkin_reminder_evening",
+        "goal_achievement",
       ],
       plan_type: ["free", "gold", "platinum"],
       subscription_status: ["active", "canceled", "past_due"],
