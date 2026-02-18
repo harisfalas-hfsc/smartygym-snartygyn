@@ -94,6 +94,11 @@ interface MeasurementGoal {
   target_workouts_completed: number | null;
   target_programs_completed: number | null;
   target_date: string | null;
+  weight_goal_achieved_at: string | null;
+  body_fat_goal_achieved_at: string | null;
+  muscle_mass_goal_achieved_at: string | null;
+  workouts_goal_achieved_at: string | null;
+  programs_goal_achieved_at: string | null;
 }
 
 type MeasurementData = {

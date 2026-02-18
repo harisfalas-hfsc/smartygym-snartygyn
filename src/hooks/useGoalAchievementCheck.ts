@@ -6,21 +6,33 @@ interface AchievedGoal {
   current: number;
 }
 
+const ACHIEVED_AT_FIELDS: Record<string, string> = {
+  workouts_completed: "workouts_goal_achieved_at",
+  programs_completed: "programs_goal_achieved_at",
+  weight: "weight_goal_achieved_at",
+  body_fat: "body_fat_goal_achieved_at",
+  muscle_mass: "muscle_mass_goal_achieved_at",
+};
+
 export const checkCompletionGoalAchievement = async (
   userId: string,
   goalType: "workouts_completed" | "programs_completed"
 ): Promise<AchievedGoal | null> => {
   try {
-    // Fetch user's active goal
+    const achievedAtField = ACHIEVED_AT_FIELDS[goalType];
+
     const { data: goalData, error: goalError } = await supabase
       .from('user_measurement_goals')
-      .select('target_workouts_completed, target_programs_completed')
+      .select(`target_workouts_completed, target_programs_completed, ${achievedAtField}`)
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .limit(1)
       .single();
 
     if (goalError || !goalData) return null;
+
+    // Fire-once: skip if already achieved
+    if ((goalData as any)[achievedAtField]) return null;
 
     const targetField = goalType === "workouts_completed" 
       ? "target_workouts_completed" 
@@ -29,7 +41,6 @@ export const checkCompletionGoalAchievement = async (
     const target = goalData[targetField];
     if (!target) return null;
 
-    // Count completions
     const table = goalType === "workouts_completed" ? "workout_interactions" : "program_interactions";
     const { count, error: countError } = await supabase
       .from(table)
@@ -40,6 +51,22 @@ export const checkCompletionGoalAchievement = async (
     if (countError || count === null) return null;
 
     if (count >= target) {
+      // Mark as achieved
+      const { data: goalRow } = await supabase
+        .from('user_measurement_goals')
+        .select('id')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (goalRow) {
+        await supabase
+          .from('user_measurement_goals')
+          .update({ [achievedAtField]: new Date().toISOString() } as any)
+          .eq('id', goalRow.id);
+      }
+
       return { type: goalType, target, current: count };
     }
 
@@ -47,6 +74,28 @@ export const checkCompletionGoalAchievement = async (
   } catch (error) {
     console.error('Error checking completion goal:', error);
     return null;
+  }
+};
+
+export const markMeasurementGoalAchieved = async (
+  userId: string,
+  goalType: "weight" | "body_fat" | "muscle_mass"
+) => {
+  const achievedAtField = ACHIEVED_AT_FIELDS[goalType];
+  
+  const { data: goalRow } = await supabase
+    .from('user_measurement_goals')
+    .select('id')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single();
+
+  if (goalRow) {
+    await supabase
+      .from('user_measurement_goals')
+      .update({ [achievedAtField]: new Date().toISOString() } as any)
+      .eq('id', goalRow.id);
   }
 };
 
@@ -62,7 +111,7 @@ export const sendGoalAchievementNotification = async (
         messageType: 'announcement_update',
         customData: {
           subject: '🎉 Goal Achieved!',
-          content: `Congratulations! You've completed ${achieved.current} ${label}, reaching your target of ${achieved.target}! Keep up the amazing work!`
+          content: `Congratulations! You've completed ${achieved.current} ${label}, reaching your target of ${achieved.target}! Ready for your next challenge? Set new goals and keep upgrading your life! Visit your Goals section to set new targets.`
         }
       }
     });

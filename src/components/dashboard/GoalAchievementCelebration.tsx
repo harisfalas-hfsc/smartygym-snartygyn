@@ -1,6 +1,7 @@
+import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Trophy, PartyPopper, Star } from "lucide-react";
+import { Trophy, PartyPopper, Star, Target } from "lucide-react";
 import { Confetti } from "@/components/ui/confetti";
 
 interface AchievedGoal {
@@ -38,7 +39,14 @@ export const GoalAchievementCelebration = ({
   onClose, 
   achievedGoals 
 }: GoalAchievementCelebrationProps) => {
+  const navigate = useNavigate();
+
   if (achievedGoals.length === 0) return null;
+
+  const handleSetNewGoals = () => {
+    onClose();
+    navigate("/calculator-history?tab=measurements");
+  };
 
   return (
     <>
@@ -86,13 +94,19 @@ export const GoalAchievementCelebration = ({
 
             {/* Motivational Message */}
             <p className="text-sm text-muted-foreground italic">
-              "Success is the sum of small efforts, repeated day in and day out."
+              Ready for your next challenge? Set new goals to keep pushing forward!
             </p>
 
-            {/* Close Button */}
-            <Button onClick={onClose} className="w-full">
-              Continue Your Journey
-            </Button>
+            {/* Action Buttons */}
+            <div className="space-y-2">
+              <Button onClick={handleSetNewGoals} className="w-full gap-2">
+                <Target className="h-4 w-4" />
+                Set New Goals
+              </Button>
+              <Button variant="ghost" onClick={onClose} className="w-full text-muted-foreground">
+                Close
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>

@@ -16,6 +16,11 @@ interface MeasurementGoal {
   target_workouts_completed: number | null;
   target_programs_completed: number | null;
   target_date: string | null;
+  weight_goal_achieved_at: string | null;
+  body_fat_goal_achieved_at: string | null;
+  muscle_mass_goal_achieved_at: string | null;
+  workouts_goal_achieved_at: string | null;
+  programs_goal_achieved_at: string | null;
 }
 
 interface LatestMeasurement {
@@ -187,32 +192,50 @@ export const GoalsSummaryCard = ({ userId }: GoalsSummaryCardProps) => {
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
-        {activeGoals.map((goalItem, index) => (
-          <div key={index} className="space-y-1">
-            <div className="flex items-center justify-between text-sm">
-              <div className="flex items-center gap-2">
-                <goalItem.icon className="h-4 w-4 text-muted-foreground" />
-                <span className="font-medium">{goalItem.label}</span>
+        {activeGoals.map((goalItem, index) => {
+          const isAchieved = goalItem.progress === 100;
+          return (
+            <div key={index} className="space-y-1">
+              <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center gap-2">
+                  <goalItem.icon className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium">{goalItem.label}</span>
+                  {isAchieved && (
+                    <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 bg-yellow-500/20 text-yellow-600 border-yellow-500/30">
+                      Achieved ✓
+                    </Badge>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  {goalItem.current !== undefined ? (
+                    <span className="text-muted-foreground">
+                      {goalItem.unit ? goalItem.current.toFixed(1) : goalItem.current} → <span className="text-primary font-semibold">{goalItem.target}{goalItem.unit}</span>
+                    </span>
+                  ) : (
+                    <span className="text-muted-foreground">Target: {goalItem.target}{goalItem.unit}</span>
+                  )}
+                  {isAchieved && (
+                    <Trophy className="h-4 w-4 text-yellow-500" />
+                  )}
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                {goalItem.current !== undefined ? (
-                  <span className="text-muted-foreground">
-                    {goalItem.unit ? goalItem.current.toFixed(1) : goalItem.current} → <span className="text-primary font-semibold">{goalItem.target}{goalItem.unit}</span>
-                  </span>
-                ) : (
-                  <span className="text-muted-foreground">Target: {goalItem.target}{goalItem.unit}</span>
-                )}
-                {goalItem.progress === 100 && (
-                  <Trophy className="h-4 w-4 text-yellow-500" />
-                )}
-              </div>
+              <Progress 
+                value={goalItem.progress || 0} 
+                className="h-2"
+              />
+              {isAchieved && (
+                <Button
+                  variant="link"
+                  size="sm"
+                  className="h-auto p-0 text-xs text-primary"
+                  onClick={() => navigate("/calculator-history?tab=measurements")}
+                >
+                  Set New Goal →
+                </Button>
+              )}
             </div>
-            <Progress 
-              value={goalItem.progress || 0} 
-              className="h-2"
-            />
-          </div>
-        ))}
+          );
+        })}
 
         <div className="pt-2 flex justify-end">
           <Button 
