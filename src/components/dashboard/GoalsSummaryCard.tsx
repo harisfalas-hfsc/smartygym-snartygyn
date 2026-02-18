@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Target, Scale, TrendingUp, Calendar, ChevronRight, Trophy } from "lucide-react";
+import { Target, Scale, TrendingUp, Calendar, ChevronRight, Trophy, Dumbbell, BookOpen } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { differenceInDays, format } from "date-fns";
 
@@ -13,6 +13,8 @@ interface MeasurementGoal {
   target_weight: number | null;
   target_body_fat: number | null;
   target_muscle_mass: number | null;
+  target_workouts_completed: number | null;
+  target_programs_completed: number | null;
   target_date: string | null;
 }
 
@@ -30,6 +32,8 @@ export const GoalsSummaryCard = ({ userId }: GoalsSummaryCardProps) => {
   const navigate = useNavigate();
   const [goal, setGoal] = useState<MeasurementGoal | null>(null);
   const [latestMeasurement, setLatestMeasurement] = useState<LatestMeasurement | null>(null);
+  const [workoutsCompleted, setWorkoutsCompleted] = useState(0);
+  const [programsCompleted, setProgramsCompleted] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -70,6 +74,22 @@ export const GoalsSummaryCard = ({ userId }: GoalsSummaryCardProps) => {
           muscle_mass: result.muscle_mass || result.muscleMass,
         });
       }
+
+      // Fetch completed workouts count
+      const { count: wCount } = await supabase
+        .from("workout_interactions")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", userId)
+        .eq("is_completed", true);
+      setWorkoutsCompleted(wCount || 0);
+
+      // Fetch completed programs count
+      const { count: pCount } = await supabase
+        .from("program_interactions")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", userId)
+        .eq("is_completed", true);
+      setProgramsCompleted(pCount || 0);
     } catch (error) {
       // No goal or measurement found
     } finally {
@@ -104,7 +124,7 @@ export const GoalsSummaryCard = ({ userId }: GoalsSummaryCardProps) => {
   if (loading) return null;
 
   // Don't show card if no goals set
-  if (!goal || (!goal.target_weight && !goal.target_body_fat && !goal.target_muscle_mass)) {
+  if (!goal || (!goal.target_weight && !goal.target_body_fat && !goal.target_muscle_mass && !goal.target_workouts_completed && !goal.target_programs_completed)) {
     return (
       <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
         <CardContent className="p-4">
@@ -139,10 +159,15 @@ export const GoalsSummaryCard = ({ userId }: GoalsSummaryCardProps) => {
   const bodyFatProgress = calculateProgress(latestMeasurement?.body_fat, goal.target_body_fat, true);
   const muscleMassProgress = calculateProgress(latestMeasurement?.muscle_mass, goal.target_muscle_mass, false);
 
+  const workoutsProgress = goal.target_workouts_completed ? Math.min(100, (workoutsCompleted / goal.target_workouts_completed) * 100) : null;
+  const programsProgress = goal.target_programs_completed ? Math.min(100, (programsCompleted / goal.target_programs_completed) * 100) : null;
+
   const activeGoals = [
     goal.target_weight && { label: "Weight", current: latestMeasurement?.weight, target: goal.target_weight, unit: "kg", progress: weightProgress, icon: Scale },
     goal.target_body_fat && { label: "Body Fat", current: latestMeasurement?.body_fat, target: goal.target_body_fat, unit: "%", progress: bodyFatProgress, icon: TrendingUp },
     goal.target_muscle_mass && { label: "Muscle", current: latestMeasurement?.muscle_mass, target: goal.target_muscle_mass, unit: "kg", progress: muscleMassProgress, icon: TrendingUp },
+    goal.target_workouts_completed && { label: "Workouts", current: workoutsCompleted, target: goal.target_workouts_completed, unit: "", progress: workoutsProgress, icon: Dumbbell },
+    goal.target_programs_completed && { label: "Programs", current: programsCompleted, target: goal.target_programs_completed, unit: "", progress: programsProgress, icon: BookOpen },
   ].filter(Boolean) as { label: string; current: number | undefined; target: number; unit: string; progress: number | null; icon: any }[];
 
   return (
@@ -172,7 +197,7 @@ export const GoalsSummaryCard = ({ userId }: GoalsSummaryCardProps) => {
               <div className="flex items-center gap-2">
                 {goalItem.current !== undefined ? (
                   <span className="text-muted-foreground">
-                    {goalItem.current.toFixed(1)} → <span className="text-primary font-semibold">{goalItem.target}{goalItem.unit}</span>
+                    {goalItem.unit ? goalItem.current.toFixed(1) : goalItem.current} → <span className="text-primary font-semibold">{goalItem.target}{goalItem.unit}</span>
                   </span>
                 ) : (
                   <span className="text-muted-foreground">Target: {goalItem.target}{goalItem.unit}</span>

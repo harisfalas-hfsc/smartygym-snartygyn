@@ -2597,7 +2597,9 @@ export type Database = {
           target_body_fat: number | null
           target_date: string | null
           target_muscle_mass: number | null
+          target_programs_completed: number | null
           target_weight: number | null
+          target_workouts_completed: number | null
           updated_at: string
           user_id: string
         }
@@ -2607,7 +2609,9 @@ export type Database = {
           target_body_fat?: number | null
           target_date?: string | null
           target_muscle_mass?: number | null
+          target_programs_completed?: number | null
           target_weight?: number | null
+          target_workouts_completed?: number | null
           updated_at?: string
           user_id: string
         }
@@ -2617,7 +2621,9 @@ export type Database = {
           target_body_fat?: number | null
           target_date?: string | null
           target_muscle_mass?: number | null
+          target_programs_completed?: number | null
           target_weight?: number | null
+          target_workouts_completed?: number | null
           updated_at?: string
           user_id?: string
         }
