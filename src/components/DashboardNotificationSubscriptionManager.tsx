@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Loader2, Dumbbell, Sun, Zap, Plus, BookOpen, FileText, BarChart3, Bell, CalendarClock } from "lucide-react";
+import { Loader2, Dumbbell, Sun, Zap, Plus, BookOpen, FileText, BarChart3, Bell, CalendarClock, Trophy } from "lucide-react";
 import { toast } from "sonner";
 
 interface DashboardNotificationPreferences {
@@ -17,6 +17,7 @@ interface DashboardNotificationPreferences {
   dashboard_checkin_reminders: boolean;
   dashboard_scheduled_workout_reminders: boolean;
   dashboard_scheduled_program_reminders: boolean;
+  dashboard_goal_achievement: boolean;
 }
 
 const DEFAULT_PREFERENCES: DashboardNotificationPreferences = {
@@ -30,6 +31,7 @@ const DEFAULT_PREFERENCES: DashboardNotificationPreferences = {
   dashboard_checkin_reminders: true,
   dashboard_scheduled_workout_reminders: true,
   dashboard_scheduled_program_reminders: true,
+  dashboard_goal_achievement: true,
 };
 
 const NOTIFICATION_OPTIONS = [
@@ -93,6 +95,12 @@ const NOTIFICATION_OPTIONS = [
     description: "Get reminded about your scheduled training programs",
     icon: CalendarClock,
   },
+  {
+    key: "dashboard_goal_achievement" as keyof DashboardNotificationPreferences,
+    label: "Goal Achievements",
+    description: "Get notified when you reach your fitness goals",
+    icon: Trophy,
+  },
 ];
 
 export const DashboardNotificationSubscriptionManager = () => {
@@ -133,6 +141,7 @@ export const DashboardNotificationSubscriptionManager = () => {
           dashboard_checkin_reminders: prefs.dashboard_checkin_reminders !== false,
           dashboard_scheduled_workout_reminders: prefs.dashboard_scheduled_workout_reminders !== false,
           dashboard_scheduled_program_reminders: prefs.dashboard_scheduled_program_reminders !== false,
+          dashboard_goal_achievement: prefs.dashboard_goal_achievement !== false,
         });
       }
     } catch (err) {

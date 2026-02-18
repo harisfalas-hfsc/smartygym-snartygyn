@@ -89,16 +89,35 @@ serve(async (req) => {
       content = customData.content;
     }
 
-    // Insert system message for the user (dashboard)
-    const { error: insertError } = await supabaseAdmin
-      .from('user_system_messages')
-      .insert({
-        user_id: userId,
-        message_type: messageType,
-        subject: subject,
-        content: content,
-        is_read: false
-      });
+    // Check user's dashboard notification preferences before inserting
+    const { data: profileForDashboard } = await supabaseAdmin
+      .from('profiles')
+      .select('notification_preferences')
+      .eq('user_id', userId)
+      .single();
+
+    const dashPrefs = profileForDashboard?.notification_preferences as Record<string, any> || {};
+
+    // Map messageType to dashboard preference key
+    const dashboardPrefKey = `dashboard_${messageType}`;
+    const shouldSendDashboard = dashPrefs[dashboardPrefKey] !== false;
+
+    let insertError = null;
+    if (shouldSendDashboard) {
+      // Insert system message for the user (dashboard)
+      const result = await supabaseAdmin
+        .from('user_system_messages')
+        .insert({
+          user_id: userId,
+          message_type: messageType,
+          subject: subject,
+          content: content,
+          is_read: false
+        });
+      insertError = result.error;
+    } else {
+      console.log(`[SEND-SYSTEM-MESSAGE] User has disabled dashboard_${messageType}, skipping dashboard message`);
+    }
 
     if (insertError) {
       // Handle duplicate welcome messages gracefully (DB trigger may have already inserted one)
