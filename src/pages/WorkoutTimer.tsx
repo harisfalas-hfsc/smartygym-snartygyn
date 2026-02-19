@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Helmet } from "react-helmet";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { Card, CardContent } from "@/components/ui/card";
@@ -17,6 +17,28 @@ const WorkoutTimer = () => {
   const [timeLeft, setTimeLeft] = useState(20);
   const [isWorking, setIsWorking] = useState(true);
   const [isRunning, setIsRunning] = useState(false);
+  const wakeLockRef = useRef<WakeLockSentinel | null>(null);
+
+  // Screen Wake Lock: keep screen on while timer is running (mobile)
+  useEffect(() => {
+    const requestWakeLock = async () => {
+      if (isRunning && 'wakeLock' in navigator) {
+        try {
+          wakeLockRef.current = await navigator.wakeLock.request('screen');
+        } catch (e) {
+          console.log('Wake Lock request failed:', e);
+        }
+      } else if (!isRunning && wakeLockRef.current) {
+        await wakeLockRef.current.release();
+        wakeLockRef.current = null;
+      }
+    };
+    requestWakeLock();
+    return () => {
+      wakeLockRef.current?.release();
+      wakeLockRef.current = null;
+    };
+  }, [isRunning]);
 
   const playBeep = useCallback(() => {
     try {
