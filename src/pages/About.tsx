@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollReveal } from "@/components/ScrollReveal";
-import { CheckCircle2, Target, Heart, Users, Shield, Award, Compass, GraduationCap, Plane, Dumbbell, UserCheck, Smartphone } from "lucide-react";
+import { CheckCircle2, Target, Heart, Users, Shield, Award, Compass, GraduationCap, Plane, Dumbbell, UserCheck, Smartphone, Calendar, Video, Wrench, FileText, BookOpen } from "lucide-react";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
@@ -122,8 +122,34 @@ const About = () => {
                     Your Gym Re-imagined. Anywhere, Anytime.
                   </h2>
                   <div className="space-y-4 max-w-4xl mx-auto">
+                    <div className="space-y-3 max-w-md mx-auto">
+                      <div className="flex items-center gap-3">
+                        <Dumbbell className="w-6 h-6 text-orange-500 flex-shrink-0" />
+                        <span className="text-base font-semibold text-foreground">Expert-Crafted Workouts</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Calendar className="w-6 h-6 text-blue-500 flex-shrink-0" />
+                        <span className="text-base font-semibold text-foreground">Structured Training Programs</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Video className="w-6 h-6 text-emerald-500 flex-shrink-0" />
+                        <span className="text-base font-semibold text-foreground">Exercise Library</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Wrench className="w-6 h-6 text-purple-500 flex-shrink-0" />
+                        <span className="text-base font-semibold text-foreground">Smarty Tools</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <FileText className="w-6 h-6 text-cyan-500 flex-shrink-0" />
+                        <span className="text-base font-semibold text-foreground">Articles</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <BookOpen className="w-6 h-6 text-pink-500 flex-shrink-0" />
+                        <span className="text-base font-semibold text-foreground">LogBook</span>
+                      </div>
+                    </div>
                     <p className="text-base text-muted-foreground text-center leading-relaxed">
-                      <strong className="text-foreground">Expert-crafted workouts</strong>, <strong className="text-foreground">structured training programs</strong>, a comprehensive <strong className="text-foreground">exercise library</strong>, powerful <strong className="text-foreground">Smarty Tools</strong>, science-based <strong className="text-foreground">articles</strong>, and a personal <strong className="text-foreground">logbook</strong>, everything a complete gym must offer, built by real professionals, all in your pocket at <strong className="text-foreground">smartygym.com</strong>.
+                      Everything a complete gym must offer, built by real professionals, in your pocket at <strong className="text-foreground">smartygym.com</strong>.
                     </p>
                     <p className="text-base text-muted-foreground text-center leading-relaxed">
                       We are not here to replace your gym. We are here to back you up when life gets in the way. Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed — <span className="text-primary font-semibold">SmartyGym</span> is your backup plan. Or, if you prefer training from home entirely, we've got you covered. Or, if you go to your gym but want to follow a professional, science-based workout or training program designed by{' '}
@@ -153,8 +179,34 @@ const About = () => {
                   <h2 className="text-2xl font-bold text-foreground">
                     Your Gym Re-imagined. Anywhere, Anytime.
                   </h2>
+                  <div className="space-y-3 text-left">
+                    <div className="flex items-center gap-3">
+                      <Dumbbell className="w-6 h-6 text-orange-500 flex-shrink-0" />
+                      <span className="text-sm font-semibold text-foreground">Expert-Crafted Workouts</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Calendar className="w-6 h-6 text-blue-500 flex-shrink-0" />
+                      <span className="text-sm font-semibold text-foreground">Structured Training Programs</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Video className="w-6 h-6 text-emerald-500 flex-shrink-0" />
+                      <span className="text-sm font-semibold text-foreground">Exercise Library</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Wrench className="w-6 h-6 text-purple-500 flex-shrink-0" />
+                      <span className="text-sm font-semibold text-foreground">Smarty Tools</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <FileText className="w-6 h-6 text-cyan-500 flex-shrink-0" />
+                      <span className="text-sm font-semibold text-foreground">Articles</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <BookOpen className="w-6 h-6 text-pink-500 flex-shrink-0" />
+                      <span className="text-sm font-semibold text-foreground">LogBook</span>
+                    </div>
+                  </div>
                   <p className="text-base text-muted-foreground text-center leading-relaxed">
-                    <strong className="text-primary">Expert-crafted workouts</strong>, <strong className="text-primary">structured training programs</strong>, a comprehensive <strong className="text-primary">exercise library</strong>, powerful <strong className="text-primary">Smarty Tools</strong>, science-based <strong className="text-primary">articles</strong>, and a personal <strong className="text-primary">logbook</strong>, everything a complete gym must offer, built by real professionals, all in your pocket at <strong className="text-primary">smartygym.com</strong>.
+                    Everything a complete gym must offer, built by real professionals, in your pocket at <strong className="text-primary">smartygym.com</strong>.
                   </p>
                 </div>
               </CardContent>
