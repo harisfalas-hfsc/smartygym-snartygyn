@@ -714,44 +714,15 @@ const Index = () => {
           )}
         </div>
 
-        {/* Mobile Only: What We Stand For */}
+        {/* Mobile Only: Everywhere, Anywhere */}
         <div className="mt-8 mb-2">
           <Card className="border-[3px] border-primary/40 p-4">
-            <h2 className="text-2xl font-bold text-left mb-6">
-              What We <span className="text-primary">Stand For</span>
+            <h2 className="text-2xl font-bold text-left mb-3">
+              Everywhere, <span className="text-primary">Anywhere</span>
             </h2>
-            
-            <div className="space-y-3">
-              {/* 100% Human, 0% AI */}
-              <div className="flex items-center gap-3">
-                <UserCheck className="w-6 h-6 text-red-500 flex-shrink-0" />
-                <span className="text-sm font-semibold">100% Human, 0% AI</span>
-              </div>
-              
-              {/* Built for Real Life */}
-              <div className="flex items-center gap-3">
-                <Heart className="w-6 h-6 text-orange-500 flex-shrink-0" />
-                <span className="text-sm font-semibold">Built for Real Life</span>
-              </div>
-              
-              {/* Science-Based Approach */}
-              <div className="flex items-center gap-3">
-                <Award className="w-6 h-6 text-purple-500 flex-shrink-0" />
-                <span className="text-sm font-semibold">Science-Based Approach</span>
-              </div>
-              
-              {/* Accessible to Everyone */}
-              <div className="flex items-center gap-3">
-                <Users className="w-6 h-6 text-emerald-500 flex-shrink-0" />
-                <span className="text-sm font-semibold">Accessible to Everyone</span>
-              </div>
-              
-              {/* Safe and Effective */}
-              <div className="flex items-center gap-3">
-                <Shield className="w-6 h-6 text-blue-500 flex-shrink-0" />
-                <span className="text-sm font-semibold">Safe and Effective</span>
-              </div>
-            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Whether you're traveling, busy with life, or simply can't make it to the gym — we've got you covered. And even if you do go to the gym, we're here with structured, science-based, professional workouts and training programs to back you up. Wherever you are, your gym comes with you — right in your pocket.
+            </p>
           </Card>
         </div>
 
