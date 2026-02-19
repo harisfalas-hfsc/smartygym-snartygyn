@@ -1,46 +1,35 @@
 
 
-# Fix: Trial Not Showing on Stripe Checkout
+# Fix: Delete the Still-Deployed `generate-welcome-workout` Edge Function
 
 ## The Problem
 
-The edge function logs confirm the issue. When you checked out just now, the log showed:
+The `generate-welcome-workout` edge function was **deleted from the codebase** previously, but it was **never removed from the deployed environment**. It is still running in production.
 
-```
-Request received - {"priceId":"price_1SJ9q1IxQYg9inGKZzxxqPbD"}
-```
+Evidence:
+- The function's logs show it was active at 12:18 UTC today -- right after the test user was created
+- The `user_purchases` table has a record for the test user: "Tempo Sprint Circuit (Welcome Gift)" at price 0.00, created at 12:15 UTC
+- The function code (`supabase/functions/generate-welcome-workout/`) does not exist in the repository
+- But the function is still deployed and being triggered
 
-The `trial` parameter is missing entirely. This means the **deployed** version of `create-checkout` does not include the `trial_period_days` logic, even though the source code does. The function needs to be redeployed.
+This means every new user signup is generating a complimentary welcome workout and inserting a $0 purchase record -- even though you thought this was removed.
 
 ## The Fix
 
-**Redeploy the `create-checkout` edge function.** No code changes needed -- the source code already has the correct trial logic:
-
-```typescript
-// Already in create-checkout/index.ts (line ~101)
-subscription_data: {
-  ...(trial ? { trial_period_days: 7 } : {}),
-}
-```
+Delete the deployed edge function from the production environment. This is a single command -- no code changes needed since the code is already gone.
 
 ## Steps
 
-1. Redeploy the `create-checkout` edge function to sync the deployed version with the source code
-2. Verify by checking logs -- the "Request received" log should now show `{"priceId":"...","trial":true}`
+1. **Delete the deployed function** using the Supabase delete edge function tool for `generate-welcome-workout`
+2. **Verify** it no longer appears in function logs
 
-## What Stripe Will Show After the Fix
+## Optional Cleanup
 
-Once `trial_period_days: 7` is properly passed to Stripe, the checkout page will automatically display:
-- "7-day free trial" prominently at the top
-- "EUR 0.00 due today"
-- "Then EUR 9.99/month starting [date 7 days from now]"
-- "Your trial ends on [specific date]"
+If you want, we can also:
+- Delete the test user's phantom purchase record ("Tempo Sprint Circuit (Welcome Gift)")
+- Delete the orphaned workout record (`WEL-CA-E-1771503308759`) from `admin_workouts`
 
-No frontend changes needed. No Stripe dashboard changes needed. Just the redeployment.
-
-## Files Changed
-
-| Action | File |
-|--------|------|
-| Redeploy | `supabase/functions/create-checkout/index.ts` (no code changes) |
-
+| Action | Target |
+|--------|--------|
+| Delete deployed function | `generate-welcome-workout` |
+| (Optional) Clean up purchase | Remove $0 welcome gift purchase for test user |
