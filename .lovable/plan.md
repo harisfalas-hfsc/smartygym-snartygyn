@@ -1,22 +1,40 @@
 
-# Fix Goal Achievement Email Link
 
-## Problem
-The goal achievement email contains a "Set New Goals" button that links to `/calculator-history?tab=measurements`, which loads a blank/black page. The link should instead direct to the main dashboard (`/userdashboard`) where the Active Goals card is visible.
+# Redesign "Your Gym Re-imagined" Card with Vertical Icon List
 
-## Fix
+## What Changes
 
-### File: `supabase/functions/send-system-message/index.ts` (line 171)
+The first card on the About page ("Your Gym Re-imagined. Anywhere, Anytime.") will be updated to display the six features as a **vertical list with icons**, matching the style of the "Who is SmartyGym For?" section below it.
 
-Change the CTA link for goal achievement emails from:
-```
-https://smartygym.com/calculator-history?tab=measurements
-```
-to:
-```
-https://smartygym.lovable.app/userdashboard
-```
+### Current Layout
+The features (Expert-crafted workouts, Structured training programs, Exercise library, Smarty Tools, Articles, Logbook) are currently listed inline as bold text within a single paragraph.
 
-This is a one-line change. The "Set New Goals" button in the email will take the user directly to the dashboard where the Goals Summary Card is displayed, and from there they can click through to update their goals.
+### New Layout
+Each feature gets its own row with a colored icon on the left and the feature name next to it, stacked vertically:
 
-Also updating the CTA button text to stay as "Set New Goals" since the goals card on the dashboard has its own "Set New Goal" link.
+- Dumbbell icon -- Expert-Crafted Workouts
+- Calendar icon -- Structured Training Programs
+- Video icon -- Exercise Library
+- Wrench icon -- Smarty Tools
+- FileText icon -- Articles
+- BookOpen icon -- LogBook
+
+Below the list, a closing line:
+**"Everything a complete gym must offer, built by real professionals, in your pocket at smartygym.com."**
+
+This applies to **both** the desktop card and the mobile card (first of the two mobile cards).
+
+---
+
+## Technical Details
+
+### File: `src/pages/About.tsx`
+
+1. **Add imports** for `Wrench`, `Video`, `FileText`, `BookOpen`, `Calendar` from `lucide-react`
+
+2. **Desktop card** (lines 117-144): Replace the inline paragraph listing features with a vertical list using `flex items-center gap-3` rows (same pattern as the "Who is SmartyGym For?" section at lines 305-340), followed by the closing tagline paragraph.
+
+3. **Mobile card 1** (lines 149-161): Same change -- replace the inline paragraph with the vertical icon list and closing tagline.
+
+The second paragraph (backup plan / "Your Gym Comes With You") remains unchanged on both desktop and mobile.
+
