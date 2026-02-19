@@ -112,9 +112,9 @@ const WorkoutTimer = () => {
             <CardContent className="p-6">
 
               {/* Settings */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+              <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-6">
                 <div>
-                  <Label className="text-sm font-semibold">Work (sec)</Label>
+                  <Label className="text-xs sm:text-sm font-semibold">Work (sec)</Label>
                   <Input
                     type="number"
                     value={workTime}
@@ -124,7 +124,7 @@ const WorkoutTimer = () => {
                   />
                 </div>
                 <div>
-                  <Label className="text-sm font-semibold">Rest (sec)</Label>
+                  <Label className="text-xs sm:text-sm font-semibold">Rest (sec)</Label>
                   <Input
                     type="number"
                     value={restTime}
@@ -134,7 +134,7 @@ const WorkoutTimer = () => {
                   />
                 </div>
                 <div>
-                  <Label className="text-sm font-semibold">Rounds</Label>
+                  <Label className="text-xs sm:text-sm font-semibold">Rounds</Label>
                   <Input
                     type="number"
                     value={rounds}
