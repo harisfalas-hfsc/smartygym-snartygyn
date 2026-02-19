@@ -180,29 +180,29 @@ const About = () => {
                     Your Gym Re-imagined. Anywhere, Anytime.
                   </h2>
                   <div className="space-y-3 text-left">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 cursor-pointer active:opacity-70" onClick={() => navigate('/workout')}>
                       <Dumbbell className="w-6 h-6 text-orange-500 flex-shrink-0" />
-                      <span className="text-sm font-semibold text-foreground">Expert-Crafted Workouts</span>
+                      <span className="text-sm font-semibold text-primary hover:underline">Expert-Crafted Workouts</span>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 cursor-pointer active:opacity-70" onClick={() => navigate('/trainingprogram')}>
                       <Calendar className="w-6 h-6 text-blue-500 flex-shrink-0" />
-                      <span className="text-sm font-semibold text-foreground">Structured Training Programs</span>
+                      <span className="text-sm font-semibold text-primary hover:underline">Structured Training Programs</span>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 cursor-pointer active:opacity-70" onClick={() => navigate('/exerciselibrary')}>
                       <Video className="w-6 h-6 text-emerald-500 flex-shrink-0" />
-                      <span className="text-sm font-semibold text-foreground">Exercise Library</span>
+                      <span className="text-sm font-semibold text-primary hover:underline">Exercise Library</span>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 cursor-pointer active:opacity-70" onClick={() => navigate('/tools')}>
                       <Wrench className="w-6 h-6 text-purple-500 flex-shrink-0" />
-                      <span className="text-sm font-semibold text-foreground">Smarty Tools</span>
+                      <span className="text-sm font-semibold text-primary hover:underline">Smarty Tools</span>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 cursor-pointer active:opacity-70" onClick={() => navigate('/blog')}>
                       <FileText className="w-6 h-6 text-cyan-500 flex-shrink-0" />
-                      <span className="text-sm font-semibold text-foreground">Articles</span>
+                      <span className="text-sm font-semibold text-primary hover:underline">Articles</span>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 cursor-pointer active:opacity-70" onClick={() => navigate('/userdashboard?tab=logbook')}>
                       <BookOpen className="w-6 h-6 text-pink-500 flex-shrink-0" />
-                      <span className="text-sm font-semibold text-foreground">LogBook</span>
+                      <span className="text-sm font-semibold text-primary hover:underline">LogBook</span>
                     </div>
                   </div>
                   <p className="text-base text-muted-foreground text-center leading-relaxed">
@@ -212,27 +212,6 @@ const About = () => {
               </CardContent>
             </Card>
 
-            <Card className="border-2 border-primary">
-              <CardContent className="p-6">
-                <div className="text-center space-y-4">
-                  <Smartphone className="w-12 h-12 text-primary mx-auto" />
-                  <h3 className="text-xl font-bold text-foreground">Your Gym Comes With You</h3>
-                  <p className="text-base text-muted-foreground text-center leading-relaxed">
-                    We are not here to replace your gym. We are here to back you up when life gets in the way. Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed — <span className="text-primary font-semibold">SmartyGym</span> is your backup plan. Or, if you prefer training from home entirely, we've got you covered. Or, if you go to your gym but want to follow a professional, science-based workout or training program designed by{' '}
-                    <a 
-                      href="/coach-profile" 
-                      onClick={(e) => {
-                        e.preventDefault();
-                        navigate('/coach-profile');
-                      }}
-                      className="text-primary hover:underline font-medium cursor-pointer"
-                    >
-                      Haris Falas
-                    </a>, we provide that expert guidance. <span className="font-semibold text-primary">Wherever you are, your gym comes with you.</span>
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
           </div>
 
           {/* Core Values */}
@@ -391,6 +370,15 @@ const About = () => {
             <span className="text-sm font-semibold text-foreground">Gym-goers</span>
           </div>
         </div>
+
+              <div className="mt-8 space-y-3 text-center">
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  We are not here to replace your gym. We are here to back you up when life gets in the way.
+                </p>
+                <p className="text-sm font-semibold text-primary">
+                  Wherever you are, your gym comes with you.
+                </p>
+              </div>
             </div>
           </div>
 
