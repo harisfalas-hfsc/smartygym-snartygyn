@@ -258,6 +258,37 @@ const About = () => {
             </Card>
           </div>
 
+          {/* Mobile: Core Values - Single compact card */}
+          <Card className="mb-12 border-2 border-primary md:hidden">
+            <CardContent className="p-6">
+              <div className="text-center space-y-4">
+                <h2 className="text-2xl font-bold text-foreground">What We Stand For</h2>
+                <div className="space-y-3 text-left">
+                  <div className="flex items-center gap-3">
+                    <UserCheck className="w-6 h-6 text-red-500 flex-shrink-0" />
+                    <span className="text-sm font-semibold text-foreground">100% Human. 0% AI.</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Heart className="w-6 h-6 text-orange-500 flex-shrink-0" />
+                    <span className="text-sm font-semibold text-foreground">Built for Real Life</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Award className="w-6 h-6 text-purple-500 flex-shrink-0" />
+                    <span className="text-sm font-semibold text-foreground">Science-Based Approach</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Users className="w-6 h-6 text-emerald-500 flex-shrink-0" />
+                    <span className="text-sm font-semibold text-foreground">Accessible to Everyone</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Shield className="w-6 h-6 text-blue-500 flex-shrink-0" />
+                    <span className="text-sm font-semibold text-foreground">Safe and Effective</span>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Desktop: Core Values - Grid Layout */}
           <ScrollReveal>
             <section className="mb-12 hidden md:block">
