@@ -721,7 +721,10 @@ const Index = () => {
               Everywhere - Anywhere
             </h2>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Whether you're <span className="text-primary font-bold">traveling</span>, <span className="text-primary font-bold">busy</span> with life, or simply can't make it to the <span className="text-primary font-bold">gym</span> — we've got you covered. And even if you do go to the gym, we're here with <span className="text-primary font-bold">structured, science-based, professional workouts and training programs</span> to back you up. Wherever you are, your gym comes with you — right in your <span className="text-primary font-bold">pocket</span>.
+              Whether you're <span className="text-primary font-bold">traveling</span>, <span className="text-primary font-bold">busy</span> with life, or simply <span className="text-primary font-bold">can't make it</span> to the gym — we've got you covered. And even if you do go to the <span className="text-primary font-bold">gym</span>, we're here with <span className="text-primary font-bold">structured, science-based, professional workouts and training programs</span> to back you up.
+            </p>
+            <p className="text-sm text-primary font-bold leading-relaxed mt-3">
+              Wherever you are, your gym comes with you — right in your pocket.
             </p>
           </Card>
         </div>
