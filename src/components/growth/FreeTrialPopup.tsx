@@ -100,7 +100,7 @@ export function FreeTrialPopup() {
     handleDismiss();
     if (user) {
       // Logged-in free subscriber → pricing page
-      navigate("/smartyplans");
+      navigate("/smarty-plans");
     } else {
       // Visitor → signup with trial flag
       navigate("/auth?mode=signup&trial=true");
