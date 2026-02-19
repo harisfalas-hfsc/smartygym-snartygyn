@@ -14,11 +14,40 @@ export const WorkoutTimerPopup = ({ open, onOpenChange }: WorkoutTimerPopupProps
   const [workTime, setWorkTime] = useState(20);
   const [restTime, setRestTime] = useState(10);
   const [rounds, setRounds] = useState(8);
+  const [workTimeInput, setWorkTimeInput] = useState("20");
+  const [restTimeInput, setRestTimeInput] = useState("10");
+  const [roundsInput, setRoundsInput] = useState("8");
   const [currentRound, setCurrentRound] = useState(0);
   const [timeLeft, setTimeLeft] = useState(20);
   const [isWorking, setIsWorking] = useState(true);
   const [isRunning, setIsRunning] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
+
+  // Auto-sync timer display when workTime changes and timer is idle
+  useEffect(() => {
+    if (!isRunning && currentRound === 0) {
+      setTimeLeft(workTime);
+    }
+  }, [workTime, isRunning, currentRound]);
+
+  const handleBlur = (field: 'work' | 'rest' | 'rounds') => {
+    if (field === 'work') {
+      const val = parseInt(workTimeInput) || 1;
+      const clamped = Math.max(1, val);
+      setWorkTime(clamped);
+      setWorkTimeInput(String(clamped));
+    } else if (field === 'rest') {
+      const val = parseInt(restTimeInput) || 1;
+      const clamped = Math.max(1, val);
+      setRestTime(clamped);
+      setRestTimeInput(String(clamped));
+    } else {
+      const val = parseInt(roundsInput) || 1;
+      const clamped = Math.max(1, val);
+      setRounds(clamped);
+      setRoundsInput(String(clamped));
+    }
+  };
 
   const playBeep = useCallback(() => {
     try {
@@ -168,8 +197,9 @@ export const WorkoutTimerPopup = ({ open, onOpenChange }: WorkoutTimerPopupProps
             <div className="flex items-center gap-0.5">
               <Input
                 type="number"
-                value={workTime}
-                onChange={(e) => setWorkTime(parseInt(e.target.value) || 20)}
+                value={workTimeInput}
+                onChange={(e) => setWorkTimeInput(e.target.value)}
+                onBlur={() => handleBlur('work')}
                 disabled={isRunning}
                 className="h-7 text-xs text-center border border-primary/40 bg-background/50"
               />
@@ -181,8 +211,9 @@ export const WorkoutTimerPopup = ({ open, onOpenChange }: WorkoutTimerPopupProps
             <div className="flex items-center gap-0.5">
               <Input
                 type="number"
-                value={restTime}
-                onChange={(e) => setRestTime(parseInt(e.target.value) || 10)}
+                value={restTimeInput}
+                onChange={(e) => setRestTimeInput(e.target.value)}
+                onBlur={() => handleBlur('rest')}
                 disabled={isRunning}
                 className="h-7 text-xs text-center border border-primary/40 bg-background/50"
               />
@@ -193,8 +224,9 @@ export const WorkoutTimerPopup = ({ open, onOpenChange }: WorkoutTimerPopupProps
             <Label className="text-[10px] font-semibold">Rounds</Label>
             <Input
               type="number"
-              value={rounds}
-              onChange={(e) => setRounds(parseInt(e.target.value) || 8)}
+              value={roundsInput}
+              onChange={(e) => setRoundsInput(e.target.value)}
+              onBlur={() => handleBlur('rounds')}
               disabled={isRunning}
               className="h-7 text-xs text-center border border-primary/40 bg-background/50"
             />
