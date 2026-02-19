@@ -29,8 +29,8 @@ serve(async (req) => {
   );
 
   try {
-    const { priceId } = await req.json();
-    logStep("Request received", { priceId });
+    const { priceId, trial } = await req.json();
+    logStep("Request received", { priceId, trial });
     
     if (!priceId) {
       throw new Error("Price ID is required");
@@ -106,6 +106,7 @@ serve(async (req) => {
         project: "SMARTYGYM",
       },
       subscription_data: {
+        ...(trial ? { trial_period_days: 7 } : {}),
         metadata: {
           project: "SMARTYGYM",
           user_id: user.id,

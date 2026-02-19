@@ -71,21 +71,27 @@ export default function Auth() {
             console.error('Failed to send welcome message:', msgError);
           }
 
-          // Generate welcome workout
-          try {
-            const { error: wwError } = await supabase.functions.invoke('generate-welcome-workout', {
-              body: { user_id: session.user.id }
-            });
-            if (wwError) console.error('Welcome workout generation failed:', wwError);
-          } catch (wwErr) {
-            console.error('Failed to trigger welcome workout:', wwErr);
-          }
-
           // Track signup event
           trackSocialMediaEvent({ eventType: 'signup', userId: session.user.id });
 
           setShowAvatarSetup(true);
           return; // Don't navigate yet — avatar setup dialog will handle it
+        }
+
+        // Check if trial=true param exists, redirect to checkout
+        const params = new URLSearchParams(window.location.search);
+        if (params.get("trial") === "true") {
+          try {
+            const { data, error } = await supabase.functions.invoke('create-checkout', {
+              body: { priceId: 'price_1SJ9q1IxQYg9inGKZzxxqPbD', trial: true }
+            });
+            if (data?.url) {
+              window.location.href = data.url;
+              return;
+            }
+          } catch (e) {
+            console.error('Trial checkout failed:', e);
+          }
         }
 
         navigate("/");
