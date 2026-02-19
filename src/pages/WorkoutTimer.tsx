@@ -13,11 +13,40 @@ const WorkoutTimer = () => {
   const [workTime, setWorkTime] = useState(20);
   const [restTime, setRestTime] = useState(10);
   const [rounds, setRounds] = useState(8);
+  const [workTimeInput, setWorkTimeInput] = useState("20");
+  const [restTimeInput, setRestTimeInput] = useState("10");
+  const [roundsInput, setRoundsInput] = useState("8");
   const [currentRound, setCurrentRound] = useState(0);
   const [timeLeft, setTimeLeft] = useState(20);
   const [isWorking, setIsWorking] = useState(true);
   const [isRunning, setIsRunning] = useState(false);
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
+
+  // Auto-sync timer display when workTime changes and timer is idle
+  useEffect(() => {
+    if (!isRunning && currentRound === 0) {
+      setTimeLeft(workTime);
+    }
+  }, [workTime, isRunning, currentRound]);
+
+  const handleBlur = (field: 'work' | 'rest' | 'rounds') => {
+    if (field === 'work') {
+      const val = parseInt(workTimeInput) || 1;
+      const clamped = Math.max(1, val);
+      setWorkTime(clamped);
+      setWorkTimeInput(String(clamped));
+    } else if (field === 'rest') {
+      const val = parseInt(restTimeInput) || 1;
+      const clamped = Math.max(1, val);
+      setRestTime(clamped);
+      setRestTimeInput(String(clamped));
+    } else {
+      const val = parseInt(roundsInput) || 1;
+      const clamped = Math.max(1, val);
+      setRounds(clamped);
+      setRoundsInput(String(clamped));
+    }
+  };
 
   // Screen Wake Lock: keep screen on while timer is running (mobile)
   useEffect(() => {
@@ -139,8 +168,9 @@ const WorkoutTimer = () => {
                   <Label className="text-xs sm:text-sm font-semibold">Work (sec)</Label>
                   <Input
                     type="number"
-                    value={workTime}
-                    onChange={(e) => setWorkTime(parseInt(e.target.value) || 20)}
+                    value={workTimeInput}
+                    onChange={(e) => setWorkTimeInput(e.target.value)}
+                    onBlur={() => handleBlur('work')}
                     disabled={isRunning}
                     className="mt-1"
                   />
@@ -149,8 +179,9 @@ const WorkoutTimer = () => {
                   <Label className="text-xs sm:text-sm font-semibold">Rest (sec)</Label>
                   <Input
                     type="number"
-                    value={restTime}
-                    onChange={(e) => setRestTime(parseInt(e.target.value) || 10)}
+                    value={restTimeInput}
+                    onChange={(e) => setRestTimeInput(e.target.value)}
+                    onBlur={() => handleBlur('rest')}
                     disabled={isRunning}
                     className="mt-1"
                   />
@@ -159,8 +190,9 @@ const WorkoutTimer = () => {
                   <Label className="text-xs sm:text-sm font-semibold">Rounds</Label>
                   <Input
                     type="number"
-                    value={rounds}
-                    onChange={(e) => setRounds(parseInt(e.target.value) || 8)}
+                    value={roundsInput}
+                    onChange={(e) => setRoundsInput(e.target.value)}
+                    onBlur={() => handleBlur('rounds')}
                     disabled={isRunning}
                     className="mt-1"
                   />
