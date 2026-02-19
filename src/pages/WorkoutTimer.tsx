@@ -93,24 +93,28 @@ const WorkoutTimer = () => {
         relatedContent={["workouts", "training programs"]}
       />
 
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto max-w-2xl px-4 pb-8">
+      <div className="min-h-screen bg-background p-4">
+        <div className="max-w-2xl mx-auto py-4 sm:py-8">
           <PageBreadcrumbs
             items={[
               { label: "Home", href: "/" },
-              { label: "Tools", href: "/tools" },
+              { label: "Smarty Tools", href: "/tools" },
               { label: "Workout Timer" }
             ]}
           />
 
-          <Card className="bg-card border-2 border-primary/40 shadow-primary">
+          <div className="text-center mb-6">
+            <p className="text-sm text-muted-foreground mb-2">Smart Tools — Free to Use</p>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">Workout Timer</h1>
+          </div>
+
+          <Card>
             <CardContent className="p-6">
-              <h1 className="text-2xl font-bold text-center mb-6">Workout Timer</h1>
 
               {/* Settings */}
-              <div className="grid grid-cols-3 gap-4 mb-6">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                 <div>
-                  <Label className="text-sm font-semibold">Work (seconds)</Label>
+                  <Label className="text-sm font-semibold">Work (sec)</Label>
                   <Input
                     type="number"
                     value={workTime}
@@ -120,7 +124,7 @@ const WorkoutTimer = () => {
                   />
                 </div>
                 <div>
-                  <Label className="text-sm font-semibold">Rest (seconds)</Label>
+                  <Label className="text-sm font-semibold">Rest (sec)</Label>
                   <Input
                     type="number"
                     value={restTime}
