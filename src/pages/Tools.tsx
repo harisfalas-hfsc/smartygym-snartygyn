@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
-import { Calculator, Activity, Flame } from "lucide-react";
+import { Calculator, Activity, Flame, Timer } from "lucide-react";
 
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
@@ -15,6 +15,7 @@ import { SwipeToExplore } from "@/components/ui/SwipeToExplore";
 import oneRmBg from "@/assets/tools/1rm-calculator-bg.jpg";
 import bmrBg from "@/assets/tools/bmr-calculator-bg.jpg";
 import macroBg from "@/assets/tools/macro-calculator-bg.jpg";
+import timerBg from "@/assets/tools/workout-timer-bg.jpg";
 
 const Tools = () => {
   const navigate = useNavigate();
@@ -56,6 +57,14 @@ const Tools = () => {
       description: "Get personalized nutrition and macro recommendations",
       route: "/macrocalculator",
       image: macroBg
+    },
+    {
+      id: "workout-timer",
+      icon: Timer,
+      title: "Workout Timer",
+      description: "Customizable interval timer for HIIT, Tabata, and circuit training sessions",
+      route: "/workouttimer",
+      image: timerBg
     }
   ];
 
@@ -100,7 +109,7 @@ const Tools = () => {
                 All tools use scientifically validated formulas and equations.
               </p>
               {/* Desktop only - detailed calculator descriptions */}
-              <div className="hidden md:grid md:grid-cols-3 gap-4 mt-4">
+              <div className="hidden md:grid md:grid-cols-4 gap-4 mt-4">
                 <div>
                   <h3 className="font-semibold text-foreground mb-2"><span className="text-primary font-semibold">1RM Calculator</span></h3>
                   <p className="text-sm">
@@ -110,13 +119,19 @@ const Tools = () => {
                 <div>
                   <h3 className="font-semibold text-foreground mb-2"><span className="text-primary font-semibold">BMR Calculator</span></h3>
                   <p className="text-sm">
-                    Uses the Mifflin-St Jeor equation to calculate your basal metabolic rate — the calories you burn at rest.
+                    Uses the Mifflin-St Jeor equation to calculate your basal metabolic rate, the calories you burn at rest.
                   </p>
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground mb-2"><span className="text-primary font-semibold">Macro Tracking Calculator</span></h3>
                   <p className="text-sm">
                     Get complete nutrition recommendations including calories, macros, fiber, water, and meal frequency.
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground mb-2"><span className="text-primary font-semibold">Workout Timer</span></h3>
+                  <p className="text-sm">
+                    Customizable interval timer for HIIT, Tabata, and circuit training sessions.
                   </p>
                 </div>
               </div>
@@ -183,7 +198,7 @@ const Tools = () => {
         </div>
 
         {/* Desktop Grid - Image cards */}
-        <div className="hidden md:grid md:grid-cols-3 gap-6">
+        <div className="hidden md:grid md:grid-cols-4 gap-4">
           {tools.map((tool) => {
             const Icon = tool.icon;
             return (

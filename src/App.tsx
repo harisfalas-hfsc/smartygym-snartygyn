@@ -41,6 +41,7 @@ import MacroTrackingCalculator from "./pages/MacroTrackingCalculator";
 import ExerciseLibrary from "./pages/ExerciseLibrary";
 import CorporateAdmin from "./pages/CorporateAdmin";
 import CalculatorHistory from "./pages/CalculatorHistory";
+import WorkoutTimer from "./pages/WorkoutTimer";
 
 import Tools from "./pages/Tools";
 
@@ -167,6 +168,7 @@ const AppContent = () => {
                   <Route path="/macrocalculator" element={<MacroTrackingCalculator />} />
                   <Route path="/caloriecalculator" element={<MacroTrackingCalculator />} />
                   <Route path="/calculator-history" element={<CalculatorHistory />} />
+                  <Route path="/workouttimer" element={<WorkoutTimer />} />
                 </Route>
                 
                 {/* Redirect /dashboard to /userdashboard */}
