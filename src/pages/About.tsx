@@ -327,60 +327,50 @@ const About = () => {
           </ScrollReveal>
 
           {/* Mobile Only: Who Is SmartyGym For? - Compact Vertical */}
-          <div className="mb-12 md:hidden">
-            <div className="text-center space-y-6">
-              <h2 className="text-2xl font-bold text-foreground">
-                Who Is <span className="text-primary">SmartyGym</span> For
-              </h2>
-              
-        <div className="space-y-4 mt-6">
-          {/* Busy adults */}
-          <div className="flex items-center gap-3">
-            <Users className="w-6 h-6 text-blue-500 flex-shrink-0" />
-            <span className="text-sm font-semibold text-foreground">Busy adults</span>
-          </div>
-          
-          {/* Parents */}
-          <div className="flex items-center gap-3">
-            <Heart className="w-6 h-6 text-pink-500 flex-shrink-0" />
-            <span className="text-sm font-semibold text-foreground">Parents</span>
-          </div>
-          
-          {/* Beginners */}
-          <div className="flex items-center gap-3">
-            <GraduationCap className="w-6 h-6 text-emerald-500 flex-shrink-0" />
-            <span className="text-sm font-semibold text-foreground">Beginners</span>
-          </div>
-          
-          {/* Intermediate lifters */}
-          <div className="flex items-center gap-3">
-            <Target className="w-6 h-6 text-orange-500 flex-shrink-0" />
-            <span className="text-sm font-semibold text-foreground">Intermediate lifters</span>
-          </div>
-          
-          {/* Travelers */}
-          <div className="flex items-center gap-3">
-            <Plane className="w-6 h-6 text-cyan-500 flex-shrink-0" />
-            <span className="text-sm font-semibold text-foreground">Travelers</span>
-          </div>
-          
-          {/* Gym-goers */}
-          <div className="flex items-center gap-3">
-            <Dumbbell className="w-6 h-6 text-purple-500 flex-shrink-0" />
-            <span className="text-sm font-semibold text-foreground">Gym-goers</span>
-          </div>
-        </div>
-
-              <div className="mt-8 space-y-3 text-center">
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  We are not here to replace your gym. We are here to back you up when life gets in the way.
-                </p>
-                <p className="text-sm font-semibold text-primary">
-                  Wherever you are, your gym comes with you.
-                </p>
+          <Card className="mb-12 border-2 border-primary md:hidden">
+            <CardContent className="p-6">
+              <div className="text-center space-y-4">
+                <Smartphone className="w-12 h-12 text-primary mx-auto" />
+                <h2 className="text-2xl font-bold text-foreground">
+                  Who Is <span className="text-primary">SmartyGym</span> For
+                </h2>
+                <div className="space-y-3 text-left">
+                  <div className="flex items-center gap-3">
+                    <Users className="w-6 h-6 text-blue-500 flex-shrink-0" />
+                    <span className="text-sm font-semibold text-foreground">Busy adults</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Heart className="w-6 h-6 text-pink-500 flex-shrink-0" />
+                    <span className="text-sm font-semibold text-foreground">Parents</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <GraduationCap className="w-6 h-6 text-emerald-500 flex-shrink-0" />
+                    <span className="text-sm font-semibold text-foreground">Beginners</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Target className="w-6 h-6 text-orange-500 flex-shrink-0" />
+                    <span className="text-sm font-semibold text-foreground">Intermediate lifters</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Plane className="w-6 h-6 text-cyan-500 flex-shrink-0" />
+                    <span className="text-sm font-semibold text-foreground">Travelers</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Dumbbell className="w-6 h-6 text-purple-500 flex-shrink-0" />
+                    <span className="text-sm font-semibold text-foreground">Gym-goers</span>
+                  </div>
+                </div>
+                <div className="pt-4 space-y-2">
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    We are not here to replace your gym. We are here to back you up when life gets in the way.
+                  </p>
+                  <p className="text-sm font-semibold text-primary">
+                    Wherever you are, your gym comes with you.
+                  </p>
+                </div>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* Desktop/Tablet: Who Is SmartyGym For? - Grid Layout */}
           <ScrollReveal>
