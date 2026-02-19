@@ -85,7 +85,7 @@ import { AccessGate } from "./components/AccessGate";
 import { PageTransition } from "./components/PageTransition";
 import { LoadingBar } from "./components/LoadingBar";
 import { AnnouncementManager } from "./components/announcements/AnnouncementManager";
-import { ExitIntentPopup } from "./components/growth/ExitIntentPopup";
+import { FreeTrialPopup } from "./components/growth/FreeTrialPopup";
 
 import { SocialProofToast } from "./components/growth/SocialProofToast";
 import { PromoBanner } from "./components/growth/PromoBanner";
@@ -112,7 +112,7 @@ const AppContent = () => {
       <LoadingBar />
       <AccessControlProvider>
         <AnnouncementManager />
-        <ExitIntentPopup />
+        <FreeTrialPopup />
         <SocialProofToast />
         <ScrollToTop />
         <div className="flex flex-col min-h-screen">
