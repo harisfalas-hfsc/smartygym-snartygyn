@@ -134,6 +134,19 @@ serve(async (req) => {
 
     console.log('[SEND-SYSTEM-MESSAGE] Dashboard message sent successfully to user:', userId);
 
+    // Mark welcome_sent on profile to prevent duplicate welcome emails
+    if (messageType === 'welcome') {
+      const { error: welcomeFlagError } = await supabaseAdmin
+        .from('profiles')
+        .update({ welcome_sent: true })
+        .eq('user_id', userId);
+      if (welcomeFlagError) {
+        console.error('[SEND-SYSTEM-MESSAGE] Failed to set welcome_sent flag:', welcomeFlagError);
+      } else {
+        console.log('[SEND-SYSTEM-MESSAGE] welcome_sent flag set for user:', userId);
+      }
+    }
+
     // Send email as well
     let emailSent = false;
     try {

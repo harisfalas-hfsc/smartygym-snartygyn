@@ -48,15 +48,14 @@ export default function Auth() {
           console.log("User signed out");
         }
       } else if (session) {
-        // Check if this is a first-time verified user (no welcome message yet)
-        const { data: existingWelcome } = await supabase
-          .from('user_system_messages')
-          .select('id')
+        // Check if this is a first-time verified user (welcome not yet sent)
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('welcome_sent')
           .eq('user_id', session.user.id)
-          .eq('message_type', 'welcome')
-          .limit(1);
+          .single();
 
-        if (!existingWelcome || existingWelcome.length === 0) {
+        if (!profile?.welcome_sent) {
           // First-time verified user — fire post-signup actions
           console.log("First-time verified user detected, triggering post-signup actions");
           
