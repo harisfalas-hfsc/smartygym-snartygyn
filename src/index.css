@@ -89,6 +89,18 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  /* Ensure number input spinners (arrows) are always visible */
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: inner-spin-button;
+    opacity: 1;
+    height: auto;
+  }
+
+  input[type="number"] {
+    -moz-appearance: spinner;
+  }
+
   body {
     @apply bg-background text-foreground;
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
