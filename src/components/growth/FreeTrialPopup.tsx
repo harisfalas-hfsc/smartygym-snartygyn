@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useAccessControl } from "@/hooks/useAccessControl";
 import {
   Dialog,
   DialogContent,
@@ -14,49 +15,97 @@ const DEFAULT_INITIAL_DELAY_MS = 10_000; // 10 seconds
 
 export function FreeTrialPopup() {
   const [show, setShow] = useState(false);
-  const [session, setSession] = useState<any>(null);
   const [dismissed, setDismissed] = useState(false);
+  const [hasSubscriptionHistory, setHasSubscriptionHistory] = useState<boolean | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const { user, userTier, isLoading } = useAccessControl();
 
   const isTakeATour = location.pathname === "/takeatour";
   const initialDelay = isTakeATour ? 0 : DEFAULT_INITIAL_DELAY_MS;
 
+  // Check if logged-in subscriber has ever had a subscription record
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => setSession(session));
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, s) => setSession(s));
-    return () => subscription.unsubscribe();
-  }, []);
+    if (!user || userTier !== "subscriber") {
+      setHasSubscriptionHistory(null);
+      return;
+    }
 
-  const showPopup = useCallback(() => {
-    if (session) return;
-    setShow(true);
-  }, [session]);
+    const check = async () => {
+      const { data } = await supabase
+        .from("user_subscriptions")
+        .select("id")
+        .eq("user_id", user.id)
+        .limit(1)
+        .maybeSingle();
+
+      setHasSubscriptionHistory(!!data);
+    };
+    check();
+  }, [user, userTier]);
+
+  // Determine if popup should be eligible to show
+  const shouldShowPopup = useCallback((): boolean => {
+    if (isLoading) return false;
+
+    // Visitors (not logged in) — show
+    if (!user) return true;
+
+    // Premium users — hide
+    if (userTier === "premium") return false;
+
+    // Subscribers who were never premium (no record in user_subscriptions) — show
+    if (userTier === "subscriber" && hasSubscriptionHistory === false) return true;
+
+    // Returning/expired customers (have subscription history) — hide
+    return false;
+  }, [user, userTier, isLoading, hasSubscriptionHistory]);
+
+  const triggerPopup = useCallback(() => {
+    if (shouldShowPopup()) {
+      setShow(true);
+    }
+  }, [shouldShowPopup]);
 
   // Initial delay timer
   useEffect(() => {
-    if (session || dismissed) return;
+    if (dismissed || isLoading) return;
+    if (!shouldShowPopup()) return;
 
-    const timer = setTimeout(showPopup, initialDelay);
+    const timer = setTimeout(triggerPopup, initialDelay);
     return () => clearTimeout(timer);
-  }, [session, dismissed, showPopup, initialDelay]);
+  }, [dismissed, triggerPopup, initialDelay, isLoading, shouldShowPopup]);
 
   // Repeat timer after dismiss
   useEffect(() => {
-    if (!dismissed || session) return;
+    if (!dismissed) return;
 
     const timer = setTimeout(() => {
-      setDismissed(false); // reset to trigger initial effect
+      setDismissed(false);
     }, REPEAT_DELAY_MS);
     return () => clearTimeout(timer);
-  }, [dismissed, session]);
+  }, [dismissed]);
 
   const handleDismiss = () => {
     setShow(false);
     setDismissed(true);
   };
 
-  if (session) return null;
+  // Don't render for premium users or returning customers
+  if (!isLoading && user && (userTier === "premium" || hasSubscriptionHistory === true)) {
+    return null;
+  }
+
+  const handleCTA = () => {
+    handleDismiss();
+    if (user) {
+      // Logged-in free subscriber → pricing page
+      navigate("/smartyplans");
+    } else {
+      // Visitor → signup with trial flag
+      navigate("/auth?mode=signup&trial=true");
+    }
+  };
 
   return (
     <Dialog open={show} onOpenChange={(open) => { if (!open) handleDismiss(); }}>
@@ -107,10 +156,7 @@ export function FreeTrialPopup() {
             <Button
               size="lg"
               className="w-full text-base sm:text-lg gap-2 h-12 sm:h-14 font-bold shadow-lg shadow-primary/30"
-              onClick={() => {
-                handleDismiss();
-                navigate("/auth?mode=signup&trial=true");
-              }}
+              onClick={handleCTA}
             >
               <Crown className="w-5 h-5" />
               Start Your Free Trial
