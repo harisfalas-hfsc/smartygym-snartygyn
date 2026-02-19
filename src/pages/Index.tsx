@@ -717,11 +717,11 @@ const Index = () => {
         {/* Mobile Only: Everywhere, Anywhere */}
         <div className="mt-8 mb-2">
           <Card className="border-[3px] border-primary/40 p-4">
-            <h2 className="text-2xl font-bold text-left mb-3">
-              Everywhere, <span className="text-primary">Anywhere</span>
+            <h2 className="text-2xl font-bold text-center mb-3">
+              <span className="text-primary">Everywhere</span> - <span className="text-primary">Anywhere</span>
             </h2>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Whether you're traveling, busy with life, or simply can't make it to the gym — we've got you covered. And even if you do go to the gym, we're here with structured, science-based, professional workouts and training programs to back you up. Wherever you are, your gym comes with you — right in your pocket.
+              Whether you're <span className="text-foreground font-bold">traveling</span>, <span className="text-foreground font-bold">busy</span> with life, or simply can't make it to the <span className="text-foreground font-bold">gym</span> — we've got you covered. And even if you do go to the gym, we're here with <span className="text-foreground font-bold">structured, science-based, professional workouts and training programs</span> to back you up. Wherever you are, your gym comes with you — right in your <span className="text-foreground font-bold">pocket</span>.
             </p>
           </Card>
         </div>
