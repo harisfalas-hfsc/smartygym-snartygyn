@@ -1,49 +1,43 @@
 
+# Fix Workout Timer Input Behavior
 
-# Mobile About Page: Clickable Features + Restructured "Your Gym Comes With You" Card
+## The Problem
+There are two issues with the workout timer inputs:
 
-## Changes (Mobile view only)
+1. **Cannot delete all digits**: When you try to clear the field (e.g., delete "20" to type "5"), the fallback logic immediately forces it back to the default value (20, 10, or 8). This makes editing frustrating.
 
-### 1. Make feature list items clickable links
+2. **Timer display does not update**: After changing the work/rest/rounds values, the timer display still shows the old number until you press "Start". There is no need for a refresh button; it should update automatically.
 
-Each item in the first card ("Your Gym Re-imagined") becomes a tappable link navigating to the correct page:
+## Where the Fix Applies
+The same bug exists in **two separate files**:
+- **Smarty Tools page** (`src/pages/WorkoutTimer.tsx`) - the full-page timer
+- **Workout popup timer** (`src/components/WorkoutTimerPopup.tsx`) - the floating timer used inside workouts and training programs
 
-| Feature | Route |
-|---|---|
-| Expert-Crafted Workouts | `/workout` |
-| Structured Training Programs | `/trainingprogram` |
-| Exercise Library | `/exerciselibrary` |
-| Smarty Tools | `/tools` |
-| Articles | `/blog` |
-| LogBook | `/userdashboard?tab=logbook` |
+Both files will be fixed with the same approach, so the fix applies everywhere across the website.
 
-Each row will use `onClick={() => navigate(route)}` with a `cursor-pointer` style and a subtle hover/active effect so users know they are tappable.
+## The Solution
 
-### 2. Restructure the second mobile card
+### 1. Allow empty input while typing
+Instead of storing only numbers, use a string state for the input display so users can freely clear and retype values. The actual numeric value is applied when the user finishes editing (on blur) or when they press Start.
 
-The current "Your Gym Comes With You" card (lines 215-235) with its long paragraph will be **replaced**. Its content will be moved **inside the "Who is SmartyGym For?" section** (lines 351-395).
+For each input (work, rest, rounds):
+- Store input as a string while the user is typing
+- Allow the field to be completely empty
+- On blur (when the user taps/clicks away), convert to a number and apply a sensible minimum (e.g., 1 second for work/rest, 1 round minimum)
+- If the field is left empty or zero, reset to a reasonable default
 
-**New mobile "Who is SmartyGym For?" section** will contain:
-1. The title "Who Is SmartyGym For"
-2. The six audience items (Busy adults, Parents, Beginners, etc.) -- same as now
-3. Below that, the new text:
-   - *"We are not here to replace your gym. We are here to back you up when life gets in the way."*
-   - *"Wherever you are, your gym comes with you."*
+### 2. Auto-sync the timer display
+When the timer is NOT running and the user changes the work time, automatically update the `timeLeft` display to match the new work time. This removes the need to press any refresh button.
 
-The old second card is deleted entirely.
-
----
+A `useEffect` will watch `workTime` and update `timeLeft` whenever the timer is idle (not running and round is 0).
 
 ## Technical Details
 
-### File: `src/pages/About.tsx`
+**Both files** (`WorkoutTimer.tsx` and `WorkoutTimerPopup.tsx`) will get these changes:
 
-1. **Mobile card 1 (lines 183-206)**: Wrap each feature `<span>` in a clickable element with `onClick={() => navigate('/route')}` and add `cursor-pointer` + `text-primary hover:underline` styling.
-
-2. **Mobile card 2 (lines 215-235)**: Delete this entire card.
-
-3. **Mobile "Who is SmartyGym For?" section (lines 351-395)**: After the six audience items, add the two lines of text:
-   - "We are not here to replace your gym. We are here to back you up when life gets in the way."
-   - "Wherever you are, your gym comes with you." (in primary/bold)
-
-Desktop remains unchanged.
+- Add string states: `workTimeInput`, `restTimeInput`, `roundsInput` for display
+- Input `value` binds to the string state (allows empty)
+- `onChange` updates the string state freely
+- `onBlur` parses the value, clamps to minimum, updates both the string and numeric state
+- Add a `useEffect`: when `workTime` changes and timer is not running, set `timeLeft = workTime`
+- Remove the `|| defaultValue` fallback from `onChange` handlers
