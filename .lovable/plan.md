@@ -1,28 +1,36 @@
 
 
-# Redesign "Your Gym Re-imagined" Card with Vertical Icon List
+# Mobile About Page: Clickable Features + Restructured "Your Gym Comes With You" Card
 
-## What Changes
+## Changes (Mobile view only)
 
-The first card on the About page ("Your Gym Re-imagined. Anywhere, Anytime.") will be updated to display the six features as a **vertical list with icons**, matching the style of the "Who is SmartyGym For?" section below it.
+### 1. Make feature list items clickable links
 
-### Current Layout
-The features (Expert-crafted workouts, Structured training programs, Exercise library, Smarty Tools, Articles, Logbook) are currently listed inline as bold text within a single paragraph.
+Each item in the first card ("Your Gym Re-imagined") becomes a tappable link navigating to the correct page:
 
-### New Layout
-Each feature gets its own row with a colored icon on the left and the feature name next to it, stacked vertically:
+| Feature | Route |
+|---|---|
+| Expert-Crafted Workouts | `/workout` |
+| Structured Training Programs | `/trainingprogram` |
+| Exercise Library | `/exerciselibrary` |
+| Smarty Tools | `/tools` |
+| Articles | `/blog` |
+| LogBook | `/userdashboard?tab=logbook` |
 
-- Dumbbell icon -- Expert-Crafted Workouts
-- Calendar icon -- Structured Training Programs
-- Video icon -- Exercise Library
-- Wrench icon -- Smarty Tools
-- FileText icon -- Articles
-- BookOpen icon -- LogBook
+Each row will use `onClick={() => navigate(route)}` with a `cursor-pointer` style and a subtle hover/active effect so users know they are tappable.
 
-Below the list, a closing line:
-**"Everything a complete gym must offer, built by real professionals, in your pocket at smartygym.com."**
+### 2. Restructure the second mobile card
 
-This applies to **both** the desktop card and the mobile card (first of the two mobile cards).
+The current "Your Gym Comes With You" card (lines 215-235) with its long paragraph will be **replaced**. Its content will be moved **inside the "Who is SmartyGym For?" section** (lines 351-395).
+
+**New mobile "Who is SmartyGym For?" section** will contain:
+1. The title "Who Is SmartyGym For"
+2. The six audience items (Busy adults, Parents, Beginners, etc.) -- same as now
+3. Below that, the new text:
+   - *"We are not here to replace your gym. We are here to back you up when life gets in the way."*
+   - *"Wherever you are, your gym comes with you."*
+
+The old second card is deleted entirely.
 
 ---
 
@@ -30,11 +38,12 @@ This applies to **both** the desktop card and the mobile card (first of the two 
 
 ### File: `src/pages/About.tsx`
 
-1. **Add imports** for `Wrench`, `Video`, `FileText`, `BookOpen`, `Calendar` from `lucide-react`
+1. **Mobile card 1 (lines 183-206)**: Wrap each feature `<span>` in a clickable element with `onClick={() => navigate('/route')}` and add `cursor-pointer` + `text-primary hover:underline` styling.
 
-2. **Desktop card** (lines 117-144): Replace the inline paragraph listing features with a vertical list using `flex items-center gap-3` rows (same pattern as the "Who is SmartyGym For?" section at lines 305-340), followed by the closing tagline paragraph.
+2. **Mobile card 2 (lines 215-235)**: Delete this entire card.
 
-3. **Mobile card 1** (lines 149-161): Same change -- replace the inline paragraph with the vertical icon list and closing tagline.
+3. **Mobile "Who is SmartyGym For?" section (lines 351-395)**: After the six audience items, add the two lines of text:
+   - "We are not here to replace your gym. We are here to back you up when life gets in the way."
+   - "Wherever you are, your gym comes with you." (in primary/bold)
 
-The second paragraph (backup plan / "Your Gym Comes With You") remains unchanged on both desktop and mobile.
-
+Desktop remains unchanged.
