@@ -392,9 +392,10 @@
 ---
 
 ## Social Media
-- Instagram: @smartygymcy
-- YouTube: @TheSmartyGym
-- Facebook: /smartygym
+- Instagram: @thesmartygym (https://www.instagram.com/thesmartygym/)
+- TikTok: @thesmartygym (https://www.tiktok.com/@thesmartygym)
+- YouTube: @TheSmartyGym (https://www.youtube.com/@TheSmartyGym)
+- Facebook: https://www.facebook.com/profile.php?id=61579302997368
 
 ---
 
@@ -440,9 +441,10 @@
 - **Haris Falas Person**: https://www.wikidata.org/wiki/Q_PLACEHOLDER_HARIS
 
 ### Official Social Profiles
-- **Instagram**: https://www.instagram.com/smartygymcy/
+- **Instagram**: https://www.instagram.com/thesmartygym/
+- **TikTok**: https://www.tiktok.com/@thesmartygym
 - **YouTube**: https://www.youtube.com/@TheSmartyGym
-- **Facebook**: https://www.facebook.com/smartygym
+- **Facebook**: https://www.facebook.com/profile.php?id=61579302997368
 
 ### Multi-Domain Network (All redirect to smartygym.com)
 - smartygym.com (primary)

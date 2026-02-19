@@ -423,7 +423,7 @@ const Index = () => {
             "@type": "Place",
             "name": "Worldwide"
           },
-          "sameAs": ["https://www.instagram.com/smartygymcy/", "https://www.youtube.com/@TheSmartyGym", "https://www.facebook.com/smartygym"],
+          "sameAs": ["https://www.instagram.com/thesmartygym/", "https://www.tiktok.com/@thesmartygym", "https://www.youtube.com/@TheSmartyGym", "https://www.facebook.com/profile.php?id=61579302997368"],
           "availableLanguage": ["English"],
           "priceRange": "€€",
           "knowsAbout": ["Online Fitness", "Personal Training", "Workout Programs", "Strength Training", "HIIT Training", "Functional Fitness", "Sports Science", "Metabolic Conditioning", "Cardio Training", "Mobility Training"],

@@ -102,9 +102,10 @@ export const generateFitnessCenterSchemaFull = () => ({
     "sameAs": ["https://smartygym.com/coach-profile"]
   },
   "sameAs": [
-    "https://www.instagram.com/smartygymcy/",
+    "https://www.instagram.com/thesmartygym/",
+    "https://www.tiktok.com/@thesmartygym",
     "https://www.youtube.com/@TheSmartyGym",
-     "https://www.facebook.com/smartygym",
+    "https://www.facebook.com/profile.php?id=61579302997368",
      // Multi-domain network - all redirect to smartygym.com
      "https://i-training.net",
      "https://smartywod.com",
@@ -135,8 +136,10 @@ export const generateHarisFalasSchema = () => ({
   "url": "https://smartygym.com/coach-profile",
   "sameAs": [
     "https://smartygym.com",
-    "https://www.instagram.com/smartygymcy/",
-    "https://www.youtube.com/@TheSmartyGym"
+    "https://www.instagram.com/thesmartygym/",
+    "https://www.tiktok.com/@thesmartygym",
+    "https://www.youtube.com/@TheSmartyGym",
+    "https://www.facebook.com/profile.php?id=61579302997368"
   ],
   "hasCredential": [
     {
