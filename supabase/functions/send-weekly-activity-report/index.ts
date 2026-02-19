@@ -319,7 +319,7 @@ function generateEmailHtml(data: UserActivityData, weekStart: string, weekEnd: s
               <p style="margin: 0 0 10px 0; color: #29B6D2; font-weight: bold; font-size: 14px;">SmartyGym - Your gym reimagined anywhere, anytime</p>
               <p style="margin: 0; color: #999999; font-size: 12px;">
                 <a href="https://smartygym.com/unsubscribe?email=${encodeURIComponent(data.email)}" style="color: #999999;">Unsubscribe</a> | 
-                <a href="https://smartygym.com/privacy" style="color: #999999;">Privacy Policy</a>
+                <a href="https://smartygym.com/privacy-policy" style="color: #999999;">Privacy Policy</a>
               </p>
             </td>
           </tr>
