@@ -1,43 +1,46 @@
 
 
-# Create a Pre-Verified Test User for Trial Testing
+# Fix: Trial Not Showing on Stripe Checkout
 
-## What We'll Do
+## The Problem
 
-Create a small edge function that uses the admin API to create a verified test user, then call it once to generate the account. This gives you a fresh user with no Stripe history, perfect for testing the 7-day trial checkout.
+The edge function logs confirm the issue. When you checked out just now, the log showed:
 
-## Test Account Credentials
+```
+Request received - {"priceId":"price_1SJ9q1IxQYg9inGKZzxxqPbD"}
+```
 
-- **Email**: `trialtest@smartygym.com`
-- **Password**: `TrialTest2025!`
+The `trial` parameter is missing entirely. This means the **deployed** version of `create-checkout` does not include the `trial_period_days` logic, even though the source code does. The function needs to be redeployed.
+
+## The Fix
+
+**Redeploy the `create-checkout` edge function.** No code changes needed -- the source code already has the correct trial logic:
+
+```typescript
+// Already in create-checkout/index.ts (line ~101)
+subscription_data: {
+  ...(trial ? { trial_period_days: 7 } : {}),
+}
+```
 
 ## Steps
 
-### 1. Create a utility edge function `create-test-user`
-A simple one-time-use function that:
-- Creates a user via the admin API with `email_confirm: true` (skips verification)
-- Auto-creates the profile (existing trigger handles this)
-- Returns the credentials for confirmation
+1. Redeploy the `create-checkout` edge function to sync the deployed version with the source code
+2. Verify by checking logs -- the "Request received" log should now show `{"priceId":"...","trial":true}`
 
-### 2. Call the function to create the user
-Invoke it once to seed the account into the database.
+## What Stripe Will Show After the Fix
 
-### 3. Test the trial flow
-- Log in with `trialtest@smartygym.com` / `TrialTest2025!`
-- Go to Smarty Plans
-- Click "Start 7-Day Free Trial" on Gold
-- Verify the Stripe checkout page shows the trial details clearly
+Once `trial_period_days: 7` is properly passed to Stripe, the checkout page will automatically display:
+- "7-day free trial" prominently at the top
+- "EUR 0.00 due today"
+- "Then EUR 9.99/month starting [date 7 days from now]"
+- "Your trial ends on [specific date]"
 
-### 4. Clean up
-Delete the `create-test-user` edge function after use (it's only needed once).
+No frontend changes needed. No Stripe dashboard changes needed. Just the redeployment.
 
-## Technical Details
-
-The edge function will use `supabase.auth.admin.createUser()` with `email_confirm: true` to bypass email verification. The existing `handle_new_user` trigger will automatically create the profile row.
+## Files Changed
 
 | Action | File |
 |--------|------|
-| Create | `supabase/functions/create-test-user/index.ts` |
-| Invoke | Call function once to create the account |
-| Delete | Remove function after account is created |
+| Redeploy | `supabase/functions/create-checkout/index.ts` (no code changes) |
 
