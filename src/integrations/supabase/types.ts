@@ -1451,6 +1451,7 @@ export type Database = {
           timezone: string | null
           updated_at: string
           user_id: string
+          welcome_sent: boolean | null
         }
         Insert: {
           avatar_url?: string | null
@@ -1462,6 +1463,7 @@ export type Database = {
           timezone?: string | null
           updated_at?: string
           user_id: string
+          welcome_sent?: boolean | null
         }
         Update: {
           avatar_url?: string | null
@@ -1473,6 +1475,7 @@ export type Database = {
           timezone?: string | null
           updated_at?: string
           user_id?: string
+          welcome_sent?: boolean | null
         }
         Relationships: []
       }
