@@ -1,43 +1,58 @@
 
-# Fix Workout Timer Input Behavior
+# Social Media SEO Optimization
 
-## The Problem
-There are two issues with the workout timer inputs:
+## What This Does
+Everything happens behind the scenes -- zero visual changes to the website. This fixes incorrect social media URLs scattered across the code and adds TikTok presence to all SEO schemas, so Google and AI systems (ChatGPT, Claude, Perplexity, etc.) correctly associate SmartyGym with all four social platforms.
 
-1. **Cannot delete all digits**: When you try to clear the field (e.g., delete "20" to type "5"), the fallback logic immediately forces it back to the default value (20, 10, or 8). This makes editing frustrating.
+## The Problem Right Now
+Your social media URLs are inconsistent across the site's SEO code. Some files point to the wrong Instagram (`smartygymcy` instead of `thesmartygym`), wrong Facebook (`smartygym.official` instead of your actual page), and TikTok is missing from most SEO schemas entirely.
 
-2. **Timer display does not update**: After changing the work/rest/rounds values, the timer display still shows the old number until you press "Start". There is no need for a refresh button; it should update automatically.
+## Correct Social Media URLs
+These are the official URLs that will be used everywhere:
+- Instagram: `https://www.instagram.com/thesmartygym/`
+- TikTok: `https://www.tiktok.com/@thesmartygym`
+- Facebook: `https://www.facebook.com/profile.php?id=61579302997368`
+- YouTube: `https://www.youtube.com/@TheSmartyGym`
 
-## Where the Fix Applies
-The same bug exists in **two separate files**:
-- **Smarty Tools page** (`src/pages/WorkoutTimer.tsx`) - the full-page timer
-- **Workout popup timer** (`src/components/WorkoutTimerPopup.tsx`) - the floating timer used inside workouts and training programs
+## What Changes (All Behind the Scenes)
 
-Both files will be fixed with the same approach, so the fix applies everywhere across the website.
+### 1. Fix `index.html` -- Global SEO Schemas
+- Update the Organization schema `sameAs` array: replace old Instagram/Facebook URLs with correct ones, add TikTok
+- Add TikTok and Instagram profile meta tags for AI crawlers
+- Add `article:publisher` meta tag pointing to Facebook page
 
-## The Solution
+### 2. Fix `src/components/SEOEnhancer.tsx` -- AI Crawler Metadata
+- Update the `KNOWLEDGE_GRAPH_LINKS` object with all four correct social URLs (including TikTok)
+- Add TikTok-specific `schema:sameAs` meta tag
 
-### 1. Allow empty input while typing
-Instead of storing only numbers, use a string state for the input display so users can freely clear and retype values. The actual numeric value is applied when the user finishes editing (on blur) or when they press Start.
+### 3. Fix `src/utils/seoHelpers.ts` -- Schema Generators
+- Update every `sameAs` array (Person schema for Haris Falas, Organization schema, etc.) to use correct URLs and include TikTok
 
-For each input (work, rest, rounds):
-- Store input as a string while the user is typing
-- Allow the field to be completely empty
-- On blur (when the user taps/clicks away), convert to a number and apply a sensible minimum (e.g., 1 second for work/rest, 1 round minimum)
-- If the field is left empty or zero, reset to a reasonable default
+### 4. Fix `src/utils/seoSchemas.ts` -- Additional Schemas
+- Same fix: update all `sameAs` arrays with correct URLs and add TikTok
 
-### 2. Auto-sync the timer display
-When the timer is NOT running and the user changes the work time, automatically update the `timeLeft` display to match the new work time. This removes the need to press any refresh button.
+### 5. Fix `src/pages/Index.tsx` -- Homepage Schema
+- Update the Organization `sameAs` in the homepage JSON-LD
 
-A `useEffect` will watch `workTime` and update `timeLeft` whenever the timer is idle (not running and round is 0).
+### 6. Fix `src/components/admin/CorporateBrochure.tsx` and `IndividualBrochure.tsx`
+- Update social links from wrong URLs (`smarty.gym`, `smartygym.official`) to correct ones
 
-## Technical Details
+### 7. Fix `public/llms.txt` -- AI Knowledge Base
+- Update the social profiles section with correct URLs and add TikTok
 
-**Both files** (`WorkoutTimer.tsx` and `WorkoutTimerPopup.tsx`) will get these changes:
+### 8. Fix `supabase/functions/refresh-seo-metadata/index.ts`
+- Update `sameAs` array in the edge function schema with correct URLs and TikTok
 
-- Add string states: `workTimeInput`, `restTimeInput`, `roundsInput` for display
-- Input `value` binds to the string state (allows empty)
-- `onChange` updates the string state freely
-- `onBlur` parses the value, clamps to minimum, updates both the string and numeric state
-- Add a `useEffect`: when `workTime` changes and timer is not running, set `timeLeft = workTime`
-- Remove the `|| defaultValue` fallback from `onChange` handlers
+## Files Modified
+- `index.html`
+- `src/components/SEOEnhancer.tsx`
+- `src/utils/seoHelpers.ts`
+- `src/utils/seoSchemas.ts`
+- `src/pages/Index.tsx`
+- `src/components/admin/CorporateBrochure.tsx`
+- `src/components/admin/IndividualBrochure.tsx`
+- `public/llms.txt`
+- `supabase/functions/refresh-seo-metadata/index.ts`
+
+## No Visual Changes
+Everything is metadata, schemas, and behind-the-scenes SEO code. Your website will look exactly the same.
