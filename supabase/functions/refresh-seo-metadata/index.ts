@@ -192,7 +192,11 @@ function generateJsonLD(item: ContentItem): object {
         "https://smartywod.com",
         "https://smartylogbook.com",
         "https://smartywellness.com",
-        "https://smartyworkout.com"
+        "https://smartyworkout.com",
+        "https://www.instagram.com/thesmartygym/",
+        "https://www.tiktok.com/@thesmartygym",
+        "https://www.youtube.com/@TheSmartyGym",
+        "https://www.facebook.com/profile.php?id=61579302997368"
       ],
       "alternateName": ["SmartyGym", "itraining", "smartywod", "smartylogbook", "smartywellness", "smartyworkout"]
     },

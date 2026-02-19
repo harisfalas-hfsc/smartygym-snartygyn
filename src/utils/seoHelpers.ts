@@ -278,8 +278,10 @@ export const generatePersonSchema = () => {
     "url": "https://smartygym.com/coach-profile",
     "image": "https://smartygym.com/haris-falas-coach.png",
     "sameAs": [
-      "https://www.instagram.com/smartygymcy/",
-       "https://www.youtube.com/@TheSmartyGym"
+      "https://www.instagram.com/thesmartygym/",
+      "https://www.tiktok.com/@thesmartygym",
+      "https://www.youtube.com/@TheSmartyGym",
+      "https://www.facebook.com/profile.php?id=61579302997368"
        // PLACEHOLDER: Add Wikidata URL once created
        // "https://www.wikidata.org/wiki/Q_HARIS_FALAS"
     ],
@@ -328,9 +330,10 @@ export const generateOrganizationSchema = () => {
       "https://smartylogbook.com",
       "https://smartywellness.com",
       "https://smartyworkout.com",
-      "https://www.instagram.com/smartygymcy/",
-      "https://www.facebook.com/smartygym",
-       "https://www.youtube.com/@TheSmartyGym"
+      "https://www.instagram.com/thesmartygym/",
+      "https://www.tiktok.com/@thesmartygym",
+      "https://www.youtube.com/@TheSmartyGym",
+      "https://www.facebook.com/profile.php?id=61579302997368"
        // PLACEHOLDER: Add Wikidata URL once created
        // "https://www.wikidata.org/wiki/Q_SMARTYGYM"
     ]
@@ -451,8 +454,10 @@ export const generateHarisFalasEnhancedSchema = () => ({
   "url": "https://smartygym.com/coach-profile",
   "image": "https://smartygym.com/haris-falas-coach.png",
   "sameAs": [
-    "https://www.instagram.com/smartygymcy/",
-    "https://www.youtube.com/@TheSmartyGym"
+    "https://www.instagram.com/thesmartygym/",
+    "https://www.tiktok.com/@thesmartygym",
+    "https://www.youtube.com/@TheSmartyGym",
+    "https://www.facebook.com/profile.php?id=61579302997368"
   ],
   "award": "20+ Years Coaching Experience"
 });

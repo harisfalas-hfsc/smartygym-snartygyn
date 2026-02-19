@@ -14,11 +14,12 @@ import { Helmet } from "react-helmet";
      smartygym: "https://www.wikidata.org/wiki/Q_PLACEHOLDER_SMARTYGYM",  // TODO: Create Wikidata entry
      harisFalas: "https://www.wikidata.org/wiki/Q_PLACEHOLDER_HARIS",     // TODO: Create Wikidata entry
    },
-   social: {
-     instagram: "https://www.instagram.com/smartygymcy/",
-     youtube: "https://www.youtube.com/@TheSmartyGym",
-     facebook: "https://www.facebook.com/smartygym",
-   },
+    social: {
+      instagram: "https://www.instagram.com/thesmartygym/",
+      tiktok: "https://www.tiktok.com/@thesmartygym",
+      youtube: "https://www.youtube.com/@TheSmartyGym",
+      facebook: "https://www.facebook.com/profile.php?id=61579302997368",
+    },
    business: {
      // Add LinkedIn, Crunchbase when available
      linkedin: "", // TODO: Add LinkedIn company page
@@ -301,6 +302,7 @@ export const SEOEnhancer = ({
       
        {/* Knowledge Graph Authority Links */}
        <meta property="schema:sameAs" content={KNOWLEDGE_GRAPH_LINKS.social.instagram} />
+       <meta property="schema:sameAs" content={KNOWLEDGE_GRAPH_LINKS.social.tiktok} />
        <meta property="schema:sameAs" content={KNOWLEDGE_GRAPH_LINKS.social.youtube} />
        <meta property="schema:sameAs" content={KNOWLEDGE_GRAPH_LINKS.social.facebook} />
        

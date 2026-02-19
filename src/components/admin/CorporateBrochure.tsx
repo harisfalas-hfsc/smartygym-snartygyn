@@ -258,9 +258,10 @@ export const CorporateBrochure = () => {
             <div className="text-right">
               <p className="font-bold mb-2">Follow Us</p>
               <div className="flex gap-4 justify-end text-sm">
-                <a href="https://instagram.com/smarty.gym" className="text-[#29B6D2]">Instagram</a>
-                <a href="https://facebook.com/smartygym.official" className="text-[#29B6D2]">Facebook</a>
-                <a href="https://youtube.com/@smartygym" className="text-[#29B6D2]">YouTube</a>
+                <a href="https://www.instagram.com/thesmartygym/" className="text-[#29B6D2]">Instagram</a>
+                <a href="https://www.tiktok.com/@thesmartygym" className="text-[#29B6D2]">TikTok</a>
+                <a href="https://www.facebook.com/profile.php?id=61579302997368" className="text-[#29B6D2]">Facebook</a>
+                <a href="https://www.youtube.com/@TheSmartyGym" className="text-[#29B6D2]">YouTube</a>
               </div>
             </div>
           </div>
