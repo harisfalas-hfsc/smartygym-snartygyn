@@ -1,63 +1,68 @@
 
-# Fix: Finisher View Buttons, Stripe Name Sync, and Comprehensive Audit
+# Reliability Improvements: WOD Generation and Future-Proofing
 
-## Problems Found
+## What Happened Last Night
 
-### 1. Equipment WOD Finisher - "burpee" Has No View Button
-The finisher section content reads: "After each row, immediately perform burpee." The exercise-matching system skips this because:
-- The `extractExerciseNames` function filters out text starting with "perform" (line 257 of exercise-matching.ts)
-- "burpee" is embedded mid-sentence, not on its own line as a standalone exercise
-- The section IS being processed (finisher has `process: true`), but the extraction logic cannot parse "burpee" from that sentence structure
+The workout generation system has TWO scheduled jobs:
 
-**Fix**: The `main_workout` HTML for the Equipment WOD needs the finisher section's "burpee" replaced with proper `{{exercise:1160:burpee}}` markup via a direct database update. Additionally, improve `extractExerciseNames` to detect exercise names embedded after "perform" verbs.
+1. **Primary (22:30 UTC / 00:30 Cyprus)**: Calls the orchestrator, which tries up to 3 times with 30-second gaps. Last night, all 3 attempts failed -- likely due to a temporary AI provider outage.
+2. **Backup (01:00 UTC / 03:00 Cyprus)**: Calls `generate-workout-of-day` directly. This SUCCEEDED and created both WODs.
 
-### 2. Stripe Product Name Not Updated
-When the name collision guard renamed the Equipment WOD from "Summit Gauntlet" to "Summit Complex" in the database, it only ran `supabase.update()` -- it never called `stripe.products.update()` to sync the Stripe product name. The Stripe product `prod_U0jYmll4JYuTu4` still shows "Summit Gauntlet".
+So the workouts WERE generated. The failure email you received was from the primary run. The backup saved the day, but you were correctly alarmed by the email.
 
-**Fix**: 
-- Update the name collision guard in `generate-workout-of-day/index.ts` to also update the Stripe product name when renaming
-- Immediately fix the current Stripe product via the Stripe API
+This is NOT related to the naming/formatting bugs we fixed earlier -- those were code logic issues. This was an infrastructure/AI provider availability issue.
 
-### 3. Bodyweight WOD Finisher - Already Correct
-The Bodyweight WOD finisher has proper markup: `{{exercise:v-up:V-Up}}`, `{{exercise:broad-jump:Broad Jump}}`, `{{exercise:3361:skater hops}}`. No action needed.
+## Root Causes
 
-### 4. Training Programs - All Have Markup
-All 20 visible training programs show `HAS_MARKUP` status for their `weekly_schedule` field. No action needed.
+1. **Tight retry window**: The orchestrator retries 3 times with only 30-second gaps. If the AI provider is down for even 2 minutes, all 3 attempts fail.
+2. **No AI provider failover**: The system uses a single AI model. If that model has issues, there is no fallback.
+3. **Alarm fatigue**: The failure email fires even though the backup job later succeeds, causing unnecessary worry.
 
-## Implementation Plan
+## Proposed Fixes
 
-### Step 1: Fix Today's Equipment WOD Finisher (Database)
-Update the `main_workout` HTML for `WOD-CH-E-1771549202373` to replace "burpee" with `{{exercise:1160:burpee}}` in the finisher section.
+### Fix 1: Increase Retry Delay (Quick Win)
+Change the orchestrator retry delay from 30 seconds to 120 seconds. This gives 3 attempts spread over ~6 minutes instead of ~1.5 minutes, greatly increasing the chance of success during brief outages.
 
-### Step 2: Fix Stripe Product Name (Stripe API)
-Update Stripe product `prod_U0jYmll4JYuTu4` name from "Summit Gauntlet" to "Summit Complex".
+**File**: `supabase/functions/wod-generation-orchestrator/index.ts`
+- Change `RETRY_DELAY_MS` from `30000` to `120000`
 
-### Step 3: Add Stripe Name Sync to Collision Guard
-In `generate-workout-of-day/index.ts`, after the name collision guard renames the workout in the database (around line 2471), add a Stripe product update call:
-```
-// Also update Stripe product name
-const workoutRecord = await supabase.from("admin_workouts")
-  .select("stripe_product_id").eq("id", generatedWorkouts[1].id).single();
-if (workoutRecord.data?.stripe_product_id) {
-  await stripe.products.update(workoutRecord.data.stripe_product_id, { name: newName });
-}
-```
+### Fix 2: Smarter Failure Email (Prevent False Alarms)
+Before sending the failure email, check if the backup verification job is scheduled. If a backup exists within a few hours, delay the admin alert or add context saying "a backup attempt is scheduled at 03:00 Cyprus time."
 
-### Step 4: Improve Exercise Extraction for "perform X" Patterns
-In `exercise-matching.ts`, add a new extraction pattern in `extractExerciseNames` that catches "perform [exercise]" patterns. Currently line 257 filters out ALL text starting with "perform". Change this to:
-- Still skip generic instructional text like "perform each exercise for 30 seconds"
-- But extract the exercise name after "perform" when it matches a known pattern (e.g., "perform burpee" should extract "burpee")
+Alternatively, modify the email to say: "Primary generation failed. Backup attempt scheduled at 03:00 Cyprus time. You will receive a second alert only if the backup also fails."
 
-Specifically, in the `<br>`-separated lines handler (Pattern 4), add handling for "perform X" where X is a short exercise candidate.
+**File**: `supabase/functions/wod-generation-orchestrator/index.ts`
+- Update `sendAdminAlert` to include backup job information
 
-### Step 5: Run Reprocess on Today's WODs
-After the database fix and code deployment, run the `reprocess-wod-exercises` function on both today's WODs to catch any remaining unmatched exercises.
+### Fix 3: Backup Job Should Also Send Status Email
+When the `verify-wod-generation` backup succeeds after a prior failure, send a "Recovery: WODs Generated Successfully" email so you know the backup worked.
 
-## Files to Modify
+**File**: `supabase/functions/generate-workout-of-day/index.ts`
+- After successful retry generation, check if a failed orchestrator run exists for the same date and send a recovery notification
 
-| File | Change |
-|------|--------|
-| `supabase/functions/generate-workout-of-day/index.ts` | Add Stripe name sync to collision guard |
-| `supabase/functions/_shared/exercise-matching.ts` | Handle "perform [exercise]" extraction pattern |
-| Database (SQL) | Fix Equipment WOD finisher "burpee" markup |
-| Stripe API | Update product `prod_U0jYmll4JYuTu4` name to "Summit Complex" |
+### Fix 4: AI Provider Failover
+Add a secondary AI model as fallback. If the primary model fails, automatically retry with a different model.
+
+**File**: `supabase/functions/generate-workout-of-day/index.ts`
+- Add a `FALLBACK_MODELS` array with alternative model names
+- Wrap the AI call in a try/catch that falls back to the next model
+
+### Fix 5: Comprehensive Post-Generation Validation (Already Partially Done)
+The exercise matching improvements and name collision guards from earlier fixes are now deployed. These prevent the formatting and naming issues from recurring.
+
+## Summary of Changes
+
+| Change | Impact | File |
+|--------|--------|------|
+| Increase retry delay to 120s | Handles brief provider outages | `wod-generation-orchestrator/index.ts` |
+| Add "backup scheduled" context to failure email | Reduces unnecessary alarm | `wod-generation-orchestrator/index.ts` |
+| Send recovery email when backup succeeds | Gives you peace of mind | `generate-workout-of-day/index.ts` |
+| AI model failover | Handles provider outages | `generate-workout-of-day/index.ts` |
+
+## What This Means for Tomorrow
+
+- The naming collision guard is deployed -- no more duplicate names
+- The exercise matching improvements are deployed -- better "View" button coverage
+- The Stripe sync is deployed -- names will match between your app and Stripe
+- After these reliability fixes, even if one AI provider goes down, the system will try alternatives and retry over a longer window
+- You will only get alarmed if BOTH the primary and backup runs fail
