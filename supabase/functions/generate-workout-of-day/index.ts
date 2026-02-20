@@ -1836,9 +1836,20 @@ ${durationDistributionPrompt}
       let workoutContent: { name: string; description: string; main_workout: string; instructions: string; tips: string } | null = null;
       let parseMethod = "unknown";
       
+      // AI Model failover: try primary model first, then fallbacks
+      const AI_MODELS = [
+        "google/gemini-2.5-flash",
+        "google/gemini-2.5-flash-lite",
+        "openai/gpt-5-mini",
+      ];
+      
+      for (const aiModel of AI_MODELS) {
+        if (workoutContent) break;
+        logStep(`Trying AI model: ${aiModel}`, { equipment });
+      
       // Attempt 1: Tool calling (most reliable)
       try {
-        logStep(`AI API call with tool calling`, { equipment });
+        logStep(`AI API call with tool calling`, { equipment, model: aiModel });
         
         const toolResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
@@ -1847,7 +1858,7 @@ ${durationDistributionPrompt}
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            model: "google/gemini-2.5-flash",
+            model: aiModel,
             messages: [
               { role: "system", content: "You are an expert fitness coach. Generate workouts using the provided tool." },
               { role: "user", content: workoutPrompt }
@@ -1898,7 +1909,7 @@ ${durationDistributionPrompt}
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              model: "google/gemini-2.5-flash",
+              model: aiModel,
               messages: [
                 { role: "system", content: "You are an expert fitness coach. Return ONLY valid JSON with no markdown, no code blocks, no explanation. Start with { and end with }." },
                 { role: "user", content: workoutPrompt }
@@ -1958,7 +1969,7 @@ Return JSON with these exact fields:
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              model: "google/gemini-2.5-flash",
+              model: aiModel,
               messages: [
                 { role: "system", content: "Return ONLY valid JSON. No markdown. No explanation." },
                 { role: "user", content: minimalPrompt }
@@ -1989,9 +2000,11 @@ Return JSON with these exact fields:
         }
       }
       
-      // If all attempts failed, throw to trigger per-equipment error handling
+      } // end of AI_MODELS failover loop
+      
+      // If all models and attempts failed, throw to trigger per-equipment error handling
       if (!workoutContent) {
-        throw new Error(`All AI parsing attempts failed for ${equipment} workout`);
+        throw new Error(`All AI parsing attempts failed for ${equipment} workout (tried models: ${AI_MODELS.join(', ')})`);
       }
       
       logStep(`Workout content acquired via ${parseMethod}`, { equipment, name: workoutContent.name });
@@ -2666,6 +2679,76 @@ Return JSON with these exact fields:
 
     // Notifications are handled separately by send-morning-notifications at 7:00 AM Cyprus time
     logStep("WOD generation complete - notifications will be sent at 7:00 AM by send-morning-notifications");
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // RECOVERY EMAIL: If a failed orchestrator run exists for today, send recovery notification
+    // ═══════════════════════════════════════════════════════════════════════════════
+    try {
+      const { data: failedRun } = await supabase
+        .from("wod_generation_runs")
+        .select("id, cyprus_date")
+        .eq("cyprus_date", effectiveDate)
+        .eq("status", "failed")
+        .limit(1)
+        .maybeSingle();
+
+      if (failedRun) {
+        logStep("Found failed orchestrator run - sending recovery email", { runId: failedRun.id });
+        
+        const resendApiKey = Deno.env.get("RESEND_API_KEY");
+        if (resendApiKey) {
+          const { getAdminNotificationEmail } = await import("../_shared/admin-settings.ts");
+          const adminEmail = await getAdminNotificationEmail(supabase);
+          const { Resend } = await import("https://esm.sh/resend@2.0.0");
+          const resend = new Resend(resendApiKey);
+          
+          const workoutNames = generatedWorkouts.map((w: any) => w.name).join(", ");
+          
+          await resend.emails.send({
+            from: "SmartyGym Alerts <notifications@smartygym.com>",
+            to: [adminEmail],
+            subject: `✅ RECOVERY: WODs Generated Successfully - ${effectiveDate}`,
+            html: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <h1 style="color: #059669; border-bottom: 2px solid #059669; padding-bottom: 10px;">
+                  ✅ WOD Recovery Successful
+                </h1>
+                <div style="background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; padding: 16px; margin: 20px 0;">
+                  <p style="margin: 0; font-weight: bold; color: #065f46;">
+                    The backup system successfully generated today's workouts after the primary run failed.
+                  </p>
+                </div>
+                <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                  <tr>
+                    <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; font-weight: bold;">Date:</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${effectiveDate}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; font-weight: bold;">Workouts Created:</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; color: #059669; font-weight: bold;">${workoutNames}</td>
+                  </tr>
+                </table>
+                <p style="color: #065f46;">No manual action needed. Everything is on track! 💪</p>
+                <p style="color: #6b7280; font-size: 12px; margin-top: 24px;">
+                  Automated recovery notification from SmartyGym.<br>
+                  Timestamp: ${new Date().toISOString()}
+                </p>
+              </div>
+            `,
+          });
+          
+          // Update the failed run to mark recovery
+          await supabase
+            .from("wod_generation_runs")
+            .update({ status: "recovered", completed_at: new Date().toISOString() })
+            .eq("id", failedRun.id);
+          
+          logStep("✅ Recovery email sent and run status updated");
+        }
+      }
+    } catch (recoveryEmailError) {
+      logStep("Recovery email check failed (non-critical)", { error: recoveryEmailError });
+    }
 
     return new Response(
       JSON.stringify({

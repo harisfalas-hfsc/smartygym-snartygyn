@@ -10,7 +10,7 @@ const corsHeaders = {
 };
 
 const MAX_ATTEMPTS = 3;
-const RETRY_DELAY_MS = 30000; // 30 seconds between retries
+const RETRY_DELAY_MS = 120000; // 120 seconds between retries (handles brief AI provider outages)
 
 interface WodVerificationResult {
   success: boolean;
@@ -156,13 +156,16 @@ async function sendAdminAlert(
   
   const emailHtml = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-      <h1 style="color: #dc2626; border-bottom: 2px solid #dc2626; padding-bottom: 10px;">
-        ⚠️ WOD Generation Failed
+      <h1 style="color: #e67e22; border-bottom: 2px solid #e67e22; padding-bottom: 10px;">
+        ⚠️ WOD Primary Generation Failed
       </h1>
       
-      <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 16px; margin: 20px 0;">
-        <p style="margin: 0; font-weight: bold; color: #dc2626;">
-          All ${MAX_ATTEMPTS} automatic retry attempts have failed.
+      <div style="background: #fef9f0; border: 1px solid #fcd9a0; border-radius: 8px; padding: 16px; margin: 20px 0;">
+        <p style="margin: 0; font-weight: bold; color: #b45309;">
+          All ${MAX_ATTEMPTS} primary attempts have failed, but a <strong>backup attempt is scheduled at 03:00 Cyprus time</strong>.
+        </p>
+        <p style="margin: 8px 0 0 0; color: #92400e;">
+          You will receive a ✅ recovery email if the backup succeeds. Only take manual action if you receive NO recovery email by 04:00 Cyprus time.
         </p>
       </div>
       
@@ -187,6 +190,10 @@ async function sendAdminAlert(
           <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; font-weight: bold;">Total Attempts:</td>
           <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${attempts.length}</td>
         </tr>
+        <tr>
+          <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; font-weight: bold;">Backup Scheduled:</td>
+          <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; color: #059669; font-weight: bold;">✅ 01:00 UTC / 03:00 Cyprus</td>
+        </tr>
       </table>
       
       <h3 style="margin-top: 24px;">Attempt Details:</h3>
@@ -194,12 +201,21 @@ async function sendAdminAlert(
         ${attemptDetails}
       </ul>
       
+      <div style="background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; padding: 16px; margin: 20px 0;">
+        <p style="margin: 0; font-weight: bold; color: #065f46;">
+          🔄 Backup System Active
+        </p>
+        <p style="margin: 8px 0 0 0; color: #065f46;">
+          A backup generation attempt will run at <strong>03:00 Cyprus time</strong>. If it succeeds, you'll receive a recovery confirmation email. No manual action needed unless you don't get that confirmation by 04:00.
+        </p>
+      </div>
+      
       <div style="background: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px; padding: 16px; margin: 20px 0;">
         <p style="margin: 0; font-weight: bold; color: #92400e;">
-          🔧 Action Required:
+          🔧 Manual Fallback (if backup also fails):
         </p>
         <p style="margin: 8px 0 0 0; color: #92400e;">
-          Go to <strong>Admin → WOD Manager → Generate New WOD</strong> and click <strong>"Regenerate Today"</strong> to manually create the missing workouts.
+          Go to <strong>Admin → WOD Manager → Generate New WOD</strong> and click <strong>"Regenerate Today"</strong>.
         </p>
       </div>
       
