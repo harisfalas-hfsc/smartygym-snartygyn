@@ -218,6 +218,7 @@ const PREFIX_PATTERNS = [
   /^for\s*time:\s*/i,
   /^amrap\s*(?:\d+)?:\s*/i,
   /^emom\s*(?:\d+)?:\s*/i,
+  /^minute\s*\d+:\s*/i,
   /^accumulation\s*challenge:\s*/i,
   /^station\s*\d*:\s*/i,
   /^exercise\s*\d*:\s*/i,
@@ -274,8 +275,12 @@ function isLikelyExerciseName(text: string): boolean {
 function cleanExerciseName(text: string): string {
   let cleaned = text;
   cleaned = cleaned.replace(/^\d+\.\s*/, '');
+  // Strip leading quantity: "15 Kettlebell Swing" → "Kettlebell Swing"
+  cleaned = cleaned.replace(/^\d+\s+(?=[A-Z])/i, '').trim();
   // Strip superset labels like "A1:", "B:", "C2.", "D)" at the start (case-sensitive: A-D only uppercase)
   cleaned = cleaned.replace(/^[A-D]\d*[\.\:\)]\s*/, '').trim();
+  // Strip "Minute N:" prefix: "Minute 1: Kettlebell Swing" → "Kettlebell Swing"
+  cleaned = cleaned.replace(/^Minute\s*\d+\s*:\s*/i, '').trim();
   cleaned = cleaned.replace(/[:;.]+$/, '');
   cleaned = cleaned.replace(/\s+machine\s*$/i, '');
   cleaned = cleaned.replace(/:\s*\d+\s*(?:sets?|rounds?|reps?|x\s|×\s|min|sec).*/i, '').trim();
