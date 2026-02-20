@@ -1,84 +1,63 @@
 
+# Fix: Finisher View Buttons, Stripe Name Sync, and Comprehensive Audit
 
-# Fix: WOD Duplicate Names, Missing Exercise View Buttons, and Data Issues
+## Problems Found
 
-## Problems Identified
+### 1. Equipment WOD Finisher - "burpee" Has No View Button
+The finisher section content reads: "After each row, immediately perform burpee." The exercise-matching system skips this because:
+- The `extractExerciseNames` function filters out text starting with "perform" (line 257 of exercise-matching.ts)
+- "burpee" is embedded mid-sentence, not on its own line as a standalone exercise
+- The section IS being processed (finisher has `process: true`), but the extraction logic cannot parse "burpee" from that sentence structure
 
-### 1. Both WODs Have the Same Name ("Summit Gauntlet")
-**Root Cause**: In `generate-workout-of-day/index.ts`, the variable `firstWorkoutName` is initialized as `""` on line 639 but **never updated** after the first workout is generated. The `bannedNameInstruction` on line 677 checks `if (firstWorkoutName)` -- which is always empty, so the AI is never told to avoid reusing the name. Both BODYWEIGHT and EQUIPMENT workouts receive the same name.
+**Fix**: The `main_workout` HTML for the Equipment WOD needs the finisher section's "burpee" replaced with proper `{{exercise:1160:burpee}}` markup via a direct database update. Additionally, improve `extractExerciseNames` to detect exercise names embedded after "perform" verbs.
 
-### 2. Main Workout and Finisher Exercises Missing View Buttons
-**Root Cause**: The AI generated some exercises as plain text (e.g., "15 Kettlebell Swing", "12 Barbell Jump Squat") instead of using `{{exercise:ID:Name}}` markup. The exercise-matching safety net on the backend ran but failed to match these because:
-- The text includes quantities and modifiers ("15 Kettlebell Swing (heavy kettlebell)") that the fuzzy matcher struggles with
-- The exercises DO exist in the library (verified: id `0549` = "kettlebell swing", id `0053` = "barbell jump squat", id `0295` = "dumbbell clean", id `0811` = "trap bar deadlift", id `1160` = "burpee")
+### 2. Stripe Product Name Not Updated
+When the name collision guard renamed the Equipment WOD from "Summit Gauntlet" to "Summit Complex" in the database, it only ran `supabase.update()` -- it never called `stripe.products.update()` to sync the Stripe product name. The Stripe product `prod_U0jYmll4JYuTu4` still shows "Summit Gauntlet".
 
-Other exercises in the Activation and Cool Down sections DO have valid markup (e.g., `{{exercise:1511:hamstring stretch}}`) and those View buttons work correctly. The problem is isolated to exercises the AI wrote as plain text and the safety net couldn't match.
+**Fix**: 
+- Update the name collision guard in `generate-workout-of-day/index.ts` to also update the Stripe product name when renaming
+- Immediately fix the current Stripe product via the Stripe API
 
-### 3. Invalid Exercise Markup IDs
-Some markup uses non-existent IDs like `{{exercise:cat-cow-stretch:Cat-Cow Stretch}}`. While the Cat-Cow Stretch exercise exists in the library, its actual ID is `cat-cow-stretch` -- so these ARE valid. The issue is specifically with the Main Workout and Finisher sections where plain text was used instead of markup.
+### 3. Bodyweight WOD Finisher - Already Correct
+The Bodyweight WOD finisher has proper markup: `{{exercise:v-up:V-Up}}`, `{{exercise:broad-jump:Broad Jump}}`, `{{exercise:3361:skater hops}}`. No action needed.
 
-## Fix Plan
+### 4. Training Programs - All Have Markup
+All 20 visible training programs show `HAS_MARKUP` status for their `weekly_schedule` field. No action needed.
 
-### Fix 1: Set `firstWorkoutName` After First Workout Generation (Critical)
+## Implementation Plan
 
-**File**: `supabase/functions/generate-workout-of-day/index.ts`
+### Step 1: Fix Today's Equipment WOD Finisher (Database)
+Update the `main_workout` HTML for `WOD-CH-E-1771549202373` to replace "burpee" with `{{exercise:1160:burpee}}` in the finisher section.
 
-After the workout content is acquired (around line 1997), add:
+### Step 2: Fix Stripe Product Name (Stripe API)
+Update Stripe product `prod_U0jYmll4JYuTu4` name from "Summit Gauntlet" to "Summit Complex".
+
+### Step 3: Add Stripe Name Sync to Collision Guard
+In `generate-workout-of-day/index.ts`, after the name collision guard renames the workout in the database (around line 2471), add a Stripe product update call:
 ```
-if (!firstWorkoutName && workoutContent.name) {
-  firstWorkoutName = workoutContent.name;
+// Also update Stripe product name
+const workoutRecord = await supabase.from("admin_workouts")
+  .select("stripe_product_id").eq("id", generatedWorkouts[1].id).single();
+if (workoutRecord.data?.stripe_product_id) {
+  await stripe.products.update(workoutRecord.data.stripe_product_id, { name: newName });
 }
 ```
 
-This ensures the second workout (EQUIPMENT) receives the `bannedNameInstruction` with the first workout's name, preventing duplicate names.
+### Step 4: Improve Exercise Extraction for "perform X" Patterns
+In `exercise-matching.ts`, add a new extraction pattern in `extractExerciseNames` that catches "perform [exercise]" patterns. Currently line 257 filters out ALL text starting with "perform". Change this to:
+- Still skip generic instructional text like "perform each exercise for 30 seconds"
+- But extract the exercise name after "perform" when it matches a known pattern (e.g., "perform burpee" should extract "burpee")
 
-Additionally, add a **post-insert name deduplication check**: after both workouts are inserted, if they somehow still share the same name, append the equipment type to the second workout's name (e.g., "Summit Gauntlet" becomes "Summit Gauntlet (Equipment)").
+Specifically, in the `<br>`-separated lines handler (Pattern 4), add handling for "perform X" where X is a short exercise candidate.
 
-### Fix 2: Improve Exercise Matching Safety Net
-
-**File**: `supabase/functions/_shared/exercise-matching.ts`
-
-The safety net needs to better handle exercises embedded in workout text with quantities and modifiers. The current matching strips some characters but struggles with lines like "15 Kettlebell Swing (heavy kettlebell)" because it tries to match the entire line segment.
-
-Improvement: Before fuzzy matching, strip leading quantities (digits) and trailing parenthetical modifiers from exercise candidates. For example:
-- "15 Kettlebell Swing (heavy kettlebell)" --> extract "Kettlebell Swing" for matching
-- "12 Barbell Jump Squat (light barbell)" --> extract "Barbell Jump Squat" for matching
-- "10 Dumbbell Clean (heavy dumbbells)" --> extract "Dumbbell Clean" for matching
-
-### Fix 3: Fix Today's WODs in Database (Immediate Data Repair)
-
-Run SQL to:
-1. Rename the EQUIPMENT WOD to a different name (since they're both "Summit Gauntlet")
-2. Re-process the `main_workout` HTML for both WODs to add proper `{{exercise:ID:Name}}` markup for the plain-text exercises
-
-This will be done by invoking the existing `regenerate-broken-programs` pattern or by direct SQL update with corrected HTML.
-
-### Fix 4: Post-Generation Name Collision Guard
-
-**File**: `supabase/functions/generate-workout-of-day/index.ts`
-
-After the generation loop (around line 2452), add a final name-collision check:
-```
-if (generatedWorkouts.length === 2 && generatedWorkouts[0].name === generatedWorkouts[1].name) {
-  // Rename the second workout
-  const suffix = generatedWorkouts[1].equipment === "EQUIPMENT" ? " (Equipment)" : " (Bodyweight)";
-  const newName = generatedWorkouts[1].name + suffix;
-  await supabase.from("admin_workouts").update({ name: newName }).eq("id", generatedWorkouts[1].id);
-}
-```
+### Step 5: Run Reprocess on Today's WODs
+After the database fix and code deployment, run the `reprocess-wod-exercises` function on both today's WODs to catch any remaining unmatched exercises.
 
 ## Files to Modify
 
 | File | Change |
 |------|--------|
-| `supabase/functions/generate-workout-of-day/index.ts` | Fix `firstWorkoutName` assignment + add post-loop name dedup guard |
-| `supabase/functions/_shared/exercise-matching.ts` | Improve text extraction to strip quantities/modifiers before matching |
-| Database (SQL) | Repair today's WODs: rename Equipment WOD + fix exercise markup |
-
-## Verification
-
-After implementation:
-- Confirm today's Equipment WOD has a different name from the Bodyweight WOD
-- Confirm all exercises in Main Workout and Finisher sections show View buttons
-- Confirm the exercise IDs in markup correspond to real exercises in the library
-
+| `supabase/functions/generate-workout-of-day/index.ts` | Add Stripe name sync to collision guard |
+| `supabase/functions/_shared/exercise-matching.ts` | Handle "perform [exercise]" extraction pattern |
+| Database (SQL) | Fix Equipment WOD finisher "burpee" markup |
+| Stripe API | Update product `prod_U0jYmll4JYuTu4` name to "Summit Complex" |
