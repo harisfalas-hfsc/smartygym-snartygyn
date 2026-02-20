@@ -16,13 +16,22 @@ export const HTMLContent: React.FC<HTMLContentProps> = ({ content, className }) 
   });
 
   return (
-    <div
-      className={cn("prose prose-sm max-w-none dark:prose-invert text-display break-words-safe", className)}
-      dangerouslySetInnerHTML={{ __html: sanitizedContent }}
-      style={{
-        width: '100%',
-        maxWidth: '100%',
-      }}
-    />
+    <>
+      <style>{`
+        .tiptap-paragraph:empty {
+          margin: 0;
+          padding: 0;
+          line-height: 0.5;
+        }
+      `}</style>
+      <div
+        className={cn("prose prose-sm max-w-none dark:prose-invert text-display break-words-safe", className)}
+        dangerouslySetInnerHTML={{ __html: sanitizedContent }}
+        style={{
+          width: '100%',
+          maxWidth: '100%',
+        }}
+      />
+    </>
   );
 };

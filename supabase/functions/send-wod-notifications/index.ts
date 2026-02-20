@@ -19,19 +19,10 @@ const DEFAULT_DASHBOARD_SUBJECT = "🏆 Today's Workouts: Choose Your Style!";
 const DEFAULT_EMAIL_SUBJECT = "🏆 Today's Workouts";
 
 function buildDefaultDashboardContent(category: string, format: string, difficulty: string, difficultyStars: number, bodyweightName: string, equipmentName: string): string {
-  return `<p class="tiptap-paragraph"><strong>🏆 Today's Workouts of the Day</strong></p>
-<p class="tiptap-paragraph"></p>
-<p class="tiptap-paragraph">Today we have <strong>TWO</strong> workout options following our ${category} day:</p>
-<p class="tiptap-paragraph"></p>
+  return `<p class="tiptap-paragraph">Today is <strong>${category}</strong> day with <strong>TWO</strong> workout options:</p>
 <p class="tiptap-paragraph"><strong>🏠 No Equipment:</strong> ${bodyweightName}</p>
 <p class="tiptap-paragraph"><strong>🏋️ With Equipment:</strong> ${equipmentName}</p>
-<p class="tiptap-paragraph"></p>
-<p class="tiptap-paragraph">${category} | ${format} | ${difficulty} (${difficultyStars}⭐)</p>
-<p class="tiptap-paragraph"></p>
-<p class="tiptap-paragraph">Choose based on your situation: at home, traveling, or at the gym!</p>
-<p class="tiptap-paragraph"></p>
-<p class="tiptap-paragraph">Available for €3.99 each or included with Premium.</p>
-<p class="tiptap-paragraph"></p>
+<p class="tiptap-paragraph">${format} | ${difficulty} (${difficultyStars}⭐) | Available for €3.99 each or included with Premium.</p>
 <p class="tiptap-paragraph"><a href="https://smartygym.com/workout/wod">View Today's Workouts →</a></p>`;
 }
 
