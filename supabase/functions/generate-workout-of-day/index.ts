@@ -2412,6 +2412,12 @@ Return JSON with these exact fields:
         equipment: equipment,
         image_url: imageUrl
       });
+
+      // Track first workout name to prevent duplicate names on the second workout
+      if (!firstWorkoutName && workoutContent.name) {
+        firstWorkoutName = workoutContent.name;
+        logStep(`Tracked first workout name for dedup`, { firstWorkoutName });
+      }
       
       } catch (equipmentError: any) {
         // ═══════════════════════════════════════════════════════════════════════════════
@@ -2451,6 +2457,21 @@ Return JSON with these exact fields:
       }
     }
     
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // POST-LOOP NAME COLLISION GUARD: If both workouts share the same name, rename
+    // ═══════════════════════════════════════════════════════════════════════════════
+    if (generatedWorkouts.length === 2 && generatedWorkouts[0].name === generatedWorkouts[1].name) {
+      const suffix = generatedWorkouts[1].equipment === "EQUIPMENT" ? " (Equipment)" : " (Bodyweight)";
+      const newName = generatedWorkouts[1].name + suffix;
+      logStep(`⚠️ Name collision detected! Renaming second workout`, {
+        original: generatedWorkouts[1].name,
+        newName,
+        equipment: generatedWorkouts[1].equipment
+      });
+      await supabase.from("admin_workouts").update({ name: newName }).eq("id", generatedWorkouts[1].id);
+      generatedWorkouts[1].name = newName;
+    }
+
     // ═══════════════════════════════════════════════════════════════════════════════
     // POST-LOOP SUMMARY: Report what was generated and what failed
     // ═══════════════════════════════════════════════════════════════════════════════
