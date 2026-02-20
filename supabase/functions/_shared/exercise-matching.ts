@@ -254,7 +254,15 @@ function isLikelyExerciseName(text: string): boolean {
   if (STRUCTURAL_HEADERS.some(h => lower === h || lower.startsWith(h + ' ') || lower.startsWith(h + ':'))) return false;
   if (STRUCTURAL_WORD_STARTS.some(w => lower.startsWith(w))) return false;
   
-  if (/^(perform|complete|repeat|do|hold|maintain|keep|breathe|inhale|exhale|record|retest|practice|simply|include|stop|start|add|test|target|focus|intensity|rep range|reps|both|after|immediately|as many|for max|for time|for energy)\s/i.test(lower)) return false;
+  // Allow "perform X" where X is a short exercise candidate (1-3 words), skip longer instructional text
+  if (/^perform\s/i.test(lower)) {
+    const afterPerform = lower.replace(/^perform\s+/i, '').replace(/[.,!?]$/, '').trim();
+    if (afterPerform.split(/\s+/).length <= 3 && afterPerform.length >= 3) {
+      return true; // Short exercise name after "perform" — allow it
+    }
+    return false;
+  }
+  if (/^(complete|repeat|do|hold|maintain|keep|breathe|inhale|exhale|record|retest|practice|simply|include|stop|start|add|test|target|focus|intensity|rep range|reps|both|after|immediately|as many|for max|for time|for energy)\s/i.test(lower)) return false;
   if (/^\d+\s*(seconds?|minutes?|mins?|secs?)\s/i.test(lower)) return false;
   if (/^\d+\s*rounds?\s/i.test(lower)) return false;
   if (!/^[A-Za-z]/.test(text)) return false;

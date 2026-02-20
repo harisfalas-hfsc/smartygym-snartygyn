@@ -2470,6 +2470,18 @@ Return JSON with these exact fields:
       });
       await supabase.from("admin_workouts").update({ name: newName }).eq("id", generatedWorkouts[1].id);
       generatedWorkouts[1].name = newName;
+      
+      // Also sync Stripe product name
+      const { data: stripeRecord } = await supabase.from("admin_workouts")
+        .select("stripe_product_id").eq("id", generatedWorkouts[1].id).single();
+      if (stripeRecord?.stripe_product_id) {
+        try {
+          await stripe.products.update(stripeRecord.stripe_product_id, { name: newName });
+          logStep(`✅ Stripe product renamed`, { productId: stripeRecord.stripe_product_id, newName });
+        } catch (stripeErr) {
+          logStep(`⚠️ Failed to rename Stripe product`, { error: stripeErr });
+        }
+      }
     }
 
     // ═══════════════════════════════════════════════════════════════════════════════
