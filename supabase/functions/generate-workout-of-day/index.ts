@@ -1749,6 +1749,38 @@ SECTION NAMING RULE (MANDATORY):
 - The creative workout name belongs ONLY in the "name" field of the JSON response
 - The ENTIRE workout shares ONE name. Sections do not get their own names.
 
+GOLD STANDARD REPS & SETS TEMPLATE (FOR STRENGTH / MOBILITY & STABILITY / PILATES):
+The EMOM template above shows timed formats. For REPS & SETS workouts, use THIS template instead:
+
+<p class="tiptap-paragraph">💪 <strong><u>Main Workout (REPS & SETS 20')</u></strong></p>
+<ul class="tiptap-bullet-list">
+<li class="tiptap-list-item"><p class="tiptap-paragraph">Push-up - 4 sets x 10 reps (3-1-1-0 tempo)</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph">Inverted Row - 4 sets x 8-10 reps (controlled tempo)</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph">Pike Push-up - 3 sets x 8 reps (2-1-1-0 tempo)</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph">Bench Dip - 3 sets x 12 reps</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph">Plank Shoulder Tap - 3 sets x 10 reps per side</p></li>
+</ul>
+<p class="tiptap-paragraph">Rest 90-120 seconds between sets for compound movements, 60-90 seconds for isolation.</p>
+
+REPS & SETS FORMAT MANDATORY RULE:
+Every exercise line in a REPS & SETS workout MUST include sets x reps prescription.
+Examples of CORRECT formatting:
+  "Push-up - 4 sets x 10 reps (3-1-1-0 tempo)"
+  "Barbell Bench Press - 4 sets x 8-10 reps (3-1-1-0 tempo)"
+  "Plank - 3 sets x 30-45 seconds"
+  "Glute Bridge - 3 sets x 12 reps per side"
+Examples of INVALID formatting (NEVER DO THIS):
+  "Push-up" ← INVALID: no sets, no reps, completely unusable
+  "Bench Press" ← INVALID: the user has no idea what to do
+  "Squat (bodyweight)" ← INVALID: still missing prescription
+An exercise listed without sets x reps prescription is INVALID and UNPROFESSIONAL.
+This rule applies to EVERY exercise in the Main Workout AND Finisher sections.
+
+Difficulty-based prescription guidelines for REPS & SETS:
+- 1-2 stars (Beginner): 3 sets x 10-12 reps, moderate tempo, longer rest (90-120s)
+- 3-4 stars (Intermediate): 4 sets x 8-10 reps, controlled tempo (3-1-1-0), moderate rest (60-90s)
+- 5-6 stars (Advanced): 4-5 sets x 5-8 reps, strict tempo (4-1-1-0), shorter rest (60-90s)
+
 COMPACT SPACING RULES:
 - NO empty paragraphs between exercises within a section
 - ONE empty paragraph between sections only
