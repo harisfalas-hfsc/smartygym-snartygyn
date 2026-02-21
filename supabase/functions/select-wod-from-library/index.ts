@@ -35,9 +35,10 @@ serve(async (req) => {
 
     // Determine today's date in Cyprus timezone
     let targetDate: string;
+    let parsedBody: any = {};
     try {
-      const body = await req.json();
-      targetDate = body?.targetDate || getCyprusDateStr();
+      parsedBody = await req.json();
+      targetDate = parsedBody?.targetDate || getCyprusDateStr();
     } catch {
       targetDate = getCyprusDateStr();
     }
@@ -204,20 +205,29 @@ serve(async (req) => {
       })),
     });
 
-    // Call send-wod-notifications
-    try {
-      const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
-      await fetch(`${supabaseUrl}/functions/v1/send-wod-notifications`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${anonKey}`,
-        },
-        body: JSON.stringify({}),
-      });
-      logStep("WOD notifications triggered");
-    } catch (notifError) {
-      logStep("WARNING: Failed to trigger WOD notifications", { error: String(notifError) });
+    // Call send-wod-notifications ONLY if selecting for today's date
+    const todayCyprus = getCyprusDateStr();
+    const skipNotifications = parsedBody?.skipNotifications === true;
+
+    if (targetDate !== todayCyprus) {
+      logStep("Skipping notifications - selection is for a different date", { targetDate, todayCyprus });
+    } else if (skipNotifications) {
+      logStep("Skipping notifications - explicitly requested via skipNotifications parameter");
+    } else {
+      try {
+        const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+        await fetch(`${supabaseUrl}/functions/v1/send-wod-notifications`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${anonKey}`,
+          },
+          body: JSON.stringify({}),
+        });
+        logStep("WOD notifications triggered");
+      } catch (notifError) {
+        logStep("WARNING: Failed to trigger WOD notifications", { error: String(notifError) });
+      }
     }
 
     logStep("Library selection complete", {
