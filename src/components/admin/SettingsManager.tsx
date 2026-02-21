@@ -313,6 +313,9 @@ export const SettingsManager = () => {
     setRegenerateWodLoading(true);
     setRegenerateWodResult(null);
     try {
+      // Archive existing WODs first (never delete - preserves Stripe products & purchase records)
+      await supabase.functions.invoke('archive-old-wods', {});
+      
       const { data, error } = await supabase.functions.invoke('generate-workout-of-day');
       
       if (error) throw error;
