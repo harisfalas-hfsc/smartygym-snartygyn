@@ -90,23 +90,24 @@ serve(async (req) => {
     }
 
     if (!todaysWods || todaysWods.length === 0) {
-      logStep("No WODs found for today - checking for any active WODs");
-      
-      const { data: activeWods } = await supabase
-        .from("admin_workouts")
-        .select("*")
-        .eq("is_workout_of_day", true)
-        .limit(2);
-      
-      if (!activeWods || activeWods.length === 0) {
-        logStep("No active WODs found at all");
-        return new Response(
-          JSON.stringify({ success: true, sent: false, reason: "No WODs to notify about" }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
-        );
-      }
-      
-      todaysWods.push(...activeWods);
+      logStep("No WODs found for today's date, skipping notifications");
+      return new Response(
+        JSON.stringify({ success: true, sent: false, reason: "No WODs found for today's date" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
+      );
+    }
+
+    // Verify that the WODs are actually for today's Cyprus date
+    const wodsForToday = todaysWods.filter(w => w.generated_for_date === todayStr);
+    if (wodsForToday.length === 0) {
+      logStep("WODs found but none match today's date - skipping notifications", {
+        todayStr,
+        wodDates: todaysWods.map(w => w.generated_for_date),
+      });
+      return new Response(
+        JSON.stringify({ success: true, sent: false, reason: "No WODs match today's date" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
+      );
     }
 
     const bodyweightWod = todaysWods.find(w => w.equipment === "BODYWEIGHT");
