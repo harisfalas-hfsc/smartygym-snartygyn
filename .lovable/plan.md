@@ -1,179 +1,60 @@
 
+# Fix: Prevent Accidental WOD Notifications from Library Selection
 
-# WOD Library Selection Mode
+## What Went Wrong
 
-## Overview
+During testing, the `select-wod-from-library` function was called directly. It selected workouts and then unconditionally triggered `send-wod-notifications`, which emailed all 42 users. The toggle button itself is safe (it only saves a database setting), but the edge function has no safeguards against being called outside the normal scheduled flow.
 
-Add a "Library Mode" toggle in the WOD admin panel. When ON, the daily automated system stops generating new workouts and instead picks existing workouts from the library based on the same periodization rules. The selected workouts appear in the Workout of the Day section AND remain visible in their categories. No archiving, no unarchiving, no new Stripe products, no cloning.
+## Fixes Required
 
-## How It Works
+### 1. Add notification guard to `select-wod-from-library`
 
-**Generate Mode (current, default -- no changes):**
-- AI creates 2 new workouts daily, new Stripe products, new images
-- At midnight: archived (unflagged, serial number assigned, joins library)
+The function currently always calls `send-wod-notifications` at the end (line 208-221). This needs a guard:
 
-**Library Mode (new):**
-- System reads today's periodization (category, difficulty, equipment)
-- Finds 1 Bodyweight + 1 Equipment workout from the library that match
-- Sets `is_workout_of_day = true` and `generated_for_date = today` on them
-- The workouts ALSO remain visible in their category pages (no hiding)
-- At midnight: simply clears `is_workout_of_day` and `generated_for_date` back to their original values -- no serial number changes, no archiving
-- Anyone who previously purchased the workout can still see it -- nothing changes for them
-- Zero AI credits consumed
+- Only trigger notifications if the `targetDate` equals today's Cyprus date (not a future/past date)
+- Accept an optional `skipNotifications` parameter so manual/test calls can explicitly skip emails
+- Add a log message when notifications are skipped and why
 
-## Database Changes
+### 2. Add date-aware deduplication to `send-wod-notifications`
 
-### 1. Add `wod_mode` to config table
+The `send-wod-notifications` function checks if it already sent a notification "today" but doesn't verify that the WODs it found are actually for today. Add a check: if the WODs' `generated_for_date` does not match today's Cyprus date, skip sending.
 
-```sql
-ALTER TABLE wod_auto_generation_config 
-ADD COLUMN wod_mode text NOT NULL DEFAULT 'generate';
-```
+### 3. No changes to the toggle button
 
-Default is `'generate'` -- current behavior, nothing changes until you toggle.
+The `WODManager.tsx` toggle only writes `wod_mode` to the database. It does NOT call any generation or selection function. This is correct and needs no changes.
 
-### 2. Add `wod_source` to admin_workouts
+## Technical Details
 
-```sql
-ALTER TABLE admin_workouts 
-ADD COLUMN wod_source text DEFAULT NULL;
-```
+### File: `supabase/functions/select-wod-from-library/index.ts`
 
-- `NULL` = normal library workout or AI-generated WOD (all existing data)
-- `'library'` = this workout was selected from the library for today's WOD
-
-This lets the archive function know: if `wod_source = 'library'`, just clear the WOD flags without touching serial numbers or doing any archiving logic.
-
-### 3. Create cooldown tracking table
-
-```sql
-CREATE TABLE wod_selection_cooldown (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  source_workout_id text NOT NULL,
-  selected_for_date date NOT NULL,
-  category text NOT NULL,
-  difficulty text,
-  equipment text,
-  created_at timestamptz DEFAULT now(),
-  UNIQUE(source_workout_id, selected_for_date)
-);
-```
-
-With RLS: admin read access, service role full access.
-
-## Key Frontend Fix: Category Pages
-
-Currently `WorkoutDetail.tsx` line 197 excludes all workouts where `is_workout_of_day = true` from category galleries. In Library Mode, the workout must appear in BOTH the WOD section AND its category page.
-
-The fix: only exclude workouts where `is_workout_of_day = true` AND `wod_source` is NOT `'library'`.
-
-```typescript
-// Before:
-const isNotActiveWOD = workout.is_workout_of_day !== true;
-
-// After:
-const isNotActiveWOD = workout.is_workout_of_day !== true || workout.wod_source === 'library';
-```
-
-This means:
-- AI-generated WODs: hidden from category pages (current behavior, unchanged)
-- Library-selected WODs: visible in BOTH the WOD section AND their category page
-
-## Archive Function Update
-
-The `archive-old-wods` function (runs at midnight) needs one check:
+**Change**: Wrap the notification call (lines 207-221) with a date guard:
 
 ```text
-For each workout with is_workout_of_day = true:
-  IF wod_source = 'library':
-    - Just clear: is_workout_of_day = false, generated_for_date = null, wod_source = null
-    - Do NOT assign new serial number (it already has one)
-    - Do NOT touch anything else
-  ELSE (normal AI-generated WOD):
-    - Current behavior: unflag, assign serial number, clear generated_for_date
+Before calling send-wod-notifications:
+  IF targetDate !== getCyprusDateStr():
+    Log "Skipping notifications - selection is for a different date"
+    Do NOT call send-wod-notifications
+  ELSE IF body contains skipNotifications = true:
+    Log "Skipping notifications - explicitly requested"
+    Do NOT call send-wod-notifications  
+  ELSE:
+    Call send-wod-notifications (current behavior)
 ```
 
-## New Edge Function: select-wod-from-library
+### File: `supabase/functions/send-wod-notifications/index.ts`
 
-### Logic
-
-```text
-1. Read periodization for today --> category, difficulty, difficulty_stars
-
-2. Query admin_workouts WHERE:
-   - category = today's category
-   - difficulty = today's difficulty
-   - equipment = 'BODYWEIGHT'
-   - is_workout_of_day = false (not currently serving as WOD)
-   - id NOT IN cooldown (last 60 days)
-
-3. Pick one. If all are in cooldown, pick the oldest-used one.
-
-4. Repeat for equipment = 'EQUIPMENT'
-   (For RECOVERY days: pick one VARIOUS workout)
-
-5. UPDATE the selected workouts:
-   - is_workout_of_day = true
-   - generated_for_date = today
-   - wod_source = 'library'
-
-6. Insert cooldown records
-
-7. Call send-wod-notifications
-
-8. Log to wod_generation_runs with trigger_source = 'library-selection'
-```
-
-No new rows. No new Stripe products. The workouts keep their existing IDs, names, images, serial numbers, and Stripe links.
-
-## Orchestrator Update
-
-Small addition to `wod-generation-orchestrator`:
-
-```text
-1. Read wod_auto_generation_config.wod_mode
-2. If mode = 'select': call select-wod-from-library (no retries needed -- it's a simple DB query)
-3. If mode = 'generate': call generate-workout-of-day (current flow, unchanged)
-4. Verification stays the same (checks if WODs with is_workout_of_day=true exist for the date)
-```
-
-## Admin UI Changes
-
-### WODManager.tsx -- Toggle in Header
-
-A toggle switch near existing buttons:
-- Label: **"Library Mode"**
-- Subtitle: "Pick from existing workouts (no AI credits)"
-- Green badge when ON, default badge when OFF
-- Reads/writes `wod_mode` in `wod_auto_generation_config`
-
-### WODAutoGenConfigDialog.tsx -- Mode in Settings
-
-Same toggle also in the settings dialog with explanation:
-- Generate Mode: "AI creates brand new workouts daily (uses AI credits)"
-- Library Mode: "System picks from existing library based on periodization (zero AI credits)"
+**Change**: After finding today's WODs (line ~86), add a verification that `generated_for_date` matches today's Cyprus date string. If no WODs match today specifically, return early with "No WODs for today."
 
 ## Files Summary
 
 | File | Action | Change |
 |------|--------|--------|
-| Database migration | ADD | `wod_mode` column, `wod_source` column, `wod_selection_cooldown` table |
-| `supabase/functions/select-wod-from-library/index.ts` | CREATE | New function: flags existing workouts as WOD |
-| `supabase/functions/wod-generation-orchestrator/index.ts` | MODIFY | Check `wod_mode`, route to correct function |
-| `supabase/functions/archive-old-wods/index.ts` | MODIFY | Skip archiving for library-selected WODs (just clear flags) |
-| `supabase/config.toml` | MODIFY | Add `select-wod-from-library` entry |
-| `src/components/admin/WODManager.tsx` | MODIFY | Add Library Mode toggle |
-| `src/components/admin/WODAutoGenConfigDialog.tsx` | MODIFY | Add mode toggle in settings |
-| `src/pages/WorkoutDetail.tsx` | MODIFY | Allow library-selected WODs to remain visible in category pages |
+| `supabase/functions/select-wod-from-library/index.ts` | MODIFY | Add date guard + skipNotifications parameter before calling notifications |
+| `supabase/functions/send-wod-notifications/index.ts` | MODIFY | Add date verification for WODs before sending |
 
-## What Stays Exactly the Same
+## What This Prevents
 
-- The 84-day periodization cycle -- completely untouched
-- `generate-workout-of-day` function -- zero changes
-- Notification system -- both modes trigger the same `send-wod-notifications`
-- Health checks and tomorrow readiness -- they check if WODs exist regardless of how they got there
-- WOD schedule preview calendar -- same periodization data
-- All existing Stripe products -- no new products created
-- All existing workouts in the library -- no rows created or deleted
-- Standalone purchases -- users who bought a workout keep access, nothing changes
-
+- Testing or manual function calls will not send emails to all users
+- Future-date selections will not trigger notifications
+- The orchestrator's scheduled run (which always uses today's date) continues working normally
+- The toggle button remains safe -- it only saves a database setting
