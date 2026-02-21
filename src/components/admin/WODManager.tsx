@@ -4,11 +4,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
-import { Flame, Play, RefreshCw, Calendar, Dumbbell, Star, TrendingUp, Clock, ExternalLink, ImageIcon, BookOpen, Edit, Settings, HeartPulse, CheckCircle, AlertTriangle, XCircle, Archive, Bell, Rocket } from "lucide-react";
+import { Flame, Play, RefreshCw, Calendar, Dumbbell, Star, TrendingUp, Clock, ExternalLink, ImageIcon, BookOpen, Edit, Settings, HeartPulse, CheckCircle, AlertTriangle, XCircle, Archive, Bell, Rocket, Library } from "lucide-react";
 import { format, addDays } from "date-fns";
 import { WODSchedulePreview } from "./WODSchedulePreview";
 import { PeriodizationSystemDialog } from "./PeriodizationSystemDialog";
@@ -829,6 +831,47 @@ export const WODManager = () => {
             hasTodayWOD={currentWODs && currentWODs.length > 0}
           />
           
+        </div>
+      </div>
+
+      {/* Library Mode Toggle */}
+      <div className="flex items-center justify-between p-4 bg-muted/50 border rounded-lg">
+        <div className="flex items-center gap-3">
+          <Library className="h-5 w-5 text-primary" />
+          <div>
+            <Label className="text-sm font-medium">Library Mode</Label>
+            <p className="text-xs text-muted-foreground">
+              Pick from existing workouts (no AI credits)
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          {(wodAutoGenConfig as any)?.wod_mode === 'select' ? (
+            <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500/30">Library Mode Active</Badge>
+          ) : (
+            <Badge variant="outline" className="text-muted-foreground">AI Generation</Badge>
+          )}
+          <Switch
+            checked={(wodAutoGenConfig as any)?.wod_mode === 'select'}
+            onCheckedChange={async (checked) => {
+              const newMode = checked ? 'select' : 'generate';
+              const { error } = await supabase
+                .from("wod_auto_generation_config")
+                .update({ wod_mode: newMode } as any)
+                .eq("id", wodAutoGenConfig?.id);
+              
+              if (error) {
+                toast.error("Failed to update WOD mode");
+              } else {
+                toast.success(checked ? "Library Mode enabled" : "AI Generation mode restored", {
+                  description: checked 
+                    ? "System will pick from existing workouts (zero AI credits)" 
+                    : "System will generate new workouts daily using AI",
+                });
+                queryClient.invalidateQueries({ queryKey: ["wod-auto-gen-config"] });
+              }
+            }}
+          />
         </div>
       </div>
 

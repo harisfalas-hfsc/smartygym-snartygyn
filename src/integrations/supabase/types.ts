@@ -149,6 +149,7 @@ export type Database = {
           type: string
           updated_at: string | null
           warm_up: string | null
+          wod_source: string | null
         }
         Insert: {
           activation?: string | null
@@ -185,6 +186,7 @@ export type Database = {
           type: string
           updated_at?: string | null
           warm_up?: string | null
+          wod_source?: string | null
         }
         Update: {
           activation?: string | null
@@ -221,6 +223,7 @@ export type Database = {
           type?: string
           updated_at?: string | null
           warm_up?: string | null
+          wod_source?: string | null
         }
         Relationships: []
       }
@@ -2807,6 +2810,7 @@ export type Database = {
           pause_reason: string | null
           paused_until: string | null
           updated_at: string
+          wod_mode: string
         }
         Insert: {
           created_at?: string
@@ -2817,6 +2821,7 @@ export type Database = {
           pause_reason?: string | null
           paused_until?: string | null
           updated_at?: string
+          wod_mode?: string
         }
         Update: {
           created_at?: string
@@ -2827,6 +2832,7 @@ export type Database = {
           pause_reason?: string | null
           paused_until?: string | null
           updated_at?: string
+          wod_mode?: string
         }
         Relationships: []
       }
@@ -2875,6 +2881,36 @@ export type Database = {
           status?: string
           trigger_source?: string | null
           wods_created?: Json | null
+        }
+        Relationships: []
+      }
+      wod_selection_cooldown: {
+        Row: {
+          category: string
+          created_at: string | null
+          difficulty: string | null
+          equipment: string | null
+          id: string
+          selected_for_date: string
+          source_workout_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          difficulty?: string | null
+          equipment?: string | null
+          id?: string
+          selected_for_date: string
+          source_workout_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          difficulty?: string | null
+          equipment?: string | null
+          id?: string
+          selected_for_date?: string
+          source_workout_id?: string
         }
         Relationships: []
       }

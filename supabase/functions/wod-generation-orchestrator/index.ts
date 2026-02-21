@@ -279,6 +279,70 @@ serve(async (req) => {
   const effectiveDate = getCyprusDateStr();
   console.log(`[ORCHESTRATOR] Effective date: ${effectiveDate}`);
 
+  // Check WOD mode from config
+  const { data: wodConfig } = await supabase
+    .from("wod_auto_generation_config")
+    .select("wod_mode")
+    .limit(1)
+    .single();
+
+  const wodMode = wodConfig?.wod_mode || "generate";
+  console.log(`[ORCHESTRATOR] WOD mode: ${wodMode}`);
+
+  // If Library Mode, call select-wod-from-library instead
+  if (wodMode === "select") {
+    console.log("[ORCHESTRATOR] Library Mode active - calling select-wod-from-library");
+    try {
+      const response = await fetch(`${supabaseUrl}/functions/v1/select-wod-from-library`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${anonKey}`,
+        },
+        body: JSON.stringify({ targetDate: effectiveDate }),
+      });
+
+      const responseData = await response.json();
+
+      if (response.ok && responseData.success) {
+        console.log("[ORCHESTRATOR] Library selection successful", responseData);
+        return new Response(
+          JSON.stringify({
+            success: true,
+            mode: "library-selection",
+            message: "WOD selected from library",
+            date: effectiveDate,
+            selected: responseData.selected,
+          }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      } else {
+        console.error("[ORCHESTRATOR] Library selection failed:", responseData);
+        return new Response(
+          JSON.stringify({
+            success: false,
+            mode: "library-selection",
+            message: "Library selection failed",
+            error: responseData.error || "Unknown error",
+            date: effectiveDate,
+          }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    } catch (libError) {
+      console.error("[ORCHESTRATOR] Library selection error:", libError);
+      return new Response(
+        JSON.stringify({
+          success: false,
+          mode: "library-selection",
+          error: libError instanceof Error ? libError.message : String(libError),
+        }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+  }
+
+  // Generate Mode (default) - existing logic unchanged
   // Determine expected count based on day type
   const recoveryDay = isRecoveryDay(effectiveDate);
   const expectedCount = recoveryDay ? 1 : 2;

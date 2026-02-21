@@ -194,7 +194,7 @@ const WorkoutDetail = () => {
   // First filter by category from URL - EXCLUDE active WODs (they should only appear on WOD page)
   const currentTypeWorkouts = allWorkouts.filter(workout => {
     const categoryMatch = workout.category?.toUpperCase().includes(mappedCategory);
-    const isNotActiveWOD = workout.is_workout_of_day !== true; // Exclude active WODs from category galleries
+    const isNotActiveWOD = workout.is_workout_of_day !== true || (workout as any).wod_source === 'library'; // Library-selected WODs remain visible in categories
     return categoryMatch && isNotActiveWOD;
   });
   
