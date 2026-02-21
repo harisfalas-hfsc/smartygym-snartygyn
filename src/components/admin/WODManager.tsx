@@ -1198,15 +1198,10 @@ export const WODManager = () => {
                     variant="outline" 
                     size="sm"
                     onClick={async () => {
-                      if (!confirm("This will delete the current WODs and generate new ones. Continue?")) return;
+                      if (!confirm("This will archive the current WODs and generate new ones. Continue?")) return;
                       
-                      // Delete existing WODs for today
-                      const today = format(new Date(), "yyyy-MM-dd");
-                      await supabase
-                        .from("admin_workouts")
-                        .delete()
-                        .eq("is_workout_of_day", true)
-                        .eq("generated_for_date", today);
+                      // Archive existing WODs (never delete - preserves Stripe products & purchase records)
+                      await supabase.functions.invoke("archive-old-wods", {});
                       
                       // Generate new WODs
                       await handleGenerateWOD();
