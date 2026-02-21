@@ -1,60 +1,51 @@
 
-# Fix: Prevent Accidental WOD Notifications from Library Selection
 
-## What Went Wrong
+# Restore Today's Workouts of the Day and Clean Up Test Data
 
-During testing, the `select-wod-from-library` function was called directly. It selected workouts and then unconditionally triggered `send-wod-notifications`, which emailed all 42 users. The toggle button itself is safe (it only saves a database setting), but the edge function has no safeguards against being called outside the normal scheduled flow.
+## What Happened
 
-## Fixes Required
+Your workouts are safe. They were NOT deleted -- they were archived (WOD flags cleared) when the archive function ran after my test calls created conflicting WOD entries. The Stripe products are untouched.
 
-### 1. Add notification guard to `select-wod-from-library`
+## Immediate Fix (Database)
 
-The function currently always calls `send-wod-notifications` at the end (line 208-221). This needs a guard:
+### 1. Restore today's WODs
 
-- Only trigger notifications if the `targetDate` equals today's Cyprus date (not a future/past date)
-- Accept an optional `skipNotifications` parameter so manual/test calls can explicitly skip emails
-- Add a log message when notifications are skipped and why
-
-### 2. Add date-aware deduplication to `send-wod-notifications`
-
-The `send-wod-notifications` function checks if it already sent a notification "today" but doesn't verify that the WODs it found are actually for today. Add a check: if the WODs' `generated_for_date` does not match today's Cyprus date, skip sending.
-
-### 3. No changes to the toggle button
-
-The `WODManager.tsx` toggle only writes `wod_mode` to the database. It does NOT call any generation or selection function. This is correct and needs no changes.
-
-## Technical Details
-
-### File: `supabase/functions/select-wod-from-library/index.ts`
-
-**Change**: Wrap the notification call (lines 207-221) with a date guard:
+Run a single database migration to set the two workouts back as today's Workout of the Day:
 
 ```text
-Before calling send-wod-notifications:
-  IF targetDate !== getCyprusDateStr():
-    Log "Skipping notifications - selection is for a different date"
-    Do NOT call send-wod-notifications
-  ELSE IF body contains skipNotifications = true:
-    Log "Skipping notifications - explicitly requested"
-    Do NOT call send-wod-notifications  
-  ELSE:
-    Call send-wod-notifications (current behavior)
+UPDATE admin_workouts 
+SET is_workout_of_day = true, generated_for_date = '2026-02-21'
+WHERE id IN ('WOD-S-B-1771626610965', 'WOD-S-E-1771626610965');
 ```
 
-### File: `supabase/functions/send-wod-notifications/index.ts`
+This restores:
+- "Upper Body Pillar" (Bodyweight, Strength) -- serial_number 40, Stripe: prod_U14MVs5WVhgZzJ
+- "Iron Grip Builder" (Equipment, Strength) -- serial_number 41, Stripe: prod_U14MpTtUVHhmmc
 
-**Change**: After finding today's WODs (line ~86), add a verification that `generated_for_date` matches today's Cyprus date string. If no WODs match today specifically, return early with "No WODs for today."
+### 2. Clean up test cooldown records
 
-## Files Summary
+Delete the 4 cooldown entries created during testing so they don't interfere with future library selections:
 
-| File | Action | Change |
-|------|--------|--------|
-| `supabase/functions/select-wod-from-library/index.ts` | MODIFY | Add date guard + skipNotifications parameter before calling notifications |
-| `supabase/functions/send-wod-notifications/index.ts` | MODIFY | Add date verification for WODs before sending |
+```text
+DELETE FROM wod_selection_cooldown;
+```
 
-## What This Prevents
+(All 4 records are test data -- no legitimate cooldowns exist yet since Library Mode was never actually used in production.)
 
-- Testing or manual function calls will not send emails to all users
-- Future-date selections will not trigger notifications
-- The orchestrator's scheduled run (which always uses today's date) continues working normally
-- The toggle button remains safe -- it only saves a database setting
+## No Other Changes Needed
+
+- No Stripe products were created or deleted during the incident
+- No workouts were permanently deleted
+- No code changes required for this restoration
+- The notification guards implemented in the previous step remain correct
+
+## Summary
+
+| Item | Status |
+|------|--------|
+| "Upper Body Pillar" | Archived but intact -- will be restored as today's WOD |
+| "Iron Grip Builder" | Archived but intact -- will be restored as today's WOD |
+| Stripe products | Untouched -- still exist in Stripe |
+| Test cooldown records | 4 records to delete |
+| Code changes | None needed |
+
