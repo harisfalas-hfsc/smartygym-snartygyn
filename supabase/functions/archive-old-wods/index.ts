@@ -57,8 +57,31 @@ serve(async (req) => {
     const archivedWods: string[] = [];
 
     for (const wod of wodsToArchive) {
-      logStep("Archiving WOD", { id: wod.id, name: wod.name, category: wod.category, generated_for_date: wod.generated_for_date });
+      logStep("Archiving WOD", { id: wod.id, name: wod.name, category: wod.category, generated_for_date: wod.generated_for_date, wod_source: wod.wod_source });
 
+      // Library-selected WODs: just clear the WOD flags, no serial number changes
+      if (wod.wod_source === 'library') {
+        const { error: clearError } = await supabase
+          .from("admin_workouts")
+          .update({
+            is_workout_of_day: false,
+            generated_for_date: null,
+            wod_source: null,
+            updated_at: new Date().toISOString()
+          })
+          .eq("id", wod.id);
+
+        if (clearError) {
+          logStep("Error clearing library WOD flags", { id: wod.id, error: clearError.message });
+        } else {
+          archivedCount++;
+          archivedWods.push(`${wod.name} (${wod.category}) [library-cleared]`);
+          logStep("Library WOD flags cleared", { id: wod.id, name: wod.name });
+        }
+        continue;
+      }
+
+      // AI-generated WODs: normal archival with serial number assignment
       // Get the next serial number for this category using persistent counter
       const { data: counterSettings, error: counterError } = await supabase
         .from("system_settings")
@@ -101,7 +124,7 @@ serve(async (req) => {
         .update({
           is_workout_of_day: false,
           serial_number: nextSerialNumber,
-          generated_for_date: null, // Clear the generation date
+          generated_for_date: null,
           updated_at: new Date().toISOString()
         })
         .eq("id", wod.id);

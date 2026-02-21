@@ -17,7 +17,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
 import { format, addDays } from "date-fns";
-import { CalendarIcon, Clock, AlertCircle } from "lucide-react";
+import { CalendarIcon, Clock, AlertCircle, Library, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CronTimeInput } from "./CronTimeInput";
 import { utcToCyprus, cyprusToUtc } from "@/lib/cyprusDate";
@@ -36,6 +36,7 @@ export const WODAutoGenConfigDialog = ({ open, onOpenChange }: WODAutoGenConfigD
   const [cyprusMinute, setCyprusMinute] = useState(30);
   const [pauseMode, setPauseMode] = useState<"none" | "tomorrow" | "days" | "indefinite">("none");
   const [pauseUntilDate, setPauseUntilDate] = useState<Date | undefined>(undefined);
+  const [wodMode, setWodMode] = useState<"generate" | "select">("generate");
   const [isSaving, setIsSaving] = useState(false);
 
   // Fetch current config
@@ -57,6 +58,7 @@ export const WODAutoGenConfigDialog = ({ open, onOpenChange }: WODAutoGenConfigD
   useEffect(() => {
     if (config) {
       setIsEnabled(config.is_enabled);
+      setWodMode((config as any).wod_mode || "generate");
       
       // Convert stored UTC time to Cyprus time for display
       const utcHour = config.generation_hour_utc ?? 22;
@@ -117,6 +119,7 @@ export const WODAutoGenConfigDialog = ({ open, onOpenChange }: WODAutoGenConfigD
           generation_minute_utc: cyprusMinute,
           paused_until: pausedUntil,
           pause_reason: pauseReason,
+          wod_mode: wodMode,
         } as any)
         .eq("id", config?.id);
 
@@ -185,12 +188,54 @@ export const WODAutoGenConfigDialog = ({ open, onOpenChange }: WODAutoGenConfigD
           </div>
         ) : (
           <div className="space-y-6 py-4">
+            {/* WOD Mode Toggle */}
+            <div className="space-y-3">
+              <Label>WOD Source Mode</Label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setWodMode("generate")}
+                  className={cn(
+                    "flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all cursor-pointer",
+                    wodMode === "generate"
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:border-muted-foreground/50"
+                  )}
+                >
+                  <Sparkles className={cn("h-6 w-6", wodMode === "generate" ? "text-primary" : "text-muted-foreground")} />
+                  <div className="text-center">
+                    <p className="text-sm font-medium">AI Generate</p>
+                    <p className="text-xs text-muted-foreground">Create new workouts daily</p>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setWodMode("select")}
+                  className={cn(
+                    "flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all cursor-pointer",
+                    wodMode === "select"
+                      ? "border-green-500 bg-green-500/5"
+                      : "border-border hover:border-muted-foreground/50"
+                  )}
+                >
+                  <Library className={cn("h-6 w-6", wodMode === "select" ? "text-green-500" : "text-muted-foreground")} />
+                  <div className="text-center">
+                    <p className="text-sm font-medium">Library Mode</p>
+                    <p className="text-xs text-muted-foreground">Pick from existing (0 AI credits)</p>
+                  </div>
+                </button>
+              </div>
+            </div>
+
             {/* Enable/Disable Toggle */}
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label htmlFor="auto-gen-enabled">Auto-Generation</Label>
                 <p className="text-xs text-muted-foreground">
-                  Automatically generate WODs daily
+                  {wodMode === "select" 
+                    ? "Automatically pick WODs from library daily"
+                    : "Automatically generate WODs daily"
+                  }
                 </p>
               </div>
               <Switch
