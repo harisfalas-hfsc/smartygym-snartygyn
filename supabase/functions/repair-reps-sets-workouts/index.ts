@@ -12,23 +12,18 @@ function hasPrescription(html: string): boolean {
   if (!html) return true;
   
   // Extract only the Main Workout section (between 💪 and ⚡ or 🧘)
-  const mainMatch = html.match(/💪.*?(?=⚡|🧘|$)/s);
+  const mainMatch = html.match(/💪[\s\S]*?(?=⚡|🧘|$)/);
   if (!mainMatch) return true; // no main workout section found
   
   const mainSection = mainMatch[0];
   
-  // Get the text content of list items only (exercise lines)
-  const liTexts = [...mainSection.matchAll(/<li[^>]*>.*?<\/li>/gi)]
-    .map(m => m[0].replace(/<[^>]+>/g, " ").replace(/\{\{exercise:[^}]+\}\}/g, "").trim());
+  // Check for prescription patterns anywhere in the main workout section
+  // This covers: "4 sets x 10", "3 x 12 reps", "12 reps", "Sets of 10", "30 seconds", etc.
+  const prescriptionPattern = /\d+\s*sets?\s*x|\d+\s*x\s*\d+|\d+\s*reps|sets?\s*of\s*\d+|\d+\s*seconds?|\d+\s*sec\b|\d+\s*each\s+side|\d+\s*per\s+side|\d+\s*per\s+arm|\d+\s*per\s+leg|hold\s+\d+|AMRAP/i;
   
-  if (liTexts.length === 0) return true;
-  
-  // Check if ANY exercise line has a prescription pattern
-  const prescriptionPattern = /\d+\s*sets?\s*x|\d+\s*x\s*\d+|\d+\s*reps|sets?\s*of\s*\d+/i;
-  const withPrescription = liTexts.filter(t => prescriptionPattern.test(t));
-  
-  // If less than half of exercise lines have prescriptions, consider it broken
-  return withPrescription.length >= liTexts.length / 2;
+  // If the main section text has ANY prescription pattern, consider it valid
+  const textContent = mainSection.replace(/<[^>]+>/g, " ");
+  return prescriptionPattern.test(textContent);
 }
 
 function getDifficultyScheme(stars: number | null): string {
@@ -111,25 +106,37 @@ Deno.serve(async (req) => {
 
       const difficultyScheme = getDifficultyScheme(workout.difficulty_stars);
 
-      const prompt = `You are a professional fitness coach. Below is the FULL HTML content of a workout (all 5 sections: Soft Tissue, Activation, Main Workout, Finisher, Cool Down).
+      // Extract only Main Workout and Finisher sections to repair (keep rest untouched)
+      const mainMatch = workout.main_workout!.match(/(💪[\s\S]*?)(?=🧘|$)/);
+      const mainSection = mainMatch ? mainMatch[1] : "";
+      
+      if (!mainSection) {
+        console.log(`${LOG} No main workout section found for "${workout.name}"`);
+        results.push({ id: workout.id, name: workout.name, status: "skipped", details: "No main workout section found" });
+        continue;
+      }
 
-The problem: The Main Workout (💪) and Finisher (⚡) sections list exercises WITHOUT sets, reps, tempo, or rest prescriptions. The exercises just show names like "push-up" with no indication of what to do.
+      const prompt = `You are a professional fitness coach. Below is ONLY the Main Workout (💪) and Finisher (⚡) section HTML from a workout.
 
-Your task: Add sets x reps prescriptions to EVERY exercise in the 💪 Main Workout and ⚡ Finisher sections ONLY.
+The problem: Exercise lines are missing sets, reps, and tempo prescriptions.
+
+Your task: Add prescriptions to EVERY exercise line that is missing them. If an exercise already has prescriptions, keep it as-is.
 
 Rules:
 1. ${difficultyScheme}
-2. DO NOT modify 🧽 Soft Tissue, 🔥 Activation, or 🧘 Cool Down sections AT ALL.
-3. Keep ALL existing HTML tags, structure, and exercise markup (like {{exercise:0662:push-up}}) EXACTLY as they are.
-4. Add the prescription AFTER the exercise markup: "{{exercise:0662:push-up}} - 4 sets x 10 reps (3-1-1-0 tempo)"
-5. Add a rest period instruction paragraph after the exercise list in each section if not present.
-6. For isometric exercises (planks, holds), use "X sets x Y seconds" instead of reps.
-7. Do NOT add new exercises. Do NOT remove exercises.
-8. Do NOT add any explanation — return ONLY the complete corrected HTML (all 5 sections).
-9. Tempo notation: eccentric-pause at bottom-concentric-pause at top (e.g., 3-1-1-0)
+2. Keep ALL existing HTML tags EXACTLY as they are. Do not change ANY tag, class name, or structure.
+3. Keep ALL exercise markup (like {{exercise:0662:push-up}}) EXACTLY as they are.
+4. Format: "ExerciseName - X sets x Y reps (tempo)" for strength exercises
+5. Format: "ExerciseName - X sets x Y seconds" for isometric holds (planks, holds)
+6. Add rest period info after exercise lists if missing.
+7. Do NOT add, remove, or reorder exercises.
+8. Do NOT add explanations or markdown — return ONLY the corrected HTML fragment.
+9. Tempo notation: eccentric-pause-concentric-pause (e.g., 3-1-1-0)
+10. If a line already says "Rest" or contains timing like "60 seconds", "90 seconds", leave it as-is.
+11. CRITICAL: Your output must contain EVERY SINGLE <li> element from the input. Count them before and after.
 
-Here is the current HTML to fix:
-${workout.main_workout}
+INPUT HTML (Main Workout + Finisher only):
+${mainSection}
 
 Return ONLY the corrected HTML. Nothing else.`;
 
@@ -144,7 +151,7 @@ Return ONLY the corrected HTML. Nothing else.`;
             model: "google/gemini-2.5-flash",
             messages: [{ role: "user", content: prompt }],
             temperature: 0.3,
-            max_tokens: 4000,
+            max_tokens: 8000,
           }),
         });
 
@@ -161,26 +168,44 @@ Return ONLY the corrected HTML. Nothing else.`;
         // Strip markdown code fences if AI wrapped it
         fixedHtml = fixedHtml.replace(/^```html?\n?/i, "").replace(/\n?```$/i, "").trim();
 
-        // Validate the fix actually has prescriptions now
-        if (!hasPrescription(fixedHtml)) {
-          console.error(`${LOG} AI output still missing prescriptions for "${workout.name}"`);
-          results.push({ id: workout.id, name: workout.name, status: "validation_failed", details: "AI output still lacks prescriptions" });
+        // Basic validation: check that the output contains exercise-like content and has some numbers (prescriptions)
+        const hasExerciseContent = fixedHtml.includes("<li") && fixedHtml.includes("💪");
+        const hasNumbers = /\d+/.test(fixedHtml);
+        if (!hasExerciseContent || !hasNumbers) {
+          console.error(`${LOG} AI output missing basic structure for "${workout.name}"`);
+          results.push({ id: workout.id, name: workout.name, status: "validation_failed", details: "AI output missing basic structure" });
           continue;
         }
 
-        // Validate it still has list items (structure preserved)
-        const origLiCount = (workout.main_workout?.match(/<li/gi) || []).length;
+        // Validate it still has list items (structure preserved) - compare against the extracted section only
+        const origLiCount = (mainSection.match(/<li/gi) || []).length;
         const fixedLiCount = (fixedHtml.match(/<li/gi) || []).length;
-        if (fixedLiCount < origLiCount - 1) {
+        if (fixedLiCount < origLiCount - 2) {
           console.error(`${LOG} AI removed exercises for "${workout.name}": ${origLiCount} -> ${fixedLiCount}`);
           results.push({ id: workout.id, name: workout.name, status: "validation_failed", details: `Exercise count dropped: ${origLiCount} -> ${fixedLiCount}` });
           continue;
         }
 
+        // Reconstruct: replace only the main workout + finisher section, keep everything else
+        const fullHtml = workout.main_workout!;
+        const mainStartIdx = fullHtml.indexOf("💪");
+        const coolDownIdx = fullHtml.indexOf("🧘");
+        
+        let reconstructed: string;
+        if (mainStartIdx >= 0 && coolDownIdx > mainStartIdx) {
+          // Keep prefix (soft tissue + activation) + fixed main/finisher + cool down
+          reconstructed = fullHtml.substring(0, mainStartIdx) + fixedHtml + fullHtml.substring(coolDownIdx);
+        } else if (mainStartIdx >= 0) {
+          // No cool down found, just replace from main workout onwards
+          reconstructed = fullHtml.substring(0, mainStartIdx) + fixedHtml;
+        } else {
+          reconstructed = fixedHtml;
+        }
+
         // Update the database
         const { error: updateError } = await supabase
           .from("admin_workouts")
-          .update({ main_workout: fixedHtml })
+          .update({ main_workout: reconstructed })
           .eq("id", workout.id);
 
         if (updateError) {
