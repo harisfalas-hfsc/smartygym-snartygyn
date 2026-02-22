@@ -239,7 +239,7 @@ const IndividualTrainingProgram = () => {
                   category: dbProgram.category || undefined
                 }}
                 content={
-                  <div className="space-y-6">
+                  <div className="space-y-6 workout-content">
                     {dbProgram.description && (
                       <div>
                         <h2 className="text-lg font-semibold mb-2">Description</h2>

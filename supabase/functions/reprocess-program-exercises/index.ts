@@ -13,6 +13,7 @@ import {
   rejectNonLibraryExercises,
   type ExerciseBasic,
 } from "../_shared/exercise-matching.ts";
+import { normalizeWorkoutHtml } from "../_shared/html-normalizer.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -154,6 +155,11 @@ Deno.serve(async (req) => {
           );
           updates[field] = rejection.processedContent;
         }
+      }
+
+      // ── NORMALIZE HTML before saving ──
+      for (const field of Object.keys(updates)) {
+        updates[field] = normalizeWorkoutHtml(updates[field]);
       }
 
       // Update the program with processed content
