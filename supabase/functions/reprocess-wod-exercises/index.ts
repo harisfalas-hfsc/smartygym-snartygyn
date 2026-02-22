@@ -10,6 +10,7 @@ import {
   processContentWithExerciseMatching,
   stripExerciseMarkup,
   logUnmatchedExercises,
+  guaranteeAllExercisesLinked,
   type ExerciseBasic,
 } from "../_shared/exercise-matching.ts";
 
@@ -160,6 +161,20 @@ Deno.serve(async (req) => {
         updates.finisher = result.processedContent;
         totalMatched += result.matched.length;
         allUnmatched.push(...result.unmatched);
+      }
+
+      // ── BULLETPROOF FINAL SWEEP on all fields ──
+      // Guarantee every exercise in every section gets a View button
+      for (const field of ["main_workout", "warm_up", "cool_down", "activation", "finisher"] as const) {
+        if (updates[field]) {
+          const sweep = guaranteeAllExercisesLinked(
+            updates[field],
+            exerciseLibrary as ExerciseBasic[],
+            `${LOG_PREFIX}[${field}-FINAL-SWEEP]`
+          );
+          updates[field] = sweep.processedContent;
+          totalMatched += sweep.forcedMatches.length;
+        }
       }
 
       // Update the WOD
