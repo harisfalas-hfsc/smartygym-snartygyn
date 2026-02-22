@@ -1,78 +1,34 @@
 
 
-# Permanent Formatting Consistency Fix -- Every Write Path Sealed
+# Finish Reprocessing ALL Remaining Content
 
-## The Real Problem
+## The Problem
+Only 125 of ~224 workouts were reprocessed. Zero training programs were reprocessed. The code fixes are deployed but ~99 workouts and ~28 programs still have broken formatting in the database.
 
-After a full audit of every function and UI component that writes workout or training program content to the database, I found **7 write paths** that either skip the HTML normalizer entirely or only partially normalize. This is why formatting keeps breaking -- fixing one path leaves others leaking bad HTML into the database.
+## The Fix
 
-## Complete Audit Results
+### Step 1: Reprocess remaining workouts
+Call `reprocess-wod-exercises` in batches of 15, starting from offset 125, with pauses between batches to avoid rate limits:
+- Batch 1: offset 125, size 15
+- Batch 2: offset 140, size 15
+- Batch 3: offset 155, size 15
+- Batch 4: offset 170, size 15
+- Batch 5: offset 185, size 15
+- Batch 6: offset 200, size 15
+- Batch 7: offset 215, size 15 (final batch)
 
-| Write Path | What It Does | Has Normalizer? |
-|---|---|---|
-| `generate-workout-of-day` | Creates daily WODs | Only on `main_workout` (misses description, instructions, tips) |
-| `generate-training-program` | Generates program content, returns to frontend | NO |
-| `regenerate-broken-programs` | Regenerates corrupted programs | NO |
-| `fix-workout-formatting` | Batch fixes workout HTML | NO |
-| `repair-content-formatting` | Repairs content spacing | NO |
-| `reprocess-wod-exercises` | Re-links exercises in WODs | YES (recently added) |
-| `reprocess-program-exercises` | Re-links exercises in programs | YES (recently added) |
-| `WorkoutEditDialog.tsx` (Admin UI) | Saves workout edits | Only on `main_workout` (misses finisher) |
-| `ProgramEditDialog.tsx` (Admin UI) | Saves program edits | NO |
+Each batch will wait 10-15 seconds before the next to stay within rate limits.
 
-That is 7 broken paths vs 2 working ones.
+### Step 2: Reprocess all training programs
+Call `reprocess-program-exercises` with no filters to process all ~28 programs at once (programs are fewer so a single call should work).
 
----
+### Step 3: Verify
+Query the database for a sample of workouts and programs to confirm the empty paragraph spacers between sections are present in the HTML.
 
-## The Fix: Seal Every Single Write Path
+## No Code Changes
+No files need to be modified. All code fixes are already deployed. This is purely about executing the reprocessing calls that were left unfinished.
 
-### 1. `generate-training-program/index.ts`
-Add `normalizeWorkoutHtml` import and apply it to the generated content before returning it to the frontend.
-
-### 2. `regenerate-broken-programs/index.ts`
-Add `normalizeWorkoutHtml` import. Apply it to `weekly_schedule`, `overview`, and `progression_plan` content before every `.update()` call (both "fix-only" mode at line 257 and "full regeneration" mode at line 376).
-
-### 3. `fix-workout-formatting/index.ts`
-Add `normalizeWorkoutHtml` import. Apply it to `main_workout`, `finisher`, `program_structure`, and `weekly_schedule` before every `.update()` call.
-
-### 4. `repair-content-formatting/index.ts`
-Add `normalizeWorkoutHtml` import. Apply it to every `repairResult.content` before writing to DB (single target at line 532, batch workouts at line 583, and batch programs at line 667).
-
-### 5. `generate-workout-of-day/index.ts`
-Extend the existing normalizer call to also normalize `description`, `instructions`, and `tips` fields before the database insert -- not just `main_workout`.
-
-### 6. `WorkoutEditDialog.tsx` (Admin UI)
-Extend the existing normalizer call to also normalize the `finisher` field before saving, in addition to `main_workout`.
-
-### 7. `ProgramEditDialog.tsx` (Admin UI)
-Add `normalizeWorkoutHtml` import from `@/utils/htmlNormalizer`. Apply it to `weekly_schedule` (`formData.training_program`) and `program_structure` (`formData.construction`) before the database `.update()` or `.insert()` call.
-
-### 8. Re-run full reprocessing
-After deploying all updated functions, trigger `reprocess-wod-exercises` (processAll) and `reprocess-program-exercises` (all programs) to normalize every existing record in the database.
-
----
-
-## What This Guarantees Going Forward
-
-- Every single path that writes workout or program content to the database will run `normalizeWorkoutHtml` as the absolute last step before the write
-- No function can save HTML without proper spacing between sections
-- No admin edit can save content without normalization
-- The CSS `workout-content` wrapper (already applied in previous fix) ensures consistent display
-- Exercise library-first enforcement remains intact in all generation and reprocessing functions
-- All existing content gets re-normalized to match the Gold Standard
-
----
-
-## Files Changed
-
-| File | Change |
-|---|---|
-| `supabase/functions/generate-training-program/index.ts` | Add normalizer import, apply before return |
-| `supabase/functions/regenerate-broken-programs/index.ts` | Add normalizer import, apply before both update paths |
-| `supabase/functions/fix-workout-formatting/index.ts` | Add normalizer import, apply before all updates |
-| `supabase/functions/repair-content-formatting/index.ts` | Add normalizer import, apply before all updates |
-| `supabase/functions/generate-workout-of-day/index.ts` | Extend normalizer to description, instructions, tips |
-| `src/components/admin/WorkoutEditDialog.tsx` | Extend normalizer to finisher field |
-| `src/components/admin/ProgramEditDialog.tsx` | Add normalizer import, apply to weekly_schedule and program_structure |
-| Post-deploy | Reprocess all workouts and programs |
-
+## What This Completes
+- All ~224 workouts will have normalized HTML with proper section spacing
+- All ~28 training programs will have normalized HTML with proper section spacing
+- Combined with the 7 sealed write paths, no future content can be saved without normalization
