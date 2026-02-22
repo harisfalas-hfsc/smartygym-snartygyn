@@ -1,35 +1,36 @@
 
-# Fix: Health Audit Function Not Deployed (404 NOT_FOUND)
 
-## Root Cause
+# Fix: Optimize SEO Gaps Check to Prevent Audit Timeout
 
-The `run-system-health-audit` edge function is **not deployed** in the production environment. Every time the cron job fires (daily at 14:00 UTC), it hits a **404 NOT_FOUND** error and silently fails. This is why you haven't received any audit emails for the past 8 days (since February 14).
+## Root Cause of Functions Disappearing
 
-The `net._http_response` table shows dozens of 404 responses with the message `"Requested function was not found"` -- this confirms the function was removed from the deployed environment, likely as a side effect of recent batch deployments.
+Every time I deploy edge functions, the deployment system replaces functions as a batch. When I deployed new or modified functions (like `reprocess-wod-exercises`, LLM SEO changes, etc.), the deployment only included the functions being touched in that session. The others -- including `run-system-health-audit`, `trigger-full-audit`, and `get-audit-status` -- were dropped as a side effect. **I caused this.** Not intentionally, but as a consequence of how the deployment batching works. No external actor was involved.
 
-The last successful audit was **February 14, 2026**. Zero audit records exist after that date.
+## Root Cause of Audit Timeout
 
-Additionally, there are other functions also returning 404 repeatedly, suggesting multiple functions were lost during recent deployments.
+The audit function has a 60-second Edge Function time limit (with a 50-second internal safety buffer). The SEO Gaps check at line 2618 makes a **synchronous call** to `refresh-seo-metadata`, which then processes hundreds of workouts one by one -- inserting SEO records and hitting duplicate key errors for each existing entry. This single call can consume 30-60+ seconds alone, pushing the audit past the CPU timeout.
 
-## What Needs to Be Done
+## The Fix
 
-### Step 1: Redeploy the `run-system-health-audit` function
-The code is intact in the codebase (3,172 lines, all imports valid). It just needs to be redeployed.
+### Change 1: Remove auto-fix from SEO Gaps check
+The SEO gaps check should **only count and report** missing SEO metadata -- not attempt to auto-fix by calling `refresh-seo-metadata`. That call blocks the entire audit.
 
-### Step 2: Redeploy `trigger-full-audit` and `get-audit-status`
-These companion functions should also be redeployed to ensure the full audit system works end-to-end.
+- Keep the counting logic (lines 2588-2611) -- this is fast (3 queries)
+- Remove the `fetch()` call to `refresh-seo-metadata` (lines 2617-2647)
+- If items are missing, report the count as a warning with a note: "Run refresh-seo-metadata manually to fix"
+- If nothing is missing, report pass as before
 
-### Step 3: Identify and redeploy other missing functions
-Check which other cron-called functions are returning 404 and redeploy them too. Based on the `net._http_response` data, there are multiple 404s every 10 minutes, meaning other scheduled functions are also missing.
+### Change 2: Add timeout guard to SEO Gaps check
+Add an `isApproachingTimeout()` check before the SEO gaps section starts, same as the broken images check already has. If the audit is already near timeout when it reaches SEO gaps, skip it gracefully.
 
-### Step 4: Verify the audit runs and email is sent
-After deployment, manually trigger the audit with `sendEmail: true` to confirm the full pipeline works: audit runs, results are saved to database, and the email report is delivered.
+## Files Modified
 
-## No Code Changes Required
-The function code is correct. The only issue is that it was removed from the deployed environment. This is a deployment-only fix.
+| File | Change |
+|------|--------|
+| `supabase/functions/run-system-health-audit/index.ts` | Remove synchronous `refresh-seo-metadata` call from SEO gaps check; add timeout guard |
 
-## Files to Redeploy
-- `supabase/functions/run-system-health-audit/index.ts` -- the main audit function
-- `supabase/functions/trigger-full-audit/index.ts` -- the trigger wrapper
-- `supabase/functions/get-audit-status/index.ts` -- the status checker
-- Any other functions identified as returning 404 in production
+## What This Fixes
+- The daily audit will complete within the 50-second budget every time
+- You will receive your daily audit email reliably
+- SEO gaps are still detected and reported -- they just won't be auto-fixed inline (you can trigger `refresh-seo-metadata` separately if needed)
+
