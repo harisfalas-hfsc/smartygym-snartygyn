@@ -265,7 +265,7 @@ const IndividualWorkout = () => {
                         category: getCategoryLabel(dbWorkout.category)
                       }}
                       content={
-                        <div className="space-y-6">
+                        <div className="space-y-6 workout-content">
                             {dbWorkout.description && (
                             <div>
                               <h2 className="text-lg font-semibold mb-2">Description</h2>
