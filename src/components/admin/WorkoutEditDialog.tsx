@@ -276,12 +276,14 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
       // This prevents spacing issues from rich text editor output
       // ═══════════════════════════════════════════════════════════════════════════════
       const normalizedMainWorkout = normalizeWorkoutHtml(formData.main_workout || '');
+      const normalizedFinisher = normalizeWorkoutHtml(formData.finisher || '');
 
       // Prepare data with backward compatibility
       const saveData = {
         ...formData,
         image_url: imageUrl,
-        main_workout: normalizedMainWorkout,  // Use normalized content
+        main_workout: normalizedMainWorkout,
+        finisher: normalizedFinisher,
         type: formData.format || formData.category,
         difficulty: getDifficultyLabel(formData.difficulty_stars),
         price: formData.price ? parseFloat(formData.price) : null,

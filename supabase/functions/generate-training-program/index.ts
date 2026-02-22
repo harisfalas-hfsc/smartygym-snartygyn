@@ -10,6 +10,7 @@ import {
   rejectNonLibraryExercises,
   type ExerciseBasic 
 } from "../_shared/exercise-matching.ts";
+import { normalizeWorkoutHtml } from "../_shared/html-normalizer.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -553,6 +554,11 @@ Available exercises: ${exerciseList}`;
         );
       }
     }
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // GOLD STANDARD: Normalize HTML before returning to frontend
+    // ═══════════════════════════════════════════════════════════════════════════════
+    generatedPlan = normalizeWorkoutHtml(generatedPlan);
 
     return new Response(JSON.stringify({ plan: generatedPlan }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
