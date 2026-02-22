@@ -2581,84 +2581,63 @@ const allStripeItems = [
     }
 
     // ============================================
-    // SEO GAPS CHECK (Auto-Fix)
+    // SEO GAPS CHECK (Report Only - No Auto-Fix)
     // ============================================
-    console.log("🔍 Checking SEO metadata gaps...");
-
-    try {
-      // Get all visible workouts and programs
-      const { data: allWorkouts } = await supabase
-        .from('admin_workouts')
-        .select('id, name')
-        .eq('is_visible', true);
-
-      const { data: allPrograms } = await supabase
-        .from('admin_training_programs')
-        .select('id, name')
-        .eq('is_visible', true);
-
-      // Get existing SEO metadata
-      const { data: existingSeo } = await supabase
-        .from('seo_metadata')
-        .select('content_id, content_type');
-
-      const seoSet = new Set(
-        (existingSeo || []).map(s => `${s.content_type}:${s.content_id}`)
+    if (isApproachingTimeout()) {
+      console.log("[SEO-GAPS] ⏱️ Skipping - approaching timeout");
+      addCheck('SEO', 'SEO Metadata Coverage',
+        'Skipped - audit approaching time limit',
+        'skip',
+        'SEO gap check skipped to ensure audit completes. Run refresh-seo-metadata separately.'
       );
+    } else {
+      console.log("🔍 Checking SEO metadata gaps...");
 
-      const workoutsMissingSeo = (allWorkouts || []).filter(w => !seoSet.has(`workout:${w.id}`));
-      const programsMissingSeo = (allPrograms || []).filter(p => !seoSet.has(`program:${p.id}`));
-      const totalMissing = workoutsMissingSeo.length + programsMissingSeo.length;
+      try {
+        const { data: allWorkouts } = await supabase
+          .from('admin_workouts')
+          .select('id, name')
+          .eq('is_visible', true);
 
-      if (totalMissing > 0) {
-        // Auto-fix: Call refresh-seo-metadata edge function
-        console.log(`[SEO-GAPS] Found ${totalMissing} items missing SEO metadata. Auto-generating...`);
-        
-        try {
-          const seoResponse = await fetch(`${supabaseUrl}/functions/v1/refresh-seo-metadata`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${supabaseServiceKey}`
-            },
-            body: JSON.stringify({ force: false, sendEmail: false }) // Don't send SEO email during auto-fix
-          });
-          
-          if (seoResponse.ok) {
-            const seoResult = await seoResponse.json();
-            addCheck('SEO', 'SEO Metadata Coverage',
-              `Auto-generated SEO for ${totalMissing} items`,
-              'warning',
-              `Fixed: ${workoutsMissingSeo.length} workouts, ${programsMissingSeo.length} programs`
-            );
-          } else {
-            addCheck('SEO', 'SEO Metadata Coverage',
-              `${totalMissing} items missing SEO metadata`,
-              'warning',
-              `Auto-fix attempted but failed. Missing: ${workoutsMissingSeo.slice(0, 3).map(w => w.name).join(', ')}`
-            );
-          }
-        } catch (seoError) {
+        const { data: allPrograms } = await supabase
+          .from('admin_training_programs')
+          .select('id, name')
+          .eq('is_visible', true);
+
+        const { data: existingSeo } = await supabase
+          .from('seo_metadata')
+          .select('content_id, content_type');
+
+        const seoSet = new Set(
+          (existingSeo || []).map(s => `${s.content_type}:${s.content_id}`)
+        );
+
+        const workoutsMissingSeo = (allWorkouts || []).filter(w => !seoSet.has(`workout:${w.id}`));
+        const programsMissingSeo = (allPrograms || []).filter(p => !seoSet.has(`program:${p.id}`));
+        const totalMissing = workoutsMissingSeo.length + programsMissingSeo.length;
+
+        if (totalMissing > 0) {
+          console.log(`[SEO-GAPS] Found ${totalMissing} items missing SEO metadata.`);
           addCheck('SEO', 'SEO Metadata Coverage',
             `${totalMissing} items missing SEO metadata`,
             'warning',
-            `Auto-fix failed: ${seoError instanceof Error ? seoError.message : 'Unknown error'}`
+            `Missing: ${workoutsMissingSeo.length} workouts, ${programsMissingSeo.length} programs. Run refresh-seo-metadata manually to fix.`
+          );
+        } else {
+          addCheck('SEO', 'SEO Metadata Coverage',
+            `All ${(allWorkouts?.length || 0) + (allPrograms?.length || 0)} visible items have SEO metadata`,
+            'pass',
+            'Complete SEO coverage for all workouts and programs'
           );
         }
-      } else {
+      } catch (seoCheckError) {
+        console.error("[SEO-GAPS] Error:", seoCheckError);
         addCheck('SEO', 'SEO Metadata Coverage',
-          `All ${(allWorkouts?.length || 0) + (allPrograms?.length || 0)} visible items have SEO metadata`,
-          'pass',
-          'Complete SEO coverage for all workouts and programs'
+          'Failed to check SEO metadata',
+          'fail',
+          seoCheckError instanceof Error ? seoCheckError.message : 'Unknown error'
         );
       }
-    } catch (seoCheckError) {
-      console.error("[SEO-GAPS] Error:", seoCheckError);
-      addCheck('SEO', 'SEO Metadata Coverage',
-        'Failed to check SEO metadata',
-        'fail',
-        seoCheckError instanceof Error ? seoCheckError.message : 'Unknown error'
-      );
     }
 
     // ============================================
