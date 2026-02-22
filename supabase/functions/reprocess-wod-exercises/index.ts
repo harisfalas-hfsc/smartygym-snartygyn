@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════════════════
-// REPROCESS WOD EXERCISES
+// REPROCESS WOD EXERCISES  (v2 — re-deployed 2026-02-22)
 // Re-runs exercise matching on existing WODs to fix broken/missing links
 // SECTION-AWARE: Only processes Main Workout and Finisher sections
 // ═══════════════════════════════════════════════════════════════════════════════
