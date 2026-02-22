@@ -15,6 +15,7 @@ import {
   rejectNonLibraryExercises,
   type ExerciseBasic,
 } from "../_shared/exercise-matching.ts";
+import { normalizeWorkoutHtml } from "../_shared/html-normalizer.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -251,6 +252,9 @@ Deno.serve(async (req) => {
 
           console.log(`${LOG}   Fix-only: ${matchResult.matched.length} matched, ${sweepResult.forcedMatches.length} swept, ${matchResult.unmatched.length} unmatched`);
 
+          // GOLD STANDARD: Normalize HTML before saving
+          content = normalizeWorkoutHtml(content);
+
           if (!dryRun) {
             const { error: updateErr } = await supabase
               .from("admin_training_programs")
@@ -362,6 +366,11 @@ Deno.serve(async (req) => {
           progressionPlan = await generateProgressionPlan(LOVABLE_API_KEY, program, philosophy);
           console.log(`${LOG}   Generated progression plan: ${progressionPlan?.length || 0} chars`);
         }
+
+        // GOLD STANDARD: Normalize all HTML fields before saving
+        fullSchedule = normalizeWorkoutHtml(fullSchedule);
+        if (overview) overview = normalizeWorkoutHtml(overview);
+        if (progressionPlan) progressionPlan = normalizeWorkoutHtml(progressionPlan);
 
         if (!dryRun) {
           // Update program

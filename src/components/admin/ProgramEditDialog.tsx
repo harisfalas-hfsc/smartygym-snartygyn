@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { A4Container } from "@/components/ui/a4-container";
+import { normalizeWorkoutHtml } from "@/utils/htmlNormalizer";
 
 const PROGRAM_CATEGORIES = [
   "CARDIO ENDURANCE",
@@ -299,6 +300,10 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
         difficultyLevel = 'Intermediate';
       }
 
+      // GOLD STANDARD: Normalize HTML before saving
+      const normalizedWeeklySchedule = normalizeWorkoutHtml(formData.training_program || '');
+      const normalizedProgramStructure = normalizeWorkoutHtml(formData.construction || '');
+
       const baseData = {
         id: formData.id,
         serial_number: formData.serial_number,
@@ -310,9 +315,9 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
         days_per_week: formData.days_per_week,
         equipment: formData.equipment,
         duration,
-        weekly_schedule: formData.training_program,
+        weekly_schedule: normalizedWeeklySchedule,
         description: formData.program_description,
-        program_structure: formData.construction,
+        program_structure: normalizedProgramStructure,
         nutrition_tips: formData.final_tips,
         image_url: imageUrl,
         is_premium: formData.is_premium,

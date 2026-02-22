@@ -2356,6 +2356,9 @@ Return JSON with these exact fields:
       // Normalize main_workout HTML before insert to prevent spacing issues
       // ═══════════════════════════════════════════════════════════════════════════════
       const normalizedMainWorkout = normalizeWorkoutHtml(workoutContent.main_workout || '');
+      const normalizedDescription = normalizeWorkoutHtml(workoutContent.description || '');
+      const normalizedInstructions = normalizeWorkoutHtml(workoutContent.instructions || '');
+      const normalizedTips = normalizeWorkoutHtml(workoutContent.tips || '');
       const validation = validateWorkoutHtml(normalizedMainWorkout);
       
       if (!validation.isValid) {
@@ -2379,10 +2382,10 @@ Return JSON with these exact fields:
           difficulty: selectedDifficulty.name,
           difficulty_stars: selectedDifficulty.stars,
           duration: finalDuration,
-          description: workoutContent.description,
-          main_workout: normalizedMainWorkout,  // Use normalized content
-          instructions: workoutContent.instructions,
-          tips: workoutContent.tips,
+          description: normalizedDescription,
+          main_workout: normalizedMainWorkout,
+          instructions: normalizedInstructions,
+          tips: normalizedTips,
           image_url: imageUrl,
           is_premium: true,
           is_standalone_purchase: true,

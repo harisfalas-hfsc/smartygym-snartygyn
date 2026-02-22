@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { normalizeWorkoutHtml } from "../_shared/html-normalizer.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -67,6 +68,9 @@ Deno.serve(async (req) => {
         }
 
         if (changed) {
+          // GOLD STANDARD: Normalize before saving
+          newMain = normalizeWorkoutHtml(newMain || '');
+          newFinisher = normalizeWorkoutHtml(newFinisher || '');
           const { error: uErr } = await supabase
             .from("admin_workouts")
             .update({ main_workout: newMain, finisher: newFinisher })
@@ -101,6 +105,9 @@ Deno.serve(async (req) => {
         }
 
         if (changed) {
+          // GOLD STANDARD: Normalize before saving
+          newS = normalizeWorkoutHtml(newS || '');
+          newW = normalizeWorkoutHtml(newW || '');
           const { error: uErr } = await supabase
             .from("admin_training_programs")
             .update({ program_structure: newS, weekly_schedule: newW })

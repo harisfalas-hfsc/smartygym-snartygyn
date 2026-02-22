@@ -492,6 +492,9 @@ serve(async (req) => {
       dryRun,
     };
 
+    // Import normalizer for final pass
+    const { normalizeWorkoutHtml } = await import("../_shared/html-normalizer.ts");
+
     // Single target mode
     if (targetId) {
       const { data: workout, error } = await supabase
@@ -527,9 +530,11 @@ serve(async (req) => {
         
         console.log(`[REPAIR-V3] DRY RUN - Would fix:`, repairResult.stats);
       } else if (modified) {
+        // GOLD STANDARD: Final normalization pass
+        const normalizedContent = normalizeWorkoutHtml(repairResult.content);
         const { error: updateError } = await supabase
           .from("admin_workouts")
-          .update({ main_workout: repairResult.content })
+          .update({ main_workout: normalizedContent })
           .eq("id", targetId);
 
         if (updateError) {
@@ -578,9 +583,11 @@ serve(async (req) => {
         const modified = repairResult.content !== originalContent;
 
         if (modified && !dryRun) {
+          // GOLD STANDARD: Final normalization pass
+          const normalizedContent = normalizeWorkoutHtml(repairResult.content);
           const { error: updateError } = await supabase
             .from("admin_workouts")
-            .update({ main_workout: repairResult.content })
+            .update({ main_workout: normalizedContent })
             .eq("id", workout.id);
 
           if (updateError) {
@@ -662,6 +669,10 @@ serve(async (req) => {
             }
 
             if (programModified && !dryRun) {
+              // GOLD STANDARD: Final normalization pass on all fields
+              for (const key of Object.keys(updates)) {
+                updates[key] = normalizeWorkoutHtml(updates[key]);
+              }
               const { error: updateError } = await supabase
                 .from("admin_training_programs")
                 .update(updates)
