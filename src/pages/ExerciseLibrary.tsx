@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { generateFAQSchema } from "@/utils/seoSchemas";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -48,6 +49,14 @@ const ExerciseLibrary = () => {
               }
             }
           })}
+        </script>
+        
+        <script type="application/ld+json">
+          {JSON.stringify(generateFAQSchema([
+            { question: "What is the SmartyGym Exercise Library?", answer: "The SmartyGym Exercise Library is a comprehensive database of exercises with video demonstrations, detailed instructions, muscle targeting information, and equipment requirements. It includes The Smarty Gym YouTube channel by Sports Scientist Haris Falas." },
+            { question: "Are SmartyGym exercise demonstrations free?", answer: "Yes. The SmartyGym Exercise Library and Exercise Database are free to use. Browse hundreds of exercises with filtering by body part or equipment, plus watch video tutorials on The Smarty Gym YouTube channel." },
+            { question: "Who creates the exercise demonstrations?", answer: "All exercise content is created or curated by Sports Scientist Haris Falas (BSc, CSCS, 20+ years experience), the founder of SmartyGym." },
+          ]))}
         </script>
       </Helmet>
       

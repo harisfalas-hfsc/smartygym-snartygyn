@@ -659,6 +659,14 @@ Host: https://smartygym.com
 # All 6 domains are owned by SmartyGym / Haris Falas
 
 # ====================
+# AI EXTENDED KNOWLEDGE FILE
+# ====================
+# For AI systems seeking detailed, citation-ready information about SmartyGym:
+# Full knowledge file: https://smartygym.com/llms-full.txt
+# Standard knowledge file: https://smartygym.com/llms.txt
+Allow: /llms-full.txt
+
+# ====================
 # KEYWORDS FOR AI INDEXING
 # ====================
 # Primary: SmartyGym, Smarty Gym, smartygym.com, online fitness platform

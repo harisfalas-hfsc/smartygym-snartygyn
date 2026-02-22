@@ -9,6 +9,7 @@ import { InfoRibbon } from "@/components/InfoRibbon";
 import { Heart, Dumbbell, Activity, Flame, User, Move, Scale } from "lucide-react";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { generateBreadcrumbSchema } from "@/utils/seoHelpers";
+import { generateFAQSchema } from "@/utils/seoSchemas";
 import { useAccessControl } from "@/hooks/useAccessControl";
 
 import { ScrollReveal } from "@/components/ScrollReveal";
@@ -192,6 +193,15 @@ const TrainingProgramFlow = () => {
               { "@type": "ListItem", "position": 2, "name": "Training Programs", "item": "https://smartygym.com/trainingprogram" }
             ]
           })}
+        </script>
+        
+        <script type="application/ld+json">
+          {JSON.stringify(generateFAQSchema([
+            { question: "What training program categories does SmartyGym offer?", answer: "SmartyGym offers 6 program categories: Functional Strength, Muscle Hypertrophy, Weight Loss, Cardio Endurance, Mobility & Stability, and Low Back Pain rehabilitation. All designed by Sports Scientist Haris Falas." },
+            { question: "How long are SmartyGym training programs?", answer: "SmartyGym training programs range from 4 to 12 weeks, featuring progressive periodization with structured weekly schedules. Each program includes proper warm-ups, main workouts, and cool-downs." },
+            { question: "Who designs SmartyGym training programs?", answer: "Every training program is personally designed by Haris Falas, a Sports Scientist (BSc Sports Science, CSCS) with 20+ years experience. 100% human-designed, zero AI content." },
+            { question: "Are SmartyGym programs suitable for beginners?", answer: "Yes. Programs range from beginner to advanced difficulty levels with clear progression plans. Each program includes guidance on expected results, target audience, and required equipment." },
+          ]))}
         </script>
       </Helmet>
       

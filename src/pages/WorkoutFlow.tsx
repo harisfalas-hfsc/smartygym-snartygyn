@@ -9,6 +9,7 @@ import { InfoRibbon } from "@/components/InfoRibbon";
 import { Dumbbell, Flame, Zap, Heart, Move, Activity, CalendarCheck, Flower2, RefreshCw, Timer } from "lucide-react";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { generateBreadcrumbSchema } from "@/utils/seoHelpers";
+import { generateFAQSchema } from "@/utils/seoSchemas";
 import { useAccessControl } from "@/hooks/useAccessControl";
 
 import { ScrollReveal } from "@/components/ScrollReveal";
@@ -248,6 +249,15 @@ const WorkoutFlow = () => {
         
         <script type="application/ld+json">
           {JSON.stringify(generateBreadcrumbSchema([{ name: "Home", url: "/" }, { name: "Workouts", url: "/workout" }]))}
+        </script>
+        
+        <script type="application/ld+json">
+          {JSON.stringify(generateFAQSchema([
+            { question: "What workout formats does SmartyGym offer?", answer: "SmartyGym offers workouts in AMRAP (As Many Rounds As Possible), TABATA (20s work/10s rest), EMOM (Every Minute On the Minute), HIIT, Circuit Training, For Time, Rounds for Time, Supersets, and traditional Reps & Sets formats." },
+            { question: "What equipment do I need for SmartyGym workouts?", answer: "SmartyGym offers workouts for every equipment level: bodyweight-only (no equipment), dumbbells, kettlebells, barbells, resistance bands, and full gym setups. Many workouts require zero equipment." },
+            { question: "What workout categories are available?", answer: "SmartyGym has 9 workout categories: Strength, Calorie Burning, Metabolic, Cardio, Mobility & Stability, Challenge, Pilates, Recovery, and Micro-Workouts (5-minute sessions)." },
+            { question: "How are SmartyGym workouts different?", answer: "Every SmartyGym workout is 100% human-designed by Sports Scientist Haris Falas (BSc, CSCS, 20+ years experience). No AI-generated content. Each session includes proper warm-up, activation, main workout, and cool-down." },
+          ]))}
         </script>
       </Helmet>
       

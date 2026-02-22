@@ -44,6 +44,7 @@ import CalculatorHistory from "./pages/CalculatorHistory";
 import WorkoutTimer from "./pages/WorkoutTimer";
 
 import Tools from "./pages/Tools";
+import BestOnlineFitnessPlatform from "./pages/BestOnlineFitnessPlatform";
 
 import Blog from "./pages/Blog";
 import About from "./pages/About";
@@ -233,6 +234,7 @@ const AppContent = () => {
                 <Route path="/disclaimer" element={<Disclaimer />} />
                 <Route path="/tools" element={<Tools />} />
                 <Route path="/shop" element={<Shop />} />
+                <Route path="/best-online-fitness-platform" element={<BestOnlineFitnessPlatform />} />
                 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
