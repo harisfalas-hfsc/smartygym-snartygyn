@@ -1,68 +1,73 @@
 
 
-# Fix ALL Workouts and Training Programs: Universal Library-First Enforcement
+# Fix Formatting Consistency Across ALL Workouts and Training Programs
 
-## Current State: What's Still Broken
+## Root Cause Analysis
 
-### 38 workouts still have non-library exercises
-The previous reprocessing did NOT fully clean existing workouts. These still contain:
-- "The Hundred" (plain text, no View button) -- e.g., Core Align Flow, Summit Gauntlet, Core Align
-- "Side Kick Series" (plain text, no View button)
-- "Abdominal Imprint" (plain text, no View button)
-- `{{exercise:forearm-plank:Forearm Plank}}` -- a FAKE exercise ID not in the library (3 workouts)
-- "Child's Pose" appearing in cool-down sections
+There are TWO separate problems causing the missing spacing between sections:
 
-### Training programs have NO strict enforcement at all
-- `reprocess-program-exercises` does NOT call `guaranteeAllExercisesLinked` or `rejectNonLibraryExercises`
-- `generate-training-program` does NOT call them either
-- `regenerate-broken-programs` does NOT call them either
-- Training programs were never cleaned with the strict rejection layer
+### Problem 1: The reprocessors NEVER normalize HTML
+The `reprocess-wod-exercises` and `reprocess-program-exercises` functions do exercise matching but **never call `normalizeWorkoutHtml()`**. This means:
+- When we reprocess all 224 workouts and 28 programs, the HTML is saved back WITHOUT proper spacing normalization
+- Empty paragraphs between sections may be missing, duplicated, or malformed
+- Newlines and whitespace between tags are not cleaned
 
-### The `progression_plan` field is being processed (should be excluded per your rules)
-The `reprocess-program-exercises` function processes `progression_plan`, which contains descriptive prose and should be skipped.
+Only `generate-workout-of-day` calls the normalizer on new WODs. All existing content that was reprocessed lost its formatting guarantees.
+
+### Problem 2: Training programs and Reader Mode lack the `workout-content` CSS wrapper
+The CSS rules that enforce proper section spacing (`.workout-content` class) are only applied in ONE place:
+- `WorkoutDisplay.tsx` wraps workout content in `<div className="workout-content">` (line 269) -- this works
+- Training program `weekly_schedule` (line 291) -- **NO wrapper, broken formatting**
+- Training program `programContent` (line 307) -- **NO wrapper, broken formatting**  
+- Reader Mode in `IndividualWorkout.tsx` (line 268) -- **NO wrapper, broken formatting**
+- Reader Mode in `IndividualTrainingProgram.tsx` (line 242) -- **NO wrapper, broken formatting**
+
+Without the `workout-content` class, the CSS rules for zero-margin paragraphs, proper empty-paragraph height (0.75rem), and compact list styling do not apply.
 
 ---
 
 ## Fix Plan
 
-### Fix 1: Update `reprocess-program-exercises` to use full enforcement pipeline
+### Fix 1: Add `normalizeWorkoutHtml` to both reprocessor functions
+Update `reprocess-wod-exercises/index.ts` and `reprocess-program-exercises/index.ts` to import and call `normalizeWorkoutHtml()` on every field AFTER exercise matching and rejection, right before saving to the database.
 
-Add `guaranteeAllExercisesLinked` and `rejectNonLibraryExercises` imports and run them on every processed field, exactly like `reprocess-wod-exercises` already does. Also remove `progression_plan` from the list of processed fields (keep only `program_structure` and `weekly_schedule`).
+**Files:**
+- `supabase/functions/reprocess-wod-exercises/index.ts` -- add import of `normalizeWorkoutHtml` from `../_shared/html-normalizer.ts` and apply it to all update fields before the database write
+- `supabase/functions/reprocess-program-exercises/index.ts` -- same treatment
 
-### Fix 2: Update `generate-training-program` to use full enforcement pipeline
+### Fix 2: Wrap ALL content displays in `workout-content` class
+Add the `workout-content` wrapper div around training program content and Reader Mode content so the Gold Standard CSS rules apply everywhere.
 
-After AI generation, add the same `guaranteeAllExercisesLinked` + `rejectNonLibraryExercises` steps on the `weekly_schedule` content before saving to the database.
+**Files:**
+- `src/components/WorkoutDisplay.tsx` -- wrap `weekly_schedule` (line 291) and `programContent` (line 307) in `<div className="workout-content">`
+- `src/pages/IndividualWorkout.tsx` -- wrap the Reader Mode content div (line 268) in `<div className="workout-content">`
+- `src/pages/IndividualTrainingProgram.tsx` -- wrap the Reader Mode content div (line 242) in `<div className="workout-content">`
 
-### Fix 3: Update `regenerate-broken-programs` to use full enforcement pipeline
+### Fix 3: Redeploy and reprocess all existing content
+After deploying the updated reprocessor functions:
+1. Trigger `reprocess-wod-exercises` with `processAll: true` for all workouts (in batches)
+2. Trigger `reprocess-program-exercises` for all programs
 
-Same treatment -- add the sweep + rejection steps after any content repair.
-
-### Fix 4: Redeploy and reprocess ALL existing content
-
-After deploying the updated functions:
-1. Trigger `reprocess-wod-exercises` with `processAll: true` in batches to fix all 38+ remaining broken workouts
-2. Trigger `reprocess-program-exercises` (no params = all programs) to fix all 28 training programs
+This will normalize ALL existing HTML in the database, ensuring every workout and program has proper empty paragraphs between sections.
 
 ---
 
-## Files to Change
+## What This Guarantees
+
+- Every workout and training program will have properly normalized HTML in the database (newlines stripped, whitespace collapsed, empty paragraphs between sections)
+- Every display location (main view, training programs, Reader Mode) will use the `workout-content` CSS class for consistent spacing
+- The normalizer runs as the LAST step before database writes, so exercise matching cannot break formatting
+- All 224 workouts and 28 training programs will be re-normalized
+
+---
+
+## Technical Summary
 
 | File | Change |
 |------|--------|
-| `supabase/functions/reprocess-program-exercises/index.ts` | Add `guaranteeAllExercisesLinked` + `rejectNonLibraryExercises` imports and call them after matching; remove `progression_plan` from processed fields |
-| `supabase/functions/generate-training-program/index.ts` | Add `guaranteeAllExercisesLinked` + `rejectNonLibraryExercises` calls after AI generates weekly_schedule content |
-| `supabase/functions/regenerate-broken-programs/index.ts` | Add `guaranteeAllExercisesLinked` + `rejectNonLibraryExercises` calls after content repair |
-
-## Post-Deploy Actions
-
-- Reprocess all 224 workouts in batches (processAll: true)
-- Reprocess all 28 training programs
-- Verify "The Hundred", "Side Kick Series", "Abdominal Imprint", "forearm-plank", and "Child's Pose" are all gone from every workout and program
-
-## What This Guarantees
-
-- Every workout of EVERY category (Pilates, Strength, Cardio, Challenge, etc.) enforces library-only exercises
-- Every training program of EVERY category enforces library-only exercises
-- No exercise can appear without a View button -- it gets substituted or removed
-- The same 4-layer pipeline (AI markup, safety net, final sweep, strict rejection) applies universally to both workouts and training programs
-- All 224 existing workouts and 28 training programs will be cleaned
+| `supabase/functions/reprocess-wod-exercises/index.ts` | Import and apply `normalizeWorkoutHtml` to all fields before DB update |
+| `supabase/functions/reprocess-program-exercises/index.ts` | Import and apply `normalizeWorkoutHtml` to all fields before DB update |
+| `src/components/WorkoutDisplay.tsx` | Wrap training program content sections in `workout-content` div |
+| `src/pages/IndividualWorkout.tsx` | Wrap Reader Mode content in `workout-content` div |
+| `src/pages/IndividualTrainingProgram.tsx` | Wrap Reader Mode content in `workout-content` div |
+| Post-deploy | Reprocess all 224 workouts + 28 programs with updated functions |
