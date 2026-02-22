@@ -968,8 +968,8 @@ export function guaranteeAllExercisesLinked(
       }
     }
     
-    // Only force-link if confidence is at least 0.30 (prevents total nonsense matches)
-    if (bestMatch && bestConfidence >= 0.30) {
+    // Only force-link if confidence is at least 0.50 (prevents wrong matches)
+    if (bestMatch && bestConfidence >= 0.50) {
       const markup = `{{exercise:${bestMatch.id}:${bestMatch.name}}}`;
       
       // Replace the exercise text in the inner HTML while preserving surrounding content
@@ -1008,6 +1008,112 @@ export function guaranteeAllExercisesLinked(
   }
   
   return { processedContent: result, forcedMatches };
+}
+
+/**
+ * STRICT POST-GENERATION VALIDATOR: Ensures NO exercise exists without library linkage.
+ * 1. Verifies all {{exercise:ID:Name}} IDs exist in the library
+ * 2. For any remaining plain-text exercises in <li> items, force-replaces with closest library match
+ * 3. If still unmatched, REMOVES the exercise line entirely (better no exercise than wrong exercise)
+ */
+export function rejectNonLibraryExercises(
+  content: string,
+  exerciseLibrary: ExerciseBasic[],
+  logPrefix: string = "[REJECT-NON-LIB]"
+): { processedContent: string; rejected: string[]; substituted: Array<{ original: string; replacement: string }> } {
+  const rejected: string[] = [];
+  const substituted: Array<{ original: string; replacement: string }> = [];
+  
+  if (!content || !exerciseLibrary || exerciseLibrary.length === 0) {
+    return { processedContent: content || '', rejected, substituted };
+  }
+  
+  let result = content;
+  const libraryById = new Map(exerciseLibrary.map(ex => [ex.id, ex]));
+  
+  // Step 1: Validate all existing {{exercise:ID:Name}} markup
+  const markupPattern = /\{\{(?:exercise|exrcise|excersize|excercise):([^:]+):([^}]+)\}\}/gi;
+  let match;
+  while ((match = markupPattern.exec(content)) !== null) {
+    const id = match[1];
+    const name = match[2];
+    if (!libraryById.has(id)) {
+      // Invalid ID - strip markup and let re-matching handle it
+      console.log(`${logPrefix} ❌ Invalid exercise ID "${id}" for "${name}" — stripping markup for re-match`);
+      result = result.replace(match[0], name);
+      rejected.push(`${name} (invalid ID: ${id})`);
+    }
+  }
+  
+  // Step 2: Find remaining unlinked <li> items and force-match or remove
+  const liRegex = /<li[^>]*>\s*<p[^>]*>((?:(?!<\/p>).)*)<\/p>\s*<\/li>/gi;
+  let liMatch;
+  const removals: string[] = [];
+  const replacements: Array<{ original: string; replacement: string }> = [];
+  
+  while ((liMatch = liRegex.exec(result)) !== null) {
+    const innerHtml = liMatch[1];
+    if (/\{\{exercise:/i.test(innerHtml)) continue; // Already linked
+    
+    const plainText = innerHtml.replace(/<[^>]+>/g, '').trim();
+    if (!plainText || plainText.length < 3) continue;
+    
+    // Skip instructional text
+    if (/^(rest|repeat|complete|perform|focus|record|note|slow|lie|maintain|alternate|foam|lacrosse|light jog|walking|breathing|diaphragm|inhale|exhale|box breath)/i.test(plainText)) continue;
+    if (plainText.split(/\s+/).length > 8) continue;
+    
+    // Extract exercise candidate
+    let candidate = plainText;
+    candidate = candidate.replace(/^(?:Minute|Round|Set|Station)\s*\d*\s*:\s*/i, '');
+    candidate = candidate.replace(/^[A-Za-z\s]+\(\d+\s*min\)\s*:\s*/i, '');
+    candidate = candidate.replace(/^\d+\s+/, '');
+    candidate = candidate.replace(/\s*[-–—]\s*\d+\s*sets?\s*x\s*\d+.*$/i, '');
+    candidate = candidate.replace(/\s*\(\d+[-–]?\d*\s*(?:kg|lb|sec|reps?|per|each).*?\)\s*$/i, '');
+    candidate = candidate.replace(/\s*\d+\s*(?:sets?\s*x|x)\s*\d+.*$/i, '');
+    candidate = candidate.replace(/\s*[-–—]\s*\d+\s*(?:reps?|sets?|sec|min).*$/i, '');
+    candidate = candidate.replace(/\s*\(.*?\)\s*$/g, '');
+    candidate = candidate.replace(/,\s+.*$/, '');
+    candidate = candidate.trim();
+    
+    if (!candidate || candidate.length < 3) continue;
+    
+    // Try to match with library
+    const forceResult = forceMatchExercise(candidate, exerciseLibrary, logPrefix);
+    
+    if (forceResult && forceResult.match.confidence >= 0.50) {
+      const markup = `{{exercise:${forceResult.match.exercise.id}:${forceResult.match.exercise.name}}}`;
+      const escapedCandidate = candidate.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const newInnerHtml = innerHtml.replace(new RegExp(escapedCandidate, 'i'), markup);
+      
+      if (newInnerHtml !== innerHtml) {
+        replacements.push({ original: liMatch[0], replacement: liMatch[0].replace(innerHtml, newInnerHtml) });
+        substituted.push({ original: candidate, replacement: forceResult.match.exercise.name });
+        console.log(`${logPrefix} 🔄 Substituted: "${candidate}" → "${forceResult.match.exercise.name}" (${(forceResult.match.confidence * 100).toFixed(0)}%)`);
+      }
+    } else {
+      // No good match — this exercise is NOT in the library. Remove the entire <li>.
+      removals.push(liMatch[0]);
+      rejected.push(candidate);
+      console.log(`${logPrefix} 🗑️ REMOVED non-library exercise: "${candidate}"`);
+    }
+  }
+  
+  // Apply replacements first, then removals
+  for (const { original, replacement } of replacements) {
+    result = result.replace(original, replacement);
+  }
+  for (const removal of removals) {
+    result = result.replace(removal, '');
+  }
+  
+  // Clean up empty <ul> tags left after removals
+  result = result.replace(/<ul[^>]*>\s*<\/ul>/gi, '');
+  
+  if (rejected.length > 0 || substituted.length > 0) {
+    console.log(`${logPrefix} Summary: ${substituted.length} substituted, ${rejected.length} rejected/removed`);
+  }
+  
+  return { processedContent: result, rejected, substituted };
 }
 
 /**

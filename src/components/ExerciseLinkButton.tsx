@@ -32,12 +32,13 @@ export const ExerciseLinkButton = ({
   
   return (
     <>
-      <span className={`inline-flex items-center gap-1.5 ${className}`}>
-        <span>{exerciseName}</span>
+      <span className={className}>
+        {exerciseName}
         <Button
           variant="ghost"
           size="sm"
-          className="h-5 w-5 p-0 hover:bg-primary/10"
+          className="h-5 w-5 p-0 hover:bg-primary/10 inline-flex items-center justify-center align-middle ml-1 flex-shrink-0"
+          style={{ display: 'inline-flex', verticalAlign: 'middle' }}
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
