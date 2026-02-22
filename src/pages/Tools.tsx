@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { generateFAQSchema } from "@/utils/seoSchemas";
 import { Helmet } from "react-helmet";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -78,6 +79,14 @@ const Tools = () => {
         {/* Greek Language */}
         <link rel="alternate" hrefLang="el" href="https://smartygym.com/tools" />
         <link rel="alternate" hrefLang="en-GB" href="https://smartygym.com/tools" />
+        
+        <script type="application/ld+json">
+          {JSON.stringify(generateFAQSchema([
+            { question: "What fitness calculators does SmartyGym offer?", answer: "SmartyGym offers free fitness calculators: 1RM Calculator (one-rep maximum using Brzycki formula), BMR Calculator (basal metabolic rate using Mifflin-St Jeor equation), Macro Tracking Calculator (personalized nutrition with protein, carbs, fats), and a customizable Workout Timer for HIIT and Tabata." },
+            { question: "Are SmartyGym fitness calculators free?", answer: "Yes. All SmartyGym fitness calculators are completely free to use. Premium members get additional features like calculation history tracking and personalized recommendations." },
+            { question: "How accurate is the SmartyGym 1RM Calculator?", answer: "The SmartyGym 1RM Calculator uses the scientifically validated Brzycki formula to estimate your one-rep maximum based on the weight and reps you can perform. It is one of the most widely accepted formulas in strength training." },
+          ]))}
+        </script>
       </Helmet>
       
       <SEOEnhancer

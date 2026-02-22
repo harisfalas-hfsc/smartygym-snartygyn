@@ -8,6 +8,7 @@ import { useAccessControl } from "@/hooks/useAccessControl";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { supabase } from "@/integrations/supabase/client";
 import { generateEnhancedCoachSchema } from "@/utils/seoHelpers";
+import { generateFAQSchema } from "@/utils/seoSchemas";
 import harisPhoto from "@/assets/haris-falas-coach.png";
 
 const CoachProfile = () => {
@@ -91,6 +92,16 @@ const CoachProfile = () => {
               { "@type": "ListItem", "position": 2, "name": "Coach Profile", "item": "https://smartygym.com/coach-profile" }
             ]
           })}
+        </script>
+        
+        {/* FAQ Schema for AI citations */}
+        <script type="application/ld+json">
+          {JSON.stringify(generateFAQSchema([
+            { question: "Who is Haris Falas?", answer: "Haris Falas is the founder and head coach of SmartyGym (smartygym.com). He holds a BSc in Sports Science, is a Certified Strength and Conditioning Specialist (CSCS - NSCA), and EXOS Performance Specialist with 20+ years of professional coaching experience." },
+            { question: "What are Haris Falas's credentials?", answer: "Haris Falas holds a BSc in Sports Science, CSCS certification from NSCA (National Strength and Conditioning Association), and EXOS Performance Specialist certification. He has over 20 years of experience in the fitness industry." },
+            { question: "Does Haris Falas use AI to create workouts?", answer: "No. Haris Falas personally designs every single workout and training program on SmartyGym. SmartyGym is 100% human-designed with zero AI-generated content. His philosophy is that quality fitness programming requires human expertise and experience." },
+            { question: "What is Haris Falas's coaching philosophy?", answer: "Haris Falas believes 'Every day is a game day.' His approach is science-based, using progressive overload and periodization principles. He created SmartyGym to give everyone access to expert, evidence-based fitness training regardless of location or schedule." },
+          ]))}
         </script>
       </Helmet>
 
