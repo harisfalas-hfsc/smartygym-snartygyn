@@ -11,6 +11,8 @@ import {
   fetchAndBuildExerciseReference,
   logUnmatchedExercises,
   findBestMatch,
+  guaranteeAllExercisesLinked,
+  rejectNonLibraryExercises,
   type ExerciseBasic,
 } from "../_shared/exercise-matching.ts";
 
@@ -239,7 +241,15 @@ Deno.serve(async (req) => {
           // Step 3: Clean corrupted text patterns
           content = cleanCorruptedText(content);
 
-          console.log(`${LOG}   Fix-only: ${matchResult.matched.length} matched, ${matchResult.unmatched.length} unmatched`);
+          // Step 4: Final sweep - link remaining exercises
+          const sweepResult = guaranteeAllExercisesLinked(content, allExercises, `${LOG}[FIX-SWEEP]`);
+          content = sweepResult.processedContent;
+
+          // Step 5: Strict rejection - remove non-library exercises
+          const rejectResult = rejectNonLibraryExercises(content, allExercises, `${LOG}[FIX-REJECT]`);
+          content = rejectResult.processedContent;
+
+          console.log(`${LOG}   Fix-only: ${matchResult.matched.length} matched, ${sweepResult.forcedMatches.length} swept, ${matchResult.unmatched.length} unmatched`);
 
           if (!dryRun) {
             const { error: updateErr } = await supabase
@@ -329,7 +339,15 @@ Deno.serve(async (req) => {
         // Step 3: Clean corrupted text
         fullSchedule = cleanCorruptedText(fullSchedule);
 
-        console.log(`${LOG}   Exercise matching: ${matchResult.matched.length} matched, ${matchResult.unmatched.length} unmatched`);
+        // Step 4: Final sweep - link remaining exercises
+        const sweepResult = guaranteeAllExercisesLinked(fullSchedule, allExercises, `${LOG}[SWEEP]`);
+        fullSchedule = sweepResult.processedContent;
+
+        // Step 5: Strict rejection - remove non-library exercises
+        const rejectResult = rejectNonLibraryExercises(fullSchedule, allExercises, `${LOG}[REJECT]`);
+        fullSchedule = rejectResult.processedContent;
+
+        console.log(`${LOG}   Exercise matching: ${matchResult.matched.length} matched, ${sweepResult.forcedMatches.length} swept, ${matchResult.unmatched.length} unmatched`);
 
         // Generate overview and progression if missing/short
         let overview = program.overview;

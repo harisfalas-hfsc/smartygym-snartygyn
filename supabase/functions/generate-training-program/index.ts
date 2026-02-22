@@ -6,6 +6,8 @@ import {
   processContentSectionAware,
   logUnmatchedExercises,
   fetchAndBuildExerciseReference,
+  guaranteeAllExercisesLinked,
+  rejectNonLibraryExercises,
   type ExerciseBasic 
 } from "../_shared/exercise-matching.ts";
 
@@ -520,7 +522,23 @@ Available exercises: ${exerciseList}`;
       );
       
       generatedPlan = result.processedContent;
-      console.log(`[TrainingProgram] Library validation: ${validMarkupCount} pre-linked, ${result.matched.length} safety-net matched, ${result.unmatched.length} unmatched`);
+      
+      // ── BULLETPROOF FINAL SWEEP + STRICT REJECTION ──
+      const sweep = guaranteeAllExercisesLinked(
+        generatedPlan,
+        exerciseLibrary,
+        `[TrainingProgram-FINAL-SWEEP]`
+      );
+      generatedPlan = sweep.processedContent;
+      
+      const rejection = rejectNonLibraryExercises(
+        generatedPlan,
+        exerciseLibrary,
+        `[TrainingProgram-REJECT]`
+      );
+      generatedPlan = rejection.processedContent;
+      
+      console.log(`[TrainingProgram] Library validation: ${validMarkupCount} pre-linked, ${result.matched.length} safety-net matched, ${sweep.forcedMatches.length} swept, ${result.unmatched.length} unmatched`);
       
       // Log unmatched exercises
       const uniqueUnmatched = [...new Set(result.unmatched)];

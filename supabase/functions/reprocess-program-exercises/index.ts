@@ -9,6 +9,8 @@ import {
   processContentWithExerciseMatching,
   stripExerciseMarkup,
   logUnmatchedExercises,
+  guaranteeAllExercisesLinked,
+  rejectNonLibraryExercises,
   type ExerciseBasic,
 } from "../_shared/exercise-matching.ts";
 
@@ -105,7 +107,7 @@ Deno.serve(async (req) => {
 
     // Only process fields that contain actual exercise content
     // overview, nutrition_tips, expected_results are informational — skip them
-    const exerciseContentFields = ["program_structure", "weekly_schedule", "progression_plan"];
+    const exerciseContentFields = ["program_structure", "weekly_schedule"];
 
     for (const program of programs) {
       console.log(`${LOG_PREFIX} 📋 Processing: "${program.name}" (${program.id})`);
@@ -132,6 +134,26 @@ Deno.serve(async (req) => {
         updates[field] = result.processedContent;
         totalMatched += result.matched.length;
         allUnmatched.push(...result.unmatched);
+      }
+
+      // ── BULLETPROOF FINAL SWEEP + STRICT REJECTION on all fields ──
+      for (const field of exerciseContentFields) {
+        if (updates[field]) {
+          const sweep = guaranteeAllExercisesLinked(
+            updates[field],
+            exerciseLibrary as ExerciseBasic[],
+            `${LOG_PREFIX}[${field}-FINAL-SWEEP]`
+          );
+          updates[field] = sweep.processedContent;
+          totalMatched += sweep.forcedMatches.length;
+
+          const rejection = rejectNonLibraryExercises(
+            updates[field],
+            exerciseLibrary as ExerciseBasic[],
+            `${LOG_PREFIX}[${field}-REJECT]`
+          );
+          updates[field] = rejection.processedContent;
+        }
       }
 
       // Update the program with processed content
