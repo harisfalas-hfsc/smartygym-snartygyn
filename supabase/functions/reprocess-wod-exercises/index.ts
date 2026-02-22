@@ -40,7 +40,7 @@ Deno.serve(async (req) => {
 
     let wodsQuery = supabase
       .from("admin_workouts")
-      .select("id, name, main_workout, warm_up, cool_down, finisher, activation")
+      .select("id, name, main_workout, warm_up, cool_down, finisher, activation, instructions, tips, notes")
       .order("id");
 
     if (wodIds && Array.isArray(wodIds) && wodIds.length > 0) {
@@ -135,8 +135,8 @@ Deno.serve(async (req) => {
         allUnmatched.push(...result.unmatched);
       }
 
-      // ── warm_up, cool_down, activation: Process with exercise matching ──
-      for (const field of ["warm_up", "cool_down", "activation"] as const) {
+      // ── warm_up, cool_down, activation, instructions, tips, notes: Process with exercise matching ──
+      for (const field of ["warm_up", "cool_down", "activation", "instructions", "tips", "notes"] as const) {
         const content = wod[field] as string | null;
         if (content) {
           const strippedContent = stripExerciseMarkup(content);
@@ -165,7 +165,7 @@ Deno.serve(async (req) => {
       }
 
       // ── BULLETPROOF FINAL SWEEP + STRICT REJECTION on all fields ──
-      for (const field of ["main_workout", "warm_up", "cool_down", "activation", "finisher"] as const) {
+      for (const field of ["main_workout", "warm_up", "cool_down", "activation", "finisher", "instructions", "tips", "notes"] as const) {
         if (updates[field]) {
           // Final sweep: link remaining exercises
           const sweep = guaranteeAllExercisesLinked(

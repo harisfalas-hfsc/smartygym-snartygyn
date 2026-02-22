@@ -1059,8 +1059,16 @@ export function rejectNonLibraryExercises(
     if (!plainText || plainText.length < 3) continue;
     
     // Skip instructional text
-    if (/^(rest|repeat|complete|perform|focus|record|note|slow|lie|maintain|alternate|foam|lacrosse|light jog|walking|breathing|diaphragm|inhale|exhale|box breath)/i.test(plainText)) continue;
-    if (plainText.split(/\s+/).length > 8) continue;
+    if (/^(rest|repeat|complete|perform|focus|record|note|slow|lie|maintain|alternate|foam|lacrosse|light jog|walking|breathing|diaphragm|inhale|exhale|box breath|tip\s*\d|quality|if an exercise|not cause|not hurt)/i.test(plainText)) continue;
+    // Strip rep/set info before counting words to avoid skipping valid exercise lines
+    const strippedForCount = plainText
+      .replace(/\s*[-–—]\s*\d+\s*sets?\s*x\s*\d+.*$/i, '')
+      .replace(/\s*\(\d+[-–]?\d*\s*(?:kg|lb|sec|seconds?|reps?|per|each|focused|sustained|controlled|slow|hold).*?\)/gi, '')
+      .replace(/\s*\d+\s*(?:sets?\s*x|x)\s*\d+.*$/i, '')
+      .replace(/\s*[-–—]\s*\d+\s*(?:reps?|sets?|sec|min).*$/i, '')
+      .replace(/\s*\(.*?\)\s*$/g, '')
+      .trim();
+    if (strippedForCount.split(/\s+/).length > 12) continue;
     
     // Extract exercise candidate
     let candidate = plainText;
@@ -1108,6 +1116,51 @@ export function rejectNonLibraryExercises(
   
   // Clean up empty <ul> tags left after removals
   result = result.replace(/<ul[^>]*>\s*<\/ul>/gi, '');
+  
+  // Step 3: Scan prose <p> tags for quoted exercise names not in the library
+  // Handles patterns like: "The Hundred", 'Side Kick Series', <strong>Child's Pose</strong>
+  const quotePatterns = [
+    /[""\u201C\u201D]([^""\u201C\u201D]{3,40})[""\u201C\u201D]/g,  // "quoted text"
+    /[''\u2018\u2019]([^''\u2018\u2019]{3,40})[''\u2018\u2019]/g,   // 'quoted text'
+  ];
+  
+  for (const qp of quotePatterns) {
+    let qMatch;
+    while ((qMatch = qp.exec(result)) !== null) {
+      const quotedName = qMatch[1].trim();
+      if (!quotedName || quotedName.length < 3) continue;
+      // Skip if already linked
+      if (/\{\{exercise:/i.test(quotedName)) continue;
+      // Skip obvious non-exercise text
+      if (/^(rest|repeat|complete|perform|focus|tip|note|quality|warm|cool|main|finisher)/i.test(quotedName)) continue;
+      
+      // Check if this looks like an exercise name (capitalized words)
+      if (!/^[A-Z]/.test(quotedName)) continue;
+      
+      // Check if it's already a library exercise name
+      const isInLibrary = exerciseLibrary.some(ex => 
+        ex.name.toLowerCase() === quotedName.toLowerCase()
+      );
+      if (isInLibrary) continue;
+      
+      // Try to match
+      const forceResult = forceMatchExercise(quotedName, exerciseLibrary, logPrefix);
+      if (forceResult && forceResult.match.confidence >= 0.50) {
+        const oldQuoted = qMatch[0];
+        const newQuoted = oldQuoted.replace(quotedName, forceResult.match.exercise.name);
+        result = result.replace(oldQuoted, newQuoted);
+        substituted.push({ original: quotedName, replacement: forceResult.match.exercise.name });
+        console.log(`${logPrefix} 🔄 Prose substitution: "${quotedName}" → "${forceResult.match.exercise.name}"`);
+      } else {
+        // Remove the sentence containing the non-library exercise reference
+        // Replace just the quoted name with a generic term
+        const oldQuoted = qMatch[0];
+        result = result.replace(oldQuoted, 'the exercise');
+        rejected.push(`${quotedName} (prose reference)`);
+        console.log(`${logPrefix} 🗑️ Removed prose reference to non-library exercise: "${quotedName}"`);
+      }
+    }
+  }
   
   if (rejected.length > 0 || substituted.length > 0) {
     console.log(`${logPrefix} Summary: ${substituted.length} substituted, ${rejected.length} rejected/removed`);
