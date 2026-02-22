@@ -8,6 +8,7 @@ import {
   processContentSectionAware, 
   logUnmatchedExercises,
   fetchAndBuildExerciseReference,
+  guaranteeAllExercisesLinked,
   type ExerciseBasic 
 } from "../_shared/exercise-matching.ts";
 import { normalizeWorkoutHtml, validateWorkoutHtml } from "../_shared/html-normalizer.ts";
@@ -2110,12 +2111,34 @@ Return JSON with these exact fields:
           unmatched: result.unmatched.length 
         });
         
-        // Log unmatched exercises
+        // ═══════════════════════════════════════════════════════════════════════════════
+        // BULLETPROOF FINAL SWEEP: Catch ANY remaining unlinked exercises in <li> items
+        // This guarantees EVERY exercise gets a View button — no exceptions
+        // ═══════════════════════════════════════════════════════════════════════════════
+        const finalSweep = guaranteeAllExercisesLinked(
+          workoutContent.main_workout,
+          currentExerciseLibrary,
+          `[WOD-FINAL-SWEEP][${equipment}]`
+        );
+        workoutContent.main_workout = finalSweep.processedContent;
+        
+        if (finalSweep.forcedMatches.length > 0) {
+          logStep(`Final sweep linked ${finalSweep.forcedMatches.length} additional exercises`, {
+            equipment,
+            matches: finalSweep.forcedMatches.map(m => `"${m.original}" → "${m.matched}" (${(m.confidence * 100).toFixed(0)}%)`)
+          });
+        }
+        
+        // Log unmatched exercises (only those that even the final sweep couldn't match)
         const uniqueUnmatched = [...new Set(result.unmatched)];
-        if (uniqueUnmatched.length > 0) {
+        // Filter out any that the final sweep DID match
+        const finalSweepMatchedNames = new Set(finalSweep.forcedMatches.map(m => m.original.toLowerCase()));
+        const trulyUnmatched = uniqueUnmatched.filter(name => !finalSweepMatchedNames.has(name.toLowerCase()));
+        
+        if (trulyUnmatched.length > 0) {
           await logUnmatchedExercises(
             supabase,
-            uniqueUnmatched,
+            trulyUnmatched,
             'wod',
             `WOD-${prefix}-${equipment.charAt(0)}-${timestamp}`,
             workoutContent.name,

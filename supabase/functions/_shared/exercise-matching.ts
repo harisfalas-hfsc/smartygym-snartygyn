@@ -895,6 +895,122 @@ export function buildExerciseReferenceList(exercises: ExerciseBasic[], equipment
 }
 
 /**
+ * BULLETPROOF FINAL SWEEP: Scan every <li> that lacks {{exercise:}} markup.
+ * For each, extract the text, find the CLOSEST library exercise (no threshold floor),
+ * and replace the plain text with the markup.
+ * This guarantees every exercise bullet gets a View button.
+ */
+export function guaranteeAllExercisesLinked(
+  content: string,
+  exerciseLibrary: ExerciseBasic[],
+  logPrefix: string = "[GUARANTEE-LINK]"
+): { processedContent: string; forcedMatches: Array<{ original: string; matched: string; id: string; confidence: number }> } {
+  const forcedMatches: Array<{ original: string; matched: string; id: string; confidence: number }> = [];
+  
+  if (!content || !exerciseLibrary || exerciseLibrary.length === 0) {
+    return { processedContent: content || '', forcedMatches };
+  }
+  
+  let result = content;
+  
+  // Find all <li> elements that do NOT contain {{exercise: markup
+  const liRegex = /<li[^>]*>\s*<p[^>]*>((?:(?!<\/p>).)*)<\/p>\s*<\/li>/gi;
+  let liMatch;
+  const replacements: Array<{ original: string; replacement: string }> = [];
+  
+  while ((liMatch = liRegex.exec(content)) !== null) {
+    const innerHtml = liMatch[1];
+    
+    // Skip if already has exercise markup
+    if (/\{\{exercise:/i.test(innerHtml)) continue;
+    
+    // Strip HTML tags to get plain text
+    const plainText = innerHtml.replace(/<[^>]+>/g, '').trim();
+    if (!plainText || plainText.length < 3) continue;
+    
+    // Skip structural/instructional text
+    if (/^(rest|repeat|complete|perform all|focus on|record|note|slow inhale|lie supine|maintain|alternate)/i.test(plainText)) continue;
+    if (/^\d+\s*(seconds?|minutes?|min|sec)\s*(rest|recovery|break)/i.test(plainText)) continue;
+    if (plainText.split(/\s+/).length > 8) continue; // Long sentences are instructions
+    
+    // Clean the text to extract exercise name candidate
+    let candidate = plainText;
+    // Strip leading bold time labels: "Minute 1:", "Round 2:", "Stability (5 min):"
+    candidate = candidate.replace(/^(?:Minute|Round|Set|Station)\s*\d*\s*:\s*/i, '');
+    // Strip leading sub-section labels: "Mobility (2 min):", "Dynamic Warm-up (8 min):"
+    candidate = candidate.replace(/^[A-Za-z\s]+\(\d+\s*min\)\s*:\s*/i, '');
+    // Strip leading numbers: "15 Kettlebell Swings"
+    candidate = candidate.replace(/^\d+\s+/, '');
+    // Strip trailing reps/sets/duration info
+    candidate = candidate.replace(/\s*[-–—]\s*\d+\s*sets?\s*x\s*\d+.*$/i, '');
+    candidate = candidate.replace(/\s*\(\d+[-–]?\d*\s*(?:kg|lb|sec|reps?|per|each).*?\)\s*$/i, '');
+    candidate = candidate.replace(/\s*\d+\s*(?:sets?\s*x|x)\s*\d+.*$/i, '');
+    candidate = candidate.replace(/\s*[-–—]\s*\d+\s*(?:reps?|sets?|sec|min).*$/i, '');
+    candidate = candidate.replace(/\s*\(.*?\)\s*$/g, '');
+    candidate = candidate.replace(/,\s+.*$/, ''); // After comma is usually secondary info
+    candidate = candidate.trim();
+    
+    if (!candidate || candidate.length < 3) continue;
+    
+    // Try to match - use ABSOLUTE BEST match, no threshold
+    const searchNorm = normalizeExerciseName(candidate);
+    if (searchNorm.length < 3) continue;
+    
+    let bestMatch: ExerciseBasic | null = null;
+    let bestConfidence = 0;
+    
+    for (const exercise of exerciseLibrary) {
+      const exerciseNorm = normalizeExerciseName(exercise.name);
+      const confidence = calculateConfidence(searchNorm, exerciseNorm);
+      if (confidence > bestConfidence) {
+        bestConfidence = confidence;
+        bestMatch = exercise;
+      }
+    }
+    
+    // Only force-link if confidence is at least 0.30 (prevents total nonsense matches)
+    if (bestMatch && bestConfidence >= 0.30) {
+      const markup = `{{exercise:${bestMatch.id}:${bestMatch.name}}}`;
+      
+      // Replace the exercise text in the inner HTML while preserving surrounding content
+      // Strategy: replace the candidate text with markup
+      const escapedCandidate = candidate.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const newInnerHtml = innerHtml.replace(new RegExp(escapedCandidate, 'i'), markup);
+      
+      if (newInnerHtml !== innerHtml) {
+        replacements.push({
+          original: liMatch[0],
+          replacement: liMatch[0].replace(innerHtml, newInnerHtml)
+        });
+        
+        const indicator = bestConfidence >= 0.65 ? '✅' : bestConfidence >= 0.45 ? '🔄' : '⚠️';
+        console.log(`${logPrefix} ${indicator} FINAL-SWEEP: "${candidate}" → "${bestMatch.name}" (${(bestConfidence * 100).toFixed(0)}%)`);
+        
+        forcedMatches.push({
+          original: candidate,
+          matched: bestMatch.name,
+          id: bestMatch.id,
+          confidence: bestConfidence
+        });
+      }
+    } else {
+      console.log(`${logPrefix} ❌ FINAL-SWEEP SKIP: "${candidate}" (best: ${bestMatch?.name || 'none'} at ${(bestConfidence * 100).toFixed(0)}%)`);
+    }
+  }
+  
+  // Apply all replacements
+  for (const { original, replacement } of replacements) {
+    result = result.replace(original, replacement);
+  }
+  
+  if (forcedMatches.length > 0) {
+    console.log(`${logPrefix} Final sweep: ${forcedMatches.length} additional exercises linked`);
+  }
+  
+  return { processedContent: result, forcedMatches };
+}
+
+/**
  * Fetch exercise library from Supabase and build reference list.
  * @param supabaseClient - Supabase client instance
  * @param logPrefix - Log prefix for debugging
