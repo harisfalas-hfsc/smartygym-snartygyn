@@ -11,6 +11,7 @@ import {
   stripExerciseMarkup,
   logUnmatchedExercises,
   guaranteeAllExercisesLinked,
+  rejectNonLibraryExercises,
   type ExerciseBasic,
 } from "../_shared/exercise-matching.ts";
 
@@ -163,10 +164,10 @@ Deno.serve(async (req) => {
         allUnmatched.push(...result.unmatched);
       }
 
-      // ── BULLETPROOF FINAL SWEEP on all fields ──
-      // Guarantee every exercise in every section gets a View button
+      // ── BULLETPROOF FINAL SWEEP + STRICT REJECTION on all fields ──
       for (const field of ["main_workout", "warm_up", "cool_down", "activation", "finisher"] as const) {
         if (updates[field]) {
+          // Final sweep: link remaining exercises
           const sweep = guaranteeAllExercisesLinked(
             updates[field],
             exerciseLibrary as ExerciseBasic[],
@@ -174,6 +175,14 @@ Deno.serve(async (req) => {
           );
           updates[field] = sweep.processedContent;
           totalMatched += sweep.forcedMatches.length;
+          
+          // Strict rejection: remove any exercise NOT in library
+          const rejection = rejectNonLibraryExercises(
+            updates[field],
+            exerciseLibrary as ExerciseBasic[],
+            `${LOG_PREFIX}[${field}-REJECT]`
+          );
+          updates[field] = rejection.processedContent;
         }
       }
 

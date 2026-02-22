@@ -9,6 +9,7 @@ import {
   logUnmatchedExercises,
   fetchAndBuildExerciseReference,
   guaranteeAllExercisesLinked,
+  rejectNonLibraryExercises,
   type ExerciseBasic 
 } from "../_shared/exercise-matching.ts";
 import { normalizeWorkoutHtml, validateWorkoutHtml } from "../_shared/html-normalizer.ts";
@@ -1426,34 +1427,14 @@ KEY PRINCIPLES:
 MAT PILATES (BODYWEIGHT VERSION):
 Classical mat Pilates with optional props (fit ball, ring, mini bands allowed).
 
-ALLOWED EXERCISES & PROPS:
-• Classical Mat Sequence: The Hundred, Roll Up, Roll Over, Single Leg Circles
-• Pilates Ring exercises: Inner thigh squeezes, Chest presses, Arm circles
-• Fit Ball (Swiss Ball): Spine articulation, Bridging, Teaser variations
-• Mini Bands: Clamshells, Leg circles, Side-lying series
-• Resistance Loop: Monster walks, Glute activation
+CRITICAL: Select ALL Pilates exercises ONLY from the exercise library provided below.
+Do NOT use exercise names not found in the library. Do NOT invent classical Pilates names.
+Search the library for Pilates-appropriate exercises by filtering for:
+- Body Part: waist, upper legs, lower legs
+- Target: abs, glutes, hip flexors, adductors
+- Equipment: body weight
 
-CLASSICAL PILATES ORDER (Can adapt but respect the flow):
-1. The Hundred (warm-up)
-2. Roll Up / Roll Down
-3. Single Leg Circles
-4. Rolling Like a Ball
-5. Single Leg Stretch
-6. Double Leg Stretch
-7. Spine Stretch Forward
-8. Open Leg Rocker
-9. Corkscrew
-10. Saw
-11. Swan
-12. Single Leg Kicks
-13. Double Leg Kicks
-14. Neck Pull
-15. Shoulder Bridge
-16. Side Kicks Series
-17. Teaser
-18. Swimming
-19. Leg Pull Front/Back
-20. Seal / Crab
+Every exercise MUST use {{exercise:ID:Name}} format from the library.
 
 MODIFICATION LEVELS:
 • Beginner (1-2★): Basic versions, more rest, fewer reps
@@ -1530,46 +1511,22 @@ PRIMARY FOCUS (ALWAYS FIRST AND PRIMARY):
   - Shoulders and neck release
 
 ═══════════════════════════════════════════════════════════════════════════════
-ALLOWED EXERCISES (NOT LIMITED TO THESE - FIND SIMILAR):
-═══════════════════════════════════════════════════════════════════════════════
+ALLOWED EXERCISES:
+CRITICAL: ALL exercises in Recovery MUST come from the exercise library below.
+Use {{exercise:ID:Name}} format for EVERY exercise. Do NOT invent exercise names.
+Search the library for recovery-appropriate exercises (stretches, mobility, light movements).
+The ONLY exception is foam rolling / lacrosse ball work in the Soft Tissue section — those are TOOLS, not exercises.
+
 LIGHT AEROBIC (warm-up only, low intensity):
-• Walking (outdoor or treadmill at low speed)
-• Light jogging (very easy pace)
-• Cycling (indoor or outdoor at low resistance)
-• Elliptical at low intensity
-• Swimming (gentle laps)
+• Walking, light jogging, cycling — these are ACTIVITIES described in plain text, not library exercises
 
-STRETCHING:
-• Static stretches for all major muscle groups
-• Hamstring stretches, quad stretches, hip flexor stretches
-• Chest openers, lat stretches, shoulder stretches
-• Calf stretches, glute stretches, IT band stretches
-• Neck stretches, back stretches
-
-MOBILITY:
-• Cat-cow, thread the needle
-• Hip circles, hip CARs
-• Shoulder CARs, wrist circles
-• Thoracic rotations, spinal twists
-• Worlds greatest stretch, deep squats (mobility, not strength)
-
-DECOMPRESSION:
-• Childs pose, prone extensions
-• Hanging (passive, if bar available)
-• Supine twists, happy baby
-• Pigeon pose, figure 4 stretch
+STRETCHING & MOBILITY & STABILITY:
+• Search the exercise library for stretches and mobility exercises
+• Use {{exercise:ID:Name}} format for every exercise found in the library
+• If a specific stretch is not in the library, find the closest equivalent that IS
 
 BREATHING:
-• Diaphragmatic breathing (belly breathing)
-• Box breathing (4-4-4-4)
-• 4-7-8 breathing for relaxation
-• Breathwork integrated with stretches
-
-LIGHT STABILITY (optional, gentle):
-• Dead bugs (slow, controlled)
-• Bird dogs (gentle, no speed)
-• Gentle core engagement
-• Balance work (single leg stands)
+• Diaphragmatic breathing, box breathing — these are TECHNIQUES described in plain text
 
 ═══════════════════════════════════════════════════════════════════════════════
 ❌ FORBIDDEN IN RECOVERY (ABSOLUTE NO):
@@ -1679,6 +1636,13 @@ CONTENT SEPARATION RULE (CRITICAL):
 - Rest period guidance (e.g., "Rest 60 seconds between rounds") can appear as a plain text line between exercise blocks, but NEVER as a bullet point
 
 GOLD STANDARD 5-SECTION TEMPLATE (FOLLOW EXACTLY):
+IMPORTANT: The exercises shown below are EXAMPLES using {{exercise:ID:Name}} markup. 
+YOU MUST replace them with exercises from YOUR exercise library above — using the SAME {{exercise:ID:Name}} format.
+NEVER use plain exercise names. EVERY exercise MUST use {{exercise:ID:Name}} format.
+
+🧽 Soft Tissue Preparation: This section is NON-EXERCISE instructional text (foam rolling, lacrosse ball work).
+These are TOOLS and TECHNIQUES, not exercises from the library. Write them as plain text descriptions.
+Example:
 <p class="tiptap-paragraph">🧽 <strong><u>Soft Tissue Preparation 5'</u></strong></p>
 <ul class="tiptap-bullet-list">
 <li class="tiptap-list-item"><p class="tiptap-paragraph">Foam roll quads, hamstrings, calves (30-45 sec per area)</p></li>
@@ -1686,46 +1650,40 @@ GOLD STANDARD 5-SECTION TEMPLATE (FOLLOW EXACTLY):
 <li class="tiptap-list-item"><p class="tiptap-paragraph">Lacrosse ball work for feet and hips (focus on tension spots)</p></li>
 </ul>
 <p class="tiptap-paragraph"></p>
+
+🔥 Activation & 💪 Main Workout & ⚡ Finisher & 🧘 Cool Down: ALL exercises MUST come from the library.
+Example (using real library exercises):
 <p class="tiptap-paragraph">🔥 <strong><u>Activation 15'</u></strong></p>
 <ul class="tiptap-bullet-list">
-<li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Mobility (2 min):</strong> Cat-Cow (10 reps), Thoracic Rotations (5 per side), Ankle Circles (10 per direction)</p></li>
-<li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Stability (5 min):</strong> Bird-Dog (8 per side), Glute Bridge (12 reps, squeeze at top), Clamshells (10 per side)</p></li>
-<li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Dynamic Warm-up (8 min):</strong> Jumping Jacks (30 sec), High Knees (30 sec), Butt Kicks (30 sec)</p></li>
-<li class="tiptap-list-item"><p class="tiptap-paragraph">Inchworms with push-up (5 reps), Walking Lunges with Torso Twist (8 per leg)</p></li>
-<li class="tiptap-list-item"><p class="tiptap-paragraph">Lateral Shuffles (10m each way x 2), A-Skips (10m x 2), Light Jog (2 min)</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Mobility (2 min):</strong> {{exercise:1311:Spine Stretch}} (10 reps), {{exercise:0571:Ankle Circles}} (10 per direction)</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Stability (5 min):</strong> {{exercise:3212:Bird Dog}} (8 per side), {{exercise:0578:Glute Bridge March}} (12 reps)</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Dynamic Warm-up (8 min):</strong> {{exercise:0630:Jumping Jack}} (30 sec), {{exercise:1160:High Knee Skips}} (30 sec)</p></li>
 </ul>
 <p class="tiptap-paragraph"></p>
 <p class="tiptap-paragraph">💪 <strong><u>Main Workout (20-minute EMOM)</u></strong></p>
 <ul class="tiptap-bullet-list">
-<li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Minute 1:</strong> 15 Kettlebell Swings (moderate weight)</p></li>
-<li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Minute 2:</strong> 12 Box Jumps (20-24 inch box)</p></li>
-<li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Minute 3:</strong> 10 Goblet Squats (moderate weight)</p></li>
-<li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Minute 4:</strong> 10 Burpees</p></li>
-<li class="tiptap-list-item"><p class="tiptap-paragraph">Repeat this 4-minute sequence for a total of 5 rounds.</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Minute 1:</strong> 15 {{exercise:0548:Kettlebell Sumo High Pull}} (moderate weight)</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Minute 2:</strong> 12 {{exercise:1636:Jump Squat}} (explosive)</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Minute 3:</strong> 10 {{exercise:0291:Dumbbell Goblet Squat}} (moderate weight)</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Minute 4:</strong> 10 {{exercise:1160:Burpee}} (full range)</p></li>
 </ul>
 <p class="tiptap-paragraph"></p>
 <p class="tiptap-paragraph">⚡ <strong><u>Finisher (For Time)</u></strong></p>
 <ul class="tiptap-bullet-list">
-<li class="tiptap-list-item"><p class="tiptap-paragraph">500m Rowing Machine (max effort pace)</p></li>
-<li class="tiptap-list-item"><p class="tiptap-paragraph">20 Dumbbell Thrusters (moderate weight, 8-12kg each hand)</p></li>
-<li class="tiptap-list-item"><p class="tiptap-paragraph">30 Box Jumps (20-inch box)</p></li>
-<li class="tiptap-list-item"><p class="tiptap-paragraph">20 Kettlebell Swings (16-20kg)</p></li>
-<li class="tiptap-list-item"><p class="tiptap-paragraph">400m Run</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph">20 {{exercise:0291:Dumbbell Goblet Squat}} (moderate weight)</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph">30 {{exercise:1636:Jump Squat}}</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph">20 {{exercise:0548:Kettlebell Sumo High Pull}} (16-20kg)</p></li>
 </ul>
 
-BAD FINISHER EXAMPLE (NEVER DO THIS):
-⚡ Finisher (8') ← WRONG: "For Time" with fixed 8-minute duration is contradictory
-  * For Time: ← WRONG: format label with a bullet point
-  * 500m Row sprint ← WRONG: vague equipment, "sprint" is for running only
-  * 20 Thrusters (light dumbbell/kettlebell) ← WRONG: each arm? total? vague weight
-  * Focus on completing as fast as possible ← WRONG: instruction with a bullet, belongs in instructions field
-Problems: bullets on non-exercises, only 2 exercises, vague equipment, instructions mixed in, contradictory duration
+BAD EXAMPLE (NEVER DO THIS — plain text exercise names without {{exercise:ID:Name}} markup):
+  * Kettlebell Swings ← WRONG: must be {{exercise:ID:Kettlebell Swings}}
+  * Child's Pose ← WRONG: not in library AND no markup
+  * Focus on completing as fast as possible ← WRONG: instruction with a bullet
 <p class="tiptap-paragraph"></p>
 <p class="tiptap-paragraph">🧘 <strong><u>Cool Down 10'</u></strong></p>
 <ul class="tiptap-bullet-list">
-<li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Static Stretching (8 min):</strong> Standing Quad Stretch (each leg), Hamstring Stretch (30 sec each)</p></li>
-<li class="tiptap-list-item"><p class="tiptap-paragraph">Calf Stretch, Figure-Four Glute Stretch, Tricep/Overhead Reach Stretch</p></li>
-<li class="tiptap-list-item"><p class="tiptap-paragraph">Child's Pose, Supine Spinal Twist (60 sec per side)</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Static Stretching (8 min):</strong> {{exercise:1473:Standing Gastrocnemius Calf Stretch}} (each leg), {{exercise:1502:Standing Hamstring and Calf Stretch}} (30 sec each)</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph">{{exercise:1424:Seated Glute Stretch}} (60 sec per side), {{exercise:0850:Overhead Triceps Stretch}} (30 sec each arm)</p></li>
 <li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Diaphragmatic Breathing (2 min):</strong> Lie supine, one hand on chest, one on belly</p></li>
 <li class="tiptap-list-item"><p class="tiptap-paragraph">Slow inhale through nose (belly rises), slow exhale through mouth. Focus on calming nervous system.</p></li>
 </ul>
@@ -2129,11 +2087,33 @@ Return JSON with these exact fields:
           });
         }
         
+        // ═══════════════════════════════════════════════════════════════════════════════
+        // STRICT REJECTION: Remove any exercise NOT in the library
+        // This is the FINAL gate — no non-library exercise passes through
+        // ═══════════════════════════════════════════════════════════════════════════════
+        const rejection = rejectNonLibraryExercises(
+          workoutContent.main_workout,
+          currentExerciseLibrary,
+          `[WOD-REJECT][${equipment}]`
+        );
+        workoutContent.main_workout = rejection.processedContent;
+        
+        if (rejection.rejected.length > 0) {
+          logStep(`Rejected/removed ${rejection.rejected.length} non-library exercises`, {
+            equipment,
+            rejected: rejection.rejected
+          });
+        }
+        
         // Log unmatched exercises (only those that even the final sweep couldn't match)
         const uniqueUnmatched = [...new Set(result.unmatched)];
         // Filter out any that the final sweep DID match
         const finalSweepMatchedNames = new Set(finalSweep.forcedMatches.map(m => m.original.toLowerCase()));
-        const trulyUnmatched = uniqueUnmatched.filter(name => !finalSweepMatchedNames.has(name.toLowerCase()));
+        const rejectionSubstitutedNames = new Set(rejection.substituted.map(s => s.original.toLowerCase()));
+        const trulyUnmatched = uniqueUnmatched.filter(name => 
+          !finalSweepMatchedNames.has(name.toLowerCase()) && 
+          !rejectionSubstitutedNames.has(name.toLowerCase())
+        );
         
         if (trulyUnmatched.length > 0) {
           await logUnmatchedExercises(
