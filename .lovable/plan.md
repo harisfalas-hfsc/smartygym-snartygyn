@@ -1,73 +1,78 @@
 
 
-# Fix Formatting Consistency Across ALL Workouts and Training Programs
+# Permanent Formatting Consistency Fix -- Every Write Path Sealed
 
-## Root Cause Analysis
+## The Real Problem
 
-There are TWO separate problems causing the missing spacing between sections:
+After a full audit of every function and UI component that writes workout or training program content to the database, I found **7 write paths** that either skip the HTML normalizer entirely or only partially normalize. This is why formatting keeps breaking -- fixing one path leaves others leaking bad HTML into the database.
 
-### Problem 1: The reprocessors NEVER normalize HTML
-The `reprocess-wod-exercises` and `reprocess-program-exercises` functions do exercise matching but **never call `normalizeWorkoutHtml()`**. This means:
-- When we reprocess all 224 workouts and 28 programs, the HTML is saved back WITHOUT proper spacing normalization
-- Empty paragraphs between sections may be missing, duplicated, or malformed
-- Newlines and whitespace between tags are not cleaned
+## Complete Audit Results
 
-Only `generate-workout-of-day` calls the normalizer on new WODs. All existing content that was reprocessed lost its formatting guarantees.
+| Write Path | What It Does | Has Normalizer? |
+|---|---|---|
+| `generate-workout-of-day` | Creates daily WODs | Only on `main_workout` (misses description, instructions, tips) |
+| `generate-training-program` | Generates program content, returns to frontend | NO |
+| `regenerate-broken-programs` | Regenerates corrupted programs | NO |
+| `fix-workout-formatting` | Batch fixes workout HTML | NO |
+| `repair-content-formatting` | Repairs content spacing | NO |
+| `reprocess-wod-exercises` | Re-links exercises in WODs | YES (recently added) |
+| `reprocess-program-exercises` | Re-links exercises in programs | YES (recently added) |
+| `WorkoutEditDialog.tsx` (Admin UI) | Saves workout edits | Only on `main_workout` (misses finisher) |
+| `ProgramEditDialog.tsx` (Admin UI) | Saves program edits | NO |
 
-### Problem 2: Training programs and Reader Mode lack the `workout-content` CSS wrapper
-The CSS rules that enforce proper section spacing (`.workout-content` class) are only applied in ONE place:
-- `WorkoutDisplay.tsx` wraps workout content in `<div className="workout-content">` (line 269) -- this works
-- Training program `weekly_schedule` (line 291) -- **NO wrapper, broken formatting**
-- Training program `programContent` (line 307) -- **NO wrapper, broken formatting**  
-- Reader Mode in `IndividualWorkout.tsx` (line 268) -- **NO wrapper, broken formatting**
-- Reader Mode in `IndividualTrainingProgram.tsx` (line 242) -- **NO wrapper, broken formatting**
-
-Without the `workout-content` class, the CSS rules for zero-margin paragraphs, proper empty-paragraph height (0.75rem), and compact list styling do not apply.
+That is 7 broken paths vs 2 working ones.
 
 ---
 
-## Fix Plan
+## The Fix: Seal Every Single Write Path
 
-### Fix 1: Add `normalizeWorkoutHtml` to both reprocessor functions
-Update `reprocess-wod-exercises/index.ts` and `reprocess-program-exercises/index.ts` to import and call `normalizeWorkoutHtml()` on every field AFTER exercise matching and rejection, right before saving to the database.
+### 1. `generate-training-program/index.ts`
+Add `normalizeWorkoutHtml` import and apply it to the generated content before returning it to the frontend.
 
-**Files:**
-- `supabase/functions/reprocess-wod-exercises/index.ts` -- add import of `normalizeWorkoutHtml` from `../_shared/html-normalizer.ts` and apply it to all update fields before the database write
-- `supabase/functions/reprocess-program-exercises/index.ts` -- same treatment
+### 2. `regenerate-broken-programs/index.ts`
+Add `normalizeWorkoutHtml` import. Apply it to `weekly_schedule`, `overview`, and `progression_plan` content before every `.update()` call (both "fix-only" mode at line 257 and "full regeneration" mode at line 376).
 
-### Fix 2: Wrap ALL content displays in `workout-content` class
-Add the `workout-content` wrapper div around training program content and Reader Mode content so the Gold Standard CSS rules apply everywhere.
+### 3. `fix-workout-formatting/index.ts`
+Add `normalizeWorkoutHtml` import. Apply it to `main_workout`, `finisher`, `program_structure`, and `weekly_schedule` before every `.update()` call.
 
-**Files:**
-- `src/components/WorkoutDisplay.tsx` -- wrap `weekly_schedule` (line 291) and `programContent` (line 307) in `<div className="workout-content">`
-- `src/pages/IndividualWorkout.tsx` -- wrap the Reader Mode content div (line 268) in `<div className="workout-content">`
-- `src/pages/IndividualTrainingProgram.tsx` -- wrap the Reader Mode content div (line 242) in `<div className="workout-content">`
+### 4. `repair-content-formatting/index.ts`
+Add `normalizeWorkoutHtml` import. Apply it to every `repairResult.content` before writing to DB (single target at line 532, batch workouts at line 583, and batch programs at line 667).
 
-### Fix 3: Redeploy and reprocess all existing content
-After deploying the updated reprocessor functions:
-1. Trigger `reprocess-wod-exercises` with `processAll: true` for all workouts (in batches)
-2. Trigger `reprocess-program-exercises` for all programs
+### 5. `generate-workout-of-day/index.ts`
+Extend the existing normalizer call to also normalize `description`, `instructions`, and `tips` fields before the database insert -- not just `main_workout`.
 
-This will normalize ALL existing HTML in the database, ensuring every workout and program has proper empty paragraphs between sections.
+### 6. `WorkoutEditDialog.tsx` (Admin UI)
+Extend the existing normalizer call to also normalize the `finisher` field before saving, in addition to `main_workout`.
 
----
+### 7. `ProgramEditDialog.tsx` (Admin UI)
+Add `normalizeWorkoutHtml` import from `@/utils/htmlNormalizer`. Apply it to `weekly_schedule` (`formData.training_program`) and `program_structure` (`formData.construction`) before the database `.update()` or `.insert()` call.
 
-## What This Guarantees
-
-- Every workout and training program will have properly normalized HTML in the database (newlines stripped, whitespace collapsed, empty paragraphs between sections)
-- Every display location (main view, training programs, Reader Mode) will use the `workout-content` CSS class for consistent spacing
-- The normalizer runs as the LAST step before database writes, so exercise matching cannot break formatting
-- All 224 workouts and 28 training programs will be re-normalized
+### 8. Re-run full reprocessing
+After deploying all updated functions, trigger `reprocess-wod-exercises` (processAll) and `reprocess-program-exercises` (all programs) to normalize every existing record in the database.
 
 ---
 
-## Technical Summary
+## What This Guarantees Going Forward
+
+- Every single path that writes workout or program content to the database will run `normalizeWorkoutHtml` as the absolute last step before the write
+- No function can save HTML without proper spacing between sections
+- No admin edit can save content without normalization
+- The CSS `workout-content` wrapper (already applied in previous fix) ensures consistent display
+- Exercise library-first enforcement remains intact in all generation and reprocessing functions
+- All existing content gets re-normalized to match the Gold Standard
+
+---
+
+## Files Changed
 
 | File | Change |
-|------|--------|
-| `supabase/functions/reprocess-wod-exercises/index.ts` | Import and apply `normalizeWorkoutHtml` to all fields before DB update |
-| `supabase/functions/reprocess-program-exercises/index.ts` | Import and apply `normalizeWorkoutHtml` to all fields before DB update |
-| `src/components/WorkoutDisplay.tsx` | Wrap training program content sections in `workout-content` div |
-| `src/pages/IndividualWorkout.tsx` | Wrap Reader Mode content in `workout-content` div |
-| `src/pages/IndividualTrainingProgram.tsx` | Wrap Reader Mode content in `workout-content` div |
-| Post-deploy | Reprocess all 224 workouts + 28 programs with updated functions |
+|---|---|
+| `supabase/functions/generate-training-program/index.ts` | Add normalizer import, apply before return |
+| `supabase/functions/regenerate-broken-programs/index.ts` | Add normalizer import, apply before both update paths |
+| `supabase/functions/fix-workout-formatting/index.ts` | Add normalizer import, apply before all updates |
+| `supabase/functions/repair-content-formatting/index.ts` | Add normalizer import, apply before all updates |
+| `supabase/functions/generate-workout-of-day/index.ts` | Extend normalizer to description, instructions, tips |
+| `src/components/admin/WorkoutEditDialog.tsx` | Extend normalizer to finisher field |
+| `src/components/admin/ProgramEditDialog.tsx` | Add normalizer import, apply to weekly_schedule and program_structure |
+| Post-deploy | Reprocess all workouts and programs |
+
