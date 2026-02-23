@@ -220,7 +220,7 @@ export const WorkoutInteractions = ({ workoutId, workoutType, workoutName, isFre
         const now = new Date();
         setTimeout(() => {
           setCalendarDialogData({
-            title: `✅ Completed: ${workoutName}`,
+            title: `Completed: ${workoutName}`,
             date: format(now, 'yyyy-MM-dd'),
             time: format(now, 'HH:mm'),
             reminderMinutes: 0,

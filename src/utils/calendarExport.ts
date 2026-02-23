@@ -20,8 +20,28 @@ function formatICSDate(dateStr: string, timeStr?: string): string {
   return `${year}${month}${day}`;
 }
 
+function getNowStamp(): string {
+  const now = new Date();
+  const y = now.getUTCFullYear();
+  const mo = String(now.getUTCMonth() + 1).padStart(2, "0");
+  const d = String(now.getUTCDate()).padStart(2, "0");
+  const h = String(now.getUTCHours()).padStart(2, "0");
+  const mi = String(now.getUTCMinutes()).padStart(2, "0");
+  const s = String(now.getUTCSeconds()).padStart(2, "0");
+  return `${y}${mo}${d}T${h}${mi}${s}Z`;
+}
+
 function escapeICS(text: string): string {
-  return text.replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\n/g, "\\n");
+  return text
+    .replace(/\\/g, "\\\\")
+    .replace(/;/g, "\\;")
+    .replace(/,/g, "\\,")
+    .replace(/\n/g, "\\n");
+}
+
+// Strip emoji and non-ASCII for maximum calendar app compatibility
+function sanitizeTitle(text: string): string {
+  return text.replace(/[^\x20-\x7E]/g, "").trim();
 }
 
 export function buildContentUrl(contentType: "workout" | "program", contentRouteType: string, contentId: string): string {
@@ -35,26 +55,26 @@ export function generateICSFile(params: CalendarEventParams): string {
   const url = buildContentUrl(contentType, contentRouteType, contentId);
   const dtStart = formatICSDate(date, time);
   const isAllDay = !time;
+  const dtstamp = getNowStamp();
+  const safeTitle = sanitizeTitle(title);
 
-  // End time: 1 hour after start, or next day for all-day
   let dtEnd: string;
   if (isAllDay) {
-    const d = new Date(date);
+    const d = new Date(date + "T12:00:00");
     d.setDate(d.getDate() + 1);
     dtEnd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
   } else {
     const [h, m] = time!.split(":").map(Number);
-    const endH = String(h + 1).padStart(2, "0");
+    const endH = String(Math.min(h + 1, 23)).padStart(2, "0");
     dtEnd = formatICSDate(date, `${endH}:${String(m).padStart(2, "0")}`);
   }
 
-  const description = [
-    notes ? notes : "",
-    "",
-    `Open in SmartyGym: ${url}`,
-  ].filter(Boolean).join("\\n");
+  const descParts: string[] = [];
+  if (notes) descParts.push(notes);
+  descParts.push(`Open in SmartyGym: ${url}`);
+  const description = escapeICS(descParts.join("\n"));
 
-  const uid = `${contentId}-${Date.now()}@smartygym.lovable.app`;
+  const uid = `${contentId.replace(/[^a-zA-Z0-9-]/g, "")}-${Date.now()}@smartygym.lovable.app`;
 
   const lines = [
     "BEGIN:VCALENDAR",
@@ -64,10 +84,11 @@ export function generateICSFile(params: CalendarEventParams): string {
     "METHOD:PUBLISH",
     "BEGIN:VEVENT",
     `UID:${uid}`,
-    `SUMMARY:${escapeICS(title)}`,
+    `DTSTAMP:${dtstamp}`,
+    `SUMMARY:${escapeICS(safeTitle)}`,
     isAllDay ? `DTSTART;VALUE=DATE:${dtStart}` : `DTSTART:${dtStart}`,
     isAllDay ? `DTEND;VALUE=DATE:${dtEnd}` : `DTEND:${dtEnd}`,
-    `DESCRIPTION:${escapeICS(description)}`,
+    `DESCRIPTION:${description}`,
     `URL:${url}`,
   ];
 
@@ -76,7 +97,7 @@ export function generateICSFile(params: CalendarEventParams): string {
       "BEGIN:VALARM",
       "TRIGGER:-PT" + reminderMinutes + "M",
       "ACTION:DISPLAY",
-      `DESCRIPTION:${escapeICS(title)} starts soon`,
+      `DESCRIPTION:${escapeICS(safeTitle)} starts soon`,
       "END:VALARM"
     );
   }
