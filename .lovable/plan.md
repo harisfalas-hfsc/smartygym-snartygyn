@@ -1,64 +1,63 @@
 
 
-# Add "Add to Native Calendar" Follow-Up After Scheduling
+# Fix Calendar Dialog + Add "Completed" Calendar Export
 
-## What Happens
+## Problems Being Fixed
 
-After a user presses "Schedule" in the scheduling dialog, instead of just closing, a second dialog appears asking: **"Would you like to add this to your calendar app?"** If they press Yes, the browser triggers a `.ics` file download (the universal calendar format supported by Google Calendar, Apple Calendar, Outlook, Samsung Calendar, and every other calendar app on every device).
+1. **AddToCalendarDialog not appearing reliably** -- It currently lives inside `ScheduleWorkoutDialog`, causing Radix Dialog overlay conflicts. When one dialog animates closed while the other tries to open, the second dialog gets blocked.
 
-The `.ics` file will contain:
-- Event title: the workout/program name
-- Date and time: exactly as scheduled
-- Reminder/alarm: matching the reminder setting chosen
-- Description: any notes entered + a direct link to the workout/program
-- URL: a working, tested link back to the specific workout or program page
+2. **No calendar export when marking as completed** -- The user wants the same "Add to Calendar?" follow-up when marking a workout or program as completed.
 
-If the user presses "No thanks", the dialog simply closes.
+## Solution
 
-## How the Link Will Work
+Move the `AddToCalendarDialog` state management out of `ScheduleWorkoutDialog` and into `WorkoutInteractions` and `ProgramInteractions`. This makes the calendar dialog fully independent. Then add the same trigger after "Mark as Completed" actions.
 
-The link in the calendar event will use the published site URL (`https://smartygym.lovable.app`) combined with the correct route:
-- Workouts: `https://smartygym.lovable.app/workout/{type}/{id}`
-- Programs: `https://smartygym.lovable.app/trainingprogram/{type}/{id}`
+## About How Calendar Export Works
 
-This ensures the link always works and does not lead to a 404.
+The `.ics` file is the universal calendar format. When opened:
+- **On mobile (Android/iOS):** The device automatically shows a picker of installed calendar apps (Google Calendar, Samsung Calendar, Apple Calendar, Outlook, etc.)
+- **On desktop:** The file opens in the default calendar application (Outlook, Apple Calendar, Google Calendar desktop app, etc.)
 
-## Technical Changes
+This is the same method used by every major website. There is no web browser API that can directly open a native calendar picker -- the `.ics` file IS how it's done.
 
-### 1. Update `ScheduleWorkoutDialog` props to include content route type
+## Changes
 
-The dialog currently receives `contentId` but not the URL type segment (e.g., "strength", "cardio"). Both `WorkoutInteractions` and `ProgramInteractions` already have this value (`workoutType` / `programType`). A new `contentRouteType` prop will be added to pass it through.
+### 1. Remove AddToCalendarDialog from ScheduleWorkoutDialog
 
-### 2. Create `AddToCalendarDialog` component
+`ScheduleWorkoutDialog` will no longer manage or render the calendar follow-up dialog. Instead, it will accept a new callback prop `onScheduleSuccess` that passes the event details back to the parent. The parent decides what to do with them.
 
-A new component (`src/components/AddToCalendarDialog.tsx`) that:
-- Shows after successful scheduling
-- Displays the scheduled details (name, date, time)
-- Has two buttons: "Add to Calendar" and "No Thanks"
-- "Add to Calendar" generates and downloads an `.ics` file with all the event details
-- The `.ics` format is universally supported -- on mobile, it opens the native calendar app picker; on desktop, it opens the default calendar application
+### 2. Update WorkoutInteractions
 
-### 3. Create `.ics` file generator utility
+- Add `AddToCalendarDialog` state management directly in this component
+- Wire it to trigger after successful scheduling (via `onScheduleSuccess` callback from ScheduleWorkoutDialog)
+- Wire it to trigger after "Mark as Complete" is clicked -- with title "Completed: {workout name}", today's date, current time, and a working link
+- Use a small delay (setTimeout) before showing the calendar dialog to ensure the previous dialog's close animation finishes
 
-A utility function (`src/utils/calendarExport.ts`) that builds a valid iCalendar (.ics) file string with:
-- `VEVENT` block with `DTSTART`, `DTEND` (1 hour default duration), `SUMMARY`, `DESCRIPTION`, `URL`, `VALARM` (reminder)
-- Proper date/time formatting in iCalendar format
-- The working URL to the workout/program page
+### 3. Update ProgramInteractions
 
-### 4. Update `WorkoutInteractions.tsx` and `ProgramInteractions.tsx`
+Same changes as WorkoutInteractions:
+- Add `AddToCalendarDialog` state management
+- Trigger after scheduling success
+- Trigger after "Complete" button click -- with title "Completed: {program name}", today's date, current time, and working link
 
-Pass the new `contentRouteType` prop to `ScheduleWorkoutDialog`:
-- In `WorkoutInteractions`: pass `workoutType`
-- In `ProgramInteractions`: pass `programType`
+### 4. The .ics content for "Completed" events
+
+When marking as completed, the calendar event will contain:
+- Title: "Completed: {workout/program name}"
+- Date: today
+- Time: current time
+- Duration: 1 hour
+- Description: "Workout completed! Open in SmartyGym: {working link}"
+- URL: working link to the workout/program page
+- No reminder (since it's a past/current event, not future)
 
 ## Files Modified
 
 | File | Change |
 |------|--------|
-| `src/utils/calendarExport.ts` | **New** -- `.ics` file generation utility |
-| `src/components/AddToCalendarDialog.tsx` | **New** -- follow-up dialog component |
-| `src/components/ScheduleWorkoutDialog.tsx` | Add `contentRouteType` prop, show `AddToCalendarDialog` after successful save instead of immediately closing |
-| `src/components/WorkoutInteractions.tsx` | Pass `contentRouteType={workoutType}` to ScheduleWorkoutDialog |
-| `src/components/ProgramInteractions.tsx` | Pass `contentRouteType={programType}` to ScheduleWorkoutDialog |
+| `src/components/ScheduleWorkoutDialog.tsx` | Remove AddToCalendarDialog, add `onScheduleSuccess` callback prop instead of managing calendar dialog internally |
+| `src/components/WorkoutInteractions.tsx` | Add AddToCalendarDialog, trigger after schedule and after completion |
+| `src/components/ProgramInteractions.tsx` | Add AddToCalendarDialog, trigger after schedule and after completion |
 
-No database changes. No edge functions. Frontend-only.
+No new files. No database changes. Frontend-only.
+
