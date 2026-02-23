@@ -11,7 +11,7 @@ import {
   Calculator,
   BookOpen,
   Users,
-  ArrowLeft,
+  
   Zap,
   TrendingUp,
   Heart,
@@ -25,7 +25,7 @@ import {
   X,
   ClipboardCheck
 } from "lucide-react";
-import { useShowBackButton } from "@/hooks/useShowBackButton";
+
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
@@ -33,7 +33,7 @@ import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 
 export default function PremiumBenefits() {
   const navigate = useNavigate();
-  const { canGoBack, goBack } = useShowBackButton();
+  
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
@@ -167,18 +167,6 @@ export default function PremiumBenefits() {
 
       <div className="min-h-screen bg-background">
         <main className="container mx-auto max-w-7xl p-4 py-8">
-          {canGoBack && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={goBack}
-              className="mb-4"
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              <span className="text-xs sm:text-sm">Back</span>
-            </Button>
-          )}
-
           <PageBreadcrumbs items={[
             { label: "Home", href: "/" },
             { label: "Premium Benefits" }

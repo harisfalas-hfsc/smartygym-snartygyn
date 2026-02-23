@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
-  ArrowLeft, 
+   
   Heart, 
   Brain, 
   TrendingUp, 
@@ -30,7 +30,7 @@ import {
   BookOpenText,
   Download
 } from "lucide-react";
-import { useShowBackButton } from "@/hooks/useShowBackButton";
+
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
@@ -92,7 +92,7 @@ const chartConfig = {
 };
 
 export default function CorporateWellness() {
-  const { canGoBack, goBack } = useShowBackButton();
+  
   const [readerModeOpen, setReaderModeOpen] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -186,18 +186,6 @@ export default function CorporateWellness() {
 
       <div className="min-h-screen bg-background">
         <main className="container mx-auto max-w-4xl p-4 pb-8">
-          {canGoBack && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={goBack}
-              className="mb-4"
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              <span className="text-xs sm:text-sm">Back</span>
-            </Button>
-          )}
-
           <PageBreadcrumbs items={[
             { label: "Home", href: "/" },
             { label: "Smarty Corporate", href: "/corporate" },
