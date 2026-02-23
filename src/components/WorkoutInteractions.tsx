@@ -224,7 +224,7 @@ export const WorkoutInteractions = ({ workoutId, workoutType, workoutName, isFre
             date: format(now, 'yyyy-MM-dd'),
             time: format(now, 'HH:mm'),
             reminderMinutes: 0,
-            notes: `Workout completed! Open in SmartyGym`,
+            notes: `Great job finishing "${workoutName}"! Keep showing up and pushing your limits -- every rep counts toward a stronger you. Open in SmartyGym to find your next challenge.`,
             contentType: "workout",
             contentRouteType: workoutType,
             contentId: workoutId,

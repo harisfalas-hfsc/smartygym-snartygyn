@@ -19,6 +19,25 @@ interface AddToCalendarDialogProps {
   } | null;
 }
 
+function getDialogCopy(title: string, contentType: "workout" | "program") {
+  const label = contentType === "workout" ? "workout" : "training program";
+  const isCompleted = title.toLowerCase().startsWith("completed:");
+
+  if (isCompleted) {
+    return {
+      heading: "Amazing Work! You Crushed It!",
+      description: `Save this achievement to your calendar and keep the momentum going. Every ${label} you finish brings you closer to your goals!`,
+      motivationalNote: `You just completed a ${label} -- that's something to be proud of. Track your wins and watch your progress grow!`,
+    };
+  }
+
+  return {
+    heading: "Lock It In -- You've Got This!",
+    description: `Add this ${label} to your calendar so nothing gets in the way. Consistency is the key to results!`,
+    motivationalNote: `A scheduled ${label} is a promise to yourself. Show up, give it your best, and let's crush it!`,
+  };
+}
+
 export const AddToCalendarDialog = ({ isOpen, onClose, eventDetails }: AddToCalendarDialogProps) => {
   if (!eventDetails) return null;
 
@@ -29,17 +48,18 @@ export const AddToCalendarDialog = ({ isOpen, onClose, eventDetails }: AddToCale
   };
 
   const displayDate = format(new Date(eventDetails.date + "T12:00:00"), "MMMM d, yyyy");
+  const copy = getDialogCopy(eventDetails.title, eventDetails.contentType);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[380px]">
+      <DialogContent className="sm:max-w-[400px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <CalendarPlus className="h-5 w-5 text-primary" />
-            Add to Your Calendar?
+            {copy.heading}
           </DialogTitle>
           <DialogDescription>
-            Would you like to add this to your device's calendar app?
+            {copy.description}
           </DialogDescription>
         </DialogHeader>
 
@@ -47,12 +67,13 @@ export const AddToCalendarDialog = ({ isOpen, onClose, eventDetails }: AddToCale
           <div className="p-3 bg-muted rounded-lg space-y-1">
             <p className="font-semibold text-sm">{eventDetails.title}</p>
             <p className="text-xs text-muted-foreground">{displayDate}{eventDetails.time ? ` at ${eventDetails.time}` : ""}</p>
+            <p className="text-xs text-primary/80 mt-1 italic">{copy.motivationalNote}</p>
           </div>
 
           <div className="flex gap-2 pt-2">
             <Button variant="outline" onClick={onClose} className="flex-1 gap-2">
               <X className="h-4 w-4" />
-              No Thanks
+              Skip
             </Button>
             <Button onClick={handleAddToCalendar} className="flex-1 gap-2">
               <CalendarPlus className="h-4 w-4" />
