@@ -468,6 +468,7 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
         contentId={programId}
         contentName={programName}
         contentType="program"
+        contentRouteType={programType}
         onScheduled={refetchScheduled}
       />
 

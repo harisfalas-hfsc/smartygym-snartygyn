@@ -358,6 +358,7 @@ export const WorkoutInteractions = ({ workoutId, workoutType, workoutName, isFre
         contentId={workoutId}
         contentName={workoutName}
         contentType="workout"
+        contentRouteType={workoutType}
         onScheduled={refetchScheduled}
       />
 
