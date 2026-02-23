@@ -247,7 +247,7 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
       const now = new Date();
       setTimeout(() => {
         setCalendarDialogData({
-          title: `✅ Completed: ${programName}`,
+          title: `Completed: ${programName}`,
           date: format(now, 'yyyy-MM-dd'),
           time: format(now, 'HH:mm'),
           reminderMinutes: 0,
