@@ -1,40 +1,64 @@
 
 
-# Fix: Remove Duplicate Back Buttons From All Pages
+# Add "Add to Native Calendar" Follow-Up After Scheduling
 
-## Problem
-7 pages have an **inline back button** at the top of the page content, which duplicates the **global fixed back button** (`FixedBackButton` in `App.tsx`) that stays visible while scrolling. This creates two back buttons on desktop.
+## What Happens
 
-## Pages Affected
+After a user presses "Schedule" in the scheduling dialog, instead of just closing, a second dialog appears asking: **"Would you like to add this to your calendar app?"** If they press Yes, the browser triggers a `.ics` file download (the universal calendar format supported by Google Calendar, Apple Calendar, Outlook, Samsung Calendar, and every other calendar app on every device).
 
-| Page | File | Lines to Remove |
-|------|------|----------------|
-| Why SmartyGym | `src/pages/HumanPerformance.tsx` | Lines 57-67 (inline back button block) |
-| Why Invest in SmartyGym | `src/pages/WhyInvestInSmartyGym.tsx` | Lines 197-207 (inline back button block) |
-| Corporate Wellness | `src/pages/CorporateWellness.tsx` | Lines 189-199 (inline back button block) |
-| Premium Benefits | `src/pages/PremiumBenefits.tsx` | Lines 170-180 (inline back button block) |
-| Take a Tour | `src/pages/TakeATour.tsx` | Lines 85-95 (inline back button block) |
-| Coach CV | `src/pages/CoachCV.tsx` | Lines 33-36 (inline back button block) |
-| Smarty Plans | `src/pages/SmartyPlans.tsx` | Lines 315-319 (inline back button block) |
+The `.ics` file will contain:
+- Event title: the workout/program name
+- Date and time: exactly as scheduled
+- Reminder/alarm: matching the reminder setting chosen
+- Description: any notes entered + a direct link to the workout/program
+- URL: a working, tested link back to the specific workout or program page
 
-## Changes Per File
+If the user presses "No thanks", the dialog simply closes.
 
-For each of the 7 files:
-1. **Remove** the `{canGoBack && (<Button>...</Button>)}` block
-2. **Remove** the `useShowBackButton` import (line varies per file)
-3. **Remove** the `const { canGoBack, goBack } = useShowBackButton();` line
-4. **Remove** the `ArrowLeft` icon import if it was only used for the back button
+## How the Link Will Work
 
-The global `FixedBackButton` component (already rendered in `App.tsx`) handles all back navigation on desktop. Mobile users use native gestures. No other back button is needed.
+The link in the calendar event will use the published site URL (`https://smartygym.lovable.app`) combined with the correct route:
+- Workouts: `https://smartygym.lovable.app/workout/{type}/{id}`
+- Programs: `https://smartygym.lovable.app/trainingprogram/{type}/{id}`
 
-## What Is NOT Changed
-- `src/components/FixedBackButton.tsx` -- remains as-is (the one we keep)
-- `src/components/AccessGate.tsx` -- uses `goBack` inside action buttons, not as a duplicate back button
-- `src/pages/NotFound.tsx` -- uses its own "Go Back" button contextually, not a duplicate
+This ensures the link always works and does not lead to a 404.
 
-## Technical Details
-- Frontend-only changes
-- No edge functions touched
-- No database changes
-- 7 files modified, removing ~10 lines each
+## Technical Changes
 
+### 1. Update `ScheduleWorkoutDialog` props to include content route type
+
+The dialog currently receives `contentId` but not the URL type segment (e.g., "strength", "cardio"). Both `WorkoutInteractions` and `ProgramInteractions` already have this value (`workoutType` / `programType`). A new `contentRouteType` prop will be added to pass it through.
+
+### 2. Create `AddToCalendarDialog` component
+
+A new component (`src/components/AddToCalendarDialog.tsx`) that:
+- Shows after successful scheduling
+- Displays the scheduled details (name, date, time)
+- Has two buttons: "Add to Calendar" and "No Thanks"
+- "Add to Calendar" generates and downloads an `.ics` file with all the event details
+- The `.ics` format is universally supported -- on mobile, it opens the native calendar app picker; on desktop, it opens the default calendar application
+
+### 3. Create `.ics` file generator utility
+
+A utility function (`src/utils/calendarExport.ts`) that builds a valid iCalendar (.ics) file string with:
+- `VEVENT` block with `DTSTART`, `DTEND` (1 hour default duration), `SUMMARY`, `DESCRIPTION`, `URL`, `VALARM` (reminder)
+- Proper date/time formatting in iCalendar format
+- The working URL to the workout/program page
+
+### 4. Update `WorkoutInteractions.tsx` and `ProgramInteractions.tsx`
+
+Pass the new `contentRouteType` prop to `ScheduleWorkoutDialog`:
+- In `WorkoutInteractions`: pass `workoutType`
+- In `ProgramInteractions`: pass `programType`
+
+## Files Modified
+
+| File | Change |
+|------|--------|
+| `src/utils/calendarExport.ts` | **New** -- `.ics` file generation utility |
+| `src/components/AddToCalendarDialog.tsx` | **New** -- follow-up dialog component |
+| `src/components/ScheduleWorkoutDialog.tsx` | Add `contentRouteType` prop, show `AddToCalendarDialog` after successful save instead of immediately closing |
+| `src/components/WorkoutInteractions.tsx` | Pass `contentRouteType={workoutType}` to ScheduleWorkoutDialog |
+| `src/components/ProgramInteractions.tsx` | Pass `contentRouteType={programType}` to ScheduleWorkoutDialog |
+
+No database changes. No edge functions. Frontend-only.
