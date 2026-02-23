@@ -208,12 +208,19 @@ export default function HumanPerformance() {
                 Discover why expert-designed, human-crafted fitness programs deliver transformative results—and how{" "}
                 <span className="text-primary font-bold">SmartyGym</span> provides the ecosystem you need to elevate every aspect of your performance.
               </p>
-              <div className="text-center mt-4">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-4">
                 <Link 
                   to="/why-invest-in-smartygym" 
                   className="inline-flex items-center gap-2 text-primary hover:text-primary/80 font-medium text-sm transition-colors"
                 >
-                  Read more
+                  Why Invest in SmartyGym
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+                <Link 
+                  to="/best-online-fitness-platform" 
+                  className="inline-flex items-center gap-2 text-primary hover:text-primary/80 font-medium text-sm transition-colors"
+                >
+                  Why We Are the Best
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
