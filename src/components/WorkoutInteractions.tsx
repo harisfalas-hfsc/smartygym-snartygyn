@@ -7,6 +7,7 @@ import { useAccessControl } from "@/hooks/useAccessControl";
 import { useNavigate } from "react-router-dom";
 import { CommentDialog } from "@/components/CommentDialog";
 import { ScheduleWorkoutDialog } from "@/components/ScheduleWorkoutDialog";
+import { AddToCalendarDialog } from "@/components/AddToCalendarDialog";
 import { useScheduledWorkoutForContent } from "@/hooks/useScheduledWorkouts";
 import { format } from "date-fns";
 import { GoalAchievementCelebration } from "@/components/dashboard/GoalAchievementCelebration";
@@ -27,6 +28,16 @@ export const WorkoutInteractions = ({ workoutId, workoutType, workoutName, isFre
   const [isScheduleDialogOpen, setIsScheduleDialogOpen] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
   const [achievedGoals, setAchievedGoals] = useState<Array<{ type: "weight" | "body_fat" | "muscle_mass" | "workouts_completed" | "programs_completed"; target: number; current: number }>>([]);
+  const [calendarDialogData, setCalendarDialogData] = useState<{
+    title: string;
+    date: string;
+    time?: string;
+    reminderMinutes: number;
+    notes?: string;
+    contentType: "workout" | "program";
+    contentRouteType: string;
+    contentId: string;
+  } | null>(null);
   const { toast } = useToast();
   const { userTier, canInteract } = useAccessControl();
   const navigate = useNavigate();
@@ -204,6 +215,21 @@ export const WorkoutInteractions = ({ workoutId, workoutType, workoutName, isFre
           setShowCelebration(true);
           await sendGoalAchievementNotification(session.user.id, achieved);
         }
+
+        // Show calendar dialog for completed workout
+        const now = new Date();
+        setTimeout(() => {
+          setCalendarDialogData({
+            title: `✅ Completed: ${workoutName}`,
+            date: format(now, 'yyyy-MM-dd'),
+            time: format(now, 'HH:mm'),
+            reminderMinutes: 0,
+            notes: `Workout completed! Open in SmartyGym`,
+            contentType: "workout",
+            contentRouteType: workoutType,
+            contentId: workoutId,
+          });
+        }, 300);
       }
 
       setIsCompleted(newCompletedStatus);
@@ -262,11 +288,14 @@ export const WorkoutInteractions = ({ workoutId, workoutType, workoutName, isFre
     setIsScheduleDialogOpen(true);
   };
 
+  const handleScheduleSuccess = (details: typeof calendarDialogData) => {
+    setCalendarDialogData(details);
+  };
+
   if (isLoading) {
     return null;
   }
 
-  // Show interactions for subscribers on free content and premium members on all content
   if (!canUserInteract) {
     const promptMessage = userTier === "subscriber" && !isFreeContent
       ? "Upgrade to Premium to track, favorite, and rate premium workouts"
@@ -360,6 +389,13 @@ export const WorkoutInteractions = ({ workoutId, workoutType, workoutName, isFre
         contentType="workout"
         contentRouteType={workoutType}
         onScheduled={refetchScheduled}
+        onScheduleSuccess={handleScheduleSuccess}
+      />
+
+      <AddToCalendarDialog
+        isOpen={!!calendarDialogData}
+        onClose={() => setCalendarDialogData(null)}
+        eventDetails={calendarDialogData}
       />
 
       <GoalAchievementCelebration
