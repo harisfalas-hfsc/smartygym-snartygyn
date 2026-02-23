@@ -12,8 +12,6 @@ import { format, addDays, isBefore, startOfDay } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { AddToCalendarDialog } from "@/components/AddToCalendarDialog";
-
 interface ScheduleWorkoutDialogProps {
   isOpen: boolean;
   onClose: () => void;
@@ -22,6 +20,16 @@ interface ScheduleWorkoutDialogProps {
   contentType: "workout" | "program";
   contentRouteType: string;
   onScheduled?: () => void;
+  onScheduleSuccess?: (details: {
+    title: string;
+    date: string;
+    time?: string;
+    reminderMinutes: number;
+    notes?: string;
+    contentType: "workout" | "program";
+    contentRouteType: string;
+    contentId: string;
+  }) => void;
 }
 
 export const ScheduleWorkoutDialog = ({
@@ -31,23 +39,14 @@ export const ScheduleWorkoutDialog = ({
   contentName,
   contentType,
   contentRouteType,
-  onScheduled
+  onScheduled,
+  onScheduleSuccess
 }: ScheduleWorkoutDialogProps) => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(addDays(new Date(), 1));
   const [selectedTime, setSelectedTime] = useState<string>("09:00");
   const [reminderMinutes, setReminderMinutes] = useState<string>("30");
   const [notes, setNotes] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [calendarDialogData, setCalendarDialogData] = useState<{
-    title: string;
-    date: string;
-    time?: string;
-    reminderMinutes: number;
-    notes?: string;
-    contentType: "workout" | "program";
-    contentRouteType: string;
-    contentId: string;
-  } | null>(null);
   const { toast } = useToast();
 
   const handleSchedule = async () => {
@@ -97,20 +96,21 @@ export const ScheduleWorkoutDialog = ({
       });
 
       onScheduled?.();
-
-      // Store data for calendar dialog, then close this dialog
-      setCalendarDialogData({
-        title: contentName,
-        date: scheduledDate,
-        time: selectedTime || undefined,
-        reminderMinutes: parseInt(reminderMinutes),
-        notes: notes || undefined,
-        contentType,
-        contentRouteType,
-        contentId,
-      });
-
       onClose();
+
+      // Trigger calendar dialog in parent after a small delay for dialog close animation
+      setTimeout(() => {
+        onScheduleSuccess?.({
+          title: contentName,
+          date: scheduledDate,
+          time: selectedTime || undefined,
+          reminderMinutes: parseInt(reminderMinutes),
+          notes: notes || undefined,
+          contentType,
+          contentRouteType,
+          contentId,
+        });
+      }, 300);
 
       // Reset form
       setSelectedDate(addDays(new Date(), 1));
@@ -230,14 +230,8 @@ export const ScheduleWorkoutDialog = ({
               </Button>
             </div>
           </div>
-        </DialogContent>
+      </DialogContent>
       </Dialog>
-
-      <AddToCalendarDialog
-        isOpen={!!calendarDialogData}
-        onClose={() => setCalendarDialogData(null)}
-        eventDetails={calendarDialogData}
-      />
     </>
   );
 };

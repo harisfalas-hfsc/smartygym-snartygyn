@@ -7,6 +7,7 @@ import { useAccessControl } from "@/hooks/useAccessControl";
 import { useNavigate } from "react-router-dom";
 import { CommentDialog } from "@/components/CommentDialog";
 import { ScheduleWorkoutDialog } from "@/components/ScheduleWorkoutDialog";
+import { AddToCalendarDialog } from "@/components/AddToCalendarDialog";
 import { useScheduledWorkoutForContent } from "@/hooks/useScheduledWorkouts";
 import { format } from "date-fns";
 import { GoalAchievementCelebration } from "@/components/dashboard/GoalAchievementCelebration";
@@ -28,6 +29,16 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
   const [isScheduleDialogOpen, setIsScheduleDialogOpen] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
   const [achievedGoals, setAchievedGoals] = useState<Array<{ type: "weight" | "body_fat" | "muscle_mass" | "workouts_completed" | "programs_completed"; target: number; current: number }>>([]);
+  const [calendarDialogData, setCalendarDialogData] = useState<{
+    title: string;
+    date: string;
+    time?: string;
+    reminderMinutes: number;
+    notes?: string;
+    contentType: "workout" | "program";
+    contentRouteType: string;
+    contentId: string;
+  } | null>(null);
   const { toast } = useToast();
   const { userTier, canInteract } = useAccessControl();
   const navigate = useNavigate();
@@ -231,6 +242,21 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
 
       setIsCompleted(true);
       setIsOngoing(false);
+
+      // Show calendar dialog for completed program
+      const now = new Date();
+      setTimeout(() => {
+        setCalendarDialogData({
+          title: `✅ Completed: ${programName}`,
+          date: format(now, 'yyyy-MM-dd'),
+          time: format(now, 'HH:mm'),
+          reminderMinutes: 0,
+          notes: `Program completed! Open in SmartyGym`,
+          contentType: "program",
+          contentRouteType: programType,
+          contentId: programId,
+        });
+      }, 300);
       
       toast({
         title: "Amazing Work! 🎉",
@@ -322,6 +348,10 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
       return;
     }
     setIsScheduleDialogOpen(true);
+  };
+
+  const handleScheduleSuccess = (details: typeof calendarDialogData) => {
+    setCalendarDialogData(details);
   };
 
   if (isLoading) {
@@ -470,6 +500,13 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
         contentType="program"
         contentRouteType={programType}
         onScheduled={refetchScheduled}
+        onScheduleSuccess={handleScheduleSuccess}
+      />
+
+      <AddToCalendarDialog
+        isOpen={!!calendarDialogData}
+        onClose={() => setCalendarDialogData(null)}
+        eventDetails={calendarDialogData}
       />
 
       <GoalAchievementCelebration
