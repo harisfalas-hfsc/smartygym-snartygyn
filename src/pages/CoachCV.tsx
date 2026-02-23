@@ -1,6 +1,6 @@
 import { Helmet } from "react-helmet";
-import { useShowBackButton } from "@/hooks/useShowBackButton";
-import { ArrowLeft, Shield } from "lucide-react";
+
+import { Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
@@ -8,10 +8,6 @@ import { useAccessControl } from "@/hooks/useAccessControl";
 import harisPhoto from "@/assets/haris-falas-coach.png";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 const CoachCV = () => {
-  const {
-    canGoBack,
-    goBack
-  } = useShowBackButton();
   const navigate = useNavigate();
   const {
     userTier
@@ -30,11 +26,6 @@ const CoachCV = () => {
 
       <main className="min-h-screen bg-gradient-to-b from-background to-background/50">
         <div className="container mx-auto px-4 py-6 max-w-4xl">
-          {canGoBack && <Button variant="ghost" size="sm" onClick={goBack} className="mb-4">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back
-            </Button>}
-
           <PageBreadcrumbs items={[
             { label: "Home", href: "/" },
             { label: "Coach Profile", href: "/coach-profile" },

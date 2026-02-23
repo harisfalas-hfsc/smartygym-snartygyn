@@ -11,7 +11,7 @@ import {
   Calendar, 
   Calculator,
   BookOpen,
-  ArrowLeft,
+  
   Zap,
   Sparkles,
   Heart,
@@ -31,7 +31,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
-import { useShowBackButton } from "@/hooks/useShowBackButton";
+
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
@@ -40,7 +40,7 @@ import { AlreadyPremiumCard } from "@/components/pricing/AlreadyPremiumCard";
 export default function SmartyPlans() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { canGoBack, goBack } = useShowBackButton();
+  
   const { userTier } = useAccessControl();
   const isPremium = userTier === "premium";
   const [user, setUser] = useState<User | null>(null);
@@ -312,13 +312,6 @@ export default function SmartyPlans() {
 
       <div className="min-h-screen bg-background">
         <main className="container mx-auto max-w-6xl px-4 pb-8">
-          {canGoBack && (
-            <Button variant="ghost" size="sm" onClick={goBack} className="mb-4">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              <span className="text-xs sm:text-sm">Back</span>
-            </Button>
-          )}
-
           <PageBreadcrumbs items={[{ label: "Home", href: "/" }, { label: "Smarty Plans" }]} />
 
           {/* Show Already Premium Card for premium users */}

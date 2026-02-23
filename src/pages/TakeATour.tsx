@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { 
-  ArrowLeft, 
+   
   Heart, 
   Dumbbell,
   Calendar,
@@ -28,12 +28,12 @@ import {
   User,
   Trophy
 } from "lucide-react";
-import { useShowBackButton } from "@/hooks/useShowBackButton";
+
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 
 export default function TakeATour() {
-  const { canGoBack, goBack } = useShowBackButton();
+  
 
   const workoutCategories = [
     { name: "Strength", icon: <Dumbbell className="h-4 w-4" /> },
@@ -82,18 +82,6 @@ export default function TakeATour() {
 
       <div className="min-h-screen bg-background">
         <main className="container mx-auto max-w-6xl px-4 pb-8">
-          {canGoBack && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={goBack}
-              className="mb-4"
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              <span className="text-xs sm:text-sm">Back</span>
-            </Button>
-          )}
-
           <PageBreadcrumbs items={[
             { label: "Home", href: "/" },
             { label: "Take a Tour" }
