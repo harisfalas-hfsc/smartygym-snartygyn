@@ -12,6 +12,7 @@ import { format, addDays, isBefore, startOfDay } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { AddToCalendarDialog } from "@/components/AddToCalendarDialog";
 
 interface ScheduleWorkoutDialogProps {
   isOpen: boolean;
@@ -19,6 +20,7 @@ interface ScheduleWorkoutDialogProps {
   contentId: string;
   contentName: string;
   contentType: "workout" | "program";
+  contentRouteType: string;
   onScheduled?: () => void;
 }
 
@@ -28,6 +30,7 @@ export const ScheduleWorkoutDialog = ({
   contentId,
   contentName,
   contentType,
+  contentRouteType,
   onScheduled
 }: ScheduleWorkoutDialogProps) => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(addDays(new Date(), 1));
@@ -35,6 +38,16 @@ export const ScheduleWorkoutDialog = ({
   const [reminderMinutes, setReminderMinutes] = useState<string>("30");
   const [notes, setNotes] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [calendarDialogData, setCalendarDialogData] = useState<{
+    title: string;
+    date: string;
+    time?: string;
+    reminderMinutes: number;
+    notes?: string;
+    contentType: "workout" | "program";
+    contentRouteType: string;
+    contentId: string;
+  } | null>(null);
   const { toast } = useToast();
 
   const handleSchedule = async () => {
@@ -62,7 +75,6 @@ export const ScheduleWorkoutDialog = ({
 
       const scheduledDate = format(selectedDate, 'yyyy-MM-dd');
 
-      // Insert scheduled workout
       const { error } = await supabase
         .from('scheduled_workouts')
         .insert({
@@ -85,8 +97,21 @@ export const ScheduleWorkoutDialog = ({
       });
 
       onScheduled?.();
+
+      // Store data for calendar dialog, then close this dialog
+      setCalendarDialogData({
+        title: contentName,
+        date: scheduledDate,
+        time: selectedTime || undefined,
+        reminderMinutes: parseInt(reminderMinutes),
+        notes: notes || undefined,
+        contentType,
+        contentRouteType,
+        contentId,
+      });
+
       onClose();
-      
+
       // Reset form
       setSelectedDate(addDays(new Date(), 1));
       setSelectedTime("09:00");
@@ -107,104 +132,112 @@ export const ScheduleWorkoutDialog = ({
   const today = startOfDay(new Date());
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <CalendarIcon className="h-5 w-5 text-primary" />
-            Schedule {contentType === 'workout' ? 'Workout' : 'Program'}
-          </DialogTitle>
-          <DialogDescription>
-            Add "{contentName}" to your calendar
-          </DialogDescription>
-        </DialogHeader>
+    <>
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CalendarIcon className="h-5 w-5 text-primary" />
+              Schedule {contentType === 'workout' ? 'Workout' : 'Program'}
+            </DialogTitle>
+            <DialogDescription>
+              Add "{contentName}" to your calendar
+            </DialogDescription>
+          </DialogHeader>
 
-        <div className="space-y-4 pt-4">
-          {/* Date Picker */}
-          <div className="space-y-2">
-            <Label>Date</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !selectedDate && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {selectedDate ? format(selectedDate, "MMMM d, yyyy") : "Pick a date"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={selectedDate}
-                  onSelect={setSelectedDate}
-                  disabled={(date) => isBefore(date, today)}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
+          <div className="space-y-4 pt-4">
+            {/* Date Picker */}
+            <div className="space-y-2">
+              <Label>Date</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !selectedDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {selectedDate ? format(selectedDate, "MMMM d, yyyy") : "Pick a date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={setSelectedDate}
+                    disabled={(date) => isBefore(date, today)}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
 
-          {/* Time Picker */}
-          <div className="space-y-2">
-            <Label className="flex items-center gap-2">
-              <Clock className="h-4 w-4" />
-              Time (optional)
-            </Label>
-            <Input
-              type="time"
-              value={selectedTime}
-              onChange={(e) => setSelectedTime(e.target.value)}
-              className="w-full"
-            />
-          </div>
+            {/* Time Picker */}
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2">
+                <Clock className="h-4 w-4" />
+                Time (optional)
+              </Label>
+              <Input
+                type="time"
+                value={selectedTime}
+                onChange={(e) => setSelectedTime(e.target.value)}
+                className="w-full"
+              />
+            </div>
 
-          {/* Reminder */}
-          <div className="space-y-2">
-            <Label className="flex items-center gap-2">
-              <Bell className="h-4 w-4" />
-              Remind me before
-            </Label>
-            <Select value={reminderMinutes} onValueChange={setReminderMinutes}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="15">15 minutes</SelectItem>
-                <SelectItem value="30">30 minutes</SelectItem>
-                <SelectItem value="60">1 hour</SelectItem>
-                <SelectItem value="120">2 hours</SelectItem>
-                <SelectItem value="1440">1 day</SelectItem>
-                <SelectItem value="0">No reminder</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+            {/* Reminder */}
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2">
+                <Bell className="h-4 w-4" />
+                Remind me before
+              </Label>
+              <Select value={reminderMinutes} onValueChange={setReminderMinutes}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="15">15 minutes</SelectItem>
+                  <SelectItem value="30">30 minutes</SelectItem>
+                  <SelectItem value="60">1 hour</SelectItem>
+                  <SelectItem value="120">2 hours</SelectItem>
+                  <SelectItem value="1440">1 day</SelectItem>
+                  <SelectItem value="0">No reminder</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-          {/* Notes */}
-          <div className="space-y-2">
-            <Label>Notes (optional)</Label>
-            <Textarea
-              placeholder="Add any notes for this scheduled workout..."
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              rows={3}
-            />
-          </div>
+            {/* Notes */}
+            <div className="space-y-2">
+              <Label>Notes (optional)</Label>
+              <Textarea
+                placeholder="Add any notes for this scheduled workout..."
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                rows={3}
+              />
+            </div>
 
-          {/* Actions */}
-          <div className="flex gap-2 pt-4">
-            <Button variant="outline" onClick={onClose} className="flex-1">
-              Cancel
-            </Button>
-            <Button onClick={handleSchedule} disabled={isSubmitting} className="flex-1">
-              {isSubmitting ? "Scheduling..." : "Schedule"}
-            </Button>
+            {/* Actions */}
+            <div className="flex gap-2 pt-4">
+              <Button variant="outline" onClick={onClose} className="flex-1">
+                Cancel
+              </Button>
+              <Button onClick={handleSchedule} disabled={isSubmitting} className="flex-1">
+                {isSubmitting ? "Scheduling..." : "Schedule"}
+              </Button>
+            </div>
           </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+
+      <AddToCalendarDialog
+        isOpen={!!calendarDialogData}
+        onClose={() => setCalendarDialogData(null)}
+        eventDetails={calendarDialogData}
+      />
+    </>
   );
 };
