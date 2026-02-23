@@ -251,7 +251,7 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
           date: format(now, 'yyyy-MM-dd'),
           time: format(now, 'HH:mm'),
           reminderMinutes: 0,
-          notes: `Program completed! Open in SmartyGym`,
+          notes: `Congratulations on completing "${programName}"! You stayed committed and finished strong. Keep this energy going -- your next level of fitness awaits. Open in SmartyGym to explore more programs.`,
           contentType: "program",
           contentRouteType: programType,
           contentId: programId,

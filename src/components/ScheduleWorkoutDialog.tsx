@@ -100,12 +100,16 @@ export const ScheduleWorkoutDialog = ({
 
       // Trigger calendar dialog in parent after a small delay for dialog close animation
       setTimeout(() => {
+        const label = contentType === "workout" ? "workout" : "training program";
+        const motivationalNote = notes
+          ? `${notes}\n\nYou've got a ${label} locked in -- show up, stay focused, and crush it! Open in SmartyGym for full details.`
+          : `You've got a ${label} locked in -- show up, stay focused, and crush it! Open in SmartyGym for full details.`;
         onScheduleSuccess?.({
           title: contentName,
           date: scheduledDate,
           time: selectedTime || undefined,
           reminderMinutes: parseInt(reminderMinutes),
-          notes: notes || undefined,
+          notes: motivationalNote,
           contentType,
           contentRouteType,
           contentId,
