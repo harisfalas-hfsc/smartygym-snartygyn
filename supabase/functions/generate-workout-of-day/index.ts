@@ -646,10 +646,13 @@ This is a NUDGE, not a mandate.
     // EQUIPMENT workouts → full library (bodyweight + all equipment)
     // ═══════════════════════════════════════════════════════════════════════════════
     // We fetch BOTH versions so each equipment type gets the right library
+    // Determine difficulty level name for exercise filtering
+    const difficultyLevelName = selectedDifficulty.name?.toLowerCase() || undefined;
+    
     const { exercises: bodyweightExercises, referenceList: bodyweightReferenceList } = 
-      await fetchAndBuildExerciseReference(supabase, "[GENERATE-WOD-BW]", "body weight");
+      await fetchAndBuildExerciseReference(supabase, "[GENERATE-WOD-BW]", "body weight", difficultyLevelName);
     const { exercises: fullExercises, referenceList: fullReferenceList } = 
-      await fetchAndBuildExerciseReference(supabase, "[GENERATE-WOD-FULL]");
+      await fetchAndBuildExerciseReference(supabase, "[GENERATE-WOD-FULL]", undefined, difficultyLevelName);
     
     logStep("Exercise libraries loaded", { 
       bodyweightCount: bodyweightExercises.length,
