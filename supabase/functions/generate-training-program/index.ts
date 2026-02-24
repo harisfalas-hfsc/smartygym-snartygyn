@@ -36,9 +36,11 @@ serve(async (req) => {
 
     // Fetch real exercise library from database
     // Determine equipment filter: if user selected bodyweight-only, filter library
+    // Pass difficulty level for exercise filtering
+    const programDifficulty = data?.difficulty?.toLowerCase() || undefined;
     const equipmentFilter = data?.equipment?.toLowerCase() === 'bodyweight' ? 'body weight' : undefined;
     const { exercises: exerciseLibrary, referenceList: exerciseReferenceList } = 
-      await fetchAndBuildExerciseReference(supabase, "[TrainingProgram]", equipmentFilter);
+      await fetchAndBuildExerciseReference(supabase, "[TrainingProgram]", equipmentFilter, programDifficulty);
     
     // Build a simple comma-separated list for backward compatibility in prompts
     const exerciseList = exerciseLibrary.length > 0 

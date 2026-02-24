@@ -9,6 +9,7 @@ export interface ExerciseBasic {
   body_part: string;
   equipment: string;
   target: string;
+  difficulty?: string | null;
 }
 
 export interface MatchResult {
@@ -804,14 +805,14 @@ export async function logUnmatchedExercises(
  * @param equipmentFilter - Optional: when set to 'body weight', only bodyweight exercises are included.
  *                          When undefined/null, the FULL library is used (for EQUIPMENT workouts).
  */
-export function buildExerciseReferenceList(exercises: ExerciseBasic[], equipmentFilter?: string): string {
+export function buildExerciseReferenceList(exercises: ExerciseBasic[], equipmentFilter?: string, difficultyLevel?: string): string {
   // Apply equipment filter if specified
   const filtered = equipmentFilter
     ? exercises.filter(ex => (ex.equipment || '').toLowerCase() === equipmentFilter.toLowerCase())
     : exercises;
 
   // Group by TARGET MUSCLE → BODY PART for structured browsing
-  const grouped: Record<string, Record<string, Array<{ id: string; name: string; equipment: string }>>> = {};
+  const grouped: Record<string, Record<string, Array<{ id: string; name: string; equipment: string; difficulty: string }>>> = {};
   
   for (const ex of filtered) {
     const target = (ex.target || 'other').toLowerCase();
@@ -821,7 +822,7 @@ export function buildExerciseReferenceList(exercises: ExerciseBasic[], equipment
     
     if (!grouped[key]) grouped[key] = {};
     if (!grouped[key][equip]) grouped[key][equip] = [];
-    grouped[key][equip].push({ id: ex.id, name: ex.name, equipment: equip });
+    grouped[key][equip].push({ id: ex.id, name: ex.name, equipment: equip, difficulty: (ex.difficulty || '').toLowerCase() });
   }
   
   const lines: string[] = [
@@ -867,7 +868,39 @@ export function buildExerciseReferenceList(exercises: ExerciseBasic[], equipment
       ? `This is a BODYWEIGHT workout. ONLY bodyweight exercises are available (${filtered.length} exercises).`
       : `Full exercise library available (${filtered.length} exercises — bodyweight + all equipment).`,
     '',
-    '───────────────────────────────────────────────────────────────────────────────',
+  ];
+
+  // Add difficulty constraint rules
+  if (difficultyLevel) {
+    const dl = difficultyLevel.toLowerCase();
+    lines.push('═══════════════════════════════════════════════════════════════════════════════');
+    lines.push(`DIFFICULTY CONSTRAINT (MANDATORY) — This is a ${difficultyLevel.toUpperCase()} workout/program`);
+    lines.push('═══════════════════════════════════════════════════════════════════════════════');
+    lines.push('');
+    if (dl === 'beginner') {
+      lines.push('Use ONLY exercises marked [beginner]. Do NOT use [intermediate] or [advanced] exercises.');
+      lines.push('Exercises with no difficulty tag may be used.');
+    } else if (dl === 'intermediate') {
+      lines.push('Use exercises marked [beginner] or [intermediate]. Do NOT use [advanced] exercises.');
+      lines.push('Exercises with no difficulty tag may be used.');
+    } else if (dl === 'advanced') {
+      lines.push('All difficulty levels are allowed. Prioritize [intermediate] and [advanced] exercises.');
+      lines.push('Exercises with no difficulty tag may be used.');
+    }
+    lines.push('');
+  } else {
+    lines.push('═══════════════════════════════════════════════════════════════════════════════');
+    lines.push('DIFFICULTY CONSTRAINT (MANDATORY):');
+    lines.push('═══════════════════════════════════════════════════════════════════════════════');
+    lines.push('');
+    lines.push('- For BEGINNER workouts: Use ONLY exercises marked [beginner]. No intermediate or advanced.');
+    lines.push('- For INTERMEDIATE workouts: Use exercises marked [beginner] or [intermediate]. No advanced.');
+    lines.push('- For ADVANCED workouts: All difficulty levels allowed, but prioritize [intermediate] and [advanced].');
+    lines.push('- Exercises with no difficulty tag may be used at any level.');
+    lines.push('');
+  }
+
+  lines.push('───────────────────────────────────────────────────────────────────────────────');
   ];
   
   const sortedKeys = Object.keys(grouped).sort();
@@ -881,7 +914,8 @@ export function buildExerciseReferenceList(exercises: ExerciseBasic[], equipment
     for (const equip of sortedEquipment) {
       const exercises = equipmentGroups[equip].sort((a, b) => a.name.localeCompare(b.name));
       for (const ex of exercises) {
-        lines.push(`  [ID:${ex.id}] ${ex.name} (${equip})`);
+        const diffTag = ex.difficulty ? ` [${ex.difficulty}]` : '';
+        lines.push(`  [ID:${ex.id}] ${ex.name} (${equip})${diffTag}`);
       }
     }
   }
@@ -1179,7 +1213,8 @@ export function rejectNonLibraryExercises(
 export async function fetchAndBuildExerciseReference(
   supabaseClient: any,
   logPrefix: string = "[EXERCISE-REF]",
-  equipmentFilter?: string
+  equipmentFilter?: string,
+  difficultyLevel?: string
 ): Promise<{ exercises: ExerciseBasic[]; referenceList: string }> {
   // Paginate to get ALL exercises (Supabase default limit is 1000)
   const allExercises: ExerciseBasic[] = [];
@@ -1189,7 +1224,7 @@ export async function fetchAndBuildExerciseReference(
   while (true) {
     const { data, error } = await supabaseClient
       .from("exercises")
-      .select("id, name, body_part, equipment, target")
+      .select("id, name, body_part, equipment, target, difficulty")
       .range(from, from + pageSize - 1);
     
     if (error) {
@@ -1204,7 +1239,7 @@ export async function fetchAndBuildExerciseReference(
   }
   
   console.log(`${logPrefix} Loaded ${allExercises.length} exercises from library${equipmentFilter ? ` (filter: ${equipmentFilter})` : ' (full library)'}`);
-  const referenceList = buildExerciseReferenceList(allExercises, equipmentFilter);
+  const referenceList = buildExerciseReferenceList(allExercises, equipmentFilter, difficultyLevel);
   
   // Return filtered exercises for post-processing matching too
   const exercisesForMatching = equipmentFilter
