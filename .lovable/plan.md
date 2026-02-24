@@ -1,63 +1,63 @@
 
 
-# Fix Calendar Dialog + Add "Completed" Calendar Export
+# Fix Duplicate Filters + Add Difficulty-Aware Exercise Selection (Workouts AND Training Programs)
 
-## Problems Being Fixed
+## Problems
 
-1. **AddToCalendarDialog not appearing reliably** -- It currently lives inside `ScheduleWorkoutDialog`, causing Radix Dialog overlay conflicts. When one dialog animates closed while the other tries to open, the second dialog gets blocked.
+1. **Duplicate filter values in Exercise Library page** -- The database has case-inconsistent entries (e.g., `beginner` and `Beginner`, `cardio` and `Cardio`), causing the same option to appear twice in the dropdown filters.
 
-2. **No calendar export when marking as completed** -- The user wants the same "Add to Calendar?" follow-up when marking a workout or program as completed.
+2. **AI ignores exercise difficulty** -- The exercise reference list sent to the AI for both workout generation AND training program generation does NOT include each exercise's difficulty level. The AI literally cannot see whether an exercise is beginner, intermediate, or advanced. This is why an advanced exercise like "Dumbbell Burpee" ends up in a beginner workout.
 
 ## Solution
 
-Move the `AddToCalendarDialog` state management out of `ScheduleWorkoutDialog` and into `WorkoutInteractions` and `ProgramInteractions`. This makes the calendar dialog fully independent. Then add the same trigger after "Mark as Completed" actions.
+### 1. Database Cleanup (Migration)
 
-## About How Calendar Export Works
+Normalize the 4 mismatched records so filters show unique values:
+- `UPDATE exercises SET difficulty = 'beginner' WHERE difficulty = 'Beginner'`
+- `UPDATE exercises SET category = 'cardio' WHERE category = 'Cardio'`
 
-The `.ics` file is the universal calendar format. When opened:
-- **On mobile (Android/iOS):** The device automatically shows a picker of installed calendar apps (Google Calendar, Samsung Calendar, Apple Calendar, Outlook, etc.)
-- **On desktop:** The file opens in the default calendar application (Outlook, Apple Calendar, Google Calendar desktop app, etc.)
+This immediately fixes duplicate dropdown entries without any frontend code changes.
 
-This is the same method used by every major website. There is no web browser API that can directly open a native calendar picker -- the `.ics` file IS how it's done.
+### 2. Add `difficulty` to the Exercise Reference System
 
-## Changes
+Update the shared `exercise-matching.ts` module (used by BOTH workout generation AND training program generation):
 
-### 1. Remove AddToCalendarDialog from ScheduleWorkoutDialog
+- Add `difficulty` to the `ExerciseBasic` interface
+- Add `difficulty` to the database query in `fetchAndBuildExerciseReference` (change `select("id, name, body_part, equipment, target")` to include `difficulty`)
+- Show difficulty next to each exercise in the reference list output: `[ID:0043] Barbell Full Squat (barbell) [intermediate]`
 
-`ScheduleWorkoutDialog` will no longer manage or render the calendar follow-up dialog. Instead, it will accept a new callback prop `onScheduleSuccess` that passes the event details back to the parent. The parent decides what to do with them.
+### 3. Add Difficulty Constraint Rules to Exercise Reference Header
 
-### 2. Update WorkoutInteractions
+Add a new section to the `buildExerciseReferenceList` header text that tells the AI:
 
-- Add `AddToCalendarDialog` state management directly in this component
-- Wire it to trigger after successful scheduling (via `onScheduleSuccess` callback from ScheduleWorkoutDialog)
-- Wire it to trigger after "Mark as Complete" is clicked -- with title "Completed: {workout name}", today's date, current time, and a working link
-- Use a small delay (setTimeout) before showing the calendar dialog to ensure the previous dialog's close animation finishes
+```
+DIFFICULTY CONSTRAINT (MANDATORY):
+- For BEGINNER workouts: Use ONLY exercises marked [beginner]. No intermediate or advanced.
+- For INTERMEDIATE workouts: Use exercises marked [beginner] or [intermediate]. No advanced.
+- For ADVANCED workouts: All difficulty levels allowed, but prioritize [intermediate] and [advanced].
+- Exercises with no difficulty tag may be used at any level.
+```
 
-### 3. Update ProgramInteractions
+This rule applies universally since the reference list is shared by both WOD generation and training program generation.
 
-Same changes as WorkoutInteractions:
-- Add `AddToCalendarDialog` state management
-- Trigger after scheduling success
-- Trigger after "Complete" button click -- with title "Completed: {program name}", today's date, current time, and working link
+### 4. Pass Workout Difficulty to Reference Builder (WOD Generation)
 
-### 4. The .ics content for "Completed" events
+In `generate-workout-of-day/index.ts`, the difficulty level is already known. Add a `difficultyLevel` parameter to `fetchAndBuildExerciseReference` so the reference list header can state the specific constraint for this workout (e.g., "This is a BEGINNER workout -- use ONLY beginner exercises").
 
-When marking as completed, the calendar event will contain:
-- Title: "Completed: {workout/program name}"
-- Date: today
-- Time: current time
-- Duration: 1 hour
-- Description: "Workout completed! Open in SmartyGym: {working link}"
-- URL: working link to the workout/program page
-- No reminder (since it's a past/current event, not future)
+### 5. Pass Program Difficulty to Reference Builder (Training Program Generation)
 
-## Files Modified
+In `generate-training-program/index.ts`, the difficulty is passed as `data.difficulty`. Thread it through to `fetchAndBuildExerciseReference` the same way.
+
+## Files Changed
 
 | File | Change |
 |------|--------|
-| `src/components/ScheduleWorkoutDialog.tsx` | Remove AddToCalendarDialog, add `onScheduleSuccess` callback prop instead of managing calendar dialog internally |
-| `src/components/WorkoutInteractions.tsx` | Add AddToCalendarDialog, trigger after schedule and after completion |
-| `src/components/ProgramInteractions.tsx` | Add AddToCalendarDialog, trigger after schedule and after completion |
+| Database migration | Normalize `Beginner` to `beginner` and `Cardio` to `cardio` in exercises table |
+| `supabase/functions/_shared/exercise-matching.ts` | Add `difficulty` to `ExerciseBasic`, update DB query, show difficulty in reference list, add difficulty constraint rules to header |
+| `supabase/functions/generate-workout-of-day/index.ts` | Pass difficulty level to `fetchAndBuildExerciseReference` |
+| `supabase/functions/generate-training-program/index.ts` | Pass difficulty level to `fetchAndBuildExerciseReference` |
 
-No new files. No database changes. Frontend-only.
-
+## What This Does NOT Change
+- Exercise Library frontend page (filters load dynamically -- fixing the data fixes the UI)
+- Calendar export features (untouched)
+- Any other existing functionality
