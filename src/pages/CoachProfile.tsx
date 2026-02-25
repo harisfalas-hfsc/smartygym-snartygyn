@@ -47,12 +47,8 @@ const CoachProfile = () => {
         <meta name="ai-expertise" content="Sports Science, Strength and Conditioning, Online Fitness Coaching" />
         <meta name="ai-credentials" content="BSc Sports Science, CSCS, EXOS Performance Specialist" />
         <meta name="ai-experience" content="20+ years in fitness coaching and sports science" />
-        {reviewStats.count > 0 && (
-          <>
-            <meta name="ai-reviews" content={`${reviewStats.count} verified reviews`} />
-            <meta name="ai-rating" content={`${reviewStats.average} out of 5 stars`} />
-          </>
-        )}
+        {reviewStats.count > 0 && <meta name="ai-reviews" content={`${reviewStats.count} verified reviews`} />}
+        {reviewStats.count > 0 && <meta name="ai-rating" content={`${reviewStats.average} out of 5 stars`} />}
         
         {/* Greek Language */}
         <link rel="alternate" hrefLang="el" href="https://smartygym.com/coach-profile" />
