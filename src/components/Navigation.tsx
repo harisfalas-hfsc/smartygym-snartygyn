@@ -358,6 +358,14 @@ export const Navigation = () => {
                   </Button>
                   <Button
                     variant="ghost"
+                    onClick={() => handleNavigate("/the-smarty-method")}
+                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/the-smarty-method' ? 'text-primary underline underline-offset-4 bg-primary/10' : 'text-foreground hover:bg-primary/10 hover:text-foreground'}`}
+                  >
+                    <BookOpen className="mr-2 h-4 w-4 text-amber-500" />
+                    The Smarty Method
+                  </Button>
+                  <Button
+                    variant="ghost"
                     onClick={() => handleNavigate("/contact")}
                     className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/contact' ? 'text-primary underline underline-offset-4 bg-primary/10' : 'text-foreground hover:bg-primary/10 hover:text-foreground'}`}
                   >
