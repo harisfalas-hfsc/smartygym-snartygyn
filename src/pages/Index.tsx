@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { ServiceCard } from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
@@ -745,9 +745,16 @@ const Index = () => {
             <p className="text-sm text-muted-foreground leading-relaxed text-center">
               Whether you're <span className="text-primary font-bold">traveling</span>, <span className="text-primary font-bold">busy</span> with life, or simply <span className="text-primary font-bold">can't make it</span> to the gym, we've got you covered. And even if you do go to the <span className="text-primary font-bold">gym</span>, we're here with <span className="text-primary font-bold">structured, science-based, professional workouts and training programs</span> to back you up.
             </p>
-            <p className="text-sm text-primary font-bold leading-relaxed mt-3 text-center">
+            <p className="text-sm text-primary font-bold leading-relaxed mt-5 text-center">
               Wherever you are, your gym comes with you, right in your pocket.
             </p>
+            <div className="mt-4 text-center">
+              <Link to="/the-smarty-method" className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline">
+                <BookOpen className="w-4 h-4" />
+                Discover The Smarty Method
+                <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
           </Card>
         </div>
 
@@ -814,8 +821,16 @@ const Index = () => {
                             </p>
                             <p className="text-base text-muted-foreground leading-relaxed">
                               We are not here to replace your gym. We are here to back you up when life gets in the way. Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed — SmartyGym is your backup plan. Or, if you prefer training from home entirely, we've got you covered. Or, if you go to your gym but want to follow a professional, science-based workout or training program designed by{' '}
-                              <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>, we provide that expert guidance. <span className="font-semibold text-primary">Wherever you are, your gym comes with you.</span>
+                              <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>, we provide that expert guidance.
                             </p>
+                            <p className="text-base font-semibold text-primary mt-3">
+                              Wherever you are, your gym comes with you.
+                            </p>
+                            <Link to="/the-smarty-method" className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline mt-2">
+                              <BookOpen className="w-4 h-4" />
+                              Discover The Smarty Method
+                              <ChevronRight className="w-4 h-4" />
+                            </Link>
                           </div>
                         </div>
 

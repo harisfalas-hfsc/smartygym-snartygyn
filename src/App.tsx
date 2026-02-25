@@ -81,6 +81,7 @@ import AppSubmissionPrintable from "./pages/AppSubmissionPrintable";
 import BrochureIndividual from "./pages/BrochureIndividual";
 import BrochureCorporate from "./pages/BrochureCorporate";
 import BrochureCronJobs from "./pages/BrochureCronJobs";
+import TheSmartyMethod from "./pages/TheSmartyMethod";
 import { AccessGate } from "./components/AccessGate";
 
 import { PageTransition } from "./components/PageTransition";
@@ -235,6 +236,7 @@ const AppContent = () => {
                 <Route path="/tools" element={<Tools />} />
                 <Route path="/shop" element={<Shop />} />
                 <Route path="/best-online-fitness-platform" element={<BestOnlineFitnessPlatform />} />
+                <Route path="/the-smarty-method" element={<TheSmartyMethod />} />
                 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
