@@ -1,9 +1,9 @@
 import { Helmet } from "react-helmet";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollReveal } from "@/components/ScrollReveal";
-import { CheckCircle2, Target, Heart, Users, Shield, Award, Compass, GraduationCap, Plane, Dumbbell, UserCheck, Smartphone, Calendar, Video, Wrench, FileText, BookOpen } from "lucide-react";
+import { CheckCircle2, Target, Heart, Users, Shield, Award, Compass, GraduationCap, Plane, Dumbbell, UserCheck, Smartphone, Calendar, Video, Wrench, FileText, BookOpen, ChevronRight } from "lucide-react";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
@@ -105,6 +105,11 @@ const About = () => {
         <h1 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">
           About <span className="text-primary">SmartyGym</span>
         </h1>
+              <Link to="/the-smarty-method" className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline md:hidden">
+                <BookOpen className="w-4 h-4" />
+                Discover The Smarty Method
+                <ChevronRight className="w-4 h-4" />
+              </Link>
               <p className="hidden md:block text-lg text-muted-foreground max-w-3xl mx-auto">
                 We're redefining online fitness — making quality training accessible, flexible, and designed for real life.
               </p>
