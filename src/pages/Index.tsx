@@ -795,8 +795,10 @@ const Index = () => {
                           <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center">
                             <UserCheck className="w-8 h-8 text-primary" />
                           </div>
-                          <Ban className="w-12 h-12 text-destructive" />
-                          <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center">
+                          <div className="w-16 h-16 rounded-full bg-destructive/20 flex items-center justify-center">
+                            <Ban className="w-8 h-8 text-destructive" />
+                          </div>
+                          <div className="w-16 h-16 rounded-full bg-destructive/20 flex items-center justify-center">
                             <Brain className="w-8 h-8 text-destructive" />
                           </div>
                         </div>
