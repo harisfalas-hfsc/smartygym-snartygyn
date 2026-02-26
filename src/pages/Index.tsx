@@ -189,6 +189,13 @@ const Index = () => {
     icon: Video,
     route: "/exerciselibrary"
   }, {
+    id: "blog",
+    title: "Blog & Insights",
+    description: "Evidence-based fitness articles and expert insights from professional coaches",
+    buttonText: "Read Articles",
+    icon: FileText,
+    route: "/blog"
+  }, {
     id: "community",
     title: "Community",
     description: "Connect, share and grow with fellow fitness enthusiasts worldwide",
@@ -228,6 +235,12 @@ const Index = () => {
     description: "Comprehensive video demos with proper form and technique guides",
     icon: Video,
     route: "/exerciselibrary"
+  }, {
+    id: "blog",
+    title: "Blog & Insights",
+    description: "Evidence-based articles and expert coaching tips for your training",
+    icon: FileText,
+    route: "/blog"
   }, {
     id: "community",
     title: "Community",
