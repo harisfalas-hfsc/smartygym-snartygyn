@@ -901,7 +901,6 @@ export function buildExerciseReferenceList(exercises: ExerciseBasic[], equipment
   }
 
   lines.push('───────────────────────────────────────────────────────────────────────────────');
-  ];
   
   const sortedKeys = Object.keys(grouped).sort();
   
