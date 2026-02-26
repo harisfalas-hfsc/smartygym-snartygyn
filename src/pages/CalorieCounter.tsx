@@ -198,7 +198,7 @@ const CalorieCounter = () => {
                   min="1"
                   value={grams}
                   onChange={(e) => setGrams(e.target.value)}
-                  className="text-center"
+                  className="text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
                 <Button
                   variant="outline"
