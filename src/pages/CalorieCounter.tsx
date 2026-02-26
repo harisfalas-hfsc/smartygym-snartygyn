@@ -2,9 +2,10 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Helmet } from "react-helmet";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
-import { Search, Flame, Beef, Wheat, Droplets, Leaf, Loader2 } from "lucide-react";
+import { Search, Flame, Beef, Wheat, Droplets, Leaf, Loader2, Plus, Minus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { generateFAQSchema } from "@/utils/seoSchemas";
 
@@ -27,6 +28,7 @@ const CalorieCounter = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const requestIdRef = useRef(0);
 
   const searchFood = useCallback(async (searchQuery: string) => {
     if (searchQuery.trim().length < 3) {
@@ -34,19 +36,22 @@ const CalorieCounter = () => {
       setShowDropdown(false);
       return;
     }
+    const thisRequestId = ++requestIdRef.current;
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("search-food-nutrition", {
         body: { query: searchQuery },
       });
       if (error) throw error;
+      // Ignore stale responses
+      if (thisRequestId !== requestIdRef.current) return;
       setResults(data.foods || []);
       setShowDropdown(true);
     } catch (err) {
       console.error("Food search error:", err);
-      setResults([]);
+      if (thisRequestId === requestIdRef.current) setResults([]);
     } finally {
-      setLoading(false);
+      if (thisRequestId === requestIdRef.current) setLoading(false);
     }
   }, []);
 
@@ -79,6 +84,13 @@ const CalorieCounter = () => {
 
   const gramsNum = parseFloat(grams) || 0;
   const multiplier = gramsNum / 100;
+
+  const adjustGrams = (delta: number) => {
+    setGrams((prev) => {
+      const next = Math.max(1, (parseInt(prev) || 0) + delta);
+      return String(next);
+    });
+  };
 
   const macros = selectedFood
     ? [
@@ -167,17 +179,37 @@ const CalorieCounter = () => {
             )}
           </div>
 
-          {/* Quantity */}
+          {/* Quantity with +/- buttons */}
           {selectedFood && (
             <div className="mb-6">
               <label className="text-sm font-medium text-foreground mb-1 block">Quantity (grams)</label>
-              <Input
-                type="number"
-                min="1"
-                value={grams}
-                onChange={(e) => setGrams(e.target.value)}
-                className="max-w-[160px]"
-              />
+              <div className="flex items-center gap-2 max-w-[220px]">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => adjustGrams(-10)}
+                  aria-label="Decrease by 10g"
+                  className="h-10 w-10 shrink-0"
+                >
+                  <Minus className="w-4 h-4" />
+                </Button>
+                <Input
+                  type="number"
+                  min="1"
+                  value={grams}
+                  onChange={(e) => setGrams(e.target.value)}
+                  className="text-center"
+                />
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => adjustGrams(10)}
+                  aria-label="Increase by 10g"
+                  className="h-10 w-10 shrink-0"
+                >
+                  <Plus className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
           )}
 
