@@ -189,7 +189,7 @@ const About = () => {
                     Your Gym Re-imagined. Anywhere, Anytime.
                   </h2>
                   <div className="space-y-3 text-left">
-                    <div className="flex items-center gap-3 cursor-pointer active:opacity-70" onClick={() => navigate('/workout')}>
+                    <div className="flex items-center gap-3 cursor-pointer active:opacity-70" onClick={() => navigate('/workout/wod')}>
                       <Flame className="w-6 h-6 text-red-500 flex-shrink-0" />
                       <span className="text-sm font-semibold text-primary hover:underline">Workout of the Day</span>
                     </div>
