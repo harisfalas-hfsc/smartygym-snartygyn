@@ -236,14 +236,14 @@ const Tools = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20 group-hover:from-black/95 transition-all duration-300" />
                 
                 {/* Content */}
-                <div className="relative h-full flex flex-col justify-end p-5">
+                <div className="relative h-full flex flex-col justify-end p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-lg font-semibold text-white">{tool.title}</h3>
-                    <div className="w-10 h-10 rounded-full bg-background/90 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
-                      <Icon className="w-6 h-6 text-primary" />
+                    <h3 className="text-base font-semibold text-white truncate mr-2">{tool.title}</h3>
+                    <div className="w-9 h-9 rounded-full bg-background/90 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
+                      <Icon className="w-5 h-5 text-primary" />
                     </div>
                   </div>
-                  <p className="text-sm text-white/80">{tool.description}</p>
+                  <p className="text-xs text-white/80 line-clamp-2 min-h-[2.5rem]">{tool.description}</p>
                 </div>
               </div>
             );
