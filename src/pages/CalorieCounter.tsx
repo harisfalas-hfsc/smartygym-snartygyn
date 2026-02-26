@@ -29,7 +29,7 @@ const CalorieCounter = () => {
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
   const searchFood = useCallback(async (searchQuery: string) => {
-    if (searchQuery.trim().length < 2) {
+    if (searchQuery.trim().length < 3) {
       setResults([]);
       setShowDropdown(false);
       return;
@@ -52,7 +52,7 @@ const CalorieCounter = () => {
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    if (query.trim().length < 2) {
+    if (query.trim().length < 3) {
       setResults([]);
       setShowDropdown(false);
       return;
@@ -130,7 +130,7 @@ const CalorieCounter = () => {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder="Search food (e.g. chicken breast)..."
+                placeholder="Search food (e.g. chicken, banana, rice)..."
                 value={query}
                 onChange={(e) => {
                   setQuery(e.target.value);
@@ -158,7 +158,7 @@ const CalorieCounter = () => {
               </Card>
             )}
 
-            {showDropdown && !loading && results.length === 0 && query.length >= 2 && (
+            {showDropdown && !loading && results.length === 0 && query.length >= 3 && (
               <Card className="absolute z-50 w-full mt-1 shadow-lg">
                 <CardContent className="p-4 text-center text-sm text-muted-foreground">
                   No foods found for "{query}"
