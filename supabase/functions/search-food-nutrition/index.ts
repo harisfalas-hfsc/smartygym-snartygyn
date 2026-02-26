@@ -8,6 +8,78 @@ const corsHeaders = {
 const USDA_API_URL = 'https://api.nal.usda.gov/fdc/v1/foods/search';
 const USDA_API_KEY = 'DEMO_KEY';
 
+interface USDAFood {
+  fdcId: number;
+  description: string;
+  foodNutrients?: { nutrientId: number; value?: number }[];
+  dataType?: string;
+}
+
+function extractNutrients(food: USDAFood) {
+  const nutrients: Record<string, number> = {};
+  for (const n of food.foodNutrients || []) {
+    const id = n.nutrientId;
+    const val = n.value ?? 0;
+    if (id === 1008) nutrients.calories = val;
+    if (id === 1003) nutrients.protein = val;
+    if (id === 1005) nutrients.carbs = val;
+    if (id === 1004) nutrients.fat = val;
+    if (id === 1079) nutrients.fiber = val;
+  }
+  return {
+    fdcId: food.fdcId,
+    name: food.description,
+    calories: nutrients.calories ?? 0,
+    protein: nutrients.protein ?? 0,
+    carbs: nutrients.carbs ?? 0,
+    fat: nutrients.fat ?? 0,
+    fiber: nutrients.fiber ?? 0,
+  };
+}
+
+async function searchUSDA(query: string, pageSize = 20): Promise<USDAFood[]> {
+  const params = new URLSearchParams({
+    api_key: USDA_API_KEY,
+    query,
+    pageSize: String(pageSize),
+    dataType: 'Foundation,SR Legacy',
+  });
+  const response = await fetch(`${USDA_API_URL}?${params}`);
+  if (!response.ok) return [];
+  const data = await response.json();
+  return data.foods || [];
+}
+
+function scoreFood(food: USDAFood, queryLower: string): number {
+  const name = food.description.toLowerCase();
+  const words = name.split(/[\s,]+/).filter(Boolean);
+
+  let score = 0;
+
+  // Base relevance scoring
+  if (name === queryLower) score = 100;
+  else if (name.startsWith(queryLower)) score = 80;
+  else if (words.some(w => w === queryLower)) score = 70;
+  else if (words.some(w => w.startsWith(queryLower))) score = 60;
+  else if (name.includes(queryLower)) score = 40;
+  else score = 20;
+
+  // Penalize noisy categories
+  const penaltyPatterns = ['babyfood', 'baby food', 'infant', 'toddler', 'formula', 'baby', 'junior', 'strained'];
+  if (penaltyPatterns.some(p => name.includes(p))) score -= 30;
+
+  const brandIndicators = ['chick-fil-a', 'mcdonald', 'wendy', 'burger king', 'subway', 'taco bell', 'pizza hut', 'kfc', 'popeye', 'denny', 'applebee'];
+  if (brandIndicators.some(b => name.includes(b))) score -= 20;
+
+  // Prefer shorter, generic names (fewer words = more generic)
+  score -= Math.min(words.length, 8);
+
+  // Prefer Foundation data type
+  if (food.dataType === 'Foundation') score += 5;
+
+  return Math.max(1, score);
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -22,42 +94,62 @@ serve(async (req) => {
       });
     }
 
-    const params = new URLSearchParams({
-      api_key: USDA_API_KEY,
-      query: query.trim(),
-      pageSize: '15',
-      dataType: 'Foundation,SR Legacy',
-    });
+    const trimmed = query.trim();
+    const queryLower = trimmed.toLowerCase();
 
-    const response = await fetch(`${USDA_API_URL}?${params}`);
-    if (!response.ok) {
-      throw new Error(`USDA API error: ${response.status}`);
+    // Stage A: exact query
+    let rawFoods = await searchUSDA(trimmed);
+
+    // Stage B: if few results, try wildcard-style broader search
+    if (rawFoods.length < 5) {
+      const wildcardFoods = await searchUSDA(trimmed + '*', 20);
+      rawFoods = [...rawFoods, ...wildcardFoods];
     }
 
-    const data = await response.json();
-
-    const foods = (data.foods || []).map((food: any) => {
-      const nutrients: Record<string, number> = {};
-      for (const n of food.foodNutrients || []) {
-        const id = n.nutrientId;
-        const val = n.value ?? 0;
-        if (id === 1008) nutrients.calories = val;
-        if (id === 1003) nutrients.protein = val;
-        if (id === 1005) nutrients.carbs = val;
-        if (id === 1004) nutrients.fat = val;
-        if (id === 1079) nutrients.fiber = val;
+    // Stage C: if still sparse, try common food-word completions
+    if (rawFoods.length < 5 && trimmed.length <= 8) {
+      const commonFoods = [
+        'chicken', 'cheese', 'cherry', 'chips', 'chocolate', 'chickpea',
+        'banana', 'bacon', 'bean', 'beef', 'bread', 'broccoli', 'butter',
+        'rice', 'salmon', 'steak', 'sugar', 'tomato', 'tuna', 'turkey',
+        'potato', 'pasta', 'pork', 'pepper', 'peanut', 'pizza',
+        'milk', 'mango', 'mushroom', 'oat', 'onion', 'orange', 'egg',
+        'fish', 'flour', 'apple', 'avocado', 'almond', 'carrot', 'corn',
+        'cream', 'cucumber', 'garlic', 'grape', 'honey', 'lemon', 'lettuce',
+        'lobster', 'lamb', 'yogurt', 'walnut', 'shrimp', 'spinach', 'soy',
+      ];
+      const matchingFoods = commonFoods.filter(f => f.startsWith(queryLower));
+      for (const foodWord of matchingFoods) {
+        if (rawFoods.length >= 40) break;
+        const moreFoods = await searchUSDA(foodWord, 25);
+        rawFoods = [...rawFoods, ...moreFoods];
       }
+    }
 
-      return {
-        fdcId: food.fdcId,
-        name: food.description,
-        calories: nutrients.calories ?? 0,
-        protein: nutrients.protein ?? 0,
-        carbs: nutrients.carbs ?? 0,
-        fat: nutrients.fat ?? 0,
-        fiber: nutrients.fiber ?? 0,
-      };
+    // Pre-filter: remove babyfood/infant items entirely for better results
+    const noisePatterns = ['babyfood', 'baby food', 'infant formula', 'gerber'];
+    rawFoods = rawFoods.filter(f => {
+      const nameLower = f.description.toLowerCase();
+      return !noisePatterns.some(p => nameLower.includes(p));
     });
+
+    // Deduplicate by fdcId
+    const seen = new Set<number>();
+    const unique: USDAFood[] = [];
+    for (const f of rawFoods) {
+      if (!seen.has(f.fdcId)) {
+        seen.add(f.fdcId);
+        unique.push(f);
+      }
+    }
+
+    // Score and sort
+    const scored = unique
+      .map(f => ({ food: f, score: scoreFood(f, queryLower) }))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 15);
+
+    const foods = scored.map(s => extractNutrients(s.food));
 
     return new Response(JSON.stringify({ foods }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
