@@ -44,6 +44,7 @@ export const WODAnnouncementModal = ({ open, onClose }: WODAnnouncementModalProp
   const bodyweightWOD = wods?.find(w => w.equipment === "BODYWEIGHT");
   const equipmentWOD = wods?.find(w => w.equipment === "EQUIPMENT");
   const hasWODs = wods && wods.length > 0;
+  const isRecoveryDay = wods?.length === 1 && wods[0]?.category?.toUpperCase() === "RECOVERY";
 
   // Countdown timer - auto close after 15 seconds
   useEffect(() => {
@@ -188,10 +189,14 @@ export const WODAnnouncementModal = ({ open, onClose }: WODAnnouncementModalProp
               <CalendarCheck className="w-7 h-7 text-primary" />
             </div>
             <h2 className="text-xl font-bold text-foreground mb-1">
-              🔥 Fresh Workouts Just Dropped!
+              🔥 {isRecoveryDay ? "Fresh Recovery Workout Just Dropped!" : "Fresh Workouts Just Dropped!"}
             </h2>
             <p className="text-sm text-muted-foreground max-w-sm">
-              Every day, <span className="text-primary font-semibold">SmartyGym</span> delivers <strong>TWO</strong> fresh workouts — pick based on your location!
+              {isRecoveryDay ? (
+                <>Today is recovery day. Take care of your body with a guided recovery session designed by <span className="text-primary font-semibold">SmartyGym</span>.</>
+              ) : (
+                <>Every day, <span className="text-primary font-semibold">SmartyGym</span> delivers <strong>TWO</strong> fresh workouts — pick one based on your mood, convenience, or training preference!</>
+              )}
             </p>
           </div>
         </div>
@@ -203,9 +208,15 @@ export const WODAnnouncementModal = ({ open, onClose }: WODAnnouncementModalProp
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             </div>
           ) : hasWODs ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-              {renderWODCard(bodyweightWOD, true)}
-              {renderWODCard(equipmentWOD, false)}
+            <div className={isRecoveryDay ? "flex justify-center mb-4" : "grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4"}>
+              {isRecoveryDay ? (
+                <div className="w-full sm:w-1/2">{renderWODCard(wods![0], wods![0]?.equipment === "BODYWEIGHT")}</div>
+              ) : (
+                <>
+                  {renderWODCard(bodyweightWOD, true)}
+                  {renderWODCard(equipmentWOD, false)}
+                </>
+              )}
             </div>
           ) : (
             <div className="text-center py-6 mb-4">
@@ -227,7 +238,7 @@ export const WODAnnouncementModal = ({ open, onClose }: WODAnnouncementModalProp
             className="w-full cta-button"
           >
             <CalendarCheck className="w-4 h-4 mr-2" />
-            {hasWODs ? "View All Today's Workouts" : "Browse Workouts"}
+            {hasWODs ? (isRecoveryDay ? "View Today's Workout" : "View All Today's Workouts") : "Browse Workouts"}
           </Button>
 
           {/* Don't show again checkbox */}
