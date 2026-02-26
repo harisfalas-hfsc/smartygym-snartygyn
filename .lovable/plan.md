@@ -1,46 +1,81 @@
 
+Goal: Make the Calorie Counter feel truly live for partial typing (like “chic” / “chick”) and make quantity controls consistent instead of relying on browser-only spinner arrows.
 
-# Calorie Counter Tool - Using USDA Food Database
+What I found from debugging
+1) The current UI is calling the backend correctly as you type (debounced).
+2) The current backend returns:
+- “chi” → empty
+- “chic” → empty
+- “chick” → mostly CHICK-FIL-A matches
+- “chicken” → expected chicken items
+3) So this is not a broken search bar; it is a data-provider search behavior/ranking issue for short prefixes.
+4) Quantity input arrows are not controlled by your app logic. Native number spinners are browser-dependent (some desktop/mobile combinations hide or minimize them even when CSS tries to show them).
 
-## Overview
-Add a new "Calorie Counter" tool to the Smarty Tools page. Users type a food name, see live search results from the USDA FoodData Central API (free, 300,000+ foods, no API key required), select a food, enter the quantity in grams, and instantly see calories and macros.
+Implementation approach
 
-## How It Works
-- As you type a food name (e.g. "chicken breast"), a dropdown shows matching results from the USDA database
-- Select the food you want, enter the quantity (e.g. 200g)
-- The tool calculates and displays: Calories, Protein, Carbs, Fat, and Fiber
+1) Improve backend search quality for partial words
+File: `supabase/functions/search-food-nutrition/index.ts`
 
-## Technical Plan
+Plan:
+- Keep current base query call.
+- Add smart fallback stages when results are weak:
+  - Stage A: exact query (current behavior)
+  - Stage B: wildcard query (`query + "*"`) when exact is empty or too limited
+  - Stage C: inferred completion query (example: infer “chicken” from partial results and run that once)
+- Merge and deduplicate by `fdcId`.
+- Apply a ranking pass so generic food matches are surfaced before brand-heavy noise.
+- Return top 15 ranked foods.
 
-### 1. Create Edge Function for USDA API Proxy
-**File:** `supabase/functions/search-food-nutrition/index.ts`
-- Proxies requests to USDA FoodData Central API (`https://api.nal.usda.gov/fdc/v1/foods/search`)
-- The USDA API is free and does not require an API key for basic access (or uses the free demo key `DEMO_KEY`)
-- Accepts a search query, returns food names with per-100g nutritional values (calories, protein, carbs, fat, fiber)
-- Handles CORS for the web app
+Why this works:
+- Fixes “chic” returning nothing.
+- Reduces the “chick only shows CHICK-FIL-A” problem by expanding and re-ranking results.
+- Keeps USDA as source (no AI credits, no new database required).
 
-### 2. Create Calorie Counter Page
-**File:** `src/pages/CalorieCounter.tsx`
-- Search input with debounced typing (300ms delay to avoid excessive API calls)
-- Dropdown list of matching foods appearing as you type
-- Quantity input (grams) with a default of 100g
-- Results card showing calculated nutrition per the entered quantity
-- Follows the same page structure as existing tools (breadcrumbs, Helmet SEO, SEOEnhancer)
+2) Keep the frontend live-search behavior but make results more stable
+File: `src/pages/CalorieCounter.tsx`
 
-### 3. Add Route
-**File:** `src/App.tsx`
-- Add route `/caloriecounter` pointing to the new page
-- Place it alongside the other tool routes
+Plan:
+- Keep 3-character minimum trigger (it avoids useless calls).
+- Add response-order protection (ignore stale/out-of-order responses) so fast typing doesn’t briefly show wrong/older results.
+- Keep dropdown behavior the same, but results quality will improve from backend changes.
 
-### 4. Add to Tools Page
-**File:** `src/pages/Tools.tsx`
-- Add the Calorie Counter card to the `tools` array with a `Search` icon from lucide-react
-- Appears in both mobile carousel and desktop grid
-- Will need a background image for the desktop card (will use a placeholder or generate one)
+3) Make quantity controls consistent across devices
+File: `src/pages/CalorieCounter.tsx`
 
-### 5. Add Background Image
-- Add a calorie counter background image to `src/assets/tools/`
+Plan:
+- Replace “depend on native spinner arrows” with explicit controls:
+  - Add visible “−” and “+” buttons around the grams input.
+  - Keep manual typing enabled.
+  - Clamp minimum to 1g.
+- This guarantees consistent behavior on desktop and mobile, regardless of browser spinner UI.
 
-### 6. Update Tools Page SEO
-- Update the Helmet meta tags and FAQ schema to include the Calorie Counter tool
+Why this works:
+- Eliminates uncertainty about whether spinner arrows should appear.
+- Gives predictable, always-visible controls for users.
 
+Technical details (implementation notes)
+- Backend ranking heuristic (lightweight):
+  - Prefer names where a word starts with user query or inferred completion.
+  - Prefer cleaner/generic descriptors over noisy brand-heavy names when tied.
+  - Keep dedupe by `fdcId`.
+- No database schema changes needed.
+- No auth changes needed.
+- No new secrets needed.
+
+Validation checklist after implementation
+1) Search behavior
+- Type: `chi`, `chic`, `chick`, `chicken`, `bana`
+- Confirm dropdown appears while typing and gives relevant food options.
+2) Selection + calculation
+- Select a result, set 100g / 200g / 300g, verify macros scale correctly.
+3) Quantity control UX
+- Desktop: plus/minus buttons always visible and working.
+- Mobile: same controls visible and working.
+- Manual number typing still works.
+4) Regression
+- No console errors during rapid typing.
+- Dropdown closes/open behavior still correct.
+
+Files planned for edits
+- `supabase/functions/search-food-nutrition/index.ts`
+- `src/pages/CalorieCounter.tsx`
