@@ -703,7 +703,7 @@ const Index = () => {
             )}
           </div>
 
-          <div onClick={() => navigate('/about')} className="flex items-center gap-2.5 py-1.5 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md">
+          <div onClick={() => navigate('/about')} className="flex items-center gap-2.5 py-3 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md">
             <Info className="w-5 h-5 text-primary flex-shrink-0" />
             <span className="text-base font-medium">About SmartyGym</span>
             <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
@@ -736,27 +736,6 @@ const Index = () => {
           )}
         </div>
 
-        {/* Mobile Only: Everywhere, Anywhere */}
-        <div className="mt-8 mb-2">
-          <Card className="border-[3px] border-primary/40 p-4">
-            <h2 className="text-2xl font-bold text-center mb-3 text-primary">
-              Everywhere - Anywhere
-            </h2>
-            <p className="text-sm text-muted-foreground leading-relaxed text-center">
-              Whether you're <span className="text-primary font-bold">traveling</span>, <span className="text-primary font-bold">busy</span> with life, or simply <span className="text-primary font-bold">can't make it</span> to the gym, we've got you covered. And even if you do go to the <span className="text-primary font-bold">gym</span>, we're here with <span className="text-primary font-bold">structured, science-based, professional workouts and training programs</span> to back you up.
-            </p>
-            <p className="text-sm text-primary font-bold leading-relaxed mt-5 text-center">
-              Wherever you are, your gym comes with you, right in your pocket.
-            </p>
-            <div className="mt-4 text-center">
-              <Link to="/the-smarty-method" className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline">
-                <BookOpen className="w-4 h-4" />
-                Discover The Smarty Method
-                <ChevronRight className="w-4 h-4" />
-              </Link>
-            </div>
-          </Card>
-        </div>
 
           </section> : <>
             {/* Desktop: Hero Section */}
