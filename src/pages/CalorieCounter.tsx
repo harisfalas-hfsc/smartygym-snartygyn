@@ -57,6 +57,7 @@ const CalorieCounter = () => {
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (selectedFood) return; // Don't search when a food is already selected
     if (query.trim().length < 3) {
       setResults([]);
       setShowDropdown(false);
@@ -64,7 +65,7 @@ const CalorieCounter = () => {
     }
     debounceRef.current = setTimeout(() => searchFood(query), 300);
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
-  }, [query, searchFood]);
+  }, [query, searchFood, selectedFood]);
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
