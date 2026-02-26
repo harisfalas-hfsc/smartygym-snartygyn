@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
-import { Clock, Calendar, BookOpen, ArrowLeft } from "lucide-react";
+import { Clock, Calendar, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ShareButtons } from "@/components/ShareButtons";
 import { Card } from "@/components/ui/card";
@@ -48,10 +48,6 @@ export const ArticleDetail = () => {
             <p className="text-muted-foreground mb-6">
               The article you're looking for doesn't exist or has been unpublished.
             </p>
-            <Button onClick={() => navigate('/blog')} className="hidden md:inline-flex">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Blog
-            </Button>
           </Card>
         </div>
       </div>
@@ -170,10 +166,6 @@ export const ArticleDetail = () => {
           </Card>
 
           <div className="mt-8 flex gap-4">
-            <Button variant="outline" onClick={() => navigate('/blog')} className="hidden md:inline-flex flex-1">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Blog
-            </Button>
             <Button onClick={() => navigate('/join-premium')} className="flex-1">
               Start Your Free Trial
             </Button>

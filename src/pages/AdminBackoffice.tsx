@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { ArrowLeft, Folder, Users, Mail, FileText, Settings, BarChart3, BookOpen, MessageSquare, Inbox, Megaphone, TrendingUp, Plus, Dumbbell, Calendar, Bell, ShoppingBag, Sparkles, Building2, Video, Smartphone, Clock, WifiOff } from "lucide-react";
+import { Folder, Users, Mail, FileText, Settings, BarChart3, BookOpen, MessageSquare, Inbox, Megaphone, TrendingUp, Plus, Dumbbell, Calendar, Bell, ShoppingBag, Sparkles, Building2, Video, Smartphone, Clock, WifiOff } from "lucide-react";
 import { ContentManager } from "@/components/admin/ContentManager";
 import { CommunicationsManager } from "@/components/admin/CommunicationsManager";
 import { EmailManager } from "@/components/admin/EmailManager";
@@ -297,14 +297,6 @@ export default function AdminBackoffice() {
         ) : (
           /* Section Content View */
           <div>
-            <Button 
-              variant="ghost" 
-              onClick={() => setActiveTab(null)}
-              className="hidden md:inline-flex mb-4 gap-2"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back to sections
-            </Button>
 
             {/* Content Section */}
             {activeTab === "content" && (

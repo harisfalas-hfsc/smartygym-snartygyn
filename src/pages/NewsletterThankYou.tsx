@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { CheckCircle2, ArrowLeft } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 
 
@@ -40,10 +40,6 @@ const NewsletterThankYou = () => {
           <div className="pt-4 space-y-3">
             <Button onClick={() => navigate("/workout")} size="lg" className="w-full">
               Explore Workouts
-            </Button>
-            <Button onClick={() => navigate("/")} variant="outline" size="lg" className="hidden md:inline-flex w-full">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Home
             </Button>
           </div>
         </Card>

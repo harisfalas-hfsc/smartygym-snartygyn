@@ -1,8 +1,7 @@
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Play, Pause, RotateCcw, Upload, CheckCircle, Info } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Play, Pause, RotateCcw, Upload, CheckCircle, Info } from "lucide-react";
 import { SampleVideo, SampleVideoRef } from "@/components/admin/marketing/videos/SampleVideo";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -96,11 +95,6 @@ export default function ExportVideoPage() {
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">
-          <Button asChild variant="ghost" size="icon" className="hidden md:inline-flex">
-            <Link to="/admin">
-              <ArrowLeft className="h-5 w-5" />
-            </Link>
-          </Button>
           <div>
             <h1 className="text-2xl font-bold">Export Video</h1>
             <p className="text-muted-foreground">

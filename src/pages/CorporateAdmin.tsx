@@ -21,7 +21,6 @@ import {
   Building2, 
   Users, 
   Crown,
-  ArrowLeft,
   Plus,
   Trash2,
   Calendar,
@@ -352,15 +351,6 @@ export default function CorporateAdmin() {
 
       <div className="min-h-screen bg-background">
         <main className="container mx-auto max-w-6xl p-4 py-8">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate('/dashboard')}
-            className="hidden md:inline-flex mb-6"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            <span>Back to Dashboard</span>
-          </Button>
 
           {/* Header */}
           <div className="flex items-center gap-3 mb-6">
