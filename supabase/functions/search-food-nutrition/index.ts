@@ -97,16 +97,14 @@ serve(async (req) => {
     const trimmed = query.trim();
     const queryLower = trimmed.toLowerCase();
 
-    // Stage A: exact query
-    let rawFoods = await searchUSDA(trimmed);
+    // Stage A+B: run exact and wildcard searches in parallel
+    const [exactFoods, wildcardFoods] = await Promise.all([
+      searchUSDA(trimmed),
+      searchUSDA(trimmed + '*', 20),
+    ]);
+    let rawFoods = [...exactFoods, ...wildcardFoods];
 
-    // Stage B: if few results, try wildcard-style broader search
-    if (rawFoods.length < 5) {
-      const wildcardFoods = await searchUSDA(trimmed + '*', 20);
-      rawFoods = [...rawFoods, ...wildcardFoods];
-    }
-
-    // Stage C: if still sparse, try common food-word completions
+    // Stage C: if still sparse, try up to 2 common food-word completions in parallel
     if (rawFoods.length < 5 && trimmed.length <= 8) {
       const commonFoods = [
         'chicken', 'cheese', 'cherry', 'chips', 'chocolate', 'chickpea',
@@ -118,11 +116,12 @@ serve(async (req) => {
         'cream', 'cucumber', 'garlic', 'grape', 'honey', 'lemon', 'lettuce',
         'lobster', 'lamb', 'yogurt', 'walnut', 'shrimp', 'spinach', 'soy',
       ];
-      const matchingFoods = commonFoods.filter(f => f.startsWith(queryLower));
-      for (const foodWord of matchingFoods) {
-        if (rawFoods.length >= 40) break;
-        const moreFoods = await searchUSDA(foodWord, 25);
-        rawFoods = [...rawFoods, ...moreFoods];
+      const matches = commonFoods.filter(f => f.startsWith(queryLower)).slice(0, 2);
+      const completionResults = await Promise.all(
+        matches.map(word => searchUSDA(word, 20))
+      );
+      for (const foods of completionResults) {
+        rawFoods = [...rawFoods, ...foods];
       }
     }
 
