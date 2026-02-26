@@ -16,7 +16,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useAccessControl } from "@/hooks/useAccessControl";
 
 import { useAdminRole } from "@/hooks/useAdminRole";
-import { Heart, CheckCircle, Clock, Star, Play, Dumbbell, Calendar, Crown, ArrowLeft, Calculator, ShoppingBag, MessageSquare, Loader2, RefreshCw, ExternalLink, ClipboardList, TrendingUp, BookOpen, Headphones, Sparkles, Quote, User as UserIcon, Scale, Building2, Users, ClipboardCheck, FileText, Trash2, Settings } from "lucide-react";
+import { Heart, CheckCircle, Clock, Star, Play, Dumbbell, Calendar, Crown, Calculator, ShoppingBag, MessageSquare, Loader2, RefreshCw, ExternalLink, ClipboardList, TrendingUp, BookOpen, Headphones, Sparkles, Quote, User as UserIcon, Scale, Building2, Users, ClipboardCheck, FileText, Trash2, Settings } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -1179,14 +1179,6 @@ export default function UserDashboard() {
         ) : (
           /* Section Content View */
           <div className="space-y-6">
-            <Button 
-              variant="ghost" 
-              onClick={() => navigate('/userdashboard')}
-              className="hidden md:inline-flex mb-4 gap-2"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back to sections
-            </Button>
 
 
             {/* Workouts Section */}

@@ -5,7 +5,7 @@ import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Eye, Check, Heart, Crown, ShoppingCart, Clock, Dumbbell, Star, Home, TrendingUp, Brain, RefreshCw, Target, CheckCircle, Shield, Shuffle, Layers } from "lucide-react";
+import { Eye, Check, Heart, Crown, ShoppingCart, Clock, Dumbbell, Star, Home, TrendingUp, Brain, RefreshCw, Target, CheckCircle, Shield, Shuffle, Layers } from "lucide-react";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { ContentLoadingSkeleton } from "@/components/ContentLoadingSkeleton";
 import { useAllWorkouts } from "@/hooks/useWorkoutData";
@@ -245,10 +245,6 @@ const WODCategory = () => {
 
           <div className="min-h-screen bg-background">
             <div className="container mx-auto max-w-5xl px-4 py-8">
-              <Button variant="ghost" size="sm" onClick={() => navigate("/workout")} className="hidden md:inline-flex mb-6">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                <span className="text-xs sm:text-sm">Back</span>
-              </Button>
 
               <PageBreadcrumbs items={[{
             label: "Home",
