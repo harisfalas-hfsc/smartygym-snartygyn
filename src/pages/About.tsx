@@ -429,7 +429,7 @@ const About = () => {
           </ScrollReveal>
 
           {/* Everywhere, Anywhere Card */}
-          <ScrollReveal>
+          <ScrollReveal className="hidden md:block">
             <Card className="mb-12 border-[3px] border-primary/40 p-4">
               <h2 className="text-2xl font-bold text-center mb-3 text-primary">
                 Everywhere - Anywhere
