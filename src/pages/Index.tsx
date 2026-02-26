@@ -605,7 +605,7 @@ const Index = () => {
                           
                           {/* Text Content */}
                           <div className="flex-1 flex flex-col justify-center gap-1.5">
-                            <h3 className="text-base font-bold text-foreground leading-tight">
+                            <h3 className="text-base font-bold text-foreground leading-tight line-clamp-1">
                               {card.title}
                             </h3>
                             <p className="text-xs text-muted-foreground leading-snug line-clamp-2">
