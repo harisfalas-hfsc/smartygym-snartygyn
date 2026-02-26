@@ -1,47 +1,46 @@
 
-# Move "Everywhere, Anywhere" Card and Update About Page Features
+
+# Calorie Counter Tool - Using USDA Food Database
 
 ## Overview
-Three changes: (1) Remove the "Everywhere, Anywhere" card from the homepage and add it as the last card on the About page, (2) add a "Workout of the Day" reference as the first item in the feature list on the About page, and (3) double the height of the "About SmartyGym" navigation link on the homepage.
+Add a new "Calorie Counter" tool to the Smarty Tools page. Users type a food name, see live search results from the USDA FoodData Central API (free, 300,000+ foods, no API key required), select a food, enter the quantity in grams, and instantly see calories and macros.
 
----
+## How It Works
+- As you type a food name (e.g. "chicken breast"), a dropdown shows matching results from the USDA database
+- Select the food you want, enter the quantity (e.g. 200g)
+- The tool calculates and displays: Calories, Protein, Carbs, Fat, and Fiber
 
-## Changes
+## Technical Plan
 
-### 1. Remove "Everywhere, Anywhere" from Homepage
-**File:** `src/pages/Index.tsx`
-- Delete lines 739-759 (the `{/* Mobile Only: Everywhere, Anywhere */}` section with the Card containing the title, description, tagline, and "Discover The Smarty Method" link).
+### 1. Create Edge Function for USDA API Proxy
+**File:** `supabase/functions/search-food-nutrition/index.ts`
+- Proxies requests to USDA FoodData Central API (`https://api.nal.usda.gov/fdc/v1/foods/search`)
+- The USDA API is free and does not require an API key for basic access (or uses the free demo key `DEMO_KEY`)
+- Accepts a search query, returns food names with per-100g nutritional values (calories, protein, carbs, fat, fiber)
+- Handles CORS for the web app
 
-### 2. Add "Everywhere, Anywhere" as Last Card on About Page
-**File:** `src/pages/About.tsx`
-- Insert a new card just before the CTA section (before line 423), replicating the same content:
-  - Title: "Everywhere - Anywhere" in primary color
-  - Description about traveling, busy life, gym backup
-  - Tagline: "Wherever you are, your gym comes with you, right in your pocket."
-  - "Discover The Smarty Method" link
-- This card will be visible on both mobile and desktop (no responsive hiding).
+### 2. Create Calorie Counter Page
+**File:** `src/pages/CalorieCounter.tsx`
+- Search input with debounced typing (300ms delay to avoid excessive API calls)
+- Dropdown list of matching foods appearing as you type
+- Quantity input (grams) with a default of 100g
+- Results card showing calculated nutrition per the entered quantity
+- Follows the same page structure as existing tools (breadcrumbs, Helmet SEO, SEOEnhancer)
 
-### 3. Add "Workout of the Day" as First Feature Reference
-**File:** `src/pages/About.tsx`
-- **Desktop card** (line 130-155): Add a new row before "Expert-Crafted Workouts":
-  ```
-  <Flame icon> Workout of the Day
-  ```
-  Using a `Flame` icon (or `Zap`) in a distinctive color (e.g., `text-red-500`).
+### 3. Add Route
+**File:** `src/App.tsx`
+- Add route `/caloriecounter` pointing to the new page
+- Place it alongside the other tool routes
 
-- **Mobile card** (line 187-211): Add the same as a clickable link navigating to `/workout` (the WOD section), placed first in the list.
+### 4. Add to Tools Page
+**File:** `src/pages/Tools.tsx`
+- Add the Calorie Counter card to the `tools` array with a `Search` icon from lucide-react
+- Appears in both mobile carousel and desktop grid
+- Will need a background image for the desktop card (will use a placeholder or generate one)
 
-### 4. Double the Height of "About SmartyGym" Link on Homepage
-**File:** `src/pages/Index.tsx`
-- Change the About SmartyGym navigation link (line 706) padding from `py-1.5` to `py-3` to double its vertical size, making it stand out more prominently among the other navigation links.
+### 5. Add Background Image
+- Add a calorie counter background image to `src/assets/tools/`
 
----
+### 6. Update Tools Page SEO
+- Update the Helmet meta tags and FAQ schema to include the Calorie Counter tool
 
-## Technical Summary
-
-| File | Change |
-|------|--------|
-| `src/pages/Index.tsx` | Remove "Everywhere, Anywhere" card (lines 739-759); increase About SmartyGym link height (`py-1.5` to `py-3`) |
-| `src/pages/About.tsx` | Add "Workout of the Day" as first feature in both desktop and mobile lists; add "Everywhere, Anywhere" card before CTA |
-
-New import needed in About.tsx: `Flame` (or `Zap`) from lucide-react. No new dependencies.
