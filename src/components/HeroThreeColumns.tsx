@@ -6,7 +6,8 @@ import {
   FileText, 
   Video,
   ChevronRight,
-  Calendar
+  Calendar,
+  Users
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SwipeToExplore } from "@/components/ui/SwipeToExplore";
@@ -26,8 +27,9 @@ import heroProgramsImage from "@/assets/hero-programs.jpg";
 import heroToolsImage from "@/assets/hero-tools.jpg";
 import heroBlogImage from "@/assets/hero-blog.jpg";
 import heroLibraryImage from "@/assets/hero-exercise-library-new.jpg";
+import heroCommunityImage from "@/assets/hero-gym-group.jpg";
 
-// Define hero cards - ordered: Workouts, Programs, Library, Blog, Tools
+// Define hero cards - ordered: Workouts, Programs, Library, Blog, Tools, Community
 const heroCards = [
   {
     id: "workouts",
@@ -68,6 +70,14 @@ const heroCards = [
     icon: Calculator,
     route: "/tools",
     image: heroToolsImage
+  },
+  {
+    id: "community",
+    title: "Community",
+    description: "Connect, share and grow with fellow fitness enthusiasts worldwide",
+    icon: Users,
+    route: "/community",
+    image: heroCommunityImage
   }
 ];
 
