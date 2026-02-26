@@ -3,7 +3,7 @@ import { generateFAQSchema } from "@/utils/seoSchemas";
 import { Helmet } from "react-helmet";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { Calculator, Activity, Flame, Timer } from "lucide-react";
 
@@ -160,37 +160,32 @@ const Tools = () => {
               {tools.map((tool) => {
                 const Icon = tool.icon;
                 return (
-                  <CarouselItem key={tool.id} className="pl-2 basis-[85%]">
-                    <div
+                  <CarouselItem key={tool.id} className="pl-2 basis-[75%]">
+                    <Card
                       onClick={() => navigate(tool.route)}
-                      className="group relative h-48 rounded-xl overflow-hidden cursor-pointer transition-all duration-500 ease-out transform-gpu hover:scale-[1.02] hover:shadow-xl"
+                      className="h-[160px] border-[3px] border-primary/40 hover:border-primary hover:scale-[1.02] hover:shadow-xl hover:bg-primary/5 transition-all duration-300 cursor-pointer"
                     >
-                      {/* Background Image */}
-                      <img 
-                        src={tool.image} 
-                        alt={tool.title}
-                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                      {/* Gradient Overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20 group-hover:from-black/95" />
-                      
-                      {/* Content */}
-                      <div className="relative h-full flex flex-col justify-end p-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <h3 className="text-base font-semibold text-white">{tool.title}</h3>
-                          <div className="w-9 h-9 rounded-full bg-background/90 flex items-center justify-center shadow-md">
-                            <Icon className="w-5 h-5 text-primary" />
-                          </div>
+                      <CardContent className="h-full flex flex-col items-center justify-center p-4 gap-2 text-center">
+                        {/* Icon - centered on top */}
+                        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 flex-shrink-0">
+                          <Icon className="w-6 h-6 text-primary" />
                         </div>
-                        <p className="text-xs text-white/80 line-clamp-2">{tool.description}</p>
-                      </div>
-                    </div>
+                        {/* Title - single line */}
+                        <h3 className="text-base font-bold text-foreground leading-tight whitespace-nowrap">
+                          {tool.title}
+                        </h3>
+                        {/* Description - max 2 lines */}
+                        <p className="text-sm text-muted-foreground leading-snug line-clamp-2">
+                          {tool.description}
+                        </p>
+                      </CardContent>
+                    </Card>
                   </CarouselItem>
                 );
               })}
             </CarouselContent>
-            <CarouselPrevious className="left-2 h-8 w-8 bg-background/80 border-primary/20" />
-            <CarouselNext className="right-2 h-8 w-8 bg-background/80 border-primary/20" />
+            <CarouselPrevious className="hidden" />
+            <CarouselNext className="hidden" />
           </Carousel>
           {/* Navigation dots */}
           <div className="flex justify-center gap-2 mt-4">
