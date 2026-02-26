@@ -42,6 +42,7 @@ import ExerciseLibrary from "./pages/ExerciseLibrary";
 import CorporateAdmin from "./pages/CorporateAdmin";
 import CalculatorHistory from "./pages/CalculatorHistory";
 import WorkoutTimer from "./pages/WorkoutTimer";
+import CalorieCounter from "./pages/CalorieCounter";
 
 import Tools from "./pages/Tools";
 import BestOnlineFitnessPlatform from "./pages/BestOnlineFitnessPlatform";
@@ -172,6 +173,9 @@ const AppContent = () => {
                   <Route path="/calculator-history" element={<CalculatorHistory />} />
                   <Route path="/workouttimer" element={<WorkoutTimer />} />
                 </Route>
+                
+                {/* Public calorie counter - no auth required */}
+                <Route path="/caloriecounter" element={<CalorieCounter />} />
                 
                 {/* Redirect /dashboard to /userdashboard */}
                 <Route path="/dashboard" element={<DashboardRedirect />} />
