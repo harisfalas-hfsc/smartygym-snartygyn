@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollReveal } from "@/components/ScrollReveal";
-import { CheckCircle2, Target, Heart, Users, Shield, Award, Compass, GraduationCap, Plane, Dumbbell, UserCheck, Smartphone, Calendar, Video, Wrench, FileText, BookOpen, ChevronRight } from "lucide-react";
+import { CheckCircle2, Target, Heart, Users, Shield, Award, Compass, GraduationCap, Plane, Dumbbell, UserCheck, Smartphone, Calendar, Video, Wrench, FileText, BookOpen, ChevronRight, Flame } from "lucide-react";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
@@ -129,6 +129,10 @@ const About = () => {
                   <div className="space-y-4 max-w-4xl mx-auto">
                     <div className="space-y-3 max-w-md mx-auto">
                       <div className="flex items-center gap-3">
+                        <Flame className="w-6 h-6 text-red-500 flex-shrink-0" />
+                        <span className="text-base font-semibold text-foreground">Workout of the Day</span>
+                      </div>
+                      <div className="flex items-center gap-3">
                         <Dumbbell className="w-6 h-6 text-orange-500 flex-shrink-0" />
                         <span className="text-base font-semibold text-foreground">Expert-Crafted Workouts</span>
                       </div>
@@ -185,6 +189,10 @@ const About = () => {
                     Your Gym Re-imagined. Anywhere, Anytime.
                   </h2>
                   <div className="space-y-3 text-left">
+                    <div className="flex items-center gap-3 cursor-pointer active:opacity-70" onClick={() => navigate('/workout')}>
+                      <Flame className="w-6 h-6 text-red-500 flex-shrink-0" />
+                      <span className="text-sm font-semibold text-primary hover:underline">Workout of the Day</span>
+                    </div>
                     <div className="flex items-center gap-3 cursor-pointer active:opacity-70" onClick={() => navigate('/workout')}>
                       <Dumbbell className="w-6 h-6 text-orange-500 flex-shrink-0" />
                       <span className="text-sm font-semibold text-primary hover:underline">Expert-Crafted Workouts</span>
@@ -417,6 +425,28 @@ const About = () => {
                   </div>
                 </div>
               </CardContent>
+            </Card>
+          </ScrollReveal>
+
+          {/* Everywhere, Anywhere Card */}
+          <ScrollReveal>
+            <Card className="mb-12 border-[3px] border-primary/40 p-4">
+              <h2 className="text-2xl font-bold text-center mb-3 text-primary">
+                Everywhere - Anywhere
+              </h2>
+              <p className="text-sm text-muted-foreground leading-relaxed text-center">
+                Whether you're <span className="text-primary font-bold">traveling</span>, <span className="text-primary font-bold">busy</span> with life, or simply <span className="text-primary font-bold">can't make it</span> to the gym, we've got you covered. And even if you do go to the <span className="text-primary font-bold">gym</span>, we're here with <span className="text-primary font-bold">structured, science-based, professional workouts and training programs</span> to back you up.
+              </p>
+              <p className="text-sm text-primary font-bold leading-relaxed mt-5 text-center">
+                Wherever you are, your gym comes with you, right in your pocket.
+              </p>
+              <div className="mt-4 text-center">
+                <Link to="/the-smarty-method" className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline">
+                  <BookOpen className="w-4 h-4" />
+                  Discover The Smarty Method
+                  <ChevronRight className="w-4 h-4" />
+                </Link>
+              </div>
             </Card>
           </ScrollReveal>
 
