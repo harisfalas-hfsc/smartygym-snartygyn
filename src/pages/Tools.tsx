@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
-import { Calculator, Activity, Flame, Timer } from "lucide-react";
+import { Calculator, Activity, Flame, Timer, Search } from "lucide-react";
 
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
@@ -17,6 +17,7 @@ import oneRmBg from "@/assets/tools/1rm-calculator-bg.jpg";
 import bmrBg from "@/assets/tools/bmr-calculator-bg.jpg";
 import macroBg from "@/assets/tools/macro-calculator-bg.jpg";
 import timerBg from "@/assets/tools/workout-timer-bg.jpg";
+import calorieBg from "@/assets/tools/calorie-counter-bg.jpg";
 
 const Tools = () => {
   const navigate = useNavigate();
@@ -66,6 +67,14 @@ const Tools = () => {
       description: "Customizable interval timer for HIIT, Tabata, and circuit training sessions",
       route: "/workouttimer",
       image: timerBg
+    },
+    {
+      id: "calorie-counter",
+      icon: Search,
+      title: "Calorie Counter",
+      description: "Search any food and instantly see calories and macros per serving",
+      route: "/caloriecounter",
+      image: calorieBg
     }
   ];
 
@@ -118,7 +127,7 @@ const Tools = () => {
                 All tools use scientifically validated formulas and equations.
               </p>
               {/* Desktop only - detailed calculator descriptions */}
-              <div className="hidden md:grid md:grid-cols-4 gap-4 mt-4">
+              <div className="hidden md:grid md:grid-cols-5 gap-4 mt-4">
                 <div>
                   <h3 className="font-semibold text-foreground mb-2"><span className="text-primary font-semibold">1RM Calculator</span></h3>
                   <p className="text-sm">
@@ -141,6 +150,12 @@ const Tools = () => {
                   <h3 className="font-semibold text-foreground mb-2"><span className="text-primary font-semibold">Workout Timer</span></h3>
                   <p className="text-sm">
                     Customizable interval timer for HIIT, Tabata, and circuit training sessions.
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground mb-2"><span className="text-primary font-semibold">Calorie Counter</span></h3>
+                  <p className="text-sm">
+                    Search any food from 300,000+ items and instantly see calories, protein, carbs, fat, and fiber.
                   </p>
                 </div>
               </div>
@@ -202,7 +217,7 @@ const Tools = () => {
         </div>
 
         {/* Desktop Grid - Image cards */}
-        <div className="hidden md:grid md:grid-cols-4 gap-4">
+        <div className="hidden md:grid md:grid-cols-5 gap-4">
           {tools.map((tool) => {
             const Icon = tool.icon;
             return (
