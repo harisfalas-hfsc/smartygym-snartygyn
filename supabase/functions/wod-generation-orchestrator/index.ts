@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { getDayIn84Cycle, getPeriodizationForDay } from "../_shared/periodization-84day.ts";
 import { getAdminNotificationEmail } from "../_shared/admin-settings.ts";
+import { validateWodSections } from "../_shared/section-validator.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -52,7 +53,7 @@ async function verifyWodsExist(
   
   const { data: wods, error } = await supabase
     .from("admin_workouts")
-    .select("id, name, equipment, is_workout_of_day")
+    .select("id, name, equipment, is_workout_of_day, main_workout")
     .eq("generated_for_date", dateStr)
     .eq("is_workout_of_day", true);
   
@@ -66,19 +67,45 @@ async function verifyWodsExist(
   
   if (recoveryDay) {
     // Recovery day: expect 1 VARIOUS workout (not MIXED - matches DB constraint)
-    const hasVarious = wods?.some((w: any) => w.equipment === "VARIOUS");
-    if (hasVarious) found.push("VARIOUS");
-    else missing.push("VARIOUS");
+    const variousWod = wods?.find((w: any) => w.equipment === "VARIOUS");
+    if (variousWod) {
+      const sectionCheck = validateWodSections(variousWod.main_workout, true);
+      if (sectionCheck.isComplete) {
+        found.push("VARIOUS");
+      } else {
+        missing.push(`VARIOUS (incomplete: missing ${sectionCheck.missingSections.join(", ")})`);
+        console.log(`[ORCHESTRATOR] VARIOUS WOD ${variousWod.id} failed section validation:`, sectionCheck.missingSections);
+      }
+    } else {
+      missing.push("VARIOUS");
+    }
   } else {
-    // Normal day: expect BODYWEIGHT + EQUIPMENT
-    const hasBodyweight = wods?.some((w: any) => w.equipment === "BODYWEIGHT");
-    const hasEquipment = wods?.some((w: any) => w.equipment === "EQUIPMENT");
+    // Normal day: expect BODYWEIGHT + EQUIPMENT (both must be section-complete)
+    const bwWod = wods?.find((w: any) => w.equipment === "BODYWEIGHT");
+    if (bwWod) {
+      const sectionCheck = validateWodSections(bwWod.main_workout, false);
+      if (sectionCheck.isComplete) {
+        found.push("BODYWEIGHT");
+      } else {
+        missing.push(`BODYWEIGHT (incomplete: missing ${sectionCheck.missingSections.join(", ")})`);
+        console.log(`[ORCHESTRATOR] BODYWEIGHT WOD ${bwWod.id} failed section validation:`, sectionCheck.missingSections);
+      }
+    } else {
+      missing.push("BODYWEIGHT");
+    }
     
-    if (hasBodyweight) found.push("BODYWEIGHT");
-    else missing.push("BODYWEIGHT");
-    
-    if (hasEquipment) found.push("EQUIPMENT");
-    else missing.push("EQUIPMENT");
+    const eqWod = wods?.find((w: any) => w.equipment === "EQUIPMENT");
+    if (eqWod) {
+      const sectionCheck = validateWodSections(eqWod.main_workout, false);
+      if (sectionCheck.isComplete) {
+        found.push("EQUIPMENT");
+      } else {
+        missing.push(`EQUIPMENT (incomplete: missing ${sectionCheck.missingSections.join(", ")})`);
+        console.log(`[ORCHESTRATOR] EQUIPMENT WOD ${eqWod.id} failed section validation:`, sectionCheck.missingSections);
+      }
+    } else {
+      missing.push("EQUIPMENT");
+    }
   }
   
   console.log(`[ORCHESTRATOR] Verification result - found: [${found.join(", ")}], missing: [${missing.join(", ")}]`);

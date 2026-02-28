@@ -13,6 +13,7 @@ import {
   type ExerciseBasic 
 } from "../_shared/exercise-matching.ts";
 import { normalizeWorkoutHtml, validateWorkoutHtml } from "../_shared/html-normalizer.ts";
+import { validateWodSections } from "../_shared/section-validator.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -227,10 +228,10 @@ serve(async (req) => {
     const isRecoveryDayEarly = earlyPeriodization.category === "RECOVERY";
     
     // Check what already exists for this date (idempotent + supports retryMissing)
-    // CRITICAL: Fetch FULL workout details so we can match parameters when retrying
+    // CRITICAL: Fetch FULL workout details including main_workout for section validation
     const { data: existingWODsForDate, error: existingWODsError } = await supabase
       .from("admin_workouts")
-      .select("id, name, equipment, generated_for_date, category, difficulty, difficulty_stars, format")
+      .select("id, name, equipment, generated_for_date, category, difficulty, difficulty_stars, format, main_workout")
       .eq("generated_for_date", effectiveDate)
       .eq("is_workout_of_day", true);
 
@@ -246,10 +247,43 @@ serve(async (req) => {
     // CRITICAL FIX: Recovery uses VARIOUS (not MIXED) to match database constraint valid_equipment
     const variousAlreadyExists = existingWODsForDate?.some((w) => w.equipment === "VARIOUS") ?? false;
 
-    // For non-recovery days, determine what needs to be generated
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // SECTION COMPLETENESS CHECK: An existing WOD only counts if it has all sections
+    // If retryMissing=true, archive malformed WODs so they get regenerated
+    // ═══════════════════════════════════════════════════════════════════════════════
+    let bodyweightComplete = bodyweightAlreadyExists;
+    let equipmentComplete = equipmentAlreadyExists;
+    let variousComplete = variousAlreadyExists;
+    
+    if (existingWODsForDate && existingWODsForDate.length > 0) {
+      for (const existingWod of existingWODsForDate) {
+        const sectionCheck = validateWodSections(existingWod.main_workout, isRecoveryDayEarly);
+        if (!sectionCheck.isComplete) {
+          logStep(`⚠️ Existing WOD ${existingWod.id} (${existingWod.equipment}) is INCOMPLETE`, {
+            missing: sectionCheck.missingSections,
+            name: existingWod.name
+          });
+          
+          if (existingWod.equipment === "BODYWEIGHT") bodyweightComplete = false;
+          else if (existingWod.equipment === "EQUIPMENT") equipmentComplete = false;
+          else if (existingWod.equipment === "VARIOUS") variousComplete = false;
+          
+          // Archive the malformed WOD if retryMissing (so it doesn't block regeneration)
+          if (retryMissing) {
+            logStep(`Archiving malformed WOD ${existingWod.id}`, { equipment: existingWod.equipment });
+            await supabase
+              .from("admin_workouts")
+              .update({ is_workout_of_day: false, generated_for_date: null })
+              .eq("id", existingWod.id);
+          }
+        }
+      }
+    }
+
+    // For non-recovery days, determine what needs to be generated (using completeness check)
     const allEquipmentTypes = ["BODYWEIGHT", "EQUIPMENT"] as const;
     const equipmentTypesToGenerate = allEquipmentTypes.filter((e) =>
-      e === "BODYWEIGHT" ? !bodyweightAlreadyExists : !equipmentAlreadyExists
+      e === "BODYWEIGHT" ? !bodyweightComplete : !equipmentComplete
     );
     
     logStep("Equipment check", {
@@ -257,6 +291,9 @@ serve(async (req) => {
       bodyweightAlreadyExists,
       equipmentAlreadyExists,
       variousAlreadyExists,
+      bodyweightComplete,
+      equipmentComplete,
+      variousComplete,
       equipmentTypesToGenerate
     });
 
@@ -629,7 +666,7 @@ This is a NUDGE, not a mandate.
     if (isRecoveryDay) {
       // RECOVERY: Only generate ONE VARIOUS workout (use early check from line ~312)
       // CRITICAL: Use VARIOUS (not MIXED) to match database constraint valid_equipment
-      equipmentTypes = variousAlreadyExists ? [] : ["VARIOUS"];
+      equipmentTypes = variousComplete ? [] : ["VARIOUS"];
       logStep("RECOVERY day - generating single VARIOUS workout", { variousAlreadyExists, equipmentTypes });
     } else {
       // Normal days: Generate BODYWEIGHT and EQUIPMENT versions
@@ -932,34 +969,11 @@ WHAT THIS MEANS IN PRACTICE:
   - The session should feel COMPLETE — the athlete finishes feeling worked 
     but not destroyed
 
-FINISHER OPTIONALITY RULE (INTELLIGENT DECISION-MAKING):
-
-The finisher is NOT always mandatory. Think like an experienced head coach:
-
-WHEN TO SKIP THE FINISHER:
-- Beginner workouts (1-2 stars) with short target duration (15-20 min):
-  If the main workout delivers complete stimulus, no finisher needed.
-- Challenge category where the main workout IS the entire challenge
-  (e.g., "Complete 100 burpees + 1km run" -- adding a finisher is absurd)
-- When the main workout RPE is 9+ and the target duration is short:
-  The athlete is already destroyed. A finisher adds nothing.
-- When the combined RPE would exceed the difficulty bracket ceiling
-
-WHEN TO ALWAYS INCLUDE THE FINISHER:
-- Intermediate and Advanced workouts with target duration >= 30 min
-- Strength workouts (the finisher provides volume completion at lighter load)
-- When the main workout alone doesn't reach the target duration
-
-THE GOLDEN RULE:
-If the main workout is FULL ENOUGH to deliver the required stimulus for the 
-category, difficulty, and duration -- you MAY skip the finisher.
-But this is a COACHING DECISION, not a default. Most workouts WILL have finishers.
-The finisher is a tool, not a checkbox.
-
-WHEN THERE IS NO FINISHER:
-- The workout still has 4 sections: Soft Tissue, Activation, Main Workout, Cool Down
-- The duration = Main Workout time only
-- The ⚡ Finisher section is simply omitted from the HTML
+FINISHER IS MANDATORY FOR ALL NON-RECOVERY WODS:
+Every non-recovery workout MUST include a ⚡ Finisher section. This is NOT optional.
+The finisher complements the main workout and is part of the 5-section structure.
+Do NOT skip the finisher. If the main workout is intense, make the finisher lighter.
+If the main workout is moderate, the finisher can push harder. But it MUST exist.
 
 5. 🧘 COOL DOWN (10 min)
    Purpose: Static stretching + diaphragmatic breathing
@@ -1327,11 +1341,12 @@ Make people question themselves: "Can I accomplish this?"
 This is NOT a normal workout. It's a TEST of mental and physical fortitude.
 Challenge workouts should inspire users to talk about them, share them, and come back to beat their times.
 
-STRUCTURE (MANDATORY - 4 SECTIONS):
-1. WARM-UP: Standard preparation (2-5 min movement + activation circuit)
-2. MAIN WORKOUT: The core challenge that defines the workout's FORMAT label
-3. FINISHER: Additional work tied to main workout performance OR separate challenge
-4. COOL DOWN: Recovery + optional final challenge element (like a run for time)
+STRUCTURE (MANDATORY - 5 SECTIONS, same as all non-recovery categories):
+1. 🧽 SOFT TISSUE PREPARATION: Tissue prep (5 min)
+2. 🔥 ACTIVATION: Dynamic warm-up + movement prep (10-15 min)
+3. 💪 MAIN WORKOUT: The core challenge that defines the workout's FORMAT label
+4. ⚡ FINISHER: Additional work tied to main workout performance OR separate challenge
+5. 🧘 COOL DOWN: Recovery + optional final challenge element (like a run for time)
 
 GAMIFICATION CONCEPTS (USE THESE CREATIVE IDEAS):
 • "Take your burpee time in minutes, multiply by 3 = your reps for next exercises"
@@ -1946,11 +1961,14 @@ ${durationDistributionPrompt}
 Difficulty: ${selectedDifficulty.name} (${selectedDifficulty.stars}/6 stars)
 Format: ${format}
 
+MANDATORY: The main_workout MUST contain exactly 5 sections with these emoji icons in order:
+🧽 Soft Tissue Preparation, 🔥 Activation, 💪 Main Workout, ⚡ Finisher, 🧘 Cool Down
+
 Return JSON with these exact fields:
 {
   "name": "2-4 word creative name",
   "description": "<p class='tiptap-paragraph'>Brief description</p>",
-  "main_workout": "<p class='tiptap-paragraph'><strong><u>Warm Up</u></strong></p><ul class='tiptap-bullet-list'><li class='tiptap-list-item'><p class='tiptap-paragraph'>Exercise 1</p></li></ul><p class='tiptap-paragraph'></p><p class='tiptap-paragraph'><strong><u>Main Workout</u></strong></p>...<p class='tiptap-paragraph'><strong><u>Finisher</u></strong></p>...<p class='tiptap-paragraph'><strong><u>Cool Down</u></strong></p>...",
+  "main_workout": "<p class='tiptap-paragraph'>🧽 <strong><u>Soft Tissue Preparation 5'</u></strong></p><ul class='tiptap-bullet-list'><li class='tiptap-list-item'><p class='tiptap-paragraph'>Exercise</p></li></ul><p class='tiptap-paragraph'></p><p class='tiptap-paragraph'>🔥 <strong><u>Activation 10'</u></strong></p>...<p class='tiptap-paragraph'>💪 <strong><u>Main Workout (${format})</u></strong></p>...<p class='tiptap-paragraph'>⚡ <strong><u>Finisher</u></strong></p>...<p class='tiptap-paragraph'>🧘 <strong><u>Cool Down 10'</u></strong></p>...",
   "instructions": "<p class='tiptap-paragraph'>How to perform</p>",
   "tips": "<p class='tiptap-paragraph'>Coaching tips</p>"
 }`;
@@ -2372,7 +2390,24 @@ Return JSON with these exact fields:
         logStep(`✅ HTML normalized and validated`, { equipment, originalLength: workoutContent.main_workout?.length, normalizedLength: normalizedMainWorkout.length });
       }
 
-      // Insert workout with generated_for_date for pre-generation tracking
+      // ═══════════════════════════════════════════════════════════════════════════════
+      // SECTION COMPLETENESS GATE: Reject WODs missing required sections BEFORE insert
+      // This prevents malformed content from ever reaching the database as active WOD
+      // ═══════════════════════════════════════════════════════════════════════════════
+      const sectionValidation = validateWodSections(normalizedMainWorkout, isRecoveryDay);
+      if (!sectionValidation.isComplete) {
+        const errorMsg = `${equipment} WOD rejected: missing sections [${sectionValidation.missingSections.join(", ")}]`;
+        logStep(`❌ SECTION VALIDATION FAILED`, {
+          equipment,
+          missingSections: sectionValidation.missingSections,
+          missingIcons: sectionValidation.missingIcons,
+          foundIcons: sectionValidation.foundIcons,
+          workoutName: workoutContent.name
+        });
+        throw new Error(errorMsg);
+      }
+      logStep(`✅ Section validation passed`, { equipment, foundIcons: sectionValidation.foundIcons });
+
       const { error: insertError } = await supabase
         .from("admin_workouts")
         .insert({
