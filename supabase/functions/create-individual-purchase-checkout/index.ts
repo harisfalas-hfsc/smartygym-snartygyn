@@ -72,34 +72,64 @@ serve(async (req) => {
       });
     }
 
+    // SECURITY: Validate content state from database (don't trust client payload)
+    const tableName = contentType === 'workout' ? 'admin_workouts' : 'admin_training_programs';
+    const { data: contentRecord, error: contentError } = await supabaseClient
+      .from(tableName)
+      .select('id, name, is_visible, is_standalone_purchase, price, stripe_product_id, stripe_price_id')
+      .eq('id', contentId)
+      .maybeSingle();
+
+    if (contentError || !contentRecord) {
+      return new Response(JSON.stringify({ error: "Content not found" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 404,
+      });
+    }
+
+    if (contentRecord.is_visible === false || !contentRecord.is_standalone_purchase || !contentRecord.price) {
+      return new Response(JSON.stringify({ error: "This content is not available for individual purchase." }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 403,
+      });
+    }
+
+    const finalContentName = contentRecord.name || contentName;
+    const finalPrice = Number(contentRecord.price);
+
     // Create or use existing Stripe product/price
-    let finalPriceId = stripePriceId;
+    let finalPriceId = contentRecord.stripe_price_id || stripePriceId;
+    const existingProductId = contentRecord.stripe_product_id || stripeProductId;
     
     if (!finalPriceId) {
-      // Create new product and price if doesn't exist
-      const product = await stripe.products.create({
-        name: contentName,
-        metadata: {
-          project: "SMARTYGYM",
-          content_type: contentType,
-          content_id: contentId,
-        },
-      });
+      // Create or reuse product, then create price
+      let productIdToUse = existingProductId;
+
+      if (!productIdToUse) {
+        const product = await stripe.products.create({
+          name: finalContentName,
+          metadata: {
+            project: "SMARTYGYM",
+            content_type: contentType,
+            content_id: contentId,
+          },
+        });
+        productIdToUse = product.id;
+      }
 
       const priceObj = await stripe.prices.create({
-        product: product.id,
-        unit_amount: Math.round(parseFloat(price) * 100), // Convert to cents
+        product: productIdToUse,
+        unit_amount: Math.round(finalPrice * 100), // Convert to cents
         currency: 'eur',
       });
 
       finalPriceId = priceObj.id;
 
       // Update database with Stripe IDs
-      const tableName = contentType === 'workout' ? 'admin_workouts' : 'admin_training_programs';
       await supabaseClient
         .from(tableName)
         .update({
-          stripe_product_id: product.id,
+          stripe_product_id: productIdToUse,
           stripe_price_id: priceObj.id,
         })
         .eq('id', contentId);
@@ -125,7 +155,7 @@ serve(async (req) => {
         user_id: user.id,
         content_type: contentType,
         content_id: contentId,
-        content_name: contentName,
+        content_name: finalContentName,
       },
     });
 
