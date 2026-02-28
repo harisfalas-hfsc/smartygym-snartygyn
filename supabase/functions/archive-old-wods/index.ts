@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-
+import { validateWodSections } from "../_shared/section-validator.ts";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -59,6 +59,14 @@ serve(async (req) => {
     for (const wod of wodsToArchive) {
       logStep("Archiving WOD", { id: wod.id, name: wod.name, category: wod.category, generated_for_date: wod.generated_for_date, wod_source: wod.wod_source });
 
+      const isRecovery = wod.category === "RECOVERY";
+      const sectionCheck = validateWodSections(wod.main_workout, isRecovery);
+      const shouldHideFromGallery = !sectionCheck.isComplete;
+
+      if (shouldHideFromGallery) {
+        logStep("WOD incomplete during archival; forcing hidden visibility", { id: wod.id, missing: sectionCheck.missingSections });
+      }
+
       // Library-selected WODs: just clear the WOD flags, no serial number changes
       if (wod.wod_source === 'library') {
         const { error: clearError } = await supabase
@@ -67,6 +75,7 @@ serve(async (req) => {
             is_workout_of_day: false,
             generated_for_date: null,
             wod_source: null,
+            ...(shouldHideFromGallery ? { is_visible: false } : {}),
             updated_at: new Date().toISOString()
           })
           .eq("id", wod.id);
@@ -125,6 +134,7 @@ serve(async (req) => {
           is_workout_of_day: false,
           serial_number: nextSerialNumber,
           generated_for_date: null,
+          ...(shouldHideFromGallery ? { is_visible: false } : {}),
           updated_at: new Date().toISOString()
         })
         .eq("id", wod.id);

@@ -38,6 +38,7 @@ export const useWorkoutData = (workoutId: string | undefined) => {
         .from("admin_workouts")
         .select("*")
         .eq("id", workoutId)
+        .neq("is_visible", false)
         .maybeSingle();
 
       if (error) throw error;
@@ -68,6 +69,7 @@ export const useAllWorkouts = () => {
       const { data, error } = await supabase
         .from("admin_workouts")
         .select("*")
+        .neq("is_visible", false)
         .order("name");
 
       if (import.meta.env.DEV) {
