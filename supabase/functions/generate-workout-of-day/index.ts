@@ -270,10 +270,10 @@ serve(async (req) => {
           
           // Archive the malformed WOD if retryMissing (so it doesn't block regeneration)
           if (retryMissing) {
-            logStep(`Archiving malformed WOD ${existingWod.id}`, { equipment: existingWod.equipment });
+            logStep(`Archiving malformed WOD ${existingWod.id} and hiding from gallery`, { equipment: existingWod.equipment });
             await supabase
               .from("admin_workouts")
-              .update({ is_workout_of_day: false, generated_for_date: null })
+              .update({ is_workout_of_day: false, generated_for_date: null, is_visible: false })
               .eq("id", existingWod.id);
           }
         }
