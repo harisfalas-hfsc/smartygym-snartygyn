@@ -164,14 +164,16 @@ const AppContent = () => {
                 <Route path="/exerciselibrary" element={<ExerciseLibrary />} />
                 <Route path="/blog/:slug" element={<ArticleDetail />} />
                 
+                {/* Public Smarty Tools - no auth required */}
+                <Route path="/1rmcalculator" element={<OneRMCalculator />} />
+                <Route path="/bmrcalculator" element={<BMRCalculator />} />
+                <Route path="/macrocalculator" element={<MacroTrackingCalculator />} />
+                <Route path="/caloriecalculator" element={<MacroTrackingCalculator />} />
+                <Route path="/workouttimer" element={<WorkoutTimer />} />
+
                 <Route element={<ProtectedRoute><AuthenticatedLayout /></ProtectedRoute>}>
                   <Route path="/userdashboard" element={<UserDashboard />} />
-                  <Route path="/1rmcalculator" element={<OneRMCalculator />} />
-                  <Route path="/bmrcalculator" element={<BMRCalculator />} />
-                  <Route path="/macrocalculator" element={<MacroTrackingCalculator />} />
-                  <Route path="/caloriecalculator" element={<MacroTrackingCalculator />} />
                   <Route path="/calculator-history" element={<CalculatorHistory />} />
-                  <Route path="/workouttimer" element={<WorkoutTimer />} />
                 </Route>
                 
                 {/* Public calorie counter - no auth required */}

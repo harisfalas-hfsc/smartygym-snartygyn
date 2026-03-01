@@ -130,14 +130,14 @@ export default function SmartyPlans() {
   };
 
   const comparisonFeatures = [
-    { category: "Workouts", icon: Dumbbell, visitor: false, subscriber: "limited", premium: true },
-    { category: "Training Programs", icon: Flame, visitor: false, subscriber: "limited", premium: true },
-    { category: "Daily Smarty Ritual", icon: Sparkles, visitor: false, subscriber: true, premium: true },
+    { category: "Smarty Workouts", icon: Dumbbell, visitor: false, subscriber: "limited", premium: true },
+    { category: "Smarty Training Programs", icon: Flame, visitor: false, subscriber: "limited", premium: true },
+    { category: "Smarty Ritual", icon: Sparkles, visitor: false, subscriber: true, premium: true },
     { category: "Smarty Check-ins", icon: ClipboardCheck, visitor: false, subscriber: false, premium: true },
+    { category: "Smarty Tools (1RM, BMR, Macro, Calories, Timer)", icon: Calculator, visitor: true, subscriber: true, premium: true },
     { category: "Dashboard", icon: LayoutDashboard, visitor: false, subscriber: "limited", premium: true },
     { category: "LogBook", icon: FileText, visitor: false, subscriber: false, premium: true },
     { category: "Exercise Library", icon: BookOpen, visitor: true, subscriber: true, premium: true },
-    { category: "Calculators (1RM, BMR, Macro)", icon: Calculator, visitor: false, subscriber: true, premium: true },
     { category: "Blog", icon: BookOpen, visitor: true, subscriber: true, premium: true },
     { category: "Workout Interactions", icon: Heart, visitor: false, subscriber: "limited", premium: true },
     { category: "Program Interactions", icon: Heart, visitor: false, subscriber: "limited", premium: true },

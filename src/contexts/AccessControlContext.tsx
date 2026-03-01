@@ -212,7 +212,7 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
     const { userTier, purchasedContent } = state;
 
     // Public content accessible to all
-    if (contentType === "exercise-library" || contentType === "blog" || contentType === "article") {
+    if (contentType === "exercise-library" || contentType === "blog" || contentType === "article" || contentType === "calculator" || contentType === "tool") {
       return true;
     }
 
