@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,13 +10,11 @@ import { Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { User } from "@supabase/supabase-js";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { generateSoftwareApplicationSchema, generateBreadcrumbSchema } from "@/utils/seoHelpers";
 
 
 const MacroTrackingCalculator = () => {
-  const navigate = useNavigate();
   const { toast } = useToast();
   
   const [age, setAge] = useState("");
@@ -212,7 +209,7 @@ const MacroTrackingCalculator = () => {
   };
 
   return (
-    <ProtectedRoute>
+    <>
       <Helmet>
         <title>Smarty Tools | Macro Calculator | Free Macronutrient Nutrition | Haris Falas | SmartyGym</title>
         <meta name="description" content="Free macro calculator at smartygym.com. Calculate protein carbs fats for weight loss muscle gain. Personalized nutrition by Sports Scientist Haris Falas HFSC. Plan meals. Train smart anywhere anytime" />
@@ -470,7 +467,7 @@ const MacroTrackingCalculator = () => {
         </Card>
       </div>
       </div>
-    </ProtectedRoute>
+    </>
   );
 };
 

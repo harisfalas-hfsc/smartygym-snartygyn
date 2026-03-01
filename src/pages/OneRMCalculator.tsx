@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,7 +9,6 @@ import { Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { User } from "@supabase/supabase-js";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { generateSoftwareApplicationSchema, generateBreadcrumbSchema } from "@/utils/seoHelpers";
 
@@ -39,7 +37,6 @@ const EXERCISES = [
 ] as const;
 
 const OneRMCalculator = () => {
-  const navigate = useNavigate();
   const { toast } = useToast();
   
   const [weight, setWeight] = useState("");
@@ -131,9 +128,8 @@ const OneRMCalculator = () => {
   };
 
   return (
-    <ProtectedRoute>
-      <>
-        <Helmet>
+    <>
+      <Helmet>
           <title>Smarty Tools | Free 1RM Calculator | One Rep Max | Haris Falas | SmartyGym</title>
           <meta name="description" content="Free 1RM calculator at smartygym.com. Calculate one rep max using Brzycki formula. Professional strength tool by Sports Scientist Haris Falas HFSC. Plan gym training. Train smart anywhere anytime" />
           <meta name="keywords" content="1RM calculator, one rep max calculator, strength calculator, online personal trainer tools, HFSC, Haris Falas, Sports Scientist, 1RM calculator online, max calculator, powerlifting, gym training, smartygym.com, HFSC Performance, strength training tools" />
@@ -180,8 +176,7 @@ const OneRMCalculator = () => {
           aiSummary="Free online 1RM calculator for calculating one rep max using Brzycki formula. Professional strength training tool by Sports Scientist Haris Falas at SmartyGym."
           aiKeywords={["1RM", "one rep max", "strength calculator", "powerlifting", "Brzycki formula", "training percentages", "gym tools", "fitness calculator"]}
           relatedContent={["strength training workouts", "powerlifting programs", "gym tools"]}
-        />
-      </>
+      />
       
       <div className="min-h-screen bg-background p-4">
       <div className="max-w-2xl mx-auto py-4 sm:py-8">
@@ -304,7 +299,7 @@ const OneRMCalculator = () => {
         </Card>
       </div>
       </div>
-    </ProtectedRoute>
+    </>
   );
 };
 
