@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,13 +10,11 @@ import { Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { User } from "@supabase/supabase-js";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { generateSoftwareApplicationSchema, generateBreadcrumbSchema } from "@/utils/seoHelpers";
 
 
 const BMRCalculator = () => {
-  const navigate = useNavigate();
   const { toast } = useToast();
   
   const [age, setAge] = useState("");
@@ -116,9 +113,8 @@ const BMRCalculator = () => {
   };
 
   return (
-    <ProtectedRoute>
-      <>
-        <Helmet>
+    <>
+      <Helmet>
           <title>Smarty Tools | Free BMR Calculator | Basal Metabolic Rate | Haris Falas | SmartyGym</title>
         <meta name="description" content="Free BMR calculator at smartygym.com. Calculate basal metabolic rate & TDEE using Mifflin-St Jeor equation. Nutrition tool by Sports Scientist Haris Falas HFSC. Daily calorie needs. Train smart anywhere, anytime." />
         <meta name="keywords" content="BMR calculator, basal metabolic rate, calorie calculator, online personal trainer nutrition, HFSC, Haris Falas, Sports Scientist, BMR calculator online, TDEE calculator, metabolism calculator, nutrition tools, smartygym.com, HFSC Performance, calorie needs" />
@@ -165,8 +161,7 @@ const BMRCalculator = () => {
           aiSummary="Free online BMR calculator for calculating basal metabolic rate and daily calorie needs using Mifflin-St Jeor equation. Professional nutrition tool by Sports Scientist Haris Falas at SmartyGym."
           aiKeywords={["BMR", "basal metabolic rate", "TDEE", "calorie calculator", "metabolism", "nutrition planning", "weight loss", "fitness calculator"]}
           relatedContent={["weight loss programs", "nutrition planning", "macro calculator"]}
-        />
-      </>
+      />
       
       <div className="min-h-screen bg-background p-4">
       <div className="max-w-2xl mx-auto py-4 sm:py-8">
@@ -301,7 +296,7 @@ const BMRCalculator = () => {
         </Card>
       </div>
       </div>
-    </ProtectedRoute>
+    </>
   );
 };
 
