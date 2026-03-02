@@ -757,7 +757,7 @@ export default function UserDashboard() {
   const validPurchases = purchases?.filter(p => !p.content_deleted) || [];
   const hasStandalonePurchases = validPurchases.length > 0;
   return <div className="min-h-screen bg-background">
-      <main className="container mx-auto max-w-7xl p-4 py-8">
+      <main className="container mx-auto max-w-7xl px-4 pb-8">
         {/* Check-in Modal Manager - shows pop-up during time windows */}
         {isPremium && <CheckInModalManager onBannerStateChange={handleBannerStateChange} />}
         

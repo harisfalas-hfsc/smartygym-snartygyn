@@ -224,7 +224,7 @@ const WODCategory = () => {
       </Card>;
   };
   return <>
-      {isLoading ? <div className="min-h-screen bg-background py-8 px-4">
+      {isLoading ? <div className="min-h-screen bg-background px-4 pb-8">
           <div className="container mx-auto max-w-7xl">
             <ContentLoadingSkeleton />
           </div>
