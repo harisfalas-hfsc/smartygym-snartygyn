@@ -3,7 +3,7 @@ import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, X, Slash, Eye, UserCheck, Crown, Dumbbell, BookOpen, Calculator, Users, Heart, Sparkles, Flame, LayoutDashboard, MessageCircle, ClipboardCheck } from "lucide-react";
+import { Check, X, CircleMinus, Eye, UserCheck, Crown, Dumbbell, BookOpen, Calculator, Users, Heart, Sparkles, Flame, LayoutDashboard, MessageCircle, ClipboardCheck } from "lucide-react";
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -120,8 +120,8 @@ const PremiumComparison = () => {
     if (value === "Limited access") {
       return (
         <div className="relative inline-flex items-center justify-center w-8 h-8 mx-auto">
-          <Check className="w-6 h-6 text-green-500" strokeWidth={3.2} />
-          <Slash className="absolute inset-0 m-auto w-7 h-7 text-amber-500 pointer-events-none" strokeWidth={2.2} />
+          <Check className="w-6 h-6 text-green-600" strokeWidth={3} />
+          <CircleMinus className="absolute -bottom-0.5 -right-0.5 w-4 h-4 text-amber-500 bg-background rounded-full" strokeWidth={2.6} />
         </div>
       );
     }

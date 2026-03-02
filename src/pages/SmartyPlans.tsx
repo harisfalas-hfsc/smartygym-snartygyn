@@ -25,7 +25,7 @@ import {
   MessageCircle,
   Flame,
   Building2,
-  Slash,
+  CircleMinus,
   FileText
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -149,8 +149,8 @@ export default function SmartyPlans() {
     if (value === true) return <Check className="w-5 h-5 text-green-600 ml-auto" />;
     if (value === "limited") return (
       <div className="relative inline-flex items-center justify-center w-8 h-8 ml-auto">
-        <Check className="w-6 h-6 text-green-500" strokeWidth={3.2} />
-        <Slash className="absolute inset-0 m-auto w-7 h-7 text-amber-500 pointer-events-none" strokeWidth={2.2} />
+        <Check className="w-6 h-6 text-green-600" strokeWidth={3} />
+        <CircleMinus className="absolute -bottom-0.5 -right-0.5 w-4 h-4 text-amber-500 bg-background rounded-full" strokeWidth={2.6} />
       </div>
     );
     return <span className="text-sm text-right">{value}</span>;
