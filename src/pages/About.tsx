@@ -105,9 +105,6 @@ const About = () => {
         <h1 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">
           About <span className="text-primary">SmartyGym</span>
         </h1>
-              <p className="md:hidden text-lg text-muted-foreground max-w-3xl mx-auto">
-                We're redefining online fitness — making quality training accessible, flexible, and designed for real life.
-              </p>
               <p className="hidden md:block text-lg text-muted-foreground max-w-3xl mx-auto">
                 We're redefining online fitness — making quality training accessible, flexible, and designed for real life.
               </p>
@@ -219,6 +216,13 @@ const About = () => {
                   <p className="text-base text-muted-foreground text-center leading-relaxed">
                     Everything a complete gym must offer, built by real professionals, in your pocket at <strong className="text-primary">smartygym.com</strong>.
                   </p>
+                  <Link 
+                    to="/best-online-fitness-platform" 
+                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+                  >
+                    Why We Are the Best
+                    <ChevronRight className="w-4 h-4" />
+                  </Link>
                 </div>
               </CardContent>
             </Card>
@@ -264,6 +268,13 @@ const About = () => {
                       Wherever you are, your gym comes with you.
                     </p>
                   </div>
+                  <Link 
+                    to="/why-invest-in-smartygym" 
+                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+                  >
+                    Why Invest in SmartyGym
+                    <ChevronRight className="w-4 h-4" />
+                  </Link>
                 </div>
               </CardContent>
             </Card>
@@ -425,6 +436,22 @@ const About = () => {
                       <Dumbbell className="w-5 h-5 text-primary flex-shrink-0" />
                       <span className="text-sm font-semibold text-foreground">Gym-goers</span>
                     </div>
+                  </div>
+                  <div className="flex items-center justify-center gap-6 mt-4">
+                    <Link 
+                      to="/why-invest-in-smartygym" 
+                      className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+                    >
+                      Why Invest in SmartyGym
+                      <ChevronRight className="w-4 h-4" />
+                    </Link>
+                    <Link 
+                      to="/best-online-fitness-platform" 
+                      className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+                    >
+                      Why We Are the Best
+                      <ChevronRight className="w-4 h-4" />
+                    </Link>
                   </div>
                 </div>
               </CardContent>
