@@ -1,50 +1,31 @@
 
+# Standardize Page Spacing Across All Smarty Tools
 
-# Make All Smarty Tools Public + Update Compare Access Levels Table
+## The Problem
 
-## 1. Make All Smarty Tools Public Routes
+The spacing between the navigation header and page content is inconsistent across pages. The **1RM Calculator**, **BMR Calculator**, **Macro Calculator**, and **Workout Timer** pages have extra top padding compared to the **Calorie Counter** and **Tools** pages (and most other pages on the site).
 
-Move the 4 calculator/timer routes out of the `ProtectedRoute` wrapper in `App.tsx` so they become public like Calorie Counter:
-- `/1rmcalculator`
-- `/bmrcalculator`
-- `/macrocalculator` and `/caloriecalculator`
-- `/workouttimer`
+**Root cause:** Those 4 pages use `p-4` on the outer wrapper and `py-4 sm:py-8` on the inner container, which adds extra top space. The Calorie Counter and most other pages use `container mx-auto px-4 pb-8` with no extra top padding.
 
-These will be placed alongside the existing public `/caloriecounter` route.
+## The Fix
 
-## 2. Update the Compare Access Levels Table in SmartyPlans.tsx
+Standardize the 4 inconsistent tool pages to match the pattern used by the Calorie Counter and the rest of the site:
 
-### Rename categories and reorder the `comparisonFeatures` array:
+```text
+Before (inconsistent):
+  <div class="min-h-screen bg-background p-4">
+    <div class="max-w-2xl mx-auto py-4 sm:py-8">
 
-**New order and naming:**
-1. **Smarty Workouts** (was "Workouts") -- visitor: X, subscriber: limited, premium: check
-2. **Smarty Training Programs** (was "Training Programs") -- visitor: X, subscriber: limited, premium: check
-3. **Smarty Ritual** (was "Daily Smarty Ritual") -- visitor: X, subscriber: check, premium: check
-4. **Smarty Check-ins** (unchanged) -- visitor: X, subscriber: X, premium: check
-5. **Smarty Tools (1RM, BMR, Macro, Calories, Timer)** (was "Calculators") -- visitor: CHECK (now public), subscriber: check, premium: check
-6. Dashboard -- unchanged
-7. LogBook -- unchanged
-8. Exercise Library -- unchanged
-9. Blog -- unchanged
-10. Workout Interactions -- unchanged
-11. Program Interactions -- unchanged
-12. WhatsApp Interaction with Coach -- unchanged
+After (consistent):
+  <div class="min-h-screen bg-background">
+    <div class="container mx-auto max-w-2xl px-4 pb-8">
+```
 
-Key changes:
-- "Workouts" renamed to "Smarty Workouts"
-- "Training Programs" renamed to "Smarty Training Programs"
-- "Daily Smarty Ritual" renamed to "Smarty Ritual"
-- "Calculators (1RM, BMR, Macro)" renamed to "Smarty Tools (1RM, BMR, Macro, Calories, Timer)" and moved below Smarty Check-ins
-- Smarty Tools visitor access changed from `false` to `true` (green check)
+## Files to Modify
 
-## 3. Update Access Control Context
+1. **src/pages/OneRMCalculator.tsx** -- Change outer `p-4` to no top padding; change inner to `container mx-auto max-w-2xl px-4 pb-8`
+2. **src/pages/BMRCalculator.tsx** -- Same change
+3. **src/pages/MacroTrackingCalculator.tsx** -- Same change
+4. **src/pages/WorkoutTimer.tsx** -- Same change
 
-In `AccessControlContext.tsx`, add `"calculator"` and `"tool"` to the public content check so guests can access them without login.
-
-## Technical Details
-
-**Files to modify:**
-- `src/App.tsx` -- Move 4 tool routes from protected to public section
-- `src/pages/SmartyPlans.tsx` -- Update `comparisonFeatures` array (rename, reorder, update visitor access)
-- `src/contexts/AccessControlContext.tsx` -- Add calculator/tool to public content types
-
+This will make the spacing between the logo/nav and page title consistent across all pages on the site, both mobile and desktop.
