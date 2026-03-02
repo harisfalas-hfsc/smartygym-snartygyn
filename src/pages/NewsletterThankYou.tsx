@@ -17,7 +17,7 @@ const NewsletterThankYou = () => {
         <link rel="canonical" href="https://smartygym.com/newsletter-thank-you" />
       </Helmet>
       
-      <div className="min-h-screen bg-background px-4 py-8">
+      <div className="min-h-screen bg-background px-4 pb-8">
         <div className="container mx-auto max-w-lg">
           <PageBreadcrumbs items={[
             { label: "Home", href: "/" },

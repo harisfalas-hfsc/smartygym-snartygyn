@@ -228,7 +228,7 @@ const IndividualWorkout = () => {
           </script>
         </Helmet>
         <div className="min-h-screen bg-background">
-          <div className="container mx-auto px-4 py-8">
+          <div className="container mx-auto px-4 pb-8">
             {/* Calculate access for Reader Mode */}
             {(() => {
               const hasAccess = userTier === "premium" || hasPurchased(dbWorkout.id, "workout") || !dbWorkout.is_premium;

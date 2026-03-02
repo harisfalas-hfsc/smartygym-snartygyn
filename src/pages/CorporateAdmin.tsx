@@ -294,7 +294,7 @@ export default function CorporateAdmin() {
   if (!user) {
     return (
       <div className="min-h-screen bg-background">
-        <main className="container mx-auto max-w-4xl p-4 py-8">
+        <main className="container mx-auto max-w-4xl px-4 pb-8">
           <Card className="text-center p-8">
             <CardContent>
               <Building2 className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
@@ -313,7 +313,7 @@ export default function CorporateAdmin() {
   if (!subscription) {
     return (
       <div className="min-h-screen bg-background">
-        <main className="container mx-auto max-w-4xl p-4 py-8">
+        <main className="container mx-auto max-w-4xl px-4 pb-8">
           <Card className="text-center p-8">
             <CardContent>
               <Building2 className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
@@ -350,7 +350,7 @@ export default function CorporateAdmin() {
       </Helmet>
 
       <div className="min-h-screen bg-background">
-        <main className="container mx-auto max-w-6xl p-4 py-8">
+        <main className="container mx-auto max-w-6xl px-4 pb-8">
 
           {/* Header */}
           <div className="flex items-center gap-3 mb-6">
