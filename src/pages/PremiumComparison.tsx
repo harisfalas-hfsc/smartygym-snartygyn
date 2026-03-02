@@ -173,7 +173,7 @@ const PremiumComparison = () => {
         </script>
       </Helmet>
 
-      <div className="min-h-screen bg-background py-8 px-4">
+      <div className="min-h-screen bg-background pb-8 px-4">
         <div className="container mx-auto max-w-6xl">
           <PageBreadcrumbs items={[
             { label: "Home", href: "/" },

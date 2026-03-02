@@ -166,7 +166,7 @@ export default function PremiumBenefits() {
       </Helmet>
 
       <div className="min-h-screen bg-background">
-        <main className="container mx-auto max-w-7xl p-4 py-8">
+        <main className="container mx-auto max-w-7xl px-4 pb-8">
           <PageBreadcrumbs items={[
             { label: "Home", href: "/" },
             { label: "Premium Benefits" }

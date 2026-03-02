@@ -193,7 +193,7 @@ export default function WhyInvestInSmartyGym() {
       />
 
       <div className="min-h-screen bg-background">
-        <main className="container mx-auto max-w-4xl p-4 pb-8">
+        <main className="container mx-auto max-w-4xl px-4 pb-8">
           <PageBreadcrumbs items={[
             { label: "Home", href: "/" },
             { label: "Why SmartyGym", href: "/human-performance" },

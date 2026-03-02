@@ -102,7 +102,7 @@ const CoachProfile = () => {
       </Helmet>
 
       <div className="min-h-screen bg-gradient-to-b from-background to-accent/20">
-        <div className="container mx-auto max-w-4xl px-4 py-8">
+        <div className="container mx-auto max-w-4xl px-4 pb-8">
           <PageBreadcrumbs items={[
             { label: "Home", href: "/" },
             { label: "Coach Profile" }

@@ -190,7 +190,7 @@ export default function AdminBackoffice() {
         </div>
       )}
       
-      <div className={`container mx-auto py-4 sm:py-8 px-2 sm:px-4 ${isOffline ? '' : ''}`}>
+      <div className={`container mx-auto pb-4 sm:pb-8 px-2 sm:px-4 ${isOffline ? '' : ''}`}>
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
           <div className="flex items-center gap-2 sm:gap-4">
