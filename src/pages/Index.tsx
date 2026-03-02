@@ -1021,6 +1021,22 @@ const Index = () => {
                               );
                             })}
                           </div>
+                          <div className="flex items-center justify-center gap-6 mt-4">
+                            <Link 
+                              to="/why-invest-in-smartygym" 
+                              className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+                            >
+                              Why Invest in SmartyGym
+                              <ChevronRight className="w-4 h-4" />
+                            </Link>
+                            <Link 
+                              to="/best-online-fitness-platform" 
+                              className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+                            >
+                              Why We Are the Best
+                              <ChevronRight className="w-4 h-4" />
+                            </Link>
+                          </div>
                         </div>
                 </CardContent>
               </Card>
