@@ -23,7 +23,8 @@ import {
   LayoutDashboard,
   MessageCircle,
   X,
-  ClipboardCheck
+  ClipboardCheck,
+  Slash
 } from "lucide-react";
 
 import { useEffect, useState } from "react";
@@ -138,10 +139,8 @@ export default function PremiumBenefits() {
     if (typeof value === "string" && value.toLowerCase().includes("limited")) {
       return (
         <div className="relative inline-flex items-center justify-center w-8 h-8 mx-auto">
-          <Check className="w-6 h-6 text-green-500" strokeWidth={3} />
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-9 h-[2.5px] bg-amber-500 rotate-[-45deg] rounded-full" />
-          </div>
+          <Check className="w-6 h-6 text-green-500" strokeWidth={3.2} />
+          <Slash className="absolute inset-0 m-auto w-7 h-7 text-amber-500 pointer-events-none" strokeWidth={2.2} />
         </div>
       );
     }
