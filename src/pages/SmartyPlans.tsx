@@ -147,7 +147,14 @@ export default function SmartyPlans() {
   const renderFeatureValue = (value: string | boolean) => {
     if (value === false) return <X className="w-5 h-5 text-destructive ml-auto" />;
     if (value === true) return <Check className="w-5 h-5 text-green-600 ml-auto" />;
-    if (value === "limited") return <CircleMinus className="w-5 h-5 text-sky-500 ml-auto" />;
+    if (value === "limited") return (
+      <div className="relative inline-flex items-center justify-center w-5 h-5 ml-auto">
+        <Check className="w-5 h-5 text-green-600" />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-6 h-0.5 bg-amber-500 rotate-[-45deg] rounded-full" />
+        </div>
+      </div>
+    );
     return <span className="text-sm text-right">{value}</span>;
   };
 
