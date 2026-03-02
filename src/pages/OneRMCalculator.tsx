@@ -178,8 +178,8 @@ const OneRMCalculator = () => {
           relatedContent={["strength training workouts", "powerlifting programs", "gym tools"]}
       />
       
-      <div className="min-h-screen bg-background p-4">
-      <div className="max-w-2xl mx-auto py-4 sm:py-8">
+      <div className="min-h-screen bg-background">
+      <div className="container mx-auto max-w-2xl px-4 pb-8">
         <PageBreadcrumbs 
           items={[
             { label: "Home", href: "/" },
