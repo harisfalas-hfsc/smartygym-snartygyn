@@ -219,13 +219,6 @@ const About = () => {
                   <p className="text-base text-muted-foreground text-center leading-relaxed">
                     Everything a complete gym must offer, built by real professionals, in your pocket at <strong className="text-primary">smartygym.com</strong>.
                   </p>
-                  <Link 
-                    to="/best-online-fitness-platform" 
-                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
-                  >
-                    Why We Are the Best
-                    <ChevronRight className="w-4 h-4" />
-                  </Link>
                 </div>
               </CardContent>
             </Card>
@@ -271,13 +264,6 @@ const About = () => {
                       Wherever you are, your gym comes with you.
                     </p>
                   </div>
-                  <Link 
-                    to="/why-invest-in-smartygym" 
-                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
-                  >
-                    Why Invest in SmartyGym
-                    <ChevronRight className="w-4 h-4" />
-                  </Link>
                 </div>
               </CardContent>
             </Card>
