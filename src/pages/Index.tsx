@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { ServiceCard } from "@/components/ServiceCard";
@@ -564,8 +565,11 @@ const Index = () => {
       </section>
       
       <div className="min-h-screen bg-background overflow-x-hidden">
+        <div className="container mx-auto max-w-6xl px-4">
+          <PageBreadcrumbs items={[{ label: "Home" }]} />
+        </div>
         
-        {isMobile ? <section className="pt-12 pb-2 px-4">
+        {isMobile ? <section className="pt-4 pb-2 px-4">
             {/* Mobile swipe indicator (homepage carousel) */}
             <div className="flex items-center justify-center gap-3 mb-3">
               <button

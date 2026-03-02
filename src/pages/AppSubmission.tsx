@@ -156,7 +156,7 @@ const AppSubmission = () => {
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
 
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <div className="container mx-auto px-4 pb-8 max-w-6xl">
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <div>

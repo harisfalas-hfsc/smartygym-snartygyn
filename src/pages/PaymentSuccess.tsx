@@ -90,7 +90,7 @@ const PaymentSuccess = () => {
         <meta name="description" content="Your payment has been processed successfully" />
       </Helmet>
 
-      <div className="min-h-screen bg-background py-8 px-4">
+      <div className="min-h-screen bg-background pb-8 px-4">
         <div className="container mx-auto max-w-2xl">
           <PageBreadcrumbs items={[
             { label: "Home", href: "/" },

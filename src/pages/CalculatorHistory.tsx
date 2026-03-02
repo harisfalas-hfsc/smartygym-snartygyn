@@ -555,7 +555,7 @@ export default function CalculatorHistory() {
 
   if (loading) {
     return (
-      <div className="container max-w-4xl mx-auto py-8 px-4">
+      <div className="container max-w-4xl mx-auto pb-8 px-4">
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-muted rounded w-1/3"></div>
           <div className="h-64 bg-muted rounded"></div>
@@ -565,7 +565,7 @@ export default function CalculatorHistory() {
   }
 
   return (
-    <div className="container max-w-5xl mx-auto py-8 px-4">
+    <div className="container max-w-5xl mx-auto pb-8 px-4">
       <PageBreadcrumbs
         items={[
           { label: "Dashboard", href: "/userdashboard" },

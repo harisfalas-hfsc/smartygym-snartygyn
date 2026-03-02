@@ -351,7 +351,7 @@ const WorkoutDetail = () => {
       </Helmet>
       
       <div className="min-h-screen bg-background">
-      <div className="container mx-auto max-w-6xl px-4 py-8">
+      <div className="container mx-auto max-w-6xl px-4 pb-8">
         <PageBreadcrumbs 
           items={[
             { label: "Home", href: "/" },

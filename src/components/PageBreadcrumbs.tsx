@@ -19,7 +19,7 @@ interface PageBreadcrumbsProps {
 
 export const PageBreadcrumbs = ({ items }: PageBreadcrumbsProps) => {
   return (
-    <nav className="mb-4 sm:mb-6 animate-fade-in" aria-label="breadcrumb">
+    <nav className="mt-4 mb-4 sm:mb-6 animate-fade-in" aria-label="breadcrumb">
       <Breadcrumb>
         <BreadcrumbList className="text-sm sm:text-base">
           {items.map((item, index) => {
