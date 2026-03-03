@@ -54,7 +54,8 @@ const WorkoutFlow = () => {
       const { data } = await supabase
         .from("admin_workouts")
         .select("category")
-        .or("is_workout_of_day.is.null,is_workout_of_day.eq.false");
+        .or("is_workout_of_day.is.null,is_workout_of_day.eq.false")
+        .neq("is_visible", false);
       
       const counts: Record<string, number> = {};
       data?.forEach(w => {
