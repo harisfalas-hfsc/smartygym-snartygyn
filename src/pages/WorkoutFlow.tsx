@@ -305,7 +305,7 @@ const WorkoutFlow = () => {
                     </p>
                     
                     <p className="text-sm sm:text-base font-semibold text-foreground text-center mt-6">
-                      Unlock all {totalWorkoutCount} workouts with a Premium plan or grab one standalone session whenever you need it.
+                      Unlock all <span className="text-primary font-bold">{totalWorkoutCount} workouts</span> with a Premium plan or grab one standalone session whenever you need it.
                     </p>
                     
                     <p className="text-xs sm:text-sm text-muted-foreground text-center mt-4">
