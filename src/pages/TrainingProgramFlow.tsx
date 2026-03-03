@@ -49,7 +49,8 @@ const TrainingProgramFlow = () => {
     queryFn: async () => {
       const { data } = await supabase
         .from("admin_training_programs")
-        .select("category");
+        .select("category")
+        .neq("is_visible", false);
       
       const counts: Record<string, number> = {};
       data?.forEach(p => {
