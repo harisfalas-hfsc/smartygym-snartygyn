@@ -71,6 +71,8 @@ const TrainingProgramFlow = () => {
     staleTime: 1000 * 60 * 5,
   });
 
+  const totalProgramCount = Object.values(programCounts).reduce((sum, c) => sum + c, 0);
+
   // Category background images for programs
   const programBackgrounds: Record<string, string> = {
     "cardio-endurance": "/images/programs/cardio-endurance-bg.jpg",

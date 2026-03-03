@@ -72,6 +72,8 @@ const WorkoutFlow = () => {
     staleTime: 1000 * 60 * 5,
   });
 
+  const totalWorkoutCount = Object.values(workoutCounts).reduce((sum, c) => sum + c, 0);
+
   // Rotate WOD images every 3.5 seconds
   useEffect(() => {
     if (wodImages.length <= 1) return;
