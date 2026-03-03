@@ -245,7 +245,7 @@ const TrainingProgramFlow = () => {
                   </p>
                   
                   <p className="text-sm sm:text-base font-semibold text-foreground text-center mt-6">
-                    Unlock all programs with a Premium plan or grab one standalone program to start your journey.
+                    Unlock all {totalProgramCount} programs with a Premium plan or grab one standalone program to start your journey.
                   </p>
                 </>
               )}
