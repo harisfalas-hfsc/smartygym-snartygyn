@@ -71,6 +71,8 @@ const TrainingProgramFlow = () => {
     staleTime: 1000 * 60 * 5,
   });
 
+  const totalProgramCount = Object.values(programCounts).reduce((sum, c) => sum + c, 0);
+
   // Category background images for programs
   const programBackgrounds: Record<string, string> = {
     "cardio-endurance": "/images/programs/cardio-endurance-bg.jpg",
@@ -234,7 +236,7 @@ const TrainingProgramFlow = () => {
             <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
             {isMobile ? (
                 <p className="text-sm text-center">
-                  <span className="text-primary font-semibold">Smarty Programs</span> are long-term, structured plans designed to help you achieve your specific fitness goals. They are strategic, periodized plans that take you from where you are to where you want to be. Unlock all programs with a Premium plan, or grab one standalone program to start your journey.
+                  <span className="text-primary font-semibold">Smarty Programs</span> are long-term, structured plans designed to help you achieve your specific fitness goals. They are strategic, periodized plans that take you from where you are to where you want to be. Unlock all {totalProgramCount} programs with a Premium plan, or grab one standalone program to start your journey.
                 </p>
               ) : (
                 <>
@@ -243,7 +245,7 @@ const TrainingProgramFlow = () => {
                   </p>
                   
                   <p className="text-sm sm:text-base font-semibold text-foreground text-center mt-6">
-                    Unlock all programs with a Premium plan or grab one standalone program to start your journey.
+                    Unlock all {totalProgramCount} programs with a Premium plan or grab one standalone program to start your journey.
                   </p>
                 </>
               )}
