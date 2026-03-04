@@ -85,6 +85,12 @@ export function normalizeWorkoutHtml(content: string): string {
   
   // STEP 13: Split multi-exercise list items into individual items
   result = splitMultiExerciseLines(result);
+
+  // STEP 14: Remove orphan/empty bullets from mixed exercise lists
+  result = removeOrphanExerciseListItems(result);
+
+  // Final safety collapse after transformations
+  result = result.replace(/(<p class="tiptap-paragraph"><\/p>){2,}/gi, CANONICAL_EMPTY_P);
   
   return result;
 }

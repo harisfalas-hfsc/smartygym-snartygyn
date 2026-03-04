@@ -116,6 +116,15 @@ export function normalizeWorkoutHtml(content: string): string {
   // Each exercise MUST have its own <li> with its own View button
   // ═══════════════════════════════════════════════════════════════════════════════
   result = splitMultiExerciseLines(result);
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // STEP 13: Remove orphan/empty bullets from exercise lists
+  // Non-exercise bullets in exercise lists are converted to paragraphs
+  // ═══════════════════════════════════════════════════════════════════════════════
+  result = removeOrphanExerciseListItems(result);
+
+  // Final safety collapse after transformations
+  result = result.replace(/(<p class="tiptap-paragraph"><\/p>){2,}/gi, CANONICAL_EMPTY_P);
   
   return result;
 }
