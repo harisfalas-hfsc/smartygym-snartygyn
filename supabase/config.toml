@@ -267,3 +267,6 @@ verify_jwt = false
 
 [functions.repair-pilates-workouts]
 verify_jwt = false
+
+[functions.bulk-format-consistency-repair]
+verify_jwt = false
