@@ -8,6 +8,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Dumbbell, Target, Activity, ListOrdered, Info, Gauge, ImageOff } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import ExerciseFrameAnimation from "./ExerciseFrameAnimation";
 
