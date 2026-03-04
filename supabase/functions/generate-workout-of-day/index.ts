@@ -8,6 +8,7 @@ import {
   processContentSectionAware, 
   logUnmatchedExercises,
   fetchAndBuildExerciseReference,
+  buildExerciseReferenceList,
   guaranteeAllExercisesLinked,
   rejectNonLibraryExercises,
   type ExerciseBasic 
