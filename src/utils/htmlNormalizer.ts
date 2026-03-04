@@ -83,5 +83,41 @@ export function normalizeWorkoutHtml(content: string): string {
   result = result.replace(/^(<p class="tiptap-paragraph"><\/p>)+/, '');
   result = result.replace(/(<p class="tiptap-paragraph"><\/p>)+$/, '');
   
+  // STEP 13: Split multi-exercise list items into individual items
+  result = splitMultiExerciseLines(result);
+  
   return result;
+}
+
+/**
+ * Split <li> items containing multiple {{exercise:...}} tags into separate <li> items.
+ */
+function splitMultiExerciseLines(html: string): string {
+  if (!html) return html;
+  
+  return html.replace(/<li[^>]*><p[^>]*>([\s\S]*?)<\/p><\/li>/gi, (match, content: string) => {
+    const exerciseTags = content.match(/\{\{exercise:[^}]+\}\}/g);
+    if (!exerciseTags || exerciseTags.length <= 1) return match;
+    
+    const parts = content.split(/(\{\{exercise:[^}]+\}\})/);
+    const items: string[] = [];
+    
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i];
+      if (/^\{\{exercise:/.test(part)) {
+        let suffix = '';
+        if (i + 1 < parts.length) {
+          const cleaned = parts[i + 1].replace(/^[\s,\-–—·•]+/, '').replace(/[\s,\-–—·•]+$/, '').trim();
+          if (cleaned && !cleaned.includes('{{exercise:') && cleaned.length < 80) {
+            suffix = cleaned;
+            parts[i + 1] = '';
+          }
+        }
+        const itemContent = suffix ? `${part} ${suffix}` : part;
+        items.push(`<li class="tiptap-list-item"><p class="tiptap-paragraph">${itemContent}</p></li>`);
+      }
+    }
+    
+    return items.length > 0 ? items.join('') : match;
+  });
 }

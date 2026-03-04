@@ -111,7 +111,65 @@ export function normalizeWorkoutHtml(content: string): string {
   result = result.replace(/^(<p class="tiptap-paragraph"><\/p>)+/, '');
   result = result.replace(/(<p class="tiptap-paragraph"><\/p>)+$/, '');
   
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // STEP 12: Split multi-exercise list items into individual items
+  // Each exercise MUST have its own <li> with its own View button
+  // ═══════════════════════════════════════════════════════════════════════════════
+  result = splitMultiExerciseLines(result);
+  
   return result;
+}
+
+/**
+ * Split <li> items containing multiple {{exercise:...}} tags into separate <li> items.
+ * Also handles comma-separated exercise names and structural labels mixed with exercises.
+ */
+export function splitMultiExerciseLines(html: string): string {
+  if (!html) return html;
+  
+  // Pattern: find <li> items with their inner <p> content
+  return html.replace(/<li[^>]*><p[^>]*>([\s\S]*?)<\/p><\/li>/gi, (match, content: string) => {
+    // Count exercise markup tags
+    const exerciseTags = content.match(/\{\{exercise:[^}]+\}\}/g);
+    
+    if (!exerciseTags || exerciseTags.length <= 1) {
+      // Single or no exercise - keep as-is
+      return match;
+    }
+    
+    // Multiple exercises on one line - split them
+    const parts = content.split(/(\{\{exercise:[^}]+\}\})/);
+    const items: string[] = [];
+    
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i];
+      if (/^\{\{exercise:/.test(part)) {
+        // This is an exercise tag - grab any suffix (sets/reps/duration) from next part
+        let suffix = '';
+        if (i + 1 < parts.length) {
+          const nextPart = parts[i + 1];
+          // Take suffix up to the next exercise tag or end, strip leading separators
+          const cleanedSuffix = nextPart
+            .replace(/^[\s,\-–—·•]+/, '')  // strip leading separators
+            .replace(/[\s,\-–—·•]+$/, '')  // strip trailing separators
+            .trim();
+          
+          // Only use as suffix if it doesn't look like another exercise name
+          // (i.e., short text like "3x12" or "30 seconds" or "each side")
+          if (cleanedSuffix && !cleanedSuffix.includes('{{exercise:') && cleanedSuffix.length < 80) {
+            suffix = cleanedSuffix;
+            parts[i + 1] = ''; // consumed
+          }
+        }
+        
+        const itemContent = suffix ? `${part} ${suffix}` : part;
+        items.push(`<li class="tiptap-list-item"><p class="tiptap-paragraph">${itemContent}</p></li>`);
+      }
+      // Non-exercise parts (structural labels, separators) are discarded
+    }
+    
+    return items.length > 0 ? items.join('') : match;
+  });
 }
 
 /**
