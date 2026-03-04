@@ -8,6 +8,7 @@ import {
   processContentSectionAware, 
   logUnmatchedExercises,
   fetchAndBuildExerciseReference,
+  buildExerciseReferenceList,
   guaranteeAllExercisesLinked,
   rejectNonLibraryExercises,
   type ExerciseBasic 
@@ -681,6 +682,7 @@ This is a NUDGE, not a mandate.
     // EXERCISE LIBRARY: Fetch and build reference list for AI prompt
     // BODYWEIGHT workouts → only bodyweight exercises visible to AI
     // EQUIPMENT workouts → full library (bodyweight + all equipment)
+    // PILATES EQUIPMENT → strict Pilates-studio props only (bands, balls, roller, bosu, rope, bodyweight)
     // ═══════════════════════════════════════════════════════════════════════════════
     // We fetch BOTH versions so each equipment type gets the right library
     // Determine difficulty level name for exercise filtering
@@ -691,9 +693,52 @@ This is a NUDGE, not a mandate.
     const { exercises: fullExercises, referenceList: fullReferenceList } = 
       await fetchAndBuildExerciseReference(supabase, "[GENERATE-WOD-FULL]", undefined, difficultyLevelName);
     
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // PILATES EQUIPMENT ALLOWLIST: Only studio-style props allowed
+    // ═══════════════════════════════════════════════════════════════════════════════
+    const PILATES_ALLOWED_EQUIPMENT = [
+      'body weight', 'band', 'resistance band', 'stability ball', 'medicine ball',
+      'roller', 'bosu ball', 'rope', 'assisted'
+    ];
+    
+    let pilatesEquipmentExercises: ExerciseBasic[] = [];
+    let pilatesEquipmentReferenceList = '';
+    
+    if (category === "PILATES") {
+      // Filter full exercise library to only Pilates-studio equipment
+      pilatesEquipmentExercises = fullExercises.filter(ex => {
+        const equip = (ex.equipment || '').toLowerCase().trim();
+        return PILATES_ALLOWED_EQUIPMENT.some(allowed => equip.includes(allowed));
+      });
+      
+      // Also include all bodyweight exercises
+      const bodyweightIds = new Set(bodyweightExercises.map(e => e.id));
+      for (const ex of pilatesEquipmentExercises) {
+        bodyweightIds.add(ex.id);
+      }
+      // Deduplicate
+      const allPilatesExercises = [...bodyweightExercises];
+      for (const ex of pilatesEquipmentExercises) {
+        if (!bodyweightExercises.some(bw => bw.id === ex.id)) {
+          allPilatesExercises.push(ex);
+        }
+      }
+      pilatesEquipmentExercises = allPilatesExercises;
+      
+      // Build reference list for Pilates equipment workouts
+      pilatesEquipmentReferenceList = buildExerciseReferenceList(pilatesEquipmentExercises, undefined, difficultyLevelName);
+      
+      logStep("Pilates equipment library built", {
+        totalPilatesExercises: pilatesEquipmentExercises.length,
+        allowedEquipment: PILATES_ALLOWED_EQUIPMENT,
+        bodyweightCount: bodyweightExercises.length
+      });
+    }
+    
     logStep("Exercise libraries loaded", { 
       bodyweightCount: bodyweightExercises.length,
-      fullCount: fullExercises.length
+      fullCount: fullExercises.length,
+      pilatesEquipmentCount: pilatesEquipmentExercises.length
     });
 
     for (const equipment of equipmentTypes) {
@@ -753,10 +798,15 @@ Generate a complete workout with these specifications:
 - Difficulty: ${selectedDifficulty.name} (${selectedDifficulty.stars} stars out of 6)
 - Format: ${format}
 
-${(equipment === "BODYWEIGHT" ? bodyweightReferenceList : fullReferenceList) ? `
-${equipment === "BODYWEIGHT" ? bodyweightReferenceList : fullReferenceList}
+${(() => {
+  // For Pilates EQUIPMENT workouts, use the Pilates-filtered library
+  if (category === "PILATES" && equipment === "EQUIPMENT") {
+    return pilatesEquipmentReferenceList || '';
+  }
+  return equipment === "BODYWEIGHT" ? (bodyweightReferenceList || '') : (fullReferenceList || '');
+})()}
 
-` : ''}
+
 ═══════════════════════════════════════════════════════════════════════════════
 FORMAT DEFINITIONS (MUST FOLLOW EXACTLY):
 ═══════════════════════════════════════════════════════════════════════════════
@@ -1416,31 +1466,40 @@ FORMAT: REPS & SETS ONLY (controlled movements require this structure)
 DURATION: 30-45 minutes depending on difficulty
 
 ${equipment === "EQUIPMENT" ? `
-REFORMER PILATES (EQUIPMENT VERSION):
-Your workout must use Pilates reformer-style movements with gym equipment alternatives.
+PILATES STUDIO EQUIPMENT VERSION:
+Your workout must use ONLY Pilates studio-style equipment and props.
 
-ALLOWED EQUIPMENT & EXERCISES:
-• Resistance bands/cables: Footwork variations, Leg presses, Arm circles, Rowing preps
-• Stability ball: Spine articulation, Bridging, Hamstring curls, Pike rolls
-• Foam roller: Rolling like a ball adaptations, Spine stretches, Mermaid stretches
-• Light dumbbells (2-5kg): Arm series, Chest expansion, Hug a tree
-• Gliders/towels: Lunges, Pikes, Mountain climbers (slow & controlled)
-• TRX/Suspension: Teaser variations, Plank to pike, Pull-through
-• Box/bench: Long box series, Short box series, Swan on box
+═══════════════════════════════════════════════════════════════════════════════
+STRICTLY ALLOWED EQUIPMENT (NOTHING ELSE):
+═══════════════════════════════════════════════════════════════════════════════
+• Resistance bands / mini bands
+• Stability ball (Swiss ball)
+• Medicine ball / soft ball
+• Foam roller
+• Bosu ball
+• Rope / jump rope
+• Bodyweight exercises (always allowed)
 
-REFORMER-INSPIRED SEQUENCES:
-• Footwork Series: Parallel, V-position, Wide V (using cables/resistance bands)
-• Long Stretch Series: Plank, Up stretch, Elephant (using gliders)
-• Short Spine & Overhead: Spinal articulation with stability ball
-• Rowing Series: Rowing front, Rowing back (with light resistance)
-• Arm Work: Biceps, Triceps, Circles (with bands or light weights)
-• Side Splits/Standing: Balance work with resistance
+❌ ABSOLUTELY FORBIDDEN EQUIPMENT IN PILATES:
+• Barbell, dumbbell, kettlebell (NO free weights except bands)
+• Leverage machine, smith machine, cable machine (NO gym machines)
+• Sled, battle ropes, weighted vest (NO heavy gym tools)
+• Any equipment you would NOT find in a Pilates studio
 
-KEY PRINCIPLES:
-• Smooth, flowing transitions between exercises
-• Constant engagement of the powerhouse (core)
-• Controlled eccentric and concentric phases (3-4 second tempo)
+PILATES STUDIO EXERCISE PRINCIPLES:
+• Controlled, flowing movements with precise form
+• Core engagement (powerhouse) throughout
+• 3-4 second tempo for all movements
 • Breath coordination: Exhale on exertion
+• Focus on alignment, symmetry, and body awareness
+• Low impact, no explosive movements
+
+EXERCISE SELECTION:
+You MUST select exercises ONLY from the exercise library provided.
+Filter the library for exercises using: body weight, band, resistance band, 
+stability ball, medicine ball, roller, bosu ball, rope.
+Do NOT select any exercise that uses barbells, dumbbells, kettlebells, 
+leverage machines, cable machines, or any gym-specific equipment.
 ` : `
 MAT PILATES (BODYWEIGHT VERSION):
 Classical mat Pilates with optional props (fit ball, ring, mini bands allowed).
@@ -2028,7 +2087,10 @@ Return JSON with these exact fields:
       // Step 3: Run section-aware matching as SAFETY NET for any exercises
       //         the AI failed to mark up (post-processing catches stragglers)
       // ═══════════════════════════════════════════════════════════════════════════════
-      const currentExerciseLibrary = equipment === "BODYWEIGHT" ? bodyweightExercises : fullExercises;
+      // For Pilates EQUIPMENT: use the strict Pilates-filtered library for post-processing
+      const currentExerciseLibrary = (category === "PILATES" && equipment === "EQUIPMENT") 
+        ? pilatesEquipmentExercises 
+        : (equipment === "BODYWEIGHT" ? bodyweightExercises : fullExercises);
       
       if (currentExerciseLibrary.length > 0 && workoutContent.main_workout) {
         // Build ID lookup map

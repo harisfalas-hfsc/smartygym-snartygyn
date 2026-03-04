@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,6 +8,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Dumbbell, Target, Activity, ListOrdered, Info, Gauge, ImageOff } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import ExerciseFrameAnimation from "./ExerciseFrameAnimation";
 
@@ -44,9 +45,15 @@ const formatLabel = (str: string) => {
 
 const ExerciseDetailModal = ({ exercise, open, onOpenChange }: ExerciseDetailModalProps) => {
   const scrollRootRef = useRef<HTMLDivElement | null>(null);
+  const [gifLoaded, setGifLoaded] = useState(false);
+  const [gifError, setGifError] = useState(false);
+  const [retryKey, setRetryKey] = useState(0);
 
   useEffect(() => {
     if (!open) return;
+    setGifLoaded(false);
+    setGifError(false);
+    setRetryKey(0);
     const viewport = scrollRootRef.current?.querySelector(
       "[data-radix-scroll-area-viewport]",
     ) as HTMLElement | null;
@@ -66,14 +73,35 @@ const ExerciseDetailModal = ({ exercise, open, onOpenChange }: ExerciseDetailMod
           <div className="space-y-6">
             {/* Exercise GIF or Frame Animation */}
             {exercise.gif_url ? (
-              <div className="w-full aspect-square rounded-lg overflow-hidden bg-white border-2 border-border flex items-center justify-center">
-                <img
-                  src={exercise.gif_url}
-                  alt={`SmartyGym ${exercise.name} exercise demonstration - Haris Falas online fitness platform smartygym.com`}
-                  className="w-full h-full object-contain"
-                  loading="lazy"
-                  decoding="async"
-                />
+              <div className="w-full aspect-square rounded-lg overflow-hidden bg-white border-2 border-border flex items-center justify-center relative">
+                {!gifLoaded && !gifError && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Skeleton className="w-full h-full" />
+                  </div>
+                )}
+                {gifError ? (
+                  <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground">
+                    <ImageOff className="h-6 w-6" />
+                    <p className="text-sm">Image failed to load</p>
+                    <button
+                      onClick={() => { setGifError(false); setGifLoaded(false); setRetryKey(k => k + 1); }}
+                      className="text-xs text-primary underline hover:no-underline"
+                    >
+                      Retry
+                    </button>
+                  </div>
+                ) : (
+                  <img
+                    key={retryKey}
+                    src={exercise.gif_url}
+                    alt={`SmartyGym ${exercise.name} exercise demonstration - Haris Falas online fitness platform smartygym.com`}
+                    className={`w-full h-full object-contain ${gifLoaded ? '' : 'opacity-0 absolute'}`}
+                    loading="lazy"
+                    decoding="async"
+                    onLoad={() => setGifLoaded(true)}
+                    onError={() => setGifError(true)}
+                  />
+                )}
               </div>
             ) : exercise.frame_start_url && exercise.frame_end_url ? (
               <ExerciseFrameAnimation
