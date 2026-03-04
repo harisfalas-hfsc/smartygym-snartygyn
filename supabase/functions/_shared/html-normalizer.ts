@@ -1,45 +1,33 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * GOLD STANDARD V3 HTML NORMALIZER
- * Ensures workout HTML has zero spacing issues by:
- * 1. Stripping all newline characters (\n, \r)
- * 2. Collapsing all whitespace between HTML tags
- * 3. Normalizing header markup (<b> → <strong>)
- * 4. Merging fragmented <ul> blocks
- * 5. Ensuring exactly one empty paragraph between sections
+ * GOLD STANDARD V4 HTML NORMALIZER
+ * Robust sanitizer-first approach:
+ * 0. Fix malformed/broken HTML tags
+ * 1. Strip newlines, collapse whitespace
+ * 2. Normalize markup
+ * 3. Merge fragmented lists
+ * 4. Split multi-exercise lines (1 exercise = 1 bullet)
+ * 5. Remove orphan bullets from exercise lists
+ * 6. Section spacing
  * ═══════════════════════════════════════════════════════════════════════════════
  */
 
 const SECTION_ICONS = ['🧽', '🔥', '💪', '⚡', '🧘'];
 const CANONICAL_EMPTY_P = '<p class="tiptap-paragraph"></p>';
 
-/**
- * Normalize HTML content to Gold Standard V3 formatting
- * Call this BEFORE inserting into the database to prevent spacing issues
- */
 export function normalizeWorkoutHtml(content: string): string {
-  if (!content || !content.trim()) {
-    return content;
-  }
+  if (!content || !content.trim()) return content;
   
   let result = content;
   
-  // ═══════════════════════════════════════════════════════════════════════════════
-  // STEP 1 (CRITICAL): Strip all newline characters
-  // This is THE root cause of spacing issues - CSS pre-wrap renders \n as visible gaps
-  // ═══════════════════════════════════════════════════════════════════════════════
-  result = result.replace(/[\n\r]+/g, '');
+  // STEP 0: Fix malformed HTML before anything else
+  result = sanitizeMalformedHtml(result);
   
-  // ═══════════════════════════════════════════════════════════════════════════════
-  // STEP 2 (CRITICAL): Collapse all whitespace between tags
-  // Patterns like "</p> <ul" create whitespace text nodes = visible gaps
-  // ═══════════════════════════════════════════════════════════════════════════════
+  // STEP 1: Strip newlines, collapse whitespace
+  result = result.replace(/[\n\r]+/g, '');
   result = result.replace(/>\s+</g, '><');
   
-  // ═══════════════════════════════════════════════════════════════════════════════
-  // STEP 3: Normalize header markup variants
-  // <u><b>...</b></u>, <b><u>...</u></b> → <strong><u>...</u></strong>
-  // ═══════════════════════════════════════════════════════════════════════════════
+  // STEP 2: Normalize header markup
   result = result.replace(/<u><b>/gi, '<strong><u>');
   result = result.replace(/<\/b><\/u>/gi, '</u></strong>');
   result = result.replace(/<b><u>/gi, '<strong><u>');
@@ -47,35 +35,24 @@ export function normalizeWorkoutHtml(content: string): string {
   result = result.replace(/<b>/gi, '<strong>');
   result = result.replace(/<\/b>/gi, '</strong>');
   
-  // ═══════════════════════════════════════════════════════════════════════════════
-  // STEP 4: Merge consecutive <ul> blocks
-  // Fragmented lists like </ul><ul> should be one continuous list
-  // ═══════════════════════════════════════════════════════════════════════════════
+  // STEP 3: Merge consecutive <ul> blocks
   result = result.replace(/<\/ul>(?:<p[^>]*><\/p>)*<ul[^>]*>/gi, '');
   
-  // ═══════════════════════════════════════════════════════════════════════════════
-  // STEP 5: Fix single-quote HTML attributes → double quotes
-  // ═══════════════════════════════════════════════════════════════════════════════
+  // STEP 4: Fix single-quote attributes
   result = result.replace(
     /(\s(?:class|id|style|data-\w+))='([^']*)'/gi,
     (_, attr, value) => `${attr}="${value}"`
   );
   
-  // ═══════════════════════════════════════════════════════════════════════════════
-  // STEP 6: Add TipTap classes to elements missing them
-  // ═══════════════════════════════════════════════════════════════════════════════
+  // STEP 5: Add TipTap classes
   result = result.replace(/<ul(?![^>]*class)/gi, '<ul class="tiptap-bullet-list"');
   result = result.replace(/<li(?![^>]*class)/gi, '<li class="tiptap-list-item"');
   result = result.replace(/<p(?![^>]*class)/gi, '<p class="tiptap-paragraph"');
   
-  // ═══════════════════════════════════════════════════════════════════════════════
-  // STEP 7: Normalize empty paragraphs to canonical form
-  // ═══════════════════════════════════════════════════════════════════════════════
+  // STEP 6: Normalize empty paragraphs
   result = result.replace(/<p[^>]*>\s*<\/p>/gi, CANONICAL_EMPTY_P);
   
-  // ═══════════════════════════════════════════════════════════════════════════════
-  // STEP 8: Remove blank lines after section headers
-  // ═══════════════════════════════════════════════════════════════════════════════
+  // STEP 7: Section header spacing
   for (const icon of SECTION_ICONS) {
     const pattern = new RegExp(
       `(<p[^>]*>[^<]*${icon}[\\s\\S]*?<\\/p>)(<p class="tiptap-paragraph"><\\/p>)+(?=<(?:ul|p|li))`,
@@ -83,10 +60,6 @@ export function normalizeWorkoutHtml(content: string): string {
     );
     result = result.replace(pattern, '$1');
   }
-  
-  // ═══════════════════════════════════════════════════════════════════════════════
-  // STEP 9: Ensure empty paragraph BEFORE section headers (icon-based)
-  // ═══════════════════════════════════════════════════════════════════════════════
   for (const icon of SECTION_ICONS) {
     const insertPattern = new RegExp(
       `(<\\/(?:ul|p)>)(?!<p class="tiptap-paragraph"><\\/p>)(<p[^>]*>[^<]*${icon})`,
@@ -94,168 +67,215 @@ export function normalizeWorkoutHtml(content: string): string {
     );
     result = result.replace(insertPattern, `$1${CANONICAL_EMPTY_P}$2`);
   }
-
-  // ═══════════════════════════════════════════════════════════════════════════════
-  // STEP 10: Collapse multiple consecutive empty paragraphs to exactly one
-  // ═══════════════════════════════════════════════════════════════════════════════
-  result = result.replace(/(<p class="tiptap-paragraph"><\/p>){2,}/gi, CANONICAL_EMPTY_P);
   
-  // ═══════════════════════════════════════════════════════════════════════════════
-  // STEP 10: Remove empty paragraphs between list items
-  // ═══════════════════════════════════════════════════════════════════════════════
+  // STEP 8: Collapse multiple empty paragraphs
+  result = result.replace(/(<p class="tiptap-paragraph"><\/p>){2,}/gi, CANONICAL_EMPTY_P);
   result = result.replace(/<\/li><p class="tiptap-paragraph"><\/p><li/gi, '</li><li');
   
-  // ═══════════════════════════════════════════════════════════════════════════════
-  // STEP 11: Remove leading/trailing empty paragraphs
-  // ═══════════════════════════════════════════════════════════════════════════════
+  // STEP 9: Remove leading/trailing empty paragraphs
   result = result.replace(/^(<p class="tiptap-paragraph"><\/p>)+/, '');
   result = result.replace(/(<p class="tiptap-paragraph"><\/p>)+$/, '');
   
-  // ═══════════════════════════════════════════════════════════════════════════════
-  // STEP 12: Split multi-exercise list items into individual items
-  // Each exercise MUST have its own <li> with its own View button
-  // ═══════════════════════════════════════════════════════════════════════════════
+  // STEP 10: Strip structural labels from exercise bullets
+  result = stripStructuralLabelsFromExerciseBullets(result);
+  
+  // STEP 11: Split multi-exercise lines
   result = splitMultiExerciseLines(result);
-
-  // ═══════════════════════════════════════════════════════════════════════════════
-  // STEP 13: Remove orphan/empty bullets from exercise lists
-  // Non-exercise bullets in exercise lists are converted to paragraphs
-  // ═══════════════════════════════════════════════════════════════════════════════
+  
+  // STEP 12: Remove orphan bullets
   result = removeOrphanExerciseListItems(result);
-
-  // Final safety collapse after transformations
+  
+  // STEP 13: Move orphan exercise <p> tags outside lists into the list
+  result = absorbOrphanExerciseParagraphs(result);
+  
+  // Final collapse
   result = result.replace(/(<p class="tiptap-paragraph"><\/p>){2,}/gi, CANONICAL_EMPTY_P);
   
   return result;
 }
 
 /**
+ * Fix malformed/broken HTML tags that would cause regex failures downstream.
+ * Examples:
+ *   <li class="tiptap-list-item"hamstring stretch/li> → drops the broken tag
+ *   </strong></p></li> missing opening → safe
+ */
+export function sanitizeMalformedHtml(html: string): string {
+  if (!html) return html;
+  let result = html;
+  
+  // Fix <li ...> missing closing ">" before content (e.g., <li class="x"some text/li>)
+  // These are completely broken and unrecoverable - remove them
+  result = result.replace(/<li[^>]*"[a-zA-Z][^<]*\/li>/gi, '');
+  
+  // Fix unclosed <li> tags (no </li>)
+  // Pattern: <li...>content that doesn't end with </li> before next <li or </ul>
+  // This is handled by ensuring all <li> have </li>
+  
+  // Fix <li> without <p> wrapper inside
+  result = result.replace(/<li([^>]*)>(?!<p)([^<]+)(?:<\/li>)/gi, 
+    '<li$1><p class="tiptap-paragraph">$2</p></li>');
+  
+  // Fix orphan </strong> at start of <p> content (leftover from stripped labels)
+  result = result.replace(/<p([^>]*)>\s*<\/strong>/gi, '<p$1>');
+  
+  // Fix doubled class attributes
+  result = result.replace(/class="[^"]*"\s*class="/gi, 'class="');
+  
+  return result;
+}
+
+/**
+ * Strip structural labels like <strong>Set 3:</strong> or <strong>Static Stretching (8 min):</strong>
+ * that precede exercise tags inside list items.
+ */
+export function stripStructuralLabelsFromExerciseBullets(html: string): string {
+  if (!html) return html;
+  
+  // Pattern: <li...><p...><strong>Label:</strong> {{exercise:...}}</p></li>
+  // → <li...><p...>{{exercise:...}}</p></li>
+  return html.replace(
+    /(<li[^>]*><p[^>]*>)\s*<strong>[^<]*<\/strong>\s*(\{\{exercise:[^}]+\}\})/gi,
+    '$1$2'
+  );
+}
+
+/**
  * Split <li> items containing multiple {{exercise:...}} tags into separate <li> items.
- * Also handles comma-separated exercise names and structural labels mixed with exercises.
+ * Also splits exercises separated by commas with plain text names.
  */
 export function splitMultiExerciseLines(html: string): string {
   if (!html) return html;
   
-  // Pattern: find <li> items with their inner <p> content
   return html.replace(/<li[^>]*><p[^>]*>([\s\S]*?)<\/p><\/li>/gi, (match, content: string) => {
-    // Count exercise markup tags
     const exerciseTags = content.match(/\{\{exercise:[^}]+\}\}/g);
+    if (!exerciseTags || exerciseTags.length <= 1) return match;
     
-    if (!exerciseTags || exerciseTags.length <= 1) {
-      // Single or no exercise - keep as-is
-      return match;
-    }
-    
-    // Multiple exercises on one line - split them
     const parts = content.split(/(\{\{exercise:[^}]+\}\})/);
     const items: string[] = [];
     
     for (let i = 0; i < parts.length; i++) {
       const part = parts[i];
       if (/^\{\{exercise:/.test(part)) {
-        // This is an exercise tag - grab any suffix (sets/reps/duration) from next part
         let suffix = '';
         if (i + 1 < parts.length) {
-          const nextPart = parts[i + 1];
-          // Take suffix up to the next exercise tag or end, strip leading separators
-          const cleanedSuffix = nextPart
-            .replace(/^[\s,\-–—·•]+/, '')  // strip leading separators
-            .replace(/[\s,\-–—·•]+$/, '')  // strip trailing separators
+          const cleaned = parts[i + 1]
+            .replace(/^[\s,\-–—·•:]+/, '')
+            .replace(/[\s,\-–—·•]+$/, '')
+            .replace(/<\/?strong>/gi, '')
             .trim();
-          
-          // Only use as suffix if it doesn't look like another exercise name
-          // (i.e., short text like "3x12" or "30 seconds" or "each side")
-          if (cleanedSuffix && !cleanedSuffix.includes('{{exercise:') && cleanedSuffix.length < 80) {
-            suffix = cleanedSuffix;
-            parts[i + 1] = ''; // consumed
+          if (cleaned && !cleaned.includes('{{exercise:') && cleaned.length < 80) {
+            suffix = cleaned;
+            parts[i + 1] = '';
           }
         }
-        
         const itemContent = suffix ? `${part} ${suffix}` : part;
         items.push(`<li class="tiptap-list-item"><p class="tiptap-paragraph">${itemContent}</p></li>`);
       }
-      // Non-exercise parts (structural labels, separators) are discarded
     }
     
     return items.length > 0 ? items.join('') : match;
   });
 }
 
-
 /**
- * In lists that already contain exercise markup, remove empty/orphan bullet items.
+ * In lists containing exercise markup, remove non-exercise bullets.
  * - Keeps bullets with {{exercise:...}}
- * - Converts non-exercise bullets to paragraphs (prevents lonely bullet dots)
- * - Drops truly empty bullets
+ * - Converts meaningful non-exercise text to <p> paragraphs
+ * - Drops empty bullets entirely
  */
 export function removeOrphanExerciseListItems(html: string): string {
   if (!html) return html;
 
   return html.replace(/<ul[^>]*>([\s\S]*?)<\/ul>/gi, (fullList, listContent: string) => {
-    const liRegex = /<li[^>]*>\s*<p[^>]*>([\s\S]*?)<\/p>\s*<\/li>/gi;
-    const items: string[] = [];
-    let match: RegExpExecArray | null;
+    // Extract all <li> items - handle both with and without <p> wrappers
+    const liRegex = /<li[^>]*>(?:\s*<p[^>]*>([\s\S]*?)<\/p>\s*|([\s\S]*?))<\/li>/gi;
+    const items: Array<{content: string; raw: string}> = [];
+    let liMatch: RegExpExecArray | null;
 
-    while ((match = liRegex.exec(listContent)) !== null) {
-      items.push(match[1]);
+    while ((liMatch = liRegex.exec(listContent)) !== null) {
+      items.push({
+        content: liMatch[1] || liMatch[2] || '',
+        raw: liMatch[0]
+      });
     }
 
     if (items.length === 0) return fullList;
 
-    const hasExerciseMarkup = items.some((item) => /\{\{exercise:[^}]+\}\}/i.test(item));
+    const hasExerciseMarkup = items.some(item => /\{\{exercise:[^}]+\}\}/i.test(item.content));
     if (!hasExerciseMarkup) return fullList;
 
     const keptExerciseItems: string[] = [];
     const convertedParagraphs: string[] = [];
 
     for (const item of items) {
-      const hasExercise = /\{\{exercise:[^}]+\}\}/i.test(item);
-      const plainText = item
-        .replace(/<[^>]+>/g, "")
-        .replace(/&nbsp;/gi, " ")
-        .replace(/\s+/g, " ")
+      const hasExercise = /\{\{exercise:[^}]+\}\}/i.test(item.content);
+      const plainText = item.content
+        .replace(/<[^>]+>/g, '')
+        .replace(/\{\{exercise:[^}]+\}\}/g, '')
+        .replace(/&nbsp;/gi, ' ')
+        .replace(/\s+/g, ' ')
         .trim();
 
       if (hasExercise) {
-        keptExerciseItems.push(`<li class="tiptap-list-item"><p class="tiptap-paragraph">${item.trim()}</p></li>`);
-      } else if (plainText.length > 0) {
-        convertedParagraphs.push(`<p class="tiptap-paragraph">${item.trim()}</p>`);
+        keptExerciseItems.push(
+          `<li class="tiptap-list-item"><p class="tiptap-paragraph">${item.content.trim()}</p></li>`
+        );
+      } else if (plainText.length > 5) {
+        // Only keep non-exercise text if it's substantial (not just "Rest" or empty)
+        convertedParagraphs.push(
+          `<p class="tiptap-paragraph">${item.content.trim()}</p>`
+        );
       }
+      // Drop empty or trivially short orphan bullets
     }
 
     if (keptExerciseItems.length === 0) {
-      return convertedParagraphs.join("");
+      return convertedParagraphs.join('');
     }
 
-    return `<ul class="tiptap-bullet-list">${keptExerciseItems.join("")}</ul>${convertedParagraphs.join("")}`;
+    const listHtml = `<ul class="tiptap-bullet-list">${keptExerciseItems.join('')}</ul>`;
+    return convertedParagraphs.length > 0 
+      ? `${listHtml}${convertedParagraphs.join('')}` 
+      : listHtml;
   });
 }
 
 /**
- * Validate that normalized HTML is compliant (for guard/rejection logic)
- * Returns true if content is clean, false if issues remain
+ * Move <p> tags containing {{exercise:...}} that sit OUTSIDE a <ul> list
+ * into the preceding or following list as proper <li> items.
  */
+export function absorbOrphanExerciseParagraphs(html: string): string {
+  if (!html) return html;
+  
+  // Pattern: </ul><p...>...{{exercise:...}}...</p> → absorb into preceding list
+  let result = html.replace(
+    /<\/ul>(<p[^>]*>([\s\S]*?)<\/p>)(?=<|\s*$)/gi,
+    (match, pTag, pContent) => {
+      if (/\{\{exercise:[^}]+\}\}/.test(pContent)) {
+        // This orphan <p> has an exercise - absorb it as a <li> into the preceding list
+        return `<li class="tiptap-list-item"><p class="tiptap-paragraph">${pContent.trim()}</p></li></ul>`;
+      }
+      return match;
+    }
+  );
+  
+  return result;
+}
+
 export function validateWorkoutHtml(content: string): { isValid: boolean; issues: string[] } {
   const issues: string[] = [];
   
-  if (/[\n\r]/.test(content)) {
-    issues.push('Contains newline characters');
+  if (/[\n\r]/.test(content)) issues.push('Contains newline characters');
+  if (/>\s+</.test(content)) issues.push('Whitespace between HTML tags');
+  if (/<\/li><p[^>]*><\/p><li/i.test(content)) issues.push('Empty paragraph between list items');
+  if (/(<p class="tiptap-paragraph"><\/p>){2,}/.test(content)) issues.push('Multiple consecutive empty paragraphs');
+  
+  // New strict checks
+  if (/<li[^>]*><p[^>]*>[^{<]*<\/p><\/li>/i.test(content) && /\{\{exercise:/.test(content)) {
+    // Check if there are non-exercise <li> in a list that has exercises
+    issues.push('Non-exercise bullet in exercise list');
   }
   
-  if (/>\s+</.test(content)) {
-    issues.push('Whitespace between HTML tags');
-  }
-  
-  if (/<\/li><p[^>]*><\/p><li/i.test(content)) {
-    issues.push('Empty paragraph between list items');
-  }
-  
-  if (/(<p class="tiptap-paragraph"><\/p>){2,}/.test(content)) {
-    issues.push('Multiple consecutive empty paragraphs');
-  }
-  
-  return {
-    isValid: issues.length === 0,
-    issues
-  };
+  return { isValid: issues.length === 0, issues };
 }
