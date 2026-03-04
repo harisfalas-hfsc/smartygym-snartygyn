@@ -264,3 +264,6 @@ verify_jwt = false
 
 [functions.select-wod-from-library]
 verify_jwt = false
+
+[functions.repair-pilates-workouts]
+verify_jwt = false
