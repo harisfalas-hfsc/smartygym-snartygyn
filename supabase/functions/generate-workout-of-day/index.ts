@@ -681,6 +681,7 @@ This is a NUDGE, not a mandate.
     // EXERCISE LIBRARY: Fetch and build reference list for AI prompt
     // BODYWEIGHT workouts → only bodyweight exercises visible to AI
     // EQUIPMENT workouts → full library (bodyweight + all equipment)
+    // PILATES EQUIPMENT → strict Pilates-studio props only (bands, balls, roller, bosu, rope, bodyweight)
     // ═══════════════════════════════════════════════════════════════════════════════
     // We fetch BOTH versions so each equipment type gets the right library
     // Determine difficulty level name for exercise filtering
@@ -691,9 +692,52 @@ This is a NUDGE, not a mandate.
     const { exercises: fullExercises, referenceList: fullReferenceList } = 
       await fetchAndBuildExerciseReference(supabase, "[GENERATE-WOD-FULL]", undefined, difficultyLevelName);
     
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // PILATES EQUIPMENT ALLOWLIST: Only studio-style props allowed
+    // ═══════════════════════════════════════════════════════════════════════════════
+    const PILATES_ALLOWED_EQUIPMENT = [
+      'body weight', 'band', 'resistance band', 'stability ball', 'medicine ball',
+      'roller', 'bosu ball', 'rope', 'assisted'
+    ];
+    
+    let pilatesEquipmentExercises: ExerciseBasic[] = [];
+    let pilatesEquipmentReferenceList = '';
+    
+    if (category === "PILATES") {
+      // Filter full exercise library to only Pilates-studio equipment
+      pilatesEquipmentExercises = fullExercises.filter(ex => {
+        const equip = (ex.equipment || '').toLowerCase().trim();
+        return PILATES_ALLOWED_EQUIPMENT.some(allowed => equip.includes(allowed));
+      });
+      
+      // Also include all bodyweight exercises
+      const bodyweightIds = new Set(bodyweightExercises.map(e => e.id));
+      for (const ex of pilatesEquipmentExercises) {
+        bodyweightIds.add(ex.id);
+      }
+      // Deduplicate
+      const allPilatesExercises = [...bodyweightExercises];
+      for (const ex of pilatesEquipmentExercises) {
+        if (!bodyweightExercises.some(bw => bw.id === ex.id)) {
+          allPilatesExercises.push(ex);
+        }
+      }
+      pilatesEquipmentExercises = allPilatesExercises;
+      
+      // Build reference list for Pilates equipment workouts
+      pilatesEquipmentReferenceList = buildExerciseReferenceList(pilatesEquipmentExercises, undefined, difficultyLevelName);
+      
+      logStep("Pilates equipment library built", {
+        totalPilatesExercises: pilatesEquipmentExercises.length,
+        allowedEquipment: PILATES_ALLOWED_EQUIPMENT,
+        bodyweightCount: bodyweightExercises.length
+      });
+    }
+    
     logStep("Exercise libraries loaded", { 
       bodyweightCount: bodyweightExercises.length,
-      fullCount: fullExercises.length
+      fullCount: fullExercises.length,
+      pilatesEquipmentCount: pilatesEquipmentExercises.length
     });
 
     for (const equipment of equipmentTypes) {
