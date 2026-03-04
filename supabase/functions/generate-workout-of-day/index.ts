@@ -798,10 +798,15 @@ Generate a complete workout with these specifications:
 - Difficulty: ${selectedDifficulty.name} (${selectedDifficulty.stars} stars out of 6)
 - Format: ${format}
 
-${(equipment === "BODYWEIGHT" ? bodyweightReferenceList : fullReferenceList) ? `
-${equipment === "BODYWEIGHT" ? bodyweightReferenceList : fullReferenceList}
+${(() => {
+  // For Pilates EQUIPMENT workouts, use the Pilates-filtered library
+  if (category === "PILATES" && equipment === "EQUIPMENT") {
+    return pilatesEquipmentReferenceList || '';
+  }
+  return equipment === "BODYWEIGHT" ? (bodyweightReferenceList || '') : (fullReferenceList || '');
+})()}
 
-` : ''}
+
 ═══════════════════════════════════════════════════════════════════════════════
 FORMAT DEFINITIONS (MUST FOLLOW EXACTLY):
 ═══════════════════════════════════════════════════════════════════════════════
