@@ -126,6 +126,7 @@ function splitMultiExerciseLines(html: string): string {
     
     return items.length > 0 ? items.join('') : match;
   });
+}
 
 /**
  * In lists that already contain exercise markup, remove empty/orphan bullet items.
