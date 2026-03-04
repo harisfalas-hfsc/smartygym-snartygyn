@@ -1466,31 +1466,40 @@ FORMAT: REPS & SETS ONLY (controlled movements require this structure)
 DURATION: 30-45 minutes depending on difficulty
 
 ${equipment === "EQUIPMENT" ? `
-REFORMER PILATES (EQUIPMENT VERSION):
-Your workout must use Pilates reformer-style movements with gym equipment alternatives.
+PILATES STUDIO EQUIPMENT VERSION:
+Your workout must use ONLY Pilates studio-style equipment and props.
 
-ALLOWED EQUIPMENT & EXERCISES:
-• Resistance bands/cables: Footwork variations, Leg presses, Arm circles, Rowing preps
-• Stability ball: Spine articulation, Bridging, Hamstring curls, Pike rolls
-• Foam roller: Rolling like a ball adaptations, Spine stretches, Mermaid stretches
-• Light dumbbells (2-5kg): Arm series, Chest expansion, Hug a tree
-• Gliders/towels: Lunges, Pikes, Mountain climbers (slow & controlled)
-• TRX/Suspension: Teaser variations, Plank to pike, Pull-through
-• Box/bench: Long box series, Short box series, Swan on box
+═══════════════════════════════════════════════════════════════════════════════
+STRICTLY ALLOWED EQUIPMENT (NOTHING ELSE):
+═══════════════════════════════════════════════════════════════════════════════
+• Resistance bands / mini bands
+• Stability ball (Swiss ball)
+• Medicine ball / soft ball
+• Foam roller
+• Bosu ball
+• Rope / jump rope
+• Bodyweight exercises (always allowed)
 
-REFORMER-INSPIRED SEQUENCES:
-• Footwork Series: Parallel, V-position, Wide V (using cables/resistance bands)
-• Long Stretch Series: Plank, Up stretch, Elephant (using gliders)
-• Short Spine & Overhead: Spinal articulation with stability ball
-• Rowing Series: Rowing front, Rowing back (with light resistance)
-• Arm Work: Biceps, Triceps, Circles (with bands or light weights)
-• Side Splits/Standing: Balance work with resistance
+❌ ABSOLUTELY FORBIDDEN EQUIPMENT IN PILATES:
+• Barbell, dumbbell, kettlebell (NO free weights except bands)
+• Leverage machine, smith machine, cable machine (NO gym machines)
+• Sled, battle ropes, weighted vest (NO heavy gym tools)
+• Any equipment you would NOT find in a Pilates studio
 
-KEY PRINCIPLES:
-• Smooth, flowing transitions between exercises
-• Constant engagement of the powerhouse (core)
-• Controlled eccentric and concentric phases (3-4 second tempo)
+PILATES STUDIO EXERCISE PRINCIPLES:
+• Controlled, flowing movements with precise form
+• Core engagement (powerhouse) throughout
+• 3-4 second tempo for all movements
 • Breath coordination: Exhale on exertion
+• Focus on alignment, symmetry, and body awareness
+• Low impact, no explosive movements
+
+EXERCISE SELECTION:
+You MUST select exercises ONLY from the exercise library provided.
+Filter the library for exercises using: body weight, band, resistance band, 
+stability ball, medicine ball, roller, bosu ball, rope.
+Do NOT select any exercise that uses barbells, dumbbells, kettlebells, 
+leverage machines, cable machines, or any gym-specific equipment.
 ` : `
 MAT PILATES (BODYWEIGHT VERSION):
 Classical mat Pilates with optional props (fit ball, ring, mini bands allowed).
