@@ -1,72 +1,40 @@
 
-Issue recap (validated, not assumed)
-- Your complaint is correct: “Center Balance Flow” is still broken.
-- I checked the database directly and found at least two records named “Center Balance Flow,” including:
-  - `WOD-PIL-E-1770849008078` (still malformed)
-  - `WOD-PIL-E-1771713008848` (partially inconsistent)
-- In `WOD-PIL-E-1770849008078` I found broken HTML like:
-  - malformed `<li ... "hamstring stretch/li>`
-  - mixed non-exercise text inside exercise bullets
-  - malformed cool-down structure that can render as empty bullets and merged rows.
-- Global scope is still not clean:
-  - 19 workouts with malformed `<li>` patterns
-  - 44 workouts with multi-exercise content inside one bullet row
-  - 3 training programs with multi-exercise-in-one-row issues
 
-Do I know what the issue is?
-- Yes.
+# Fix the Limited Access Icon - Make Check + Slash Actually Visible
 
-Why previous “fixed all” runs did not truly fix all
-1) The admin repair flow still calls `repair-content-formatting`, not the newer bulk consistency function.
-2) That repair path is regex-fragile against malformed HTML (broken tags bypass intended split/orphan cleanup).
-3) Program repair is not consistently included in admin flow.
-4) Audit criteria miss critical corruption signatures (so it can report success while broken bullets remain).
+## Problem
 
-What I will implement after approval
-1) Build a strict sanitizer-first repair pass (server-side) before matching
-- Parse/repair malformed list markup before exercise relinking.
-- Normalize broken `<li>/<p>` structures into valid list nodes.
-- Then apply split + orphan cleanup + one-exercise-per-bullet enforcement.
+The current implementation produces an icon that looks like a tiny pencil/edit icon rather than a green checkmark with an amber slash through it. The check is barely visible because:
+- The container is too small (w-6 h-6)
+- The amber slash dominates and obscures the checkmark
+- The overall result doesn't read as "check with slash"
 
-2) Enforce hard rule: one linked exercise per bullet
-- For each `<li>`:
-  - If it contains multiple `{{exercise:...}}` entries → split into separate `<li>` rows.
-  - If it contains non-exercise instruction text in an exercise list → move to paragraph, not bullet.
-  - If it contains an exercise not in library → substitute closest valid library equivalent (per your existing rule).
+## Solution
 
-3) Replace/upgrade the bulk repair execution path
-- Use one robust function to process all workout HTML fields and all program HTML fields.
-- Run full pagination until exhaustion (no partial “batch done” claims).
-- Process target-first (Center Balance Flow IDs) then full library.
+Make the green checkmark larger and bolder so it's clearly visible, then overlay a thinner but distinct amber diagonal line across it. The check should be the dominant visual element, with the slash as a clear modifier.
 
-4) Make the audit truthful
-- Add hard checks for:
-  - malformed `<li>` syntax
-  - multi-exercise rows per `<li>`
-  - orphan/empty bullets
-  - invalid `{{exercise:id:name}}` references
-- Audit must fail if any of these remain.
+### Updated code for `renderFeatureValue` (limited case):
 
-5) Verification gates before claiming done
-- Database proof queries must return zero for:
-  - malformed list-item patterns
-  - multi-exercise-in-one-li patterns
-  - orphan empty bullet patterns
-- Spot-check required:
-  - both Center Balance Flow IDs
-  - current Pilates WOD
-  - random sample of repaired workouts and programs
-- Only after passing all gates will I report complete.
+```tsx
+<div className="relative inline-flex items-center justify-center w-8 h-8 mx-auto">
+  <Check className="w-6 h-6 text-green-500" strokeWidth={3} />
+  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+    <div className="w-9 h-[2.5px] bg-amber-500 rotate-[-45deg] rounded-full" />
+  </div>
+</div>
+```
 
-Execution order (fastest recovery path)
-1) Fix both Center Balance Flow records immediately.
-2) Run full workout repair to completion.
-3) Run full training-program repair to completion.
-4) Run strict post-repair audit.
-5) Re-check the exact workout route(s) you’re viewing and provide direct before/after proof.
+Key changes:
+- Container increased to `w-8 h-8` so the check has room to breathe
+- Check icon increased to `w-6 h-6` with `strokeWidth={3}` so it's clearly a checkmark
+- Slash line made longer (`w-9`) but slightly thinner (`h-[2.5px]`) so it crosses through without hiding the check
+- Uses `mx-auto` for centering in all contexts (desktop table and mobile cards)
 
-Success criteria
-- No empty bullets.
-- No “three exercises in one row.”
-- Every exercise bullet has exactly one View button.
-- All workouts + training programs pass the strict audit.
+## Files to Update
+
+1. **src/pages/SmartyPlans.tsx** -- line 150-157, update the limited case (uses `ml-auto`)
+2. **src/pages/PremiumComparison.tsx** -- line 119-128, update the limited case (uses `mx-auto`)
+3. **src/pages/PremiumBenefits.tsx** -- line 137-146, update the limited case (uses `mx-auto`)
+
+Each file gets the same icon markup, with alignment matching the existing pattern (`ml-auto` for SmartyPlans, `mx-auto` for the other two).
+
