@@ -2078,7 +2078,10 @@ Return JSON with these exact fields:
       // Step 3: Run section-aware matching as SAFETY NET for any exercises
       //         the AI failed to mark up (post-processing catches stragglers)
       // ═══════════════════════════════════════════════════════════════════════════════
-      const currentExerciseLibrary = equipment === "BODYWEIGHT" ? bodyweightExercises : fullExercises;
+      // For Pilates EQUIPMENT: use the strict Pilates-filtered library for post-processing
+      const currentExerciseLibrary = (category === "PILATES" && equipment === "EQUIPMENT") 
+        ? pilatesEquipmentExercises 
+        : (equipment === "BODYWEIGHT" ? bodyweightExercises : fullExercises);
       
       if (currentExerciseLibrary.length > 0 && workoutContent.main_workout) {
         // Build ID lookup map
