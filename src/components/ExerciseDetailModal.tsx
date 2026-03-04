@@ -44,9 +44,15 @@ const formatLabel = (str: string) => {
 
 const ExerciseDetailModal = ({ exercise, open, onOpenChange }: ExerciseDetailModalProps) => {
   const scrollRootRef = useRef<HTMLDivElement | null>(null);
+  const [gifLoaded, setGifLoaded] = useState(false);
+  const [gifError, setGifError] = useState(false);
+  const [retryKey, setRetryKey] = useState(0);
 
   useEffect(() => {
     if (!open) return;
+    setGifLoaded(false);
+    setGifError(false);
+    setRetryKey(0);
     const viewport = scrollRootRef.current?.querySelector(
       "[data-radix-scroll-area-viewport]",
     ) as HTMLElement | null;
