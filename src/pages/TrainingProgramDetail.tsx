@@ -129,6 +129,15 @@ const TrainingProgramDetail = () => {
     "mobility-stability": "Mobility & Stability Programs"
   };
 
+  const programFallbackByType: Record<string, string> = {
+    "cardio-endurance": "/images/programs/cardio-endurance-bg.jpg",
+    "functional-strength": "/images/programs/functional-strength-bg.jpg",
+    "muscle-hypertrophy": "/images/programs/muscle-hypertrophy-bg.jpg",
+    "weight-loss": "/images/programs/weight-loss-bg.jpg",
+    "low-back-pain": "/images/programs/low-back-pain-bg.jpg",
+    "mobility-stability": "/images/programs/mobility-stability-bg.jpg",
+  };
+
   const categoryDescriptions: { [key: string]: { description: string; meta: string } } = {
     "cardio-endurance": {
       description: "Structured multi-week programs designed to improve your cardiovascular endurance, VO2 max, and both aerobic and anaerobic thresholds. Build a stronger, more efficient heart.",

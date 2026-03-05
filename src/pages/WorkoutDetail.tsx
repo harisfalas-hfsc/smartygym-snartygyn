@@ -144,6 +144,18 @@ const WorkoutDetail = () => {
     "micro-workouts": "Micro-Workouts"
   };
 
+  const workoutFallbackByType: Record<string, string> = {
+    "strength": "/images/workouts/strength-category-bg.jpg",
+    "calorie-burning": "/images/workouts/calorie-burning-category-bg.jpg",
+    "metabolic": "/images/workouts/metabolic-category-bg.jpg",
+    "cardio": "/images/workouts/cardio-category-bg.jpg",
+    "mobility": "/images/workouts/mobility-category-bg.jpg",
+    "challenge": "/images/workouts/challenge-category-bg.jpg",
+    "pilates": "/images/workouts/pilates-category-bg.jpg",
+    "recovery": "/images/workouts/recovery-category-bg.jpg",
+    "micro-workouts": "/images/workouts/micro-workouts-category-bg.jpg",
+  };
+
   // Category descriptions for the description card
   const categoryDescriptions: { [key: string]: { description: string; meta: string } } = {
     "strength": {
