@@ -324,7 +324,7 @@ const About = () => {
                 <h2 className="text-2xl font-bold text-foreground">Meet the Coach</h2>
                 <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-primary/30 flex-shrink-0">
                   <img 
-                    src="/haris-falas-coach.png" 
+                    src={harisPhoto} 
                     alt="Haris Falas - Head Coach" 
                     className="w-full h-full object-cover"
                     onError={(e) => {
