@@ -551,10 +551,14 @@ const TrainingProgramDetail = () => {
                   </div>
 
                   <img 
-                    src={program.image_url} 
+                    src={program.image_url || fallbackProgramImage}
                     alt={`${program.name} - ${program.duration} training program by Haris Falas Sports Scientist at SmartyGym.com`}
                     className="w-full h-full object-cover"
                     loading="lazy"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = fallbackProgramImage;
+                    }}
                   />
                 </div>
                 
