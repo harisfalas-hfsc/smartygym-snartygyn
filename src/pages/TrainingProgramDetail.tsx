@@ -194,7 +194,7 @@ const TrainingProgramDetail = () => {
 
   const title = programTitles[type || ""] || "Training Programs";
   const mappedCategory = categoryMap[type || "cardio-endurance"];
-  
+  const fallbackProgramImage = programFallbackByType[type || ""] || "/images/programs/cardio-endurance-bg.jpg";
   // First filter by category from URL
   const currentTypePrograms = allPrograms.filter(program => {
     return program.category?.toUpperCase().includes(mappedCategory);
