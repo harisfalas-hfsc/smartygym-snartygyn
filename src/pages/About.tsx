@@ -316,6 +316,39 @@ const About = () => {
               </CardContent>
             </Card>
 
+          {/* Mobile: Meet the Coach Card */}
+          <Card className="mb-12 border-2 border-primary md:hidden">
+            <CardContent className="p-6">
+              <div className="flex flex-col items-center text-center space-y-4">
+                <h2 className="text-2xl font-bold text-foreground">Meet the Coach</h2>
+                <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-primary/30 flex-shrink-0">
+                  <img 
+                    src="/haris-falas-coach.png" 
+                    alt="Haris Falas - Head Coach" 
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                    }}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-lg font-bold text-primary">Message from Haris Falas</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    For more than twenty years, I've coached athletes, teams, and everyday people — helping them move better, train smarter, and build lasting fitness habits.
+                  </p>
+                </div>
+                <Link 
+                  to="/coach-profile" 
+                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+                >
+                  Read More
+                  <ChevronRight className="w-4 h-4" />
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Desktop: Core Values - Grid Layout */}
           <ScrollReveal>
             <section className="mb-12 hidden md:block">
