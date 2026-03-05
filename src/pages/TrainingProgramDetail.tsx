@@ -129,6 +129,15 @@ const TrainingProgramDetail = () => {
     "mobility-stability": "Mobility & Stability Programs"
   };
 
+  const programFallbackByType: Record<string, string> = {
+    "cardio-endurance": "/images/programs/cardio-endurance-bg.jpg",
+    "functional-strength": "/images/programs/functional-strength-bg.jpg",
+    "muscle-hypertrophy": "/images/programs/muscle-hypertrophy-bg.jpg",
+    "weight-loss": "/images/programs/weight-loss-bg.jpg",
+    "low-back-pain": "/images/programs/low-back-pain-bg.jpg",
+    "mobility-stability": "/images/programs/mobility-stability-bg.jpg",
+  };
+
   const categoryDescriptions: { [key: string]: { description: string; meta: string } } = {
     "cardio-endurance": {
       description: "Structured multi-week programs designed to improve your cardiovascular endurance, VO2 max, and both aerobic and anaerobic thresholds. Build a stronger, more efficient heart.",
@@ -185,7 +194,7 @@ const TrainingProgramDetail = () => {
 
   const title = programTitles[type || ""] || "Training Programs";
   const mappedCategory = categoryMap[type || "cardio-endurance"];
-  
+  const fallbackProgramImage = programFallbackByType[type || ""] || "/images/programs/cardio-endurance-bg.jpg";
   // First filter by category from URL
   const currentTypePrograms = allPrograms.filter(program => {
     return program.category?.toUpperCase().includes(mappedCategory);
@@ -542,10 +551,14 @@ const TrainingProgramDetail = () => {
                   </div>
 
                   <img 
-                    src={program.image_url} 
+                    src={program.image_url || fallbackProgramImage}
                     alt={`${program.name} - ${program.duration} training program by Haris Falas Sports Scientist at SmartyGym.com`}
                     className="w-full h-full object-cover"
                     loading="lazy"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = fallbackProgramImage;
+                    }}
                   />
                 </div>
                 

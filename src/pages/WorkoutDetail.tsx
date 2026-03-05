@@ -144,6 +144,18 @@ const WorkoutDetail = () => {
     "micro-workouts": "Micro-Workouts"
   };
 
+  const workoutFallbackByType: Record<string, string> = {
+    "strength": "/images/workouts/strength-category-bg.jpg",
+    "calorie-burning": "/images/workouts/calorie-burning-category-bg.jpg",
+    "metabolic": "/images/workouts/metabolic-category-bg.jpg",
+    "cardio": "/images/workouts/cardio-category-bg.jpg",
+    "mobility": "/images/workouts/mobility-category-bg.jpg",
+    "challenge": "/images/workouts/challenge-category-bg.jpg",
+    "pilates": "/images/workouts/pilates-category-bg.jpg",
+    "recovery": "/images/workouts/recovery-category-bg.jpg",
+    "micro-workouts": "/images/workouts/micro-workouts-category-bg.jpg",
+  };
+
   // Category descriptions for the description card
   const categoryDescriptions: { [key: string]: { description: string; meta: string } } = {
     "strength": {
@@ -190,7 +202,7 @@ const WorkoutDetail = () => {
 
   const title = workoutTitles[type || ""] || "Workout";
   const mappedCategory = categoryMap[type || "strength"];
-  
+  const fallbackWorkoutImage = workoutFallbackByType[type || ""] || "/images/workouts/strength-category-bg.jpg";
   // First filter by category from URL - EXCLUDE active WODs (they should only appear on WOD page)
   const currentTypeWorkouts = allWorkouts.filter(workout => {
     const categoryMatch = workout.category?.toUpperCase().includes(mappedCategory);
@@ -584,10 +596,14 @@ const WorkoutDetail = () => {
                   </div>
 
                   <img 
-                    src={workout.image_url} 
+                    src={workout.image_url || fallbackWorkoutImage}
                     alt={`${workout.name} - ${workout.duration} ${workout.difficulty} ${workout.equipment === 'BODYWEIGHT' ? 'bodyweight' : 'equipment-based'} ${workout.format} workout by Haris Falas Sports Scientist at SmartyGym.com`}
                     className="w-full h-full object-cover"
                     loading="lazy"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = fallbackWorkoutImage;
+                    }}
                   />
                 </div>
                 
