@@ -202,7 +202,7 @@ const WorkoutDetail = () => {
 
   const title = workoutTitles[type || ""] || "Workout";
   const mappedCategory = categoryMap[type || "strength"];
-  
+  const fallbackWorkoutImage = workoutFallbackByType[type || ""] || "/images/workouts/strength-category-bg.jpg";
   // First filter by category from URL - EXCLUDE active WODs (they should only appear on WOD page)
   const currentTypeWorkouts = allWorkouts.filter(workout => {
     const categoryMatch = workout.category?.toUpperCase().includes(mappedCategory);
