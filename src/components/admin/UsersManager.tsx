@@ -711,13 +711,14 @@ export function UsersManager() {
               <TableHead>User Status</TableHead>
               <TableHead>Period End</TableHead>
               <TableHead>Joined</TableHead>
+              <TableHead>Subscribed</TableHead>
               <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredUsers.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-12 text-muted-foreground">
+                  <TableCell colSpan={9} className="text-center py-12 text-muted-foreground">
                     No users found
                   </TableCell>
                 </TableRow>
@@ -852,6 +853,11 @@ export function UsersManager() {
                       </TableCell>
                       <TableCell className="text-sm">
                         {format(new Date(user.created_at), 'MMM d, yyyy')}
+                      </TableCell>
+                      <TableCell className="text-sm">
+                        {user.subscription_created_at && user.plan_type !== 'free'
+                          ? format(new Date(user.subscription_created_at), 'MMM d, yyyy')
+                          : <span className="text-muted-foreground">—</span>}
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-wrap items-center gap-1 sm:gap-2">
