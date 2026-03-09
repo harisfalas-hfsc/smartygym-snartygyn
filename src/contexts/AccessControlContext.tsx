@@ -121,7 +121,7 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
     try {
       setState(prev => ({ ...prev, isLoading: true }));
       
-      const { data: dbData, error: dbError } = await supabase
+      let { data: dbData, error: dbError } = await supabase
         .from('user_subscriptions')
         .select('plan_type, status, current_period_end, stripe_subscription_id')
         .eq('user_id', user.id)
@@ -129,6 +129,28 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
 
       if (dbError && dbError.code !== 'PGRST116') {
         console.error("Database subscription error:", dbError);
+      }
+
+      // If no subscription record exists or it's free, trigger Stripe sync
+      // This ensures users returning from checkout get their subscription synced immediately
+      if (!dbData || dbData.plan_type === 'free') {
+        try {
+          const { data: syncResult, error: syncError } = await supabase.functions.invoke('check-subscription');
+          if (!syncError && syncResult?.subscribed) {
+            // Re-read the database after sync
+            const { data: refreshedData } = await supabase
+              .from('user_subscriptions')
+              .select('plan_type, status, current_period_end, stripe_subscription_id')
+              .eq('user_id', user.id)
+              .maybeSingle();
+            if (refreshedData) {
+              dbData = refreshedData;
+            }
+          }
+        } catch (syncErr) {
+          // Sync failure is non-critical, continue with existing data
+          console.warn("Stripe sync failed (non-critical):", syncErr);
+        }
       }
 
       // Fetch purchased content (only valid, non-deleted content)

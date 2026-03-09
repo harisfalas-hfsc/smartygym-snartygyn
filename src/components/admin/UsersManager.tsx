@@ -711,6 +711,7 @@ export function UsersManager() {
               <TableHead>User Status</TableHead>
               <TableHead>Period End</TableHead>
               <TableHead>Joined</TableHead>
+              <TableHead>Subscribed</TableHead>
               <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
