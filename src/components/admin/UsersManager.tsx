@@ -854,6 +854,11 @@ export function UsersManager() {
                       <TableCell className="text-sm">
                         {format(new Date(user.created_at), 'MMM d, yyyy')}
                       </TableCell>
+                      <TableCell className="text-sm">
+                        {user.subscription_created_at && user.plan_type !== 'free'
+                          ? format(new Date(user.subscription_created_at), 'MMM d, yyyy')
+                          : <span className="text-muted-foreground">—</span>}
+                      </TableCell>
                       <TableCell>
                         <div className="flex flex-wrap items-center gap-1 sm:gap-2">
                           {/* Admin Toggle */}
