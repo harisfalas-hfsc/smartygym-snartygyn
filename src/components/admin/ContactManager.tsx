@@ -787,6 +787,7 @@ export const ContactManager = () => {
                 <span className="capitalize hidden sm:inline">{message.category.replace('_', ' ')}</span>
               </Badge>
             </div>
+            </div>
           </div>
           <div className="flex gap-1 sm:gap-2 flex-shrink-0 justify-end sm:justify-start">
             <Button 
