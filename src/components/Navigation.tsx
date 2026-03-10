@@ -20,6 +20,7 @@ import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 
 import { SafeNotificationBadge } from "@/components/NotificationBadge";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAdminRole } from "@/hooks/useAdminRole";
 
@@ -385,6 +386,10 @@ export const Navigation = () => {
                       Admin
                     </Button>
                   )}
+                  <div className="flex items-center gap-2 mt-4 pt-4 border-t border-border">
+                    <ThemeToggle />
+                    <span className="text-sm text-muted-foreground">Toggle theme</span>
+                  </div>
                 </nav>
               </SheetContent>
             </Sheet>
@@ -446,9 +451,10 @@ export const Navigation = () => {
             </Link>
           </div>
 
-          {/* Right Side - Auth */}
-          <div className="flex items-center gap-2">
-            {/* Admin Button - only visible to admins */}
+           {/* Right Side - Auth */}
+           <div className="flex items-center gap-2">
+             <ThemeToggle />
+             {/* Admin Button - only visible to admins */}
             {isAdmin && (
               <Button
                 variant="outline"
