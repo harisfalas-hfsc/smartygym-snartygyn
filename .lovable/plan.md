@@ -1,55 +1,40 @@
 
 
-## Improve User Management Filters and Status Clarity
+# Fix the Limited Access Icon - Make Check + Slash Actually Visible
 
-### Problem
-The current status labels ("Active", "Canceled", etc.) are confusing. There's no way to distinguish trial users from paying subscribers, no sorting options, and the filter categories mix unrelated concepts (roles, purchase history, subscription status).
+## Problem
 
-### What Changes
+The current implementation produces an icon that looks like a tiny pencil/edit icon rather than a green checkmark with an amber slash through it. The check is barely visible because:
+- The container is too small (w-6 h-6)
+- The amber slash dominates and obscures the checkmark
+- The overall result doesn't read as "check with slash"
 
-**1. Clearer Status Labels**
-Replace the vague statuses with meaningful labels:
-- **"Trial"** — user is on 7-day free trial (Stripe status = `trialing`)
-- **"Paying"** — user is actively paying (Stripe status = `active`, past trial)
-- **"Expired"** — subscription ended or was canceled
-- **"Revoked"** — admin manually revoked access
-- **"Free"** — never subscribed
-- **"Purchase Only"** — bought individual items, no plan
+## Solution
 
-This requires the `get-users-with-emails` edge function to also return the raw Stripe subscription status (`trialing` vs `active`), which it currently doesn't distinguish.
+Make the green checkmark larger and bolder so it's clearly visible, then overlay a thinner but distinct amber diagonal line across it. The check should be the dominant visual element, with the slash as a clear modifier.
 
-**2. Add Sort Options**
-Add a "Sort by" dropdown with:
-- Newest registered (default) — by account creation date
-- Oldest registered
-- Newest subscriber — by subscription start date
-- Oldest subscriber
-- Plan (Platinum → Gold → Free)
+### Updated code for `renderFeatureValue` (limited case):
 
-**3. Reorganize Filters**
-Keep existing filters but make the status filter clearer:
-- **Plan filter**: All / Free / Gold / Platinum / Corporate
-- **Status filter**: All / Trial / Paying / Expired / Free / Purchase Only
-- **Role filter** (new, separate): All / Admins / Corporate Admins / Corporate Members
-- **Source filter**: All / Stripe / Admin Granted / Corporate
-- **Sort by** (new): Registration date / Subscription date / Plan tier
+```tsx
+<div className="relative inline-flex items-center justify-center w-8 h-8 mx-auto">
+  <Check className="w-6 h-6 text-green-500" strokeWidth={3} />
+  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+    <div className="w-9 h-[2.5px] bg-amber-500 rotate-[-45deg] rounded-full" />
+  </div>
+</div>
+```
 
-**4. Update Stats Bar**
-Replace "Active Subscribers" with split counts:
-- Total Users | Trial | Paying | Gold | Platinum | Purchases | Admins
+Key changes:
+- Container increased to `w-8 h-8` so the check has room to breathe
+- Check icon increased to `w-6 h-6` with `strokeWidth={3}` so it's clearly a checkmark
+- Slash line made longer (`w-9`) but slightly thinner (`h-[2.5px]`) so it crosses through without hiding the check
+- Uses `mx-auto` for centering in all contexts (desktop table and mobile cards)
 
-### Technical Changes
+## Files to Update
 
-1. **`supabase/functions/get-users-with-emails/index.ts`** — Include the raw Stripe `status` field (trialing vs active) in the response, and also fetch `current_period_start` from Stripe during sync to help determine trial vs paid.
+1. **src/pages/SmartyPlans.tsx** -- line 150-157, update the limited case (uses `ml-auto`)
+2. **src/pages/PremiumComparison.tsx** -- line 119-128, update the limited case (uses `mx-auto`)
+3. **src/pages/PremiumBenefits.tsx** -- line 137-146, update the limited case (uses `mx-auto`)
 
-2. **`src/components/admin/UsersManager.tsx`** — 
-   - Update `getUserStatus()` to distinguish trial vs paying using subscription dates and status
-   - Add sort state and sort logic
-   - Reorganize filter dropdowns
-   - Update stats cards
-
-3. **`src/hooks/useAdminUserData.ts`** — Add `stripe_status` field to `AdminUserData` interface.
-
-### No database changes needed
-All data already exists — we just need to surface the `trialing` vs `active` distinction that Stripe provides.
+Each file gets the same icon markup, with alignment matching the existing pattern (`ml-auto` for SmartyPlans, `mx-auto` for the other two).
 

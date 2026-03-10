@@ -301,6 +301,7 @@ serve(async (req) => {
         email: authUser?.email || null,
         plan_type: subscription?.plan_type || "free",
         status,
+        stripe_status: subscription?.status || null,
         current_period_start: subscription?.current_period_start || null,
         current_period_end: subscription?.current_period_end || null,
         created_at: profile.created_at,
