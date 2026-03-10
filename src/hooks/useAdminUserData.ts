@@ -9,6 +9,7 @@ export interface AdminUserData {
   avatar_url?: string | null;
   plan_type: string;
   status: string;
+  stripe_status?: string | null;
   created_at?: string;
   // Admin role fields
   is_admin?: boolean;
