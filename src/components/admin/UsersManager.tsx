@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Download, Search, RefreshCw, Mail, Crown, Gem, Building2, UserMinus } from "lucide-react";
+import { Download, Search, RefreshCw, Mail, Crown, Gem, Building2, UserMinus, ArrowUpDown } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import {
@@ -29,6 +29,7 @@ interface UserData {
   email: string | null;
   plan_type: string;
   status: string;
+  stripe_status?: string | null;
   current_period_start: string | null;
   current_period_end: string | null;
   created_at: string;
@@ -53,13 +54,17 @@ interface CorporateInfo {
   corporateSubscriptionId: string | null;
 }
 
+type SortOption = 'newest_registered' | 'oldest_registered' | 'newest_subscribed' | 'oldest_subscribed' | 'plan_tier';
+
 export function UsersManager() {
   const [users, setUsers] = useState<UserData[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [planFilter, setPlanFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [roleFilter, setRoleFilter] = useState<string>("all");
+  const [sourceFilter, setSourceFilter] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<SortOption>("newest_registered");
   const [userPurchases, setUserPurchases] = useState<string[]>([]);
   const [userRoles, setUserRoles] = useState<Record<string, string[]>>({});
   const [corporateInfo, setCorporateInfo] = useState<Record<string, CorporateInfo>>({});
@@ -75,66 +80,77 @@ export function UsersManager() {
   } | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [organizationFilter, setOrganizationFilter] = useState<string>("all");
-  const [sourceFilter, setSourceFilter] = useState<string>("all");
   const [organizations, setOrganizations] = useState<string[]>([]);
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const SUPER_ADMIN_EMAIL = "harisfalas@gmail.com";
 
+  // --- Status determination ---
+  const getUserStatus = (user: UserData, hasPurchases: boolean) => {
+    // Revoked by admin
+    if (user.status === 'revoked') return 'Revoked';
+    
+    // Active subscription
+    if (user.status === 'active' && (user.plan_type === 'gold' || user.plan_type === 'platinum')) {
+      if (user.stripe_status === 'trialing') return 'Trial';
+      return 'Paying';
+    }
+    
+    // Expired / canceled
+    if (user.status === 'canceled' || user.status === 'expired') return 'Expired';
+    
+    // Has standalone purchases but no plan
+    if (hasPurchases && user.plan_type === 'free') return 'Purchase Only';
+    
+    return 'Free';
+  };
+
+  const getStatusBadgeVariant = (statusLabel: string) => {
+    switch (statusLabel) {
+      case 'Trial': return 'default';
+      case 'Paying': return 'default';
+      case 'Purchase Only': return 'secondary';
+      case 'Revoked': return 'outline';
+      case 'Expired': return 'destructive';
+      default: return 'outline';
+    }
+  };
+
+  const getStatusBadgeClassName = (statusLabel: string) => {
+    switch (statusLabel) {
+      case 'Trial': return 'bg-blue-600 text-white hover:bg-blue-700';
+      case 'Paying': return 'bg-green-600 text-white hover:bg-green-700';
+      case 'Revoked': return 'bg-orange-500 text-white hover:bg-orange-600';
+      default: return '';
+    }
+  };
+
+  // --- Data fetching ---
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      // Use edge function to fetch users with emails (requires admin auth)
       const { data, error } = await supabase.functions.invoke('get-users-with-emails');
-
       if (error) throw error;
+      if (data?.users) setUsers(data.users);
 
-      if (data?.users) {
-        setUsers(data.users);
-        setFilteredUsers(data.users);
-      }
+      const { data: purchases } = await supabase.from('user_purchases').select('user_id');
+      setUserPurchases([...new Set(purchases?.map(p => p.user_id) || [])]);
 
-      // Fetch users with purchases
-      const { data: purchases } = await supabase
-        .from('user_purchases')
-        .select('user_id');
-      
-      const uniquePurchasers = [...new Set(purchases?.map(p => p.user_id) || [])];
-      setUserPurchases(uniquePurchasers);
-
-      // Fetch all user roles
-      const { data: roles } = await supabase
-        .from('user_roles')
-        .select('user_id, role');
-
-      // Create a map of user_id -> roles[]
+      const { data: roles } = await supabase.from('user_roles').select('user_id, role');
       const rolesMap: Record<string, string[]> = {};
       roles?.forEach(r => {
         if (!rolesMap[r.user_id]) rolesMap[r.user_id] = [];
         rolesMap[r.user_id].push(r.role);
       });
 
-      // Fetch corporate subscriptions with plan type and organization name
-      const { data: corpSubs } = await supabase
-        .from('corporate_subscriptions')
-        .select('id, admin_user_id, plan_type, organization_name');
+      const { data: corpSubs } = await supabase.from('corporate_subscriptions').select('id, admin_user_id, plan_type, organization_name');
+      const { data: corpMembers } = await supabase.from('corporate_members').select('user_id, corporate_subscription_id, corporate_subscriptions(id, plan_type, organization_name)');
       
-      // Fetch corporate members with their subscription's plan type and organization name
-      const { data: corpMembers } = await supabase
-        .from('corporate_members')
-        .select('user_id, corporate_subscription_id, corporate_subscriptions(id, plan_type, organization_name)');
-      
-      // Build corporate info map
       const corpInfoMap: Record<string, CorporateInfo> = {};
       const orgNames: Set<string> = new Set();
       
       corpSubs?.forEach(s => {
-        corpInfoMap[s.admin_user_id] = { 
-          adminPlanType: s.plan_type, 
-          memberPlanType: null,
-          organizationName: s.organization_name,
-          corporateSubscriptionId: s.id
-        };
+        corpInfoMap[s.admin_user_id] = { adminPlanType: s.plan_type, memberPlanType: null, organizationName: s.organization_name, corporateSubscriptionId: s.id };
         if (s.organization_name) orgNames.add(s.organization_name);
       });
       corpMembers?.forEach(m => {
@@ -143,12 +159,7 @@ export function UsersManager() {
         const orgName = corpData?.organization_name || null;
         const corpSubId = corpData?.id || m.corporate_subscription_id;
         if (!corpInfoMap[m.user_id]) {
-          corpInfoMap[m.user_id] = { 
-            adminPlanType: null, 
-            memberPlanType: planType,
-            organizationName: orgName,
-            corporateSubscriptionId: corpSubId
-          };
+          corpInfoMap[m.user_id] = { adminPlanType: null, memberPlanType: planType, organizationName: orgName, corporateSubscriptionId: corpSubId };
         } else {
           corpInfoMap[m.user_id].memberPlanType = planType;
           corpInfoMap[m.user_id].organizationName = orgName;
@@ -168,39 +179,24 @@ export function UsersManager() {
     }
   };
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+  useEffect(() => { fetchUsers(); }, []);
 
+  // --- Actions ---
   const toggleAdminRole = async (userId: string, userEmail: string | null, isCurrentlyAdmin: boolean) => {
-    // Protect super admin
     if (userEmail === SUPER_ADMIN_EMAIL && isCurrentlyAdmin) {
       toast.error("Cannot remove admin privileges from the main administrator");
       return;
     }
-
     try {
       if (isCurrentlyAdmin) {
-        // Remove admin role
-        const { error } = await supabase
-          .from('user_roles')
-          .delete()
-          .eq('user_id', userId)
-          .eq('role', 'admin');
-        
+        const { error } = await supabase.from('user_roles').delete().eq('user_id', userId).eq('role', 'admin');
         if (error) throw error;
         toast.success("Admin privileges removed successfully");
       } else {
-        // Add admin role
-        const { error } = await supabase
-          .from('user_roles')
-          .insert({ user_id: userId, role: 'admin' });
-        
+        const { error } = await supabase.from('user_roles').insert({ user_id: userId, role: 'admin' });
         if (error) throw error;
         toast.success("Admin privileges granted successfully");
       }
-      
-      // Refresh users
       fetchUsers();
     } catch (error) {
       console.error('Error toggling admin role:', error);
@@ -212,18 +208,12 @@ export function UsersManager() {
     setActionLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke('manage-subscription', {
-        body: { 
-          user_id: action.userId, 
-          action: action.action, 
-          plan_type: action.planType 
-        }
+        body: { user_id: action.userId, action: action.action, plan_type: action.planType }
       });
-
       if (error) throw error;
       if (!data?.success) throw new Error(data?.error || 'Unknown error');
-
       toast.success(data.message);
-      fetchUsers(); // Refresh the list
+      fetchUsers();
     } catch (error) {
       console.error('Error managing subscription:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to update subscription');
@@ -239,10 +229,8 @@ export function UsersManager() {
       const { data, error } = await supabase.functions.invoke('grant-corporate-admin', {
         body: { user_id: userId, plan_type: planType }
       });
-
       if (error) throw error;
       if (!data?.success) throw new Error(data?.error || 'Unknown error');
-
       toast.success(data.message);
       fetchUsers();
     } catch (error) {
@@ -254,28 +242,12 @@ export function UsersManager() {
     }
   };
 
-  const handleConfirmAction = () => {
-    if (pendingAction) {
-      manageSubscription(pendingAction);
-    }
-  };
-
-  const handleConfirmCorpAction = () => {
-    if (pendingCorpAction) {
-      grantCorporateAdmin(pendingCorpAction.userId, pendingCorpAction.planType);
-    }
-  };
-
   const revokeCorporateAdmin = async (userId: string) => {
     setActionLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('revoke-corporate-admin', {
-        body: { user_id: userId }
-      });
-
+      const { data, error } = await supabase.functions.invoke('revoke-corporate-admin', { body: { user_id: userId } });
       if (error) throw error;
       if (!data?.success) throw new Error(data?.error || 'Unknown error');
-
       toast.success(data.message);
       fetchUsers();
     } catch (error) {
@@ -287,22 +259,14 @@ export function UsersManager() {
     }
   };
 
-  const handleConfirmCorpRevoke = () => {
-    if (pendingCorpRevoke) {
-      revokeCorporateAdmin(pendingCorpRevoke.userId);
-    }
-  };
-
   const revokeCorporateMember = async (userId: string, corporateSubscriptionId: string) => {
     setActionLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke('revoke-corporate-member', {
         body: { member_user_id: userId, corporate_subscription_id: corporateSubscriptionId }
       });
-
       if (error) throw error;
       if (!data?.success) throw new Error(data?.error || 'Unknown error');
-
       toast.success(data.message);
       fetchUsers();
     } catch (error) {
@@ -314,47 +278,57 @@ export function UsersManager() {
     }
   };
 
-  const handleConfirmMemberRevoke = () => {
-    if (pendingMemberRevoke) {
-      revokeCorporateMember(pendingMemberRevoke.userId, pendingMemberRevoke.corporateSubscriptionId);
-    }
-  };
-
-  useEffect(() => {
+  // --- Filtering & Sorting ---
+  const filteredAndSortedUsers = useMemo(() => {
     let filtered = users;
 
-    // Search filter
+    // Search
     if (searchTerm) {
+      const term = searchTerm.toLowerCase();
       filtered = filtered.filter(user =>
-        user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email?.toLowerCase().includes(searchTerm.toLowerCase())
+        user.full_name?.toLowerCase().includes(term) || user.email?.toLowerCase().includes(term)
       );
     }
 
     // Plan filter
     if (planFilter !== "all") {
       if (planFilter === "corporate") {
-        filtered = filtered.filter(user => 
-          corporateInfo[user.user_id]?.adminPlanType || corporateInfo[user.user_id]?.memberPlanType
-        );
+        filtered = filtered.filter(user => corporateInfo[user.user_id]?.adminPlanType || corporateInfo[user.user_id]?.memberPlanType);
       } else {
         filtered = filtered.filter(user => user.plan_type === planFilter);
       }
     }
 
-    // Status filter
-    if (statusFilter === "active") {
-      filtered = filtered.filter(user => user.status === "active");
-    } else if (statusFilter === "canceled") {
-      filtered = filtered.filter(user => user.status === "canceled");
-    } else if (statusFilter === "with_purchases") {
-      filtered = filtered.filter(user => userPurchases.includes(user.user_id));
-    } else if (statusFilter === "admins_only") {
-      filtered = filtered.filter(user => userRoles[user.user_id]?.includes('admin'));
-    } else if (statusFilter === "corporate_admins") {
-      filtered = filtered.filter(user => corporateInfo[user.user_id]?.adminPlanType);
-    } else if (statusFilter === "corporate_members") {
-      filtered = filtered.filter(user => corporateInfo[user.user_id]?.memberPlanType && !corporateInfo[user.user_id]?.adminPlanType);
+    // Status filter (new clear categories)
+    if (statusFilter !== "all") {
+      filtered = filtered.filter(user => {
+        const hasPurchases = userPurchases.includes(user.user_id);
+        const label = getUserStatus(user, hasPurchases);
+        switch (statusFilter) {
+          case "trial": return label === 'Trial';
+          case "paying": return label === 'Paying';
+          case "expired": return label === 'Expired';
+          case "revoked": return label === 'Revoked';
+          case "free": return label === 'Free';
+          case "purchase_only": return label === 'Purchase Only';
+          default: return true;
+        }
+      });
+    }
+
+    // Role filter (separated from status)
+    if (roleFilter !== "all") {
+      switch (roleFilter) {
+        case "admins":
+          filtered = filtered.filter(user => userRoles[user.user_id]?.includes('admin'));
+          break;
+        case "corporate_admins":
+          filtered = filtered.filter(user => corporateInfo[user.user_id]?.adminPlanType);
+          break;
+        case "corporate_members":
+          filtered = filtered.filter(user => corporateInfo[user.user_id]?.memberPlanType && !corporateInfo[user.user_id]?.adminPlanType);
+          break;
+      }
     }
 
     // Organization filter
@@ -363,35 +337,90 @@ export function UsersManager() {
     }
 
     // Source filter
-    if (sourceFilter === "stripe") {
-      filtered = filtered.filter(user => user.stripe_subscription_id);
-    } else if (sourceFilter === "admin_grant") {
-      filtered = filtered.filter(user => user.subscription_source === 'admin_grant');
-    } else if (sourceFilter === "corporate") {
-      filtered = filtered.filter(user => corporateInfo[user.user_id]?.memberPlanType || corporateInfo[user.user_id]?.adminPlanType);
+    if (sourceFilter !== "all") {
+      switch (sourceFilter) {
+        case "stripe":
+          filtered = filtered.filter(user => user.stripe_subscription_id);
+          break;
+        case "admin_grant":
+          filtered = filtered.filter(user => user.subscription_source === 'admin_grant');
+          break;
+        case "corporate":
+          filtered = filtered.filter(user => corporateInfo[user.user_id]?.memberPlanType || corporateInfo[user.user_id]?.adminPlanType);
+          break;
+      }
     }
 
-    setFilteredUsers(filtered);
-  }, [searchTerm, planFilter, statusFilter, organizationFilter, sourceFilter, users, userPurchases, userRoles, corporateInfo]);
+    // Sort
+    const sorted = [...filtered];
+    switch (sortBy) {
+      case 'newest_registered':
+        sorted.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        break;
+      case 'oldest_registered':
+        sorted.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+        break;
+      case 'newest_subscribed':
+        sorted.sort((a, b) => {
+          const aDate = a.subscription_created_at ? new Date(a.subscription_created_at).getTime() : 0;
+          const bDate = b.subscription_created_at ? new Date(b.subscription_created_at).getTime() : 0;
+          return bDate - aDate;
+        });
+        break;
+      case 'oldest_subscribed':
+        sorted.sort((a, b) => {
+          const aDate = a.subscription_created_at ? new Date(a.subscription_created_at).getTime() : Infinity;
+          const bDate = b.subscription_created_at ? new Date(b.subscription_created_at).getTime() : Infinity;
+          return aDate - bDate;
+        });
+        break;
+      case 'plan_tier':
+        const tierOrder: Record<string, number> = { platinum: 0, gold: 1, free: 2 };
+        sorted.sort((a, b) => (tierOrder[a.plan_type] ?? 3) - (tierOrder[b.plan_type] ?? 3));
+        break;
+    }
 
+    return sorted;
+  }, [searchTerm, planFilter, statusFilter, roleFilter, organizationFilter, sourceFilter, sortBy, users, userPurchases, userRoles, corporateInfo]);
+
+  // --- Stats ---
+  const stats = useMemo(() => {
+    let trialCount = 0;
+    let payingCount = 0;
+    users.forEach(u => {
+      if (u.status === 'active' && (u.plan_type === 'gold' || u.plan_type === 'platinum')) {
+        if (u.stripe_status === 'trialing') trialCount++;
+        else payingCount++;
+      }
+    });
+    return {
+      total: users.length,
+      trial: trialCount,
+      paying: payingCount,
+      gold: users.filter(u => u.plan_type === 'gold' && u.status === 'active').length,
+      platinum: users.filter(u => u.plan_type === 'platinum' && u.status === 'active').length,
+      purchases: userPurchases.length,
+      admins: Object.values(userRoles).filter(roles => roles.includes('admin')).length,
+    };
+  }, [users, userPurchases, userRoles]);
+
+  // --- Helpers ---
   const exportToCSV = () => {
-    const headers = ["User ID", "Name", "Email", "Is Admin", "Plan", "Status", "Period Start", "Period End", "Joined"];
-    const rows = filteredUsers.map(user => [
+    const headers = ["User ID", "Name", "Email", "Is Admin", "Plan", "Status", "Stripe Status", "Period Start", "Period End", "Joined", "Subscribed"];
+    const rows = filteredAndSortedUsers.map(user => [
       user.user_id,
       user.full_name || '',
       user.email || '',
       userRoles[user.user_id]?.includes('admin') ? 'Yes' : 'No',
       user.plan_type,
-      user.status,
+      getUserStatus(user, userPurchases.includes(user.user_id)),
+      user.stripe_status || '',
       user.current_period_start ? format(new Date(user.current_period_start), 'yyyy-MM-dd') : '',
       user.current_period_end ? format(new Date(user.current_period_end), 'yyyy-MM-dd') : '',
       format(new Date(user.created_at), 'yyyy-MM-dd'),
+      user.subscription_created_at ? format(new Date(user.subscription_created_at), 'yyyy-MM-dd') : '',
     ]);
-
-    const csvContent = [headers, ...rows]
-      .map(row => row.map(cell => `"${cell}"`).join(','))
-      .join('\n');
-
+    const csvContent = [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -399,26 +428,7 @@ export function UsersManager() {
     a.download = `users-export-${format(new Date(), 'yyyy-MM-dd')}.csv`;
     a.click();
     window.URL.revokeObjectURL(url);
-    toast.success(`Exported ${filteredUsers.length} users`);
-  };
-
-  const getUserStatus = (user: UserData, hasPurchases: boolean) => {
-    if (user.status === 'active') {
-      if (user.plan_type === 'gold') return 'Gold Subscriber';
-      if (user.plan_type === 'platinum') return 'Platinum Subscriber';
-    }
-    if (hasPurchases) return 'Purchase Only';
-    if (user.status === 'revoked') return 'Revoked';
-    if (user.status === 'canceled' || user.status === 'expired') return 'Expired Subscriber';
-    return 'Free User';
-  };
-
-  const getStatusBadgeVariant = (statusLabel: string) => {
-    if (statusLabel.includes('Subscriber') && !statusLabel.includes('Expired')) return 'default';
-    if (statusLabel === 'Purchase Only') return 'secondary';
-    if (statusLabel === 'Revoked') return 'outline';  // Orange styling via className
-    if (statusLabel === 'Expired Subscriber') return 'destructive';
-    return 'outline';
+    toast.success(`Exported ${filteredAndSortedUsers.length} users`);
   };
 
   const getCorporatePlanLabel = (planType: string | null) => {
@@ -429,9 +439,9 @@ export function UsersManager() {
 
   const getPlanBadgeVariant = (plan: string) => {
     switch (plan) {
-      case 'platinum': return 'default';
-      case 'gold': return 'secondary';
-      default: return 'outline';
+      case 'platinum': return 'default' as const;
+      case 'gold': return 'secondary' as const;
+      default: return 'outline' as const;
     }
   };
 
@@ -479,7 +489,7 @@ export function UsersManager() {
           <AlertDialogFooter>
             <AlertDialogCancel disabled={actionLoading}>Cancel</AlertDialogCancel>
             <AlertDialogAction 
-              onClick={handleConfirmAction} 
+              onClick={() => pendingAction && manageSubscription(pendingAction)} 
               disabled={actionLoading}
               className={pendingAction?.action === 'revoke' ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90' : ''}
             >
@@ -506,7 +516,7 @@ export function UsersManager() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={actionLoading}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmCorpAction} disabled={actionLoading}>
+            <AlertDialogAction onClick={() => pendingCorpAction && grantCorporateAdmin(pendingCorpAction.userId, pendingCorpAction.planType)} disabled={actionLoading}>
               {actionLoading ? 'Processing...' : 'Confirm'}
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -517,9 +527,7 @@ export function UsersManager() {
       <AlertDialog open={!!pendingCorpRevoke} onOpenChange={(open) => !open && setPendingCorpRevoke(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-destructive">
-              Revoke Corporate Admin Status
-            </AlertDialogTitle>
+            <AlertDialogTitle className="text-destructive">Revoke Corporate Admin Status</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to revoke corporate admin status from "{pendingCorpRevoke?.userName}"? 
               This will remove their {pendingCorpRevoke?.planType?.toUpperCase()} plan, delete all their team members, 
@@ -529,7 +537,7 @@ export function UsersManager() {
           <AlertDialogFooter>
             <AlertDialogCancel disabled={actionLoading}>Cancel</AlertDialogCancel>
             <AlertDialogAction 
-              onClick={handleConfirmCorpRevoke} 
+              onClick={() => pendingCorpRevoke && revokeCorporateAdmin(pendingCorpRevoke.userId)} 
               disabled={actionLoading}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
@@ -543,9 +551,7 @@ export function UsersManager() {
       <AlertDialog open={!!pendingMemberRevoke} onOpenChange={(open) => !open && setPendingMemberRevoke(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-destructive">
-              Revoke Corporate Member Access
-            </AlertDialogTitle>
+            <AlertDialogTitle className="text-destructive">Revoke Corporate Member Access</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to revoke corporate member access from "{pendingMemberRevoke?.userName}"?
               <br /><br />
@@ -558,7 +564,7 @@ export function UsersManager() {
           <AlertDialogFooter>
             <AlertDialogCancel disabled={actionLoading}>Cancel</AlertDialogCancel>
             <AlertDialogAction 
-              onClick={handleConfirmMemberRevoke} 
+              onClick={() => pendingMemberRevoke && revokeCorporateMember(pendingMemberRevoke.userId, pendingMemberRevoke.corporateSubscriptionId)} 
               disabled={actionLoading}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
@@ -587,505 +593,354 @@ export function UsersManager() {
             </div>
           </div>
         </CardHeader>
-      <CardContent>
-        {/* Filters */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search by name or email..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9"
-            />
-          </div>
-          <Select value={planFilter} onValueChange={setPlanFilter}>
-            <SelectTrigger className="w-full sm:w-[180px]">
-              <SelectValue placeholder="Filter by plan" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Plans</SelectItem>
-              <SelectItem value="free">Free</SelectItem>
-              <SelectItem value="gold">Gold</SelectItem>
-              <SelectItem value="platinum">Platinum</SelectItem>
-              <SelectItem value="corporate">Corporate</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-full sm:w-[180px]">
-              <SelectValue placeholder="Filter by status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="canceled">Canceled</SelectItem>
-              <SelectItem value="with_purchases">With Purchases</SelectItem>
-              <SelectItem value="admins_only">Admins Only</SelectItem>
-              <SelectItem value="corporate_admins">Corporate Admins</SelectItem>
-              <SelectItem value="corporate_members">Corporate Members</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={sourceFilter} onValueChange={setSourceFilter}>
-            <SelectTrigger className="w-full sm:w-[160px]">
-              <SelectValue placeholder="Source" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Sources</SelectItem>
-              <SelectItem value="stripe">Stripe (Paid)</SelectItem>
-              <SelectItem value="admin_grant">Admin Granted</SelectItem>
-              <SelectItem value="corporate">Corporate</SelectItem>
-            </SelectContent>
-          </Select>
-          {organizations.length > 0 && (
-            <Select value={organizationFilter} onValueChange={setOrganizationFilter}>
-              <SelectTrigger className="w-full sm:w-[200px]">
-                <SelectValue placeholder="Filter by organization" />
+        <CardContent>
+          {/* Filters Row 1: Search + Plan + Status */}
+          <div className="flex flex-col sm:flex-row gap-4 mb-4">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by name or email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+            <Select value={planFilter} onValueChange={setPlanFilter}>
+              <SelectTrigger className="w-full sm:w-[160px]">
+                <SelectValue placeholder="Plan" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Organizations</SelectItem>
-                {organizations.map((org) => (
-                  <SelectItem key={org} value={org}>
-                    🏛️ {org}
-                  </SelectItem>
-                ))}
+                <SelectItem value="all">All Plans</SelectItem>
+                <SelectItem value="free">Free</SelectItem>
+                <SelectItem value="gold">Gold</SelectItem>
+                <SelectItem value="platinum">Platinum</SelectItem>
+                <SelectItem value="corporate">Corporate</SelectItem>
               </SelectContent>
             </Select>
-          )}
-        </div>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-full sm:w-[170px]">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Statuses</SelectItem>
+                <SelectItem value="trial">🔵 Trial</SelectItem>
+                <SelectItem value="paying">🟢 Paying</SelectItem>
+                <SelectItem value="expired">🔴 Expired</SelectItem>
+                <SelectItem value="revoked">🟠 Revoked</SelectItem>
+                <SelectItem value="free">⚪ Free</SelectItem>
+                <SelectItem value="purchase_only">💳 Purchase Only</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-6 gap-4 mb-6">
-          <div className="bg-muted/50 p-4 rounded-lg">
-            <p className="text-sm text-muted-foreground">Total Users</p>
-            <p className="text-2xl font-bold">{users.length}</p>
+          {/* Filters Row 2: Role + Source + Org + Sort */}
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <Select value={roleFilter} onValueChange={setRoleFilter}>
+              <SelectTrigger className="w-full sm:w-[170px]">
+                <SelectValue placeholder="Role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Roles</SelectItem>
+                <SelectItem value="admins">👑 Admins</SelectItem>
+                <SelectItem value="corporate_admins">🏢 Corp Admins</SelectItem>
+                <SelectItem value="corporate_members">👥 Corp Members</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={sourceFilter} onValueChange={setSourceFilter}>
+              <SelectTrigger className="w-full sm:w-[160px]">
+                <SelectValue placeholder="Source" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Sources</SelectItem>
+                <SelectItem value="stripe">Stripe (Paid)</SelectItem>
+                <SelectItem value="admin_grant">Admin Granted</SelectItem>
+                <SelectItem value="corporate">Corporate</SelectItem>
+              </SelectContent>
+            </Select>
+            {organizations.length > 0 && (
+              <Select value={organizationFilter} onValueChange={setOrganizationFilter}>
+                <SelectTrigger className="w-full sm:w-[200px]">
+                  <SelectValue placeholder="Organization" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Organizations</SelectItem>
+                  {organizations.map((org) => (
+                    <SelectItem key={org} value={org}>🏛️ {org}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+            <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortOption)}>
+              <SelectTrigger className="w-full sm:w-[200px]">
+                <ArrowUpDown className="h-4 w-4 mr-2 shrink-0" />
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="newest_registered">Newest Registered</SelectItem>
+                <SelectItem value="oldest_registered">Oldest Registered</SelectItem>
+                <SelectItem value="newest_subscribed">Newest Subscribed</SelectItem>
+                <SelectItem value="oldest_subscribed">Oldest Subscribed</SelectItem>
+                <SelectItem value="plan_tier">Plan Tier</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          <div className="bg-muted/50 p-4 rounded-lg">
-            <p className="text-sm text-muted-foreground">Active Subscribers</p>
-            <p className="text-2xl font-bold">
-              {users.filter(u => u.status === 'active').length}
-            </p>
-          </div>
-          <div className="bg-muted/50 p-4 rounded-lg">
-            <p className="text-sm text-muted-foreground">Gold Members</p>
-            <p className="text-2xl font-bold">
-              {users.filter(u => u.plan_type === 'gold').length}
-            </p>
-          </div>
-          <div className="bg-muted/50 p-4 rounded-lg">
-            <p className="text-sm text-muted-foreground">Platinum Members</p>
-            <p className="text-2xl font-bold">
-              {users.filter(u => u.plan_type === 'platinum').length}
-            </p>
-          </div>
-          <div className="bg-muted/50 p-4 rounded-lg">
-            <p className="text-sm text-muted-foreground">Users with Purchases</p>
-            <p className="text-2xl font-bold">
-              {userPurchases.length}
-            </p>
-          </div>
-          <div className="bg-muted/50 p-4 rounded-lg">
-            <p className="text-sm text-muted-foreground">Administrators</p>
-            <p className="text-2xl font-bold">
-              {Object.values(userRoles).filter(roles => roles.includes('admin')).length}
-            </p>
-          </div>
-          <div className="bg-muted/50 p-4 rounded-lg">
-            <p className="text-sm text-muted-foreground flex items-center gap-1">
-              <Building2 className="h-3 w-3" /> Corporate Users
-            </p>
-            <p className="text-2xl font-bold">
-              {Object.keys(corporateInfo).length}
-            </p>
-          </div>
-        </div>
 
-        {/* Users Table */}
-        <div className="border rounded-lg overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-              <TableHead>User</TableHead>
-              <TableHead>Admin</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Plan</TableHead>
-              <TableHead>User Status</TableHead>
-              <TableHead>Period End</TableHead>
-              <TableHead>Joined</TableHead>
-              <TableHead>Subscribed</TableHead>
-              <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredUsers.length === 0 ? (
+          {/* Stats */}
+          <div className="grid grid-cols-2 sm:grid-cols-7 gap-3 mb-6">
+            <div className="bg-muted/50 p-3 rounded-lg">
+              <p className="text-xs text-muted-foreground">Total Users</p>
+              <p className="text-2xl font-bold">{stats.total}</p>
+            </div>
+            <div className="bg-blue-50 dark:bg-blue-950/30 p-3 rounded-lg">
+              <p className="text-xs text-muted-foreground">Trial</p>
+              <p className="text-2xl font-bold text-blue-600">{stats.trial}</p>
+            </div>
+            <div className="bg-green-50 dark:bg-green-950/30 p-3 rounded-lg">
+              <p className="text-xs text-muted-foreground">Paying</p>
+              <p className="text-2xl font-bold text-green-600">{stats.paying}</p>
+            </div>
+            <div className="bg-muted/50 p-3 rounded-lg">
+              <p className="text-xs text-muted-foreground">Gold</p>
+              <p className="text-2xl font-bold">{stats.gold}</p>
+            </div>
+            <div className="bg-muted/50 p-3 rounded-lg">
+              <p className="text-xs text-muted-foreground">Platinum</p>
+              <p className="text-2xl font-bold">{stats.platinum}</p>
+            </div>
+            <div className="bg-muted/50 p-3 rounded-lg">
+              <p className="text-xs text-muted-foreground">Purchases</p>
+              <p className="text-2xl font-bold">{stats.purchases}</p>
+            </div>
+            <div className="bg-muted/50 p-3 rounded-lg">
+              <p className="text-xs text-muted-foreground">Admins</p>
+              <p className="text-2xl font-bold">{stats.admins}</p>
+            </div>
+          </div>
+
+          {/* Users Table */}
+          <div className="border rounded-lg overflow-x-auto">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={9} className="text-center py-12 text-muted-foreground">
-                    No users found
-                  </TableCell>
+                  <TableHead>User</TableHead>
+                  <TableHead>Admin</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Plan</TableHead>
+                  <TableHead>User Status</TableHead>
+                  <TableHead>Period End</TableHead>
+                  <TableHead>Joined</TableHead>
+                  <TableHead>Subscribed</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
-              ) : (
-                filteredUsers.map((user) => {
-                  const hasPurchases = userPurchases.includes(user.user_id);
-                  const statusLabel = getUserStatus(user, hasPurchases);
-                  const isPremium = isActivePremium(user);
-                  const userName = user.full_name || user.email || 'Anonymous';
-                  const corpInfo = corporateInfo[user.user_id];
-                  const isCorporateAdmin = !!corpInfo?.adminPlanType;
-                  const isCorporateMember = !!corpInfo?.memberPlanType;
-                  
-                  return (
-                    <TableRow 
-                      key={user.user_id} 
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => {
-                        setSelectedUser(user);
-                        setIsDetailModalOpen(true);
-                      }}
-                    >
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          <Avatar>
-                            <AvatarImage src={user.avatar_url || undefined} />
-                            <AvatarFallback>
-                              {user.full_name?.charAt(0) || 'U'}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
+              </TableHeader>
+              <TableBody>
+                {filteredAndSortedUsers.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={9} className="text-center py-12 text-muted-foreground">
+                      No users found
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredAndSortedUsers.map((user) => {
+                    const hasPurchases = userPurchases.includes(user.user_id);
+                    const statusLabel = getUserStatus(user, hasPurchases);
+                    const isPremium = isActivePremium(user);
+                    const userName = user.full_name || user.email || 'Anonymous';
+                    const corpInfo = corporateInfo[user.user_id];
+                    const isCorporateAdmin = !!corpInfo?.adminPlanType;
+                    const isCorporateMember = !!corpInfo?.memberPlanType;
+                    
+                    return (
+                      <TableRow 
+                        key={user.user_id} 
+                        className="cursor-pointer hover:bg-muted/50"
+                        onClick={() => {
+                          setSelectedUser(user);
+                          setIsDetailModalOpen(true);
+                        }}
+                      >
+                        <TableCell>
+                          <div className="flex items-center gap-3">
+                            <Avatar>
+                              <AvatarImage src={user.avatar_url || undefined} />
+                              <AvatarFallback>{user.full_name?.charAt(0) || 'U'}</AvatarFallback>
+                            </Avatar>
                             <p className="font-medium">{user.full_name || 'Anonymous'}</p>
                           </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
+                        </TableCell>
+                        <TableCell>
                           {userRoles[user.user_id]?.includes('admin') && (
                             <Badge variant="destructive" className="text-xs">
-                              👑 Admin
-                              {user.email === SUPER_ADMIN_EMAIL && " (Main)"}
+                              👑 Admin{user.email === SUPER_ADMIN_EMAIL && " (Main)"}
                             </Badge>
                           )}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-sm">{user.email || 'N/A'}</TableCell>
-                      <TableCell>
-                        <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-1">
-                          {/* Show corporate platinum badge for corp members instead of personal plan */}
-                          {isCorporateMember && !user.stripe_subscription_id && user.subscription_source !== 'admin_grant' ? (
-                            <Badge className="bg-teal-600 hover:bg-teal-700 text-white">
-                              Platinum (Corporate)
-                            </Badge>
-                          ) : (
-                            <>
-                              <Badge variant={getPlanBadgeVariant(user.plan_type)}>
-                                {user.plan_type}
-                              </Badge>
-                              {user.subscription_source === 'admin_grant' && (
-                                <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300">
-                                  Complimentary
-                                </Badge>
-                              )}
-                              {user.stripe_subscription_id && (
-                                <Badge variant="outline" className="text-xs border-green-600 text-green-600">
-                                  Paid
-                                </Badge>
-                              )}
-                            </>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-1">
-                          <Badge 
-                            variant={getStatusBadgeVariant(statusLabel)}
-                            className={statusLabel === 'Revoked' ? 'bg-orange-500 text-white hover:bg-orange-600' : ''}
-                          >
-                            {statusLabel}
-                          </Badge>
-                          {hasPurchases && (
-                            <Badge variant="outline" className="text-xs">
-                              💳 Purchases
-                            </Badge>
-                          )}
-                          {isCorporateAdmin && (
-                            <>
-                              <Badge variant="default" className="text-xs bg-blue-600">
-                                🏢 Corp Admin ({getCorporatePlanLabel(corpInfo.adminPlanType)})
-                              </Badge>
-                              {corpInfo.organizationName && (
-                                <Badge 
-                                  variant="outline" 
-                                  className="text-xs border-teal-600 text-teal-600 cursor-pointer hover:bg-teal-50 dark:hover:bg-teal-950"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setOrganizationFilter(corpInfo.organizationName!);
-                                  }}
-                                >
-                                  🏛️ {corpInfo.organizationName}
-                                </Badge>
-                              )}
-                            </>
-                          )}
-                          {isCorporateMember && (
-                            <>
-                              <Badge className="text-xs bg-teal-600 hover:bg-teal-700 text-white">
-                                👥 Platinum (Corporate)
-                              </Badge>
-                              {corpInfo.organizationName && (
-                                <Badge 
-                                  variant="outline" 
-                                  className="text-xs border-teal-600 text-teal-600 cursor-pointer hover:bg-teal-50 dark:hover:bg-teal-950"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setOrganizationFilter(corpInfo.organizationName!);
-                                  }}
-                                >
-                                  🏛️ {corpInfo.organizationName}
-                                </Badge>
-                              )}
-                            </>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-sm">
-                        {user.current_period_end
-                          ? format(new Date(user.current_period_end), 'MMM d, yyyy')
-                          : user.subscription_source === 'admin_grant' && (user.plan_type === 'gold' || user.plan_type === 'platinum')
-                            ? <span className="text-green-600 dark:text-green-400 font-medium">Lifetime</span>
-                            : 'N/A'}
-                      </TableCell>
-                      <TableCell className="text-sm">
-                        {format(new Date(user.created_at), 'MMM d, yyyy')}
-                      </TableCell>
-                      <TableCell className="text-sm">
-                        {user.subscription_created_at && user.plan_type !== 'free'
-                          ? format(new Date(user.subscription_created_at), 'MMM d, yyyy')
-                          : <span className="text-muted-foreground">—</span>}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex flex-wrap items-center gap-1 sm:gap-2">
-                          {/* Admin Toggle */}
-                          <Button
-                            variant={userRoles[user.user_id]?.includes('admin') ? "destructive" : "default"}
-                            size="sm"
-                            className="h-7 sm:h-8 text-xs sm:text-sm px-2 sm:px-3"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              toggleAdminRole(
-                                user.user_id, 
-                                user.email, 
-                                userRoles[user.user_id]?.includes('admin') || false
-                              );
-                            }}
-                            disabled={user.email === SUPER_ADMIN_EMAIL && userRoles[user.user_id]?.includes('admin')}
-                          >
-                            <span className="hidden sm:inline">{userRoles[user.user_id]?.includes('admin') ? "Remove Admin" : "Make Admin"}</span>
-                            <span className="sm:hidden">{userRoles[user.user_id]?.includes('admin') ? "Remove" : "Admin"}</span>
-                          </Button>
-
-                          {/* Subscription Management */}
-                          {!isPremium ? (
-                            <>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="h-7 sm:h-8 text-xs sm:text-sm px-2 sm:px-3 text-primary border-primary hover:bg-primary/10"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setPendingAction({
-                                    userId: user.user_id,
-                                    userName,
-                                    action: 'grant',
-                                    planType: 'gold'
-                                  });
-                                }}
-                              >
-                                <Crown className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
-                                <span className="hidden sm:inline">Gold</span>
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="h-7 sm:h-8 text-xs sm:text-sm px-2 sm:px-3 text-purple-600 border-purple-600 hover:bg-purple-50"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setPendingAction({
-                                    userId: user.user_id,
-                                    userName,
-                                    action: 'grant',
-                                    planType: 'platinum'
-                                  });
-                                }}
-                              >
-                                <Gem className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
-                                <span className="hidden sm:inline">Platinum</span>
-                              </Button>
-                            </>
-                          ) : (
-                            <>
-                              {user.plan_type === 'gold' && (
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="h-7 sm:h-8 text-xs sm:text-sm px-2 sm:px-3 text-purple-600 border-purple-600 hover:bg-purple-50"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setPendingAction({
-                                      userId: user.user_id,
-                                      userName,
-                                      action: 'grant',
-                                      planType: 'platinum'
-                                    });
-                                  }}
-                                >
-                                  <Gem className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
-                                  <span className="hidden sm:inline">Upgrade</span>
-                                </Button>
-                              )}
-                              {user.plan_type === 'platinum' && (
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="h-7 sm:h-8 text-xs sm:text-sm px-2 sm:px-3 text-primary border-primary hover:bg-primary/10"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setPendingAction({
-                                      userId: user.user_id,
-                                      userName,
-                                      action: 'grant',
-                                      planType: 'gold'
-                                    });
-                                  }}
-                                >
-                                  <Crown className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
-                                  <span className="hidden sm:inline">Downgrade</span>
-                                </Button>
-                              )}
-                              <Button
-                                variant="destructive"
-                                size="sm"
-                                className="h-7 sm:h-8 text-xs sm:text-sm px-2 sm:px-3"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setPendingAction({
-                                    userId: user.user_id,
-                                    userName,
-                                    action: 'revoke',
-                                    planType: 'free'
-                                  });
-                                }}
-                              >
-                                <span className="hidden sm:inline">Revoke</span>
-                                <span className="sm:hidden">✕</span>
-                              </Button>
-                            </>
-                          )}
-
-                          {/* Email */}
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-7 sm:h-8 px-2 sm:px-3"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (user.email) {
-                                window.location.href = `mailto:${user.email}`;
-                              }
-                            }}
-                            disabled={!user.email}
-                          >
-                            <Mail className="h-4 w-4" />
-                          </Button>
-
-                          {/* Corporate Admin Buttons - show grant buttons or revoke button */}
-                          {/* Hide corporate buttons for users who are already corporate members */}
-                          {!isCorporateAdmin && !isCorporateMember ? (
-                            <div className="flex flex-wrap gap-1 mt-1">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="text-xs px-2 py-1 h-7 text-blue-600 border-blue-600 hover:bg-blue-50"
-                                onClick={() => setPendingCorpAction({ userId: user.user_id, userName, planType: 'dynamic' })}
-                              >
-                                <Building2 className="h-3 w-3 mr-1" />
-                                Dynamic
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="text-xs px-2 py-1 h-7 text-blue-600 border-blue-600 hover:bg-blue-50"
-                                onClick={() => setPendingCorpAction({ userId: user.user_id, userName, planType: 'power' })}
-                              >
-                                <Building2 className="h-3 w-3 mr-1" />
-                                Power
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="text-xs px-2 py-1 h-7 text-blue-600 border-blue-600 hover:bg-blue-50"
-                                onClick={() => setPendingCorpAction({ userId: user.user_id, userName, planType: 'elite' })}
-                              >
-                                <Building2 className="h-3 w-3 mr-1" />
-                                Elite
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="text-xs px-2 py-1 h-7 text-blue-600 border-blue-600 hover:bg-blue-50"
-                                onClick={() => setPendingCorpAction({ userId: user.user_id, userName, planType: 'enterprise' })}
-                              >
-                                <Building2 className="h-3 w-3 mr-1" />
-                                Enterprise
-                              </Button>
-                            </div>
-                          ) : isCorporateAdmin ? (
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              className="text-xs px-2 py-1 h-7 mt-1"
-                              onClick={() => setPendingCorpRevoke({ 
-                                userId: user.user_id, 
-                                userName, 
-                                planType: corpInfo.adminPlanType || '' 
-                              })}
+                        </TableCell>
+                        <TableCell className="text-sm">{user.email || 'N/A'}</TableCell>
+                        <TableCell>
+                          <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-1">
+                            {isCorporateMember && !user.stripe_subscription_id && user.subscription_source !== 'admin_grant' ? (
+                              <Badge className="bg-teal-600 hover:bg-teal-700 text-white">Platinum (Corporate)</Badge>
+                            ) : (
+                              <>
+                                <Badge variant={getPlanBadgeVariant(user.plan_type)}>{user.plan_type}</Badge>
+                                {user.subscription_source === 'admin_grant' && (
+                                  <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300">Complimentary</Badge>
+                                )}
+                                {user.stripe_subscription_id && (
+                                  <Badge variant="outline" className="text-xs border-green-600 text-green-600">Paid</Badge>
+                                )}
+                              </>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-1">
+                            <Badge 
+                              variant={getStatusBadgeVariant(statusLabel)}
+                              className={getStatusBadgeClassName(statusLabel)}
                             >
-                              <Building2 className="h-3 w-3 mr-1" />
-                              Revoke Corp
-                            </Button>
-                          ) : isCorporateMember ? (
+                              {statusLabel}
+                            </Badge>
+                            {hasPurchases && (
+                              <Badge variant="outline" className="text-xs">💳 Purchases</Badge>
+                            )}
+                            {isCorporateAdmin && (
+                              <>
+                                <Badge variant="default" className="text-xs bg-blue-600">
+                                  🏢 Corp Admin ({getCorporatePlanLabel(corpInfo.adminPlanType)})
+                                </Badge>
+                                {corpInfo.organizationName && (
+                                  <Badge 
+                                    variant="outline" 
+                                    className="text-xs border-teal-600 text-teal-600 cursor-pointer hover:bg-teal-50 dark:hover:bg-teal-950"
+                                    onClick={(e) => { e.stopPropagation(); setOrganizationFilter(corpInfo.organizationName!); }}
+                                  >
+                                    🏛️ {corpInfo.organizationName}
+                                  </Badge>
+                                )}
+                              </>
+                            )}
+                            {isCorporateMember && (
+                              <>
+                                <Badge className="text-xs bg-teal-600 hover:bg-teal-700 text-white">👥 Platinum (Corporate)</Badge>
+                                {corpInfo.organizationName && (
+                                  <Badge 
+                                    variant="outline" 
+                                    className="text-xs border-teal-600 text-teal-600 cursor-pointer hover:bg-teal-50 dark:hover:bg-teal-950"
+                                    onClick={(e) => { e.stopPropagation(); setOrganizationFilter(corpInfo.organizationName!); }}
+                                  >
+                                    🏛️ {corpInfo.organizationName}
+                                  </Badge>
+                                )}
+                              </>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-sm">
+                          {user.current_period_end
+                            ? format(new Date(user.current_period_end), 'MMM d, yyyy')
+                            : user.subscription_source === 'admin_grant' && (user.plan_type === 'gold' || user.plan_type === 'platinum')
+                              ? <span className="text-green-600 dark:text-green-400 font-medium">Lifetime</span>
+                              : 'N/A'}
+                        </TableCell>
+                        <TableCell className="text-sm">
+                          {format(new Date(user.created_at), 'MMM d, yyyy')}
+                        </TableCell>
+                        <TableCell className="text-sm">
+                          {user.subscription_created_at && user.plan_type !== 'free'
+                            ? format(new Date(user.subscription_created_at), 'MMM d, yyyy')
+                            : <span className="text-muted-foreground">—</span>}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex flex-wrap items-center gap-1 sm:gap-2">
                             <Button
-                              variant="destructive"
+                              variant={userRoles[user.user_id]?.includes('admin') ? "destructive" : "default"}
                               size="sm"
-                              className="text-xs px-2 py-1 h-7 mt-1"
-                              onClick={() => setPendingMemberRevoke({ 
-                                userId: user.user_id, 
-                                userName, 
-                                organizationName: corpInfo.organizationName || 'Unknown',
-                                planType: corpInfo.memberPlanType || '',
-                                corporateSubscriptionId: corpInfo.corporateSubscriptionId || ''
-                              })}
+                              className="h-7 sm:h-8 text-xs sm:text-sm px-2 sm:px-3"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleAdminRole(user.user_id, user.email, userRoles[user.user_id]?.includes('admin') || false);
+                              }}
+                              disabled={user.email === SUPER_ADMIN_EMAIL && userRoles[user.user_id]?.includes('admin')}
                             >
-                              <UserMinus className="h-3 w-3 mr-1" />
-                              Revoke Member
+                              <span className="hidden sm:inline">{userRoles[user.user_id]?.includes('admin') ? "Remove Admin" : "Make Admin"}</span>
+                              <span className="sm:hidden">{userRoles[user.user_id]?.includes('admin') ? "Remove" : "Admin"}</span>
                             </Button>
-                          ) : null}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-    </Card>
 
-      {/* User Detail Modal */}
+                            {!isPremium ? (
+                              <>
+                                <Button variant="outline" size="sm" className="h-7 sm:h-8 text-xs sm:text-sm px-2 sm:px-3 text-primary border-primary hover:bg-primary/10"
+                                  onClick={(e) => { e.stopPropagation(); setPendingAction({ userId: user.user_id, userName, action: 'grant', planType: 'gold' }); }}>
+                                  <Crown className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" /><span className="hidden sm:inline">Gold</span>
+                                </Button>
+                                <Button variant="outline" size="sm" className="h-7 sm:h-8 text-xs sm:text-sm px-2 sm:px-3 text-purple-600 border-purple-600 hover:bg-purple-50"
+                                  onClick={(e) => { e.stopPropagation(); setPendingAction({ userId: user.user_id, userName, action: 'grant', planType: 'platinum' }); }}>
+                                  <Gem className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" /><span className="hidden sm:inline">Platinum</span>
+                                </Button>
+                              </>
+                            ) : (
+                              <>
+                                {user.plan_type === 'gold' && (
+                                  <Button variant="outline" size="sm" className="h-7 sm:h-8 text-xs sm:text-sm px-2 sm:px-3 text-purple-600 border-purple-600 hover:bg-purple-50"
+                                    onClick={(e) => { e.stopPropagation(); setPendingAction({ userId: user.user_id, userName, action: 'grant', planType: 'platinum' }); }}>
+                                    <Gem className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" /><span className="hidden sm:inline">Upgrade</span>
+                                  </Button>
+                                )}
+                                {user.plan_type === 'platinum' && (
+                                  <Button variant="outline" size="sm" className="h-7 sm:h-8 text-xs sm:text-sm px-2 sm:px-3 text-primary border-primary hover:bg-primary/10"
+                                    onClick={(e) => { e.stopPropagation(); setPendingAction({ userId: user.user_id, userName, action: 'grant', planType: 'gold' }); }}>
+                                    <Crown className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" /><span className="hidden sm:inline">Downgrade</span>
+                                  </Button>
+                                )}
+                                <Button variant="destructive" size="sm" className="h-7 sm:h-8 text-xs sm:text-sm px-2 sm:px-3"
+                                  onClick={(e) => { e.stopPropagation(); setPendingAction({ userId: user.user_id, userName, action: 'revoke', planType: 'free' }); }}>
+                                  <span className="hidden sm:inline">Revoke</span><span className="sm:hidden">✕</span>
+                                </Button>
+                              </>
+                            )}
+
+                            <Button variant="ghost" size="sm" className="h-7 sm:h-8 px-2 sm:px-3"
+                              onClick={(e) => { e.stopPropagation(); if (user.email) window.location.href = `mailto:${user.email}`; }}
+                              disabled={!user.email}>
+                              <Mail className="h-4 w-4" />
+                            </Button>
+
+                            {!isCorporateAdmin && !isCorporateMember ? (
+                              <div className="flex flex-wrap gap-1 mt-1">
+                                {['dynamic', 'power', 'elite', 'enterprise'].map(pt => (
+                                  <Button key={pt} variant="outline" size="sm" className="text-xs px-2 py-1 h-7 text-blue-600 border-blue-600 hover:bg-blue-50"
+                                    onClick={(e) => { e.stopPropagation(); setPendingCorpAction({ userId: user.user_id, userName, planType: pt }); }}>
+                                    <Building2 className="h-3 w-3 mr-1" />{pt.charAt(0).toUpperCase() + pt.slice(1)}
+                                  </Button>
+                                ))}
+                              </div>
+                            ) : isCorporateAdmin ? (
+                              <Button variant="destructive" size="sm" className="text-xs px-2 py-1 h-7 mt-1"
+                                onClick={(e) => { e.stopPropagation(); setPendingCorpRevoke({ userId: user.user_id, userName, planType: corpInfo.adminPlanType || '' }); }}>
+                                <Building2 className="h-3 w-3 mr-1" />Revoke Corp
+                              </Button>
+                            ) : isCorporateMember ? (
+                              <Button variant="destructive" size="sm" className="text-xs px-2 py-1 h-7 mt-1"
+                                onClick={(e) => { e.stopPropagation(); setPendingMemberRevoke({ userId: user.user_id, userName, organizationName: corpInfo.organizationName || 'Unknown', planType: corpInfo.memberPlanType || '', corporateSubscriptionId: corpInfo.corporateSubscriptionId || '' }); }}>
+                                <UserMinus className="h-3 w-3 mr-1" />Revoke Member
+                              </Button>
+                            ) : null}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
+
       <UserDetailModal
         user={selectedUser}
         isOpen={isDetailModalOpen}
-        onClose={() => {
-          setIsDetailModalOpen(false);
-          setSelectedUser(null);
-        }}
+        onClose={() => { setIsDetailModalOpen(false); setSelectedUser(null); }}
         corporateInfo={selectedUser ? corporateInfo[selectedUser.user_id] : undefined}
         isAdmin={selectedUser ? userRoles[selectedUser.user_id]?.includes('admin') : false}
         onRefresh={fetchUsers}
