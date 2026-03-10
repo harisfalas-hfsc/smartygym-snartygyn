@@ -874,6 +874,78 @@ export const ContactManager = () => {
             </Select>
           </div>
 
+          {/* Bulk Actions Toolbar */}
+          <div className="flex flex-wrap items-center gap-2 mb-4">
+            <div className="flex items-center gap-2">
+              <Checkbox
+                checked={filteredMessages.length > 0 && selectedIds.size === filteredMessages.length}
+                onCheckedChange={toggleSelectAll}
+              />
+              <span className="text-sm text-muted-foreground">
+                {selectedIds.size > 0 ? `${selectedIds.size} selected` : 'Select all'}
+              </span>
+            </div>
+
+            {selectedIds.size > 0 && (
+              <>
+                <Button size="sm" variant="outline" onClick={handleMarkSelectedRead}>
+                  <CheckCheck className="h-4 w-4 mr-1" />
+                  Mark Read
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button size="sm" variant="outline">
+                      <MoreHorizontal className="h-4 w-4 mr-1" />
+                      Status
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onClick={() => handleBulkStatusUpdate('read')}>Mark as Read</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleBulkStatusUpdate('responded')}>Mark as Responded</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleBulkStatusUpdate('closed')}>Mark as Closed</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => { setBulkDeleteTarget('selected'); setBulkDeleteDialogOpen(true); }}
+                >
+                  <Trash2 className="h-4 w-4 mr-1" />
+                  Delete ({selectedIds.size})
+                </Button>
+              </>
+            )}
+
+            <div className="ml-auto flex gap-2">
+              <Button size="sm" variant="outline" onClick={handleMarkAllRead} disabled={unreadMessages.length === 0}>
+                <CheckCheck className="h-4 w-4 mr-1" />
+                Mark All Read
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button size="sm" variant="outline">
+                    <MoreHorizontal className="h-4 w-4 mr-1" />
+                    More
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => { setBulkDeleteTarget('filtered'); setBulkDeleteDialogOpen(true); }}>
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete Filtered ({filteredMessages.length})
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="text-destructive"
+                    onClick={() => { setBulkDeleteTarget('all'); setBulkDeleteDialogOpen(true); }}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete All ({messages.length})
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+
           {/* Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 mb-6">
             <Card>
