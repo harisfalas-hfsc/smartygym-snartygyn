@@ -760,7 +760,13 @@ export const ContactManager = () => {
     <Card key={message.id} className={`${message.status === 'new' ? 'border-primary' : ''}`}>
       <CardContent className="pt-4 sm:pt-6">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
-          <div className="flex-1 min-w-0">
+          <div className="flex items-start gap-3 flex-1 min-w-0">
+            <Checkbox
+              checked={selectedIds.has(message.id)}
+              onCheckedChange={() => toggleSelectMessage(message.id)}
+              className="mt-1 flex-shrink-0"
+            />
+            <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-2 flex-wrap">
               <div className={`w-2 h-2 rounded-full flex-shrink-0 ${getCategoryColor(message.category)}`} />
               <h3 className="font-semibold text-sm sm:text-base truncate">{message.name}</h3>
