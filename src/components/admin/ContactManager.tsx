@@ -10,7 +10,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Mail, MessageSquare, Eye, CheckCircle, X, ArrowLeft, Send, Search, Filter, FileText, Paperclip, Download, Upload, BarChart3, Trash2, History, SendHorizonal, Bell } from "lucide-react";
+import { Mail, MessageSquare, Eye, CheckCircle, X, ArrowLeft, Send, Search, Filter, FileText, Paperclip, Download, Upload, BarChart3, Trash2, History, SendHorizonal, Bell, CheckCheck, MoreHorizontal } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Checkbox } from "@/components/ui/checkbox";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { format } from "date-fns";
 import { ContactAnalytics } from "./ContactAnalytics";
@@ -73,6 +75,9 @@ export const ContactManager = () => {
   const [messageToDelete, setMessageToDelete] = useState<ContactMessage | null>(null);
   const [showHistoryDialog, setShowHistoryDialog] = useState(false);
   const [historyUser, setHistoryUser] = useState<{ userId: string | null; email: string; name: string } | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
+  const [bulkDeleteTarget, setBulkDeleteTarget] = useState<'selected' | 'all' | 'filtered'>('selected');
 
   useEffect(() => {
     verifyAdminAccess();
@@ -645,6 +650,103 @@ export const ContactManager = () => {
     }
   };
 
+  // Bulk action handlers
+  const toggleSelectMessage = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === filteredMessages.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filteredMessages.map(m => m.id)));
+    }
+  };
+
+  const handleMarkAllRead = async () => {
+    const unreadIds = messages.filter(m => !m.read_at || m.status === 'new').map(m => m.id);
+    if (unreadIds.length === 0) return;
+    
+    const { error } = await supabase
+      .from('contact_messages')
+      .update({ read_at: new Date().toISOString(), status: 'read' })
+      .in('id', unreadIds);
+
+    if (error) {
+      toast({ title: "Error", description: "Failed to mark messages as read", variant: "destructive" });
+    } else {
+      toast({ title: "Success", description: `${unreadIds.length} messages marked as read` });
+      fetchMessages();
+    }
+  };
+
+  const handleMarkSelectedRead = async () => {
+    if (selectedIds.size === 0) return;
+    
+    const { error } = await supabase
+      .from('contact_messages')
+      .update({ read_at: new Date().toISOString(), status: 'read' })
+      .in('id', Array.from(selectedIds));
+
+    if (error) {
+      toast({ title: "Error", description: "Failed to mark messages as read", variant: "destructive" });
+    } else {
+      toast({ title: "Success", description: `${selectedIds.size} messages marked as read` });
+      setSelectedIds(new Set());
+      fetchMessages();
+    }
+  };
+
+  const handleBulkDeleteConfirm = async () => {
+    let idsToDelete: string[] = [];
+    
+    if (bulkDeleteTarget === 'all') {
+      idsToDelete = messages.map(m => m.id);
+    } else if (bulkDeleteTarget === 'filtered') {
+      idsToDelete = filteredMessages.map(m => m.id);
+    } else {
+      idsToDelete = Array.from(selectedIds);
+    }
+
+    if (idsToDelete.length === 0) return;
+
+    const { error } = await supabase
+      .from('contact_messages')
+      .delete()
+      .in('id', idsToDelete);
+
+    if (error) {
+      toast({ title: "Error", description: "Failed to delete messages", variant: "destructive" });
+    } else {
+      toast({ title: "Success", description: `${idsToDelete.length} messages deleted` });
+      setSelectedIds(new Set());
+      fetchMessages();
+    }
+    setBulkDeleteDialogOpen(false);
+  };
+
+  const handleBulkStatusUpdate = async (status: string) => {
+    if (selectedIds.size === 0) return;
+    
+    const { error } = await supabase
+      .from('contact_messages')
+      .update({ status })
+      .in('id', Array.from(selectedIds));
+
+    if (error) {
+      toast({ title: "Error", description: "Failed to update messages", variant: "destructive" });
+    } else {
+      toast({ title: "Success", description: `${selectedIds.size} messages updated to ${status}` });
+      setSelectedIds(new Set());
+      fetchMessages();
+    }
+  };
+
   const unreadMessages = messages.filter(m => !m.read_at || m.status === 'new');
   const readMessages = messages.filter(m => m.status === 'read');
   const respondedMessages = messages.filter(m => m.status === 'responded');
@@ -658,7 +760,13 @@ export const ContactManager = () => {
     <Card key={message.id} className={`${message.status === 'new' ? 'border-primary' : ''}`}>
       <CardContent className="pt-4 sm:pt-6">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
-          <div className="flex-1 min-w-0">
+          <div className="flex items-start gap-3 flex-1 min-w-0">
+            <Checkbox
+              checked={selectedIds.has(message.id)}
+              onCheckedChange={() => toggleSelectMessage(message.id)}
+              className="mt-1 flex-shrink-0"
+            />
+            <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-2 flex-wrap">
               <div className={`w-2 h-2 rounded-full flex-shrink-0 ${getCategoryColor(message.category)}`} />
               <h3 className="font-semibold text-sm sm:text-base truncate">{message.name}</h3>
@@ -678,6 +786,7 @@ export const ContactManager = () => {
                 {getCategoryIcon(message.category)}
                 <span className="capitalize hidden sm:inline">{message.category.replace('_', ' ')}</span>
               </Badge>
+            </div>
             </div>
           </div>
           <div className="flex gap-1 sm:gap-2 flex-shrink-0 justify-end sm:justify-start">
@@ -770,6 +879,78 @@ export const ContactManager = () => {
                 <SelectItem value="coach_direct">Coach Direct</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+
+          {/* Bulk Actions Toolbar */}
+          <div className="flex flex-wrap items-center gap-2 mb-4">
+            <div className="flex items-center gap-2">
+              <Checkbox
+                checked={filteredMessages.length > 0 && selectedIds.size === filteredMessages.length}
+                onCheckedChange={toggleSelectAll}
+              />
+              <span className="text-sm text-muted-foreground">
+                {selectedIds.size > 0 ? `${selectedIds.size} selected` : 'Select all'}
+              </span>
+            </div>
+
+            {selectedIds.size > 0 && (
+              <>
+                <Button size="sm" variant="outline" onClick={handleMarkSelectedRead}>
+                  <CheckCheck className="h-4 w-4 mr-1" />
+                  Mark Read
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button size="sm" variant="outline">
+                      <MoreHorizontal className="h-4 w-4 mr-1" />
+                      Status
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onClick={() => handleBulkStatusUpdate('read')}>Mark as Read</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleBulkStatusUpdate('responded')}>Mark as Responded</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleBulkStatusUpdate('closed')}>Mark as Closed</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => { setBulkDeleteTarget('selected'); setBulkDeleteDialogOpen(true); }}
+                >
+                  <Trash2 className="h-4 w-4 mr-1" />
+                  Delete ({selectedIds.size})
+                </Button>
+              </>
+            )}
+
+            <div className="ml-auto flex gap-2">
+              <Button size="sm" variant="outline" onClick={handleMarkAllRead} disabled={unreadMessages.length === 0}>
+                <CheckCheck className="h-4 w-4 mr-1" />
+                Mark All Read
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button size="sm" variant="outline">
+                    <MoreHorizontal className="h-4 w-4 mr-1" />
+                    More
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => { setBulkDeleteTarget('filtered'); setBulkDeleteDialogOpen(true); }}>
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete Filtered ({filteredMessages.length})
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="text-destructive"
+                    onClick={() => { setBulkDeleteTarget('all'); setBulkDeleteDialogOpen(true); }}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete All ({messages.length})
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
 
           {/* Stats */}
@@ -1278,6 +1459,28 @@ export const ContactManager = () => {
         userEmail={historyUser?.email || ''}
         userName={historyUser?.name || ''}
       />
+
+      {/* Bulk Delete Confirmation Dialog */}
+      <AlertDialog open={bulkDeleteDialogOpen} onOpenChange={setBulkDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Messages</AlertDialogTitle>
+            <AlertDialogDescription>
+              {bulkDeleteTarget === 'all'
+                ? `Are you sure you want to delete ALL ${messages.length} messages? This action cannot be undone.`
+                : bulkDeleteTarget === 'filtered'
+                ? `Are you sure you want to delete ${filteredMessages.length} filtered messages? This action cannot be undone.`
+                : `Are you sure you want to delete ${selectedIds.size} selected messages? This action cannot be undone.`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleBulkDeleteConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
