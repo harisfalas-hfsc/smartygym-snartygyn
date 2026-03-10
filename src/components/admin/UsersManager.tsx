@@ -852,75 +852,74 @@ export function UsersManager() {
                             : <span className="text-muted-foreground">—</span>}
                         </TableCell>
                         <TableCell>
-                          <div className="flex flex-wrap items-center gap-1 sm:gap-2">
+                          <div className="flex flex-row flex-wrap items-center gap-1">
                             <Button
                               variant={userRoles[user.user_id]?.includes('admin') ? "destructive" : "default"}
                               size="sm"
-                              className="h-7 sm:h-8 text-xs sm:text-sm px-2 sm:px-3"
+                              className="h-7 text-xs px-2 whitespace-nowrap"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 toggleAdminRole(user.user_id, user.email, userRoles[user.user_id]?.includes('admin') || false);
                               }}
                               disabled={user.email === SUPER_ADMIN_EMAIL && userRoles[user.user_id]?.includes('admin')}
                             >
-                              <span className="hidden sm:inline">{userRoles[user.user_id]?.includes('admin') ? "Remove Admin" : "Make Admin"}</span>
-                              <span className="sm:hidden">{userRoles[user.user_id]?.includes('admin') ? "Remove" : "Admin"}</span>
+                              {userRoles[user.user_id]?.includes('admin') ? "Remove Admin" : "Make Admin"}
                             </Button>
 
                             {!isPremium ? (
                               <>
-                                <Button variant="outline" size="sm" className="h-7 sm:h-8 text-xs sm:text-sm px-2 sm:px-3 text-primary border-primary hover:bg-primary/10"
+                                <Button variant="outline" size="sm" className="h-7 text-xs px-2 text-primary border-primary hover:bg-primary/10 whitespace-nowrap"
                                   onClick={(e) => { e.stopPropagation(); setPendingAction({ userId: user.user_id, userName, action: 'grant', planType: 'gold' }); }}>
-                                  <Crown className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" /><span className="hidden sm:inline">Gold</span>
+                                  <Crown className="h-3 w-3 mr-1" />Gold
                                 </Button>
-                                <Button variant="outline" size="sm" className="h-7 sm:h-8 text-xs sm:text-sm px-2 sm:px-3 text-purple-600 border-purple-600 hover:bg-purple-50"
+                                <Button variant="outline" size="sm" className="h-7 text-xs px-2 text-purple-600 border-purple-600 hover:bg-purple-50 whitespace-nowrap"
                                   onClick={(e) => { e.stopPropagation(); setPendingAction({ userId: user.user_id, userName, action: 'grant', planType: 'platinum' }); }}>
-                                  <Gem className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" /><span className="hidden sm:inline">Platinum</span>
+                                  <Gem className="h-3 w-3 mr-1" />Platinum
                                 </Button>
                               </>
                             ) : (
                               <>
                                 {user.plan_type === 'gold' && (
-                                  <Button variant="outline" size="sm" className="h-7 sm:h-8 text-xs sm:text-sm px-2 sm:px-3 text-purple-600 border-purple-600 hover:bg-purple-50"
+                                  <Button variant="outline" size="sm" className="h-7 text-xs px-2 text-purple-600 border-purple-600 hover:bg-purple-50 whitespace-nowrap"
                                     onClick={(e) => { e.stopPropagation(); setPendingAction({ userId: user.user_id, userName, action: 'grant', planType: 'platinum' }); }}>
-                                    <Gem className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" /><span className="hidden sm:inline">Upgrade</span>
+                                    <Gem className="h-3 w-3 mr-1" />Upgrade
                                   </Button>
                                 )}
                                 {user.plan_type === 'platinum' && (
-                                  <Button variant="outline" size="sm" className="h-7 sm:h-8 text-xs sm:text-sm px-2 sm:px-3 text-primary border-primary hover:bg-primary/10"
+                                  <Button variant="outline" size="sm" className="h-7 text-xs px-2 text-primary border-primary hover:bg-primary/10 whitespace-nowrap"
                                     onClick={(e) => { e.stopPropagation(); setPendingAction({ userId: user.user_id, userName, action: 'grant', planType: 'gold' }); }}>
-                                    <Crown className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" /><span className="hidden sm:inline">Downgrade</span>
+                                    <Crown className="h-3 w-3 mr-1" />Downgrade
                                   </Button>
                                 )}
-                                <Button variant="destructive" size="sm" className="h-7 sm:h-8 text-xs sm:text-sm px-2 sm:px-3"
+                                <Button variant="destructive" size="sm" className="h-7 text-xs px-2 whitespace-nowrap"
                                   onClick={(e) => { e.stopPropagation(); setPendingAction({ userId: user.user_id, userName, action: 'revoke', planType: 'free' }); }}>
-                                  <span className="hidden sm:inline">Revoke</span><span className="sm:hidden">✕</span>
+                                  Revoke
                                 </Button>
                               </>
                             )}
 
-                            <Button variant="ghost" size="sm" className="h-7 sm:h-8 px-2 sm:px-3"
+                            <Button variant="ghost" size="sm" className="h-7 px-2"
                               onClick={(e) => { e.stopPropagation(); if (user.email) window.location.href = `mailto:${user.email}`; }}
                               disabled={!user.email}>
-                              <Mail className="h-4 w-4" />
+                              <Mail className="h-3 w-3" />
                             </Button>
 
                             {!isCorporateAdmin && !isCorporateMember ? (
-                              <div className="flex flex-wrap gap-1 mt-1">
+                              <>
                                 {['dynamic', 'power', 'elite', 'enterprise'].map(pt => (
-                                  <Button key={pt} variant="outline" size="sm" className="text-xs px-2 py-1 h-7 text-blue-600 border-blue-600 hover:bg-blue-50"
+                                  <Button key={pt} variant="outline" size="sm" className="h-7 text-xs px-2 text-blue-600 border-blue-600 hover:bg-blue-50 whitespace-nowrap"
                                     onClick={(e) => { e.stopPropagation(); setPendingCorpAction({ userId: user.user_id, userName, planType: pt }); }}>
                                     <Building2 className="h-3 w-3 mr-1" />{pt.charAt(0).toUpperCase() + pt.slice(1)}
                                   </Button>
                                 ))}
-                              </div>
+                              </>
                             ) : isCorporateAdmin ? (
-                              <Button variant="destructive" size="sm" className="text-xs px-2 py-1 h-7 mt-1"
+                              <Button variant="destructive" size="sm" className="h-7 text-xs px-2 whitespace-nowrap"
                                 onClick={(e) => { e.stopPropagation(); setPendingCorpRevoke({ userId: user.user_id, userName, planType: corpInfo.adminPlanType || '' }); }}>
                                 <Building2 className="h-3 w-3 mr-1" />Revoke Corp
                               </Button>
                             ) : isCorporateMember ? (
-                              <Button variant="destructive" size="sm" className="text-xs px-2 py-1 h-7 mt-1"
+                              <Button variant="destructive" size="sm" className="h-7 text-xs px-2 whitespace-nowrap"
                                 onClick={(e) => { e.stopPropagation(); setPendingMemberRevoke({ userId: user.user_id, userName, organizationName: corpInfo.organizationName || 'Unknown', planType: corpInfo.memberPlanType || '', corporateSubscriptionId: corpInfo.corporateSubscriptionId || '' }); }}>
                                 <UserMinus className="h-3 w-3 mr-1" />Revoke Member
                               </Button>
