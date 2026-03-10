@@ -386,10 +386,6 @@ export const Navigation = () => {
                       Admin
                     </Button>
                   )}
-                  <div className="flex items-center gap-2 mt-4 pt-4 border-t border-border">
-                    <ThemeToggle />
-                    <span className="text-sm text-muted-foreground">Toggle theme</span>
-                  </div>
                 </nav>
               </SheetContent>
             </Sheet>
