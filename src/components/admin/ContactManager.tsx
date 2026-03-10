@@ -75,6 +75,9 @@ export const ContactManager = () => {
   const [messageToDelete, setMessageToDelete] = useState<ContactMessage | null>(null);
   const [showHistoryDialog, setShowHistoryDialog] = useState(false);
   const [historyUser, setHistoryUser] = useState<{ userId: string | null; email: string; name: string } | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
+  const [bulkDeleteTarget, setBulkDeleteTarget] = useState<'selected' | 'all' | 'filtered'>('selected');
 
   useEffect(() => {
     verifyAdminAccess();
