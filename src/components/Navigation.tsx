@@ -20,6 +20,7 @@ import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 
 import { SafeNotificationBadge } from "@/components/NotificationBadge";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAdminRole } from "@/hooks/useAdminRole";
 
