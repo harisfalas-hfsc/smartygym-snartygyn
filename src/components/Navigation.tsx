@@ -447,9 +447,10 @@ export const Navigation = () => {
             </Link>
           </div>
 
-          {/* Right Side - Auth */}
-          <div className="flex items-center gap-2">
-            {/* Admin Button - only visible to admins */}
+           {/* Right Side - Auth */}
+           <div className="flex items-center gap-2">
+             <ThemeToggle />
+             {/* Admin Button - only visible to admins */}
             {isAdmin && (
               <Button
                 variant="outline"
