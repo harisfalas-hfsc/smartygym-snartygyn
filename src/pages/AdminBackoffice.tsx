@@ -34,7 +34,16 @@ import { OfflineBanner } from "@/components/OfflineBanner";
 export default function AdminBackoffice() {
   const navigate = useNavigate();
   const { isAdmin, loading } = useAdminRole();
-  const [activeTab, setActiveTab] = useState<string | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get('section') || null;
+  
+  const setActiveTab = useCallback((tab: string | null) => {
+    if (tab) {
+      setSearchParams({ section: tab });
+    } else {
+      setSearchParams({});
+    }
+  }, [setSearchParams]);
   const [contentInnerTab, setContentInnerTab] = useState("workouts");
   const [showWorkoutDialog, setShowWorkoutDialog] = useState(false);
   const [showProgramDialog, setShowProgramDialog] = useState(false);

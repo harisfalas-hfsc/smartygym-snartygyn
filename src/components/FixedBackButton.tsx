@@ -15,14 +15,20 @@ export const FixedBackButton = () => {
   const { goBack } = useShowBackButton();
   
   const isDashboardGrid = location.pathname === '/userdashboard' && !searchParams.get('tab');
+  const isAdminGrid = location.pathname === '/admin' && !searchParams.get('section');
   
-  // Hide on homepage and main dashboard grid (user's "home")
-  if (location.pathname === '/' || isDashboardGrid) return null;
+  // Hide on homepage and main grids (user's "home" views)
+  if (location.pathname === '/' || isDashboardGrid || isAdminGrid) return null;
   
   const handleBack = () => {
     // If on a dashboard tab, go back to dashboard grid
     if (location.pathname === '/userdashboard' && searchParams.get('tab')) {
       navigate('/userdashboard');
+      return;
+    }
+    // If on an admin section, go back to admin grid
+    if (location.pathname === '/admin' && searchParams.get('section')) {
+      navigate('/admin');
       return;
     }
     goBack();
