@@ -650,6 +650,103 @@ export const ContactManager = () => {
     }
   };
 
+  // Bulk action handlers
+  const toggleSelectMessage = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === filteredMessages.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filteredMessages.map(m => m.id)));
+    }
+  };
+
+  const handleMarkAllRead = async () => {
+    const unreadIds = messages.filter(m => !m.read_at || m.status === 'new').map(m => m.id);
+    if (unreadIds.length === 0) return;
+    
+    const { error } = await supabase
+      .from('contact_messages')
+      .update({ read_at: new Date().toISOString(), status: 'read' })
+      .in('id', unreadIds);
+
+    if (error) {
+      toast({ title: "Error", description: "Failed to mark messages as read", variant: "destructive" });
+    } else {
+      toast({ title: "Success", description: `${unreadIds.length} messages marked as read` });
+      fetchMessages();
+    }
+  };
+
+  const handleMarkSelectedRead = async () => {
+    if (selectedIds.size === 0) return;
+    
+    const { error } = await supabase
+      .from('contact_messages')
+      .update({ read_at: new Date().toISOString(), status: 'read' })
+      .in('id', Array.from(selectedIds));
+
+    if (error) {
+      toast({ title: "Error", description: "Failed to mark messages as read", variant: "destructive" });
+    } else {
+      toast({ title: "Success", description: `${selectedIds.size} messages marked as read` });
+      setSelectedIds(new Set());
+      fetchMessages();
+    }
+  };
+
+  const handleBulkDeleteConfirm = async () => {
+    let idsToDelete: string[] = [];
+    
+    if (bulkDeleteTarget === 'all') {
+      idsToDelete = messages.map(m => m.id);
+    } else if (bulkDeleteTarget === 'filtered') {
+      idsToDelete = filteredMessages.map(m => m.id);
+    } else {
+      idsToDelete = Array.from(selectedIds);
+    }
+
+    if (idsToDelete.length === 0) return;
+
+    const { error } = await supabase
+      .from('contact_messages')
+      .delete()
+      .in('id', idsToDelete);
+
+    if (error) {
+      toast({ title: "Error", description: "Failed to delete messages", variant: "destructive" });
+    } else {
+      toast({ title: "Success", description: `${idsToDelete.length} messages deleted` });
+      setSelectedIds(new Set());
+      fetchMessages();
+    }
+    setBulkDeleteDialogOpen(false);
+  };
+
+  const handleBulkStatusUpdate = async (status: string) => {
+    if (selectedIds.size === 0) return;
+    
+    const { error } = await supabase
+      .from('contact_messages')
+      .update({ status })
+      .in('id', Array.from(selectedIds));
+
+    if (error) {
+      toast({ title: "Error", description: "Failed to update messages", variant: "destructive" });
+    } else {
+      toast({ title: "Success", description: `${selectedIds.size} messages updated to ${status}` });
+      setSelectedIds(new Set());
+      fetchMessages();
+    }
+  };
+
   const unreadMessages = messages.filter(m => !m.read_at || m.status === 'new');
   const readMessages = messages.filter(m => m.status === 'read');
   const respondedMessages = messages.filter(m => m.status === 'responded');
