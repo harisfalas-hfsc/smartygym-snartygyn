@@ -1459,6 +1459,28 @@ export const ContactManager = () => {
         userEmail={historyUser?.email || ''}
         userName={historyUser?.name || ''}
       />
+
+      {/* Bulk Delete Confirmation Dialog */}
+      <AlertDialog open={bulkDeleteDialogOpen} onOpenChange={setBulkDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Messages</AlertDialogTitle>
+            <AlertDialogDescription>
+              {bulkDeleteTarget === 'all'
+                ? `Are you sure you want to delete ALL ${messages.length} messages? This action cannot be undone.`
+                : bulkDeleteTarget === 'filtered'
+                ? `Are you sure you want to delete ${filteredMessages.length} filtered messages? This action cannot be undone.`
+                : `Are you sure you want to delete ${selectedIds.size} selected messages? This action cannot be undone.`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleBulkDeleteConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
