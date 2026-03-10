@@ -453,7 +453,7 @@ export const Navigation = () => {
 
            {/* Right Side - Auth */}
            <div className="flex items-center gap-2">
-             <ThemeToggle />
+             <div className="sm:hidden"><ThemeToggle /></div>
              {/* Admin Button - only visible to admins */}
             {isAdmin && (
               <Button
