@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useCallback } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAdminRole } from "@/hooks/useAdminRole";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,7 +34,16 @@ import { OfflineBanner } from "@/components/OfflineBanner";
 export default function AdminBackoffice() {
   const navigate = useNavigate();
   const { isAdmin, loading } = useAdminRole();
-  const [activeTab, setActiveTab] = useState<string | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get('section') || null;
+  
+  const setActiveTab = useCallback((tab: string | null) => {
+    if (tab) {
+      setSearchParams({ section: tab });
+    } else {
+      setSearchParams({});
+    }
+  }, [setSearchParams]);
   const [contentInnerTab, setContentInnerTab] = useState("workouts");
   const [showWorkoutDialog, setShowWorkoutDialog] = useState(false);
   const [showProgramDialog, setShowProgramDialog] = useState(false);
