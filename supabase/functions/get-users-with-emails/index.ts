@@ -104,7 +104,7 @@ async function syncRecentSubscriptionFromStripe({
       .from("user_subscriptions")
       .upsert(upsertPayload, { onConflict: "user_id", ignoreDuplicates: false })
       .select(
-        "user_id, plan_type, status, current_period_start, current_period_end, created_at, updated_at, stripe_customer_id, stripe_subscription_id, subscription_source",
+        "user_id, plan_type, status, current_period_start, current_period_end, created_at, updated_at, stripe_customer_id, stripe_subscription_id, subscription_source, cancel_at_period_end",
       )
       .single();
 
@@ -177,7 +177,7 @@ serve(async (req) => {
       supabaseAdmin
         .from("user_subscriptions")
         .select(
-          "user_id, plan_type, status, current_period_start, current_period_end, created_at, updated_at, stripe_customer_id, stripe_subscription_id, subscription_source",
+        "user_id, plan_type, status, current_period_start, current_period_end, created_at, updated_at, stripe_customer_id, stripe_subscription_id, subscription_source, cancel_at_period_end",
         ),
       supabaseAdmin.from("user_roles").select("user_id, role"),
       supabaseAdmin
@@ -310,6 +310,7 @@ serve(async (req) => {
         stripe_customer_id: subscription?.stripe_customer_id || null,
         stripe_subscription_id: subscription?.stripe_subscription_id || null,
         subscription_source: subscription?.subscription_source || null,
+        cancel_at_period_end: subscription?.cancel_at_period_end || false,
         // User role info
         is_admin: userRole?.role === "admin",
         is_moderator: userRole?.role === "moderator",

@@ -23,6 +23,7 @@ export interface AdminUserData {
   stripe_customer_id?: string | null;
   stripe_subscription_id?: string | null;
   subscription_source?: string | null;
+  cancel_at_period_end?: boolean;
   // Corporate fields
   is_corporate_admin?: boolean;
   corporate_admin_org?: string | null;
@@ -87,6 +88,7 @@ export function useAdminUserData(): UseAdminUserDataReturn {
         stripe_customer_id: user.stripe_customer_id,
         stripe_subscription_id: user.stripe_subscription_id,
         subscription_source: user.subscription_source,
+        cancel_at_period_end: user.cancel_at_period_end || false,
         // Corporate fields
         is_corporate_admin: user.is_corporate_admin || false,
         corporate_admin_org: user.corporate_admin_org || null,
