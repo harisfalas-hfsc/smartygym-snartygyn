@@ -781,6 +781,11 @@ export function UsersManager() {
                         >
                           {statusLabel}
                         </Badge>
+                        {user.cancel_at_period_end && (statusLabel === 'Paying' || statusLabel === 'Trial') && (
+                          <Badge variant="outline" className="text-xs bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20">
+                            Cancels at period end
+                          </Badge>
+                        )}
                         {hasPurchases && (
                           <Badge variant="outline" className="text-xs">💳 Purchases</Badge>
                         )}
