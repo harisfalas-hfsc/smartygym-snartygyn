@@ -177,7 +177,7 @@ serve(async (req) => {
       supabaseAdmin
         .from("user_subscriptions")
         .select(
-          "user_id, plan_type, status, current_period_start, current_period_end, created_at, updated_at, stripe_customer_id, stripe_subscription_id, subscription_source",
+        "user_id, plan_type, status, current_period_start, current_period_end, created_at, updated_at, stripe_customer_id, stripe_subscription_id, subscription_source, cancel_at_period_end",
         ),
       supabaseAdmin.from("user_roles").select("user_id, role"),
       supabaseAdmin
