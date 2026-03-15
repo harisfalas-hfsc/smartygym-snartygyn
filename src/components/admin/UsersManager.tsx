@@ -38,6 +38,7 @@ interface UserData {
   stripe_customer_id?: string | null;
   stripe_subscription_id?: string | null;
   subscription_source?: string | null;
+  cancel_at_period_end?: boolean;
 }
 
 interface SubscriptionAction {
