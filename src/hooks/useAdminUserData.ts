@@ -23,6 +23,7 @@ export interface AdminUserData {
   stripe_customer_id?: string | null;
   stripe_subscription_id?: string | null;
   subscription_source?: string | null;
+  cancel_at_period_end?: boolean;
   // Corporate fields
   is_corporate_admin?: boolean;
   corporate_admin_org?: string | null;
