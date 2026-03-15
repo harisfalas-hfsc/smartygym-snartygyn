@@ -1,40 +1,40 @@
 
 
-# Fix the Limited Access Icon - Make Check + Slash Actually Visible
-
 ## Problem
 
-The current implementation produces an icon that looks like a tiny pencil/edit icon rather than a green checkmark with an amber slash through it. The check is barely visible because:
-- The container is too small (w-6 h-6)
-- The amber slash dominates and obscures the checkmark
-- The overall result doesn't read as "check with slash"
+The `cancel_at_period_end` field exists in the `user_subscriptions` table and is correctly synced from Stripe (via webhooks, check-subscription, and the admin self-heal sync). However, this information is **not surfaced in the admin User Management panel**. You currently have no way to see if a user like Manos has canceled their subscription from the admin view.
 
-## Solution
+## What Already Works
 
-Make the green checkmark larger and bolder so it's clearly visible, then overlay a thinner but distinct amber diagonal line across it. The check should be the dominant visual element, with the slash as a clear modifier.
+- Stripe webhook updates `cancel_at_period_end` when a user cancels
+- The `check-subscription` function syncs it on each user visit
+- The user's own dashboard shows "Cancels at period end" badge correctly
+- The database column is populated and accurate
 
-### Updated code for `renderFeatureValue` (limited case):
+## What's Missing
 
-```tsx
-<div className="relative inline-flex items-center justify-center w-8 h-8 mx-auto">
-  <Check className="w-6 h-6 text-green-500" strokeWidth={3} />
-  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-    <div className="w-9 h-[2.5px] bg-amber-500 rotate-[-45deg] rounded-full" />
-  </div>
-</div>
-```
+The data pipeline from database to admin UI has two gaps:
 
-Key changes:
-- Container increased to `w-8 h-8` so the check has room to breathe
-- Check icon increased to `w-6 h-6` with `strokeWidth={3}` so it's clearly a checkmark
-- Slash line made longer (`w-9`) but slightly thinner (`h-[2.5px]`) so it crosses through without hiding the check
-- Uses `mx-auto` for centering in all contexts (desktop table and mobile cards)
+1. **Edge function (`get-users-with-emails`)** — fetches subscriptions but does NOT include `cancel_at_period_end` in the response payload
+2. **Admin hook (`useAdminUserData`)** — does not map `cancel_at_period_end` to the user data interface
+3. **Admin UI (`UsersManager.tsx`)** — no visual indicator for cancellation status on user cards
 
-## Files to Update
+## Plan
 
-1. **src/pages/SmartyPlans.tsx** -- line 150-157, update the limited case (uses `ml-auto`)
-2. **src/pages/PremiumComparison.tsx** -- line 119-128, update the limited case (uses `mx-auto`)
-3. **src/pages/PremiumBenefits.tsx** -- line 137-146, update the limited case (uses `mx-auto`)
+### 1. Update the `get-users-with-emails` edge function
+- Add `cancel_at_period_end` to the subscription select query and include it in the combined response for each user
 
-Each file gets the same icon markup, with alignment matching the existing pattern (`ml-auto` for SmartyPlans, `mx-auto` for the other two).
+### 2. Update `useAdminUserData` hook
+- Add `cancel_at_period_end` to the `AdminUserData` interface
+- Map it from the API response
+
+### 3. Update `UsersManager.tsx` user cards
+- Show an orange "Cancels at period end" badge next to the status badge when `cancel_at_period_end` is `true` and the subscription is still active
+- This makes it immediately visible which paying users have scheduled cancellations vs those who will auto-renew
+
+## Result
+
+For a user like Manos who has an active trial/subscription, you'll see either:
+- **Active** (green) — will auto-renew
+- **Active** (green) + **Cancels at period end** (orange) — canceled, access expires at period end
 
