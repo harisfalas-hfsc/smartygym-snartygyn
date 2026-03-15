@@ -310,6 +310,7 @@ serve(async (req) => {
         stripe_customer_id: subscription?.stripe_customer_id || null,
         stripe_subscription_id: subscription?.stripe_subscription_id || null,
         subscription_source: subscription?.subscription_source || null,
+        cancel_at_period_end: subscription?.cancel_at_period_end || false,
         // User role info
         is_admin: userRole?.role === "admin",
         is_moderator: userRole?.role === "moderator",
