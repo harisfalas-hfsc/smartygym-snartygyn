@@ -230,8 +230,18 @@ serve(async (req) => {
       logStep("Dashboard notifications inserted", { count: usersForDashboard.length });
     }
 
-    // Get user emails for email notifications
-    const { data: usersData } = await supabase.auth.admin.listUsers();
+    // Paginate through ALL users (listUsers defaults to 50 per page)
+    const allAuthUsers: any[] = [];
+    let page = 1;
+    const perPage = 100;
+    while (true) {
+      const { data: pageData } = await supabase.auth.admin.listUsers({ page, perPage });
+      if (!pageData?.users?.length) break;
+      allAuthUsers.push(...pageData.users);
+      if (pageData.users.length < perPage) break;
+      page++;
+    }
+    const usersData = { users: allAuthUsers };
 
     let emailsSent = 0;
     let emailsSkipped = 0;

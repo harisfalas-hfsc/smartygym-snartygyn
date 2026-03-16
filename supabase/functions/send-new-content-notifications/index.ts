@@ -84,14 +84,20 @@ serve(async (req) => {
 
     logStep("📊 Content breakdown", { workoutCount, programCount, articleCount });
 
-    // Get all users with their preferences FIRST (needed for all content types)
+    // Paginate through ALL users (listUsers defaults to 50 per page)
     logStep("🔍 Fetching all users with preferences");
-    const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
-    
-    if (authError) {
-      logStep("❌ Error fetching users", { error: authError.message });
-      throw new Error(`Failed to fetch users: ${authError.message}`);
+    const allAuthUsers: any[] = [];
+    let usersPage = 1;
+    const usersPerPage = 100;
+    while (true) {
+      const { data: pageData, error: pageError } = await supabase.auth.admin.listUsers({ page: usersPage, perPage: usersPerPage });
+      if (pageError) { logStep("❌ Error fetching users", { error: pageError.message }); throw new Error(`Failed to fetch users: ${pageError.message}`); }
+      if (!pageData?.users?.length) break;
+      allAuthUsers.push(...pageData.users);
+      if (pageData.users.length < usersPerPage) break;
+      usersPage++;
     }
+    const authUsers = { data: { users: allAuthUsers } };
 
     const users = authUsers?.users || [];
     

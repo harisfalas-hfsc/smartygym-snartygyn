@@ -184,7 +184,20 @@ serve(async (req) => {
         .from("corporate_subscriptions")
         .select("id, admin_user_id, organization_name, plan_type, status, current_period_end"),
       supabaseAdmin.from("corporate_members").select("user_id, corporate_subscription_id, email"),
-      supabaseAdmin.auth.admin.listUsers(),
+      (async () => {
+        const allUsers: any[] = [];
+        let page = 1;
+        const perPage = 100;
+        while (true) {
+          const { data: pageData, error: pageError } = await supabaseAdmin.auth.admin.listUsers({ page, perPage });
+          if (pageError) return { data: null, error: pageError };
+          if (!pageData?.users?.length) break;
+          allUsers.push(...pageData.users);
+          if (pageData.users.length < perPage) break;
+          page++;
+        }
+        return { data: { users: allUsers }, error: null };
+      })(),
     ]);
 
     if (profilesResult.error) throw profilesResult.error;
