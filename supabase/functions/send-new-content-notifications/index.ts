@@ -97,9 +97,8 @@ serve(async (req) => {
       if (pageData.users.length < usersPerPage) break;
       usersPage++;
     }
-    const authUsers = { data: { users: allAuthUsers } };
 
-    const users = authUsers?.users || [];
+    const users = allAuthUsers;
     
     // Get all user preferences from profiles
     const { data: allProfiles } = await supabase
