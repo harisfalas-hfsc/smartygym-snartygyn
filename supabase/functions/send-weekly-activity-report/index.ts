@@ -377,15 +377,20 @@ const handler = async (req: Request): Promise<Response> => {
 
     logStep(`Generating reports for week: ${weekStart} - ${weekEnd}`);
 
-    // Get all users with active subscriptions or any activity
-    const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
-    
-    if (authError) {
-      logStep("Error fetching users", { error: authError });
-      throw authError;
+    // Paginate through ALL users (listUsers defaults to 50 per page)
+    const allAuthUsers: any[] = [];
+    let usersPage = 1;
+    const usersPerPage = 100;
+    while (true) {
+      const { data: pageData, error: pageError } = await supabase.auth.admin.listUsers({ page: usersPage, perPage: usersPerPage });
+      if (pageError) { logStep("Error fetching users", { error: pageError }); throw pageError; }
+      if (!pageData?.users?.length) break;
+      allAuthUsers.push(...pageData.users);
+      if (pageData.users.length < usersPerPage) break;
+      usersPage++;
     }
 
-    const users = authUsers.users || [];
+    const users = allAuthUsers;
     logStep(`Found ${users.length} total users`);
 
     let successCount = 0;

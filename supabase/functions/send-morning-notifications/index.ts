@@ -537,7 +537,19 @@ serve(async (req) => {
     // ============================================
     // SEND EMAILS (PREFERENCE-AWARE) - Using email_content from templates
     // ============================================
-    const { data: usersData } = await supabase.auth.admin.listUsers();
+    // Paginate through ALL users (listUsers defaults to 50 per page)
+    const allUsers: any[] = [];
+    let page = 1;
+    const perPage = 100;
+    while (true) {
+      const { data: pageData } = await supabase.auth.admin.listUsers({ page, perPage });
+      if (!pageData?.users?.length) break;
+      allUsers.push(...pageData.users);
+      if (pageData.users.length < perPage) break;
+      page++;
+    }
+    logStep("All users fetched via pagination", { totalUsers: allUsers.length, pages: page });
+    const usersData = { users: allUsers };
     const profilesMap = new Map(allProfiles?.map(p => [p.user_id, p.notification_preferences]) || []);
 
     let emailsSent = 0;

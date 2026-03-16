@@ -82,9 +82,19 @@ serve(async (req) => {
     if (profilesError) throw profilesError;
     logStep("Profiles fetched", { count: profiles.length });
 
-    // Get auth users to fetch emails (using service role)
-    const { data: { users: authUsers }, error: authError } = await supabaseClient.auth.admin.listUsers();
-    if (authError) throw authError;
+    // Paginate through ALL users (listUsers defaults to 50 per page)
+    const allAuthUsers: any[] = [];
+    let usersPage = 1;
+    const usersPerPage = 100;
+    while (true) {
+      const { data: pageData, error: pageError } = await supabaseClient.auth.admin.listUsers({ page: usersPage, perPage: usersPerPage });
+      if (pageError) throw pageError;
+      if (!pageData?.users?.length) break;
+      allAuthUsers.push(...pageData.users);
+      if (pageData.users.length < usersPerPage) break;
+      usersPage++;
+    }
+    const authUsers = allAuthUsers;
 
     // Match profiles with emails
     const recipients = profiles

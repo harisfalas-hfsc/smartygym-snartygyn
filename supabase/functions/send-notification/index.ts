@@ -192,9 +192,18 @@ serve(async (req: Request) => {
       console.log(`[SEND-NOTIFICATION] ✅ Inserted ${targetUserIds.length} dashboard messages`);
     }
 
-    // Send emails
-    const { data: usersWithEmails } = await supabase.auth.admin.listUsers();
-    const targetEmails = usersWithEmails?.users
+    // Paginate through ALL users (listUsers defaults to 50 per page)
+    const allAuthUsers: any[] = [];
+    let page = 1;
+    const perPage = 100;
+    while (true) {
+      const { data: pageData } = await supabase.auth.admin.listUsers({ page, perPage });
+      if (!pageData?.users?.length) break;
+      allAuthUsers.push(...pageData.users);
+      if (pageData.users.length < perPage) break;
+      page++;
+    }
+    const targetEmails = allAuthUsers
       ?.filter(u => targetUserIds.includes(u.id) && u.email)
       .map(u => ({ id: u.id, email: u.email! })) || [];
 

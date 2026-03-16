@@ -174,13 +174,19 @@ serve(async (req: Request) => {
       });
     }
 
-    // Get user emails from auth.users
-    const { data: { users }, error: usersError } = await supabase.auth.admin.listUsers();
-    
-    if (usersError) {
-      console.error('Error fetching users:', usersError);
-      throw usersError;
+    // Paginate through ALL users (listUsers defaults to 50 per page)
+    const allAuthUsers: any[] = [];
+    let usersPage = 1;
+    const usersPerPage = 100;
+    while (true) {
+      const { data: pageData, error: pageError } = await supabase.auth.admin.listUsers({ page: usersPage, perPage: usersPerPage });
+      if (pageError) { console.error('Error fetching users:', pageError); throw pageError; }
+      if (!pageData?.users?.length) break;
+      allAuthUsers.push(...pageData.users);
+      if (pageData.users.length < usersPerPage) break;
+      usersPage++;
     }
+    const users = allAuthUsers;
 
     const userMap = new Map(users?.map(u => [u.id, u.email]) || []);
 
