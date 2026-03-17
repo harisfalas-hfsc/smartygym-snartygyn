@@ -49,6 +49,12 @@ interface AuditResult {
   multipleSectionSeparators: number;
   exercisesOutsideLists: number;
   
+  // NEW: Exercise content issues
+  restOnlyMainWorkout: number;
+  restOnlyFinisher: number;
+  emptyMainWorkout: number;
+  emptyFinisher: number;
+  
   // Overall
   totalIssues: number;
   compliantItems: number;
