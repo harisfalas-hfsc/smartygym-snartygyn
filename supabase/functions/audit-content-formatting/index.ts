@@ -485,6 +485,22 @@ serve(async (req) => {
       if (hasMultipleSectionSeparators(content)) result.multipleSectionSeparators++;
       if (hasExercisesOutsideLists(content)) result.exercisesOutsideLists++;
       
+      // NEW: Exercise content quality checks
+      if (content.includes('💪') && countExerciseTagsBetweenIcons(content, '💪', '⚡') === 0) {
+        if (isSectionRestOnly(content, '💪', '⚡')) {
+          result.restOnlyMainWorkout++;
+        } else {
+          result.emptyMainWorkout++;
+        }
+      }
+      if (content.includes('⚡') && countExerciseTagsBetweenIcons(content, '⚡', '🧘') === 0) {
+        if (isSectionRestOnly(content, '⚡', '🧘')) {
+          result.restOnlyFinisher++;
+        } else {
+          result.emptyFinisher++;
+        }
+      }
+      
       const issue = auditWorkout(workout);
       if (issue) {
         allIssues.push(issue);
