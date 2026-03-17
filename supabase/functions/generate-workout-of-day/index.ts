@@ -2611,26 +2611,30 @@ Return JSON with these exact fields:
     // ═══════════════════════════════════════════════════════════════════════════════
     // POST-LOOP NAME COLLISION GUARD: If both workouts share the same name, rename
     // ═══════════════════════════════════════════════════════════════════════════════
-    if (generatedWorkouts.length === 2 && generatedWorkouts[0].name === generatedWorkouts[1].name) {
-      const suffix = generatedWorkouts[1].equipment === "EQUIPMENT" ? " (Equipment)" : " (Bodyweight)";
-      const newName = generatedWorkouts[1].name + suffix;
-      logStep(`⚠️ Name collision detected! Renaming second workout`, {
-        original: generatedWorkouts[1].name,
-        newName,
-        equipment: generatedWorkouts[1].equipment
-      });
-      await supabase.from("admin_workouts").update({ name: newName }).eq("id", generatedWorkouts[1].id);
-      generatedWorkouts[1].name = newName;
-      
-      // Also sync Stripe product name
-      const { data: stripeRecord } = await supabase.from("admin_workouts")
-        .select("stripe_product_id").eq("id", generatedWorkouts[1].id).single();
-      if (stripeRecord?.stripe_product_id) {
-        try {
-          await stripe.products.update(stripeRecord.stripe_product_id, { name: newName });
-          logStep(`✅ Stripe product renamed`, { productId: stripeRecord.stripe_product_id, newName });
-        } catch (stripeErr) {
-          logStep(`⚠️ Failed to rename Stripe product`, { error: stripeErr });
+    if (generatedWorkouts.length === 2 && generatedWorkouts[0].name.trim().toLowerCase() === generatedWorkouts[1].name.trim().toLowerCase()) {
+      // Rename BOTH workouts to include their equipment type for clarity
+      for (let i = 0; i < 2; i++) {
+        const w = generatedWorkouts[i];
+        const suffix = w.equipment === "EQUIPMENT" ? " (Equipment)" : " (Bodyweight)";
+        const newName = w.name.trim() + suffix;
+        logStep(`⚠️ Name collision detected! Renaming workout ${i + 1}`, {
+          original: w.name,
+          newName,
+          equipment: w.equipment
+        });
+        await supabase.from("admin_workouts").update({ name: newName }).eq("id", w.id);
+        w.name = newName;
+        
+        // Also sync Stripe product name
+        const { data: stripeRecord } = await supabase.from("admin_workouts")
+          .select("stripe_product_id").eq("id", w.id).single();
+        if (stripeRecord?.stripe_product_id) {
+          try {
+            await stripe.products.update(stripeRecord.stripe_product_id, { name: newName });
+            logStep(`✅ Stripe product renamed`, { productId: stripeRecord.stripe_product_id, newName });
+          } catch (stripeErr) {
+            logStep(`⚠️ Failed to rename Stripe product`, { error: stripeErr });
+          }
         }
       }
     }
