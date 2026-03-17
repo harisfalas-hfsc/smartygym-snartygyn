@@ -49,6 +49,12 @@ interface AuditResult {
   multipleSectionSeparators: number;
   exercisesOutsideLists: number;
   
+  // NEW: Exercise content issues
+  restOnlyMainWorkout: number;
+  restOnlyFinisher: number;
+  emptyMainWorkout: number;
+  emptyFinisher: number;
+  
   // Overall
   totalIssues: number;
   compliantItems: number;
@@ -160,7 +166,7 @@ function hasExercisesOutsideLists(content: string): boolean {
   for (const icon of SECTION_ICONS) {
     if (!content.includes(icon)) continue;
     
-    // Find paragraphs between section headers that aren't in lists
+  // Find paragraphs between section headers that aren't in lists
     const exercisePattern = /<p class="tiptap-paragraph">(?!<strong>)[A-Z][^<]{10,}<\/p>/;
     const afterSectionPattern = new RegExp(
       `<p[^>]*>${icon}[^<]*<\\/p>\\s*<p class="tiptap-paragraph">(?!<strong>)[A-Z]`,
@@ -171,6 +177,47 @@ function hasExercisesOutsideLists(content: string): boolean {
   }
   
   return false;
+}
+
+// NEW: Count {{exercise:...}} tags between two section icons
+function countExerciseTagsBetweenIcons(content: string, startIcon: string, endIcon: string | null): number {
+  const startIdx = content.indexOf(startIcon);
+  if (startIdx === -1) return 0;
+  
+  let endIdx: number;
+  if (endIcon) {
+    endIdx = content.indexOf(endIcon, startIdx + 1);
+    if (endIdx === -1) endIdx = content.length;
+  } else {
+    endIdx = content.length;
+  }
+  
+  const section = content.substring(startIdx, endIdx);
+  const matches = section.match(/\{\{exercise:/g);
+  return matches ? matches.length : 0;
+}
+
+// NEW: Check if section content is only rest instructions (no exercises)
+function isSectionRestOnly(content: string, startIcon: string, endIcon: string | null): boolean {
+  const startIdx = content.indexOf(startIcon);
+  if (startIdx === -1) return false;
+  
+  let endIdx: number;
+  if (endIcon) {
+    endIdx = content.indexOf(endIcon, startIdx + 1);
+    if (endIdx === -1) endIdx = content.length;
+  } else {
+    endIdx = content.length;
+  }
+  
+  const section = content.substring(startIdx, endIdx);
+  
+  // Has no exercise tags AND contains rest instructions
+  const hasExerciseTags = /\{\{exercise:/.test(section);
+  const hasRestInstructions = /rest\s+\d/i.test(section);
+  const hasListItems = /<li/i.test(section);
+  
+  return !hasExerciseTags && hasRestInstructions && hasListItems;
 }
 
 // Detect if content has proper bullet lists for exercises
@@ -293,6 +340,28 @@ function auditWorkout(workout: any): FormatIssue | null {
     issues.push('Empty paragraph between list items');
   }
   
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // NEW: Check for rest-only or empty exercise sections
+  // ═══════════════════════════════════════════════════════════════════════════════
+  const mainExerciseCount = countExerciseTagsBetweenIcons(content, '💪', '⚡');
+  const finisherExerciseCount = countExerciseTagsBetweenIcons(content, '⚡', '🧘');
+  
+  if (content.includes('💪') && mainExerciseCount === 0) {
+    if (isSectionRestOnly(content, '💪', '⚡')) {
+      issues.push('Main Workout contains only rest instructions (no exercises)');
+    } else {
+      issues.push('Main Workout has no {{exercise:}} tags');
+    }
+  }
+  
+  if (content.includes('⚡') && finisherExerciseCount === 0) {
+    if (isSectionRestOnly(content, '⚡', '🧘')) {
+      issues.push('Finisher contains only rest instructions (no exercises)');
+    } else {
+      issues.push('Finisher has no {{exercise:}} tags');
+    }
+  }
+  
   if (issues.length === 0) return null;
   
   return {
@@ -379,6 +448,10 @@ serve(async (req) => {
       missingSectionSeparator: 0,
       multipleSectionSeparators: 0,
       exercisesOutsideLists: 0,
+      restOnlyMainWorkout: 0,
+      restOnlyFinisher: 0,
+      emptyMainWorkout: 0,
+      emptyFinisher: 0,
       totalIssues: 0,
       compliantItems: 0,
       topOffenders: [],
@@ -411,6 +484,22 @@ serve(async (req) => {
       if (hasMissingSectionSeparator(content)) result.missingSectionSeparator++;
       if (hasMultipleSectionSeparators(content)) result.multipleSectionSeparators++;
       if (hasExercisesOutsideLists(content)) result.exercisesOutsideLists++;
+      
+      // NEW: Exercise content quality checks
+      if (content.includes('💪') && countExerciseTagsBetweenIcons(content, '💪', '⚡') === 0) {
+        if (isSectionRestOnly(content, '💪', '⚡')) {
+          result.restOnlyMainWorkout++;
+        } else {
+          result.emptyMainWorkout++;
+        }
+      }
+      if (content.includes('⚡') && countExerciseTagsBetweenIcons(content, '⚡', '🧘') === 0) {
+        if (isSectionRestOnly(content, '⚡', '🧘')) {
+          result.restOnlyFinisher++;
+        } else {
+          result.emptyFinisher++;
+        }
+      }
       
       const issue = auditWorkout(workout);
       if (issue) {

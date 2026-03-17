@@ -2468,7 +2468,28 @@ Return JSON with these exact fields:
         });
         throw new Error(errorMsg);
       }
-      logStep(`✅ Section validation passed`, { equipment, foundIcons: sectionValidation.foundIcons });
+
+      // ═══════════════════════════════════════════════════════════════════════════════
+      // EXERCISE CONTENT GATE: Reject WODs where Main Workout or Finisher lack exercises
+      // This prevents rest-only or empty sections from passing the icon check
+      // ═══════════════════════════════════════════════════════════════════════════════
+      if (!sectionValidation.hasMinimumExercises) {
+        const errorMsg = `${equipment} WOD rejected: insufficient exercises [${sectionValidation.exerciseContentIssues.join("; ")}]`;
+        logStep(`❌ EXERCISE CONTENT VALIDATION FAILED`, {
+          equipment,
+          mainWorkoutExercises: sectionValidation.mainWorkoutExerciseCount,
+          finisherExercises: sectionValidation.finisherExerciseCount,
+          issues: sectionValidation.exerciseContentIssues,
+          workoutName: workoutContent.name
+        });
+        throw new Error(errorMsg);
+      }
+      logStep(`✅ Section & exercise validation passed`, { 
+        equipment, 
+        foundIcons: sectionValidation.foundIcons,
+        mainWorkoutExercises: sectionValidation.mainWorkoutExerciseCount,
+        finisherExercises: sectionValidation.finisherExerciseCount
+      });
 
       const { error: insertError } = await supabase
         .from("admin_workouts")
