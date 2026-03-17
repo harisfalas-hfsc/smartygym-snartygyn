@@ -1,43 +1,40 @@
 
 
-## Analysis: Trial vs. Invoice Finalization Issue
+# Fix the Limited Access Icon - Make Check + Slash Actually Visible
 
-**Short answer: No, removing the trial won't fix the root problem.** But there's a code-side fix we can apply.
+## Problem
 
-### What Actually Happened
+The current implementation produces an icon that looks like a tiny pencil/edit icon rather than a green checkmark with an amber slash through it. The check is barely visible because:
+- The container is too small (w-6 h-6)
+- The amber slash dominates and obscures the checkmark
+- The overall result doesn't read as "check with slash"
 
-When Manos's 7-day trial ended, Stripe created a draft invoice for €9.99. That invoice was never auto-finalized, so payment was never collected. This is **not caused by the trial itself** — it's a Stripe account-level setting issue where invoices require manual finalization instead of being processed automatically.
+## Solution
 
-If you removed the trial, the same problem could still occur on regular subscription renewals — any invoice Stripe generates could get stuck in "draft" if the account setting is wrong.
+Make the green checkmark larger and bolder so it's clearly visible, then overlay a thinner but distinct amber diagonal line across it. The check should be the dominant visual element, with the slash as a clear modifier.
 
-### The Stripe Setting You're Looking For
+### Updated code for `renderFeatureValue` (limited case):
 
-The setting is buried in: **Stripe Dashboard → Settings → search "invoices"** → look for **"Invoice default"** or **"Invoice creation"** → set to **"Automatically finalize draft invoices"**. It's not under Subscriptions — it's under the **Invoices** section of settings.
-
-### Code-Side Fix (Recommended)
-
-Instead of relying on the Stripe dashboard setting (which you're having trouble finding), we can **force automatic payment collection in our checkout code**. This overrides any account-level default and guarantees invoices are finalized and charged automatically.
-
-**Changes:**
-
-1. **`supabase/functions/create-checkout/index.ts`** — Add `payment_settings` to the `subscription_data` in the checkout session to explicitly set `collection_method` behavior and ensure invoices auto-finalize:
-
-```typescript
-subscription_data: {
-  ...(trial ? { trial_period_days: 7 } : {}),
-  metadata: {
-    project: "SMARTYGYM",
-    user_id: user.id,
-  }
-},
-payment_method_collection: 'always',
+```tsx
+<div className="relative inline-flex items-center justify-center w-8 h-8 mx-auto">
+  <Check className="w-6 h-6 text-green-500" strokeWidth={3} />
+  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+    <div className="w-9 h-[2.5px] bg-amber-500 rotate-[-45deg] rounded-full" />
+  </div>
+</div>
 ```
 
-This ensures Stripe always collects a payment method upfront and charges it automatically when the trial ends — regardless of account-level invoice settings.
+Key changes:
+- Container increased to `w-8 h-8` so the check has room to breathe
+- Check icon increased to `w-6 h-6` with `strokeWidth={3}` so it's clearly a checkmark
+- Slash line made longer (`w-9`) but slightly thinner (`h-[2.5px]`) so it crosses through without hiding the check
+- Uses `mx-auto` for centering in all contexts (desktop table and mobile cards)
 
-### Recommendation
+## Files to Update
 
-- **Keep the 7-day trial** — it's your primary conversion tool
-- **Apply the code fix** to guarantee auto-charging after trial
-- **Try to find the Stripe setting** when you have time (search "finalization" in Stripe settings search bar) as a belt-and-suspenders approach
+1. **src/pages/SmartyPlans.tsx** -- line 150-157, update the limited case (uses `ml-auto`)
+2. **src/pages/PremiumComparison.tsx** -- line 119-128, update the limited case (uses `mx-auto`)
+3. **src/pages/PremiumBenefits.tsx** -- line 137-146, update the limited case (uses `mx-auto`)
+
+Each file gets the same icon markup, with alignment matching the existing pattern (`ml-auto` for SmartyPlans, `mx-auto` for the other two).
 

@@ -101,6 +101,7 @@ serve(async (req) => {
       mode: "subscription",
       success_url: `${req.headers.get("origin")}/userdashboard?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get("origin")}/`,
+      payment_method_collection: 'always',
       metadata: {
         user_id: user.id,
         project: "SMARTYGYM",
