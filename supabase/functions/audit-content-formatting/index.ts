@@ -340,6 +340,28 @@ function auditWorkout(workout: any): FormatIssue | null {
     issues.push('Empty paragraph between list items');
   }
   
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // NEW: Check for rest-only or empty exercise sections
+  // ═══════════════════════════════════════════════════════════════════════════════
+  const mainExerciseCount = countExerciseTagsBetweenIcons(content, '💪', '⚡');
+  const finisherExerciseCount = countExerciseTagsBetweenIcons(content, '⚡', '🧘');
+  
+  if (content.includes('💪') && mainExerciseCount === 0) {
+    if (isSectionRestOnly(content, '💪', '⚡')) {
+      issues.push('Main Workout contains only rest instructions (no exercises)');
+    } else {
+      issues.push('Main Workout has no {{exercise:}} tags');
+    }
+  }
+  
+  if (content.includes('⚡') && finisherExerciseCount === 0) {
+    if (isSectionRestOnly(content, '⚡', '🧘')) {
+      issues.push('Finisher contains only rest instructions (no exercises)');
+    } else {
+      issues.push('Finisher has no {{exercise:}} tags');
+    }
+  }
+  
   if (issues.length === 0) return null;
   
   return {
