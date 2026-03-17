@@ -1,40 +1,54 @@
 
+Goal: restore **Iron Grip Builder** in place (same ID, same product linkage), fix its broken Main Workout, republish it, and clean up the 3 legacy workouts with missing exercise tags.
 
-# Fix the Limited Access Icon - Make Check + Slash Actually Visible
+What I verified from the current backend state:
+- **Iron Grip Builder** (`WOD-S-E-1771626610965`) is not deleted; it is `is_visible = false`.
+- Its Main Workout section has **0 exercise tags** and only rest lines.
+- The same is true for **Align & Restore** (`WOD-MS-E-1771453809150`) (still hidden).
+- The other 3 are still visible and were **not hidden/deleted**:
+  - `Cardio Kickstart Challenge` (`WOD-CA-E-1765946364498`)
+  - `Endurance Drive` (`WOD-CA-EQ-1765083606100`)
+  - `Ground Align Thrive` (`WOD-MS-E-1766622604142`)
+- Those 3 were flagged because Main Workout has legacy plain-text exercises (no `{{exercise:...}}` tags), not because they were removed.
 
-## Problem
+Implementation plan (no questions, direct execution):
 
-The current implementation produces an icon that looks like a tiny pencil/edit icon rather than a green checkmark with an amber slash through it. The check is barely visible because:
-- The container is too small (w-6 h-6)
-- The amber slash dominates and obscures the checkmark
-- The overall result doesn't read as "check with slash"
+1) Repair Iron Grip Builder main section in-place
+- Update backend logic with a targeted repair path (new maintenance edge function) for a specific workout ID.
+- For `WOD-S-E-1771626610965`:
+  - Fetch workout metadata + current HTML.
+  - Rebuild only the **💪 Main Workout** segment (not the whole workout), generating real exercise lines (not rest-only).
+  - Run library-first matching + normalization so every exercise gets `{{exercise:ID:Name}}` markup.
+  - Validate with section/content gate:
+    - Main Workout minimum exercises satisfied.
+    - Finisher still valid.
+- Save back to the **same row ID** so purchases/links/Stripe metadata stay intact.
 
-## Solution
+2) Republish Iron Grip Builder immediately after passing validation
+- Set `is_visible = true` for `WOD-S-E-1771626610965` only after successful content repair.
+- Keep `is_workout_of_day` and historical fields as-is (no re-generation/new ID).
 
-Make the green checkmark larger and bolder so it's clearly visible, then overlay a thinner but distinct amber diagonal line across it. The check should be the dominant visual element, with the slash as a clear modifier.
+3) Fix the 3 legacy “missing tag” workouts (in place, keep visible)
+- Reprocess these IDs in place:
+  - `WOD-CA-E-1765946364498` (Cardio Kickstart Challenge)
+  - `WOD-CA-EQ-1765083606100` (Endurance Drive)
+  - `WOD-MS-E-1766622604142` (Ground Align Thrive)
+- Apply exercise-linking pipeline on existing content so names become proper `{{exercise:...}}` tags.
+- Preserve workout availability (`is_visible` remains true) and existing IDs/products.
 
-### Updated code for `renderFeatureValue` (limited case):
+4) Verification and report output
+- DB checks for each of the 4 IDs:
+  - `is_visible` status
+  - Main section exercise-tag count (>0 and meets thresholds where required)
+- Page-level confirmation:
+  - Iron Grip detail endpoint no longer returns “Workout not found”.
+- Audit confirmation:
+  - Re-run content audit and confirm these records are no longer flagged for “Main Workout has no tags” / rest-only issue.
+- Deliver a final report listing exactly what changed per workout (before/after counts and visibility state).
 
-```tsx
-<div className="relative inline-flex items-center justify-center w-8 h-8 mx-auto">
-  <Check className="w-6 h-6 text-green-500" strokeWidth={3} />
-  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-    <div className="w-9 h-[2.5px] bg-amber-500 rotate-[-45deg] rounded-full" />
-  </div>
-</div>
-```
-
-Key changes:
-- Container increased to `w-8 h-8` so the check has room to breathe
-- Check icon increased to `w-6 h-6` with `strokeWidth={3}` so it's clearly a checkmark
-- Slash line made longer (`w-9`) but slightly thinner (`h-[2.5px]`) so it crosses through without hiding the check
-- Uses `mx-auto` for centering in all contexts (desktop table and mobile cards)
-
-## Files to Update
-
-1. **src/pages/SmartyPlans.tsx** -- line 150-157, update the limited case (uses `ml-auto`)
-2. **src/pages/PremiumComparison.tsx** -- line 119-128, update the limited case (uses `mx-auto`)
-3. **src/pages/PremiumBenefits.tsx** -- line 137-146, update the limited case (uses `mx-auto`)
-
-Each file gets the same icon markup, with alignment matching the existing pattern (`ml-auto` for SmartyPlans, `mx-auto` for the other two).
-
+Technical details (files/components touched during implementation):
+- `supabase/functions/_shared/section-validator.ts` (already hardened; reuse for gating)
+- New maintenance repair function (targeted single-workout main-section repair + publish step)
+- Existing reprocessing pipeline function invocation for the 3 legacy records
+- No schema change required; only controlled content/visibility data updates
+- No new workout IDs will be created for Iron Grip; repair is strictly in-place
