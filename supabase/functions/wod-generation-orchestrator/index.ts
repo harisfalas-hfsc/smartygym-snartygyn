@@ -10,8 +10,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const MAX_ATTEMPTS = 3;
-const RETRY_DELAY_MS = 120000; // 120 seconds between retries (handles brief AI provider outages)
+const MAX_ATTEMPTS = 2;
+const RETRY_DELAY_MS = 30000; // 30 seconds between retries (fits within execution limits)
 
 interface WodVerificationResult {
   success: boolean;
@@ -398,126 +398,145 @@ serve(async (req) => {
 
   const attempts: { attempt: number; error?: string }[] = [];
   let finalResult: WodVerificationResult | null = null;
+  let succeeded = false;
 
-  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-    console.log(`[ORCHESTRATOR] ===== ATTEMPT ${attempt}/${MAX_ATTEMPTS} =====`);
+  try {
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      console.log(`[ORCHESTRATOR] ===== ATTEMPT ${attempt}/${MAX_ATTEMPTS} =====`);
 
-    // Call generate-workout-of-day
-    const isRetry = attempt > 1;
-    const generateResult = await callGenerateWod(supabaseUrl, anonKey, isRetry);
+      // Call generate-workout-of-day
+      const isRetry = attempt > 1;
+      const generateResult = await callGenerateWod(supabaseUrl, anonKey, isRetry);
 
-    if (!generateResult.success) {
-      attempts.push({ attempt, error: generateResult.error });
-    } else {
-      attempts.push({ attempt });
-    }
-
-    // Wait a moment for database to settle
-    await delay(2000);
-
-    // Verify WODs exist
-    const verification = await verifyWodsExist(supabase, effectiveDate);
-    finalResult = verification;
-
-    if (verification.success) {
-      console.log(`[ORCHESTRATOR] ✅ SUCCESS on attempt ${attempt} - All required WODs exist`);
-      console.log(`[ORCHESTRATOR] Found: ${verification.found.join(", ")}`);
-
-      // Update run log with success
-      if (runLog?.id) {
-        await supabase
-          .from("wod_generation_runs")
-          .update({
-            status: "success",
-            completed_at: new Date().toISOString(),
-            found_count: verification.found.length,
-            wods_created: verification.found,
-          })
-          .eq("id", runLog.id);
+      if (!generateResult.success) {
+        attempts.push({ attempt, error: generateResult.error });
+      } else {
+        attempts.push({ attempt });
       }
 
-      return new Response(
-        JSON.stringify({
-          success: true,
-          message: `WOD generation successful on attempt ${attempt}`,
-          date: effectiveDate,
-          found: verification.found,
-          attempts: attempt,
-          runLogId: runLog?.id,
-        }),
-        {
-          status: 200,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+      // Wait a moment for database to settle
+      await delay(2000);
+
+      // Verify WODs exist
+      const verification = await verifyWodsExist(supabase, effectiveDate);
+      finalResult = verification;
+
+      if (verification.success) {
+        console.log(`[ORCHESTRATOR] ✅ SUCCESS on attempt ${attempt} - All required WODs exist`);
+        console.log(`[ORCHESTRATOR] Found: ${verification.found.join(", ")}`);
+        succeeded = true;
+
+        // Update run log with success
+        if (runLog?.id) {
+          await supabase
+            .from("wod_generation_runs")
+            .update({
+              status: "success",
+              completed_at: new Date().toISOString(),
+              found_count: verification.found.length,
+              wods_created: verification.found,
+            })
+            .eq("id", runLog.id);
         }
-      );
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            message: `WOD generation successful on attempt ${attempt}`,
+            date: effectiveDate,
+            found: verification.found,
+            attempts: attempt,
+            runLogId: runLog?.id,
+          }),
+          {
+            status: 200,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
+      }
+
+      console.log(`[ORCHESTRATOR] ❌ Attempt ${attempt} - Missing: ${verification.missing.join(", ")}`);
+
+      // If not the last attempt, wait before retrying
+      if (attempt < MAX_ATTEMPTS) {
+        console.log(`[ORCHESTRATOR] Waiting ${RETRY_DELAY_MS / 1000}s before retry...`);
+        await delay(RETRY_DELAY_MS);
+      }
     }
 
-    console.log(`[ORCHESTRATOR] ❌ Attempt ${attempt} - Missing: ${verification.missing.join(", ")}`);
+    // All attempts failed - send admin alert
+    console.log(`[ORCHESTRATOR] 🚨 ALL ${MAX_ATTEMPTS} ATTEMPTS FAILED - Sending admin alert`);
 
-    // If not the last attempt, wait before retrying
-    if (attempt < MAX_ATTEMPTS) {
-      console.log(`[ORCHESTRATOR] Waiting ${RETRY_DELAY_MS / 1000}s before retry...`);
-      await delay(RETRY_DELAY_MS);
+    await sendAdminAlert(
+      supabase,
+      effectiveDate,
+      finalResult?.missing || ["UNKNOWN"],
+      attempts,
+      finalResult?.isRecoveryDay || false
+    );
+
+    // Log to notification_audit_log
+    await supabase.from("notification_audit_log").insert({
+      notification_type: "wod_generation_failure",
+      message_type: "email",
+      subject: `WOD Generation Failed - ${effectiveDate}`,
+      content: `All ${MAX_ATTEMPTS} attempts failed. Missing: ${finalResult?.missing.join(", ")}`,
+      recipient_count: 1,
+      success_count: 0,
+      failed_count: 1,
+      metadata: {
+        date: effectiveDate,
+        missing: finalResult?.missing,
+        found: finalResult?.found,
+        attempts: attempts,
+        isRecoveryDay: finalResult?.isRecoveryDay,
+        runLogId: runLog?.id,
+      },
+    });
+
+    return new Response(
+      JSON.stringify({
+        success: false,
+        message: `WOD generation failed after ${MAX_ATTEMPTS} attempts`,
+        date: effectiveDate,
+        missing: finalResult?.missing,
+        found: finalResult?.found,
+        attempts: attempts,
+        adminAlerted: true,
+        runLogId: runLog?.id,
+      }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      }
+    );
+  } finally {
+    // CRITICAL: Always finalize the run log status - prevents zombie "running" records
+    if (runLog?.id && !succeeded) {
+      console.log(`[ORCHESTRATOR] FINALLY block: Ensuring run log ${runLog.id} is not left as 'running'`);
+      try {
+        // Check if still "running" (might have been updated to "failed" already)
+        const { data: currentRun } = await supabase
+          .from("wod_generation_runs")
+          .select("status")
+          .eq("id", runLog.id)
+          .single();
+
+        if (currentRun?.status === "running") {
+          await supabase
+            .from("wod_generation_runs")
+            .update({
+              status: "failed",
+              completed_at: new Date().toISOString(),
+              found_count: finalResult?.found?.length || 0,
+              error_message: `Orchestrator terminated unexpectedly. Missing: ${finalResult?.missing?.join(", ") || "UNKNOWN"}. Attempts: ${attempts.length}`,
+            })
+            .eq("id", runLog.id);
+          console.log(`[ORCHESTRATOR] FINALLY: Marked run ${runLog.id} as failed (was still running)`);
+        }
+      } catch (finallyError) {
+        console.error(`[ORCHESTRATOR] FINALLY: Error updating run log:`, finallyError);
+      }
     }
   }
-
-  // All attempts failed - send admin alert
-  console.log(`[ORCHESTRATOR] 🚨 ALL ${MAX_ATTEMPTS} ATTEMPTS FAILED - Sending admin alert`);
-
-  await sendAdminAlert(
-    supabase,
-    effectiveDate,
-    finalResult?.missing || ["UNKNOWN"],
-    attempts,
-    finalResult?.isRecoveryDay || false
-  );
-
-  // Update run log with failure
-  if (runLog?.id) {
-    await supabase
-      .from("wod_generation_runs")
-      .update({
-        status: "failed",
-        completed_at: new Date().toISOString(),
-        found_count: finalResult?.found.length || 0,
-        error_message: `All ${MAX_ATTEMPTS} attempts failed. Missing: ${finalResult?.missing.join(", ")}`,
-      })
-      .eq("id", runLog.id);
-  }
-
-  // Log to notification_audit_log
-  await supabase.from("notification_audit_log").insert({
-    notification_type: "wod_generation_failure",
-    message_type: "email",
-    subject: `WOD Generation Failed - ${effectiveDate}`,
-    content: `All ${MAX_ATTEMPTS} attempts failed. Missing: ${finalResult?.missing.join(", ")}`,
-    recipient_count: 1,
-    success_count: 0,
-    failed_count: 1,
-    metadata: {
-      date: effectiveDate,
-      missing: finalResult?.missing,
-      found: finalResult?.found,
-      attempts: attempts,
-      isRecoveryDay: finalResult?.isRecoveryDay,
-      runLogId: runLog?.id,
-    },
-  });
-
-  return new Response(
-    JSON.stringify({
-      success: false,
-      message: `WOD generation failed after ${MAX_ATTEMPTS} attempts`,
-      date: effectiveDate,
-      missing: finalResult?.missing,
-      found: finalResult?.found,
-      attempts: attempts,
-      adminAlerted: true,
-      runLogId: runLog?.id,
-    }),
-    {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    }
-  );
 });
