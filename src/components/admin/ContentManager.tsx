@@ -96,6 +96,7 @@ export const ContentManager = ({
           </TabsContent>
         </Tabs>
       </CardContent>
-    </Card>
+      </Card>
+    </div>
   );
 };
