@@ -39,19 +39,23 @@
 - If missing, triggers `generate-workout-of-day` with `retryMissing: true`
 - Sends recovery ✅ or final failure 🚨 email to admin
 
-## ⏳ Phase C — Monitoring You Can Trust (Week 2)
+## ✅ Phase C — Monitoring You Can Trust (March 18, 2026)
 
-### Cron/Scheduler Reconciliation
-- Auto-check metadata vs actual scheduler jobs and flag orphaned jobs
+### 1. Watchdog Function (`watchdog-wod-check/index.ts`)
+- Runs at 01:05 UTC (03:05 Cyprus) — 5 minutes after backup
+- Counts active, validated WODs for today
+- If count < expected → triggers recovery + sends critical 🐕 watchdog email
+- If all good → silent exit, no noise
+- Cron job scheduled: `5 1 * * *`
 
-### Operational Alerts
-- Dedicated "partial generation" alert (1/2 variants) with exact missing variant ✅ (implemented in orchestrator)
+### 2. Scheduler Reconciliation (inside `run-system-health-audit`)
+- Compares `cron.job` vs `cron_job_metadata` automatically in daily audit
+- Flags orphaned metadata, schedule mismatches, and untracked cron jobs
+- Cleaned 4 stale metadata entries: `verify-wod-generation`, `cleanup-expired-sessions`, `send-workout-reminders-job`, `sync-stripe-subscriptions-job`
+- Fixed `archive-old-wods` metadata schedule: was `0 4 * * *`, corrected to actual `0 22 * * *`
 
-### Idempotent Retry Lock
-- Prevent race/double-generation per `cyprus_date` while allowing safe recovery re-runs
-
-### Admin Diagnostics
-- Lightweight status endpoint: `today expected`, `today found`, `run status`, `last error`
-
-### 03:05 Cyprus Watchdog
-- Independent check: if today's active WOD count < expected, auto-trigger recovery + critical alert
+### 3. WOD Status Widget (`WODStatusWidget.tsx`)
+- Added to admin Content section (top of ContentManager)
+- Shows: "Today's WODs: 2/2 ✅" or "1/2 ❌ BODYWEIGHT missing"
+- Displays last run status, source (primary/backup), and time
+- Green border when healthy, red border when missing
