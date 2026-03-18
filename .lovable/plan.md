@@ -1,40 +1,41 @@
 
+# WOD Generation Reliability Fix - Implementation Status
 
-# Fix the Limited Access Icon - Make Check + Slash Actually Visible
+## ✅ Completed (Hotfix - March 18, 2026)
 
-## Problem
+### 1. Zombie Run Closed
+- Marked stuck run `77803639-94c6-4f72-867e-be4ffc59da37` as `failed` with explicit error message
 
-The current implementation produces an icon that looks like a tiny pencil/edit icon rather than a green checkmark with an amber slash through it. The check is barely visible because:
-- The container is too small (w-6 h-6)
-- The amber slash dominates and obscures the checkmark
-- The overall result doesn't read as "check with slash"
+### 2. Section Validator Fixed (`_shared/section-validator.ts`)
+- `isComplete` now includes exercise density check: `missingIcons.length === 0 && exerciseContentIssues.length === 0`
+- Orchestrator will now correctly retry when WODs have missing exercises
 
-## Solution
+### 3. Orchestrator Hardened (`wod-generation-orchestrator/index.ts`)
+- Added `try/finally` block that ensures run log is NEVER left as "running"
+- Reduced retry attempts from 3→2 and delay from 120s→30s to fit within execution limits
+- On unexpected termination, `finally` block auto-closes the run as "failed"
 
-Make the green checkmark larger and bolder so it's clearly visible, then overlay a thinner but distinct amber diagonal line across it. The check should be the dominant visual element, with the slash as a clear modifier.
+### 4. Zombie Run Detection (`run-system-health-audit/index.ts`)
+- Health audit now checks for `wod_generation_runs` stuck in "running" for >30 minutes
+- Auto-closes zombie runs and reports them as `fail` in the audit
 
-### Updated code for `renderFeatureValue` (limited case):
+### 5. Backup WOD Generation Function (`backup-wod-generation/index.ts`)
+- New function runs at 01:00 UTC (03:00 Cyprus) daily via cron
+- Checks if today's WODs exist and are complete
+- If missing, triggers `generate-workout-of-day` with `retryMissing: true`
+- Sends recovery success ✅ or final failure 🚨 email to admin
+- Cron job `backup-wod-generation` scheduled in pg_cron
 
-```tsx
-<div className="relative inline-flex items-center justify-center w-8 h-8 mx-auto">
-  <Check className="w-6 h-6 text-green-500" strokeWidth={3} />
-  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-    <div className="w-9 h-[2.5px] bg-amber-500 rotate-[-45deg] rounded-full" />
-  </div>
-</div>
-```
+## ⏳ Pending (Week 2 Hardening)
 
-Key changes:
-- Container increased to `w-8 h-8` so the check has room to breathe
-- Check icon increased to `w-6 h-6` with `strokeWidth={3}` so it's clearly a checkmark
-- Slash line made longer (`w-9`) but slightly thinner (`h-[2.5px]`) so it crosses through without hiding the check
-- Uses `mx-auto` for centering in all contexts (desktop table and mobile cards)
+### Cron/Scheduler Reconciliation
+- Auto-check metadata vs actual scheduler jobs and flag orphaned jobs
 
-## Files to Update
+### Operational Alerts
+- Dedicated "partial generation" alert (1/2 variants) with exact missing variant
 
-1. **src/pages/SmartyPlans.tsx** -- line 150-157, update the limited case (uses `ml-auto`)
-2. **src/pages/PremiumComparison.tsx** -- line 119-128, update the limited case (uses `mx-auto`)
-3. **src/pages/PremiumBenefits.tsx** -- line 137-146, update the limited case (uses `mx-auto`)
+### Idempotent Retry Lock
+- Prevent race/double-generation per `cyprus_date` while allowing safe recovery re-runs
 
-Each file gets the same icon markup, with alignment matching the existing pattern (`ml-auto` for SmartyPlans, `mx-auto` for the other two).
-
+### Admin Diagnostics
+- Lightweight status endpoint: `today expected`, `today found`, `run status`, `last error`
