@@ -1,57 +1,60 @@
 
-# WOD Generation Reliability Fix - Implementation Status
 
-## ✅ Phase A — Immediate Production Recovery (March 18, 2026)
+# Phase C: WOD Monitoring & Diagnostics — Implementation Plan
 
-### 1. Missing BODYWEIGHT WOD Restored
-- Triggered `generate-workout-of-day` with `retryMissing: true`
-- Confirmed 2/2 WODs now active for 2026-03-18: EQUIPMENT + BODYWEIGHT
+## My honest assessment first
 
-### 2. Zombie Run Closed
-- Run `77803639-94c6-4f72-867e-be4ffc59da37` marked as `failed` with explicit error message
+Your existing protection layers are **already strong**:
+- Orchestrator has `try/finally` ensuring no zombie runs ✅
+- Backup generation runs at 03:00 Cyprus ✅  
+- Health audit detects and auto-closes zombie runs ✅
+- Validator now includes exercise density check ✅
+- Cron timeout increased to 15 min ✅
 
-### 3. Incident Logged
-- notification_audit_log entry created for traceability
+Phase C adds **3 targeted additions** that don't touch any existing generation code. They are purely monitoring/detection — read-only observers. Zero risk of breaking what works.
 
-## ✅ Phase B — Stop Recurrence (Same-Day Hardening)
+## What to build
 
-### 1. Cron Timeout Fixed
-- `generate-workout-of-day` cron now uses `timeout_milliseconds:=900000` (15 min, was 300000/5 min)
-- This allows the orchestrator's 2 retry attempts + 30s delays to complete within the timeout
+### 1. Watchdog Function (03:05 Cyprus / 01:05 UTC)
+A tiny edge function `watchdog-wod-check` that runs 5 minutes after the backup. All it does:
+- Count today's active WODs
+- If count < expected → trigger `generate-workout-of-day` with `retryMissing: true` + send critical email
+- If count = expected → do nothing (silent success)
 
-### 2. Section Validator Fixed (`_shared/section-validator.ts`)
-- `isComplete` now includes exercise density check: `missingIcons.length === 0 && exerciseContentIssues.length === 0`
-- Orchestrator will now correctly retry when WODs have missing exercises
+This is the **last safety net** before users wake up. It's a 50-line function, no complex logic.
 
-### 3. Orchestrator Hardened (`wod-generation-orchestrator/index.ts`)
-- `try/finally` block ensures run log is NEVER left as "running"
-- Reduced retry attempts from 3→2 and delay from 120s→30s to fit within execution limits
-- Added **partial-failure** detection: distinguishes between "no WODs" and "1 of 2 WODs" failures
-- Run log now always gets explicit `failed` status with detailed error on any failure path
+### 2. Scheduler Reconciliation (inside health audit)
+Add a check to the existing health audit that compares `cron.job` vs `cron_job_metadata`:
 
-### 4. Zombie Run Detection (`run-system-health-audit/index.ts`)
-- Health audit checks for `wod_generation_runs` stuck in "running" for >30 minutes
-- Auto-closes zombie runs and reports them as `fail` in the audit
+Current drift I already found:
+- `cron_job_metadata` has `verify-wod-generation`, `cleanup-expired-sessions`, `send-workout-reminders-job`, `sync-stripe-subscriptions-job` — **none of these exist in `cron.job`**
+- `archive-old-wods` metadata says schedule `0 4 * * *` but actual cron is `0 22 * * *`
 
-### 5. Backup WOD Generation (`backup-wod-generation/index.ts`)
-- Function runs at 01:00 UTC (03:00 Cyprus) daily via cron
-- Checks if today's WODs exist and are complete
-- If missing, triggers `generate-workout-of-day` with `retryMissing: true`
-- Sends recovery ✅ or final failure 🚨 email to admin
+This check flags orphaned metadata and schedule mismatches in the daily audit email. Read-only, no modifications.
 
-## ⏳ Phase C — Monitoring You Can Trust (Week 2)
+### 3. WOD Status Widget in Admin
+A small card added to the existing admin content section showing:
+```
+Today's WODs: 2/2 ✅  (or 1/2 ❌ BODYWEIGHT missing)
+Last run: success at 00:35 UTC
+Backup: not needed
+```
 
-### Cron/Scheduler Reconciliation
-- Auto-check metadata vs actual scheduler jobs and flag orphaned jobs
+Simple database read, no logic changes.
 
-### Operational Alerts
-- Dedicated "partial generation" alert (1/2 variants) with exact missing variant ✅ (implemented in orchestrator)
+## Files to create/modify
 
-### Idempotent Retry Lock
-- Prevent race/double-generation per `cyprus_date` while allowing safe recovery re-runs
+1. **Create** `supabase/functions/watchdog-wod-check/index.ts` — ~60 lines, checks WOD count, triggers recovery if needed
+2. **Add cron job** for `watchdog-wod-check` at `5 1 * * *` (01:05 UTC = 03:05 Cyprus)
+3. **Modify** `supabase/functions/run-system-health-audit/index.ts` — add ~40 lines for scheduler reconciliation check (compares `cron.job` vs `cron_job_metadata`)
+4. **Create** `src/components/admin/WODStatusWidget.tsx` — small status card component
+5. **Modify** existing admin content area to show the widget
+6. **Clean up** stale `cron_job_metadata` entries that reference non-existent jobs
 
-### Admin Diagnostics
-- Lightweight status endpoint: `today expected`, `today found`, `run status`, `last error`
+## What I will NOT touch
+- `wod-generation-orchestrator` — already hardened, no changes
+- `generate-workout-of-day` — core generation logic, no changes
+- `backup-wod-generation` — already deployed, no changes
+- `section-validator.ts` — already fixed, no changes
+- Any Stripe, pricing, or checkout code — completely separate
 
-### 03:05 Cyprus Watchdog
-- Independent check: if today's active WOD count < expected, auto-trigger recovery + critical alert
