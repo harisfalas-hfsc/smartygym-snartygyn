@@ -10,8 +10,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const MAX_ATTEMPTS = 3;
-const RETRY_DELAY_MS = 120000; // 120 seconds between retries (handles brief AI provider outages)
+const MAX_ATTEMPTS = 2;
+const RETRY_DELAY_MS = 30000; // 30 seconds between retries (fits within execution limits)
 
 interface WodVerificationResult {
   success: boolean;
