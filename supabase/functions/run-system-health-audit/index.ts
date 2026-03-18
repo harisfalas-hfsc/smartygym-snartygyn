@@ -829,9 +829,48 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // ============================================
-    // CATEGORY 4: DAILY RITUAL
+    // ZOMBIE RUN DETECTION - Flag stuck "running" generation runs
     // ============================================
-    console.log("🌅 Checking Daily Ritual...");
+    console.log("🧟 Checking for zombie generation runs...");
+    
+    const thirtyMinutesAgo = new Date(now.getTime() - 30 * 60 * 1000).toISOString();
+    const { data: zombieRuns, error: zombieError } = await supabase
+      .from('wod_generation_runs')
+      .select('id, cyprus_date, status, created_at, expected_count, found_count')
+      .eq('status', 'running')
+      .lt('created_at', thirtyMinutesAgo);
+    
+    if (!zombieError && zombieRuns && zombieRuns.length > 0) {
+      // Auto-close zombie runs and report
+      for (const zombie of zombieRuns) {
+        await supabase
+          .from('wod_generation_runs')
+          .update({
+            status: 'failed',
+            completed_at: now.toISOString(),
+            error_message: `Auto-closed by health audit: stuck in "running" for >30 minutes (created: ${zombie.created_at})`
+          })
+          .eq('id', zombie.id);
+      }
+      
+      addCheck(
+        'WOD System',
+        'Zombie Generation Runs',
+        `${zombieRuns.length} stuck run(s) found and auto-closed`,
+        'fail',
+        `Runs stuck in "running" for >30min: ${zombieRuns.map(z => `${z.cyprus_date} (created ${z.created_at})`).join(', ')}. This indicates orchestrator timeout. Check generation function logs.`
+      );
+    } else {
+      addCheck(
+        'WOD System',
+        'Zombie Generation Runs',
+        'No stuck generation runs',
+        'pass',
+        'All wod_generation_runs have finalized status'
+      );
+    }
+
+
 
     const { data: todayRitual } = await supabase
       .from('daily_smarty_rituals')
