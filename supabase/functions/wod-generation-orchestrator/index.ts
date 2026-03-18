@@ -464,8 +464,10 @@ serve(async (req) => {
       }
     }
 
-    // All attempts failed - send admin alert
-    console.log(`[ORCHESTRATOR] 🚨 ALL ${MAX_ATTEMPTS} ATTEMPTS FAILED - Sending admin alert`);
+    // All attempts failed - determine if partial or complete failure
+    const isPartialFailure = (finalResult?.found?.length || 0) > 0;
+    const failureType = isPartialFailure ? "PARTIAL" : "COMPLETE";
+    console.log(`[ORCHESTRATOR] 🚨 ${failureType} FAILURE after ${MAX_ATTEMPTS} attempts - Sending admin alert`);
 
     await sendAdminAlert(
       supabase,
@@ -475,12 +477,26 @@ serve(async (req) => {
       finalResult?.isRecoveryDay || false
     );
 
+    // Update run log with failure
+    if (runLog?.id) {
+      await supabase
+        .from("wod_generation_runs")
+        .update({
+          status: "failed",
+          completed_at: new Date().toISOString(),
+          found_count: finalResult?.found?.length || 0,
+          wods_created: finalResult?.found || [],
+          error_message: `${failureType} failure after ${MAX_ATTEMPTS} attempts. Missing: ${finalResult?.missing?.join(", ")}. Found: ${finalResult?.found?.join(", ") || "none"}.`,
+        })
+        .eq("id", runLog.id);
+    }
+
     // Log to notification_audit_log
     await supabase.from("notification_audit_log").insert({
-      notification_type: "wod_generation_failure",
+      notification_type: isPartialFailure ? "wod_partial_generation_failure" : "wod_generation_failure",
       message_type: "email",
-      subject: `WOD Generation Failed - ${effectiveDate}`,
-      content: `All ${MAX_ATTEMPTS} attempts failed. Missing: ${finalResult?.missing.join(", ")}`,
+      subject: `WOD ${failureType} Failure - ${effectiveDate}`,
+      content: `${failureType} failure after ${MAX_ATTEMPTS} attempts. Missing: ${finalResult?.missing.join(", ")}. Found: ${finalResult?.found?.join(", ") || "none"}.`,
       recipient_count: 1,
       success_count: 0,
       failed_count: 1,
@@ -491,6 +507,7 @@ serve(async (req) => {
         attempts: attempts,
         isRecoveryDay: finalResult?.isRecoveryDay,
         runLogId: runLog?.id,
+        failureType,
       },
     });
 
