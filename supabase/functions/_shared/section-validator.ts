@@ -154,7 +154,7 @@ export function validateWodSections(
   const hasMinimumExercises = exerciseContentIssues.length === 0;
 
   return {
-    isComplete: missingIcons.length === 0,
+    isComplete: missingIcons.length === 0 && exerciseContentIssues.length === 0,
     missingSections,
     missingIcons,
     foundIcons,
