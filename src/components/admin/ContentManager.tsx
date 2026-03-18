@@ -6,6 +6,7 @@ import { WorkoutsManager } from "./WorkoutsManager";
 import { ProgramsManager } from "./ProgramsManager";
 import { WODManager } from "./WODManager";
 import { RitualsManager } from "./RitualsManager";
+import { WODStatusWidget } from "./WODStatusWidget";
 import { Dumbbell, Calendar, Flame, Sparkles } from "lucide-react";
 
 interface ContentManagerProps {
