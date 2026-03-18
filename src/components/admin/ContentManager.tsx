@@ -6,6 +6,7 @@ import { WorkoutsManager } from "./WorkoutsManager";
 import { ProgramsManager } from "./ProgramsManager";
 import { WODManager } from "./WODManager";
 import { RitualsManager } from "./RitualsManager";
+import { WODStatusWidget } from "./WODStatusWidget";
 import { Dumbbell, Calendar, Flame, Sparkles } from "lucide-react";
 
 interface ContentManagerProps {
@@ -36,17 +37,19 @@ export const ContentManager = ({
   }, [activeInnerTab]);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Dumbbell className="w-5 h-5" />
-          Content Library
-        </CardTitle>
-        <CardDescription>
-          Manage workouts, training programs, WOD, and Daily Smarty Rituals
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
+    <div className="space-y-4">
+      <WODStatusWidget />
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Dumbbell className="w-5 h-5" />
+            Content Library
+          </CardTitle>
+          <CardDescription>
+            Manage workouts, training programs, WOD, and Daily Smarty Rituals
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
         <Tabs value={innerTab} onValueChange={setInnerTab} className="w-full">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="workouts" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-1 sm:px-3">
@@ -93,6 +96,7 @@ export const ContentManager = ({
           </TabsContent>
         </Tabs>
       </CardContent>
-    </Card>
+      </Card>
+    </div>
   );
 };
