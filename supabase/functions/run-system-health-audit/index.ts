@@ -2908,6 +2908,80 @@ const allStripeItems = [
     }
 
     // ============================================
+    // SCHEDULER RECONCILIATION CHECK
+    // ============================================
+    if (!isApproachingTimeout()) {
+      console.log("🔄 Running scheduler reconciliation...");
+      try {
+        // Get actual cron jobs from database
+        const { data: actualJobs } = await supabase.rpc('get_cron_jobs');
+        
+        // Get metadata entries
+        const { data: metadataJobs } = await supabase
+          .from('cron_job_metadata')
+          .select('job_name, schedule, is_active, display_name');
+
+        if (actualJobs && metadataJobs) {
+          const actualJobNames = new Set((actualJobs as any[]).map((j: any) => j.jobname));
+          const metadataJobNames = new Set(metadataJobs.map((m: any) => m.job_name));
+
+          // Find orphaned metadata (metadata exists but no actual cron job)
+          const orphanedMetadata = metadataJobs.filter((m: any) => !actualJobNames.has(m.job_name));
+          
+          // Find schedule mismatches
+          const mismatches: string[] = [];
+          for (const meta of metadataJobs) {
+            const actual = (actualJobs as any[]).find((j: any) => j.jobname === meta.job_name);
+            if (actual && meta.schedule && actual.schedule !== meta.schedule) {
+              mismatches.push(`${meta.job_name}: metadata="${meta.schedule}" actual="${actual.schedule}"`);
+            }
+          }
+
+          // Find untracked jobs (actual cron exists but no metadata)
+          const untrackedJobs = (actualJobs as any[]).filter((j: any) => !metadataJobNames.has(j.jobname));
+
+          const issues: string[] = [];
+          if (orphanedMetadata.length > 0) {
+            issues.push(`${orphanedMetadata.length} orphaned metadata: ${orphanedMetadata.map((m: any) => m.job_name).join(', ')}`);
+          }
+          if (mismatches.length > 0) {
+            issues.push(`${mismatches.length} schedule mismatch: ${mismatches.join('; ')}`);
+          }
+          if (untrackedJobs.length > 0) {
+            issues.push(`${untrackedJobs.length} untracked cron jobs: ${untrackedJobs.map((j: any) => j.jobname).join(', ')}`);
+          }
+
+          if (issues.length > 0) {
+            addCheck('Scheduler', 'Cron/Metadata Reconciliation',
+              `Found ${issues.length} scheduler inconsistencies`,
+              'warning',
+              issues.join(' | ')
+            );
+          } else {
+            addCheck('Scheduler', 'Cron/Metadata Reconciliation',
+              `All ${metadataJobs.length} metadata entries match actual cron jobs`,
+              'pass',
+              'No orphaned metadata, schedule mismatches, or untracked jobs'
+            );
+          }
+        }
+      } catch (reconError) {
+        console.error("[SCHEDULER-RECON] Error:", reconError);
+        addCheck('Scheduler', 'Cron/Metadata Reconciliation',
+          'Failed to run scheduler reconciliation',
+          'warning',
+          reconError instanceof Error ? reconError.message : 'Unknown error'
+        );
+      }
+    } else {
+      addCheck('Scheduler', 'Cron/Metadata Reconciliation',
+        'Skipped due to timeout guard',
+        'skip',
+        'Audit approaching time limit'
+      );
+    }
+
+    // ============================================
     // COMPILE RESULTS
     // ============================================
     const duration = Date.now() - startTime;
