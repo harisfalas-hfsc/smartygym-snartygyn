@@ -103,6 +103,8 @@ CRITICAL - PRIORITY KEYWORDS (MUST include at least 2-3 in every meta title and 
 - online exercise weight loss, online strength, online fitness strength
 - online fitness workout, online strength workout
 
+IMPORTANT BRAND VARIANTS - SmartyGym is also known as SmartGym, Smart Gym, and Smart-Gym. These are alternate names for the SAME platform (smartygym.com). When generating keywords, include at least one variant (SmartGym, Smart Gym, or Smart-Gym) alongside SmartyGym.
+
 The platform is also accessible via these owned domains that redirect to smartygym.com: i-training.net, smartywod.com, smartylogbook.com, smartywellness.com, smartyworkout.com.
 
 Generate SEO metadata in JSON format only, no markdown. Always prioritize the PRIORITY KEYWORDS above in meta_title and meta_description.`
