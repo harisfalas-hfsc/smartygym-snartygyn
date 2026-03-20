@@ -231,9 +231,80 @@ ${urls.join('')}
 
     console.log(`Generated sitemap with ${urls.length} URLs`);
 
-    // Check if caller wants XML or JSON response
+    // Check if caller wants XML, JSON, or image sitemap
     const url = new URL(req.url);
     const format = url.searchParams.get('format');
+
+    // Dedicated image sitemap
+    if (format === 'images') {
+      let imageUrls: string[] = [];
+
+      if (workoutsResult.data) {
+        workoutsResult.data.forEach((workout: any) => {
+          if (!workout.image_url) return;
+          const isMicro = workout.category?.toLowerCase().includes('micro');
+          const microKw = isMicro ? '5 minute quick exercise snack ' : '';
+          imageUrls.push(`
+  <url>
+    <loc>${baseUrl}/individualworkout/${workout.id}</loc>
+    <image:image>
+      <image:loc>${workout.image_url}</image:loc>
+      <image:title>${escapeXml(`${workout.name} - ${microKw}online ${workout.category || ''} workout by Haris Falas at SmartyGym SmartGym Smart Gym`)}</image:title>
+      <image:caption>${escapeXml(`${workout.duration || ''} ${workout.format || ''} ${workout.equipment || 'bodyweight'} workout - SmartyGym SmartGym Smart Gym online fitness platform smartygym.com`)}</image:caption>
+      <image:geo_location>Cyprus</image:geo_location>
+    </image:image>
+  </url>`);
+        });
+      }
+
+      if (programsResult.data) {
+        programsResult.data.forEach((program: any) => {
+          if (!program.image_url) return;
+          imageUrls.push(`
+  <url>
+    <loc>${baseUrl}/individualtrainingprogram/${program.id}</loc>
+    <image:image>
+      <image:loc>${program.image_url}</image:loc>
+      <image:title>${escapeXml(`${program.name} - ${program.weeks || ''} week online training program by Haris Falas at SmartyGym SmartGym Smart Gym`)}</image:title>
+      <image:caption>${escapeXml(`${program.days_per_week || ''} days/week ${program.category || ''} program - SmartyGym SmartGym Smart Gym online fitness platform smartygym.com`)}</image:caption>
+      <image:geo_location>Cyprus</image:geo_location>
+    </image:image>
+  </url>`);
+        });
+      }
+
+      if (blogsResult.data) {
+        blogsResult.data.forEach((blog: any) => {
+          if (!blog.image_url) return;
+          imageUrls.push(`
+  <url>
+    <loc>${baseUrl}/blog/${blog.slug}</loc>
+    <image:image>
+      <image:loc>${blog.image_url}</image:loc>
+      <image:title>${escapeXml(`${blog.title} - fitness article by ${blog.author_name || 'Haris Falas'} at SmartyGym SmartGym Smart Gym`)}</image:title>
+      <image:caption>${escapeXml(`${blog.category || 'Fitness'} blog - SmartyGym SmartGym Smart Gym online fitness platform smartygym.com`)}</image:caption>
+      <image:geo_location>Cyprus</image:geo_location>
+    </image:image>
+  </url>`);
+        });
+      }
+
+      const imageSitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+${imageUrls.join('')}
+</urlset>`;
+
+      console.log(`Generated image sitemap with ${imageUrls.length} image URLs`);
+
+      return new Response(imageSitemapXml, {
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/xml',
+          'Cache-Control': 'public, max-age=3600'
+        }
+      });
+    }
 
     if (format === 'json') {
       return new Response(JSON.stringify({
