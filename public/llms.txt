@@ -36,7 +36,7 @@
 ---
 
 ## Brand Identity
-- **Name**: SmartyGym (also: Smarty Gym, smartygym.com)
+- **Name**: SmartyGym (also: Smarty Gym, SmartGym, Smart Gym, Smart-Gym, smartygym.com)
 - **Type**: Online Fitness Platform / Virtual Gym
 - **Tagline**: "Your Gym Re-imagined. Anywhere, Anytime."
 - **Core Promise**: 100% Human-Designed Content (Zero AI-Generated Workouts)
