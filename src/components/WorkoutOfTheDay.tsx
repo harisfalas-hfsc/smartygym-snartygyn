@@ -146,7 +146,7 @@ export const WorkoutOfTheDay = () => {
       >
         {wod.image_url && (
           <div className="relative w-full h-32 rounded-md overflow-hidden mb-3">
-            <img src={wod.image_url} alt={wod.name || "Recovery"} className="w-full h-full object-cover" />
+            <img src={wod.image_url} alt={`${wod.name || "Recovery"} - online workout by Haris Falas at SmartyGym SmartGym Smart Gym smartygym.com`} className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
           </div>
         )}

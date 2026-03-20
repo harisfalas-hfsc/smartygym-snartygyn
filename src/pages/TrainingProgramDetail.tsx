@@ -557,7 +557,7 @@ const TrainingProgramDetail = () => {
 
                   <img 
                     src={program.image_url || fallbackProgramImage}
-                    alt={`${program.name} - ${program.duration} training program by Haris Falas Sports Scientist at SmartyGym.com`}
+                    alt={`${program.name} - ${program.duration} training program by Haris Falas Sports Scientist at SmartyGym SmartGym Smart Gym smartygym.com`}
                     className="w-full h-full object-cover"
                     loading="lazy"
                     onError={(e) => {

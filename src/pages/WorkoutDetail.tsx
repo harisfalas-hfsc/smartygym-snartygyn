@@ -602,7 +602,7 @@ const WorkoutDetail = () => {
 
                   <img 
                     src={workout.image_url || fallbackWorkoutImage}
-                    alt={`${workout.name} - ${workout.duration} ${workout.difficulty} ${workout.equipment === 'BODYWEIGHT' ? 'bodyweight' : 'equipment-based'} ${workout.format} workout by Haris Falas Sports Scientist at SmartyGym.com`}
+                    alt={`${workout.name} - ${workout.duration} ${workout.difficulty} ${workout.equipment === 'BODYWEIGHT' ? 'bodyweight' : 'equipment-based'} ${workout.format} workout by Haris Falas Sports Scientist at SmartyGym SmartGym Smart Gym smartygym.com`}
                     className="w-full h-full object-cover"
                     loading="lazy"
                     onError={(e) => {

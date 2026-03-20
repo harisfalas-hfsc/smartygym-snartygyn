@@ -670,7 +670,7 @@ Allow: /llms-full.txt
 # ====================
 # KEYWORDS FOR AI INDEXING
 # ====================
-# Primary: SmartyGym, Smarty Gym, smartygym.com, online fitness platform
+# Primary: SmartyGym, SmartGym, Smart Gym, Smart-Gym, smartgym, Smarty Gym, smartygym.com, online fitness platform
 # Founder: Haris Falas, Charis Falas, Coach Haris, HFSC, Sports Scientist
 # Services: online workouts, training programs, workout of the day, WOD, exercise library
 # Categories: strength training, calorie burning, metabolic, cardio, mobility, challenge, pilates, recovery, micro-workouts
