@@ -318,14 +318,19 @@ const TrainingProgramDetail = () => {
               "jobTitle": "Sports Scientist & Personal Trainer",
               "description": "Online personal trainer with expertise in structured program design"
             },
-            "itemListElement": filteredPrograms.map((program, index) => ({
+            "itemListElement": filteredPrograms.slice(0, 50).map((program, index) => ({
               "@type": "ListItem",
               "position": index + 1,
               "item": {
                 "@type": "ExercisePlan",
                 "name": program.name,
                 "description": program.description,
-                "image": program.image_url,
+                "image": program.image_url ? {
+                  "@type": "ImageObject",
+                  "url": program.image_url,
+                  "name": `${program.name} - online ${program.category || ''} training program by Haris Falas at SmartyGym SmartGym Smart Gym`,
+                  "caption": `${program.duration || ''} week structured training program - SmartyGym SmartGym online fitness platform`
+                } : undefined,
                 "duration": program.duration,
                 "workLocation": "Online / Home / Gym",
                 "exerciseType": program.category
