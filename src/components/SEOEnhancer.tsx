@@ -210,11 +210,14 @@ export const SEOEnhancer = ({
       {entities.map((entity, index) => (
         <meta key={`entity-${index}`} property="schema:entity" content={entity} />
       ))}
-      <meta property="schema:entity" content="SmartyGym" />
-      <meta property="schema:entity" content="HFSC Performance" />
-      <meta property="schema:entity" content="Haris Falas" />
-      <meta property="schema:entity" content="Online Fitness Platform" />
-      <meta property="schema:entity" content="Global Online Gym" />
+       <meta property="schema:entity" content="SmartyGym" />
+       <meta property="schema:entity" content="SmartGym" />
+       <meta property="schema:entity" content="Smart Gym" />
+       <meta property="schema:entity" content="Smart-Gym" />
+       <meta property="schema:entity" content="HFSC Performance" />
+       <meta property="schema:entity" content="Haris Falas" />
+       <meta property="schema:entity" content="Online Fitness Platform" />
+       <meta property="schema:entity" content="Global Online Gym" />
       
       {/* Knowledge Graph Signals */}
       {topics.map((topic, index) => (

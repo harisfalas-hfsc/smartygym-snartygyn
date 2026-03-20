@@ -15,6 +15,11 @@ const BRANDED_KEYWORDS = [
   "SmartyGym Online Personal Training",
   "Haris Falas Coach",
   "Haris Falas Personal Training",
+  "SmartGym Online Fitness",
+  "Smart Gym Online Workout",
+  "Smart-Gym Online Training",
+  "SmartGym Haris Falas",
+  "Smart Gym by Haris Falas",
 ];
 
 function buildKeywordBlock(exerciseName: string): string {

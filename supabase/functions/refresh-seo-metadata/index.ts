@@ -201,7 +201,7 @@ function generateJsonLD(item: ContentItem): object {
         "https://www.youtube.com/@TheSmartyGym",
         "https://www.facebook.com/profile.php?id=61579302997368"
       ],
-      "alternateName": ["SmartyGym", "itraining", "smartywod", "smartylogbook", "smartywellness", "smartyworkout"]
+      "alternateName": ["SmartyGym", "SmartGym", "Smart Gym", "Smart-Gym", "itraining", "smartywod", "smartylogbook", "smartywellness", "smartyworkout"]
     },
     "author": {
       "@type": "Person",
