@@ -583,6 +583,7 @@ Disallow: /api/
 # SITEMAPS
 # ====================
 Sitemap: https://smartygym.com/sitemap.xml
+Sitemap: https://smartygym.com/image-sitemap.xml
 
 # ====================
 # CANONICAL HOST
