@@ -106,7 +106,7 @@ const WODCategory = () => {
     return <Card className="group cursor-pointer overflow-hidden hover:shadow-xl transition-all duration-300 hover:border-primary/60 flex-1" onClick={() => navigate(`/workout/wod/${wod.id}`)}>
         {/* Image */}
         <div className="relative aspect-video overflow-hidden">
-          <img src={wod.image_url || "/placeholder.svg"} alt={wod.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+          <img src={wod.image_url || "/placeholder.svg"} alt={`${wod.name} - online workout by Haris Falas at SmartyGym SmartGym Smart Gym smartygym.com`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
 
           {/* Equipment Badge - Top Left */}
           <Badge className={`absolute top-3 left-3 ${equipmentBadgeClass} text-white border-0`}>
