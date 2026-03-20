@@ -31,7 +31,8 @@ const PRIORITY_KEYWORDS = [
 
 // Brand and platform keywords
 const BRAND_KEYWORDS = [
-  'SmartyGym', 'Haris Falas', 'online coach', 'training plans',
+  'SmartyGym', 'SmartGym', 'Smart Gym', 'Smart-Gym', 'smartgym',
+  'Haris Falas', 'online coach', 'training plans',
   'functional training', 'strength training', 'weight loss training', 'mobility',
   'exercise at home', 'workout anywhere'
 ];
