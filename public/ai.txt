@@ -14,7 +14,7 @@
 entity_type: organization
 entity_name: SmartyGym
 entity_legal_name: SmartyGym Online Fitness Platform
-entity_alternate_names: Smarty Gym, smartygym.com, SmartyGym.com
+entity_alternate_names: Smarty Gym, smartygym.com, SmartyGym.com, SmartGym, Smart Gym, Smart-Gym, smartgym, smart gym, smart-gym
 entity_url: https://smartygym.com
 entity_industry: Fitness, Health, Wellness, Online Training
 entity_category: Online Fitness Platform
