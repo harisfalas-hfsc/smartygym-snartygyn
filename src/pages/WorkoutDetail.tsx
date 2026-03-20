@@ -346,14 +346,19 @@ const WorkoutDetail = () => {
               "jobTitle": "Sports Scientist & Personal Trainer",
               "description": "Online fitness expert specializing in functional training"
             },
-            "itemListElement": filteredWorkouts.slice(0, 10).map((workout, index) => ({
+            "itemListElement": filteredWorkouts.slice(0, 50).map((workout, index) => ({
               "@type": "ListItem",
               "position": index + 1,
               "item": {
                 "@type": "ExercisePlan",
                 "name": workout.name,
                 "description": workout.description,
-                "image": workout.image_url,
+                "image": workout.image_url ? {
+                  "@type": "ImageObject",
+                  "url": workout.image_url,
+                  "name": `${workout.name} - online ${workout.category || ''} workout by Haris Falas at SmartyGym SmartGym Smart Gym`,
+                  "caption": `${workout.duration || ''} ${workout.format || ''} ${workout.equipment || 'bodyweight'} workout - SmartyGym SmartGym online fitness platform`
+                } : undefined,
                 "duration": workout.duration,
                 "workLocation": "Online / Home / Gym"
               }
