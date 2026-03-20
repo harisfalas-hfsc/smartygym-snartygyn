@@ -31,7 +31,8 @@ const PRIORITY_KEYWORDS = [
 
 // Brand and platform keywords
 const BRAND_KEYWORDS = [
-  'SmartyGym', 'Haris Falas', 'online coach', 'training plans',
+  'SmartyGym', 'SmartGym', 'Smart Gym', 'Smart-Gym', 'smartgym',
+  'Haris Falas', 'online coach', 'training plans',
   'functional training', 'strength training', 'weight loss training', 'mobility',
   'exercise at home', 'workout anywhere'
 ];
@@ -101,6 +102,8 @@ CRITICAL - PRIORITY KEYWORDS (MUST include at least 2-3 in every meta title and 
 - online personal training, online fitness coach, online exercise
 - online exercise weight loss, online strength, online fitness strength
 - online fitness workout, online strength workout
+
+IMPORTANT BRAND VARIANTS - SmartyGym is also known as SmartGym, Smart Gym, and Smart-Gym. These are alternate names for the SAME platform (smartygym.com). When generating keywords, include at least one variant (SmartGym, Smart Gym, or Smart-Gym) alongside SmartyGym.
 
 The platform is also accessible via these owned domains that redirect to smartygym.com: i-training.net, smartywod.com, smartylogbook.com, smartywellness.com, smartyworkout.com.
 
@@ -198,7 +201,7 @@ function generateJsonLD(item: ContentItem): object {
         "https://www.youtube.com/@TheSmartyGym",
         "https://www.facebook.com/profile.php?id=61579302997368"
       ],
-      "alternateName": ["SmartyGym", "itraining", "smartywod", "smartylogbook", "smartywellness", "smartyworkout"]
+      "alternateName": ["SmartyGym", "SmartGym", "Smart Gym", "Smart-Gym", "itraining", "smartywod", "smartylogbook", "smartywellness", "smartyworkout"]
     },
     "author": {
       "@type": "Person",
