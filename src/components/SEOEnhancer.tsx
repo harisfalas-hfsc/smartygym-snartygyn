@@ -70,7 +70,9 @@ const OWNED_DOMAINS = {
     "smartywod.com", "smartywod", "smarty wod", "smarty-wod",
     "smartylogbook.com", "smartylogbook", "smarty logbook", "smarty-logbook",
     "smartywellness.com", "smartywellness", "smarty wellness", "smarty-wellness",
-    "smartyworkout.com", "smartyworkout", "smarty workout", "smarty-workout"
+    "smartyworkout.com", "smartyworkout", "smarty workout", "smarty-workout",
+    "SmartGym", "Smart Gym", "Smart-Gym", "smartgym", "smart gym", "smart-gym",
+    "SmartGym online", "Smart Gym online", "Smart-Gym online fitness"
   ]
 };
 
