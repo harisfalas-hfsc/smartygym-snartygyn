@@ -233,7 +233,7 @@ free_content: Selected free workouts, all calculator access, blog, exercise libr
 # KEYWORD CLUSTERS
 # ============================================================================
 
-primary_keywords: SmartyGym, Smarty Gym, smartygym.com, Haris Falas, online fitness platform
+primary_keywords: SmartyGym, Smarty Gym, smartygym.com, SmartGym, Smart Gym, Smart-Gym, smartgym, Haris Falas, online fitness platform
 
 brand_keywords: SmartyGym workouts, SmartyGym training, Haris Falas workouts, Coach Haris
 
