@@ -105,7 +105,7 @@ export default function SmartyCorporate() {
       });
       if (error) throw error;
       if (data?.url) {
-        window.open(data.url, '_blank');
+        openExternal(data.url);
         toast({
           title: "Checkout opened",
           description: "Complete your purchase in the new tab"
