@@ -15,7 +15,6 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
-      injectRegister: "script-defer",
       includeAssets: ["favicon.ico", "smarty-gym-logo.png"],
       manifest: {
         name: "Smarty Gym",
