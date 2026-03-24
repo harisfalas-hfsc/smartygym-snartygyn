@@ -24,6 +24,7 @@ import { useToast } from "@/hooks/use-toast";
 
 import { useAccessControl } from "@/contexts/AccessControlContext";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
+import { isNativePlatform, openExternal } from "@/utils/native";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { AlreadyPremiumCard } from "@/components/pricing/AlreadyPremiumCard";
 
