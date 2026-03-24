@@ -57,7 +57,7 @@ const Contact = () => {
   
   const handleWhatsAppClick = () => {
     const url = `https://wa.me/${phoneNumber.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(whatsappMessage)}`;
-    window.open(url, '_blank');
+    openExternal(url);
   };
 
   const uploadFiles = async (files: File[]) => {
