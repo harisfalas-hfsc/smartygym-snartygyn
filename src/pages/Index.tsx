@@ -18,6 +18,7 @@ import harisPhoto from "@/assets/haris-falas-coach.png";
 import { MobilePhoneIllustration } from "@/components/MobilePhoneIllustration";
 import { useIsPortraitMode } from "@/hooks/useIsPortraitMode";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
+import { openExternal } from "@/utils/native";
 import { cn } from "@/lib/utils";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { ScrollReveal } from "@/components/ScrollReveal";
@@ -368,7 +369,7 @@ const Index = () => {
       });
       if (error) throw error;
       if (data?.url) {
-        window.open(data.url, '_blank');
+        openExternal(data.url);
       }
     } catch (error) {
       console.error('Error creating checkout:', error);

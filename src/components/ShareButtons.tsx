@@ -1,13 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Share2, Mail } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { openExternal } from "@/utils/native";
 
 export const ShareButtons = ({ title, url }: { title: string; url: string }) => {
   const { toast } = useToast();
 
   const handleWhatsAppShare = () => {
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`${title} - ${url}`)}`;
-    window.open(whatsappUrl, '_blank');
+    openExternal(whatsappUrl);
   };
 
   const handleInstagramShare = () => {

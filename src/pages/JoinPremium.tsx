@@ -24,6 +24,7 @@ import { useToast } from "@/hooks/use-toast";
 
 import { useAccessControl } from "@/contexts/AccessControlContext";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
+import { isNativePlatform, openExternal } from "@/utils/native";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { AlreadyPremiumCard } from "@/components/pricing/AlreadyPremiumCard";
 
@@ -78,15 +79,14 @@ export default function JoinPremium() {
       platinum: 'price_1SJ9qGIxQYg9inGKFbgqVRjj'
     };
 
-    // CRITICAL: Open window BEFORE async call to avoid Safari/iOS popup blocker
-    const checkoutWindow = window.open('', '_blank');
+    // In native Capacitor, skip pre-opening a blank window (not needed)
+    const checkoutWindow = isNativePlatform() ? null : window.open('', '_blank');
 
     try {
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: { priceId: priceIds[plan] }
       });
 
-      // Handle already subscribed response from backend
       if (data?.hasActiveSubscription) {
         checkoutWindow?.close();
         toast({
@@ -102,14 +102,18 @@ export default function JoinPremium() {
         throw error;
       }
 
-      if (data?.url && checkoutWindow) {
-        checkoutWindow.location.href = data.url;
+      if (data?.url) {
+        if (isNativePlatform()) {
+          await openExternal(data.url);
+        } else if (checkoutWindow) {
+          checkoutWindow.location.href = data.url;
+        }
         toast({
           title: "Checkout opened",
           description: "Complete your purchase in the opened window",
         });
-      } else if (checkoutWindow) {
-        checkoutWindow.close();
+      } else {
+        checkoutWindow?.close();
         throw new Error("No checkout URL returned");
       }
     } catch (error) {

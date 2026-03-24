@@ -1057,3 +1057,32 @@ textarea {
   outline: 2px solid hsl(var(--primary));
   outline-offset: 2px;
 }
+
+/* ============================================
+   Native App Safe Area Insets (Capacitor)
+   Handles notch, Dynamic Island, home indicator
+   ============================================ */
+html {
+  --sat: env(safe-area-inset-top, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+}
+
+/* Main app wrapper gets safe-area padding */
+body {
+  padding-top: var(--sat);
+  padding-right: var(--sar);
+  padding-bottom: var(--sab);
+  padding-left: var(--sal);
+}
+
+/* Fixed bottom elements need extra bottom padding */
+.safe-area-bottom {
+  padding-bottom: calc(var(--sab) + 0.5rem);
+}
+
+/* Fixed top elements need extra top padding */
+.safe-area-top {
+  padding-top: calc(var(--sat) + 0.5rem);
+}

@@ -1,6 +1,7 @@
 import { MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAccessControl } from "@/hooks/useAccessControl";
+import { openExternal } from "@/utils/native";
 
 export const WhatsAppButton = () => {
   const { userTier, isLoading } = useAccessControl();
@@ -9,7 +10,7 @@ export const WhatsAppButton = () => {
   
   const handleWhatsAppClick = () => {
     const url = `https://wa.me/${phoneNumber.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
-    window.open(url, '_blank');
+    openExternal(url);
   };
 
   // Only show for premium users

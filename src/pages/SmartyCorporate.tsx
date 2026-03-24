@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Building2, Check, Users, Crown, CreditCard, Shield, Headphones, Lightbulb } from "lucide-react";
+import { openExternal } from "@/utils/native";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
@@ -105,7 +106,7 @@ export default function SmartyCorporate() {
       });
       if (error) throw error;
       if (data?.url) {
-        window.open(data.url, '_blank');
+        openExternal(data.url);
         toast({
           title: "Checkout opened",
           description: "Complete your purchase in the new tab"
