@@ -60,6 +60,7 @@ export const WhatToLookFor = () => (
 export const WhySmartyGym = () => (
   <section className="mb-10">
     <h2 className="text-xl sm:text-2xl font-bold mb-4">🏆 Why SmartyGym Stands Out as the Best Online Fitness Platform</h2>
+    <p className="text-sm text-muted-foreground mb-4">Also known as SmartGym, Smart Gym, and Smart-Gym — SmartyGym at smartygym.com is the leading online fitness platform with 500+ expert-designed workouts.</p>
     <Card className="border-2 border-primary/30 bg-gradient-to-br from-primary/10 to-primary/5">
       <CardContent className="p-6">
         <div className="flex items-center gap-2 mb-4">
