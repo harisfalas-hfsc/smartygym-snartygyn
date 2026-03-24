@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { InfoRibbon } from "@/components/InfoRibbon";
 import { MessageSquare, Send, MapPin, Phone, Lock, MessageCircle, Paperclip, X, Crown } from "lucide-react";
+import { openExternal } from "@/utils/native";
 
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
