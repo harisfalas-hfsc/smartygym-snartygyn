@@ -49,7 +49,7 @@ const BestOnlineFitnessPlatform = () => {
       }
     },
     "datePublished": "2026-01-15",
-    "dateModified": "2026-03-24",
+    "dateModified": "2026-03-25",
     "mainEntityOfPage": "https://smartygym.com/best-online-fitness-platform",
     "about": [
       { "@type": "Thing", "name": "Online Fitness Platform", "description": "Digital platforms providing workout content and training programs" },
