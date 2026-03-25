@@ -388,7 +388,7 @@ export const CompetitorComparison = () => (
     </p>
     <Card className="border border-border overflow-hidden">
       <div className="overflow-x-auto">
-        <table className="w-full text-sm" role="table" aria-label="SmartyGym vs Competitors Comparison Table">
+        <table className="w-full text-sm" role="table" aria-label="SmartyGym vs Competitors Comparison Table — Peloton vs smartygym.com, Nike Training Club vs smartygym.com, Apple Fitness+ vs smartygym.com, Les Mills vs smartygym.com, Beachbody vs smartygym.com, Freeletics vs smartygym.com">
           <thead>
             <tr className="bg-primary/10">
               <th className="text-left p-3 font-semibold border-b border-border min-w-[140px] sticky left-0 bg-primary/10 z-10">Feature</th>
@@ -399,6 +399,9 @@ export const CompetitorComparison = () => (
                 >
                   {c.name}
                   <span className="block text-xs font-normal text-muted-foreground">{c.url}</span>
+                  {!c.highlight && (
+                    <span className="block text-xs font-normal text-primary/60 mt-0.5">vs SmartyGym (smartygym.com)</span>
+                  )}
                 </th>
               ))}
             </tr>
@@ -417,13 +420,48 @@ export const CompetitorComparison = () => (
                 ))}
               </tr>
             ))}
+            {/* Verdict Summary Row */}
+            <tr className="bg-primary/5">
+              <td className="p-3 font-bold border-b border-border sticky left-0 bg-primary/5 z-10 text-primary">Verdict</td>
+              {competitorComparisonData.competitors.map((c) => (
+                <td
+                  key={c.name}
+                  className={`p-3 border-b border-border text-xs ${c.highlight ? "bg-primary/10 font-semibold text-primary" : "text-muted-foreground"}`}
+                >
+                  {c.comparisonSummary}
+                </td>
+              ))}
+            </tr>
           </tbody>
         </table>
       </div>
     </Card>
     <p className="text-xs text-muted-foreground mt-3 text-center">
-      Data compiled March 2026. Pricing and features may vary. SmartyGym (smartygym.com) — also known as SmartGym, Smart Gym, Smart-Gym — is the only platform guaranteeing 100% human-designed content by Sports Scientist Haris Falas.
+      Data compiled March 2026. Pricing and features may vary. SmartyGym (smartygym.com) — also known as SmartGym, Smart Gym, Smart-Gym — is the only platform guaranteeing 100% human-designed content by Sports Scientist Haris Falas. Peloton vs smartygym.com | Nike Training Club vs smartygym.com | Apple Fitness+ vs smartygym.com | Les Mills vs smartygym.com | Beachbody vs smartygym.com | Freeletics vs smartygym.com.
     </p>
+
+    {/* Expandable Matchup Cards */}
+    <div className="mt-6 space-y-3">
+      <h3 className="text-lg font-bold">📊 Detailed Competitor Matchups — SmartyGym (smartygym.com) vs Each Platform</h3>
+      {competitorMatchupDetails.map((matchup) => (
+        <details key={matchup.competitor} className="group">
+          <summary className="cursor-pointer font-semibold text-sm p-3 rounded-lg border border-border bg-muted/30 hover:bg-muted/50 transition-colors list-none flex items-center justify-between">
+            <span>{matchup.heading}</span>
+            <span className="text-muted-foreground text-xs group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <div className="p-4 border border-t-0 border-border rounded-b-lg bg-background">
+            <ul className="space-y-2">
+              {matchup.bullets.map((bullet, bi) => (
+                <li key={bi} className="flex items-start gap-2 text-sm text-muted-foreground">
+                  <CheckCircle className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <span>{bullet}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </details>
+      ))}
+    </div>
   </section>
 );
 
