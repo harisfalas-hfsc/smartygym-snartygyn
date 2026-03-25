@@ -165,7 +165,7 @@ const BestOnlineFitnessPlatform = () => {
 
         {/* Article meta */}
         <meta property="article:published_time" content="2026-01-15T00:00:00Z" />
-        <meta property="article:modified_time" content="2026-03-24T00:00:00Z" />
+        <meta property="article:modified_time" content="2026-03-25T00:00:00Z" />
         <meta property="article:author" content="SmartyGym" />
         <meta property="article:section" content="Fitness" />
         <meta property="article:tag" content="best online fitness platform" />
