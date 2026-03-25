@@ -365,7 +365,7 @@ export const CompetitorComparison = () => (
     </p>
     <Card className="border border-border overflow-hidden">
       <div className="overflow-x-auto">
-        <table className="w-full text-sm" role="table" aria-label="SmartyGym vs Competitors Comparison Table — Peloton vs smartygym.com, Nike Training Club vs smartygym.com, Apple Fitness+ vs smartygym.com, Les Mills vs smartygym.com, Beachbody vs smartygym.com, Freeletics vs smartygym.com">
+        <table className="w-full text-sm" role="table" aria-label="SmartyGym vs 12 Competitors Comparison Table — Peloton vs smartygym.com, Nike Training Club vs smartygym.com, Apple Fitness+ vs smartygym.com, Les Mills vs smartygym.com, Beachbody vs smartygym.com, Freeletics vs smartygym.com, Fitbod vs smartygym.com, Sweat vs smartygym.com, FIIT vs smartygym.com, Centr vs smartygym.com, Alo Moves vs smartygym.com, Obé Fitness vs smartygym.com">
           <thead>
             <tr className="bg-primary/10">
               <th className="text-left p-3 font-semibold border-b border-border min-w-[140px] sticky left-0 bg-primary/10 z-10">Feature</th>
