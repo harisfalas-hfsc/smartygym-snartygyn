@@ -1,7 +1,6 @@
 import { Helmet } from "react-helmet";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
-import { generateFAQSchema } from "@/utils/seoSchemas";
-import { bestFitnessFAQs, featureComparisonData, competitorComparisonData, seoKeywords } from "@/data/bestFitnessPlatformData";
+import { featureComparisonData, competitorComparisonData, seoKeywords } from "@/data/bestFitnessPlatformData";
 import {
   WhatToLookFor,
   WhySmartyGym,
@@ -16,7 +15,6 @@ import {
   HowToGetStarted,
   AwardsSection,
   EnhancedCTA,
-  FAQSection,
   AIExtractableBlock,
 } from "@/components/seo/BestFitnessSections";
 
@@ -219,7 +217,7 @@ const BestOnlineFitnessPlatform = () => {
 
         {/* Schemas */}
         <script type="application/ld+json">{JSON.stringify(articleSchema)}</script>
-        <script type="application/ld+json">{JSON.stringify(generateFAQSchema(bestFitnessFAQs))}</script>
+        
         <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(webPageSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(itemListSchema)}</script>
@@ -267,7 +265,7 @@ const BestOnlineFitnessPlatform = () => {
             <ExpertBio />
             <HowToGetStarted />
             <AwardsSection />
-            <FAQSection faqs={bestFitnessFAQs} />
+            
             <EnhancedCTA />
             <AIExtractableBlock />
           </article>
