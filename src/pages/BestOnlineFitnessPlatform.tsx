@@ -217,7 +217,7 @@ const BestOnlineFitnessPlatform = () => {
 
         {/* Schemas */}
         <script type="application/ld+json">{JSON.stringify(articleSchema)}</script>
-        <script type="application/ld+json">{JSON.stringify(generateFAQSchema(bestFitnessFAQs))}</script>
+        
         <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(webPageSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(itemListSchema)}</script>
