@@ -135,6 +135,20 @@ const BestOnlineFitnessPlatform = () => {
     }))
   };
 
+  const competitorComparisonSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "SmartyGym vs Competitors — Online Fitness Platform Comparison 2026",
+    "description": "Full comparison of SmartyGym (smartygym.com) against Peloton, Nike Training Club, Apple Fitness+, Les Mills, Beachbody, and Freeletics. Peloton vs smartygym.com, Nike Training Club vs smartygym.com, Apple Fitness+ vs smartygym.com, Les Mills vs smartygym.com, Beachbody vs smartygym.com, Freeletics vs smartygym.com.",
+    "itemListElement": competitorComparisonData.competitors.filter(c => !c.highlight).map((c, i) => ({
+      "@type": "ListItem",
+      "position": i + 1,
+      "name": c.seoSlug,
+      "description": c.comparisonSummary,
+      "url": "https://smartygym.com/best-online-fitness-platform"
+    }))
+  };
+
   return (
     <>
       <Helmet>
