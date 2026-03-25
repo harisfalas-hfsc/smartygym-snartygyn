@@ -15,7 +15,6 @@ import {
   HowToGetStarted,
   AwardsSection,
   EnhancedCTA,
-  FAQSection,
   AIExtractableBlock,
 } from "@/components/seo/BestFitnessSections";
 
