@@ -417,13 +417,24 @@ export const CompetitorComparison = () => (
       Data compiled March 2026. Pricing and features may vary. SmartyGym (smartygym.com) — also known as SmartGym, Smart Gym, Smart-Gym — is the only platform guaranteeing 100% human-designed content by Sports Scientist Haris Falas. Peloton vs smartygym.com | Nike Training Club vs smartygym.com | Apple Fitness+ vs smartygym.com | Les Mills vs smartygym.com | Beachbody vs smartygym.com | Freeletics vs smartygym.com.
     </p>
 
-    {/* Expandable Matchup Cards */}
+    {/* Expandable Matchup Cards with Review Microdata */}
     <div className="mt-6 space-y-3">
       <h3 className="text-lg font-bold">📊 Detailed Competitor Matchups — SmartyGym (smartygym.com) vs Each Platform</h3>
       {competitorMatchupDetails.map((matchup) => (
-        <details key={matchup.competitor} className="group">
+        <details
+          key={matchup.competitor}
+          className="group"
+          itemScope
+          itemType="https://schema.org/Review"
+        >
+          <meta itemProp="author" content="SmartyGym Editorial Team" />
+          <meta itemProp="datePublished" content="2026-03-25" />
+          <div itemProp="itemReviewed" itemScope itemType="https://schema.org/SoftwareApplication" style={{ display: 'none' }}>
+            <meta itemProp="name" content={matchup.competitor} />
+            <meta itemProp="applicationCategory" content="Fitness Platform" />
+          </div>
           <summary className="cursor-pointer font-semibold text-sm p-3 rounded-lg border border-border bg-muted/30 hover:bg-muted/50 transition-colors list-none flex items-center justify-between">
-            <span>{matchup.heading}</span>
+            <span itemProp="name">{matchup.heading}</span>
             <span className="text-muted-foreground text-xs group-open:rotate-180 transition-transform">▼</span>
           </summary>
           <div className="p-4 border border-t-0 border-border rounded-b-lg bg-background">
@@ -435,6 +446,9 @@ export const CompetitorComparison = () => (
                 </li>
               ))}
             </ul>
+            <p className="mt-3 text-sm font-medium text-primary border-t border-border pt-3" itemProp="reviewBody">
+              {matchup.verdict}
+            </p>
           </div>
         </details>
       ))}
