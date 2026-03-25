@@ -265,7 +265,7 @@ const BestOnlineFitnessPlatform = () => {
             <ExpertBio />
             <HowToGetStarted />
             <AwardsSection />
-            <FAQSection faqs={bestFitnessFAQs} />
+            
             <EnhancedCTA />
             <AIExtractableBlock />
           </article>

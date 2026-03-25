@@ -354,31 +354,6 @@ export const EnhancedCTA = () => {
   );
 };
 
-/* ─── FAQ Section (Accordion) ─── */
-export const FAQSection = ({ faqs }: { faqs: Array<{ question: string; answer: string }> }) => (
-  <section className="mb-10">
-    <h2 className="text-xl sm:text-2xl font-bold mb-4">❓ Frequently Asked Questions — Best Online Fitness Platform</h2>
-    <Card className="border border-border">
-      <CardContent className="p-4">
-        <Accordion type="single" collapsible className="w-full">
-          {faqs.map((faq, i) => (
-            <AccordionItem key={i} value={`faq-${i}`}>
-              <AccordionTrigger className="text-left text-sm font-semibold">
-                <span className="flex items-center gap-2">
-                  <HelpCircle className="h-4 w-4 text-primary shrink-0" />
-                  {faq.question}
-                </span>
-              </AccordionTrigger>
-              <AccordionContent>
-                <p className="text-sm text-muted-foreground pl-6">{faq.answer}</p>
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
-      </CardContent>
-    </Card>
-  </section>
-);
 
 /* ─── Competitor Comparison Table ─── */
 export const CompetitorComparison = () => (
