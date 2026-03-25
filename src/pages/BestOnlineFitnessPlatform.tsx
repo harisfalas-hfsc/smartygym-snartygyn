@@ -6,6 +6,7 @@ import {
   WhatToLookFor,
   WhySmartyGym,
   FeatureComparison,
+  CompetitorComparison,
   WorkoutCategories,
   WorkoutFormats,
   EquipmentOptions,
