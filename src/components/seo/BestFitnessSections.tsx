@@ -361,7 +361,7 @@ export const CompetitorComparison = () => (
   <section className="mb-10">
     <h2 className="text-xl sm:text-2xl font-bold mb-4">⚔️ SmartyGym vs Competitors — Online Fitness Platform Comparison 2026</h2>
     <p className="text-muted-foreground mb-4">
-      How does SmartyGym (smartygym.com) compare to Peloton, Nike Training Club, Apple Fitness+, Les Mills, Beachbody, and Freeletics? See the full side-by-side comparison below. SmartyGym (also known as SmartGym, Smart Gym, Smart-Gym) leads in workout format variety, expert credentials, affordability, and zero AI content.
+      How does SmartyGym (smartygym.com) compare to Peloton, Nike Training Club, Apple Fitness+, Les Mills, Beachbody, Freeletics, Fitbod, Sweat (Kayla Itsines), FIIT, Centr (Chris Hemsworth), Alo Moves, and Obé Fitness? See the full side-by-side comparison of 12 competitors below. SmartyGym (also known as SmartGym, Smart Gym, Smart-Gym) leads in workout format variety, expert credentials, affordability, and zero AI content.
     </p>
     <Card className="border border-border overflow-hidden">
       <div className="overflow-x-auto">
