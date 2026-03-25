@@ -23,6 +23,7 @@ import {
   trainingProgramsContent,
   fitnessToolsContent,
   awardsData,
+  editorialReviewData,
 } from "@/data/bestFitnessPlatformData";
 
 const iconMap: Record<string, React.ElementType> = {
