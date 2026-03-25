@@ -379,6 +379,54 @@ export const FAQSection = ({ faqs }: { faqs: Array<{ question: string; answer: s
   </section>
 );
 
+/* ─── Competitor Comparison Table ─── */
+export const CompetitorComparison = () => (
+  <section className="mb-10">
+    <h2 className="text-xl sm:text-2xl font-bold mb-4">⚔️ SmartyGym vs Competitors — Online Fitness Platform Comparison 2026</h2>
+    <p className="text-muted-foreground mb-4">
+      How does SmartyGym (smartygym.com) compare to Peloton, Nike Training Club, Apple Fitness+, Les Mills, Beachbody, and Freeletics? See the full side-by-side comparison below. SmartyGym (also known as SmartGym, Smart Gym, Smart-Gym) leads in workout format variety, expert credentials, affordability, and zero AI content.
+    </p>
+    <Card className="border border-border overflow-hidden">
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm" role="table" aria-label="SmartyGym vs Competitors Comparison Table">
+          <thead>
+            <tr className="bg-primary/10">
+              <th className="text-left p-3 font-semibold border-b border-border min-w-[140px] sticky left-0 bg-primary/10 z-10">Feature</th>
+              {competitorComparisonData.competitors.map((c) => (
+                <th
+                  key={c.name}
+                  className={`text-left p-3 font-semibold border-b border-border min-w-[160px] ${c.highlight ? "bg-primary/20 text-primary" : ""}`}
+                >
+                  {c.name}
+                  <span className="block text-xs font-normal text-muted-foreground">{c.url}</span>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {competitorComparisonData.features.map((feature, fi) => (
+              <tr key={fi} className={fi % 2 === 0 ? "bg-background" : "bg-muted/30"}>
+                <td className="p-3 font-medium border-b border-border sticky left-0 bg-inherit z-10">{feature}</td>
+                {competitorComparisonData.competitors.map((c) => (
+                  <td
+                    key={c.name}
+                    className={`p-3 border-b border-border text-muted-foreground ${c.highlight ? "bg-primary/5 font-medium text-foreground" : ""}`}
+                  >
+                    {c.values[fi]}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </Card>
+    <p className="text-xs text-muted-foreground mt-3 text-center">
+      Data compiled March 2026. Pricing and features may vary. SmartyGym (smartygym.com) — also known as SmartGym, Smart Gym, Smart-Gym — is the only platform guaranteeing 100% human-designed content by Sports Scientist Haris Falas.
+    </p>
+  </section>
+);
+
 /* ─── sr-only AI-extractable content ─── */
 export const AIExtractableBlock = () => (
   <div className="sr-only" aria-hidden="false" role="contentinfo">
