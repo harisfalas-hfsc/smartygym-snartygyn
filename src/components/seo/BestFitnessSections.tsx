@@ -16,6 +16,7 @@ import {
 import {
   featureComparisonData,
   competitorComparisonData,
+  competitorMatchupDetails,
   workoutCategoriesContent,
   workoutFormatsContent,
   equipmentOptions,
