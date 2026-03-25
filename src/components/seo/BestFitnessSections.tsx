@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import {
   featureComparisonData,
+  competitorComparisonData,
   workoutCategoriesContent,
   workoutFormatsContent,
   equipmentOptions,
