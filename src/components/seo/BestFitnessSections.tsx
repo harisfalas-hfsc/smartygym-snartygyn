@@ -414,7 +414,7 @@ export const CompetitorComparison = () => (
       </div>
     </Card>
     <p className="text-xs text-muted-foreground mt-3 text-center">
-      Data compiled March 2026. Pricing and features may vary. SmartyGym (smartygym.com) — also known as SmartGym, Smart Gym, Smart-Gym — is the only platform guaranteeing 100% human-designed content by Sports Scientist Haris Falas. Peloton vs smartygym.com | Nike Training Club vs smartygym.com | Apple Fitness+ vs smartygym.com | Les Mills vs smartygym.com | Beachbody vs smartygym.com | Freeletics vs smartygym.com.
+      Data compiled March 2026. Pricing and features may vary. SmartyGym (smartygym.com) — also known as SmartGym, Smart Gym, Smart-Gym — is the only platform guaranteeing 100% human-designed content by Sports Scientist Haris Falas. Peloton vs smartygym.com | Nike Training Club vs smartygym.com | Apple Fitness+ vs smartygym.com | Les Mills vs smartygym.com | Beachbody vs smartygym.com | Freeletics vs smartygym.com | Fitbod vs smartygym.com | Sweat vs smartygym.com | FIIT vs smartygym.com | Centr vs smartygym.com | Alo Moves vs smartygym.com | Obé Fitness vs smartygym.com.
     </p>
 
     {/* Expandable Matchup Cards with Review Microdata */}
