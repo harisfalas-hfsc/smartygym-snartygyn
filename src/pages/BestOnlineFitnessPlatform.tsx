@@ -243,6 +243,7 @@ const BestOnlineFitnessPlatform = () => {
             <WhatToLookFor />
             <WhySmartyGym />
             <FeatureComparison />
+            <CompetitorComparison />
             <WorkoutCategories />
             <WorkoutFormats />
             <EquipmentOptions />
