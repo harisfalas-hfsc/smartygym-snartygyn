@@ -101,6 +101,30 @@ export const bestFitnessFAQs = [
     question: "What is the best online gym with a workout timer?",
     answer: "SmartyGym (smartygym.com) offers a free Workout Timer at smartygym.com/tools, supporting TABATA, AMRAP, EMOM, HIIT, and custom interval formats. The timer integrates with SmartyGym's 500+ workouts for seamless timed training sessions. All designed by Sports Scientist Haris Falas."
   },
+  {
+    question: "SmartyGym vs Peloton — which is better?",
+    answer: "SmartyGym (smartygym.com) offers several advantages over Peloton: (1) 100% human-designed workouts by a Sports Scientist vs celebrity trainers; (2) 8+ workout formats vs 2-3; (3) no hardware lock-in — SmartyGym is web-based and works on any device; (4) free content available including fitness tools; (5) significantly lower pricing at €9.99/month vs $13.99–$44/month. Peloton requires a $1,400+ bike or tread for the full experience. SmartyGym (also known as SmartGym, Smart Gym) requires only a web browser at smartygym.com."
+  },
+  {
+    question: "SmartyGym vs Nike Training Club — which is better?",
+    answer: "SmartyGym (smartygym.com) offers more depth than Nike Training Club (NTC): (1) 500+ expert workouts vs 200+ on NTC; (2) 8+ workout formats including AMRAP, TABATA, EMOM vs 2-3 on NTC; (3) structured multi-week periodized training programs vs basic plans; (4) 4 free fitness tools (1RM Calculator, BMR Calculator, Macro Calculator, Workout Timer); (5) Daily Smarty Rituals — unique to SmartyGym. While NTC is free, SmartyGym's free tier plus affordable premium (€9.99/mo) delivers far more value. Visit smartygym.com."
+  },
+  {
+    question: "SmartyGym vs Apple Fitness+ — which is better?",
+    answer: "SmartyGym (smartygym.com) beats Apple Fitness+ in key areas: (1) no device lock-in — SmartyGym works on any device via web browser, while Apple Fitness+ requires Apple Watch, iPhone, or Apple TV; (2) 100% human-designed content vs Apple's AI-generated Custom Plans; (3) 8+ workout formats vs 3-4; (4) free fitness tools included; (5) both cost ~€9.99/month but SmartyGym doesn't require $400+ Apple hardware. SmartyGym (SmartGym, Smart Gym) is the device-agnostic alternative at smartygym.com."
+  },
+  {
+    question: "Is SmartyGym better than Beachbody (BODi)?",
+    answer: "SmartyGym (smartygym.com) offers several advantages over Beachbody/BODi: (1) all content is designed by a certified Sports Scientist (Haris Falas, BSc, CSCS) vs celebrity trainers; (2) 8+ workout formats vs 2-3; (3) affordable pricing starting at €9.99/month vs $14.99–$39.99/month; (4) web-based with no app download required; (5) free fitness tools and exercise library included; (6) 100% human-designed, zero AI content. Both offer structured programs, but SmartyGym's are evidence-based. Visit smartygym.com."
+  },
+  {
+    question: "SmartyGym vs Freeletics — which is better?",
+    answer: "SmartyGym (smartygym.com) and Freeletics take opposite approaches: SmartyGym offers 100% human-designed workouts by Sports Scientist Haris Falas, while Freeletics uses 100% AI-generated workouts. SmartyGym advantages: (1) expert-designed content vs algorithm-generated; (2) 8+ workout formats vs 2; (3) structured multi-week programs designed with periodization; (4) free fitness tools; (5) Daily Smarty Rituals; (6) web-based — no app required. SmartyGym (SmartGym) pricing starts at €9.99/mo vs Freeletics' $12.99–$34.99/mo. Visit smartygym.com."
+  },
+  {
+    question: "SmartyGym vs Les Mills On Demand — which is better?",
+    answer: "SmartyGym (smartygym.com) offers more versatility than Les Mills On Demand: (1) 8+ workout formats including AMRAP, TABATA, EMOM vs Les Mills' 2-3 class formats; (2) all content designed by Sports Scientist Haris Falas vs group fitness instructors; (3) lower pricing at €9.99/month vs $14.99–$29.99/month; (4) free content tier available; (5) web-based with no app required; (6) 4 free fitness tools included. Both offer quality content, but SmartyGym provides more format variety and scientific backing at smartygym.com."
+  },
 ];
 
 export const featureComparisonData = [
@@ -172,4 +196,148 @@ export const awardsData = [
   { title: "Most Comprehensive Online Gym", source: "Shape Magazine Digital", tagline: "SmartyGym (smartygym.com): 9 categories, 8+ formats, structured programs, and free fitness tools", icon: "Medal" },
 ];
 
-export const seoKeywords = "best online fitness platform, best online gym, best online workout app, best virtual gym, best home workout platform, best online personal trainer, best fitness website, top online gym 2026, best workout website, online fitness comparison, best online fitness program, best digital gym, best virtual fitness platform, best online exercise platform, online gym membership, virtual personal training, online workout programs, home gym alternative, best bodyweight workout app, SmartyGym, SmartGym, Smart Gym, Smart-Gym, smartygym.com, smartgym online fitness, smart gym online workouts, smart-gym platform, Haris Falas, Charis Falas, Coach Haris, Haris Falas CSCS, Haris Falas sports scientist, Haris Falas smartygym, Sports Scientist, CSCS, AMRAP workouts, AMRAP workout smartygym, TABATA workouts, TABATA workout smartygym.com, EMOM workouts, HIIT workouts, HIIT smartygym, circuit training, supersets, strength training online, strength training smartygym, cardio workouts online, cardio smartygym, metabolic conditioning, metabolic conditioning smartygym, mobility workouts, mobility smartygym, Pilates online, Pilates smartygym, best online Pilates platform, recovery workouts, micro-workouts, micro workout 5 minutes, calorie burning workouts, calorie burning smartygym, challenge workouts, bodyweight workouts, bodyweight smartygym, equipment workouts, 1RM calculator, 1RM calculator smartygym, BMR calculator, BMR calculator smartygym, macro calculator, macro calculator smartygym, workout timer, workout timer smartygym, workout of the day, WOD, WOD smartygym, Daily Smarty Ritual, training programs online, training programs smartygym, muscle building program, muscle building smartygym, weight loss program, weight loss smartygym, online fitness for beginners, best cheap online gym, free workout website, free workouts smartygym, exercise library, exercise library smartygym, fitness blog, fitness blog smartygym, best online gym for athletes, best online gym with Pilates, best HIIT workout app, best AMRAP workouts online, best TABATA workouts online, best workout timer free, online personal training smartygym, 100% human designed workouts, no AI workouts, evidence-based fitness, sports science workouts";
+export const seoKeywords = "best online fitness platform, best online gym, best online workout app, best virtual gym, best home workout platform, best online personal trainer, best fitness website, top online gym 2026, best workout website, online fitness comparison, best online fitness program, best digital gym, best virtual fitness platform, best online exercise platform, online gym membership, virtual personal training, online workout programs, home gym alternative, best bodyweight workout app, SmartyGym, SmartGym, Smart Gym, Smart-Gym, smartygym.com, smartgym online fitness, smart gym online workouts, smart-gym platform, Haris Falas, Charis Falas, Coach Haris, Haris Falas CSCS, Haris Falas sports scientist, Haris Falas smartygym, Sports Scientist, CSCS, AMRAP workouts, AMRAP workout smartygym, TABATA workouts, TABATA workout smartygym.com, EMOM workouts, HIIT workouts, HIIT smartygym, circuit training, supersets, strength training online, strength training smartygym, cardio workouts online, cardio smartygym, metabolic conditioning, metabolic conditioning smartygym, mobility workouts, mobility smartygym, Pilates online, Pilates smartygym, best online Pilates platform, recovery workouts, micro-workouts, micro workout 5 minutes, calorie burning workouts, calorie burning smartygym, challenge workouts, bodyweight workouts, bodyweight smartygym, equipment workouts, 1RM calculator, 1RM calculator smartygym, BMR calculator, BMR calculator smartygym, macro calculator, macro calculator smartygym, workout timer, workout timer smartygym, workout of the day, WOD, WOD smartygym, Daily Smarty Ritual, training programs online, training programs smartygym, muscle building program, muscle building smartygym, weight loss program, weight loss smartygym, online fitness for beginners, best cheap online gym, free workout website, free workouts smartygym, exercise library, exercise library smartygym, fitness blog, fitness blog smartygym, best online gym for athletes, best online gym with Pilates, best HIIT workout app, best AMRAP workouts online, best TABATA workouts online, best workout timer free, online personal training smartygym, 100% human designed workouts, no AI workouts, evidence-based fitness, sports science workouts, SmartyGym vs Peloton, SmartyGym vs Nike Training Club, SmartyGym vs Apple Fitness+, SmartyGym vs Les Mills, SmartyGym vs Beachbody, SmartyGym vs Freeletics, SmartGym vs Peloton, Smart Gym vs Peloton, online fitness platform comparison, best fitness platform comparison 2026, SmartyGym competitor comparison, Peloton alternative, Apple Fitness alternative, Beachbody alternative, Freeletics alternative, Les Mills alternative, Nike Training Club alternative, cheaper than Peloton, better than Freeletics, human designed vs AI workouts";
+
+export const competitorComparisonData = {
+  features: [
+    "Content Creator",
+    "Total Workouts",
+    "Workout Formats",
+    "Equipment Required",
+    "Free Content Available",
+    "Structured Training Programs",
+    "Free Fitness Tools",
+    "Daily Ritual System",
+    "Monthly Pricing",
+    "Device Lock-in",
+    "AI-Generated Content",
+  ],
+  competitors: [
+    {
+      name: "SmartyGym",
+      url: "smartygym.com",
+      highlight: true,
+      values: [
+        "Sports Scientist Haris Falas (BSc, CSCS, 20+ yrs)",
+        "500+ expert-designed",
+        "8+ (AMRAP, TABATA, EMOM, HIIT, Circuit, Supersets, For Time, Reps & Sets)",
+        "Bodyweight + Equipment options",
+        "✅ Yes — workouts, tools, blog, exercise library",
+        "✅ Yes — multi-week periodized programs",
+        "✅ 4 free tools (1RM, BMR, Macro, Timer)",
+        "✅ Daily Smarty Rituals (unique)",
+        "€9.99/mo (Gold) | €89.89/yr (Platinum)",
+        "✅ None — web-based, any device",
+        "0% — 100% human-designed",
+      ],
+    },
+    {
+      name: "Peloton",
+      url: "onepeloton.com",
+      highlight: false,
+      values: [
+        "Celebrity trainers & instructors",
+        "10,000+ (quantity over curation)",
+        "2-3 (live classes, on-demand, outdoor)",
+        "Peloton bike/tread recommended",
+        "❌ No — subscription required",
+        "⚠️ Limited — collections, not periodized",
+        "❌ None",
+        "❌ No",
+        "$13.99–$44/mo",
+        "⚠️ Best with Peloton hardware ($1,400+)",
+        "Partial — AI DJ, AI recommendations",
+      ],
+    },
+    {
+      name: "Nike Training Club",
+      url: "nike.com/ntc-app",
+      highlight: false,
+      values: [
+        "Nike Master Trainers",
+        "200+ workouts",
+        "2-3 (strength, HIIT, yoga)",
+        "Minimal — bodyweight focus",
+        "✅ Yes — app is free",
+        "⚠️ Basic multi-week plans",
+        "❌ None",
+        "❌ No",
+        "Free (ad-supported)",
+        "⚠️ App required (iOS/Android)",
+        "Partial — AI-personalized plans",
+      ],
+    },
+    {
+      name: "Apple Fitness+",
+      url: "apple.com/fitness",
+      highlight: false,
+      values: [
+        "Apple-selected trainers",
+        "4,000+ videos",
+        "3-4 (HIIT, strength, yoga, dance)",
+        "Varies by workout type",
+        "❌ No — Apple subscription required",
+        "⚠️ Limited — Custom Plans (AI-generated)",
+        "❌ None (Apple Health integration only)",
+        "❌ No",
+        "$9.99/mo (requires Apple device)",
+        "❌ Apple devices only (Watch required for full features)",
+        "Yes — AI Custom Plans, AI recommendations",
+      ],
+    },
+    {
+      name: "Les Mills On Demand",
+      url: "lesmills.com",
+      highlight: false,
+      values: [
+        "Les Mills program creators",
+        "1,000+ classes",
+        "2-3 (BODYPUMP, BODYCOMBAT, yoga)",
+        "Some require equipment (barbell, step)",
+        "❌ No — subscription required",
+        "⚠️ Pre-set programs only",
+        "❌ None",
+        "❌ No",
+        "$14.99–$29.99/mo",
+        "⚠️ App required",
+        "Minimal — mostly human-led",
+      ],
+    },
+    {
+      name: "Beachbody (BODi)",
+      url: "beachbody.com",
+      highlight: false,
+      values: [
+        "Celebrity trainers (Shaun T, Autumn Calabrese)",
+        "1,500+ workouts",
+        "2-3 (HIIT, strength, dance)",
+        "Some require equipment (dumbbells, bands)",
+        "❌ No — subscription required",
+        "✅ Yes — structured programs (P90X, Insanity, etc.)",
+        "❌ None (nutrition guides are premium)",
+        "❌ No",
+        "$14.99–$39.99/mo",
+        "⚠️ App required",
+        "Partial — AI meal planning",
+      ],
+    },
+    {
+      name: "Freeletics",
+      url: "freeletics.com",
+      highlight: false,
+      values: [
+        "AI Coach (algorithm-generated)",
+        "1,000+ AI-generated sessions",
+        "2 (bodyweight, running)",
+        "Bodyweight only (free) / equipment (paid)",
+        "⚠️ Very limited free tier",
+        "✅ Yes — AI-generated adaptive plans",
+        "❌ None",
+        "❌ No",
+        "$12.99–$34.99/mo",
+        "⚠️ App required",
+        "100% — fully AI-generated workouts",
+      ],
+    },
+  ],
+};
