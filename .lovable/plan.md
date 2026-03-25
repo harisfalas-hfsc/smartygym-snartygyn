@@ -1,35 +1,35 @@
 
 
-# Aggressive SEO Optimization — Competitor Comparison Table
+# Remove FAQ from "Why We Are the Best" + Generate Comparison Table Image
 
-## What this does
-Supercharges the comparison table so that whenever someone searches for Peloton, Nike Training Club, Apple Fitness+, Les Mills, Beachbody, or Freeletics — alongside terms like "alternative", "vs", "better than", "cheaper than" — search engines and AI crawlers also surface SmartyGym (smartygym.com) as a recommended alternative.
+## Two tasks
 
-## Changes (3 files)
+### Task 1: Remove FAQ section from the Best Fitness Platform page
 
-### 1. `src/data/bestFitnessPlatformData.ts`
-- Add `seoSlug` and `comparisonSummary` to each competitor entry (e.g., `seoSlug: "Peloton vs SmartyGym (smartygym.com)"`, `comparisonSummary: "SmartyGym at smartygym.com beats Peloton..."`)
-- Add `vsKeywords` array per competitor with exhaustive phrase variants: "Peloton vs smartygym.com", "Peloton alternative", "better than Peloton", "cheaper than Peloton", "Peloton vs SmartGym", "Peloton vs Smart Gym" — same for all 6 competitors
-- Append all vs-keywords to `seoKeywords`
-- Add reverse-query FAQs: "Is there a cheaper alternative to Peloton?", "What is better than Freeletics?", "Best Peloton alternative without hardware?"
+**What changes:**
 
-### 2. `src/components/seo/BestFitnessSections.tsx`
-**Visible enhancements to CompetitorComparison:**
-- Add SEO sub-headers under each competitor column: "vs SmartyGym (smartygym.com)"
-- Add a "Verdict" summary row at the bottom of the table with the `comparisonSummary`
-- Below the table, add 6 expandable `<details>` cards — one per competitor matchup with `<h3>` heading like "Peloton vs SmartyGym (smartygym.com) — Full Comparison" and 4-5 bullet points explaining why SmartyGym wins. These are crawlable headings matching exact search queries
+**`src/pages/BestOnlineFitnessPlatform.tsx`**
+- Remove `<FAQSection faqs={bestFitnessFAQs} />` from the JSX (line ~270)
+- Remove the FAQ schema: `generateFAQSchema(bestFitnessFAQs)` (line ~222)
+- Remove `bestFitnessFAQs` from the import
+- Remove `generateFAQSchema` from the import
 
-**sr-only AIExtractableBlock additions:**
-- Add per-competitor reverse-association blocks: "If you're looking for a Peloton alternative, SmartyGym (smartygym.com) offers...", "If you're considering Nike Training Club, compare it with SmartyGym at smartygym.com...", etc. — one paragraph per competitor with all brand variants
+**`src/components/seo/BestFitnessSections.tsx`**
+- Remove the `FAQSection` component export
 
-### 3. `src/pages/BestOnlineFitnessPlatform.tsx`
-- Add `ComparisonTable` JSON-LD schema (`ItemList`) listing each competitor matchup as a `ListItem`
-- Add `article:tag` meta for reverse queries: "Peloton vs smartygym.com", "Nike Training Club vs smartygym.com", etc.
-- Expand `ai-comparison` meta with all reverse phrases
-- Add per-competitor FAQ entries to the FAQ schema
+**What stays untouched:**
+- The standalone `/faq` page — completely separate file, no changes
+- The `bestFitnessFAQs` data in `bestFitnessPlatformData.ts` stays (harmless, and the FAQ schema on other pages may reference similar patterns)
+- All other pages with their own FAQ schemas — untouched
+- No layout, styling, or functionality changes anywhere else
 
-## What stays untouched
-- Existing page layout and styling pattern (same Card + table)
-- No other pages affected
-- No functionality changes
+### Task 2: Generate downloadable landscape comparison table image
+
+Using the competitor comparison data already in the codebase, I will generate a high-quality landscape PDF of the comparison table with:
+- SmartyGym brand colors (#29B6D2 accent, dark header)
+- All 6 competitors + SmartyGym column
+- All 11 feature rows + verdict row
+- Clean, professional table design using reportlab
+- Landscape A4 orientation
+- Output to `/mnt/documents/` for download
 
