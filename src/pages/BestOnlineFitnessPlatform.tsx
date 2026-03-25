@@ -1,7 +1,6 @@
 import { Helmet } from "react-helmet";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
-import { generateFAQSchema } from "@/utils/seoSchemas";
-import { bestFitnessFAQs, featureComparisonData, competitorComparisonData, seoKeywords } from "@/data/bestFitnessPlatformData";
+import { featureComparisonData, competitorComparisonData, seoKeywords } from "@/data/bestFitnessPlatformData";
 import {
   WhatToLookFor,
   WhySmartyGym,
