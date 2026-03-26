@@ -323,8 +323,30 @@ export const TestimonialsSection = ({
         </div>
       )}
       {userTestimonial && (
-        <div className="text-xs text-muted-foreground italic">
-          You have already shared your testimonial
+        <div className="space-y-2">
+          <div className="text-xs text-muted-foreground italic">
+            You have already shared your testimonial
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleEdit(userTestimonial)}
+              className="h-8"
+            >
+              <Pencil className="h-3.5 w-3.5 mr-1" />
+              Edit My Testimonial
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => handleDeleteClick(userTestimonial.id)}
+              className="h-8"
+            >
+              <Trash2 className="h-3.5 w-3.5 mr-1" />
+              Delete My Testimonial
+            </Button>
+          </div>
         </div>
       )}
     </div>
@@ -335,28 +357,30 @@ export const TestimonialsSection = ({
     return (
       <div className="flex items-center gap-1 ml-2">
         <Button
-          variant="ghost"
+          variant="outline"
           size="sm"
           onClick={(e) => {
             e.stopPropagation();
             if (closeModal) setShowViewAllModal(false);
             handleEdit(testimonial);
           }}
-          className="h-7 w-7 p-0 hover:bg-primary/10"
+          className="h-7 px-2 text-xs"
         >
-          <Pencil className="h-3 w-3 text-muted-foreground hover:text-primary" />
+          <Pencil className="h-3 w-3 mr-1" />
+          Edit
         </Button>
         <Button
-          variant="ghost"
+          variant="destructive"
           size="sm"
           onClick={(e) => {
             e.stopPropagation();
             if (closeModal) setShowViewAllModal(false);
             handleDeleteClick(testimonial.id);
           }}
-          className="h-7 w-7 p-0 hover:bg-destructive/10"
+          className="h-7 px-2 text-xs"
         >
-          <Trash2 className="h-3 w-3 text-muted-foreground hover:text-destructive" />
+          <Trash2 className="h-3 w-3 mr-1" />
+          Delete
         </Button>
       </div>
     );
@@ -430,6 +454,9 @@ export const TestimonialsSection = ({
                 <Quote className="h-5 w-5 text-primary" />
                 All Community Testimonials
               </DialogTitle>
+              <DialogDescription>
+                Browse every testimonial shared by the community.
+              </DialogDescription>
             </DialogHeader>
             <ScrollArea className="h-[60vh] pr-4">
               <div className="space-y-3">
@@ -555,6 +582,9 @@ export const TestimonialsSection = ({
                 <Quote className="h-5 w-5 text-primary" />
                 All Community Testimonials
               </DialogTitle>
+              <DialogDescription>
+                Browse every testimonial shared by the community.
+              </DialogDescription>
             </DialogHeader>
             <ScrollArea className="h-[60vh] pr-4">
               <div className="space-y-3">
@@ -596,28 +626,7 @@ export const TestimonialsSection = ({
         </CardTitle>
         
         {/* Write testimonial button or status message - on its own line */}
-        <div className="mt-3">
-          {isPremium && !userTestimonial && (
-            <Button
-              onClick={() => setShowForm(true)}
-              className="w-full sm:w-auto"
-              size="sm"
-            >
-              <Pencil className="h-4 w-4 mr-2" />
-              Write Your Testimonial
-            </Button>
-          )}
-          {!isPremium && !userTestimonial && (
-            <div className="text-xs text-muted-foreground italic">
-              Premium members can share their testimonials
-            </div>
-          )}
-          {userTestimonial && (
-            <div className="text-xs text-muted-foreground italic">
-              You have already shared your testimonial
-            </div>
-          )}
-        </div>
+        <div className="mt-3">{renderWriteButton()}</div>
         
         {/* CompactFilters - below the button, matching other sections */}
         <div className="mt-3">
@@ -735,6 +744,9 @@ export const TestimonialsSection = ({
               <Quote className="h-5 w-5 text-primary" />
               All Community Testimonials
             </DialogTitle>
+            <DialogDescription>
+              Browse every testimonial shared by the community.
+            </DialogDescription>
           </DialogHeader>
           <ScrollArea className="h-[60vh] pr-4">
             <div className="space-y-3 md:space-y-4">
