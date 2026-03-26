@@ -44,7 +44,6 @@ export const TestimonialsSection = ({
   onSortOrderChange
 }: TestimonialsSectionProps) => {
   const { user, userTier } = useAccessControl();
-  const isPremium = userTier === "premium";
   
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -63,6 +62,7 @@ export const TestimonialsSection = ({
   
   // User's own testimonial
   const [userTestimonial, setUserTestimonial] = useState<Testimonial | null>(null);
+  const [canWriteTestimonial, setCanWriteTestimonial] = useState(false);
   
   // Delete confirmation
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -88,11 +88,63 @@ export const TestimonialsSection = ({
   }, [sortOrder, internalSortOrder]);
 
   useEffect(() => {
-    if (user?.id && testimonials.length > 0) {
-      const found = testimonials.find(t => t.user_id === user.id);
-      setUserTestimonial(found || null);
+    const resolveWriteAccess = async () => {
+      if (!user?.id) {
+        setCanWriteTestimonial(false);
+        return;
+      }
+
+      if (userTier === "premium") {
+        setCanWriteTestimonial(true);
+        return;
+      }
+
+      try {
+        const [{ data: premiumByFunction }, { data: adminRole }] = await Promise.all([
+          supabase.rpc("has_premium_subscription", { check_user_id: user.id }),
+          supabase
+            .from("user_roles")
+            .select("role")
+            .eq("user_id", user.id)
+            .eq("role", "admin")
+            .maybeSingle(),
+        ]);
+
+        setCanWriteTestimonial(Boolean(premiumByFunction) || Boolean(adminRole));
+      } catch (error) {
+        console.error("Error resolving testimonial write access:", error);
+        setCanWriteTestimonial(false);
+      }
+    };
+
+    resolveWriteAccess();
+  }, [user?.id, userTier]);
+
+  useEffect(() => {
+    if (!user?.id) {
+      setUserTestimonial(null);
+      return;
     }
+
+    fetchUserTestimonial(user.id);
   }, [user?.id, testimonials]);
+
+
+  const fetchUserTestimonial = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("testimonials")
+        .select("*")
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      if (error && error.code !== "PGRST116") throw error;
+      setUserTestimonial(data || null);
+    } catch (error) {
+      console.error("Error fetching user testimonial:", error);
+      setUserTestimonial(null);
+    }
+  };
 
 
   const fetchTestimonials = async () => {
@@ -162,6 +214,7 @@ export const TestimonialsSection = ({
 
       resetForm();
       fetchTestimonials();
+      fetchUserTestimonial(user.id);
     } catch (error: any) {
       console.error("Error submitting testimonial:", error);
       toast.error(error.message || "Failed to submit testimonial");
@@ -194,6 +247,9 @@ export const TestimonialsSection = ({
       if (error) throw error;
       toast.success("Testimonial deleted successfully");
       fetchTestimonials();
+      if (user?.id) {
+        fetchUserTestimonial(user.id);
+      }
     } catch (error: any) {
       console.error("Error deleting testimonial:", error);
       toast.error("Failed to delete testimonial");
@@ -307,22 +363,12 @@ export const TestimonialsSection = ({
 
   const renderWriteButton = () => (
     <div className="mb-3">
-      {isPremium && !userTestimonial && (
-        <Button
-          onClick={() => setShowForm(true)}
-          className="w-full sm:w-auto"
-          size="sm"
-        >
-          <Pencil className="h-4 w-4 mr-2" />
-          Write Your Testimonial
-        </Button>
-      )}
-      {!isPremium && user && !userTestimonial && (
+      {!user && (
         <div className="text-xs text-muted-foreground italic">
-          Premium members can share their testimonials
+          Sign in with your premium account to write or manage your testimonial.
         </div>
       )}
-      {userTestimonial && (
+      {user && userTestimonial && (
         <div className="space-y-2">
           <div className="text-xs text-muted-foreground italic">
             You have already shared your testimonial
@@ -347,6 +393,21 @@ export const TestimonialsSection = ({
               Delete My Testimonial
             </Button>
           </div>
+        </div>
+      )}
+      {user && !userTestimonial && canWriteTestimonial && (
+        <Button
+          onClick={() => setShowForm(true)}
+          className="w-full sm:w-auto"
+          size="sm"
+        >
+          <Pencil className="h-4 w-4 mr-2" />
+          Write Your Testimonial
+        </Button>
+      )}
+      {user && !userTestimonial && !canWriteTestimonial && (
+        <div className="text-xs text-muted-foreground italic">
+          Premium members can share their testimonials
         </div>
       )}
     </div>
