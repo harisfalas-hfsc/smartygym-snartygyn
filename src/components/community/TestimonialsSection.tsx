@@ -487,6 +487,7 @@ export const TestimonialsSection = ({
           />
         </CardHeader>
         <CardContent className="p-3 flex-1 overflow-auto">
+          {renderWriteButton()}
           {isLoading ? (
             <div className="space-y-2">
               {[...Array(6)].map((_, i) => (
@@ -517,6 +518,7 @@ export const TestimonialsSection = ({
                           </span>
                           {renderStars(testimonial.rating)}
                         </div>
+                        {renderOwnerControls(testimonial)}
                       </div>
                       <p className={`text-xs leading-relaxed text-foreground/90 ${isExpanded ? '' : 'line-clamp-2'}`}>
                         "{testimonial.testimonial_text}"
@@ -561,10 +563,13 @@ export const TestimonialsSection = ({
                     key={testimonial.id}
                     className="p-3 rounded-lg border-2 border-primary/20 bg-gradient-to-r from-background to-primary/5"
                   >
-                    <div className="flex items-center gap-2 mb-2">
-                      <User className="h-4 w-4 text-primary flex-shrink-0" />
-                      <span className="font-semibold text-sm">{testimonial.display_name}</span>
-                      {renderStars(testimonial.rating)}
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <div className="flex items-center gap-2">
+                        <User className="h-4 w-4 text-primary flex-shrink-0" />
+                        <span className="font-semibold text-sm">{testimonial.display_name}</span>
+                        {renderStars(testimonial.rating)}
+                      </div>
+                      {renderOwnerControls(testimonial, true)}
                     </div>
                     <p className="text-sm leading-relaxed text-foreground/90">
                       "{testimonial.testimonial_text}"
@@ -575,6 +580,9 @@ export const TestimonialsSection = ({
             </ScrollArea>
           </DialogContent>
         </Dialog>
+
+        {renderFormDialog()}
+        {renderDeleteDialog()}
       </Card>
     );
   }
