@@ -104,10 +104,11 @@ export const ArticleDetail = () => {
       </Helmet>
 
       <SEOEnhancer
-        page="blog-article"
-        title={article.title}
-        description={article.excerpt}
-        keywords={[article.category, "SmartyGym", "SmartGym", "Haris Falas", "fitness", "health"]}
+        contentType="blog-article"
+        entities={[article.author_name || "Haris Falas", "SmartyGym", article.category]}
+        topics={[article.category, "fitness", "health", "wellness"]}
+        aiKeywords={[article.category, "SmartyGym", "SmartGym", "Smart-Gym", "Haris Falas"]}
+        pageType="article"
       />
 
       <div className="min-h-screen bg-background py-2">
