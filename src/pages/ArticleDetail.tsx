@@ -57,6 +57,24 @@ export const ArticleDetail = () => {
   }
 
   const articleUrl = `https://smartygym.com/blog/${article.slug}`;
+  const publishedDate = new Date(article.published_at || article.created_at).toISOString();
+  const modifiedDate = new Date(article.updated_at || article.created_at).toISOString();
+
+  const articleSchema = generateArticleSchema({
+    title: article.title,
+    description: article.excerpt,
+    datePublished: publishedDate,
+    dateModified: modifiedDate,
+    imageUrl: article.image_url || undefined,
+    url: `/blog/${article.slug}`,
+    category: article.category,
+  });
+
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: "Home", url: "/" },
+    { name: "Blog", url: "/blog" },
+    { name: article.title, url: `/blog/${article.slug}` },
+  ]);
 
   return (
     <>
@@ -64,12 +82,33 @@ export const ArticleDetail = () => {
         <title>{article.title} | SmartyGym Blog</title>
         <meta name="description" content={article.excerpt} />
         <link rel="canonical" href={articleUrl} />
+        <meta name="keywords" content={`${article.category}, SmartyGym, SmartGym, Smart-Gym, Haris Falas, fitness, health, ${article.title}`} />
         <meta property="og:type" content="article" />
         <meta property="og:url" content={articleUrl} />
         <meta property="og:title" content={article.title} />
         <meta property="og:description" content={article.excerpt} />
+        <meta property="og:site_name" content="SmartyGym" />
         {article.image_url && <meta property="og:image" content={article.image_url} />}
+        {article.image_url && <meta property="og:image:width" content="1200" />}
+        {article.image_url && <meta property="og:image:height" content="630" />}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={article.title} />
+        <meta name="twitter:description" content={article.excerpt} />
+        {article.image_url && <meta name="twitter:image" content={article.image_url} />}
+        <meta property="article:published_time" content={publishedDate} />
+        <meta property="article:modified_time" content={modifiedDate} />
+        <meta property="article:section" content={article.category} />
+        {article.author_name && <meta property="article:author" content={article.author_name} />}
+        <script type="application/ld+json">{JSON.stringify(articleSchema)}</script>
+        <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>
       </Helmet>
+
+      <SEOEnhancer
+        page="blog-article"
+        title={article.title}
+        description={article.excerpt}
+        keywords={[article.category, "SmartyGym", "SmartGym", "Haris Falas", "fitness", "health"]}
+      />
 
       <div className="min-h-screen bg-background py-2">
         <article className="container mx-auto px-4 max-w-4xl">
