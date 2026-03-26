@@ -14,6 +14,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { ContentLoadingSkeleton } from "@/components/ContentLoadingSkeleton";
 import { ReaderModeDialog } from "@/components/ReaderModeDialog";
+import { generateArticleSchema, generateBreadcrumbSchema } from "@/utils/seoHelpers";
+import { SEOEnhancer } from "@/components/SEOEnhancer";
 
 
 export const ArticleDetail = () => {
