@@ -238,11 +238,135 @@ export const TestimonialsSection = ({
     return testimonials.slice(0, 6);
   };
 
+  // Shared dialogs JSX - rendered in all modes
+  const renderFormDialog = () => (
+    <Dialog open={showForm} onOpenChange={(open) => !open && resetForm()}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>
+            {editingId ? "Edit Your Testimonial" : "Share Your Experience"}
+          </DialogTitle>
+          <DialogDescription>
+            Tell us about your experience with SmartyGym. Your testimonial will be visible to everyone.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4 py-4">
+          <div>
+            <label className="text-sm font-medium mb-2 block">Your Rating</label>
+            <div className="flex items-center gap-2">
+              {renderStars(formRating, true, setFormRating)}
+              <span className="text-sm text-muted-foreground ml-2">{formRating}/5</span>
+            </div>
+          </div>
+          <div>
+            <label className="text-sm font-medium mb-2 block">Your Testimonial</label>
+            <Textarea
+              value={formText}
+              onChange={(e) => setFormText(e.target.value)}
+              placeholder="Share your experience with SmartyGym..."
+              className="min-h-[120px] resize-none"
+              maxLength={500}
+            />
+            <p className="text-xs text-muted-foreground mt-1 text-right">
+              {formText.length}/500
+            </p>
+          </div>
+        </div>
+        <DialogFooter className="flex flex-col sm:flex-row gap-2">
+          <Button variant="outline" onClick={resetForm} disabled={isSubmitting}>
+            Cancel
+          </Button>
+          <Button onClick={handleSubmit} disabled={isSubmitting || !formText.trim()}>
+            {isSubmitting ? "Submitting..." : editingId ? "Update" : "Submit"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+
+  const renderDeleteDialog = () => (
+    <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+      <DialogContent className="sm:max-w-sm">
+        <DialogHeader>
+          <DialogTitle>Delete Testimonial</DialogTitle>
+          <DialogDescription>
+            Are you sure you want to delete your testimonial? This action cannot be undone.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter className="flex flex-col sm:flex-row gap-2">
+          <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+            Cancel
+          </Button>
+          <Button variant="destructive" onClick={handleDeleteConfirm}>
+            Delete
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+
+  const renderWriteButton = () => (
+    <div className="mb-3">
+      {isPremium && !userTestimonial && (
+        <Button
+          onClick={() => setShowForm(true)}
+          className="w-full sm:w-auto"
+          size="sm"
+        >
+          <Pencil className="h-4 w-4 mr-2" />
+          Write Your Testimonial
+        </Button>
+      )}
+      {!isPremium && user && !userTestimonial && (
+        <div className="text-xs text-muted-foreground italic">
+          Premium members can share their testimonials
+        </div>
+      )}
+      {userTestimonial && (
+        <div className="text-xs text-muted-foreground italic">
+          You have already shared your testimonial
+        </div>
+      )}
+    </div>
+  );
+
+  const renderOwnerControls = (testimonial: Testimonial, closeModal = false) => {
+    if (user?.id !== testimonial.user_id) return null;
+    return (
+      <div className="flex items-center gap-1 ml-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (closeModal) setShowViewAllModal(false);
+            handleEdit(testimonial);
+          }}
+          className="h-7 w-7 p-0 hover:bg-primary/10"
+        >
+          <Pencil className="h-3 w-3 text-muted-foreground hover:text-primary" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (closeModal) setShowViewAllModal(false);
+            handleDeleteClick(testimonial.id);
+          }}
+          className="h-7 w-7 p-0 hover:bg-destructive/10"
+        >
+          <Trash2 className="h-3 w-3 text-muted-foreground hover:text-destructive" />
+        </Button>
+      </div>
+    );
+  };
+
   // Desktop carousel mode - content only, no Card wrapper (rendered inside parent Card)
-  // Filter is now controlled by parent via externalSortOrder prop
   if (desktopCarouselMode) {
     return (
       <>
+        {renderWriteButton()}
         {isLoading ? (
           <div className="space-y-4">
             {[...Array(6)].map((_, i) => (
@@ -266,12 +390,15 @@ export const TestimonialsSection = ({
                   key={testimonial.id}
                   className="p-3 md:p-4 rounded-lg border-2 border-primary/20 bg-gradient-to-r from-background to-primary/5 hover:border-primary/40 transition-colors"
                 >
-                  <div className="flex items-center gap-2 mb-2">
-                    <User className="h-3 w-3 md:h-4 md:w-4 text-primary flex-shrink-0" />
-                    <span className="font-semibold text-xs md:text-sm truncate">
-                      {testimonial.display_name}
-                    </span>
-                    {renderStars(testimonial.rating)}
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <div className="flex items-center gap-2">
+                      <User className="h-3 w-3 md:h-4 md:w-4 text-primary flex-shrink-0" />
+                      <span className="font-semibold text-xs md:text-sm truncate">
+                        {testimonial.display_name}
+                      </span>
+                      {renderStars(testimonial.rating)}
+                    </div>
+                    {renderOwnerControls(testimonial)}
                   </div>
                   <p className="text-xs md:text-sm leading-relaxed text-foreground/90">
                     "{testimonial.testimonial_text}"
@@ -311,10 +438,13 @@ export const TestimonialsSection = ({
                     key={testimonial.id}
                     className="p-3 rounded-lg border-2 border-primary/20 bg-gradient-to-r from-background to-primary/5"
                   >
-                    <div className="flex items-center gap-2 mb-2">
-                      <User className="h-4 w-4 text-primary flex-shrink-0" />
-                      <span className="font-semibold text-sm">{testimonial.display_name}</span>
-                      {renderStars(testimonial.rating)}
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <div className="flex items-center gap-2">
+                        <User className="h-4 w-4 text-primary flex-shrink-0" />
+                        <span className="font-semibold text-sm">{testimonial.display_name}</span>
+                        {renderStars(testimonial.rating)}
+                      </div>
+                      {renderOwnerControls(testimonial, true)}
                     </div>
                     <p className="text-sm leading-relaxed text-foreground/90">
                       "{testimonial.testimonial_text}"
@@ -325,6 +455,9 @@ export const TestimonialsSection = ({
             </ScrollArea>
           </DialogContent>
         </Dialog>
+
+        {renderFormDialog()}
+        {renderDeleteDialog()}
       </>
     );
   }
@@ -354,6 +487,7 @@ export const TestimonialsSection = ({
           />
         </CardHeader>
         <CardContent className="p-3 flex-1 overflow-auto">
+          {renderWriteButton()}
           {isLoading ? (
             <div className="space-y-2">
               {[...Array(6)].map((_, i) => (
@@ -384,6 +518,7 @@ export const TestimonialsSection = ({
                           </span>
                           {renderStars(testimonial.rating)}
                         </div>
+                        {renderOwnerControls(testimonial)}
                       </div>
                       <p className={`text-xs leading-relaxed text-foreground/90 ${isExpanded ? '' : 'line-clamp-2'}`}>
                         "{testimonial.testimonial_text}"
@@ -428,10 +563,13 @@ export const TestimonialsSection = ({
                     key={testimonial.id}
                     className="p-3 rounded-lg border-2 border-primary/20 bg-gradient-to-r from-background to-primary/5"
                   >
-                    <div className="flex items-center gap-2 mb-2">
-                      <User className="h-4 w-4 text-primary flex-shrink-0" />
-                      <span className="font-semibold text-sm">{testimonial.display_name}</span>
-                      {renderStars(testimonial.rating)}
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <div className="flex items-center gap-2">
+                        <User className="h-4 w-4 text-primary flex-shrink-0" />
+                        <span className="font-semibold text-sm">{testimonial.display_name}</span>
+                        {renderStars(testimonial.rating)}
+                      </div>
+                      {renderOwnerControls(testimonial, true)}
                     </div>
                     <p className="text-sm leading-relaxed text-foreground/90">
                       "{testimonial.testimonial_text}"
@@ -442,6 +580,9 @@ export const TestimonialsSection = ({
             </ScrollArea>
           </DialogContent>
         </Dialog>
+
+        {renderFormDialog()}
+        {renderDeleteDialog()}
       </Card>
     );
   }
@@ -583,77 +724,8 @@ export const TestimonialsSection = ({
         )}
       </CardContent>
 
-      {/* Write/Edit Testimonial Dialog */}
-      <Dialog open={showForm} onOpenChange={(open) => !open && resetForm()}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>
-              {editingId ? "Edit Your Testimonial" : "Share Your Experience"}
-            </DialogTitle>
-            <DialogDescription>
-              Tell us about your experience with SmartyGym. Your testimonial will be visible to everyone.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-4 py-4">
-            {/* Star Rating */}
-            <div>
-              <label className="text-sm font-medium mb-2 block">Your Rating</label>
-              <div className="flex items-center gap-2">
-                {renderStars(formRating, true, setFormRating)}
-                <span className="text-sm text-muted-foreground ml-2">{formRating}/5</span>
-              </div>
-            </div>
-            
-            {/* Testimonial Text */}
-            <div>
-              <label className="text-sm font-medium mb-2 block">Your Testimonial</label>
-              <Textarea
-                value={formText}
-                onChange={(e) => setFormText(e.target.value)}
-                placeholder="Share your experience with SmartyGym..."
-                className="min-h-[120px] resize-none"
-                maxLength={500}
-              />
-              <p className="text-xs text-muted-foreground mt-1 text-right">
-                {formText.length}/500
-              </p>
-            </div>
-          </div>
-          
-          <DialogFooter className="flex flex-col sm:flex-row gap-2">
-            <Button variant="outline" onClick={resetForm} disabled={isSubmitting}>
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSubmit}
-              disabled={isSubmitting || !formText.trim()}
-            >
-              {isSubmitting ? "Submitting..." : editingId ? "Update" : "Submit"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Delete Testimonial</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete your testimonial? This action cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="flex flex-col sm:flex-row gap-2">
-            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button variant="destructive" onClick={handleDeleteConfirm}>
-              Delete
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {renderFormDialog()}
+      {renderDeleteDialog()}
 
       {/* View All Testimonials Modal */}
       <Dialog open={showViewAllModal} onOpenChange={setShowViewAllModal}>
@@ -686,34 +758,7 @@ export const TestimonialsSection = ({
                           {format(new Date(testimonial.created_at), "MMM d, yyyy 'at' h:mm a")}
                         </span>
                       </div>
-                      
-                      {/* Edit/Delete buttons - only for owner */}
-                      {user?.id === testimonial.user_id && (
-                        <div className="flex items-center gap-1 ml-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              setShowViewAllModal(false);
-                              handleEdit(testimonial);
-                            }}
-                            className="h-7 w-7 p-0 hover:bg-primary/10"
-                          >
-                            <Pencil className="h-3 w-3 text-muted-foreground hover:text-primary" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              setShowViewAllModal(false);
-                              handleDeleteClick(testimonial.id);
-                            }}
-                            className="h-7 w-7 p-0 hover:bg-destructive/10"
-                          >
-                            <Trash2 className="h-3 w-3 text-muted-foreground hover:text-destructive" />
-                          </Button>
-                        </div>
-                      )}
+                      {renderOwnerControls(testimonial, true)}
                     </div>
                   </div>
                   <p className="text-xs md:text-sm leading-relaxed text-foreground/90">
