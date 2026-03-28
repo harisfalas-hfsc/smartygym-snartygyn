@@ -1,65 +1,54 @@
 
+## Incident explanation (based on current data)
 
-# Create "Welcome Message 2" — Onboarding Guide + Automated 5-Day Delivery
+1. **Why Manos never got Welcome #1 originally**
+   - The welcome pipeline depends on a profile-insert trigger that checks whether email is already confirmed **at insert time**.
+   - For Manos, profile was created at `2026-03-05 15:10:20 UTC`, but email was confirmed at `15:10:35 UTC` (15 seconds later).
+   - Because confirmation happened after profile insert, the trigger path was skipped and there was no retry at that time.
+   - There are also **two profile insert triggers** calling the same welcome function, which is risky and should be cleaned up.
 
-## Finding: Manos Never Got the Welcome Message
-Manos Christofi (`welcome_sent: false`) has **zero** welcome messages in his inbox. This is a separate issue but worth noting — the welcome trigger may have a bug. We'll send him Welcome Message 2 manually after setup, and I'll also investigate the welcome message gap.
+2. **Did he get it now? Which inbox?**
+   - **Dashboard inbox:** Yes. `user_system_messages` has a `welcome` message for his user at `2026-03-28 07:42:43 UTC`.
+   - **Email:** System audit shows `email_sent: true` for that same send event at `2026-03-28 07:42:44 UTC` to his account email (`manos_christofi@yahoo.com`).
+   - This means the provider accepted the email send; final mailbox placement (inbox/spam) depends on recipient mailbox filtering.
 
-## What This Plan Delivers
+3. **When will he get Welcome #2 with current logic**
+   - Current automation sends only to users whose premium subscription was created **exactly 5 days ago**.
+   - Manos subscription started `2026-03-09`, so he is outside that window and will not get it automatically now.
+   - Cron for Welcome #2 exists and is active (`0 10 * * *`), but no run yet because it was created recently and next run is at scheduled time.
 
-1. **A rich, interactive onboarding message** covering all platform features in an engaging, emoji-driven, easy-to-read format
-2. **A new message type** (`welcome_onboarding`) added to the database enum and notification registry
-3. **An automated template** stored in `automated_message_templates` as "Welcome Message 2"
-4. **A new edge function** (`send-welcome-onboarding`) that runs daily via cron, finds premium members who signed up exactly 5 days ago and haven't received this message yet, and sends it via both dashboard + email
-5. **A cron job** scheduled to run daily
+4. **Are cron jobs currently running**
+   - Core jobs checked are active and recently succeeding (morning notifications, scheduled notifications, renewal reminders).
+   - Welcome #2 cron is active; pending first eligible execution window.
 
-## Message Content Structure
+---
 
-The message will be visually structured with numbered sections, emojis, bold headers, and short punchy paragraphs — not a wall of text. Sections:
+## Implementation plan (next execution pass)
 
-1. 🏆 **Workout of the Day** — philosophy, science-based daily programming, how it's built
-2. 📅 **Smarty Workouts Calendar** — browse alternatives if the WOD isn't your mood today
-3. 🎯 **Training Programs** — long-term periodized programs for serious goal achievement
-4. 🧘 **Smarty Ritual** — daily wellness ritual, why consistency matters
-5. 🛠️ **Smarty Tools** — use anywhere, anytime (gym, home, on the go)
-6. 📚 **Blog & Knowledge** — fitness, nutrition, wellness articles
-7. 📊 **Logbook & Progress** — track goals, see progress, stay motivated
-8. 💡 **What Makes SmartyGym Different** — human-designed, science-based, not random workouts
+1. **Immediate user recovery**
+   - Trigger **Welcome #2 immediately for Manos** (dashboard + email), then verify:
+     - dashboard row exists in `user_system_messages`
+     - audit row exists with send metadata
+     - no duplicate welcome_onboarding message
 
-Closing: motivational push — "You have something powerful in your hands."
+2. **Fix the root cause for Welcome #1**
+   - Replace fragile “insert-time confirmed email” dependency with a robust fallback:
+     - keep first-login send path
+     - add a backend retry/backfill job for users with `welcome_sent = false` and confirmed email
+   - Remove duplicate profile trigger wiring (single trigger only).
 
-No name placeholder — it's a generic template.
+3. **Guarantee no future misses**
+   - Add idempotent enforcement for welcome flow:
+     - only one `welcome` per user
+     - safe retry behavior if first attempt is skipped/fails
 
-## Technical Steps
+4. **Cron reliability hardening**
+   - Add cron health watchdog:
+     - monitor `cron.job_run_details` for failures/stale jobs
+     - alert admin via dashboard notification if any critical job misses expected runtime
+   - Extend system health audit to include “last successful run” and failure streaks per critical job.
 
-### Step 1: Database migration
-- Add `welcome_onboarding` to the `message_type` enum
-- Insert the template row into `automated_message_templates` with full HTML content (dashboard + email versions)
-
-### Step 2: Update notification registry
-- Add `WELCOME_ONBOARDING` to `supabase/functions/_shared/notification-types.ts`
-
-### Step 3: Create edge function `send-welcome-onboarding`
-- Query `user_subscriptions` for active premium members whose subscription `created_at` is exactly 5 days ago
-- Check they haven't already received a `welcome_onboarding` message
-- Send via `send-system-message` (which handles both dashboard + email delivery)
-- Pattern follows `send-renewal-reminders` — checks automation rule, uses template, sends to qualifying users
-
-### Step 4: Create cron job
-- Schedule daily at 10:00 UTC (12:00 Cyprus) — a good mid-morning time for an onboarding email
-- Uses existing `cron.schedule` + `net.http_post` pattern
-
-### Step 5: Add to admin UI
-- The template will appear automatically in the Templates tab since it uses the standard `automated_message_templates` table
-- Add automation rule entry so it can be toggled on/off from the Auto Messages tab
-
-### Step 6: Send Welcome Message 1 to Manos
-- Manos never received his welcome message — trigger it manually for him
-
-## Files Changed
-- Database migration (enum + template + automation rule)
-- `supabase/functions/_shared/notification-types.ts` — add WELCOME_ONBOARDING
-- `supabase/functions/send-welcome-onboarding/index.ts` — new edge function
-- `supabase/config.toml` — function config
-- Cron job via SQL insert
-
+5. **Verification checklist after changes**
+   - New premium test user with delayed email confirm still gets Welcome #1.
+   - Manos has Welcome #2 in dashboard and email audit.
+   - Critical cron jobs show green status and last-run timestamps in admin monitoring.
