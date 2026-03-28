@@ -1,54 +1,26 @@
 
 
-# Fix Welcome Message 2 — Missing From Admin Panel & Database
+# Fix Hero Background Image Readability
 
-## What Went Wrong
+## Problem
+The 3 rotating hero images have inconsistent contrast. The outdoor park image works well — its tones allow white text and UI elements to remain readable. The gym and home images are brighter/busier, making content hard to see.
 
-Three things were never completed in the previous implementation:
+## Approach
+Two complementary changes to make all three images behave like the park image:
 
-1. **Template row missing** — The migration only added the enum value `welcome_onboarding` to the database type. It never inserted the actual template content into the `automated_message_templates` table. So the edge function tries to fetch the template and gets nothing.
+### 1. Apply CSS brightness/contrast filters to the problematic images
+Instead of replacing the images (which would lose the gym/home/outdoor storytelling), darken the gym and home images via CSS so they match the park image's tone. Each image gets its own filter tuning:
 
-2. **Automation rule missing** — No row was inserted into the `automation_rules` table for `welcome_onboarding_5day`. That's why you don't see it in the Auto Messages tab.
+- **Park couple** — no change (reference standard)
+- **Gym group** — `brightness(0.6)` to darken the busy, bright gym environment
+- **Home couple** — `brightness(0.65)` to tone down the indoor lighting
 
-3. **Hardcoded UI** — The Templates tab (`AutomatedMessagesManager.tsx`) has a hardcoded list of 9 message types on lines 40-50. `welcome_onboarding` is not in that list. Even if the database had the template, the UI would still hide it.
+This is done in `HeroBackgroundImages.tsx` by adding per-image filter classes.
 
-## Implementation Plan
-
-### Step 1: Add `welcome_onboarding` to the Templates UI
-
-Edit `src/components/admin/AutomatedMessagesManager.tsx` — add `welcome_onboarding` to the `MESSAGE_TYPES` object with label "Welcome Onboarding Guide", a relevant icon, and description "Sent 5 days after premium signup — full platform guide".
-
-### Step 2: Insert the template into the database
-
-Use the data insert tool to add the full onboarding template row into `automated_message_templates` with:
-- `message_type`: `welcome_onboarding`
-- `template_name`: "Welcome Onboarding Guide"
-- `subject`: the motivational onboarding subject
-- `content`: the full emoji-rich, section-by-section onboarding message (WOD philosophy, Calendar, Programs, Ritual, Tools, Blog, Logbook, what makes SmartyGym different)
-- `dashboard_subject` / `dashboard_content` / `email_subject` / `email_content`: matching versions
-- `is_active`: true, `is_default`: true
-
-### Step 3: Insert the automation rule into the database
-
-Insert into `automation_rules`:
-- `automation_key`: `welcome_onboarding_5day`
-- `name`: "Welcome Onboarding Guide (5-Day)"
-- `description`: "Sends comprehensive platform guide 5 days after premium signup"
-- `rule_type`: `scheduled`
-- `trigger_type`: `cron`
-- `trigger_config`: with `cron_job_name`, `edge_function_name`, schedule description
-- `message_type`: `welcome_onboarding`
-- `target_audience`: `premium_members`
-- `sends_email`: true, `sends_dashboard_message`: true
-- `is_active`: true
-
-### Step 4: Verify the cron job exists
-
-Check and ensure the cron job `send-welcome-onboarding-daily` is registered. If not, insert it via SQL.
+### 2. Slightly increase overlay opacity as a safety net
+Bump `bg-background/65` → `bg-background/70` in `Index.tsx` (line 766) for a small additional readability boost across all images without making it feel too opaque.
 
 ## Files Changed
-
-- `src/components/admin/AutomatedMessagesManager.tsx` — add `welcome_onboarding` to hardcoded MESSAGE_TYPES
-- Database inserts (2): template row + automation rule row
-- Possible cron job registration if missing
+- `src/components/HeroBackgroundImages.tsx` — add per-image brightness filters
+- `src/pages/Index.tsx` — adjust overlay opacity from 65 to 70
 
