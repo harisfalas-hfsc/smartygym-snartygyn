@@ -301,6 +301,7 @@ export default function PremiumBenefits() {
                     <Button 
                       className="w-full mt-6 bg-gradient-to-r from-primary to-accent hover:opacity-90"
                       onClick={() => navigate("/joinpremium")}
+                      data-track-cta="join-premium"
                     >
                       <Crown className="w-4 h-4 mr-2" />
                       Get Premium
