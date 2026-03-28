@@ -344,6 +344,143 @@ export function WebsiteAnalytics() {
         }));
       setDailyVisitors(dailyData);
 
+      // ===== ENHANCED ANALYTICS: Fetch new event types =====
+      const enhancedQuery = supabase
+        .from("social_media_analytics")
+        .select("event_type, landing_page, event_value, utm_content, session_id, created_at")
+        .gte("created_at", startDate.toISOString())
+        .lte("created_at", endDate.toISOString())
+        .in("event_type", ["page_view", "scroll_depth", "cta_click", "time_on_page", "exit"])
+        .not("browser_info", "ilike", "%lovable%")
+        .not("browser_info", "ilike", "%bot%")
+        .range(0, 9999);
+
+      const { data: enhancedData } = await enhancedQuery;
+
+      if (enhancedData && enhancedData.length > 0) {
+        // 1. Page Flow (user journeys) - group page_views by session, find transitions
+        const sessionPages: { [sessionId: string]: { page: string; time: string }[] } = {};
+        enhancedData
+          .filter(d => d.event_type === "page_view")
+          .forEach(d => {
+            if (!sessionPages[d.session_id]) sessionPages[d.session_id] = [];
+            sessionPages[d.session_id].push({ page: d.landing_page || "/", time: d.created_at });
+          });
+
+        const flowCounts: { [key: string]: number } = {};
+        Object.values(sessionPages).forEach(pages => {
+          const sorted = pages.sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
+          for (let i = 0; i < sorted.length - 1; i++) {
+            const key = `${sorted[i].page}→${sorted[i + 1].page}`;
+            flowCounts[key] = (flowCounts[key] || 0) + 1;
+          }
+        });
+
+        const flowData = Object.entries(flowCounts)
+          .map(([key, count]) => {
+            const [from, to] = key.split("→");
+            return { from, to, count };
+          })
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 15);
+        setPageFlows(flowData);
+
+        // 2. Scroll Depth by Page
+        const scrollData: { [page: string]: number[] } = {};
+        enhancedData
+          .filter(d => d.event_type === "scroll_depth")
+          .forEach(d => {
+            const page = d.landing_page || "/";
+            if (!scrollData[page]) scrollData[page] = [];
+            scrollData[page].push(d.event_value || 0);
+          });
+
+        const scrollDepth = Object.entries(scrollData)
+          .map(([page, values]) => ({
+            page: page.length > 25 ? page.substring(0, 25) + "..." : page,
+            fullPage: page,
+            avgDepth: Math.round(values.reduce((a, b) => a + b, 0) / values.length),
+            count: values.length,
+          }))
+          .sort((a, b) => b.avgDepth - a.avgDepth)
+          .slice(0, 10);
+        setScrollDepthData(scrollDepth);
+
+        // 3. CTA Performance
+        const ctaCounts: { [cta: string]: { clicks: number; pages: { [p: string]: number } } } = {};
+        enhancedData
+          .filter(d => d.event_type === "cta_click")
+          .forEach(d => {
+            const cta = d.utm_content || "unknown";
+            if (!ctaCounts[cta]) ctaCounts[cta] = { clicks: 0, pages: {} };
+            ctaCounts[cta].clicks++;
+            const page = d.landing_page || "/";
+            ctaCounts[cta].pages[page] = (ctaCounts[cta].pages[page] || 0) + 1;
+          });
+
+        const ctaData = Object.entries(ctaCounts)
+          .map(([ctaName, data]) => {
+            const topPage = Object.entries(data.pages).sort((a, b) => b[1] - a[1])[0]?.[0] || "/";
+            return { ctaName, clicks: data.clicks, topPage };
+          })
+          .sort((a, b) => b.clicks - a.clicks);
+        setCTAPerformance(ctaData);
+
+        // 4. Time on Page
+        const timeData: { [page: string]: number[] } = {};
+        enhancedData
+          .filter(d => d.event_type === "time_on_page")
+          .forEach(d => {
+            const page = d.landing_page || "/";
+            if (!timeData[page]) timeData[page] = [];
+            timeData[page].push(d.event_value || 0);
+          });
+
+        const timeOnPage = Object.entries(timeData)
+          .map(([page, values]) => ({
+            page: page.length > 25 ? page.substring(0, 25) + "..." : page,
+            fullPage: page,
+            avgSeconds: Math.round(values.reduce((a, b) => a + b, 0) / values.length),
+            views: values.length,
+          }))
+          .sort((a, b) => b.avgSeconds - a.avgSeconds)
+          .slice(0, 10);
+        setTimeOnPageData(timeOnPage);
+
+        // 5. Exit Pages
+        const exitCounts: { [page: string]: number } = {};
+        const totalPageViewsByPage: { [page: string]: number } = {};
+        enhancedData
+          .filter(d => d.event_type === "exit")
+          .forEach(d => {
+            const page = d.landing_page || "/";
+            exitCounts[page] = (exitCounts[page] || 0) + 1;
+          });
+        enhancedData
+          .filter(d => d.event_type === "page_view")
+          .forEach(d => {
+            const page = d.landing_page || "/";
+            totalPageViewsByPage[page] = (totalPageViewsByPage[page] || 0) + 1;
+          });
+
+        const exitData = Object.entries(exitCounts)
+          .map(([page, exits]) => ({
+            page: page.length > 25 ? page.substring(0, 25) + "..." : page,
+            fullPage: page,
+            exits,
+            exitRate: totalPageViewsByPage[page] ? Math.round((exits / totalPageViewsByPage[page]) * 100) : 100,
+          }))
+          .sort((a, b) => b.exits - a.exits)
+          .slice(0, 10);
+        setExitPages(exitData);
+      } else {
+        setPageFlows([]);
+        setScrollDepthData([]);
+        setCTAPerformance([]);
+        setTimeOnPageData([]);
+        setExitPages([]);
+      }
+
     } catch (error) {
       console.error("Error fetching website analytics:", error);
       toast.error("Failed to load website analytics");
