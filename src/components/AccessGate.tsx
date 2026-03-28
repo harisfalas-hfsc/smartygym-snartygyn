@@ -66,7 +66,7 @@ export const AccessGate = ({
                 Please log in or create an account to access {contentType === "workout" ? "workouts" : contentType === "program" ? "training programs" : "this content"}.
               </p>
               <div className="space-y-2 pt-4">
-                <Button onClick={() => navigate("/auth")} className="w-full" size="lg">
+                <Button onClick={() => navigate("/auth")} className="w-full" size="lg" data-track-cta="signup-gate">
                   <Lock className="w-4 h-4 mr-2" />
                   Log In / Sign Up
                 </Button>
@@ -115,7 +115,7 @@ export const AccessGate = ({
               Please log in or create an account to access {contentType === "workout" ? "workouts" : contentType === "program" ? "training programs" : "this content"}.
             </p>
             <div className="space-y-2 pt-4">
-              <Button onClick={() => navigate("/auth")} className="w-full" size="lg">
+              <Button onClick={() => navigate("/auth")} className="w-full" size="lg" data-track-cta="signup-gate">
                 <Lock className="w-4 h-4 mr-2" />
                 Log In / Sign Up
               </Button>

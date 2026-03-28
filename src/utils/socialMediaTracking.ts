@@ -40,7 +40,6 @@ const detectReferralSource = (): { source: string; utmParams: any } => {
     if (referrer.includes('youtube.com') || referrer.includes('youtu.be')) return { source: 'youtube', utmParams };
     if (referrer.includes('twitter.com') || referrer.includes('x.com')) return { source: 'twitter', utmParams };
     if (referrer.includes('linkedin.com')) return { source: 'linkedin', utmParams };
-    // Organic search engines
     if (referrer.includes('google.com') || referrer.includes('google.')) return { source: 'google', utmParams };
     if (referrer.includes('bing.com')) return { source: 'bing', utmParams };
     if (referrer.includes('yahoo.com')) return { source: 'yahoo', utmParams };
@@ -63,14 +62,16 @@ const getDeviceInfo = () => {
 
   return {
     device_type: deviceType,
-    browser_info: ua.substring(0, 200), // Limit length
+    browser_info: ua.substring(0, 200),
   };
 };
 
 interface TrackEventParams {
-  eventType: 'visit' | 'signup' | 'subscription_purchase' | 'standalone_purchase' | 'workout_view' | 'program_view';
+  eventType: 'visit' | 'signup' | 'subscription_purchase' | 'standalone_purchase' | 'workout_view' | 'program_view' | 'page_view' | 'scroll_depth' | 'cta_click' | 'time_on_page' | 'exit';
   eventValue?: number;
   userId?: string;
+  pagePath?: string;
+  extraContext?: string;
 }
 
 // Bot/crawler user agent patterns to exclude from tracking
@@ -88,19 +89,16 @@ const BOT_PATTERNS = [
 
 // Check if current context should be excluded from tracking
 const shouldExcludeFromTracking = (): boolean => {
-  // Exclude Lovable preview iframe
   if (window.location.hostname.includes('lovableproject.com') || 
       window.location.hostname.includes('lovable.app') ||
       window.self !== window.top) {
     return true;
   }
   
-  // Exclude if admin exclusion cookie is set
   if (document.cookie.includes('sm_exclude_tracking=true')) {
     return true;
   }
   
-  // Exclude bots and crawlers
   const ua = navigator.userAgent.toLowerCase();
   if (BOT_PATTERNS.some(pattern => ua.includes(pattern))) {
     return true;
@@ -109,9 +107,8 @@ const shouldExcludeFromTracking = (): boolean => {
   return false;
 };
 
-export const trackSocialMediaEvent = async ({ eventType, eventValue = 0, userId }: TrackEventParams) => {
+export const trackSocialMediaEvent = async ({ eventType, eventValue = 0, userId, pagePath, extraContext }: TrackEventParams) => {
   try {
-    // Skip tracking for excluded contexts
     if (shouldExcludeFromTracking()) {
       return;
     }
@@ -129,8 +126,8 @@ export const trackSocialMediaEvent = async ({ eventType, eventValue = 0, userId 
         utm_source: utmParams.utm_source,
         utm_medium: utmParams.utm_medium,
         utm_campaign: utmParams.utm_campaign,
-        utm_content: utmParams.utm_content,
-        landing_page: window.location.pathname,
+        utm_content: extraContext || utmParams.utm_content,
+        landing_page: pagePath || window.location.pathname,
         event_type: eventType,
         event_value: eventValue,
         device_type: deviceInfo.device_type,
@@ -145,12 +142,54 @@ export const trackSocialMediaEvent = async ({ eventType, eventValue = 0, userId 
   }
 };
 
-// Track initial page visit
+// Track initial page visit (first visit only)
 export const trackPageVisit = () => {
-  // Only track if not already tracked in this session
   const tracked = sessionStorage.getItem('sm_visit_tracked');
   if (!tracked) {
     trackSocialMediaEvent({ eventType: 'visit' });
     sessionStorage.setItem('sm_visit_tracked', 'true');
   }
+};
+
+// Track every page navigation (route change)
+export const trackPageNavigation = (path: string) => {
+  trackSocialMediaEvent({ eventType: 'page_view', pagePath: path });
+};
+
+// Track scroll depth milestones (25, 50, 75, 100)
+export const trackScrollDepth = (path: string, depthPercent: number) => {
+  trackSocialMediaEvent({ 
+    eventType: 'scroll_depth', 
+    eventValue: depthPercent, 
+    pagePath: path,
+    extraContext: `scroll_${depthPercent}%`
+  });
+};
+
+// Track CTA button clicks
+export const trackCTAClick = (ctaName: string, path: string) => {
+  trackSocialMediaEvent({ 
+    eventType: 'cta_click', 
+    pagePath: path,
+    extraContext: ctaName
+  });
+};
+
+// Track time spent on a page (in seconds)
+export const trackTimeOnPage = (path: string, seconds: number) => {
+  if (seconds < 2) return; // Ignore very short visits
+  trackSocialMediaEvent({ 
+    eventType: 'time_on_page', 
+    eventValue: Math.round(seconds), 
+    pagePath: path,
+    extraContext: `${Math.round(seconds)}s`
+  });
+};
+
+// Track exit (last page before leaving)
+export const trackExit = (path: string) => {
+  trackSocialMediaEvent({ 
+    eventType: 'exit', 
+    pagePath: path 
+  });
 };

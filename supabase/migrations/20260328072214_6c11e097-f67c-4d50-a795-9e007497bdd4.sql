@@ -1,0 +1,1 @@
+CREATE INDEX IF NOT EXISTS idx_social_media_analytics_event_type_page ON social_media_analytics (event_type, landing_page);

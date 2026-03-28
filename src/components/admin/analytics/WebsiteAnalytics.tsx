@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { Globe, Monitor, Smartphone, Tablet, Eye, TrendingUp, TrendingDown, Download, RefreshCw, FileText, Calendar as CalendarIcon, ArrowUpRight, ArrowDownRight, Minus } from "lucide-react";
+import { Globe, Monitor, Smartphone, Tablet, Eye, TrendingUp, TrendingDown, Download, RefreshCw, FileText, Calendar as CalendarIcon, ArrowUpRight, ArrowDownRight, Minus, MousePointerClick, Clock, LogOut, ScrollText, Navigation } from "lucide-react";
 import { toast } from "sonner";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -39,6 +39,39 @@ interface DailyVisitorData {
   fullDate: string;
   visits: number;
   uniqueSessions: number;
+}
+
+interface PageFlowData {
+  from: string;
+  to: string;
+  count: number;
+}
+
+interface ScrollDepthData {
+  page: string;
+  fullPage?: string;
+  avgDepth: number;
+  count: number;
+}
+
+interface CTAPerformanceData {
+  ctaName: string;
+  clicks: number;
+  topPage: string;
+}
+
+interface TimeOnPageData {
+  page: string;
+  fullPage?: string;
+  avgSeconds: number;
+  views: number;
+}
+
+interface ExitPageData {
+  page: string;
+  fullPage?: string;
+  exits: number;
+  exitRate: number;
 }
 
 interface PeriodSummary {
@@ -77,6 +110,11 @@ export function WebsiteAnalytics() {
   const [dailyVisitors, setDailyVisitors] = useState<DailyVisitorData[]>([]);
   const [availableSources, setAvailableSources] = useState<string[]>([]);
   const [availableDevices, setAvailableDevices] = useState<string[]>([]);
+  const [pageFlows, setPageFlows] = useState<PageFlowData[]>([]);
+  const [scrollDepthData, setScrollDepthData] = useState<ScrollDepthData[]>([]);
+  const [ctaPerformance, setCTAPerformance] = useState<CTAPerformanceData[]>([]);
+  const [timeOnPageData, setTimeOnPageData] = useState<TimeOnPageData[]>([]);
+  const [exitPages, setExitPages] = useState<ExitPageData[]>([]);
   
   const reportRef = useRef<HTMLDivElement>(null);
 
@@ -305,6 +343,143 @@ export function WebsiteAnalytics() {
           uniqueSessions: data.sessions.size
         }));
       setDailyVisitors(dailyData);
+
+      // ===== ENHANCED ANALYTICS: Fetch new event types =====
+      const enhancedQuery = supabase
+        .from("social_media_analytics")
+        .select("event_type, landing_page, event_value, utm_content, session_id, created_at")
+        .gte("created_at", startDate.toISOString())
+        .lte("created_at", endDate.toISOString())
+        .in("event_type", ["page_view", "scroll_depth", "cta_click", "time_on_page", "exit"])
+        .not("browser_info", "ilike", "%lovable%")
+        .not("browser_info", "ilike", "%bot%")
+        .range(0, 9999);
+
+      const { data: enhancedData } = await enhancedQuery;
+
+      if (enhancedData && enhancedData.length > 0) {
+        // 1. Page Flow (user journeys) - group page_views by session, find transitions
+        const sessionPages: { [sessionId: string]: { page: string; time: string }[] } = {};
+        enhancedData
+          .filter(d => d.event_type === "page_view")
+          .forEach(d => {
+            if (!sessionPages[d.session_id]) sessionPages[d.session_id] = [];
+            sessionPages[d.session_id].push({ page: d.landing_page || "/", time: d.created_at });
+          });
+
+        const flowCounts: { [key: string]: number } = {};
+        Object.values(sessionPages).forEach(pages => {
+          const sorted = pages.sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
+          for (let i = 0; i < sorted.length - 1; i++) {
+            const key = `${sorted[i].page}→${sorted[i + 1].page}`;
+            flowCounts[key] = (flowCounts[key] || 0) + 1;
+          }
+        });
+
+        const flowData = Object.entries(flowCounts)
+          .map(([key, count]) => {
+            const [from, to] = key.split("→");
+            return { from, to, count };
+          })
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 15);
+        setPageFlows(flowData);
+
+        // 2. Scroll Depth by Page
+        const scrollData: { [page: string]: number[] } = {};
+        enhancedData
+          .filter(d => d.event_type === "scroll_depth")
+          .forEach(d => {
+            const page = d.landing_page || "/";
+            if (!scrollData[page]) scrollData[page] = [];
+            scrollData[page].push(d.event_value || 0);
+          });
+
+        const scrollDepth = Object.entries(scrollData)
+          .map(([page, values]) => ({
+            page: page.length > 25 ? page.substring(0, 25) + "..." : page,
+            fullPage: page,
+            avgDepth: Math.round(values.reduce((a, b) => a + b, 0) / values.length),
+            count: values.length,
+          }))
+          .sort((a, b) => b.avgDepth - a.avgDepth)
+          .slice(0, 10);
+        setScrollDepthData(scrollDepth);
+
+        // 3. CTA Performance
+        const ctaCounts: { [cta: string]: { clicks: number; pages: { [p: string]: number } } } = {};
+        enhancedData
+          .filter(d => d.event_type === "cta_click")
+          .forEach(d => {
+            const cta = d.utm_content || "unknown";
+            if (!ctaCounts[cta]) ctaCounts[cta] = { clicks: 0, pages: {} };
+            ctaCounts[cta].clicks++;
+            const page = d.landing_page || "/";
+            ctaCounts[cta].pages[page] = (ctaCounts[cta].pages[page] || 0) + 1;
+          });
+
+        const ctaData = Object.entries(ctaCounts)
+          .map(([ctaName, data]) => {
+            const topPage = Object.entries(data.pages).sort((a, b) => b[1] - a[1])[0]?.[0] || "/";
+            return { ctaName, clicks: data.clicks, topPage };
+          })
+          .sort((a, b) => b.clicks - a.clicks);
+        setCTAPerformance(ctaData);
+
+        // 4. Time on Page
+        const timeData: { [page: string]: number[] } = {};
+        enhancedData
+          .filter(d => d.event_type === "time_on_page")
+          .forEach(d => {
+            const page = d.landing_page || "/";
+            if (!timeData[page]) timeData[page] = [];
+            timeData[page].push(d.event_value || 0);
+          });
+
+        const timeOnPage = Object.entries(timeData)
+          .map(([page, values]) => ({
+            page: page.length > 25 ? page.substring(0, 25) + "..." : page,
+            fullPage: page,
+            avgSeconds: Math.round(values.reduce((a, b) => a + b, 0) / values.length),
+            views: values.length,
+          }))
+          .sort((a, b) => b.avgSeconds - a.avgSeconds)
+          .slice(0, 10);
+        setTimeOnPageData(timeOnPage);
+
+        // 5. Exit Pages
+        const exitCounts: { [page: string]: number } = {};
+        const totalPageViewsByPage: { [page: string]: number } = {};
+        enhancedData
+          .filter(d => d.event_type === "exit")
+          .forEach(d => {
+            const page = d.landing_page || "/";
+            exitCounts[page] = (exitCounts[page] || 0) + 1;
+          });
+        enhancedData
+          .filter(d => d.event_type === "page_view")
+          .forEach(d => {
+            const page = d.landing_page || "/";
+            totalPageViewsByPage[page] = (totalPageViewsByPage[page] || 0) + 1;
+          });
+
+        const exitData = Object.entries(exitCounts)
+          .map(([page, exits]) => ({
+            page: page.length > 25 ? page.substring(0, 25) + "..." : page,
+            fullPage: page,
+            exits,
+            exitRate: totalPageViewsByPage[page] ? Math.round((exits / totalPageViewsByPage[page]) * 100) : 100,
+          }))
+          .sort((a, b) => b.exits - a.exits)
+          .slice(0, 10);
+        setExitPages(exitData);
+      } else {
+        setPageFlows([]);
+        setScrollDepthData([]);
+        setCTAPerformance([]);
+        setTimeOnPageData([]);
+        setExitPages([]);
+      }
 
     } catch (error) {
       console.error("Error fetching website analytics:", error);
@@ -824,6 +999,254 @@ export function WebsiteAnalytics() {
                   </div>
                 ))}
               </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* ===== SECTION 5: USER JOURNEY / PAGE FLOW ===== */}
+        <Card>
+          <CardHeader className="pb-2">
+            <div className="flex justify-between items-center">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Navigation className="h-5 w-5" /> User Journey Flow
+                </CardTitle>
+                <CardDescription>Top page-to-page transitions showing how users navigate your site</CardDescription>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => exportSectionCSV(pageFlows, 'page-flows')}>
+                <Download className="h-3 w-3 mr-1" /> CSV
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {pageFlows.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <Navigation className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                <p className="text-sm">No page flow data yet. Data will appear as visitors navigate between pages.</p>
+              </div>
+            ) : (
+              <div className="border rounded-lg overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead className="bg-muted">
+                    <tr>
+                      <th className="text-left py-2 px-3 font-medium">From Page</th>
+                      <th className="text-center py-2 px-3 font-medium">→</th>
+                      <th className="text-left py-2 px-3 font-medium">To Page</th>
+                      <th className="text-right py-2 px-3 font-medium">Count</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pageFlows.map((flow, idx) => (
+                      <tr key={idx} className="border-t">
+                        <td className="py-2 px-3 font-mono text-xs">{flow.from}</td>
+                        <td className="text-center py-2 px-3 text-muted-foreground">→</td>
+                        <td className="py-2 px-3 font-mono text-xs">{flow.to}</td>
+                        <td className="text-right py-2 px-3 font-medium">{flow.count}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* ===== SECTION 6: SCROLL DEPTH ===== */}
+          <Card>
+            <CardHeader className="pb-2">
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <ScrollText className="h-5 w-5" /> Scroll Depth by Page
+                  </CardTitle>
+                  <CardDescription>Average scroll depth per page</CardDescription>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => exportSectionCSV(scrollDepthData, 'scroll-depth')}>
+                  <Download className="h-3 w-3 mr-1" /> CSV
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {scrollDepthData.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <ScrollText className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <p className="text-sm">No scroll data yet.</p>
+                </div>
+              ) : (
+                <>
+                  <ResponsiveContainer width="100%" height={200}>
+                    <BarChart data={scrollDepthData} barSize={16}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="page" tick={{ fontSize: 9 }} interval={0} angle={-20} textAnchor="end" height={60} />
+                      <YAxis tick={{ fontSize: 10 }} domain={[0, 100]} unit="%" />
+                      <Tooltip 
+                        contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }}
+                        formatter={(value: number) => [`${value}%`, "Avg Scroll Depth"]}
+                        labelFormatter={(label, payload) => payload?.[0]?.payload?.fullPage || label}
+                      />
+                      <Bar dataKey="avgDepth" name="Avg Depth %" fill="hsl(var(--chart-3))" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                  <div className="mt-3 border-t pt-3 max-h-[150px] overflow-y-auto">
+                    {scrollDepthData.map((page, idx) => (
+                      <div key={idx} className="flex justify-between items-center text-xs py-1 border-b last:border-0">
+                        <span className="text-muted-foreground truncate max-w-[180px]" title={page.fullPage}>{page.page}</span>
+                        <span className="font-medium">{page.avgDepth}% <span className="text-muted-foreground">({page.count} events)</span></span>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* ===== SECTION 7: CTA PERFORMANCE ===== */}
+          <Card>
+            <CardHeader className="pb-2">
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <MousePointerClick className="h-5 w-5" /> CTA Performance
+                  </CardTitle>
+                  <CardDescription>Button clicks and where they happen</CardDescription>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => exportSectionCSV(ctaPerformance, 'cta-performance')}>
+                  <Download className="h-3 w-3 mr-1" /> CSV
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {ctaPerformance.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <MousePointerClick className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <p className="text-sm">No CTA click data yet.</p>
+                </div>
+              ) : (
+                <div className="border rounded-lg overflow-hidden">
+                  <table className="w-full text-sm">
+                    <thead className="bg-muted">
+                      <tr>
+                        <th className="text-left py-2 px-3 font-medium">CTA</th>
+                        <th className="text-right py-2 px-3 font-medium">Clicks</th>
+                        <th className="text-left py-2 px-3 font-medium">Top Page</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {ctaPerformance.map((cta, idx) => (
+                        <tr key={idx} className="border-t">
+                          <td className="py-2 px-3">
+                            <Badge variant="secondary" className="text-xs">{cta.ctaName}</Badge>
+                          </td>
+                          <td className="text-right py-2 px-3 font-medium">{cta.clicks}</td>
+                          <td className="py-2 px-3 font-mono text-xs text-muted-foreground">{cta.topPage}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* ===== SECTION 8: TIME ON PAGE ===== */}
+          <Card>
+            <CardHeader className="pb-2">
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Clock className="h-5 w-5" /> Time on Page
+                  </CardTitle>
+                  <CardDescription>Average time visitors spend per page</CardDescription>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => exportSectionCSV(timeOnPageData, 'time-on-page')}>
+                  <Download className="h-3 w-3 mr-1" /> CSV
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {timeOnPageData.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Clock className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <p className="text-sm">No time-on-page data yet.</p>
+                </div>
+              ) : (
+                <>
+                  <ResponsiveContainer width="100%" height={200}>
+                    <BarChart data={timeOnPageData} barSize={16}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="page" tick={{ fontSize: 9 }} interval={0} angle={-20} textAnchor="end" height={60} />
+                      <YAxis tick={{ fontSize: 10 }} unit="s" />
+                      <Tooltip 
+                        contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }}
+                        formatter={(value: number) => [`${value}s`, "Avg Time"]}
+                        labelFormatter={(label, payload) => payload?.[0]?.payload?.fullPage || label}
+                      />
+                      <Bar dataKey="avgSeconds" name="Avg Seconds" fill="hsl(var(--chart-4))" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                  <div className="mt-3 border-t pt-3 max-h-[150px] overflow-y-auto">
+                    {timeOnPageData.map((page, idx) => (
+                      <div key={idx} className="flex justify-between items-center text-xs py-1 border-b last:border-0">
+                        <span className="text-muted-foreground truncate max-w-[180px]" title={page.fullPage}>{page.page}</span>
+                        <span className="font-medium">{page.avgSeconds}s <span className="text-muted-foreground">({page.views} views)</span></span>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* ===== SECTION 9: EXIT PAGES ===== */}
+          <Card>
+            <CardHeader className="pb-2">
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <LogOut className="h-5 w-5" /> Exit Pages
+                  </CardTitle>
+                  <CardDescription>Where visitors leave your website</CardDescription>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => exportSectionCSV(exitPages, 'exit-pages')}>
+                  <Download className="h-3 w-3 mr-1" /> CSV
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {exitPages.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <LogOut className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <p className="text-sm">No exit data yet.</p>
+                </div>
+              ) : (
+                <div className="border rounded-lg overflow-hidden">
+                  <table className="w-full text-sm">
+                    <thead className="bg-muted">
+                      <tr>
+                        <th className="text-left py-2 px-3 font-medium">Page</th>
+                        <th className="text-right py-2 px-3 font-medium">Exits</th>
+                        <th className="text-right py-2 px-3 font-medium">Exit Rate</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {exitPages.map((page, idx) => (
+                        <tr key={idx} className="border-t">
+                          <td className="py-2 px-3 font-mono text-xs" title={page.fullPage}>{page.page}</td>
+                          <td className="text-right py-2 px-3 font-medium">{page.exits}</td>
+                          <td className="text-right py-2 px-3">
+                            <Badge variant={page.exitRate > 70 ? "destructive" : "secondary"} className="text-xs">
+                              {page.exitRate}%
+                            </Badge>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
