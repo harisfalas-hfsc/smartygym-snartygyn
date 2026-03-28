@@ -127,12 +127,59 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
-    // Support manual trigger for a specific user
+    // Support manual trigger for a specific user or test email
     let manualTriggerUserId: string | null = null;
+    let testEmail: string | null = null;
     try {
       const body = await req.json();
       manualTriggerUserId = body?.manualTriggerUserId || null;
+      testEmail = body?.testEmail || null;
     } catch { /* no body = cron trigger */ }
+
+    // Test mode: send template directly to a specific email address
+    if (testEmail) {
+      console.log(`[WELCOME-ONBOARDING] Test send to: ${testEmail}`);
+      const { data: template } = await supabaseAdmin
+        .from('automated_message_templates')
+        .select('*')
+        .eq('message_type', ONBOARDING_MESSAGE_TYPE)
+        .eq('is_active', true)
+        .eq('is_default', true)
+        .single();
+
+      if (!template) {
+        return new Response(JSON.stringify({ error: "No template found" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500,
+        });
+      }
+
+      const emailSubject = template.email_subject || template.subject;
+      const emailContent = template.email_content || template.content;
+      const emailHtml = wrapInEmailTemplateWithFooter(
+        emailSubject, emailContent, testEmail,
+        'https://smartygym.lovable.app/userdashboard', 'Explore Your Dashboard'
+      );
+      
+      const { error: sendError } = await resend.emails.send({
+        from: "SmartyGym <notifications@smartygym.com>",
+        to: [testEmail],
+        subject: emailSubject,
+        html: emailHtml,
+        headers: getEmailHeaders(testEmail),
+      });
+
+      if (sendError) {
+        console.error("[WELCOME-ONBOARDING] Test email error:", sendError);
+        return new Response(JSON.stringify({ error: sendError.message }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500,
+        });
+      }
+
+      console.log(`[WELCOME-ONBOARDING] ✅ Test email sent to ${testEmail}`);
+      return new Response(JSON.stringify({ success: true, testEmailSent: testEmail }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     if (manualTriggerUserId) {
       console.log(`[WELCOME-ONBOARDING] Manual trigger for user: ${manualTriggerUserId}`);
