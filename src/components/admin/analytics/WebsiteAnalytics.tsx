@@ -41,6 +41,39 @@ interface DailyVisitorData {
   uniqueSessions: number;
 }
 
+interface PageFlowData {
+  from: string;
+  to: string;
+  count: number;
+}
+
+interface ScrollDepthData {
+  page: string;
+  fullPage?: string;
+  avgDepth: number;
+  count: number;
+}
+
+interface CTAPerformanceData {
+  ctaName: string;
+  clicks: number;
+  topPage: string;
+}
+
+interface TimeOnPageData {
+  page: string;
+  fullPage?: string;
+  avgSeconds: number;
+  views: number;
+}
+
+interface ExitPageData {
+  page: string;
+  fullPage?: string;
+  exits: number;
+  exitRate: number;
+}
+
 interface PeriodSummary {
   totalVisits: number;
   uniqueSessions: number;
