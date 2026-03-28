@@ -110,6 +110,11 @@ export function WebsiteAnalytics() {
   const [dailyVisitors, setDailyVisitors] = useState<DailyVisitorData[]>([]);
   const [availableSources, setAvailableSources] = useState<string[]>([]);
   const [availableDevices, setAvailableDevices] = useState<string[]>([]);
+  const [pageFlows, setPageFlows] = useState<PageFlowData[]>([]);
+  const [scrollDepthData, setScrollDepthData] = useState<ScrollDepthData[]>([]);
+  const [ctaPerformance, setCTAPerformance] = useState<CTAPerformanceData[]>([]);
+  const [timeOnPageData, setTimeOnPageData] = useState<TimeOnPageData[]>([]);
+  const [exitPages, setExitPages] = useState<ExitPageData[]>([]);
   
   const reportRef = useRef<HTMLDivElement>(null);
 
