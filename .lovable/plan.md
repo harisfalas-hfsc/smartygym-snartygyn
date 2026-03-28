@@ -1,50 +1,57 @@
 
 
-# Create Blog Article: "The Myth of Cholesterol"
+# Fix Duplicate & Repetitive Workout Names
 
-## Overview
-Write and publish a Nutrition blog article debunking the oversimplified "cholesterol = heart disease" narrative, with evidence-based analysis of oxidized LDL, carnivore diet data, statin side effects, and the multi-factorial nature of cardiovascular risk. Generate an AI image and insert into the database.
+## The Problem
 
-## Steps
+Two issues with workout naming:
 
-### 1. Generate article image
-AI-generated image: professional food photography showing healthy fats — eggs, steak, avocado, butter, olive oil — styled cleanly on a modern kitchen surface. No text. Upload to `blog-images` storage bucket.
+1. **Duplicate names exist** — Multiple workouts share the exact same name (e.g., "Foundation Glute Core" for both bodyweight and equipment). These also have matching Stripe products with wrong names.
 
-### 2. Write and insert the article
-Insert into `blog_articles` with:
-- **Title**: "The Myth of Cholesterol"
-- **Slug**: `the-myth-of-cholesterol`
-- **Category**: Nutrition
-- **Author**: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
-- **is_published**: true
-- **is_ai_generated**: false
+2. **Repetitive naming patterns** — The AI prompt on lines 771-789 of `generate-workout-of-day/index.ts` literally *suggests* the same words: "Foundation", "Forge", "Builder" for Strength; "Melt", "Torch" for Calorie Burning. The AI follows the suggestions, producing near-identical names daily.
 
-### 3. Article content structure
+3. **No uniqueness enforcement** — The generator never checks existing workout names before inserting. The only deduplication is between the bodyweight/equipment pair on the *same day* (line 764), not against the entire library.
 
-1. **Introduction** — The 60-year-old narrative that dietary cholesterol causes heart disease is crumbling under modern evidence. Time to separate myth from science.
+## Plan
 
-2. **The Original Hypothesis & Where It Went Wrong** — Ancel Keys' lipid hypothesis, the flawed Seven Countries Study, cherry-picked data, and how it shaped decades of dietary guidelines.
+### Part 1: Audit & Fix Existing Duplicates (script via `code--exec`)
 
-3. **Oxidized LDL: The Real Culprit** — Total LDL vs oxidized LDL (ox-LDL). It's not the cholesterol in your blood that causes plaque — it's damaged, oxidized LDL particles driven by inflammation, seed oils, sugar, and metabolic dysfunction.
+- Query `admin_workouts` for all duplicate `name` values
+- Query `admin_training_programs` for duplicate names
+- Generate a report showing all duplicates
+- For each duplicate group, rename workouts to unique names (keeping the oldest one unchanged)
+- For renamed workouts that have `stripe_product_id`, update the Stripe product name to match
+- This will be a careful script — preview duplicates first, then fix
 
-4. **The Carnivore Paradox** — People eating primarily meat and animal fats (high dietary cholesterol) consistently showing normal or improved lipid panels, reduced inflammation markers (CRP, triglycerides), and better metabolic health. Reference real-world data and physician observations (Dr. Shawn Baker, Dr. Paul Saladino, etc.).
+### Part 2: Prevent Future Duplicates in WOD Generation
 
-5. **Cholesterol Is Not the Villain — It's a Vital Molecule** — Cholesterol's essential roles: hormone production (testosterone, estrogen, cortisol), vitamin D synthesis, brain function (25% of body's cholesterol is in the brain), cell membrane integrity.
+Changes to `supabase/functions/generate-workout-of-day/index.ts`:
 
-6. **The Multi-Factorial Reality of Heart Disease** — The actual risk factors: chronic inflammation, insulin resistance, high triglycerides, low HDL, metabolic syndrome, stress, sedentary lifestyle, processed food consumption. Cholesterol is one data point, not the verdict.
+1. **Fetch recent names before generation** — Query the last 100+ workout names for the same category from `admin_workouts` and pass them to the AI prompt as a "DO NOT USE" list
 
-7. **Statins: More Harm Than Good?** — Evidence-based analysis of statin side effects: muscle pain/myopathy, cognitive decline, increased diabetes risk, liver damage, CoQ10 depletion, hormonal disruption. The NNT (Number Needed to Treat) data showing marginal benefit for primary prevention vs significant side effect burden.
+2. **Rewrite naming instructions (lines 771-789)** — Remove the fixed word lists that cause repetition. Instead:
+   - Instruct the AI to create unique, creative names
+   - Provide naming *principles* (short, category-relevant, professional) instead of specific word banks
+   - Explicitly ban reusing any name from the provided list
 
-8. **What Actually Protects Your Heart** — Exercise (the proven free medicine), whole foods, stress management, sleep, avoiding processed seed oils and refined sugars. Link to SmartyGym training programs.
+3. **Post-generation uniqueness check** — After the AI returns a name, query the database for exact matches. If a duplicate is found, append a differentiator or request regeneration
 
-9. **Disclaimer** — This article is for educational purposes. Always consult your physician before making changes to medication. Link to `/disclaimer`.
+4. **Same-day pair check already exists** (line 764) — enhance it to also block near-duplicates (not just exact matches)
 
-- Internal links to: `/workout`, `/trainingprogram`, `/exerciselibrary`, `/daily-ritual`, `/disclaimer`
+### Part 3: Database constraint (optional but recommended)
 
-### 4. Execution method
-- Generate image via AI gateway script, upload to storage
-- Insert full HTML article via psql
+- Add a unique index on `admin_workouts.name` to prevent duplicates at the database level as a final safety net
 
-## No codebase changes needed
-Data insertion task only.
+## Execution Order
+
+1. First: Audit duplicates (read-only report)
+2. Second: Fix duplicates + Stripe sync
+3. Third: Update the WOD generator prompt and add uniqueness checking
+4. Fourth: Add database constraint after all duplicates are resolved
+
+## Files Changed
+
+- `supabase/functions/generate-workout-of-day/index.ts` — naming instructions rewrite + recent-names query + post-generation duplicate check
+- Database migration — unique index on `admin_workouts.name` (after cleanup)
+- `code--exec` scripts for audit and fixing existing duplicates with Stripe sync
 
