@@ -5,7 +5,11 @@ import heroGymGroup from "@/assets/hero-gym-group.jpg";
 import heroHomeCouple from "@/assets/hero-home-couple.jpg";
 import heroParkCouple from "@/assets/hero-park-couple.jpg";
 
-const heroImages = [heroGymGroup, heroHomeCouple, heroParkCouple];
+const heroImages = [
+  { src: heroGymGroup, filter: "brightness-[0.6]" },
+  { src: heroHomeCouple, filter: "brightness-[0.65]" },
+  { src: heroParkCouple, filter: "" },
+];
 
 type HeroBackgroundImagesProps = {
   className?: string;
