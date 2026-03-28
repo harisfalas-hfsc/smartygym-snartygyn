@@ -2116,6 +2116,35 @@ Return JSON with these exact fields:
       logStep(`Workout content acquired via ${parseMethod}`, { equipment, name: workoutContent.name });
 
       // ═══════════════════════════════════════════════════════════════════════════════
+      // POST-GENERATION NAME UNIQUENESS CHECK
+      // If the AI generated a name that already exists, auto-differentiate it
+      // ═══════════════════════════════════════════════════════════════════════════════
+      if (workoutContent.name) {
+        const nameToCheck = workoutContent.name.trim();
+        const nameExistsInDb = existingNamesForCategory.some(
+          (n: string) => n.trim().toLowerCase() === nameToCheck.toLowerCase()
+        );
+        const nameMatchesFirstWorkout = firstWorkoutName && 
+          firstWorkoutName.trim().toLowerCase() === nameToCheck.toLowerCase();
+        
+        if (nameExistsInDb || nameMatchesFirstWorkout) {
+          // Generate a unique suffix based on date + equipment
+          const dateSuffix = effectiveDate.replace(/-/g, '').slice(-4); // e.g., "0328"
+          const eqSuffix = equipment === "EQUIPMENT" ? "EQ" : equipment === "BODYWEIGHT" ? "BW" : "V";
+          const uniqueName = `${nameToCheck} ${dateSuffix}${eqSuffix}`;
+          logStep(`⚠️ Name collision detected, auto-renaming`, {
+            original: nameToCheck,
+            newName: uniqueName,
+            collidedWith: nameExistsInDb ? 'database' : 'first workout today'
+          });
+          workoutContent.name = uniqueName;
+        }
+        
+        // Add the new name to our tracking list to prevent same-session collisions
+        existingNamesForCategory.push(workoutContent.name);
+      }
+
+      // ═══════════════════════════════════════════════════════════════════════════════
       // LIBRARY-FIRST VALIDATION + SAFETY NET
       // Step 1: Check if the AI used {{exercise:ID:Name}} markup correctly
       // Step 2: Validate that every ID exists in the library
