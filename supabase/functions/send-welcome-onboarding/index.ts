@@ -13,6 +13,108 @@ const corsHeaders = {
 
 const ONBOARDING_MESSAGE_TYPE = MESSAGE_TYPES.WELCOME_ONBOARDING;
 
+async function sendOnboardingToUser(supabaseAdmin: any, userId: string) {
+  // Check if already sent
+  const { data: existing } = await supabaseAdmin
+    .from('user_system_messages')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('message_type', ONBOARDING_MESSAGE_TYPE)
+    .limit(1);
+
+  if (existing && existing.length > 0) {
+    console.log(`[WELCOME-ONBOARDING] Already sent to ${userId}, skipping.`);
+    return new Response(JSON.stringify({ success: true, alreadySent: true }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  // Get template
+  const { data: template, error: templateError } = await supabaseAdmin
+    .from('automated_message_templates')
+    .select('*')
+    .eq('message_type', ONBOARDING_MESSAGE_TYPE)
+    .eq('is_active', true)
+    .eq('is_default', true)
+    .single();
+
+  if (templateError || !template) {
+    console.error("[WELCOME-ONBOARDING] No active template:", templateError);
+    return new Response(JSON.stringify({ error: "No template found" }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500,
+    });
+  }
+
+  // Check notification prefs
+  const { data: profile } = await supabaseAdmin
+    .from('profiles')
+    .select('notification_preferences')
+    .eq('user_id', userId)
+    .single();
+
+  const prefs = (profile?.notification_preferences as Record<string, any>) || {};
+
+  // Dashboard message
+  const dashPrefKey = `dashboard_${ONBOARDING_MESSAGE_TYPE}`;
+  let dashboardSent = false;
+  if (prefs[dashPrefKey] !== false) {
+    await supabaseAdmin.from('user_system_messages').insert({
+      user_id: userId,
+      message_type: ONBOARDING_MESSAGE_TYPE,
+      subject: template.dashboard_subject || template.subject,
+      content: template.dashboard_content || template.content,
+      is_read: false,
+    });
+    dashboardSent = true;
+    console.log(`[WELCOME-ONBOARDING] Dashboard message sent to ${userId}`);
+  }
+
+  // Email
+  let emailSent = false;
+  if (prefs.opt_out_all !== true && prefs.email !== false && prefs[`email_${ONBOARDING_MESSAGE_TYPE}`] !== false) {
+    try {
+      const { data: userData } = await supabaseAdmin.auth.admin.getUserById(userId);
+      if (userData?.user?.email) {
+        const emailSubject = template.email_subject || template.subject;
+        const emailContent = template.email_content || template.content;
+        const emailHtml = wrapInEmailTemplateWithFooter(
+          emailSubject, emailContent, userData.user.email,
+          'https://smartygym.lovable.app/userdashboard', 'Explore Your Dashboard'
+        );
+        await resend.emails.send({
+          from: "SmartyGym <notifications@smartygym.com>",
+          to: [userData.user.email],
+          subject: emailSubject,
+          html: emailHtml,
+          headers: getEmailHeaders(userData.user.email),
+        });
+        emailSent = true;
+        console.log(`[WELCOME-ONBOARDING] Email sent to ${userData.user.email}`);
+      }
+    } catch (emailErr) {
+      console.error(`[WELCOME-ONBOARDING] Email failed for ${userId}:`, emailErr);
+    }
+  }
+
+  // Audit log
+  await supabaseAdmin.from('notification_audit_log').insert({
+    notification_type: 'automated',
+    message_type: ONBOARDING_MESSAGE_TYPE,
+    sent_by: null,
+    recipient_filter: 'manual_trigger',
+    recipient_count: 1,
+    success_count: (dashboardSent ? 1 : 0) + (emailSent ? 1 : 0),
+    failed_count: 0,
+    subject: template.subject,
+    content: 'Welcome Onboarding Guide - manual trigger',
+    metadata: { user_id: userId, dashboard_sent: dashboardSent, email_sent: emailSent },
+  });
+
+  return new Response(JSON.stringify({ success: true, dashboardSent, emailSent }), {
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -25,12 +127,24 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
+    // Support manual trigger for a specific user
+    let manualTriggerUserId: string | null = null;
+    try {
+      const body = await req.json();
+      manualTriggerUserId = body?.manualTriggerUserId || null;
+    } catch { /* no body = cron trigger */ }
+
+    if (manualTriggerUserId) {
+      console.log(`[WELCOME-ONBOARDING] Manual trigger for user: ${manualTriggerUserId}`);
+      return await sendOnboardingToUser(supabaseAdmin, manualTriggerUserId);
+    }
+
     console.log("[WELCOME-ONBOARDING] Starting daily check for 5-day-old premium members...");
 
     // Check if automation rule is active
     const { data: rule } = await supabaseAdmin
       .from('automation_rules')
-      .select('is_active')
+      .select('is_active, total_executions')
       .eq('automation_key', 'welcome_onboarding_5day')
       .single();
 
@@ -93,77 +207,16 @@ serve(async (req) => {
     let skipCount = 0;
 
     for (const sub of subscriptions) {
-      // Check if already sent
-      const { data: existing } = await supabaseAdmin
-        .from('user_system_messages')
-        .select('id')
-        .eq('user_id', sub.user_id)
-        .eq('message_type', ONBOARDING_MESSAGE_TYPE)
-        .limit(1);
-
-      if (existing && existing.length > 0) {
-        console.log(`[WELCOME-ONBOARDING] Already sent to ${sub.user_id}, skipping.`);
+      const result = await sendOnboardingToUser(supabaseAdmin, sub.user_id);
+      const resultBody = await result.json();
+      if (resultBody.alreadySent) {
         skipCount++;
-        continue;
+      } else if (resultBody.success) {
+        sentCount++;
       }
-
-      // Check user notification preferences
-      const { data: profile } = await supabaseAdmin
-        .from('profiles')
-        .select('notification_preferences')
-        .eq('user_id', sub.user_id)
-        .single();
-
-      const prefs = (profile?.notification_preferences as Record<string, any>) || {};
-
-      // Insert dashboard message (unless disabled)
-      const dashPrefKey = `dashboard_${ONBOARDING_MESSAGE_TYPE}`;
-      if (prefs[dashPrefKey] !== false) {
-        await supabaseAdmin
-          .from('user_system_messages')
-          .insert({
-            user_id: sub.user_id,
-            message_type: ONBOARDING_MESSAGE_TYPE,
-            subject: template.dashboard_subject || template.subject,
-            content: template.dashboard_content || template.content,
-            is_read: false,
-          });
-      }
-
-      // Send email (unless disabled)
-      if (prefs.opt_out_all !== true && prefs.email !== false && prefs[`email_${ONBOARDING_MESSAGE_TYPE}`] !== false) {
-        try {
-          const { data: userData } = await supabaseAdmin.auth.admin.getUserById(sub.user_id);
-          if (userData?.user?.email) {
-            const emailSubject = template.email_subject || template.subject;
-            const emailContent = template.email_content || template.content;
-            const emailHtml = wrapInEmailTemplateWithFooter(
-              emailSubject,
-              emailContent,
-              userData.user.email,
-              'https://smartygym.lovable.app/userdashboard',
-              'Explore Your Dashboard'
-            );
-
-            await resend.emails.send({
-              from: "SmartyGym <notifications@smartygym.com>",
-              to: [userData.user.email],
-              subject: emailSubject,
-              html: emailHtml,
-              headers: getEmailHeaders(userData.user.email),
-            });
-
-            console.log(`[WELCOME-ONBOARDING] Email sent to ${userData.user.email}`);
-          }
-        } catch (emailErr) {
-          console.error(`[WELCOME-ONBOARDING] Email failed for ${sub.user_id}:`, emailErr);
-        }
-      }
-
-      sentCount++;
     }
 
-    // Log audit
+    // Log audit for batch run
     await supabaseAdmin
       .from('notification_audit_log')
       .insert({
