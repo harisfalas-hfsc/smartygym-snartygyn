@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX idx_admin_workouts_unique_name ON admin_workouts (name);
