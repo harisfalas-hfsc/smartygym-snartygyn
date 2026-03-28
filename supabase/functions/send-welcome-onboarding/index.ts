@@ -25,6 +25,18 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
+    // Support manual trigger for a specific user
+    let manualTriggerUserId: string | null = null;
+    try {
+      const body = await req.json();
+      manualTriggerUserId = body?.manualTriggerUserId || null;
+    } catch { /* no body = cron trigger */ }
+
+    if (manualTriggerUserId) {
+      console.log(`[WELCOME-ONBOARDING] Manual trigger for user: ${manualTriggerUserId}`);
+      return await sendOnboardingToUser(supabaseAdmin, manualTriggerUserId);
+    }
+
     console.log("[WELCOME-ONBOARDING] Starting daily check for 5-day-old premium members...");
 
     // Check if automation rule is active
