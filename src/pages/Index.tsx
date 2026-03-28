@@ -763,7 +763,7 @@ const Index = () => {
                 <HeroBackgroundImages />
                 
                 {/* Semi-transparent overlay for readability */}
-                <div className="absolute inset-0 bg-background/65 z-10" />
+                <div className="absolute inset-0 bg-background/70 z-10" />
                 
                 {/* Decorative circles */}
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -mr-16 -mt-16 z-20" aria-hidden="true"></div>
