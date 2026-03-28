@@ -1,54 +1,54 @@
 
-## Incident explanation (based on current data)
 
-1. **Why Manos never got Welcome #1 originally**
-   - The welcome pipeline depends on a profile-insert trigger that checks whether email is already confirmed **at insert time**.
-   - For Manos, profile was created at `2026-03-05 15:10:20 UTC`, but email was confirmed at `15:10:35 UTC` (15 seconds later).
-   - Because confirmation happened after profile insert, the trigger path was skipped and there was no retry at that time.
-   - There are also **two profile insert triggers** calling the same welcome function, which is risky and should be cleaned up.
+# Fix Welcome Message 2 — Missing From Admin Panel & Database
 
-2. **Did he get it now? Which inbox?**
-   - **Dashboard inbox:** Yes. `user_system_messages` has a `welcome` message for his user at `2026-03-28 07:42:43 UTC`.
-   - **Email:** System audit shows `email_sent: true` for that same send event at `2026-03-28 07:42:44 UTC` to his account email (`manos_christofi@yahoo.com`).
-   - This means the provider accepted the email send; final mailbox placement (inbox/spam) depends on recipient mailbox filtering.
+## What Went Wrong
 
-3. **When will he get Welcome #2 with current logic**
-   - Current automation sends only to users whose premium subscription was created **exactly 5 days ago**.
-   - Manos subscription started `2026-03-09`, so he is outside that window and will not get it automatically now.
-   - Cron for Welcome #2 exists and is active (`0 10 * * *`), but no run yet because it was created recently and next run is at scheduled time.
+Three things were never completed in the previous implementation:
 
-4. **Are cron jobs currently running**
-   - Core jobs checked are active and recently succeeding (morning notifications, scheduled notifications, renewal reminders).
-   - Welcome #2 cron is active; pending first eligible execution window.
+1. **Template row missing** — The migration only added the enum value `welcome_onboarding` to the database type. It never inserted the actual template content into the `automated_message_templates` table. So the edge function tries to fetch the template and gets nothing.
 
----
+2. **Automation rule missing** — No row was inserted into the `automation_rules` table for `welcome_onboarding_5day`. That's why you don't see it in the Auto Messages tab.
 
-## Implementation plan (next execution pass)
+3. **Hardcoded UI** — The Templates tab (`AutomatedMessagesManager.tsx`) has a hardcoded list of 9 message types on lines 40-50. `welcome_onboarding` is not in that list. Even if the database had the template, the UI would still hide it.
 
-1. **Immediate user recovery**
-   - Trigger **Welcome #2 immediately for Manos** (dashboard + email), then verify:
-     - dashboard row exists in `user_system_messages`
-     - audit row exists with send metadata
-     - no duplicate welcome_onboarding message
+## Implementation Plan
 
-2. **Fix the root cause for Welcome #1**
-   - Replace fragile “insert-time confirmed email” dependency with a robust fallback:
-     - keep first-login send path
-     - add a backend retry/backfill job for users with `welcome_sent = false` and confirmed email
-   - Remove duplicate profile trigger wiring (single trigger only).
+### Step 1: Add `welcome_onboarding` to the Templates UI
 
-3. **Guarantee no future misses**
-   - Add idempotent enforcement for welcome flow:
-     - only one `welcome` per user
-     - safe retry behavior if first attempt is skipped/fails
+Edit `src/components/admin/AutomatedMessagesManager.tsx` — add `welcome_onboarding` to the `MESSAGE_TYPES` object with label "Welcome Onboarding Guide", a relevant icon, and description "Sent 5 days after premium signup — full platform guide".
 
-4. **Cron reliability hardening**
-   - Add cron health watchdog:
-     - monitor `cron.job_run_details` for failures/stale jobs
-     - alert admin via dashboard notification if any critical job misses expected runtime
-   - Extend system health audit to include “last successful run” and failure streaks per critical job.
+### Step 2: Insert the template into the database
 
-5. **Verification checklist after changes**
-   - New premium test user with delayed email confirm still gets Welcome #1.
-   - Manos has Welcome #2 in dashboard and email audit.
-   - Critical cron jobs show green status and last-run timestamps in admin monitoring.
+Use the data insert tool to add the full onboarding template row into `automated_message_templates` with:
+- `message_type`: `welcome_onboarding`
+- `template_name`: "Welcome Onboarding Guide"
+- `subject`: the motivational onboarding subject
+- `content`: the full emoji-rich, section-by-section onboarding message (WOD philosophy, Calendar, Programs, Ritual, Tools, Blog, Logbook, what makes SmartyGym different)
+- `dashboard_subject` / `dashboard_content` / `email_subject` / `email_content`: matching versions
+- `is_active`: true, `is_default`: true
+
+### Step 3: Insert the automation rule into the database
+
+Insert into `automation_rules`:
+- `automation_key`: `welcome_onboarding_5day`
+- `name`: "Welcome Onboarding Guide (5-Day)"
+- `description`: "Sends comprehensive platform guide 5 days after premium signup"
+- `rule_type`: `scheduled`
+- `trigger_type`: `cron`
+- `trigger_config`: with `cron_job_name`, `edge_function_name`, schedule description
+- `message_type`: `welcome_onboarding`
+- `target_audience`: `premium_members`
+- `sends_email`: true, `sends_dashboard_message`: true
+- `is_active`: true
+
+### Step 4: Verify the cron job exists
+
+Check and ensure the cron job `send-welcome-onboarding-daily` is registered. If not, insert it via SQL.
+
+## Files Changed
+
+- `src/components/admin/AutomatedMessagesManager.tsx` — add `welcome_onboarding` to hardcoded MESSAGE_TYPES
+- Database inserts (2): template row + automation rule row
+- Possible cron job registration if missing
+
