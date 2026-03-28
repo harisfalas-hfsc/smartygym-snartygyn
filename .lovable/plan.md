@@ -1,77 +1,65 @@
 
 
-# Upgrade Analytics: Full Event Tracking & Enhanced Dashboard
+# Create "Welcome Message 2" — Onboarding Guide + Automated 5-Day Delivery
 
-## Overview
-Currently, your analytics only tracks a single "visit" event per session with the landing page. This upgrade adds comprehensive behavioral tracking (page navigation, scroll depth, CTA clicks, time on page, exit detection) and surfaces all this new data in the admin Website Analytics dashboard.
+## Finding: Manos Never Got the Welcome Message
+Manos Christofi (`welcome_sent: false`) has **zero** welcome messages in his inbox. This is a separate issue but worth noting — the welcome trigger may have a bug. We'll send him Welcome Message 2 manually after setup, and I'll also investigate the welcome message gap.
 
-## What You'll Get
-- **Page Navigation Tracking** — Every page change is recorded, so you can see user journeys (which pages they visit after landing, in what order)
-- **Scroll Depth** — Know if visitors read 25%, 50%, 75%, or 100% of each page
-- **CTA Click Tracking** — Track clicks on key buttons: "Join Premium", "View Plans", "Sign Up", "Contact", "Shop" etc.
-- **Time on Page** — How long visitors spend on each page before navigating away
-- **Exit Detection** — Which page users are on when they leave your website
-- **Enhanced Dashboard** — New sections in admin analytics showing all this data with charts and tables
+## What This Plan Delivers
 
-## Technical Plan
+1. **A rich, interactive onboarding message** covering all platform features in an engaging, emoji-driven, easy-to-read format
+2. **A new message type** (`welcome_onboarding`) added to the database enum and notification registry
+3. **An automated template** stored in `automated_message_templates` as "Welcome Message 2"
+4. **A new edge function** (`send-welcome-onboarding`) that runs daily via cron, finds premium members who signed up exactly 5 days ago and haven't received this message yet, and sends it via both dashboard + email
+5. **A cron job** scheduled to run daily
 
-### Step 1: Add new event types to tracking system
-**File: `src/utils/socialMediaTracking.ts`**
-- Expand `TrackEventParams.eventType` to include: `page_view`, `scroll_depth`, `cta_click`, `time_on_page`, `exit`
-- Add new tracking functions:
-  - `trackPageNavigation(path)` — fires on every route change (not just first visit)
-  - `trackScrollDepth(path, depth)` — fires at 25/50/75/100% scroll thresholds using IntersectionObserver
-  - `trackCTAClick(ctaName, path)` — fires when key CTAs are clicked
-  - `trackTimeOnPage(path, seconds)` — fires when user leaves a page
-  - `trackExit(path)` — fires on `beforeunload` / `visibilitychange`
-- Use `event_value` field for numeric data (scroll %, seconds) and `landing_page` for the page path
-- Use `utm_content` field to store extra context (CTA name, scroll milestone) to avoid schema changes
+## Message Content Structure
 
-### Step 2: Integrate tracking into the app
-**File: `src/App.tsx`** (or a new `src/components/AnalyticsTracker.tsx` component)
-- Create an `<AnalyticsTracker />` component that:
-  - Listens to route changes via `useLocation()` and calls `trackPageNavigation`
-  - Sets up scroll depth observers on each page
-  - Tracks time on page using `performance.now()` or timestamps
-  - Registers `beforeunload` and `visibilitychange` listeners for exit detection
-- CTA click tracking: Add a utility `trackCTA(name)` that can be called from onClick handlers on key buttons, or use a data attribute approach with a global click listener for `[data-track-cta]` elements
+The message will be visually structured with numbered sections, emojis, bold headers, and short punchy paragraphs — not a wall of text. Sections:
 
-### Step 3: Add data attributes to key CTAs
-**Files: Various page components**
-- Add `data-track-cta="join-premium"` to Join Premium buttons
-- Add `data-track-cta="view-plans"` to pricing/plans buttons
-- Add `data-track-cta="signup"` to sign up buttons
-- Add `data-track-cta="contact"` to contact buttons
-- The global click listener in AnalyticsTracker catches these automatically — no need to modify every component individually
+1. 🏆 **Workout of the Day** — philosophy, science-based daily programming, how it's built
+2. 📅 **Smarty Workouts Calendar** — browse alternatives if the WOD isn't your mood today
+3. 🎯 **Training Programs** — long-term periodized programs for serious goal achievement
+4. 🧘 **Smarty Ritual** — daily wellness ritual, why consistency matters
+5. 🛠️ **Smarty Tools** — use anywhere, anytime (gym, home, on the go)
+6. 📚 **Blog & Knowledge** — fitness, nutrition, wellness articles
+7. 📊 **Logbook & Progress** — track goals, see progress, stay motivated
+8. 💡 **What Makes SmartyGym Different** — human-designed, science-based, not random workouts
 
-### Step 4: Upgrade the admin analytics dashboard
-**File: `src/components/admin/analytics/WebsiteAnalytics.tsx`**
-- Add new sections after the existing ones:
+Closing: motivational push — "You have something powerful in your hands."
 
-1. **User Journey / Page Flow** — Show which pages users navigate to after landing (top page transitions, e.g., "/" → "/workout" → "/joinpremium"), with a flow table
-2. **Scroll Depth by Page** — Bar chart showing average scroll depth per page (which pages get fully read vs. abandoned early)
-3. **CTA Performance** — Table showing each CTA's click count, which pages they're clicked from, and conversion context
-4. **Time on Page** — Average time spent per page, sorted by engagement
-5. **Exit Pages** — Which pages users leave from most often (exit rate per page)
+No name placeholder — it's a generic template.
 
-Each section follows existing pattern: chart + data table + CSV export button.
+## Technical Steps
 
-### Step 5: Database optimization
-- Add a database index on `(event_type, landing_page)` for faster analytics queries on new event types
-- No new tables needed — reuses existing `social_media_analytics` table with new event_type values
+### Step 1: Database migration
+- Add `welcome_onboarding` to the `message_type` enum
+- Insert the template row into `automated_message_templates` with full HTML content (dashboard + email versions)
 
-## Performance Safeguards
-- Scroll tracking uses `IntersectionObserver` (no scroll event spam)
-- Events are debounced/throttled — scroll depth fires max 4 times per page (25/50/75/100)
-- Time on page only fires once per page navigation
-- Exit event fires once via `visibilitychange` (reliable on mobile)
-- All tracking respects existing `shouldExcludeFromTracking()` logic (no admin/preview/bot tracking)
+### Step 2: Update notification registry
+- Add `WELCOME_ONBOARDING` to `supabase/functions/_shared/notification-types.ts`
+
+### Step 3: Create edge function `send-welcome-onboarding`
+- Query `user_subscriptions` for active premium members whose subscription `created_at` is exactly 5 days ago
+- Check they haven't already received a `welcome_onboarding` message
+- Send via `send-system-message` (which handles both dashboard + email delivery)
+- Pattern follows `send-renewal-reminders` — checks automation rule, uses template, sends to qualifying users
+
+### Step 4: Create cron job
+- Schedule daily at 10:00 UTC (12:00 Cyprus) — a good mid-morning time for an onboarding email
+- Uses existing `cron.schedule` + `net.http_post` pattern
+
+### Step 5: Add to admin UI
+- The template will appear automatically in the Templates tab since it uses the standard `automated_message_templates` table
+- Add automation rule entry so it can be toggled on/off from the Auto Messages tab
+
+### Step 6: Send Welcome Message 1 to Manos
+- Manos never received his welcome message — trigger it manually for him
 
 ## Files Changed
-- `src/utils/socialMediaTracking.ts` — new tracking functions
-- `src/components/AnalyticsTracker.tsx` — new component for automated tracking
-- `src/App.tsx` — mount AnalyticsTracker
-- `src/components/admin/analytics/WebsiteAnalytics.tsx` — 5 new dashboard sections
-- Database migration — index on `(event_type, landing_page)`
-- Minor edits to CTA buttons across pages (adding `data-track-cta` attributes)
+- Database migration (enum + template + automation rule)
+- `supabase/functions/_shared/notification-types.ts` — add WELCOME_ONBOARDING
+- `supabase/functions/send-welcome-onboarding/index.ts` — new edge function
+- `supabase/config.toml` — function config
+- Cron job via SQL insert
 
