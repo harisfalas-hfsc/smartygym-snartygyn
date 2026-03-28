@@ -1002,6 +1002,254 @@ export function WebsiteAnalytics() {
             </CardContent>
           </Card>
         </div>
+
+        {/* ===== SECTION 5: USER JOURNEY / PAGE FLOW ===== */}
+        <Card>
+          <CardHeader className="pb-2">
+            <div className="flex justify-between items-center">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Navigation className="h-5 w-5" /> User Journey Flow
+                </CardTitle>
+                <CardDescription>Top page-to-page transitions showing how users navigate your site</CardDescription>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => exportSectionCSV(pageFlows, 'page-flows')}>
+                <Download className="h-3 w-3 mr-1" /> CSV
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {pageFlows.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <Navigation className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                <p className="text-sm">No page flow data yet. Data will appear as visitors navigate between pages.</p>
+              </div>
+            ) : (
+              <div className="border rounded-lg overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead className="bg-muted">
+                    <tr>
+                      <th className="text-left py-2 px-3 font-medium">From Page</th>
+                      <th className="text-center py-2 px-3 font-medium">→</th>
+                      <th className="text-left py-2 px-3 font-medium">To Page</th>
+                      <th className="text-right py-2 px-3 font-medium">Count</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pageFlows.map((flow, idx) => (
+                      <tr key={idx} className="border-t">
+                        <td className="py-2 px-3 font-mono text-xs">{flow.from}</td>
+                        <td className="text-center py-2 px-3 text-muted-foreground">→</td>
+                        <td className="py-2 px-3 font-mono text-xs">{flow.to}</td>
+                        <td className="text-right py-2 px-3 font-medium">{flow.count}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* ===== SECTION 6: SCROLL DEPTH ===== */}
+          <Card>
+            <CardHeader className="pb-2">
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <ScrollText className="h-5 w-5" /> Scroll Depth by Page
+                  </CardTitle>
+                  <CardDescription>Average scroll depth per page</CardDescription>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => exportSectionCSV(scrollDepthData, 'scroll-depth')}>
+                  <Download className="h-3 w-3 mr-1" /> CSV
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {scrollDepthData.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <ScrollText className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <p className="text-sm">No scroll data yet.</p>
+                </div>
+              ) : (
+                <>
+                  <ResponsiveContainer width="100%" height={200}>
+                    <BarChart data={scrollDepthData} barSize={16}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="page" tick={{ fontSize: 9 }} interval={0} angle={-20} textAnchor="end" height={60} />
+                      <YAxis tick={{ fontSize: 10 }} domain={[0, 100]} unit="%" />
+                      <Tooltip 
+                        contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }}
+                        formatter={(value: number) => [`${value}%`, "Avg Scroll Depth"]}
+                        labelFormatter={(label, payload) => payload?.[0]?.payload?.fullPage || label}
+                      />
+                      <Bar dataKey="avgDepth" name="Avg Depth %" fill="hsl(var(--chart-3))" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                  <div className="mt-3 border-t pt-3 max-h-[150px] overflow-y-auto">
+                    {scrollDepthData.map((page, idx) => (
+                      <div key={idx} className="flex justify-between items-center text-xs py-1 border-b last:border-0">
+                        <span className="text-muted-foreground truncate max-w-[180px]" title={page.fullPage}>{page.page}</span>
+                        <span className="font-medium">{page.avgDepth}% <span className="text-muted-foreground">({page.count} events)</span></span>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* ===== SECTION 7: CTA PERFORMANCE ===== */}
+          <Card>
+            <CardHeader className="pb-2">
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <MousePointerClick className="h-5 w-5" /> CTA Performance
+                  </CardTitle>
+                  <CardDescription>Button clicks and where they happen</CardDescription>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => exportSectionCSV(ctaPerformance, 'cta-performance')}>
+                  <Download className="h-3 w-3 mr-1" /> CSV
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {ctaPerformance.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <MousePointerClick className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <p className="text-sm">No CTA click data yet.</p>
+                </div>
+              ) : (
+                <div className="border rounded-lg overflow-hidden">
+                  <table className="w-full text-sm">
+                    <thead className="bg-muted">
+                      <tr>
+                        <th className="text-left py-2 px-3 font-medium">CTA</th>
+                        <th className="text-right py-2 px-3 font-medium">Clicks</th>
+                        <th className="text-left py-2 px-3 font-medium">Top Page</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {ctaPerformance.map((cta, idx) => (
+                        <tr key={idx} className="border-t">
+                          <td className="py-2 px-3">
+                            <Badge variant="secondary" className="text-xs">{cta.ctaName}</Badge>
+                          </td>
+                          <td className="text-right py-2 px-3 font-medium">{cta.clicks}</td>
+                          <td className="py-2 px-3 font-mono text-xs text-muted-foreground">{cta.topPage}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* ===== SECTION 8: TIME ON PAGE ===== */}
+          <Card>
+            <CardHeader className="pb-2">
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Clock className="h-5 w-5" /> Time on Page
+                  </CardTitle>
+                  <CardDescription>Average time visitors spend per page</CardDescription>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => exportSectionCSV(timeOnPageData, 'time-on-page')}>
+                  <Download className="h-3 w-3 mr-1" /> CSV
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {timeOnPageData.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Clock className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <p className="text-sm">No time-on-page data yet.</p>
+                </div>
+              ) : (
+                <>
+                  <ResponsiveContainer width="100%" height={200}>
+                    <BarChart data={timeOnPageData} barSize={16}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="page" tick={{ fontSize: 9 }} interval={0} angle={-20} textAnchor="end" height={60} />
+                      <YAxis tick={{ fontSize: 10 }} unit="s" />
+                      <Tooltip 
+                        contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }}
+                        formatter={(value: number) => [`${value}s`, "Avg Time"]}
+                        labelFormatter={(label, payload) => payload?.[0]?.payload?.fullPage || label}
+                      />
+                      <Bar dataKey="avgSeconds" name="Avg Seconds" fill="hsl(var(--chart-4))" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                  <div className="mt-3 border-t pt-3 max-h-[150px] overflow-y-auto">
+                    {timeOnPageData.map((page, idx) => (
+                      <div key={idx} className="flex justify-between items-center text-xs py-1 border-b last:border-0">
+                        <span className="text-muted-foreground truncate max-w-[180px]" title={page.fullPage}>{page.page}</span>
+                        <span className="font-medium">{page.avgSeconds}s <span className="text-muted-foreground">({page.views} views)</span></span>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* ===== SECTION 9: EXIT PAGES ===== */}
+          <Card>
+            <CardHeader className="pb-2">
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <LogOut className="h-5 w-5" /> Exit Pages
+                  </CardTitle>
+                  <CardDescription>Where visitors leave your website</CardDescription>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => exportSectionCSV(exitPages, 'exit-pages')}>
+                  <Download className="h-3 w-3 mr-1" /> CSV
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {exitPages.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <LogOut className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <p className="text-sm">No exit data yet.</p>
+                </div>
+              ) : (
+                <div className="border rounded-lg overflow-hidden">
+                  <table className="w-full text-sm">
+                    <thead className="bg-muted">
+                      <tr>
+                        <th className="text-left py-2 px-3 font-medium">Page</th>
+                        <th className="text-right py-2 px-3 font-medium">Exits</th>
+                        <th className="text-right py-2 px-3 font-medium">Exit Rate</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {exitPages.map((page, idx) => (
+                        <tr key={idx} className="border-t">
+                          <td className="py-2 px-3 font-mono text-xs" title={page.fullPage}>{page.page}</td>
+                          <td className="text-right py-2 px-3 font-medium">{page.exits}</td>
+                          <td className="text-right py-2 px-3">
+                            <Badge variant={page.exitRate > 70 ? "destructive" : "secondary"} className="text-xs">
+                              {page.exitRate}%
+                            </Badge>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
