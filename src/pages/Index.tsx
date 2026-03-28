@@ -797,7 +797,7 @@ const Index = () => {
                           </div>
                         </div>
                         
-                        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 text-center">
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 text-center text-white">
                           100% Human. <span className="text-destructive">0% AI.</span>
                         </h2>
                         
