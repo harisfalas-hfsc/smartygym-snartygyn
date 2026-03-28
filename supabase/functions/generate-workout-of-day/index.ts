@@ -679,6 +679,31 @@ This is a NUDGE, not a mandate.
     let firstWorkoutName = "";
 
     // ═══════════════════════════════════════════════════════════════════════════════
+    // FETCH EXISTING WORKOUT NAMES for uniqueness enforcement
+    // Query all names in this category to prevent the AI from reusing them
+    // ═══════════════════════════════════════════════════════════════════════════════
+    let existingNamesForCategory: string[] = [];
+    try {
+      const { data: existingNames } = await supabase
+        .from("admin_workouts")
+        .select("name")
+        .eq("category", category)
+        .order("created_at", { ascending: false })
+        .limit(500);
+      
+      if (existingNames) {
+        existingNamesForCategory = existingNames.map((w: any) => w.name);
+        logStep("Loaded existing workout names for uniqueness check", { 
+          category, 
+          count: existingNamesForCategory.length,
+          sample: existingNamesForCategory.slice(0, 5)
+        });
+      }
+    } catch (nameErr) {
+      logStep("Failed to fetch existing names (non-critical)", { error: String(nameErr) });
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════════
     // EXERCISE LIBRARY: Fetch and build reference list for AI prompt
     // BODYWEIGHT workouts → only bodyweight exercises visible to AI
     // EQUIPMENT workouts → full library (bodyweight + all equipment)
