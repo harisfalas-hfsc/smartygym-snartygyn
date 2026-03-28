@@ -337,6 +337,7 @@ export const Navigation = () => {
                     variant="ghost"
                     onClick={() => handleNavigate("/smarty-plans")}
                     className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/smarty-plans' ? 'text-primary underline underline-offset-4 bg-primary/10' : 'text-foreground hover:bg-primary/10 hover:text-foreground'}`}
+                    data-track-cta="view-plans-nav"
                   >
                     <Crown className="mr-2 h-4 w-4 text-yellow-500" />
                     Smarty Plans

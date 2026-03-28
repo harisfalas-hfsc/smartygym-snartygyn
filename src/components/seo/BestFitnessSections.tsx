@@ -339,7 +339,7 @@ export const EnhancedCTA = () => {
             Gold Plan: €9.99/month | Platinum Plan: €89.89/year (best value) | Free content available
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Button size="lg" onClick={() => navigate("/join-premium")}>
+            <Button size="lg" onClick={() => navigate("/join-premium")} data-track-cta="join-premium">
               Join Premium <ArrowRight className="ml-1 h-4 w-4" />
             </Button>
             <Button size="lg" variant="outline" onClick={() => navigate("/workout")}>
