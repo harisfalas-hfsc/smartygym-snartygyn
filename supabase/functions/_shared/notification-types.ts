@@ -74,6 +74,9 @@ export const MESSAGE_TYPES = {
   /** Welcome email for new signups */
   WELCOME: 'welcome',
   
+  /** Welcome Onboarding Guide (5 days after premium signup) */
+  WELCOME_ONBOARDING: 'welcome_onboarding',
+  
   /** First purchase thank you */
   FIRST_PURCHASE: 'first_purchase',
   

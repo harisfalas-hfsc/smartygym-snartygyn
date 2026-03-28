@@ -1,0 +1,201 @@
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { Resend } from "https://esm.sh/resend@3.5.0";
+import { MESSAGE_TYPES } from "../_shared/notification-types.ts";
+import { getEmailHeaders, wrapInEmailTemplateWithFooter } from "../_shared/email-utils.ts";
+
+const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+const ONBOARDING_MESSAGE_TYPE = MESSAGE_TYPES.WELCOME_ONBOARDING;
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const supabaseAdmin = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { auth: { persistSession: false } }
+    );
+
+    console.log("[WELCOME-ONBOARDING] Starting daily check for 5-day-old premium members...");
+
+    // Check if automation rule is active
+    const { data: rule } = await supabaseAdmin
+      .from('automation_rules')
+      .select('is_active')
+      .eq('automation_key', 'welcome_onboarding_5day')
+      .single();
+
+    if (rule && !rule.is_active) {
+      console.log("[WELCOME-ONBOARDING] Automation rule is disabled, skipping.");
+      return new Response(JSON.stringify({ success: true, message: "Automation disabled" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Get the template
+    const { data: template, error: templateError } = await supabaseAdmin
+      .from('automated_message_templates')
+      .select('*')
+      .eq('message_type', ONBOARDING_MESSAGE_TYPE)
+      .eq('is_active', true)
+      .eq('is_default', true)
+      .single();
+
+    if (templateError || !template) {
+      console.error("[WELCOME-ONBOARDING] No active template found:", templateError);
+      return new Response(JSON.stringify({ error: "No template found" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500,
+      });
+    }
+
+    // Find premium members whose subscription was created exactly 5 days ago (within a 24h window)
+    const now = new Date();
+    const fiveDaysAgo = new Date(now);
+    fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
+    const fiveDaysAgoStart = new Date(fiveDaysAgo);
+    fiveDaysAgoStart.setHours(0, 0, 0, 0);
+    const fiveDaysAgoEnd = new Date(fiveDaysAgo);
+    fiveDaysAgoEnd.setHours(23, 59, 59, 999);
+
+    const { data: subscriptions, error: subError } = await supabaseAdmin
+      .from('user_subscriptions')
+      .select('user_id')
+      .in('plan_type', ['gold', 'platinum'])
+      .eq('status', 'active')
+      .gte('created_at', fiveDaysAgoStart.toISOString())
+      .lte('created_at', fiveDaysAgoEnd.toISOString());
+
+    if (subError) {
+      console.error("[WELCOME-ONBOARDING] Error querying subscriptions:", subError);
+      throw subError;
+    }
+
+    if (!subscriptions || subscriptions.length === 0) {
+      console.log("[WELCOME-ONBOARDING] No qualifying users found today.");
+      return new Response(JSON.stringify({ success: true, sent: 0 }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    console.log(`[WELCOME-ONBOARDING] Found ${subscriptions.length} potential users.`);
+
+    let sentCount = 0;
+    let skipCount = 0;
+
+    for (const sub of subscriptions) {
+      // Check if already sent
+      const { data: existing } = await supabaseAdmin
+        .from('user_system_messages')
+        .select('id')
+        .eq('user_id', sub.user_id)
+        .eq('message_type', ONBOARDING_MESSAGE_TYPE)
+        .limit(1);
+
+      if (existing && existing.length > 0) {
+        console.log(`[WELCOME-ONBOARDING] Already sent to ${sub.user_id}, skipping.`);
+        skipCount++;
+        continue;
+      }
+
+      // Check user notification preferences
+      const { data: profile } = await supabaseAdmin
+        .from('profiles')
+        .select('notification_preferences')
+        .eq('user_id', sub.user_id)
+        .single();
+
+      const prefs = (profile?.notification_preferences as Record<string, any>) || {};
+
+      // Insert dashboard message (unless disabled)
+      const dashPrefKey = `dashboard_${ONBOARDING_MESSAGE_TYPE}`;
+      if (prefs[dashPrefKey] !== false) {
+        await supabaseAdmin
+          .from('user_system_messages')
+          .insert({
+            user_id: sub.user_id,
+            message_type: ONBOARDING_MESSAGE_TYPE,
+            subject: template.dashboard_subject || template.subject,
+            content: template.dashboard_content || template.content,
+            is_read: false,
+          });
+      }
+
+      // Send email (unless disabled)
+      if (prefs.opt_out_all !== true && prefs.email !== false && prefs[`email_${ONBOARDING_MESSAGE_TYPE}`] !== false) {
+        try {
+          const { data: userData } = await supabaseAdmin.auth.admin.getUserById(sub.user_id);
+          if (userData?.user?.email) {
+            const emailSubject = template.email_subject || template.subject;
+            const emailContent = template.email_content || template.content;
+            const emailHtml = wrapInEmailTemplateWithFooter(
+              emailSubject,
+              emailContent,
+              userData.user.email,
+              'https://smartygym.lovable.app/userdashboard',
+              'Explore Your Dashboard'
+            );
+
+            await resend.emails.send({
+              from: "SmartyGym <notifications@smartygym.com>",
+              to: [userData.user.email],
+              subject: emailSubject,
+              html: emailHtml,
+              headers: getEmailHeaders(userData.user.email),
+            });
+
+            console.log(`[WELCOME-ONBOARDING] Email sent to ${userData.user.email}`);
+          }
+        } catch (emailErr) {
+          console.error(`[WELCOME-ONBOARDING] Email failed for ${sub.user_id}:`, emailErr);
+        }
+      }
+
+      sentCount++;
+    }
+
+    // Log audit
+    await supabaseAdmin
+      .from('notification_audit_log')
+      .insert({
+        notification_type: 'automated',
+        message_type: ONBOARDING_MESSAGE_TYPE,
+        sent_by: null,
+        recipient_filter: 'premium_5_day',
+        recipient_count: subscriptions.length,
+        success_count: sentCount,
+        failed_count: 0,
+        subject: template.subject,
+        content: 'Welcome Onboarding Guide - 5 day follow-up',
+        metadata: { skipped: skipCount },
+      });
+
+    // Update automation rule last triggered
+    await supabaseAdmin
+      .from('automation_rules')
+      .update({ last_triggered_at: new Date().toISOString(), total_executions: (rule?.total_executions || 0) + 1 })
+      .eq('automation_key', 'welcome_onboarding_5day');
+
+    console.log(`[WELCOME-ONBOARDING] Done. Sent: ${sentCount}, Skipped: ${skipCount}`);
+
+    return new Response(
+      JSON.stringify({ success: true, sent: sentCount, skipped: skipCount }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  } catch (error) {
+    console.error("[WELCOME-ONBOARDING] Error:", error);
+    return new Response(
+      JSON.stringify({ error: error instanceof Error ? error.message : String(error) }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
+    );
+  }
+});
