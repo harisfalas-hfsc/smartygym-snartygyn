@@ -192,6 +192,7 @@ export const MESSAGE_TYPE_SOURCES: Record<string, { source: string; schedule: st
   [MESSAGE_TYPES.CANCELLATION]: { source: 'stripe-webhook', schedule: 'On cancellation' },
   [MESSAGE_TYPES.SUBSCRIPTION_EXPIRED]: { source: 'send-subscription-expired-notifications', schedule: 'Daily 08:00 UTC' },
   [MESSAGE_TYPES.WELCOME]: { source: 'send-welcome-email', schedule: 'On signup' },
+  [MESSAGE_TYPES.WELCOME_ONBOARDING]: { source: 'send-welcome-onboarding', schedule: 'Daily 10:00 UTC (5 days after premium signup)' },
   [MESSAGE_TYPES.NEW_WORKOUT]: { source: 'send-new-content-notifications', schedule: 'On new content' },
   [MESSAGE_TYPES.NEW_PROGRAM]: { source: 'send-new-content-notifications', schedule: 'On new content' },
   [MESSAGE_TYPES.NEW_ARTICLE]: { source: 'send-new-content-notifications', schedule: 'On new content' },
