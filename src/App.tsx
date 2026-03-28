@@ -11,6 +11,7 @@ import { AuthenticatedLayout } from "./components/AuthenticatedLayout";
 import { AdminRoute } from "./components/AdminRoute";
 import { trackPageVisit } from "./utils/socialMediaTracking";
 import { ScrollToTop } from "./components/ScrollToTop";
+import { AnalyticsTracker } from "./components/AnalyticsTracker";
 
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { useSessionExpiry } from "./hooks/useSessionExpiry";
