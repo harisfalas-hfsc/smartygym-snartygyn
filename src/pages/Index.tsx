@@ -797,16 +797,16 @@ const Index = () => {
                           </div>
                         </div>
                         
-                        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 text-center">
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 text-center text-white">
                           100% Human. <span className="text-destructive">0% AI.</span>
                         </h2>
                         
 						<div className="max-w-4xl mx-auto space-y-5 text-center mb-10">
-                          <p className="text-xl font-semibold text-foreground">
+                          <p className="text-xl font-semibold text-white">
                             <span className="text-primary font-semibold">SmartyGym</span> workouts and programs are built to fit YOUR life.
                           </p>
-                          <p className="text-lg leading-relaxed text-muted-foreground">
-                            That's why they work — safe and efficient design by <a href="/coach-profile" className="text-primary hover:underline font-medium"><strong>Haris Falas</strong></a>, crafted by hand with care to deliver effective results at <strong>smartygym.com</strong>, <strong className="text-foreground">NOT by AI</strong>.
+                          <p className="text-lg leading-relaxed text-white/90">
+                            That's why they work — safe and efficient design by <a href="/coach-profile" className="text-primary hover:underline font-medium"><strong>Haris Falas</strong></a>, crafted by hand with care to deliver effective results at <strong>smartygym.com</strong>, <strong className="text-white">NOT by AI</strong>.
                           </p>
                           <div className="bg-background/60 backdrop-blur-sm p-6 rounded-lg border-2 border-primary/30 mt-8 max-w-4xl mx-auto">
                             <p className="text-xl font-bold text-primary mb-2">
