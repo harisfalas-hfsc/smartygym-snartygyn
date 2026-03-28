@@ -1,57 +1,77 @@
 
 
-# Fix Duplicate & Repetitive Workout Names
+# Upgrade Analytics: Full Event Tracking & Enhanced Dashboard
 
-## The Problem
+## Overview
+Currently, your analytics only tracks a single "visit" event per session with the landing page. This upgrade adds comprehensive behavioral tracking (page navigation, scroll depth, CTA clicks, time on page, exit detection) and surfaces all this new data in the admin Website Analytics dashboard.
 
-Two issues with workout naming:
+## What You'll Get
+- **Page Navigation Tracking** — Every page change is recorded, so you can see user journeys (which pages they visit after landing, in what order)
+- **Scroll Depth** — Know if visitors read 25%, 50%, 75%, or 100% of each page
+- **CTA Click Tracking** — Track clicks on key buttons: "Join Premium", "View Plans", "Sign Up", "Contact", "Shop" etc.
+- **Time on Page** — How long visitors spend on each page before navigating away
+- **Exit Detection** — Which page users are on when they leave your website
+- **Enhanced Dashboard** — New sections in admin analytics showing all this data with charts and tables
 
-1. **Duplicate names exist** — Multiple workouts share the exact same name (e.g., "Foundation Glute Core" for both bodyweight and equipment). These also have matching Stripe products with wrong names.
+## Technical Plan
 
-2. **Repetitive naming patterns** — The AI prompt on lines 771-789 of `generate-workout-of-day/index.ts` literally *suggests* the same words: "Foundation", "Forge", "Builder" for Strength; "Melt", "Torch" for Calorie Burning. The AI follows the suggestions, producing near-identical names daily.
+### Step 1: Add new event types to tracking system
+**File: `src/utils/socialMediaTracking.ts`**
+- Expand `TrackEventParams.eventType` to include: `page_view`, `scroll_depth`, `cta_click`, `time_on_page`, `exit`
+- Add new tracking functions:
+  - `trackPageNavigation(path)` — fires on every route change (not just first visit)
+  - `trackScrollDepth(path, depth)` — fires at 25/50/75/100% scroll thresholds using IntersectionObserver
+  - `trackCTAClick(ctaName, path)` — fires when key CTAs are clicked
+  - `trackTimeOnPage(path, seconds)` — fires when user leaves a page
+  - `trackExit(path)` — fires on `beforeunload` / `visibilitychange`
+- Use `event_value` field for numeric data (scroll %, seconds) and `landing_page` for the page path
+- Use `utm_content` field to store extra context (CTA name, scroll milestone) to avoid schema changes
 
-3. **No uniqueness enforcement** — The generator never checks existing workout names before inserting. The only deduplication is between the bodyweight/equipment pair on the *same day* (line 764), not against the entire library.
+### Step 2: Integrate tracking into the app
+**File: `src/App.tsx`** (or a new `src/components/AnalyticsTracker.tsx` component)
+- Create an `<AnalyticsTracker />` component that:
+  - Listens to route changes via `useLocation()` and calls `trackPageNavigation`
+  - Sets up scroll depth observers on each page
+  - Tracks time on page using `performance.now()` or timestamps
+  - Registers `beforeunload` and `visibilitychange` listeners for exit detection
+- CTA click tracking: Add a utility `trackCTA(name)` that can be called from onClick handlers on key buttons, or use a data attribute approach with a global click listener for `[data-track-cta]` elements
 
-## Plan
+### Step 3: Add data attributes to key CTAs
+**Files: Various page components**
+- Add `data-track-cta="join-premium"` to Join Premium buttons
+- Add `data-track-cta="view-plans"` to pricing/plans buttons
+- Add `data-track-cta="signup"` to sign up buttons
+- Add `data-track-cta="contact"` to contact buttons
+- The global click listener in AnalyticsTracker catches these automatically — no need to modify every component individually
 
-### Part 1: Audit & Fix Existing Duplicates (script via `code--exec`)
+### Step 4: Upgrade the admin analytics dashboard
+**File: `src/components/admin/analytics/WebsiteAnalytics.tsx`**
+- Add new sections after the existing ones:
 
-- Query `admin_workouts` for all duplicate `name` values
-- Query `admin_training_programs` for duplicate names
-- Generate a report showing all duplicates
-- For each duplicate group, rename workouts to unique names (keeping the oldest one unchanged)
-- For renamed workouts that have `stripe_product_id`, update the Stripe product name to match
-- This will be a careful script — preview duplicates first, then fix
+1. **User Journey / Page Flow** — Show which pages users navigate to after landing (top page transitions, e.g., "/" → "/workout" → "/joinpremium"), with a flow table
+2. **Scroll Depth by Page** — Bar chart showing average scroll depth per page (which pages get fully read vs. abandoned early)
+3. **CTA Performance** — Table showing each CTA's click count, which pages they're clicked from, and conversion context
+4. **Time on Page** — Average time spent per page, sorted by engagement
+5. **Exit Pages** — Which pages users leave from most often (exit rate per page)
 
-### Part 2: Prevent Future Duplicates in WOD Generation
+Each section follows existing pattern: chart + data table + CSV export button.
 
-Changes to `supabase/functions/generate-workout-of-day/index.ts`:
+### Step 5: Database optimization
+- Add a database index on `(event_type, landing_page)` for faster analytics queries on new event types
+- No new tables needed — reuses existing `social_media_analytics` table with new event_type values
 
-1. **Fetch recent names before generation** — Query the last 100+ workout names for the same category from `admin_workouts` and pass them to the AI prompt as a "DO NOT USE" list
-
-2. **Rewrite naming instructions (lines 771-789)** — Remove the fixed word lists that cause repetition. Instead:
-   - Instruct the AI to create unique, creative names
-   - Provide naming *principles* (short, category-relevant, professional) instead of specific word banks
-   - Explicitly ban reusing any name from the provided list
-
-3. **Post-generation uniqueness check** — After the AI returns a name, query the database for exact matches. If a duplicate is found, append a differentiator or request regeneration
-
-4. **Same-day pair check already exists** (line 764) — enhance it to also block near-duplicates (not just exact matches)
-
-### Part 3: Database constraint (optional but recommended)
-
-- Add a unique index on `admin_workouts.name` to prevent duplicates at the database level as a final safety net
-
-## Execution Order
-
-1. First: Audit duplicates (read-only report)
-2. Second: Fix duplicates + Stripe sync
-3. Third: Update the WOD generator prompt and add uniqueness checking
-4. Fourth: Add database constraint after all duplicates are resolved
+## Performance Safeguards
+- Scroll tracking uses `IntersectionObserver` (no scroll event spam)
+- Events are debounced/throttled — scroll depth fires max 4 times per page (25/50/75/100)
+- Time on page only fires once per page navigation
+- Exit event fires once via `visibilitychange` (reliable on mobile)
+- All tracking respects existing `shouldExcludeFromTracking()` logic (no admin/preview/bot tracking)
 
 ## Files Changed
-
-- `supabase/functions/generate-workout-of-day/index.ts` — naming instructions rewrite + recent-names query + post-generation duplicate check
-- Database migration — unique index on `admin_workouts.name` (after cleanup)
-- `code--exec` scripts for audit and fixing existing duplicates with Stripe sync
+- `src/utils/socialMediaTracking.ts` — new tracking functions
+- `src/components/AnalyticsTracker.tsx` — new component for automated tracking
+- `src/App.tsx` — mount AnalyticsTracker
+- `src/components/admin/analytics/WebsiteAnalytics.tsx` — 5 new dashboard sections
+- Database migration — index on `(event_type, landing_page)`
+- Minor edits to CTA buttons across pages (adding `data-track-cta` attributes)
 
