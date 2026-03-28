@@ -119,6 +119,7 @@ const AppContent = () => {
         <FreeTrialPopup />
         <SocialProofToast />
         <ScrollToTop />
+        <AnalyticsTracker />
         <div className="flex flex-col min-h-screen">
           <Navigation />
           <FixedBackButton />
