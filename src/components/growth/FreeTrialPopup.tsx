@@ -157,6 +157,7 @@ export function FreeTrialPopup() {
               size="lg"
               className="w-full text-base sm:text-lg gap-2 h-12 sm:h-14 font-bold shadow-lg shadow-primary/30"
               onClick={handleCTA}
+              data-track-cta="free-trial-popup"
             >
               <Crown className="w-5 h-5" />
               Start Your Free Trial
