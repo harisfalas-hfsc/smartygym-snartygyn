@@ -3222,6 +3222,7 @@ export type Database = {
         | "checkin_reminder_morning"
         | "checkin_reminder_evening"
         | "goal_achievement"
+        | "welcome_onboarding"
       plan_type: "free" | "gold" | "platinum"
       subscription_status: "active" | "canceled" | "past_due"
     }
@@ -3390,6 +3391,7 @@ export const Constants = {
         "checkin_reminder_morning",
         "checkin_reminder_evening",
         "goal_achievement",
+        "welcome_onboarding",
       ],
       plan_type: ["free", "gold", "platinum"],
       subscription_status: ["active", "canceled", "past_due"],
