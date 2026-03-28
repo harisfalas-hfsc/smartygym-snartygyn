@@ -38,15 +38,16 @@ export function HeroBackgroundImages({
 
   return (
     <>
-      {heroImages.map((src, index) => (
+      {heroImages.map((img, index) => (
         <img
           key={index}
-          src={src}
+          src={img.src}
           alt=""
           aria-hidden="true"
           className={cn(
             "absolute inset-0 w-full h-full object-cover z-0 transition-opacity duration-1000",
             currentIndex === index ? "opacity-100" : "opacity-0",
+            img.filter,
             className,
           )}
           loading={index === 0 ? "eager" : "lazy"}
