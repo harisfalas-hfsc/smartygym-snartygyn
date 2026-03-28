@@ -791,27 +791,37 @@ This is a NUDGE, not a mandate.
         : "";
 
       // ═══════════════════════════════════════════════════════════════════════════════
-      // NAMING VARIETY INSTRUCTIONS - Avoid repetitive and mismatched names
+      // NAMING VARIETY INSTRUCTIONS - Creative, unique names only
       // ═══════════════════════════════════════════════════════════════════════════════
+      // Build a "DO NOT USE" list from existing names in this category
+      const bannedNamesList = existingNamesForCategory.length > 0
+        ? `\n\n⛔ BANNED NAMES — These names already exist in the ${category} library. You MUST NOT use any of these names or minor variations:\n${existingNamesForCategory.map(n => `   ❌ "${n}"`).join('\n')}\n`
+        : "";
+
       const namingInstructions = `
 ═══════════════════════════════════════════════════════════════════════════════
 NAMING RULES (CRITICAL - MUST FOLLOW):
 ═══════════════════════════════════════════════════════════════════════════════
 
-1. AVOID OVERUSED WORDS - DO NOT START with these words (they're overused):
+1. THE NAME MUST BE 100% UNIQUE — Never reuse an existing workout name from the banned list below.
+
+2. AVOID OVERUSED WORDS — DO NOT START with these words (they're overused):
    ❌ Inferno, Blaze, Fire, Burn, Fury, Storm, Thunder, Power, Beast, Warrior, Elite, Ultimate, Extreme
+   ❌ Foundation (massively overused in Strength)
+   ❌ Torch, Melt (massively overused in Calorie Burning)
+   ❌ Engine, Drive, Catalyst (massively overused in Metabolic)
+   ❌ Flow, Restore (massively overused in Recovery/Mobility)
+   ❌ Gauntlet, Summit, Crucible, Endurance (massively overused in Challenge)
 
-2. MATCH THE NAME TO THE CATEGORY:
-   - STRENGTH: Use words like "Iron", "Foundation", "Forge", "Builder", "Anchor", "Pillar"
-   - CARDIO: Use words like "Pulse", "Rush", "Flow", "Motion", "Surge", "Stride"
-   - METABOLIC: Use words like "Engine", "Drive", "Catalyst", "Ignite", "Reactor"
-   - CALORIE BURNING: Use words like "Torch", "Melt", "Shred", "Scorch", "Heat"
-   - MOBILITY & STABILITY: Use words like "Balance", "Flow", "Restore", "Align", "Ground"
-   - CHALLENGE: Use words like "Gauntlet", "Test", "Summit", "Peak", "Crucible", "Forge", "Trial", "Proving Ground", "Benchmark", "The [Number]", "Death By", "Grind", "Endure"
+3. NAMING PRINCIPLES (instead of word banks):
+   - Draw from athletics, martial arts, nature, engineering, architecture, mythology, music terminology
+   - The name should hint at the workout's focus (upper body, legs, full body, etc.)
+   - Be creative and memorable — imagine a premium fitness brand naming their signature workouts
+   - Mix unexpected words: "Granite Press", "Velocity Chain", "Steel Meridian", "Apex Protocol"
 
-3. BE CREATIVE: Each workout should have a unique, memorable name that reflects its purpose
 4. KEEP IT SHORT: 2-4 words maximum
-`;
+5. NEVER copy or slightly modify a name from the banned list (e.g., adding "II", changing one word)
+${bannedNamesList}`;
 
       // Generate workout content using Lovable AI
       const workoutPrompt = `You are Haris Falas, a Sports Scientist with 20+ years of coaching experience (CSCS Certified), creating a premium Workout of the Day for SmartyGym members worldwide.${bannedNameInstruction}
