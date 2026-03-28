@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { Globe, Monitor, Smartphone, Tablet, Eye, TrendingUp, TrendingDown, Download, RefreshCw, FileText, Calendar as CalendarIcon, ArrowUpRight, ArrowDownRight, Minus } from "lucide-react";
+import { Globe, Monitor, Smartphone, Tablet, Eye, TrendingUp, TrendingDown, Download, RefreshCw, FileText, Calendar as CalendarIcon, ArrowUpRight, ArrowDownRight, Minus, MousePointerClick, Clock, LogOut, ScrollText, Navigation } from "lucide-react";
 import { toast } from "sonner";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
