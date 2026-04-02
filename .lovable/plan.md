@@ -1,38 +1,53 @@
 
 
-# Add Tabata Equipment Constraint to WOD Generation
+# Create 3 SEO-Optimized Blog Articles
 
-## The Problem
-Standing Calf Raise Machine appeared in a Tabata workout. Machines require setup (adjusting pins, seats, loading plates) which is incompatible with Tabata's 20s work / 10s rest format — there's literally no time to set up or transition.
+## What Gets Built
+Three Fitness-category blog articles generated via AI script, inserted into `blog_articles` as published, with AI-generated images and SEO metadata.
 
-## The Fix
-Add an explicit **Tabata Equipment Rule** to the WOD generation prompt in `supabase/functions/generate-workout-of-day/index.ts`. This is a permanent rule that will apply to all future generations.
+### Articles
+1. **"Best 10-Minute Workouts for Busy People"** — slug: `best-10-minute-workouts-for-busy-people`
+2. **"How to Stay Consistent with Training"** — slug: `how-to-stay-consistent-with-training`
+3. **"Daily Workout vs Gym Program"** — slug: `daily-workout-vs-gym-program`
 
-### What gets added
-A new constraint block near the FORMAT DEFINITIONS section (after line 848) and in the equipment rules sections:
+## Implementation Steps
 
-**Rule text to inject into the prompt:**
-```
-TABATA EQUIPMENT CONSTRAINT (CRITICAL):
-When format is TABATA (or any section uses Tabata timing):
-• ALLOWED: Dumbbells, kettlebells, barbells (pre-loaded), medicine balls, 
-  battle ropes, resistance bands, jump ropes, plyo boxes, bodyweight exercises
-  — anything you can grab instantly with ZERO setup time
-• FORBIDDEN: ANY machine-based exercise (cable machines, leg press, smith machine, 
-  seated/standing calf raise machine, lat pulldown machine, chest press machine, 
-  leg extension, leg curl, hack squat, any pin-loaded or plate-loaded machine)
-• REASON: Tabata demands instant transitions (10 seconds rest). Machines require 
-  setup, adjustment, and travel time that breaks the protocol entirely.
-• This applies to ALL Tabata sections including Tabata finishers in MIX format workouts.
-```
+### Step 1: Generate article content via AI script
+Use the `ai-gateway` skill to generate each article's HTML content with a detailed prompt including:
+- Category: Fitness
+- Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
+- 800–1200 words, HTML formatted (`<h2>`, `<p>`, `<ul>`, `<strong>`)
+- Evidence-based, scientific references
+- Internal links to valid paths only: `/workout`, `/trainingprogram`, `/1rmcalculator`, `/exerciselibrary`, `/daily-ritual`, `/disclaimer`, `/blog`, `/the-smarty-method`, `/coach-profile`, `/macrocalculator`, `/bmrcalculator`, `/caloriecounter`, `/smarty-plans`
+- Brand mentions: SmartyGym, SmartGym, Smart-Gym, Haris Falas
+- Each article gets a unique excerpt (under 160 chars)
 
-### Where it gets added
-Two locations in the generation prompt:
-1. **After the Tabata format definition** (line ~848) — so the AI sees the constraint immediately when reading about Tabata
-2. **In the Challenge category equipment rules** (line ~1457-1461) — since Challenge workouts can also use Tabata format
+### Step 2: Validate all internal links
+Apply the same whitelist validation used in `generate-weekly-blog-articles` to strip any invalid internal links while preserving text.
 
-### File changed
-- `supabase/functions/generate-workout-of-day/index.ts` — add Tabata equipment constraint in 2 prompt locations
+### Step 3: Generate blog images
+Call the `generate-blog-image` edge function for each article to create featured images and get public URLs.
 
-No database migration needed. No UI changes. This is purely a prompt improvement that prevents inappropriate exercise selection in all future Tabata workouts.
+### Step 4: Insert into `blog_articles` table
+Insert each article with:
+- `is_published: true`, `published_at: now()`
+- `author_name: "Haris Falas"`, `author_credentials: "Sports Scientist | CSCS Certified | 20+ Years Experience"`
+- `category: "Fitness"`, `is_ai_generated: true`
+- Generated image URL, calculated read time
+
+### Step 5: Upsert SEO metadata
+Insert rows into `seo_metadata` table (via service role) for each article with:
+- `content_type: "blog-article"`, `content_id: slug`
+- Targeted keyword clusters (title variations, brand names, topic keywords)
+- `meta_title` optimized for search (under 60 chars)
+- `meta_description` matching the excerpt
+
+The existing `ArticleDetail.tsx` already handles Article JSON-LD, BreadcrumbList schema, Open Graph, Twitter cards, and `SEOEnhancer` component — no code changes needed.
+
+## Technical Details
+- All work done via `code--exec` scripts — no source code file changes
+- Uses `ai-gateway` skill for content generation
+- Uses existing `generate-blog-image` edge function for images
+- Database inserts via `psql` (blog_articles) and edge function calls
+- SEO metadata inserted via service role since RLS blocks public access on `seo_metadata`
 
