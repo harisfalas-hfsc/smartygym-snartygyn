@@ -112,8 +112,8 @@ export function useCheckInWindow(timezone: string = 'Europe/Athens') {
     const hour = localTime.getHours();
     const minute = localTime.getMinutes();
 
-    const isMorningWindow = isInTimeWindow(hour, minute, 7, 0, 9, 0);
-    const isNightWindow = isInTimeWindow(hour, minute, 19, 0, 21, 0);
+    const isMorningWindow = isInTimeWindow(hour, minute, 7, 0, 10, 0);
+    const isNightWindow = isInTimeWindow(hour, minute, 19, 0, 22, 0);
     const { window: nextWindow, timeUntil } = calculateNextWindow(hour, minute);
 
     setWindowStatus({
