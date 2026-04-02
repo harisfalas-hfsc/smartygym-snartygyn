@@ -17,9 +17,9 @@ export function useCheckInWindow(timezone: string = 'Europe/Athens') {
     isMorningWindow: false,
     isNightWindow: false,
     morningWindowStart: '07:00',
-    morningWindowEnd: '09:00',
+    morningWindowEnd: '10:00',
     nightWindowStart: '19:00',
-    nightWindowEnd: '21:00',
+    nightWindowEnd: '22:00',
     currentTime: new Date(),
     nextWindow: null,
     timeUntilNextWindow: ''
@@ -76,9 +76,9 @@ export function useCheckInWindow(timezone: string = 'Europe/Athens') {
   ): { window: 'morning' | 'night' | null; timeUntil: string } => {
     const currentMinutes = currentHour * 60 + currentMinute;
     const morningStart = 7 * 60; // 07:00
-    const morningEnd = 9 * 60; // 09:00
+    const morningEnd = 10 * 60; // 10:00
     const nightStart = 19 * 60; // 19:00
-    const nightEnd = 21 * 60; // 21:00
+    const nightEnd = 22 * 60; // 22:00
 
     let minutesUntil = 0;
     let nextWindow: 'morning' | 'night' | null = null;
@@ -112,17 +112,17 @@ export function useCheckInWindow(timezone: string = 'Europe/Athens') {
     const hour = localTime.getHours();
     const minute = localTime.getMinutes();
 
-    const isMorningWindow = isInTimeWindow(hour, minute, 7, 0, 9, 0);
-    const isNightWindow = isInTimeWindow(hour, minute, 19, 0, 21, 0);
+    const isMorningWindow = isInTimeWindow(hour, minute, 7, 0, 10, 0);
+    const isNightWindow = isInTimeWindow(hour, minute, 19, 0, 22, 0);
     const { window: nextWindow, timeUntil } = calculateNextWindow(hour, minute);
 
     setWindowStatus({
       isMorningWindow,
       isNightWindow,
       morningWindowStart: '07:00',
-      morningWindowEnd: '09:00',
+      morningWindowEnd: '10:00',
       nightWindowStart: '19:00',
-      nightWindowEnd: '21:00',
+      nightWindowEnd: '22:00',
       currentTime: localTime,
       nextWindow,
       timeUntilNextWindow: timeUntil
