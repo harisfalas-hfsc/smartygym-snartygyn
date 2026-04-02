@@ -67,7 +67,7 @@ export function ExitIntentPopup() {
 
   return (
     <Dialog open={show} onOpenChange={setShow}>
-      <DialogContent className="p-0 border-0 overflow-hidden sm:max-w-lg max-w-[95vw] rounded-2xl bg-transparent shadow-2xl ring-1 ring-white/20 [&>button]:hidden">
+      <DialogContent className="p-0 border-0 overflow-hidden sm:max-w-lg max-w-[95vw] rounded-2xl bg-transparent shadow-2xl border-[3px] border-white [&>button]:hidden">
         <div className="relative w-full">
           <img
             src={trialPopupBg}
@@ -75,7 +75,7 @@ export function ExitIntentPopup() {
             className="w-full h-auto object-cover rounded-2xl min-h-[420px] sm:min-h-[480px]"
             loading="eager"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/60 to-white/20 rounded-2xl" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/40 rounded-2xl" />
 
           <button
             onClick={() => setShow(false)}
