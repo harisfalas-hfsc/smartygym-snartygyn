@@ -853,6 +853,13 @@ FORMAT DEFINITIONS (MUST FOLLOW EXACTLY):
 - Reps & Sets: Classic strength format (e.g., 4 sets x 8 reps) with defined rest
 - Mix: Combination of two or more formats (e.g., EMOM warm-up + Tabata finisher)
 
+TABATA EQUIPMENT CONSTRAINT (CRITICAL):
+When format is TABATA (or any section uses Tabata timing, including Tabata finishers in MIX format):
+• ALLOWED: Dumbbells, kettlebells, barbells (pre-loaded), medicine balls, battle ropes, resistance bands, jump ropes, plyo boxes, bodyweight exercises — anything you can grab instantly with ZERO setup time
+• FORBIDDEN: ANY machine-based exercise (cable machines, leg press, smith machine, seated/standing calf raise machine, lat pulldown machine, chest press machine, leg extension, leg curl, hack squat, any pin-loaded or plate-loaded machine)
+• REASON: Tabata demands instant transitions (10 seconds rest). Machines require setup, adjustment, and travel time that breaks the protocol entirely.
+• This applies to ALL Tabata sections including Tabata finishers in MIX format workouts.
+
 YOUR FORMAT TODAY: ${format}
 - You MUST structure the workout using the ${format} format rules defined above
 
@@ -1459,6 +1466,7 @@ EQUIPMENT RULES:
 • EQUIPMENT: Can add kettlebells, dumbbells, wall balls, but at safe weights for fatigue
 • NO heavy deadlifts or Olympic lifts - safety under fatigue is paramount
 • Cardio machines allowed: treadmill, assault bike, rower (for distance/calorie challenges)
+• TABATA CONSTRAINT: When using Tabata format, NO machine-based exercises allowed (no cable machines, leg press, smith machine, calf raise machine, lat pulldown, chest press, leg extension, leg curl, hack squat). Only free weights, bodyweight, and quick-grab equipment.
 
 DESCRIPTION TONE:
 • Challenge the reader: "This is not a 'pretty' workout"
