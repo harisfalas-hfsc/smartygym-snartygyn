@@ -99,7 +99,7 @@ export function FreeTrialPopup() {
 
   return (
     <Dialog open={show} onOpenChange={(open) => { if (!open) handleDismiss(); }}>
-      <DialogContent className="p-0 border-0 overflow-hidden sm:max-w-lg max-w-[95vw] rounded-2xl bg-transparent shadow-2xl ring-1 ring-white/20 [&>button]:hidden">
+      <DialogContent className="p-0 border-0 overflow-hidden sm:max-w-lg max-w-[95vw] rounded-2xl bg-transparent shadow-2xl border-[3px] border-white [&>button]:hidden">
         <div className="relative w-full">
           <img
             src={trialPopupBg}
@@ -107,7 +107,7 @@ export function FreeTrialPopup() {
             className="w-full h-auto object-cover rounded-2xl min-h-[420px] sm:min-h-[480px]"
             loading="eager"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/60 to-white/20 rounded-2xl" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/40 rounded-2xl" />
 
           <button
             onClick={handleDismiss}
@@ -124,21 +124,21 @@ export function FreeTrialPopup() {
               </span>
             </div>
 
-            <h2 className="text-2xl sm:text-3xl font-bold text-[hsl(210,50%,15%)] leading-tight mb-3">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white leading-tight mb-3">
               Try Premium Free<br />for 7 Days
             </h2>
 
-            <p className="text-sm sm:text-base text-[hsl(210,20%,25%)] leading-relaxed mb-4">
+            <p className="text-sm sm:text-base text-white/80 leading-relaxed mb-4">
               Get unlimited access to all workouts, training programs, and premium tools. No charge for 7 days — cancel anytime.
             </p>
 
             <div className="flex items-center gap-4 mb-4">
-              <p className="text-xs sm:text-sm font-medium text-emerald-700 flex items-center gap-1.5">
-                <span className="inline-block w-4 h-4 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-600">✓</span>
+              <p className="text-xs sm:text-sm font-medium text-emerald-400 flex items-center gap-1.5">
+                <span className="inline-block w-4 h-4 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400">✓</span>
                 Cancel anytime
               </p>
-              <p className="text-xs sm:text-sm font-medium text-emerald-700 flex items-center gap-1.5">
-                <span className="inline-block w-4 h-4 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-600">✓</span>
+              <p className="text-xs sm:text-sm font-medium text-emerald-400 flex items-center gap-1.5">
+                <span className="inline-block w-4 h-4 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400">✓</span>
                 No commitment
               </p>
             </div>
@@ -155,7 +155,7 @@ export function FreeTrialPopup() {
 
             <button
               onClick={handleDismiss}
-              className="mt-3 text-xs text-gray-500 hover:text-gray-700 transition-colors text-center"
+              className="mt-3 text-xs text-white/50 hover:text-white/70 transition-colors text-center"
             >
               No thanks, I'll pass
             </button>
