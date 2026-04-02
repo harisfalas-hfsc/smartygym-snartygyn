@@ -17,7 +17,7 @@ export function useCheckInWindow(timezone: string = 'Europe/Athens') {
     isMorningWindow: false,
     isNightWindow: false,
     morningWindowStart: '07:00',
-    morningWindowEnd: '09:00',
+    morningWindowEnd: '10:00',
     nightWindowStart: '19:00',
     nightWindowEnd: '21:00',
     currentTime: new Date(),
