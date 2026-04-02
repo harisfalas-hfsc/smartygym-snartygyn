@@ -76,7 +76,7 @@ export function useCheckInWindow(timezone: string = 'Europe/Athens') {
   ): { window: 'morning' | 'night' | null; timeUntil: string } => {
     const currentMinutes = currentHour * 60 + currentMinute;
     const morningStart = 7 * 60; // 07:00
-    const morningEnd = 9 * 60; // 09:00
+    const morningEnd = 10 * 60; // 10:00
     const nightStart = 19 * 60; // 19:00
     const nightEnd = 21 * 60; // 21:00
 
