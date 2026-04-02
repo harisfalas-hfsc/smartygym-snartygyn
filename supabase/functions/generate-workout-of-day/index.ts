@@ -1466,6 +1466,7 @@ EQUIPMENT RULES:
 • EQUIPMENT: Can add kettlebells, dumbbells, wall balls, but at safe weights for fatigue
 • NO heavy deadlifts or Olympic lifts - safety under fatigue is paramount
 • Cardio machines allowed: treadmill, assault bike, rower (for distance/calorie challenges)
+• TABATA CONSTRAINT: When using Tabata format, NO machine-based exercises allowed (no cable machines, leg press, smith machine, calf raise machine, lat pulldown, chest press, leg extension, leg curl, hack squat). Only free weights, bodyweight, and quick-grab equipment.
 
 DESCRIPTION TONE:
 • Challenge the reader: "This is not a 'pretty' workout"
