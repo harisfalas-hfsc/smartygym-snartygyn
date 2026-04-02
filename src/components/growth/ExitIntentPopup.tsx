@@ -92,14 +92,14 @@ export function ExitIntentPopup() {
               </span>
             </div>
 
-            <h2 className="text-2xl sm:text-3xl font-bold text-[hsl(210,50%,15%)] leading-tight mb-3">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white leading-tight mb-3">
               Your Free Workout<br />Is Waiting
             </h2>
 
-            <p className="text-sm sm:text-base text-[hsl(210,20%,25%)] leading-relaxed mb-1">
+            <p className="text-sm sm:text-base text-white/80 leading-relaxed mb-1">
               Sign up now and receive a complimentary personalized workout directly in your dashboard — available right away.
             </p>
-            <p className="text-sm sm:text-base text-[hsl(210,20%,25%)] leading-relaxed mb-4">
+            <p className="text-sm sm:text-base text-white/80 leading-relaxed mb-4">
               Designed by our expert coach,{" "}
               <a
                 href="/about"
