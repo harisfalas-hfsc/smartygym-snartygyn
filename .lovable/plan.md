@@ -1,26 +1,18 @@
 
 
-# Fix Hero Background Image Readability
+# Extend Check-In Windows: 07:00–10:00 and 19:00–22:00
 
-## Problem
-The 3 rotating hero images have inconsistent contrast. The outdoor park image works well — its tones allow white text and UI elements to remain readable. The gym and home images are brighter/busier, making content hard to see.
+## Change
+Update the morning window from 07:00–09:00 → 07:00–10:00 and the night window from 19:00–21:00 → 19:00–22:00.
 
-## Approach
-Two complementary changes to make all three images behave like the park image:
+## File: `src/hooks/useCheckInWindow.ts`
 
-### 1. Apply CSS brightness/contrast filters to the problematic images
-Instead of replacing the images (which would lose the gym/home/outdoor storytelling), darken the gym and home images via CSS so they match the park image's tone. Each image gets its own filter tuning:
+All changes in one file — update 4 locations:
 
-- **Park couple** — no change (reference standard)
-- **Gym group** — `brightness(0.6)` to darken the busy, bright gym environment
-- **Home couple** — `brightness(0.65)` to tone down the indoor lighting
+1. **Default state** (lines 20, 22): `morningWindowEnd: '10:00'`, `nightWindowEnd: '22:00'`
+2. **Time window checks** (line 112): Change `isInTimeWindow(hour, minute, 7, 0, 9, 0)` → `(7, 0, 10, 0)` and `(19, 0, 21, 0)` → `(19, 0, 22, 0)`
+3. **calculateNextWindow** (lines 80, 82): Change `morningEnd = 9 * 60` → `10 * 60` and `nightEnd = 21 * 60` → `22 * 60`
+4. **setWindowStatus** (lines 120, 122): Update the hardcoded strings to `'10:00'` and `'22:00'`
 
-This is done in `HeroBackgroundImages.tsx` by adding per-image filter classes.
-
-### 2. Slightly increase overlay opacity as a safety net
-Bump `bg-background/65` → `bg-background/70` in `Index.tsx` (line 766) for a small additional readability boost across all images without making it feel too opaque.
-
-## Files Changed
-- `src/components/HeroBackgroundImages.tsx` — add per-image brightness filters
-- `src/pages/Index.tsx` — adjust overlay opacity from 65 to 70
+No other changes. No database migration needed.
 
