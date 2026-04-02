@@ -1,0 +1,1 @@
+UPDATE admin_workouts SET main_workout = REPLACE(main_workout, '{{exercise:0605:lever standing calf raise}}', '{{exercise:0514:jump squat}}') WHERE id = 'WOD-CB-E-1775082602363';
