@@ -134,7 +134,7 @@ export function ExitIntentPopup() {
 
             <button
               onClick={() => setShow(false)}
-              className="mt-3 text-xs text-gray-500 hover:text-gray-700 transition-colors text-center"
+              className="mt-3 text-xs text-white/50 hover:text-white/70 transition-colors text-center"
             >
               No thanks, I'll pass
             </button>
