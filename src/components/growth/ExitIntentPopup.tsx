@@ -75,7 +75,7 @@ export function ExitIntentPopup() {
             className="w-full h-auto object-cover rounded-2xl min-h-[420px] sm:min-h-[480px]"
             loading="eager"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-white/95 via-white/75 to-white/30 rounded-2xl" />
+          <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/60 to-white/20 rounded-2xl" />
 
           <button
             onClick={() => setShow(false)}
