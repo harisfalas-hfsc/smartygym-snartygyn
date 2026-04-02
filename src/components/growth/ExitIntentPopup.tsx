@@ -115,8 +115,8 @@ export function ExitIntentPopup() {
               .
             </p>
 
-            <p className="text-xs sm:text-sm font-medium text-emerald-700 mb-4 flex items-center gap-1.5">
-              <span className="inline-block w-4 h-4 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-600">✓</span>
+            <p className="text-xs sm:text-sm font-medium text-emerald-400 mb-4 flex items-center gap-1.5">
+              <span className="inline-block w-4 h-4 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400">✓</span>
               No credit card needed
             </p>
 
