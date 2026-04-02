@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Crown, X } from "lucide-react";
-import exitPopupBg from "@/assets/exit-popup-bg.jpg";
+import trialPopupBg from "@/assets/trial-popup-bg.jpg";
 
 const REPEAT_DELAY_MS = 5 * 60 * 1000; // 5 minutes
 const DEFAULT_INITIAL_DELAY_MS = 10_000; // 10 seconds
@@ -47,17 +47,9 @@ export function FreeTrialPopup() {
   // Determine if popup should be eligible to show
   const shouldShowPopup = useCallback((): boolean => {
     if (isLoading) return false;
-
-    // Visitors (not logged in) — show
     if (!user) return true;
-
-    // Premium users — hide
     if (userTier === "premium") return false;
-
-    // Subscribers who were never premium (no record in user_subscriptions) — show
     if (userTier === "subscriber" && hasSubscriptionHistory === false) return true;
-
-    // Returning/expired customers (have subscription history) — hide
     return false;
   }, [user, userTier, isLoading, hasSubscriptionHistory]);
 
@@ -99,29 +91,27 @@ export function FreeTrialPopup() {
   const handleCTA = () => {
     handleDismiss();
     if (user) {
-      // Logged-in free subscriber → pricing page
       navigate("/smarty-plans");
     } else {
-      // Visitor → signup with trial flag
       navigate("/auth?mode=signup&trial=true");
     }
   };
 
   return (
     <Dialog open={show} onOpenChange={(open) => { if (!open) handleDismiss(); }}>
-      <DialogContent className="p-0 border-0 overflow-hidden sm:max-w-lg max-w-[95vw] rounded-2xl bg-transparent shadow-2xl [&>button]:hidden">
+      <DialogContent className="p-0 border-0 overflow-hidden sm:max-w-lg max-w-[95vw] rounded-2xl bg-transparent shadow-2xl ring-1 ring-white/20 [&>button]:hidden">
         <div className="relative w-full">
           <img
-            src={exitPopupBg}
+            src={trialPopupBg}
             alt=""
             className="w-full h-auto object-cover rounded-2xl min-h-[420px] sm:min-h-[480px]"
             loading="eager"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/40 rounded-2xl" />
+          <div className="absolute inset-0 bg-gradient-to-t from-white/95 via-white/75 to-white/30 rounded-2xl" />
 
           <button
             onClick={handleDismiss}
-            className="absolute top-3 right-3 z-20 p-1.5 rounded-full bg-black/50 hover:bg-black/70 text-white/80 hover:text-white transition-colors"
+            className="absolute top-3 right-3 z-20 p-1.5 rounded-full bg-white/60 hover:bg-white/80 text-gray-700 hover:text-gray-900 transition-colors"
             aria-label="Close"
           >
             <X className="w-5 h-5" />
@@ -134,21 +124,21 @@ export function FreeTrialPopup() {
               </span>
             </div>
 
-            <h2 className="text-2xl sm:text-3xl font-bold text-white leading-tight mb-3">
+            <h2 className="text-2xl sm:text-3xl font-bold text-[hsl(210,50%,15%)] leading-tight mb-3">
               Try Premium Free<br />for 7 Days
             </h2>
 
-            <p className="text-sm sm:text-base text-white/90 leading-relaxed mb-4">
+            <p className="text-sm sm:text-base text-[hsl(210,20%,25%)] leading-relaxed mb-4">
               Get unlimited access to all workouts, training programs, and premium tools. No charge for 7 days — cancel anytime.
             </p>
 
             <div className="flex items-center gap-4 mb-4">
-              <p className="text-xs sm:text-sm font-medium text-green-400 flex items-center gap-1.5">
-                <span className="inline-block w-4 h-4 rounded-full bg-green-500/20 flex items-center justify-center text-green-400">✓</span>
+              <p className="text-xs sm:text-sm font-medium text-emerald-700 flex items-center gap-1.5">
+                <span className="inline-block w-4 h-4 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-600">✓</span>
                 Cancel anytime
               </p>
-              <p className="text-xs sm:text-sm font-medium text-green-400 flex items-center gap-1.5">
-                <span className="inline-block w-4 h-4 rounded-full bg-green-500/20 flex items-center justify-center text-green-400">✓</span>
+              <p className="text-xs sm:text-sm font-medium text-emerald-700 flex items-center gap-1.5">
+                <span className="inline-block w-4 h-4 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-600">✓</span>
                 No commitment
               </p>
             </div>
@@ -165,7 +155,7 @@ export function FreeTrialPopup() {
 
             <button
               onClick={handleDismiss}
-              className="mt-3 text-xs text-white/50 hover:text-white/70 transition-colors text-center"
+              className="mt-3 text-xs text-gray-500 hover:text-gray-700 transition-colors text-center"
             >
               No thanks, I'll pass
             </button>
