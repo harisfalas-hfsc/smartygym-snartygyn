@@ -124,11 +124,11 @@ export function FreeTrialPopup() {
               </span>
             </div>
 
-            <h2 className="text-2xl sm:text-3xl font-bold text-[hsl(210,50%,15%)] leading-tight mb-3">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white leading-tight mb-3">
               Try Premium Free<br />for 7 Days
             </h2>
 
-            <p className="text-sm sm:text-base text-[hsl(210,20%,25%)] leading-relaxed mb-4">
+            <p className="text-sm sm:text-base text-white/80 leading-relaxed mb-4">
               Get unlimited access to all workouts, training programs, and premium tools. No charge for 7 days — cancel anytime.
             </p>
 
