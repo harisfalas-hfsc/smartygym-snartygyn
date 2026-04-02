@@ -1,53 +1,35 @@
 
 
-# Create 3 SEO-Optimized Blog Articles
+# Brighten Free Trial Popup Background Image
 
-## What Gets Built
-Three Fitness-category blog articles generated via AI script, inserted into `blog_articles` as published, with AI-generated images and SEO metadata.
+## Problem
+The current popup uses a dark background image (`exit-popup-bg.jpg`) with a heavy dark overlay (`from-black/90 via-black/60 to-black/40`). On the SmartyGym dark-themed site, the popup borders blend in — especially on mobile — making it hard to tell where the popup starts and ends.
 
-### Articles
-1. **"Best 10-Minute Workouts for Busy People"** — slug: `best-10-minute-workouts-for-busy-people`
-2. **"How to Stay Consistent with Training"** — slug: `how-to-stay-consistent-with-training`
-3. **"Daily Workout vs Gym Program"** — slug: `daily-workout-vs-gym-program`
+## Approach
+Generate a new **bright, airy** background image using AI image generation. Same concept — a fitness person or couple using a tablet/phone showing SmartyGym — but with a **bright, well-lit environment** (bright gym, outdoor sunlight, or modern bright studio). Then adjust the overlay and text colors to match the brighter aesthetic while keeping the SmartyGym brand palette (navy + electric blue #29B6D2).
 
-## Implementation Steps
+### Step 1: Generate new bright popup image
+Use the AI image generation model to create a bright, high-contrast image:
+- **Subject**: Fit person or couple holding a tablet/phone showing a workout app interface
+- **Setting**: Bright, well-lit environment (sunlit gym, bright modern studio, or outdoor)
+- **Tone**: Energetic, positive, bright whites and natural light
+- **Colors**: Brand-aligned — touches of electric blue (#29B6D2) where natural
 
-### Step 1: Generate article content via AI script
-Use the `ai-gateway` skill to generate each article's HTML content with a detailed prompt including:
-- Category: Fitness
-- Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
-- 800–1200 words, HTML formatted (`<h2>`, `<p>`, `<ul>`, `<strong>`)
-- Evidence-based, scientific references
-- Internal links to valid paths only: `/workout`, `/trainingprogram`, `/1rmcalculator`, `/exerciselibrary`, `/daily-ritual`, `/disclaimer`, `/blog`, `/the-smarty-method`, `/coach-profile`, `/macrocalculator`, `/bmrcalculator`, `/caloriecounter`, `/smarty-plans`
-- Brand mentions: SmartyGym, SmartGym, Smart-Gym, Haris Falas
-- Each article gets a unique excerpt (under 160 chars)
+Save as `src/assets/trial-popup-bg.jpg`.
 
-### Step 2: Validate all internal links
-Apply the same whitelist validation used in `generate-weekly-blog-articles` to strip any invalid internal links while preserving text.
+### Step 2: Redesign popup styling for bright background
+Update `FreeTrialPopup.tsx`:
+- Replace the dark overlay (`from-black/90 via-black/60 to-black/40`) with a **light semi-transparent overlay** or a bottom gradient that keeps text readable without darkening everything
+- Change text colors from white to **dark navy** (brand color) for the heading and body text
+- Adjust the close button, badge, and "No thanks" link colors to work on a bright background
+- Add a visible **border or shadow** so the popup stands out against the dark site background on both mobile and desktop
+- Keep the same layout, CTA button, and content structure
 
-### Step 3: Generate blog images
-Call the `generate-blog-image` edge function for each article to create featured images and get public URLs.
+### Step 3: Update ExitIntentPopup similarly
+`ExitIntentPopup.tsx` also uses the same dark image — update it with the same bright treatment for consistency.
 
-### Step 4: Insert into `blog_articles` table
-Insert each article with:
-- `is_published: true`, `published_at: now()`
-- `author_name: "Haris Falas"`, `author_credentials: "Sports Scientist | CSCS Certified | 20+ Years Experience"`
-- `category: "Fitness"`, `is_ai_generated: true`
-- Generated image URL, calculated read time
-
-### Step 5: Upsert SEO metadata
-Insert rows into `seo_metadata` table (via service role) for each article with:
-- `content_type: "blog-article"`, `content_id: slug`
-- Targeted keyword clusters (title variations, brand names, topic keywords)
-- `meta_title` optimized for search (under 60 chars)
-- `meta_description` matching the excerpt
-
-The existing `ArticleDetail.tsx` already handles Article JSON-LD, BreadcrumbList schema, Open Graph, Twitter cards, and `SEOEnhancer` component — no code changes needed.
-
-## Technical Details
-- All work done via `code--exec` scripts — no source code file changes
-- Uses `ai-gateway` skill for content generation
-- Uses existing `generate-blog-image` edge function for images
-- Database inserts via `psql` (blog_articles) and edge function calls
-- SEO metadata inserted via service role since RLS blocks public access on `seo_metadata`
+## Files Changed
+- `src/assets/trial-popup-bg.jpg` — new AI-generated bright image (replaces `exit-popup-bg.jpg` usage)
+- `src/components/growth/FreeTrialPopup.tsx` — new image import, bright overlay/text styling
+- `src/components/growth/ExitIntentPopup.tsx` — same bright styling update
 
