@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { MESSAGE_TYPES } from "../_shared/notification-types.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -128,6 +129,50 @@ serve(async (req) => {
       if (upsertError) {
         logStep("Upsert error", { error: upsertError.message });
         throw new Error(`Failed to grant subscription: ${upsertError.message}`);
+      }
+
+      // Check if user needs a welcome message
+      const { data: profile } = await supabaseAdmin
+        .from('profiles')
+        .select('welcome_sent')
+        .eq('user_id', user_id)
+        .maybeSingle();
+
+      if (!profile?.welcome_sent) {
+        logStep("Sending welcome message to user", { user_id });
+        try {
+          // Get the welcome template
+          const { data: welcomeTemplate } = await supabaseAdmin
+            .from('automated_message_templates')
+            .select('*')
+            .eq('message_type', MESSAGE_TYPES.WELCOME)
+            .eq('is_active', true)
+            .eq('is_default', true)
+            .single();
+
+          if (welcomeTemplate) {
+            // Insert welcome dashboard message
+            await supabaseAdmin.from('user_system_messages').insert({
+              user_id,
+              message_type: MESSAGE_TYPES.WELCOME,
+              subject: welcomeTemplate.dashboard_subject || welcomeTemplate.subject,
+              content: welcomeTemplate.dashboard_content || welcomeTemplate.content,
+              is_read: false,
+            });
+
+            // Mark welcome as sent
+            await supabaseAdmin
+              .from('profiles')
+              .update({ welcome_sent: true })
+              .eq('user_id', user_id);
+
+            logStep("Welcome message sent successfully");
+          } else {
+            logStep("No welcome template found, skipping welcome message");
+          }
+        } catch (welcomeErr) {
+          logStep("Welcome message failed (non-blocking)", { error: String(welcomeErr) });
+        }
       }
 
       const durationText = plan_type === 'gold' ? '1 month' : '12 months';
