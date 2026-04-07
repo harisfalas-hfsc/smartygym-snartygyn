@@ -128,39 +128,43 @@ export const HeroThreeColumns = () => {
             const Icon = card.icon;
             
             return (
-              <CarouselItem key={card.id} className="pl-3 basis-[32%]">
+              <CarouselItem key={card.id} className="pl-3 basis-[75%] md:basis-[32%]">
                 <div
                   onClick={() => navigate(card.route)}
                   className={cn(
                     "cursor-pointer group border-2 border-primary/40 rounded-xl overflow-hidden",
                     "hover:border-primary hover:shadow-2xl hover:scale-[1.05] hover:z-10",
-                    "transition-all duration-300 ease-out h-[180px]",
-                    "relative bg-card"
+                    "transition-all duration-300 ease-out",
+                    "h-[220px] md:h-[180px]",
+                    "flex flex-col md:relative bg-card"
                   )}
                 >
-                  {/* Image Section - Full height */}
-                  <div className="absolute inset-0 overflow-hidden">
+                  {/* Image Section */}
+                  <div className="relative h-[55%] md:absolute md:inset-0 overflow-hidden flex-shrink-0">
                     <img 
                       src={card.image} 
                       alt={card.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
-                    {/* Gradient overlay for text readability */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent group-hover:from-black/95 transition-colors duration-300" />
+                    {/* Gradient overlay - desktop only */}
+                    <div className="hidden md:block absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent group-hover:from-black/95 transition-colors duration-300" />
                   </div>
                   
-                  {/* Content Section - Positioned at bottom */}
-                  <div className="absolute bottom-0 left-0 right-0 p-2.5 flex flex-col justify-end z-10">
+                  {/* Content Section - stacked on mobile, overlay on desktop */}
+                  <div className={cn(
+                    "flex flex-col justify-center flex-1 p-2.5 z-10",
+                    "md:absolute md:bottom-0 md:left-0 md:right-0 md:justify-end"
+                  )}>
                     {/* Title with Icon */}
                     <div className="flex items-center justify-between">
-                      <h3 className="text-xs font-semibold text-white">{card.title}</h3>
-                      <div className="w-8 h-8 rounded-full bg-background/90 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
+                      <h3 className="text-xs font-semibold text-foreground md:text-white">{card.title}</h3>
+                      <div className="w-8 h-8 rounded-full bg-muted md:bg-background/90 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
                         <Icon className="w-4 h-4 text-primary" />
                       </div>
                     </div>
                     
                     {/* Description */}
-                    <p className="text-[10px] text-white/80 line-clamp-1 mt-0.5">{card.description}</p>
+                    <p className="text-[10px] text-muted-foreground md:text-white/80 line-clamp-1 mt-0.5">{card.description}</p>
                     
                     {/* CTA indicator */}
                     <div className="flex items-center justify-center gap-1 text-primary text-[9px] font-medium group-hover:gap-2 transition-all mt-1">
