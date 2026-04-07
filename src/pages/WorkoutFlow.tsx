@@ -292,7 +292,7 @@ const WorkoutFlow = () => {
                 {isMobile ? (
                   <>
                     <p className="text-sm text-center">
-                      <span className="text-primary font-semibold">Smarty Workouts</span> are single-session routines for any goal or setting. Unlock all <span className="text-primary font-bold">{totalWorkoutCount} workouts</span> with Premium, or grab one standalone session.
+                      <span className="text-primary font-semibold">Smarty Workouts</span> are single-session routines for any goal. Unlock all <span className="text-primary font-bold">{totalWorkoutCount}</span> with Premium or grab one standalone.
                     </p>
                   </>
                 ) : (

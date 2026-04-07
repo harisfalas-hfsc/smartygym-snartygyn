@@ -237,7 +237,7 @@ const TrainingProgramFlow = () => {
             <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
             {isMobile ? (
                 <p className="text-sm text-center">
-                  <span className="text-primary font-semibold">Smarty Programs</span> are structured plans to achieve your fitness goals. Unlock all <span className="text-primary font-bold">{totalProgramCount} programs</span> with Premium, or grab one standalone.
+                  <span className="text-primary font-semibold">Smarty Programs</span> are structured plans for your fitness goals. Unlock all <span className="text-primary font-bold">{totalProgramCount}</span> with Premium or grab one standalone.
                 </p>
               ) : (
                 <>
