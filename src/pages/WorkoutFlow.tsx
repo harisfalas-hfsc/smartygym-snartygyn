@@ -292,10 +292,7 @@ const WorkoutFlow = () => {
                 {isMobile ? (
                   <>
                     <p className="text-sm text-center">
-                      <span className="text-primary font-semibold">Smarty Workouts</span> are single-session training routines designed to fit your lifestyle and goals.&nbsp;&nbsp;Unlock all <span className="text-primary font-bold">{totalWorkoutCount} workouts</span> with a Premium plan, or grab one standalone session whenever you need it.
-                    </p>
-                    <p className="text-xs text-center mt-4 text-muted-foreground">
-                      (Our coach, <Link to="/coach-profile" className="text-primary font-semibold hover:underline">Haris Falas</Link>, suggests following the <span className="text-primary font-semibold">WOD</span> for science-based periodization, ensuring safety and optimal results)
+                      <span className="text-primary font-semibold">Smarty Workouts</span> are single-session routines for any goal or setting. Unlock all <span className="text-primary font-bold">{totalWorkoutCount} workouts</span> with Premium, or grab one standalone session.
                     </p>
                   </>
                 ) : (
