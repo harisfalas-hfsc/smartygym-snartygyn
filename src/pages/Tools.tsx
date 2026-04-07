@@ -19,6 +19,13 @@ import macroBg from "@/assets/tools/macro-calculator-bg.jpg";
 import timerBg from "@/assets/tools/workout-timer-bg.jpg";
 import calorieBg from "@/assets/tools/calorie-counter-bg.jpg";
 
+// Mobile card images
+import oneRmCardMobile from "@/assets/tools/1rm-card-mobile.jpg";
+import bmrCardMobile from "@/assets/tools/bmr-card-mobile.jpg";
+import macroCardMobile from "@/assets/tools/macro-card-mobile.jpg";
+import timerCardMobile from "@/assets/tools/timer-card-mobile.jpg";
+import calorieCardMobile from "@/assets/tools/calorie-card-mobile.jpg";
+
 const Tools = () => {
   const navigate = useNavigate();
   
@@ -42,7 +49,8 @@ const Tools = () => {
       title: "1RM Calculator",
       description: "Calculate your one-rep maximum for any exercise",
       route: "/1rmcalculator",
-      image: oneRmBg
+      image: oneRmBg,
+      mobileImage: oneRmCardMobile
     },
     {
       id: "bmr-calculator",
@@ -50,7 +58,8 @@ const Tools = () => {
       title: "BMR Calculator",
       description: "Calculate your basal metabolic rate using the Mifflin-St Jeor formula",
       route: "/bmrcalculator",
-      image: bmrBg
+      image: bmrBg,
+      mobileImage: bmrCardMobile
     },
     {
       id: "macro-calculator",
@@ -58,7 +67,8 @@ const Tools = () => {
       title: "Macro Tracking Calculator",
       description: "Get personalized nutrition and macro recommendations",
       route: "/macrocalculator",
-      image: macroBg
+      image: macroBg,
+      mobileImage: macroCardMobile
     },
     {
       id: "workout-timer",
@@ -66,7 +76,8 @@ const Tools = () => {
       title: "Workout Timer",
       description: "Customizable interval timer for HIIT, Tabata, and circuit training sessions",
       route: "/workouttimer",
-      image: timerBg
+      image: timerBg,
+      mobileImage: timerCardMobile
     },
     {
       id: "calorie-counter",
@@ -74,7 +85,8 @@ const Tools = () => {
       title: "Calorie Counter",
       description: "Search any food and instantly see calories and macros per serving",
       route: "/caloriecounter",
-      image: calorieBg
+      image: calorieBg,
+      mobileImage: calorieCardMobile
     }
   ];
 
@@ -175,25 +187,34 @@ const Tools = () => {
                 const Icon = tool.icon;
                 return (
                   <CarouselItem key={tool.id} className="pl-2 basis-[75%]">
-                    <Card
+                    <div
                       onClick={() => navigate(tool.route)}
-                      className="h-[160px] border-[3px] border-primary/40 hover:border-primary hover:scale-[1.02] hover:shadow-xl hover:bg-primary/5 transition-all duration-300 cursor-pointer"
+                      className="flex flex-col h-[220px] bg-card border-2 border-primary/40 rounded-xl overflow-hidden cursor-pointer hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300"
                     >
-                      <CardContent className="h-full flex flex-col items-center justify-center p-4 gap-2 text-center">
-                        {/* Icon - centered on top */}
-                        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 flex-shrink-0">
-                          <Icon className="w-6 h-6 text-primary" />
+                      {/* Image section */}
+                      <div className="relative h-[55%] overflow-hidden">
+                        <img 
+                          src={tool.mobileImage} 
+                          alt={tool.title}
+                          loading="lazy"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      {/* Content section */}
+                      <div className="flex flex-col justify-center flex-1 p-3 text-center">
+                        <div className="flex items-center justify-center gap-2 mb-1">
+                          <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                            <Icon className="w-4 h-4 text-primary" />
+                          </div>
+                          <h3 className="text-sm font-bold text-foreground whitespace-nowrap">
+                            {tool.title}
+                          </h3>
                         </div>
-                        {/* Title - single line */}
-                        <h3 className="text-base font-bold text-foreground leading-tight whitespace-nowrap">
-                          {tool.title}
-                        </h3>
-                        {/* Description - max 2 lines */}
-                        <p className="text-sm text-muted-foreground leading-snug line-clamp-2">
+                        <p className="text-xs text-muted-foreground leading-snug line-clamp-2">
                           {tool.description}
                         </p>
-                      </CardContent>
-                    </Card>
+                      </div>
+                    </div>
                   </CarouselItem>
                 );
               })}
