@@ -336,7 +336,7 @@ const TrainingProgramFlow = () => {
         <div className="md:hidden mb-4">
           <Card className="bg-card border border-primary/20">
             <div className="p-4 text-center">
-              <p className="text-sm text-muted-foreground transition-opacity duration-300">
+              <p className="text-sm text-muted-foreground transition-opacity duration-300 line-clamp-2">
                 {programDescriptions[programTypes[currentSlide]?.id] || ""}
               </p>
             </div>
