@@ -28,6 +28,10 @@ import { HeroBackgroundImages } from "@/components/HeroBackgroundImages";
 import heroWodImage from "@/assets/hero-wod.jpg";
 import heroWorkoutsImage from "@/assets/hero-workouts.jpg";
 import heroBlogImage from "@/assets/hero-blog.jpg";
+import heroProgramsImage from "@/assets/hero-programs.jpg";
+import heroToolsImage from "@/assets/hero-tools.jpg";
+import heroLibraryImage from "@/assets/hero-exercise-library-new.jpg";
+import heroCommunityImage from "@/assets/hero-gym-group.jpg";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -168,42 +172,48 @@ const Index = () => {
     description: "500+ expert-designed workout routines for every fitness level and goal",
     buttonText: "Browse Workouts",
     icon: Dumbbell,
-    route: "/workout"
+    route: "/workout",
+    image: heroWorkoutsImage
   }, {
     id: "programs",
     title: "Smarty Programs",
     description: "Structured multi-week programs designed to transform your fitness journey",
     buttonText: "View Programs",
     icon: Calendar,
-    route: "/trainingprogram"
+    route: "/trainingprogram",
+    image: heroProgramsImage
   }, {
     id: "tools",
     title: "Smarty Tools",
     description: "Professional fitness calculators and tracking tools to optimize your training",
     buttonText: "Explore Tools",
     icon: Calculator,
-    route: "/tools"
+    route: "/tools",
+    image: heroToolsImage
   }, {
     id: "exerciselibrary",
     title: "Exercise Library",
     description: "Comprehensive video library with proper form demonstrations and technique guides",
     buttonText: "Browse Library",
     icon: Video,
-    route: "/exerciselibrary"
+    route: "/exerciselibrary",
+    image: heroLibraryImage
   }, {
     id: "blog",
     title: "Blog & Insights",
     description: "Evidence-based fitness articles and expert insights from professional coaches",
     buttonText: "Read Articles",
     icon: FileText,
-    route: "/blog"
+    route: "/blog",
+    image: heroBlogImage
   }, {
     id: "community",
     title: "Community",
     description: "Connect, share and grow with fellow fitness enthusiasts worldwide",
     buttonText: "Join Community",
     icon: Users,
-    route: "/community"
+    route: "/community",
+    image: heroCommunityImage
   }];
 
   // Desktop hero navigation carousel cards - Order: WOD, Workouts, Programs, Tools, Library, Blog
@@ -600,26 +610,35 @@ const Index = () => {
                 {heroCards.map(card => {
               const Icon = card.icon;
               return <CarouselItem key={card.id} className="pl-2 basis-[75%]">
-                      <Card onClick={() => navigate(card.route)} className="h-[160px] border-[3px] border-primary/40 hover:border-primary hover:scale-[1.02] hover:shadow-xl hover:bg-primary/5 transition-all duration-300 cursor-pointer">
-                        <CardContent className="h-full flex flex-col items-center justify-center p-4 gap-2 text-center">
-                          
-                          {/* Icon - centered on top */}
-                          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 flex-shrink-0">
-                            <Icon className="w-6 h-6 text-primary" />
+                      <div onClick={() => navigate(card.route)} className="border-2 border-primary/40 rounded-xl overflow-hidden hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300 cursor-pointer bg-card flex flex-col h-[220px]">
+                        {/* Image Section */}
+                        <div className="relative h-[55%] overflow-hidden flex-shrink-0">
+                          <img 
+                            src={card.image} 
+                            alt={card.title}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        
+                        {/* Content Section */}
+                        <div className="flex flex-col justify-center flex-1 p-3 text-center">
+                          <div className="flex items-center justify-center gap-2 mb-1">
+                            <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                              <Icon className="w-3.5 h-3.5 text-primary" />
+                            </div>
+                            <h3 className="text-sm font-bold text-foreground leading-tight whitespace-nowrap">
+                              {card.title}
+                            </h3>
                           </div>
-                          
-                          {/* Title - single line */}
-                          <h3 className="text-base font-bold text-foreground leading-tight whitespace-nowrap">
-                            {card.title}
-                          </h3>
-                          
-                          {/* Description - max 2 lines */}
-                          <p className="text-sm text-muted-foreground leading-snug line-clamp-2">
+                          <p className="text-xs text-muted-foreground leading-snug line-clamp-2">
                             {card.description}
                           </p>
-                          
-                        </CardContent>
-                      </Card>
+                          <div className="flex items-center justify-center gap-1 text-primary text-[10px] font-medium mt-1">
+                            Explore
+                            <ChevronRight className="w-3 h-3" />
+                          </div>
+                        </div>
+                      </div>
                     </CarouselItem>;
             })}
               </CarouselContent>
