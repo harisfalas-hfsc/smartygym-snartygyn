@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Dumbbell, X } from "lucide-react";
-import trialPopupBg from "@/assets/trial-popup-bg.jpg";
+import popupImg from "@/assets/popup-exit-intent-bright.jpg";
 
 const STORAGE_KEY = "smarty_exit_popup_shown";
 const THREE_HOURS_MS = 3 * 60 * 60 * 1000;
@@ -67,39 +67,41 @@ export function ExitIntentPopup() {
 
   return (
     <Dialog open={show} onOpenChange={setShow}>
-      <DialogContent className="p-0 border-0 overflow-hidden sm:max-w-lg max-w-[95vw] rounded-2xl bg-transparent shadow-2xl border-[3px] border-white [&>button]:hidden">
-        <div className="relative w-full">
-          <img
-            src={trialPopupBg}
-            alt=""
-            className="w-full h-auto object-cover rounded-2xl min-h-[420px] sm:min-h-[480px]"
-            loading="eager"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/40 rounded-2xl" />
+      <DialogContent className="p-0 border-0 overflow-hidden sm:max-w-lg max-w-[95vw] rounded-2xl bg-card border-2 border-primary/40 shadow-2xl [&>button]:hidden">
+        <div className="flex flex-col">
+          {/* Bright image section */}
+          <div className="relative h-[200px] overflow-hidden">
+            <img
+              src={popupImg}
+              alt="Your complimentary workout awaits"
+              className="w-full h-full object-cover"
+              loading="eager"
+            />
+            <button
+              onClick={() => setShow(false)}
+              className="absolute top-3 right-3 z-20 p-1.5 rounded-full bg-background/80 hover:bg-background text-foreground transition-colors"
+              aria-label="Close"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
 
-          <button
-            onClick={() => setShow(false)}
-            className="absolute top-3 right-3 z-20 p-1.5 rounded-full bg-white/60 hover:bg-white/80 text-gray-700 hover:text-gray-900 transition-colors"
-            aria-label="Close"
-          >
-            <X className="w-5 h-5" />
-          </button>
-
-          <div className="absolute inset-0 flex flex-col justify-end p-5 sm:p-8 rounded-2xl">
+          {/* Content section */}
+          <div className="flex flex-col p-5 sm:p-6">
             <div className="mb-3">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/90 text-primary-foreground text-xs font-bold uppercase tracking-wider">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider">
                 🎁 Complimentary Workout
               </span>
             </div>
 
-            <h2 className="text-2xl sm:text-3xl font-bold text-white leading-tight mb-3">
+            <h2 className="text-2xl sm:text-3xl font-bold text-foreground leading-tight mb-3">
               Your Free Workout<br />Is Waiting
             </h2>
 
-            <p className="text-sm sm:text-base text-white/80 leading-relaxed mb-1">
+            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-1">
               Sign up now and receive a complimentary personalized workout directly in your dashboard — available right away.
             </p>
-            <p className="text-sm sm:text-base text-white/80 leading-relaxed mb-4">
+            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-4">
               Designed by our expert coach,{" "}
               <a
                 href="/about"
@@ -115,8 +117,8 @@ export function ExitIntentPopup() {
               .
             </p>
 
-            <p className="text-xs sm:text-sm font-medium text-emerald-400 mb-4 flex items-center gap-1.5">
-              <span className="inline-block w-4 h-4 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400">✓</span>
+            <p className="text-xs sm:text-sm font-medium text-emerald-500 mb-4 flex items-center gap-1.5">
+              <span className="inline-flex w-4 h-4 rounded-full bg-emerald-500/20 items-center justify-center text-emerald-500">✓</span>
               No credit card needed
             </p>
 
@@ -134,7 +136,7 @@ export function ExitIntentPopup() {
 
             <button
               onClick={() => setShow(false)}
-              className="mt-3 text-xs text-white/50 hover:text-white/70 transition-colors text-center"
+              className="mt-3 text-xs text-muted-foreground hover:text-foreground transition-colors text-center"
             >
               No thanks, I'll pass
             </button>
