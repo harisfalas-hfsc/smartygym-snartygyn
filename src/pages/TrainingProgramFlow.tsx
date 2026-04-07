@@ -84,6 +84,16 @@ const TrainingProgramFlow = () => {
     "mobility-stability": "/images/programs/mobility-stability-bg.jpg",
   };
 
+  // Mobile card images for stacked blog-card layout
+  const programMobileImages: Record<string, string> = {
+    "cardio-endurance": "/images/programs/cardio-endurance-card-mobile.jpg",
+    "functional-strength": "/images/programs/functional-strength-card-mobile.jpg",
+    "muscle-hypertrophy": "/images/programs/muscle-hypertrophy-card-mobile.jpg",
+    "weight-loss": "/images/programs/weight-loss-card-mobile.jpg",
+    "low-back-pain": "/images/programs/low-back-pain-card-mobile.jpg",
+    "mobility-stability": "/images/programs/mobility-stability-card-mobile.jpg",
+  };
+
   // Extended descriptions for mobile carousel
   const programDescriptions: Record<string, string> = {
     "cardio-endurance": "Multi-week plans to improve cardiovascular endurance, VO2 max, and aerobic capacity.",

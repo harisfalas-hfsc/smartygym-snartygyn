@@ -459,79 +459,50 @@ const WorkoutFlow = () => {
               <CarouselContent className="-ml-2">
                 {workoutTypes.map((workout) => {
                   const Icon = workout.icon;
+                  const mobileImage = categoryMobileImages[workout.id];
                   const isWodCard = workout.id === "wod";
-                  const hasBackground = isWodCard ? wodImages.length > 0 : !!categoryBackgrounds[workout.id];
-                  const backgroundImage = isWodCard ? null : categoryBackgrounds[workout.id];
                   
                   return (
-                    <CarouselItem key={workout.id} className="pl-2 basis-[80%]">
-                      <Card 
-                        itemScope 
-                        itemType="https://schema.org/ExercisePlan" 
-                        onClick={() => handleWorkoutSelect(workout.id)} 
-                        className={`group p-6 cursor-pointer transition-all duration-300 border-2 border-border ${hasBackground ? 'relative overflow-hidden' : 'bg-card'}`}
-                        role="button" 
+                    <CarouselItem key={workout.id} className="pl-2 basis-[75%]">
+                      <div
+                        itemScope
+                        itemType="https://schema.org/ExercisePlan"
+                        onClick={() => handleWorkoutSelect(workout.id)}
+                        className="flex flex-col h-[220px] bg-card border-2 border-primary/40 rounded-xl overflow-hidden cursor-pointer hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300"
+                        role="button"
                         aria-label={`${workout.title} workouts`}
                       >
-                        {/* Counter Badge - Only show for non-WOD cards */}
-                        {!isWodCard && <CategoryCountBadge count={workoutCounts[workout.id] || 0} size="sm" />}
-                        
-                        {/* WOD Card Background Images with Crossfade */}
-                        {isWodCard && wodImages.length > 0 && (
-                          <>
-                            {wodImages.map((imageUrl, index) => (
-                              <div
-                                key={index}
-                                className="absolute inset-0 transition-opacity duration-1000 ease-in-out"
-                                style={{ opacity: currentWodImageIndex === index ? 1 : 0 }}
-                              >
-                                <img
-                                  src={imageUrl}
-                                  alt=""
-                                  className="w-full h-full object-cover"
-                                />
-                              </div>
-                            ))}
-                            <div className="absolute inset-0 bg-black/60" />
-                          </>
-                        )}
-                        
-                        {/* Non-WOD Card Background Images */}
-                        {!isWodCard && backgroundImage && (
-                          <>
-                            <div className="absolute inset-0">
-                              <img
-                                src={backgroundImage}
-                                alt=""
-                                className="w-full h-full object-cover"
-                              />
+                        {/* Image section */}
+                        <div className="relative h-[55%] overflow-hidden">
+                          {mobileImage && (
+                            <img 
+                              src={mobileImage} 
+                              alt={workout.title}
+                              loading="lazy"
+                              className="w-full h-full object-cover"
+                            />
+                          )}
+                          {!isWodCard && (
+                            <div className="absolute top-2 right-2">
+                              <CategoryCountBadge count={workoutCounts[workout.id] || 0} size="sm" />
                             </div>
-                            <div className="absolute inset-0 bg-black/60" />
-                          </>
-                        )}
-                        
-                        <div className={`flex flex-col items-center text-center space-y-4 ${hasBackground ? 'relative z-10' : ''}`}>
-                          <div
-                            className="relative w-16 h-16 rounded-full flex items-center justify-center bg-card"
-                            aria-hidden="true"
-                          >
-                            <div className="absolute inset-0 rounded-full bg-primary/10 pointer-events-none" aria-hidden="true" />
-                            <Icon className="relative w-8 h-8 text-primary" />
-                          </div>
-                          <div>
-                            <h3 className={`font-semibold text-lg mb-2 ${hasBackground ? 'text-white' : ''}`} itemProp="name">
+                          )}
+                        </div>
+                        {/* Content section */}
+                        <div className="flex flex-col justify-center flex-1 p-3 text-center">
+                          <div className="flex items-center justify-center gap-2 mb-1">
+                            <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                              <Icon className="w-4 h-4 text-primary" />
+                            </div>
+                            <h3 className="text-sm font-bold text-foreground whitespace-nowrap" itemProp="name">
                               {workout.title}
                             </h3>
-                            <p className={`text-xs italic ${hasBackground ? 'text-white/80' : 'text-muted-foreground/80'}`}>
-                              Crafted by{" "}
-                              <a href="/coach-profile" className="hover:underline font-medium whitespace-nowrap text-primary" onClick={e => e.stopPropagation()}>
-                                Haris Falas
-                              </a>
-                              {" "}BSc Sports Science, EXOS Specialist, CSCS
-                            </p>
                           </div>
+                          <p className="text-xs text-muted-foreground leading-snug">
+                            {workoutDescriptions[workout.id] || workout.description}
+                          </p>
                         </div>
-                      </Card>
+                      </div>
                     </CarouselItem>
                   );
                 })}
