@@ -49,7 +49,8 @@ const Tools = () => {
       title: "1RM Calculator",
       description: "Calculate your one-rep maximum for any exercise",
       route: "/1rmcalculator",
-      image: oneRmBg
+      image: oneRmBg,
+      mobileImage: oneRmCardMobile
     },
     {
       id: "bmr-calculator",
@@ -57,7 +58,8 @@ const Tools = () => {
       title: "BMR Calculator",
       description: "Calculate your basal metabolic rate using the Mifflin-St Jeor formula",
       route: "/bmrcalculator",
-      image: bmrBg
+      image: bmrBg,
+      mobileImage: bmrCardMobile
     },
     {
       id: "macro-calculator",
@@ -65,7 +67,8 @@ const Tools = () => {
       title: "Macro Tracking Calculator",
       description: "Get personalized nutrition and macro recommendations",
       route: "/macrocalculator",
-      image: macroBg
+      image: macroBg,
+      mobileImage: macroCardMobile
     },
     {
       id: "workout-timer",
@@ -73,7 +76,8 @@ const Tools = () => {
       title: "Workout Timer",
       description: "Customizable interval timer for HIIT, Tabata, and circuit training sessions",
       route: "/workouttimer",
-      image: timerBg
+      image: timerBg,
+      mobileImage: timerCardMobile
     },
     {
       id: "calorie-counter",
@@ -81,7 +85,8 @@ const Tools = () => {
       title: "Calorie Counter",
       description: "Search any food and instantly see calories and macros per serving",
       route: "/caloriecounter",
-      image: calorieBg
+      image: calorieBg,
+      mobileImage: calorieCardMobile
     }
   ];
 
