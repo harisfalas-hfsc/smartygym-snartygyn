@@ -533,9 +533,7 @@ const Community = () => {
               <h2 className="text-xl sm:text-2xl font-bold mb-3 text-center">About Community</h2>
               <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
                 <p className="text-sm sm:text-base text-center">
-                  Welcome to the <span className="text-primary font-semibold">SmartyGym</span> Community! 
-                  Our community is our greatest asset – <span className="font-medium text-foreground">you</span> are what makes this special. 
-                  Connect, compete, and interact through leaderboards, ratings, and shared experiences.
+                  Welcome to the <span className="text-primary font-semibold">SmartyGym</span> Community! Connect, compete, and interact through leaderboards, ratings, and shared experiences.
                 </p>
               </div>
             </CardContent>
