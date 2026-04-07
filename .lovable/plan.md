@@ -1,56 +1,48 @@
 
 
-# Fix: New Gold User Missing Welcome Message & Messages Panel
+# Fix Equipment Exercises in Micro Workouts + Enforce Bodyweight-Only Rule
 
-## Problem Analysis
+## Problem
+10 exercises across 7 micro workouts use equipment (cables, kettlebells, stability balls, bands, leverage machines, rope, dumbbells) — these should all be bodyweight-only since micro workouts are meant to be done anywhere (sofa, office, house) in 5 minutes with zero equipment.
 
-Two issues reported for user "App Lab Projects" who was granted Gold access via admin:
+### Affected Workouts & Exercises
 
-### Issue 1: No Welcome Message
-The welcome message trigger lives in `Auth.tsx` (line 58-71). It fires **only** when:
-- The user goes through auth state change on the `/auth` page
-- The profile's `welcome_sent` flag is `false`
+| Workout | Exercise | Equipment |
+|---------|----------|-----------|
+| Core Crusher | peroneals stretch (1388) | rope |
+| Desk Breaker | chest stretch with exercise ball (1272) | stability ball |
+| Jump Starter | cable palm rotational row (1319) | cable |
+| Squat Storm | deep push up (1274) | dumbbell |
+| Squat Storm | kettlebell swing (0549) ×2 | kettlebell |
+| Squat Storm | band squat (1004) | band |
+| Stairway Sprint | lever overhand triceps dip (0591) | leverage machine |
+| Wall Warrior | kettlebell swing (0549) ×2 | kettlebell |
 
-If this user signed up earlier and already had `welcome_sent = true` on their profile, the welcome message won't re-trigger. Or if they signed up but something failed silently during the welcome flow, they'd have no messages at all.
+## The Fix
 
-**Fix**: The `manage-subscription` edge function (which grants Gold/Platinum) should also send a welcome message if the user hasn't received one yet. After granting the subscription, check `welcome_sent` on their profile — if false, invoke `send-system-message` with `messageType: 'welcome'`.
+### Step 1: Replace all equipment exercises with bodyweight alternatives
+Run a script that updates each micro workout's `main_workout` HTML, swapping the equipment-based exercise markup tags for suitable bodyweight equivalents targeting the same muscle group.
 
-### Issue 2: Tabs Bar Not Visible
-The inner tabs (All, System, Requests, Settings) in `UserMessagesPanel.tsx` are always rendered at line 775. However, with zero messages, the counts show `All (0)`, `System (0)`, `Requests (0)` — the tabs bar IS there but may appear disconnected from the empty state visually.
+Replacement map (same body part / target):
+- **peroneals stretch** (rope, lower legs) → bodyweight calf/ankle stretch
+- **chest stretch with exercise ball** (stability ball, chest) → bodyweight chest stretch (e.g., doorway or standing chest stretch)
+- **cable palm rotational row** (cable, back) → bodyweight standing row or superman
+- **deep push up** (dumbbell, chest) → regular push-up or diamond push-up
+- **kettlebell swing** (kettlebell, upper legs) → squat jump or broad jump
+- **band squat** (band, upper legs) → bodyweight squat variation
+- **lever overhand triceps dip** (leverage machine, upper arms) → bodyweight triceps dip (on chair/bench — already acceptable for micro workouts which allow chairs/stairs)
 
-This is likely a perception issue because there are genuinely zero messages. Once the welcome message is delivered, the user will see content and the tabs will make sense.
+Each replacement will use a real exercise from the library with `equipment = 'body weight'` and matching `body_part`.
 
-No code change needed for the tabs — they already render unconditionally.
+### Step 2: Add enforcement rule to WOD generation prompt
+The `generate-workout-of-day` edge function currently excludes micro workouts from its generation cycle ("DOES NOT APPLY TO: MICRO-WORKOUTS"). However, for future-proofing, add a clear rule in the admin workout creation logic:
 
-## Changes
+In `src/components/admin/WorkoutEditDialog.tsx`, the `MICRO_WORKOUT_RULES` constant already enforces `equipment: 'BODYWEIGHT'` at the workout level. But the individual exercises inside aren't validated.
 
-### File: `supabase/functions/manage-subscription/index.ts`
-After the successful grant upsert (around line 131), add a check:
-1. Query the user's `profiles` table for `welcome_sent`
-2. If `welcome_sent` is false/null, call `send-system-message` with `messageType: 'welcome'` and the `user_id`
-3. This ensures any user granted a subscription who never received a welcome message gets one
+Add a validation check in the bulk format repair function and the workout save flow that flags any exercise inside a MICRO-WORKOUTS category workout that has `equipment != 'body weight'`.
 
-```
-// After successful grant, around line 131:
-// Check if user needs a welcome message
-const { data: profile } = await supabaseAdmin
-  .from('profiles')
-  .select('welcome_sent')
-  .eq('user_id', user_id)
-  .maybeSingle();
-
-if (!profile?.welcome_sent) {
-  // Insert welcome system message directly
-  // (calling edge function from edge function is unreliable)
-  // ... insert into user_system_messages using the welcome template
-}
-```
-
-### Immediate Fix for "App Lab Projects"
-Run a one-time script via `code--exec` to manually send the welcome message to this specific user by invoking the `send-system-message` edge function with their user ID.
-
-## Summary
-- **Root cause**: The welcome message only triggers on the Auth page during first login. Admin-granted users who already passed that gate (or had a glitch) never receive it.
-- **Fix**: Make `manage-subscription` grant flow also deliver the welcome message when `welcome_sent` is false.
-- **Immediate action**: Manually trigger the welcome message for the affected user.
+### Files Changed
+- **Database**: Direct updates to `admin_workouts` rows MW-003 through MW-010 (replacing exercise markup)
+- `supabase/functions/bulk-format-consistency-repair/index.ts` — add micro-workout equipment validation mode
+- `src/components/admin/WorkoutEditDialog.tsx` — add save-time warning if micro workout contains non-bodyweight exercises
 
