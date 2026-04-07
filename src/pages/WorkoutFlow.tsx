@@ -110,6 +110,20 @@ const WorkoutFlow = () => {
     "micro-workouts": "/images/workouts/micro-workouts-category-bg.jpg",
   };
 
+  // Mobile card images for stacked blog-card layout
+  const categoryMobileImages: Record<string, string> = {
+    "wod": "/images/workouts/wod-card-mobile.jpg",
+    "strength": "/images/workouts/strength-card-mobile.jpg",
+    "calorie-burning": "/images/workouts/calorie-burning-card-mobile.jpg",
+    "metabolic": "/images/workouts/metabolic-card-mobile.jpg",
+    "cardio": "/images/workouts/cardio-card-mobile.jpg",
+    "mobility": "/images/workouts/mobility-card-mobile.jpg",
+    "challenge": "/images/workouts/challenge-card-mobile.jpg",
+    "pilates": "/images/workouts/pilates-card-mobile.jpg",
+    "recovery": "/images/workouts/recovery-card-mobile.jpg",
+    "micro-workouts": "/images/workouts/micro-workouts-card-mobile.jpg",
+  };
+
   // Extended descriptions for mobile carousel
   const workoutDescriptions: Record<string, string> = {
     "wod": "Your daily dose of expertly programmed fitness, following science-based periodization.",
