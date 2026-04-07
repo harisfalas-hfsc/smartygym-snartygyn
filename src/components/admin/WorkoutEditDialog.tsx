@@ -244,6 +244,33 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
         return;
       }
 
+      // Micro-workout bodyweight-only enforcement
+      if (formData.category === 'MICRO-WORKOUTS') {
+        const htmlFields = [formData.main_workout, formData.warm_up, formData.cool_down, formData.activation, formData.finisher];
+        const exerciseIds = new Set<string>();
+        for (const html of htmlFields) {
+          if (!html) continue;
+          const matches = html.matchAll(/\{\{exercise:([^:]+):[^}]+\}\}/g);
+          for (const m of matches) exerciseIds.add(m[1]);
+        }
+        if (exerciseIds.size > 0) {
+          const { data: nonBw } = await supabase
+            .from('exercises')
+            .select('id, name, equipment')
+            .in('id', Array.from(exerciseIds))
+            .neq('equipment', 'body weight');
+          if (nonBw && nonBw.length > 0) {
+            const names = nonBw.map(e => `"${e.name}" (${e.equipment})`).join(', ');
+            toast({
+              variant: "destructive",
+              title: "Micro-Workout: Equipment Exercises Found",
+              description: `Micro workouts must be bodyweight-only. These exercises use equipment: ${names}. Please replace them before saving.`,
+            });
+            return;
+          }
+        }
+      }
+
       setIsGeneratingImage(true);
       
       let imageUrl = formData.image_url;
