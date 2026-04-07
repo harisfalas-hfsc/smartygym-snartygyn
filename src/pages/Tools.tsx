@@ -19,6 +19,13 @@ import macroBg from "@/assets/tools/macro-calculator-bg.jpg";
 import timerBg from "@/assets/tools/workout-timer-bg.jpg";
 import calorieBg from "@/assets/tools/calorie-counter-bg.jpg";
 
+// Mobile card images
+import oneRmCardMobile from "@/assets/tools/1rm-card-mobile.jpg";
+import bmrCardMobile from "@/assets/tools/bmr-card-mobile.jpg";
+import macroCardMobile from "@/assets/tools/macro-card-mobile.jpg";
+import timerCardMobile from "@/assets/tools/timer-card-mobile.jpg";
+import calorieCardMobile from "@/assets/tools/calorie-card-mobile.jpg";
+
 const Tools = () => {
   const navigate = useNavigate();
   
