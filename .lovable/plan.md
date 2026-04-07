@@ -1,41 +1,42 @@
 
 
-# Redesign Homepage Hero Carousel Cards (Mobile Only) to Match Blog Card Style
+# Redesign Free Trial & Exit Intent Popups to Bright/Clean Style
+
+## Problem
+The Free Trial and Exit Intent popups use a dark cinematic style (dark background image + heavy black overlay + white text) that clashes with the bright, clean aesthetic now used across the rest of the mobile UI.
 
 ## What Changes
-On mobile only, the hero carousel cards will switch from the current "full-bleed image with overlay text" layout to a stacked layout matching the blog article cards: **image on top, content section below** on a card background.
+Redesign both popups to match the stacked "blog card" style: bright image on top, clean `bg-card` content section below, theme-aware colors that look great in both light and dark mode.
 
-## Current vs New Layout
+## Components to Update
 
-```text
-CURRENT (mobile):                NEW (mobile):
-┌──────────────┐                ┌──────────────┐
-│  ░░IMAGE░░░░ │                │  ░░IMAGE░░░░ │
-│  ░░░░░░░░░░░ │                │  ░░░░░░░░░░░ │
-│  ░░░░░░░░░░░ │                │  ░░░░░░░░░░░ │
-│──────────────│                ├──────────────┤
-│  Title  [ic] │                │  Title  [ic] │
-│  Description │                │  Description │
-│   Explore >  │                │   Explore >  │
-└──────────────┘                └──────────────┘
-  (text overlays image)           (text on card bg)
+### 1. `src/components/growth/FreeTrialPopup.tsx`
+- Remove the full-bleed dark background image + gradient overlay approach
+- New layout: stacked card with a bright, energetic hero image on top (~45% height) and a clean `bg-card` content section below
+- Content section uses `text-foreground` for headings, `text-muted-foreground` for body text, and the existing `Crown` icon + CTA button
+- Border uses `border-primary/40` to match other cards
+- Generate a new bright hero image for the free trial theme (e.g., bright gym, energetic atmosphere)
 
-DESKTOP: No change — keeps current overlay style.
-```
+### 2. `src/components/growth/ExitIntentPopup.tsx`
+- Same redesign approach as Free Trial
+- Stacked layout: bright image top, clean content below
+- Generate a bright hero image for the "complimentary workout" theme
+- Keep the Haris Falas link and "No credit card needed" badge, just restyle to use semantic theme colors
 
-## File Changed: `src/components/HeroThreeColumns.tsx`
+### 3. Generate 2 new bright images
+- `src/assets/popup-free-trial-bright.jpg` — Bright, sunlit gym/fitness scene
+- `src/assets/popup-exit-intent-bright.jpg` — Bright, welcoming workout scene
 
-### Mobile card structure
-- Use responsive classes to switch between layouts at the `md:` breakpoint
-- Mobile: card becomes a vertical flex column — image section takes ~55% height, content section below with `bg-card` background
-- Remove the absolute positioning and gradient overlay on mobile
-- Keep the icon circle, title, description, and "Explore >" CTA in the content area
-- Match blog card styling: rounded corners, border, clean separation between image and text
+## Design Details
+- Card: `rounded-2xl overflow-hidden bg-card border-2 border-primary/40`
+- Image section: `h-[200px]` with `object-cover`, no overlay
+- Content section: padded, centered text, semantic colors throughout
+- CTA button: keeps existing primary styling
+- "No thanks" dismiss link: `text-muted-foreground` instead of `text-white/50`
+- Checkmarks/badges: keep `text-emerald-500` accents
 
-### Desktop preservation
-- Desktop (`md:` and up) keeps the current overlay layout with gradient, absolute positioning, and 32% basis — no changes
-
-### Card sizing
-- Mobile: `basis-[75%]` for the peek/carousel effect (consistent with other mobile carousels), taller card (~220px) to accommodate stacked layout
-- Desktop: stays `basis-[32%]` and `h-[180px]`
+## What Stays the Same
+- All other popups (WOD, Ritual, PAR-Q, Promo Banner, Social Proof) are already theme-adaptive — no changes needed
+- Popup logic, timing, and behavior unchanged
+- CTA actions and navigation unchanged
 
