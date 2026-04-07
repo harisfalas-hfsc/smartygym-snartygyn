@@ -1,48 +1,42 @@
 
 
-# Fix Equipment Exercises in Micro Workouts + Enforce Bodyweight-Only Rule
+# Hide "BUY €X.XX" Badge for Premium Users and Users Who Already Purchased
 
 ## Problem
-10 exercises across 7 micro workouts use equipment (cables, kettlebells, stability balls, bands, leverage machines, rope, dumbbells) — these should all be bodyweight-only since micro workouts are meant to be done anywhere (sofa, office, house) in 5 minutes with zero equipment.
+The green "BUY €X.XX" badge on workout and training program cards is visible to **all users**, including premium subscribers (who already have access to everything) and users who already purchased that specific item. It should only show for visitors, free subscribers who haven't purchased that item.
 
-### Affected Workouts & Exercises
+## Affected Files
+Three pages render the buy badge:
+1. **`src/pages/WODCategory.tsx`** — workout cards in category listings (line ~203)
+2. **`src/pages/WorkoutDetail.tsx`** — workout cards in the detail/listing view (line ~682)
+3. **`src/pages/TrainingProgramDetail.tsx`** — program cards in program listings (line ~629)
 
-| Workout | Exercise | Equipment |
-|---------|----------|-----------|
-| Core Crusher | peroneals stretch (1388) | rope |
-| Desk Breaker | chest stretch with exercise ball (1272) | stability ball |
-| Jump Starter | cable palm rotational row (1319) | cable |
-| Squat Storm | deep push up (1274) | dumbbell |
-| Squat Storm | kettlebell swing (0549) ×2 | kettlebell |
-| Squat Storm | band squat (1004) | band |
-| Stairway Sprint | lever overhand triceps dip (0591) | leverage machine |
-| Wall Warrior | kettlebell swing (0549) ×2 | kettlebell |
+None of these currently import `useAccessControl`.
 
-## The Fix
+## Changes
 
-### Step 1: Replace all equipment exercises with bodyweight alternatives
-Run a script that updates each micro workout's `main_workout` HTML, swapping the equipment-based exercise markup tags for suitable bodyweight equivalents targeting the same muscle group.
+### All 3 files: Import `useAccessControl` and conditionally hide the badge
 
-Replacement map (same body part / target):
-- **peroneals stretch** (rope, lower legs) → bodyweight calf/ankle stretch
-- **chest stretch with exercise ball** (stability ball, chest) → bodyweight chest stretch (e.g., doorway or standing chest stretch)
-- **cable palm rotational row** (cable, back) → bodyweight standing row or superman
-- **deep push up** (dumbbell, chest) → regular push-up or diamond push-up
-- **kettlebell swing** (kettlebell, upper legs) → squat jump or broad jump
-- **band squat** (band, upper legs) → bodyweight squat variation
-- **lever overhand triceps dip** (leverage machine, upper arms) → bodyweight triceps dip (on chair/bench — already acceptable for micro workouts which allow chairs/stairs)
+In each file:
+1. Import `useAccessControl` from `@/hooks/useAccessControl`
+2. Destructure `{ userTier, hasPurchased }` from the hook
+3. Wrap the buy badge condition with an additional check:
 
-Each replacement will use a real exercise from the library with `equipment = 'body weight'` and matching `body_part`.
+```
+// Current:
+{item.is_standalone_purchase && item.price && ( <BuyBadge /> )}
 
-### Step 2: Add enforcement rule to WOD generation prompt
-The `generate-workout-of-day` edge function currently excludes micro workouts from its generation cycle ("DOES NOT APPLY TO: MICRO-WORKOUTS"). However, for future-proofing, add a clear rule in the admin workout creation logic:
+// New:
+{item.is_standalone_purchase && item.price && 
+ userTier !== "premium" && 
+ !hasPurchased(item.id, "workout"|"program") && ( <BuyBadge /> )}
+```
 
-In `src/components/admin/WorkoutEditDialog.tsx`, the `MICRO_WORKOUT_RULES` constant already enforces `equipment: 'BODYWEIGHT'` at the workout level. But the individual exercises inside aren't validated.
+This ensures:
+- **Premium users**: badge hidden (everything included in their plan)
+- **Users who purchased this specific item**: badge hidden (already owns it)
+- **Visitors / free subscribers without purchase**: badge visible (can use it)
+- **Free subscribers who purchased item A but not B**: badge hidden on A, visible on B
 
-Add a validation check in the bulk format repair function and the workout save flow that flags any exercise inside a MICRO-WORKOUTS category workout that has `equipment != 'body weight'`.
-
-### Files Changed
-- **Database**: Direct updates to `admin_workouts` rows MW-003 through MW-010 (replacing exercise markup)
-- `supabase/functions/bulk-format-consistency-repair/index.ts` — add micro-workout equipment validation mode
-- `src/components/admin/WorkoutEditDialog.tsx` — add save-time warning if micro workout contains non-bodyweight exercises
+No backend changes needed — `useAccessControl` already provides `userTier` and `hasPurchased()`.
 
