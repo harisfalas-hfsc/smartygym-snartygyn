@@ -37,6 +37,7 @@ import { ContentLoadingSkeleton } from "@/components/ContentLoadingSkeleton";
 import { useAllPrograms } from "@/hooks/useProgramData";
 import { useProgramInteractions } from "@/hooks/useProgramInteractions";
 import { supabase } from "@/integrations/supabase/client";
+import { useAccessControl } from "@/hooks/useAccessControl";
 import { stripHtmlTags } from "@/lib/text";
 
 type EquipmentFilter = "all" | "bodyweight" | "equipment";
@@ -60,6 +61,7 @@ export interface TrainingProgram {
 const TrainingProgramDetail = () => {
   const navigate = useNavigate();
   const { type } = useParams();
+  const { userTier, hasPurchased } = useAccessControl();
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [equipmentFilter, setEquipmentFilter] = useState<EquipmentFilter>("all");
