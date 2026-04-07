@@ -237,7 +237,7 @@ const TrainingProgramFlow = () => {
             <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
             {isMobile ? (
                 <p className="text-sm text-center">
-                  <span className="text-primary font-semibold">Smarty Programs</span> are long-term, structured plans designed to help you achieve your specific fitness goals. They are strategic, periodized plans that take you from where you are to where you want to be. Unlock all <span className="text-primary font-bold">{totalProgramCount} programs</span> with a Premium plan, or grab one standalone program to start your journey.
+                  <span className="text-primary font-semibold">Smarty Programs</span> are long-term, structured plans designed to help you achieve your specific fitness goals. Unlock all <span className="text-primary font-bold">{totalProgramCount} programs</span> with a Premium plan, or grab one standalone program to start your journey.
                 </p>
               ) : (
                 <>
