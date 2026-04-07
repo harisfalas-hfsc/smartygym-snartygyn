@@ -9,6 +9,7 @@ import { Eye, Check, Heart, Crown, ShoppingCart, Clock, Dumbbell, Star, Home, Tr
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { ContentLoadingSkeleton } from "@/components/ContentLoadingSkeleton";
 import { useAllWorkouts } from "@/hooks/useWorkoutData";
+import { useAccessControl } from "@/hooks/useAccessControl";
 import { useWorkoutInteractions } from "@/hooks/useWorkoutInteractions";
 import { supabase } from "@/integrations/supabase/client";
 import WODPeriodizationCalendar from "@/components/WODPeriodizationCalendar";
@@ -18,6 +19,7 @@ import { getCyprusTodayStr } from "@/lib/cyprusDate";
 
 const WODCategory = () => {
   const navigate = useNavigate();
+  const { userTier, hasPurchased } = useAccessControl();
   const [wodCarouselApi, setWodCarouselApi] = useState<CarouselApi>();
   const [wodCurrentSlide, setWodCurrentSlide] = useState(0);
 
@@ -200,7 +202,7 @@ const WODCategory = () => {
                 <Crown className="w-3 h-3 mr-1" />
                 Premium
               </Badge>
-              {wod.is_standalone_purchase && wod.price && <TooltipProvider>
+              {wod.is_standalone_purchase && wod.price && userTier !== "premium" && !hasPurchased(wod.id, "workout") && <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Badge className="bg-gradient-to-r from-green-500 to-emerald-600 text-white border-0 cursor-help text-xs py-0.5">

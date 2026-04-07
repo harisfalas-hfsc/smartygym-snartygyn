@@ -28,6 +28,7 @@ import { CompactFilters } from "@/components/CompactFilters";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { ContentLoadingSkeleton } from "@/components/ContentLoadingSkeleton";
 import { useAllWorkouts } from "@/hooks/useWorkoutData";
+import { useAccessControl } from "@/hooks/useAccessControl";
 import { useWorkoutInteractions } from "@/hooks/useWorkoutInteractions";
 import { supabase } from "@/integrations/supabase/client";
 import { stripHtmlTags } from "@/lib/text";
@@ -55,6 +56,7 @@ export interface Workout {
 const WorkoutDetail = () => {
   const navigate = useNavigate();
   const { type } = useParams();
+  const { userTier, hasPurchased } = useAccessControl();
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [equipmentFilter, setEquipmentFilter] = useState<EquipmentFilter>("all");
@@ -678,8 +680,8 @@ const WorkoutDetail = () => {
                     </div>
                   )}
                   
-                  {/* Buy Badge - Only if standalone purchasable */}
-                  {workout.is_standalone_purchase && workout.price && (
+                  {/* Buy Badge - Only if standalone purchasable and user can use it */}
+                  {workout.is_standalone_purchase && workout.price && userTier !== "premium" && !hasPurchased(workout.id, "workout") && (
                     <div className="flex items-center">
                       <Tooltip>
                         <TooltipTrigger asChild>

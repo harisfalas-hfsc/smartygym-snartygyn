@@ -37,6 +37,7 @@ import { ContentLoadingSkeleton } from "@/components/ContentLoadingSkeleton";
 import { useAllPrograms } from "@/hooks/useProgramData";
 import { useProgramInteractions } from "@/hooks/useProgramInteractions";
 import { supabase } from "@/integrations/supabase/client";
+import { useAccessControl } from "@/hooks/useAccessControl";
 import { stripHtmlTags } from "@/lib/text";
 
 type EquipmentFilter = "all" | "bodyweight" | "equipment";
@@ -60,6 +61,7 @@ export interface TrainingProgram {
 const TrainingProgramDetail = () => {
   const navigate = useNavigate();
   const { type } = useParams();
+  const { userTier, hasPurchased } = useAccessControl();
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [equipmentFilter, setEquipmentFilter] = useState<EquipmentFilter>("all");
@@ -625,8 +627,8 @@ const TrainingProgramDetail = () => {
                     </div>
                   )}
                   
-                  {/* Buy Badge - Only if standalone purchasable */}
-                  {program.is_standalone_purchase && program.price && (
+                  {/* Buy Badge - Only if standalone purchasable and user can use it */}
+                  {program.is_standalone_purchase && program.price && userTier !== "premium" && !hasPurchased(program.id, "program") && (
                     <div className="flex items-center">
                       <Tooltip>
                         <TooltipTrigger asChild>
