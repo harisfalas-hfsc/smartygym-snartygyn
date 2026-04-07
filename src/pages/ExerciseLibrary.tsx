@@ -90,7 +90,7 @@ const ExerciseLibrary = () => {
               <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
                 {/* Mobile: Short description only */}
                 <p className="md:hidden text-sm text-center">
-                  Your comprehensive resource for learning exercises through video demonstrations and detailed instructions.
+                  Your resource for learning exercises through video demos and detailed instructions.
                 </p>
                 {/* Desktop: Full description */}
                 <p className="hidden md:block text-base text-center">
