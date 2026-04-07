@@ -112,16 +112,16 @@ const WorkoutFlow = () => {
 
   // Extended descriptions for mobile carousel
   const workoutDescriptions: Record<string, string> = {
-    "wod": "Your daily dose of expertly programmed fitness. The Workout of the Day follows science-based periodization for optimal results and safety.",
-    "strength": "Standalone single-session workouts designed to develop general strength. Using bodyweight or equipment, these sessions build foundational power and muscular endurance.",
-    "calorie-burning": "High-intensity interval training formats designed to maximize calorie expenditure. Various workout structures keep you challenged while achieving your fat-burning goals.",
-    "metabolic": "High-intensity interval training focused on boosting your metabolic rate. These sessions are designed to enhance how efficiently your body burns energy.",
-    "cardio": "Workouts dedicated to improving cardiovascular endurance and aerobic capacity. Build a stronger heart and better stamina for everyday activities.",
-    "mobility": "Sessions focused on joint health, mobility, and stability. Improve how your joints move and stabilize during dynamic movements.",
-    "challenge": "Push beyond your comfort zone with gamification-style workouts. Challenge yourself to break personal boundaries and discover your true potential.",
-    "pilates": "Controlled movements focused on core strength, spinal alignment, and body awareness. Develop stability and flexibility through precise technique.",
-    "recovery": "Active recovery and regeneration sessions designed to help your body repair and rebuild. Essential for long-term performance and injury prevention.",
-    "micro-workouts": "No time for a run or a trip to the gym? Exercise 'snacks' are the answer. All you need is some stairs, a chair, a wall or just your body and 5 minutes away from your desk or sofa!",
+    "wod": "Your daily dose of expertly programmed fitness, following science-based periodization.",
+    "strength": "Single-session workouts to build foundational strength, power, and muscular endurance.",
+    "calorie-burning": "High-intensity sessions designed to maximize calorie burn and fat loss.",
+    "metabolic": "High-intensity training focused on boosting your metabolic rate and energy burn.",
+    "cardio": "Build cardiovascular endurance, a stronger heart, and better everyday stamina.",
+    "mobility": "Focused on joint health, mobility, and stability for better movement quality.",
+    "challenge": "Gamification-style workouts that push you beyond your comfort zone.",
+    "pilates": "Core strength, spinal alignment, and body awareness through precise movements.",
+    "recovery": "Active recovery sessions to help your body repair, rebuild, and prevent injuries.",
+    "micro-workouts": "Quick 5-minute bodyweight exercises you can do anywhere — desk, sofa, or on the go.",
   };
 
   const workoutTypes = [{
@@ -426,7 +426,7 @@ const WorkoutFlow = () => {
           <div className="md:hidden mb-4">
             <Card className="bg-card border border-primary/20">
               <div className="p-4 text-center">
-                <p className="text-sm text-muted-foreground transition-opacity duration-300 line-clamp-2">
+                <p className="text-sm text-muted-foreground transition-opacity duration-300">
                   {workoutDescriptions[workoutTypes[currentSlide]?.id] || ""}
                 </p>
               </div>

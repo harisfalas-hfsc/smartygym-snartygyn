@@ -86,12 +86,12 @@ const TrainingProgramFlow = () => {
 
   // Extended descriptions for mobile carousel
   const programDescriptions: Record<string, string> = {
-    "cardio-endurance": "Structured multi-week programs designed to improve your cardiovascular endurance, VO2 max, and both aerobic and anaerobic thresholds. Build a stronger, more efficient heart.",
-    "functional-strength": "Programs focused on developing the strength every adult needs for better performance in daily life, hobbies, and sports. Real-world strength for real-world demands.",
-    "muscle-hypertrophy": "Strategic programs designed for muscle growth. Understand the importance of lean muscle mass for metabolism, strength, and long-term health.",
-    "weight-loss": "Comprehensive programs combining calorie burning, metabolic enhancement, and muscle building. A sustainable approach to losing weight and keeping it off.",
-    "low-back-pain": "Targeted programs addressing the modern epidemic of low back pain. Whether from office work, tactical jobs, or daily stress, these plans provide relief and prevention.",
-    "mobility-stability": "Programs designed to improve joint mobility, stability, and overall movement quality. Essential for injury prevention and optimal physical function.",
+    "cardio-endurance": "Multi-week plans to improve cardiovascular endurance, VO2 max, and aerobic capacity.",
+    "functional-strength": "Build the real-world strength you need for daily life, hobbies, and sports performance.",
+    "muscle-hypertrophy": "Strategic programs for muscle growth, metabolism, and long-term health.",
+    "weight-loss": "Combining calorie burning, metabolic training, and muscle building for sustainable results.",
+    "low-back-pain": "Targeted plans addressing low back pain from office work, daily stress, or physical jobs.",
+    "mobility-stability": "Improve joint mobility, stability, and movement quality for injury prevention.",
   };
 
   const programTypes = [{
@@ -336,7 +336,7 @@ const TrainingProgramFlow = () => {
         <div className="md:hidden mb-4">
           <Card className="bg-card border border-primary/20">
             <div className="p-4 text-center">
-              <p className="text-sm text-muted-foreground transition-opacity duration-300 line-clamp-2">
+              <p className="text-sm text-muted-foreground transition-opacity duration-300">
                 {programDescriptions[programTypes[currentSlide]?.id] || ""}
               </p>
             </div>
