@@ -216,49 +216,56 @@ const Index = () => {
     image: heroCommunityImage
   }];
 
-  // Desktop hero navigation carousel cards - Order: WOD, Workouts, Programs, Tools, Library, Blog
+  // Desktop hero navigation carousel cards - same images as mobile for consistency
   const desktopNavCards = [{
     id: "wod",
     title: "Workout of the Day",
     description: "Today's featured workout designed fresh by Coach Haris",
     icon: CalendarCheck,
-    route: "/workout/wod"
+    route: "/workout/wod",
+    image: heroWodImage
   }, {
     id: "workouts",
     title: "Smarty Workouts",
     description: "Complete workout library with 500+ expert-designed routines for every goal",
     icon: Dumbbell,
-    route: "/workout"
+    route: "/workout",
+    image: heroWorkoutsImage
   }, {
     id: "programs",
     title: "Smarty Programs",
     description: "Structured multi-week training plans to transform your fitness journey",
     icon: Calendar,
-    route: "/trainingprogram"
+    route: "/trainingprogram",
+    image: heroProgramsImage
   }, {
     id: "tools",
     title: "Smarty Tools",
     description: "Professional fitness calculators and tracking tools for optimization",
     icon: Calculator,
-    route: "/tools"
+    route: "/tools",
+    image: heroToolsImage
   }, {
     id: "exerciselibrary",
     title: "Exercise Library",
     description: "Comprehensive video demos with proper form and technique guides",
     icon: Video,
-    route: "/exerciselibrary"
+    route: "/exerciselibrary",
+    image: heroLibraryImage
   }, {
     id: "blog",
     title: "Blog & Insights",
     description: "Evidence-based articles and expert coaching tips for your training",
     icon: FileText,
-    route: "/blog"
+    route: "/blog",
+    image: heroBlogImage
   }, {
     id: "community",
     title: "Community",
     description: "Connect, share and grow with fellow fitness enthusiasts worldwide",
     icon: Users,
-    route: "/community"
+    route: "/community",
+    image: heroCommunityImage
   }];
 
   useEffect(() => {
