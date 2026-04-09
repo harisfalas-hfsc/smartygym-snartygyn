@@ -902,7 +902,7 @@ const Index = () => {
                             onMouseLeave={() => setIsHoveringDesktopNav(false)}
                           >
 							{/* padding creates space for arrows centered between card edge and container edge */}
-							<div className="relative px-12">
+							<div className="relative px-16">
                             <Carousel
                               className="w-full"
                               setApi={setDesktopNavApi}
@@ -962,8 +962,8 @@ const Index = () => {
                               </CarouselContent>
 
                               {/* Arrows at far edges per user request */}
-                              <CarouselPrevious className="z-20 -left-[44px] w-12 h-12 bg-background/90 border-2 border-primary/40 shadow-lg hover:border-primary [&>svg]:h-6 [&>svg]:w-6" />
-                              <CarouselNext className="z-20 -right-[44px] w-12 h-12 bg-background/90 border-2 border-primary/40 shadow-lg hover:border-primary [&>svg]:h-6 [&>svg]:w-6" />
+                              <CarouselPrevious className="z-20 -left-[56px] w-11 h-11 bg-background/90 border-2 border-primary/40 shadow-lg hover:border-primary [&>svg]:h-5 [&>svg]:w-5" />
+                              <CarouselNext className="z-20 -right-[56px] w-11 h-11 bg-background/90 border-2 border-primary/40 shadow-lg hover:border-primary [&>svg]:h-5 [&>svg]:w-5" />
                             </Carousel>
                           </div>
 
