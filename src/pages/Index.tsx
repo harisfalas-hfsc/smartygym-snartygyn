@@ -216,49 +216,56 @@ const Index = () => {
     image: heroCommunityImage
   }];
 
-  // Desktop hero navigation carousel cards - Order: WOD, Workouts, Programs, Tools, Library, Blog
+  // Desktop hero navigation carousel cards - same images as mobile for consistency
   const desktopNavCards = [{
     id: "wod",
     title: "Workout of the Day",
     description: "Today's featured workout designed fresh by Coach Haris",
     icon: CalendarCheck,
-    route: "/workout/wod"
+    route: "/workout/wod",
+    image: heroWodImage
   }, {
     id: "workouts",
     title: "Smarty Workouts",
     description: "Complete workout library with 500+ expert-designed routines for every goal",
     icon: Dumbbell,
-    route: "/workout"
+    route: "/workout",
+    image: heroWorkoutsImage
   }, {
     id: "programs",
     title: "Smarty Programs",
     description: "Structured multi-week training plans to transform your fitness journey",
     icon: Calendar,
-    route: "/trainingprogram"
+    route: "/trainingprogram",
+    image: heroProgramsImage
   }, {
     id: "tools",
     title: "Smarty Tools",
     description: "Professional fitness calculators and tracking tools for optimization",
     icon: Calculator,
-    route: "/tools"
+    route: "/tools",
+    image: heroToolsImage
   }, {
     id: "exerciselibrary",
     title: "Exercise Library",
     description: "Comprehensive video demos with proper form and technique guides",
     icon: Video,
-    route: "/exerciselibrary"
+    route: "/exerciselibrary",
+    image: heroLibraryImage
   }, {
     id: "blog",
     title: "Blog & Insights",
     description: "Evidence-based articles and expert coaching tips for your training",
     icon: FileText,
-    route: "/blog"
+    route: "/blog",
+    image: heroBlogImage
   }, {
     id: "community",
     title: "Community",
     description: "Connect, share and grow with fellow fitness enthusiasts worldwide",
     icon: Users,
-    route: "/community"
+    route: "/community",
+    image: heroCommunityImage
   }];
 
   useEffect(() => {
@@ -913,32 +920,43 @@ const Index = () => {
                                   return (
                                     <CarouselItem
                                       key={card.id}
-                                      className="pl-3 basis-[45%] lg:basis-[42%]"
+                                      className="pl-3 basis-[32%]"
                                     >
                                       <Card
                                         onClick={() => navigate(card.route)}
                                         className={cn(
-                                          "h-[160px] border-[3px] border-primary/40 bg-background/50",
+                                          "h-[220px] border-[3px] border-primary/40 bg-card",
                                           "cursor-pointer overflow-hidden rounded-xl",
                                           "hover:border-primary hover:shadow-xl hover:scale-[1.02]",
-                                          "transition-all duration-300"
+                                          "transition-all duration-300 flex flex-col"
                                         )}
                                       >
-                                        <CardContent className="h-full flex flex-row items-center p-4 gap-4">
-                                          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary/10 flex-shrink-0">
-                                            <Icon className="w-7 h-7 text-primary" />
-                                          </div>
-
-                                          <div className="flex-1 flex flex-col justify-center gap-1.5">
-                                            <h3 className="text-base font-bold text-foreground leading-tight">
+                                        {/* Image Section */}
+                                        <div className="relative h-[55%] overflow-hidden flex-shrink-0">
+                                          <img 
+                                            src={card.image} 
+                                            alt={card.title}
+                                            className="w-full h-full object-cover"
+                                          />
+                                        </div>
+                                        
+                                        {/* Content Section */}
+                                        <CardContent className="flex-1 flex flex-col justify-center p-3 text-center">
+                                          <div className="flex items-center justify-center gap-2 mb-1">
+                                            <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                              <Icon className="w-3.5 h-3.5 text-primary" />
+                                            </div>
+                                            <h3 className="text-sm font-bold text-foreground leading-tight whitespace-nowrap">
                                               {card.title}
                                             </h3>
-                                            <p className="text-xs text-muted-foreground leading-snug line-clamp-2">
-                                              {card.description}
-                                            </p>
                                           </div>
-
-                                          <ChevronRight className="w-5 h-5 text-primary/50 flex-shrink-0" />
+                                          <p className="text-xs text-muted-foreground leading-snug line-clamp-2">
+                                            {card.description}
+                                          </p>
+                                          <div className="flex items-center justify-center gap-1 text-primary text-[10px] font-medium mt-1">
+                                            Explore
+                                            <ChevronRight className="w-3 h-3" />
+                                          </div>
                                         </CardContent>
                                       </Card>
                                     </CarouselItem>
