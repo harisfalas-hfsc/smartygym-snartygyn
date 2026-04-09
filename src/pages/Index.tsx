@@ -842,9 +842,6 @@ const Index = () => {
                               We are not here to replace your gym. We are here to back you up when life gets in the way. Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed, SmartyGym is your backup plan. Or, if you go to your gym but want to follow a professional, science-based workout or training program designed by{' '}
                               <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>, we provide that expert guidance.
                             </p>
-                            <p className="text-base font-semibold text-primary mt-3">
-                              Wherever you are, your gym comes with you.
-                            </p>
                             <Link to="/the-smarty-method" className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline mt-2">
                               <BookOpen className="w-4 h-4" />
                               Discover The Smarty Method
