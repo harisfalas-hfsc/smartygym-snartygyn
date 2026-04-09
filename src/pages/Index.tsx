@@ -920,7 +920,7 @@ const Index = () => {
                                   return (
                                     <CarouselItem
                                       key={card.id}
-                                      className="pl-3 basis-[45%] lg:basis-[42%]"
+                                      className="pl-3 basis-[32%]"
                                     >
                                       <Card
                                         onClick={() => navigate(card.route)}
