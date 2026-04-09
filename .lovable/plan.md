@@ -1,42 +1,51 @@
 
 
-# Redesign Free Trial & Exit Intent Popups to Bright/Clean Style
-
 ## Problem
-The Free Trial and Exit Intent popups use a dark cinematic style (dark background image + heavy black overlay + white text) that clashes with the bright, clean aesthetic now used across the rest of the mobile UI.
 
-## What Changes
-Redesign both popups to match the stacked "blog card" style: bright image on top, clean `bg-card` content section below, theme-aware colors that look great in both light and dark mode.
+The desktop category cards on both Smarty Workouts and Smarty Programs pages use background images with a `bg-black/60` dark overlay. This creates very dark cards that clash with the light mode's white background. The mobile cards already have separate, brighter images that work well.
 
-## Components to Update
+## Solution
 
-### 1. `src/components/growth/FreeTrialPopup.tsx`
-- Remove the full-bleed dark background image + gradient overlay approach
-- New layout: stacked card with a bright, energetic hero image on top (~45% height) and a clean `bg-card` content section below
-- Content section uses `text-foreground` for headings, `text-muted-foreground` for body text, and the existing `Crown` icon + CTA button
-- Border uses `border-primary/40` to match other cards
-- Generate a new bright hero image for the free trial theme (e.g., bright gym, energetic atmosphere)
+Two-part approach to make cards look good in both light and dark mode:
 
-### 2. `src/components/growth/ExitIntentPopup.tsx`
-- Same redesign approach as Free Trial
-- Stacked layout: bright image top, clean content below
-- Generate a bright hero image for the "complimentary workout" theme
-- Keep the Haris Falas link and "No credit card needed" badge, just restyle to use semantic theme colors
+### 1. Use the mobile card images for desktop too (both pages)
 
-### 3. Generate 2 new bright images
-- `src/assets/popup-free-trial-bright.jpg` — Bright, sunlit gym/fitness scene
-- `src/assets/popup-exit-intent-bright.jpg` — Bright, welcoming workout scene
+Instead of the current full-bleed background approach with dark overlay, switch the desktop cards to use the same **stacked blog-card layout** as mobile — image on top, content below. This eliminates the dark overlay entirely and uses the existing bright mobile images.
 
-## Design Details
-- Card: `rounded-2xl overflow-hidden bg-card border-2 border-primary/40`
-- Image section: `h-[200px]` with `object-cover`, no overlay
-- Content section: padded, centered text, semantic colors throughout
-- CTA button: keeps existing primary styling
-- "No thanks" dismiss link: `text-muted-foreground` instead of `text-white/50`
-- Checkmarks/badges: keep `text-emerald-500` accents
+**WorkoutFlow.tsx (desktop grid, lines 332-434):**
+- Replace the current full-background card design with a stacked layout: image section on top (~55% height) + content section below
+- Use `categoryMobileImages` instead of `categoryBackgrounds` for the image source
+- Remove the `bg-black/60` overlay entirely
+- Text renders on the card background (`bg-card`), so it automatically adapts to light/dark mode
+- Keep all existing hover effects, badges, and metadata
 
-## What Stays the Same
-- All other popups (WOD, Ritual, PAR-Q, Promo Banner, Social Proof) are already theme-adaptive — no changes needed
-- Popup logic, timing, and behavior unchanged
-- CTA actions and navigation unchanged
+**TrainingProgramFlow.tsx (desktop grid, lines 268-350):**
+- Same structural change: stacked layout with image on top, content below
+- Use `programMobileImages` instead of `programBackgrounds`
+- Remove the `bg-black/60` overlay
+- Keep all existing hover effects, badges, and metadata
+
+### 2. Card structure (both pages)
+
+The new desktop card structure will be:
+```text
+┌──────────────────────┐
+│   [Image - 55%]      │
+│   (bright, no overlay)│
+│   [Count Badge]       │
+├──────────────────────┤
+│   [Icon] Title        │
+│   Description         │
+│   Haris Falas credit  │
+│   [Tags: Level, Equip]│
+└──────────────────────┘
+```
+
+This matches the mobile approach already in use, ensures consistent branding, and looks great on both light and dark backgrounds since the content area uses the theme's card color.
+
+### Files to modify
+1. `src/pages/WorkoutFlow.tsx` — desktop grid section (lines 332-434)
+2. `src/pages/TrainingProgramFlow.tsx` — desktop grid section (lines 268-350)
+
+No new images needed. No database changes. No new components.
 
