@@ -785,11 +785,8 @@ const Index = () => {
           <div className="container mx-auto max-w-6xl px-4 relative z-10 overflow-x-hidden">
             <ScrollReveal>
               <Card itemScope itemType="https://schema.org/Organization" data-hero-section="true" data-keywords="smarty gym, online gym, online fitness, smartygym.com, Haris Falas, global online gym" aria-label="SmartyGym - Your online gym and fitness platform - smartygym.com" className="border-2 border-primary overflow-hidden relative">
-                {/* Background Images - Rotating every 2.5 seconds */}
-                <HeroBackgroundImages />
                 
-                {/* Semi-transparent overlay for readability */}
-                <div className="absolute inset-0 bg-background/70 z-10" />
+
                 
                 {/* Decorative circles */}
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -mr-16 -mt-16 z-20" aria-hidden="true"></div>
