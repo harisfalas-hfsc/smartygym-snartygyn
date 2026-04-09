@@ -921,7 +921,7 @@ const Index = () => {
                         </div>
 
                         {/* "Your Gym Re-imagined" card - now below carousel on desktop */}
-                        <div className="bg-background/60 backdrop-blur-sm p-6 rounded-lg border-2 border-primary/30 mt-8 max-w-4xl mx-auto">
+                        <div className="bg-background/60 backdrop-blur-sm p-6 rounded-lg border-2 border-primary/30 mt-8 max-w-4xl mx-auto text-center">
                             <p className="text-xl font-bold text-primary mb-2">
                               Your Gym Re-imagined Anywhere, Anytime
                             </p>
@@ -934,33 +934,34 @@ const Index = () => {
                               Discover The Smarty Method
                               <ChevronRight className="w-4 h-4" />
                             </Link>
-                          </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto mt-8">
-                          <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20 h-full min-h-[88px]" itemScope itemType="https://schema.org/Thing" data-feature="smarty-gym-expertise" data-keywords="smarty gym, online gym, online fitness, smartygym.com, Haris Falas Cyprus, sports scientist" role="article" aria-label="Real expertise - SmartyGym Cyprus online fitness - smartygym.com by Haris Falas">
-                            <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
-                            <div className="flex-1">
-                              <p className="font-semibold text-sm mb-1" itemProp="name">Real Expertise</p>
-                              <p className="text-xs text-muted-foreground leading-relaxed" itemProp="description">Sports science degree & years of professional coaching experience</p>
+                            {/* Three feature cards inside */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
+                              <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20 h-full min-h-[88px]" itemScope itemType="https://schema.org/Thing" data-feature="smarty-gym-expertise" role="article">
+                                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
+                                <div className="flex-1 text-left">
+                                  <p className="font-semibold text-sm mb-1" itemProp="name">Real Expertise</p>
+                                  <p className="text-xs text-muted-foreground leading-relaxed" itemProp="description">Sports science degree & years of professional coaching experience</p>
+                                </div>
+                              </article>
+                              
+                              <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20 h-full min-h-[88px]" itemScope itemType="https://schema.org/Thing" data-feature="smarty-gym-personalized" role="article">
+                                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
+                                <div className="flex-1 text-left">
+                                  <p className="font-semibold text-sm mb-1" itemProp="name">Personal Touch</p>
+                                  <p className="text-xs text-muted-foreground leading-relaxed" itemProp="description">Workouts designed to fit YOUR unique schedule and lifestyle</p>
+                                </div>
+                              </article>
+                              
+                              <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20 h-full min-h-[88px]" itemScope itemType="https://schema.org/Thing" data-feature="smarty-gym-science" role="article">
+                                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
+                                <div className="flex-1 text-left">
+                                  <p className="font-semibold text-sm mb-1" itemProp="name">Not a Robot</p>
+                                  <p className="text-xs text-muted-foreground leading-relaxed" itemProp="description">Human-designed workouts backed by science, never by AI</p>
+                                </div>
+                              </article>
                             </div>
-                          </article>
-                          
-                          <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20 h-full min-h-[88px]" itemScope itemType="https://schema.org/Thing" data-feature="smarty-gym-personalized" data-keywords="smarty gym, online gym, online fitness, smartygym.com, personalized workouts Cyprus" role="article" aria-label="Personal touch - SmartyGym personalized workouts - smartygym.com">
-                            <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
-                            <div className="flex-1">
-                              <p className="font-semibold text-sm mb-1" itemProp="name">Personal Touch</p>
-                              <p className="text-xs text-muted-foreground leading-relaxed" itemProp="description">Workouts designed to fit YOUR unique schedule and lifestyle</p>
-                            </div>
-                          </article>
-                          
-                          <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20 h-full min-h-[88px]" itemScope itemType="https://schema.org/Thing" data-feature="smarty-gym-science" data-keywords="smarty gym, online gym, online fitness, smartygym.com, science-based training, no AI" role="article" aria-label="Not a robot - SmartyGym science-based no AI training - smartygym.com">
-                            <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
-                            <div className="flex-1">
-                              <p className="font-semibold text-sm mb-1" itemProp="name">Not a Robot</p>
-                              <p className="text-xs text-muted-foreground leading-relaxed" itemProp="description">Human-designed workouts backed by science, never by AI</p>
-                            </div>
-                          </article>
-                        </div>
+                          </div>
                         
                         {/* Science-based training text */}
                         <div className="space-y-2 text-center mt-6 pt-4 border-t border-primary/20">
