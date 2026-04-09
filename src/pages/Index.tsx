@@ -24,7 +24,7 @@ import { useAccessControl } from "@/hooks/useAccessControl";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { LazySection } from "@/components/LazySection";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { HeroBackgroundImages } from "@/components/HeroBackgroundImages";
+
 import heroWodImage from "@/assets/hero-wod.jpg";
 import heroWorkoutsImage from "@/assets/hero-workouts-bright.jpg";
 import heroBlogImage from "@/assets/hero-blog.jpg";
@@ -831,9 +831,6 @@ const Index = () => {
                           <div className="bg-background/60 backdrop-blur-sm p-6 rounded-lg border-2 border-primary/30 mt-8 max-w-4xl mx-auto">
                             <p className="text-xl font-bold text-primary mb-2">
                               Your Gym Re-imagined Anywhere, Anytime
-                            </p>
-                            <p className="text-base text-muted-foreground leading-relaxed mb-3">
-                              {"\n"}
                             </p>
                             <p className="text-base text-muted-foreground leading-relaxed">
                               We are not here to replace your gym. We are here to back you up when life gets in the way. Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed, SmartyGym is your backup plan. Or, if you go to your gym but want to follow a professional, science-based workout or training program designed by{' '}
