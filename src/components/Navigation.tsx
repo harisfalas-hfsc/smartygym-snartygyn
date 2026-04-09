@@ -261,10 +261,9 @@ export const Navigation = () => {
               <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="h-12 w-12 sm:h-16 sm:w-16 -ml-4">
                   <svg className="h-14 w-14 sm:h-12 sm:w-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                    <circle cx="12" cy="12" r="10" />
-                    <line x1="7" y1="8" x2="17" y2="8" />
-                    <line x1="7" y1="12" x2="17" y2="12" />
-                    <line x1="7" y1="16" x2="17" y2="16" />
+                    <line x1="3" y1="4" x2="21" y2="4" />
+                    <line x1="3" y1="12" x2="21" y2="12" />
+                    <line x1="3" y1="20" x2="21" y2="20" />
                   </svg>
                 </Button>
               </SheetTrigger>
