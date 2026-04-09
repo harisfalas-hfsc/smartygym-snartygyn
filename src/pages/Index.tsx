@@ -785,11 +785,8 @@ const Index = () => {
           <div className="container mx-auto max-w-6xl px-4 relative z-10 overflow-x-hidden">
             <ScrollReveal>
               <Card itemScope itemType="https://schema.org/Organization" data-hero-section="true" data-keywords="smarty gym, online gym, online fitness, smartygym.com, Haris Falas, global online gym" aria-label="SmartyGym - Your online gym and fitness platform - smartygym.com" className="border-2 border-primary overflow-hidden relative">
-                {/* Background Images - Rotating every 2.5 seconds */}
-                <HeroBackgroundImages />
                 
-                {/* Semi-transparent overlay for readability */}
-                <div className="absolute inset-0 bg-background/70 z-10" />
+
                 
                 {/* Decorative circles */}
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -mr-16 -mt-16 z-20" aria-hidden="true"></div>
@@ -823,16 +820,16 @@ const Index = () => {
                           </div>
                         </div>
                         
-                        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 text-center text-white">
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 text-center text-foreground">
                           100% Human. <span className="text-destructive">0% AI.</span>
                         </h2>
                         
 						<div className="max-w-4xl mx-auto space-y-5 text-center mb-10">
-                          <p className="text-xl font-semibold text-white">
+                          <p className="text-xl font-semibold text-foreground">
                             <span className="text-primary font-semibold">SmartyGym</span> workouts and programs are built to fit YOUR life.
                           </p>
-                          <p className="text-lg leading-relaxed text-white/90">
-                            That's why they work — safe and efficient design by <a href="/coach-profile" className="text-primary hover:underline font-medium"><strong>Haris Falas</strong></a>, crafted by hand with care to deliver effective results at <strong>smartygym.com</strong>, <strong className="text-white">NOT by AI</strong>.
+                          <p className="text-lg leading-relaxed text-muted-foreground">
+                            That's why they work — safe and efficient design by <a href="/coach-profile" className="text-primary hover:underline font-medium"><strong>Haris Falas</strong></a>, crafted by hand with care to deliver effective results at <strong>smartygym.com</strong>, <strong className="text-foreground">NOT by AI</strong>.
                           </p>
                           <div className="bg-background/60 backdrop-blur-sm p-6 rounded-lg border-2 border-primary/30 mt-8 max-w-4xl mx-auto">
                             <p className="text-xl font-bold text-primary mb-2">
