@@ -483,9 +483,7 @@ const WorkoutFlow = () => {
                             />
                           )}
                           {!isWodCard && (
-                            <div className="absolute top-2 right-2">
-                              <CategoryCountBadge count={workoutCounts[workout.id] || 0} size="sm" />
-                            </div>
+                            <CategoryCountBadge count={workoutCounts[workout.id] || 0} size="sm" className="top-1.5 right-1.5 left-auto" />
                           )}
                         </div>
                         {/* Content section */}
