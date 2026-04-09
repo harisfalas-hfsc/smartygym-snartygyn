@@ -7,14 +7,13 @@ export const ThemeToggle = () => {
 
   return (
     <Button
-      variant="outline"
-      size="icon"
+      variant="ghost"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className="h-8 w-8"
+      className="relative h-11 w-11 rounded-full p-0"
       aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
     >
-      <Sun className="h-3.5 w-3.5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-      <Moon className="absolute h-3.5 w-3.5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+      <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+      <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
       <span className="sr-only">Toggle theme</span>
     </Button>
   );
