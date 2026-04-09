@@ -264,12 +264,11 @@ const TrainingProgramFlow = () => {
           </div>
         </Card>
 
-        {/* Desktop: Grid Layout */}
+        {/* Desktop: Grid Layout - Stacked blog-card style */}
         <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {programTypes.map(program => {
             const Icon = program.icon;
-            const backgroundImage = programBackgrounds[program.id];
-            const hasBackground = !!backgroundImage;
+            const mobileImage = programMobileImages[program.id];
             
             return (
               <ScrollReveal key={program.id}>
@@ -277,43 +276,39 @@ const TrainingProgramFlow = () => {
                   itemScope 
                   itemType="https://schema.org/Course" 
                   onClick={() => handleProgramSelect(program.id)} 
-                  className={`group p-6 cursor-pointer transition-all duration-500 ease-out transform-gpu hover:scale-110 hover:-translate-y-3 hover:shadow-2xl hover:shadow-primary/40 hover:border-primary/60 border-2 border-border ${hasBackground ? 'relative overflow-hidden' : 'bg-card'}`}
+                  className="group cursor-pointer transition-all duration-500 ease-out transform-gpu hover:scale-105 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/40 hover:border-primary/60 border-2 border-border overflow-hidden bg-card"
                   role="button" 
                   aria-label={`${program.title} training program - Online gym program at SmartyGym - smartygym.com by Haris Falas`} 
                   data-program-category={program.id} 
                   data-keywords="online gym training programs, workout training programs, smarty gym, online fitness programs, smartygym.com, Haris Falas"
                 >
-                  {/* Counter Badge */}
-                  <CategoryCountBadge count={programCounts[program.id] || 0} />
-                  
-                  {/* Background Image */}
-                  {hasBackground && (
-                    <>
-                      <div className="absolute inset-0">
-                        <img
-                          src={backgroundImage}
-                          alt=""
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      {/* Dark overlay for readability */}
-                      <div className="absolute inset-0 bg-black/60" />
-                    </>
-                  )}
-                  
-                  <div className={`flex flex-col items-center text-center space-y-4 ${hasBackground ? 'relative z-10' : ''}`}>
-                    <div className="relative w-16 h-16 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-110 bg-card" aria-hidden="true">
+                  {/* Image Section */}
+                  <div className="relative h-48 lg:h-52 overflow-hidden">
+                    {mobileImage && (
+                      <img
+                        src={mobileImage}
+                        alt=""
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      />
+                    )}
+                    {/* Counter Badge */}
+                    <CategoryCountBadge count={programCounts[program.id] || 0} />
+                  </div>
+
+                  {/* Content Section */}
+                  <div className="p-5 flex flex-col items-center text-center space-y-3">
+                    <div className="relative w-14 h-14 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-110" aria-hidden="true">
                       <div className="absolute inset-0 rounded-full bg-primary/10 pointer-events-none" aria-hidden="true" />
-                      <Icon className="relative w-8 h-8 text-primary transition-transform duration-300 group-hover:rotate-3" />
+                      <Icon className="relative w-7 h-7 text-primary transition-transform duration-300 group-hover:rotate-3" />
                     </div>
                     <div>
-                      <h3 className={`font-semibold text-lg mb-2 ${hasBackground ? 'text-white' : ''}`} itemProp="name">
+                      <h3 className="font-semibold text-lg mb-2 text-foreground" itemProp="name">
                         {program.title}
                       </h3>
-                      <p className={`text-sm mb-3 ${hasBackground ? 'text-white/90' : 'text-muted-foreground'}`} itemProp="description">
+                      <p className="text-sm mb-3 text-muted-foreground" itemProp="description">
                         {program.description}
                       </p>
-                      <p className={`text-xs italic mb-3 ${hasBackground ? 'text-white/80' : 'text-muted-foreground/80'}`}>
+                      <p className="text-xs italic mb-3 text-muted-foreground/80">
                         Crafted by{" "}
                         <a href="/coach-profile" className="text-primary hover:underline font-medium whitespace-nowrap" itemProp="instructor" onClick={e => e.stopPropagation()}>
                           Haris Falas
