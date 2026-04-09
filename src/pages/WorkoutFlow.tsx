@@ -328,13 +328,12 @@ const WorkoutFlow = () => {
             </div>
           </Card>
 
-          {/* Desktop: Grid Layout */}
+          {/* Desktop: Grid Layout - Stacked blog-card style */}
           <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {workoutTypes.map(workout => {
               const Icon = workout.icon;
               const isWodCard = workout.id === "wod";
-              const hasBackground = isWodCard ? wodImages.length > 0 : !!categoryBackgrounds[workout.id];
-              const backgroundImage = isWodCard ? null : categoryBackgrounds[workout.id];
+              const mobileImage = categoryMobileImages[workout.id];
               
               return (
                 <ScrollReveal key={workout.id}>
@@ -342,67 +341,52 @@ const WorkoutFlow = () => {
                     itemScope 
                     itemType="https://schema.org/ExercisePlan" 
                     onClick={() => handleWorkoutSelect(workout.id)} 
-                    className={`group p-6 cursor-pointer transition-all duration-500 ease-out transform-gpu hover:scale-110 hover:-translate-y-3 hover:shadow-2xl hover:shadow-primary/40 hover:border-primary/60 border-2 border-border ${hasBackground ? 'relative overflow-hidden' : 'bg-card'}`}
+                    className="group cursor-pointer transition-all duration-500 ease-out transform-gpu hover:scale-105 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/40 hover:border-primary/60 border-2 border-border overflow-hidden bg-card"
                     role="button" 
                     aria-label={`${workout.title} workouts - Online gym category at SmartyGym - smartygym.com by Haris Falas`} 
                     data-workout-category={workout.id} 
                     data-keywords="online gym workouts, smarty gym, online fitness, smartygym.com, Haris Falas workouts"
                   >
-                    {/* Counter Badge - Only show for non-WOD cards */}
-                    {!isWodCard && <CategoryCountBadge count={workoutCounts[workout.id] || 0} />}
-                    
-                    {/* WOD Card Background Images with Crossfade */}
-                    {isWodCard && wodImages.length > 0 && (
-                      <>
-                        {wodImages.map((imageUrl, index) => (
-                          <div
-                            key={index}
-                            className="absolute inset-0 transition-opacity duration-1000 ease-in-out"
-                            style={{ opacity: currentWodImageIndex === index ? 1 : 0 }}
-                          >
-                            <img
-                              src={imageUrl}
-                              alt=""
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                        ))}
-                        {/* Dark overlay for readability */}
-                        <div className="absolute inset-0 bg-black/60" />
-                      </>
-                    )}
-                    
-                    {/* Non-WOD Card Background Images */}
-                    {!isWodCard && backgroundImage && (
-                      <>
-                        <div className="absolute inset-0">
+                    {/* Image Section */}
+                    <div className="relative h-48 lg:h-52 overflow-hidden">
+                      {isWodCard && wodImages.length > 0 ? (
+                        wodImages.map((imageUrl, index) => (
                           <img
-                            src={backgroundImage}
+                            key={index}
+                            src={imageUrl}
                             alt=""
-                            className="w-full h-full object-cover"
+                            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out"
+                            style={{ opacity: currentWodImageIndex === index ? 1 : 0 }}
                           />
-                        </div>
-                        {/* Dark overlay for readability */}
-                        <div className="absolute inset-0 bg-black/60" />
-                      </>
-                    )}
-                    
-                    <div className={`flex flex-col items-center text-center space-y-4 ${hasBackground ? 'relative z-10' : ''}`}>
+                        ))
+                      ) : mobileImage ? (
+                        <img
+                          src={mobileImage}
+                          alt=""
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
+                      ) : null}
+                      {/* Counter Badge */}
+                      {!isWodCard && <CategoryCountBadge count={workoutCounts[workout.id] || 0} />}
+                    </div>
+
+                    {/* Content Section */}
+                    <div className="p-5 flex flex-col items-center text-center space-y-3">
                       <div
-                        className="relative w-16 h-16 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-110 bg-card"
+                        className="relative w-14 h-14 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
                         aria-hidden="true"
                       >
                         <div className="absolute inset-0 rounded-full bg-primary/10 pointer-events-none" aria-hidden="true" />
-                        <Icon className="relative w-8 h-8 transition-transform duration-300 group-hover:rotate-3 text-primary" />
+                        <Icon className="relative w-7 h-7 transition-transform duration-300 group-hover:rotate-3 text-primary" />
                       </div>
                       <div>
-                        <h3 className={`font-semibold text-lg mb-2 ${hasBackground ? 'text-white' : ''}`} itemProp="name">
+                        <h3 className="font-semibold text-lg mb-2 text-foreground" itemProp="name">
                           {workout.title}
                         </h3>
-                        <p className={`text-sm mb-3 ${hasBackground ? 'text-white/90' : 'text-muted-foreground'}`} itemProp="description">
+                        <p className="text-sm mb-3 text-muted-foreground" itemProp="description">
                           {workout.description}
                         </p>
-                        <p className={`text-xs italic ${hasBackground ? 'text-white/80' : 'text-muted-foreground/80'}`}>
+                        <p className="text-xs italic text-muted-foreground/80">
                           Crafted by{" "}
                           <a href="/coach-profile" className="hover:underline font-medium whitespace-nowrap text-primary" onClick={e => e.stopPropagation()}>
                             Haris Falas
