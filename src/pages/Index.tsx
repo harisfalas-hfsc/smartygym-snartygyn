@@ -853,51 +853,9 @@ const Index = () => {
                           </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
-                          <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20 h-full min-h-[88px]" itemScope itemType="https://schema.org/Thing" data-feature="smarty-gym-expertise" data-keywords="smarty gym, online gym, online fitness, smartygym.com, Haris Falas Cyprus, sports scientist" role="article" aria-label="Real expertise - SmartyGym Cyprus online fitness - smartygym.com by Haris Falas">
-                            <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
-                            <div className="flex-1">
-                              <p className="font-semibold text-sm mb-1" itemProp="name">Real Expertise</p>
-                              <p className="text-xs text-muted-foreground leading-relaxed" itemProp="description">Sports science degree & years of professional coaching experience</p>
-                            </div>
-                          </article>
-                          
-                          <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20 h-full min-h-[88px]" itemScope itemType="https://schema.org/Thing" data-feature="smarty-gym-personalized" data-keywords="smarty gym, online gym, online fitness, smartygym.com, personalized workouts Cyprus" role="article" aria-label="Personal touch - SmartyGym personalized workouts - smartygym.com">
-                            <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
-                            <div className="flex-1">
-                              <p className="font-semibold text-sm mb-1" itemProp="name">Personal Touch</p>
-                              <p className="text-xs text-muted-foreground leading-relaxed" itemProp="description">Workouts designed to fit YOUR unique schedule and lifestyle</p>
-                            </div>
-                          </article>
-                          
-                          <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20 h-full min-h-[88px]" itemScope itemType="https://schema.org/Thing" data-feature="smarty-gym-science" data-keywords="smarty gym, online gym, online fitness, smartygym.com, science-based training, no AI" role="article" aria-label="Not a robot - SmartyGym science-based no AI training - smartygym.com">
-                            <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
-                            <div className="flex-1">
-                              <p className="font-semibold text-sm mb-1" itemProp="name">Not a Robot</p>
-                              <p className="text-xs text-muted-foreground leading-relaxed" itemProp="description">Human-designed workouts backed by science, never by AI</p>
-                            </div>
-                          </article>
-                        </div>
-                        
-                        {/* Science-based training text */}
-                        <div className="space-y-2 text-center mt-6 pt-4 border-t border-primary/20">
-                          <p className="text-base font-semibold text-primary">
-                            Every workout and training program is science-based and personally created by{' '}
-                            <a href="/coach-profile" onClick={e => {
-                                e.preventDefault();
-                                navigate('/coach-profile');
-                              }} className="text-primary hover:underline font-medium cursor-pointer">
-                              Haris Falas
-                            </a>.
-                          </p>
-                          <p className="text-base text-muted-foreground leading-relaxed">
-                            Never by AI. Never by algorithms. Always by a real human expert who understands YOUR needs. Training designed by humans, for humans.
-                          </p>
-                        </div>
-                        
                         {/* Desktop navigation carousel (compact cards, arrows centered in gap) */}
                           <div 
-                            className="mt-8"
+                            className="mt-0"
                             onMouseEnter={() => setIsHoveringDesktopNav(true)}
                             onMouseLeave={() => setIsHoveringDesktopNav(false)}
                           >
@@ -983,6 +941,48 @@ const Index = () => {
                               />
                             ))}
                           </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto mt-8">
+                          <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20 h-full min-h-[88px]" itemScope itemType="https://schema.org/Thing" data-feature="smarty-gym-expertise" data-keywords="smarty gym, online gym, online fitness, smartygym.com, Haris Falas Cyprus, sports scientist" role="article" aria-label="Real expertise - SmartyGym Cyprus online fitness - smartygym.com by Haris Falas">
+                            <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
+                            <div className="flex-1">
+                              <p className="font-semibold text-sm mb-1" itemProp="name">Real Expertise</p>
+                              <p className="text-xs text-muted-foreground leading-relaxed" itemProp="description">Sports science degree & years of professional coaching experience</p>
+                            </div>
+                          </article>
+                          
+                          <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20 h-full min-h-[88px]" itemScope itemType="https://schema.org/Thing" data-feature="smarty-gym-personalized" data-keywords="smarty gym, online gym, online fitness, smartygym.com, personalized workouts Cyprus" role="article" aria-label="Personal touch - SmartyGym personalized workouts - smartygym.com">
+                            <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
+                            <div className="flex-1">
+                              <p className="font-semibold text-sm mb-1" itemProp="name">Personal Touch</p>
+                              <p className="text-xs text-muted-foreground leading-relaxed" itemProp="description">Workouts designed to fit YOUR unique schedule and lifestyle</p>
+                            </div>
+                          </article>
+                          
+                          <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20 h-full min-h-[88px]" itemScope itemType="https://schema.org/Thing" data-feature="smarty-gym-science" data-keywords="smarty gym, online gym, online fitness, smartygym.com, science-based training, no AI" role="article" aria-label="Not a robot - SmartyGym science-based no AI training - smartygym.com">
+                            <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
+                            <div className="flex-1">
+                              <p className="font-semibold text-sm mb-1" itemProp="name">Not a Robot</p>
+                              <p className="text-xs text-muted-foreground leading-relaxed" itemProp="description">Human-designed workouts backed by science, never by AI</p>
+                            </div>
+                          </article>
+                        </div>
+                        
+                        {/* Science-based training text */}
+                        <div className="space-y-2 text-center mt-6 pt-4 border-t border-primary/20">
+                          <p className="text-base font-semibold text-primary">
+                            Every workout and training program is science-based and personally created by{' '}
+                            <a href="/coach-profile" onClick={e => {
+                                e.preventDefault();
+                                navigate('/coach-profile');
+                              }} className="text-primary hover:underline font-medium cursor-pointer">
+                              Haris Falas
+                            </a>.
+                          </p>
+                          <p className="text-base text-muted-foreground leading-relaxed">
+                            Never by AI. Never by algorithms. Always by a real human expert who understands YOUR needs. Training designed by humans, for humans.
+                          </p>
                         </div>
                         
                         {/* Who is SmartyGym For? - Now at the bottom */}
