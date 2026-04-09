@@ -9,11 +9,12 @@ export const ThemeToggle = () => {
   return (
     <Button
       variant="ghost"
+      size="icon"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
       className="relative h-11 w-11 rounded-full"
       aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
     >
-      <Avatar className="h-11 w-11 ring-2 ring-blue-500 ring-offset-2 ring-offset-background">
+      <Avatar className="h-11 w-11 border-2 border-primary">
         <AvatarFallback className="relative bg-transparent text-foreground">
           <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
           <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
