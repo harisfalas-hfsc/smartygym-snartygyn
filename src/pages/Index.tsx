@@ -925,27 +925,38 @@ const Index = () => {
                                       <Card
                                         onClick={() => navigate(card.route)}
                                         className={cn(
-                                          "h-[160px] border-[3px] border-primary/40 bg-background/50",
+                                          "h-[220px] border-[3px] border-primary/40 bg-card",
                                           "cursor-pointer overflow-hidden rounded-xl",
                                           "hover:border-primary hover:shadow-xl hover:scale-[1.02]",
-                                          "transition-all duration-300"
+                                          "transition-all duration-300 flex flex-col"
                                         )}
                                       >
-                                        <CardContent className="h-full flex flex-row items-center p-4 gap-4">
-                                          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary/10 flex-shrink-0">
-                                            <Icon className="w-7 h-7 text-primary" />
-                                          </div>
-
-                                          <div className="flex-1 flex flex-col justify-center gap-1.5">
-                                            <h3 className="text-base font-bold text-foreground leading-tight">
+                                        {/* Image Section */}
+                                        <div className="relative h-[55%] overflow-hidden flex-shrink-0">
+                                          <img 
+                                            src={card.image} 
+                                            alt={card.title}
+                                            className="w-full h-full object-cover"
+                                          />
+                                        </div>
+                                        
+                                        {/* Content Section */}
+                                        <CardContent className="flex-1 flex flex-col justify-center p-3 text-center">
+                                          <div className="flex items-center justify-center gap-2 mb-1">
+                                            <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                              <Icon className="w-3.5 h-3.5 text-primary" />
+                                            </div>
+                                            <h3 className="text-sm font-bold text-foreground leading-tight whitespace-nowrap">
                                               {card.title}
                                             </h3>
-                                            <p className="text-xs text-muted-foreground leading-snug line-clamp-2">
-                                              {card.description}
-                                            </p>
                                           </div>
-
-                                          <ChevronRight className="w-5 h-5 text-primary/50 flex-shrink-0" />
+                                          <p className="text-xs text-muted-foreground leading-snug line-clamp-2">
+                                            {card.description}
+                                          </p>
+                                          <div className="flex items-center justify-center gap-1 text-primary text-[10px] font-medium mt-1">
+                                            Explore
+                                            <ChevronRight className="w-3 h-3" />
+                                          </div>
                                         </CardContent>
                                       </Card>
                                     </CarouselItem>
