@@ -828,20 +828,6 @@ const Index = () => {
                           <p className="text-xl font-semibold text-foreground">
                             <span className="text-primary font-semibold">SmartyGym</span> workouts and programs are built to fit YOUR life.
                           </p>
-                          <div className="bg-background/60 backdrop-blur-sm p-6 rounded-lg border-2 border-primary/30 mt-8 max-w-4xl mx-auto">
-                            <p className="text-xl font-bold text-primary mb-2">
-                              Your Gym Re-imagined Anywhere, Anytime
-                            </p>
-                            <p className="text-base text-muted-foreground leading-relaxed">
-                              We are not here to replace your gym. We are here to back you up when life gets in the way. Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed, SmartyGym is your backup plan. Or, if you go to your gym but want to follow a professional, science-based workout or training program designed by{' '}
-                              <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>, we provide that expert guidance.
-                            </p>
-                            <Link to="/the-smarty-method" className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline mt-2">
-                              <BookOpen className="w-4 h-4" />
-                              Discover The Smarty Method
-                              <ChevronRight className="w-4 h-4" />
-                            </Link>
-                          </div>
                         </div>
 
                         {/* Desktop navigation carousel (compact cards, arrows centered in gap) */}
@@ -933,6 +919,22 @@ const Index = () => {
                             ))}
                           </div>
                         </div>
+
+                        {/* "Your Gym Re-imagined" card - now below carousel on desktop */}
+                        <div className="bg-background/60 backdrop-blur-sm p-6 rounded-lg border-2 border-primary/30 mt-8 max-w-4xl mx-auto">
+                            <p className="text-xl font-bold text-primary mb-2">
+                              Your Gym Re-imagined Anywhere, Anytime
+                            </p>
+                            <p className="text-base text-muted-foreground leading-relaxed">
+                              We are not here to replace your gym. We are here to back you up when life gets in the way. Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed, SmartyGym is your backup plan. Or, if you go to your gym but want to follow a professional, science-based workout or training program designed by{' '}
+                              <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>, we provide that expert guidance.
+                            </p>
+                            <Link to="/the-smarty-method" className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline mt-2">
+                              <BookOpen className="w-4 h-4" />
+                              Discover The Smarty Method
+                              <ChevronRight className="w-4 h-4" />
+                            </Link>
+                          </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto mt-8">
                           <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20 h-full min-h-[88px]" itemScope itemType="https://schema.org/Thing" data-feature="smarty-gym-expertise" data-keywords="smarty gym, online gym, online fitness, smartygym.com, Haris Falas Cyprus, sports scientist" role="article" aria-label="Real expertise - SmartyGym Cyprus online fitness - smartygym.com by Haris Falas">
