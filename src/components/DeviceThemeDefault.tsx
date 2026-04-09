@@ -2,9 +2,10 @@ import { useEffect } from "react";
 import { useTheme } from "next-themes";
 
 /**
- * Forces dark theme on every NEW session.
- * User can switch to light during their session, and it persists on refresh.
- * When browser/app is closed and reopened, it resets to dark.
+ * Sets default theme based on device width:
+ * - Desktop (≥768px): light mode
+ * - Mobile (<768px): dark mode
+ * User can override during session; persists on refresh within same session.
  */
 export const DeviceThemeDefault = () => {
   const { setTheme, theme } = useTheme();
@@ -15,8 +16,10 @@ export const DeviceThemeDefault = () => {
     if (sessionTheme) {
       setTheme(sessionTheme);
     } else {
-      setTheme("dark");
-      sessionStorage.setItem("smartygym-session-theme", "dark");
+      const isMobile = window.innerWidth < 768;
+      const defaultTheme = isMobile ? "dark" : "light";
+      setTheme(defaultTheme);
+      sessionStorage.setItem("smartygym-session-theme", defaultTheme);
     }
   }, [setTheme]);
 
