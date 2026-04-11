@@ -2355,9 +2355,9 @@ Return JSON with these exact fields:
       // Create Stripe product with IDEMPOTENCY KEY to prevent duplicates
       const workoutId = `WOD-${prefix}-${equipment.charAt(0)}-${timestamp}`;
       
-      // CRITICAL: Idempotency key prevents duplicate Stripe products on retries
-      // Key format: wod:{date}:{equipment} ensures same date+equipment = same product
-      const stripeIdempotencyKey = `wod:${effectiveDate}:${equipment}:${timestamp}`;
+      // CRITICAL: Deterministic idempotency key prevents duplicate Stripe products on retries
+      // Key format: wod:{date}:{equipment} — NO timestamp, so retries reuse the same product
+      const stripeIdempotencyKey = `wod:${effectiveDate}:${equipment}`;
       
       logStep(`Creating Stripe product with idempotency`, { 
         name: workoutContent.name, 
@@ -2609,6 +2609,15 @@ Return JSON with these exact fields:
         });
 
       if (insertError) {
+        // ORPHAN GUARD: Archive Stripe product immediately if DB insert fails
+        // This prevents orphaned active Stripe products from accumulating
+        try {
+          logStep(`⚠️ DB insert failed, archiving orphaned Stripe product`, { stripeProductId, insertError: insertError.message });
+          await stripe.products.update(stripeProductId, { active: false });
+          logStep(`✅ Orphaned Stripe product archived`, { stripeProductId });
+        } catch (archiveErr: any) {
+          logStep(`❌ Failed to archive orphaned Stripe product`, { stripeProductId, error: archiveErr.message });
+        }
         throw new Error(`Failed to insert ${equipment} WOD: ${insertError.message}`);
       }
 
