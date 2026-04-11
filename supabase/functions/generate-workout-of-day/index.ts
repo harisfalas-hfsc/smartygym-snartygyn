@@ -772,6 +772,22 @@ This is a NUDGE, not a mandate.
       // If BODYWEIGHT fails, we still try EQUIPMENT (and vice versa)
       // This prevents one AI failure from destroying the entire run
       // ═══════════════════════════════════════════════════════════════════════════════
+      
+      // ═══════════════════════════════════════════════════════════════════════════════
+      // PER-VARIANT RETRY: 2 attempts with 15s delay per equipment type
+      // A single transient AI error no longer kills the variant for the entire run
+      // ═══════════════════════════════════════════════════════════════════════════════
+      const PER_VARIANT_MAX_ATTEMPTS = 2;
+      const PER_VARIANT_RETRY_DELAY_MS = 15000;
+      let variantAttempt = 0;
+      let variantSucceeded = false;
+      
+      while (variantAttempt < PER_VARIANT_MAX_ATTEMPTS && !variantSucceeded) {
+        variantAttempt++;
+        if (variantAttempt > 1) {
+          logStep(`🔄 Retrying ${equipment} variant (attempt ${variantAttempt}/${PER_VARIANT_MAX_ATTEMPTS}) after ${PER_VARIANT_RETRY_DELAY_MS / 1000}s delay`);
+          await new Promise(r => setTimeout(r, PER_VARIANT_RETRY_DELAY_MS));
+        }
       try {
       // ═══════════════════════════════════════════════════════════════════════════════
       // GET FORMAT AND DURATION FOR THIS SPECIFIC WORKOUT
@@ -2663,40 +2679,48 @@ Return JSON with these exact fields:
         logStep(`Tracked first workout name for dedup`, { firstWorkoutName });
       }
       
+      variantSucceeded = true;
+      
       } catch (equipmentError: any) {
         // ═══════════════════════════════════════════════════════════════════════════════
-        // PER-EQUIPMENT ERROR HANDLING: Log failure but continue to next equipment type
+        // PER-EQUIPMENT ERROR HANDLING: Retry once, then log failure and continue
         // ═══════════════════════════════════════════════════════════════════════════════
-        failedEquipmentTypes.push(equipment);
-        logStep(`❌ FAILED to generate ${equipment} workout`, { 
+        logStep(`❌ ${equipment} variant attempt ${variantAttempt}/${PER_VARIANT_MAX_ATTEMPTS} failed`, { 
           error: equipmentError.message,
           equipment,
           category,
-          willContinue: true
+          willRetry: variantAttempt < PER_VARIANT_MAX_ATTEMPTS
         });
         
-        // Log the failure to notification_audit_log for visibility
-        try {
-          await supabase.from('notification_audit_log').insert({
-            notification_type: 'wod_equipment_failure',
-            message_type: 'wod_equipment_failure',
-            subject: `${equipment} WOD Generation Failed - ${effectiveDate}`,
-            content: equipmentError.message,
-            sent_at: new Date().toISOString(),
-            metadata: {
-              effectiveDate,
-              equipment,
-              category,
-              error: equipmentError.message,
-              timestamp: new Date().toISOString()
-            }
-          });
-          logStep(`${equipment} failure logged to audit`, { equipment });
-        } catch (logErr) {
-          logStep(`Failed to log ${equipment} failure`, { error: logErr });
+        // Only mark as failed after all per-variant attempts exhausted
+        if (variantAttempt >= PER_VARIANT_MAX_ATTEMPTS) {
+          failedEquipmentTypes.push(equipment);
+          logStep(`❌ ALL ${PER_VARIANT_MAX_ATTEMPTS} attempts FAILED for ${equipment} workout`, { equipment, category });
+          
+          // Log the failure to notification_audit_log for visibility
+          try {
+            await supabase.from('notification_audit_log').insert({
+              notification_type: 'wod_equipment_failure',
+              message_type: 'wod_equipment_failure',
+              subject: `${equipment} WOD Generation Failed (${PER_VARIANT_MAX_ATTEMPTS} attempts) - ${effectiveDate}`,
+              content: equipmentError.message,
+              sent_at: new Date().toISOString(),
+              metadata: {
+                effectiveDate,
+                equipment,
+                category,
+                error: equipmentError.message,
+                variantAttempts: variantAttempt,
+                timestamp: new Date().toISOString()
+              }
+            });
+            logStep(`${equipment} failure logged to audit`, { equipment });
+          } catch (logErr) {
+            logStep(`Failed to log ${equipment} failure`, { error: logErr });
+          }
         }
         
-        // Continue to next equipment type instead of throwing
+        // Continue retry loop or move to next equipment type
         continue;
       }
     }
