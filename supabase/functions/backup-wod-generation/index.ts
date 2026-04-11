@@ -15,24 +15,46 @@ const corsHeaders = {
  * 
  * Runs at 01:00 UTC (03:00 Cyprus) as a safety net.
  * Checks if today's WODs exist and are complete.
- * If missing, triggers generation and sends recovery/failure emails.
+ * If missing, triggers generation with up to 2 attempts (30s apart).
  */
 
+const BACKUP_MAX_ATTEMPTS = 2;
+const BACKUP_RETRY_DELAY_MS = 30000; // 30s between backup attempts
+
 function getCyprusDateStr(): string {
-  const now = new Date();
-  const cyprusFormatter = new Intl.DateTimeFormat("en-CA", {
+  return new Intl.DateTimeFormat("en-CA", {
     timeZone: "Europe/Athens",
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
-  });
-  return cyprusFormatter.format(now);
+  }).format(new Date());
 }
 
 function isRecoveryDay(dateStr: string): boolean {
   const dayIn84 = getDayIn84Cycle(dateStr);
   const periodization = getPeriodizationForDay(dayIn84);
   return periodization.category === "RECOVERY";
+}
+
+function verifyWods(wods: any[], recoveryDay: boolean): { valid: string[]; missing: string[] } {
+  const valid: string[] = [];
+  const missing: string[] = [];
+
+  if (recoveryDay) {
+    const v = wods?.find((w: any) => w.equipment === "VARIOUS");
+    if (v && validateWodSections(v.main_workout, true).isComplete) valid.push("VARIOUS");
+    else missing.push(v ? "VARIOUS (incomplete)" : "VARIOUS");
+  } else {
+    const bw = wods?.find((w: any) => w.equipment === "BODYWEIGHT");
+    if (bw && validateWodSections(bw.main_workout, false).isComplete) valid.push("BODYWEIGHT");
+    else missing.push(bw ? "BODYWEIGHT (incomplete)" : "BODYWEIGHT");
+
+    const eq = wods?.find((w: any) => w.equipment === "EQUIPMENT");
+    if (eq && validateWodSections(eq.main_workout, false).isComplete) valid.push("EQUIPMENT");
+    else missing.push(eq ? "EQUIPMENT (incomplete)" : "EQUIPMENT");
+  }
+
+  return { valid, missing };
 }
 
 serve(async (req) => {
@@ -68,55 +90,24 @@ serve(async (req) => {
     });
   }
 
-  // Validate each WOD
-  const validWods: string[] = [];
-  const missing: string[] = [];
-
-  if (recoveryDay) {
-    const variousWod = wods?.find((w: any) => w.equipment === "VARIOUS");
-    if (variousWod) {
-      const check = validateWodSections(variousWod.main_workout, true);
-      if (check.isComplete) validWods.push("VARIOUS");
-      else missing.push("VARIOUS (incomplete)");
-    } else {
-      missing.push("VARIOUS");
-    }
-  } else {
-    const bwWod = wods?.find((w: any) => w.equipment === "BODYWEIGHT");
-    if (bwWod) {
-      const check = validateWodSections(bwWod.main_workout, false);
-      if (check.isComplete) validWods.push("BODYWEIGHT");
-      else missing.push("BODYWEIGHT (incomplete)");
-    } else {
-      missing.push("BODYWEIGHT");
-    }
-
-    const eqWod = wods?.find((w: any) => w.equipment === "EQUIPMENT");
-    if (eqWod) {
-      const check = validateWodSections(eqWod.main_workout, false);
-      if (check.isComplete) validWods.push("EQUIPMENT");
-      else missing.push("EQUIPMENT (incomplete)");
-    } else {
-      missing.push("EQUIPMENT");
-    }
-  }
+  const initial = verifyWods(wods || [], recoveryDay);
 
   // If all WODs present and valid, nothing to do
-  if (missing.length === 0) {
-    console.log(`[BACKUP-WOD] ✅ All ${validWods.length} WODs present and valid. No action needed.`);
+  if (initial.missing.length === 0) {
+    console.log(`[BACKUP-WOD] ✅ All ${initial.valid.length} WODs present and valid. No action needed.`);
     return new Response(
       JSON.stringify({
         success: true,
         message: "All WODs present - no backup needed",
         date: effectiveDate,
-        found: validWods,
+        found: initial.valid,
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 
-  // Missing WODs detected - attempt backup generation
-  console.log(`[BACKUP-WOD] ⚠️ Missing WODs: ${missing.join(", ")}. Triggering backup generation...`);
+  // Missing WODs detected - attempt backup generation with retries
+  console.log(`[BACKUP-WOD] ⚠️ Missing WODs: ${initial.missing.join(", ")}. Starting backup generation (up to ${BACKUP_MAX_ATTEMPTS} attempts)...`);
 
   // Create run log
   const dayIn84 = getDayIn84Cycle(effectiveDate);
@@ -135,43 +126,62 @@ serve(async (req) => {
     .select()
     .single();
 
+  let backupSucceeded = false;
+  let recheckValid: string[] = [];
+  let lastError: string | null = null;
+
   try {
-    const response = await fetch(`${supabaseUrl}/functions/v1/generate-workout-of-day`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${anonKey}`,
-      },
-      body: JSON.stringify({ retryMissing: true }),
-    });
+    for (let attempt = 1; attempt <= BACKUP_MAX_ATTEMPTS; attempt++) {
+      console.log(`[BACKUP-WOD] ===== BACKUP ATTEMPT ${attempt}/${BACKUP_MAX_ATTEMPTS} =====`);
 
-    const responseText = await response.text();
+      if (attempt > 1) {
+        console.log(`[BACKUP-WOD] Waiting ${BACKUP_RETRY_DELAY_MS / 1000}s before retry...`);
+        await new Promise(r => setTimeout(r, BACKUP_RETRY_DELAY_MS));
+      }
 
-    if (!response.ok) {
-      throw new Error(`Generation failed: HTTP ${response.status}: ${responseText.substring(0, 200)}`);
+      try {
+        const response = await fetch(`${supabaseUrl}/functions/v1/generate-workout-of-day`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${anonKey}`,
+          },
+          body: JSON.stringify({ retryMissing: true }),
+        });
+
+        const responseText = await response.text();
+
+        if (!response.ok) {
+          lastError = `HTTP ${response.status}: ${responseText.substring(0, 200)}`;
+          console.error(`[BACKUP-WOD] Attempt ${attempt} failed: ${lastError}`);
+          continue;
+        }
+      } catch (fetchError: any) {
+        lastError = fetchError.message || String(fetchError);
+        console.error(`[BACKUP-WOD] Attempt ${attempt} fetch error: ${lastError}`);
+        continue;
+      }
+
+      // Wait for DB to settle then re-verify
+      await new Promise(r => setTimeout(r, 3000));
+
+      const { data: recheck } = await supabase
+        .from("admin_workouts")
+        .select("id, equipment, main_workout")
+        .eq("generated_for_date", effectiveDate)
+        .eq("is_workout_of_day", true);
+
+      const result = verifyWods(recheck || [], recoveryDay);
+      recheckValid = result.valid;
+
+      if (recheckValid.length >= expectedCount) {
+        backupSucceeded = true;
+        console.log(`[BACKUP-WOD] ✅ Backup SUCCEEDED on attempt ${attempt}`);
+        break;
+      }
+
+      console.log(`[BACKUP-WOD] Attempt ${attempt} incomplete: found ${recheckValid.length}/${expectedCount}`);
     }
-
-    // Wait for DB to settle then re-verify
-    await new Promise(r => setTimeout(r, 3000));
-
-    const { data: recheck } = await supabase
-      .from("admin_workouts")
-      .select("id, equipment, main_workout")
-      .eq("generated_for_date", effectiveDate)
-      .eq("is_workout_of_day", true);
-
-    const recheckValid: string[] = [];
-    if (recoveryDay) {
-      const v = recheck?.find((w: any) => w.equipment === "VARIOUS");
-      if (v && validateWodSections(v.main_workout, true).isComplete) recheckValid.push("VARIOUS");
-    } else {
-      const bw = recheck?.find((w: any) => w.equipment === "BODYWEIGHT");
-      if (bw && validateWodSections(bw.main_workout, false).isComplete) recheckValid.push("BODYWEIGHT");
-      const eq = recheck?.find((w: any) => w.equipment === "EQUIPMENT");
-      if (eq && validateWodSections(eq.main_workout, false).isComplete) recheckValid.push("EQUIPMENT");
-    }
-
-    const backupSucceeded = recheckValid.length === expectedCount;
 
     // Update run log
     if (runLog?.id) {
@@ -182,7 +192,7 @@ serve(async (req) => {
           completed_at: new Date().toISOString(),
           found_count: recheckValid.length,
           wods_created: recheckValid,
-          error_message: backupSucceeded ? null : `Backup recovery incomplete. Found: ${recheckValid.join(", ")}`,
+          error_message: backupSucceeded ? null : `Backup recovery incomplete after ${BACKUP_MAX_ATTEMPTS} attempts. Found: ${recheckValid.join(", ")}`,
         })
         .eq("id", runLog.id);
     }
@@ -194,7 +204,7 @@ serve(async (req) => {
       const resend = new Resend(resendApiKey);
 
       if (backupSucceeded) {
-        console.log("[BACKUP-WOD] ✅ Backup generation SUCCEEDED - sending recovery email");
+        console.log("[BACKUP-WOD] ✅ Sending recovery success email");
         await resend.emails.send({
           from: "SmartyGym Alerts <notifications@smartygym.com>",
           to: [adminEmail],
@@ -203,7 +213,7 @@ serve(async (req) => {
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
               <h1 style="color: #16a34a;">✅ WOD Backup Recovery Successful</h1>
               <p>The backup generation system successfully created the missing WOD(s) for <strong>${effectiveDate}</strong>.</p>
-              <p><strong>Previously missing:</strong> ${missing.join(", ")}</p>
+              <p><strong>Previously missing:</strong> ${initial.missing.join(", ")}</p>
               <p><strong>Now available:</strong> ${recheckValid.join(", ")}</p>
               <p style="color: #6b7280; font-size: 12px;">Timestamp: ${new Date().toISOString()}</p>
             </div>
@@ -217,16 +227,18 @@ serve(async (req) => {
           metadata: { date: effectiveDate, recovered: recheckValid }
         });
       } else {
-        console.log("[BACKUP-WOD] ❌ Backup generation FAILED - sending final failure email");
+        console.log("[BACKUP-WOD] ❌ Sending final failure email");
         await resend.emails.send({
           from: "SmartyGym Alerts <notifications@smartygym.com>",
           to: [adminEmail],
-          subject: `🚨 CRITICAL: WOD Backup Also Failed - ${effectiveDate}`,
+          subject: `🚨 CRITICAL: WOD Backup Also Failed (${BACKUP_MAX_ATTEMPTS} attempts) - ${effectiveDate}`,
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
               <h1 style="color: #dc2626;">🚨 WOD Backup Generation Failed</h1>
               <p>Both primary and backup WOD generation have failed for <strong>${effectiveDate}</strong>.</p>
-              <p><strong>Still missing:</strong> ${missing.join(", ")}</p>
+              <p><strong>Backup attempts:</strong> ${BACKUP_MAX_ATTEMPTS}</p>
+              <p><strong>Still missing:</strong> ${initial.missing.join(", ")}</p>
+              <p><strong>Last error:</strong> ${lastError || "Unknown"}</p>
               <p><strong>Manual action required:</strong> Go to Admin → WOD Manager → Generate New WOD → "Regenerate Today"</p>
               <p style="color: #6b7280; font-size: 12px;">Timestamp: ${new Date().toISOString()}</p>
             </div>
@@ -237,7 +249,7 @@ serve(async (req) => {
           message_type: 'wod_backup_failure',
           to_email: adminEmail,
           status: 'sent',
-          metadata: { date: effectiveDate, missing }
+          metadata: { date: effectiveDate, missing: initial.missing, attempts: BACKUP_MAX_ATTEMPTS }
         });
       }
     }
@@ -245,10 +257,11 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: backupSucceeded,
-        message: backupSucceeded ? "Backup recovery succeeded" : "Backup recovery failed",
+        message: backupSucceeded ? "Backup recovery succeeded" : `Backup recovery failed after ${BACKUP_MAX_ATTEMPTS} attempts`,
         date: effectiveDate,
         found: recheckValid,
-        previouslyMissing: missing,
+        previouslyMissing: initial.missing,
+        attempts: BACKUP_MAX_ATTEMPTS,
       }),
       {
         status: backupSucceeded ? 200 : 500,
@@ -258,7 +271,6 @@ serve(async (req) => {
   } catch (error) {
     console.error("[BACKUP-WOD] Backup generation error:", error);
 
-    // Ensure run log is closed
     if (runLog?.id) {
       await supabase
         .from("wod_generation_runs")
