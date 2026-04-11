@@ -14,8 +14,15 @@ const corsHeaders = {
  * Watchdog WOD Check
  * 
  * Runs at 01:05 UTC (03:05 Cyprus) — 5 minutes after backup.
- * Final safety net: counts active WODs, triggers recovery if needed.
+ * Final safety net with verify-retry-verify loop:
+ * 1. Check WODs → if OK, exit silently
+ * 2. Trigger recovery → wait 60s → re-verify
+ * 3. If still missing, trigger once more → wait 60s → final verify
+ * 4. Send alert with final status
  */
+
+const WATCHDOG_MAX_RETRIES = 2;
+const WATCHDOG_VERIFY_DELAY_MS = 60000; // 60s wait after each recovery trigger
 
 function getCyprusDateStr(): string {
   return new Intl.DateTimeFormat("en-CA", {
@@ -24,6 +31,26 @@ function getCyprusDateStr(): string {
     month: "2-digit",
     day: "2-digit",
   }).format(new Date());
+}
+
+function countValidWods(wods: any[], isRecovery: boolean): string[] {
+  const valid: string[] = [];
+  for (const w of wods || []) {
+    const check = validateWodSections(w.main_workout, isRecovery);
+    if (check.isComplete) valid.push(w.equipment || "UNKNOWN");
+  }
+  return valid;
+}
+
+function getMissing(validWods: string[], isRecovery: boolean): string[] {
+  const missing: string[] = [];
+  if (isRecovery) {
+    if (!validWods.includes("VARIOUS")) missing.push("VARIOUS");
+  } else {
+    if (!validWods.includes("BODYWEIGHT")) missing.push("BODYWEIGHT");
+    if (!validWods.includes("EQUIPMENT")) missing.push("EQUIPMENT");
+  }
+  return missing;
 }
 
 serve(async (req) => {
@@ -46,20 +73,16 @@ serve(async (req) => {
 
   console.log(`[WATCHDOG] Date: ${today}, Recovery: ${isRecovery}, Expected: ${expectedCount}`);
 
-  // Count today's active, validated WODs
-  const { data: wods } = await supabase
+  // Initial check
+  const { data: initialWods } = await supabase
     .from("admin_workouts")
     .select("id, name, equipment, main_workout")
     .eq("generated_for_date", today)
     .eq("is_workout_of_day", true);
 
-  const validWods: string[] = [];
-  for (const w of wods || []) {
-    const check = validateWodSections(w.main_workout, isRecovery);
-    if (check.isComplete) validWods.push(w.equipment || "UNKNOWN");
-  }
+  let validWods = countValidWods(initialWods || [], isRecovery);
 
-  console.log(`[WATCHDOG] Found ${validWods.length}/${expectedCount} valid WODs: ${validWods.join(", ")}`);
+  console.log(`[WATCHDOG] Initial check: ${validWods.length}/${expectedCount} valid WODs: ${validWods.join(", ")}`);
 
   // All good — silent exit
   if (validWods.length >= expectedCount) {
@@ -70,50 +93,95 @@ serve(async (req) => {
     );
   }
 
-  // Missing WODs — trigger recovery
-  const missing = [];
-  if (!isRecovery) {
-    if (!validWods.includes("BODYWEIGHT")) missing.push("BODYWEIGHT");
-    if (!validWods.includes("EQUIPMENT")) missing.push("EQUIPMENT");
-  } else {
-    if (!validWods.includes("VARIOUS")) missing.push("VARIOUS");
+  // Missing WODs — enter verify-retry-verify loop
+  let recoveryAttempt = 0;
+  let missing = getMissing(validWods, isRecovery);
+
+  while (recoveryAttempt < WATCHDOG_MAX_RETRIES && validWods.length < expectedCount) {
+    recoveryAttempt++;
+    console.log(`[WATCHDOG] ⚠️ Recovery attempt ${recoveryAttempt}/${WATCHDOG_MAX_RETRIES}. Missing: ${missing.join(", ")}`);
+
+    // Trigger generation
+    try {
+      const response = await fetch(`${supabaseUrl}/functions/v1/generate-workout-of-day`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${anonKey}`,
+        },
+        body: JSON.stringify({ retryMissing: true }),
+      });
+
+      const responseOk = response.ok;
+      await response.text(); // consume body
+      console.log(`[WATCHDOG] Recovery trigger ${recoveryAttempt} response: ${response.status} ok=${responseOk}`);
+    } catch (triggerError) {
+      console.error(`[WATCHDOG] Recovery trigger ${recoveryAttempt} failed:`, triggerError);
+    }
+
+    // Wait for generation to complete
+    console.log(`[WATCHDOG] Waiting ${WATCHDOG_VERIFY_DELAY_MS / 1000}s for generation to complete...`);
+    await new Promise(r => setTimeout(r, WATCHDOG_VERIFY_DELAY_MS));
+
+    // Re-verify
+    const { data: recheckWods } = await supabase
+      .from("admin_workouts")
+      .select("id, name, equipment, main_workout")
+      .eq("generated_for_date", today)
+      .eq("is_workout_of_day", true);
+
+    validWods = countValidWods(recheckWods || [], isRecovery);
+    missing = getMissing(validWods, isRecovery);
+
+    console.log(`[WATCHDOG] After attempt ${recoveryAttempt}: ${validWods.length}/${expectedCount} valid. Missing: ${missing.join(", ") || "none"}`);
   }
 
-  console.log(`[WATCHDOG] ⚠️ Missing: ${missing.join(", ")}. Triggering recovery...`);
+  // Final status
+  const allRecovered = validWods.length >= expectedCount;
 
-  // Trigger generation
-  try {
-    const response = await fetch(`${supabaseUrl}/functions/v1/generate-workout-of-day`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${anonKey}`,
-      },
-      body: JSON.stringify({ retryMissing: true }),
-    });
+  // Send alert email
+  const resendKey = Deno.env.get("RESEND_API_KEY");
+  if (resendKey) {
+    const adminEmail = await getAdminNotificationEmail(supabase);
+    const resend = new Resend(resendKey);
 
-    const responseOk = response.ok;
-    console.log(`[WATCHDOG] Recovery trigger response: ${response.status} ok=${responseOk}`);
-
-    // Send critical alert email
-    const resendKey = Deno.env.get("RESEND_API_KEY");
-    if (resendKey) {
-      const adminEmail = await getAdminNotificationEmail(supabase);
-      const resend = new Resend(resendKey);
-
+    if (allRecovered) {
+      console.log("[WATCHDOG] ✅ Recovery succeeded after retries");
       await resend.emails.send({
         from: "SmartyGym Alerts <notifications@smartygym.com>",
         to: [adminEmail],
-        subject: `🐕 WATCHDOG: WOD Recovery Triggered - ${today}`,
+        subject: `✅ WATCHDOG: WOD Recovery Succeeded - ${today}`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <h1 style="color: #d97706;">🐕 Watchdog WOD Recovery</h1>
-            <p>The 03:05 Cyprus watchdog detected missing WODs for <strong>${today}</strong>.</p>
+            <h1 style="color: #16a34a;">✅ Watchdog Recovery Successful</h1>
+            <p>The watchdog detected missing WODs and successfully recovered them for <strong>${today}</strong>.</p>
+            <p><strong>Recovery attempts:</strong> ${recoveryAttempt}</p>
+            <p><strong>Now available:</strong> ${validWods.join(", ")}</p>
+            <p style="color: #6b7280; font-size: 12px;">Timestamp: ${new Date().toISOString()}</p>
+          </div>
+        `,
+      });
+
+      await supabase.from("email_delivery_log").insert({
+        message_type: "watchdog_wod_recovery",
+        to_email: adminEmail,
+        status: "sent",
+        metadata: { date: today, recovered: validWods, attempts: recoveryAttempt },
+      });
+    } else {
+      console.log("[WATCHDOG] ❌ Recovery FAILED after all retries");
+      await resend.emails.send({
+        from: "SmartyGym Alerts <notifications@smartygym.com>",
+        to: [adminEmail],
+        subject: `🐕 WATCHDOG CRITICAL: WOD Recovery Failed (${WATCHDOG_MAX_RETRIES} attempts) - ${today}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h1 style="color: #dc2626;">🐕 Watchdog WOD Recovery FAILED</h1>
+            <p>The watchdog tried <strong>${WATCHDOG_MAX_RETRIES} recovery attempts</strong> but WODs are still missing for <strong>${today}</strong>.</p>
             <p><strong>Expected:</strong> ${expectedCount} WODs</p>
             <p><strong>Found:</strong> ${validWods.length} (${validWods.join(", ") || "none"})</p>
-            <p><strong>Missing:</strong> ${missing.join(", ")}</p>
-            <p><strong>Action:</strong> Recovery generation has been triggered (retryMissing=true).</p>
-            <p>Check the admin panel in 5-10 minutes to confirm recovery.</p>
+            <p><strong>Still missing:</strong> ${missing.join(", ")}</p>
+            <p><strong>Manual action required:</strong> Go to Admin → WOD Manager → Generate New WOD → "Regenerate Today"</p>
             <p style="color: #6b7280; font-size: 12px;">Timestamp: ${new Date().toISOString()}</p>
           </div>
         `,
@@ -123,25 +191,20 @@ serve(async (req) => {
         message_type: "watchdog_wod_alert",
         to_email: adminEmail,
         status: "sent",
-        metadata: { date: today, missing, found: validWods },
+        metadata: { date: today, missing, found: validWods, attempts: recoveryAttempt },
       });
     }
-
-    return new Response(
-      JSON.stringify({
-        status: "recovery_triggered",
-        date: today,
-        found: validWods.length,
-        expected: expectedCount,
-        missing,
-      }),
-      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
-  } catch (error) {
-    console.error("[WATCHDOG] Recovery trigger failed:", error);
-    return new Response(
-      JSON.stringify({ status: "error", error: String(error) }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
   }
+
+  return new Response(
+    JSON.stringify({
+      status: allRecovered ? "recovered" : "recovery_failed",
+      date: today,
+      found: validWods.length,
+      expected: expectedCount,
+      missing,
+      recoveryAttempts: recoveryAttempt,
+    }),
+    { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+  );
 });

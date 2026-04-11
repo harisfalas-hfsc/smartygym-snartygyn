@@ -2723,7 +2723,7 @@ Return JSON with these exact fields:
         // Continue retry loop or move to next equipment type
         continue;
       }
-    }
+      } // end while (per-variant retry loop)
     
     // ═══════════════════════════════════════════════════════════════════════════════
     // POST-LOOP NAME COLLISION GUARD: If both workouts share the same name, rename
