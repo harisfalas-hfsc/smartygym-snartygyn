@@ -1,51 +1,49 @@
 
 
-## Problem
+## Immediate Fix: Done
 
-The desktop category cards on both Smarty Workouts and Smarty Programs pages use background images with a `bg-black/60` dark overlay. This creates very dark cards that clash with the light mode's white background. The mobile cards already have separate, brighter images that work well.
+Both WODs for April 11, 2026 are now live:
+- **Circuit Cascade** (EQUIPMENT) - generated at 22:30 UTC
+- **Apex Protocol** (BODYWEIGHT) - just generated via retryMissing
 
-## Solution
+## Root Cause
 
-Two-part approach to make cards look good in both light and dark mode:
+The BODYWEIGHT generation failed during the primary orchestrator run at 22:30 UTC. The orchestrator retried once (MAX_ATTEMPTS = 2, 30s delay), but the retry also failed. The backup at 01:00 UTC and watchdog at 01:05 UTC both also failed -- all hitting the same transient AI generation error.
 
-### 1. Use the mobile card images for desktop too (both pages)
+The problem: **only 2 retries with 30s gaps, and the backup/watchdog systems re-call the same function that already failed, with no independent retry logic per variant.**
 
-Instead of the current full-bleed background approach with dark overlay, switch the desktop cards to use the same **stacked blog-card layout** as mobile — image on top, content below. This eliminates the dark overlay entirely and uses the existing bright mobile images.
+## Reliability Improvements
 
-**WorkoutFlow.tsx (desktop grid, lines 332-434):**
-- Replace the current full-background card design with a stacked layout: image section on top (~55% height) + content section below
-- Use `categoryMobileImages` instead of `categoryBackgrounds` for the image source
-- Remove the `bg-black/60` overlay entirely
-- Text renders on the card background (`bg-card`), so it automatically adapts to light/dark mode
-- Keep all existing hover effects, badges, and metadata
+### 1. Increase orchestrator retry count and delay
+**File:** `supabase/functions/wod-generation-orchestrator/index.ts`
+- Change `MAX_ATTEMPTS` from 2 to **3**
+- Change `RETRY_DELAY_MS` from 30000 to **45000** (45s) -- gives the AI provider more recovery time between attempts
+- On attempt 2+, pass `retryMissing: true` (already done)
 
-**TrainingProgramFlow.tsx (desktop grid, lines 268-350):**
-- Same structural change: stacked layout with image on top, content below
-- Use `programMobileImages` instead of `programBackgrounds`
-- Remove the `bg-black/60` overlay
-- Keep all existing hover effects, badges, and metadata
+### 2. Add per-variant retry inside the generator
+**File:** `supabase/functions/generate-workout-of-day/index.ts`
+- Inside the `for (const equipment of equipmentTypes)` loop (line 769), wrap the AI call in a retry loop of **2 attempts** with a 15-second delay
+- Currently if the AI call fails once per variant, it's immediately added to `failedEquipmentTypes` and skipped
+- This means a single transient AI error kills that variant for the entire run
 
-### 2. Card structure (both pages)
+### 3. Make the backup function retry each missing variant independently
+**File:** `supabase/functions/backup-wod-generation/index.ts`
+- Currently calls `generate-workout-of-day` once with `retryMissing: true`
+- Change to: if the first call fails, wait 30s and try **one more time**
+- This gives a total of 3 orchestrator + 2 backup = 5 independent generation windows
 
-The new desktop card structure will be:
-```text
-┌──────────────────────┐
-│   [Image - 55%]      │
-│   (bright, no overlay)│
-│   [Count Badge]       │
-├──────────────────────┤
-│   [Icon] Title        │
-│   Description         │
-│   Haris Falas credit  │
-│   [Tags: Level, Equip]│
-└──────────────────────┘
-```
+### 4. Make the watchdog also retry once before alerting
+**File:** `supabase/functions/watchdog-wod-check/index.ts`
+- Currently triggers one recovery call and sends an alert
+- Add: wait 60s after the first trigger, re-verify, and if still missing, trigger once more before sending the final alert
 
-This matches the mobile approach already in use, ensures consistent branding, and looks great on both light and dark backgrounds since the content area uses the theme's card color.
+These changes create **7+ independent generation attempts** across a 2.5-hour window (22:30 - 01:05 UTC), making total failure extremely unlikely.
 
 ### Files to modify
-1. `src/pages/WorkoutFlow.tsx` — desktop grid section (lines 332-434)
-2. `src/pages/TrainingProgramFlow.tsx` — desktop grid section (lines 268-350)
+1. `supabase/functions/wod-generation-orchestrator/index.ts` -- bump MAX_ATTEMPTS to 3, delay to 45s
+2. `supabase/functions/generate-workout-of-day/index.ts` -- add per-variant AI call retry (2 attempts, 15s delay)
+3. `supabase/functions/backup-wod-generation/index.ts` -- add second attempt if first fails
+4. `supabase/functions/watchdog-wod-check/index.ts` -- add verify-retry-verify loop
 
-No new images needed. No database changes. No new components.
+No database changes needed.
 
