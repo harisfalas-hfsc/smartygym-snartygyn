@@ -303,8 +303,8 @@ RESPOND WITH EXACTLY THIS JSON FORMAT (no markdown, no code blocks, just raw JSO
         console.log(`Generating image for: ${parsed.title}`);
         const imageUrl = await generateBlogImage(supabaseUrl, supabaseAnonKey, parsed.title, category, slug);
 
-        // Insert as draft
-        const { error: insertError } = await supabase
+        // Insert and auto-publish
+        const { data: insertedArticle, error: insertError } = await supabase
           .from("blog_articles")
           .insert({
             title: parsed.title,
@@ -315,10 +315,13 @@ RESPOND WITH EXACTLY THIS JSON FORMAT (no markdown, no code blocks, just raw JSO
             author_name: "Haris Falas",
             author_credentials: "Sports Scientist | CSCS Certified | 20+ Years Experience",
             is_ai_generated: true,
-            is_published: false,
+            is_published: true,
+            published_at: new Date().toISOString(),
             read_time: readTime,
             image_url: imageUrl,
-          });
+          })
+          .select("id")
+          .single();
 
         if (insertError) {
           console.error(`Insert error for ${category}:`, insertError);
@@ -326,8 +329,22 @@ RESPOND WITH EXACTLY THIS JSON FORMAT (no markdown, no code blocks, just raw JSO
           continue;
         }
 
-        console.log(`✅ Created draft: ${parsed.title}`);
-        results.push({ category, title: parsed.title, slug, status: "Created as draft" });
+        // Queue notification so the existing pipeline sends dashboard + email alerts
+        const { error: notifError } = await supabase
+          .from("pending_content_notifications")
+          .insert({
+            content_id: insertedArticle.id,
+            content_type: "article",
+            content_name: parsed.title,
+            content_category: category,
+          });
+
+        if (notifError) {
+          console.warn(`Notification queue error for ${parsed.title}:`, notifError.message);
+        }
+
+        console.log(`✅ Published & queued notification: ${parsed.title}`);
+        results.push({ category, title: parsed.title, slug, status: "Published & notification queued" });
 
         // Rate limit between categories
         await new Promise(resolve => setTimeout(resolve, 2000));
