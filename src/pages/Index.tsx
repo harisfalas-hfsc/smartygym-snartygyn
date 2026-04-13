@@ -616,8 +616,8 @@ const Index = () => {
               <CarouselContent className="-ml-2">
                 {heroCards.map(card => {
               const Icon = card.icon;
-              return <CarouselItem key={card.id} className="pl-2 basis-[75%]">
-                      <div onClick={() => navigate(card.route)} className="border-2 border-primary/40 rounded-xl overflow-hidden hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300 cursor-pointer bg-card flex flex-col h-[220px]">
+return <CarouselItem key={card.id} className="pl-2 basis-[75%] sm:basis-[60%]">
+                      <div onClick={() => navigate(card.route)} className="border-2 border-primary/40 rounded-xl overflow-hidden hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300 cursor-pointer bg-card flex flex-col h-[220px] sm:h-[280px]">
                         {/* Image Section */}
                         <div className="relative h-[55%] overflow-hidden flex-shrink-0">
                           <img 
@@ -686,7 +686,7 @@ const Index = () => {
                         <img 
                           src={bodyweightWod.image_url || '/placeholder.svg'} 
                           alt={bodyweightWod.name}
-                          className={`w-full ${wodCount === 1 ? 'h-36' : 'h-28'} object-cover`}
+className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-cover`}
                           onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
                         />
                         <Badge className="absolute top-1 left-1 bg-green-500 hover:bg-green-500 text-white text-[10px] px-1.5 py-0.5">No Equipment</Badge>
@@ -711,7 +711,7 @@ const Index = () => {
                         <img 
                           src={equipmentWod.image_url || '/placeholder.svg'} 
                           alt={equipmentWod.name}
-                          className={`w-full ${wodCount === 1 ? 'h-36' : 'h-28'} object-cover`}
+className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-cover`}
                           onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
                         />
                         <Badge className="absolute top-1 left-1 bg-orange-500 hover:bg-orange-500 text-white text-[10px] px-1.5 py-0.5">With Equipment</Badge>
