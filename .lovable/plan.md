@@ -1,47 +1,46 @@
 
 
-## SEO Optimization for All Workouts and Programs + Automated Future Coverage
+## Fix: Theme Toggle Button Background Flash
 
-### Current State
+### Problem
 
-- **318 visible workouts** across 9 categories — **288 already have SEO metadata**, **33 are missing** (mostly recent WOD-converted gallery workouts)
-- **28 visible programs** across 6 categories — **all 28 already have SEO metadata**
-- The `refresh-seo-metadata` weekly cron already handles new content automatically, but it only processes items that have **no existing SEO entry** — it never upgrades existing ones
+The ThemeToggle uses a Radix `AvatarFallback` component to wrap the Sun/Moon icons. Radix `AvatarFallback` has a **built-in rendering delay** (~600ms) — it intentionally waits before appearing, to give `AvatarImage` time to load first. Since there is no `AvatarImage` here, the fallback eventually renders, but on every re-render (theme change), it resets this delay cycle. This causes the brief background flash you see — the fallback disappears momentarily, then reappears with its `bg-muted` default before `bg-transparent` takes effect.
 
-### What Will Be Done
+Additionally, `next-themes` returns `theme` as `undefined` on the initial client render (to avoid hydration mismatch), which can cause the wrong icon to briefly appear until the theme value resolves.
 
-**1. Generate rich SEO metadata for the 33 missing workouts**
+### Fix
 
-A script will use the AI gateway to generate optimized `meta_title`, `meta_description`, 15-20 keywords (including "Haris Falas", "SmartyGym", brand variants, priority "online fitness/workout" keywords, category-specific terms, and each workout's unique name), `image_alt_text`, and `json_ld` (ExercisePlan schema) for each. These will be inserted into `seo_metadata` with `content_type = 'workout'`.
+Remove the unnecessary `Avatar`/`AvatarFallback` wrapper entirely. Replace it with a simple `div` that has the same visual styling (circular, bordered, sized). This eliminates the Radix delay mechanism and the background flash.
 
-**2. Upgrade existing 288 workout SEO entries with richer keywords**
+Also switch from `theme` to `resolvedTheme` for reliable icon display without requiring a refresh.
 
-The current entries have only 5-8 keywords each. The script will **merge** additional keywords into each existing record without removing any current keywords. Added keywords will include:
-- Priority online keywords (online fitness, online workout, online training programs, etc.)
-- Brand variants (SmartGym, Smart Gym, Smart-Gym)
-- Domain keywords (smartygym.com, i-training.net, smartywod.com, etc.)
-- Category-specific terms (e.g., "HIIT calorie burn" for CALORIE BURNING, "pilates core control" for PILATES)
-- "Haris Falas" if not already present
+### Code Change — `src/components/ThemeToggle.tsx`
 
-Existing `meta_title`, `meta_description`, and `image_alt_text` will be preserved — only the `keywords` array will be enriched.
+```tsx
+import { Moon, Sun } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useTheme } from "next-themes";
 
-**3. Upgrade existing 28 program SEO entries with richer keywords**
+export const ThemeToggle = () => {
+  const { resolvedTheme, setTheme } = useTheme();
 
-Same enrichment approach as workouts — merge additional branded, priority, and category-specific keywords into each program's existing keyword array without touching titles or descriptions.
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+      className="relative h-11 w-11 rounded-full"
+      aria-label={`Switch to ${resolvedTheme === "dark" ? "light" : "dark"} mode`}
+    >
+      <div className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-primary">
+        <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+        <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+      </div>
+      <span className="sr-only">Toggle theme</span>
+    </Button>
+  );
+};
+```
 
-**4. Automate SEO generation for future workouts and programs**
-
-The existing `refresh-seo-metadata` edge function already handles this — it runs weekly (Sunday 02:00 UTC) and processes any content item that doesn't yet have an `seo_metadata` row. This already covers new workouts and programs automatically.
-
-Additionally, I will verify that the database triggers (`queue_workout_notification`, `queue_program_notification`) do not interfere with the SEO pipeline.
-
-**No existing SEO data will be deleted or overwritten** — only keywords arrays will be extended, and missing entries will be created.
-
-### Technical Details
-
-- **Script**: One `code--exec` Python script using the AI gateway to generate SEO for the 33 missing workouts, then a second pass to enrich keywords on all 316 existing entries (288 workouts + 28 programs)
-- **Database**: `UPDATE` existing `seo_metadata` rows to append keywords; `INSERT` new rows for the 33 missing workouts
-- **No code changes needed**: The `refresh-seo-metadata` edge function already auto-generates SEO for any new workout/program added in the future
-- **No edge function changes needed**: The existing weekly cron covers future automation
-- **Deliverable**: A report listing all workouts and programs with their keyword counts, confirming full coverage
+Single file change. No other files affected. Visual appearance stays identical (same size, border, icon transitions).
 
