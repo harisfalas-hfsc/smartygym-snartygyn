@@ -1,32 +1,29 @@
 
 
-## Problem
+## Three Custom Blog Articles
 
-On a real tablet in portrait mode (768-820px wide), the mobile carousel cards are 75% of screen width (~576px) but only 220px tall, creating an overly wide/stretched appearance. Same issue with WOD images at h-28 (112px) and h-36 (144px) — too short for the wider tablet screen.
+A script will generate each article using AI with detailed, specific prompts reflecting your exact requirements, generate unique images, and insert them as drafts into the database.
 
-## Solution
+### Article 1 — Fitness
+**Topic:** Comparative analysis of CrossFit, HYROX, F45, Orange Theory, and Calisthenics/street workout trends. Conclusion: structured, periodized strength training under a personalized plan is the only evidence-based method; everything else is a complementary tool.
 
-Add a tablet-specific intermediate size using a custom Tailwind breakpoint (`sm:` at 640px, which covers tablets in portrait). This increases card heights and adjusts proportions without touching mobile phone or desktop layouts.
+### Article 2 — Nutrition
+**Topic:** Comparative analysis of Keto, Carnivore, Intermittent Fasting, Mediterranean, and Paleo diets. Includes references to WHO and peer-reviewed sources. Conclusion: the best nutrition approach is individualized based on needs, lifestyle, health markers, and personal preferences.
 
-### Changes
+### Article 3 — Wellness
+**Topic:** Analysis of GLP-1 weight loss drugs — Ozempic (semaglutide), Mounjaro (tirzepatide), Wegovy, Saxenda, and Zepbound. Covers what they are, side effects, original medical purpose vs. weight loss use, and how to maintain results safely. Conclusion: these are medicines with real risks, not lifestyle shortcuts.
 
-**1. `src/pages/Index.tsx` — Hero carousel cards (line 620)**
-- Change `h-[220px]` to `h-[220px] sm:h-[280px]`
-- This gives tablet portrait cards more height while keeping phone cards at 220px
+### How it works
+1. A script sends three detailed prompts to the AI gateway, each with your specific angle and conclusion
+2. Each prompt requires scientific references with real external links (PubMed, WHO, etc.) plus internal SmartyGym links
+3. Author: Haris Falas, Sports Scientist | CSCS Certified | 20+ Years Experience
+4. Images generated via the existing `generate-blog-image` edge function
+5. All three inserted as **drafts** so you can review before publishing
 
-**2. `src/pages/Index.tsx` — WOD images (lines 689, 714)**
-- Single WOD: change `h-36` to `h-36 sm:h-48`
-- Two WODs: change `h-28` to `h-28 sm:h-40`
-- Taller images prevent the stretched look on wider tablet screens
-
-**3. `src/pages/Index.tsx` — Carousel basis (line 619)**
-- Change `basis-[75%]` to `basis-[75%] sm:basis-[60%]`
-- Narrower cards on tablet = better proportions, still shows peek of adjacent cards
-
-### What stays unchanged
-- Phone view (< 640px): identical to current
-- Desktop view (1024px+): identical to current
-- No changes to any other pages or components
-
-Three targeted CSS class additions in one file.
+### Technical details
+- Uses the existing `blog_articles` table schema
+- Calls `generate-blog-image` for each article's featured image
+- Articles stored as drafts (`is_published: false`)
+- Internal links validated against the whitelist
+- One script execution via `code--exec`, inserting directly into the database
 
