@@ -1,29 +1,45 @@
 
 
-## Three Custom Blog Articles
+## Findings
 
-A script will generate each article using AI with detailed, specific prompts reflecting your exact requirements, generate unique images, and insert them as drafts into the database.
+### 1. Blog Articles — Not Published (Expected)
 
-### Article 1 — Fitness
-**Topic:** Comparative analysis of CrossFit, HYROX, F45, Orange Theory, and Calisthenics/street workout trends. Conclusion: structured, periodized strength training under a personalized plan is the only evidence-based method; everything else is a complementary tool.
+The three articles were inserted as **drafts** (`is_published = false`, `published_at = NULL`). That's why they don't appear on the public blog page — the blog query filters for `is_published = true`.
 
-### Article 2 — Nutrition
-**Topic:** Comparative analysis of Keto, Carnivore, Intermittent Fasting, Mediterranean, and Paleo diets. Includes references to WHO and peer-reviewed sources. Conclusion: the best nutrition approach is individualized based on needs, lifestyle, health markers, and personal preferences.
+**Fix:** Set `is_published = true` and `published_at = NOW()` for all three articles so they appear on the blog.
 
-### Article 3 — Wellness
-**Topic:** Analysis of GLP-1 weight loss drugs — Ozempic (semaglutide), Mounjaro (tirzepatide), Wegovy, Saxenda, and Zepbound. Covers what they are, side effects, original medical purpose vs. weight loss use, and how to maintain results safely. Conclusion: these are medicines with real risks, not lifestyle shortcuts.
+**Internal links verified — all valid:** `/trainingprogram`, `/workout`, `/1rmcalculator`, `/the-smarty-method`, `/coach-profile`, `/bmrcalculator`, `/caloriecounter`, `/macrocalculator`, `/blog`, `/daily-ritual`, `/disclaimer`.
 
-### How it works
-1. A script sends three detailed prompts to the AI gateway, each with your specific angle and conclusion
-2. Each prompt requires scientific references with real external links (PubMed, WHO, etc.) plus internal SmartyGym links
-3. Author: Haris Falas, Sports Scientist | CSCS Certified | 20+ Years Experience
-4. Images generated via the existing `generate-blog-image` edge function
-5. All three inserted as **drafts** so you can review before publishing
+**External links present:** PubMed, NEJM, WHO, The Lancet, ACSM, JSCR — these are real journal URLs embedded in the content.
 
-### Technical details
-- Uses the existing `blog_articles` table schema
-- Calls `generate-blog-image` for each article's featured image
-- Articles stored as drafts (`is_published: false`)
-- Internal links validated against the whitelist
-- One script execution via `code--exec`, inserting directly into the database
+### 2. Workout Counts — Verified Correct
+
+- **Total visible workouts (excluding WOD): 318** — the page shows this number, which is accurate
+- **1 active WOD** brings the total visible to 319
+- **Category breakdown (all correct):**
+
+```text
+CALORIE BURNING      33
+CARDIO               35
+CHALLENGE            68
+METABOLIC            35
+MICRO-WORKOUTS       10
+MOBILITY & STABILITY 35
+PILATES              30
+RECOVERY             11
+STRENGTH             61
+─────────────────────
+TOTAL               318
+```
+
+The count logic in `WorkoutFlow.tsx` correctly excludes WOD workouts and maps categories to card IDs. The total and per-category badge numbers are accurate.
+
+### What needs to be done
+
+**Single database update** — publish the three blog articles by setting `is_published = true` and `published_at = now()` for:
+- "Trendy Fitness: Scientific Look vs. Structured Training" (Fitness)
+- "Diet Showdown: Keto, Carnivore, IF, Med, Paleo Analyzed" (Nutrition)
+- "GLP-1s: Weight Loss Wonder or Risky Business?" (Wellness)
+
+No code changes needed. No workout count fixes needed — everything is accurate.
 
