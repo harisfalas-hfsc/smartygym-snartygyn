@@ -39,6 +39,21 @@ export const ArticleDetail = () => {
     enabled: !!slug,
   });
 
+  const { data: seoMeta } = useQuery({
+    queryKey: ['article-seo', article?.id],
+    queryFn: async () => {
+      if (!article?.id) return null;
+      const { data } = await supabase
+        .from('seo_metadata')
+        .select('*')
+        .eq('content_id', article.id)
+        .eq('content_type', 'article')
+        .maybeSingle();
+      return data;
+    },
+    enabled: !!article?.id,
+  });
+
   if (isLoading) return <ContentLoadingSkeleton />;
 
   if (!article || error) {
@@ -60,9 +75,17 @@ export const ArticleDetail = () => {
   const publishedDate = new Date(article.published_at || article.created_at).toISOString();
   const modifiedDate = new Date(article.updated_at || article.created_at).toISOString();
 
+  // Use SEO metadata if available, fall back to defaults
+  const pageTitle = seoMeta?.meta_title || `${article.title} | SmartyGym Blog`;
+  const pageDescription = seoMeta?.meta_description || article.excerpt;
+  const pageKeywords = seoMeta?.keywords?.length
+    ? seoMeta.keywords.join(', ')
+    : `${article.category}, SmartyGym, SmartGym, Smart-Gym, Haris Falas, fitness, health, ${article.title}`;
+  const imageAltText = seoMeta?.image_alt_text || article.title;
+
   const articleSchema = generateArticleSchema({
     title: article.title,
-    description: article.excerpt,
+    description: pageDescription,
     datePublished: publishedDate,
     dateModified: modifiedDate,
     imageUrl: article.image_url || undefined,
@@ -76,24 +99,29 @@ export const ArticleDetail = () => {
     { name: article.title, url: `/blog/${article.slug}` },
   ]);
 
+  // Build AI keywords from seo_metadata or defaults
+  const aiKeywords = seoMeta?.keywords?.length
+    ? seoMeta.keywords.filter((k: string) => !['Haris Falas', 'SmartyGym', 'smartygym.com'].includes(k)).slice(0, 10)
+    : [article.category, "SmartyGym", "SmartGym", "Smart-Gym", "Haris Falas"];
+
   return (
     <>
       <Helmet>
-        <title>{article.title} | SmartyGym Blog</title>
-        <meta name="description" content={article.excerpt} />
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDescription} />
         <link rel="canonical" href={articleUrl} />
-        <meta name="keywords" content={`${article.category}, SmartyGym, SmartGym, Smart-Gym, Haris Falas, fitness, health, ${article.title}`} />
+        <meta name="keywords" content={pageKeywords} />
         <meta property="og:type" content="article" />
         <meta property="og:url" content={articleUrl} />
         <meta property="og:title" content={article.title} />
-        <meta property="og:description" content={article.excerpt} />
+        <meta property="og:description" content={pageDescription} />
         <meta property="og:site_name" content="SmartyGym" />
         {article.image_url && <meta property="og:image" content={article.image_url} />}
         {article.image_url && <meta property="og:image:width" content="1200" />}
         {article.image_url && <meta property="og:image:height" content="630" />}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={article.title} />
-        <meta name="twitter:description" content={article.excerpt} />
+        <meta name="twitter:description" content={pageDescription} />
         {article.image_url && <meta name="twitter:image" content={article.image_url} />}
         <meta property="article:published_time" content={publishedDate} />
         <meta property="article:modified_time" content={modifiedDate} />
@@ -101,13 +129,16 @@ export const ArticleDetail = () => {
         {article.author_name && <meta property="article:author" content={article.author_name} />}
         <script type="application/ld+json">{JSON.stringify(articleSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>
+        {seoMeta?.json_ld && (
+          <script type="application/ld+json">{JSON.stringify(seoMeta.json_ld)}</script>
+        )}
       </Helmet>
 
       <SEOEnhancer
         contentType="blog-article"
         entities={[article.author_name || "Haris Falas", "SmartyGym", article.category]}
         topics={[article.category, "fitness", "health", "wellness"]}
-        aiKeywords={[article.category, "SmartyGym", "SmartGym", "Smart-Gym", "Haris Falas"]}
+        aiKeywords={aiKeywords}
         pageType="article"
       />
 
@@ -192,7 +223,7 @@ export const ArticleDetail = () => {
             </div>
 
             {article.image_url && (
-              <img src={article.image_url} alt={article.title} className="w-full h-auto rounded-lg mb-8 shadow-lg" />
+              <img src={article.image_url} alt={imageAltText} className="w-full h-auto rounded-lg mb-8 shadow-lg" />
             )}
 
             <div className="prose prose-lg max-w-none mb-8">

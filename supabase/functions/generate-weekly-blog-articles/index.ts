@@ -343,8 +343,28 @@ RESPOND WITH EXACTLY THIS JSON FORMAT (no markdown, no code blocks, just raw JSO
           console.warn(`Notification queue error for ${parsed.title}:`, notifError.message);
         }
 
-        console.log(`✅ Published & queued notification: ${parsed.title}`);
-        results.push({ category, title: parsed.title, slug, status: "Published & notification queued" });
+        // Auto-generate SEO metadata for the new article
+        const seoKeywords = ["Haris Falas", "SmartyGym", "smartygym.com", "SmartGym", "Smart-Gym", "Sports Scientist", "CSCS", category, "online fitness", "evidence-based training"];
+        await supabase.from("seo_metadata").insert({
+          content_id: insertedArticle.id,
+          content_type: "article",
+          meta_title: `${parsed.title} | Haris Falas`.substring(0, 60),
+          meta_description: `${(parsed.excerpt || parsed.title).substring(0, 120)} By Haris Falas at SmartyGym.`.substring(0, 155),
+          keywords: seoKeywords,
+          image_alt_text: `Haris Falas SmartyGym ${parsed.title}`.substring(0, 125),
+          json_ld: {
+            "@context": "https://schema.org",
+            "@type": "Article",
+            headline: parsed.title,
+            author: { "@type": "Person", name: "Haris Falas", jobTitle: "Sports Scientist, CSCS Certified", url: "https://smartygym.com/coach-profile" },
+            publisher: { "@type": "Organization", name: "SmartyGym", url: "https://smartygym.com" },
+            mainEntityOfPage: `https://smartygym.com/blog/${slug}`,
+          },
+          last_refreshed_at: new Date().toISOString(),
+        });
+
+        console.log(`✅ Published, notified & SEO created: ${parsed.title}`);
+        results.push({ category, title: parsed.title, slug, status: "Published, notified & SEO created" });
 
         // Rate limit between categories
         await new Promise(resolve => setTimeout(resolve, 2000));
