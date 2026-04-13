@@ -1,71 +1,39 @@
 
-Problem
 
-You are seeing multiple Stripe workout products because the WOD Stripe flow is not clean enough when generation is retried or regenerated. The current code can leave extra Stripe products behind.
+## Problem
 
-What I found
+Tablet portrait (768-820px width) triggers Tailwind's `md:` breakpoint (768px), causing desktop styles to appear. This affects all pages: homepage carousel, WOD cards, About page missing links, and general layout inconsistency.
 
-- In `supabase/functions/generate-workout-of-day/index.ts`, every WOD generation creates a brand-new Stripe product with `stripe.products.create(...)`.
-- The “idempotency” key is not truly idempotent because it includes `timestamp`:
-  `wod:${effectiveDate}:${equipment}:${timestamp}`
-  That means a retry/regeneration creates a new Stripe product instead of reusing the same generation slot.
-- The exact string `Apex current` does not exist in the current codebase, so those products look like old/stale Stripe data from earlier bad runs or older naming logic, not the intended current WOD naming.
-- Based on the last repaired WOD state in this conversation, the intended current pair is:
-  - `Circuit Cascade`
-  - `Apex Protocol`
-- The real source of truth is not the Stripe dashboard list. The real source of truth is:
-  `admin_workouts.stripe_product_id`
-  for the currently live WOD rows.
+The root cause is that `md:` is the dividing line between mobile and desktop layouts across the entire codebase, and tablets in portrait land exactly at that boundary.
 
-Which one is right vs wrong
+## Solution
 
-- Right: the Stripe products currently linked from the live WOD rows in `admin_workouts`.
-- Wrong/stale: any extra Stripe products with similar WOD names that are not linked by the current database rows.
-- So `Apex Protocol` and `Circuit Cascade` are the likely correct current ones, and the repeated `Apex current` entries are likely stale leftovers unless one of them is the product ID currently linked in the database.
+Change the `md` breakpoint from 768px to 1024px globally. This single change makes all tablet portrait views use mobile styles, and tablet landscape (1024px+) continues showing desktop styles.
 
-Implementation plan
+### What changes
 
-1. Audit the live mapping first
-- Read today’s live WOD rows from the database.
-- Read their `stripe_product_id` and `stripe_price_id`.
-- Cross-check those exact IDs against the Stripe products you are seeing.
-- Mark one canonical product per live WOD row.
+**1. tailwind.config.ts** --- Override `md` screen to 1024px
 
-2. Clean up the stale Stripe products safely
-- Archive only the extra WOD Stripe products that are not linked from the current database rows.
-- Do not delete anything destructively.
-- Preserve purchase history and leave canonical linked products untouched.
+This is the core fix. Every `md:hidden`, `hidden md:block`, `md:grid-cols-X`, etc. across all 96 files will now activate at 1024px instead of 768px. No individual file changes needed for the breakpoint logic.
 
-3. Fix the generator so this stops happening
-- In `generate-workout-of-day/index.ts`, replace the timestamp-based Stripe idempotency key with a stable generation key per date/equipment.
-- Before creating a new WOD Stripe product, check whether a canonical product already exists for that same generation slot and reuse/update it when appropriate.
-- If Stripe product creation succeeds but the database insert fails, immediately archive that just-created Stripe product so it cannot remain orphaned.
+**2. src/hooks/use-mobile.tsx** --- Update `MOBILE_BREAKPOINT` to 1024
 
-4. Add a duplicate/orphan guard
-- Add a dedicated WOD Stripe cleanup path that can detect:
-  - active Stripe WOD products not referenced by any workout row
-  - duplicate active products for the same WOD date/equipment
-- This can be a small admin cleanup action so the issue can be audited quickly if it ever happens again.
+Keeps the JS hook in sync with the CSS breakpoint.
 
-Technical details
+### What this fixes automatically
+- Homepage carousel: cards stay at mobile sizing (75% basis, 220px height) on tablet portrait instead of the stretched desktop layout (32% basis, 180px height)
+- WOD cards: same fix, mobile proportions maintained
+- About page: the `md:hidden` mobile cards (with "Why We Are the Best", "Discover the Smarty Method", "Why invest in SmartyGym" links) will now show on tablet portrait
+- All other pages: consistent mobile layout on tablet portrait
 
-Files to update:
-- `supabase/functions/generate-workout-of-day/index.ts`
-- likely one dedicated cleanup/audit edge function for stale WOD Stripe products
-- optionally `src/components/admin/SettingsManager.tsx` for a one-click admin cleanup trigger
+### Side effect and mitigation
+Pages using `md:grid-cols-2 lg:grid-cols-3` patterns (mostly admin dashboards) will lose the 2-column intermediate layout at 768-1023px. This is acceptable because that range IS tablet portrait, which should show mobile (1-column) layout per the user's request.
 
-Key fixes:
-- Change unstable key:
-  `wod:${effectiveDate}:${equipment}:${timestamp}`
-  to a deterministic per-slot key
-- Add orphan rollback after failed DB insert
-- Add canonical-product lookup before creation
-- Archive stale unlinked WOD Stripe products after audit
+### What stays unchanged
+- Mobile view (below 768px): no change
+- Desktop view (1024px+): no change, `md:` and `lg:` both activate at 1024px
+- Tablet landscape: continues showing desktop layout
 
-Safety rules I will follow
-- I will not guess and bulk-remove products blindly.
-- I will first identify the exact Stripe product IDs linked to the live WOD rows.
-- I will archive only unlinked stale products.
-- I will not break purchase history or replace the current valid products.
+### Technical detail
+Two files modified total. No database changes.
 
-No database migration is required for the main fix unless we decide to add explicit audit metadata/logging.
