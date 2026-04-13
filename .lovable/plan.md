@@ -1,58 +1,47 @@
 
 
-## SEO Optimization for All 27 Blog Articles
+## SEO Optimization for All Workouts and Programs + Automated Future Coverage
 
-### Problem
-1. The three new articles (Trendy Fitness, Diet Showdown, GLP-1s) have **no entries** in the `seo_metadata` table
-2. Existing article SEO metadata uses inconsistent `content_type` values (`blog`, `blog_article`, `blog-article`) — should be standardized
-3. Current keywords are basic and generic — missing article-specific terms that would drive search traffic
-4. `ArticleDetail.tsx` doesn't read from `seo_metadata` at all — it uses only the basic `article.category` for keywords
-5. The `SEOEnhancer` component uses generic topics instead of article-specific keywords
+### Current State
 
-### What will be done
+- **318 visible workouts** across 9 categories — **288 already have SEO metadata**, **33 are missing** (mostly recent WOD-converted gallery workouts)
+- **28 visible programs** across 6 categories — **all 28 already have SEO metadata**
+- The `refresh-seo-metadata` weekly cron already handles new content automatically, but it only processes items that have **no existing SEO entry** — it never upgrades existing ones
 
-**1. Generate rich SEO metadata for all 27 articles via script**
+### What Will Be Done
 
-A script will analyze each article's content and generate:
-- **meta_title**: Keyword-optimized title including "Haris Falas" and "SmartyGym"
-- **meta_description**: Under 160 chars, keyword-dense excerpt
-- **keywords**: 15-25 article-specific keywords per article (extracted from content + strategic additions)
-- **image_alt_text**: Branded alt text for each article image
-- **json_ld**: Enhanced Article schema with author, publisher, keywords
+**1. Generate rich SEO metadata for the 33 missing workouts**
 
-For the three new articles specifically:
-- **Trendy Fitness**: CrossFit, HYROX, F45, Orangetheory Fitness, OTF, calisthenics, periodization, structured training, strength training, functional fitness, injury risk, evidence-based training, Haris Falas
-- **Diet Showdown**: keto diet, carnivore diet, intermittent fasting, Mediterranean diet, paleo diet, individualized nutrition, macronutrients, weight loss diet, WHO nutrition, metabolic health, Haris Falas
-- **GLP-1s**: Ozempic, Mounjaro, semaglutide, tirzepatide, Wegovy, Saxenda, Zepbound, GLP-1 receptor agonist, weight loss drugs, side effects, muscle loss, obesity medication, Haris Falas
+A script will use the AI gateway to generate optimized `meta_title`, `meta_description`, 15-20 keywords (including "Haris Falas", "SmartyGym", brand variants, priority "online fitness/workout" keywords, category-specific terms, and each workout's unique name), `image_alt_text`, and `json_ld` (ExercisePlan schema) for each. These will be inserted into `seo_metadata` with `content_type = 'workout'`.
 
-All articles will include: Haris Falas, SmartyGym, smartygym.com, Sports Scientist, CSCS, plus article-specific terms.
+**2. Upgrade existing 288 workout SEO entries with richer keywords**
 
-**2. Standardize content_type to `article` and upsert all 27 records**
+The current entries have only 5-8 keywords each. The script will **merge** additional keywords into each existing record without removing any current keywords. Added keywords will include:
+- Priority online keywords (online fitness, online workout, online training programs, etc.)
+- Brand variants (SmartGym, Smart Gym, Smart-Gym)
+- Domain keywords (smartygym.com, i-training.net, smartywod.com, etc.)
+- Category-specific terms (e.g., "HIIT calorie burn" for CALORIE BURNING, "pilates core control" for PILATES)
+- "Haris Falas" if not already present
 
-Clean up existing inconsistent keys (`blog`, `blog_article`, `blog-article`) → all become `article` with `content_id` = article UUID.
+Existing `meta_title`, `meta_description`, and `image_alt_text` will be preserved — only the `keywords` array will be enriched.
 
-**3. Update `ArticleDetail.tsx` to use `seo_metadata`**
+**3. Upgrade existing 28 program SEO entries with richer keywords**
 
-- Fetch SEO metadata alongside the article query
-- Use `seo_metadata.keywords` array in the `<meta name="keywords">` tag (falling back to current basic keywords)
-- Use `seo_metadata.meta_title` for the page title
-- Use `seo_metadata.meta_description` for the description meta tag
-- Pass article-specific keywords to `SEOEnhancer` component's `aiKeywords` prop
-- Add the `json_ld` from seo_metadata as an additional structured data script
+Same enrichment approach as workouts — merge additional branded, priority, and category-specific keywords into each program's existing keyword array without touching titles or descriptions.
 
-**4. Ensure the `refresh-seo-metadata` weekly cron covers articles**
+**4. Automate SEO generation for future workouts and programs**
 
-Verify that future auto-generated articles also get SEO metadata entries automatically.
+The existing `refresh-seo-metadata` edge function already handles this — it runs weekly (Sunday 02:00 UTC) and processes any content item that doesn't yet have an `seo_metadata` row. This already covers new workouts and programs automatically.
 
-### Technical details
+Additionally, I will verify that the database triggers (`queue_workout_notification`, `queue_program_notification`) do not interfere with the SEO pipeline.
 
-- **Script execution**: One `code--exec` script using the AI gateway to analyze each article's content and generate optimized keywords, then upsert into `seo_metadata` via the Supabase API
-- **Database**: Upsert 27 rows into `seo_metadata` with `content_type = 'article'`, delete old inconsistent rows (`blog`, `blog_article`, `blog-article`)
-- **Code change**: `src/pages/ArticleDetail.tsx` — add a secondary query for `seo_metadata` and wire it into Helmet/SEOEnhancer
-- **Edge function**: Check `generate-weekly-blog-articles` to ensure it creates `seo_metadata` entries for new articles going forward
-- **No destructive changes**: All existing SEO data is preserved or upgraded, never deleted without replacement
+**No existing SEO data will be deleted or overwritten** — only keywords arrays will be extended, and missing entries will be created.
 
-### Deliverable
+### Technical Details
 
-A report listing all 27 articles with their optimized keywords, confirming coverage for Google, Bing, and AI crawlers (ChatGPT, Gemini, Claude, Grok, Copilot).
+- **Script**: One `code--exec` Python script using the AI gateway to generate SEO for the 33 missing workouts, then a second pass to enrich keywords on all 316 existing entries (288 workouts + 28 programs)
+- **Database**: `UPDATE` existing `seo_metadata` rows to append keywords; `INSERT` new rows for the 33 missing workouts
+- **No code changes needed**: The `refresh-seo-metadata` edge function already auto-generates SEO for any new workout/program added in the future
+- **No edge function changes needed**: The existing weekly cron covers future automation
+- **Deliverable**: A report listing all workouts and programs with their keyword counts, confirming full coverage
 
