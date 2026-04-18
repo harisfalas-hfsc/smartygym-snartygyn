@@ -8,7 +8,7 @@ const corsHeaders = {
 
 const log = (step: string, details?: Record<string, unknown>) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : "";
-  console.log(`[AUTO-FINALIZE-DRAFTS] ${step}${detailsStr}`);
+  console.log(`[AUTO-FIX-INVOICES] ${step}${detailsStr}`);
 };
 
 serve(async (req) => {
@@ -22,43 +22,76 @@ serve(async (req) => {
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
 
-    log("Searching for draft subscription renewal invoices");
+    const results: {
+      finalized: Array<{ id: string; status: string; error?: string }>;
+      paid: Array<{ id: string; status: string; error?: string }>;
+    } = { finalized: [], paid: [] };
 
-    // Find draft invoices created by subscription cycles (renewals).
-    // Stripe leaves these in 'draft' if account-level auto-advance is off
-    // OR if the original checkout didn't enforce payment_method_collection: 'always'.
-    const drafts = await stripe.invoices.list({
-      status: "draft",
-      limit: 100,
-    });
-
+    // ============================================================
+    // LAYER A: Finalize stuck DRAFT subscription renewal invoices
+    // ============================================================
+    log("Scanning for draft subscription renewal invoices");
+    const drafts = await stripe.invoices.list({ status: "draft", limit: 100 });
     const renewalDrafts = drafts.data.filter(
-      (inv) => inv.billing_reason === "subscription_cycle" || inv.billing_reason === "subscription_update"
+      (inv) =>
+        inv.billing_reason === "subscription_cycle" ||
+        inv.billing_reason === "subscription_update"
     );
-
-    log("Found draft renewal invoices", { count: renewalDrafts.length });
-
-    const results: Array<{ id: string; status: string; error?: string }> = [];
+    log("Draft renewal invoices found", { count: renewalDrafts.length });
 
     for (const invoice of renewalDrafts) {
       try {
-        // Finalize → Stripe will then auto-attempt payment via the customer's default payment method
         const finalized = await stripe.invoices.finalizeInvoice(invoice.id, {
           auto_advance: true,
         });
-        log("Finalized invoice", { id: invoice.id, status: finalized.status, customer: invoice.customer });
-        results.push({ id: invoice.id, status: finalized.status ?? "unknown" });
+        log("Finalized draft", { id: invoice.id, status: finalized.status });
+        results.finalized.push({ id: invoice.id, status: finalized.status ?? "unknown" });
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
         log("Failed to finalize", { id: invoice.id, error: msg });
-        results.push({ id: invoice.id, status: "error", error: msg });
+        results.finalized.push({ id: invoice.id, status: "error", error: msg });
+      }
+    }
+
+    // ============================================================
+    // LAYER B: Force-pay any OPEN (finalized but unpaid) renewal
+    // invoices using the customer's default saved payment method.
+    // This catches the case where Stripe finalized but didn't
+    // auto-attempt the charge.
+    // ============================================================
+    log("Scanning for open unpaid subscription renewal invoices");
+    const opens = await stripe.invoices.list({ status: "open", limit: 100 });
+    const renewalOpens = opens.data.filter(
+      (inv) =>
+        (inv.billing_reason === "subscription_cycle" ||
+          inv.billing_reason === "subscription_update") &&
+        inv.amount_remaining > 0
+    );
+    log("Open renewal invoices found", { count: renewalOpens.length });
+
+    for (const invoice of renewalOpens) {
+      try {
+        // stripe.invoices.pay() forces Stripe to attempt the charge
+        // immediately against the customer's default payment method.
+        const paid = await stripe.invoices.pay(invoice.id);
+        log("Paid invoice", {
+          id: invoice.id,
+          status: paid.status,
+          customer: invoice.customer,
+        });
+        results.paid.push({ id: invoice.id, status: paid.status ?? "unknown" });
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        log("Failed to pay", { id: invoice.id, error: msg });
+        results.paid.push({ id: invoice.id, status: "error", error: msg });
       }
     }
 
     return new Response(
       JSON.stringify({
         success: true,
-        processed: renewalDrafts.length,
+        finalized_count: results.finalized.length,
+        paid_count: results.paid.length,
         results,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
