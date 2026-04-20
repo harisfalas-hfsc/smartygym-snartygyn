@@ -95,8 +95,12 @@ function buildPrompt(args: {
   duration: string;
   referenceList: string;
   bannedNames: string[];
+  difficulty: string;
+  difficultyStars: number;
 }): string {
-  const { category, equipment, format, duration, referenceList, bannedNames } = args;
+  const { category, equipment, format, duration, referenceList, bannedNames, difficulty, difficultyStars } = args;
+  const difficultyLc = difficulty.toLowerCase();
+  const isBeginner = difficultyLc === "beginner";
 
   const bannedBlock = bannedNames.length
     ? `\n⛔ BANNED NAMES — these names already exist for ${category}; DO NOT use any of them or minor variations:\n${bannedNames.map(n => `   ❌ "${n}"`).join("\n")}\n`
@@ -104,12 +108,12 @@ function buildPrompt(args: {
 
   const isRepsSets = category === "STRENGTH" || category === "MOBILITY & STABILITY";
 
-  return `You are Haris Falas, Sports Scientist (CSCS), creating a premium FREE intermediate workout for SmartyGym.
+  return `You are Haris Falas, Sports Scientist (CSCS), creating a premium FREE ${difficultyLc} workout for SmartyGym.
 
 WORKOUT SPEC:
 - Category: ${category}
 - Equipment: ${equipment === "BODYWEIGHT" ? "BODYWEIGHT ONLY (no equipment)" : "GYM EQUIPMENT (dumbbells, kettlebells, barbells, machines, bands, etc.)"}
-- Difficulty: Intermediate (3 stars out of 6)
+- Difficulty: ${difficulty} (${difficultyStars} stars out of 6)${isBeginner ? "\n- IMPORTANT: BEGINNER level — choose foundational, low-skill exercises only. Lower volume, longer rest, simpler progressions. Avoid advanced movements (muscle-ups, pistol squats, plyometric depth jumps, heavy Olympic lifts, single-arm advanced KB work). Use regressions where appropriate." : ""}
 - Format: ${format}
 - Target Main+Finisher Duration: ${duration}
 
@@ -154,9 +158,9 @@ MAIN WORKOUT TITLE: "Main Workout (${format} ${duration.replace(' min', "'")})" 
 FINISHER TITLE: "Finisher (For Time)" or "Finisher (8-minute AMRAP)" — no creative sub-name.
 
 ${isRepsSets ? `
-REPS & SETS MANDATORY RULE (Intermediate):
+REPS & SETS MANDATORY RULE (${difficulty}):
 Every exercise line MUST include sets x reps with tempo and prescription.
-Example: "{{exercise:0123:Push-up}} - 4 sets x 8-10 reps (3-1-1-0 tempo, rest 60-90s)"
+${isBeginner ? `Beginner volume guidance: 2-3 sets x 8-12 reps with controlled tempo (3-1-2-0) and longer rest (60-120s). Use foundational lifts: goblet squat, dumbbell RDL, push-up (incline if needed), seated row, glute bridge, plank.` : `Example: "{{exercise:0123:Push-up}} - 4 sets x 8-10 reps (3-1-1-0 tempo, rest 60-90s)"`}
 NEVER list an exercise without sets x reps prescription.
 ` : `
 TIMED FORMAT RULES:
@@ -281,6 +285,8 @@ async function generateOne(
   fullExercises: ExerciseBasic[],
   fullRefList: string,
   bannedNames: string[],
+  difficulty: string,
+  difficultyStars: number,
 ): Promise<{ ok: boolean; id?: string; name?: string; error?: string }> {
   const { category, equipment } = job;
   const { format, duration } = pickFormat(category);
@@ -290,8 +296,8 @@ async function generateOne(
   const MAX_ATTEMPTS = 2;
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     try {
-      log(`Generating`, { category, equipment, format, duration, attempt });
-      const prompt = buildPrompt({ category, equipment, format, duration, referenceList, bannedNames });
+      log(`Generating`, { category, equipment, format, duration, difficulty, attempt });
+      const prompt = buildPrompt({ category, equipment, format, duration, referenceList, bannedNames, difficulty, difficultyStars });
       const content = await callAI(apiKey, prompt);
       if (!content) throw new Error("All AI models failed");
 
@@ -357,13 +363,14 @@ async function generateOne(
       // Build ID + insert
       const ts = Date.now();
       const catSlug = category.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-      const workoutId = `FREE-${catSlug}-${equipment.charAt(0)}-${ts}`;
+      const diffSlug = difficulty.toLowerCase().slice(0, 3);
+      const workoutId = `FREE-${diffSlug}-${catSlug}-${equipment.charAt(0)}-${ts}`;
 
       // Generate image synchronously (so the row immediately has one — trigger is the backup)
       let imageUrl: string | null = null;
       try {
         const { data: imgData, error: imgErr } = await supabase.functions.invoke("generate-workout-image", {
-          body: { name: content.name, category, format, difficulty_stars: 3 },
+          body: { name: content.name, category, format, difficulty_stars: difficultyStars },
         });
         if (!imgErr && imgData?.image_url) imageUrl = imgData.image_url;
       } catch (e: any) { log("Image gen exception (trigger will retry)", { err: e.message }); }
@@ -375,8 +382,8 @@ async function generateOne(
         category,
         format,
         equipment,
-        difficulty: "Intermediate",
-        difficulty_stars: 3,
+        difficulty,
+        difficulty_stars: difficultyStars,
         duration,
         description: descNorm,
         main_workout: mainNorm,
@@ -421,17 +428,23 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     let onlyJobs: Job[] | null = null;
+    let difficulty = "Intermediate";
+    let difficultyStars = 3;
     try {
       const body = await req.json();
       if (Array.isArray(body?.jobs)) onlyJobs = body.jobs;
+      if (typeof body?.difficulty === "string") difficulty = body.difficulty;
+      if (typeof body?.difficulty_stars === "number") difficultyStars = body.difficulty_stars;
     } catch { /* no body */ }
 
-    // Fetch existing names per category for dedup + idempotency
+    log("Run config", { difficulty, difficultyStars });
+
+    // Fetch existing names per category for dedup + idempotency (filtered by difficulty)
     const { data: existing } = await supabase
       .from("admin_workouts")
       .select("name, category, equipment, difficulty, is_free, is_workout_of_day")
       .eq("is_free", true)
-      .eq("difficulty", "Intermediate")
+      .eq("difficulty", difficulty)
       .eq("is_workout_of_day", false);
 
     const existingByKey = new Map<string, string[]>(); // key: `${category}|${equipment}` -> names
@@ -443,11 +456,19 @@ serve(async (req) => {
       existingNamesAll.add(w.name);
     }
 
-    // Build exercise libraries once
+    // Also load ALL existing free workout names (any difficulty) for global name uniqueness
+    const { data: allFree } = await supabase
+      .from("admin_workouts")
+      .select("name")
+      .eq("is_free", true);
+    for (const w of allFree || []) existingNamesAll.add(w.name);
+
+    // Build exercise libraries once (difficulty-aware filter)
+    const libDifficulty = difficulty.toLowerCase();
     const { exercises: bodyweightExercises, referenceList: bodyweightRefList } =
-      await fetchAndBuildExerciseReference(supabase, "[FREE-CAT-GEN-BW]", "body weight", "intermediate");
+      await fetchAndBuildExerciseReference(supabase, "[FREE-CAT-GEN-BW]", "body weight", libDifficulty);
     const { exercises: fullExercises, referenceList: fullRefList } =
-      await fetchAndBuildExerciseReference(supabase, "[FREE-CAT-GEN-FULL]", undefined, "intermediate");
+      await fetchAndBuildExerciseReference(supabase, "[FREE-CAT-GEN-FULL]", undefined, libDifficulty);
 
     log("Libraries loaded", { bw: bodyweightExercises.length, full: fullExercises.length });
 
@@ -456,10 +477,10 @@ serve(async (req) => {
 
     for (const job of jobsToRun) {
       const key = `${job.category}|${job.equipment}`;
-      // Idempotent: skip if a free intermediate workout already exists for this combo
+      // Idempotent: skip if a free workout for this (category, equipment, difficulty) triple already exists
       if ((existingByKey.get(key)?.length ?? 0) > 0) {
-        log(`Skipping (already exists)`, { ...job, existing: existingByKey.get(key) });
-        results.push({ ...job, status: "skipped", reason: "already exists", existing: existingByKey.get(key) });
+        log(`Skipping (already exists)`, { ...job, difficulty, existing: existingByKey.get(key) });
+        results.push({ ...job, difficulty, status: "skipped", reason: "already exists", existing: existingByKey.get(key) });
         continue;
       }
 
@@ -468,10 +489,11 @@ serve(async (req) => {
         supabase, lovableApiKey, job,
         bodyweightExercises, bodyweightRefList,
         fullExercises, fullRefList,
-        banned
+        banned,
+        difficulty, difficultyStars,
       );
       if (r.ok && r.name) existingNamesAll.add(r.name);
-      results.push({ ...job, ...r });
+      results.push({ ...job, difficulty, ...r });
 
       // small delay to be nice to AI gateway
       await new Promise(res => setTimeout(res, 1500));
