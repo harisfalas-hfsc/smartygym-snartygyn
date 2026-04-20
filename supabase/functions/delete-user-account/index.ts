@@ -69,13 +69,13 @@ serve(async (req) => {
             await stripe.subscriptions.cancel(sub.id);
             logStep("Cancelled subscription", { subscriptionId: sub.id });
           }
+        }
+      } catch (stripeError) {
+        const stripeErrorMsg = stripeError instanceof Error ? stripeError.message : String(stripeError);
+        logStep("Stripe error (continuing)", { error: stripeErrorMsg });
+        // Continue with deletion even if Stripe fails
       }
-    } catch (stripeError) {
-      const stripeErrorMsg = stripeError instanceof Error ? stripeError.message : String(stripeError);
-      logStep("Stripe error (continuing)", { error: stripeErrorMsg });
-      // Continue with deletion even if Stripe fails
     }
-  }
 
     // Step 2: Delete user data from all tables (in correct order for FK constraints)
     // Tier 1: Tables with no FK dependencies on other user tables
