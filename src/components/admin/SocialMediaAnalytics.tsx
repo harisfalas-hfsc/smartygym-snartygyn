@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { applyBotFilter } from "@/lib/admin-analytics";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -44,12 +45,15 @@ export const SocialMediaAnalytics = () => {
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - daysAgo);
 
-      // Fetch all analytics data
-      const { data, error } = await supabase
+      // Fetch all analytics data — exclude preview/bot traffic so the totals
+      // match the Website tab and the dashboard overview card.
+      let query = supabase
         .from('social_media_analytics')
         .select('*')
         .gte('created_at', startDate.toISOString())
         .order('created_at', { ascending: true });
+      query = applyBotFilter(query as any) as typeof query;
+      const { data, error } = await query;
 
       if (error) throw error;
 

@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
+import { fetchFilteredVisitorCount, computePremiumCounts } from "@/lib/admin-analytics";
 
 interface ReportSection {
   id: string;
@@ -82,8 +83,10 @@ export function BusinessReportExport({ dashboardRef }: BusinessReportExportProps
     // Fetch subscriptions
     const { data: subscriptions } = await supabase
       .from("user_subscriptions")
-      .select("plan_type, status");
+      .select("plan_type, status, stripe_subscription_id");
 
+    // Use the same premium-counting rules as the dashboard
+    const premium = computePremiumCounts(subscriptions as any);
     const activeGold = subscriptions?.filter(s => s.status === "active" && s.plan_type === "gold").length || 0;
     const activePlatinum = subscriptions?.filter(s => s.status === "active" && s.plan_type === "platinum").length || 0;
 
@@ -122,13 +125,8 @@ export function BusinessReportExport({ dashboardRef }: BusinessReportExportProps
     const workoutCompletions = workoutInteractions?.filter(w => w.is_completed).length || 0;
     const programCompletions = programInteractions?.filter(p => p.is_completed).length || 0;
 
-    // Fetch website visitors
-    const { count: websiteVisitors } = await supabase
-      .from("social_media_analytics")
-      .select("id", { count: "exact" })
-      .eq("event_type", "visit")
-      .gte("created_at", startISO)
-      .lte("created_at", endISO);
+    // Filtered visitor count — same logic as overview card and Website tab
+    const websiteVisitors = await fetchFilteredVisitorCount(startDate, endDate);
 
     // Fetch corporate subscriptions
     const { data: corporateSubs } = await supabase
@@ -151,6 +149,8 @@ export function BusinessReportExport({ dashboardRef }: BusinessReportExportProps
         new: newUsers || 0,
         goldSubscribers: activeGold,
         platinumSubscribers: activePlatinum,
+        paidSubscribers: premium.paidSubscribers,
+        manualSubscribers: premium.manualSubscribers,
       },
       revenue: {
         total: stripeRevenue.totalRevenue,

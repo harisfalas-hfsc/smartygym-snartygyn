@@ -24,6 +24,14 @@ import { PopularAnalytics } from "./analytics/PopularAnalytics";
 import { BusinessReportExport } from "./analytics/BusinessReportExport";
 import html2canvas from "html2canvas";
 import { SUBSCRIPTION_PRICES, SUBSCRIPTION_BILLING_PERIODS, CORPORATE_PRICES } from "@/config/pricing";
+import {
+  fetchWorkoutLibraryCounts,
+  fetchAvailableProgramsCount,
+  fetchAvailableRitualsCount,
+  fetchFilteredVisitorCount,
+  computePremiumCounts,
+  computeNonPremiumUsers,
+} from "@/lib/admin-analytics";
 
 interface AnalyticsData {
   totalUsers: number;
@@ -39,6 +47,10 @@ interface AnalyticsData {
   avgWorkoutCompletionRate: number;
   avgProgramCompletionRate: number;
   totalWorkouts: number;
+  // Workout library breakdown (matches public /workouts page)
+  availableWorkouts: number;     // visible & not WOD
+  activeWODs: number;
+  hiddenWorkouts: number;
   totalPrograms: number;
   totalRituals: number;
   totalCheckins: number;
@@ -79,6 +91,9 @@ export function AnalyticsDashboard() {
     avgWorkoutCompletionRate: 0,
     avgProgramCompletionRate: 0,
     totalWorkouts: 0,
+    availableWorkouts: 0,
+    activeWODs: 0,
+    hiddenWorkouts: 0,
     totalPrograms: 0,
     totalRituals: 0,
     totalCheckins: 0,
@@ -147,20 +162,22 @@ export function AnalyticsDashboard() {
         .from("user_subscriptions")
         .select("plan_type, status, created_at, current_period_end, stripe_subscription_id");
 
-      const activeSubscribers = subscriptions?.filter(s => s.status === "active" && s.plan_type !== "free").length || 0;
-      
-      // PAID = has stripe_subscription_id (real Stripe payment)
-      // MANUAL = no stripe_subscription_id (admin granted, complimentary)
-      const paidSubscribers = subscriptions?.filter(s => s.status === "active" && s.plan_type !== "free" && s.stripe_subscription_id).length || 0;
-      const manualSubscribers = subscriptions?.filter(s => s.status === "active" && s.plan_type !== "free" && !s.stripe_subscription_id).length || 0;
-      
+      // Centralized premium counts (matches live product rules)
+      const premiumCounts = computePremiumCounts(subscriptions as any);
+      const activeSubscribers = premiumCounts.activePremiumSubscribers;
+      const paidSubscribers = premiumCounts.paidSubscribers;
+      const manualSubscribers = premiumCounts.manualSubscribers;
+
       const goldSubscribers = subscriptions?.filter(s => s.status === "active" && s.plan_type === "gold").length || 0;
       const goldPaid = subscriptions?.filter(s => s.status === "active" && s.plan_type === "gold" && s.stripe_subscription_id).length || 0;
       
       const platinumSubscribers = subscriptions?.filter(s => s.status === "active" && s.plan_type === "platinum").length || 0;
       const platinumPaid = subscriptions?.filter(s => s.status === "active" && s.plan_type === "platinum" && s.stripe_subscription_id).length || 0;
       
-      const freeUsers = subscriptions?.filter(s => s.plan_type === "free" || s.status !== "active").length || 0;
+      // Non-premium users = total profiles minus distinct active premium users.
+      // (Counting only `user_subscriptions` rows missed all profiles without any
+      // subscription row, undercounting free users dramatically.)
+      const freeUsers = computeNonPremiumUsers(totalUsers, premiumCounts.distinctPremiumUsers);
 
       // Calculate ACTUAL revenue from PAID subscriptions only
       // Gold = €9.99/month, Platinum = €89.89/year
@@ -316,18 +333,12 @@ export function AnalyticsDashboard() {
         .sort((a, b) => b.value - a.value)
         .slice(0, 10);
 
-      // Fetch total content counts
-      const { count: totalWorkoutsCount } = await supabase
-        .from("admin_workouts")
-        .select("id", { count: "exact" });
-
-      const { count: totalProgramsCount } = await supabase
-        .from("admin_training_programs")
-        .select("id", { count: "exact" });
-
-      const { count: totalRitualsCount } = await supabase
-        .from("daily_smarty_rituals")
-        .select("id", { count: "exact" });
+      // Use centralized library-rule counters so totals match the public pages.
+      const [workoutCounts, totalProgramsCount, totalRitualsCount] = await Promise.all([
+        fetchWorkoutLibraryCounts(),
+        fetchAvailableProgramsCount(),
+        fetchAvailableRitualsCount(),
+      ]);
 
       // Fetch check-ins count
       const { count: totalCheckinsCount } = await supabase
@@ -339,12 +350,8 @@ export function AnalyticsDashboard() {
         .from("workout_comments")
         .select("id", { count: "exact" });
 
-      // Fetch website visitors
-      const { count: websiteVisitorsCount } = await supabase
-        .from("social_media_analytics")
-        .select("id", { count: "exact" })
-        .eq("event_type", "visit")
-        .gte("created_at", startDate.toISOString());
+      // Filtered visitor count (excludes bots / Lovable preview / scrapers)
+      const websiteVisitorsCount = await fetchFilteredVisitorCount(startDate);
 
       // Fetch corporate subscriptions - include stripe fields to identify paid vs free
       const { data: corporateSubs } = await supabase
@@ -382,9 +389,12 @@ export function AnalyticsDashboard() {
         totalRevenue,
         avgWorkoutCompletionRate,
         avgProgramCompletionRate,
-        totalWorkouts: totalWorkoutsCount || 0,
-        totalPrograms: totalProgramsCount || 0,
-        totalRituals: totalRitualsCount || 0,
+        totalWorkouts: workoutCounts.availableWorkouts,
+        availableWorkouts: workoutCounts.availableWorkouts,
+        activeWODs: workoutCounts.activeWODs,
+        hiddenWorkouts: workoutCounts.hiddenWorkouts,
+        totalPrograms: totalProgramsCount,
+        totalRituals: totalRitualsCount,
         totalCheckins: totalCheckinsCount || 0,
         totalComments: totalCommentsCount || 0,
         websiteVisitors: websiteVisitorsCount || 0,
@@ -492,7 +502,7 @@ export function AnalyticsDashboard() {
         <AnalyticsMetricCard 
           title="Active Subscribers" 
           value={analytics.activeSubscribers} 
-          subtitle="Paid memberships"
+          subtitle={`${analytics.paidSubscribers} paid • ${analytics.manualSubscribers} comp`}
           icon={TrendingUp}
         />
         <AnalyticsMetricCard 
@@ -510,13 +520,13 @@ export function AnalyticsDashboard() {
         <AnalyticsMetricCard 
           title="Free Users" 
           value={analytics.freeUsers} 
-          subtitle="Non-premium"
+          subtitle="Non-premium accounts"
           icon={Users}
         />
         <AnalyticsMetricCard 
           title="Paid Revenue" 
           value={`€${analytics.totalRevenue.toFixed(2)}`} 
-          subtitle={`${analytics.paidSubscribers} paid subs • ${analytics.manualSubscribers} free`}
+          subtitle={`${analytics.paidSubscribers} paid subs • ${analytics.manualSubscribers} comp`}
           icon={DollarSign}
         />
       </div>
@@ -525,8 +535,8 @@ export function AnalyticsDashboard() {
       <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
         <AnalyticsMetricCard 
           title="Total Workouts" 
-          value={analytics.totalWorkouts} 
-          subtitle="Available workouts"
+          value={analytics.availableWorkouts} 
+          subtitle={`Library • ${analytics.activeWODs} WOD • ${analytics.hiddenWorkouts} hidden`}
           icon={Dumbbell}
         />
         <AnalyticsMetricCard 
@@ -680,6 +690,12 @@ export function AnalyticsDashboard() {
               className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-3 sm:px-4 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md"
             >
               Corporate
+            </TabsTrigger>
+            <TabsTrigger 
+              value="shop" 
+              className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-3 sm:px-4 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md"
+            >
+              Shop
             </TabsTrigger>
           </TabsList>
         </div>
