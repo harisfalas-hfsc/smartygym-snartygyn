@@ -170,6 +170,8 @@ serve(async (req) => {
           });
           if (msgError) {
             dashboardFailed++;
+            dashboardErrors.push({ user_id: user.id, error: msgError.message });
+            logStep("❌ Article dashboard insert failed", { userId: user.id, error: msgError.message, code: msgError.code });
           } else {
             dashboardSuccess++;
           }
