@@ -1,93 +1,55 @@
 
 
-# Fix Everything — Full Remediation
+# Fix Corrupted `(male)` / `(female)` Token Repetitions in 25 Workouts
 
-Execute all batches from the audit in priority order. One approval, then I work through them sequentially and report back after each batch.
+## Root cause
 
-## Batch A — Critical Safety (first)
+The previous batch-relink job replaced exercise text with `{{exercise:id:name}}` markup, but for library entries whose names end in a parenthetical annotation like `(male)`, `(female)`, or `(beginner)`, the replacement regex left the trailing token un-consumed and then re-emitted it once per match attempt — producing chains of 9–31 duplicated `(male)` tokens after the closing `}}`.
 
-**A1. Fix `delete-user-account` brace mismatch**
-- Repair the syntax bug so GDPR deletion works.
-- Redeploy function.
-- Test with a dummy call (dry-run path) to confirm it boots.
+## What I'll fix
 
-**A2. Resolve the 737 broken exercise links**
-- Run `batch-relink-exercises` across all workouts + programs in dryRun=false mode, batched (5 at a time) to stay under Edge limits.
-- For each entry in `mismatched_exercises`: re-run AI matching → if confidence ≥ 0.75 replace with `{{exercise:ID:Name}}`, else mark `needs_manual_review = true`.
-- Report final numbers: auto-fixed vs needs-manual.
+**Scope:** 25 workouts. Zero training programs. Only the corrupted token sequences — no other content touched.
 
-## Batch B — Revenue & Renewal Integrity
+**Affected records (by id):**
+- WODs: WOD-S-B-1768343408374 (Gluteal Anchor), WOD-S-B-1767393007630, WOD-CH-B-1767163844535, WOD-CH-B-1765776894884, WOD-CH-B-1769985007209, WOD-CB-1764399612573, WOD-M-1764486040577, WOD-CA-E-1765946364498, WOD-MS-E-1768170609085, WOD-20241124, WOD-20241125, WOD-20241126, WOD-20241127
+- Pilates: PIL-001 through PIL-006
+- Recovery: rec-001 through rec-004
+- Mobility: M-003, M-005
 
-**B1. Backfill NULL `current_period_end` from Stripe**
-- For every active subscription with `stripe_subscription_id` and NULL renewal date, fetch live data from Stripe and write the real `current_period_end` + `current_period_start`.
-- Specifically heals Manos Christofi and any other affected paid users.
+## Fix logic
 
-**B2. Renewal reminders verification**
-- Re-run `send-renewal-reminders` after backfill so the cron sees real dates.
-- Confirm 3-day and 1-day reminders queue correctly.
+Run a single SQL migration that, for each corrupted column (`main_workout`, `finisher`, `warm_up`, `cool_down`, `activation`):
 
-## Batch C — SEO Coverage for Blog
+1. Use `regexp_replace` to collapse runs of `}} (male) (male) (male) ...` → `}}` (the original `(male)` is already inside the `{{exercise:id:name (male)}}` markup, so the trailing duplicates are pure noise).
+2. Same pass for `(female)` and any other repeated `\([a-z]+\)` token (3+ in a row, case-insensitive).
+3. Preserve the `-12 reps (3-1-1-0 tempo, 90 sec rest)` text that follows the duplicated tokens.
 
-**C1. Generate SEO metadata for all 30 published articles**
-- Call the existing blog SEO generator for each article missing a `seo_metadata` row.
-- Populate: meta_title, meta_description (≤160 chars), keywords, og_image, JSON-LD Article schema, image alt text.
-- Verify sitemap includes all 30.
+**Pattern (Postgres regex):**
+```
+regexp_replace(col, '(\}\})\s*(\([a-zA-Z]+\)\s*){2,}', '\1', 'g')
+```
+This keeps the closing `}}` and removes 2+ trailing parenthetical tokens.
 
-## Batch D — Notifications & Email Hygiene
+## Verification after fix
 
-**D1. Investigate empty `email_delivery_log` (last 72h)**
-- Determine: cron not firing, Resend errors, or logging gap.
-- Check `send-scheduled-emails` + `send-automated-messages` cron history and Resend account status.
-- Fix root cause (re-enable cron, fix logger insert, or both).
+1. Re-run the two detector queries — both must return zero rows.
+2. Spot-check Gluteal Anchor's `main_workout` to confirm it reads:
+   `{{exercise:3523:glute bridge two legs on bench (male)}}-12 reps (3-1-1-0 tempo, 90 sec rest)`
+3. Open `/workouts/WOD-S-B-1768343408374` in the preview to confirm rendering.
 
-**D2. Deduplicate Welcome templates**
-- Identify duplicate "Welcome" automated_messages rows.
-- Keep the canonical one (referenced by `trigger_welcome_email`), archive the rest.
+## Prevent recurrence
 
-## Batch E — Migration: react-helmet → react-helmet-async
+Patch `supabase/functions/batch-relink-exercises/index.ts` (and the matching helper in `supabase/functions/fix-workout-formatting/index.ts`) so the matcher consumes the trailing parenthetical suffix as part of the exercise name, not as separate floating text. Add a guard that refuses to write output containing `}} (word) (word)` patterns.
 
-**E1. Migrate 48 files** to `react-helmet-async`.
-- Add `<HelmetProvider>` at app root.
-- Replace `import { Helmet } from 'react-helmet'` everywhere.
-- Removes the recurring HMR `removeChild` errors.
+## Files / DB touched
 
-## Batch F — Storage & SDK Hardening
-
-**F1. Tighten storage bucket LIST policies** (`avatars`, `message-attachments`, `contact-files`).
-- Restrict LIST to owner / admin only; keep public READ on the public buckets.
-
-**F2. Align Stripe SDK to v18.5.0** across all edge functions.
-
-## Batch G — Final Verification Pass
-
-After A–F:
-- Re-run the audit queries.
-- Generate `SMARTYGYM_POST_FIX_REPORT_<date>.md` showing before/after numbers for every issue.
-- Confirm: 0 broken exercise links, 30/30 articles with SEO, 0 NULL renewal dates on paid subs, email log populated.
-
-## Execution rules
-
-- One batch at a time, in order A → G.
-- After each batch: short status message with numbers proving the fix.
-- If any batch surfaces a new blocker (e.g. Stripe key missing scope), I stop and ask before continuing.
-- No new features added. No layout changes. Audit-driven repairs only.
-
-## Files / systems touched
-
-- `supabase/functions/delete-user-account/index.ts`
-- `supabase/functions/batch-relink-exercises/*` (run only, no code change unless needed)
-- `supabase/functions/sync-stripe-subscription/*` (used to backfill)
-- `supabase/functions/seo-blog-generator/*` (run only)
-- `supabase/functions/send-scheduled-emails/*`, `send-automated-messages/*` (debug)
-- All 48 files using `react-helmet`
-- Storage policy migration
-- Stripe SDK version bumps in affected functions
+- **DB migration:** UPDATE `admin_workouts` for the 25 ids above.
+- **Code:** `supabase/functions/batch-relink-exercises/index.ts`, `supabase/functions/fix-workout-formatting/index.ts` — fix the regex that strips/re-emits exercise-name suffixes.
 
 ## What I will NOT touch
 
-- Workout/program content
-- WOD generation logic
-- UI layout, theme, colors
-- Pricing
-- Cron schedule times
+- The exercise library itself (the `(male)` / `(female)` suffixes in exercise names are intentional — they distinguish gendered demo variants).
+- Training programs (none affected).
+- Any non-corrupted workout content.
+- Layout, theme, or rendering code.
 
