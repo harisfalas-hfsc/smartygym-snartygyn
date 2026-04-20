@@ -158,9 +158,9 @@ MAIN WORKOUT TITLE: "Main Workout (${format} ${duration.replace(' min', "'")})" 
 FINISHER TITLE: "Finisher (For Time)" or "Finisher (8-minute AMRAP)" — no creative sub-name.
 
 ${isRepsSets ? `
-REPS & SETS MANDATORY RULE (Intermediate):
+REPS & SETS MANDATORY RULE (${difficulty}):
 Every exercise line MUST include sets x reps with tempo and prescription.
-Example: "{{exercise:0123:Push-up}} - 4 sets x 8-10 reps (3-1-1-0 tempo, rest 60-90s)"
+${isBeginner ? `Beginner volume guidance: 2-3 sets x 8-12 reps with controlled tempo (3-1-2-0) and longer rest (60-120s). Use foundational lifts: goblet squat, dumbbell RDL, push-up (incline if needed), seated row, glute bridge, plank.` : `Example: "{{exercise:0123:Push-up}} - 4 sets x 8-10 reps (3-1-1-0 tempo, rest 60-90s)"`}
 NEVER list an exercise without sets x reps prescription.
 ` : `
 TIMED FORMAT RULES:
