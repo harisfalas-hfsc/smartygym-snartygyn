@@ -350,8 +350,9 @@ serve(async (req) => {
             });
 
           if (msgError) {
-            logStep("❌ Dashboard message failed", { userId: user.id, error: msgError.message });
+            logStep("❌ Dashboard message failed", { userId: user.id, error: msgError.message, code: msgError.code });
             dashboardFailed++;
+            dashboardErrors.push({ user_id: user.id, error: msgError.message });
           } else {
             dashboardSuccess++;
           }
