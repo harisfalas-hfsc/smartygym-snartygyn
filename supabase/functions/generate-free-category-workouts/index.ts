@@ -363,13 +363,14 @@ async function generateOne(
       // Build ID + insert
       const ts = Date.now();
       const catSlug = category.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-      const workoutId = `FREE-${catSlug}-${equipment.charAt(0)}-${ts}`;
+      const diffSlug = difficulty.toLowerCase().slice(0, 3);
+      const workoutId = `FREE-${diffSlug}-${catSlug}-${equipment.charAt(0)}-${ts}`;
 
       // Generate image synchronously (so the row immediately has one — trigger is the backup)
       let imageUrl: string | null = null;
       try {
         const { data: imgData, error: imgErr } = await supabase.functions.invoke("generate-workout-image", {
-          body: { name: content.name, category, format, difficulty_stars: 3 },
+          body: { name: content.name, category, format, difficulty_stars: difficultyStars },
         });
         if (!imgErr && imgData?.image_url) imageUrl = imgData.image_url;
       } catch (e: any) { log("Image gen exception (trigger will retry)", { err: e.message }); }
@@ -381,8 +382,8 @@ async function generateOne(
         category,
         format,
         equipment,
-        difficulty: "Intermediate",
-        difficulty_stars: 3,
+        difficulty,
+        difficulty_stars: difficultyStars,
         duration,
         description: descNorm,
         main_workout: mainNorm,
