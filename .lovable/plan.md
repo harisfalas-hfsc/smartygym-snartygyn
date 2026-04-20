@@ -1,109 +1,93 @@
 
 
-# Full Website Audit — SmartyGym
+# Fix Everything — Full Remediation
 
-I will run a complete, end-to-end audit of the entire platform and deliver a single written report. **No code changes** in this pass — audit only. Once you read the report, you decide what to fix and in what order.
+Execute all batches from the audit in priority order. One approval, then I work through them sequentially and report back after each batch.
 
-## Scope (every area, nothing skipped)
+## Batch A — Critical Safety (first)
 
-1. **Access Control & Security**
-   - Guest / Subscriber / Premium / Admin tier rules vs actual code paths
-   - All RLS policies on every table (admin visibility, user privacy, public reads)
-   - Edge function JWT checks, server-side purchase rejection for premium
-   - Admin route protection, role checks, `has_role` usage
-   - Supabase linter + security scan (leaked passwords, exposed schemas, etc.)
+**A1. Fix `delete-user-account` brace mismatch**
+- Repair the syntax bug so GDPR deletion works.
+- Redeploy function.
+- Test with a dummy call (dry-run path) to confirm it boots.
 
-2. **Admin Back Office / Analytics**
-   - Re-verify all dashboard counters after the recent fix (workouts 350, users 51, subs 3)
-   - Revenue tab, Purchases tab, Growth tab, Completion tab, Popular tab, Website tab, Corporate tab, Shop tab, Social Analytics
-   - Business report export numbers vs dashboard numbers
-   - Cron jobs status, system health audit, edge function error rates
+**A2. Resolve the 737 broken exercise links**
+- Run `batch-relink-exercises` across all workouts + programs in dryRun=false mode, batched (5 at a time) to stay under Edge limits.
+- For each entry in `mismatched_exercises`: re-run AI matching → if confidence ≥ 0.75 replace with `{{exercise:ID:Name}}`, else mark `needs_manual_review = true`.
+- Report final numbers: auto-fixed vs needs-manual.
 
-3. **Subscriptions, Payments, Stripe**
-   - Live Stripe vs DB reconciliation (Manos / Maria / Applab + any others)
-   - Renewal reminders, 7-day trial flow, auto-finalization, webhook health
-   - Standalone purchases: hidden for premium, accessible to subscribers, RLS correct
-   - Refund / cancel / expired-access read-only behavior
+## Batch B — Revenue & Renewal Integrity
 
-4. **Workouts & Training Programs**
-   - Library count vs admin count vs public page count (the 350 / 353 issue)
-   - Hidden / archived / WOD lifecycle integrity
-   - Exercise linking (`{{exercise:ID:Name}}`) coverage and broken links
-   - Image generation backlog (workouts/programs without images)
-   - Format/density rules, naming uniqueness, duplicate detection
+**B1. Backfill NULL `current_period_end` from Stripe**
+- For every active subscription with `stripe_subscription_id` and NULL renewal date, fetch live data from Stripe and write the real `current_period_end` + `current_period_start`.
+- Specifically heals Manos Christofi and any other affected paid users.
 
-5. **WOD System**
-   - Today's WOD bodyweight + equipment both live and matching
-   - Archival lifecycle, all-or-none publishing, Stripe idempotency
-   - Recent failures from the beginner/intermediate generation runs
+**B2. Renewal reminders verification**
+- Re-run `send-renewal-reminders` after backfill so the cron sees real dates.
+- Confirm 3-day and 1-day reminders queue correctly.
 
-6. **Messages & Notifications**
-   - Web / Email / Push parity (the 100% parity standard)
-   - Welcome onboarding sequence trigger health
-   - Renewal reminder schedule
-   - Pending content notifications queue (workouts/programs/articles)
-   - Cron job health for `send-scheduled-notifications` and `send-automated-messages`
+## Batch C — SEO Coverage for Blog
 
-7. **Tools, Calendar, Goals, PAR-Q, Check-ins**
-   - Workout Timer, Calorie Counter, Macro Calculator history sync
-   - Native `.ics` export
-   - Goal completion tracking (workouts + programs counters)
-   - PAR-Q compliance gating
-   - Check-in window (07–10 / 19–22) enforcement
+**C1. Generate SEO metadata for all 30 published articles**
+- Call the existing blog SEO generator for each article missing a `seo_metadata` row.
+- Populate: meta_title, meta_description (≤160 chars), keywords, og_image, JSON-LD Article schema, image alt text.
+- Verify sitemap includes all 30.
 
-8. **Community & Testimonials**
-   - Leaderboards (workout + check-in + program) returning data
-   - Testimonials premium gating + structured data
-   - Comments / ratings RLS
+## Batch D — Notifications & Email Hygiene
 
-9. **Blog & SEO**
-   - Automated weekly blog generation health
-   - JSON-LD, sitemaps (incl. image sitemap), social meta, favicon
-   - Broken internal links / non-whitelisted links
-   - React Helmet HMR risk check
+**D1. Investigate empty `email_delivery_log` (last 72h)**
+- Determine: cron not firing, Resend errors, or logging gap.
+- Check `send-scheduled-emails` + `send-automated-messages` cron history and Resend account status.
+- Fix root cause (re-enable cron, fix logger insert, or both).
 
-10. **Public Site, UI, Mobile**
-    - Every public route loads, no console errors
-    - 1024px breakpoint, dark/light theme defaults
-    - Stacked card layout, workout wrapper, carousel standards
-    - Google Ads tag (`G-VCRTFQDY85`) firing
-    - PWA / native-ready layer
+**D2. Deduplicate Welcome templates**
+- Identify duplicate "Welcome" automated_messages rows.
+- Keep the canonical one (referenced by `trigger_welcome_email`), archive the rest.
 
-11. **GDPR & Account Management**
-    - Delete account cascades across all 31 tables
-    - Download my data export integrity
+## Batch E — Migration: react-helmet → react-helmet-async
 
-## How I will do it (read-only)
+**E1. Migrate 48 files** to `react-helmet-async`.
+- Add `<HelmetProvider>` at app root.
+- Replace `import { Helmet } from 'react-helmet'` everywhere.
+- Removes the recurring HMR `removeChild` errors.
 
-- Database queries via `supabase--read_query` for every count and integrity check
-- Supabase linter + security scan
-- Edge function logs review for the last 24–72h on critical functions
-- Stripe live data via `stripe--list_subscriptions`
-- Code reads of every screen listed above to confirm logic matches DB rules
-- Cross-check public page counts vs admin page counts vs raw DB
+## Batch F — Storage & SDK Hardening
 
-## Deliverable
+**F1. Tighten storage bucket LIST policies** (`avatars`, `message-attachments`, `contact-files`).
+- Restrict LIST to owner / admin only; keep public READ on the public buckets.
 
-A single structured **Audit Report** with this exact format, written to `/mnt/documents/SMARTYGYM_FULL_AUDIT_<date>.md` and summarized in chat:
+**F2. Align Stripe SDK to v18.5.0** across all edge functions.
 
-For every area:
-- ✅ **Working** — what's verified correct, with the number proving it
-- ⚠️ **Warning** — works but inconsistent, mislabeled, or fragile
-- 🔴 **Broken** — actual bug, with: where, why, impact, and exact fix
-- 🟡 **Recommendation** — improvement, not a bug
+## Batch G — Final Verification Pass
 
-At the end:
-- **Severity-ranked fix list** (Critical → High → Medium → Low)
-- **Estimated effort per fix** (single migration / single file / multi-file / requires plan)
-- **Suggested fix order** so you can approve them one batch at a time instead of one giant change
+After A–F:
+- Re-run the audit queries.
+- Generate `SMARTYGYM_POST_FIX_REPORT_<date>.md` showing before/after numbers for every issue.
+- Confirm: 0 broken exercise links, 30/30 articles with SEO, 0 NULL renewal dates on paid subs, email log populated.
 
-## What this pass will NOT do
+## Execution rules
 
-- No code edits
-- No migrations
-- No Stripe changes
-- No content generation
-- No WOD regeneration
+- One batch at a time, in order A → G.
+- After each batch: short status message with numbers proving the fix.
+- If any batch surfaces a new blocker (e.g. Stripe key missing scope), I stop and ask before continuing.
+- No new features added. No layout changes. Audit-driven repairs only.
 
-You get the full picture first. Then you choose what gets fixed and when.
+## Files / systems touched
+
+- `supabase/functions/delete-user-account/index.ts`
+- `supabase/functions/batch-relink-exercises/*` (run only, no code change unless needed)
+- `supabase/functions/sync-stripe-subscription/*` (used to backfill)
+- `supabase/functions/seo-blog-generator/*` (run only)
+- `supabase/functions/send-scheduled-emails/*`, `send-automated-messages/*` (debug)
+- All 48 files using `react-helmet`
+- Storage policy migration
+- Stripe SDK version bumps in affected functions
+
+## What I will NOT touch
+
+- Workout/program content
+- WOD generation logic
+- UI layout, theme, colors
+- Pricing
+- Cron schedule times
 
