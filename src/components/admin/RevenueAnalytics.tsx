@@ -103,14 +103,16 @@ export function RevenueAnalytics() {
       const purDetails: PurchaseDetail[] = [];
       const corpDetails: CorporateDetail[] = [];
 
-      // Fetch subscriptions with user emails - ONLY PAID (has stripe_subscription_id)
+      // Fetch subscriptions with user emails — use ACTIVE-OVERLAP semantics so
+      // recurring revenue created before the window but still active in it is
+      // counted. (Filtering by `created_at` alone undercounts MRR.)
       if (planFilter === "all" || planFilter === "gold" || planFilter === "platinum") {
         let subQuery = supabase
           .from("user_subscriptions")
           .select("id, user_id, plan_type, status, created_at, current_period_end, stripe_subscription_id")
           .eq("status", "active")
-          .gte("created_at", startDate.toISOString())
-          .lte("created_at", endDate.toISOString());
+          .lte("created_at", endDate.toISOString())
+          .or(`current_period_end.is.null,current_period_end.gte.${startDate.toISOString()}`);
 
         if (planFilter === "gold" || planFilter === "platinum") {
           subQuery = subQuery.eq("plan_type", planFilter);
@@ -262,14 +264,14 @@ export function RevenueAnalytics() {
         }
       }
 
-      // Fetch corporate subscriptions - ONLY PAID (has stripe_subscription_id AND stripe_customer_id)
+      // Fetch corporate subscriptions — active-overlap semantics (same rule).
       if (planFilter === "all" || planFilter === "corporate") {
         const { data: corporateSubs } = await supabase
           .from("corporate_subscriptions")
           .select("*, stripe_subscription_id, stripe_customer_id")
           .eq("status", "active")
-          .gte("created_at", startDate.toISOString())
-          .lte("created_at", endDate.toISOString());
+          .lte("created_at", endDate.toISOString())
+          .or(`current_period_end.is.null,current_period_end.gte.${startDate.toISOString()}`);
 
         corporateSubs?.forEach((corp) => {
           const isPaid = !!(corp.stripe_subscription_id && corp.stripe_customer_id);

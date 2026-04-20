@@ -87,11 +87,17 @@ export function CorporateAnalytics() {
       setLoading(true);
       const { startDate, endDate } = getDateRange();
 
-      // Fetch corporate subscriptions
+      // Fetch corporate subscriptions.
+      // Use ACTIVE-OVERLAP semantics for date filtering: include any sub that
+      // was created on/before endDate AND is still active inside the window
+      // (current_period_end is null or >= startDate). Filtering only by
+      // created_at undercounts active recurring revenue.
       let query = supabase.from("corporate_subscriptions").select("*");
-      
+
       if (startDate) {
-        query = query.gte("created_at", startDate.toISOString());
+        query = query
+          .lte("created_at", endDate.toISOString())
+          .or(`current_period_end.is.null,current_period_end.gte.${startDate.toISOString()}`);
       }
 
       const { data: subscriptions, error } = await query.order("created_at", { ascending: false });
