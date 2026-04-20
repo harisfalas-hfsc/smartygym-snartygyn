@@ -24,6 +24,14 @@ import { PopularAnalytics } from "./analytics/PopularAnalytics";
 import { BusinessReportExport } from "./analytics/BusinessReportExport";
 import html2canvas from "html2canvas";
 import { SUBSCRIPTION_PRICES, SUBSCRIPTION_BILLING_PERIODS, CORPORATE_PRICES } from "@/config/pricing";
+import {
+  fetchWorkoutLibraryCounts,
+  fetchAvailableProgramsCount,
+  fetchAvailableRitualsCount,
+  fetchFilteredVisitorCount,
+  computePremiumCounts,
+  computeNonPremiumUsers,
+} from "@/lib/admin-analytics";
 
 interface AnalyticsData {
   totalUsers: number;
@@ -39,6 +47,10 @@ interface AnalyticsData {
   avgWorkoutCompletionRate: number;
   avgProgramCompletionRate: number;
   totalWorkouts: number;
+  // Workout library breakdown (matches public /workouts page)
+  availableWorkouts: number;     // visible & not WOD
+  activeWODs: number;
+  hiddenWorkouts: number;
   totalPrograms: number;
   totalRituals: number;
   totalCheckins: number;
