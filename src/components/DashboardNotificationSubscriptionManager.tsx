@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Loader2, Dumbbell, Sun, Zap, Plus, BookOpen, FileText, BarChart3, Bell, CalendarClock, Trophy } from "lucide-react";
+import { Loader2, Dumbbell, Sun, Zap, Plus, BookOpen, FileText, BarChart3, Bell, CalendarClock, Trophy, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 interface DashboardNotificationPreferences {
@@ -18,6 +18,7 @@ interface DashboardNotificationPreferences {
   dashboard_scheduled_workout_reminders: boolean;
   dashboard_scheduled_program_reminders: boolean;
   dashboard_goal_achievement: boolean;
+  dashboard_welcome_onboarding: boolean;
 }
 
 const DEFAULT_PREFERENCES: DashboardNotificationPreferences = {
@@ -32,6 +33,7 @@ const DEFAULT_PREFERENCES: DashboardNotificationPreferences = {
   dashboard_scheduled_workout_reminders: true,
   dashboard_scheduled_program_reminders: true,
   dashboard_goal_achievement: true,
+  dashboard_welcome_onboarding: true,
 };
 
 const NOTIFICATION_OPTIONS = [
@@ -101,6 +103,12 @@ const NOTIFICATION_OPTIONS = [
     description: "Get notified when you reach your fitness goals",
     icon: Trophy,
   },
+  {
+    key: "dashboard_welcome_onboarding" as keyof DashboardNotificationPreferences,
+    label: "Welcome Onboarding Guide",
+    description: "Day-5 onboarding guide for new premium members",
+    icon: Sparkles,
+  },
 ];
 
 export const DashboardNotificationSubscriptionManager = () => {
@@ -142,6 +150,7 @@ export const DashboardNotificationSubscriptionManager = () => {
           dashboard_scheduled_workout_reminders: prefs.dashboard_scheduled_workout_reminders !== false,
           dashboard_scheduled_program_reminders: prefs.dashboard_scheduled_program_reminders !== false,
           dashboard_goal_achievement: prefs.dashboard_goal_achievement !== false,
+          dashboard_welcome_onboarding: prefs.dashboard_welcome_onboarding !== false,
         });
       }
     } catch (err) {
