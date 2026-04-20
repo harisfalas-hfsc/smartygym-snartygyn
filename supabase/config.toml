@@ -270,3 +270,6 @@ verify_jwt = false
 
 [functions.bulk-format-consistency-repair]
 verify_jwt = false
+
+[functions.generate-free-category-workouts]
+verify_jwt = false
