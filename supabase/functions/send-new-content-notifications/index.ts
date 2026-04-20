@@ -117,6 +117,7 @@ serve(async (req) => {
     let emailFailed = 0;
     let emailSkipped = 0;
     const emailErrors: { email: string; error: string }[] = [];
+    const dashboardErrors: { user_id: string; error: string }[] = [];
 
     // Handle articles
     if (articleCount > 0) {
