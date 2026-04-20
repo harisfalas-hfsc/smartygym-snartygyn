@@ -187,6 +187,11 @@ function fixHtml(
     return `<li>${content}</li>`;
   });
 
+  // GUARD: collapse any accidental `}} (male) (male) ...` chains that may have
+  // leaked through during matching. The suffix is already inside the
+  // {{exercise:id:name (male)}} markup, so trailing duplicates are pure noise.
+  h = h.replace(/(\}\})\s*(\([a-zA-Z]+\)\s*){2,}/g, "$1");
+
   return h;
 }
 
