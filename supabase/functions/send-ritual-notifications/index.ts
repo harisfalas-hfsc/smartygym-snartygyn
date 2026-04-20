@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
 import { MESSAGE_TYPES } from "../_shared/notification-types.ts";
+import { logEmailDelivery } from "../_shared/email-log.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -240,12 +241,33 @@ ${getEmailFooter(authUser.email, 'ritual')}
 
         if (emailResult.error) {
           logStep("Email API error", { email: authUser.email, error: emailResult.error });
+          await logEmailDelivery({
+            userId: authUser.id,
+            toEmail: authUser.email,
+            messageType: MESSAGE_TYPES.DAILY_RITUAL,
+            status: "failed",
+            errorMessage: typeof emailResult.error === 'string' ? emailResult.error : JSON.stringify(emailResult.error),
+          });
         } else {
           emailsSent++;
+          await logEmailDelivery({
+            userId: authUser.id,
+            toEmail: authUser.email,
+            messageType: MESSAGE_TYPES.DAILY_RITUAL,
+            status: "sent",
+            resendId: emailResult.data?.id ?? null,
+          });
           await new Promise(resolve => setTimeout(resolve, 600));
         }
       } catch (e) {
         logStep("Email send error", { email: authUser.email, error: e });
+        await logEmailDelivery({
+          userId: authUser.id,
+          toEmail: authUser.email,
+          messageType: MESSAGE_TYPES.DAILY_RITUAL,
+          status: "failed",
+          errorMessage: e instanceof Error ? e.message : String(e),
+        });
       }
     }
 

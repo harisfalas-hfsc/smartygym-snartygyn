@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@3.5.0";
 import { getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
 import { MESSAGE_TYPES } from "../_shared/notification-types.ts";
+import { logEmailDelivery } from "../_shared/email-log.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -189,6 +190,14 @@ serve(async (req) => {
     });
 
     logStep("Notification email sent", { emailId: emailResponse.data?.id });
+    await logEmailDelivery({
+      userId,
+      toEmail: userEmail,
+      messageType: MESSAGE_TYPES.PROGRAM_DELIVERED,
+      status: emailResponse.error ? "failed" : "sent",
+      resendId: emailResponse.data?.id ?? null,
+      errorMessage: emailResponse.error ? JSON.stringify(emailResponse.error) : null,
+    });
 
     return new Response(
       JSON.stringify({ success: true, emailId: emailResponse.data?.id }),

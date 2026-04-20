@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@3.5.0";
 import { convertTiptapToEmailHtml, getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
 import { MESSAGE_TYPES } from "../_shared/notification-types.ts";
+import { logEmailDelivery } from "../_shared/email-log.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -205,6 +206,12 @@ serve(async (req) => {
           success: true, 
           id: emailResponse.data?.id 
         });
+        await logEmailDelivery({
+          toEmail: recipient.email!,
+          messageType: MESSAGE_TYPES.MASS_NOTIFICATION,
+          status: "sent",
+          resendId: emailResponse.data?.id ?? null,
+        });
         
       } catch (error) {
         console.error(`Failed to send to ${recipient.email}:`, error);
@@ -212,6 +219,12 @@ serve(async (req) => {
           email: recipient.email, 
           success: false, 
           error: error instanceof Error ? error.message : String(error)
+        });
+        await logEmailDelivery({
+          toEmail: recipient.email!,
+          messageType: MESSAGE_TYPES.MASS_NOTIFICATION,
+          status: "failed",
+          errorMessage: error instanceof Error ? error.message : String(error),
         });
       }
     }

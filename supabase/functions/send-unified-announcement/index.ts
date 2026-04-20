@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { wrapInEmailTemplate, getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
+import { logEmailDelivery } from "../_shared/email-log.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -123,12 +124,33 @@ serve(async (req) => {
           
           if (emailResult.error) {
             logStep("ERROR sending email", { userId, error: emailResult.error });
+            await logEmailDelivery({
+              userId,
+              toEmail: userEmail,
+              messageType: safeMessageType,
+              status: "failed",
+              errorMessage: typeof emailResult.error === 'string' ? emailResult.error : JSON.stringify(emailResult.error),
+            });
           } else {
+            await logEmailDelivery({
+              userId,
+              toEmail: userEmail,
+              messageType: safeMessageType,
+              status: "sent",
+              resendId: emailResult.data?.id ?? null,
+            });
             // Rate limiting: 600ms delay to respect Resend's 2 requests/second limit
             await new Promise(resolve => setTimeout(resolve, 600));
           }
         } catch (emailError) {
           logStep("ERROR sending email", { userId, error: emailError });
+          await logEmailDelivery({
+            userId,
+            toEmail: userEmail,
+            messageType: safeMessageType,
+            status: "failed",
+            errorMessage: emailError instanceof Error ? emailError.message : String(emailError),
+          });
         }
 
         sentCount++;

@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
 import { MESSAGE_TYPES } from "../_shared/notification-types.ts";
+import { logEmailDelivery } from "../_shared/email-log.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -259,8 +260,22 @@ serve(async (req) => {
           });
           emailSent = true;
           logStep("Email sent successfully", { emailId: emailResult?.data?.id });
+          await logEmailDelivery({
+            userId: record.user_id,
+            toEmail: userEmail,
+            messageType: MESSAGE_TYPES.WELCOME,
+            status: "sent",
+            resendId: emailResult?.data?.id ?? null,
+          });
         } catch (emailError: any) {
           logStep("Error sending email", { error: emailError.message || String(emailError) });
+          await logEmailDelivery({
+            userId: record.user_id,
+            toEmail: userEmail,
+            messageType: MESSAGE_TYPES.WELCOME,
+            status: "failed",
+            errorMessage: emailError?.message || String(emailError),
+          });
         }
       }
     }
