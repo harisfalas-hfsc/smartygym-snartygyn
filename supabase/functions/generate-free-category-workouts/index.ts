@@ -285,6 +285,8 @@ async function generateOne(
   fullExercises: ExerciseBasic[],
   fullRefList: string,
   bannedNames: string[],
+  difficulty: string,
+  difficultyStars: number,
 ): Promise<{ ok: boolean; id?: string; name?: string; error?: string }> {
   const { category, equipment } = job;
   const { format, duration } = pickFormat(category);
@@ -294,8 +296,8 @@ async function generateOne(
   const MAX_ATTEMPTS = 2;
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     try {
-      log(`Generating`, { category, equipment, format, duration, attempt });
-      const prompt = buildPrompt({ category, equipment, format, duration, referenceList, bannedNames });
+      log(`Generating`, { category, equipment, format, duration, difficulty, attempt });
+      const prompt = buildPrompt({ category, equipment, format, duration, referenceList, bannedNames, difficulty, difficultyStars });
       const content = await callAI(apiKey, prompt);
       if (!content) throw new Error("All AI models failed");
 
