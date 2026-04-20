@@ -95,8 +95,12 @@ function buildPrompt(args: {
   duration: string;
   referenceList: string;
   bannedNames: string[];
+  difficulty: string;
+  difficultyStars: number;
 }): string {
-  const { category, equipment, format, duration, referenceList, bannedNames } = args;
+  const { category, equipment, format, duration, referenceList, bannedNames, difficulty, difficultyStars } = args;
+  const difficultyLc = difficulty.toLowerCase();
+  const isBeginner = difficultyLc === "beginner";
 
   const bannedBlock = bannedNames.length
     ? `\n⛔ BANNED NAMES — these names already exist for ${category}; DO NOT use any of them or minor variations:\n${bannedNames.map(n => `   ❌ "${n}"`).join("\n")}\n`
