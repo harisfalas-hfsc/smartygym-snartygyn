@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Loader2, Dumbbell, Sun, Zap, Plus, BookOpen, FileText, BarChart3, Bell, CalendarClock, Trophy } from "lucide-react";
+import { Loader2, Dumbbell, Sun, Zap, Plus, BookOpen, FileText, BarChart3, Bell, CalendarClock, Trophy, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 interface EmailPreferences {
@@ -18,6 +18,7 @@ interface EmailPreferences {
   email_scheduled_workout_reminders: boolean;
   email_scheduled_program_reminders: boolean;
   email_goal_achievement: boolean;
+  email_welcome_onboarding: boolean;
   opt_out_all: boolean;
 }
 
@@ -33,6 +34,7 @@ const DEFAULT_PREFERENCES: EmailPreferences = {
   email_scheduled_workout_reminders: true,
   email_scheduled_program_reminders: true,
   email_goal_achievement: true,
+  email_welcome_onboarding: true,
   opt_out_all: false,
 };
 
@@ -114,6 +116,13 @@ const EMAIL_OPTIONS = [
     timing: "Sent when you achieve a goal",
     icon: Trophy,
   },
+  {
+    key: "email_welcome_onboarding" as keyof EmailPreferences,
+    label: "Welcome Onboarding Guide",
+    description: "Day-5 onboarding guide for new premium members",
+    timing: "Sent 5 days after signup",
+    icon: Sparkles,
+  },
 ];
 
 export const EmailSubscriptionManager = () => {
@@ -155,6 +164,7 @@ export const EmailSubscriptionManager = () => {
           email_scheduled_workout_reminders: prefs.email_scheduled_workout_reminders !== false,
           email_scheduled_program_reminders: prefs.email_scheduled_program_reminders !== false,
           email_goal_achievement: prefs.email_goal_achievement !== false,
+          email_welcome_onboarding: prefs.email_welcome_onboarding !== false,
           opt_out_all: prefs.opt_out_all === true,
         });
       }
