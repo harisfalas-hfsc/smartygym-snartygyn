@@ -497,7 +497,7 @@ export default function TakeATour() {
               </p>
               <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-3 text-center">
                 <p className="text-sm font-semibold text-green-600 dark:text-green-400">
-                  🎉 Try free for 7 days — cancel anytime. No commitment.
+                  🎉 Try free for 3 days — cancel anytime. No commitment.
                 </p>
               </div>
 
@@ -593,7 +593,7 @@ export default function TakeATour() {
                   </Link>
                   <Link to="/auth?mode=signup&trial=true">
                     <Button size="sm" variant="default" className="bg-green-600 hover:bg-green-700">
-                      Start 7-Day Free Trial
+                      Start 3-Day Free Trial
                     </Button>
                   </Link>
                 </div>

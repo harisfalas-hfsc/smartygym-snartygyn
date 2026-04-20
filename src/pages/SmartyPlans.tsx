@@ -339,7 +339,7 @@ export default function SmartyPlans() {
                 Join thousands of members who've upgraded to premium and achieved their fitness goals
               </p>
               <p className="text-sm font-semibold text-primary mt-2">
-                🎉 Try free for 7 days. Cancel anytime.
+                🎉 Try free for 3 days. Cancel anytime.
               </p>
             </div>
           </div>
@@ -521,7 +521,7 @@ export default function SmartyPlans() {
                     <Badge className="bg-[#D4AF37] text-white mx-auto mb-3 sm:mb-4">MONTHLY</Badge>
                     <CardTitle className="text-2xl sm:text-3xl font-bold">€{goldOriginal.toFixed(2)}</CardTitle>
                     <p className="text-xs sm:text-sm text-muted-foreground">per month</p>
-                    <p className="text-xs text-green-600 font-semibold mt-2">🎉 7 days free trial included</p>
+                    <p className="text-xs text-green-600 font-semibold mt-2">🎉 3 days free trial included</p>
                     <p className="text-xs text-[#D4AF37] font-semibold mt-1">🔄 Auto-renews monthly</p>
                   </CardHeader>
                   <CardContent className="space-y-2 sm:space-y-4 flex-1 flex flex-col">
@@ -539,7 +539,7 @@ export default function SmartyPlans() {
                         onClick={() => handleSubscribe('gold')}
                         disabled={loading}
                       >
-                        {loading ? "Processing..." : "Start 7-Day Free Trial"}
+                        {loading ? "Processing..." : "Start 3-Day Free Trial"}
                       </Button>
                       <p className="text-xs text-center text-muted-foreground">Auto-renews each month</p>
                     </div>
