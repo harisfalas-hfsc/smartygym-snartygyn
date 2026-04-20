@@ -514,8 +514,8 @@ const handler = async (req: Request): Promise<Response> => {
       }
     }
 
-    // Log to audit
-    await supabase.from('notification_audit_log').insert({
+    // Log to audit (capture errors so silent failures become visible)
+    const { error: auditError } = await supabase.from('notification_audit_log').insert({
       notification_type: MESSAGE_TYPES.WEEKLY_ACTIVITY_REPORT,
       message_type: MESSAGE_TYPES.WEEKLY_ACTIVITY_REPORT,
       recipient_count: users.length,
@@ -531,6 +531,9 @@ const handler = async (req: Request): Promise<Response> => {
         skippedPrefs,
       }
     });
+    if (auditError) {
+      logStep("⚠️ Audit insert failed", { error: auditError.message, code: auditError.code });
+    }
 
     logStep(`Weekly reports completed`, { 
       successCount, 

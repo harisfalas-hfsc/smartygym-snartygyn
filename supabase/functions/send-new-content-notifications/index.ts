@@ -117,6 +117,7 @@ serve(async (req) => {
     let emailFailed = 0;
     let emailSkipped = 0;
     const emailErrors: { email: string; error: string }[] = [];
+    const dashboardErrors: { user_id: string; error: string }[] = [];
 
     // Handle articles
     if (articleCount > 0) {
@@ -169,6 +170,8 @@ serve(async (req) => {
           });
           if (msgError) {
             dashboardFailed++;
+            dashboardErrors.push({ user_id: user.id, error: msgError.message });
+            logStep("❌ Article dashboard insert failed", { userId: user.id, error: msgError.message, code: msgError.code });
           } else {
             dashboardSuccess++;
           }
@@ -347,8 +350,9 @@ serve(async (req) => {
             });
 
           if (msgError) {
-            logStep("❌ Dashboard message failed", { userId: user.id, error: msgError.message });
+            logStep("❌ Dashboard message failed", { userId: user.id, error: msgError.message, code: msgError.code });
             dashboardFailed++;
+            dashboardErrors.push({ user_id: user.id, error: msgError.message });
           } else {
             dashboardSuccess++;
           }
@@ -401,17 +405,20 @@ serve(async (req) => {
       subject: subject || `Content notification (${articleCount} articles)`,
       content: dashboardContent || "Article notifications sent",
       recipient_count: users.length,
-      success_count: dashboardSuccess,
-      failed_count: dashboardFailed,
+      success_count: dashboardSuccess + emailSuccess,
+      failed_count: dashboardFailed + emailFailed,
       metadata: {
         workouts_count: workoutCount,
         programs_count: programCount,
         articles_count: articleCount,
+        dashboard_success: dashboardSuccess,
+        dashboard_failed: dashboardFailed,
         dashboard_skipped: dashboardSkipped,
         email_success: emailSuccess,
         email_failed: emailFailed,
         email_skipped: emailSkipped,
-        email_errors: emailErrors.length > 0 ? emailErrors : undefined,
+        email_errors: emailErrors.length > 0 ? emailErrors.slice(0, 10) : undefined,
+        dashboard_errors: dashboardErrors.length > 0 ? dashboardErrors.slice(0, 10) : undefined,
       },
     });
 
