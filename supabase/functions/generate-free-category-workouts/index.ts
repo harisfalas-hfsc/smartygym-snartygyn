@@ -108,12 +108,12 @@ function buildPrompt(args: {
 
   const isRepsSets = category === "STRENGTH" || category === "MOBILITY & STABILITY";
 
-  return `You are Haris Falas, Sports Scientist (CSCS), creating a premium FREE intermediate workout for SmartyGym.
+  return `You are Haris Falas, Sports Scientist (CSCS), creating a premium FREE ${difficultyLc} workout for SmartyGym.
 
 WORKOUT SPEC:
 - Category: ${category}
 - Equipment: ${equipment === "BODYWEIGHT" ? "BODYWEIGHT ONLY (no equipment)" : "GYM EQUIPMENT (dumbbells, kettlebells, barbells, machines, bands, etc.)"}
-- Difficulty: Intermediate (3 stars out of 6)
+- Difficulty: ${difficulty} (${difficultyStars} stars out of 6)${isBeginner ? "\n- IMPORTANT: BEGINNER level — choose foundational, low-skill exercises only. Lower volume, longer rest, simpler progressions. Avoid advanced movements (muscle-ups, pistol squats, plyometric depth jumps, heavy Olympic lifts, single-arm advanced KB work). Use regressions where appropriate." : ""}
 - Format: ${format}
 - Target Main+Finisher Duration: ${duration}
 
