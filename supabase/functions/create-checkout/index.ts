@@ -107,7 +107,7 @@ serve(async (req) => {
         project: "SMARTYGYM",
       },
       subscription_data: {
-        ...(trial ? { trial_period_days: 7 } : {}),
+        ...(trial ? { trial_period_days: 3 } : {}),
         metadata: {
           project: "SMARTYGYM",
           user_id: user.id,

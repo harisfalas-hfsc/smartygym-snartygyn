@@ -109,16 +109,16 @@ export function FreeTrialPopup() {
           <div className="flex flex-col p-5 sm:p-6">
             <div className="mb-3">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider">
-                <Crown className="w-3.5 h-3.5" /> 7-Day Free Trial
+                <Crown className="w-3.5 h-3.5" /> 3-Day Free Trial
               </span>
             </div>
 
             <h2 className="text-2xl sm:text-3xl font-bold text-foreground leading-tight mb-3">
-              Try Premium Free<br />for 7 Days
+              Try Premium Free<br />for 3 Days
             </h2>
 
             <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-4">
-              Get unlimited access to all workouts, training programs, and premium tools. No charge for 7 days — cancel anytime.
+              Get unlimited access to all workouts, training programs, and premium tools. No charge for 3 days — cancel anytime.
             </p>
 
             <div className="flex items-center gap-4 mb-4">
