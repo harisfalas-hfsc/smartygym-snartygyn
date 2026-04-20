@@ -1,45 +1,39 @@
 
 
-## Plan: Change 7-day trial → 3-day trial everywhere
+## Issue
 
-### Code changes (all visible copy + Stripe trial length)
+The text on Stripe's checkout page comes from the **Stripe Product `description` field** (set in Stripe, not in our code). Both products have wrong/typo'd descriptions:
 
-**1. `supabase/functions/create-checkout/index.ts`** (line 110)
-- Change `trial_period_days: 7` → `trial_period_days: 3`
-- This affects only NEW checkout sessions. Existing active subscriptions (already on a 7-day trial or paying) are untouched. No risk to Stripe — same field, just a different number. Auto-renewal behavior is identical.
+**Gold Plan (`prod_TFfAcybp438BH6`)** — current:
+> "Ome month is perfect if you want to test the Smarty Gym experience or need a quick push to get back on track. In just 60 days, you'll have access to a wide variety of workouts..."
 
-**2. `src/pages/SmartyPlans.tsx`**
-- Line 342: "🎉 Try free for 7 days. Cancel anytime." → "🎉 Try free for 3 days. Cancel anytime."
-- Line 524 (Gold card): "🎉 7 days free trial included" → "🎉 3 days free trial included"
-- Line 542 (Gold button): "Start 7-Day Free Trial" → "Start 3-Day Free Trial"
-- Line 563 (Platinum card): "🎉 7 days free trial included" → "🎉 3 days free trial included"
-- Line 581 (Platinum button): "Start 7-Day Free Trial" → "Start 3-Day Free Trial"
+Problems: typo "Ome", says "60 days" (nonsense for a monthly plan), generic.
 
-**3. `src/pages/TakeATour.tsx`**
-- Line 500: "🎉 Try free for 7 days — cancel anytime. No commitment." → "🎉 Try free for 3 days — cancel anytime. No commitment."
-- Line 596: "Start 7-Day Free Trial" → "Start 3-Day Free Trial"
+**Platinum Plan (`prod_TFfAPp1tq7RdUk`)** — current:
+> "One full year, one powerful decision. This transformation **GOLD Plan** is the ultimate commitment..."
 
-**4. `src/components/growth/FreeTrialPopup.tsx`** (the popup announcement)
-- Line 112 badge: "7-Day Free Trial" → "3-Day Free Trial"
-- Line 117 heading: "Try Premium Free for 7 Days" → "Try Premium Free for 3 Days"
-- Line 121 body: "No charge for 7 days — cancel anytime." → "No charge for 3 days — cancel anytime."
+Problem: calls itself "GOLD Plan" — wrong, this is the Platinum/yearly plan.
 
-### Intentionally NOT changed
-- `src/utils/socialMediaContent.ts` — historical/launch copy in admin Social Media tool, not user-facing on site. Leaving avoids rewriting past campaign archives. (Can change if you want — say the word.)
-- All other "7 days" matches are unrelated (analytics filters, check-in windows, periodization, backups, app review timelines, etc.).
-- FAQ / JoinPremium — already do not mention "7 days" specifically.
-- `send-renewal-reminders` — already uses 3 days (renewal reminder timing), unrelated to trial length.
-- DB message templates — none mention the trial length.
+## Fix
 
-### Stripe safety
-Trial length lives only in `subscription_data.trial_period_days` at checkout-session creation. Changing 7 → 3 is a one-character edit with zero side effects:
-- Existing subscribers: unaffected (their trial/billing cycle was set when their session was created).
-- New subscribers: get a 3-day trial, then auto-charged exactly as before via the same hardened pipeline (forced card collection + hourly auto-finalize fallback).
-- Stripe products and prices are unchanged.
+Update both Stripe product descriptions via the Stripe API. No code changes — just metadata on the Stripe products. Zero impact on subscriptions, prices, billing, or auto-renewal.
 
-### Verification after implementation
-1. Visit `/plans` → confirm all copy says "3 days" / "3-Day".
-2. Visit `/take-a-tour` → confirm the green banner and CTA button say "3 days" / "3-Day".
-3. Trigger the Free Trial popup → confirm badge, heading, and body say "3 days".
-4. Test a checkout in Stripe test mode → confirm Stripe shows a 3-day trial on the new subscription.
+**New Gold Plan description (monthly, €9.99/mo):**
+> "Smarty Gym Gold — your monthly all-access pass. Unlimited workouts, training programs, the daily Workout of the Day, and all Smarty Tools. Perfect if you want flexibility month-to-month with no long commitment. Cancel anytime."
+
+**New Platinum Plan description (yearly, €89.99/yr):**
+> "Smarty Gym Platinum — your full-year all-access pass. 12 months of unlimited workouts, training programs, the daily Workout of the Day, and all Smarty Tools at the best value (save vs monthly). Built for lasting results and consistent progress year-round."
+
+## Steps
+
+1. Call `stripe--stripe_api_execute` → `PostProductsId` for `prod_TFfAcybp438BH6` with the new Gold description.
+2. Call `stripe--stripe_api_execute` → `PostProductsId` for `prod_TFfAPp1tq7RdUk` with the new Platinum description.
+3. Confirm both updates by re-fetching the products.
+4. Tell the user to refresh / re-open the Stripe checkout page to see the corrected text.
+
+## Safety
+
+- Only the `description` field changes. Name, price, currency, billing interval, trial settings — all untouched.
+- No code/files changed. No deploy needed.
+- Existing and new subscribers are unaffected. Auto-renewal pipeline is unchanged.
 
