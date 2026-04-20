@@ -1,173 +1,109 @@
 
-Fix the admin analytics by aligning every count with the same business rules the live product uses.
 
-## What is already verified
+# Full Website Audit — SmartyGym
 
-### Workouts
-The mismatch is real and explainable:
+I will run a complete, end-to-end audit of the entire platform and deliver a single written report. **No code changes** in this pass — audit only. Once you read the report, you decide what to fix and in what order.
 
-- `admin_workouts` total rows: 353
-- visible rows: 352
-- hidden rows: 1
-- active WOD rows: 2
-- visible non-WOD library workouts: 350
+## Scope (every area, nothing skipped)
 
-So:
-- Admin Analytics currently shows **353** because it counts all workout rows
-- Smarty Workouts page shows **350** because it excludes:
-  - the 2 active WOD rows
-  - the 1 hidden row
+1. **Access Control & Security**
+   - Guest / Subscriber / Premium / Admin tier rules vs actual code paths
+   - All RLS policies on every table (admin visibility, user privacy, public reads)
+   - Edge function JWT checks, server-side purchase rejection for premium
+   - Admin route protection, role checks, `has_role` usage
+   - Supabase linter + security scan (leaked passwords, exposed schemas, etc.)
 
-The current card label says “Available workouts”, but the query is not using the same “available in library” rules.
+2. **Admin Back Office / Analytics**
+   - Re-verify all dashboard counters after the recent fix (workouts 350, users 51, subs 3)
+   - Revenue tab, Purchases tab, Growth tab, Completion tab, Popular tab, Website tab, Corporate tab, Shop tab, Social Analytics
+   - Business report export numbers vs dashboard numbers
+   - Cron jobs status, system health audit, edge function error rates
 
-### Subscriptions / users
-Current backend numbers:
-- profiles: 54
-- active non-free subscribers: 3
-- paid premium subscribers: 1
-- complimentary/manual premium subscribers: 2
-- free or inactive subscription rows: 13
-- profiles with no subscription row at all: 38
+3. **Subscriptions, Payments, Stripe**
+   - Live Stripe vs DB reconciliation (Manos / Maria / Applab + any others)
+   - Renewal reminders, 7-day trial flow, auto-finalization, webhook health
+   - Standalone purchases: hidden for premium, accessible to subscribers, RLS correct
+   - Refund / cancel / expired-access read-only behavior
 
-So the current **Free Users = 13** card is also misleading if it means “non-premium users”.  
-The real non-premium account count is **54 - 3 = 51**.
+4. **Workouts & Training Programs**
+   - Library count vs admin count vs public page count (the 350 / 353 issue)
+   - Hidden / archived / WOD lifecycle integrity
+   - Exercise linking (`{{exercise:ID:Name}}`) coverage and broken links
+   - Image generation backlog (workouts/programs without images)
+   - Format/density rules, naming uniqueness, duplicate detection
 
-### Other counts checked
-- programs: 28 visible, 28 total
-- rituals: 140 visible, 140 total
-- check-ins: 25
-- comments: 11
-- standalone purchases: 0
-- corporate active: 1 manual, 0 paid
-- website raw visit rows: 9,934
+5. **WOD System**
+   - Today's WOD bodyweight + equipment both live and matching
+   - Archival lifecycle, all-or-none publishing, Stripe idempotency
+   - Recent failures from the beginner/intermediate generation runs
 
-### Website analytics inconsistency
-The overview card uses a raw `social_media_analytics` count, but the Website Analytics tab uses filtered logic/RPC that removes preview traffic, bots, crawlers, Lovable noise, etc. Those two can disagree.
+6. **Messages & Notifications**
+   - Web / Email / Push parity (the 100% parity standard)
+   - Welcome onboarding sequence trigger health
+   - Renewal reminder schedule
+   - Pending content notifications queue (workouts/programs/articles)
+   - Cron job health for `send-scheduled-notifications` and `send-automated-messages`
 
-### Extra UI issue found
-`ShopAnalytics` exists as a tab panel but has **no tab trigger**, so that analytics page is currently unreachable from the UI.
+7. **Tools, Calendar, Goals, PAR-Q, Check-ins**
+   - Workout Timer, Calorie Counter, Macro Calculator history sync
+   - Native `.ics` export
+   - Goal completion tracking (workouts + programs counters)
+   - PAR-Q compliance gating
+   - Check-in window (07–10 / 19–22) enforcement
 
----
+8. **Community & Testimonials**
+   - Leaderboards (workout + check-in + program) returning data
+   - Testimonials premium gating + structured data
+   - Comments / ratings RLS
 
-## Implementation plan
+9. **Blog & SEO**
+   - Automated weekly blog generation health
+   - JSON-LD, sitemaps (incl. image sitemap), social meta, favicon
+   - Broken internal links / non-whitelisted links
+   - React Helmet HMR risk check
 
-### 1) Centralize analytics definitions
-Create one shared admin analytics source of truth so all screens use the same counting rules.
+10. **Public Site, UI, Mobile**
+    - Every public route loads, no console errors
+    - 1024px breakpoint, dark/light theme defaults
+    - Stacked card layout, workout wrapper, carousel standards
+    - Google Ads tag (`G-VCRTFQDY85`) firing
+    - PWA / native-ready layer
 
-Canonical definitions:
-- **availableWorkouts** = `admin_workouts` where `is_visible != false` and not active WOD
-- **visibleWorkoutsIncludingWOD** = `admin_workouts` where `is_visible != false`
-- **activeWODs** = `is_workout_of_day = true`
-- **hiddenWorkouts** = `is_visible = false`
-- **availablePrograms** = visible programs only
-- **availableRituals** = visible rituals only
-- **activePremiumSubscribers** = active `gold|platinum`
-- **paidSubscribers** = active premium with `stripe_subscription_id`
-- **manualSubscribers** = active premium without `stripe_subscription_id`
-- **nonPremiumUsers** = total profiles minus distinct active premium users
-- **websiteVisitors** = filtered website analytics, not raw rows
+11. **GDPR & Account Management**
+    - Delete account cascades across all 31 tables
+    - Download my data export integrity
 
-### 2) Fix `AnalyticsDashboard.tsx`
-Update the top cards so they reflect the real product rules:
+## How I will do it (read-only)
 
-- **Total Workouts** → use library count (**350**) instead of all rows
-- change subtitle to something explicit like:
-  - “Library workouts”
-  - or “350 library • 2 active WOD • 1 hidden”
-- **Active Subscribers** subtitle should not say “Paid memberships” if the value includes complimentary/manual
-- **Free Users** should use non-premium accounts (**51** with current data), not only rows in `user_subscriptions`
-- **Website Visitors** should use the same filtered logic as the Website Analytics tab
+- Database queries via `supabase--read_query` for every count and integrity check
+- Supabase linter + security scan
+- Edge function logs review for the last 24–72h on critical functions
+- Stripe live data via `stripe--list_subscriptions`
+- Code reads of every screen listed above to confirm logic matches DB rules
+- Cross-check public page counts vs admin page counts vs raw DB
 
-### 3) Fix `BusinessReportExport.tsx`
-Make the export use the same exact metrics as the dashboard:
-- same workout/program/ritual visibility rules
-- same premium vs paid/manual definitions
-- same filtered website visitor logic
-- no mixing of “all-time Stripe total” with period-based standalone numbers unless labels clearly say so
+## Deliverable
 
-### 4) Fix revenue screens for time-range correctness
-Audit and correct:
-- `RevenueAnalytics.tsx`
-- `CorporateAnalytics.tsx`
+A single structured **Audit Report** with this exact format, written to `/mnt/documents/SMARTYGYM_FULL_AUDIT_<date>.md` and summarized in chat:
 
-Right now they filter subscriptions by `created_at` inside the selected window, which can undercount active recurring revenue. Update them so the time-based numbers follow one clear rule:
-- either “new sales created in period”
-- or “active revenue overlapping the period”
+For every area:
+- ✅ **Working** — what's verified correct, with the number proving it
+- ⚠️ **Warning** — works but inconsistent, mislabeled, or fragile
+- 🔴 **Broken** — actual bug, with: where, why, impact, and exact fix
+- 🟡 **Recommendation** — improvement, not a bug
 
-The labels and calculations must match exactly. For admin reporting, the better default is overlap/current-active logic.
+At the end:
+- **Severity-ranked fix list** (Critical → High → Medium → Low)
+- **Estimated effort per fix** (single migration / single file / multi-file / requires plan)
+- **Suggested fix order** so you can approve them one batch at a time instead of one giant change
 
-### 5) Align website/social analytics
-Audit and standardize:
-- `WebsiteAnalytics.tsx`
-- `SocialMediaAnalytics.tsx`
+## What this pass will NOT do
 
-Apply the same traffic exclusions everywhere:
-- preview traffic
-- Lovable traffic
-- bots/crawlers/spiders
-- common external scrapers
+- No code edits
+- No migrations
+- No Stripe changes
+- No content generation
+- No WOD regeneration
 
-This prevents the overview card, Website tab, and Social analytics from showing different visit totals for the same period.
+You get the full picture first. Then you choose what gets fixed and when.
 
-### 6) Restore the missing Shop analytics entry point
-In `AnalyticsDashboard.tsx`, add the missing `TabsTrigger` for the existing `shop` tab so the screen is actually reachable.
-
----
-
-## Files to update
-
-- `src/components/admin/AnalyticsDashboard.tsx`
-- `src/components/admin/analytics/BusinessReportExport.tsx`
-- `src/components/admin/RevenueAnalytics.tsx`
-- `src/components/admin/analytics/CorporateAnalytics.tsx`
-- `src/components/admin/analytics/WebsiteAnalytics.tsx`
-- `src/components/admin/SocialMediaAnalytics.tsx`
-
-Likely also add:
-- a shared helper such as `src/lib/admin-analytics.ts` or similar, to avoid duplicated counting logic
-
----
-
-## Expected result after the fix
-
-With current data, the main overview should read consistently:
-
-- Total Users: 54
-- Active Subscribers: 3
-- Paid Subscribers: 1
-- Complimentary Premium: 2
-- Free / Non-Premium Users: 51
-- Total Workouts: 350 library workouts
-- Programs: 28
-- Rituals: 140
-- Check-ins: 25
-- Comments: 11
-- Standalone purchases: 0
-- Corporate active: 1 manual, 0 paid
-
-And the Workout Analytics card will finally match the public Smarty Workouts page.
-
----
-
-## Verification after implementation
-
-After the fix, verify one by one:
-
-1. Admin Analytics overview cards
-2. Revenue tab
-3. Purchases tab
-4. Growth tab
-5. Completion tab
-6. Popular tab
-7. Website tab
-8. Corporate tab
-9. Social analytics page
-10. Business report export
-11. Smarty Workouts page count vs admin workout count labels
-
-Pass condition:
-- no mislabeled totals
-- no raw-vs-filtered visitor mismatch
-- no library-vs-WOD mismatch
-- no free-user undercount
-- no hidden analytics tabs
