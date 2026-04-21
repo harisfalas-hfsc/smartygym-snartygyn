@@ -93,6 +93,7 @@ import { FreeTrialPopup } from "./components/growth/FreeTrialPopup";
 
 import { SocialProofToast } from "./components/growth/SocialProofToast";
 import { PromoBanner } from "./components/growth/PromoBanner";
+import { SmartyCoachButton } from "./components/smarty-coach";
 
 // Redirect component for /dashboard to /userdashboard
 const DashboardRedirect = () => {
@@ -252,7 +253,7 @@ const AppContent = () => {
             </PageTransition>
           </div>
         <Footer />
-        
+        <SmartyCoachButton />
       </div>
     </AccessControlProvider>
     </>

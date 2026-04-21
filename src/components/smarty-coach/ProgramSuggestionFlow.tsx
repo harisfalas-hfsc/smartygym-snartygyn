@@ -9,6 +9,7 @@ import { useSmartyContext } from "@/hooks/useSmartyContext";
 import { generateProgramSuggestion, ProgramItem, ProgramAnswers } from "@/utils/smarty-coach/programSuggestionEngine";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { getProgramUrl } from "@/utils/smarty-coach/routes";
 
 interface ProgramSuggestionFlowProps {
   onBack: () => void;
@@ -43,10 +44,6 @@ const equipmentOptions = [
 ];
 
 type ProgramStep = 1 | 2 | 3 | 4 | 'result';
-
-const getCategorySlug = (category: string) => {
-  return category?.toLowerCase().replace(/\s+/g, "-").replace(/&/g, "and") || "general";
-};
 
 const getDifficultyColor = (difficulty: string | null) => {
   switch (difficulty?.toLowerCase()) {
@@ -96,8 +93,7 @@ export const ProgramSuggestionFlow = ({ onBack, onClose }: ProgramSuggestionFlow
 
   const handleSelectSuggestion = (item: ProgramItem) => {
     onClose();
-    const categorySlug = getCategorySlug(item.category);
-    navigate(`/programs/${categorySlug}/${item.id}`);
+    navigate(getProgramUrl(item.category, item.id));
   };
 
   if (isLoading) {

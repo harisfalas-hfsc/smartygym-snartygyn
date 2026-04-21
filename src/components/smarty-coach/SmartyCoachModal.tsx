@@ -21,6 +21,8 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAccessControl } from "@/contexts/AccessControlContext";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { getWorkoutUrl } from "@/utils/smarty-coach/routes";
+import { DialogDescription } from "@/components/ui/dialog";
 
 interface SmartyCoachModalProps {
   isOpen: boolean;
@@ -59,10 +61,6 @@ const equipmentOptions = [
   { label: "No equipment", value: "bodyweight" },
   { label: "Equipment available", value: "equipment" },
 ];
-
-const getCategorySlug = (category: string) => {
-  return category?.toLowerCase().replace(/\s+/g, "-").replace(/&/g, "and") || "strength";
-};
 
 type MainPath = 'menu' | 'workout' | 'program' | 'knowledge';
 type WorkoutStep = 1 | 2 | 3 | 4 | 5 | 'result';
@@ -174,8 +172,7 @@ export const SmartyCoachModal = ({ isOpen, onClose }: SmartyCoachModalProps) => 
   const handleSelectSuggestion = (item: ContentItem) => {
     logInteraction.mutate({ suggested_content_id: item.id, action_taken: 'accepted' });
     onClose();
-    const categorySlug = getCategorySlug(item.category);
-    navigate(`/workout/${categorySlug}/${item.id}`);
+    navigate(getWorkoutUrl(item.category, item.id));
   };
 
   const handleDismiss = () => {
@@ -235,12 +232,12 @@ export const SmartyCoachModal = ({ isOpen, onClose }: SmartyCoachModalProps) => 
             <Brain className="h-5 w-5 text-primary" />
             Smarty Coach
           </DialogTitle>
-          <p className="text-sm text-muted-foreground">
+          <DialogDescription className="text-sm text-muted-foreground">
             {activePath === 'menu' ? "I want to..." : 
              activePath === 'workout' ? "Let's find the perfect workout" :
              activePath === 'program' ? "Let's find the right program" :
              "Let's find something to read"}
-          </p>
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 pt-2">

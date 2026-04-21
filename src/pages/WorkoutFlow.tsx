@@ -19,7 +19,6 @@ import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext
 import { cn } from "@/lib/utils";
 import { CategoryCountBadge } from "@/components/ui/category-count-badge";
 import { SwipeToExplore } from "@/components/ui/SwipeToExplore";
-import { SmartyCoachButton } from "@/components/smarty-coach";
 
 const WorkoutFlow = () => {
   const navigate = useNavigate();
@@ -529,8 +528,6 @@ const WorkoutFlow = () => {
           )}
         </div>
 
-        {/* Smarty Coach Button */}
-        <SmartyCoachButton />
       </div>
     </>
   );

@@ -7,7 +7,6 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { ArrowLeft, Eye, CheckCircle, Search, X, Sparkles, Star, Crown, ShoppingCart, Check, Home, Dumbbell, Layers, Target, TrendingUp, Clock } from "lucide-react";
-import { SmartyCoachButton } from "@/components/smarty-coach";
 
 // Helper function for category color styling
 const getCategoryColor = (category: string | null) => {
@@ -711,8 +710,6 @@ const WorkoutDetail = () => {
         )}
       </div>
 
-      {/* Smarty Coach Button */}
-      <SmartyCoachButton />
       </div>
       </>
       )}
