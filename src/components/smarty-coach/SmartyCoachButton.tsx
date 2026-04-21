@@ -37,6 +37,12 @@ export const SmartyCoachButton = ({ className }: SmartyCoachButtonProps) => {
     setIsMounted(true);
   }, []);
 
+  const clampY = useCallback((y: number) => {
+    const min = getDefaultTop();
+    const max = window.innerHeight - 60;
+    return Math.max(min, Math.min(max, y));
+  }, [getDefaultTop]);
+
   useEffect(() => {
     const handleResize = () => {
       setTopY((currentTop) => clampY(currentTop ?? getDefaultTop()));
@@ -45,12 +51,6 @@ export const SmartyCoachButton = ({ className }: SmartyCoachButtonProps) => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, [clampY, getDefaultTop]);
-
-  const clampY = useCallback((y: number) => {
-    const min = getDefaultTop();
-    const max = window.innerHeight - 60;
-    return Math.max(min, Math.min(max, y));
-  }, [getDefaultTop]);
 
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
     isDragging.current = true;
