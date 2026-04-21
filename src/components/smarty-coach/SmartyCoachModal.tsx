@@ -221,7 +221,7 @@ export const SmartyCoachModal = ({ isOpen, onClose }: SmartyCoachModalProps) => 
 
   const handleMeasurement = () => {
     onClose();
-    navigate('/userdashboard?scroll=active-goals');
+    navigate('/tools');
   };
 
   return (
@@ -246,7 +246,7 @@ export const SmartyCoachModal = ({ isOpen, onClose }: SmartyCoachModalProps) => 
             <div className="space-y-3 animate-in fade-in duration-300">
               <Button
                 variant="outline"
-                className="w-full h-auto py-4 px-4 flex items-center gap-3 text-left border-2 hover:border-primary hover:bg-primary/5"
+                className="w-full h-auto py-4 px-4 flex items-center gap-3 text-left border-2 hover:border-primary hover:bg-primary hover:text-primary-foreground"
                 onClick={() => handleMenuSelect('workout')}
               >
                 <Activity className="h-6 w-6 text-primary shrink-0" />
@@ -259,7 +259,7 @@ export const SmartyCoachModal = ({ isOpen, onClose }: SmartyCoachModalProps) => 
 
               <Button
                 variant="outline"
-                className="w-full h-auto py-4 px-4 flex items-center gap-3 text-left border-2 hover:border-primary hover:bg-primary/5"
+                className="w-full h-auto py-4 px-4 flex items-center gap-3 text-left border-2 hover:border-primary hover:bg-primary hover:text-primary-foreground"
                 onClick={() => handleMenuSelect('program')}
               >
                 <Target className="h-6 w-6 text-primary shrink-0" />
@@ -272,20 +272,20 @@ export const SmartyCoachModal = ({ isOpen, onClose }: SmartyCoachModalProps) => 
 
               <Button
                 variant="outline"
-                className="w-full h-auto py-4 px-4 flex items-center gap-3 text-left border-2 hover:border-primary hover:bg-primary/5"
+                className="w-full h-auto py-4 px-4 flex items-center gap-3 text-left border-2 hover:border-primary hover:bg-primary hover:text-primary-foreground"
                 onClick={handleMeasurement}
               >
                 <Dumbbell className="h-6 w-6 text-primary shrink-0" />
                 <div>
                   <p className="font-medium text-foreground">Make a Measurement</p>
-                  <p className="text-xs text-muted-foreground">Track your progress and goals</p>
+                  <p className="text-xs text-muted-foreground">Open Smarty Tools and choose what you want to track</p>
                 </div>
                 <ChevronRight className="h-4 w-4 ml-auto text-muted-foreground" />
               </Button>
 
               <Button
                 variant="outline"
-                className="w-full h-auto py-4 px-4 flex items-center gap-3 text-left border-2 hover:border-primary hover:bg-primary/5"
+                className="w-full h-auto py-4 px-4 flex items-center gap-3 text-left border-2 hover:border-primary hover:bg-primary hover:text-primary-foreground"
                 onClick={() => handleMenuSelect('knowledge')}
               >
                 <BookOpen className="h-6 w-6 text-primary shrink-0" />
@@ -396,7 +396,7 @@ export const SmartyCoachModal = ({ isOpen, onClose }: SmartyCoachModalProps) => 
                       <div className="flex flex-wrap gap-2">
                         {durationOptions.map((dur) => (
                           <Button key={dur.value} variant="outline" onClick={() => handleDurationSelect(dur.value)}
-                            className={cn("h-auto py-2 px-3 sm:py-3 sm:px-4 text-sm font-medium", "border-2 border-border hover:border-primary hover:bg-primary/5")}>{dur.label}</Button>
+                            className={cn("h-auto py-2 px-3 sm:py-3 sm:px-4 text-sm font-medium whitespace-normal text-left", "border-2 border-border hover:border-primary hover:bg-primary hover:text-primary-foreground")}>{dur.label}</Button>
                         ))}
                       </div>
                       <Button variant="outline" onClick={goBack} className="flex items-center gap-1"><ChevronLeft className="h-4 w-4" />Back</Button>
@@ -409,7 +409,7 @@ export const SmartyCoachModal = ({ isOpen, onClose }: SmartyCoachModalProps) => 
                       <div className="flex flex-wrap gap-2">
                         {equipmentOptions.map((eq) => (
                           <Button key={eq.value} variant="outline" onClick={() => handleEquipmentSelect(eq.value)}
-                            className={cn("h-auto py-2 px-3 sm:py-3 sm:px-4 text-sm font-medium flex-1", "border-2 border-border hover:border-primary hover:bg-primary/5")}>{eq.label}</Button>
+                            className={cn("h-auto py-2 px-3 sm:py-3 sm:px-4 text-sm font-medium flex-1 whitespace-normal text-left", "border-2 border-border hover:border-primary hover:bg-primary hover:text-primary-foreground")}>{eq.label}</Button>
                         ))}
                       </div>
                       <Button variant="outline" onClick={goBack} className="flex items-center gap-1"><ChevronLeft className="h-4 w-4" />Back</Button>

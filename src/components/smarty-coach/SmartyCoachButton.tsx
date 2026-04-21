@@ -26,8 +26,8 @@ export const SmartyCoachButton = ({ className }: SmartyCoachButtonProps) => {
               onClick={() => setIsOpen(true)}
               size="icon"
               className={cn(
-                "fixed top-32 right-4 z-40",
-                "h-16 w-16 rounded-full shadow-xl",
+                "fixed top-32 right-4 z-[80]",
+                "h-16 w-16 rounded-full shadow-xl ring-2 ring-background/80",
                 "bg-primary hover:bg-primary/90 text-primary-foreground",
                 "animate-in slide-in-from-right-5 duration-300",
                 className
