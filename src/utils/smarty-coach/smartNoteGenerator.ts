@@ -6,7 +6,6 @@ export interface SmartNote {
   type: 'info' | 'caution' | 'encouragement';
 }
 
-// Categories that are calming/recovery focused
 const RECOVERY_CATEGORIES = ['RECOVERY', 'MOBILITY & STABILITY', 'PILATES', 'STRETCHING', 'YOGA'];
 
 export const generateSmartNote = (
@@ -15,7 +14,6 @@ export const generateSmartNote = (
 ): SmartNote | null => {
   const category = suggestion.category?.toUpperCase() || '';
   
-  // 1. Low sleep warning
   if (context.todayCheckin?.sleep_hours && context.todayCheckin.sleep_hours < 6) {
     return {
       message: "Sleep was short. A lighter difficulty or recovery session may serve you better.",
@@ -23,7 +21,6 @@ export const generateSmartNote = (
     };
   }
 
-  // 2. High soreness
   if (context.todayCheckin?.soreness_rating && context.todayCheckin.soreness_rating >= 4) {
     return {
       message: "Soreness is elevated. Consider a recovery or mobility session today.",
@@ -31,7 +28,6 @@ export const generateSmartNote = (
     };
   }
 
-  // 3. Low energy/readiness
   if (context.todayCheckin?.readiness_score && context.todayCheckin.readiness_score <= 2) {
     return {
       message: "Energy is low. A beginner difficulty could help without overloading.",
@@ -39,7 +35,6 @@ export const generateSmartNote = (
     };
   }
 
-  // 4. Low mood - provide context based on suggestion
   if (context.todayCheckin?.mood_rating && context.todayCheckin.mood_rating <= 2) {
     if (RECOVERY_CATEGORIES.some(cat => category.includes(cat))) {
       return {
@@ -54,7 +49,6 @@ export const generateSmartNote = (
     }
   }
 
-  // 5. Coming back after break
   if (context.daysSinceLastWorkout >= 3 && context.daysSinceLastWorkout < 999) {
     return {
       message: "Welcome back. Starting with lighter intensity is a smart choice.",
@@ -62,14 +56,12 @@ export const generateSmartNote = (
     };
   }
 
-  // 6. Category variety suggestion
   const recentCategories = context.recentCategories || [];
   const categoryCount = recentCategories.filter(c => 
     c?.toUpperCase() === category
   ).length;
   
   if (categoryCount >= 3) {
-    // Find a category not recently done
     const allCategories = ['STRENGTH', 'CARDIO', 'RECOVERY', 'MOBILITY & STABILITY', 'METABOLIC', 'PILATES'];
     const differentCategories = allCategories.filter(cat => 
       !recentCategories.some(rc => rc?.toUpperCase().includes(cat))
@@ -83,8 +75,6 @@ export const generateSmartNote = (
     }
   }
 
-
-  // 8. First workout encouragement
   if (context.completedWorkoutIds.length === 0) {
     return {
       message: "Great choice for your first workout. You've got this.",
@@ -92,7 +82,6 @@ export const generateSmartNote = (
     };
   }
 
-  // 9. Scheduled workout reminder
   if (context.scheduledWorkouts.length > 0) {
     const today = new Date().toISOString().split('T')[0];
     const todayScheduled = context.scheduledWorkouts.find(sw => sw.scheduled_date === today);
@@ -104,5 +93,5 @@ export const generateSmartNote = (
     }
   }
 
-  return null; // No note needed
+  return null;
 };

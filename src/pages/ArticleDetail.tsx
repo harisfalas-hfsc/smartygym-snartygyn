@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Clock, Calendar, BookOpen } from "lucide-react";
@@ -16,12 +16,14 @@ import { ContentLoadingSkeleton } from "@/components/ContentLoadingSkeleton";
 import { ReaderModeDialog } from "@/components/ReaderModeDialog";
 import { generateArticleSchema, generateBreadcrumbSchema } from "@/utils/seoHelpers";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
+import { useAccessControl } from "@/contexts/AccessControlContext";
 
 
 export const ArticleDetail = () => {
   const [readerModeOpen, setReaderModeOpen] = useState(false);
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const { user } = useAccessControl();
 
   const { data: article, isLoading, error } = useQuery({
     queryKey: ['article', slug],
@@ -38,6 +40,19 @@ export const ArticleDetail = () => {
     },
     enabled: !!slug,
   });
+
+  // Track article view for Smarty Coach knowledge flow
+  useEffect(() => {
+    if (article?.id && user?.id) {
+      supabase
+        .from('blog_article_views')
+        .upsert(
+          { user_id: user.id, article_id: article.id },
+          { onConflict: 'user_id,article_id' }
+        )
+        .then(() => {});
+    }
+  }, [article?.id, user?.id]);
 
   const { data: seoMeta } = useQuery({
     queryKey: ['article-seo', article?.id],

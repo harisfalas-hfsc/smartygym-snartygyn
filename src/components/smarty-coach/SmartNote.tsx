@@ -1,5 +1,5 @@
 import { Info, AlertTriangle, Sparkles } from "lucide-react";
-import { SmartNote } from "@/utils/smartly-suggest/smartNoteGenerator";
+import { SmartNote } from "@/utils/smarty-coach/smartNoteGenerator";
 import { cn } from "@/lib/utils";
 
 interface SmartNoteDisplayProps {

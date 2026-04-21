@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { Lightbulb } from "lucide-react";
+import { Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAccessControl } from "@/contexts/AccessControlContext";
-import { SmartlySuggestModal } from "./SmartlySuggestModal";
+import { SmartyCoachModal } from "./SmartyCoachModal";
 import { cn } from "@/lib/utils";
 import {
   Tooltip,
@@ -11,18 +10,12 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-interface SmartlySuggestButtonProps {
+interface SmartyCoachButtonProps {
   className?: string;
 }
 
-export const SmartlySuggestButton = ({ className }: SmartlySuggestButtonProps) => {
+export const SmartyCoachButton = ({ className }: SmartyCoachButtonProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { userTier, isLoading } = useAccessControl();
-
-  // Only show for premium users
-  if (isLoading || userTier !== 'premium') {
-    return null;
-  }
 
   return (
     <>
@@ -34,22 +27,22 @@ export const SmartlySuggestButton = ({ className }: SmartlySuggestButtonProps) =
               size="icon"
               className={cn(
                 "fixed top-32 right-4 z-40",
-                "h-14 w-14 rounded-full shadow-xl",
+                "h-16 w-16 rounded-full shadow-xl",
                 "bg-primary hover:bg-primary/90 text-primary-foreground",
                 "animate-in slide-in-from-right-5 duration-300",
                 className
               )}
             >
-              <Lightbulb className="h-6 w-6" />
+              <Brain className="h-7 w-7" />
             </Button>
           </TooltipTrigger>
           <TooltipContent side="left">
-            <p>Smartly Suggest</p>
+            <p>Smarty Coach</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
 
-      <SmartlySuggestModal 
+      <SmartyCoachModal 
         isOpen={isOpen} 
         onClose={() => setIsOpen(false)} 
       />

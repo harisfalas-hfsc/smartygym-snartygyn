@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Question } from "@/utils/smartly-suggest/questionSelector";
+import { Question } from "@/utils/smarty-coach/questionSelector";
 import { cn } from "@/lib/utils";
 
 interface QuestionStepProps {
@@ -12,7 +12,6 @@ interface QuestionStepProps {
 export const QuestionStep = ({ question, currentStep, totalSteps, onAnswer }: QuestionStepProps) => {
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-right-5 duration-300">
-      {/* Progress indicator */}
       <div className="flex items-center gap-2">
         {Array.from({ length: totalSteps }).map((_, i) => (
           <div
@@ -25,13 +24,11 @@ export const QuestionStep = ({ question, currentStep, totalSteps, onAnswer }: Qu
         ))}
       </div>
 
-      {/* Question */}
       <div className="space-y-4">
         <h3 className="text-lg font-medium text-foreground">
           {question.question}
         </h3>
 
-        {/* Options as chips */}
         <div className="flex flex-wrap gap-2">
           {question.options.map((option) => (
             <Button

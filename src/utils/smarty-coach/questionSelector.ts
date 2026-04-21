@@ -90,13 +90,11 @@ export const selectQuestions = (
 ): Question[] => {
   const questions: Question[] = [];
   
-  // HIGH confidence = 1 question (care/confirmation)
   if (confidence === 'high') {
     questions.push(QUESTION_POOL.TIME);
     return questions;
   }
   
-  // MEDIUM confidence = 2 questions
   if (confidence === 'medium') {
     questions.push(QUESTION_POOL.TIME);
     
@@ -115,7 +113,6 @@ export const selectQuestions = (
     return questions;
   }
   
-  // LOW confidence = 3 questions
   questions.push(QUESTION_POOL.GOAL);
   questions.push(QUESTION_POOL.TIME);
   questions.push(QUESTION_POOL.ENERGY);

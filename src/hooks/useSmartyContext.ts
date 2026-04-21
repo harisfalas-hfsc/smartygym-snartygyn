@@ -153,7 +153,7 @@ export const useSmartyContext = (): SmartyContext => {
         .eq('user_id', userId);
       return data || [];
     },
-    enabled: !!userId && isPremium,
+    enabled: !!userId,
   });
 
   // Fetch program interactions
@@ -167,7 +167,7 @@ export const useSmartyContext = (): SmartyContext => {
         .eq('user_id', userId);
       return data || [];
     },
-    enabled: !!userId && isPremium,
+    enabled: !!userId,
   });
 
   // Derive completed and viewed content from activities
