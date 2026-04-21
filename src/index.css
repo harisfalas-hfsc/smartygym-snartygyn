@@ -1082,6 +1082,47 @@ body {
   padding-bottom: calc(var(--sab) + 0.5rem);
 }
 
+@keyframes smarty-coach-attention {
+  0%, 82%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  85% {
+    opacity: 0.4;
+    transform: scale(0.92);
+  }
+
+  88% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+
+  91% {
+    opacity: 0.4;
+    transform: scale(0.92);
+  }
+
+  94% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+
+@layer utilities {
+  .smarty-coach-attention {
+    animation: smarty-coach-attention 5s ease-in-out infinite;
+    transform-origin: center;
+    will-change: transform, opacity;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .smarty-coach-attention {
+    animation: none;
+  }
+}
+
 /* Fixed top elements need extra top padding */
 .safe-area-top {
   padding-top: calc(var(--sat) + 0.5rem);
