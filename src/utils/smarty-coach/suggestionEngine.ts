@@ -204,18 +204,15 @@ export const generateSuggestions = (
   const validItems = scored.filter(s => s.score > -500);
 
   if (validItems.length === 0) {
-    return {
-      item: allContent[0],
-      score: 0,
-      reasons: ['Suggested workout for you'],
-    };
+    // All workouts excluded (completed) — no suggestion possible
+    return null;
   }
 
   validItems.sort((a, b) => b.score - a.score);
   const top = validItems[0];
   
-  if (top.reasons.length === 0) {
-    top.reasons.push('Suggested based on your preferences');
+  if (top.reasons.length === 0 || top.score < 20) {
+    top.reasons.push('Best available match based on your preferences');
   }
 
   return top;

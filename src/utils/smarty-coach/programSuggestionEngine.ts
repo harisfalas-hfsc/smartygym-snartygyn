@@ -129,18 +129,30 @@ export const generateProgramSuggestion = (
   const validItems = scored.filter(s => s.score > -500);
 
   if (validItems.length === 0) {
-    return {
-      item: programs[0],
-      score: 0,
-      reasons: ['Suggested program for you'],
-    };
+    // All programs excluded (completed/ongoing) — no suggestion possible
+    return null;
   }
 
   validItems.sort((a, b) => b.score - a.score);
   const top = validItems[0];
   
-  if (top.reasons.length === 0) {
-    top.reasons.push('Suggested based on your preferences');
+  // Add fallback context when no strong match reasons exist
+  if (top.reasons.length === 0 || top.score < 30) {
+    const targetWeeks = parseInt(answers.duration.replace(/\D/g, ''), 10);
+    const itemWeeks = parseProgramWeeks(top.item.duration, top.item.weeks);
+    
+    if (targetWeeks && itemWeeks && targetWeeks !== itemWeeks) {
+      top.reasons.unshift(
+        `No ${targetWeeks}-week program is available for this combination right now`
+      );
+      top.reasons.push(
+        `This ${itemWeeks}-week option is the closest match for your goal and level`
+      );
+    }
+    
+    if (top.reasons.length === 0) {
+      top.reasons.push('Best available match based on your preferences');
+    }
   }
 
   return top;
