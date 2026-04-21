@@ -1,4 +1,5 @@
 import { createRoot } from "react-dom/client";
+import { registerSW } from "virtual:pwa-register";
 import App from "./App.tsx";
 import "./index.css";
 import { isNativePlatform, configureStatusBar } from "./utils/native";
@@ -34,6 +35,20 @@ if (import.meta.env.DEV && !isNativePlatform() && 'serviceWorker' in navigator) 
       });
     });
   }
+}
+
+if (import.meta.env.PROD && !isNativePlatform()) {
+  const updateSW = registerSW({
+    immediate: true,
+    onNeedRefresh() {
+      updateSW(true);
+    },
+    onRegisteredSW(_swUrl, registration) {
+      registration?.update();
+      window.addEventListener("focus", () => registration?.update());
+      window.addEventListener("pageshow", () => registration?.update());
+    },
+  });
 }
 
 createRoot(document.getElementById("root")!).render(<App />);
