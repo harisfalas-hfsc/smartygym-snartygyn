@@ -36,9 +36,9 @@ export const QuestionStep = ({ question, currentStep, totalSteps, onAnswer }: Qu
               variant="outline"
               onClick={() => onAnswer(option.value)}
               className={cn(
-                "h-auto py-3 px-4 text-sm font-medium",
-                "border-2 border-border hover:border-primary hover:bg-primary/5",
-                "transition-all duration-200"
+                "h-auto py-3 px-4 text-sm font-medium whitespace-normal text-left",
+                "border-2 border-border hover:border-primary hover:bg-primary hover:text-primary-foreground",
+                "transition-all duration-200 max-w-full"
               )}
             >
               {option.label}
