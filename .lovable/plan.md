@@ -1,152 +1,74 @@
 
-# Smarty Coach Fix Plan
+# Smarty Coach UI Fix Plan
 
-## What is actually broken
+## What will be fixed
 
-1. Program suggestions are navigating to the wrong route.
-   - Current code in `ProgramSuggestionFlow.tsx` sends users to `/programs/{slug}/{id}`.
-   - The app routes in `src/App.tsx` are actually `/trainingprogram/:type/:id`.
-   - That is why “View Program” lands on 404.
+1. Reposition the floating Smarty Coach button higher on the screen across mobile, tablet, and desktop.
+   - Move it above the homepage hero/carousel card area so it no longer overlaps card actions, cart-like controls, or busy image backgrounds.
+   - Keep one consistent vertical placement strategy across breakpoints instead of the current `top-[33vh]`, which is too low on the homepage and visually collides with card content.
 
-2. The floating Smarty Coach button is not global.
-   - Right now it is only mounted inside `WorkoutFlow.tsx` and `WorkoutDetail.tsx`.
-   - So it only appears on those pages instead of being persistent across the site.
+2. Fix unreadable Smarty Coach cards/buttons in both dark mode and light mode.
+   - The current issue comes from `variant="outline"` plus custom hover classes such as `hover:bg-primary hover:text-primary-foreground` while nested texts/icons still keep `text-foreground`, `text-muted-foreground`, or `text-primary`.
+   - On hover, backgrounds change, but child text/icon colors do not consistently switch, so labels become hard or impossible to read.
+   - This affects:
+     - the 4 main menu cards in `SmartyCoachModal.tsx`
+     - workout step option buttons
+     - program flow option buttons
+     - any related nested icon/description content that still uses fixed muted/foreground colors
 
-3. Program fallback logic is too weak.
-   - If no strong match exists, `programSuggestionEngine.ts` can fall back to an arbitrary first item.
-   - It does not clearly explain “12 weeks is unavailable, but this 6-week option is the closest match.”
-   - This is why the program logic feels less intelligent than the workout flow.
-
-4. There is also a modal accessibility warning.
-   - `SmartyCoachModal.tsx` uses a plain `<p>` under `DialogTitle` instead of a proper dialog description component.
-   - That is causing the Radix warning shown in the console.
-
----
-
-## What I will change
-
-### 1. Fix all Smarty Coach destination links
-Create one centralized route-mapping helper for Smarty Coach suggestions so workouts, programs, and articles always navigate to valid pages.
-
-This helper will:
-- map program categories to the real program route slugs:
-  - `CARDIO ENDURANCE` → `cardio-endurance`
-  - `FUNCTIONAL STRENGTH` → `functional-strength`
-  - `MUSCLE HYPERTROPHY` → `muscle-hypertrophy`
-  - `WEIGHT LOSS` → `weight-loss`
-  - `LOW BACK PAIN` → `low-back-pain`
-  - `MOBILITY & STABILITY` → `mobility-stability`
-- build program URLs as:
-  - `/trainingprogram/{slug}/{id}`
-- keep article URLs as:
-  - `/blog/{slug}`
-- align workout URLs with the app’s existing route expectations as well, so Smarty Coach never generates invalid category paths.
-
-Files:
-- `src/components/smarty-coach/ProgramSuggestionFlow.tsx`
-- `src/components/smarty-coach/SmartyCoachModal.tsx`
-- new shared helper such as `src/utils/smarty-coach/routes.ts`
-
-### 2. Make Smarty Coach permanently visible site-wide
-Move the button from page-level rendering to the app shell so it stays visible during navigation.
-
-Implementation:
-- mount a single `<SmartyCoachButton />` in `App.tsx` inside the main customer-facing layout
-- remove duplicate button renders from:
-  - `src/pages/WorkoutFlow.tsx`
-  - `src/pages/WorkoutDetail.tsx`
-
-Result:
-- the button stays visible on homepage, blog, workouts, programs, dashboard, auth pages, and all regular site pages
-- no duplicate buttons
-- no page-specific mounting gaps
-
-### 3. Upgrade program suggestion logic to real “closest match” behavior
-Refactor `programSuggestionEngine.ts` so it behaves like a recommendation engine, not a raw first-item fallback.
-
-New logic order:
-1. Prefer exact matches:
-   - category
-   - difficulty
-   - duration/weeks
-   - equipment
-2. If no exact duration exists:
-   - choose the closest available duration in the same category
-   - keep equipment and difficulty as high-priority constraints where possible
-3. If difficulty is unavailable:
-   - allow adjacent difficulty with an explicit explanation
-4. Never fall back to a random first program.
-
-Example reason text:
-- “No 12-week Functional Strength bodyweight program is available right now.”
-- “This 6-week option is the closest match for your goal and level.”
-- “Intermediate was prioritized, and duration was matched as closely as possible.”
-
-### 4. Align workout fallback behavior with the same standard
-The workout engine currently also has a weak last-resort fallback (`allContent[0]`).
-
-I will align workout and program behavior so both use the same rule:
-- exact match first
-- closest sensible alternative second
-- always explain the compromise
-- never suggest a random item without context
-
-Files:
-- `src/utils/smarty-coach/suggestionEngine.ts`
-- `src/utils/smarty-coach/programSuggestionEngine.ts`
-
-### 5. Preserve completion/in-progress exclusions
-Keep the exclusion logic already added, but make sure it remains part of the new fallback system.
-
-That means:
-- completed workouts are still excluded
-- completed programs are still excluded
-- ongoing programs are still excluded
-- closest-match fallback only considers eligible content
-
-Files:
-- `src/hooks/useSmartyContext.ts`
-- `src/utils/smarty-coach/suggestionEngine.ts`
-- `src/utils/smarty-coach/programSuggestionEngine.ts`
-
-### 6. Remove the current Smarty Coach modal warning
-Update the dialog header to use proper accessible dialog metadata.
-
-Implementation:
-- add `DialogDescription` to `SmartyCoachModal.tsx`
-- wire it correctly so the modal no longer shows the missing description warning
-
-File:
-- `src/components/smarty-coach/SmartyCoachModal.tsx`
-
----
-
-## Expected result after the fix
-
-- “View Program” opens the correct program page instead of 404.
-- Smarty Coach is permanently visible across the whole website, not only on workout pages.
-- Program suggestions feel intelligent:
-  - exact match when available
-  - closest valid alternative when not
-  - clear explanation when a perfect 12-week match does not exist
-- Workout and program suggestion logic behave consistently.
-- Existing access behavior stays intact:
-  - users can complete the questionnaire
-  - tapping the result still follows the normal site access rules on the destination page
-- current dialog warning is removed.
-
----
+3. Add a friendlier intro under the “Smarty Coach” title.
+   - Replace the current minimal description with clearer helper copy on the main menu.
+   - Example tone: “I’m your Smarty Coach. I’m here to help you find the right next step. Choose what you want to do.”
+   - Keep contextual subcopy for workout/program/knowledge flows, but make the first screen more welcoming and self-explanatory.
 
 ## Files to update
 
-- `src/App.tsx`
-- `src/pages/WorkoutFlow.tsx`
-- `src/pages/WorkoutDetail.tsx`
+- `src/components/smarty-coach/SmartyCoachButton.tsx`
 - `src/components/smarty-coach/SmartyCoachModal.tsx`
 - `src/components/smarty-coach/ProgramSuggestionFlow.tsx`
-- `src/utils/smarty-coach/suggestionEngine.ts`
-- `src/utils/smarty-coach/programSuggestionEngine.ts`
-- new shared route helper in `src/utils/smarty-coach/`
+- `src/components/smarty-coach/KnowledgeSuggestionFlow.tsx` if needed for consistency
+- `src/components/ui/button.tsx` if a safer reusable outline/coach variant is the cleanest fix
 
-## No backend/database changes needed
-This is a frontend routing, rendering, and recommendation-logic fix. No new tables or migrations are required for this round.
+## Implementation approach
+
+### 1) Button position
+- Update the floating button’s fixed position in `SmartyCoachButton.tsx`.
+- Move it upward from the current viewport-third placement to a safer “above hero cards” zone that works on home/mobile/tablet/desktop.
+- Preserve right-side alignment and safe-area support.
+- Keep the attention animation intact.
+
+### 2) Hover/readability fix
+- Refactor Smarty Coach interactive cards so hover states control both background and all nested text/icon colors together.
+- Best approach:
+  - use parent `group`
+  - apply `group-hover:text-*` to title, subtitle, chevron, and icon wrappers
+  - avoid relying only on the base `outline` variant, because it currently carries green-specific styling that clashes with Smarty Coach’s blue theme and theme modes
+- Normalize widths/wrapping for long option labels so buttons do not become visually broken on hover.
+- Ensure dark-mode and light-mode contrast remain readable before hover, on hover, and on focus.
+
+### 3) Friendlier modal copy
+- Update the `DialogDescription` logic in `SmartyCoachModal.tsx`.
+- On menu screen, show a short welcoming sentence under the title.
+- On subflows, keep brief directional copy like:
+  - workout: helping find the best workout now
+  - program: helping choose the right plan
+  - knowledge: helping find what to read
+
+## Technical details
+
+- Current root cause for unreadable text:
+  - `Button` outline variant in `src/components/ui/button.tsx` is globally green-based:
+    - `border-green-500 text-primary bg-background hover:bg-green-500 hover:text-white`
+  - Smarty Coach buttons then add extra blue hover classes on top.
+  - Nested children inside menu cards still use fixed classes like `text-foreground`, `text-muted-foreground`, and `text-primary`, so they do not inherit the right hover contrast.
+- Safer fix:
+  - either add a dedicated Smarty Coach visual variant, or
+  - override Smarty Coach buttons locally with explicit non-conflicting classes and `group-hover` child styling
+- No backend changes are needed.
+- No database migration is needed.
+
+## Expected result
+
+- Smarty Coach button sits higher and no longer interferes with homepage cards or touch targets.
+- All Smarty Coach button/card text stays readable in dark mode and light mode, including on hover/focus.
+- The modal feels clearer and more welcoming with friendly intro text under the title.
