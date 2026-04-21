@@ -233,7 +233,7 @@ export const SmartyCoachModal = ({ isOpen, onClose }: SmartyCoachModalProps) => 
             Smarty Coach
           </DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">
-            {activePath === 'menu' ? "I want to..." : 
+            {activePath === 'menu' ? "I'm your Smarty Coach — here to help you find the right next step. What would you like to do?" : 
              activePath === 'workout' ? "Let's find the perfect workout" :
              activePath === 'program' ? "Let's find the right program" :
              "Let's find something to read"}
@@ -246,54 +246,54 @@ export const SmartyCoachModal = ({ isOpen, onClose }: SmartyCoachModalProps) => 
             <div className="space-y-3 animate-in fade-in duration-300">
               <Button
                 variant="outline"
-                className="w-full h-auto py-4 px-4 flex items-center gap-3 text-left border-2 hover:border-primary hover:bg-primary hover:text-primary-foreground"
+                className="group w-full h-auto py-4 px-4 flex items-center gap-3 text-left border-2 border-border hover:border-primary hover:bg-primary hover:text-primary-foreground"
                 onClick={() => handleMenuSelect('workout')}
               >
-                <Activity className="h-6 w-6 text-primary shrink-0" />
+                <Activity className="h-6 w-6 text-primary shrink-0 group-hover:text-primary-foreground" />
                 <div>
-                  <p className="font-medium text-foreground">Start a Workout</p>
-                  <p className="text-xs text-muted-foreground">Find the perfect workout for right now</p>
+                  <p className="font-medium text-foreground group-hover:text-primary-foreground">Start a Workout</p>
+                  <p className="text-xs text-muted-foreground group-hover:text-primary-foreground/80">Find the perfect workout for right now</p>
                 </div>
-                <ChevronRight className="h-4 w-4 ml-auto text-muted-foreground" />
+                <ChevronRight className="h-4 w-4 ml-auto text-muted-foreground group-hover:text-primary-foreground" />
               </Button>
 
               <Button
                 variant="outline"
-                className="w-full h-auto py-4 px-4 flex items-center gap-3 text-left border-2 hover:border-primary hover:bg-primary hover:text-primary-foreground"
+                className="group w-full h-auto py-4 px-4 flex items-center gap-3 text-left border-2 border-border hover:border-primary hover:bg-primary hover:text-primary-foreground"
                 onClick={() => handleMenuSelect('program')}
               >
-                <Target className="h-6 w-6 text-primary shrink-0" />
+                <Target className="h-6 w-6 text-primary shrink-0 group-hover:text-primary-foreground" />
                 <div>
-                  <p className="font-medium text-foreground">Start a Program</p>
-                  <p className="text-xs text-muted-foreground">Get a structured training plan</p>
+                  <p className="font-medium text-foreground group-hover:text-primary-foreground">Start a Program</p>
+                  <p className="text-xs text-muted-foreground group-hover:text-primary-foreground/80">Get a structured training plan</p>
                 </div>
-                <ChevronRight className="h-4 w-4 ml-auto text-muted-foreground" />
+                <ChevronRight className="h-4 w-4 ml-auto text-muted-foreground group-hover:text-primary-foreground" />
               </Button>
 
               <Button
                 variant="outline"
-                className="w-full h-auto py-4 px-4 flex items-center gap-3 text-left border-2 hover:border-primary hover:bg-primary hover:text-primary-foreground"
+                className="group w-full h-auto py-4 px-4 flex items-center gap-3 text-left border-2 border-border hover:border-primary hover:bg-primary hover:text-primary-foreground"
                 onClick={handleMeasurement}
               >
-                <Dumbbell className="h-6 w-6 text-primary shrink-0" />
+                <Dumbbell className="h-6 w-6 text-primary shrink-0 group-hover:text-primary-foreground" />
                 <div>
-                  <p className="font-medium text-foreground">Make a Measurement</p>
-                  <p className="text-xs text-muted-foreground">Open Smarty Tools and choose what you want to track</p>
+                  <p className="font-medium text-foreground group-hover:text-primary-foreground">Make a Measurement</p>
+                  <p className="text-xs text-muted-foreground group-hover:text-primary-foreground/80">Open Smarty Tools and choose what you want to track</p>
                 </div>
-                <ChevronRight className="h-4 w-4 ml-auto text-muted-foreground" />
+                <ChevronRight className="h-4 w-4 ml-auto text-muted-foreground group-hover:text-primary-foreground" />
               </Button>
 
               <Button
                 variant="outline"
-                className="w-full h-auto py-4 px-4 flex items-center gap-3 text-left border-2 hover:border-primary hover:bg-primary hover:text-primary-foreground"
+                className="group w-full h-auto py-4 px-4 flex items-center gap-3 text-left border-2 border-border hover:border-primary hover:bg-primary hover:text-primary-foreground"
                 onClick={() => handleMenuSelect('knowledge')}
               >
-                <BookOpen className="h-6 w-6 text-primary shrink-0" />
+                <BookOpen className="h-6 w-6 text-primary shrink-0 group-hover:text-primary-foreground" />
                 <div>
-                  <p className="font-medium text-foreground">Upgrade My Knowledge</p>
-                  <p className="text-xs text-muted-foreground">Discover articles on fitness, nutrition & wellness</p>
+                  <p className="font-medium text-foreground group-hover:text-primary-foreground">Upgrade My Knowledge</p>
+                  <p className="text-xs text-muted-foreground group-hover:text-primary-foreground/80">Discover articles on fitness, nutrition & wellness</p>
                 </div>
-                <ChevronRight className="h-4 w-4 ml-auto text-muted-foreground" />
+                <ChevronRight className="h-4 w-4 ml-auto text-muted-foreground group-hover:text-primary-foreground" />
               </Button>
             </div>
           )}
