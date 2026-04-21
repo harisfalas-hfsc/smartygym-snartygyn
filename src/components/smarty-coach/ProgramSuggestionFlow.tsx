@@ -213,7 +213,7 @@ export const ProgramSuggestionFlow = ({ onBack, onClose }: ProgramSuggestionFlow
           <div className="flex flex-wrap gap-2">
             {categoryOptions.map(opt => (
               <Button key={opt.value} variant="outline" onClick={() => { setAnswers(prev => ({ ...prev, category: opt.value })); setCurrentStep(2); }}
-                className="h-auto py-2 px-3 text-sm border-2 border-border hover:border-primary hover:bg-primary/5">
+                className="h-auto py-2 px-3 text-sm whitespace-normal text-left border-2 border-border hover:border-primary hover:bg-primary hover:text-primary-foreground">
                 {opt.label}
               </Button>
             ))}
@@ -230,7 +230,7 @@ export const ProgramSuggestionFlow = ({ onBack, onClose }: ProgramSuggestionFlow
           <div className="flex flex-wrap gap-2">
             {difficultyOptions.map(opt => (
               <Button key={opt.value} variant="outline" onClick={() => { setAnswers(prev => ({ ...prev, difficulty: opt.value })); setCurrentStep(3); }}
-                className="h-auto py-2 px-3 text-sm border-2 border-border hover:border-primary hover:bg-primary/5">
+                className="h-auto py-2 px-3 text-sm whitespace-normal text-left border-2 border-border hover:border-primary hover:bg-primary hover:text-primary-foreground">
                 {opt.label}
               </Button>
             ))}
@@ -247,7 +247,7 @@ export const ProgramSuggestionFlow = ({ onBack, onClose }: ProgramSuggestionFlow
           <div className="flex flex-wrap gap-2">
             {durationOptions.map(opt => (
               <Button key={opt.value} variant="outline" onClick={() => { setAnswers(prev => ({ ...prev, duration: opt.value })); setCurrentStep(4); }}
-                className="h-auto py-2 px-3 text-sm border-2 border-border hover:border-primary hover:bg-primary/5">
+                className="h-auto py-2 px-3 text-sm whitespace-normal text-left border-2 border-border hover:border-primary hover:bg-primary hover:text-primary-foreground">
                 {opt.label}
               </Button>
             ))}
@@ -264,7 +264,7 @@ export const ProgramSuggestionFlow = ({ onBack, onClose }: ProgramSuggestionFlow
           <div className="flex flex-wrap gap-2">
             {equipmentOptions.map(opt => (
               <Button key={opt.value} variant="outline" onClick={() => { setAnswers(prev => ({ ...prev, equipment: opt.value })); setCurrentStep('result'); }}
-                className="h-auto py-2 px-3 sm:py-3 sm:px-4 text-sm font-medium flex-1 border-2 border-border hover:border-primary hover:bg-primary/5">
+                className="h-auto py-2 px-3 sm:py-3 sm:px-4 text-sm font-medium flex-1 whitespace-normal text-left border-2 border-border hover:border-primary hover:bg-primary hover:text-primary-foreground">
                 {opt.label}
               </Button>
             ))}
