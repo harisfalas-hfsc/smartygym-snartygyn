@@ -22,19 +22,20 @@ export const SmartyCoachButton = ({ className }: SmartyCoachButtonProps) => {
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button
+            <button
               onClick={() => setIsOpen(true)}
-              size="icon"
               className={cn(
                 "fixed top-32 right-4 z-[80]",
-                "h-20 w-20 rounded-full shadow-xl ring-2 ring-background/80",
-                "bg-primary hover:bg-primary/90 text-primary-foreground",
+                "p-0 border-0 bg-transparent cursor-pointer",
+                "hover:scale-110 active:scale-95 transition-transform duration-200",
                 "animate-in slide-in-from-right-5 duration-300",
+                "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
                 className
               )}
+              aria-label="Smarty Coach"
             >
-              <Brain className="h-10 w-10 text-green-400" />
-            </Button>
+              <Brain className="h-12 w-12 text-green-500 drop-shadow-lg" />
+            </button>
           </TooltipTrigger>
           <TooltipContent side="left">
             <p>Smarty Coach</p>
