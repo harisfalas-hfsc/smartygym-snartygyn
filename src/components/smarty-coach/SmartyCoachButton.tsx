@@ -24,10 +24,13 @@ export const SmartyCoachButton = ({ className }: SmartyCoachButtonProps) => {
             <button
               onClick={() => setIsOpen(true)}
               className={cn(
-                "fixed top-32 right-4 z-[80]",
+                "fixed z-[80]",
+                "bottom-[calc(var(--sab)+1rem)] right-[calc(var(--sar)+0.75rem)]",
+                "md:bottom-auto md:top-[calc(var(--app-header-h,100px)+1rem)] md:right-[calc(var(--sar)+1rem)]",
                 "p-0 border-0 bg-transparent cursor-pointer",
                 "hover:scale-110 active:scale-95 transition-transform duration-200",
                 "animate-in slide-in-from-right-5 duration-300",
+                "smarty-coach-attention motion-reduce:animate-none",
                 "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
                 className
               )}
