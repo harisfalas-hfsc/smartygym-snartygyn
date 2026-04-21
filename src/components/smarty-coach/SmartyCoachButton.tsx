@@ -27,13 +27,13 @@ export const SmartyCoachButton = ({ className }: SmartyCoachButtonProps) => {
               size="icon"
               className={cn(
                 "fixed top-32 right-4 z-[80]",
-                "h-16 w-16 rounded-full shadow-xl ring-2 ring-background/80",
+                "h-20 w-20 rounded-full shadow-xl ring-2 ring-background/80",
                 "bg-primary hover:bg-primary/90 text-primary-foreground",
                 "animate-in slide-in-from-right-5 duration-300",
                 className
               )}
             >
-              <Brain className="h-7 w-7" />
+              <Brain className="h-10 w-10 text-green-400" />
             </Button>
           </TooltipTrigger>
           <TooltipContent side="left">
