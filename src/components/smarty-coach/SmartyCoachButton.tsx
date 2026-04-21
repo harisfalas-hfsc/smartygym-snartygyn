@@ -25,8 +25,7 @@ export const SmartyCoachButton = ({ className }: SmartyCoachButtonProps) => {
               onClick={() => setIsOpen(true)}
               className={cn(
                 "fixed z-[80]",
-                "bottom-[calc(var(--sab)+1rem)] right-[calc(var(--sar)+0.75rem)]",
-                "md:bottom-auto md:top-[calc(var(--app-header-h,100px)+1rem)] md:right-[calc(var(--sar)+1rem)]",
+                "top-[33vh] right-[calc(var(--sar)+0.75rem)]",
                 "p-0 border-0 bg-transparent cursor-pointer",
                 "hover:scale-110 active:scale-95 transition-transform duration-200",
                 "animate-in slide-in-from-right-5 duration-300",
