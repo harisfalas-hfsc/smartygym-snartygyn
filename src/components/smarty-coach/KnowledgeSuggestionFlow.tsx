@@ -187,7 +187,7 @@ export const KnowledgeSuggestionFlow = ({ onBack, onClose }: KnowledgeSuggestion
           <div className="flex flex-wrap gap-2">
             {categoryOptions.map(opt => (
               <Button key={opt.value} variant="outline" onClick={() => { setAnswers(prev => ({ ...prev, category: opt.value })); setCurrentStep(2); }}
-                className="h-auto py-3 px-4 text-sm font-medium border-2 border-border hover:border-primary hover:bg-primary/5">
+                className="h-auto py-3 px-4 text-sm font-medium border-2 border-border hover:border-primary hover:bg-primary hover:text-primary-foreground">
                 {opt.label}
               </Button>
             ))}
@@ -204,7 +204,7 @@ export const KnowledgeSuggestionFlow = ({ onBack, onClose }: KnowledgeSuggestion
           <div className="flex flex-wrap gap-2">
             {recencyOptions.map(opt => (
               <Button key={opt.value} variant="outline" onClick={() => { setAnswers(prev => ({ ...prev, recency: opt.value })); setCurrentStep('result'); }}
-                className="h-auto py-3 px-4 text-sm font-medium flex-1 border-2 border-border hover:border-primary hover:bg-primary/5">
+                className="h-auto py-3 px-4 text-sm font-medium flex-1 border-2 border-border hover:border-primary hover:bg-primary hover:text-primary-foreground">
                 {opt.label}
               </Button>
             ))}
