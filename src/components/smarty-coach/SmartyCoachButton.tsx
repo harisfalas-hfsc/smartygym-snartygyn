@@ -87,12 +87,13 @@ export const SmartyCoachButton = ({ className }: SmartyCoachButtonProps) => {
             onPointerUp={handlePointerUp}
             className={cn(
               "fixed z-40",
-              "rounded-full border border-border/80 bg-background/90 p-1.5 shadow-lg shadow-primary/20 backdrop-blur-md supports-[backdrop-filter]:bg-background/80",
+              // Fixed dark appearance - never changes with theme
+              "rounded-full border border-white/20 bg-[#1a1f2e] p-1.5 shadow-lg shadow-blue-500/30 backdrop-blur-md",
               "cursor-grab active:cursor-grabbing",
               "hover:scale-110 transition-transform duration-200",
               "animate-in slide-in-from-right-5 duration-300",
               "smarty-coach-attention motion-reduce:animate-none",
-              "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+              "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400",
               "touch-none select-none",
               className
             )}
@@ -107,7 +108,7 @@ export const SmartyCoachButton = ({ className }: SmartyCoachButtonProps) => {
             <img src={smartyCoachIcon} alt="Smarty Coach" className="h-11 w-11 rounded-full drop-shadow-md" loading="lazy" width={44} height={44} />
           </button>
         </TooltipTrigger>
-        <TooltipContent side="left">
+        <TooltipContent side="left" className="bg-[#1a1f2e] border-white/20 text-white">
           <p>Smarty Coach</p>
         </TooltipContent>
       </Tooltip>
