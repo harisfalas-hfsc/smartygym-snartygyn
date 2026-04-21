@@ -249,7 +249,7 @@ const Tools = () => {
                 className="group relative h-72 rounded-xl overflow-hidden cursor-pointer transition-all duration-500 ease-out transform-gpu hover:scale-[1.02] hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/40 hover:z-10"
               >
                 <img 
-                  src={timerTool.image} 
+                  src={timerTool.mobileImage} 
                   alt={timerTool.title}
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
@@ -278,7 +278,7 @@ const Tools = () => {
                   className="group relative h-64 rounded-xl overflow-hidden cursor-pointer transition-all duration-500 ease-out transform-gpu hover:scale-[1.08] hover:-translate-y-3 hover:shadow-2xl hover:shadow-primary/40 hover:z-10"
                 >
                   <img 
-                    src={tool.image} 
+                    src={tool.mobileImage} 
                     alt={tool.title}
                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                   />
