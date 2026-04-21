@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { Brain } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { SmartyCoachModal } from "./SmartyCoachModal";
 import { cn } from "@/lib/utils";
+import smartyCoachIcon from "@/assets/smarty-coach-icon.png";
 import {
   Tooltip,
   TooltipContent,
@@ -34,7 +33,7 @@ export const SmartyCoachButton = ({ className }: SmartyCoachButtonProps) => {
               )}
               aria-label="Smarty Coach"
             >
-              <Brain className="h-12 w-12 text-green-500 drop-shadow-lg" />
+              <img src={smartyCoachIcon} alt="Smarty Coach" className="h-12 w-12 drop-shadow-lg rounded-lg" loading="lazy" width={48} height={48} />
             </button>
           </TooltipTrigger>
           <TooltipContent side="left">
