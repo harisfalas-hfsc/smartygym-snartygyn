@@ -86,6 +86,17 @@ async function rollbackActiveWodsForDate(
   });
 }
 
+async function createDeterministicIdempotencyKey(prefix: string, payload: Record<string, unknown>) {
+  const encoder = new TextEncoder();
+  const bytes = encoder.encode(JSON.stringify(payload));
+  const digest = await crypto.subtle.digest("SHA-256", bytes);
+  const hash = Array.from(new Uint8Array(digest))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+
+  return `${prefix}:${hash.slice(0, 32)}`;
+}
+
 // ═══════════════════════════════════════════════════════════════════════════════
 // SIMPLIFIED 84-DAY PERIODIZATION - Direct lookup, no compatibility layers
 // ═══════════════════════════════════════════════════════════════════════════════
