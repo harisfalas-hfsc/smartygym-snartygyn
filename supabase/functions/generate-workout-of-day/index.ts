@@ -2416,9 +2416,26 @@ Return JSON with these exact fields:
       // Create Stripe product with IDEMPOTENCY KEY to prevent duplicates
       const workoutId = `WOD-${prefix}-${equipment.charAt(0)}-${timestamp}`;
       
-      // CRITICAL: Deterministic idempotency key prevents duplicate Stripe products on retries
-      // Key format: wod:{date}:{equipment} — NO timestamp, so retries reuse the same product
-      const stripeIdempotencyKey = `wod:${effectiveDate}:${equipment}`;
+      const stripeProductPayload = {
+        name: workoutContent.name,
+        description: `${category} Workout (${equipment})`,
+        images: imageUrl ? [imageUrl] : [],
+        metadata: {
+          project: "SMARTYGYM",
+          content_type: "Workout",
+          content_id: workoutId,
+          workout_id: workoutId,
+          type: "wod",
+          category,
+          equipment,
+          generated_for_date: effectiveDate,
+        },
+      };
+
+      const stripeIdempotencyKey = await createDeterministicIdempotencyKey(
+        `wod:${effectiveDate}:${equipment}`,
+        stripeProductPayload,
+      );
       
       logStep(`Creating Stripe product with idempotency`, { 
         name: workoutContent.name, 
@@ -2427,21 +2444,7 @@ Return JSON with these exact fields:
         idempotencyKey: stripeIdempotencyKey
       });
       
-      const stripeProduct = await stripe.products.create({
-        name: workoutContent.name,
-        description: `${category} Workout (${equipment})`,
-        images: imageUrl ? [imageUrl] : [],
-        metadata: { 
-          project: "SMARTYGYM",
-          content_type: "Workout",  // CRITICAL: Required for revenue tracking
-          content_id: workoutId,
-          workout_id: workoutId, 
-          type: "wod", 
-          category: category, 
-          equipment: equipment,
-          generated_for_date: effectiveDate
-        }
-      }, {
+      const stripeProduct = await stripe.products.create(stripeProductPayload, {
         idempotencyKey: stripeIdempotencyKey
       });
 
