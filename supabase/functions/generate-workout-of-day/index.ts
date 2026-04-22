@@ -41,6 +41,51 @@ function logStep(step: string, details?: any) {
   console.log(`[GENERATE-WOD] ${step}${detailsStr}`);
 }
 
+async function rollbackActiveWodsForDate(
+  supabase: ReturnType<typeof createClient>,
+  effectiveDate: string,
+  reason: string,
+) {
+  logStep("ROLLBACK: Clearing partial WOD publish", { effectiveDate, reason });
+
+  const { data: activeWods, error: fetchError } = await supabase
+    .from("admin_workouts")
+    .select("id, name, equipment")
+    .eq("generated_for_date", effectiveDate)
+    .eq("is_workout_of_day", true);
+
+  if (fetchError) {
+    logStep("ROLLBACK: Failed to inspect active WODs", { effectiveDate, error: fetchError.message });
+    return;
+  }
+
+  if (!activeWods || activeWods.length === 0) {
+    logStep("ROLLBACK: No active WODs to clear", { effectiveDate });
+    return;
+  }
+
+  const { error: rollbackError } = await supabase
+    .from("admin_workouts")
+    .update({
+      is_workout_of_day: false,
+      generated_for_date: null,
+      is_visible: false,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("generated_for_date", effectiveDate)
+    .eq("is_workout_of_day", true);
+
+  if (rollbackError) {
+    logStep("ROLLBACK: Failed to clear partial WOD publish", { effectiveDate, error: rollbackError.message });
+    return;
+  }
+
+  logStep("ROLLBACK: Cleared partial WOD publish", {
+    effectiveDate,
+    cleared: activeWods.map((w) => ({ id: w.id, name: w.name, equipment: w.equipment })),
+  });
+}
+
 // ═══════════════════════════════════════════════════════════════════════════════
 // SIMPLIFIED 84-DAY PERIODIZATION - Direct lookup, no compatibility layers
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -162,6 +207,9 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  let cleanupSupabase: ReturnType<typeof createClient> | null = null;
+  let effectiveDateForCleanup: string | null = null;
+
   try {
     // Parse request body
     let targetDate: string | null = null;
@@ -220,6 +268,8 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
+    cleanupSupabase = supabase;
+    effectiveDateForCleanup = effectiveDate;
 
     // ═══════════════════════════════════════════════════════════════════════════════
     // EARLY RECOVERY DAY CHECK: Using simplified 84-day cycle
@@ -2800,6 +2850,7 @@ Return JSON with these exact fields:
       });
       
       if (!variousExists) {
+        await rollbackActiveWodsForDate(supabase, effectiveDate, "Recovery day final verification failed");
         logStep("CRITICAL ERROR: RECOVERY VARIOUS workout not generated", { 
           generated: generatedWorkouts.map(w => w.equipment)
         });
@@ -2832,6 +2883,8 @@ Return JSON with these exact fields:
         const missing = [];
         if (!bodyweightExists) missing.push("BODYWEIGHT");
         if (!equipmentExists) missing.push("EQUIPMENT");
+
+        await rollbackActiveWodsForDate(supabase, effectiveDate, `Final verification failed. Missing: ${missing.join(", ")}`);
         
         logStep("CRITICAL ERROR: Not all workouts generated", { 
           missing, 
@@ -3041,6 +3094,10 @@ Return JSON with these exact fields:
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
     logStep("ERROR", { message: errorMessage });
+
+    if (cleanupSupabase && effectiveDateForCleanup) {
+      await rollbackActiveWodsForDate(cleanupSupabase, effectiveDateForCleanup, `Unhandled error: ${errorMessage}`);
+    }
     
     // Log failure to notification_audit_log for visibility
     try {
