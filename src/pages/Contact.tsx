@@ -375,7 +375,14 @@ const Contact = () => {
                 "@type": "ContactPoint",
                 "contactType": "Customer Service",
                 "availableLanguage": ["en"]
-              }
+              },
+              "sameAs": [
+                "https://www.google.com/maps/place/SmartyGym",
+                "https://www.instagram.com/thesmartygym/",
+                "https://www.tiktok.com/@thesmartygym",
+                "https://www.youtube.com/@TheSmartyGym",
+                "https://www.facebook.com/profile.php?id=61579302997368"
+              ]
             }
           })}
         </script>
