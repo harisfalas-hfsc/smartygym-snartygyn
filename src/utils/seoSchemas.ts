@@ -106,6 +106,8 @@ export const generateFitnessCenterSchemaFull = () => ({
     "https://www.tiktok.com/@thesmartygym",
     "https://www.youtube.com/@TheSmartyGym",
     "https://www.facebook.com/profile.php?id=61579302997368",
+     // Google Business Profile
+     "https://www.google.com/maps/place/SmartyGym",
      // Multi-domain network - all redirect to smartygym.com
      "https://i-training.net",
      "https://smartywod.com",
