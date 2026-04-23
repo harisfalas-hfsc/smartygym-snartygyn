@@ -362,29 +362,6 @@ const Contact = () => {
             "description": "Get in touch with Haris Falas and the SmartyGym team for online fitness platform support and training inquiries",
             "url": "https://smartygym.com/contact",
             "mainEntity": {
-              "@type": "LocalBusiness",
-              "name": "SmartyGym",
-              "url": "https://smartygym.com",
-              "email": "smartygym@outlook.com",
-              "founder": {
-                "@type": "Person",
-                "name": "Haris Falas",
-                "jobTitle": "Sports Scientist & Strength and Conditioning Coach"
-              },
-              "contactPoint": {
-                "@type": "ContactPoint",
-                "contactType": "Customer Service",
-                "availableLanguage": ["en"]
-              },
-              "sameAs": [
-                "https://www.google.com/maps/place/SmartyGym",
-                "https://www.instagram.com/thesmartygym/",
-                "https://www.tiktok.com/@thesmartygym",
-                "https://www.youtube.com/@TheSmartyGym",
-                "https://www.facebook.com/profile.php?id=61579302997368"
-              ]
-            }
-            "mainEntity": {
               "@type": ["LocalBusiness", "HealthClub"],
               "name": "SmartyGym",
               "alternateName": ["Smarty Gym", "SmartyGym Online", "smartygym.com"],
