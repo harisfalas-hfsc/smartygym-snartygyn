@@ -384,6 +384,87 @@ const Contact = () => {
                 "https://www.facebook.com/profile.php?id=61579302997368"
               ]
             }
+              "@type": ["LocalBusiness", "HealthClub"],
+              "name": "SmartyGym",
+              "alternateName": ["Smarty Gym", "SmartyGym Online", "smartygym.com"],
+              "description": "Global online fitness platform with 500+ expert-designed workouts and training programs. 100% human-designed by Sports Scientist Haris Falas. Train anywhere, anytime.",
+              "url": "https://smartygym.com",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://smartygym.com/smarty-gym-logo.png",
+                "width": 512,
+                "height": 512
+              },
+              "image": "https://smartygym.com/smarty-gym-logo.png",
+              "email": "smartygym@outlook.com",
+              "priceRange": "€€",
+              "currenciesAccepted": "EUR",
+              "paymentAccepted": "Credit Card, Debit Card",
+              "openingHoursSpecification": {
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+                "opens": "00:00",
+                "closes": "23:59"
+              },
+              "areaServed": [
+                { "@type": "Country", "name": "United States" },
+                { "@type": "Country", "name": "Canada" },
+                { "@type": "Country", "name": "United Kingdom" },
+                { "@type": "Country", "name": "Germany" },
+                { "@type": "Country", "name": "France" },
+                { "@type": "Country", "name": "Italy" },
+                { "@type": "Country", "name": "Spain" },
+                { "@type": "Country", "name": "Netherlands" },
+                { "@type": "Country", "name": "Belgium" },
+                { "@type": "Country", "name": "Sweden" },
+                { "@type": "Country", "name": "Denmark" },
+                { "@type": "Country", "name": "Norway" },
+                { "@type": "Country", "name": "Finland" },
+                { "@type": "Country", "name": "Poland" },
+                { "@type": "Country", "name": "Austria" },
+                { "@type": "Country", "name": "Switzerland" },
+                { "@type": "Country", "name": "Portugal" },
+                { "@type": "Country", "name": "Ireland" },
+                { "@type": "Country", "name": "Greece" },
+                { "@type": "Country", "name": "Cyprus" },
+                { "@type": "Country", "name": "Australia" },
+                { "@type": "Country", "name": "Japan" },
+                { "@type": "Country", "name": "South Korea" },
+                { "@type": "Country", "name": "China" },
+                { "@type": "Country", "name": "India" },
+                { "@type": "Country", "name": "Russia" },
+                { "@type": "Country", "name": "Brazil" },
+                { "@type": "Country", "name": "Mexico" },
+                { "@type": "Country", "name": "South Africa" },
+                { "@type": "Country", "name": "Turkey" },
+                { "@type": "Country", "name": "Saudi Arabia" },
+                { "@type": "Country", "name": "Argentina" },
+                { "@type": "Country", "name": "Indonesia" }
+              ],
+              "founder": {
+                "@type": "Person",
+                "name": "Haris Falas",
+                "jobTitle": "Sports Scientist & Strength and Conditioning Coach"
+              },
+              "contactPoint": {
+                "@type": "ContactPoint",
+                "contactType": "Customer Support",
+                "url": "https://smartygym.com/contact",
+                "availableLanguage": ["English", "Greek"]
+              },
+              "sameAs": [
+                "https://www.google.com/maps/place/SmartyGym",
+                "https://www.instagram.com/thesmartygym/",
+                "https://www.tiktok.com/@thesmartygym",
+                "https://www.youtube.com/@TheSmartyGym",
+                "https://www.facebook.com/profile.php?id=61579302997368",
+                "https://i-training.net",
+                "https://smartywod.com",
+                "https://smartylogbook.com",
+                "https://smartywellness.com",
+                "https://smartyworkout.com"
+              ]
+            }
           })}
         </script>
       </Helmet>
