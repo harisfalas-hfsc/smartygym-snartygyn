@@ -1,29 +1,41 @@
 
 
-# Connect Google Business Profile — Invisible SEO Enhancement
+# Enrich LocalBusiness Schema and Update Sitemap — Global Focus
 
 ## Summary
 
-Zero visual changes to the website. All modifications are in hidden structured data (JSON-LD) that only search engines read. Your visitors will see no difference.
+Extend the Contact page's `LocalBusiness` structured data with full social profiles, opening hours, global service area, and business details. Update sitemap dates for freshness. Zero visual, design, style, or content changes — all modifications are invisible metadata only.
 
 ## Changes
 
-### 1. Add Google Business Profile URL to Organization Schema
-- File: `src/utils/seoSchemas.ts`
-- Add the Google Business Profile URL to the `sameAs` array alongside your existing Instagram, TikTok, YouTube, and Facebook links
-- This is invisible metadata that tells Google "this website and this Business Profile are the same entity"
+### 1. Enrich LocalBusiness Schema on Contact Page
+**File:** `src/pages/Contact.tsx`
 
-### 2. Add Google Business Profile URL to Contact Page Schema
-- File: `src/pages/Contact.tsx`
-- Add the same URL to the `LocalBusiness` structured data
-- Again, completely invisible to visitors
+Extend the existing sparse `LocalBusiness` schema to include:
+- **`@type`**: Change to `["LocalBusiness", "HealthClub"]` for richer categorization
+- **`areaServed`**: Array of 30+ countries (all G20 nations plus key European and advanced economies) — signals to Google this is a global platform, not tied to any single country
+- **`openingHoursSpecification`**: 24/7 availability (online platform, matching the existing HealthClub schema)
+- **`priceRange`**: `€€`
+- **`currenciesAccepted`**: `EUR`
+- **`paymentAccepted`**: `Credit Card, Debit Card`
+- **`contactPoint`**: Expand with available languages (English, Greek)
+- **`logo`** and **`image`**: Add logo reference
+- **`sameAs`**: Add the multi-domain network URLs (i-training.net, smartywod.com, smartylogbook.com, smartywellness.com, smartyworkout.com) to match the main Organization schema
+- **No physical address**: Deliberately omitted to avoid associating the brand with any single country
 
-### 3. Your Manual Step (Outside the Website)
-- On your Google Business Profile, verify that the website field is set to `https://smartygym.com` — this creates the reverse trust link from Google back to your site
+The `areaServed` list will include: United States, Canada, United Kingdom, Germany, France, Italy, Spain, Netherlands, Belgium, Sweden, Denmark, Norway, Finland, Poland, Austria, Switzerland, Portugal, Ireland, Greece, Cyprus, Australia, Japan, South Korea, China, India, Russia, Brazil, Mexico, South Africa, Turkey, Saudi Arabia, Argentina, Indonesia — covering all G20 and major advanced economies.
 
-## Impact
-- Stronger brand signal in Google Search
-- Better Knowledge Panel visibility
-- Improved brand search rankings
-- Zero visual changes to the website
+### 2. Update Sitemap Dates
+**File:** `public/sitemap.xml`
+
+- Update all `lastmod` dates to April 2026 to signal active maintenance and freshness to search engines
+- No structural changes, just date refreshes
+
+## Technical Details
+
+**Files to edit:**
+- `src/pages/Contact.tsx` — Enrich `LocalBusiness` JSON-LD with global areaServed, hours, payment, social profiles, multi-domain network
+- `public/sitemap.xml` — Update `lastmod` dates
+
+No new files. No visual changes. No design changes. No content changes. No style changes. Completely invisible to visitors.
 
