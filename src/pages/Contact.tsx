@@ -384,6 +384,7 @@ const Contact = () => {
                 "https://www.facebook.com/profile.php?id=61579302997368"
               ]
             }
+            "mainEntity": {
               "@type": ["LocalBusiness", "HealthClub"],
               "name": "SmartyGym",
               "alternateName": ["Smarty Gym", "SmartyGym Online", "smartygym.com"],
