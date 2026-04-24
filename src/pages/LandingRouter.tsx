@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, Navigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import {
@@ -88,6 +88,17 @@ const OptionRow = ({ opt, compact = false }: { opt: Option; compact?: boolean })
 const LandingRouter = () => {
   const navigate = useNavigate();
   const [selected, setSelected] = useState<string>("");
+
+  // Show landing page once per browser tab session.
+  // sessionStorage is tab-scoped and cleared when the tab closes,
+  // so opening a fresh tab to "/" always shows the landing page again,
+  // regardless of authentication state.
+  if (typeof window !== "undefined") {
+    if (sessionStorage.getItem("smarty_landing_seen") === "1") {
+      return <Navigate to="/home" replace />;
+    }
+    sessionStorage.setItem("smarty_landing_seen", "1");
+  }
 
   const go = () => {
     if (selected) navigate(selected);
