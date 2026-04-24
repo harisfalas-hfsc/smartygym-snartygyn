@@ -748,13 +748,12 @@ This is a NUDGE, not a mandate.
       const { data: existingNames } = await supabase
         .from("admin_workouts")
         .select("name")
-        .eq("category", category)
         .order("created_at", { ascending: false })
-        .limit(500);
+        .limit(2000);
       
       if (existingNames) {
         existingNamesForCategory = existingNames.map((w: any) => w.name);
-        logStep("Loaded existing workout names for uniqueness check", { 
+        logStep("Loaded existing workout names for uniqueness check (library-wide)", { 
           category, 
           count: existingNamesForCategory.length,
           sample: existingNamesForCategory.slice(0, 5)
