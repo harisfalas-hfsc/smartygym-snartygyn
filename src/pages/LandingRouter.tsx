@@ -36,8 +36,8 @@ const OPTIONS: Option[] = [
   },
   {
     value: "/workout",
-    label: "Train — Smarty Workouts",
-    description: "Browse the workout library",
+    label: "Smarty Workouts",
+    description: "Browse the full workout library",
     icon: Dumbbell,
     route: "/workout",
   },
@@ -126,17 +126,17 @@ const LandingRouter = () => {
                     <SelectItem
                       key={opt.value}
                       value={opt.value}
-                      className="py-3"
+                      className="py-3 group focus:bg-accent data-[highlighted]:bg-accent"
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 text-popover-foreground group-focus:text-accent-foreground group-data-[highlighted]:text-accent-foreground">
                         <span className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                           <Icon className="w-4 h-4 text-primary" />
                         </span>
-                        <div className="flex flex-col text-left">
-                          <span className="font-medium leading-tight">
+                        <div className="flex flex-col text-left min-w-0">
+                          <span className="font-medium leading-tight truncate">
                             {opt.label}
                           </span>
-                          <span className="text-xs text-muted-foreground">
+                          <span className="text-xs text-muted-foreground group-focus:text-accent-foreground/80 group-data-[highlighted]:text-accent-foreground/80 truncate">
                             {opt.description}
                           </span>
                         </div>
