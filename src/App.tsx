@@ -93,7 +93,6 @@ import { AnnouncementManager } from "./components/announcements/AnnouncementMana
 import { FreeTrialPopup } from "./components/growth/FreeTrialPopup";
 
 import { SocialProofToast } from "./components/growth/SocialProofToast";
-import { PromoBanner } from "./components/growth/PromoBanner";
 import { SmartyCoachButton } from "./components/smarty-coach";
 
 // Redirect component for /dashboard to /userdashboard
