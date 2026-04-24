@@ -2642,6 +2642,32 @@ Return JSON with these exact fields:
         finisherExercises: sectionValidation.finisherExerciseCount
       });
 
+      // ═══════════════════════════════════════════════════════════════════════════════
+      // FINAL PRE-INSERT UNIQUENESS GUARD (library-wide, race-condition safe)
+      // Re-check the database immediately before INSERT in case another row was added
+      // between the initial banlist fetch and now. If a collision is found, append a
+      // date+equipment suffix so the name remains globally unique.
+      // ═══════════════════════════════════════════════════════════════════════════════
+      try {
+        const { data: collisionRows } = await supabase
+          .from("admin_workouts")
+          .select("id")
+          .ilike("name", workoutContent.name)
+          .limit(1);
+        if (collisionRows && collisionRows.length > 0) {
+          const dateSuffix = effectiveDate.replace(/-/g, '').slice(-4);
+          const eqSuffix = equipment === "EQUIPMENT" ? "EQ" : equipment === "BODYWEIGHT" ? "BW" : "V";
+          const guardedName = `${workoutContent.name} ${dateSuffix}${eqSuffix}`;
+          logStep(`⚠️ Pre-insert collision detected, applying guard rename`, {
+            original: workoutContent.name,
+            newName: guardedName,
+          });
+          workoutContent.name = guardedName;
+        }
+      } catch (guardErr) {
+        logStep("Pre-insert uniqueness guard failed (non-critical)", { error: String(guardErr) });
+      }
+
       const { error: insertError } = await supabase
         .from("admin_workouts")
         .insert({
