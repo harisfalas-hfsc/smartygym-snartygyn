@@ -15,8 +15,7 @@ import {
   CalendarRange,
   Wrench,
   BookOpen,
-  Dumbbell as _Dumbbell,
-  Biceps,
+  BicepsFlexed,
   type LucideIcon,
 } from "lucide-react";
 
@@ -111,7 +110,12 @@ const LandingRouter = () => {
               Hello, Smarty
             </p>
             <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-foreground leading-tight">
-              Ready to crush your goal?
+              <span className="inline-flex items-center gap-3 justify-center flex-wrap">
+                <span className="w-11 h-11 md:w-14 md:h-14 rounded-full bg-primary/15 ring-1 ring-primary/30 inline-flex items-center justify-center shrink-0">
+                  <BicepsFlexed className="w-6 h-6 md:w-7 md:h-7 text-primary" />
+                </span>
+                Ready to crush your goal?
+              </span>
             </h1>
             <p className="text-base md:text-lg text-muted-foreground">
               Pick your move. Let's give it a go.
@@ -152,6 +156,17 @@ const LandingRouter = () => {
             >
               Let's go
             </Button>
+
+            <p className="text-sm text-muted-foreground pt-2">
+              Or{" "}
+              <Link
+                to="/home"
+                className="font-medium text-primary underline-offset-4 hover:underline"
+              >
+                go to the homepage
+              </Link>
+              .
+            </p>
           </div>
         </div>
       </main>
