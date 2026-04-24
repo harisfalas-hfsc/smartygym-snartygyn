@@ -5,58 +5,62 @@ import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import smartyGymLogo from "@/assets/smarty-gym-logo.png";
+import {
+  Flame,
+  Dumbbell,
+  CalendarRange,
+  Wrench,
+  BookOpen,
+  type LucideIcon,
+} from "lucide-react";
 
-type Option = { label: string; route: string };
-type Group = { label: string; options: Option[] };
+type Option = {
+  value: string;
+  label: string;
+  description: string;
+  icon: LucideIcon;
+  route: string;
+};
 
-const GROUPS: Group[] = [
+const OPTIONS: Option[] = [
   {
-    label: "Train",
-    options: [
-      { label: "Workout of the Day", route: "/workout/wod" },
-      { label: "Daily Smarty Ritual", route: "/daily-ritual" },
-      { label: "Browse Workouts", route: "/workout" },
-      { label: "Training Programs", route: "/trainingprogram" },
-      { label: "WOD Archive", route: "/wod-archive" },
-    ],
+    value: "/workout/wod",
+    label: "Check the Workout of the Day",
+    description: "Today's smart-coded WOD",
+    icon: Flame,
+    route: "/workout/wod",
   },
   {
-    label: "Tools",
-    options: [
-      { label: "Smarty Tools (all)", route: "/tools" },
-      { label: "Workout Timer", route: "/workouttimer" },
-      { label: "1RM Calculator", route: "/1rmcalculator" },
-      { label: "BMR Calculator", route: "/bmrcalculator" },
-      { label: "Macro Calculator", route: "/macrocalculator" },
-      { label: "Calorie Counter", route: "/caloriecounter" },
-      { label: "Exercise Library", route: "/exerciselibrary" },
-    ],
+    value: "/workout",
+    label: "Train — Smarty Workouts",
+    description: "Browse the workout library",
+    icon: Dumbbell,
+    route: "/workout",
   },
   {
-    label: "Learn",
-    options: [
-      { label: "Blog", route: "/blog" },
-      { label: "The Smarty Method", route: "/the-smarty-method" },
-      { label: "About / Coach", route: "/about" },
-      { label: "FAQ", route: "/faq" },
-    ],
+    value: "/trainingprogram",
+    label: "Training Programs",
+    description: "Structured multi-week plans",
+    icon: CalendarRange,
+    route: "/trainingprogram",
   },
   {
-    label: "Account & More",
-    options: [
-      { label: "My Dashboard", route: "/userdashboard" },
-      { label: "Join Premium", route: "/joinpremium" },
-      { label: "Shop", route: "/shop" },
-      { label: "Community", route: "/community" },
-      { label: "Contact", route: "/contact" },
-    ],
+    value: "/tools",
+    label: "Use a Smarty Tool",
+    description: "Calculators, timer, library",
+    icon: Wrench,
+    route: "/tools",
+  },
+  {
+    value: "/blog",
+    label: "Read a Blog Article",
+    description: "Fitness, nutrition & wellness",
+    icon: BookOpen,
+    route: "/blog",
   },
 ];
 
@@ -68,31 +72,30 @@ const LandingRouter = () => {
     if (selected) navigate(selected);
   };
 
+  const SelectedIcon =
+    OPTIONS.find((o) => o.value === selected)?.icon ?? null;
+
   return (
     <>
       <Helmet>
-        <title>Start Here | SmartyGym — What do you want to do today?</title>
+        <title>Hello Smarty | Ready to crush your goal? — SmartyGym</title>
         <meta
           name="description"
-          content="Pick a destination — Workout of the Day, workouts, training programs, tools, blog and more — and we'll take you there."
+          content="Hello Smarty — pick what you want to do today: Workout of the Day, Smarty Workouts, Training Programs, a Tool or a Blog article."
         />
       </Helmet>
 
       <main className="min-h-[calc(100vh-var(--app-header-h,100px))] flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-xl mx-auto text-center space-y-8">
-          <img
-            src={smartyGymLogo}
-            alt="SmartyGym logo"
-            className="h-16 md:h-20 mx-auto object-contain"
-            loading="eager"
-          />
-
-          <div className="space-y-3">
-            <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-foreground">
-              What do you want to do today?
+        <div className="w-full max-w-xl mx-auto text-center space-y-10">
+          <div className="space-y-4">
+            <p className="text-sm md:text-base font-semibold tracking-[0.2em] uppercase text-primary">
+              Hello, Smarty
+            </p>
+            <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-foreground leading-tight">
+              Ready to crush your goal?
             </h1>
             <p className="text-base md:text-lg text-muted-foreground">
-              Pick a destination and we'll take you there.
+              Pick your move. Let's give it a go.
             </p>
           </div>
 
@@ -104,22 +107,43 @@ const LandingRouter = () => {
           >
             <Select value={selected} onValueChange={setSelected}>
               <SelectTrigger
-                className="h-14 text-base md:text-lg w-full"
-                aria-label="Choose where to go"
+                className="h-16 text-base md:text-lg w-full pl-4"
+                aria-label="Choose what you want to do today"
               >
-                <SelectValue placeholder="Choose what you want to do…" />
+                <div className="flex items-center gap-3 min-w-0">
+                  {SelectedIcon ? (
+                    <span className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                      <SelectedIcon className="w-5 h-5 text-primary" />
+                    </span>
+                  ) : null}
+                  <SelectValue placeholder="What do you want to do today?" />
+                </div>
               </SelectTrigger>
               <SelectContent className="max-h-[60vh]">
-                {GROUPS.map((group) => (
-                  <SelectGroup key={group.label}>
-                    <SelectLabel>{group.label}</SelectLabel>
-                    {group.options.map((opt) => (
-                      <SelectItem key={opt.route} value={opt.route}>
-                        {opt.label}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                ))}
+                {OPTIONS.map((opt) => {
+                  const Icon = opt.icon;
+                  return (
+                    <SelectItem
+                      key={opt.value}
+                      value={opt.value}
+                      className="py-3"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                          <Icon className="w-4 h-4 text-primary" />
+                        </span>
+                        <div className="flex flex-col text-left">
+                          <span className="font-medium leading-tight">
+                            {opt.label}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {opt.description}
+                          </span>
+                        </div>
+                      </div>
+                    </SelectItem>
+                  );
+                })}
               </SelectContent>
             </Select>
 
@@ -129,17 +153,9 @@ const LandingRouter = () => {
               onClick={go}
               disabled={!selected}
             >
-              Go
+              Let's go
             </Button>
           </div>
-
-          <button
-            type="button"
-            onClick={() => navigate("/")}
-            className="text-sm text-muted-foreground hover:text-foreground underline underline-offset-4 transition-colors"
-          >
-            Or browse the full homepage
-          </button>
         </div>
       </main>
     </>
