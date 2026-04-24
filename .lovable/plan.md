@@ -1,52 +1,54 @@
-# Fix: WOD Name Collision (Kinetic Cascade)
+# Stripe Orphan Cleanup — Kinetic Cascade + Full Audit
 
-## Root Cause
+## Summary
 
-The duplicate "Kinetic Cascade" entries are not actually duplicates — they are two different workouts that share the same base name:
+Three actions, all Stripe-only. Zero database, UI, or content changes.
 
-1. **Today's WOD** — `Kinetic Cascade 0424EQ` (CARDIO / AMRAP / generated 04/24)
-2. **Older free workout** — `Kinetic Cascade` (CALORIE BURNING / TABATA / created 04/20)
+## Part 1 — Archive the immediate orphan
 
-The WOD generator already has a uniqueness check, but it only queries existing names **within the same category** (`generate-workout-of-day/index.ts`, line 751: `.eq("category", category)`). Today's WOD was generated for `CARDIO`, so the older `CALORIE BURNING` workout with the same name was invisible to the collision check — and the AI happily reused "Kinetic Cascade".
+Archive Stripe product **`prod_UOIMbl2vRFnTK8`** ("Kinetic Cascade").
 
-This violates the project's [workout naming uniqueness standard](mem://system/workout-naming-and-uniqueness-standard) which requires unique names across the **entire library**.
+- Confirmed: no row in `admin_workouts` references this product (the renamed `Kinetic Cascade Burn` is free and has `stripe_product_id = NULL`; today's WOD points to `prod_UOINFzqoCmbe3E`).
+- Action: `stripe.products.update(prod_UOIMbl2vRFnTK8, { active: false })`. Archive (not delete) so historical invoices keep working. It will disappear from the active catalog.
 
-## Fix — Two Parts
+## Part 2 — Full SmartyGym orphan audit
 
-### Part 1: Rename the Conflicting Free Workout (data fix)
+Run a one-time audit to catch any other dangling Stripe products from past WOD regenerations.
 
-Rename the older free workout so the library has no remaining collision:
+Steps:
+1. List all active Stripe products with `metadata.project = "SMARTYGYM"`.
+2. Fetch all `stripe_product_id` values from `admin_workouts`.
+3. Diff: any active SMARTYGYM Stripe product NOT referenced in `admin_workouts` = orphan.
+4. For each orphan:
+   - Log id, name, created date, content_type metadata.
+   - Archive it (`active: false`).
+5. Skip and never touch:
+   - The 6 subscription/corporate products and 3 standalone training programs and 10 micro-workouts listed in `src/config/pricing.ts` (`OUR_STRIPE_PRODUCT_IDS`) — these are permanent catalog items, not WOD-generated.
 
-- `FREE-calorie-burning-B-1776659161171`
-- `Kinetic Cascade` → **`Kinetic Cascade Burn`**
+Report the full list of archived products back to you so you can spot-check.
 
-Run a SQL `UPDATE` via the data tool. No regeneration, no Stripe changes (this workout is free and has no Stripe product).
+## Part 3 — Verify WOD product naming
 
-### Part 2: Harden the Generator (code fix)
+Confirm `prod_UOINFzqoCmbe3E` Stripe name = `Kinetic Cascade 0424EQ` (already confirmed via search — no rename needed). Just included as a final verification step in the report.
 
-In `supabase/functions/generate-workout-of-day/index.ts`:
+## Why the orphan exists
 
-1. **Broaden the existing-names query** (around line 748-753): remove the `.eq("category", category)` filter so the banlist covers **all categories** (WODs, free workouts, premium, standalone — everything in `admin_workouts`). Bump the limit to 2000 to cover the full library.
-2. **Keep the post-generation collision auto-rename** (lines 2207-2230) as the second safety net — it already appends a `MMDD+EQ/BW/V` suffix when a collision slips through. With the broader banlist feeding it, it will now also catch cross-category collisions.
-3. **Add a final pre-insert guard**: right before inserting the new workout into `admin_workouts`, do one last `select id from admin_workouts where lower(name) = lower(newName) limit 1`. If anything is returned, append the date+equipment suffix again. This protects against race conditions where another row was added between the initial banlist fetch and the insert.
+The WOD generator's idempotency logic creates a Stripe product when a WOD is generated. If a WOD is regenerated, replaced, or its DB row's `stripe_product_id` is overwritten, the previous Stripe product is left dangling unless explicitly archived. The pre-existing `archive-orphan-stripe-products` / cleanup logic apparently didn't catch this one (likely because the orphan was created in the same minute as the legitimate WOD, before the DB row settled). The audit in Part 2 will sweep it and any siblings.
 
-No prompt rewrites, no behavior changes for end users — purely an internal safety net.
+## Files / Resources Touched
 
-## Files Touched
-
-- **Data**: `admin_workouts` row `FREE-calorie-burning-B-1776659161171` (rename only)
-- **Code**: `supabase/functions/generate-workout-of-day/index.ts`
-  - ~3 lines changed in the existing-names fetch block
-  - ~10 lines added for the pre-insert guard
-
-## What the User Will See
-
-- The "Kinetic Cascade" free workout in the Calorie Burning library will now read **"Kinetic Cascade Burn"**.
-- Today's WOD `Kinetic Cascade 0424EQ` is unchanged.
-- All future WODs will be guaranteed unique across the entire workout library.
+- **Stripe**: archive `prod_UOIMbl2vRFnTK8` + any orphans found in audit. No deletions.
+- **Database**: read-only (used to build the orphan diff).
+- **Code**: none. No edge function changes, no UI changes.
 
 ## Out of Scope
 
-- No changes to Stripe products, pricing, images, or any UI.
-- No changes to existing WODs from prior days.
-- No design, layout, or content changes elsewhere.
+- No new recurring cleanup cron (can be added later if you want continuous protection — say the word).
+- No changes to the WOD generator (already hardened in the previous fix).
+- No changes to free workouts, premium workouts, or subscriptions.
+
+## What You'll See After
+
+- Stripe catalog will no longer show the duplicate "Kinetic Cascade" product.
+- April 24 will show only the 2 legitimate WOD products (Kinetic Cascade 0424EQ + Velocity Core Cadence).
+- A printed report of any other orphans archived.
