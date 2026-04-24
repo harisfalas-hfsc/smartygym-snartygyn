@@ -1,54 +1,69 @@
-# Stripe Orphan Cleanup — Kinetic Cascade + Full Audit
+# Landing Router Page — "What do you want to do today?"
 
-## Summary
+## Goal
+Add a new first-screen landing page where users pick a destination from a single prominent dropdown and get routed to the corresponding flow. Existing homepage (`Index.tsx`) remains untouched and reachable.
 
-Three actions, all Stripe-only. Zero database, UI, or content changes.
+## Routing change
+- New route `/start` → `LandingRouter` page.
+- Keep `/` → `Index` (current homepage) unchanged so existing SEO, links, and marketing are preserved.
+- Optional follow-up (not in this plan): make `/start` the default for first-time visitors via a localStorage flag. We will NOT auto-redirect `/` by default to avoid breaking SEO and existing user flows.
 
-## Part 1 — Archive the immediate orphan
+If you'd rather have `/` itself become the new dropdown landing and move the current homepage to `/home`, say the word and I'll swap it in implementation.
 
-Archive Stripe product **`prod_UOIMbl2vRFnTK8`** ("Kinetic Cascade").
+## The Page (`src/pages/LandingRouter.tsx`)
+Clean, centered, full-height hero:
+- SmartyGym logo + headline: "What do you want to do today?"
+- Sub-line: "Pick a destination and we'll take you there."
+- A single large `Select` (shadcn `@/components/ui/select`) with grouped options.
+- Primary `Button` "Go" → navigates to chosen route.
+- Secondary link: "Or browse the full homepage" → `/`.
+- Uses existing brand styling (dark theme, electric blue accent #29B6D2), no new colors.
+- `Helmet` with title/description for SEO.
 
-- Confirmed: no row in `admin_workouts` references this product (the renamed `Kinetic Cascade Burn` is free and has `stripe_product_id = NULL`; today's WOD points to `prod_UOINFzqoCmbe3E`).
-- Action: `stripe.products.update(prod_UOIMbl2vRFnTK8, { active: false })`. Archive (not delete) so historical invoices keep working. It will disappear from the active catalog.
+### Dropdown options (label → route)
+Grouped via `SelectGroup` / `SelectLabel`:
 
-## Part 2 — Full SmartyGym orphan audit
+Train
+- Workout of the Day → `/workout/wod`
+- Daily Smarty Ritual → `/daily-ritual`
+- Browse Workouts → `/workout`
+- Training Programs → `/trainingprogram`
+- WOD Archive → `/wod-archive`
 
-Run a one-time audit to catch any other dangling Stripe products from past WOD regenerations.
+Tools
+- Smarty Tools (all) → `/tools`
+- Workout Timer → `/workouttimer`
+- 1RM Calculator → `/1rmcalculator`
+- BMR Calculator → `/bmrcalculator`
+- Macro Calculator → `/macrocalculator`
+- Calorie Counter → `/caloriecounter`
+- Exercise Library → `/exerciselibrary`
 
-Steps:
-1. List all active Stripe products with `metadata.project = "SMARTYGYM"`.
-2. Fetch all `stripe_product_id` values from `admin_workouts`.
-3. Diff: any active SMARTYGYM Stripe product NOT referenced in `admin_workouts` = orphan.
-4. For each orphan:
-   - Log id, name, created date, content_type metadata.
-   - Archive it (`active: false`).
-5. Skip and never touch:
-   - The 6 subscription/corporate products and 3 standalone training programs and 10 micro-workouts listed in `src/config/pricing.ts` (`OUR_STRIPE_PRODUCT_IDS`) — these are permanent catalog items, not WOD-generated.
+Learn
+- Blog → `/blog`
+- The Smarty Method → `/the-smarty-method`
+- About / Coach → `/about`
+- FAQ → `/faq`
 
-Report the full list of archived products back to you so you can spot-check.
+Account & More
+- My Dashboard → `/userdashboard`
+- Join Premium → `/joinpremium`
+- Shop → `/shop`
+- Community → `/community`
+- Contact → `/contact`
 
-## Part 3 — Verify WOD product naming
+All routes verified against `src/App.tsx` route table.
 
-Confirm `prod_UOINFzqoCmbe3E` Stripe name = `Kinetic Cascade 0424EQ` (already confirmed via search — no rename needed). Just included as a final verification step in the report.
+## Behavior
+- On selection + "Go" click → `navigate(route)`.
+- Pressing Enter while focused on the Select also triggers navigation.
+- "My Dashboard" route is protected; the existing `ProtectedRoute` will handle redirect to `/auth` if not signed in. No extra logic needed here.
 
-## Why the orphan exists
+## Files
+- Add: `src/pages/LandingRouter.tsx`
+- Edit: `src/App.tsx` — import `LandingRouter`, add `<Route path="/start" element={<LandingRouter />} />` above the catch-all.
 
-The WOD generator's idempotency logic creates a Stripe product when a WOD is generated. If a WOD is regenerated, replaced, or its DB row's `stripe_product_id` is overwritten, the previous Stripe product is left dangling unless explicitly archived. The pre-existing `archive-orphan-stripe-products` / cleanup logic apparently didn't catch this one (likely because the orphan was created in the same minute as the legitimate WOD, before the DB row settled). The audit in Part 2 will sweep it and any siblings.
-
-## Files / Resources Touched
-
-- **Stripe**: archive `prod_UOIMbl2vRFnTK8` + any orphans found in audit. No deletions.
-- **Database**: read-only (used to build the orphan diff).
-- **Code**: none. No edge function changes, no UI changes.
-
-## Out of Scope
-
-- No new recurring cleanup cron (can be added later if you want continuous protection — say the word).
-- No changes to the WOD generator (already hardened in the previous fix).
-- No changes to free workouts, premium workouts, or subscriptions.
-
-## What You'll See After
-
-- Stripe catalog will no longer show the duplicate "Kinetic Cascade" product.
-- April 24 will show only the 2 legitimate WOD products (Kinetic Cascade 0424EQ + Velocity Core Cadence).
-- A printed report of any other orphans archived.
+## Out of scope
+- No changes to `Index.tsx`, navigation bar, or footer.
+- No analytics/tracking changes beyond the existing global `AnalyticsTracker`.
+- No DB or backend changes.
