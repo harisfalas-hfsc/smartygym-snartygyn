@@ -25,6 +25,7 @@ import { useAdminRole } from "./hooks/useAdminRole";
 import { ArticleDetail } from "./pages/ArticleDetail";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import LandingRouter from "./pages/LandingRouter";
 import ResetPassword from "./pages/ResetPassword";
 import UserDashboard from "./pages/UserDashboard";
 import WorkoutFlow from "./pages/WorkoutFlow";
@@ -129,6 +130,7 @@ const AppContent = () => {
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/auth" element={<Auth />} />
+                  <Route path="/start" element={<LandingRouter />} />
                   <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/joinpremium" element={<JoinPremium />} />
                   <Route path="/join-premium" element={<JoinPremium />} />
