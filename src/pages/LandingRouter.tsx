@@ -23,7 +23,8 @@ type Option = {
   label: string;
   description: string;
   icon: LucideIcon;
-  route: string;
+  /** Tailwind classes for the icon chip (background + icon color). Use semantic-ish accents. */
+  chip: string;
 };
 
 const OPTIONS: Option[] = [
@@ -32,37 +33,56 @@ const OPTIONS: Option[] = [
     label: "Check the Workout of the Day",
     description: "Today's smart-coded WOD",
     icon: Flame,
-    route: "/workout/wod",
+    chip: "bg-orange-500/15 text-orange-500 ring-1 ring-orange-500/30",
   },
   {
     value: "/workout",
-    label: "Smarty Workouts",
+    label: "Choose a Workout",
     description: "Browse the full workout library",
     icon: Dumbbell,
-    route: "/workout",
+    chip: "bg-sky-500/15 text-sky-500 ring-1 ring-sky-500/30",
   },
   {
     value: "/trainingprogram",
-    label: "Training Programs",
+    label: "Choose a Training Program",
     description: "Structured multi-week plans",
     icon: CalendarRange,
-    route: "/trainingprogram",
+    chip: "bg-violet-500/15 text-violet-500 ring-1 ring-violet-500/30",
   },
   {
     value: "/tools",
     label: "Use a Smarty Tool",
     description: "Calculators, timer, library",
     icon: Wrench,
-    route: "/tools",
+    chip: "bg-emerald-500/15 text-emerald-500 ring-1 ring-emerald-500/30",
   },
   {
     value: "/blog",
     label: "Read a Blog Article",
     description: "Fitness, nutrition & wellness",
     icon: BookOpen,
-    route: "/blog",
+    chip: "bg-pink-500/15 text-pink-500 ring-1 ring-pink-500/30",
   },
 ];
+
+const OptionRow = ({ opt, compact = false }: { opt: Option; compact?: boolean }) => {
+  const Icon = opt.icon;
+  return (
+    <div className="flex items-center gap-3 min-w-0 w-full">
+      <span
+        className={`${compact ? "w-9 h-9" : "w-10 h-10"} rounded-full flex items-center justify-center shrink-0 ${opt.chip}`}
+      >
+        <Icon className={compact ? "w-4 h-4" : "w-5 h-5"} />
+      </span>
+      <div className="flex flex-col text-left min-w-0">
+        <span className="font-medium leading-tight truncate">{opt.label}</span>
+        <span className="text-xs text-muted-foreground truncate">
+          {opt.description}
+        </span>
+      </div>
+    </div>
+  );
+};
 
 const LandingRouter = () => {
   const navigate = useNavigate();
@@ -72,16 +92,13 @@ const LandingRouter = () => {
     if (selected) navigate(selected);
   };
 
-  const SelectedIcon =
-    OPTIONS.find((o) => o.value === selected)?.icon ?? null;
-
   return (
     <>
       <Helmet>
         <title>Hello Smarty | Ready to crush your goal? — SmartyGym</title>
         <meta
           name="description"
-          content="Hello Smarty — pick what you want to do today: Workout of the Day, Smarty Workouts, Training Programs, a Tool or a Blog article."
+          content="Hello Smarty — pick what you want to do today: Workout of the Day, a Workout, a Training Program, a Tool or a Blog article."
         />
       </Helmet>
 
@@ -107,43 +124,21 @@ const LandingRouter = () => {
           >
             <Select value={selected} onValueChange={setSelected}>
               <SelectTrigger
-                className="h-16 text-base md:text-lg w-full pl-4"
+                className="h-16 text-base md:text-lg w-full pl-3 pr-4 [&>span]:flex [&>span]:w-full [&>span]:min-w-0"
                 aria-label="Choose what you want to do today"
               >
-                <div className="flex items-center gap-3 min-w-0">
-                  {SelectedIcon ? (
-                    <span className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                      <SelectedIcon className="w-5 h-5 text-primary" />
-                    </span>
-                  ) : null}
-                  <SelectValue placeholder="What do you want to do today?" />
-                </div>
+                <SelectValue placeholder="What do you want to do today?" />
               </SelectTrigger>
               <SelectContent className="max-h-[60vh]">
-                {OPTIONS.map((opt) => {
-                  const Icon = opt.icon;
-                  return (
-                    <SelectItem
-                      key={opt.value}
-                      value={opt.value}
-                      className="py-3 group focus:bg-accent data-[highlighted]:bg-accent"
-                    >
-                      <div className="flex items-center gap-3 text-popover-foreground group-focus:text-accent-foreground group-data-[highlighted]:text-accent-foreground">
-                        <span className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                          <Icon className="w-4 h-4 text-primary" />
-                        </span>
-                        <div className="flex flex-col text-left min-w-0">
-                          <span className="font-medium leading-tight truncate">
-                            {opt.label}
-                          </span>
-                          <span className="text-xs text-muted-foreground group-focus:text-accent-foreground/80 group-data-[highlighted]:text-accent-foreground/80 truncate">
-                            {opt.description}
-                          </span>
-                        </div>
-                      </div>
-                    </SelectItem>
-                  );
-                })}
+                {OPTIONS.map((opt) => (
+                  <SelectItem
+                    key={opt.value}
+                    value={opt.value}
+                    className="py-3 pl-3 pr-2 focus:bg-accent data-[highlighted]:bg-accent text-popover-foreground focus:text-accent-foreground data-[highlighted]:text-accent-foreground"
+                  >
+                    <OptionRow opt={opt} compact />
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
 
