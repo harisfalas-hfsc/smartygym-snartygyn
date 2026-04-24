@@ -1,41 +1,52 @@
+# Fix: WOD Name Collision (Kinetic Cascade)
 
+## Root Cause
 
-# Enrich LocalBusiness Schema and Update Sitemap — Global Focus
+The duplicate "Kinetic Cascade" entries are not actually duplicates — they are two different workouts that share the same base name:
 
-## Summary
+1. **Today's WOD** — `Kinetic Cascade 0424EQ` (CARDIO / AMRAP / generated 04/24)
+2. **Older free workout** — `Kinetic Cascade` (CALORIE BURNING / TABATA / created 04/20)
 
-Extend the Contact page's `LocalBusiness` structured data with full social profiles, opening hours, global service area, and business details. Update sitemap dates for freshness. Zero visual, design, style, or content changes — all modifications are invisible metadata only.
+The WOD generator already has a uniqueness check, but it only queries existing names **within the same category** (`generate-workout-of-day/index.ts`, line 751: `.eq("category", category)`). Today's WOD was generated for `CARDIO`, so the older `CALORIE BURNING` workout with the same name was invisible to the collision check — and the AI happily reused "Kinetic Cascade".
 
-## Changes
+This violates the project's [workout naming uniqueness standard](mem://system/workout-naming-and-uniqueness-standard) which requires unique names across the **entire library**.
 
-### 1. Enrich LocalBusiness Schema on Contact Page
-**File:** `src/pages/Contact.tsx`
+## Fix — Two Parts
 
-Extend the existing sparse `LocalBusiness` schema to include:
-- **`@type`**: Change to `["LocalBusiness", "HealthClub"]` for richer categorization
-- **`areaServed`**: Array of 30+ countries (all G20 nations plus key European and advanced economies) — signals to Google this is a global platform, not tied to any single country
-- **`openingHoursSpecification`**: 24/7 availability (online platform, matching the existing HealthClub schema)
-- **`priceRange`**: `€€`
-- **`currenciesAccepted`**: `EUR`
-- **`paymentAccepted`**: `Credit Card, Debit Card`
-- **`contactPoint`**: Expand with available languages (English, Greek)
-- **`logo`** and **`image`**: Add logo reference
-- **`sameAs`**: Add the multi-domain network URLs (i-training.net, smartywod.com, smartylogbook.com, smartywellness.com, smartyworkout.com) to match the main Organization schema
-- **No physical address**: Deliberately omitted to avoid associating the brand with any single country
+### Part 1: Rename the Conflicting Free Workout (data fix)
 
-The `areaServed` list will include: United States, Canada, United Kingdom, Germany, France, Italy, Spain, Netherlands, Belgium, Sweden, Denmark, Norway, Finland, Poland, Austria, Switzerland, Portugal, Ireland, Greece, Cyprus, Australia, Japan, South Korea, China, India, Russia, Brazil, Mexico, South Africa, Turkey, Saudi Arabia, Argentina, Indonesia — covering all G20 and major advanced economies.
+Rename the older free workout so the library has no remaining collision:
 
-### 2. Update Sitemap Dates
-**File:** `public/sitemap.xml`
+- `FREE-calorie-burning-B-1776659161171`
+- `Kinetic Cascade` → **`Kinetic Cascade Burn`**
 
-- Update all `lastmod` dates to April 2026 to signal active maintenance and freshness to search engines
-- No structural changes, just date refreshes
+Run a SQL `UPDATE` via the data tool. No regeneration, no Stripe changes (this workout is free and has no Stripe product).
 
-## Technical Details
+### Part 2: Harden the Generator (code fix)
 
-**Files to edit:**
-- `src/pages/Contact.tsx` — Enrich `LocalBusiness` JSON-LD with global areaServed, hours, payment, social profiles, multi-domain network
-- `public/sitemap.xml` — Update `lastmod` dates
+In `supabase/functions/generate-workout-of-day/index.ts`:
 
-No new files. No visual changes. No design changes. No content changes. No style changes. Completely invisible to visitors.
+1. **Broaden the existing-names query** (around line 748-753): remove the `.eq("category", category)` filter so the banlist covers **all categories** (WODs, free workouts, premium, standalone — everything in `admin_workouts`). Bump the limit to 2000 to cover the full library.
+2. **Keep the post-generation collision auto-rename** (lines 2207-2230) as the second safety net — it already appends a `MMDD+EQ/BW/V` suffix when a collision slips through. With the broader banlist feeding it, it will now also catch cross-category collisions.
+3. **Add a final pre-insert guard**: right before inserting the new workout into `admin_workouts`, do one last `select id from admin_workouts where lower(name) = lower(newName) limit 1`. If anything is returned, append the date+equipment suffix again. This protects against race conditions where another row was added between the initial banlist fetch and the insert.
 
+No prompt rewrites, no behavior changes for end users — purely an internal safety net.
+
+## Files Touched
+
+- **Data**: `admin_workouts` row `FREE-calorie-burning-B-1776659161171` (rename only)
+- **Code**: `supabase/functions/generate-workout-of-day/index.ts`
+  - ~3 lines changed in the existing-names fetch block
+  - ~10 lines added for the pre-insert guard
+
+## What the User Will See
+
+- The "Kinetic Cascade" free workout in the Calorie Burning library will now read **"Kinetic Cascade Burn"**.
+- Today's WOD `Kinetic Cascade 0424EQ` is unchanged.
+- All future WODs will be guaranteed unique across the entire workout library.
+
+## Out of Scope
+
+- No changes to Stripe products, pricing, images, or any UI.
+- No changes to existing WODs from prior days.
+- No design, layout, or content changes elsewhere.
