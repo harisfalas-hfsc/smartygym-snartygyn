@@ -1,42 +1,45 @@
-## Goal
+Plan to fix the landing page behavior
 
-Show the landing page once per browser tab session, regardless of login status. After the visitor uses it (or navigates away), they go straight to `/home` for any reload or in-tab navigation. Closing the tab and opening a new one to `smartygym.com` shows the landing page again.
+What will change
+1. Remove the current `sessionStorage` redirect logic from the landing page.
+   - This is the part causing “sometimes yes, sometimes no.”
+   - It remembers that the landing page was already seen inside the current tab, then sends `/` to `/home`.
 
-## Behavior Rules
+2. Make `/` always render the landing page.
+   - Every fresh opening of `smartygym.com` or `www.smartygym.com` will show the landing page.
+   - This applies to everyone: visitors, logged-in users, free users, premium users, and admins.
 
-| Scenario | Result |
-|---|---|
-| New tab → opens `smartygym.com/` (any user: visitor, free, premium, logged in/out) | **Show landing page** |
-| Already saw landing page in this tab → reload `/` | Redirect to `/home` |
-| Already saw landing page → type `smartygym.com/` again in same tab | Redirect to `/home` |
-| Close tab, open new tab → `smartygym.com/` | **Show landing page again** |
-| Direct deep links (e.g. `/workout`, `/home`) | Unaffected — never forced to landing |
+3. Keep the homepage available at `/home`.
+   - If someone clicks “go to the homepage” from the landing page, they go to `/home`.
+   - If they refresh while already on `/home`, they stay on `/home`.
+   - If they close the tab and later open the website root again, they see the landing page again.
 
-## Technical Implementation
+4. Keep internal navigation stable.
+   - I will not force the landing page to appear when someone opens a deep link like `/workout`, `/blog`, or `/trainingprogram`.
+   - The landing page will appear when they open the main website root: `/`.
 
-**Storage choice:** Use `sessionStorage` (NOT `localStorage`).
-- `sessionStorage` is scoped to the browser tab. It's cleared when the tab closes — exactly matching the requested behavior.
-- Works identically on desktop, mobile, and tablet.
-- Independent of authentication state (visitors and logged-in users behave the same).
+Technical details
+- Edit `src/pages/LandingRouter.tsx`.
+- Remove this behavior:
 
-**Key:** `smarty_landing_seen` = `"1"`
+```text
+if landing page was already seen in this tab:
+  redirect to /home
+else:
+  mark landing page as seen
+```
 
-**Logic in `src/pages/LandingRouter.tsx`:**
-1. On mount, read `sessionStorage.getItem('smarty_landing_seen')`.
-2. If present → `<Navigate to="/home" replace />` immediately.
-3. If absent → set it to `"1"` and render the landing UI.
+- New behavior:
 
-This means the very first hit to `/` in a new tab shows the landing page once; every subsequent visit to `/` in that same tab redirects to `/home`. Closing the tab clears `sessionStorage`, so the next new tab sees the landing page again.
+```text
+route / always shows LandingRouter
+route /home always shows the homepage
+```
 
-**No routing changes** in `App.tsx` — `/` still maps to `LandingRouter`. All other routes are untouched.
-
-## Files to Edit
-
-- `src/pages/LandingRouter.tsx` — add the sessionStorage check + redirect at the top of the component.
-
-## Edge Cases Handled
-
-- **Multiple tabs simultaneously**: each tab has its own `sessionStorage`, so each tab's first visit to `/` shows the landing page. Correct per the request ("whenever I land").
-- **In-tab navigation away and back**: once seen in the tab, redirects to `/home`. Correct.
-- **Hard refresh on `/`**: still in same tab → redirects to `/home`. Correct.
-- **Logged-in vs logged-out**: identical behavior — auth state is never checked. Correct per request.
+Expected result
+- Type `smartygym.com` in a new tab: landing page shows.
+- Close the tab, open again, type `smartygym.com`: landing page shows again.
+- Open another new tab and type `smartygym.com`: landing page shows again.
+- Click “go to the homepage”: goes to `/home`.
+- Refresh `/home`: stays on `/home`.
+- Refresh `/`: landing page still shows.
