@@ -165,8 +165,6 @@ const KNOWN_SWAPS: Record<string, string> = {
   "barbell romanian deadlift": "glute-ham raise",
   "dumbbell romanian deadlift": "glute-ham raise",
   "barbell good morning": "glute-ham raise",
-  // Leg curl
-  "lever lying leg curl": "standing single leg curl",
   // Upper body
   "cable reverse crunch": "decline crunch",
   "band bicycle crunch": "bicycle crunch",
