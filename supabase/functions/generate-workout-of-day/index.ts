@@ -2693,7 +2693,7 @@ Return JSON with these exact fields:
           .select("id")
           .ilike("name", workoutContent.name)
           .limit(1);
-        if ((collisionRows && collisionRows.length > 0) || hasInternalNameCode(workoutContent.name)) {
+        if ((collisionRows && collisionRows.length > 0) || hasInternalNameCode(workoutContent.name) || hasAiStyleName(workoutContent.name)) {
           const cleaned = cleanPublicWorkoutName(workoutContent.name, category, equipment, existingNamesForCategory);
           logStep(`⚠️ Pre-insert bad/colliding name detected, applying public-safe rename`, {
             original: workoutContent.name,
@@ -2706,12 +2706,12 @@ Return JSON with these exact fields:
         logStep("Pre-insert uniqueness guard failed (non-critical)", { error: String(guardErr) });
       }
 
-      if (hasInternalNameCode(workoutContent.name)) {
+      if (hasInternalNameCode(workoutContent.name) || hasAiStyleName(workoutContent.name)) {
         const cleaned = cleanPublicWorkoutName(workoutContent.name, category, equipment, existingNamesForCategory);
         workoutContent.name = cleaned.name;
       }
 
-      if (hasInternalNameCode(workoutContent.name)) {
+      if (hasInternalNameCode(workoutContent.name) || hasAiStyleName(workoutContent.name)) {
         throw new Error(`${equipment} WOD rejected: unsafe public name after cleanup (${workoutContent.name})`);
       }
 
