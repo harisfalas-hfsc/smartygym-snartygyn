@@ -444,6 +444,7 @@ serve(async (req) => {
         console.log(`[ORCHESTRATOR] ✅ SUCCESS on attempt ${attempt} - All required WODs exist`);
         console.log(`[ORCHESTRATOR] Found: ${verification.found.join(", ")}`);
         succeeded = true;
+        await runWodStripeCleanup(supabaseUrl, supabaseServiceKey, "orchestrator-success", false);
 
         // Update run log with success
         if (runLog?.id) {
@@ -487,6 +488,7 @@ serve(async (req) => {
     const isPartialFailure = (finalResult?.found?.length || 0) > 0;
     const failureType = isPartialFailure ? "PARTIAL" : "COMPLETE";
     console.log(`[ORCHESTRATOR] 🚨 ${failureType} FAILURE after ${MAX_ATTEMPTS} attempts - Sending admin alert`);
+    await runWodStripeCleanup(supabaseUrl, supabaseServiceKey, "orchestrator-failure", false);
 
     await sendAdminAlert(
       supabase,
