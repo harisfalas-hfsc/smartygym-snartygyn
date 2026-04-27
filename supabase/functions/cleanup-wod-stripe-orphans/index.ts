@@ -93,12 +93,14 @@ serve(async (req) => {
       limit: 100,
     });
 
-    const activeProducts = searchResult.data.filter((product) => product.metadata?.project === "SMARTYGYM");
+    const activeProducts = searchResult.data.filter((product: Stripe.Product) => product.metadata?.project === "SMARTYGYM");
     console.log(`[CLEANUP] Found ${activeProducts.length} active Stripe products for scope ${scope}`);
 
     // 3. Find orphans: active trusted products NOT linked from any DB row
-    const orphans = activeProducts.filter(p => !linkedProductIds.has(p.id));
-    const kept = activeProducts.filter(p => linkedProductIds.has(p.id)).map(p => `${p.id} - ${p.name}`);
+    const orphans = activeProducts.filter((p: Stripe.Product) => !linkedProductIds.has(p.id));
+    const kept = activeProducts
+      .filter((p: Stripe.Product) => linkedProductIds.has(p.id))
+      .map((p: Stripe.Product) => `${p.id} - ${p.name}`);
     console.log(`[CLEANUP] Found ${orphans.length} orphaned Stripe products to archive`);
 
     const archived: string[] = [];
