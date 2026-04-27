@@ -41,6 +41,63 @@ function logStep(step: string, details?: any) {
   console.log(`[GENERATE-WOD] ${step}${detailsStr}`);
 }
 
+function hasInternalNameCode(name: string): boolean {
+  const trimmed = name.trim();
+  return /\b\d{4}(BW|EQ|V)\b$/i.test(trimmed)
+    || /\b\d{6,}\b$/.test(trimmed)
+    || /\b(v\d+|#\d+)\b$/i.test(trimmed)
+    || /\b(II|III|IV|V|VI|VII|VIII|IX|X)\b$/.test(trimmed);
+}
+
+function cleanPublicWorkoutName(
+  rawName: string,
+  category: string,
+  equipment: string,
+  existingNames: string[],
+): { name: string; changed: boolean; reason: string } {
+  const normalizedExisting = new Set(existingNames.map((name) => name.trim().toLowerCase()));
+  const baseName = rawName
+    .replace(/\s+\d{4}(BW|EQ|V)\b$/i, "")
+    .replace(/\s+\b(v\d+|#\d+|II|III|IV|V|VI|VII|VIII|IX|X)\b$/i, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  const candidateIsClean = baseName.length >= 5
+    && baseName.split(/\s+/).length <= 4
+    && !hasInternalNameCode(baseName)
+    && !normalizedExisting.has(baseName.toLowerCase());
+
+  if (candidateIsClean) {
+    return { name: baseName, changed: baseName !== rawName.trim(), reason: baseName !== rawName.trim() ? "removed internal suffix" : "clean" };
+  }
+
+  const categoryWord = category === "STRENGTH" ? "Strength"
+    : category === "CALORIE BURNING" ? "Conditioning"
+    : category === "METABOLIC" ? "Engine"
+    : category === "CARDIO" ? "Cardio"
+    : category === "MOBILITY & STABILITY" ? "Control"
+    : category === "PILATES" ? "Pilates"
+    : category === "RECOVERY" ? "Recovery"
+    : category === "CHALLENGE" ? "Challenge"
+    : "Training";
+  const equipmentWord = equipment === "BODYWEIGHT" ? "Bodyweight" : equipment === "EQUIPMENT" ? "Loaded" : "Athletic";
+  const fallbackNames = [
+    `${equipmentWord} ${categoryWord} Session`,
+    `${categoryWord} Tempo Circuit`,
+    `Athletic ${categoryWord} Builder`,
+    `${equipmentWord} Movement Flow`,
+    `${categoryWord} Control Session`,
+    `Precision ${categoryWord} Circuit`,
+    `${equipmentWord} Performance Block`,
+    `Focused ${categoryWord} Practice`,
+  ];
+
+  const fallback = fallbackNames.find((name) => !normalizedExisting.has(name.toLowerCase()))
+    || `${equipmentWord} ${categoryWord} Practice`;
+
+  return { name: fallback, changed: true, reason: "duplicate or internal-code name" };
+}
+
 async function rollbackActiveWodsForDate(
   supabase: ReturnType<typeof createClient>,
   effectiveDate: string,
@@ -897,6 +954,9 @@ NAMING RULES (CRITICAL - MUST FOLLOW):
 
 4. KEEP IT SHORT: 2-4 words maximum
 5. NEVER copy or slightly modify a name from the banned list (e.g., adding "II", changing one word)
+6. CUSTOMER-FACING ONLY: Never add dates, serial numbers, random letters, equipment codes, version numbers, or internal IDs.
+   ❌ Forbidden examples: "Core Cadence 0427BW", "Iron Circuit 0427EQ", "Mobility Flow V2", "Strength Block #1"
+   ✅ Correct style: "Core Tempo Circuit", "Midline Control Session", "Athletic Strength Builder"
 ${bannedNamesList}`;
 
       // Generate workout content using Lovable AI
@@ -2211,17 +2271,15 @@ Return JSON with these exact fields:
         const nameMatchesFirstWorkout = firstWorkoutName && 
           firstWorkoutName.trim().toLowerCase() === nameToCheck.toLowerCase();
         
-        if (nameExistsInDb || nameMatchesFirstWorkout) {
-          // Generate a unique suffix based on date + equipment
-          const dateSuffix = effectiveDate.replace(/-/g, '').slice(-4); // e.g., "0328"
-          const eqSuffix = equipment === "EQUIPMENT" ? "EQ" : equipment === "BODYWEIGHT" ? "BW" : "V";
-          const uniqueName = `${nameToCheck} ${dateSuffix}${eqSuffix}`;
-          logStep(`⚠️ Name collision detected, auto-renaming`, {
+        if (nameExistsInDb || nameMatchesFirstWorkout || hasInternalNameCode(nameToCheck)) {
+          const cleaned = cleanPublicWorkoutName(nameToCheck, category, equipment, existingNamesForCategory);
+          logStep(`⚠️ Name collision/internal code detected, applying public-safe rename`, {
             original: nameToCheck,
-            newName: uniqueName,
-            collidedWith: nameExistsInDb ? 'database' : 'first workout today'
+            newName: cleaned.name,
+            reason: cleaned.reason,
+            collidedWith: nameExistsInDb ? 'database' : nameMatchesFirstWorkout ? 'first workout today' : 'internal code'
           });
-          workoutContent.name = uniqueName;
+          workoutContent.name = cleaned.name;
         }
         
         // Add the new name to our tracking list to prevent same-session collisions
@@ -2643,10 +2701,10 @@ Return JSON with these exact fields:
       });
 
       // ═══════════════════════════════════════════════════════════════════════════════
-      // FINAL PRE-INSERT UNIQUENESS GUARD (library-wide, race-condition safe)
+      // FINAL PRE-INSERT PUBLIC NAME GUARD (library-wide, race-condition safe)
       // Re-check the database immediately before INSERT in case another row was added
-      // between the initial banlist fetch and now. If a collision is found, append a
-      // date+equipment suffix so the name remains globally unique.
+      // between the initial banlist fetch and now. If a collision or internal-looking
+      // code is found, use a clean customer-facing replacement name.
       // ═══════════════════════════════════════════════════════════════════════════════
       try {
         const { data: collisionRows } = await supabase
@@ -2654,15 +2712,14 @@ Return JSON with these exact fields:
           .select("id")
           .ilike("name", workoutContent.name)
           .limit(1);
-        if (collisionRows && collisionRows.length > 0) {
-          const dateSuffix = effectiveDate.replace(/-/g, '').slice(-4);
-          const eqSuffix = equipment === "EQUIPMENT" ? "EQ" : equipment === "BODYWEIGHT" ? "BW" : "V";
-          const guardedName = `${workoutContent.name} ${dateSuffix}${eqSuffix}`;
-          logStep(`⚠️ Pre-insert collision detected, applying guard rename`, {
+        if ((collisionRows && collisionRows.length > 0) || hasInternalNameCode(workoutContent.name)) {
+          const cleaned = cleanPublicWorkoutName(workoutContent.name, category, equipment, existingNamesForCategory);
+          logStep(`⚠️ Pre-insert bad/colliding name detected, applying public-safe rename`, {
             original: workoutContent.name,
-            newName: guardedName,
+            newName: cleaned.name,
+            reason: cleaned.reason,
           });
-          workoutContent.name = guardedName;
+          workoutContent.name = cleaned.name;
         }
       } catch (guardErr) {
         logStep("Pre-insert uniqueness guard failed (non-critical)", { error: String(guardErr) });

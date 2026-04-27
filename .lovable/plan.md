@@ -1,45 +1,79 @@
-Plan to fix the landing page behavior
+You are right. The fix must cover both sides:
 
-What will change
-1. Remove the current `sessionStorage` redirect logic from the landing page.
-   - This is the part causing “sometimes yes, sometimes no.”
-   - It remembers that the landing page was already seen inside the current tab, then sends `/` to `/home`.
+- Existing bad names already shown on the website
+- The associated Stripe products using the same bad names
+- Future WOD generation so this never happens again
 
-2. Make `/` always render the landing page.
-   - Every fresh opening of `smartygym.com` or `www.smartygym.com` will show the landing page.
-   - This applies to everyone: visitors, logged-in users, free users, premium users, and admins.
+Plan:
 
-3. Keep the homepage available at `/home`.
-   - If someone clicks “go to the homepage” from the landing page, they go to `/home`.
-   - If they refresh while already on `/home`, they stay on `/home`.
-   - If they close the tab and later open the website root again, they see the landing page again.
+1. Fix the generator so public names never contain internal codes
+   - Remove the current fallback that appends codes like `0427BW`, `0427EQ`, or `0427V`.
+   - That code exists because the system was trying to avoid duplicate workout names, but it exposed an internal uniqueness suffix to customers. That is not acceptable.
+   - Replace it with a clean professional naming fallback.
 
-4. Keep internal navigation stable.
-   - I will not force the landing page to appear when someone opens a deep link like `/workout`, `/blog`, or `/trainingprogram`.
-   - The landing page will appear when they open the main website root: `/`.
+2. Add a final name safety check before saving
+   - Before any new WOD is saved, validate the final name.
+   - Reject or replace names containing:
+     - Date/equipment suffixes: `0427BW`, `0427EQ`, `0427V`
+     - Random serial numbers
+     - Version-style endings: `II`, `V2`, `#1`, etc. when used only to avoid duplication
+     - Anything that looks like an internal code instead of a customer-facing workout name
+   - If a generated name fails, replace it with a clean name such as:
+     - `Core Tempo Circuit`
+     - `Midline Control Session`
+     - `Athletic Core Builder`
+     - `Bodyweight Core Flow`
 
-Technical details
-- Edit `src/pages/LandingRouter.tsx`.
-- Remove this behavior:
+3. Strengthen the AI naming instructions
+   - Update the WOD prompt so names must be professional, human-readable, and customer-facing.
+   - Explicitly ban dates, codes, random letters, equipment suffixes, serial numbers, and lazy duplicate variations.
+   - Keep the rule: names should be short, serious, premium, and relevant to the workout focus.
+
+4. Rename existing bad workout records
+   - Search existing workouts for names ending with patterns like:
 
 ```text
-if landing page was already seen in this tab:
-  redirect to /home
-else:
-  mark landing page as seen
+0427BW
+0427EQ
+0427V
+0328BW
+1125EQ
 ```
 
-- New behavior:
+   - Rename only those bad names.
+   - Preserve the workout ID, content, image, purchase settings, visibility, WOD date, and all metadata.
+   - This avoids breaking existing links or user purchases.
 
-```text
-route / always shows LandingRouter
-route /home always shows the homepage
+5. Update associated Stripe products
+   - For each renamed workout that has an associated Stripe product, update the Stripe product name to match the cleaned workout name.
+   - Do not recreate products.
+   - Do not change prices.
+   - Do not touch purchase history.
+   - Only update the public product name, and if needed the product description/metadata name reference.
+
+6. Add a maintenance safety net
+   - Add a reusable helper in the WOD generation function to sanitize workout names consistently.
+   - Use it after AI generation and before database insert/update.
+   - Log when a bad name is caught, so future issues can be detected quickly.
+
+Technical implementation notes:
+
+- Main generator file: `supabase/functions/generate-workout-of-day/index.ts`
+- Problematic current logic:
+
+```ts
+const dateSuffix = effectiveDate.replace(/-/g, '').slice(-4);
+const eqSuffix = equipment === "EQUIPMENT" ? "EQ" : equipment === "BODYWEIGHT" ? "BW" : "V";
+const uniqueName = `${nameToCheck} ${dateSuffix}${eqSuffix}`;
 ```
 
-Expected result
-- Type `smartygym.com` in a new tab: landing page shows.
-- Close the tab, open again, type `smartygym.com`: landing page shows again.
-- Open another new tab and type `smartygym.com`: landing page shows again.
-- Click “go to the homepage”: goes to `/home`.
-- Refresh `/home`: stays on `/home`.
-- Refresh `/`: landing page still shows.
+- This will be replaced with a clean name fallback/sanitizer.
+- Existing database records will be cleaned through Lovable Cloud database changes.
+- Stripe product names will be updated through the Stripe integration, matching the corrected website names.
+
+Expected result:
+
+- No customer sees names like `Velocity Core Cadence 0427BW` again.
+- Existing bad workout names are cleaned.
+- Matching Stripe product names are cleaned.
+- Future WODs are protected by validation before they go live.
