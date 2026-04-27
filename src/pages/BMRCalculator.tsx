@@ -174,7 +174,7 @@ const BMRCalculator = () => {
         />
         
         <div className="text-center mb-6">
-          <p className="text-sm text-muted-foreground mb-2">Smart Tools — Free to Use</p>
+          <p className="text-sm text-muted-foreground mb-2">Smarty Tools — Free to Use</p>
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">BMR Calculator</h1>
         </div>
 
