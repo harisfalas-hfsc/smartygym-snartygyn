@@ -43,10 +43,28 @@ function logStep(step: string, details?: any) {
 
 function hasInternalNameCode(name: string): boolean {
   const trimmed = name.trim();
-  return /\b\d{4}(BW|EQ|V)\b$/i.test(trimmed)
+  return /\d/.test(trimmed)
+    || /\b\d{4}(BW|EQ|V)\b$/i.test(trimmed)
     || /\b\d{6,}\b$/.test(trimmed)
     || /\b(v\d+|#\d+)\b$/i.test(trimmed)
     || /\b(II|III|IV|V|VI|VII|VIII|IX|X)\b$/.test(trimmed);
+}
+
+async function archiveStripeProductSafely(stripe: Stripe, productId: string | null, reason: string) {
+  if (!productId) return;
+  try {
+    logStep("Archiving unsafe/unlinked Stripe product", { productId, reason });
+    await stripe.products.update(productId, {
+      active: false,
+      metadata: {
+        cleanup_reason: reason,
+        archived_by: "wod_generation_guard",
+        archived_at: new Date().toISOString(),
+      },
+    });
+  } catch (archiveErr: any) {
+    logStep("Failed to archive unsafe/unlinked Stripe product", { productId, error: archiveErr?.message || String(archiveErr) });
+  }
 }
 
 function cleanPublicWorkoutName(
