@@ -2915,12 +2915,16 @@ Return JSON with these exact fields:
       // Rename BOTH workouts to include their equipment type for clarity
       for (let i = 0; i < 2; i++) {
         const w = generatedWorkouts[i];
-        const suffix = w.equipment === "EQUIPMENT" ? " (Equipment)" : " (Bodyweight)";
-        const newName = w.name.trim() + suffix;
+        const cleaned = cleanPublicWorkoutName(w.name, category, w.equipment, [
+          ...existingNamesForCategory,
+          ...generatedWorkouts.filter((other: any) => other.id !== w.id).map((other: any) => other.name),
+        ]);
+        const newName = cleaned.name;
         logStep(`⚠️ Name collision detected! Renaming workout ${i + 1}`, {
           original: w.name,
           newName,
-          equipment: w.equipment
+          equipment: w.equipment,
+          reason: cleaned.reason,
         });
         await supabase.from("admin_workouts").update({ name: newName }).eq("id", w.id);
         w.name = newName;
