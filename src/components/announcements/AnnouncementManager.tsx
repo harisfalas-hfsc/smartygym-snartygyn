@@ -1,16 +1,9 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { WODAnnouncementModal } from "./WODAnnouncementModal";
 import { RitualAnnouncementModal } from "./RitualAnnouncementModal";
 import { ParQReminderModal } from "./ParQReminderModal";
-import { getCyprusTodayStr, getCyprusHour } from "@/lib/cyprusDate";
+import { getCyprusTodayStr } from "@/lib/cyprusDate";
 
-// Polling interval for checking if WODs exist (3 minutes)
-const WOD_CHECK_INTERVAL_MS = 3 * 60 * 1000;
-// Stop checking after 06:00 Cyprus time (failsafe)
-const WOD_CHECK_CUTOFF_HOUR = 6;
-// Delay for Ritual modal after WOD modal closes (10 seconds)
-const RITUAL_DELAY_MS = 10 * 1000;
 // Delay for PAR-Q popup after first sign-in (30 seconds)
 const PARQ_POPUP_DELAY_MS = 30 * 1000;
 
@@ -21,10 +14,8 @@ const PARQ_REMINDER_SHOWN_KEY = "smartygym_parq_reminder_shown";
 const USER_AUTHENTICATED_KEY = "smartygym_user_authenticated";
 
 export const AnnouncementManager = () => {
-  const [showWODModal, setShowWODModal] = useState(false);
   const [showRitualModal, setShowRitualModal] = useState(false);
   const [showParQModal, setShowParQModal] = useState(false);
-  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const parqTimerRef = useRef<NodeJS.Timeout | null>(null);
   const hasStartedRef = useRef(false);
 
@@ -33,37 +24,6 @@ export const AnnouncementManager = () => {
     const cyprusToday = getCyprusTodayStr();
     return `${prefix}_${cyprusToday}`;
   };
-
-  // Check if today's WODs exist (Cyprus date)
-  const checkTodaysWODsExist = async (): Promise<boolean> => {
-    try {
-      const cyprusToday = getCyprusTodayStr();
-      const { data, error } = await supabase
-        .from("admin_workouts")
-        .select("id")
-        .eq("is_workout_of_day", true)
-        .eq("generated_for_date", cyprusToday)
-        .limit(1);
-      
-      if (error) {
-        console.error("Error checking WODs:", error);
-        return false;
-      }
-      
-      return (data?.length || 0) > 0;
-    } catch (err) {
-      console.error("Error in checkTodaysWODsExist:", err);
-      return false;
-    }
-  };
-
-  // Stop polling
-  const stopPolling = useCallback(() => {
-    if (pollingIntervalRef.current) {
-      clearInterval(pollingIntervalRef.current);
-      pollingIntervalRef.current = null;
-    }
-  }, []);
 
   // Check if this is user's first sign-in and schedule PAR-Q popup
   // IMPORTANT: Only runs for AUTHENTICATED users
