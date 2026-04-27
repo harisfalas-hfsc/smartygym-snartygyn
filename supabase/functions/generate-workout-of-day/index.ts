@@ -1002,6 +1002,10 @@ NAMING RULES (CRITICAL - MUST FOLLOW):
 6. CUSTOMER-FACING ONLY: Never add dates, serial numbers, random letters, equipment codes, version numbers, or internal IDs.
    ❌ Forbidden examples: "Core Cadence 0427BW", "Iron Circuit 0427EQ", "Mobility Flow V2", "Strength Block #1"
    ✅ Correct style: "Core Tempo Circuit", "Midline Control Session", "Athletic Strength Builder"
+
+7. DO NOT USE AI-SOUNDING / ABSTRACT TECHNICAL TERMS in public workout names.
+   ❌ Forbidden words: Axial, Matrix, Meridian, Protocol, Helix, Arcus, Synergy, Conduit, Integration, Current, Vector, Quantum, Algorithm, Neural, System, Module, Phase, Sequence
+   ✅ Use simple athletic/customer language instead: Core, Tempo, Circuit, Builder, Sprint, Grip, Press, Climb, Flow, Control
 ${bannedNamesList}`;
 
       // Generate workout content using Lovable AI
@@ -2316,13 +2320,13 @@ Return JSON with these exact fields:
         const nameMatchesFirstWorkout = firstWorkoutName && 
           firstWorkoutName.trim().toLowerCase() === nameToCheck.toLowerCase();
         
-        if (nameExistsInDb || nameMatchesFirstWorkout || hasInternalNameCode(nameToCheck)) {
+        if (nameExistsInDb || nameMatchesFirstWorkout || hasInternalNameCode(nameToCheck) || hasAiStyleName(nameToCheck)) {
           const cleaned = cleanPublicWorkoutName(nameToCheck, category, equipment, existingNamesForCategory);
           logStep(`⚠️ Name collision/internal code detected, applying public-safe rename`, {
             original: nameToCheck,
             newName: cleaned.name,
             reason: cleaned.reason,
-            collidedWith: nameExistsInDb ? 'database' : nameMatchesFirstWorkout ? 'first workout today' : 'internal code'
+            collidedWith: nameExistsInDb ? 'database' : nameMatchesFirstWorkout ? 'first workout today' : hasAiStyleName(nameToCheck) ? 'AI-style wording' : 'internal code'
           });
           workoutContent.name = cleaned.name;
         }
