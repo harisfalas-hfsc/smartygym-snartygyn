@@ -67,6 +67,28 @@ async function archiveStripeProductSafely(stripe: Stripe, productId: string | nu
   }
 }
 
+async function runWodStripeCleanup(reason: string, dryRun = false) {
+  const supabaseUrl = Deno.env.get("SUPABASE_URL");
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!supabaseUrl || !serviceKey) return;
+
+  try {
+    logStep("Running WOD Stripe cleanup", { reason, dryRun });
+    const response = await fetch(`${supabaseUrl}/functions/v1/cleanup-wod-stripe-orphans`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Internal-Secret": serviceKey,
+      },
+      body: JSON.stringify({ dryRun, scope: "wod", reason }),
+    });
+    const resultText = await response.text();
+    logStep("WOD Stripe cleanup finished", { ok: response.ok, status: response.status, result: resultText.slice(0, 500) });
+  } catch (cleanupError: any) {
+    logStep("WOD Stripe cleanup failed", { reason, error: cleanupError?.message || String(cleanupError) });
+  }
+}
+
 function cleanPublicWorkoutName(
   rawName: string,
   category: string,
@@ -2893,12 +2915,16 @@ Return JSON with these exact fields:
       // Rename BOTH workouts to include their equipment type for clarity
       for (let i = 0; i < 2; i++) {
         const w = generatedWorkouts[i];
-        const suffix = w.equipment === "EQUIPMENT" ? " (Equipment)" : " (Bodyweight)";
-        const newName = w.name.trim() + suffix;
+        const cleaned = cleanPublicWorkoutName(w.name, category, w.equipment, [
+          ...existingNamesForCategory,
+          ...generatedWorkouts.filter((other: any) => other.id !== w.id).map((other: any) => other.name),
+        ]);
+        const newName = cleaned.name;
         logStep(`⚠️ Name collision detected! Renaming workout ${i + 1}`, {
           original: w.name,
           newName,
-          equipment: w.equipment
+          equipment: w.equipment,
+          reason: cleaned.reason,
         });
         await supabase.from("admin_workouts").update({ name: newName }).eq("id", w.id);
         w.name = newName;
@@ -2952,6 +2978,7 @@ Return JSON with these exact fields:
       
       if (!variousExists) {
         await rollbackActiveWodsForDate(supabase, effectiveDate, "Recovery day final verification failed");
+        await runWodStripeCleanup("recovery-final-verification-failed", false);
         logStep("CRITICAL ERROR: RECOVERY VARIOUS workout not generated", { 
           generated: generatedWorkouts.map(w => w.equipment)
         });
@@ -2986,6 +3013,7 @@ Return JSON with these exact fields:
         if (!equipmentExists) missing.push("EQUIPMENT");
 
         await rollbackActiveWodsForDate(supabase, effectiveDate, `Final verification failed. Missing: ${missing.join(", ")}`);
+        await runWodStripeCleanup("normal-final-verification-failed", false);
         
         logStep("CRITICAL ERROR: Not all workouts generated", { 
           missing, 
@@ -3021,6 +3049,8 @@ Return JSON with these exact fields:
         effectiveDate,
         last_generated_at: stateData?.last_generated_at,
       });
+
+      await runWodStripeCleanup("generate-workout-of-day-state-already-updated", false);
 
       return new Response(
         JSON.stringify({
@@ -3173,6 +3203,8 @@ Return JSON with these exact fields:
       logStep("Recovery email check failed (non-critical)", { error: recoveryEmailError });
     }
 
+    await runWodStripeCleanup("generate-workout-of-day-success", false);
+
     return new Response(
       JSON.stringify({
         success: true,
@@ -3199,6 +3231,7 @@ Return JSON with these exact fields:
     if (cleanupSupabase && effectiveDateForCleanup) {
       await rollbackActiveWodsForDate(cleanupSupabase, effectiveDateForCleanup, `Unhandled error: ${errorMessage}`);
     }
+    await runWodStripeCleanup("generate-workout-of-day-error", false);
     
     // Log failure to notification_audit_log for visibility
     try {
