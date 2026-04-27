@@ -2771,7 +2771,7 @@ Return JSON with these exact fields:
       // ═══════════════════════════════════════════════════════════════════════════════
       const { data: verifyWorkout, error: verifyError } = await supabase
         .from("admin_workouts")
-        .select("id, name, equipment, generated_for_date, category, difficulty, difficulty_stars")
+        .select("id, name, equipment, generated_for_date, category, difficulty, difficulty_stars, stripe_product_id, stripe_price_id")
         .eq("id", workoutId)
         .single();
       
@@ -2783,6 +2783,11 @@ Return JSON with these exact fields:
         });
         await archiveStripeProductSafely(stripe, stripeProductId, "post_insert_verification_failed");
         throw new Error(`${equipment} WOD verification failed - workout not found in database after insert`);
+      }
+
+      if (verifyWorkout.stripe_product_id !== stripeProductId || verifyWorkout.stripe_price_id !== stripePriceId) {
+        await archiveStripeProductSafely(stripe, stripeProductId, "stripe_database_association_mismatch");
+        throw new Error(`${equipment} WOD payment association mismatch after insert`);
       }
       
       // Verify category matches expected
