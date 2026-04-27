@@ -67,6 +67,28 @@ async function archiveStripeProductSafely(stripe: Stripe, productId: string | nu
   }
 }
 
+async function runWodStripeCleanup(reason: string, dryRun = false) {
+  const supabaseUrl = Deno.env.get("SUPABASE_URL");
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!supabaseUrl || !serviceKey) return;
+
+  try {
+    logStep("Running WOD Stripe cleanup", { reason, dryRun });
+    const response = await fetch(`${supabaseUrl}/functions/v1/cleanup-wod-stripe-orphans`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Internal-Secret": serviceKey,
+      },
+      body: JSON.stringify({ dryRun, scope: "wod", reason }),
+    });
+    const resultText = await response.text();
+    logStep("WOD Stripe cleanup finished", { ok: response.ok, status: response.status, result: resultText.slice(0, 500) });
+  } catch (cleanupError: any) {
+    logStep("WOD Stripe cleanup failed", { reason, error: cleanupError?.message || String(cleanupError) });
+  }
+}
+
 function cleanPublicWorkoutName(
   rawName: string,
   category: string,
