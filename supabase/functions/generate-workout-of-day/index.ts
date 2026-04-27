@@ -43,10 +43,28 @@ function logStep(step: string, details?: any) {
 
 function hasInternalNameCode(name: string): boolean {
   const trimmed = name.trim();
-  return /\b\d{4}(BW|EQ|V)\b$/i.test(trimmed)
+  return /\d/.test(trimmed)
+    || /\b\d{4}(BW|EQ|V)\b$/i.test(trimmed)
     || /\b\d{6,}\b$/.test(trimmed)
     || /\b(v\d+|#\d+)\b$/i.test(trimmed)
     || /\b(II|III|IV|V|VI|VII|VIII|IX|X)\b$/.test(trimmed);
+}
+
+async function archiveStripeProductSafely(stripe: Stripe, productId: string | null, reason: string) {
+  if (!productId) return;
+  try {
+    logStep("Archiving unsafe/unlinked Stripe product", { productId, reason });
+    await stripe.products.update(productId, {
+      active: false,
+      metadata: {
+        cleanup_reason: reason,
+        archived_by: "wod_generation_guard",
+        archived_at: new Date().toISOString(),
+      },
+    });
+  } catch (archiveErr: any) {
+    logStep("Failed to archive unsafe/unlinked Stripe product", { productId, error: archiveErr?.message || String(archiveErr) });
+  }
 }
 
 function cleanPublicWorkoutName(
@@ -2470,77 +2488,9 @@ Return JSON with these exact fields:
         logStep(`✅ Image validated for Stripe`, { imageUrl: imageUrl.substring(0, 80) });
       }
 
-      // Create Stripe product with IDEMPOTENCY KEY to prevent duplicates
       const workoutId = `WOD-${prefix}-${equipment.charAt(0)}-${timestamp}`;
-      
-      const stripeProductPayload = {
-        name: workoutContent.name,
-        description: `${category} Workout (${equipment})`,
-        images: imageUrl ? [imageUrl] : [],
-        metadata: {
-          project: "SMARTYGYM",
-          content_type: "Workout",
-          content_id: workoutId,
-          workout_id: workoutId,
-          type: "wod",
-          category,
-          equipment,
-          generated_for_date: effectiveDate,
-        },
-      };
-
-      const stripeIdempotencyKey = await createDeterministicIdempotencyKey(
-        `wod:${effectiveDate}:${equipment}`,
-        stripeProductPayload,
-      );
-      
-      logStep(`Creating Stripe product with idempotency`, { 
-        name: workoutContent.name, 
-        hasImage: !!imageUrl, 
-        imageUrl: imageUrl ? imageUrl.substring(0, 80) : 'NONE',
-        idempotencyKey: stripeIdempotencyKey
-      });
-      
-      const stripeProduct = await stripe.products.create(stripeProductPayload, {
-        idempotencyKey: stripeIdempotencyKey
-      });
-
-      // ═══════════════════════════════════════════════════════════════════════════════
-      // STRIPE PRODUCT IMAGE VERIFICATION (Critical for WOD integrity)
-      // ═══════════════════════════════════════════════════════════════════════════════
-      if (!stripeProduct.images || stripeProduct.images.length === 0) {
-        console.error(`[WOD-GENERATION] ❌ CRITICAL: Stripe product ${stripeProduct.id} created WITHOUT images!`);
-        console.error(`[WOD-GENERATION] Workout: ${workoutContent.name}, Equipment: ${equipment}`);
-        console.error(`[WOD-GENERATION] Original imageUrl was: ${imageUrl || 'NULL/EMPTY'}`);
-        logStep(`❌ STRIPE PRODUCT MISSING IMAGE`, { 
-          productId: stripeProduct.id, 
-          workoutName: workoutContent.name,
-          equipment,
-          imageUrlProvided: !!imageUrl 
-        });
-      } else {
-        logStep(`✅ Stripe product image verified`, { 
-          productId: stripeProduct.id, 
-          imageCount: stripeProduct.images.length,
-          imageUrl: stripeProduct.images[0]?.substring(0, 80)
-        });
-      }
-
-      const stripePrice = await stripe.prices.create({
-        product: stripeProduct.id,
-        unit_amount: 399,
-        currency: "eur",
-      });
-
-      const stripeProductId = stripeProduct.id;
-      const stripePriceId = stripePrice.id;
-      logStep(`${equipment} Stripe product created`, { 
-        productId: stripeProductId, 
-        priceId: stripePriceId,
-        hasImage: stripeProduct.images && stripeProduct.images.length > 0,
-        imageVerified: 'YES',
-        idempotencyKey: stripeIdempotencyKey
-      });
+      let stripeProductId: string | null = null;
+      let stripePriceId: string | null = null;
 
       // ═══════════════════════════════════════════════════════════════════════════════
       // POST-GENERATION DURATION CALCULATION - Parse actual section durations from HTML
@@ -2725,6 +2675,61 @@ Return JSON with these exact fields:
         logStep("Pre-insert uniqueness guard failed (non-critical)", { error: String(guardErr) });
       }
 
+      if (hasInternalNameCode(workoutContent.name)) {
+        const cleaned = cleanPublicWorkoutName(workoutContent.name, category, equipment, existingNamesForCategory);
+        workoutContent.name = cleaned.name;
+      }
+
+      if (hasInternalNameCode(workoutContent.name)) {
+        throw new Error(`${equipment} WOD rejected: unsafe public name after cleanup (${workoutContent.name})`);
+      }
+
+      const stripeProductPayload = {
+        name: workoutContent.name,
+        description: `${category} Workout (${equipment})`,
+        images: imageUrl ? [imageUrl] : [],
+        metadata: {
+          project: "SMARTYGYM",
+          content_type: "Workout",
+          content_id: workoutId,
+          workout_id: workoutId,
+          type: "wod",
+          category,
+          equipment,
+          generated_for_date: effectiveDate,
+        },
+      };
+
+      const stripeProductIdempotencyKey = `SMARTYGYM:wod:${effectiveDate}:${equipment}:product`;
+      const stripePriceIdempotencyKey = `SMARTYGYM:wod:${effectiveDate}:${equipment}:price`;
+
+      const stripeProduct = await stripe.products.create(stripeProductPayload, {
+        idempotencyKey: stripeProductIdempotencyKey,
+      });
+      stripeProductId = stripeProduct.id;
+
+      const stripePrice = await stripe.prices.create({
+        product: stripeProduct.id,
+        unit_amount: 399,
+        currency: "eur",
+        metadata: {
+          project: "SMARTYGYM",
+          content_id: workoutId,
+          generated_for_date: effectiveDate,
+          equipment,
+        },
+      }, {
+        idempotencyKey: stripePriceIdempotencyKey,
+      });
+      stripePriceId = stripePrice.id;
+
+      logStep(`${equipment} Stripe product/price created`, {
+        productId: stripeProductId,
+        priceId: stripePriceId,
+        productIdempotencyKey: stripeProductIdempotencyKey,
+        priceIdempotencyKey: stripePriceIdempotencyKey,
+      });
+
       const { error: insertError } = await supabase
         .from("admin_workouts")
         .insert({
@@ -2757,13 +2762,7 @@ Return JSON with these exact fields:
       if (insertError) {
         // ORPHAN GUARD: Archive Stripe product immediately if DB insert fails
         // This prevents orphaned active Stripe products from accumulating
-        try {
-          logStep(`⚠️ DB insert failed, archiving orphaned Stripe product`, { stripeProductId, insertError: insertError.message });
-          await stripe.products.update(stripeProductId, { active: false });
-          logStep(`✅ Orphaned Stripe product archived`, { stripeProductId });
-        } catch (archiveErr: any) {
-          logStep(`❌ Failed to archive orphaned Stripe product`, { stripeProductId, error: archiveErr.message });
-        }
+        await archiveStripeProductSafely(stripe, stripeProductId, `db_insert_failed:${insertError.message}`);
         throw new Error(`Failed to insert ${equipment} WOD: ${insertError.message}`);
       }
 
@@ -2772,7 +2771,7 @@ Return JSON with these exact fields:
       // ═══════════════════════════════════════════════════════════════════════════════
       const { data: verifyWorkout, error: verifyError } = await supabase
         .from("admin_workouts")
-        .select("id, name, equipment, generated_for_date, category, difficulty, difficulty_stars")
+        .select("id, name, equipment, generated_for_date, category, difficulty, difficulty_stars, stripe_product_id, stripe_price_id")
         .eq("id", workoutId)
         .single();
       
@@ -2782,7 +2781,13 @@ Return JSON with these exact fields:
           verifyError: verifyError?.message,
           verifyWorkout 
         });
+        await archiveStripeProductSafely(stripe, stripeProductId, "post_insert_verification_failed");
         throw new Error(`${equipment} WOD verification failed - workout not found in database after insert`);
+      }
+
+      if (verifyWorkout.stripe_product_id !== stripeProductId || verifyWorkout.stripe_price_id !== stripePriceId) {
+        await archiveStripeProductSafely(stripe, stripeProductId, "stripe_database_association_mismatch");
+        throw new Error(`${equipment} WOD payment association mismatch after insert`);
       }
       
       // Verify category matches expected

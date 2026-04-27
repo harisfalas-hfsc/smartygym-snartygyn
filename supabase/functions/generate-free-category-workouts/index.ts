@@ -343,7 +343,7 @@ async function generateOne(
         !reject.substituted.some(s => s.original.toLowerCase() === n.toLowerCase())
       );
       if (trulyUnmatched.length > 0) {
-        await logUnmatchedExercises(supabase, trulyUnmatched, "free-cat", `FREE-${category}-${equipment}`, content.name, `[FREE-MISMATCH][${equipment}]`);
+        await logUnmatchedExercises(supabase as any, trulyUnmatched, "workout", `FREE-${category}-${equipment}`, content.name, `[FREE-MISMATCH][${equipment}]`);
       }
 
       // Normalize + validate
@@ -375,7 +375,7 @@ async function generateOne(
         if (!imgErr && imgData?.image_url) imageUrl = imgData.image_url;
       } catch (e: any) { log("Image gen exception (trigger will retry)", { err: e.message }); }
 
-      const { error: insErr } = await supabase.from("admin_workouts").insert({
+      const { error: insErr } = await (supabase as any).from("admin_workouts").insert({
         id: workoutId,
         name: content.name,
         type: "workout",
@@ -486,7 +486,7 @@ serve(async (req) => {
 
       const banned = Array.from(existingNamesAll); // global banned list to maximize uniqueness
       const r = await generateOne(
-        supabase, lovableApiKey, job,
+        supabase as any, lovableApiKey, job,
         bodyweightExercises, bodyweightRefList,
         fullExercises, fullRefList,
         banned,
