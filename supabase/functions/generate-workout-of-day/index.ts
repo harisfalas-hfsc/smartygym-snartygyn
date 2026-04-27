@@ -2488,77 +2488,9 @@ Return JSON with these exact fields:
         logStep(`✅ Image validated for Stripe`, { imageUrl: imageUrl.substring(0, 80) });
       }
 
-      // Create Stripe product with IDEMPOTENCY KEY to prevent duplicates
       const workoutId = `WOD-${prefix}-${equipment.charAt(0)}-${timestamp}`;
-      
-      const stripeProductPayload = {
-        name: workoutContent.name,
-        description: `${category} Workout (${equipment})`,
-        images: imageUrl ? [imageUrl] : [],
-        metadata: {
-          project: "SMARTYGYM",
-          content_type: "Workout",
-          content_id: workoutId,
-          workout_id: workoutId,
-          type: "wod",
-          category,
-          equipment,
-          generated_for_date: effectiveDate,
-        },
-      };
-
-      const stripeIdempotencyKey = await createDeterministicIdempotencyKey(
-        `wod:${effectiveDate}:${equipment}`,
-        stripeProductPayload,
-      );
-      
-      logStep(`Creating Stripe product with idempotency`, { 
-        name: workoutContent.name, 
-        hasImage: !!imageUrl, 
-        imageUrl: imageUrl ? imageUrl.substring(0, 80) : 'NONE',
-        idempotencyKey: stripeIdempotencyKey
-      });
-      
-      const stripeProduct = await stripe.products.create(stripeProductPayload, {
-        idempotencyKey: stripeIdempotencyKey
-      });
-
-      // ═══════════════════════════════════════════════════════════════════════════════
-      // STRIPE PRODUCT IMAGE VERIFICATION (Critical for WOD integrity)
-      // ═══════════════════════════════════════════════════════════════════════════════
-      if (!stripeProduct.images || stripeProduct.images.length === 0) {
-        console.error(`[WOD-GENERATION] ❌ CRITICAL: Stripe product ${stripeProduct.id} created WITHOUT images!`);
-        console.error(`[WOD-GENERATION] Workout: ${workoutContent.name}, Equipment: ${equipment}`);
-        console.error(`[WOD-GENERATION] Original imageUrl was: ${imageUrl || 'NULL/EMPTY'}`);
-        logStep(`❌ STRIPE PRODUCT MISSING IMAGE`, { 
-          productId: stripeProduct.id, 
-          workoutName: workoutContent.name,
-          equipment,
-          imageUrlProvided: !!imageUrl 
-        });
-      } else {
-        logStep(`✅ Stripe product image verified`, { 
-          productId: stripeProduct.id, 
-          imageCount: stripeProduct.images.length,
-          imageUrl: stripeProduct.images[0]?.substring(0, 80)
-        });
-      }
-
-      const stripePrice = await stripe.prices.create({
-        product: stripeProduct.id,
-        unit_amount: 399,
-        currency: "eur",
-      });
-
-      const stripeProductId = stripeProduct.id;
-      const stripePriceId = stripePrice.id;
-      logStep(`${equipment} Stripe product created`, { 
-        productId: stripeProductId, 
-        priceId: stripePriceId,
-        hasImage: stripeProduct.images && stripeProduct.images.length > 0,
-        imageVerified: 'YES',
-        idempotencyKey: stripeIdempotencyKey
-      });
+      let stripeProductId: string | null = null;
+      let stripePriceId: string | null = null;
 
       // ═══════════════════════════════════════════════════════════════════════════════
       // POST-GENERATION DURATION CALCULATION - Parse actual section durations from HTML
