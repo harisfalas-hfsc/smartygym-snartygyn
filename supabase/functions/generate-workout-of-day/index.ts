@@ -275,7 +275,7 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  let cleanupSupabase: ReturnType<typeof createClient> | null = null;
+  let cleanupSupabase: any = null;
   let effectiveDateForCleanup: string | null = null;
 
   try {
