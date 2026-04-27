@@ -155,6 +155,25 @@ async function callGenerateWod(
   }
 }
 
+async function runWodStripeCleanup(supabaseUrl: string, serviceKey: string, reason: string, dryRun = false): Promise<void> {
+  try {
+    console.log(`[ORCHESTRATOR] Running WOD Stripe cleanup: ${reason}`);
+    const response = await fetch(`${supabaseUrl}/functions/v1/cleanup-wod-stripe-orphans`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Internal-Secret": serviceKey,
+      },
+      body: JSON.stringify({ dryRun, scope: "wod", reason }),
+    });
+
+    const resultText = await response.text();
+    console.log(`[ORCHESTRATOR] Cleanup result ${response.status}: ${resultText.substring(0, 500)}`);
+  } catch (cleanupError) {
+    console.error(`[ORCHESTRATOR] Cleanup failed:`, cleanupError);
+  }
+}
+
 async function sendAdminAlert(
   supabase: any,
   dateStr: string,
