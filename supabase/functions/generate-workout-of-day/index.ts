@@ -3199,6 +3199,8 @@ Return JSON with these exact fields:
       logStep("Recovery email check failed (non-critical)", { error: recoveryEmailError });
     }
 
+    await runWodStripeCleanup("generate-workout-of-day-success", false);
+
     return new Response(
       JSON.stringify({
         success: true,
@@ -3225,6 +3227,7 @@ Return JSON with these exact fields:
     if (cleanupSupabase && effectiveDateForCleanup) {
       await rollbackActiveWodsForDate(cleanupSupabase, effectiveDateForCleanup, `Unhandled error: ${errorMessage}`);
     }
+    await runWodStripeCleanup("generate-workout-of-day-error", false);
     
     // Log failure to notification_audit_log for visibility
     try {
