@@ -81,14 +81,19 @@ serve(async (req) => {
 
     // SECURITY: Validate content state from database (don't trust client payload)
     const tableName = contentType === 'workout' ? 'admin_workouts' : 'admin_training_programs';
-    const selectFields = contentType === 'workout'
-      ? 'id, name, is_visible, is_standalone_purchase, price, stripe_product_id, stripe_price_id, is_workout_of_day, generated_for_date'
-      : 'id, name, is_visible, is_standalone_purchase, price, stripe_product_id, stripe_price_id';
-    const { data: contentRecord, error: contentError } = await supabaseClient
-      .from(tableName)
-      .select(selectFields)
-      .eq('id', contentId)
-      .maybeSingle();
+    const contentQuery = contentType === 'workout'
+      ? supabaseClient
+          .from('admin_workouts')
+          .select('id, name, is_visible, is_standalone_purchase, price, stripe_product_id, stripe_price_id, is_workout_of_day, generated_for_date')
+          .eq('id', contentId)
+          .maybeSingle()
+      : supabaseClient
+          .from('admin_training_programs')
+          .select('id, name, is_visible, is_standalone_purchase, price, stripe_product_id, stripe_price_id')
+          .eq('id', contentId)
+          .maybeSingle();
+    const { data: contentRecordRaw, error: contentError } = await contentQuery;
+    const contentRecord = contentRecordRaw as any;
 
     if (contentError || !contentRecord) {
       return new Response(JSON.stringify({ error: "Content not found" }), {
