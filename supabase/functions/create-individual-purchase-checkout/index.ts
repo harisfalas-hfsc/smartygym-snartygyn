@@ -81,9 +81,12 @@ serve(async (req) => {
 
     // SECURITY: Validate content state from database (don't trust client payload)
     const tableName = contentType === 'workout' ? 'admin_workouts' : 'admin_training_programs';
+    const selectFields = contentType === 'workout'
+      ? 'id, name, is_visible, is_standalone_purchase, price, stripe_product_id, stripe_price_id, is_workout_of_day, generated_for_date'
+      : 'id, name, is_visible, is_standalone_purchase, price, stripe_product_id, stripe_price_id';
     const { data: contentRecord, error: contentError } = await supabaseClient
       .from(tableName)
-      .select('id, name, is_visible, is_standalone_purchase, price, stripe_product_id, stripe_price_id, is_workout_of_day, generated_for_date')
+      .select(selectFields)
       .eq('id', contentId)
       .maybeSingle();
 
@@ -115,7 +118,7 @@ serve(async (req) => {
     let finalPriceId = contentRecord.stripe_price_id;
     const existingProductId = contentRecord.stripe_product_id;
 
-    if (contentRecord.is_workout_of_day && (!existingProductId || !finalPriceId)) {
+    if (contentType === 'workout' && contentRecord.is_workout_of_day && (!existingProductId || !finalPriceId)) {
       return new Response(JSON.stringify({ error: "This Workout of the Day is temporarily unavailable for purchase." }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 409,
