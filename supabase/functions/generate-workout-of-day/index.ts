@@ -2675,6 +2675,61 @@ Return JSON with these exact fields:
         logStep("Pre-insert uniqueness guard failed (non-critical)", { error: String(guardErr) });
       }
 
+      if (hasInternalNameCode(workoutContent.name)) {
+        const cleaned = cleanPublicWorkoutName(workoutContent.name, category, equipment, existingNamesForCategory);
+        workoutContent.name = cleaned.name;
+      }
+
+      if (hasInternalNameCode(workoutContent.name)) {
+        throw new Error(`${equipment} WOD rejected: unsafe public name after cleanup (${workoutContent.name})`);
+      }
+
+      const stripeProductPayload = {
+        name: workoutContent.name,
+        description: `${category} Workout (${equipment})`,
+        images: imageUrl ? [imageUrl] : [],
+        metadata: {
+          project: "SMARTYGYM",
+          content_type: "Workout",
+          content_id: workoutId,
+          workout_id: workoutId,
+          type: "wod",
+          category,
+          equipment,
+          generated_for_date: effectiveDate,
+        },
+      };
+
+      const stripeProductIdempotencyKey = `SMARTYGYM:wod:${effectiveDate}:${equipment}:product`;
+      const stripePriceIdempotencyKey = `SMARTYGYM:wod:${effectiveDate}:${equipment}:price`;
+
+      const stripeProduct = await stripe.products.create(stripeProductPayload, {
+        idempotencyKey: stripeProductIdempotencyKey,
+      });
+      stripeProductId = stripeProduct.id;
+
+      const stripePrice = await stripe.prices.create({
+        product: stripeProduct.id,
+        unit_amount: 399,
+        currency: "eur",
+        metadata: {
+          project: "SMARTYGYM",
+          content_id: workoutId,
+          generated_for_date: effectiveDate,
+          equipment,
+        },
+      }, {
+        idempotencyKey: stripePriceIdempotencyKey,
+      });
+      stripePriceId = stripePrice.id;
+
+      logStep(`${equipment} Stripe product/price created`, {
+        productId: stripeProductId,
+        priceId: stripePriceId,
+        productIdempotencyKey: stripeProductIdempotencyKey,
+        priceIdempotencyKey: stripePriceIdempotencyKey,
+      });
+
       const { error: insertError } = await supabase
         .from("admin_workouts")
         .insert({
