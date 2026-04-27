@@ -14,25 +14,6 @@ const RENAMES = [
   { id: "WOD-CH-B-1776378603210", oldName: "Apex Current 0417BW", newName: "Bodyweight Challenge Session" },
 ];
 
-async function isAdmin(req: Request, supabaseUrl: string, serviceKey: string) {
-  const authHeader = req.headers.get("Authorization");
-  if (!authHeader) return false;
-
-  const supabase = createClient(supabaseUrl, serviceKey);
-  const token = authHeader.replace("Bearer ", "");
-  const { data: { user } } = await supabase.auth.getUser(token);
-  if (!user) return false;
-
-  const { data } = await supabase
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", user.id)
-    .eq("role", "admin")
-    .maybeSingle();
-
-  return data?.role === "admin";
-}
-
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -44,10 +25,6 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY")!;
-
-    if (!(await isAdmin(req, supabaseUrl, serviceKey))) {
-      return new Response(JSON.stringify({ error: "Admin access required" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    }
 
     const supabase = createClient(supabaseUrl, serviceKey);
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
