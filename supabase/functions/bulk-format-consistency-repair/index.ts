@@ -123,7 +123,7 @@ Deno.serve(async (req) => {
       const { data: workouts, error: wErr } = await query;
       if (wErr) throw new Error(`Failed to load workouts: ${wErr.message}`);
 
-      for (const workout of workouts || []) {
+      for (const workout of (workouts || []) as Array<Record<string, any>>) {
         stats.workoutsProcessed++;
         try {
           const updates: Record<string, string> = {};
@@ -172,7 +172,7 @@ Deno.serve(async (req) => {
       const { data: programs, error: pErr } = await query;
       if (pErr) throw new Error(`Failed to load programs: ${pErr.message}`);
 
-      for (const program of programs || []) {
+      for (const program of (programs || []) as Array<Record<string, any>>) {
         stats.programsProcessed++;
         try {
           const updates: Record<string, string> = {};
