@@ -1,104 +1,95 @@
-You are right: the system must not create public products that are unlinked, badly named, or confusing. I checked the current state and the actual code path.
+Here is the finish-now plan for everything still incomplete from the WOD/Stripe hardening work.
 
-Current status from the audit
-- Today’s WOD database state is healthy:
-  - Core Tempo Circuit [BODYWEIGHT] is linked to Stripe product `prod_UPQ2ckz0m0gSpd` and a price.
-  - Granite Descent Challenge [EQUIPMENT] is linked to Stripe product `prod_UPQ32ncD6SRpzq` and a price.
-  - Current WOD count is 2, which is correct for a normal non-recovery day.
-  - No workout records are missing a price/product pair in the database.
-  - No duplicated Stripe product IDs are linked in the database.
-- Stripe catalog state is not fully clean:
-  - `Granite Ascent Protocol` / `prod_UPQ2XCrWvpLmmC` is active in Stripe but is not linked to any workout record.
-  - It has no default price, so it appears to be a failed/leftover product from a generation attempt.
-- Code issue found:
-  - The WOD function creates the Stripe product and price before inserting the workout record. It has a rollback, but if a later failure path happens after Stripe creation or a retry creates a different payload, an orphan can still remain.
-  - The idempotency key is not truly stable because it hashes a payload that includes variable fields like generated workout ID/name/image. That can create a different Stripe product during retries for the same date/equipment.
-  - Name cleanup exists, but it still allows some confusing generated names and the final duplicate guard can append “(Equipment)” / “(Bodyweight)”, which should not be used as public product naming.
+## Goal
+Lock the system so it cannot quietly create:
+- active orphan Stripe products,
+- WOD names with numbers/internal codes,
+- partially linked paid content,
+- partial WOD days where only one expected workout is live,
+- fallback payment products from unsafe or client-provided data.
 
-Plan to fix and prevent this class of errors
+## What appears already done
+- The WOD generator now validates names before Stripe creation.
+- WOD Stripe idempotency keys are now stable by date/equipment slot.
+- Stripe products are archived if the database insert or immediate verification fails.
+- Database validation functions for public workout/program integrity exist in the project.
+- A `cleanup-wod-stripe-orphans` backend function exists, but it is not fully integrated yet.
 
-1. Immediate cleanup
-- Archive the orphan Stripe product `prod_UPQ2XCrWvpLmmC` (`Granite Ascent Protocol`) so it no longer appears as an active product.
-- Re-check the Stripe catalog after archiving and confirm today’s two WOD products remain active and correctly linked.
+## What is left unfinished
 
-2. Make Stripe creation truly idempotent
-- Change the WOD Stripe idempotency key to be based only on stable slot identity:
-  - `SMARTYGYM:wod:{generated_for_date}:{equipment}:product`
-  - `SMARTYGYM:wod:{generated_for_date}:{equipment}:price`
-- Do not include generated name, image URL, timestamp ID, or full payload in the idempotency key.
-- This means retries for the same date/equipment cannot create a second product just because the AI generated a different name on retry.
+### 1. Verify and finish the Stripe cleanup action
+- Re-check Stripe for the known orphan product: `prod_UPQ2XCrWvpLmmC` / `Granite Ascent Protocol`.
+- If it is still active, archive it.
+- Re-check active WOD Stripe products after cleanup and confirm only database-linked products remain active.
 
-3. Move validation before Stripe creation
-- Enforce all hard gates before any Stripe product is created:
-  - final public name validation
-  - no numeric/internal suffixes
-  - no duplicate name
-  - section completeness
-  - minimum exercise density
-  - exercise-library linking/rejection
-  - image generation/validation policy
-- Stripe creation should happen only after the workout content is fully accepted.
+### 2. Verify database triggers are actually installed
+- Confirm the integrity triggers exist on:
+  - `admin_workouts`
+  - `admin_training_programs`
+- If the trigger functions exist but the triggers are missing, add/fix the triggers with a migration.
+- Confirm the database rejects future WOD names containing numbers/internal codes and rejects paid standalone records with only one payment ID.
 
-4. Strengthen the public name rules
-- Replace the current loose name cleaner with a strict public-name validator:
-  - Reject names containing digits anywhere unless explicitly allowed by a small whitelist.
-  - Reject internal suffixes like `0427BW`, `0418EQ`, `v2`, `#3`, etc.
-  - Reject awkward AI-style protocol names if they are not aligned with the brand naming standard.
-  - Reject duplicate names across the full workout library and across the same generation run.
-- Remove the fallback behavior that appends `(Equipment)` or `(Bodyweight)` to a duplicate public name.
-- Use clean professional fallback names instead, e.g. `Core Tempo Circuit`, `Loaded Challenge Session`, `Bodyweight Strength Builder`, etc.
+### 3. Expand orphan cleanup so it covers all paid content safely
+The current cleanup function only compares active WOD Stripe products against `admin_workouts`.
 
-5. Add a post-creation Stripe association verification gate
-- Immediately after Stripe product/price creation and database update/insert, verify:
-  - the database workout exists
-  - `stripe_product_id` matches the created Stripe product
-  - `stripe_price_id` exists
-  - Stripe product metadata `content_id` matches the workout ID
-  - Stripe product name matches the final database workout name
-  - product is active
-- If any check fails, archive the Stripe product immediately and mark the workout invisible/non-WOD if needed.
+I will update it to:
+- collect linked Stripe product IDs from both workouts and training programs,
+- only touch SmartyGym-owned products with trusted metadata,
+- support dry-run by default,
+- archive with metadata explaining why it was archived,
+- return a clear report of kept/archived/errors,
+- avoid deleting anything.
 
-6. Add automatic orphan reconciliation
-- Add or repair a backend function dedicated to Stripe WOD hygiene:
-  - List recent active SmartyGym WOD Stripe products.
-  - Compare them against `admin_workouts.stripe_product_id` and `admin_training_programs.stripe_product_id`.
-  - Archive any active Stripe product not linked in the database.
-  - Report exactly what it archived and what it left untouched.
-- Run this after WOD generation and from watchdog checks, so orphans are cleaned automatically instead of waiting for manual discovery.
+### 4. Run cleanup automatically after WOD generation
+- After a successful WOD generation/orchestration run, call the cleanup logic in safe mode for WOD products.
+- If a generation attempt fails after Stripe creation, cleanup should run before the function exits.
+- This prevents a failed retry from leaving active unlinked products behind.
 
-7. Add a WOD health report function
-- Create an admin-only health check that reports:
-  - today’s expected WOD count
-  - whether BODYWEIGHT and EQUIPMENT exist, or VARIOUS on recovery days
-  - whether each WOD has product and price IDs
-  - whether each Stripe product exists, is active, and has a price
-  - whether any active Stripe products are orphaned
-  - whether names contain numbers/internal suffixes
-  - whether final WOD section validation passes
-- This gives a clear “healthy / warning / failed” result instead of hidden failures.
+### 5. Add a dedicated WOD payment health report
+Create or extend a backend health check that reports:
+- today’s expected WOD count: 2 normally, 1 on recovery days,
+- expected equipment slots: BODYWEIGHT + EQUIPMENT, or VARIOUS on recovery days,
+- each WOD’s database ID, name, equipment, visibility, product ID, price ID,
+- whether names contain forbidden numbers/internal suffixes,
+- whether any WOD is missing a product/price pair,
+- whether each Stripe product is active,
+- whether product metadata points back to the correct workout ID,
+- whether any active WOD Stripe products are orphaned.
 
-8. Add database-level safety rails where appropriate
-- Add non-destructive constraints/triggers for future WOD inserts/updates:
-  - Prevent `is_workout_of_day = true` records with numeric/internal-coded public names.
-  - Prevent WOD standalone purchase records from having only one of `stripe_product_id` / `stripe_price_id` when both are required.
-  - Use validation triggers rather than time-based check constraints.
-- Keep this non-destructive and compatible with existing records.
+Result should be a simple status: `healthy`, `warning`, or `failed`.
 
-9. Update monitoring and failure handling
-- Make generation failures explicit:
-  - if a variant fails after Stripe creation, archive created Stripe artifacts immediately
-  - if only one WOD variant succeeds on a normal day, rollback partial publishing and archive unlinked Stripe products
-  - log the exact failed step in `notification_audit_log`
-- Update admin alert wording to include payment association health, not just generation success.
+### 6. Harden checkout so it cannot create fallback products from unsafe data
+`create-individual-purchase-checkout` can still create a Stripe product/price if the database record has missing Stripe IDs.
 
-10. Verify after implementation
-- Run the WOD health check for today.
-- Confirm the active Stripe catalog has no unlinked WOD products.
-- Confirm today’s two WODs are visible, linked, purchasable, and correctly named.
-- Confirm no new names contain internal numbers/codes.
+I will change that so:
+- checkout never trusts client-provided `contentName`, `price`, `stripeProductId`, or `stripePriceId`,
+- checkout uses only database-validated content,
+- for WOD standalone purchases, missing Stripe product/price IDs becomes a hard error instead of creating a fallback product,
+- for non-WOD paid content, fallback creation only happens after strict database validation and with stable metadata/idempotency.
 
-Technical notes
-- Main code to harden: `supabase/functions/generate-workout-of-day/index.ts`.
-- Related checkout safety path: `supabase/functions/create-individual-purchase-checkout/index.ts` should also stop creating fallback Stripe products from client-provided names and only use validated database content.
-- A cleanup/health function should be implemented as a backend function with in-code admin validation and safe, parameterized database calls.
-- No destructive workout deletion is needed. Stripe cleanup should archive products, not delete them.
+### 7. Strengthen name guards one final time
+- Remove any remaining duplicate fallback behavior that could create awkward names.
+- Keep public WOD names free of digits, internal suffixes, version markers, and AI-style debug names.
+- Confirm no fallback adds `(Equipment)`, `(Bodyweight)`, numbers, or codes.
+
+### 8. Final verification report
+After implementation, run a final audit and report back with:
+- whether the known orphan product is inactive,
+- active WOD Stripe product count,
+- today’s WOD count and expected count,
+- each today WOD name and payment link status,
+- orphan count,
+- trigger status,
+- checkout safety status.
+
+## Technical implementation notes
+- Main files to update:
+  - `supabase/functions/cleanup-wod-stripe-orphans/index.ts`
+  - `supabase/functions/generate-workout-of-day/index.ts`
+  - `supabase/functions/wod-generation-orchestrator/index.ts`
+  - `supabase/functions/create-individual-purchase-checkout/index.ts`
+  - possibly `supabase/functions/run-system-health-audit/index.ts` or a new WOD-specific health function
+- Database changes, if needed, will be done by migration only.
+- Stripe products will be archived, never deleted.
+- No workout/program content will be deleted.
+- Admin checks will use server-side role validation, not browser storage.
