@@ -8,6 +8,12 @@ const corsHeaders = {
 };
 
 async function verifyAdminRole(req: Request): Promise<{ isAdmin: boolean; userId: string | null; error?: string }> {
+  const internalSecret = req.headers.get("X-Internal-Secret");
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (internalSecret && serviceKey && internalSecret === serviceKey) {
+    return { isAdmin: true, userId: "internal-maintenance" };
+  }
+
   const authHeader = req.headers.get("Authorization");
   if (!authHeader) return { isAdmin: false, userId: null, error: "No authorization header" };
 
@@ -51,46 +57,69 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // 1. Get all stripe_product_ids currently linked in admin_workouts
-    const { data: linkedWorkouts, error: dbError } = await supabase
+    const body = await req.json().catch(() => ({}));
+    const dryRun = body.dryRun !== false; // Default to dry run for safety
+    const scope = body.scope === "all-paid-content" ? "all-paid-content" : "wod";
+
+    // 1. Get all Stripe product IDs currently linked from trusted paid content tables
+    const { data: linkedWorkouts, error: workoutError } = await supabase
       .from("admin_workouts")
-      .select("stripe_product_id")
+      .select("id, name, stripe_product_id")
       .not("stripe_product_id", "is", null);
 
-    if (dbError) throw new Error(`DB query failed: ${dbError.message}`);
+    if (workoutError) throw new Error(`Workout DB query failed: ${workoutError.message}`);
+
+    const { data: linkedPrograms, error: programError } = await supabase
+      .from("admin_training_programs")
+      .select("id, name, stripe_product_id")
+      .not("stripe_product_id", "is", null);
+
+    if (programError) throw new Error(`Program DB query failed: ${programError.message}`);
 
     const linkedProductIds = new Set(
-      (linkedWorkouts || []).map((w: any) => w.stripe_product_id).filter(Boolean)
+      [...(linkedWorkouts || []), ...(linkedPrograms || [])]
+        .map((item: any) => item.stripe_product_id)
+        .filter(Boolean)
     );
 
-    console.log(`[CLEANUP] Found ${linkedProductIds.size} linked Stripe product IDs in admin_workouts`);
+    console.log(`[CLEANUP] Found ${linkedProductIds.size} linked Stripe product IDs across paid content`);
 
-    // 2. Search for active WOD Stripe products
+    // 2. Search only for active SmartyGym products with trusted project metadata
+    const productQuery = scope === "all-paid-content"
+      ? 'active:"true" AND metadata["project"]:"SMARTYGYM"'
+      : 'active:"true" AND metadata["project"]:"SMARTYGYM" AND metadata["type"]:"wod"';
     const searchResult = await stripe.products.search({
-      query: 'active:"true" AND metadata["type"]:"wod" AND metadata["project"]:"SMARTYGYM"',
+      query: productQuery,
       limit: 100,
     });
 
-    const activeWodProducts = searchResult.data;
-    console.log(`[CLEANUP] Found ${activeWodProducts.length} active WOD Stripe products`);
+    const activeProducts = searchResult.data.filter((product) => product.metadata?.project === "SMARTYGYM");
+    console.log(`[CLEANUP] Found ${activeProducts.length} active Stripe products for scope ${scope}`);
 
-    // 3. Find orphans: active WOD products NOT linked from any DB row
-    const orphans = activeWodProducts.filter(p => !linkedProductIds.has(p.id));
-    console.log(`[CLEANUP] Found ${orphans.length} orphaned WOD Stripe products to archive`);
+    // 3. Find orphans: active trusted products NOT linked from any DB row
+    const orphans = activeProducts.filter(p => !linkedProductIds.has(p.id));
+    const kept = activeProducts.filter(p => linkedProductIds.has(p.id)).map(p => `${p.id} - ${p.name}`);
+    console.log(`[CLEANUP] Found ${orphans.length} orphaned Stripe products to archive`);
 
     const archived: string[] = [];
     const errors: string[] = [];
 
     // 4. Archive orphans (set active=false, preserve purchase history)
-    const body = await req.json().catch(() => ({}));
-    const dryRun = body.dryRun !== false; // Default to dry run for safety
-
     for (const orphan of orphans) {
       if (dryRun) {
         archived.push(`[DRY RUN] ${orphan.id} - ${orphan.name} (date: ${orphan.metadata?.generated_for_date || 'unknown'})`);
       } else {
         try {
-          await stripe.products.update(orphan.id, { active: false });
+          await stripe.products.update(orphan.id, {
+            active: false,
+            metadata: {
+              ...orphan.metadata,
+              cleanup_reason: "active_product_not_linked_in_database",
+              cleanup_scope: scope,
+              archived_by: "cleanup-wod-stripe-orphans",
+              archived_at: new Date().toISOString(),
+            },
+          });
           archived.push(`${orphan.id} - ${orphan.name}`);
         } catch (err: any) {
           errors.push(`${orphan.id}: ${err.message}`);
@@ -101,9 +130,11 @@ serve(async (req) => {
     return new Response(JSON.stringify({
       success: true,
       dryRun,
-      totalActiveWodProducts: activeWodProducts.length,
+      scope,
+      totalActiveProducts: activeProducts.length,
       linkedInDatabase: linkedProductIds.size,
       orphansFound: orphans.length,
+      kept,
       archived,
       errors,
       message: dryRun
