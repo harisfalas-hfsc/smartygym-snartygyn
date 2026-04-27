@@ -2978,6 +2978,7 @@ Return JSON with these exact fields:
       
       if (!variousExists) {
         await rollbackActiveWodsForDate(supabase, effectiveDate, "Recovery day final verification failed");
+        await runWodStripeCleanup("recovery-final-verification-failed", false);
         logStep("CRITICAL ERROR: RECOVERY VARIOUS workout not generated", { 
           generated: generatedWorkouts.map(w => w.equipment)
         });
@@ -3012,6 +3013,7 @@ Return JSON with these exact fields:
         if (!equipmentExists) missing.push("EQUIPMENT");
 
         await rollbackActiveWodsForDate(supabase, effectiveDate, `Final verification failed. Missing: ${missing.join(", ")}`);
+        await runWodStripeCleanup("normal-final-verification-failed", false);
         
         logStep("CRITICAL ERROR: Not all workouts generated", { 
           missing, 
@@ -3047,6 +3049,8 @@ Return JSON with these exact fields:
         effectiveDate,
         last_generated_at: stateData?.last_generated_at,
       });
+
+      await runWodStripeCleanup("generate-workout-of-day-state-already-updated", false);
 
       return new Response(
         JSON.stringify({
