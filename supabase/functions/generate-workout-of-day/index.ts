@@ -2762,13 +2762,7 @@ Return JSON with these exact fields:
       if (insertError) {
         // ORPHAN GUARD: Archive Stripe product immediately if DB insert fails
         // This prevents orphaned active Stripe products from accumulating
-        try {
-          logStep(`⚠️ DB insert failed, archiving orphaned Stripe product`, { stripeProductId, insertError: insertError.message });
-          await stripe.products.update(stripeProductId, { active: false });
-          logStep(`✅ Orphaned Stripe product archived`, { stripeProductId });
-        } catch (archiveErr: any) {
-          logStep(`❌ Failed to archive orphaned Stripe product`, { stripeProductId, error: archiveErr.message });
-        }
+        await archiveStripeProductSafely(stripe, stripeProductId, `db_insert_failed:${insertError.message}`);
         throw new Error(`Failed to insert ${equipment} WOD: ${insertError.message}`);
       }
 
@@ -2787,6 +2781,7 @@ Return JSON with these exact fields:
           verifyError: verifyError?.message,
           verifyWorkout 
         });
+        await archiveStripeProductSafely(stripe, stripeProductId, "post_insert_verification_failed");
         throw new Error(`${equipment} WOD verification failed - workout not found in database after insert`);
       }
       
