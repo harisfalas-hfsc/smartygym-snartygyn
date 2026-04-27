@@ -13,7 +13,14 @@ serve(async (req) => {
   }
 
   try {
-    const { contentType, contentId, contentName, price, stripeProductId, stripePriceId } = await req.json();
+    const { contentType, contentId } = await req.json();
+
+    if (!['workout', 'program'].includes(contentType) || !contentId) {
+      return new Response(JSON.stringify({ error: "Invalid purchase request" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
 
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
@@ -76,7 +83,7 @@ serve(async (req) => {
     const tableName = contentType === 'workout' ? 'admin_workouts' : 'admin_training_programs';
     const { data: contentRecord, error: contentError } = await supabaseClient
       .from(tableName)
-      .select('id, name, is_visible, is_standalone_purchase, price, stripe_product_id, stripe_price_id')
+      .select('id, name, is_visible, is_standalone_purchase, price, stripe_product_id, stripe_price_id, is_workout_of_day, generated_for_date')
       .eq('id', contentId)
       .maybeSingle();
 
@@ -94,12 +101,33 @@ serve(async (req) => {
       });
     }
 
-    const finalContentName = contentRecord.name || contentName;
+    const finalContentName = contentRecord.name;
     const finalPrice = Number(contentRecord.price);
 
-    // Create or use existing Stripe product/price
-    let finalPriceId = contentRecord.stripe_price_id || stripePriceId;
-    const existingProductId = contentRecord.stripe_product_id || stripeProductId;
+    if (!finalContentName || !Number.isFinite(finalPrice) || finalPrice <= 0) {
+      return new Response(JSON.stringify({ error: "This content is not configured correctly for purchase." }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 422,
+      });
+    }
+
+    // Create or use existing Stripe product/price. Never trust client-provided product, price, name, or amount.
+    let finalPriceId = contentRecord.stripe_price_id;
+    const existingProductId = contentRecord.stripe_product_id;
+
+    if (contentRecord.is_workout_of_day && (!existingProductId || !finalPriceId)) {
+      return new Response(JSON.stringify({ error: "This Workout of the Day is temporarily unavailable for purchase." }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 409,
+      });
+    }
+
+    if ((existingProductId && !finalPriceId) || (!existingProductId && finalPriceId)) {
+      return new Response(JSON.stringify({ error: "This content is temporarily unavailable for purchase." }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 409,
+      });
+    }
     
     if (!finalPriceId) {
       // Create or reuse product, then create price
@@ -112,7 +140,10 @@ serve(async (req) => {
             project: "SMARTYGYM",
             content_type: contentType,
             content_id: contentId,
+            source: "create-individual-purchase-checkout",
           },
+        }, {
+          idempotencyKey: `SMARTYGYM:${contentType}:${contentId}:product`,
         });
         productIdToUse = product.id;
       }
@@ -121,6 +152,14 @@ serve(async (req) => {
         product: productIdToUse,
         unit_amount: Math.round(finalPrice * 100), // Convert to cents
         currency: 'eur',
+        metadata: {
+          project: "SMARTYGYM",
+          content_type: contentType,
+          content_id: contentId,
+          source: "create-individual-purchase-checkout",
+        },
+      }, {
+        idempotencyKey: `SMARTYGYM:${contentType}:${contentId}:price:${Math.round(finalPrice * 100)}:eur`,
       });
 
       finalPriceId = priceObj.id;
