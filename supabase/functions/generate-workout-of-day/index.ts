@@ -954,6 +954,9 @@ NAMING RULES (CRITICAL - MUST FOLLOW):
 
 4. KEEP IT SHORT: 2-4 words maximum
 5. NEVER copy or slightly modify a name from the banned list (e.g., adding "II", changing one word)
+6. CUSTOMER-FACING ONLY: Never add dates, serial numbers, random letters, equipment codes, version numbers, or internal IDs.
+   ❌ Forbidden examples: "Core Cadence 0427BW", "Iron Circuit 0427EQ", "Mobility Flow V2", "Strength Block #1"
+   ✅ Correct style: "Core Tempo Circuit", "Midline Control Session", "Athletic Strength Builder"
 ${bannedNamesList}`;
 
       // Generate workout content using Lovable AI
@@ -2268,17 +2271,15 @@ Return JSON with these exact fields:
         const nameMatchesFirstWorkout = firstWorkoutName && 
           firstWorkoutName.trim().toLowerCase() === nameToCheck.toLowerCase();
         
-        if (nameExistsInDb || nameMatchesFirstWorkout) {
-          // Generate a unique suffix based on date + equipment
-          const dateSuffix = effectiveDate.replace(/-/g, '').slice(-4); // e.g., "0328"
-          const eqSuffix = equipment === "EQUIPMENT" ? "EQ" : equipment === "BODYWEIGHT" ? "BW" : "V";
-          const uniqueName = `${nameToCheck} ${dateSuffix}${eqSuffix}`;
-          logStep(`⚠️ Name collision detected, auto-renaming`, {
+        if (nameExistsInDb || nameMatchesFirstWorkout || hasInternalNameCode(nameToCheck)) {
+          const cleaned = cleanPublicWorkoutName(nameToCheck, category, equipment, existingNamesForCategory);
+          logStep(`⚠️ Name collision/internal code detected, applying public-safe rename`, {
             original: nameToCheck,
-            newName: uniqueName,
-            collidedWith: nameExistsInDb ? 'database' : 'first workout today'
+            newName: cleaned.name,
+            reason: cleaned.reason,
+            collidedWith: nameExistsInDb ? 'database' : nameMatchesFirstWorkout ? 'first workout today' : 'internal code'
           });
-          workoutContent.name = uniqueName;
+          workoutContent.name = cleaned.name;
         }
         
         // Add the new name to our tracking list to prevent same-session collisions
