@@ -86,10 +86,10 @@ export function FreeTrialPopup() {
 
   return (
     <Dialog open={show} onOpenChange={(open) => { if (!open) handleDismiss(); }}>
-      <DialogContent className="p-0 border-0 overflow-hidden sm:max-w-lg max-w-[95vw] rounded-2xl bg-card border-2 border-primary/40 shadow-2xl [&>button]:hidden">
+      <DialogContent className="p-0 border-0 overflow-hidden max-w-sm w-[95vw] sm:w-full rounded-xl bg-card border-2 border-primary/40 shadow-2xl [&>button]:hidden">
         <div className="flex flex-col">
           {/* Bright image section */}
-          <div className="relative h-[200px] overflow-hidden">
+          <div className="relative h-32 overflow-hidden">
             <img
               src={popupImg}
               alt="Premium fitness experience"
@@ -106,27 +106,27 @@ export function FreeTrialPopup() {
           </div>
 
           {/* Content section */}
-          <div className="flex flex-col p-5 sm:p-6">
-            <div className="mb-3">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider">
+          <div className="flex flex-col p-4">
+            <div className="mb-2">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-[11px] font-bold uppercase tracking-wider">
                 <Crown className="w-3.5 h-3.5" /> 3-Day Free Trial
               </span>
             </div>
 
-            <h2 className="text-2xl sm:text-3xl font-bold text-foreground leading-tight mb-3">
+            <h2 className="text-xl font-bold text-foreground leading-tight mb-2">
               Try Premium Free<br />for 3 Days
             </h2>
 
-            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-4">
+            <p className="text-sm text-muted-foreground leading-relaxed mb-3">
               Get unlimited access to all workouts, training programs, and premium tools. No charge for 3 days — cancel anytime.
             </p>
 
-            <div className="flex items-center gap-4 mb-4">
-              <p className="text-xs sm:text-sm font-medium text-emerald-500 flex items-center gap-1.5">
+            <div className="flex items-center gap-3 mb-3">
+              <p className="text-xs font-medium text-emerald-500 flex items-center gap-1.5">
                 <span className="inline-flex w-4 h-4 rounded-full bg-emerald-500/20 items-center justify-center text-emerald-500">✓</span>
                 Cancel anytime
               </p>
-              <p className="text-xs sm:text-sm font-medium text-emerald-500 flex items-center gap-1.5">
+              <p className="text-xs font-medium text-emerald-500 flex items-center gap-1.5">
                 <span className="inline-flex w-4 h-4 rounded-full bg-emerald-500/20 items-center justify-center text-emerald-500">✓</span>
                 No commitment
               </p>
@@ -134,11 +134,11 @@ export function FreeTrialPopup() {
 
             <Button
               size="lg"
-              className="w-full text-base sm:text-lg gap-2 h-12 sm:h-14 font-bold shadow-lg shadow-primary/30"
+              className="w-full text-sm gap-2 h-11 font-bold shadow-lg shadow-primary/30"
               onClick={handleCTA}
               data-track-cta="free-trial-popup"
             >
-              <Crown className="w-5 h-5" />
+              <Crown className="w-4 h-4" />
               Start Your Free Trial
             </Button>
 
