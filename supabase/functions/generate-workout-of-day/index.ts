@@ -99,7 +99,7 @@ function cleanPublicWorkoutName(
 }
 
 async function rollbackActiveWodsForDate(
-  supabase: ReturnType<typeof createClient>,
+  supabase: any,
   effectiveDate: string,
   reason: string,
 ) {
@@ -139,7 +139,7 @@ async function rollbackActiveWodsForDate(
 
   logStep("ROLLBACK: Cleared partial WOD publish", {
     effectiveDate,
-    cleared: activeWods.map((w) => ({ id: w.id, name: w.name, equipment: w.equipment })),
+    cleared: activeWods.map((w: any) => ({ id: w.id, name: w.name, equipment: w.equipment })),
   });
 }
 
@@ -275,7 +275,7 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  let cleanupSupabase: ReturnType<typeof createClient> | null = null;
+  let cleanupSupabase: any = null;
   let effectiveDateForCleanup: string | null = null;
 
   try {
