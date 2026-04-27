@@ -50,6 +50,10 @@ function hasInternalNameCode(name: string): boolean {
     || /\b(II|III|IV|V|VI|VII|VIII|IX|X)\b$/.test(trimmed);
 }
 
+function hasAiStyleName(name: string): boolean {
+  return /\b(axial|matrix|meridian|protocol|helix|arcus|synergy|conduit|integration|current|vector|quantum|algorithm|neural|system|module|phase|sequence)\b/i.test(name.trim());
+}
+
 async function archiveStripeProductSafely(stripe: Stripe, productId: string | null, reason: string) {
   if (!productId) return;
   try {
@@ -105,6 +109,7 @@ function cleanPublicWorkoutName(
   const candidateIsClean = baseName.length >= 5
     && baseName.split(/\s+/).length <= 4
     && !hasInternalNameCode(baseName)
+    && !hasAiStyleName(baseName)
     && !normalizedExisting.has(baseName.toLowerCase());
 
   if (candidateIsClean) {
@@ -135,7 +140,7 @@ function cleanPublicWorkoutName(
   const fallback = fallbackNames.find((name) => !normalizedExisting.has(name.toLowerCase()))
     || `${equipmentWord} ${categoryWord} Practice`;
 
-  return { name: fallback, changed: true, reason: "duplicate or internal-code name" };
+  return { name: fallback, changed: true, reason: "duplicate, internal-code, or AI-style name" };
 }
 
 async function rollbackActiveWodsForDate(
