@@ -7,6 +7,10 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+function hasAiStyleName(name: string): boolean {
+  return /\b(axial|matrix|meridian|protocol|helix|arcus|synergy|conduit|integration|current|vector|quantum|algorithm|neural|system|module|phase|sequence)\b/i.test(name.trim());
+}
+
 async function verifyAdminRole(req: Request): Promise<{ isAdmin: boolean; userId: string | null; error?: string }> {
   const internalSecret = req.headers.get("X-Internal-Secret");
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -97,7 +101,7 @@ serve(async (req) => {
     console.log(`[CLEANUP] Found ${activeProducts.length} active Stripe products for scope ${scope}`);
 
     // 3. Find orphans: active trusted products NOT linked from any DB row
-    const orphans = activeProducts.filter((p: Stripe.Product) => !linkedProductIds.has(p.id));
+    const orphans = activeProducts.filter((p: Stripe.Product) => !linkedProductIds.has(p.id) || hasAiStyleName(p.name || ""));
     const kept = activeProducts
       .filter((p: Stripe.Product) => linkedProductIds.has(p.id))
       .map((p: Stripe.Product) => `${p.id} - ${p.name}`);

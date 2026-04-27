@@ -50,6 +50,10 @@ function hasInternalNameCode(name: string): boolean {
     || /\b(II|III|IV|V|VI|VII|VIII|IX|X)\b$/.test(trimmed);
 }
 
+function hasAiStyleName(name: string): boolean {
+  return /\b(axial|matrix|meridian|protocol|helix|arcus|synergy|conduit|integration|current|vector|quantum|algorithm|neural|system|module|phase|sequence)\b/i.test(name.trim());
+}
+
 async function archiveStripeProductSafely(stripe: Stripe, productId: string | null, reason: string) {
   if (!productId) return;
   try {
@@ -105,6 +109,7 @@ function cleanPublicWorkoutName(
   const candidateIsClean = baseName.length >= 5
     && baseName.split(/\s+/).length <= 4
     && !hasInternalNameCode(baseName)
+    && !hasAiStyleName(baseName)
     && !normalizedExisting.has(baseName.toLowerCase());
 
   if (candidateIsClean) {
@@ -135,7 +140,7 @@ function cleanPublicWorkoutName(
   const fallback = fallbackNames.find((name) => !normalizedExisting.has(name.toLowerCase()))
     || `${equipmentWord} ${categoryWord} Practice`;
 
-  return { name: fallback, changed: true, reason: "duplicate or internal-code name" };
+  return { name: fallback, changed: true, reason: "duplicate, internal-code, or AI-style name" };
 }
 
 async function rollbackActiveWodsForDate(
@@ -997,6 +1002,10 @@ NAMING RULES (CRITICAL - MUST FOLLOW):
 6. CUSTOMER-FACING ONLY: Never add dates, serial numbers, random letters, equipment codes, version numbers, or internal IDs.
    ❌ Forbidden examples: "Core Cadence 0427BW", "Iron Circuit 0427EQ", "Mobility Flow V2", "Strength Block #1"
    ✅ Correct style: "Core Tempo Circuit", "Midline Control Session", "Athletic Strength Builder"
+
+7. DO NOT USE AI-SOUNDING / ABSTRACT TECHNICAL TERMS in public workout names.
+   ❌ Forbidden words: Axial, Matrix, Meridian, Protocol, Helix, Arcus, Synergy, Conduit, Integration, Current, Vector, Quantum, Algorithm, Neural, System, Module, Phase, Sequence
+   ✅ Use simple athletic/customer language instead: Core, Tempo, Circuit, Builder, Sprint, Grip, Press, Climb, Flow, Control
 ${bannedNamesList}`;
 
       // Generate workout content using Lovable AI
@@ -2311,13 +2320,13 @@ Return JSON with these exact fields:
         const nameMatchesFirstWorkout = firstWorkoutName && 
           firstWorkoutName.trim().toLowerCase() === nameToCheck.toLowerCase();
         
-        if (nameExistsInDb || nameMatchesFirstWorkout || hasInternalNameCode(nameToCheck)) {
+        if (nameExistsInDb || nameMatchesFirstWorkout || hasInternalNameCode(nameToCheck) || hasAiStyleName(nameToCheck)) {
           const cleaned = cleanPublicWorkoutName(nameToCheck, category, equipment, existingNamesForCategory);
           logStep(`⚠️ Name collision/internal code detected, applying public-safe rename`, {
             original: nameToCheck,
             newName: cleaned.name,
             reason: cleaned.reason,
-            collidedWith: nameExistsInDb ? 'database' : nameMatchesFirstWorkout ? 'first workout today' : 'internal code'
+            collidedWith: nameExistsInDb ? 'database' : nameMatchesFirstWorkout ? 'first workout today' : hasAiStyleName(nameToCheck) ? 'AI-style wording' : 'internal code'
           });
           workoutContent.name = cleaned.name;
         }
@@ -2684,7 +2693,7 @@ Return JSON with these exact fields:
           .select("id")
           .ilike("name", workoutContent.name)
           .limit(1);
-        if ((collisionRows && collisionRows.length > 0) || hasInternalNameCode(workoutContent.name)) {
+        if ((collisionRows && collisionRows.length > 0) || hasInternalNameCode(workoutContent.name) || hasAiStyleName(workoutContent.name)) {
           const cleaned = cleanPublicWorkoutName(workoutContent.name, category, equipment, existingNamesForCategory);
           logStep(`⚠️ Pre-insert bad/colliding name detected, applying public-safe rename`, {
             original: workoutContent.name,
@@ -2697,12 +2706,12 @@ Return JSON with these exact fields:
         logStep("Pre-insert uniqueness guard failed (non-critical)", { error: String(guardErr) });
       }
 
-      if (hasInternalNameCode(workoutContent.name)) {
+      if (hasInternalNameCode(workoutContent.name) || hasAiStyleName(workoutContent.name)) {
         const cleaned = cleanPublicWorkoutName(workoutContent.name, category, equipment, existingNamesForCategory);
         workoutContent.name = cleaned.name;
       }
 
-      if (hasInternalNameCode(workoutContent.name)) {
+      if (hasInternalNameCode(workoutContent.name) || hasAiStyleName(workoutContent.name)) {
         throw new Error(`${equipment} WOD rejected: unsafe public name after cleanup (${workoutContent.name})`);
       }
 

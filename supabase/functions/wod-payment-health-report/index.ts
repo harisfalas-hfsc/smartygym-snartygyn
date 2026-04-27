@@ -23,7 +23,8 @@ function hasForbiddenPublicName(name: string): boolean {
     || /\b\d{4}(BW|EQ|V)\b$/i.test(trimmed)
     || /\b\d{6,}\b$/.test(trimmed)
     || /\b(v\d+|#\d+)\b$/i.test(trimmed)
-    || /\b(II|III|IV|V|VI|VII|VIII|IX|X)\b$/.test(trimmed);
+    || /\b(II|III|IV|V|VI|VII|VIII|IX|X)\b$/.test(trimmed)
+    || /\b(axial|matrix|meridian|protocol|helix|arcus|synergy|conduit|integration|current|vector|quantum|algorithm|neural|system|module|phase|sequence)\b/i.test(trimmed);
 }
 
 async function verifyAdminRole(req: Request): Promise<{ isAdmin: boolean; error?: string }> {
@@ -130,7 +131,7 @@ serve(async (req) => {
       };
     }));
 
-    if (orphanProducts.length > 0) warnings.push(`${orphanProducts.length} active WOD Stripe product(s) are not linked in the database`);
+    if (orphanProducts.length > 0) failures.push(`${orphanProducts.length} active WOD Stripe product(s) are not linked in the database`);
     if ((wods || []).length !== expectedSlots.length) warnings.push(`Found ${(wods || []).length} WOD row(s), expected ${expectedSlots.length}`);
     checks.push("database WOD rows", "public names", "payment ID pairs", "Stripe product activity", "orphan WOD products");
 
