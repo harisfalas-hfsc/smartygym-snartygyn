@@ -2701,10 +2701,10 @@ Return JSON with these exact fields:
       });
 
       // ═══════════════════════════════════════════════════════════════════════════════
-      // FINAL PRE-INSERT UNIQUENESS GUARD (library-wide, race-condition safe)
+      // FINAL PRE-INSERT PUBLIC NAME GUARD (library-wide, race-condition safe)
       // Re-check the database immediately before INSERT in case another row was added
-      // between the initial banlist fetch and now. If a collision is found, append a
-      // date+equipment suffix so the name remains globally unique.
+      // between the initial banlist fetch and now. If a collision or internal-looking
+      // code is found, use a clean customer-facing replacement name.
       // ═══════════════════════════════════════════════════════════════════════════════
       try {
         const { data: collisionRows } = await supabase
@@ -2712,15 +2712,14 @@ Return JSON with these exact fields:
           .select("id")
           .ilike("name", workoutContent.name)
           .limit(1);
-        if (collisionRows && collisionRows.length > 0) {
-          const dateSuffix = effectiveDate.replace(/-/g, '').slice(-4);
-          const eqSuffix = equipment === "EQUIPMENT" ? "EQ" : equipment === "BODYWEIGHT" ? "BW" : "V";
-          const guardedName = `${workoutContent.name} ${dateSuffix}${eqSuffix}`;
-          logStep(`⚠️ Pre-insert collision detected, applying guard rename`, {
+        if ((collisionRows && collisionRows.length > 0) || hasInternalNameCode(workoutContent.name)) {
+          const cleaned = cleanPublicWorkoutName(workoutContent.name, category, equipment, existingNamesForCategory);
+          logStep(`⚠️ Pre-insert bad/colliding name detected, applying public-safe rename`, {
             original: workoutContent.name,
-            newName: guardedName,
+            newName: cleaned.name,
+            reason: cleaned.reason,
           });
-          workoutContent.name = guardedName;
+          workoutContent.name = cleaned.name;
         }
       } catch (guardErr) {
         logStep("Pre-insert uniqueness guard failed (non-critical)", { error: String(guardErr) });
