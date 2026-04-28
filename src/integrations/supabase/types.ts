@@ -3363,6 +3363,59 @@ export type Database = {
           rating_count: number
         }[]
       }
+      get_visible_program_metadata: {
+        Args: { _program_id?: string }
+        Returns: {
+          category: string
+          days_per_week: number
+          description: string
+          difficulty: string
+          difficulty_stars: number
+          duration: string
+          equipment: string
+          id: string
+          image_url: string
+          is_free: boolean
+          is_premium: boolean
+          is_standalone_purchase: boolean
+          is_visible: boolean
+          name: string
+          price: number
+          serial_number: number
+          stripe_price_id: string
+          stripe_product_id: string
+          tier_required: string
+          weeks: number
+        }[]
+      }
+      get_visible_workout_metadata: {
+        Args: { _workout_id?: string }
+        Returns: {
+          category: string
+          description: string
+          difficulty: string
+          difficulty_stars: number
+          duration: string
+          equipment: string
+          focus: string
+          format: string
+          generated_for_date: string
+          id: string
+          image_url: string
+          is_free: boolean
+          is_premium: boolean
+          is_standalone_purchase: boolean
+          is_visible: boolean
+          is_workout_of_day: boolean
+          name: string
+          price: number
+          serial_number: number
+          stripe_price_id: string
+          stripe_product_id: string
+          tier_required: string
+          type: string
+        }[]
+      }
       get_website_analytics_summary: {
         Args: { end_date: string; start_date: string }
         Returns: {
