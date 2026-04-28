@@ -1,159 +1,125 @@
-## Clear production health audit answer
+No, I am not going to leave paid content RLS like this.
 
-I checked the current backend data, payment records, code paths, logs, and console/network snapshots in read-only mode.
+Clear answer: the website is working right now, but the paid-content database policy is too open. That is not acceptable for a production paid site. I paused it only because changing RLS too aggressively can instantly break browsing, checkout, WOD pages, and premium member access. The right fix is to harden it carefully, not leave it open and not make a rushed change that locks real users out.
 
-### Current status
+## What I will do
 
-| Area | Status | Finding |
-|---|---:|---|
-| Workout of the Day | Working now | Today’s two WODs are visible, active, and marked as WOD for 2026-04-28. |
-| WOD payment products | Working now | Both WOD Stripe products now have the correct default price attached. |
-| Visible paid workouts | Working now | 335 visible paid workouts have product + price IDs. 0 visible paid workouts are missing payment links. |
-| Visible paid programs | Working now | 25 visible paid programs have product + price IDs. 0 visible paid programs are missing payment links. |
-| Membership database | Working | 17 subscription rows: 16 active, 1 canceled. Active includes 2 Gold and 1 Platinum paid/premium rows plus free active users. |
-| Stripe subscriptions | Working from Stripe side | Stripe currently shows 1 active subscription. |
-| Tools pages | Working text corrected | The checked tool pages now say “Smarty Tools — Free to Use”, not “Smart Tools”. |
-| Login/reset password | Mostly working | Login, Google login, forgot password, and reset-password page exist. One code-order issue should be cleaned up. |
-| Notifications queue | Healthy right now | Pending content notifications: 0. Scheduled notification/email queues: empty. Recent notification functions returned 200. |
-| Backend function failures | No current 4xx/5xx in recent edge request logs | Recent backend function request logs show no failed HTTP statuses. |
-| Console errors | One UI accessibility warning | Browser snapshot shows a DialogContent warning in the user dashboard check-in dialogs because DialogTitle/DialogDescription are missing. This is not a payment/WOD failure, but should be fixed. |
-| Security/RLS | Needs hardening | Public SELECT policies expose all workouts/programs, including premium content, at database level. The UI may still gate content, but database policies are too open for paid content protection. |
-| Database triggers | Serious issue found | The database reports no active triggers, even though functions exist for profile creation, notifications, image repair, workout validation, etc. This can cause silent workflow failures. |
+### 1. Replace broad public read access
+I will remove or narrow the current public read policies like:
 
-## What likely caused the recent WOD failure
+```text
+Public can view all workouts
+Public can view all programs
+```
 
-The WOD rows were generated, but the publishing/payment state was incomplete:
+Those policies currently allow too much direct database access.
 
-- the WOD content existed,
-- it was hidden/unpublished,
-- the Stripe products existed,
-- but the Stripe products were missing the required default price connection.
+### 2. Keep public browsing working
+Visitors still need to see public/free content and marketing previews. I will keep safe public access for:
 
-That specific issue was already repaired. Today’s rows are now live:
+- visible free workouts/programs,
+- public metadata needed for cards and listings,
+- checkout pages that need product/price information,
+- WOD preview/purchase flow.
 
-- `Leg Anchor Pull` — BODYWEIGHT — visible WOD — product and price connected
-- `Squat Row Hybrid` — EQUIPMENT — visible WOD — product and price connected
+I will not blindly block everything.
 
-## Important risks I found
+### 3. Protect paid full content at database level
+Premium workout/program content should be readable only when the user is allowed:
 
-### 1. Database triggers are missing
+- admin user,
+- active Gold/Platinum member,
+- user who purchased that exact standalone workout/program,
+- free/non-premium content.
 
-This is the biggest red flag.
+The database should enforce this, not only the frontend.
 
-The schema has many trigger functions, but the database currently reports zero triggers. That means some automatic behavior may not fire reliably, including things like:
+### 4. Add safe database helper functions
+I will use server-side access-check functions so policies stay clean and avoid recursive RLS problems. The checks will cover:
 
-- automatic profile creation after signup,
-- welcome email/profile workflow,
-- content notification queueing,
-- workout/program image repair queueing,
-- workout format/integrity enforcement.
+- premium subscription status,
+- individual purchases,
+- admin role,
+- free vs premium content.
 
-This does not mean every page is broken today, but it explains why “one thing after another” can happen: several systems depend on automation that may not actually be attached.
+### 5. Avoid breaking checkout
+Standalone purchase flow must still work for free users. So I will make sure users can still read the minimum fields required to show and buy a paid item:
 
-### 2. Premium content database access is too open
+- id,
+- name,
+- description/summary if used by cards,
+- image,
+- price,
+- Stripe product/price ids,
+- category/type/difficulty/duration,
+- premium/standalone flags.
 
-There are public policies named:
+If the current table structure cannot safely expose metadata while hiding full workout/program content, I will use a safer staged approach: keep public metadata readable, but lock full body/content fields behind secure access paths.
 
-- `Public can view all workouts`
-- `Public can view all programs`
+### 6. Verify access after the change
+After applying the fix, I will verify these flows:
 
-with `USING true`.
+- guest can browse public pages,
+- guest cannot read premium full content directly,
+- free logged-in user can access free content,
+- free user can buy standalone premium content,
+- purchased user can access purchased content,
+- Gold/Platinum user can access all premium content,
+- premium user cannot buy standalone content,
+- admin can still manage content,
+- WOD remains visible and purchasable,
+- checkout still starts correctly,
+- no new console or network errors.
 
-That means the database allows public reads of all workout/program rows. The frontend may still hide/prompt purchase, but paid content protection should not rely only on frontend logic.
+## Important safety note
 
-### 3. User dashboard dialogs need accessibility cleanup
+I did not change paid-content RLS earlier because it is a high-impact production change. Done wrong, it can break the paid site immediately. But yes: it must be fixed. The correct production move is a controlled database policy hardening with verification, not leaving `USING true` on paid content forever.
 
-The console warning is from these dashboard dialogs:
+## Technical implementation plan
 
-- Morning check-in dialog
-- Night check-in dialog
+### Database policy hardening
+Create a migration that:
 
-They render `DialogContent` without a `DialogTitle` / `DialogDescription`. This is not a production outage, but it should be fixed because it is a real console warning.
+1. Adds or updates secure helper functions:
+   - `has_role(auth.uid(), 'admin')`
+   - premium subscription check
+   - purchased workout check
+   - purchased program check
+   - content access check
 
-### 4. Auth state listener order should be cleaned up
+2. Replaces broad public SELECT policies on:
+   - `public.admin_workouts`
+   - `public.admin_training_programs`
 
-The main auth page calls `getSession()` before registering `onAuthStateChange`. Best practice is listener first, then session check. It may still work, but cleaning it up reduces edge-case login redirect issues.
+3. Allows SELECT only when one of these is true:
+   - content is visible and free,
+   - user is admin,
+   - user has active premium membership,
+   - user purchased the exact standalone item,
+   - metadata access is needed for visible standalone purchase/listing flow.
 
-## Stabilization plan for approval
+4. Keeps admin insert/update/delete policies role-protected.
 
-### Step 1: Restore critical database triggers
+### Frontend compatibility check
+Review and adjust queries in the main content pages/components if needed so locked content does not cause broken pages:
 
-Create a migration that safely recreates missing triggers for existing trigger functions, including:
+- workout listing/detail pages,
+- training program listing/detail pages,
+- WOD pages,
+- shop/checkout cards,
+- `PurchaseButton`,
+- access-control hooks/context.
 
-- profile creation on signup,
-- welcome/profile email workflow where appropriate,
-- workout/program notification queueing,
-- workout/program image repair queueing,
-- workout format enforcement,
-- WOD/content integrity validation.
+### Production verification
+Run a focused post-change audit for:
 
-The migration will use `DROP TRIGGER IF EXISTS` then `CREATE TRIGGER` so it is safe to re-run.
+- paid/free access,
+- checkout,
+- WOD,
+- memberships,
+- admin content management,
+- browser console/network errors.
 
-### Step 2: Harden paid/free content access
+## Expected result
 
-Replace overly broad public read policies for workouts/programs so:
-
-- visitors can still browse visible free metadata/content,
-- premium content is readable only by premium users, admins, or users who purchased that exact item,
-- admin management policies stay role-protected,
-- the app’s existing browsing experience is preserved as much as possible.
-
-This must be done carefully because changing RLS can affect public pages.
-
-### Step 3: Add stronger WOD production guardrails
-
-Add/verify safeguards so a WOD cannot be considered successfully published unless:
-
-- expected WOD count is present,
-- rows are visible,
-- both variants are active for the correct date,
-- each paid WOD has both product and price IDs,
-- Stripe product `default_price` matches the stored price ID,
-- the state table is updated only after all checks pass.
-
-### Step 4: Fix current console warning
-
-Update the dashboard check-in dialogs to include accessible titles/descriptions, using hidden titles if the visual design should remain unchanged.
-
-### Step 5: Clean up auth session initialization
-
-Refactor the auth page so the auth listener is registered before the initial session check. Keep the existing login, signup, Google login, trial checkout, and avatar setup behavior.
-
-### Step 6: Add an admin-facing production health summary
-
-Improve the existing health audit/reporting so it explicitly flags:
-
-- missing WOD for today,
-- generated-but-hidden WODs,
-- payment products missing default price,
-- missing database triggers,
-- broken paid content payment links,
-- notification queue backlog,
-- recent backend function 4xx/5xx errors.
-
-## Technical details
-
-Files likely involved:
-
-- `src/pages/UserDashboard.tsx`
-- `src/pages/Auth.tsx`
-- `supabase/functions/wod-payment-health-report/index.ts`
-- `supabase/functions/run-system-health-audit/index.ts`
-- `supabase/functions/generate-workout-of-day/index.ts`
-- new database migration for triggers and RLS policy hardening
-
-Database objects likely involved:
-
-- `admin_workouts`
-- `admin_training_programs`
-- `profiles`
-- `pending_content_notifications`
-- `user_subscriptions`
-- `user_purchases`
-- `user_roles`
-- `workout_of_day_state`
-- `wod_generation_runs`
-
-## My recommendation
-
-Approve this plan. The website is working right now for the checked critical production paths, but I do not want to leave the missing triggers and broad paid-content read policies untouched. Those are structural risks, not cosmetic issues.
+After this fix, paid content will no longer be exposed at the database level, while normal users should still experience the site smoothly: browse, log in, buy, access purchased content, or access everything with premium membership.
