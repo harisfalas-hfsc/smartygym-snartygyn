@@ -11,13 +11,27 @@ export const useProgramData = (programId: string | undefined) => {
         .from("admin_training_programs")
         .select("*")
         .eq("id", programId)
-        .single();
+        .maybeSingle();
 
       if (error) {
         if (import.meta.env.DEV) {
           console.error("Error fetching program:", error);
         }
         return null;
+      }
+
+      if (!data) {
+        const { data: metadata, error: metadataError } = await (supabase as any)
+          .rpc("get_visible_program_metadata", { _program_id: programId });
+
+        if (metadataError) {
+          if (import.meta.env.DEV) {
+            console.error("Error fetching program metadata:", metadataError);
+          }
+          return null;
+        }
+
+        return Array.isArray(metadata) ? metadata[0] || null : metadata;
       }
 
       return data;
@@ -38,9 +52,7 @@ export const useAllPrograms = () => {
         console.log("🔍 Fetching ALL programs...");
       }
       const { data, error } = await supabase
-        .from("admin_training_programs")
-        .select("*")
-        .order("name");
+        .rpc("get_visible_program_metadata" as never, { _program_id: null } as never);
 
       if (import.meta.env.DEV) {
         console.log("📦 Programs data:", data);
@@ -54,7 +66,7 @@ export const useAllPrograms = () => {
         return [];
       }
 
-      return data || [];
+      return (data || []).sort((a: any, b: any) => a.name.localeCompare(b.name));
     },
   });
 };
