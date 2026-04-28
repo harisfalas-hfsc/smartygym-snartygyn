@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import type { Session } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
@@ -32,72 +33,85 @@ export default function Auth() {
   // Get the mode from URL params, default to login
   const defaultTab = searchParams.get("mode") === "signup" ? "signup" : "login";
 
-  // Check if user is already authenticated and set up listener
+  // Set up listener first, then check if user is already authenticated
   useEffect(() => {
-    // Check current session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        navigate("/");
-      }
-    });
+    let mounted = true;
 
-    // Listen for auth state changes
+    const handleAuthenticatedSession = async (session: Session) => {
+      if (!mounted) return;
+
+      // Check if this is a first-time verified user (welcome not yet sent)
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('welcome_sent')
+        .eq('user_id', session.user.id)
+        .single();
+
+      if (!mounted) return;
+
+      if (!profile?.welcome_sent) {
+        // First-time verified user — fire post-signup actions
+        console.log("First-time verified user detected, triggering post-signup actions");
+        
+        setNewUserId(session.user.id);
+
+        // Send welcome message
+        try {
+          await supabase.functions.invoke('send-system-message', {
+            body: { userId: session.user.id, messageType: 'welcome' }
+          });
+        } catch (msgError) {
+          console.error('Failed to send welcome message:', msgError);
+        }
+
+        // Track signup event
+        trackSocialMediaEvent({ eventType: 'signup', userId: session.user.id });
+
+        setShowAvatarSetup(true);
+        return; // Don't navigate yet — avatar setup dialog will handle it
+      }
+
+      // Check if trial=true param exists, redirect to checkout
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("trial") === "true") {
+        try {
+          const { data } = await supabase.functions.invoke('create-checkout', {
+            body: { priceId: 'price_1SJ9q1IxQYg9inGKZzxxqPbD', trial: true }
+          });
+          if (data?.url) {
+            window.location.href = data.url;
+            return;
+          }
+        } catch (e) {
+          console.error('Trial checkout failed:', e);
+        }
+      }
+
+      navigate("/");
+    };
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_OUT') {
         if (import.meta.env.DEV) {
           console.log("User signed out");
         }
       } else if (session) {
-        // Check if this is a first-time verified user (welcome not yet sent)
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('welcome_sent')
-          .eq('user_id', session.user.id)
-          .single();
-
-        if (!profile?.welcome_sent) {
-          // First-time verified user — fire post-signup actions
-          console.log("First-time verified user detected, triggering post-signup actions");
-          
-          setNewUserId(session.user.id);
-
-          // Send welcome message
-          try {
-            await supabase.functions.invoke('send-system-message', {
-              body: { userId: session.user.id, messageType: 'welcome' }
-            });
-          } catch (msgError) {
-            console.error('Failed to send welcome message:', msgError);
-          }
-
-          // Track signup event
-          trackSocialMediaEvent({ eventType: 'signup', userId: session.user.id });
-
-          setShowAvatarSetup(true);
-          return; // Don't navigate yet — avatar setup dialog will handle it
-        }
-
-        // Check if trial=true param exists, redirect to checkout
-        const params = new URLSearchParams(window.location.search);
-        if (params.get("trial") === "true") {
-          try {
-            const { data, error } = await supabase.functions.invoke('create-checkout', {
-              body: { priceId: 'price_1SJ9q1IxQYg9inGKZzxxqPbD', trial: true }
-            });
-            if (data?.url) {
-              window.location.href = data.url;
-              return;
-            }
-          } catch (e) {
-            console.error('Trial checkout failed:', e);
-          }
-        }
-
-        navigate("/");
+        setTimeout(() => {
+          handleAuthenticatedSession(session);
+        }, 0);
       }
     });
 
-    return () => subscription.unsubscribe();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        handleAuthenticatedSession(session);
+      }
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, [navigate]);
 
   const [showVerificationMessage, setShowVerificationMessage] = useState(false);

@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { usePurchases } from "@/hooks/usePurchases";
 import { UserMessagesPanel } from "@/components/UserMessagesPanel";
@@ -1925,6 +1925,10 @@ export default function UserDashboard() {
       {/* Morning Check-in Form Dialog */}
       <Dialog open={showMorningForm} onOpenChange={setShowMorningForm}>
         <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+          <DialogHeader className="sr-only">
+            <DialogTitle>Morning Check-in</DialogTitle>
+            <DialogDescription>Complete your morning wellness check-in.</DialogDescription>
+          </DialogHeader>
           <MorningCheckInForm onSubmit={async data => {
           const success = await submitMorningCheckin(data);
           if (success) {
@@ -1939,6 +1943,10 @@ export default function UserDashboard() {
       {/* Night Check-in Form Dialog */}
       <Dialog open={showNightForm} onOpenChange={setShowNightForm}>
         <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+          <DialogHeader className="sr-only">
+            <DialogTitle>Night Check-in</DialogTitle>
+            <DialogDescription>Complete your night wellness check-in.</DialogDescription>
+          </DialogHeader>
           <NightCheckInForm onSubmit={async data => {
           const success = await submitNightCheckin(data);
           if (success) {
