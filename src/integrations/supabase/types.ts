@@ -3210,6 +3210,14 @@ export type Database = {
       update_wod_cron_schedule:
         | { Args: { new_hour: number }; Returns: Json }
         | { Args: { new_hour: number; new_minute?: number }; Returns: Json }
+      user_has_active_premium_access: {
+        Args: { _user_id: string }
+        Returns: boolean
+      }
+      user_has_purchased_content: {
+        Args: { _content_id: string; _content_type: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
