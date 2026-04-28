@@ -3100,6 +3100,210 @@ export type Database = {
         }
         Relationships: []
       }
+      public_program_metadata: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          days_per_week: number | null
+          description: string | null
+          difficulty: string | null
+          difficulty_stars: number | null
+          duration: string | null
+          equipment: string | null
+          expected_results: string | null
+          id: string | null
+          image_url: string | null
+          is_free: boolean | null
+          is_premium: boolean | null
+          is_standalone_purchase: boolean | null
+          is_visible: boolean | null
+          name: string | null
+          nutrition_tips: string | null
+          overview: string | null
+          price: number | null
+          program_structure: string | null
+          progression_plan: string | null
+          serial_number: number | null
+          stripe_price_id: string | null
+          stripe_product_id: string | null
+          target_audience: string | null
+          tier_required: string | null
+          updated_at: string | null
+          weekly_schedule: string | null
+          weeks: number | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          days_per_week?: number | null
+          description?: string | null
+          difficulty?: string | null
+          difficulty_stars?: number | null
+          duration?: string | null
+          equipment?: string | null
+          expected_results?: never
+          id?: string | null
+          image_url?: string | null
+          is_free?: boolean | null
+          is_premium?: boolean | null
+          is_standalone_purchase?: boolean | null
+          is_visible?: boolean | null
+          name?: string | null
+          nutrition_tips?: never
+          overview?: never
+          price?: number | null
+          program_structure?: never
+          progression_plan?: never
+          serial_number?: number | null
+          stripe_price_id?: string | null
+          stripe_product_id?: string | null
+          target_audience?: never
+          tier_required?: string | null
+          updated_at?: string | null
+          weekly_schedule?: never
+          weeks?: number | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          days_per_week?: number | null
+          description?: string | null
+          difficulty?: string | null
+          difficulty_stars?: number | null
+          duration?: string | null
+          equipment?: string | null
+          expected_results?: never
+          id?: string | null
+          image_url?: string | null
+          is_free?: boolean | null
+          is_premium?: boolean | null
+          is_standalone_purchase?: boolean | null
+          is_visible?: boolean | null
+          name?: string | null
+          nutrition_tips?: never
+          overview?: never
+          price?: number | null
+          program_structure?: never
+          progression_plan?: never
+          serial_number?: number | null
+          stripe_price_id?: string | null
+          stripe_product_id?: string | null
+          target_audience?: never
+          tier_required?: string | null
+          updated_at?: string | null
+          weekly_schedule?: never
+          weeks?: number | null
+        }
+        Relationships: []
+      }
+      public_workout_metadata: {
+        Row: {
+          activation: string | null
+          category: string | null
+          cool_down: string | null
+          created_at: string | null
+          description: string | null
+          difficulty: string | null
+          difficulty_stars: number | null
+          duration: string | null
+          equipment: string | null
+          finisher: string | null
+          focus: string | null
+          format: string | null
+          generated_for_date: string | null
+          id: string | null
+          image_url: string | null
+          instructions: string | null
+          is_free: boolean | null
+          is_premium: boolean | null
+          is_standalone_purchase: boolean | null
+          is_visible: boolean | null
+          is_workout_of_day: boolean | null
+          main_workout: string | null
+          name: string | null
+          notes: string | null
+          price: number | null
+          serial_number: number | null
+          stripe_price_id: string | null
+          stripe_product_id: string | null
+          tier_required: string | null
+          tips: string | null
+          type: string | null
+          updated_at: string | null
+          warm_up: string | null
+        }
+        Insert: {
+          activation?: never
+          category?: string | null
+          cool_down?: never
+          created_at?: string | null
+          description?: string | null
+          difficulty?: string | null
+          difficulty_stars?: number | null
+          duration?: string | null
+          equipment?: string | null
+          finisher?: never
+          focus?: string | null
+          format?: string | null
+          generated_for_date?: string | null
+          id?: string | null
+          image_url?: string | null
+          instructions?: never
+          is_free?: boolean | null
+          is_premium?: boolean | null
+          is_standalone_purchase?: boolean | null
+          is_visible?: boolean | null
+          is_workout_of_day?: boolean | null
+          main_workout?: never
+          name?: string | null
+          notes?: never
+          price?: number | null
+          serial_number?: number | null
+          stripe_price_id?: string | null
+          stripe_product_id?: string | null
+          tier_required?: string | null
+          tips?: never
+          type?: string | null
+          updated_at?: string | null
+          warm_up?: never
+        }
+        Update: {
+          activation?: never
+          category?: string | null
+          cool_down?: never
+          created_at?: string | null
+          description?: string | null
+          difficulty?: string | null
+          difficulty_stars?: number | null
+          duration?: string | null
+          equipment?: string | null
+          finisher?: never
+          focus?: string | null
+          format?: string | null
+          generated_for_date?: string | null
+          id?: string | null
+          image_url?: string | null
+          instructions?: never
+          is_free?: boolean | null
+          is_premium?: boolean | null
+          is_standalone_purchase?: boolean | null
+          is_visible?: boolean | null
+          is_workout_of_day?: boolean | null
+          main_workout?: never
+          name?: string | null
+          notes?: never
+          price?: number | null
+          serial_number?: number | null
+          stripe_price_id?: string | null
+          stripe_product_id?: string | null
+          tier_required?: string | null
+          tips?: never
+          type?: string | null
+          updated_at?: string | null
+          warm_up?: never
+        }
+        Relationships: []
+      }
       workout_activity_summary: {
         Row: {
           avg_rating: number | null
