@@ -42,7 +42,16 @@ export const useWorkoutData = (workoutId: string | undefined) => {
         .maybeSingle();
 
       if (error) throw error;
-      if (!data) throw new Error("Workout not found");
+      if (!data) {
+        const { data: metadata, error: metadataError } = await (supabase as any)
+          .rpc("get_visible_workout_metadata", { _workout_id: workoutId });
+
+        if (metadataError) throw metadataError;
+        const fallback = Array.isArray(metadata) ? metadata[0] : metadata;
+        if (!fallback) throw new Error("Workout not found");
+
+        return fallback as WorkoutData;
+      }
 
       return data as WorkoutData;
     },
@@ -67,10 +76,7 @@ export const useAllWorkouts = () => {
         console.log("🔍 Fetching ALL workouts...");
       }
       const { data, error } = await supabase
-        .from("admin_workouts")
-        .select("*")
-        .neq("is_visible", false)
-        .order("name");
+        .rpc("get_visible_workout_metadata" as never, { _workout_id: null } as never);
 
       if (import.meta.env.DEV) {
         console.log("📦 Workouts data:", data);
@@ -84,7 +90,7 @@ export const useAllWorkouts = () => {
         return [];
       }
 
-      return data || [];
+      return (data || []) as WorkoutData[];
     },
   });
 };
