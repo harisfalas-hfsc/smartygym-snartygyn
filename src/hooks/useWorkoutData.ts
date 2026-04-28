@@ -26,6 +26,10 @@ export interface WorkoutData {
   activation: string | null;
   finisher: string | null;
   notes: string | null;
+  focus: string | null;
+  is_workout_of_day: boolean | null;
+  generated_for_date: string | null;
+  created_at: string | null;
 }
 
 export const useWorkoutData = (workoutId: string | undefined) => {
