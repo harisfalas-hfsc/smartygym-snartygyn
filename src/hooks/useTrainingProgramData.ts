@@ -39,7 +39,16 @@ export const useTrainingProgramData = (programId: string | undefined) => {
         .maybeSingle();
 
       if (error) throw error;
-      if (!data) throw new Error("Training program not found");
+      if (!data) {
+        const { data: metadata, error: metadataError } = await (supabase as any)
+          .rpc("get_visible_program_metadata", { _program_id: programId });
+
+        if (metadataError) throw metadataError;
+        const fallback = Array.isArray(metadata) ? metadata[0] : metadata;
+        if (!fallback) throw new Error("Training program not found");
+
+        return fallback as TrainingProgramData;
+      }
 
       return data as TrainingProgramData;
     },
