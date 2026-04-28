@@ -2754,9 +2754,14 @@ Return JSON with these exact fields:
       });
       stripePriceId = stripePrice.id;
 
+      await stripe.products.update(stripeProduct.id, {
+        default_price: stripePrice.id,
+      });
+
       logStep(`${equipment} Stripe product/price created`, {
         productId: stripeProductId,
         priceId: stripePriceId,
+        defaultPriceSet: true,
         productIdempotencyKey: stripeProductIdempotencyKey,
         priceIdempotencyKey: stripePriceIdempotencyKey,
       });
