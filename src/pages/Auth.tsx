@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import type { Session } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
@@ -36,7 +37,7 @@ export default function Auth() {
   useEffect(() => {
     let mounted = true;
 
-    const handleAuthenticatedSession = async (session: NonNullable<Awaited<ReturnType<typeof supabase.auth.getSession>>["data"]["session"]>) => {
+    const handleAuthenticatedSession = async (session: Session) => {
       if (!mounted) return;
 
       // Check if this is a first-time verified user (welcome not yet sent)
