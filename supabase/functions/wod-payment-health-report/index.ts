@@ -78,7 +78,19 @@ serve(async (req) => {
       .eq("generated_for_date", date)
       .eq("is_workout_of_day", true);
 
+    const { data: generatedButHidden, error: hiddenError } = await supabase
+      .from("admin_workouts")
+      .select("id, name, equipment, is_visible, is_workout_of_day, stripe_product_id, stripe_price_id, created_at, updated_at")
+      .is("generated_for_date", null)
+      .eq("is_workout_of_day", false)
+      .eq("is_visible", false)
+      .not("stripe_product_id", "is", null)
+      .not("stripe_price_id", "is", null)
+      .order("created_at", { ascending: false })
+      .limit(10);
+
     if (wodError) throw new Error(`WOD query failed: ${wodError.message}`);
+    if (hiddenError) warnings.push(`Hidden generated WOD inspection failed: ${hiddenError.message}`);
 
     const linkedProductIds = new Set((wods || []).map((w: any) => w.stripe_product_id).filter(Boolean));
     const activeSearch = await stripe.products.search({
@@ -108,10 +120,13 @@ serve(async (req) => {
           const product = await stripe.products.retrieve(wod.stripe_product_id);
           productStatus = {
             active: product.active,
+            defaultPrice: typeof product.default_price === "string" ? product.default_price : product.default_price?.id || null,
             metadataWorkoutId: product.metadata?.workout_id || product.metadata?.content_id || null,
             metadataMatches: [product.metadata?.workout_id, product.metadata?.content_id].includes(wod.id),
+            defaultPriceMatches: (typeof product.default_price === "string" ? product.default_price : product.default_price?.id || null) === wod.stripe_price_id,
           };
           if (!product.active) failures.push(`Inactive Stripe product for ${wod.name}`);
+          if (!productStatus.defaultPriceMatches) failures.push(`Stripe default price missing/mismatched for ${wod.name}`);
           if (!productStatus.metadataMatches) warnings.push(`Stripe metadata mismatch for ${wod.name}`);
         } catch (stripeError: any) {
           failures.push(`Stripe product lookup failed for ${wod.name}: ${stripeError?.message || String(stripeError)}`);
@@ -131,6 +146,7 @@ serve(async (req) => {
       };
     }));
 
+    if ((generatedButHidden || []).length > 0) warnings.push(`${(generatedButHidden || []).length} hidden generated paid WOD row(s) found without an active WOD date`);
     if (orphanProducts.length > 0) failures.push(`${orphanProducts.length} active WOD Stripe product(s) are not linked in the database`);
     if ((wods || []).length !== expectedSlots.length) warnings.push(`Found ${(wods || []).length} WOD row(s), expected ${expectedSlots.length}`);
     checks.push("database WOD rows", "public names", "payment ID pairs", "Stripe product activity", "orphan WOD products");
@@ -152,6 +168,7 @@ serve(async (req) => {
       activeWodStripeProductCount: activeWodProducts.length,
       orphanCount: orphanProducts.length,
       orphanProducts: orphanProducts.map((product: Stripe.Product) => ({ id: product.id, name: product.name })),
+      generatedButHidden: (generatedButHidden || []).map((wod: any) => ({ id: wod.id, name: wod.name, equipment: wod.equipment, stripeProductId: wod.stripe_product_id, stripePriceId: wod.stripe_price_id })),
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
