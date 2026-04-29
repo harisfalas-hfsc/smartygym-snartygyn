@@ -26,7 +26,8 @@ export const SmartyCoachButton = ({ className }: SmartyCoachButtonProps) => {
 
   const getDefaultTop = useCallback(() => {
     const headerH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--app-header-h') || '100');
-    return headerH + 8;
+    const isMobile = window.innerWidth < 1024;
+    return headerH + (isMobile ? 56 : 8);
   }, []);
 
   useEffect(() => {
@@ -95,6 +96,7 @@ export const SmartyCoachButton = ({ className }: SmartyCoachButtonProps) => {
               "smarty-coach-attention motion-reduce:animate-none",
               "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400",
               "touch-none select-none",
+              "max-lg:!top-auto max-lg:bottom-[calc(var(--mobile-bottom-nav-h,76px)+var(--sab,0px)+0.75rem)]",
               className
             )}
             style={{

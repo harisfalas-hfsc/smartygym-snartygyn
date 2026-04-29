@@ -52,21 +52,35 @@ export const Navigation = () => {
 
   // Dynamically set --app-header-h CSS variable based on actual header height
   useLayoutEffect(() => {
+    let animationFrame = 0;
+    let lastHeight = 0;
+
     const updateHeaderHeight = () => {
       if (headerRef.current) {
         const height = headerRef.current.offsetHeight;
-        document.documentElement.style.setProperty('--app-header-h', `${height}px`);
+        if (height !== lastHeight) {
+          lastHeight = height;
+          document.documentElement.style.setProperty('--app-header-h', `${height}px`);
+        }
       }
     };
 
-    updateHeaderHeight();
+    const scheduleHeaderHeightUpdate = () => {
+      cancelAnimationFrame(animationFrame);
+      animationFrame = requestAnimationFrame(updateHeaderHeight);
+    };
 
-    const resizeObserver = new ResizeObserver(updateHeaderHeight);
+    scheduleHeaderHeightUpdate();
+
+    const resizeObserver = new ResizeObserver(scheduleHeaderHeightUpdate);
     if (headerRef.current) {
       resizeObserver.observe(headerRef.current);
     }
 
-    return () => resizeObserver.disconnect();
+    return () => {
+      cancelAnimationFrame(animationFrame);
+      resizeObserver.disconnect();
+    };
   }, []);
 
   // Listen for messages being read to update badge immediately
@@ -251,7 +265,7 @@ export const Navigation = () => {
   };
 
   return (
-    <header ref={headerRef} className="fixed top-0 left-0 right-0 z-50 bg-background pt-2 pb-0.5 px-4">
+    <header ref={headerRef} className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md pt-2 pb-0.5 px-4">
       <div className="mx-auto max-w-7xl">
         <div className="flex justify-between items-center gap-4">
           {/* LEFT SECTION - Hamburger Menu + Social Media Icons */}
