@@ -16,17 +16,17 @@ export const WorkoutOfTheDay = () => {
   const { data: wods, isLoading } = useQuery({
     queryKey: ["workout-of-the-day", cyprusToday],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("admin_workouts")
-        .select("*")
-        .eq("is_workout_of_day", true)
-        .eq("generated_for_date", cyprusToday);
+      const { data, error } = await (supabase as any)
+        .rpc("get_visible_workout_metadata", { _workout_id: null });
       
       if (error && error.code !== "PGRST116") {
         console.error("Error fetching WODs:", error);
         return [];
       }
-      return data || [];
+
+      return (data || []).filter(
+        (wod: any) => wod.is_workout_of_day === true && wod.generated_for_date === cyprusToday
+      );
     },
     staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: true
