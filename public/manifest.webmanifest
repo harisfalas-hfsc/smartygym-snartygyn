@@ -1,0 +1,25 @@
+{
+  "name": "Smarty Gym",
+  "short_name": "Smarty Gym",
+  "description": "Your Smart Gym — Functional, science-based workouts anywhere, anytime",
+  "theme_color": "#29B6D2",
+  "background_color": "#0F172A",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "/smarty-gym-logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/smarty-gym-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
