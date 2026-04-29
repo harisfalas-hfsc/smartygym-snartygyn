@@ -20,6 +20,7 @@ import {
 import { CalendarCheck, CalendarIcon, Clock, Dumbbell, Star, Crown, ShoppingBag, Archive, Filter, X } from "lucide-react";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { cn } from "@/lib/utils";
+import { fetchVisibleWorkoutMetadata } from "@/hooks/useTodayWods";
 
 const WOD_CATEGORIES = [
   "STRENGTH",
@@ -44,23 +45,11 @@ const WODArchive = () => {
   const { data: dateRange, isLoading: isLoadingDateRange } = useQuery({
     queryKey: ["wod-date-range"],
     queryFn: async () => {
-      // Get first WOD (oldest)
-      const { data: first } = await supabase
-        .from("admin_workouts")
-        .select("created_at")
-        .like("id", "WOD-%")
-        .order("created_at", { ascending: true })
-        .limit(1)
-        .maybeSingle();
-      
-      // Get last WOD (newest)
-      const { data: last } = await supabase
-        .from("admin_workouts")
-        .select("created_at")
-        .like("id", "WOD-%")
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
+      const wods = (await fetchVisibleWorkoutMetadata(null))
+        .filter((workout) => workout.id?.startsWith("WOD-") || workout.is_workout_of_day === true)
+        .sort((a, b) => new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime());
+      const first = wods[0];
+      const last = wods[wods.length - 1];
       
       return {
         minDate: first?.created_at ? new Date(first.created_at) : null,
@@ -72,44 +61,38 @@ const WODArchive = () => {
   const { data: pastWODs, isLoading } = useQuery({
     queryKey: ["wod-archive", selectedDateRange?.from?.toISOString(), selectedDateRange?.to?.toISOString(), categoryFilter, equipmentFilter, difficultyFilter],
     queryFn: async () => {
-      let query = supabase
-        .from("admin_workouts")
-        .select("*")
-        .like("id", "WOD-%")
-        .eq("is_visible", true)
-        .order("created_at", { ascending: false });
+      let wods = (await fetchVisibleWorkoutMetadata(null))
+        .filter((workout) => workout.id?.startsWith("WOD-") || workout.is_workout_of_day === true)
+        .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime());
       
       // Filter by selected date range
       if (selectedDateRange?.from) {
         const startOfDay = new Date(selectedDateRange.from);
         startOfDay.setHours(0, 0, 0, 0);
-        query = query.gte("created_at", startOfDay.toISOString());
         
         if (selectedDateRange.to) {
           const endOfDay = new Date(selectedDateRange.to);
           endOfDay.setHours(23, 59, 59, 999);
-          query = query.lte("created_at", endOfDay.toISOString());
+          wods = wods.filter((wod) => wod.created_at && new Date(wod.created_at) >= startOfDay && new Date(wod.created_at) <= endOfDay);
         } else {
           // Single day selected - use same day as end
           const endOfDay = new Date(selectedDateRange.from);
           endOfDay.setHours(23, 59, 59, 999);
-          query = query.lte("created_at", endOfDay.toISOString());
+          wods = wods.filter((wod) => wod.created_at && new Date(wod.created_at) >= startOfDay && new Date(wod.created_at) <= endOfDay);
         }
       }
       
       if (categoryFilter && categoryFilter !== "all") {
-        query = query.eq("category", categoryFilter);
+        wods = wods.filter((wod) => wod.category === categoryFilter);
       }
       if (equipmentFilter && equipmentFilter !== "all") {
-        query = query.eq("equipment", equipmentFilter);
+        wods = wods.filter((wod) => wod.equipment === equipmentFilter);
       }
       if (difficultyFilter && difficultyFilter !== "all") {
-        query = query.eq("difficulty", difficultyFilter);
+        wods = wods.filter((wod) => wod.difficulty === difficultyFilter);
       }
-      
-      const { data, error } = await query;
-      if (error) throw error;
-      return data || [];
+
+      return wods;
     }
   });
 
