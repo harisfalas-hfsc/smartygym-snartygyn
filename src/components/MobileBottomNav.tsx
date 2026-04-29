@@ -95,7 +95,7 @@ export const MobileBottomNav = () => {
   return (
     <>
       <nav
-        className="lg:hidden fixed inset-x-0 bottom-0 z-[70] border-t border-primary/20 bg-background/92 backdrop-blur-xl shadow-[0_-12px_32px_hsl(var(--foreground)/0.08)] safe-area-bottom"
+        className="lg:hidden fixed inset-x-0 bottom-0 z-[70] border-t border-primary/20 bg-background/95 backdrop-blur-xl shadow-lg safe-area-bottom"
         aria-label="Mobile primary navigation"
       >
         <div className="mx-auto grid max-w-md grid-cols-5 items-end gap-1 px-2 pt-2">
@@ -108,7 +108,7 @@ export const MobileBottomNav = () => {
                 type="button"
                 onClick={() => item.path && goTo(item.path)}
                 className={`flex min-h-[58px] flex-col items-center justify-center gap-1 rounded-lg px-1 text-[11px] font-semibold transition-colors ${
-                  active ? "bg-primary/12 text-primary" : "text-muted-foreground hover:bg-primary/8 hover:text-foreground"
+                  active ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-primary/10 hover:text-foreground"
                 }`}
                 aria-current={active ? "page" : undefined}
               >
@@ -122,7 +122,7 @@ export const MobileBottomNav = () => {
             type="button"
             onClick={() => setMoreOpen(true)}
             className={`flex min-h-[58px] flex-col items-center justify-center gap-1 rounded-lg px-1 text-[11px] font-semibold transition-colors ${
-              isMoreActive || moreOpen ? "bg-primary/12 text-primary" : "text-muted-foreground hover:bg-primary/8 hover:text-foreground"
+              isMoreActive || moreOpen ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-primary/10 hover:text-foreground"
             }`}
             aria-haspopup="dialog"
             aria-expanded={moreOpen}
@@ -148,7 +148,7 @@ export const MobileBottomNav = () => {
                   type="button"
                   onClick={() => item.path && goTo(item.path)}
                   className={`flex min-h-[72px] items-center gap-3 rounded-xl border p-3 text-left transition-colors ${
-                    active ? "border-primary/50 bg-primary/12 text-primary" : "border-border bg-card text-foreground hover:border-primary/40 hover:bg-primary/8"
+                    active ? "border-primary/50 bg-primary/10 text-primary" : "border-border bg-card text-foreground hover:border-primary/40 hover:bg-primary/10"
                   }`}
                 >
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
