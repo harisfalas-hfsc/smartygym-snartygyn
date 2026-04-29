@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import { CategoryCountBadge } from "@/components/ui/category-count-badge";
 import { SwipeToExplore } from "@/components/ui/SwipeToExplore";
 import { getCyprusTodayStr } from "@/lib/cyprusDate";
+import { fetchVisibleWorkoutMetadata } from "@/hooks/useTodayWods";
 
 const WorkoutFlow = () => {
   const navigate = useNavigate();
@@ -55,14 +56,12 @@ const WorkoutFlow = () => {
   const { data: workoutCounts = {} } = useQuery({
     queryKey: ["workout-category-counts"],
     queryFn: async () => {
-      const { data } = await supabase
-        .from("admin_workouts")
-        .select("category")
-        .or("is_workout_of_day.is.null,is_workout_of_day.eq.false")
-        .neq("is_visible", false);
+      const data = await fetchVisibleWorkoutMetadata(null);
       
       const counts: Record<string, number> = {};
-      data?.forEach(w => {
+      data
+        ?.filter((w) => w.is_workout_of_day !== true)
+        .forEach(w => {
         if (w.category) {
           // Map DB category to card ID
           const cat = w.category.toLowerCase()
