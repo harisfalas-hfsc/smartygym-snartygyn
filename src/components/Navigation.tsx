@@ -286,8 +286,7 @@ export const Navigation = () => {
           {/* LEFT SECTION - Hamburger Menu + Social Media Icons */}
           <div className="hidden lg:flex items-center gap-2">
             {/* Desktop Menu - original layout */}
-            {(
-              <Sheet open={desktopMenuOpen} onOpenChange={setDesktopMenuOpen}>
+            <Sheet open={desktopMenuOpen} onOpenChange={setDesktopMenuOpen}>
                 <SheetTrigger asChild>
                   <Button variant="ghost" size="icon" className="h-12 w-12 sm:h-16 sm:w-16 -ml-4">
                     <svg className="h-14 w-14 sm:h-12 sm:w-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -327,7 +326,6 @@ export const Navigation = () => {
                   </nav>
                 </SheetContent>
               </Sheet>
-            )}
 
             {/* Social Media Icons */}
             <div className="hidden sm:flex items-center gap-2">
