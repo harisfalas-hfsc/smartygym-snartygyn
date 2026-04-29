@@ -1,102 +1,49 @@
-Yes — I agree with you. For the Strength workout library page, replacing the Format filter with a Focus filter is the smarter and cleaner idea.
+Plan: place Smarty Coach next to the light/dark button
 
-Reason:
+I will bring Smarty Coach back, but not as the old floating draggable button.
 
-```text
-Strength page:
-Equipment = Bodyweight / Equipment
-Level = Beginner / Intermediate / Advanced
-Duration = workout length
-Focus = Strength split pattern
-Format = almost always Reps & Sets, so it adds very little value
-```
+What will change:
 
-So on the Strength page, `Focus` is more useful than `Format` because it lets the user find the kind of strength workout they need: lower body, upper body, full body, push/pull, core & glutes, etc.
+1. Add a new header-style Smarty Coach button
+- It will sit in the right-side header controls next to the light/dark mode button.
+- It will use the same round structure as the theme button and avatar/login button.
+- Same size: 44px by 44px.
+- Same rounded shape.
+- Same primary border style.
+- Same hover behavior: primary background, primary-foreground icon/text behavior where appropriate.
 
-Important clarification:
+2. Reuse the existing Smarty Coach modal/functionality
+- I will not delete the existing Smarty Coach functionality.
+- The button will simply open the existing Smarty Coach modal.
+- The old floating button behavior stays removed/unused.
 
-```text
-This should happen ONLY on the Strength workout page.
-```
+3. Keep desktop/tablet/mobile layout safe
+- This change will add the new button inside the existing header control group, instead of using a fixed overlay.
+- It will not float over page content anymore.
+- It will not block scrolling or hide information.
+- The button will appear consistently across desktop, tablet, and mobile unless you later decide mobile-only or desktop-only.
 
-For all other workout category pages, the Format filter should remain exactly as it is, because for categories like Calorie Burning, Metabolic, Cardio, Challenge, and Micro-Workouts, format is still meaningful: Circuit, AMRAP, For Time, Tabata, EMOM, Mix, etc.
-
-Planned change
-
-1. Add a Strength Focus filter only for `/workout/strength`
-- On the Strength workout category page, replace the current `Format` dropdown with `Focus`.
-- The options will be:
-
-```text
-All Focuses
-Lower Body
-Upper Body
-Full Body
-Low Push & Upper Pull
-Low Pull & Upper Push
-Core & Glutes
-```
-
-2. Keep Format filter everywhere else
-- Calorie Burning: keep Format
-- Metabolic: keep Format
-- Cardio: keep Format
-- Mobility & Stability: keep Format
-- Challenge: keep Format
-- Pilates: keep Format
-- Recovery: keep Format
-- Micro-Workouts: keep Format
-
-No Strength Focus filter will appear outside the Strength page.
-
-3. Filtering behavior
-- If the user is on Strength page and selects a Focus, the library will show only Strength workouts with that exact focus.
-- Equipment, Level, Duration, Status, Access, Search, and Sort filters will continue to work together with Focus.
-- Example: user can filter:
+4. Visual design
+- Use the Smarty Coach icon inside a circular bordered button.
+- Match the ThemeToggle button style closely:
 
 ```text
-Strength + Bodyweight + Intermediate + Lower Body
+[ Discovery ]        [ Logo ]        [ Coach ] [ Theme ] [ Avatar/Login ]
 ```
 
-4. Safety boundaries
-This is a front-end filtering change only. I will not touch:
-- Stripe products
-- prices
-- checkout
-- subscriptions
-- workout content
-- exercise links
-- images
-- visibility flags
-- premium/free flags
-- WOD publishing flags
-- generated dates
-- user access
-- database schema
+On mobile, it will be part of the top navigation row, not stuck on the page body.
 
-5. Future consistency
-- The Focus options will use the existing centralized `STRENGTH_FOCUS_OPTIONS` constant already created.
-- This prevents duplicate spellings or accidental new focus labels.
-- Since the admin editor already requires Focus for Strength workouts, future Strength workouts will automatically be filterable by Focus.
+Technical notes:
 
-Technical implementation details
+- Update `src/components/Navigation.tsx` to render a new Smarty Coach trigger button beside `<ThemeToggle />`.
+- Import and render the existing `SmartyCoachModal` directly from `src/components/smarty-coach`.
+- Add local state in `Navigation` to open/close the modal.
+- Keep `src/App.tsx` without the floating `<SmartyCoachButton />`, so the old overlay does not return.
+- Do not change desktop menu alignment, Discovery layout, page content, routes, backend, or the existing modal logic.
 
-- Update `src/pages/WorkoutDetail.tsx`.
-- Add a separate `focusFilter` state for the Strength page.
-- Update `clearAllFilters` and active-filter detection to include the Focus filter.
-- In the filtering logic:
-  - if `mappedCategory === 'STRENGTH'`, apply `focusFilter` against `workout.focus`.
-  - if not Strength, ignore `focusFilter` completely.
-- In the filter UI:
-  - if `type === 'strength'`, show `Focus` dropdown instead of `Format`.
-  - otherwise, keep the existing `Format` dropdown unchanged.
+Verification after implementation:
 
-Final rule after this change
-
-```text
-Strength page uses Focus filter instead of Format filter.
-All non-Strength pages keep Format filter.
-Focus remains Strength-only.
-```
-
-This is a safe, logical improvement and it matches the metadata system we just created.
+- Check mobile header at the current mobile/tablet-sized viewport.
+- Check desktop header alignment to make sure nothing shifts incorrectly.
+- Confirm clicking the new Coach button opens the existing Smarty Coach modal.
+- Confirm there is no floating button covering content anymore.
