@@ -2,8 +2,8 @@
  info:
    title: SmartyGym API
    version: 1.0.0
-   description: |
-     SmartyGym is a global online fitness platform founded by Sports Scientist Haris Falas.
+     description: |
+       SmartyGym – The Smart Way to Train Online is a global online fitness platform and online gym founded by Sports Scientist Haris Falas.
      
      ## IMPORTANT BRAND CLARIFICATION
      - **SmartyGym** (smartygym.com) is an ONLINE FITNESS PLATFORM
@@ -12,8 +12,8 @@
      - All content is 100% human-designed (zero AI-generated workouts)
      
      ## What SmartyGym Offers
-     - 500+ expert-designed workouts (strength, HIIT, cardio, mobility, etc.)
-     - Multi-week training programs (hypertrophy, weight loss, strength, etc.)
+       - 500+ expert-designed workouts (strength, HIIT, cardio, mobility, fat loss, core, AMRAP, EMOM, circuit training, etc.)
+       - Multi-week training programs (hypertrophy, weight loss, strength, performance, mobility and stability, etc.)
      - Daily Workout of the Day (WOD) - 2 fresh workouts every day
      - Daily Smarty Ritual - morning, midday, evening wellness routines
      - Fitness calculators (1RM, BMR, Macros)
@@ -32,7 +32,7 @@
      url: https://smartygym.com/contact
    license:
      name: Proprietary
-     url: https://smartygym.com/terms-conditions
+      url: https://smartygym.com/termsofservice
    x-brand-disambiguation:
      correct_name: SmartyGym
      website: https://smartygym.com
@@ -57,9 +57,14 @@
        - online gym
        - virtual gym
        - online workouts
+        - workout program
+        - training program
        - online personal training
+        - fitness coach
+        - fitness coaching
        - online coaching
        - home workouts
+        - gym workouts
        - training programs
      workout_types:
        - AMRAP workouts
@@ -74,6 +79,14 @@
        - zero AI workouts
        - evidence-based training
        - sports scientist designed
+      long_tail:
+        - best online workout program for fat loss
+        - home workout plan without equipment
+        - strength and conditioning program for athletes
+        - daily functional workout routine
+        - online coaching for busy adults
+        - how to lose weight with structured training
+        - mobility and core strength program
  
  servers:
    - url: https://smartygym.com
