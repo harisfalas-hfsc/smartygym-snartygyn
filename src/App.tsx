@@ -255,7 +255,6 @@ const AppContent = () => {
             </PageTransition>
           </div>
         <Footer />
-        <SmartyCoachButton />
       </div>
     </AccessControlProvider>
     </>
