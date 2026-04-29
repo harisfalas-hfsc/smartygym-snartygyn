@@ -505,11 +505,13 @@ export const Navigation = () => {
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-11 w-11 rounded-full">
-                    <Avatar className={`h-11 w-11 ${subscriptionInfo?.subscribed ? 'ring-2 ring-yellow-500 ring-offset-2 ring-offset-background' : ''} ${corporateSubscription ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-background' : ''}`}>
-                      <AvatarImage src={avatarUrl || undefined} alt="Profile" />
-                      <AvatarFallback>{getUserInitials()}</AvatarFallback>
-                    </Avatar>
+                  <Button variant="ghost" size="icon" className="relative h-11 w-11 rounded-full">
+                    <div className={`flex h-11 w-11 items-center justify-center rounded-full border-2 border-primary transition-colors hover:bg-primary/10 ${subscriptionInfo?.subscribed ? 'ring-2 ring-yellow-500 ring-offset-2 ring-offset-background' : ''} ${corporateSubscription ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-background' : ''}`}>
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={avatarUrl || undefined} alt="Profile" />
+                        <AvatarFallback className="text-xs">{getUserInitials()}</AvatarFallback>
+                      </Avatar>
+                    </div>
                     {/* Premium Badge */}
                     {subscriptionInfo?.subscribed && (
                       <div className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-yellow-500 flex items-center justify-center">
