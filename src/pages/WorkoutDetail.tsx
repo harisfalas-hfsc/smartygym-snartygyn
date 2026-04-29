@@ -464,22 +464,36 @@ const WorkoutDetail = () => {
                 { value: "advanced", label: "Advanced" },
               ],
             },
-            {
-              name: "Format",
-              value: formatFilter,
-              onChange: (value) => setFormatFilter(value as FormatFilter),
-              placeholder: "Format",
-              options: [
-                { value: "all", label: "All Formats" },
-                { value: "circuit", label: "Circuit" },
-                { value: "amrap", label: "AMRAP" },
-                { value: "for time", label: "For Time" },
-                { value: "tabata", label: "Tabata" },
-                { value: "reps & sets", label: "Reps & Sets" },
-                { value: "emom", label: "EMOM" },
-                { value: "mix", label: "Mix" },
-              ],
-            },
+            isStrengthPage
+              ? {
+                  name: "Focus",
+                  value: focusFilter,
+                  onChange: (value) => setFocusFilter(value as FocusFilter),
+                  placeholder: "Focus",
+                  options: [
+                    { value: "all", label: "All Focuses" },
+                    ...STRENGTH_FOCUS_OPTIONS.map((focus) => ({
+                      value: focus,
+                      label: focus
+                    })),
+                  ],
+                }
+              : {
+                  name: "Format",
+                  value: formatFilter,
+                  onChange: (value) => setFormatFilter(value as FormatFilter),
+                  placeholder: "Format",
+                  options: [
+                    { value: "all", label: "All Formats" },
+                    { value: "circuit", label: "Circuit" },
+                    { value: "amrap", label: "AMRAP" },
+                    { value: "for time", label: "For Time" },
+                    { value: "tabata", label: "Tabata" },
+                    { value: "reps & sets", label: "Reps & Sets" },
+                    { value: "emom", label: "EMOM" },
+                    { value: "mix", label: "Mix" },
+                  ],
+                },
             {
               name: "Duration",
               value: durationFilter,
