@@ -31,11 +31,12 @@ import { useAccessControl } from "@/hooks/useAccessControl";
 import { useWorkoutInteractions } from "@/hooks/useWorkoutInteractions";
 import { supabase } from "@/integrations/supabase/client";
 import { stripHtmlTags } from "@/lib/text";
-import { isStrengthFocus } from "@/constants/workoutCategories";
+import { STRENGTH_FOCUS_OPTIONS, isStrengthFocus, type StrengthFocus } from "@/constants/workoutCategories";
 
 type EquipmentFilter = "all" | "bodyweight" | "equipment";
 type LevelFilter = "all" | "beginner" | "intermediate" | "advanced";
 type FormatFilter = "all" | "circuit" | "amrap" | "for time" | "tabata" | "reps & sets" | "emom" | "mix";
+type FocusFilter = "all" | StrengthFocus;
 type DurationFilter = "all" | "15" | "20" | "30" | "40" | "50" | "various";
 type StatusFilter = "all" | "viewed" | "completed" | "not-viewed" | "favorites";
 type SortByFilter = "newest" | "oldest" | "name-asc" | "name-desc";
@@ -62,6 +63,7 @@ const WorkoutDetail = () => {
   const [equipmentFilter, setEquipmentFilter] = useState<EquipmentFilter>("all");
   const [levelFilter, setLevelFilter] = useState<LevelFilter>("all");
   const [formatFilter, setFormatFilter] = useState<FormatFilter>("all");
+  const [focusFilter, setFocusFilter] = useState<FocusFilter>("all");
   const [durationFilter, setDurationFilter] = useState<DurationFilter>("all");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [sortBy, setSortBy] = useState<SortByFilter>("newest");
@@ -107,14 +109,16 @@ const WorkoutDetail = () => {
     setEquipmentFilter("all");
     setLevelFilter("all");
     setFormatFilter("all");
+    setFocusFilter("all");
     setDurationFilter("all");
     setStatusFilter("all");
     setSortBy("newest");
     setAccessFilter("all");
   };
 
+  const isStrengthPage = type === "strength";
   const hasActiveFilters = searchTerm || equipmentFilter !== "all" || levelFilter !== "all" || 
-    formatFilter !== "all" || durationFilter !== "all" || statusFilter !== "all" || sortBy !== "newest" || accessFilter !== "all";
+    (isStrengthPage ? focusFilter !== "all" : formatFilter !== "all") || durationFilter !== "all" || statusFilter !== "all" || sortBy !== "newest" || accessFilter !== "all";
   
   if (import.meta.env.DEV) {
     console.log("📦 All Workouts:", allWorkouts.length, allWorkouts);
@@ -233,9 +237,14 @@ const WorkoutDetail = () => {
       
       // Level filter
       if (levelFilter !== "all" && workout.difficulty?.toLowerCase() !== levelFilter) return false;
+
+      // Strength-only focus filter
+      if (mappedCategory === "STRENGTH" && focusFilter !== "all") {
+        if (workout.focus !== focusFilter) return false;
+      }
       
-      // Format filter
-      if (formatFilter !== "all") {
+      // Format filter for non-Strength categories
+      if (mappedCategory !== "STRENGTH" && formatFilter !== "all") {
         const workoutFormat = workout.format?.toLowerCase();
         if (formatFilter === "reps & sets" && workoutFormat !== "reps & sets") return false;
         if (formatFilter === "for time" && workoutFormat !== "for time") return false;
@@ -302,8 +311,8 @@ const WorkoutDetail = () => {
     }
 
     return sorted;
-  }, [currentTypeWorkouts, debouncedSearch, equipmentFilter, levelFilter, formatFilter, 
-      durationFilter, statusFilter, sortBy, accessFilter, userId, interactions]);
+  }, [currentTypeWorkouts, debouncedSearch, equipmentFilter, levelFilter, focusFilter, formatFilter, 
+      durationFilter, statusFilter, sortBy, accessFilter, userId, interactions, mappedCategory]);
 
   return (
     <>
@@ -455,22 +464,36 @@ const WorkoutDetail = () => {
                 { value: "advanced", label: "Advanced" },
               ],
             },
-            {
-              name: "Format",
-              value: formatFilter,
-              onChange: (value) => setFormatFilter(value as FormatFilter),
-              placeholder: "Format",
-              options: [
-                { value: "all", label: "All Formats" },
-                { value: "circuit", label: "Circuit" },
-                { value: "amrap", label: "AMRAP" },
-                { value: "for time", label: "For Time" },
-                { value: "tabata", label: "Tabata" },
-                { value: "reps & sets", label: "Reps & Sets" },
-                { value: "emom", label: "EMOM" },
-                { value: "mix", label: "Mix" },
-              ],
-            },
+            isStrengthPage
+              ? {
+                  name: "Focus",
+                  value: focusFilter,
+                  onChange: (value) => setFocusFilter(value as FocusFilter),
+                  placeholder: "Focus",
+                  options: [
+                    { value: "all", label: "All Focuses" },
+                    ...STRENGTH_FOCUS_OPTIONS.map((focus) => ({
+                      value: focus,
+                      label: focus
+                    })),
+                  ],
+                }
+              : {
+                  name: "Format",
+                  value: formatFilter,
+                  onChange: (value) => setFormatFilter(value as FormatFilter),
+                  placeholder: "Format",
+                  options: [
+                    { value: "all", label: "All Formats" },
+                    { value: "circuit", label: "Circuit" },
+                    { value: "amrap", label: "AMRAP" },
+                    { value: "for time", label: "For Time" },
+                    { value: "tabata", label: "Tabata" },
+                    { value: "reps & sets", label: "Reps & Sets" },
+                    { value: "emom", label: "EMOM" },
+                    { value: "mix", label: "Mix" },
+                  ],
+                },
             {
               name: "Duration",
               value: durationFilter,

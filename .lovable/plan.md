@@ -1,135 +1,102 @@
-Yes — your understanding is correct.
+Yes — I agree with you. For the Strength workout library page, replacing the Format filter with a Focus filter is the smarter and cleaner idea.
 
-`Focus` should mean one thing only in this system:
-
-```text
-Focus = the Strength training pattern required by the 84-day periodization plan.
-```
-
-It is not the same as:
-- equipment: BODYWEIGHT / EQUIPMENT
-- difficulty: Beginner / Intermediate / Advanced
-- format: CIRCUIT / AMRAP / FOR TIME / TABATA / REPS & SETS / EMOM / MIX
-- duration
-- category
-- content
-
-For SmartyGym, `focus` should be used only for `STRENGTH` workouts.
-
-Other categories should not use this Strength focus system:
-- Calorie Burning: no Strength focus tag
-- Metabolic: no Strength focus tag
-- Cardio: no Strength focus tag
-- Mobility & Stability: no Strength focus tag
-- Challenge: no Strength focus tag
-- Pilates: no Strength focus tag
-- Recovery: no Strength focus tag
-- Micro-Workouts: should not be part of this Strength focus system going forward
-
-Reason: a Tabata, Cardio, Challenge, Mobility, Pilates, or Recovery workout can have a training emphasis in its content, but it is not part of the Strength split rotation. We should not mix those ideas into the same `focus` field, because that would create confusion later.
-
-The six allowed Strength-only focus values are:
+Reason:
 
 ```text
-LOWER BODY
-UPPER BODY
-FULL BODY
-LOW PUSH & UPPER PULL
-LOW PULL & UPPER PUSH
-CORE & GLUTES
+Strength page:
+Equipment = Bodyweight / Equipment
+Level = Beginner / Intermediate / Advanced
+Duration = workout length
+Focus = Strength split pattern
+Format = almost always Reps & Sets, so it adds very little value
 ```
 
-These match the existing 84-day Strength periodization cycle.
+So on the Strength page, `Focus` is more useful than `Format` because it lets the user find the kind of strength workout they need: lower body, upper body, full body, push/pull, core & glutes, etc.
 
-Revised plan
-
-1. Treat `focus` as Strength-only metadata
-- `focus` will be meaningful only when `category = 'STRENGTH'`.
-- For all non-Strength workout categories, the admin form will not show a Strength Focus field.
-- Non-Strength categories will not be required to have focus.
-- Non-Strength categories will not be tagged with lower body, upper body, push, pull, etc.
-
-2. Tag only existing Strength workouts
-- Review the current 72 visible library Strength workouts.
-- Assign one of the six official Strength focus labels to each clear Strength workout.
-- Classification will be based on the workout name, description, workout content, and linked exercises.
-- This is metadata-only: only the `focus` column changes for Strength workouts.
-
-3. Do not modify other workout categories
-- I will not tag Calorie Burning, Metabolic, Cardio, Mobility & Stability, Challenge, Pilates, Recovery, or Micro-Workouts as part of this work.
-- I will not create a fake/general focus for them.
-- I will not add Strength focus choices to their admin creation flow.
-
-4. Future admin creation/editing rule
-- In the admin workout editor:
-  - if category is `STRENGTH`, show a required `Strength Focus` dropdown.
-  - if category is not `STRENGTH`, hide the field.
-  - if category is `STRENGTH`, saving is blocked unless the selected focus is one of the six approved labels.
-  - if a workout is changed from Strength to another category, the Strength focus should be cleared or ignored so it does not contaminate other categories.
-
-5. Keep existing filters separate
-- Equipment remains equipment.
-- Difficulty remains difficulty.
-- Format remains format.
-- Duration remains duration.
-- Category remains category.
-- Focus is only the Strength split/pattern.
-
-6. Keep Stripe completely separate
-- No Stripe product changes.
-- No Stripe price changes.
-- No checkout changes.
-- No paid/free access changes.
-- No standalone purchase changes.
-
-7. Keep WOD logic safe
-- This does not switch the WOD system to library-selection yet.
-- It only prepares the Strength library so library-selection can later pick the correct Strength focus.
-- After tagging, I will produce a Strength coverage matrix by:
-  - focus
-  - difficulty
-  - equipment
-
-Example:
+Important clarification:
 
 ```text
-Strength Focus                 Beginner BW/EQ   Intermediate BW/EQ   Advanced BW/EQ
-LOWER BODY                     count/count      count/count          count/count
-UPPER BODY                     count/count      count/count          count/count
-FULL BODY                      count/count      count/count          count/count
-LOW PUSH & UPPER PULL          count/count      count/count          count/count
-LOW PULL & UPPER PUSH          count/count      count/count          count/count
-CORE & GLUTES                  count/count      count/count          count/count
+This should happen ONLY on the Strength workout page.
 ```
 
-8. Safety limits
-I will not touch:
-- workout content HTML
+For all other workout category pages, the Format filter should remain exactly as it is, because for categories like Calorie Burning, Metabolic, Cardio, Challenge, and Micro-Workouts, format is still meaningful: Circuit, AMRAP, For Time, Tabata, EMOM, Mix, etc.
+
+Planned change
+
+1. Add a Strength Focus filter only for `/workout/strength`
+- On the Strength workout category page, replace the current `Format` dropdown with `Focus`.
+- The options will be:
+
+```text
+All Focuses
+Lower Body
+Upper Body
+Full Body
+Low Push & Upper Pull
+Low Pull & Upper Push
+Core & Glutes
+```
+
+2. Keep Format filter everywhere else
+- Calorie Burning: keep Format
+- Metabolic: keep Format
+- Cardio: keep Format
+- Mobility & Stability: keep Format
+- Challenge: keep Format
+- Pilates: keep Format
+- Recovery: keep Format
+- Micro-Workouts: keep Format
+
+No Strength Focus filter will appear outside the Strength page.
+
+3. Filtering behavior
+- If the user is on Strength page and selects a Focus, the library will show only Strength workouts with that exact focus.
+- Equipment, Level, Duration, Status, Access, Search, and Sort filters will continue to work together with Focus.
+- Example: user can filter:
+
+```text
+Strength + Bodyweight + Intermediate + Lower Body
+```
+
+4. Safety boundaries
+This is a front-end filtering change only. I will not touch:
+- Stripe products
+- prices
+- checkout
+- subscriptions
+- workout content
 - exercise links
 - images
-- visibility
-- premium flags
-- WOD flags
+- visibility flags
+- premium/free flags
+- WOD publishing flags
 - generated dates
-- Stripe IDs
-- prices
 - user access
-- routes
-- homepage/WOD card logic
+- database schema
+
+5. Future consistency
+- The Focus options will use the existing centralized `STRENGTH_FOCUS_OPTIONS` constant already created.
+- This prevents duplicate spellings or accidental new focus labels.
+- Since the admin editor already requires Focus for Strength workouts, future Strength workouts will automatically be filterable by Focus.
 
 Technical implementation details
 
-- Use the existing `admin_workouts.focus` column.
-- Do not add a new database column unless a later separate cleanup proves it is necessary.
-- Add a centralized constant for Strength focus options so the admin UI and future logic use the same exact labels.
-- Update the admin workout editor only enough to enforce Strength-only focus selection.
-- Make display logic careful: show Strength focus only for Strength workouts; for other categories, continue showing format/category information instead of pretending they have a focus.
+- Update `src/pages/WorkoutDetail.tsx`.
+- Add a separate `focusFilter` state for the Strength page.
+- Update `clearAllFilters` and active-filter detection to include the Focus filter.
+- In the filtering logic:
+  - if `mappedCategory === 'STRENGTH'`, apply `focusFilter` against `workout.focus`.
+  - if not Strength, ignore `focusFilter` completely.
+- In the filter UI:
+  - if `type === 'strength'`, show `Focus` dropdown instead of `Format`.
+  - otherwise, keep the existing `Format` dropdown unchanged.
 
-Final rule going forward
+Final rule after this change
 
 ```text
-Only STRENGTH workouts use focus.
-All other categories do not use Strength focus.
+Strength page uses Focus filter instead of Format filter.
+All non-Strength pages keep Format filter.
+Focus remains Strength-only.
 ```
 
-This prevents the future misunderstanding you are worried about.
+This is a safe, logical improvement and it matches the metadata system we just created.
