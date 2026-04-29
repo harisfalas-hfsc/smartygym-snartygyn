@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetClose, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User as UserIcon, Settings, LogOut, LayoutDashboard, Crown, Bell, Facebook, Instagram, Youtube, ShoppingBag, Info, Dumbbell, ListChecks, Wrench, BookOpen, Users, Newspaper, Mail, Sparkles, Building2, Shield, HelpCircle, Compass } from "lucide-react";
+import { User as UserIcon, Settings, LogOut, LayoutDashboard, Crown, Bell, Facebook, Instagram, Youtube, ShoppingBag, Info, Dumbbell, ListChecks, Wrench, BookOpen, Users, Newspaper, Mail, Sparkles, Building2, Shield, HelpCircle, Compass, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
@@ -328,12 +328,18 @@ export const Navigation = () => {
             {/* Mobile Discovery Menu */}
             {isMobile && <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" className="inline-flex lg:hidden h-12 min-w-0 gap-1.5 rounded-full px-2.5 -ml-2 text-primary">
+                <Button variant="ghost" className="inline-flex lg:hidden h-12 min-w-0 gap-1.5 rounded-full border-2 border-primary px-2.5 -ml-2 text-primary hover:bg-primary hover:text-primary-foreground">
                   <Compass className="h-6 w-6" />
                   <span className="text-[10px] font-semibold leading-none tracking-normal">Discovery</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="h-[100dvh] w-screen max-w-none overflow-y-auto border-r-0 p-4 pt-12">
+              <SheetContent side="left" hideClose className="left-4 top-6 bottom-6 h-auto w-[calc(100vw-2rem)] max-w-none overflow-y-auto rounded-2xl border-2 border-primary/40 p-4 shadow-xl">
+                <SheetClose asChild>
+                  <Button variant="ghost" className="mb-4 h-10 gap-2 rounded-full border-2 border-primary px-4 text-primary hover:bg-primary hover:text-primary-foreground">
+                    <ArrowLeft className="h-4 w-4" />
+                    Back
+                  </Button>
+                </SheetClose>
                 <div className="mb-5">
                   <p className="text-xs font-semibold uppercase tracking-normal text-primary">Discovery</p>
                   <h2 className="mt-1 text-2xl font-bold leading-tight text-foreground">Explore SmartyGym</h2>
