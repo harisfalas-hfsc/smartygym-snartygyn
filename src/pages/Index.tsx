@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap, Check, Crown, ChevronDown, ChevronLeft, ChevronRight, Move, Ban, Brain, CheckCircle2, Award, Shield, Compass, Sparkles, Info, User, HelpCircle, ShoppingBag, Star, TrendingUp, Clock, CalendarCheck } from "lucide-react";
-import { getCyprusTodayStr } from "@/lib/cyprusDate";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { User as SupabaseUser } from "@supabase/supabase-js";
@@ -101,7 +100,7 @@ const Index = () => {
     refetchOnWindowFocus: false, // Don't refetch on tab focus
   });
 
-  const { allTodayWods: mobileWods, bodyweightWod, equipmentWod, variousWod, hasWods } = useTodayWods(isMobile);
+  const { bodyweightWod, equipmentWod, variousWod, hasWods } = useTodayWods(isMobile);
   useEffect(() => {
     if (!carouselApi) return;
     const onSelect = () => {
