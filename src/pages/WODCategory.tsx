@@ -8,7 +8,6 @@ import { Badge } from "@/components/ui/badge";
 import { Eye, Check, Heart, Crown, ShoppingCart, Clock, Dumbbell, Star, Home, TrendingUp, Brain, RefreshCw, Target, CheckCircle, Shield, Shuffle, Layers } from "lucide-react";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { ContentLoadingSkeleton } from "@/components/ContentLoadingSkeleton";
-import { useAllWorkouts } from "@/hooks/useWorkoutData";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { useWorkoutInteractions } from "@/hooks/useWorkoutInteractions";
 import { supabase } from "@/integrations/supabase/client";
