@@ -298,7 +298,7 @@ export const Navigation = () => {
                   <h2 className="mt-1 text-2xl font-bold leading-tight text-foreground">Explore SmartyGym</h2>
                 </div>
                 <nav className="grid grid-cols-2 gap-3 pb-8 lg:mt-8 lg:flex lg:flex-col lg:gap-2">
-                  {discoveryItems.map(({ label, path, icon: Icon, track }) => {
+                  {discoveryItems.map(({ label, path, icon: Icon, iconClass, track }) => {
                     const active = location.pathname === path;
                     return (
                       <button
@@ -306,9 +306,9 @@ export const Navigation = () => {
                         type="button"
                         onClick={() => handleNavigate(path)}
                         data-track-cta={track}
-                        className={`min-h-[112px] rounded-2xl border-2 p-3 text-center font-semibold transition-all duration-200 lg:flex lg:min-h-0 lg:items-center lg:justify-start lg:rounded-md lg:border-0 lg:p-2 lg:text-left ${active ? 'border-primary bg-primary/15 text-primary shadow-sm lg:underline lg:underline-offset-4' : 'border-primary/25 bg-card text-foreground hover:border-primary hover:bg-primary/10'}`}
+                        className={`min-h-[112px] rounded-2xl border-2 p-3 text-center font-semibold transition-all duration-200 lg:flex lg:min-h-0 lg:items-center lg:justify-start lg:rounded-md lg:border-0 lg:bg-transparent lg:p-2 lg:text-left ${active ? 'border-primary bg-primary/15 text-primary shadow-sm lg:text-primary lg:underline lg:underline-offset-4' : 'border-primary/25 bg-card text-foreground hover:border-primary hover:bg-primary/10 lg:hover:bg-primary/10 lg:hover:text-foreground'}`}
                       >
-                        <span className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary lg:mb-0 lg:mr-2 lg:inline-flex lg:h-8 lg:w-8">
+                        <span className={`mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 lg:mb-0 lg:mr-2 lg:inline-flex lg:h-auto lg:w-auto lg:bg-transparent ${iconClass}`}>
                           <Icon className="h-6 w-6 lg:h-4 lg:w-4" />
                         </span>
                         <span className="block text-sm leading-tight lg:inline">{label}</span>
