@@ -80,7 +80,7 @@ const FAQ = () => {
                 "name": "Is there a free trial?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Yes! We offer free access to selected workouts, tools, and resources so you can explore the platform before committing. Additionally, you can purchase selected premium workouts or training programs as standalone items — this lets you experience our coaching philosophy and training quality before committing to a full subscription. Premium subscriptions (Gold and Platinum) unlock our full library."
+                  "text": "Yes. SmartyGym Gold and Platinum plans include a 3-day free trial so you can experience the full premium library before your subscription begins. You can also explore free tools, the exercise library, blog resources, and selected free content before upgrading."
                 }
               },
               {
@@ -336,11 +336,9 @@ const FAQ = () => {
                   <AccordionItem value="item-8">
                     <AccordionTrigger className="text-left">Is there a free trial?</AccordionTrigger>
                     <AccordionContent className="py-2 leading-relaxed">
-                      Yes! We offer <strong>free access</strong> to selected workouts, tools, and resources so you can explore the platform before committing. 
-                      Additionally, you can <strong>purchase selected premium workouts or training programs as standalone items</strong> — 
-                      this lets you experience our coaching philosophy and training quality before committing to a full subscription.
-                      Premium subscriptions (Gold and Platinum) unlock our full library of workouts, training programs, and advanced features. 
-                      Check out our <a href="/premium-comparison" className="text-primary hover:underline font-medium">pricing plans</a> to see what's included.
+                      Yes. SmartyGym Gold and Platinum plans include a <strong>3-day free trial</strong>, so you can experience the full premium library before your subscription begins. 
+                      You can also explore our free tools, exercise library, blog resources, and selected free content before upgrading. 
+                      Check out our <a href="/smarty-plans" className="text-primary hover:underline font-medium">Smarty Plans</a> to see the compare access levels and what's included.
                     </AccordionContent>
                   </AccordionItem>
 
