@@ -281,10 +281,10 @@
   </url>
   
   <url>
-    <loc>https://smartygym.com/smartyworkout</loc>
-    <lastmod>2026-04-23</lastmod>
+    <loc>https://smartygym.com/caloriecounter</loc>
+    <lastmod>2026-04-29</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.75</priority>
   </url>
   
   <!-- Premium & Services -->
@@ -316,19 +316,19 @@
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
+
+  <url>
+    <loc>https://smartygym.com/best-online-fitness-platform</loc>
+    <lastmod>2026-04-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
   
   <url>
     <loc>https://smartygym.com/community</loc>
     <lastmod>2026-04-23</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
-  </url>
-  
-  <url>
-    <loc>https://smartygym.com/freecontent</loc>
-    <lastmod>2026-04-23</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
   </url>
   
   <url>
@@ -354,7 +354,7 @@
   
   <!-- Legal Pages -->
   <url>
-    <loc>https://smartygym.com/privacypolicy</loc>
+    <loc>https://smartygym.com/privacy-policy</loc>
     <lastmod>2026-04-23</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>

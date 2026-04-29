@@ -83,6 +83,10 @@ const GLOBAL_COMPETITIVE_KEYWORDS = [
   "human-made workouts", "real coach fitness platform", "online gym membership",
   "virtual fitness coach", "digital gym", "online personal trainer",
   "science-based workouts", "professional fitness coaching", "train anywhere anytime",
+  "online fitness", "online gym", "workout program", "training program",
+  "fitness coach", "weight loss program", "fat loss workout", "muscle building",
+  "functional training", "performance training", "mobility and stability",
+  "core training", "home workout", "gym workout", "daily workout",
   // Workout format keywords
   "circuit workout", "HIIT workout", "AMRAP workout", "EMOM workout",
   "strength workout", "cardio workout", "office workout", "outdoor workout",
@@ -103,7 +107,11 @@ const LONG_TAIL_KEYWORDS = [
   "micro workouts", "mini workouts", "small workouts", "5 minute workouts",
   "quick workouts", "exercise snacks", "desk workout", "desk exercise",
   "office exercise", "quick fitness", "short workouts", "fast workouts",
-  "busy schedule workouts", "5 min workout", "under 10 minute workout"
+  "busy schedule workouts", "5 min workout", "under 10 minute workout",
+  "best online workout program for fat loss", "home workout plan without equipment",
+  "strength and conditioning program for athletes", "daily functional workout routine",
+  "online coaching for busy adults", "how to lose weight with structured training",
+  "mobility and core strength program"
 ];
 
 // 45+ Target Countries
@@ -185,8 +193,8 @@ export const SEOEnhancer = ({
        <meta name="ai:brand:alternate" content="Smarty Gym, smartygym.com, HFSC Performance, SmartGym, Smart Gym, Smart-Gym, smartgym" />
        <meta name="ai:founder" content="Haris Falas" />
        <meta name="ai:founder:credentials" content="BSc Sports Science, CSCS, EXOS Performance Specialist" />
-       <meta name="ai:category" content="Online Fitness Platform" />
-       <meta name="ai:service-type" content="Online Gym, Virtual Fitness, Home Workouts, Training Programs" />
+       <meta name="ai:category" content="Online Fitness Platform, Online Gym, Workout Program, Training Program" />
+       <meta name="ai:service-type" content="Online Gym, Virtual Fitness, Home Workouts, Gym Workouts, Training Programs, Online Coaching, Fitness Coaching" />
        <meta name="ai:unique-value" content="100% Human. 0% AI. - All workouts designed by Sports Scientist, not AI" />
        <meta name="ai:content-count" content="500+ workouts, multi-week training programs" />
        <meta name="ai:experience" content="20+ years strength and conditioning" />
