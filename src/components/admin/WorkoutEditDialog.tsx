@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { A4Container } from "@/components/ui/a4-container";
 import { normalizeWorkoutHtml } from "@/utils/htmlNormalizer";
 
-import { WORKOUT_CATEGORIES, STRENGTH_FOCUS_OPTIONS, isStrengthFocus, getDifficultyFromStars } from "@/constants/workoutCategories";
+import { WORKOUT_CATEGORIES, STRENGTH_FOCUS_OPTIONS, isStrengthFocus } from "@/constants/workoutCategories";
 
 // Micro-workout fixed values (enforced by DB trigger too)
 const MICRO_WORKOUT_RULES = {
