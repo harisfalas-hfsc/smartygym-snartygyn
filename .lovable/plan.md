@@ -1,102 +1,225 @@
-Yes — I agree with you. For the Strength workout library page, replacing the Format filter with a Focus filter is the smarter and cleaner idea.
+Yes — this is exactly the right direction, and I would treat it as a mobile-app UX redesign, not just “make the website smaller.” The goal is: same SmartyGym brand, same services, same content, same desktop experience, but on phones it should feel like a polished native fitness app.
 
-Reason:
+Important safety boundary: this plan is mobile-only. Desktop/tablet desktop layouts stay as they are. No workout content, pricing, subscriptions, database schema, admin data, Stripe/payment logic, or existing content metadata will be changed.
 
-```text
-Strength page:
-Equipment = Bodyweight / Equipment
-Level = Beginner / Intermediate / Advanced
-Duration = workout length
-Focus = Strength split pattern
-Format = almost always Reps & Sets, so it adds very little value
-```
+## Design direction
 
-So on the Strength page, `Focus` is more useful than `Format` because it lets the user find the kind of strength workout they need: lower body, upper body, full body, push/pull, core & glutes, etc.
-
-Important clarification:
+Create a mobile experience built around fast one-thumb navigation:
 
 ```text
-This should happen ONLY on the Strength workout page.
+Top compact app header
+  Logo / profile / theme / notifications
+
+Home screen
+  Today-first dashboard
+  Quick access cards
+  Continue / discover sections
+
+Bottom native tab bar
+  Today | Workouts | Programs | Tools | More
+
+More menu
+  Rituals, Exercise Library, Community, Blog, Plans, Corporate, FAQ, Contact
 ```
 
-For all other workout category pages, the Format filter should remain exactly as it is, because for categories like Calorie Burning, Metabolic, Cardio, Challenge, and Micro-Workouts, format is still meaningful: Circuit, AMRAP, For Time, Tabata, EMOM, Mix, etc.
+This mirrors how strong iOS/Android fitness apps work: the most-used actions are always at the bottom, while secondary services remain available in a clean “More” area.
 
-Planned change
+## What I would redesign on mobile
 
-1. Add a Strength Focus filter only for `/workout/strength`
-- On the Strength workout category page, replace the current `Format` dropdown with `Focus`.
-- The options will be:
+### 1. Add a native-style bottom navigation bar for phones only
+
+On screens below the existing mobile breakpoint, add a fixed bottom tab bar with:
+
+- Today
+- Workouts
+- Programs
+- Tools
+- More
+
+Behavior:
+- Active tab is highlighted in SmartyGym primary blue.
+- The bar uses glass/blur styling, rounded top corners, safe-area padding for iPhone home indicator, and works in light and dark mode.
+- It appears only on mobile.
+- Desktop keeps the current navigation.
+- The current hamburger menu can remain, but becomes secondary. The bottom tabs become the main mobile navigation.
+
+Suggested mapping:
 
 ```text
-All Focuses
-Lower Body
-Upper Body
-Full Body
-Low Push & Upper Pull
-Low Pull & Upper Push
-Core & Glutes
+Today      -> / or /start style mobile landing experience
+Workouts   -> /workout
+Programs   -> /trainingprogram
+Tools      -> /tools
+More       -> opens a mobile sheet/menu
 ```
 
-2. Keep Format filter everywhere else
-- Calorie Burning: keep Format
-- Metabolic: keep Format
-- Cardio: keep Format
-- Mobility & Stability: keep Format
-- Challenge: keep Format
-- Pilates: keep Format
-- Recovery: keep Format
-- Micro-Workouts: keep Format
+The More sheet would include:
+- Workout of the Day
+- Smarty Rituals
+- Exercise Library
+- Community
+- Blog
+- Smarty Plans
+- The Smarty Method
+- Take a Tour
+- Corporate
+- FAQ
+- Contact
+- Dashboard / Account if logged in
+- Admin if admin
 
-No Strength Focus filter will appear outside the Strength page.
+This keeps all services available without overcrowding the bottom bar.
 
-3. Filtering behavior
-- If the user is on Strength page and selects a Focus, the library will show only Strength workouts with that exact focus.
-- Equipment, Level, Duration, Status, Access, Search, and Sort filters will continue to work together with Focus.
-- Example: user can filter:
+### 2. Replace the current mobile homepage structure with a “Today Hub”
 
-```text
-Strength + Bodyweight + Intermediate + Lower Body
-```
+The mobile homepage should feel less like a marketing page and more like an app start screen.
 
-4. Safety boundaries
-This is a front-end filtering change only. I will not touch:
-- Stripe products
-- prices
-- checkout
-- subscriptions
-- workout content
-- exercise links
-- images
-- visibility flags
-- premium/free flags
-- WOD publishing flags
-- generated dates
-- user access
-- database schema
+Top section:
+- “Hello, Smarty” / “Ready to train today?”
+- A prominent Workout of the Day card
+- If WOD is available, show the available variants clearly.
+- If not available, show a polished “Today’s workout is being prepared” state.
 
-5. Future consistency
-- The Focus options will use the existing centralized `STRENGTH_FOCUS_OPTIONS` constant already created.
-- This prevents duplicate spellings or accidental new focus labels.
-- Since the admin editor already requires Focus for Strength workouts, future Strength workouts will automatically be filterable by Focus.
+Then quick action cards:
+- Start Workout
+- Choose Program
+- Open Tools
+- Exercise Library
 
-Technical implementation details
+Then discovery sections:
+- Smarty Workouts categories
+- Smarty Programs categories
+- Smarty Rituals
+- Community / Blog
+- Premium upgrade, only where appropriate
 
-- Update `src/pages/WorkoutDetail.tsx`.
-- Add a separate `focusFilter` state for the Strength page.
-- Update `clearAllFilters` and active-filter detection to include the Focus filter.
-- In the filtering logic:
-  - if `mappedCategory === 'STRENGTH'`, apply `focusFilter` against `workout.focus`.
-  - if not Strength, ignore `focusFilter` completely.
-- In the filter UI:
-  - if `type === 'strength'`, show `Focus` dropdown instead of `Format`.
-  - otherwise, keep the existing `Format` dropdown unchanged.
+The current mobile carousel can be replaced or reduced. Carousels look nice, but native app UX usually works better with visible vertical cards and bottom navigation.
 
-Final rule after this change
+### 3. Redesign mobile category pages into app-style lists
 
-```text
-Strength page uses Focus filter instead of Format filter.
-All non-Strength pages keep Format filter.
-Focus remains Strength-only.
-```
+For mobile only, pages like `/workout`, `/workout/strength`, `/trainingprogram`, and `/tools` should use tighter app screens:
 
-This is a safe, logical improvement and it matches the metadata system we just created.
+- Sticky compact title/search area
+- Filter chips instead of large dropdown-heavy controls where possible
+- Large tappable cards with clear metadata
+- Less vertical waste
+- Clear “Free / Premium / Purchased” badges
+- Smooth spacing for thumb use
+
+For Strength specifically, keep the recent improvement:
+- Strength page shows Focus filtering instead of Format filtering.
+- Other workout categories keep Format filtering.
+
+### 4. Mobile cards should feel more native
+
+Across mobile content lists:
+- Rounded app-card corners
+- Clear image top area or thumbnail side area
+- Strong title hierarchy
+- Metadata chips: duration, level, equipment, focus/format
+- Primary CTA area large enough for touch
+- Avoid tiny text and cramped buttons
+
+This improves workouts, programs, tools, exercise library entries, community, and blog discovery without changing the actual data.
+
+### 5. Use mobile-specific layout components instead of rewriting desktop
+
+To keep this safe, I would not globally rewrite every page. I would add mobile-only components and conditional rendering using the existing mobile breakpoint.
+
+Examples:
+- `MobileBottomNav`
+- `MobileMoreMenu`
+- `MobileHomeHub`
+- `MobilePageHeader`
+- `MobileActionCard`
+- `MobileContentCard`
+
+Existing desktop components remain untouched or hidden only on mobile.
+
+### 6. Preserve brand and theme exactly
+
+Keep:
+- Existing light/dark mode behavior
+- Deep dark navy and electric blue brand direction
+- Current logo and typography approach
+- Existing content wording where it matters
+- Premium/free access rules
+
+Improve:
+- Spacing
+- Touch target size
+- Navigation hierarchy
+- Native-app feeling
+- Mobile readability
+
+No new unrelated colors. If icons need accent colors, keep them subtle and consistent with current usage.
+
+### 7. Handle safe areas and floating buttons carefully
+
+The project already has safe-area variables for native/mobile behavior. I would use them so the bottom tab bar does not collide with:
+- iPhone home indicator
+- Android navigation area
+- WhatsApp button
+- Smarty Coach floating button
+- Timer popup
+- Toasts/modals
+
+This is important because a bottom nav can easily create overlap problems if done carelessly.
+
+### 8. Fix the current mobile ResizeObserver warning while touching navigation
+
+There is a current runtime warning related to `ResizeObserver` in the navigation/header height logic. While implementing the mobile header/nav, I would make that measurement safer, for example by deferring the CSS variable update with `requestAnimationFrame` and only updating when the height actually changes.
+
+This is a quiet stability fix and should not alter design.
+
+## Implementation phases
+
+### Phase 1 — Safe mobile shell
+
+- Add mobile bottom tab bar.
+- Add More menu sheet.
+- Add bottom padding to mobile page wrapper so content does not hide behind the tab bar.
+- Keep desktop unchanged.
+- Keep existing hamburger temporarily for backup access.
+
+### Phase 2 — Mobile homepage / Today Hub
+
+- Replace only the mobile homepage layout with a native-style Today screen.
+- Keep desktop homepage unchanged.
+- Make WOD, Workouts, Programs, Tools, Exercise Library, Rituals, Community, Blog all reachable quickly.
+
+### Phase 3 — Mobile library screens
+
+- Improve `/workout` mobile category selection.
+- Improve `/workout/:type` mobile list and filtering UX.
+- Improve `/trainingprogram` mobile category selection.
+- Improve `/tools` mobile entry points.
+
+### Phase 4 — Polish and QA
+
+- Check 390px wide viewport first, since that is the current phone preview size.
+- Check light mode and dark mode.
+- Check logged-out and logged-in states.
+- Check premium/free badge visibility.
+- Check that admin link remains available only to admins.
+- Check that desktop remains visually unchanged.
+- Check that bottom nav does not overlap Smarty Coach, WhatsApp, timer, or dialogs.
+
+## What will not be changed
+
+- No database changes.
+- No content changes.
+- No workout tagging changes.
+- No pricing/subscription changes.
+- No admin permissions changes.
+- No desktop redesign.
+- No deletion of current pages.
+- No removal of existing services.
+
+If you dislike it, you can revert through Lovable history and return exactly to the previous state.
+
+## My professional recommendation
+
+I recommend proceeding, but in a controlled way: build the mobile shell first, then the mobile homepage, then the deeper pages. That gives you a safer checkpoint after each stage instead of one huge risky redesign.
+
+The biggest improvement will be the bottom tab bar plus a Today-first mobile home. That alone will make SmartyGym feel much more like a real iOS/Android fitness app while keeping all services available.
