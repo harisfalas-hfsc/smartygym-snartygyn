@@ -710,6 +710,29 @@ className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-co
                         </div>
                       </div>
                     )}
+                    {variousWod && !bodyweightWod && !equipmentWod && (
+                      <div className="relative rounded-lg overflow-hidden border border-border">
+                        <img 
+                          src={variousWod.image_url || '/placeholder.svg'} 
+                          alt={variousWod.name}
+className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-cover`}
+                          onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
+                        />
+                        <Badge className="absolute top-1 left-1 bg-cyan-500 hover:bg-cyan-500 text-white text-[10px] px-1.5 py-0.5">Recovery</Badge>
+                        <div className="p-2 bg-background/90">
+                          <p className="text-xs font-semibold line-clamp-1">{variousWod.name}</p>
+                          <div className="flex items-center gap-1 text-[9px] text-muted-foreground">
+                            <span className="text-red-500">{variousWod.category}</span>
+                            {variousWod.format && (
+                              <>
+                                <span>•</span>
+                                <span>{variousWod.format}</span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 );
               })()
