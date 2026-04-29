@@ -21,7 +21,6 @@ import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 
 import { SafeNotificationBadge } from "@/components/NotificationBadge";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { useAdminRole } from "@/hooks/useAdminRole";
 import { SmartyCoachModal } from "@/components/smarty-coach";
 import smartyCoachIcon from "@/assets/smarty-coach-icon.png";
@@ -50,7 +49,6 @@ export const Navigation = () => {
   const [desktopMenuOpen, setDesktopMenuOpen] = useState(false);
   const [smartyCoachOpen, setSmartyCoachOpen] = useState(false);
   const { data: unreadCount = 0, refetch: refetchUnread } = useUnreadMessages();
-  const isMobile = useIsMobile();
   const { isAdmin } = useAdminRole();
   const headerRef = useRef<HTMLElement>(null);
 
@@ -282,7 +280,7 @@ export const Navigation = () => {
     <>
     <header ref={headerRef} className="fixed top-0 left-0 right-0 z-50 bg-background pt-2 pb-0.5 px-4">
       <div className="mx-auto max-w-7xl">
-        <div className="flex justify-between items-center gap-4">
+        <div className="relative flex items-center justify-between gap-2 lg:gap-4">
           {/* LEFT SECTION - Hamburger Menu + Social Media Icons */}
           <div className="hidden lg:flex items-center gap-2">
             {/* Desktop Menu - original layout */}
@@ -370,24 +368,9 @@ export const Navigation = () => {
             </div>
           </div>
 
-          {/* CENTER SECTION - Logo */}
-          <div className="flex-1 flex justify-start lg:justify-center min-w-0 max-w-none lg:max-w-none">
-            <Link
-              to="/home"
-              className="cursor-pointer flex-shrink-0"
-            >
-              <img
-                src={smartyGymLogo}
-                alt="SmartyGym"
-                className="h-10 xs:h-12 sm:h-[68px] md:h-20 lg:h-24 w-auto object-contain dark:mix-blend-lighten"
-              />
-            </Link>
-          </div>
-
-           {/* Right Side - Auth */}
-           <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
-             {/* Mobile Discovery Menu */}
-             {isMobile && <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+          {/* Mobile Left Controls - Discovery + Smarty Coach */}
+          <div className="flex shrink-0 items-center gap-1.5 lg:hidden">
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
                 <Button
                   variant="ghost"
@@ -447,12 +430,42 @@ export const Navigation = () => {
                   )}
                 </nav>
               </SheetContent>
-            </Sheet>}
+            </Sheet>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setSmartyCoachOpen(true)}
+              className="relative h-11 w-11 rounded-full"
+              aria-label="Open Smarty Coach"
+            >
+              <div className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-primary transition-colors hover:bg-primary hover:text-primary-foreground">
+                <img src={smartyCoachIcon} alt="" className="h-8 w-8 rounded-full" loading="lazy" width={32} height={32} />
+              </div>
+              <span className="sr-only">Smarty Coach</span>
+            </Button>
+          </div>
+
+          {/* CENTER SECTION - Logo */}
+          <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 justify-center lg:static lg:top-auto lg:flex-1 lg:translate-x-0 lg:translate-y-0 lg:justify-center">
+            <Link
+              to="/home"
+              className="cursor-pointer flex-shrink-0"
+            >
+              <img
+                src={smartyGymLogo}
+                alt="SmartyGym"
+                className="h-11 xs:h-12 sm:h-[68px] md:h-20 lg:h-24 w-auto max-w-[112px] object-contain dark:mix-blend-lighten sm:max-w-none"
+              />
+            </Link>
+          </div>
+
+           {/* Right Side - Auth */}
+           <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
              <Button
                variant="ghost"
                size="icon"
                onClick={() => setSmartyCoachOpen(true)}
-               className="relative h-11 w-11 rounded-full"
+                className="relative hidden h-11 w-11 rounded-full lg:inline-flex"
                aria-label="Open Smarty Coach"
              >
                <div className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-primary transition-colors hover:bg-primary hover:text-primary-foreground">
