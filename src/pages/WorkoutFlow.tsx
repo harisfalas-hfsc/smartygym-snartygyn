@@ -14,13 +14,11 @@ import { useAccessControl } from "@/hooks/useAccessControl";
 
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { supabase } from "@/integrations/supabase/client";
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, type CarouselApi } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
 import { CategoryCountBadge } from "@/components/ui/category-count-badge";
 import { SwipeToExplore } from "@/components/ui/SwipeToExplore";
-import { getCyprusTodayStr } from "@/lib/cyprusDate";
-import { fetchVisibleWorkoutMetadata } from "@/hooks/useTodayWods";
+import { fetchVisibleWorkoutMetadata, useTodayWods } from "@/hooks/useTodayWods";
 
 const WorkoutFlow = () => {
   const navigate = useNavigate();
@@ -32,25 +30,8 @@ const WorkoutFlow = () => {
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  // Fetch today's WOD images for the card background
-  const { data: wodImages = [] } = useQuery({
-    queryKey: ["wod-card-images"],
-    queryFn: async () => {
-      const today = getCyprusTodayStr();
-      const { data, error } = await (supabase as any)
-        .rpc("get_visible_workout_metadata", { _workout_id: null });
-
-      if (error) {
-        console.error("Error fetching WOD card images:", error);
-        return [];
-      }
-
-      return (data || [])
-        .filter((w: any) => w.is_workout_of_day === true && w.generated_for_date === today && w.image_url)
-        .map((w: any) => w.image_url as string);
-    },
-    staleTime: 1000 * 60 * 5,
-  });
+  const { allTodayWods } = useTodayWods();
+  const wodImages = allTodayWods.filter((w) => w.image_url).map((w) => w.image_url as string);
 
   // Fetch workout counts by category (excluding WOD)
   const { data: workoutCounts = {} } = useQuery({
