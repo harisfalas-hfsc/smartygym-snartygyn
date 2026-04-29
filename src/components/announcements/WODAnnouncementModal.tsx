@@ -1,13 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CalendarCheck, Clock, Dumbbell, Home, Crown, ShoppingBag, X, TrendingUp, Layers, Target } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { getCyprusTodayStr } from "@/lib/cyprusDate";
+import { useTodayWods } from "@/hooks/useTodayWods";
 
 interface WODAnnouncementModalProps {
   open: boolean;
@@ -19,32 +17,7 @@ export const WODAnnouncementModal = ({ open, onClose }: WODAnnouncementModalProp
   const [countdown, setCountdown] = useState(15);
   const [dontShowAgain, setDontShowAgain] = useState(false);
 
-  const { data: wods, isLoading } = useQuery({
-    queryKey: ["wod-announcement"],
-    queryFn: async () => {
-      // Use Cyprus date for consistent filtering with other WOD components
-      const cyprusToday = getCyprusTodayStr();
-      
-      const { data, error } = await (supabase as any)
-        .rpc("get_visible_workout_metadata", { _workout_id: null });
-      
-      if (error && error.code !== "PGRST116") {
-        console.error("Error fetching WODs:", error);
-        return [];
-      }
-
-      return (data || []).filter(
-        (wod: any) => wod.is_workout_of_day === true && wod.generated_for_date === cyprusToday
-      );
-    },
-    enabled: open,
-    staleTime: 1000 * 60 * 5,
-  });
-
-  const bodyweightWOD = wods?.find(w => w.equipment === "BODYWEIGHT");
-  const equipmentWOD = wods?.find(w => w.equipment === "EQUIPMENT");
-  const hasWODs = wods && wods.length > 0;
-  const isRecoveryDay = wods?.length === 1 && wods[0]?.category?.toUpperCase() === "RECOVERY";
+  const { allTodayWods: wods, bodyweightWod: bodyweightWOD, equipmentWod: equipmentWOD, hasWods: hasWODs, isRecoveryDay, isLoading } = useTodayWods(open);
 
   // Countdown timer - auto close after 15 seconds
   useEffect(() => {
