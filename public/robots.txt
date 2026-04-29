@@ -564,10 +564,12 @@ Allow: /shop
 Allow: /join-premium
 Allow: /premiumbenefits
 Allow: /faq
-Allow: /freecontent
 Allow: /community
 Allow: /wod-archive
+Allow: /best-online-fitness-platform
+Allow: /caloriecounter
 Allow: /llms.txt
+Allow: /llms-full.txt
 Allow: /ai.txt
 Allow: /.well-known/ai-plugin.json
 
@@ -677,4 +679,6 @@ Allow: /llms-full.txt
 # Formats: AMRAP, TABATA, EMOM, Circuit Training, For Time, Rounds for Time, Reps and Sets
 # Equipment: bodyweight, dumbbells, kettlebells, barbells, resistance bands
 # Features: 1RM calculator, BMR calculator, macro calculator, fitness tools
+# Outcomes: fat loss, strength, muscle building, mobility and stability, core training, performance training, consistency
+# Long-tail: best online workout program for fat loss, home workout plan without equipment, online coaching for busy adults
 # Unique: 100% human-designed, zero AI, evidence-based, science-based fitness
