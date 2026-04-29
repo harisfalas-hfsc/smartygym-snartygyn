@@ -31,6 +31,7 @@ import { useAccessControl } from "@/hooks/useAccessControl";
 import { useWorkoutInteractions } from "@/hooks/useWorkoutInteractions";
 import { supabase } from "@/integrations/supabase/client";
 import { stripHtmlTags } from "@/lib/text";
+import { isStrengthFocus } from "@/constants/workoutCategories";
 
 type EquipmentFilter = "all" | "bodyweight" | "equipment";
 type LevelFilter = "all" | "beginner" | "intermediate" | "advanced";
@@ -630,7 +631,9 @@ const WorkoutDetail = () => {
                     )}
                     <div className="flex items-center gap-1">
                       <Target className="h-3 w-3 shrink-0 text-primary" />
-                      <span className="text-blue-600 dark:text-blue-400 font-medium">{workout.focus || workout.format || "General"}</span>
+                      <span className="text-primary font-medium">
+                        {workout.category === "STRENGTH" && isStrengthFocus(workout.focus) ? workout.focus : workout.format || "General"}
+                      </span>
                     </div>
                     <span>•</span>
                     {workout.difficulty && (
