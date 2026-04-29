@@ -52,6 +52,7 @@ export const Navigation = () => {
 
   // Dynamically set --app-header-h CSS variable based on actual header height
   useLayoutEffect(() => {
+    let frame = 0;
     const updateHeaderHeight = () => {
       if (headerRef.current) {
         const height = headerRef.current.offsetHeight;
@@ -61,12 +62,18 @@ export const Navigation = () => {
 
     updateHeaderHeight();
 
-    const resizeObserver = new ResizeObserver(updateHeaderHeight);
+    const resizeObserver = new ResizeObserver(() => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(updateHeaderHeight);
+    });
     if (headerRef.current) {
       resizeObserver.observe(headerRef.current);
     }
 
-    return () => resizeObserver.disconnect();
+    return () => {
+      cancelAnimationFrame(frame);
+      resizeObserver.disconnect();
+    };
   }, []);
 
   // Listen for messages being read to update badge immediately
@@ -251,19 +258,19 @@ export const Navigation = () => {
   };
 
   const discoveryItems = [
-    { label: "Smarty Workouts", path: "/workout", icon: Dumbbell, track: undefined },
-    { label: "Smarty Programs", path: "/trainingprogram", icon: ListChecks, track: undefined },
-    { label: "Smarty Ritual", path: "/daily-ritual", icon: Sparkles, track: undefined },
-    { label: "Smarty Tools", path: "/tools", icon: Wrench, track: undefined },
-    { label: "Exercise Library", path: "/exerciselibrary", icon: BookOpen, track: undefined },
-    { label: "Community", path: "/community", icon: Users, track: undefined },
-    { label: "Blog", path: "/blog", icon: Newspaper, track: undefined },
-    { label: "Take a Tour", path: "/takeatour", icon: Info, track: undefined },
-    { label: "Smarty Plans", path: "/smarty-plans", icon: Crown, track: "view-plans-nav" },
-    { label: "Smarty Corporate", path: "/corporate", icon: Building2, track: undefined },
-    { label: "FAQ", path: "/faq", icon: HelpCircle, track: undefined },
-    { label: "The Smarty Method", path: "/the-smarty-method", icon: BookOpen, track: undefined },
-    { label: "Contact", path: "/contact", icon: Mail, track: undefined },
+    { label: "Smarty Workouts", path: "/workout", icon: Dumbbell, iconClass: "text-primary", track: undefined },
+    { label: "Smarty Programs", path: "/trainingprogram", icon: ListChecks, iconClass: "text-blue-500", track: undefined },
+    { label: "Smarty Ritual", path: "/daily-ritual", icon: Sparkles, iconClass: "text-purple-500", track: undefined },
+    { label: "Smarty Tools", path: "/tools", icon: Wrench, iconClass: "text-orange-500", track: undefined },
+    { label: "Exercise Library", path: "/exerciselibrary", icon: BookOpen, iconClass: "text-emerald-500", track: undefined },
+    { label: "Community", path: "/community", icon: Users, iconClass: "text-cyan-500", track: undefined },
+    { label: "Blog", path: "/blog", icon: Newspaper, iconClass: "text-red-500", track: undefined },
+    { label: "Take a Tour", path: "/takeatour", icon: Info, iconClass: "text-teal-500", track: undefined },
+    { label: "Smarty Plans", path: "/smarty-plans", icon: Crown, iconClass: "text-yellow-500", track: "view-plans-nav" },
+    { label: "Smarty Corporate", path: "/corporate", icon: Building2, iconClass: "text-sky-500", track: undefined },
+    { label: "FAQ", path: "/faq", icon: HelpCircle, iconClass: "text-purple-500", track: undefined },
+    { label: "The Smarty Method", path: "/the-smarty-method", icon: BookOpen, iconClass: "text-amber-500", track: undefined },
+    { label: "Contact", path: "/contact", icon: Mail, iconClass: "text-indigo-500", track: undefined },
   ];
 
   return (
@@ -291,7 +298,7 @@ export const Navigation = () => {
                   <h2 className="mt-1 text-2xl font-bold leading-tight text-foreground">Explore SmartyGym</h2>
                 </div>
                 <nav className="grid grid-cols-2 gap-3 pb-8 lg:mt-8 lg:flex lg:flex-col lg:gap-2">
-                  {discoveryItems.map(({ label, path, icon: Icon, track }) => {
+                  {discoveryItems.map(({ label, path, icon: Icon, iconClass, track }) => {
                     const active = location.pathname === path;
                     return (
                       <button
@@ -299,9 +306,9 @@ export const Navigation = () => {
                         type="button"
                         onClick={() => handleNavigate(path)}
                         data-track-cta={track}
-                        className={`min-h-[112px] rounded-2xl border-2 p-3 text-center font-semibold transition-all duration-200 lg:flex lg:min-h-0 lg:items-center lg:justify-start lg:rounded-md lg:border-0 lg:p-2 lg:text-left ${active ? 'border-primary bg-primary/15 text-primary shadow-sm lg:underline lg:underline-offset-4' : 'border-primary/25 bg-card text-foreground hover:border-primary hover:bg-primary/10'}`}
+                        className={`min-h-[112px] rounded-2xl border-2 p-3 text-center font-semibold transition-all duration-200 lg:flex lg:min-h-0 lg:items-center lg:justify-start lg:rounded-md lg:border-0 lg:bg-transparent lg:p-2 lg:text-left ${active ? 'border-primary bg-primary/15 text-primary shadow-sm lg:text-primary lg:underline lg:underline-offset-4' : 'border-primary/25 bg-card text-foreground hover:border-primary hover:bg-primary/10 lg:hover:bg-primary/10 lg:hover:text-foreground'}`}
                       >
-                        <span className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary lg:mb-0 lg:mr-2 lg:inline-flex lg:h-8 lg:w-8">
+                        <span className={`mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 lg:mb-0 lg:mr-2 lg:inline-flex lg:h-auto lg:w-auto lg:bg-transparent ${iconClass}`}>
                           <Icon className="h-6 w-6 lg:h-4 lg:w-4" />
                         </span>
                         <span className="block text-sm leading-tight lg:inline">{label}</span>
