@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { A4Container } from "@/components/ui/a4-container";
 import { normalizeWorkoutHtml } from "@/utils/htmlNormalizer";
 
-import { WORKOUT_CATEGORIES, getDifficultyFromStars } from "@/constants/workoutCategories";
+import { WORKOUT_CATEGORIES, STRENGTH_FOCUS_OPTIONS, isStrengthFocus } from "@/constants/workoutCategories";
 
 // Micro-workout fixed values (enforced by DB trigger too)
 const MICRO_WORKOUT_RULES = {
@@ -96,6 +96,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
     price: '',
     stripe_product_id: '',
     stripe_price_id: '',
+    focus: '',
   });
   const [sendNotification, setSendNotification] = useState(false);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
@@ -154,6 +155,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
         price: '',
         stripe_product_id: '',
         stripe_price_id: '',
+          focus: '',
       });
       setSendNotification(false); // Default to NOT sending notifications
     }
@@ -234,6 +236,15 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
         return;
       }
 
+      if (formData.category === 'STRENGTH' && !isStrengthFocus(formData.focus)) {
+        toast({
+          variant: "destructive",
+          title: "Strength Focus Required",
+          description: "Strength workouts must have one official Strength focus selected.",
+        });
+        return;
+      }
+
       // Validate that free content cannot be standalone purchase
       if (!formData.is_premium && formData.is_standalone_purchase) {
         toast({
@@ -308,6 +319,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
       // Prepare data with backward compatibility
       const saveData = {
         ...formData,
+        focus: formData.category === 'STRENGTH' ? formData.focus : null,
         image_url: imageUrl,
         main_workout: normalizedMainWorkout,
         finisher: normalizedFinisher,
@@ -518,6 +530,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
                   setFormData(prev => ({ 
                     ...prev, 
                     category: value,
+                    focus: value === 'STRENGTH' ? prev.focus : '',
                     // Auto-set format for restricted categories
                     ...(requiredFormat ? { format: requiredFormat } : {})
                   }));
@@ -534,6 +547,25 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
               </SelectContent>
             </Select>
           </div>
+
+          {formData.category === 'STRENGTH' && (
+            <div className="space-y-2">
+              <Label htmlFor="focus">4. Strength Focus *</Label>
+              <Select value={formData.focus || ''} onValueChange={(value) => setFormData({ ...formData, focus: value })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Strength focus" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  {STRENGTH_FOCUS_OPTIONS.map(focus => (
+                    <SelectItem key={focus} value={focus}>{focus}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Strength-only periodization focus. Other categories do not use this field.
+              </p>
+            </div>
+          )}
 
           {/* 2. Serial Number */}
           <div className="space-y-2">

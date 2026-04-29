@@ -608,6 +608,8 @@ serve(async (req) => {
       hasForcedParameters: !!forcedParameters
     });
 
+    const strengthFocusForWorkout = category === "STRENGTH" ? (periodization.strengthFocus || null) : null;
+
     // Duration calculation function - returns MAIN WORKOUT + FINISHER time ONLY
     // Warm-up (Soft Tissue 5' + Activation 10-15') and Cool Down (10') are constant overhead
     // and NOT included in the advertised duration. Customers care about "how long is the work?"
@@ -2777,6 +2779,7 @@ Return JSON with these exact fields:
           equipment: equipment,
           difficulty: selectedDifficulty.name,
           difficulty_stars: selectedDifficulty.stars,
+          focus: strengthFocusForWorkout,
           duration: finalDuration,
           description: normalizedDescription,
           main_workout: normalizedMainWorkout,

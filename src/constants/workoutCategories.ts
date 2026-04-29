@@ -13,6 +13,22 @@ export const WORKOUT_CATEGORIES = [
 
 export type WorkoutCategory = typeof WORKOUT_CATEGORIES[number];
 
+// Strength-only periodization focus values. Do not use these for non-Strength categories.
+export const STRENGTH_FOCUS_OPTIONS = [
+  "LOWER BODY",
+  "UPPER BODY",
+  "FULL BODY",
+  "LOW PUSH & UPPER PULL",
+  "LOW PULL & UPPER PUSH",
+  "CORE & GLUTES"
+] as const;
+
+export type StrengthFocus = typeof STRENGTH_FOCUS_OPTIONS[number];
+
+export const isStrengthFocus = (value: string | null | undefined): value is StrengthFocus => {
+  return STRENGTH_FOCUS_OPTIONS.includes(value as StrengthFocus);
+};
+
 // Difficulty levels including "All Levels"
 export const DIFFICULTY_OPTIONS = [
   { value: 0, label: "All Levels", stars: 0 },
