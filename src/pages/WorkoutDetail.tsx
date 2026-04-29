@@ -237,9 +237,14 @@ const WorkoutDetail = () => {
       
       // Level filter
       if (levelFilter !== "all" && workout.difficulty?.toLowerCase() !== levelFilter) return false;
+
+      // Strength-only focus filter
+      if (mappedCategory === "STRENGTH" && focusFilter !== "all") {
+        if (workout.focus !== focusFilter) return false;
+      }
       
-      // Format filter
-      if (formatFilter !== "all") {
+      // Format filter for non-Strength categories
+      if (mappedCategory !== "STRENGTH" && formatFilter !== "all") {
         const workoutFormat = workout.format?.toLowerCase();
         if (formatFilter === "reps & sets" && workoutFormat !== "reps & sets") return false;
         if (formatFilter === "for time" && workoutFormat !== "for time") return false;
@@ -306,8 +311,8 @@ const WorkoutDetail = () => {
     }
 
     return sorted;
-  }, [currentTypeWorkouts, debouncedSearch, equipmentFilter, levelFilter, formatFilter, 
-      durationFilter, statusFilter, sortBy, accessFilter, userId, interactions]);
+  }, [currentTypeWorkouts, debouncedSearch, equipmentFilter, levelFilter, focusFilter, formatFilter, 
+      durationFilter, statusFilter, sortBy, accessFilter, userId, interactions, mappedCategory]);
 
   return (
     <>
