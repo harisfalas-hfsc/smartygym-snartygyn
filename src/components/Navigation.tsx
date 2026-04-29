@@ -282,49 +282,51 @@ export const Navigation = () => {
           {/* LEFT SECTION - Hamburger Menu + Social Media Icons */}
           <div className="flex items-center gap-2">
             {/* Desktop Menu - original layout */}
-            <Sheet open={desktopMenuOpen} onOpenChange={setDesktopMenuOpen}>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="hidden lg:inline-flex h-16 w-16 -ml-4">
-                  <svg className="h-12 w-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                    <line x1="3" y1="4" x2="21" y2="4" />
-                    <line x1="3" y1="12" x2="21" y2="12" />
-                    <line x1="3" y1="20" x2="21" y2="20" />
-                  </svg>
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-64 overflow-y-auto max-h-screen">
-                <nav className="flex flex-col gap-2 mt-8 pb-8">
-                  {discoveryItems.map(({ label, path, icon: Icon, iconClass, track }) => (
-                    <Button
-                      key={path}
-                      variant="ghost"
-                      onClick={() => handleNavigate(path)}
-                      className={`justify-start font-semibold transition-all duration-200 ${location.pathname === path ? 'text-primary underline underline-offset-4 bg-primary/10' : 'text-foreground hover:bg-primary/10 hover:text-foreground'}`}
-                      data-track-cta={track}
-                    >
-                      <Icon className={`mr-2 h-4 w-4 ${iconClass}`} />
-                      {label}
-                    </Button>
-                  ))}
-                  {isAdmin && (
-                    <Button
-                      variant="ghost"
-                      onClick={() => {
-                        window.open('/admin', '_blank', 'noopener,noreferrer');
-                        setDesktopMenuOpen(false);
-                      }}
-                      className="justify-start font-semibold transition-all duration-200 text-red-600 hover:bg-red-100/80 hover:text-red-700"
-                    >
-                      <Shield className="mr-2 h-4 w-4 text-red-600" />
-                      Admin
-                    </Button>
-                  )}
-                </nav>
-              </SheetContent>
-            </Sheet>
+            {!isMobile && (
+              <Sheet open={desktopMenuOpen} onOpenChange={setDesktopMenuOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-12 w-12 sm:h-16 sm:w-16 -ml-4">
+                    <svg className="h-14 w-14 sm:h-12 sm:w-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                      <line x1="3" y1="4" x2="21" y2="4" />
+                      <line x1="3" y1="12" x2="21" y2="12" />
+                      <line x1="3" y1="20" x2="21" y2="20" />
+                    </svg>
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="w-64 overflow-y-auto max-h-screen">
+                  <nav className="flex flex-col gap-2 mt-8 pb-8">
+                    {discoveryItems.map(({ label, path, icon: Icon, iconClass, track }) => (
+                      <Button
+                        key={path}
+                        variant="ghost"
+                        onClick={() => handleNavigate(path)}
+                        className={`justify-start font-semibold transition-all duration-200 ${location.pathname === path ? 'text-primary underline underline-offset-4 bg-primary/10' : 'text-foreground hover:bg-primary/10 hover:text-foreground'}`}
+                        data-track-cta={track}
+                      >
+                        <Icon className={`mr-2 h-4 w-4 ${iconClass}`} />
+                        {label}
+                      </Button>
+                    ))}
+                    {isAdmin && (
+                      <Button
+                        variant="ghost"
+                        onClick={() => {
+                          window.open('/admin', '_blank', 'noopener,noreferrer');
+                          setDesktopMenuOpen(false);
+                        }}
+                        className="justify-start font-semibold transition-all duration-200 text-red-600 hover:bg-red-100/80 hover:text-red-700"
+                      >
+                        <Shield className="mr-2 h-4 w-4 text-red-600" />
+                        Admin
+                      </Button>
+                    )}
+                  </nav>
+                </SheetContent>
+              </Sheet>
+            )}
 
             {/* Mobile Discovery Menu */}
-            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+            {isMobile && <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" className="inline-flex lg:hidden h-12 min-w-0 gap-1.5 rounded-full px-2.5 -ml-2 text-primary">
                   <Compass className="h-6 w-6" />
@@ -371,7 +373,7 @@ export const Navigation = () => {
                   )}
                 </nav>
               </SheetContent>
-            </Sheet>
+            </Sheet>}
 
             {/* Social Media Icons */}
             <div className="hidden sm:flex items-center gap-2">
