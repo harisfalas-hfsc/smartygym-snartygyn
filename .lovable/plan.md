@@ -1,49 +1,43 @@
-Plan: place Smarty Coach next to the light/dark button
+I checked the live site and the code. The server is already sending the correct no-cache headers, so the main problem is not normal browser caching. The live site still has an active PWA service worker (`/sw.js`) that precaches the app shell and generated JS/CSS bundles. Once a browser has that worker installed, it can keep serving an old app version even after Publish/Update, especially across Safari/Chrome/Edge and installed PWA contexts.
 
-I will bring Smarty Coach back, but not as the old floating draggable button.
+The safest fix is to stop the old worker from controlling the app shell so aggressively, while keeping the installable PWA benefits as much as possible.
 
-What will change:
+Plan:
 
-1. Add a new header-style Smarty Coach button
-- It will sit in the right-side header controls next to the light/dark mode button.
-- It will use the same round structure as the theme button and avatar/login button.
-- Same size: 44px by 44px.
-- Same rounded shape.
-- Same primary border style.
-- Same hover behavior: primary background, primary-foreground icon/text behavior where appropriate.
+1. Ship a one-release service-worker cleanup/kill-switch
+   - Add static cleanup service workers at both likely paths: `/sw.js` and `/service-worker.js`.
+   - On activation, they will:
+     - take control immediately,
+     - delete old Workbox/PWA caches,
+     - navigate open tabs once with a small cleanup marker,
+     - unregister themselves after cleanup.
+   - This is important because simply changing or removing PWA code does not remove old service workers from browsers that already have them.
 
-2. Reuse the existing Smarty Coach modal/functionality
-- I will not delete the existing Smarty Coach functionality.
-- The button will simply open the existing Smarty Coach modal.
-- The old floating button behavior stays removed/unused.
+2. Keep installability, remove aggressive app-shell caching
+   - Remove `vite-plugin-pwa` service worker generation from the build for now.
+   - Keep PWA/mobile meta tags and add/use a manifest-only setup so users can still add SmartyGym to their home screen.
+   - This avoids the stale-cache issue while preserving the main “app-like” install experience.
+   - Offline caching of full app pages/workouts will be reduced temporarily, but this is the safer tradeoff to make updates reliable.
 
-3. Keep desktop/tablet/mobile layout safe
-- This change will add the new button inside the existing header control group, instead of using a fixed overlay.
-- It will not float over page content anymore.
-- It will not block scrolling or hide information.
-- The button will appear consistently across desktop, tablet, and mobile unless you later decide mobile-only or desktop-only.
+3. Add a normal static web manifest
+   - Create `public/manifest.webmanifest` with the existing app name, colors, icons, `display: standalone`, `scope`, and `start_url`.
+   - Add/ensure the manifest link exists in `index.html`.
+   - No cache-busting query tricks; the hosting layer already serves manifest and HTML with no-cache headers.
 
-4. Visual design
-- Use the Smarty Coach icon inside a circular bordered button.
-- Match the ThemeToggle button style closely:
+4. Clean up app registration code
+   - Remove the `virtual:pwa-register` import and auto-update logic from `src/main.tsx`, because the cleanup worker will handle old installs and there will no longer be a generated Workbox service worker to update.
+   - Keep the native-platform and preview safety cleanup logic where useful, but simplify it to avoid repeated reload behavior.
 
-```text
-[ Discovery ]        [ Logo ]        [ Coach ] [ Theme ] [ Avatar/Login ]
-```
+5. Keep service-worker messaging safe
+   - Leave the existing `navigator.serviceWorker` message listener in authenticated layouts harmlessly in place or make it defensive, so notification-related future code does not crash when no worker is active.
 
-On mobile, it will be part of the top navigation row, not stuck on the page body.
+6. Verify expected behavior after publishing
+   - After the next Publish/Update, affected browsers should receive the cleanup worker, delete old caches, reload once, and then load the current published app directly from the network.
+   - After that, normal refreshes should show new published versions without needing to clear cookies/history.
 
 Technical notes:
 
-- Update `src/components/Navigation.tsx` to render a new Smarty Coach trigger button beside `<ThemeToggle />`.
-- Import and render the existing `SmartyCoachModal` directly from `src/components/smarty-coach`.
-- Add local state in `Navigation` to open/close the modal.
-- Keep `src/App.tsx` without the floating `<SmartyCoachButton />`, so the old overlay does not return.
-- Do not change desktop menu alignment, Discovery layout, page content, routes, backend, or the existing modal logic.
-
-Verification after implementation:
-
-- Check mobile header at the current mobile/tablet-sized viewport.
-- Check desktop header alignment to make sure nothing shifts incorrectly.
-- Confirm clicking the new Coach button opens the existing Smarty Coach modal.
-- Confirm there is no floating button covering content anymore.
+- The live response for `https://smartygym.com/` already has `cache-control: no-cache, must-revalidate, max-age=0`, so repeated stale UI strongly points to the installed service worker rather than the web server.
+- The current live `/sw.js` precaches `index.html`, `assets/index-...js`, and `assets/index-...css`, which is exactly the pattern that can pin browsers to an old version.
+- This fix intentionally avoids refresh loops: the cleanup worker reloads controlled clients once using a URL marker, deletes caches, then unregisters.
+- If later you want full offline workout caching again, we can reintroduce it in a more limited way that never precaches `index.html` or the main app shell.
