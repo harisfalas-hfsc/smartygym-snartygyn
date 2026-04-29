@@ -1,5 +1,4 @@
 import { createRoot } from "react-dom/client";
-import { registerSW } from "virtual:pwa-register";
 import App from "./App.tsx";
 import "./index.css";
 import { isNativePlatform, configureStatusBar } from "./utils/native";
@@ -46,49 +45,6 @@ if (!isNativePlatform() && (isInIframe || isLovablePreviewHost)) {
 // DEV-only: Clear stuck service workers and caches from previous PWA builds
 if (import.meta.env.DEV && !isNativePlatform()) {
   clearServiceWorkersAndCaches();
-}
-
-if (import.meta.env.PROD && !isNativePlatform() && !isInIframe && !isLovablePreviewHost) {
-  const refreshRequestedKey = "smartygym-sw-refresh-requested";
-  const lastReloadKey = "smartygym-sw-last-reload";
-  let isReloadingForUpdate = false;
-
-  navigator.serviceWorker?.addEventListener("controllerchange", () => {
-    if (isReloadingForUpdate) return;
-    if (sessionStorage.getItem(refreshRequestedKey) !== "1") return;
-
-    const now = Date.now();
-    const lastReload = Number(sessionStorage.getItem(lastReloadKey) || "0");
-
-    sessionStorage.removeItem(refreshRequestedKey);
-
-    // Avoid refresh loops if a browser repeatedly fires controllerchange.
-    if (now - lastReload < 10_000) return;
-
-    isReloadingForUpdate = true;
-    sessionStorage.setItem(lastReloadKey, String(now));
-    window.location.reload();
-  });
-
-  const updateSW = registerSW({
-    immediate: true,
-    onNeedRefresh() {
-      sessionStorage.setItem(refreshRequestedKey, "1");
-      updateSW(true);
-    },
-    onRegisteredSW(_swUrl, registration) {
-      registration?.update();
-      if (registration?.waiting && navigator.serviceWorker.controller) {
-        sessionStorage.setItem(refreshRequestedKey, "1");
-        updateSW(true);
-      }
-      window.addEventListener("focus", () => registration?.update());
-      window.addEventListener("pageshow", () => registration?.update());
-      document.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === "visible") registration?.update();
-      });
-    },
-  });
 }
 
 createRoot(document.getElementById("root")!).render(<App />);
