@@ -332,9 +332,16 @@ export const Navigation = () => {
             {/* Mobile Discovery Menu */}
             {isMobile && <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" className="inline-flex lg:hidden h-12 min-w-0 gap-1.5 rounded-full border-2 border-primary px-2.5 -ml-2 text-primary hover:bg-primary hover:text-primary-foreground">
-                  <Compass className="h-6 w-6" />
-                  <span className="text-[10px] font-semibold leading-none tracking-normal">Discovery</span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="relative h-11 w-11 rounded-full -ml-2"
+                  aria-label="Open Discovery"
+                >
+                  <div className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-primary text-primary transition-colors hover:bg-primary hover:text-primary-foreground">
+                    <Compass className="h-5 w-5" />
+                  </div>
+                  <span className="sr-only">Discovery</span>
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" hideClose className="left-4 top-6 bottom-6 h-auto w-[calc(100vw-2rem)] max-w-none overflow-y-auto rounded-2xl border-2 border-primary/40 p-4 shadow-xl">
