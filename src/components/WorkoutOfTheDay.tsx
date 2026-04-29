@@ -1,43 +1,15 @@
-import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CalendarCheck, Clock, Dumbbell, Star, Crown, ShoppingBag, Archive, Home, TrendingUp, Layers, Target } from "lucide-react";
-import { getCyprusTodayStr } from "@/lib/cyprusDate";
+import { useTodayWods } from "@/hooks/useTodayWods";
 
 export const WorkoutOfTheDay = () => {
   const navigate = useNavigate();
-  
-  const cyprusToday = getCyprusTodayStr();
-  
-  const { data: wods, isLoading } = useQuery({
-    queryKey: ["workout-of-the-day", cyprusToday],
-    queryFn: async () => {
-      const { data, error } = await (supabase as any)
-        .rpc("get_visible_workout_metadata", { _workout_id: null });
-      
-      if (error && error.code !== "PGRST116") {
-        console.error("Error fetching WODs:", error);
-        return [];
-      }
 
-      return (data || []).filter(
-        (wod: any) => wod.is_workout_of_day === true && wod.generated_for_date === cyprusToday
-      );
-    },
-    staleTime: 1000 * 60 * 5,
-    refetchOnWindowFocus: true
-  });
-
-  // Handle different equipment types: BODYWEIGHT, EQUIPMENT, or VARIOUS (Recovery)
-  const bodyweightWOD = wods?.find(w => w.equipment === "BODYWEIGHT");
-  const equipmentWOD = wods?.find(w => w.equipment === "EQUIPMENT");
-  const variousWOD = wods?.find(w => w.equipment === "VARIOUS");
-  const isRecoveryDay = variousWOD && !bodyweightWOD && !equipmentWOD;
-  const hasWODs = bodyweightWOD || equipmentWOD || variousWOD;
+  const { bodyweightWod: bodyweightWOD, equipmentWod: equipmentWOD, variousWod: variousWOD, isRecoveryDay, hasWods: hasWODs, isLoading } = useTodayWods();
 
   const getDifficultyColor = (stars: number | null) => {
     if (!stars) return "bg-gray-500/20 text-gray-600 border-gray-500/40";
