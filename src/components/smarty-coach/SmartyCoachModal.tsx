@@ -23,6 +23,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { getWorkoutUrl } from "@/utils/smarty-coach/routes";
 import { DialogDescription } from "@/components/ui/dialog";
+import { fetchVisibleWorkoutMetadata } from "@/hooks/useTodayWods";
 
 interface SmartyCoachModalProps {
   isOpen: boolean;
@@ -78,12 +79,8 @@ export const SmartyCoachModal = ({ isOpen, onClose }: SmartyCoachModalProps) => 
   const { data: allContent = [], isLoading: contentLoading } = useQuery({
     queryKey: ['smarty-coach-workouts'],
     queryFn: async () => {
-      const { data } = await supabase
-        .from('admin_workouts')
-        .select('id, name, category, difficulty, duration, equipment, format, image_url, description, is_premium, type')
-        .eq('is_visible', true)
-        .order('created_at', { ascending: false });
-      return (data || []).map(w => ({
+      const data = await fetchVisibleWorkoutMetadata(null);
+      return data.map(w => ({
         ...w,
         category: w.category || w.type || 'General',
       })) as ContentItem[];
