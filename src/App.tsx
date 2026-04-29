@@ -67,7 +67,6 @@ import CorporateWellness from "./pages/CorporateWellness";
 import HumanPerformance from "./pages/HumanPerformance";
 import WhyInvestInSmartyGym from "./pages/WhyInvestInSmartyGym";
 import PremiumBenefits from "./pages/PremiumBenefits";
-import PremiumComparison from "./pages/PremiumComparison";
 import SmartyPlans from "./pages/SmartyPlans";
 
 import PaymentSuccess from "./pages/PaymentSuccess";
@@ -134,7 +133,8 @@ const AppContent = () => {
                   <Route path="/joinpremium" element={<JoinPremium />} />
                   <Route path="/join-premium" element={<JoinPremium />} />
                   <Route path="/premiumbenefits" element={<PremiumBenefits />} />
-                  <Route path="/premium-comparison" element={<PremiumComparison />} />
+                  <Route path="/premium-comparison" element={<Navigate to="/smarty-plans" replace />} />
+                  <Route path="/premiumcomparison" element={<Navigate to="/smarty-plans" replace />} />
                   <Route path="/smarty-plans" element={<SmartyPlans />} />
                   <Route path="/about" element={<About />} />
                   <Route path="/faq" element={<FAQ />} />
