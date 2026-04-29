@@ -31,11 +31,12 @@ import { useAccessControl } from "@/hooks/useAccessControl";
 import { useWorkoutInteractions } from "@/hooks/useWorkoutInteractions";
 import { supabase } from "@/integrations/supabase/client";
 import { stripHtmlTags } from "@/lib/text";
-import { isStrengthFocus } from "@/constants/workoutCategories";
+import { STRENGTH_FOCUS_OPTIONS, isStrengthFocus, type StrengthFocus } from "@/constants/workoutCategories";
 
 type EquipmentFilter = "all" | "bodyweight" | "equipment";
 type LevelFilter = "all" | "beginner" | "intermediate" | "advanced";
 type FormatFilter = "all" | "circuit" | "amrap" | "for time" | "tabata" | "reps & sets" | "emom" | "mix";
+type FocusFilter = "all" | StrengthFocus;
 type DurationFilter = "all" | "15" | "20" | "30" | "40" | "50" | "various";
 type StatusFilter = "all" | "viewed" | "completed" | "not-viewed" | "favorites";
 type SortByFilter = "newest" | "oldest" | "name-asc" | "name-desc";
@@ -62,6 +63,7 @@ const WorkoutDetail = () => {
   const [equipmentFilter, setEquipmentFilter] = useState<EquipmentFilter>("all");
   const [levelFilter, setLevelFilter] = useState<LevelFilter>("all");
   const [formatFilter, setFormatFilter] = useState<FormatFilter>("all");
+  const [focusFilter, setFocusFilter] = useState<FocusFilter>("all");
   const [durationFilter, setDurationFilter] = useState<DurationFilter>("all");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [sortBy, setSortBy] = useState<SortByFilter>("newest");
@@ -107,14 +109,16 @@ const WorkoutDetail = () => {
     setEquipmentFilter("all");
     setLevelFilter("all");
     setFormatFilter("all");
+    setFocusFilter("all");
     setDurationFilter("all");
     setStatusFilter("all");
     setSortBy("newest");
     setAccessFilter("all");
   };
 
+  const isStrengthPage = type === "strength";
   const hasActiveFilters = searchTerm || equipmentFilter !== "all" || levelFilter !== "all" || 
-    formatFilter !== "all" || durationFilter !== "all" || statusFilter !== "all" || sortBy !== "newest" || accessFilter !== "all";
+    (isStrengthPage ? focusFilter !== "all" : formatFilter !== "all") || durationFilter !== "all" || statusFilter !== "all" || sortBy !== "newest" || accessFilter !== "all";
   
   if (import.meta.env.DEV) {
     console.log("📦 All Workouts:", allWorkouts.length, allWorkouts);
