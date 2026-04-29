@@ -45,6 +45,7 @@ export const Navigation = () => {
   const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo | null>(null);
   const [corporateSubscription, setCorporateSubscription] = useState<CorporateSubscriptionInfo | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [desktopMenuOpen, setDesktopMenuOpen] = useState(false);
   const { data: unreadCount = 0, refetch: refetchUnread } = useUnreadMessages();
   const isMobile = useIsMobile();
   const { isAdmin } = useAdminRole();
@@ -247,6 +248,7 @@ export const Navigation = () => {
   const handleNavigate = (path: string) => {
     navigate(path);
     setMobileMenuOpen(false);
+    setDesktopMenuOpen(false);
     // Scroll to top after navigation
     setTimeout(() => window.scrollTo(0, 0), 0);
   };
