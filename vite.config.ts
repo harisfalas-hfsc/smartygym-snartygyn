@@ -52,8 +52,25 @@ export default defineConfig(({ mode }) => ({
         globIgnores: ["**/service-worker.js"],
         // Navigation fallback for SPA
         navigateFallback: "/index.html",
-        navigateFallbackDenylist: [/^\/api/, /^\/supabase/],
+        navigateFallbackDenylist: [/^\/api/, /^\/supabase/, /^\/~oauth/],
         runtimeCaching: [
+          // App shell navigations should prefer the network so published updates
+          // are discovered quickly, while still falling back offline.
+          {
+            urlPattern: ({ request }) => request.mode === "navigate",
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "html-pages",
+              networkTimeoutSeconds: 3,
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24
+              },
+              cacheableResponse: {
+                statuses: [200]
+              }
+            }
+          },
           // Cache Google Fonts
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
