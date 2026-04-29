@@ -21,7 +21,6 @@ import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 
 import { SafeNotificationBadge } from "@/components/NotificationBadge";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { useAdminRole } from "@/hooks/useAdminRole";
 import { SmartyCoachModal } from "@/components/smarty-coach";
 import smartyCoachIcon from "@/assets/smarty-coach-icon.png";
@@ -50,7 +49,6 @@ export const Navigation = () => {
   const [desktopMenuOpen, setDesktopMenuOpen] = useState(false);
   const [smartyCoachOpen, setSmartyCoachOpen] = useState(false);
   const { data: unreadCount = 0, refetch: refetchUnread } = useUnreadMessages();
-  const isMobile = useIsMobile();
   const { isAdmin } = useAdminRole();
   const headerRef = useRef<HTMLElement>(null);
 
