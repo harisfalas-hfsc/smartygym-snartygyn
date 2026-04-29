@@ -52,6 +52,7 @@ export const Navigation = () => {
 
   // Dynamically set --app-header-h CSS variable based on actual header height
   useLayoutEffect(() => {
+    let frame = 0;
     const updateHeaderHeight = () => {
       if (headerRef.current) {
         const height = headerRef.current.offsetHeight;
@@ -61,12 +62,18 @@ export const Navigation = () => {
 
     updateHeaderHeight();
 
-    const resizeObserver = new ResizeObserver(updateHeaderHeight);
+    const resizeObserver = new ResizeObserver(() => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(updateHeaderHeight);
+    });
     if (headerRef.current) {
       resizeObserver.observe(headerRef.current);
     }
 
-    return () => resizeObserver.disconnect();
+    return () => {
+      cancelAnimationFrame(frame);
+      resizeObserver.disconnect();
+    };
   }, []);
 
   // Listen for messages being read to update badge immediately
@@ -251,19 +258,19 @@ export const Navigation = () => {
   };
 
   const discoveryItems = [
-    { label: "Smarty Workouts", path: "/workout", icon: Dumbbell, track: undefined },
-    { label: "Smarty Programs", path: "/trainingprogram", icon: ListChecks, track: undefined },
-    { label: "Smarty Ritual", path: "/daily-ritual", icon: Sparkles, track: undefined },
-    { label: "Smarty Tools", path: "/tools", icon: Wrench, track: undefined },
-    { label: "Exercise Library", path: "/exerciselibrary", icon: BookOpen, track: undefined },
-    { label: "Community", path: "/community", icon: Users, track: undefined },
-    { label: "Blog", path: "/blog", icon: Newspaper, track: undefined },
-    { label: "Take a Tour", path: "/takeatour", icon: Info, track: undefined },
-    { label: "Smarty Plans", path: "/smarty-plans", icon: Crown, track: "view-plans-nav" },
-    { label: "Smarty Corporate", path: "/corporate", icon: Building2, track: undefined },
-    { label: "FAQ", path: "/faq", icon: HelpCircle, track: undefined },
-    { label: "The Smarty Method", path: "/the-smarty-method", icon: BookOpen, track: undefined },
-    { label: "Contact", path: "/contact", icon: Mail, track: undefined },
+    { label: "Smarty Workouts", path: "/workout", icon: Dumbbell, iconClass: "text-primary", track: undefined },
+    { label: "Smarty Programs", path: "/trainingprogram", icon: ListChecks, iconClass: "text-blue-500", track: undefined },
+    { label: "Smarty Ritual", path: "/daily-ritual", icon: Sparkles, iconClass: "text-purple-500", track: undefined },
+    { label: "Smarty Tools", path: "/tools", icon: Wrench, iconClass: "text-orange-500", track: undefined },
+    { label: "Exercise Library", path: "/exerciselibrary", icon: BookOpen, iconClass: "text-emerald-500", track: undefined },
+    { label: "Community", path: "/community", icon: Users, iconClass: "text-cyan-500", track: undefined },
+    { label: "Blog", path: "/blog", icon: Newspaper, iconClass: "text-red-500", track: undefined },
+    { label: "Take a Tour", path: "/takeatour", icon: Info, iconClass: "text-teal-500", track: undefined },
+    { label: "Smarty Plans", path: "/smarty-plans", icon: Crown, iconClass: "text-yellow-500", track: "view-plans-nav" },
+    { label: "Smarty Corporate", path: "/corporate", icon: Building2, iconClass: "text-sky-500", track: undefined },
+    { label: "FAQ", path: "/faq", icon: HelpCircle, iconClass: "text-purple-500", track: undefined },
+    { label: "The Smarty Method", path: "/the-smarty-method", icon: BookOpen, iconClass: "text-amber-500", track: undefined },
+    { label: "Contact", path: "/contact", icon: Mail, iconClass: "text-indigo-500", track: undefined },
   ];
 
   return (
