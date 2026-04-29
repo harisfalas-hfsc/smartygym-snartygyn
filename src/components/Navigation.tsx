@@ -23,6 +23,8 @@ import { SafeNotificationBadge } from "@/components/NotificationBadge";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAdminRole } from "@/hooks/useAdminRole";
+import { SmartyCoachModal } from "@/components/smarty-coach";
+import smartyCoachIcon from "@/assets/smarty-coach-icon.png";
 
 interface SubscriptionInfo {
   subscribed: boolean;
@@ -46,6 +48,7 @@ export const Navigation = () => {
   const [corporateSubscription, setCorporateSubscription] = useState<CorporateSubscriptionInfo | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [desktopMenuOpen, setDesktopMenuOpen] = useState(false);
+  const [smartyCoachOpen, setSmartyCoachOpen] = useState(false);
   const { data: unreadCount = 0, refetch: refetchUnread } = useUnreadMessages();
   const isMobile = useIsMobile();
   const { isAdmin } = useAdminRole();
@@ -276,6 +279,7 @@ export const Navigation = () => {
   ];
 
   return (
+    <>
     <header ref={headerRef} className="fixed top-0 left-0 right-0 z-50 bg-background pt-2 pb-0.5 px-4">
       <div className="mx-auto max-w-7xl">
         <div className="flex justify-between items-center gap-4">
@@ -440,6 +444,18 @@ export const Navigation = () => {
 
            {/* Right Side - Auth */}
            <div className="flex items-center gap-2">
+             <Button
+               variant="ghost"
+               size="icon"
+               onClick={() => setSmartyCoachOpen(true)}
+               className="relative h-11 w-11 rounded-full"
+               aria-label="Open Smarty Coach"
+             >
+               <div className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-primary transition-colors hover:bg-primary hover:text-primary-foreground">
+                 <img src={smartyCoachIcon} alt="" className="h-8 w-8 rounded-full" loading="lazy" width={32} height={32} />
+               </div>
+               <span className="sr-only">Smarty Coach</span>
+             </Button>
              <div><ThemeToggle /></div>
              {/* Admin Button - only visible to admins */}
             {isAdmin && (
@@ -627,5 +643,7 @@ export const Navigation = () => {
         </div>
       </div>
     </header>
+    <SmartyCoachModal isOpen={smartyCoachOpen} onClose={() => setSmartyCoachOpen(false)} />
+    </>
   );
 };
