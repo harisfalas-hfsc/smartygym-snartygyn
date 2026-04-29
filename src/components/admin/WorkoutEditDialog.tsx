@@ -236,6 +236,15 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
         return;
       }
 
+      if (formData.category === 'STRENGTH' && !isStrengthFocus(formData.focus)) {
+        toast({
+          variant: "destructive",
+          title: "Strength Focus Required",
+          description: "Strength workouts must have one official Strength focus selected.",
+        });
+        return;
+      }
+
       // Validate that free content cannot be standalone purchase
       if (!formData.is_premium && formData.is_standalone_purchase) {
         toast({
@@ -310,6 +319,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
       // Prepare data with backward compatibility
       const saveData = {
         ...formData,
+        focus: formData.category === 'STRENGTH' ? formData.focus : null,
         image_url: imageUrl,
         main_workout: normalizedMainWorkout,
         finisher: normalizedFinisher,
