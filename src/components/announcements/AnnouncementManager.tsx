@@ -58,14 +58,32 @@ export const AnnouncementManager = () => {
     }, PARQ_POPUP_DELAY_MS);
   }, []);
 
-  // Trigger Ritual modal (when WOD is skipped or not available)
-  const triggerRitualModalIfNeeded = useCallback(() => {
+  // Trigger Ritual modal only when today's WODs are genuinely unavailable
+  const triggerRitualModalIfNeeded = useCallback(async () => {
     const ritualShownKey = getTodayKey("ritual_announcement_shown");
     const ritualAlreadyShown = localStorage.getItem(ritualShownKey) === "true";
     const ritualDontShow = localStorage.getItem(getTodayKey("ritual_dont_show")) === "true";
 
     if (ritualAlreadyShown || ritualDontShow) {
       console.log("[AnnouncementManager] Ritual already shown or don't show - skipping");
+      return;
+    }
+
+    const cyprusToday = getCyprusTodayStr();
+    const { data, error } = await (supabase as any)
+      .rpc("get_visible_workout_metadata", { _workout_id: null });
+
+    if (error) {
+      console.error("[AnnouncementManager] Could not verify WOD availability:", error);
+      return;
+    }
+
+    const todaysWods = (data || []).filter(
+      (wod: any) => wod.is_workout_of_day === true && wod.generated_for_date === cyprusToday
+    );
+
+    if (todaysWods.length > 0) {
+      console.log("[AnnouncementManager] Today's WODs available - skipping Ritual fallback");
       return;
     }
 
