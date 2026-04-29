@@ -26,7 +26,8 @@ export const SmartyCoachButton = ({ className }: SmartyCoachButtonProps) => {
 
   const getDefaultTop = useCallback(() => {
     const headerH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--app-header-h') || '100');
-    return headerH + 8;
+    const isMobile = window.innerWidth < 1024;
+    return headerH + (isMobile ? 56 : 8);
   }, []);
 
   useEffect(() => {
