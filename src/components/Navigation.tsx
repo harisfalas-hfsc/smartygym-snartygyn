@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User as UserIcon, Settings, LogOut, LayoutDashboard, Crown, Menu, Bell, Facebook, Instagram, Youtube, ShoppingBag, Info, Dumbbell, ListChecks, Wrench, BookOpen, Users, Newspaper, Mail, Sparkles, Building2, Shield, HelpCircle, Compass } from "lucide-react";
+import { User as UserIcon, Settings, LogOut, LayoutDashboard, Crown, Bell, Facebook, Instagram, Youtube, ShoppingBag, Info, Dumbbell, ListChecks, Wrench, BookOpen, Users, Newspaper, Mail, Sparkles, Building2, Shield, HelpCircle, Compass } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
@@ -275,17 +275,22 @@ export const Navigation = () => {
             {/* Mobile Discovery Menu */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" className="h-12 min-w-0 gap-1.5 rounded-full px-2.5 -ml-2 text-primary sm:h-16 sm:px-4">
-                  <Compass className="h-6 w-6" />
-                  <span className="text-[10px] font-semibold leading-none tracking-normal sm:text-sm">Discovery</span>
+                <Button variant="ghost" className="h-12 min-w-0 gap-1.5 rounded-full px-2.5 -ml-2 text-primary lg:h-16 lg:w-16 lg:rounded-md lg:px-0 lg:-ml-4">
+                  <Compass className="h-6 w-6 lg:hidden" />
+                  <span className="text-[10px] font-semibold leading-none tracking-normal lg:hidden">Discovery</span>
+                  <svg className="hidden h-12 w-12 lg:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <line x1="3" y1="4" x2="21" y2="4" />
+                    <line x1="3" y1="12" x2="21" y2="12" />
+                    <line x1="3" y1="20" x2="21" y2="20" />
+                  </svg>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="h-[100dvh] w-screen max-w-none overflow-y-auto border-r-0 p-4 pt-12 sm:w-64 sm:max-w-sm sm:border-r sm:p-6">
-                <div className="mb-5">
+              <SheetContent side="left" className="h-[100dvh] w-screen max-w-none overflow-y-auto border-r-0 p-4 pt-12 lg:w-64 lg:max-w-sm lg:border-r lg:p-6">
+                <div className="mb-5 lg:hidden">
                   <p className="text-xs font-semibold uppercase tracking-normal text-primary">Discovery</p>
                   <h2 className="mt-1 text-2xl font-bold leading-tight text-foreground">Explore SmartyGym</h2>
                 </div>
-                <nav className="grid grid-cols-2 gap-3 pb-8 sm:flex sm:flex-col sm:gap-2">
+                <nav className="grid grid-cols-2 gap-3 pb-8 lg:mt-8 lg:flex lg:flex-col lg:gap-2">
                   {discoveryItems.map(({ label, path, icon: Icon, track }) => {
                     const active = location.pathname === path;
                     return (
@@ -294,12 +299,12 @@ export const Navigation = () => {
                         type="button"
                         onClick={() => handleNavigate(path)}
                         data-track-cta={track}
-                        className={`min-h-[112px] rounded-2xl border-2 p-3 text-center font-semibold transition-all duration-200 sm:min-h-0 sm:justify-start sm:rounded-md sm:p-2 ${active ? 'border-primary bg-primary/15 text-primary shadow-sm' : 'border-primary/25 bg-card text-foreground hover:border-primary hover:bg-primary/10'}`}
+                        className={`min-h-[112px] rounded-2xl border-2 p-3 text-center font-semibold transition-all duration-200 lg:flex lg:min-h-0 lg:items-center lg:justify-start lg:rounded-md lg:border-0 lg:p-2 lg:text-left ${active ? 'border-primary bg-primary/15 text-primary shadow-sm lg:underline lg:underline-offset-4' : 'border-primary/25 bg-card text-foreground hover:border-primary hover:bg-primary/10'}`}
                       >
-                        <span className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary sm:mb-0 sm:mr-2 sm:inline-flex sm:h-8 sm:w-8">
-                          <Icon className="h-6 w-6 sm:h-4 sm:w-4" />
+                        <span className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary lg:mb-0 lg:mr-2 lg:inline-flex lg:h-8 lg:w-8">
+                          <Icon className="h-6 w-6 lg:h-4 lg:w-4" />
                         </span>
-                        <span className="block text-sm leading-tight sm:inline">{label}</span>
+                        <span className="block text-sm leading-tight lg:inline">{label}</span>
                       </button>
                     );
                   })}
@@ -310,12 +315,12 @@ export const Navigation = () => {
                         window.open('/admin', '_blank', 'noopener,noreferrer');
                         setMobileMenuOpen(false);
                       }}
-                      className="min-h-[112px] rounded-2xl border-2 border-destructive/25 bg-card p-3 text-center font-semibold text-destructive transition-all duration-200 hover:border-destructive hover:bg-destructive/10 sm:min-h-0 sm:rounded-md sm:p-2"
+                      className="min-h-[112px] rounded-2xl border-2 border-destructive/25 bg-card p-3 text-center font-semibold text-destructive transition-all duration-200 hover:border-destructive hover:bg-destructive/10 lg:flex lg:min-h-0 lg:items-center lg:justify-start lg:rounded-md lg:border-0 lg:p-2 lg:text-left"
                     >
-                      <span className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 text-destructive sm:mb-0 sm:mr-2 sm:inline-flex sm:h-8 sm:w-8">
-                        <Shield className="h-6 w-6 sm:h-4 sm:w-4" />
+                      <span className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 text-destructive lg:mb-0 lg:mr-2 lg:inline-flex lg:h-8 lg:w-8">
+                        <Shield className="h-6 w-6 lg:h-4 lg:w-4" />
                       </span>
-                      <span className="block text-sm leading-tight sm:inline">Admin</span>
+                      <span className="block text-sm leading-tight lg:inline">Admin</span>
                     </button>
                   )}
                 </nav>
