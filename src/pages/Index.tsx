@@ -6,7 +6,7 @@ import { ServiceCard } from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap, Check, Crown, ChevronDown, ChevronLeft, ChevronRight, Move, Ban, Brain, CheckCircle2, Award, Shield, Compass, Sparkles, Info, User, HelpCircle, ShoppingBag, Star, TrendingUp, Clock, CalendarCheck, Newspaper } from "lucide-react";
+import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap, Check, Crown, ChevronDown, ChevronLeft, ChevronRight, Move, Ban, Brain, CheckCircle2, Award, Shield, Compass, Sparkles, Info, User, HelpCircle, ShoppingBag, Star, TrendingUp, Clock, CalendarCheck } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { User as SupabaseUser } from "@supabase/supabase-js";
@@ -566,97 +566,222 @@ const Index = () => {
           <PageBreadcrumbs items={[{ label: "Home" }]} />
         </div>
         
-        {isMobile ? <section className="px-4 pb-6 pt-2">
-          <div className="mb-5">
-            <p className="text-sm font-semibold text-primary">Hello, Smarty</p>
-            <h1 className="mt-1 text-3xl font-bold leading-tight text-foreground">Ready to train today?</h1>
-          </div>
-
-          <div onClick={() => navigate('/workout/wod')} className="mb-5 overflow-hidden rounded-2xl border-2 border-primary/40 bg-card shadow-sm active:scale-[0.99] transition-transform cursor-pointer">
-            <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
-              <div className="flex items-center gap-3">
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  <Flame className="h-5 w-5" />
-                </span>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-primary">Today</p>
-                  <h2 className="text-base font-bold text-foreground">Workout of the Day</h2>
-                </div>
-              </div>
-              <ChevronRight className="h-5 w-5 text-muted-foreground" />
+        {isMobile ? <section className="pt-4 pb-2 px-4">
+            {/* Mobile swipe indicator (homepage carousel) */}
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <button
+                type="button"
+                onClick={() => carouselApi?.scrollPrev()}
+                className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors"
+                aria-label="Previous card"
+              >
+                <ChevronLeft className="h-4 w-4 text-primary" />
+              </button>
+              <span className="text-xs text-muted-foreground font-medium">Swipe to explore</span>
+              <button
+                type="button"
+                onClick={() => carouselApi?.scrollNext()}
+                className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors"
+                aria-label="Next card"
+              >
+                <ChevronRight className="h-4 w-4 text-primary" />
+              </button>
             </div>
-            {hasWods ? (
-              <div className="grid grid-cols-1 gap-3 p-3">
-                {[bodyweightWod, equipmentWod, variousWod].filter(Boolean).map((wod: any) => (
-                  <div key={wod.id} className="flex min-h-[92px] overflow-hidden rounded-xl border border-border bg-background">
-                    <img
-                      src={wod.image_url || '/placeholder.svg'}
-                      alt={wod.name}
-                      className="h-[92px] w-[104px] shrink-0 object-cover"
-                      onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
-                    />
-                    <div className="flex min-w-0 flex-1 flex-col justify-center p-3">
-                      <p className="line-clamp-1 text-sm font-bold text-foreground">{wod.name}</p>
-                      <div className="mt-2 flex flex-wrap gap-1.5 text-[10px] font-semibold uppercase tracking-wide">
-                        <span className="rounded-full bg-primary/10 px-2 py-1 text-primary">{wod.equipment || 'Workout'}</span>
-                        {wod.format && <span className="rounded-full bg-muted px-2 py-1 text-muted-foreground">{wod.format}</span>}
+
+            <Carousel className="w-full" opts={{
+          align: "center",
+          loop: true
+        }} setApi={setCarouselApi}>
+              <CarouselContent className="-ml-2">
+                {heroCards.map(card => {
+              const Icon = card.icon;
+return <CarouselItem key={card.id} className="pl-2 basis-[75%] sm:basis-[60%]">
+                      <div onClick={() => navigate(card.route)} className="border-2 border-primary/40 rounded-xl overflow-hidden hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300 cursor-pointer bg-card flex flex-col h-[220px] sm:h-[280px]">
+                        {/* Image Section */}
+                        <div className="relative h-[55%] overflow-hidden flex-shrink-0">
+                          <img 
+                            src={card.image} 
+                            alt={card.title}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        
+                        {/* Content Section */}
+                        <div className="flex flex-col justify-center flex-1 p-3 text-center">
+                          <div className="flex items-center justify-center gap-2 mb-1">
+                            <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                              <Icon className="w-3.5 h-3.5 text-primary" />
+                            </div>
+                            <h3 className="text-sm font-bold text-foreground leading-tight whitespace-nowrap">
+                              {card.title}
+                            </h3>
+                          </div>
+                          <p className="text-xs text-muted-foreground leading-snug line-clamp-2">
+                            {card.description}
+                          </p>
+                          <div className="flex items-center justify-center gap-1 text-primary text-[10px] font-medium mt-1">
+                            Explore
+                            <ChevronRight className="w-3 h-3" />
+                          </div>
+                        </div>
                       </div>
-                    </div>
+                    </CarouselItem>;
+            })}
+              </CarouselContent>
+              
+              {/* Arrows positioned OUTSIDE cards */}
+              <CarouselPrevious className="hidden -left-12 bg-background border-2 border-primary shadow-lg" />
+              <CarouselNext className="hidden -right-12 bg-background border-2 border-primary shadow-lg" />
+            </Carousel>
+
+            {/* Carousel Dots */}
+            <div className="flex justify-center gap-2 mt-4">
+              {heroCards.map((_, index) => <button key={index} onClick={() => carouselApi?.scrollTo(index)} className={cn("w-2.5 h-2.5 rounded-full transition-all duration-300", currentSlide === index ? "bg-primary scale-125" : "bg-primary/30 hover:bg-primary/50")} aria-label={`Go to slide ${index + 1}`} />)}
+            </div>
+
+        {/* Quick Access Menu */}
+        <div className="mt-8 space-y-3">
+          {/* WOD Card - Always visible with "Being Prepared" fallback */}
+          <div 
+            onClick={() => navigate('/workout/wod')} 
+            className="py-3 px-4 bg-primary/5 border-2 border-emerald-400 dark:border-emerald-500 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 transition-all cursor-pointer hover:shadow-md"
+          >
+            {/* Header */}
+            <div className="flex items-center gap-2 mb-3">
+              <Dumbbell className="w-5 h-5 text-primary flex-shrink-0" />
+              <span className="text-sm font-bold text-foreground">Your Workout of the Day</span>
+              <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
+            </div>
+            
+            {hasWods ? (
+              /* Workout images - dynamic columns based on count */
+              (() => {
+                const wodCards = [bodyweightWod, equipmentWod, variousWod].filter(Boolean);
+                const wodCount = wodCards.length;
+                return (
+                  <div className={`grid ${wodCount === 1 ? 'grid-cols-1' : 'grid-cols-2'} gap-3`}>
+                    {/* Bodyweight workout */}
+                    {bodyweightWod && (
+                      <div className="relative rounded-lg overflow-hidden border border-border">
+                        <img 
+                          src={bodyweightWod.image_url || '/placeholder.svg'} 
+                          alt={bodyweightWod.name}
+className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-cover`}
+                          onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
+                        />
+                        <Badge className="absolute top-1 left-1 bg-green-500 hover:bg-green-500 text-white text-[10px] px-1.5 py-0.5">No Equipment</Badge>
+                        <div className="p-2 bg-background/90">
+                          <p className="text-xs font-semibold line-clamp-1">{bodyweightWod.name}</p>
+                          <div className="flex items-center gap-1 text-[9px] text-muted-foreground">
+                            <span className="text-red-500">{bodyweightWod.category}</span>
+                            {bodyweightWod.format && (
+                              <>
+                                <span>•</span>
+                                <span>{bodyweightWod.format}</span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Equipment workout */}
+                    {equipmentWod && (
+                      <div className="relative rounded-lg overflow-hidden border border-border">
+                        <img 
+                          src={equipmentWod.image_url || '/placeholder.svg'} 
+                          alt={equipmentWod.name}
+className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-cover`}
+                          onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
+                        />
+                        <Badge className="absolute top-1 left-1 bg-orange-500 hover:bg-orange-500 text-white text-[10px] px-1.5 py-0.5">With Equipment</Badge>
+                        <div className="p-2 bg-background/90">
+                          <p className="text-xs font-semibold line-clamp-1">{equipmentWod.name}</p>
+                          <div className="flex items-center gap-1 text-[9px] text-muted-foreground">
+                            <span className="text-red-500">{equipmentWod.category}</span>
+                            {equipmentWod.format && (
+                              <>
+                                <span>•</span>
+                                <span>{equipmentWod.format}</span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    {variousWod && !bodyweightWod && !equipmentWod && (
+                      <div className="relative rounded-lg overflow-hidden border border-border">
+                        <img 
+                          src={variousWod.image_url || '/placeholder.svg'} 
+                          alt={variousWod.name}
+className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-cover`}
+                          onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
+                        />
+                        <Badge className="absolute top-1 left-1 bg-cyan-500 hover:bg-cyan-500 text-white text-[10px] px-1.5 py-0.5">Recovery</Badge>
+                        <div className="p-2 bg-background/90">
+                          <p className="text-xs font-semibold line-clamp-1">{variousWod.name}</p>
+                          <div className="flex items-center gap-1 text-[9px] text-muted-foreground">
+                            <span className="text-red-500">{variousWod.category}</span>
+                            {variousWod.format && (
+                              <>
+                                <span>•</span>
+                                <span>{variousWod.format}</span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                ))}
-              </div>
+                );
+              })()
             ) : (
-              <div className="px-5 py-8 text-center">
-                <Clock className="mx-auto mb-3 h-10 w-10 text-primary/60" />
-                <p className="font-bold text-foreground">Today's workouts are being prepared</p>
-                <p className="mt-1 text-sm text-muted-foreground">Check back soon for your fresh daily sessions.</p>
+              /* Being Prepared fallback */
+              <div className="text-center py-4">
+                <Clock className="w-10 h-10 text-primary/50 mx-auto mb-2" />
+                <p className="text-sm font-semibold text-foreground">Today's Workouts are Being Prepared</p>
+                <p className="text-xs text-muted-foreground">
+                  Check back <span className="text-primary font-semibold">soon</span> for your fresh Workouts of the Day!
+                </p>
               </div>
             )}
           </div>
 
-          <div className="mb-6 grid grid-cols-2 gap-3">
-            {[
-              { title: 'Start Workout', route: '/workout', icon: Dumbbell },
-              { title: 'Choose Program', route: '/trainingprogram', icon: Calendar },
-              { title: 'Open Tools', route: '/tools', icon: Wrench },
-              { title: 'Exercise Library', route: '/exerciselibrary', icon: BookOpen },
-            ].map((item) => {
-              const Icon = item.icon;
-              return (
-                <button key={item.title} type="button" onClick={() => navigate(item.route)} className="flex min-h-[104px] flex-col justify-between rounded-2xl border border-border bg-card p-4 text-left active:scale-[0.98] transition-transform">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
-                    <Icon className="h-5 w-5" />
-                  </span>
-                  <span className="text-base font-bold leading-tight text-foreground">{item.title}</span>
-                </button>
-              );
-            })}
+          <div onClick={() => navigate('/about')} className="flex items-center gap-2.5 py-3 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md">
+            <Info className="w-5 h-5 text-primary flex-shrink-0" />
+            <span className="text-base font-medium">About SmartyGym</span>
+            <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
           </div>
+          
+          <div onClick={() => navigate('/smarty-plans')} className="flex items-center gap-2.5 py-1.5 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md">
+            <Crown className="w-5 h-5 text-primary flex-shrink-0" />
+            <span className="text-base font-medium">Smarty Plans</span>
+            <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
+          </div>
+          
+              <div onClick={() => navigate('/faq')} className="flex items-center gap-2.5 py-1.5 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md">
+            <HelpCircle className="w-5 h-5 text-primary flex-shrink-0" />
+            <span className="text-base font-medium">FAQ</span>
+            <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
+          </div>
+          
+          <div onClick={() => navigate('/human-performance')} className="flex items-center gap-2.5 py-1.5 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md">
+            <TrendingUp className="w-5 h-5 text-primary flex-shrink-0" />
+            <span className="text-base font-medium">Why SmartyGym?</span>
+            <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
+          </div>
+          
+          {!isPremium && (
+              <div onClick={() => navigate('/joinpremium')} className="flex items-center gap-2.5 py-1.5 px-4 bg-primary/10 border-2 border-primary rounded-lg hover:bg-primary/20 transition-all cursor-pointer hover:shadow-md">
+              <Crown className="w-5 h-5 text-primary flex-shrink-0" />
+              <span className="text-base font-medium text-primary">Join SmartyGym now</span>
+              <ChevronRight className="w-5 h-5 ml-auto text-primary" />
+            </div>
+          )}
+        </div>
 
-          <div className="space-y-3">
-            <h2 className="text-lg font-bold text-foreground">Discover</h2>
-            {[
-              { title: 'Smarty Rituals', description: 'Daily recovery and wellness practice', route: '/daily-ritual', icon: Sparkles },
-              { title: 'Community', description: 'Challenges, progress and shared momentum', route: '/community', icon: Users },
-              { title: 'Blog', description: 'Evidence-based fitness and wellness articles', route: '/blog', icon: Newspaper },
-              { title: 'Smarty Plans', description: 'Unlock the full training ecosystem', route: '/smarty-plans', icon: Crown },
-            ].map((item) => {
-              const Icon = item.icon;
-              return (
-                <button key={item.title} type="button" onClick={() => navigate(item.route)} className="flex w-full items-center gap-3 rounded-2xl border border-border bg-card p-3 text-left active:scale-[0.99] transition-transform">
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                    <Icon className="h-5 w-5" />
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-sm font-bold text-foreground">{item.title}</span>
-                    <span className="line-clamp-1 text-xs text-muted-foreground">{item.description}</span>
-                  </span>
-                  <ChevronRight className="h-5 w-5 shrink-0 text-muted-foreground" />
-                </button>
-              );
-            })}
-          </div>
-        </section> : <>
+
+          </section> : <>
             {/* Desktop: Hero Section */}
             <section className="relative py-2 sm:py-2 bg-background overflow-hidden my-0">
           
