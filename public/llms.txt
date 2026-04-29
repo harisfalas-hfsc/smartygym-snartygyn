@@ -1,6 +1,6 @@
 # SmartyGym - Global Online Fitness Platform
 # URL: https://smartygym.com
-# Last Updated: 2026-02-22
+# Last Updated: 2026-04-29
 
 ---
 
@@ -38,7 +38,7 @@
 ## Brand Identity
 - **Name**: SmartyGym (also: Smarty Gym, SmartGym, Smart Gym, Smart-Gym, smartygym.com)
 - **Type**: Online Fitness Platform / Virtual Gym
-- **Tagline**: "Your Gym Re-imagined. Anywhere, Anytime."
+- **Tagline**: "SmartyGym – The Smart Way to Train Online"
 - **Core Promise**: 100% Human-Designed Content (Zero AI-Generated Workouts)
 - **Unique Selling Point**: All workouts created by certified Sports Scientist, not AI
 
@@ -157,7 +157,6 @@
 - **BMR Calculator** (/bmrcalculator): Basal Metabolic Rate calculation
 - **Macro Calculator** (/macrocalculator): Macronutrient recommendations
 - **Calorie Counter** (/caloriecounter): Free calorie and nutrition lookup for 300,000+ foods (USDA database)
-- **SmartyWorkout Generator** (/smartyworkout): AI-assisted custom workout creation (Premium feature)
 
 ### 5. Exercise Library
 **Location**: /exerciselibrary
@@ -182,7 +181,7 @@
 - Fitness challenges
 
 ### 8. Daily Smarty Ritual
-**Location**: /smarty-ritual
+**Location**: /daily-ritual
 - Daily movement and wellness content
 - Morning, midday, and evening routines
 - Holistic fitness approach
