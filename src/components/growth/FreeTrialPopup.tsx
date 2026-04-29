@@ -22,6 +22,7 @@ export function FreeTrialPopup() {
   const { user, userTier, isLoading } = useAccessControl();
 
   const isTakeATour = location.pathname === "/takeatour";
+  const isCriticalContentRoute = ["/", "/home", "/workout", "/workout/wod"].includes(location.pathname);
   const initialDelay = isTakeATour ? 0 : DEFAULT_INITIAL_DELAY_MS;
 
   useEffect(() => {
@@ -43,11 +44,12 @@ export function FreeTrialPopup() {
 
   const shouldShowPopup = useCallback((): boolean => {
     if (isLoading) return false;
+    if (isCriticalContentRoute) return false;
     if (!user) return true;
     if (userTier === "premium") return false;
     if (userTier === "subscriber" && hasSubscriptionHistory === false) return true;
     return false;
-  }, [user, userTier, isLoading, hasSubscriptionHistory]);
+  }, [user, userTier, isLoading, hasSubscriptionHistory, isCriticalContentRoute]);
 
   const triggerPopup = useCallback(() => {
     if (shouldShowPopup()) setShow(true);

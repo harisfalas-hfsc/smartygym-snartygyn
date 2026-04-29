@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap, Check, Crown, ChevronDown, ChevronLeft, ChevronRight, Move, Ban, Brain, CheckCircle2, Award, Shield, Compass, Sparkles, Info, User, HelpCircle, ShoppingBag, Star, TrendingUp, Clock, CalendarCheck } from "lucide-react";
-import { getCyprusTodayStr } from "@/lib/cyprusDate";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { User as SupabaseUser } from "@supabase/supabase-js";
@@ -24,6 +23,7 @@ import { useAccessControl } from "@/hooks/useAccessControl";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { LazySection } from "@/components/LazySection";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useTodayWods } from "@/hooks/useTodayWods";
 
 import heroWodImage from "@/assets/hero-wod.jpg";
 import heroWorkoutsImage from "@/assets/hero-workouts-bright.jpg";
@@ -100,32 +100,7 @@ const Index = () => {
     refetchOnWindowFocus: false, // Don't refetch on tab focus
   });
 
-  // Fetch WODs for mobile card using safe public metadata (full paid content stays protected)
-  const { data: mobileWods } = useQuery({
-    queryKey: ["wod-mobile-banner", getCyprusTodayStr()],
-    queryFn: async () => {
-      const cyprusToday = getCyprusTodayStr();
-      const { data, error } = await (supabase as any)
-        .rpc("get_visible_workout_metadata", { _workout_id: null });
-
-      if (error) {
-        console.error("Error fetching homepage WOD metadata:", error);
-        return [];
-      }
-
-      return (data || [])
-        .filter((wod: any) => wod.is_workout_of_day === true && wod.generated_for_date === cyprusToday)
-        .slice(0, 2);
-    },
-    staleTime: 1000 * 60 * 10, // 10 minutes
-    gcTime: 1000 * 60 * 30, // Keep in cache for 30 minutes
-    refetchOnWindowFocus: false,
-    enabled: isMobile, // Only fetch on mobile - not needed for desktop
-  });
-
-  // Separate bodyweight and equipment WODs
-  const bodyweightWod = mobileWods?.find(w => w.equipment?.toLowerCase() === 'none' || w.equipment?.toLowerCase() === 'bodyweight');
-  const equipmentWod = mobileWods?.find(w => w.equipment?.toLowerCase() !== 'none' && w.equipment?.toLowerCase() !== 'bodyweight');
+  const { bodyweightWod, equipmentWod, variousWod, hasWods } = useTodayWods(isMobile);
   useEffect(() => {
     if (!carouselApi) return;
     const onSelect = () => {
@@ -678,10 +653,11 @@ return <CarouselItem key={card.id} className="pl-2 basis-[75%] sm:basis-[60%]">
               <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
             </div>
             
-            {mobileWods && mobileWods.length > 0 ? (
+            {hasWods ? (
               /* Workout images - dynamic columns based on count */
               (() => {
-                const wodCount = [bodyweightWod, equipmentWod].filter(Boolean).length;
+                const wodCards = [bodyweightWod, equipmentWod, variousWod].filter(Boolean);
+                const wodCount = wodCards.length;
                 return (
                   <div className={`grid ${wodCount === 1 ? 'grid-cols-1' : 'grid-cols-2'} gap-3`}>
                     {/* Bodyweight workout */}
@@ -727,6 +703,29 @@ className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-co
                               <>
                                 <span>•</span>
                                 <span>{equipmentWod.format}</span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    {variousWod && !bodyweightWod && !equipmentWod && (
+                      <div className="relative rounded-lg overflow-hidden border border-border">
+                        <img 
+                          src={variousWod.image_url || '/placeholder.svg'} 
+                          alt={variousWod.name}
+className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-cover`}
+                          onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
+                        />
+                        <Badge className="absolute top-1 left-1 bg-cyan-500 hover:bg-cyan-500 text-white text-[10px] px-1.5 py-0.5">Recovery</Badge>
+                        <div className="p-2 bg-background/90">
+                          <p className="text-xs font-semibold line-clamp-1">{variousWod.name}</p>
+                          <div className="flex items-center gap-1 text-[9px] text-muted-foreground">
+                            <span className="text-red-500">{variousWod.category}</span>
+                            {variousWod.format && (
+                              <>
+                                <span>•</span>
+                                <span>{variousWod.format}</span>
                               </>
                             )}
                           </div>

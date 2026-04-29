@@ -127,8 +127,8 @@ const AppContent = () => {
             <div className="flex-1" style={{ paddingTop: 'var(--app-header-h, 100px)' }}>
             <PageTransition>
                 <Routes>
-                  <Route path="/" element={<LandingRouter />} />
-                  <Route path="/start" element={<Navigate to="/" replace />} />
+                  <Route path="/" element={<Index />} />
+                  <Route path="/start" element={<LandingRouter />} />
                   <Route path="/home" element={<Index />} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/reset-password" element={<ResetPassword />} />

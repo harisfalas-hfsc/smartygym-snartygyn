@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchVisibleWorkoutMetadata } from "@/hooks/useTodayWods";
 
 export interface WorkoutData {
   id: string;
@@ -45,13 +46,15 @@ export const useWorkoutData = (workoutId: string | undefined) => {
         .neq("is_visible", false)
         .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        const metadata = await fetchVisibleWorkoutMetadata(workoutId);
+        const fallback = metadata[0];
+        if (!fallback) throw error;
+        return fallback as WorkoutData;
+      }
       if (!data) {
-        const { data: metadata, error: metadataError } = await (supabase as any)
-          .rpc("get_visible_workout_metadata", { _workout_id: workoutId });
-
-        if (metadataError) throw metadataError;
-        const fallback = Array.isArray(metadata) ? metadata[0] : metadata;
+        const metadata = await fetchVisibleWorkoutMetadata(workoutId);
+        const fallback = metadata[0];
         if (!fallback) throw new Error("Workout not found");
 
         return fallback as WorkoutData;
@@ -79,19 +82,10 @@ export const useAllWorkouts = () => {
       if (import.meta.env.DEV) {
         console.log("🔍 Fetching ALL workouts...");
       }
-      const { data, error } = await supabase
-        .rpc("get_visible_workout_metadata" as never, { _workout_id: null } as never);
+      const data = await fetchVisibleWorkoutMetadata(null);
 
       if (import.meta.env.DEV) {
         console.log("📦 Workouts data:", data);
-        console.log("❌ Workouts error:", error);
-      }
-
-      if (error) {
-        if (import.meta.env.DEV) {
-          console.error("Error fetching workouts:", error);
-        }
-        return [];
       }
 
       return (data || []) as WorkoutData[];
