@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { RitualAnnouncementModal } from "./RitualAnnouncementModal";
 import { ParQReminderModal } from "./ParQReminderModal";
 import { getCyprusTodayStr } from "@/lib/cyprusDate";
+import { fetchVisibleWorkoutMetadata } from "@/hooks/useTodayWods";
 
 // Delay for PAR-Q popup after first sign-in (30 seconds)
 const PARQ_POPUP_DELAY_MS = 30 * 1000;
@@ -70,15 +71,15 @@ export const AnnouncementManager = () => {
     }
 
     const cyprusToday = getCyprusTodayStr();
-    const { data, error } = await (supabase as any)
-      .rpc("get_visible_workout_metadata", { _workout_id: null });
-
-    if (error) {
+    let workouts = [] as any[];
+    try {
+      workouts = await fetchVisibleWorkoutMetadata(null);
+    } catch (error) {
       console.error("[AnnouncementManager] Could not verify WOD availability:", error);
       return;
     }
 
-    const todaysWods = (data || []).filter(
+    const todaysWods = workouts.filter(
       (wod: any) => wod.is_workout_of_day === true && wod.generated_for_date === cyprusToday
     );
 
