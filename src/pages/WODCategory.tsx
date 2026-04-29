@@ -15,7 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 import WODPeriodizationCalendar from "@/components/WODPeriodizationCalendar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
-import { getCyprusTodayStr } from "@/lib/cyprusDate";
+import { useTodayWods } from "@/hooks/useTodayWods";
 
 const WODCategory = () => {
   const navigate = useNavigate();
@@ -48,23 +48,11 @@ const WODCategory = () => {
   }, []);
 
   // Fetch workouts, interactions, and WOD state from database
-  const {
-    data: allWorkouts = [],
-    isLoading
-  } = useAllWorkouts();
+  const { isLoading, bodyweightWod: bodyweightWOD, equipmentWod: equipmentWOD, variousWod: variousWOD, isRecoveryDay } = useTodayWods();
   const {
     data: interactions = []
   } = useWorkoutInteractions(userId);
 
-  // Get current WODs (is_workout_of_day = true AND generated_for_date = Cyprus today)
-  const cyprusToday = getCyprusTodayStr();
-  const currentWODs = allWorkouts.filter(
-    workout => workout.is_workout_of_day === true && workout.generated_for_date === cyprusToday
-  );
-  const bodyweightWOD = currentWODs.find(w => w.equipment === "BODYWEIGHT");
-  const equipmentWOD = currentWODs.find(w => w.equipment === "EQUIPMENT");
-  const variousWOD = currentWODs.find(w => w.equipment === "VARIOUS");
-  const isRecoveryDay = !!variousWOD && !bodyweightWOD && !equipmentWOD;
   // Get interactions for current WODs
   const getInteraction = (workoutId: string | undefined) => {
     if (!workoutId) return null;
