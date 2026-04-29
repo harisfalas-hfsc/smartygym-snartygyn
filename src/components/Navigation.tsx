@@ -272,136 +272,51 @@ export const Navigation = () => {
         <div className="flex justify-between items-center gap-4">
           {/* LEFT SECTION - Hamburger Menu + Social Media Icons */}
           <div className="flex items-center gap-2">
-            {/* Hamburger Menu - pushed to far left */}
+            {/* Mobile Discovery Menu */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-12 w-12 sm:h-16 sm:w-16 -ml-4">
-                  <svg className="h-14 w-14 sm:h-12 sm:w-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                    <line x1="3" y1="4" x2="21" y2="4" />
-                    <line x1="3" y1="12" x2="21" y2="12" />
-                    <line x1="3" y1="20" x2="21" y2="20" />
-                  </svg>
+                <Button variant="ghost" className="h-12 min-w-0 gap-1.5 rounded-full px-2.5 -ml-2 text-primary sm:h-16 sm:px-4">
+                  <Compass className="h-6 w-6" />
+                  <span className="text-[10px] font-semibold leading-none tracking-normal sm:text-sm">Discovery</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-64 overflow-y-auto max-h-screen">
-                <nav className="flex flex-col gap-2 mt-8 pb-8">
-                  <Button
-                    variant="ghost"
-                    onClick={() => handleNavigate("/workout")}
-                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/workout' ? 'text-primary underline underline-offset-4 bg-primary/10' : 'text-foreground hover:bg-primary/10 hover:text-foreground'}`}
-                  >
-                    <Dumbbell className="mr-2 h-4 w-4 text-primary" />
-                    Smarty Workouts
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onClick={() => handleNavigate("/trainingprogram")}
-                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/trainingprogram' ? 'text-primary underline underline-offset-4 bg-primary/10' : 'text-foreground hover:bg-primary/10 hover:text-foreground'}`}
-                  >
-                    <ListChecks className="mr-2 h-4 w-4 text-blue-500" />
-                    Smarty Programs
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onClick={() => handleNavigate("/daily-ritual")}
-                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/daily-ritual' ? 'text-primary underline underline-offset-4 bg-primary/10' : 'text-foreground hover:bg-primary/10 hover:text-foreground'}`}
-                  >
-                    <Sparkles className="mr-2 h-4 w-4 text-purple-500" />
-                    Smarty Ritual
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onClick={() => handleNavigate("/tools")}
-                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/tools' ? 'text-primary underline underline-offset-4 bg-primary/10' : 'text-foreground hover:bg-primary/10 hover:text-foreground'}`}
-                  >
-                    <Wrench className="mr-2 h-4 w-4 text-orange-500" />
-                    Smarty Tools
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onClick={() => handleNavigate("/exerciselibrary")}
-                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/exerciselibrary' ? 'text-primary underline underline-offset-4 bg-primary/10' : 'text-foreground hover:bg-primary/10 hover:text-foreground'}`}
-                  >
-                    <BookOpen className="mr-2 h-4 w-4 text-emerald-500" />
-                    Exercise Library
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onClick={() => handleNavigate("/community")}
-                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/community' ? 'text-primary underline underline-offset-4 bg-primary/10' : 'text-foreground hover:bg-primary/10 hover:text-foreground'}`}
-                  >
-                    <Users className="mr-2 h-4 w-4 text-cyan-500" />
-                    Community
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onClick={() => handleNavigate("/blog")}
-                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/blog' ? 'text-primary underline underline-offset-4 bg-primary/10' : 'text-foreground hover:bg-primary/10 hover:text-foreground'}`}
-                  >
-                    <Newspaper className="mr-2 h-4 w-4 text-red-500" />
-                    Blog
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onClick={() => handleNavigate("/takeatour")}
-                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/takeatour' ? 'text-primary underline underline-offset-4 bg-primary/10' : 'text-foreground hover:bg-primary/10 hover:text-foreground'}`}
-                  >
-                    <Info className="mr-2 h-4 w-4 text-teal-500" />
-                    Take a Tour
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onClick={() => handleNavigate("/smarty-plans")}
-                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/smarty-plans' ? 'text-primary underline underline-offset-4 bg-primary/10' : 'text-foreground hover:bg-primary/10 hover:text-foreground'}`}
-                    data-track-cta="view-plans-nav"
-                  >
-                    <Crown className="mr-2 h-4 w-4 text-yellow-500" />
-                    Smarty Plans
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onClick={() => handleNavigate("/corporate")}
-                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/corporate' ? 'text-primary underline underline-offset-4 bg-primary/10' : 'text-foreground hover:bg-primary/10 hover:text-foreground'}`}
-                  >
-                    <Building2 className="mr-2 h-4 w-4 text-sky-500" />
-                    Smarty Corporate
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onClick={() => handleNavigate("/faq")}
-                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/faq' ? 'text-primary underline underline-offset-4 bg-primary/10' : 'text-foreground hover:bg-primary/10 hover:text-foreground'}`}
-                  >
-                    <HelpCircle className="mr-2 h-4 w-4 text-purple-500" />
-                    FAQ
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onClick={() => handleNavigate("/the-smarty-method")}
-                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/the-smarty-method' ? 'text-primary underline underline-offset-4 bg-primary/10' : 'text-foreground hover:bg-primary/10 hover:text-foreground'}`}
-                  >
-                    <BookOpen className="mr-2 h-4 w-4 text-amber-500" />
-                    The Smarty Method
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onClick={() => handleNavigate("/contact")}
-                    className={`justify-start font-semibold transition-all duration-200 ${location.pathname === '/contact' ? 'text-primary underline underline-offset-4 bg-primary/10' : 'text-foreground hover:bg-primary/10 hover:text-foreground'}`}
-                  >
-                    <Mail className="mr-2 h-4 w-4 text-indigo-500" />
-                    Contact
-                  </Button>
+              <SheetContent side="left" className="h-[100dvh] w-screen max-w-none overflow-y-auto border-r-0 p-4 pt-12 sm:w-64 sm:max-w-sm sm:border-r sm:p-6">
+                <div className="mb-5">
+                  <p className="text-xs font-semibold uppercase tracking-normal text-primary">Discovery</p>
+                  <h2 className="mt-1 text-2xl font-bold leading-tight text-foreground">Explore SmartyGym</h2>
+                </div>
+                <nav className="grid grid-cols-2 gap-3 pb-8 sm:flex sm:flex-col sm:gap-2">
+                  {discoveryItems.map(({ label, path, icon: Icon, track }) => {
+                    const active = location.pathname === path;
+                    return (
+                      <button
+                        key={path}
+                        type="button"
+                        onClick={() => handleNavigate(path)}
+                        data-track-cta={track}
+                        className={`min-h-[112px] rounded-2xl border-2 p-3 text-center font-semibold transition-all duration-200 sm:min-h-0 sm:justify-start sm:rounded-md sm:p-2 ${active ? 'border-primary bg-primary/15 text-primary shadow-sm' : 'border-primary/25 bg-card text-foreground hover:border-primary hover:bg-primary/10'}`}
+                      >
+                        <span className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary sm:mb-0 sm:mr-2 sm:inline-flex sm:h-8 sm:w-8">
+                          <Icon className="h-6 w-6 sm:h-4 sm:w-4" />
+                        </span>
+                        <span className="block text-sm leading-tight sm:inline">{label}</span>
+                      </button>
+                    );
+                  })}
                   {isAdmin && (
-                    <Button
-                      variant="ghost"
+                    <button
+                      type="button"
                       onClick={() => {
                         window.open('/admin', '_blank', 'noopener,noreferrer');
                         setMobileMenuOpen(false);
                       }}
-                      className="justify-start font-semibold transition-all duration-200 text-red-600 hover:bg-red-100/80 hover:text-red-700"
+                      className="min-h-[112px] rounded-2xl border-2 border-destructive/25 bg-card p-3 text-center font-semibold text-destructive transition-all duration-200 hover:border-destructive hover:bg-destructive/10 sm:min-h-0 sm:rounded-md sm:p-2"
                     >
-                      <Shield className="mr-2 h-4 w-4 text-red-600" />
-                      Admin
-                    </Button>
+                      <span className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 text-destructive sm:mb-0 sm:mr-2 sm:inline-flex sm:h-8 sm:w-8">
+                        <Shield className="h-6 w-6 sm:h-4 sm:w-4" />
+                      </span>
+                      <span className="block text-sm leading-tight sm:inline">Admin</span>
+                    </button>
                   )}
                 </nav>
               </SheetContent>
