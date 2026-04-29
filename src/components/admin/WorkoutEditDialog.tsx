@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { A4Container } from "@/components/ui/a4-container";
 import { normalizeWorkoutHtml } from "@/utils/htmlNormalizer";
 
-import { WORKOUT_CATEGORIES, getDifficultyFromStars } from "@/constants/workoutCategories";
+import { WORKOUT_CATEGORIES, STRENGTH_FOCUS_OPTIONS, isStrengthFocus, getDifficultyFromStars } from "@/constants/workoutCategories";
 
 // Micro-workout fixed values (enforced by DB trigger too)
 const MICRO_WORKOUT_RULES = {
@@ -96,6 +96,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
     price: '',
     stripe_product_id: '',
     stripe_price_id: '',
+    focus: '',
   });
   const [sendNotification, setSendNotification] = useState(false);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
@@ -154,6 +155,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
         price: '',
         stripe_product_id: '',
         stripe_price_id: '',
+          focus: '',
       });
       setSendNotification(false); // Default to NOT sending notifications
     }
