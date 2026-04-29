@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User as UserIcon, Settings, LogOut, LayoutDashboard, Crown, Menu, Bell, Facebook, Instagram, Youtube, ShoppingBag, Info, Dumbbell, ListChecks, Wrench, BookOpen, Users, Newspaper, Mail, Sparkles, Building2, Shield, HelpCircle } from "lucide-react";
+import { User as UserIcon, Settings, LogOut, LayoutDashboard, Crown, Menu, Bell, Facebook, Instagram, Youtube, ShoppingBag, Info, Dumbbell, ListChecks, Wrench, BookOpen, Users, Newspaper, Mail, Sparkles, Building2, Shield, HelpCircle, Compass } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
@@ -249,6 +249,22 @@ export const Navigation = () => {
     // Scroll to top after navigation
     setTimeout(() => window.scrollTo(0, 0), 0);
   };
+
+  const discoveryItems = [
+    { label: "Smarty Workouts", path: "/workout", icon: Dumbbell, track: undefined },
+    { label: "Smarty Programs", path: "/trainingprogram", icon: ListChecks, track: undefined },
+    { label: "Smarty Ritual", path: "/daily-ritual", icon: Sparkles, track: undefined },
+    { label: "Smarty Tools", path: "/tools", icon: Wrench, track: undefined },
+    { label: "Exercise Library", path: "/exerciselibrary", icon: BookOpen, track: undefined },
+    { label: "Community", path: "/community", icon: Users, track: undefined },
+    { label: "Blog", path: "/blog", icon: Newspaper, track: undefined },
+    { label: "Take a Tour", path: "/takeatour", icon: Info, track: undefined },
+    { label: "Smarty Plans", path: "/smarty-plans", icon: Crown, track: "view-plans-nav" },
+    { label: "Smarty Corporate", path: "/corporate", icon: Building2, track: undefined },
+    { label: "FAQ", path: "/faq", icon: HelpCircle, track: undefined },
+    { label: "The Smarty Method", path: "/the-smarty-method", icon: BookOpen, track: undefined },
+    { label: "Contact", path: "/contact", icon: Mail, track: undefined },
+  ];
 
   return (
     <header ref={headerRef} className="fixed top-0 left-0 right-0 z-50 bg-background pt-2 pb-0.5 px-4">
