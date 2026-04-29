@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
 import { CalendarCheck, Clock, Dumbbell, Home, Crown, ShoppingBag, X, TrendingUp, Layers, Target } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getCyprusTodayStr } from "@/lib/cyprusDate";
