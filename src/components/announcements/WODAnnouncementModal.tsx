@@ -5,6 +5,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
 import { CalendarCheck, Clock, Dumbbell, Home, Crown, ShoppingBag, X, TrendingUp, Layers, Target } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getCyprusTodayStr } from "@/lib/cyprusDate";
@@ -25,17 +26,17 @@ export const WODAnnouncementModal = ({ open, onClose }: WODAnnouncementModalProp
       // Use Cyprus date for consistent filtering with other WOD components
       const cyprusToday = getCyprusTodayStr();
       
-      const { data, error } = await supabase
-        .from("admin_workouts")
-        .select("*")
-        .eq("is_workout_of_day", true)
-        .eq("generated_for_date", cyprusToday); // Only today's WODs (Cyprus date)
+      const { data, error } = await (supabase as any)
+        .rpc("get_visible_workout_metadata", { _workout_id: null });
       
       if (error && error.code !== "PGRST116") {
         console.error("Error fetching WODs:", error);
         return [];
       }
-      return data || [];
+
+      return (data || []).filter(
+        (wod: any) => wod.is_workout_of_day === true && wod.generated_for_date === cyprusToday
+      );
     },
     enabled: open,
     staleTime: 1000 * 60 * 5,
@@ -166,6 +167,8 @@ export const WODAnnouncementModal = ({ open, onClose }: WODAnnouncementModalProp
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleClose()}>
       <DialogContent className="max-w-lg w-[95vw] sm:w-full max-h-[90vh] border-2 border-primary/60 bg-gradient-to-br from-primary/5 via-background to-primary/5 shadow-[0_0_40px_rgba(212,175,55,0.15)] p-0 gap-0 animate-scale-in overflow-hidden [&>button]:hidden">
+        <DialogTitle className="sr-only">Workout of the Day announcement</DialogTitle>
+        <DialogDescription className="sr-only">Today's available Workout of the Day sessions.</DialogDescription>
         {/* Header */}
         <div className="relative p-4 pb-2">
           {/* Close button */}
