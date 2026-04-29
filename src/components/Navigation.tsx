@@ -281,35 +281,65 @@ export const Navigation = () => {
         <div className="flex justify-between items-center gap-4">
           {/* LEFT SECTION - Hamburger Menu + Social Media Icons */}
           <div className="flex items-center gap-2">
+            {/* Desktop Menu - original layout */}
+            <Sheet open={desktopMenuOpen} onOpenChange={setDesktopMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="hidden lg:inline-flex h-16 w-16 -ml-4">
+                  <svg className="h-12 w-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <line x1="3" y1="4" x2="21" y2="4" />
+                    <line x1="3" y1="12" x2="21" y2="12" />
+                    <line x1="3" y1="20" x2="21" y2="20" />
+                  </svg>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-64 overflow-y-auto max-h-screen">
+                <nav className="flex flex-col gap-2 mt-8 pb-8">
+                  {discoveryItems.map(({ label, path, icon: Icon, iconClass, track }) => (
+                    <Button
+                      key={path}
+                      variant="ghost"
+                      onClick={() => handleNavigate(path)}
+                      className={`justify-start font-semibold transition-all duration-200 ${location.pathname === path ? 'text-primary underline underline-offset-4 bg-primary/10' : 'text-foreground hover:bg-primary/10 hover:text-foreground'}`}
+                      data-track-cta={track}
+                    >
+                      <Icon className={`mr-2 h-4 w-4 ${iconClass}`} />
+                      {label}
+                    </Button>
+                  ))}
+                  {isAdmin && (
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        window.open('/admin', '_blank', 'noopener,noreferrer');
+                        setDesktopMenuOpen(false);
+                      }}
+                      className="justify-start font-semibold transition-all duration-200 text-red-600 hover:bg-red-100/80 hover:text-red-700"
+                    >
+                      <Shield className="mr-2 h-4 w-4 text-red-600" />
+                      Admin
+                    </Button>
+                  )}
+                </nav>
+              </SheetContent>
+            </Sheet>
+
             {/* Mobile Discovery Menu */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
-                {isMobile ? (
-                  <Button variant="ghost" className="h-12 min-w-0 gap-1.5 rounded-full px-2.5 -ml-2 text-primary">
-                    <Compass className="h-6 w-6" />
-                    <span className="text-[10px] font-semibold leading-none tracking-normal">Discovery</span>
-                  </Button>
-                ) : (
-                  <Button variant="ghost" size="icon" className="h-12 w-12 sm:h-16 sm:w-16 -ml-4">
-                    <svg className="h-14 w-14 sm:h-12 sm:w-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                      <line x1="3" y1="4" x2="21" y2="4" />
-                      <line x1="3" y1="12" x2="21" y2="12" />
-                      <line x1="3" y1="20" x2="21" y2="20" />
-                    </svg>
-                  </Button>
-                )}
+                <Button variant="ghost" className="inline-flex lg:hidden h-12 min-w-0 gap-1.5 rounded-full px-2.5 -ml-2 text-primary">
+                  <Compass className="h-6 w-6" />
+                  <span className="text-[10px] font-semibold leading-none tracking-normal">Discovery</span>
+                </Button>
               </SheetTrigger>
-              <SheetContent side="left" className={isMobile ? "h-[100dvh] w-screen max-w-none overflow-y-auto border-r-0 p-4 pt-12" : "w-64 overflow-y-auto max-h-screen"}>
-                {isMobile && (
-                  <div className="mb-5">
-                    <p className="text-xs font-semibold uppercase tracking-normal text-primary">Discovery</p>
-                    <h2 className="mt-1 text-2xl font-bold leading-tight text-foreground">Explore SmartyGym</h2>
-                  </div>
-                )}
-                <nav className={isMobile ? "grid grid-cols-2 gap-3 pb-8" : "flex flex-col gap-2 mt-8 pb-8"}>
+              <SheetContent side="left" className="h-[100dvh] w-screen max-w-none overflow-y-auto border-r-0 p-4 pt-12">
+                <div className="mb-5">
+                  <p className="text-xs font-semibold uppercase tracking-normal text-primary">Discovery</p>
+                  <h2 className="mt-1 text-2xl font-bold leading-tight text-foreground">Explore SmartyGym</h2>
+                </div>
+                <nav className="grid grid-cols-2 gap-3 pb-8">
                   {discoveryItems.map(({ label, path, icon: Icon, iconClass, track }) => {
                     const active = location.pathname === path;
-                    return isMobile ? (
+                    return (
                       <button
                         key={path}
                         type="button"
@@ -322,47 +352,22 @@ export const Navigation = () => {
                         </span>
                         <span className="block text-sm leading-tight">{label}</span>
                       </button>
-                    ) : (
-                      <Button
-                        key={path}
-                        variant="ghost"
-                        onClick={() => handleNavigate(path)}
-                        className={`justify-start font-semibold transition-all duration-200 ${active ? 'text-primary underline underline-offset-4 bg-primary/10' : 'text-foreground hover:bg-primary/10 hover:text-foreground'}`}
-                        data-track-cta={track}
-                      >
-                        <Icon className={`mr-2 h-4 w-4 ${iconClass}`} />
-                        {label}
-                      </Button>
                     );
                   })}
                   {isAdmin && (
-                    isMobile ? (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          window.open('/admin', '_blank', 'noopener,noreferrer');
-                          setMobileMenuOpen(false);
-                        }}
-                        className="min-h-[112px] rounded-2xl border-2 border-destructive/25 bg-card p-3 text-center font-semibold text-destructive transition-all duration-200 hover:border-destructive hover:bg-destructive/10"
-                      >
-                        <span className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 text-destructive">
-                          <Shield className="h-6 w-6" />
-                        </span>
-                        <span className="block text-sm leading-tight">Admin</span>
-                      </button>
-                    ) : (
-                      <Button
-                        variant="ghost"
-                        onClick={() => {
-                          window.open('/admin', '_blank', 'noopener,noreferrer');
-                          setMobileMenuOpen(false);
-                        }}
-                        className="justify-start font-semibold transition-all duration-200 text-red-600 hover:bg-red-100/80 hover:text-red-700"
-                      >
-                        <Shield className="mr-2 h-4 w-4 text-red-600" />
-                        Admin
-                      </Button>
-                    )
+                    <button
+                      type="button"
+                      onClick={() => {
+                        window.open('/admin', '_blank', 'noopener,noreferrer');
+                        setMobileMenuOpen(false);
+                      }}
+                      className="min-h-[112px] rounded-2xl border-2 border-destructive/25 bg-card p-3 text-center font-semibold text-destructive transition-all duration-200 hover:border-destructive hover:bg-destructive/10"
+                    >
+                      <span className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+                        <Shield className="h-6 w-6" />
+                      </span>
+                      <span className="block text-sm leading-tight">Admin</span>
+                    </button>
                   )}
                 </nav>
               </SheetContent>
