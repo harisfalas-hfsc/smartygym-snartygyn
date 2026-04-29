@@ -6,10 +6,6 @@ import { isNativePlatform, configureStatusBar } from "./utils/native";
 // Configure native status bar on app launch
 configureStatusBar();
 
-// Lovable hosting may set a short-lived deployment pin cookie during publish
-// transitions. If a browser keeps an old pin, refreshes can keep loading an
-// older deployment until cookies are cleared. Remove it on every app start.
-clearLovableDeploymentPinCookie();
 
 const isInIframe = (() => {
   try {
@@ -40,6 +36,12 @@ const clearLovableDeploymentPinCookie = () => {
     document.cookie = `${base}; Domain=.${domain}`;
   }
 };
+
+
+// Lovable hosting may set a short-lived deployment pin cookie during publish
+// transitions. If a browser keeps an old pin, refreshes can keep loading an
+// older deployment until cookies are cleared. Remove it on every app start.
+clearLovableDeploymentPinCookie();
 
 const clearServiceWorkersAndCaches = () => {
   if ('serviceWorker' in navigator) {
