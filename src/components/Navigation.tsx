@@ -286,7 +286,7 @@ export const Navigation = () => {
           {/* LEFT SECTION - Hamburger Menu + Social Media Icons */}
           <div className="hidden lg:flex items-center gap-2">
             {/* Desktop Menu - original layout */}
-            {!isMobile && (
+            {(
               <Sheet open={desktopMenuOpen} onOpenChange={setDesktopMenuOpen}>
                 <SheetTrigger asChild>
                   <Button variant="ghost" size="icon" className="h-12 w-12 sm:h-16 sm:w-16 -ml-4">
@@ -373,7 +373,7 @@ export const Navigation = () => {
           </div>
 
           {/* CENTER SECTION - Logo */}
-          <div className="flex-1 flex justify-start lg:justify-center max-w-none lg:max-w-none">
+          <div className="flex-1 flex justify-start lg:justify-center min-w-0 max-w-none lg:max-w-none">
             <Link
               to="/home"
               className="cursor-pointer flex-shrink-0"
@@ -381,20 +381,20 @@ export const Navigation = () => {
               <img
                 src={smartyGymLogo}
                 alt="SmartyGym"
-                className="h-12 xs:h-14 sm:h-[68px] md:h-20 lg:h-24 w-auto object-contain dark:mix-blend-lighten"
+                className="h-10 xs:h-12 sm:h-[68px] md:h-20 lg:h-24 w-auto object-contain dark:mix-blend-lighten"
               />
             </Link>
           </div>
 
            {/* Right Side - Auth */}
-           <div className="flex items-center gap-2">
+           <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
              {/* Mobile Discovery Menu */}
              {isMobile && <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="relative h-11 w-11 rounded-full -ml-2"
+                  className="relative h-11 w-11 rounded-full"
                   aria-label="Open Discovery"
                 >
                   <div className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-primary text-primary transition-colors hover:bg-primary hover:text-primary-foreground">
