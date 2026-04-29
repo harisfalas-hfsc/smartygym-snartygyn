@@ -100,18 +100,22 @@ const Index = () => {
     refetchOnWindowFocus: false, // Don't refetch on tab focus
   });
 
-  // Fetch WODs for mobile card - using Cyprus date filter
+  // Fetch WODs for mobile card using safe public metadata (full paid content stays protected)
   const { data: mobileWods } = useQuery({
     queryKey: ["wod-mobile-banner", getCyprusTodayStr()],
     queryFn: async () => {
       const cyprusToday = getCyprusTodayStr();
-      const { data } = await supabase
-        .from("admin_workouts")
-        .select("id, name, category, format, difficulty_stars, duration, image_url, equipment")
-        .eq("is_workout_of_day", true)
-        .eq("generated_for_date", cyprusToday)
-        .limit(2);
-      return data || [];
+      const { data, error } = await (supabase as any)
+        .rpc("get_visible_workout_metadata", { _workout_id: null });
+
+      if (error) {
+        console.error("Error fetching homepage WOD metadata:", error);
+        return [];
+      }
+
+      return (data || [])
+        .filter((wod: any) => wod.is_workout_of_day === true && wod.generated_for_date === cyprusToday)
+        .slice(0, 2);
     },
     staleTime: 1000 * 60 * 10, // 10 minutes
     gcTime: 1000 * 60 * 30, // Keep in cache for 30 minutes
