@@ -530,6 +530,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
                   setFormData(prev => ({ 
                     ...prev, 
                     category: value,
+                    focus: value === 'STRENGTH' ? prev.focus : '',
                     // Auto-set format for restricted categories
                     ...(requiredFormat ? { format: requiredFormat } : {})
                   }));
@@ -546,6 +547,25 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
               </SelectContent>
             </Select>
           </div>
+
+          {formData.category === 'STRENGTH' && (
+            <div className="space-y-2">
+              <Label htmlFor="focus">4. Strength Focus *</Label>
+              <Select value={formData.focus || ''} onValueChange={(value) => setFormData({ ...formData, focus: value })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Strength focus" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  {STRENGTH_FOCUS_OPTIONS.map(focus => (
+                    <SelectItem key={focus} value={focus}>{focus}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Strength-only periodization focus. Other categories do not use this field.
+              </p>
+            </div>
+          )}
 
           {/* 2. Serial Number */}
           <div className="space-y-2">
