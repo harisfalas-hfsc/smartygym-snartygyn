@@ -19,6 +19,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext
 import { cn } from "@/lib/utils";
 import { CategoryCountBadge } from "@/components/ui/category-count-badge";
 import { SwipeToExplore } from "@/components/ui/SwipeToExplore";
+import { getCyprusTodayStr } from "@/lib/cyprusDate";
 
 const WorkoutFlow = () => {
   const navigate = useNavigate();
@@ -34,14 +35,18 @@ const WorkoutFlow = () => {
   const { data: wodImages = [] } = useQuery({
     queryKey: ["wod-card-images"],
     queryFn: async () => {
-      const now = new Date();
-      const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-      const { data } = await supabase
-        .from("admin_workouts")
-        .select("id, image_url")
-        .eq("is_workout_of_day", true)
-        .eq("generated_for_date", today);
-      return (data || []).filter(w => w.image_url).map(w => w.image_url as string);
+      const today = getCyprusTodayStr();
+      const { data, error } = await (supabase as any)
+        .rpc("get_visible_workout_metadata", { _workout_id: null });
+
+      if (error) {
+        console.error("Error fetching WOD card images:", error);
+        return [];
+      }
+
+      return (data || [])
+        .filter((w: any) => w.is_workout_of_day === true && w.generated_for_date === today && w.image_url)
+        .map((w: any) => w.image_url as string);
     },
     staleTime: 1000 * 60 * 5,
   });
