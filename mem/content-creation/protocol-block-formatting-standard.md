@@ -1,6 +1,6 @@
 ---
 name: Protocol Block Formatting Standard
-description: TABATA/EMOM/AMRAP/FOR TIME headers must never embed durations; no stray text after }} of an exercise token; protocol explanations always live in Instructions field.
+description: Protocol headers must never embed durations; exercise tokens need measurable prescriptions; no stray text after }}; explanations live in Instructions.
 type: feature
 ---
 
@@ -23,6 +23,12 @@ Mandatory rules enforced in WOD generation prompts, post-generation validators, 
 - Every minute from 1 to N must be labelled `<strong>Minute N:</strong>` in order.
 - No bullet may exist after the last labelled minute.
 - For repeating patterns: write the pattern once, then add a separate paragraph "Repeat X rounds = total minutes".
+
+## Rule 4 — No naked exercise prescriptions in Main Workout or Finisher
+- Every exercise token in Main Workout and Finisher must have a measurable dose before the token: reps, seconds, minutes, meters, km, miles, calories, rounds, or sets x reps.
+- WRONG: `{{exercise:0685:run}} (equipment) on treadmill (fast pace)`
+- RIGHT: `400m {{exercise:0685:run}} on treadmill (fast pace)` or `60 sec {{exercise:0685:run}} on treadmill (fast pace)`.
+- Why: users must know exactly what to do. An exercise name alone is not coaching.
 
 ## Enforcement layers
 1. **Prompt rules** in `generate-workout-of-day` STRUCTURAL_RULES block.
