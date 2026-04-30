@@ -2653,21 +2653,36 @@ Return JSON with these exact fields:
       const normalizedDescription = normalizeWorkoutHtml(workoutContent.description || '');
       const normalizedInstructions = normalizeWorkoutHtml(workoutContent.instructions || '');
       const normalizedTips = normalizeWorkoutHtml(workoutContent.tips || '');
-      const validation = validateWorkoutHtml(normalizedMainWorkout);
+
+      // Auto-clean protocol header durations + stray-after-token noise (idempotent).
+      const protocolSweep = sanitizeProtocolBlocks(normalizedMainWorkout);
+      const cleanedMainWorkout = protocolSweep.cleaned;
+      if (protocolSweep.fixesApplied.length > 0) {
+        logStep(`🧹 Protocol auto-fixes applied`, { fixes: protocolSweep.fixesApplied });
+      }
+
+      // Hard structural validator: block any remaining violations and force regeneration.
+      const protocolErrors = validateProtocolBlocks(cleanedMainWorkout);
+      if (protocolErrors.length > 0) {
+        logStep(`❌ PROTOCOL VALIDATION FAILED`, { equipment, protocolErrors, workoutName: workoutContent.name });
+        throw new Error(`${equipment} WOD rejected: protocol issues [${protocolErrors.join("; ")}]`);
+      }
+
+      const validation = validateWorkoutHtml(cleanedMainWorkout);
       
       if (!validation.isValid) {
         console.error(`[WOD-GENERATION] ⚠️ HTML validation issues after normalization:`, validation.issues);
         logStep(`⚠️ HTML validation issues`, { issues: validation.issues, equipment });
         // Log but don't reject - normalization should have fixed it
       } else {
-        logStep(`✅ HTML normalized and validated`, { equipment, originalLength: workoutContent.main_workout?.length, normalizedLength: normalizedMainWorkout.length });
+        logStep(`✅ HTML normalized and validated`, { equipment, originalLength: workoutContent.main_workout?.length, normalizedLength: cleanedMainWorkout.length });
       }
 
       // ═══════════════════════════════════════════════════════════════════════════════
       // SECTION COMPLETENESS GATE: Reject WODs missing required sections BEFORE insert
       // This prevents malformed content from ever reaching the database as active WOD
       // ═══════════════════════════════════════════════════════════════════════════════
-      const sectionValidation = validateWodSections(normalizedMainWorkout, isRecoveryDay);
+      const sectionValidation = validateWodSections(cleanedMainWorkout, isRecoveryDay);
       if (!sectionValidation.isComplete) {
         const errorMsg = `${equipment} WOD rejected: missing sections [${sectionValidation.missingSections.join(", ")}]`;
         logStep(`❌ SECTION VALIDATION FAILED`, {
@@ -2701,6 +2716,18 @@ Return JSON with these exact fields:
         mainWorkoutExercises: sectionValidation.mainWorkoutExerciseCount,
         finisherExercises: sectionValidation.finisherExerciseCount
       });
+
+      // Auto-inject protocol explanations into the instructions field so every
+      // protocol workout always teaches the user how to follow the format.
+      const enrichedInstructions = injectProtocolExplanations(
+        normalizedInstructions,
+        cleanedMainWorkout,
+        format,
+      );
+      const finalInstructions = enrichedInstructions.html;
+      if (enrichedInstructions.injected.length > 0) {
+        logStep(`📘 Protocol explanations injected into instructions`, { protocols: enrichedInstructions.injected });
+      }
 
       // ═══════════════════════════════════════════════════════════════════════════════
       // FINAL PRE-INSERT PUBLIC NAME GUARD (library-wide, race-condition safe)
