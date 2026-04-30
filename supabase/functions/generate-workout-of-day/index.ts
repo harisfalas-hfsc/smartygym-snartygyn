@@ -2032,7 +2032,7 @@ STRUCTURAL RULES — VIOLATING ANY OF THESE TRIGGERS REGENERATION (MANDATORY):
    No naked exercises. No "run" without distance/time. No exercise token alone and no vague "fast pace" without dose.
    - WRONG: "{{exercise:0685:run}} (equipment) on treadmill (fast pace)"
    - RIGHT: "400m {{exercise:0685:run}} on treadmill (fast pace)" or "60 sec {{exercise:0685:run}} on treadmill (fast pace)"
-   Accepted prescriptions: reps, seconds, minutes, meters, km, miles, calories, rounds, sets x reps.
+   Accepted prescriptions: reps, seconds, minutes, meters, km, miles, calories, rounds, sets x reps, or a clear bare number for reps.
 4. EMOM blocks must label EVERY minute from 1 to N in order. No bullet may exist after the last labelled minute.
    If a pattern repeats, write the pattern once (Minute 1 through Minute N) and then add a separate paragraph
    "Repeat X rounds = total minutes". Never trail an unlabelled exercise after "Minute 3:".
