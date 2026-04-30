@@ -3075,6 +3075,39 @@ export type Database = {
         }
         Relationships: []
       }
+      workout_repair_log: {
+        Row: {
+          bugs_found: Json
+          changed: boolean
+          fixes_applied: Json
+          flagged_for_review: Json
+          id: string
+          run_at: string
+          workout_id: string
+          workout_name: string | null
+        }
+        Insert: {
+          bugs_found?: Json
+          changed?: boolean
+          fixes_applied?: Json
+          flagged_for_review?: Json
+          id?: string
+          run_at?: string
+          workout_id: string
+          workout_name?: string | null
+        }
+        Update: {
+          bugs_found?: Json
+          changed?: boolean
+          fixes_applied?: Json
+          flagged_for_review?: Json
+          id?: string
+          run_at?: string
+          workout_id?: string
+          workout_name?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       leaderboard_stats: {
