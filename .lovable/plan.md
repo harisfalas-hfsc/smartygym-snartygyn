@@ -1,203 +1,95 @@
-Plan: Background-only SEO dominance upgrade for smartygym.com
 
-Your instruction is clear: nothing visible to visitors changes. I will not change page layout, style, buttons, headings, public copy, cards, colors, navigation, pricing display, or any visible text. The work will be limited to background SEO, structured data, crawler files, metadata, and hidden crawler-readable content.
+# Workout Integrity Fix + Future Prevention
 
-Primary goal
+## 1. The two errors you saw
 
-Make SmartyGym stronger for Google, Bing, and AI crawlers by improving:
-- Technical metadata
-- Structured data / JSON-LD
-- AI knowledge files
-- Sitemap accuracy
-- Internal SEO signals
-- Page-specific semantic relevance
-- Performance-safe crawler readability
+**Cadence Blast (Bodyweight WOD)**
+- "TABATA 24'" main block is fine arithmetically (6 exercises × 4 min) but per your new rule the number must be removed entirely.
+- "TABATA 11'" finisher is mathematically impossible (Tabata = 4 min per exercise, so 3 exercises = 12 min, never 11).
+- Two exercise lines have broken syntax: `{{exercise:0725:single arm push-up}}20 sec interval)` — stray text after the `}}` and an orphan closing parenthesis.
 
-Non-negotiable constraint
+**Velocity Compass Blitz (Equipment WOD)**
+- "Finisher (15-minute EMOM)" lists Minute 1, Minute 2, Minute 3 — and then a 4th bullet for chin-ups with no minute label and a confused "Complete 5 rounds" tail. The intent is a 5-minute pattern repeated 3× (= 15 min EMOM), but the structure was broken.
 
-No visitor-facing content changes.
+## 2. Library-wide audit results (371 visible workouts)
 
-This means:
-- No design changes
-- No visual layout changes
-- No visible 1000+ word content blocks added to pages
-- No visible copy edits
-- No changes to your brand look or structure
-- No replacement of existing visitor-visible content
+| Bug | Count | Description |
+|-----|-------|-------------|
+| Stray text after `{{exercise:...}}` token | 40 | e.g. `}}20 sec interval)`, `}} - 30 seconds`, `}}, and upper back...` |
+| Stray orphan `)` after token | 2 | broken parenthesis pairs |
+| Tabata header with embedded duration | 31 | `TABATA 24'`, `TABATA 11'`, `TABATA 5'`, `TABATA 8'` etc. — must all be removed |
+| EMOM with explicit `Minute N:` labels | 23 | need verification that minute count = stated EMOM duration and no orphan trailing exercises |
 
-Because the user requested 1000+ words per page but also said “do not change anything visitors see,” I will satisfy that intent through hidden/background SEO assets and metadata, not visible page content.
+## 3. Immediate fix — Today's two WODs
 
-Implementation plan
+**Cadence Blast**
+- Rename header `Main Workout (TABATA 24')` → `Main Workout (TABATA)`.
+- Rename header `Finisher (TABATA 11')` → `Finisher (TABATA)`.
+- Clean the two broken exercise lines (remove stray `20 sec interval)` text, since the Tabata protocol already defines the interval).
+- Rewrite the Instructions field to explain Tabata clearly:
+  > **Tabata protocol:** Each exercise = 8 rounds × (20 seconds work + 10 seconds rest) = 4 minutes per exercise. Move to the next exercise without extra rest. Push to maximum effort during the 20-second work intervals.
 
-1. Create a centralized background SEO content system
+**Velocity Compass Blitz**
+- Restructure the 15-minute EMOM finisher into a clean, repeating 5-minute pattern:
+  - Minute 1: 15 battling ropes
+  - Minute 2: 10 jack burpees
+  - Minute 3: 20 jump ropes
+  - Minute 4: 8 chin-ups
+  - Minute 5: rest
+  - Repeat 3 rounds = 15 minutes
+- Update Instructions to explain EMOM:
+  > **EMOM (Every Minute On the Minute):** At the start of each minute, perform the prescribed reps as fast as possible. Use the remainder of the minute as rest. The next minute starts on the clock regardless of how long you took.
 
-Add a reusable background SEO component that outputs crawler-readable, visually hidden semantic content using the project’s existing `sr-only` pattern.
+## 4. Library-wide content cleanup (one-shot script)
 
-It will include, per page:
-- Clear “What is...” definitions
-- Direct AI-answer summaries
-- Step-by-step guidance blocks
-- Keyword-rich but natural summaries
-- FAQ-style answer blocks
-- Internal link references
-- Authority statements about SmartyGym and Haris Falas
+Build a Deno-based admin edge function `repair-workout-content` that performs a controlled sweep over all 371 workouts:
 
-This content will be hidden from visual users and will not affect the design.
+1. **Strip Tabata duration**: regex replaces `TABATA\s*\d+'` → `TABATA` inside section headers. Same for `Tabata 24'` etc.
+2. **Strip stray post-token text**: detects `}}<non-html-text>` and either:
+   - removes pure noise like `}} - 30 seconds`, `}}20 sec interval)`,
+   - keeps legitimate continuations like `}} (left side)` after manual review (script flags those for admin review instead of auto-deleting).
+3. **EMOM coherence check**: counts `Minute N:` labels per EMOM block and compares with the stated minute count in the header. Mismatches are flagged in an admin report (not auto-fixed because the correct rep scheme is editorial).
+4. **Auto-inject default Instructions** for any workout whose format is TABATA / EMOM / AMRAP / FOR TIME / CIRCUIT and whose `instructions` field doesn't already explain that protocol. Standard text comes from a shared `protocol-explanations.ts` module.
+5. Writes a `workout_repair_log` row per workout listing: bugs found, auto-fixes applied, items flagged for human review.
 
-Important: I will keep the “100% Human, 0% AI” positioning intact and will not describe SmartyGym as an “AI fitness coach” or imply workouts are generated by AI.
+Result: every existing workout gets cleaned, and you get one admin report listing the small subset (EMOM rep mismatches, ambiguous post-token text) that needs your eyes.
 
-2. Add page-specific background SEO to key public pages
+## 5. Future prevention — multi-layer guardrails
 
-Apply background-only SEO blocks to the core routes requested:
-- Homepage `/`
-- Workout of the Day `/workout/wod`
-- Workouts `/workout`
-- Training Programs `/trainingprogram`
-- Tools `/tools`
-- Blog `/blog`
-- Contact / Join pages `/contact`, `/join-premium`, `/smarty-plans`
-- Existing authority page `/best-online-fitness-platform`
+This is the part that matters most. We layer 4 independent guards so a bad workout cannot reach you again.
 
-Where category/detail pages already exist, I will strengthen their background metadata without changing what visitors see.
+**Layer 1 — Prompt hardening** (`generate-workout-of-day`, `wod-generation-orchestrator`, manual workout generator)
+- Add a `STRUCTURAL_RULES` block at the top of the system prompt:
+  - Never write a number after TABATA / EMOM / AMRAP in the section header. The protocol explanation belongs in the Instructions field, not the content.
+  - For EMOM: every minute from 1 to N must be labelled, in order, with no orphan exercises after the last minute. If a pattern repeats, write the pattern once and append "Repeat X rounds = N minutes".
+  - Never write any text on the same line after `{{exercise:ID:Name}}`. Modifiers (reps, sides, weight) must be written before the token, not after.
+- Add a worked example for each format showing correct vs. forbidden patterns.
 
-3. Strengthen structured data across the site
+**Layer 2 — Post-generation structural validator** (`_shared/section-validator.ts` extension)
+- New `validateProtocolBlocks(html, format)` function runs after the existing density/section validators.
+- Rejects (forces regeneration) if it detects:
+  - `TABATA\s*\d+`, `EMOM\s*\d+'` style numbers inside headers,
+  - `}}\S` or `}}[^<\s]` patterns (stray characters glued to a token),
+  - EMOM block where labelled minutes ≠ stated duration,
+  - Tabata block where exercise count × 4 ≠ implied total when a duration somehow survives.
+- Same retry budget as existing reliability layer (per memory `wod-generation-reliability-and-integrity`).
 
-Add or improve JSON-LD schemas for:
-- Organization
-- WebSite with SearchAction
-- WebApplication / MobileApplication
-- HealthClub / online fitness platform identity
-- Service schemas for online fitness, training programs, online coaching, fitness tools
-- FAQPage schemas for AI/direct-answer extraction
-- HowTo schemas for getting started and choosing programs
-- ItemList schemas for workouts, programs, tools, and key site sections
-- Breadcrumb schemas where missing
-- SpeakableSpecification for AI/voice extraction where appropriate
+**Layer 3 — Auto-Instructions injector**
+- After successful generation, if the workout format is TABATA/EMOM/AMRAP/FOR TIME/CIRCUIT and the Instructions field doesn't already explain the protocol, prepend the canonical explanation from `protocol-explanations.ts`. This guarantees every protocol workout always teaches the user the format.
 
-All JSON-LD will live in `<Helmet>` / document metadata and will not change visible content.
+**Layer 4 — Pre-publish gate**
+- The all-or-none publishing rule (per memory `wod-all-or-none-publishing`) gets a structural check added: if either WOD variant fails the new validator after retries, neither is published and you get a Slack/dashboard alert instead of broken content going live.
 
-4. Create stronger AI crawler knowledge assets
+## Files to add / edit
 
-Update the background crawler files:
-- `public/llms.txt`
-- `public/llms-full.txt`
-- `public/ai.txt`
-- `public/.well-known/ai-plugin.json` if needed
-- `public/.well-known/openapi.yaml` if needed
+- `supabase/functions/_shared/protocol-explanations.ts` (new)
+- `supabase/functions/_shared/section-validator.ts` (extend with `validateProtocolBlocks`)
+- `supabase/functions/generate-workout-of-day/index.ts` (prompt rules + validator hook + auto-instructions)
+- `supabase/functions/wod-generation-orchestrator/index.ts` (gate + alert)
+- `supabase/functions/repair-workout-content/index.ts` (new one-shot library cleaner)
+- New table `workout_repair_log` (id, workout_id, bugs_found jsonb, fixes_applied jsonb, flagged_for_review jsonb, run_at)
+- Direct SQL fix for the two WODs today
 
-The content will include:
-- SmartyGym definition
-- “SmartyGym – The Smart Way to Train Online” positioning
-- Brand keyword variants: SmartyGym, Smart Gym, SmartGym, smartygym.com
-- Core keywords: online fitness, online gym, workout program, training program, strength training, personal training, online personal trainer, fitness coach, fat loss workout, etc.
-- Long-tail answer targets
-- Route map for AI assistants
-- Citation-ready answers
-- Disambiguation from unrelated “Smartgym” equipment/machine brands
-- Internal linking suggestions for crawlers
+## Memory to save after approval
 
-5. Improve sitemap and crawl signals
-
-Update `public/sitemap.xml` to ensure all important real routes are represented accurately and remove or correct stale routes if found.
-
-Add/verify priority for:
-- `/`
-- `/workout`
-- `/workout/wod`
-- `/trainingprogram`
-- `/tools`
-- `/blog`
-- `/contact`
-- `/join-premium`
-- `/smarty-plans`
-- `/best-online-fitness-platform`
-- `/caloriecounter`
-- `/1rmcalculator`
-- `/bmrcalculator`
-- `/macrocalculator`
-- `/exerciselibrary`
-- `/coach-profile`
-
-Also verify `robots.txt` references the correct AI files and sitemap URLs.
-
-6. Add semantic meta bundles for target keyword clusters
-
-Create reusable SEO definitions for these clusters:
-- Online fitness / online gym
-- Workout programs
-- Training programs
-- Strength training
-- Fat loss / weight loss
-- Functional training
-- Performance training
-- Mobility and stability
-- Core training
-- Home workouts
-- Gym workouts
-- AMRAP / EMOM / HIIT / circuit training
-- Daily workout / Workout of the Day
-- Online coaching / online personal trainer
-
-These will be applied as background metadata and JSON-LD, not visible copy.
-
-7. Performance-safe implementation
-
-The implementation will avoid heavy runtime work:
-- Static SEO data where possible
-- No new visual assets
-- No added external scripts
-- No database changes required
-- No render-blocking third-party tools
-- No new large dependencies
-
-8. Fix obvious SEO inconsistencies without visible changes
-
-While implementing, I will correct background-only issues such as:
-- Metadata that still says “100+ workouts” instead of “500+ workouts”
-- Broken/stale schema URLs like `/personaltraining` if that route does not exist
-- Sitemap entries for routes that are not currently served
-- Mismatched membership links where background files still point to old pages
-- Outdated dates in crawler knowledge files
-
-9. Final verification
-
-After implementation, I will check:
-- Core routes still render the same visible UI
-- No visible content was added or changed
-- Metadata and JSON-LD are present
-- Sitemap includes the intended routes
-- Robots/AI crawler files allow indexing
-- No references to deleted Premium Comparison page remain
-- No “AI-generated workouts” positioning is introduced
-
-Technical details
-
-Files likely to be updated:
-- `src/components/SEOEnhancer.tsx`
-- New background-only SEO component, likely under `src/components/seo/`
-- New SEO content/config utility, likely under `src/data/` or `src/utils/`
-- Public pages that need Helmet/background SEO injection, such as `Index.tsx`, `WorkoutFlow.tsx`, `TrainingProgramFlow.tsx`, `Tools.tsx`, `Blog.tsx`, `Contact.tsx`, `JoinPremium.tsx`, `SmartyPlans.tsx`, `WODCategory.tsx`
-- `public/llms.txt`
-- `public/llms-full.txt`
-- `public/ai.txt`
-- `public/sitemap.xml`
-- `public/robots.txt` only if needed
-
-What I will not do
-
-- I will not add visible 1000+ word sections to pages.
-- I will not change your design.
-- I will not alter navigation or layout.
-- I will not change visitor-facing copy.
-- I will not remove your human-designed brand positioning.
-- I will not add any backend/database changes unless a later requirement demands it.
-- I will not add new tracking scripts or slow third-party SEO tools.
-
-Expected result
-
-A stronger background SEO layer that helps search engines and AI assistants understand SmartyGym as:
-- A global online fitness platform
-- A modern online gym
-- A structured workout and training program system
-- A science-based, human-designed fitness authority by Haris Falas
-- A strong match for online fitness, workout program, training program, fat loss, strength training, mobility, home workout, HIIT, AMRAP, EMOM, circuit training, and daily workout queries
+- `mem://content-creation/protocol-block-formatting-standard` — Never embed durations in TABATA/EMOM/AMRAP headers, never trail text after `}}`, every protocol workout must include Instructions that explain the protocol.
