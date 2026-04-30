@@ -25,7 +25,7 @@ Mandatory rules enforced in WOD generation prompts, post-generation validators, 
 - For repeating patterns: write the pattern once, then add a separate paragraph "Repeat X rounds = total minutes".
 
 ## Rule 4 — No naked exercise prescriptions in Main Workout or Finisher
-- Every exercise token in Main Workout and Finisher must have a measurable dose before the token: reps, seconds, minutes, meters, km, miles, calories, rounds, or sets x reps.
+- Every exercise token in Main Workout and Finisher must have a measurable dose before the token: reps, seconds, minutes, meters, km, miles, calories, rounds, sets x reps, or a clear bare rep count.
 - WRONG: `{{exercise:0685:run}} (equipment) on treadmill (fast pace)`
 - RIGHT: `400m {{exercise:0685:run}} on treadmill (fast pace)` or `60 sec {{exercise:0685:run}} on treadmill (fast pace)`.
 - Why: users must know exactly what to do. An exercise name alone is not coaching.
