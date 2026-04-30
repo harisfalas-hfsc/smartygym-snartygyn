@@ -2024,10 +2024,10 @@ STRUCTURAL RULES — VIOLATING ANY OF THESE TRIGGERS REGENERATION (MANDATORY):
    The protocol explanation belongs in the "instructions" JSON field, not in the workout body.
    - WRONG: "Main Workout (TABATA 24')", "Finisher (TABATA 11')", "Finisher (15-minute EMOM)"
    - RIGHT: "Main Workout (TABATA)", "Finisher (TABATA)", "Finisher (EMOM)"
-2. NEVER write any text on the same line directly after `}}` of an exercise token.
+2. NEVER write any text on the same line directly after the closing }} of an exercise token.
    Modifiers (reps, sides, weight, intervals) must come BEFORE the token, not after.
-   - WRONG: `{{exercise:0725:single arm push-up}}20 sec interval)`
-   - RIGHT: `20 sec {{exercise:0725:single arm push-up}}`
+   - WRONG: "{{exercise:0725:single arm push-up}}20 sec interval)"
+   - RIGHT: "20 sec {{exercise:0725:single arm push-up}}"
 3. EMOM blocks must label EVERY minute from 1 to N in order. No bullet may exist after the last labelled minute.
    If a pattern repeats, write the pattern once (Minute 1 through Minute N) and then add a separate paragraph
    "Repeat X rounds = total minutes". Never trail an unlabelled exercise after "Minute 3:".
