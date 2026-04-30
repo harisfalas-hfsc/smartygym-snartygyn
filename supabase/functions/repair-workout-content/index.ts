@@ -1,5 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
-import { sanitizeProtocolBlocks } from "../_shared/protocol-sanitizer.ts";
+import { sanitizeProtocolBlocks, validateProtocolBlocks } from "../_shared/protocol-sanitizer.ts";
 import { injectProtocolExplanations } from "../_shared/protocol-explanations.ts";
 
 const corsHeaders = {
@@ -89,6 +89,15 @@ Deno.serve(async (req) => {
       const allBugs = [...sweepMain.bugsFound, ...sweepFin.bugsFound];
       const allFixes = [...sweepMain.fixesApplied, ...sweepFin.fixesApplied];
       const allFlagged = [...sweepMain.flaggedForReview, ...sweepFin.flaggedForReview];
+      const blockingIssues = validateProtocolBlocks(`${sweepMain.cleaned || ""} ${sweepFin.cleaned || ""}`);
+      for (const issue of blockingIssues) {
+        if (/Naked exercise prescription/i.test(issue)) {
+          allFlagged.push({
+            type: "naked_exercise_prescription",
+            detail: issue,
+          });
+        }
+      }
 
       // Auto-inject protocol explanations into instructions if missing.
       const enriched = injectProtocolExplanations(
@@ -107,6 +116,10 @@ Deno.serve(async (req) => {
 
       for (const b of allBugs) {
         stats.perBug[b.type] = (stats.perBug[b.type] || 0) + 1;
+      }
+      for (const b of allFlagged) {
+        const type = String((b as { type?: unknown }).type || "flagged_for_review");
+        stats.perBug[type] = (stats.perBug[type] || 0) + 1;
       }
 
       if (changed) stats.changed += 1;
