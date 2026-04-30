@@ -189,9 +189,9 @@ function hasClearPrescriptionBeforeExercise(text: string, format: string): boole
   if (tokenIndex < 0) return true;
   const before = text.slice(0, tokenIndex).trim();
 
-  // Accept explicit reps, time, distance, calories, rounds, sets, or labelled EMOM minutes
-  // only when they appear before the exercise token.
-  return /(?:^|\b)(?:minute\s+\d+\s*:)?\s*(?:\d+(?:\.\d+)?(?:\s*-\s*\d+(?:\.\d+)?)?\s*(?:reps?|sec(?:onds?)?|s\b|min(?:utes?)?|m\b|meters?|metres?|km\b|kilometers?|kilometres?|mi\b|miles?|cal(?:ories)?|kcal|rounds?|sets?)\b|\d+\s*(?:x|×)\s*\d+|amrap\s+\d+)/i.test(before);
+  // Accept explicit reps, time, distance, calories, rounds, sets, labelled EMOM minutes,
+  // or a bare number used as reps, only when they appear before the exercise token.
+  return /(?:^|\b)(?:minute\s+\d+\s*:)?\s*(?:\d+(?:\.\d+)?(?:\s*-\s*\d+(?:\.\d+)?)?\s*(?:reps?|sec(?:onds?)?|s\b|min(?:utes?)?|m\b|meters?|metres?|km\b|kilometers?|kilometres?|mi\b|miles?|cal(?:ories)?|kcal|rounds?|sets?)\b|\d+\s*(?:x|×)\s*\d+|\d+(?:\s*-\s*\d+)?\s*$|amrap\s+\d+)/i.test(before);
 }
 
 function detectNakedExercisePrescriptions(html: string, flagged: ProtocolIssue[]) {
