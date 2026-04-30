@@ -6,6 +6,7 @@
  *  2. No stray text glued to an `{{exercise:ID:Name}}` token.
  *  3. EMOM blocks with explicit `Minute N:` labels must be sequential
  *     (1..N) with no orphan exercise after the last labelled minute.
+ *  4. No naked exercise prescriptions in Main Workout / Finisher protocol blocks.
  */
 
 export interface ProtocolIssue {
@@ -13,7 +14,8 @@ export interface ProtocolIssue {
     | "duration_in_header"
     | "stray_after_token"
     | "emom_orphan_exercise"
-    | "emom_minute_gap";
+    | "emom_minute_gap"
+    | "naked_exercise_prescription";
   detail: string;
   snippet?: string;
 }
@@ -152,6 +154,58 @@ function detectEmomOrphans(html: string, flagged: ProtocolIssue[]) {
   }
 }
 
+function stripTags(value: string): string {
+  return value.replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function getMainAndFinisherItems(html: string): Array<{ section: string; format: string; text: string }> {
+  const items: Array<{ section: string; format: string; text: string }> = [];
+  const sectionPattern = /<p[^>]*>\s*(💪|⚡)\s*<strong><u>\s*([^<]+?)\s*<\/u><\/strong>\s*<\/p>([\s\S]*?)(?=<p[^>]*>\s*(?:🧘|⚡|💪|🔥|🧽)|$)/gi;
+  let sectionMatch: RegExpExecArray | null;
+
+  while ((sectionMatch = sectionPattern.exec(html)) !== null) {
+    const sectionTitle = stripTags(sectionMatch[2] || "");
+    const body = sectionMatch[3] || "";
+    const formatMatch = sectionTitle.match(/\(([^)]+)\)/);
+    const format = (formatMatch?.[1] || sectionTitle).toUpperCase();
+    const liPattern = /<li[^>]*>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>[\s\S]*?<\/li>/gi;
+    let liMatch: RegExpExecArray | null;
+    while ((liMatch = liPattern.exec(body)) !== null) {
+      const raw = liMatch[1] || "";
+      if (/\{\{exercise:[^}]+\}\}/i.test(raw)) {
+        items.push({ section: sectionTitle, format, text: stripTags(raw) });
+      }
+    }
+  }
+
+  return items;
+}
+
+function hasClearPrescriptionBeforeExercise(text: string, format: string): boolean {
+  // Tabata timing is the protocol itself: 20s work / 10s rest x 8 rounds per exercise.
+  if (/TABATA/i.test(format)) return true;
+
+  const tokenIndex = text.search(/\{\{exercise:[^}]+\}\}/i);
+  if (tokenIndex < 0) return true;
+  const before = text.slice(0, tokenIndex).trim();
+
+  // Accept explicit reps, time, distance, calories, rounds, sets, labelled EMOM minutes,
+  // or a bare number used as reps, only when they appear before the exercise token.
+  return /(?:^|\b)(?:minute\s+\d+\s*:)?\s*(?:\d+(?:\.\d+)?(?:\s*-\s*\d+(?:\.\d+)?)?\s*(?:reps?|sec(?:onds?)?|s\b|min(?:utes?)?|m\b|meters?|metres?|km\b|kilometers?|kilometres?|mi\b|miles?|cal(?:ories)?|kcal|rounds?|sets?)\b|\d+\s*(?:x|×)\s*\d+|\d+(?:\s*-\s*\d+)?\s*$|amrap\s+\d+)/i.test(before);
+}
+
+function detectNakedExercisePrescriptions(html: string, flagged: ProtocolIssue[]) {
+  for (const item of getMainAndFinisherItems(html)) {
+    if (!hasClearPrescriptionBeforeExercise(item.text, item.format)) {
+      flagged.push({
+        type: "naked_exercise_prescription",
+        detail: `${item.section}: exercise token has no reps, time, distance, calories, or sets before it`,
+        snippet: item.text.slice(0, 180),
+      });
+    }
+  }
+}
+
 export function sanitizeProtocolBlocks(input: string | null | undefined): ProtocolSanitizeResult {
   const original = input || "";
   const issues: ProtocolIssue[] = [];
@@ -162,6 +216,7 @@ export function sanitizeProtocolBlocks(input: string | null | undefined): Protoc
   cleaned = stripDurationFromHeaders(cleaned, issues, fixes);
   cleaned = cleanStrayAfterToken(cleaned, issues, fixes, flagged);
   detectEmomOrphans(cleaned, flagged);
+  detectNakedExercisePrescriptions(cleaned, flagged);
 
   return {
     cleaned,
@@ -187,6 +242,12 @@ export function validateProtocolBlocks(html: string): string[] {
 
   if (/\}\}[^\s<]/.test(html)) {
     issues.push("Stray text glued to an exercise token (no whitespace between `}}` and following text)");
+  }
+
+  const nakedItems: ProtocolIssue[] = [];
+  detectNakedExercisePrescriptions(html, nakedItems);
+  for (const item of nakedItems) {
+    issues.push(`Naked exercise prescription: ${item.detail}${item.snippet ? ` [${item.snippet}]` : ""}`);
   }
 
   // EMOM orphan check (blocking)

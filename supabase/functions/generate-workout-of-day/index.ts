@@ -2028,7 +2028,12 @@ STRUCTURAL RULES — VIOLATING ANY OF THESE TRIGGERS REGENERATION (MANDATORY):
    Modifiers (reps, sides, weight, intervals) must come BEFORE the token, not after.
    - WRONG: "{{exercise:0725:single arm push-up}}20 sec interval)"
    - RIGHT: "20 sec {{exercise:0725:single arm push-up}}"
-3. EMOM blocks must label EVERY minute from 1 to N in order. No bullet may exist after the last labelled minute.
+3. EVERY exercise in Main Workout and Finisher must have a measurable prescription BEFORE the exercise token.
+   No naked exercises. No "run" without distance/time. No exercise token alone and no vague "fast pace" without dose.
+   - WRONG: "{{exercise:0685:run}} (equipment) on treadmill (fast pace)"
+   - RIGHT: "400m {{exercise:0685:run}} on treadmill (fast pace)" or "60 sec {{exercise:0685:run}} on treadmill (fast pace)"
+   Accepted prescriptions: reps, seconds, minutes, meters, km, miles, calories, rounds, sets x reps, or a clear bare number for reps.
+4. EMOM blocks must label EVERY minute from 1 to N in order. No bullet may exist after the last labelled minute.
    If a pattern repeats, write the pattern once (Minute 1 through Minute N) and then add a separate paragraph
    "Repeat X rounds = total minutes". Never trail an unlabelled exercise after "Minute 3:".
    - WRONG: list with "Minute 1:", "Minute 2:", "Minute 3:" then a 4th bullet "{{exercise:1326:chin-up}}, perform the prescribed reps..."
@@ -2039,25 +2044,25 @@ The EMOM template above shows timed formats. For REPS & SETS workouts, use THIS 
 
 <p class="tiptap-paragraph">💪 <strong><u>Main Workout (REPS & SETS 20')</u></strong></p>
 <ul class="tiptap-bullet-list">
-<li class="tiptap-list-item"><p class="tiptap-paragraph">Push-up - 4 sets x 10 reps (3-1-1-0 tempo)</p></li>
-<li class="tiptap-list-item"><p class="tiptap-paragraph">Inverted Row - 4 sets x 8-10 reps (controlled tempo)</p></li>
-<li class="tiptap-list-item"><p class="tiptap-paragraph">Pike Push-up - 3 sets x 8 reps (2-1-1-0 tempo)</p></li>
-<li class="tiptap-list-item"><p class="tiptap-paragraph">Bench Dip - 3 sets x 12 reps</p></li>
-<li class="tiptap-list-item"><p class="tiptap-paragraph">Plank Shoulder Tap - 3 sets x 10 reps per side</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph">4 sets x 10 reps {{exercise:0662:push-up}} (3-1-1-0 tempo)</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph">4 sets x 8-10 reps {{exercise:0490:inverted row}} (controlled tempo)</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph">3 sets x 8 reps {{exercise:0665:pike push-up}} (2-1-1-0 tempo)</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph">3 sets x 12 reps {{exercise:1753:three bench dip}}</p></li>
+<li class="tiptap-list-item"><p class="tiptap-paragraph">3 sets x 10 reps per side {{exercise:3664:plank shoulder tap}}</p></li>
 </ul>
 <p class="tiptap-paragraph">Rest 90-120 seconds between sets for compound movements, 60-90 seconds for isolation.</p>
 
 REPS & SETS FORMAT MANDATORY RULE:
 Every exercise line in a REPS & SETS workout MUST include sets x reps prescription.
 Examples of CORRECT formatting:
-  "Push-up - 4 sets x 10 reps (3-1-1-0 tempo)"
-  "Barbell Bench Press - 4 sets x 8-10 reps (3-1-1-0 tempo)"
-  "Plank - 3 sets x 30-45 seconds"
-  "Glute Bridge - 3 sets x 12 reps per side"
+  "4 sets x 10 reps {{exercise:0662:push-up}} (3-1-1-0 tempo)"
+  "4 sets x 8-10 reps {{exercise:0025:barbell bench press}} (3-1-1-0 tempo)"
+  "3 sets x 30-45 seconds {{exercise:forearm-plank:Forearm Plank}}"
+  "3 sets x 12 reps per side {{exercise:glute-bridge:Glute Bridge}}"
 Examples of INVALID formatting (NEVER DO THIS):
-  "Push-up" ← INVALID: no sets, no reps, completely unusable
-  "Bench Press" ← INVALID: the user has no idea what to do
-  "Squat (bodyweight)" ← INVALID: still missing prescription
+  "{{exercise:0662:push-up}}" ← INVALID: no sets, no reps, completely unusable
+  "{{exercise:0025:barbell bench press}} - 4 sets x 8 reps" ← INVALID: prescription comes after the token
+  "{{exercise:3533:quads (bodyweight squat)}} (bodyweight)" ← INVALID: still missing prescription
 An exercise listed without sets x reps prescription is INVALID and UNPROFESSIONAL.
 This rule applies to EVERY exercise in the Main Workout AND Finisher sections.
 
