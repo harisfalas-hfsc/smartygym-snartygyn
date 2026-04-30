@@ -15,6 +15,8 @@ import {
 } from "../_shared/exercise-matching.ts";
 import { normalizeWorkoutHtml, validateWorkoutHtml } from "../_shared/html-normalizer.ts";
 import { validateWodSections } from "../_shared/section-validator.ts";
+import { sanitizeProtocolBlocks, validateProtocolBlocks } from "../_shared/protocol-sanitizer.ts";
+import { injectProtocolExplanations } from "../_shared/protocol-explanations.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -1967,7 +1969,7 @@ Example (using real library exercises):
 <li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Dynamic Warm-up (8 min):</strong> {{exercise:0630:Jumping Jack}} (30 sec), {{exercise:1160:High Knee Skips}} (30 sec)</p></li>
 </ul>
 <p class="tiptap-paragraph"></p>
-<p class="tiptap-paragraph">💪 <strong><u>Main Workout (20-minute EMOM)</u></strong></p>
+<p class="tiptap-paragraph">💪 <strong><u>Main Workout (EMOM)</u></strong></p>
 <ul class="tiptap-bullet-list">
 <li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Minute 1:</strong> 15 {{exercise:0548:Kettlebell Sumo High Pull}} (moderate weight)</p></li>
 <li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Minute 2:</strong> 12 {{exercise:1636:Jump Squat}} (explosive)</p></li>
@@ -2006,14 +2008,31 @@ Icons go BEFORE <strong><u>Section Title</u></strong> with a space after the emo
 SECTION NAMING RULE (MANDATORY):
 - Soft Tissue Preparation, Activation, Cool Down: Keep simple names with duration
     Example: "Soft Tissue Preparation 5'", "Activation 15'", "Cool Down 10'"
-- Main Workout: Label as "Main Workout (FORMAT DURATION')" — NO creative sub-name
-    CORRECT: "Main Workout (TABATA 24')" or "Main Workout (CIRCUIT 30')"
-    WRONG: "Main Workout: Iron Forge (TABATA 24')" — no sub-names allowed
-- Finisher: Label as "Finisher (FORMAT DURATION')" or "Finisher (For Time)" — NO creative sub-name
-    CORRECT: "Finisher (8-minute AMRAP)" or "Finisher (For Time)"
-    WRONG: "Finisher: Burn Out (8-minute AMRAP)" — no sub-names allowed
+- Main Workout: Label as "Main Workout (FORMAT)" — NO creative sub-name AND NO duration in the header
+    CORRECT: "Main Workout (TABATA)" or "Main Workout (CIRCUIT)" or "Main Workout (EMOM)"
+    WRONG: "Main Workout (TABATA 24')" — never embed minutes in the header
+    WRONG: "Main Workout: Iron Forge (TABATA)" — no sub-names allowed
+- Finisher: Label as "Finisher (FORMAT)" — NO creative sub-name AND NO duration in the header
+    CORRECT: "Finisher (AMRAP)" or "Finisher (For Time)" or "Finisher (TABATA)"
+    WRONG: "Finisher (8-minute AMRAP)" — never embed minutes in the header
+    WRONG: "Finisher: Burn Out (AMRAP)" — no sub-names allowed
 - The creative workout name belongs ONLY in the "name" field of the JSON response
 - The ENTIRE workout shares ONE name. Sections do not get their own names.
+
+STRUCTURAL RULES — VIOLATING ANY OF THESE TRIGGERS REGENERATION (MANDATORY):
+1. NEVER write a number, "minute", or duration after TABATA / EMOM / AMRAP / FOR TIME inside any section header.
+   The protocol explanation belongs in the "instructions" JSON field, not in the workout body.
+   - WRONG: "Main Workout (TABATA 24')", "Finisher (TABATA 11')", "Finisher (15-minute EMOM)"
+   - RIGHT: "Main Workout (TABATA)", "Finisher (TABATA)", "Finisher (EMOM)"
+2. NEVER write any text on the same line directly after the closing }} of an exercise token.
+   Modifiers (reps, sides, weight, intervals) must come BEFORE the token, not after.
+   - WRONG: "{{exercise:0725:single arm push-up}}20 sec interval)"
+   - RIGHT: "20 sec {{exercise:0725:single arm push-up}}"
+3. EMOM blocks must label EVERY minute from 1 to N in order. No bullet may exist after the last labelled minute.
+   If a pattern repeats, write the pattern once (Minute 1 through Minute N) and then add a separate paragraph
+   "Repeat X rounds = total minutes". Never trail an unlabelled exercise after "Minute 3:".
+   - WRONG: list with "Minute 1:", "Minute 2:", "Minute 3:" then a 4th bullet "{{exercise:1326:chin-up}}, perform the prescribed reps..."
+   - RIGHT: list with "Minute 1:", "Minute 2:", "Minute 3:", "Minute 4:", "Minute 5:" then a paragraph "Repeat 3 rounds = 15 minutes."
 
 GOLD STANDARD REPS & SETS TEMPLATE (FOR STRENGTH / MOBILITY & STABILITY / PILATES):
 The EMOM template above shows timed formats. For REPS & SETS workouts, use THIS template instead:
@@ -2634,21 +2653,36 @@ Return JSON with these exact fields:
       const normalizedDescription = normalizeWorkoutHtml(workoutContent.description || '');
       const normalizedInstructions = normalizeWorkoutHtml(workoutContent.instructions || '');
       const normalizedTips = normalizeWorkoutHtml(workoutContent.tips || '');
-      const validation = validateWorkoutHtml(normalizedMainWorkout);
+
+      // Auto-clean protocol header durations + stray-after-token noise (idempotent).
+      const protocolSweep = sanitizeProtocolBlocks(normalizedMainWorkout);
+      const cleanedMainWorkout = protocolSweep.cleaned;
+      if (protocolSweep.fixesApplied.length > 0) {
+        logStep(`🧹 Protocol auto-fixes applied`, { fixes: protocolSweep.fixesApplied });
+      }
+
+      // Hard structural validator: block any remaining violations and force regeneration.
+      const protocolErrors = validateProtocolBlocks(cleanedMainWorkout);
+      if (protocolErrors.length > 0) {
+        logStep(`❌ PROTOCOL VALIDATION FAILED`, { equipment, protocolErrors, workoutName: workoutContent.name });
+        throw new Error(`${equipment} WOD rejected: protocol issues [${protocolErrors.join("; ")}]`);
+      }
+
+      const validation = validateWorkoutHtml(cleanedMainWorkout);
       
       if (!validation.isValid) {
         console.error(`[WOD-GENERATION] ⚠️ HTML validation issues after normalization:`, validation.issues);
         logStep(`⚠️ HTML validation issues`, { issues: validation.issues, equipment });
         // Log but don't reject - normalization should have fixed it
       } else {
-        logStep(`✅ HTML normalized and validated`, { equipment, originalLength: workoutContent.main_workout?.length, normalizedLength: normalizedMainWorkout.length });
+        logStep(`✅ HTML normalized and validated`, { equipment, originalLength: workoutContent.main_workout?.length, normalizedLength: cleanedMainWorkout.length });
       }
 
       // ═══════════════════════════════════════════════════════════════════════════════
       // SECTION COMPLETENESS GATE: Reject WODs missing required sections BEFORE insert
       // This prevents malformed content from ever reaching the database as active WOD
       // ═══════════════════════════════════════════════════════════════════════════════
-      const sectionValidation = validateWodSections(normalizedMainWorkout, isRecoveryDay);
+      const sectionValidation = validateWodSections(cleanedMainWorkout, isRecoveryDay);
       if (!sectionValidation.isComplete) {
         const errorMsg = `${equipment} WOD rejected: missing sections [${sectionValidation.missingSections.join(", ")}]`;
         logStep(`❌ SECTION VALIDATION FAILED`, {
@@ -2682,6 +2716,18 @@ Return JSON with these exact fields:
         mainWorkoutExercises: sectionValidation.mainWorkoutExerciseCount,
         finisherExercises: sectionValidation.finisherExerciseCount
       });
+
+      // Auto-inject protocol explanations into the instructions field so every
+      // protocol workout always teaches the user how to follow the format.
+      const enrichedInstructions = injectProtocolExplanations(
+        normalizedInstructions,
+        cleanedMainWorkout,
+        format,
+      );
+      const finalInstructions = enrichedInstructions.html;
+      if (enrichedInstructions.injected.length > 0) {
+        logStep(`📘 Protocol explanations injected into instructions`, { protocols: enrichedInstructions.injected });
+      }
 
       // ═══════════════════════════════════════════════════════════════════════════════
       // FINAL PRE-INSERT PUBLIC NAME GUARD (library-wide, race-condition safe)
@@ -2782,8 +2828,8 @@ Return JSON with these exact fields:
           focus: strengthFocusForWorkout,
           duration: finalDuration,
           description: normalizedDescription,
-          main_workout: normalizedMainWorkout,
-          instructions: normalizedInstructions,
+          main_workout: cleanedMainWorkout,
+          instructions: finalInstructions,
           tips: normalizedTips,
           image_url: imageUrl,
           is_premium: true,
