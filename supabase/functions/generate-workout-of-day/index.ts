@@ -15,6 +15,8 @@ import {
 } from "../_shared/exercise-matching.ts";
 import { normalizeWorkoutHtml, validateWorkoutHtml } from "../_shared/html-normalizer.ts";
 import { validateWodSections } from "../_shared/section-validator.ts";
+import { sanitizeProtocolBlocks, validateProtocolBlocks } from "../_shared/protocol-sanitizer.ts";
+import { injectProtocolExplanations } from "../_shared/protocol-explanations.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
