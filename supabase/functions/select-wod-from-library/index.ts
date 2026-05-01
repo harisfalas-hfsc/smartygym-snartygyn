@@ -271,6 +271,8 @@ serve(async (req) => {
       );
     }
 
+    let promotedCount = 0;
+
     // Flag selected workouts as WOD
     for (const workout of selectedWorkouts) {
       // Guarantee a valid Stripe product + price BEFORE promoting to WOD
@@ -315,6 +317,7 @@ serve(async (req) => {
         stripeProductId,
         stripePriceId,
       });
+      promotedCount++;
 
       // Insert cooldown record
       await supabase.from("wod_selection_cooldown").insert({
@@ -326,12 +329,17 @@ serve(async (req) => {
       });
     }
 
+    const expectedCount = isRecoveryDay ? 1 : 2;
+    if (promotedCount < expectedCount) {
+      throw new Error(`Library fallback promoted ${promotedCount}/${expectedCount} WODs; refusing to report success without image + Stripe associations`);
+    }
+
     // Log to wod_generation_runs
     await supabase.from("wod_generation_runs").insert({
       cyprus_date: targetDate,
       status: "success",
       expected_count: isRecoveryDay ? 1 : 2,
-      found_count: selectedWorkouts.length,
+      found_count: promotedCount,
       is_recovery_day: isRecoveryDay,
       expected_category: periodization.category,
       trigger_source: "library-selection",
