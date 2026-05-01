@@ -1,11 +1,102 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import Stripe from "https://esm.sh/stripe@18.5.0";
 import { getDayIn84Cycle, getPeriodizationForDay } from "../_shared/periodization-84day.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+const WOD_PRICE_EUR = 3.99;
+
+/**
+ * Ensure a library workout has a valid Stripe product + default price linked
+ * before being promoted to WOD. If anything is missing, create it now.
+ * Returns { stripeProductId, stripePriceId } or throws.
+ */
+async function ensureWodStripeAssociation(
+  supabase: any,
+  stripe: Stripe,
+  workout: any,
+  effectiveDate: string,
+) {
+  let productId: string | null = workout.stripe_product_id || null;
+  let priceId: string | null = workout.stripe_price_id || null;
+
+  // 1. Validate or create product
+  if (productId) {
+    try {
+      const product = await stripe.products.retrieve(productId);
+      if (!product.active) {
+        await stripe.products.update(productId, { active: true });
+      }
+    } catch (e) {
+      logStep("Existing stripe_product_id invalid - will recreate", { id: workout.id, error: (e as Error).message });
+      productId = null;
+      priceId = null;
+    }
+  }
+
+  if (!productId) {
+    const product = await stripe.products.create({
+      name: workout.name,
+      description: `SMARTYGYM Workout of the Day — ${workout.equipment || ""} ${workout.category || ""} ${workout.format || ""}`.trim(),
+      images: workout.image_url && workout.image_url.startsWith("https://") ? [workout.image_url] : undefined,
+      metadata: {
+        project: "SMARTYGYM",
+        content_type: "Workout",
+        type: "wod",
+        workout_id: workout.id,
+        content_id: workout.id,
+        equipment: workout.equipment || "",
+        generated_for_date: effectiveDate,
+        source: "select-wod-from-library",
+      },
+    }, {
+      idempotencyKey: `SMARTYGYM:wod:${workout.id}:product`,
+    });
+    productId = product.id;
+  }
+
+  // 2. Validate or create price
+  if (priceId) {
+    try {
+      const price = await stripe.prices.retrieve(priceId);
+      if (!price.active || price.product !== productId) {
+        priceId = null;
+      }
+    } catch (e) {
+      logStep("Existing stripe_price_id invalid - will recreate", { id: workout.id, error: (e as Error).message });
+      priceId = null;
+    }
+  }
+
+  if (!priceId) {
+    const price = await stripe.prices.create({
+      product: productId,
+      unit_amount: Math.round(WOD_PRICE_EUR * 100),
+      currency: "eur",
+      metadata: {
+        project: "SMARTYGYM",
+        content_type: "Workout",
+        type: "wod",
+        workout_id: workout.id,
+        content_id: workout.id,
+        equipment: workout.equipment || "",
+        generated_for_date: effectiveDate,
+        source: "select-wod-from-library",
+      },
+    }, {
+      idempotencyKey: `SMARTYGYM:wod:${workout.id}:price:${Math.round(WOD_PRICE_EUR * 100)}:eur`,
+    });
+    priceId = price.id;
+
+    await stripe.products.update(productId, { default_price: priceId });
+  }
+
+  return { stripeProductId: productId, stripePriceId: priceId };
+}
 
 function logStep(step: string, details?: any) {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
@@ -32,6 +123,8 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY") || "";
+    const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" as any });
 
     // Determine today's date in Cyprus timezone
     let targetDate: string;
@@ -161,21 +254,48 @@ serve(async (req) => {
 
     // Flag selected workouts as WOD
     for (const workout of selectedWorkouts) {
+      // Guarantee a valid Stripe product + price BEFORE promoting to WOD
+      let stripeProductId: string;
+      let stripePriceId: string;
+      try {
+        const association = await ensureWodStripeAssociation(supabase, stripe, workout, targetDate);
+        stripeProductId = association.stripeProductId;
+        stripePriceId = association.stripePriceId;
+      } catch (assocError) {
+        logStep("ERROR ensuring Stripe association - skipping promotion", {
+          id: workout.id,
+          error: (assocError as Error).message,
+        });
+        continue;
+      }
+
       const { error: updateError } = await supabase
         .from("admin_workouts")
         .update({
           is_workout_of_day: true,
           generated_for_date: targetDate,
           wod_source: "library",
+          is_free: false,
+          is_premium: true,
+          is_standalone_purchase: true,
+          price: WOD_PRICE_EUR,
+          stripe_product_id: stripeProductId,
+          stripe_price_id: stripePriceId,
           updated_at: new Date().toISOString(),
         })
         .eq("id", workout.id);
 
       if (updateError) {
         logStep("ERROR flagging workout as WOD", { id: workout.id, error: updateError.message });
-      } else {
-        logStep("Flagged workout as WOD", { id: workout.id, name: workout.name, equipment: workout.equipment });
+        continue;
       }
+      logStep("Flagged workout as WOD with payment links", {
+        id: workout.id,
+        name: workout.name,
+        equipment: workout.equipment,
+        stripeProductId,
+        stripePriceId,
+      });
 
       // Insert cooldown record
       await supabase.from("wod_selection_cooldown").insert({
