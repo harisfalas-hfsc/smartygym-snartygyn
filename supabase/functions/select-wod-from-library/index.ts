@@ -114,6 +114,17 @@ async function ensureWodStripeAssociation(
     await stripe.products.update(productId, { default_price: priceId });
   }
 
+  const finalProduct = await stripe.products.retrieve(productId);
+  const defaultPriceId = typeof finalProduct.default_price === "string"
+    ? finalProduct.default_price
+    : finalProduct.default_price?.id;
+  if (defaultPriceId !== priceId || !finalProduct.images?.includes(productImage)) {
+    await stripe.products.update(productId, {
+      default_price: priceId,
+      images: [productImage],
+    });
+  }
+
   return { stripeProductId: productId, stripePriceId: priceId };
 }
 
