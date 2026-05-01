@@ -40,18 +40,26 @@ function verifyWods(wods: any[], recoveryDay: boolean): { valid: string[]; missi
   const valid: string[] = [];
   const missing: string[] = [];
 
+  const hasAssets = (w: any) => Boolean(
+    w?.image_url?.startsWith?.("https://") &&
+    w?.stripe_product_id &&
+    w?.stripe_price_id &&
+    w?.is_standalone_purchase === true &&
+    Number(w?.price) > 0
+  );
+
   if (recoveryDay) {
     const v = wods?.find((w: any) => w.equipment === "VARIOUS");
-    if (v && validateWodSections(v.main_workout, true).isComplete) valid.push("VARIOUS");
-    else missing.push(v ? "VARIOUS (incomplete)" : "VARIOUS");
+    if (v && validateWodSections(v.main_workout, true).isComplete && hasAssets(v)) valid.push("VARIOUS");
+    else missing.push(v ? "VARIOUS (incomplete or missing image/payment)" : "VARIOUS");
   } else {
     const bw = wods?.find((w: any) => w.equipment === "BODYWEIGHT");
-    if (bw && validateWodSections(bw.main_workout, false).isComplete) valid.push("BODYWEIGHT");
-    else missing.push(bw ? "BODYWEIGHT (incomplete)" : "BODYWEIGHT");
+    if (bw && validateWodSections(bw.main_workout, false).isComplete && hasAssets(bw)) valid.push("BODYWEIGHT");
+    else missing.push(bw ? "BODYWEIGHT (incomplete or missing image/payment)" : "BODYWEIGHT");
 
     const eq = wods?.find((w: any) => w.equipment === "EQUIPMENT");
-    if (eq && validateWodSections(eq.main_workout, false).isComplete) valid.push("EQUIPMENT");
-    else missing.push(eq ? "EQUIPMENT (incomplete)" : "EQUIPMENT");
+    if (eq && validateWodSections(eq.main_workout, false).isComplete && hasAssets(eq)) valid.push("EQUIPMENT");
+    else missing.push(eq ? "EQUIPMENT (incomplete or missing image/payment)" : "EQUIPMENT");
   }
 
   return { valid, missing };
