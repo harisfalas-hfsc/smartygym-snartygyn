@@ -545,11 +545,6 @@ const Index = () => {
             {JSON.stringify(generateOrganizationWithRatingSchema(reviewStats.count, reviewStats.average))}
           </script>
         )}
-        
-        {/* FAQ Schema for AI citations */}
-        <script type="application/ld+json">
-          {JSON.stringify(generateFAQSchema(homepageFAQs))}
-        </script>
       </Helmet>
       
       {/* Citation-ready about section for AI crawlers */}
