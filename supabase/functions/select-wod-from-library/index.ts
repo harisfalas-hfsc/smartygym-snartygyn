@@ -23,13 +23,32 @@ async function ensureWodStripeAssociation(
 ) {
   let productId: string | null = workout.stripe_product_id || null;
   let priceId: string | null = workout.stripe_price_id || null;
+  const productImage = workout.image_url && workout.image_url.startsWith("https://") ? workout.image_url : null;
+
+  if (!productImage) {
+    throw new Error(`Library WOD ${workout.id} has no valid image_url; refusing to create a product without a picture`);
+  }
 
   // 1. Validate or create product
   if (productId) {
     try {
       const product = await stripe.products.retrieve(productId);
-      if (!product.active) {
-        await stripe.products.update(productId, { active: true });
+      if (!product.active || !product.images?.includes(productImage)) {
+        await stripe.products.update(productId, {
+          active: true,
+          images: [productImage],
+          metadata: {
+            ...product.metadata,
+            project: "SMARTYGYM",
+            content_type: "Workout",
+            type: "wod",
+            workout_id: workout.id,
+            content_id: workout.id,
+            equipment: workout.equipment || "",
+            generated_for_date: effectiveDate,
+            source: "select-wod-from-library",
+          },
+        });
       }
     } catch (e) {
       logStep("Existing stripe_product_id invalid - will recreate", { id: workout.id, error: (e as Error).message });
@@ -42,7 +61,7 @@ async function ensureWodStripeAssociation(
     const product = await stripe.products.create({
       name: workout.name,
       description: `SMARTYGYM Workout of the Day — ${workout.equipment || ""} ${workout.category || ""} ${workout.format || ""}`.trim(),
-      images: workout.image_url && workout.image_url.startsWith("https://") ? [workout.image_url] : undefined,
+      images: [productImage],
       metadata: {
         project: "SMARTYGYM",
         content_type: "Workout",
