@@ -252,40 +252,6 @@ export default function SmartyPlans() {
           })}
         </script>
         
-        {/* FAQ Schema */}
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            "mainEntity": [
-              {
-                "@type": "Question",
-                "name": "What is the difference between Gold and Platinum plans?",
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": "Both plans include full access to all SmartyGym features. Gold is billed monthly at €9.99/month. Platinum is billed yearly at €89.99/year (€7.50/month equivalent), saving you 25% compared to monthly billing."
-                }
-              },
-              {
-                "@type": "Question",
-                "name": "How much does SmartyGym cost per month?",
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": "SmartyGym Gold costs €9.99/month. With Platinum yearly billing, the effective cost is just €7.50/month."
-                }
-              },
-              {
-                "@type": "Question",
-                "name": "Can I switch between Gold and Platinum plans?",
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": "Yes, you can upgrade from Gold to Platinum anytime to lock in yearly savings. Contact support for assistance with plan changes."
-                }
-              }
-            ]
-          })}
-        </script>
-        
         {/* BreadcrumbList Schema */}
         <script type="application/ld+json">
           {JSON.stringify({

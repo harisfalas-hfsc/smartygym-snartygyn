@@ -183,9 +183,13 @@ const resolvePage = (pathname: string) => {
     pages[0];
 };
 
-const buildSchema = (page: SeoPage) => ({
-  "@context": "https://schema.org",
-  "@graph": [
+const buildSchema = (page: SeoPage, pathname: string) => {
+  const normalizedPath = pathname === "" ? "/" : pathname.replace(/\/$/, "") || "/";
+  // The dedicated /faq page injects its own (richer) FAQPage schema.
+  // Skip emitting one here to avoid Google "Duplicate field FAQPage" warnings.
+  const includeFaq = normalizedPath !== "/faq";
+
+  const graph: any[] = [
     {
       "@type": page.type,
       "@id": `https://smartygym.com${page.route === "/" ? "/#webpage" : `${page.route}#webpage`}`,
@@ -210,15 +214,6 @@ const buildSchema = (page: SeoPage) => ({
       "knowsAbout": coreKeywords
     },
     {
-      "@type": "FAQPage",
-      "@id": `https://smartygym.com${page.route === "/" ? "/#faq" : `${page.route}#faq`}`,
-      "mainEntity": page.faqs.map((faq) => ({
-        "@type": "Question",
-        "name": faq.question,
-        "acceptedAnswer": { "@type": "Answer", "text": faq.answer }
-      }))
-    },
-    {
       "@type": "HowTo",
       "name": `How to use ${page.name}`,
       "description": `A practical step-by-step guide for using ${page.name} on SmartyGym.`,
@@ -233,8 +228,26 @@ const buildSchema = (page: SeoPage) => ({
         "item": { "@type": "WebPage", "name": link.name, "url": `https://smartygym.com${link.url}` }
       }))
     }
-  ]
-});
+  ];
+
+  if (includeFaq) {
+    // Insert FAQPage right after Organization (index 2) to preserve original ordering.
+    graph.splice(2, 0, {
+      "@type": "FAQPage",
+      "@id": `https://smartygym.com${page.route === "/" ? "/#faq" : `${page.route}#faq`}`,
+      "mainEntity": page.faqs.map((faq) => ({
+        "@type": "Question",
+        "name": faq.question,
+        "acceptedAnswer": { "@type": "Answer", "text": faq.answer }
+      }))
+    });
+  }
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": graph,
+  };
+};
 
 export const BackgroundSEO = () => {
   const { pathname } = useLocation();
@@ -251,7 +264,7 @@ export const BackgroundSEO = () => {
         <meta name="ai:brand-positioning" content="SmartyGym - The Smart Way to Train Online. A human-designed online fitness platform and online gym by Haris Falas." />
         <meta name="ai:primary-outcomes" content="fat loss, strength, muscle building, functional training, performance training, mobility and stability, core training, consistency" />
         <meta name="ai:important-routes" content="/, /workout, /workout/wod, /trainingprogram, /tools, /blog, /contact, /smarty-plans" />
-        <script type="application/ld+json">{JSON.stringify(buildSchema(page))}</script>
+        <script type="application/ld+json">{JSON.stringify(buildSchema(page, pathname))}</script>
       </Helmet>
 
       <section className="sr-only" data-background-seo="true" aria-label={`${page.name} background search context`}>

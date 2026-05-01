@@ -210,56 +210,6 @@ export default function JoinPremium() {
           })}
         </script>
         
-        {/* FAQ Schema for subscription questions */}
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            "mainEntity": [
-              {
-                "@type": "Question",
-                "name": "How much does SmartyGym cost?",
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": "SmartyGym offers two premium plans: Gold Plan at €9.99/month or Platinum Plan at €89.99/year (equivalent to €7.50/month, saving 25%)."
-                }
-              },
-              {
-                "@type": "Question",
-                "name": "Is there a free trial for SmartyGym?",
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": "SmartyGym offers a free tier with access to selected workouts, all fitness calculators, blog articles, and the exercise library."
-                }
-              },
-              {
-                "@type": "Question",
-                "name": "Can I cancel my SmartyGym subscription?",
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": "Yes, you can cancel your SmartyGym subscription anytime. There are no long-term contracts or cancellation fees."
-                }
-              },
-              {
-                "@type": "Question",
-                "name": "What's included in SmartyGym Premium?",
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": "Premium includes unlimited access to 500+ workouts, multi-week training programs, fitness calculators with history tracking, Smarty Rituals, Check-ins, progress tracking, and priority support. All content is 100% human-designed by Sports Scientist Haris Falas."
-                }
-              },
-              {
-                "@type": "Question",
-                "name": "Is SmartyGym worth it?",
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": "SmartyGym provides evidence-based training designed by certified Sports Scientist Haris Falas (BSc, CSCS) with 20+ years experience. Unlike AI-generated content, every workout is professionally designed. At €9.99/month (or less with yearly plan), it's a fraction of traditional gym or personal training costs."
-                }
-              }
-            ]
-          })}
-        </script>
-        
         {/* BreadcrumbList Schema */}
         <script type="application/ld+json">
           {JSON.stringify({

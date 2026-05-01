@@ -7,7 +7,6 @@ import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { Search, Flame, Beef, Wheat, Droplets, Leaf, Loader2, Plus, Minus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { generateFAQSchema } from "@/utils/seoSchemas";
 
 interface FoodItem {
   fdcId: number;
@@ -179,9 +178,6 @@ const CalorieCounter = () => {
         <meta name="twitter:description" content="Search any food and instantly see calories, protein, carbs, fat, fiber. USDA database, free, no signup." />
         <meta name="twitter:image" content="https://smartygym.com/og-image.png" />
         <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large" />
-        <script type="application/ld+json">
-          {JSON.stringify(generateFAQSchema(CALORIE_COUNTER_FAQS))}
-        </script>
         <script type="application/ld+json">
           {JSON.stringify(SOFTWARE_APP_SCHEMA)}
         </script>

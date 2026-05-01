@@ -173,20 +173,6 @@ const BestOnlineFitnessPlatform = () => {
     }
   }));
 
-  // FAQ schema for competitor "vs" queries (invisible — triggers featured snippets)
-  const faqSchema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": competitorFAQSchema.map(faq => ({
-      "@type": "Question",
-      "name": faq.question,
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": faq.answer
-      }
-    }))
-  };
-
   // Editorial rating schema
   const editorialRatingSchema = {
     "@context": "https://schema.org",
@@ -400,7 +386,6 @@ const BestOnlineFitnessPlatform = () => {
         <script type="application/ld+json">{JSON.stringify(competitorComparisonSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(organizationSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(howToSchema)}</script>
-        <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(editorialRatingSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(softwareAppSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(videoObjectSchema)}</script>
