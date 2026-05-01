@@ -13,6 +13,13 @@ serve(async (req) => {
   }
 
   try {
+    let body: any = {};
+    try {
+      body = await req.json();
+    } catch {
+      body = {};
+    }
+
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) {
       throw new Error("STRIPE_SECRET_KEY not configured");
@@ -26,20 +33,28 @@ serve(async (req) => {
     console.log("[AUDIT-STRIPE-IMAGES] Starting audit...");
 
     // Fetch workouts with stripe_product_id, image_url, and is_free
-    const { data: workouts, error: workoutsError } = await supabase
+    let workoutsQuery = supabase
       .from("admin_workouts")
-      .select("id, name, stripe_product_id, image_url, is_free")
+      .select("id, name, stripe_product_id, image_url, is_free, is_workout_of_day, generated_for_date")
       .not("stripe_product_id", "is", null);
+
+    if (body?.wodDate) {
+      workoutsQuery = workoutsQuery.eq("is_workout_of_day", true).eq("generated_for_date", body.wodDate);
+    }
+
+    const { data: workouts, error: workoutsError } = await workoutsQuery;
 
     if (workoutsError) {
       throw new Error(`Failed to fetch workouts: ${workoutsError.message}`);
     }
 
     // Fetch programs with stripe_product_id, image_url, and is_free
-    const { data: programs, error: programsError } = await supabase
-      .from("admin_training_programs")
-      .select("id, name, stripe_product_id, image_url, is_free")
-      .not("stripe_product_id", "is", null);
+    const { data: programs, error: programsError } = body?.wodDate
+      ? { data: [], error: null }
+      : await supabase
+        .from("admin_training_programs")
+        .select("id, name, stripe_product_id, image_url, is_free")
+        .not("stripe_product_id", "is", null);
 
     if (programsError) {
       throw new Error(`Failed to fetch programs: ${programsError.message}`);
