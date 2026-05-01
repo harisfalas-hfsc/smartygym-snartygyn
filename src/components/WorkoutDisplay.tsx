@@ -325,7 +325,13 @@ export const WorkoutDisplay = ({
             <CardContent className="content-container pt-6">
               <ExerciseLibraryBanner />
               <A4Container>
-                <HTMLContent content={instructions || program_structure || ''} className="text-base" />
+                <div className="workout-content">
+                  <ExerciseHTMLContent
+                    content={instructions || program_structure || ''}
+                    className="text-base"
+                    enableExerciseLinking={true}
+                  />
+                </div>
               </A4Container>
             </CardContent>
           </Card>
@@ -341,7 +347,13 @@ export const WorkoutDisplay = ({
             </CardHeader>
             <CardContent className="content-container pt-6">
               <A4Container>
-                <HTMLContent content={tips || nutrition_tips || ''} className="text-base" />
+                <div className="workout-content">
+                  <ExerciseHTMLContent
+                    content={tips || nutrition_tips || ''}
+                    className="text-base"
+                    enableExerciseLinking={true}
+                  />
+                </div>
               </A4Container>
             </CardContent>
           </Card>
