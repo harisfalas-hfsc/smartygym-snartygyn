@@ -288,21 +288,9 @@ serve(async (req) => {
       // No body or invalid JSON - use defaults
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════════
-    // CRITICAL: Use Cyprus timezone (Europe/Athens, UTC+2/+3) for date calculation
-    // The cron runs at 00:30 UTC - we use Intl.DateTimeFormat for proper DST handling
-    // ═══════════════════════════════════════════════════════════════════════════════
+    // Cyprus date (Europe/Athens) — DST-safe via shared helper.
     const now = new Date();
-    
-    // Use Intl.DateTimeFormat to get the correct date in Europe/Athens timezone
-    // This automatically handles DST transitions correctly
-    const cyprusFormatter = new Intl.DateTimeFormat('en-CA', {
-      timeZone: 'Europe/Athens',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    });
-    const cyprusDateStr = cyprusFormatter.format(now); // Returns YYYY-MM-DD format
+    const cyprusDateStr = cyprusToday(now);
     
     logStep("Timezone calculation", {
       utcNow: now.toISOString(),
