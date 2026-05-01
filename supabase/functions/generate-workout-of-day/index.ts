@@ -2540,7 +2540,7 @@ Return JSON with these exact fields:
       if (!imageUrl) {
         console.error(`[WOD-GENERATION] ❌ CRITICAL ERROR: No image URL for ${equipment} workout "${workoutContent.name}" after ${imageMaxRetries} attempts!`);
         logStep(`❌ CRITICAL: All image generation attempts failed`, { workout: workoutContent.name, equipment, attempts: imageMaxRetries });
-        // Continue but log prominently - the workout will be created without image
+        throw new Error(`${equipment} WOD rejected: image generation failed after ${imageMaxRetries} attempts`);
       } else {
         logStep(`✅ Image validated for Stripe`, { imageUrl: imageUrl.substring(0, 80) });
       }
