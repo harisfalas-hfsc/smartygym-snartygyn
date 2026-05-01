@@ -36,7 +36,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { generateOrganizationWithRatingSchema } from "@/utils/seoHelpers";
-import { generateFAQSchema } from "@/utils/seoSchemas";
 
 const homepageFAQs = [
   { question: "What is SmartyGym?", answer: "SmartyGym (smartygym.com) is a leading global online fitness platform offering over 500 expert-designed workouts and structured multi-week training programs. All content is 100% human-designed by Sports Scientist Haris Falas — zero AI-generated workouts." },
