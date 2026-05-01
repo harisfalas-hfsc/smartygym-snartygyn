@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import Stripe from "https://esm.sh/stripe@14.21.0";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import Stripe from "https://esm.sh/stripe@18.5.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -21,7 +21,7 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
-    const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
+    const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" as any });
 
     console.log("[AUDIT-STRIPE-IMAGES] Starting audit...");
 
@@ -75,15 +75,16 @@ serve(async (req) => {
         // Fetch the Stripe product
         const product = await stripe.products.retrieve(item.stripe_product_id);
         
-        // Check if Stripe product has images
+        // Check if Stripe product already has the website image
         const hasStripeImage = product.images && product.images.length > 0;
+        const hasMatchingStripeImage = hasStripeImage && product.images.includes(item.image_url);
         
-        if (hasStripeImage) {
+        if (hasMatchingStripeImage) {
           results.already_has_image++;
           results.details.push({
             name: item.name,
             type: item.type,
-            status: "has_image",
+            status: "has_matching_image",
           });
           continue;
         }
