@@ -400,7 +400,6 @@ const BestOnlineFitnessPlatform = () => {
         <script type="application/ld+json">{JSON.stringify(competitorComparisonSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(organizationSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(howToSchema)}</script>
-        <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(editorialRatingSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(softwareAppSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(videoObjectSchema)}</script>
