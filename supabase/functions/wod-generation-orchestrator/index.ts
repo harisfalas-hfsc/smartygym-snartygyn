@@ -490,6 +490,66 @@ serve(async (req) => {
     console.log(`[ORCHESTRATOR] 🚨 ${failureType} FAILURE after ${MAX_ATTEMPTS} attempts - Sending admin alert`);
     await runWodStripeCleanup(supabaseUrl, supabaseServiceKey, "orchestrator-failure", false);
 
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // EMERGENCY LIBRARY FALLBACK: Before alerting failure, try to publish validated
+    // existing library workouts so users always have today's WODs.
+    // Non-destructive: re-flags existing rows, never deletes anything.
+    // ═══════════════════════════════════════════════════════════════════════════════
+    let fallbackResult: WodVerificationResult | null = null;
+    try {
+      console.log("[ORCHESTRATOR] 🛟 Attempting emergency library-selection fallback");
+      const fbResp = await fetch(`${supabaseUrl}/functions/v1/select-wod-from-library`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${anonKey}`,
+        },
+        body: JSON.stringify({ targetDate: effectiveDate }),
+      });
+      const fbText = await fbResp.text();
+      console.log(`[ORCHESTRATOR] 🛟 Library fallback response ${fbResp.status}: ${fbText.substring(0, 300)}`);
+
+      // Re-verify after fallback
+      await delay(2000);
+      fallbackResult = await verifyWodsExist(supabase, effectiveDate);
+
+      if (fallbackResult.success) {
+        console.log(`[ORCHESTRATOR] ✅ EMERGENCY FALLBACK SUCCEEDED - WODs published from library: ${fallbackResult.found.join(", ")}`);
+        succeeded = true;
+
+        if (runLog?.id) {
+          await supabase
+            .from("wod_generation_runs")
+            .update({
+              status: "recovered",
+              completed_at: new Date().toISOString(),
+              found_count: fallbackResult.found.length,
+              wods_created: fallbackResult.found,
+              error_message: `Generation failed after ${MAX_ATTEMPTS} attempts; recovered automatically via library-selection fallback.`,
+            })
+            .eq("id", runLog.id);
+        }
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            recovered: true,
+            mode: "library-fallback",
+            message: `WOD generation failed but library fallback published today's WODs`,
+            date: effectiveDate,
+            found: fallbackResult.found,
+            attempts: attempts,
+            runLogId: runLog?.id,
+          }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      } else {
+        console.log(`[ORCHESTRATOR] 🛟 Library fallback did not satisfy expected count. Missing: ${fallbackResult.missing.join(", ")}`);
+      }
+    } catch (fbError) {
+      console.error("[ORCHESTRATOR] 🛟 Library fallback failed:", fbError);
+    }
+
     await sendAdminAlert(
       supabase,
       effectiveDate,
