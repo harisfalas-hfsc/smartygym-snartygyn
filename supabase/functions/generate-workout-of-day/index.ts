@@ -2861,7 +2861,7 @@ Return JSON with these exact fields:
       // ═══════════════════════════════════════════════════════════════════════════════
       const { data: verifyWorkout, error: verifyError } = await supabase
         .from("admin_workouts")
-        .select("id, name, equipment, generated_for_date, category, difficulty, difficulty_stars, stripe_product_id, stripe_price_id")
+        .select("id, name, equipment, generated_for_date, category, difficulty, difficulty_stars, image_url, is_standalone_purchase, price, stripe_product_id, stripe_price_id")
         .eq("id", workoutId)
         .single();
       
@@ -2878,6 +2878,11 @@ Return JSON with these exact fields:
       if (verifyWorkout.stripe_product_id !== stripeProductId || verifyWorkout.stripe_price_id !== stripePriceId) {
         await archiveStripeProductSafely(stripe, stripeProductId, "stripe_database_association_mismatch");
         throw new Error(`${equipment} WOD payment association mismatch after insert`);
+      }
+
+      if (!verifyWorkout.image_url?.startsWith?.("https://") || !verifyWorkout.is_standalone_purchase || Number(verifyWorkout.price) <= 0) {
+        await archiveStripeProductSafely(stripe, stripeProductId, "post_insert_missing_image_or_purchase_flags");
+        throw new Error(`${equipment} WOD image/payment verification failed after insert`);
       }
       
       // Verify category matches expected
