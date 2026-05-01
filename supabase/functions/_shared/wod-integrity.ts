@@ -11,8 +11,10 @@
 
 import { validateWodSections } from "./section-validator.ts";
 import { getDayIn84Cycle, getPeriodizationForDay } from "./periodization-84day.ts";
+import { WOD_PRICE_EUR as RULES_WOD_PRICE_EUR } from "./wod/rules.ts";
 
-export const WOD_PRICE_EUR = 3.99;
+/** Re-exported so existing callers keep working. Single source: ./wod/rules.ts */
+export const WOD_PRICE_EUR = RULES_WOD_PRICE_EUR;
 
 export type WodEquipment = "BODYWEIGHT" | "EQUIPMENT" | "VARIOUS";
 
