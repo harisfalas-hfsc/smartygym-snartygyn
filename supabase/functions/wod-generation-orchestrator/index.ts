@@ -331,6 +331,44 @@ serve(async (req) => {
   const effectiveDate = getCyprusDateStr();
   console.log(`[ORCHESTRATOR] Effective date: ${effectiveDate}`);
 
+  // Parse optional trigger source from body (used by backup/watchdog wrappers)
+  let triggerSource = "orchestrator";
+  try {
+    if (req.method === "POST") {
+      const bodyText = await req.text();
+      if (bodyText && bodyText.trim().length > 0) {
+        const body = JSON.parse(bodyText);
+        if (body && typeof body.triggerSource === "string" && body.triggerSource.length > 0) {
+          triggerSource = body.triggerSource;
+        }
+      }
+    }
+  } catch (parseError) {
+    console.log(`[ORCHESTRATOR] No JSON body or invalid body, using default trigger source. (${parseError instanceof Error ? parseError.message : String(parseError)})`);
+  }
+  console.log(`[ORCHESTRATOR] Trigger source: ${triggerSource}`);
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // EARLY EXIT: If today's WODs already exist and pass the publish contract,
+  // do nothing. This prevents backup (03:00) and watchdog (03:05) wrappers
+  // from re-generating WODs unnecessarily and burning AI credits.
+  // ───────────────────────────────────────────────────────────────────────────
+  const preCheck = await verifyWodsExist(supabase, effectiveDate);
+  if (preCheck.missing.length === 0 && preCheck.found.length > 0) {
+    console.log(`[ORCHESTRATOR] ✅ WODs already exist for ${effectiveDate}: ${preCheck.found.join(", ")}. Trigger="${triggerSource}". Nothing to do.`);
+    return new Response(
+      JSON.stringify({
+        success: true,
+        mode: "noop",
+        message: "WODs already present and valid",
+        date: effectiveDate,
+        found: preCheck.found,
+        triggerSource,
+      }),
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+
   // Check WOD mode from config
   const { data: wodConfig } = await supabase
     .from("wod_auto_generation_config")
@@ -410,7 +448,7 @@ serve(async (req) => {
       expected_count: expectedCount,
       is_recovery_day: recoveryDay,
       expected_category: periodization.category,
-      trigger_source: "orchestrator",
+      trigger_source: triggerSource,
     })
     .select()
     .single();
