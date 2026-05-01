@@ -322,6 +322,33 @@ serve(async (req) => {
         logStep("ERROR flagging workout as WOD", { id: workout.id, error: updateError.message });
         continue;
       }
+
+      // Re-fetch the row and apply the shared WOD publish contract.
+      // Library fallback is NOT allowed to publish anything that would
+      // not pass the same gate as a freshly generated WOD.
+      const { data: postRow } = await supabase
+        .from("admin_workouts")
+        .select("id, name, equipment, category, is_workout_of_day, is_visible, main_workout, description, instructions, tips, image_url, is_standalone_purchase, price, stripe_product_id, stripe_price_id, generated_for_date")
+        .eq("id", workout.id)
+        .single();
+      const contract = validateWodPublishContract(postRow || {}, targetDate);
+      if (!contract.ok) {
+        logStep("REJECT: library candidate failed publish contract - rolling back", {
+          id: workout.id,
+          failures: contract.failures,
+        });
+        await supabase
+          .from("admin_workouts")
+          .update({
+            is_workout_of_day: false,
+            generated_for_date: null,
+            wod_source: null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", workout.id);
+        continue;
+      }
+
       logStep("Flagged workout as WOD with payment links", {
         id: workout.id,
         name: workout.name,
