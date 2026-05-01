@@ -4,6 +4,7 @@ import { Resend } from "https://esm.sh/resend@2.0.0";
 import { getDayIn84Cycle, getPeriodizationForDay } from "../_shared/periodization-84day.ts";
 import { getAdminNotificationEmail } from "../_shared/admin-settings.ts";
 import { validateWodSections } from "../_shared/section-validator.ts";
+import { validateWodPublishContract } from "../_shared/wod-integrity.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -36,30 +37,20 @@ function isRecoveryDay(dateStr: string): boolean {
   return periodization.category === "RECOVERY";
 }
 
-function verifyWods(wods: any[], recoveryDay: boolean): { valid: string[]; missing: string[] } {
+function verifyWods(wods: any[], recoveryDay: boolean, dateStr: string): { valid: string[]; missing: string[] } {
   const valid: string[] = [];
   const missing: string[] = [];
 
-  const hasAssets = (w: any) => Boolean(
-    w?.image_url?.startsWith?.("https://") &&
-    w?.stripe_product_id &&
-    w?.stripe_price_id &&
-    w?.is_standalone_purchase === true &&
-    Number(w?.price) > 0
-  );
-
-  if (recoveryDay) {
-    const v = wods?.find((w: any) => w.equipment === "VARIOUS");
-    if (v && validateWodSections(v.main_workout, true).isComplete && hasAssets(v)) valid.push("VARIOUS");
-    else missing.push(v ? "VARIOUS (incomplete or missing image/payment)" : "VARIOUS");
-  } else {
-    const bw = wods?.find((w: any) => w.equipment === "BODYWEIGHT");
-    if (bw && validateWodSections(bw.main_workout, false).isComplete && hasAssets(bw)) valid.push("BODYWEIGHT");
-    else missing.push(bw ? "BODYWEIGHT (incomplete or missing image/payment)" : "BODYWEIGHT");
-
-    const eq = wods?.find((w: any) => w.equipment === "EQUIPMENT");
-    if (eq && validateWodSections(eq.main_workout, false).isComplete && hasAssets(eq)) valid.push("EQUIPMENT");
-    else missing.push(eq ? "EQUIPMENT (incomplete or missing image/payment)" : "EQUIPMENT");
+  const expectedSlots = recoveryDay ? ["VARIOUS"] : ["BODYWEIGHT", "EQUIPMENT"];
+  for (const slot of expectedSlots) {
+    const w = wods?.find((x: any) => x.equipment === slot);
+    if (!w) {
+      missing.push(slot);
+      continue;
+    }
+    const contract = validateWodPublishContract(w, dateStr);
+    if (contract.ok) valid.push(slot);
+    else missing.push(`${slot} (${contract.failures.join("; ")})`);
   }
 
   return { valid, missing };
@@ -98,7 +89,7 @@ serve(async (req) => {
     });
   }
 
-  const initial = verifyWods(wods || [], recoveryDay);
+  const initial = verifyWods(wods || [], recoveryDay, effectiveDate);
 
   // If all WODs present and valid, nothing to do
   if (initial.missing.length === 0) {
@@ -179,7 +170,7 @@ serve(async (req) => {
         .eq("generated_for_date", effectiveDate)
         .eq("is_workout_of_day", true);
 
-      const result = verifyWods(recheck || [], recoveryDay);
+      const result = verifyWods(recheck || [], recoveryDay, effectiveDate);
       recheckValid = result.valid;
 
       if (recheckValid.length >= expectedCount) {
@@ -218,7 +209,7 @@ serve(async (req) => {
           .eq("generated_for_date", effectiveDate)
           .eq("is_workout_of_day", true);
 
-        const postResult = verifyWods(postFb || [], recoveryDay);
+        const postResult = verifyWods(postFb || [], recoveryDay, effectiveDate);
         recheckValid = postResult.valid;
         if (recheckValid.length >= expectedCount) {
           backupSucceeded = true;
