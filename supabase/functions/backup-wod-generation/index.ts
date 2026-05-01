@@ -86,7 +86,7 @@ serve(async (req) => {
   // Check existing WODs
   const { data: wods, error: wodsError } = await supabase
     .from("admin_workouts")
-    .select("id, name, equipment, is_workout_of_day, main_workout")
+    .select("id, name, equipment, is_workout_of_day, main_workout, image_url, is_standalone_purchase, price, stripe_product_id, stripe_price_id")
     .eq("generated_for_date", effectiveDate)
     .eq("is_workout_of_day", true);
 
@@ -175,7 +175,7 @@ serve(async (req) => {
 
       const { data: recheck } = await supabase
         .from("admin_workouts")
-        .select("id, equipment, main_workout")
+        .select("id, equipment, main_workout, image_url, is_standalone_purchase, price, stripe_product_id, stripe_price_id")
         .eq("generated_for_date", effectiveDate)
         .eq("is_workout_of_day", true);
 
@@ -214,7 +214,7 @@ serve(async (req) => {
 
         const { data: postFb } = await supabase
           .from("admin_workouts")
-          .select("id, equipment, main_workout")
+          .select("id, equipment, main_workout, image_url, is_standalone_purchase, price, stripe_product_id, stripe_price_id")
           .eq("generated_for_date", effectiveDate)
           .eq("is_workout_of_day", true);
 
