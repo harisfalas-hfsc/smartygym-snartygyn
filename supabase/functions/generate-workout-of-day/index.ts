@@ -17,6 +17,13 @@ import { normalizeWorkoutHtml, validateWorkoutHtml } from "../_shared/html-norma
 import { validateWodSections } from "../_shared/section-validator.ts";
 import { sanitizeProtocolBlocks, validateProtocolBlocks } from "../_shared/protocol-sanitizer.ts";
 import { injectProtocolExplanations } from "../_shared/protocol-explanations.ts";
+import {
+  hasInternalNameCode,
+  hasAiStyleName,
+  cleanPublicWorkoutName,
+} from "../_shared/wod/naming.ts";
+import { cyprusToday } from "../_shared/wod/schedule.ts";
+import { WOD_PRICE_EUR, WOD_STRIPE_METADATA } from "../_shared/wod/rules.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -43,18 +50,7 @@ function logStep(step: string, details?: any) {
   console.log(`[GENERATE-WOD] ${step}${detailsStr}`);
 }
 
-function hasInternalNameCode(name: string): boolean {
-  const trimmed = name.trim();
-  return /\d/.test(trimmed)
-    || /\b\d{4}(BW|EQ|V)\b$/i.test(trimmed)
-    || /\b\d{6,}\b$/.test(trimmed)
-    || /\b(v\d+|#\d+)\b$/i.test(trimmed)
-    || /\b(II|III|IV|V|VI|VII|VIII|IX|X)\b$/.test(trimmed);
-}
-
-function hasAiStyleName(name: string): boolean {
-  return /\b(axial|matrix|meridian|protocol|helix|arcus|synergy|conduit|integration|current|vector|quantum|algorithm|neural|system|module|phase|sequence)\b/i.test(name.trim());
-}
+// hasInternalNameCode + hasAiStyleName moved to ../_shared/wod/naming.ts
 
 async function archiveStripeProductSafely(stripe: Stripe, productId: string | null, reason: string) {
   if (!productId) return;
@@ -95,55 +91,7 @@ async function runWodStripeCleanup(reason: string, dryRun = false) {
   }
 }
 
-function cleanPublicWorkoutName(
-  rawName: string,
-  category: string,
-  equipment: string,
-  existingNames: string[],
-): { name: string; changed: boolean; reason: string } {
-  const normalizedExisting = new Set(existingNames.map((name) => name.trim().toLowerCase()));
-  const baseName = rawName
-    .replace(/\s+\d{4}(BW|EQ|V)\b$/i, "")
-    .replace(/\s+\b(v\d+|#\d+|II|III|IV|V|VI|VII|VIII|IX|X)\b$/i, "")
-    .replace(/\s+/g, " ")
-    .trim();
-
-  const candidateIsClean = baseName.length >= 5
-    && baseName.split(/\s+/).length <= 4
-    && !hasInternalNameCode(baseName)
-    && !hasAiStyleName(baseName)
-    && !normalizedExisting.has(baseName.toLowerCase());
-
-  if (candidateIsClean) {
-    return { name: baseName, changed: baseName !== rawName.trim(), reason: baseName !== rawName.trim() ? "removed internal suffix" : "clean" };
-  }
-
-  const categoryWord = category === "STRENGTH" ? "Strength"
-    : category === "CALORIE BURNING" ? "Conditioning"
-    : category === "METABOLIC" ? "Engine"
-    : category === "CARDIO" ? "Cardio"
-    : category === "MOBILITY & STABILITY" ? "Control"
-    : category === "PILATES" ? "Pilates"
-    : category === "RECOVERY" ? "Recovery"
-    : category === "CHALLENGE" ? "Challenge"
-    : "Training";
-  const equipmentWord = equipment === "BODYWEIGHT" ? "Bodyweight" : equipment === "EQUIPMENT" ? "Loaded" : "Athletic";
-  const fallbackNames = [
-    `${equipmentWord} ${categoryWord} Session`,
-    `${categoryWord} Tempo Circuit`,
-    `Athletic ${categoryWord} Builder`,
-    `${equipmentWord} Movement Flow`,
-    `${categoryWord} Control Session`,
-    `Precision ${categoryWord} Circuit`,
-    `${equipmentWord} Performance Block`,
-    `Focused ${categoryWord} Practice`,
-  ];
-
-  const fallback = fallbackNames.find((name) => !normalizedExisting.has(name.toLowerCase()))
-    || `${equipmentWord} ${categoryWord} Practice`;
-
-  return { name: fallback, changed: true, reason: "duplicate, internal-code, or AI-style name" };
-}
+// cleanPublicWorkoutName moved to ../_shared/wod/naming.ts
 
 async function rollbackActiveWodsForDate(
   supabase: any,
