@@ -4,6 +4,7 @@ import { Resend } from "https://esm.sh/resend@2.0.0";
 import { getDayIn84Cycle, getPeriodizationForDay } from "../_shared/periodization-84day.ts";
 import { getAdminNotificationEmail } from "../_shared/admin-settings.ts";
 import { validateWodSections } from "../_shared/section-validator.ts";
+import { validateWodPublishContract } from "../_shared/wod-integrity.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -33,18 +34,11 @@ function getCyprusDateStr(): string {
   }).format(new Date());
 }
 
-function countValidWods(wods: any[], isRecovery: boolean): string[] {
+function countValidWods(wods: any[], isRecovery: boolean, dateStr: string): string[] {
   const valid: string[] = [];
   for (const w of wods || []) {
-    const check = validateWodSections(w.main_workout, isRecovery);
-    const hasAssets = Boolean(
-      w?.image_url?.startsWith?.("https://") &&
-      w?.stripe_product_id &&
-      w?.stripe_price_id &&
-      w?.is_standalone_purchase === true &&
-      Number(w?.price) > 0
-    );
-    if (check.isComplete && hasAssets) valid.push(w.equipment || "UNKNOWN");
+    const contract = validateWodPublishContract(w, dateStr);
+    if (contract.ok) valid.push(w.equipment || "UNKNOWN");
   }
   return valid;
 }
@@ -83,11 +77,11 @@ serve(async (req) => {
   // Initial check
   const { data: initialWods } = await supabase
     .from("admin_workouts")
-    .select("id, name, equipment, main_workout, image_url, is_standalone_purchase, price, stripe_product_id, stripe_price_id")
+    .select("id, name, equipment, category, is_workout_of_day, is_visible, main_workout, description, instructions, tips, image_url, is_standalone_purchase, price, stripe_product_id, stripe_price_id, generated_for_date")
     .eq("generated_for_date", today)
     .eq("is_workout_of_day", true);
 
-  let validWods = countValidWods(initialWods || [], isRecovery);
+  let validWods = countValidWods(initialWods || [], isRecovery, today);
 
   console.log(`[WATCHDOG] Initial check: ${validWods.length}/${expectedCount} valid WODs: ${validWods.join(", ")}`);
 
@@ -133,11 +127,11 @@ serve(async (req) => {
     // Re-verify
     const { data: recheckWods } = await supabase
       .from("admin_workouts")
-      .select("id, name, equipment, main_workout, image_url, is_standalone_purchase, price, stripe_product_id, stripe_price_id")
+    .select("id, name, equipment, category, is_workout_of_day, is_visible, main_workout, description, instructions, tips, image_url, is_standalone_purchase, price, stripe_product_id, stripe_price_id, generated_for_date")
       .eq("generated_for_date", today)
       .eq("is_workout_of_day", true);
 
-    validWods = countValidWods(recheckWods || [], isRecovery);
+    validWods = countValidWods(recheckWods || [], isRecovery, today);
     missing = getMissing(validWods, isRecovery);
 
     console.log(`[WATCHDOG] After attempt ${recoveryAttempt}: ${validWods.length}/${expectedCount} valid. Missing: ${missing.join(", ") || "none"}`);
@@ -165,11 +159,11 @@ serve(async (req) => {
 
       const { data: postFb } = await supabase
         .from("admin_workouts")
-        .select("id, name, equipment, main_workout, image_url, is_standalone_purchase, price, stripe_product_id, stripe_price_id")
+        .select("id, name, equipment, category, is_workout_of_day, is_visible, main_workout, description, instructions, tips, image_url, is_standalone_purchase, price, stripe_product_id, stripe_price_id, generated_for_date")
         .eq("generated_for_date", today)
         .eq("is_workout_of_day", true);
 
-      validWods = countValidWods(postFb || [], isRecovery);
+      validWods = countValidWods(postFb || [], isRecovery, today);
       missing = getMissing(validWods, isRecovery);
       if (validWods.length >= expectedCount) {
         usedLibraryFallback = true;

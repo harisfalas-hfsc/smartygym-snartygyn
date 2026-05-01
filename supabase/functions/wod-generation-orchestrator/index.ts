@@ -4,6 +4,7 @@ import { Resend } from "https://esm.sh/resend@2.0.0";
 import { getDayIn84Cycle, getPeriodizationForDay } from "../_shared/periodization-84day.ts";
 import { getAdminNotificationEmail } from "../_shared/admin-settings.ts";
 import { validateWodSections } from "../_shared/section-validator.ts";
+import { validateWodPublishContract } from "../_shared/wod-integrity.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -20,14 +21,9 @@ interface WodVerificationResult {
   isRecoveryDay: boolean;
 }
 
-function hasCompleteWodAssets(wod: any): boolean {
-  return Boolean(
-    wod?.image_url?.startsWith?.("https://") &&
-    wod?.stripe_product_id &&
-    wod?.stripe_price_id &&
-    wod?.is_standalone_purchase === true &&
-    Number(wod?.price) > 0
-  );
+function passesPublishContract(wod: any, dateStr: string): { ok: boolean; reason?: string } {
+  const result = validateWodPublishContract(wod, dateStr);
+  return result.ok ? { ok: true } : { ok: false, reason: result.failures.join("; ") };
 }
 
 /**
@@ -63,7 +59,7 @@ async function verifyWodsExist(
   
   const { data: wods, error } = await supabase
     .from("admin_workouts")
-    .select("id, name, equipment, is_workout_of_day, main_workout, image_url, is_standalone_purchase, price, stripe_product_id, stripe_price_id")
+    .select("id, name, equipment, category, is_workout_of_day, is_visible, main_workout, description, instructions, tips, image_url, is_standalone_purchase, price, stripe_product_id, stripe_price_id, generated_for_date")
     .eq("generated_for_date", dateStr)
     .eq("is_workout_of_day", true);
   
@@ -79,12 +75,12 @@ async function verifyWodsExist(
     // Recovery day: expect 1 VARIOUS workout (not MIXED - matches DB constraint)
     const variousWod = wods?.find((w: any) => w.equipment === "VARIOUS");
     if (variousWod) {
-      const sectionCheck = validateWodSections(variousWod.main_workout, true);
-      if (sectionCheck.isComplete && hasCompleteWodAssets(variousWod)) {
+      const contract = passesPublishContract(variousWod, dateStr);
+      if (contract.ok) {
         found.push("VARIOUS");
       } else {
-        missing.push(sectionCheck.isComplete ? "VARIOUS (missing image/payment links)" : `VARIOUS (incomplete: missing ${sectionCheck.missingSections.join(", ")})`);
-        console.log(`[ORCHESTRATOR] VARIOUS WOD ${variousWod.id} failed section validation:`, sectionCheck.missingSections);
+        missing.push(`VARIOUS (${contract.reason})`);
+        console.log(`[ORCHESTRATOR] VARIOUS WOD ${variousWod.id} failed publish contract:`, contract.reason);
       }
     } else {
       missing.push("VARIOUS");
@@ -93,12 +89,12 @@ async function verifyWodsExist(
     // Normal day: expect BODYWEIGHT + EQUIPMENT (both must be section-complete)
     const bwWod = wods?.find((w: any) => w.equipment === "BODYWEIGHT");
     if (bwWod) {
-      const sectionCheck = validateWodSections(bwWod.main_workout, false);
-      if (sectionCheck.isComplete && hasCompleteWodAssets(bwWod)) {
+      const contract = passesPublishContract(bwWod, dateStr);
+      if (contract.ok) {
         found.push("BODYWEIGHT");
       } else {
-        missing.push(sectionCheck.isComplete ? "BODYWEIGHT (missing image/payment links)" : `BODYWEIGHT (incomplete: missing ${sectionCheck.missingSections.join(", ")})`);
-        console.log(`[ORCHESTRATOR] BODYWEIGHT WOD ${bwWod.id} failed section validation:`, sectionCheck.missingSections);
+        missing.push(`BODYWEIGHT (${contract.reason})`);
+        console.log(`[ORCHESTRATOR] BODYWEIGHT WOD ${bwWod.id} failed publish contract:`, contract.reason);
       }
     } else {
       missing.push("BODYWEIGHT");
@@ -106,12 +102,12 @@ async function verifyWodsExist(
     
     const eqWod = wods?.find((w: any) => w.equipment === "EQUIPMENT");
     if (eqWod) {
-      const sectionCheck = validateWodSections(eqWod.main_workout, false);
-      if (sectionCheck.isComplete && hasCompleteWodAssets(eqWod)) {
+      const contract = passesPublishContract(eqWod, dateStr);
+      if (contract.ok) {
         found.push("EQUIPMENT");
       } else {
-        missing.push(sectionCheck.isComplete ? "EQUIPMENT (missing image/payment links)" : `EQUIPMENT (incomplete: missing ${sectionCheck.missingSections.join(", ")})`);
-        console.log(`[ORCHESTRATOR] EQUIPMENT WOD ${eqWod.id} failed section validation:`, sectionCheck.missingSections);
+        missing.push(`EQUIPMENT (${contract.reason})`);
+        console.log(`[ORCHESTRATOR] EQUIPMENT WOD ${eqWod.id} failed publish contract:`, contract.reason);
       }
     } else {
       missing.push("EQUIPMENT");
