@@ -136,6 +136,43 @@ serve(async (req) => {
     console.log(`[WATCHDOG] After attempt ${recoveryAttempt}: ${validWods.length}/${expectedCount} valid. Missing: ${missing.join(", ") || "none"}`);
   }
 
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // EMERGENCY LIBRARY FALLBACK: If retries still failed, publish library workouts.
+  // ═══════════════════════════════════════════════════════════════════════════════
+  let usedLibraryFallback = false;
+  if (validWods.length < expectedCount) {
+    try {
+      console.log("[WATCHDOG] 🛟 Triggering emergency library-selection fallback");
+      const fbResp = await fetch(`${supabaseUrl}/functions/v1/select-wod-from-library`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${anonKey}`,
+        },
+        body: JSON.stringify({ targetDate: today }),
+      });
+      const fbText = await fbResp.text();
+      console.log(`[WATCHDOG] 🛟 Library fallback response ${fbResp.status}: ${fbText.substring(0, 300)}`);
+
+      await new Promise(r => setTimeout(r, 2000));
+
+      const { data: postFb } = await supabase
+        .from("admin_workouts")
+        .select("id, name, equipment, main_workout")
+        .eq("generated_for_date", today)
+        .eq("is_workout_of_day", true);
+
+      validWods = countValidWods(postFb || [], isRecovery);
+      missing = getMissing(validWods, isRecovery);
+      if (validWods.length >= expectedCount) {
+        usedLibraryFallback = true;
+        console.log(`[WATCHDOG] ✅ Library fallback recovered today's WODs: ${validWods.join(", ")}`);
+      }
+    } catch (fbError) {
+      console.error("[WATCHDOG] 🛟 Library fallback error:", fbError);
+    }
+  }
+
   // Final status
   const allRecovered = validWods.length >= expectedCount;
 

@@ -183,6 +183,45 @@ serve(async (req) => {
       console.log(`[BACKUP-WOD] Attempt ${attempt} incomplete: found ${recheckValid.length}/${expectedCount}`);
     }
 
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // EMERGENCY LIBRARY FALLBACK: If both backup attempts failed, try selecting
+    // existing validated workouts from the library so the day is never empty.
+    // ═══════════════════════════════════════════════════════════════════════════════
+    let usedLibraryFallback = false;
+    if (!backupSucceeded) {
+      try {
+        console.log("[BACKUP-WOD] 🛟 Triggering emergency library-selection fallback");
+        const fbResp = await fetch(`${supabaseUrl}/functions/v1/select-wod-from-library`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${anonKey}`,
+          },
+          body: JSON.stringify({ targetDate: effectiveDate }),
+        });
+        const fbText = await fbResp.text();
+        console.log(`[BACKUP-WOD] 🛟 Library fallback response ${fbResp.status}: ${fbText.substring(0, 300)}`);
+
+        await new Promise(r => setTimeout(r, 2000));
+
+        const { data: postFb } = await supabase
+          .from("admin_workouts")
+          .select("id, equipment, main_workout")
+          .eq("generated_for_date", effectiveDate)
+          .eq("is_workout_of_day", true);
+
+        const postResult = verifyWods(postFb || [], recoveryDay);
+        recheckValid = postResult.valid;
+        if (recheckValid.length >= expectedCount) {
+          backupSucceeded = true;
+          usedLibraryFallback = true;
+          console.log(`[BACKUP-WOD] ✅ Library fallback recovered today's WODs: ${recheckValid.join(", ")}`);
+        }
+      } catch (fbError) {
+        console.error("[BACKUP-WOD] 🛟 Library fallback error:", fbError);
+      }
+    }
+
     // Update run log
     if (runLog?.id) {
       await supabase
@@ -192,7 +231,11 @@ serve(async (req) => {
           completed_at: new Date().toISOString(),
           found_count: recheckValid.length,
           wods_created: recheckValid,
-          error_message: backupSucceeded ? null : `Backup recovery incomplete after ${BACKUP_MAX_ATTEMPTS} attempts. Found: ${recheckValid.join(", ")}`,
+          error_message: backupSucceeded
+            ? (usedLibraryFallback
+                ? `Recovered via library-selection fallback after ${BACKUP_MAX_ATTEMPTS} backup attempts.`
+                : null)
+            : `Backup recovery incomplete after ${BACKUP_MAX_ATTEMPTS} attempts. Found: ${recheckValid.join(", ")}`,
         })
         .eq("id", runLog.id);
     }
