@@ -173,20 +173,6 @@ const BestOnlineFitnessPlatform = () => {
     }
   }));
 
-  // FAQ schema for competitor "vs" queries (invisible — triggers featured snippets)
-  const faqSchema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": competitorFAQSchema.map(faq => ({
-      "@type": "Question",
-      "name": faq.question,
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": faq.answer
-      }
-    }))
-  };
-
   // Editorial rating schema
   const editorialRatingSchema = {
     "@context": "https://schema.org",
