@@ -20,6 +20,16 @@ interface WodVerificationResult {
   isRecoveryDay: boolean;
 }
 
+function hasCompleteWodAssets(wod: any): boolean {
+  return Boolean(
+    wod?.image_url?.startsWith?.("https://") &&
+    wod?.stripe_product_id &&
+    wod?.stripe_price_id &&
+    wod?.is_standalone_purchase === true &&
+    Number(wod?.price) > 0
+  );
+}
+
 /**
  * Determines if a date is a recovery day using the shared periodization data.
  * Recovery days are Days 10, 28, 38, 56, 66, 84 in the 84-day cycle.
@@ -53,7 +63,7 @@ async function verifyWodsExist(
   
   const { data: wods, error } = await supabase
     .from("admin_workouts")
-    .select("id, name, equipment, is_workout_of_day, main_workout")
+    .select("id, name, equipment, is_workout_of_day, main_workout, image_url, is_standalone_purchase, price, stripe_product_id, stripe_price_id")
     .eq("generated_for_date", dateStr)
     .eq("is_workout_of_day", true);
   
@@ -70,10 +80,10 @@ async function verifyWodsExist(
     const variousWod = wods?.find((w: any) => w.equipment === "VARIOUS");
     if (variousWod) {
       const sectionCheck = validateWodSections(variousWod.main_workout, true);
-      if (sectionCheck.isComplete) {
+      if (sectionCheck.isComplete && hasCompleteWodAssets(variousWod)) {
         found.push("VARIOUS");
       } else {
-        missing.push(`VARIOUS (incomplete: missing ${sectionCheck.missingSections.join(", ")})`);
+        missing.push(sectionCheck.isComplete ? "VARIOUS (missing image/payment links)" : `VARIOUS (incomplete: missing ${sectionCheck.missingSections.join(", ")})`);
         console.log(`[ORCHESTRATOR] VARIOUS WOD ${variousWod.id} failed section validation:`, sectionCheck.missingSections);
       }
     } else {
@@ -84,10 +94,10 @@ async function verifyWodsExist(
     const bwWod = wods?.find((w: any) => w.equipment === "BODYWEIGHT");
     if (bwWod) {
       const sectionCheck = validateWodSections(bwWod.main_workout, false);
-      if (sectionCheck.isComplete) {
+      if (sectionCheck.isComplete && hasCompleteWodAssets(bwWod)) {
         found.push("BODYWEIGHT");
       } else {
-        missing.push(`BODYWEIGHT (incomplete: missing ${sectionCheck.missingSections.join(", ")})`);
+        missing.push(sectionCheck.isComplete ? "BODYWEIGHT (missing image/payment links)" : `BODYWEIGHT (incomplete: missing ${sectionCheck.missingSections.join(", ")})`);
         console.log(`[ORCHESTRATOR] BODYWEIGHT WOD ${bwWod.id} failed section validation:`, sectionCheck.missingSections);
       }
     } else {
@@ -97,10 +107,10 @@ async function verifyWodsExist(
     const eqWod = wods?.find((w: any) => w.equipment === "EQUIPMENT");
     if (eqWod) {
       const sectionCheck = validateWodSections(eqWod.main_workout, false);
-      if (sectionCheck.isComplete) {
+      if (sectionCheck.isComplete && hasCompleteWodAssets(eqWod)) {
         found.push("EQUIPMENT");
       } else {
-        missing.push(`EQUIPMENT (incomplete: missing ${sectionCheck.missingSections.join(", ")})`);
+        missing.push(sectionCheck.isComplete ? "EQUIPMENT (missing image/payment links)" : `EQUIPMENT (incomplete: missing ${sectionCheck.missingSections.join(", ")})`);
         console.log(`[ORCHESTRATOR] EQUIPMENT WOD ${eqWod.id} failed section validation:`, sectionCheck.missingSections);
       }
     } else {

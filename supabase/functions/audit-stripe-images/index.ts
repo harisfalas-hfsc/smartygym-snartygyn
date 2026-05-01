@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import Stripe from "https://esm.sh/stripe@14.21.0";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import Stripe from "https://esm.sh/stripe@18.5.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -13,6 +13,13 @@ serve(async (req) => {
   }
 
   try {
+    let body: any = {};
+    try {
+      body = await req.json();
+    } catch {
+      body = {};
+    }
+
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) {
       throw new Error("STRIPE_SECRET_KEY not configured");
@@ -21,25 +28,33 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
-    const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
+    const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" as any });
 
     console.log("[AUDIT-STRIPE-IMAGES] Starting audit...");
 
     // Fetch workouts with stripe_product_id, image_url, and is_free
-    const { data: workouts, error: workoutsError } = await supabase
+    let workoutsQuery = supabase
       .from("admin_workouts")
-      .select("id, name, stripe_product_id, image_url, is_free")
+      .select("id, name, stripe_product_id, image_url, is_free, is_workout_of_day, generated_for_date")
       .not("stripe_product_id", "is", null);
+
+    if (body?.wodDate) {
+      workoutsQuery = workoutsQuery.eq("is_workout_of_day", true).eq("generated_for_date", body.wodDate);
+    }
+
+    const { data: workouts, error: workoutsError } = await workoutsQuery;
 
     if (workoutsError) {
       throw new Error(`Failed to fetch workouts: ${workoutsError.message}`);
     }
 
     // Fetch programs with stripe_product_id, image_url, and is_free
-    const { data: programs, error: programsError } = await supabase
-      .from("admin_training_programs")
-      .select("id, name, stripe_product_id, image_url, is_free")
-      .not("stripe_product_id", "is", null);
+    const { data: programs, error: programsError } = body?.wodDate
+      ? { data: [], error: null }
+      : await supabase
+        .from("admin_training_programs")
+        .select("id, name, stripe_product_id, image_url, is_free")
+        .not("stripe_product_id", "is", null);
 
     if (programsError) {
       throw new Error(`Failed to fetch programs: ${programsError.message}`);
@@ -75,15 +90,16 @@ serve(async (req) => {
         // Fetch the Stripe product
         const product = await stripe.products.retrieve(item.stripe_product_id);
         
-        // Check if Stripe product has images
+        // Check if Stripe product already has the website image
         const hasStripeImage = product.images && product.images.length > 0;
+        const hasMatchingStripeImage = hasStripeImage && product.images.includes(item.image_url);
         
-        if (hasStripeImage) {
+        if (hasMatchingStripeImage) {
           results.already_has_image++;
           results.details.push({
             name: item.name,
             type: item.type,
-            status: "has_image",
+            status: "has_matching_image",
           });
           continue;
         }

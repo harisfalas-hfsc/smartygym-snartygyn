@@ -37,7 +37,14 @@ function countValidWods(wods: any[], isRecovery: boolean): string[] {
   const valid: string[] = [];
   for (const w of wods || []) {
     const check = validateWodSections(w.main_workout, isRecovery);
-    if (check.isComplete) valid.push(w.equipment || "UNKNOWN");
+    const hasAssets = Boolean(
+      w?.image_url?.startsWith?.("https://") &&
+      w?.stripe_product_id &&
+      w?.stripe_price_id &&
+      w?.is_standalone_purchase === true &&
+      Number(w?.price) > 0
+    );
+    if (check.isComplete && hasAssets) valid.push(w.equipment || "UNKNOWN");
   }
   return valid;
 }
@@ -76,7 +83,7 @@ serve(async (req) => {
   // Initial check
   const { data: initialWods } = await supabase
     .from("admin_workouts")
-    .select("id, name, equipment, main_workout")
+    .select("id, name, equipment, main_workout, image_url, is_standalone_purchase, price, stripe_product_id, stripe_price_id")
     .eq("generated_for_date", today)
     .eq("is_workout_of_day", true);
 
@@ -126,7 +133,7 @@ serve(async (req) => {
     // Re-verify
     const { data: recheckWods } = await supabase
       .from("admin_workouts")
-      .select("id, name, equipment, main_workout")
+      .select("id, name, equipment, main_workout, image_url, is_standalone_purchase, price, stripe_product_id, stripe_price_id")
       .eq("generated_for_date", today)
       .eq("is_workout_of_day", true);
 
@@ -158,7 +165,7 @@ serve(async (req) => {
 
       const { data: postFb } = await supabase
         .from("admin_workouts")
-        .select("id, name, equipment, main_workout")
+        .select("id, name, equipment, main_workout, image_url, is_standalone_purchase, price, stripe_product_id, stripe_price_id")
         .eq("generated_for_date", today)
         .eq("is_workout_of_day", true);
 
