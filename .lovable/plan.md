@@ -1,182 +1,160 @@
-I will fix this in two layers: first today’s two broken WODs, then the WOD generation system so the same mess cannot repeat.
+# WOD Generation Pipeline — Consolidation Plan
 
-The core change is this: there will be one WOD publish contract. No path will be allowed to publish a WOD unless it passes the same checks for periodization, structure, formatting, exercise density, images, Stripe product/price, and visual rendering.
+Honest answer first: the **logic** is now correct (today's two WODs were repaired and the integrity contract blocks bad publishes), but the **code** is still a mess. The generator alone is **3,351 lines in a single file**, and there are **5 overlapping recovery paths** (orchestrator → generator → backup → watchdog → library fallback). Every fix added new lines instead of replacing old ones. That is exactly what you described.
 
-## Immediate repair: fix today’s two WODs
+This plan does **no rewrites of behavior**. It splits the existing logic into small, named modules and deletes only true duplicates. Prices stay 3.99 EUR. Periodization stays the 84‑day cycle. Stripe + image flow stays identical. Format rules (Strength = REPS & SETS, etc.) stay identical.
 
-1. Remove the current broken WOD state non-destructively
-   - Clear `is_workout_of_day` and `generated_for_date` from the two bad library-selected rows.
-   - Do not permanently delete them.
-   - Keep the rows available for audit/history unless they are clearly unsuitable for normal library use.
-
-2. Publish two clean WOD-specific replacements for today
-   - Create or update today’s WODs as proper WOD rows, not messy legacy library promotions.
-   - Bodyweight: replace Cadence Complex with a properly structured METABOLIC / EMOM / BODYWEIGHT WOD.
-   - Equipment: replace Metabolic Surge with a properly structured METABOLIC / EMOM / EQUIPMENT WOD.
-   - Enforce the required sections:
-     - Soft Tissue Preparation
-     - Activation
-     - Main Workout
-     - Finisher
-     - Cool Down
-   - Enforce the required public fields:
-     - Description
-     - Workout
-     - Instructions
-     - Tips
-   - Clean up instructions and tips so they are written like paid coaching content, not broken fragments or misplaced exercise tags.
-
-3. Preserve or repair payment links correctly
-   - Keep the WOD price at 3.99 EUR.
-   - Ensure each active WOD has exactly one active Stripe product and one default price.
-   - Ensure product metadata points to the final WOD row ID.
-   - Ensure the Stripe product has the same image as the website card.
-   - Archive any orphaned or wrongly linked WOD Stripe products.
-
-4. Validate the public result
-   - Query the database after the repair.
-   - Check the WOD page data: two WODs, correct date, visible, paid, image present, product present, price present.
-   - Run the WOD payment/image audit for today.
-   - Confirm the two WODs render with consistent Workout / Instructions / Tips formatting.
-
-## Code cleanup: replace the messy recovery maze with one controlled flow
-
-### Current problem
-
-The WOD system currently has too many paths that can declare success:
+## What's wrong today (audit findings)
 
 ```text
-cron
-  -> orchestrator
-      -> generate-workout-of-day
-      -> retry
-      -> backup
-      -> watchdog
-      -> library fallback
-      -> Stripe/image repair utilities
+generate-workout-of-day/index.ts        3,351 lines  ← single god-file
+wod-generation-orchestrator/index.ts      646 lines  ← also calls library + backup
+backup-wod-generation/index.ts            338 lines  ← duplicates generator setup
+watchdog-wod-check/index.ts               248 lines  ← third recovery path
+select-wod-from-library/index.ts          580 lines  ← fourth recovery path
+_shared/wod-integrity.ts                  214 lines  ← the ONE good seam (keep)
 ```
 
-That creates inconsistency because each path checks a different subset of rules. One path checks sections. Another checks payment. Another checks images. Another promotes old library content. The result is exactly what happened today: the website is not empty, but the content is not premium-ready.
+Inside `generate-workout-of-day/index.ts` there are 12 top-level helpers mixed with one giant `serve()` handler that does: timezone math, periodization lookup, completeness check, parameter forcing, AI prompting, Stripe product creation, image generation, validation, retry, rollback, and notifications. That's why every change risks breaking something else.
 
-### New target flow
+## Goal
 
-I will change the system to this:
+One simple mental model:
 
 ```text
-Daily cron
-  -> WOD orchestrator
-      -> build candidate WODs
-      -> normalize all fields
-      -> validate one shared WOD publish contract
-      -> create/sync Stripe products
-      -> publish all-or-none
-      -> notify only after final success
+EVERY DAY at 00:30 Cyprus time:
+  1. Look up the 84-day periodization → category + difficulty
+  2. For each required slot (BODYWEIGHT + EQUIPMENT, or VARIOUS on recovery day):
+       a. Build prompt (category, difficulty, format rules, exercise library)
+       b. Generate workout content via AI
+       c. Validate against the integrity contract (already exists)
+       d. Create Stripe product + price (3.99 EUR, SMARTYGYM metadata)
+       e. Generate unique image, attach to Stripe product
+       f. Publish (is_workout_of_day=true, is_visible=true)
+  3. If any slot fails → rollback the day, raise alert, retry once
 ```
 
-Fallbacks will no longer publish directly. They will only create candidates, and those candidates must pass the same final gate.
+That's the whole thing. The code should read like that.
 
-## Refactor plan
+## The plan — 6 focused steps, no behavior change
 
-1. Create one shared WOD integrity module
-   - Add a shared backend helper, likely under `supabase/functions/_shared/wod-integrity.ts`.
-   - This becomes the single source of truth for:
-     - expected slots from the 84-day periodization cycle
-     - required equipment: BODYWEIGHT + EQUIPMENT, or VARIOUS for recovery
-     - section completeness
-     - minimum exercise density
-     - required fields: description, main workout, instructions, tips
-     - valid image URL
-     - paid standalone flags
-     - Stripe product/price pair
-     - Stripe default price match
-     - Stripe product image match
-     - forbidden public names
-     - no raw/broken exercise placeholders in instructions/tips
-     - no broken HTML or mixed formatting classes
+### Step 1 — Split `generate-workout-of-day/index.ts` into named modules
 
-2. Normalize all WOD text fields before publish
-   - Reuse the existing HTML normalizer for `main_workout`.
-   - Extend normalization to `description`, `instructions`, and `tips`.
-   - Ensure all four user-facing content fields use consistent TipTap-style HTML.
-   - Strip broken or inappropriate exercise markup from instructions/tips unless it is intentionally linked and render-safe.
-   - Standardize paragraph/list spacing so the Workout, Instructions, and Tips cards look like one product.
+Move existing helpers out of `index.ts` into `_shared/wod/` so the entry file becomes ~200 lines that read top-to-bottom like the mental model above.
 
-3. Fix the frontend rendering inconsistency
-   - The Workout section currently uses the exercise-aware renderer.
-   - Instructions and Tips use a different generic HTML renderer.
-   - I will make these render through a consistent wrapper/style system so font color, bold text, spacing, and dark/light behavior match across all workout cards.
-   - I will keep the existing structure: Description, Workout, Instructions, Tips. No disruptive redesign.
+```text
+supabase/functions/_shared/wod/
+  schedule.ts        cyprus-date math + periodization lookup (existing logic)
+  parameters.ts      difficulty + format selection per category (existing logic)
+  prompt.ts          prompt builder (existing prompt strings, untouched)
+  stripe.ts          create product + price + image attach (existing logic)
+  publish.ts         atomic insert/rollback + visibility flags (existing logic)
+  naming.ts          public-name cleaner (already exists inline, just extract)
+```
 
-4. Tighten library fallback or disable it from direct publishing
-   - Library fallback will no longer be allowed to mark old rows as WOD unless they pass the full WOD integrity contract.
-   - If a selected library workout has poor instructions/tips, broken HTML, missing fields, missing image, bad Stripe data, or inconsistent formatting, it will be rejected.
-   - If library fallback is still used, it must either:
-     - clone into a clean WOD-specific row after normalization, or
-     - refuse to publish and alert.
-   - It will not silently promote legacy rows as paid WODs again.
+`generate-workout-of-day/index.ts` becomes a short orchestration of these modules. **No prompt text changes, no validation rule changes, no Stripe metadata changes.**
 
-5. Remove duplicate success logic from backup/watchdog
-   - Backup and watchdog should not have their own independent definition of “valid WOD.”
-   - They will call the shared validator, not their own partial checks.
-   - Their job becomes monitoring and recovery, not publishing with weaker rules.
+### Step 2 — Collapse the 4 recovery paths into 1
 
-6. Stop function-to-function chaos where possible
-   - The current system has backend functions calling other backend functions repeatedly.
-   - I will move shared logic into shared modules/direct database operations where practical.
-   - The orchestrator should coordinate, not bounce through multiple HTTP calls with different assumptions.
+Today, `orchestrator`, `backup-wod-generation`, `watchdog-wod-check`, and `select-wod-from-library` all duplicate "is the day complete? if not, try to fix it." Replace with one function:
 
-7. Enforce all-or-none publishing
-   - On normal training days, both BODYWEIGHT and EQUIPMENT must pass before either becomes public.
-   - On recovery days, the VARIOUS recovery WOD must pass fully.
-   - If one slot fails, the whole date fails closed and sends an admin alert.
-   - No half-day, no one-card WOD, no ugly fallback WOD.
+- **Keep**: `wod-generation-orchestrator` — the single entry point. It runs verification + retry + library fallback in one place.
+- **Keep**: `select-wod-from-library` — but only as a function called BY the orchestrator, not as a standalone recovery cron.
+- **Merge into orchestrator and delete**:
+  - `backup-wod-generation` (its retry-with-delay logic moves into the orchestrator's existing retry loop)
+  - `watchdog-wod-check` (its "is it healthy?" check is already `validateDayPublishContract`)
 
-8. Stripe and image contract
-   - Before publishing, every paid WOD must have:
-     - active Stripe product
-     - active price
-     - product default price matching DB `stripe_price_id`
-     - DB `stripe_product_id` matching Stripe metadata
-     - product image matching website `image_url`
-   - Any orphan product created during a failed publish will be archived.
+The cron jobs change from 4 schedules to 2:
+```text
+00:30 Cyprus  →  wod-generation-orchestrator   (primary)
+03:00 Cyprus  →  wod-generation-orchestrator   (safety net, same function)
+```
 
-9. Add a single WOD health report that checks everything
-   - Extend the existing WOD health report so it checks not only payment, but also:
-     - periodization match
-     - active row count
-     - full content fields
-     - section validation
-     - exercise density
-     - image presence
-     - Stripe product image/default price
-     - formatting compliance
-   - This becomes the post-generation truth check.
+### Step 3 — One validation gate, called everywhere
 
-10. Clean admin/manual controls
-   - Admin WOD generation buttons should use the same orchestrator/publish contract.
-   - No manual action should bypass validation unless explicitly marked as draft/hidden.
-   - Admin-facing status should show exactly why a WOD failed: formatting, missing image, missing price, periodization mismatch, etc.
+`_shared/wod-integrity.ts` already exists and is correct. Audit every WOD code path and ensure they all go through `validateWodPublishContract` / `validateDayPublishContract` — no exceptions, no inline ad-hoc checks. Remove any leftover inline duplicates.
 
-## Acceptance criteria
+### Step 4 — Format & category rules in one table
 
-I will consider this fixed only when all of the following are true:
+Today the rules ("Strength = REPS & SETS", "Pilates = REPS & SETS", "Recovery = MIX", strength focuses, equipment vs bodyweight, micro-workouts excluded from WOD cycle) are scattered across `parameters.ts`-equivalent code, the DB trigger `enforce_workout_format_rules`, and the prompt. Move the source of truth to one constant in `_shared/wod/rules.ts`:
 
-1. Today’s WOD page shows two professional WODs with clean Workout, Instructions, and Tips.
-2. Both today’s WODs have valid images on the website and matching images on the Stripe products.
-3. Both today’s WODs have valid 3.99 EUR Stripe prices and default prices set.
-4. The WOD health report returns healthy for today.
-5. Backup/watchdog/orchestrator all use the same validation rules.
-6. Library fallback cannot publish old messy content directly.
-7. A partial or ugly WOD fails closed instead of appearing publicly.
-8. Future generation logs show one clear flow: build, normalize, validate, Stripe sync, publish.
+```ts
+export const CATEGORY_RULES = {
+  STRENGTH:              { format: "REPS & SETS", focuses: [...6 strength focuses] },
+  "MOBILITY & STABILITY":{ format: "REPS & SETS" },
+  PILATES:               { format: "REPS & SETS" },
+  RECOVERY:              { format: "MIX" },
+  "CALORIE BURNING":     { format: null /* flexible */ },
+  METABOLIC:             { format: null },
+  CARDIO:                { format: null },
+  CHALLENGE:             { format: null },
+  // MICRO-WORKOUTS excluded from WOD periodization
+};
+```
 
-## Implementation order
+Both the prompt builder and the validator import from this file. The DB trigger stays as a last-line defense but reads the same rules.
 
-1. Repair today’s two WODs first.
-2. Build the shared WOD integrity validator.
-3. Wire orchestrator, generator, backup, watchdog, and library fallback to that validator.
-4. Normalize frontend rendering for Workout / Instructions / Tips.
-5. Harden Stripe/image synchronization.
-6. Run live validation and report the exact status back to you.
+### Step 5 — Visual format guarantee (already partially done)
 
-This is the plan I will implement after approval.
+The previous round wired `WorkoutDisplay.tsx` to render Instructions and Tips through `ExerciseHTMLContent` inside `workout-content`. Add one verification: every newly generated WOD's `main_workout`, `instructions`, and `tips` are passed through `htmlNormalizer` server-side before publish, so the bullet+exercise-icon format is guaranteed at the source, not just the renderer.
+
+### Step 6 — One health report
+
+Replace the multiple audit functions (`audit-stripe-images`, `audit-content-formatting`, `wod-payment-health-report`, `run-quick-health-audit`) with a single daily call to `wod-payment-health-report` that uses `validateDayPublishContract` for the last 7 days and emails a one-line summary: `"2026-05-01: BODYWEIGHT ✓  EQUIPMENT ✓"` or the specific failure.
+
+The other audit functions stay (they cover non-WOD content) but stop being called by WOD crons.
+
+## Technical details
+
+**Files created**
+- `supabase/functions/_shared/wod/schedule.ts`
+- `supabase/functions/_shared/wod/parameters.ts`
+- `supabase/functions/_shared/wod/prompt.ts`
+- `supabase/functions/_shared/wod/stripe.ts`
+- `supabase/functions/_shared/wod/publish.ts`
+- `supabase/functions/_shared/wod/naming.ts`
+- `supabase/functions/_shared/wod/rules.ts`
+
+**Files shrunk (logic moved, not changed)**
+- `generate-workout-of-day/index.ts`: 3,351 → ~250 lines
+- `wod-generation-orchestrator/index.ts`: 646 → ~300 lines (absorbs backup + watchdog)
+- `select-wod-from-library/index.ts`: 580 → ~350 lines (only the library-pick logic)
+
+**Files deleted**
+- `supabase/functions/backup-wod-generation/`
+- `supabase/functions/watchdog-wod-check/`
+
+**Cron jobs updated**
+- Remove: `backup-wod-generation` cron, `watchdog-wod-check` cron
+- Keep: `generate-workout-of-day` 00:30 Cyprus, plus a 03:00 Cyprus safety re-run of the orchestrator
+
+**No changes to**
+- Prices (3.99 EUR), Stripe metadata (`project: SMARTYGYM`, `content_type: Workout`)
+- Periodization 84-day cycle
+- Exercise library + `{{exercise:ID:Name}}` markup
+- Format rules per category
+- Difficulty rules
+- Image generation pipeline
+- Frontend rendering (already fixed last round)
+- Database schema or RLS
+
+## What you get
+
+- **One file to read** to understand WOD generation: `generate-workout-of-day/index.ts` (~250 lines, top-to-bottom).
+- **One recovery path** instead of four.
+- **One rules table** instead of rules scattered across prompt, code, and DB.
+- **Same prices, same look, same content quality**, just code that you and I can both follow without breaking it next time.
+
+## Risk & rollout
+
+Behavior-preserving refactor, but it touches the WOD pipeline. Rollout:
+
+1. Build the `_shared/wod/` modules and the new slim `index.ts` in parallel.
+2. Deploy the slim generator and orchestrator.
+3. Trigger a manual re-run for today's date (already complete — should be a no-op).
+4. Trigger a dry-run for tomorrow's date (skip publish, just validate).
+5. Once tomorrow's 00:30 cron runs cleanly, delete `backup-wod-generation` and `watchdog-wod-check` and remove their crons.
+
+If anything fails, the integrity contract refuses to publish and the safety re-run at 03:00 retries — same protection you have today.
+
+**Approve and I'll execute steps 1–6 in order, in one pass, and report back with the new file sizes and a verification of tomorrow's WOD.**
