@@ -75,8 +75,8 @@ export default function JoinPremium() {
 
     setLoading(true);
     const priceIds = {
-      gold: 'price_1SJ9q1IxQYg9inGKZzxxqPbD',
-      platinum: 'price_1SJ9qGIxQYg9inGKFbgqVRjj'
+      gold: STRIPE_PRICE_IDS.gold,
+      platinum: STRIPE_PRICE_IDS.platinum,
     };
 
     // In native Capacitor, skip pre-opening a blank window (not needed)

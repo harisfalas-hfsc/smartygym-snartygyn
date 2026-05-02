@@ -350,8 +350,8 @@ const Index = () => {
       return;
     }
     const priceIds = {
-      gold: 'price_1SJ9q1IxQYg9inGKZzxxqPbD',
-      platinum: 'price_1SJ9qGIxQYg9inGKFbgqVRjj'
+      gold: STRIPE_PRICE_IDS.gold,
+      platinum: STRIPE_PRICE_IDS.platinum,
     };
     try {
       const {
