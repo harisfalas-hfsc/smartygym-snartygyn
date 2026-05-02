@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -19,6 +20,43 @@ serve(async (req) => {
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+  // PLAN B+E asset re-kick: if any of today's WODs are missing image_url or
+  // Stripe IDs, re-fire the background linker / image generator. Skip the
+  // re-kick within the first 10 minutes after creation so the initial
+  // background job has a chance to finish first.
+  try {
+    const supabase = createClient(supabaseUrl, serviceKey);
+    const tenMinAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+    const { data: pending } = await supabase
+      .from("admin_workouts")
+      .select("id, image_url, stripe_product_id, stripe_price_id, created_at")
+      .eq("is_workout_of_day", true)
+      .eq("is_visible", true)
+      .lt("created_at", tenMinAgo);
+
+    for (const w of pending || []) {
+      if (!w.stripe_product_id || !w.stripe_price_id) {
+        console.log(`[WATCHDOG] re-kick wod-stripe-link for ${w.id}`);
+        fetch(`${supabaseUrl}/functions/v1/wod-stripe-link`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Authorization": `Bearer ${serviceKey}` },
+          body: JSON.stringify({ workout_id: w.id }),
+        }).catch((e) => console.error("[WATCHDOG] linker re-kick failed", e));
+      }
+      if (!w.image_url) {
+        console.log(`[WATCHDOG] re-kick auto-generate-workout-image for ${w.id}`);
+        fetch(`${supabaseUrl}/functions/v1/auto-generate-workout-image`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Authorization": `Bearer ${serviceKey}` },
+          body: JSON.stringify({ workout_id: w.id }),
+        }).catch((e) => console.error("[WATCHDOG] image re-kick failed", e));
+      }
+    }
+  } catch (assetErr) {
+    console.error("[WATCHDOG] asset re-kick scan failed", assetErr);
+  }
 
   console.log("[WATCHDOG] Triggering orchestrator in verify-only mode");
 
