@@ -2,9 +2,7 @@ import { useEffect } from "react";
 import { useTheme } from "next-themes";
 
 /**
- * Sets default theme based on device width:
- * - Desktop (≥768px): light mode
- * - Mobile (<768px): dark mode
+ * Sets default theme to light mode for all devices (mobile + desktop).
  * User can override during session; persists on refresh within same session.
  */
 export const DeviceThemeDefault = () => {
@@ -16,8 +14,7 @@ export const DeviceThemeDefault = () => {
     if (sessionTheme) {
       setTheme(sessionTheme);
     } else {
-      const isMobile = window.innerWidth < 768;
-      const defaultTheme = isMobile ? "dark" : "light";
+      const defaultTheme = "light";
       setTheme(defaultTheme);
       sessionStorage.setItem("smartygym-session-theme", defaultTheme);
     }
