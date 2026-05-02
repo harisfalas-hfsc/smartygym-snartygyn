@@ -6,31 +6,26 @@ const corsHeaders = {
 };
 
 /**
- * Backup WOD Generation — thin wrapper.
+ * Backup WOD Generation — fast safety wrapper.
  *
- * Runs at 03:00 Cyprus time (cron: 0 1 * * * UTC) as a safety net hours after
- * the primary 00:30 generation. Delegates ALL retry / verification / library
- * fallback / email / run-log logic to `wod-generation-orchestrator`, which
- * short-circuits when today's WODs already exist.
- *
- * Why keep this wrapper instead of relying only on the 00:30 orchestrator run?
- * If the AI provider, network, or edge runtime was unhealthy at 00:30, this
- * gives the system a second chance hours later. DB history shows this has
- * actually rescued WODs multiple times. We keep the safety net but no longer
- * duplicate the recovery code.
+ * Runs at 03:00 Cyprus time. It must NOT call the long AI orchestrator from
+ * inside another function: that nested path can exceed the hosted function idle
+ * timeout and leave WOD run logs stuck as `running`. The backup safety net uses
+ * the validated library selector directly; that selector short-circuits when
+ * today's WODs already exist.
  */
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
-  console.log("[BACKUP-WOD] Delegating to wod-generation-orchestrator (triggerSource=backup)");
+  console.log("[BACKUP-WOD] Delegating to select-wod-from-library (fast fallback)");
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
 
   try {
-    const response = await fetch(`${supabaseUrl}/functions/v1/wod-generation-orchestrator`, {
+    const response = await fetch(`${supabaseUrl}/functions/v1/select-wod-from-library`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -40,14 +35,14 @@ serve(async (req) => {
     });
 
     const text = await response.text();
-    console.log(`[BACKUP-WOD] Orchestrator response ${response.status}: ${text.substring(0, 300)}`);
+    console.log(`[BACKUP-WOD] Library fallback response ${response.status}: ${text.substring(0, 300)}`);
 
     return new Response(text, {
       status: response.status,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("[BACKUP-WOD] Failed to invoke orchestrator:", error);
+    console.error("[BACKUP-WOD] Failed to invoke library fallback:", error);
     return new Response(
       JSON.stringify({
         success: false,
