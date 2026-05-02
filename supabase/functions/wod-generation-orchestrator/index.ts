@@ -4,7 +4,7 @@ import { Resend } from "https://esm.sh/resend@2.0.0";
 import { getDayIn84Cycle, getPeriodizationForDay } from "../_shared/periodization-84day.ts";
 import { getAdminNotificationEmail } from "../_shared/admin-settings.ts";
 import { validateWodSections } from "../_shared/section-validator.ts";
-import { validateWodPublishContract } from "../_shared/wod-integrity.ts";
+import { validateWodPublishContract, type WodContractMode } from "../_shared/wod-integrity.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -21,8 +21,12 @@ interface WodVerificationResult {
   isRecoveryDay: boolean;
 }
 
-function passesPublishContract(wod: any, dateStr: string): { ok: boolean; reason?: string } {
-  const result = validateWodPublishContract(wod, dateStr);
+function passesPublishContract(
+  wod: any,
+  dateStr: string,
+  mode: WodContractMode = "structural",
+): { ok: boolean; reason?: string } {
+  const result = validateWodPublishContract(wod, dateStr, { mode });
   return result.ok ? { ok: true } : { ok: false, reason: result.failures.join("; ") };
 }
 
@@ -51,7 +55,8 @@ function getCyprusDateStr(): string {
 
 async function verifyWodsExist(
   supabase: any,
-  dateStr: string
+  dateStr: string,
+  contractMode: WodContractMode = "structural",
 ): Promise<WodVerificationResult> {
   const recoveryDay = isRecoveryDay(dateStr);
   
@@ -75,7 +80,7 @@ async function verifyWodsExist(
     // Recovery day: expect 1 VARIOUS workout (not MIXED - matches DB constraint)
     const variousWod = wods?.find((w: any) => w.equipment === "VARIOUS");
     if (variousWod) {
-      const contract = passesPublishContract(variousWod, dateStr);
+      const contract = passesPublishContract(variousWod, dateStr, contractMode);
       if (contract.ok) {
         found.push("VARIOUS");
       } else {
@@ -89,7 +94,7 @@ async function verifyWodsExist(
     // Normal day: expect BODYWEIGHT + EQUIPMENT (both must be section-complete)
     const bwWod = wods?.find((w: any) => w.equipment === "BODYWEIGHT");
     if (bwWod) {
-      const contract = passesPublishContract(bwWod, dateStr);
+      const contract = passesPublishContract(bwWod, dateStr, contractMode);
       if (contract.ok) {
         found.push("BODYWEIGHT");
       } else {
@@ -102,7 +107,7 @@ async function verifyWodsExist(
     
     const eqWod = wods?.find((w: any) => w.equipment === "EQUIPMENT");
     if (eqWod) {
-      const contract = passesPublishContract(eqWod, dateStr);
+      const contract = passesPublishContract(eqWod, dateStr, contractMode);
       if (contract.ok) {
         found.push("EQUIPMENT");
       } else {
