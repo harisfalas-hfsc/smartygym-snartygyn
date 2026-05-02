@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { wrapInEmailTemplateWithFooter, getEmailHeaders } from "../_shared/email-utils.ts";
 import { MESSAGE_TYPES } from "../_shared/notification-types.ts";
+import { logEmailDelivery } from "../_shared/email-log.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -403,8 +404,22 @@ serve(async (req) => {
               if (emailResult.error) {
                 logStep("Email API error", { userId: user.user_id, email: userEmail, error: emailResult.error });
                 emailErrors.push(`${userEmail}: ${emailResult.error.message || String(emailResult.error)}`);
+                await logEmailDelivery({
+                  userId: user.user_id,
+                  toEmail: userEmail,
+                  messageType: "weekly-motivation",
+                  status: "failed",
+                  errorMessage: emailResult.error.message || String(emailResult.error),
+                });
               } else {
                 emailsSent++;
+                await logEmailDelivery({
+                  userId: user.user_id,
+                  toEmail: userEmail,
+                  messageType: "weekly-motivation",
+                  status: "sent",
+                  resendId: (emailResult as any)?.data?.id ?? null,
+                });
                 // Rate limiting: 600ms delay to respect Resend's 2 requests/second limit
                 await new Promise(resolve => setTimeout(resolve, 600));
               }
@@ -412,6 +427,13 @@ serve(async (req) => {
               const errorMsg = emailError.message || String(emailError);
               logStep("Email send error", { userId: user.user_id, email: userEmail, error: errorMsg });
               emailErrors.push(`${userEmail}: ${errorMsg}`);
+              await logEmailDelivery({
+                userId: user.user_id,
+                toEmail: userEmail,
+                messageType: "weekly-motivation",
+                status: "failed",
+                errorMessage: errorMsg,
+              });
           }
         }
 

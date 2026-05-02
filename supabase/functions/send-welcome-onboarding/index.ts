@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@3.5.0";
 import { MESSAGE_TYPES } from "../_shared/notification-types.ts";
 import { getEmailHeaders, wrapInEmailTemplateWithFooter } from "../_shared/email-utils.ts";
+import { logEmailDelivery } from "../_shared/email-log.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -81,7 +82,7 @@ async function sendOnboardingToUser(supabaseAdmin: any, userId: string) {
           emailSubject, emailContent, userData.user.email,
           'https://smartygym.lovable.app/userdashboard', 'Explore Your Dashboard'
         );
-        await resend.emails.send({
+        const sendResult = await resend.emails.send({
           from: "SmartyGym <notifications@smartygym.com>",
           to: [userData.user.email],
           subject: emailSubject,
@@ -90,9 +91,25 @@ async function sendOnboardingToUser(supabaseAdmin: any, userId: string) {
         });
         emailSent = true;
         console.log(`[WELCOME-ONBOARDING] Email sent to ${userData.user.email}`);
+        await logEmailDelivery({
+          userId,
+          toEmail: userData.user.email,
+          messageType: ONBOARDING_MESSAGE_TYPE,
+          status: "sent",
+          resendId: (sendResult as any)?.data?.id ?? null,
+        });
       }
     } catch (emailErr) {
       console.error(`[WELCOME-ONBOARDING] Email failed for ${userId}:`, emailErr);
+      try {
+        await logEmailDelivery({
+          userId,
+          toEmail: "",
+          messageType: ONBOARDING_MESSAGE_TYPE,
+          status: "failed",
+          errorMessage: emailErr instanceof Error ? emailErr.message : String(emailErr),
+        });
+      } catch { /* ignore */ }
     }
   }
 
@@ -170,12 +187,23 @@ serve(async (req) => {
 
       if (sendError) {
         console.error("[WELCOME-ONBOARDING] Test email error:", sendError);
+        await logEmailDelivery({
+          toEmail: testEmail,
+          messageType: `${ONBOARDING_MESSAGE_TYPE}-test`,
+          status: "failed",
+          errorMessage: sendError.message,
+        });
         return new Response(JSON.stringify({ error: sendError.message }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500,
         });
       }
 
       console.log(`[WELCOME-ONBOARDING] ✅ Test email sent to ${testEmail}`);
+      await logEmailDelivery({
+        toEmail: testEmail,
+        messageType: `${ONBOARDING_MESSAGE_TYPE}-test`,
+        status: "sent",
+      });
       return new Response(JSON.stringify({ success: true, testEmailSent: testEmail }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

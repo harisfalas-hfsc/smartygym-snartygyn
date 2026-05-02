@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@3.5.0";
 import { getEmailHeaders, getEmailFooter, wrapInEmailTemplateWithFooter } from "../_shared/email-utils.ts";
+import { logEmailDelivery } from "../_shared/email-log.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -201,11 +202,27 @@ serve(async (req) => {
 
           console.log('[SEND-SYSTEM-MESSAGE] Email sent successfully:', emailResponse.data?.id);
           emailSent = true;
+          await logEmailDelivery({
+            userId,
+            toEmail: userEmail,
+            messageType,
+            status: "sent",
+            resendId: emailResponse?.data?.id ?? null,
+          });
           }
         }
       }
     } catch (emailError) {
       console.error('[SEND-SYSTEM-MESSAGE] Email sending failed:', emailError);
+      try {
+        await logEmailDelivery({
+          userId,
+          toEmail: (typeof userEmail !== "undefined" ? userEmail : ""),
+          messageType,
+          status: "failed",
+          errorMessage: emailError instanceof Error ? emailError.message : String(emailError),
+        });
+      } catch { /* ignore */ }
     }
 
     // Log to notification audit
