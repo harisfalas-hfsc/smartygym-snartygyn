@@ -2458,62 +2458,18 @@ Return JSON with these exact fields:
       }
 
       // ═══════════════════════════════════════════════════════════════════════════════
-      // IMAGE GENERATION WITH RETRY LOGIC - CRITICAL FOR WOD INTEGRITY
-      // Try up to 3 times with delays to ensure every WOD gets an image
+      // PLAN A+B+E: Image + Stripe creation are now DEFERRED to background tasks.
+      // - Image: handled by `auto-generate-workout-image` (queued via pg_net below)
+      // - Stripe product/price: handled by `wod-stripe-link` (queued via pg_net below)
+      // The WOD row is inserted with image_url=NULL, stripe_product_id=NULL,
+      // stripe_price_id=NULL. The orchestrator now uses STRUCTURAL contract
+      // mode to accept this state. The watchdog enforces the FULL contract
+      // later and re-fires the linker if assets are still missing.
       // ═══════════════════════════════════════════════════════════════════════════════
-      logStep(`Generating image for ${equipment} workout`, { name: workoutContent.name, category, format });
-      
-      let imageUrl: string | null = null;
-      const imageMaxRetries = 3;
-      const imageRetryDelayMs = 3000;
-
-      for (let imageAttempt = 1; imageAttempt <= imageMaxRetries; imageAttempt++) {
-        try {
-          logStep(`Image generation attempt ${imageAttempt}/${imageMaxRetries}`, { equipment, workout: workoutContent.name });
-          
-          const { data: imageData, error: imageError } = await supabase.functions.invoke("generate-workout-image", {
-            body: { 
-              name: workoutContent.name, 
-              category: category, 
-              format: format, 
-              difficulty_stars: selectedDifficulty.stars 
-            }
-          });
-
-          if (imageError) {
-            logStep(`Image generation error on attempt ${imageAttempt}`, { error: imageError.message, equipment });
-          } else if (imageData?.image_url) {
-            imageUrl = imageData.image_url;
-            logStep(`✅ Image generated successfully on attempt ${imageAttempt}`, { equipment, imageUrl: imageUrl!.substring(0, 80) });
-            break; // Success, exit retry loop
-          } else {
-            logStep(`Image generation returned no URL on attempt ${imageAttempt}`, { equipment, imageData });
-          }
-        } catch (imgErr: any) {
-          logStep(`Image generation exception on attempt ${imageAttempt}`, { error: imgErr.message, equipment });
-        }
-
-        // Wait before retry (except on last attempt)
-        if (imageAttempt < imageMaxRetries && !imageUrl) {
-          logStep(`Waiting ${imageRetryDelayMs}ms before image retry...`);
-          await new Promise(resolve => setTimeout(resolve, imageRetryDelayMs));
-        }
-      }
-      
-      logStep(`${equipment} image generation complete`, { hasImage: !!imageUrl, attempts: imageMaxRetries });
-
-      // CRITICAL: Validate image before Stripe product creation
-      if (!imageUrl) {
-        console.error(`[WOD-GENERATION] ❌ CRITICAL ERROR: No image URL for ${equipment} workout "${workoutContent.name}" after ${imageMaxRetries} attempts!`);
-        logStep(`❌ CRITICAL: All image generation attempts failed`, { workout: workoutContent.name, equipment, attempts: imageMaxRetries });
-        throw new Error(`${equipment} WOD rejected: image generation failed after ${imageMaxRetries} attempts`);
-      } else {
-        logStep(`✅ Image validated for Stripe`, { imageUrl: imageUrl.substring(0, 80) });
-      }
-
+      const imageUrl: string | null = null;
       const workoutId = `WOD-${prefix}-${equipment.charAt(0)}-${timestamp}`;
-      let stripeProductId: string | null = null;
-      let stripePriceId: string | null = null;
+      const stripeProductId: string | null = null;
+      const stripePriceId: string | null = null;
 
       // ═══════════════════════════════════════════════════════════════════════════════
       // POST-GENERATION DURATION CALCULATION - Parse actual section durations from HTML
@@ -2734,56 +2690,8 @@ Return JSON with these exact fields:
         throw new Error(`${equipment} WOD rejected: unsafe public name after cleanup (${workoutContent.name})`);
       }
 
-      const stripeProductPayload = {
-        name: workoutContent.name,
-        description: `${category} Workout (${equipment})`,
-        images: imageUrl ? [imageUrl] : [],
-        metadata: {
-          project: "SMARTYGYM",
-          content_type: "Workout",
-          content_id: workoutId,
-          workout_id: workoutId,
-          type: "wod",
-          category,
-          equipment,
-          generated_for_date: effectiveDate,
-        },
-      };
-
-      const stripeProductIdempotencyKey = `SMARTYGYM:wod:${effectiveDate}:${equipment}:product`;
-      const stripePriceIdempotencyKey = `SMARTYGYM:wod:${effectiveDate}:${equipment}:price`;
-
-      const stripeProduct = await stripe.products.create(stripeProductPayload, {
-        idempotencyKey: stripeProductIdempotencyKey,
-      });
-      stripeProductId = stripeProduct.id;
-
-      const stripePrice = await stripe.prices.create({
-        product: stripeProduct.id,
-        unit_amount: 399,
-        currency: "eur",
-        metadata: {
-          project: "SMARTYGYM",
-          content_id: workoutId,
-          generated_for_date: effectiveDate,
-          equipment,
-        },
-      }, {
-        idempotencyKey: stripePriceIdempotencyKey,
-      });
-      stripePriceId = stripePrice.id;
-
-      await stripe.products.update(stripeProduct.id, {
-        default_price: stripePrice.id,
-      });
-
-      logStep(`${equipment} Stripe product/price created`, {
-        productId: stripeProductId,
-        priceId: stripePriceId,
-        defaultPriceSet: true,
-        productIdempotencyKey: stripeProductIdempotencyKey,
-        priceIdempotencyKey: stripePriceIdempotencyKey,
-      });
+      // PLAN B: Stripe product/price creation deferred. See `wod-stripe-link`.
+      logStep(`Stripe linking deferred for ${equipment} WOD`, { workoutId, equipment });
 
       const { error: insertError } = await supabase
         .from("admin_workouts")
@@ -2816,18 +2724,41 @@ Return JSON with these exact fields:
         });
 
       if (insertError) {
-        // ORPHAN GUARD: Archive Stripe product immediately if DB insert fails
-        // This prevents orphaned active Stripe products from accumulating
-        await archiveStripeProductSafely(stripe, stripeProductId, `db_insert_failed:${insertError.message}`);
         throw new Error(`Failed to insert ${equipment} WOD: ${insertError.message}`);
       }
+
+      // PLAN A+B: Fire-and-forget background asset generation. The DB trigger
+      // `trigger_auto_generate_workout_image` does not run for WODs, so we
+      // explicitly invoke both `auto-generate-workout-image` and the new
+      // `wod-stripe-link` here. They run independently of this function's
+      // 150s window.
+      try {
+        await fetch(`${supabaseUrl}/functions/v1/auto-generate-workout-image`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${supabaseServiceKey}`,
+          },
+          body: JSON.stringify({ workout_id: workoutId }),
+        }).catch((e) => logStep("auto-generate-workout-image kickoff failed (non-fatal)", { error: String(e) }));
+      } catch (_e) { /* non-fatal */ }
+      try {
+        await fetch(`${supabaseUrl}/functions/v1/wod-stripe-link`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${supabaseServiceKey}`,
+          },
+          body: JSON.stringify({ workout_id: workoutId }),
+        }).catch((e) => logStep("wod-stripe-link kickoff failed (non-fatal)", { error: String(e) }));
+      } catch (_e) { /* non-fatal */ }
 
       // ═══════════════════════════════════════════════════════════════════════════════
       // CRITICAL SAFETY CHECK: Verify workout was actually inserted with correct data
       // ═══════════════════════════════════════════════════════════════════════════════
       const { data: verifyWorkout, error: verifyError } = await supabase
         .from("admin_workouts")
-        .select("id, name, equipment, generated_for_date, category, difficulty, difficulty_stars, image_url, is_standalone_purchase, price, stripe_product_id, stripe_price_id")
+        .select("id, name, equipment, generated_for_date, category, difficulty, difficulty_stars, is_standalone_purchase, price")
         .eq("id", workoutId)
         .single();
       
@@ -2837,18 +2768,11 @@ Return JSON with these exact fields:
           verifyError: verifyError?.message,
           verifyWorkout 
         });
-        await archiveStripeProductSafely(stripe, stripeProductId, "post_insert_verification_failed");
         throw new Error(`${equipment} WOD verification failed - workout not found in database after insert`);
       }
 
-      if (verifyWorkout.stripe_product_id !== stripeProductId || verifyWorkout.stripe_price_id !== stripePriceId) {
-        await archiveStripeProductSafely(stripe, stripeProductId, "stripe_database_association_mismatch");
-        throw new Error(`${equipment} WOD payment association mismatch after insert`);
-      }
-
-      if (!verifyWorkout.image_url?.startsWith?.("https://") || !verifyWorkout.is_standalone_purchase || Number(verifyWorkout.price) <= 0) {
-        await archiveStripeProductSafely(stripe, stripeProductId, "post_insert_missing_image_or_purchase_flags");
-        throw new Error(`${equipment} WOD image/payment verification failed after insert`);
+      if (!verifyWorkout.is_standalone_purchase || Number(verifyWorkout.price) <= 0) {
+        throw new Error(`${equipment} WOD purchase flags verification failed after insert`);
       }
       
       // Verify category matches expected
@@ -3017,7 +2941,7 @@ Return JSON with these exact fields:
       
       if (!variousExists) {
         await rollbackActiveWodsForDate(supabase, effectiveDate, "Recovery day final verification failed");
-        await runWodStripeCleanup("recovery-final-verification-failed", false);
+        runWodStripeCleanup("recovery-final-verification-failed", false).catch(() => {});
         logStep("CRITICAL ERROR: RECOVERY VARIOUS workout not generated", { 
           generated: generatedWorkouts.map(w => w.equipment)
         });
@@ -3052,7 +2976,7 @@ Return JSON with these exact fields:
         if (!equipmentExists) missing.push("EQUIPMENT");
 
         await rollbackActiveWodsForDate(supabase, effectiveDate, `Final verification failed. Missing: ${missing.join(", ")}`);
-        await runWodStripeCleanup("normal-final-verification-failed", false);
+        runWodStripeCleanup("normal-final-verification-failed", false).catch(() => {});
         
         logStep("CRITICAL ERROR: Not all workouts generated", { 
           missing, 
@@ -3089,7 +3013,7 @@ Return JSON with these exact fields:
         last_generated_at: stateData?.last_generated_at,
       });
 
-      await runWodStripeCleanup("generate-workout-of-day-state-already-updated", false);
+      runWodStripeCleanup("generate-workout-of-day-state-already-updated", false).catch(() => {});
 
       return new Response(
         JSON.stringify({
@@ -3242,7 +3166,9 @@ Return JSON with these exact fields:
       logStep("Recovery email check failed (non-critical)", { error: recoveryEmailError });
     }
 
-    await runWodStripeCleanup("generate-workout-of-day-success", false);
+    // PLAN E: cleanup is now scheduled daily (`stripe-orphan-cleanup` 04:00
+    // UTC). Fire-and-forget here only as a best-effort sweep.
+    runWodStripeCleanup("generate-workout-of-day-success", false).catch(() => {});
 
     return new Response(
       JSON.stringify({
@@ -3270,7 +3196,7 @@ Return JSON with these exact fields:
     if (cleanupSupabase && effectiveDateForCleanup) {
       await rollbackActiveWodsForDate(cleanupSupabase, effectiveDateForCleanup, `Unhandled error: ${errorMessage}`);
     }
-    await runWodStripeCleanup("generate-workout-of-day-error", false);
+    runWodStripeCleanup("generate-workout-of-day-error", false).catch(() => {});
     
     // Log failure to notification_audit_log for visibility
     try {

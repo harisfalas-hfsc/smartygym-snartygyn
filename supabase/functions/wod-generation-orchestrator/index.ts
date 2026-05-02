@@ -4,7 +4,7 @@ import { Resend } from "https://esm.sh/resend@2.0.0";
 import { getDayIn84Cycle, getPeriodizationForDay } from "../_shared/periodization-84day.ts";
 import { getAdminNotificationEmail } from "../_shared/admin-settings.ts";
 import { validateWodSections } from "../_shared/section-validator.ts";
-import { validateWodPublishContract } from "../_shared/wod-integrity.ts";
+import { validateWodPublishContract, type WodContractMode } from "../_shared/wod-integrity.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -21,8 +21,12 @@ interface WodVerificationResult {
   isRecoveryDay: boolean;
 }
 
-function passesPublishContract(wod: any, dateStr: string): { ok: boolean; reason?: string } {
-  const result = validateWodPublishContract(wod, dateStr);
+function passesPublishContract(
+  wod: any,
+  dateStr: string,
+  mode: WodContractMode = "structural",
+): { ok: boolean; reason?: string } {
+  const result = validateWodPublishContract(wod, dateStr, { mode });
   return result.ok ? { ok: true } : { ok: false, reason: result.failures.join("; ") };
 }
 
@@ -51,7 +55,8 @@ function getCyprusDateStr(): string {
 
 async function verifyWodsExist(
   supabase: any,
-  dateStr: string
+  dateStr: string,
+  contractMode: WodContractMode = "structural",
 ): Promise<WodVerificationResult> {
   const recoveryDay = isRecoveryDay(dateStr);
   
@@ -75,7 +80,7 @@ async function verifyWodsExist(
     // Recovery day: expect 1 VARIOUS workout (not MIXED - matches DB constraint)
     const variousWod = wods?.find((w: any) => w.equipment === "VARIOUS");
     if (variousWod) {
-      const contract = passesPublishContract(variousWod, dateStr);
+      const contract = passesPublishContract(variousWod, dateStr, contractMode);
       if (contract.ok) {
         found.push("VARIOUS");
       } else {
@@ -89,7 +94,7 @@ async function verifyWodsExist(
     // Normal day: expect BODYWEIGHT + EQUIPMENT (both must be section-complete)
     const bwWod = wods?.find((w: any) => w.equipment === "BODYWEIGHT");
     if (bwWod) {
-      const contract = passesPublishContract(bwWod, dateStr);
+      const contract = passesPublishContract(bwWod, dateStr, contractMode);
       if (contract.ok) {
         found.push("BODYWEIGHT");
       } else {
@@ -102,7 +107,7 @@ async function verifyWodsExist(
     
     const eqWod = wods?.find((w: any) => w.equipment === "EQUIPMENT");
     if (eqWod) {
-      const contract = passesPublishContract(eqWod, dateStr);
+      const contract = passesPublishContract(eqWod, dateStr, contractMode);
       if (contract.ok) {
         found.push("EQUIPMENT");
       } else {
@@ -370,7 +375,11 @@ serve(async (req) => {
   // do nothing. This prevents backup (03:00) and watchdog (03:05) wrappers
   // from re-generating WODs unnecessarily and burning AI credits.
   // ───────────────────────────────────────────────────────────────────────────
-  const preCheck = await verifyWodsExist(supabase, effectiveDate);
+  // Watchdog/backup verify-only mode runs the FULL contract (image + Stripe
+  // must be present). Generator success path uses STRUCTURAL contract because
+  // image + Stripe are populated asynchronously after the WOD row is saved.
+  const preCheckMode: WodContractMode = mode === "verify" ? "full" : "structural";
+  const preCheck = await verifyWodsExist(supabase, effectiveDate, preCheckMode);
 
   // VERIFY-ONLY MODE (used by backup + watchdog wrappers): never generate,
   // never pull from library. Just check, and alert if anything is missing.
@@ -535,15 +544,16 @@ serve(async (req) => {
       // Wait a moment for database to settle
       await delay(2000);
 
-      // Verify WODs exist
-      const verification = await verifyWodsExist(supabase, effectiveDate);
+      // Verify WODs exist (structural — assets land asynchronously)
+      const verification = await verifyWodsExist(supabase, effectiveDate, "structural");
       finalResult = verification;
 
       if (verification.success) {
         console.log(`[ORCHESTRATOR] ✅ SUCCESS on attempt ${attempt} - All required WODs exist`);
         console.log(`[ORCHESTRATOR] Found: ${verification.found.join(", ")}`);
         succeeded = true;
-        await runWodStripeCleanup(supabaseUrl, supabaseServiceKey, "orchestrator-success", false);
+        // PLAN E: cleanup is no longer in the critical path. Daily cron
+        // `stripe-orphan-cleanup` at 04:00 UTC handles it.
 
         // Update run log with success
         if (runLog?.id) {
@@ -587,7 +597,7 @@ serve(async (req) => {
     const isPartialFailure = (finalResult?.found?.length || 0) > 0;
     const failureType = isPartialFailure ? "PARTIAL" : "COMPLETE";
     console.log(`[ORCHESTRATOR] 🚨 ${failureType} FAILURE after ${MAX_ATTEMPTS} attempts - Sending admin alert`);
-    await runWodStripeCleanup(supabaseUrl, supabaseServiceKey, "orchestrator-failure", false);
+    // PLAN E: cleanup deferred to daily cron — not run inline anymore.
 
     // CHAIN FIX: NO automatic library fallback. Per the locked-in rules,
     // the only outcomes are (a) verified success, or (b) admin alert.
