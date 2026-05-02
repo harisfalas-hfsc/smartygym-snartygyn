@@ -2941,7 +2941,7 @@ Return JSON with these exact fields:
       
       if (!variousExists) {
         await rollbackActiveWodsForDate(supabase, effectiveDate, "Recovery day final verification failed");
-        await runWodStripeCleanup("recovery-final-verification-failed", false);
+        runWodStripeCleanup("recovery-final-verification-failed", false).catch(() => {});
         logStep("CRITICAL ERROR: RECOVERY VARIOUS workout not generated", { 
           generated: generatedWorkouts.map(w => w.equipment)
         });
@@ -2976,7 +2976,7 @@ Return JSON with these exact fields:
         if (!equipmentExists) missing.push("EQUIPMENT");
 
         await rollbackActiveWodsForDate(supabase, effectiveDate, `Final verification failed. Missing: ${missing.join(", ")}`);
-        await runWodStripeCleanup("normal-final-verification-failed", false);
+        runWodStripeCleanup("normal-final-verification-failed", false).catch(() => {});
         
         logStep("CRITICAL ERROR: Not all workouts generated", { 
           missing, 
@@ -3013,7 +3013,7 @@ Return JSON with these exact fields:
         last_generated_at: stateData?.last_generated_at,
       });
 
-      await runWodStripeCleanup("generate-workout-of-day-state-already-updated", false);
+      runWodStripeCleanup("generate-workout-of-day-state-already-updated", false).catch(() => {});
 
       return new Response(
         JSON.stringify({
@@ -3196,7 +3196,7 @@ Return JSON with these exact fields:
     if (cleanupSupabase && effectiveDateForCleanup) {
       await rollbackActiveWodsForDate(cleanupSupabase, effectiveDateForCleanup, `Unhandled error: ${errorMessage}`);
     }
-    await runWodStripeCleanup("generate-workout-of-day-error", false);
+    runWodStripeCleanup("generate-workout-of-day-error", false).catch(() => {});
     
     // Log failure to notification_audit_log for visibility
     try {
