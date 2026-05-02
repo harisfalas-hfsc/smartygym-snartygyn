@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
 import { MESSAGE_TYPES } from "../_shared/notification-types.ts";
+import { logEmailDelivery } from "../_shared/email-log.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -183,13 +184,34 @@ serve(async (req) => {
               
               if (emailResult.error) {
                 console.error(`[SEND-RENEWAL-REMINDERS] Email API error for ${userEmail}:`, emailResult.error);
+                await logEmailDelivery({
+                  userId: subscription.user_id,
+                  toEmail: userEmail,
+                  messageType: "renewal-reminder",
+                  status: "failed",
+                  errorMessage: emailResult.error.message || String(emailResult.error),
+                });
               } else {
                 emailsSent++;
+                await logEmailDelivery({
+                  userId: subscription.user_id,
+                  toEmail: userEmail,
+                  messageType: "renewal-reminder",
+                  status: "sent",
+                  resendId: (emailResult as any)?.data?.id ?? null,
+                });
                 // Rate limiting: 600ms delay to respect Resend's 2 requests/second limit
                 await new Promise(resolve => setTimeout(resolve, 600));
               }
             } catch (emailError) {
               console.error(`[SEND-RENEWAL-REMINDERS] Email error for ${userEmail}:`, emailError);
+              await logEmailDelivery({
+                userId: subscription.user_id,
+                toEmail: userEmail,
+                messageType: "renewal-reminder",
+                status: "failed",
+                errorMessage: emailError instanceof Error ? emailError.message : String(emailError),
+              });
             }
           }
         }

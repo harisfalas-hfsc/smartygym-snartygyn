@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCoachInboxEmail } from "../_shared/admin-settings.ts";
+import { logEmailDelivery } from "../_shared/email-log.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -64,7 +65,9 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // Send direct email to coach
-    const emailResponse = await resend.emails.send({
+    let emailResponse: any;
+    try {
+      emailResponse = await resend.emails.send({
       from: "SmartyGym <noreply@smartygym.com>",
       to: [coachEmail],
       reply_to: email,
@@ -108,9 +111,25 @@ const handler = async (req: Request): Promise<Response> => {
           </div>
         </div>
       `,
-    });
-
-    console.log("Direct coach email sent successfully:", emailResponse);
+      });
+      console.log("Direct coach email sent successfully:", emailResponse);
+      await logEmailDelivery({
+        toEmail: coachEmail,
+        messageType: "direct-coach-email",
+        status: "sent",
+        resendId: emailResponse?.data?.id ?? null,
+        metadata: { from_name: name, from_email: email, subject },
+      });
+    } catch (sendErr: any) {
+      await logEmailDelivery({
+        toEmail: coachEmail,
+        messageType: "direct-coach-email",
+        status: "failed",
+        errorMessage: sendErr?.message || String(sendErr),
+        metadata: { from_name: name, from_email: email, subject },
+      });
+      throw sendErr;
+    }
 
     return new Response(JSON.stringify({ success: true, emailResponse }), {
       status: 200,

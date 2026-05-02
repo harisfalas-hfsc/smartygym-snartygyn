@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { getEmailHeaders, getEmailFooter, wrapInEmailTemplate } from "../_shared/email-utils.ts";
+import { logEmailDelivery } from "../_shared/email-log.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -220,8 +221,22 @@ serve(async (req) => {
         if (emailResult.error) {
           console.error('[MASS-NOTIFICATION] Email error for', userEmail, emailResult.error);
           emailsFailed++;
+          await logEmailDelivery({
+            userId: recipient.user_id,
+            toEmail: userEmail,
+            messageType: messageType || "mass-notification",
+            status: "failed",
+            errorMessage: emailResult.error.message || String(emailResult.error),
+          });
         } else {
           emailsSent++;
+          await logEmailDelivery({
+            userId: recipient.user_id,
+            toEmail: userEmail,
+            messageType: messageType || "mass-notification",
+            status: "sent",
+            resendId: emailResult?.data?.id ?? null,
+          });
           // Rate limiting: 600ms delay to respect Resend's 2 requests/second limit
           await new Promise(resolve => setTimeout(resolve, 600));
         }
@@ -229,6 +244,13 @@ serve(async (req) => {
       } catch (emailError) {
         console.error('[MASS-NOTIFICATION] Email send error:', emailError);
         emailsFailed++;
+        await logEmailDelivery({
+          userId: recipient.user_id,
+          toEmail: userEmail,
+          messageType: messageType || "mass-notification",
+          status: "failed",
+          errorMessage: emailError instanceof Error ? emailError.message : String(emailError),
+        });
       }
     }
 

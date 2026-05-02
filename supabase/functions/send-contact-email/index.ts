@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@4.0.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { getAdminNotificationEmail } from "../_shared/admin-settings.ts";
+import { logEmailDelivery } from "../_shared/email-log.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -139,7 +140,9 @@ const handler = async (req: Request): Promise<Response> => {
     console.log(`Sending email from ${email} to ${adminEmail} (resolved from database)`);
 
     // Send initial email to admin
-    const emailResponse = await resend.emails.send({
+    let emailResponse: any;
+    try {
+      emailResponse = await resend.emails.send({
       from: "SmartyGym Contact <notifications@smartygym.com>",
       to: [adminEmail],
       replyTo: email,
@@ -167,16 +170,32 @@ const handler = async (req: Request): Promise<Response> => {
           </div>
         </div>
       `,
-    });
-
-    console.log("Email sent successfully to admin:", emailResponse);
+      });
+      console.log("Email sent successfully to admin:", emailResponse);
+      await logEmailDelivery({
+        toEmail: adminEmail,
+        messageType: "contact-form-admin",
+        status: "sent",
+        resendId: emailResponse?.data?.id ?? null,
+        metadata: { from_email: email, subject: safeSubject },
+      });
+    } catch (sendErr: any) {
+      await logEmailDelivery({
+        toEmail: adminEmail,
+        messageType: "contact-form-admin",
+        status: "failed",
+        errorMessage: sendErr?.message || String(sendErr),
+        metadata: { from_email: email, subject: safeSubject },
+      });
+      throw sendErr;
+    }
 
     // Auto-reply content that will be logged to history
     const autoReplyContent = `Thank you for contacting SmartyGym! We have received your inquiry regarding "${subject}" and will review it promptly. Our team typically responds within 24-48 hours.`;
 
     // Send auto-reply confirmation to the sender
     try {
-      await resend.emails.send({
+      const autoReplyResult = await resend.emails.send({
         from: "SmartyGym <notifications@smartygym.com>",
         to: [email],
         subject: "Thank you for contacting SmartyGym!",
@@ -198,6 +217,12 @@ const handler = async (req: Request): Promise<Response> => {
         `,
       });
       console.log("Auto-reply sent to:", email);
+      await logEmailDelivery({
+        toEmail: email,
+        messageType: "contact-form-auto-reply",
+        status: "sent",
+        resendId: autoReplyResult?.data?.id ?? null,
+      });
 
       // Log auto-reply to message history if messageId is provided
       if (messageId) {
@@ -259,7 +284,7 @@ const handler = async (req: Request): Promise<Response> => {
             aiResponseContent = aiData.response;
             
             // Send AI response email to customer (no AI disclosure)
-            await resend.emails.send({
+            const aiSendResult = await resend.emails.send({
               from: "SmartyGym <notifications@smartygym.com>",
               to: [email],
               replyTo: "smartygym@outlook.com",
@@ -281,6 +306,12 @@ const handler = async (req: Request): Promise<Response> => {
               `,
             });
             console.log("AI response email sent to customer:", email);
+            await logEmailDelivery({
+              toEmail: email,
+              messageType: "contact-ai-response",
+              status: "sent",
+              resendId: aiSendResult?.data?.id ?? null,
+            });
 
             // Log AI response to history if messageId provided
             if (messageId) {
@@ -328,7 +359,7 @@ const handler = async (req: Request): Promise<Response> => {
             </div>
           `;
 
-        await resend.emails.send({
+        const adminFwdResult = await resend.emails.send({
           from: "SmartyGym Contact <notifications@smartygym.com>",
           to: [adminEmail],
           replyTo: email,
@@ -383,8 +414,21 @@ const handler = async (req: Request): Promise<Response> => {
           `,
         });
         console.log(`Forward email sent to ${adminEmail} with AI response included`);
+        await logEmailDelivery({
+          toEmail: adminEmail,
+          messageType: "contact-admin-forward",
+          status: "sent",
+          resendId: adminFwdResult?.data?.id ?? null,
+          metadata: { from_email: email, subject: safeSubject, category: categoryLabel },
+        });
       } catch (forwardError) {
         console.error("Failed to forward email:", forwardError);
+        await logEmailDelivery({
+          toEmail: adminEmail,
+          messageType: "contact-admin-forward",
+          status: "failed",
+          errorMessage: forwardError instanceof Error ? forwardError.message : String(forwardError),
+        });
         // Don't fail the whole request if forward fails
       }
     } catch (autoReplyError) {

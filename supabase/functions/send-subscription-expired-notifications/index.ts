@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
 import { MESSAGE_TYPES } from "../_shared/notification-types.ts";
+import { logEmailDelivery } from "../_shared/email-log.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -158,7 +159,7 @@ serve(async (req) => {
           </html>
         `;
 
-        await resend.emails.send({
+        const sendResult = await resend.emails.send({
           from: "SmartyGym <notifications@smartygym.com>",
           to: [userEmail],
           subject: "Your SmartyGym Subscription Has Ended",
@@ -171,11 +172,25 @@ serve(async (req) => {
 
         emailCount++;
         console.log(`Email sent to ${userEmail}`);
+        await logEmailDelivery({
+          userId: subscription.user_id,
+          toEmail: userEmail,
+          messageType: "subscription-expired",
+          status: "sent",
+          resendId: (sendResult as any)?.data?.id ?? null,
+        });
 
         // Rate limiting for Resend (600ms delay)
         await new Promise(resolve => setTimeout(resolve, 600));
       } catch (emailError) {
         console.error(`Failed to send email to ${userEmail}:`, emailError);
+        await logEmailDelivery({
+          userId: subscription.user_id,
+          toEmail: userEmail,
+          messageType: "subscription-expired",
+          status: "failed",
+          errorMessage: emailError instanceof Error ? emailError.message : String(emailError),
+        });
       }
     }
 
