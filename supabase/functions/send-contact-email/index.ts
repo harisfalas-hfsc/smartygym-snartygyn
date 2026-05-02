@@ -284,7 +284,7 @@ const handler = async (req: Request): Promise<Response> => {
             aiResponseContent = aiData.response;
             
             // Send AI response email to customer (no AI disclosure)
-            await resend.emails.send({
+            const aiSendResult = await resend.emails.send({
               from: "SmartyGym <notifications@smartygym.com>",
               to: [email],
               replyTo: "smartygym@outlook.com",
@@ -306,6 +306,12 @@ const handler = async (req: Request): Promise<Response> => {
               `,
             });
             console.log("AI response email sent to customer:", email);
+            await logEmailDelivery({
+              toEmail: email,
+              messageType: "contact-ai-response",
+              status: "sent",
+              resendId: aiSendResult?.data?.id ?? null,
+            });
 
             // Log AI response to history if messageId provided
             if (messageId) {
