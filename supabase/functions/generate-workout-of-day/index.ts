@@ -2458,62 +2458,18 @@ Return JSON with these exact fields:
       }
 
       // ═══════════════════════════════════════════════════════════════════════════════
-      // IMAGE GENERATION WITH RETRY LOGIC - CRITICAL FOR WOD INTEGRITY
-      // Try up to 3 times with delays to ensure every WOD gets an image
+      // PLAN A+B+E: Image + Stripe creation are now DEFERRED to background tasks.
+      // - Image: handled by `auto-generate-workout-image` (queued via pg_net below)
+      // - Stripe product/price: handled by `wod-stripe-link` (queued via pg_net below)
+      // The WOD row is inserted with image_url=NULL, stripe_product_id=NULL,
+      // stripe_price_id=NULL. The orchestrator now uses STRUCTURAL contract
+      // mode to accept this state. The watchdog enforces the FULL contract
+      // later and re-fires the linker if assets are still missing.
       // ═══════════════════════════════════════════════════════════════════════════════
-      logStep(`Generating image for ${equipment} workout`, { name: workoutContent.name, category, format });
-      
-      let imageUrl: string | null = null;
-      const imageMaxRetries = 3;
-      const imageRetryDelayMs = 3000;
-
-      for (let imageAttempt = 1; imageAttempt <= imageMaxRetries; imageAttempt++) {
-        try {
-          logStep(`Image generation attempt ${imageAttempt}/${imageMaxRetries}`, { equipment, workout: workoutContent.name });
-          
-          const { data: imageData, error: imageError } = await supabase.functions.invoke("generate-workout-image", {
-            body: { 
-              name: workoutContent.name, 
-              category: category, 
-              format: format, 
-              difficulty_stars: selectedDifficulty.stars 
-            }
-          });
-
-          if (imageError) {
-            logStep(`Image generation error on attempt ${imageAttempt}`, { error: imageError.message, equipment });
-          } else if (imageData?.image_url) {
-            imageUrl = imageData.image_url;
-            logStep(`✅ Image generated successfully on attempt ${imageAttempt}`, { equipment, imageUrl: imageUrl!.substring(0, 80) });
-            break; // Success, exit retry loop
-          } else {
-            logStep(`Image generation returned no URL on attempt ${imageAttempt}`, { equipment, imageData });
-          }
-        } catch (imgErr: any) {
-          logStep(`Image generation exception on attempt ${imageAttempt}`, { error: imgErr.message, equipment });
-        }
-
-        // Wait before retry (except on last attempt)
-        if (imageAttempt < imageMaxRetries && !imageUrl) {
-          logStep(`Waiting ${imageRetryDelayMs}ms before image retry...`);
-          await new Promise(resolve => setTimeout(resolve, imageRetryDelayMs));
-        }
-      }
-      
-      logStep(`${equipment} image generation complete`, { hasImage: !!imageUrl, attempts: imageMaxRetries });
-
-      // CRITICAL: Validate image before Stripe product creation
-      if (!imageUrl) {
-        console.error(`[WOD-GENERATION] ❌ CRITICAL ERROR: No image URL for ${equipment} workout "${workoutContent.name}" after ${imageMaxRetries} attempts!`);
-        logStep(`❌ CRITICAL: All image generation attempts failed`, { workout: workoutContent.name, equipment, attempts: imageMaxRetries });
-        throw new Error(`${equipment} WOD rejected: image generation failed after ${imageMaxRetries} attempts`);
-      } else {
-        logStep(`✅ Image validated for Stripe`, { imageUrl: imageUrl.substring(0, 80) });
-      }
-
+      const imageUrl: string | null = null;
       const workoutId = `WOD-${prefix}-${equipment.charAt(0)}-${timestamp}`;
-      let stripeProductId: string | null = null;
-      let stripePriceId: string | null = null;
+      const stripeProductId: string | null = null;
+      const stripePriceId: string | null = null;
 
       // ═══════════════════════════════════════════════════════════════════════════════
       // POST-GENERATION DURATION CALCULATION - Parse actual section durations from HTML
