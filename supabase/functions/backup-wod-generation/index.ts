@@ -1,6 +1,4 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { cyprusToday, getDayIn84Cycle, getPeriodizationForDay } from "../_shared/wod/schedule.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -8,13 +6,16 @@ const corsHeaders = {
 };
 
 /**
- * Backup WOD Generation — slot-aware safety net (PLAN 2).
+ * Backup WOD Generation — VERIFY-ONLY safety net (CHAIN FIX).
  *
- * Detects which of today's WOD slots are missing for the Cyprus day and
- * triggers `generate-workout-of-day` ONCE per missing slot in background mode.
- * Never silently switches to library mode. Each missing slot is regenerated
- * fresh by AI; if generation legitimately fails, the failure surfaces in
- * `wod_generation_runs` and the existing alert system handles it.
+ * Per the locked-in rules:
+ *   - NEVER regenerates automatically.
+ *   - NEVER pulls from the library (library mode is admin-only).
+ *   - Calls the orchestrator in verify-only mode. If anything is missing
+ *     for today's Cyprus date, the orchestrator sends an admin alert.
+ *
+ * The owner manually publishes from the library via the admin panel
+ * after receiving the alert.
  */
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -23,80 +24,26 @@ serve(async (req) => {
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
-  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-  const supabase = createClient(supabaseUrl, serviceKey);
 
-  const today = cyprusToday();
-  const dayIn84 = getDayIn84Cycle(today);
-  const periodization = getPeriodizationForDay(dayIn84);
-  const isRecoveryDay = periodization.category === "RECOVERY";
-  const expectedSlots = isRecoveryDay
-    ? ["VARIOUS"]
-    : ["BODYWEIGHT", "EQUIPMENT"];
-
-  console.log(`[BACKUP-WOD] Cyprus today=${today}, recovery=${isRecoveryDay}, expected slots=${expectedSlots.join(",")}`);
+  console.log("[BACKUP-WOD] Triggering orchestrator in verify-only mode");
 
   try {
-    const { data: existing, error } = await supabase
-      .from("admin_workouts")
-      .select("id, equipment, main_workout")
-      .eq("generated_for_date", today)
-      .eq("is_workout_of_day", true);
+    const resp = await fetch(`${supabaseUrl}/functions/v1/wod-generation-orchestrator`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${anonKey}` },
+      body: JSON.stringify({ mode: "verify", triggerSource: "backup" }),
+    });
+    const text = await resp.text();
+    console.log(`[BACKUP-WOD] Orchestrator verify response ${resp.status}: ${text.substring(0, 300)}`);
 
-    if (error) {
-      console.error("[BACKUP-WOD] DB query failed:", error);
-      return new Response(JSON.stringify({ success: false, error: error.message }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    const presentSlots = new Set((existing || []).map((w: any) => w.equipment));
-    const missingSlots = expectedSlots.filter((s) => !presentSlots.has(s));
-
-    if (missingSlots.length === 0) {
-      console.log("[BACKUP-WOD] ✅ All expected slots present, nothing to do");
-      return new Response(
-        JSON.stringify({ success: true, message: "all slots present", today, present: [...presentSlots] }),
-        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    console.log(`[BACKUP-WOD] Missing slots: ${missingSlots.join(",")} — triggering targeted regeneration`);
-
-    const results: any[] = [];
-    for (const slot of missingSlots) {
-      try {
-        const resp = await fetch(`${supabaseUrl}/functions/v1/generate-workout-of-day`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${anonKey}` },
-          body: JSON.stringify({
-            slot,
-            triggerSource: "backup",
-            retryMissing: true,
-            background: true,
-          }),
-        });
-        const text = await resp.text();
-        console.log(`[BACKUP-WOD] slot=${slot} response ${resp.status}: ${text.substring(0, 200)}`);
-        results.push({ slot, status: resp.status, ok: resp.ok });
-      } catch (e: any) {
-        console.error(`[BACKUP-WOD] slot=${slot} invocation failed:`, e);
-        results.push({ slot, ok: false, error: e?.message || String(e) });
-      }
-    }
-
-    return new Response(
-      JSON.stringify({ success: true, today, missingSlots, results }),
-      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return new Response(text, {
+      status: resp.status,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   } catch (error) {
-    console.error("[BACKUP-WOD] Unexpected error:", error);
+    console.error("[BACKUP-WOD] Failed to call orchestrator:", error);
     return new Response(
-      JSON.stringify({
-        success: false,
-        error: error instanceof Error ? error.message : String(error),
-      }),
+      JSON.stringify({ success: false, error: error instanceof Error ? error.message : String(error) }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

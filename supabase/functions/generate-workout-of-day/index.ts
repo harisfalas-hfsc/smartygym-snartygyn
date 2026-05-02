@@ -3330,7 +3330,10 @@ serve(async (req) => {
   let targetDate: string | null = null;
   let skipNotifications = false;
   let retryMissing = false;
-  let background = true; // default: never block the caller
+  // PLAN — Chain Fix: default is SYNCHRONOUS so the orchestrator can
+  // verify the real outcome. Only opt-in callers (e.g. admin "fire and
+  // forget" UI) may pass `background: true`.
+  let background = false;
   let triggerSource = "manual";
   let slot: 'BODYWEIGHT' | 'EQUIPMENT' | 'VARIOUS' | null = null;
 
