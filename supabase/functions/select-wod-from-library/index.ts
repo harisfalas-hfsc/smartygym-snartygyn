@@ -220,7 +220,7 @@ serve(async (req) => {
 
     if (isRecoveryDay) {
       // Recovery day: pick 1 workout from RECOVERY category
-      const selected = await selectWorkout(supabase, {
+      const selected = await selectWorkoutCandidates(supabase, {
         category: "RECOVERY",
         difficulty: null,
         difficultyStars: null,
@@ -229,14 +229,14 @@ serve(async (req) => {
         strengthFocus: null,
       });
 
-      if (selected) {
-        selectedWorkouts.push(selected);
+      if (selected && selected.length > 0) {
+        selectedWorkouts.push({ slot: "RECOVERY", candidates: selected });
       } else {
         logStep("WARNING: No recovery workout found in library");
       }
     } else {
       // Normal day: pick 1 BODYWEIGHT + 1 EQUIPMENT
-      const bwSelected = await selectWorkout(supabase, {
+      const bwSelected = await selectWorkoutCandidates(supabase, {
         category: periodization.category,
         difficulty: periodization.difficulty,
         difficultyStars: periodization.difficultyStars,
@@ -245,13 +245,13 @@ serve(async (req) => {
         strengthFocus: periodization.strengthFocus || null,
       });
 
-      if (bwSelected) {
-        selectedWorkouts.push(bwSelected);
+      if (bwSelected && bwSelected.length > 0) {
+        selectedWorkouts.push({ slot: "BODYWEIGHT", candidates: bwSelected });
       } else {
         logStep("WARNING: No BODYWEIGHT workout found for", { category: periodization.category, difficulty: periodization.difficulty });
       }
 
-      const eqSelected = await selectWorkout(supabase, {
+      const eqSelected = await selectWorkoutCandidates(supabase, {
         category: periodization.category,
         difficulty: periodization.difficulty,
         difficultyStars: periodization.difficultyStars,
@@ -260,8 +260,8 @@ serve(async (req) => {
         strengthFocus: periodization.strengthFocus || null,
       });
 
-      if (eqSelected) {
-        selectedWorkouts.push(eqSelected);
+      if (eqSelected && eqSelected.length > 0) {
+        selectedWorkouts.push({ slot: "EQUIPMENT", candidates: eqSelected });
       } else {
         logStep("WARNING: No EQUIPMENT workout found for", { category: periodization.category, difficulty: periodization.difficulty });
       }
@@ -284,9 +284,18 @@ serve(async (req) => {
     }
 
     let promotedCount = 0;
+    const finallyPromoted: any[] = [];
 
-    // Flag selected workouts as WOD
-    for (const workout of selectedWorkouts) {
+    // Iterate slots; for each slot try candidates in order until one passes
+    // the publish contract. This protects against pre-existing data quality
+    // issues in older library workouts (missing density, raw placeholders, etc.)
+    for (const slotEntry of selectedWorkouts) {
+      const { slot, candidates } = slotEntry as { slot: string; candidates: any[] };
+      logStep(`Trying slot ${slot} with ${candidates.length} candidate(s)`);
+      let slotPromoted = false;
+
+      for (const workout of candidates) {
+        if (slotPromoted) break;
       // Guarantee a valid Stripe product + price BEFORE promoting to WOD
       let stripeProductId: string;
       let stripePriceId: string;
@@ -357,6 +366,14 @@ serve(async (req) => {
         stripePriceId,
       });
       promotedCount++;
+      slotPromoted = true;
+      finallyPromoted.push(postRow);
+      } // end candidate loop
+
+      if (!slotPromoted) {
+        logStep(`SLOT FAILED: no usable candidate for ${slot} after trying ${candidates.length}`);
+      }
+    } // end slot loop
 
       // Insert cooldown record
       await supabase.from("wod_selection_cooldown").insert({
