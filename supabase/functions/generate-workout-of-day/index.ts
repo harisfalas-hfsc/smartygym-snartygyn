@@ -2724,18 +2724,41 @@ Return JSON with these exact fields:
         });
 
       if (insertError) {
-        // ORPHAN GUARD: Archive Stripe product immediately if DB insert fails
-        // This prevents orphaned active Stripe products from accumulating
-        await archiveStripeProductSafely(stripe, stripeProductId, `db_insert_failed:${insertError.message}`);
         throw new Error(`Failed to insert ${equipment} WOD: ${insertError.message}`);
       }
+
+      // PLAN A+B: Fire-and-forget background asset generation. The DB trigger
+      // `trigger_auto_generate_workout_image` does not run for WODs, so we
+      // explicitly invoke both `auto-generate-workout-image` and the new
+      // `wod-stripe-link` here. They run independently of this function's
+      // 150s window.
+      try {
+        await fetch(`${supabaseUrl}/functions/v1/auto-generate-workout-image`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${supabaseServiceKey}`,
+          },
+          body: JSON.stringify({ workout_id: workoutId }),
+        }).catch((e) => logStep("auto-generate-workout-image kickoff failed (non-fatal)", { error: String(e) }));
+      } catch (_e) { /* non-fatal */ }
+      try {
+        await fetch(`${supabaseUrl}/functions/v1/wod-stripe-link`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${supabaseServiceKey}`,
+          },
+          body: JSON.stringify({ workout_id: workoutId }),
+        }).catch((e) => logStep("wod-stripe-link kickoff failed (non-fatal)", { error: String(e) }));
+      } catch (_e) { /* non-fatal */ }
 
       // ═══════════════════════════════════════════════════════════════════════════════
       // CRITICAL SAFETY CHECK: Verify workout was actually inserted with correct data
       // ═══════════════════════════════════════════════════════════════════════════════
       const { data: verifyWorkout, error: verifyError } = await supabase
         .from("admin_workouts")
-        .select("id, name, equipment, generated_for_date, category, difficulty, difficulty_stars, image_url, is_standalone_purchase, price, stripe_product_id, stripe_price_id")
+        .select("id, name, equipment, generated_for_date, category, difficulty, difficulty_stars, is_standalone_purchase, price")
         .eq("id", workoutId)
         .single();
       
@@ -2745,18 +2768,11 @@ Return JSON with these exact fields:
           verifyError: verifyError?.message,
           verifyWorkout 
         });
-        await archiveStripeProductSafely(stripe, stripeProductId, "post_insert_verification_failed");
         throw new Error(`${equipment} WOD verification failed - workout not found in database after insert`);
       }
 
-      if (verifyWorkout.stripe_product_id !== stripeProductId || verifyWorkout.stripe_price_id !== stripePriceId) {
-        await archiveStripeProductSafely(stripe, stripeProductId, "stripe_database_association_mismatch");
-        throw new Error(`${equipment} WOD payment association mismatch after insert`);
-      }
-
-      if (!verifyWorkout.image_url?.startsWith?.("https://") || !verifyWorkout.is_standalone_purchase || Number(verifyWorkout.price) <= 0) {
-        await archiveStripeProductSafely(stripe, stripeProductId, "post_insert_missing_image_or_purchase_flags");
-        throw new Error(`${equipment} WOD image/payment verification failed after insert`);
+      if (!verifyWorkout.is_standalone_purchase || Number(verifyWorkout.price) <= 0) {
+        throw new Error(`${equipment} WOD purchase flags verification failed after insert`);
       }
       
       // Verify category matches expected
