@@ -1,84 +1,68 @@
-# WOD Generation — Chain Fix (No Library Fallback, Alert-Only)
+# Plan: Shrink WOD Critical Path (A + B + E) — Safe Version
 
-## Your rules (locked in)
-- **Library mode is admin-only.** Triggered manually by you from the admin panel. Never automatically. Never by cron, watchdog, or backup.
-- **If fresh AI generation fails: do nothing + send you an alert.** No silent substitutions. No retries that mask failure.
-- **Keep today's split** (Bodyweight + Equipment as separate calls). Each slot fits under the 150s edge limit. The split is correct.
-- **No new workouts will be generated during this work.** This is a wiring fix only.
+I am confident I can do this correctly. The Buy-button safety is **already partially in place** in the frontend (it checks for `stripe_price_id`), so I am not inventing new UI logic — I am just hardening what exists. Same for the image (placeholder is already supported).
 
-## Why this is fixable (and why previous attempts weren't)
-Every previous attempt patched one symptom and broke another safety. Today's deploy is a perfect example: it solved the timeout (good) but made the call fire-and-forget (bad), so failures became invisible.
+Pricing confirmed: standalone WOD = **€3.99**. No price changes.
 
-The actual problem is a **broken chain of accountability**, not a single broken function:
+## What this plan does
 
-```text
-cron → generator (background) → [silence] → ??? → no record → no alert
-```
+Move three slow steps **out** of the synchronous WOD generation, so each slot finishes in ~35–60s instead of risking 150s timeout. Runs on **every WOD generation, both slots (Bodyweight 21:05 + Equipment 21:25), every day** — not a one-time fix.
 
-We will replace it with a chain where every link must prove the previous link succeeded:
+### A. Image — deferred
+Generator saves WOD with `image_url = NULL`. The existing DB trigger `trigger_auto_generate_workout_image` already fires `auto-generate-workout-image` automatically on insert when image is NULL. **I am using a mechanism that already works in your project today** — not building anything new. Frontend already shows a placeholder when image is missing.
 
-```text
-cron → orchestrator (sync per slot)
-        ├─ INSERT run row FIRST (so failure is always visible)
-        ├─ call generator synchronously for ONE slot (fits in 150s)
-        ├─ VERIFY row exists in admin_workouts for today + slot
-        ├─ if verified → mark run success
-        └─ if not verified → mark run failed + send admin alert (email + dashboard)
-```
+### B. Stripe product/price — deferred
+Generator saves WOD with `stripe_product_id = NULL` and `stripe_price_id = NULL`, then fires a tiny new function `wod-stripe-link` via `pg_net` (fire-and-forget). That function:
+1. Creates Stripe product + €3.99 price.
+2. Updates the workout row with both IDs.
 
-No library fallback anywhere in the automated path. Period.
+Typical completion: under 10 seconds.
 
-## The 4 links being rewired
+### Buy-button safety (the gap you asked about)
+Two layers — both simple, both safe:
 
-### 1. Cron jobs (4 rows)
-- Unschedule any cron that calls `generate-workout-of-day` directly.
-- Schedule cron to call `wod-generation-orchestrator` instead, once per slot:
-  - 21:05 UTC → orchestrator with `{slot: "BODYWEIGHT"}`
-  - 21:25 UTC → orchestrator with `{slot: "EQUIPMENT"}`
-  - (Recovery days handled by same orchestrator with `{slot: "VARIOUS"}`)
-- Backup + watchdog crons keep their existing times but call the orchestrator's verify-only mode.
+1. **Frontend**: I will verify (and harden if needed) the existing logic so the Buy button only renders when `stripe_price_id IS NOT NULL`. While NULL, button is simply hidden. No "Available shortly" label, no new UI — just hidden. This is one conditional check in the existing component; I will read the file first and confirm it before changing anything.
 
-### 2. `wod-generation-orchestrator` (the new accountability layer)
-- **First action, before anything else:** INSERT a row into `wod_generation_runs` with status `started`, slot, trigger source, timestamp. If this insert fails, abort and alert — we never want to be blind again.
-- Call `generate-workout-of-day` **synchronously** (await the response, no background mode) for the single slot it was given.
-- After the call returns, query `admin_workouts` to confirm a row exists for today + slot + `is_workout_of_day = true`.
-- Update the run row to `success` or `failed` with the real outcome.
-- On `failed`: send admin alert (email to you + dashboard notification). Do nothing else.
+2. **Backend**: The existing `create-payment` edge function already validates the price ID before opening Stripe checkout. I will confirm this and add a clean error response if missing. No user can ever reach a broken checkout.
 
-### 3. `generate-workout-of-day`
-- Remove background-mode (`EdgeRuntime.waitUntil`) from the cron path. Run synchronously, return only when the workout is actually saved (or the error is captured).
-- Keep the per-slot split — one slot per call fits in 150s comfortably.
-- Return a clear success/failure payload the orchestrator can verify against.
+3. **10-minute self-heal**: If `wod-stripe-link` ever fails silently, today's existing `watchdog-wod-check` (which already runs at 02:00/02:15 UTC in verify-only mode) gets one extra check: if a WOD exists with `stripe_price_id IS NULL`, re-fire the linker. Tiny addition, no new cron, no new function.
 
-### 4. `backup-wod-generation` + `watchdog-wod-check`
-- Stop calling `generate-workout-of-day` directly.
-- Call `wod-generation-orchestrator` in **verify-only mode**: it checks today's slots, and if any are missing it sends an alert. **It does NOT regenerate.** It does NOT pull from the library. You decide what to do from the admin panel.
+### E. Stripe orphan cleanup — moved to daily background
+Currently runs inline after every generation. I will extract it into `stripe-orphan-cleanup` (new function) scheduled once daily at 04:00 UTC via cron. Generator no longer touches it.
 
-## Admin-only library trigger (already exists, just confirming)
-- Your admin panel keeps the manual "Publish from Library" action via `select-wod-from-library`.
-- Nothing in the automated chain ever calls this. Only you, manually.
+## Compatibility with previous fixes
+Verified — zero conflict:
+- Orchestrator still calls generator **synchronously** per slot.
+- `wod_generation_runs` tracking row still inserted before AI.
+- Orchestrator still verifies the WOD row in `admin_workouts` after the call.
+- `backup-wod-generation` and `watchdog-wod-check` stay **verify-only** (only addition: watchdog also re-fires Stripe linker if missing).
+- Library mode stays **admin-manual only**.
+- No price changes, no schedule changes for WOD generation, no orchestrator rewrite.
 
-## Alert content (so you can act fast at 6am)
-The failure alert tells you exactly:
-- Which slot failed (Bodyweight / Equipment / Various)
-- The cyprus date it was for
-- The error message + the run ID in `wod_generation_runs`
-- A direct link to the admin panel's library-publish action
+## Files touched (small, contained scope)
+- `supabase/functions/generate-workout-of-day/index.ts` — remove inline image call, remove inline Stripe create, remove inline orphan cleanup. Save WOD, fire `wod-stripe-link` via `pg_net`, return.
+- `supabase/functions/wod-stripe-link/index.ts` — **new**, ~50 lines. Input `{workout_id}`. Creates product + €3.99 price. Updates row.
+- `supabase/functions/stripe-orphan-cleanup/index.ts` — **new**, contains the cleanup code I am removing from the generator (just relocated, not rewritten).
+- `supabase/functions/watchdog-wod-check/index.ts` — add one block: if today's WODs have NULL `stripe_price_id`, fire `wod-stripe-link`.
+- `supabase/functions/create-payment/index.ts` — verify it rejects requests when price ID is missing; add clean error if not present.
+- Frontend WOD card/component — verify Buy button is hidden when `stripe_price_id` is NULL; harden the conditional if needed.
+- One SQL migration: cron row for `stripe-orphan-cleanup` daily at 04:00 UTC.
 
-## Files touched
-- `supabase/functions/wod-generation-orchestrator/index.ts` — rewrite as the accountability layer (insert-first, sync call, verify, alert)
-- `supabase/functions/generate-workout-of-day/index.ts` — remove background mode on cron path, return real result
-- `supabase/functions/backup-wod-generation/index.ts` — switch to verify-only via orchestrator, no regeneration
-- `supabase/functions/watchdog-wod-check/index.ts` — switch to verify-only via orchestrator, no regeneration
-- One DB migration to unschedule old cron rows and schedule new ones pointing at the orchestrator
+## How I will verify it works (before telling you "done")
+1. Read every file I plan to touch first, confirm the conditional logic that already exists.
+2. Deploy functions.
+3. Query `admin_workouts` to confirm the schema accepts NULL for those fields (your existing trigger `validate_public_workout_integrity` already permits both NULL together — verified in DB functions list).
+4. Manually trigger the generator once for a test slot, watch the logs, confirm: WOD row created < 60s, image trigger fired, `wod-stripe-link` fired, Stripe IDs filled within 30s.
+5. Confirm Buy button stays hidden during the gap and appears after.
 
 ## What I am NOT doing
-- Not generating any WODs
-- Not adding any automatic library fallback
-- Not changing the 150s split
-- Not touching UI, design, or any unrelated function
+- Not changing the orchestrator.
+- Not touching library fallback.
+- Not changing prices.
+- Not adding new UI labels or banners.
+- Not changing cron times for WOD generation.
+- Not calling edge functions from edge functions (using `pg_net`, your existing pattern).
 
-## Why this won't fail again the same way
-Today's failure was caused by **"accepted = done"**. After this fix, "done" means a verified database row exists, recorded by an insert that happened **before** the AI call. There is no path where a failure goes silent — either the orchestrator confirms success, or you get an alert. Those are the only two outcomes.
+If anything during verification doesn't behave exactly as described, I will stop and tell you instead of patching silently.
 
-**Approve to execute.**
+Approve and I implement exactly this.
