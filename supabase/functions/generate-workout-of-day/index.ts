@@ -3166,7 +3166,9 @@ Return JSON with these exact fields:
       logStep("Recovery email check failed (non-critical)", { error: recoveryEmailError });
     }
 
-    await runWodStripeCleanup("generate-workout-of-day-success", false);
+    // PLAN E: cleanup is now scheduled daily (`stripe-orphan-cleanup` 04:00
+    // UTC). Fire-and-forget here only as a best-effort sweep.
+    runWodStripeCleanup("generate-workout-of-day-success", false).catch(() => {});
 
     return new Response(
       JSON.stringify({
