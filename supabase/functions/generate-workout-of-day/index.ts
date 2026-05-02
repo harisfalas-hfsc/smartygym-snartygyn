@@ -3332,6 +3332,7 @@ serve(async (req) => {
   let retryMissing = false;
   let background = true; // default: never block the caller
   let triggerSource = "manual";
+  let slot: 'BODYWEIGHT' | 'EQUIPMENT' | 'VARIOUS' | null = null;
 
   try {
     const body = await req.json();
@@ -3340,11 +3341,17 @@ serve(async (req) => {
     retryMissing = body?.retryMissing || false;
     if (typeof body?.background === "boolean") background = body.background;
     if (typeof body?.triggerSource === "string") triggerSource = body.triggerSource;
+    if (typeof body?.slot === "string") {
+      const s = body.slot.toUpperCase();
+      if (s === "BODYWEIGHT" || s === "EQUIPMENT" || s === "VARIOUS") {
+        slot = s as 'BODYWEIGHT' | 'EQUIPMENT' | 'VARIOUS';
+      }
+    }
   } catch {
     // No body / invalid JSON — keep defaults (background=true)
   }
 
-  const params = { targetDate, skipNotifications, retryMissing, triggerSource };
+  const params = { targetDate, skipNotifications, retryMissing, triggerSource, slot };
 
   if (background) {
     // Fire-and-forget: real work continues after the response is sent.
