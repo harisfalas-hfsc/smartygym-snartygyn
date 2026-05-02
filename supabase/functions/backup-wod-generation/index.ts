@@ -1,4 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { cyprusToday, getDayIn84Cycle, getPeriodizationForDay } from "../_shared/wod/schedule.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -6,43 +8,90 @@ const corsHeaders = {
 };
 
 /**
- * Backup WOD Generation — fast safety wrapper.
+ * Backup WOD Generation — slot-aware safety net (PLAN 2).
  *
- * Runs at 03:00 Cyprus time. It must NOT call the long AI orchestrator from
- * inside another function: that nested path can exceed the hosted function idle
- * timeout and leave WOD run logs stuck as `running`. The backup safety net uses
- * the validated library selector directly; that selector short-circuits when
- * today's WODs already exist.
+ * Detects which of today's WOD slots are missing for the Cyprus day and
+ * triggers `generate-workout-of-day` ONCE per missing slot in background mode.
+ * Never silently switches to library mode. Each missing slot is regenerated
+ * fresh by AI; if generation legitimately fails, the failure surfaces in
+ * `wod_generation_runs` and the existing alert system handles it.
  */
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
-  console.log("[BACKUP-WOD] Delegating to select-wod-from-library (fast fallback)");
-
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const supabase = createClient(supabaseUrl, serviceKey);
+
+  const today = cyprusToday();
+  const dayIn84 = getDayIn84Cycle(today);
+  const periodization = getPeriodizationForDay(dayIn84);
+  const isRecoveryDay = periodization.category === "RECOVERY";
+  const expectedSlots = isRecoveryDay
+    ? ["VARIOUS"]
+    : ["BODYWEIGHT", "EQUIPMENT"];
+
+  console.log(`[BACKUP-WOD] Cyprus today=${today}, recovery=${isRecoveryDay}, expected slots=${expectedSlots.join(",")}`);
 
   try {
-    const response = await fetch(`${supabaseUrl}/functions/v1/select-wod-from-library`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${anonKey}`,
-      },
-      body: JSON.stringify({ triggerSource: "backup" }),
-    });
+    const { data: existing, error } = await supabase
+      .from("admin_workouts")
+      .select("id, equipment, main_workout")
+      .eq("generated_for_date", today)
+      .eq("is_workout_of_day", true);
 
-    const text = await response.text();
-    console.log(`[BACKUP-WOD] Library fallback response ${response.status}: ${text.substring(0, 300)}`);
+    if (error) {
+      console.error("[BACKUP-WOD] DB query failed:", error);
+      return new Response(JSON.stringify({ success: false, error: error.message }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
-    return new Response(text, {
-      status: response.status,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    const presentSlots = new Set((existing || []).map((w: any) => w.equipment));
+    const missingSlots = expectedSlots.filter((s) => !presentSlots.has(s));
+
+    if (missingSlots.length === 0) {
+      console.log("[BACKUP-WOD] ✅ All expected slots present, nothing to do");
+      return new Response(
+        JSON.stringify({ success: true, message: "all slots present", today, present: [...presentSlots] }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    console.log(`[BACKUP-WOD] Missing slots: ${missingSlots.join(",")} — triggering targeted regeneration`);
+
+    const results: any[] = [];
+    for (const slot of missingSlots) {
+      try {
+        const resp = await fetch(`${supabaseUrl}/functions/v1/generate-workout-of-day`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${anonKey}` },
+          body: JSON.stringify({
+            slot,
+            triggerSource: "backup",
+            retryMissing: true,
+            background: true,
+          }),
+        });
+        const text = await resp.text();
+        console.log(`[BACKUP-WOD] slot=${slot} response ${resp.status}: ${text.substring(0, 200)}`);
+        results.push({ slot, status: resp.status, ok: resp.ok });
+      } catch (e: any) {
+        console.error(`[BACKUP-WOD] slot=${slot} invocation failed:`, e);
+        results.push({ slot, ok: false, error: e?.message || String(e) });
+      }
+    }
+
+    return new Response(
+      JSON.stringify({ success: true, today, missingSlots, results }),
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
   } catch (error) {
-    console.error("[BACKUP-WOD] Failed to invoke library fallback:", error);
+    console.error("[BACKUP-WOD] Unexpected error:", error);
     return new Response(
       JSON.stringify({
         success: false,

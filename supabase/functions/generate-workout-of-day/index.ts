@@ -279,6 +279,7 @@ async function runWodGeneration(params: {
   skipNotifications: boolean;
   retryMissing: boolean;
   triggerSource: string;
+  slot?: 'BODYWEIGHT' | 'EQUIPMENT' | 'VARIOUS' | null;
 }): Promise<Response> {
   let cleanupSupabase: any = null;
   let effectiveDateForCleanup: string | null = null;
@@ -287,12 +288,14 @@ async function runWodGeneration(params: {
     const targetDate = params.targetDate;
     const skipNotifications = params.skipNotifications;
     const retryMissing = params.retryMissing;
+    const slot = params.slot || null;
 
     logStep("Background runner started", {
       triggerSource: params.triggerSource,
       targetDate,
       retryMissing,
       skipNotifications,
+      slot,
     });
 
     // Cyprus date (Europe/Athens) — DST-safe via shared helper.
@@ -391,9 +394,17 @@ async function runWodGeneration(params: {
 
     // For non-recovery days, determine what needs to be generated (using completeness check)
     const allEquipmentTypes = ["BODYWEIGHT", "EQUIPMENT"] as const;
-    const equipmentTypesToGenerate = allEquipmentTypes.filter((e) =>
+    let equipmentTypesToGenerate = allEquipmentTypes.filter((e) =>
       e === "BODYWEIGHT" ? !bodyweightComplete : !equipmentComplete
     );
+
+    // PLAN 2 — slot scoping: when an explicit slot is requested (cron split path),
+    // restrict generation to that single variant only. Recovery-day VARIOUS slot
+    // is handled below at the equipmentTypes assignment.
+    if (slot && (slot === "BODYWEIGHT" || slot === "EQUIPMENT")) {
+      equipmentTypesToGenerate = equipmentTypesToGenerate.filter((e) => e === slot);
+      logStep("PLAN 2 slot filter applied", { slot, equipmentTypesToGenerate });
+    }
     
     logStep("Equipment check", {
       isRecoveryDayEarly,
@@ -778,10 +789,22 @@ This is a NUDGE, not a mandate.
       // RECOVERY: Only generate ONE VARIOUS workout (use early check from line ~312)
       // CRITICAL: Use VARIOUS (not MIXED) to match database constraint valid_equipment
       equipmentTypes = variousComplete ? [] : ["VARIOUS"];
+      // PLAN 2 — slot scoping: BODYWEIGHT/EQUIPMENT crons are no-ops on recovery
+      // days; only VARIOUS (or no slot) should produce work.
+      if (slot && slot !== "VARIOUS") {
+        logStep("PLAN 2 slot filter: recovery day, non-VARIOUS slot → no-op", { slot });
+        equipmentTypes = [];
+      }
       logStep("RECOVERY day - generating single VARIOUS workout", { variousAlreadyExists, equipmentTypes });
     } else {
-      // Normal days: Generate BODYWEIGHT and EQUIPMENT versions
-      equipmentTypes = equipmentTypesToGenerate;
+      // Normal days: Generate BODYWEIGHT and EQUIPMENT versions.
+      // PLAN 2 — VARIOUS slot is a no-op on non-recovery days.
+      if (slot === "VARIOUS") {
+        logStep("PLAN 2 slot filter: normal day, VARIOUS slot → no-op", { slot });
+        equipmentTypes = [];
+      } else {
+        equipmentTypes = equipmentTypesToGenerate;
+      }
     }
     
     const generatedWorkouts: any[] = [];
@@ -3309,6 +3332,7 @@ serve(async (req) => {
   let retryMissing = false;
   let background = true; // default: never block the caller
   let triggerSource = "manual";
+  let slot: 'BODYWEIGHT' | 'EQUIPMENT' | 'VARIOUS' | null = null;
 
   try {
     const body = await req.json();
@@ -3317,11 +3341,17 @@ serve(async (req) => {
     retryMissing = body?.retryMissing || false;
     if (typeof body?.background === "boolean") background = body.background;
     if (typeof body?.triggerSource === "string") triggerSource = body.triggerSource;
+    if (typeof body?.slot === "string") {
+      const s = body.slot.toUpperCase();
+      if (s === "BODYWEIGHT" || s === "EQUIPMENT" || s === "VARIOUS") {
+        slot = s as 'BODYWEIGHT' | 'EQUIPMENT' | 'VARIOUS';
+      }
+    }
   } catch {
     // No body / invalid JSON — keep defaults (background=true)
   }
 
-  const params = { targetDate, skipNotifications, retryMissing, triggerSource };
+  const params = { targetDate, skipNotifications, retryMissing, triggerSource, slot };
 
   if (background) {
     // Fire-and-forget: real work continues after the response is sent.
