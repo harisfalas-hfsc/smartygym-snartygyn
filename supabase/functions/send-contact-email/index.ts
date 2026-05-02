@@ -414,8 +414,21 @@ const handler = async (req: Request): Promise<Response> => {
           `,
         });
         console.log(`Forward email sent to ${adminEmail} with AI response included`);
+        await logEmailDelivery({
+          toEmail: adminEmail,
+          messageType: "contact-admin-forward",
+          status: "sent",
+          resendId: adminFwdResult?.data?.id ?? null,
+          metadata: { from_email: email, subject: safeSubject, category: categoryLabel },
+        });
       } catch (forwardError) {
         console.error("Failed to forward email:", forwardError);
+        await logEmailDelivery({
+          toEmail: adminEmail,
+          messageType: "contact-admin-forward",
+          status: "failed",
+          errorMessage: forwardError instanceof Error ? forwardError.message : String(forwardError),
+        });
         // Don't fail the whole request if forward fails
       }
     } catch (autoReplyError) {
