@@ -359,7 +359,7 @@ const handler = async (req: Request): Promise<Response> => {
             </div>
           `;
 
-        await resend.emails.send({
+        const adminFwdResult = await resend.emails.send({
           from: "SmartyGym Contact <notifications@smartygym.com>",
           to: [adminEmail],
           replyTo: email,
