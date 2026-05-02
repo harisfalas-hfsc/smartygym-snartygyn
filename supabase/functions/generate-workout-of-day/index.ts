@@ -394,9 +394,17 @@ async function runWodGeneration(params: {
 
     // For non-recovery days, determine what needs to be generated (using completeness check)
     const allEquipmentTypes = ["BODYWEIGHT", "EQUIPMENT"] as const;
-    const equipmentTypesToGenerate = allEquipmentTypes.filter((e) =>
+    let equipmentTypesToGenerate = allEquipmentTypes.filter((e) =>
       e === "BODYWEIGHT" ? !bodyweightComplete : !equipmentComplete
     );
+
+    // PLAN 2 — slot scoping: when an explicit slot is requested (cron split path),
+    // restrict generation to that single variant only. Recovery-day VARIOUS slot
+    // is handled below at the equipmentTypes assignment.
+    if (slot && (slot === "BODYWEIGHT" || slot === "EQUIPMENT")) {
+      equipmentTypesToGenerate = equipmentTypesToGenerate.filter((e) => e === slot);
+      logStep("PLAN 2 slot filter applied", { slot, equipmentTypesToGenerate });
+    }
     
     logStep("Equipment check", {
       isRecoveryDayEarly,
