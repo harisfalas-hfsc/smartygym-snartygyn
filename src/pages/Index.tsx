@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
+import { STRIPE_PRICE_IDS } from "@/config/pricing";
 import { ServiceCard } from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
