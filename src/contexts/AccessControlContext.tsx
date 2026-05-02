@@ -222,7 +222,8 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
       console.error("Error checking subscription:", error);
       setState({
         user,
-        userTier: "subscriber",
+        // SECURITY: Fail closed to "guest" on error — never grant elevated access on failure
+        userTier: "guest",
         isLoading: false,
         productId: null,
         purchasedContent: new Set(),

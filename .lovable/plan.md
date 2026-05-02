@@ -1,59 +1,59 @@
-# Today's Safe Backend Fixes
+# Next Batch: Quick Wins + 1 Critical Security Fix
 
 ## Goal
-Apply 3 backend cleanups in **one database migration**. Zero changes visible to users on the website.
+Fix 5 issues. All low-risk except #1 which is a real security leak. No design changes, no removed features.
 
 ---
 
-## The 3 Fixes
+## What I Verified Just Now
 
-| # | Fix | Risk | What Users See |
-|---|-----|------|----------------|
-| 1 | Make `contact-files` storage bucket **private** + admin-only read policy | 🟢 Zero | Nothing. Contact form still uploads files. Only admins read inbox. |
-| 2 | Remove broken `cleanup-old-rate-limits` cron job | 🟢 Zero | Nothing. Rate limiting still works (handled inline by `check_rate_limit`). |
-| 3 | Drop the **duplicate** image-generation trigger on `admin_workouts` | 🟢 Zero | Nothing. Workout images still auto-generate — once instead of twice. Saves AI credits. |
+| Audit claim | Reality |
+|---|---|
+| "useAccessControl falls back to subscriber on error" | ✅ TRUE — line 225 catch block sets `userTier: "subscriber"`. Real security leak. |
+| "5s timeout falls back to guest" | ✅ TRUE but **already correct** (guest is the safe default). No fix needed — the audit was wrong to flag it. |
+| "Hardcoded Stripe price IDs in 6+ files" | ✅ TRUE — found in 9 files. Config file `src/config/pricing.ts` exists but only holds prices/product IDs, not price IDs. |
+| "Free trial hardcoded to gold" | ⚠️ PARTIAL — backend accepts any `priceId`. Need to check frontend sends the right one. |
+| "Unknown message type warning" | ❓ Not found in codebase right now. Will skip unless reproduced. |
+
+---
+
+## The 5 Fixes
+
+| # | Fix | Risk | What Changes |
+|---|-----|------|--------------|
+| 1 | **Change error fallback from "subscriber" → "guest"** in `AccessControlContext.tsx` line 225 | 🟡 Low | If subscription check crashes, users see locked content (correct behavior) instead of getting free premium access. |
+| 2 | **Centralize Stripe price IDs** into `src/config/pricing.ts` | 🟢 Zero | Add `STRIPE_PRICE_IDS` constant. Update 9 files to import from it. No behavior change. Easy to update prices later. |
+| 3 | **Verify free-trial sends correct price ID** for the user's chosen plan | 🟢 Zero | Audit `Auth.tsx` / trial signup flow. If it always sends gold, fix to pass selected plan. |
+| 4 | **Set up custom branded auth emails** (signup, password reset, magic link) | 🟢 Zero | Replace generic Supabase emails with branded SmartyGym templates. Requires verified email domain. |
+| 5 | **Lock down 4 unused public storage bucket policies** (review `blog-images`, `ritual-images`, `promotional-videos`, `app-store-assets` listing) | 🟢 Zero | Read access stays public (needed for site). Just remove the ability for outsiders to *list* every filename. |
 
 ---
 
 ## What I Will NOT Touch
-- All frontend code
-- All edge functions
-- All other cron jobs
-- All other triggers
-- Any user-facing feature, page, button, or design
+- Any UI/design
+- Any feature, page, or button
+- Subscription logic beyond the one-line fallback fix
+- Any working trigger, cron, or function
 
 ---
 
-## Technical Steps
+## Order of Operations
 
-**Step 1 — Verify** (read-only query first to confirm exact trigger names before dropping anything):
-```sql
-SELECT tgname FROM pg_trigger WHERE tgrelid = 'public.admin_workouts'::regclass;
-SELECT jobname FROM cron.job WHERE jobname LIKE '%rate-limit%';
-```
-
-**Step 2 — One migration:**
-```sql
--- Fix 1: Lock contact-files bucket
-UPDATE storage.buckets SET public = false WHERE id = 'contact-files';
-
-CREATE POLICY "Admins read contact files"
-ON storage.objects FOR SELECT TO authenticated
-USING (bucket_id = 'contact-files' AND has_role(auth.uid(), 'admin'));
-
--- Fix 2: Remove dead cron
-SELECT cron.unschedule('cleanup-old-rate-limits');
-
--- Fix 3: Remove duplicate image trigger (keep the newer one)
-DROP TRIGGER IF EXISTS <verified_name> ON public.admin_workouts;
-```
-
-**Step 3 — Confirm** each fix succeeded and report back.
+1. **Fix #1** (1-line change in AccessControlContext.tsx)
+2. **Fix #2** (add price IDs to pricing.ts, update 9 file imports — pure refactor, zero behavior change)
+3. **Fix #3** (read trial flow code, fix only if broken — report findings either way)
+4. **Fix #5** (one DB migration tightening bucket policies)
+5. **Fix #4** (auth email setup — needs your email domain verified; I'll check status first)
 
 ---
 
 ## Deliverable
-- 1 migration file
-- A short confirmation message listing what was fixed
+- 1 small frontend code change (#1)
+- 1 refactor (#2)
+- Possibly 1 small frontend fix (#3)
+- 1 DB migration (#5)
+- Email templates scaffolded (#4)
 
-**Click Approve to execute.**
+After all 5: a short confirmation report telling you exactly what changed and what to test.
+
+**Approve to execute.**

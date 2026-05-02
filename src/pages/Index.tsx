@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
+import { STRIPE_PRICE_IDS } from "@/config/pricing";
 import { ServiceCard } from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
@@ -350,8 +351,8 @@ const Index = () => {
       return;
     }
     const priceIds = {
-      gold: 'price_1SJ9q1IxQYg9inGKZzxxqPbD',
-      platinum: 'price_1SJ9qGIxQYg9inGKFbgqVRjj'
+      gold: STRIPE_PRICE_IDS.gold,
+      platinum: STRIPE_PRICE_IDS.platinum,
     };
     try {
       const {

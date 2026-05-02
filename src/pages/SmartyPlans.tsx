@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
+import { STRIPE_PRICE_IDS } from "@/config/pricing";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { 
@@ -80,8 +81,8 @@ export default function SmartyPlans() {
 
     setLoading(true);
     const priceIds = {
-      gold: 'price_1SJ9q1IxQYg9inGKZzxxqPbD',
-      platinum: 'price_1SJ9qGIxQYg9inGKFbgqVRjj'
+      gold: STRIPE_PRICE_IDS.gold,
+      platinum: STRIPE_PRICE_IDS.platinum,
     };
 
     // In native Capacitor, skip pre-opening a blank window (not needed)

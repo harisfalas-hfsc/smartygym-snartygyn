@@ -19,6 +19,7 @@ import { trackSocialMediaEvent } from "@/utils/socialMediaTracking";
 import { checkPasswordBreach } from "@/utils/passwordBreachCheck";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { OfflineBanner } from "@/components/OfflineBanner";
+import { STRIPE_PRICE_IDS } from "@/config/pricing";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -74,9 +75,12 @@ export default function Auth() {
       // Check if trial=true param exists, redirect to checkout
       const params = new URLSearchParams(window.location.search);
       if (params.get("trial") === "true") {
+        // Honor the plan the user chose (?plan=gold|platinum); default to gold
+        const planParam = params.get("plan") === "platinum" ? "platinum" : "gold";
+        const trialPriceId = STRIPE_PRICE_IDS[planParam];
         try {
           const { data } = await supabase.functions.invoke('create-checkout', {
-            body: { priceId: 'price_1SJ9q1IxQYg9inGKZzxxqPbD', trial: true }
+            body: { priceId: trialPriceId, trial: true }
           });
           if (data?.url) {
             window.location.href = data.url;

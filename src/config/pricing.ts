@@ -6,6 +6,24 @@ export const SUBSCRIPTION_PRICES = {
   platinum: 89.89,   // €89.89/year (NOT monthly!)
 } as const;
 
+// ============================================================
+// STRIPE PRICE IDs — single source of truth
+// Update here when prices change in Stripe.
+// Edge functions have their own copy (Deno cannot import from src/).
+// ============================================================
+export const STRIPE_PRICE_IDS = {
+  gold:     'price_1SJ9q1IxQYg9inGKZzxxqPbD', // Gold Monthly €9.99
+  platinum: 'price_1SJ9qGIxQYg9inGKFbgqVRjj', // Platinum Yearly €89.89
+
+  // Corporate plans
+  corporate_dynamic:    'price_1Sc28CIxQYg9inGKfoqZgtXZ',
+  corporate_power:      'price_1Sc28EIxQYg9inGKCDUA4ii8',
+  corporate_elite:      'price_1Sc28GIxQYg9inGKS8NkWB11',
+  corporate_enterprise: 'price_1Sc28HIxQYg9inGK3YzEE4YR',
+} as const;
+
+export type StripePlanKey = keyof typeof STRIPE_PRICE_IDS;
+
 export const SUBSCRIPTION_BILLING_PERIODS = {
   gold: 'monthly',
   platinum: 'yearly',

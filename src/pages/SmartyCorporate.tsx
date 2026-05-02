@@ -16,6 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
+import { STRIPE_PRICE_IDS } from "@/config/pricing";
 
 // Stripe product and price IDs for corporate plans
 const CORPORATE_PLANS = {
@@ -23,28 +24,28 @@ const CORPORATE_PLANS = {
     name: "Smarty Dynamic",
     maxUsers: 10,
     price: 399,
-    priceId: "price_1Sc28CIxQYg9inGKfoqZgtXZ",
+    priceId: STRIPE_PRICE_IDS.corporate_dynamic,
     productId: "prod_TZATAcAlqgc1P7"
   },
   power: {
     name: "Smarty Power",
     maxUsers: 20,
     price: 499,
-    priceId: "price_1Sc28EIxQYg9inGKCDUA4ii8",
+    priceId: STRIPE_PRICE_IDS.corporate_power,
     productId: "prod_TZATDsKcDvMtHc"
   },
   elite: {
     name: "Smarty Elite",
     maxUsers: 30,
     price: 599,
-    priceId: "price_1Sc28GIxQYg9inGKS8NkWB11",
+    priceId: STRIPE_PRICE_IDS.corporate_elite,
     productId: "prod_TZATGTAsKalmCn"
   },
   enterprise: {
     name: "Smarty Enterprise",
     maxUsers: 9999,
     price: 699,
-    priceId: "price_1Sc28HIxQYg9inGK3YzEE4YR",
+    priceId: STRIPE_PRICE_IDS.corporate_enterprise,
     productId: "prod_TZATUtaS2jhgtK"
   }
 };
