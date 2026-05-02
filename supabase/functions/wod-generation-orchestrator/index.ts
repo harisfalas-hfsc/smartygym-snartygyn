@@ -127,16 +127,20 @@ async function verifyWodsExist(
 async function callGenerateWod(
   supabaseUrl: string,
   anonKey: string,
-  retryMissing: boolean = false
+  opts: { slot?: string | null; retryMissing?: boolean; triggerSource?: string } = {}
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const body: any = {};
-    if (retryMissing) {
-      body.retryMissing = true;
-    }
-    
-    console.log(`[ORCHESTRATOR] Calling generate-workout-of-day, retryMissing: ${retryMissing}`);
-    
+    const body: any = {
+      // CHAIN FIX: orchestrator MUST run the generator synchronously so
+      // it can verify the real outcome. Never fire-and-forget from here.
+      background: false,
+      triggerSource: opts.triggerSource || "orchestrator",
+    };
+    if (opts.slot) body.slot = opts.slot;
+    if (opts.retryMissing) body.retryMissing = true;
+
+    console.log(`[ORCHESTRATOR] Calling generate-workout-of-day (sync)`, body);
+
     const response = await fetch(`${supabaseUrl}/functions/v1/generate-workout-of-day`, {
       method: "POST",
       headers: {
@@ -145,15 +149,15 @@ async function callGenerateWod(
       },
       body: JSON.stringify(body),
     });
-    
+
     const responseText = await response.text();
-    
+
     if (!response.ok) {
-      console.error(`[ORCHESTRATOR] generate-workout-of-day failed with status ${response.status}:`, responseText);
+      console.error(`[ORCHESTRATOR] generate-workout-of-day failed status ${response.status}:`, responseText.substring(0, 300));
       return { success: false, error: `HTTP ${response.status}: ${responseText.substring(0, 200)}` };
     }
-    
-    console.log(`[ORCHESTRATOR] generate-workout-of-day succeeded`);
+
+    console.log(`[ORCHESTRATOR] generate-workout-of-day returned OK`);
     return { success: true };
   } catch (error) {
     console.error(`[ORCHESTRATOR] Error calling generate-workout-of-day:`, error);
