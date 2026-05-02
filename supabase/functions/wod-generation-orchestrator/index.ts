@@ -335,22 +335,35 @@ serve(async (req) => {
   const effectiveDate = getCyprusDateStr();
   console.log(`[ORCHESTRATOR] Effective date: ${effectiveDate}`);
 
-  // Parse optional trigger source from body (used by backup/watchdog wrappers)
+  // Parse optional body. CHAIN FIX additions:
+  //   - `slot`: limit work to a single slot (BODYWEIGHT|EQUIPMENT|VARIOUS)
+  //   - `mode`: "verify" → only verify and alert if missing (used by
+  //     backup-wod-generation and watchdog-wod-check). Never regenerates,
+  //     never pulls from library.
   let triggerSource = "orchestrator";
+  let requestedSlot: string | null = null;
+  let mode: "generate" | "verify" = "generate";
   try {
     if (req.method === "POST") {
       const bodyText = await req.text();
       if (bodyText && bodyText.trim().length > 0) {
         const body = JSON.parse(bodyText);
-        if (body && typeof body.triggerSource === "string" && body.triggerSource.length > 0) {
+        if (typeof body?.triggerSource === "string" && body.triggerSource.length > 0) {
           triggerSource = body.triggerSource;
         }
+        if (typeof body?.slot === "string") {
+          const s = body.slot.toUpperCase();
+          if (s === "BODYWEIGHT" || s === "EQUIPMENT" || s === "VARIOUS") {
+            requestedSlot = s;
+          }
+        }
+        if (body?.mode === "verify") mode = "verify";
       }
     }
   } catch (parseError) {
-    console.log(`[ORCHESTRATOR] No JSON body or invalid body, using default trigger source. (${parseError instanceof Error ? parseError.message : String(parseError)})`);
+    console.log(`[ORCHESTRATOR] No JSON body or invalid body. (${parseError instanceof Error ? parseError.message : String(parseError)})`);
   }
-  console.log(`[ORCHESTRATOR] Trigger source: ${triggerSource}`);
+  console.log(`[ORCHESTRATOR] Trigger=${triggerSource} mode=${mode} slot=${requestedSlot ?? "ALL"}`);
 
   // ───────────────────────────────────────────────────────────────────────────
   // EARLY EXIT: If today's WODs already exist and pass the publish contract,
@@ -358,6 +371,31 @@ serve(async (req) => {
   // from re-generating WODs unnecessarily and burning AI credits.
   // ───────────────────────────────────────────────────────────────────────────
   const preCheck = await verifyWodsExist(supabase, effectiveDate);
+
+  // VERIFY-ONLY MODE (used by backup + watchdog wrappers): never generate,
+  // never pull from library. Just check, and alert if anything is missing.
+  if (mode === "verify") {
+    if (preCheck.missing.length === 0) {
+      console.log(`[ORCHESTRATOR/verify] ✅ All slots present for ${effectiveDate}`);
+      return new Response(
+        JSON.stringify({ success: true, mode: "verify", date: effectiveDate, found: preCheck.found }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    console.log(`[ORCHESTRATOR/verify] ⚠️ Missing slots: ${preCheck.missing.join(", ")} — sending admin alert`);
+    await sendAdminAlert(
+      supabase,
+      effectiveDate,
+      preCheck.missing,
+      [{ attempt: 0, error: `verify-only check via ${triggerSource} found missing slots` }],
+      preCheck.isRecoveryDay
+    );
+    return new Response(
+      JSON.stringify({ success: false, mode: "verify", date: effectiveDate, missing: preCheck.missing, found: preCheck.found, adminAlerted: true }),
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+
   if (preCheck.missing.length === 0 && preCheck.found.length > 0) {
     console.log(`[ORCHESTRATOR] ✅ WODs already exist for ${effectiveDate}: ${preCheck.found.join(", ")}. Trigger="${triggerSource}". Nothing to do.`);
     return new Response(
@@ -373,7 +411,10 @@ serve(async (req) => {
     );
   }
 
-  // Check WOD mode from config
+  // Check WOD mode from config. Library Mode is ADMIN-ONLY and may only be
+  // triggered manually (e.g. from the admin panel passing a special
+  // `triggerSource: "admin-library"`). Never let cron/backup/watchdog
+  // silently switch to library mode.
   const { data: wodConfig } = await supabase
     .from("wod_auto_generation_config")
     .select("wod_mode")
@@ -381,10 +422,11 @@ serve(async (req) => {
     .single();
 
   const wodMode = wodConfig?.wod_mode || "generate";
-  console.log(`[ORCHESTRATOR] WOD mode: ${wodMode}`);
+  console.log(`[ORCHESTRATOR] WOD mode in config: ${wodMode}, trigger=${triggerSource}`);
 
-  // If Library Mode, call select-wod-from-library instead
-  if (wodMode === "select") {
+  const isAdminTrigger = triggerSource === "admin" || triggerSource === "admin-library" || triggerSource.startsWith("admin-");
+
+  if (wodMode === "select" && isAdminTrigger) {
     console.log("[ORCHESTRATOR] Library Mode active - calling select-wod-from-library");
     try {
       const response = await fetch(`${supabaseUrl}/functions/v1/select-wod-from-library`, {
@@ -436,6 +478,10 @@ serve(async (req) => {
     }
   }
 
+  if (wodMode === "select" && !isAdminTrigger) {
+    console.log(`[ORCHESTRATOR] Library Mode is set in config but trigger=${triggerSource} is not admin. Ignoring library mode for automated runs (admin-only).`);
+  }
+
   // Generate Mode (default) - existing logic unchanged
   // Determine expected count based on day type
   const recoveryDay = isRecoveryDay(effectiveDate);
@@ -471,9 +517,14 @@ serve(async (req) => {
     for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
       console.log(`[ORCHESTRATOR] ===== ATTEMPT ${attempt}/${MAX_ATTEMPTS} =====`);
 
-      // Call generate-workout-of-day
+      // Call generate-workout-of-day SYNCHRONOUSLY for the requested slot
+      // (or for all slots when no slot was specified).
       const isRetry = attempt > 1;
-      const generateResult = await callGenerateWod(supabaseUrl, anonKey, isRetry);
+      const generateResult = await callGenerateWod(supabaseUrl, anonKey, {
+        slot: requestedSlot,
+        retryMissing: isRetry,
+        triggerSource,
+      });
 
       if (!generateResult.success) {
         attempts.push({ attempt, error: generateResult.error });
@@ -538,66 +589,9 @@ serve(async (req) => {
     console.log(`[ORCHESTRATOR] 🚨 ${failureType} FAILURE after ${MAX_ATTEMPTS} attempts - Sending admin alert`);
     await runWodStripeCleanup(supabaseUrl, supabaseServiceKey, "orchestrator-failure", false);
 
-    // ═══════════════════════════════════════════════════════════════════════════════
-    // EMERGENCY LIBRARY FALLBACK: Before alerting failure, try to publish validated
-    // existing library workouts so users always have today's WODs.
-    // Non-destructive: re-flags existing rows, never deletes anything.
-    // ═══════════════════════════════════════════════════════════════════════════════
-    let fallbackResult: WodVerificationResult | null = null;
-    try {
-      console.log("[ORCHESTRATOR] 🛟 Attempting emergency library-selection fallback");
-      const fbResp = await fetch(`${supabaseUrl}/functions/v1/select-wod-from-library`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${anonKey}`,
-        },
-        body: JSON.stringify({ targetDate: effectiveDate }),
-      });
-      const fbText = await fbResp.text();
-      console.log(`[ORCHESTRATOR] 🛟 Library fallback response ${fbResp.status}: ${fbText.substring(0, 300)}`);
-
-      // Re-verify after fallback
-      await delay(2000);
-      fallbackResult = await verifyWodsExist(supabase, effectiveDate);
-
-      if (fallbackResult.success) {
-        console.log(`[ORCHESTRATOR] ✅ EMERGENCY FALLBACK SUCCEEDED - WODs published from library: ${fallbackResult.found.join(", ")}`);
-        succeeded = true;
-
-        if (runLog?.id) {
-          await supabase
-            .from("wod_generation_runs")
-            .update({
-              status: "recovered",
-              completed_at: new Date().toISOString(),
-              found_count: fallbackResult.found.length,
-              wods_created: fallbackResult.found,
-              error_message: `Generation failed after ${MAX_ATTEMPTS} attempts; recovered automatically via library-selection fallback.`,
-            })
-            .eq("id", runLog.id);
-        }
-
-        return new Response(
-          JSON.stringify({
-            success: true,
-            recovered: true,
-            mode: "library-fallback",
-            message: `WOD generation failed but library fallback published today's WODs`,
-            date: effectiveDate,
-            found: fallbackResult.found,
-            attempts: attempts,
-            runLogId: runLog?.id,
-          }),
-          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      } else {
-        console.log(`[ORCHESTRATOR] 🛟 Library fallback did not satisfy expected count. Missing: ${fallbackResult.missing.join(", ")}`);
-      }
-    } catch (fbError) {
-      console.error("[ORCHESTRATOR] 🛟 Library fallback failed:", fbError);
-    }
-
+    // CHAIN FIX: NO automatic library fallback. Per the locked-in rules,
+    // the only outcomes are (a) verified success, or (b) admin alert.
+    // Library mode is admin-only and is triggered manually from the panel.
     await sendAdminAlert(
       supabase,
       effectiveDate,
