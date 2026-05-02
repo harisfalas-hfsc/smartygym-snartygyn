@@ -789,10 +789,22 @@ This is a NUDGE, not a mandate.
       // RECOVERY: Only generate ONE VARIOUS workout (use early check from line ~312)
       // CRITICAL: Use VARIOUS (not MIXED) to match database constraint valid_equipment
       equipmentTypes = variousComplete ? [] : ["VARIOUS"];
+      // PLAN 2 — slot scoping: BODYWEIGHT/EQUIPMENT crons are no-ops on recovery
+      // days; only VARIOUS (or no slot) should produce work.
+      if (slot && slot !== "VARIOUS") {
+        logStep("PLAN 2 slot filter: recovery day, non-VARIOUS slot → no-op", { slot });
+        equipmentTypes = [];
+      }
       logStep("RECOVERY day - generating single VARIOUS workout", { variousAlreadyExists, equipmentTypes });
     } else {
-      // Normal days: Generate BODYWEIGHT and EQUIPMENT versions
-      equipmentTypes = equipmentTypesToGenerate;
+      // Normal days: Generate BODYWEIGHT and EQUIPMENT versions.
+      // PLAN 2 — VARIOUS slot is a no-op on non-recovery days.
+      if (slot === "VARIOUS") {
+        logStep("PLAN 2 slot filter: normal day, VARIOUS slot → no-op", { slot });
+        equipmentTypes = [];
+      } else {
+        equipmentTypes = equipmentTypesToGenerate;
+      }
     }
     
     const generatedWorkouts: any[] = [];
