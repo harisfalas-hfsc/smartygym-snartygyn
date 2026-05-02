@@ -1,124 +1,142 @@
-## Goal
+# Codebase Cruft Audit — Report Only, Zero Changes
 
-Fix two issues found in the audit, leaving the WOD orchestrator (issue a) untouched until tomorrow's verification:
+## What changed vs. previous plan
 
-- **(b)** Welcome emails never fire because the trigger checks `email_confirmed_at` at the wrong moment.
-- **(c)** 14 email-sending Edge Functions don't write to `email_delivery_log`, so we have zero visibility into delivery success/failure.
+Previous plan: scan + clean + verify in one pass.
+**This plan: scan only. Produce a detailed report. You approve each item before any deletion happens in a future session.**
 
-No changes to the WOD orchestrator. No structural changes to UI. No new tables.
-
----
-
-## Issue (b) — Welcome Email Trigger Gap
-
-### Root cause
-
-The current trigger `trigger_welcome_email()` runs on `profiles` INSERT. But the order of operations during signup is:
-1. User signs up → `auth.users` row created with `email_confirmed_at = NULL`
-2. `handle_new_user()` immediately creates a `profiles` row → trigger fires → sees `user_confirmed = false` → **skips sending**
-3. User clicks confirmation link → `auth.users.email_confirmed_at` is set → **nothing fires**
-
-Net result: welcome email is never sent for any user who confirms their email after signup (i.e., everyone).
-
-### Fix
-
-Add a second trigger on `auth.users` that fires on UPDATE when `email_confirmed_at` transitions from NULL → NOT NULL. It calls the same `send-welcome-email` Edge Function and marks `profiles.welcome_sent = true`.
-
-```text
-auth.users (UPDATE)
-   └─ trigger_welcome_email_on_confirm()
-        ├─ if OLD.email_confirmed_at IS NULL AND NEW.email_confirmed_at IS NOT NULL
-        ├─ if profiles.welcome_sent = false (idempotency)
-        └─ POST /send-welcome-email + mark welcome_sent = true
-```
-
-Keep the existing profile-INSERT trigger as-is (covers admin-created users that are already confirmed). The new trigger covers the normal signup flow.
-
-### Backfill
-
-Run a one-time UPDATE that fires the welcome email for users who:
-- Have `email_confirmed_at IS NOT NULL` (confirmed)
-- Have `profiles.welcome_sent = false` (never received it)
-- Created in the last 30 days (avoid spamming year-old accounts)
-
-This catches recent signups stuck in the gap.
+No file is modified. No `// SMARTY-FLAG` comments are inserted. No cleanup executed. The deliverable is a single report.
 
 ---
 
-## Issue (c) — Missing logEmailDelivery Instrumentation
+## What I'm looking for (the "cruft" categories)
 
-### Root cause
+After a year of fixes, codebases accumulate these specific patterns. I'll hunt each one explicitly:
 
-The helper `supabase/functions/_shared/email-log.ts` exists and writes to `email_delivery_log`. But 14 of the email-sending Edge Functions never import or call it. So every email send is invisible — we cannot tell if Resend bounced, succeeded, or was rate-limited.
+1. **Superseded duplicates** — two functions/hooks/components that do the same job, where a newer one replaced an older one but the older was never deleted (e.g. `useWodState` vs `useTodayWods`, `WorkoutDisplay` vs an older display component, two versions of the same edge function helper).
 
-### Functions to instrument (14 total)
+2. **Orphaned edge functions** — functions in `supabase/functions/` that are no longer called from anywhere (no cron job, no client call, no other function calling them, no docs referencing them).
 
-```
-send-checkin-reminders
-send-contact-email
-send-contact-response-notification
-send-direct-coach-email
-send-holiday-notifications
-send-mass-notification
-send-new-content-notifications
-send-notification
-send-renewal-reminders
-send-subscription-expired-notifications
-send-system-message
-send-test-admin-email
-send-weekly-motivation
-send-welcome-onboarding
-```
+3. **Dead cron jobs** — `cron.job` rows pointing at edge functions that no longer exist OR superseded by a newer cron (e.g. old single WOD cron sitting next to the new Plan 2 split crons).
 
-### Fix pattern (applied to each function)
+4. **Stale migrations / SQL artifacts** — DB functions or triggers in the schema that are no longer referenced (e.g. `trigger_welcome_email` on profiles, now superseded by `trigger_welcome_email_on_confirm` on auth.users — both currently exist).
 
-After every `resend.emails.send(...)` call, log the outcome:
+5. **Overwritten logic left behind** — within a single file, two implementations of the same thing where only the newer is reachable (dead branch, dead helper above the active one).
 
-```text
-import { logEmailDelivery } from "../_shared/email-log.ts";
+6. **Unused imports / dead variables / commented-out blocks** — purely cosmetic, but I'll catalog volume per file so you can decide threshold.
 
-const result = await resend.emails.send({ ... });
+7. **Conflicting notification triggers** — same notification fireable from 2+ paths (DB trigger + edge function + cron), causing potential duplicates.
 
-if (result.error) {
-  await logEmailDelivery({
-    userId, toEmail, messageType: "renewal-reminder",
-    status: "failed", errorMessage: result.error.message,
-  });
-} else {
-  await logEmailDelivery({
-    userId, toEmail, messageType: "renewal-reminder",
-    status: "sent", resendId: result.data?.id,
-  });
-}
-```
+8. **Abandoned audit/repair scripts** — one-off `repair-*`, `fix-*`, `audit-*`, `migrate-*` edge functions and pages that were used once and never deleted (I see ~15 of these in `supabase/functions/` and `src/pages/MigrateContent.tsx`).
 
-`messageType` will be a stable string per function (e.g., `welcome-onboarding`, `renewal-reminder`, `weekly-motivation`) so we can filter the log later.
+9. **Stale documentation files at repo root** — 40+ `.md` audit reports (`COMPLETE_FIX_REPORT_2025.md`, `FINAL_AUDIT_REPORT.md`, etc.) — most are point-in-time and likely outdated.
 
-Wrap in try/catch so logging failures never break sends.
+10. **Duplicate DB functions** — e.g. two versions of `update_wod_cron_schedule` (one with 1 arg, one with 2 args) currently coexist in the schema.
 
 ---
 
-## What we're NOT touching
+## Method (read-only)
 
-- ❌ WOD orchestrator (issue a) — waiting until tomorrow morning
-- ❌ Library-fallback removal — same, blocked on (a)
-- ❌ `send-welcome-email` Edge Function logic itself (already works when called)
-- ❌ Existing profile-INSERT welcome trigger — kept as safety net for admin-created confirmed users
-- ❌ Auth flow / signup UX
+For each candidate I find, I'll establish:
 
----
-
-## Deliverables
-
-1. One DB migration: new `trigger_welcome_email_on_confirm()` function + `AFTER UPDATE OF email_confirmed_at ON auth.users` trigger + 30-day backfill UPDATE.
-2. 14 Edge Function edits, each adding `logEmailDelivery` calls after `resend.emails.send`.
-3. Deploy all 14 modified Edge Functions.
+- **What it is** (file path + symbol name + ~size)
+- **What replaced it** (the newer working version, with file path)
+- **Proof it's unused** (grep results across `src/`, `supabase/functions/`, `cron.job`, DB triggers, migrations, docs — showing zero references outside its own definition)
+- **Risk level** to remove:
+  - 🟢 **Safe** — zero references anywhere, newer version verified working
+  - 🟡 **Likely safe** — zero code references but referenced in docs/comments only, or newer version exists but not yet validated in production
+  - 🔴 **Do not touch** — has references, or is in the protected list (WOD orchestrator, periodization, library, logbook, programs, tools, schemas, auth)
+- **Why removing is safe** (one-paragraph justification per item)
+- **What would break if removed in error** (worst case)
 
 ---
 
-## Verification (after deploy)
+## Specific known-suspicious areas I'll prioritize
 
-- (b) Create a test signup → confirm via email link → check `profiles.welcome_sent = true` and welcome email arrives.
-- (c) Trigger any one of the 14 functions (e.g., send a test admin email) → confirm a row appears in `email_delivery_log` with status `sent` and a Resend ID.
+Based on what I already see in the codebase context:
 
-Estimated time: ~15 min.
+### A. Welcome email triggers (we just touched this yesterday)
+- `trigger_welcome_email()` — old, on `profiles`
+- `trigger_welcome_email_on_confirm()` — new, on `auth.users` (created yesterday)
+- **Need to confirm the OLD trigger is actually still attached and whether it's now redundant or harmful.**
+
+### B. Two `update_wod_cron_schedule` overloads
+- One with `(new_hour integer)` only
+- One with `(new_hour integer, new_minute integer)`
+- Likely the single-arg version is the older one. Confirm caller(s).
+
+### C. WOD-related cron jobs
+- `generate-wod-daily` (old single cron from `update_wod_cron_schedule` 1-arg version)
+- `generate-workout-of-day` (referenced from 2-arg version)
+- Plan 2 split crons at 21:05 / 21:25
+- Likely 2-3 of these are stale. Will not delete — only flag — until tomorrow's Plan 2 validation.
+
+### D. Repair / audit / migrate one-off functions
+Candidates (I'll verify each is unused):
+`repair-pilates-workouts`, `repair-missing-images`, `repair-stripe-metadata`, `fix-stripe-metadata`, `fix-blog-images`, `fix-program-images`, `audit-stripe-images`, `audit-workout-durations`, `audit-fix-bodyweight-workouts`, `bulk-format-consistency-repair`, `batch-relink-exercises`, `regenerate-broken-programs`, `reprocess-wod-exercises`, `pull-stripe-images`, `sync-stripe-images`, `update-corporate-product-images`, `start-image-repair`, `process-image-repair`, `get-repair-job-status`, `repair-stripe-metadata`, `tag-smartygym-products`, `MigrateContent.tsx` page.
+
+### E. 40+ root-level `.md` audit reports
+List, identify the few that contain still-relevant standards (vs point-in-time reports), recommend archival of the rest to `/docs/archive/`.
+
+### F. Duplicate hooks / components
+Will scan `src/hooks/` and `src/components/` for name-similar files (e.g. `useWODState` vs `useTodayWods`, `WorkoutTools*` variants, multiple notification managers).
+
+### G. Notification trigger overlap
+Map every code path that fires each notification type. Specifically check WOD notifications, welcome email, renewal reminders, content notifications.
+
+---
+
+## Hard "do not touch — flag only" list (unchanged)
+
+WOD orchestrator + periodization, all workout categories, the 500+ library/gallery, logbook, 6/8/12-week programs, Smarty Tools (1RM, macros, BMR), notification/messaging behavior, all DB schemas/tables/RLS, auth, `src/integrations/supabase/*`, `.env`, `supabase/config.toml` project-level settings.
+
+If something in these areas looks like cruft, it gets reported as 🔴 with explanation — **never** marked safe to delete.
+
+---
+
+## Deliverable
+
+A single markdown report in chat, structured as:
+
+### Section 1 — Safe to remove (🟢)
+Table: item | type | location | replaced by | proof unused | one-line justification
+
+### Section 2 — Likely safe, needs your call (🟡)
+Same table + a "what to verify first" column
+
+### Section 3 — Do not touch (🔴)
+Items that look like cruft but are protected or still referenced — with explanation of the reference
+
+### Section 4 — Conflicting/duplicate logic still active
+Pairs of things doing the same job, both currently live, with recommendation on which to keep
+
+### Section 5 — Cron job inventory
+Every `cron.job` row + status (active / orphan / superseded)
+
+### Section 6 — Notification trigger map
+Every notification type + every path that can fire it + duplicate risk
+
+### Section 7 — Stale docs at repo root
+List + recommendation (keep / archive / delete)
+
+### Section 8 — Volume summary
+File-by-file count of unused imports, dead vars, commented blocks (no per-line listing — too noisy; just totals)
+
+### Section 9 — Recommended order of operations
+If you decide to clean later, the safest sequence (e.g. "remove 🟢 items first, validate Plan 2 tomorrow, then handle 🟡 WOD-related items, then archive docs").
+
+---
+
+## What this plan is NOT
+
+- Not making any code changes.
+- Not inserting flag comments in source files.
+- Not deleting anything.
+- Not running migrations.
+- Not touching the WOD system before tomorrow's Plan 2 validation.
+
+After you read the report, you tell me which 🟢 items to remove, and I'll do it in a follow-up session with your explicit approval per batch.
+
+## Estimated effort
+
+~30-45 minutes of read-only exploration (file scans, DB queries via `read_query`, edge function inventory, cron inventory, grep cross-references). Output is one detailed report — no follow-on work without your sign-off.
