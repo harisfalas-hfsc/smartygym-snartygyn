@@ -6,30 +6,26 @@ const corsHeaders = {
 };
 
 /**
- * Watchdog WOD Check — thin wrapper.
+ * Watchdog WOD Check — final fast safety wrapper.
  *
- * Runs at 03:05 Cyprus time (cron: 5 1 * * * UTC), 5 minutes after backup,
- * as the FINAL safety net. Delegates ALL verification / retry / library
- * fallback / email / run-log logic to `wod-generation-orchestrator`, which
- * short-circuits when today's WODs already exist (the common case).
- *
- * Why keep this wrapper instead of relying only on the backup run?
- * If the orchestrator process itself crashed mid-run (timeout, edge restart)
- * and never wrote a "failed" status, this independent verification 5 minutes
- * later catches it. Single source of truth lives in the orchestrator.
+ * Runs at 03:05 Cyprus time, 5 minutes after backup. It must NOT call the long
+ * AI orchestrator from inside another function: that nested path can exceed the
+ * hosted function idle timeout and leave WOD run logs stuck as `running`.
+ * The watchdog uses the validated library selector directly; that selector
+ * short-circuits when today's WODs already exist.
  */
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
-  console.log("[WATCHDOG] Delegating to wod-generation-orchestrator (triggerSource=watchdog)");
+  console.log("[WATCHDOG] Delegating to select-wod-from-library (fast fallback)");
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
 
   try {
-    const response = await fetch(`${supabaseUrl}/functions/v1/wod-generation-orchestrator`, {
+    const response = await fetch(`${supabaseUrl}/functions/v1/select-wod-from-library`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -39,14 +35,14 @@ serve(async (req) => {
     });
 
     const text = await response.text();
-    console.log(`[WATCHDOG] Orchestrator response ${response.status}: ${text.substring(0, 300)}`);
+    console.log(`[WATCHDOG] Library fallback response ${response.status}: ${text.substring(0, 300)}`);
 
     return new Response(text, {
       status: response.status,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("[WATCHDOG] Failed to invoke orchestrator:", error);
+    console.error("[WATCHDOG] Failed to invoke library fallback:", error);
     return new Response(
       JSON.stringify({
         success: false,
