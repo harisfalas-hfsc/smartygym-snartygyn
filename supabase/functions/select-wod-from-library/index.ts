@@ -484,9 +484,29 @@ async function selectWorkout(
     strengthFocus: string | null;
   }
 ): Promise<any | null> {
+  const list = await selectWorkoutCandidates(supabase, params);
+  return list && list.length > 0 ? list[0] : null;
+}
+
+/**
+ * Like selectWorkout but returns a *prioritised list* of all valid candidates,
+ * highest-priority first. The caller can then iterate and skip any that fail
+ * the publish contract — so a single broken library workout never fails the slot.
+ */
+async function selectWorkoutCandidates(
+  supabase: any,
+  params: {
+    category: string;
+    difficulty: string | null;
+    difficultyStars: [number, number] | null;
+    equipment: string | null;
+    cooldownIds: Set<string>;
+    strengthFocus: string | null;
+  }
+): Promise<any[]> {
   const { category, difficulty, difficultyStars, equipment, cooldownIds, strengthFocus } = params;
 
-  logStep("Selecting workout", { category, difficulty, equipment, strengthFocus, cooldownSize: cooldownIds.size });
+  logStep("Selecting candidate list", { category, difficulty, equipment, strengthFocus, cooldownSize: cooldownIds.size });
 
   // Build base query
   let query = supabase
@@ -510,35 +530,51 @@ async function selectWorkout(
 
   if (error) {
     logStep("Error querying candidates", { error: error.message });
-    return null;
+    return [];
   }
 
-  if (!candidates || candidates.length === 0) {
+  let pool: any[] = candidates || [];
+
+  if (pool.length === 0) {
     logStep("No candidates found, trying without difficulty filter");
-    
-    // Fallback: try without difficulty filter
     let fallbackQuery = supabase
       .from("admin_workouts")
       .select("*")
       .eq("category", category)
       .eq("is_workout_of_day", false)
       .eq("is_visible", true);
-
-    if (equipment) {
-      fallbackQuery = fallbackQuery.eq("equipment", equipment);
-    }
-
+    if (equipment) fallbackQuery = fallbackQuery.eq("equipment", equipment);
     const { data: fallbackCandidates } = await fallbackQuery;
-    
-    if (!fallbackCandidates || fallbackCandidates.length === 0) {
+    pool = fallbackCandidates || [];
+    if (pool.length === 0) {
       logStep("No candidates even without difficulty filter");
-      return null;
+      return [];
     }
-
-    return pickFromCandidates(supabase, fallbackCandidates, cooldownIds, strengthFocus);
   }
 
-  return pickFromCandidates(supabase, candidates, cooldownIds, strengthFocus);
+  // Split: outside cooldown first, then in cooldown (so we still try them
+  // before giving up on the slot if all fresh candidates are broken).
+  const outOfCooldown = pool.filter(c => !cooldownIds.has(c.id));
+  const inCooldown = pool.filter(c => cooldownIds.has(c.id));
+
+  // Optional focus prioritisation within out-of-cooldown
+  let prioritised = outOfCooldown;
+  if (strengthFocus && outOfCooldown.length > 1) {
+    const focusMatch = outOfCooldown.filter(c =>
+      c.focus && c.focus.toUpperCase().includes(strengthFocus.toUpperCase())
+    );
+    if (focusMatch.length > 0) {
+      const others = outOfCooldown.filter(c => !focusMatch.includes(c));
+      prioritised = [...focusMatch, ...others];
+    }
+  }
+
+  // Shuffle within priority bucket so we don't always pick the same one
+  const shuffle = (arr: any[]) => arr.map(v => [Math.random(), v] as const).sort((a,b) => a[0]-b[0]).map(([,v]) => v);
+  const ordered = [...shuffle(prioritised), ...shuffle(inCooldown)];
+
+  logStep("Candidate list built", { total: ordered.length, outOfCooldown: outOfCooldown.length, inCooldown: inCooldown.length });
+  return ordered;
 }
 
 /**
