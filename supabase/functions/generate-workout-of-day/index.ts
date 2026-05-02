@@ -2690,56 +2690,8 @@ Return JSON with these exact fields:
         throw new Error(`${equipment} WOD rejected: unsafe public name after cleanup (${workoutContent.name})`);
       }
 
-      const stripeProductPayload = {
-        name: workoutContent.name,
-        description: `${category} Workout (${equipment})`,
-        images: imageUrl ? [imageUrl] : [],
-        metadata: {
-          project: "SMARTYGYM",
-          content_type: "Workout",
-          content_id: workoutId,
-          workout_id: workoutId,
-          type: "wod",
-          category,
-          equipment,
-          generated_for_date: effectiveDate,
-        },
-      };
-
-      const stripeProductIdempotencyKey = `SMARTYGYM:wod:${effectiveDate}:${equipment}:product`;
-      const stripePriceIdempotencyKey = `SMARTYGYM:wod:${effectiveDate}:${equipment}:price`;
-
-      const stripeProduct = await stripe.products.create(stripeProductPayload, {
-        idempotencyKey: stripeProductIdempotencyKey,
-      });
-      stripeProductId = stripeProduct.id;
-
-      const stripePrice = await stripe.prices.create({
-        product: stripeProduct.id,
-        unit_amount: 399,
-        currency: "eur",
-        metadata: {
-          project: "SMARTYGYM",
-          content_id: workoutId,
-          generated_for_date: effectiveDate,
-          equipment,
-        },
-      }, {
-        idempotencyKey: stripePriceIdempotencyKey,
-      });
-      stripePriceId = stripePrice.id;
-
-      await stripe.products.update(stripeProduct.id, {
-        default_price: stripePrice.id,
-      });
-
-      logStep(`${equipment} Stripe product/price created`, {
-        productId: stripeProductId,
-        priceId: stripePriceId,
-        defaultPriceSet: true,
-        productIdempotencyKey: stripeProductIdempotencyKey,
-        priceIdempotencyKey: stripePriceIdempotencyKey,
-      });
+      // PLAN B: Stripe product/price creation deferred. See `wod-stripe-link`.
+      logStep(`Stripe linking deferred for ${equipment} WOD`, { workoutId, equipment });
 
       const { error: insertError } = await supabase
         .from("admin_workouts")
