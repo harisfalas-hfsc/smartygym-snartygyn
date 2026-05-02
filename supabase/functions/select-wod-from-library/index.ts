@@ -368,14 +368,8 @@ serve(async (req) => {
       promotedCount++;
       slotPromoted = true;
       finallyPromoted.push(postRow);
-      } // end candidate loop
 
-      if (!slotPromoted) {
-        logStep(`SLOT FAILED: no usable candidate for ${slot} after trying ${candidates.length}`);
-      }
-    } // end slot loop
-
-      // Insert cooldown record
+      // Insert cooldown record for the workout we just promoted
       await supabase.from("wod_selection_cooldown").insert({
         source_workout_id: workout.id,
         selected_for_date: targetDate,
@@ -383,7 +377,12 @@ serve(async (req) => {
         difficulty: workout.difficulty,
         equipment: workout.equipment,
       });
-    }
+      } // end candidate loop
+
+      if (!slotPromoted) {
+        logStep(`SLOT FAILED: no usable candidate for ${slot} after trying ${candidates.length}`);
+      }
+    } // end slot loop
 
     const expectedCount = isRecoveryDay ? 1 : 2;
     if (promotedCount < expectedCount) {
@@ -400,7 +399,7 @@ serve(async (req) => {
       expected_category: periodization.category,
       trigger_source: "library-selection",
       completed_at: new Date().toISOString(),
-      wods_created: selectedWorkouts.map(w => ({
+      wods_created: finallyPromoted.map(w => ({
         id: w.id,
         name: w.name,
         equipment: w.equipment,
@@ -434,8 +433,8 @@ serve(async (req) => {
     }
 
     logStep("Library selection complete", {
-      selectedCount: selectedWorkouts.length,
-      workouts: selectedWorkouts.map(w => `${w.name} (${w.equipment})`),
+      selectedCount: finallyPromoted.length,
+      workouts: finallyPromoted.map(w => `${w.name} (${w.equipment})`),
     });
 
     return new Response(
@@ -449,12 +448,11 @@ serve(async (req) => {
           difficulty: periodization.difficulty,
           strengthFocus: periodization.strengthFocus,
         },
-        selected: selectedWorkouts.map(w => ({
+        selected: finallyPromoted.map(w => ({
           id: w.id,
           name: w.name,
           equipment: w.equipment,
           category: w.category,
-          difficulty: w.difficulty,
         })),
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
