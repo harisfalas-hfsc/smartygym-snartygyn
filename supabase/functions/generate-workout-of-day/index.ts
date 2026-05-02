@@ -265,28 +265,35 @@ export function calculateFutureWODSchedule(
   return schedule;
 }
 
-serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
-
+// ═══════════════════════════════════════════════════════════════════════════════
+// BACKGROUND-SAFE ENTRY (PLAN C+D)
+// The heavy AI generation can exceed the 150s hosted function idle timeout.
+// To prevent that, the entry handler can run the real work via
+// EdgeRuntime.waitUntil(...) and return 202 Accepted immediately.
+// Pass `background: false` (or run with no body) to keep the legacy synchronous
+// behaviour for short admin one-off triggers; pass `background: true` (or
+// inherit the default) for cron-like callers that must not block.
+// ═══════════════════════════════════════════════════════════════════════════════
+async function runWodGeneration(params: {
+  targetDate: string | null;
+  skipNotifications: boolean;
+  retryMissing: boolean;
+  triggerSource: string;
+}): Promise<Response> {
   let cleanupSupabase: any = null;
   let effectiveDateForCleanup: string | null = null;
 
   try {
-    // Parse request body
-    let targetDate: string | null = null;
-    let skipNotifications = false;
-    let retryMissing = false;
-    
-    try {
-      const body = await req.json();
-      targetDate = body?.targetDate || null;
-      skipNotifications = body?.skipNotifications || false;
-      retryMissing = body?.retryMissing || false;
-    } catch {
-      // No body or invalid JSON - use defaults
-    }
+    const targetDate = params.targetDate;
+    const skipNotifications = params.skipNotifications;
+    const retryMissing = params.retryMissing;
+
+    logStep("Background runner started", {
+      triggerSource: params.triggerSource,
+      targetDate,
+      retryMissing,
+      skipNotifications,
+    });
 
     // Cyprus date (Europe/Athens) — DST-safe via shared helper.
     const now = new Date();
