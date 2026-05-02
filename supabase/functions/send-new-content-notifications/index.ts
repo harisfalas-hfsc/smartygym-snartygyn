@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
 import { MESSAGE_TYPES } from "../_shared/notification-types.ts";
+import { logEmailDelivery } from "../_shared/email-log.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -16,23 +17,36 @@ const logStep = (step: string, details?: any) => {
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
-async function sendEmail(to: string, subject: string, html: string): Promise<{ success: boolean; error?: string }> {
+async function sendEmail(to: string, subject: string, html: string, messageType: string = "new-content", userId?: string): Promise<{ success: boolean; error?: string }> {
   if (!RESEND_API_KEY) {
     return { success: false, error: "RESEND_API_KEY not configured" };
   }
   
   try {
     const resend = new Resend(RESEND_API_KEY);
-    await resend.emails.send({
+    const sendResult = await resend.emails.send({
       from: "SmartyGym <notifications@smartygym.com>",
       to: [to],
       subject,
       headers: getEmailHeaders(to),
       html: html.replace('</body>', `${getEmailFooter(to)}</body>`),
     });
-    
+    await logEmailDelivery({
+      userId: userId ?? null,
+      toEmail: to,
+      messageType,
+      status: "sent",
+      resendId: (sendResult as any)?.data?.id ?? null,
+    });
     return { success: true };
   } catch (error: any) {
+    await logEmailDelivery({
+      userId: userId ?? null,
+      toEmail: to,
+      messageType,
+      status: "failed",
+      errorMessage: error?.message || String(error),
+    });
     return { success: false, error: error.message || String(error) };
   }
 }

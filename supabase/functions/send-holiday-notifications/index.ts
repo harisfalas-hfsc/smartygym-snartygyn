@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { logEmailDelivery } from "../_shared/email-log.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -175,16 +176,32 @@ serve(async (req) => {
           
           if (authUser?.user?.email) {
             try {
-              await resend.emails.send({
+              const sendResult = await resend.emails.send({
                 from: "SmartyGym <notifications@smartygym.com>",
                 to: [authUser.user.email],
                 subject: content.subject,
                 html: content.emailHtml,
               });
               emailCount++;
+              await logEmailDelivery({
+                userId: user.user_id,
+                toEmail: authUser.user.email,
+                messageType: "holiday-notification",
+                status: "sent",
+                resendId: sendResult?.data?.id ?? null,
+                metadata: { holiday },
+              });
             } catch (emailErr) {
               console.error(`[Holiday Notifications] Email error for ${authUser.user.email}:`, emailErr);
               errors.push(`Email: ${authUser.user.email}`);
+              await logEmailDelivery({
+                userId: user.user_id,
+                toEmail: authUser.user.email,
+                messageType: "holiday-notification",
+                status: "failed",
+                errorMessage: emailErr instanceof Error ? emailErr.message : String(emailErr),
+                metadata: { holiday },
+              });
             }
           }
         }

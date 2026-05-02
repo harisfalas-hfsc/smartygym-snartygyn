@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
+import { logEmailDelivery } from "../_shared/email-log.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -218,7 +219,7 @@ serve(async (req: Request) => {
           </div>
         `;
 
-        await resend.emails.send({
+        const sendResult = await resend.emails.send({
           from: "SmartyGym <notifications@smartygym.com>",
           to: [user.email],
           subject: subject,
@@ -226,11 +227,25 @@ serve(async (req: Request) => {
           headers: getEmailHeaders(user.email),
         });
         emailsSent++;
+        await logEmailDelivery({
+          userId: user.user_id ?? null,
+          toEmail: user.email,
+          messageType: messageType || body.type || "notification",
+          status: "sent",
+          resendId: (sendResult as any)?.data?.id ?? null,
+        });
 
         // Rate limiting: 600ms delay between emails
         await new Promise(resolve => setTimeout(resolve, 600));
       } catch (emailError) {
         console.error(`[SEND-NOTIFICATION] Email error for ${user.email}:`, emailError);
+        await logEmailDelivery({
+          userId: user.user_id ?? null,
+          toEmail: user.email,
+          messageType: messageType || body.type || "notification",
+          status: "failed",
+          errorMessage: emailError instanceof Error ? emailError.message : String(emailError),
+        });
       }
     }
 
