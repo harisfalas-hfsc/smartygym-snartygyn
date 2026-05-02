@@ -195,7 +195,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send auto-reply confirmation to the sender
     try {
-      await resend.emails.send({
+      const autoReplyResult = await resend.emails.send({
         from: "SmartyGym <notifications@smartygym.com>",
         to: [email],
         subject: "Thank you for contacting SmartyGym!",
@@ -217,6 +217,12 @@ const handler = async (req: Request): Promise<Response> => {
         `,
       });
       console.log("Auto-reply sent to:", email);
+      await logEmailDelivery({
+        toEmail: email,
+        messageType: "contact-form-auto-reply",
+        status: "sent",
+        resendId: autoReplyResult?.data?.id ?? null,
+      });
 
       // Log auto-reply to message history if messageId is provided
       if (messageId) {
