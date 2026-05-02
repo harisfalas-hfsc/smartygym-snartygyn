@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { MESSAGE_TYPES } from "../_shared/notification-types.ts";
+import { logEmailDelivery } from "../_shared/email-log.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -228,7 +229,7 @@ serve(async (req: Request) => {
       try {
         const emailHtml = generateEmailHtml(emailSubject, userName, emailContent, reminderIcon);
         
-        await resend.emails.send({
+        const emailResult = await resend.emails.send({
           from: "SmartyGym <notifications@smartygym.com>",
           to: [email],
           subject: emailSubject,
@@ -242,12 +243,26 @@ serve(async (req: Request) => {
         
         sentCount++;
         console.log(`Sent ${reminderType} reminder to ${email}`);
+        await logEmailDelivery({
+          userId: profile.user_id,
+          toEmail: email,
+          messageType: MESSAGE_TYPES.CHECKIN_REMINDER,
+          status: "sent",
+          resendId: emailResult?.data?.id ?? null,
+        });
         
         // Rate limiting: 600ms delay
         await new Promise(resolve => setTimeout(resolve, 600));
       } catch (emailError) {
         console.error(`Failed to send email to ${email}:`, emailError);
         failedCount++;
+        await logEmailDelivery({
+          userId: profile.user_id,
+          toEmail: email,
+          messageType: MESSAGE_TYPES.CHECKIN_REMINDER,
+          status: "failed",
+          errorMessage: emailError instanceof Error ? emailError.message : String(emailError),
+        });
       }
     }
 

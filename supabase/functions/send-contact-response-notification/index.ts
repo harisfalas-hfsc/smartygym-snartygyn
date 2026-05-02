@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@3.5.0";
 import { getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
 import { MESSAGE_TYPES } from "../_shared/notification-types.ts";
+import { logEmailDelivery } from "../_shared/email-log.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -112,15 +113,33 @@ serve(async (req) => {
     }
 
     // Send email
-    const emailResponse = await resend.emails.send({
-      from: "SmartyGym <notifications@smartygym.com>",
-      to: [userEmail],
-      subject: emailSubject,
-      html: htmlBody,
-      headers: getEmailHeaders(userEmail),
-    });
-
-    logStep("Notification email sent", { emailId: emailResponse.data?.id });
+    let emailResponse: any;
+    try {
+      emailResponse = await resend.emails.send({
+        from: "SmartyGym <notifications@smartygym.com>",
+        to: [userEmail],
+        subject: emailSubject,
+        html: htmlBody,
+        headers: getEmailHeaders(userEmail),
+      });
+      logStep("Notification email sent", { emailId: emailResponse.data?.id });
+      await logEmailDelivery({
+        userId,
+        toEmail: userEmail,
+        messageType: MESSAGE_TYPES.SUPPORT,
+        status: "sent",
+        resendId: emailResponse?.data?.id ?? null,
+      });
+    } catch (sendErr: any) {
+      await logEmailDelivery({
+        userId,
+        toEmail: userEmail,
+        messageType: MESSAGE_TYPES.SUPPORT,
+        status: "failed",
+        errorMessage: sendErr?.message || String(sendErr),
+      });
+      throw sendErr;
+    }
 
     return new Response(
       JSON.stringify({ success: true, emailId: emailResponse.data?.id }),
