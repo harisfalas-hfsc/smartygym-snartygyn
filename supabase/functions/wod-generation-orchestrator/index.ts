@@ -552,7 +552,8 @@ serve(async (req) => {
         console.log(`[ORCHESTRATOR] ✅ SUCCESS on attempt ${attempt} - All required WODs exist`);
         console.log(`[ORCHESTRATOR] Found: ${verification.found.join(", ")}`);
         succeeded = true;
-        await runWodStripeCleanup(supabaseUrl, supabaseServiceKey, "orchestrator-success", false);
+        // PLAN E: cleanup is no longer in the critical path. Daily cron
+        // `stripe-orphan-cleanup` at 04:00 UTC handles it.
 
         // Update run log with success
         if (runLog?.id) {
@@ -596,7 +597,7 @@ serve(async (req) => {
     const isPartialFailure = (finalResult?.found?.length || 0) > 0;
     const failureType = isPartialFailure ? "PARTIAL" : "COMPLETE";
     console.log(`[ORCHESTRATOR] 🚨 ${failureType} FAILURE after ${MAX_ATTEMPTS} attempts - Sending admin alert`);
-    await runWodStripeCleanup(supabaseUrl, supabaseServiceKey, "orchestrator-failure", false);
+    // PLAN E: cleanup deferred to daily cron — not run inline anymore.
 
     // CHAIN FIX: NO automatic library fallback. Per the locked-in rules,
     // the only outcomes are (a) verified success, or (b) admin alert.
