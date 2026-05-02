@@ -265,28 +265,35 @@ export function calculateFutureWODSchedule(
   return schedule;
 }
 
-serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
-
+// ═══════════════════════════════════════════════════════════════════════════════
+// BACKGROUND-SAFE ENTRY (PLAN C+D)
+// The heavy AI generation can exceed the 150s hosted function idle timeout.
+// To prevent that, the entry handler can run the real work via
+// EdgeRuntime.waitUntil(...) and return 202 Accepted immediately.
+// Pass `background: false` (or run with no body) to keep the legacy synchronous
+// behaviour for short admin one-off triggers; pass `background: true` (or
+// inherit the default) for cron-like callers that must not block.
+// ═══════════════════════════════════════════════════════════════════════════════
+async function runWodGeneration(params: {
+  targetDate: string | null;
+  skipNotifications: boolean;
+  retryMissing: boolean;
+  triggerSource: string;
+}): Promise<Response> {
   let cleanupSupabase: any = null;
   let effectiveDateForCleanup: string | null = null;
 
   try {
-    // Parse request body
-    let targetDate: string | null = null;
-    let skipNotifications = false;
-    let retryMissing = false;
-    
-    try {
-      const body = await req.json();
-      targetDate = body?.targetDate || null;
-      skipNotifications = body?.skipNotifications || false;
-      retryMissing = body?.retryMissing || false;
-    } catch {
-      // No body or invalid JSON - use defaults
-    }
+    const targetDate = params.targetDate;
+    const skipNotifications = params.skipNotifications;
+    const retryMissing = params.retryMissing;
+
+    logStep("Background runner started", {
+      triggerSource: params.triggerSource,
+      targetDate,
+      retryMissing,
+      skipNotifications,
+    });
 
     // Cyprus date (Europe/Athens) — DST-safe via shared helper.
     const now = new Date();
@@ -3284,4 +3291,66 @@ Return JSON with these exact fields:
       }
     );
   }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// HTTP ENTRY — chooses sync vs background mode (PLAN C)
+// Default: BACKGROUND (returns 202 immediately, work continues via waitUntil).
+// Pass `{ "background": false }` in body to force synchronous behaviour.
+// ═══════════════════════════════════════════════════════════════════════════════
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  // Parse request body once at the entry point
+  let targetDate: string | null = null;
+  let skipNotifications = false;
+  let retryMissing = false;
+  let background = true; // default: never block the caller
+  let triggerSource = "manual";
+
+  try {
+    const body = await req.json();
+    targetDate = body?.targetDate || null;
+    skipNotifications = body?.skipNotifications || false;
+    retryMissing = body?.retryMissing || false;
+    if (typeof body?.background === "boolean") background = body.background;
+    if (typeof body?.triggerSource === "string") triggerSource = body.triggerSource;
+  } catch {
+    // No body / invalid JSON — keep defaults (background=true)
+  }
+
+  const params = { targetDate, skipNotifications, retryMissing, triggerSource };
+
+  if (background) {
+    // Fire-and-forget: real work continues after the response is sent.
+    // EdgeRuntime.waitUntil keeps the isolate alive until the promise settles.
+    const work = runWodGeneration(params).catch((err) => {
+      console.error("[GENERATE-WOD] Background runner crashed:", err);
+    });
+
+    // @ts-ignore — EdgeRuntime is provided by the Supabase Edge runtime.
+    if (typeof EdgeRuntime !== "undefined" && EdgeRuntime?.waitUntil) {
+      // @ts-ignore
+      EdgeRuntime.waitUntil(work);
+    }
+
+    return new Response(
+      JSON.stringify({
+        accepted: true,
+        mode: "background",
+        message: "Generation started in background; check wod_generation_runs / admin_workouts for completion.",
+        triggerSource,
+        targetDate,
+      }),
+      {
+        status: 202,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
+  }
+
+  // Synchronous mode (legacy) — caller waits for the full result.
+  return await runWodGeneration(params);
 });

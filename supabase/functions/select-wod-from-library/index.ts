@@ -220,7 +220,7 @@ serve(async (req) => {
 
     if (isRecoveryDay) {
       // Recovery day: pick 1 workout from RECOVERY category
-      const selected = await selectWorkout(supabase, {
+      const selected = await selectWorkoutCandidates(supabase, {
         category: "RECOVERY",
         difficulty: null,
         difficultyStars: null,
@@ -229,14 +229,14 @@ serve(async (req) => {
         strengthFocus: null,
       });
 
-      if (selected) {
-        selectedWorkouts.push(selected);
+      if (selected && selected.length > 0) {
+        selectedWorkouts.push({ slot: "RECOVERY", candidates: selected });
       } else {
         logStep("WARNING: No recovery workout found in library");
       }
     } else {
       // Normal day: pick 1 BODYWEIGHT + 1 EQUIPMENT
-      const bwSelected = await selectWorkout(supabase, {
+      const bwSelected = await selectWorkoutCandidates(supabase, {
         category: periodization.category,
         difficulty: periodization.difficulty,
         difficultyStars: periodization.difficultyStars,
@@ -245,13 +245,13 @@ serve(async (req) => {
         strengthFocus: periodization.strengthFocus || null,
       });
 
-      if (bwSelected) {
-        selectedWorkouts.push(bwSelected);
+      if (bwSelected && bwSelected.length > 0) {
+        selectedWorkouts.push({ slot: "BODYWEIGHT", candidates: bwSelected });
       } else {
         logStep("WARNING: No BODYWEIGHT workout found for", { category: periodization.category, difficulty: periodization.difficulty });
       }
 
-      const eqSelected = await selectWorkout(supabase, {
+      const eqSelected = await selectWorkoutCandidates(supabase, {
         category: periodization.category,
         difficulty: periodization.difficulty,
         difficultyStars: periodization.difficultyStars,
@@ -260,8 +260,8 @@ serve(async (req) => {
         strengthFocus: periodization.strengthFocus || null,
       });
 
-      if (eqSelected) {
-        selectedWorkouts.push(eqSelected);
+      if (eqSelected && eqSelected.length > 0) {
+        selectedWorkouts.push({ slot: "EQUIPMENT", candidates: eqSelected });
       } else {
         logStep("WARNING: No EQUIPMENT workout found for", { category: periodization.category, difficulty: periodization.difficulty });
       }
@@ -284,9 +284,18 @@ serve(async (req) => {
     }
 
     let promotedCount = 0;
+    const finallyPromoted: any[] = [];
 
-    // Flag selected workouts as WOD
-    for (const workout of selectedWorkouts) {
+    // Iterate slots; for each slot try candidates in order until one passes
+    // the publish contract. This protects against pre-existing data quality
+    // issues in older library workouts (missing density, raw placeholders, etc.)
+    for (const slotEntry of selectedWorkouts) {
+      const { slot, candidates } = slotEntry as { slot: string; candidates: any[] };
+      logStep(`Trying slot ${slot} with ${candidates.length} candidate(s)`);
+      let slotPromoted = false;
+
+      for (const workout of candidates) {
+        if (slotPromoted) break;
       // Guarantee a valid Stripe product + price BEFORE promoting to WOD
       let stripeProductId: string;
       let stripePriceId: string;
@@ -357,8 +366,10 @@ serve(async (req) => {
         stripePriceId,
       });
       promotedCount++;
+      slotPromoted = true;
+      finallyPromoted.push(postRow);
 
-      // Insert cooldown record
+      // Insert cooldown record for the workout we just promoted
       await supabase.from("wod_selection_cooldown").insert({
         source_workout_id: workout.id,
         selected_for_date: targetDate,
@@ -366,7 +377,12 @@ serve(async (req) => {
         difficulty: workout.difficulty,
         equipment: workout.equipment,
       });
-    }
+      } // end candidate loop
+
+      if (!slotPromoted) {
+        logStep(`SLOT FAILED: no usable candidate for ${slot} after trying ${candidates.length}`);
+      }
+    } // end slot loop
 
     const expectedCount = isRecoveryDay ? 1 : 2;
     if (promotedCount < expectedCount) {
@@ -383,7 +399,7 @@ serve(async (req) => {
       expected_category: periodization.category,
       trigger_source: "library-selection",
       completed_at: new Date().toISOString(),
-      wods_created: selectedWorkouts.map(w => ({
+      wods_created: finallyPromoted.map(w => ({
         id: w.id,
         name: w.name,
         equipment: w.equipment,
@@ -417,8 +433,8 @@ serve(async (req) => {
     }
 
     logStep("Library selection complete", {
-      selectedCount: selectedWorkouts.length,
-      workouts: selectedWorkouts.map(w => `${w.name} (${w.equipment})`),
+      selectedCount: finallyPromoted.length,
+      workouts: finallyPromoted.map(w => `${w.name} (${w.equipment})`),
     });
 
     return new Response(
@@ -432,12 +448,11 @@ serve(async (req) => {
           difficulty: periodization.difficulty,
           strengthFocus: periodization.strengthFocus,
         },
-        selected: selectedWorkouts.map(w => ({
+        selected: finallyPromoted.map(w => ({
           id: w.id,
           name: w.name,
           equipment: w.equipment,
           category: w.category,
-          difficulty: w.difficulty,
         })),
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
@@ -469,9 +484,29 @@ async function selectWorkout(
     strengthFocus: string | null;
   }
 ): Promise<any | null> {
+  const list = await selectWorkoutCandidates(supabase, params);
+  return list && list.length > 0 ? list[0] : null;
+}
+
+/**
+ * Like selectWorkout but returns a *prioritised list* of all valid candidates,
+ * highest-priority first. The caller can then iterate and skip any that fail
+ * the publish contract — so a single broken library workout never fails the slot.
+ */
+async function selectWorkoutCandidates(
+  supabase: any,
+  params: {
+    category: string;
+    difficulty: string | null;
+    difficultyStars: [number, number] | null;
+    equipment: string | null;
+    cooldownIds: Set<string>;
+    strengthFocus: string | null;
+  }
+): Promise<any[]> {
   const { category, difficulty, difficultyStars, equipment, cooldownIds, strengthFocus } = params;
 
-  logStep("Selecting workout", { category, difficulty, equipment, strengthFocus, cooldownSize: cooldownIds.size });
+  logStep("Selecting candidate list", { category, difficulty, equipment, strengthFocus, cooldownSize: cooldownIds.size });
 
   // Build base query
   let query = supabase
@@ -495,35 +530,51 @@ async function selectWorkout(
 
   if (error) {
     logStep("Error querying candidates", { error: error.message });
-    return null;
+    return [];
   }
 
-  if (!candidates || candidates.length === 0) {
+  let pool: any[] = candidates || [];
+
+  if (pool.length === 0) {
     logStep("No candidates found, trying without difficulty filter");
-    
-    // Fallback: try without difficulty filter
     let fallbackQuery = supabase
       .from("admin_workouts")
       .select("*")
       .eq("category", category)
       .eq("is_workout_of_day", false)
       .eq("is_visible", true);
-
-    if (equipment) {
-      fallbackQuery = fallbackQuery.eq("equipment", equipment);
-    }
-
+    if (equipment) fallbackQuery = fallbackQuery.eq("equipment", equipment);
     const { data: fallbackCandidates } = await fallbackQuery;
-    
-    if (!fallbackCandidates || fallbackCandidates.length === 0) {
+    pool = fallbackCandidates || [];
+    if (pool.length === 0) {
       logStep("No candidates even without difficulty filter");
-      return null;
+      return [];
     }
-
-    return pickFromCandidates(supabase, fallbackCandidates, cooldownIds, strengthFocus);
   }
 
-  return pickFromCandidates(supabase, candidates, cooldownIds, strengthFocus);
+  // Split: outside cooldown first, then in cooldown (so we still try them
+  // before giving up on the slot if all fresh candidates are broken).
+  const outOfCooldown = pool.filter(c => !cooldownIds.has(c.id));
+  const inCooldown = pool.filter(c => cooldownIds.has(c.id));
+
+  // Optional focus prioritisation within out-of-cooldown
+  let prioritised = outOfCooldown;
+  if (strengthFocus && outOfCooldown.length > 1) {
+    const focusMatch = outOfCooldown.filter(c =>
+      c.focus && c.focus.toUpperCase().includes(strengthFocus.toUpperCase())
+    );
+    if (focusMatch.length > 0) {
+      const others = outOfCooldown.filter(c => !focusMatch.includes(c));
+      prioritised = [...focusMatch, ...others];
+    }
+  }
+
+  // Shuffle within priority bucket so we don't always pick the same one
+  const shuffle = (arr: any[]) => arr.map(v => [Math.random(), v] as const).sort((a,b) => a[0]-b[0]).map(([,v]) => v);
+  const ordered = [...shuffle(prioritised), ...shuffle(inCooldown)];
+
+  logStep("Candidate list built", { total: ordered.length, outOfCooldown: outOfCooldown.length, inCooldown: inCooldown.length });
+  return ordered;
 }
 
 /**
