@@ -47,6 +47,21 @@ export interface WodValidationResult {
   warnings: string[];
 }
 
+export type WodContractMode = "structural" | "full";
+
+export interface WodContractOptions {
+  /**
+   * "structural" (default for orchestrator success path):
+   *   Validate everything EXCEPT image_url and Stripe IDs. Used while those
+   *   assets are still being created in the background by `auto-generate-
+   *   workout-image` and `wod-stripe-link` (PLAN A+B+E).
+   * "full":
+   *   Strict validation including image_url and Stripe IDs. Used by the
+   *   watchdog and any final-state checks.
+   */
+  mode?: WodContractMode;
+}
+
 /**
  * Returns the expected publish slots for a given Cyprus date based on the
  * 84-day periodization cycle. Recovery days require one VARIOUS WOD; all
@@ -94,7 +109,9 @@ const HTTPS_URL_RE = /^https:\/\//;
 export function validateWodPublishContract(
   wod: WodCandidate,
   expectedDate: string,
+  options: WodContractOptions = {},
 ): WodValidationResult {
+  const mode: WodContractMode = options.mode ?? "full";
   const failures: string[] = [];
   const warnings: string[] = [];
 
@@ -153,9 +170,11 @@ export function validateWodPublishContract(
     failures.push("tips contain raw {{exercise:...}} placeholders");
   }
 
-  // Image
-  if (!wod.image_url || !HTTPS_URL_RE.test(wod.image_url)) {
-    failures.push("missing or invalid image_url");
+  // Image (asset — only enforced in full mode)
+  if (mode === "full") {
+    if (!wod.image_url || !HTTPS_URL_RE.test(wod.image_url)) {
+      failures.push("missing or invalid image_url");
+    }
   }
 
   // Visibility / publishing flags
@@ -168,11 +187,20 @@ export function validateWodPublishContract(
   // Payment contract
   if (wod.is_standalone_purchase !== true) failures.push("is_standalone_purchase must be true");
   if (!wod.price || Number(wod.price) <= 0) failures.push("price must be > 0");
-  if (!wod.stripe_product_id || !STRIPE_PRODUCT_RE.test(wod.stripe_product_id)) {
-    failures.push("missing or invalid stripe_product_id");
-  }
-  if (!wod.stripe_price_id || !STRIPE_PRICE_RE.test(wod.stripe_price_id)) {
-    failures.push("missing or invalid stripe_price_id");
+  // Stripe IDs (asset — only enforced in full mode)
+  if (mode === "full") {
+    if (!wod.stripe_product_id || !STRIPE_PRODUCT_RE.test(wod.stripe_product_id)) {
+      failures.push("missing or invalid stripe_product_id");
+    }
+    if (!wod.stripe_price_id || !STRIPE_PRICE_RE.test(wod.stripe_price_id)) {
+      failures.push("missing or invalid stripe_price_id");
+    }
+  } else {
+    // Structural mode: do NOT fail on missing assets, but DO fail on partial
+    // Stripe state (one ID set but not the other) since that means corruption.
+    if ((wod.stripe_product_id == null) !== (wod.stripe_price_id == null)) {
+      failures.push("partial stripe link state (one id set, the other null)");
+    }
   }
 
   return { ok: failures.length === 0, failures, warnings };
@@ -185,6 +213,7 @@ export function validateWodPublishContract(
 export function validateDayPublishContract(
   wods: WodCandidate[],
   expectedDate: string,
+  options: WodContractOptions = {},
 ): WodValidationResult & { perWod: Array<{ id?: string | null; equipment?: string | null; result: WodValidationResult }> } {
   const failures: string[] = [];
   const warnings: string[] = [];
@@ -200,7 +229,7 @@ export function validateDayPublishContract(
   }
 
   for (const wod of wods) {
-    const result = validateWodPublishContract(wod, expectedDate);
+    const result = validateWodPublishContract(wod, expectedDate, options);
     perWod.push({ id: wod.id, equipment: wod.equipment, result });
     if (!result.ok) {
       failures.push(`${wod.equipment || "?"}/${wod.id || "?"}: ${result.failures.join("; ")}`);
