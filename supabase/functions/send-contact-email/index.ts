@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@4.0.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { getAdminNotificationEmail } from "../_shared/admin-settings.ts";
+import { logEmailDelivery } from "../_shared/email-log.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -139,7 +140,9 @@ const handler = async (req: Request): Promise<Response> => {
     console.log(`Sending email from ${email} to ${adminEmail} (resolved from database)`);
 
     // Send initial email to admin
-    const emailResponse = await resend.emails.send({
+    let emailResponse: any;
+    try {
+      emailResponse = await resend.emails.send({
       from: "SmartyGym Contact <notifications@smartygym.com>",
       to: [adminEmail],
       replyTo: email,
@@ -167,9 +170,25 @@ const handler = async (req: Request): Promise<Response> => {
           </div>
         </div>
       `,
-    });
-
-    console.log("Email sent successfully to admin:", emailResponse);
+      });
+      console.log("Email sent successfully to admin:", emailResponse);
+      await logEmailDelivery({
+        toEmail: adminEmail,
+        messageType: "contact-form-admin",
+        status: "sent",
+        resendId: emailResponse?.data?.id ?? null,
+        metadata: { from_email: email, subject: safeSubject },
+      });
+    } catch (sendErr: any) {
+      await logEmailDelivery({
+        toEmail: adminEmail,
+        messageType: "contact-form-admin",
+        status: "failed",
+        errorMessage: sendErr?.message || String(sendErr),
+        metadata: { from_email: email, subject: safeSubject },
+      });
+      throw sendErr;
+    }
 
     // Auto-reply content that will be logged to history
     const autoReplyContent = `Thank you for contacting SmartyGym! We have received your inquiry regarding "${subject}" and will review it promptly. Our team typically responds within 24-48 hours.`;
