@@ -375,7 +375,11 @@ serve(async (req) => {
   // do nothing. This prevents backup (03:00) and watchdog (03:05) wrappers
   // from re-generating WODs unnecessarily and burning AI credits.
   // ───────────────────────────────────────────────────────────────────────────
-  const preCheck = await verifyWodsExist(supabase, effectiveDate);
+  // Watchdog/backup verify-only mode runs the FULL contract (image + Stripe
+  // must be present). Generator success path uses STRUCTURAL contract because
+  // image + Stripe are populated asynchronously after the WOD row is saved.
+  const preCheckMode: WodContractMode = mode === "verify" ? "full" : "structural";
+  const preCheck = await verifyWodsExist(supabase, effectiveDate, preCheckMode);
 
   // VERIFY-ONLY MODE (used by backup + watchdog wrappers): never generate,
   // never pull from library. Just check, and alert if anything is missing.
@@ -540,8 +544,8 @@ serve(async (req) => {
       // Wait a moment for database to settle
       await delay(2000);
 
-      // Verify WODs exist
-      const verification = await verifyWodsExist(supabase, effectiveDate);
+      // Verify WODs exist (structural — assets land asynchronously)
+      const verification = await verifyWodsExist(supabase, effectiveDate, "structural");
       finalResult = verification;
 
       if (verification.success) {
