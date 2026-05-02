@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { getAdminNotificationEmail } from "../_shared/admin-settings.ts";
+import { logEmailDelivery } from "../_shared/email-log.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -107,18 +108,25 @@ serve(async (req: Request): Promise<Response> => {
 
     if (emailError) {
       console.error("Resend error:", emailError);
+      await logEmailDelivery({
+        toEmail: adminEmail,
+        messageType: "admin_test_email",
+        status: "failed",
+        errorMessage: emailError.message,
+        metadata: { source: "admin_email_monitor" },
+      });
       throw new Error(`Email failed: ${emailError.message}`);
     }
 
     console.log(`✅ Test email sent successfully to ${adminEmail}`);
 
     // Log the email
-    await supabase.from('email_delivery_log').insert({
-      message_type: 'admin_test_email',
-      to_email: adminEmail,
-      status: 'sent',
-      resend_id: emailResult?.id,
-      metadata: { source: 'admin_email_monitor' }
+    await logEmailDelivery({
+      toEmail: adminEmail,
+      messageType: "admin_test_email",
+      status: "sent",
+      resendId: emailResult?.id ?? null,
+      metadata: { source: "admin_email_monitor" },
     });
 
     return new Response(JSON.stringify({
