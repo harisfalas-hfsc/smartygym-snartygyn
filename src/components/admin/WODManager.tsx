@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
-import { Flame, Play, RefreshCw, Calendar, Dumbbell, Star, TrendingUp, Clock, ExternalLink, ImageIcon, BookOpen, Edit, Settings, HeartPulse, CheckCircle, AlertTriangle, XCircle, Archive, Bell, Rocket, Library } from "lucide-react";
+import { Flame, Play, RefreshCw, Calendar, Dumbbell, Star, TrendingUp, Clock, ExternalLink, ImageIcon, BookOpen, Edit, Settings, HeartPulse, CheckCircle, AlertTriangle, XCircle, Archive, Bell, Rocket, Library, Shield } from "lucide-react";
 import { format, addDays } from "date-fns";
 import { WODSchedulePreview } from "./WODSchedulePreview";
 import { PeriodizationSystemDialog } from "./PeriodizationSystemDialog";
@@ -28,6 +28,7 @@ export const WODManager = () => {
   const [isSyncingImages, setIsSyncingImages] = useState(false);
   const [isRunningHealthCheck, setIsRunningHealthCheck] = useState(false);
   const [isCheckingTomorrow, setIsCheckingTomorrow] = useState(false);
+  const [isRunningWatchdog, setIsRunningWatchdog] = useState(false);
   const [isArchiving, setIsArchiving] = useState(false);
   const [isSendingNotifications, setIsSendingNotifications] = useState(false);
   const [periodizationDialogOpen, setPeriodizationDialogOpen] = useState(false);
@@ -526,6 +527,40 @@ export const WODManager = () => {
   // Persists every run to wod_readiness_audits and flags RECURRING issues by
   // matching stable check-keys against the previous 7 audits.
   // ===========================================================================
+  // WOD WATCHDOG — manually triggers the verify-only safety net that confirms
+  // today's WODs exist + re-kicks Stripe linking and image generation if any
+  // assets are missing. Same function the daily watchdog cron calls.
+  const handleRunWatchdog = async () => {
+    setIsRunningWatchdog(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("watchdog-wod-check");
+      if (error) throw error;
+      const result: any = data || {};
+      const found = (result?.found || []) as string[];
+      const missing = (result?.missing || []) as string[];
+      if (result?.success && missing.length === 0) {
+        toast.success("WOD Watchdog: all healthy ✅", {
+          description: `Today's slots present: ${found.join(", ") || "(verified)"}. Asset re-kick scan complete.`,
+          duration: 6000,
+        });
+      } else if (missing.length > 0) {
+        toast.warning("WOD Watchdog: missing slots", {
+          description: `Missing: ${missing.join(", ")}. Admin alert dispatched.`,
+          duration: 8000,
+        });
+      } else {
+        toast.info("WOD Watchdog ran", {
+          description: JSON.stringify(result).slice(0, 200),
+        });
+      }
+    } catch (err: any) {
+      console.error("WOD Watchdog error:", err);
+      toast.error("WOD Watchdog failed", { description: err?.message || String(err) });
+    } finally {
+      setIsRunningWatchdog(false);
+    }
+  };
+
   const handleFutureReadinessCheck = async () => {
     setIsCheckingTomorrow(true);
     type CheckResult = {
@@ -927,7 +962,24 @@ export const WODManager = () => {
             <span className="hidden sm:inline">{isCheckingTomorrow ? "Auditing..." : "Future Ready?"}</span>
             <span className="sm:hidden">{isCheckingTomorrow ? "..." : "Future?"}</span>
           </Button>
-          
+
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-1 sm:gap-2 border-cyan-500 text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3"
+            disabled={isRunningWatchdog}
+            onClick={handleRunWatchdog}
+            title="Verify today's WODs exist and re-kick Stripe/image pipelines if assets are missing"
+          >
+            {isRunningWatchdog ? (
+              <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
+            ) : (
+              <Shield className="h-3 w-3 sm:h-4 sm:w-4 text-cyan-500" />
+            )}
+            <span className="hidden sm:inline">{isRunningWatchdog ? "Running..." : "WOD Watchdog"}</span>
+            <span className="sm:hidden">{isRunningWatchdog ? "..." : "Watchdog"}</span>
+          </Button>
+
           <Button 
             variant="outline"
             size="sm"

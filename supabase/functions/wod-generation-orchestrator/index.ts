@@ -337,6 +337,94 @@ function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+/**
+ * Send a one-shot admin notification for a (target_date, slot, status) tuple.
+ * Uses the wod_generation_notifications table as a dedupe ledger so multiple
+ * retry passes never re-notify for the same outcome.
+ */
+async function notifyAdminOnce(
+  supabase: any,
+  params: {
+    targetDate: string;
+    slot: string;
+    status: "success" | "failure";
+    triggerSource: string;
+    foundSlots: string[];
+    missingSlots: string[];
+  },
+): Promise<void> {
+  const { targetDate, slot, status, triggerSource, foundSlots, missingSlots } = params;
+  // Dedupe: insert and skip if (target_date, slot, status) already exists
+  const { data: inserted, error: dedupeErr } = await supabase
+    .from("wod_generation_notifications")
+    .insert({
+      target_date: targetDate,
+      slot,
+      status,
+      attempt_source: triggerSource,
+    })
+    .select("id")
+    .maybeSingle();
+
+  if (dedupeErr) {
+    // Unique-violation = already notified → silent skip
+    if ((dedupeErr as any).code === "23505") {
+      console.log(`[ORCHESTRATOR/notify] Already notified for ${targetDate}/${slot}/${status} — skipping`);
+      return;
+    }
+    console.error("[ORCHESTRATOR/notify] dedupe insert failed:", dedupeErr);
+    return;
+  }
+  if (!inserted) {
+    console.log(`[ORCHESTRATOR/notify] Already notified (no row returned) — skipping`);
+    return;
+  }
+
+  const resendApiKey = Deno.env.get("RESEND_API_KEY");
+  if (!resendApiKey) {
+    console.error("[ORCHESTRATOR/notify] RESEND_API_KEY missing — cannot email admin");
+    return;
+  }
+  const adminEmail = await getAdminNotificationEmail(supabase);
+  const resend = new Resend(resendApiKey);
+
+  const isSuccess = status === "success";
+  const subject = isSuccess
+    ? `✅ WODs ready for ${targetDate} (${foundSlots.join(" + ")})`
+    : `❌ WOD generation FAILED for ${targetDate} — action may be needed`;
+
+  const html = isSuccess
+    ? `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px">
+         <h2 style="color:#059669">✅ WODs Successfully Generated</h2>
+         <p><strong>Target date:</strong> ${targetDate}</p>
+         <p><strong>Slots ready:</strong> ${foundSlots.join(", ")}</p>
+         <p><strong>Triggered by:</strong> ${triggerSource}</p>
+         <p>Tomorrow's WODs are pre-built and waiting. They become "today" silently at 00:00 Cyprus.</p>
+         <p style="color:#6b7280;font-size:12px;margin-top:24px">Automated success confirmation — sent once per slot per day.</p>
+       </div>`
+    : `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px">
+         <h2 style="color:#dc2626">❌ WOD Generation Failed</h2>
+         <p><strong>Target date:</strong> ${targetDate}</p>
+         <p><strong>Missing slots:</strong> ${missingSlots.join(", ") || "UNKNOWN"}</p>
+         <p><strong>Found slots:</strong> ${foundSlots.join(", ") || "none"}</p>
+         <p><strong>Trigger:</strong> ${triggerSource}</p>
+         <p>Up to 4 retry passes will run between 09:20 and 10:50 Cyprus. If they all fail, manually generate from <strong>Admin → WOD Manager → Generate New WOD</strong>.</p>
+         <p style="color:#6b7280;font-size:12px;margin-top:24px">Automated failure alert — sent once per slot per day.</p>
+       </div>`;
+
+  try {
+    await resend.emails.send({
+      from: "SmartyGym Alerts <notifications@smartygym.com>",
+      to: [adminEmail],
+      subject,
+      html,
+    });
+    console.log(`[ORCHESTRATOR/notify] ${status} email sent to ${adminEmail} for ${targetDate}/${slot}`);
+  } catch (e) {
+    console.error("[ORCHESTRATOR/notify] resend send failed:", e);
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -599,6 +687,20 @@ serve(async (req) => {
             .eq("id", runLog.id);
         }
 
+        // Notify admin once per slot/day on success (dedupe via wod_generation_notifications)
+        try {
+          await notifyAdminOnce(supabase, {
+            targetDate: effectiveDate,
+            slot: requestedSlot || "ALL",
+            status: "success",
+            triggerSource,
+            foundSlots: verification.found,
+            missingSlots: [],
+          });
+        } catch (notifyErr) {
+          console.error("[ORCHESTRATOR] success notify failed:", notifyErr);
+        }
+
         return new Response(
           JSON.stringify({
             success: true,
@@ -640,6 +742,20 @@ serve(async (req) => {
       attempts,
       finalResult?.isRecoveryDay || false
     );
+
+    // Also send the deduped one-shot failure email so retry passes don't spam.
+    try {
+      await notifyAdminOnce(supabase, {
+        targetDate: effectiveDate,
+        slot: requestedSlot || "ALL",
+        status: "failure",
+        triggerSource,
+        foundSlots: finalResult?.found || [],
+        missingSlots: finalResult?.missing || ["UNKNOWN"],
+      });
+    } catch (notifyErr) {
+      console.error("[ORCHESTRATOR] failure notify failed:", notifyErr);
+    }
 
     // Update run log with failure
     if (runLog?.id) {
