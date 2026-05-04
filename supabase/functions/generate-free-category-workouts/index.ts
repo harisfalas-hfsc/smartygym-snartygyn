@@ -5,6 +5,7 @@
 
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import Stripe from "https://esm.sh/stripe@18.5.0";
 import {
   processContentSectionAware,
   fetchAndBuildExerciseReference,
@@ -287,6 +288,10 @@ async function generateOne(
   bannedNames: string[],
   difficulty: string,
   difficultyStars: number,
+  mode: "free" | "premium" = "free",
+  premiumPrice: number = 4.99,
+  premiumTier: string = "gold",
+  callerAuthHeader: string | null = null,
 ): Promise<{ ok: boolean; id?: string; name?: string; error?: string }> {
   const { category, equipment } = job;
   const { format, duration } = pickFormat(category);
@@ -364,7 +369,8 @@ async function generateOne(
       const ts = Date.now();
       const catSlug = category.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
       const diffSlug = difficulty.toLowerCase().slice(0, 3);
-      const workoutId = `FREE-${diffSlug}-${catSlug}-${equipment.charAt(0)}-${ts}`;
+      const idPrefix = mode === "premium" ? "PREM" : "FREE";
+      const workoutId = `${idPrefix}-${diffSlug}-${catSlug}-${equipment.charAt(0)}-${ts}`;
 
       // Generate image synchronously (so the row immediately has one — trigger is the backup)
       let imageUrl: string | null = null;
@@ -374,6 +380,46 @@ async function generateOne(
         });
         if (!imgErr && imgData?.image_url) imageUrl = imgData.image_url;
       } catch (e: any) { log("Image gen exception (trigger will retry)", { err: e.message }); }
+
+      // Premium: create Stripe product+price BEFORE insert so trigger validations pass cleanly.
+      let stripeProductId: string | null = null;
+      let stripePriceId: string | null = null;
+      if (mode === "premium") {
+        try {
+          const stripeKey = Deno.env.get("STRIPE_SECRET_KEY") || "";
+          if (!stripeKey) throw new Error("STRIPE_SECRET_KEY not configured");
+          const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
+          const productData: any = {
+            name: content.name,
+            description: `Workout: ${content.name}`,
+            metadata: {
+              project: "SMARTYGYM",
+              content_type: "Workout",
+              source: "generate-free-category-workouts:premium",
+            },
+          };
+          if (imageUrl && imageUrl.startsWith("https://")) {
+            productData.images = [imageUrl];
+          }
+          const product = await stripe.products.create(productData);
+          const priceObj = await stripe.prices.create({
+            product: product.id,
+            unit_amount: Math.round(premiumPrice * 100),
+            currency: "eur",
+            metadata: {
+              project: "SMARTYGYM",
+              content_type: "Workout",
+            },
+          });
+          stripeProductId = product.id;
+          stripePriceId = priceObj.id;
+          if (!stripeProductId || !stripePriceId) throw new Error("Stripe product creation returned no IDs");
+          log("Stripe product created", { id: stripeProductId, price: stripePriceId });
+        } catch (e: any) {
+          log("Stripe product creation failed", { err: e.message });
+          throw new Error(`Stripe product creation failed: ${e.message}`);
+        }
+      }
 
       const { error: insErr } = await (supabase as any).from("admin_workouts").insert({
         id: workoutId,
@@ -390,12 +436,13 @@ async function generateOne(
         instructions: insNorm,
         tips: tipsNorm,
         image_url: imageUrl,
-        is_premium: false,
-        is_free: true,
-        is_standalone_purchase: false,
-        price: null,
-        stripe_product_id: null,
-        stripe_price_id: null,
+        is_premium: mode === "premium",
+        is_free: mode !== "premium",
+        tier_required: mode === "premium" ? premiumTier : null,
+        is_standalone_purchase: mode === "premium",
+        price: mode === "premium" ? premiumPrice : null,
+        stripe_product_id: stripeProductId,
+        stripe_price_id: stripePriceId,
         is_workout_of_day: false,
         is_ai_generated: true,
         is_visible: true,
@@ -431,23 +478,33 @@ serve(async (req) => {
     let difficulty = "Intermediate";
     let difficultyStars = 3;
     let allowDuplicates = false;
+    let mode: "free" | "premium" = "free";
+    let premiumPrice = 4.99;
+    let premiumTier = "gold";
     try {
       const body = await req.json();
       if (Array.isArray(body?.jobs)) onlyJobs = body.jobs;
       if (typeof body?.difficulty === "string") difficulty = body.difficulty;
       if (typeof body?.difficulty_stars === "number") difficultyStars = body.difficulty_stars;
       if (body?.allow_duplicates === true) allowDuplicates = true;
+      if (body?.mode === "premium") mode = "premium";
+      if (typeof body?.price === "number") premiumPrice = body.price;
+      if (typeof body?.tier_required === "string") premiumTier = body.tier_required;
     } catch { /* no body */ }
 
-    log("Run config", { difficulty, difficultyStars, allowDuplicates });
+    log("Run config", { difficulty, difficultyStars, allowDuplicates, mode, premiumPrice, premiumTier });
 
-    // Fetch existing names per category for dedup + idempotency (filtered by difficulty)
-    const { data: existing } = await supabase
+    const callerAuthHeader = req.headers.get("Authorization");
+
+    // Fetch existing names per category for dedup + idempotency (filtered by difficulty + mode)
+    const existingQuery = supabase
       .from("admin_workouts")
-      .select("name, category, equipment, difficulty, is_free, is_workout_of_day")
-      .eq("is_free", true)
+      .select("name, category, equipment, difficulty, is_free, is_premium, is_workout_of_day")
       .eq("difficulty", difficulty)
       .eq("is_workout_of_day", false);
+    if (mode === "premium") existingQuery.eq("is_premium", true);
+    else existingQuery.eq("is_free", true);
+    const { data: existing } = await existingQuery;
 
     const existingByKey = new Map<string, string[]>(); // key: `${category}|${equipment}` -> names
     const existingNamesAll = new Set<string>();
@@ -458,12 +515,11 @@ serve(async (req) => {
       existingNamesAll.add(w.name);
     }
 
-    // Also load ALL existing free workout names (any difficulty) for global name uniqueness
-    const { data: allFree } = await supabase
+    // Also load ALL existing workout names (any difficulty) for global name uniqueness
+    const { data: allNames } = await supabase
       .from("admin_workouts")
-      .select("name")
-      .eq("is_free", true);
-    for (const w of allFree || []) existingNamesAll.add(w.name);
+      .select("name");
+    for (const w of allNames || []) existingNamesAll.add(w.name);
 
     // Build exercise libraries once (difficulty-aware filter)
     const libDifficulty = difficulty.toLowerCase();
@@ -493,6 +549,8 @@ serve(async (req) => {
         fullExercises, fullRefList,
         banned,
         difficulty, difficultyStars,
+        mode, premiumPrice, premiumTier,
+        callerAuthHeader,
       );
       if (r.ok && r.name) existingNamesAll.add(r.name);
       results.push({ ...job, difficulty, ...r });

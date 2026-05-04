@@ -1,45 +1,81 @@
-# Fix sort bug + verify the 10 new free workouts
+# Generate 10 Premium Advanced Workouts (with Stripe products)
 
-## Part A — Fix the "Newest First" sort (root cause)
+Mirror exactly what was done for the 10 free workouts, but flipped to **Premium / Standalone Purchase / Advanced** with full Stripe wiring.
 
-The DB function `get_visible_workout_metadata` does NOT return `created_at`, so the client sort always sees `null` and falls back to `0`. That's why "Glute Core Anchor" appears above "Axial Forge" / "Axial Press" even though those two are genuinely the newest in the database.
+## Scope
 
-Steps:
-1. Migration: update `public.get_visible_workout_metadata` to also return `created_at` and `updated_at` (append columns, keep existing ones in the same order so nothing else breaks).
-2. Update the matching TypeScript type used by `fetchVisibleWorkoutMetadata` so `created_at` flows through to the list.
-3. Sanity-check on `/workout` Strength tab: Axial Forge + Axial Press should appear at the top under "Newest First". Spot-check the same for Cardio, Metabolic, Calorie Burning, and Mobility & Stability tabs.
+5 categories × 2 variants = **10 new workouts**:
 
-(No change to the sort code itself — it's already correct, it just had no data to sort on.)
+| Category | Bodyweight | Equipment |
+|---|---|---|
+| Strength | 1 | 1 |
+| Calorie Burning | 1 | 1 |
+| Metabolic | 1 | 1 |
+| Cardio | 1 | 1 |
+| Mobility & Stability | 1 | 1 |
 
-## Part B — Full per-workout QA of the 10 new free workouts
+All Advanced (`difficulty = 'Advanced'`, `difficulty_stars = 5 or 6`).
 
-For each of the 10 workouts (5 categories × Bodyweight + Equipment), open `main_workout`, `description`, `tips`, `instructions` and verify:
+## Part A — Generator (reuse with premium mode)
 
-1. Strict 5-section structure present and wrapped in `workout-content`:
-   - Soft Tissue Preparation
-   - Activation
-   - Main Workout
-   - Finisher
-   - Cool Down
-2. Exercise density meets the minimum per section (per the workout density rule).
-3. Every exercise uses `{{exercise:ID:Name}}` library-first markup — no invented exercises, no plain-text exercise names.
-4. Every exercise line has reps / sets / tempo / rest prescribed.
-5. Category-specific format applied:
-   - Strength + Mobility & Stability → REPS & SETS
-   - Cardio / Metabolic / Calorie Burning → EMOM / AMRAP / Tabata / Circuit (rotated, not all the same)
-6. Bodyweight variants contain zero machine/equipment exercises; Equipment variants use studio/standard equipment only (and Tabata/HIIT respects the no-machine rule).
-7. Unique name (no duplicates anywhere in `admin_workouts`) and unique AI-generated `image_url` that actually loads.
-8. Free-access flags: `is_free=true`, `is_premium=false`, `is_visible=true`, `stripe_product_id` and `stripe_price_id` both NULL, `is_standalone_purchase=false`.
-9. Tone/brand: human-designed voice, no "AI coach" phrasing, aligned with the Smarty Method philosophy.
+Add a `mode: "premium"` branch to `supabase/functions/generate-free-category-workouts/index.ts` (or fork into `generate-premium-category-workouts`) that:
 
-## Part C — Remediation
+1. Forces `difficulty = 'Advanced'`, `difficulty_stars = 6`, intensity/volume tuned for advanced trainees.
+2. Sets DB flags:
+   - `is_free = false`
+   - `is_premium = true`
+   - `tier_required = 'gold'` (matches existing premium content)
+   - `is_visible = true`
+   - `is_standalone_purchase = true`
+   - `price = 4.99` (standard standalone workout price — confirm if you want a different number)
+3. Generates content with the same hard rules already enforced for the free batch:
+   - 5-section structure inside `<div class="workout-content">` (Soft Tissue, Activation, Main, Finisher, Cool Down)
+   - Library-first `{{exercise:ID:Name}}` markup only
+   - Density minimums per section
+   - Reps / sets / tempo / rest on every exercise line
+   - Category-specific format: Strength + Mobility & Stability → REPS & SETS; Cardio / Metabolic / Calorie Burning → rotate EMOM / AMRAP / Tabata / Circuit
+   - Bodyweight variant: zero machines/equipment; Equipment variant: studio/standard equipment, no machines in HIIT/Tabata
+   - Unique human-friendly name (no AI/debug suffixes — passes `validate_public_workout_integrity`)
+   - Triggers auto image generation (existing `trigger_auto_generate_workout_image` runs because `image_url` is NULL)
 
-For any workout that fails one or more checks in Part B:
-- Re-run the single-workout regeneration (not the full batch) preserving the same id, name, image, and free flags, with the failing section as the focus of the fix.
-- Re-verify, then report a final pass/fail table for all 10.
+## Part B — Stripe products (one per workout, 10 total)
 
-## Deliverable
+For each generated workout, call the existing `create-stripe-product` edge function with:
 
-- One migration (RPC return signature) + one type update for Part A.
-- A short table for Part B listing each workout id, name, and pass/fail per check, plus what was fixed in Part C.
-- No Stripe products created. No structural UI changes. No change to other categories' data.
+- `name`: workout name
+- `price`: 4.99
+- `contentType`: `"Workout"`
+- `imageUrl`: the workout's generated `image_url` (wait until image generation completes; if still pending after a short retry window, create the Stripe product without image and run `update-stripe-product-image` once the image lands)
+
+This guarantees the **mandatory metadata**:
+```
+project: "SMARTYGYM"
+content_type: "Workout"
+```
+(per `.note/stripe-metadata-rule.md` — no direct Stripe API calls, only the project's edge functions).
+
+Then update each `admin_workouts` row with the returned `stripe_product_id` and `stripe_price_id`. This satisfies `validate_public_workout_integrity` (both must be set together for a paid standalone workout).
+
+## Part C — QA pass (same checklist as the free batch)
+
+For each of the 10 workouts verify:
+
+1. 5-section structure + `workout-content` wrapper present.
+2. Exercise density meets minimums.
+3. Every exercise uses library-first markup, no invented exercises, no plain-text names.
+4. Every exercise line has reps / sets / tempo / rest.
+5. Correct category-specific format applied.
+6. Bodyweight = no equipment; Equipment = no banned machines in HIIT/Tabata.
+7. Unique name (DB unique check) + unique loaded `image_url`.
+8. Premium flags correct: `is_premium=true`, `is_free=false`, `is_visible=true`, `is_standalone_purchase=true`, `price=4.99`, `tier_required='gold'`, both `stripe_product_id` and `stripe_price_id` set and linked to a real Stripe product carrying SMARTYGYM metadata.
+9. Tone: human-designed voice, aligned with the Smarty Method philosophy, no "AI coach" phrasing.
+10. Premium gating works: anonymous + free users see "Buy / Upgrade", premium users see "Included in Premium" (no purchase button), per existing `PurchaseButton` + `create-individual-purchase-checkout` rules.
+
+Report a final pass/fail table for all 10 workouts with their ids, names, Stripe product ids, and any fixes applied.
+
+## Confirmations needed
+
+1. **Price per workout = €4.99** (matches existing standalone micro-workouts). Want a different price?
+2. **`tier_required = 'gold'`** for all 10 (so Gold + Platinum subscribers get them included). OK?
+
+If both are OK, no further questions — I'll execute Parts A → B → C end-to-end.
