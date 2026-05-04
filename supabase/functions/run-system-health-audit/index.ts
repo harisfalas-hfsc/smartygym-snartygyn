@@ -134,21 +134,21 @@ function buildScheduledJobs(wodConfig: WodAutoGenConfig | null, automationRules:
     },
     'wod_archiving': {
       name: 'WOD Archiving',
-      cronHourUTC: 22, // 22:00 UTC → 00:00 Cyprus winter, 01:00 summer
+      cronHourUTC: 21, // 21:00 UTC → 00:00 Cyprus (rolls tomorrow's pre-built WODs into today)
       cronMinuteUTC: 0,
       frequency: 'daily',
       messageTypes: [], // Doesn't send messages, archives previous WODs
-      description: 'Archives previous WODs at 22:00 UTC (00:00 Cyprus)',
+      description: 'Archives previous WODs at 21:00 UTC (00:00 Cyprus)',
       isDisabled: wodPaused,
       disabledReason: wodPaused ? wodPauseReason : undefined
     },
     'wod_generation': {
       name: 'Workout of Day Generation',
-      cronHourUTC: wodHour, // Dynamic from database (should be 22)
+      cronHourUTC: wodHour, // Dynamic from database (should be 6 → 06:30 UTC for next-day pre-build)
       cronMinuteUTC: 30,    // Runs at :30 past the hour
       frequency: 'daily',
       messageTypes: [], // Doesn't send messages, generates content
-      description: `Generates new daily workout at ${wodHour}:30 UTC (00:30 Cyprus)`,
+      description: `Generates TOMORROW's workout at ${wodHour}:30 UTC (≈ 09:30 Cyprus summer)`,
       isDisabled: wodPaused,
       disabledReason: wodPaused ? wodPauseReason : undefined
     },
@@ -670,13 +670,13 @@ const handler = async (req: Request): Promise<Response> => {
         detailMessage = isRecoveryDay
           ? `ISSUE: 0 active WODs found. Expected: 1 Recovery WOD (VARIOUS) for ${today} (Cyprus).\n\n` +
             `POSSIBLE CAUSES:\n` +
-            `• Automatic generation at ${wodAutoGenConfig?.generation_hour_utc ?? 22}:30 UTC failed\n` +
+            `• Automatic generation at ${wodAutoGenConfig?.generation_hour_utc ?? 6}:30 UTC failed\n` +
             `• Edge function 'generate-workout-of-day' returned an error\n` +
             `• Recovery WOD was created but not tagged correctly\n\n` +
             `SOLUTION: Go to Admin → WOD Manager → click 'Generate New WOD' → select 'Generate for Today'`
           : `ISSUE: 0 active WODs found. Expected: 2 (bodyweight + equipment) for ${today} (Cyprus).\n\n` +
             `POSSIBLE CAUSES:\n` +
-            `• Automatic generation at ${wodAutoGenConfig?.generation_hour_utc ?? 22}:30 UTC failed\n` +
+            `• Automatic generation at ${wodAutoGenConfig?.generation_hour_utc ?? 6}:30 UTC failed\n` +
             `• Edge function 'generate-workout-of-day' returned an error\n` +
             `• Workouts were created but not tagged with is_workout_of_day=true\n` +
             `• Workouts created with wrong generated_for_date\n\n` +
