@@ -42,6 +42,22 @@ const parseProgramWeeks = (duration: string | null, weeks: number | null): numbe
   return match ? parseInt(match[1], 10) : null;
 };
 
+const isBodyweightOnly = (equipment: string | null | undefined): boolean => {
+  if (!equipment) return true;
+  const eq = equipment.toLowerCase().trim();
+  if (eq === '' || eq === 'none' || eq === 'no equipment') return true;
+  // Pure bodyweight (no commas indicating mixed items)
+  if (eq === 'bodyweight') return true;
+  return false;
+};
+
+const requiresEquipment = (equipment: string | null | undefined): boolean => {
+  return !isBodyweightOnly(equipment);
+};
+
+// Difficulty tier index
+const DIFFICULTY_LEVELS = ['beginner', 'intermediate', 'advanced'];
+
 export const scoreProgramItem = (
   item: ProgramItem,
   answers: ProgramAnswers,
@@ -51,7 +67,6 @@ export const scoreProgramItem = (
   const reasons: string[] = [];
   const categoryUpper = item.category?.toUpperCase() || '';
   const difficultyLower = item.difficulty?.toLowerCase() || '';
-  const itemEquipment = item.equipment?.toLowerCase() || '';
   const itemWeeks = parseProgramWeeks(item.duration, item.weeks);
 
   // === COMPLETED / ONGOING PENALTY ===
@@ -66,56 +81,81 @@ export const scoreProgramItem = (
     return { item, score: -1000, reasons: ['Already completed or in progress'] };
   }
 
-  // === CATEGORY MATCH ===
+  // === CATEGORY MATCH (HIGHEST PRIORITY — heavy penalty if wrong) ===
   const targetCategories = CATEGORY_MAP[answers.category] || [];
   const matchesCategory = targetCategories.some(cat => categoryUpper.includes(cat));
   if (matchesCategory) {
-    score += 50;
+    score += 200;
     reasons.push(`Matches your ${item.category} goal`);
-  }
-
-  // === DIFFICULTY MATCH ===
-  if (difficultyLower === answers.difficulty.toLowerCase()) {
-    score += 30;
-    reasons.push(`${item.difficulty} difficulty — perfect for your level`);
   } else {
-    // Adjacent difficulty gets partial credit
-    const levels = ['beginner', 'intermediate', 'advanced'];
-    const targetIdx = levels.indexOf(answers.difficulty.toLowerCase());
-    const itemIdx = levels.indexOf(difficultyLower);
-    if (Math.abs(targetIdx - itemIdx) === 1) {
-      score += 10;
-    }
+    score -= 150;
   }
 
-  // === DURATION MATCH ===
+  // === DIFFICULTY MATCH (SECOND PRIORITY) ===
+  const targetDifficulty = answers.difficulty.toLowerCase();
+  const targetDiffIdx = DIFFICULTY_LEVELS.indexOf(targetDifficulty);
+  const itemDiffIdx = DIFFICULTY_LEVELS.indexOf(difficultyLower);
+  if (difficultyLower === targetDifficulty) {
+    score += 100;
+    reasons.push(`${item.difficulty} level — matches your experience`);
+  } else if (targetDiffIdx >= 0 && itemDiffIdx >= 0 && Math.abs(targetDiffIdx - itemDiffIdx) === 1) {
+    score += 20;
+    // Soft note added later only if it ends up being the chosen item
+  } else {
+    score -= 60;
+  }
+
+  // === DURATION MATCH (THIRD PRIORITY — nearest wins) ===
   const targetWeeks = parseInt(answers.duration.replace(/\D/g, ''), 10);
   if (itemWeeks && targetWeeks) {
-    if (itemWeeks === targetWeeks) {
-      score += 25;
-      reasons.push(`${itemWeeks}-week program fits your timeline`);
-    } else if (Math.abs(itemWeeks - targetWeeks) <= 2) {
+    const diff = Math.abs(itemWeeks - targetWeeks);
+    if (diff === 0) {
+      score += 60;
+      reasons.push(`${itemWeeks}-week program fits your timeline exactly`);
+    } else if (diff <= 2) {
+      score += 30;
+    } else if (diff <= 4) {
       score += 10;
-      reasons.push(`${itemWeeks} weeks — close to your preferred duration`);
+    } else {
+      score -= 10;
     }
   }
 
-  // === EQUIPMENT MATCH ===
+  // === EQUIPMENT MATCH (FOURTH PRIORITY — strict bodyweight constraint) ===
+  const itemIsBodyweight = isBodyweightOnly(item.equipment);
+  const itemNeedsEquipment = requiresEquipment(item.equipment);
+
   if (answers.equipment === 'bodyweight') {
-    const isBodyweight = itemEquipment.includes('bodyweight') || 
-                         itemEquipment.includes('no equipment') ||
-                         itemEquipment === '' || !item.equipment;
-    if (isBodyweight) {
-      score += 15;
+    if (itemIsBodyweight) {
+      score += 30;
       reasons.push('No equipment needed');
     } else {
-      score -= 30;
+      // Hard constraint — exclude equipment-required programs when user has none
+      return { item, score: -1000, reasons: ['Requires equipment you don\'t have'] };
     }
   } else {
-    score += 5;
+    // User has equipment available — prefer programs that use it
+    if (itemNeedsEquipment) {
+      score += 25;
+      reasons.push('Uses the equipment you have available');
+    } else {
+      score += 5; // Bodyweight still valid, just less prioritized
+    }
   }
 
   return { item, score, reasons };
+};
+
+const formatGoalLabel = (category: string): string => {
+  const map: Record<string, string> = {
+    cardio_endurance: 'cardio endurance',
+    functional_strength: 'functional strength',
+    muscle_hypertrophy: 'muscle building',
+    weight_loss: 'weight loss',
+    low_back_pain: 'back care',
+    mobility_stability: 'mobility & stability',
+  };
+  return map[category] || category;
 };
 
 export const generateProgramSuggestion = (
@@ -129,30 +169,62 @@ export const generateProgramSuggestion = (
   const validItems = scored.filter(s => s.score > -500);
 
   if (validItems.length === 0) {
-    // All programs excluded (completed/ongoing) — no suggestion possible
     return null;
   }
 
-  validItems.sort((a, b) => b.score - a.score);
+  // Tie-break: prefer (1) category match, (2) exact difficulty, (3) closest duration
+  const targetWeeks = parseInt(answers.duration.replace(/\D/g, ''), 10);
+  const targetDifficulty = answers.difficulty.toLowerCase();
+  const targetCats = CATEGORY_MAP[answers.category] || [];
+
+  validItems.sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score;
+    const aCat = targetCats.some(c => (a.item.category?.toUpperCase() || '').includes(c)) ? 1 : 0;
+    const bCat = targetCats.some(c => (b.item.category?.toUpperCase() || '').includes(c)) ? 1 : 0;
+    if (aCat !== bCat) return bCat - aCat;
+    const aDiff = (a.item.difficulty?.toLowerCase() || '') === targetDifficulty ? 1 : 0;
+    const bDiff = (b.item.difficulty?.toLowerCase() || '') === targetDifficulty ? 1 : 0;
+    if (aDiff !== bDiff) return bDiff - aDiff;
+    const aWeeks = parseProgramWeeks(a.item.duration, a.item.weeks) || 0;
+    const bWeeks = parseProgramWeeks(b.item.duration, b.item.weeks) || 0;
+    return Math.abs(aWeeks - targetWeeks) - Math.abs(bWeeks - targetWeeks);
+  });
+
   const top = validItems[0];
-  
-  // Add fallback context when no strong match reasons exist
-  if (top.reasons.length === 0 || top.score < 30) {
-    const targetWeeks = parseInt(answers.duration.replace(/\D/g, ''), 10);
-    const itemWeeks = parseProgramWeeks(top.item.duration, top.item.weeks);
-    
-    if (targetWeeks && itemWeeks && targetWeeks !== itemWeeks) {
-      top.reasons.unshift(
-        `No ${targetWeeks}-week program is available for this combination right now`
-      );
-      top.reasons.push(
-        `This ${itemWeeks}-week option is the closest match for your goal and level`
-      );
-    }
-    
-    if (top.reasons.length === 0) {
-      top.reasons.push('Best available match based on your preferences');
-    }
+
+  // === HONEST EXPLANATIONS: surface gaps so the user understands the trade-off ===
+  const topCat = (top.item.category?.toUpperCase() || '');
+  const topDiff = (top.item.difficulty?.toLowerCase() || '');
+  const topWeeks = parseProgramWeeks(top.item.duration, top.item.weeks);
+  const goalLabel = formatGoalLabel(answers.category);
+
+  const categoryMatched = targetCats.some(c => topCat.includes(c));
+  const difficultyMatched = topDiff === targetDifficulty;
+  const durationMatched = topWeeks === targetWeeks;
+
+  const gaps: string[] = [];
+  if (!categoryMatched) {
+    gaps.push(
+      `We don't have a ${goalLabel} program matching all your criteria yet — this is the closest available alternative that delivers similar benefits.`
+    );
+  }
+  if (categoryMatched && !difficultyMatched && top.item.difficulty) {
+    gaps.push(
+      `No ${answers.difficulty} ${goalLabel} program at ${targetWeeks} weeks is available — this ${top.item.difficulty} option is the nearest fit and can be scaled to your level.`
+    );
+  }
+  if (categoryMatched && difficultyMatched && !durationMatched && topWeeks) {
+    gaps.push(
+      `No ${targetWeeks}-week ${answers.difficulty} ${goalLabel} program is available right now — this ${topWeeks}-week version is the closest match and delivers the same training stimulus.`
+    );
+  }
+
+  if (gaps.length > 0) {
+    top.reasons = [...gaps, ...top.reasons];
+  }
+
+  if (top.reasons.length === 0) {
+    top.reasons.push('Best available match based on your preferences');
   }
 
   return top;
