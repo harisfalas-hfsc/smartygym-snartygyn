@@ -350,17 +350,18 @@ serve(async (req) => {
 
   const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-  const effectiveDate = getCyprusDateStr();
-  console.log(`[ORCHESTRATOR] Effective date: ${effectiveDate}`);
-
   // Parse optional body. CHAIN FIX additions:
   //   - `slot`: limit work to a single slot (BODYWEIGHT|EQUIPMENT|VARIOUS)
   //   - `mode`: "verify" → only verify and alert if missing (used by
   //     backup-wod-generation and watchdog-wod-check). Never regenerates,
   //     never pulls from library.
+  //   - `targetDate`: explicit YYYY-MM-DD to build for. Used by the new
+  //     06:30/06:50 UTC morning crons to pre-build TOMORROW's WODs while the
+  //     gateway is calm. When omitted, falls back to today (Cyprus).
   let triggerSource = "orchestrator";
   let requestedSlot: string | null = null;
   let mode: "generate" | "verify" = "generate";
+  let bodyTargetDate: string | null = null;
   try {
     if (req.method === "POST") {
       const bodyText = await req.text();
@@ -376,11 +377,16 @@ serve(async (req) => {
           }
         }
         if (body?.mode === "verify") mode = "verify";
+        if (typeof body?.targetDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(body.targetDate)) {
+          bodyTargetDate = body.targetDate;
+        }
       }
     }
   } catch (parseError) {
     console.log(`[ORCHESTRATOR] No JSON body or invalid body. (${parseError instanceof Error ? parseError.message : String(parseError)})`);
   }
+  const effectiveDate = bodyTargetDate ?? getCyprusDateStr();
+  console.log(`[ORCHESTRATOR] Effective date: ${effectiveDate}${bodyTargetDate ? " (from body.targetDate)" : " (today Cyprus)"}`);
   console.log(`[ORCHESTRATOR] Trigger=${triggerSource} mode=${mode} slot=${requestedSlot ?? "ALL"}`);
 
   // ───────────────────────────────────────────────────────────────────────────
