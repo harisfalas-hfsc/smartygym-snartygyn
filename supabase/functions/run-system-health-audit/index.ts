@@ -721,9 +721,9 @@ const handler = async (req: Request): Promise<Response> => {
       const tomorrowCyprus = new Intl.DateTimeFormat('en-CA', {
         timeZone: 'Europe/Nicosia', year: 'numeric', month: '2-digit', day: '2-digit',
       }).format(tomorrowDate);
-      const tomorrowIsRecovery = (() => {
-        try { return isRecoveryDayForDate(tomorrowCyprus); } catch { return false; }
-      })();
+      const tomorrowDayIn84 = getDayIn84Cycle(tomorrowCyprus);
+      const tomorrowPeriodization = getPeriodizationForDay(tomorrowDayIn84);
+      const tomorrowIsRecovery = tomorrowPeriodization.category === 'RECOVERY';
       const expectedTomorrowCount = tomorrowIsRecovery ? 1 : 2;
       const { data: tomorrowWods } = await supabase
         .from('admin_workouts')
