@@ -430,14 +430,16 @@ serve(async (req) => {
     let onlyJobs: Job[] | null = null;
     let difficulty = "Intermediate";
     let difficultyStars = 3;
+    let allowDuplicates = false;
     try {
       const body = await req.json();
       if (Array.isArray(body?.jobs)) onlyJobs = body.jobs;
       if (typeof body?.difficulty === "string") difficulty = body.difficulty;
       if (typeof body?.difficulty_stars === "number") difficultyStars = body.difficulty_stars;
+      if (body?.allow_duplicates === true) allowDuplicates = true;
     } catch { /* no body */ }
 
-    log("Run config", { difficulty, difficultyStars });
+    log("Run config", { difficulty, difficultyStars, allowDuplicates });
 
     // Fetch existing names per category for dedup + idempotency (filtered by difficulty)
     const { data: existing } = await supabase
@@ -478,7 +480,7 @@ serve(async (req) => {
     for (const job of jobsToRun) {
       const key = `${job.category}|${job.equipment}`;
       // Idempotent: skip if a free workout for this (category, equipment, difficulty) triple already exists
-      if ((existingByKey.get(key)?.length ?? 0) > 0) {
+      if (!allowDuplicates && (existingByKey.get(key)?.length ?? 0) > 0) {
         log(`Skipping (already exists)`, { ...job, difficulty, existing: existingByKey.get(key) });
         results.push({ ...job, difficulty, status: "skipped", reason: "already exists", existing: existingByKey.get(key) });
         continue;
