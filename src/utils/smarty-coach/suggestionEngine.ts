@@ -1,4 +1,5 @@
 import { SmartyContext } from "@/hooks/useSmartyContext";
+import { WORKOUT_CATEGORY_FAMILIES, GOAL_LABELS, familyRank } from "./categoryFamilies";
 
 export interface QuestionAnswers {
   mood?: number;
@@ -26,26 +27,31 @@ export interface ScoredContent {
   item: ContentItem;
   score: number;
   reasons: string[];
+  _famRank: number;
+  _timeDiff: number;
+  _equipmentMatched: boolean;
+  _difficultyMatchedEnergy: boolean;
 }
 
-const GOAL_CATEGORY_MAP: Record<string, string[]> = {
-  fat_loss: ['CALORIE BURNING', 'METABOLIC', 'CARDIO', 'HIIT', 'TABATA'],
-  muscle_gain: ['STRENGTH', 'MUSCLE HYPERTROPHY', 'RESISTANCE'],
-  strength: ['STRENGTH', 'FUNCTIONAL STRENGTH', 'POWER'],
-  endurance: ['CARDIO', 'CARDIO ENDURANCE', 'METABOLIC'],
-  flexibility: ['MOBILITY & STABILITY', 'PILATES', 'RECOVERY', 'STRETCHING'],
-  general_fitness: ['FUNCTIONAL STRENGTH', 'CARDIO', 'METABOLIC'],
-  recovery: ['RECOVERY', 'PILATES', 'MOBILITY & STABILITY', 'STRETCHING'],
-};
-
 const LOW_ENERGY_CATEGORIES = ['RECOVERY', 'MOBILITY & STABILITY', 'PILATES', 'STRETCHING'];
-const HIGH_ENERGY_CATEGORIES = ['CHALLENGE', 'HIIT', 'METABOLIC', 'TABATA', 'STRENGTH'];
-const MOOD_BOOST_CATEGORIES = ['CARDIO', 'METABOLIC', 'CALORIE BURNING'];
 
 const parseDuration = (duration: string | null): number | null => {
   if (!duration) return null;
   const match = duration.match(/(\d+)/);
   return match ? parseInt(match[1], 10) : null;
+};
+
+const isBodyweight = (equipment: string | null | undefined): boolean => {
+  if (!equipment) return true;
+  const eq = equipment.toLowerCase().trim();
+  return eq === '' || eq === 'bodyweight' || eq === 'no equipment' || eq === 'none' || eq === 'home';
+};
+
+const inferDesiredDifficulty = (energy?: number): 'beginner' | 'intermediate' | 'advanced' | null => {
+  if (typeof energy !== 'number') return null;
+  if (energy <= 3) return 'beginner';
+  if (energy <= 6) return 'intermediate';
+  return 'advanced';
 };
 
 export const calculateScore = (
@@ -54,143 +60,128 @@ export const calculateScore = (
   context: SmartyContext
 ): ScoredContent => {
   let score = 0;
-  const reasons: string[] = [];
-
   const { mood, energy, goal, time, equipment } = answers;
   const categoryUpper = item.category?.toUpperCase() || '';
-  const difficultyLower = item.difficulty?.toLowerCase() || 'beginner';
+  const difficultyLower = item.difficulty?.toLowerCase() || '';
   const itemDuration = parseDuration(item.duration);
-  const itemEquipment = item.equipment?.toLowerCase() || '';
+  const itemBodyweight = isBodyweight(item.equipment);
 
-  // === COMPLETED PENALTY (hard exclude) ===
-  if (context.completedWorkoutIds.includes(item.id)) {
-    return { item, score: -1000, reasons: ['Already completed'] };
-  }
+  // === COMPLETED soft penalty ===
+  const isCompleted = context.completedWorkoutIds.includes(item.id);
+  if (isCompleted) score -= 200;
 
-  // === EQUIPMENT FILTER (hard constraint) ===
-  if (equipment === 'bodyweight') {
-    const isBodyweight = itemEquipment.includes('bodyweight') || 
-                         itemEquipment.includes('no equipment') || 
-                         itemEquipment === '' ||
-                         !item.equipment;
-    if (!isBodyweight) {
-      return { item, score: -1000, reasons: ['Requires equipment'] };
-    }
-    reasons.push('No equipment needed');
-    score += 10;
-  }
-
-  // === TIME FILTER ===
-  if (time && itemDuration) {
-    const timeDiff = Math.abs(itemDuration - time);
-    if (timeDiff <= 5) {
-      score += 30;
-      reasons.push(`Fits your ${time} min time perfectly`);
-    } else if (timeDiff <= 15) {
-      score += 15;
-      reasons.push(`Close to your ${time} min availability`);
-    } else if (itemDuration > time + 15) {
-      score -= 20;
-    }
-  }
-
-  // === GOAL ALIGNMENT ===
+  // === GOAL / CATEGORY (highest weight) ===
+  let famRank = -1;
   if (goal) {
-    const goalCategories = GOAL_CATEGORY_MAP[goal] || [];
-    const matchesGoal = goalCategories.some(cat => categoryUpper.includes(cat));
-    
-    if (matchesGoal) {
-      score += 40;
-      const goalLabels: Record<string, string> = {
-        fat_loss: 'fat loss',
-        muscle_gain: 'building muscle',
-        strength: 'getting stronger',
-        endurance: 'endurance',
-        flexibility: 'mobility & flexibility',
-        general_fitness: 'general fitness',
-        recovery: 'recovery',
-      };
-      reasons.push(`Your goal is ${goalLabels[goal]} — this ${item.category} workout is ideal for that`);
-    }
+    famRank = familyRank(WORKOUT_CATEGORY_FAMILIES, goal, categoryUpper);
+    if (famRank === 0) score += 600;
+    else if (famRank > 0) score += 250 - (famRank * 30);
+    else score -= 250;
   }
 
-  // === ENERGY-BASED SCORING ===
-  if (typeof energy === 'number') {
-    if (energy <= 3) {
-      const isLowEnergy = LOW_ENERGY_CATEGORIES.some(cat => categoryUpper.includes(cat));
-      if (isLowEnergy) {
-        score += 35;
-        reasons.push(`Energy is low (${energy}/10) — this ${item.category} workout won't drain you`);
-      }
-      if (difficultyLower === 'beginner') {
-        score += 20;
-        reasons.push('Beginner level protects your energy');
-      } else if (difficultyLower === 'advanced') {
-        score -= 30;
-      }
-    } else if (energy <= 6) {
-      if (difficultyLower === 'intermediate') {
-        score += 15;
-        reasons.push(`Energy is moderate (${energy}/10) — Intermediate difficulty is a good match`);
-      } else if (difficultyLower === 'beginner') {
-        score += 10;
-      }
-    } else {
-      const isHighEnergy = HIGH_ENERGY_CATEGORIES.some(cat => categoryUpper.includes(cat));
-      if (isHighEnergy) {
-        score += 30;
-        reasons.push(`Energy is high (${energy}/10) — time to challenge yourself!`);
-      }
-      if (difficultyLower === 'advanced') {
-        score += 20;
-        reasons.push('Advanced level matches your energy');
-      } else if (difficultyLower === 'intermediate') {
-        score += 10;
-      }
-    }
+  // === DIFFICULTY (inferred from energy) ===
+  const desiredDifficulty = inferDesiredDifficulty(energy);
+  let difficultyMatchedEnergy = false;
+  if (desiredDifficulty && difficultyLower) {
+    if (difficultyLower === desiredDifficulty) { score += 150; difficultyMatchedEnergy = true; }
+    else if (
+      (desiredDifficulty === 'beginner' && difficultyLower === 'intermediate') ||
+      (desiredDifficulty === 'advanced' && difficultyLower === 'intermediate') ||
+      (desiredDifficulty === 'intermediate' && (difficultyLower === 'beginner' || difficultyLower === 'advanced'))
+    ) score += 40;
+    else score -= 60;
   }
 
-  // === MOOD-BASED SCORING ===
-  if (typeof mood === 'number') {
-    if (mood <= 2) {
-      const isMoodBoost = MOOD_BOOST_CATEGORIES.some(cat => categoryUpper.includes(cat));
-      const isCalming = LOW_ENERGY_CATEGORIES.some(cat => categoryUpper.includes(cat));
-      if (isMoodBoost) {
-        score += 25;
-        reasons.push('Movement can boost your mood — this workout will help');
-      } else if (isCalming) {
-        score += 20;
-        reasons.push('A calming session might be what you need today');
-      }
-    } else if (mood >= 4) {
-      const isChallenge = HIGH_ENERGY_CATEGORIES.some(cat => categoryUpper.includes(cat));
-      if (isChallenge && (typeof energy === 'number' && energy >= 6)) {
-        score += 15;
-        reasons.push('Your positive mood is perfect for this workout');
-      }
-    }
+  // === TIME ===
+  let timeDiff = 99;
+  if (time && itemDuration) {
+    timeDiff = Math.abs(itemDuration - time);
+    if (timeDiff <= 5) score += 100;
+    else if (timeDiff <= 15) score += 50;
+    else if (itemDuration > time + 15) score -= 60;
   }
 
-  // === VARIETY BONUS ===
+  // === EQUIPMENT ===
+  let equipmentMatched = false;
+  if (equipment === 'bodyweight') {
+    if (itemBodyweight) { score += 100; equipmentMatched = true; }
+    else { score -= 250; }
+  } else {
+    if (!itemBodyweight) { score += 100; equipmentMatched = true; }
+    else { score += 15; }
+  }
+
+  // === MOOD micro-adjustment (does not override goal) ===
+  if (typeof mood === 'number' && mood <= 2) {
+    const isCalming = LOW_ENERGY_CATEGORIES.some(cat => categoryUpper.includes(cat));
+    if (isCalming) score += 20;
+  }
+
+  // === Variety: small bonus only ===
   const recentCategories = context.recentCategories || [];
-  const categoryDone = recentCategories.filter(c => 
-    c?.toUpperCase().includes(categoryUpper) || categoryUpper.includes(c?.toUpperCase() || '')
-  ).length;
-  
-  if (categoryDone === 0 && recentCategories.length > 0) {
-    score += 15;
-    reasons.push(`You haven't done ${item.category} recently — adds variety`);
+  const categoryDone = recentCategories.some(c =>
+    (c?.toUpperCase() || '').includes(categoryUpper) || categoryUpper.includes(c?.toUpperCase() || '')
+  );
+  if (!categoryDone && recentCategories.length > 0) score += 15;
+
+  return {
+    item, score, reasons: [],
+    _famRank: famRank,
+    _timeDiff: timeDiff,
+    _equipmentMatched: equipmentMatched,
+    _difficultyMatchedEnergy: difficultyMatchedEnergy,
+  };
+};
+
+const buildWorkoutExplanations = (top: ScoredContent, answers: QuestionAnswers): string[] => {
+  const reasons: string[] = [];
+  const { goal, time, equipment, energy } = answers;
+  const goalLabel = goal ? (GOAL_LABELS[goal] || goal) : '';
+  const cat = top.item.category || '';
+  const itemDuration = parseDuration(top.item.duration);
+  const itemBodyweight = isBodyweight(top.item.equipment);
+  const desiredDifficulty = inferDesiredDifficulty(energy);
+
+  const exactCategory = top._famRank === 0;
+  const fallbackCategory = top._famRank > 0;
+  const exactTime = time && itemDuration && Math.abs(itemDuration - time) <= 5;
+
+  const allMatch = exactCategory && top._equipmentMatched && exactTime && (!desiredDifficulty || top._difficultyMatchedEnergy);
+
+  if (allMatch) {
+    if (goalLabel) reasons.push(`Perfect match for your ${goalLabel} focus today.`);
+    if (itemDuration) reasons.push(`Fits your ${time}-minute window.`);
+    reasons.push(equipment === 'bodyweight' ? 'No equipment needed.' : 'Uses the equipment you have available.');
+    return reasons;
   }
 
-  // === COMEBACK BONUS ===
-  if (context.daysSinceLastWorkout >= 4) {
-    if (difficultyLower === 'beginner') {
-      score += 10;
-      reasons.push(`It's been ${context.daysSinceLastWorkout} days — ease back in`);
-    }
+  reasons.push(`We don't have a workout matching every choice you made — this is the closest professional fit.`);
+
+  if (goal) {
+    if (exactCategory) reasons.push(`Targets your ${goalLabel} focus directly.`);
+    else if (fallbackCategory) reasons.push(`No exact ${goalLabel} session was available — this ${cat.toLowerCase()} workout delivers similar training benefits.`);
   }
 
-  return { item, score, reasons };
+  if (desiredDifficulty && top.item.difficulty) {
+    if (top._difficultyMatchedEnergy) reasons.push(`${top.item.difficulty} matches your current energy.`);
+    else reasons.push(`Difficulty is ${top.item.difficulty} — closest available to your energy level.`);
+  }
+
+  if (time && itemDuration) {
+    if (exactTime) reasons.push(`Fits your ${time}-minute window.`);
+    else if (itemDuration < time) reasons.push(`Runs ${itemDuration} minutes (you have ${time}) — leaves room for warm-up or a short cool-down.`);
+    else reasons.push(`Runs ${itemDuration} minutes (you have ${time}) — slightly longer; you can shorten the last circuit if pressed for time.`);
+  }
+
+  if (top._equipmentMatched) {
+    reasons.push(equipment === 'bodyweight' ? 'No equipment needed.' : 'Uses the equipment you have available.');
+  } else if (equipment === 'bodyweight') {
+    reasons.push('Normally uses equipment — most movements can be substituted with bodyweight versions.');
+  } else {
+    reasons.push('Bodyweight-based — equipment not required today.');
+  }
+
+  return reasons;
 };
 
 export const generateSuggestions = (
@@ -201,19 +192,18 @@ export const generateSuggestions = (
   if (allContent.length === 0) return null;
 
   const scored = allContent.map(item => calculateScore(item, answers, context));
-  const validItems = scored.filter(s => s.score > -500);
+  scored.sort((a, b) => {
+    const aFam = a._famRank === -1 ? 999 : a._famRank;
+    const bFam = b._famRank === -1 ? 999 : b._famRank;
+    if (aFam !== bFam) return aFam - bFam;
+    if (a._equipmentMatched !== b._equipmentMatched) return a._equipmentMatched ? -1 : 1;
+    if (a._difficultyMatchedEnergy !== b._difficultyMatchedEnergy) return a._difficultyMatchedEnergy ? -1 : 1;
+    if (a._timeDiff !== b._timeDiff) return a._timeDiff - b._timeDiff;
+    return b.score - a.score;
+  });
 
-  if (validItems.length === 0) {
-    // All workouts excluded (completed) — no suggestion possible
-    return null;
-  }
-
-  validItems.sort((a, b) => b.score - a.score);
-  const top = validItems[0];
-  
-  if (top.reasons.length === 0 || top.score < 20) {
-    top.reasons.push('Best available match based on your preferences');
-  }
-
+  const top = scored[0];
+  if (!top) return null;
+  top.reasons = buildWorkoutExplanations(top, answers);
   return top;
 };

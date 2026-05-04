@@ -438,10 +438,10 @@ export const SmartyCoachModal = ({ isOpen, onClose }: SmartyCoachModalProps) => 
                     <div className="space-y-2 p-3 rounded-lg bg-muted/50">
                       <div className="flex items-center gap-2">
                         <Zap className="h-4 w-4 text-primary" />
-                        <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Why This For You</span>
+                        <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Why we recommend this</span>
                       </div>
                       <ul className="space-y-1.5">
-                        {suggestion.reasons.slice(0, 4).map((reason, index) => (
+                        {suggestion.reasons.slice(0, 6).map((reason, index) => (
                           <li key={index} className="text-sm text-foreground flex items-start gap-2">
                             <span className="text-primary mt-1">•</span><span>{reason}</span>
                           </li>
