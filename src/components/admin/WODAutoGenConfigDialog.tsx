@@ -30,9 +30,11 @@ interface WODAutoGenConfigDialogProps {
 export const WODAutoGenConfigDialog = ({ open, onOpenChange }: WODAutoGenConfigDialogProps) => {
   const queryClient = useQueryClient();
   
-  // Store time in Cyprus timezone for the UI
+  // Store time in Cyprus timezone for the UI.
+  // Default = 09:30 Cyprus (summer) = 06:30 UTC — calmest AI-gateway window;
+  // morning crons pre-build TOMORROW's WODs so midnight rollover is seamless.
   const [isEnabled, setIsEnabled] = useState(true);
-  const [cyprusHour, setCyprusHour] = useState(0); // 00:30 Cyprus = 22:30 UTC
+  const [cyprusHour, setCyprusHour] = useState(9);
   const [cyprusMinute, setCyprusMinute] = useState(30);
   const [pauseMode, setPauseMode] = useState<"none" | "tomorrow" | "days" | "indefinite">("none");
   const [pauseUntilDate, setPauseUntilDate] = useState<Date | undefined>(undefined);
@@ -61,7 +63,7 @@ export const WODAutoGenConfigDialog = ({ open, onOpenChange }: WODAutoGenConfigD
       setWodMode((config as any).wod_mode || "generate");
       
       // Convert stored UTC time to Cyprus time for display
-      const utcHour = config.generation_hour_utc ?? 22;
+      const utcHour = config.generation_hour_utc ?? 6;
       const utcMinute = (config as any).generation_minute_utc ?? 30;
       setCyprusHour(utcToCyprus(utcHour));
       setCyprusMinute(utcMinute);
@@ -178,7 +180,7 @@ export const WODAutoGenConfigDialog = ({ open, onOpenChange }: WODAutoGenConfigD
             WOD Auto-Generation Settings
           </DialogTitle>
           <DialogDescription>
-            Configure when the Workout of the Day is automatically generated
+            Configure when tomorrow's Workout of the Day is automatically pre-generated. Morning runs build the next day in advance, then become "today" automatically at midnight Cyprus.
           </DialogDescription>
         </DialogHeader>
 
