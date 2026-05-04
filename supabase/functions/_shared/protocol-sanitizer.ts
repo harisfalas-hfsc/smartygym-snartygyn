@@ -214,6 +214,19 @@ export function sanitizeProtocolBlocks(input: string | null | undefined): Protoc
 
   let cleaned = original;
   cleaned = stripDurationFromHeaders(cleaned, issues, fixes);
+  // PRE-STEP: auto-insert a single space when text is glued directly after
+  // an exercise token (`}}foo` -> `}} foo`). This is purely cosmetic but
+  // unblocks the hard validator below, which forbids `}}` followed by any
+  // non-whitespace, non-tag character. Safe — never deletes content.
+  cleaned = cleaned.replace(/\}\}([^\s<])/g, (match, next) => {
+    issues.push({
+      type: "stray_after_token",
+      detail: `auto-spaced after token before "${next}"`,
+      snippet: `}}${next}`,
+    });
+    fixes.push("Inserted missing space after exercise token");
+    return `}} ${next}`;
+  });
   cleaned = cleanStrayAfterToken(cleaned, issues, fixes, flagged);
   detectEmomOrphans(cleaned, flagged);
   detectNakedExercisePrescriptions(cleaned, flagged);
