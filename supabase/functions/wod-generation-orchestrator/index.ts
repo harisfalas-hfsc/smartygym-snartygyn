@@ -392,7 +392,14 @@ serve(async (req) => {
   // must be present). Generator success path uses STRUCTURAL contract because
   // image + Stripe are populated asynchronously after the WOD row is saved.
   const preCheckMode: WodContractMode = mode === "verify" ? "full" : "structural";
-  const preCheck = await verifyWodsExist(supabase, effectiveDate, preCheckMode);
+  // Verify-only (backup/watchdog) always checks the FULL day; generation
+  // pre-checks may be slot-scoped to match the cron that triggered them.
+  const preCheck = await verifyWodsExist(
+    supabase,
+    effectiveDate,
+    preCheckMode,
+    mode === "verify" ? null : requestedSlot,
+  );
 
   // VERIFY-ONLY MODE (used by backup + watchdog wrappers): never generate,
   // never pull from library. Just check, and alert if anything is missing.
@@ -558,7 +565,12 @@ serve(async (req) => {
       await delay(2000);
 
       // Verify WODs exist (structural — assets land asynchronously)
-      const verification = await verifyWodsExist(supabase, effectiveDate, "structural");
+      const verification = await verifyWodsExist(
+        supabase,
+        effectiveDate,
+        "structural",
+        requestedSlot,
+      );
       finalResult = verification;
 
       if (verification.success) {
