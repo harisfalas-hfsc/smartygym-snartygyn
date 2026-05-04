@@ -1115,10 +1115,16 @@ className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-co
 
             <Card className="border-2 border-border text-center hover:shadow-lg transition-all hover:-translate-y-1">
               <CardHeader>
-                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                <div className="hidden lg:block aspect-[16/9] overflow-hidden rounded-md mb-4 -mt-2">
+                  <img src={valueAccessibleToAll} alt="Accessible training for all levels" loading="lazy" className="w-full h-full object-cover" />
+                </div>
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4 lg:hidden">
                   <Users className="w-7 h-7 text-emerald-500" />
                 </div>
-                <CardTitle className="text-xl">Accessible to All </CardTitle>
+                <CardTitle className="text-xl flex items-center justify-center gap-2">
+                  <Users className="w-5 h-5 text-emerald-500 hidden lg:inline-block" />
+                  Accessible to All
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-sm text-muted-foreground">
@@ -1129,10 +1135,16 @@ className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-co
 
             <Card className="border-2 border-border text-center hover:shadow-lg transition-all hover:-translate-y-1">
               <CardHeader>
-                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                <div className="hidden lg:block aspect-[16/9] overflow-hidden rounded-md mb-4 -mt-2">
+                  <img src={valueSafeEffective} alt="Safe and effective training programs" loading="lazy" className="w-full h-full object-cover" />
+                </div>
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4 lg:hidden">
                   <Shield className="w-7 h-7 text-blue-500" />
                 </div>
-                <CardTitle className="text-xl">Safe & Effective</CardTitle>
+                <CardTitle className="text-xl flex items-center justify-center gap-2">
+                  <Shield className="w-5 h-5 text-blue-500 hidden lg:inline-block" />
+                  Safe & Effective
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-sm text-muted-foreground">
@@ -1166,10 +1178,16 @@ className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-co
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Card className="border-2 border-border text-center hover:shadow-lg transition-all hover:-translate-y-1">
               <CardHeader>
-                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                <div className="hidden lg:block aspect-[16/9] overflow-hidden rounded-md mb-4 -mt-2">
+                  <img src={valueEvidenceBased} alt="Evidence-based training methodology" loading="lazy" className="w-full h-full object-cover" />
+                </div>
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4 lg:hidden">
                   <Award className="w-7 h-7 text-cyan-500" />
                 </div>
-                <CardTitle className="text-xl">Evidence-Based</CardTitle>
+                <CardTitle className="text-xl flex items-center justify-center gap-2">
+                  <Award className="w-5 h-5 text-cyan-500 hidden lg:inline-block" />
+                  Evidence-Based
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-sm text-muted-foreground">
@@ -1180,10 +1198,16 @@ className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-co
 
             <Card className="border-2 border-border text-center hover:shadow-lg transition-all hover:-translate-y-1">
               <CardHeader>
-                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                <div className="hidden lg:block aspect-[16/9] overflow-hidden rounded-md mb-4 -mt-2">
+                  <img src={valueStructureClarity} alt="Structured workout plans with clarity" loading="lazy" className="w-full h-full object-cover" />
+                </div>
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4 lg:hidden">
                   <CheckCircle2 className="w-7 h-7 text-pink-500" />
                 </div>
-                <CardTitle className="text-xl">Structure & Clarity</CardTitle>
+                <CardTitle className="text-xl flex items-center justify-center gap-2">
+                  <CheckCircle2 className="w-5 h-5 text-pink-500 hidden lg:inline-block" />
+                  Structure & Clarity
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-sm text-muted-foreground">
@@ -1194,10 +1218,16 @@ className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-co
 
             <Card className="border-2 border-border text-center hover:shadow-lg transition-all hover:-translate-y-1">
               <CardHeader>
-                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                <div className="hidden lg:block aspect-[16/9] overflow-hidden rounded-md mb-4 -mt-2">
+                  <img src={valueHumanConnection} alt="Human connection in coaching" loading="lazy" className="w-full h-full object-cover" />
+                </div>
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4 lg:hidden">
                   <Heart className="w-7 h-7 text-red-500" />
                 </div>
-                <CardTitle className="text-xl">Human Connection</CardTitle>
+                <CardTitle className="text-xl flex items-center justify-center gap-2">
+                  <Heart className="w-5 h-5 text-red-500 hidden lg:inline-block" />
+                  Human Connection
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-sm text-muted-foreground">
@@ -1208,10 +1238,16 @@ className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-co
 
             <Card className="border-2 border-border text-center hover:shadow-lg transition-all hover:-translate-y-1">
               <CardHeader>
-                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                <div className="hidden lg:block aspect-[16/9] overflow-hidden rounded-md mb-4 -mt-2">
+                  <img src={valueResultsDriven} alt="Results-driven training programs" loading="lazy" className="w-full h-full object-cover" />
+                </div>
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4 lg:hidden">
                   <Target className="w-7 h-7 text-green-500" />
                 </div>
-                <CardTitle className="text-xl">Results-Driven</CardTitle>
+                <CardTitle className="text-xl flex items-center justify-center gap-2">
+                  <Target className="w-5 h-5 text-green-500 hidden lg:inline-block" />
+                  Results-Driven
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-sm text-muted-foreground">
