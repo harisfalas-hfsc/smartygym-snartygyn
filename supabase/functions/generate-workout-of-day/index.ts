@@ -368,7 +368,9 @@ async function runWodGeneration(params: {
     
     // Check what already exists for this date (idempotent + supports retryMissing)
     // CRITICAL: Fetch FULL workout details including main_workout for section validation
-    const { data: existingWODsForDate, error: existingWODsError } = await supabase
+    const { data: existingWODsForDate, error: existingWODsError } = testMode
+      ? { data: [] as any[], error: null as any }
+      : await supabase
       .from("admin_workouts")
       .select("id, name, equipment, generated_for_date, category, difficulty, difficulty_stars, format, main_workout")
       .eq("generated_for_date", effectiveDate)
