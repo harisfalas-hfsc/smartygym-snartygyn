@@ -290,6 +290,7 @@ async function generateOne(
   mode: "free" | "premium" = "free",
   premiumPrice: number = 4.99,
   premiumTier: string = "gold",
+  callerAuthHeader: string | null = null,
 ): Promise<{ ok: boolean; id?: string; name?: string; error?: string }> {
   const { category, equipment } = job;
   const { format, duration } = pickFormat(category);
@@ -384,15 +385,24 @@ async function generateOne(
       let stripePriceId: string | null = null;
       if (mode === "premium") {
         try {
-          const { data: spData, error: spErr } = await supabase.functions.invoke("create-stripe-product", {
-            body: {
+          const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+          const headers: Record<string, string> = { "Content-Type": "application/json" };
+          if (callerAuthHeader) headers["Authorization"] = callerAuthHeader;
+          const spRes = await fetch(`${supabaseUrl}/functions/v1/create-stripe-product`, {
+            method: "POST",
+            headers,
+            body: JSON.stringify({
               name: content.name,
               price: premiumPrice,
               contentType: "Workout",
               imageUrl: imageUrl,
-            },
+            }),
           });
-          if (spErr) throw new Error(spErr.message);
+          if (!spRes.ok) {
+            const txt = await spRes.text();
+            throw new Error(`create-stripe-product ${spRes.status}: ${txt}`);
+          }
+          const spData = await spRes.json();
           stripeProductId = spData?.product_id ?? null;
           stripePriceId = spData?.price_id ?? null;
           if (!stripeProductId || !stripePriceId) throw new Error("Stripe product creation returned no IDs");
@@ -530,6 +540,7 @@ serve(async (req) => {
         banned,
         difficulty, difficultyStars,
         mode, premiumPrice, premiumTier,
+        callerAuthHeader,
       );
       if (r.ok && r.name) existingNamesAll.add(r.name);
       results.push({ ...job, difficulty, ...r });
