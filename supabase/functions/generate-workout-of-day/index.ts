@@ -434,6 +434,17 @@ async function runWodGeneration(params: {
       equipmentTypesToGenerate = equipmentTypesToGenerate.filter((e) => e === slot);
       logStep("PLAN 2 slot filter applied", { slot, equipmentTypesToGenerate });
     }
+
+    // ───────────────────────────────────────────────────────────────────────
+    // TEST MODE: override the to-generate set with the explicitly forced
+    // equipment slot. Defaults to EQUIPMENT (the most representative path of
+    // the prior STRENGTH/Advanced failure).
+    // ───────────────────────────────────────────────────────────────────────
+    if (testMode) {
+      const testSlot = (forceEquipment || "EQUIPMENT") as any;
+      equipmentTypesToGenerate = [testSlot] as any;
+      logStep("TEST MODE: equipment override applied", { testSlot, equipmentTypesToGenerate });
+    }
     
     logStep("Equipment check", {
       isRecoveryDayEarly,
