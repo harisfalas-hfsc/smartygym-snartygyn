@@ -2865,6 +2865,36 @@ export type Database = {
         }
         Relationships: []
       }
+      wod_generation_notifications: {
+        Row: {
+          attempt_source: string | null
+          created_at: string
+          id: string
+          notified_at: string
+          slot: string
+          status: string
+          target_date: string
+        }
+        Insert: {
+          attempt_source?: string | null
+          created_at?: string
+          id?: string
+          notified_at?: string
+          slot: string
+          status: string
+          target_date: string
+        }
+        Update: {
+          attempt_source?: string | null
+          created_at?: string
+          id?: string
+          notified_at?: string
+          slot?: string
+          status?: string
+          target_date?: string
+        }
+        Relationships: []
+      }
       wod_generation_runs: {
         Row: {
           completed_at: string | null
