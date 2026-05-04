@@ -562,92 +562,6 @@ const Index = () => {
         </div>
         
         {isMobile ? <section className="pt-4 pb-2 px-4">
-            {/* WOD Card - Always visible with "Being Prepared" fallback (moved above carousel on mobile) */}
-            <div 
-              onClick={() => navigate('/workout/wod')} 
-              className="py-3 px-4 bg-primary/5 border-2 border-emerald-400 dark:border-emerald-500 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 transition-all cursor-pointer hover:shadow-md mb-6"
-            >
-              {/* Header */}
-              <div className="flex items-center gap-2 mb-3">
-                <Dumbbell className="w-5 h-5 text-primary flex-shrink-0" />
-                <span className="text-sm font-bold text-foreground">Your Workout of the Day</span>
-                <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
-              </div>
-              
-              {hasWods ? (
-                (() => {
-                  const wodCards = [bodyweightWod, equipmentWod, variousWod].filter(Boolean);
-                  const wodCount = wodCards.length;
-                  return (
-                    <div className={`grid ${wodCount === 1 ? 'grid-cols-1' : 'grid-cols-2'} gap-3`}>
-                      {bodyweightWod && (
-                        <div className="relative rounded-lg overflow-hidden border border-border">
-                          <img 
-                            src={bodyweightWod.image_url || '/placeholder.svg'} 
-                            alt={bodyweightWod.name}
-                            className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-cover`}
-                            onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
-                          />
-                          <Badge className="absolute top-1 left-1 bg-green-500 hover:bg-green-500 text-white text-[10px] px-1.5 py-0.5">No Equipment</Badge>
-                          <div className="p-2 bg-background/90">
-                            <p className="text-xs font-semibold line-clamp-1">{bodyweightWod.name}</p>
-                            <div className="flex items-center gap-1 text-[9px] text-muted-foreground">
-                              <span className="text-red-500">{bodyweightWod.category}</span>
-                              {bodyweightWod.format && (<><span>•</span><span>{bodyweightWod.format}</span></>)}
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                      {equipmentWod && (
-                        <div className="relative rounded-lg overflow-hidden border border-border">
-                          <img 
-                            src={equipmentWod.image_url || '/placeholder.svg'} 
-                            alt={equipmentWod.name}
-                            className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-cover`}
-                            onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
-                          />
-                          <Badge className="absolute top-1 left-1 bg-orange-500 hover:bg-orange-500 text-white text-[10px] px-1.5 py-0.5">With Equipment</Badge>
-                          <div className="p-2 bg-background/90">
-                            <p className="text-xs font-semibold line-clamp-1">{equipmentWod.name}</p>
-                            <div className="flex items-center gap-1 text-[9px] text-muted-foreground">
-                              <span className="text-red-500">{equipmentWod.category}</span>
-                              {equipmentWod.format && (<><span>•</span><span>{equipmentWod.format}</span></>)}
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                      {variousWod && !bodyweightWod && !equipmentWod && (
-                        <div className="relative rounded-lg overflow-hidden border border-border">
-                          <img 
-                            src={variousWod.image_url || '/placeholder.svg'} 
-                            alt={variousWod.name}
-                            className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-cover`}
-                            onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
-                          />
-                          <Badge className="absolute top-1 left-1 bg-cyan-500 hover:bg-cyan-500 text-white text-[10px] px-1.5 py-0.5">Recovery</Badge>
-                          <div className="p-2 bg-background/90">
-                            <p className="text-xs font-semibold line-clamp-1">{variousWod.name}</p>
-                            <div className="flex items-center gap-1 text-[9px] text-muted-foreground">
-                              <span className="text-red-500">{variousWod.category}</span>
-                              {variousWod.format && (<><span>•</span><span>{variousWod.format}</span></>)}
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })()
-              ) : (
-                <div className="text-center py-4">
-                  <Clock className="w-10 h-10 text-primary/50 mx-auto mb-2" />
-                  <p className="text-sm font-semibold text-foreground">Today's Workouts are Being Prepared</p>
-                  <p className="text-xs text-muted-foreground">
-                    Check back <span className="text-primary font-semibold">soon</span> for your fresh Workouts of the Day!
-                  </p>
-                </div>
-              )}
-            </div>
-
             {/* Mobile swipe indicator (homepage carousel) */}
             <div className="flex items-center justify-center gap-3 mb-3">
               <button
@@ -722,6 +636,112 @@ return <CarouselItem key={card.id} className="pl-2 basis-[75%] sm:basis-[60%]">
 
         {/* Quick Access Menu */}
         <div className="mt-8 space-y-3">
+          {/* WOD Card - Always visible with "Being Prepared" fallback */}
+          <div 
+            onClick={() => navigate('/workout/wod')} 
+            className="py-3 px-4 bg-primary/5 border-2 border-emerald-400 dark:border-emerald-500 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 transition-all cursor-pointer hover:shadow-md"
+          >
+            {/* Header */}
+            <div className="flex items-center gap-2 mb-3">
+              <Dumbbell className="w-5 h-5 text-primary flex-shrink-0" />
+              <span className="text-sm font-bold text-foreground">Your Workout of the Day</span>
+              <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
+            </div>
+            
+            {hasWods ? (
+              /* Workout images - dynamic columns based on count */
+              (() => {
+                const wodCards = [bodyweightWod, equipmentWod, variousWod].filter(Boolean);
+                const wodCount = wodCards.length;
+                return (
+                  <div className={`grid ${wodCount === 1 ? 'grid-cols-1' : 'grid-cols-2'} gap-3`}>
+                    {/* Bodyweight workout */}
+                    {bodyweightWod && (
+                      <div className="relative rounded-lg overflow-hidden border border-border">
+                        <img 
+                          src={bodyweightWod.image_url || '/placeholder.svg'} 
+                          alt={bodyweightWod.name}
+className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-cover`}
+                          onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
+                        />
+                        <Badge className="absolute top-1 left-1 bg-green-500 hover:bg-green-500 text-white text-[10px] px-1.5 py-0.5">No Equipment</Badge>
+                        <div className="p-2 bg-background/90">
+                          <p className="text-xs font-semibold line-clamp-1">{bodyweightWod.name}</p>
+                          <div className="flex items-center gap-1 text-[9px] text-muted-foreground">
+                            <span className="text-red-500">{bodyweightWod.category}</span>
+                            {bodyweightWod.format && (
+                              <>
+                                <span>•</span>
+                                <span>{bodyweightWod.format}</span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Equipment workout */}
+                    {equipmentWod && (
+                      <div className="relative rounded-lg overflow-hidden border border-border">
+                        <img 
+                          src={equipmentWod.image_url || '/placeholder.svg'} 
+                          alt={equipmentWod.name}
+className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-cover`}
+                          onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
+                        />
+                        <Badge className="absolute top-1 left-1 bg-orange-500 hover:bg-orange-500 text-white text-[10px] px-1.5 py-0.5">With Equipment</Badge>
+                        <div className="p-2 bg-background/90">
+                          <p className="text-xs font-semibold line-clamp-1">{equipmentWod.name}</p>
+                          <div className="flex items-center gap-1 text-[9px] text-muted-foreground">
+                            <span className="text-red-500">{equipmentWod.category}</span>
+                            {equipmentWod.format && (
+                              <>
+                                <span>•</span>
+                                <span>{equipmentWod.format}</span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    {variousWod && !bodyweightWod && !equipmentWod && (
+                      <div className="relative rounded-lg overflow-hidden border border-border">
+                        <img 
+                          src={variousWod.image_url || '/placeholder.svg'} 
+                          alt={variousWod.name}
+className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-cover`}
+                          onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
+                        />
+                        <Badge className="absolute top-1 left-1 bg-cyan-500 hover:bg-cyan-500 text-white text-[10px] px-1.5 py-0.5">Recovery</Badge>
+                        <div className="p-2 bg-background/90">
+                          <p className="text-xs font-semibold line-clamp-1">{variousWod.name}</p>
+                          <div className="flex items-center gap-1 text-[9px] text-muted-foreground">
+                            <span className="text-red-500">{variousWod.category}</span>
+                            {variousWod.format && (
+                              <>
+                                <span>•</span>
+                                <span>{variousWod.format}</span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()
+            ) : (
+              /* Being Prepared fallback */
+              <div className="text-center py-4">
+                <Clock className="w-10 h-10 text-primary/50 mx-auto mb-2" />
+                <p className="text-sm font-semibold text-foreground">Today's Workouts are Being Prepared</p>
+                <p className="text-xs text-muted-foreground">
+                  Check back <span className="text-primary font-semibold">soon</span> for your fresh Workouts of the Day!
+                </p>
+              </div>
+            )}
+          </div>
+
           <div onClick={() => navigate('/about')} className="flex items-center gap-2.5 py-3 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md">
             <Info className="w-5 h-5 text-primary flex-shrink-0" />
             <span className="text-base font-medium">About SmartyGym</span>
