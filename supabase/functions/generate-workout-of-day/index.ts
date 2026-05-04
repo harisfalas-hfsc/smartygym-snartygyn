@@ -564,7 +564,19 @@ async function runWodGeneration(params: {
     let updatedUsage: Record<string, string[]> = state.format_usage || {};
     
     // Category and difficulty are determined ONCE for both workouts
-    if (forcedParameters) {
+    if (testMode) {
+      // TEST MODE: caller fully controls category + difficulty (and optional format).
+      const cat = (forceCategory || "STRENGTH").toUpperCase();
+      const stars = forceDifficultyStars && forceDifficultyStars >= 1 && forceDifficultyStars <= 6
+        ? forceDifficultyStars
+        : 5;
+      const name = cat === "RECOVERY"
+        ? "Recovery"
+        : (stars <= 2 ? "Beginner" : stars <= 4 ? "Intermediate" : "Advanced");
+      category = cat;
+      selectedDifficulty = { name, stars: cat === "RECOVERY" ? 0 : stars };
+      logStep("TEST MODE: category/difficulty override", { category, selectedDifficulty, forceFormat });
+    } else if (forcedParameters) {
       // When retrying, ALWAYS match the existing workout's category and difficulty
       logStep("USING FORCED PARAMETERS FROM EXISTING WORKOUT", forcedParameters);
       category = forcedParameters.category;
