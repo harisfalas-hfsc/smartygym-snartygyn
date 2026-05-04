@@ -2913,6 +2913,54 @@ export type Database = {
         }
         Relationships: []
       }
+      wod_readiness_audits: {
+        Row: {
+          audit_date: string
+          created_at: string
+          failed_check_keys: string[] | null
+          failed_count: number
+          id: string
+          notes: string | null
+          overall_status: string
+          passed_count: number
+          results: Json | null
+          total_checks: number
+          triggered_by: string
+          warning_check_keys: string[] | null
+          warning_count: number
+        }
+        Insert: {
+          audit_date?: string
+          created_at?: string
+          failed_check_keys?: string[] | null
+          failed_count?: number
+          id?: string
+          notes?: string | null
+          overall_status?: string
+          passed_count?: number
+          results?: Json | null
+          total_checks?: number
+          triggered_by?: string
+          warning_check_keys?: string[] | null
+          warning_count?: number
+        }
+        Update: {
+          audit_date?: string
+          created_at?: string
+          failed_check_keys?: string[] | null
+          failed_count?: number
+          id?: string
+          notes?: string | null
+          overall_status?: string
+          passed_count?: number
+          results?: Json | null
+          total_checks?: number
+          triggered_by?: string
+          warning_check_keys?: string[] | null
+          warning_count?: number
+        }
+        Relationships: []
+      }
       wod_selection_cooldown: {
         Row: {
           category: string
