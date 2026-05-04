@@ -91,12 +91,14 @@ serve(async (req) => {
     const workouts = pendingItems.filter(item => item.content_type === 'workout');
     const programs = pendingItems.filter(item => item.content_type === 'program');
     const articles = pendingItems.filter(item => item.content_type === 'article');
+    const wods = pendingItems.filter(item => item.content_type === 'wod');
 
     const workoutCount = workouts.length;
     const programCount = programs.length;
     const articleCount = articles.length;
+    const wodCount = wods.length;
 
-    logStep("📊 Content breakdown", { workoutCount, programCount, articleCount });
+    logStep("📊 Content breakdown", { workoutCount, programCount, articleCount, wodCount });
 
     // Paginate through ALL users (listUsers defaults to 50 per page)
     logStep("🔍 Fetching all users with preferences");
@@ -209,6 +211,82 @@ serve(async (req) => {
       }
 
       logStep("📰 Article notifications sent", { articleCount, dashboardSuccess, emailSuccess });
+    }
+
+    // ============================================================
+    // WOD NOTIFICATIONS — queued by archive-old-wods at 00:00 Cyprus
+    // when tomorrow's pre-built WODs become today's active WODs.
+    // ============================================================
+    if (wodCount > 0) {
+      const bw = wods.find(w => w.content_name && (w.content_category || '').toUpperCase() !== 'RECOVERY');
+      const wodCategory = wods[0]?.content_category || 'Fitness';
+      const isRecoveryWod = (wodCategory || '').toUpperCase() === 'RECOVERY';
+      const wodSubject = isRecoveryWod
+        ? `🧘 Today's Recovery Workout is Live`
+        : `🏆 Today's Workouts (${wodCategory}) are Live`;
+
+      const wodNamesHtml = wods
+        .map(w => `<p class="tiptap-paragraph"><strong>${w.content_name}</strong></p>`)
+        .join('');
+
+      const wodDashboardContent = `
+        <p class="tiptap-paragraph">Today's <strong>${wodCategory}</strong> Workout of the Day is now available!</p>
+        ${wodNamesHtml}
+        <p class="tiptap-paragraph">Free for Premium members. €3.99 individually.</p>
+        <p class="tiptap-paragraph"><a href="/workout/wod" style="color: #29B6D2; text-decoration: underline;">View Today's Workouts →</a></p>
+      `;
+
+      const wodEmailHtml = buildEmailHtml(
+        wodSubject,
+        `<p style="font-size: 16px; line-height: 1.6; color: #333; margin-bottom: 15px;">Today's <strong>${wodCategory}</strong> Workout of the Day is now available on SmartyGym.</p>
+         ${wods.map(w => `<p style="font-size: 18px; font-weight: bold; color: #29B6D2; margin: 10px 0;">${w.content_name}</p>`).join('')}
+         <p style="font-size: 16px; line-height: 1.6; color: #333; margin-bottom: 20px;">Free for Premium members. €3.99 individually. Designed by Sports Scientist Haris Falas.</p>`,
+        [{ text: "View Today's Workouts", url: "https://smartygym.com/workout/wod" }]
+      );
+
+      for (const user of users) {
+        const prefs = prefsMap.get(user.id) || {};
+
+        if (prefs.opt_out_all === true) {
+          dashboardSkipped++;
+          emailSkipped++;
+          continue;
+        }
+
+        // Reuse new-workout preference (default true)
+        if (prefs.dashboard_new_workout !== false) {
+          const { error: msgError } = await supabase.from("user_system_messages").insert({
+            user_id: user.id,
+            message_type: MESSAGE_TYPES.WOD_NOTIFICATION,
+            subject: wodSubject,
+            content: wodDashboardContent,
+            is_read: false,
+          });
+          if (msgError) {
+            dashboardFailed++;
+            dashboardErrors.push({ user_id: user.id, error: msgError.message });
+          } else {
+            dashboardSuccess++;
+          }
+        } else {
+          dashboardSkipped++;
+        }
+
+        if (user.email && prefs.email_new_workout !== false) {
+          const result = await sendEmail(user.email, wodSubject, wodEmailHtml);
+          if (result.success) {
+            emailSuccess++;
+            await new Promise(resolve => setTimeout(resolve, 600));
+          } else {
+            emailFailed++;
+            emailErrors.push({ email: user.email, error: result.error || "Unknown error" });
+          }
+        } else {
+          emailSkipped++;
+        }
+      }
+
+      logStep("🏆 WOD notifications sent", { wodCount, dashboardSuccess, emailSuccess });
     }
 
     // Build notification content for workouts/programs
