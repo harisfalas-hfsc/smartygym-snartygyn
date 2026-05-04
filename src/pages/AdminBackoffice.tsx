@@ -209,15 +209,6 @@ export default function AdminBackoffice() {
             </div>
           </div>
           <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={() => navigate("/admin/migrate")}
-              className="gap-2"
-              disabled={isOffline}
-            >
-              Import Content
-            </Button>
-
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="default" className="gap-2" disabled={isOffline}>
