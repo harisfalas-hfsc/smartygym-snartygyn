@@ -842,7 +842,12 @@ This is a NUDGE, not a mandate.
     // ═══════════════════════════════════════════════════════════════════════════════
     let equipmentTypes: string[];
     
-    if (isRecoveryDay) {
+    if (testMode) {
+      // TEST MODE: always honour the explicit equipment override; recovery
+      // gating doesn't apply because we are not publishing for the day.
+      equipmentTypes = equipmentTypesToGenerate;
+      logStep("TEST MODE - equipmentTypes", { equipmentTypes });
+    } else if (isRecoveryDay) {
       // RECOVERY: Only generate ONE VARIOUS workout (use early check from line ~312)
       // CRITICAL: Use VARIOUS (not MIXED) to match database constraint valid_equipment
       equipmentTypes = variousComplete ? [] : ["VARIOUS"];
