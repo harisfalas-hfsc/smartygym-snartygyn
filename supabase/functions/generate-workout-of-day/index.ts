@@ -657,6 +657,11 @@ async function runWodGeneration(params: {
         const fmt = "REPS & SETS";
         return { format: fmt, duration: getDuration(fmt, selectedDifficulty.stars) };
       }
+
+      // TEST MODE: explicit format override (when category allows rotation).
+      if (testMode && forceFormat) {
+        return { format: forceFormat, duration: getDuration(forceFormat, selectedDifficulty.stars) };
+      }
       
       // For retry with forced parameters and format is specified (should only happen for STRENGTH/MOBILITY)
       if (forcedParameters?.format) {
