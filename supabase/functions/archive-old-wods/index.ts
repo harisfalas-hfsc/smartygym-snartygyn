@@ -150,50 +150,11 @@ serve(async (req) => {
 
     logStep(`Archival complete: ${archivedCount} WODs archived`);
 
-    // ============================================================
-    // QUEUE TODAY'S WODs FOR NEW-CONTENT NOTIFICATIONS
-    // After archival of yesterday's WODs, the pre-built WODs whose
-    // generated_for_date == today (Cyprus) are now active. Queue them
-    // so the every-10-min drainer (send-new-content-notifications-job)
-    // sends dashboard + email pings about today's new WODs.
-    // ============================================================
-    try {
-      // Cyprus date (DST-aware)
-      const monthNum = now.getUTCMonth() + 1;
-      const cyprusOffsetHrs = (monthNum >= 4 && monthNum <= 10) ? 3 : 2;
-      const cyprusNow = new Date(now.getTime() + cyprusOffsetHrs * 60 * 60 * 1000);
-      const cyprusTodayStr = cyprusNow.toISOString().split('T')[0];
+    // NOTE: WOD notifications are NOT queued here at midnight (people are sleeping).
+    // A dedicated cron `queue-wod-notifications-morning` runs at 05:00 UTC (07:00
+    // Cyprus) and queues today's active WODs into pending_content_notifications,
+    // so the every-10-min drainer delivers dashboard + email at a humane hour.
 
-      const { data: todaysWods, error: todaysErr } = await supabase
-        .from("admin_workouts")
-        .select("id, name, category, equipment, is_visible")
-        .eq("is_workout_of_day", true)
-        .eq("generated_for_date", cyprusTodayStr)
-        .eq("is_visible", true);
-
-      if (todaysErr) {
-        logStep("Could not fetch today's WODs to queue notification", { error: todaysErr.message });
-      } else if (todaysWods && todaysWods.length > 0) {
-        const rows = todaysWods.map(w => ({
-          content_id: w.id,
-          content_name: w.name,
-          content_type: 'wod',
-          content_category: w.category,
-        }));
-        const { error: insErr } = await supabase
-          .from("pending_content_notifications")
-          .insert(rows);
-        if (insErr) {
-          logStep("Failed to queue WOD notifications", { error: insErr.message });
-        } else {
-          logStep("Queued today's WODs for notification drainer", { count: rows.length, date: cyprusTodayStr });
-        }
-      } else {
-        logStep("No active WODs found for today; skipping notification queue", { cyprusTodayStr });
-      }
-    } catch (queueErr) {
-      logStep("Notification-queue step failed (non-fatal)", { error: (queueErr as Error).message });
-    }
 
     return new Response(
       JSON.stringify({
