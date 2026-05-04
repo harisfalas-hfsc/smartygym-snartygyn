@@ -5,6 +5,7 @@
 
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import Stripe from "https://esm.sh/stripe@18.5.0";
 import {
   processContentSectionAware,
   fetchAndBuildExerciseReference,
@@ -385,26 +386,33 @@ async function generateOne(
       let stripePriceId: string | null = null;
       if (mode === "premium") {
         try {
-          const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-          const headers: Record<string, string> = { "Content-Type": "application/json" };
-          if (callerAuthHeader) headers["Authorization"] = callerAuthHeader;
-          const spRes = await fetch(`${supabaseUrl}/functions/v1/create-stripe-product`, {
-            method: "POST",
-            headers,
-            body: JSON.stringify({
-              name: content.name,
-              price: premiumPrice,
-              contentType: "Workout",
-              imageUrl: imageUrl,
-            }),
-          });
-          if (!spRes.ok) {
-            const txt = await spRes.text();
-            throw new Error(`create-stripe-product ${spRes.status}: ${txt}`);
+          const stripeKey = Deno.env.get("STRIPE_SECRET_KEY") || "";
+          if (!stripeKey) throw new Error("STRIPE_SECRET_KEY not configured");
+          const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
+          const productData: any = {
+            name: content.name,
+            description: `Workout: ${content.name}`,
+            metadata: {
+              project: "SMARTYGYM",
+              content_type: "Workout",
+              source: "generate-free-category-workouts:premium",
+            },
+          };
+          if (imageUrl && imageUrl.startsWith("https://")) {
+            productData.images = [imageUrl];
           }
-          const spData = await spRes.json();
-          stripeProductId = spData?.product_id ?? null;
-          stripePriceId = spData?.price_id ?? null;
+          const product = await stripe.products.create(productData);
+          const priceObj = await stripe.prices.create({
+            product: product.id,
+            unit_amount: Math.round(premiumPrice * 100),
+            currency: "eur",
+            metadata: {
+              project: "SMARTYGYM",
+              content_type: "Workout",
+            },
+          });
+          stripeProductId = product.id;
+          stripePriceId = priceObj.id;
           if (!stripeProductId || !stripePriceId) throw new Error("Stripe product creation returned no IDs");
           log("Stripe product created", { id: stripeProductId, price: stripePriceId });
         } catch (e: any) {
