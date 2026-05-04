@@ -1087,10 +1087,16 @@ className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-co
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
             <Card className="border-2 border-border text-center hover:shadow-lg transition-all hover:-translate-y-1">
               <CardHeader>
-                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                <div className="hidden lg:block aspect-[16/9] overflow-hidden rounded-md mb-4 -mt-2">
+                  <img src={valueBuiltForRealLife} alt="Built for real life — busy professionals training" loading="lazy" className="w-full h-full object-cover" />
+                </div>
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4 lg:hidden">
                   <Target className="w-7 h-7 text-orange-500" />
                 </div>
-                <CardTitle className="text-xl">Built for Real Life</CardTitle>
+                <CardTitle className="text-xl flex items-center justify-center gap-2">
+                  <Target className="w-5 h-5 text-orange-500 hidden lg:inline-block" />
+                  Built for Real Life
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-sm text-muted-foreground">
@@ -1101,10 +1107,16 @@ className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-co
 
             <Card className="border-2 border-border text-center hover:shadow-lg transition-all hover:-translate-y-1">
               <CardHeader>
-                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                <div className="hidden lg:block aspect-[16/9] overflow-hidden rounded-md mb-4 -mt-2">
+                  <img src={valueScientificApproach} alt="Scientific approach to training" loading="lazy" className="w-full h-full object-cover" />
+                </div>
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4 lg:hidden">
                   <Brain className="w-7 h-7 text-purple-500" />
                 </div>
-                <CardTitle className="text-xl">Scientific Approach</CardTitle>
+                <CardTitle className="text-xl flex items-center justify-center gap-2">
+                  <Brain className="w-5 h-5 text-purple-500 hidden lg:inline-block" />
+                  Scientific Approach
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-sm text-muted-foreground">
