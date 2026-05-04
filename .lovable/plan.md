@@ -1,54 +1,46 @@
-I triggered the same WOD generation path manually and watched the logs.
+# End-to-End WOD Generation Test
 
-What failed:
-- The scheduled cron jobs did run.
-- The manual triggers also ran.
-- The AI generated workout text, but every attempt was rejected before database insert.
-- Exact blocking error: `Stray text glued to an exercise token (no whitespace between }}` and following text)`.
-- Because nothing was inserted, final verification found zero WODs.
+Verify the recent fixes (slot-scoped verification + sanitizer auto-repair) hold up under a fresh, real run by archiving today's two WODs and re-generating them via the orchestrator.
 
-There is also a second structural bug from the recent split:
-- When a cron asks for only BODYWEIGHT or only EQUIPMENT, `generate-workout-of-day` still performs final verification as if both slots must already exist.
-- That means a single-slot cron can fail/rollback even when it should only be responsible for its own slot.
+## Steps
 
-Plan I am confident in:
+1. **Snapshot current state**
+   - Query `admin_workouts` for today's `is_workout_of_day = true` rows (Cyprus date) and record their IDs, names, categories, image_url, stripe_product_id.
 
-1. Fix the protocol sanitizer so safe token spacing is auto-repaired before validation
-- In `supabase/functions/_shared/protocol-sanitizer.ts`, add a normalization step that inserts a space after every exercise token when text is glued directly after `}}`.
-- Example repair:
-  - before: `{{exercise:id:name}}2 sets...`
-  - after: `{{exercise:id:name}} 2 sets...`
-- Keep dangerous/ambiguous protocol checks, but do not reject an otherwise usable workout for a simple missing space.
+2. **Archive both active WODs**
+   - Invoke `archive-old-wods` edge function directly (it archives ALL active WODs regardless of date — exactly what we need for a clean test).
+   - Re-query to confirm `is_workout_of_day = false` and that they received serial numbers (AI-generated) or were cleared (library).
 
-2. Make single-slot generation verify only its own responsibility
-- In `supabase/functions/generate-workout-of-day/index.ts`, change final verification logic:
-  - BODYWEIGHT slot requires BODYWEIGHT only.
-  - EQUIPMENT slot requires EQUIPMENT only.
-  - VARIOUS slot requires VARIOUS only.
-  - no explicit slot still requires the full day set.
-- This prevents the BODYWEIGHT cron from failing because EQUIPMENT has not run yet, and prevents EQUIPMENT from rolling back BODYWEIGHT.
+3. **Trigger BODYWEIGHT generation**
+   - Call `wod-generation-orchestrator` with `{ slot: "BODYWEIGHT", force: true }`.
+   - Stream `wod-generation-orchestrator` + `generate-workout-of-day` logs in real time, watching for:
+     - Sanitizer auto-repair hits (`}}<text>` → `}} <text>`)
+     - Slot-scoped verification ("requested slot: BODYWEIGHT, found: BODYWEIGHT")
+     - Image generation trigger
+     - Stripe product link
+     - Final commit (no rollback)
 
-3. Make orchestrator verification match split cron behavior
-- In `supabase/functions/wod-generation-orchestrator/index.ts`, when a specific slot is requested:
-  - verify only that requested slot after generation.
-  - full-day verification remains for backup/watchdog/no-slot checks.
-- This keeps the split schedule correct while preserving the all-slots safety net later.
+4. **Trigger EQUIPMENT generation**
+   - Same as above with `{ slot: "EQUIPMENT", force: true }`.
 
-4. Add targeted logs for the exact generated slot outcome
-- Add clear logs showing:
-  - requested slot
-  - slots found after generation
-  - whether final verification is slot-scoped or full-day
-- This makes tomorrow’s failure/success immediately visible without guessing.
+5. **Verify final state**
+   - Run `scripts/wod-smoke-check.sql` equivalent: confirm `has_bodyweight_wod = true`, `has_equipment_wod = true` for today's Cyprus date.
+   - Confirm both rows have: `image_url IS NOT NULL`, `stripe_product_id IS NOT NULL`, `is_visible = true`, valid 5-section `main_workout`.
 
-5. Deploy and immediately re-test manually
-- Deploy only the affected WOD functions/shared code.
-- Trigger BODYWEIGHT manually and confirm it inserts one WOD.
-- Trigger EQUIPMENT manually and confirm it inserts the second WOD.
-- Confirm today’s database has both WODs visible.
-- Confirm missing Stripe/image assets are allowed initially and the Buy button remains protected until `stripe_price_id` exists.
+6. **Report**
+   - Per-slot summary: success/failure, time taken, any auto-repairs triggered, any retries.
+   - If anything fails, surface the exact log line and root cause before any further fixes.
 
-Expected result after approval:
-- The missing-space formatting issue will no longer kill generation.
-- The two split cron jobs will no longer fight the old “both must exist immediately” rule.
-- Today’s WODs can be regenerated manually after the fix, and tomorrow’s cron should follow the same corrected path.
+## Failure handling
+
+- If a slot fails to commit, do NOT auto-retry blindly. Capture the failure reason from logs, present it, and wait for direction.
+- If the watchdog or stripe-orphan-cleanup needs to run to clean partial state, mention it but don't run unprompted.
+
+## Affected systems (read/invoke only — no code changes)
+
+- `archive-old-wods` (invoke)
+- `wod-generation-orchestrator` (invoke ×2)
+- `generate-workout-of-day` (invoked downstream)
+- `admin_workouts` table (read before/after)
+
+No code edits in this plan — pure verification run.
