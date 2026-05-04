@@ -97,14 +97,17 @@ async function rollbackActiveWodsForDate(
   supabase: any,
   effectiveDate: string,
   reason: string,
+  slot: string | null = null,
 ) {
-  logStep("ROLLBACK: Clearing partial WOD publish", { effectiveDate, reason });
+  logStep("ROLLBACK: Clearing partial WOD publish", { effectiveDate, reason, slot });
 
-  const { data: activeWods, error: fetchError } = await supabase
+  let fetchQuery = supabase
     .from("admin_workouts")
     .select("id, name, equipment")
     .eq("generated_for_date", effectiveDate)
     .eq("is_workout_of_day", true);
+  if (slot) fetchQuery = fetchQuery.eq("equipment", slot);
+  const { data: activeWods, error: fetchError } = await fetchQuery;
 
   if (fetchError) {
     logStep("ROLLBACK: Failed to inspect active WODs", { effectiveDate, error: fetchError.message });
@@ -116,7 +119,7 @@ async function rollbackActiveWodsForDate(
     return;
   }
 
-  const { error: rollbackError } = await supabase
+  let updateQuery = supabase
     .from("admin_workouts")
     .update({
       is_workout_of_day: false,
@@ -126,6 +129,8 @@ async function rollbackActiveWodsForDate(
     })
     .eq("generated_for_date", effectiveDate)
     .eq("is_workout_of_day", true);
+  if (slot) updateQuery = updateQuery.eq("equipment", slot);
+  const { error: rollbackError } = await updateQuery;
 
   if (rollbackError) {
     logStep("ROLLBACK: Failed to clear partial WOD publish", { effectiveDate, error: rollbackError.message });
