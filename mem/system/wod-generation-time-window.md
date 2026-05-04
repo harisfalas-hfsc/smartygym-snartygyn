@@ -1,35 +1,39 @@
 ---
 name: WOD generation time window
-description: Daily WOD generation runs 06:30/06:50 UTC and pre-builds tomorrow; archive at 21:00 UTC rolls tomorrow into today
+description: Daily WOD generation runs 06:30/06:50 UTC pre-building TOMORROW with 4 retry passes (07:20–08:50 UTC); 09:30 Cyprus post-gen audit emails admin success or failure; archive 21:00 UTC
 type: feature
 ---
 
-# WOD Generation Time Window (LIVE since 2026-05-04)
+# WOD Generation Time Window (LIVE)
 
 ## Schedule (UTC)
 - 06:30 UTC — `generate-wod-bodyweight-daily` → builds **tomorrow's** bodyweight WOD
 - 06:50 UTC — `generate-wod-equipment-daily` → builds **tomorrow's** equipment WOD
+- 07:20 UTC — `wod-retry-pass-1` (retries missing slots for tomorrow only)
+- 07:30 UTC — `wod-post-generation-audit` (calls `run-system-health-audit` with `sendEmail:true` → admin email success or failure)
+- 07:50 UTC — `wod-retry-pass-2`
+- 08:20 UTC — `wod-retry-pass-3`
+- 08:50 UTC — `wod-retry-pass-4` (final)
 - 21:00 UTC (00:00 Cyprus) — `archive-old-wods` archives yesterday; tomorrow's pre-built WODs become "today" via `generated_for_date` filter
 
-## Rationale
-06:30/06:50 UTC is the calmest window on the AI gateway (US asleep, Asia winding down, EU not yet awake). The previous 21:05/21:25 UTC slot collided with the global peak and caused intermittent generation failures.
+## Cyprus times (winter / EET)
+08:30 BW · 08:50 EQ · 09:20 retry1 · 09:30 audit+email · 09:50 retry2 · 10:20 retry3 · 10:50 retry4 · 23:00 archive · 00:00 silent rollover · 07:00 user notifications
 
-## Cron payload contract
-Both morning jobs POST to `wod-generation-orchestrator` with:
-```json
-{ "triggerSource": "cron-bodyweight" | "cron-equipment",
-  "slot": "BODYWEIGHT" | "EQUIPMENT",
-  "targetDate": "<tomorrow Cyprus YYYY-MM-DD>" }
-```
-Orchestrator validates `targetDate` (regex `^\d{4}-\d{2}-\d{2}$`) and falls back to today (Cyprus) if missing.
+## Admin notifications
+- Orchestrator sends ONE email per (target_date, slot, status) tuple via `wod_generation_notifications` dedupe table.
+- Success → ✅ confirmation email after first successful pass.
+- Failure → ❌ alert after final attempt of any single orchestrator run.
+- Multiple retry crons therefore cannot spam the inbox.
 
-## Admin "change time" RPC
-`update_wod_cron_schedule(hour, minute)` reschedules **both** split jobs: bodyweight at chosen time, equipment at chosen + 20 min (carries hour). Also syncs `cron_job_metadata` and `wod_auto_generation_config`.
+## Internal orchestrator retries
+3 attempts × 45 s wait inside a single orchestrator invocation.
+External retry chain (4 crons × 30-min spacing) re-fires the orchestrator with `retryMissing:true`.
 
-## Health-audit guard
-`run-system-health-audit` adds a "Tomorrow's WODs Pre-Generated" check. After 12:00 UTC it fails if tomorrow's WODs are missing (warning before noon, when crons may not have run yet).
+## Admin UI
+"WOD Watchdog" button in WODManager (next to "Future Ready?") manually invokes `watchdog-wod-check`.
 
 ## Safety nets unchanged
-- 02:00 UTC `backup-wod-generation` (verify-only retry for today)
-- 02:15 UTC `watchdog-wod-check` (admin alert if today missing)
+- 02:00 UTC `backup-wod-generation` (verify-only)
+- 02:15 UTC `watchdog-wod-check` (display name "WOD Watchdog")
+- 14:00 UTC `daily-system-health-audit-after-generation` (17:00 Cyprus long-window check)
 - Manual "Generate New WOD" button always available
