@@ -486,6 +486,8 @@ serve(async (req) => {
 
     log("Run config", { difficulty, difficultyStars, allowDuplicates, mode, premiumPrice, premiumTier });
 
+    const callerAuthHeader = req.headers.get("Authorization");
+
     // Fetch existing names per category for dedup + idempotency (filtered by difficulty + mode)
     const existingQuery = supabase
       .from("admin_workouts")
