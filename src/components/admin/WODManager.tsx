@@ -517,122 +517,315 @@ export const WODManager = () => {
     }
   };
 
-  // Tomorrow Readiness Check: Verify system is ready for tomorrow's WOD generation
-  const handleTomorrowReadinessCheck = async () => {
+  // ===========================================================================
+  // FUTURE READY? — Comprehensive audit of the entire WOD generation pipeline
+  // ---------------------------------------------------------------------------
+  // Covers: cron infrastructure (Plan C+D split), last-7-day generation history,
+  // today's WOD integrity, next-7-day periodization, exercise library health,
+  // Stripe & image pipelines, auto-gen config consistency.
+  // Persists every run to wod_readiness_audits and flags RECURRING issues by
+  // matching stable check-keys against the previous 7 audits.
+  // ===========================================================================
+  const handleFutureReadinessCheck = async () => {
     setIsCheckingTomorrow(true);
+    type CheckResult = {
+      key: string;
+      section: string;
+      status: "pass" | "warn" | "fail";
+      title: string;
+      detail?: string;
+      fix?: string;
+    };
+    const results: CheckResult[] = [];
+    const add = (r: CheckResult) => results.push(r);
+
     try {
-      const tomorrow = new Date();
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      const tomorrowStr = format(tomorrow, "yyyy-MM-dd");
-      const tomorrowInfo = getWODInfoForDate(tomorrowStr);
-      const issues: string[] = [];
-      const ready: string[] = [];
-
-      // Check 1: Cron job is active
-      const { data: cronData } = await supabase
-        .from("cron_job_metadata")
-        .select("is_active, schedule")
-        .eq("job_name", "generate-workout-of-day")
-        .single();
-
-      if (cronData?.is_active) {
-        ready.push("✅ WOD generation cron job is active");
-      } else {
-        issues.push("❌ WOD generation cron job is NOT active");
-      }
-
-      // Check 2: Archive job is active
-      const { data: archiveCron } = await supabase
-        .from("cron_job_metadata")
-        .select("is_active")
-        .ilike("job_name", "%archive%")
-        .limit(1);
-
-      if (archiveCron && archiveCron.length > 0 && archiveCron[0].is_active) {
-        ready.push("✅ Archive job is active");
-      } else {
-        issues.push("⚠️ No active archive job found");
-      }
-
-      // Check 3: Morning notifications job is active
-      const { data: notifCron } = await supabase
-        .from("cron_job_metadata")
-        .select("is_active")
-        .eq("job_name", "send-morning-notifications-job")
-        .single();
-
-      if (notifCron?.is_active) {
-        ready.push("✅ Morning notifications job is active");
-      } else {
-        issues.push("⚠️ Morning notifications job is NOT active");
-      }
-
-      // Check 4: Expected periodization for tomorrow
-      const isRecovery = tomorrowInfo.category === "RECOVERY";
-      const expectedCount = isRecovery ? 1 : 2;
-      ready.push(`📅 Tomorrow (${tomorrowStr}): ${tomorrowInfo.category} - expect ${expectedCount} WOD(s)`);
-
-      // Check 5: Recent generation runs (last 3 days)
-      const { data: recentRuns } = await supabase
-        .from("wod_generation_runs")
-        .select("cyprus_date, status, found_count, expected_count")
-        .order("created_at", { ascending: false })
-        .limit(3);
-
-      if (recentRuns && recentRuns.length > 0) {
-        const successRuns = recentRuns.filter(r => r.status === "success").length;
-        const failedRuns = recentRuns.filter(r => r.status === "failed").length;
-        if (failedRuns > 0) {
-          issues.push(`⚠️ ${failedRuns} of last ${recentRuns.length} generation runs failed`);
-        } else {
-          ready.push(`✅ Last ${recentRuns.length} generation runs successful`);
-        }
-      } else {
-        ready.push("ℹ️ No recent generation run logs (new feature)");
-      }
-
-      // Check 6: Today's WOD exists (yesterday's generation worked)
       const todayStr = getCyprusTodayStr();
+      const todayInfo = getWODInfoForDate(todayStr);
+
+      // === SECTION A: Cron infrastructure (Plan C+D split jobs) ===
+      const expectedCrons = [
+        { name: "generate-wod-bodyweight-daily", label: "Bodyweight WOD generator", critical: true, key: "cron_bodyweight_inactive" },
+        { name: "generate-wod-equipment-daily", label: "Equipment WOD generator", critical: true, key: "cron_equipment_inactive" },
+        { name: "archive-old-wods", label: "Archive old WODs", critical: true, key: "cron_archive_inactive" },
+        { name: "backup-wod-generation", label: "Backup WOD generator (02:00)", critical: false, key: "cron_backup_inactive" },
+        { name: "watchdog-wod-check", label: "Watchdog WOD check (02:15)", critical: false, key: "cron_watchdog_inactive" },
+        { name: "send-morning-notifications-job", label: "Morning notifications", critical: false, key: "cron_morning_notif_inactive" },
+        { name: "daily-system-health-audit-after-generation", label: "Daily system health audit", critical: false, key: "cron_health_audit_inactive" },
+        { name: "sync-stripe-images-weekly", label: "Stripe images weekly sync", critical: false, key: "cron_stripe_sync_inactive" },
+      ];
+      const { data: cronRows } = await supabase
+        .from("cron_job_metadata")
+        .select("job_name, schedule, is_active");
+      const cronMap = new Map((cronRows || []).map((c: any) => [c.job_name, c]));
+      for (const c of expectedCrons) {
+        const row = cronMap.get(c.name);
+        if (!row) {
+          add({ key: c.key, section: "Cron", status: c.critical ? "fail" : "warn",
+            title: `${c.label} not registered`,
+            detail: `Job "${c.name}" missing from cron_job_metadata.`,
+            fix: "Re-run the cron registration migration." });
+        } else if (!row.is_active) {
+          add({ key: c.key, section: "Cron", status: c.critical ? "fail" : "warn",
+            title: `${c.label} is INACTIVE`,
+            detail: `Job "${c.name}" exists but is_active=false (schedule: ${row.schedule}).`,
+            fix: "Re-enable in admin Cron Manager." });
+        } else {
+          add({ key: c.key + "_ok", section: "Cron", status: "pass",
+            title: `${c.label} active`,
+            detail: `${c.name} — ${row.schedule}` });
+        }
+      }
+      // Sequencing check: bodyweight must run before equipment (avoids 150s timeout overlap)
+      const bw = cronMap.get("generate-wod-bodyweight-daily");
+      const eq = cronMap.get("generate-wod-equipment-daily");
+      if (bw?.schedule && eq?.schedule) {
+        const parseMin = (s: string) => {
+          const [m, h] = s.split(" ");
+          return parseInt(h) * 60 + parseInt(m);
+        };
+        const gap = parseMin(eq.schedule) - parseMin(bw.schedule);
+        if (gap < 10) {
+          add({ key: "cron_sequence_too_tight", section: "Cron", status: "warn",
+            title: "Bodyweight & equipment crons too close together",
+            detail: `Gap is ${gap} minutes; recommend ≥15 min to prevent overlap with the 150s edge timeout.`,
+            fix: "Stagger schedules (e.g. 21:05 and 21:25)." });
+        } else {
+          add({ key: "cron_sequence_ok", section: "Cron", status: "pass",
+            title: `Cron sequencing healthy (${gap} min gap)` });
+        }
+      }
+
+      // === SECTION B: Generation history (last 7 days) ===
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      const { data: runs } = await supabase
+        .from("wod_generation_runs")
+        .select("cyprus_date, status, found_count, expected_count, error_message, started_at")
+        .gte("started_at", sevenDaysAgo.toISOString())
+        .order("started_at", { ascending: false });
+      if (!runs || runs.length === 0) {
+        add({ key: "history_no_runs", section: "History", status: "warn",
+          title: "No generation runs logged in last 7 days",
+          fix: "If WODs are being generated, the run-tracker may be skipping inserts." });
+      } else {
+        const failed = runs.filter((r: any) => r.status === "failed");
+        const partial = runs.filter((r: any) => r.status === "success" && (r.found_count ?? 0) < (r.expected_count ?? 0));
+        const successCount = runs.length - failed.length;
+        if (failed.length > 0) {
+          add({ key: "history_failed_runs", section: "History", status: "fail",
+            title: `${failed.length}/${runs.length} generation runs failed in last 7 days`,
+            detail: failed.slice(0, 3).map((r: any) => `${r.cyprus_date}: ${r.error_message || "unknown"}`).join(" | "),
+            fix: "Inspect failed runs and rerun manually if needed." });
+        }
+        if (partial.length > 0) {
+          add({ key: "history_partial_runs", section: "History", status: "warn",
+            title: `${partial.length} partial generations (fewer WODs than expected)`,
+            detail: partial.slice(0, 3).map((r: any) => `${r.cyprus_date}: ${r.found_count}/${r.expected_count}`).join(" | "),
+            fix: "Backfill missing variants via Generate New WOD." });
+        }
+        if (failed.length === 0 && partial.length === 0) {
+          add({ key: "history_all_ok", section: "History", status: "pass",
+            title: `All ${successCount} generation runs successful in last 7 days` });
+        }
+      }
+
+      // === SECTION C: Today's WOD integrity ===
       const { data: todayWods } = await supabase
         .from("admin_workouts")
-        .select("id")
+        .select("id, name, image_url, stripe_product_id, stripe_price_id, category, difficulty_stars")
         .eq("generated_for_date", todayStr)
         .eq("is_workout_of_day", true);
-
-      const todayInfo = getWODInfoForDate(todayStr);
       const todayExpected = todayInfo.category === "RECOVERY" ? 1 : 2;
-
-      if (todayWods && todayWods.length >= todayExpected) {
-        ready.push(`✅ Today's WOD exists (${todayWods.length} workout${todayWods.length > 1 ? 's' : ''})`);
+      const todayCount = todayWods?.length || 0;
+      if (todayCount < todayExpected) {
+        add({ key: "today_wod_missing", section: "Today", status: "fail",
+          title: `Today's WODs missing or incomplete (${todayCount}/${todayExpected})`,
+          fix: "Click 'Generate New WOD' for today." });
       } else {
-        issues.push(`❌ Today's WOD missing or incomplete (${todayWods?.length || 0}/${todayExpected})`);
+        add({ key: "today_wod_count_ok", section: "Today", status: "pass",
+          title: `Today's WOD count correct (${todayCount}/${todayExpected})` });
+      }
+      if (todayWods && todayWods.length > 0) {
+        const noImage = todayWods.filter((w: any) => !w.image_url);
+        if (noImage.length > 0) {
+          add({ key: "today_image_missing", section: "Today", status: "warn",
+            title: `${noImage.length} of today's WODs missing image`,
+            detail: noImage.map((w: any) => w.name).join(", "),
+            fix: "Auto-image trigger should retry; if not, run Sync Stripe Images." });
+        } else {
+          add({ key: "today_images_ok", section: "Today", status: "pass", title: "All today's WODs have images" });
+        }
+        const noStripe = todayWods.filter((w: any) => !w.stripe_product_id || !w.stripe_price_id);
+        if (noStripe.length > 0) {
+          add({ key: "today_stripe_missing", section: "Today", status: "warn",
+            title: `${noStripe.length} of today's WODs missing Stripe link`,
+            detail: noStripe.map((w: any) => w.name).join(", "),
+            fix: "Run Sync Stripe Images to backfill product/price IDs." });
+        } else {
+          add({ key: "today_stripe_ok", section: "Today", status: "pass", title: "All today's WODs have Stripe linked" });
+        }
       }
 
-      // Display results
-      const message = [...ready, ...issues].join("\n");
-      
-      if (issues.length === 0) {
-        toast.success("Tomorrow Readiness: ALL SYSTEMS GO! ✅", {
-          description: `${tomorrowInfo.category} WOD will generate tonight`,
-          duration: 6000,
-        });
+      // === SECTION D: Next 7 days periodization ===
+      const upcoming: string[] = [];
+      for (let i = 1; i <= 7; i++) {
+        const d = new Date();
+        d.setDate(d.getDate() + i);
+        const ds = format(d, "yyyy-MM-dd");
+        const info = getWODInfoForDate(ds);
+        upcoming.push(`${ds} (Day ${getDayIn84Cycle(ds)}): ${info.category}`);
+      }
+      add({ key: "future_periodization", section: "Future", status: "pass",
+        title: "Next 7 days periodization plan",
+        detail: upcoming.join(" • ") });
+
+      // === SECTION E: Exercise library health ===
+      const { count: bodyweightCount } = await supabase
+        .from("exercises").select("*", { count: "exact", head: true }).ilike("equipment", "body weight");
+      const { count: totalExercises } = await supabase
+        .from("exercises").select("*", { count: "exact", head: true });
+      if ((bodyweightCount ?? 0) < 30) {
+        add({ key: "library_bodyweight_low", section: "Library", status: "warn",
+          title: `Only ${bodyweightCount ?? 0} bodyweight exercises in library`,
+          fix: "Add more bodyweight exercises to support Micro-Workouts and Plan C." });
       } else {
-        toast.warning(`Tomorrow Readiness: ${issues.length} issue(s)`, {
-          description: issues[0],
-          duration: 8000,
-        });
+        add({ key: "library_bodyweight_ok", section: "Library", status: "pass",
+          title: `Bodyweight library healthy (${bodyweightCount} exercises)` });
+      }
+      add({ key: "library_total", section: "Library", status: "pass",
+        title: `Total exercise library: ${totalExercises ?? 0} exercises` });
+
+      // === SECTION F: Stripe & image pipeline (last 7 days of WODs) ===
+      const { data: weekWods } = await supabase
+        .from("admin_workouts")
+        .select("name, generated_for_date, image_url, stripe_product_id")
+        .like("id", "WOD-%")
+        .gte("generated_for_date", format(sevenDaysAgo, "yyyy-MM-dd"));
+      if (weekWods && weekWods.length > 0) {
+        const missingImg = weekWods.filter((w: any) => !w.image_url);
+        const missingStripe = weekWods.filter((w: any) => !w.stripe_product_id);
+        if (missingImg.length > 0) {
+          add({ key: "week_images_missing", section: "Pipelines", status: "warn",
+            title: `${missingImg.length} WODs in last 7 days missing image`,
+            fix: "Image-repair trigger should fix; manually run Sync if persists." });
+        } else {
+          add({ key: "week_images_ok", section: "Pipelines", status: "pass", title: "All last-7-day WODs have images" });
+        }
+        if (missingStripe.length > 0) {
+          add({ key: "week_stripe_missing", section: "Pipelines", status: "warn",
+            title: `${missingStripe.length} WODs in last 7 days missing Stripe link`,
+            fix: "Run Sync Stripe Images." });
+        } else {
+          add({ key: "week_stripe_ok", section: "Pipelines", status: "pass", title: "All last-7-day WODs have Stripe linked" });
+        }
       }
 
-      console.log("=== TOMORROW READINESS CHECK ===");
-      console.log(message);
-      
-      if (issues.length > 0) {
-        alert(`Tomorrow Readiness Check:\n\n${message}`);
+      // === SECTION G: Auto-gen config consistency ===
+      const { data: autoCfg } = await supabase
+        .from("wod_auto_generation_config").select("*").limit(1).maybeSingle();
+      if (autoCfg) {
+        add({ key: "config_present", section: "Config", status: "pass",
+          title: `Auto-gen config present`,
+          detail: `Generation hour ${(autoCfg as any).generation_hour_utc}:${String((autoCfg as any).generation_minute_utc ?? 0).padStart(2, "0")} UTC` });
+      } else {
+        add({ key: "config_missing", section: "Config", status: "warn",
+          title: "wod_auto_generation_config row missing",
+          fix: "Insert default row in admin." });
       }
 
+      // === RECURRENCE MEMORY: compare against previous 7 audits ===
+      const { data: prevAudits } = await supabase
+        .from("wod_readiness_audits")
+        .select("audit_date, failed_check_keys, warning_check_keys")
+        .order("audit_date", { ascending: false })
+        .limit(7);
+
+      const failedKeys = results.filter(r => r.status === "fail").map(r => r.key);
+      const warningKeys = results.filter(r => r.status === "warn").map(r => r.key);
+      const recurringNotes: string[] = [];
+      const resolvedNotes: string[] = [];
+
+      for (const k of [...failedKeys, ...warningKeys]) {
+        const occurrences = (prevAudits || []).filter((a: any) =>
+          (a.failed_check_keys || []).includes(k) || (a.warning_check_keys || []).includes(k)
+        );
+        if (occurrences.length >= 1) {
+          recurringNotes.push(`🔁 RECURRING: "${k}" also flagged on ${occurrences.length} of last ${prevAudits?.length || 0} audits.`);
+          const r = results.find(rr => rr.key === k);
+          if (r) r.detail = (r.detail ? r.detail + " " : "") + `[Recurring ${occurrences.length + 1}× incl. today]`;
+        }
+      }
+      // Detect resolved issues
+      if (prevAudits && prevAudits.length > 0) {
+        const lastAudit: any = prevAudits[0];
+        const lastFailed: string[] = [...(lastAudit.failed_check_keys || []), ...(lastAudit.warning_check_keys || [])];
+        for (const k of lastFailed) {
+          if (!failedKeys.includes(k) && !warningKeys.includes(k) && !k.endsWith("_ok") && !k.startsWith("library_total") && !k.startsWith("future_") && !k.startsWith("config_present")) {
+            resolvedNotes.push(`✅ RESOLVED: "${k}" no longer failing.`);
+          }
+        }
+      }
+
+      const passedCount = results.filter(r => r.status === "pass").length;
+      const warnCount = warningKeys.length;
+      const failCount = failedKeys.length;
+      const overall = failCount > 0 ? "critical" : warnCount > 0 ? "warnings" : "healthy";
+
+      // Save to memory table
+      await supabase.from("wod_readiness_audits").insert({
+        triggered_by: "manual",
+        overall_status: overall,
+        total_checks: results.length,
+        passed_count: passedCount,
+        warning_count: warnCount,
+        failed_count: failCount,
+        results: results as any,
+        failed_check_keys: failedKeys,
+        warning_check_keys: warningKeys,
+        notes: [...recurringNotes, ...resolvedNotes].join("\n") || null,
+      });
+
+      // Build the report
+      const sections = ["Cron", "History", "Today", "Future", "Library", "Pipelines", "Config"];
+      const reportLines: string[] = [];
+      for (const s of sections) {
+        const sectionResults = results.filter(r => r.section === s);
+        if (sectionResults.length === 0) continue;
+        reportLines.push(`\n━━━ ${s.toUpperCase()} ━━━`);
+        for (const r of sectionResults) {
+          const icon = r.status === "pass" ? "✅" : r.status === "warn" ? "⚠️" : "❌";
+          reportLines.push(`${icon} ${r.title}`);
+          if (r.detail) reportLines.push(`   ${r.detail}`);
+          if (r.fix && r.status !== "pass") reportLines.push(`   FIX: ${r.fix}`);
+        }
+      }
+      if (recurringNotes.length || resolvedNotes.length) {
+        reportLines.push(`\n━━━ MEMORY ━━━`);
+        recurringNotes.forEach(n => reportLines.push(n));
+        resolvedNotes.forEach(n => reportLines.push(n));
+      }
+      const fullReport = reportLines.join("\n");
+
+      console.log("=== FUTURE READY? AUDIT ===" + fullReport);
+
+      const summary = `${passedCount} ✅, ${warnCount} ⚠️, ${failCount} ❌` +
+        (recurringNotes.length ? `, ${recurringNotes.length} 🔁 recurring` : "");
+      if (overall === "healthy") {
+        toast.success(`Future Ready: ALL SYSTEMS GO ✅`, { description: summary, duration: 6000 });
+      } else if (overall === "warnings") {
+        toast.warning(`Future Ready: warnings detected`, { description: summary, duration: 8000 });
+      } else {
+        toast.error(`Future Ready: critical issues`, { description: summary, duration: 10000 });
+      }
+      if (failCount > 0 || warnCount > 0) {
+        alert(`FUTURE READY? AUDIT\n${summary}\n${fullReport}`);
+      } else {
+        alert(`FUTURE READY? AUDIT — ALL HEALTHY\n${summary}\n${fullReport}`);
+      }
     } catch (error: any) {
-      console.error("Tomorrow readiness check error:", error);
-      toast.error("Readiness check failed", {
+      console.error("Future readiness check error:", error);
+      toast.error("Future Ready check failed", {
         description: error.message || "Please try again",
       });
     } finally {
@@ -724,15 +917,15 @@ export const WODManager = () => {
             size="sm"
             className="flex items-center gap-1 sm:gap-2 border-purple-500 text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3"
             disabled={isCheckingTomorrow}
-            onClick={handleTomorrowReadinessCheck}
+            onClick={handleFutureReadinessCheck}
           >
             {isCheckingTomorrow ? (
               <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
             ) : (
               <Rocket className="h-3 w-3 sm:h-4 sm:w-4 text-purple-500" />
             )}
-            <span className="hidden sm:inline">{isCheckingTomorrow ? "Checking..." : "Tomorrow Ready?"}</span>
-            <span className="sm:hidden">{isCheckingTomorrow ? "..." : "Ready?"}</span>
+            <span className="hidden sm:inline">{isCheckingTomorrow ? "Auditing..." : "Future Ready?"}</span>
+            <span className="sm:hidden">{isCheckingTomorrow ? "..." : "Future?"}</span>
           </Button>
           
           <Button 
