@@ -69,17 +69,17 @@ export const CronJobsDocumentation = () => {
               <tr>
                 <td className="border border-gray-300 p-3">
                   <strong>WOD Generation</strong><br/>
-                  <span className="text-gray-600 text-xs">2 fresh workouts (bodyweight + equipment)</span>
+                  <span className="text-gray-600 text-xs">2 fresh workouts (bodyweight + equipment) — pre-built for TOMORROW</span>
                 </td>
-                <td className="border border-gray-300 p-3">Daily at 00:00</td>
+                <td className="border border-gray-300 p-3">Daily at 09:30 + 09:50 (06:30 + 06:50 UTC)</td>
                 <td className="border border-gray-300 p-3">System (no notification sent)</td>
               </tr>
               <tr className="bg-gray-50">
                 <td className="border border-gray-300 p-3">
                   <strong>WOD Archive</strong><br/>
-                  <span className="text-gray-600 text-xs">Previous day WODs archived</span>
+                  <span className="text-gray-600 text-xs">Previous day WODs archived; tomorrow's pre-built WODs roll into today</span>
                 </td>
-                <td className="border border-gray-300 p-3">Daily at 23:55</td>
+                <td className="border border-gray-300 p-3">Daily at 00:00 (21:00 UTC)</td>
                 <td className="border border-gray-300 p-3">System (no notification sent)</td>
               </tr>
               <tr>

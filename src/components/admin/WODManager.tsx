@@ -140,7 +140,7 @@ export const WODManager = () => {
   // Check if schedule is out of sync
   const isScheduleOutOfSync = (() => {
     if (!wodAutoGenConfig || !cronJobMetadata?.schedule) return false;
-    const configHour = wodAutoGenConfig.generation_hour_utc ?? 22;
+    const configHour = wodAutoGenConfig.generation_hour_utc ?? 6;
     const configMinute = (wodAutoGenConfig as any).generation_minute_utc ?? 30;
     const expectedCron = `${configMinute} ${configHour} * * *`;
     return cronJobMetadata.schedule !== expectedCron;
@@ -323,7 +323,7 @@ export const WODManager = () => {
         });
       } else if (!todayWods || todayWods.length === 0) {
         // Get dynamic generation time from config
-        const genHour = wodAutoGenConfig?.generation_hour_utc ?? 22;
+        const genHour = wodAutoGenConfig?.generation_hour_utc ?? 6;
         const genMinute = (wodAutoGenConfig as any)?.generation_minute_utc ?? 30;
         const cyprusHour = utcToCyprus(genHour);
         const isRecovery = expectedInfo.category === "RECOVERY";
@@ -589,7 +589,7 @@ export const WODManager = () => {
           add({ key: "cron_sequence_too_tight", section: "Cron", status: "warn",
             title: "Bodyweight & equipment crons too close together",
             detail: `Gap is ${gap} minutes; recommend ≥15 min to prevent overlap with the 150s edge timeout.`,
-            fix: "Stagger schedules (e.g. 21:05 and 21:25)." });
+            fix: "Stagger schedules (e.g. 06:30 and 06:50)." });
         } else {
           add({ key: "cron_sequence_ok", section: "Cron", status: "pass",
             title: `Cron sequencing healthy (${gap} min gap)` });
@@ -887,7 +887,7 @@ export const WODManager = () => {
           </h3>
           <p className="text-sm text-muted-foreground">
             {(() => {
-              const utcHour = wodAutoGenConfig?.generation_hour_utc ?? 22;
+              const utcHour = wodAutoGenConfig?.generation_hour_utc ?? 6;
               const utcMinute = (wodAutoGenConfig as any)?.generation_minute_utc ?? 30;
               const cyprusHour = utcToCyprus(utcHour);
               return `Generate, edit, and manage daily workouts. WODs auto-generate at ${cyprusHour.toString().padStart(2, '0')}:${utcMinute.toString().padStart(2, '0')} Cyprus (${utcHour.toString().padStart(2, '0')}:${utcMinute.toString().padStart(2, '0')} UTC).`;
@@ -1173,7 +1173,7 @@ export const WODManager = () => {
                 )}
                 <p className="text-sm font-medium">
                   {(() => {
-                    const utcHour = wodAutoGenConfig?.generation_hour_utc ?? 22;
+                    const utcHour = wodAutoGenConfig?.generation_hour_utc ?? 6;
                     const utcMinute = (wodAutoGenConfig as any)?.generation_minute_utc ?? 30;
                     return `${utcHour.toString().padStart(2, '0')}:${utcMinute.toString().padStart(2, '0')} UTC`;
                   })()}
@@ -1190,7 +1190,7 @@ export const WODManager = () => {
             </div>
             <p className="text-xs text-muted-foreground mt-1">
               {(() => {
-                const utcHour = wodAutoGenConfig?.generation_hour_utc ?? 22;
+                const utcHour = wodAutoGenConfig?.generation_hour_utc ?? 6;
                 const utcMinute = (wodAutoGenConfig as any)?.generation_minute_utc ?? 30;
                 const cyprusHour = utcToCyprus(utcHour);
                 return `${cyprusHour.toString().padStart(2, '0')}:${utcMinute.toString().padStart(2, '0')} Cyprus`;

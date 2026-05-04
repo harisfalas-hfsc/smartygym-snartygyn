@@ -283,7 +283,7 @@ export const WODSchedulePreview = () => {
           <p className="text-xs text-muted-foreground pt-2">
             <Clock className="h-3 w-3 inline mr-1" />
             {(() => {
-              const utcHour = wodConfig?.generation_hour_utc ?? 22;
+              const utcHour = wodConfig?.generation_hour_utc ?? 6;
               const utcMinute = (wodConfig as any)?.generation_minute_utc ?? 30;
               const cyprusHour = utcToCyprus(utcHour);
               return `WODs generate daily at ${cyprusHour.toString().padStart(2, '0')}:${utcMinute.toString().padStart(2, '0')} Cyprus (${utcHour.toString().padStart(2, '0')}:${utcMinute.toString().padStart(2, '0')} UTC)`;
