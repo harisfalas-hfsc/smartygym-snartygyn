@@ -105,7 +105,7 @@ export const GenerateWODDialog = ({
             Generate Workout of the Day
           </DialogTitle>
           <DialogDescription>
-            Choose when to generate the WOD. Pre-generating for a future date will prevent the cron job from generating on that day.
+            Choose when to generate the WOD. The morning crons (06:30 / 06:50 UTC = 09:30 / 09:50 Cyprus summer) already pre-build TOMORROW's WODs automatically — use this dialog only to fix today, or to pre-build further ahead.
           </DialogDescription>
         </DialogHeader>
         
@@ -159,7 +159,7 @@ export const GenerateWODDialog = ({
               <Label htmlFor="future" className="flex-1 cursor-pointer">
                 <div className="font-medium">Pre-Generate for Future Date</div>
                 <div className="text-sm text-muted-foreground">
-                  Schedule ahead, cron will skip that day
+                  Build further ahead (cron already covers tomorrow). Cron will skip any pre-built day.
                 </div>
               </Label>
             </div>
