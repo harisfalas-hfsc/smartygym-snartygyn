@@ -3400,6 +3400,7 @@ export type Database = {
         Args: { _program_id?: string }
         Returns: {
           category: string
+          created_at: string
           days_per_week: number
           description: string
           difficulty: string
@@ -3418,6 +3419,7 @@ export type Database = {
           stripe_price_id: string
           stripe_product_id: string
           tier_required: string
+          updated_at: string
           weeks: number
         }[]
       }
