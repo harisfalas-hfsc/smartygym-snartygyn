@@ -743,6 +743,20 @@ serve(async (req) => {
       finalResult?.isRecoveryDay || false
     );
 
+    // Also send the deduped one-shot failure email so retry passes don't spam.
+    try {
+      await notifyAdminOnce(supabase, {
+        targetDate: effectiveDate,
+        slot: requestedSlot || "ALL",
+        status: "failure",
+        triggerSource,
+        foundSlots: finalResult?.found || [],
+        missingSlots: finalResult?.missing || ["UNKNOWN"],
+      });
+    } catch (notifyErr) {
+      console.error("[ORCHESTRATOR] failure notify failed:", notifyErr);
+    }
+
     // Update run log with failure
     if (runLog?.id) {
       await supabase
