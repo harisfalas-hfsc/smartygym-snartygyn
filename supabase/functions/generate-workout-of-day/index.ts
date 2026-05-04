@@ -285,6 +285,11 @@ async function runWodGeneration(params: {
   retryMissing: boolean;
   triggerSource: string;
   slot?: 'BODYWEIGHT' | 'EQUIPMENT' | 'VARIOUS' | null;
+  testMode?: boolean;
+  forceCategory?: string | null;
+  forceDifficultyStars?: number | null;
+  forceEquipment?: 'BODYWEIGHT' | 'EQUIPMENT' | 'VARIOUS' | null;
+  forceFormat?: string | null;
 }): Promise<Response> {
   let cleanupSupabase: any = null;
   let effectiveDateForCleanup: string | null = null;
@@ -294,6 +299,11 @@ async function runWodGeneration(params: {
     const skipNotifications = params.skipNotifications;
     const retryMissing = params.retryMissing;
     const slot = params.slot || null;
+    const testMode = params.testMode === true;
+    const forceCategory = params.forceCategory || null;
+    const forceDifficultyStars = typeof params.forceDifficultyStars === "number" ? params.forceDifficultyStars : null;
+    const forceEquipment = params.forceEquipment || null;
+    const forceFormat = params.forceFormat || null;
 
     logStep("Background runner started", {
       triggerSource: params.triggerSource,
@@ -301,6 +311,11 @@ async function runWodGeneration(params: {
       retryMissing,
       skipNotifications,
       slot,
+      testMode,
+      forceCategory,
+      forceDifficultyStars,
+      forceEquipment,
+      forceFormat,
     });
 
     // Cyprus date (Europe/Athens) — DST-safe via shared helper.
@@ -335,18 +350,27 @@ async function runWodGeneration(params: {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
     cleanupSupabase = supabase;
-    effectiveDateForCleanup = effectiveDate;
+    // In testMode we never want the unhandled-error path to roll back today's
+    // published WODs. Leave effectiveDateForCleanup null for tests.
+    effectiveDateForCleanup = testMode ? null : effectiveDate;
 
     // ═══════════════════════════════════════════════════════════════════════════════
     // EARLY RECOVERY DAY CHECK: Using simplified 84-day cycle
     // ═══════════════════════════════════════════════════════════════════════════════
     const dayIn84 = getDayIn84Cycle(effectiveDate);
     const earlyPeriodization = getPeriodizationForDay(dayIn84);
-    const isRecoveryDayEarly = earlyPeriodization.category === "RECOVERY";
+    let isRecoveryDayEarly = earlyPeriodization.category === "RECOVERY";
+    // In testMode, the recovery flag is driven by the forced category, not by
+    // the calendar. STRENGTH/Advanced (default test) is never a recovery day.
+    if (testMode && forceCategory) {
+      isRecoveryDayEarly = forceCategory.toUpperCase() === "RECOVERY";
+    }
     
     // Check what already exists for this date (idempotent + supports retryMissing)
     // CRITICAL: Fetch FULL workout details including main_workout for section validation
-    const { data: existingWODsForDate, error: existingWODsError } = await supabase
+    const { data: existingWODsForDate, error: existingWODsError } = testMode
+      ? { data: [] as any[], error: null as any }
+      : await supabase
       .from("admin_workouts")
       .select("id, name, equipment, generated_for_date, category, difficulty, difficulty_stars, format, main_workout")
       .eq("generated_for_date", effectiveDate)
@@ -409,6 +433,17 @@ async function runWodGeneration(params: {
     if (slot && (slot === "BODYWEIGHT" || slot === "EQUIPMENT")) {
       equipmentTypesToGenerate = equipmentTypesToGenerate.filter((e) => e === slot);
       logStep("PLAN 2 slot filter applied", { slot, equipmentTypesToGenerate });
+    }
+
+    // ───────────────────────────────────────────────────────────────────────
+    // TEST MODE: override the to-generate set with the explicitly forced
+    // equipment slot. Defaults to EQUIPMENT (the most representative path of
+    // the prior STRENGTH/Advanced failure).
+    // ───────────────────────────────────────────────────────────────────────
+    if (testMode) {
+      const testSlot = (forceEquipment || "EQUIPMENT") as any;
+      equipmentTypesToGenerate = [testSlot] as any;
+      logStep("TEST MODE: equipment override applied", { testSlot, equipmentTypesToGenerate });
     }
     
     logStep("Equipment check", {
@@ -529,7 +564,19 @@ async function runWodGeneration(params: {
     let updatedUsage: Record<string, string[]> = state.format_usage || {};
     
     // Category and difficulty are determined ONCE for both workouts
-    if (forcedParameters) {
+    if (testMode) {
+      // TEST MODE: caller fully controls category + difficulty (and optional format).
+      const cat = (forceCategory || "STRENGTH").toUpperCase();
+      const stars = forceDifficultyStars && forceDifficultyStars >= 1 && forceDifficultyStars <= 6
+        ? forceDifficultyStars
+        : 5;
+      const name = cat === "RECOVERY"
+        ? "Recovery"
+        : (stars <= 2 ? "Beginner" : stars <= 4 ? "Intermediate" : "Advanced");
+      category = cat;
+      selectedDifficulty = { name, stars: cat === "RECOVERY" ? 0 : stars };
+      logStep("TEST MODE: category/difficulty override", { category, selectedDifficulty, forceFormat });
+    } else if (forcedParameters) {
       // When retrying, ALWAYS match the existing workout's category and difficulty
       logStep("USING FORCED PARAMETERS FROM EXISTING WORKOUT", forcedParameters);
       category = forcedParameters.category;
@@ -609,6 +656,11 @@ async function runWodGeneration(params: {
       if (cat === "STRENGTH" || cat === "MOBILITY & STABILITY" || cat === "PILATES") {
         const fmt = "REPS & SETS";
         return { format: fmt, duration: getDuration(fmt, selectedDifficulty.stars) };
+      }
+
+      // TEST MODE: explicit format override (when category allows rotation).
+      if (testMode && forceFormat) {
+        return { format: forceFormat, duration: getDuration(forceFormat, selectedDifficulty.stars) };
       }
       
       // For retry with forced parameters and format is specified (should only happen for STRENGTH/MOBILITY)
@@ -790,7 +842,12 @@ This is a NUDGE, not a mandate.
     // ═══════════════════════════════════════════════════════════════════════════════
     let equipmentTypes: string[];
     
-    if (isRecoveryDay) {
+    if (testMode) {
+      // TEST MODE: always honour the explicit equipment override; recovery
+      // gating doesn't apply because we are not publishing for the day.
+      equipmentTypes = equipmentTypesToGenerate;
+      logStep("TEST MODE - equipmentTypes", { equipmentTypes });
+    } else if (isRecoveryDay) {
       // RECOVERY: Only generate ONE VARIOUS workout (use early check from line ~312)
       // CRITICAL: Use VARIOUS (not MIXED) to match database constraint valid_equipment
       equipmentTypes = variousComplete ? [] : ["VARIOUS"];
@@ -2702,7 +2759,7 @@ Return JSON with these exact fields:
         .from("admin_workouts")
         .insert({
           id: workoutId,
-          name: workoutContent.name,
+          name: testMode ? `[TEST] ${workoutContent.name}` : workoutContent.name,
           type: isRecoveryDay ? "recovery" : "WOD",
           category: category,
           format: format,
@@ -2721,11 +2778,12 @@ Return JSON with these exact fields:
           price: 3.99,
           stripe_product_id: stripeProductId,
           stripe_price_id: stripePriceId,
-          is_workout_of_day: true,
+          is_workout_of_day: testMode ? false : true,
           is_ai_generated: true,
           is_visible: true,
           serial_number: null,
-          generated_for_date: effectiveDate
+          generated_for_date: testMode ? null : effectiveDate,
+          ...(testMode ? { wod_source: 'test_mode' } : {}),
         });
 
       if (insertError) {
@@ -2927,6 +2985,26 @@ Return JSON with these exact fields:
     // RECOVERY: Requires ONE MIXED workout
     // Other categories: Require BOTH BODYWEIGHT and EQUIPMENT workouts
     // ═══════════════════════════════════════════════════════════════════════════════
+    if (testMode) {
+      // TEST MODE short-circuit: do NOT touch publish state, do NOT send any
+      // recovery email, do NOT update workout_of_day_state. Return whatever
+      // got generated so the admin can inspect the workouts directly.
+      logStep("TEST MODE: skipping publish verification + state update", {
+        generated: generatedWorkouts.map((w) => ({ id: w.id, name: w.name, equipment: w.equipment })),
+        failed: failedEquipmentTypes,
+      });
+      return new Response(
+        JSON.stringify({
+          success: failedEquipmentTypes.length === 0 && generatedWorkouts.length > 0,
+          testMode: true,
+          workouts: generatedWorkouts,
+          failed: failedEquipmentTypes,
+          forced: { category, difficulty: selectedDifficulty, equipment: equipmentTypesToGenerate, format: forceFormat || null },
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 },
+      );
+    }
+
     const { data: finalVerification, error: finalVerifyError } = await supabase
       .from("admin_workouts")
       .select("id, name, equipment, generated_for_date")
@@ -3289,6 +3367,11 @@ serve(async (req) => {
   let background = false;
   let triggerSource = "manual";
   let slot: 'BODYWEIGHT' | 'EQUIPMENT' | 'VARIOUS' | null = null;
+  let testMode = false;
+  let forceCategory: string | null = null;
+  let forceDifficultyStars: number | null = null;
+  let forceEquipment: 'BODYWEIGHT' | 'EQUIPMENT' | 'VARIOUS' | null = null;
+  let forceFormat: string | null = null;
 
   try {
     const body = await req.json();
@@ -3303,11 +3386,32 @@ serve(async (req) => {
         slot = s as 'BODYWEIGHT' | 'EQUIPMENT' | 'VARIOUS';
       }
     }
+    if (body?.testMode === true) testMode = true;
+    if (typeof body?.forceCategory === "string") forceCategory = body.forceCategory;
+    if (typeof body?.forceDifficultyStars === "number") forceDifficultyStars = body.forceDifficultyStars;
+    if (typeof body?.forceEquipment === "string") {
+      const fe = body.forceEquipment.toUpperCase();
+      if (fe === "BODYWEIGHT" || fe === "EQUIPMENT" || fe === "VARIOUS") {
+        forceEquipment = fe as 'BODYWEIGHT' | 'EQUIPMENT' | 'VARIOUS';
+      }
+    }
+    if (typeof body?.forceFormat === "string") forceFormat = body.forceFormat;
   } catch {
     // No body / invalid JSON — keep defaults (background=true)
   }
 
-  const params = { targetDate, skipNotifications, retryMissing, triggerSource, slot };
+  const params = {
+    targetDate,
+    skipNotifications,
+    retryMissing,
+    triggerSource,
+    slot,
+    testMode,
+    forceCategory,
+    forceDifficultyStars,
+    forceEquipment,
+    forceFormat,
+  };
 
   if (background) {
     // Fire-and-forget: real work continues after the response is sent.
