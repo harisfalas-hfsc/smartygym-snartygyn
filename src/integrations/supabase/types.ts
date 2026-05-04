@@ -3425,6 +3425,7 @@ export type Database = {
         Args: { _workout_id?: string }
         Returns: {
           category: string
+          created_at: string
           description: string
           difficulty: string
           difficulty_stars: number
@@ -3447,6 +3448,7 @@ export type Database = {
           stripe_product_id: string
           tier_required: string
           type: string
+          updated_at: string
         }[]
       }
       get_website_analytics_summary: {
