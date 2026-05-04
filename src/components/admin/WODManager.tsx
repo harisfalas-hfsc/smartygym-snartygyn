@@ -10,14 +10,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
-import { Flame, Play, RefreshCw, Calendar, Dumbbell, Star, TrendingUp, Clock, ExternalLink, ImageIcon, BookOpen, Edit, Settings, HeartPulse, CheckCircle, AlertTriangle, XCircle, Archive, Bell, Rocket, Library, Beaker } from "lucide-react";
+import { Flame, Play, RefreshCw, Calendar, Dumbbell, Star, TrendingUp, Clock, ExternalLink, ImageIcon, BookOpen, Edit, Settings, HeartPulse, CheckCircle, AlertTriangle, XCircle, Archive, Bell, Rocket, Library } from "lucide-react";
 import { format, addDays } from "date-fns";
 import { WODSchedulePreview } from "./WODSchedulePreview";
 import { PeriodizationSystemDialog } from "./PeriodizationSystemDialog";
 import { WorkoutEditDialog } from "./WorkoutEditDialog";
 import { GenerateWODDialog } from "./GenerateWODDialog";
 import { WODAutoGenConfigDialog } from "./WODAutoGenConfigDialog";
-import { TestGenerateWODDialog } from "./TestGenerateWODDialog";
 import { getWODInfoForDate, getDayIn84Cycle, getCategoryForDay } from "@/lib/wodCycle";
 import { getCyprusTodayStr, utcToCyprus } from "@/lib/cyprusDate";
 
@@ -33,7 +32,6 @@ export const WODManager = () => {
   const [isSendingNotifications, setIsSendingNotifications] = useState(false);
   const [periodizationDialogOpen, setPeriodizationDialogOpen] = useState(false);
   const [generateDialogOpen, setGenerateDialogOpen] = useState(false);
-  const [testGenerateDialogOpen, setTestGenerateDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingWorkout, setEditingWorkout] = useState<any>(null);
   const [cronDialogOpen, setCronDialogOpen] = useState(false);
@@ -832,23 +830,7 @@ export const WODManager = () => {
             dayInCycle={getDayInCycle()}
             hasTodayWOD={currentWODs && currentWODs.length > 0}
           />
-
-          <Button
-            size="sm"
-            variant="outline"
-            className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3"
-            onClick={() => setTestGenerateDialogOpen(true)}
-          >
-            <Beaker className="h-3 w-3 sm:h-4 sm:w-4" />
-            <span className="hidden sm:inline">Test generation</span>
-            <span className="sm:hidden">Test</span>
-          </Button>
-
-          <TestGenerateWODDialog
-            open={testGenerateDialogOpen}
-            onOpenChange={setTestGenerateDialogOpen}
-          />
-
+          
         </div>
       </div>
 

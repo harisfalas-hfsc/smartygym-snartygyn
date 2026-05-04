@@ -1,103 +1,202 @@
-# Plan — Forced STRENGTH/Advanced WOD Test Run
+I checked the current Smarty Coach logic and the data behind your exact example.
 
-## Goal
+Report — what I found
 
-Run the **real** WOD generation pipeline (AI generation, exercise linking, normalization, image, Stripe) for a **STRENGTH / Advanced** workout, on demand, **without**:
+1. Your specific test case should never return “Cardio Foundations” with correct logic
+- User choices: Weight Loss + Advanced + 12 weeks + Equipment available.
+- The database already contains an exact matching program:
+  - “90-Day Shred Challenge”
+  - Category: WEIGHT LOSS
+  - Difficulty: Advanced
+  - Duration: 12 weeks
+  - Equipment: Equipment
+- “Cardio Foundations” is:
+  - Category: CARDIO ENDURANCE
+  - Difficulty: Beginner
+  - Duration: 4 weeks
+  - Equipment: Bodyweight
+- So the result you saw is objectively wrong: it misses category, level, duration, and equipment preference.
 
-- replacing today's published WOD,
-- sending notifications,
-- being shown to users on the homepage WOD widget,
-- breaking the 84-day periodization for upcoming days.
+2. Program matching has been partially corrected but needs to be made more robust
+The current program engine now has stronger scoring than before, but it still needs a cleaner “professional coaching hierarchy” and fallback logic.
 
-The result is a fully-formed workout we can open in admin, inspect end-to-end, and confirm the previous failure mode is fixed.
+The recommendation should follow this order:
+1. Goal/category match first.
+2. Difficulty second.
+3. Duration third.
+4. Equipment fourth.
+5. Completed/ongoing content excluded unless there is no other safe option.
 
-## Approach
+For your example, the result should be:
+- Primary recommendation: 90-Day Shred Challenge.
+- Explanation: “This is the best match because it matches weight loss, advanced level, 12-week duration, and uses equipment.”
 
-Add a `testMode` execution path to `generate-workout-of-day` that:
+3. Workout matching is weaker than program matching
+The workout engine still uses mood, energy, time, goal, equipment, and recent workout variety, but the score is not strict enough. For example:
+- Goal alignment is not weighted strongly enough.
+- Equipment available does not properly prefer equipment-based workouts.
+- There is no explicit workout difficulty question, so “advanced” workout matching is currently inferred from energy rather than directly asked.
+- Fallback explanations are too generic.
 
-1. Takes explicit `forceCategory` + `forceDifficultyStars` (e.g. `STRENGTH`, `5`).
-2. Runs the same generation, linking, normalization, image-generation and Stripe steps as production.
-3. Saves the workout to `admin_workouts` but with:
-   - `is_workout_of_day = false`
-   - `generated_for_date = null`
-   - `is_visible = true` (so it shows up in the matching category gallery for review)
-   - `name` prefixed with `[TEST]`
-   - `wod_source = 'test_mode'`
-4. **Skips** notifications, homepage announcement, daily-slot contract, and rollback-of-active-WOD logic.
-5. Still runs the publish contract (`validateWodPublishContract`) in **structural** mode so we get the same quality gating.
+4. Explanation UI already exists, but the explanation content needs to become more honest and coaching-based
+The UI has a “Why This For You” section, but the text should be upgraded so users understand:
+- What matched exactly.
+- What did not match.
+- Why the fallback still makes sense.
+- What training benefit they will still get.
 
-Then add an admin dialog to trigger it and link to the result.
+Plan to fix it
 
-## Changes
+1. Rebuild the recommendation hierarchy for training programs
+I will refactor the program scoring so the result is selected by a strict coaching priority:
 
-### 1. `supabase/functions/generate-workout-of-day/index.ts`
+```text
+Exact goal/category match
+  > related goal/category fallback
+  > exact difficulty
+  > nearest duration
+  > equipment fit
+  > recent/completed/in-progress context
+```
 
-- Extend `runWodGeneration` params with:
-  ```ts
-  testMode?: boolean;
-  forceCategory?: string;          // e.g. "STRENGTH"
-  forceDifficultyStars?: number;   // 1..6
-  forceEquipment?: 'BODYWEIGHT' | 'EQUIPMENT' | 'VARIOUS';
-  forceFormat?: string;            // optional, defaults from FORMATS_BY_CATEGORY
-  ```
-- HTTP entry (`serve(...)` ~line 3277): parse `testMode`, `forceCategory`, `forceDifficultyStars`, `forceEquipment`, `forceFormat` from body and pass through.
-- When `testMode === true`:
-  - Skip the "existingWODsForDate" branching (do not consult or modify today's published WODs).
-  - Override the periodization-derived `category` and `selectedDifficulty` with the forced values (analogous to existing `forcedParameters` path, but coming from the request, not a retry).
-  - Restrict `equipmentTypesToGenerate` to `[forceEquipment]` (default `EQUIPMENT` for STRENGTH/Advanced — most representative of the prior failure).
-  - At save time:
-    - `is_workout_of_day = false`
-    - `generated_for_date = null`
-    - `wod_source = 'test_mode'`
-    - prefix `name` with `"[TEST] "`
-  - Skip the notification / homepage announcement send.
-  - Skip rollback-of-active-WOD on failure (only delete the test row itself).
-- Run `validateWodPublishContract` in `mode: 'structural'`, but treat failures as "test failed" rather than "rollback today's WOD".
-- Return JSON with `{ ok, workoutId, name, failures, warnings }`.
+This means:
+- A Weight Loss program beats Cardio unless no good Weight Loss option exists.
+- An Advanced option beats Beginner for an advanced user.
+- A 12-week option beats 4 or 6 weeks when 12 weeks was requested.
+- Equipment-based programs are preferred when the user selected “Equipment available”.
+- Bodyweight is allowed as fallback only when there is no better equipment option.
 
-### 2. `supabase/functions/wod-generation-orchestrator/index.ts`
+2. Add professional fallback category families
+I will add explicit fallback relationships, for example:
 
-- Accept and pass through `testMode` and the force-* params when calling `generate-workout-of-day`.
-- When `testMode`, skip the day-level slot completeness check (`validateDayPublishContract`) at the end — orchestrator returns whatever the generator returned.
+```text
+Weight Loss
+  Exact: WEIGHT LOSS
+  Strong fallback: METABOLIC, CALORIE BURNING, HIIT, TABATA
+  Acceptable fallback: CARDIO ENDURANCE
 
-### 3. New admin UI: `src/components/admin/TestGenerateWODDialog.tsx`
+Muscle Hypertrophy
+  Exact: MUSCLE HYPERTROPHY
+  Strong fallback: STRENGTH, FUNCTIONAL STRENGTH
 
-A small dialog with:
+Functional Strength
+  Exact: FUNCTIONAL STRENGTH
+  Strong fallback: STRENGTH, POWER, ATHLETIC PERFORMANCE
 
-- Category select (default `STRENGTH`).
-- Difficulty stars select (default `5` = Advanced).
-- Equipment select (`EQUIPMENT` / `BODYWEIGHT` / `VARIOUS`, default `EQUIPMENT`).
-- Format select (auto-filled from `FORMATS_BY_CATEGORY[category]`, default first; for STRENGTH this is `REPS & SETS`).
-- "Run Test Generation" button → calls `supabase.functions.invoke('wod-generation-orchestrator', { body: { testMode: true, forceCategory, forceDifficultyStars, forceEquipment, forceFormat, background: false } })`.
-- On success: show resulting workout name + a link `/admin/workouts/:id` (or whatever the existing admin workout edit route is).
-- Shows the validation `failures` and `warnings` if any.
+Mobility & Stability
+  Exact: MOBILITY & STABILITY
+  Strong fallback: PILATES, RECOVERY, STRETCHING
+```
 
-### 4. Admin entry point
+So if the exact category is missing, Smarty Coach will still recommend something logical, not random.
 
-In the existing **Admin → WOD Manager** screen (next to the existing `GenerateWODDialog`), add a secondary button **"Test generation (no publish)"** that opens `TestGenerateWODDialog`.
+3. Fix the workout recommendation engine with the same logic
+For workouts, I will apply the same professional structure:
 
-### 5. Cleanup helper
+```text
+User goal
+  > appropriate category/fallback family
+  > difficulty/intensity fit
+  > available time
+  > equipment fit
+  > mood/energy adjustment
+  > variety/recent history
+```
 
-Add a small admin action **"Delete all `[TEST]` workouts"** in the same WOD Manager section:
+Important change:
+- Mood and energy should adjust the recommendation, but they should not overpower the user’s main goal.
+- If the user asks to burn fat, a random mobility or beginner workout should not win just because it is short or because variety score is high.
 
-- Lists workouts where `name LIKE '[TEST]%'` AND `wod_source = 'test_mode'`.
-- Soft-deletes them (`is_visible = false`) consistent with the project's non-destructive content policy. (Hard delete is not used because of the existing archival/no-permanent-delete rule.)
+4. Add or adjust workout difficulty handling
+Because program flow asks difficulty but workout flow does not, I will make workout difficulty more professional in one of two ways:
 
-## What this proves
+- Keep the current flow unchanged, but infer difficulty from energy:
+  - Low energy: beginner/recovery bias.
+  - Medium energy: intermediate bias.
+  - High energy: advanced bias.
 
-A successful run with `STRENGTH` + Advanced (5★) + `EQUIPMENT` exercises the exact pipeline path that previously failed:
+- If appropriate in the existing UI, add a simple “How hard do you want to train today?” step:
+  - Easy / Moderate / Hard
 
-- Strength format pinned to `REPS & SETS` (enforced by trigger + format guard).
-- Section validator + density check on `main_workout`.
-- Library-first exercise matching with required exercise count.
-- Image generation + Stripe product creation (background tasks).
-- Public name guard (no internal codes, no AI-style words).
+I will choose the least disruptive option unless the code shows adding the step is clearly better.
 
-If the `[TEST]` workout lands with `ok: true` and renders cleanly in the admin, we have direct evidence that the previous STRENGTH/Advanced failure mode is fixed — without affecting today's user-facing WOD.
+5. Add transparent “match quality” explanations
+Each recommendation will generate explanation lines like:
 
-## Out of scope
+For an exact match:
+```text
+Why we recommend this:
+- It matches your weight loss goal.
+- It matches your advanced level.
+- It fits your 12-week timeline.
+- It uses the equipment you have available.
+```
 
-- Any change to the cron schedule.
-- Any change to the periodization tables.
-- Any change to user-facing pages or notifications.
+For a fallback:
+```text
+Why we recommend this:
+- We do not currently have an exact 12-week advanced weight loss program with your selected setup.
+- This is the closest available option because it still targets calorie burn and conditioning.
+- The duration is shorter than requested, so you can repeat or progress into the next phase.
+- It uses similar training benefits: heart-rate elevation, metabolic demand, and full-body work.
+```
 
+6. Add deterministic tie-breaking
+If two options have similar scores, the winner should be predictable and logical:
+
+```text
+1. Exact category beats fallback category.
+2. Exact difficulty beats nearby difficulty.
+3. Exact/closest duration wins.
+4. Equipment match wins.
+5. Newer/visible content only after coaching criteria are equal.
+```
+
+This prevents a poor match from winning because of database order.
+
+7. Add local verification cases before finishing
+I will verify the logic against important scenarios, including:
+
+- Weight Loss + Advanced + 12 weeks + Equipment
+  - Expected: 90-Day Shred Challenge.
+
+- Weight Loss + Advanced + 12 weeks + Bodyweight
+  - Expected: best weight-loss/bodyweight or nearest safe fallback, not equipment-only content.
+
+- Weight Loss + Beginner + 4 weeks + Equipment
+  - Expected: Calorie Torch or closest weight-loss beginner equipment program.
+
+- Muscle Hypertrophy + Advanced + 12 weeks + Equipment
+  - Expected: 90-Day Mass Protocol.
+
+- If exact duration is missing
+  - Expected: closest duration in same category/difficulty before jumping category.
+
+- If exact category is missing
+  - Expected: related fallback with a clear explanation.
+
+8. Keep the brand rules intact
+I will not generate exercises or call it an “AI fitness coach.” Smarty Coach will remain a human-designed recommendation assistant pointing users toward existing content designed by Haris Falas.
+
+Files expected to change
+
+- `src/utils/smarty-coach/programSuggestionEngine.ts`
+  - Strict program scoring, fallback families, explanation builder.
+
+- `src/utils/smarty-coach/suggestionEngine.ts`
+  - Strict workout scoring, equipment preference, better goal/fallback logic, explanation builder.
+
+- `src/components/smarty-coach/ProgramSuggestionFlow.tsx`
+  - Minor UI wording if needed for clearer explanation display.
+
+- `src/components/smarty-coach/SmartyCoachModal.tsx`
+  - Minor UI wording if needed for workout explanations.
+
+Expected result
+
+After the fix, Smarty Coach will behave like a professional coach:
+- It will prioritize the user’s stated goal.
+- It will respect difficulty and duration.
+- It will handle equipment logically.
+- If there is no perfect match, it will recommend the closest useful alternative.
+- It will clearly explain why the recommendation was made and what trade-offs were involved.
