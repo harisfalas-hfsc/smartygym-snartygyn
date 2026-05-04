@@ -57,10 +57,11 @@ async function verifyWodsExist(
   supabase: any,
   dateStr: string,
   contractMode: WodContractMode = "structural",
+  requestedSlot: string | null = null,
 ): Promise<WodVerificationResult> {
   const recoveryDay = isRecoveryDay(dateStr);
-  
-  console.log(`[ORCHESTRATOR] Verifying WODs for ${dateStr}, isRecoveryDay: ${recoveryDay}`);
+
+  console.log(`[ORCHESTRATOR] Verifying WODs for ${dateStr}, isRecoveryDay: ${recoveryDay}, slot: ${requestedSlot ?? "ALL"}`);
   
   const { data: wods, error } = await supabase
     .from("admin_workouts")
@@ -91,9 +92,18 @@ async function verifyWodsExist(
       missing.push("VARIOUS");
     }
   } else {
-    // Normal day: expect BODYWEIGHT + EQUIPMENT (both must be section-complete)
-    const bwWod = wods?.find((w: any) => w.equipment === "BODYWEIGHT");
-    if (bwWod) {
+    // Normal day: by default expect BODYWEIGHT + EQUIPMENT.
+    // PLAN 2 — slot scoping: when this orchestrator run is responsible for
+    // a single slot only, verify ONLY that slot. The sibling slot is owned
+    // by its own cron and may not exist yet.
+    const slotsToCheck =
+      requestedSlot === "BODYWEIGHT" || requestedSlot === "EQUIPMENT"
+        ? [requestedSlot]
+        : ["BODYWEIGHT", "EQUIPMENT"];
+
+    if (slotsToCheck.includes("BODYWEIGHT")) {
+      const bwWod = wods?.find((w: any) => w.equipment === "BODYWEIGHT");
+      if (bwWod) {
       const contract = passesPublishContract(bwWod, dateStr, contractMode);
       if (contract.ok) {
         found.push("BODYWEIGHT");
@@ -101,12 +111,14 @@ async function verifyWodsExist(
         missing.push(`BODYWEIGHT (${contract.reason})`);
         console.log(`[ORCHESTRATOR] BODYWEIGHT WOD ${bwWod.id} failed publish contract:`, contract.reason);
       }
-    } else {
-      missing.push("BODYWEIGHT");
+      } else {
+        missing.push("BODYWEIGHT");
+      }
     }
-    
-    const eqWod = wods?.find((w: any) => w.equipment === "EQUIPMENT");
-    if (eqWod) {
+
+    if (slotsToCheck.includes("EQUIPMENT")) {
+      const eqWod = wods?.find((w: any) => w.equipment === "EQUIPMENT");
+      if (eqWod) {
       const contract = passesPublishContract(eqWod, dateStr, contractMode);
       if (contract.ok) {
         found.push("EQUIPMENT");
@@ -114,8 +126,9 @@ async function verifyWodsExist(
         missing.push(`EQUIPMENT (${contract.reason})`);
         console.log(`[ORCHESTRATOR] EQUIPMENT WOD ${eqWod.id} failed publish contract:`, contract.reason);
       }
-    } else {
-      missing.push("EQUIPMENT");
+      } else {
+        missing.push("EQUIPMENT");
+      }
     }
   }
   
