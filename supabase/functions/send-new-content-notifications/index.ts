@@ -91,12 +91,14 @@ serve(async (req) => {
     const workouts = pendingItems.filter(item => item.content_type === 'workout');
     const programs = pendingItems.filter(item => item.content_type === 'program');
     const articles = pendingItems.filter(item => item.content_type === 'article');
+    const wods = pendingItems.filter(item => item.content_type === 'wod');
 
     const workoutCount = workouts.length;
     const programCount = programs.length;
     const articleCount = articles.length;
+    const wodCount = wods.length;
 
-    logStep("📊 Content breakdown", { workoutCount, programCount, articleCount });
+    logStep("📊 Content breakdown", { workoutCount, programCount, articleCount, wodCount });
 
     // Paginate through ALL users (listUsers defaults to 50 per page)
     logStep("🔍 Fetching all users with preferences");
