@@ -1,66 +1,121 @@
 
-# WOD Notification Timing Fix — Full Synchronization Plan
+# WOD Generation: Retry Chain + Alerting + Watchdog UI
 
-## Problem
-Currently no automatic notification fires when the WOD becomes "today's" at 00:00 Cyprus. Previous attempt queued at midnight while users were sleeping — unacceptable. Goal: users receive their dashboard ping + email at **07:00 Cyprus** (humane wake-up time), and every related admin panel surface reflects this.
+## Goal
+Use the wide pre-build window (08:30 Cyprus generation → 00:00 Cyprus rollover) to retry up to 5 times with 30-min spacing if generation fails, and notify admin (you) on BOTH success and failure so you always know the state.
 
-## What changes (technical)
+---
 
-### 1. New edge function: `queue-wod-notifications-morning`
-- Runs daily at **05:00 UTC (07:00 Cyprus)**.
-- Reads today's active WODs (`is_workout_of_day=true`, `generated_for_date=today Cyprus`, `is_visible=true`).
-- Inserts them into `pending_content_notifications` with `content_type='wod'`.
-- Idempotent — checks for already-queued WODs, won't double-send if rerun manually.
+## 1. Retry chain — pre-build day (Cyprus times)
 
-### 2. New cron job entry
-- Job name: `queue-wod-notifications-morning`
-- Schedule: `0 5 * * *`
-- Category: **notifications**
-- Registered in both `cron.job` (live) and `cron_job_metadata` (admin panel).
+The bodyweight slot kicks at 08:30 and equipment at 08:50. If either fails, we add scheduled retry crons that re-fire ONLY for missing slots:
 
-### 3. `archive-old-wods` cleanup
-- Removes the midnight notification-queueing block I added previously.
-- Archive function reverts to its single job: rolling over WODs at 00:00 Cyprus, silently.
+| Cron name | Cyprus time | UTC | Purpose |
+|---|---|---|---|
+| `generate-wod-bodyweight-daily` | 08:30 | 06:30 | Attempt 1 — bodyweight |
+| `generate-wod-equipment-daily` | 08:50 | 06:50 | Attempt 1 — equipment |
+| `wod-retry-pass-1` (NEW) | 09:20 | 07:20 | Retry any missing slot for tomorrow |
+| `wod-retry-pass-2` (NEW) | 09:50 | 07:50 | Retry any missing slot for tomorrow |
+| `wod-retry-pass-3` (NEW) | 10:20 | 08:20 | Retry any missing slot for tomorrow |
+| `wod-retry-pass-4` (NEW) | 10:50 | 08:50 | Final retry pass |
 
-### 4. `send-new-content-notifications` already extended
-- Already has the `wod` branch added (handles dashboard messages + emails using existing `dashboard_new_workout` and `email_new_workout` user preferences).
-- No further changes needed.
+Each retry pass calls `wod-generation-orchestrator` with `{ mode: "generate", retryMissing: true, targetDate: "<tomorrow Cyprus>" }`. The orchestrator already short-circuits if the target date is fully populated, so once tomorrow's WODs are complete the rest of the passes become silent no-ops.
 
-## Synchronization across the admin panel
+Internal orchestrator retries stay at the existing 3 attempts × 45 s for transient AI hiccups within a single run.
 
-| Admin section | What gets updated | How |
-|---|---|---|
-| **Cron Jobs page** | New row "queue-wod-notifications-morning" appears under **Notifications** with schedule `0 5 * * *` and human-readable label "Daily at 05:00 UTC (07:00 Cyprus) — queues today's WODs so dashboard + email pings deliver at wake-up time, not midnight" | Migration inserts into `cron_job_metadata` |
-| **System Health Audit** | Already aware. New cron joins the dashboard health checks automatically (it queries `cron_job_metadata` for active jobs). No code change needed; if the morning queue ever stops running, audit will flag it the same as any other notification job. | Existing `run-system-health-audit` reads cron metadata generically |
-| **Auto Messages / Notifications Manager** | WOD notifications already use `MESSAGE_TYPES.WOD_NOTIFICATION` and respect existing user preferences `dashboard_new_workout` + `email_new_workout`. Users can already toggle them in their notification settings. | No change — preference plumbing already exists |
-| **Email templates** | Uses inline template (matches the article/workout/program style already in `send-new-content-notifications`). No new template row required, no missing template warnings in admin. | Already wired |
-| **Manual workout creation** | Unaffected. Admin-created standard workouts continue using the existing `queue_workout_notification` trigger (skips WODs). Manually published WODs via admin "Send WOD Notifications" button in WODManager continue to work via the existing `send-wod-notifications` function. | No change |
-| **WODManager admin panel** | The manual "Send WOD Notifications" button still works for instant testing/resends. The new cron does not conflict (idempotency check prevents double-queueing). | No change |
-| **Stripe / WOD purchase flow** | Unaffected. Notifications only ping users about content existence — purchase, pricing, and Stripe links untouched. | No change |
-| **System Settings** | No new settings introduced. Schedule is editable later via a future `update_*` RPC if needed; for now, the standard cron management applies. | No change |
-| **Health Audit "Tomorrow's WODs" check** | Continues to verify pre-built WODs at 12:00 UTC. Independent from this notification timing change. | No change |
+---
 
-## Risk audit — what does NOT break
+## 2. Success + Failure admin notifications
 
-- ✅ 07:00 Cyprus morning email (`send-morning-notifications-job`) keeps working — unrelated path.
-- ✅ Archive at 00:00 Cyprus continues with **zero gap** to the new "today" WOD becoming live.
-- ✅ Library-mode WOD selection (`select-wod-from-library` for today) still calls `send-wod-notifications` directly — instant notification when admin manually picks a today-WOD.
-- ✅ Existing notification preferences honored (opt-out, dashboard toggle, email toggle).
-- ✅ Idempotent: rerunning the new function won't duplicate notifications.
-- ✅ All 28 existing cron jobs remain untouched.
+Currently the orchestrator only emails on failure. We add a "post-run admin ping" path:
 
-## Execution order
-1. Migration creates the cron schedule + `cron_job_metadata` row.
-2. Deploy `queue-wod-notifications-morning` (already done in previous turn — code exists).
-3. Confirm the cron is registered (`SELECT FROM cron.job WHERE jobname='queue-wod-notifications-morning'`).
-4. Confirm admin panel Cron Jobs page now lists 29 jobs with the new one under **Notifications**.
+- On **successful build** of a slot, send a one-line admin email + dashboard message: "WOD generated for <date> — slot <BW/EQ>".
+- On **failure after all retries**, send the existing failure email plus an explicit "Action required" badge.
+- Use `getAdminNotificationEmail()` (already present) and the existing `MESSAGE_TYPES.SYSTEM_NOTIFICATION` channel for the dashboard ping.
+- Dedupe: store a `wod_generation_run_log` row keyed by `(target_date, slot, status)` so the same outcome is not announced twice across the 4 retry passes.
 
-## Memory update
-Add a Core memory line: *"WOD notifications fire at 07:00 Cyprus (05:00 UTC) via `queue-wod-notifications-morning` cron — never at midnight."*
+New tiny table:
+```
+wod_generation_run_log (
+  id uuid pk,
+  target_date date,
+  slot text,            -- BODYWEIGHT | EQUIPMENT
+  status text,          -- success | failure
+  attempt_source text,  -- cron-bodyweight | wod-retry-pass-1 | ...
+  notified_at timestamptz,
+  created_at timestamptz default now(),
+  unique(target_date, slot, status)
+)
+```
 
-## Timeline
-- After approval: migration runs, new cron is live.
-- **Tomorrow at 07:00 Cyprus**: first automatic WOD notification batch (dashboard + email) reaches users.
-- No notifications fire at midnight ever again.
+---
+
+## 3. 09:30 Cyprus post-generation health alert
+
+New cron: `wod-post-generation-audit`
+- Schedule: `0 8 * * *` (08:00 UTC = 10:00 Cyprus summer / 09:00 Cyprus winter — consistent with how the other generation jobs are timed using fixed UTC anchors). Actually tied to **09:30 Cyprus** = `30 7 * * *` UTC.
+- Calls `run-system-health-audit` with `{ sendEmail: true, focus: "tomorrow_wods" }`.
+- Emails admin a clear status: ✅ both slots ready / ⚠️ partial / ❌ none.
+- Runs AFTER the first generation pass (08:50) but BEFORE the first retry (09:20)? — placed at 09:30 so it sees one retry attempt already, then leaves room for 3 more retries before lunch.
+
+Existing audit cron stays:
+- `daily-system-health-audit-after-generation` at 17:00 Cyprus — keep as final long-window safety net.
+
+---
+
+## 4. Rename watchdog + admin UI button
+
+- Rename `watchdog-wod-check` (the cron) → display label **"WOD Watchdog"** in `cron_job_metadata` (`display_name` column), schedule unchanged. The function name stays the same to avoid breaking the deployed edge function.
+- In `src/components/admin/WODManager.tsx`, add a new button **"WOD Watchdog"** placed next to the existing **"Future Ready?"** button (around line 920).
+- Button behavior: calls `watchdog-wod-check` edge function via `supabase.functions.invoke("watchdog-wod-check")`, shows a toast with the result (slots present / missing / asset re-kick triggered).
+
+---
+
+## 5. Cron metadata sync (admin panel Cron Jobs page)
+
+Insert/update rows in `cron_job_metadata` for:
+- `wod-retry-pass-1` … `wod-retry-pass-4` — category `content_generation`, human-readable labels showing both UTC and Cyprus times.
+- `wod-post-generation-audit` — category `maintenance`, label "Daily 09:30 Cyprus — verifies tomorrow's WODs were built and emails admin".
+- `watchdog-wod-check` — update `display_name` to **"WOD Watchdog"**.
+
+After this the admin Cron Jobs page will show 33 jobs (was 29).
+
+---
+
+## 6. Files to change
+
+### New
+- `supabase/functions/wod-post-generation-audit/index.ts` — wraps `run-system-health-audit` with `sendEmail: true`.
+- Migration: creates 4 retry crons + post-gen audit cron + `wod_generation_run_log` table + metadata rows + `display_name` rename.
+
+### Edited
+- `supabase/functions/wod-generation-orchestrator/index.ts` — after a successful publish, write a `success` row to `wod_generation_run_log` and send admin email/dashboard ping if no prior `success` row exists for `(target_date, slot)`. After final-attempt failure, write a `failure` row with the same dedupe.
+- `src/components/admin/WODManager.tsx` — new "WOD Watchdog" button next to "Future Ready?".
+
+### Untouched (verified safe)
+- `archive-old-wods` (00:00 Cyprus silent rollover) — no change.
+- `queue-wod-notifications-morning` (07:00 Cyprus) — no change.
+- `backup-wod-generation` (02:00 UTC) — kept as final overnight verify-only safety net.
+- All 28 existing crons — untouched.
+
+---
+
+## 7. Final daily timeline (Cyprus, winter — add +1h in summer)
+
+| Cyprus time | What |
+|---|---|
+| 08:30 | Generate tomorrow's bodyweight WOD |
+| 08:50 | Generate tomorrow's equipment WOD |
+| 09:20 | Retry pass 1 (only if missing) |
+| 09:30 | **Post-generation audit + admin email — success or failure** |
+| 09:50 | Retry pass 2 |
+| 10:20 | Retry pass 3 |
+| 10:50 | Retry pass 4 (final) |
+| 17:00 | Long-window safety audit + admin email |
+| 23:00 | Today's WODs archived |
+| 00:00 | Pre-built WODs become "today" — silent rollover |
+| 07:00 | Users get dashboard ping + email about new WODs |
+
+Result: if any generation fails, you receive notification within 1 hour and have ~14 hours and 4 retry passes to fix it before midnight rollover. On success, you get a single confirmation email per slot — no spam.
 
 Approve to execute.
