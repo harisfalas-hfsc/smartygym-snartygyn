@@ -962,7 +962,24 @@ export const WODManager = () => {
             <span className="hidden sm:inline">{isCheckingTomorrow ? "Auditing..." : "Future Ready?"}</span>
             <span className="sm:hidden">{isCheckingTomorrow ? "..." : "Future?"}</span>
           </Button>
-          
+
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-1 sm:gap-2 border-cyan-500 text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3"
+            disabled={isRunningWatchdog}
+            onClick={handleRunWatchdog}
+            title="Verify today's WODs exist and re-kick Stripe/image pipelines if assets are missing"
+          >
+            {isRunningWatchdog ? (
+              <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
+            ) : (
+              <Shield className="h-3 w-3 sm:h-4 sm:w-4 text-cyan-500" />
+            )}
+            <span className="hidden sm:inline">{isRunningWatchdog ? "Running..." : "WOD Watchdog"}</span>
+            <span className="sm:hidden">{isRunningWatchdog ? "..." : "Watchdog"}</span>
+          </Button>
+
           <Button 
             variant="outline"
             size="sm"
