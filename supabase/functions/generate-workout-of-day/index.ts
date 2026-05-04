@@ -350,7 +350,9 @@ async function runWodGeneration(params: {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
     cleanupSupabase = supabase;
-    effectiveDateForCleanup = effectiveDate;
+    // In testMode we never want the unhandled-error path to roll back today's
+    // published WODs. Leave effectiveDateForCleanup null for tests.
+    effectiveDateForCleanup = testMode ? null : effectiveDate;
 
     // ═══════════════════════════════════════════════════════════════════════════════
     // EARLY RECOVERY DAY CHECK: Using simplified 84-day cycle
