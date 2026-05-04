@@ -285,6 +285,11 @@ async function runWodGeneration(params: {
   retryMissing: boolean;
   triggerSource: string;
   slot?: 'BODYWEIGHT' | 'EQUIPMENT' | 'VARIOUS' | null;
+  testMode?: boolean;
+  forceCategory?: string | null;
+  forceDifficultyStars?: number | null;
+  forceEquipment?: 'BODYWEIGHT' | 'EQUIPMENT' | 'VARIOUS' | null;
+  forceFormat?: string | null;
 }): Promise<Response> {
   let cleanupSupabase: any = null;
   let effectiveDateForCleanup: string | null = null;
@@ -294,6 +299,11 @@ async function runWodGeneration(params: {
     const skipNotifications = params.skipNotifications;
     const retryMissing = params.retryMissing;
     const slot = params.slot || null;
+    const testMode = params.testMode === true;
+    const forceCategory = params.forceCategory || null;
+    const forceDifficultyStars = typeof params.forceDifficultyStars === "number" ? params.forceDifficultyStars : null;
+    const forceEquipment = params.forceEquipment || null;
+    const forceFormat = params.forceFormat || null;
 
     logStep("Background runner started", {
       triggerSource: params.triggerSource,
@@ -301,6 +311,11 @@ async function runWodGeneration(params: {
       retryMissing,
       skipNotifications,
       slot,
+      testMode,
+      forceCategory,
+      forceDifficultyStars,
+      forceEquipment,
+      forceFormat,
     });
 
     // Cyprus date (Europe/Athens) — DST-safe via shared helper.
