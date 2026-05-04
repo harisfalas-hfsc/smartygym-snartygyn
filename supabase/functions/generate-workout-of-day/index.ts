@@ -3367,6 +3367,11 @@ serve(async (req) => {
   let background = false;
   let triggerSource = "manual";
   let slot: 'BODYWEIGHT' | 'EQUIPMENT' | 'VARIOUS' | null = null;
+  let testMode = false;
+  let forceCategory: string | null = null;
+  let forceDifficultyStars: number | null = null;
+  let forceEquipment: 'BODYWEIGHT' | 'EQUIPMENT' | 'VARIOUS' | null = null;
+  let forceFormat: string | null = null;
 
   try {
     const body = await req.json();
@@ -3381,11 +3386,32 @@ serve(async (req) => {
         slot = s as 'BODYWEIGHT' | 'EQUIPMENT' | 'VARIOUS';
       }
     }
+    if (body?.testMode === true) testMode = true;
+    if (typeof body?.forceCategory === "string") forceCategory = body.forceCategory;
+    if (typeof body?.forceDifficultyStars === "number") forceDifficultyStars = body.forceDifficultyStars;
+    if (typeof body?.forceEquipment === "string") {
+      const fe = body.forceEquipment.toUpperCase();
+      if (fe === "BODYWEIGHT" || fe === "EQUIPMENT" || fe === "VARIOUS") {
+        forceEquipment = fe as 'BODYWEIGHT' | 'EQUIPMENT' | 'VARIOUS';
+      }
+    }
+    if (typeof body?.forceFormat === "string") forceFormat = body.forceFormat;
   } catch {
     // No body / invalid JSON — keep defaults (background=true)
   }
 
-  const params = { targetDate, skipNotifications, retryMissing, triggerSource, slot };
+  const params = {
+    targetDate,
+    skipNotifications,
+    retryMissing,
+    triggerSource,
+    slot,
+    testMode,
+    forceCategory,
+    forceDifficultyStars,
+    forceEquipment,
+    forceFormat,
+  };
 
   if (background) {
     // Fire-and-forget: real work continues after the response is sent.
