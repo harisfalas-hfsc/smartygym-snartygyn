@@ -2985,6 +2985,26 @@ Return JSON with these exact fields:
     // RECOVERY: Requires ONE MIXED workout
     // Other categories: Require BOTH BODYWEIGHT and EQUIPMENT workouts
     // ═══════════════════════════════════════════════════════════════════════════════
+    if (testMode) {
+      // TEST MODE short-circuit: do NOT touch publish state, do NOT send any
+      // recovery email, do NOT update workout_of_day_state. Return whatever
+      // got generated so the admin can inspect the workouts directly.
+      logStep("TEST MODE: skipping publish verification + state update", {
+        generated: generatedWorkouts.map((w) => ({ id: w.id, name: w.name, equipment: w.equipment })),
+        failed: failedEquipmentTypes,
+      });
+      return new Response(
+        JSON.stringify({
+          success: failedEquipmentTypes.length === 0 && generatedWorkouts.length > 0,
+          testMode: true,
+          workouts: generatedWorkouts,
+          failed: failedEquipmentTypes,
+          forced: { category, difficulty: selectedDifficulty, equipment: equipmentTypesToGenerate, format: forceFormat || null },
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 },
+      );
+    }
+
     const { data: finalVerification, error: finalVerifyError } = await supabase
       .from("admin_workouts")
       .select("id, name, equipment, generated_for_date")
