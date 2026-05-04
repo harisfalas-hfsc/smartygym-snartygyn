@@ -51,8 +51,10 @@ serve(async (req) => {
     const date = wod.generated_for_date || new Date().toISOString().slice(0, 10);
     const equipment = (wod.equipment || "VARIOUS").toUpperCase();
 
-    const productKey = `SMARTYGYM:wod:${date}:${equipment}:product`;
-    const priceKey = `SMARTYGYM:wod:${date}:${equipment}:price`;
+    // Include workout_id so re-generations on the same day/slot don't collide
+    // with the archived WOD's already-burned idempotency key.
+    const productKey = `SMARTYGYM:wod:${wod.id}:product`;
+    const priceKey = `SMARTYGYM:wod:${wod.id}:price`;
 
     const product = await stripe.products.create({
       name: wod.name,
