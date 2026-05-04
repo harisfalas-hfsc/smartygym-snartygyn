@@ -1,202 +1,96 @@
-I checked the current Smarty Coach logic and the data behind your exact example.
+## Goal
 
-Report — what I found
+Replace the narrow "Tomorrow Ready?" check with a comprehensive **"Future Ready?"** audit that inspects the entire WOD generation pipeline, persists every run, and tells you when an issue is **recurring** (same failure as a previous day).
 
-1. Your specific test case should never return “Cardio Foundations” with correct logic
-- User choices: Weight Loss + Advanced + 12 weeks + Equipment available.
-- The database already contains an exact matching program:
-  - “90-Day Shred Challenge”
-  - Category: WEIGHT LOSS
-  - Difficulty: Advanced
-  - Duration: 12 weeks
-  - Equipment: Equipment
-- “Cardio Foundations” is:
-  - Category: CARDIO ENDURANCE
-  - Difficulty: Beginner
-  - Duration: 4 weeks
-  - Equipment: Bodyweight
-- So the result you saw is objectively wrong: it misses category, level, duration, and equipment preference.
+## What's wrong today (quick recap)
 
-2. Program matching has been partially corrected but needs to be made more robust
-The current program engine now has stronger scoring than before, but it still needs a cleaner “professional coaching hierarchy” and fallback logic.
+The current check looks for a cron job named `generate-workout-of-day`, which no longer exists. The actual jobs are `generate-wod-bodyweight-daily` (21:05 UTC) and `generate-wod-equipment-daily` (21:25 UTC), both active. So the ❌ you saw is a false alarm — the system IS generating WODs, today's exists, and the last 3 runs succeeded.
 
-The recommendation should follow this order:
-1. Goal/category match first.
-2. Difficulty second.
-3. Duration third.
-4. Equipment fourth.
-5. Completed/ongoing content excluded unless there is no other safe option.
+## Plan
 
-For your example, the result should be:
-- Primary recommendation: 90-Day Shred Challenge.
-- Explanation: “This is the best match because it matches weight loss, advanced level, 12-week duration, and uses equipment.”
+### Step 1 — Create a persistent memory table
 
-3. Workout matching is weaker than program matching
-The workout engine still uses mood, energy, time, goal, equipment, and recent workout variety, but the score is not strict enough. For example:
-- Goal alignment is not weighted strongly enough.
-- Equipment available does not properly prefer equipment-based workouts.
-- There is no explicit workout difficulty question, so “advanced” workout matching is currently inferred from energy rather than directly asked.
-- Fallback explanations are too generic.
+New table `wod_readiness_audits`:
+- `audit_date`, `triggered_by` (manual / cron), `overall_status` (`healthy` / `warnings` / `critical`)
+- `total_checks`, `passed`, `warnings`, `failed`
+- `results` (jsonb, full per-check details)
+- `failed_check_keys` (text[]) — stable IDs like `cron_inactive`, `image_missing`, `stripe_missing` for quick recurrence matching
+- `notes` (auto-generated recurrence summary)
 
-4. Explanation UI already exists, but the explanation content needs to become more honest and coaching-based
-The UI has a “Why This For You” section, but the text should be upgraded so users understand:
-- What matched exactly.
-- What did not match.
-- Why the fallback still makes sense.
-- What training benefit they will still get.
+This lets the next run say things like: *"⚠️ This same issue (`stripe_missing`) also failed yesterday and 2 days ago — recurring problem."*
 
-Plan to fix it
+### Step 2 — Rename and expand the check
 
-1. Rebuild the recommendation hierarchy for training programs
-I will refactor the program scoring so the result is selected by a strict coaching priority:
+Rename button **"Tomorrow Ready?" → "Future Ready?"**. Replace its logic with a full system audit covering every layer of the WOD philosophy:
 
-```text
-Exact goal/category match
-  > related goal/category fallback
-  > exact difficulty
-  > nearest duration
-  > equipment fit
-  > recent/completed/in-progress context
-```
+**A. Cron infrastructure (fix the false alarm)**
+- Look up the real jobs in `cron_job_metadata`: `generate-wod-bodyweight-daily`, `generate-wod-equipment-daily`, `archive-old-wods`, `backup-wod-generation`, `watchdog-wod-check`, `send-morning-notifications-job`, `daily-system-health-audit-after-generation`.
+- For each: confirm `is_active = true` and that the schedule hasn't drifted from the expected time.
+- Confirm bodyweight cron fires before equipment cron (the Plan C+D sequential ordering that prevents the 150s timeout).
 
-This means:
-- A Weight Loss program beats Cardio unless no good Weight Loss option exists.
-- An Advanced option beats Beginner for an advanced user.
-- A 12-week option beats 4 or 6 weeks when 12 weeks was requested.
-- Equipment-based programs are preferred when the user selected “Equipment available”.
-- Bodyweight is allowed as fallback only when there is no better equipment option.
+**B. Generation history (catch recurring failures)**
+- Read last 7 days from `wod_generation_runs`.
+- Flag missing days, failures, partial generations (`found_count < expected_count`).
+- Compute success rate over the last week; warn if < 100%.
 
-2. Add professional fallback category families
-I will add explicit fallback relationships, for example:
+**C. Today's WOD integrity (the existing 5 checks, kept)**
+- Right number of WODs for today (1 for Recovery, 2 otherwise).
+- All have `image_url`.
+- All have `stripe_product_id` + `stripe_price_id`.
+- Category matches the 84-day periodization for today.
+- Difficulty stars within today's expected range.
 
-```text
-Weight Loss
-  Exact: WEIGHT LOSS
-  Strong fallback: METABOLIC, CALORIE BURNING, HIIT, TABATA
-  Acceptable fallback: CARDIO ENDURANCE
+**D. Forward-looking periodization (next 7 days)**
+- Compute the expected category + difficulty for each of the next 7 days from the 84-day cycle.
+- Show the upcoming sequence so you can verify Recovery days, Strength days, etc. land on the right dates.
 
-Muscle Hypertrophy
-  Exact: MUSCLE HYPERTROPHY
-  Strong fallback: STRENGTH, FUNCTIONAL STRENGTH
+**E. Library health (so generation has materials)**
+- Count active exercises per category vs. minimum thresholds (Pilates studio equipment, micro-workout bodyweight, Tabata no-machines, etc.).
+- Warn if a category is at risk of running out of unique combinations.
 
-Functional Strength
-  Exact: FUNCTIONAL STRENGTH
-  Strong fallback: STRENGTH, POWER, ATHLETIC PERFORMANCE
+**F. Stripe & image pipelines**
+- Last 7 days of WODs: any missing `stripe_product_id` or `image_url`?
+- Last `sync-stripe-images-weekly` cron run timestamp present?
 
-Mobility & Stability
-  Exact: MOBILITY & STABILITY
-  Strong fallback: PILATES, RECOVERY, STRETCHING
-```
+**G. Auto-gen config consistency**
+- `wod_auto_generation_config.generation_hour_utc/minute_utc` matches the actual cron schedules.
+- WOD state row exists and looks sane.
 
-So if the exact category is missing, Smarty Coach will still recommend something logical, not random.
+### Step 3 — Recurrence memory
 
-3. Fix the workout recommendation engine with the same logic
-For workouts, I will apply the same professional structure:
+Before saving the new audit row:
+1. Pull the previous 7 audits.
+2. For every `failed_check_key` in this run, count how many of the last 7 audits had the same key.
+3. If count ≥ 2, mark the issue as **🔁 RECURRING** in the toast/console and in the `notes` field — e.g. *"`stripe_missing` failed today, also failed on 2026-05-03 and 2026-05-02."*
+4. If a check that previously failed now passes, log *"✅ `image_missing` resolved (last failed 2026-05-02)."*
 
-```text
-User goal
-  > appropriate category/fallback family
-  > difficulty/intensity fit
-  > available time
-  > equipment fit
-  > mood/energy adjustment
-  > variety/recent history
-```
+### Step 4 — UI improvements
 
-Important change:
-- Mood and energy should adjust the recommendation, but they should not overpower the user’s main goal.
-- If the user asks to burn fat, a random mobility or beginner workout should not win just because it is short or because variety score is high.
+- Toast summary: `Future Ready: 18/20 ✅, 1 ⚠️, 1 🔁 recurring`.
+- Detailed results in console + alert modal grouped by section (Cron / History / Today / Future / Library / Stripe / Images).
+- Each issue shows: **What**, **Why**, **Fix**, and **Recurrence** (e.g. "first time" or "3rd time in 7 days").
+- Keep the existing "WOD Health Check" button untouched — it stays as the quick "today only" check. "Future Ready?" is the deeper weekly-aware audit.
 
-4. Add or adjust workout difficulty handling
-Because program flow asks difficulty but workout flow does not, I will make workout difficulty more professional in one of two ways:
+### Step 5 — Auto-run from existing daily audit
 
-- Keep the current flow unchanged, but infer difficulty from energy:
-  - Low energy: beginner/recovery bias.
-  - Medium energy: intermediate bias.
-  - High energy: advanced bias.
+The `daily-system-health-audit-after-generation` cron already runs at 14:00 UTC. Have it also write a row into `wod_readiness_audits` so the memory builds even on days you don't click the button manually.
 
-- If appropriate in the existing UI, add a simple “How hard do you want to train today?” step:
-  - Easy / Moderate / Hard
+## Technical notes
 
-I will choose the least disruptive option unless the code shows adding the step is clearly better.
+- Migration: create `wod_readiness_audits` with admin-only RLS (mirror `system_health_audits` policies).
+- All checks happen client-side in `WODManager.tsx` against existing tables (`cron_job_metadata`, `wod_generation_runs`, `admin_workouts`, `wod_auto_generation_config`, `workout_of_day_state`, `exercises`). No new edge function needed for the manual button.
+- Server-side autosave: extend `daily-system-health-audit-after-generation` (or its target function) to also insert a `wod_readiness_audits` row.
+- No changes to generation crons themselves — they're working correctly.
 
-5. Add transparent “match quality” explanations
-Each recommendation will generate explanation lines like:
+## Files touched
 
-For an exact match:
-```text
-Why we recommend this:
-- It matches your weight loss goal.
-- It matches your advanced level.
-- It fits your 12-week timeline.
-- It uses the equipment you have available.
-```
+- `src/components/admin/WODManager.tsx` — replace `handleTomorrowReadinessCheck` with `handleFutureReadinessCheck`; rename button.
+- New migration — create `wod_readiness_audits` table + RLS.
+- `supabase/functions/daily-system-health-audit/index.ts` (or equivalent) — append an insert into the new table.
 
-For a fallback:
-```text
-Why we recommend this:
-- We do not currently have an exact 12-week advanced weight loss program with your selected setup.
-- This is the closest available option because it still targets calorie burn and conditioning.
-- The duration is shorter than requested, so you can repeat or progress into the next phase.
-- It uses similar training benefits: heart-rate elevation, metabolic demand, and full-body work.
-```
+## Outcome
 
-6. Add deterministic tie-breaking
-If two options have similar scores, the winner should be predictable and logical:
-
-```text
-1. Exact category beats fallback category.
-2. Exact difficulty beats nearby difficulty.
-3. Exact/closest duration wins.
-4. Equipment match wins.
-5. Newer/visible content only after coaching criteria are equal.
-```
-
-This prevents a poor match from winning because of database order.
-
-7. Add local verification cases before finishing
-I will verify the logic against important scenarios, including:
-
-- Weight Loss + Advanced + 12 weeks + Equipment
-  - Expected: 90-Day Shred Challenge.
-
-- Weight Loss + Advanced + 12 weeks + Bodyweight
-  - Expected: best weight-loss/bodyweight or nearest safe fallback, not equipment-only content.
-
-- Weight Loss + Beginner + 4 weeks + Equipment
-  - Expected: Calorie Torch or closest weight-loss beginner equipment program.
-
-- Muscle Hypertrophy + Advanced + 12 weeks + Equipment
-  - Expected: 90-Day Mass Protocol.
-
-- If exact duration is missing
-  - Expected: closest duration in same category/difficulty before jumping category.
-
-- If exact category is missing
-  - Expected: related fallback with a clear explanation.
-
-8. Keep the brand rules intact
-I will not generate exercises or call it an “AI fitness coach.” Smarty Coach will remain a human-designed recommendation assistant pointing users toward existing content designed by Haris Falas.
-
-Files expected to change
-
-- `src/utils/smarty-coach/programSuggestionEngine.ts`
-  - Strict program scoring, fallback families, explanation builder.
-
-- `src/utils/smarty-coach/suggestionEngine.ts`
-  - Strict workout scoring, equipment preference, better goal/fallback logic, explanation builder.
-
-- `src/components/smarty-coach/ProgramSuggestionFlow.tsx`
-  - Minor UI wording if needed for clearer explanation display.
-
-- `src/components/smarty-coach/SmartyCoachModal.tsx`
-  - Minor UI wording if needed for workout explanations.
-
-Expected result
-
-After the fix, Smarty Coach will behave like a professional coach:
-- It will prioritize the user’s stated goal.
-- It will respect difficulty and duration.
-- It will handle equipment logically.
-- If there is no perfect match, it will recommend the closest useful alternative.
-- It will clearly explain why the recommendation was made and what trade-offs were involved.
+After this:
+- ❌ The false "cron not active" alarm is gone (real job names checked).
+- ✅ One button gives you a complete picture: crons, last week's runs, today's integrity, next week's periodization, library readiness, Stripe, images.
+- 🔁 Recurring problems get flagged automatically — you'll know "this is the same Stripe failure as yesterday" without remembering it yourself.
