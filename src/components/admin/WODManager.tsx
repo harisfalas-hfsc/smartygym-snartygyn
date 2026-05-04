@@ -527,6 +527,40 @@ export const WODManager = () => {
   // Persists every run to wod_readiness_audits and flags RECURRING issues by
   // matching stable check-keys against the previous 7 audits.
   // ===========================================================================
+  // WOD WATCHDOG — manually triggers the verify-only safety net that confirms
+  // today's WODs exist + re-kicks Stripe linking and image generation if any
+  // assets are missing. Same function the daily watchdog cron calls.
+  const handleRunWatchdog = async () => {
+    setIsRunningWatchdog(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("watchdog-wod-check");
+      if (error) throw error;
+      const result: any = data || {};
+      const found = (result?.found || []) as string[];
+      const missing = (result?.missing || []) as string[];
+      if (result?.success && missing.length === 0) {
+        toast.success("WOD Watchdog: all healthy ✅", {
+          description: `Today's slots present: ${found.join(", ") || "(verified)"}. Asset re-kick scan complete.`,
+          duration: 6000,
+        });
+      } else if (missing.length > 0) {
+        toast.warning("WOD Watchdog: missing slots", {
+          description: `Missing: ${missing.join(", ")}. Admin alert dispatched.`,
+          duration: 8000,
+        });
+      } else {
+        toast.info("WOD Watchdog ran", {
+          description: JSON.stringify(result).slice(0, 200),
+        });
+      }
+    } catch (err: any) {
+      console.error("WOD Watchdog error:", err);
+      toast.error("WOD Watchdog failed", { description: err?.message || String(err) });
+    } finally {
+      setIsRunningWatchdog(false);
+    }
+  };
+
   const handleFutureReadinessCheck = async () => {
     setIsCheckingTomorrow(true);
     type CheckResult = {
