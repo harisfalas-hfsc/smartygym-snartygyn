@@ -687,6 +687,20 @@ serve(async (req) => {
             .eq("id", runLog.id);
         }
 
+        // Notify admin once per slot/day on success (dedupe via wod_generation_notifications)
+        try {
+          await notifyAdminOnce(supabase, {
+            targetDate: effectiveDate,
+            slot: requestedSlot || "ALL",
+            status: "success",
+            triggerSource,
+            foundSlots: verification.found,
+            missingSlots: [],
+          });
+        } catch (notifyErr) {
+          console.error("[ORCHESTRATOR] success notify failed:", notifyErr);
+        }
+
         return new Response(
           JSON.stringify({
             success: true,
