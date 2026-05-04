@@ -359,7 +359,12 @@ async function runWodGeneration(params: {
     // ═══════════════════════════════════════════════════════════════════════════════
     const dayIn84 = getDayIn84Cycle(effectiveDate);
     const earlyPeriodization = getPeriodizationForDay(dayIn84);
-    const isRecoveryDayEarly = earlyPeriodization.category === "RECOVERY";
+    let isRecoveryDayEarly = earlyPeriodization.category === "RECOVERY";
+    // In testMode, the recovery flag is driven by the forced category, not by
+    // the calendar. STRENGTH/Advanced (default test) is never a recovery day.
+    if (testMode && forceCategory) {
+      isRecoveryDayEarly = forceCategory.toUpperCase() === "RECOVERY";
+    }
     
     // Check what already exists for this date (idempotent + supports retryMissing)
     // CRITICAL: Fetch FULL workout details including main_workout for section validation
