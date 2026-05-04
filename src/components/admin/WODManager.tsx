@@ -17,6 +17,7 @@ import { PeriodizationSystemDialog } from "./PeriodizationSystemDialog";
 import { WorkoutEditDialog } from "./WorkoutEditDialog";
 import { GenerateWODDialog } from "./GenerateWODDialog";
 import { WODAutoGenConfigDialog } from "./WODAutoGenConfigDialog";
+import { TestGenerateWODDialog } from "./TestGenerateWODDialog";
 import { getWODInfoForDate, getDayIn84Cycle, getCategoryForDay } from "@/lib/wodCycle";
 import { getCyprusTodayStr, utcToCyprus } from "@/lib/cyprusDate";
 
@@ -32,6 +33,7 @@ export const WODManager = () => {
   const [isSendingNotifications, setIsSendingNotifications] = useState(false);
   const [periodizationDialogOpen, setPeriodizationDialogOpen] = useState(false);
   const [generateDialogOpen, setGenerateDialogOpen] = useState(false);
+  const [testGenerateDialogOpen, setTestGenerateDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingWorkout, setEditingWorkout] = useState<any>(null);
   const [cronDialogOpen, setCronDialogOpen] = useState(false);
