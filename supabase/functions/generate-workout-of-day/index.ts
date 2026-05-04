@@ -2963,41 +2963,63 @@ Return JSON with these exact fields:
       
       logStep("✅ RECOVERY VARIOUS workout verified - proceeding with state update");
     } else {
-      // Normal days: Check for BOTH BODYWEIGHT and EQUIPMENT
+      // Normal days. PLAN 2 — slot scoping: when an explicit slot was
+      // requested (split BODYWEIGHT / EQUIPMENT crons), this run is ONLY
+      // responsible for verifying its own slot. Otherwise verify both.
       const bodyweightExists = finalVerification?.some(w => w.equipment === "BODYWEIGHT");
       const equipmentExists = finalVerification?.some(w => w.equipment === "EQUIPMENT");
-      
+
+      const slotScoped = slot === "BODYWEIGHT" || slot === "EQUIPMENT";
+      const requiredSlots: string[] = slotScoped
+        ? [slot as string]
+        : ["BODYWEIGHT", "EQUIPMENT"];
+
+      const missing: string[] = [];
+      for (const req of requiredSlots) {
+        if (req === "BODYWEIGHT" && !bodyweightExists) missing.push("BODYWEIGHT");
+        if (req === "EQUIPMENT" && !equipmentExists) missing.push("EQUIPMENT");
+      }
+
       logStep("Final verification before state update", {
         effectiveDate,
+        slotScoped,
+        requiredSlots,
         totalFound: finalVerification?.length || 0,
         bodyweightExists,
         equipmentExists,
         workouts: finalVerification?.map(w => ({ id: w.id, name: w.name, equipment: w.equipment }))
       });
-      
-      if (!bodyweightExists || !equipmentExists) {
-        const missing = [];
-        if (!bodyweightExists) missing.push("BODYWEIGHT");
-        if (!equipmentExists) missing.push("EQUIPMENT");
 
-        await rollbackActiveWodsForDate(supabase, effectiveDate, `Final verification failed. Missing: ${missing.join(", ")}`);
+      if (missing.length > 0) {
+        // Only roll back THIS slot's own row(s) when slot-scoped.
+        // Never touch the sibling slot the other cron is responsible for.
+        const rollbackSlot = slotScoped ? (slot as string) : null;
+        await rollbackActiveWodsForDate(
+          supabase,
+          effectiveDate,
+          `Final verification failed. Missing: ${missing.join(", ")}`,
+          rollbackSlot,
+        );
         runWodStripeCleanup("normal-final-verification-failed", false).catch(() => {});
-        
-        logStep("CRITICAL ERROR: Not all workouts generated", { 
-          missing, 
-          generated: generatedWorkouts.map(w => w.equipment)
+
+        logStep("CRITICAL ERROR: Required workouts not generated", {
+          missing,
+          slotScoped,
+          requiredSlots,
+          generated: generatedWorkouts.map(w => w.equipment),
         });
-        
+
         return new Response(
           JSON.stringify({
             success: false,
-            error: `Failed to generate all WODs. Missing: ${missing.join(", ")}`,
-            generated: generatedWorkouts.map(w => ({ name: w.name, equipment: w.equipment }))
+            error: `Failed to generate required WODs. Missing: ${missing.join(", ")}`,
+            slot: slot || null,
+            generated: generatedWorkouts.map(w => ({ name: w.name, equipment: w.equipment })),
           }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
         );
       }
-      
+
       logStep("✅ BOTH workouts verified - proceeding with state update");
     }
 
