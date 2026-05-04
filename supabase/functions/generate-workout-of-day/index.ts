@@ -2759,7 +2759,7 @@ Return JSON with these exact fields:
         .from("admin_workouts")
         .insert({
           id: workoutId,
-          name: workoutContent.name,
+          name: testMode ? `[TEST] ${workoutContent.name}` : workoutContent.name,
           type: isRecoveryDay ? "recovery" : "WOD",
           category: category,
           format: format,
@@ -2778,11 +2778,12 @@ Return JSON with these exact fields:
           price: 3.99,
           stripe_product_id: stripeProductId,
           stripe_price_id: stripePriceId,
-          is_workout_of_day: true,
+          is_workout_of_day: testMode ? false : true,
           is_ai_generated: true,
           is_visible: true,
           serial_number: null,
-          generated_for_date: effectiveDate
+          generated_for_date: testMode ? null : effectiveDate,
+          ...(testMode ? { wod_source: 'test_mode' } : {}),
         });
 
       if (insertError) {
