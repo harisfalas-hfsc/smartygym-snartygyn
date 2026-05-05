@@ -814,28 +814,6 @@ className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-co
                           </Button>
                         )}
                         
-                        <div className="flex items-center justify-center gap-2 mb-3">
-                          <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                            <UserCheck className="w-5 h-5 text-primary" />
-                          </div>
-                          <div className="w-10 h-10 rounded-full bg-destructive/20 flex items-center justify-center">
-                            <Ban className="w-5 h-5 text-destructive" />
-                          </div>
-                          <div className="w-10 h-10 rounded-full bg-destructive/20 flex items-center justify-center">
-                            <Brain className="w-5 h-5 text-destructive" />
-                          </div>
-                        </div>
-                        
-                        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 sm:mb-3 text-center text-foreground">
-                          100% Human. <span className="text-destructive">0% AI.</span>
-                        </h2>
-                        
-						<div className="max-w-4xl mx-auto space-y-2 text-center mb-4">
-                          <p className="text-base sm:text-lg font-medium text-foreground">
-                            <span className="text-primary font-semibold">SmartyGym</span> workouts and programs are built to fit YOUR life.
-                          </p>
-                        </div>
-
                         {/* Desktop navigation carousel (compact cards, arrows centered in gap) */}
                           <div 
                             className="mt-0"
