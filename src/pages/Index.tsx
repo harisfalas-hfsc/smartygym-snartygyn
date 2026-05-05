@@ -841,7 +841,7 @@ className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-co
                                       <Card
                                         onClick={() => navigate(card.route)}
                                         className={cn(
-                                          "h-[220px] border-[3px] border-primary/40 bg-card",
+                                          "h-[260px] border-[3px] border-primary/40 bg-card",
                                           "cursor-pointer overflow-hidden rounded-xl",
                                           "hover:border-primary hover:shadow-xl hover:scale-[1.02]",
                                           "transition-all duration-300 flex flex-col"
