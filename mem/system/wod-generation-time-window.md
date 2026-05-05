@@ -24,6 +24,7 @@ type: feature
 - Success → ✅ confirmation email after first successful pass.
 - Failure → ❌ alert after final attempt of any single orchestrator run.
 - Multiple retry crons therefore cannot spam the inbox.
+- Failure email body lists the full Cyprus auto-retry chain (04:00 / 04:15 / 08:30 / 08:50 / 09:20 / 09:50 / 10:20 / 10:50) and points to the 09:30 Cyprus post-generation audit email as the authoritative final verdict.
 
 ## Internal orchestrator retries
 3 attempts × 45 s wait inside a single orchestrator invocation.
