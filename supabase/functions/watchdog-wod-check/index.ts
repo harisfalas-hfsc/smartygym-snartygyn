@@ -22,6 +22,74 @@ serve(async (req) => {
   const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
+  // ────────────────────────────────────────────────────────────
+  // CRON SELF-HEAL: detect silently-dead WOD jobs and re-register
+  // ────────────────────────────────────────────────────────────
+  // Background: pg_cron rows can show active=true while never producing
+  // run rows in cron.job_run_details (observed in production). If any of
+  // the 7 critical WOD jobs has not produced an execution row in the last
+  // 24h, re-register them all and email admin.
+  try {
+    const supabase = createClient(supabaseUrl, serviceKey);
+    const criticalJobs = [
+      "generate-wod-bodyweight-daily",
+      "generate-wod-equipment-daily",
+      "wod-retry-pass-1",
+      "wod-retry-pass-2",
+      "wod-retry-pass-3",
+      "wod-retry-pass-4",
+      "wod-post-generation-audit",
+    ];
+
+    const { data: deadJobs, error: deadErr } = await supabase.rpc("exec_sql_select", {
+      sql: `
+        SELECT j.jobname
+        FROM cron.job j
+        WHERE j.jobname = ANY(ARRAY['${criticalJobs.join("','")}'])
+          AND NOT EXISTS (
+            SELECT 1 FROM cron.job_run_details d
+            WHERE d.jobid = j.jobid
+              AND d.start_time > now() - interval '24 hours'
+          )
+      `,
+    }).maybeSingle?.() ?? { data: null, error: null };
+
+    // Fallback: query directly via select (admin client bypasses RLS)
+    const { data: jobsRows } = await supabase
+      .from("cron_job_metadata")
+      .select("job_name")
+      .in("job_name", criticalJobs);
+    void jobsRows; // metadata table is informational; real check below
+
+    // Direct PostgREST query against cron schema is not exposed; instead,
+    // detect missing recent runs by calling get_cron_jobs RPC + comparing.
+    // (We keep the heal SQL in a dedicated DB function `heal_wod_crons`.)
+    const { data: healResult, error: healErr } = await supabase.rpc("heal_wod_crons");
+    if (healErr) {
+      console.error("[WATCHDOG] heal_wod_crons RPC failed:", healErr.message);
+    } else if (healResult && (healResult as any).healed_count > 0) {
+      console.log(`[WATCHDOG] Self-healed ${ (healResult as any).healed_count } cron job(s):`, (healResult as any).healed_jobs);
+      // Email admin about the self-heal event
+      fetch(`${supabaseUrl}/functions/v1/run-system-health-audit`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${serviceKey}` },
+        body: JSON.stringify({
+          sendEmail: true,
+          triggerSource: "watchdog-cron-self-heal",
+          extraContext: {
+            healed_jobs: (healResult as any).healed_jobs,
+            note: "Watchdog detected silently-dead WOD cron jobs and re-registered them.",
+          },
+        }),
+      }).catch((e) => console.error("[WATCHDOG] self-heal email failed:", e));
+    } else {
+      console.log("[WATCHDOG] All 7 critical WOD cron jobs ran in the last 24h.");
+    }
+    void deadJobs; void deadErr;
+  } catch (cronHealErr) {
+    console.error("[WATCHDOG] Cron self-heal scan failed:", cronHealErr);
+  }
+
   // PLAN B+E asset re-kick: if any of today's WODs are missing image_url or
   // Stripe IDs, re-fire the background linker / image generator. Skip the
   // re-kick within the first 10 minutes after creation so the initial
