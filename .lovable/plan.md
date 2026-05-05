@@ -1,40 +1,30 @@
-## Direct answer
-The 06:30 / 06:50 UTC pre-build crons **did not fire** today. The 07:30 UTC audit job (which sends the success/failure email) **did not fire** either. That's why your inbox is empty.
+## Goal
+Reduce vertical space taken by the hero header (3 icons + "100% Human. 0% AI." + tagline) on desktop so the navigation carousel sits higher and feels like the main focus.
 
-The 7 jobs are listed as `active: true` in `cron.job`, but they have **zero execution rows in `cron.job_run_details`** for the last 30+ hours. They are silently dead. Other crons on the same database (`archive-old-wods`, `backup-wod-generation`, `watchdog-wod-check`, `queue-wod-notifications-morning`) are firing normally, so pg_cron itself is fine — only these 7 are broken.
+## Changes — `src/pages/Index.tsx` (desktop hero block, ~lines 805–838)
 
-## What to do
+1. **Card padding**: `p-8 md:p-12` → `p-6 md:p-8` (less internal padding).
 
-### Step 1 — Drop and recreate the 7 dead cron jobs
-Use `cron.unschedule` + `cron.schedule` (same SQL pattern that the existing `update_wod_cron_schedule()` function already uses successfully). Re-register:
+2. **Icon row** (line 817–827):
+   - Container: `gap-3 mb-6` → `gap-2 mb-3`
+   - Each circle: `w-16 h-16` → `w-10 h-10`
+   - Each icon: `w-8 h-8` → `w-5 h-5`
 
-```text
-generate-wod-bodyweight-daily   30 6 * * *  → wod-generation-orchestrator (slot=BODYWEIGHT, targetDate=tomorrow)
-generate-wod-equipment-daily    50 6 * * *  → wod-generation-orchestrator (slot=EQUIPMENT,  targetDate=tomorrow)
-wod-retry-pass-1                20 7 * * *  → wod-generation-orchestrator (retryMissing=true)
-wod-retry-pass-2                50 7 * * *  → wod-generation-orchestrator (retryMissing=true)
-wod-retry-pass-3                20 8 * * *  → wod-generation-orchestrator (retryMissing=true)
-wod-retry-pass-4                50 8 * * *  → wod-generation-orchestrator (retryMissing=true, finalAttempt=true)
-wod-post-generation-audit       30 7 * * *  → run-system-health-audit (sendEmail=true)
-```
+3. **Heading** (line 829):
+   - `text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6` → `text-xl sm:text-2xl md:text-3xl font-bold mb-2 sm:mb-3`
 
-After re-registering, query `cron.job_run_details` to confirm new rows appear at the next scheduled minute.
+4. **Tagline block** (line 833–837):
+   - Wrapper: `space-y-5 text-center mb-10` → `space-y-2 text-center mb-4`
+   - Paragraph: `text-xl font-semibold` → `text-base sm:text-lg font-medium`
 
-### Step 2 — Fire one test audit now to prove the email path works
-Manually invoke `wod-post-generation-audit` (or `run-system-health-audit` with `sendEmail:true`) so you receive **one email immediately** confirming the audit + Resend pipeline works end-to-end against today's already-generated WODs.
+5. **Section padding** (line 789): `py-2 sm:py-2` is already minimal — leave as-is.
 
-### Step 3 — Patch the watchdog so this can't happen silently again
-Edit `watchdog-wod-check` (already runs 02:15 UTC daily) so that, in addition to checking that tomorrow's WODs exist, it also checks `cron.job_run_details` and confirms each of the 7 critical jobs ran in the previous 24h. If any didn't, it auto-re-registers the missing ones and emails admin a "cron self-heal" alert. This closes the silent-failure window that just bit us.
-
-### Step 4 — Verification tomorrow morning
-Tomorrow's chain (06:30 → 08:50 UTC May 6) will:
-1. Build May 7's two WODs
-2. Run audit at 07:30 UTC
-3. Email you success or failure verdict at ~09:30 Cyprus
-
-If the email lands tomorrow, the fix is confirmed and we move on.
+## Result
+- Header block height drops from ~280px to ~140px on desktop.
+- Carousel cards (220px tall) become the dominant element above the fold at 1128×672 viewport.
+- No changes to mobile branch, carousel, or copy text.
+- No changes to tablet sub-cards or other templates referenced in codebase.
 
 ## Out of scope
-- No DB schema changes
-- No edits to the orchestrator (it already works — yesterday's manual run proved it)
-- Today's two manually-generated WODs stay exactly as they are
+- Editing brand templates in `src/components/admin/instagram/*` (those are exports, not the homepage).
+- Any copy or color changes.
