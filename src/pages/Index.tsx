@@ -816,7 +816,7 @@ className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-co
                         
                         {/* Desktop navigation carousel (compact cards, arrows centered in gap) */}
                           <div 
-                            className="mt-0"
+                            className={cn("mt-0", !isPremium && "pt-12")}
                             onMouseEnter={() => setIsHoveringDesktopNav(true)}
                             onMouseLeave={() => setIsHoveringDesktopNav(false)}
                           >
