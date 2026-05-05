@@ -31,39 +31,9 @@ serve(async (req) => {
   // 24h, re-register them all and email admin.
   try {
     const supabase = createClient(supabaseUrl, serviceKey);
-    const criticalJobs = [
-      "generate-wod-bodyweight-daily",
-      "generate-wod-equipment-daily",
-      "wod-retry-pass-1",
-      "wod-retry-pass-2",
-      "wod-retry-pass-3",
-      "wod-retry-pass-4",
-      "wod-post-generation-audit",
-    ];
-
-    const { data: deadJobs, error: deadErr } = await supabase.rpc("exec_sql_select", {
-      sql: `
-        SELECT j.jobname
-        FROM cron.job j
-        WHERE j.jobname = ANY(ARRAY['${criticalJobs.join("','")}'])
-          AND NOT EXISTS (
-            SELECT 1 FROM cron.job_run_details d
-            WHERE d.jobid = j.jobid
-              AND d.start_time > now() - interval '24 hours'
-          )
-      `,
-    }).maybeSingle?.() ?? { data: null, error: null };
-
-    // Fallback: query directly via select (admin client bypasses RLS)
-    const { data: jobsRows } = await supabase
-      .from("cron_job_metadata")
-      .select("job_name")
-      .in("job_name", criticalJobs);
-    void jobsRows; // metadata table is informational; real check below
-
-    // Direct PostgREST query against cron schema is not exposed; instead,
-    // detect missing recent runs by calling get_cron_jobs RPC + comparing.
-    // (We keep the heal SQL in a dedicated DB function `heal_wod_crons`.)
+    // Detection + healing happens inside the SECURITY DEFINER DB function
+    // `heal_wod_crons()` which has access to the cron schema. It returns
+    // { healed_count, healed_jobs }.
     const { data: healResult, error: healErr } = await supabase.rpc("heal_wod_crons");
     if (healErr) {
       console.error("[WATCHDOG] heal_wod_crons RPC failed:", healErr.message);
@@ -85,7 +55,6 @@ serve(async (req) => {
     } else {
       console.log("[WATCHDOG] All 7 critical WOD cron jobs ran in the last 24h.");
     }
-    void deadJobs; void deadErr;
   } catch (cronHealErr) {
     console.error("[WATCHDOG] Cron self-heal scan failed:", cronHealErr);
   }
