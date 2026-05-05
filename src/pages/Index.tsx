@@ -569,7 +569,7 @@ const Index = () => {
           <PageBreadcrumbs items={[{ label: "Home" }]} />
         </div>
         
-        {isMobile ? <section className="pt-4 pb-2 px-4">
+        {isMobile ? <section className="pt-0 pb-2 px-4">
             {/* Mobile swipe indicator (homepage carousel) */}
             <div className="flex items-center justify-center gap-3 mb-3">
               <button
@@ -786,7 +786,7 @@ className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-co
 
           </section> : <>
             {/* Desktop: Hero Section */}
-            <section className="relative py-2 sm:py-2 bg-background overflow-hidden my-0">
+            <section className="relative pt-0 pb-2 bg-background overflow-hidden my-0">
           
           <div className="container mx-auto max-w-6xl px-4 relative z-10 overflow-x-hidden">
             <ScrollReveal>
