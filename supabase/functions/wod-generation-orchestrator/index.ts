@@ -652,6 +652,7 @@ serve(async (req) => {
         slot: requestedSlot,
         retryMissing: isRetry,
         triggerSource,
+        targetDate: effectiveDate,
       });
 
       if (!generateResult.success) {
