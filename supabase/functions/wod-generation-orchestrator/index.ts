@@ -236,10 +236,10 @@ async function sendAdminAlert(
       
       <div style="background: #fef9f0; border: 1px solid #fcd9a0; border-radius: 8px; padding: 16px; margin: 20px 0;">
         <p style="margin: 0; font-weight: bold; color: #b45309;">
-          All ${MAX_ATTEMPTS} primary attempts have failed, but a <strong>backup attempt is scheduled at 03:00 Cyprus time</strong>.
+          All ${MAX_ATTEMPTS} attempts have failed in this run. The system will <strong>automatically retry</strong> at the next scheduled slot.
         </p>
         <p style="margin: 8px 0 0 0; color: #92400e;">
-          You will receive a ✅ recovery email if the backup succeeds. Only take manual action if you receive NO recovery email by 04:00 Cyprus time.
+          Auto-retry chain (Cyprus): <strong>04:00 backup → 04:15 watchdog → 08:30 / 08:50 primary → 09:20 / 09:50 / 10:20 / 10:50 retries</strong>. You will receive a ✅ success or ❌ final-failure summary in the <strong>09:30 Cyprus post-generation audit email</strong>. Only take manual action if the 09:30 audit email is ❌ — or if you receive no email by 11:00 Cyprus.
         </p>
       </div>
       
@@ -265,8 +265,12 @@ async function sendAdminAlert(
           <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${attempts.length}</td>
         </tr>
         <tr>
-          <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; font-weight: bold;">Backup Scheduled:</td>
-          <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; color: #059669; font-weight: bold;">✅ 01:00 UTC / 03:00 Cyprus</td>
+          <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; font-weight: bold;">Auto-Retry Chain:</td>
+          <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; color: #059669; font-weight: bold;">✅ 04:00 / 04:15 / 08:30 / 08:50 / 09:20 / 09:50 / 10:20 / 10:50 Cyprus</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; font-weight: bold;">Final Verdict:</td>
+          <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; color: #059669; font-weight: bold;">📧 09:30 Cyprus audit email (✅ or ❌)</td>
         </tr>
       </table>
       
@@ -277,19 +281,19 @@ async function sendAdminAlert(
       
       <div style="background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; padding: 16px; margin: 20px 0;">
         <p style="margin: 0; font-weight: bold; color: #065f46;">
-          🔄 Backup System Active
+          🔄 Auto-Retry Chain Active
         </p>
         <p style="margin: 8px 0 0 0; color: #065f46;">
-          A backup generation attempt will run at <strong>03:00 Cyprus time</strong>. If it succeeds, you'll receive a recovery confirmation email. No manual action needed unless you don't get that confirmation by 04:00.
+          Two verify-only safety nets (<strong>04:00</strong> backup + <strong>04:15</strong> watchdog) plus the primary generation crons (<strong>08:30 / 08:50</strong>) and four retry passes (<strong>09:20 / 09:50 / 10:20 / 10:50</strong> Cyprus) will attempt to fill any missing slot. The <strong>09:30 Cyprus post-generation audit</strong> sends a single ✅ or ❌ summary email — that is your authoritative status.
         </p>
       </div>
       
       <div style="background: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px; padding: 16px; margin: 20px 0;">
         <p style="margin: 0; font-weight: bold; color: #92400e;">
-          🔧 Manual Fallback (if backup also fails):
+          🔧 Manual Fallback (only if 09:30 audit email is ❌):
         </p>
         <p style="margin: 8px 0 0 0; color: #92400e;">
-          Go to <strong>Admin → WOD Manager → Generate New WOD</strong> and click <strong>"Regenerate Today"</strong>.
+          Go to <strong>Admin → Content → WOD → WOD Watchdog</strong> to verify, or click <strong>Generate New WOD</strong> to manually create the missing slot.
         </p>
       </div>
       
@@ -479,8 +483,8 @@ serve(async (req) => {
 
   // ───────────────────────────────────────────────────────────────────────────
   // EARLY EXIT: If today's WODs already exist and pass the publish contract,
-  // do nothing. This prevents backup (03:00) and watchdog (03:05) wrappers
-  // from re-generating WODs unnecessarily and burning AI credits.
+  // do nothing. This prevents backup (04:00 Cyprus) and watchdog (04:15 Cyprus)
+  // wrappers from re-generating WODs unnecessarily and burning AI credits.
   // ───────────────────────────────────────────────────────────────────────────
   // Watchdog/backup verify-only mode runs the FULL contract (image + Stripe
   // must be present). Generator success path uses STRUCTURAL contract because
