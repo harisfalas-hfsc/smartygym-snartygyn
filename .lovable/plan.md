@@ -1,82 +1,109 @@
-You are right. No library mode. I will not use library selection for this fix.
+## Goal
 
-Clear final answer:
-- Yes, I can fix the admin button.
-- The button must generate the WOD itself, using the WOD generation engine, not library mode.
-- The current button is wrong because it still calls the old fragile path directly.
+1. **Cleanup** the 2 orphan WODs polluting the DB and Stripe (one-time).
+2. **Fix** the WOD generation flow so a failed attempt cannot leave behind a hidden DB row OR a Stripe product/price ever again.
 
-What I found in the code
+---
 
-1. The admin button currently calls `generate-workout-of-day` directly.
-- File: `src/components/admin/WODManager.tsx`
-- It sends only `{ targetDate }`.
-- It does not send `slot`.
-- It does not use the newer orchestrator flow.
-- It waits synchronously for the full result.
+## Part 1 — One-time cleanup
 
-That means the manual button is still trying to create BODYWEIGHT + EQUIPMENT together in one old-style call. If one succeeds and the other fails, the system rolls back the partial result. That is exactly what happened: EQUIPMENT was created, BODYWEIGHT was missing, then the partial WOD was hidden.
+The two orphans confirmed in the DB:
+- `Cadence Leap Circuit` → Stripe `prod_USUHshUBTX5OVl`
+- `Torque Circuit Tabata` → Stripe `prod_USUKBf4oXIGfOJ`
 
-2. I also found a serious bug in the orchestrator.
-- File: `supabase/functions/wod-generation-orchestrator/index.ts`
-- The orchestrator accepts `targetDate`, but its internal `callGenerateWod()` does not pass that `targetDate` down to `generate-workout-of-day`.
-- So an orchestrator run can think it is generating/verifying tomorrow, while the generator itself may still generate today.
+Both have `is_visible: false` and `generated_for_date: null` — they are dead rows from the May 4 failed manual attempts, not part of any planned WOD.
 
-That must be fixed. This is not library mode. This is a date-forwarding bug.
+Steps:
+1. **Stripe side** — archive each product (sets `active: false`, also auto-archives attached prices). Use `stripe--stripe_api_execute` with `PostProductsId`, body `{ active: false }`. Stripe does not allow hard delete on products that have been used; archiving is the correct end state and removes them from product listings/checkout.
+2. **DB side** — delete the two rows from `admin_workouts` where `id` matches the two orphans (via a migration). This is intentionally a hard delete, not archival, because they were never live and never sold — the non-destructive policy applies to **live/sold** content only.
+3. Verify `SELECT … WHERE is_visible=false AND is_workout_of_day=true` returns 0 rows after.
 
-3. The 1,000-workout question
-There are two different things:
-- Generating a new WOD with the generation engine: a larger library can make exercise/content constraints and uniqueness checks heavier.
-- Selecting from library: a larger library can make selection easier.
+---
 
-You rejected library mode, so the relevant answer is: the generation engine must not depend on doing everything in one giant fragile call. The button needs to use the same split-slot generation contract as the cron system, but hidden behind one admin click.
+## Part 2 — Fix the orchestrator: validate-then-stripe-then-publish
 
-What I will implement
+### Current (broken) order
 
-1. Fix target date forwarding in the orchestrator
-- Update `callGenerateWod()` so it accepts `targetDate`.
-- Include `targetDate` in the body sent to `generate-workout-of-day`.
-- This protects tomorrow pre-generation and manual future generation.
+```text
+generate-workout-of-day per slot:
+  build content → INSERT row (is_visible=TRUE, stripe IDs NULL)
+                  ├─ fire-and-forget auto-generate-workout-image
+                  └─ fire-and-forget wod-stripe-link  (creates Stripe product + price)
 
-2. Fix the admin button to use the orchestrator / split-slot generation, not the old direct full generation
-- Replace the direct call to `generate-workout-of-day` from the admin button.
-- For normal days, one click will trigger:
-  - BODYWEIGHT generation for the selected date
-  - EQUIPMENT generation for the selected date
-- For recovery days, one click will trigger the required recovery slot only.
-- This is still generation, not library mode.
+orchestrator:
+  loops attempts, only checks "did rows exist?"
+  no cross-slot pairing check before Stripe linking happens
+  → if slot 2 fails, slot 1 is already visible AND its Stripe product is being created in the background
+  → on retry/cleanup the row is flipped to is_visible=false but the Stripe product stays
+```
 
-3. Keep it one-click for you
-- You will not need to click BODYWEIGHT and EQUIPMENT separately.
-- The button will do the split internally.
-- The UI can say something like: “Generating BODYWEIGHT + EQUIPMENT WODs...”
+This is exactly what produced the two orphans.
 
-4. Stop false success / false hanging
-- The button will verify the database after generation.
-- It will show success only when the required WODs exist for the selected Cyprus date and are active.
-- If one slot fails, the message will say exactly which one failed.
+### New (correct) order
 
-5. Make the archive checkbox sane
-- If no active WOD exists, the archive option will not confuse the flow.
-- It can be disabled or treated as irrelevant.
-- If active WODs exist, it remains available.
+```text
+generate-workout-of-day per slot:
+  build content → INSERT row with is_visible=FALSE, stripe IDs NULL
+                  (NO stripe-link kickoff here, NO image kickoff that depends on visibility)
+  return slot result to orchestrator
 
-6. Do not change the WOD mode setting
-- I will not enable library mode.
-- I will not route this through `select-wod-from-library`.
-- If you ever want library mode, you can switch it yourself. This fix does not touch that.
+orchestrator (after both slots return for the day):
+  Step 1 — Pair validation
+    • Required slots present? (BODYWEIGHT + EQUIPMENT, or just one on recovery days)
+    • Both pass section/density/name validators
+    • If ANY slot fails or is missing →
+        DELETE both staged rows (hard delete, since is_visible=false and never linked)
+        Mark run failed, send failure email, exit. Zero trace.
 
-Expected result
+  Step 2 — Stripe linking (only after Step 1 passes)
+    • For each staged row, call wod-stripe-link synchronously
+    • If Stripe call fails on either slot →
+        Roll back: archive any product already created in this run,
+        DELETE both staged rows, mark run failed, exit.
 
-After this fix, pressing “Generate Missing WOD” should:
-- generate today’s WODs through the generation engine,
-- publish them immediately for today,
-- not wait for midnight,
-- not use library mode,
-- and not fail just because the old all-in-one call produced only one of the two slots.
+  Step 3 — Publish flip (atomic-ish)
+    • UPDATE both rows SET is_visible = TRUE in a single statement
+      (WHERE id IN (slot1_id, slot2_id))
+    • Kick off image generation (image absence is non-blocking, image
+      can land later without affecting visibility)
+    • Mark run success, send success email.
+```
 
-Implementation files
-- `supabase/functions/wod-generation-orchestrator/index.ts`
-- `src/components/admin/WODManager.tsx`
-- possibly `src/components/admin/GenerateWODDialog.tsx` for clearer button text and archive-checkbox behavior
+This enforces the existing rule in `mem://business-rules/wod-all-or-none-publishing` at the orchestrator level instead of trusting each slot individually.
 
-I will keep the change focused on fixing the button and the date-forwarding bug.
+### Code changes required
+
+1. **`supabase/functions/generate-workout-of-day/index.ts`** (around line 2701–2759):
+   - Change the INSERT to `is_visible: false`.
+   - Remove the inline `wod-stripe-link` fire-and-forget call.
+   - Remove the inline `auto-generate-workout-image` fire-and-forget call (move to Step 3).
+   - Return the inserted `workoutId` and slot in the response so the orchestrator can act on it.
+
+2. **`supabase/functions/wod-generation-orchestrator/index.ts`** (around line 644–710):
+   - After all attempts succeed structurally, add the new 3-step finalize block:
+     - `validateBothSlots(rows)` — already have validators in `_shared/wod-integrity.ts`; just call against both staged rows.
+     - `linkStripeForBoth(rows)` — synchronous calls to `wod-stripe-link`, with rollback helper.
+     - `publishBoth(rows)` — single UPDATE flipping `is_visible=true` for both ids, then fire image jobs.
+   - Add `rollbackStagedRun(rows)` helper that:
+     - For any row with a `stripe_product_id`, archive it via Stripe API (`active:false`).
+     - Hard-DELETE both rows (safe: they are still `is_visible=false` and never reached customers).
+
+3. **No schema migration needed.** All changes are in edge function logic. Existing columns (`is_visible`, `stripe_product_id`, `stripe_price_id`) carry the new state.
+
+4. **Recovery-day case** (single slot): the same 3-step flow runs with one row instead of two. The "all or nothing" rule degenerates to "this one or nothing".
+
+### What this guarantees
+
+| Scenario | DB result | Stripe result |
+|---|---|---|
+| Both slots succeed | 2 rows visible | 2 products live |
+| Slot 1 ok, Slot 2 fails generation | 0 rows | 0 products |
+| Both ok, Stripe link fails on slot 2 | 0 rows | 0 products (slot 1 product archived in rollback) |
+| Image generation later fails | 2 rows visible (image-less, retried by image cron) | 2 products live |
+
+No "hidden orphan" state ever exists for more than the few seconds of the finalize block, and even within that window nothing is customer-visible.
+
+### Out of scope (deliberately)
+
+- Renaming/repurposing the existing `cleanup-wod-stripe-orphans` cron — it stays as a safety net for any pre-existing orphans, but with the new flow it should find nothing on healthy days.
+- WODManager UI date/badge/grouping improvements — that was a separate proposal; not included here unless you want me to fold it in.
