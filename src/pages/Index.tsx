@@ -906,6 +906,20 @@ className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-co
 
                         {/* "Your Gym Re-imagined" card - now below carousel on desktop */}
                         <div className="bg-background/60 backdrop-blur-sm p-6 rounded-lg border-2 border-primary/30 mt-8 max-w-4xl mx-auto text-center">
+                            <div className="flex items-center justify-center gap-2 mb-3">
+                              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                                <UserCheck className="w-5 h-5 text-primary" />
+                              </div>
+                              <div className="w-10 h-10 rounded-full bg-destructive/20 flex items-center justify-center">
+                                <Ban className="w-5 h-5 text-destructive" />
+                              </div>
+                              <div className="w-10 h-10 rounded-full bg-destructive/20 flex items-center justify-center">
+                                <Brain className="w-5 h-5 text-destructive" />
+                              </div>
+                            </div>
+                            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 text-center text-foreground">
+                              100% Human. <span className="text-destructive">0% AI.</span>
+                            </h2>
                             <p className="text-xl font-bold text-primary mb-2">
                               Your Gym Re-imagined Anywhere, Anytime
                             </p>
