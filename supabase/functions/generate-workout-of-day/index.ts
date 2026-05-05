@@ -2695,68 +2695,143 @@ Return JSON with these exact fields:
         throw new Error(`${equipment} WOD rejected: unsafe public name after cleanup (${workoutContent.name})`);
       }
 
-      // PLAN B: Stripe product/price creation deferred. See `wod-stripe-link`.
-      logStep(`Stripe linking deferred for ${equipment} WOD`, { workoutId, equipment });
+      // ═══════════════════════════════════════════════════════════════════════════════
+      // ATOMIC STAGE → LINK → PUBLISH (replaces old "insert visible + fire-and-forget"
+      // flow that left orphan hidden rows + orphan Stripe products on failure).
+      //
+      // 1. INSERT row with is_visible=FALSE (staged, not customer-visible).
+      // 2. Synchronously create Stripe product + price (idempotent keys).
+      // 3. UPDATE row with stripe IDs + is_visible=TRUE (publish).
+      // If any step fails: archive any created Stripe product + DELETE the staged row.
+      // ═══════════════════════════════════════════════════════════════════════════════
+      let stagedProductId: string | null = null;
+      let stagedPriceId: string | null = null;
+      try {
+        const { error: insertError } = await supabase
+          .from("admin_workouts")
+          .insert({
+            id: workoutId,
+            name: workoutContent.name,
+            type: isRecoveryDay ? "recovery" : "WOD",
+            category: category,
+            format: format,
+            equipment: equipment,
+            difficulty: selectedDifficulty.name,
+            difficulty_stars: selectedDifficulty.stars,
+            focus: strengthFocusForWorkout,
+            duration: finalDuration,
+            description: normalizedDescription,
+            main_workout: cleanedMainWorkout,
+            instructions: finalInstructions,
+            tips: normalizedTips,
+            image_url: imageUrl,
+            is_premium: true,
+            is_standalone_purchase: true,
+            price: 3.99,
+            stripe_product_id: null,
+            stripe_price_id: null,
+            is_workout_of_day: true,
+            is_ai_generated: true,
+            is_visible: false, // STAGED — not visible until Stripe link succeeds
+            serial_number: null,
+            generated_for_date: effectiveDate
+          });
 
-      const { error: insertError } = await supabase
-        .from("admin_workouts")
-        .insert({
-          id: workoutId,
+        if (insertError) {
+          throw new Error(`Failed to insert ${equipment} WOD: ${insertError.message}`);
+        }
+
+        // Synchronous Stripe link with idempotent keys (matches wod-stripe-link logic).
+        const productKey = `SMARTYGYM:wod:${workoutId}:product`;
+        const priceKey = `SMARTYGYM:wod:${workoutId}:price`;
+
+        const product = await stripe.products.create({
           name: workoutContent.name,
-          type: isRecoveryDay ? "recovery" : "WOD",
-          category: category,
-          format: format,
-          equipment: equipment,
-          difficulty: selectedDifficulty.name,
-          difficulty_stars: selectedDifficulty.stars,
-          focus: strengthFocusForWorkout,
-          duration: finalDuration,
-          description: normalizedDescription,
-          main_workout: cleanedMainWorkout,
-          instructions: finalInstructions,
-          tips: normalizedTips,
-          image_url: imageUrl,
-          is_premium: true,
-          is_standalone_purchase: true,
-          price: 3.99,
-          stripe_product_id: stripeProductId,
-          stripe_price_id: stripePriceId,
-          is_workout_of_day: true,
-          is_ai_generated: true,
-          is_visible: true,
-          serial_number: null,
-          generated_for_date: effectiveDate
+          description: `${category} Workout (${equipment})`,
+          images: [],
+          metadata: {
+            project: "SMARTYGYM",
+            content_type: "Workout",
+            content_id: workoutId,
+            workout_id: workoutId,
+            type: "wod",
+            category: category || "",
+            equipment,
+            generated_for_date: effectiveDate,
+          },
+        }, { idempotencyKey: productKey });
+        stagedProductId = product.id;
+
+        const price = await stripe.prices.create({
+          product: product.id,
+          unit_amount: 399,
+          currency: "eur",
+          metadata: {
+            project: "SMARTYGYM",
+            content_id: workoutId,
+            generated_for_date: effectiveDate,
+            equipment,
+          },
+        }, { idempotencyKey: priceKey });
+        stagedPriceId = price.id;
+
+        await stripe.products.update(product.id, { default_price: price.id });
+
+        // Publish: link Stripe IDs and flip visible in a single update.
+        const { error: publishError } = await supabase
+          .from("admin_workouts")
+          .update({
+            stripe_product_id: product.id,
+            stripe_price_id: price.id,
+            is_visible: true,
+          })
+          .eq("id", workoutId);
+
+        if (publishError) {
+          throw new Error(`Failed to publish ${equipment} WOD: ${publishError.message}`);
+        }
+
+        logStep(`✅ ${equipment} WOD staged → linked → published atomically`, {
+          workoutId, productId: product.id, priceId: price.id,
         });
 
-      if (insertError) {
-        throw new Error(`Failed to insert ${equipment} WOD: ${insertError.message}`);
+        // Image generation stays fire-and-forget. Image absence is non-blocking
+        // (re-tried by the image cron). It does NOT affect publish state.
+        try {
+          await fetch(`${supabaseUrl}/functions/v1/auto-generate-workout-image`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${supabaseServiceKey}`,
+            },
+            body: JSON.stringify({ workout_id: workoutId }),
+          }).catch((e) => logStep("auto-generate-workout-image kickoff failed (non-fatal)", { error: String(e) }));
+        } catch (_e) { /* non-fatal */ }
+      } catch (atomicErr: any) {
+        // ROLLBACK: archive any created Stripe product, delete the staged row.
+        logStep(`⚠️ Atomic publish failed for ${equipment} WOD — rolling back`, {
+          workoutId, error: atomicErr?.message, stagedProductId,
+        });
+        if (stagedProductId) {
+          try {
+            await stripe.products.update(stagedProductId, { active: false });
+            logStep(`Stripe product archived during rollback`, { stagedProductId });
+          } catch (archiveErr: any) {
+            logStep(`Failed to archive Stripe product during rollback (non-fatal)`, {
+              stagedProductId, error: archiveErr?.message,
+            });
+          }
+        }
+        try {
+          await supabase.from("admin_workouts").delete().eq("id", workoutId);
+          logStep(`Staged row deleted during rollback`, { workoutId });
+        } catch (delErr: any) {
+          logStep(`Failed to delete staged row during rollback`, {
+            workoutId, error: delErr?.message,
+          });
+        }
+        throw atomicErr; // re-throw so per-variant retry / failure flow runs
       }
-
-      // PLAN A+B: Fire-and-forget background asset generation. The DB trigger
-      // `trigger_auto_generate_workout_image` does not run for WODs, so we
-      // explicitly invoke both `auto-generate-workout-image` and the new
-      // `wod-stripe-link` here. They run independently of this function's
-      // 150s window.
-      try {
-        await fetch(`${supabaseUrl}/functions/v1/auto-generate-workout-image`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${supabaseServiceKey}`,
-          },
-          body: JSON.stringify({ workout_id: workoutId }),
-        }).catch((e) => logStep("auto-generate-workout-image kickoff failed (non-fatal)", { error: String(e) }));
-      } catch (_e) { /* non-fatal */ }
-      try {
-        await fetch(`${supabaseUrl}/functions/v1/wod-stripe-link`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${supabaseServiceKey}`,
-          },
-          body: JSON.stringify({ workout_id: workoutId }),
-        }).catch((e) => logStep("wod-stripe-link kickoff failed (non-fatal)", { error: String(e) }));
-      } catch (_e) { /* non-fatal */ }
 
       // ═══════════════════════════════════════════════════════════════════════════════
       // CRITICAL SAFETY CHECK: Verify workout was actually inserted with correct data
