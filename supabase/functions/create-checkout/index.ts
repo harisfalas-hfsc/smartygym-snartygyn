@@ -113,6 +113,14 @@ serve(async (req) => {
           user_id: user.id,
         }
       },
+      // Ensure Stripe saves the checkout payment method as the
+      // subscription's default — this is what guarantees future
+      // recurring renewals auto-charge without any manual action.
+      payment_method_options: {
+        card: {
+          request_three_d_secure: 'automatic',
+        },
+      },
     });
 
     logStep("Checkout session created", { sessionId: session.id });
