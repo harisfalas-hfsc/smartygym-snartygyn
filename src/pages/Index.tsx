@@ -565,11 +565,11 @@ const Index = () => {
       </section>
       
       <div className="min-h-screen bg-background overflow-x-hidden">
-        <div className="container mx-auto max-w-6xl px-4">
-          <PageBreadcrumbs items={[{ label: "Home" }]} />
-        </div>
-        
-        {isMobile ? <section className="pt-4 pb-2 px-4">
+        {isMobile ? <>
+          <div className="container mx-auto max-w-6xl px-4">
+            <PageBreadcrumbs items={[{ label: "Home" }]} />
+          </div>
+          <section className="pt-0 pb-2 px-4">
             {/* Mobile swipe indicator (homepage carousel) */}
             <div className="flex items-center justify-center gap-3 mb-3">
               <button
