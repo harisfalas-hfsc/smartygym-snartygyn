@@ -802,7 +802,7 @@ className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-co
                 <meta itemProp="url" content="https://smartygym.com" />
                 <meta itemProp="description" content="SmartyGym - #1 online gym and fitness platform by Haris Falas - smartygym.com" />
                 
-                <CardContent className="p-8 md:p-12 relative z-20">
+                <CardContent className="p-6 md:p-8 relative z-20">
                         {/* CTA Button for non-premium users - positioned top left */}
                         {!isPremium && (
                           <Button 
@@ -814,24 +814,24 @@ className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-co
                           </Button>
                         )}
                         
-                        <div className="flex items-center justify-center gap-3 mb-6">
-                          <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center">
-                            <UserCheck className="w-8 h-8 text-primary" />
+                        <div className="flex items-center justify-center gap-2 mb-3">
+                          <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                            <UserCheck className="w-5 h-5 text-primary" />
                           </div>
-                          <div className="w-16 h-16 rounded-full bg-destructive/20 flex items-center justify-center">
-                            <Ban className="w-8 h-8 text-destructive" />
+                          <div className="w-10 h-10 rounded-full bg-destructive/20 flex items-center justify-center">
+                            <Ban className="w-5 h-5 text-destructive" />
                           </div>
-                          <div className="w-16 h-16 rounded-full bg-destructive/20 flex items-center justify-center">
-                            <Brain className="w-8 h-8 text-destructive" />
+                          <div className="w-10 h-10 rounded-full bg-destructive/20 flex items-center justify-center">
+                            <Brain className="w-5 h-5 text-destructive" />
                           </div>
                         </div>
                         
-                        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 text-center text-foreground">
+                        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 sm:mb-3 text-center text-foreground">
                           100% Human. <span className="text-destructive">0% AI.</span>
                         </h2>
                         
-						<div className="max-w-4xl mx-auto space-y-5 text-center mb-10">
-                          <p className="text-xl font-semibold text-foreground">
+						<div className="max-w-4xl mx-auto space-y-2 text-center mb-4">
+                          <p className="text-base sm:text-lg font-medium text-foreground">
                             <span className="text-primary font-semibold">SmartyGym</span> workouts and programs are built to fit YOUR life.
                           </p>
                         </div>
