@@ -22,6 +22,43 @@ serve(async (req) => {
   const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
+  // ────────────────────────────────────────────────────────────
+  // CRON SELF-HEAL: detect silently-dead WOD jobs and re-register
+  // ────────────────────────────────────────────────────────────
+  // Background: pg_cron rows can show active=true while never producing
+  // run rows in cron.job_run_details (observed in production). If any of
+  // the 7 critical WOD jobs has not produced an execution row in the last
+  // 24h, re-register them all and email admin.
+  try {
+    const supabase = createClient(supabaseUrl, serviceKey);
+    // Detection + healing happens inside the SECURITY DEFINER DB function
+    // `heal_wod_crons()` which has access to the cron schema. It returns
+    // { healed_count, healed_jobs }.
+    const { data: healResult, error: healErr } = await supabase.rpc("heal_wod_crons");
+    if (healErr) {
+      console.error("[WATCHDOG] heal_wod_crons RPC failed:", healErr.message);
+    } else if (healResult && (healResult as any).healed_count > 0) {
+      console.log(`[WATCHDOG] Self-healed ${ (healResult as any).healed_count } cron job(s):`, (healResult as any).healed_jobs);
+      // Email admin about the self-heal event
+      fetch(`${supabaseUrl}/functions/v1/run-system-health-audit`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${serviceKey}` },
+        body: JSON.stringify({
+          sendEmail: true,
+          triggerSource: "watchdog-cron-self-heal",
+          extraContext: {
+            healed_jobs: (healResult as any).healed_jobs,
+            note: "Watchdog detected silently-dead WOD cron jobs and re-registered them.",
+          },
+        }),
+      }).catch((e) => console.error("[WATCHDOG] self-heal email failed:", e));
+    } else {
+      console.log("[WATCHDOG] All 7 critical WOD cron jobs ran in the last 24h.");
+    }
+  } catch (cronHealErr) {
+    console.error("[WATCHDOG] Cron self-heal scan failed:", cronHealErr);
+  }
+
   // PLAN B+E asset re-kick: if any of today's WODs are missing image_url or
   // Stripe IDs, re-fire the background linker / image generator. Skip the
   // re-kick within the first 10 minutes after creation so the initial
