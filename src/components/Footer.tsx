@@ -2,16 +2,19 @@ import { useNavigate } from "react-router-dom";
 import { Facebook, Instagram, Youtube } from "lucide-react";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { isNativePlatform } from "@/utils/native";
 
 export const Footer = () => {
   const navigate = useNavigate();
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
+  const isNative = isNativePlatform();
 
   return (
     <footer className="bg-background mt-auto py-8 px-4">
       <div className="container mx-auto max-w-7xl">
         <div className="flex flex-col items-center gap-6">
-          {/* App Store Download Buttons */}
+          {/* App Store Download Buttons — hidden inside the native Capacitor app */}
+          {!isNative && (
           <div className="flex items-center gap-3">
             {/* Apple App Store */}
             <a 
@@ -72,6 +75,7 @@ export const Footer = () => {
               </svg>
             </a>
           </div>
+          )}
 
           {/* Social Media Links */}
           <div className="flex items-center gap-4">
