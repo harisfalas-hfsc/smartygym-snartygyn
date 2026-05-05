@@ -1,109 +1,40 @@
-## Goal
+## Direct answer
+The 06:30 / 06:50 UTC pre-build crons **did not fire** today. The 07:30 UTC audit job (which sends the success/failure email) **did not fire** either. That's why your inbox is empty.
 
-1. **Cleanup** the 2 orphan WODs polluting the DB and Stripe (one-time).
-2. **Fix** the WOD generation flow so a failed attempt cannot leave behind a hidden DB row OR a Stripe product/price ever again.
+The 7 jobs are listed as `active: true` in `cron.job`, but they have **zero execution rows in `cron.job_run_details`** for the last 30+ hours. They are silently dead. Other crons on the same database (`archive-old-wods`, `backup-wod-generation`, `watchdog-wod-check`, `queue-wod-notifications-morning`) are firing normally, so pg_cron itself is fine — only these 7 are broken.
 
----
+## What to do
 
-## Part 1 — One-time cleanup
-
-The two orphans confirmed in the DB:
-- `Cadence Leap Circuit` → Stripe `prod_USUHshUBTX5OVl`
-- `Torque Circuit Tabata` → Stripe `prod_USUKBf4oXIGfOJ`
-
-Both have `is_visible: false` and `generated_for_date: null` — they are dead rows from the May 4 failed manual attempts, not part of any planned WOD.
-
-Steps:
-1. **Stripe side** — archive each product (sets `active: false`, also auto-archives attached prices). Use `stripe--stripe_api_execute` with `PostProductsId`, body `{ active: false }`. Stripe does not allow hard delete on products that have been used; archiving is the correct end state and removes them from product listings/checkout.
-2. **DB side** — delete the two rows from `admin_workouts` where `id` matches the two orphans (via a migration). This is intentionally a hard delete, not archival, because they were never live and never sold — the non-destructive policy applies to **live/sold** content only.
-3. Verify `SELECT … WHERE is_visible=false AND is_workout_of_day=true` returns 0 rows after.
-
----
-
-## Part 2 — Fix the orchestrator: validate-then-stripe-then-publish
-
-### Current (broken) order
+### Step 1 — Drop and recreate the 7 dead cron jobs
+Use `cron.unschedule` + `cron.schedule` (same SQL pattern that the existing `update_wod_cron_schedule()` function already uses successfully). Re-register:
 
 ```text
-generate-workout-of-day per slot:
-  build content → INSERT row (is_visible=TRUE, stripe IDs NULL)
-                  ├─ fire-and-forget auto-generate-workout-image
-                  └─ fire-and-forget wod-stripe-link  (creates Stripe product + price)
-
-orchestrator:
-  loops attempts, only checks "did rows exist?"
-  no cross-slot pairing check before Stripe linking happens
-  → if slot 2 fails, slot 1 is already visible AND its Stripe product is being created in the background
-  → on retry/cleanup the row is flipped to is_visible=false but the Stripe product stays
+generate-wod-bodyweight-daily   30 6 * * *  → wod-generation-orchestrator (slot=BODYWEIGHT, targetDate=tomorrow)
+generate-wod-equipment-daily    50 6 * * *  → wod-generation-orchestrator (slot=EQUIPMENT,  targetDate=tomorrow)
+wod-retry-pass-1                20 7 * * *  → wod-generation-orchestrator (retryMissing=true)
+wod-retry-pass-2                50 7 * * *  → wod-generation-orchestrator (retryMissing=true)
+wod-retry-pass-3                20 8 * * *  → wod-generation-orchestrator (retryMissing=true)
+wod-retry-pass-4                50 8 * * *  → wod-generation-orchestrator (retryMissing=true, finalAttempt=true)
+wod-post-generation-audit       30 7 * * *  → run-system-health-audit (sendEmail=true)
 ```
 
-This is exactly what produced the two orphans.
+After re-registering, query `cron.job_run_details` to confirm new rows appear at the next scheduled minute.
 
-### New (correct) order
+### Step 2 — Fire one test audit now to prove the email path works
+Manually invoke `wod-post-generation-audit` (or `run-system-health-audit` with `sendEmail:true`) so you receive **one email immediately** confirming the audit + Resend pipeline works end-to-end against today's already-generated WODs.
 
-```text
-generate-workout-of-day per slot:
-  build content → INSERT row with is_visible=FALSE, stripe IDs NULL
-                  (NO stripe-link kickoff here, NO image kickoff that depends on visibility)
-  return slot result to orchestrator
+### Step 3 — Patch the watchdog so this can't happen silently again
+Edit `watchdog-wod-check` (already runs 02:15 UTC daily) so that, in addition to checking that tomorrow's WODs exist, it also checks `cron.job_run_details` and confirms each of the 7 critical jobs ran in the previous 24h. If any didn't, it auto-re-registers the missing ones and emails admin a "cron self-heal" alert. This closes the silent-failure window that just bit us.
 
-orchestrator (after both slots return for the day):
-  Step 1 — Pair validation
-    • Required slots present? (BODYWEIGHT + EQUIPMENT, or just one on recovery days)
-    • Both pass section/density/name validators
-    • If ANY slot fails or is missing →
-        DELETE both staged rows (hard delete, since is_visible=false and never linked)
-        Mark run failed, send failure email, exit. Zero trace.
+### Step 4 — Verification tomorrow morning
+Tomorrow's chain (06:30 → 08:50 UTC May 6) will:
+1. Build May 7's two WODs
+2. Run audit at 07:30 UTC
+3. Email you success or failure verdict at ~09:30 Cyprus
 
-  Step 2 — Stripe linking (only after Step 1 passes)
-    • For each staged row, call wod-stripe-link synchronously
-    • If Stripe call fails on either slot →
-        Roll back: archive any product already created in this run,
-        DELETE both staged rows, mark run failed, exit.
+If the email lands tomorrow, the fix is confirmed and we move on.
 
-  Step 3 — Publish flip (atomic-ish)
-    • UPDATE both rows SET is_visible = TRUE in a single statement
-      (WHERE id IN (slot1_id, slot2_id))
-    • Kick off image generation (image absence is non-blocking, image
-      can land later without affecting visibility)
-    • Mark run success, send success email.
-```
-
-This enforces the existing rule in `mem://business-rules/wod-all-or-none-publishing` at the orchestrator level instead of trusting each slot individually.
-
-### Code changes required
-
-1. **`supabase/functions/generate-workout-of-day/index.ts`** (around line 2701–2759):
-   - Change the INSERT to `is_visible: false`.
-   - Remove the inline `wod-stripe-link` fire-and-forget call.
-   - Remove the inline `auto-generate-workout-image` fire-and-forget call (move to Step 3).
-   - Return the inserted `workoutId` and slot in the response so the orchestrator can act on it.
-
-2. **`supabase/functions/wod-generation-orchestrator/index.ts`** (around line 644–710):
-   - After all attempts succeed structurally, add the new 3-step finalize block:
-     - `validateBothSlots(rows)` — already have validators in `_shared/wod-integrity.ts`; just call against both staged rows.
-     - `linkStripeForBoth(rows)` — synchronous calls to `wod-stripe-link`, with rollback helper.
-     - `publishBoth(rows)` — single UPDATE flipping `is_visible=true` for both ids, then fire image jobs.
-   - Add `rollbackStagedRun(rows)` helper that:
-     - For any row with a `stripe_product_id`, archive it via Stripe API (`active:false`).
-     - Hard-DELETE both rows (safe: they are still `is_visible=false` and never reached customers).
-
-3. **No schema migration needed.** All changes are in edge function logic. Existing columns (`is_visible`, `stripe_product_id`, `stripe_price_id`) carry the new state.
-
-4. **Recovery-day case** (single slot): the same 3-step flow runs with one row instead of two. The "all or nothing" rule degenerates to "this one or nothing".
-
-### What this guarantees
-
-| Scenario | DB result | Stripe result |
-|---|---|---|
-| Both slots succeed | 2 rows visible | 2 products live |
-| Slot 1 ok, Slot 2 fails generation | 0 rows | 0 products |
-| Both ok, Stripe link fails on slot 2 | 0 rows | 0 products (slot 1 product archived in rollback) |
-| Image generation later fails | 2 rows visible (image-less, retried by image cron) | 2 products live |
-
-No "hidden orphan" state ever exists for more than the few seconds of the finalize block, and even within that window nothing is customer-visible.
-
-### Out of scope (deliberately)
-
-- Renaming/repurposing the existing `cleanup-wod-stripe-orphans` cron — it stays as a safety net for any pre-existing orphans, but with the new flow it should find nothing on healthy days.
-- WODManager UI date/badge/grouping improvements — that was a separate proposal; not included here unless you want me to fold it in.
+## Out of scope
+- No DB schema changes
+- No edits to the orchestrator (it already works — yesterday's manual run proved it)
+- Today's two manually-generated WODs stay exactly as they are
