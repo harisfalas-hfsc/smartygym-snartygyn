@@ -145,7 +145,7 @@ async function verifyWodsExist(
 async function callGenerateWod(
   supabaseUrl: string,
   anonKey: string,
-  opts: { slot?: string | null; retryMissing?: boolean; triggerSource?: string } = {}
+  opts: { slot?: string | null; retryMissing?: boolean; triggerSource?: string; targetDate?: string | null } = {}
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const body: any = {
@@ -156,6 +156,7 @@ async function callGenerateWod(
     };
     if (opts.slot) body.slot = opts.slot;
     if (opts.retryMissing) body.retryMissing = true;
+    if (opts.targetDate) body.targetDate = opts.targetDate;
 
     console.log(`[ORCHESTRATOR] Calling generate-workout-of-day (sync)`, body);
 
@@ -651,6 +652,7 @@ serve(async (req) => {
         slot: requestedSlot,
         retryMissing: isRetry,
         triggerSource,
+        targetDate: effectiveDate,
       });
 
       if (!generateResult.success) {

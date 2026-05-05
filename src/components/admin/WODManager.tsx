@@ -194,21 +194,67 @@ export const WODManager = () => {
         }
       }
 
-      const { data, error } = await supabase.functions.invoke("generate-workout-of-day", {
-        body: { targetDate },
+      // Resolve effective Cyprus date for verification + slot decision
+      const effectiveDate = targetDate || getCyprusTodayStr();
+      const dayInCycle = getDayIn84Cycle(effectiveDate);
+      const category = getCategoryForDay(dayInCycle);
+      const isRecovery = category === "RECOVERY";
+      const slots: Array<"BODYWEIGHT" | "EQUIPMENT" | "VARIOUS"> = isRecovery
+        ? ["VARIOUS"]
+        : ["BODYWEIGHT", "EQUIPMENT"];
+
+      toast.message(`Generating ${slots.join(" + ")} for ${effectiveDate}…`, {
+        description: "Each slot runs separately. Please wait — this can take 1–3 minutes per slot.",
       });
 
-      if (error) throw error;
+      const slotResults: Array<{ slot: string; ok: boolean; error?: string }> = [];
+      for (const slot of slots) {
+        const { data: orchData, error: orchError } = await supabase.functions.invoke(
+          "wod-generation-orchestrator",
+          {
+            body: {
+              triggerSource: "admin",
+              slot,
+              targetDate: effectiveDate,
+            },
+          },
+        );
+        if (orchError) {
+          slotResults.push({ slot, ok: false, error: orchError.message || "invoke failed" });
+          continue;
+        }
+        const ok = !!orchData?.success;
+        slotResults.push({
+          slot,
+          ok,
+          error: ok ? undefined : (orchData?.error || JSON.stringify(orchData?.missing || orchData)),
+        });
+      }
 
-      // Check if WOD was skipped (already exists)
-      if (data?.skipped) {
-        toast.info(data.message || "WOD already exists", {
-          description: "No new WOD generated - use Edit to modify the existing one",
+      // Verify in DB what is actually live for the effective date
+      const { data: liveWods } = await supabase
+        .from("admin_workouts")
+        .select("id, name, equipment")
+        .eq("generated_for_date", effectiveDate)
+        .eq("is_workout_of_day", true)
+        .eq("is_visible", true);
+
+      const liveSlots = new Set((liveWods || []).map((w: any) => w.equipment));
+      const missing = slots.filter((s) => !liveSlots.has(s));
+
+      if (missing.length === 0) {
+        toast.success(`Workout of the Day published for ${effectiveDate}`, {
+          description: (liveWods || [])
+            .map((w: any) => `${w.equipment}: ${w.name}`)
+            .join(" • "),
         });
       } else {
-        const dateLabel = targetDate ? `for ${targetDate}` : "for today";
-        toast.success(`Workout of the Day generated ${dateLabel}!`, {
-          description: `${data?.workouts?.[0]?.name || 'New WOD'} - ${data?.shared?.category || 'Generated'}`,
+        const failedDetail = slotResults
+          .filter((r) => !r.ok)
+          .map((r) => `${r.slot}: ${r.error || "failed"}`)
+          .join(" | ");
+        toast.error(`Missing slot(s): ${missing.join(", ")}`, {
+          description: failedDetail || "Generator did not produce all required slots. Try again.",
         });
       }
 

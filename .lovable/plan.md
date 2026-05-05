@@ -1,48 +1,82 @@
-# Fix Stale WOD Failure Email Template
+You are right. No library mode. I will not use library selection for this fix.
 
-## Why
+Clear final answer:
+- Yes, I can fix the admin button.
+- The button must generate the WOD itself, using the WOD generation engine, not library mode.
+- The current button is wrong because it still calls the old fragile path directly.
 
-You received a failure email this morning with **outdated wording** that still references the old backup logic (03:00 / 04:00 Cyprus). The detection logic itself is **working correctly** — it really did find missing WODs and alert you — but the HTML body is out of sync with the new schedule we deployed yesterday.
+What I found in the code
 
-The new safety chain (which is actually what runs) is:
-- 04:00 Cyprus — backup-wod-generation (verify)
-- 04:15 Cyprus — watchdog-wod-check (verify)
-- 08:30 / 08:50 Cyprus — primary generation
-- 09:20 / 09:50 / 10:20 / 10:50 Cyprus — 4 retry passes
-- 09:30 Cyprus — post-generation audit email (✅ success or ❌ failure summary)
+1. The admin button currently calls `generate-workout-of-day` directly.
+- File: `src/components/admin/WODManager.tsx`
+- It sends only `{ targetDate }`.
+- It does not send `slot`.
+- It does not use the newer orchestrator flow.
+- It waits synchronously for the full result.
 
-## What to change
+That means the manual button is still trying to create BODYWEIGHT + EQUIPMENT together in one old-style call. If one succeeds and the other fails, the system rolls back the partial result. That is exactly what happened: EQUIPMENT was created, BODYWEIGHT was missing, then the partial WOD was hidden.
 
-**File:** `supabase/functions/wod-generation-orchestrator/index.ts`
+2. I also found a serious bug in the orchestrator.
+- File: `supabase/functions/wod-generation-orchestrator/index.ts`
+- The orchestrator accepts `targetDate`, but its internal `callGenerateWod()` does not pass that `targetDate` down to `generate-workout-of-day`.
+- So an orchestrator run can think it is generating/verifying tomorrow, while the generator itself may still generate today.
 
-Rewrite the failure-email HTML block (lines ~235–290) to:
+That must be fixed. This is not library mode. This is a date-forwarding bug.
 
-1. **Headline alert box** — replace "backup attempt is scheduled at 03:00 Cyprus" with the new retry chain wording. New copy:
-   > All ${MAX_ATTEMPTS} primary attempts have failed for this run. The system will automatically retry at **04:00, 04:15, 08:30, 08:50, 09:20, 09:50, 10:20, and 10:50 Cyprus time**. You will receive a ✅ confirmation or ❌ final failure summary by **09:30 Cyprus** (post-generation audit email). Only take manual action if you receive a ❌ audit email at 09:30, OR no email at all by 11:00 Cyprus.
+3. The 1,000-workout question
+There are two different things:
+- Generating a new WOD with the generation engine: a larger library can make exercise/content constraints and uniqueness checks heavier.
+- Selecting from library: a larger library can make selection easier.
 
-2. **Details table — "Backup Scheduled" row** — rename to **"Next Auto-Retry"** and show the next scheduled retry slot (computed from current UTC time vs. the cron schedule list), not a hardcoded "01:00 UTC / 03:00 Cyprus".
+You rejected library mode, so the relevant answer is: the generation engine must not depend on doing everything in one giant fragile call. The button needs to use the same split-slot generation contract as the cron system, but hidden behind one admin click.
 
-3. **"Backup System Active" info box** — rewrite to describe the 4-retry chain + 09:30 audit email instead of the obsolete single 03:00 backup.
+What I will implement
 
-4. **"Manual Fallback" box** — keep it (still valid), but update the wording to say "if the 09:30 audit email is ❌" instead of "if backup also fails".
+1. Fix target date forwarding in the orchestrator
+- Update `callGenerateWod()` so it accepts `targetDate`.
+- Include `targetDate` in the body sent to `generate-workout-of-day`.
+- This protects tomorrow pre-generation and manual future generation.
 
-5. **Comment on line 482** — update the inline comment that says "backup (03:00) and watchdog (03:05) wrappers" to reflect the new times (04:00 backup / 04:15 watchdog).
+2. Fix the admin button to use the orchestrator / split-slot generation, not the old direct full generation
+- Replace the direct call to `generate-workout-of-day` from the admin button.
+- For normal days, one click will trigger:
+  - BODYWEIGHT generation for the selected date
+  - EQUIPMENT generation for the selected date
+- For recovery days, one click will trigger the required recovery slot only.
+- This is still generation, not library mode.
 
-## What NOT to change
+3. Keep it one-click for you
+- You will not need to click BODYWEIGHT and EQUIPMENT separately.
+- The button will do the split internally.
+- The UI can say something like: “Generating BODYWEIGHT + EQUIPMENT WODs...”
 
-- Detection / dedup logic (it's correct).
-- `wod_generation_notifications` table.
-- Cron schedules.
-- The post-generation audit email template (already correct from yesterday's migration).
+4. Stop false success / false hanging
+- The button will verify the database after generation.
+- It will show success only when the required WODs exist for the selected Cyprus date and are active.
+- If one slot fails, the message will say exactly which one failed.
 
-## After deploying
+5. Make the archive checkbox sane
+- If no active WOD exists, the archive option will not confuse the flow.
+- It can be disabled or treated as irrelevant.
+- If active WODs exist, it remains available.
 
-The email you got this morning was a **real signal** — yesterday's manual catch-up didn't successfully fill May 5. Confirm via a quick query whether May 5's two WODs now exist (the 04:00 / 04:15 / 08:30 / 08:50 Cyprus chain should have filled them by now). If still missing, fire one manual retry from the admin panel.
+6. Do not change the WOD mode setting
+- I will not enable library mode.
+- I will not route this through `select-wod-from-library`.
+- If you ever want library mode, you can switch it yourself. This fix does not touch that.
 
-## Memory update
+Expected result
 
-Update `mem/system/wod-generation-time-window.md` to note: "Failure email body lists the full retry chain (04:00 / 04:15 / 08:30 / 08:50 / 09:20 / 09:50 / 10:20 / 10:50 Cyprus) and points to the 09:30 Cyprus audit email as the final verdict."
+After this fix, pressing “Generate Missing WOD” should:
+- generate today’s WODs through the generation engine,
+- publish them immediately for today,
+- not wait for midnight,
+- not use library mode,
+- and not fail just because the old all-in-one call produced only one of the two slots.
 
----
+Implementation files
+- `supabase/functions/wod-generation-orchestrator/index.ts`
+- `src/components/admin/WODManager.tsx`
+- possibly `src/components/admin/GenerateWODDialog.tsx` for clearer button text and archive-checkbox behavior
 
-**Approve this plan and I'll implement it in default mode, then verify May 5's WODs actually exist.**
+I will keep the change focused on fixing the button and the date-forwarding bug.
