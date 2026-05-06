@@ -25,6 +25,7 @@ import { LazySection } from "@/components/LazySection";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useTodayWods } from "@/hooks/useTodayWods";
 import { HeroDestinationConstellation } from "@/components/home/HeroDestinationConstellation";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
 
 import heroWodImage from "@/assets/hero-wod.jpg";
 import heroWorkoutsImage from "@/assets/hero-workouts-bright.jpg";
@@ -69,6 +70,30 @@ const Index = () => {
 
   // State for pinned audience tooltip (click to toggle)
   const [activeAudienceTooltip, setActiveAudienceTooltip] = useState<string | null>(null);
+
+  // Mobile hero carousel state (cards are wider than viewport, swipeable)
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  useEffect(() => {
+    if (!carouselApi) return;
+    const onSelect = () => setCurrentSlide(carouselApi.selectedScrollSnap());
+    onSelect();
+    carouselApi.on("select", onSelect);
+    return () => {
+      carouselApi.off("select", onSelect);
+    };
+  }, [carouselApi]);
+
+  // Mobile hero swipeable cards
+  const heroCards = [
+    { id: "workouts", title: "Smarty Workouts", description: "500+ expert-designed workout routines for every fitness level and goal", icon: Dumbbell, route: "/workout", image: heroWorkoutsImage },
+    { id: "programs", title: "Smarty Programs", description: "Structured multi-week programs designed to transform your fitness journey", icon: Calendar, route: "/trainingprogram", image: heroProgramsImage },
+    { id: "tools", title: "Smarty Tools", description: "Professional fitness calculators and tracking tools to optimize your training", icon: Calculator, route: "/tools", image: heroToolsImage },
+    { id: "exerciselibrary", title: "Exercise Library", description: "Comprehensive video library with proper form demonstrations and technique guides", icon: Video, route: "/exerciselibrary", image: heroLibraryImage },
+    { id: "blog", title: "Blog & Insights", description: "Evidence-based fitness articles and expert insights from professional coaches", icon: FileText, route: "/blog", image: heroBlogImage },
+    { id: "community", title: "Community", description: "Connect, share and grow with fellow fitness enthusiasts worldwide", icon: Users, route: "/community", image: heroCommunityImage },
+  ];
 
   // Fetch review stats for SEO schema - low priority, don't block render
   const { data: reviewStats } = useQuery({
@@ -409,9 +434,76 @@ const Index = () => {
         </div>
         
         {isMobile ? <section className="pt-0 pb-2 px-4">
-            {/* Interactive constellation of destination bubbles */}
-            <div className="pt-2 pb-4">
-              <HeroDestinationConstellation />
+            {/* Mobile swipe indicator (homepage carousel) */}
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <button
+                type="button"
+                onClick={() => carouselApi?.scrollPrev()}
+                className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors"
+                aria-label="Previous card"
+              >
+                <ChevronLeft className="h-4 w-4 text-primary" />
+              </button>
+              <span className="text-xs text-muted-foreground font-medium">Swipe to explore</span>
+              <button
+                type="button"
+                onClick={() => carouselApi?.scrollNext()}
+                className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors"
+                aria-label="Next card"
+              >
+                <ChevronRight className="h-4 w-4 text-primary" />
+              </button>
+            </div>
+
+            <Carousel className="w-full" opts={{ align: "center", loop: true }} setApi={setCarouselApi}>
+              <CarouselContent className="-ml-2">
+                {heroCards.map((card) => {
+                  const Icon = card.icon;
+                  return (
+                    <CarouselItem key={card.id} className="pl-2 basis-[75%] sm:basis-[60%]">
+                      <div onClick={() => navigate(card.route)} className="border-2 border-primary/40 rounded-xl overflow-hidden hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300 cursor-pointer bg-card flex flex-col h-[220px] sm:h-[280px]">
+                        <div className="relative h-[55%] overflow-hidden flex-shrink-0">
+                          <img src={card.image} alt={card.title} className="w-full h-full object-cover" />
+                        </div>
+                        <div className="flex flex-col justify-center flex-1 p-3 text-center">
+                          <div className="flex items-center justify-center gap-2 mb-1">
+                            <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                              <Icon className="w-3.5 h-3.5 text-primary" />
+                            </div>
+                            <h3 className="text-sm font-bold text-foreground leading-tight whitespace-nowrap">
+                              {card.title}
+                            </h3>
+                          </div>
+                          <p className="text-xs text-muted-foreground leading-snug line-clamp-2">
+                            {card.description}
+                          </p>
+                          <div className="flex items-center justify-center gap-1 text-primary text-[10px] font-medium mt-1">
+                            Explore
+                            <ChevronRight className="w-3 h-3" />
+                          </div>
+                        </div>
+                      </div>
+                    </CarouselItem>
+                  );
+                })}
+              </CarouselContent>
+              <CarouselPrevious className="hidden -left-12 bg-background border-2 border-primary shadow-lg" />
+              <CarouselNext className="hidden -right-12 bg-background border-2 border-primary shadow-lg" />
+            </Carousel>
+
+            {/* Carousel Dots */}
+            <div className="flex justify-center gap-2 mt-4">
+              {heroCards.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => carouselApi?.scrollTo(index)}
+                  className={cn(
+                    "w-2.5 h-2.5 rounded-full transition-all duration-300",
+                    currentSlide === index ? "bg-primary scale-125" : "bg-primary/30 hover:bg-primary/50"
+                  )}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
             </div>
 
         {/* Quick Access Menu */}
