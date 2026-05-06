@@ -70,24 +70,24 @@ export const MobileBottomNav = () => {
       >
         <div className="flex h-14 items-stretch">
           <Item onClick={goBack} disabled={!canGoBack} label="Back">
-            <ChevronLeft className="h-6 w-6" strokeWidth={2.25} />
+            <ChevronLeft className="h-7 w-7" strokeWidth={2.25} />
           </Item>
 
           <Item onClick={() => setCoachOpen(true)} label="Smarty Coach">
             <img
               src={smartyCoachIcon}
               alt=""
-              className="h-8 w-8 rounded-full drop-shadow"
+              className="h-9 w-9 rounded-full drop-shadow"
               loading="lazy"
             />
           </Item>
 
           <Item onClick={() => navigate("/")} label="Home" active={isHome}>
-            <Home className="h-6 w-6" strokeWidth={2.25} />
+            <Home className="h-7 w-7" strokeWidth={2.25} />
           </Item>
 
           <Item onClick={goForward} disabled={!canGoForward} label="Forward">
-            <ChevronRight className="h-6 w-6" strokeWidth={2.25} />
+            <ChevronRight className="h-7 w-7" strokeWidth={2.25} />
           </Item>
         </div>
       </nav>
