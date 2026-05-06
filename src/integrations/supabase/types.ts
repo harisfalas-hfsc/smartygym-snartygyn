@@ -3474,6 +3474,24 @@ export type Database = {
           rating_count: number
         }[]
       }
+      get_public_testimonials: {
+        Args: never
+        Returns: {
+          created_at: string
+          display_name: string
+          id: string
+          rating: number
+          testimonial_text: string
+          updated_at: string
+        }[]
+      }
+      get_testimonial_rating_stats: {
+        Args: never
+        Returns: {
+          average: number
+          count: number
+        }[]
+      }
       get_visible_program_metadata: {
         Args: { _program_id?: string }
         Returns: {
