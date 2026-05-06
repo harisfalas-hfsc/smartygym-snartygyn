@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import {
   CalendarCheck,
   Dumbbell,
@@ -103,7 +104,7 @@ const DESTINATIONS: Destination[] = [
     icon: FileText,
     route: "/blog",
     image: heroBlogImage,
-    desktop: { top: 460, left: 360, size: 150 },
+  desktop: { top: 460, left: 360, size: 190 },
     delay: "0.3s",
   },
   {
@@ -114,7 +115,7 @@ const DESTINATIONS: Destination[] = [
     icon: Users,
     route: "/community",
     image: heroCommunityImage,
-    desktop: { top: 460, left: 800, size: 150 },
+    desktop: { top: 460, left: 760, size: 190 },
     delay: "1.8s",
   },
 ];
@@ -151,6 +152,7 @@ const Bubble = ({
   style,
   pullX = 0,
   pullY = 0,
+  cycleImages,
 }: {
   dest: Destination;
   isWodLive: boolean;
@@ -159,6 +161,7 @@ const Bubble = ({
   style?: React.CSSProperties;
   pullX?: number;
   pullY?: number;
+  cycleImages?: string[];
 }) => {
   const navigate = useNavigate();
   const Icon = dest.icon;
@@ -166,6 +169,17 @@ const Bubble = ({
   const labelMaxWidth = Math.max(size + 40, 130);
   // Featured WOD is already prominent — gentler scale.
   const hoverScale = dest.featured ? 1.1 : 1.18;
+
+  // Optional image carousel (e.g. today's WOD bodyweight + equipment images)
+  const images = cycleImages && cycleImages.length > 0 ? cycleImages : [dest.image];
+  const [imgIndex, setImgIndex] = useState(0);
+  useEffect(() => {
+    if (images.length < 2) return;
+    const id = window.setInterval(() => {
+      setImgIndex((i) => (i + 1) % images.length);
+    }, 2500);
+    return () => window.clearInterval(id);
+  }, [images.length]);
 
   return (
     <div
@@ -212,12 +226,18 @@ const Bubble = ({
           animationDelay: dest.delay,
         }}
       >
-        <img
-          src={dest.image}
-          alt=""
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-          loading="lazy"
-        />
+        {images.map((src, i) => (
+          <img
+            key={src + i}
+            src={src}
+            alt=""
+            className={cn(
+              "absolute inset-0 w-full h-full object-cover transition-opacity duration-700 group-hover:scale-110",
+              i === imgIndex ? "opacity-100" : "opacity-0"
+            )}
+            loading="lazy"
+          />
+        ))}
         {/* Subtle gradient overlay for legibility */}
         <div
           className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent"
@@ -285,7 +305,18 @@ const Bubble = ({
 
 export const HeroDestinationConstellation = () => {
   const { isPortrait: isMobile } = useIsPortraitMode();
-  const { hasWods } = useTodayWods(isMobile);
+  const { hasWods, bodyweightWod, equipmentWod, variousWod, allTodayWods } =
+    useTodayWods(true);
+
+  // Build the WOD image carousel from today's actual WOD images (bodyweight + equipment).
+  // Falls back to the static hero image if nothing is available yet.
+  const wodCycleImages = (() => {
+    const ordered = [bodyweightWod, equipmentWod, variousWod].filter(Boolean) as Array<{ image_url?: string | null }>;
+    const fromOrdered = ordered.map((w) => w.image_url).filter(Boolean) as string[];
+    if (fromOrdered.length > 0) return fromOrdered;
+    const fromAll = (allTodayWods || []).map((w: any) => w.image_url).filter(Boolean) as string[];
+    return fromAll;
+  })();
 
   // Find bubble center coords for connection lines (desktop)
   const centers: Record<string, { cx: number; cy: number }> = {};
@@ -381,6 +412,7 @@ export const HeroDestinationConstellation = () => {
                 size={dest.desktop.size}
                 pullX={pullX}
                 pullY={pullY}
+                cycleImages={dest.featured ? wodCycleImages : undefined}
                 className="absolute"
                 style={{
                   top: `${dest.desktop.top}px`,
@@ -410,7 +442,7 @@ export const HeroDestinationConstellation = () => {
       <div className="md:hidden">
         <div className="flex flex-col items-center gap-5">
           {/* Featured WOD bubble */}
-          <Bubble dest={featured} isWodLive={hasWods} size={150} />
+          <Bubble dest={featured} isWodLive={hasWods} size={150} cycleImages={wodCycleImages} />
 
           {/* 3 rows × 2 bubbles */}
           <div className="grid grid-cols-2 gap-x-6 gap-y-5 w-full max-w-xs">
