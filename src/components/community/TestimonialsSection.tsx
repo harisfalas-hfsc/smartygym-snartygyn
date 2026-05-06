@@ -21,12 +21,13 @@ import { CompactFilters } from "@/components/CompactFilters";
 
 interface Testimonial {
   id: string;
-  user_id: string;
+  user_id?: string;
   display_name: string;
   rating: number;
   testimonial_text: string;
   created_at: string;
   updated_at: string;
+  is_mine?: boolean;
 }
 
 interface TestimonialsSectionProps {
@@ -149,13 +150,13 @@ export const TestimonialsSection = ({
 
   const fetchTestimonials = async () => {
     try {
-      const { data, error } = await supabase
-        .from("testimonials")
-        .select("*")
-        .order("created_at", { ascending: sortOrder === "oldest" });
+      const { data, error } = await supabase.rpc("get_public_testimonials");
 
       if (error) throw error;
-      setTestimonials(data || []);
+      const rows = (data || []) as Testimonial[];
+      // RPC returns newest-first; reverse for "oldest" sort
+      const sorted = sortOrder === "oldest" ? [...rows].reverse() : rows;
+      setTestimonials(sorted);
     } catch (error) {
       console.error("Error fetching testimonials:", error);
     } finally {
