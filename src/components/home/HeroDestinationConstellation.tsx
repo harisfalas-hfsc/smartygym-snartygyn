@@ -45,7 +45,7 @@ const DESTINATIONS: Destination[] = [
     icon: CalendarCheck,
     route: "/workout/wod",
     image: heroWodImage,
-    desktop: { top: 0, left: 290, size: 180 },
+    desktop: { top: 0, left: 380, size: 200 },
     delay: "0s",
     featured: true,
   },
@@ -57,7 +57,7 @@ const DESTINATIONS: Destination[] = [
     icon: Dumbbell,
     route: "/workout",
     image: heroWorkoutsImage,
-    desktop: { top: 70, left: 510, size: 140 },
+    desktop: { top: 60, left: 720, size: 170 },
     delay: "0.6s",
   },
   {
@@ -68,7 +68,7 @@ const DESTINATIONS: Destination[] = [
     icon: Calendar,
     route: "/trainingprogram",
     image: heroProgramsImage,
-    desktop: { top: 70, left: 130, size: 140 },
+    desktop: { top: 60, left: 90, size: 170 },
     delay: "1.2s",
   },
   {
@@ -79,7 +79,7 @@ const DESTINATIONS: Destination[] = [
     icon: Calculator,
     route: "/tools",
     image: heroToolsImage,
-    desktop: { top: 240, left: 50, size: 120 },
+    desktop: { top: 270, left: 0, size: 150 },
     delay: "0.9s",
   },
   {
@@ -90,7 +90,7 @@ const DESTINATIONS: Destination[] = [
     icon: Video,
     route: "/exerciselibrary",
     image: heroLibraryImage,
-    desktop: { top: 240, left: 590, size: 120 },
+    desktop: { top: 270, left: 830, size: 150 },
     delay: "1.5s",
   },
   {
@@ -101,7 +101,7 @@ const DESTINATIONS: Destination[] = [
     icon: FileText,
     route: "/blog",
     image: heroBlogImage,
-    desktop: { top: 360, left: 200, size: 105 },
+    desktop: { top: 410, left: 280, size: 130 },
     delay: "0.3s",
   },
   {
@@ -112,7 +112,7 @@ const DESTINATIONS: Destination[] = [
     icon: Users,
     route: "/community",
     image: heroCommunityImage,
-    desktop: { top: 360, left: 460, size: 105 },
+    desktop: { top: 410, left: 570, size: 130 },
     delay: "1.8s",
   },
 ];
@@ -271,12 +271,13 @@ export const HeroDestinationConstellation = () => {
       <div className="hidden md:block">
         <div
           className="relative mx-auto"
-          style={{ width: "760px", height: "510px" }}
+          style={{ width: "100%", maxWidth: "980px", height: "590px" }}
         >
           {/* Decorative connection SVG */}
           <svg
             className="absolute inset-0 w-full h-full pointer-events-none"
-            viewBox="0 0 760 510"
+            viewBox="0 0 980 590"
+            preserveAspectRatio="xMidYMid meet"
             aria-hidden="true"
           >
             <defs>
@@ -285,7 +286,7 @@ export const HeroDestinationConstellation = () => {
                 <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0" />
               </radialGradient>
             </defs>
-            <rect width="760" height="510" fill="url(#constellation-glow)" />
+            <rect width="980" height="590" fill="url(#constellation-glow)" />
             {CONNECTIONS.map(([a, b]) => {
               const A = centers[a];
               const B = centers[b];
