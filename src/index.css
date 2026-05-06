@@ -12,20 +12,28 @@
   }
 }
 
-/* MOBILE FOOTER GAP FIX
- * Many page components wrap their root in `min-h-screen`, which forces every
+/* MOBILE FOOTER GAP FIX (universal)
+ * 50+ page components wrap their root in `min-h-screen`, which forces every
  * page to be at least 100vh tall. On mobile this creates a large empty gap
- * between the page content and the global <Footer />. Neutralize that on
- * mobile so pages take their natural content height; the App-level wrapper
- * (`flex-1` content + `min-h-screen` outer column) still keeps the footer at
- * the bottom of the viewport when content is short.
+ * between the page content and the global <Footer />. Neutralize ALL
+ * `min-h-screen` usages on mobile so pages take their natural content height.
+ * The App-level outer column still has `min-h-screen` on the BODY/HTML via
+ * the flex layout, which keeps the footer at the bottom of the viewport when
+ * content is shorter than the screen. We only exclude the App's own outer
+ * sticky-footer column via the `data-app-shell` attribute below.
  */
 @media (max-width: 1023px) {
-  main .min-h-screen,
-  [data-page-root].min-h-screen,
-  .page-transition .min-h-screen,
-  .flex-1 > .min-h-screen,
-  .flex-1 .min-h-screen {
+  .min-h-screen:not([data-app-shell]) {
+    min-height: 0 !important;
+  }
+}
+
+/* On mobile, also disable the App-shell sticky-footer behavior. The user
+ * prefers the footer to sit immediately under the content even when content
+ * is shorter than the viewport, instead of being pushed to the bottom edge.
+ */
+@media (max-width: 1023px) {
+  [data-app-shell] {
     min-height: 0 !important;
   }
 }
