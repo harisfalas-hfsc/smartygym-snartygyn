@@ -1,83 +1,48 @@
-I checked the live backend state and the code paths for WOD generation, rollover, and audits.
+## Goal
 
-Current verified status:
+Rename the **Take a Tour** page to **About SmartyGym**, add four new sections (Smarty Tools, Exercise Library, Community, Blog) using the exact same card/icon/description pattern as the existing sections, place the menu link first in the hamburger order, and keep everything mobile-friendly.
 
-- Today’s active WODs are present for the current Cyprus date:
-  - `Granite Glute Control` — BODYWEIGHT — visible, active, image present, payment link present.
-  - `Granite Hip Builder` — EQUIPMENT — visible, active, image present, payment link present.
-- Tomorrow’s Pilates WODs are already pre-built and waiting for the date rollover:
-  - `Cadence Center Align` — BODYWEIGHT — generated for tomorrow, visible, active, image present, payment link present.
-  - `Cadence Bloom Shift` — EQUIPMENT — generated for tomorrow, visible, active, image present, payment link present.
-- There are no stale active WODs older than today.
-- The archive job is registered and active at `21:00 UTC`, which is `00:00 Cyprus` during summer time.
-- The archive job did run successfully last night.
-- The manual WODs from the previous issue were archived non-destructively last night: they are no longer active WODs and no longer have a `generated_for_date`, so they are not conflicting with today/tomorrow.
+## Changes
 
-So for tonight: the database state is healthy. The two Pilates WODs are in the correct waiting state, and the midnight rollover should make them appear as tomorrow’s WODs automatically because the frontend filters by Cyprus date.
+### 1. Rename page file & route
+- Rename `src/pages/TakeATour.tsx` → `src/pages/AboutSmartyGym.tsx` (rename component to `AboutSmartyGym`).
+- New canonical route: `/about` (matches the page name).
+- Keep `/takeatour` and `/take-a-tour` as **aliases** that render the same component (zero broken external links / SEO redirects).
+- Update import in `src/App.tsx` and add the alias routes.
 
-However, I found a few reliability gaps that should be fixed so I am not just saying “done” without adding protection.
+### 2. Page content updates (`AboutSmartyGym.tsx`)
+- Update `<title>`, meta description, OG tags, canonical, breadcrumb label, and H1 from "Take a Tour" → "About SmartyGym".
+- Keep existing section order: What is SmartyGym → Workout of the Day → Smarty Workouts → Smarty Programs → Smarty Ritual → Logbook & Progress Tracking.
+- **Insert four NEW cards** between Logbook and Subscription Plans, using the exact same `Card / CardHeader / CardTitle (icon + name) / CardContent` pattern with description paragraph, supporting mini-grid where useful, and a "Explore" outline button at the bottom:
+  1. **Smarty Tools** — `Wrench` icon (orange-500). Description of the free fitness calculators (1RM, BMR, Macro, Calorie Counter). CTA → `/tools`.
+  2. **Exercise Library** — `BookOpen` icon (emerald-500). Description of the searchable exercise database with descriptions, instructions, and video demos. CTA → `/exerciselibrary`.
+  3. **Community** — `Users` icon (cyan-500). Description of leaderboards, ratings, and member interactions. CTA → `/community`.
+  4. **Blog** — `Newspaper` icon (red-500). Description of expert fitness/nutrition articles by Haris Falas. CTA → `/blog`.
+- Same color/spacing tokens, same `mb-6 border border-border` card styling, same responsive grids (`grid-cols-1 md:grid-cols-2/3`), same prose color (`text-muted-foreground`).
+- Update breadcrumb: `Home › About SmartyGym`.
 
-Issues found:
+### 3. Navigation reorder (`src/components/Navigation.tsx`)
+- Move the menu item to **first position** in `discoveryItems`, before "Smarty Workouts".
+- Rename label "Take a Tour" → "About SmartyGym", path → `/about`, keep `Info` icon + teal-500 color.
+- This single array drives both desktop and mobile hamburger menus → mobile parity automatic.
 
-1. The main archive cron exists and ran, but the actual backend scheduler does not currently contain the two expected safety jobs:
-   - `backup-wod-generation`
-   - `watchdog-wod-check`
+### 4. Touch-up other references
+- `src/pages/Auth.tsx` line 386: `navigate("/take-a-tour")` → `navigate("/about")`.
+- `src/components/growth/FreeTrialPopup.tsx`: include `/about` in the `isTakeATour` (rename to `isAboutPage`) check so the trial popup behavior is preserved on the renamed page.
+- `public/sitemap.xml`: update `/takeatour` entry to `/about` (keep alias also indexed).
 
-   They exist in admin metadata, and the code exists, but they are not registered in the actual scheduler. That means the admin panel can give a false sense of safety unless we cross-check the real scheduler.
+## Out of scope / preserved
 
-2. The archive function archives old WODs, but it does not currently send a dedicated post-rollover confirmation email saying:
-   - old WODs were archived,
-   - today’s expected WODs are active,
-   - tomorrow’s pre-built WODs remain untouched.
+- No visual restyling of existing 6 sections.
+- No layout/structure changes elsewhere on the site.
+- Mobile breakpoints unchanged (existing responsive classes already mobile-first).
+- Existing SEOEnhancer, breadcrumbs, and trial popup logic preserved.
 
-3. The “Future Ready?” admin audit can report slot-based generation as “partial” because bodyweight and equipment are generated by separate cron runs. Each successful slot run naturally finds `1/2`, even though together they are correct. The audit should understand the split-slot system.
+## Files touched
 
-Implementation plan:
-
-1. Register the missing safety crons in the real scheduler
-   - Add `backup-wod-generation` at `02:00 UTC`.
-   - Add `watchdog-wod-check` at `02:15 UTC`.
-   - Keep them verify-only: they must not generate automatically or pull from the library.
-   - Their job is to alert and re-kick missing image/payment linking if needed.
-
-2. Harden the midnight archive function
-   - After archiving old WODs, add a post-archive verification step.
-   - It will check:
-     - no active WOD remains for dates older than the current Cyprus date,
-     - the current Cyprus date has the expected active WODs,
-     - tomorrow’s pre-built WODs are still present and were not accidentally archived,
-     - all active today/tomorrow WODs have image and payment links.
-   - If everything is healthy, write a clean audit log entry.
-   - If anything is wrong, send an admin alert immediately after midnight.
-
-3. Add an independent post-midnight rollover watchdog
-   - Add a small backend verification function scheduled at `21:05 UTC`, five minutes after archive.
-   - This protects against the archive job silently failing or partially completing.
-   - It will verify the same rollover contract independently.
-   - If stale active WODs remain, it can clear only the WOD flags non-destructively.
-   - If today’s WODs are missing, it will not invent/generate content; it will alert the admin.
-
-4. Fix the “Future Ready?” admin audit
-   - Make it verify the actual backend scheduler, not only the metadata table.
-   - Update the expected job list to the current WOD architecture:
-     - bodyweight generation,
-     - equipment generation,
-     - retry passes,
-     - post-generation audit,
-     - archive,
-     - morning WOD notifications,
-     - backup,
-     - watchdog,
-     - Stripe orphan cleanup.
-   - Remove false “partial generation” warnings by treating a bodyweight success plus equipment success for the same target date as a complete successful day.
-
-5. Validate after implementation
-   - Confirm today’s active WODs still show correctly.
-   - Confirm tomorrow’s Pilates WODs still remain pre-built.
-   - Confirm no stale active WODs exist.
-   - Confirm the actual backend scheduler contains all safety jobs.
-   - Run the new rollover verification in dry-run mode and confirm it reports healthy.
-
-Expected result:
-
-Tonight’s rollover will not depend only on the archive job. It will have a second verification layer immediately after midnight, plus corrected admin audits so you can trust the panel instead of manually checking every morning.
+- `src/pages/TakeATour.tsx` → renamed to `src/pages/AboutSmartyGym.tsx` (content updates + 4 new cards)
+- `src/App.tsx` (import + routes)
+- `src/components/Navigation.tsx` (reorder + rename)
+- `src/pages/Auth.tsx` (navigate path)
+- `src/components/growth/FreeTrialPopup.tsx` (path check)
+- `public/sitemap.xml` (URL entry)

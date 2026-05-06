@@ -21,9 +21,9 @@ export function FreeTrialPopup() {
   const location = useLocation();
   const { user, userTier, isLoading } = useAccessControl();
 
-  const isTakeATour = location.pathname === "/takeatour";
+  const isAboutPage = ["/about-smartygym", "/takeatour", "/take-a-tour"].includes(location.pathname);
   const isCriticalContentRoute = ["/", "/home", "/workout", "/workout/wod"].includes(location.pathname);
-  const initialDelay = isTakeATour ? 0 : DEFAULT_INITIAL_DELAY_MS;
+  const initialDelay = isAboutPage ? 0 : DEFAULT_INITIAL_DELAY_MS;
 
   useEffect(() => {
     if (!user || userTier !== "subscriber") {
