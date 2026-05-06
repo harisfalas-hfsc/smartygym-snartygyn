@@ -29,7 +29,9 @@ import {
   Trophy,
   Wrench,
   Users,
-  Newspaper
+  Newspaper,
+  Info,
+  ListChecks
 } from "lucide-react";
 
 import { SEOEnhancer } from "@/components/SEOEnhancer";
@@ -93,7 +95,7 @@ export default function AboutSmartyGym() {
           {/* Header */}
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-3 mb-2">
-              <Target className="h-8 w-8 text-primary" />
+              <Info className="h-8 w-8 text-teal-500" />
               <h1 className="text-3xl sm:text-4xl font-bold">
                 About <span className="text-primary">SmartyGym</span>
               </h1>
@@ -308,7 +310,7 @@ export default function AboutSmartyGym() {
           <Card className="mb-6 border border-border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-primary" />
+                <ListChecks className="h-5 w-5 text-blue-500" />
                 Smarty Programs
               </CardTitle>
             </CardHeader>
@@ -375,7 +377,7 @@ export default function AboutSmartyGym() {
           <Card className="mb-6 border border-border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-primary" />
+                <Sparkles className="h-5 w-5 text-purple-500" />
                 Smarty Ritual
               </CardTitle>
             </CardHeader>
@@ -497,7 +499,7 @@ export default function AboutSmartyGym() {
           <Card className="mb-6 border border-border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Wrench className="h-5 w-5 text-primary" />
+                <Wrench className="h-5 w-5 text-orange-500" />
                 Smarty Tools
               </CardTitle>
             </CardHeader>
@@ -551,7 +553,7 @@ export default function AboutSmartyGym() {
           <Card className="mb-6 border border-border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <BookOpen className="h-5 w-5 text-primary" />
+                <BookOpen className="h-5 w-5 text-emerald-500" />
                 Exercise Library
               </CardTitle>
             </CardHeader>
@@ -607,7 +609,7 @@ export default function AboutSmartyGym() {
           <Card className="mb-6 border border-border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-primary" />
+                <Users className="h-5 w-5 text-cyan-500" />
                 Community
               </CardTitle>
             </CardHeader>
@@ -663,7 +665,7 @@ export default function AboutSmartyGym() {
           <Card className="mb-6 border border-border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Newspaper className="h-5 w-5 text-primary" />
+                <Newspaper className="h-5 w-5 text-red-500" />
                 Blog
               </CardTitle>
             </CardHeader>
