@@ -383,7 +383,7 @@ export default function Auth() {
           onOpenChange={(open) => {
             setShowAvatarSetup(open);
             if (!open) {
-              setTimeout(() => navigate("/take-a-tour"), 500);
+              setTimeout(() => navigate("/about-smartygym"), 500);
             }
           }}
           userId={newUserId}

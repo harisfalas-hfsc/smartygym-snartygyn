@@ -57,7 +57,7 @@ import FAQ from "./pages/FAQ";
 import CoachProfile from "./pages/CoachProfile";
 import CoachCV from "./pages/CoachCV";
 import Contact from "./pages/Contact";
-import TakeATour from "./pages/TakeATour";
+import AboutSmartyGym from "./pages/AboutSmartyGym";
 import Shop from "./pages/Shop";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
@@ -242,7 +242,9 @@ const AppContent = () => {
                 {/* Public routes */}
                 
                 <Route path="/community" element={<Community />} />
-                <Route path="/takeatour" element={<TakeATour />} />
+                <Route path="/about-smartygym" element={<AboutSmartyGym />} />
+                <Route path="/takeatour" element={<AboutSmartyGym />} />
+                <Route path="/take-a-tour" element={<AboutSmartyGym />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/payment-success" element={<PaymentSuccess />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
