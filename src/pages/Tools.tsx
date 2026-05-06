@@ -8,6 +8,7 @@ import { Calculator, Activity, Flame, Timer, Search } from "lucide-react";
 
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
+import { generateToolWebApplicationSchema, generateSpeakableSchema } from "@/utils/seoSchemas";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
 import { SwipeToExplore } from "@/components/ui/SwipeToExplore";
 
@@ -99,6 +100,33 @@ const Tools = () => {
         {/* Greek Language */}
         <link rel="alternate" hrefLang="el" href="https://smartygym.com/tools" />
         <link rel="alternate" hrefLang="en-GB" href="https://smartygym.com/tools" />
+
+        {/* WebApplication schemas — one per tool, AI/Google rich-result ready */}
+        <script type="application/ld+json">{JSON.stringify(generateToolWebApplicationSchema({
+          name: "1RM Calculator",
+          description: "Free One Rep Max calculator by Sports Scientist Haris Falas. Estimate your 1RM using validated strength formulas (Epley, Brzycki, Lombardi).",
+          url: "/1rmcalculator",
+          keywords: ["1RM calculator", "one rep max", "strength calculator", "Epley formula", "Brzycki formula", "Haris Falas", "SmartyGym"]
+        }))}</script>
+        <script type="application/ld+json">{JSON.stringify(generateToolWebApplicationSchema({
+          name: "BMR Calculator",
+          description: "Free Basal Metabolic Rate calculator by Sports Scientist Haris Falas. Mifflin-St Jeor formula for accurate daily calorie needs.",
+          url: "/bmrcalculator",
+          keywords: ["BMR calculator", "basal metabolic rate", "TDEE", "calorie calculator", "Mifflin-St Jeor", "Haris Falas", "SmartyGym"]
+        }))}</script>
+        <script type="application/ld+json">{JSON.stringify(generateToolWebApplicationSchema({
+          name: "Macro Tracking Calculator",
+          description: "Free macronutrient calculator by Sports Scientist Haris Falas. Personalized protein, carbs, and fat targets for weight loss, maintenance, or muscle gain.",
+          url: "/macrocalculator",
+          keywords: ["macro calculator", "macronutrient calculator", "protein calculator", "nutrition planning", "Haris Falas", "SmartyGym"]
+        }))}</script>
+        <script type="application/ld+json">{JSON.stringify(generateToolWebApplicationSchema({
+          name: "Calorie Counter",
+          description: "Free calorie and macro food search tool by SmartyGym. Look up any food and instantly see calories, protein, carbs, and fat per serving.",
+          url: "/caloriecounter",
+          keywords: ["calorie counter", "food calorie lookup", "macro tracking", "USDA food database", "Haris Falas", "SmartyGym"]
+        }))}</script>
+        <script type="application/ld+json">{JSON.stringify(generateSpeakableSchema())}</script>
       </Helmet>
       
       <SEOEnhancer

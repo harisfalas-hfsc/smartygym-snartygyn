@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { User } from "@supabase/supabase-js";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
+import { generateToolWebApplicationSchema } from "@/utils/seoSchemas";
 import { generateSoftwareApplicationSchema, generateBreadcrumbSchema } from "@/utils/seoHelpers";
 
 
@@ -225,6 +226,12 @@ const MacroTrackingCalculator = () => {
         <meta name="twitter:description" content="Free macro calculator at smartygym.com for personalized nutrition" />
         
         <link rel="canonical" href="https://smartygym.com/macrocalculator" />
+        <script type="application/ld+json">{JSON.stringify(generateToolWebApplicationSchema({
+          name: "Macro Tracking Calculator",
+          description: "Free macronutrient calculator by Sports Scientist Haris Falas. Personalized protein, carbs, and fat targets for weight loss, maintenance, or muscle gain.",
+          url: "/macrocalculator",
+          keywords: ["macro calculator", "macronutrient calculator", "protein calculator", "TDEE", "nutrition planning", "Haris Falas", "SmartyGym"]
+        }))}</script>
       </Helmet>
       
       <div className="min-h-screen bg-background">
