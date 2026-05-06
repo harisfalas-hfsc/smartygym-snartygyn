@@ -563,3 +563,70 @@ export const generateCheckInToolSchema = () => ({
     "name": "SmartyGym"
   }
 });
+
+// ============================================================
+// WebApplication Schema for Fitness Tools (BMR, Macro, 1RM, etc.)
+// Used dynamically per-tool. Authored by Haris Falas, provided by SmartyGym.
+// ============================================================
+export const generateToolWebApplicationSchema = (tool: {
+  name: string;
+  description: string;
+  url: string;          // e.g. "/macrocalculator"
+  keywords?: string[];
+  imageUrl?: string;
+}) => ({
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": tool.name,
+  "description": tool.description,
+  "url": `https://smartygym.com${tool.url}`,
+  "applicationCategory": "HealthApplication",
+  "applicationSubCategory": "Fitness Calculator",
+  "operatingSystem": "Web Browser",
+  "browserRequirements": "Requires JavaScript",
+  "isAccessibleForFree": true,
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "EUR",
+    "availability": "https://schema.org/InStock"
+  },
+  "author": {
+    "@type": "Person",
+    "@id": "https://smartygym.com/coach-profile#person",
+    "name": "Haris Falas",
+    "jobTitle": "Sports Scientist & Strength and Conditioning Coach",
+    "url": "https://smartygym.com/coach-profile"
+  },
+  "creator": {
+    "@type": "Person",
+    "name": "Haris Falas"
+  },
+  "provider": {
+    "@type": "Organization",
+    "@id": "https://smartygym.com/#organization",
+    "name": "SmartyGym",
+    "url": "https://smartygym.com",
+    "logo": "https://smartygym.com/smarty-gym-logo.png"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SmartyGym",
+    "url": "https://smartygym.com"
+  },
+  ...(tool.imageUrl ? { "image": tool.imageUrl, "screenshot": tool.imageUrl } : {}),
+  ...(tool.keywords && tool.keywords.length > 0 ? { "keywords": tool.keywords.join(", ") } : {}),
+  "inLanguage": ["en-GB", "en-US"]
+});
+
+// ============================================================
+// Speakable Schema for voice search / AI audio responses
+// ============================================================
+export const generateSpeakableSchema = (cssSelectors: string[] = ["h1", "article p:first-of-type", ".speakable"]) => ({
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": cssSelectors
+  }
+});
