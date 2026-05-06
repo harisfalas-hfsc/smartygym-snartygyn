@@ -21,7 +21,6 @@ import { AccessControlProvider } from "./contexts/AccessControlContext";
 import { NavigationHistoryProvider } from "./contexts/NavigationHistoryContext";
 import { Navigation } from "./components/Navigation";
 import { FixedBackButton } from "./components/FixedBackButton";
-import { MobileBottomNav } from "./components/MobileBottomNav";
 import { Footer } from "./components/Footer";
 import { useAdminRole } from "./hooks/useAdminRole";
 import { ArticleDetail } from "./pages/ArticleDetail";
@@ -123,7 +122,6 @@ const AppContent = () => {
         <BackgroundSEO />
         <div
           className="flex flex-col min-h-screen"
-          style={{ paddingBottom: 'var(--mobile-bottom-nav-h, 0px)' }}
         >
           <Navigation />
           <FixedBackButton />
@@ -261,7 +259,6 @@ const AppContent = () => {
             </PageTransition>
           </div>
         <Footer />
-        <MobileBottomNav />
       </div>
     </AccessControlProvider>
     </>
