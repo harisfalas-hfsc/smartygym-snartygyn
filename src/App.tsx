@@ -257,6 +257,7 @@ const AppContent = () => {
             </PageTransition>
           </div>
         <Footer />
+        <MobileBottomNav />
       </div>
     </AccessControlProvider>
     </>
