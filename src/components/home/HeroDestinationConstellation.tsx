@@ -150,8 +150,6 @@ const Bubble = ({
   size,
   className,
   style,
-  pullX = 0,
-  pullY = 0,
   cycleImages,
 }: {
   dest: Destination;
@@ -159,8 +157,6 @@ const Bubble = ({
   size: number;
   className?: string;
   style?: React.CSSProperties;
-  pullX?: number;
-  pullY?: number;
   cycleImages?: string[];
 }) => {
   const navigate = useNavigate();
@@ -168,7 +164,7 @@ const Bubble = ({
   const showLivePill = dest.featured && isWodLive;
   const labelMaxWidth = Math.max(size + 40, 130);
   // Featured WOD is already prominent — gentler scale.
-  const hoverScale = dest.featured ? 1.1 : 1.18;
+  const hoverScale = dest.featured ? 1.06 : 1.08;
 
   // Optional image carousel (e.g. today's WOD bodyweight + equipment images)
   const images = cycleImages && cycleImages.length > 0 ? cycleImages : [dest.image];
@@ -192,9 +188,6 @@ const Bubble = ({
       style={
         {
           ...style,
-          // CSS vars consumed by the button transform on hover
-          ["--pull-x" as any]: `${pullX}px`,
-          ["--pull-y" as any]: `${pullY}px`,
           ["--hover-scale" as any]: hoverScale,
         } as React.CSSProperties
       }
@@ -213,11 +206,7 @@ const Bubble = ({
           "[transition:transform_550ms_cubic-bezier(0.22,1,0.36,1),box-shadow_400ms_ease-out,outline-color_300ms_ease-out]",
           "ring-[3px] ring-primary/50 hover:ring-primary",
           "shadow-lg shadow-primary/10 hover:shadow-2xl hover:shadow-primary/30",
-          // Smooth gravitate-toward-center + scale on hover/focus
-          "hover:[transform:translate3d(calc(var(--pull-x)*0.28),calc(var(--pull-y)*0.28),0)_scale(var(--hover-scale))]",
-          "focus-visible:[transform:translate3d(calc(var(--pull-x)*0.28),calc(var(--pull-y)*0.28),0)_scale(var(--hover-scale))]",
-          // Reduced motion: scale only, no translation
-          "motion-reduce:hover:[transform:scale(1.06)] motion-reduce:focus-visible:[transform:scale(1.06)]",
+          "hover:[transform:scale(var(--hover-scale))] focus-visible:[transform:scale(var(--hover-scale))]",
           "focus:outline-none focus-visible:ring-4 focus-visible:ring-primary",
           dest.featured && "ring-4 ring-primary"
         )}
@@ -328,16 +317,6 @@ export const HeroDestinationConstellation = () => {
     };
   });
 
-  // Constellation stage center — bubbles gravitate toward this point on hover.
-  const STAGE_CX = 1300 / 2;
-  const STAGE_CY = 650 / 2;
-
-  // Coach bubble occupies the center; cap each bubble's pull so its hovered
-  // edge never touches the coach circle (prevents WOD/coach collision).
-  const COACH_RADIUS = COACH.desktop.size / 2;
-  const SAFE_GAP = 18; // px of breathing room around the coach
-  const HOVER_PULL_RATIO = 0.28; // matches the CSS transform multiplier
-
   const featured = DESTINATIONS.find((d) => d.featured)!;
   const others = DESTINATIONS.filter((d) => !d.featured);
 
@@ -391,45 +370,26 @@ export const HeroDestinationConstellation = () => {
             })}
           </svg>
 
-          {DESTINATIONS.map((dest) => {
-            const c = centers[dest.id];
-            const dx = STAGE_CX - c.cx;
-            const dy = STAGE_CY - c.cy;
-            const dist = Math.hypot(dx, dy) || 1;
-            // Hovered bubble (after scale) needs to stop before touching the coach.
-            const bubbleHoverRadius = (dest.desktop.size / 2) * (dest.featured ? 1.1 : 1.18);
-            const maxTravel = Math.max(0, dist - COACH_RADIUS - bubbleHoverRadius - SAFE_GAP);
-            const desiredTravel = dist * HOVER_PULL_RATIO;
-            const allowedTravel = Math.min(desiredTravel, maxTravel);
-            const scale = allowedTravel / dist; // shrink the pull vector to a safe magnitude
-            // Reverse the CSS multiplier so the final transform = dx*scale, dy*scale.
-            const pullX = (dx * scale) / HOVER_PULL_RATIO;
-            const pullY = (dy * scale) / HOVER_PULL_RATIO;
-            return (
-              <Bubble
-                key={dest.id}
-                dest={dest}
-                isWodLive={hasWods}
-                size={dest.desktop.size}
-                pullX={pullX}
-                pullY={pullY}
-                cycleImages={dest.featured ? wodCycleImages : undefined}
-                className="absolute"
-                style={{
-                  top: `${dest.desktop.top}px`,
-                  left: `${dest.desktop.left}px`,
-                }}
-              />
-            );
-          })}
+          {DESTINATIONS.map((dest) => (
+            <Bubble
+              key={dest.id}
+              dest={dest}
+              isWodLive={hasWods}
+              size={dest.desktop.size}
+              cycleImages={dest.featured ? wodCycleImages : undefined}
+              className="absolute"
+              style={{
+                top: `${dest.desktop.top}px`,
+                left: `${dest.desktop.left}px`,
+              }}
+            />
+          ))}
 
           {/* Center coach bubble */}
           <Bubble
             dest={COACH}
             isWodLive={false}
             size={COACH.desktop.size}
-            pullX={0}
-            pullY={0}
             className="absolute"
             style={{
               top: `${COACH.desktop.top}px`,

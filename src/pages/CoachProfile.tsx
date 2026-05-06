@@ -91,7 +91,7 @@ const CoachProfile = () => {
       </Helmet>
 
       <div className="min-h-screen bg-gradient-to-b from-background to-accent/20">
-        <div className="container mx-auto max-w-4xl px-4 pb-8">
+        <div className="container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6 pb-8">
           <PageBreadcrumbs items={[
             { label: "Home", href: "/" },
             { label: "Coach Profile" }
@@ -114,7 +114,7 @@ const CoachProfile = () => {
             </header>
 
             {/* Main Content Card */}
-            <Card className="p-6 sm:p-8 md:p-10 space-y-6 sm:space-y-8">
+            <Card className="p-6 sm:p-8 md:p-10 xl:p-12 space-y-6 sm:space-y-8">
               {/* Message from Haris Falas */}
               <section>
                 <h2 className="text-2xl font-bold mb-6">Message from Haris Falas</h2>
@@ -186,7 +186,7 @@ const CoachProfile = () => {
             </Card>
 
             {/* Why I Created SmartyGym */}
-            <Card className="p-6 sm:p-8 md:p-10">
+            <Card className="p-6 sm:p-8 md:p-10 xl:p-12">
               <section>
                 <h3 className="text-xl sm:text-2xl font-semibold mb-4">Why I Created <span className="text-primary">SmartyGym</span></h3>
                 <div className="flex items-start gap-3">
