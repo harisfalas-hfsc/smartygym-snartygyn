@@ -287,7 +287,7 @@ export const Navigation = () => {
             <Sheet open={desktopMenuOpen} onOpenChange={setDesktopMenuOpen}>
                 <SheetTrigger asChild>
                   <button className="text-primary hover:text-primary/80 transition-colors -ml-2 p-1">
-                    <Menu className="h-12 w-12" strokeWidth={2} />
+                    <Menu className="h-8 w-8" strokeWidth={2} />
                   </button>
                 </SheetTrigger>
                 <SheetContent side="left" className="w-64 overflow-y-auto max-h-screen">
