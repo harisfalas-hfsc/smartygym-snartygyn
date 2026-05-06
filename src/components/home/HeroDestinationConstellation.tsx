@@ -1,0 +1,345 @@
+import { useNavigate } from "react-router-dom";
+import {
+  CalendarCheck,
+  Dumbbell,
+  Calendar,
+  Calculator,
+  Video,
+  FileText,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useTodayWods } from "@/hooks/useTodayWods";
+import { useIsPortraitMode } from "@/hooks/useIsPortraitMode";
+
+import heroWodImage from "@/assets/hero-wod.jpg";
+import heroWorkoutsImage from "@/assets/hero-workouts-bright.jpg";
+import heroProgramsImage from "@/assets/hero-programs.jpg";
+import heroToolsImage from "@/assets/hero-tools.jpg";
+import heroLibraryImage from "@/assets/hero-exercise-library-new.jpg";
+import heroBlogImage from "@/assets/hero-blog.jpg";
+import heroCommunityImage from "@/assets/hero-community-new.jpg";
+
+type Destination = {
+  id: string;
+  title: string;
+  short: string;
+  tagline: string;
+  icon: LucideIcon;
+  route: string;
+  image: string;
+  /** Desktop absolute position + size (px). */
+  desktop: { top: number; left: number; size: number };
+  /** Tailwind animation delay (staggered float). */
+  delay: string;
+  featured?: boolean;
+};
+
+const DESTINATIONS: Destination[] = [
+  {
+    id: "wod",
+    title: "Workout of the Day",
+    short: "WOD",
+    tagline: "Today's featured session",
+    icon: CalendarCheck,
+    route: "/workout/wod",
+    image: heroWodImage,
+    desktop: { top: 0, left: 290, size: 180 },
+    delay: "0s",
+    featured: true,
+  },
+  {
+    id: "workouts",
+    title: "Smarty Workouts",
+    short: "Workouts",
+    tagline: "500+ expert sessions",
+    icon: Dumbbell,
+    route: "/workout",
+    image: heroWorkoutsImage,
+    desktop: { top: 70, left: 510, size: 140 },
+    delay: "0.6s",
+  },
+  {
+    id: "programs",
+    title: "Smarty Programs",
+    short: "Programs",
+    tagline: "Multi-week plans",
+    icon: Calendar,
+    route: "/trainingprogram",
+    image: heroProgramsImage,
+    desktop: { top: 70, left: 130, size: 140 },
+    delay: "1.2s",
+  },
+  {
+    id: "tools",
+    title: "Smarty Tools",
+    short: "Tools",
+    tagline: "Calculators & timers",
+    icon: Calculator,
+    route: "/tools",
+    image: heroToolsImage,
+    desktop: { top: 240, left: 50, size: 120 },
+    delay: "0.9s",
+  },
+  {
+    id: "library",
+    title: "Exercise Library",
+    short: "Library",
+    tagline: "Form & technique",
+    icon: Video,
+    route: "/exerciselibrary",
+    image: heroLibraryImage,
+    desktop: { top: 240, left: 590, size: 120 },
+    delay: "1.5s",
+  },
+  {
+    id: "blog",
+    title: "Blog & Insights",
+    short: "Blog",
+    tagline: "Evidence-based articles",
+    icon: FileText,
+    route: "/blog",
+    image: heroBlogImage,
+    desktop: { top: 360, left: 200, size: 105 },
+    delay: "0.3s",
+  },
+  {
+    id: "community",
+    title: "Community",
+    short: "Community",
+    tagline: "Train together",
+    icon: Users,
+    route: "/community",
+    image: heroCommunityImage,
+    desktop: { top: 360, left: 460, size: 105 },
+    delay: "1.8s",
+  },
+];
+
+/** Decorative connection lines between bubble centers (desktop only). */
+const CONNECTIONS: Array<[string, string]> = [
+  ["wod", "workouts"],
+  ["wod", "programs"],
+  ["workouts", "library"],
+  ["programs", "tools"],
+  ["tools", "blog"],
+  ["library", "community"],
+  ["blog", "community"],
+];
+
+const Bubble = ({
+  dest,
+  isWodLive,
+  size,
+  className,
+  style,
+}: {
+  dest: Destination;
+  isWodLive: boolean;
+  size: number;
+  className?: string;
+  style?: React.CSSProperties;
+}) => {
+  const navigate = useNavigate();
+  const Icon = dest.icon;
+  const showLivePill = dest.featured && isWodLive;
+  const labelMaxWidth = Math.max(size + 40, 130);
+
+  return (
+    <div
+      className={cn("flex flex-col items-center group", className)}
+      style={style}
+    >
+      <button
+        type="button"
+        onClick={() => navigate(dest.route)}
+        aria-label={`Go to ${dest.title}`}
+        className={cn(
+          "relative rounded-full overflow-hidden",
+          "ring-[3px] ring-primary/50 hover:ring-primary",
+          "shadow-lg shadow-primary/10 hover:shadow-2xl hover:shadow-primary/30",
+          "transition-all duration-300 ease-out",
+          "hover:scale-110 focus-visible:scale-110",
+          "focus:outline-none focus-visible:ring-4 focus-visible:ring-primary",
+          "motion-safe:animate-[float_6s_ease-in-out_infinite]",
+          dest.featured && "ring-4 ring-primary"
+        )}
+        style={{
+          width: `${size}px`,
+          height: `${size}px`,
+          animationDelay: dest.delay,
+        }}
+      >
+        <img
+          src={dest.image}
+          alt=""
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          loading="lazy"
+        />
+        {/* Subtle gradient overlay for legibility */}
+        <div
+          className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent"
+          aria-hidden="true"
+        />
+
+        {/* Featured pulsing ring */}
+        {dest.featured && (
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 rounded-full ring-4 ring-primary motion-safe:animate-ping opacity-40"
+          />
+        )}
+
+        {/* TODAY pill on featured WOD when live */}
+        {showLivePill && (
+          <span className="absolute top-2 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-primary text-primary-foreground text-[9px] font-bold tracking-wider uppercase shadow-md">
+            Today
+          </span>
+        )}
+
+        {/* Icon chip bottom-right */}
+        <span
+          className={cn(
+            "absolute bottom-1 right-1 rounded-full bg-background/95 backdrop-blur-sm",
+            "flex items-center justify-center shadow-md ring-1 ring-primary/30",
+            "group-hover:scale-110 transition-transform"
+          )}
+          style={{
+            width: `${Math.max(size * 0.22, 26)}px`,
+            height: `${Math.max(size * 0.22, 26)}px`,
+          }}
+          aria-hidden="true"
+        >
+          <Icon
+            className="text-primary"
+            style={{
+              width: `${Math.max(size * 0.12, 14)}px`,
+              height: `${Math.max(size * 0.12, 14)}px`,
+            }}
+          />
+        </span>
+      </button>
+
+      <div
+        className="mt-2 text-center"
+        style={{ maxWidth: `${labelMaxWidth}px` }}
+      >
+        <p
+          className={cn(
+            "font-bold text-foreground leading-tight",
+            size >= 160 ? "text-sm" : "text-xs"
+          )}
+        >
+          {dest.short}
+        </p>
+        <p className="text-[10px] text-muted-foreground leading-tight mt-0.5 line-clamp-1">
+          {dest.tagline}
+        </p>
+      </div>
+    </div>
+  );
+};
+
+export const HeroDestinationConstellation = () => {
+  const { isPortrait: isMobile } = useIsPortraitMode();
+  const { hasWods } = useTodayWods(isMobile);
+
+  // Find bubble center coords for connection lines (desktop)
+  const centers: Record<string, { cx: number; cy: number }> = {};
+  DESTINATIONS.forEach((d) => {
+    centers[d.id] = {
+      cx: d.desktop.left + d.desktop.size / 2,
+      cy: d.desktop.top + d.desktop.size / 2,
+    };
+  });
+
+  const featured = DESTINATIONS.find((d) => d.featured)!;
+  const others = DESTINATIONS.filter((d) => !d.featured);
+
+  return (
+    <div className="w-full">
+      {/* Inline keyframes — local to this component */}
+      <style>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-6px); }
+        }
+      `}</style>
+
+      {/* ============ DESKTOP ============ */}
+      <div className="hidden md:block">
+        <div
+          className="relative mx-auto"
+          style={{ width: "760px", height: "510px" }}
+        >
+          {/* Decorative connection SVG */}
+          <svg
+            className="absolute inset-0 w-full h-full pointer-events-none"
+            viewBox="0 0 760 510"
+            aria-hidden="true"
+          >
+            <defs>
+              <radialGradient id="constellation-glow" cx="50%" cy="40%" r="60%">
+                <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.08" />
+                <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0" />
+              </radialGradient>
+            </defs>
+            <rect width="760" height="510" fill="url(#constellation-glow)" />
+            {CONNECTIONS.map(([a, b]) => {
+              const A = centers[a];
+              const B = centers[b];
+              if (!A || !B) return null;
+              return (
+                <line
+                  key={`${a}-${b}`}
+                  x1={A.cx}
+                  y1={A.cy}
+                  x2={B.cx}
+                  y2={B.cy}
+                  stroke="hsl(var(--primary))"
+                  strokeOpacity="0.18"
+                  strokeWidth="1.5"
+                  strokeDasharray="4 6"
+                />
+              );
+            })}
+          </svg>
+
+          {DESTINATIONS.map((dest) => (
+            <Bubble
+              key={dest.id}
+              dest={dest}
+              isWodLive={hasWods}
+              size={dest.desktop.size}
+              className="absolute"
+              style={{
+                top: `${dest.desktop.top}px`,
+                left: `${dest.desktop.left}px`,
+              }}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* ============ MOBILE ============ */}
+      <div className="md:hidden">
+        <div className="flex flex-col items-center gap-5">
+          {/* Featured WOD bubble */}
+          <Bubble dest={featured} isWodLive={hasWods} size={150} />
+
+          {/* 3 rows × 2 bubbles */}
+          <div className="grid grid-cols-2 gap-x-6 gap-y-5 w-full max-w-xs">
+            {others.map((dest) => (
+              <div key={dest.id} className="flex justify-center">
+                <Bubble dest={dest} isWodLive={hasWods} size={105} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default HeroDestinationConstellation;
