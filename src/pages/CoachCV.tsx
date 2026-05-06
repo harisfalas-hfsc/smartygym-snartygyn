@@ -25,7 +25,7 @@ const CoachCV = () => {
       </Helmet>
 
       <main className="min-h-screen bg-gradient-to-b from-background to-background/50">
-        <div className="container mx-auto px-4 py-6 max-w-4xl">
+        <div className="container mx-auto px-4 py-6 max-w-6xl md:max-w-[1500px]">
           <PageBreadcrumbs items={[
             { label: "Home", href: "/" },
             { label: "Coach Profile", href: "/coach-profile" },
