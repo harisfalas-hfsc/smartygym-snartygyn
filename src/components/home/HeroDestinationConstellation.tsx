@@ -7,6 +7,7 @@ import {
   Video,
   FileText,
   Users,
+  User,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -20,6 +21,7 @@ import heroToolsImage from "@/assets/hero-tools.jpg";
 import heroLibraryImage from "@/assets/hero-exercise-library-new.jpg";
 import heroBlogImage from "@/assets/hero-blog.jpg";
 import heroCommunityImage from "@/assets/hero-community-new.jpg";
+import harisFalasImage from "@/assets/haris-falas-coach.png";
 
 type Destination = {
   id: string;
@@ -116,6 +118,19 @@ const DESTINATIONS: Destination[] = [
     delay: "1.8s",
   },
 ];
+
+/** Center coach bubble — sits in the middle of the constellation. */
+const COACH: Destination = {
+  id: "coach",
+  title: "Haris Falas",
+  short: "Haris Falas",
+  tagline: "Founder & Head Coach",
+  icon: User,
+  route: "/coach-profile",
+  image: harisFalasImage,
+  desktop: { top: 215, left: 405, size: 150 },
+  delay: "0.4s",
+};
 
 /** Decorative connection lines between bubble centers (desktop only). */
 const CONNECTIONS: Array<[string, string]> = [
@@ -229,12 +244,12 @@ const Bubble = ({
         <p
           className={cn(
             "font-bold text-foreground leading-tight",
-            size >= 160 ? "text-sm" : "text-xs"
+            size >= 160 ? "text-base" : "text-sm"
           )}
         >
           {dest.short}
         </p>
-        <p className="text-[10px] text-muted-foreground leading-tight mt-0.5 line-clamp-1">
+        <p className="text-xs text-muted-foreground leading-snug mt-1 line-clamp-2">
           {dest.tagline}
         </p>
       </div>
@@ -321,6 +336,18 @@ export const HeroDestinationConstellation = () => {
               }}
             />
           ))}
+
+          {/* Center coach bubble */}
+          <Bubble
+            dest={COACH}
+            isWodLive={false}
+            size={COACH.desktop.size}
+            className="absolute"
+            style={{
+              top: `${COACH.desktop.top}px`,
+              left: `${COACH.desktop.left}px`,
+            }}
+          />
         </div>
       </div>
 
