@@ -17,27 +17,35 @@ serve(async (req) => {
   }
 
   try {
-    logStep("Starting WOD archival process at 00:00 UTC");
+    logStep("Starting WOD archival process at Cyprus midnight");
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Get current UTC date for logging
+    // Get current UTC and Cyprus date for logging/filtering
     const now = new Date();
     const utcDateStr = now.toISOString().split('T')[0];
+    const cyprusDateStr = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Europe/Athens",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(now);
     
     logStep("Date context", { 
       utcNow: now.toISOString(), 
-      utcDateStr
+      utcDateStr,
+      cyprusDateStr,
     });
 
-    // Find ALL active WODs (regardless of date) - they all need to be archived
-    // This runs at 00:00 UTC, so any WOD still marked as is_workout_of_day should be archived
+    // Archive only genuinely old WODs. Prebuilt WODs for today/tomorrow must remain
+    // active; they become visible automatically through the generated_for_date filter.
     const { data: wodsToArchive, error: fetchError } = await supabase
       .from("admin_workouts")
       .select("*")
-      .eq("is_workout_of_day", true);
+      .eq("is_workout_of_day", true)
+      .lt("generated_for_date", cyprusDateStr);
 
     if (fetchError) {
       throw new Error(`Failed to fetch WODs: ${fetchError.message}`);
