@@ -1,52 +1,47 @@
-## Mobile native-style bottom navigation bar
+## Goal
 
-A persistent bottom bar that appears **only on mobile (< 768px)** across all pages, styled to feel like a native app's bottom toolbar — but using your brand palette (deep navy + electric blue).
+Fix the admin "Today's WODs" widget so it reflects reality (both WODs are live for 2026-05-06) and confirm tonight's archive + tomorrow's pre-build will run on schedule.
 
-### Layout (left → right)
+## Diagnosis
 
-```text
-┌─────────────────────────────────────────────────┐
-│   ◀ Back      🧠 Coach     🏠 Home    Forward ▶ │
-└─────────────────────────────────────────────────┘
-```
+**Database reality (verified):**
+- ✅ Both WODs exist for today (Cyprus date 2026-05-06):
+  - `Granite Glute Control` — BODYWEIGHT, visible, `is_workout_of_day=true`
+  - `Granite Hip Builder` — EQUIPMENT, visible, `is_workout_of_day=true`
+- ✅ `wod_generation_runs` shows both ran successfully yesterday at 06:30 / 06:50 UTC for cyprus_date `2026-05-06`.
 
-- **Back** (far left) — same logic as the existing back system: pops the in-app `NavigationHistoryContext` history stack, falls back to `/`. Disabled (dimmed, non-clickable) when there's nothing to go back to.
-- **Smarty Coach** (center-left) — opens the existing `SmartyCoachModal`. Uses the brand icon already in `src/assets/smarty-coach-icon.png`.
-- **Home** (center-right) — navigates to `/` (homepage).
-- **Forward** (far right) — mirrors Back: re-navigates to a path that was popped via Back. Disabled when there's nothing to go forward to.
+**Crons (verified active):**
+- `generate-wod-bodyweight-daily` → `30 6 * * *` UTC = **09:30 Cyprus** (builds tomorrow)
+- `generate-wod-equipment-daily` → `50 6 * * *` UTC = **09:50 Cyprus** (builds tomorrow)
+- `archive-old-wods` → `0 21 * * *` UTC = **00:00 Cyprus** (archives yesterday)
+- All retry passes + post-gen audit active
 
-### Forward button — exact behavior
+So tonight's archive and tomorrow's pre-build are **already correctly scheduled**. No cron change needed.
 
-You asked it to behave like the swipe-forward gesture but as a physical button. To support this we extend `NavigationHistoryContext` with a forward stack:
+**Widget bug (root cause):**
+`src/components/admin/WODStatusWidget.tsx` has three issues that make it show stale/wrong data:
+1. **Fetches once on mount only** — never refreshes. If the first call ran during a transient state (or before publish), it shows "missing" forever until page reload.
+2. **No manual refresh button** — admin has no way to re-sync.
+3. **Queries `admin_workouts` directly** instead of the security-definer RPC `get_visible_workout_metadata`, which is the canonical visibility source used by the rest of the app. RLS differences can cause the admin row to be invisible to this query.
 
-- When the user clicks **Back**, the popped path is pushed onto a `forwardStack`.
-- When the user clicks **Forward**, the top of `forwardStack` is popped and navigated to (and pushed back onto `history`).
-- Any **new navigation** (clicking a link, opening a workout, etc.) clears `forwardStack` — exactly like browser/native behavior.
-- New context API: `goForward()`, `canGoForward`.
+## Plan
 
-### Styling — native feel, brand colors
+### Single file change: `src/components/admin/WODStatusWidget.tsx`
 
-- Fixed to bottom, full width, `safe-area-inset-bottom` respected (iOS notch/home-bar safe).
-- Background: deep navy `hsl(var(--background))` with subtle top border in `hsl(var(--primary) / 0.2)` and a soft backdrop blur.
-- Icons: `lucide-react` (`ChevronLeft`, `Home`, `ChevronRight`) + the Smarty Coach PNG, all in electric blue `hsl(var(--primary))` when active, muted when disabled.
-- 4 equal columns, ~56 px tall (native tab-bar height), large touch targets, tap feedback (active scale).
-- Visible **only below 768 px** (`md:hidden`). Desktop stays exactly as it is today.
-- The page content gets `padding-bottom` reserved via a CSS variable so the bar never covers content.
+1. **Switch the WOD query** from direct `admin_workouts` select to `supabase.rpc("get_visible_workout_metadata", { _workout_id: null })`, then filter client-side for `is_workout_of_day === true && generated_for_date === cyprusDate`. This matches `useTodayWods` and guarantees the widget sees the same reality as the public site.
+2. **Auto-refresh every 60 seconds** via `setInterval`, plus refresh on window focus.
+3. **Add a small "Refresh" icon button** in the card header so the admin can force a re-check on demand.
+4. **Add a Supabase realtime subscription** to `admin_workouts` filtered on `is_workout_of_day=true` so the widget reacts immediately when WODs are published or archived.
+5. Keep loading/error UI; show "Last checked" timestamp so it's obvious the data is live.
 
-### Where it doesn't show
+### No cron / DB / edge function changes needed
 
-- Hidden on `/auth`, `/reset-password`, `/payment-success`, `/payment-cancelled` (same exclusion list already used by `NavigationHistoryContext`).
-- Otherwise visible on every page on mobile.
+Verified live state already matches the user's intent:
+- 09:30 + 09:50 Cyprus → tomorrow's BW + EQ pre-built
+- 00:00 Cyprus → today's archive + tomorrow's pre-built becomes visible
 
-### Files to add / change
+I'll note this in the response so the user has explicit confirmation.
 
-- **New** `src/components/MobileBottomNav.tsx` — the bar component.
-- **Edit** `src/contexts/NavigationHistoryContext.tsx` — add `forwardStack`, `goForward`, `canGoForward`; clear forward stack on new (non-back) navigation.
-- **Edit** `src/App.tsx` — mount `<MobileBottomNav />` once inside `AppContent` (next to `<FixedBackButton />`), and add `padding-bottom: var(--mobile-bottom-nav-h, 0px)` to the main content wrapper. The CSS var is set to ~64 px on mobile, 0 on desktop.
-- **Edit** `src/index.css` — define `--mobile-bottom-nav-h` responsively.
+## Files Modified
 
-### What is NOT changed
-
-- Desktop layout, top navigation, and the existing `FixedBackButton` (desktop-only) are untouched.
-- The existing floating Smarty Coach button behavior is preserved on desktop; on mobile it can stay or be hidden in favor of the bar — I'll keep the floating one hidden on mobile to avoid duplication, since the bar already exposes Coach.
-- No changes to routing, auth, or any business logic.
+- `src/components/admin/WODStatusWidget.tsx` — switch to RPC, add 60s polling + focus refresh + realtime + manual refresh button + last-checked timestamp.

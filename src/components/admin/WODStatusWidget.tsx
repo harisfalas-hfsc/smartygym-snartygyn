@@ -1,8 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { Flame, CheckCircle2, XCircle, Clock } from "lucide-react";
+import { Flame, CheckCircle2, XCircle, Clock, RefreshCw } from "lucide-react";
+import { getCyprusTodayStr } from "@/lib/cyprusDate";
+import { fetchVisibleWorkoutMetadata, normalizeWodEquipment } from "@/hooks/useTodayWods";
 
 interface WodStatus {
   date: string;
@@ -17,27 +20,19 @@ interface WodStatus {
 export const WODStatusWidget = () => {
   const [status, setStatus] = useState<WodStatus | null>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [lastChecked, setLastChecked] = useState<Date | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
-    fetchStatus();
-  }, []);
-
-  const fetchStatus = async () => {
+  const fetchStatus = useCallback(async () => {
     try {
-      // Get Cyprus date
-      const cyprusDate = new Intl.DateTimeFormat("en-CA", {
-        timeZone: "Europe/Athens",
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-      }).format(new Date());
+      const cyprusDate = getCyprusTodayStr();
 
-      // Fetch today's active WODs
-      const { data: wods } = await supabase
-        .from("admin_workouts")
-        .select("equipment")
-        .eq("generated_for_date", cyprusDate)
-        .eq("is_workout_of_day", true);
+      // Use the canonical visibility RPC (same source the public site uses)
+      const allWorkouts = await fetchVisibleWorkoutMetadata(null);
+      const todayWods = allWorkouts.filter(
+        (w: any) => w.is_workout_of_day === true && w.generated_for_date === cyprusDate
+      );
 
       // Fetch latest run for today
       const { data: runs } = await supabase
@@ -48,7 +43,9 @@ export const WODStatusWidget = () => {
         .limit(1);
 
       const latestRun = runs?.[0] as any;
-      const variants = (wods || []).map((w: any) => w.equipment).filter(Boolean);
+      const variants = todayWods
+        .map((w: any) => normalizeWodEquipment(w.equipment))
+        .filter(Boolean);
 
       // Determine expected count from run or default to 2
       const expected = latestRun?.expected_count || 2;
@@ -62,12 +59,46 @@ export const WODStatusWidget = () => {
         lastRunTime: latestRun?.completed_at || null,
         lastRunSource: latestRun?.trigger_source || null,
       });
+      setLastChecked(new Date());
     } catch (error) {
       console.error("Error fetching WOD status:", error);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
-  };
+  }, []);
+
+  const handleManualRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchStatus();
+  }, [fetchStatus]);
+
+  useEffect(() => {
+    fetchStatus();
+
+    // Auto-refresh every 60 seconds
+    intervalRef.current = setInterval(fetchStatus, 60_000);
+
+    // Refresh when the tab regains focus
+    const onFocus = () => fetchStatus();
+    window.addEventListener("focus", onFocus);
+
+    // Realtime: react instantly to WOD publish/archive changes
+    const channel = supabase
+      .channel("admin-wod-status-widget")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "admin_workouts" },
+        () => fetchStatus()
+      )
+      .subscribe();
+
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      window.removeEventListener("focus", onFocus);
+      supabase.removeChannel(channel);
+    };
+  }, [fetchStatus]);
 
   if (loading) {
     return (
@@ -89,9 +120,21 @@ export const WODStatusWidget = () => {
   return (
     <Card className={`border-2 ${isHealthy ? "border-green-500/30" : "border-destructive/50"}`}>
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium flex items-center gap-2">
-          <Flame className="w-4 h-4 text-orange-500" />
-          Today's WODs — {status.date}
+        <CardTitle className="text-sm font-medium flex items-center justify-between gap-2">
+          <span className="flex items-center gap-2">
+            <Flame className="w-4 h-4 text-orange-500" />
+            Today's WODs — {status.date}
+          </span>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleManualRefresh}
+            disabled={refreshing}
+            className="h-7 px-2"
+            title="Refresh"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? "animate-spin" : ""}`} />
+          </Button>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -139,6 +182,12 @@ export const WODStatusWidget = () => {
                 ? ` at ${new Date(status.lastRunTime).toLocaleTimeString()}`
                 : ""}
             </span>
+          </div>
+        )}
+
+        {lastChecked && (
+          <div className="text-[10px] text-muted-foreground/70">
+            Last checked: {lastChecked.toLocaleTimeString()} (auto-refresh every 60s)
           </div>
         )}
       </CardContent>
