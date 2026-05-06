@@ -485,7 +485,233 @@ export default function AboutSmartyGym() {
             </CardContent>
           </Card>
 
-          {/* Section 6: Subscription Plans */}
+          {/* Section 6: Smarty Tools */}
+          <Card className="mb-6 border border-border">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Wrench className="h-5 w-5 text-primary" />
+                Smarty Tools
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-muted-foreground">
+                <strong>Smarty Tools</strong> is your free suite of evidence-based fitness calculators, designed to give you
+                instant, science-backed answers for the numbers that drive your training and nutrition.
+              </p>
+
+              <div className="bg-muted/30 rounded-lg p-4 border border-border">
+                <h4 className="font-semibold mb-3">What's Inside</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  <div className="flex items-center gap-2 p-2 bg-background rounded-lg text-sm border border-border">
+                    <Dumbbell className="h-4 w-4 text-primary" />
+                    <span>1RM Calculator</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-2 bg-background rounded-lg text-sm border border-border">
+                    <Flame className="h-4 w-4 text-primary" />
+                    <span>BMR Calculator</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-2 bg-background rounded-lg text-sm border border-border">
+                    <Target className="h-4 w-4 text-primary" />
+                    <span>Macro Tracking Calculator</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-2 bg-background rounded-lg text-sm border border-border">
+                    <Activity className="h-4 w-4 text-primary" />
+                    <span>Calorie Counter</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4 bg-primary/10 rounded-lg border border-primary/30">
+                <h4 className="font-semibold mb-2">The Purpose</h4>
+                <p className="text-sm text-muted-foreground">
+                  Replace guesswork with data. Track strength benchmarks, dial in your daily energy needs, and align your
+                  nutrition with your training goals — all in one place.
+                </p>
+              </div>
+
+              <div className="text-center">
+                <Link to="/tools">
+                  <Button variant="outline" size="sm">
+                    Explore Smarty Tools
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Section 7: Exercise Library */}
+          <Card className="mb-6 border border-border">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BookOpen className="h-5 w-5 text-primary" />
+                Exercise Library
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-muted-foreground">
+                The <strong>Exercise Library</strong> is a curated, searchable database of every movement used inside
+                SmartyGym workouts and programs — with clear descriptions, step-by-step instructions, and visual demos.
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="flex items-start gap-2 p-3 bg-muted/30 rounded-lg border border-border">
+                  <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                  <div>
+                    <h5 className="font-medium text-sm">Detailed Descriptions</h5>
+                    <p className="text-xs text-muted-foreground">Purpose, muscles trained, and benefits</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2 p-3 bg-muted/30 rounded-lg border border-border">
+                  <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                  <div>
+                    <h5 className="font-medium text-sm">Step-by-Step Instructions</h5>
+                    <p className="text-xs text-muted-foreground">Proper setup, execution, and cues</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2 p-3 bg-muted/30 rounded-lg border border-border">
+                  <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                  <div>
+                    <h5 className="font-medium text-sm">Filter & Search</h5>
+                    <p className="text-xs text-muted-foreground">By body part, equipment, or difficulty</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4 bg-primary/10 rounded-lg border border-primary/30">
+                <h4 className="font-semibold mb-2">The Purpose</h4>
+                <p className="text-sm text-muted-foreground">
+                  Train with confidence. Every exercise inside a workout is linked to its full library entry, so you always
+                  know exactly how to perform it safely and effectively.
+                </p>
+              </div>
+
+              <div className="text-center">
+                <Link to="/exerciselibrary">
+                  <Button variant="outline" size="sm">
+                    Browse Exercise Library
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Section 8: Community */}
+          <Card className="mb-6 border border-border">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5 text-primary" />
+                Community
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-muted-foreground">
+                The SmartyGym <strong>Community</strong> connects you with other members on the same journey. Share progress,
+                rate workouts, and see how you stack up on the global leaderboards.
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="flex items-start gap-2 p-3 bg-muted/30 rounded-lg border border-border">
+                  <Trophy className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                  <div>
+                    <h5 className="font-medium text-sm">Leaderboards</h5>
+                    <p className="text-xs text-muted-foreground">Global rankings by workouts and streaks</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2 p-3 bg-muted/30 rounded-lg border border-border">
+                  <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                  <div>
+                    <h5 className="font-medium text-sm">Ratings & Reviews</h5>
+                    <p className="text-xs text-muted-foreground">Member feedback on workouts and programs</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2 p-3 bg-muted/30 rounded-lg border border-border">
+                  <Activity className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                  <div>
+                    <h5 className="font-medium text-sm">Live Activity</h5>
+                    <p className="text-xs text-muted-foreground">See what the community is training right now</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4 bg-primary/10 rounded-lg border border-primary/30">
+                <h4 className="font-semibold mb-2">The Purpose</h4>
+                <p className="text-sm text-muted-foreground">
+                  Consistency thrives in numbers. The Community keeps you accountable, inspired, and part of a global
+                  movement of people training smarter.
+                </p>
+              </div>
+
+              <div className="text-center">
+                <Link to="/community">
+                  <Button variant="outline" size="sm">
+                    Visit the Community
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Section 9: Blog */}
+          <Card className="mb-6 border border-border">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Newspaper className="h-5 w-5 text-primary" />
+                Blog
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-muted-foreground">
+                The SmartyGym <strong>Blog</strong> is your go-to resource for science-based articles on training,
+                nutrition, recovery, and healthy aging — all written and curated by{" "}
+                <Link to="/coach-profile" className="text-primary font-semibold hover:underline">
+                  Haris Falas
+                </Link>
+                .
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="flex items-start gap-2 p-3 bg-muted/30 rounded-lg border border-border">
+                  <Brain className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                  <div>
+                    <h5 className="font-medium text-sm">Evidence-Based</h5>
+                    <p className="text-xs text-muted-foreground">Backed by sports science and real coaching</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2 p-3 bg-muted/30 rounded-lg border border-border">
+                  <Heart className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                  <div>
+                    <h5 className="font-medium text-sm">Healthy Aging</h5>
+                    <p className="text-xs text-muted-foreground">Train and eat for long-term performance</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2 p-3 bg-muted/30 rounded-lg border border-border">
+                  <TrendingUp className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                  <div>
+                    <h5 className="font-medium text-sm">Practical Guides</h5>
+                    <p className="text-xs text-muted-foreground">Actionable advice you can use today</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4 bg-primary/10 rounded-lg border border-primary/30">
+                <h4 className="font-semibold mb-2">The Purpose</h4>
+                <p className="text-sm text-muted-foreground">
+                  Knowledge is the multiplier. The Blog gives you the "why" behind what you train, what you eat, and how
+                  you recover — so every choice is an informed one.
+                </p>
+              </div>
+
+              <div className="text-center">
+                <Link to="/blog">
+                  <Button variant="outline" size="sm">
+                    Read the Blog
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Section 10: Subscription Plans */}
           <Card className="mb-6 border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-background">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
