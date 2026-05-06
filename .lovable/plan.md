@@ -1,53 +1,52 @@
-# Make the bottom nav adapt to every phone's system UI
+## Mobile native-style bottom navigation bar
 
-## The problem (visible in your screenshots)
+A persistent bottom bar that appears **only on mobile (< 768px)** across all pages, styled to feel like a native app's bottom toolbar — but using your brand palette (deep navy + electric blue).
 
-Your bottom navigation bar must sit **above** whatever the phone shows at the very bottom of the screen. That bottom area is different on every device:
+### Layout (left → right)
 
-| Device type | What's at the bottom |
-|---|---|
-| iPhone (Face ID) | Home indicator (the thin horizontal pill) |
-| Android with gesture nav | Thin gesture pill |
-| Android with 3-button nav (Samsung/Pixel old mode) | Full bar with Back / Home / Recents |
-| Older iPhones / browser tabs | Nothing |
+```text
+┌─────────────────────────────────────────────────┐
+│   ◀ Back      🧠 Coach     🏠 Home    Forward ▶ │
+└─────────────────────────────────────────────────┘
+```
 
-Right now the code uses one CSS trick (`env(safe-area-inset-bottom)`) that only works correctly on iPhones and modern Android gesture mode. On Samsung/Pixel devices using the **3-button navigation** (your Image 3), the system reports `0`, and our bar gets covered by the system buttons.
+- **Back** (far left) — same logic as the existing back system: pops the in-app `NavigationHistoryContext` history stack, falls back to `/`. Disabled (dimmed, non-clickable) when there's nothing to go back to.
+- **Smarty Coach** (center-left) — opens the existing `SmartyCoachModal`. Uses the brand icon already in `src/assets/smarty-coach-icon.png`.
+- **Home** (center-right) — navigates to `/` (homepage).
+- **Forward** (far right) — mirrors Back: re-navigates to a path that was popped via Back. Disabled when there's nothing to go forward to.
 
-There are also two related issues:
-- The viewport meta tag is missing `viewport-fit=cover`, which iOS needs before it will report the safe-area values at all.
-- On mobile Chrome, the URL bar collapses on scroll and our fixed bar can briefly jump.
+### Forward button — exact behavior
 
-## What will change
+You asked it to behave like the swipe-forward gesture but as a physical button. To support this we extend `NavigationHistoryContext` with a forward stack:
 
-**1. Fix the viewport meta tag** (`index.html`)
-Add `viewport-fit=cover` so iOS reports the home-indicator inset correctly. Also enables proper edge-to-edge rendering on Android.
+- When the user clicks **Back**, the popped path is pushed onto a `forwardStack`.
+- When the user clicks **Forward**, the top of `forwardStack` is popped and navigated to (and pushed back onto `history`).
+- Any **new navigation** (clicking a link, opening a workout, etc.) clears `forwardStack` — exactly like browser/native behavior.
+- New context API: `goForward()`, `canGoForward`.
 
-**2. Make `MobileBottomNav` truly adaptive** (`src/components/MobileBottomNav.tsx`)
-Replace the single `env(safe-area-inset-bottom)` rule with a layered approach that handles every case:
+### Styling — native feel, brand colors
 
-- Use the modern `dvh` (dynamic viewport height) and `max(...)` CSS so the bar always honors whichever is bigger: the iOS safe area, the Android gesture pill, **or** a sensible fallback when the OS reports 0 but a system bar is actually present.
-- Add a small bottom padding fallback (8px) so even when the OS reports `0`, the bar never sits flush against the screen edge or under a 3-button navbar in browsers that resize the viewport.
-- Detect Android 3-button nav using `window.visualViewport` height vs `window.screen.height`. When the difference exceeds the safe-area inset by more than ~30px, we know a system nav bar is eating space the browser didn't report — add that delta as extra padding. This recalculates on `resize`, `orientationchange`, and `visualViewport` events.
-- Use `position: fixed` with `bottom: 0` and `paddingBottom: max(env(safe-area-inset-bottom), <measured-android-gap>, 8px)`.
+- Fixed to bottom, full width, `safe-area-inset-bottom` respected (iOS notch/home-bar safe).
+- Background: deep navy `hsl(var(--background))` with subtle top border in `hsl(var(--primary) / 0.2)` and a soft backdrop blur.
+- Icons: `lucide-react` (`ChevronLeft`, `Home`, `ChevronRight`) + the Smarty Coach PNG, all in electric blue `hsl(var(--primary))` when active, muted when disabled.
+- 4 equal columns, ~56 px tall (native tab-bar height), large touch targets, tap feedback (active scale).
+- Visible **only below 768 px** (`md:hidden`). Desktop stays exactly as it is today.
+- The page content gets `padding-bottom` reserved via a CSS variable so the bar never covers content.
 
-**3. Update the body padding token** (`src/index.css`)
-The existing `--mobile-bottom-nav-h` variable currently uses only `env(safe-area-inset-bottom)`. Update it to mirror the same `max(...)` logic so page content (especially the last item in scroll lists) is never hidden behind the bar on any device.
+### Where it doesn't show
 
-**4. Native Capacitor app**
-For the wrapped iOS/Android app the project already supports via Capacitor: the safe-area insets work natively on both platforms, so the same code automatically does the right thing inside the installed app — no extra work needed.
+- Hidden on `/auth`, `/reset-password`, `/payment-success`, `/payment-cancelled` (same exclusion list already used by `NavigationHistoryContext`).
+- Otherwise visible on every page on mobile.
 
-## Result per device
+### Files to add / change
 
-- **iPhone (notch/home indicator)** → bar sits above the home indicator (uses iOS safe-area inset).
-- **Android gesture nav (modern Samsung/Pixel)** → bar sits above the gesture pill (uses Android safe-area inset).
-- **Android 3-button nav** → bar sits above the Back/Home/Recents row (uses the visualViewport delta detection + fallback padding).
-- **In-browser with collapsing URL bar** → bar follows the visible viewport without overlap.
-- **Tablets / desktop** → unchanged (component is `md:hidden`).
+- **New** `src/components/MobileBottomNav.tsx` — the bar component.
+- **Edit** `src/contexts/NavigationHistoryContext.tsx` — add `forwardStack`, `goForward`, `canGoForward`; clear forward stack on new (non-back) navigation.
+- **Edit** `src/App.tsx` — mount `<MobileBottomNav />` once inside `AppContent` (next to `<FixedBackButton />`), and add `padding-bottom: var(--mobile-bottom-nav-h, 0px)` to the main content wrapper. The CSS var is set to ~64 px on mobile, 0 on desktop.
+- **Edit** `src/index.css` — define `--mobile-bottom-nav-h` responsively.
 
-## Files to touch
+### What is NOT changed
 
-- `index.html` — add `viewport-fit=cover` to the existing viewport meta.
-- `src/components/MobileBottomNav.tsx` — adaptive padding logic + visualViewport listener.
-- `src/index.css` — update `--mobile-bottom-nav-h` to match.
-
-No new dependencies, no database changes, no impact on desktop or non-mobile pages.
+- Desktop layout, top navigation, and the existing `FixedBackButton` (desktop-only) are untouched.
+- The existing floating Smarty Coach button behavior is preserved on desktop; on mobile it can stay or be hidden in favor of the bar — I'll keep the floating one hidden on mobile to avoid duplication, since the bar already exposes Coach.
+- No changes to routing, auth, or any business logic.

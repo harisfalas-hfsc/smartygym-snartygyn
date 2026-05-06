@@ -8,13 +8,7 @@
 }
 @media (max-width: 767px) {
   :root {
-    /* Reserve bottom space equal to bar height (3.5rem) + whichever is greater:
-       iOS safe area, Android system-nav gap (set by MobileBottomNav as --android-sys-nav-gap),
-       or an 8px fallback so content never sits flush against the screen edge. */
-    --android-sys-nav-gap: 0px;
-    --mobile-bottom-nav-h: calc(
-      3.5rem + max(env(safe-area-inset-bottom, 0px), var(--android-sys-nav-gap, 0px), 8px)
-    );
+    --mobile-bottom-nav-h: calc(3.5rem + env(safe-area-inset-bottom, 0px));
   }
 }
 
