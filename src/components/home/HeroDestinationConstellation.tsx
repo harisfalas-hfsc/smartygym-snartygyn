@@ -199,6 +199,10 @@ const Bubble = ({
         } as React.CSSProperties
       }
     >
+      <span
+        className="motion-safe:animate-[float_6s_ease-in-out_infinite] inline-block group-hover:[animation-play-state:paused] group-focus-within:[animation-play-state:paused]"
+        style={{ animationDelay: dest.delay }}
+      >
       <button
         type="button"
         onClick={() => navigate(dest.route)}
@@ -212,18 +216,14 @@ const Bubble = ({
           // Smooth gravitate-toward-center + scale on hover/focus
           "hover:[transform:translate3d(calc(var(--pull-x)*0.28),calc(var(--pull-y)*0.28),0)_scale(var(--hover-scale))]",
           "focus-visible:[transform:translate3d(calc(var(--pull-x)*0.28),calc(var(--pull-y)*0.28),0)_scale(var(--hover-scale))]",
-          // Pause idle float while hovering so the gravitation reads cleanly
-          "hover:[animation-play-state:paused] focus-visible:[animation-play-state:paused]",
           // Reduced motion: scale only, no translation
           "motion-reduce:hover:[transform:scale(1.06)] motion-reduce:focus-visible:[transform:scale(1.06)]",
           "focus:outline-none focus-visible:ring-4 focus-visible:ring-primary",
-          "motion-safe:animate-[float_6s_ease-in-out_infinite]",
           dest.featured && "ring-4 ring-primary"
         )}
         style={{
           width: `${size}px`,
           height: `${size}px`,
-          animationDelay: dest.delay,
         }}
       >
         {images.map((src, i) => (
@@ -282,6 +282,7 @@ const Bubble = ({
           />
         </span>
       </button>
+      </span>
 
       <div
         className="mt-2 text-center"
