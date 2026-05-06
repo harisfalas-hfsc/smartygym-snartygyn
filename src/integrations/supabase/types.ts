@@ -3480,6 +3480,7 @@ export type Database = {
           created_at: string
           display_name: string
           id: string
+          is_mine: boolean
           rating: number
           testimonial_text: string
           updated_at: string
