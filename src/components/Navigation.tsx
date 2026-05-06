@@ -286,13 +286,9 @@ export const Navigation = () => {
             {/* Desktop Menu - original layout */}
             <Sheet open={desktopMenuOpen} onOpenChange={setDesktopMenuOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-24 w-24 text-primary hover:text-primary -ml-2">
-                    <svg className="h-20 w-20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                      <line x1="3" y1="4" x2="21" y2="4" />
-                      <line x1="3" y1="12" x2="21" y2="12" />
-                      <line x1="3" y1="20" x2="21" y2="20" />
-                    </svg>
-                  </Button>
+                  <button className="text-primary hover:text-primary/80 transition-colors -ml-2 p-1">
+                    <Menu className="h-12 w-12" strokeWidth={2} />
+                  </button>
                 </SheetTrigger>
                 <SheetContent side="left" className="w-64 overflow-y-auto max-h-screen">
                   <nav className="flex flex-col gap-2 mt-8 pb-8">
