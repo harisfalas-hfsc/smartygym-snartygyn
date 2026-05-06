@@ -17,7 +17,6 @@ import smartyGymIcon from "@/assets/smarty-gym-icon.png";
 import harisPhoto from "@/assets/haris-falas-coach.png";
 import { MobilePhoneIllustration } from "@/components/MobilePhoneIllustration";
 import { useIsPortraitMode } from "@/hooks/useIsPortraitMode";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
 import { openExternal } from "@/utils/native";
 import { cn } from "@/lib/utils";
 import { useAccessControl } from "@/hooks/useAccessControl";
@@ -25,6 +24,7 @@ import { ScrollReveal } from "@/components/ScrollReveal";
 import { LazySection } from "@/components/LazySection";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useTodayWods } from "@/hooks/useTodayWods";
+import { HeroDestinationConstellation } from "@/components/home/HeroDestinationConstellation";
 
 import heroWodImage from "@/assets/hero-wod.jpg";
 import heroWorkoutsImage from "@/assets/hero-workouts-bright.jpg";
@@ -67,21 +67,6 @@ const Index = () => {
   const isPremium = userTier === "premium";
   const { isPortrait: isMobile, isPhoneLandscape } = useIsPortraitMode();
 
-  // Carousel state for mobile navigation dots
-  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
-  const [currentSlide, setCurrentSlide] = useState(0);
-
-  // Carousel state for desktop hero navigation carousel
-  const [desktopNavApi, setDesktopNavApi] = useState<CarouselApi>();
-  const [desktopNavSlide, setDesktopNavSlide] = useState(0);
-
-  // Auto-cycling state for tablet hero cards
-  const [highlightedCardIndex, setHighlightedCardIndex] = useState(0);
-  const [isHoveringTablet, setIsHoveringTablet] = useState(false);
-  
-  // Auto-cycling state for desktop navigation carousel
-  const [isHoveringDesktopNav, setIsHoveringDesktopNav] = useState(false);
-
   // State for pinned audience tooltip (click to toggle)
   const [activeAudienceTooltip, setActiveAudienceTooltip] = useState<string | null>(null);
 
@@ -109,152 +94,6 @@ const Index = () => {
   });
 
   const { bodyweightWod, equipmentWod, variousWod, hasWods } = useTodayWods(isMobile);
-  useEffect(() => {
-    if (!carouselApi) return;
-    const onSelect = () => {
-      setCurrentSlide(carouselApi.selectedScrollSnap());
-    };
-    carouselApi.on("select", onSelect);
-    onSelect();
-    return () => {
-      carouselApi.off("select", onSelect);
-    };
-  }, [carouselApi]);
-
-  useEffect(() => {
-    if (!desktopNavApi) return;
-    const onSelect = () => {
-      setDesktopNavSlide(desktopNavApi.selectedScrollSnap());
-    };
-    desktopNavApi.on("select", onSelect);
-    onSelect();
-    return () => {
-      desktopNavApi.off("select", onSelect);
-    };
-  }, [desktopNavApi]);
-
-  // Auto-cycle through tablet hero cards every 4 seconds (slower to reduce re-renders)
-  useEffect(() => {
-    if (isHoveringTablet) return; // Pause when hovering
-
-    const interval = setInterval(() => {
-      setHighlightedCardIndex(prev => (prev + 1) % 6);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, [isHoveringTablet]);
-  
-  // Auto-cycle through desktop navigation carousel every 2.5 seconds
-  useEffect(() => {
-    if (!desktopNavApi || isHoveringDesktopNav) return; // Pause when hovering
-
-    const interval = setInterval(() => {
-      desktopNavApi.scrollNext();
-    }, 2500);
-    return () => clearInterval(interval);
-  }, [desktopNavApi, isHoveringDesktopNav]);
-  // Mobile hero carousel cards - Order: Workouts, Programs, Tools, Library, Blog
-  const heroCards = [{
-    id: "workouts",
-    title: "Smarty Workouts",
-    description: "500+ expert-designed workout routines for every fitness level and goal",
-    buttonText: "Browse Workouts",
-    icon: Dumbbell,
-    route: "/workout",
-    image: heroWorkoutsImage
-  }, {
-    id: "programs",
-    title: "Smarty Programs",
-    description: "Structured multi-week programs designed to transform your fitness journey",
-    buttonText: "View Programs",
-    icon: Calendar,
-    route: "/trainingprogram",
-    image: heroProgramsImage
-  }, {
-    id: "tools",
-    title: "Smarty Tools",
-    description: "Professional fitness calculators and tracking tools to optimize your training",
-    buttonText: "Explore Tools",
-    icon: Calculator,
-    route: "/tools",
-    image: heroToolsImage
-  }, {
-    id: "exerciselibrary",
-    title: "Exercise Library",
-    description: "Comprehensive video library with proper form demonstrations and technique guides",
-    buttonText: "Browse Library",
-    icon: Video,
-    route: "/exerciselibrary",
-    image: heroLibraryImage
-  }, {
-    id: "blog",
-    title: "Blog & Insights",
-    description: "Evidence-based fitness articles and expert insights from professional coaches",
-    buttonText: "Read Articles",
-    icon: FileText,
-    route: "/blog",
-    image: heroBlogImage
-  }, {
-    id: "community",
-    title: "Community",
-    description: "Connect, share and grow with fellow fitness enthusiasts worldwide",
-    buttonText: "Join Community",
-    icon: Users,
-    route: "/community",
-    image: heroCommunityImage
-  }];
-
-  // Desktop hero navigation carousel cards - same images as mobile for consistency
-  const desktopNavCards = [{
-    id: "wod",
-    title: "Workout of the Day",
-    description: "Today's featured workout designed fresh by Coach Haris",
-    icon: CalendarCheck,
-    route: "/workout/wod",
-    image: heroWodImage
-  }, {
-    id: "workouts",
-    title: "Smarty Workouts",
-    description: "Complete workout library with 500+ expert-designed routines for every goal",
-    icon: Dumbbell,
-    route: "/workout",
-    image: heroWorkoutsImage
-  }, {
-    id: "programs",
-    title: "Smarty Programs",
-    description: "Structured multi-week training plans to transform your fitness journey",
-    icon: Calendar,
-    route: "/trainingprogram",
-    image: heroProgramsImage
-  }, {
-    id: "tools",
-    title: "Smarty Tools",
-    description: "Professional fitness calculators and tracking tools for optimization",
-    icon: Calculator,
-    route: "/tools",
-    image: heroToolsImage
-  }, {
-    id: "exerciselibrary",
-    title: "Exercise Library",
-    description: "Comprehensive video demos with proper form and technique guides",
-    icon: Video,
-    route: "/exerciselibrary",
-    image: heroLibraryImage
-  }, {
-    id: "blog",
-    title: "Blog & Insights",
-    description: "Evidence-based articles and expert coaching tips for your training",
-    icon: FileText,
-    route: "/blog",
-    image: heroBlogImage
-  }, {
-    id: "community",
-    title: "Community",
-    description: "Connect, share and grow with fellow fitness enthusiasts worldwide",
-    icon: Users,
-    route: "/community",
-    image: heroCommunityImage
-  }];
-
   useEffect(() => {
     // Check current session
     supabase.auth.getSession().then(({
@@ -570,76 +409,9 @@ const Index = () => {
         </div>
         
         {isMobile ? <section className="pt-0 pb-2 px-4">
-            {/* Mobile swipe indicator (homepage carousel) */}
-            <div className="flex items-center justify-center gap-3 mb-3">
-              <button
-                type="button"
-                onClick={() => carouselApi?.scrollPrev()}
-                className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors"
-                aria-label="Previous card"
-              >
-                <ChevronLeft className="h-4 w-4 text-primary" />
-              </button>
-              <span className="text-xs text-muted-foreground font-medium">Swipe to explore</span>
-              <button
-                type="button"
-                onClick={() => carouselApi?.scrollNext()}
-                className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors"
-                aria-label="Next card"
-              >
-                <ChevronRight className="h-4 w-4 text-primary" />
-              </button>
-            </div>
-
-            <Carousel className="w-full" opts={{
-          align: "center",
-          loop: true
-        }} setApi={setCarouselApi}>
-              <CarouselContent className="-ml-2">
-                {heroCards.map(card => {
-              const Icon = card.icon;
-return <CarouselItem key={card.id} className="pl-2 basis-[75%] sm:basis-[60%]">
-                      <div onClick={() => navigate(card.route)} className="border-2 border-primary/40 rounded-xl overflow-hidden hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300 cursor-pointer bg-card flex flex-col h-[220px] sm:h-[280px]">
-                        {/* Image Section */}
-                        <div className="relative h-[55%] overflow-hidden flex-shrink-0">
-                          <img 
-                            src={card.image} 
-                            alt={card.title}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        
-                        {/* Content Section */}
-                        <div className="flex flex-col justify-center flex-1 p-3 text-center">
-                          <div className="flex items-center justify-center gap-2 mb-1">
-                            <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                              <Icon className="w-3.5 h-3.5 text-primary" />
-                            </div>
-                            <h3 className="text-sm font-bold text-foreground leading-tight whitespace-nowrap">
-                              {card.title}
-                            </h3>
-                          </div>
-                          <p className="text-xs text-muted-foreground leading-snug line-clamp-2">
-                            {card.description}
-                          </p>
-                          <div className="flex items-center justify-center gap-1 text-primary text-[10px] font-medium mt-1">
-                            Explore
-                            <ChevronRight className="w-3 h-3" />
-                          </div>
-                        </div>
-                      </div>
-                    </CarouselItem>;
-            })}
-              </CarouselContent>
-              
-              {/* Arrows positioned OUTSIDE cards */}
-              <CarouselPrevious className="hidden -left-12 bg-background border-2 border-primary shadow-lg" />
-              <CarouselNext className="hidden -right-12 bg-background border-2 border-primary shadow-lg" />
-            </Carousel>
-
-            {/* Carousel Dots */}
-            <div className="flex justify-center gap-2 mt-4">
-              {heroCards.map((_, index) => <button key={index} onClick={() => carouselApi?.scrollTo(index)} className={cn("w-2.5 h-2.5 rounded-full transition-all duration-300", currentSlide === index ? "bg-primary scale-125" : "bg-primary/30 hover:bg-primary/50")} aria-label={`Go to slide ${index + 1}`} />)}
+            {/* Interactive constellation of destination bubbles */}
+            <div className="pt-2 pb-4">
+              <HeroDestinationConstellation />
             </div>
 
         {/* Quick Access Menu */}
@@ -836,97 +608,12 @@ className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-co
                           </p>
                         </div>
 
-                        {/* Desktop navigation carousel (compact cards, arrows centered in gap) */}
-                          <div 
-                            className="mt-0"
-                            onMouseEnter={() => setIsHoveringDesktopNav(true)}
-                            onMouseLeave={() => setIsHoveringDesktopNav(false)}
-                          >
-							{/* padding creates space for arrows centered between card edge and container edge */}
-							<div className="relative px-16">
-                            <Carousel
-                              className="w-full"
-                              setApi={setDesktopNavApi}
-                              opts={{
-                                align: "center",
-                                loop: true,
-                              }}
-                            >
-                              <CarouselContent className="-ml-3">
-                                {desktopNavCards.map((card) => {
-                                  const Icon = card.icon;
-                                  return (
-                                    <CarouselItem
-                                      key={card.id}
-                                      className="pl-3 basis-[32%]"
-                                    >
-                                      <Card
-                                        onClick={() => navigate(card.route)}
-                                        className={cn(
-                                          "h-[220px] border-[3px] border-primary/40 bg-card",
-                                          "cursor-pointer overflow-hidden rounded-xl",
-                                          "hover:border-primary hover:shadow-xl hover:scale-[1.02]",
-                                          "transition-all duration-300 flex flex-col"
-                                        )}
-                                      >
-                                        {/* Image Section */}
-                                        <div className="relative h-[55%] overflow-hidden flex-shrink-0">
-                                          <img 
-                                            src={card.image} 
-                                            alt={card.title}
-                                            className="w-full h-full object-cover"
-                                          />
-                                        </div>
-                                        
-                                        {/* Content Section */}
-                                        <CardContent className="flex-1 flex flex-col justify-center p-3 text-center">
-                                          <div className="flex items-center justify-center gap-2 mb-1">
-                                            <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                                              <Icon className="w-3.5 h-3.5 text-primary" />
-                                            </div>
-                                            <h3 className="text-sm font-bold text-foreground leading-tight whitespace-nowrap">
-                                              {card.title}
-                                            </h3>
-                                          </div>
-                                          <p className="text-xs text-muted-foreground leading-snug line-clamp-2">
-                                            {card.description}
-                                          </p>
-                                          <div className="flex items-center justify-center gap-1 text-primary text-[10px] font-medium mt-1">
-                                            Explore
-                                            <ChevronRight className="w-3 h-3" />
-                                          </div>
-                                        </CardContent>
-                                      </Card>
-                                    </CarouselItem>
-                                  );
-                                })}
-                              </CarouselContent>
-
-                              {/* Arrows at far edges per user request */}
-                              <CarouselPrevious className="z-20 -left-[56px] w-11 h-11 bg-background/90 border-2 border-primary/40 shadow-lg hover:border-primary [&>svg]:h-5 [&>svg]:w-5" />
-                              <CarouselNext className="z-20 -right-[56px] w-11 h-11 bg-background/90 border-2 border-primary/40 shadow-lg hover:border-primary [&>svg]:h-5 [&>svg]:w-5" />
-                            </Carousel>
-                          </div>
-
-                          {/* Dots */}
-                          <div className="flex justify-center gap-2 mt-4">
-                            {desktopNavCards.map((_, index) => (
-                              <button
-                                key={index}
-                                onClick={() => desktopNavApi?.scrollTo(index)}
-                                className={cn(
-                                  "w-2.5 h-2.5 rounded-full transition-all duration-300",
-                                  desktopNavSlide === index
-                                    ? "bg-primary scale-125"
-                                    : "bg-primary/30 hover:bg-primary/50"
-                                )}
-                                aria-label={`Go to slide ${index + 1}`}
-                              />
-                            ))}
-                          </div>
+                        {/* Interactive constellation of destination bubbles */}
+                        <div className="mt-0">
+                          <HeroDestinationConstellation />
                         </div>
 
-                        {/* "Your Gym Re-imagined" card - now below carousel on desktop */}
+                                                {/* "Your Gym Re-imagined" card - now below carousel on desktop */}
                         <div className="bg-background/60 backdrop-blur-sm p-6 rounded-lg border-2 border-primary/30 mt-8 max-w-4xl mx-auto text-center">
                             <p className="text-xl font-bold text-primary mb-2">
                               Your Gym Re-imagined Anywhere, Anytime
