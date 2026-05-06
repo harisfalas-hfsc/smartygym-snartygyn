@@ -751,7 +751,7 @@ export const TestimonialsSection = ({
                       </div>
                       
                       {/* Edit/Delete buttons - only for owner */}
-                      {user?.id === testimonial.user_id && (
+                      {(testimonial.is_mine ?? (!!user?.id && user.id === testimonial.user_id)) && (
                         <div className="flex items-center gap-1 ml-2">
                           <Button
                             variant="ghost"
