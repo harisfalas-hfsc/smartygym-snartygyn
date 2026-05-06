@@ -304,7 +304,9 @@ export const HeroDestinationConstellation = () => {
     const check = () => {
       const w = window.innerWidth;
       const h = window.innerHeight;
-      setIsTablet(w >= 768 && w < 1280 && w >= h);
+      // True tablets only (iPad portrait/landscape up to 1024px wide).
+      // Anything wider is treated as desktop so the constellation stays intact.
+      setIsTablet(w >= 768 && w <= 1024 && w >= h);
     };
     check();
     window.addEventListener("resize", check);
