@@ -1,28 +1,48 @@
 ## Problem
 
-When you click the "i" button on an exercise (e.g. inside Velocity Compass Blitz), the popup shows only the GIF — you can't see the description, secondary muscles, or step‑by‑step instructions, and you can't scroll. This affects every exercise, not just one workout.
+On mobile, every page shows a large empty gap between the page content and the footer. The amount varies (more empty space when the "Join SmartyGym Now" CTA is hidden for logged-in/premium users), but it appears on **every page** — homepage, workouts, training programs, logbook, measurements, all 500+ dynamic pages.
 
 ## Root cause
 
-The popup uses a Radix `ScrollArea` set to `max-h-[70vh]` with no defined parent height. Radix's scroll viewport requires an actual height to enable scrolling — with only a `max-height` it collapses, so the GIF (which fills the full square width of the dialog) pushes the description and instructions outside the visible 90vh window with no way to scroll down to them.
+In `src/App.tsx`, the layout wrapper uses:
 
-On your laptop (672px tall viewport) the GIF alone consumes the entire visible area, hiding everything below it.
+```tsx
+<div className="flex flex-col min-h-screen">
+  <Navigation />
+  <div className="md:flex-1" style={{ paddingTop: '...' }}>
+    <Routes />
+  </div>
+  <Footer />
+</div>
+```
+
+- `min-h-screen` forces the column to be at least 100vh tall.
+- `md:flex-1` only makes the content area grow on screens ≥768px (tablet/desktop).
+- On mobile, no child has `flex-1`, so the leftover space inside the `min-h-screen` column appears as a gap, and the footer is pushed away from the content.
+
+This is exactly the same "sticky footer" pattern problem — the growing child must exist at every breakpoint, not only desktop.
 
 ## Fix
 
-Rebuild the popup so the header is fixed and the body scrolls reliably:
+Change one class in `src/App.tsx`:
 
-1. Make `DialogContent` a vertical flex container with `max-h-[90vh]`.
-2. Replace the broken `ScrollArea` with a plain `div` using `overflow-y-auto` + `flex-1 min-h-0` — this is the standard, reliable pattern for scrollable dialog bodies and works the same on desktop, tablet, and mobile.
-3. Move padding so the header has a subtle divider and the scrollable body has its own padding.
-4. Reset the scroll position to top whenever a new exercise is opened (already done, just retargeted to the new container).
+- `md:flex-1` → `flex-1`
 
-No content, copy, GIFs, badges, or styling change — only the scroll container is fixed. The description, secondary muscles, and numbered instructions will now be visible and scrollable on every exercise.
+That makes the content area absorb all leftover vertical space on mobile too. Result:
+- **Short content pages** (e.g. homepage logged-in as premium): footer sits at the bottom of the viewport with no awkward gap above it.
+- **Long content pages** (e.g. a full workout, training program, blog article): footer sits naturally right after the content, as it does today.
 
-## File touched
+Tablet and desktop behavior is unchanged because `flex-1` already applied there.
 
-- `src/components/ExerciseDetailModal.tsx` — swap Radix `ScrollArea` for a flex‑based `overflow-y-auto` body, drop the unused `ScrollArea` import.
+## Scope
 
-## Verification
+- **One file:** `src/App.tsx`
+- **One class change:** `md:flex-1` → `flex-1`
+- No changes to Navigation, Footer, or any individual page.
+- No CSS, no responsive breakpoint changes.
+- Applies automatically to all 500+ pages because they all render inside this wrapper.
 
-After the fix, opening the "i" button on any exercise (Velocity Compass Blitz or any other) will show: GIF → tags → Description → Secondary Muscles → Instructions, with smooth scrolling on phone, tablet, and desktop.
+## Out of scope
+
+- The page-count question is answered in chat (≈70 static routes + hundreds of dynamic ones — every workout, program, and article is its own URL).
+- No design or content changes.
