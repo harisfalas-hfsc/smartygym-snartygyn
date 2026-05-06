@@ -107,7 +107,7 @@ const CoachCV = () => {
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-primary mt-1">•</span>
-                  <span>Founder and Head Coach of HFSC</span>
+                  <span>Founder and Head Coach of <a href="https://hfsc.eu/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-medium">HFSC</a></span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-primary mt-1">•</span>
@@ -120,11 +120,11 @@ const CoachCV = () => {
           {/* HFSC and SmartyGym */}
           <Card className="mb-8 border-2 border-primary">
             <CardHeader>
-              <CardTitle className="text-2xl text-primary">HFSC and SmartyGym</CardTitle>
+              <CardTitle className="text-2xl text-primary"><a href="https://hfsc.eu/" target="_blank" rel="noopener noreferrer" className="hover:underline">HFSC</a> and SmartyGym</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p>
-                At HFSC, I focus on functional strength, mobility, rehabilitation principles and real performance training for athletes and adults.
+                At <a href="https://hfsc.eu/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-medium">HFSC</a>, I focus on functional strength, mobility, rehabilitation principles and real performance training for athletes and adults.
               </p>
               <p>
                 With SmartyGym, I transformed this approach into a digital platform that gives people structured workouts, programs and professional coaching anywhere, anytime.
