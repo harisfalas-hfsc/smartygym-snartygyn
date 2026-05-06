@@ -7,7 +7,6 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Dumbbell, Target, Activity, ListOrdered, Info, Gauge, ImageOff } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import ExerciseFrameAnimation from "./ExerciseFrameAnimation";
@@ -54,22 +53,22 @@ const ExerciseDetailModal = ({ exercise, open, onOpenChange }: ExerciseDetailMod
     setGifLoaded(false);
     setGifError(false);
     setRetryKey(0);
-    const viewport = scrollRootRef.current?.querySelector(
-      "[data-radix-scroll-area-viewport]",
-    ) as HTMLElement | null;
-    viewport?.scrollTo({ top: 0 });
+    scrollRootRef.current?.scrollTo({ top: 0 });
   }, [open, exercise?.id]);
 
   if (!exercise) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh]">
-        <DialogHeader>
+      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col p-0 gap-0">
+        <DialogHeader className="px-6 pt-6 pb-4 border-b shrink-0">
           <DialogTitle className="text-xl">{exercise.name}</DialogTitle>
         </DialogHeader>
 
-        <ScrollArea ref={scrollRootRef} className="max-h-[70vh] pr-4">
+        <div
+          ref={scrollRootRef}
+          className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-6 py-4"
+        >
           <div className="space-y-6">
             {/* Exercise GIF or Frame Animation */}
             {exercise.gif_url ? (
@@ -195,7 +194,7 @@ const ExerciseDetailModal = ({ exercise, open, onOpenChange }: ExerciseDetailMod
               </div>
             )}
           </div>
-        </ScrollArea>
+        </div>
       </DialogContent>
     </Dialog>
   );

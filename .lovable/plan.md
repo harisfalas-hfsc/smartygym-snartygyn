@@ -1,48 +1,28 @@
-## Goal
+## Problem
 
-Rename the **Take a Tour** page to **About SmartyGym**, add four new sections (Smarty Tools, Exercise Library, Community, Blog) using the exact same card/icon/description pattern as the existing sections, place the menu link first in the hamburger order, and keep everything mobile-friendly.
+When you click the "i" button on an exercise (e.g. inside Velocity Compass Blitz), the popup shows only the GIF — you can't see the description, secondary muscles, or step‑by‑step instructions, and you can't scroll. This affects every exercise, not just one workout.
 
-## Changes
+## Root cause
 
-### 1. Rename page file & route
-- Rename `src/pages/TakeATour.tsx` → `src/pages/AboutSmartyGym.tsx` (rename component to `AboutSmartyGym`).
-- New canonical route: `/about` (matches the page name).
-- Keep `/takeatour` and `/take-a-tour` as **aliases** that render the same component (zero broken external links / SEO redirects).
-- Update import in `src/App.tsx` and add the alias routes.
+The popup uses a Radix `ScrollArea` set to `max-h-[70vh]` with no defined parent height. Radix's scroll viewport requires an actual height to enable scrolling — with only a `max-height` it collapses, so the GIF (which fills the full square width of the dialog) pushes the description and instructions outside the visible 90vh window with no way to scroll down to them.
 
-### 2. Page content updates (`AboutSmartyGym.tsx`)
-- Update `<title>`, meta description, OG tags, canonical, breadcrumb label, and H1 from "Take a Tour" → "About SmartyGym".
-- Keep existing section order: What is SmartyGym → Workout of the Day → Smarty Workouts → Smarty Programs → Smarty Ritual → Logbook & Progress Tracking.
-- **Insert four NEW cards** between Logbook and Subscription Plans, using the exact same `Card / CardHeader / CardTitle (icon + name) / CardContent` pattern with description paragraph, supporting mini-grid where useful, and a "Explore" outline button at the bottom:
-  1. **Smarty Tools** — `Wrench` icon (orange-500). Description of the free fitness calculators (1RM, BMR, Macro, Calorie Counter). CTA → `/tools`.
-  2. **Exercise Library** — `BookOpen` icon (emerald-500). Description of the searchable exercise database with descriptions, instructions, and video demos. CTA → `/exerciselibrary`.
-  3. **Community** — `Users` icon (cyan-500). Description of leaderboards, ratings, and member interactions. CTA → `/community`.
-  4. **Blog** — `Newspaper` icon (red-500). Description of expert fitness/nutrition articles by Haris Falas. CTA → `/blog`.
-- Same color/spacing tokens, same `mb-6 border border-border` card styling, same responsive grids (`grid-cols-1 md:grid-cols-2/3`), same prose color (`text-muted-foreground`).
-- Update breadcrumb: `Home › About SmartyGym`.
+On your laptop (672px tall viewport) the GIF alone consumes the entire visible area, hiding everything below it.
 
-### 3. Navigation reorder (`src/components/Navigation.tsx`)
-- Move the menu item to **first position** in `discoveryItems`, before "Smarty Workouts".
-- Rename label "Take a Tour" → "About SmartyGym", path → `/about`, keep `Info` icon + teal-500 color.
-- This single array drives both desktop and mobile hamburger menus → mobile parity automatic.
+## Fix
 
-### 4. Touch-up other references
-- `src/pages/Auth.tsx` line 386: `navigate("/take-a-tour")` → `navigate("/about")`.
-- `src/components/growth/FreeTrialPopup.tsx`: include `/about` in the `isTakeATour` (rename to `isAboutPage`) check so the trial popup behavior is preserved on the renamed page.
-- `public/sitemap.xml`: update `/takeatour` entry to `/about` (keep alias also indexed).
+Rebuild the popup so the header is fixed and the body scrolls reliably:
 
-## Out of scope / preserved
+1. Make `DialogContent` a vertical flex container with `max-h-[90vh]`.
+2. Replace the broken `ScrollArea` with a plain `div` using `overflow-y-auto` + `flex-1 min-h-0` — this is the standard, reliable pattern for scrollable dialog bodies and works the same on desktop, tablet, and mobile.
+3. Move padding so the header has a subtle divider and the scrollable body has its own padding.
+4. Reset the scroll position to top whenever a new exercise is opened (already done, just retargeted to the new container).
 
-- No visual restyling of existing 6 sections.
-- No layout/structure changes elsewhere on the site.
-- Mobile breakpoints unchanged (existing responsive classes already mobile-first).
-- Existing SEOEnhancer, breadcrumbs, and trial popup logic preserved.
+No content, copy, GIFs, badges, or styling change — only the scroll container is fixed. The description, secondary muscles, and numbered instructions will now be visible and scrollable on every exercise.
 
-## Files touched
+## File touched
 
-- `src/pages/TakeATour.tsx` → renamed to `src/pages/AboutSmartyGym.tsx` (content updates + 4 new cards)
-- `src/App.tsx` (import + routes)
-- `src/components/Navigation.tsx` (reorder + rename)
-- `src/pages/Auth.tsx` (navigate path)
-- `src/components/growth/FreeTrialPopup.tsx` (path check)
-- `public/sitemap.xml` (URL entry)
+- `src/components/ExerciseDetailModal.tsx` — swap Radix `ScrollArea` for a flex‑based `overflow-y-auto` body, drop the unused `ScrollArea` import.
+
+## Verification
+
+After the fix, opening the "i" button on any exercise (Velocity Compass Blitz or any other) will show: GIF → tags → Description → Secondary Muscles → Instructions, with smooth scrolling on phone, tablet, and desktop.
