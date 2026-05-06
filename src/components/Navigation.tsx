@@ -282,7 +282,7 @@ export const Navigation = () => {
       <div className="mx-auto max-w-7xl">
         <div className="relative flex items-center justify-between gap-2 lg:gap-4">
           {/* LEFT SECTION - Hamburger Menu + Social Media Icons */}
-          <div className="hidden lg:flex items-center gap-6">
+          <div className="hidden lg:flex items-center gap-12">
             {/* Desktop Menu - original layout */}
             <Sheet open={desktopMenuOpen} onOpenChange={setDesktopMenuOpen}>
                 <SheetTrigger asChild>
