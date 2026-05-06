@@ -415,7 +415,8 @@ export const TestimonialsSection = ({
   );
 
   const renderOwnerControls = (testimonial: Testimonial, closeModal = false) => {
-    if (user?.id !== testimonial.user_id) return null;
+    const isOwner = testimonial.is_mine ?? (!!user?.id && user.id === testimonial.user_id);
+    if (!isOwner) return null;
     return (
       <div className="flex items-center gap-1 ml-2">
         <Button
