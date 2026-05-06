@@ -25,6 +25,7 @@ import { ScrollReveal } from "@/components/ScrollReveal";
 import { LazySection } from "@/components/LazySection";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useTodayWods } from "@/hooks/useTodayWods";
+import { HeroDestinationConstellation } from "@/components/home/HeroDestinationConstellation";
 
 import heroWodImage from "@/assets/hero-wod.jpg";
 import heroWorkoutsImage from "@/assets/hero-workouts-bright.jpg";
@@ -67,21 +68,6 @@ const Index = () => {
   const isPremium = userTier === "premium";
   const { isPortrait: isMobile, isPhoneLandscape } = useIsPortraitMode();
 
-  // Carousel state for mobile navigation dots
-  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
-  const [currentSlide, setCurrentSlide] = useState(0);
-
-  // Carousel state for desktop hero navigation carousel
-  const [desktopNavApi, setDesktopNavApi] = useState<CarouselApi>();
-  const [desktopNavSlide, setDesktopNavSlide] = useState(0);
-
-  // Auto-cycling state for tablet hero cards
-  const [highlightedCardIndex, setHighlightedCardIndex] = useState(0);
-  const [isHoveringTablet, setIsHoveringTablet] = useState(false);
-  
-  // Auto-cycling state for desktop navigation carousel
-  const [isHoveringDesktopNav, setIsHoveringDesktopNav] = useState(false);
-
   // State for pinned audience tooltip (click to toggle)
   const [activeAudienceTooltip, setActiveAudienceTooltip] = useState<string | null>(null);
 
@@ -109,49 +95,6 @@ const Index = () => {
   });
 
   const { bodyweightWod, equipmentWod, variousWod, hasWods } = useTodayWods(isMobile);
-  useEffect(() => {
-    if (!carouselApi) return;
-    const onSelect = () => {
-      setCurrentSlide(carouselApi.selectedScrollSnap());
-    };
-    carouselApi.on("select", onSelect);
-    onSelect();
-    return () => {
-      carouselApi.off("select", onSelect);
-    };
-  }, [carouselApi]);
-
-  useEffect(() => {
-    if (!desktopNavApi) return;
-    const onSelect = () => {
-      setDesktopNavSlide(desktopNavApi.selectedScrollSnap());
-    };
-    desktopNavApi.on("select", onSelect);
-    onSelect();
-    return () => {
-      desktopNavApi.off("select", onSelect);
-    };
-  }, [desktopNavApi]);
-
-  // Auto-cycle through tablet hero cards every 4 seconds (slower to reduce re-renders)
-  useEffect(() => {
-    if (isHoveringTablet) return; // Pause when hovering
-
-    const interval = setInterval(() => {
-      setHighlightedCardIndex(prev => (prev + 1) % 6);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, [isHoveringTablet]);
-  
-  // Auto-cycle through desktop navigation carousel every 2.5 seconds
-  useEffect(() => {
-    if (!desktopNavApi || isHoveringDesktopNav) return; // Pause when hovering
-
-    const interval = setInterval(() => {
-      desktopNavApi.scrollNext();
-    }, 2500);
-    return () => clearInterval(interval);
-  }, [desktopNavApi, isHoveringDesktopNav]);
   // Mobile hero carousel cards - Order: Workouts, Programs, Tools, Library, Blog
   const heroCards = [{
     id: "workouts",
