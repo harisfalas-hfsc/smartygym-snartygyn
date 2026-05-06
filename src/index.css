@@ -28,6 +28,16 @@
   }
 }
 
+/* On mobile, also disable the App-shell sticky-footer behavior. The user
+ * prefers the footer to sit immediately under the content even when content
+ * is shorter than the viewport, instead of being pushed to the bottom edge.
+ */
+@media (max-width: 1023px) {
+  [data-app-shell] {
+    min-height: 0 !important;
+  }
+}
+
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.
 */
