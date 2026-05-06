@@ -121,14 +121,16 @@ const AppContent = () => {
         <ScrollToTop />
         <AnalyticsTracker />
         <BackgroundSEO />
-        <div className="flex flex-col min-h-screen">
+        <div
+          className="flex flex-col min-h-screen"
+          style={{ paddingBottom: 'var(--mobile-bottom-nav-h, 0px)' }}
+        >
           <Navigation />
           <FixedBackButton />
             <div
-              className="flex-1"
+              className="md:flex-1"
               style={{
                 paddingTop: 'var(--app-header-h, 100px)',
-                paddingBottom: 'var(--mobile-bottom-nav-h, 0px)',
               }}
             >
             <PageTransition>
