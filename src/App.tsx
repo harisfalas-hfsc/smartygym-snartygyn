@@ -121,6 +121,7 @@ const AppContent = () => {
         <AnalyticsTracker />
         <BackgroundSEO />
         <div
+          data-app-shell
           className="flex flex-col min-h-screen"
         >
           <Navigation />
