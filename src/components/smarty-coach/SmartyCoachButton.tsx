@@ -86,7 +86,7 @@ export const SmartyCoachButton = ({ className }: SmartyCoachButtonProps) => {
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
             className={cn(
-              "fixed z-40",
+              "fixed z-40 hidden md:block",
               // Fixed dark appearance - never changes with theme
               "rounded-full border border-white/20 bg-[#1a1f2e] p-1.5 shadow-lg shadow-blue-500/30 backdrop-blur-md",
               "cursor-grab active:cursor-grabbing",
