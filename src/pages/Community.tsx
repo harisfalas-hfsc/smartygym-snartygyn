@@ -205,11 +205,7 @@ const Community = () => {
 
   const fetchTestimonials = async () => {
     try {
-      const { data, error } = await supabase
-        .from("testimonials")
-        .select("id, display_name, rating, testimonial_text, created_at")
-        .order("created_at", { ascending: false });
-      
+      const { data, error } = await supabase.rpc("get_public_testimonials");
       if (error) throw error;
       setTestimonials(data || []);
     } catch (error) {
