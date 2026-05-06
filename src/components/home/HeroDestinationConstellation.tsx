@@ -149,22 +149,41 @@ const Bubble = ({
   size,
   className,
   style,
+  pullX = 0,
+  pullY = 0,
 }: {
   dest: Destination;
   isWodLive: boolean;
   size: number;
   className?: string;
   style?: React.CSSProperties;
+  pullX?: number;
+  pullY?: number;
 }) => {
   const navigate = useNavigate();
   const Icon = dest.icon;
   const showLivePill = dest.featured && isWodLive;
   const labelMaxWidth = Math.max(size + 40, 130);
+  // Featured WOD is already prominent — gentler scale.
+  const hoverScale = dest.featured ? 1.1 : 1.18;
 
   return (
     <div
-      className={cn("flex flex-col items-center group", className)}
-      style={style}
+      className={cn(
+        "flex flex-col items-center group",
+        "transition-[z-index] duration-0",
+        "hover:z-30 focus-within:z-30",
+        className
+      )}
+      style={
+        {
+          ...style,
+          // CSS vars consumed by the button transform on hover
+          ["--pull-x" as any]: `${pullX}px`,
+          ["--pull-y" as any]: `${pullY}px`,
+          ["--hover-scale" as any]: hoverScale,
+        } as React.CSSProperties
+      }
     >
       <button
         type="button"
@@ -172,10 +191,17 @@ const Bubble = ({
         aria-label={`Go to ${dest.title}`}
         className={cn(
           "relative rounded-full overflow-hidden",
+          "transform-gpu will-change-transform",
+          "[transition:transform_550ms_cubic-bezier(0.22,1,0.36,1),box-shadow_400ms_ease-out,outline-color_300ms_ease-out]",
           "ring-[3px] ring-primary/50 hover:ring-primary",
           "shadow-lg shadow-primary/10 hover:shadow-2xl hover:shadow-primary/30",
-          "transition-all duration-300 ease-out",
-          "hover:scale-110 focus-visible:scale-110",
+          // Smooth gravitate-toward-center + scale on hover/focus
+          "hover:[transform:translate3d(calc(var(--pull-x)*0.28),calc(var(--pull-y)*0.28),0)_scale(var(--hover-scale))]",
+          "focus-visible:[transform:translate3d(calc(var(--pull-x)*0.28),calc(var(--pull-y)*0.28),0)_scale(var(--hover-scale))]",
+          // Pause idle float while hovering so the gravitation reads cleanly
+          "hover:[animation-play-state:paused] focus-visible:[animation-play-state:paused]",
+          // Reduced motion: scale only, no translation
+          "motion-reduce:hover:[transform:scale(1.06)] motion-reduce:focus-visible:[transform:scale(1.06)]",
           "focus:outline-none focus-visible:ring-4 focus-visible:ring-primary",
           "motion-safe:animate-[float_6s_ease-in-out_infinite]",
           dest.featured && "ring-4 ring-primary"
@@ -270,6 +296,10 @@ export const HeroDestinationConstellation = () => {
     };
   });
 
+  // Constellation stage center — bubbles gravitate toward this point on hover.
+  const STAGE_CX = 980 / 2;
+  const STAGE_CY = 590 / 2;
+
   const featured = DESTINATIONS.find((d) => d.featured)!;
   const others = DESTINATIONS.filter((d) => !d.featured);
 
@@ -323,25 +353,32 @@ export const HeroDestinationConstellation = () => {
             })}
           </svg>
 
-          {DESTINATIONS.map((dest) => (
-            <Bubble
-              key={dest.id}
-              dest={dest}
-              isWodLive={hasWods}
-              size={dest.desktop.size}
-              className="absolute"
-              style={{
-                top: `${dest.desktop.top}px`,
-                left: `${dest.desktop.left}px`,
-              }}
-            />
-          ))}
+          {DESTINATIONS.map((dest) => {
+            const c = centers[dest.id];
+            return (
+              <Bubble
+                key={dest.id}
+                dest={dest}
+                isWodLive={hasWods}
+                size={dest.desktop.size}
+                pullX={STAGE_CX - c.cx}
+                pullY={STAGE_CY - c.cy}
+                className="absolute"
+                style={{
+                  top: `${dest.desktop.top}px`,
+                  left: `${dest.desktop.left}px`,
+                }}
+              />
+            );
+          })}
 
           {/* Center coach bubble */}
           <Bubble
             dest={COACH}
             isWodLive={false}
             size={COACH.desktop.size}
+            pullX={0}
+            pullY={0}
             className="absolute"
             style={{
               top: `${COACH.desktop.top}px`,
