@@ -375,10 +375,10 @@ export const Navigation = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="relative h-12 w-12 rounded-full text-foreground hover:text-primary [&_svg]:!h-12 [&_svg]:!w-12"
+                  className="relative h-11 w-11 rounded-full text-foreground/80 hover:text-primary [&_svg]:!h-8 [&_svg]:!w-8"
                   aria-label="Open Discovery"
                 >
-                  <Menu className="h-12 w-12" strokeWidth={2.5} />
+                  <Menu className="h-8 w-8" strokeWidth={2.25} />
                   <span className="sr-only">Discovery</span>
                 </Button>
               </SheetTrigger>
