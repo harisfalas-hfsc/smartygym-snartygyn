@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Home } from "lucide-react";
 import { useNavigationHistory } from "@/contexts/NavigationHistoryContext";
@@ -18,6 +18,44 @@ export const MobileBottomNav = () => {
   const navigate = useNavigate();
   const { goBack, canGoBack, goForward, canGoForward } = useNavigationHistory();
   const [coachOpen, setCoachOpen] = useState(false);
+
+  /**
+   * Some Android devices using 3-button navigation don't report a
+   * `safe-area-inset-bottom` value, so the fixed bar can end up underneath
+   * the system Back/Home/Recents bar. We measure the gap between the
+   * visual viewport and the physical screen and expose it as a CSS variable
+   * so both the bar and the global content padding can honor it.
+   */
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const root = document.documentElement;
+
+    const update = () => {
+      const vv = window.visualViewport;
+      const visibleBottom = vv ? vv.height + vv.offsetTop : window.innerHeight;
+      // Compare against screen height; positive delta = system UI eating space
+      // that the browser didn't expose via safe-area-inset.
+      const screenH = window.screen?.height ?? window.innerHeight;
+      const rawGap = Math.max(0, screenH - visibleBottom);
+      // Ignore tiny rounding noise and absurd values (keyboard etc.).
+      const gap = rawGap > 30 && rawGap < 200 ? rawGap : 0;
+      root.style.setProperty("--android-sys-nav-gap", `${gap}px`);
+    };
+
+    update();
+    window.addEventListener("resize", update);
+    window.addEventListener("orientationchange", update);
+    window.visualViewport?.addEventListener("resize", update);
+    window.visualViewport?.addEventListener("scroll", update);
+
+    return () => {
+      window.removeEventListener("resize", update);
+      window.removeEventListener("orientationchange", update);
+      window.visualViewport?.removeEventListener("resize", update);
+      window.visualViewport?.removeEventListener("scroll", update);
+    };
+  }, []);
 
   if (HIDDEN_PATHS.includes(location.pathname)) return null;
 
@@ -65,7 +103,13 @@ export const MobileBottomNav = () => {
           "border-t border-primary/20",
           "shadow-[0_-4px_16px_-4px_hsl(var(--primary)/0.15)]"
         )}
-        style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+        style={{
+          // Honor whichever bottom inset is largest:
+          // iOS home indicator, Android gesture pill, measured Android
+          // 3-button bar gap, or an 8px fallback.
+          paddingBottom:
+            "max(env(safe-area-inset-bottom, 0px), var(--android-sys-nav-gap, 0px), 8px)",
+        }}
         aria-label="Mobile navigation bar"
       >
         <div className="flex h-14 items-stretch">
