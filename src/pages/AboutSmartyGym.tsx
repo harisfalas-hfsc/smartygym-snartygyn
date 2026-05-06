@@ -226,9 +226,9 @@ export default function AboutSmartyGym() {
               </div>
 
               <div className="text-center">
-                <Link to="/workouts">
+                <Link to="/workout/wod">
                   <Button variant="outline" size="sm">
-                    Explore Today's Workouts
+                    View the Workout of the Day
                   </Button>
                 </Link>
               </div>
@@ -295,7 +295,7 @@ export default function AboutSmartyGym() {
               </div>
 
               <div className="text-center">
-                <Link to="/workouts">
+                <Link to="/workout">
                   <Button variant="outline" size="sm">
                     Browse All Workouts
                   </Button>
@@ -364,7 +364,7 @@ export default function AboutSmartyGym() {
               <div className="text-center">
                 <Link to="/trainingprogram">
                   <Button variant="outline" size="sm">
-                    Explore Smarty Programs
+                    Browse All Programs
                   </Button>
                 </Link>
               </div>
@@ -482,6 +482,14 @@ export default function AboutSmartyGym() {
                   smart tracking, Google Calendar integration, and personalized insights.
                 </p>
               </div>
+
+              <div className="text-center">
+                <Link to="/userdashboard">
+                  <Button variant="outline" size="sm">
+                    Open My Logbook
+                  </Button>
+                </Link>
+              </div>
             </CardContent>
           </Card>
 
@@ -588,7 +596,7 @@ export default function AboutSmartyGym() {
               <div className="text-center">
                 <Link to="/exerciselibrary">
                   <Button variant="outline" size="sm">
-                    Browse Exercise Library
+                    Visit Exercise Library
                   </Button>
                 </Link>
               </div>
