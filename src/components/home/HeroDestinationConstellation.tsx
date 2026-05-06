@@ -200,7 +200,7 @@ const Bubble = ({
       }
     >
       <span
-        className="motion-safe:animate-[float_6s_ease-in-out_infinite] inline-block"
+        className="motion-safe:animate-[float_6s_ease-in-out_infinite] inline-block group-hover:[animation-play-state:paused] group-focus-within:[animation-play-state:paused]"
         style={{ animationDelay: dest.delay }}
       >
       <button
