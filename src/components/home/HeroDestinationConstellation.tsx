@@ -47,7 +47,7 @@ const DESTINATIONS: Destination[] = [
     icon: CalendarCheck,
     route: "/workout/wod",
     image: heroWodImage,
-    desktop: { top: 0, left: 380, size: 170 },
+    desktop: { top: 0, left: 540, size: 200 },
     delay: "0s",
     featured: true,
   },
@@ -59,7 +59,7 @@ const DESTINATIONS: Destination[] = [
     icon: Dumbbell,
     route: "/workout",
     image: heroWorkoutsImage,
-    desktop: { top: 60, left: 720, size: 170 },
+    desktop: { top: 70, left: 950, size: 190 },
     delay: "0.6s",
   },
   {
@@ -70,7 +70,7 @@ const DESTINATIONS: Destination[] = [
     icon: Calendar,
     route: "/trainingprogram",
     image: heroProgramsImage,
-    desktop: { top: 60, left: 90, size: 170 },
+    desktop: { top: 70, left: 160, size: 190 },
     delay: "1.2s",
   },
   {
@@ -81,7 +81,7 @@ const DESTINATIONS: Destination[] = [
     icon: Calculator,
     route: "/tools",
     image: heroToolsImage,
-    desktop: { top: 270, left: 0, size: 150 },
+    desktop: { top: 290, left: 0, size: 170 },
     delay: "0.9s",
   },
   {
@@ -92,7 +92,7 @@ const DESTINATIONS: Destination[] = [
     icon: Video,
     route: "/exerciselibrary",
     image: heroLibraryImage,
-    desktop: { top: 270, left: 830, size: 150 },
+    desktop: { top: 290, left: 1130, size: 170 },
     delay: "1.5s",
   },
   {
@@ -103,7 +103,7 @@ const DESTINATIONS: Destination[] = [
     icon: FileText,
     route: "/blog",
     image: heroBlogImage,
-    desktop: { top: 410, left: 280, size: 130 },
+    desktop: { top: 460, left: 360, size: 150 },
     delay: "0.3s",
   },
   {
@@ -114,7 +114,7 @@ const DESTINATIONS: Destination[] = [
     icon: Users,
     route: "/community",
     image: heroCommunityImage,
-    desktop: { top: 410, left: 570, size: 130 },
+    desktop: { top: 460, left: 800, size: 150 },
     delay: "1.8s",
   },
 ];
@@ -128,7 +128,7 @@ const COACH: Destination = {
   icon: User,
   route: "/coach-profile",
   image: harisFalasImage,
-  desktop: { top: 245, left: 415, size: 130 },
+  desktop: { top: 270, left: 575, size: 150 },
   delay: "0.4s",
 };
 
@@ -297,8 +297,8 @@ export const HeroDestinationConstellation = () => {
   });
 
   // Constellation stage center — bubbles gravitate toward this point on hover.
-  const STAGE_CX = 980 / 2;
-  const STAGE_CY = 590 / 2;
+  const STAGE_CX = 1300 / 2;
+  const STAGE_CY = 650 / 2;
 
   // Coach bubble occupies the center; cap each bubble's pull so its hovered
   // edge never touches the coach circle (prevents WOD/coach collision).
@@ -323,12 +323,12 @@ export const HeroDestinationConstellation = () => {
       <div className="hidden md:block">
         <div
           className="relative mx-auto"
-          style={{ width: "100%", maxWidth: "980px", height: "590px" }}
+          style={{ width: "100%", maxWidth: "1300px", height: "650px" }}
         >
           {/* Decorative connection SVG */}
           <svg
             className="absolute inset-0 w-full h-full pointer-events-none"
-            viewBox="0 0 980 590"
+            viewBox="0 0 1300 650"
             preserveAspectRatio="xMidYMid meet"
             aria-hidden="true"
           >
@@ -338,7 +338,7 @@ export const HeroDestinationConstellation = () => {
                 <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0" />
               </radialGradient>
             </defs>
-            <rect width="980" height="590" fill="url(#constellation-glow)" />
+            <rect width="1300" height="650" fill="url(#constellation-glow)" />
             {CONNECTIONS.map(([a, b]) => {
               const A = centers[a];
               const B = centers[b];
