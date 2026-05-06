@@ -26,13 +26,16 @@ import {
   Flame,
   Activity,
   User,
-  Trophy
+  Trophy,
+  Wrench,
+  Users,
+  Newspaper
 } from "lucide-react";
 
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 
-export default function TakeATour() {
+export default function AboutSmartyGym() {
   
 
   const workoutCategories = [
@@ -56,27 +59,27 @@ export default function TakeATour() {
   return (
     <>
       <Helmet>
-        <title>Take a Tour | Discover SmartyGym Features | SmartyGym</title>
-        <meta name="description" content="Explore SmartyGym's complete fitness ecosystem: daily workouts, training programs, Smarty Rituals, progress tracking, and subscription plans. Your guide to getting started." />
-        <meta name="keywords" content="SmartyGym tour, fitness app features, workout app guide, training programs, smarty ritual, fitness tracking" />
+        <title>About SmartyGym | The Complete Fitness Ecosystem | SmartyGym</title>
+        <meta name="description" content="About SmartyGym: discover our complete fitness ecosystem — daily workouts, training programs, Smarty Rituals, tools, exercise library, community, blog, and subscription plans." />
+        <meta name="keywords" content="about SmartyGym, fitness app features, workout app guide, training programs, smarty ritual, smarty tools, exercise library, community, blog" />
         
-        <meta property="og:title" content="Take a Tour | Discover SmartyGym" />
-        <meta property="og:description" content="Your complete guide to the SmartyGym ecosystem - workouts, programs, rituals, and progress tracking." />
+        <meta property="og:title" content="About SmartyGym | The Complete Fitness Ecosystem" />
+        <meta property="og:description" content="Your complete guide to the SmartyGym ecosystem — workouts, programs, rituals, tools, exercise library, community, blog, and progress tracking." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://smartygym.com/takeatour" />
+        <meta property="og:url" content="https://smartygym.com/about-smartygym" />
         
-        <link rel="canonical" href="https://smartygym.com/takeatour" />
+        <link rel="canonical" href="https://smartygym.com/about-smartygym" />
       </Helmet>
 
       <SEOEnhancer
-        entities={["SmartyGym Tour", "Fitness Features", "Workout Guide"]}
-        topics={["fitness app tour", "workout features", "training programs", "progress tracking", "wellness rituals"]}
+        entities={["About SmartyGym", "Fitness Features", "Workout Guide"]}
+        topics={["about SmartyGym", "workout features", "training programs", "progress tracking", "wellness rituals", "fitness tools", "exercise library", "fitness community", "fitness blog"]}
         expertise={["fitness coaching", "workout programming", "wellness protocols"]}
         contentType="Guide"
-        aiSummary="A comprehensive tour of SmartyGym's features including daily workouts, multi-week training programs, Smarty Rituals, and progress tracking tools."
-        aiKeywords={["SmartyGym", "fitness tour", "workout features", "training programs", "smarty ritual"]}
-        relatedContent={["Smarty Workouts", "Smarty Programs", "Daily Ritual", "User Dashboard"]}
-        targetAudience="individuals exploring SmartyGym's fitness ecosystem"
+        aiSummary="An in-depth overview of the SmartyGym ecosystem: daily workouts, multi-week training programs, Smarty Rituals, logbook, Smarty Tools, exercise library, community, blog and subscription plans."
+        aiKeywords={["SmartyGym", "about SmartyGym", "workout features", "training programs", "smarty ritual", "smarty tools", "exercise library", "community", "blog"]}
+        relatedContent={["Smarty Workouts", "Smarty Programs", "Daily Ritual", "Smarty Tools", "Exercise Library", "Community", "Blog"]}
+        targetAudience="individuals exploring the SmartyGym fitness ecosystem"
         pageType="Guide"
       />
 
@@ -84,7 +87,7 @@ export default function TakeATour() {
         <main className="container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6 pb-8">
           <PageBreadcrumbs items={[
             { label: "Home", href: "/" },
-            { label: "Take a Tour" }
+            { label: "About SmartyGym" }
           ]} />
 
           {/* Header */}
@@ -92,7 +95,7 @@ export default function TakeATour() {
             <div className="flex items-center justify-center gap-3 mb-2">
               <Target className="h-8 w-8 text-primary" />
               <h1 className="text-3xl sm:text-4xl font-bold">
-                Take a <span className="text-primary">Tour</span>
+                About <span className="text-primary">SmartyGym</span>
               </h1>
             </div>
             <p className="text-muted-foreground max-w-2xl mx-auto">
