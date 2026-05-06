@@ -198,24 +198,25 @@ const Bubble = ({
           </span>
         )}
 
-        {/* Icon chip bottom-right */}
+        {/* Icon chip centered near the bottom, inset from the circle edge */}
         <span
           className={cn(
-            "absolute bottom-1 right-1 rounded-full bg-background/95 backdrop-blur-sm",
-            "flex items-center justify-center shadow-md ring-1 ring-primary/30",
+            "absolute left-1/2 z-10 -translate-x-1/2 rounded-full bg-background/95 backdrop-blur-sm",
+            "flex items-center justify-center shadow-lg ring-2 ring-primary/60",
             "group-hover:scale-110 transition-transform"
           )}
           style={{
-            width: `${Math.max(size * 0.22, 26)}px`,
-            height: `${Math.max(size * 0.22, 26)}px`,
+            bottom: `${Math.max(size * 0.1, 12)}px`,
+            width: `${Math.max(size * 0.26, 34)}px`,
+            height: `${Math.max(size * 0.26, 34)}px`,
           }}
           aria-hidden="true"
         >
           <Icon
             className="text-primary"
             style={{
-              width: `${Math.max(size * 0.12, 14)}px`,
-              height: `${Math.max(size * 0.12, 14)}px`,
+              width: `${Math.max(size * 0.14, 18)}px`,
+              height: `${Math.max(size * 0.14, 18)}px`,
             }}
           />
         </span>
