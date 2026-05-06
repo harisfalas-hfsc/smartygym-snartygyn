@@ -185,7 +185,7 @@ export default function CorporateWellness() {
       />
 
       <div className="min-h-screen bg-background">
-        <main className="container mx-auto max-w-4xl px-4 pb-8">
+        <main className="container mx-auto max-w-4xl md:max-w-[1200px] px-4 md:px-6 pb-8">
           <PageBreadcrumbs items={[
             { label: "Home", href: "/" },
             { label: "Smarty Corporate", href: "/corporate" },

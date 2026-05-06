@@ -150,7 +150,7 @@ const DailySmartyRitual = () => {
       />
 
       <div className="min-h-screen bg-background">
-        <div className="container mx-auto max-w-6xl px-4 pb-8">
+        <div className="container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6 pb-8">
           {/* Header */}
           <div className="flex items-center justify-end mb-6">
             <div className="flex items-center gap-2">

@@ -21,7 +21,7 @@ const Disclaimer = () => {
       </Helmet>
 
       <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 pb-8 max-w-4xl">
+        <div className="container mx-auto px-4 md:px-6 pb-8 max-w-4xl md:max-w-[1200px]">
           <PageBreadcrumbs items={[
             { label: "Home", href: "/" },
             { label: "Disclaimer" }

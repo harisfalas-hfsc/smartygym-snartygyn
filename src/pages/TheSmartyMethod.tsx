@@ -105,7 +105,7 @@ const TheSmartyMethod = () => {
       </Helmet>
 
       <main className="min-h-screen bg-background">
-        <div className="container mx-auto max-w-5xl px-4 pb-8">
+        <div className="container mx-auto max-w-5xl md:max-w-[1200px] px-4 md:px-6 pb-8">
           <PageBreadcrumbs items={breadcrumbItems} />
 
           {/* Hero / Introduction */}

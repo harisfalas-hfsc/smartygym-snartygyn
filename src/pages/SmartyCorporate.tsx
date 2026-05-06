@@ -164,7 +164,7 @@ export default function SmartyCorporate() {
       <SEOEnhancer entities={["Corporate Fitness", "Team Membership", "Business Wellness"]} topics={["corporate fitness plans", "team training", "business wellness programs"]} expertise={["corporate wellness", "team fitness management"]} contentType="Corporate Plans" aiSummary="SmartyGym Corporate: Premium fitness access for teams and organizations. Plans from €399/year (10 users) to €699/year (unlimited). All members get Platinum access with admin dashboard for team management." aiKeywords={["corporate fitness", "team membership", "business wellness", "group fitness"]} relatedContent={["Premium Benefits", "Workout Library", "Training Programs"]} targetAudience="businesses and organizations seeking team fitness solutions" pageType="Product" />
 
       <div className="min-h-screen bg-background">
-        <main className="container mx-auto max-w-6xl px-4 pb-8">
+        <main className="container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6 pb-8">
           <PageBreadcrumbs items={[{
           label: "Home",
           href: "/"
