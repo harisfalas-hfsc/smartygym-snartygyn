@@ -99,7 +99,7 @@ export default function AboutSmartyGym() {
               </h1>
             </div>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Discover everything SmartyGym has to offer
+              Your Gym Re-imagined. Anywhere, Anytime.
             </p>
           </div>
 
