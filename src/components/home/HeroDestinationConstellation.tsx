@@ -305,7 +305,18 @@ const Bubble = ({
 
 export const HeroDestinationConstellation = () => {
   const { isPortrait: isMobile } = useIsPortraitMode();
-  const { hasWods } = useTodayWods(isMobile);
+  const { hasWods, bodyweightWod, equipmentWod, variousWod, allTodayWods } =
+    useTodayWods(true);
+
+  // Build the WOD image carousel from today's actual WOD images (bodyweight + equipment).
+  // Falls back to the static hero image if nothing is available yet.
+  const wodCycleImages = (() => {
+    const ordered = [bodyweightWod, equipmentWod, variousWod].filter(Boolean) as Array<{ image_url?: string | null }>;
+    const fromOrdered = ordered.map((w) => w.image_url).filter(Boolean) as string[];
+    if (fromOrdered.length > 0) return fromOrdered;
+    const fromAll = (allTodayWods || []).map((w: any) => w.image_url).filter(Boolean) as string[];
+    return fromAll;
+  })();
 
   // Find bubble center coords for connection lines (desktop)
   const centers: Record<string, { cx: number; cy: number }> = {};
@@ -401,6 +412,7 @@ export const HeroDestinationConstellation = () => {
                 size={dest.desktop.size}
                 pullX={pullX}
                 pullY={pullY}
+                cycleImages={dest.featured ? wodCycleImages : undefined}
                 className="absolute"
                 style={{
                   top: `${dest.desktop.top}px`,
@@ -430,7 +442,7 @@ export const HeroDestinationConstellation = () => {
       <div className="md:hidden">
         <div className="flex flex-col items-center gap-5">
           {/* Featured WOD bubble */}
-          <Bubble dest={featured} isWodLive={hasWods} size={150} />
+          <Bubble dest={featured} isWodLive={hasWods} size={150} cycleImages={wodCycleImages} />
 
           {/* 3 rows × 2 bubbles */}
           <div className="grid grid-cols-2 gap-x-6 gap-y-5 w-full max-w-xs">
