@@ -99,18 +99,14 @@ const Index = () => {
   const { data: reviewStats } = useQuery({
     queryKey: ["homepage-review-stats"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("testimonials")
-        .select("rating");
-      
-      if (error || !data || data.length === 0) {
+      const { data, error } = await supabase.rpc("get_testimonial_rating_stats");
+      const row = Array.isArray(data) ? data[0] : data;
+      if (error || !row || !row.count) {
         return { count: 12, average: 4.83 }; // Default fallback
       }
-      
-      const total = data.reduce((sum, t) => sum + t.rating, 0);
       return {
-        count: data.length,
-        average: Math.round((total / data.length) * 100) / 100
+        count: Number(row.count),
+        average: Number(row.average) || 0,
       };
     },
     staleTime: 1000 * 60 * 60, // 1 hour - this data rarely changes
