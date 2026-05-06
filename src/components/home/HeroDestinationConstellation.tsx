@@ -47,7 +47,7 @@ const DESTINATIONS: Destination[] = [
     icon: CalendarCheck,
     route: "/workout/wod",
     image: heroWodImage,
-    desktop: { top: 0, left: 380, size: 200 },
+    desktop: { top: 0, left: 380, size: 170 },
     delay: "0s",
     featured: true,
   },
@@ -128,7 +128,7 @@ const COACH: Destination = {
   icon: User,
   route: "/coach-profile",
   image: harisFalasImage,
-  desktop: { top: 215, left: 405, size: 150 },
+  desktop: { top: 245, left: 415, size: 130 },
   delay: "0.4s",
 };
 
