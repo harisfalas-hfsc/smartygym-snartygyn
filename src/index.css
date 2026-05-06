@@ -12,6 +12,24 @@
   }
 }
 
+/* MOBILE FOOTER GAP FIX
+ * Many page components wrap their root in `min-h-screen`, which forces every
+ * page to be at least 100vh tall. On mobile this creates a large empty gap
+ * between the page content and the global <Footer />. Neutralize that on
+ * mobile so pages take their natural content height; the App-level wrapper
+ * (`flex-1` content + `min-h-screen` outer column) still keeps the footer at
+ * the bottom of the viewport when content is short.
+ */
+@media (max-width: 1023px) {
+  main .min-h-screen,
+  [data-page-root].min-h-screen,
+  .page-transition .min-h-screen,
+  .flex-1 > .min-h-screen,
+  .flex-1 .min-h-screen {
+    min-height: 0 !important;
+  }
+}
+
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.
 */
