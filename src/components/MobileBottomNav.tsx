@@ -70,7 +70,7 @@ export const MobileBottomNav = () => {
       >
         <div className="flex h-14 items-stretch">
           <Item onClick={goBack} disabled={!canGoBack} label="Back">
-            <ChevronLeft className="h-6 w-6" strokeWidth={2.25} />
+            <ChevronLeft className="h-7 w-7" strokeWidth={2.25} />
           </Item>
 
           <Item onClick={() => setCoachOpen(true)} label="Smarty Coach">
