@@ -300,6 +300,12 @@ export const HeroDestinationConstellation = () => {
   const STAGE_CX = 980 / 2;
   const STAGE_CY = 590 / 2;
 
+  // Coach bubble occupies the center; cap each bubble's pull so its hovered
+  // edge never touches the coach circle (prevents WOD/coach collision).
+  const COACH_RADIUS = COACH.desktop.size / 2;
+  const SAFE_GAP = 18; // px of breathing room around the coach
+  const HOVER_PULL_RATIO = 0.28; // matches the CSS transform multiplier
+
   const featured = DESTINATIONS.find((d) => d.featured)!;
   const others = DESTINATIONS.filter((d) => !d.featured);
 
@@ -355,14 +361,26 @@ export const HeroDestinationConstellation = () => {
 
           {DESTINATIONS.map((dest) => {
             const c = centers[dest.id];
+            const dx = STAGE_CX - c.cx;
+            const dy = STAGE_CY - c.cy;
+            const dist = Math.hypot(dx, dy) || 1;
+            // Hovered bubble (after scale) needs to stop before touching the coach.
+            const bubbleHoverRadius = (dest.desktop.size / 2) * (dest.featured ? 1.1 : 1.18);
+            const maxTravel = Math.max(0, dist - COACH_RADIUS - bubbleHoverRadius - SAFE_GAP);
+            const desiredTravel = dist * HOVER_PULL_RATIO;
+            const allowedTravel = Math.min(desiredTravel, maxTravel);
+            const scale = allowedTravel / dist; // shrink the pull vector to a safe magnitude
+            // Reverse the CSS multiplier so the final transform = dx*scale, dy*scale.
+            const pullX = (dx * scale) / HOVER_PULL_RATIO;
+            const pullY = (dy * scale) / HOVER_PULL_RATIO;
             return (
               <Bubble
                 key={dest.id}
                 dest={dest}
                 isWodLive={hasWods}
                 size={dest.desktop.size}
-                pullX={STAGE_CX - c.cx}
-                pullY={STAGE_CY - c.cy}
+                pullX={pullX}
+                pullY={pullY}
                 className="absolute"
                 style={{
                   top: `${dest.desktop.top}px`,
