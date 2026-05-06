@@ -323,7 +323,7 @@ export const SentMessagesTab = () => {
                   </div>
                 )}
               </div>
-            </ScrollArea>
+            </div>
           )}
         </DialogContent>
       </Dialog>
