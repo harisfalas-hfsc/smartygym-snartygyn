@@ -158,7 +158,7 @@ export const VideoRevertDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <History className="h-5 w-5 text-primary" />
@@ -170,7 +170,7 @@ export const VideoRevertDialog = ({
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="max-h-[400px] pr-4">
+        <div className="flex-1 min-h-0 overflow-y-auto pr-4">
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -225,7 +225,7 @@ export const VideoRevertDialog = ({
               ))}
             </div>
           )}
-        </ScrollArea>
+        </div>
       </DialogContent>
     </Dialog>
   );

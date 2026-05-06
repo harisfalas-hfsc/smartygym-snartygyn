@@ -208,7 +208,7 @@ export const UserCommunicationHistory = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh]">
+      <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <User className="h-5 w-5" />
@@ -231,7 +231,7 @@ export const UserCommunicationHistory = ({
           </div>
         )}
 
-        <ScrollArea className="max-h-[65vh]">
+        <div className="flex-1 min-h-0 overflow-y-auto">
           {loading ? (
             <div className="flex items-center justify-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -290,7 +290,7 @@ export const UserCommunicationHistory = ({
               ))}
             </div>
           )}
-        </ScrollArea>
+        </div>
       </DialogContent>
     </Dialog>
   );

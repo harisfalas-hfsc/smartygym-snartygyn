@@ -258,7 +258,7 @@ export const SentMessagesTab = () => {
 
       {/* Message Detail Dialog */}
       <Dialog open={showDetailDialog} onOpenChange={setShowDetailDialog}>
-        <DialogContent className="max-w-2xl max-h-[90vh]">
+        <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>Sent Message Details</DialogTitle>
             <DialogDescription>
@@ -266,7 +266,7 @@ export const SentMessagesTab = () => {
             </DialogDescription>
           </DialogHeader>
           {selectedMessage && (
-            <ScrollArea className="max-h-[60vh]">
+            <div className="flex-1 min-h-0 overflow-y-auto">
               <div className="space-y-4 pr-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -323,7 +323,7 @@ export const SentMessagesTab = () => {
                   </div>
                 )}
               </div>
-            </ScrollArea>
+            </div>
           )}
         </DialogContent>
       </Dialog>
