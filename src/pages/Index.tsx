@@ -404,7 +404,7 @@ const Index = () => {
       </section>
       
       <div className="min-h-screen bg-background overflow-x-hidden">
-        <div className="container mx-auto max-w-6xl px-4">
+        <div className="container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6">
           <PageBreadcrumbs items={[{ label: "Home" }]} />
         </div>
         
@@ -560,7 +560,7 @@ className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-co
             {/* Desktop: Hero Section */}
             <section className="relative pt-0 pb-2 bg-background overflow-hidden my-0">
           
-          <div className="container mx-auto max-w-6xl px-4 relative z-10 overflow-x-hidden">
+          <div className="container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6 relative z-10 overflow-x-hidden">
             <ScrollReveal>
               <Card itemScope itemType="https://schema.org/Organization" data-hero-section="true" data-keywords="smarty gym, online gym, online fitness, smartygym.com, Haris Falas, global online gym" aria-label="SmartyGym - Your online gym and fitness platform - smartygym.com" className="border-2 border-primary overflow-hidden relative">
                 
@@ -767,11 +767,11 @@ className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-co
         </section>
 
         <LazySection minHeight="400px" rootMargin="300px">
-        <div className="container mx-auto max-w-6xl px-4">
+        <div className="container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6">
           {/* Mission Statement with Cards */}
           <section className="mb-16 mt-8">
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
             <Card className="border-2 border-border text-center hover:shadow-lg transition-all hover:-translate-y-1">
               <CardHeader>
                 <div className="hidden lg:block aspect-[16/9] overflow-hidden rounded-md mb-4 -mt-2">
@@ -874,7 +874,7 @@ className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-co
         {/* Core Values Section */}
         <section className="mb-16">
           <h2 className="text-3xl font-bold text-center mb-8">What We Stand For</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <Card className="border-2 border-border text-center hover:shadow-lg transition-all hover:-translate-y-1">
               <CardHeader>
                 <div className="hidden lg:block aspect-[16/9] overflow-hidden rounded-md mb-4 -mt-2">
