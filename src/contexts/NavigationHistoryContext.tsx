@@ -8,6 +8,8 @@ interface NavigationHistoryContextType {
   history: string[];
   goBack: () => void;
   canGoBack: boolean;
+  goForward: () => void;
+  canGoForward: boolean;
 }
 
 const NavigationHistoryContext = createContext<NavigationHistoryContextType | undefined>(undefined);
@@ -16,9 +18,11 @@ export const NavigationHistoryProvider = ({ children }: { children: ReactNode })
   const location = useLocation();
   const navigate = useNavigate();
   const [history, setHistory] = useState<string[]>([]);
-  
-  // Track when we're going back to prevent re-adding to history
+  const [forwardStack, setForwardStack] = useState<string[]>([]);
+
+  // Track when we're going back/forward programmatically to control stack mutation
   const isGoingBack = useRef(false);
+  const isGoingForward = useRef(false);
 
   useEffect(() => {
     const currentPath = location.pathname;
@@ -34,6 +38,12 @@ export const NavigationHistoryProvider = ({ children }: { children: ReactNode })
       return;
     }
 
+    // If we're going forward, history is mutated by goForward — don't re-add
+    if (isGoingForward.current) {
+      isGoingForward.current = false;
+      return;
+    }
+
     // Only add if it's a new path (not the same as last)
     setHistory(prev => {
       if (prev[prev.length - 1] !== currentPath) {
@@ -41,18 +51,25 @@ export const NavigationHistoryProvider = ({ children }: { children: ReactNode })
       }
       return prev;
     });
+
+    // Any new (non-back/forward) navigation clears the forward stack — native behavior
+    setForwardStack([]);
   }, [location.pathname]);
 
   const goBack = () => {
     if (history.length > 1) {
       const newHistory = [...history];
-      newHistory.pop();
-      
+      const popped = newHistory.pop();
+
       // Skip any excluded paths when going back
       while (newHistory.length > 0 && EXCLUDED_PATHS.includes(newHistory[newHistory.length - 1])) {
         newHistory.pop();
       }
-      
+
+      if (popped && !EXCLUDED_PATHS.includes(popped)) {
+        setForwardStack(prev => [...prev, popped]);
+      }
+
       if (newHistory.length > 0) {
         const previousPath = newHistory[newHistory.length - 1];
         isGoingBack.current = true;
@@ -70,10 +87,20 @@ export const NavigationHistoryProvider = ({ children }: { children: ReactNode })
     }
   };
 
+  const goForward = () => {
+    if (forwardStack.length === 0) return;
+    const next = forwardStack[forwardStack.length - 1];
+    setForwardStack(prev => prev.slice(0, -1));
+    setHistory(prev => (prev[prev.length - 1] === next ? prev : [...prev, next]));
+    isGoingForward.current = true;
+    navigate(next);
+  };
+
   const canGoBack = history.length > 1;
+  const canGoForward = forwardStack.length > 0;
 
   return (
-    <NavigationHistoryContext.Provider value={{ history, goBack, canGoBack }}>
+    <NavigationHistoryContext.Provider value={{ history, goBack, canGoBack, goForward, canGoForward }}>
       {children}
     </NavigationHistoryContext.Provider>
   );
