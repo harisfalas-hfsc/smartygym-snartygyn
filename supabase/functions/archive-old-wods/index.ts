@@ -163,6 +163,23 @@ serve(async (req) => {
     // Cyprus) and queues today's active WODs into pending_content_notifications,
     // so the every-10-min drainer delivers dashboard + email at a humane hour.
 
+    // ─────────────────────────────────────────────────────────────────────
+    // POST-ARCHIVE VERIFICATION — fire-and-forget independent rollover check
+    // ─────────────────────────────────────────────────────────────────────
+    // We invoke the dedicated `verify-wod-rollover` function. It will check
+    // that today's WODs are healthy and tomorrow's pre-built WODs are intact,
+    // and email the admin only if there is an issue. We do NOT block the
+    // archive response on it — the verifier also runs on its own cron at
+    // 21:05 UTC as a second safety net.
+    try {
+      fetch(`${supabaseUrl}/functions/v1/verify-wod-rollover`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${supabaseServiceKey}` },
+        body: JSON.stringify({ triggerSource: "archive-old-wods" }),
+      }).catch((e) => logStep("post-archive verifier kick failed", { error: String(e) }));
+    } catch (kickErr) {
+      logStep("post-archive verifier kick threw", { error: String(kickErr) });
+    }
 
     return new Response(
       JSON.stringify({

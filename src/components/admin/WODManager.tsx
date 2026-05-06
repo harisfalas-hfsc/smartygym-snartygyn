@@ -629,22 +629,49 @@ export const WODManager = () => {
         { name: "generate-wod-bodyweight-daily", label: "Bodyweight WOD generator", critical: true, key: "cron_bodyweight_inactive" },
         { name: "generate-wod-equipment-daily", label: "Equipment WOD generator", critical: true, key: "cron_equipment_inactive" },
         { name: "archive-old-wods", label: "Archive old WODs", critical: true, key: "cron_archive_inactive" },
+        { name: "verify-wod-rollover", label: "Midnight rollover verifier (21:05)", critical: true, key: "cron_rollover_inactive" },
         { name: "backup-wod-generation", label: "Backup WOD generator (02:00)", critical: false, key: "cron_backup_inactive" },
         { name: "watchdog-wod-check", label: "Watchdog WOD check (02:15)", critical: false, key: "cron_watchdog_inactive" },
         { name: "send-morning-notifications-job", label: "Morning notifications", critical: false, key: "cron_morning_notif_inactive" },
         { name: "daily-system-health-audit-after-generation", label: "Daily system health audit", critical: false, key: "cron_health_audit_inactive" },
         { name: "sync-stripe-images-weekly", label: "Stripe images weekly sync", critical: false, key: "cron_stripe_sync_inactive" },
       ];
+      // Cross-check BOTH the metadata table and the actual scheduler so the
+      // audit can't be fooled by metadata that drifts from real cron.job rows.
       const { data: cronRows } = await supabase
         .from("cron_job_metadata")
         .select("job_name, schedule, is_active");
-      const cronMap = new Map((cronRows || []).map((c: any) => [c.job_name, c]));
+      const { data: realCronRows } = await supabase.rpc("get_cron_jobs");
+      const realCronMap = new Map((realCronRows || []).map((c: any) => [c.jobname, c]));
+      const cronMap = new Map(
+        (cronRows || []).map((c: any) => {
+          const real = realCronMap.get(c.job_name);
+          return [c.job_name, {
+            ...c,
+            schedule: real?.schedule || c.schedule,
+            is_active: !!real?.active && !!c.is_active,
+            registered_in_scheduler: !!real,
+          }];
+        })
+      );
+      // Also surface jobs that exist in the real scheduler but are missing
+      // from metadata (silent additions).
+      for (const [name, real] of realCronMap.entries()) {
+        if (!cronMap.has(name) && expectedCrons.some(e => e.name === name)) {
+          cronMap.set(name, { job_name: name, schedule: (real as any).schedule, is_active: !!(real as any).active, registered_in_scheduler: true });
+        }
+      }
       for (const c of expectedCrons) {
         const row = cronMap.get(c.name);
         if (!row) {
           add({ key: c.key, section: "Cron", status: c.critical ? "fail" : "warn",
             title: `${c.label} not registered`,
-            detail: `Job "${c.name}" missing from cron_job_metadata.`,
+            detail: `Job "${c.name}" missing from BOTH cron_job_metadata and the actual scheduler.`,
+            fix: "Re-run the cron registration migration." });
+        } else if (!(row as any).registered_in_scheduler) {
+          add({ key: c.key, section: "Cron", status: c.critical ? "fail" : "warn",
+            title: `${c.label} missing from real scheduler`,
+            detail: `Listed in admin metadata but no matching row in cron.job (schedule: ${row.schedule}).`,
             fix: "Re-run the cron registration migration." });
         } else if (!row.is_active) {
           add({ key: c.key, section: "Cron", status: c.critical ? "fail" : "warn",
@@ -682,32 +709,60 @@ export const WODManager = () => {
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
       const { data: runs } = await supabase
         .from("wod_generation_runs")
-        .select("cyprus_date, status, found_count, expected_count, error_message, started_at")
-        .gte("started_at", sevenDaysAgo.toISOString())
-        .order("started_at", { ascending: false });
+        .select("cyprus_date, status, found_count, expected_count, error_message, created_at, trigger_source")
+        .gte("created_at", sevenDaysAgo.toISOString())
+        .order("created_at", { ascending: false });
       if (!runs || runs.length === 0) {
         add({ key: "history_no_runs", section: "History", status: "warn",
           title: "No generation runs logged in last 7 days",
           fix: "If WODs are being generated, the run-tracker may be skipping inserts." });
       } else {
-        const failed = runs.filter((r: any) => r.status === "failed");
-        const partial = runs.filter((r: any) => r.status === "success" && (r.found_count ?? 0) < (r.expected_count ?? 0));
-        const successCount = runs.length - failed.length;
+        // SLOT-AWARE rollup: each cron handles a single slot, so each
+        // individual run row naturally reports 1/2 found. Group by Cyprus
+        // date and consider the day complete if BOTH slots succeeded (or 1
+        // for recovery days).
+        const dayBuckets: Record<string, { runs: any[]; foundSlots: Set<string> }> = {};
+        for (const r of runs as any[]) {
+          const key = r.cyprus_date;
+          if (!dayBuckets[key]) dayBuckets[key] = { runs: [], foundSlots: new Set() };
+          dayBuckets[key].runs.push(r);
+          if (r.status === "success" && r.trigger_source) {
+            if (r.trigger_source.includes("bodyweight")) dayBuckets[key].foundSlots.add("BODYWEIGHT");
+            else if (r.trigger_source.includes("equipment")) dayBuckets[key].foundSlots.add("EQUIPMENT");
+            else if ((r.found_count ?? 0) >= (r.expected_count ?? 2)) {
+              dayBuckets[key].foundSlots.add("BODYWEIGHT");
+              dayBuckets[key].foundSlots.add("EQUIPMENT");
+            }
+          }
+        }
+        const failed: any[] = [];
+        const partial: any[] = [];
+        for (const [date, bucket] of Object.entries(dayBuckets)) {
+          const expected = bucket.runs[0]?.expected_count ?? 2;
+          const allFinal = bucket.runs.every((r: any) => r.status !== "running");
+          const anyFailed = bucket.runs.some((r: any) => r.status === "failed");
+          const slotCount = bucket.foundSlots.size;
+          if (allFinal && slotCount < expected) {
+            if (anyFailed && slotCount === 0) failed.push({ cyprus_date: date, error_message: bucket.runs.find((r: any) => r.status === "failed")?.error_message });
+            else partial.push({ cyprus_date: date, found_count: slotCount, expected_count: expected });
+          }
+        }
+        const successDays = Object.keys(dayBuckets).length - failed.length - partial.length;
         if (failed.length > 0) {
           add({ key: "history_failed_runs", section: "History", status: "fail",
-            title: `${failed.length}/${runs.length} generation runs failed in last 7 days`,
+            title: `${failed.length} day(s) with no successful WOD generation in last 7 days`,
             detail: failed.slice(0, 3).map((r: any) => `${r.cyprus_date}: ${r.error_message || "unknown"}`).join(" | "),
             fix: "Inspect failed runs and rerun manually if needed." });
         }
         if (partial.length > 0) {
           add({ key: "history_partial_runs", section: "History", status: "warn",
-            title: `${partial.length} partial generations (fewer WODs than expected)`,
+            title: `${partial.length} day(s) with only one slot generated`,
             detail: partial.slice(0, 3).map((r: any) => `${r.cyprus_date}: ${r.found_count}/${r.expected_count}`).join(" | "),
             fix: "Backfill missing variants via Generate New WOD." });
         }
         if (failed.length === 0 && partial.length === 0) {
           add({ key: "history_all_ok", section: "History", status: "pass",
-            title: `All ${successCount} generation runs successful in last 7 days` });
+            title: `All ${successDays} day(s) had complete WOD generation in last 7 days` });
         }
       }
 
