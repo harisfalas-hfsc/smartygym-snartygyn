@@ -25,6 +25,7 @@ import { LazySection } from "@/components/LazySection";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useTodayWods } from "@/hooks/useTodayWods";
 import { HeroDestinationConstellation } from "@/components/home/HeroDestinationConstellation";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
 
 import heroWodImage from "@/assets/hero-wod.jpg";
 import heroWorkoutsImage from "@/assets/hero-workouts-bright.jpg";
@@ -69,6 +70,30 @@ const Index = () => {
 
   // State for pinned audience tooltip (click to toggle)
   const [activeAudienceTooltip, setActiveAudienceTooltip] = useState<string | null>(null);
+
+  // Mobile hero carousel state (cards are wider than viewport, swipeable)
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  useEffect(() => {
+    if (!carouselApi) return;
+    const onSelect = () => setCurrentSlide(carouselApi.selectedScrollSnap());
+    onSelect();
+    carouselApi.on("select", onSelect);
+    return () => {
+      carouselApi.off("select", onSelect);
+    };
+  }, [carouselApi]);
+
+  // Mobile hero swipeable cards
+  const heroCards = [
+    { id: "workouts", title: "Smarty Workouts", description: "500+ expert-designed workout routines for every fitness level and goal", icon: Dumbbell, route: "/workout", image: heroWorkoutsImage },
+    { id: "programs", title: "Smarty Programs", description: "Structured multi-week programs designed to transform your fitness journey", icon: Calendar, route: "/trainingprogram", image: heroProgramsImage },
+    { id: "tools", title: "Smarty Tools", description: "Professional fitness calculators and tracking tools to optimize your training", icon: Calculator, route: "/tools", image: heroToolsImage },
+    { id: "exerciselibrary", title: "Exercise Library", description: "Comprehensive video library with proper form demonstrations and technique guides", icon: Video, route: "/exerciselibrary", image: heroLibraryImage },
+    { id: "blog", title: "Blog & Insights", description: "Evidence-based fitness articles and expert insights from professional coaches", icon: FileText, route: "/blog", image: heroBlogImage },
+    { id: "community", title: "Community", description: "Connect, share and grow with fellow fitness enthusiasts worldwide", icon: Users, route: "/community", image: heroCommunityImage },
+  ];
 
   // Fetch review stats for SEO schema - low priority, don't block render
   const { data: reviewStats } = useQuery({
