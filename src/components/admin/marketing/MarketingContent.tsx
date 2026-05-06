@@ -247,13 +247,13 @@ export const MarketingContent = () => {
 
       {/* Preview Dialog for Main Documents */}
       <Dialog open={!!previewDoc} onOpenChange={() => setPreviewDoc(null)}>
-        <DialogContent className="max-w-2xl max-h-[80vh]">
+        <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>{previewDoc?.title}</DialogTitle>
           </DialogHeader>
-          <ScrollArea className="max-h-[60vh] pr-4">
+          <div className="flex-1 min-h-0 overflow-y-auto pr-4">
             {previewDoc && renderContentPreview(previewDoc.content)}
-          </ScrollArea>
+          </div>
           <div className="flex justify-end gap-2 pt-4">
             <Button variant="outline" onClick={() => setPreviewDoc(null)}>Close</Button>
             <Button onClick={() => previewDoc && handleDownload(previewDoc)} className="gap-2">
@@ -266,13 +266,13 @@ export const MarketingContent = () => {
 
       {/* Preview Dialog for Daily Content */}
       <Dialog open={!!previewDailyContent} onOpenChange={() => setPreviewDailyContent(null)}>
-        <DialogContent className="max-w-2xl max-h-[80vh]">
+        <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>Day {previewDailyContent?.day}: {previewDailyContent?.title}</DialogTitle>
           </DialogHeader>
-          <ScrollArea className="max-h-[60vh] pr-4">
+          <div className="flex-1 min-h-0 overflow-y-auto pr-4">
             {previewDailyContent && renderDailyContentPreview(previewDailyContent)}
-          </ScrollArea>
+          </div>
           <div className="flex justify-end gap-2 pt-4">
             <Button variant="outline" onClick={() => setPreviewDailyContent(null)}>Close</Button>
             <Button onClick={() => previewDailyContent && handleDownloadDailyContent(previewDailyContent)} className="gap-2">

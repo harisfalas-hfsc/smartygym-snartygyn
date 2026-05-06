@@ -172,11 +172,11 @@ export const PromotionalContent = () => {
 
       {/* Strategy Preview Dialog */}
       <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
-        <DialogContent className="max-w-4xl max-h-[80vh]">
+        <DialogContent className="max-w-4xl max-h-[80vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>30-Day Social Media Strategy</DialogTitle>
           </DialogHeader>
-          <ScrollArea className="max-h-[60vh]">
+          <div className="flex-1 min-h-0 overflow-y-auto">
             <div className="space-y-4 pr-4">
               <div className="grid grid-cols-4 gap-2 text-xs font-semibold bg-muted p-2 rounded sticky top-0">
                 <span>Day</span>
@@ -193,7 +193,7 @@ export const PromotionalContent = () => {
                 </div>
               ))}
             </div>
-          </ScrollArea>
+          </div>
           <div className="flex justify-end gap-2 pt-4">
             <Button variant="outline" onClick={() => setPreviewOpen(false)}>Close</Button>
             <Button onClick={generateStrategyDocument} className="gap-2">
