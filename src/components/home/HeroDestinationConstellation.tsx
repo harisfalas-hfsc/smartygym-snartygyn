@@ -152,6 +152,7 @@ const Bubble = ({
   style,
   pullX = 0,
   pullY = 0,
+  cycleImages,
 }: {
   dest: Destination;
   isWodLive: boolean;
@@ -160,6 +161,7 @@ const Bubble = ({
   style?: React.CSSProperties;
   pullX?: number;
   pullY?: number;
+  cycleImages?: string[];
 }) => {
   const navigate = useNavigate();
   const Icon = dest.icon;
@@ -167,6 +169,17 @@ const Bubble = ({
   const labelMaxWidth = Math.max(size + 40, 130);
   // Featured WOD is already prominent — gentler scale.
   const hoverScale = dest.featured ? 1.1 : 1.18;
+
+  // Optional image carousel (e.g. today's WOD bodyweight + equipment images)
+  const images = cycleImages && cycleImages.length > 0 ? cycleImages : [dest.image];
+  const [imgIndex, setImgIndex] = useState(0);
+  useEffect(() => {
+    if (images.length < 2) return;
+    const id = window.setInterval(() => {
+      setImgIndex((i) => (i + 1) % images.length);
+    }, 2500);
+    return () => window.clearInterval(id);
+  }, [images.length]);
 
   return (
     <div
@@ -213,12 +226,18 @@ const Bubble = ({
           animationDelay: dest.delay,
         }}
       >
-        <img
-          src={dest.image}
-          alt=""
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-          loading="lazy"
-        />
+        {images.map((src, i) => (
+          <img
+            key={src + i}
+            src={src}
+            alt=""
+            className={cn(
+              "absolute inset-0 w-full h-full object-cover transition-opacity duration-700 group-hover:scale-110",
+              i === imgIndex ? "opacity-100" : "opacity-0"
+            )}
+            loading="lazy"
+          />
+        ))}
         {/* Subtle gradient overlay for legibility */}
         <div
           className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent"
