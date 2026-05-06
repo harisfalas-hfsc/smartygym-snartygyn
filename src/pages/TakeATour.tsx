@@ -81,7 +81,7 @@ export default function TakeATour() {
       />
 
       <div className="min-h-screen bg-background">
-        <main className="container mx-auto max-w-6xl px-4 pb-8">
+        <main className="container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6 pb-8">
           <PageBreadcrumbs items={[
             { label: "Home", href: "/" },
             { label: "Take a Tour" }
