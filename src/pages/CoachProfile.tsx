@@ -18,15 +18,12 @@ const CoachProfile = () => {
 
   useEffect(() => {
     const fetchReviewStats = async () => {
-      const { data, error } = await supabase
-        .from("testimonials")
-        .select("rating");
-      
-      if (!error && data && data.length > 0) {
-        const total = data.reduce((sum, t) => sum + t.rating, 0);
+      const { data, error } = await supabase.rpc("get_testimonial_rating_stats");
+      const row = Array.isArray(data) ? data[0] : data;
+      if (!error && row && Number(row.count) > 0) {
         setReviewStats({
-          count: data.length,
-          average: Math.round((total / data.length) * 100) / 100
+          count: Number(row.count),
+          average: Number(row.average) || 0,
         });
       }
     };
