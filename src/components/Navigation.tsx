@@ -375,7 +375,7 @@ export const Navigation = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="relative h-11 w-11 rounded-full text-foreground/80 hover:text-primary [&_svg]:!h-8 [&_svg]:!w-8"
+                  className="relative h-11 w-11 rounded-full text-primary hover:text-primary [&_svg]:!h-8 [&_svg]:!w-8"
                   aria-label="Open Discovery"
                 >
                   <Menu className="h-8 w-8" strokeWidth={2.25} />
