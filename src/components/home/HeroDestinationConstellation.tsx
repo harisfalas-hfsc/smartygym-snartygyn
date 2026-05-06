@@ -298,6 +298,23 @@ export const HeroDestinationConstellation = () => {
   const { hasWods, bodyweightWod, equipmentWod, variousWod, allTodayWods } =
     useTodayWods(true);
 
+  // Tablet detection: landscape but narrower than full desktop.
+  const [isTablet, setIsTablet] = useState(false);
+  useEffect(() => {
+    const check = () => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      setIsTablet(w >= 768 && w < 1280 && w >= h);
+    };
+    check();
+    window.addEventListener("resize", check);
+    window.addEventListener("orientationchange", check);
+    return () => {
+      window.removeEventListener("resize", check);
+      window.removeEventListener("orientationchange", check);
+    };
+  }, []);
+
   // Build the WOD image carousel from today's actual WOD images (bodyweight + equipment).
   // Falls back to the static hero image if nothing is available yet.
   const wodCycleImages = (() => {
@@ -319,6 +336,111 @@ export const HeroDestinationConstellation = () => {
 
   const featured = DESTINATIONS.find((d) => d.featured)!;
   const others = DESTINATIONS.filter((d) => !d.featured);
+
+  // ============ TABLET CIRCULAR LAYOUT ============
+  const tabletStage = 720;
+  const tabletRadius = 260;
+  const tabletBubbleSize = 130;
+  const tabletCoachSize = 160;
+  const tabletCenter = tabletStage / 2;
+  const tabletPositions = DESTINATIONS.map((dest, i) => {
+    const angle = (-Math.PI / 2) + (i * 2 * Math.PI) / DESTINATIONS.length;
+    const cx = tabletCenter + tabletRadius * Math.cos(angle);
+    const cy = tabletCenter + tabletRadius * Math.sin(angle);
+    return {
+      dest,
+      top: cy - tabletBubbleSize / 2,
+      left: cx - tabletBubbleSize / 2,
+      cx,
+      cy,
+    };
+  });
+
+  if (isTablet) {
+    return (
+      <div className="w-full">
+        <style>{`
+          @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+          }
+          @keyframes orbitPulse {
+            0%, 100% { stroke-opacity: 0.18; }
+            50% { stroke-opacity: 0.35; }
+          }
+        `}</style>
+        <div
+          className="relative mx-auto"
+          style={{ width: "100%", maxWidth: `${tabletStage}px`, aspectRatio: "1 / 1" }}
+        >
+          <svg
+            className="absolute inset-0 w-full h-full pointer-events-none"
+            viewBox={`0 0 ${tabletStage} ${tabletStage}`}
+            preserveAspectRatio="xMidYMid meet"
+            aria-hidden="true"
+          >
+            <defs>
+              <radialGradient id="tablet-glow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.12" />
+                <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0" />
+              </radialGradient>
+            </defs>
+            <rect width={tabletStage} height={tabletStage} fill="url(#tablet-glow)" />
+            <circle
+              cx={tabletCenter}
+              cy={tabletCenter}
+              r={tabletRadius}
+              fill="none"
+              stroke="hsl(var(--primary))"
+              strokeOpacity="0.25"
+              strokeWidth="1.5"
+              strokeDasharray="4 6"
+              style={{ animation: "orbitPulse 6s ease-in-out infinite" }}
+            />
+            {tabletPositions.map(({ dest, cx, cy }) => (
+              <line
+                key={`spoke-${dest.id}`}
+                x1={tabletCenter}
+                y1={tabletCenter}
+                x2={cx}
+                y2={cy}
+                stroke="hsl(var(--primary))"
+                strokeOpacity="0.2"
+                strokeWidth="1.25"
+                strokeDasharray="3 5"
+              />
+            ))}
+          </svg>
+
+          {tabletPositions.map(({ dest, top, left }) => (
+            <Bubble
+              key={dest.id}
+              dest={dest}
+              isWodLive={hasWods}
+              size={tabletBubbleSize}
+              cycleImages={dest.featured ? wodCycleImages : undefined}
+              className="absolute"
+              style={{
+                top: `${(top / tabletStage) * 100}%`,
+                left: `${(left / tabletStage) * 100}%`,
+              }}
+            />
+          ))}
+
+          <Bubble
+            dest={COACH}
+            isWodLive={false}
+            size={tabletCoachSize}
+            className="absolute"
+            style={{
+              top: `${((tabletCenter - tabletCoachSize / 2) / tabletStage) * 100}%`,
+              left: `${((tabletCenter - tabletCoachSize / 2) / tabletStage) * 100}%`,
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full">
