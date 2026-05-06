@@ -150,8 +150,6 @@ const Bubble = ({
   size,
   className,
   style,
-  pullX = 0,
-  pullY = 0,
   cycleImages,
 }: {
   dest: Destination;
@@ -159,8 +157,6 @@ const Bubble = ({
   size: number;
   className?: string;
   style?: React.CSSProperties;
-  pullX?: number;
-  pullY?: number;
   cycleImages?: string[];
 }) => {
   const navigate = useNavigate();
@@ -168,7 +164,7 @@ const Bubble = ({
   const showLivePill = dest.featured && isWodLive;
   const labelMaxWidth = Math.max(size + 40, 130);
   // Featured WOD is already prominent — gentler scale.
-  const hoverScale = dest.featured ? 1.1 : 1.18;
+  const hoverScale = dest.featured ? 1.06 : 1.08;
 
   // Optional image carousel (e.g. today's WOD bodyweight + equipment images)
   const images = cycleImages && cycleImages.length > 0 ? cycleImages : [dest.image];
@@ -192,9 +188,6 @@ const Bubble = ({
       style={
         {
           ...style,
-          // CSS vars consumed by the button transform on hover
-          ["--pull-x" as any]: `${pullX}px`,
-          ["--pull-y" as any]: `${pullY}px`,
           ["--hover-scale" as any]: hoverScale,
         } as React.CSSProperties
       }
@@ -213,11 +206,7 @@ const Bubble = ({
           "[transition:transform_550ms_cubic-bezier(0.22,1,0.36,1),box-shadow_400ms_ease-out,outline-color_300ms_ease-out]",
           "ring-[3px] ring-primary/50 hover:ring-primary",
           "shadow-lg shadow-primary/10 hover:shadow-2xl hover:shadow-primary/30",
-          // Smooth gravitate-toward-center + scale on hover/focus
-          "hover:[transform:translate3d(calc(var(--pull-x)*0.28),calc(var(--pull-y)*0.28),0)_scale(var(--hover-scale))]",
-          "focus-visible:[transform:translate3d(calc(var(--pull-x)*0.28),calc(var(--pull-y)*0.28),0)_scale(var(--hover-scale))]",
-          // Reduced motion: scale only, no translation
-          "motion-reduce:hover:[transform:scale(1.06)] motion-reduce:focus-visible:[transform:scale(1.06)]",
+          "hover:[transform:scale(var(--hover-scale))] focus-visible:[transform:scale(var(--hover-scale))]",
           "focus:outline-none focus-visible:ring-4 focus-visible:ring-primary",
           dest.featured && "ring-4 ring-primary"
         )}
