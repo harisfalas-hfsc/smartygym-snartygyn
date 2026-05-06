@@ -684,7 +684,7 @@ className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-co
                         </div>
 
                                                 {/* "Your Gym Re-imagined" card - now below carousel on desktop */}
-                        <div className="bg-background/60 backdrop-blur-sm p-6 rounded-lg border-2 border-primary/30 mt-8 max-w-4xl mx-auto text-center">
+                        <div className="bg-background/60 backdrop-blur-sm p-6 rounded-lg border-2 border-primary/30 mt-8 w-full text-center">
                             <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 text-center text-foreground">
                               100% Human. <span className="text-destructive">0% AI.</span>
                             </h2>
