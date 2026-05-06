@@ -126,7 +126,7 @@ const AppContent = () => {
           <Navigation />
           <FixedBackButton />
             <div
-              className="md:flex-1"
+              className="flex-1"
               style={{
                 paddingTop: 'var(--app-header-h, 100px)',
               }}
