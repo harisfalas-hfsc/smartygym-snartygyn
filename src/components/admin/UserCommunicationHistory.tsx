@@ -290,7 +290,7 @@ export const UserCommunicationHistory = ({
               ))}
             </div>
           )}
-        </ScrollArea>
+        </div>
       </DialogContent>
     </Dialog>
   );
