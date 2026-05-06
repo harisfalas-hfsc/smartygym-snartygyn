@@ -104,7 +104,7 @@ const DESTINATIONS: Destination[] = [
     icon: FileText,
     route: "/blog",
     image: heroBlogImage,
-  desktop: { top: 460, left: 360, size: 190 },
+    desktop: { top: 380, left: 280, size: 190 },
     delay: "0.3s",
   },
   {
@@ -115,7 +115,7 @@ const DESTINATIONS: Destination[] = [
     icon: Users,
     route: "/community",
     image: heroCommunityImage,
-    desktop: { top: 460, left: 760, size: 190 },
+    desktop: { top: 380, left: 840, size: 190 },
     delay: "1.8s",
   },
 ];
