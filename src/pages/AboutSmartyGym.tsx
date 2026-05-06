@@ -29,7 +29,8 @@ import {
   Trophy,
   Wrench,
   Users,
-  Newspaper
+  Newspaper,
+  Info
 } from "lucide-react";
 
 import { SEOEnhancer } from "@/components/SEOEnhancer";
@@ -93,7 +94,7 @@ export default function AboutSmartyGym() {
           {/* Header */}
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-3 mb-2">
-              <Target className="h-8 w-8 text-primary" />
+              <Info className="h-8 w-8 text-teal-500" />
               <h1 className="text-3xl sm:text-4xl font-bold">
                 About <span className="text-primary">SmartyGym</span>
               </h1>
