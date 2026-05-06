@@ -323,10 +323,10 @@ const Community = () => {
 
       // Fetch profiles for comment authors
       const userIds = [...new Set(commentsData?.map((c) => c.user_id) || [])];
-      const { data: profilesData, error: profilesError } = await supabase
-        .from("profiles")
-        .select("user_id, full_name")
-        .in("user_id", userIds);
+      const { data: profilesData, error: profilesError } = await supabase.rpc(
+        "get_profile_display_names",
+        { user_ids: userIds }
+      );
 
       if (profilesError) {
         console.error("Error fetching profiles for comments:", profilesError);

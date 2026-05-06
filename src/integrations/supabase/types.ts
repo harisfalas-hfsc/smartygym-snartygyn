@@ -3455,6 +3455,13 @@ export type Database = {
           schedule: string
         }[]
       }
+      get_profile_display_names: {
+        Args: { user_ids: string[] }
+        Returns: {
+          full_name: string
+          user_id: string
+        }[]
+      }
       get_program_leaderboard: {
         Args: never
         Returns: {
