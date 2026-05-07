@@ -1,39 +1,59 @@
+# Constellation Hover Descriptions
 
-## Root cause
+Replace the barely-visible tagline text under each constellation bubble with a hover/focus popover that appears in the empty space next to each circle. Works in both desktop constellation and tablet circular layouts; mobile is unaffected.
 
-Today's WODs are correctly generated, visible, with image + Stripe, and the rollover/archive crons all succeeded overnight. The user-visible "the WODs aren't published" symptom is a **date-label bug** in `src/components/WODPeriodizationCalendar.tsx`, not a content/cron bug.
+## File to edit
+- `src/components/home/HeroDestinationConstellation.tsx`
 
-The component does:
+## Changes
 
-```ts
-const todayStr = formatInTimeZone(now, "Europe/Athens", "yyyy-MM-dd"); // ✅ correct: "2026-05-07"
-const today = new Date(todayStr + "T00:00:00Z");                       // ❌ UTC midnight
-const yesterday = subDays(today, 1);
-const tomorrow  = addDays(today, 1);
-const yesterdayStr = format(yesterday, "yyyy-MM-dd");                  // local-TZ format
-const tomorrowStr  = format(tomorrow,  "yyyy-MM-dd");
-…
-const fullDate = format(new Date(dateStr), "EEEE, MMMM d");            // local-TZ format
-```
+### 1. Add a `description` field to each destination
+One short sentence per bubble (taken as the first sentence of each section's existing copy):
 
-`format()` uses the browser/system local timezone, so `2026-05-07T00:00:00Z` becomes `2026-05-06` for any visitor west of UTC, and `tomorrow` collapses onto today. That is why the strip currently reads "Today Wed May 6 / Tomorrow Wed May 6" while the actual Cyprus date is Thu May 7. The WOD cards underneath load via `useTodayWods` which uses `formatInTimeZone` directly, so they show the right workouts — but the broken header makes them look like stale Wednesday content.
+- **WOD**: "The Workout of the Day is a fresh, smart-coded session published every morning for you to train with."
+- **Workouts**: "Smarty Workouts are single-session training routines designed to fit your lifestyle and goals."
+- **Programs**: "Smarty Programs are long-term, structured plans designed to help you achieve your specific fitness goals."
+- **Tools**: "Smarty Tools are calculators and timers that help you measure, plan and time your training."
+- **Library**: "The Exercise Library shows you proper form and technique for every movement we use."
+- **Blog**: "The Blog publishes evidence-based articles on training, nutrition and recovery."
+- **Community**: "The Community is where Smarty members connect, share progress and train together."
+- **Coach (Haris Falas)**: "Haris Falas is the founder and head coach behind every workout, program and article on SmartyGym."
 
-## Fix
+### 2. Remove the always-visible tagline
+Delete the `<p className="text-xs text-muted-foreground …">{dest.tagline}</p>` line under each bubble. Keep the bold short title (`Workouts`, `Programs`, etc.) — that stays as the always-visible label.
 
-Make the calendar consistently timezone-aware (Europe/Athens), the same TZ the backend uses to set `generated_for_date`.
+### 3. Add a hover/focus description popover per bubble
+Inside `Bubble`, add an absolutely-positioned card that appears on `group-hover` and `group-focus-within`:
 
-### `src/components/WODPeriodizationCalendar.tsx`
-1. Build `today/yesterday/tomorrow` strictly as `yyyy-MM-dd` strings derived from `formatInTimeZone(... 'Europe/Athens' ...)` — never round-trip through `new Date(... + "T00:00:00Z")`.
-2. For the human label (`"Wednesday, May 7"`), parse the `yyyy-MM-dd` as a local-noon date (`new Date(dateStr + "T12:00:00")`) so `format(..., "EEEE, MMMM d")` can never drift across a day boundary regardless of viewer TZ.
-3. Use `subDays`/`addDays` on the Cyprus-anchored noon date, then re-emit with `format(..., "yyyy-MM-dd")` — safe because we're nowhere near a midnight boundary.
+- Small box: `~220px wide`, padding `p-3`, `rounded-lg`, `border border-primary/30`, `bg-popover text-popover-foreground` (theme-aware in light + dark), `shadow-xl`, `text-xs leading-snug`.
+- Hidden by default (`opacity-0 pointer-events-none translate-y-1`), shown on hover/focus (`group-hover:opacity-100 group-focus-within:opacity-100 transition`).
+- `z-40` so it sits above neighbouring bubbles and connection lines.
+- `aria-hidden` toggled appropriately; the description is also exposed via `aria-describedby` on the button for screen readers.
 
-### Verification (after switch to default mode)
-- Re-fetch `https://smartygym.com/workout/wod` and confirm the strip shows `Yesterday Wed May 6 / Today Thu May 7 / Tomorrow Fri May 8` and the cards underneath stay the same Pilates pair.
-- Spot-check the strip against Cyprus local date with `select (now() at time zone 'Europe/Nicosia')::date`.
-- No backend/cron changes — those are healthy and don't need to be touched.
+### 4. Per-bubble popover placement (desktop)
+Each destination gets a `popoverSide` field that controls where the popover sits relative to its circle, chosen so it lands in the empty space of the constellation:
 
-## Files touched
-- `src/components/WODPeriodizationCalendar.tsx` (date math + label formatting only)
+| Bubble | Side | Tailwind position on the popover |
+|---|---|---|
+| wod (top center) | top | `bottom-full mb-3 left-1/2 -translate-x-1/2` |
+| workouts (top right) | bottom-left (diagonal) | `top-full mt-3 right-1/2` |
+| programs (top left) | bottom-right (diagonal) | `top-full mt-3 left-1/2` |
+| tools (mid-left) | right | `left-full ml-3 top-1/2 -translate-y-1/2` |
+| library (mid-right) | left | `right-full mr-3 top-1/2 -translate-y-1/2` |
+| blog (bottom-left) | top-right (diagonal) | `bottom-full mb-3 left-1/2` |
+| community (bottom-right) | top-left (diagonal) | `bottom-full mb-3 right-1/2` |
+| coach (center) | bottom | `top-full mt-3 left-1/2 -translate-x-1/2` |
 
-## Out of scope (intentionally)
-- WOD generation/orchestrator code, archive job, watchdog, periodization tables — all confirmed healthy in the last 3 cron runs and don't need edits.
+### 5. Tablet layout
+Bubbles are arranged in a circle, so use a simple radial rule: if the bubble is in the upper half of the ring put the popover below it (`top-full mt-2`), otherwise above (`bottom-full mb-2`); always horizontally centered on the bubble. Same styling and same `description` text reused.
+
+### 6. Mobile
+The mobile layout doesn't render this constellation, so no change is needed there. (The mobile hero card grid keeps its own descriptions.)
+
+## Theme handling
+Uses semantic tokens only (`bg-popover`, `text-popover-foreground`, `border-primary/30`) so the popover automatically renders correctly in both light and dark mode without any conditional logic.
+
+## Out of scope
+- No changes to bubble images, sizes, animations, layout positions, or routing.
+- No new dependencies (pure Tailwind + group-hover; no Radix Tooltip needed).
+- No backend or content changes.

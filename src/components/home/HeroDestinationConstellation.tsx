@@ -29,6 +29,7 @@ type Destination = {
   title: string;
   short: string;
   tagline: string;
+  description: string;
   icon: LucideIcon;
   route: string;
   image: string;
@@ -37,6 +38,8 @@ type Destination = {
   /** Tailwind animation delay (staggered float). */
   delay: string;
   featured?: boolean;
+  /** Where the hover description popover should appear relative to the bubble. */
+  popoverPos?: string;
 };
 
 const DESTINATIONS: Destination[] = [
@@ -45,78 +48,99 @@ const DESTINATIONS: Destination[] = [
     title: "Workout of the Day",
     short: "WOD",
     tagline: "Today's featured session",
+    description:
+      "The Workout of the Day is a fresh, smart-coded session published every morning for you to train with.",
     icon: CalendarCheck,
     route: "/workout/wod",
     image: heroWodImage,
     desktop: { top: 0, left: 540, size: 200 },
     delay: "0s",
     featured: true,
+    popoverPos: "bottom-full mb-3 left-1/2 -translate-x-1/2",
   },
   {
     id: "workouts",
     title: "Smarty Workouts",
     short: "Workouts",
     tagline: "500+ expert sessions",
+    description:
+      "Smarty Workouts are single-session training routines designed to fit your lifestyle and goals.",
     icon: Dumbbell,
     route: "/workout",
     image: heroWorkoutsImage,
     desktop: { top: 70, left: 950, size: 190 },
     delay: "0.6s",
+    popoverPos: "top-full mt-3 right-0",
   },
   {
     id: "programs",
     title: "Smarty Programs",
     short: "Programs",
     tagline: "Multi-week plans",
+    description:
+      "Smarty Programs are long-term, structured plans designed to help you achieve your specific fitness goals.",
     icon: Calendar,
     route: "/trainingprogram",
     image: heroProgramsImage,
     desktop: { top: 70, left: 160, size: 190 },
     delay: "1.2s",
+    popoverPos: "top-full mt-3 left-0",
   },
   {
     id: "tools",
     title: "Smarty Tools",
     short: "Tools",
     tagline: "Calculators & timers",
+    description:
+      "Smarty Tools are calculators and timers that help you measure, plan and time your training.",
     icon: Calculator,
     route: "/tools",
     image: heroToolsImage,
     desktop: { top: 290, left: 0, size: 170 },
     delay: "0.9s",
+    popoverPos: "left-full ml-3 top-1/2 -translate-y-1/2",
   },
   {
     id: "library",
     title: "Exercise Library",
     short: "Library",
     tagline: "Form & technique",
+    description:
+      "The Exercise Library shows you proper form and technique for every movement we use.",
     icon: Video,
     route: "/exerciselibrary",
     image: heroLibraryImage,
     desktop: { top: 290, left: 1130, size: 170 },
     delay: "1.5s",
+    popoverPos: "right-full mr-3 top-1/2 -translate-y-1/2",
   },
   {
     id: "blog",
     title: "Blog & Insights",
     short: "Blog",
     tagline: "Evidence-based articles",
+    description:
+      "The Blog publishes evidence-based articles on training, nutrition and recovery.",
     icon: FileText,
     route: "/blog",
     image: heroBlogImage,
     desktop: { top: 380, left: 280, size: 190 },
     delay: "0.3s",
+    popoverPos: "bottom-full mb-3 left-0",
   },
   {
     id: "community",
     title: "Community",
     short: "Community",
     tagline: "Train together",
+    description:
+      "The Community is where Smarty members connect, share progress and train together.",
     icon: Users,
     route: "/community",
     image: heroCommunityImage,
     desktop: { top: 380, left: 840, size: 190 },
     delay: "1.8s",
+    popoverPos: "bottom-full mb-3 right-0",
   },
 ];
 
@@ -126,11 +150,14 @@ const COACH: Destination = {
   title: "Haris Falas",
   short: "Haris Falas",
   tagline: "Founder & Head Coach",
+  description:
+    "Haris Falas is the founder and head coach behind every workout, program and article on SmartyGym.",
   icon: User,
   route: "/coach-profile",
   image: harisFalasImage,
   desktop: { top: 270, left: 575, size: 150 },
   delay: "0.4s",
+  popoverPos: "top-full mt-3 left-1/2 -translate-x-1/2",
 };
 
 /** Decorative connection lines between bubble centers (desktop only). */
@@ -151,6 +178,7 @@ const Bubble = ({
   className,
   style,
   cycleImages,
+  popoverPosOverride,
 }: {
   dest: Destination;
   isWodLive: boolean;
@@ -158,11 +186,17 @@ const Bubble = ({
   className?: string;
   style?: React.CSSProperties;
   cycleImages?: string[];
+  popoverPosOverride?: string;
 }) => {
   const navigate = useNavigate();
   const Icon = dest.icon;
   const showLivePill = dest.featured && isWodLive;
   const labelMaxWidth = Math.max(size + 40, 130);
+  const popoverPos =
+    popoverPosOverride ||
+    dest.popoverPos ||
+    "top-full mt-3 left-1/2 -translate-x-1/2";
+  const descId = `bubble-desc-${dest.id}`;
   // Featured WOD is already prominent — gentler scale.
   const hoverScale = dest.featured ? 1.06 : 1.08;
 
@@ -200,6 +234,7 @@ const Bubble = ({
         type="button"
         onClick={() => navigate(dest.route)}
         aria-label={`Go to ${dest.title}`}
+        aria-describedby={descId}
         className={cn(
           "relative rounded-full overflow-hidden",
           "transform-gpu will-change-transform",
@@ -273,6 +308,23 @@ const Bubble = ({
       </button>
       </span>
 
+      {/* Hover/focus description popover — placed in empty space next to the bubble */}
+      <div
+        id={descId}
+        role="tooltip"
+        className={cn(
+          "absolute z-40 w-[220px] p-3 rounded-lg border border-primary/30",
+          "bg-popover text-popover-foreground shadow-xl",
+          "text-xs leading-snug text-left",
+          "opacity-0 translate-y-1 pointer-events-none",
+          "group-hover:opacity-100 group-focus-within:opacity-100 group-hover:translate-y-0 group-focus-within:translate-y-0",
+          "transition-all duration-200",
+          popoverPos
+        )}
+      >
+        {dest.description}
+      </div>
+
       <div
         className="mt-2 text-center"
         style={{ maxWidth: `${labelMaxWidth}px` }}
@@ -284,9 +336,6 @@ const Bubble = ({
           )}
         >
           {dest.short}
-        </p>
-        <p className="text-xs text-muted-foreground leading-snug mt-1 line-clamp-2">
-          {dest.tagline}
         </p>
       </div>
     </div>
@@ -422,6 +471,11 @@ export const HeroDestinationConstellation = () => {
               size={tabletBubbleSize}
               cycleImages={dest.featured ? wodCycleImages : undefined}
               className="absolute"
+              popoverPosOverride={
+                top + tabletBubbleSize / 2 < tabletCenter
+                  ? "top-full mt-2 left-1/2 -translate-x-1/2"
+                  : "bottom-full mb-2 left-1/2 -translate-x-1/2"
+              }
               style={{
                 top: `${(top / tabletStage) * 100}%`,
                 left: `${(left / tabletStage) * 100}%`,
