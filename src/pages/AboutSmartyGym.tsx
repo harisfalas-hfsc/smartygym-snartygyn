@@ -41,12 +41,12 @@ export default function AboutSmartyGym() {
   
 
   const workoutCategories = [
-    { name: "Strength", icon: <Dumbbell className="h-4 w-4" /> },
-    { name: "Calorie Burning", icon: <Flame className="h-4 w-4" /> },
-    { name: "Metabolic", icon: <Zap className="h-4 w-4" /> },
-    { name: "Cardio", icon: <Activity className="h-4 w-4" /> },
-    { name: "Mobility & Stability", icon: <Target className="h-4 w-4" /> },
-    { name: "Challenge", icon: <Trophy className="h-4 w-4" /> },
+    { name: "Strength", icon: <Dumbbell className="h-4 w-4 text-rose-500" /> },
+    { name: "Calorie Burning", icon: <Flame className="h-4 w-4 text-orange-500" /> },
+    { name: "Metabolic", icon: <Zap className="h-4 w-4 text-amber-500" /> },
+    { name: "Cardio", icon: <Activity className="h-4 w-4 text-red-500" /> },
+    { name: "Mobility & Stability", icon: <Target className="h-4 w-4 text-emerald-500" /> },
+    { name: "Challenge", icon: <Trophy className="h-4 w-4 text-yellow-500" /> },
   ];
 
   const programCategories = [
@@ -130,7 +130,7 @@ export default function AboutSmartyGym() {
           <Card className="mb-6 border border-border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Dumbbell className="h-5 w-5 text-primary" />
+              <Dumbbell className="h-5 w-5 text-amber-500" />
                 The Workout of the Day (WOD)
               </CardTitle>
             </CardHeader>
@@ -143,24 +143,24 @@ export default function AboutSmartyGym() {
               {/* Periodization Explanation */}
               <div className="bg-muted/30 rounded-lg p-4 border border-border">
                 <h4 className="font-semibold mb-3 flex items-center gap-2">
-                  <Brain className="h-4 w-4 text-primary" />
+                  <Brain className="h-4 w-4 text-purple-500" />
                   The Science of Periodization
                 </h4>
                 <ul className="space-y-2 text-sm text-muted-foreground">
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                    <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
                     <span><strong>Smart Periodization:</strong> Science-based category rotation designed for optimal results and balanced fitness development</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                    <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
                     <span><strong>Difficulty Rotation:</strong> Stars cycle from 1-6, ensuring progressive challenge</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                    <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
                     <span><strong>Smart Scheduling:</strong> Strategic training that targets different energy systems for structured and science-based progress.</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                    <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
                     <span><strong>Two Options Daily:</strong> With equipment & bodyweight alternatives</span>
                   </li>
                 </ul>
@@ -198,28 +198,28 @@ export default function AboutSmartyGym() {
               {/* Workout Metadata */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <div className="flex items-center gap-2 p-3 bg-muted/30 rounded-lg">
-                  <Timer className="h-4 w-4 text-primary" />
+                  <Timer className="h-4 w-4 text-blue-500" />
                   <div>
                     <div className="text-xs text-muted-foreground">Duration</div>
                     <div className="text-sm font-medium">15-60 min</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 p-3 bg-muted/30 rounded-lg">
-                  <TrendingUp className="h-4 w-4 text-primary" />
+                  <TrendingUp className="h-4 w-4 text-emerald-500" />
                   <div>
                     <div className="text-xs text-muted-foreground">Difficulty</div>
                     <div className="text-sm font-medium">1-6 Stars</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 p-3 bg-muted/30 rounded-lg">
-                  <Zap className="h-4 w-4 text-primary" />
+                  <Zap className="h-4 w-4 text-amber-500" />
                   <div>
                     <div className="text-xs text-muted-foreground">Types</div>
                     <div className="text-sm font-medium">AMRAP, EMOM, etc.</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 p-3 bg-muted/30 rounded-lg">
-                  <Dumbbell className="h-4 w-4 text-primary" />
+                  <Dumbbell className="h-4 w-4 text-rose-500" />
                   <div>
                     <div className="text-xs text-muted-foreground">Equipment</div>
                     <div className="text-sm font-medium">With & Without</div>
@@ -241,7 +241,7 @@ export default function AboutSmartyGym() {
           <Card className="mb-6 border border-border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Dumbbell className="h-5 w-5 text-primary" />
+                <Dumbbell className="h-5 w-5 text-rose-500" />
                 Smarty Workouts
               </CardTitle>
             </CardHeader>
@@ -277,20 +277,20 @@ export default function AboutSmartyGym() {
               {/* Access Levels */}
               <div className="bg-muted/30 rounded-lg p-4 border border-border">
                 <h4 className="font-semibold mb-2 flex items-center gap-2">
-                  <Crown className="h-4 w-4 text-primary" />
+                  <Crown className="h-4 w-4 text-yellow-500" />
                   Access Levels
                 </h4>
                 <ul className="space-y-2 text-sm text-muted-foreground">
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                    <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
                     <span><strong>Subscribers (Free):</strong> Access all free workouts at no cost</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                    <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
                     <span><strong>Premium Members:</strong> Full access to all workouts (free & premium)</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                    <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
                     <span><strong>Standalone Purchase:</strong> Buy individual premium workouts without a subscription</span>
                   </li>
                 </ul>
@@ -325,7 +325,7 @@ export default function AboutSmartyGym() {
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                   {programCategories.map((cat) => (
                     <div key={cat} className="flex items-center gap-2 p-2 bg-background rounded-lg text-sm border border-border">
-                      <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
+                      <CheckCircle2 className="h-4 w-4 text-blue-500 shrink-0" />
                       <span>{cat}</span>
                     </div>
                   ))}
@@ -344,20 +344,20 @@ export default function AboutSmartyGym() {
               {/* Access Info */}
               <div className="bg-muted/30 rounded-lg p-4 border border-border">
                 <h4 className="font-semibold mb-2 flex items-center gap-2">
-                  <Crown className="h-4 w-4 text-primary" />
+                  <Crown className="h-4 w-4 text-yellow-500" />
                   Access Levels
                 </h4>
                 <ul className="space-y-2 text-sm text-muted-foreground">
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                    <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
                     <span><strong>Subscribers (Free):</strong> Access all free training programs at no cost</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                    <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
                     <span><strong>Premium Members:</strong> Full access to all programs (free & premium)</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                    <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
                     <span><strong>Standalone Purchase:</strong> Buy individual premium programs without a subscription</span>
                   </li>
                 </ul>
@@ -419,7 +419,7 @@ export default function AboutSmartyGym() {
           <Card className="mb-6 border border-border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <BookOpen className="h-5 w-5 text-primary" />
+                <BookOpen className="h-5 w-5 text-teal-500" />
                 Logbook & Progress Tracking
               </CardTitle>
             </CardHeader>
@@ -432,21 +432,21 @@ export default function AboutSmartyGym() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-3">
                   <div className="flex items-start gap-3 p-3 bg-muted/30 rounded-lg">
-                    <Calendar className="h-5 w-5 text-primary mt-0.5" />
+                    <Calendar className="h-5 w-5 text-blue-500 mt-0.5" />
                     <div>
                       <h5 className="font-medium text-sm">Calendar View</h5>
                       <p className="text-xs text-muted-foreground">See your completed workouts at a glance</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3 p-3 bg-muted/30 rounded-lg">
-                    <Activity className="h-5 w-5 text-primary mt-0.5" />
+                    <Activity className="h-5 w-5 text-red-500 mt-0.5" />
                     <div>
                       <h5 className="font-medium text-sm">Activity Timeline</h5>
                       <p className="text-xs text-muted-foreground">Filter and review your fitness history</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3 p-3 bg-muted/30 rounded-lg">
-                    <BarChart3 className="h-5 w-5 text-primary mt-0.5" />
+                    <BarChart3 className="h-5 w-5 text-purple-500 mt-0.5" />
                     <div>
                       <h5 className="font-medium text-sm">Analytics & Insights</h5>
                       <p className="text-xs text-muted-foreground">Visualize your progress over time</p>
@@ -455,21 +455,21 @@ export default function AboutSmartyGym() {
                 </div>
                 <div className="space-y-3">
                   <div className="flex items-start gap-3 p-3 bg-muted/30 rounded-lg">
-                    <Clock className="h-5 w-5 text-primary mt-0.5" />
+                    <Clock className="h-5 w-5 text-cyan-500 mt-0.5" />
                     <div>
                       <h5 className="font-medium text-sm">Smarty Check-ins</h5>
                       <p className="text-xs text-muted-foreground">Track sleep, readiness, and recovery daily</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3 p-3 bg-muted/30 rounded-lg">
-                    <Target className="h-5 w-5 text-primary mt-0.5" />
+                    <Target className="h-5 w-5 text-emerald-500 mt-0.5" />
                     <div>
                       <h5 className="font-medium text-sm">Goals System</h5>
                       <p className="text-xs text-muted-foreground">Set and track your fitness objectives</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3 p-3 bg-muted/30 rounded-lg">
-                    <Zap className="h-5 w-5 text-primary mt-0.5" />
+                    <Zap className="h-5 w-5 text-amber-500 mt-0.5" />
                     <div>
                       <h5 className="font-medium text-sm">Monday Motivation</h5>
                       <p className="text-xs text-muted-foreground">Weekly reports to keep you inspired</p>
@@ -513,19 +513,19 @@ export default function AboutSmartyGym() {
                 <h4 className="font-semibold mb-3">What's Inside</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   <div className="flex items-center gap-2 p-2 bg-background rounded-lg text-sm border border-border">
-                    <Dumbbell className="h-4 w-4 text-primary" />
+                    <Dumbbell className="h-4 w-4 text-rose-500" />
                     <span>1RM Calculator</span>
                   </div>
                   <div className="flex items-center gap-2 p-2 bg-background rounded-lg text-sm border border-border">
-                    <Flame className="h-4 w-4 text-primary" />
+                    <Flame className="h-4 w-4 text-orange-500" />
                     <span>BMR Calculator</span>
                   </div>
                   <div className="flex items-center gap-2 p-2 bg-background rounded-lg text-sm border border-border">
-                    <Target className="h-4 w-4 text-primary" />
+                    <Target className="h-4 w-4 text-emerald-500" />
                     <span>Macro Tracking Calculator</span>
                   </div>
                   <div className="flex items-center gap-2 p-2 bg-background rounded-lg text-sm border border-border">
-                    <Activity className="h-4 w-4 text-primary" />
+                    <Activity className="h-4 w-4 text-red-500" />
                     <span>Calorie Counter</span>
                   </div>
                 </div>
@@ -565,21 +565,21 @@ export default function AboutSmartyGym() {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div className="flex items-start gap-2 p-3 bg-muted/30 rounded-lg border border-border">
-                  <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                  <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
                   <div>
                     <h5 className="font-medium text-sm">Detailed Descriptions</h5>
                     <p className="text-xs text-muted-foreground">Purpose, muscles trained, and benefits</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2 p-3 bg-muted/30 rounded-lg border border-border">
-                  <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                  <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
                   <div>
                     <h5 className="font-medium text-sm">Step-by-Step Instructions</h5>
                     <p className="text-xs text-muted-foreground">Proper setup, execution, and cues</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2 p-3 bg-muted/30 rounded-lg border border-border">
-                  <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                  <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
                   <div>
                     <h5 className="font-medium text-sm">Filter & Search</h5>
                     <p className="text-xs text-muted-foreground">By body part, equipment, or difficulty</p>
@@ -621,21 +621,21 @@ export default function AboutSmartyGym() {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div className="flex items-start gap-2 p-3 bg-muted/30 rounded-lg border border-border">
-                  <Trophy className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                  <Trophy className="h-4 w-4 text-yellow-500 mt-0.5 shrink-0" />
                   <div>
                     <h5 className="font-medium text-sm">Leaderboards</h5>
                     <p className="text-xs text-muted-foreground">Global rankings by workouts and streaks</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2 p-3 bg-muted/30 rounded-lg border border-border">
-                  <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                  <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
                   <div>
                     <h5 className="font-medium text-sm">Ratings & Reviews</h5>
                     <p className="text-xs text-muted-foreground">Member feedback on workouts and programs</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2 p-3 bg-muted/30 rounded-lg border border-border">
-                  <Activity className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                  <Activity className="h-4 w-4 text-red-500 mt-0.5 shrink-0" />
                   <div>
                     <h5 className="font-medium text-sm">Live Activity</h5>
                     <p className="text-xs text-muted-foreground">See what the community is training right now</p>
@@ -681,21 +681,21 @@ export default function AboutSmartyGym() {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div className="flex items-start gap-2 p-3 bg-muted/30 rounded-lg border border-border">
-                  <Brain className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                  <Brain className="h-4 w-4 text-purple-500 mt-0.5 shrink-0" />
                   <div>
                     <h5 className="font-medium text-sm">Evidence-Based</h5>
                     <p className="text-xs text-muted-foreground">Backed by sports science and real coaching</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2 p-3 bg-muted/30 rounded-lg border border-border">
-                  <Heart className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                  <Heart className="h-4 w-4 text-rose-500 mt-0.5 shrink-0" />
                   <div>
                     <h5 className="font-medium text-sm">Healthy Aging</h5>
                     <p className="text-xs text-muted-foreground">Train and eat for long-term performance</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2 p-3 bg-muted/30 rounded-lg border border-border">
-                  <TrendingUp className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                  <TrendingUp className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
                   <div>
                     <h5 className="font-medium text-sm">Practical Guides</h5>
                     <p className="text-xs text-muted-foreground">Actionable advice you can use today</p>
