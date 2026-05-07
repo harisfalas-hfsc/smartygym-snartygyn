@@ -528,7 +528,7 @@ const Community = () => {
             <CardContent className="p-4 sm:p-5">
               <h2 className="text-xl sm:text-2xl font-bold mb-3 text-center">About Community</h2>
               <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
-                <p className="text-sm sm:text-base text-center">
+                <p className="text-sm sm:text-base text-center font-bold">
                   Welcome to <span className="text-primary font-semibold">SmartyGym</span> Community! Connect, compete, and interact through leaderboards and shared experiences.
                 </p>
               </div>
