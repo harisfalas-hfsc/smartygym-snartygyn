@@ -187,15 +187,15 @@ const DailySmartyRitual = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 justify-items-center mt-4">
                   <div className="flex items-center gap-2">
                     <Sunrise className="h-4 w-4 text-orange-500" />
-                    <span className="text-sm"><strong>Morning:</strong> Activation</span>
+                    <span className="text-sm font-bold"><strong>Morning:</strong> Activation</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Sun className="h-4 w-4 text-yellow-600" />
-                    <span className="text-sm"><strong>Midday:</strong> Reset</span>
+                    <span className="text-sm font-bold"><strong>Midday:</strong> Reset</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Moon className="h-4 w-4 text-purple-600" />
-                    <span className="text-sm"><strong>Evening:</strong> Unwind</span>
+                    <span className="text-sm font-bold"><strong>Evening:</strong> Unwind</span>
                   </div>
                 </div>
                 <p className="text-sm sm:text-base font-semibold text-foreground text-center mt-4">

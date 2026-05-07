@@ -187,7 +187,7 @@ export default function AboutSmartyGym() {
                 <h4 className="font-semibold mb-3">Workout Categories</h4>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                   {workoutCategories.map((cat) => (
-                    <div key={cat.name} className="flex items-center gap-2 p-2 bg-muted/30 rounded-lg text-sm">
+                    <div key={cat.name} className="flex items-center gap-2 p-2 bg-muted/30 rounded-lg text-sm font-bold">
                       <span className="text-primary">{cat.icon}</span>
                       <span>{cat.name}</span>
                     </div>
@@ -256,7 +256,7 @@ export default function AboutSmartyGym() {
                 <h4 className="font-semibold mb-3">Workout Categories</h4>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                   {workoutCategories.map((cat) => (
-                    <div key={cat.name} className="flex items-center gap-2 p-2 bg-background rounded-lg text-sm border border-border">
+                    <div key={cat.name} className="flex items-center gap-2 p-2 bg-background rounded-lg text-sm font-bold border border-border">
                       <span className="text-primary">{cat.icon}</span>
                       <span>{cat.name}</span>
                     </div>
@@ -324,7 +324,7 @@ export default function AboutSmartyGym() {
                 <h4 className="font-semibold mb-3">Program Categories</h4>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                   {programCategories.map((cat) => (
-                    <div key={cat} className="flex items-center gap-2 p-2 bg-background rounded-lg text-sm border border-border">
+                    <div key={cat} className="flex items-center gap-2 p-2 bg-background rounded-lg text-sm font-bold border border-border">
                       <CheckCircle2 className="h-4 w-4 text-blue-500 shrink-0" />
                       <span>{cat}</span>
                     </div>
@@ -567,21 +567,21 @@ export default function AboutSmartyGym() {
                 <div className="flex items-start gap-2 p-3 bg-muted/30 rounded-lg border border-border">
                   <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
                   <div>
-                    <h5 className="font-medium text-sm">Detailed Descriptions</h5>
+                    <h5 className="font-bold text-sm">Detailed Descriptions</h5>
                     <p className="text-xs text-muted-foreground">Purpose, muscles trained, and benefits</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2 p-3 bg-muted/30 rounded-lg border border-border">
                   <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
                   <div>
-                    <h5 className="font-medium text-sm">Step-by-Step Instructions</h5>
+                    <h5 className="font-bold text-sm">Step-by-Step Instructions</h5>
                     <p className="text-xs text-muted-foreground">Proper setup, execution, and cues</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2 p-3 bg-muted/30 rounded-lg border border-border">
                   <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
                   <div>
-                    <h5 className="font-medium text-sm">Filter & Search</h5>
+                    <h5 className="font-bold text-sm">Filter & Search</h5>
                     <p className="text-xs text-muted-foreground">By body part, equipment, or difficulty</p>
                   </div>
                 </div>
@@ -623,21 +623,21 @@ export default function AboutSmartyGym() {
                 <div className="flex items-start gap-2 p-3 bg-muted/30 rounded-lg border border-border">
                   <Trophy className="h-4 w-4 text-yellow-500 mt-0.5 shrink-0" />
                   <div>
-                    <h5 className="font-medium text-sm">Leaderboards</h5>
+                    <h5 className="font-bold text-sm">Leaderboards</h5>
                     <p className="text-xs text-muted-foreground">Global rankings by workouts and streaks</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2 p-3 bg-muted/30 rounded-lg border border-border">
                   <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
                   <div>
-                    <h5 className="font-medium text-sm">Ratings & Reviews</h5>
+                    <h5 className="font-bold text-sm">Ratings & Reviews</h5>
                     <p className="text-xs text-muted-foreground">Member feedback on workouts and programs</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2 p-3 bg-muted/30 rounded-lg border border-border">
                   <Activity className="h-4 w-4 text-red-500 mt-0.5 shrink-0" />
                   <div>
-                    <h5 className="font-medium text-sm">Live Activity</h5>
+                    <h5 className="font-bold text-sm">Live Activity</h5>
                     <p className="text-xs text-muted-foreground">See what the community is training right now</p>
                   </div>
                 </div>
@@ -683,21 +683,21 @@ export default function AboutSmartyGym() {
                 <div className="flex items-start gap-2 p-3 bg-muted/30 rounded-lg border border-border">
                   <Brain className="h-4 w-4 text-purple-500 mt-0.5 shrink-0" />
                   <div>
-                    <h5 className="font-medium text-sm">Evidence-Based</h5>
+                    <h5 className="font-bold text-sm">Evidence-Based</h5>
                     <p className="text-xs text-muted-foreground">Backed by sports science and real coaching</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2 p-3 bg-muted/30 rounded-lg border border-border">
                   <Heart className="h-4 w-4 text-rose-500 mt-0.5 shrink-0" />
                   <div>
-                    <h5 className="font-medium text-sm">Healthy Aging</h5>
+                    <h5 className="font-bold text-sm">Healthy Aging</h5>
                     <p className="text-xs text-muted-foreground">Train and eat for long-term performance</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2 p-3 bg-muted/30 rounded-lg border border-border">
                   <TrendingUp className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
                   <div>
-                    <h5 className="font-medium text-sm">Practical Guides</h5>
+                    <h5 className="font-bold text-sm">Practical Guides</h5>
                     <p className="text-xs text-muted-foreground">Actionable advice you can use today</p>
                   </div>
                 </div>

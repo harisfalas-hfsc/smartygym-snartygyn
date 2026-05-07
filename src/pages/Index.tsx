@@ -802,7 +802,7 @@ className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-co
                                       onClick={() => setActiveAudienceTooltip(audience.label)}
                                     >
                                       <Icon className={`w-6 h-6 ${audience.color}`} />
-                                      <span className="text-xs font-medium text-foreground text-center">{audience.label}</span>
+                                      <span className="text-sm font-bold text-foreground text-center">{audience.label}</span>
                                     </div>
                                   </TooltipTrigger>
                                   <TooltipContent 
