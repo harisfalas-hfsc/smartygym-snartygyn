@@ -27,7 +27,7 @@ export const PageTitleCard = ({ title, subtitle, icon: Icon, imageSrc, children 
           {title}
         </h1>
         {subtitle && (
-          <p className="text-sm sm:text-base text-muted-foreground mt-2">
+          <p className="text-sm sm:text-base text-center text-muted-foreground mt-2">
             {subtitle}
           </p>
         )}

@@ -181,7 +181,7 @@ const DailySmartyRitual = () => {
             <div className="p-4 sm:p-5">
               <h2 className="text-xl sm:text-2xl font-bold mb-3 text-center">About Smarty Ritual</h2>
               <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
-                <p className="text-sm sm:text-base">
+                <p className="text-sm sm:text-base text-center">
                   Your all-day game plan for movement, recovery, and performance. Each day brings a fresh ritual with three expertly designed phases:
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 justify-items-center mt-4">
