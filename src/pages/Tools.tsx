@@ -153,7 +153,7 @@ const Tools = () => {
           <div className="p-5">
             <h2 className="text-2xl font-bold mb-3 text-center">About Smarty Tools</h2>
             <div className="text-muted-foreground max-w-3xl mx-auto">
-              <p className="text-sm sm:text-base text-center">
+              <p className="text-sm sm:text-base text-center font-bold">
                 <span className="text-primary font-semibold">Smarty Tools</span> are fitness calculators to understand your body and optimize training using validated formulas.
               </p>
               {/* Desktop only - detailed calculator descriptions */}
