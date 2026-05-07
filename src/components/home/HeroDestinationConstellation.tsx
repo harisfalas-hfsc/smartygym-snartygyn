@@ -256,10 +256,9 @@ const Bubble = ({
             src={src}
             alt=""
             className={cn(
-              "absolute inset-0 w-full h-full object-cover transition-opacity duration-700 group-hover:scale-110",
+              "absolute inset-0 w-full h-full object-cover scale-110 transition-opacity duration-700 group-hover:scale-125",
               i === imgIndex ? "opacity-100" : "opacity-0"
             )}
-            loading="lazy"
           />
         ))}
         {/* Subtle gradient overlay for legibility */}
