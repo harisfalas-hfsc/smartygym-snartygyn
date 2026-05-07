@@ -347,7 +347,7 @@ const WODCategory = () => {
                     <h2 className="text-xl sm:text-2xl font-bold text-center">The Science Behind Your Daily Workout</h2>
                   </div>
                   
-                  <p className="text-sm sm:text-base text-center text-muted-foreground mb-6 max-w-3xl mx-auto">
+                  <p className="text-sm sm:text-base text-center font-bold text-muted-foreground mb-6 max-w-3xl mx-auto">
                     Following <span className="text-primary font-bold">SmartyGym's</span> and <Link to="/coach-profile" className="text-primary font-bold hover:underline">Haris Falas</Link>' Workout of the Day is like having a personal trainer monitoring your training day by day — 
                     tracking your training load, recovery needs, and energy systems to deliver the perfect workout every single day.
                   </p>
