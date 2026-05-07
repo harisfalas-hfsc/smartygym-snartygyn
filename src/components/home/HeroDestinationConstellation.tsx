@@ -56,7 +56,7 @@ const DESTINATIONS: Destination[] = [
     desktop: { top: 0, left: 540, size: 200 },
     delay: "0s",
     featured: true,
-    popoverPos: "top-full mt-3 left-1/2 -translate-x-1/2",
+    popoverPos: "top-full mt-1 left-1/2 -translate-x-1/2",
   },
   {
     id: "workouts",
@@ -70,7 +70,7 @@ const DESTINATIONS: Destination[] = [
     image: heroWorkoutsImage,
     desktop: { top: 70, left: 950, size: 190 },
     delay: "0.6s",
-    popoverPos: "top-full mt-3 right-full mr-3",
+    popoverPos: "top-1/2 right-full mr-1",
   },
   {
     id: "programs",
@@ -84,7 +84,7 @@ const DESTINATIONS: Destination[] = [
     image: heroProgramsImage,
     desktop: { top: 70, left: 160, size: 190 },
     delay: "1.2s",
-    popoverPos: "top-full mt-3 left-full ml-3",
+    popoverPos: "top-1/2 left-full ml-1",
   },
   {
     id: "tools",
@@ -98,7 +98,7 @@ const DESTINATIONS: Destination[] = [
     image: heroToolsImage,
     desktop: { top: 290, left: 0, size: 170 },
     delay: "0.9s",
-    popoverPos: "bottom-full mb-3 left-full ml-3",
+    popoverPos: "bottom-1/2 left-full ml-1",
   },
   {
     id: "library",
@@ -112,7 +112,7 @@ const DESTINATIONS: Destination[] = [
     image: heroLibraryImage,
     desktop: { top: 290, left: 1130, size: 170 },
     delay: "1.5s",
-    popoverPos: "bottom-full mb-3 right-full mr-3",
+    popoverPos: "bottom-1/2 right-full mr-1",
   },
   {
     id: "blog",
@@ -126,7 +126,7 @@ const DESTINATIONS: Destination[] = [
     image: heroBlogImage,
     desktop: { top: 380, left: 280, size: 190 },
     delay: "0.3s",
-    popoverPos: "bottom-full mb-3 left-full ml-3",
+    popoverPos: "top-1/2 left-full ml-1",
   },
   {
     id: "community",
@@ -140,7 +140,7 @@ const DESTINATIONS: Destination[] = [
     image: heroCommunityImage,
     desktop: { top: 380, left: 840, size: 190 },
     delay: "1.8s",
-    popoverPos: "bottom-full mb-3 right-full mr-3",
+    popoverPos: "top-1/2 right-full mr-1",
   },
 ];
 
