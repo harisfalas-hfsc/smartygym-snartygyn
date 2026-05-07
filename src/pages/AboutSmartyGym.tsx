@@ -187,7 +187,7 @@ export default function AboutSmartyGym() {
                 <h4 className="font-semibold mb-3">Workout Categories</h4>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                   {workoutCategories.map((cat) => (
-                    <div key={cat.name} className="flex items-center gap-2 p-2 bg-muted/30 rounded-lg text-sm">
+                    <div key={cat.name} className="flex items-center gap-2 p-2 bg-muted/30 rounded-lg text-sm font-bold">
                       <span className="text-primary">{cat.icon}</span>
                       <span>{cat.name}</span>
                     </div>
@@ -256,7 +256,7 @@ export default function AboutSmartyGym() {
                 <h4 className="font-semibold mb-3">Workout Categories</h4>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                   {workoutCategories.map((cat) => (
-                    <div key={cat.name} className="flex items-center gap-2 p-2 bg-background rounded-lg text-sm border border-border">
+                    <div key={cat.name} className="flex items-center gap-2 p-2 bg-background rounded-lg text-sm font-bold border border-border">
                       <span className="text-primary">{cat.icon}</span>
                       <span>{cat.name}</span>
                     </div>
@@ -324,7 +324,7 @@ export default function AboutSmartyGym() {
                 <h4 className="font-semibold mb-3">Program Categories</h4>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                   {programCategories.map((cat) => (
-                    <div key={cat} className="flex items-center gap-2 p-2 bg-background rounded-lg text-sm border border-border">
+                    <div key={cat} className="flex items-center gap-2 p-2 bg-background rounded-lg text-sm font-bold border border-border">
                       <CheckCircle2 className="h-4 w-4 text-blue-500 shrink-0" />
                       <span>{cat}</span>
                     </div>
