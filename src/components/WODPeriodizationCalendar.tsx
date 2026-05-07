@@ -1,4 +1,4 @@
-import { format, subDays, addDays } from "date-fns";
+import { format } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -20,15 +20,18 @@ const WODPeriodizationCalendar = () => {
   const now = new Date();
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = useState(1); // Start on Today (index 1)
-  
-  // Get today's date in Cyprus timezone (Europe/Athens)
-  const todayStr = formatInTimeZone(now, TIMEZONE, "yyyy-MM-dd");
-  const today = new Date(todayStr + "T00:00:00Z");
-  const yesterday = subDays(today, 1);
-  const tomorrow = addDays(today, 1);
 
-  const yesterdayStr = format(yesterday, "yyyy-MM-dd");
-  const tomorrowStr = format(tomorrow, "yyyy-MM-dd");
+  // Build Cyprus-anchored yyyy-MM-dd strings without ever round-tripping through
+  // the viewer's local timezone (which previously made tomorrow collapse onto today).
+  const todayStr = formatInTimeZone(now, TIMEZONE, "yyyy-MM-dd");
+  const shiftCyprusDay = (baseStr: string, deltaDays: number) => {
+    // Anchor at Cyprus noon to stay far from any DST/midnight boundary.
+    const anchor = new Date(`${baseStr}T12:00:00Z`);
+    anchor.setUTCDate(anchor.getUTCDate() + deltaDays);
+    return formatInTimeZone(anchor, TIMEZONE, "yyyy-MM-dd");
+  };
+  const yesterdayStr = shiftCyprusDay(todayStr, -1);
+  const tomorrowStr = shiftCyprusDay(todayStr, 1);
 
   const yesterdayInfo = getWODInfoForDate(yesterdayStr);
   const todayInfo = getWODInfoForDate(todayStr);
@@ -57,7 +60,9 @@ const WODPeriodizationCalendar = () => {
     info: ReturnType<typeof getWODInfoForDate>,
     isToday: boolean = false
   ) => {
-    const fullDate = format(new Date(dateStr), "EEEE, MMMM d");
+    // Parse as local noon so format() can never drift across a day boundary
+    // regardless of the viewer's timezone.
+    const fullDate = format(new Date(`${dateStr}T12:00:00`), "EEEE, MMMM d");
     const borderColor = getDifficultyBorderClass(info.difficulty.level);
 
     return (
