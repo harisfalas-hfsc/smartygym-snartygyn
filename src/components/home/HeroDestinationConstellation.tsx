@@ -313,9 +313,9 @@ const Bubble = ({
         id={descId}
         role="tooltip"
         className={cn(
-          "absolute z-40 w-[220px] p-3 rounded-lg border border-primary/30",
-          "bg-popover text-popover-foreground shadow-xl",
-          "text-xs leading-snug text-left",
+          "absolute z-40 w-[260px] p-4 rounded-lg border-2 border-primary/40",
+          "bg-popover text-popover-foreground shadow-2xl",
+          "text-sm leading-snug text-left font-medium",
           "opacity-0 translate-y-1 pointer-events-none",
           "group-hover:opacity-100 group-focus-within:opacity-100 group-hover:translate-y-0 group-focus-within:translate-y-0",
           "transition-all duration-200",
