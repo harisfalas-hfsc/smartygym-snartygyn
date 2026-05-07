@@ -1,48 +1,39 @@
-## Problem
-
-On mobile, every page shows a large empty gap between the page content and the footer. The amount varies (more empty space when the "Join SmartyGym Now" CTA is hidden for logged-in/premium users), but it appears on **every page** — homepage, workouts, training programs, logbook, measurements, all 500+ dynamic pages.
 
 ## Root cause
 
-In `src/App.tsx`, the layout wrapper uses:
+Today's WODs are correctly generated, visible, with image + Stripe, and the rollover/archive crons all succeeded overnight. The user-visible "the WODs aren't published" symptom is a **date-label bug** in `src/components/WODPeriodizationCalendar.tsx`, not a content/cron bug.
 
-```tsx
-<div className="flex flex-col min-h-screen">
-  <Navigation />
-  <div className="md:flex-1" style={{ paddingTop: '...' }}>
-    <Routes />
-  </div>
-  <Footer />
-</div>
+The component does:
+
+```ts
+const todayStr = formatInTimeZone(now, "Europe/Athens", "yyyy-MM-dd"); // ✅ correct: "2026-05-07"
+const today = new Date(todayStr + "T00:00:00Z");                       // ❌ UTC midnight
+const yesterday = subDays(today, 1);
+const tomorrow  = addDays(today, 1);
+const yesterdayStr = format(yesterday, "yyyy-MM-dd");                  // local-TZ format
+const tomorrowStr  = format(tomorrow,  "yyyy-MM-dd");
+…
+const fullDate = format(new Date(dateStr), "EEEE, MMMM d");            // local-TZ format
 ```
 
-- `min-h-screen` forces the column to be at least 100vh tall.
-- `md:flex-1` only makes the content area grow on screens ≥768px (tablet/desktop).
-- On mobile, no child has `flex-1`, so the leftover space inside the `min-h-screen` column appears as a gap, and the footer is pushed away from the content.
-
-This is exactly the same "sticky footer" pattern problem — the growing child must exist at every breakpoint, not only desktop.
+`format()` uses the browser/system local timezone, so `2026-05-07T00:00:00Z` becomes `2026-05-06` for any visitor west of UTC, and `tomorrow` collapses onto today. That is why the strip currently reads "Today Wed May 6 / Tomorrow Wed May 6" while the actual Cyprus date is Thu May 7. The WOD cards underneath load via `useTodayWods` which uses `formatInTimeZone` directly, so they show the right workouts — but the broken header makes them look like stale Wednesday content.
 
 ## Fix
 
-Change one class in `src/App.tsx`:
+Make the calendar consistently timezone-aware (Europe/Athens), the same TZ the backend uses to set `generated_for_date`.
 
-- `md:flex-1` → `flex-1`
+### `src/components/WODPeriodizationCalendar.tsx`
+1. Build `today/yesterday/tomorrow` strictly as `yyyy-MM-dd` strings derived from `formatInTimeZone(... 'Europe/Athens' ...)` — never round-trip through `new Date(... + "T00:00:00Z")`.
+2. For the human label (`"Wednesday, May 7"`), parse the `yyyy-MM-dd` as a local-noon date (`new Date(dateStr + "T12:00:00")`) so `format(..., "EEEE, MMMM d")` can never drift across a day boundary regardless of viewer TZ.
+3. Use `subDays`/`addDays` on the Cyprus-anchored noon date, then re-emit with `format(..., "yyyy-MM-dd")` — safe because we're nowhere near a midnight boundary.
 
-That makes the content area absorb all leftover vertical space on mobile too. Result:
-- **Short content pages** (e.g. homepage logged-in as premium): footer sits at the bottom of the viewport with no awkward gap above it.
-- **Long content pages** (e.g. a full workout, training program, blog article): footer sits naturally right after the content, as it does today.
+### Verification (after switch to default mode)
+- Re-fetch `https://smartygym.com/workout/wod` and confirm the strip shows `Yesterday Wed May 6 / Today Thu May 7 / Tomorrow Fri May 8` and the cards underneath stay the same Pilates pair.
+- Spot-check the strip against Cyprus local date with `select (now() at time zone 'Europe/Nicosia')::date`.
+- No backend/cron changes — those are healthy and don't need to be touched.
 
-Tablet and desktop behavior is unchanged because `flex-1` already applied there.
+## Files touched
+- `src/components/WODPeriodizationCalendar.tsx` (date math + label formatting only)
 
-## Scope
-
-- **One file:** `src/App.tsx`
-- **One class change:** `md:flex-1` → `flex-1`
-- No changes to Navigation, Footer, or any individual page.
-- No CSS, no responsive breakpoint changes.
-- Applies automatically to all 500+ pages because they all render inside this wrapper.
-
-## Out of scope
-
-- The page-count question is answered in chat (≈70 static routes + hundreds of dynamic ones — every workout, program, and article is its own URL).
-- No design or content changes.
+## Out of scope (intentionally)
+- WOD generation/orchestrator code, archive job, watchdog, periodization tables — all confirmed healthy in the last 3 cron runs and don't need edits.
