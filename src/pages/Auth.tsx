@@ -15,6 +15,7 @@ import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { AvatarSetupDialog } from "@/components/AvatarSetupDialog";
 import { ForgotPasswordDialog } from "@/components/auth/ForgotPasswordDialog";
 import { trackSocialMediaEvent } from "@/utils/socialMediaTracking";
+import { lovable } from "@/integrations/lovable";
 
 import { checkPasswordBreach } from "@/utils/passwordBreachCheck";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
@@ -136,6 +137,7 @@ export default function Auth() {
   });
   const [rememberMe, setRememberMe] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [appleLoading, setAppleLoading] = useState(false);
 
   const handleGoogleSignIn = async () => {
     if (isOffline) {
@@ -171,6 +173,44 @@ export default function Auth() {
         variant: "destructive",
       });
       setGoogleLoading(false);
+    }
+  };
+
+  const handleAppleSignIn = async () => {
+    if (isOffline) {
+      toast({
+        title: "No Internet Connection",
+        description: "Please connect to the internet to sign in with Apple.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setAppleLoading(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth("apple", {
+        redirect_uri: `${window.location.origin}/`,
+      });
+
+      if (result.redirected) {
+        return;
+      }
+
+      if (result.error) {
+        toast({
+          title: "Error",
+          description: result.error.message || "Failed to sign in with Apple",
+          variant: "destructive",
+        });
+        setAppleLoading(false);
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error?.message || "Failed to sign in with Apple",
+        variant: "destructive",
+      });
+      setAppleLoading(false);
     }
   };
 
