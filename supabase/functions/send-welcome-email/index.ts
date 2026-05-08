@@ -389,8 +389,6 @@ serve(async (req) => {
                             ${footer}
                           </td>
                         </tr>
-                          </td>
-                        </tr>
                       </table>
                     </td>
                   </tr>
