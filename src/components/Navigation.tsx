@@ -448,13 +448,13 @@ export const Navigation = () => {
               <img
                 src={smartyGymLogo}
                 alt="SmartyGym"
-                className="h-14 xs:h-[60px] sm:h-[72px] md:h-20 lg:h-24 w-auto max-w-[min(34vw,136px)] object-contain dark:mix-blend-lighten sm:max-w-none"
+                className="h-14 xs:h-[60px] sm:h-[72px] md:h-20 lg:h-24 w-auto max-w-[min(28vw,120px)] object-contain dark:mix-blend-lighten lg:max-w-none"
               />
             </Link>
           </div>
 
            {/* Right Side - Auth */}
-           <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+           <div className="flex shrink-0 items-center gap-1 sm:gap-1.5 lg:gap-2">
              <Button
                variant="ghost"
                size="icon"
