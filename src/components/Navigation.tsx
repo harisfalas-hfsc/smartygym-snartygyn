@@ -429,7 +429,7 @@ export const Navigation = () => {
               variant="ghost"
               size="icon"
               onClick={() => setSmartyCoachOpen(true)}
-              className="relative hidden h-11 w-11 rounded-full md:inline-flex"
+              className="relative hidden h-11 w-11 rounded-full lg:inline-flex"
               aria-label="Open Smarty Coach"
             >
               <div className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-primary transition-colors hover:bg-primary hover:text-primary-foreground">
