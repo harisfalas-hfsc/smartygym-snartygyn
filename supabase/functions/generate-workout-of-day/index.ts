@@ -17,6 +17,7 @@ import { normalizeWorkoutHtml, validateWorkoutHtml } from "../_shared/html-norma
 import { validateWodSections } from "../_shared/section-validator.ts";
 import { sanitizeProtocolBlocks, validateProtocolBlocks } from "../_shared/protocol-sanitizer.ts";
 import { injectProtocolExplanations } from "../_shared/protocol-explanations.ts";
+import { calculateWorkoutDurationMinutes, formatDurationLabel } from "../_shared/duration-calculator.ts";
 import {
   hasInternalNameCode,
   hasAiStyleName,
@@ -2561,20 +2562,30 @@ Return JSON with these exact fields:
         return `${rounded} min`;
       };
       
-      const actualDuration = calculateActualDuration(workoutContent.main_workout || '');
-      const finalDuration = actualDuration || duration;
-      
-      if (actualDuration) {
-        logStep(`Duration override: ${duration} → ${actualDuration}`, { 
-          equipment, 
-          originalDuration: duration, 
-          calculatedDuration: actualDuration 
+      // Authoritative content-based duration: counts Tabata blocks, EMOM minutes×rounds,
+      // AMRAP/FOR TIME caps, or sets+rest. Replaces any AI-estimated value when reliable.
+      const computedMinutes = calculateWorkoutDurationMinutes(
+        workoutContent.main_workout || '',
+        format,
+      );
+      const headerDuration = calculateActualDuration(workoutContent.main_workout || '');
+      const computedLabel = computedMinutes > 0 ? formatDurationLabel(computedMinutes) : null;
+      const finalDuration = computedLabel || headerDuration || duration;
+
+      if (computedLabel) {
+        logStep(`Duration computed from content: ${duration} → ${computedLabel}`, {
+          equipment,
+          format,
+          originalDuration: duration,
+          computedMinutes,
+        });
+      } else if (headerDuration) {
+        logStep(`Duration parsed from headers (fallback): ${duration} → ${headerDuration}`, {
+          equipment,
+          duration,
         });
       } else {
-        logStep(`Using estimated duration (parsing found insufficient data)`, { 
-          equipment, 
-          duration 
-        });
+        logStep(`Using estimated duration (no reliable signal)`, { equipment, duration });
       }
 
       // ═══════════════════════════════════════════════════════════════════════════════
