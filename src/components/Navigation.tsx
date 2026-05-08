@@ -448,13 +448,13 @@ export const Navigation = () => {
               <img
                 src={smartyGymLogo}
                 alt="SmartyGym"
-                className="h-14 xs:h-[60px] sm:h-[72px] md:h-20 lg:h-24 w-auto max-w-[min(34vw,136px)] object-contain dark:mix-blend-lighten sm:max-w-none"
+                className="h-14 xs:h-[60px] sm:h-[72px] md:h-20 lg:h-24 w-auto max-w-[min(28vw,120px)] object-contain dark:mix-blend-lighten lg:max-w-none"
               />
             </Link>
           </div>
 
            {/* Right Side - Auth */}
-           <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+           <div className="flex shrink-0 items-center gap-1 sm:gap-1.5 lg:gap-2">
              <Button
                variant="ghost"
                size="icon"
@@ -481,27 +481,27 @@ export const Navigation = () => {
               </Button>
             )}
             
-            {user && unreadCount > 0 && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="relative"
-                onClick={() => {
-                  navigate("/userdashboard?tab=messages");
-                  setTimeout(() => window.scrollTo(0, 0), 0);
-                }}
-              >
-                <Bell className="h-5 w-5" />
-                <SafeNotificationBadge count={unreadCount} />
-              </Button>
-            )}
+           {user && unreadCount > 0 && (
+             <Button
+               variant="ghost"
+               size="icon"
+               className="relative h-9 w-9 lg:h-11 lg:w-11"
+               onClick={() => {
+                 navigate("/userdashboard?tab=messages");
+                 setTimeout(() => window.scrollTo(0, 0), 0);
+               }}
+             >
+               <Bell className="h-4 w-4 lg:h-5 lg:w-5" />
+               <SafeNotificationBadge count={unreadCount} />
+             </Button>
+           )}
             
             {user ? (
               <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="relative h-11 w-11 rounded-full">
-                    <div className={`flex h-11 w-11 items-center justify-center rounded-full border-2 border-primary transition-colors hover:bg-primary/10 ${subscriptionInfo?.subscribed ? 'ring-2 ring-yellow-500 ring-offset-2 ring-offset-background' : ''} ${corporateSubscription ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-background' : ''}`}>
-                      <Avatar className="h-8 w-8">
+               <DropdownMenuTrigger asChild>
+                 <Button variant="ghost" size="icon" className="relative h-9 w-9 lg:h-11 lg:w-11 rounded-full">
+                   <div className={`flex h-9 w-9 lg:h-11 lg:w-11 items-center justify-center rounded-full border-2 border-primary transition-colors hover:bg-primary/10 ${subscriptionInfo?.subscribed ? 'ring-2 ring-yellow-500 ring-offset-2 ring-offset-background' : ''} ${corporateSubscription ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-background' : ''}`}>
+                     <Avatar className="h-7 w-7 lg:h-8 lg:w-8">
                         <AvatarImage src={avatarUrl || undefined} alt="Profile" />
                         <AvatarFallback className="text-xs">{getUserInitials()}</AvatarFallback>
                       </Avatar>
