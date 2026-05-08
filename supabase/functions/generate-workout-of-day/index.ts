@@ -17,6 +17,7 @@ import { normalizeWorkoutHtml, validateWorkoutHtml } from "../_shared/html-norma
 import { validateWodSections } from "../_shared/section-validator.ts";
 import { sanitizeProtocolBlocks, validateProtocolBlocks } from "../_shared/protocol-sanitizer.ts";
 import { injectProtocolExplanations } from "../_shared/protocol-explanations.ts";
+import { calculateWorkoutDurationMinutes, formatDurationLabel } from "../_shared/duration-calculator.ts";
 import {
   hasInternalNameCode,
   hasAiStyleName,
