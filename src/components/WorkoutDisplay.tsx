@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Star } from "lucide-react";
+import { Star, Info } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useNavigate } from "react-router-dom";
 import { WorkoutToolsCards } from "@/components/WorkoutToolsCards";
 import workoutHero from "@/assets/workout-hero.jpg";
@@ -219,6 +220,23 @@ export const WorkoutDisplay = ({
             <div className="flex items-center gap-2">
               <span className="font-semibold">Duration:</span>
               <span>{duration}</span>
+              <TooltipProvider delayDuration={150}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      aria-label="How is duration calculated?"
+                      className="inline-flex items-center justify-center text-muted-foreground hover:text-foreground"
+                    >
+                      <Info className="h-4 w-4" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="max-w-[260px] text-xs leading-relaxed">
+                    Duration covers the actual <strong>work time</strong> (Main Workout + Finisher).
+                    Add roughly <strong>15–20 min</strong> for Warm-up + Cool Down.
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           )}
           {equipment && (
