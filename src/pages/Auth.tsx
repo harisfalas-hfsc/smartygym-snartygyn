@@ -441,6 +441,8 @@ export default function Auth() {
             </CardDescription>
           </CardHeader>
         <CardContent>
+          {/* Social logins temporarily hidden — re-enable when ready */}
+          {false && (<>
           {/* Google Sign In Button */}
           <Button
             type="button"
@@ -502,6 +504,7 @@ export default function Auth() {
               </span>
             </div>
           </div>
+          </>)}
 
           <Tabs defaultValue={defaultTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2">
