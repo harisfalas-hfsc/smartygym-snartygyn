@@ -1,59 +1,94 @@
-# Constellation Hover Descriptions
+## Goal
+Make SmartyGym pass Apple App Store and Google Play automated review for the Capacitor builds, without breaking the web experience.
 
-Replace the barely-visible tagline text under each constellation bubble with a hover/focus popover that appears in the empty space next to each circle. Works in both desktop constellation and tablet circular layouts; mobile is unaffected.
+## Direct answers to your questions
 
-## File to edit
-- `src/components/home/HeroDestinationConstellation.tsx`
+**1. Is Sign in with Apple a must?**  
+Yes — for **iOS only**, and only because you already offer Google sign-in. Apple Guideline 4.8 says: if your iOS app uses any third-party social login (Google, Facebook, etc.), you **must also offer Sign in with Apple**. Skipping it = guaranteed iOS rejection.  
+Google Play does **not** require it. So it only matters for the App Store submission.
 
-## Changes
+**2. Will hiding Stripe buttons in the iOS shell break the website?**  
+No. The change is gated by a runtime check (`Capacitor.isNativePlatform() && platform === 'ios'`). Web, Android APK, and PWA users see Stripe exactly as today. Only the iOS native app hides them.
 
-### 1. Add a `description` field to each destination
-One short sentence per bubble (taken as the first sentence of each section's existing copy):
+**3. Will the privacy page break anything?**  
+No — it's a new public route `/privacy`. Existing `/disclaimer` stays.
 
-- **WOD**: "The Workout of the Day is a fresh, smart-coded session published every morning for you to train with."
-- **Workouts**: "Smarty Workouts are single-session training routines designed to fit your lifestyle and goals."
-- **Programs**: "Smarty Programs are long-term, structured plans designed to help you achieve your specific fitness goals."
-- **Tools**: "Smarty Tools are calculators and timers that help you measure, plan and time your training."
-- **Library**: "The Exercise Library shows you proper form and technique for every movement we use."
-- **Blog**: "The Blog publishes evidence-based articles on training, nutrition and recovery."
-- **Community**: "The Community is where Smarty members connect, share progress and train together."
-- **Coach (Haris Falas)**: "Haris Falas is the founder and head coach behind every workout, program and article on SmartyGym."
+**4. Are these 3 items enough to pass review?**  
+These are the **three blockers**. There are also smaller fixes that, if skipped, will trigger warnings or rejections. I've grouped everything into Phase 1 (must-do for submission) and Phase 2 (do before/right after first review).
 
-### 2. Remove the always-visible tagline
-Delete the `<p className="text-xs text-muted-foreground …">{dest.tagline}</p>` line under each bubble. Keep the bold short title (`Workouts`, `Programs`, etc.) — that stays as the always-visible label.
+---
 
-### 3. Add a hover/focus description popover per bubble
-Inside `Bubble`, add an absolutely-positioned card that appears on `group-hover` and `group-focus-within`:
+## Phase 1 — Required for submission (this plan)
 
-- Small box: `~220px wide`, padding `p-3`, `rounded-lg`, `border border-primary/30`, `bg-popover text-popover-foreground` (theme-aware in light + dark), `shadow-xl`, `text-xs leading-snug`.
-- Hidden by default (`opacity-0 pointer-events-none translate-y-1`), shown on hover/focus (`group-hover:opacity-100 group-focus-within:opacity-100 transition`).
-- `z-40` so it sits above neighbouring bubbles and connection lines.
-- `aria-hidden` toggled appropriately; the description is also exposed via `aria-describedby` on the button for screen readers.
+### A. Sign in with Apple
+- Use Lovable Cloud's managed Apple provider (no Apple Developer credentials needed from you up front — you can switch to your own later).
+- On the `Auth.tsx` page, add a "Continue with Apple" button **next to** the existing Google button. Identical UX and styling.
+- Use `lovable.auth.signInWithOAuth("apple", { redirect_uri: window.location.origin })`.
+- Show the Apple button on **all platforms** (Apple requires it visible on iOS; harmless elsewhere — many apps do the same).
 
-### 4. Per-bubble popover placement (desktop)
-Each destination gets a `popoverSide` field that controls where the popover sits relative to its circle, chosen so it lands in the empty space of the constellation:
+### B. Hide Stripe purchase UI in iOS Capacitor shell
+- Add a tiny helper `src/utils/platform.ts`:
+  ```ts
+  export const isIOSNative = () =>
+    Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios';
+  ```
+- Wrap purchase CTAs with `{!isIOSNative() && <PurchaseButton .../>}` in:
+  - `src/components/PurchaseButton.tsx` (return null if iOS native)
+  - `src/components/shop/ProductCard.tsx` (hide buy button)
+  - `src/pages/JoinPremium.tsx`, `src/pages/SmartyPlans.tsx` (hide checkout CTAs)
+  - `src/components/AccessGate.tsx` (replace "Upgrade to access" with a softer "Available on the web version" message on iOS)
+- Web, Android, and PWA: zero changes. Existing Stripe flow untouched.
+- This satisfies Apple Guideline 3.1.1 (no external payment links for digital goods on iOS).
 
-| Bubble | Side | Tailwind position on the popover |
-|---|---|---|
-| wod (top center) | top | `bottom-full mb-3 left-1/2 -translate-x-1/2` |
-| workouts (top right) | bottom-left (diagonal) | `top-full mt-3 right-1/2` |
-| programs (top left) | bottom-right (diagonal) | `top-full mt-3 left-1/2` |
-| tools (mid-left) | right | `left-full ml-3 top-1/2 -translate-y-1/2` |
-| library (mid-right) | left | `right-full mr-3 top-1/2 -translate-y-1/2` |
-| blog (bottom-left) | top-right (diagonal) | `bottom-full mb-3 left-1/2` |
-| community (bottom-right) | top-left (diagonal) | `bottom-full mb-3 right-1/2` |
-| coach (center) | bottom | `top-full mt-3 left-1/2 -translate-x-1/2` |
+### C. Dedicated `/privacy` page
+- New route `src/pages/PrivacyPolicy.tsx` linked in router and footer.
+- Store-listing-grade content:
+  - Data collected: email, auth tokens, push tokens, payment metadata (via Stripe), workout activity, usage analytics (Google Analytics), USDA food queries.
+  - Purposes: account, content delivery, billing, analytics.
+  - Third parties: Lovable Cloud (Supabase), Stripe, Resend, Google Analytics, USDA FoodData Central.
+  - User rights: access, export, deletion (point to Account → Delete Account).
+  - Children: not for under 13 / 16.
+  - Contact: smartygym@outlook.com.
+  - Last-updated date.
+- Public route, indexable. Must match the URL you submit to the stores.
 
-### 5. Tablet layout
-Bubbles are arranged in a circle, so use a simple radial rule: if the bubble is in the upper half of the ring put the popover below it (`top-full mt-2`), otherwise above (`bottom-full mb-2`); always horizontally centered on the bubble. Same styling and same `description` text reused.
+### Conflicts / risks
+- **None for the website or Android APK.** All three changes are additive or runtime-gated.
+- **iOS revenue impact:** while Stripe is hidden inside the iOS app, iOS users can still subscribe via the web at smartygym.com and their account works in the app. This is the standard "reader app" pattern (Netflix, Spotify, Kindle).
+- Apple Sign In requires the iOS app to be built with the Sign in with Apple capability enabled in Xcode — your developer must check that box when packaging the IPA. I'll add a one-line note in the deliverable.
 
-### 6. Mobile
-The mobile layout doesn't render this constellation, so no change is needed there. (The mobile hero card grid keeps its own descriptions.)
+---
 
-## Theme handling
-Uses semantic tokens only (`bg-popover`, `text-popover-foreground`, `border-primary/30`) so the popover automatically renders correctly in both light and dark mode without any conditional logic.
+## Phase 2 — Strongly recommended before submission (separate plan, ask me)
 
-## Out of scope
-- No changes to bubble images, sizes, animations, layout positions, or routing.
-- No new dependencies (pure Tailwind + group-hover; no Radix Tooltip needed).
-- No backend or content changes.
+These are not part of this plan's code changes, but you should fix them or your APK/IPA will be flagged:
+
+1. **`public/.well-known/assetlinks.json`** — replace `REPLACE_WITH_YOUR_SIGNING_KEY_SHA256_FINGERPRINT` with the SHA-256 from your release keystore (your Android developer has it).
+2. **`public/.well-known/apple-app-site-association`** — replace `TEAM_ID` with your real Apple Developer Team ID.
+3. **Android app icons** — `public/app-icons/android/mipmap-*/` are empty. Your developer must place real icons in `android/app/src/main/res/mipmap-*` inside the native project (not in `public/`).
+4. **iOS `Info.plist`** — your developer must add usage strings for any permission used (push notifications, etc.).
+5. **Splash background color** — `capacitor.config.ts` uses `#0F0F0F`; change to brand `#0F172A`. Cosmetic.
+
+I will handle 5 in code if you want; 1–4 are native/config tasks for your developer.
+
+---
+
+## What I will NOT change
+- Existing Google sign-in flow.
+- Web Stripe checkout (unchanged on web/Android).
+- Existing `/disclaimer` page (kept; `/privacy` is a separate, store-formatted page).
+- Any backend/database logic.
+
+## Files affected
+- `src/pages/Auth.tsx` — add Apple button
+- `src/utils/platform.ts` — new helper
+- `src/components/PurchaseButton.tsx`
+- `src/components/shop/ProductCard.tsx`
+- `src/components/AccessGate.tsx`
+- `src/pages/JoinPremium.tsx`
+- `src/pages/SmartyPlans.tsx`
+- `src/pages/PrivacyPolicy.tsx` — new
+- `src/App.tsx` — register `/privacy` route
+- `src/components/Footer.tsx` — add Privacy link
+
+After approval I will also call the social-auth tool to enable Apple in Lovable Cloud.

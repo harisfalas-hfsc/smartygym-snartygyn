@@ -19,6 +19,7 @@
     "@capacitor/status-bar": "^8.0.1",
     "@hookform/resolvers": "^3.10.0",
     "@huggingface/transformers": "^3.7.6",
+    "@lovable.dev/cloud-auth-js": "^1.1.2",
     "@playwright/test": "^1.56.1",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-alert-dialog": "^1.1.14",
