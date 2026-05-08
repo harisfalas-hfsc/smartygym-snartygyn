@@ -60,7 +60,7 @@ export const MobileBottomNav = () => {
     <>
       <nav
         className={cn(
-          "md:hidden fixed bottom-0 left-0 right-0 z-50",
+          "lg:hidden fixed bottom-0 left-0 right-0 z-50",
           "bg-background/95 backdrop-blur-md",
           "border-t border-primary/20",
           "shadow-[0_-4px_16px_-4px_hsl(var(--primary)/0.15)]"
