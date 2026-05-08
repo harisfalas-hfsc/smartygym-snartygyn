@@ -1,0 +1,1 @@
+DELETE FROM public.user_system_messages WHERE user_id='19f14d6b-4da2-4ac6-b3dd-bb20f29257b9' AND message_type='welcome';
