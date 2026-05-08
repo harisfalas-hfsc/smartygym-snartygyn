@@ -22,6 +22,7 @@ import { NavigationHistoryProvider } from "./contexts/NavigationHistoryContext";
 import { Navigation } from "./components/Navigation";
 import { FixedBackButton } from "./components/FixedBackButton";
 import { Footer } from "./components/Footer";
+import { MobileBottomNav } from "./components/MobileBottomNav";
 import { useAdminRole } from "./hooks/useAdminRole";
 import { ArticleDetail } from "./pages/ArticleDetail";
 import Index from "./pages/Index";
@@ -260,6 +261,7 @@ const AppContent = () => {
             </PageTransition>
           </div>
         <Footer />
+        <MobileBottomNav />
       </div>
     </AccessControlProvider>
     </>

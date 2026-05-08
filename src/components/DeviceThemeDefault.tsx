@@ -14,7 +14,8 @@ export const DeviceThemeDefault = () => {
     if (sessionTheme) {
       setTheme(sessionTheme);
     } else {
-      const defaultTheme = "light";
+      const isMobile = window.innerWidth < 1024;
+      const defaultTheme = isMobile ? "dark" : "light";
       setTheme(defaultTheme);
       sessionStorage.setItem("smartygym-session-theme", defaultTheme);
     }
