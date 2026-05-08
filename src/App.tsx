@@ -123,7 +123,7 @@ const AppContent = () => {
         <BackgroundSEO />
         <div
           data-app-shell
-          className="flex flex-col min-h-screen"
+          className="flex flex-col min-h-screen pb-[calc(3.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0"
         >
           <Navigation />
           <FixedBackButton />
