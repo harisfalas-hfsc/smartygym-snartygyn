@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { useNavigate } from "react-router-dom";
+import { isIOSNative } from "@/utils/platform";
 
 interface PurchaseButtonProps {
   contentId: string;
@@ -33,6 +34,11 @@ export const PurchaseButton = ({
   
   // NEW: Check if user is premium (cannot purchase)
   const isPremium = userTier === "premium";
+
+  // Apple Guideline 3.1.1: hide external payment CTAs in the iOS native app
+  if (isIOSNative()) {
+    return null;
+  }
 
   const handlePurchase = async () => {
     if (!user) {

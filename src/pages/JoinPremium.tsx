@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { STRIPE_PRICE_IDS } from "@/config/pricing";
+import { isIOSNative } from "@/utils/platform";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { 
@@ -372,6 +373,11 @@ export default function JoinPremium() {
                   </div>
                 </div>
                 <div className="space-y-3 sm:space-y-4 mt-auto">
+                  {isIOSNative() ? (
+                    <div className="text-center text-xs sm:text-sm text-muted-foreground p-3 border rounded">
+                      Subscribe at <span className="text-primary font-semibold">smartygym.com</span>
+                    </div>
+                  ) : (
                   <Button 
                     className="w-full text-sm sm:text-lg py-4 sm:py-6 bg-[#D4AF37] hover:bg-[#C9A431] text-white" 
                     onClick={() => handleSubscribe('gold')}
@@ -384,6 +390,7 @@ export default function JoinPremium() {
                       </>
                     )}
                   </Button>
+                  )}
                   <p className="text-xs text-center text-muted-foreground">
                     Auto-renews each month
                   </p>
@@ -448,6 +455,11 @@ export default function JoinPremium() {
                   </div>
                 </div>
                 <div className="space-y-3 sm:space-y-4 mt-auto">
+                  {isIOSNative() ? (
+                    <div className="text-center text-xs sm:text-sm text-muted-foreground p-3 border rounded">
+                      Subscribe at <span className="text-primary font-semibold">smartygym.com</span>
+                    </div>
+                  ) : (
                   <Button 
                     className="w-full text-sm sm:text-lg py-4 sm:py-6 bg-[#A8A9AD] hover:bg-[#9A9B9F] text-white" 
                     onClick={() => handleSubscribe('platinum')}
@@ -460,6 +472,7 @@ export default function JoinPremium() {
                       </>
                     )}
                   </Button>
+                  )}
                   <p className="text-xs text-center text-muted-foreground">
                     Auto-renews each year
                   </p>

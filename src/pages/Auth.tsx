@@ -15,6 +15,7 @@ import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { AvatarSetupDialog } from "@/components/AvatarSetupDialog";
 import { ForgotPasswordDialog } from "@/components/auth/ForgotPasswordDialog";
 import { trackSocialMediaEvent } from "@/utils/socialMediaTracking";
+import { lovable } from "@/integrations/lovable";
 
 import { checkPasswordBreach } from "@/utils/passwordBreachCheck";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
@@ -136,6 +137,7 @@ export default function Auth() {
   });
   const [rememberMe, setRememberMe] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [appleLoading, setAppleLoading] = useState(false);
 
   const handleGoogleSignIn = async () => {
     if (isOffline) {
@@ -171,6 +173,44 @@ export default function Auth() {
         variant: "destructive",
       });
       setGoogleLoading(false);
+    }
+  };
+
+  const handleAppleSignIn = async () => {
+    if (isOffline) {
+      toast({
+        title: "No Internet Connection",
+        description: "Please connect to the internet to sign in with Apple.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setAppleLoading(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth("apple", {
+        redirect_uri: `${window.location.origin}/`,
+      });
+
+      if (result.redirected) {
+        return;
+      }
+
+      if (result.error) {
+        toast({
+          title: "Error",
+          description: result.error.message || "Failed to sign in with Apple",
+          variant: "destructive",
+        });
+        setAppleLoading(false);
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error?.message || "Failed to sign in with Apple",
+        variant: "destructive",
+      });
+      setAppleLoading(false);
     }
   };
 
@@ -432,6 +472,24 @@ export default function Auth() {
               </svg>
             )}
             {googleLoading ? "Signing in..." : "Continue with Google"}
+          </Button>
+
+          {/* Apple Sign In Button — required by Apple Guideline 4.8 when other social logins are offered */}
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full mb-4 flex items-center justify-center gap-2"
+            onClick={handleAppleSignIn}
+            disabled={appleLoading || googleLoading || loading}
+          >
+            {appleLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M16.365 1.43c0 1.14-.43 2.21-1.27 3.06-.83.85-2.18 1.5-3.31 1.41-.13-1.1.43-2.27 1.21-3.04.84-.84 2.27-1.45 3.37-1.43zM20.5 17.34c-.55 1.27-.81 1.84-1.52 2.96-.99 1.56-2.39 3.51-4.12 3.52-1.54.02-1.94-.99-4.03-.97-2.09.01-2.53.99-4.07.97-1.73-.02-3.06-1.78-4.05-3.34C-.07 16.07-.36 10.96 1.93 8.27 3.55 6.36 6.13 5.25 8.55 5.25c2.46 0 4.01 1.34 6.04 1.34 1.97 0 3.17-1.34 6.02-1.34 2.16 0 4.45 1.18 6.07 3.21-5.34 2.93-4.47 10.55-1.18 8.88h-5z"/>
+              </svg>
+            )}
+            {appleLoading ? "Signing in..." : "Continue with Apple"}
           </Button>
 
           <div className="relative mb-4">
