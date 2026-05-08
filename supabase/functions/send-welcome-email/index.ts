@@ -221,10 +221,9 @@ serve(async (req) => {
                     <td style="padding: 20px;">
                       <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 24px rgba(15,23,42,0.08);">
                         <tr>
-                          <td style="background: linear-gradient(135deg, #0F172A 0%, #1e3a8a 50%, #29B6D2 100%); padding: 40px 32px; text-align: center;">
-                            <div style="font-size: 42px; line-height: 1; margin-bottom: 12px;">🧠💪</div>
-                            <h1 style="color: #ffffff; margin: 0 0 8px 0; font-size: 30px; letter-spacing: -0.5px;">Welcome to SmartyGym</h1>
-                            <p style="color: #29B6D2; margin: 0; font-size: 14px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase;">100% Human · 0% AI</p>
+                          <td style="background: linear-gradient(135deg, #0F172A 0%, #1e3a8a 50%, #29B6D2 100%); padding: 36px 32px; text-align: center;">
+                            <img src="https://smartygym.com/smarty-gym-logo.png" alt="SmartyGym" width="160" style="display:block; margin: 0 auto 14px auto; max-width:160px; height:auto;" />
+                            <p style="color: #29B6D2; margin: 0; font-size: 13px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase;">100% Human · 0% AI</p>
                           </td>
                         </tr>
                         <tr>
@@ -380,7 +379,7 @@ serve(async (req) => {
                         <tr>
                           <td style="padding: 18px 32px 32px 32px; text-align:center;">
                             <p style="font-size: 15px; line-height: 1.6; color: #475569; margin: 0 0 8px 0;">💡 <strong>Quick tip:</strong> start with today's Workout of the Day and let the ritual build itself.</p>
-                            <p style="font-size: 15px; color: #0F172A; margin: 18px 0 0 0; font-weight: bold;">Train smart. Age strong.</p>
+                            <p style="font-size: 16px; color: #0F172A; margin: 18px 0 0 0; font-weight: bold;">Gym Reimagined. Anywhere. Anytime.</p>
                             <p style="font-size: 14px; color: #64748B; margin: 4px 0 0 0;">— Coach Haris Falas & the SmartyGym team</p>
                           </td>
                         </tr>
