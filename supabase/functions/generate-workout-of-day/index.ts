@@ -587,6 +587,8 @@ async function runWodGeneration(params: {
       };
       
       if (fmt === "FOR TIME") return "Various";
+      // REPS & SETS time depends on how many sets/reps the user performs → Various.
+      if (fmt === "REPS & SETS") return "Various";
       
       const [minDuration, midDuration, maxDuration] = baseDurations[fmt] || [20, 30, 45];
       
