@@ -379,7 +379,7 @@ serve(async (req) => {
                         <tr>
                           <td style="padding: 18px 32px 32px 32px; text-align:center;">
                             <p style="font-size: 15px; line-height: 1.6; color: #475569; margin: 0 0 8px 0;">💡 <strong>Quick tip:</strong> start with today's Workout of the Day and let the ritual build itself.</p>
-                            <p style="font-size: 16px; color: #0F172A; margin: 18px 0 0 0; font-weight: bold;">Gym Reimagined. Anywhere. Anytime.</p>
+                            <p style="font-size: 16px; color: #0F172A; margin: 18px 0 0 0; font-weight: bold;">Your Gym Re-imagined. Anywhere, Anytime.</p>
                             <p style="font-size: 14px; color: #64748B; margin: 4px 0 0 0;">— Coach Haris Falas & the SmartyGym team</p>
                           </td>
                         </tr>
