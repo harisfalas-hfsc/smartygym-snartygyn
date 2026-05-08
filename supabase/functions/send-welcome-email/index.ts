@@ -219,34 +219,173 @@ serve(async (req) => {
                 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f5f5f5;">
                   <tr>
                     <td style="padding: 20px;">
-                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="margin: 0 auto; background-color: #ffffff; border-radius: 8px;">
+                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 24px rgba(15,23,42,0.08);">
                         <tr>
-                          <td style="padding: 32px;">
-                            <h1 style="color: #29B6D2; margin-bottom: 20px;">Welcome to SmartyGym! 🎉</h1>
-                            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Hi ${userName},</p>
-                            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">We're thrilled to have you join our community of fitness enthusiasts!</p>
-                            
-                            <div style="background-color: #FEE2E2; border: 2px solid #EF4444; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
-                              <p style="font-size: 16px; font-weight: bold; color: #DC2626; margin: 0 0 8px 0;">⚠️ IMPORTANT: Complete Your Health Assessment</p>
-                              <p style="font-size: 14px; color: #7F1D1D; margin: 0 0 12px 0;">Before starting any workout, please complete the <strong>PAR-Q (Physical Activity Readiness Questionnaire)</strong> to ensure you can exercise safely. This is a <strong>mandatory</strong> health assessment that takes only 2 minutes.</p>
-                              <p style="margin: 0;">
-                                <a href="https://smartygym.com/disclaimer#parq" style="display: inline-block; background: #DC2626; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 14px;">👉 Complete Your PAR-Q Test Now</a>
-                              </p>
+                          <td style="background: linear-gradient(135deg, #0F172A 0%, #1e3a8a 50%, #29B6D2 100%); padding: 40px 32px; text-align: center;">
+                            <div style="font-size: 42px; line-height: 1; margin-bottom: 12px;">🧠💪</div>
+                            <h1 style="color: #ffffff; margin: 0 0 8px 0; font-size: 30px; letter-spacing: -0.5px;">Welcome to SmartyGym</h1>
+                            <p style="color: #29B6D2; margin: 0; font-size: 14px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase;">100% Human · 0% AI</p>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="padding: 36px 32px 16px 32px;">
+                            <p style="font-size: 17px; line-height: 1.6; margin: 0 0 12px 0; color: #0F172A;">Hi ${userName} 👋</p>
+                            <p style="font-size: 16px; line-height: 1.7; margin: 0 0 14px 0; color: #334155;">You just joined a community built around one belief: <strong>aging is not optional — how you age is</strong>.</p>
+                            <p style="font-size: 16px; line-height: 1.7; margin: 0 0 8px 0; color: #334155;">Every workout, program and tool here is designed by <strong>Coach Haris Falas</strong> — no algorithms guessing your training. Just real coaching, refined over decades.</p>
+                          </td>
+                        </tr>
+
+                        <tr>
+                          <td style="padding: 8px 32px;">
+                            <div style="background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%); border-left: 5px solid #EF4444; border-radius: 10px; padding: 18px 20px; margin-bottom: 8px;">
+                              <p style="font-size: 16px; font-weight: bold; color: #991B1B; margin: 0 0 6px 0;">⚠️ Before your first workout — PAR-Q Health Check</p>
+                              <p style="font-size: 14px; color: #7F1D1D; margin: 0 0 14px 0; line-height: 1.6;">A 2-minute mandatory safety questionnaire. It keeps your training smart and your body safe.</p>
+                              <a href="https://smartygym.com/disclaimer#parq" style="display: inline-block; background: #DC2626; color: #ffffff; padding: 11px 22px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 14px;">🩺 Take the PAR-Q Now</a>
                             </div>
-                            
-                            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 12px;"><strong>Here's what you can explore:</strong></p>
-                            <ul style="font-size: 16px; line-height: 1.8; margin-bottom: 24px; padding-left: 20px;">
-                              <li><strong>Browse 500+ Expert Workouts</strong> – From strength to cardio, we have everything</li>
-                              <li><strong>Follow Structured Training Programs</strong> – Achieve your goals with proven plans</li>
-                              <li><strong>Track Your Progress</strong> – Save favorites, mark completed workouts</li>
-                              <li><strong>Get Daily Workout of the Day</strong> – Fresh workout every morning at 7:00 AM</li>
-                            </ul>
-                            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">Ready to start your fitness journey safely?</p>
-                            <p style="margin-top: 24px;">
-                              <a href="https://smartygym.com/userdashboard" style="display: inline-block; background: #29B6D2; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Go to Your Dashboard</a>
-                            </p>
-                            <p style="font-size: 16px; line-height: 1.6; margin-top: 24px;">Let's make every workout count! 💪</p>
-                            <p style="font-size: 16px; font-weight: bold; margin-top: 20px;">– The SmartyGym Team</p>
+                          </td>
+                        </tr>
+
+                        <tr>
+                          <td style="padding: 24px 32px 8px 32px;">
+                            <h2 style="font-size: 20px; color: #0F172A; margin: 0 0 18px 0; text-align: center;">✨ Your SmartyGym Toolkit</h2>
+
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                              <tr>
+                                <td style="padding: 10px 0;">
+                                  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background:#F8FAFC; border-radius:10px;">
+                                    <tr>
+                                      <td width="56" style="padding:14px 0 14px 16px; vertical-align:top; font-size:26px;">🌅</td>
+                                      <td style="padding:14px 16px;">
+                                        <p style="margin:0 0 3px 0; font-weight:bold; color:#0F172A; font-size:15px;">Daily Smarty Ritual</p>
+                                        <p style="margin:0; color:#475569; font-size:14px; line-height:1.5;">A short, guided start to set the tone of your day.</p>
+                                      </td>
+                                    </tr>
+                                  </table>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td style="padding: 6px 0;">
+                                  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background:#F0F9FF; border-radius:10px;">
+                                    <tr>
+                                      <td width="56" style="padding:14px 0 14px 16px; vertical-align:top; font-size:26px;">🔥</td>
+                                      <td style="padding:14px 16px;">
+                                        <p style="margin:0 0 3px 0; font-weight:bold; color:#0F172A; font-size:15px;">Workout of the Day</p>
+                                        <p style="margin:0; color:#475569; font-size:14px; line-height:1.5;">A fresh, human-designed session published every day.</p>
+                                      </td>
+                                    </tr>
+                                  </table>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td style="padding: 6px 0;">
+                                  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background:#F8FAFC; border-radius:10px;">
+                                    <tr>
+                                      <td width="56" style="padding:14px 0 14px 16px; vertical-align:top; font-size:26px;">🏋️</td>
+                                      <td style="padding:14px 16px;">
+                                        <p style="margin:0 0 3px 0; font-weight:bold; color:#0F172A; font-size:15px;">500+ Workouts</p>
+                                        <p style="margin:0; color:#475569; font-size:14px; line-height:1.5;">Strength, cardio, mobility, Pilates, recovery and more.</p>
+                                      </td>
+                                    </tr>
+                                  </table>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td style="padding: 6px 0;">
+                                  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background:#F0F9FF; border-radius:10px;">
+                                    <tr>
+                                      <td width="56" style="padding:14px 0 14px 16px; vertical-align:top; font-size:26px;">📋</td>
+                                      <td style="padding:14px 16px;">
+                                        <p style="margin:0 0 3px 0; font-weight:bold; color:#0F172A; font-size:15px;">Training Programs</p>
+                                        <p style="margin:0; color:#475569; font-size:14px; line-height:1.5;">Structured plans built on the 84-day periodization cycle.</p>
+                                      </td>
+                                    </tr>
+                                  </table>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td style="padding: 6px 0;">
+                                  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background:#F8FAFC; border-radius:10px;">
+                                    <tr>
+                                      <td width="56" style="padding:14px 0 14px 16px; vertical-align:top; font-size:26px;">📚</td>
+                                      <td style="padding:14px 16px;">
+                                        <p style="margin:0 0 3px 0; font-weight:bold; color:#0F172A; font-size:15px;">Exercise Library</p>
+                                        <p style="margin:0; color:#475569; font-size:14px; line-height:1.5;">Detailed technique, cues and progressions for every move.</p>
+                                      </td>
+                                    </tr>
+                                  </table>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td style="padding: 6px 0;">
+                                  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background:#F0F9FF; border-radius:10px;">
+                                    <tr>
+                                      <td width="56" style="padding:14px 0 14px 16px; vertical-align:top; font-size:26px;">🧮</td>
+                                      <td style="padding:14px 16px;">
+                                        <p style="margin:0 0 3px 0; font-weight:bold; color:#0F172A; font-size:15px;">Smart Tools</p>
+                                        <p style="margin:0; color:#475569; font-size:14px; line-height:1.5;">Macro calculator, calorie counter, timer and more.</p>
+                                      </td>
+                                    </tr>
+                                  </table>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td style="padding: 6px 0;">
+                                  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background:#F8FAFC; border-radius:10px;">
+                                    <tr>
+                                      <td width="56" style="padding:14px 0 14px 16px; vertical-align:top; font-size:26px;">🎯</td>
+                                      <td style="padding:14px 16px;">
+                                        <p style="margin:0 0 3px 0; font-weight:bold; color:#0F172A; font-size:15px;">Logbook & Goals</p>
+                                        <p style="margin:0; color:#475569; font-size:14px; line-height:1.5;">Track progress, hit milestones, build streaks.</p>
+                                      </td>
+                                    </tr>
+                                  </table>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td style="padding: 6px 0;">
+                                  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background:#F0F9FF; border-radius:10px;">
+                                    <tr>
+                                      <td width="56" style="padding:14px 0 14px 16px; vertical-align:top; font-size:26px;">📝</td>
+                                      <td style="padding:14px 16px;">
+                                        <p style="margin:0 0 3px 0; font-weight:bold; color:#0F172A; font-size:15px;">Blog & Knowledge</p>
+                                        <p style="margin:0; color:#475569; font-size:14px; line-height:1.5;">Science-backed articles on strength, nutrition and longevity.</p>
+                                      </td>
+                                    </tr>
+                                  </table>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td style="padding: 6px 0;">
+                                  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background:#F8FAFC; border-radius:10px;">
+                                    <tr>
+                                      <td width="56" style="padding:14px 0 14px 16px; vertical-align:top; font-size:26px;">🤝</td>
+                                      <td style="padding:14px 16px;">
+                                        <p style="margin:0 0 3px 0; font-weight:bold; color:#0F172A; font-size:15px;">Community</p>
+                                        <p style="margin:0; color:#475569; font-size:14px; line-height:1.5;">Train together, share wins, stay accountable.</p>
+                                      </td>
+                                    </tr>
+                                  </table>
+                                </td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+
+                        <tr>
+                          <td style="padding: 28px 32px 8px 32px; text-align:center;">
+                            <a href="https://smartygym.com/userdashboard" style="display: inline-block; background: linear-gradient(135deg, #29B6D2 0%, #1e88e5 100%); color: #ffffff; padding: 15px 34px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 14px rgba(41,182,210,0.35);">🚀 Open Your Dashboard</a>
+                          </td>
+                        </tr>
+
+                        <tr>
+                          <td style="padding: 18px 32px 32px 32px; text-align:center;">
+                            <p style="font-size: 15px; line-height: 1.6; color: #475569; margin: 0 0 8px 0;">💡 <strong>Quick tip:</strong> start with today's Workout of the Day and let the ritual build itself.</p>
+                            <p style="font-size: 15px; color: #0F172A; margin: 18px 0 0 0; font-weight: bold;">Train smart. Age strong.</p>
+                            <p style="font-size: 14px; color: #64748B; margin: 4px 0 0 0;">— Coach Haris Falas & the SmartyGym team</p>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="padding: 0 32px 32px 32px;">
                             ${footer}
                           </td>
                         </tr>
