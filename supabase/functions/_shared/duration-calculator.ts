@@ -70,7 +70,9 @@ export function sectionMinutes(html: string, format: string | null | undefined):
   if (f.includes("TABATA")) return countTabataBlocks(html) * 4;
   if (f.includes("EMOM"))   return calcEmomMinutes(html);
   if (f.includes("AMRAP") || f.includes("FOR TIME")) return calcCappedMinutes(html);
-  // REPS & SETS / CIRCUIT / MIX fallback
+  // REPS & SETS = Various by policy (depends on user's pace/load). Caller treats 0 as unknown.
+  if (f.includes("REPS") && f.includes("SETS")) return 0;
+  // CIRCUIT / MIX fallback estimate
   return estimateRepsSetsMinutes(html);
 }
 
