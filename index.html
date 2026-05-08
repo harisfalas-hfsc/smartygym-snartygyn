@@ -11,7 +11,23 @@
     </script>
     
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+    <meta name="viewport" id="viewport-meta" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <script>
+      (function() {
+        var meta = document.getElementById('viewport-meta');
+        if (!meta) return;
+        var MOBILE_BREAKPOINT = 1024;
+        function updateViewport() {
+          if (window.innerWidth >= MOBILE_BREAKPOINT) {
+            meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes');
+          } else {
+            meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+          }
+        }
+        updateViewport();
+        window.addEventListener('resize', updateViewport);
+      })();
+    </script>
     
     <!-- PWA & Mobile Meta Tags -->
     <meta name="mobile-web-app-capable" content="yes" />
