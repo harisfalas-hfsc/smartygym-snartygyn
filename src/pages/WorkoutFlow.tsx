@@ -58,12 +58,12 @@ const WorkoutFlow = () => {
 
   const totalWorkoutCount = Object.values(workoutCounts).reduce((sum, c) => sum + c, 0);
 
-  // Rotate WOD images every 3.5 seconds
+  // Rotate WOD images every 2.5 seconds
   useEffect(() => {
     if (wodImages.length <= 1) return;
     const interval = setInterval(() => {
       setCurrentWodImageIndex(prev => (prev + 1) % wodImages.length);
-    }, 3500);
+    }, 2500);
     return () => clearInterval(interval);
   }, [wodImages.length]);
 
@@ -432,7 +432,18 @@ const WorkoutFlow = () => {
                       >
                         {/* Image section */}
                         <div className="relative h-[55%] overflow-hidden">
-                          {mobileImage && (
+                          {isWodCard && wodImages.length > 0 ? (
+                            wodImages.map((imageUrl, index) => (
+                              <img
+                                key={index}
+                                src={imageUrl}
+                                alt=""
+                                loading="lazy"
+                                className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out"
+                                style={{ opacity: currentWodImageIndex === index ? 1 : 0 }}
+                              />
+                            ))
+                          ) : mobileImage && (
                             <img 
                               src={mobileImage} 
                               alt={workout.title}
