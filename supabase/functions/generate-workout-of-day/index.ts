@@ -2926,6 +2926,10 @@ Return JSON with these exact fields:
         id: workoutId,
         name: workoutContent.name,
         equipment: equipment,
+        description: normalizedDescription,
+        instructions: finalInstructions,
+        tips: normalizedTips,
+        main_workout: cleanedMainWorkout,
         image_url: imageUrl
       });
 
@@ -3000,7 +3004,14 @@ Return JSON with these exact fields:
           equipment: w.equipment,
           reason: cleaned.reason,
         });
-        await supabase.from("admin_workouts").update({ name: newName }).eq("id", w.id);
+        syncWorkoutNameReferences(w, w.name, newName);
+        await supabase.from("admin_workouts").update({
+          name: newName,
+          description: w.description,
+          instructions: w.instructions,
+          tips: w.tips,
+          main_workout: w.main_workout,
+        }).eq("id", w.id);
         w.name = newName;
         
         // Also sync Stripe product name
