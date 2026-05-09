@@ -15,7 +15,8 @@ export interface ProtocolIssue {
     | "stray_after_token"
     | "emom_orphan_exercise"
     | "emom_minute_gap"
-    | "naked_exercise_prescription";
+    | "naked_exercise_prescription"
+    | "mixed_rep_time_prescription";
   detail: string;
   snippet?: string;
 }
@@ -206,6 +207,26 @@ function detectNakedExercisePrescriptions(html: string, flagged: ProtocolIssue[]
   }
 }
 
+function detectMixedRepTimePrescriptions(html: string, flagged: ProtocolIssue[]) {
+  for (const item of getMainAndFinisherItems(html)) {
+    const tokenIndex = item.text.search(/\{\{exercise:[^}]+\}\}/i);
+    if (tokenIndex < 0) continue;
+
+    const before = item.text.slice(0, tokenIndex).trim();
+    const after = item.text.slice(tokenIndex).trim();
+    const bareNumberOnly = /^\d+(?:\s*-\s*\d+)?$/.test(before);
+    const timedHoldAfterToken = /\b(?:hold|hold\s+for|hold\s+each|for)\s+\d+\s*(?:sec|seconds?|s\b|min|minutes?)\b/i.test(after);
+
+    if (bareNumberOnly && timedHoldAfterToken) {
+      flagged.push({
+        type: "mixed_rep_time_prescription",
+        detail: `${item.section}: bare reps before a timed hold creates an impossible mixed prescription`,
+        snippet: item.text.slice(0, 180),
+      });
+    }
+  }
+}
+
 export function sanitizeProtocolBlocks(input: string | null | undefined): ProtocolSanitizeResult {
   const original = input || "";
   const issues: ProtocolIssue[] = [];
@@ -230,6 +251,7 @@ export function sanitizeProtocolBlocks(input: string | null | undefined): Protoc
   cleaned = cleanStrayAfterToken(cleaned, issues, fixes, flagged);
   detectEmomOrphans(cleaned, flagged);
   detectNakedExercisePrescriptions(cleaned, flagged);
+  detectMixedRepTimePrescriptions(cleaned, flagged);
 
   return {
     cleaned,
@@ -259,8 +281,9 @@ export function validateProtocolBlocks(html: string): string[] {
 
   const nakedItems: ProtocolIssue[] = [];
   detectNakedExercisePrescriptions(html, nakedItems);
+  detectMixedRepTimePrescriptions(html, nakedItems);
   for (const item of nakedItems) {
-    issues.push(`Naked exercise prescription: ${item.detail}${item.snippet ? ` [${item.snippet}]` : ""}`);
+    issues.push(`Invalid exercise prescription: ${item.detail}${item.snippet ? ` [${item.snippet}]` : ""}`);
   }
 
   // EMOM orphan check (blocking)
