@@ -51,6 +51,23 @@ function logStep(step: string, details?: any) {
   console.log(`[GENERATE-WOD] ${step}${detailsStr}`);
 }
 
+function syncWorkoutNameReferences(
+  workoutContent: { description?: string; instructions?: string; tips?: string; main_workout?: string },
+  oldName: string,
+  newName: string,
+) {
+  const from = oldName.trim();
+  const to = newName.trim();
+  if (!from || !to || from.toLowerCase() === to.toLowerCase()) return;
+
+  for (const field of ["description", "instructions", "tips", "main_workout"] as const) {
+    const value = workoutContent[field];
+    if (typeof value === "string" && value.includes(from)) {
+      workoutContent[field] = value.replaceAll(from, to);
+    }
+  }
+}
+
 // hasInternalNameCode + hasAiStyleName moved to ../_shared/wod/naming.ts
 
 async function archiveStripeProductSafely(stripe: Stripe, productId: string | null, reason: string) {
@@ -2329,6 +2346,7 @@ Return JSON with these exact fields:
             collidedWith: nameExistsInDb ? 'database' : nameMatchesFirstWorkout ? 'first workout today' : hasAiStyleName(nameToCheck) ? 'AI-style wording' : 'internal code'
           });
           workoutContent.name = cleaned.name;
+          syncWorkoutNameReferences(workoutContent, nameToCheck, cleaned.name);
         }
         
         // Add the new name to our tracking list to prevent same-session collisions
@@ -2908,6 +2926,10 @@ Return JSON with these exact fields:
         id: workoutId,
         name: workoutContent.name,
         equipment: equipment,
+        description: normalizedDescription,
+        instructions: finalInstructions,
+        tips: normalizedTips,
+        main_workout: cleanedMainWorkout,
         image_url: imageUrl
       });
 
@@ -2982,7 +3004,14 @@ Return JSON with these exact fields:
           equipment: w.equipment,
           reason: cleaned.reason,
         });
-        await supabase.from("admin_workouts").update({ name: newName }).eq("id", w.id);
+        syncWorkoutNameReferences(w, w.name, newName);
+        await supabase.from("admin_workouts").update({
+          name: newName,
+          description: w.description,
+          instructions: w.instructions,
+          tips: w.tips,
+          main_workout: w.main_workout,
+        }).eq("id", w.id);
         w.name = newName;
         
         // Also sync Stripe product name
