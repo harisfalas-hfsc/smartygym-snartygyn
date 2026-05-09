@@ -2019,10 +2019,13 @@ STRUCTURAL RULES — VIOLATING ANY OF THESE TRIGGERS REGENERATION (MANDATORY):
    Modifiers (reps, sides, weight, intervals) must come BEFORE the token, not after.
    - WRONG: "{{exercise:0725:single arm push-up}}20 sec interval)"
    - RIGHT: "20 sec {{exercise:0725:single arm push-up}}"
-3. EVERY exercise in Main Workout and Finisher must have a measurable prescription BEFORE the exercise token.
+3. EVERY exercise in Main Workout and Finisher must have ONE clear measurable prescription BEFORE the exercise token.
    No naked exercises. No "run" without distance/time. No exercise token alone and no vague "fast pace" without dose.
+   NEVER combine a bare rep number before a timed hold after the token; isometric holds are time-based, not rep-based.
    - WRONG: "{{exercise:0685:run}} (equipment) on treadmill (fast pace)"
+   - WRONG: "15 {{exercise:forearm-plank:Forearm Plank}} (hold for 30 seconds)"
    - RIGHT: "400m {{exercise:0685:run}} on treadmill (fast pace)" or "60 sec {{exercise:0685:run}} on treadmill (fast pace)"
+   - RIGHT: "30 sec {{exercise:forearm-plank:Forearm Plank}}" or "3 sets x 30 sec {{exercise:forearm-plank:Forearm Plank}}"
    Accepted prescriptions: reps, seconds, minutes, meters, km, miles, calories, rounds, sets x reps, or a clear bare number for reps.
 4. EMOM blocks must label EVERY minute from 1 to N in order. No bullet may exist after the last labelled minute.
    If a pattern repeats, write the pattern once (Minute 1 through Minute N) and then add a separate paragraph
