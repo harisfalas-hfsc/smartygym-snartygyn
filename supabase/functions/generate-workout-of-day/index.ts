@@ -51,6 +51,23 @@ function logStep(step: string, details?: any) {
   console.log(`[GENERATE-WOD] ${step}${detailsStr}`);
 }
 
+function syncWorkoutNameReferences(
+  workoutContent: { description?: string; instructions?: string; tips?: string; main_workout?: string },
+  oldName: string,
+  newName: string,
+) {
+  const from = oldName.trim();
+  const to = newName.trim();
+  if (!from || !to || from.toLowerCase() === to.toLowerCase()) return;
+
+  for (const field of ["description", "instructions", "tips", "main_workout"] as const) {
+    const value = workoutContent[field];
+    if (typeof value === "string" && value.includes(from)) {
+      workoutContent[field] = value.replaceAll(from, to);
+    }
+  }
+}
+
 // hasInternalNameCode + hasAiStyleName moved to ../_shared/wod/naming.ts
 
 async function archiveStripeProductSafely(stripe: Stripe, productId: string | null, reason: string) {
