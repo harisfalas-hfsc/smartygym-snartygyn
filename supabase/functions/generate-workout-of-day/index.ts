@@ -2346,6 +2346,7 @@ Return JSON with these exact fields:
             collidedWith: nameExistsInDb ? 'database' : nameMatchesFirstWorkout ? 'first workout today' : hasAiStyleName(nameToCheck) ? 'AI-style wording' : 'internal code'
           });
           workoutContent.name = cleaned.name;
+          syncWorkoutNameReferences(workoutContent, nameToCheck, cleaned.name);
         }
         
         // Add the new name to our tracking list to prevent same-session collisions
