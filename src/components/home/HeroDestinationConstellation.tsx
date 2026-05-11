@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   CalendarCheck,
   Dumbbell,
@@ -390,6 +390,35 @@ export const HeroDestinationConstellation = () => {
   const featured = DESTINATIONS.find((d) => d.featured)!;
   const others = DESTINATIONS.filter((d) => !d.featured);
 
+  // ============ DESKTOP RESPONSIVE SCALING ============
+  // The desktop stage is a fixed 1300x650 absolutely-positioned canvas.
+  // On viewports narrower than 1300px (e.g. phone in landscape with
+  // "Desktop site" forced) we uniformly scale it down to fit.
+  const desktopWrapperRef = useRef<HTMLDivElement | null>(null);
+  const [desktopScale, setDesktopScale] = useState(1);
+  useEffect(() => {
+    const el = desktopWrapperRef.current;
+    if (!el) return;
+    const measure = () => {
+      const w = el.clientWidth;
+      if (!w) return;
+      setDesktopScale(Math.min(1, w / 1300));
+    };
+    measure();
+    let ro: ResizeObserver | undefined;
+    if (typeof ResizeObserver !== "undefined") {
+      ro = new ResizeObserver(measure);
+      ro.observe(el);
+    }
+    window.addEventListener("resize", measure);
+    window.addEventListener("orientationchange", measure);
+    return () => {
+      ro?.disconnect();
+      window.removeEventListener("resize", measure);
+      window.removeEventListener("orientationchange", measure);
+    };
+  }, []);
+
   // ============ TABLET CIRCULAR LAYOUT ============
   const tabletStage = 720;
   const tabletRadius = 260;
@@ -513,9 +542,24 @@ export const HeroDestinationConstellation = () => {
       {/* ============ DESKTOP ============ */}
       <div className="hidden md:block">
         <div
+          ref={desktopWrapperRef}
           className="relative mx-auto"
-          style={{ width: "100%", maxWidth: "1300px", height: "650px" }}
+          style={{
+            width: "100%",
+            maxWidth: "1300px",
+            height: `${650 * desktopScale}px`,
+            overflow: "hidden",
+          }}
         >
+          <div
+            style={{
+              width: "1300px",
+              height: "650px",
+              transform: `scale(${desktopScale})`,
+              transformOrigin: "top left",
+              position: "relative",
+            }}
+          >
           {/* Decorative connection SVG */}
           <svg
             className="absolute inset-0 w-full h-full pointer-events-none"
@@ -576,6 +620,7 @@ export const HeroDestinationConstellation = () => {
               left: `${COACH.desktop.left}px`,
             }}
           />
+          </div>
         </div>
       </div>
 
