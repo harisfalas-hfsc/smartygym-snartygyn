@@ -1,94 +1,37 @@
-## Goal
-Make SmartyGym pass Apple App Store and Google Play automated review for the Capacitor builds, without breaking the web experience.
+## Why the page is cut off
 
-## Direct answers to your questions
+On the homepage, the "constellation" of circles uses a **fixed-size desktop stage of 1300×650 pixels** with each bubble placed at hard-coded pixel coordinates (e.g. one bubble starts at `left: 1130px`, size `170px` = right edge at 1300px).
 
-**1. Is Sign in with Apple a must?**  
-Yes — for **iOS only**, and only because you already offer Google sign-in. Apple Guideline 4.8 says: if your iOS app uses any third-party social login (Google, Facebook, etc.), you **must also offer Sign in with Apple**. Skipping it = guaranteed iOS rejection.  
-Google Play does **not** require it. So it only matters for the App Store submission.
+The outer container is `max-width: 1300px` but inside, nothing scales — bubbles are positioned in absolute pixels. So whenever the viewport is narrower than 1300 px (which is exactly what happens on a phone in landscape, even with "Desktop site" enabled in Chrome — typical width 800–900 px), the right-side bubbles (Workouts, Library, Community) sit outside the visible area and you cannot scroll horizontally to reach them.
 
-**2. Will hiding Stripe buttons in the iOS shell break the website?**  
-No. The change is gated by a runtime check (`Capacitor.isNativePlatform() && platform === 'ios'`). Web, Android APK, and PWA users see Stripe exactly as today. Only the iOS native app hides them.
+The mobile/tablet layouts already adapt correctly. The problem is only the desktop layout viewed on a small screen.
 
-**3. Will the privacy page break anything?**  
-No — it's a new public route `/privacy`. Existing `/disclaimer` stays.
+## Fix
 
-**4. Are these 3 items enough to pass review?**  
-These are the **three blockers**. There are also smaller fixes that, if skipped, will trigger warnings or rejections. I've grouped everything into Phase 1 (must-do for submission) and Phase 2 (do before/right after first review).
+Make the desktop constellation **uniformly shrink** to fit the available width, instead of being clipped.
 
----
+### Change in `src/components/home/HeroDestinationConstellation.tsx` (desktop branch only)
 
-## Phase 1 — Required for submission (this plan)
+1. Measure the container width with a `ref` + `ResizeObserver`.
+2. Compute `scale = min(1, containerWidth / 1300)`.
+3. Wrap the existing 1300×650 absolutely-positioned stage in an outer wrapper:
+   - Outer wrapper height = `650 * scale` (so layout below the constellation stays correct).
+   - Inner stage keeps its fixed `1300 × 650` size and absolute coordinates, but gets `transform: scale(var(--scale)); transform-origin: top left;`.
+4. Nothing else changes — bubble sizes, positions, popovers, connection SVG all scale together as one piece.
 
-### A. Sign in with Apple
-- Use Lovable Cloud's managed Apple provider (no Apple Developer credentials needed from you up front — you can switch to your own later).
-- On the `Auth.tsx` page, add a "Continue with Apple" button **next to** the existing Google button. Identical UX and styling.
-- Use `lovable.auth.signInWithOAuth("apple", { redirect_uri: window.location.origin })`.
-- Show the Apple button on **all platforms** (Apple requires it visible on iOS; harmless elsewhere — many apps do the same).
+This keeps the design pixel-perfect on full desktop (≥1300 px) and gracefully shrinks it on:
+- phone in landscape with "Desktop site" forced (~800–900 px),
+- small laptops / split-screen windows,
+- the `/` route in any narrow desktop viewport.
 
-### B. Hide Stripe purchase UI in iOS Capacitor shell
-- Add a tiny helper `src/utils/platform.ts`:
-  ```ts
-  export const isIOSNative = () =>
-    Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios';
-  ```
-- Wrap purchase CTAs with `{!isIOSNative() && <PurchaseButton .../>}` in:
-  - `src/components/PurchaseButton.tsx` (return null if iOS native)
-  - `src/components/shop/ProductCard.tsx` (hide buy button)
-  - `src/pages/JoinPremium.tsx`, `src/pages/SmartyPlans.tsx` (hide checkout CTAs)
-  - `src/components/AccessGate.tsx` (replace "Upgrade to access" with a softer "Available on the web version" message on iOS)
-- Web, Android, and PWA: zero changes. Existing Stripe flow untouched.
-- This satisfies Apple Guideline 3.1.1 (no external payment links for digital goods on iOS).
+### Out of scope
 
-### C. Dedicated `/privacy` page
-- New route `src/pages/PrivacyPolicy.tsx` linked in router and footer.
-- Store-listing-grade content:
-  - Data collected: email, auth tokens, push tokens, payment metadata (via Stripe), workout activity, usage analytics (Google Analytics), USDA food queries.
-  - Purposes: account, content delivery, billing, analytics.
-  - Third parties: Lovable Cloud (Supabase), Stripe, Resend, Google Analytics, USDA FoodData Central.
-  - User rights: access, export, deletion (point to Account → Delete Account).
-  - Children: not for under 13 / 16.
-  - Contact: smartygym@outlook.com.
-  - Last-updated date.
-- Public route, indexable. Must match the URL you submit to the stores.
+- No changes to mobile portrait layout.
+- No changes to the tablet circular layout.
+- No changes to colors, copy, bubble sizes on real desktop, or any other page.
 
-### Conflicts / risks
-- **None for the website or Android APK.** All three changes are additive or runtime-gated.
-- **iOS revenue impact:** while Stripe is hidden inside the iOS app, iOS users can still subscribe via the web at smartygym.com and their account works in the app. This is the standard "reader app" pattern (Netflix, Spotify, Kindle).
-- Apple Sign In requires the iOS app to be built with the Sign in with Apple capability enabled in Xcode — your developer must check that box when packaging the IPA. I'll add a one-line note in the deliverable.
+### Technical notes
 
----
-
-## Phase 2 — Strongly recommended before submission (separate plan, ask me)
-
-These are not part of this plan's code changes, but you should fix them or your APK/IPA will be flagged:
-
-1. **`public/.well-known/assetlinks.json`** — replace `REPLACE_WITH_YOUR_SIGNING_KEY_SHA256_FINGERPRINT` with the SHA-256 from your release keystore (your Android developer has it).
-2. **`public/.well-known/apple-app-site-association`** — replace `TEAM_ID` with your real Apple Developer Team ID.
-3. **Android app icons** — `public/app-icons/android/mipmap-*/` are empty. Your developer must place real icons in `android/app/src/main/res/mipmap-*` inside the native project (not in `public/`).
-4. **iOS `Info.plist`** — your developer must add usage strings for any permission used (push notifications, etc.).
-5. **Splash background color** — `capacitor.config.ts` uses `#0F0F0F`; change to brand `#0F172A`. Cosmetic.
-
-I will handle 5 in code if you want; 1–4 are native/config tasks for your developer.
-
----
-
-## What I will NOT change
-- Existing Google sign-in flow.
-- Web Stripe checkout (unchanged on web/Android).
-- Existing `/disclaimer` page (kept; `/privacy` is a separate, store-formatted page).
-- Any backend/database logic.
-
-## Files affected
-- `src/pages/Auth.tsx` — add Apple button
-- `src/utils/platform.ts` — new helper
-- `src/components/PurchaseButton.tsx`
-- `src/components/shop/ProductCard.tsx`
-- `src/components/AccessGate.tsx`
-- `src/pages/JoinPremium.tsx`
-- `src/pages/SmartyPlans.tsx`
-- `src/pages/PrivacyPolicy.tsx` — new
-- `src/App.tsx` — register `/privacy` route
-- `src/components/Footer.tsx` — add Privacy link
-
-After approval I will also call the social-auth tool to enable Apple in Lovable Cloud.
+- Use a single `useState` for measured width and a `ResizeObserver` on the wrapper element (fall back to `window.resize` if RO is unavailable).
+- Apply scale via inline style on the inner `<div>` that currently has `width: 100%; maxWidth: 1300px; height: 650px`. That div becomes `width: 1300px; height: 650px; transform: scale(...); transform-origin: top left;` and is wrapped by a new outer div with `width: 100%; height: ${650*scale}px; overflow: hidden`.
+- Guard against SSR / first paint by defaulting scale to `1` until the first measurement.
