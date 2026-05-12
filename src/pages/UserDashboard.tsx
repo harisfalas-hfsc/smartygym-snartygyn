@@ -1209,7 +1209,7 @@ export default function UserDashboard() {
 
             {/* Workouts Section */}
             {activeTab === "workouts" && <div className="space-y-6">
-            {!isPremium ? <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
+            {!canAccessWorkoutsTab ? <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
                 <CardContent className="text-center py-12">
                   <Crown className="h-12 w-12 text-primary mx-auto mb-4" />
                   <h3 className="text-xl font-bold mb-2">Premium Feature</h3>
@@ -1221,6 +1221,16 @@ export default function UserDashboard() {
                   </Button>
                 </CardContent>
               </Card> : <>
+                {!isPremium && <Card className="border-primary/30 bg-primary/5">
+                  <CardContent className="py-3 px-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                    <p className="text-sm text-muted-foreground">
+                      Showing activity for your <strong>{purchasedWorkoutIds.size}</strong> purchased workout{purchasedWorkoutIds.size === 1 ? '' : 's'}. Upgrade to Premium to track every workout.
+                    </p>
+                    <Button size="sm" variant="outline" onClick={() => navigate("/premiumbenefits")}>
+                      <Crown className="h-3 w-3 mr-1" /> Upgrade
+                    </Button>
+                  </CardContent>
+                </Card>}
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
               <Card>
                 <CardHeader className="pb-3">
