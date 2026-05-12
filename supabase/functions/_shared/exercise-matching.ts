@@ -582,6 +582,11 @@ export function processContentWithExerciseMatching(
   let processedContent = content;
   
   for (const exerciseName of extractedNames) {
+    if (isBreathingCueFragment(exerciseName)) {
+      unmatched.push(exerciseName);
+      console.log(`${logPrefix} ⏭️ SKIPPED breathing cue fragment: "${exerciseName}"`);
+      continue;
+    }
     // Use force-matching: 0.65 first, then 0.45
     const forceResult = forceMatchExercise(exerciseName, exerciseLibrary, logPrefix);
     
