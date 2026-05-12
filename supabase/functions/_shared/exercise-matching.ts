@@ -12,6 +12,45 @@ export interface ExerciseBasic {
   difficulty?: string | null;
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// HOME-BODYWEIGHT GUARDRAIL
+// Some exercises are tagged equipment="body weight" but still require apparatus
+// (bench, pull-up bar, dip station, GHD/glute-ham bench, parallel bars, box,
+// captain's chair, gymnastic rings, etc.). For BODYWEIGHT WODs (no-equipment,
+// home/hotel/travel) those must be excluded from the prompt and rejected post
+// generation. Match by exercise NAME so we never need to touch the data.
+// ─────────────────────────────────────────────────────────────────────────────
+const HOME_BODYWEIGHT_FORBIDDEN_PATTERNS: RegExp[] = [
+  /\bbench\b/i,
+  /\(bench/i,
+  /\bdip(s)?\b/i,
+  /pull-?up/i,
+  /chin-?up/i,
+  /muscle-?up/i,
+  /parallel\s*bars?/i,
+  /\bcage\b/i,
+  /\brings?\b/i,
+  /hyperextension/i,
+  /glute-?ham/i,
+  /captains?\s*chair/i,
+  /\(on\s*box\)/i,
+  /\bbox\s*jump/i,
+  /vertical\s*bar/i,
+  /on\s*(a\s*)?(straight|vertical)\s*bar/i,
+  /pull-?up\s*cable/i,
+];
+
+export function isHomeBodyweightFriendly(exercise: ExerciseBasic): boolean {
+  const equip = (exercise.equipment || '').toLowerCase().trim();
+  if (equip !== 'body weight') return false;
+  const name = (exercise.name || '').toLowerCase();
+  return !HOME_BODYWEIGHT_FORBIDDEN_PATTERNS.some((re) => re.test(name));
+}
+
+export function filterToHomeBodyweight(exercises: ExerciseBasic[]): ExerciseBasic[] {
+  return exercises.filter(isHomeBodyweightFriendly);
+}
+
 export interface MatchResult {
   exercise: ExerciseBasic;
   confidence: number;
