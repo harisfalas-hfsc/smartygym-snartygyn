@@ -442,7 +442,7 @@ export const Navigation = () => {
           {/* CENTER SECTION - Logo */}
           <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 justify-center lg:static lg:top-auto lg:flex-1 lg:translate-x-0 lg:translate-y-0 lg:justify-center">
             <Link
-              to="/home"
+              to="/"
               className="cursor-pointer flex-shrink-0"
             >
               <img

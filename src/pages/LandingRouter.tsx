@@ -160,7 +160,7 @@ const LandingRouter = () => {
             <p className="text-sm text-muted-foreground pt-2">
               Or{" "}
               <Link
-                to="/home"
+                to="/"
                 className="font-medium text-primary underline-offset-4 hover:underline"
               >
                 go to the homepage
