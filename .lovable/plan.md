@@ -1,37 +1,66 @@
-## Why the page is cut off
+# Fix today's broken WOD + close the holes that let it through
 
-On the homepage, the "constellation" of circles uses a **fixed-size desktop stage of 1300×650 pixels** with each bubble placed at hard-coded pixel coordinates (e.g. one bubble starts at `left: 1130px`, size `170px` = right edge at 1300px).
+## Constraint (acknowledged)
+**Do NOT rename any workout.** Names are linked to Stripe `stripe_product_id` / `stripe_price_id` on the same record. Renaming desyncs the Stripe catalog. Only `warm_up`, `main_workout`, `finisher`, `cool_down`, `instructions`, and `duration` will ever be touched.
 
-The outer container is `max-width: 1300px` but inside, nothing scales — bubbles are positioned in absolute pixels. So whenever the viewport is narrower than 1300 px (which is exactly what happens on a phone in landscape, even with "Desktop site" enabled in Chrome — typical width 800–900 px), the right-side bubbles (Workouts, Library, Community) sit outside the visible area and you cannot scroll horizontally to reach them.
+## Part 1 — Fix today's "Cadence Drive Motion" (WOD-CA-B-1778481004025)
 
-The mobile/tablet layouts already adapt correctly. The problem is only the desktop layout viewed on a small screen.
+Rewrite the stored content in place (non-destructive: previous version logged to `workout_repair_log`):
 
-## Fix
+1. **Move Soft Tissue Prep + Activation 15' out of `main_workout` into the `warm_up` column.** `main_workout` keeps only the Main circuit + Finisher.
+2. **Reformat Activation 15'** so Dynamic Mobility, Core Activation, and Movement Prep are each their own labelled bullet list — not loose `<p>` paragraphs.
+3. **Link every exercise consistently** using the existing library:
+   - Bird Dog, Glute Bridge, Jumping Jacks, High Knees, Butt Kicks → use the same library IDs already used in the Main Workout (`jumping-jacks`, `high-knees-cardio`, `3013` for glute bridge, etc.)
+   - Cool Down stretches (hamstring, butterfly, lying quad) → link to library stretch IDs
+4. **Fix the Diaphragmatic Breathing line.** Remove `{{exercise:3679:sit-up with arms on chest}}` — a sit-up is not a breathing drill. Replace with plain coaching text describing the breathing pattern (no fake token).
+5. **Split the glued Soft Tissue line** `Foam roll glutes, {{exercise:1346:kneeling lat stretch}}` into two separate bullets.
+6. **Recalculate `duration`** from actual section math (≈52 min) and overwrite the stored value.
+7. **Name stays exactly as is.** Stripe IDs untouched.
 
-Make the desktop constellation **uniformly shrink** to fit the available width, instead of being clipped.
+## Part 2 — Plug the generator holes so this stops happening
 
-### Change in `src/components/home/HeroDestinationConstellation.tsx` (desktop branch only)
+Add the missing enforcement layers in `supabase/functions/_shared/protocol-sanitizer.ts` and the WOD generator:
 
-1. Measure the container width with a `ref` + `ResizeObserver`.
-2. Compute `scale = min(1, containerWidth / 1300)`.
-3. Wrap the existing 1300×650 absolutely-positioned stage in an outer wrapper:
-   - Outer wrapper height = `650 * scale` (so layout below the constellation stays correct).
-   - Inner stage keeps its fixed `1300 × 650` size and absolute coordinates, but gets `transform: scale(var(--scale)); transform-origin: top left;`.
-4. Nothing else changes — bubble sizes, positions, popovers, connection SVG all scale together as one piece.
+**A. Section-placement validator (new check)**
+- Reject any generation where `warm_up` is empty AND `main_workout` contains 🧽 or 🔥 emojis (warm-up markers in wrong column). Force regeneration or auto-move into `warm_up`.
 
-This keeps the design pixel-perfect on full desktop (≥1300 px) and gracefully shrinks it on:
-- phone in landscape with "Desktop site" forced (~800–900 px),
-- small laptops / split-screen windows,
-- the `/` route in any narrow desktop viewport.
+**B. Activation sub-block formatter**
+- Detect "Dynamic Mobility:", "Core Activation:", "Movement Prep:" labels.
+- Each must live in its own `<ul class="tiptap-bullet-list">` with `<li>` items. Loose `<p>` siblings get auto-wrapped or rejected.
 
-### Out of scope
+**C. Extend bare-exercise detector to Activation + Cool Down**
+- Today's `validateProtocolBlocks` only inspects Main Workout and Finisher.
+- Same check now runs on Activation and Cool Down: any plain-text exercise name that exists in the library must be auto-linked to `{{exercise:ID:Name}}`, or the workout is rejected.
 
-- No changes to mobile portrait layout.
-- No changes to the tablet circular layout.
-- No changes to colors, copy, bubble sizes on real desktop, or any other page.
+**D. Stimulus mismatch guard (new)**
+- If a token sits inside a paragraph mentioning "breathing", "diaphragmatic", "meditation", or "static stretch hold", and the linked exercise's `category` is `strength` / `core` / `cardio` / `plyometric`, reject. Prevents the breathing→sit-up bug.
 
-### Technical notes
+**E. Soft Tissue glued-text rule (already in standard, now enforced in sanitizer)**
+- Comma-separated lines mixing bare text + a token auto-split into two bullets.
 
-- Use a single `useState` for measured width and a `ResizeObserver` on the wrapper element (fall back to `window.resize` if RO is unavailable).
-- Apply scale via inline style on the inner `<div>` that currently has `width: 100%; maxWidth: 1300px; height: 650px`. That div becomes `width: 1300px; height: 650px; transform: scale(...); transform-origin: top left;` and is wrapped by a new outer div with `width: 100%; height: ${650*scale}px; overflow: hidden`.
-- Guard against SSR / first paint by defaulting scale to `1` until the first measurement.
+**F. Duration recompute pass**
+- After all section fixes, recompute `duration` from section math (sum of warm-up minutes + main work+rest + finisher work+rest + cool-down minutes) and overwrite the field. Never trust the model's `duration`.
+
+## Part 3 — Sweep recent WODs for the same defects
+
+Run `repair-workout-content` across the last 30 days of WODs (and any program weeks generated in the same window) using the new validators from Part 2. For every record:
+
+- Log original + fixed content to `workout_repair_log`.
+- Touch only content fields. Never touch `name`, `stripe_product_id`, `stripe_price_id`, `price`, `is_premium`, `is_visible`.
+
+Report back: how many records were inspected, how many had each defect, what was rewritten.
+
+## Order of operations
+
+1. Fix today's WOD (Part 1) and verify in DB + live preview.
+2. Add the four new validators (Part 2 A–D) + recompute pass (F) to the shared sanitizer.
+3. Run the 30-day sweep (Part 3).
+4. Send you a short report with the counts.
+
+## What I need from you before starting
+
+- Confirm: rewrite today's WOD content in place, name untouched.
+- Confirm: add the four new validators + duration recompute to the sanitizer.
+- Confirm: run the 30-day repair sweep with names/Stripe fields locked.
+
+Nothing changes until you say go.

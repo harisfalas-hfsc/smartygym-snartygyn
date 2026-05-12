@@ -16,7 +16,9 @@ export interface ProtocolIssue {
     | "emom_orphan_exercise"
     | "emom_minute_gap"
     | "naked_exercise_prescription"
-    | "mixed_rep_time_prescription";
+    | "mixed_rep_time_prescription"
+    | "stimulus_mismatch"
+    | "bare_exercise_in_warmup_or_cooldown";
   detail: string;
   snippet?: string;
 }
@@ -29,6 +31,37 @@ export interface ProtocolSanitizeResult {
 }
 
 const HEADER_PROTOCOLS = ["TABATA", "EMOM", "AMRAP", "FOR\\s*TIME"];
+
+// Known library exercises that frequently get written as plain text inside
+// Activation (🔥) and Cool Down (🧘) sections. When found as bare words there,
+// they should be linked via {{exercise:…}} tokens. List intentionally short
+// and high-precision to avoid false positives.
+const COMMON_BARE_EXERCISE_NAMES = [
+  "Bird Dog",
+  "Glute Bridge",
+  "Jumping Jacks",
+  "High Knees",
+  "Butt Kicks",
+  "Mountain Climber",
+  "Mountain Climbers",
+  "Hamstring Stretch",
+  "Butterfly",
+  "Lying Quad Stretch",
+  "Lying Quads Stretch",
+  "Cat-Cow Stretch",
+  "Cat Cow",
+  "Air Squats",
+  "Push-Up",
+  "Push-Ups",
+  "Plank",
+  "Forearm Plank",
+];
+
+// Stimulus categories: tokens whose linked exercise category does NOT match the
+// surrounding sentence intent should be rejected. We can't read the exercise
+// library at sanitize time, but we can flag the obvious editorial mismatch:
+// any token sitting inside a paragraph that mentions breathing or meditation.
+const BREATHING_CONTEXT_RE = /\b(diaphragmatic|breathing|breath\s+work|meditation|box\s*breathing|inhale|exhale)\b/i;
 
 /**
  * Strips trailing duration tokens after a protocol keyword inside section headers.
@@ -227,6 +260,83 @@ function detectMixedRepTimePrescriptions(html: string, flagged: ProtocolIssue[])
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// New: Stimulus mismatch — token inside a breathing/meditation paragraph.
+// Blocking: a sit-up token in "Diaphragmatic Breathing" is a coaching error.
+// ─────────────────────────────────────────────────────────────────────────────
+function detectStimulusMismatch(html: string, flagged: ProtocolIssue[]) {
+  // Inspect every <p>…</p> and <li>…</li> independently so a breathing
+  // paragraph in the cool-down can't poison unrelated bullets.
+  const blockPattern = /<(p|li)[^>]*>([\s\S]*?)<\/\1>/gi;
+  let m: RegExpExecArray | null;
+  while ((m = blockPattern.exec(html)) !== null) {
+    const block = m[2] || "";
+    const text = stripTags(block);
+    if (!BREATHING_CONTEXT_RE.test(text)) continue;
+    if (!/\{\{exercise:[^}]+\}\}/i.test(block)) continue;
+    flagged.push({
+      type: "stimulus_mismatch",
+      detail: "Exercise token placed inside a breathing/meditation paragraph",
+      snippet: text.slice(0, 180),
+    });
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// New: Bare common-exercise names inside Activation (🔥) or Cool Down (🧘).
+// These same exercises are usually linked elsewhere in the same workout, so a
+// plain-text mention is almost always a missed link. Non-blocking (flagged).
+// ─────────────────────────────────────────────────────────────────────────────
+function detectBareExerciseInWarmupOrCooldown(html: string, flagged: ProtocolIssue[]) {
+  const sectionPattern = /(🔥|🧘)([\s\S]*?)(?=🧽|🔥|💪|⚡|🧘|$)/g;
+  let m: RegExpExecArray | null;
+  // Skip the first emoji match itself; scan the body
+  while ((m = sectionPattern.exec(html)) !== null) {
+    const body = m[2] || "";
+    // Strip linked tokens so we don't flag the linked Name inside `{{...:Name}}`.
+    const stripped = body.replace(/\{\{exercise:[^}]+\}\}/gi, " ");
+    const text = stripTags(stripped);
+    for (const name of COMMON_BARE_EXERCISE_NAMES) {
+      const re = new RegExp(`\\b${name.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&")}\\b`, "i");
+      if (re.test(text)) {
+        flagged.push({
+          type: "bare_exercise_in_warmup_or_cooldown",
+          detail: `Bare exercise name "${name}" in ${m[1] === "🔥" ? "Activation" : "Cool Down"} — should be a {{exercise:…}} token`,
+          snippet: text.slice(0, 180),
+        });
+      }
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// New: Auto-wrap loose <p> sub-blocks inside Activation (🔥) so labels like
+// "Dynamic Mobility (5 min):", "Core Activation (5 min):", "Movement Prep
+// (5 min):" each become their own <ul> with at least one <li> sibling,
+// matching the gold-standard structure.
+// Conservative: only wraps when a label paragraph is immediately followed by
+// a <p> that contains an exercise token or a numeric prescription.
+// ─────────────────────────────────────────────────────────────────────────────
+function wrapLooseActivationSubBlocks(
+  html: string,
+  fixes: string[],
+): string {
+  const labelRe = /(<p[^>]*>\s*<strong>(?:Dynamic Mobility|Core Activation|Movement Prep|Movement Preparation)[^<]*<\/strong>\s*<\/p>)\s*(<p[^>]*>(?!\s*<strong>)([\s\S]*?)<\/p>)/gi;
+  let changed = false;
+  const out = html.replace(labelRe, (_full, labelP: string, looseP: string, looseBody: string) => {
+    const body = looseBody || "";
+    // Only wrap when the loose paragraph carries an exercise token or a
+    // measurable prescription — otherwise it's coaching text and should stay.
+    if (!/\{\{exercise:[^}]+\}\}/i.test(body) && !/\b\d+\s*(reps?|sec|seconds?|min|minutes?)\b/i.test(body)) {
+      return `${labelP}${looseP}`;
+    }
+    changed = true;
+    return `${labelP}<ul class="tiptap-bullet-list"><li class="tiptap-list-item"><p class="tiptap-paragraph">${body}</p></li></ul>`;
+  });
+  if (changed) fixes.push("Wrapped loose <p> after Activation sub-block label into a bullet list");
+  return out;
+}
+
 export function sanitizeProtocolBlocks(input: string | null | undefined): ProtocolSanitizeResult {
   const original = input || "";
   const issues: ProtocolIssue[] = [];
@@ -249,9 +359,12 @@ export function sanitizeProtocolBlocks(input: string | null | undefined): Protoc
     return `}} ${next}`;
   });
   cleaned = cleanStrayAfterToken(cleaned, issues, fixes, flagged);
+  cleaned = wrapLooseActivationSubBlocks(cleaned, fixes);
   detectEmomOrphans(cleaned, flagged);
   detectNakedExercisePrescriptions(cleaned, flagged);
   detectMixedRepTimePrescriptions(cleaned, flagged);
+  detectStimulusMismatch(cleaned, flagged);
+  detectBareExerciseInWarmupOrCooldown(cleaned, flagged);
 
   return {
     cleaned,
@@ -284,6 +397,13 @@ export function validateProtocolBlocks(html: string): string[] {
   detectMixedRepTimePrescriptions(html, nakedItems);
   for (const item of nakedItems) {
     issues.push(`Invalid exercise prescription: ${item.detail}${item.snippet ? ` [${item.snippet}]` : ""}`);
+  }
+
+  // Blocking: stimulus mismatch (token inside breathing/meditation paragraph)
+  const mismatchItems: ProtocolIssue[] = [];
+  detectStimulusMismatch(html, mismatchItems);
+  for (const item of mismatchItems) {
+    issues.push(`Stimulus mismatch: ${item.detail}${item.snippet ? ` [${item.snippet}]` : ""}`);
   }
 
   // EMOM orphan check (blocking)
