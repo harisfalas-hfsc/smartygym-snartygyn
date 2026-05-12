@@ -250,6 +250,8 @@ function isLikelyExerciseName(text: string): boolean {
   
   if (lower.length < 3 || lower.length > 60) return false;
   if (/^\d+\.?\s*$/.test(text)) return false;
+  if (/\b(diaphragmatic|breathing|breath\s*work|box\s*breathing|inhale|exhale)\b/i.test(lower)) return false;
+  if (/\b(one\s+hand|one\s+on|both\s+hands|hand\s+on\s+chest|on\s+belly|on\s+chest|lie\s+supine|lying\s+supine)\b/i.test(lower)) return false;
   
   if (PURE_STRUCTURAL_PATTERNS.some(p => p.test(text))) return false;
   if (STRUCTURAL_HEADERS.some(h => lower === h || lower.startsWith(h + ' ') || lower.startsWith(h + ':'))) return false;
@@ -276,6 +278,12 @@ function isLikelyExerciseName(text: string): boolean {
   if (lower.split(/\s+/).length > 6) return false;
   
   return true;
+}
+
+function isBreathingCueFragment(text: string): boolean {
+  const lower = text.toLowerCase().trim();
+  return /\b(diaphragmatic|breathing|breath\s*work|box\s*breathing|inhale|exhale)\b/i.test(lower)
+    || /\b(one\s+hand|one\s+on|both\s+hands|hand\s+on\s+chest|on\s+belly|on\s+chest|lie\s+supine|lying\s+supine)\b/i.test(lower);
 }
 
 /**
@@ -580,6 +588,11 @@ export function processContentWithExerciseMatching(
   let processedContent = content;
   
   for (const exerciseName of extractedNames) {
+    if (isBreathingCueFragment(exerciseName)) {
+      unmatched.push(exerciseName);
+      console.log(`${logPrefix} ⏭️ SKIPPED breathing cue fragment: "${exerciseName}"`);
+      continue;
+    }
     // Use force-matching: 0.65 first, then 0.45
     const forceResult = forceMatchExercise(exerciseName, exerciseLibrary, logPrefix);
     
