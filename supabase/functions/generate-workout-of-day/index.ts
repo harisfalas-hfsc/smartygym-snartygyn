@@ -102,7 +102,9 @@ function ensureFiveSectionWorkoutHtml(
 
   const required = ["🧽", "🔥", "💪", "⚡", "🧘"];
   const missing = required.filter((icon) => !html.includes(icon));
-  if (missing.length === 0) {
+  const preliminaryValidation = validateWodSections(html, false);
+  const needsDensityRepair = missing.length === 0 && !preliminaryValidation.hasMinimumExercises;
+  if (missing.length === 0 && !needsDensityRepair) {
     return { html, repaired: false, addedSections: [] };
   }
 
@@ -132,13 +134,15 @@ function ensureFiveSectionWorkoutHtml(
   };
 
   const repaired = required
-    .map((icon) => extractWodSection(html, icon) || sections[icon])
+    .map((icon) => needsDensityRepair ? sections[icon] : (extractWodSection(html, icon) || sections[icon]))
     .join('<p class="tiptap-paragraph"></p>');
 
   return {
     html: repaired,
     repaired: true,
-    addedSections: missing.map((icon) => ({ "🧽": "Soft Tissue Preparation", "🔥": "Activation", "💪": "Main Workout", "⚡": "Finisher", "🧘": "Cool Down" }[icon] || icon)),
+    addedSections: needsDensityRepair
+      ? ["Main/Finisher exercise density repair"]
+      : missing.map((icon) => ({ "🧽": "Soft Tissue Preparation", "🔥": "Activation", "💪": "Main Workout", "⚡": "Finisher", "🧘": "Cool Down" }[icon] || icon)),
   };
 }
 
