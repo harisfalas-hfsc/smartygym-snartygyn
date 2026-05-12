@@ -1304,9 +1304,14 @@ export async function fetchAndBuildExerciseReference(
   const referenceList = buildExerciseReferenceList(allExercises, equipmentFilter, difficultyLevel);
   
   // Return filtered exercises for post-processing matching too
-  const exercisesForMatching = equipmentFilter
+  let exercisesForMatching = equipmentFilter
     ? allExercises.filter(ex => (ex.equipment || '').toLowerCase() === equipmentFilter.toLowerCase())
     : allExercises;
+  if ((equipmentFilter || '').toLowerCase() === 'body weight') {
+    const before = exercisesForMatching.length;
+    exercisesForMatching = filterToHomeBodyweight(exercisesForMatching);
+    console.log(`${logPrefix} Home-bodyweight guardrail removed ${before - exercisesForMatching.length} apparatus-dependent exercises (${exercisesForMatching.length} remain)`);
+  }
   
   return { exercises: exercisesForMatching, referenceList };
 }
