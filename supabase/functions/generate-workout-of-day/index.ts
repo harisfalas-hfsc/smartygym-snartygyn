@@ -2591,6 +2591,21 @@ Return JSON with these exact fields:
       const stripeProductId: string | null = null;
       const stripePriceId: string | null = null;
 
+      const structuralRepair = ensureFiveSectionWorkoutHtml(
+        workoutContent.main_workout || '',
+        currentExerciseLibrary,
+        equipment,
+        format,
+      );
+      if (structuralRepair.repaired) {
+        workoutContent.main_workout = structuralRepair.html;
+        logStep(`🛠️ Repaired incomplete WOD structure before validation`, {
+          equipment,
+          addedSections: structuralRepair.addedSections,
+          workoutName: workoutContent.name,
+        });
+      }
+
       // ═══════════════════════════════════════════════════════════════════════════════
       // POST-GENERATION DURATION CALCULATION - Parse actual section durations from HTML
       // Overrides the getDuration() estimate with the real sum from generated content
