@@ -250,6 +250,8 @@ function isLikelyExerciseName(text: string): boolean {
   
   if (lower.length < 3 || lower.length > 60) return false;
   if (/^\d+\.?\s*$/.test(text)) return false;
+  if (/\b(diaphragmatic|breathing|breath\s*work|box\s*breathing|inhale|exhale)\b/i.test(lower)) return false;
+  if (/\b(one\s+hand|one\s+on|both\s+hands|hand\s+on\s+chest|on\s+belly|on\s+chest|lie\s+supine|lying\s+supine)\b/i.test(lower)) return false;
   
   if (PURE_STRUCTURAL_PATTERNS.some(p => p.test(text))) return false;
   if (STRUCTURAL_HEADERS.some(h => lower === h || lower.startsWith(h + ' ') || lower.startsWith(h + ':'))) return false;
