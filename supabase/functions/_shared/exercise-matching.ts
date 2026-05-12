@@ -280,6 +280,12 @@ function isLikelyExerciseName(text: string): boolean {
   return true;
 }
 
+function isBreathingCueFragment(text: string): boolean {
+  const lower = text.toLowerCase().trim();
+  return /\b(diaphragmatic|breathing|breath\s*work|box\s*breathing|inhale|exhale)\b/i.test(lower)
+    || /\b(one\s+hand|one\s+on|both\s+hands|hand\s+on\s+chest|on\s+belly|on\s+chest|lie\s+supine|lying\s+supine)\b/i.test(lower);
+}
+
 /**
  * Clean an exercise name by stripping metadata, qualifiers, etc.
  */
