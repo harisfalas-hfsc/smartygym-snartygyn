@@ -1589,7 +1589,7 @@ export default function UserDashboard() {
 
             {/* LogBook Section */}
             {activeTab === "logbook" && <div className="space-y-6">
-            {!isPremium ? <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
+            {!canAccessLogbookTab ? <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
                 <CardContent className="text-center py-12">
                   <Crown className="h-12 w-12 text-primary mx-auto mb-4" />
                   <h3 className="text-xl font-bold mb-2">Premium Feature</h3>
@@ -1601,6 +1601,16 @@ export default function UserDashboard() {
                   </Button>
                 </CardContent>
               </Card> : <>
+                {!isPremium && <Card className="border-primary/30 bg-primary/5">
+                  <CardContent className="py-3 px-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                    <p className="text-sm text-muted-foreground">
+                      Showing logbook activity for your purchased content. Upgrade to Premium to log every workout, program, and check-in.
+                    </p>
+                    <Button size="sm" variant="outline" onClick={() => navigate("/premiumbenefits")}>
+                      <Crown className="h-3 w-3 mr-1" /> Upgrade
+                    </Button>
+                  </CardContent>
+                </Card>}
                 {/* Workout Activity Stats */}
                 <div>
             <h3 className="text-lg font-semibold mb-2">Workout Activity</h3>
