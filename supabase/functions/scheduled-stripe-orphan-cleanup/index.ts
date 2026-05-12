@@ -41,12 +41,20 @@ serve(async (req) => {
         .filter(Boolean),
     );
 
-    const search = await stripe.products.search({
-      query: 'active:"true" AND metadata["project"]:"SMARTYGYM"',
-      limit: 100,
-    });
+    // Paginate through ALL active SMARTYGYM products (Stripe caps each page at 100).
+    const allActive: Stripe.Product[] = [];
+    let page: string | undefined = undefined;
+    do {
+      const res: Stripe.ApiSearchResult<Stripe.Product> = await stripe.products.search({
+        query: 'active:"true" AND metadata["project"]:"SMARTYGYM"',
+        limit: 100,
+        page,
+      });
+      allActive.push(...res.data);
+      page = res.has_more ? res.next_page ?? undefined : undefined;
+    } while (page);
 
-    const orphans = search.data.filter(
+    const orphans = allActive.filter(
       (p) => p.metadata?.project === "SMARTYGYM" && !linked.has(p.id),
     );
 
@@ -69,10 +77,10 @@ serve(async (req) => {
       }
     }
 
-    console.log(`[scheduled-cleanup] linked=${linked.size} active=${search.data.length} archived=${archived.length} errors=${errors.length}`);
+    console.log(`[scheduled-cleanup] linked=${linked.size} active=${allActive.length} orphans=${orphans.length} archived=${archived.length} errors=${errors.length}`);
 
     return new Response(
-      JSON.stringify({ success: true, linked: linked.size, active: search.data.length, archived, errors }),
+      JSON.stringify({ success: true, linked: linked.size, active: allActive.length, archived, errors }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 },
     );
   } catch (err: any) {
