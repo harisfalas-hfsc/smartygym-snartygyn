@@ -51,6 +51,97 @@ function logStep(step: string, details?: any) {
   console.log(`[GENERATE-WOD] ${step}${detailsStr}`);
 }
 
+function exerciseToken(exercise: ExerciseBasic): string {
+  return `{{exercise:${exercise.id}:${exercise.name}}}`;
+}
+
+function pickRepairExercise(
+  exercises: ExerciseBasic[],
+  usedIds: Set<string>,
+  options: { names?: string[]; targets?: string[]; bodyParts?: string[]; preferEquipment?: boolean } = {},
+): ExerciseBasic {
+  const pool = exercises.filter((ex) => !usedIds.has(ex.id));
+  const candidates = pool.length > 0 ? pool : exercises;
+  const byName = candidates.find((ex) =>
+    options.names?.some((name) => ex.name.toLowerCase().includes(name.toLowerCase()))
+  );
+  const byTarget = candidates.find((ex) =>
+    options.targets?.some((target) => (ex.target || "").toLowerCase().includes(target.toLowerCase()))
+  );
+  const byBodyPart = candidates.find((ex) =>
+    options.bodyParts?.some((part) => (ex.body_part || "").toLowerCase().includes(part.toLowerCase()))
+  );
+  const byEquipment = options.preferEquipment
+    ? candidates.find((ex) => (ex.equipment || "").toLowerCase() !== "body weight")
+    : null;
+  const picked = byName || byTarget || byBodyPart || byEquipment || candidates[0];
+  usedIds.add(picked.id);
+  return picked;
+}
+
+function extractWodSection(html: string, icon: string): string | null {
+  const start = html.indexOf(icon);
+  if (start === -1) return null;
+  const nextStarts = ["🧽", "🔥", "💪", "⚡", "🧘"]
+    .filter((candidate) => candidate !== icon)
+    .map((candidate) => html.indexOf(candidate, start + icon.length))
+    .filter((idx) => idx > start);
+  const end = nextStarts.length > 0 ? Math.min(...nextStarts) : html.length;
+  return html.slice(start, end).trim();
+}
+
+function ensureFiveSectionWorkoutHtml(
+  html: string,
+  exercises: ExerciseBasic[],
+  equipment: string,
+  format: string,
+): { html: string; repaired: boolean; addedSections: string[] } {
+  if (!html || exercises.length === 0) {
+    return { html, repaired: false, addedSections: [] };
+  }
+
+  const required = ["🧽", "🔥", "💪", "⚡", "🧘"];
+  const missing = required.filter((icon) => !html.includes(icon));
+  if (missing.length === 0) {
+    return { html, repaired: false, addedSections: [] };
+  }
+
+  const usedIds = new Set<string>();
+  const preferEquipment = equipment === "EQUIPMENT";
+  const pick = (options: Parameters<typeof pickRepairExercise>[2] = {}) =>
+    pickRepairExercise(exercises, usedIds, { ...options, preferEquipment });
+
+  const mobility = pick({ names: ["hip", "thoracic", "ankle", "cat"], targets: ["mobility"], bodyParts: ["hips", "back"] });
+  const activation = pick({ names: ["glute", "bridge", "band", "walk"], targets: ["glutes"], bodyParts: ["glutes", "legs"] });
+  const prep = pick({ names: ["plank", "dead bug", "bird dog"], targets: ["core"], bodyParts: ["waist"] });
+  const mainA = pick({ names: ["squat", "press", "deadlift", "row"], targets: ["quadriceps", "chest", "back"] });
+  const mainB = pick({ names: ["lunge", "pull", "curl", "hinge"], targets: ["glutes", "back", "biceps"] });
+  const mainC = pick({ names: ["row", "press", "squat"], targets: ["back", "shoulders", "quadriceps"] });
+  const finisherA = pick({ names: ["swing", "thruster", "burpee"], targets: ["glutes", "shoulders"] });
+  const finisherB = pick({ names: ["farmer", "carry", "step"], targets: ["forearms", "quadriceps"] });
+  const finisherC = pick({ names: ["slam", "pull", "row"], targets: ["back", "shoulders"] });
+  const stretchA = pick({ names: ["hamstring", "calf", "quad", "stretch"], targets: ["hamstrings", "calves"], bodyParts: ["legs"] });
+  const stretchB = pick({ names: ["chest", "shoulder", "glute", "stretch"], targets: ["chest", "shoulders", "glutes"] });
+
+  const sections: Record<string, string> = {
+    "🧽": `<p class="tiptap-paragraph">🧽 <strong><u>Soft Tissue Preparation 5'</u></strong></p><ul class="tiptap-bullet-list"><li class="tiptap-list-item"><p class="tiptap-paragraph">Foam roll quads, hamstrings, calves, glutes, lats, and upper back (30-45 sec per area)</p></li><li class="tiptap-list-item"><p class="tiptap-paragraph">Lacrosse ball work for feet and hips (focus on tension spots)</p></li></ul>`,
+    "🔥": `<p class="tiptap-paragraph">🔥 <strong><u>Activation 15'</u></strong></p><ul class="tiptap-bullet-list"><li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Mobility (5 min):</strong> 10 reps ${exerciseToken(mobility)} each side</p></li><li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Activation (5 min):</strong> 12 reps ${exerciseToken(activation)}</p></li><li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Core Prep (5 min):</strong> 30 sec ${exerciseToken(prep)}</p></li></ul>`,
+    "💪": `<p class="tiptap-paragraph">💪 <strong><u>Main Workout (${format})</u></strong></p><ul class="tiptap-bullet-list"><li class="tiptap-list-item"><p class="tiptap-paragraph">4 sets x 6 reps ${exerciseToken(mainA)}</p></li><li class="tiptap-list-item"><p class="tiptap-paragraph">3 sets x 8 reps ${exerciseToken(mainB)}</p></li><li class="tiptap-list-item"><p class="tiptap-paragraph">3 sets x 10 reps ${exerciseToken(mainC)}</p></li></ul>`,
+    "⚡": `<p class="tiptap-paragraph">⚡ <strong><u>Finisher (For Time)</u></strong></p><ul class="tiptap-bullet-list"><li class="tiptap-list-item"><p class="tiptap-paragraph">12 reps ${exerciseToken(finisherA)}</p></li><li class="tiptap-list-item"><p class="tiptap-paragraph">16 reps ${exerciseToken(finisherB)}</p></li><li class="tiptap-list-item"><p class="tiptap-paragraph">12 reps ${exerciseToken(finisherC)}</p></li></ul>`,
+    "🧘": `<p class="tiptap-paragraph">🧘 <strong><u>Cool Down 10'</u></strong></p><ul class="tiptap-bullet-list"><li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Static Stretching (8 min):</strong> 45 sec ${exerciseToken(stretchA)} each side</p></li><li class="tiptap-list-item"><p class="tiptap-paragraph">45 sec ${exerciseToken(stretchB)} each side</p></li><li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Breathing (2 min):</strong> Slow nasal inhale, long mouth exhale, calm the nervous system</p></li></ul>`,
+  };
+
+  const repaired = required
+    .map((icon) => extractWodSection(html, icon) || sections[icon])
+    .join('<p class="tiptap-paragraph"></p>');
+
+  return {
+    html: repaired,
+    repaired: true,
+    addedSections: missing.map((icon) => ({ "🧽": "Soft Tissue Preparation", "🔥": "Activation", "💪": "Main Workout", "⚡": "Finisher", "🧘": "Cool Down" }[icon] || icon)),
+  };
+}
+
 function syncWorkoutNameReferences(
   workoutContent: { description?: string; instructions?: string; tips?: string; main_workout?: string },
   oldName: string,
