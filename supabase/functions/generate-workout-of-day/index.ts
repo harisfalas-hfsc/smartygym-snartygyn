@@ -11,6 +11,7 @@ import {
   buildExerciseReferenceList,
   guaranteeAllExercisesLinked,
   rejectNonLibraryExercises,
+  isHomeBodyweightFriendly,
   type ExerciseBasic 
 } from "../_shared/exercise-matching.ts";
 import { normalizeWorkoutHtml, validateWorkoutHtml } from "../_shared/html-normalizer.ts";
