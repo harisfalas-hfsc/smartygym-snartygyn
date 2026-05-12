@@ -859,9 +859,18 @@ export async function logUnmatchedExercises(
  */
 export function buildExerciseReferenceList(exercises: ExerciseBasic[], equipmentFilter?: string, difficultyLevel?: string): string {
   // Apply equipment filter if specified
-  const filtered = equipmentFilter
+  let filtered = equipmentFilter
     ? exercises.filter(ex => (ex.equipment || '').toLowerCase() === equipmentFilter.toLowerCase())
     : exercises;
+
+  // HOME-BODYWEIGHT GUARDRAIL: when this is a bodyweight-only prompt, strip
+  // exercises that need a bench, pull-up bar, dip station, GHD bench, rings,
+  // parallel bars, box, captain's chair, etc. — even though they are tagged
+  // "body weight" in the database.
+  const isBodyweightFilter = (equipmentFilter || '').toLowerCase() === 'body weight';
+  if (isBodyweightFilter) {
+    filtered = filterToHomeBodyweight(filtered);
+  }
 
   // Group by TARGET MUSCLE → BODY PART for structured browsing
   const grouped: Record<string, Record<string, Array<{ id: string; name: string; equipment: string; difficulty: string }>>> = {};
@@ -916,9 +925,11 @@ export function buildExerciseReferenceList(exercises: ExerciseBasic[], equipment
     '- NEVER invent, rename, or create exercises not listed below.',
     '- If the exercise you want does not exist here, pick the closest biomechanical equivalent FROM THIS LIST.',
     '',
-    equipmentFilter
-      ? `This is a BODYWEIGHT workout. ONLY bodyweight exercises are available (${filtered.length} exercises).`
-      : `Full exercise library available (${filtered.length} exercises — bodyweight + all equipment).`,
+    isBodyweightFilter
+      ? `This is a BODYWEIGHT (no-equipment / home / hotel / travel) workout. ${filtered.length} exercises are available. NO benches, NO pull-up bars, NO dip stations, NO glute-ham/GHD benches, NO rings, NO parallel bars, NO boxes, NO captain's chair, NO gym apparatus of any kind. Pick exercises a user can perform on a flat floor with their own bodyweight only. A wall, a doorway, or a sturdy chair for support is acceptable only when explicitly part of the listed exercise.`
+      : equipmentFilter
+        ? `This is a BODYWEIGHT workout. ONLY bodyweight exercises are available (${filtered.length} exercises).`
+        : `Full exercise library available (${filtered.length} exercises — bodyweight + all equipment).`,
     '',
   ];
 
