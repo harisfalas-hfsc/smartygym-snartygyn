@@ -741,22 +741,47 @@ export default function UserDashboard() {
         <div className="animate-pulse text-lg">Loading dashboard...</div>
       </div>;
   }
-  const favoriteWorkouts = workoutInteractions.filter(w => w.is_favorite);
-  const completedWorkouts = workoutInteractions.filter(w => w.is_completed);
-  const viewedWorkouts = workoutInteractions.filter(w => w.has_viewed);
-  const ratedWorkouts = workoutInteractions.filter(w => w.rating && w.rating > 0);
-  const favoritePrograms = programInteractions.filter(p => p.is_favorite);
-  const completedPrograms = programInteractions.filter(p => p.is_completed);
-  const viewedPrograms = programInteractions.filter(p => p.has_viewed);
-  const ratedPrograms = programInteractions.filter(p => p.rating && p.rating > 0);
-  const inProgressPrograms = programInteractions.filter(p => p.is_ongoing);
-
   // Premium members have Gold/Platinum subscription
   const hasActivePlan = subscriptionInfo?.subscribed && subscriptionInfo?.product_id;
 
   // Separate flag for standalone purchases (only count non-deleted content)
   const validPurchases = purchases?.filter(p => !p.content_deleted) || [];
   const hasStandalonePurchases = validPurchases.length > 0;
+
+  // Build sets of purchased content IDs so non-premium subscribers can still
+  // see activity stats / lists for the items they actually paid for.
+  const purchasedWorkoutIds = new Set(
+    validPurchases.filter(p => p.content_type === "workout").map(p => p.content_id)
+  );
+  const purchasedProgramIds = new Set(
+    validPurchases.filter(p => p.content_type === "program").map(p => p.content_id)
+  );
+  const hasPurchasedWorkouts = purchasedWorkoutIds.size > 0;
+  const hasPurchasedPrograms = purchasedProgramIds.size > 0;
+
+  // Scope interactions for non-premium users to only purchased content.
+  // Premium users see everything (no scoping).
+  const visibleWorkoutInteractions = isPremium
+    ? workoutInteractions
+    : workoutInteractions.filter(w => purchasedWorkoutIds.has(w.workout_id));
+  const visibleProgramInteractions = isPremium
+    ? programInteractions
+    : programInteractions.filter(p => purchasedProgramIds.has(p.program_id));
+
+  const favoriteWorkouts = visibleWorkoutInteractions.filter(w => w.is_favorite);
+  const completedWorkouts = visibleWorkoutInteractions.filter(w => w.is_completed);
+  const viewedWorkouts = visibleWorkoutInteractions.filter(w => w.has_viewed);
+  const ratedWorkouts = visibleWorkoutInteractions.filter(w => w.rating && w.rating > 0);
+  const favoritePrograms = visibleProgramInteractions.filter(p => p.is_favorite);
+  const completedPrograms = visibleProgramInteractions.filter(p => p.is_completed);
+  const viewedPrograms = visibleProgramInteractions.filter(p => p.has_viewed);
+  const ratedPrograms = visibleProgramInteractions.filter(p => p.rating && p.rating > 0);
+  const inProgressPrograms = visibleProgramInteractions.filter(p => p.is_ongoing);
+
+  // Tab-level access: allow non-premium users in if they have relevant purchases.
+  const canAccessWorkoutsTab = isPremium || hasPurchasedWorkouts;
+  const canAccessProgramsTab = isPremium || hasPurchasedPrograms;
+  const canAccessLogbookTab = isPremium || hasStandalonePurchases;
   return <div className="min-h-screen bg-background">
       <main className="container mx-auto max-w-7xl px-4 pb-8">
         {/* Check-in Modal Manager - shows pop-up during time windows */}
@@ -1184,7 +1209,7 @@ export default function UserDashboard() {
 
             {/* Workouts Section */}
             {activeTab === "workouts" && <div className="space-y-6">
-            {!isPremium ? <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
+            {!canAccessWorkoutsTab ? <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
                 <CardContent className="text-center py-12">
                   <Crown className="h-12 w-12 text-primary mx-auto mb-4" />
                   <h3 className="text-xl font-bold mb-2">Premium Feature</h3>
@@ -1196,6 +1221,16 @@ export default function UserDashboard() {
                   </Button>
                 </CardContent>
               </Card> : <>
+                {!isPremium && <Card className="border-primary/30 bg-primary/5">
+                  <CardContent className="py-3 px-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                    <p className="text-sm text-muted-foreground">
+                      Showing activity for your <strong>{purchasedWorkoutIds.size}</strong> purchased workout{purchasedWorkoutIds.size === 1 ? '' : 's'}. Upgrade to Premium to track every workout.
+                    </p>
+                    <Button size="sm" variant="outline" onClick={() => navigate("/premiumbenefits")}>
+                      <Crown className="h-3 w-3 mr-1" /> Upgrade
+                    </Button>
+                  </CardContent>
+                </Card>}
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
               <Card>
                 <CardHeader className="pb-3">
@@ -1312,7 +1347,7 @@ export default function UserDashboard() {
 
             {/* Programs Section */}
             {activeTab === "programs" && <div className="space-y-6">
-            {!isPremium ? <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
+            {!canAccessProgramsTab ? <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
                 <CardContent className="text-center py-12">
                   <Crown className="h-12 w-12 text-primary mx-auto mb-4" />
                   <h3 className="text-xl font-bold mb-2">Premium Feature</h3>
@@ -1324,6 +1359,16 @@ export default function UserDashboard() {
                   </Button>
                 </CardContent>
               </Card> : <>
+                {!isPremium && <Card className="border-primary/30 bg-primary/5">
+                  <CardContent className="py-3 px-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                    <p className="text-sm text-muted-foreground">
+                      Showing activity for your <strong>{purchasedProgramIds.size}</strong> purchased program{purchasedProgramIds.size === 1 ? '' : 's'}. Upgrade to Premium to track every program.
+                    </p>
+                    <Button size="sm" variant="outline" onClick={() => navigate("/premiumbenefits")}>
+                      <Crown className="h-3 w-3 mr-1" /> Upgrade
+                    </Button>
+                  </CardContent>
+                </Card>}
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
               <Card>
                 <CardHeader className="pb-3">
@@ -1544,7 +1589,7 @@ export default function UserDashboard() {
 
             {/* LogBook Section */}
             {activeTab === "logbook" && <div className="space-y-6">
-            {!isPremium ? <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
+            {!canAccessLogbookTab ? <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
                 <CardContent className="text-center py-12">
                   <Crown className="h-12 w-12 text-primary mx-auto mb-4" />
                   <h3 className="text-xl font-bold mb-2">Premium Feature</h3>
@@ -1556,6 +1601,16 @@ export default function UserDashboard() {
                   </Button>
                 </CardContent>
               </Card> : <>
+                {!isPremium && <Card className="border-primary/30 bg-primary/5">
+                  <CardContent className="py-3 px-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                    <p className="text-sm text-muted-foreground">
+                      Showing logbook activity for your purchased content. Upgrade to Premium to log every workout, program, and check-in.
+                    </p>
+                    <Button size="sm" variant="outline" onClick={() => navigate("/premiumbenefits")}>
+                      <Crown className="h-3 w-3 mr-1" /> Upgrade
+                    </Button>
+                  </CardContent>
+                </Card>}
                 {/* Workout Activity Stats */}
                 <div>
             <h3 className="text-lg font-semibold mb-2">Workout Activity</h3>
