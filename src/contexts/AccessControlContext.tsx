@@ -244,8 +244,11 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
       return false;
     }
 
-    // Check if content was individually purchased
-    if (contentId && purchasedContent.has(`${contentType}:${contentId}`)) {
+    // Check if content was individually purchased.
+    // Purchases are stored with normalized type ("workout" / "program"), so
+    // strip the "free-" prefix before looking up.
+    const normalizedType = contentType.replace(/^free-/, "");
+    if (contentId && purchasedContent.has(`${normalizedType}:${contentId}`)) {
       return true;
     }
 
@@ -255,8 +258,10 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
     }
 
     // Subscribers can access free content, tools, and dashboard
-    // NOTE: For workouts and programs, database verification happens at the component level
-    // via AccessGate which checks the actual is_premium flag from the database
+    // NOTE: For workouts and programs, this returns true to let the page render,
+    // but the *real* is_premium check is enforced server-side by RLS and at the
+    // component level by <AccessGate>, which calls hasPurchased() and verifies
+    // the database is_premium flag. Do not rely on this function alone for gating.
     if (userTier === "subscriber") {
       return contentType === "tool" || 
              contentType === "calculator" ||
@@ -269,7 +274,9 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
   };
 
   const hasPurchased = (contentId: string, contentType: string): boolean => {
-    return state.purchasedContent.has(`${contentType}:${contentId}`);
+    // Normalize "free-workout" / "free-program" to the stored purchase type.
+    const normalizedType = contentType.replace(/^free-/, "");
+    return state.purchasedContent.has(`${normalizedType}:${contentId}`);
   };
 
   const canInteract = (contentType: string, contentId?: string): boolean => {
@@ -281,8 +288,9 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
     // Premium users can interact with ALL content (free and premium)
     if (userTier === "premium") return true;
 
-    // Check if user purchased this specific content
-    if (contentId && purchasedContent.has(`${contentType}:${contentId}`)) {
+    // Check if user purchased this specific content (normalize free- prefix).
+    const normalizedType = contentType.replace(/^free-/, "");
+    if (contentId && purchasedContent.has(`${normalizedType}:${contentId}`)) {
       return true;
     }
 
