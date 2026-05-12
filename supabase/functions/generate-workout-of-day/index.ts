@@ -11,6 +11,7 @@ import {
   buildExerciseReferenceList,
   guaranteeAllExercisesLinked,
   rejectNonLibraryExercises,
+  isHomeBodyweightFriendly,
   type ExerciseBasic 
 } from "../_shared/exercise-matching.ts";
 import { normalizeWorkoutHtml, validateWorkoutHtml } from "../_shared/html-normalizer.ts";
@@ -2792,6 +2793,38 @@ Return JSON with these exact fields:
         mainWorkoutExercises: sectionValidation.mainWorkoutExerciseCount,
         finisherExercises: sectionValidation.finisherExerciseCount
       });
+
+      // ═══════════════════════════════════════════════════════════════════════════════
+      // HOME-BODYWEIGHT GUARDRAIL (FINAL GATE)
+      // For BODYWEIGHT WODs, every {{exercise:ID:Name}} token must reference a
+      // home-friendly bodyweight exercise. Apparatus-dependent items (bench,
+      // pull-up bar, dip station, GHD/glute-ham bench, rings, parallel bars,
+      // box, captain's chair, etc.) are rejected here and trigger a retry.
+      // ═══════════════════════════════════════════════════════════════════════════════
+      if (equipment === "BODYWEIGHT") {
+        const libraryById = new Map(currentExerciseLibrary.map((ex) => [ex.id, ex]));
+        const tokenRe = /\{\{(?:exercise|exrcise|excersize|excercise):([^:]+):([^}]+)\}\}/gi;
+        const offending: string[] = [];
+        let m: RegExpExecArray | null;
+        while ((m = tokenRe.exec(cleanedMainWorkout)) !== null) {
+          const id = m[1];
+          const ex = libraryById.get(id);
+          if (!ex) continue; // unknown ids handled elsewhere
+          if (!isHomeBodyweightFriendly(ex)) {
+            offending.push(`${ex.name} (${ex.equipment})`);
+          }
+        }
+        if (offending.length > 0) {
+          logStep(`❌ HOME-BODYWEIGHT GUARDRAIL FAILED`, {
+            equipment,
+            workoutName: workoutContent.name,
+            offending,
+          });
+          throw new Error(
+            `BODYWEIGHT WOD rejected: apparatus-dependent exercises [${offending.join("; ")}]`,
+          );
+        }
+      }
 
       // Auto-inject protocol explanations into the instructions field so every
       // protocol workout always teaches the user how to follow the format.
