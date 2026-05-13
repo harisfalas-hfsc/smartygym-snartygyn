@@ -2,6 +2,47 @@
 # URL: https://smartygym.com
 # Last Updated: 2026-04-29
 
+> The Smart Way to Train Online — 500+ expert-designed workouts, training programs, and daily rituals by Sports Scientist Haris Falas. 100% human, 0% AI.
+
+## Pages
+
+- [Home](/): SmartyGym overview, featured content, and entry to the platform.
+- [About SmartyGym](/about-smartygym): What SmartyGym is and how it works.
+- [About](/about): Story and mission behind SmartyGym.
+- [The Smarty Method](/the-smarty-method): Coaching philosophy and ecosystem overview.
+- [Coach Haris Falas](/coach-profile): Founder bio, credentials, and expertise.
+- [Coach CV](/coach-cv): Detailed professional CV for Haris Falas.
+- [Workouts](/workout): Browse the full workout library.
+- [Workout of the Day](/workout/wod): Two fresh workouts published every day.
+- [WOD Archive](/wod-archive): Past Workouts of the Day.
+- [Daily Smarty Ritual](/daily-ritual): Daily movement and wellness routines.
+- [Training Programs](/trainingprogram): Multi-week structured training plans.
+- [Exercise Library](/exerciselibrary): Exercises with form demos and instructions.
+- [Tools](/tools): Fitness calculators and utilities.
+- [1RM Calculator](/1rmcalculator): Estimate your one-rep maximum.
+- [BMR Calculator](/bmrcalculator): Calculate basal metabolic rate.
+- [Macro Calculator](/macrocalculator): Get macronutrient targets.
+- [Calorie Counter](/caloriecounter): Free USDA-backed calorie lookup.
+- [Workout Timer](/workouttimer): Interval, AMRAP, TABATA and EMOM timer.
+- [Blog](/blog): Evidence-based articles on fitness, nutrition, and recovery.
+- [Community](/community): Leaderboards, ratings, and member activity.
+- [Shop](/shop): Standalone workouts and programs.
+- [Join Premium](/joinpremium): Subscription plans and benefits.
+- [Smarty Plans](/smarty-plans): Plan comparison and pricing.
+- [Premium Benefits](/premiumbenefits): What premium membership includes.
+- [Corporate Wellness](/corporate-wellness): Programs for teams and companies.
+- [Smarty Corporate](/corporate): Corporate offering overview.
+- [Human Performance](/human-performance): Performance-focused services.
+- [Why Invest in SmartyGym](/why-invest-in-smartygym): Investor and partner overview.
+- [Best Online Fitness Platform](/best-online-fitness-platform): Why SmartyGym stands out.
+- [Take a Tour](/take-a-tour): Guided product tour.
+- [FAQ](/faq): Frequently asked questions.
+- [Contact](/contact): Get in touch with the team.
+- [Sign In / Sign Up](/auth): Account access.
+- [Privacy Policy](/privacy-policy): How we handle your data.
+- [Terms of Service](/termsofservice): Terms governing use of the platform.
+- [Disclaimer](/disclaimer): Health and medical disclaimer.
+
 ---
 
 ## CRITICAL BRAND DISAMBIGUATION

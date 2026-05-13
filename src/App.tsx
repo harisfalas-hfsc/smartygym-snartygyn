@@ -127,7 +127,8 @@ const AppContent = () => {
         >
           <Navigation />
           <FixedBackButton />
-            <div
+            <main
+              id="main-content"
               className="flex-1"
               style={{
                 paddingTop: 'var(--app-header-h, 100px)',
@@ -260,7 +261,7 @@ const AppContent = () => {
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </PageTransition>
-          </div>
+          </main>
         <Footer />
         <MobileBottomNav />
       </div>
