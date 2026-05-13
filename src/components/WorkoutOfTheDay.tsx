@@ -1,38 +1,13 @@
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  type CarouselApi,
-} from "@/components/ui/carousel";
-import { cn } from "@/lib/utils";
-import { CalendarCheck, Clock, Dumbbell, Star, Crown, ShoppingBag, Archive, Home, TrendingUp, Layers, Target, ChevronRight } from "lucide-react";
+import { CalendarCheck, Clock, Dumbbell, Star, Crown, ShoppingBag, Archive, Home, TrendingUp, Layers, Target } from "lucide-react";
 import { useTodayWods } from "@/hooks/useTodayWods";
 
 export const WorkoutOfTheDay = () => {
   const navigate = useNavigate();
-
-  const [api, setApi] = useState<CarouselApi>();
-  const [current, setCurrent] = useState(0);
-
-  const onSelect = useCallback(() => {
-    if (!api) return;
-    setCurrent(api.selectedScrollSnap());
-  }, [api]);
-
-  useEffect(() => {
-    if (!api) return;
-    onSelect();
-    api.on("select", onSelect);
-    return () => {
-      api.off("select", onSelect);
-    };
-  }, [api, onSelect]);
 
   const { bodyweightWod: bodyweightWOD, equipmentWod: equipmentWOD, variousWod: variousWOD, isRecoveryDay, hasWods: hasWODs, isLoading } = useTodayWods();
 
@@ -186,12 +161,7 @@ export const WorkoutOfTheDay = () => {
           <div className="flex flex-col items-center gap-4">
             <Skeleton className="h-8 w-64" />
             <Skeleton className="h-4 w-96" />
-            {/* Mobile carousel skeleton */}
-            <div className="sm:hidden w-full max-w-xs mx-auto">
-              <Skeleton className="h-[220px] w-full rounded-xl" />
-            </div>
-            {/* Desktop grid skeleton */}
-            <div className="hidden sm:grid grid-cols-2 gap-4 w-full max-w-lg">
+            <div className="grid grid-cols-2 gap-4 w-full max-w-lg">
               <Skeleton className="h-40 w-full rounded-lg" />
               <Skeleton className="h-40 w-full rounded-lg" />
             </div>
@@ -249,96 +219,10 @@ export const WorkoutOfTheDay = () => {
               {renderRecoveryCard(variousWOD)}
             </div>
           ) : (
-            <>
-              {/* Mobile Carousel - matches hero card size/style */}
-              <div className="sm:hidden relative mb-4">
-                <Carousel
-                  setApi={setApi}
-                  opts={{ align: "center", loop: true }}
-                  className="w-full"
-                >
-                  <CarouselContent className="-ml-3">
-                    {[bodyweightWOD, equipmentWOD].filter(Boolean).map((wod, idx) => {
-                      if (!wod) return null;
-                      const isBodyweight = idx === 0;
-                      const equipmentIcon = isBodyweight ? <Home className="w-3 h-3" /> : <Dumbbell className="w-3 h-3" />;
-                      const bgColor = isBodyweight ? "bg-blue-500" : "bg-orange-500";
-                      return (
-                        <CarouselItem key={wod.id} className="pl-3 basis-[75%]">
-                          <div
-                            onClick={() => navigate(`/workout/wod/${wod.id}`)}
-                            className={cn(
-                              "cursor-pointer group border-2 border-primary/40 rounded-xl overflow-hidden",
-                              "hover:border-primary hover:shadow-2xl hover:scale-[1.05] hover:z-10",
-                              "transition-all duration-300 ease-out",
-                              "h-[220px]",
-                              "flex flex-col bg-card"
-                            )}
-                          >
-                            {/* Image Section */}
-                            <div className="relative h-[55%] overflow-hidden flex-shrink-0">
-                              {wod.image_url && (
-                                <img
-                                  src={wod.image_url}
-                                  alt={`${wod.name || "Workout"} - ${wod.format || ''} ${wod.category || ''} workout`}
-                                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                                />
-                              )}
-                              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                              <Badge className={`absolute top-2 left-2 ${bgColor} text-white border-0 text-[10px] py-0`}>
-                                {equipmentIcon}
-                                <span className="ml-1">{isBodyweight ? "Home" : "Gym"}</span>
-                              </Badge>
-                            </div>
-
-                            {/* Content Section */}
-                            <div className="flex flex-col justify-center flex-1 p-2.5 z-10">
-                              <h4 className="text-xs font-semibold text-foreground line-clamp-1">{wod.name}</h4>
-                              <p className="text-[10px] text-muted-foreground line-clamp-1 mt-0.5">
-                                {wod.category} • {wod.format || "General"} • {wod.difficulty_stars ? `${wod.difficulty_stars}⭐` : "All Levels"} • {wod.duration || "45-60 min"}
-                              </p>
-                              <div className="flex items-center gap-1 mt-1.5">
-                                <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0 text-[9px] py-0">
-                                  <Crown className="w-2 h-2 mr-0.5" />
-                                  Premium
-                                </Badge>
-                                <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0 text-[9px] py-0">
-                                  <ShoppingBag className="w-2 h-2 mr-0.5" />
-                                  €{wod.price?.toFixed(2)}
-                                </Badge>
-                              </div>
-                            </div>
-                          </div>
-                        </CarouselItem>
-                      );
-                    })}
-                  </CarouselContent>
-                </Carousel>
-
-                {/* Navigation dots */}
-                <div className="flex justify-center gap-2 mt-3">
-                  {[0, 1].map((index) => (
-                    <button
-                      key={index}
-                      onClick={() => api?.scrollTo(index)}
-                      className={cn(
-                        "w-1.5 h-1.5 rounded-full transition-all",
-                        current === index
-                          ? "bg-primary w-3"
-                          : "bg-primary/30 hover:bg-primary/50"
-                      )}
-                      aria-label={`Go to slide ${index + 1}`}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              {/* Desktop Grid */}
-              <div className="hidden sm:grid grid-cols-2 gap-3 max-w-xl mx-auto mb-4">
-                {renderMiniCard(bodyweightWOD, true)}
-                {renderMiniCard(equipmentWOD, false)}
-              </div>
-            </>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-xl mx-auto mb-4">
+              {renderMiniCard(bodyweightWOD, true)}
+              {renderMiniCard(equipmentWOD, false)}
+            </div>
           )
         ) : (
           <div className="bg-background/80 backdrop-blur-sm rounded-xl p-6 border-2 border-dashed border-primary/30 max-w-md mx-auto text-center mb-4">

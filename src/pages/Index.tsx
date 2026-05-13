@@ -74,8 +74,6 @@ const Index = () => {
   // Mobile hero carousel state (cards are wider than viewport, swipeable)
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [wodCarouselApi, setWodCarouselApi] = useState<CarouselApi>();
-  const [currentWodSlide, setCurrentWodSlide] = useState(0);
 
   useEffect(() => {
     if (!carouselApi) return;
@@ -86,16 +84,6 @@ const Index = () => {
       carouselApi.off("select", onSelect);
     };
   }, [carouselApi]);
-
-  useEffect(() => {
-    if (!wodCarouselApi) return;
-    const onSelect = () => setCurrentWodSlide(wodCarouselApi.selectedScrollSnap());
-    onSelect();
-    wodCarouselApi.on("select", onSelect);
-    return () => {
-      wodCarouselApi.off("select", onSelect);
-    };
-  }, [wodCarouselApi]);
 
   // Mobile hero swipeable cards
   const heroCards = [
@@ -529,78 +517,82 @@ const Index = () => {
             </div>
             
             {hasWods ? (
+              /* Workout images - dynamic columns based on count */
               (() => {
-                const wodCards = [
-                  bodyweightWod && { wod: bodyweightWod, label: "No Equipment", badgeClass: "bg-green-500 hover:bg-green-500 text-white" },
-                  equipmentWod && { wod: equipmentWod, label: "With Equipment", badgeClass: "bg-orange-500 hover:bg-orange-500 text-white" },
-                  variousWod && !bodyweightWod && !equipmentWod && { wod: variousWod, label: "Recovery", badgeClass: "bg-cyan-500 hover:bg-cyan-500 text-white" },
-                ].filter(Boolean) as Array<{ wod: NonNullable<typeof bodyweightWod>; label: string; badgeClass: string }>;
-
+                const wodCards = [bodyweightWod, equipmentWod, variousWod].filter(Boolean);
+                const wodCount = wodCards.length;
                 return (
-                  <div className="relative -mx-4">
-                    <Carousel className="w-full" opts={{ align: "center", loop: wodCards.length > 1 }} setApi={setWodCarouselApi}>
-                      <CarouselContent className="-ml-2">
-                        {wodCards.map(({ wod, label, badgeClass }) => (
-                          <CarouselItem key={wod.id} className="pl-2 basis-[75%]">
-                            <div
-                              onClick={(event) => {
-                                event.stopPropagation();
-                                navigate(`/workout/wod/${wod.id}`);
-                              }}
-                              className="flex flex-col h-[220px] bg-card border-2 border-primary/40 rounded-xl overflow-hidden cursor-pointer hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300"
-                              role="button"
-                              aria-label={`${wod.name} workout of the day`}
-                            >
-                              <div className="relative h-[55%] overflow-hidden flex-shrink-0">
-                                <img
-                                  src={wod.image_url || "/placeholder.svg"}
-                                  alt={wod.name}
-                                  className="w-full h-full object-cover"
-                                  onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.svg"; }}
-                                />
-                                <Badge className={cn("absolute top-1.5 left-1.5 border-0 text-[10px] px-1.5 py-0.5", badgeClass)}>
-                                  {label}
-                                </Badge>
-                              </div>
-                              <div className="flex flex-col justify-center flex-1 p-3 text-center">
-                                <h3 className="text-sm font-bold text-foreground leading-tight line-clamp-1">
-                                  {wod.name}
-                                </h3>
-                                <p className="text-xs text-muted-foreground leading-snug line-clamp-2 mt-1">
-                                  {wod.category}{wod.format ? ` • ${wod.format}` : ""}
-                                </p>
-                                <div className="flex items-center justify-center gap-1 text-primary text-[10px] font-medium mt-1">
-                                  Open
-                                  <ChevronRight className="w-3 h-3" />
-                                </div>
-                              </div>
-                            </div>
-                          </CarouselItem>
-                        ))}
-                      </CarouselContent>
-                      {wodCards.length > 1 && (
-                        <>
-                          <CarouselPrevious className="left-2 h-8 w-8 rounded-full bg-background/80 border border-border/50 shadow-sm" />
-                          <CarouselNext className="right-2 h-8 w-8 rounded-full bg-background/80 border border-border/50 shadow-sm" />
-                        </>
-                      )}
-                    </Carousel>
-                    {wodCards.length > 1 && (
-                      <div className="flex justify-center gap-2 mt-3">
-                        {wodCards.map((_, index) => (
-                          <button
-                            key={index}
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              wodCarouselApi?.scrollTo(index);
-                            }}
-                            className={cn(
-                              "w-2.5 h-2.5 rounded-full transition-all duration-300",
-                              currentWodSlide === index ? "bg-primary scale-125" : "bg-primary/30 hover:bg-primary/50"
+                  <div className={`grid ${wodCount === 1 ? 'grid-cols-1' : 'grid-cols-2'} gap-3`}>
+                    {/* Bodyweight workout */}
+                    {bodyweightWod && (
+                      <div className="relative rounded-lg overflow-hidden border border-border">
+                        <img 
+                          src={bodyweightWod.image_url || '/placeholder.svg'} 
+                          alt={bodyweightWod.name}
+className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-cover`}
+                          onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
+                        />
+                        <Badge className="absolute top-1 left-1 bg-green-500 hover:bg-green-500 text-white text-[10px] px-1.5 py-0.5">No Equipment</Badge>
+                        <div className="p-2 bg-background/90">
+                          <p className="text-xs font-semibold line-clamp-1">{bodyweightWod.name}</p>
+                          <div className="flex items-center gap-1 text-[9px] text-muted-foreground">
+                            <span className="text-red-500">{bodyweightWod.category}</span>
+                            {bodyweightWod.format && (
+                              <>
+                                <span>•</span>
+                                <span>{bodyweightWod.format}</span>
+                              </>
                             )}
-                            aria-label={`Go to workout ${index + 1}`}
-                          />
-                        ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Equipment workout */}
+                    {equipmentWod && (
+                      <div className="relative rounded-lg overflow-hidden border border-border">
+                        <img 
+                          src={equipmentWod.image_url || '/placeholder.svg'} 
+                          alt={equipmentWod.name}
+className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-cover`}
+                          onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
+                        />
+                        <Badge className="absolute top-1 left-1 bg-orange-500 hover:bg-orange-500 text-white text-[10px] px-1.5 py-0.5">With Equipment</Badge>
+                        <div className="p-2 bg-background/90">
+                          <p className="text-xs font-semibold line-clamp-1">{equipmentWod.name}</p>
+                          <div className="flex items-center gap-1 text-[9px] text-muted-foreground">
+                            <span className="text-red-500">{equipmentWod.category}</span>
+                            {equipmentWod.format && (
+                              <>
+                                <span>•</span>
+                                <span>{equipmentWod.format}</span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    {variousWod && !bodyweightWod && !equipmentWod && (
+                      <div className="relative rounded-lg overflow-hidden border border-border">
+                        <img 
+                          src={variousWod.image_url || '/placeholder.svg'} 
+                          alt={variousWod.name}
+className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-cover`}
+                          onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
+                        />
+                        <Badge className="absolute top-1 left-1 bg-cyan-500 hover:bg-cyan-500 text-white text-[10px] px-1.5 py-0.5">Recovery</Badge>
+                        <div className="p-2 bg-background/90">
+                          <p className="text-xs font-semibold line-clamp-1">{variousWod.name}</p>
+                          <div className="flex items-center gap-1 text-[9px] text-muted-foreground">
+                            <span className="text-red-500">{variousWod.category}</span>
+                            {variousWod.format && (
+                              <>
+                                <span>•</span>
+                                <span>{variousWod.format}</span>
+                              </>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     )}
                   </div>
