@@ -77,12 +77,15 @@ export function HeroBackgroundVideo({
           src={posterSrc}
           alt=""
           aria-hidden="true"
+          width={1920}
+          height={1080}
           className={cn(
             "absolute inset-0 w-full h-full object-cover z-0 transition-opacity duration-300",
             ready ? "opacity-0" : "opacity-100",
             className,
           )}
           loading="eager"
+          fetchPriority="high"
           decoding="async"
         />
       ) : null}
