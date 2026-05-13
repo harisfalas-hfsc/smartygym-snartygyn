@@ -180,11 +180,6 @@ const Bubble = ({
   const Icon = dest.icon;
   const showLivePill = dest.featured && isWodLive;
   const labelMaxWidth = Math.max(size + 40, 130);
-  const popoverPos =
-    popoverPosOverride ||
-    dest.popoverPos ||
-    "top-full mt-3 left-1/2 -translate-x-1/2";
-  const descId = `bubble-desc-${dest.id}`;
   // Featured WOD is already prominent — gentler scale.
   const hoverScale = dest.featured ? 1.06 : 1.08;
 
