@@ -168,7 +168,6 @@ const Bubble = ({
   className,
   style,
   cycleImages,
-  popoverPosOverride,
 }: {
   dest: Destination;
   isWodLive: boolean;
@@ -176,7 +175,6 @@ const Bubble = ({
   className?: string;
   style?: React.CSSProperties;
   cycleImages?: string[];
-  popoverPosOverride?: string;
 }) => {
   const navigate = useNavigate();
   const Icon = dest.icon;
