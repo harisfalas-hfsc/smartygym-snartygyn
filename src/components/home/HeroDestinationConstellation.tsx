@@ -38,8 +38,6 @@ type Destination = {
   /** Tailwind animation delay (staggered float). */
   delay: string;
   featured?: boolean;
-  /** Where the hover description popover should appear relative to the bubble. */
-  popoverPos?: string;
 };
 
 const DESTINATIONS: Destination[] = [
@@ -56,7 +54,6 @@ const DESTINATIONS: Destination[] = [
     desktop: { top: 15, left: 530, size: 240 },
     delay: "0s",
     featured: true,
-    popoverPos: "top-full mt-3 left-full ml-3",
   },
   {
     id: "workouts",
@@ -70,7 +67,6 @@ const DESTINATIONS: Destination[] = [
     image: heroWorkoutsImage,
     desktop: { top: 70, left: 950, size: 190 },
     delay: "0.6s",
-    popoverPos: "top-1/2 right-full mr-1",
   },
   {
     id: "programs",
@@ -84,7 +80,6 @@ const DESTINATIONS: Destination[] = [
     image: heroProgramsImage,
     desktop: { top: 70, left: 160, size: 190 },
     delay: "1.2s",
-    popoverPos: "top-1/2 left-full ml-1",
   },
   {
     id: "tools",
@@ -98,7 +93,6 @@ const DESTINATIONS: Destination[] = [
     image: heroToolsImage,
     desktop: { top: 290, left: 0, size: 170 },
     delay: "0.9s",
-    popoverPos: "bottom-1/2 left-full ml-1",
   },
   {
     id: "library",
@@ -112,7 +106,6 @@ const DESTINATIONS: Destination[] = [
     image: heroLibraryImage,
     desktop: { top: 290, left: 1130, size: 170 },
     delay: "1.5s",
-    popoverPos: "bottom-1/2 right-full mr-1",
   },
   {
     id: "blog",
@@ -126,7 +119,6 @@ const DESTINATIONS: Destination[] = [
     image: heroBlogImage,
     desktop: { top: 430, left: 280, size: 190 },
     delay: "0.3s",
-    popoverPos: "top-1/2 left-full ml-1",
   },
   {
     id: "community",
@@ -140,7 +132,6 @@ const DESTINATIONS: Destination[] = [
     image: heroCommunityImage,
     desktop: { top: 430, left: 840, size: 190 },
     delay: "1.8s",
-    popoverPos: "top-1/2 right-full mr-1",
   },
 ];
 
@@ -157,7 +148,6 @@ const COACH: Destination = {
   image: harisFalasImage,
   desktop: { top: 310, left: 575, size: 150 },
   delay: "0.4s",
-  popoverPos: "top-full mt-3 left-1/2 -translate-x-1/2",
 };
 
 /** Decorative connection lines between bubble centers (desktop only). */
@@ -178,7 +168,6 @@ const Bubble = ({
   className,
   style,
   cycleImages,
-  popoverPosOverride,
 }: {
   dest: Destination;
   isWodLive: boolean;
@@ -186,17 +175,11 @@ const Bubble = ({
   className?: string;
   style?: React.CSSProperties;
   cycleImages?: string[];
-  popoverPosOverride?: string;
 }) => {
   const navigate = useNavigate();
   const Icon = dest.icon;
   const showLivePill = dest.featured && isWodLive;
   const labelMaxWidth = Math.max(size + 40, 130);
-  const popoverPos =
-    popoverPosOverride ||
-    dest.popoverPos ||
-    "top-full mt-3 left-1/2 -translate-x-1/2";
-  const descId = `bubble-desc-${dest.id}`;
   // Featured WOD is already prominent — gentler scale.
   const hoverScale = dest.featured ? 1.06 : 1.08;
 
@@ -234,7 +217,6 @@ const Bubble = ({
         type="button"
         onClick={() => navigate(dest.route)}
         aria-label={`Go to ${dest.title}`}
-        aria-describedby={descId}
         className={cn(
           "relative rounded-full overflow-hidden",
           "transform-gpu will-change-transform",
@@ -309,23 +291,6 @@ const Bubble = ({
         </span>
       </button>
       </span>
-
-      {/* Hover/focus description popover — placed in empty space next to the bubble */}
-      <div
-        id={descId}
-        role="tooltip"
-        className={cn(
-          "absolute z-40 w-[240px] p-4 rounded-lg border-2 border-primary",
-          "bg-primary text-primary-foreground shadow-2xl",
-          "text-sm sm:text-base leading-snug text-center font-bold",
-          "opacity-0 translate-y-1 pointer-events-none",
-          "group-hover:opacity-100 group-focus-within:opacity-100 group-hover:translate-y-0 group-focus-within:translate-y-0",
-          "transition-all duration-200",
-          popoverPos
-        )}
-      >
-        {dest.description}
-      </div>
 
       <div
         className="mt-2 text-center"
@@ -502,11 +467,6 @@ export const HeroDestinationConstellation = () => {
               size={tabletBubbleSize}
               cycleImages={dest.featured ? wodCycleImages : undefined}
               className="absolute"
-              popoverPosOverride={
-                top + tabletBubbleSize / 2 < tabletCenter
-                  ? "top-full mt-2 left-1/2 -translate-x-1/2"
-                  : "bottom-full mb-2 left-1/2 -translate-x-1/2"
-              }
               style={{
                 top: `${(top / tabletStage) * 100}%`,
                 left: `${(left / tabletStage) * 100}%`,
