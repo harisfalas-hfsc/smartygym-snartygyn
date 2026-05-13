@@ -292,23 +292,6 @@ const Bubble = ({
       </button>
       </span>
 
-      {/* Hover/focus description popover — placed in empty space next to the bubble */}
-      <div
-        id={descId}
-        role="tooltip"
-        className={cn(
-          "absolute z-40 w-[240px] p-4 rounded-lg border-2 border-primary",
-          "bg-primary text-primary-foreground shadow-2xl",
-          "text-sm sm:text-base leading-snug text-center font-bold",
-          "opacity-0 translate-y-1 pointer-events-none",
-          "group-hover:opacity-100 group-focus-within:opacity-100 group-hover:translate-y-0 group-focus-within:translate-y-0",
-          "transition-all duration-200",
-          popoverPos
-        )}
-      >
-        {dest.description}
-      </div>
-
       <div
         className="mt-2 text-center"
         style={{ maxWidth: `${labelMaxWidth}px` }}
