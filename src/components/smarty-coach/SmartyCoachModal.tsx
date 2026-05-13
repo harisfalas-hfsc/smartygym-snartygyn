@@ -246,12 +246,14 @@ export const SmartyCoachModal = ({ isOpen, onClose }: SmartyCoachModalProps) => 
                 className="group w-full h-auto py-4 px-4 flex items-center gap-3 text-left border-2 border-border hover:border-primary hover:bg-primary hover:text-primary-foreground"
                 onClick={() => handleMenuSelect('workout')}
               >
-                <Activity className="h-6 w-6 text-primary shrink-0 group-hover:text-primary-foreground" />
-                <div>
+                <div className="w-10 h-10 min-w-[2.5rem] min-h-[2.5rem] rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary-foreground/20">
+                  <Activity className="h-5 w-5 text-primary group-hover:text-primary-foreground" />
+                </div>
+                <div className="flex-1 min-w-0">
                   <p className="font-medium text-foreground group-hover:text-primary-foreground">Start a Workout</p>
                   <p className="text-xs text-muted-foreground group-hover:text-primary-foreground/80">Find the perfect workout for right now</p>
                 </div>
-                <ChevronRight className="h-4 w-4 ml-auto text-muted-foreground group-hover:text-primary-foreground" />
+                <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground group-hover:text-primary-foreground" />
               </Button>
 
               <Button
@@ -259,12 +261,14 @@ export const SmartyCoachModal = ({ isOpen, onClose }: SmartyCoachModalProps) => 
                 className="group w-full h-auto py-4 px-4 flex items-center gap-3 text-left border-2 border-border hover:border-primary hover:bg-primary hover:text-primary-foreground"
                 onClick={() => handleMenuSelect('program')}
               >
-                <Target className="h-6 w-6 text-primary shrink-0 group-hover:text-primary-foreground" />
-                <div>
+                <div className="w-10 h-10 min-w-[2.5rem] min-h-[2.5rem] rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary-foreground/20">
+                  <Target className="h-5 w-5 text-primary group-hover:text-primary-foreground" />
+                </div>
+                <div className="flex-1 min-w-0">
                   <p className="font-medium text-foreground group-hover:text-primary-foreground">Start a Program</p>
                   <p className="text-xs text-muted-foreground group-hover:text-primary-foreground/80">Get a structured training plan</p>
                 </div>
-                <ChevronRight className="h-4 w-4 ml-auto text-muted-foreground group-hover:text-primary-foreground" />
+                <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground group-hover:text-primary-foreground" />
               </Button>
 
               <Button
@@ -272,12 +276,14 @@ export const SmartyCoachModal = ({ isOpen, onClose }: SmartyCoachModalProps) => 
                 className="group w-full h-auto py-4 px-4 flex items-center gap-3 text-left border-2 border-border hover:border-primary hover:bg-primary hover:text-primary-foreground"
                 onClick={handleMeasurement}
               >
-                <Dumbbell className="h-6 w-6 text-primary shrink-0 group-hover:text-primary-foreground" />
-                <div>
+                <div className="w-10 h-10 min-w-[2.5rem] min-h-[2.5rem] rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary-foreground/20">
+                  <Dumbbell className="h-5 w-5 text-primary group-hover:text-primary-foreground" />
+                </div>
+                <div className="flex-1 min-w-0">
                   <p className="font-medium text-foreground group-hover:text-primary-foreground">Make a Measurement</p>
                   <p className="text-xs text-muted-foreground group-hover:text-primary-foreground/80">Open Smarty Tools and choose what you want to track</p>
                 </div>
-                <ChevronRight className="h-4 w-4 ml-auto text-muted-foreground group-hover:text-primary-foreground" />
+                <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground group-hover:text-primary-foreground" />
               </Button>
 
               <Button
@@ -285,12 +291,14 @@ export const SmartyCoachModal = ({ isOpen, onClose }: SmartyCoachModalProps) => 
                 className="group w-full h-auto py-4 px-4 flex items-center gap-3 text-left border-2 border-border hover:border-primary hover:bg-primary hover:text-primary-foreground"
                 onClick={() => handleMenuSelect('knowledge')}
               >
-                <BookOpen className="h-6 w-6 text-primary shrink-0 group-hover:text-primary-foreground" />
-                <div>
+                <div className="w-10 h-10 min-w-[2.5rem] min-h-[2.5rem] rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary-foreground/20">
+                  <BookOpen className="h-5 w-5 text-primary group-hover:text-primary-foreground" />
+                </div>
+                <div className="flex-1 min-w-0">
                   <p className="font-medium text-foreground group-hover:text-primary-foreground">Upgrade My Knowledge</p>
                   <p className="text-xs text-muted-foreground group-hover:text-primary-foreground/80">Discover articles on fitness, nutrition & wellness</p>
                 </div>
-                <ChevronRight className="h-4 w-4 ml-auto text-muted-foreground group-hover:text-primary-foreground" />
+                <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground group-hover:text-primary-foreground" />
               </Button>
             </div>
           )}
