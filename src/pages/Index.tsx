@@ -74,6 +74,8 @@ const Index = () => {
   // Mobile hero carousel state (cards are wider than viewport, swipeable)
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [wodCarouselApi, setWodCarouselApi] = useState<CarouselApi>();
+  const [currentWodSlide, setCurrentWodSlide] = useState(0);
 
   useEffect(() => {
     if (!carouselApi) return;
@@ -84,6 +86,16 @@ const Index = () => {
       carouselApi.off("select", onSelect);
     };
   }, [carouselApi]);
+
+  useEffect(() => {
+    if (!wodCarouselApi) return;
+    const onSelect = () => setCurrentWodSlide(wodCarouselApi.selectedScrollSnap());
+    onSelect();
+    wodCarouselApi.on("select", onSelect);
+    return () => {
+      wodCarouselApi.off("select", onSelect);
+    };
+  }, [wodCarouselApi]);
 
   // Mobile hero swipeable cards
   const heroCards = [
