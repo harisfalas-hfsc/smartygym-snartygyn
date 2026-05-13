@@ -56,7 +56,7 @@ const DESTINATIONS: Destination[] = [
     desktop: { top: 15, left: 530, size: 240 },
     delay: "0s",
     featured: true,
-    popoverPos: "top-full mt-1 left-1/2 -translate-x-1/2",
+    popoverPos: "top-full mt-3 left-full ml-3",
   },
   {
     id: "workouts",
@@ -124,7 +124,7 @@ const DESTINATIONS: Destination[] = [
     icon: FileText,
     route: "/blog",
     image: heroBlogImage,
-    desktop: { top: 380, left: 280, size: 190 },
+    desktop: { top: 430, left: 280, size: 190 },
     delay: "0.3s",
     popoverPos: "top-1/2 left-full ml-1",
   },
@@ -138,7 +138,7 @@ const DESTINATIONS: Destination[] = [
     icon: Users,
     route: "/community",
     image: heroCommunityImage,
-    desktop: { top: 380, left: 840, size: 190 },
+    desktop: { top: 430, left: 840, size: 190 },
     delay: "1.8s",
     popoverPos: "top-1/2 right-full mr-1",
   },
@@ -155,7 +155,7 @@ const COACH: Destination = {
   icon: User,
   route: "/coach-profile",
   image: harisFalasImage,
-  desktop: { top: 270, left: 575, size: 150 },
+  desktop: { top: 310, left: 575, size: 150 },
   delay: "0.4s",
   popoverPos: "top-full mt-3 left-1/2 -translate-x-1/2",
 };
@@ -547,14 +547,14 @@ export const HeroDestinationConstellation = () => {
           style={{
             width: "100%",
             maxWidth: "1300px",
-            height: `${650 * desktopScale}px`,
+            height: `${700 * desktopScale}px`,
             overflow: "hidden",
           }}
         >
           <div
             style={{
               width: "1300px",
-              height: "650px",
+              height: "700px",
               transform: `scale(${desktopScale})`,
               transformOrigin: "top left",
               position: "relative",
@@ -563,7 +563,7 @@ export const HeroDestinationConstellation = () => {
           {/* Decorative connection SVG */}
           <svg
             className="absolute inset-0 w-full h-full pointer-events-none"
-            viewBox="0 0 1300 650"
+            viewBox="0 0 1300 700"
             preserveAspectRatio="xMidYMid meet"
             aria-hidden="true"
           >
@@ -573,7 +573,7 @@ export const HeroDestinationConstellation = () => {
                 <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0" />
               </radialGradient>
             </defs>
-            <rect width="1300" height="650" fill="url(#constellation-glow)" />
+            <rect width="1300" height="700" fill="url(#constellation-glow)" />
             {CONNECTIONS.map(([a, b]) => {
               const A = centers[a];
               const B = centers[b];
