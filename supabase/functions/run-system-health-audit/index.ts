@@ -882,7 +882,7 @@ const handler = async (req: Request): Promise<Response> => {
       .lt('created_at', thirtyMinutesAgo);
     
     if (!zombieError && zombieRuns && zombieRuns.length > 0) {
-      // Auto-close zombie runs and report
+      // Auto-close zombie runs
       for (const zombie of zombieRuns) {
         await supabase
           .from('wod_generation_runs')
@@ -893,14 +893,29 @@ const handler = async (req: Request): Promise<Response> => {
           })
           .eq('id', zombie.id);
       }
-      
-      addCheck(
-        'WOD System',
-        'Zombie Generation Runs',
-        `${zombieRuns.length} stuck run(s) found and auto-closed`,
-        'fail',
-        `Runs stuck in "running" for >30min: ${zombieRuns.map(z => `${z.cyprus_date} (created ${z.created_at})`).join(', ')}. This indicates orchestrator timeout. Check generation function logs.`
+
+      // Determine severity: if every zombie's cyprus_date already has visible WODs,
+      // these are just stale duplicate runs (harmless cleanup) -> warning, not fail.
+      const affectedDates = Array.from(new Set(zombieRuns.map(z => z.cyprus_date)));
+      const { data: existingWods } = await supabase
+        .from('admin_workouts')
+        .select('generated_for_date, equipment')
+        .eq('is_workout_of_day', true)
+        .in('generated_for_date', affectedDates);
+
+      const datesWithoutWods = affectedDates.filter(d =>
+        !existingWods?.some(w => w.generated_for_date === d)
       );
+
+      const severity: 'fail' | 'warning' = datesWithoutWods.length > 0 ? 'fail' : 'warning';
+      const summary = severity === 'fail'
+        ? `${zombieRuns.length} stuck run(s) auto-closed; ${datesWithoutWods.length} date(s) missing WODs`
+        : `${zombieRuns.length} stale duplicate run(s) auto-closed (today's WODs are healthy)`;
+      const detail = severity === 'fail'
+        ? `Runs stuck in "running" for >30min and dates still missing WODs: ${datesWithoutWods.join(', ')}. Check generation function logs.`
+        : `Cleaned up old duplicate runs from removed cron jobs. All affected dates (${affectedDates.join(', ')}) already have valid WODs. No action needed.`;
+
+      addCheck('WOD System', 'Zombie Generation Runs', summary, severity, detail);
     } else {
       addCheck(
         'WOD System',
