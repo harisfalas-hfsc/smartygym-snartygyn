@@ -246,8 +246,8 @@ const Index = () => {
   };
   return <>
       <Helmet>
-        <title>SmartyGym | Online Gym | 500+ Workouts Training Programs | Haris Falas HFSC | smartygym.com</title>
-        <meta name="description" content="SmartyGym #1 online gym smartygym.com. 500+ expert workouts training programs by Sports Scientist Haris Falas HFSC. AMRAP TABATA HIIT strength cardio home workouts. Train anywhere anytime. 100% human zero AI." />
+        <title>SmartyGym | Online Gym | 500+ Workouts by Haris Falas</title>
+        <meta name="description" content="SmartyGym online gym: 500+ expert workouts and training programs by Sports Scientist Haris Falas. HIIT, TABATA, strength, cardio. Train anywhere." />
         <meta name="keywords" content="smartygym, smarty gym, online gym, online fitness, personal trainer, HFSC, HFSC Performance, Haris Falas, Sports Scientist, AMRAP workouts, TABATA training, HIIT workouts, strength training, cardio workouts, functional training, home workouts, bodyweight workouts, online training programs, workout programs online, fitness calculators, smartygym.com" />
         
         <meta name="semantic-keywords" content="online-fitness, home-workouts, virtual-training, digital-gym, remote-coaching, bodyweight-training, functional-fitness, strength-conditioning" />
