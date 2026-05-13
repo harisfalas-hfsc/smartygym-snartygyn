@@ -467,11 +467,6 @@ export const HeroDestinationConstellation = () => {
               size={tabletBubbleSize}
               cycleImages={dest.featured ? wodCycleImages : undefined}
               className="absolute"
-              popoverPosOverride={
-                top + tabletBubbleSize / 2 < tabletCenter
-                  ? "top-full mt-2 left-1/2 -translate-x-1/2"
-                  : "bottom-full mb-2 left-1/2 -translate-x-1/2"
-              }
               style={{
                 top: `${(top / tabletStage) * 100}%`,
                 left: `${(left / tabletStage) * 100}%`,
