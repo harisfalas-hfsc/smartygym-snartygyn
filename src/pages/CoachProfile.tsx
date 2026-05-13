@@ -33,7 +33,7 @@ const CoachProfile = () => {
   return (
     <>
       <Helmet>
-        <title>Haris Falas | Online Personal Trainer | Sports Scientist HFSC | SmartyGym</title>
+        <title>Haris Falas | Online Personal Trainer | SmartyGym</title>
         <meta name="description" content="Haris Falas - online personal trainer & Sports Scientist with 20+ years experience at HFSC Performance. Expert online workouts, training programs, and personal training worldwide. Strength & conditioning coach at smartygym.com" />
         <meta name="keywords" content="Haris Falas, Haris Falas reviews, Haris Falas trainer, personal trainer, online personal trainer, Sports Scientist, HFSC, HFSC Performance, strength and conditioning coach, fitness expert, online fitness professional, gym coach, training specialist, smartygym.com, SmartyGym coach, Haris Falas CSCS" />
         
