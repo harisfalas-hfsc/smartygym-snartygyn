@@ -1,0 +1,1 @@
+SELECT cron.unschedule('send-new-content-notifications-job');
