@@ -38,8 +38,6 @@ type Destination = {
   /** Tailwind animation delay (staggered float). */
   delay: string;
   featured?: boolean;
-  /** Where the hover description popover should appear relative to the bubble. */
-  popoverPos?: string;
 };
 
 const DESTINATIONS: Destination[] = [
