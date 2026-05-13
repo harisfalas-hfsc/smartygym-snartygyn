@@ -54,7 +54,6 @@ const DESTINATIONS: Destination[] = [
     desktop: { top: 15, left: 530, size: 240 },
     delay: "0s",
     featured: true,
-    popoverPos: "top-full mt-3 left-full ml-3",
   },
   {
     id: "workouts",
