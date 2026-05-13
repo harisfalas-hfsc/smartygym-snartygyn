@@ -547,14 +547,14 @@ export const HeroDestinationConstellation = () => {
           style={{
             width: "100%",
             maxWidth: "1300px",
-            height: `${650 * desktopScale}px`,
+            height: `${700 * desktopScale}px`,
             overflow: "hidden",
           }}
         >
           <div
             style={{
               width: "1300px",
-              height: "650px",
+              height: "700px",
               transform: `scale(${desktopScale})`,
               transformOrigin: "top left",
               position: "relative",
@@ -563,7 +563,7 @@ export const HeroDestinationConstellation = () => {
           {/* Decorative connection SVG */}
           <svg
             className="absolute inset-0 w-full h-full pointer-events-none"
-            viewBox="0 0 1300 650"
+            viewBox="0 0 1300 700"
             preserveAspectRatio="xMidYMid meet"
             aria-hidden="true"
           >
@@ -573,7 +573,7 @@ export const HeroDestinationConstellation = () => {
                 <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0" />
               </radialGradient>
             </defs>
-            <rect width="1300" height="650" fill="url(#constellation-glow)" />
+            <rect width="1300" height="700" fill="url(#constellation-glow)" />
             {CONNECTIONS.map(([a, b]) => {
               const A = centers[a];
               const B = centers[b];
