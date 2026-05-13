@@ -261,7 +261,7 @@ export const Navigation = () => {
   };
 
   const discoveryItems = [
-    { label: "About SmartyGym", path: "/about-smartygym", icon: Info, iconClass: "text-teal-500", track: undefined },
+    { label: "The SmartyGym", path: "/thesmartygym", icon: Info, iconClass: "text-teal-500", track: undefined },
     { label: "Smarty Workouts", path: "/workout", icon: Dumbbell, iconClass: "text-primary", track: undefined },
     { label: "Smarty Programs", path: "/trainingprogram", icon: ListChecks, iconClass: "text-blue-500", track: undefined },
     { label: "Smarty Ritual", path: "/daily-ritual", icon: Sparkles, iconClass: "text-purple-500", track: undefined },

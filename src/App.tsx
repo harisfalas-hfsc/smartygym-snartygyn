@@ -242,7 +242,8 @@ const AppContent = () => {
                 {/* Public routes */}
                 
                 <Route path="/community" element={<Community />} />
-                <Route path="/about-smartygym" element={<AboutSmartyGym />} />
+                <Route path="/thesmartygym" element={<AboutSmartyGym />} />
+                <Route path="/about-smartygym" element={<Navigate to="/thesmartygym" replace />} />
                 <Route path="/takeatour" element={<AboutSmartyGym />} />
                 <Route path="/take-a-tour" element={<AboutSmartyGym />} />
                 <Route path="/contact" element={<Contact />} />

@@ -618,9 +618,9 @@ const Index = () => {
             )}
           </div>
 
-          <div onClick={() => navigate('/about')} className="flex items-center gap-2.5 py-3 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md">
+          <div onClick={() => navigate('/thesmartygym')} className="flex items-center gap-2.5 py-3 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md">
             <Info className="w-5 h-5 text-primary flex-shrink-0" />
-            <span className="text-base font-medium">About SmartyGym</span>
+            <span className="text-base font-medium">The SmartyGym</span>
             <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
           </div>
           
