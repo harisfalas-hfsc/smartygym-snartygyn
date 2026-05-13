@@ -61,16 +61,16 @@ export default function AboutSmartyGym() {
   return (
     <>
       <Helmet>
-        <title>The SmartyGym | SmartyGym</title>
-        <meta name="description" content="Discover The SmartyGym — a leading online fitness ecosystem. 500+ expert-designed workouts, training programs, and tools by Sports Scientist Haris Falas." />
+        <title>About SmartyGym | The Complete Fitness Ecosystem | SmartyGym</title>
+        <meta name="description" content="About SmartyGym: discover our complete fitness ecosystem — daily workouts, training programs, Smarty Rituals, tools, exercise library, community, blog, and subscription plans." />
         <meta name="keywords" content="about SmartyGym, fitness app features, workout app guide, training programs, smarty ritual, smarty tools, exercise library, community, blog" />
         
-        <meta property="og:title" content="The SmartyGym | SmartyGym" />
-        <meta property="og:description" content="Discover The SmartyGym — a leading online fitness ecosystem. 500+ expert-designed workouts, training programs, and tools by Sports Scientist Haris Falas." />
+        <meta property="og:title" content="About SmartyGym | The Complete Fitness Ecosystem" />
+        <meta property="og:description" content="Your complete guide to the SmartyGym ecosystem — workouts, programs, rituals, tools, exercise library, community, blog, and progress tracking." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://smartygym.com/thesmartygym" />
+        <meta property="og:url" content="https://smartygym.com/about-smartygym" />
         
-        <link rel="canonical" href="https://smartygym.com/thesmartygym" />
+        <link rel="canonical" href="https://smartygym.com/about-smartygym" />
       </Helmet>
 
       <SEOEnhancer
