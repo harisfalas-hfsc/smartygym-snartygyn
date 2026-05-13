@@ -148,7 +148,6 @@ const COACH: Destination = {
   image: harisFalasImage,
   desktop: { top: 310, left: 575, size: 150 },
   delay: "0.4s",
-  popoverPos: "top-full mt-3 left-1/2 -translate-x-1/2",
 };
 
 /** Decorative connection lines between bubble centers (desktop only). */
