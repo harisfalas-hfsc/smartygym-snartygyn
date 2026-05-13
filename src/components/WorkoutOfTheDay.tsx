@@ -186,7 +186,12 @@ export const WorkoutOfTheDay = () => {
           <div className="flex flex-col items-center gap-4">
             <Skeleton className="h-8 w-64" />
             <Skeleton className="h-4 w-96" />
-            <div className="grid grid-cols-2 gap-4 w-full max-w-lg">
+            {/* Mobile carousel skeleton */}
+            <div className="sm:hidden w-full max-w-xs mx-auto">
+              <Skeleton className="h-[220px] w-full rounded-xl" />
+            </div>
+            {/* Desktop grid skeleton */}
+            <div className="hidden sm:grid grid-cols-2 gap-4 w-full max-w-lg">
               <Skeleton className="h-40 w-full rounded-lg" />
               <Skeleton className="h-40 w-full rounded-lg" />
             </div>
