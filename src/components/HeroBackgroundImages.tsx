@@ -45,6 +45,8 @@ export function HeroBackgroundImages({
           src={img.src}
           alt=""
           aria-hidden="true"
+          width={1920}
+          height={1080}
           className={cn(
             "absolute inset-0 w-full h-full object-cover z-0 transition-opacity duration-1000",
             currentIndex === index ? "opacity-100" : "opacity-0",
@@ -52,6 +54,7 @@ export function HeroBackgroundImages({
             className,
           )}
           loading={index === 0 ? "eager" : "lazy"}
+          fetchPriority={index === 0 ? "high" : "auto"}
           decoding="async"
         />
       ))}
