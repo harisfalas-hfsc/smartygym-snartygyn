@@ -217,7 +217,6 @@ const Bubble = ({
         type="button"
         onClick={() => navigate(dest.route)}
         aria-label={`Go to ${dest.title}`}
-        aria-describedby={descId}
         className={cn(
           "relative rounded-full overflow-hidden",
           "transform-gpu will-change-transform",
