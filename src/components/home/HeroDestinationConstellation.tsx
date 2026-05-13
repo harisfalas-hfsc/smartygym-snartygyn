@@ -53,7 +53,7 @@ const DESTINATIONS: Destination[] = [
     icon: CalendarCheck,
     route: "/workout/wod",
     image: heroWodImage,
-    desktop: { top: 0, left: 540, size: 200 },
+    desktop: { top: 15, left: 530, size: 240 },
     delay: "0s",
     featured: true,
     popoverPos: "top-full mt-1 left-1/2 -translate-x-1/2",
