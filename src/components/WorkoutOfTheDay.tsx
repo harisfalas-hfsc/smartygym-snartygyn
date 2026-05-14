@@ -1,15 +1,28 @@
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CalendarCheck, Clock, Dumbbell, Star, Crown, ShoppingBag, Archive, Home, TrendingUp, Layers, Target } from "lucide-react";
 import { useTodayWods } from "@/hooks/useTodayWods";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export const WorkoutOfTheDay = () => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
+  const [rotatingIndex, setRotatingIndex] = useState(0);
 
   const { bodyweightWod: bodyweightWOD, equipmentWod: equipmentWOD, variousWod: variousWOD, isRecoveryDay, hasWods: hasWODs, isLoading } = useTodayWods();
+
+  // Mobile-only: rotate between the two WODs every 2.5 seconds
+  useEffect(() => {
+    if (!isMobile || isRecoveryDay || !bodyweightWOD || !equipmentWOD) return;
+    const t = setInterval(() => {
+      setRotatingIndex((prev) => (prev + 1) % 2);
+    }, 2500);
+    return () => clearInterval(t);
+  }, [isMobile, isRecoveryDay, bodyweightWOD, equipmentWOD]);
 
   const getDifficultyColor = (stars: number | null) => {
     if (!stars) return "bg-gray-500/20 text-gray-600 border-gray-500/40";
@@ -219,10 +232,18 @@ export const WorkoutOfTheDay = () => {
               {renderRecoveryCard(variousWOD)}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-xl mx-auto mb-4">
-              {renderMiniCard(bodyweightWOD, true)}
-              {renderMiniCard(equipmentWOD, false)}
-            </div>
+            isMobile ? (
+              <div className="max-w-xl mx-auto mb-4">
+                {rotatingIndex === 0 && bodyweightWOD
+                  ? renderMiniCard(bodyweightWOD, true)
+                  : renderMiniCard(equipmentWOD, false)}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-xl mx-auto mb-4">
+                {renderMiniCard(bodyweightWOD, true)}
+                {renderMiniCard(equipmentWOD, false)}
+              </div>
+            )
           )
         ) : (
           <div className="bg-background/80 backdrop-blur-sm rounded-xl p-6 border-2 border-dashed border-primary/30 max-w-md mx-auto text-center mb-4">
