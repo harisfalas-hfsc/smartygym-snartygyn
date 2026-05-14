@@ -149,7 +149,7 @@ export function CheckInModalManager({ onBannerStateChange }: CheckInModalManager
 
       {/* Morning Form Dialog */}
       <Dialog open={showMorningForm} onOpenChange={setShowMorningForm}>
-        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-md max-h-[85dvh] overflow-y-auto p-0">
           <MorningCheckInForm
             onSubmit={handleMorningSubmit}
             isWindowOpen={windowStatus.isMorningWindow}
@@ -161,7 +161,7 @@ export function CheckInModalManager({ onBannerStateChange }: CheckInModalManager
 
       {/* Night Form Dialog */}
       <Dialog open={showNightForm} onOpenChange={setShowNightForm}>
-        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-md max-h-[85dvh] overflow-y-auto p-0">
           <NightCheckInForm
             onSubmit={handleNightSubmit}
             isWindowOpen={windowStatus.isNightWindow}
