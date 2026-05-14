@@ -16,13 +16,15 @@ import {
   BarChart3,
   TrendingUp,
   ArrowRight,
-  UserCheck
+  UserCheck,
+  Wrench,
+  Video
 } from "lucide-react";
 
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 
-export default function HumanPerformance() {
+export default function WhySmartyGym() {
 
   return (
     <>
@@ -34,9 +36,9 @@ export default function HumanPerformance() {
         <meta property="og:title" content="Why SmartyGym | Your Complete Fitness Ecosystem" />
         <meta property="og:description" content="SmartyGym provides a complete ecosystem to succeed with daily workouts, structured programs, and expert guidance. Like having a personal trainer in your pocket." />
         <meta property="og:type" content="article" />
-        <meta property="og:url" content="https://smartygym.com/human-performance" />
+        <meta property="og:url" content="https://smartygym.com/why-smartygym" />
         
-        <link rel="canonical" href="https://smartygym.com/human-performance" />
+        <link rel="canonical" href="https://smartygym.com/why-smartygym" />
       </Helmet>
 
       <SEOEnhancer
@@ -142,6 +144,26 @@ export default function HumanPerformance() {
                   </div>
                 </div>
                 
+                <div className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20">
+                  <div className="p-2 bg-primary/20 rounded-full flex-shrink-0">
+                    <Wrench className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Smarty Tools</h3>
+                    <p className="text-sm text-muted-foreground">Evidence-based calculators — 1RM, BMR, macro tracking and calorie counter — for data-driven training and nutrition.</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20">
+                  <div className="p-2 bg-primary/20 rounded-full flex-shrink-0">
+                    <Video className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Exercise Library</h3>
+                    <p className="text-sm text-muted-foreground">A searchable library of every exercise used in our workouts and programs, with clear demos and step-by-step instructions.</p>
+                  </div>
+                </div>
+
                 <div className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20">
                   <div className="p-2 bg-primary/20 rounded-full flex-shrink-0">
                     <BookOpen className="h-5 w-5 text-primary" />
