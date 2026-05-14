@@ -107,8 +107,8 @@ export default function AboutSmartyGym() {
 
           {/* Section 1: What is SmartyGym? */}
           <Card className="mb-6 border-2 border-primary/30">
-            <CardHeader className="text-center">
-              <CardTitle className="flex items-center justify-center gap-2">
+            <CardHeader className="text-left">
+              <CardTitle className="text-2xl font-semibold leading-none tracking-tight flex items-center justify-start gap-2 text-left">
                 <Heart className="h-5 w-5 text-primary" />
                 What is SmartyGym?
               </CardTitle>
