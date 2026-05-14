@@ -690,7 +690,7 @@ const Index = () => {
             <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
           </div>
           
-          <div onClick={() => navigate('/human-performance')} className="flex items-center gap-2.5 py-1.5 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md">
+          <div onClick={() => navigate('/why-smartygym')} className="flex items-center gap-2.5 py-1.5 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md">
             <TrendingUp className="w-5 h-5 text-primary flex-shrink-0" />
             <span className="text-base font-medium">Why SmartyGym?</span>
             <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
