@@ -576,6 +576,9 @@ const Index = () => {
                         src={wod.image_url || "/placeholder.svg"}
                         alt={wod.name}
                         className="w-full h-full object-cover transition-opacity duration-500"
+                        loading="eager"
+                        decoding="async"
+                        fetchPriority="high"
                         onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
                       />
                       <Badge className={cn("absolute top-3 left-3 text-white border-0", equipmentBadgeClass)}>
