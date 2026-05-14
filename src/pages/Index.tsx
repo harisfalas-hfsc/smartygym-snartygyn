@@ -457,8 +457,80 @@ const Index = () => {
         </div>
         
         {isMobile ? <section className="pt-0 pb-2 px-4">
+            {/* Mobile swipe indicator (homepage carousel) */}
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <button
+                type="button"
+                onClick={() => carouselApi?.scrollPrev()}
+                className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors"
+                aria-label="Previous card"
+              >
+                <ChevronLeft className="h-4 w-4 text-primary" />
+              </button>
+              <span className="text-xs text-muted-foreground font-medium">Swipe to explore</span>
+              <button
+                type="button"
+                onClick={() => carouselApi?.scrollNext()}
+                className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors"
+                aria-label="Next card"
+              >
+                <ChevronRight className="h-4 w-4 text-primary" />
+              </button>
+            </div>
+
+            <Carousel className="w-full" opts={{ align: "center", loop: true }} setApi={setCarouselApi}>
+              <CarouselContent className="-ml-2">
+                {heroCards.map((card) => {
+                  const Icon = card.icon;
+                  return (
+                    <CarouselItem key={card.id} className="pl-2 basis-[75%] sm:basis-[60%]">
+                      <div onClick={() => navigate(card.route)} className="border-2 border-primary/40 rounded-xl overflow-hidden hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300 cursor-pointer bg-card flex flex-col h-[260px] sm:h-[300px]">
+                        <div className="relative h-[70%] overflow-hidden flex-shrink-0">
+                          <img src={card.image} alt={card.title} className="w-full h-full object-cover object-[center_top]" />
+                        </div>
+                        <div className="flex flex-col justify-center flex-1 p-3 text-center">
+                          <div className="flex items-center justify-center gap-2 mb-1">
+                            <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                              <Icon className="w-3.5 h-3.5 text-primary" />
+                            </div>
+                            <h3 className="text-sm font-bold text-foreground leading-tight whitespace-nowrap">
+                              {card.title}
+                            </h3>
+                          </div>
+                          <p className="text-xs text-muted-foreground leading-snug line-clamp-2">
+                            {card.description}
+                          </p>
+                          <div className="flex items-center justify-center gap-1 text-primary text-[10px] font-medium mt-1">
+                            Explore
+                            <ChevronRight className="w-3 h-3" />
+                          </div>
+                        </div>
+                      </div>
+                    </CarouselItem>
+                  );
+                })}
+              </CarouselContent>
+              <CarouselPrevious className="hidden -left-12 bg-background border-2 border-primary shadow-lg" />
+              <CarouselNext className="hidden -right-12 bg-background border-2 border-primary shadow-lg" />
+            </Carousel>
+
+            {/* Carousel Dots */}
+            <div className="flex justify-center gap-2 mt-4">
+              {heroCards.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => carouselApi?.scrollTo(index)}
+                  className={cn(
+                    "w-2.5 h-2.5 rounded-full transition-all duration-300",
+                    currentSlide === index ? "bg-primary scale-125" : "bg-primary/30 hover:bg-primary/50"
+                  )}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
+
         {/* Quick Access Menu */}
-        <div className="space-y-3">
+        <div className="mt-8 space-y-3">
           {/* WOD Card - Always visible with "Being Prepared" fallback */}
           <div 
             onClick={() => navigate('/workout/wod')} 
@@ -622,77 +694,6 @@ const Index = () => {
           )}
         </div>
 
-            {/* Mobile swipe indicator (homepage carousel) */}
-            <div className="flex items-center justify-center gap-3 mb-3 mt-8">
-              <button
-                type="button"
-                onClick={() => carouselApi?.scrollPrev()}
-                className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors"
-                aria-label="Previous card"
-              >
-                <ChevronLeft className="h-4 w-4 text-primary" />
-              </button>
-              <span className="text-xs text-muted-foreground font-medium">Swipe to explore</span>
-              <button
-                type="button"
-                onClick={() => carouselApi?.scrollNext()}
-                className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors"
-                aria-label="Next card"
-              >
-                <ChevronRight className="h-4 w-4 text-primary" />
-              </button>
-            </div>
-
-            <Carousel className="w-full" opts={{ align: "center", loop: true }} setApi={setCarouselApi}>
-              <CarouselContent className="-ml-2">
-                {heroCards.map((card) => {
-                  const Icon = card.icon;
-                  return (
-                    <CarouselItem key={card.id} className="pl-2 basis-[75%] sm:basis-[60%]">
-                      <div onClick={() => navigate(card.route)} className="border-2 border-primary/40 rounded-xl overflow-hidden hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300 cursor-pointer bg-card flex flex-col h-[260px] sm:h-[300px]">
-                        <div className="relative h-[70%] overflow-hidden flex-shrink-0">
-                          <img src={card.image} alt={card.title} className="w-full h-full object-cover object-[center_top]" />
-                        </div>
-                        <div className="flex flex-col justify-center flex-1 p-3 text-center">
-                          <div className="flex items-center justify-center gap-2 mb-1">
-                            <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                              <Icon className="w-3.5 h-3.5 text-primary" />
-                            </div>
-                            <h3 className="text-sm font-bold text-foreground leading-tight whitespace-nowrap">
-                              {card.title}
-                            </h3>
-                          </div>
-                          <p className="text-xs text-muted-foreground leading-snug line-clamp-2">
-                            {card.description}
-                          </p>
-                          <div className="flex items-center justify-center gap-1 text-primary text-[10px] font-medium mt-1">
-                            Explore
-                            <ChevronRight className="w-3 h-3" />
-                          </div>
-                        </div>
-                      </div>
-                    </CarouselItem>
-                  );
-                })}
-              </CarouselContent>
-              <CarouselPrevious className="hidden -left-12 bg-background border-2 border-primary shadow-lg" />
-              <CarouselNext className="hidden -right-12 bg-background border-2 border-primary shadow-lg" />
-            </Carousel>
-
-            {/* Carousel Dots */}
-            <div className="flex justify-center gap-2 mt-4">
-              {heroCards.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => carouselApi?.scrollTo(index)}
-                  className={cn(
-                    "w-2.5 h-2.5 rounded-full transition-all duration-300",
-                    currentSlide === index ? "bg-primary scale-125" : "bg-primary/30 hover:bg-primary/50"
-                  )}
-                  aria-label={`Go to slide ${index + 1}`}
-                />
-              ))}
-            </div>
 
           </section> : <>
             {/* Desktop: Hero Section */}
