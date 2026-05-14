@@ -66,7 +66,7 @@ import NotFound from "./pages/NotFound";
 import JoinPremium from "./pages/JoinPremium";
 import SmartyCorporate from "./pages/SmartyCorporate";
 import CorporateWellness from "./pages/CorporateWellness";
-import HumanPerformance from "./pages/HumanPerformance";
+import WhySmartyGym from "./pages/WhySmartyGym";
 import WhyInvestInSmartyGym from "./pages/WhyInvestInSmartyGym";
 import PremiumBenefits from "./pages/PremiumBenefits";
 import SmartyPlans from "./pages/SmartyPlans";
@@ -171,7 +171,8 @@ const AppContent = () => {
                 {/* Corporate page is public */}
                 <Route path="/corporate" element={<SmartyCorporate />} />
                 <Route path="/corporate-wellness" element={<CorporateWellness />} />
-                <Route path="/human-performance" element={<HumanPerformance />} />
+                <Route path="/why-smartygym" element={<WhySmartyGym />} />
+                <Route path="/human-performance" element={<Navigate to="/why-smartygym" replace />} />
                 <Route path="/why-invest-in-smartygym" element={<WhyInvestInSmartyGym />} />
                 <Route path="/corporate-admin" element={<ProtectedRoute><CorporateAdmin /></ProtectedRoute>} />
                 
