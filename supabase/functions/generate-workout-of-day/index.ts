@@ -16,6 +16,7 @@ import {
 } from "../_shared/exercise-matching.ts";
 import { normalizeWorkoutHtml, validateWorkoutHtml } from "../_shared/html-normalizer.ts";
 import { validateWodSections } from "../_shared/section-validator.ts";
+import { applyWodQualityGate } from "../_shared/wod-quality-gate.ts";
 import { sanitizeProtocolBlocks, validateProtocolBlocks } from "../_shared/protocol-sanitizer.ts";
 import { injectProtocolExplanations } from "../_shared/protocol-explanations.ts";
 import { calculateWorkoutDurationMinutes, formatDurationLabel } from "../_shared/duration-calculator.ts";
@@ -2792,6 +2793,33 @@ Return JSON with these exact fields:
         foundIcons: sectionValidation.foundIcons,
         mainWorkoutExercises: sectionValidation.mainWorkoutExerciseCount,
         finisherExercises: sectionValidation.finisherExerciseCount
+      });
+
+      // ═══════════════════════════════════════════════════════════════════════════════
+      // WOD QUALITY GATE: duration minimum by difficulty + per-line prescription check
+      // + finisher structure check. Blocks weak/under-programmed advanced workouts and
+      // workouts whose exercise lines lack a measurable prescription.
+      // ═══════════════════════════════════════════════════════════════════════════════
+      const qualityGate = applyWodQualityGate({
+        mainWorkoutHtml: cleanedMainWorkout,
+        category,
+        difficultyStars: selectedDifficulty.stars,
+        format,
+        isRecoveryDay,
+      });
+      if (!qualityGate.ok) {
+        logStep(`❌ QUALITY GATE FAILED`, {
+          equipment,
+          workoutName: workoutContent.name,
+          computedMinutes: qualityGate.computedMinutes,
+          failures: qualityGate.failures,
+        });
+        throw new Error(`${equipment} WOD rejected: quality gate [${qualityGate.failures.join(" | ")}]`);
+      }
+      logStep(`✅ Quality gate passed`, {
+        equipment,
+        computedMinutes: qualityGate.computedMinutes,
+        difficultyStars: selectedDifficulty.stars,
       });
 
       // ═══════════════════════════════════════════════════════════════════════════════
