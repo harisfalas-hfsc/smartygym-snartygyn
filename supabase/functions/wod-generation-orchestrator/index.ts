@@ -398,12 +398,44 @@ async function notifyAdminOnce(
     ? `✅ WODs ready for ${targetDate} (${foundSlots.join(" + ")})`
     : `❌ WOD generation FAILED for ${targetDate} — action may be needed`;
 
+  // Fetch the actual generated workout names for this target date so the
+  // admin email shows WHICH workouts were generated (not just slot labels).
+  let generatedWorkouts: Array<{ slot: string; name: string; id: string }> = [];
+  try {
+    const { data: wodRows } = await supabase
+      .from("admin_workouts")
+      .select("id, name, equipment, category")
+      .eq("generated_for_date", targetDate)
+      .eq("is_workout_of_day", true);
+    if (Array.isArray(wodRows)) {
+      generatedWorkouts = wodRows.map((w: any) => ({
+        id: w.id,
+        name: w.name || "(unnamed)",
+        slot: w.equipment === "VARIOUS"
+          ? "VARIOUS"
+          : (w.equipment === "BODYWEIGHT" ? "BODYWEIGHT" : "EQUIPMENT"),
+      }));
+    }
+  } catch (e) {
+    console.error("[ORCHESTRATOR/notify] failed to fetch workout names:", e);
+  }
+
+  const workoutsListHtml = generatedWorkouts.length
+    ? `<ul style="margin:8px 0 16px 20px;padding:0">
+         ${generatedWorkouts.map((w) =>
+           `<li><strong>${w.slot}:</strong> ${w.name} <span style="color:#9ca3af;font-size:11px">(${w.id})</span></li>`
+         ).join("")}
+       </ul>`
+    : `<p style="color:#9ca3af;font-style:italic">Workout names unavailable.</p>`;
+
   const html = isSuccess
     ? `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px">
          <h2 style="color:#059669">✅ WODs Successfully Generated</h2>
          <p><strong>Target date:</strong> ${targetDate}</p>
          <p><strong>Slots ready:</strong> ${foundSlots.join(", ")}</p>
          <p><strong>Triggered by:</strong> ${triggerSource}</p>
+         <p><strong>Generated workouts:</strong></p>
+         ${workoutsListHtml}
          <p>Tomorrow's WODs are pre-built and waiting. They become "today" silently at 00:00 Cyprus.</p>
          <p style="color:#6b7280;font-size:12px;margin-top:24px">Automated success confirmation — sent once per slot per day.</p>
        </div>`
@@ -413,6 +445,8 @@ async function notifyAdminOnce(
          <p><strong>Missing slots:</strong> ${missingSlots.join(", ") || "UNKNOWN"}</p>
          <p><strong>Found slots:</strong> ${foundSlots.join(", ") || "none"}</p>
          <p><strong>Trigger:</strong> ${triggerSource}</p>
+         <p><strong>Workouts generated so far:</strong></p>
+         ${workoutsListHtml}
          <p>Up to 4 retry passes will run between 09:20 and 10:50 Cyprus. If they all fail, manually generate from <strong>Admin → WOD Manager → Generate New WOD</strong>.</p>
          <p style="color:#6b7280;font-size:12px;margin-top:24px">Automated failure alert — sent once per slot per day.</p>
        </div>`;
