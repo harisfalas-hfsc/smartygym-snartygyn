@@ -74,6 +74,7 @@ const Index = () => {
   // Mobile hero carousel state (cards are wider than viewport, swipeable)
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [activeWodIndex, setActiveWodIndex] = useState(0);
 
   useEffect(() => {
     if (!carouselApi) return;
@@ -115,6 +116,31 @@ const Index = () => {
   });
 
   const { bodyweightWod, equipmentWod, variousWod, hasWods } = useTodayWods(isMobile);
+  const mobileWodCards = [
+    bodyweightWod && { id: "bodyweight", label: "No Equipment", badgeClassName: "bg-green-500 hover:bg-green-500", wod: bodyweightWod },
+    equipmentWod && { id: "equipment", label: "With Equipment", badgeClassName: "bg-orange-500 hover:bg-orange-500", wod: equipmentWod },
+    variousWod && { id: "various", label: "Recovery", badgeClassName: "bg-cyan-500 hover:bg-cyan-500", wod: variousWod },
+  ].filter(Boolean) as Array<{
+    id: string;
+    label: string;
+    badgeClassName: string;
+    wod: NonNullable<typeof bodyweightWod>;
+  }>;
+  const activeMobileWod = mobileWodCards.length > 0 ? mobileWodCards[activeWodIndex % mobileWodCards.length] : null;
+
+  useEffect(() => {
+    if (!isMobile || mobileWodCards.length <= 1) {
+      setActiveWodIndex(0);
+      return;
+    }
+
+    const interval = window.setInterval(() => {
+      setActiveWodIndex((current) => (current + 1) % mobileWodCards.length);
+    }, 2500);
+
+    return () => window.clearInterval(interval);
+  }, [isMobile, mobileWodCards.length]);
+
   useEffect(() => {
     // Check current session
     supabase.auth.getSession().then(({
