@@ -430,6 +430,14 @@ const About = () => {
                     </div>
 
                   </div>
+
+                  <a
+                    href="https://smartygym.com/about-smartygym"
+                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+                  >
+                    Read More About SmartyGym
+                    <ChevronRight className="w-4 h-4" />
+                  </a>
                 </div>
               </CardContent>
             </Card>
