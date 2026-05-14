@@ -114,12 +114,12 @@ export default function AboutSmartyGym() {
               </CardTitle>
             </CardHeader>
             <CardContent className="prose prose-sm dark:prose-invert max-w-none">
-              <p className="text-center text-muted-foreground">
+              <p className="text-muted-foreground text-left">
                 In a world of endless fitness advice on YouTube, conflicting information on social media, and generic gym memberships 
                 that lead nowhere, finding a structured path to real results has never been harder. <span className="text-primary font-bold">SmartyGym</span> provides the 
                 ecosystem you need to elevate every aspect of your performance—anywhere, anytime.
               </p>
-              <p className="text-center text-muted-foreground mt-4">
+              <p className="text-muted-foreground mt-4 text-left">
                 Your body is your greatest asset. <span className="text-primary font-bold whitespace-nowrap">SmartyGym is your Gym Re-imagined</span>: expert-designed workouts, 
                 structured training programs, and a complete wellness ecosystem that keeps you consistent and motivated.
               </p>
