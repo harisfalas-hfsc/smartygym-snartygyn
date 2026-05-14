@@ -568,7 +568,6 @@ const Index = () => {
                 return (
                   <Card
                     className="group cursor-pointer overflow-hidden hover:shadow-xl transition-all duration-300 hover:border-primary/60"
-                    onClick={(e) => { e.stopPropagation(); navigate(`/workout/wod/${wod.id}`); }}
                   >
                     <div className="relative aspect-video overflow-hidden">
                       <img
