@@ -129,6 +129,17 @@ const Index = () => {
   }>;
   const activeMobileWod = mobileWodCards.length > 0 ? mobileWodCards[activeWodIndex % mobileWodCards.length] : null;
 
+  // Preload all mobile WOD images so rotation is instant (no flash/loading)
+  useEffect(() => {
+    if (!isMobile) return;
+    mobileWodCards.forEach((card) => {
+      if (card.wod.image_url) {
+        const img = new Image();
+        img.src = card.wod.image_url;
+      }
+    });
+  }, [isMobile, mobileWodCards.map((c) => c.wod.image_url).join("|")]);
+
   useEffect(() => {
     if (!isMobile || mobileWodCards.length <= 1) {
       setActiveWodIndex(0);
