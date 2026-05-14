@@ -544,43 +544,111 @@ const Index = () => {
             </div>
             
             {hasWods ? (
-              activeMobileWod && (
-                <div className="relative rounded-lg overflow-hidden border border-border">
-                  <img
-                    key={activeMobileWod.wod.id}
-                    src={activeMobileWod.wod.image_url || '/placeholder.svg'}
-                    alt={activeMobileWod.wod.name}
-                    className="w-full h-44 sm:h-56 object-cover object-[center_top] transition-opacity duration-500"
-                    onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
-                  />
-                  <Badge className={cn("absolute top-1.5 left-1.5 text-white text-[10px] px-1.5 py-0.5", activeMobileWod.badgeClassName)}>{activeMobileWod.label}</Badge>
-                  <div className="p-2 bg-background/90">
-                    <p className="text-sm font-semibold line-clamp-1">{activeMobileWod.wod.name}</p>
-                    <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                      <span className="text-red-500">{activeMobileWod.wod.category}</span>
-                      {activeMobileWod.wod.format && (
-                        <>
-                          <span>•</span>
-                          <span>{activeMobileWod.wod.format}</span>
-                        </>
+              activeMobileWod && (() => {
+                const wod = activeMobileWod.wod;
+                const isVarious = activeMobileWod.id === "various";
+                const isBodyweight = activeMobileWod.id === "bodyweight";
+                const equipmentIcon = isVarious ? <Shuffle className="w-4 h-4" /> : isBodyweight ? <Home className="w-4 h-4" /> : <Dumbbell className="w-4 h-4" />;
+                const equipmentLabel = isVarious ? "Mixed/Minimal" : isBodyweight ? "No Equipment" : "With Equipment";
+                const equipmentBadgeClass = isVarious ? "bg-purple-500" : isBodyweight ? "bg-blue-500" : "bg-orange-500";
+                const isNew = wod.created_at ? (Date.now() - new Date(wod.created_at).getTime()) / (1000 * 60 * 60 * 24) <= 2 : false;
+                const stripHtml = (html: string | null | undefined) => (html ? html.replace(/<[^>]*>/g, "") : "");
+                const isRecovery = wod.category?.toUpperCase() === "RECOVERY";
+                return (
+                  <Card
+                    className="group cursor-pointer overflow-hidden hover:shadow-xl transition-all duration-300 hover:border-primary/60"
+                    onClick={(e) => { e.stopPropagation(); navigate(`/workout/wod/${wod.id}`); }}
+                  >
+                    <div className="relative aspect-video overflow-hidden">
+                      <img
+                        key={wod.id}
+                        src={wod.image_url || "/placeholder.svg"}
+                        alt={wod.name}
+                        className="w-full h-full object-cover transition-opacity duration-500"
+                        onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
+                      />
+                      <Badge className={cn("absolute top-3 left-3 text-white border-0", equipmentBadgeClass)}>
+                        {equipmentIcon}
+                        <span className="ml-1">{equipmentLabel}</span>
+                      </Badge>
+                      {isNew && (
+                        <Badge className="absolute top-3 right-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white border-0">NEW</Badge>
                       )}
+                      <div className="absolute bottom-3 right-3">
+                        {wod.is_premium ? (
+                          <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0 shadow-lg">
+                            <Crown className="w-3 h-3 mr-1" />Premium
+                          </Badge>
+                        ) : wod.is_standalone_purchase && wod.price ? (
+                          <Badge className="bg-gradient-to-r from-green-500 to-emerald-600 text-white border-0 shadow-lg">
+                            <ShoppingCart className="w-3 h-3 mr-1" />€{wod.price.toFixed(2)}
+                          </Badge>
+                        ) : (
+                          <Badge className="bg-gradient-to-r from-blue-500 to-cyan-600 text-white border-0 shadow-lg">
+                            <Check className="w-3 h-3 mr-1" />Free
+                          </Badge>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                  {mobileWodCards.length > 1 && (
-                    <div className="absolute right-2 top-2 flex gap-1">
-                      {mobileWodCards.map((card, index) => (
-                        <span
-                          key={card.id}
-                          className={cn(
-                            "h-1.5 w-1.5 rounded-full transition-colors",
-                            index === activeWodIndex % mobileWodCards.length ? "bg-primary" : "bg-background/70"
-                          )}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )
+                    <CardContent className="p-3">
+                      <h3 className="text-base font-bold text-foreground mb-1 group-hover:text-primary transition-colors line-clamp-1">
+                        {wod.name}
+                      </h3>
+                      {wod.description && (
+                        <p className="text-muted-foreground text-xs mb-2 line-clamp-2 min-h-[2.25rem]">
+                          {stripHtml(wod.description).substring(0, 120)}...
+                        </p>
+                      )}
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] mb-2">
+                        {wod.category && (
+                          <>
+                            <div className="flex items-center gap-1">
+                              <Layers className="w-3 h-3 text-primary" />
+                              <span className="text-muted-foreground font-medium">{wod.category}</span>
+                            </div>
+                            <span className="text-muted-foreground/50">•</span>
+                          </>
+                        )}
+                        <div className="flex items-center gap-1">
+                          <Target className="w-3 h-3 text-primary" />
+                          <span className="text-blue-600 dark:text-blue-400 font-medium">{wod.format || "General"}</span>
+                        </div>
+                        <span className="text-muted-foreground/50">•</span>
+                        <div className="flex items-center gap-1">
+                          <TrendingUp className={`w-3 h-3 ${isRecovery ? "text-green-600 dark:text-green-400" : getDifficultyColorClasses(wod.difficulty_stars || wod.difficulty).icon}`} />
+                          <span className={`font-medium capitalize ${isRecovery ? "text-green-600 dark:text-green-400" : getDifficultyColorClasses(wod.difficulty_stars || wod.difficulty).text}`}>
+                            {isRecovery
+                              ? "All Levels"
+                              : (wod.difficulty || (wod.difficulty_stars ? (wod.difficulty_stars <= 2 ? "Beginner" : wod.difficulty_stars <= 4 ? "Intermediate" : "Advanced") : "Beginner"))}
+                            {!isRecovery && wod.difficulty_stars ? ` (${wod.difficulty_stars}★)` : ""}
+                          </span>
+                        </div>
+                        <span className="text-muted-foreground/50">•</span>
+                        <div className="flex items-center gap-1">
+                          <Clock className="w-3 h-3 text-purple-600 dark:text-purple-400" />
+                          <span className="text-purple-600 dark:text-purple-400 font-medium">{wod.duration || "45-60 min"}</span>
+                        </div>
+                      </div>
+                      <Button className="w-full" size="sm" onClick={(e) => { e.stopPropagation(); navigate(`/workout/wod/${wod.id}`); }}>
+                        View Workout
+                      </Button>
+                      {mobileWodCards.length > 1 && (
+                        <div className="flex justify-center gap-1.5 mt-2">
+                          {mobileWodCards.map((card, index) => (
+                            <span
+                              key={card.id}
+                              className={cn(
+                                "h-1.5 w-1.5 rounded-full transition-colors",
+                                index === activeWodIndex % mobileWodCards.length ? "bg-primary" : "bg-muted-foreground/30"
+                              )}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                );
+              })()
             ) : (
               /* Being Prepared fallback */
               <div className="text-center py-4">
