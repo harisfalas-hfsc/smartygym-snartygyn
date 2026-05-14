@@ -629,11 +629,8 @@ const Index = () => {
                           <span className="text-purple-600 dark:text-purple-400 font-medium">{wod.duration || "45-60 min"}</span>
                         </div>
                       </div>
-                      <Button className="w-full" size="sm" onClick={(e) => { e.stopPropagation(); navigate(`/workout/wod/${wod.id}`); }}>
-                        View Workout
-                      </Button>
                       {mobileWodCards.length > 1 && (
-                        <div className="flex justify-center gap-1.5 mt-2">
+                        <div className="flex justify-center gap-1.5 mt-1">
                           {mobileWodCards.map((card, index) => (
                             <span
                               key={card.id}
