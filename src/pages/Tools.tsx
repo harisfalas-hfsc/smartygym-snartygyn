@@ -208,20 +208,20 @@ const Tools = () => {
                   <CarouselItem key={tool.id} className="pl-2 basis-[75%]">
                     <div
                       onClick={() => navigate(tool.route)}
-                      className="flex flex-col h-[220px] bg-card border-2 border-primary/40 rounded-xl overflow-hidden cursor-pointer hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300"
+                      className="flex flex-col h-[260px] bg-card border-2 border-primary/40 rounded-xl overflow-hidden cursor-pointer hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300"
                     >
                       {/* Image section */}
-                      <div className="relative h-[55%] overflow-hidden">
+                      <div className="relative h-[70%] overflow-hidden">
                         <img 
                           src={tool.mobileImage} 
                           alt={tool.title}
                           loading="lazy"
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover object-[center_top]"
                         />
                       </div>
                       {/* Content section */}
-                      <div className="flex flex-col justify-center flex-1 p-3 text-center">
-                        <div className="flex items-center justify-center gap-2 mb-1">
+                      <div className="flex flex-col justify-center flex-1 px-3 py-2 text-center">
+                        <div className="flex items-center justify-center gap-2 mb-0.5">
                           <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                             <Icon className="w-4 h-4 text-primary" />
                           </div>
