@@ -196,7 +196,7 @@ export default function WhyInvestInSmartyGym() {
         <main className="container mx-auto max-w-4xl md:max-w-[1200px] px-4 md:px-6 pb-8">
           <PageBreadcrumbs items={[
             { label: "Home", href: "/" },
-            { label: "Why SmartyGym", href: "/why-smartygym" },
+            { label: "About SmartyGym", href: "/about-smartygym" },
             { label: "Why Invest in SmartyGym" }
           ]} />
 
