@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { Image } from "https://deno.land/x/imagescript@1.2.17/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -116,15 +117,36 @@ Remember: ZERO text on the image. Only show people training with PHYSICALLY POSS
       throw new Error("No image generated");
     }
 
-    // Upload to Supabase Storage
-    const fileName = `program-${Date.now()}-${Math.random().toString(36).substring(7)}.png`;
+    // Decode original PNG, then resize + re-encode as JPEG to dramatically reduce file size.
+    // Falls back to original PNG if optimization fails for any reason — guarantees an image is always uploaded.
     const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, "");
-    const buffer = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0));
+    const originalBuffer = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0));
+
+    let uploadBuffer: Uint8Array = originalBuffer;
+    let uploadExt = "png";
+    let uploadContentType = "image/png";
+
+    try {
+      const decoded = await Image.decode(originalBuffer);
+      const targetWidth = 800;
+      if (decoded.width > targetWidth) {
+        decoded.resize(targetWidth, Image.RESIZE_AUTO);
+      }
+      const jpegBytes = await decoded.encodeJPEG(82);
+      uploadBuffer = jpegBytes;
+      uploadExt = "jpg";
+      uploadContentType = "image/jpeg";
+      console.log(`Optimized program image: ${originalBuffer.length} -> ${jpegBytes.length} bytes`);
+    } catch (optErr) {
+      console.warn("Image optimization failed, falling back to original PNG:", optErr);
+    }
+
+    const fileName = `program-${Date.now()}-${Math.random().toString(36).substring(7)}.${uploadExt}`;
 
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from("avatars")
-      .upload(`program-covers/${fileName}`, buffer, {
-        contentType: "image/png",
+      .upload(`program-covers/${fileName}`, uploadBuffer, {
+        contentType: uploadContentType,
         upsert: false,
       });
 
