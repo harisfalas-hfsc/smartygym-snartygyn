@@ -74,6 +74,7 @@ const Index = () => {
   // Mobile hero carousel state (cards are wider than viewport, swipeable)
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [activeWodIndex, setActiveWodIndex] = useState(0);
 
   useEffect(() => {
     if (!carouselApi) return;
@@ -115,6 +116,31 @@ const Index = () => {
   });
 
   const { bodyweightWod, equipmentWod, variousWod, hasWods } = useTodayWods(isMobile);
+  const mobileWodCards = [
+    bodyweightWod && { id: "bodyweight", label: "No Equipment", badgeClassName: "bg-green-500 hover:bg-green-500", wod: bodyweightWod },
+    equipmentWod && { id: "equipment", label: "With Equipment", badgeClassName: "bg-orange-500 hover:bg-orange-500", wod: equipmentWod },
+    variousWod && { id: "various", label: "Recovery", badgeClassName: "bg-cyan-500 hover:bg-cyan-500", wod: variousWod },
+  ].filter(Boolean) as Array<{
+    id: string;
+    label: string;
+    badgeClassName: string;
+    wod: NonNullable<typeof bodyweightWod>;
+  }>;
+  const activeMobileWod = mobileWodCards.length > 0 ? mobileWodCards[activeWodIndex % mobileWodCards.length] : null;
+
+  useEffect(() => {
+    if (!isMobile || mobileWodCards.length <= 1) {
+      setActiveWodIndex(0);
+      return;
+    }
+
+    const interval = window.setInterval(() => {
+      setActiveWodIndex((current) => (current + 1) % mobileWodCards.length);
+    }, 2500);
+
+    return () => window.clearInterval(interval);
+  }, [isMobile, mobileWodCards.length]);
+
   useEffect(() => {
     // Check current session
     supabase.auth.getSession().then(({
@@ -457,9 +483,9 @@ const Index = () => {
                   const Icon = card.icon;
                   return (
                     <CarouselItem key={card.id} className="pl-2 basis-[75%] sm:basis-[60%]">
-                      <div onClick={() => navigate(card.route)} className="border-2 border-primary/40 rounded-xl overflow-hidden hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300 cursor-pointer bg-card flex flex-col h-[220px] sm:h-[280px]">
-                        <div className="relative h-[55%] overflow-hidden flex-shrink-0">
-                          <img src={card.image} alt={card.title} className="w-full h-full object-cover" />
+                      <div onClick={() => navigate(card.route)} className="border-2 border-primary/40 rounded-xl overflow-hidden hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300 cursor-pointer bg-card flex flex-col h-[260px] sm:h-[300px]">
+                        <div className="relative h-[70%] overflow-hidden flex-shrink-0">
+                          <img src={card.image} alt={card.title} className="w-full h-full object-cover object-[center_top]" />
                         </div>
                         <div className="flex flex-col justify-center flex-1 p-3 text-center">
                           <div className="flex items-center justify-center gap-2 mb-1">
@@ -517,87 +543,43 @@ const Index = () => {
             </div>
             
             {hasWods ? (
-              /* Workout images - dynamic columns based on count */
-              (() => {
-                const wodCards = [bodyweightWod, equipmentWod, variousWod].filter(Boolean);
-                const wodCount = wodCards.length;
-                return (
-                  <div className={`grid ${wodCount === 1 ? 'grid-cols-1' : 'grid-cols-2'} gap-3`}>
-                    {/* Bodyweight workout */}
-                    {bodyweightWod && (
-                      <div className="relative rounded-lg overflow-hidden border border-border">
-                        <img 
-                          src={bodyweightWod.image_url || '/placeholder.svg'} 
-                          alt={bodyweightWod.name}
-className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-cover`}
-                          onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
-                        />
-                        <Badge className="absolute top-1 left-1 bg-green-500 hover:bg-green-500 text-white text-[10px] px-1.5 py-0.5">No Equipment</Badge>
-                        <div className="p-2 bg-background/90">
-                          <p className="text-xs font-semibold line-clamp-1">{bodyweightWod.name}</p>
-                          <div className="flex items-center gap-1 text-[9px] text-muted-foreground">
-                            <span className="text-red-500">{bodyweightWod.category}</span>
-                            {bodyweightWod.format && (
-                              <>
-                                <span>•</span>
-                                <span>{bodyweightWod.format}</span>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    
-                    {/* Equipment workout */}
-                    {equipmentWod && (
-                      <div className="relative rounded-lg overflow-hidden border border-border">
-                        <img 
-                          src={equipmentWod.image_url || '/placeholder.svg'} 
-                          alt={equipmentWod.name}
-className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-cover`}
-                          onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
-                        />
-                        <Badge className="absolute top-1 left-1 bg-orange-500 hover:bg-orange-500 text-white text-[10px] px-1.5 py-0.5">With Equipment</Badge>
-                        <div className="p-2 bg-background/90">
-                          <p className="text-xs font-semibold line-clamp-1">{equipmentWod.name}</p>
-                          <div className="flex items-center gap-1 text-[9px] text-muted-foreground">
-                            <span className="text-red-500">{equipmentWod.category}</span>
-                            {equipmentWod.format && (
-                              <>
-                                <span>•</span>
-                                <span>{equipmentWod.format}</span>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    {variousWod && !bodyweightWod && !equipmentWod && (
-                      <div className="relative rounded-lg overflow-hidden border border-border">
-                        <img 
-                          src={variousWod.image_url || '/placeholder.svg'} 
-                          alt={variousWod.name}
-className={`w-full ${wodCount === 1 ? 'h-36 sm:h-48' : 'h-28 sm:h-40'} object-cover`}
-                          onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
-                        />
-                        <Badge className="absolute top-1 left-1 bg-cyan-500 hover:bg-cyan-500 text-white text-[10px] px-1.5 py-0.5">Recovery</Badge>
-                        <div className="p-2 bg-background/90">
-                          <p className="text-xs font-semibold line-clamp-1">{variousWod.name}</p>
-                          <div className="flex items-center gap-1 text-[9px] text-muted-foreground">
-                            <span className="text-red-500">{variousWod.category}</span>
-                            {variousWod.format && (
-                              <>
-                                <span>•</span>
-                                <span>{variousWod.format}</span>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    )}
+              activeMobileWod && (
+                <div className="relative rounded-lg overflow-hidden border border-border">
+                  <img
+                    key={activeMobileWod.wod.id}
+                    src={activeMobileWod.wod.image_url || '/placeholder.svg'}
+                    alt={activeMobileWod.wod.name}
+                    className="w-full h-44 sm:h-56 object-cover object-[center_top] transition-opacity duration-500"
+                    onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
+                  />
+                  <Badge className={cn("absolute top-1.5 left-1.5 text-white text-[10px] px-1.5 py-0.5", activeMobileWod.badgeClassName)}>{activeMobileWod.label}</Badge>
+                  <div className="p-2 bg-background/90">
+                    <p className="text-sm font-semibold line-clamp-1">{activeMobileWod.wod.name}</p>
+                    <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                      <span className="text-red-500">{activeMobileWod.wod.category}</span>
+                      {activeMobileWod.wod.format && (
+                        <>
+                          <span>•</span>
+                          <span>{activeMobileWod.wod.format}</span>
+                        </>
+                      )}
+                    </div>
                   </div>
-                );
-              })()
+                  {mobileWodCards.length > 1 && (
+                    <div className="absolute right-2 top-2 flex gap-1">
+                      {mobileWodCards.map((card, index) => (
+                        <span
+                          key={card.id}
+                          className={cn(
+                            "h-1.5 w-1.5 rounded-full transition-colors",
+                            index === activeWodIndex % mobileWodCards.length ? "bg-primary" : "bg-background/70"
+                          )}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )
             ) : (
               /* Being Prepared fallback */
               <div className="text-center py-4">
