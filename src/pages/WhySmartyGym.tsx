@@ -150,7 +150,7 @@ export default function WhySmartyGym() {
                   </div>
                   <div>
                     <h3 className="font-semibold">Smarty Tools</h3>
-                    <p className="text-sm text-muted-foreground">Evidence-based calculators — 1RM, BMR, macro tracking and calorie counter — for data-driven training and nutrition.</p>
+                    <p className="text-sm text-muted-foreground">Five evidence-based tools — 1RM Calculator, BMR Calculator, Macro Tracking Calculator, Workout Timer and Calorie Counter — for data-driven training and nutrition.</p>
                   </div>
                 </div>
 
