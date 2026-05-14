@@ -1,85 +1,52 @@
-## Goal
+# Fix Today's WODs (2026-05-15)
 
-Two changes to the page currently at `/human-performance`:
+Both live WODs are missing round prescriptions on the Finisher block, and the bodyweight WOD's advertised duration (11 min) is unrealistic for an Advanced session. Protocols stay exactly as-is — only the finisher round count and the duration field change.
 
-1. Add the missing **Smarty Tools** and **Exercise Library** entries to the "Your Complete Fitness Ecosystem" card.
-2. Rename the page (file, component, route, URL) from "Human Performance" to **"Why SmartyGym"** so the URL matches the visible page title and the "Why SmartyGym" button in the footer/home.
+## WOD 1 — Granite Coil Press (Bodyweight, Advanced, MIX)
 
----
+Current duration: **11 min** → Realistic for the prescribed work.
 
-## 1. Add Smarty Tools + Exercise Library to the ecosystem grid
+Main Workout (unchanged):
+- 4 sets × 6 reps drop jump squat
+- 3 sets × 8 reps side-lying biceps curl
+- 3 sets × 10 reps squatting row
 
-File: `src/pages/HumanPerformance.tsx` (becomes `WhySmartyGym.tsx` — see step 2).
+Finisher (For Time) — currently no round count. Add:
+> **Complete 3 rounds for time:**
+> - 12 reps burpee
+> - 16 reps posterior step to overhead reach
+> - 12 reps standing one-arm row
 
-Current grid order inside the "Your Complete Fitness Ecosystem" card:
-1. 100% Human. 0% AI. (full width)
-2. Daily Fresh Workouts
-3. Structured Training Programs
-4. Daily Smarty Rituals
-5. Smarty Check-ins
-6. Expert Blog Articles
-7. Supportive Community
-8. Personal LogBook (full width)
+Recalculated duration:
+- Main: 10 working sets × ~60 sec work + ~45 sec rest ≈ **16–18 min**
+- Finisher: 3 rounds × ~2 min ≈ **6 min**
+- **New advertised duration: 23 min**
 
-Currently missing: **Smarty Tools** and **Exercise Library**.
+## WOD 2 — Arcane Descent Test (Equipment, Advanced, EMOM)
 
-New order, inserting both right after the workout/program/ritual cluster and before community/blog so neither ends up last:
-1. 100% Human. 0% AI. (full width)
-2. Daily Fresh Workouts
-3. Structured Training Programs
-4. Daily Smarty Rituals
-5. Smarty Check-ins
-6. **Smarty Tools** (new)
-7. **Exercise Library** (new — placed immediately after Smarty Tools, per the user's instruction)
-8. Expert Blog Articles
-9. Supportive Community
-10. Personal LogBook (full width)
+Current duration: **29 min**.
 
-New cards (same visual pattern as the existing items):
+Main Workout (EMOM, unchanged): 5 exercises × 5 rounds = 25 min.
 
-- **Smarty Tools** — icon `Wrench` (lucide-react). Description: "Evidence-based calculators — 1RM, BMR, macro tracking and calorie counter — for data-driven training and nutrition."
-- **Exercise Library** — icon `Video` (lucide-react). Description: "A searchable library of every exercise used in our workouts and programs, with clear demos and step-by-step instructions."
+Finisher (For Time) — currently no round count. Add:
+> **Complete 3 rounds for time:**
+> - 12 reps barbell thruster
+> - 16 reps band step-up
+> - 12 reps alternate lateral pulldown
 
-Both use `bg-primary/20` icon chip + `text-primary` icon, matching the rest. Add `Wrench` and `Video` to the lucide-react import block.
+Recalculated duration:
+- Main EMOM: **25 min**
+- Finisher: 3 rounds × ~2.5 min ≈ **7 min**
+- **New advertised duration: 32 min**
 
-(No copy change to other sections; the rest of the page is untouched.)
+## What I will change (data-only, no code)
 
----
+For each of the two workout rows in `admin_workouts`:
+1. Update `main_workout` HTML: insert one paragraph immediately after the `Finisher (For Time)` heading reading `Complete 3 rounds for time:` (using the existing `tiptap-paragraph` markup, no protocol or list changes).
+2. Update `duration` to `23 min` and `32 min` respectively.
 
-## 2. Rename page from `/human-performance` to `/why-smartygym`
-
-The visible button and page title are already "Why SmartyGym", but the URL slug and component file still say "human-performance" / `HumanPerformance`. Bring everything in line.
-
-### File rename
-- `src/pages/HumanPerformance.tsx` → `src/pages/WhySmartyGym.tsx`
-- Default export `HumanPerformance` → `WhySmartyGym`
-
-### Route change in `src/App.tsx`
-- Update import: `import WhySmartyGym from "./pages/WhySmartyGym";`
-- New route: `<Route path="/why-smartygym" element={<WhySmartyGym />} />`
-- **Backwards-compatibility redirect** (preserves any external links, llms.txt, social shares, search-indexed URLs):
-  ```tsx
-  <Route path="/human-performance" element={<Navigate to="/why-smartygym" replace />} />
-  ```
-  Reuses the existing `Navigate` import (already used in App.tsx for other redirects).
-
-### Update all internal references found in the codebase
-| File | Change |
-|---|---|
-| `src/components/Footer.tsx:34` | `navigate("/human-performance")` → `navigate("/why-smartygym")` |
-| `src/pages/Index.tsx:693` | `navigate('/human-performance')` → `navigate('/why-smartygym')` |
-| `src/pages/WhyInvestInSmartyGym.tsx:199` | breadcrumb href `/human-performance` → `/why-smartygym` |
-| `src/pages/WhySmartyGym.tsx` (the renamed file) | `<meta property="og:url">` and `<link rel="canonical">` → `https://smartygym.com/why-smartygym` |
-| `public/llms.txt:35` | Update label + URL to `[Why SmartyGym](/why-smartygym): ...` |
-
-### Conflict / breakage check
-- Verified via grep across `src/`, `supabase/`, `public/`, `index.html`. The only references to `human-performance` / `HumanPerformance` are the 7 listed above. None in supabase functions, sitemaps, or other configs.
-- No existing route uses `/why-smartygym` (verified against `src/App.tsx`).
-- The 301-style client redirect (`<Navigate replace>`) ensures any old external/email/SEO link still lands on the new page.
-
----
+Nothing else is touched: format stays MIX / EMOM, exercise tokens stay identical, warm-up / activation / cool-down stay identical, no exercises added or swapped.
 
 ## Out of scope
-- No copy or layout changes outside the ecosystem grid card.
-- No SEO meta-text rewrite beyond updating the URL fields above.
-- No backend/edge-function changes — none reference this page.
+- No change to the WOD generator prompts in this pass (you've asked me to only fix today's two workouts).
+- No re-generation, no image regeneration, no Stripe changes.
