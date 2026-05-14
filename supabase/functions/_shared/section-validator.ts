@@ -42,7 +42,7 @@ const ICON_LABELS: Record<string, string> = {
 
 // Minimum exercise tag counts per section
 const MIN_MAIN_WORKOUT_EXERCISES = 3;
-const MIN_FINISHER_EXERCISES = 1;
+const MIN_FINISHER_EXERCISES = 3;
 
 export interface SectionValidationResult {
   isComplete: boolean;
