@@ -313,7 +313,7 @@ const Bubble = ({
 const BENTO_LAYOUT: Record<string, { top: number; left: number; width: number; height: number }> = {
   wod:       { top:  20, left:  40, width: 300, height: 340 },
   blog:      { top: 470, left:  55, width: 270, height: 150 },
-  workouts:  { top: 110, left: 430, width: 440, height: 400 },
+  workouts:  { top:  20, left: 430, width: 440, height: 490 },
   library:   { top: 540, left: 410, width: 340, height: 150 },
   programs:  { top:  30, left: 960, width: 300, height: 170 },
   tools:     { top: 250, left: 970, width: 290, height: 260 },
