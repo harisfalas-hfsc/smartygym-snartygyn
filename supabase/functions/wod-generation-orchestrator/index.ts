@@ -17,8 +17,8 @@ const corsHeaders = {
 // 2 attempts × (60 + 2 + 30) = ~184s is the worst case — still risky but
 // retries also fire from separate cron passes, so a single attempt per call
 // is what keeps us inside the wall-time budget.
-const MAX_ATTEMPTS = 2;
-const RETRY_DELAY_MS = 30000;
+const MAX_ATTEMPTS = 1;
+const RETRY_DELAY_MS = 0;
 
 interface WodVerificationResult {
   success: boolean;
@@ -154,10 +154,12 @@ async function callGenerateWod(
   opts: { slot?: string | null; retryMissing?: boolean; triggerSource?: string; targetDate?: string | null } = {}
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const body: any = {
-      // CHAIN FIX: orchestrator MUST run the generator synchronously so
-      // it can verify the real outcome. Never fire-and-forget from here.
-      background: false,
+      const body: any = {
+        // Cron/manual repair calls must not sit inside the database HTTP
+        // timeout window. The generator owns the heavy work in waitUntil;
+        // this orchestrator records the attempt and external audits verify
+        // the final rows after the background job settles.
+        background: true,
       triggerSource: opts.triggerSource || "orchestrator",
     };
     if (opts.slot) body.slot = opts.slot;
@@ -182,7 +184,7 @@ async function callGenerateWod(
       return { success: false, error: `HTTP ${response.status}: ${responseText.substring(0, 200)}` };
     }
 
-    console.log(`[ORCHESTRATOR] generate-workout-of-day returned OK`);
+    console.log(`[ORCHESTRATOR] generate-workout-of-day accepted/returned OK`);
     return { success: true };
   } catch (error) {
     console.error(`[ORCHESTRATOR] Error calling generate-workout-of-day:`, error);
