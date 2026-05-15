@@ -2734,7 +2734,7 @@ Return JSON with these exact fields:
 
       // Auto-clean protocol header durations + stray-after-token noise (idempotent).
       const protocolSweep = sanitizeProtocolBlocks(normalizedMainWorkout);
-      const cleanedMainWorkout = protocolSweep.cleaned;
+      let cleanedMainWorkout = protocolSweep.cleaned;
       if (protocolSweep.fixesApplied.length > 0) {
         logStep(`🧹 Protocol auto-fixes applied`, { fixes: protocolSweep.fixesApplied });
       }
@@ -2760,7 +2760,21 @@ Return JSON with these exact fields:
       // SECTION COMPLETENESS GATE: Reject WODs missing required sections BEFORE insert
       // This prevents malformed content from ever reaching the database as active WOD
       // ═══════════════════════════════════════════════════════════════════════════════
-      const sectionValidation = validateWodSections(cleanedMainWorkout, isRecoveryDay);
+      let sectionValidation = validateWodSections(cleanedMainWorkout, isRecoveryDay);
+      if (sectionValidation.missingSections.length === 0 && !sectionValidation.hasMinimumExercises) {
+        const densityRepair = ensureFiveSectionWorkoutHtml(cleanedMainWorkout, currentExerciseLibrary, equipment, format);
+        if (densityRepair.repaired) {
+          cleanedMainWorkout = densityRepair.html;
+          sectionValidation = validateWodSections(cleanedMainWorkout, isRecoveryDay);
+          logStep(`🛠️ Repaired under-dense WOD before validation`, {
+            equipment,
+            addedSections: densityRepair.addedSections,
+            workoutName: workoutContent.name,
+            mainWorkoutExercises: sectionValidation.mainWorkoutExerciseCount,
+            finisherExercises: sectionValidation.finisherExerciseCount,
+          });
+        }
+      }
       if (!sectionValidation.isComplete) {
         const errorMsg = `${equipment} WOD rejected: missing sections [${sectionValidation.missingSections.join(", ")}]`;
         logStep(`❌ SECTION VALIDATION FAILED`, {
