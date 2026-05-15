@@ -311,13 +311,13 @@ const Bubble = ({
 
 /** Bento grid layout for desktop — uneven, hand-drawn feel matching the sketch. */
 const BENTO_LAYOUT: Record<string, { top: number; left: number; width: number; height: number }> = {
-  wod:       { top:  20, left:  20, width: 320, height: 360 },
-  blog:      { top: 400, left:  20, width: 320, height: 140 },
-  library:   { top: 560, left:  20, width: 320, height: 140 },
-  workouts:  { top:  20, left: 360, width: 580, height: 680 },
-  programs:  { top:  20, left: 960, width: 320, height: 180 },
-  tools:     { top: 220, left: 960, width: 320, height: 320 },
-  community: { top: 560, left: 960, width: 320, height: 140 },
+  workouts:  { top:  20, left:  20, width: 320, height: 324 },
+  blog:      { top: 364, left:  20, width: 320, height: 126 },
+  library:   { top: 510, left:  20, width: 320, height: 126 },
+  wod:       { top:  20, left: 360, width: 580, height: 612 },
+  programs:  { top:  20, left: 960, width: 320, height: 162 },
+  tools:     { top: 202, left: 960, width: 320, height: 288 },
+  community: { top: 510, left: 960, width: 320, height: 126 },
 };
 
 const BentoTile = ({
@@ -628,14 +628,14 @@ export const HeroDestinationConstellation = () => {
           style={{
             width: "100%",
             maxWidth: "1300px",
-            height: `${720 * desktopScale}px`,
+            height: `${656 * desktopScale}px`,
             overflow: "hidden",
           }}
         >
           <div
             style={{
               width: "1300px",
-              height: "720px",
+              height: "656px",
               transform: `scale(${desktopScale})`,
               transformOrigin: "top left",
               position: "relative",
@@ -644,7 +644,7 @@ export const HeroDestinationConstellation = () => {
           {/* Soft radial glow background */}
           <svg
             className="absolute inset-0 w-full h-full pointer-events-none"
-            viewBox="0 0 1300 720"
+            viewBox="0 0 1300 656"
             preserveAspectRatio="xMidYMid meet"
             aria-hidden="true"
           >
@@ -654,7 +654,7 @@ export const HeroDestinationConstellation = () => {
                 <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0" />
               </radialGradient>
             </defs>
-            <rect width="1300" height="720" fill="url(#bento-glow)" />
+            <rect width="1300" height="656" fill="url(#bento-glow)" />
           </svg>
 
           {DESTINATIONS.map((dest) => {
