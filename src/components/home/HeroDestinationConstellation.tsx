@@ -717,6 +717,7 @@ export const HeroDestinationConstellation = () => {
                 width={pos.width}
                 height={pos.height}
                 cycleImages={dest.featured ? wodCycleImages : undefined}
+                cycleWods={dest.featured ? wodCycleData : undefined}
                 className="absolute"
                 style={{ top: `${pos.top}px`, left: `${pos.left}px` }}
               />
