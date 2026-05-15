@@ -155,11 +155,10 @@ async function callGenerateWod(
 ): Promise<{ success: boolean; error?: string }> {
   try {
       const body: any = {
-        // Cron/manual repair calls must not sit inside the database HTTP
-        // timeout window. The generator owns the heavy work in waitUntil;
-        // this orchestrator records the attempt and external audits verify
-        // the final rows after the background job settles.
-        background: true,
+        // Keep this synchronous so the orchestrator can verify the actual row
+        // before finalizing the run log. With one attempt per cron pass, this
+        // stays under edge wall-time while external retry crons handle retries.
+        background: false,
       triggerSource: opts.triggerSource || "orchestrator",
     };
     if (opts.slot) body.slot = opts.slot;
