@@ -89,12 +89,12 @@ const Index = () => {
 
   // Mobile hero swipeable cards
   const heroCards = [
-    { id: "workouts", title: "Smarty Workouts", description: "500+ expert-designed workout routines for every fitness level and goal", icon: Dumbbell, route: "/workout", image: heroWorkoutsImage },
-    { id: "programs", title: "Smarty Programs", description: "Structured multi-week programs designed to transform your fitness journey", icon: Calendar, route: "/trainingprogram", image: heroProgramsImage },
-    { id: "tools", title: "Smarty Tools", description: "Professional fitness calculators and tracking tools to optimize your training", icon: Calculator, route: "/tools", image: heroToolsImage },
-    { id: "exerciselibrary", title: "Exercise Library", description: "Comprehensive video library with proper form demonstrations and technique guides", icon: Video, route: "/exerciselibrary", image: heroLibraryImage },
-    { id: "blog", title: "Blog & Insights", description: "Evidence-based fitness articles and expert insights from professional coaches", icon: FileText, route: "/blog", image: heroBlogImage },
-    { id: "community", title: "Community", description: "Connect, share and grow with fellow fitness enthusiasts worldwide", icon: Users, route: "/community", image: heroCommunityImage },
+    { id: "workouts", title: "Smarty Workouts", description: "500+ expert-designed workout routines for every fitness level and goal", icon: Dumbbell, route: "/workout", image: heroWorkoutsImage, imageWidth: 1024, imageHeight: 1024 },
+    { id: "programs", title: "Smarty Programs", description: "Structured multi-week programs designed to transform your fitness journey", icon: Calendar, route: "/trainingprogram", image: heroProgramsImage, imageWidth: 768, imageHeight: 768 },
+    { id: "tools", title: "Smarty Tools", description: "Professional fitness calculators and tracking tools to optimize your training", icon: Calculator, route: "/tools", image: heroToolsImage, imageWidth: 768, imageHeight: 768 },
+    { id: "exerciselibrary", title: "Exercise Library", description: "Comprehensive video library with proper form demonstrations and technique guides", icon: Video, route: "/exerciselibrary", image: heroLibraryImage, imageWidth: 800, imageHeight: 512 },
+    { id: "blog", title: "Blog & Insights", description: "Evidence-based fitness articles and expert insights from professional coaches", icon: FileText, route: "/blog", image: heroBlogImage, imageWidth: 400, imageHeight: 300 },
+    { id: "community", title: "Community", description: "Connect, share and grow with fellow fitness enthusiasts worldwide", icon: Users, route: "/community", image: heroCommunityImage, imageWidth: 1024, imageHeight: 1024 },
   ];
 
   // Fetch review stats for SEO schema - low priority, don't block render
@@ -502,13 +502,22 @@ const Index = () => {
 
             <Carousel className="w-full" opts={{ align: "center", loop: true }} setApi={setCarouselApi}>
               <CarouselContent className="-ml-2">
-                {heroCards.map((card) => {
+                {heroCards.map((card, index) => {
                   const Icon = card.icon;
                   return (
                     <CarouselItem key={card.id} className="pl-2 basis-[75%] sm:basis-[60%]">
                       <div onClick={() => navigate(card.route)} className="border-2 border-primary/40 rounded-xl overflow-hidden hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300 cursor-pointer bg-card flex flex-col h-[260px] sm:h-[300px]">
                         <div className="relative h-[70%] overflow-hidden flex-shrink-0">
-                          <img src={card.image} alt={card.title} className="w-full h-full object-cover object-[center_top]" />
+                          <img
+                            src={card.image}
+                            alt={card.title}
+                            width={card.imageWidth}
+                            height={card.imageHeight}
+                            loading={index === 0 ? "eager" : "lazy"}
+                            decoding="async"
+                            fetchPriority={index === 0 ? "high" : "auto"}
+                            className="w-full h-full object-cover object-[center_top]"
+                          />
                         </div>
                         <div className="flex flex-col justify-center flex-1 p-3 text-center">
                           <div className="flex items-center justify-center gap-2 mb-1">
