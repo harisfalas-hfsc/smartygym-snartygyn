@@ -628,14 +628,14 @@ export const HeroDestinationConstellation = () => {
           style={{
             width: "100%",
             maxWidth: "1300px",
-            height: `${700 * desktopScale}px`,
+            height: `${720 * desktopScale}px`,
             overflow: "hidden",
           }}
         >
           <div
             style={{
               width: "1300px",
-              height: "700px",
+              height: "720px",
               transform: `scale(${desktopScale})`,
               transformOrigin: "top left",
               position: "relative",
@@ -644,7 +644,7 @@ export const HeroDestinationConstellation = () => {
           {/* Soft radial glow background */}
           <svg
             className="absolute inset-0 w-full h-full pointer-events-none"
-            viewBox="0 0 1300 700"
+            viewBox="0 0 1300 720"
             preserveAspectRatio="xMidYMid meet"
             aria-hidden="true"
           >
@@ -654,7 +654,7 @@ export const HeroDestinationConstellation = () => {
                 <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0" />
               </radialGradient>
             </defs>
-            <rect width="1300" height="700" fill="url(#bento-glow)" />
+            <rect width="1300" height="720" fill="url(#bento-glow)" />
           </svg>
 
           {DESTINATIONS.map((dest) => {
