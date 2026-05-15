@@ -312,15 +312,25 @@ const Bubble = ({
   );
 };
 
-/** Bento grid layout for desktop — uneven, hand-drawn feel matching the sketch. */
-const BENTO_LAYOUT: Record<string, { top: number; left: number; width: number; height: number }> = {
-  workouts:  { top:  20, left:  20, width: 320, height: 324 },
-  blog:      { top: 364, left:  20, width: 320, height: 126 },
-  library:   { top: 510, left:  20, width: 320, height: 126 },
-  wod:       { top:  20, left: 360, width: 580, height: 616 },
-  programs:  { top:  20, left: 960, width: 320, height: 162 },
-  tools:     { top: 202, left: 960, width: 320, height: 288 },
-  community: { top: 510, left: 960, width: 320, height: 126 },
+/** Bento grid layout for desktop — expands side cards to page edges while preserving equal 20px gaps. */
+const getBentoLayout = (stageWidth: number): Record<string, { top: number; left: number; width: number; height: number }> => {
+  const gap = 20;
+  const edgeGap = 20;
+  const wodWidth = 580;
+  const sideWidth = Math.max(320, (stageWidth - edgeGap * 2 - gap * 2 - wodWidth) / 2);
+  const leftX = edgeGap;
+  const wodX = leftX + sideWidth + gap;
+  const rightX = wodX + wodWidth + gap;
+
+  return {
+    workouts:  { top:  20, left: leftX, width: sideWidth, height: 324 },
+    blog:      { top: 364, left: leftX, width: sideWidth, height: 126 },
+    library:   { top: 510, left: leftX, width: sideWidth, height: 126 },
+    wod:       { top:  20, left: wodX, width: wodWidth, height: 616 },
+    programs:  { top:  20, left: rightX, width: sideWidth, height: 162 },
+    tools:     { top: 202, left: rightX, width: sideWidth, height: 288 },
+    community: { top: 510, left: rightX, width: sideWidth, height: 126 },
+  };
 };
 
 const BentoTile = ({
