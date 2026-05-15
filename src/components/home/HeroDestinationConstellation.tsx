@@ -312,15 +312,25 @@ const Bubble = ({
   );
 };
 
-/** Bento grid layout for desktop — uneven, hand-drawn feel matching the sketch. */
-const BENTO_LAYOUT: Record<string, { top: number; left: number; width: number; height: number }> = {
-  workouts:  { top:  20, left:  20, width: 320, height: 324 },
-  blog:      { top: 364, left:  20, width: 320, height: 126 },
-  library:   { top: 510, left:  20, width: 320, height: 126 },
-  wod:       { top:  20, left: 360, width: 580, height: 616 },
-  programs:  { top:  20, left: 960, width: 320, height: 162 },
-  tools:     { top: 202, left: 960, width: 320, height: 288 },
-  community: { top: 510, left: 960, width: 320, height: 126 },
+/** Bento grid layout for desktop — expands side cards to page edges while preserving equal 20px gaps. */
+const getBentoLayout = (stageWidth: number): Record<string, { top: number; left: number; width: number; height: number }> => {
+  const gap = 20;
+  const edgeGap = 20;
+  const wodWidth = 580;
+  const sideWidth = Math.max(320, (stageWidth - edgeGap * 2 - gap * 2 - wodWidth) / 2);
+  const leftX = edgeGap;
+  const wodX = leftX + sideWidth + gap;
+  const rightX = wodX + wodWidth + gap;
+
+  return {
+    workouts:  { top:  20, left: leftX, width: sideWidth, height: 324 },
+    blog:      { top: 364, left: leftX, width: sideWidth, height: 126 },
+    library:   { top: 510, left: leftX, width: sideWidth, height: 126 },
+    wod:       { top:  20, left: wodX, width: wodWidth, height: 616 },
+    programs:  { top:  20, left: rightX, width: sideWidth, height: 162 },
+    tools:     { top: 202, left: rightX, width: sideWidth, height: 288 },
+    community: { top: 510, left: rightX, width: sideWidth, height: 126 },
+  };
 };
 
 const BentoTile = ({
@@ -531,13 +541,16 @@ export const HeroDestinationConstellation = () => {
   // "Desktop site" forced) we uniformly scale it down to fit.
   const desktopWrapperRef = useRef<HTMLDivElement | null>(null);
   const [desktopScale, setDesktopScale] = useState(1);
+  const [desktopStageWidth, setDesktopStageWidth] = useState(1300);
   useEffect(() => {
     const el = desktopWrapperRef.current;
     if (!el) return;
     const measure = () => {
       const w = el.clientWidth;
       if (!w) return;
-      setDesktopScale(Math.min(1, w / 1300));
+      const stageWidth = Math.max(1300, w);
+      setDesktopStageWidth(stageWidth);
+      setDesktopScale(Math.min(1, w / stageWidth));
     };
     measure();
     let ro: ResizeObserver | undefined;
@@ -553,6 +566,8 @@ export const HeroDestinationConstellation = () => {
       window.removeEventListener("orientationchange", measure);
     };
   }, []);
+
+  const bentoLayout = getBentoLayout(desktopStageWidth);
 
   // ============ TABLET CIRCULAR LAYOUT ============
   const tabletStage = 720;
@@ -676,14 +691,14 @@ export const HeroDestinationConstellation = () => {
           className="relative mx-auto"
           style={{
             width: "100%",
-            maxWidth: "1300px",
+            maxWidth: "100%",
             height: `${656 * desktopScale}px`,
             overflow: "hidden",
           }}
         >
           <div
             style={{
-              width: "1300px",
+              width: `${desktopStageWidth}px`,
               height: "656px",
               transform: `scale(${desktopScale})`,
               transformOrigin: "top left",
@@ -693,7 +708,7 @@ export const HeroDestinationConstellation = () => {
           {/* Soft radial glow background */}
           <svg
             className="absolute inset-0 w-full h-full pointer-events-none"
-            viewBox="0 0 1300 656"
+            viewBox={`0 0 ${desktopStageWidth} 656`}
             preserveAspectRatio="xMidYMid meet"
             aria-hidden="true"
           >
@@ -703,11 +718,11 @@ export const HeroDestinationConstellation = () => {
                 <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0" />
               </radialGradient>
             </defs>
-            <rect width="1300" height="656" fill="url(#bento-glow)" />
+            <rect width={desktopStageWidth} height="656" fill="url(#bento-glow)" />
           </svg>
 
           {DESTINATIONS.map((dest) => {
-            const pos = BENTO_LAYOUT[dest.id];
+            const pos = bentoLayout[dest.id];
             if (!pos) return null;
             return (
               <BentoTile
