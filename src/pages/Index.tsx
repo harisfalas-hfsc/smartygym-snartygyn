@@ -515,7 +515,7 @@ const Index = () => {
                             height={card.imageHeight}
                             loading={index === 0 ? "eager" : "lazy"}
                             decoding="async"
-                            fetchpriority={index === 0 ? "high" : "auto"}
+                            fetchPriority={index === 0 ? "high" : "auto"}
                             className="w-full h-full object-cover object-[center_top]"
                           />
                         </div>
@@ -587,7 +587,7 @@ const Index = () => {
                 const isRecovery = wod.category?.toUpperCase() === "RECOVERY";
                 return (
                   <Card
-                    className="group cursor-pointer overflow-hidden hover:shadow-xl transition-all duration-300 hover:border-primary/60"
+                    className="group h-[286px] cursor-pointer overflow-hidden hover:shadow-xl transition-all duration-300 hover:border-primary/60"
                   >
                     <div className="relative aspect-video overflow-hidden">
                       <img
@@ -599,7 +599,7 @@ const Index = () => {
                         className="w-full h-full object-cover transition-opacity duration-500"
                         loading="eager"
                         decoding="async"
-                        fetchpriority="high"
+                        fetchPriority="high"
                         onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
                       />
                       <Badge className={cn("absolute top-3 left-3 text-white border-0", equipmentBadgeClass)}>
@@ -629,38 +629,37 @@ const Index = () => {
                       <h3 className="text-base font-bold text-foreground mb-1 group-hover:text-primary transition-colors line-clamp-1">
                         {wod.name}
                       </h3>
-                      {wod.description && (
-                        <p className="text-muted-foreground text-xs mb-2 line-clamp-2 min-h-[2.25rem]">
-                          {stripHtml(wod.description).substring(0, 120)}...
-                        </p>
-                      )}
-                      <div className="flex flex-nowrap items-center gap-x-1.5 text-[10px] mb-2 overflow-hidden">
+                      <p className="text-muted-foreground text-xs mb-2 line-clamp-2 h-9">
+                        {stripHtml(wod.description).substring(0, 120) || "Today's expert-designed Workout of the Day."}...
+                      </p>
+                      <div className="flex h-4 flex-nowrap items-center gap-x-1 text-[10px] mb-2 overflow-hidden whitespace-nowrap">
                         {wod.category && (
                           <>
-                            <div className="flex items-center gap-1 min-w-0">
-                              <Layers className="w-3 h-3 text-primary shrink-0" />
+                            <div className="flex min-w-0 flex-1 items-center gap-0.5 overflow-hidden">
+                              <Layers className="w-2.5 h-2.5 text-primary shrink-0" />
                               <span className="text-muted-foreground font-medium truncate">{wod.category}</span>
                             </div>
                             <span className="text-muted-foreground shrink-0">•</span>
                           </>
                         )}
-                        <div className="flex items-center gap-1 min-w-0">
-                          <Target className="w-3 h-3 text-primary shrink-0" />
+                        <div className="flex min-w-0 flex-1 items-center gap-0.5 overflow-hidden">
+                          <Target className="w-2.5 h-2.5 text-primary shrink-0" />
                           <span className="text-blue-700 dark:text-blue-400 font-medium truncate">{wod.format || "General"}</span>
                         </div>
                         <span className="text-muted-foreground shrink-0">•</span>
-                        <div className="flex items-center gap-1 shrink-0">
-                          <TrendingUp className={`w-3 h-3 ${isRecovery ? "text-green-600 dark:text-green-400" : getDifficultyColorClasses(wod.difficulty_stars || wod.difficulty).icon}`} />
+                        <div className="flex items-center gap-0.5 shrink-0">
+                          <TrendingUp className={`w-2.5 h-2.5 ${isRecovery ? "text-green-600 dark:text-green-400" : getDifficultyColorClasses(wod.difficulty_stars || wod.difficulty).icon}`} />
                           <span className={`font-medium capitalize whitespace-nowrap ${isRecovery ? "text-green-600 dark:text-green-400" : getDifficultyColorClasses(wod.difficulty_stars || wod.difficulty).text}`}>
                             {isRecovery
-                              ? "All Levels"
-                              : (wod.difficulty || (wod.difficulty_stars ? (wod.difficulty_stars <= 2 ? "Beginner" : wod.difficulty_stars <= 4 ? "Intermediate" : "Advanced") : "Beginner"))}
-                            {!isRecovery && wod.difficulty_stars ? ` (${wod.difficulty_stars}★)` : ""}
+                              ? "All"
+                              : wod.difficulty_stars
+                                ? `${wod.difficulty_stars}★`
+                                : (wod.difficulty || "Beginner")}
                           </span>
                         </div>
                         <span className="text-muted-foreground shrink-0">•</span>
-                        <div className="flex items-center gap-1 shrink-0">
-                          <Clock className="w-3 h-3 text-purple-700 dark:text-purple-400" />
+                        <div className="flex items-center gap-0.5 shrink-0">
+                          <Clock className="w-2.5 h-2.5 text-purple-700 dark:text-purple-400" />
                           <span className="text-purple-700 dark:text-purple-400 font-medium whitespace-nowrap">{wod.duration || "45-60 min"}</span>
                         </div>
                       </div>
