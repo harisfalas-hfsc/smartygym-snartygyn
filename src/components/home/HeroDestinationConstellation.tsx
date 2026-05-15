@@ -314,13 +314,13 @@ const Bubble = ({
 
 /** Bento grid layout for desktop — uneven, hand-drawn feel matching the sketch. */
 const BENTO_LAYOUT: Record<string, { top: number; left: number; width: number; height: number }> = {
-  workouts:  { top:  20, left:  20, width: 320, height: 324 },
-  blog:      { top: 364, left:  20, width: 320, height: 126 },
-  library:   { top: 510, left:  20, width: 320, height: 126 },
+  workouts:  { top:  20, left:   0, width: 350, height: 324 },
+  blog:      { top: 364, left:   0, width: 350, height: 126 },
+  library:   { top: 510, left:   0, width: 350, height: 126 },
   wod:       { top:  20, left: 360, width: 580, height: 612 },
-  programs:  { top:  20, left: 960, width: 320, height: 162 },
-  tools:     { top: 202, left: 960, width: 320, height: 288 },
-  community: { top: 510, left: 960, width: 320, height: 126 },
+  programs:  { top:  20, left: 950, width: 350, height: 162 },
+  tools:     { top: 202, left: 950, width: 350, height: 288 },
+  community: { top: 510, left: 950, width: 350, height: 126 },
 };
 
 const BentoTile = ({
@@ -399,7 +399,7 @@ const BentoTile = ({
             className={cn(
               "absolute inset-0",
               activeWod
-                ? "bg-gradient-to-t from-black/90 via-black/55 to-black/15"
+                ? "bg-gradient-to-t from-black/65 via-black/20 to-transparent"
                 : "bg-gradient-to-t from-black/70 via-black/15 to-transparent"
             )}
             aria-hidden="true"
