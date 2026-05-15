@@ -657,6 +657,32 @@ serve(async (req) => {
   const dayIn84 = getDayIn84Cycle(effectiveDate);
   const periodization = getPeriodizationForDay(dayIn84);
 
+  // ─────────────────────────────────────────────────────────────────────
+  // ZOMBIE CLEANUP: close any prior "running" rows for the same date that
+  // are older than 10 minutes BEFORE we create a new one. This prevents
+  // the run-history view from filling up with rows that the FINALLY block
+  // never finalised (Edge wall-time hit).
+  // ─────────────────────────────────────────────────────────────────────
+  try {
+    const tenMinAgoIso = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+    const { data: zombies } = await supabase
+      .from("wod_generation_runs")
+      .update({
+        status: "failed",
+        completed_at: new Date().toISOString(),
+        error_message: "Auto-closed by orchestrator: prior run exceeded edge wall-time before finalize ran",
+      })
+      .eq("status", "running")
+      .eq("cyprus_date", effectiveDate)
+      .lt("started_at", tenMinAgoIso)
+      .select("id");
+    if (zombies && zombies.length > 0) {
+      console.log(`[ORCHESTRATOR] Closed ${zombies.length} zombie running row(s) for ${effectiveDate}`);
+    }
+  } catch (zErr) {
+    console.error("[ORCHESTRATOR] Zombie cleanup failed (non-fatal):", zErr);
+  }
+
   // Create run log entry at start
   const { data: runLog, error: runLogError } = await supabase
     .from("wod_generation_runs")
