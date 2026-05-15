@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
@@ -782,7 +783,13 @@ export default function UserDashboard() {
   const canAccessWorkoutsTab = isPremium || hasPurchasedWorkouts;
   const canAccessProgramsTab = isPremium || hasPurchasedPrograms;
   const canAccessLogbookTab = isPremium || hasStandalonePurchases;
-  return <div className="min-h-screen bg-background">
+  return <>
+    <Helmet>
+      <title>My Dashboard | SmartyGym</title>
+      <meta name="description" content="Your private SmartyGym dashboard for workouts, programs, activity, orders, check-ins, and account tools." />
+      <meta name="robots" content="noindex, nofollow" />
+    </Helmet>
+    <div className="min-h-screen bg-background">
       <main className="container mx-auto max-w-7xl px-4 pb-8">
         {/* Check-in Modal Manager - shows pop-up during time windows */}
         {isPremium && <CheckInModalManager onBannerStateChange={handleBannerStateChange} />}
@@ -2030,5 +2037,6 @@ export default function UserDashboard() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>;
+    </div>
+  </>;
 }
