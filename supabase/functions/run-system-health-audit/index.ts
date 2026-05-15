@@ -732,9 +732,10 @@ const handler = async (req: Request): Promise<Response> => {
         .eq('is_workout_of_day', true);
       const tomorrowCount = tomorrowWods?.length ?? 0;
       const nowUtcHour = new Date().getUTCHours();
-      // Only enforce after 12:00 UTC — earlier in the day the morning
-      // generation may not have run yet.
-      const enforce = nowUtcHour >= 12;
+      const nowUtcMinute = new Date().getUTCMinutes();
+      // Generation window: 06:30 → 08:50 UTC (last retry pass at 08:50).
+      // After 09:00 UTC tomorrow's WODs MUST exist or it's a critical failure.
+      const enforce = nowUtcHour > 9 || (nowUtcHour === 9 && nowUtcMinute >= 0);
       const ok = tomorrowCount >= expectedTomorrowCount;
       addCheck(
         'WOD System',
@@ -744,8 +745,8 @@ const handler = async (req: Request): Promise<Response> => {
         ok
           ? `✅ Tomorrow's WODs already built — midnight rollover will be seamless`
           : enforce
-            ? `Morning crons (06:30 / 06:50 UTC) should have built tomorrow's WODs by now. Trigger: Admin → WOD Manager → Generate New WOD → Pre-Generate for Future Date.`
-            : `Morning crons run at 06:30 / 06:50 UTC; check again after 12:00 UTC.`
+            ? `CRITICAL: Morning crons (06:30 / 06:50 UTC) and 4 retry passes (07:20, 07:50, 08:20, 08:50 UTC) all failed to build tomorrow's WODs. Inspect wod_generation_runs for the failure reason and trigger Admin → WOD Manager → Generate New WOD → Pre-Generate for Future Date manually.`
+            : `Morning crons run at 06:30 / 06:50 UTC with retries through 08:50 UTC; check again after 09:00 UTC.`
       );
     } catch (tmrErr) {
       console.error('[HEALTH-AUDIT] tomorrow WOD check failed:', tmrErr);
