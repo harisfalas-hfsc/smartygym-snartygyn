@@ -515,7 +515,7 @@ const Index = () => {
                             height={card.imageHeight}
                             loading={index === 0 ? "eager" : "lazy"}
                             decoding="async"
-                            fetchpriority={index === 0 ? "high" : "auto"}
+                            fetchPriority={index === 0 ? "high" : "auto"}
                             className="w-full h-full object-cover object-[center_top]"
                           />
                         </div>
@@ -599,7 +599,7 @@ const Index = () => {
                         className="w-full h-full object-cover transition-opacity duration-500"
                         loading="eager"
                         decoding="async"
-                        fetchpriority="high"
+                        fetchPriority="high"
                         onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
                       />
                       <Badge className={cn("absolute top-3 left-3 text-white border-0", equipmentBadgeClass)}>
