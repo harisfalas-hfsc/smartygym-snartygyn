@@ -503,13 +503,15 @@ export const HeroDestinationConstellation = () => {
 
   // Build the WOD image carousel from today's actual WOD images (bodyweight + equipment).
   // Falls back to the static hero image if nothing is available yet.
-  const wodCycleImages = (() => {
-    const ordered = [bodyweightWod, equipmentWod, variousWod].filter(Boolean) as Array<{ image_url?: string | null }>;
-    const fromOrdered = ordered.map((w) => w.image_url).filter(Boolean) as string[];
-    if (fromOrdered.length > 0) return fromOrdered;
-    const fromAll = (allTodayWods || []).map((w: any) => w.image_url).filter(Boolean) as string[];
-    return fromAll;
+  // Build the WOD cycle (ordered list of today's WOD objects + their images).
+  const wodCycleData = (() => {
+    const ordered = [bodyweightWod, equipmentWod, variousWod].filter(Boolean) as WorkoutData[];
+    if (ordered.length > 0) return ordered;
+    return (allTodayWods || []) as WorkoutData[];
   })();
+  const wodCycleImages = wodCycleData
+    .map((w) => w.image_url)
+    .filter(Boolean) as string[];
 
   // Find bubble center coords for connection lines (desktop)
   const centers: Record<string, { cx: number; cy: number }> = {};
