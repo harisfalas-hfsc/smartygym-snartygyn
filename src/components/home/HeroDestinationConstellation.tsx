@@ -313,7 +313,7 @@ const Bubble = ({
 const BENTO_LAYOUT: Record<string, { top: number; left: number; width: number; height: number }> = {
   wod:       { top:  20, left:  40, width: 300, height: 340 },
   blog:      { top: 470, left:  55, width: 270, height: 150 },
-  workouts:  { top: 110, left: 430, width: 300, height: 400 },
+  workouts:  { top: 110, left: 430, width: 440, height: 400 },
   library:   { top: 540, left: 410, width: 340, height: 150 },
   programs:  { top:  30, left: 960, width: 300, height: 170 },
   tools:     { top: 250, left: 970, width: 290, height: 260 },
@@ -358,24 +358,17 @@ const BentoTile = ({
   return (
     <div
       className={cn("group", className)}
-      style={{ ...style, ["--hover-scale" as any]: hoverScale } as React.CSSProperties}
+      style={style}
     >
-      <span
-        className="motion-safe:animate-[float_6s_ease-in-out_infinite] inline-block group-hover:[animation-play-state:paused] group-focus-within:[animation-play-state:paused]"
-        style={{ animationDelay: dest.delay, display: "block" }}
-      >
+      <span className="block">
         <button
           type="button"
           onClick={() => navigate(dest.route)}
           aria-label={`Go to ${dest.title}`}
           className={cn(
             "relative block rounded-2xl overflow-hidden text-left",
-            "transform-gpu will-change-transform",
-            "[transition:transform_550ms_cubic-bezier(0.22,1,0.36,1),box-shadow_400ms_ease-out,outline-color_300ms_ease-out]",
-            "ring-1 ring-border/60 hover:ring-2 hover:ring-primary",
-            "shadow-lg shadow-primary/10 hover:shadow-2xl hover:shadow-primary/30",
-            "hover:[transform:scale(var(--hover-scale))] focus-visible:[transform:scale(var(--hover-scale))]",
-            "focus:outline-none focus-visible:ring-4 focus-visible:ring-primary",
+            "ring-1 ring-border/60 shadow-lg shadow-primary/10",
+            "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
             dest.featured && "ring-2 ring-primary"
           )}
           style={{ width: `${width}px`, height: `${height}px` }}
@@ -387,7 +380,6 @@ const BentoTile = ({
               alt=""
               className={cn(
                 "absolute inset-0 w-full h-full object-cover transition-opacity duration-700",
-                "scale-105 group-hover:scale-110",
                 i === imgIndex ? "opacity-100" : "opacity-0"
               )}
             />
@@ -402,7 +394,7 @@ const BentoTile = ({
           {dest.featured && (
             <span
               aria-hidden="true"
-              className="pointer-events-none absolute inset-0 rounded-2xl ring-2 ring-primary motion-safe:animate-pulse opacity-50"
+              className="pointer-events-none absolute inset-0 rounded-2xl ring-2 ring-primary opacity-60"
             />
           )}
 
@@ -415,7 +407,7 @@ const BentoTile = ({
 
           {/* Icon chip — top right */}
           <span
-            className="absolute top-2 right-2 z-10 rounded-full bg-background/95 backdrop-blur-sm flex items-center justify-center shadow-lg ring-2 ring-primary/60 group-hover:scale-110 transition-transform"
+            className="absolute top-2 right-2 z-10 rounded-full bg-background/95 backdrop-blur-sm flex items-center justify-center shadow-lg ring-2 ring-primary/60"
             style={{ width: `${chipSize}px`, height: `${chipSize}px` }}
             aria-hidden="true"
           >
