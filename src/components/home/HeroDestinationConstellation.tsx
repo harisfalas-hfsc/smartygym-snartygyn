@@ -648,7 +648,7 @@ export const HeroDestinationConstellation = () => {
               position: "relative",
             }}
           >
-          {/* Decorative connection SVG */}
+          {/* Soft radial glow background */}
           <svg
             className="absolute inset-0 w-full h-full pointer-events-none"
             viewBox="0 0 1300 700"
@@ -656,58 +656,30 @@ export const HeroDestinationConstellation = () => {
             aria-hidden="true"
           >
             <defs>
-              <radialGradient id="constellation-glow" cx="50%" cy="40%" r="60%">
+              <radialGradient id="bento-glow" cx="50%" cy="40%" r="60%">
                 <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.08" />
                 <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0" />
               </radialGradient>
             </defs>
-            <rect width="1300" height="700" fill="url(#constellation-glow)" />
-            {CONNECTIONS.map(([a, b]) => {
-              const A = centers[a];
-              const B = centers[b];
-              if (!A || !B) return null;
-              return (
-                <line
-                  key={`${a}-${b}`}
-                  x1={A.cx}
-                  y1={A.cy}
-                  x2={B.cx}
-                  y2={B.cy}
-                  stroke="hsl(var(--primary))"
-                  strokeOpacity="0.18"
-                  strokeWidth="1.5"
-                  strokeDasharray="4 6"
-                />
-              );
-            })}
+            <rect width="1300" height="700" fill="url(#bento-glow)" />
           </svg>
 
-          {DESTINATIONS.map((dest) => (
-            <Bubble
-              key={dest.id}
-              dest={dest}
-              isWodLive={hasWods}
-              size={dest.desktop.size}
-              cycleImages={dest.featured ? wodCycleImages : undefined}
-              className="absolute"
-              style={{
-                top: `${dest.desktop.top}px`,
-                left: `${dest.desktop.left}px`,
-              }}
-            />
-          ))}
-
-          {/* Center coach bubble */}
-          <Bubble
-            dest={COACH}
-            isWodLive={false}
-            size={COACH.desktop.size}
-            className="absolute"
-            style={{
-              top: `${COACH.desktop.top}px`,
-              left: `${COACH.desktop.left}px`,
-            }}
-          />
+          {DESTINATIONS.map((dest) => {
+            const pos = BENTO_LAYOUT[dest.id];
+            if (!pos) return null;
+            return (
+              <BentoTile
+                key={dest.id}
+                dest={dest}
+                isWodLive={hasWods}
+                width={pos.width}
+                height={pos.height}
+                cycleImages={dest.featured ? wodCycleImages : undefined}
+                className="absolute"
+                style={{ top: `${pos.top}px`, left: `${pos.left}px` }}
+              />
+            );
+          })}
           </div>
         </div>
       </div>
