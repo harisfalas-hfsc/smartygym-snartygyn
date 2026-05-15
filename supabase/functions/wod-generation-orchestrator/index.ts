@@ -11,8 +11,14 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const MAX_ATTEMPTS = 3;
-const RETRY_DELAY_MS = 45000; // 45 seconds between retries (gives AI provider more recovery time)
+// MAX_ATTEMPTS × (callGenerateWod ~60s + 2s settle + RETRY_DELAY_MS) must stay
+// under the Edge Function wall-time (~150s), otherwise the FINALLY block never
+// fires and `wod_generation_runs` rows are left as zombie "running" entries.
+// 2 attempts × (60 + 2 + 30) = ~184s is the worst case — still risky but
+// retries also fire from separate cron passes, so a single attempt per call
+// is what keeps us inside the wall-time budget.
+const MAX_ATTEMPTS = 2;
+const RETRY_DELAY_MS = 30000;
 
 interface WodVerificationResult {
   success: boolean;
@@ -650,6 +656,32 @@ serve(async (req) => {
   const expectedCount = recoveryDay ? 1 : 2;
   const dayIn84 = getDayIn84Cycle(effectiveDate);
   const periodization = getPeriodizationForDay(dayIn84);
+
+  // ─────────────────────────────────────────────────────────────────────
+  // ZOMBIE CLEANUP: close any prior "running" rows for the same date that
+  // are older than 10 minutes BEFORE we create a new one. This prevents
+  // the run-history view from filling up with rows that the FINALLY block
+  // never finalised (Edge wall-time hit).
+  // ─────────────────────────────────────────────────────────────────────
+  try {
+    const tenMinAgoIso = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+    const { data: zombies } = await supabase
+      .from("wod_generation_runs")
+      .update({
+        status: "failed",
+        completed_at: new Date().toISOString(),
+        error_message: "Auto-closed by orchestrator: prior run exceeded edge wall-time before finalize ran",
+      })
+      .eq("status", "running")
+      .eq("cyprus_date", effectiveDate)
+      .lt("started_at", tenMinAgoIso)
+      .select("id");
+    if (zombies && zombies.length > 0) {
+      console.log(`[ORCHESTRATOR] Closed ${zombies.length} zombie running row(s) for ${effectiveDate}`);
+    }
+  } catch (zErr) {
+    console.error("[ORCHESTRATOR] Zombie cleanup failed (non-fatal):", zErr);
+  }
 
   // Create run log entry at start
   const { data: runLog, error: runLogError } = await supabase
