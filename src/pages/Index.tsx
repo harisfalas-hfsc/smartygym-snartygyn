@@ -318,6 +318,7 @@ const Index = () => {
         <link rel="alternate" hrefLang="en-gb" href="https://smartygym.com" />
         <link rel="alternate" hrefLang="en" href="https://smartygym.com" />
         <link rel="alternate" hrefLang="x-default" href="https://smartygym.com" />
+        <link rel="preload" as="image" href={heroWorkoutsImage} />
         
         <link rel="preconnect" href="https://smartygym.com" />
         <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
