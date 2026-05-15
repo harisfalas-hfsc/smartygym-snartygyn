@@ -88,8 +88,8 @@ const DailySmartyRitual = () => {
   return (
     <>
       <Helmet>
-        <title>Smarty Ritual | Daily Movement System | Morning Midday Evening Routine | Haris Falas | SmartyGym</title>
-        <meta name="description" content="Daily Smarty Ritual - All-day movement, recovery, and performance system by Sports Scientist Haris Falas. Morning activation, Midday reset, Evening unwind. 100% human-designed wellness routine. Train your lifestyle." />
+        <title>Smarty Ritual | Daily Movement System | SmartyGym</title>
+        <meta name="description" content="Daily movement, recovery, and performance rituals by Haris Falas with morning, midday, and evening phases." />
         <meta name="keywords" content="daily movement ritual, morning routine workout, midday movement, evening recovery, wellness routine, daily fitness habit, movement system, recovery routine, performance optimization, Haris Falas, SmartyGym, daily wellness, lifestyle fitness, morning activation, mobility routine" />
         <link rel="canonical" href="https://smartygym.com/daily-ritual" />
         

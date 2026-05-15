@@ -346,6 +346,7 @@ export default function CorporateAdmin() {
     <>
       <Helmet>
         <title>Corporate Admin Dashboard | SmartyGym</title>
+        <meta name="description" content="Private SmartyGym corporate dashboard for managing team membership, seats, billing status, and access." />
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
 

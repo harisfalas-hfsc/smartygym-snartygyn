@@ -67,8 +67,8 @@ const Blog = () => {
   });
   return <>
       <Helmet>
-        <title>Fitness Blog | Expert Articles | Haris Falas HFSC | SmartyGym</title>
-        <meta name="description" content="Fitness blog at smartygym.com. Expert articles on strength training cardio nutrition by Sports Scientist Haris Falas HFSC. Evidence-based fitness content for online gym training. Real results anywhere anytime" />
+        <title>Fitness Blog | Expert Articles | SmartyGym</title>
+        <meta name="description" content="Expert fitness, nutrition, and wellness articles by Sports Scientist Haris Falas for smarter training." />
         <meta name="keywords" content="fitness blog, fitness articles, online personal trainer blog, HFSC, Haris Falas, Sports Scientist, strength training articles, cardio training tips, nutrition guides, online gym, workout guides, training tips, smartygym.com, HFSC Performance, evidence-based fitness" />
         
         <meta property="og:title" content="Fitness Blog - Expert Training & Nutrition Advice by Haris Falas | SmartyGym" />

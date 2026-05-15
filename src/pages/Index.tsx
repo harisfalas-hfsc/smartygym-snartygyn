@@ -7,7 +7,7 @@ import { ServiceCard } from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap, Check, Crown, ChevronDown, ChevronLeft, ChevronRight, Move, Ban, Brain, CheckCircle2, Award, Shield, Compass, Sparkles, Info, User, HelpCircle, ShoppingBag, Star, TrendingUp, Clock, CalendarCheck, Home, Shuffle, Layers, ShoppingCart } from "lucide-react";
+import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap, Check, Crown, ChevronDown, ChevronLeft, ChevronRight, Move, Ban, Brain, CheckCircle2, Award, Shield, Compass, Sparkles, Info, User, HelpCircle, ShoppingBag, Star, Clock, CalendarCheck, Home, Shuffle, ShoppingCart } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { User as SupabaseUser } from "@supabase/supabase-js";
@@ -318,6 +318,7 @@ const Index = () => {
         <link rel="alternate" hrefLang="en-gb" href="https://smartygym.com" />
         <link rel="alternate" hrefLang="en" href="https://smartygym.com" />
         <link rel="alternate" hrefLang="x-default" href="https://smartygym.com" />
+        <link rel="preload" as="image" href={heroWorkoutsImage} />
         
         <link rel="preconnect" href="https://smartygym.com" />
         <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
@@ -584,12 +585,13 @@ const Index = () => {
                 const equipmentBadgeClass = isVarious ? "bg-purple-500" : isBodyweight ? "bg-blue-500" : "bg-orange-500";
                 const isNew = wod.created_at ? (Date.now() - new Date(wod.created_at).getTime()) / (1000 * 60 * 60 * 24) <= 2 : false;
                 const stripHtml = (html: string | null | undefined) => (html ? html.replace(/<[^>]*>/g, "") : "");
+                const formatMetaLabel = (value: string | null | undefined) => value ? value.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase()) : "";
                 const isRecovery = wod.category?.toUpperCase() === "RECOVERY";
                 return (
                   <Card
-                    className="group h-[300px] cursor-pointer overflow-hidden hover:shadow-xl transition-all duration-300 hover:border-primary/60"
+                    className="group h-[330px] cursor-pointer overflow-hidden hover:shadow-xl transition-all duration-300 hover:border-primary/60"
                   >
-                    <div className="relative h-36 overflow-hidden">
+                    <div className="relative aspect-video overflow-hidden">
                       <img
                         key={wod.id}
                         src={wod.image_url || "/placeholder.svg"}
@@ -632,19 +634,16 @@ const Index = () => {
                       <p className="text-muted-foreground text-xs mb-2 line-clamp-2 h-8 leading-4">
                         {stripHtml(wod.description).substring(0, 120) || "Today's expert-designed Workout of the Day."}...
                       </p>
-                      <div className="grid h-11 grid-cols-4 items-center gap-1 text-[11px] mb-1 overflow-hidden">
+                      <div className="grid h-8 grid-cols-4 items-center gap-1 text-xs mb-1 overflow-hidden">
                         {wod.category && (
-                          <div className="flex min-w-0 flex-col items-center justify-center gap-0.5 overflow-hidden text-center leading-none">
-                            <Layers className="w-3.5 h-3.5 text-primary shrink-0" />
-                            <span className="max-w-full truncate text-muted-foreground font-medium">{wod.category}</span>
+                          <div className="min-w-0 overflow-hidden rounded-md bg-primary/10 px-1.5 py-1 text-center leading-none">
+                            <span className="max-w-full truncate text-muted-foreground font-medium">{formatMetaLabel(wod.category)}</span>
                           </div>
                         )}
-                        <div className="flex min-w-0 flex-col items-center justify-center gap-0.5 overflow-hidden text-center leading-none">
-                          <Target className="w-3.5 h-3.5 text-primary shrink-0" />
+                        <div className="min-w-0 overflow-hidden rounded-md bg-primary/10 px-1.5 py-1 text-center leading-none">
                           <span className="max-w-full truncate text-blue-700 dark:text-blue-400 font-medium">{wod.format || "General"}</span>
                         </div>
-                        <div className="flex min-w-0 flex-col items-center justify-center gap-0.5 overflow-hidden text-center leading-none">
-                          <TrendingUp className={`w-3.5 h-3.5 ${isRecovery ? "text-green-600 dark:text-green-400" : getDifficultyColorClasses(wod.difficulty_stars || wod.difficulty).icon}`} />
+                        <div className="min-w-0 overflow-hidden rounded-md bg-primary/10 px-1.5 py-1 text-center leading-none">
                           <span className={`max-w-full truncate font-medium capitalize ${isRecovery ? "text-green-600 dark:text-green-400" : getDifficultyColorClasses(wod.difficulty_stars || wod.difficulty).text}`}>
                             {isRecovery
                               ? "All"
@@ -653,8 +652,7 @@ const Index = () => {
                                 : (wod.difficulty || "Beginner")}
                           </span>
                         </div>
-                        <div className="flex min-w-0 flex-col items-center justify-center gap-0.5 overflow-hidden text-center leading-none">
-                          <Clock className="w-3.5 h-3.5 text-purple-700 dark:text-purple-400" />
+                        <div className="min-w-0 overflow-hidden rounded-md bg-primary/10 px-1.5 py-1 text-center leading-none">
                           <span className="max-w-full truncate text-purple-700 dark:text-purple-400 font-medium">{wod.duration || "45-60 min"}</span>
                         </div>
                       </div>

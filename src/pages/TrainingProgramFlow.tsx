@@ -154,8 +154,8 @@ const TrainingProgramFlow = () => {
   return (
     <>
       <Helmet>
-        <title>Training Programs | Muscle Building Weight Loss Strength | Haris Falas | SmartyGym</title>
-        <meta name="description" content="Expert training programs at smartygym.com. Multi-week structured programs for muscle hypertrophy, weight loss, functional strength, cardio endurance by Sports Scientist Haris Falas. Online gym training programs. Train anywhere." />
+        <title>Training Programs | Strength & Weight Loss | SmartyGym</title>
+        <meta name="description" content="Multi-week training programs for strength, weight loss, hypertrophy, endurance, mobility, and low back pain." />
         <meta name="keywords" content="training programs, online training programs, workout programs, muscle building program, weight loss program, strength training program, hypertrophy program, functional strength, cardio endurance program, online gym programs, Haris Falas, Sports Scientist, smartygym.com, HFSC, periodization, progressive overload, structured training" />
         <link rel="canonical" href="https://smartygym.com/trainingprogram" />
         

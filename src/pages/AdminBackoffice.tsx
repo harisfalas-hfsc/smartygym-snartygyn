@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import { useAdminRole } from "@/hooks/useAdminRole";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -183,6 +184,12 @@ export default function AdminBackoffice() {
   }
 
   return (
+    <>
+    <Helmet>
+      <title>Admin Backoffice | SmartyGym</title>
+      <meta name="description" content="Private SmartyGym administration area for content, users, messages, analytics, shop, and system settings." />
+      <meta name="robots" content="noindex, nofollow" />
+    </Helmet>
     <div className="min-h-screen bg-background">
       <OfflineBanner />
       
@@ -391,5 +398,6 @@ export default function AdminBackoffice() {
         )}
       </div>
     </div>
+    </>
   );
 }

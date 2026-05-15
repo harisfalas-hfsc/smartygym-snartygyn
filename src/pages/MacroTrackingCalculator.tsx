@@ -212,8 +212,8 @@ const MacroTrackingCalculator = () => {
   return (
     <>
       <Helmet>
-        <title>Smarty Tools | Macro Calculator | Free Macronutrient Nutrition | Haris Falas | SmartyGym</title>
-        <meta name="description" content="Free macro calculator at smartygym.com. Calculate protein carbs fats for weight loss muscle gain. Personalized nutrition by Sports Scientist Haris Falas HFSC. Plan meals. Train smart anywhere anytime" />
+        <title>Macro Calculator | Nutrition Targets | SmartyGym</title>
+        <meta name="description" content="Calculate calories, protein, carbs, fats, fiber, water, and meal targets for your fitness goal." />
         <meta name="keywords" content="macro calculator, macronutrient calculator, nutrition calculator, online personal trainer nutrition, HFSC, Haris Falas, Sports Scientist, protein calculator, TDEE calculator, meal planning, nutrition planning, smartygym.com, HFSC Performance, weight loss nutrition, muscle gain nutrition" />
         
         <meta property="og:title" content="Macro Calculator - Smarty Gym" />
