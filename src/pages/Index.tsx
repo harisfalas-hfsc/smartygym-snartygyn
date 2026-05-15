@@ -585,6 +585,7 @@ const Index = () => {
                 const equipmentBadgeClass = isVarious ? "bg-purple-500" : isBodyweight ? "bg-blue-500" : "bg-orange-500";
                 const isNew = wod.created_at ? (Date.now() - new Date(wod.created_at).getTime()) / (1000 * 60 * 60 * 24) <= 2 : false;
                 const stripHtml = (html: string | null | undefined) => (html ? html.replace(/<[^>]*>/g, "") : "");
+                const formatMetaLabel = (value: string | null | undefined) => value ? value.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase()) : "";
                 const isRecovery = wod.category?.toUpperCase() === "RECOVERY";
                 return (
                   <Card
@@ -636,7 +637,7 @@ const Index = () => {
                       <div className="grid h-8 grid-cols-4 items-center gap-1 text-xs mb-1 overflow-hidden">
                         {wod.category && (
                           <div className="min-w-0 overflow-hidden rounded-md bg-primary/10 px-1.5 py-1 text-center leading-none">
-                            <span className="max-w-full truncate text-muted-foreground font-medium">{wod.category}</span>
+                            <span className="max-w-full truncate text-muted-foreground font-medium">{formatMetaLabel(wod.category)}</span>
                           </div>
                         )}
                         <div className="min-w-0 overflow-hidden rounded-md bg-primary/10 px-1.5 py-1 text-center leading-none">
