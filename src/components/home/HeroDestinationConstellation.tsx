@@ -309,6 +309,134 @@ const Bubble = ({
   );
 };
 
+/** Bento grid layout for desktop — uneven, hand-drawn feel matching the sketch. */
+const BENTO_LAYOUT: Record<string, { top: number; left: number; width: number; height: number }> = {
+  wod:       { top:  20, left:  40, width: 300, height: 340 },
+  blog:      { top: 470, left:  55, width: 270, height: 150 },
+  workouts:  { top: 110, left: 430, width: 300, height: 400 },
+  library:   { top: 540, left: 410, width: 340, height: 150 },
+  programs:  { top:  30, left: 960, width: 300, height: 170 },
+  tools:     { top: 250, left: 970, width: 290, height: 260 },
+  community: { top: 540, left: 980, width: 280, height: 130 },
+};
+
+const BentoTile = ({
+  dest,
+  isWodLive,
+  width,
+  height,
+  className,
+  style,
+  cycleImages,
+}: {
+  dest: Destination;
+  isWodLive: boolean;
+  width: number;
+  height: number;
+  className?: string;
+  style?: React.CSSProperties;
+  cycleImages?: string[];
+}) => {
+  const navigate = useNavigate();
+  const Icon = dest.icon;
+  const showLivePill = dest.featured && isWodLive;
+  const hoverScale = dest.featured ? 1.03 : 1.04;
+
+  const images = cycleImages && cycleImages.length > 0 ? cycleImages : [dest.image];
+  const [imgIndex, setImgIndex] = useState(0);
+  useEffect(() => {
+    if (images.length < 2) return;
+    const id = window.setInterval(() => {
+      setImgIndex((i) => (i + 1) % images.length);
+    }, 2500);
+    return () => window.clearInterval(id);
+  }, [images.length]);
+
+  const chipSize = Math.max(Math.min(width, height) * 0.18, 36);
+  const iconSize = Math.max(chipSize * 0.55, 18);
+
+  return (
+    <div
+      className={cn("group", className)}
+      style={{ ...style, ["--hover-scale" as any]: hoverScale } as React.CSSProperties}
+    >
+      <span
+        className="motion-safe:animate-[float_6s_ease-in-out_infinite] inline-block group-hover:[animation-play-state:paused] group-focus-within:[animation-play-state:paused]"
+        style={{ animationDelay: dest.delay, display: "block" }}
+      >
+        <button
+          type="button"
+          onClick={() => navigate(dest.route)}
+          aria-label={`Go to ${dest.title}`}
+          className={cn(
+            "relative block rounded-2xl overflow-hidden text-left",
+            "transform-gpu will-change-transform",
+            "[transition:transform_550ms_cubic-bezier(0.22,1,0.36,1),box-shadow_400ms_ease-out,outline-color_300ms_ease-out]",
+            "ring-1 ring-border/60 hover:ring-2 hover:ring-primary",
+            "shadow-lg shadow-primary/10 hover:shadow-2xl hover:shadow-primary/30",
+            "hover:[transform:scale(var(--hover-scale))] focus-visible:[transform:scale(var(--hover-scale))]",
+            "focus:outline-none focus-visible:ring-4 focus-visible:ring-primary",
+            dest.featured && "ring-2 ring-primary"
+          )}
+          style={{ width: `${width}px`, height: `${height}px` }}
+        >
+          {images.map((src, i) => (
+            <img
+              key={src + i}
+              src={src}
+              alt=""
+              className={cn(
+                "absolute inset-0 w-full h-full object-cover transition-opacity duration-700",
+                "scale-105 group-hover:scale-110",
+                i === imgIndex ? "opacity-100" : "opacity-0"
+              )}
+            />
+          ))}
+          {/* Bottom gradient for label legibility */}
+          <div
+            className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent"
+            aria-hidden="true"
+          />
+
+          {/* Featured pulsing ring */}
+          {dest.featured && (
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 rounded-2xl ring-2 ring-primary motion-safe:animate-pulse opacity-50"
+            />
+          )}
+
+          {/* TODAY pill on featured WOD when live */}
+          {showLivePill && (
+            <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold tracking-wider uppercase shadow-md">
+              Today
+            </span>
+          )}
+
+          {/* Icon chip — top right */}
+          <span
+            className="absolute top-2 right-2 z-10 rounded-full bg-background/95 backdrop-blur-sm flex items-center justify-center shadow-lg ring-2 ring-primary/60 group-hover:scale-110 transition-transform"
+            style={{ width: `${chipSize}px`, height: `${chipSize}px` }}
+            aria-hidden="true"
+          >
+            <Icon className="text-primary" style={{ width: `${iconSize}px`, height: `${iconSize}px` }} />
+          </span>
+
+          {/* Label — bottom left */}
+          <div className="absolute bottom-3 left-3 right-3 z-10">
+            <p className="font-bold text-white leading-tight drop-shadow-lg text-base md:text-lg">
+              {dest.short}
+            </p>
+            <p className="text-white/85 text-xs leading-tight drop-shadow-md mt-0.5 line-clamp-1">
+              {dest.tagline}
+            </p>
+          </div>
+        </button>
+      </span>
+    </div>
+  );
+};
+
 export const HeroDestinationConstellation = () => {
   const { isPortrait: isMobile } = useIsPortraitMode();
   const { hasWods, bodyweightWod, equipmentWod, variousWod, allTodayWods } =
