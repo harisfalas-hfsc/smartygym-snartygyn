@@ -147,6 +147,14 @@ export function calculateWorkoutDurationMinutes(
 ): number {
   if (!mainAndFinisherHtml) return 0;
 
+  // REPS & SETS is load/tempo/rest dependent, so a deterministic duration is
+  // not safe. Returning 0 keeps the public label as "Various" and prevents the
+  // quality gate from rejecting valid strength sessions on a partial finisher
+  // estimate only.
+  if (/REPS/i.test(workoutFormat || "") && /SETS/i.test(workoutFormat || "")) {
+    return 0;
+  }
+
   const mainHtml = sectionByEmoji(mainAndFinisherHtml, "💪");
   const finisherHtml = sectionByEmoji(mainAndFinisherHtml, "⚡");
 
