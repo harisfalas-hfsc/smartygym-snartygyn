@@ -331,6 +331,17 @@ const Index = () => {
         <script type="application/ld+json">
           {JSON.stringify({
           "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": homepageFAQs.map((f) => ({
+            "@type": "Question",
+            "name": f.question,
+            "acceptedAnswer": { "@type": "Answer", "text": f.answer }
+          }))
+          })}
+        </script>
+        <script type="application/ld+json">
+          {JSON.stringify({
+          "@context": "https://schema.org",
           "@type": ["SportsActivityLocation", "HealthAndBeautyBusiness", "Organization"],
           "name": "SmartyGym",
           "alternateName": ["Smarty Gym", "smartygym.com", "SmartyGym Online Gym"],
