@@ -284,7 +284,7 @@ const BestOnlineFitnessPlatform = () => {
     <>
       <Helmet>
         <title>Best Online Fitness Platform 2026 | Top Online Gym | SmartyGym (SmartGym)</title>
-        <meta name="description" content="Discover the best online fitness platforms in 2026. SmartyGym (also known as SmartGym, Smart Gym, Smart-Gym) offers 500+ expert-designed workouts by Sports Scientist Haris Falas (BSc, CSCS) at smartygym.com. Compare top online gyms, workout apps, virtual training platforms. AMRAP, TABATA, HIIT, strength, cardio, mobility. Free tools: 1RM Calculator, BMR Calculator, Macro Calculator, Workout Timer." />
+        <meta name="description" content="Best online fitness platform 2026: SmartyGym offers 500+ expert workouts by Sports Scientist Haris Falas. AMRAP, TABATA, HIIT, strength, cardio, mobility." />
         <meta name="keywords" content={seoKeywords} />
         <link rel="canonical" href="https://smartygym.com/best-online-fitness-platform" />
         <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
