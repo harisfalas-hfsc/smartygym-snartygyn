@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
@@ -565,6 +566,12 @@ export default function CalculatorHistory() {
   }
 
   return (
+    <>
+    <Helmet>
+      <title>Calculator History | SmartyGym</title>
+      <meta name="description" content="Private SmartyGym history for 1RM, BMR, macro, and body measurement records." />
+      <meta name="robots" content="noindex, nofollow" />
+    </Helmet>
     <div className="container max-w-6xl md:max-w-[1500px] mx-auto pb-8 px-4">
       <PageBreadcrumbs
         items={[
@@ -1463,5 +1470,6 @@ export default function CalculatorHistory() {
         onDelete={handleDeleteFromDialog}
       />
     </div>
+    </>
   );
 }
