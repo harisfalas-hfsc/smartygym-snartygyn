@@ -11,8 +11,14 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const MAX_ATTEMPTS = 3;
-const RETRY_DELAY_MS = 45000; // 45 seconds between retries (gives AI provider more recovery time)
+// MAX_ATTEMPTS × (callGenerateWod ~60s + 2s settle + RETRY_DELAY_MS) must stay
+// under the Edge Function wall-time (~150s), otherwise the FINALLY block never
+// fires and `wod_generation_runs` rows are left as zombie "running" entries.
+// 2 attempts × (60 + 2 + 30) = ~184s is the worst case — still risky but
+// retries also fire from separate cron passes, so a single attempt per call
+// is what keeps us inside the wall-time budget.
+const MAX_ATTEMPTS = 2;
+const RETRY_DELAY_MS = 30000;
 
 interface WodVerificationResult {
   success: boolean;
