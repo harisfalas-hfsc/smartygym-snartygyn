@@ -594,6 +594,8 @@ const Index = () => {
                         key={wod.id}
                         src={wod.image_url || "/placeholder.svg"}
                         alt={wod.name}
+                        width={1280}
+                        height={720}
                         className="w-full h-full object-cover transition-opacity duration-500"
                         loading="eager"
                         decoding="async"
@@ -632,34 +634,34 @@ const Index = () => {
                           {stripHtml(wod.description).substring(0, 120)}...
                         </p>
                       )}
-                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] mb-2">
+                      <div className="flex flex-nowrap items-center gap-x-1.5 text-[10px] mb-2 overflow-hidden">
                         {wod.category && (
                           <>
-                            <div className="flex items-center gap-1">
-                              <Layers className="w-3 h-3 text-primary" />
-                              <span className="text-muted-foreground font-medium">{wod.category}</span>
+                            <div className="flex items-center gap-1 min-w-0">
+                              <Layers className="w-3 h-3 text-primary shrink-0" />
+                              <span className="text-muted-foreground font-medium truncate">{wod.category}</span>
                             </div>
-                            <span className="text-muted-foreground/50">•</span>
+                            <span className="text-muted-foreground shrink-0">•</span>
                           </>
                         )}
-                        <div className="flex items-center gap-1">
-                          <Target className="w-3 h-3 text-primary" />
-                          <span className="text-blue-600 dark:text-blue-400 font-medium">{wod.format || "General"}</span>
+                        <div className="flex items-center gap-1 min-w-0">
+                          <Target className="w-3 h-3 text-primary shrink-0" />
+                          <span className="text-blue-700 dark:text-blue-400 font-medium truncate">{wod.format || "General"}</span>
                         </div>
-                        <span className="text-muted-foreground/50">•</span>
-                        <div className="flex items-center gap-1">
+                        <span className="text-muted-foreground shrink-0">•</span>
+                        <div className="flex items-center gap-1 shrink-0">
                           <TrendingUp className={`w-3 h-3 ${isRecovery ? "text-green-600 dark:text-green-400" : getDifficultyColorClasses(wod.difficulty_stars || wod.difficulty).icon}`} />
-                          <span className={`font-medium capitalize ${isRecovery ? "text-green-600 dark:text-green-400" : getDifficultyColorClasses(wod.difficulty_stars || wod.difficulty).text}`}>
+                          <span className={`font-medium capitalize whitespace-nowrap ${isRecovery ? "text-green-600 dark:text-green-400" : getDifficultyColorClasses(wod.difficulty_stars || wod.difficulty).text}`}>
                             {isRecovery
                               ? "All Levels"
                               : (wod.difficulty || (wod.difficulty_stars ? (wod.difficulty_stars <= 2 ? "Beginner" : wod.difficulty_stars <= 4 ? "Intermediate" : "Advanced") : "Beginner"))}
                             {!isRecovery && wod.difficulty_stars ? ` (${wod.difficulty_stars}★)` : ""}
                           </span>
                         </div>
-                        <span className="text-muted-foreground/50">•</span>
-                        <div className="flex items-center gap-1">
-                          <Clock className="w-3 h-3 text-purple-600 dark:text-purple-400" />
-                          <span className="text-purple-600 dark:text-purple-400 font-medium">{wod.duration || "45-60 min"}</span>
+                        <span className="text-muted-foreground shrink-0">•</span>
+                        <div className="flex items-center gap-1 shrink-0">
+                          <Clock className="w-3 h-3 text-purple-700 dark:text-purple-400" />
+                          <span className="text-purple-700 dark:text-purple-400 font-medium whitespace-nowrap">{wod.duration || "45-60 min"}</span>
                         </div>
                       </div>
                       {mobileWodCards.length > 1 && (
