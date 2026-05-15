@@ -96,8 +96,12 @@ export function applyWodQualityGate(args: {
 
   // 1) Duration minimum.
   const minMinutes = minimumMinutes(difficultyStars, category, format);
-  // Only enforce when we can actually compute a duration (REPS & SETS returns 0 → skip).
-  if (computedMinutes > 0 && computedMinutes < minMinutes) {
+  const isRepsAndSets = /REPS/i.test(format || "") && /SETS/i.test(format || "");
+  // REPS & SETS duration is intentionally not deterministic: the real work time
+  // depends on load, tempo, rest, and set execution. The calculator may still
+  // estimate a short finisher, so never reject strength-style WODs on partial
+  // computed minutes. Prescription/section density gates below remain strict.
+  if (!isRepsAndSets && computedMinutes > 0 && computedMinutes < minMinutes) {
     failures.push(
       `Main+Finisher duration ${computedMinutes} min is below the ${minMinutes} min minimum for ${category} ${difficultyStars}-star (${format}).`,
     );
