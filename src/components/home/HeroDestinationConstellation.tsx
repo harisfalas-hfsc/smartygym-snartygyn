@@ -313,12 +313,11 @@ const Bubble = ({
 const BENTO_LAYOUT: Record<string, { top: number; left: number; width: number; height: number }> = {
   wod:       { top:  20, left:  40, width: 300, height: 340 },
   blog:      { top: 380, left:  40, width: 300, height: 140 },
-  workouts:  { top:  20, left: 430, width: 440, height: 490 },
+  workouts:  { top:  20, left: 430, width: 440, height: 660 },
   library:   { top: 540, left:  40, width: 300, height: 140 },
   programs:  { top:  30, left: 960, width: 300, height: 170 },
   tools:     { top: 250, left: 970, width: 290, height: 260 },
   community: { top: 540, left: 980, width: 280, height: 140 },
-  coach:     { top: 540, left: 430, width: 440, height: 140 },
 };
 
 const BentoTile = ({
@@ -657,7 +656,7 @@ export const HeroDestinationConstellation = () => {
             <rect width="1300" height="700" fill="url(#bento-glow)" />
           </svg>
 
-          {[...DESTINATIONS, COACH].map((dest) => {
+          {DESTINATIONS.map((dest) => {
             const pos = BENTO_LAYOUT[dest.id];
             if (!pos) return null;
             return (
