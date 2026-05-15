@@ -311,13 +311,13 @@ const Bubble = ({
 
 /** Bento grid layout for desktop — uneven, hand-drawn feel matching the sketch. */
 const BENTO_LAYOUT: Record<string, { top: number; left: number; width: number; height: number }> = {
-  wod:       { top:  20, left:  40, width: 300, height: 340 },
-  blog:      { top: 380, left:  40, width: 300, height: 140 },
-  workouts:  { top:  20, left: 430, width: 440, height: 660 },
-  library:   { top: 540, left:  40, width: 300, height: 140 },
-  programs:  { top:  30, left: 960, width: 300, height: 170 },
-  tools:     { top: 250, left: 970, width: 290, height: 260 },
-  community: { top: 540, left: 980, width: 280, height: 140 },
+  wod:       { top:  20, left:  20, width: 320, height: 360 },
+  blog:      { top: 400, left:  20, width: 320, height: 140 },
+  library:   { top: 560, left:  20, width: 320, height: 140 },
+  workouts:  { top:  20, left: 360, width: 580, height: 680 },
+  programs:  { top:  20, left: 960, width: 320, height: 180 },
+  tools:     { top: 220, left: 960, width: 320, height: 320 },
+  community: { top: 560, left: 960, width: 320, height: 140 },
 };
 
 const BentoTile = ({
@@ -352,8 +352,9 @@ const BentoTile = ({
     return () => window.clearInterval(id);
   }, [images.length]);
 
-  const chipSize = Math.max(Math.min(width, height) * 0.18, 36);
-  const iconSize = Math.max(chipSize * 0.55, 18);
+  // Fixed icon chip size across all bento tiles (matches Tools card sizing).
+  const chipSize = 46;
+  const iconSize = 26;
 
   return (
     <div
@@ -627,14 +628,14 @@ export const HeroDestinationConstellation = () => {
           style={{
             width: "100%",
             maxWidth: "1300px",
-            height: `${700 * desktopScale}px`,
+            height: `${720 * desktopScale}px`,
             overflow: "hidden",
           }}
         >
           <div
             style={{
               width: "1300px",
-              height: "700px",
+              height: "720px",
               transform: `scale(${desktopScale})`,
               transformOrigin: "top left",
               position: "relative",
@@ -643,7 +644,7 @@ export const HeroDestinationConstellation = () => {
           {/* Soft radial glow background */}
           <svg
             className="absolute inset-0 w-full h-full pointer-events-none"
-            viewBox="0 0 1300 700"
+            viewBox="0 0 1300 720"
             preserveAspectRatio="xMidYMid meet"
             aria-hidden="true"
           >
@@ -653,7 +654,7 @@ export const HeroDestinationConstellation = () => {
                 <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0" />
               </radialGradient>
             </defs>
-            <rect width="1300" height="700" fill="url(#bento-glow)" />
+            <rect width="1300" height="720" fill="url(#bento-glow)" />
           </svg>
 
           {DESTINATIONS.map((dest) => {
