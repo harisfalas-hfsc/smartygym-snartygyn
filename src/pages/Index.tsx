@@ -651,8 +651,7 @@ const Index = () => {
                                 : (wod.difficulty || "Beginner")}
                           </span>
                         </div>
-                        <div className="flex min-w-0 flex-col items-center justify-center gap-0.5 overflow-hidden text-center leading-none">
-                          <Clock className="w-3.5 h-3.5 text-purple-700 dark:text-purple-400" />
+                        <div className="min-w-0 overflow-hidden rounded-md bg-primary/10 px-1.5 py-1 text-center leading-none">
                           <span className="max-w-full truncate text-purple-700 dark:text-purple-400 font-medium">{wod.duration || "45-60 min"}</span>
                         </div>
                       </div>
