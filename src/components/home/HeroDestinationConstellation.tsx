@@ -14,6 +14,9 @@ import {
 import { cn } from "@/lib/utils";
 import { useTodayWods } from "@/hooks/useTodayWods";
 import { useIsPortraitMode } from "@/hooks/useIsPortraitMode";
+import type { WorkoutData } from "@/hooks/useWorkoutData";
+import { Badge } from "@/components/ui/badge";
+import { Clock, Flame, Layers } from "lucide-react";
 
 import heroWodImage from "@/assets/hero-wod.jpg";
 import heroWorkoutsImage from "@/assets/hero-workouts-bright.jpg";
@@ -328,6 +331,7 @@ const BentoTile = ({
   className,
   style,
   cycleImages,
+  cycleWods,
 }: {
   dest: Destination;
   isWodLive: boolean;
@@ -336,6 +340,7 @@ const BentoTile = ({
   className?: string;
   style?: React.CSSProperties;
   cycleImages?: string[];
+  cycleWods?: WorkoutData[];
 }) => {
   const navigate = useNavigate();
   const Icon = dest.icon;
@@ -348,9 +353,13 @@ const BentoTile = ({
     if (images.length < 2) return;
     const id = window.setInterval(() => {
       setImgIndex((i) => (i + 1) % images.length);
-    }, 2500);
+    }, 4500);
     return () => window.clearInterval(id);
   }, [images.length]);
+
+  const activeWod = cycleWods && cycleWods.length > 0
+    ? cycleWods[imgIndex % cycleWods.length]
+    : undefined;
 
   // Fixed icon chip size across all bento tiles (matches Tools card sizing).
   const chipSize = 46;
@@ -387,7 +396,12 @@ const BentoTile = ({
           ))}
           {/* Bottom gradient for label legibility */}
           <div
-            className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent"
+            className={cn(
+              "absolute inset-0",
+              activeWod
+                ? "bg-gradient-to-t from-black/90 via-black/55 to-black/15"
+                : "bg-gradient-to-t from-black/70 via-black/15 to-transparent"
+            )}
             aria-hidden="true"
           />
 
@@ -416,14 +430,47 @@ const BentoTile = ({
           </span>
 
           {/* Label — bottom left */}
-          <div className="absolute bottom-3 left-3 right-3 z-10">
-            <p className="font-bold text-white leading-tight drop-shadow-lg text-base md:text-lg">
-              {dest.short}
-            </p>
-            <p className="text-white/85 text-xs leading-tight drop-shadow-md mt-0.5 line-clamp-1">
-              {dest.tagline}
-            </p>
-          </div>
+          {activeWod ? (
+            <div className="absolute bottom-4 left-4 right-4 z-10 space-y-2">
+              <p className="font-extrabold text-white leading-tight drop-shadow-lg text-xl md:text-2xl line-clamp-2">
+                {activeWod.name}
+              </p>
+              {activeWod.description && (
+                <p className="text-white/90 text-sm leading-snug drop-shadow-md line-clamp-3">
+                  {activeWod.description}
+                </p>
+              )}
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {activeWod.category && (
+                  <Badge className="bg-primary/90 text-primary-foreground border-0 gap-1">
+                    <Layers className="w-3 h-3" />
+                    {activeWod.category}
+                  </Badge>
+                )}
+                {activeWod.difficulty && (
+                  <Badge variant="secondary" className="bg-white/15 text-white border-white/20 gap-1 backdrop-blur-sm">
+                    <Flame className="w-3 h-3" />
+                    {activeWod.difficulty}
+                  </Badge>
+                )}
+                {activeWod.duration && (
+                  <Badge variant="secondary" className="bg-white/15 text-white border-white/20 gap-1 backdrop-blur-sm">
+                    <Clock className="w-3 h-3" />
+                    {activeWod.duration}
+                  </Badge>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="absolute bottom-3 left-3 right-3 z-10">
+              <p className="font-bold text-white leading-tight drop-shadow-lg text-base md:text-lg">
+                {dest.short}
+              </p>
+              <p className="text-white/85 text-xs leading-tight drop-shadow-md mt-0.5 line-clamp-1">
+                {dest.tagline}
+              </p>
+            </div>
+          )}
         </button>
       </span>
     </div>
