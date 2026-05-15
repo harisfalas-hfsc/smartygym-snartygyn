@@ -89,12 +89,12 @@ const Index = () => {
 
   // Mobile hero swipeable cards
   const heroCards = [
-    { id: "workouts", title: "Smarty Workouts", description: "500+ expert-designed workout routines for every fitness level and goal", icon: Dumbbell, route: "/workout", image: heroWorkoutsImage },
-    { id: "programs", title: "Smarty Programs", description: "Structured multi-week programs designed to transform your fitness journey", icon: Calendar, route: "/trainingprogram", image: heroProgramsImage },
-    { id: "tools", title: "Smarty Tools", description: "Professional fitness calculators and tracking tools to optimize your training", icon: Calculator, route: "/tools", image: heroToolsImage },
-    { id: "exerciselibrary", title: "Exercise Library", description: "Comprehensive video library with proper form demonstrations and technique guides", icon: Video, route: "/exerciselibrary", image: heroLibraryImage },
-    { id: "blog", title: "Blog & Insights", description: "Evidence-based fitness articles and expert insights from professional coaches", icon: FileText, route: "/blog", image: heroBlogImage },
-    { id: "community", title: "Community", description: "Connect, share and grow with fellow fitness enthusiasts worldwide", icon: Users, route: "/community", image: heroCommunityImage },
+    { id: "workouts", title: "Smarty Workouts", description: "500+ expert-designed workout routines for every fitness level and goal", icon: Dumbbell, route: "/workout", image: heroWorkoutsImage, imageWidth: 1024, imageHeight: 1024 },
+    { id: "programs", title: "Smarty Programs", description: "Structured multi-week programs designed to transform your fitness journey", icon: Calendar, route: "/trainingprogram", image: heroProgramsImage, imageWidth: 768, imageHeight: 768 },
+    { id: "tools", title: "Smarty Tools", description: "Professional fitness calculators and tracking tools to optimize your training", icon: Calculator, route: "/tools", image: heroToolsImage, imageWidth: 768, imageHeight: 768 },
+    { id: "exerciselibrary", title: "Exercise Library", description: "Comprehensive video library with proper form demonstrations and technique guides", icon: Video, route: "/exerciselibrary", image: heroLibraryImage, imageWidth: 800, imageHeight: 512 },
+    { id: "blog", title: "Blog & Insights", description: "Evidence-based fitness articles and expert insights from professional coaches", icon: FileText, route: "/blog", image: heroBlogImage, imageWidth: 400, imageHeight: 300 },
+    { id: "community", title: "Community", description: "Connect, share and grow with fellow fitness enthusiasts worldwide", icon: Users, route: "/community", image: heroCommunityImage, imageWidth: 1024, imageHeight: 1024 },
   ];
 
   // Fetch review stats for SEO schema - low priority, don't block render
@@ -502,13 +502,22 @@ const Index = () => {
 
             <Carousel className="w-full" opts={{ align: "center", loop: true }} setApi={setCarouselApi}>
               <CarouselContent className="-ml-2">
-                {heroCards.map((card) => {
+                {heroCards.map((card, index) => {
                   const Icon = card.icon;
                   return (
                     <CarouselItem key={card.id} className="pl-2 basis-[75%] sm:basis-[60%]">
                       <div onClick={() => navigate(card.route)} className="border-2 border-primary/40 rounded-xl overflow-hidden hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300 cursor-pointer bg-card flex flex-col h-[260px] sm:h-[300px]">
                         <div className="relative h-[70%] overflow-hidden flex-shrink-0">
-                          <img src={card.image} alt={card.title} className="w-full h-full object-cover object-[center_top]" />
+                          <img
+                            src={card.image}
+                            alt={card.title}
+                            width={card.imageWidth}
+                            height={card.imageHeight}
+                            loading={index === 0 ? "eager" : "lazy"}
+                            decoding="async"
+                            fetchpriority={index === 0 ? "high" : "auto"}
+                            className="w-full h-full object-cover object-[center_top]"
+                          />
                         </div>
                         <div className="flex flex-col justify-center flex-1 p-3 text-center">
                           <div className="flex items-center justify-center gap-2 mb-1">
@@ -585,10 +594,12 @@ const Index = () => {
                         key={wod.id}
                         src={wod.image_url || "/placeholder.svg"}
                         alt={wod.name}
+                        width={1280}
+                        height={720}
                         className="w-full h-full object-cover transition-opacity duration-500"
                         loading="eager"
                         decoding="async"
-                        fetchPriority="high"
+                        fetchpriority="high"
                         onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
                       />
                       <Badge className={cn("absolute top-3 left-3 text-white border-0", equipmentBadgeClass)}>
@@ -623,34 +634,34 @@ const Index = () => {
                           {stripHtml(wod.description).substring(0, 120)}...
                         </p>
                       )}
-                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] mb-2">
+                      <div className="flex flex-nowrap items-center gap-x-1.5 text-[10px] mb-2 overflow-hidden">
                         {wod.category && (
                           <>
-                            <div className="flex items-center gap-1">
-                              <Layers className="w-3 h-3 text-primary" />
-                              <span className="text-muted-foreground font-medium">{wod.category}</span>
+                            <div className="flex items-center gap-1 min-w-0">
+                              <Layers className="w-3 h-3 text-primary shrink-0" />
+                              <span className="text-muted-foreground font-medium truncate">{wod.category}</span>
                             </div>
-                            <span className="text-muted-foreground/50">•</span>
+                            <span className="text-muted-foreground shrink-0">•</span>
                           </>
                         )}
-                        <div className="flex items-center gap-1">
-                          <Target className="w-3 h-3 text-primary" />
-                          <span className="text-blue-600 dark:text-blue-400 font-medium">{wod.format || "General"}</span>
+                        <div className="flex items-center gap-1 min-w-0">
+                          <Target className="w-3 h-3 text-primary shrink-0" />
+                          <span className="text-blue-700 dark:text-blue-400 font-medium truncate">{wod.format || "General"}</span>
                         </div>
-                        <span className="text-muted-foreground/50">•</span>
-                        <div className="flex items-center gap-1">
+                        <span className="text-muted-foreground shrink-0">•</span>
+                        <div className="flex items-center gap-1 shrink-0">
                           <TrendingUp className={`w-3 h-3 ${isRecovery ? "text-green-600 dark:text-green-400" : getDifficultyColorClasses(wod.difficulty_stars || wod.difficulty).icon}`} />
-                          <span className={`font-medium capitalize ${isRecovery ? "text-green-600 dark:text-green-400" : getDifficultyColorClasses(wod.difficulty_stars || wod.difficulty).text}`}>
+                          <span className={`font-medium capitalize whitespace-nowrap ${isRecovery ? "text-green-600 dark:text-green-400" : getDifficultyColorClasses(wod.difficulty_stars || wod.difficulty).text}`}>
                             {isRecovery
                               ? "All Levels"
                               : (wod.difficulty || (wod.difficulty_stars ? (wod.difficulty_stars <= 2 ? "Beginner" : wod.difficulty_stars <= 4 ? "Intermediate" : "Advanced") : "Beginner"))}
                             {!isRecovery && wod.difficulty_stars ? ` (${wod.difficulty_stars}★)` : ""}
                           </span>
                         </div>
-                        <span className="text-muted-foreground/50">•</span>
-                        <div className="flex items-center gap-1">
-                          <Clock className="w-3 h-3 text-purple-600 dark:text-purple-400" />
-                          <span className="text-purple-600 dark:text-purple-400 font-medium">{wod.duration || "45-60 min"}</span>
+                        <span className="text-muted-foreground shrink-0">•</span>
+                        <div className="flex items-center gap-1 shrink-0">
+                          <Clock className="w-3 h-3 text-purple-700 dark:text-purple-400" />
+                          <span className="text-purple-700 dark:text-purple-400 font-medium whitespace-nowrap">{wod.duration || "45-60 min"}</span>
                         </div>
                       </div>
                       {mobileWodCards.length > 1 && (
