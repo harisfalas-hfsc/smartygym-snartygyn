@@ -541,13 +541,16 @@ export const HeroDestinationConstellation = () => {
   // "Desktop site" forced) we uniformly scale it down to fit.
   const desktopWrapperRef = useRef<HTMLDivElement | null>(null);
   const [desktopScale, setDesktopScale] = useState(1);
+  const [desktopStageWidth, setDesktopStageWidth] = useState(1300);
   useEffect(() => {
     const el = desktopWrapperRef.current;
     if (!el) return;
     const measure = () => {
       const w = el.clientWidth;
       if (!w) return;
-      setDesktopScale(Math.min(1, w / 1300));
+      const stageWidth = Math.max(1300, w);
+      setDesktopStageWidth(stageWidth);
+      setDesktopScale(Math.min(1, w / stageWidth));
     };
     measure();
     let ro: ResizeObserver | undefined;
@@ -563,6 +566,8 @@ export const HeroDestinationConstellation = () => {
       window.removeEventListener("orientationchange", measure);
     };
   }, []);
+
+  const bentoLayout = getBentoLayout(desktopStageWidth);
 
   // ============ TABLET CIRCULAR LAYOUT ============
   const tabletStage = 720;
@@ -686,14 +691,14 @@ export const HeroDestinationConstellation = () => {
           className="relative mx-auto"
           style={{
             width: "100%",
-            maxWidth: "1300px",
+            maxWidth: "100%",
             height: `${656 * desktopScale}px`,
             overflow: "hidden",
           }}
         >
           <div
             style={{
-              width: "1300px",
+              width: `${desktopStageWidth}px`,
               height: "656px",
               transform: `scale(${desktopScale})`,
               transformOrigin: "top left",
@@ -703,7 +708,7 @@ export const HeroDestinationConstellation = () => {
           {/* Soft radial glow background */}
           <svg
             className="absolute inset-0 w-full h-full pointer-events-none"
-            viewBox="0 0 1300 656"
+            viewBox={`0 0 ${desktopStageWidth} 656`}
             preserveAspectRatio="xMidYMid meet"
             aria-hidden="true"
           >
@@ -713,11 +718,11 @@ export const HeroDestinationConstellation = () => {
                 <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0" />
               </radialGradient>
             </defs>
-            <rect width="1300" height="656" fill="url(#bento-glow)" />
+            <rect width={desktopStageWidth} height="656" fill="url(#bento-glow)" />
           </svg>
 
           {DESTINATIONS.map((dest) => {
-            const pos = BENTO_LAYOUT[dest.id];
+            const pos = bentoLayout[dest.id];
             if (!pos) return null;
             return (
               <BentoTile
