@@ -587,7 +587,7 @@ const Index = () => {
                 const isRecovery = wod.category?.toUpperCase() === "RECOVERY";
                 return (
                   <Card
-                    className="group cursor-pointer overflow-hidden hover:shadow-xl transition-all duration-300 hover:border-primary/60"
+                    className="group h-[286px] cursor-pointer overflow-hidden hover:shadow-xl transition-all duration-300 hover:border-primary/60"
                   >
                     <div className="relative aspect-video overflow-hidden">
                       <img
@@ -629,11 +629,9 @@ const Index = () => {
                       <h3 className="text-base font-bold text-foreground mb-1 group-hover:text-primary transition-colors line-clamp-1">
                         {wod.name}
                       </h3>
-                      {wod.description && (
-                        <p className="text-muted-foreground text-xs mb-2 line-clamp-2 min-h-[2.25rem]">
-                          {stripHtml(wod.description).substring(0, 120)}...
-                        </p>
-                      )}
+                      <p className="text-muted-foreground text-xs mb-2 line-clamp-2 h-9">
+                        {stripHtml(wod.description).substring(0, 120) || "Today's expert-designed Workout of the Day."}...
+                      </p>
                       <div className="flex h-4 flex-nowrap items-center gap-x-1 text-[10px] mb-2 overflow-hidden whitespace-nowrap">
                         {wod.category && (
                           <>
