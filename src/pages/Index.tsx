@@ -732,17 +732,6 @@ const Index = () => {
                 <meta itemProp="description" content="SmartyGym - #1 online gym and fitness platform by Haris Falas - smartygym.com" />
                 
                 <CardContent className="p-6 md:p-8 relative z-20">
-                        {/* CTA Button for non-premium users - positioned top left */}
-                        {!isPremium && (
-                          <Button 
-                            onClick={() => navigate("/smarty-plans")} 
-                            className="absolute top-4 left-4 bg-primary text-primary-foreground hover:bg-primary/90 text-sm"
-                          >
-                            <Crown className="mr-2 h-4 w-4" />
-                            Transform Your Fitness
-                          </Button>
-                        )}
-                        
                         {/* Interactive constellation of destination bubbles */}
                         <div className="mt-0">
                           <HeroDestinationConstellation />
