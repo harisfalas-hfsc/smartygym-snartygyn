@@ -587,7 +587,7 @@ const Index = () => {
                 const isRecovery = wod.category?.toUpperCase() === "RECOVERY";
                 return (
                   <Card
-                    className="group h-[286px] cursor-pointer overflow-hidden hover:shadow-xl transition-all duration-300 hover:border-primary/60"
+                    className="group h-[318px] cursor-pointer overflow-hidden hover:shadow-xl transition-all duration-300 hover:border-primary/60"
                   >
                     <div className="relative aspect-video overflow-hidden">
                       <img
@@ -632,24 +632,20 @@ const Index = () => {
                       <p className="text-muted-foreground text-xs mb-2 line-clamp-2 h-9">
                         {stripHtml(wod.description).substring(0, 120) || "Today's expert-designed Workout of the Day."}...
                       </p>
-                      <div className="flex h-4 flex-nowrap items-center gap-x-1 text-[10px] mb-2 overflow-hidden whitespace-nowrap">
+                      <div className="grid h-10 grid-cols-4 items-center gap-1 text-[11px] mb-2 overflow-hidden">
                         {wod.category && (
-                          <>
-                            <div className="flex min-w-0 flex-1 items-center gap-0.5 overflow-hidden">
-                              <Layers className="w-2.5 h-2.5 text-primary shrink-0" />
-                              <span className="text-muted-foreground font-medium truncate">{wod.category}</span>
-                            </div>
-                            <span className="text-muted-foreground shrink-0">•</span>
-                          </>
+                          <div className="flex min-w-0 flex-col items-center justify-center gap-0.5 overflow-hidden text-center leading-none">
+                            <Layers className="w-3.5 h-3.5 text-primary shrink-0" />
+                            <span className="max-w-full truncate text-muted-foreground font-medium">{wod.category}</span>
+                          </div>
                         )}
-                        <div className="flex min-w-0 flex-1 items-center gap-0.5 overflow-hidden">
-                          <Target className="w-2.5 h-2.5 text-primary shrink-0" />
-                          <span className="text-blue-700 dark:text-blue-400 font-medium truncate">{wod.format || "General"}</span>
+                        <div className="flex min-w-0 flex-col items-center justify-center gap-0.5 overflow-hidden text-center leading-none">
+                          <Target className="w-3.5 h-3.5 text-primary shrink-0" />
+                          <span className="max-w-full truncate text-blue-700 dark:text-blue-400 font-medium">{wod.format || "General"}</span>
                         </div>
-                        <span className="text-muted-foreground shrink-0">•</span>
-                        <div className="flex items-center gap-0.5 shrink-0">
-                          <TrendingUp className={`w-2.5 h-2.5 ${isRecovery ? "text-green-600 dark:text-green-400" : getDifficultyColorClasses(wod.difficulty_stars || wod.difficulty).icon}`} />
-                          <span className={`font-medium capitalize whitespace-nowrap ${isRecovery ? "text-green-600 dark:text-green-400" : getDifficultyColorClasses(wod.difficulty_stars || wod.difficulty).text}`}>
+                        <div className="flex min-w-0 flex-col items-center justify-center gap-0.5 overflow-hidden text-center leading-none">
+                          <TrendingUp className={`w-3.5 h-3.5 ${isRecovery ? "text-green-600 dark:text-green-400" : getDifficultyColorClasses(wod.difficulty_stars || wod.difficulty).icon}`} />
+                          <span className={`max-w-full truncate font-medium capitalize ${isRecovery ? "text-green-600 dark:text-green-400" : getDifficultyColorClasses(wod.difficulty_stars || wod.difficulty).text}`}>
                             {isRecovery
                               ? "All"
                               : wod.difficulty_stars
@@ -657,10 +653,9 @@ const Index = () => {
                                 : (wod.difficulty || "Beginner")}
                           </span>
                         </div>
-                        <span className="text-muted-foreground shrink-0">•</span>
-                        <div className="flex items-center gap-0.5 shrink-0">
-                          <Clock className="w-2.5 h-2.5 text-purple-700 dark:text-purple-400" />
-                          <span className="text-purple-700 dark:text-purple-400 font-medium whitespace-nowrap">{wod.duration || "45-60 min"}</span>
+                        <div className="flex min-w-0 flex-col items-center justify-center gap-0.5 overflow-hidden text-center leading-none">
+                          <Clock className="w-3.5 h-3.5 text-purple-700 dark:text-purple-400" />
+                          <span className="max-w-full truncate text-purple-700 dark:text-purple-400 font-medium">{wod.duration || "45-60 min"}</span>
                         </div>
                       </div>
                       {mobileWodCards.length > 1 && (
