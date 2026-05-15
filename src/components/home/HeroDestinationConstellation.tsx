@@ -447,7 +447,16 @@ const BentoTile = ({
               </p>
               {activeWod.description && (
                 <p className="text-white/90 text-sm leading-snug drop-shadow-md line-clamp-3">
-                  {activeWod.description}
+                  {activeWod.description
+                    .replace(/<[^>]*>/g, " ")
+                    .replace(/&nbsp;/gi, " ")
+                    .replace(/&amp;/gi, "&")
+                    .replace(/&lt;/gi, "<")
+                    .replace(/&gt;/gi, ">")
+                    .replace(/&quot;/gi, '"')
+                    .replace(/&#39;/gi, "'")
+                    .replace(/\s+/g, " ")
+                    .trim()}
                 </p>
               )}
               <div className="flex flex-wrap gap-1.5 pt-1">
