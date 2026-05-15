@@ -635,17 +635,14 @@ const Index = () => {
                       </p>
                       <div className="grid h-8 grid-cols-4 items-center gap-1 text-xs mb-1 overflow-hidden">
                         {wod.category && (
-                          <div className="flex min-w-0 flex-col items-center justify-center gap-0.5 overflow-hidden text-center leading-none">
-                            <Layers className="w-3.5 h-3.5 text-primary shrink-0" />
+                          <div className="min-w-0 overflow-hidden rounded-md bg-primary/10 px-1.5 py-1 text-center leading-none">
                             <span className="max-w-full truncate text-muted-foreground font-medium">{wod.category}</span>
                           </div>
                         )}
-                        <div className="flex min-w-0 flex-col items-center justify-center gap-0.5 overflow-hidden text-center leading-none">
-                          <Target className="w-3.5 h-3.5 text-primary shrink-0" />
+                        <div className="min-w-0 overflow-hidden rounded-md bg-primary/10 px-1.5 py-1 text-center leading-none">
                           <span className="max-w-full truncate text-blue-700 dark:text-blue-400 font-medium">{wod.format || "General"}</span>
                         </div>
-                        <div className="flex min-w-0 flex-col items-center justify-center gap-0.5 overflow-hidden text-center leading-none">
-                          <TrendingUp className={`w-3.5 h-3.5 ${isRecovery ? "text-green-600 dark:text-green-400" : getDifficultyColorClasses(wod.difficulty_stars || wod.difficulty).icon}`} />
+                        <div className="min-w-0 overflow-hidden rounded-md bg-primary/10 px-1.5 py-1 text-center leading-none">
                           <span className={`max-w-full truncate font-medium capitalize ${isRecovery ? "text-green-600 dark:text-green-400" : getDifficultyColorClasses(wod.difficulty_stars || wod.difficulty).text}`}>
                             {isRecovery
                               ? "All"
