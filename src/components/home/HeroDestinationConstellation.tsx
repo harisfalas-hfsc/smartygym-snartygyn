@@ -323,13 +323,13 @@ const getBentoLayout = (stageWidth: number): Record<string, { top: number; left:
   const rightX = wodX + wodWidth + gap;
 
   return {
-    workouts:  { top:  20, left: leftX, width: sideWidth, height: 324 },
-    blog:      { top: 364, left: leftX, width: sideWidth, height: 126 },
-    library:   { top: 510, left: leftX, width: sideWidth, height: 126 },
-    wod:       { top:  20, left: wodX, width: wodWidth, height: 616 },
+    workouts:  { top:  20, left: leftX, width: sideWidth, height: 258 },
+    blog:      { top: 298, left: leftX, width: sideWidth, height: 126 },
+    library:   { top: 444, left: leftX, width: sideWidth, height: 126 },
+    wod:       { top:  20, left: wodX, width: wodWidth, height: 550 },
     programs:  { top:  20, left: rightX, width: sideWidth, height: 162 },
-    tools:     { top: 202, left: rightX, width: sideWidth, height: 288 },
-    community: { top: 510, left: rightX, width: sideWidth, height: 126 },
+    tools:     { top: 202, left: rightX, width: sideWidth, height: 222 },
+    community: { top: 444, left: rightX, width: sideWidth, height: 126 },
   };
 };
 
