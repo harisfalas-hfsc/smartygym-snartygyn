@@ -95,7 +95,10 @@ const IndividualWorkout = () => {
       <>
         <Helmet>
           <title>{dbWorkout.name} | Online Workout by Haris Falas | SmartyGym</title>
-          <meta name="description" content={`${dbWorkout.description || dbWorkout.name} - Professional online workout by Sports Scientist Haris Falas. ${dbWorkout.duration} ${dbWorkout.format} workout. ${dbWorkout.equipment}. 100% Human-Designed.`} />
+          <meta name="description" content={(() => {
+            const base = `${dbWorkout.duration || ''} ${dbWorkout.format || ''} workout by Haris Falas. ${dbWorkout.description || dbWorkout.name}`.trim().replace(/\s+/g, ' ');
+            return base.length > 158 ? base.slice(0, 155).trimEnd() + '…' : base;
+          })()} />
           <meta name="keywords" content={`${dbWorkout.name}, online workouts, ${dbWorkout.format} workout, ${dbWorkout.category} training, Haris Falas, online fitness, ${dbWorkout.equipment} workout, ${dbWorkout.difficulty} workout, SmartyGym workout, circuit workout, HIIT workout, AMRAP workout, EMOM workout, strength workout, cardio workout, office workout, outdoor workout, bodyweight workout${dbWorkout.category?.includes('MICRO') ? ', micro workouts, mini workouts, small workouts, 5 minute workout, quick workout, exercise snacks, desk workout' : ''}`} />
           
           {/* Open Graph */}
