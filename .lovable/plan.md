@@ -1,75 +1,55 @@
-## What changes
+## Confirmed from your screenshots
 
-Replace the desktop constellation (circles + connecting lines + Haris Falas center bubble) with **7 image tiles absolutely-positioned to match your sketch exactly** — uneven, asymmetric, with the precise gaps you drew. Same hero frame size (1300×700), nothing around it moves.
+- Email #1 ("🏆 Today's Workouts (STRENGTH) are Live", arrives ~08:10 Cyprus) — the WOD-only one. Source: cron `queue-wod-notifications-morning` (05:00 UTC) → `send-new-content-notifications` drainer every 10 min. **Delete this.**
+- Email #2 ("🌅 Good Morning, Smarty!" with both Workouts of the Day and Daily Smarty Ritual, arrives 08:00 Cyprus) — the combined one. Source: cron `send-morning-notifications-job` (05:00 UTC) → `send-morning-notifications`. **Keep this.**
 
-Desktop only. Tablet and mobile layouts stay untouched. Haris Falas card is removed from this layout.
+The same applies to the dashboard notifications — the duplicate WOD-only dashboard message comes from the same WOD-only path.
 
-## Exact placement (read straight from your sketch)
+## Permanent fix
 
-Stage = 1300 × 700 px. Coordinates measured from the top-left of the stage to mirror the sketch proportions and the visible gaps from the header.
+### 1. Delete the WOD-only cron job
 
-```text
-┌──────────────────────────────────────────────────────────────────┐
-│                                                                  │
-│  ┌─────────┐                                ┌──────────┐         │  ← right column
-│  │         │       ┌─────────┐              │ PROGRAMS │         │    starts
-│  │   WOD   │       │         │              └──────────┘         │    near top
-│  │ (square)│       │WORKOUTS │                                   │
-│  │         │       │ (tall   │              ┌──────────┐         │
-│  │         │       │  rect)  │              │          │         │
-│  └─────────┘       │         │              │  TOOLS   │         │
-│                    │         │              │ (taller) │         │
-│  ┌─────────┐       └─────────┘              │          │         │
-│  │  BLOG   │       ┌──────────────┐         └──────────┘         │
-│  │ (small) │       │EXERCISE LIB. │         ┌──────────┐         │
-│  └─────────┘       │  (wide rect) │         │COMMUNITY │         │
-│                    └──────────────┘         └──────────┘         │
-└──────────────────────────────────────────────────────────────────┘
-```
+Remove `queue-wod-notifications-morning` from the live `cron.job` table. No more daily 08:00 Cyprus queueing of WOD-only items.
 
-Per-tile coordinates `{ top, left, width, height }` in stage px:
+### 2. Delete the cron metadata row
 
-| Tile             | top | left | width | height |
-|------------------|-----|------|-------|--------|
-| WOD (square)     |  20 |   40 |  300  |  340   |
-| Blog (small)     | 470 |   55 |  270  |  150   |
-| Workouts (tall)  | 110 |  430 |  300  |  400   |
-| Exercise Library | 540 |  410 |  340  |  150   |
-| Programs (wide)  |  30 |  960 |  300  |  170   |
-| Tools (taller)   | 250 |  970 |  290  |  260   |
-| Community (small)| 540 |  980 |  280  |  130   |
+Remove `queue-wod-notifications-morning` from `cron_job_metadata` so it disappears from the admin cron monitor and stops being treated as expected infrastructure.
 
-These intentionally reproduce the sketch's unevenness:
-- WOD sits flush near the top-left, big square.
-- Workouts is **pushed down and centered**, taller than WOD.
-- Programs sits **near the top-right** (slightly higher than Workouts), wide.
-- Tools is the tallest right-column tile, in the middle.
-- Blog, Exercise Library, Community line up near the bottom but at different baselines (Blog highest, Exercise Library/Community lower) — exactly like the sketch.
-- Visible gap between the header and the top of WOD/Programs ≈ 20–30 px, matching the sketch's small breathing room under the title row.
+### 3. Purge any pending WOD-only queue items
 
-## Visual treatment
+Delete all rows in `pending_content_notifications` where `content_type = 'wod'`. This ensures the every-10-min drainer cannot send any leftover queued WOD-only emails after the cron is removed.
 
-- Each tile: `rounded-2xl overflow-hidden` with full-bleed image background, soft `ring-1 ring-border/40` and a `shadow-lg`. **No hard border on the image itself** so the photo isn't cropped/framed harshly.
-- Bottom dark-to-transparent gradient + label in foreground white-on-image style. Small icon chip (background/95, primary ring) in the corner.
-- Featured WOD tile keeps the **Today pill** + pulsing primary ring + cycling between today's bodyweight/equipment images.
-- Hover: scale 1.03, primary ring intensifies, shadow lifts. Subtle 6s float with staggered delays so the grid still breathes.
-- Light & dark mode: only semantic tokens (`--primary`, `--border`, `--background`, `--foreground`). No hard-coded hex.
+### 4. Strip WOD handling from the content-notification drainer
 
-## Technical details
+Edit `send-new-content-notifications/index.ts` and remove the entire `content_type = 'wod'` branch (lines that build "🏆 Today's Workouts ... are Live" emails and dashboard messages). Even if a stale WOD row ever lands in the queue, no WOD-only message can be produced again.
 
-File: `src/components/home/HeroDestinationConstellation.tsx`
+### 5. Delete the legacy edge functions (code + deployment)
 
-1. Add `BENTO_LAYOUT` map (the table above).
-2. Add a `BentoTile` component — same image-cycle, Today pill, icon-chip, label, hover/float behavior as `Bubble`, but `rounded-2xl` and arbitrary `width × height`.
-3. In the desktop branch (`<div className="hidden md:block">`), keep the same 1300×700 stage and the `desktopScale` shrink-to-fit logic. Replace the SVG connection lines, the absolutely-positioned `Bubble`s, and the center `COACH` `Bubble` with absolutely-positioned `BentoTile`s using `BENTO_LAYOUT`.
-4. Tablet branch and mobile branch are not touched.
-5. `COACH`, `CONNECTIONS`, and `centers` become unused in the desktop branch — leave the constants in place (cheap) so nothing else breaks.
+Delete from the codebase and from the deployed functions:
 
-## Verification
+- `supabase/functions/queue-wod-notifications-morning`
+- `supabase/functions/send-wod-notifications` (the older direct WOD-only sender, still callable today)
 
-- Open the homepage at desktop ≥ 1300 px and confirm the 7 tiles match the sketch positions and the visible gaps from the header / between tiles.
-- Confirm the surrounding hero (100% Human / 0% AI card, headline, CTAs) hasn't moved a pixel — the stage is still 1300×700.
-- Toggle light/dark and confirm legibility.
-- Resize to ~1100 px to confirm `desktopScale` shrinks the whole bento proportionally without overflow.
-- Confirm tablet (≤1024 px landscape) and mobile views are visually identical to before.
-- Confirm WOD tile cycles today's images and shows the Today pill when WODs are live.
+### 6. Remove the manual admin trigger
+
+In `src/components/admin/WODManager.tsx`, remove the "Send WOD Notifications" button and its `supabase.functions.invoke("send-wod-notifications")` handler. The combined morning notification can still be re-sent if needed via the existing morning notification controls.
+
+### 7. Stop `select-wod-from-library` from calling the old sender
+
+In `supabase/functions/select-wod-from-library/index.ts`, remove the fallback `fetch(...send-wod-notifications)` block. WOD selection should never trigger WOD-only notifications — only the combined morning job sends user notifications.
+
+### 8. Clean up notification-type registry
+
+In `supabase/functions/_shared/notification-types.ts`, mark `WOD_NOTIFICATION` as historical-only (kept for old DB records and the existing combined-job audit log) and remove the legacy alias mappings that encourage future WOD-only use. The combined morning job continues to use it internally to log the WOD half of the combined message — that is fine and not user-facing as a separate message.
+
+### 9. Verification after implementation
+
+- `cron.job` no longer contains `queue-wod-notifications-morning`.
+- `cron_job_metadata` no longer contains `queue-wod-notifications-morning`.
+- `pending_content_notifications` has zero rows with `content_type = 'wod'`.
+- Project source code has zero references to `send-wod-notifications` or `queue-wod-notifications-morning`.
+- Only `send-morning-notifications-job` remains as the daily WOD/Ritual sender.
+
+## Result
+
+You will receive only one daily message — email and dashboard — at 08:00 Cyprus, containing both the Workout of the Day and the Daily Smarty Ritual. The 08:10 WOD-only email and its dashboard duplicate disappear permanently and cannot resurrect from any path.

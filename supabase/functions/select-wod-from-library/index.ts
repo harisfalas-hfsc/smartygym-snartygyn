@@ -407,30 +407,13 @@ serve(async (req) => {
       })),
     });
 
-    // Call send-wod-notifications ONLY if selecting for today's date
-    const todayCyprus = getCyprusDateStr();
-    const skipNotifications = parsedBody?.skipNotifications === true;
-
-    if (targetDate !== todayCyprus) {
-      logStep("Skipping notifications - selection is for a different date", { targetDate, todayCyprus });
-    } else if (skipNotifications) {
-      logStep("Skipping notifications - explicitly requested via skipNotifications parameter");
-    } else {
-      try {
-        const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
-        await fetch(`${supabaseUrl}/functions/v1/send-wod-notifications`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${anonKey}`,
-          },
-          body: JSON.stringify({}),
-        });
-        logStep("WOD notifications triggered");
-      } catch (notifError) {
-        logStep("WARNING: Failed to trigger WOD notifications", { error: String(notifError) });
-      }
-    }
+    // NOTE: Do NOT trigger any WOD-only notification here.
+    // User-facing daily notifications are sent EXCLUSIVELY by the combined
+    // `send-morning-notifications` job (07:00 Cyprus / 05:00 UTC), which
+    // delivers the Workout of the Day and the Daily Smarty Ritual together
+    // in a single email + dashboard message. The legacy WOD-only pipeline
+    // (`queue-wod-notifications-morning` + `send-wod-notifications`) has
+    // been permanently removed.
 
     logStep("Library selection complete", {
       selectedCount: finallyPromoted.length,
