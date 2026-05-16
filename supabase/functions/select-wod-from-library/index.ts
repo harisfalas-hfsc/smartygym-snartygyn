@@ -411,9 +411,7 @@ serve(async (req) => {
     // User-facing daily notifications are sent EXCLUSIVELY by the combined
     // `send-morning-notifications` job (07:00 Cyprus / 05:00 UTC), which
     // delivers the Workout of the Day and the Daily Smarty Ritual together
-    // in a single email + dashboard message. The legacy WOD-only pipeline
-    // (`queue-wod-notifications-morning` + `send-wod-notifications`) has
-    // been permanently removed.
+    // in a single email + dashboard message.
 
     logStep("Library selection complete", {
       selectedCount: finallyPromoted.length,

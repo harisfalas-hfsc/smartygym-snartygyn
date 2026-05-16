@@ -183,8 +183,8 @@ export type MessageType = typeof MESSAGE_TYPES[keyof typeof MESSAGE_TYPES];
  */
 export const MESSAGE_TYPE_SOURCES: Record<string, { source: string; schedule: string }> = {
   [MESSAGE_TYPES.MORNING_NOTIFICATION]: { source: 'send-morning-notifications', schedule: 'Daily 05:00 UTC (07:00 Cyprus)' },
-  [MESSAGE_TYPES.WOD_NOTIFICATION]: { source: 'send-wod-notifications (legacy)', schedule: 'Merged into morning notification' },
-  [MESSAGE_TYPES.DAILY_RITUAL]: { source: 'send-ritual-notifications (legacy)', schedule: 'Merged into morning notification' },
+  [MESSAGE_TYPES.WOD_NOTIFICATION]: { source: 'send-morning-notifications', schedule: 'Daily 05:00 UTC (07:00 Cyprus) — combined morning message' },
+  [MESSAGE_TYPES.DAILY_RITUAL]: { source: 'send-morning-notifications', schedule: 'Daily 05:00 UTC (07:00 Cyprus) — combined morning message' },
   [MESSAGE_TYPES.CHECKIN_REMINDER]: { source: 'send-checkin-reminders', schedule: 'Daily 06:00 & 18:00 UTC' },
   [MESSAGE_TYPES.MONDAY_MOTIVATION]: { source: 'send-weekly-motivation', schedule: 'Mondays 08:00 UTC' },
   [MESSAGE_TYPES.WEEKLY_ACTIVITY_REPORT]: { source: 'send-weekly-activity-report', schedule: 'Mondays 07:00 UTC' },
@@ -209,8 +209,6 @@ export const MESSAGE_TYPE_SOURCES: Record<string, { source: string; schedule: st
 export function getMessageType(notificationType: string): string {
   const typeMap: Record<string, string> = {
     // Map notification type names to correct message types
-    'wod': MESSAGE_TYPES.WOD_NOTIFICATION,
-    'workout_of_day': MESSAGE_TYPES.WOD_NOTIFICATION,
     'ritual': MESSAGE_TYPES.DAILY_RITUAL,
     'daily_ritual': MESSAGE_TYPES.DAILY_RITUAL,
     'checkin': MESSAGE_TYPES.CHECKIN_REMINDER,

@@ -158,10 +158,10 @@ serve(async (req) => {
 
     logStep(`Archival complete: ${archivedCount} WODs archived`);
 
-    // NOTE: WOD notifications are NOT queued here at midnight (people are sleeping).
-    // A dedicated cron `queue-wod-notifications-morning` runs at 05:00 UTC (07:00
-    // Cyprus) and queues today's active WODs into pending_content_notifications,
-    // so the every-10-min drainer delivers dashboard + email at a humane hour.
+    // NOTE: WOD notifications are NOT sent here at midnight (people are sleeping).
+    // The combined `send-morning-notifications` cron runs at 05:00 UTC (07:00
+    // Cyprus) and delivers the Workout of the Day together with the Daily Smarty
+    // Ritual in a single email + dashboard message at a humane hour.
 
     // ─────────────────────────────────────────────────────────────────────
     // POST-ARCHIVE VERIFICATION — fire-and-forget independent rollover check
