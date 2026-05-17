@@ -72,6 +72,7 @@ export default function AdminBackoffice() {
     { id: "exercise-library", label: "Exercise Library", description: "Video tutorials", icon: Video, color: "text-teal-500", bgColor: "bg-teal-500/10" },
     { id: "docs", label: "Docs", description: "Documentation", icon: FileText, color: "text-lime-600", bgColor: "bg-lime-500/10" },
     { id: "smartygym-app", label: "SmartyGym App", description: "App vault & settings", icon: Smartphone, color: "text-fuchsia-500", bgColor: "bg-fuchsia-500/10" },
+    { id: "seo-preview", label: "SEO Preview", description: "Inspect schemas & meta tags", icon: Search, color: "text-orange-400", bgColor: "bg-orange-400/10" },
   ];
 
   useEffect(() => {
