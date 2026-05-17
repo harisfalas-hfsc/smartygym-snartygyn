@@ -218,16 +218,14 @@ async function main() {
       });
 
       const [workoutsRes, programsRes, blogRes] = await Promise.all([
-        supabase
-          .from("admin_workouts")
-          .select("id, category, updated_at, created_at, is_visible")
-          .eq("is_visible", true)
-          .limit(2000),
-        supabase
-          .from("admin_training_programs")
-          .select("id, category, updated_at, created_at, is_visible")
-          .eq("is_visible", true)
-          .limit(500),
+        // Use public RPCs that bypass RLS for visibility-safe metadata —
+        // direct table reads with the anon key only see a tiny subset.
+        (supabase as any).rpc("get_visible_workout_metadata", {
+          _workout_id: null,
+        }),
+        (supabase as any).rpc("get_visible_program_metadata", {
+          _program_id: null,
+        }),
         supabase
           .from("blog_articles")
           .select("slug, updated_at, created_at, is_published")
