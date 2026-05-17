@@ -185,9 +185,10 @@ const resolvePage = (pathname: string) => {
 
 const buildSchema = (page: SeoPage, pathname: string) => {
   const normalizedPath = pathname === "" ? "/" : pathname.replace(/\/$/, "") || "/";
-  // The dedicated /faq page injects its own (richer) FAQPage schema.
-  // Skip emitting one here to avoid Google "Duplicate field FAQPage" warnings.
-  const includeFaq = normalizedPath !== "/faq";
+  // The dedicated /faq page and the homepage (Index.tsx) inject their own
+  // (richer) FAQPage schema. Skip emitting one here on those routes to avoid
+  // Google "Duplicate field FAQPage" warnings.
+  const includeFaq = normalizedPath !== "/faq" && normalizedPath !== "/";
 
   const graph: any[] = [
     {
