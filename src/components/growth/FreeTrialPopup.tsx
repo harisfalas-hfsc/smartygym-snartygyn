@@ -10,8 +10,24 @@ import { Button } from "@/components/ui/button";
 import { Crown, X } from "lucide-react";
 import popupImg from "@/assets/popup-free-trial-bright.jpg";
 
-const REPEAT_DELAY_MS = 5 * 60 * 1000;
+const REPEAT_DELAY_MS = 60 * 60 * 1000;
 const DEFAULT_INITIAL_DELAY_MS = 10_000;
+const DISMISS_KEY = "free-trial-popup-dismissed-until";
+
+// Routes where the popup must NEVER appear (functional / auth / checkout flows)
+const BLOCKED_ROUTE_PREFIXES = [
+  "/auth",
+  "/reset-password",
+  "/userdashboard",
+  "/dashboard",
+  "/calculator-history",
+  "/admin",
+  "/payment",
+  "/checkout",
+  "/unsubscribe",
+  "/newsletter-thank-you",
+  "/corporate-admin",
+];
 
 export function FreeTrialPopup() {
   const [show, setShow] = useState(false);
@@ -23,7 +39,18 @@ export function FreeTrialPopup() {
 
   const isAboutPage = ["/about-smartygym", "/takeatour", "/take-a-tour"].includes(location.pathname);
   const isCriticalContentRoute = ["/", "/home", "/workout", "/workout/wod"].includes(location.pathname);
+  const isBlockedRoute = BLOCKED_ROUTE_PREFIXES.some(p => location.pathname.startsWith(p));
   const initialDelay = isAboutPage ? 0 : DEFAULT_INITIAL_DELAY_MS;
+
+  // Hydrate dismissal from sessionStorage so it doesn't reappear during the same visit
+  useEffect(() => {
+    try {
+      const until = sessionStorage.getItem(DISMISS_KEY);
+      if (until && Number(until) > Date.now()) {
+        setDismissed(true);
+      }
+    } catch {}
+  }, []);
 
   useEffect(() => {
     if (!user || userTier !== "subscriber") {
@@ -44,12 +71,13 @@ export function FreeTrialPopup() {
 
   const shouldShowPopup = useCallback((): boolean => {
     if (isLoading) return false;
+    if (isBlockedRoute) return false;
     if (isCriticalContentRoute) return false;
     if (!user) return true;
     if (userTier === "premium") return false;
     if (userTier === "subscriber" && hasSubscriptionHistory === false) return true;
     return false;
-  }, [user, userTier, isLoading, hasSubscriptionHistory, isCriticalContentRoute]);
+  }, [user, userTier, isLoading, hasSubscriptionHistory, isCriticalContentRoute, isBlockedRoute]);
 
   const triggerPopup = useCallback(() => {
     if (shouldShowPopup()) setShow(true);
@@ -71,6 +99,9 @@ export function FreeTrialPopup() {
   const handleDismiss = () => {
     setShow(false);
     setDismissed(true);
+    try {
+      sessionStorage.setItem(DISMISS_KEY, String(Date.now() + REPEAT_DELAY_MS));
+    } catch {}
   };
 
   if (!isLoading && user && (userTier === "premium" || hasSubscriptionHistory === true)) {

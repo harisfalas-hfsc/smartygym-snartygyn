@@ -220,6 +220,8 @@ export default function CalculatorHistory() {
   } | null>(null);
 
   useEffect(() => {
+    if (accessLoading) return;
+    if (!isPremium) return;
     let cancelled = false;
     (async () => {
       const { data: { user: authUser } } = await supabase.auth.getUser();
@@ -234,7 +236,7 @@ export default function CalculatorHistory() {
     })();
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [accessLoading, isPremium]);
 
   // Premium gate - redirect non-premium users
   useEffect(() => {
