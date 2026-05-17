@@ -88,6 +88,8 @@ export default function ResetPassword() {
       <div className="min-h-screen flex items-center justify-center p-4">
         <Helmet>
           <title>Validating Reset Link | SmartyGym</title>
+          <meta name="robots" content="noindex, nofollow" />
+          <link rel="canonical" href="https://smartygym.com/reset-password" />
         </Helmet>
         <div className="text-center">
           <p className="text-muted-foreground">Validating reset link...</p>
@@ -101,6 +103,8 @@ export default function ResetPassword() {
       <Helmet>
         <title>Reset Your Password | SmartyGym</title>
         <meta name="description" content="Reset your SmartyGym account password securely" />
+        <meta name="robots" content="noindex, nofollow" />
+        <link rel="canonical" href="https://smartygym.com/reset-password" />
       </Helmet>
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
