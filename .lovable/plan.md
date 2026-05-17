@@ -1,71 +1,90 @@
-Root cause found
 
-The failure is not the deleted notification cron and not library mode.
+# Plan — 24 Premium Strength Workouts (Focus × Equipment × Difficulty)
 
-For the failed Equipment WOD for 2026-05-18, the logs show two concrete blockers:
+## Goal
+Create exactly 24 new Strength workouts:
+- 6 focuses: LOWER BODY, UPPER BODY, FULL BODY, LOW PUSH & UPPER PULL, LOW PULL & UPPER PUSH, CORE & GLUTES
+- For each focus: 1 BODYWEIGHT + 1 EQUIPMENT
+- Two difficulty passes: **Advanced** (12) + **Intermediate** (12)
+- All **Premium**, all standalone-purchase, all with unique AI image + matching Stripe product/price.
 
-1. The exercise-linking repair layer corrupts valid prescriptions.
-   - The AI produced lines like `15-20 kettlebell swing` and `500m run on treadmill`.
-   - The final sweep matched those to library exercises, but replaced the whole phrase with only `{{exercise:ID:Name}}`.
-   - Result: `15-20 kettlebell swing` became `{{exercise:0549:kettlebell swing}} (moderate weight)`.
-   - Then the protocol validator correctly rejected it because the exercise token had no reps, time, distance, calories, or sets before it.
+## Difficulty stars (UPDATED)
+Differentiate stars by equipment because loaded work is objectively harder than bodyweight at the same tier:
+- **Advanced** → BODYWEIGHT = **5★**, EQUIPMENT = **6★**
+- **Intermediate** → BODYWEIGHT = **3★**, EQUIPMENT = **4★**
 
-2. The prompt and validator currently contradict each other.
-   - The hard rules say prescriptions/modifiers must come before the exercise token.
-   - But the gold-standard examples still show many modifiers after the token, such as `{{exercise:...}} (10 reps)` and `{{exercise:...}} (moderate weight)`.
-   - The AI follows the examples, then the validator rejects the result.
+This keeps both tiers covered with the full star range (3, 4, 5, 6) instead of only 3 and 5.
 
-3. The duration target and quality gate also contradict each other.
-   - For a 4-star Calorie Burning AMRAP, the generator target can be `25 min`.
-   - The quality gate requires at least `28 min`.
-   - So a workout can follow the requested duration and still be rejected.
+## Approach
+Build one dedicated orchestrator edge function — `generate-strength-focus-batch` — modeled on the existing `generate-free-category-workouts` (same proven pipeline: library-first `{{exercise:ID:Name}}` markup, 5-section format, density validation, HTML normalizer, section validator, AI image, then Stripe link).
 
-Plan to fix it
+Body:
+```
+POST /generate-strength-focus-batch
+{ "difficulty": "advanced" | "intermediate",
+  "focuses": ["LOWER BODY", ...],
+  "equipment": ["BODYWEIGHT","EQUIPMENT"] }
+```
 
-1. Stop the linker from destroying prescriptions
-   - Patch `supabase/functions/_shared/exercise-matching.ts`.
-   - Preserve numeric/time/distance prefixes when linking plain text exercises.
-   - Example expected result:
-     - Before: `15-20 kettlebell swing`
-     - After: `15-20 {{exercise:0549:kettlebell swing}}`
-   - Also preserve distance/time prefixes:
-     - Before: `500m run on treadmill`
-     - After: `500m {{exercise:0685:run}} on treadmill`
+Run in 4 controlled batches (~6 workouts each, well under 150s Edge timeout):
+1. Advanced — LOWER, UPPER, FULL (BW+EQ → 6)
+2. Advanced — LOW PUSH/UP PULL, LOW PULL/UP PUSH, CORE & GLUTES (6)
+3. Intermediate — LOWER, UPPER, FULL (6)
+4. Intermediate — LOW PUSH/UP PULL, LOW PULL/UP PUSH, CORE & GLUTES (6)
 
-2. Stop stripping already-valid exercise tokens unnecessarily
-   - Patch `processContentSectionAware` so it does not remove valid `{{exercise:ID:Name}}` markup from whole sections and then re-match everything again.
-   - Only repair list items or text fragments that are genuinely missing exercise tokens.
-   - This reduces the chance of the repair layer damaging already-good AI output.
+## Per-workout pipeline (existing standards)
+1. **Format**: `REPS & SETS`, duration `30 min` (Strength rule, fixed).
+2. **Stars**: per matrix above; `difficulty` text = "Advanced" or "Intermediate".
+3. **Reasoning prompt** with focus, equipment, difficulty, banned-name list (existing Strength names), exercise library reference scoped to focus + equipment + difficulty.
+4. **Library-first** via `rejectNonLibraryExercises` + `guaranteeAllExercisesLinked`. Difficulty-aware exercise selection (e.g. 6★ EQ can use barbell/heavy compound lifts; 5★ BW uses advanced calisthenics; 3★ BW basic compounds; 4★ EQ moderate dumbbell/cable).
+5. **5-section format**: Warm-Up, Activation, Main Workout, Finisher, Cool-Down — enforced by `validateWodSections` + density check.
+6. **HTML normalize + validate** via `normalizeWorkoutHtml` / `validateWorkoutHtml` (bullets, bold, spacing per standard).
+7. **Description, Instructions, Tips** per standard (4-sentence description, 5–7 step instructions, focused tips).
+8. **Unique AI image** via `generate-workout-image` → Storage URL on the row.
+9. **Insert** in `admin_workouts`:
+   - `category='STRENGTH'`, `focus=<focus>`, `equipment=<BW|EQ>`, `format='REPS & SETS'`, `duration='30 min'`
+   - `difficulty_stars` per matrix, `difficulty` text
+   - `is_premium=true`, `is_standalone_purchase=true`, `is_free=false`, `is_visible=true`, `is_workout_of_day=false`, `is_ai_generated=true`
+   - `price=3.99` (current standalone price — confirm or override)
+   - `id` = `PREM-STR-<focus-slug>-<BW|EQ>-<adv|int>-<ts>`
+10. **Stripe sync** (deterministic idempotency key per workout id): create Product (image, SMARTYGYM metadata, content_type=Workout, focus, equipment, stars), create Price (€price × 100), set default_price, update row with `stripe_product_id` + `stripe_price_id`.
 
-3. Fix the WOD prompt examples so they match the validator
-   - Patch `supabase/functions/generate-workout-of-day/index.ts`.
-   - Rewrite all gold-standard examples so the prescription always comes before the exercise token.
-   - Remove examples that place reps/time/weight after `}}`.
-   - Remove contradictory header examples like `Finisher (8-minute AMRAP)` and use clean headers like `Finisher (AMRAP)` with the time cap in plain text or instructions.
+## Verification — MANDATORY before reporting "done"
+Single SQL audit over the 24 new IDs, per row:
+- `category='STRENGTH'` ✓
+- `focus` matches expected ✓
+- `equipment` matches expected ✓
+- `difficulty_stars` matches expected (5/6 advanced, 3/4 intermediate) ✓
+- `is_premium=true AND is_standalone_purchase=true AND is_free=false AND is_visible=true AND is_workout_of_day=false` ✓
+- `main_workout` not null, density passes, all `{{exercise:…}}` tokens resolved ✓
+- `image_url` starts with `https://` ✓
+- `stripe_product_id` and `stripe_price_id` not null ✓
 
-4. Align duration generation with the quality gate
-   - Patch the WOD duration selection logic so generated target durations never fall below the hard quality minimum.
-   - For intermediate non-recovery WODs, target at least ~30 minutes Main+Finisher instead of 25 when the gate requires 28.
-   - For advanced non-Tabata WODs, target at least the gate minimum.
+Then for each Stripe product retrieve and assert:
+- `metadata.project='SMARTYGYM'`, `metadata.content_type='Workout'` ✓
+- `images[0]` equals row's `image_url` ✓
+- `default_price` set, unit_amount = €price × 100, currency=eur ✓
 
-5. Add regression tests for this exact failure
-   - Add Deno tests for the shared WOD repair logic.
-   - Test that `15-20 kettlebell swing` becomes `15-20 {{exercise:...}}`, not `{{exercise:...}}`.
-   - Test that `500m run on treadmill` keeps `500m` before the token.
-   - Test that a Calorie Burning EMOM/AMRAP sample passes protocol validation and quality gate after repair.
+Output a numbered confirmation table (1…24) with name, focus, equipment, stars, all 11 checks pass/fail. Only if **all 24 rows pass every check** is the task reported done. Any failure → list it and stop.
 
-6. Validate with the live WOD generator
-   - Deploy the changed backend functions.
-   - Run `generate-workout-of-day` for BODYWEIGHT and EQUIPMENT against the failed target date with generation mode still enabled.
-   - Confirm two active WOD rows exist for the date, with valid sections, valid exercise prescriptions, and no library-mode fallback.
+## Files to add / change
+- NEW: `supabase/functions/generate-strength-focus-batch/index.ts` (~600 lines, reuses shared helpers).
+- NO changes to existing functions, DB schema, or front-end. No migration.
 
-What I will not do
+## Out of scope
+- WOD library mode (untouched).
+- Other categories.
+- Periodization cron changes.
 
-- I will not switch cron to library mode.
-- I will not enable automatic library fallback.
-- I will not delete paid content.
-- I will not change your admin-panel WOD mode choice.
+## Risks & mitigations
+- **Edge timeout** → 6 workouts/call (proven by `generate-free-category-workouts`).
+- **Duplicate names** → banned-name list preloaded per call from existing Strength workouts.
+- **Stripe failure** → per-workout try/catch; failed link surfaces in response and is caught by verification.
+- **Image failure** → insert blocked until image URL present (WOD contract).
 
-Expected result
-
-The bottleneck is fixed inside the current AI-generation pipeline: the AI can still generate WODs, but the repair layer will stop corrupting prescriptions, the prompt will stop teaching invalid formatting, and the duration gate will stop rejecting workouts that were asked to be too short.
+## Execution order after approval
+1. Write the new edge function.
+2. Run batch 1 (Advanced × LOWER/UPPER/FULL) → partial verify.
+3. Run batches 2, 3, 4 → partial verify each.
+4. Final full 24-row verification (DB + Stripe).
+5. Report confirmation table; only then say done.
