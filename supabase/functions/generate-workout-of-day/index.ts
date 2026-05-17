@@ -691,13 +691,16 @@ async function runWodGeneration(params: {
     // and NOT included in the advertised duration. Customers care about "how long is the work?"
     const getDuration = (fmt: string, stars: number): string => {
       const baseDurations: Record<string, number[]> = {
+        // [beginner, intermediate, advanced] Main+Finisher minutes.
+        // MUST stay at or above the wod-quality-gate minimums:
+        //   beginner 20, intermediate 28, advanced 38 (35 for short brutal Tabata).
         "REPS & SETS": [25, 35, 50],
-        "CIRCUIT": [20, 30, 45],
-        "TABATA": [15, 25, 35],
-        "AMRAP": [15, 25, 40],
-        "EMOM": [15, 25, 35],
-        "FOR TIME": [0, 0, 0],
-        "MIX": [20, 30, 45]
+        "CIRCUIT":     [22, 32, 45],
+        "TABATA":      [22, 30, 38],
+        "AMRAP":       [22, 32, 42],
+        "EMOM":        [22, 30, 40],
+        "FOR TIME":    [0, 0, 0],
+        "MIX":         [22, 32, 45]
       };
       
       if (fmt === "FOR TIME") return "Various";
