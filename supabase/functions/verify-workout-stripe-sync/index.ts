@@ -35,21 +35,27 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    // Admin gate via JWT
+    // Admin gate: either valid admin JWT OR service-role internal call (used by
+    // Lovable agent / scheduled audits). No public surface — function is not
+    // wired into UI.
     const authHeader = req.headers.get("Authorization") ?? "";
     const token = authHeader.replace("Bearer ", "");
-    const { data: userData } = await supabase.auth.getUser(token);
-    const userId = userData?.user?.id;
-    if (!userId) {
-      return json({ error: "Unauthorized" }, 401);
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    let authorized = token && token === serviceKey;
+    if (!authorized && token) {
+      const { data: userData } = await supabase.auth.getUser(token);
+      const uid = userData?.user?.id;
+      if (uid) {
+        const { data: roleRow } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", uid)
+          .eq("role", "admin")
+          .maybeSingle();
+        if (roleRow) authorized = true;
+      }
     }
-    const { data: roleRow } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId)
-      .eq("role", "admin")
-      .maybeSingle();
-    if (!roleRow) return json({ error: "Forbidden — admin only" }, 403);
+    if (!authorized) return json({ error: "Unauthorized" }, 401);
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, {
       apiVersion: "2025-08-27.basil",
