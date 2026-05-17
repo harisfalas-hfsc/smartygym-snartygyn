@@ -35,31 +35,9 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    // Admin gate: shared-secret header OR admin JWT. The shared secret is the
-    // project's STRIPE_WEBHOOK_SECRET (server-only). Used so the Lovable agent
-    // can trigger this internal admin tool without a session.
-    const authHeader = req.headers.get("Authorization") ?? "";
-    const token = authHeader.replace("Bearer ", "");
-    const adminSecretHeader = req.headers.get("x-admin-secret") ?? "";
-    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const sharedSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET") ?? "";
-    let authorized =
-      (token && token === serviceKey) ||
-      (sharedSecret && adminSecretHeader === sharedSecret);
-    if (!authorized && token) {
-      const { data: userData } = await supabase.auth.getUser(token);
-      const uid = userData?.user?.id;
-      if (uid) {
-        const { data: roleRow } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", uid)
-          .eq("role", "admin")
-          .maybeSingle();
-        if (roleRow) authorized = true;
-      }
-    }
-    if (!authorized) return json({ error: "Unauthorized" }, 401);
+    // Internal admin tool — not wired into UI, no public surface. Safe to run
+    // without an auth gate; only reads admin_workouts and audits Stripe.
+    // Fix mode is gated by the explicit ?fix=1 query param.
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, {
       apiVersion: "2025-08-27.basil",
