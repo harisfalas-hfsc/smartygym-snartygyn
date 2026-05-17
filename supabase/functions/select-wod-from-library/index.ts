@@ -203,18 +203,24 @@ serve(async (req) => {
       );
     }
 
-    // Get cooldown list (workouts used in last 60 days)
-    const sixtyDaysAgo = new Date();
-    sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
-    const cooldownDateStr = sixtyDaysAgo.toISOString().split("T")[0];
-
+    // EXHAUSTION-FIRST ROTATION:
+    // `wod_selection_cooldown` is treated as a permanent "ever-used" ledger.
+    // A workout is only re-picked once every other eligible workout in the
+    // same {category,equipment} slot has been used at least once. When the
+    // slot is fully exhausted we restart from the least-recently-used.
+    // New workouts the admin adds appear immediately because the candidate
+    // pool is queried LIVE every invocation (no cache, no snapshot).
     const { data: cooldownWorkouts } = await supabase
       .from("wod_selection_cooldown")
-      .select("source_workout_id")
-      .gte("selected_for_date", cooldownDateStr);
+      .select("source_workout_id, selected_for_date")
+      .order("selected_for_date", { ascending: true });
 
     const cooldownIds = new Set((cooldownWorkouts || []).map(c => c.source_workout_id));
-    logStep("Cooldown list", { count: cooldownIds.size });
+    const lastUsedAt = new Map<string, string>();
+    for (const row of (cooldownWorkouts || [])) {
+      lastUsedAt.set(row.source_workout_id, row.selected_for_date);
+    }
+    logStep("Ever-used ledger loaded", { uniqueIds: cooldownIds.size });
 
     const selectedWorkouts: any[] = [];
 
