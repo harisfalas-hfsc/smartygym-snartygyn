@@ -1,54 +1,71 @@
-## Admin panel sync status — audit results
+Root cause found
 
-I checked every admin surface that could still expose the deleted WOD-only cron / function / notification. Here is the truth, panel by panel.
+The failure is not the deleted notification cron and not library mode.
 
-### 1. Cron Jobs Manager (`CronJobsManager.tsx`)
-- Reads live data from `cron.job` and `cron_job_metadata`.
-- `queue-wod-notifications-morning` is **gone from both tables**. It cannot be re-enabled with a click.
-- No hardcoded reference to the old job in the component.
-- **Result: already in sync. No action needed.**
+For the failed Equipment WOD for 2026-05-18, the logs show two concrete blockers:
 
-### 2. Automated Messages Manager (`AutomatedMessagesManager.tsx`)
-- Reads `automated_message_templates`.
-- The templates `morning_wod`, `morning_wod_recovery`, `morning_ritual` are **still in the table on purpose** — the combined 08:00 Cyprus email (`send-morning-notifications`) reads them as the building blocks for the single combined message.
-- No template named `wod_notification` / `send-wod-notifications` exists.
-- **Result: already in sync. Leaving the morning_* templates as-is is correct.**
+1. The exercise-linking repair layer corrupts valid prescriptions.
+   - The AI produced lines like `15-20 kettlebell swing` and `500m run on treadmill`.
+   - The final sweep matched those to library exercises, but replaced the whole phrase with only `{{exercise:ID:Name}}`.
+   - Result: `15-20 kettlebell swing` became `{{exercise:0549:kettlebell swing}} (moderate weight)`.
+   - Then the protocol validator correctly rejected it because the exercise token had no reps, time, distance, calories, or sets before it.
 
-### 3. Automation Rules Manager (`AutomationRulesManager.tsx`)
-- Reads `automation_rules`. Same story: morning_wod / morning_ritual / morning_wod_recovery rules still exist because the combined sender uses them. Standalone WOD-only rule does not exist.
-- **Result: already in sync.**
+2. The prompt and validator currently contradict each other.
+   - The hard rules say prescriptions/modifiers must come before the exercise token.
+   - But the gold-standard examples still show many modifiers after the token, such as `{{exercise:...}} (10 reps)` and `{{exercise:...}} (moderate weight)`.
+   - The AI follows the examples, then the validator rejects the result.
 
-### 4. Notification History Manager (`NotificationHistoryManager.tsx`)
-- Shows past `user_system_messages` rows. There are 6,957 historical rows with `message_type = 'wod_notification'` — those are real history and must not be deleted.
-- The combined morning sender continues to write the WOD dashboard card with `message_type = 'wod_notification'` (legitimate label for the WOD card on the user dashboard).
-- **Result: in sync. The label is reused intentionally.**
+3. The duration target and quality gate also contradict each other.
+   - For a 4-star Calorie Burning AMRAP, the generator target can be `25 min`.
+   - The quality gate requires at least `28 min`.
+   - So a workout can follow the requested duration and still be rejected.
 
-### 5. Automation Rule Edit Dialog
-- Has `wod_notification` / `morning_wod_notification` in its option lists. These map to message types that are still alive (the combined morning flow). Not stale.
+Plan to fix it
 
-### Orphan rows worth a separate cleanup (NOT WOD-related)
-While auditing I found four rows in `cron_job_metadata` that no longer have a matching cron in `cron.job`:
-- `send-automated-messages-job`
-- `daily-system-health-audit-after-generation`
-- `cleanup-old-rate-limits`
-- `send-new-content-notifications-job`
+1. Stop the linker from destroying prescriptions
+   - Patch `supabase/functions/_shared/exercise-matching.ts`.
+   - Preserve numeric/time/distance prefixes when linking plain text exercises.
+   - Example expected result:
+     - Before: `15-20 kettlebell swing`
+     - After: `15-20 {{exercise:0549:kettlebell swing}}`
+   - Also preserve distance/time prefixes:
+     - Before: `500m run on treadmill`
+     - After: `500m {{exercise:0685:run}} on treadmill`
 
-None are related to WOD notifications, so they did not get cleaned up by yesterday's work. They will appear as "ghost" rows in CronJobsManager. I will flag these but **not delete them in this plan** — they predate today's request and may belong to other workflows you want kept.
+2. Stop stripping already-valid exercise tokens unnecessarily
+   - Patch `processContentSectionAware` so it does not remove valid `{{exercise:ID:Name}}` markup from whole sections and then re-match everything again.
+   - Only repair list items or text fragments that are genuinely missing exercise tokens.
+   - This reduces the chance of the repair layer damaging already-good AI output.
 
-### Optional cosmetic cleanup (safe, no behaviour change)
-1. `supabase/functions/_shared/notification-types.ts`
-   - Remove the legacy registry entry that still labels `WOD_NOTIFICATION` as `'send-wod-notifications (legacy)'` and the alias mapping `'wod' → WOD_NOTIFICATION` / `'workout_of_day' → WOD_NOTIFICATION`. Keep the `WOD_NOTIFICATION` constant itself (still used as a dashboard message_type).
-2. `supabase/functions/select-wod-from-library/index.ts` and `supabase/functions/archive-old-wods/index.ts`
-   - Remove stale comments that still reference `queue-wod-notifications-morning` / `send-wod-notifications`.
-3. Redeploy the two edge functions after the comment edits.
+3. Fix the WOD prompt examples so they match the validator
+   - Patch `supabase/functions/generate-workout-of-day/index.ts`.
+   - Rewrite all gold-standard examples so the prescription always comes before the exercise token.
+   - Remove examples that place reps/time/weight after `}}`.
+   - Remove contradictory header examples like `Finisher (8-minute AMRAP)` and use clean headers like `Finisher (AMRAP)` with the time cap in plain text or instructions.
 
-These are pure documentation cleanups — they do not affect the admin panel or any user-facing behaviour.
+4. Align duration generation with the quality gate
+   - Patch the WOD duration selection logic so generated target durations never fall below the hard quality minimum.
+   - For intermediate non-recovery WODs, target at least ~30 minutes Main+Finisher instead of 25 when the gate requires 28.
+   - For advanced non-Tabata WODs, target at least the gate minimum.
 
-### What the admin panel will show after this plan
-- **Cron Jobs Manager:** no `queue-wod-notifications-morning` row, no way to re-enable it. ✓
-- **Automated Messages / Automation Rules:** unchanged (combined morning flow keeps working). ✓
-- **Notification History:** historical `wod_notification` rows preserved; new sends still write the dashboard WOD card under the same label as part of the combined 08:00 Cyprus message. ✓
-- **No stale legacy strings** left in notification-types registry or function comments.
+5. Add regression tests for this exact failure
+   - Add Deno tests for the shared WOD repair logic.
+   - Test that `15-20 kettlebell swing` becomes `15-20 {{exercise:...}}`, not `{{exercise:...}}`.
+   - Test that `500m run on treadmill` keeps `500m` before the token.
+   - Test that a Calorie Burning EMOM/AMRAP sample passes protocol validation and quality gate after repair.
 
-### Summary
-The admin panel is already correctly synchronised with yesterday's deletion — the deleted cron job and function cannot be brought back from any admin click. The only remaining work is a small cosmetic pass on shared labels and comments, plus an optional follow-up on four unrelated orphan cron-metadata rows if you want them tidied separately.
+6. Validate with the live WOD generator
+   - Deploy the changed backend functions.
+   - Run `generate-workout-of-day` for BODYWEIGHT and EQUIPMENT against the failed target date with generation mode still enabled.
+   - Confirm two active WOD rows exist for the date, with valid sections, valid exercise prescriptions, and no library-mode fallback.
+
+What I will not do
+
+- I will not switch cron to library mode.
+- I will not enable automatic library fallback.
+- I will not delete paid content.
+- I will not change your admin-panel WOD mode choice.
+
+Expected result
+
+The bottleneck is fixed inside the current AI-generation pipeline: the AI can still generate WODs, but the repair layer will stop corrupting prescriptions, the prompt will stop teaching invalid formatting, and the duration gate will stop rejecting workouts that were asked to be too short.
