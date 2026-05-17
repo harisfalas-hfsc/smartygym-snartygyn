@@ -29,6 +29,8 @@ Deno.serve(async (req) => {
     const url = new URL(req.url);
     const fix = url.searchParams.get("fix") === "1";
     const dryRun = url.searchParams.get("dryRun") === "1";
+    const offset = parseInt(url.searchParams.get("offset") ?? "0", 10);
+    const limit = parseInt(url.searchParams.get("limit") ?? "100", 10);
 
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
@@ -48,8 +50,17 @@ Deno.serve(async (req) => {
       .from("admin_workouts")
       .select("id,name,price,is_standalone_purchase,stripe_product_id,stripe_price_id")
       .eq("is_premium", true)
-      .eq("is_visible", true);
+      .eq("is_visible", true)
+      .order("id", { ascending: true })
+      .range(offset, offset + limit - 1);
     if (error) throw error;
+
+    // Get total count too
+    const { count: totalCount } = await supabase
+      .from("admin_workouts")
+      .select("id", { count: "exact", head: true })
+      .eq("is_premium", true)
+      .eq("is_visible", true);
 
     const workouts = (rows ?? []) as Row[];
     const issues: Issue[] = [];
@@ -183,6 +194,9 @@ Deno.serve(async (req) => {
 
     const summary = {
       total: workouts.length,
+      total_overall: totalCount ?? null,
+      offset,
+      limit,
       ok,
       broken: issues.length,
       fixed,
