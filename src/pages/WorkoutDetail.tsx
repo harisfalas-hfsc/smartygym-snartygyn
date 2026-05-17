@@ -625,11 +625,14 @@ const WorkoutDetail = () => {
                     )}
                   </div>
 
-                  <img 
+                  <img
                     src={workout.image_url || fallbackWorkoutImage}
                     alt={`${workout.name} - ${workout.duration} ${workout.difficulty} ${workout.equipment === 'BODYWEIGHT' ? 'bodyweight' : 'equipment-based'} ${workout.format} workout by Haris Falas Sports Scientist at SmartyGym SmartGym Smart Gym smartygym.com`}
-                    className="w-full h-full object-cover"
+                    width={1280}
+                    height={720}
                     loading="lazy"
+                    decoding="async"
+                    className="w-full h-full object-cover"
                     onError={(e) => {
                       e.currentTarget.onerror = null;
                       e.currentTarget.src = fallbackWorkoutImage;

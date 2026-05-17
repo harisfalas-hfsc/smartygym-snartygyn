@@ -1,71 +1,254 @@
-# Verify premium workouts ↔ Stripe sync
+# Permanent SEO & AI Search Fix Plan
 
-## What the database actually says
+I understand clearly: **we will not hide, ignore, or manipulate the scanner.** The goal is to fix the real causes so the warnings stop because the app is actually better.
 
-Quick audit of `admin_workouts`:
+## What is happening now
 
-- Total premium workouts: **426** (not 453 — the 453 figure may include hidden/archived rows or programs)
-- Visible premium: **422**
-- Have both `stripe_product_id` + `stripe_price_id`: **417** (all unique 1-to-1)
-- Price distribution: 2.19 (10), 2.99 (4), 3.99 (386), 4.99 (17) — so yes, prices vary as you said
-- **Broken — visible premium with NO Stripe link, NO price, NOT standalone:**
-  1. `M-002` Stability Core
-  2. `CB-003` Calorie Torch
-  3. `C-002` Cardio Power
-  4. `CH-002` The Grinder
-  5. `ME-001` Metabolic Ignite
+The SEO panel is showing 4 active findings:
 
-These 5 cannot be bought right now.
+1. **Sitemap needs attention**
+   - Real issue.
+   - Current sitemap is a huge static file (`public/sitemap.xml`) and it is drifting away from the real routes/data.
+   - There is already a backend sitemap function, but it generates some wrong/old URLs like `/individualworkout/{id}`, `/individualtrainingprogram/{id}`, `/smartyritual`, `/premium`, `/terms`, `/exercise-library`, which do not match the real React routes.
 
-## Plan
+2. **Has accessibility barriers**
+   - Real category to fix.
+   - Likely caused by low-contrast text/badges such as `text-muted-foreground/80`, arbitrary green/orange text classes, and gradient badges with white text.
 
-### 1. Build a one-shot verification edge function (no Stripe Allow prompts)
+3. **Awkward on phones**
+   - Real category to fix.
+   - Several images are rendered inside fixed-height/aspect containers but lack explicit `width`, `height`, and `decoding` attributes. This can trigger aspect-ratio warnings and layout instability.
 
-Create `verify-workout-stripe-sync` (admin-only). For every visible premium workout it will:
+4. **Page loads slowly**
+   - Real category to fix.
+   - Above-the-fold/homepage images and carousel/WOD images need stricter LCP handling: exact dimensions, eager/high-priority only for the real first visible image, lazy for the rest, and stable containers.
 
-1. Fetch the linked Stripe **product** by `stripe_product_id` and check:
-   - exists, `active = true`
-   - `metadata.project = 'SMARTYGYM'`
-   - `metadata.content_type = 'Workout'`
-   - `metadata.workout_id` matches DB row
-   - name matches DB name
-2. Fetch the linked Stripe **price** by `stripe_price_id` and check:
-   - exists, `active = true`
-   - `currency = 'eur'`
-   - `unit_amount = round(price * 100)` (so 3.99 → 399, 2.19 → 219, 4.99 → 499, etc. — handles your varying prices)
-   - belongs to the same product
-3. Confirm `is_standalone_purchase = true` and `price IS NOT NULL`.
+---
 
-Returns a JSON report: `{ total, ok, broken: [{id, name, issues: [...]}] }` and writes it to a new `stripe_sync_audit` table so we can show it in chat without 417 separate Stripe tool approvals.
+# Implementation Plan
 
-Uses `STRIPE_SECRET_KEY` directly from env — runs entirely server-side, so it does **not** trigger the Stripe MCP "Allow" approval you've been clicking. One run covers all 417.
+## 1. Replace the stale sitemap with a real source-of-truth generator
 
-### 2. Run it and surface the report
+Create a build-time script: `scripts/generate-sitemap.ts`.
 
-I'll invoke the function, summarize totals, and list any mismatches (wrong currency, inactive price, amount mismatch, missing metadata, orphaned product, etc.) for you to approve fixes.
+It will generate `public/sitemap.xml` from the real app routes and real database content, every time the project runs/builds.
 
-### 3. Fix the 5 broken workouts
+### Include public static routes
 
-For `M-002`, `CB-003`, `C-002`, `CH-002`, `ME-001`:
-- Set `price = 3.99` (default — confirm if you want a different amount for any of them)
-- Set `is_standalone_purchase = true`
-- Create matching Stripe product (`project=SMARTYGYM`, `content_type=Workout`, `workout_id=<id>`) + €3.99 EUR price
-- Backfill `stripe_product_id` / `stripe_price_id`
-- Sync image to Stripe
+Include real public routes from `src/App.tsx`, such as:
 
-### 4. Fix anything else the audit finds
+- `/`
+- `/home`
+- `/start`
+- `/about`
+- `/about-smartygym`
+- `/take-a-tour`
+- `/contact`
+- `/faq`
+- `/blog`
+- `/coach-profile`
+- `/coach-cv`
+- `/workout`
+- `/workout/wod`
+- `/wod-archive`
+- `/daily-ritual`
+- `/trainingprogram`
+- `/corporate`
+- `/corporate-wellness`
+- `/why-invest-in-smartygym`
+- `/exerciselibrary`
+- `/1rmcalculator`
+- `/bmrcalculator`
+- `/macrocalculator`
+- `/caloriecalculator`
+- `/workouttimer`
+- `/caloriecounter`
+- `/tools`
+- `/shop`
+- `/community`
+- `/best-online-fitness-platform`
+- `/the-smarty-method`
+- legal pages: `/privacy-policy`, `/privacy`, `/termsofservice`, `/disclaimer`
 
-Same pattern: for each broken row, recreate/update Stripe object via the function (no manual Allow clicks) and re-run audit until report is clean.
+### Exclude non-indexable/protected/internal routes
 
-## About the "Allow" button
+Do **not** include:
 
-That prompt comes from the **Stripe MCP tool** (`stripe--stripe_api_execute`) which requires per-call human confirmation for write operations — that's a Stripe MCP security policy, not a Lovable setting, so there is no "always allow" toggle for it.
+- `/admin`
+- `/admin/*`
+- `/corporate-admin`
+- `/userdashboard`
+- `/calculator-history`
+- `/auth`
+- `/reset-password`
+- `/payment-success`
+- `/newsletter-thank-you`
+- `/unsubscribe`
+- `/unsubscribe-help`
+- `/dashboard`
+- wildcard `*`
 
-The workaround is exactly what step 1 does: **stop using the Stripe MCP for bulk work**. The edge function uses `STRIPE_SECRET_KEY` directly via the Stripe SDK server-side, which has no approval prompts. From now on, bulk Stripe operations (creating products, syncing prices, audits) will go through edge functions — you'll only see the Allow prompt for one-off ad-hoc Stripe actions, not for batch jobs.
+This directly addresses the scanner’s complaint that `/corporate-admin` and `/userdashboard` are “missing”: they are protected pages and should not be indexed. We will also add/verify `robots.txt` disallows them, so crawlers and scanners understand the intent.
 
-## Technical notes
+### Include dynamic routes correctly
 
-- New file: `supabase/functions/verify-workout-stripe-sync/index.ts` (admin JWT check, uses service role + Stripe SDK v18.5.0 per project standard)
-- New migration: `stripe_sync_audit` table (timestamp, summary jsonb, issues jsonb) — non-destructive, append-only
-- No changes to user-facing UI; this is a backend integrity tool
-- Reuses existing patterns from your Stripe WOD idempotency + content safety enforcer memories
+Generate one URL per real visible row:
+
+- Blog articles: `/blog/{slug}` from `blog_articles where is_published = true`
+- Workouts: `/workout/{category}/{id}` from `admin_workouts where is_visible = true`
+- Training programs: `/trainingprogram/{category}/{id}` from `admin_training_programs where is_visible = true`
+
+Important: this fixes the existing sitemap generator’s wrong dynamic URLs (`/individualworkout/{id}` and `/individualtrainingprogram/{id}`), which do not match the real app routes.
+
+### Wire it permanently
+
+Update `package.json`:
+
+```json
+"predev": "tsx scripts/generate-sitemap.ts",
+"prebuild": "tsx scripts/generate-sitemap.ts"
+```
+
+So the sitemap is regenerated automatically before preview and before publish builds.
+
+### Validate
+
+After generation:
+
+- Confirm `/blog/{real-slug}` entries exist.
+- Confirm `/caloriecalculator` exists.
+- Confirm `/workouttimer` exists.
+- Confirm protected/internal routes are absent.
+- Confirm sitemap XML is valid.
+
+---
+
+## 2. Fix `robots.txt` so scanner/crawlers understand protected pages
+
+Review and update `public/robots.txt` without replacing the whole file.
+
+Add explicit `Disallow` rules for routes that should never be indexed:
+
+```txt
+Disallow: /admin
+Disallow: /admin/
+Disallow: /corporate-admin
+Disallow: /userdashboard
+Disallow: /calculator-history
+Disallow: /auth
+Disallow: /reset-password
+Disallow: /payment-success
+Disallow: /unsubscribe
+Disallow: /unsubscribe-help
+```
+
+Keep:
+
+```txt
+Sitemap: https://smartygym.com/sitemap.xml
+Sitemap: https://smartygym.com/image-sitemap.xml
+```
+
+This is not hiding a bug; it is correct SEO hygiene. Private pages must not be in the sitemap.
+
+---
+
+## 3. Fix mobile image aspect-ratio warnings properly
+
+Update the image patterns that are likely causing “Awkward on phones”.
+
+Files already identified:
+
+- `src/pages/WorkoutFlow.tsx`
+- `src/pages/WorkoutDetail.tsx`
+- `src/pages/Blog.tsx`
+- `src/pages/ArticleDetail.tsx`
+- selected homepage image blocks in `src/pages/Index.tsx`
+
+Changes:
+
+- Add explicit `width` and `height` to images that currently lack them.
+- Add `decoding="async"` to non-critical images.
+- Keep images inside stable `aspect-video`, `aspect-square`, or fixed ratio wrappers.
+- Use `object-cover` only inside a stable aspect container.
+- Do not let images render with unknown intrinsic dimensions on mobile.
+
+This is a real fix for the exact Lighthouse issue: rendered dimensions not matching source ratio / layout instability.
+
+---
+
+## 4. Fix accessibility contrast warnings properly
+
+Scan and replace low-contrast patterns, especially:
+
+- `text-muted-foreground/80`
+- `text-muted-foreground/50`
+- arbitrary `text-gray-*` on light backgrounds
+- arbitrary green/orange text colors on tinted backgrounds where contrast may fail
+- white text on yellow/orange gradients where contrast may fail
+
+Use the design system tokens instead:
+
+- `text-foreground`
+- `text-muted-foreground`
+- `text-primary`
+- `bg-primary text-primary-foreground`
+- theme-safe badge variants
+
+Known likely fixes:
+
+- `WorkoutFlow.tsx` “Crafted by Haris” text: replace `text-muted-foreground/80` with `text-muted-foreground`.
+- Review workout/program badges with white text on yellow/orange gradients and adjust to accessible token-based contrast.
+- Review homepage carousel/card muted labels on mobile.
+
+This fixes the actual contrast problem instead of suppressing it.
+
+---
+
+## 5. Fix performance/LCP warnings properly
+
+Improve the above-the-fold loading path without changing the page design.
+
+Changes:
+
+- Keep exactly one real above-the-fold image as `loading="eager"` and `fetchPriority="high"`.
+- Make every other carousel/non-visible image `loading="lazy"` and `fetchPriority="auto"`.
+- Ensure the homepage first visible image has explicit dimensions and a stable aspect container.
+- Avoid multiple competing high-priority images on the homepage.
+- Keep `/smarty-gym-logo.png` preload only if it is actually the first meaningful visual; otherwise move priority to the hero/WOD image.
+
+This directly targets “main image or headline takes too long to appear”.
+
+---
+
+## 6. Verify with real checks, not guessing
+
+After implementation:
+
+1. Run the sitemap generator and inspect `public/sitemap.xml`.
+2. Confirm all scanner-mentioned public routes exist in sitemap:
+   - `/blog/{real-slug}` entries
+   - `/caloriecalculator`
+   - `/workouttimer`
+3. Confirm protected routes are excluded and blocked in `robots.txt`:
+   - `/corporate-admin`
+   - `/userdashboard`
+4. Run a focused search for remaining risky image patterns:
+   - `<img` without `width`
+   - `<img` without `height`
+   - low-contrast text classes
+5. Mark SEO findings as fixed only after code changes are applied.
+6. Tell you to publish/update, because the SEO scanner checks the published version.
+
+---
+
+# Expected Result
+
+After this is implemented and you publish:
+
+- Sitemap warning should be permanently solved because the sitemap regenerates from real routes/data.
+- Accessibility warning should be reduced/removed because low-contrast classes are replaced with safe tokens.
+- Mobile warning should be reduced/removed because image dimensions and aspect containers are corrected.
+- Performance warning should be reduced/removed because LCP priority is cleaned up.
+
+No hiding. No ignoring. No fake green status. Real fixes in code and SEO files.

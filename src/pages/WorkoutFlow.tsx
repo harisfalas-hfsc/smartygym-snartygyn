@@ -360,7 +360,7 @@ const WorkoutFlow = () => {
                         <p className="text-sm mb-3 text-muted-foreground" itemProp="description">
                           {workout.description}
                         </p>
-                        <p className="text-xs italic text-muted-foreground/80">
+                        <p className="text-xs italic text-muted-foreground">
                           Crafted by{" "}
                           <a href="/coach-profile" className="hover:underline font-medium whitespace-nowrap text-primary" onClick={e => e.stopPropagation()}>
                             Haris Falas
