@@ -279,7 +279,13 @@ export default function AdminBackoffice() {
               return (
                 <Card 
                   key={section.id}
-                  onClick={() => setActiveTab(section.id)}
+                  onClick={() => {
+                    if (section.id === "seo-preview") {
+                      navigate("/admin/seo-preview");
+                    } else {
+                      setActiveTab(section.id);
+                    }
+                  }}
                   className="cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all duration-200 group relative"
                 >
                   <CardContent className="p-4 sm:p-6 flex flex-col items-center text-center gap-2 sm:gap-3">
