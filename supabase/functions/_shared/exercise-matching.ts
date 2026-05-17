@@ -1067,12 +1067,24 @@ export function guaranteeAllExercisesLinked(
     // Only force-link if confidence is at least 0.50 (prevents wrong matches)
     if (bestMatch && bestConfidence >= 0.50) {
       const markup = `{{exercise:${bestMatch.id}:${bestMatch.name}}}`;
-      
-      // Replace the exercise text in the inner HTML while preserving surrounding content
-      // Strategy: replace the candidate text with markup
-      const escapedCandidate = candidate.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const newInnerHtml = innerHtml.replace(new RegExp(escapedCandidate, 'i'), markup);
-      
+
+      // CRITICAL FIX: preserve any prescription text (reps / sec / min / m / km / cal /
+      // sets x reps / "Minute N:" labels) that appears around the exercise name.
+      // Strategy: locate ONLY the exercise-name portion inside the bullet and replace
+      // just that with the markup, keeping everything before and after intact.
+      // 1) Prefer matching the library name (optional trailing 's' / ' machine').
+      // 2) Fall back to matching the cleaned candidate as a last resort.
+      const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const libName = bestMatch.name;
+      const namePattern = new RegExp(`${escapeRe(libName)}(?:s)?(?:\\s+machine)?`, 'i');
+      let newInnerHtml = innerHtml.replace(namePattern, markup);
+      if (newInnerHtml === innerHtml) {
+        // Fallback: replace the cleaned candidate (last-resort behaviour) but keep
+        // any numeric / unit prefix that appears before it on the same line.
+        const escapedCandidate = escapeRe(candidate);
+        newInnerHtml = innerHtml.replace(new RegExp(escapedCandidate, 'i'), markup);
+      }
+
       if (newInnerHtml !== innerHtml) {
         replacements.push({
           original: liMatch[0],

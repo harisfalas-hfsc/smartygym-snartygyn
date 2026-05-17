@@ -691,13 +691,18 @@ async function runWodGeneration(params: {
     // and NOT included in the advertised duration. Customers care about "how long is the work?"
     const getDuration = (fmt: string, stars: number): string => {
       const baseDurations: Record<string, number[]> = {
-        "REPS & SETS": [25, 35, 50],
-        "CIRCUIT": [20, 30, 45],
-        "TABATA": [15, 25, 35],
-        "AMRAP": [15, 25, 40],
-        "EMOM": [15, 25, 35],
-        "FOR TIME": [0, 0, 0],
-        "MIX": [20, 30, 45]
+        // [beginner, intermediate, advanced] Main+Finisher minutes.
+        // MUST stay at or above the wod-quality-gate minimums:
+        //   beginner 20, intermediate 28, advanced 38 (35 for short brutal Tabata).
+        // Targets are deliberately HIGHER than the gate minimum because the AI
+        // typically under-delivers the requested minutes by 20-30%.
+        "REPS & SETS": [28, 40, 55],
+        "CIRCUIT":     [28, 40, 50],
+        "TABATA":      [28, 36, 44],
+        "AMRAP":       [28, 40, 48],
+        "EMOM":        [28, 38, 46],
+        "FOR TIME":    [0, 0, 0],
+        "MIX":         [28, 40, 50]
       };
       
       if (fmt === "FOR TIME") return "Various";
@@ -2181,6 +2186,17 @@ This is like a restaurant menu showing "cooking time" not "total visit time."
 Customers want to know how long the ACTUAL TRAINING is.
 
 YOUR TARGET MAIN+FINISHER DURATION: ${duration}
+
+HARD MINIMUM DURATION (NON-NEGOTIABLE — WOD WILL BE REJECTED IF VIOLATED):
+The COMPUTED total of Main Workout + Finisher minutes (from rounds × work + rest
++ EMOM minutes × repeats + Tabata blocks × 4 min + AMRAP/For-Time caps) MUST be:
+- At least 20 minutes for Beginner (1-2 stars)
+- At least 28 minutes for Intermediate (3-4 stars)
+- At least 35 minutes for Advanced Tabata (5-6 stars)
+- At least 38 minutes for any other Advanced workout (5-6 stars)
+If your Main Workout is short, the Finisher MUST compensate: add more rounds,
+more exercises per round, or extend the AMRAP/EMOM cap until the sum clears
+the minimum above. Do NOT submit a workout below the minimum.
 
 DURATION-RPE-DIFFICULTY RELATIONSHIP (THINK LIKE AN EXPERT COACH):
 
