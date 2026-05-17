@@ -286,8 +286,11 @@ export const Navigation = () => {
             {/* Desktop Menu - original layout */}
             <Sheet open={desktopMenuOpen} onOpenChange={setDesktopMenuOpen}>
                 <SheetTrigger asChild>
-                  <button className="text-primary hover:text-primary/80 transition-colors -ml-2 p-1">
-                    <Menu className="h-8 w-8" strokeWidth={2} />
+                  <button
+                    className="text-primary hover:text-primary/80 transition-colors -ml-2 p-1"
+                    aria-label="Open menu"
+                  >
+                    <Menu className="h-8 w-8 text-primary" strokeWidth={2} />
                   </button>
                 </SheetTrigger>
                 <SheetContent side="left" className="w-64 overflow-y-auto max-h-screen">
@@ -371,10 +374,10 @@ export const Navigation = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="relative h-11 w-11 rounded-full text-primary hover:text-primary [&_svg]:!h-8 [&_svg]:!w-8"
+                  className="relative h-11 w-11 rounded-full text-primary hover:bg-primary/10 hover:text-primary [&_svg]:!h-8 [&_svg]:!w-8 [&_svg]:!text-primary"
                   aria-label="Open Discovery"
                 >
-                  <Menu className="h-8 w-8" strokeWidth={2.25} />
+                  <Menu className="h-8 w-8 text-primary" strokeWidth={2.25} />
                   <span className="sr-only">Discovery</span>
                 </Button>
               </SheetTrigger>

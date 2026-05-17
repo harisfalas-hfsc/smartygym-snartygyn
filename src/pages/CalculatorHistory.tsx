@@ -220,8 +220,23 @@ export default function CalculatorHistory() {
   } | null>(null);
 
   useEffect(() => {
-    checkAuth();
-  }, []);
+    if (accessLoading) return;
+    if (!isPremium) return;
+    let cancelled = false;
+    (async () => {
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (cancelled) return;
+      if (!authUser) {
+        navigate("/auth");
+        return;
+      }
+      setUser(authUser);
+      await fetchAllData(authUser.id);
+      if (!cancelled) setLoading(false);
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accessLoading, isPremium]);
 
   // Premium gate - redirect non-premium users
   useEffect(() => {
