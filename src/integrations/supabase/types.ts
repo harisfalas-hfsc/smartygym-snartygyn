@@ -2364,6 +2364,39 @@ export type Database = {
         }
         Relationships: []
       }
+      stripe_sync_audit: {
+        Row: {
+          broken_count: number
+          created_at: string
+          id: string
+          issues: Json
+          ok_count: number
+          scope: string
+          summary: Json
+          total: number
+        }
+        Insert: {
+          broken_count: number
+          created_at?: string
+          id?: string
+          issues?: Json
+          ok_count: number
+          scope: string
+          summary?: Json
+          total: number
+        }
+        Update: {
+          broken_count?: number
+          created_at?: string
+          id?: string
+          issues?: Json
+          ok_count?: number
+          scope?: string
+          summary?: Json
+          total?: number
+        }
+        Relationships: []
+      }
       system_health_audits: {
         Row: {
           audit_date: string
