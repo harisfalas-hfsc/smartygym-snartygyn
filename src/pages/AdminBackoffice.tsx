@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Folder, Users, Mail, FileText, Settings, BarChart3, BookOpen, MessageSquare, Inbox, Megaphone, TrendingUp, Plus, Dumbbell, Calendar, Bell, ShoppingBag, Sparkles, Building2, Video, Smartphone, Clock, WifiOff } from "lucide-react";
+import { Folder, Users, Mail, FileText, Settings, BarChart3, BookOpen, MessageSquare, Inbox, Megaphone, TrendingUp, Plus, Dumbbell, Calendar, Bell, ShoppingBag, Sparkles, Building2, Video, Smartphone, Clock, WifiOff, Search } from "lucide-react";
 import { ContentManager } from "@/components/admin/ContentManager";
 import { CommunicationsManager } from "@/components/admin/CommunicationsManager";
 import { EmailManager } from "@/components/admin/EmailManager";
@@ -72,6 +72,7 @@ export default function AdminBackoffice() {
     { id: "exercise-library", label: "Exercise Library", description: "Video tutorials", icon: Video, color: "text-teal-500", bgColor: "bg-teal-500/10" },
     { id: "docs", label: "Docs", description: "Documentation", icon: FileText, color: "text-lime-600", bgColor: "bg-lime-500/10" },
     { id: "smartygym-app", label: "SmartyGym App", description: "App vault & settings", icon: Smartphone, color: "text-fuchsia-500", bgColor: "bg-fuchsia-500/10" },
+    { id: "seo-preview", label: "SEO Preview", description: "Inspect schemas & meta tags", icon: Search, color: "text-orange-400", bgColor: "bg-orange-400/10" },
   ];
 
   useEffect(() => {
@@ -278,7 +279,13 @@ export default function AdminBackoffice() {
               return (
                 <Card 
                   key={section.id}
-                  onClick={() => setActiveTab(section.id)}
+                  onClick={() => {
+                    if (section.id === "seo-preview") {
+                      navigate("/admin/seo-preview");
+                    } else {
+                      setActiveTab(section.id);
+                    }
+                  }}
                   className="cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all duration-200 group relative"
                 >
                   <CardContent className="p-4 sm:p-6 flex flex-col items-center text-center gap-2 sm:gap-3">
