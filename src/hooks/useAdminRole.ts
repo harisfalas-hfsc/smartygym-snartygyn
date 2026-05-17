@@ -24,16 +24,15 @@ export const useAdminRole = () => {
         .select('role')
         .eq('user_id', user.id)
         .eq('role', 'admin')
-        .single();
+        .maybeSingle();
 
       if (error) {
-        console.error('Error checking admin role:', error);
+        // Don't log — non-admin users will simply have no row, which is expected.
         setIsAdmin(false);
       } else {
         setIsAdmin(!!data);
       }
     } catch (error) {
-      console.error('Error in checkAdminRole:', error);
       setIsAdmin(false);
     } finally {
       setLoading(false);
