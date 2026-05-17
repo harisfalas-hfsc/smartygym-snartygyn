@@ -21,6 +21,7 @@ import { checkPasswordBreach } from "@/utils/passwordBreachCheck";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import { STRIPE_PRICE_IDS } from "@/config/pricing";
+import { Helmet } from "react-helmet";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -380,6 +381,12 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <Helmet>
+        <title>Sign In or Create Account | SmartyGym</title>
+        <meta name="description" content="Sign in to your SmartyGym account or create a new account to access workouts, training programs, and fitness tools." />
+        <meta name="robots" content="noindex, follow" />
+        <link rel="canonical" href="https://smartygym.com/auth" />
+      </Helmet>
       <OfflineBanner />
 
       {showVerificationMessage && (

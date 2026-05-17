@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
+import { Helmet } from "react-helmet";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AuthenticatedLayout } from "./components/AuthenticatedLayout";
 import { AdminRoute } from "./components/AdminRoute";
@@ -99,6 +100,17 @@ const DashboardRedirect = () => {
   return <Navigate to={`/userdashboard${location.search}`} replace />;
 };
 
+const PremiumComparisonRedirect = () => (
+  <>
+    <Helmet>
+      <title>Smarty Plans | SmartyGym</title>
+      <meta name="robots" content="noindex, follow" />
+      <link rel="canonical" href="https://smartygym.com/smarty-plans" />
+    </Helmet>
+    <Navigate to="/smarty-plans" replace />
+  </>
+);
+
 const queryClient = new QueryClient();
 
 const AppContent = () => {
@@ -143,8 +155,8 @@ const AppContent = () => {
                   <Route path="/joinpremium" element={<JoinPremium />} />
                   <Route path="/join-premium" element={<JoinPremium />} />
                   <Route path="/premiumbenefits" element={<PremiumBenefits />} />
-                  <Route path="/premium-comparison" element={<Navigate to="/smarty-plans" replace />} />
-                  <Route path="/premiumcomparison" element={<Navigate to="/smarty-plans" replace />} />
+                  <Route path="/premium-comparison" element={<PremiumComparisonRedirect />} />
+                  <Route path="/premiumcomparison" element={<PremiumComparisonRedirect />} />
                   <Route path="/smarty-plans" element={<SmartyPlans />} />
                   <Route path="/about" element={<About />} />
                   <Route path="/faq" element={<FAQ />} />
