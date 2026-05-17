@@ -478,6 +478,7 @@ async function selectWorkout(
     difficultyStars: [number, number] | null;
     equipment: string | null;
     cooldownIds: Set<string>;
+    lastUsedAt?: Map<string, string>;
     strengthFocus: string | null;
   }
 ): Promise<any | null> {
@@ -498,20 +499,32 @@ async function selectWorkoutCandidates(
     difficultyStars: [number, number] | null;
     equipment: string | null;
     cooldownIds: Set<string>;
+    lastUsedAt?: Map<string, string>;
     strengthFocus: string | null;
   }
 ): Promise<any[]> {
-  const { category, difficulty, difficultyStars, equipment, cooldownIds, strengthFocus } = params;
+  const { category, difficulty, difficultyStars, equipment, cooldownIds, lastUsedAt, strengthFocus } = params;
 
   logStep("Selecting candidate list", { category, difficulty, equipment, strengthFocus, cooldownSize: cooldownIds.size });
 
   // Build base query
+  // HARD SAFETY FILTERS (never relax these):
+  //  - is_workout_of_day = false  (don't reuse an active WOD)
+  //  - is_visible        = true   (no hidden/unpublished drafts)
+  //  - is_premium        = true   (only paid library workouts)
+  //  - is_free           = false  (NEVER pick a free workout as WOD)
+  //  - main_workout      not null (no broken/empty rows)
+  //  - image_url starts with https:// (Stripe needs a real image)
   let query = supabase
     .from("admin_workouts")
     .select("*")
     .eq("category", category)
     .eq("is_workout_of_day", false)
-    .eq("is_visible", true);
+    .eq("is_visible", true)
+    .eq("is_premium", true)
+    .eq("is_free", false)
+    .not("main_workout", "is", null)
+    .ilike("image_url", "https://%");
 
   // Filter by equipment if specified
   if (equipment) {
@@ -539,7 +552,11 @@ async function selectWorkoutCandidates(
       .select("*")
       .eq("category", category)
       .eq("is_workout_of_day", false)
-      .eq("is_visible", true);
+      .eq("is_visible", true)
+      .eq("is_premium", true)
+      .eq("is_free", false)
+      .not("main_workout", "is", null)
+      .ilike("image_url", "https://%");
     if (equipment) fallbackQuery = fallbackQuery.eq("equipment", equipment);
     const { data: fallbackCandidates } = await fallbackQuery;
     pool = fallbackCandidates || [];
@@ -549,28 +566,40 @@ async function selectWorkoutCandidates(
     }
   }
 
-  // Split: outside cooldown first, then in cooldown (so we still try them
-  // before giving up on the slot if all fresh candidates are broken).
-  const outOfCooldown = pool.filter(c => !cooldownIds.has(c.id));
-  const inCooldown = pool.filter(c => cooldownIds.has(c.id));
+  // EXHAUSTION-FIRST: workouts never picked before in this slot go first
+  // (shuffled). Only when every workout in the pool has been used at least
+  // once do we recycle, and then we recycle the LEAST-RECENTLY-USED first.
+  const neverUsed = pool.filter(c => !cooldownIds.has(c.id));
+  const alreadyUsed = pool.filter(c => cooldownIds.has(c.id));
 
-  // Optional focus prioritisation within out-of-cooldown
-  let prioritised = outOfCooldown;
-  if (strengthFocus && outOfCooldown.length > 1) {
-    const focusMatch = outOfCooldown.filter(c =>
+  // Optional focus prioritisation within never-used pool
+  let prioritised = neverUsed;
+  if (strengthFocus && neverUsed.length > 1) {
+    const focusMatch = neverUsed.filter(c =>
       c.focus && c.focus.toUpperCase().includes(strengthFocus.toUpperCase())
     );
     if (focusMatch.length > 0) {
-      const others = outOfCooldown.filter(c => !focusMatch.includes(c));
+      const others = neverUsed.filter(c => !focusMatch.includes(c));
       prioritised = [...focusMatch, ...others];
     }
   }
 
-  // Shuffle within priority bucket so we don't always pick the same one
   const shuffle = (arr: any[]) => arr.map(v => [Math.random(), v] as const).sort((a,b) => a[0]-b[0]).map(([,v]) => v);
-  const ordered = [...shuffle(prioritised), ...shuffle(inCooldown)];
 
-  logStep("Candidate list built", { total: ordered.length, outOfCooldown: outOfCooldown.length, inCooldown: inCooldown.length });
+  // Recycled pool: oldest-used first (least recently picked).
+  const recycled = [...alreadyUsed].sort((a, b) => {
+    const da = lastUsedAt?.get(a.id) || "0000-00-00";
+    const db = lastUsedAt?.get(b.id) || "0000-00-00";
+    return da.localeCompare(db); // ascending = oldest first
+  });
+
+  const ordered = [...shuffle(prioritised), ...recycled];
+
+  logStep("Candidate list built (exhaustion-first)", {
+    total: ordered.length,
+    neverUsed: neverUsed.length,
+    recycled: recycled.length,
+  });
   return ordered;
 }
 
