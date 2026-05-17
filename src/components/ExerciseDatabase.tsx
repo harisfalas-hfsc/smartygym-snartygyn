@@ -350,8 +350,8 @@ const ExerciseDatabase = () => {
         </div>
       )}
 
-      {/* Filters - Hidden on mobile, visible on md+ */}
-      <div className="hidden md:flex flex-col gap-4">
+      {/* Filters - visible on all viewports */}
+      <div className="flex flex-col gap-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
           {/* Body Part Filter */}
           <div className="space-y-1">
