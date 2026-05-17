@@ -164,8 +164,17 @@ const Blog = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredArticles.map(article => <Card key={article.id} itemScope itemType="https://schema.org/BlogPosting" className="overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg" onClick={() => navigate(`/blog/${article.slug}`)} data-article-id={article.id} data-keywords="smarty gym blog, online fitness tips, smartygym.com, Haris Falas, online gym advice" aria-label={`${article.title} - SmartyGym blog - Online fitness at smartygym.com`}>
-                <div className="relative h-48 overflow-hidden">
-                  <img src={article.image} alt={`${article.title} - SmartyGym online fitness blog - smartygym.com by Haris Falas`} className="w-full h-full object-cover" loading="lazy" itemProp="image" />
+                <div className="relative aspect-video overflow-hidden">
+                  <img
+                    src={article.image}
+                    alt={`${article.title} - SmartyGym online fitness blog - smartygym.com by Haris Falas`}
+                    width={1280}
+                    height={720}
+                    loading="lazy"
+                    decoding="async"
+                    className="w-full h-full object-cover"
+                    itemProp="image"
+                  />
                   <div className="absolute top-3 right-3">
                     <span className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-medium">
                       {article.category}

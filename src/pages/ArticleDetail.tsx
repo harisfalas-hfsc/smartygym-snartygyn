@@ -238,7 +238,15 @@ export const ArticleDetail = () => {
             </div>
 
             {article.image_url && (
-              <img src={article.image_url} alt={imageAltText} className="w-full h-auto rounded-lg mb-8 shadow-lg" />
+              <img
+                src={article.image_url}
+                alt={imageAltText}
+                width={1280}
+                height={720}
+                loading="lazy"
+                decoding="async"
+                className="w-full h-auto rounded-lg mb-8 shadow-lg"
+              />
             )}
 
             <div className="prose prose-lg max-w-none mb-8">

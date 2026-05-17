@@ -577,8 +577,20 @@ Allow: /.well-known/ai-plugin.json
 # BLOCK ADMIN AND PRIVATE AREAS
 # ====================
 Disallow: /admin
+Disallow: /admin/
+Disallow: /corporate-admin
+Disallow: /userdashboard
+Disallow: /calculator-history
 Disallow: /dashboard
 Disallow: /auth
+Disallow: /reset-password
+Disallow: /payment-success
+Disallow: /newsletter-thank-you
+Disallow: /unsubscribe
+Disallow: /unsubscribe-help
+Disallow: /app-submission
+Disallow: /app-submission-printable
+Disallow: /process-logo
 Disallow: /api/
 
 # ====================
