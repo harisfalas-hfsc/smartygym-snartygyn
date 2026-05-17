@@ -232,6 +232,7 @@ serve(async (req) => {
         difficultyStars: null,
         equipment: null, // Any equipment for recovery
         cooldownIds,
+        lastUsedAt,
         strengthFocus: null,
       });
 
@@ -248,6 +249,7 @@ serve(async (req) => {
         difficultyStars: periodization.difficultyStars,
         equipment: "BODYWEIGHT",
         cooldownIds,
+        lastUsedAt,
         strengthFocus: periodization.strengthFocus || null,
       });
 
@@ -263,6 +265,7 @@ serve(async (req) => {
         difficultyStars: periodization.difficultyStars,
         equipment: "EQUIPMENT",
         cooldownIds,
+        lastUsedAt,
         strengthFocus: periodization.strengthFocus || null,
       });
 
