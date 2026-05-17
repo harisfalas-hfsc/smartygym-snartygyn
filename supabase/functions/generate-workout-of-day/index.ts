@@ -2187,6 +2187,17 @@ Customers want to know how long the ACTUAL TRAINING is.
 
 YOUR TARGET MAIN+FINISHER DURATION: ${duration}
 
+HARD MINIMUM DURATION (NON-NEGOTIABLE — WOD WILL BE REJECTED IF VIOLATED):
+The COMPUTED total of Main Workout + Finisher minutes (from rounds × work + rest
++ EMOM minutes × repeats + Tabata blocks × 4 min + AMRAP/For-Time caps) MUST be:
+- At least 20 minutes for Beginner (1-2 stars)
+- At least 28 minutes for Intermediate (3-4 stars)
+- At least 35 minutes for Advanced Tabata (5-6 stars)
+- At least 38 minutes for any other Advanced workout (5-6 stars)
+If your Main Workout is short, the Finisher MUST compensate: add more rounds,
+more exercises per round, or extend the AMRAP/EMOM cap until the sum clears
+the minimum above. Do NOT submit a workout below the minimum.
+
 DURATION-RPE-DIFFICULTY RELATIONSHIP (THINK LIKE AN EXPERT COACH):
 
 Short duration + Advanced difficulty = MAXIMUM intensity (RPE ceiling)
