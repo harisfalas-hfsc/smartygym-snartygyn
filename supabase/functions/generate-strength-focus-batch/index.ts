@@ -137,7 +137,7 @@ MANDATORY 5-SECTION STRUCTURE (icons in this exact order):
 1. 🧽 Soft Tissue Preparation — plain text foam-roll/lacrosse-ball cues (NOT library exercises)
 2. 🔥 Activation — library exercises with markup
 3. 💪 Main Workout — library exercises with markup (minimum 4 exercises)
-4. ⚡ Finisher — library exercises with markup (minimum 1 exercise)
+4. ⚡ Finisher — library exercises with markup (MINIMUM 3 exercises — required)
 5. 🧘 Cool Down — library exercises with markup (stretches & breathing)
 
 SECTION TITLE FORMAT: <p class="tiptap-paragraph">🧽 <strong><u>Soft Tissue Preparation 5'</u></strong></p>
