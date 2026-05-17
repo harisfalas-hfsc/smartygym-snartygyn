@@ -694,13 +694,15 @@ async function runWodGeneration(params: {
         // [beginner, intermediate, advanced] Main+Finisher minutes.
         // MUST stay at or above the wod-quality-gate minimums:
         //   beginner 20, intermediate 28, advanced 38 (35 for short brutal Tabata).
-        "REPS & SETS": [25, 35, 50],
-        "CIRCUIT":     [22, 32, 45],
-        "TABATA":      [22, 30, 38],
-        "AMRAP":       [22, 32, 42],
-        "EMOM":        [22, 30, 40],
+        // Targets are deliberately HIGHER than the gate minimum because the AI
+        // typically under-delivers the requested minutes by 20-30%.
+        "REPS & SETS": [28, 40, 55],
+        "CIRCUIT":     [28, 40, 50],
+        "TABATA":      [28, 36, 44],
+        "AMRAP":       [28, 40, 48],
+        "EMOM":        [28, 38, 46],
         "FOR TIME":    [0, 0, 0],
-        "MIX":         [22, 32, 45]
+        "MIX":         [28, 40, 50]
       };
       
       if (fmt === "FOR TIME") return "Various";
