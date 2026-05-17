@@ -364,6 +364,13 @@ serve(async (req) => {
             updated_at: new Date().toISOString(),
           })
           .eq("id", workout.id);
+        // Don't burn the slot for a workout that didn't actually publish:
+        // remove any cooldown record from a stale prior attempt today.
+        await supabase
+          .from("wod_selection_cooldown")
+          .delete()
+          .eq("source_workout_id", workout.id)
+          .eq("selected_for_date", targetDate);
         continue;
       }
 
