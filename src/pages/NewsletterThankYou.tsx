@@ -14,6 +14,7 @@ const NewsletterThankYou = () => {
       <Helmet>
         <title>Welcome to Smarty Gym | smartygym.com</title>
         <meta name="description" content="Thank you for joining Smarty Gym. Check your email for your first free workout." />
+        <meta name="robots" content="noindex, follow" />
         <link rel="canonical" href="https://smartygym.com/newsletter-thank-you" />
       </Helmet>
       
