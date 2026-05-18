@@ -27,6 +27,15 @@ import heroToolsImage from "@/assets/hero-tools.jpg";
 import heroLibraryImage from "@/assets/hero-exercise-library-new.jpg";
 import heroBlogImage from "@/assets/hero-blog.jpg";
 import heroCommunityImage from "@/assets/hero-community-new.jpg";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+  type CarouselApi,
+} from "@/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
 
 type RotatingLink = {
   id: string;
@@ -241,6 +250,82 @@ const DesktopVideoHero = ({ width, height }: { width: number; height: number }) 
           <RotatingLinkBanner />
         </div>
       </div>
+    </div>
+  );
+};
+
+type DesktopCardItem = {
+  id: string;
+  title: string;
+  description: string;
+  icon: LucideIcon;
+  route: string;
+  image: string;
+};
+
+const DESKTOP_CARDS: DesktopCardItem[] = [
+  { id: "workouts",  title: "Smarty Workouts",   description: "500+ expert sessions",      icon: Dumbbell,      route: "/workout",          image: heroWorkoutsImage },
+  { id: "programs",  title: "Smarty Programs",   description: "Multi-week training plans", icon: Calendar,      route: "/trainingprogram",  image: heroProgramsImage },
+  { id: "library",   title: "Exercise Library",  description: "Form & technique videos",   icon: Video,         route: "/exerciselibrary",  image: heroLibraryImage },
+  { id: "wod",       title: "Workout of the Day",description: "Today's featured session",  icon: CalendarCheck, route: "/workout/wod",      image: heroWodImage },
+  { id: "blog",      title: "Blog & Insights",   description: "Evidence-based articles",   icon: FileText,      route: "/blog",             image: heroBlogImage },
+  { id: "tools",     title: "Smarty Tools",      description: "Calculators & timers",      icon: Calculator,    route: "/tools",            image: heroToolsImage },
+  { id: "community", title: "Community",         description: "Train together",            icon: Users,         route: "/community",        image: heroCommunityImage },
+];
+
+const DesktopCardCarousel = ({ width, cardHeight }: { width: number; cardHeight: number }) => {
+  const navigate = useNavigate();
+  const autoplayRef = useRef(Autoplay({ delay: 2500, stopOnInteraction: false, stopOnMouseEnter: true }));
+  const [api, setApi] = useState<CarouselApi>();
+
+  return (
+    <div className="mx-auto mt-4" style={{ width: `${width}px`, maxWidth: "100%" }}>
+      <Carousel
+        setApi={setApi}
+        opts={{ align: "start", loop: true, dragFree: false }}
+        plugins={[autoplayRef.current]}
+        className="w-full"
+        onMouseEnter={() => autoplayRef.current.stop()}
+        onMouseLeave={() => autoplayRef.current.play()}
+      >
+        <CarouselContent className="-ml-3">
+          {DESKTOP_CARDS.map((card) => {
+            const Icon = card.icon;
+            return (
+              <CarouselItem key={card.id} className="pl-3 basis-1/5">
+                <button
+                  type="button"
+                  onClick={() => navigate(card.route)}
+                  className={cn(
+                    "relative w-full overflow-hidden rounded-xl border-2 border-primary/40",
+                    "hover:border-primary hover:shadow-xl hover:scale-[1.03]",
+                    "transition-all duration-300 ease-out group"
+                  )}
+                  style={{ height: `${cardHeight}px` }}
+                >
+                  <img
+                    src={card.image}
+                    alt={card.title}
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
+                  <div className="absolute inset-x-0 bottom-0 p-2.5 flex items-end justify-between gap-2">
+                    <div className="min-w-0">
+                      <h3 className="text-white text-xs font-semibold truncate drop-shadow">{card.title}</h3>
+                      <p className="text-white/85 text-[10px] truncate">{card.description}</p>
+                    </div>
+                    <span className="flex-shrink-0 w-7 h-7 rounded-full bg-background/95 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                      <Icon className="w-3.5 h-3.5 text-primary" />
+                    </span>
+                  </div>
+                </button>
+              </CarouselItem>
+            );
+          })}
+        </CarouselContent>
+        <CarouselPrevious className="-left-4 w-8 h-8 border-border bg-background/80 hover:bg-accent" />
+        <CarouselNext className="-right-4 w-8 h-8 border-border bg-background/80 hover:bg-accent" />
+      </Carousel>
     </div>
   );
 };
@@ -955,10 +1040,16 @@ export const HeroDestinationConstellation = () => {
       {/* ============ DESKTOP ============ */}
       <div className="hidden md:block">
         <div ref={desktopWrapperRef} className="w-full">
-          <DesktopVideoHero
-            width={(desktopStageWidth - 40) * desktopScale}
-            height={Math.round(530 * desktopScale)}
-          />
+          {(() => {
+            const w = (desktopStageWidth - 40) * desktopScale;
+            const h = Math.round(610 * desktopScale);
+            return (
+              <>
+                <DesktopVideoHero width={w} height={h} />
+                <DesktopCardCarousel width={w} cardHeight={Math.round(h / 5)} />
+              </>
+            );
+          })()}
         </div>
       </div>
 
