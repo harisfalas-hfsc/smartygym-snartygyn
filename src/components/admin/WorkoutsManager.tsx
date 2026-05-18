@@ -521,7 +521,7 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex gap-4 flex-wrap">
+          <div className="flex gap-2 items-center flex-nowrap overflow-x-auto pb-2">
             <div className="flex-1 min-w-[200px]">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -613,7 +613,7 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
               </SelectContent>
             </Select>
             <Select value={accessFilter} onValueChange={setAccessFilter}>
-              <SelectTrigger className="w-[120px]">
+              <SelectTrigger className="w-[120px] shrink-0">
                 <SelectValue placeholder="Access" />
               </SelectTrigger>
               <SelectContent>
@@ -622,8 +622,18 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
                 <SelectItem value="premium">Premium</SelectItem>
               </SelectContent>
             </Select>
+            <Select value={visibilityFilter} onValueChange={setVisibilityFilter}>
+              <SelectTrigger className="w-[130px] shrink-0">
+                <SelectValue placeholder="Visibility" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Visibility</SelectItem>
+                <SelectItem value="visible">👁️ Visible</SelectItem>
+                <SelectItem value="hidden">🙈 Hidden</SelectItem>
+              </SelectContent>
+            </Select>
             <Select value={sortOrder} onValueChange={setSortOrder}>
-              <SelectTrigger className="w-[120px]">
+              <SelectTrigger className="w-[120px] shrink-0">
                 <SelectValue placeholder="Sort" />
               </SelectTrigger>
               <SelectContent>
