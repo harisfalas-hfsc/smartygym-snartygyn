@@ -1,44 +1,40 @@
-## Scope
+## Hero Bento — make the WOD card unmistakable + add hover enhancement to all tiles
 
-Only the **"Direct Access to Your Coach"** form on the Contact page (Premium-only). The general contact form stays untouched.
+Scope: `src/components/home/HeroDestinationConstellation.tsx` only (the desktop bento grid that renders the hero on `/`).
 
-## Problem
+### 1. Make the WOD card clearly the "Workout of the Day"
 
-`send-direct-coach-email` currently:
-- Sends to `coach_inbox_email` which resolves to `smartygym@outlook.com` (same as admin).
-- Uses a different HTML layout than the proven general contact form.
-- Sends nothing back to the sender, and no AI/automated response is generated — so when you tested with your own Gmail, your inbox only showed the customer-facing replies from the OTHER form.
+Today the only signal is a tiny "Today" pill at top-left of the featured tile. Change the featured (WOD) bento tile so it reads as the hero:
 
-## Fix
+- Replace the small "Today" pill with a prominent header band at the top of the WOD card:
+  - Large, all-caps title: **"Workout of the Day"**
+  - Subtitle line: today's date (e.g. "Monday, May 18") + a small live "Today" chip
+  - Sit on a translucent dark gradient so it stays legible over the image
+- Keep the existing workout name + description + category/difficulty badges anchored at the bottom (unchanged content), but tighten spacing so the new header has room.
+- Bump the WOD tile's visual weight: thicker primary ring (already `ring-2`, go to `ring-4`), stronger primary glow shadow, and a subtle persistent pulse on the ring instead of only when live.
+- Slightly enlarge the workout name typography (e.g. `text-2xl md:text-3xl`) so it reads as the dominant element on the page.
+- No layout/grid-size changes — the bento footprint stays the same so the surrounding cards aren't disturbed (per the layout standard memory).
 
-### 1. Hardcode recipient to your personal Gmail
-- In `supabase/functions/send-direct-coach-email/index.ts`, set recipient to `harisfalas@gmail.com` (constant at the top of the file, easy to change later).
-- Remove the `getCoachInboxEmail` lookup for this function. Admin's Outlook is unaffected — it's still used by the general contact form.
+### 2. Enhance hover on every bento tile
 
-### 2. Rebuild the email to you (the coach) using the proven format
-Mirror the admin-notification HTML from `send-contact-email`:
-- Header bar: "Direct Message from Premium Member" + user name badge
-- Table: From / Email / Subject
-- **📥 Original Message** panel (cyan left border, white background) — full sender message
-- Attachments list (if any)
-- Footer: "Reply directly to this email to respond to {name}" (`reply_to: <sender email>`)
-- Subject: `[SmartyGym Premium Direct] {subject}`
-- From: `SmartyGym Premium <notifications@smartygym.com>`
+Apply a consistent, premium hover to all 7 tiles (workouts, blog, library, WOD, programs, tools, community) inside `BentoTile`:
 
-### 3. Add an automated reply to the sender
-A short branded confirmation sent to the Premium member who submitted the form, so they know it was received:
-- Subject: `Your message to Haris was received`
-- Body: "Hi {name}, your message has reached Haris directly. As a Premium member you'll get a personal reply soon. Best, The SmartyGym Team"
-- NO AI-generated response (this channel is advertised as "100% human, no automated responses" — only a delivery confirmation, which is standard transactional)
-- Logged via `logEmailDelivery` like the other sends.
+- Smooth scale-up (`hover:scale-[1.025]`, featured WOD `1.015` to stay proportional) with GPU transform and `cubic-bezier(0.22,1,0.36,1)` easing (~450ms).
+- Ring transitions from `border/60` → `primary` on hover; featured card deepens from `primary` → `primary` + glow.
+- Shadow lifts: `shadow-lg` → `shadow-2xl shadow-primary/30`.
+- Background image gains a slow `scale-105` zoom on hover (already cycling, so wrap in a transform layer).
+- Bottom gradient darkens slightly on hover for better text contrast.
+- Icon chip nudges up + scales `1.1` with primary-tinted ring.
+- All transitions `motion-safe` only, respecting reduced motion.
 
-### 4. Test
-Submit the Direct-to-Coach form as a Premium user → confirm:
-- `harisfalas@gmail.com` receives an email with the full original message clearly visible
-- Sender receives the "message received" confirmation
-- Reply button in your Gmail goes to the sender
+### 3. Out of scope
 
-## Files changed
-- `supabase/functions/send-direct-coach-email/index.ts` (rewrite only)
+- Mobile constellation layout (untouched — desktop bento only, matching memory: no permanent structural layout changes on mobile).
+- No content/data changes, no new components, no business logic.
 
-No DB migration, no settings UI changes, no impact on the general contact form.
+### Technical notes
+
+- Edits localized to `BentoTile` JSX and class strings in `src/components/home/HeroDestinationConstellation.tsx`.
+- New header block conditionally rendered only when `dest.featured` is true.
+- Date formatted with `Intl.DateTimeFormat(undefined, { weekday: "long", month: "long", day: "numeric" })`.
+- Uses existing semantic tokens (`primary`, `primary-foreground`, `background`) — no hardcoded colors.
