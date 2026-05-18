@@ -29,6 +29,46 @@ import heroToolsImage from "@/assets/hero-tools.jpg";
 import heroLibraryImage from "@/assets/hero-exercise-library-new.jpg";
 import heroBlogImage from "@/assets/hero-blog.jpg";
 import heroCommunityImage from "@/assets/hero-community-new.jpg";
+
+const DesktopVideoBanner = () => {
+  const navigate = useNavigate();
+  const { userTier } = useAccessControl();
+  const showCTA = userTier !== "premium";
+  return (
+    <div className="mb-4">
+      <div className="relative rounded-2xl overflow-hidden ring-1 ring-border/60 shadow-lg shadow-primary/10 h-[180px]">
+        <video
+          src={heroBannerVideo.url}
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        {showCTA && (
+          <>
+            <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/35 to-transparent" />
+            <div className="absolute inset-0 flex items-center">
+              <div className="pl-10 max-w-xl">
+                <h2 className="text-white text-2xl lg:text-3xl font-bold leading-tight mb-3 drop-shadow-lg">
+                  Your gym, re-imagined.
+                </h2>
+                <Button
+                  size="lg"
+                  onClick={() => navigate(userTier === "guest" ? "/auth" : "/premium-benefits")}
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-xl"
+                >
+                  Start your fitness journey now
+                  <ChevronRight className="w-4 h-4 ml-1" />
+                </Button>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
 import harisFalasImage from "@/assets/haris-falas-coach.png";
 
 type Destination = {
