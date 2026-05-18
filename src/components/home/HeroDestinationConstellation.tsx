@@ -375,6 +375,15 @@ const BentoTile = ({
   const chipSize = 46;
   const iconSize = 26;
 
+  // Today's date label for the featured (WOD) header band.
+  const todayLabel = new Intl.DateTimeFormat(undefined, {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  }).format(new Date());
+
+  const hoverScale = dest.featured ? 1.015 : 1.025;
+
   return (
     <div
       className={cn("group", className)}
@@ -386,13 +395,22 @@ const BentoTile = ({
           onClick={() => navigate(dest.route)}
           aria-label={`Go to ${dest.title}`}
           className={cn(
-            "relative block rounded-2xl overflow-hidden text-left",
+            "relative block rounded-2xl overflow-hidden text-left transform-gpu will-change-transform",
+            "[transition:transform_450ms_cubic-bezier(0.22,1,0.36,1),box-shadow_400ms_ease-out,outline-color_300ms_ease-out]",
             "ring-1 ring-border/60 shadow-lg shadow-primary/10",
+            "hover:ring-primary hover:shadow-2xl hover:shadow-primary/30",
+            "motion-safe:hover:[transform:scale(var(--bento-hover-scale))] motion-safe:focus-visible:[transform:scale(var(--bento-hover-scale))]",
             "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
-            dest.featured && "ring-2 ring-primary"
+            dest.featured && "ring-4 ring-primary shadow-2xl shadow-primary/40"
           )}
-          style={{ width: `${width}px`, height: `${height}px` }}
+          style={{
+            width: `${width}px`,
+            height: `${height}px`,
+            ["--bento-hover-scale" as any]: hoverScale,
+          } as React.CSSProperties}
         >
+          {/* Image layer with hover zoom */}
+          <div className="absolute inset-0 overflow-hidden transition-transform duration-700 ease-out motion-safe:group-hover:scale-105">
           {images.map((src, i) => (
             <img
               key={src + i}
@@ -404,10 +422,11 @@ const BentoTile = ({
               )}
             />
           ))}
+          </div>
           {/* Bottom gradient for label legibility */}
           <div
             className={cn(
-              "absolute inset-0",
+              "absolute inset-0 transition-opacity duration-500 group-hover:opacity-90",
               activeWod
                 ? "bg-gradient-to-t from-black/65 via-black/20 to-transparent"
                 : "bg-gradient-to-t from-black/70 via-black/15 to-transparent"
@@ -419,30 +438,44 @@ const BentoTile = ({
           {dest.featured && (
             <span
               aria-hidden="true"
-              className="pointer-events-none absolute inset-0 rounded-2xl ring-2 ring-primary opacity-60"
+              className="pointer-events-none absolute inset-0 rounded-2xl ring-2 ring-primary opacity-60 motion-safe:animate-pulse"
             />
           )}
 
-          {/* TODAY pill on featured WOD when live */}
-          {showLivePill && (
-            <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold tracking-wider uppercase shadow-md">
-              Today
-            </span>
+          {/* Prominent header band on the WOD (featured) tile */}
+          {dest.featured && (
+            <div className="absolute top-0 left-0 right-0 z-10 px-4 pt-3 pb-4 bg-gradient-to-b from-black/75 via-black/45 to-transparent">
+              <div className="flex items-center justify-between gap-3">
+                <h2 className="font-extrabold uppercase tracking-wide text-white drop-shadow-lg text-xl md:text-2xl leading-tight">
+                  Workout of the Day
+                </h2>
+                {showLivePill && (
+                  <span className="shrink-0 px-2 py-0.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold tracking-wider uppercase shadow-md">
+                    Today
+                  </span>
+                )}
+              </div>
+              <p className="mt-0.5 text-white/85 text-xs md:text-sm font-medium drop-shadow-md">
+                {todayLabel}
+              </p>
+            </div>
           )}
 
-          {/* Icon chip — top right */}
-          <span
-            className="absolute top-2 right-2 z-10 rounded-full bg-background/95 backdrop-blur-sm flex items-center justify-center shadow-lg ring-2 ring-primary/60"
-            style={{ width: `${chipSize}px`, height: `${chipSize}px` }}
-            aria-hidden="true"
-          >
-            <Icon className="text-primary" style={{ width: `${iconSize}px`, height: `${iconSize}px` }} />
-          </span>
+          {/* Icon chip — top right (hidden on featured to avoid clashing with header) */}
+          {!dest.featured && (
+            <span
+              className="absolute top-2 right-2 z-10 rounded-full bg-background/95 backdrop-blur-sm flex items-center justify-center shadow-lg ring-2 ring-primary/60 transition-transform duration-300 ease-out motion-safe:group-hover:scale-110 motion-safe:group-hover:-translate-y-0.5"
+              style={{ width: `${chipSize}px`, height: `${chipSize}px` }}
+              aria-hidden="true"
+            >
+              <Icon className="text-primary" style={{ width: `${iconSize}px`, height: `${iconSize}px` }} />
+            </span>
+          )}
 
           {/* Label — bottom left */}
           {activeWod ? (
             <div className="absolute bottom-4 left-4 right-4 z-10 space-y-2">
-              <p className="font-extrabold text-white leading-tight drop-shadow-lg text-xl md:text-2xl line-clamp-2">
+              <p className="font-extrabold text-white leading-tight drop-shadow-lg text-2xl md:text-3xl line-clamp-2">
                 {activeWod.name}
               </p>
               {activeWod.description && (
