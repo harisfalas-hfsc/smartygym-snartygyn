@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS public.strength_library_batch CASCADE;
