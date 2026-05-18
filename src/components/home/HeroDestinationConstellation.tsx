@@ -223,24 +223,17 @@ const DesktopVideoHero = ({ width, height }: { width: number; height: number }) 
         <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/10 to-transparent" aria-hidden="true" />
         <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/50 to-transparent" aria-hidden="true" />
 
-        {/* CTA — left side, vertically centered */}
-        {showCTA && (
-          <div className="absolute inset-y-0 left-0 flex items-center">
-            <div className="pl-10 lg:pl-14 max-w-xl">
-              <h2 className="text-white text-3xl lg:text-5xl font-bold leading-tight mb-4 drop-shadow-lg">
-                Your gym,<br />re-imagined.
-              </h2>
-              <Button
-                size="lg"
-                onClick={() => navigate(userTier === "guest" ? "/auth" : "/premium-benefits")}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-xl"
-              >
-                Start your fitness journey now
-                <ChevronRight className="w-4 h-4 ml-1" />
-              </Button>
-            </div>
+        {/* Brand message — centered at top */}
+        <div className="absolute inset-x-0 top-0 flex items-start justify-center pt-10 px-6">
+          <div className="text-center">
+            <h2 className="text-white text-2xl lg:text-4xl font-bold leading-tight drop-shadow-lg">
+              100% Human. 0% AI.
+            </h2>
+            <p className="text-white/90 text-sm lg:text-base mt-2 drop-shadow-md max-w-lg">
+              SmartyGym workouts and programs are built to fit YOUR life.
+            </p>
           </div>
-        )}
+        </div>
 
         {/* Rotating destination banner — bottom center */}
         <div className="absolute inset-x-0 bottom-6 flex justify-center px-6">
