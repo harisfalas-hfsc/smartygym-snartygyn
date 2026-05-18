@@ -1,10 +1,12 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@2.0.0";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { getCoachInboxEmail } from "../_shared/admin-settings.ts";
 import { logEmailDelivery } from "../_shared/email-log.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+
+// Coach personal inbox for Premium direct messages.
+// Keep this separate from admin Outlook inbox used by the general contact form.
+const COACH_PERSONAL_EMAIL = "harisfalas@gmail.com";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -20,39 +22,48 @@ interface DirectCoachEmailRequest {
   attachments?: { name: string; url: string; size: number; type: string }[];
 }
 
-const handler = async (req: Request): Promise<Response> => {
-  console.log("send-direct-coach-email function called");
+function sanitizeHtml(input: string): string {
+  return input
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
 
-  // Handle CORS preflight requests
+const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    
     const { name, email, subject, message, attachments }: DirectCoachEmailRequest = await req.json();
 
-    console.log(`Processing direct coach email from: ${name} (${email})`);
-    console.log(`Subject: ${subject}`);
+    if (!name || !email || !subject || !message) {
+      return new Response(
+        JSON.stringify({ error: "All fields are required" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
-    // Get coach email from database settings
-    const coachEmail = await getCoachInboxEmail(supabase);
-    console.log(`Coach inbox email resolved to: ${coachEmail}`);
+    const safeName = sanitizeHtml(name.trim());
+    const safeEmail = sanitizeHtml(email.trim());
+    const safeSubject = sanitizeHtml(subject.trim());
+    const safeMessage = sanitizeHtml(message.trim()).replace(/\n/g, "<br>");
 
-    // Build attachments HTML if any
+    console.log(`[send-direct-coach-email] From ${name} <${email}> → ${COACH_PERSONAL_EMAIL}`);
+
+    // Attachments HTML
     let attachmentsHtml = "";
     if (attachments && attachments.length > 0) {
       attachmentsHtml = `
-        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
-          <h3 style="color: #333; margin-bottom: 10px;">Attachments:</h3>
-          <ul style="list-style: none; padding: 0;">
+        <div style="margin: 20px 0;">
+          <p style="font-weight: bold; color: #333; margin-bottom: 10px;">📎 Attachments:</p>
+          <ul style="list-style: none; padding: 0; margin: 0;">
             ${attachments.map(att => `
-              <li style="margin-bottom: 8px;">
-                <a href="${att.url}" style="color: #2563eb; text-decoration: none;">
-                  📎 ${att.name}
+              <li style="margin-bottom: 8px; background-color: #f5f5f5; padding: 10px; border-radius: 4px;">
+                <a href="${att.url}" style="color: #29B6D2; text-decoration: none; font-weight: 500;">
+                  ${sanitizeHtml(att.name)}
                 </a>
                 <span style="color: #666; font-size: 12px; margin-left: 8px;">
                   (${(att.size / 1024 / 1024).toFixed(2)} MB)
@@ -64,65 +75,74 @@ const handler = async (req: Request): Promise<Response> => {
       `;
     }
 
-    // Send direct email to coach
-    let emailResponse: any;
+    // 1) Send to coach personal email (matches working contact-form admin layout)
+    let coachResponse: any;
     try {
-      emailResponse = await resend.emails.send({
-      from: "SmartyGym <noreply@smartygym.com>",
-      to: [coachEmail],
-      reply_to: email,
-      subject: `[Direct from Premium] ${subject}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <div style="background: linear-gradient(135deg, #2563eb, #7c3aed); padding: 20px; border-radius: 8px 8px 0 0;">
-            <h1 style="color: white; margin: 0; font-size: 24px;">💬 Direct Message from Premium Member</h1>
-          </div>
-          
-          <div style="background: #f9fafb; padding: 20px; border: 1px solid #e5e7eb; border-top: none;">
-            <table style="width: 100%; border-collapse: collapse;">
-              <tr>
-                <td style="padding: 8px 0; color: #6b7280; width: 80px;"><strong>From:</strong></td>
-                <td style="padding: 8px 0; color: #111827;">${name}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0; color: #6b7280;"><strong>Email:</strong></td>
-                <td style="padding: 8px 0; color: #111827;">
-                  <a href="mailto:${email}" style="color: #2563eb; text-decoration: none;">${email}</a>
-                </td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0; color: #6b7280;"><strong>Subject:</strong></td>
-                <td style="padding: 8px 0; color: #111827;">${subject}</td>
-              </tr>
-            </table>
-          </div>
-          
-          <div style="background: white; padding: 20px; border: 1px solid #e5e7eb; border-top: none;">
-            <h3 style="color: #374151; margin-top: 0;">Message:</h3>
-            <div style="color: #4b5563; line-height: 1.6; white-space: pre-wrap;">${message}</div>
+      coachResponse = await resend.emails.send({
+        from: "SmartyGym Premium <notifications@smartygym.com>",
+        to: [COACH_PERSONAL_EMAIL],
+        replyTo: email,
+        subject: `[SmartyGym Premium Direct] ${safeSubject}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background-color: #29B6D2; color: white; padding: 15px; border-radius: 5px 5px 0 0;">
+              <h2 style="margin: 0;">💬 Direct Message from Premium Member</h2>
+              <p style="margin: 5px 0 0 0; opacity: 0.9;">Channel: <strong>Direct Access to Your Coach</strong></p>
+            </div>
+
+            <div style="background-color: #f5f5f5; padding: 20px; border-radius: 0 0 5px 5px;">
+              <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                  <td style="padding: 8px 0; font-weight: bold; color: #333; width: 100px;">From:</td>
+                  <td style="padding: 8px 0; color: #333;">${safeName}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; font-weight: bold; color: #333;">Email:</td>
+                  <td style="padding: 8px 0;"><a href="mailto:${safeEmail}" style="color: #29B6D2;">${safeEmail}</a></td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; font-weight: bold; color: #333;">Subject:</td>
+                  <td style="padding: 8px 0; color: #333;">${safeSubject}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; font-weight: bold; color: #333;">Status:</td>
+                  <td style="padding: 8px 0;"><span style="background-color: #d4af37; color: white; padding: 2px 8px; border-radius: 3px; font-size: 12px;">Premium</span></td>
+                </tr>
+              </table>
+            </div>
+
+            <div style="margin: 20px 0;">
+              <p style="font-weight: bold; color: #333; margin-bottom: 10px;">📥 Original Message:</p>
+              <div style="background-color: #fff; padding: 15px; border-left: 4px solid #29B6D2; border-radius: 0 5px 5px 0;">
+                ${safeMessage}
+              </div>
+            </div>
+
             ${attachmentsHtml}
+
+            <div style="margin-top: 20px; padding: 15px; background-color: #f0f0f0; border-radius: 5px;">
+              <p style="margin: 0; font-size: 14px; color: #666;">
+                <strong>Quick Action:</strong> Reply directly to this email to respond to ${safeName}.
+              </p>
+            </div>
+
+            <div style="margin-top: 20px; color: #999; font-size: 11px;">
+              <p>SmartyGym Premium Direct Coach Channel • ${new Date().toLocaleString('en-CY', { timeZone: 'Europe/Nicosia' })} Cyprus Time</p>
+            </div>
           </div>
-          
-          <div style="background: #f3f4f6; padding: 15px; border-radius: 0 0 8px 8px; border: 1px solid #e5e7eb; border-top: none;">
-            <p style="margin: 0; color: #6b7280; font-size: 12px; text-align: center;">
-              This is a direct message from a Premium member via SmartyGym. 
-              Reply directly to this email to respond to ${name}.
-            </p>
-          </div>
-        </div>
-      `,
+        `,
       });
-      console.log("Direct coach email sent successfully:", emailResponse);
+      console.log("[send-direct-coach-email] Coach email sent:", coachResponse?.data?.id);
       await logEmailDelivery({
-        toEmail: coachEmail,
+        toEmail: COACH_PERSONAL_EMAIL,
         messageType: "direct-coach-email",
         status: "sent",
-        resendId: emailResponse?.data?.id ?? null,
+        resendId: coachResponse?.data?.id ?? null,
         metadata: { from_name: name, from_email: email, subject },
       });
     } catch (sendErr: any) {
       await logEmailDelivery({
-        toEmail: coachEmail,
+        toEmail: COACH_PERSONAL_EMAIL,
         messageType: "direct-coach-email",
         status: "failed",
         errorMessage: sendErr?.message || String(sendErr),
@@ -131,12 +151,65 @@ const handler = async (req: Request): Promise<Response> => {
       throw sendErr;
     }
 
-    return new Response(JSON.stringify({ success: true, emailResponse }), {
+    // 2) Send confirmation to the Premium sender
+    try {
+      const confirmResult = await resend.emails.send({
+        from: "SmartyGym <notifications@smartygym.com>",
+        to: [email],
+        subject: "Your message to Haris was received",
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background-color: #29B6D2; color: white; padding: 15px; border-radius: 5px 5px 0 0;">
+              <h2 style="margin: 0;">Message Delivered to Your Coach</h2>
+            </div>
+
+            <div style="padding: 20px; background-color: #f9f9f9;">
+              <p style="font-size: 16px; color: #333; margin-top: 0;">Hi ${safeName},</p>
+              <p style="color: #333; line-height: 1.6;">
+                Your message has reached <strong>Haris Falas</strong> directly.
+                As a Premium member, you'll get a personal reply from your coach — no automated answers, no AI, just real human support.
+              </p>
+
+              <div style="margin: 20px 0; background-color: #fff; padding: 15px; border-left: 4px solid #29B6D2; border-radius: 0 5px 5px 0;">
+                <p style="margin: 0 0 8px 0; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 0.5px;">Your message — Subject: ${safeSubject}</p>
+                <div style="color: #333; line-height: 1.6;">${safeMessage}</div>
+              </div>
+
+              <p style="color: #333;">Haris typically replies within 24–48 hours.</p>
+            </div>
+
+            <div style="padding: 15px; background-color: #f0f0f0; border-radius: 0 0 5px 5px; font-size: 12px; color: #666;">
+              <p style="margin: 0;">Best regards,<br><strong>The SmartyGym Team</strong></p>
+              <p style="margin: 10px 0 0 0;">This is an automated delivery confirmation. Haris's personal reply will follow.</p>
+            </div>
+          </div>
+        `,
+      });
+      console.log("[send-direct-coach-email] Confirmation sent to:", email);
+      await logEmailDelivery({
+        toEmail: email,
+        messageType: "direct-coach-confirmation",
+        status: "sent",
+        resendId: confirmResult?.data?.id ?? null,
+        metadata: { from_name: name, subject },
+      });
+    } catch (confirmErr: any) {
+      // Don't fail the request if confirmation send fails
+      console.error("[send-direct-coach-email] Confirmation failed:", confirmErr);
+      await logEmailDelivery({
+        toEmail: email,
+        messageType: "direct-coach-confirmation",
+        status: "failed",
+        errorMessage: confirmErr?.message || String(confirmErr),
+      });
+    }
+
+    return new Response(JSON.stringify({ success: true }), {
       status: 200,
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });
   } catch (error: any) {
-    console.error("Error in send-direct-coach-email function:", error);
+    console.error("[send-direct-coach-email] Error:", error);
     return new Response(
       JSON.stringify({ error: error.message }),
       {
