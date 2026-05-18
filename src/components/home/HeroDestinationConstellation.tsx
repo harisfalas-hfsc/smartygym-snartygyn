@@ -275,14 +275,14 @@ const DESKTOP_CARDS: DesktopCardItem[] = [
 
 const DesktopCardCarousel = ({ width, cardHeight }: { width?: number; cardHeight: number }) => {
   const navigate = useNavigate();
-  const autoplayRef = useRef(Autoplay({ delay: 2500, stopOnInteraction: false, stopOnMouseEnter: true }));
+  const autoplayRef = useRef(Autoplay({ delay: 3500, stopOnInteraction: false, stopOnMouseEnter: true }));
   const [api, setApi] = useState<CarouselApi>();
 
   return (
-    <div className="mx-auto" style={width ? { width: `${width}px`, maxWidth: "100%" } : undefined}>
+    <div className="mx-auto px-10" style={width ? { width: `${width}px`, maxWidth: "100%" } : undefined}>
       <Carousel
         setApi={setApi}
-        opts={{ align: "start", loop: true, dragFree: false }}
+        opts={{ align: "center", loop: true, dragFree: false }}
         plugins={[autoplayRef.current]}
         className="w-full"
         onMouseEnter={() => autoplayRef.current.stop()}
@@ -292,7 +292,7 @@ const DesktopCardCarousel = ({ width, cardHeight }: { width?: number; cardHeight
           {DESKTOP_CARDS.map((card) => {
             const Icon = card.icon;
             return (
-              <CarouselItem key={card.id} className="pl-3 basis-1/5">
+              <CarouselItem key={card.id} className="pl-3 basis-1/4">
                 <button
                   type="button"
                   onClick={() => navigate(card.route)}
@@ -323,8 +323,8 @@ const DesktopCardCarousel = ({ width, cardHeight }: { width?: number; cardHeight
             );
           })}
         </CarouselContent>
-        <CarouselPrevious className="-left-3 w-8 h-8 border-white/30 bg-black/50 text-white hover:bg-primary hover:text-primary-foreground" />
-        <CarouselNext className="-right-3 w-8 h-8 border-white/30 bg-black/50 text-white hover:bg-primary hover:text-primary-foreground" />
+        <CarouselPrevious className="left-0 w-9 h-9 border-white/30 bg-black/60 text-white hover:bg-primary hover:text-primary-foreground z-20" />
+        <CarouselNext className="right-0 w-9 h-9 border-white/30 bg-black/60 text-white hover:bg-primary hover:text-primary-foreground z-20" />
       </Carousel>
     </div>
   );
