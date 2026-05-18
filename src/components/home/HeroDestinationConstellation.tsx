@@ -1040,16 +1040,10 @@ export const HeroDestinationConstellation = () => {
       {/* ============ DESKTOP ============ */}
       <div className="hidden md:block">
         <div ref={desktopWrapperRef} className="w-full">
-          {(() => {
-            const w = (desktopStageWidth - 40) * desktopScale;
-            const h = Math.round(610 * desktopScale);
-            return (
-              <>
-                <DesktopVideoHero width={w} height={h} />
-                <DesktopCardCarousel width={w} cardHeight={Math.round(h / 5)} />
-              </>
-            );
-          })()}
+          <DesktopVideoHero
+            width={(desktopStageWidth - 40) * desktopScale}
+            height={Math.round(610 * desktopScale)}
+          />
         </div>
       </div>
 
