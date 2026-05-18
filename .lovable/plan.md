@@ -1,42 +1,40 @@
-# Verify every published workout & training program has a live Stripe product
+# Fix Desktop Hero Issues
 
-## What I already confirmed from the database
+Three corrections to the recent desktop hero changes.
 
-```text
-admin_workouts (is_visible = true)
-  Total visible.............. 483
-  Visible & premium.......... 448
-  Visible+premium+standalone. 448
-  Missing stripe_product_id.. 0
-  Missing stripe_price_id.... 0
+## 1. Restore card alignment (remove the 25% scale)
 
-admin_training_programs (is_visible = true)
-  Total visible.............. 28
-  Missing stripe_product_id.. 1   ← "Cardio Foundations" (id = C-1)
+The previous change wrapped the bento grid in a `scale(0.75)` transform, which shrank every card uniformly and broke the spacing/alignment that existed before.
 
-WODs (latest 12, includes today + tomorrow's 2 pre-built variants)
-  All have stripe_product_id + stripe_price_id
-```
+**Fix in `src/components/home/HeroDestinationConstellation.tsx`:**
+- Remove `* 0.75` from the wrapper height (`height: ${530 * desktopScale}px`).
+- Remove `* 0.75` from the transform (`transform: translateX(-50%) scale(${desktopScale})`).
+- Cards return to their original sizes/positions — exactly as they were before the video was added.
 
-On your example: "Apex Current Press UPP-E-I" in the DB points to `prod_UX5F680sKd4f1t`, which still exists in Stripe. The archived `prod_UXM4mpiGMzWZ4j` with the same name is a duplicate from an earlier regeneration that the DB no longer references, so it was correctly archived.
+Note: the user originally asked to reduce only the **height** by 10%, which was already done in an earlier step (cards now ~519px tall instead of ~570px). That height reduction stays. Only the new 25% uniform shrink is reverted.
 
-The only gap so far: **Cardio Foundations (C-1)** has no Stripe product.
+## 2. Align the video banner with the cards below
 
-## What I still need to verify
+Currently `DesktopVideoBanner` uses `w-full` and stretches edge-to-edge of the hero container, while the bento grid is centered at `desktopStageWidth` (the card grid's actual width).
 
-Every DB row points to *an* id, but I have not yet confirmed each of those 475 product ids is `active=true` in Stripe. If a cleanup ever wrongly archived a referenced product, the DB still holds the id and the check above wouldn't catch it.
+**Fix:**
+- Wrap the video banner in a centered container that matches `desktopStageWidth` (same width the bento stage uses).
+- The video card's left/right edges will line up vertically with the leftmost and rightmost cards in the grid below (Workouts / Library / Community column edges).
+- Keep the existing height (180px), rounded corners, CTA, and premium gating untouched.
 
-## Plan
+## 3. Regenerate the hero video — real training, not dancing
 
-1. **Run a one-shot reverse audit** — script (no new cron, no UI) that:
-   - Pulls every `stripe_product_id` / `stripe_price_id` from `admin_workouts` and `admin_training_programs` where `is_visible = true`.
-   - Calls Stripe to confirm each product is `active` and each price is `active`, currency `eur`, amount matches the DB `price`.
-   - Returns the list of any mismatches.
+The current `src/assets/hero-banner-video.mp4` shows two people doing dance-like movements. Replace it with a proper fitness training clip.
 
-2. **Repair anything broken**:
-   - For each visible workout whose linked product is archived/missing → create a new Stripe product + price with SMARTYGYM metadata and update the DB row.
-   - Create the missing product + price for Cardio Foundations (C-1) and link it.
+**New video prompt direction:**
+- Two athletic fitness models in a modern bright gym.
+- Clearly performing real strength/conditioning exercises — e.g. one doing a barbell back squat with controlled form, the other doing kettlebell swings or dumbbell presses alongside.
+- Cinematic side-angle, slow camera, natural gym lighting, focused training expressions.
+- No dance moves, no synchronized choreography, no jumping in place for show.
+- 5s loop, 1080p, 16:9, same path (`src/assets/hero-banner-video.mp4`) so no imports change.
 
-3. **Report back** with: total checked, count OK, list of repaired items (old id → new id).
+## Out of scope
 
-No cron, no scheduler, no extra infrastructure. Just verify and fix.
+- Mobile layout (untouched).
+- WOD card header, hover effects, bento positions — all left as they are now.
+- No backend, no Stripe, no DB changes.
