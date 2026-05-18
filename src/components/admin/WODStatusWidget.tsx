@@ -12,6 +12,7 @@ interface WodStatus {
   found: number;
   expected: number;
   variants: string[];
+  wods: { id: string; name: string; category: string | null; variant: string }[];
   lastRunStatus: string | null;
   lastRunTime: string | null;
   lastRunSource: string | null;
@@ -47,6 +48,13 @@ export const WODStatusWidget = () => {
         .map((w: any) => normalizeWodEquipment(w.equipment))
         .filter(Boolean);
 
+      const wods = todayWods.map((w: any) => ({
+        id: w.id,
+        name: w.name,
+        category: w.category ?? null,
+        variant: normalizeWodEquipment(w.equipment),
+      }));
+
       // Determine expected count from run or default to 2
       const expected = latestRun?.expected_count || 2;
 
@@ -55,6 +63,7 @@ export const WODStatusWidget = () => {
         found: variants.length,
         expected,
         variants,
+        wods,
         lastRunStatus: latestRun?.status || null,
         lastRunTime: latestRun?.completed_at || null,
         lastRunSource: latestRun?.trigger_source || null,
