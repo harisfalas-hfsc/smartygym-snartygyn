@@ -13,6 +13,10 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTodayWods } from "@/hooks/useTodayWods";
+import { useAccessControl } from "@/contexts/AccessControlContext";
+import { Button } from "@/components/ui/button";
+import { ChevronRight } from "lucide-react";
+import heroBannerVideo from "@/assets/hero-banner-video.mp4.asset.json";
 import { useIsPortraitMode } from "@/hooks/useIsPortraitMode";
 import type { WorkoutData } from "@/hooks/useWorkoutData";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +29,46 @@ import heroToolsImage from "@/assets/hero-tools.jpg";
 import heroLibraryImage from "@/assets/hero-exercise-library-new.jpg";
 import heroBlogImage from "@/assets/hero-blog.jpg";
 import heroCommunityImage from "@/assets/hero-community-new.jpg";
+
+const DesktopVideoBanner = () => {
+  const navigate = useNavigate();
+  const { userTier } = useAccessControl();
+  const showCTA = userTier !== "premium";
+  return (
+    <div className="mb-4">
+      <div className="relative rounded-2xl overflow-hidden ring-1 ring-border/60 shadow-lg shadow-primary/10 h-[180px]">
+        <video
+          src={heroBannerVideo.url}
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        {showCTA && (
+          <>
+            <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/35 to-transparent" />
+            <div className="absolute inset-0 flex items-center">
+              <div className="pl-10 max-w-xl">
+                <h2 className="text-white text-2xl lg:text-3xl font-bold leading-tight mb-3 drop-shadow-lg">
+                  Your gym, re-imagined.
+                </h2>
+                <Button
+                  size="lg"
+                  onClick={() => navigate(userTier === "guest" ? "/auth" : "/premium-benefits")}
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-xl"
+                >
+                  Start your fitness journey now
+                  <ChevronRight className="w-4 h-4 ml-1" />
+                </Button>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
 import harisFalasImage from "@/assets/haris-falas-coach.png";
 
 type Destination = {
@@ -735,13 +779,14 @@ export const HeroDestinationConstellation = () => {
 
       {/* ============ DESKTOP ============ */}
       <div className="hidden md:block">
+        <DesktopVideoBanner />
         <div
           ref={desktopWrapperRef}
           className="relative mx-auto"
           style={{
             width: "100%",
             maxWidth: "100%",
-            height: `${530 * desktopScale}px`,
+            height: `${530 * 0.75 * desktopScale}px`,
             overflow: "hidden",
           }}
         >
@@ -749,9 +794,11 @@ export const HeroDestinationConstellation = () => {
             style={{
               width: `${desktopStageWidth}px`,
               height: "530px",
-              transform: `scale(${desktopScale})`,
-              transformOrigin: "top left",
-              position: "relative",
+              transform: `translateX(-50%) scale(${desktopScale * 0.75})`,
+              transformOrigin: "top center",
+              position: "absolute",
+              top: 0,
+              left: "50%",
             }}
           >
           {/* Soft radial glow background */}
