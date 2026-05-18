@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 import { useTodayWods } from "@/hooks/useTodayWods";
 import { useAccessControl } from "@/contexts/AccessControlContext";
 import { Button } from "@/components/ui/button";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, ChevronLeft } from "lucide-react";
 import heroBannerVideo from "@/assets/hero-banner-video.mp4.asset.json";
 import { useIsPortraitMode } from "@/hooks/useIsPortraitMode";
 import type { WorkoutData } from "@/hooks/useWorkoutData";
@@ -53,28 +53,34 @@ const RotatingLinkBanner = () => {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const prefersReducedMotion = useRef(false);
-  const touchStartX = useRef<number | null>(null);
-  const touchDeltaX = useRef(0);
+  const dragStartX = useRef<number | null>(null);
+  const dragDeltaX = useRef(0);
+  const draggedRef = useRef(false);
 
   const goPrev = () => setIndex((i) => (i - 1 + ROTATING_LINKS.length) % ROTATING_LINKS.length);
   const goNext = () => setIndex((i) => (i + 1) % ROTATING_LINKS.length);
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-    touchDeltaX.current = 0;
+  const handlePointerDown = (e: React.PointerEvent) => {
+    dragStartX.current = e.clientX;
+    dragDeltaX.current = 0;
+    draggedRef.current = false;
     setPaused(true);
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
   };
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (touchStartX.current === null) return;
-    touchDeltaX.current = e.touches[0].clientX - touchStartX.current;
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (dragStartX.current === null) return;
+    dragDeltaX.current = e.clientX - dragStartX.current;
+    if (Math.abs(dragDeltaX.current) > 5) draggedRef.current = true;
   };
-  const handleTouchEnd = () => {
-    const dx = touchDeltaX.current;
+  const handlePointerEnd = (e: React.PointerEvent) => {
+    if (dragStartX.current === null) return;
+    const dx = dragDeltaX.current;
     const threshold = 40;
     if (dx > threshold) goPrev();
     else if (dx < -threshold) goNext();
-    touchStartX.current = null;
-    touchDeltaX.current = 0;
+    dragStartX.current = null;
+    dragDeltaX.current = 0;
+    try { (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId); } catch {}
     setPaused(false);
   };
 
@@ -118,37 +124,64 @@ const RotatingLinkBanner = () => {
     <div
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
       aria-live="polite"
-      className="w-full max-w-md touch-pan-y select-none"
+      className="w-full max-w-md select-none relative"
     >
-      <button
-        type="button"
-        onClick={() => navigate(current.route)}
-        key={current.id}
-        className={cn(
-          "group w-full flex items-center gap-4 px-5 py-4 rounded-2xl",
-          "bg-background/85 backdrop-blur-xl border border-white/25",
-          "shadow-2xl shadow-primary/20",
-          "hover:bg-background/95 hover:border-primary transition-all",
-          "animate-fade-in text-left"
-        )}
-      >
-        <span className="flex-shrink-0 w-12 h-12 rounded-full bg-primary/15 ring-2 ring-primary/40 flex items-center justify-center">
-          <Icon className="w-6 h-6 text-primary" />
-        </span>
-        <span className="flex-1 min-w-0">
-          <span className="block text-base lg:text-lg font-bold text-foreground leading-tight truncate">
-            {current.title}
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={goPrev}
+          aria-label="Previous destination"
+          className="flex-shrink-0 w-9 h-9 rounded-full bg-background/85 backdrop-blur-md border border-white/25 shadow-lg flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors"
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+
+        <button
+          type="button"
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerEnd}
+          onPointerCancel={handlePointerEnd}
+          onClick={(e) => {
+            if (draggedRef.current) {
+              e.preventDefault();
+              return;
+            }
+            navigate(current.route);
+          }}
+          key={current.id}
+          className={cn(
+            "group flex-1 min-w-0 flex items-center gap-4 px-5 py-4 rounded-2xl touch-pan-y cursor-grab active:cursor-grabbing",
+            "bg-background/85 backdrop-blur-xl border border-white/25",
+            "shadow-2xl shadow-primary/20",
+            "hover:bg-background/95 hover:border-primary transition-all",
+            "animate-fade-in text-left"
+          )}
+        >
+          <span className="flex-shrink-0 w-12 h-12 rounded-full bg-primary/15 ring-2 ring-primary/40 flex items-center justify-center">
+            <Icon className="w-6 h-6 text-primary" />
           </span>
-          <span className="block text-xs lg:text-sm text-muted-foreground truncate">
-            {current.tagline}
+          <span className="flex-1 min-w-0">
+            <span className="block text-base lg:text-lg font-bold text-foreground leading-tight truncate">
+              {current.title}
+            </span>
+            <span className="block text-xs lg:text-sm text-muted-foreground truncate">
+              {current.tagline}
+            </span>
           </span>
-        </span>
-        <ChevronRight className="w-5 h-5 text-primary flex-shrink-0 group-hover:translate-x-1 transition-transform" />
-      </button>
+          <ChevronRight className="w-5 h-5 text-primary flex-shrink-0 group-hover:translate-x-1 transition-transform" />
+        </button>
+
+        <button
+          type="button"
+          onClick={goNext}
+          aria-label="Next destination"
+          className="flex-shrink-0 w-9 h-9 rounded-full bg-background/85 backdrop-blur-md border border-white/25 shadow-lg flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors"
+        >
+          <ChevronRight className="w-5 h-5" />
+        </button>
+      </div>
 
       {/* Dots */}
       <div className="flex justify-center gap-1.5 mt-3">
