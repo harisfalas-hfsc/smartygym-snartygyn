@@ -2134,6 +2134,25 @@ STRUCTURAL RULES — VIOLATING ANY OF THESE TRIGGERS REGENERATION (MANDATORY):
    "Repeat X rounds = total minutes". Never trail an unlabelled exercise after "Minute 3:".
    - WRONG: list with "Minute 1:", "Minute 2:", "Minute 3:" then a 4th bullet "{{exercise:1326:chin-up}}, perform the prescribed reps..."
    - RIGHT: list with "Minute 1:", "Minute 2:", "Minute 3:", "Minute 4:", "Minute 5:" then a paragraph "Repeat 3 rounds = 15 minutes."
+5. PROTOCOL COMPLETENESS — EVERY Main Workout AND Finisher must declare its full structure. A protocol is NOT a free-for-all.
+   These are the ONLY acceptable shapes; anything else is a coaching error and will be rejected:
+   • FOR TIME — MUST include either:
+       (a) "Complete N rounds for time." after the bullet list (e.g. "Complete 4 rounds for time."), OR
+       (b) A descending or ascending chipper ladder with at least 3 different rep counts (e.g. 50-40-30-20), OR
+       (c) An explicit time cap ("within 15 minutes", "time cap: 12 min"), OR
+       (d) A single very-high-volume challenge (e.g. "100 {{exercise:0662:push-up}} for time").
+     A "For Time" section with a list of small rep counts and no rounds is FORBIDDEN. One round of
+     "10 squats, 10 push-ups, 20 jumping jacks, 10 mountain climbers, 10 hip raises" is NOT a workout.
+   • CIRCUIT — MUST state rounds: "Complete 4 rounds" or "Perform 5 rounds with 60 sec rest between rounds."
+   • AMRAP — MUST state the time cap in a sentence below the list: "Complete as many rounds as possible in 15 minutes."
+     Never write an AMRAP section with no time window.
+   • EMOM — MUST end with either "Repeat N rounds = M minutes." OR a single explicit "N-minute EMOM" sentence.
+     A bare list of minutes with no total duration is FORBIDDEN.
+   • TABATA — MUST state the 20 sec work / 10 sec rest x 8 rounds protocol AND each prescribed exercise = 4 minutes.
+     List enough Tabata blocks so the math reaches the target duration.
+   • REPS & SETS — every line MUST have "N sets x M reps" before the exercise token (existing rule).
+   These structure sentences live in the workout body — not in the section header, not only in the instructions.
+   The athlete must be able to read the Main Workout / Finisher alone and know exactly how to perform it.
 
 GOLD STANDARD REPS & SETS TEMPLATE (FOR STRENGTH / MOBILITY & STABILITY / PILATES):
 The EMOM template above shows timed formats. For REPS & SETS workouts, use THIS template instead:

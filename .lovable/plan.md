@@ -1,41 +1,45 @@
-## Hero WOD card — remove "Today" badge + guarantee header/content legibility on any image
+I found the exact problem: the generator currently accepts sections that have exercise reps but no complete workout structure. The existing quality gate only checks that a finisher contains words like “For Time”, which is too weak. It also computes duration before final normalization/validation, so a bad “For Time” section can still become a fake estimated duration.
 
-Scope: `src/components/home/HeroDestinationConstellation.tsx`, desktop bento `BentoTile` only. No content, data, layout-size, or mobile changes.
+Plan:
 
-### 1. Remove the "Today" badge (desktop WOD card)
+1. Repair the affected pre-built WODs now
+- Update “Loaded Engine Session” so the For Time finisher has a real prescription, e.g. clear rounds/time cap/rest guidance, not a single token list.
+- Update “Engine Tempo Circuit” so the Main Workout has explicit rounds and the displayed duration reflects Main + Finisher from the actual prescription.
+- Also repair the two other currently flagged WODs I found:
+  - “Loaded Conditioning Session” has the same unstructured For Time finisher issue.
+  - “Velocity Burst Ascend” has an AMRAP section missing a clear time cap.
+- Keep changes non-destructive: update content only, preserve workout IDs, dates, visibility, images, and access metadata.
 
-- Delete the small "Today" pill currently rendered in the WOD header band (the `showLivePill` span inside the featured header).
-- Keep `showLivePill` logic untouched elsewhere; just stop rendering the chip on the desktop bento WOD tile.
-- The header band keeps the "Workout of the Day" title + today's date — no replacement badge.
+2. Add a real protocol-structure gate
+- Extend the shared protocol validator so each protocol must prove its structure:
+  - For Time/Circuit: must declare rounds, ladder/chipper structure, or a time cap.
+  - EMOM: must declare either total minutes or Minute labels plus repeat rounds = total minutes.
+  - AMRAP: must declare a time cap.
+  - Tabata: must declare 20s/10s x 8 rounds or enough explicit Tabata blocks to calculate duration.
+  - Reps & Sets: every exercise line must include sets x reps/reps and rest where needed.
+- Make these checks blocking for WOD generation, not just logged warnings.
 
-### 2. Make "Workout of the Day" + date readable on ANY background image
+3. Fix duration calculation so it cannot reward bad structure
+- Calculate duration after cleanup/normalization, not before.
+- Treat under-specified For Time/Circuit as invalid instead of guessing one round.
+- Keep “Various” only for valid For Time workouts where the work is clearly prescribed but completion speed varies.
+- Ensure Tabata duration uses the rule: each Tabata exercise/block = 4 minutes.
 
-Problem: WOD images vary (bright Pilates/Recovery whites vs dark Strength shots). A translucent gradient alone fails over white backgrounds. Fix with a layered, image-independent treatment so the header is always legible without looking heavy on dark images either.
+4. Harden the AI prompt against these exact failures
+- Add explicit “never publish” rules:
+  - Never write “For Time” with only a list of exercises and no rounds/cap/chipper volume.
+  - Never write “Circuit” without rounds.
+  - Never write “AMRAP” without a time cap.
+  - Never write “EMOM” without total minutes.
+  - Never write “Tabata” without 20/10 x 8 logic.
+- Add concrete examples of acceptable Main Workout and Finisher structures.
 
-**Header band (top of WOD card):**
-- Replace the current `bg-gradient-to-b from-black/75 …` with a solid-dark, blurred header bar that does not depend on the image:
-  - `bg-black/55 backdrop-blur-md` plus a thin `border-b border-white/10`
-  - Fades out into the image below via a short secondary gradient strip (`from-black/40 to-transparent`, ~24px tall) so the transition looks intentional, not a hard band
-- Title uses `text-white` with a true text outline (paint-order stroke) so it survives both bright and dark images:
-  - `[paint-order:stroke] [-webkit-text-stroke:1px_rgba(0,0,0,0.55)] drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]`
-  - Keep `font-extrabold uppercase tracking-wide text-xl md:text-2xl`
-- Date line: `text-white/90` with the same drop-shadow (smaller, no stroke needed because of the blurred bar behind it)
+5. Add an audit/repair path for existing content
+- Update the existing workout repair/audit logic to flag the same missing-structure problems across the workout library.
+- Add a focused scan query/report so we can identify all similar issues before making content edits.
+- Repair WODs first; library-wide repair can be handled in a controlled second pass to avoid accidental changes to paid content.
 
-**Bottom content area (workout name + meta on the WOD tile):**
-- Strengthen the bottom scrim to be image-independent:
-  - Increase the bottom gradient on the featured tile from `from-black/65` to `from-black/80 via-black/40 to-transparent` and bump its min-height (e.g. apply on the bottom ~55% only via `bg-gradient-to-t … h-[60%] bottom-0` wrapper) so bright Pilates/Recovery images still yield WCAG-legible text without darkening the whole picture.
-  - Add the same text-stroke + drop-shadow utility class to the workout name and description so they stay readable if the scrim is briefly defeated by a near-white image edge.
-
-**Why this works for white/bright images:**
-- The header bar is a real semi-opaque dark layer (`bg-black/55`) with `backdrop-blur-md`, so it renders as a frosted dark band regardless of the underlying pixel color — no reliance on the image being dark.
-- The text stroke + drop shadow give the glyphs their own contrast, so even on a pure-white frame the white fill reads against the dark 1px outline.
-- Non-WOD tiles are unchanged (their images are static/curated).
-
-### 3. Out of scope
-- Mobile constellation, layout sizes, data, business logic, generated image prompts.
-- Non-WOD tiles' overlays.
-
-### Technical notes
-- Edits localized to the featured-tile header `<div>` and the bottom gradient `<div>` inside `BentoTile`.
-- Use Tailwind arbitrary-value utilities for `-webkit-text-stroke` and `paint-order` (no config changes).
-- Uses existing semantic colors; `text-white` is acceptable here because the layer sits over arbitrary photography (the legibility scrim, not theme color).
+6. Validate before finishing
+- Run targeted checks against the four flagged WODs after repair.
+- Run edge-function tests or targeted validator checks to confirm malformed examples now fail.
+- Confirm the database scan returns zero active WODs with missing protocol structure.
