@@ -717,7 +717,7 @@ export const HeroDestinationConstellation = () => {
           {/* Soft radial glow background */}
           <svg
             className="absolute inset-0 w-full h-full pointer-events-none"
-            viewBox={`0 0 ${desktopStageWidth} 590`}
+            viewBox={`0 0 ${desktopStageWidth} 530`}
             preserveAspectRatio="xMidYMid meet"
             aria-hidden="true"
           >
@@ -727,7 +727,7 @@ export const HeroDestinationConstellation = () => {
                 <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0" />
               </radialGradient>
             </defs>
-            <rect width={desktopStageWidth} height="590" fill="url(#bento-glow)" />
+            <rect width={desktopStageWidth} height="530" fill="url(#bento-glow)" />
           </svg>
 
           {DESTINATIONS.map((dest) => {
