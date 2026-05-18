@@ -36,7 +36,7 @@ const DesktopVideoBanner = ({ width }: { width: number }) => {
   const showCTA = userTier !== "premium";
   return (
     <div className="mb-4 mx-auto" style={{ width: `${width}px`, maxWidth: "100%" }}>
-      <div className="relative rounded-2xl overflow-hidden ring-1 ring-border/60 shadow-lg shadow-primary/10 h-[180px]">
+      <div className="relative rounded-2xl overflow-hidden ring-1 ring-border/60 shadow-lg shadow-primary/10 h-[207px]">
         <video
           src={heroBannerVideo.url}
           autoPlay
@@ -779,7 +779,7 @@ export const HeroDestinationConstellation = () => {
 
       {/* ============ DESKTOP ============ */}
       <div className="hidden md:block">
-        <DesktopVideoBanner width={desktopStageWidth * desktopScale} />
+        <DesktopVideoBanner width={(desktopStageWidth - 40) * desktopScale} />
         <div
           ref={desktopWrapperRef}
           className="relative mx-auto"
