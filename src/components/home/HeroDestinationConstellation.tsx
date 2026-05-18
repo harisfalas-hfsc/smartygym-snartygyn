@@ -451,7 +451,7 @@ const BentoTile = ({
           {/* Prominent header band on the WOD (featured) tile — frosted dark bar, image-independent */}
           {dest.featured && (
             <>
-              <div className="absolute top-0 left-0 right-0 z-10 px-4 pt-3 pb-3 bg-black/55 backdrop-blur-md border-b border-white/10">
+              <div className="absolute top-0 left-0 right-0 z-10 px-4 pt-3 pb-3 bg-black/55 backdrop-blur-md border-b border-white/10 text-center">
                 <h2 className="font-extrabold uppercase tracking-wide text-white text-xl md:text-2xl leading-tight [paint-order:stroke] [-webkit-text-stroke:1px_rgba(0,0,0,0.55)] drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]">
                   Workout of the Day
                 </h2>
