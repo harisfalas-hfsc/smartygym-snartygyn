@@ -52,6 +52,7 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
   const [durationFilter, setDurationFilter] = useState("all");
   const [accessFilter, setAccessFilter] = useState("all");
   const [sourceFilter, setSourceFilter] = useState("all");
+  const [visibilityFilter, setVisibilityFilter] = useState("all");
   const [sortOrder, setSortOrder] = useState("newest");
   const { toast } = useToast();
 
@@ -61,7 +62,7 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
 
   useEffect(() => {
     filterWorkouts();
-  }, [workouts, searchTerm, categoryFilter, formatFilter, equipmentFilter, difficultyFilter, durationFilter, accessFilter, sourceFilter, sortOrder]);
+  }, [workouts, searchTerm, categoryFilter, formatFilter, equipmentFilter, difficultyFilter, durationFilter, accessFilter, sourceFilter, visibilityFilter, sortOrder]);
 
   // Watch for external dialog trigger
   useEffect(() => {
@@ -136,6 +137,12 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
       filtered = filtered.filter(w => w.id.startsWith("WOD-"));
     } else if (sourceFilter === "manual") {
       filtered = filtered.filter(w => !w.is_ai_generated);
+    }
+
+    if (visibilityFilter === "visible") {
+      filtered = filtered.filter(w => w.is_visible !== false);
+    } else if (visibilityFilter === "hidden") {
+      filtered = filtered.filter(w => w.is_visible === false);
     }
 
     // Apply sorting
