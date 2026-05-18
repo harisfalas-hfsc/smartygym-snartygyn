@@ -13,8 +13,6 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTodayWods } from "@/hooks/useTodayWods";
-import { useAccessControl } from "@/contexts/AccessControlContext";
-import { Button } from "@/components/ui/button";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import heroBannerVideo from "@/assets/hero-banner-video.mp4.asset.json";
 import { useIsPortraitMode } from "@/hooks/useIsPortraitMode";
