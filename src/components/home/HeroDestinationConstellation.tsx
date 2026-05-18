@@ -739,13 +739,14 @@ export const HeroDestinationConstellation = () => {
 
       {/* ============ DESKTOP ============ */}
       <div className="hidden md:block">
+        <DesktopVideoBanner />
         <div
           ref={desktopWrapperRef}
           className="relative mx-auto"
           style={{
             width: "100%",
             maxWidth: "100%",
-            height: `${530 * desktopScale}px`,
+            height: `${530 * 0.75 * desktopScale}px`,
             overflow: "hidden",
           }}
         >
@@ -753,9 +754,11 @@ export const HeroDestinationConstellation = () => {
             style={{
               width: `${desktopStageWidth}px`,
               height: "530px",
-              transform: `scale(${desktopScale})`,
-              transformOrigin: "top left",
-              position: "relative",
+              transform: `translateX(-50%) scale(${desktopScale * 0.75})`,
+              transformOrigin: "top center",
+              position: "absolute",
+              top: 0,
+              left: "50%",
             }}
           >
           {/* Soft radial glow background */}
