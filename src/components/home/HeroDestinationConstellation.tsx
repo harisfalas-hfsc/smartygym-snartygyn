@@ -218,13 +218,19 @@ const DesktopVideoHero = ({ width, height }: { width: number; height: number }) 
         <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/10 to-transparent" aria-hidden="true" />
         <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/50 to-transparent" aria-hidden="true" />
 
-        {/* Brand message — centered at top */}
-        <div className="absolute inset-x-0 top-0 flex items-start justify-center pt-6 px-6">
-          <div className="text-center px-6 py-3 rounded-2xl bg-black/55 backdrop-blur-md border border-white/20 shadow-xl shadow-black/40">
-            <h2 className="text-white text-2xl lg:text-4xl font-extrabold leading-tight drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)]">
+        {/* Brand message — centered at top, no backdrop so the video stays visible */}
+        <div className="absolute inset-x-0 top-0 flex items-start justify-center pt-5 px-6 pointer-events-none">
+          <div
+            className="text-center"
+            style={{
+              textShadow:
+                "0 1px 2px rgba(0,0,0,0.95), 0 2px 8px rgba(0,0,0,0.85), 0 0 18px rgba(0,0,0,0.7)",
+            }}
+          >
+            <h2 className="text-white text-2xl lg:text-4xl font-extrabold leading-tight tracking-tight">
               100% Human. <span className="text-red-500">0% AI.</span>
             </h2>
-            <p className="text-white text-sm lg:text-base font-medium mt-1.5 drop-shadow-[0_1px_4px_rgba(0,0,0,0.7)] max-w-xl">
+            <p className="text-white text-sm lg:text-base font-semibold mt-1 max-w-xl mx-auto">
               SmartyGym workouts and programs are built to fit YOUR life.
             </p>
           </div>
