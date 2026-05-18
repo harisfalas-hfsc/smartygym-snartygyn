@@ -202,9 +202,6 @@ const RotatingLinkBanner = () => {
 };
 
 const DesktopVideoHero = ({ width, height }: { width: number; height: number }) => {
-  const navigate = useNavigate();
-  const { userTier } = useAccessControl();
-  const showCTA = userTier !== "premium";
   return (
     <div className="mx-auto" style={{ width: `${width}px`, maxWidth: "100%" }}>
       <div
