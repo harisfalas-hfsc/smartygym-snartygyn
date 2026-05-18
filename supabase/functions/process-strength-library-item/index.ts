@@ -95,6 +95,7 @@ Build "main_workout" as a single HTML string containing ALL FIVE sections in thi
 2. 🔥 Activation 5' — dynamic activation drills (bird dog, glute bridge, scap pulls, etc.).
 3. 💪 Main Workout (REPS & SETS) — minimum 4 strength exercises, each with explicit sets × reps × tempo × rest. Group as "<strong>Exercise 1:</strong>" then bullet "4 sets x 8 reps {{exercise:ID:Name}} — Tempo 3-1-1-0, Rest 90s".
 4. ⚡ Finisher — short structural protocol (e.g. "3 rounds for time", "AMRAP 8 min", "EMOM 6 min") with 2-4 exercises, every line with measurable prescription BEFORE the exercise token.
+   - Finisher MUST contain AT LEAST 3 DIFFERENT exercise tokens (not the same exercise repeated). Pick 3 distinct movements that flow together.
 5. 🧘 Cool Down 5' — static stretching for trained muscles.
 
 Formatting rules (memory: workout-structure-exact-format):
@@ -117,20 +118,42 @@ OUTPUT FORMAT — STRICT JSON, NO MARKDOWN FENCES
   "tips": "<p class=\\"tiptap-paragraph\\">3-5 coaching cues as separate sentences or <br> lines covering technique, breathing, progression.</p>"
 }
 
-Return ONLY the JSON object. No prose, no markdown fences.`;
+Return ONLY the JSON object. No prose, no markdown fences.
+
+═══════════════════════════════════════════════════════════════════════════════
+CRITICAL — main_workout MUST contain {{exercise:ID:Name}} tokens
+═══════════════════════════════════════════════════════════════════════════════
+• MINIMUM 4 distinct exercise tokens in the Main Workout (💪) section.
+• MINIMUM 3 DISTINCT (different) exercise tokens in the Finisher (⚡) section — never repeat the same exercise 3 times.
+• Use exact IDs from the EXERCISE LIBRARY above. NEVER invent IDs. NEVER write an exercise name without wrapping it in {{exercise:ID:Name}}.
+• Activation, Soft Tissue Prep, and Cool Down may use plain text drills (foam roll, stretches) — but Main Workout and Finisher MUST use the {{exercise:ID:Name}} markup for every working exercise.
+
+EXACT FORMAT STRUCTURE for one main-workout exercise line — replace <ID> and <Name> with REAL values from the EXERCISE LIBRARY above (never invent IDs):
+<p class="tiptap-paragraph"><strong>Exercise 1: <Name></strong></p>
+<ul class="tiptap-bullet-list"><li class="tiptap-list-item">4 sets x 8 reps {{exercise:<ID>:<Name>}} — Tempo 3-1-1-0, Rest 120s</li></ul>
+
+EXACT FORMAT STRUCTURE for finisher (3 DIFFERENT exercises, all IDs from the library):
+<p class="tiptap-paragraph">⚡ <strong><u>Finisher (AMRAP)</u></strong></p>
+<p class="tiptap-paragraph">AMRAP 8 minutes:</p>
+<ul class="tiptap-bullet-list">
+<li class="tiptap-list-item">10 reps {{exercise:<ID1>:<Name1>}}</li>
+<li class="tiptap-list-item">12 reps {{exercise:<ID2>:<Name2>}}</li>
+<li class="tiptap-list-item">15 reps {{exercise:<ID3>:<Name3>}}</li>
+</ul>
+
+CRITICAL ID RULE: every <ID> you write MUST be copied verbatim from the EXERCISE LIBRARY list above. NEVER invent IDs like 0001 or 1234. Pick the exercise from the library, then write its real ID and real Name in the token. If you cannot find a perfect match, pick the closest library exercise — never skip the token, never invent an ID.`;
 }
 
 async function callLovableAI(prompt: string, apiKey: string): Promise<string> {
-  // Use Gemini 2.5 Flash with strict JSON mode — much more reliable than Pro
-  // for structured output (Pro often returns reasoning-only with empty content).
+  // Model locked by user decision: openai/gpt-5 for strictest JSON + token compliance.
+  // DO NOT change without explicit user approval.
   const body = {
-    model: "google/gemini-2.5-flash",
+    model: "openai/gpt-5",
     messages: [
       { role: "system", content: "You are a precise JSON generator. Always return ONE valid JSON object matching the requested schema. Never include markdown fences, prose, or explanations." },
       { role: "user", content: prompt },
     ],
     response_format: { type: "json_object" },
-    temperature: 0.7,
   };
   const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
@@ -282,6 +305,18 @@ serve(async (req) => {
       const raw = await callLovableAI(prompt, LOVABLE_KEY);
       const ai = extractJson(raw);
       if (!ai.name || !ai.main_workout) throw new Error("AI response missing name or main_workout");
+      log("AI name:", ai.name);
+      log("AI main_workout length:", String(ai.main_workout).length, "preview:", String(ai.main_workout).slice(0, 400).replace(/\s+/g, " "));
+      // Log the finisher portion specifically
+      const finIdx = String(ai.main_workout).indexOf("⚡");
+      const coolIdx = String(ai.main_workout).indexOf("🧘");
+      const finisherSlice = finIdx >= 0 ? String(ai.main_workout).slice(finIdx, coolIdx > 0 ? coolIdx : finIdx + 800) : "(no ⚡ found)";
+      log("AI finisher slice:", finisherSlice.replace(/\s+/g, " "));
+      const tokenCount = (String(ai.main_workout).match(/\{\{exercise:/g) || []).length;
+      log("AI exercise-token count:", tokenCount);
+      if (tokenCount < 4) {
+        throw new Error(`AI produced only ${tokenCount} {{exercise:ID:Name}} tokens (need 4+ in main_workout alone). Preview: ${String(ai.main_workout).slice(0, 300).replace(/\s+/g, " ")}`);
+      }
 
       // 4) Process exercise tokens (library-first)
       let main: string = ai.main_workout;
@@ -295,6 +330,18 @@ serve(async (req) => {
       // 5) Sanitize protocols + normalize html
       const sanitized = sanitizeProtocolBlocks(main);
       main = normalizeWorkoutHtml(sanitized.cleaned);
+
+      // Re-link any exercises that lost their markup during reject/sanitize/normalize
+      const relinked = guaranteeAllExercisesLinked(main, exercises, "[STR-BATCH][RELINK]");
+      main = relinked.processedContent;
+
+      // Debug: log finisher slice after full pipeline
+      {
+        const fIdx = main.indexOf("⚡");
+        const cIdx = main.indexOf("🧘");
+        const slice = fIdx >= 0 ? main.slice(fIdx, cIdx > 0 ? cIdx : fIdx + 800) : "(no ⚡)";
+        log("POST-PIPELINE finisher slice:", slice.replace(/\s+/g, " "));
+      }
 
       // 6) Section + protocol + quality gate validation
       const secVal = validateWodSections(main, false);
