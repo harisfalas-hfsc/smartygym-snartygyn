@@ -47,6 +47,113 @@ function extractSection(html: string, startIcon: string, endIcons: string[]): st
   return html.slice(start, end);
 }
 
+/** Detect the format declared inside a section header like "Main Workout (EMOM)". */
+function detectSectionFormat(section: string): string {
+  const m = section.match(/\((TABATA|EMOM|AMRAP|FOR\s*TIME|CIRCUIT|REPS\s*&\s*SETS|MIX)\)/i);
+  return m ? m[1].toUpperCase().replace(/\s+/g, " ") : "";
+}
+
+/** Count exercise-token lines inside a section (used for chipper/ladder detection). */
+function countExerciseLines(section: string): number {
+  const lis = section.split(/<li[^>]*>/i).slice(1);
+  return lis.filter((s) => /\{\{exercise:/i.test(s)).length;
+}
+
+/** Extract the leading rep number of each exercise <li> for ladder/chipper detection. */
+function leadingRepsPerLine(section: string): number[] {
+  const lis = section.split(/<li[^>]*>/i).slice(1);
+  const reps: number[] = [];
+  for (const raw of lis) {
+    if (!/\{\{exercise:/i.test(raw)) continue;
+    const text = raw.replace(/<[^>]+>/g, " ").replace(/&nbsp;/gi, " ").trim();
+    const before = text.split(/\{\{exercise:/i)[0] || "";
+    const m = before.match(/(?:^|\s)(\d+)\b/);
+    if (m) reps.push(parseInt(m[1], 10));
+  }
+  return reps;
+}
+
+/**
+ * Format-specific structural check for ONE section (Main Workout or Finisher).
+ * Returns an explanatory failure string if the section is missing the
+ * mandatory rounds / cap / total-minutes / chipper structure for its format.
+ */
+function validateSectionStructure(
+  label: "Main Workout" | "Finisher",
+  section: string,
+): string | null {
+  if (!section) return null;
+  const fmt = detectSectionFormat(section);
+  if (!fmt) return null; // not a protocol section
+  const text = section.replace(/<[^>]+>/g, " ").replace(/&nbsp;/gi, " ").replace(/\s+/g, " ");
+
+  // EMOM: must declare total minutes OR have Minute labels plus a "Repeat N rounds = M minutes" line.
+  if (fmt === "EMOM") {
+    const explicitTotal = /\b\d+[\s-]*minute\s+EMOM\b/i.test(text);
+    const hasLabels = /\bMinute\s+\d+\b/i.test(text);
+    const repeatTotal = /\brepeat\s+\d+\s+rounds?\s*=\s*\d+\s*min(?:utes?)?\b/i.test(text);
+    const totalEquals = /=\s*\d+\s*min(?:utes?)?\b/i.test(text);
+    if (!(explicitTotal || (hasLabels && (repeatTotal || totalEquals)))) {
+      return `${label} (EMOM) is missing total duration. Add either "N-minute EMOM" in the header body or a "Repeat N rounds = M minutes" line.`;
+    }
+    return null;
+  }
+
+  // AMRAP: must declare a time cap.
+  if (fmt === "AMRAP") {
+    const hasCap =
+      /\b\d+[\s-]*minute\s+AMRAP\b/i.test(text) ||
+      /AMRAP\s*(?:in|for)?\s*\d+\s*min(?:utes?)?\b/i.test(text) ||
+      /as\s+many\s+rounds?\s+as\s+possible\s+(?:in|within|for)\s+\d+\s*min(?:utes?)?\b/i.test(text) ||
+      /\b(?:cap|time\s*cap|time\s*limit)[:\s]*\d+\s*min(?:utes?)?\b/i.test(text) ||
+      /\bin\s+\d+\s*min(?:utes?)?\b/i.test(text);
+    if (!hasCap) {
+      return `${label} (AMRAP) is missing a time cap. Add "in N minutes" or "N-minute AMRAP".`;
+    }
+    return null;
+  }
+
+  // FOR TIME / CIRCUIT: must declare rounds, a chipper ladder (descending reps),
+  // a time cap, OR be a single very-high-volume challenge (e.g. "100 burpees for time").
+  if (fmt === "FOR TIME" || fmt === "CIRCUIT") {
+    const hasRounds =
+      /\b(?:complete|perform|repeat|do)\s+\d+\s+rounds?\b/i.test(text) ||
+      /\b\d+\s+rounds?\s+(?:for\s+time|total|of|with)\b/i.test(text) ||
+      /\brounds?\s*:\s*\d+\b/i.test(text);
+    const hasCap =
+      /\b(?:cap|time\s*cap|time\s*limit)[:\s]*\d+\s*min(?:utes?)?\b/i.test(text) ||
+      /\bwithin\s+\d+\s*min(?:utes?)?\b/i.test(text);
+    const reps = leadingRepsPerLine(section);
+    const isDescending = reps.length >= 3 &&
+      reps.every((n, i) => i === 0 || n < reps[i - 1]);
+    const isAscending = reps.length >= 3 &&
+      reps.every((n, i) => i === 0 || n > reps[i - 1]);
+    const isLadder = isDescending || isAscending;
+    const lineCount = countExerciseLines(section);
+    const singleHighVolume = lineCount === 1 && reps[0] >= 50;
+    if (!(hasRounds || hasCap || isLadder || singleHighVolume)) {
+      return `${label} (${fmt}) is missing rounds, time cap, or descending/ascending ladder. One round of a short rep list is not a valid ${fmt} workout.`;
+    }
+    return null;
+  }
+
+  // TABATA: must reference 20/10 x 8 protocol OR contain enough exercise blocks
+  // to compute a real duration (every Tabata exercise = 4 minutes).
+  if (fmt === "TABATA") {
+    const explicit =
+      /\b20\s*(?:sec|seconds?|s)\b[\s\S]{0,40}\b10\s*(?:sec|seconds?|s)\b/i.test(text) ||
+      /\b8\s*(?:rounds?|x|sets?)\b/i.test(text) ||
+      /\b\d+\s*(?:tabata\s*)?blocks?\b/i.test(text);
+    const lineCount = countExerciseLines(section);
+    if (!explicit && lineCount < 2) {
+      return `${label} (TABATA) must declare the 20-sec/10-sec x 8 protocol or list multiple Tabata blocks.`;
+    }
+    return null;
+  }
+
+  return null;
+}
+
 function stripHtmlToLines(section: string): string[] {
   // Split by <li> boundaries → one logical exercise line per <li>.
   const liSegments = section.split(/<li[^>]*>/i).slice(1);
@@ -107,9 +214,18 @@ export function applyWodQualityGate(args: {
     );
   }
 
-  // 2) Finisher structure keyword.
+  // 2) Per-section STRUCTURE check (rounds / time cap / EMOM total / Tabata protocol).
+  //    Catches the "For Time with 1 round of 5 exercises" anti-pattern that used
+  //    to slip through the loose keyword regex below.
+  const mainSection = extractSection(mainWorkoutHtml, "💪", ["⚡", "🧘"]);
   const finisherSection = extractSection(mainWorkoutHtml, "⚡", ["🧘"]);
-  if (finisherSection) {
+  const mainStructureFail = validateSectionStructure("Main Workout", mainSection);
+  const finStructureFail = validateSectionStructure("Finisher", finisherSection);
+  if (mainStructureFail) failures.push(mainStructureFail);
+  if (finStructureFail) failures.push(finStructureFail);
+
+  // 3) Loose finisher keyword fallback (kept for non-protocol finishers).
+  if (finisherSection && !detectSectionFormat(finisherSection)) {
     if (!STRUCTURE_KEYWORD_RE.test(finisherSection)) {
       failures.push(
         "Finisher is missing structural prescription (rounds / sets / AMRAP cap / EMOM / Tabata / Complete N).",
@@ -117,8 +233,7 @@ export function applyWodQualityGate(args: {
     }
   }
 
-  // 3) Per-line prescription check on Main + Finisher.
-  const mainSection = extractSection(mainWorkoutHtml, "💪", ["⚡", "🧘"]);
+  // 4) Per-line prescription check on Main + Finisher.
   const unmeasurableMain = findUnmeasurableLines(mainSection);
   const unmeasurableFin = findUnmeasurableLines(finisherSection);
   if (unmeasurableMain.length) {
