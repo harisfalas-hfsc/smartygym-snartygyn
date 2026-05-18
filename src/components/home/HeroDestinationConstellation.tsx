@@ -53,6 +53,30 @@ const RotatingLinkBanner = () => {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const prefersReducedMotion = useRef(false);
+  const touchStartX = useRef<number | null>(null);
+  const touchDeltaX = useRef(0);
+
+  const goPrev = () => setIndex((i) => (i - 1 + ROTATING_LINKS.length) % ROTATING_LINKS.length);
+  const goNext = () => setIndex((i) => (i + 1) % ROTATING_LINKS.length);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchDeltaX.current = 0;
+    setPaused(true);
+  };
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    touchDeltaX.current = e.touches[0].clientX - touchStartX.current;
+  };
+  const handleTouchEnd = () => {
+    const dx = touchDeltaX.current;
+    const threshold = 40;
+    if (dx > threshold) goPrev();
+    else if (dx < -threshold) goNext();
+    touchStartX.current = null;
+    touchDeltaX.current = 0;
+    setPaused(false);
+  };
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -94,8 +118,11 @@ const RotatingLinkBanner = () => {
     <div
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
       aria-live="polite"
-      className="w-full max-w-md"
+      className="w-full max-w-md touch-pan-y select-none"
     >
       <button
         type="button"
