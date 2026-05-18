@@ -219,9 +219,9 @@ const DesktopVideoHero = ({ width, height }: { width: number; height: number }) 
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
         />
-        {/* Readability gradient — darker on left for CTA, fades to bottom for banner */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/25 to-black/10" aria-hidden="true" />
-        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/70 via-black/20 to-transparent" aria-hidden="true" />
+        {/* Readability gradient — lighter so video stays vivid in light mode */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/10 to-transparent" aria-hidden="true" />
+        <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/50 to-transparent" aria-hidden="true" />
 
         {/* CTA — left side, vertically centered */}
         {showCTA && (
