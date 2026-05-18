@@ -900,62 +900,11 @@ export const HeroDestinationConstellation = () => {
 
       {/* ============ DESKTOP ============ */}
       <div className="hidden md:block">
-        <DesktopVideoBanner width={(desktopStageWidth - 40) * desktopScale} />
-        <div
-          ref={desktopWrapperRef}
-          className="relative mx-auto"
-          style={{
-            width: "100%",
-            maxWidth: "100%",
-            height: `${530 * desktopScale}px`,
-            overflow: "hidden",
-          }}
-        >
-          <div
-            style={{
-              width: `${desktopStageWidth}px`,
-              height: "530px",
-              transform: `translateX(-50%) scale(${desktopScale})`,
-              transformOrigin: "top center",
-              position: "absolute",
-              top: 0,
-              left: "50%",
-            }}
-          >
-          {/* Soft radial glow background */}
-          <svg
-            className="absolute inset-0 w-full h-full pointer-events-none"
-            viewBox={`0 0 ${desktopStageWidth} 530`}
-            preserveAspectRatio="xMidYMid meet"
-            aria-hidden="true"
-          >
-            <defs>
-              <radialGradient id="bento-glow" cx="50%" cy="40%" r="60%">
-                <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.08" />
-                <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0" />
-              </radialGradient>
-            </defs>
-            <rect width={desktopStageWidth} height="530" fill="url(#bento-glow)" />
-          </svg>
-
-          {DESTINATIONS.map((dest) => {
-            const pos = bentoLayout[dest.id];
-            if (!pos) return null;
-            return (
-              <BentoTile
-                key={dest.id}
-                dest={dest}
-                isWodLive={hasWods}
-                width={pos.width}
-                height={pos.height}
-                cycleImages={dest.featured ? wodCycleImages : undefined}
-                cycleWods={dest.featured ? wodCycleData : undefined}
-                className="absolute"
-                style={{ top: `${pos.top}px`, left: `${pos.left}px` }}
-              />
-            );
-          })}
-          </div>
+        <div ref={desktopWrapperRef} className="w-full">
+          <DesktopVideoHero
+            width={(desktopStageWidth - 40) * desktopScale}
+            height={Math.round(530 * desktopScale)}
+          />
         </div>
       </div>
 
