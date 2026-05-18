@@ -757,14 +757,14 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://smartygym.com/workout/calorie-burning/WOD-CB-E-1779001224102</loc>
-    <lastmod>2026-05-17</lastmod>
+    <loc>https://smartygym.com/workout/challenge/WOD-CH-E-1777242603037</loc>
+    <lastmod>2026-04-30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://smartygym.com/workout/challenge/WOD-CH-E-1777242603037</loc>
-    <lastmod>2026-04-30</lastmod>
+    <loc>https://smartygym.com/workout/calorie-burning/WOD-CB-E-1779001224102</loc>
+    <lastmod>2026-05-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -2137,12 +2137,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://smartygym.com/workout/metabolic/WOD-M-B-1779088804293</loc>
-    <lastmod>2026-05-18</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://smartygym.com/workout/strength/WOD-S-E-1775601002299</loc>
     <lastmod>2026-05-08</lastmod>
     <changefreq>weekly</changefreq>
@@ -2151,6 +2145,12 @@
   <url>
     <loc>https://smartygym.com/workout/metabolic/WOD-M-B-1772749804560</loc>
     <lastmod>2026-04-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://smartygym.com/workout/metabolic/WOD-M-B-1779088804293</loc>
+    <lastmod>2026-05-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
