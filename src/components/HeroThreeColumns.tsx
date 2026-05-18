@@ -11,9 +11,6 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SwipeToExplore } from "@/components/ui/SwipeToExplore";
-import { Button } from "@/components/ui/button";
-import { useAccessControl } from "@/contexts/AccessControlContext";
-import heroBannerVideo from "@/assets/hero-banner-video.mp4.asset.json";
 import {
   Carousel,
   CarouselContent,
@@ -86,8 +83,6 @@ const heroCards = [
 
 export const HeroThreeColumns = () => {
   const navigate = useNavigate();
-  const { userTier } = useAccessControl();
-  const showCTA = userTier !== "premium";
   const [api, setApi] = useState<CarouselApi>();
   const autoplayRef = useRef(
     Autoplay({ delay: 4000, stopOnInteraction: true })
@@ -111,40 +106,6 @@ export const HeroThreeColumns = () => {
 
   return (
     <div className="mt-6 relative">
-      {/* Wide video banner — desktop only, above the hero cards */}
-      <div className="hidden md:block mb-4">
-        <div className="relative border-2 border-primary/40 rounded-xl overflow-hidden h-[200px] group">
-          <video
-            src={heroBannerVideo.url}
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full h-full object-cover"
-          />
-          {showCTA && (
-            <>
-              <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent" />
-              <div className="absolute inset-0 flex items-center">
-                <div className="pl-10 max-w-xl">
-                  <h2 className="text-white text-2xl lg:text-3xl font-bold leading-tight mb-3 drop-shadow-lg">
-                    Your gym, re-imagined.
-                  </h2>
-                  <Button
-                    size="lg"
-                    onClick={() => navigate(userTier === "guest" ? "/auth" : "/premium-benefits")}
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-xl"
-                  >
-                    Start your fitness journey now
-                    <ChevronRight className="w-4 h-4 ml-1" />
-                  </Button>
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-
       {/* Swipe to explore indicator */}
       <div className="flex md:hidden">
         <SwipeToExplore onPrev={() => api?.scrollPrev()} onNext={() => api?.scrollNext()} />
@@ -174,7 +135,7 @@ export const HeroThreeColumns = () => {
                     "cursor-pointer group border-2 border-primary/40 rounded-xl overflow-hidden",
                     "hover:border-primary hover:shadow-2xl hover:scale-[1.05] hover:z-10",
                     "transition-all duration-300 ease-out",
-                    "h-[220px] md:h-[135px]",
+                    "h-[220px] md:h-[180px]",
                     "flex flex-col md:relative bg-card"
                   )}
                 >
