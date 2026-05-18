@@ -279,7 +279,7 @@ const DesktopCardCarousel = ({ width, cardHeight }: { width?: number; cardHeight
   const [api, setApi] = useState<CarouselApi>();
 
   return (
-    <div className="mx-auto px-10" style={width ? { width: `${width}px`, maxWidth: "100%" } : undefined}>
+    <div className="mx-auto px-16" style={width ? { width: `${width}px`, maxWidth: "100%" } : undefined}>
       <Carousel
         setApi={setApi}
         opts={{ align: "center", loop: true, dragFree: false }}
@@ -292,7 +292,7 @@ const DesktopCardCarousel = ({ width, cardHeight }: { width?: number; cardHeight
           {DESKTOP_CARDS.map((card) => {
             const Icon = card.icon;
             return (
-              <CarouselItem key={card.id} className="pl-3 basis-1/4">
+              <CarouselItem key={card.id} className="pl-3 basis-1/3">
                 <button
                   type="button"
                   onClick={() => navigate(card.route)}
@@ -323,8 +323,8 @@ const DesktopCardCarousel = ({ width, cardHeight }: { width?: number; cardHeight
             );
           })}
         </CarouselContent>
-        <CarouselPrevious className="left-0 w-9 h-9 border-white/30 bg-black/60 text-white hover:bg-primary hover:text-primary-foreground z-20" />
-        <CarouselNext className="right-0 w-9 h-9 border-white/30 bg-black/60 text-white hover:bg-primary hover:text-primary-foreground z-20" />
+        <CarouselPrevious className="left-0 w-14 h-14 [&_svg]:w-6 [&_svg]:h-6 border-white/30 bg-black/60 text-white hover:bg-primary hover:text-primary-foreground z-20" />
+        <CarouselNext className="right-0 w-14 h-14 [&_svg]:w-6 [&_svg]:h-6 border-white/30 bg-black/60 text-white hover:bg-primary hover:text-primary-foreground z-20" />
       </Carousel>
     </div>
   );
