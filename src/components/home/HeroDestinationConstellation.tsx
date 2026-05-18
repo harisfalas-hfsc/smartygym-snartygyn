@@ -33,6 +33,7 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
+  type CarouselApi,
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 
@@ -275,11 +276,25 @@ const DESKTOP_CARDS: DesktopCardItem[] = [
 const DesktopCardCarousel = ({ width, cardHeight }: { width?: number; cardHeight: number }) => {
   const navigate = useNavigate();
   const autoplayRef = useRef(Autoplay({ delay: 3500, stopOnInteraction: false, stopOnMouseEnter: true }));
+  const [api, setApi] = useState<CarouselApi>();
+  const [current, setCurrent] = useState(3);
+  const wodIndex = DESKTOP_CARDS.findIndex((c) => c.id === "wod");
+
+  useEffect(() => {
+    if (!api) return;
+    const onSelect = () => setCurrent(api.selectedScrollSnap());
+    onSelect();
+    api.on("select", onSelect);
+    return () => {
+      api.off("select", onSelect);
+    };
+  }, [api]);
 
   return (
     <div className="mx-auto" style={width ? { width: `${width}px`, maxWidth: "100%" } : undefined}>
       <Carousel
-        opts={{ align: "center", loop: true, dragFree: false }}
+        setApi={setApi}
+        opts={{ align: "center", loop: true, dragFree: false, startIndex: wodIndex }}
         plugins={[autoplayRef.current]}
         className="w-full px-20"
         onMouseEnter={() => autoplayRef.current.stop()}
@@ -323,6 +338,20 @@ const DesktopCardCarousel = ({ width, cardHeight }: { width?: number; cardHeight
         <CarouselPrevious className="left-2 w-14 h-14 [&_svg]:w-6 [&_svg]:h-6 border-white/30 bg-black/60 text-white hover:bg-primary hover:text-primary-foreground z-20" />
         <CarouselNext className="right-2 w-14 h-14 [&_svg]:w-6 [&_svg]:h-6 border-white/30 bg-black/60 text-white hover:bg-primary hover:text-primary-foreground z-20" />
       </Carousel>
+      <div className="flex justify-center gap-1.5 mt-2">
+        {DESKTOP_CARDS.map((card, i) => (
+          <button
+            key={card.id}
+            type="button"
+            onClick={() => api?.scrollTo(i)}
+            aria-label={`Go to ${card.title}`}
+            className={cn(
+              "h-1.5 rounded-full transition-all",
+              i === current ? "w-6 bg-primary" : "w-1.5 bg-white/50 hover:bg-white/80"
+            )}
+          />
+        ))}
+      </div>
     </div>
   );
 };
