@@ -1,5 +1,11 @@
 project_id = "cvccrvyimyzrxcwzmxwk"
 
+[functions.process-strength-library-item]
+verify_jwt = false
+
+[functions.verify-strength-library-batch]
+verify_jwt = false
+
 [functions.fix-stripe-metadata]
 verify_jwt = true
 
