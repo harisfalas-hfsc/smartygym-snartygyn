@@ -132,7 +132,7 @@ const RotatingLinkBanner = () => {
           type="button"
           onClick={goPrev}
           aria-label="Previous destination"
-          className="flex-shrink-0 w-9 h-9 rounded-full bg-background/85 backdrop-blur-md border border-white/25 shadow-lg flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors"
+          className="flex-shrink-0 w-9 h-9 rounded-full bg-black/45 backdrop-blur-md border border-white/30 text-white shadow-lg flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors"
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
@@ -153,31 +153,31 @@ const RotatingLinkBanner = () => {
           key={current.id}
           className={cn(
             "group flex-1 min-w-0 flex items-center gap-4 px-5 py-4 rounded-2xl touch-pan-y cursor-grab active:cursor-grabbing",
-            "bg-background/85 backdrop-blur-xl border border-white/25",
-            "shadow-2xl shadow-primary/20",
-            "hover:bg-background/95 hover:border-primary transition-all",
+            "bg-black/50 backdrop-blur-xl border border-white/25",
+            "shadow-2xl shadow-black/40",
+            "hover:bg-black/65 hover:border-primary transition-all",
             "animate-fade-in text-left"
           )}
         >
-          <span className="flex-shrink-0 w-12 h-12 rounded-full bg-primary/15 ring-2 ring-primary/40 flex items-center justify-center">
-            <Icon className="w-6 h-6 text-primary" />
+          <span className="flex-shrink-0 w-12 h-12 rounded-full bg-primary/25 ring-2 ring-primary/60 flex items-center justify-center">
+            <Icon className="w-6 h-6 text-white" />
           </span>
           <span className="flex-1 min-w-0">
-            <span className="block text-base lg:text-lg font-bold text-foreground leading-tight truncate">
+            <span className="block text-base lg:text-lg font-bold text-white leading-tight truncate drop-shadow">
               {current.title}
             </span>
-            <span className="block text-xs lg:text-sm text-muted-foreground truncate">
+            <span className="block text-xs lg:text-sm text-white/80 truncate">
               {current.tagline}
             </span>
           </span>
-          <ChevronRight className="w-5 h-5 text-primary flex-shrink-0 group-hover:translate-x-1 transition-transform" />
+          <ChevronRight className="w-5 h-5 text-white flex-shrink-0 group-hover:translate-x-1 transition-transform" />
         </button>
 
         <button
           type="button"
           onClick={goNext}
           aria-label="Next destination"
-          className="flex-shrink-0 w-9 h-9 rounded-full bg-background/85 backdrop-blur-md border border-white/25 shadow-lg flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors"
+          className="flex-shrink-0 w-9 h-9 rounded-full bg-black/45 backdrop-blur-md border border-white/30 text-white shadow-lg flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors"
         >
           <ChevronRight className="w-5 h-5" />
         </button>
@@ -219,9 +219,9 @@ const DesktopVideoHero = ({ width, height }: { width: number; height: number }) 
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
         />
-        {/* Readability gradient — darker on left for CTA, fades to bottom for banner */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/25 to-black/10" aria-hidden="true" />
-        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/70 via-black/20 to-transparent" aria-hidden="true" />
+        {/* Readability gradient — lighter so video stays vivid in light mode */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/10 to-transparent" aria-hidden="true" />
+        <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/50 to-transparent" aria-hidden="true" />
 
         {/* CTA — left side, vertically centered */}
         {showCTA && (
