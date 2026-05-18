@@ -33,7 +33,6 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-  type CarouselApi,
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 
@@ -276,15 +275,13 @@ const DESKTOP_CARDS: DesktopCardItem[] = [
 const DesktopCardCarousel = ({ width, cardHeight }: { width?: number; cardHeight: number }) => {
   const navigate = useNavigate();
   const autoplayRef = useRef(Autoplay({ delay: 3500, stopOnInteraction: false, stopOnMouseEnter: true }));
-  const [api, setApi] = useState<CarouselApi>();
 
   return (
-    <div className="mx-auto px-16" style={width ? { width: `${width}px`, maxWidth: "100%" } : undefined}>
+    <div className="mx-auto" style={width ? { width: `${width}px`, maxWidth: "100%" } : undefined}>
       <Carousel
-        setApi={setApi}
         opts={{ align: "center", loop: true, dragFree: false }}
         plugins={[autoplayRef.current]}
-        className="w-full"
+        className="w-full px-20"
         onMouseEnter={() => autoplayRef.current.stop()}
         onMouseLeave={() => autoplayRef.current.play()}
       >
@@ -323,8 +320,8 @@ const DesktopCardCarousel = ({ width, cardHeight }: { width?: number; cardHeight
             );
           })}
         </CarouselContent>
-        <CarouselPrevious className="left-0 w-14 h-14 [&_svg]:w-6 [&_svg]:h-6 border-white/30 bg-black/60 text-white hover:bg-primary hover:text-primary-foreground z-20" />
-        <CarouselNext className="right-0 w-14 h-14 [&_svg]:w-6 [&_svg]:h-6 border-white/30 bg-black/60 text-white hover:bg-primary hover:text-primary-foreground z-20" />
+        <CarouselPrevious className="left-2 w-14 h-14 [&_svg]:w-6 [&_svg]:h-6 border-white/30 bg-black/60 text-white hover:bg-primary hover:text-primary-foreground z-20" />
+        <CarouselNext className="right-2 w-14 h-14 [&_svg]:w-6 [&_svg]:h-6 border-white/30 bg-black/60 text-white hover:bg-primary hover:text-primary-foreground z-20" />
       </Carousel>
     </div>
   );
