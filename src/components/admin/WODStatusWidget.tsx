@@ -12,6 +12,7 @@ interface WodStatus {
   found: number;
   expected: number;
   variants: string[];
+  wods: { id: string; name: string; category: string | null; variant: string }[];
   lastRunStatus: string | null;
   lastRunTime: string | null;
   lastRunSource: string | null;
@@ -47,6 +48,13 @@ export const WODStatusWidget = () => {
         .map((w: any) => normalizeWodEquipment(w.equipment))
         .filter(Boolean);
 
+      const wods = todayWods.map((w: any) => ({
+        id: w.id,
+        name: w.name,
+        category: w.category ?? null,
+        variant: normalizeWodEquipment(w.equipment),
+      }));
+
       // Determine expected count from run or default to 2
       const expected = latestRun?.expected_count || 2;
 
@@ -55,6 +63,7 @@ export const WODStatusWidget = () => {
         found: variants.length,
         expected,
         variants,
+        wods,
         lastRunStatus: latestRun?.status || null,
         lastRunTime: latestRun?.completed_at || null,
         lastRunSource: latestRun?.trigger_source || null,
@@ -170,6 +179,30 @@ export const WODStatusWidget = () => {
               ) : null
             )}
         </div>
+
+        {/* Today's WOD names + categories */}
+        {status.wods.length > 0 && (
+          <div className="space-y-1 rounded-md border border-border/60 bg-muted/30 p-2">
+            {status.wods.map((w) => (
+              <div
+                key={w.id}
+                className="flex items-center justify-between gap-2 text-xs"
+              >
+                <span className="font-medium truncate">{w.name}</span>
+                <div className="flex items-center gap-1 shrink-0">
+                  {w.category && (
+                    <Badge variant="secondary" className="text-[10px] py-0">
+                      {w.category}
+                    </Badge>
+                  )}
+                  <Badge variant="outline" className="text-[10px] py-0">
+                    {w.variant}
+                  </Badge>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Last run info */}
         {status.lastRunStatus && (
