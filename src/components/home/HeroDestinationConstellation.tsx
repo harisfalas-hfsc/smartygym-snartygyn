@@ -422,16 +422,23 @@ const BentoTile = ({
             />
           ))}
           </div>
-          {/* Bottom gradient for label legibility */}
-          <div
-            className={cn(
-              "absolute inset-0 transition-opacity duration-500 group-hover:opacity-90",
-              activeWod
-                ? "bg-gradient-to-t from-black/65 via-black/20 to-transparent"
-                : "bg-gradient-to-t from-black/70 via-black/15 to-transparent"
-            )}
-            aria-hidden="true"
-          />
+          {/* Bottom gradient for label legibility — image-independent dark scrim */}
+          {dest.featured ? (
+            <div
+              className="absolute bottom-0 left-0 right-0 h-[60%] bg-gradient-to-t from-black/85 via-black/45 to-transparent transition-opacity duration-500 group-hover:opacity-95"
+              aria-hidden="true"
+            />
+          ) : (
+            <div
+              className={cn(
+                "absolute inset-0 transition-opacity duration-500 group-hover:opacity-90",
+                activeWod
+                  ? "bg-gradient-to-t from-black/65 via-black/20 to-transparent"
+                  : "bg-gradient-to-t from-black/70 via-black/15 to-transparent"
+              )}
+              aria-hidden="true"
+            />
+          )}
 
           {/* Featured pulsing ring */}
           {dest.featured && (
@@ -441,23 +448,24 @@ const BentoTile = ({
             />
           )}
 
-          {/* Prominent header band on the WOD (featured) tile */}
+          {/* Prominent header band on the WOD (featured) tile — frosted dark bar, image-independent */}
           {dest.featured && (
-            <div className="absolute top-0 left-0 right-0 z-10 px-4 pt-3 pb-4 bg-gradient-to-b from-black/75 via-black/45 to-transparent">
-              <div className="flex items-center justify-between gap-3">
-                <h2 className="font-extrabold uppercase tracking-wide text-white drop-shadow-lg text-xl md:text-2xl leading-tight">
+            <>
+              <div className="absolute top-0 left-0 right-0 z-10 px-4 pt-3 pb-3 bg-black/55 backdrop-blur-md border-b border-white/10">
+                <h2 className="font-extrabold uppercase tracking-wide text-white text-xl md:text-2xl leading-tight [paint-order:stroke] [-webkit-text-stroke:1px_rgba(0,0,0,0.55)] drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]">
                   Workout of the Day
                 </h2>
-                {showLivePill && (
-                  <span className="shrink-0 px-2 py-0.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold tracking-wider uppercase shadow-md">
-                    Today
-                  </span>
-                )}
+                <p className="mt-0.5 text-white/90 text-xs md:text-sm font-medium drop-shadow-[0_1px_4px_rgba(0,0,0,0.6)]">
+                  {todayLabel}
+                </p>
               </div>
-              <p className="mt-0.5 text-white/85 text-xs md:text-sm font-medium drop-shadow-md">
-                {todayLabel}
-              </p>
-            </div>
+              {/* Soft fade strip below the bar so it blends into the image */}
+              <div
+                aria-hidden="true"
+                className="absolute left-0 right-0 z-[9] h-6 bg-gradient-to-b from-black/40 to-transparent pointer-events-none"
+                style={{ top: "calc(var(--wod-header-h, 64px))" }}
+              />
+            </>
           )}
 
           {/* Icon chip — top right (hidden on featured to avoid clashing with header) */}
@@ -474,11 +482,11 @@ const BentoTile = ({
           {/* Label — bottom left */}
           {activeWod ? (
             <div className="absolute bottom-4 left-4 right-4 z-10 space-y-2">
-              <p className="font-extrabold text-white leading-tight drop-shadow-lg text-2xl md:text-3xl line-clamp-2">
+              <p className="font-extrabold text-white leading-tight text-2xl md:text-3xl line-clamp-2 [paint-order:stroke] [-webkit-text-stroke:1px_rgba(0,0,0,0.55)] drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)]">
                 {activeWod.name}
               </p>
               {activeWod.description && (
-                <p className="text-white/90 text-sm leading-snug drop-shadow-md line-clamp-3">
+                <p className="text-white/95 text-sm leading-snug line-clamp-3 drop-shadow-[0_1px_4px_rgba(0,0,0,0.7)]">
                   {activeWod.description
                     .replace(/<[^>]*>/g, " ")
                     .replace(/&nbsp;/gi, " ")
