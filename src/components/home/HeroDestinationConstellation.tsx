@@ -13,6 +13,10 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTodayWods } from "@/hooks/useTodayWods";
+import { useAccessControl } from "@/contexts/AccessControlContext";
+import { Button } from "@/components/ui/button";
+import { ChevronRight } from "lucide-react";
+import heroBannerVideo from "@/assets/hero-banner-video.mp4.asset.json";
 import { useIsPortraitMode } from "@/hooks/useIsPortraitMode";
 import type { WorkoutData } from "@/hooks/useWorkoutData";
 import { Badge } from "@/components/ui/badge";
