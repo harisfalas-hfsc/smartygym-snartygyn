@@ -355,7 +355,6 @@ const BentoTile = ({
   const navigate = useNavigate();
   const Icon = dest.icon;
   const showLivePill = dest.featured && isWodLive;
-  const hoverScale = dest.featured ? 1.03 : 1.04;
 
   const images = cycleImages && cycleImages.length > 0 ? cycleImages : [dest.image];
   const [imgIndex, setImgIndex] = useState(0);
