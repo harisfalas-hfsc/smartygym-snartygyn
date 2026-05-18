@@ -739,12 +739,6 @@ const Index = () => {
 
                                                 {/* "Your Gym Re-imagined" card - now below carousel on desktop */}
                         <div className="bg-background/60 backdrop-blur-sm p-6 rounded-lg border-2 border-primary/30 mt-4 w-full text-center">
-                            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 text-center text-foreground">
-                              100% Human. <span className="text-destructive">0% AI.</span>
-                            </h2>
-                            <p className="text-base sm:text-lg font-medium text-foreground mb-4">
-                              <span className="text-primary font-semibold">SmartyGym</span> workouts and programs are built to fit YOUR life.
-                            </p>
                             <p className="text-xl font-bold text-primary mb-2">
                               Your Gym Re-imagined Anywhere, Anytime
                             </p>
