@@ -180,6 +180,30 @@ export const WODStatusWidget = () => {
             )}
         </div>
 
+        {/* Today's WOD names + categories */}
+        {status.wods.length > 0 && (
+          <div className="space-y-1 rounded-md border border-border/60 bg-muted/30 p-2">
+            {status.wods.map((w) => (
+              <div
+                key={w.id}
+                className="flex items-center justify-between gap-2 text-xs"
+              >
+                <span className="font-medium truncate">{w.name}</span>
+                <div className="flex items-center gap-1 shrink-0">
+                  {w.category && (
+                    <Badge variant="secondary" className="text-[10px] py-0">
+                      {w.category}
+                    </Badge>
+                  )}
+                  <Badge variant="outline" className="text-[10px] py-0">
+                    {w.variant}
+                  </Badge>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* Last run info */}
         {status.lastRunStatus && (
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
