@@ -731,14 +731,14 @@ const Index = () => {
                 <meta itemProp="url" content="https://smartygym.com" />
                 <meta itemProp="description" content="SmartyGym - #1 online gym and fitness platform by Haris Falas - smartygym.com" />
                 
-                <CardContent className="p-6 md:py-5 md:px-0 relative z-20">
+                <CardContent className="p-6 md:pt-5 md:pb-2 md:px-0 relative z-20">
                         {/* Interactive constellation of destination bubbles */}
                         <div className="mt-0">
                           <HeroDestinationConstellation />
                         </div>
 
                                                 {/* "Your Gym Re-imagined" card - now below carousel on desktop */}
-                        <div className="bg-background/60 backdrop-blur-sm p-6 rounded-lg border-2 border-primary/30 mt-8 w-full text-center">
+                        <div className="bg-background/60 backdrop-blur-sm p-6 rounded-lg border-2 border-primary/30 mt-4 w-full text-center">
                             <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 text-center text-foreground">
                               100% Human. <span className="text-destructive">0% AI.</span>
                             </h2>
