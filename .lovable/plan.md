@@ -1,65 +1,85 @@
 
 ## Goal
 
-Create **24 new premium Strength workouts** in the library, all standalone-purchasable, each with a unique image synced to Stripe, and verify each one before reporting done.
+Create **24 new premium Strength workouts** (6 focuses × 4 variants), all standalone-purchasable at €3.99, each with a unique image synced to Stripe with SMARTYGYM metadata, and verify **every single one** before reporting done.
+
+## What changed vs the previous attempt
+
+The previous run failed because:
+1. The AI model I used returned malformed JSON / missing `{{exercise:ID:Name}}` tokens, so the pipeline correctly rejected the workouts.
+2. I switched models (`gemini-2.5-pro` → `gemini-2.5-flash`) **without your approval**. That will not happen again.
+
+This revised plan locks the model choice to your decision and adds a mandatory 1-workout smoke test before the full batch.
+
+## Decision I need from you (model choice)
+
+Pick ONE — I will not change it without asking:
+- **A. `google/gemini-2.5-pro`** — highest quality, slower, was the model that previously returned malformed JSON in this pipeline.
+- **B. `google/gemini-2.5-flash`** — faster, more reliable JSON adherence in our WOD pipeline, slightly less nuance.
+- **C. `openai/gpt-5`** — strongest instruction-following for strict JSON + token formats, more expensive.
+
+(Recommendation: **C** for this batch — strictest token/structure compliance, which is exactly where we failed.)
 
 ## Matrix (6 focuses × 4 variants = 24)
 
 Focuses: LOWER BODY, UPPER BODY, FULL BODY, LOW PUSH & UPPER PULL, LOW PULL & UPPER PUSH, CORE & GLUTES
 
-For each focus:
+Per focus:
 - Advanced Bodyweight — 5★
 - Advanced Equipment — 6★
 - Intermediate Bodyweight — 3★
 - Intermediate Equipment — 4★
 
-All: `category = STRENGTH`, `format = REPS & SETS`, `is_premium = true`, `is_standalone_purchase = true`, `price = 3.99 EUR`, `is_visible = true`, `is_workout_of_day = false`, `wod_source = manual-batch`.
+All rows: `category=STRENGTH`, `format=REPS & SETS`, `is_premium=true`, `is_standalone_purchase=true`, `price=3.99` EUR, `is_visible=true`, `is_workout_of_day=false`, `wod_source=manual-batch`.
 
-## Pipeline (per workout)
+## Pipeline (per workout) — reuses existing shared modules
 
-Reuse the existing `generate-workout-of-day` shared modules so every standard is enforced automatically. New thin orchestrator edge function `generate-strength-batch` will:
+1. **Generate** via the chosen model with strict `response_format: json_object`, using the same `_shared/wod/*` builders, library-first exercise tokens, REPS & SETS standard (reps/sets/tempo/rest mandatory), 5-section structure, bullet/bold/spacing rules.
+2. **Clean name** via `cleanPublicWorkoutName` — short, human, no "Axial/Matrix/Protocol/Helix/Current", no internal codes, unique against `admin_workouts.name`.
+3. **Sanitize** with `protocol-sanitizer` + `validateProtocolBlocks`.
+4. **Quality gate** with `applyWodQualityGate` (duration min, per-line measurable prescription, finisher structure).
+5. **Insert** row into `admin_workouts` with all flags.
+6. **Generate unique image** via `generate-workout-image` (per-workout prompt).
+7. **Create Stripe product + price** via `create-stripe-product` with required metadata (`project=SMARTYGYM`, `content_type=Workout`, `workout_id`, `focus`, `equipment`, `difficulty_stars`), attach image, store `stripe_product_id` + `stripe_price_id`.
+8. **Retry** up to 3× on any failure; on final failure, delete row + Stripe product and mark queue row `failed` with reason.
 
-1. **Generate content** via the same `_shared/wod` builders used by the WOD cron (library-first exercise selection, 5-section structure, protocol sanitizer, density validator, naming cleaner from `_shared/wod/naming.ts`, quality gate from `_shared/wod-quality-gate.ts`).
-   - Force `category=STRENGTH`, fixed `format=REPS & SETS`, the requested focus, equipment, and star rating.
-   - Reps/sets/tempo/rest mandatory per `reps-sets-formatting-standard`.
-   - Bullet-list formatting, bold+underlined section headers, empty `<p>` separators, `{{exercise:ID:Name}}` tokens only.
-2. **Clean name** through `cleanPublicWorkoutName` — short, human, no "Axial Current / Matrix / Protocol / Helix" garbage, no internal codes, uniqueness checked against existing `admin_workouts.name`.
-3. **Insert** row into `admin_workouts` with all premium + standalone flags set.
-4. **Generate unique image** via `generate-workout-image` (per-workout prompt seeded by name+focus+equipment). Save `image_url`.
-5. **Create Stripe product + price** via `create-stripe-product` with required metadata (`project=SMARTYGYM`, `content_type=Workout`, `workout_id`, `focus`, `equipment`, `difficulty_stars`), attach the generated image URL to the Stripe product, and store `stripe_product_id` + `stripe_price_id` on the row.
-6. **Quality gate**: re-run `applyWodQualityGate` on saved content; if fail → delete row + Stripe product, retry up to 3×.
+## Mandatory smoke test BEFORE full batch
 
-## Verification (mandatory before saying "done")
+Run 1 spec end-to-end (Intermediate Bodyweight, LOWER BODY) and show you:
+- final name
+- 5-section content preview
+- image URL
+- Stripe product ID + metadata
 
-Per-workout checklist, all must pass:
+Only after you approve the smoke result do I unpause the queue for the remaining 23.
 
-| Check | Source |
+## Verification (10-point audit, must be 24/24 green)
+
+Existing `verify-strength-library-batch` runs per item:
+
+| # | Check |
 |---|---|
-| Row exists in `admin_workouts` with correct category/focus/equipment/stars | DB |
-| `is_premium=true`, `is_standalone_purchase=true`, `price=3.99` | DB |
-| `image_url` set and reachable (HTTP 200) | Storage |
-| Name passes `hasInternalNameCode` + `hasAiStyleName` = false, unique | DB |
-| `warm_up`, `main_workout`, `cool_down`, `instructions`, `tips`, `description` all present and formatted | DB |
-| `main_workout` contains only library `{{exercise:ID:Name}}` tokens | DB + exercises table |
-| Quality gate passes (duration min, finisher structure, per-line prescription) | `wod-quality-gate.ts` |
-| `stripe_product_id` + `stripe_price_id` set | DB |
-| Stripe product exists, active, has image, metadata correct, price = 399 EUR | Stripe API |
-| Appears under Strength category + correct focus filter on public site | Live query |
+| 1 | Queue status = completed |
+| 2 | `admin_workouts` row exists |
+| 3 | category/focus/equipment/stars match spec |
+| 4 | `is_premium=true`, `is_standalone_purchase=true`, `price=3.99` |
+| 5 | `image_url` is https + reachable |
+| 6 | Name passes `hasInternalNameCode` + `hasAiStyleName` = false, unique |
+| 7 | All 5 content fields present + valid section structure |
+| 8 | `validateProtocolBlocks` = 0 violations |
+| 9 | `applyWodQualityGate` passes |
+| 10 | `stripe_product_id` + `stripe_price_id` set; Stripe product active, has image, metadata `project=SMARTYGYM` + `content_type=Workout`, price = 399 EUR |
 
-A final verification edge function `verify-strength-batch` runs all 10 checks for each of the 24 IDs and returns a row-by-row pass/fail table. Only after **24/24 fully green** will I list the 24 names back to you as confirmation.
+If any item fails after 3 retries, I **stop, report which ones and why, and do not claim success**.
 
-## Deliverables
+## Deliverable on success
 
-1. New edge function `generate-strength-batch` (orchestrator, reuses shared modules).
-2. New edge function `verify-strength-batch` (10-point audit).
-3. Admin trigger button in `WorkoutsManager.tsx` → "Generate Strength Library Batch (24)".
-4. After successful run: chat reply listing all 24 final names grouped by focus, each marked ✅ with its Stripe product ID.
+Chat reply listing all 24 final workout names grouped by focus, each line:
+`✅ <Name> — workout_id=<id> — stripe_product=<prod_…>`
 
-## Technical notes
+Only sent after `verify-strength-library-batch` returns `all_green: true` with `passed: 24`.
 
-- All generation reuses `_shared/wod/*` and `_shared/protocol-sanitizer.ts` — zero duplication.
-- Naming uses `cleanPublicWorkoutName` fallback pool ("Loaded Strength Session", "Bodyweight Strength Builder", etc.) with focus suffix only if needed for uniqueness. Never AI-style words.
-- Image prompts: human, gym-realistic, varied (no two prompts identical), brand colors per memory.
-- If any of the 24 fails verification after 3 retries, I stop and report exactly which ones failed and why — I will not claim success.
+## What I need from you now
 
-Run as background job (sequential, ~24 × ~30s = ~12 min) to stay under Edge Function timeout per item.
+1. Pick the model (A / B / C above).
+2. Confirm "yes, run the 1-workout smoke test first" before I unpause the queue.
