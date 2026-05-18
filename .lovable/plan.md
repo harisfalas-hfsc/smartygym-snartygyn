@@ -1,71 +1,65 @@
 
-## What I found
+## Goal
 
-### Cron Jobs section in admin panel
-The admin panel reads from `cron_job_metadata`. I compared it to the live `cron.job` table (the actual scheduler).
+Create **24 new premium Strength workouts** in the library, all standalone-purchasable, each with a unique image synced to Stripe, and verify each one before reporting done.
 
-**35 live cron jobs running. Metadata is 99% in sync, but there are 6 discrepancies:**
+## Matrix (6 focuses × 4 variants = 24)
 
-#### A) Live in scheduler but MISSING from admin panel (2)
-| job_name | schedule | what it does |
-|---|---|---|
-| `auto-finalize-draft-invoices-hourly` | `0 * * * *` (hourly) | Hourly safety net for stuck Stripe draft invoices (companion to the 4-hour one already shown) |
-| `stripe-orphan-cleanup-daily` | `0 4 * * *` (daily 04:00 UTC) | Calls `stripe-orphan-cleanup` to clean general Stripe orphans (distinct from `cleanup-wod-stripe-orphans-daily` at 09:00) |
+Focuses: LOWER BODY, UPPER BODY, FULL BODY, LOW PUSH & UPPER PULL, LOW PULL & UPPER PUSH, CORE & GLUTES
 
-#### B) Shown in admin panel but NO LONGER in scheduler (4 stale rows)
-| job_name | status |
+For each focus:
+- Advanced Bodyweight — 5★
+- Advanced Equipment — 6★
+- Intermediate Bodyweight — 3★
+- Intermediate Equipment — 4★
+
+All: `category = STRENGTH`, `format = REPS & SETS`, `is_premium = true`, `is_standalone_purchase = true`, `price = 3.99 EUR`, `is_visible = true`, `is_workout_of_day = false`, `wod_source = manual-batch`.
+
+## Pipeline (per workout)
+
+Reuse the existing `generate-workout-of-day` shared modules so every standard is enforced automatically. New thin orchestrator edge function `generate-strength-batch` will:
+
+1. **Generate content** via the same `_shared/wod` builders used by the WOD cron (library-first exercise selection, 5-section structure, protocol sanitizer, density validator, naming cleaner from `_shared/wod/naming.ts`, quality gate from `_shared/wod-quality-gate.ts`).
+   - Force `category=STRENGTH`, fixed `format=REPS & SETS`, the requested focus, equipment, and star rating.
+   - Reps/sets/tempo/rest mandatory per `reps-sets-formatting-standard`.
+   - Bullet-list formatting, bold+underlined section headers, empty `<p>` separators, `{{exercise:ID:Name}}` tokens only.
+2. **Clean name** through `cleanPublicWorkoutName` — short, human, no "Axial Current / Matrix / Protocol / Helix" garbage, no internal codes, uniqueness checked against existing `admin_workouts.name`.
+3. **Insert** row into `admin_workouts` with all premium + standalone flags set.
+4. **Generate unique image** via `generate-workout-image` (per-workout prompt seeded by name+focus+equipment). Save `image_url`.
+5. **Create Stripe product + price** via `create-stripe-product` with required metadata (`project=SMARTYGYM`, `content_type=Workout`, `workout_id`, `focus`, `equipment`, `difficulty_stars`), attach the generated image URL to the Stripe product, and store `stripe_product_id` + `stripe_price_id` on the row.
+6. **Quality gate**: re-run `applyWodQualityGate` on saved content; if fail → delete row + Stripe product, retry up to 3×.
+
+## Verification (mandatory before saying "done")
+
+Per-workout checklist, all must pass:
+
+| Check | Source |
 |---|---|
-| `cleanup-old-rate-limits` | not in pg_cron |
-| `daily-system-health-audit-after-generation` | not in pg_cron (replaced by `wod-post-generation-audit`) |
-| `send-automated-messages-job` | not in pg_cron |
-| `send-new-content-notifications-job` | not in pg_cron (folded into `process-pending-notifications-job`) |
+| Row exists in `admin_workouts` with correct category/focus/equipment/stars | DB |
+| `is_premium=true`, `is_standalone_purchase=true`, `price=3.99` | DB |
+| `image_url` set and reachable (HTTP 200) | Storage |
+| Name passes `hasInternalNameCode` + `hasAiStyleName` = false, unique | DB |
+| `warm_up`, `main_workout`, `cool_down`, `instructions`, `tips`, `description` all present and formatted | DB |
+| `main_workout` contains only library `{{exercise:ID:Name}}` tokens | DB + exercises table |
+| Quality gate passes (duration min, finisher structure, per-line prescription) | `wod-quality-gate.ts` |
+| `stripe_product_id` + `stripe_price_id` set | DB |
+| Stripe product exists, active, has image, metadata correct, price = 399 EUR | Stripe API |
+| Appears under Strength category + correct focus filter on public site | Live query |
 
-#### C) One outdated description
-- `generate-weekly-blog-articles` description says "saved as drafts for admin review" — but the function actually **auto-publishes**. Fix the wording.
+A final verification edge function `verify-strength-batch` runs all 10 checks for each of the 24 IDs and returns a row-by-row pass/fail table. Only after **24/24 fully green** will I list the 24 names back to you as confirmation.
 
-### Communications Center (Messaging System Monitor)
-All 8 tabs are wired correctly to live components:
+## Deliverables
 
-| Tab | Component | Status |
-|---|---|---|
-| Monitor | `MessagingMonitoringDashboard` (Automation Rules / Recent Activity / System Health) | wired ✅ |
-| Mobile Push | `MobileAppPushManager` | wired ✅ |
-| Auto Messages | `AutomationRulesManager` | wired ✅ |
-| Templates | `AutomatedMessagesManager` | wired ✅ |
-| Scheduled | `ScheduledNotificationsManager` | wired ✅ |
-| Mass | `MassNotificationManager` | wired ✅ |
-| Announce | `UnifiedAnnouncementSender` | wired ✅ |
-| Test | `TestMessageSender` | wired ✅ |
+1. New edge function `generate-strength-batch` (orchestrator, reuses shared modules).
+2. New edge function `verify-strength-batch` (10-point audit).
+3. Admin trigger button in `WorkoutsManager.tsx` → "Generate Strength Library Batch (24)".
+4. After successful run: chat reply listing all 24 final names grouped by focus, each marked ✅ with its Stripe product ID.
 
-No tabs are missing or pointing to the wrong component. I'll do a runtime check of each tab's data fetch during execution to make sure each one actually shows the right rows (no empty states from a broken query).
+## Technical notes
 
----
+- All generation reuses `_shared/wod/*` and `_shared/protocol-sanitizer.ts` — zero duplication.
+- Naming uses `cleanPublicWorkoutName` fallback pool ("Loaded Strength Session", "Bodyweight Strength Builder", etc.) with focus suffix only if needed for uniqueness. Never AI-style words.
+- Image prompts: human, gym-realistic, varied (no two prompts identical), brand colors per memory.
+- If any of the 24 fails verification after 3 retries, I stop and report exactly which ones failed and why — I will not claim success.
 
-## Plan
-
-### Step 1 — Add 2 missing cron jobs to admin panel
-Insert metadata rows for `auto-finalize-draft-invoices-hourly` (category `billing`) and `stripe-orphan-cleanup-daily` (category `maintenance`), so they show up alongside the others in CronJobsManager.
-
-### Step 2 — Remove 4 stale rows from admin panel
-Delete the 4 `cron_job_metadata` rows that no longer have a matching live cron job. This prevents the UI from showing dead jobs.
-
-### Step 3 — Fix blog generator description
-Update `generate-weekly-blog-articles` metadata text from "saved as drafts" → "auto-published Monday 06:00 Cyprus".
-
-### Step 4 — Runtime check of Communications Center
-Open the deployed admin route and verify each tab loads:
-- Monitor → counts/rows render in all 3 sub-tabs
-- Mobile Push, Auto Messages, Templates, Scheduled, Mass, Announce, Test → list/form renders without console errors
-Fix anything that returns 0 rows or throws.
-
-### Step 5 — Verify
-Re-run the diff query → both lists must be empty (live = metadata). Reload `/admin` Cron Jobs tab and visually confirm both new jobs show in the right category and the 4 stale ones are gone. Confirm 8 Communications tabs all render.
-
----
-
-## Technical details
-
-- Step 1+2+3 are **data-only changes** to `public.cron_job_metadata` — no schema changes, no code changes.
-- No live `cron.job` entries will be modified — the scheduler is already correct, only the admin display layer is being synced to it.
-- Step 4 is read-only inspection; any fixes will be isolated patches to the specific tab component.
-- Zero impact on user-facing site, content, billing, or scheduled execution.
+Run as background job (sequential, ~24 × ~30s = ~12 min) to stay under Edge Function timeout per item.
