@@ -534,7 +534,7 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
               </div>
             </div>
             <Select value={sourceFilter} onValueChange={setSourceFilter}>
-              <SelectTrigger className="w-[120px]">
+              <SelectTrigger className="w-[120px] shrink-0">
                 <SelectValue placeholder="Source" />
               </SelectTrigger>
               <SelectContent>
@@ -545,7 +545,7 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
               </SelectContent>
             </Select>
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-[140px]">
+              <SelectTrigger className="w-[140px] shrink-0">
                 <Filter className="h-4 w-4 mr-2" />
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
@@ -563,7 +563,7 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
               </SelectContent>
             </Select>
             <Select value={formatFilter} onValueChange={setFormatFilter}>
-              <SelectTrigger className="w-[130px]">
+              <SelectTrigger className="w-[130px] shrink-0">
                 <SelectValue placeholder="Format" />
               </SelectTrigger>
               <SelectContent>
@@ -578,7 +578,7 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
               </SelectContent>
             </Select>
             <Select value={equipmentFilter} onValueChange={setEquipmentFilter}>
-              <SelectTrigger className="w-[130px]">
+              <SelectTrigger className="w-[130px] shrink-0">
                 <SelectValue placeholder="Equipment" />
               </SelectTrigger>
               <SelectContent>
@@ -588,7 +588,7 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
               </SelectContent>
             </Select>
             <Select value={difficultyFilter} onValueChange={setDifficultyFilter}>
-              <SelectTrigger className="w-[130px]">
+              <SelectTrigger className="w-[130px] shrink-0">
                 <SelectValue placeholder="Difficulty" />
               </SelectTrigger>
               <SelectContent>
@@ -599,7 +599,7 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
               </SelectContent>
             </Select>
             <Select value={durationFilter} onValueChange={setDurationFilter}>
-              <SelectTrigger className="w-[130px]">
+              <SelectTrigger className="w-[130px] shrink-0">
                 <SelectValue placeholder="Duration" />
               </SelectTrigger>
               <SelectContent>
