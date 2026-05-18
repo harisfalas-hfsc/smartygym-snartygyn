@@ -30,12 +30,12 @@ import heroLibraryImage from "@/assets/hero-exercise-library-new.jpg";
 import heroBlogImage from "@/assets/hero-blog.jpg";
 import heroCommunityImage from "@/assets/hero-community-new.jpg";
 
-const DesktopVideoBanner = () => {
+const DesktopVideoBanner = ({ width }: { width: number }) => {
   const navigate = useNavigate();
   const { userTier } = useAccessControl();
   const showCTA = userTier !== "premium";
   return (
-    <div className="mb-4">
+    <div className="mb-4 mx-auto" style={{ width: `${width}px`, maxWidth: "100%" }}>
       <div className="relative rounded-2xl overflow-hidden ring-1 ring-border/60 shadow-lg shadow-primary/10 h-[180px]">
         <video
           src={heroBannerVideo.url}
@@ -779,14 +779,14 @@ export const HeroDestinationConstellation = () => {
 
       {/* ============ DESKTOP ============ */}
       <div className="hidden md:block">
-        <DesktopVideoBanner />
+        <DesktopVideoBanner width={desktopStageWidth * desktopScale} />
         <div
           ref={desktopWrapperRef}
           className="relative mx-auto"
           style={{
             width: "100%",
             maxWidth: "100%",
-            height: `${530 * 0.75 * desktopScale}px`,
+            height: `${530 * desktopScale}px`,
             overflow: "hidden",
           }}
         >
@@ -794,7 +794,7 @@ export const HeroDestinationConstellation = () => {
             style={{
               width: `${desktopStageWidth}px`,
               height: "530px",
-              transform: `translateX(-50%) scale(${desktopScale * 0.75})`,
+              transform: `translateX(-50%) scale(${desktopScale})`,
               transformOrigin: "top center",
               position: "absolute",
               top: 0,
