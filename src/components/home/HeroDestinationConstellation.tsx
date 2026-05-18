@@ -30,13 +30,127 @@ import heroLibraryImage from "@/assets/hero-exercise-library-new.jpg";
 import heroBlogImage from "@/assets/hero-blog.jpg";
 import heroCommunityImage from "@/assets/hero-community-new.jpg";
 
-const DesktopVideoBanner = ({ width }: { width: number }) => {
+type RotatingLink = {
+  id: string;
+  title: string;
+  tagline: string;
+  icon: LucideIcon;
+  route: string;
+};
+
+const ROTATING_LINKS: RotatingLink[] = [
+  { id: "wod",       title: "Workout of the Day", tagline: "Today's featured session",   icon: CalendarCheck, route: "/workout/wod" },
+  { id: "workouts",  title: "Smarty Workouts",    tagline: "500+ expert sessions",       icon: Dumbbell,      route: "/workout" },
+  { id: "programs",  title: "Smarty Programs",    tagline: "Multi-week training plans",  icon: Calendar,      route: "/trainingprogram" },
+  { id: "library",   title: "Exercise Library",   tagline: "Form & technique videos",    icon: Video,         route: "/exerciselibrary" },
+  { id: "blog",      title: "Blog & Insights",    tagline: "Evidence-based articles",    icon: FileText,      route: "/blog" },
+  { id: "tools",     title: "Smarty Tools",       tagline: "Calculators & timers",       icon: Calculator,    route: "/tools" },
+  { id: "community", title: "Community",          tagline: "Train together",             icon: Users,         route: "/community" },
+];
+
+const RotatingLinkBanner = () => {
+  const navigate = useNavigate();
+  const [index, setIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const prefersReducedMotion = useRef(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    prefersReducedMotion.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  }, []);
+
+  useEffect(() => {
+    if (paused || prefersReducedMotion.current) return;
+    const id = window.setInterval(() => {
+      setIndex((i) => (i + 1) % ROTATING_LINKS.length);
+    }, 2500);
+    return () => window.clearInterval(id);
+  }, [paused]);
+
+  if (prefersReducedMotion.current) {
+    return (
+      <div className="flex flex-wrap justify-center gap-2 max-w-3xl">
+        {ROTATING_LINKS.map((link) => {
+          const Icon = link.icon;
+          return (
+            <button
+              key={link.id}
+              onClick={() => navigate(link.route)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-background/85 backdrop-blur-md border border-white/20 text-foreground hover:bg-primary hover:text-primary-foreground transition-colors text-sm font-medium"
+            >
+              <Icon className="w-3.5 h-3.5" />
+              {link.title}
+            </button>
+          );
+        })}
+      </div>
+    );
+  }
+
+  const current = ROTATING_LINKS[index];
+  const Icon = current.icon;
+
+  return (
+    <div
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      aria-live="polite"
+      className="w-full max-w-md"
+    >
+      <button
+        type="button"
+        onClick={() => navigate(current.route)}
+        key={current.id}
+        className={cn(
+          "group w-full flex items-center gap-4 px-5 py-4 rounded-2xl",
+          "bg-background/85 backdrop-blur-xl border border-white/25",
+          "shadow-2xl shadow-primary/20",
+          "hover:bg-background/95 hover:border-primary transition-all",
+          "animate-fade-in text-left"
+        )}
+      >
+        <span className="flex-shrink-0 w-12 h-12 rounded-full bg-primary/15 ring-2 ring-primary/40 flex items-center justify-center">
+          <Icon className="w-6 h-6 text-primary" />
+        </span>
+        <span className="flex-1 min-w-0">
+          <span className="block text-base lg:text-lg font-bold text-foreground leading-tight truncate">
+            {current.title}
+          </span>
+          <span className="block text-xs lg:text-sm text-muted-foreground truncate">
+            {current.tagline}
+          </span>
+        </span>
+        <ChevronRight className="w-5 h-5 text-primary flex-shrink-0 group-hover:translate-x-1 transition-transform" />
+      </button>
+
+      {/* Dots */}
+      <div className="flex justify-center gap-1.5 mt-3">
+        {ROTATING_LINKS.map((link, i) => (
+          <button
+            key={link.id}
+            onClick={() => setIndex(i)}
+            aria-label={`Go to ${link.title}`}
+            className={cn(
+              "h-1.5 rounded-full transition-all",
+              i === index ? "w-6 bg-primary" : "w-1.5 bg-white/40 hover:bg-white/70"
+            )}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const DesktopVideoHero = ({ width, height }: { width: number; height: number }) => {
   const navigate = useNavigate();
   const { userTier } = useAccessControl();
   const showCTA = userTier !== "premium";
   return (
-    <div className="mb-4 mx-auto" style={{ width: `${width}px`, maxWidth: "100%" }}>
-      <div className="relative rounded-2xl overflow-hidden ring-1 ring-border/60 shadow-lg shadow-primary/10 h-[207px]">
+    <div className="mx-auto" style={{ width: `${width}px`, maxWidth: "100%" }}>
+      <div
+        className="relative rounded-2xl overflow-hidden ring-1 ring-border/60 shadow-2xl shadow-primary/15"
+        style={{ height: `${height}px` }}
+      >
         <video
           src={heroBannerVideo.url}
           autoPlay
@@ -45,26 +159,33 @@ const DesktopVideoBanner = ({ width }: { width: number }) => {
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
         />
+        {/* Readability gradient — darker on left for CTA, fades to bottom for banner */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/25 to-black/10" aria-hidden="true" />
+        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/70 via-black/20 to-transparent" aria-hidden="true" />
+
+        {/* CTA — left side, vertically centered */}
         {showCTA && (
-          <>
-            <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/35 to-transparent" />
-            <div className="absolute inset-0 flex items-center">
-              <div className="pl-10 max-w-xl">
-                <h2 className="text-white text-2xl lg:text-3xl font-bold leading-tight mb-3 drop-shadow-lg">
-                  Your gym, re-imagined.
-                </h2>
-                <Button
-                  size="lg"
-                  onClick={() => navigate(userTier === "guest" ? "/auth" : "/premium-benefits")}
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-xl"
-                >
-                  Start your fitness journey now
-                  <ChevronRight className="w-4 h-4 ml-1" />
-                </Button>
-              </div>
+          <div className="absolute inset-y-0 left-0 flex items-center">
+            <div className="pl-10 lg:pl-14 max-w-xl">
+              <h2 className="text-white text-3xl lg:text-5xl font-bold leading-tight mb-4 drop-shadow-lg">
+                Your gym,<br />re-imagined.
+              </h2>
+              <Button
+                size="lg"
+                onClick={() => navigate(userTier === "guest" ? "/auth" : "/premium-benefits")}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-xl"
+              >
+                Start your fitness journey now
+                <ChevronRight className="w-4 h-4 ml-1" />
+              </Button>
             </div>
-          </>
+          </div>
         )}
+
+        {/* Rotating destination banner — bottom center */}
+        <div className="absolute inset-x-0 bottom-6 flex justify-center px-6">
+          <RotatingLinkBanner />
+        </div>
       </div>
     </div>
   );
