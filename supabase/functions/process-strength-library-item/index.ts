@@ -121,24 +121,41 @@ Return ONLY the JSON object. No prose, no markdown fences.`;
 }
 
 async function callLovableAI(prompt: string, apiKey: string): Promise<string> {
+  // Use Gemini 2.5 Flash with strict JSON mode — much more reliable than Pro
+  // for structured output (Pro often returns reasoning-only with empty content).
+  const body = {
+    model: "google/gemini-2.5-flash",
+    messages: [
+      { role: "system", content: "You are a precise JSON generator. Always return ONE valid JSON object matching the requested schema. Never include markdown fences, prose, or explanations." },
+      { role: "user", content: prompt },
+    ],
+    response_format: { type: "json_object" },
+    temperature: 0.7,
+  };
   const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model: "google/gemini-2.5-pro",
-      messages: [{ role: "user", content: prompt }],
-    }),
+    body: JSON.stringify(body),
   });
-  if (!res.ok) throw new Error(`AI gateway ${res.status}: ${await res.text()}`);
+  if (!res.ok) throw new Error(`AI gateway ${res.status}: ${(await res.text()).slice(0, 500)}`);
   const data = await res.json();
-  return data.choices?.[0]?.message?.content || "";
+  const content = data.choices?.[0]?.message?.content || "";
+  if (!content.trim()) {
+    const finish = data.choices?.[0]?.finish_reason || "?";
+    throw new Error(`AI returned empty content (finish_reason=${finish})`);
+  }
+  return content;
 }
 
 function extractJson(text: string): any {
+  if (!text || !text.trim()) throw new Error("AI returned empty content");
   const cleaned = text.replace(/```json\s*/gi, "").replace(/```\s*/g, "").trim();
+  try { return JSON.parse(cleaned); } catch {}
   const start = cleaned.indexOf("{");
   const end = cleaned.lastIndexOf("}");
-  if (start === -1 || end === -1) throw new Error("No JSON object in AI response");
+  if (start === -1 || end === -1) {
+    throw new Error(`No JSON object in AI response. Preview: ${cleaned.slice(0, 240).replace(/\s+/g, " ")}`);
+  }
   return JSON.parse(cleaned.slice(start, end + 1));
 }
 
