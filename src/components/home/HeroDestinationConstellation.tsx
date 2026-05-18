@@ -701,14 +701,14 @@ export const HeroDestinationConstellation = () => {
           style={{
             width: "100%",
             maxWidth: "100%",
-            height: `${590 * desktopScale}px`,
+            height: `${530 * desktopScale}px`,
             overflow: "hidden",
           }}
         >
           <div
             style={{
               width: `${desktopStageWidth}px`,
-              height: "590px",
+              height: "530px",
               transform: `scale(${desktopScale})`,
               transformOrigin: "top left",
               position: "relative",
