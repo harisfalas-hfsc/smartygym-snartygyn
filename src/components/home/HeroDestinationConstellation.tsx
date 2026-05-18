@@ -245,9 +245,9 @@ const DesktopVideoHero = ({ width, height }: { width: number; height: number }) 
           </div>
         </div>
 
-        {/* Rotating destination banner — bottom center */}
-        <div className="absolute inset-x-0 bottom-6 flex justify-center px-6">
-          <RotatingLinkBanner />
+        {/* Destination cards — overlaid at bottom of video */}
+        <div className="absolute inset-x-0 bottom-4 px-4">
+          <DesktopCardCarousel cardHeight={Math.max(80, Math.round(height / 5))} />
         </div>
       </div>
     </div>
@@ -273,13 +273,13 @@ const DESKTOP_CARDS: DesktopCardItem[] = [
   { id: "community", title: "Community",         description: "Train together",            icon: Users,         route: "/community",        image: heroCommunityImage },
 ];
 
-const DesktopCardCarousel = ({ width, cardHeight }: { width: number; cardHeight: number }) => {
+const DesktopCardCarousel = ({ width, cardHeight }: { width?: number; cardHeight: number }) => {
   const navigate = useNavigate();
   const autoplayRef = useRef(Autoplay({ delay: 2500, stopOnInteraction: false, stopOnMouseEnter: true }));
   const [api, setApi] = useState<CarouselApi>();
 
   return (
-    <div className="mx-auto mt-4" style={{ width: `${width}px`, maxWidth: "100%" }}>
+    <div className="mx-auto" style={width ? { width: `${width}px`, maxWidth: "100%" } : undefined}>
       <Carousel
         setApi={setApi}
         opts={{ align: "start", loop: true, dragFree: false }}
@@ -297,7 +297,7 @@ const DesktopCardCarousel = ({ width, cardHeight }: { width: number; cardHeight:
                   type="button"
                   onClick={() => navigate(card.route)}
                   className={cn(
-                    "relative w-full overflow-hidden rounded-xl border-2 border-primary/40",
+                    "relative w-full overflow-hidden rounded-xl border-2 border-white/40",
                     "hover:border-primary hover:shadow-xl hover:scale-[1.03]",
                     "transition-all duration-300 ease-out group"
                   )}
@@ -323,8 +323,8 @@ const DesktopCardCarousel = ({ width, cardHeight }: { width: number; cardHeight:
             );
           })}
         </CarouselContent>
-        <CarouselPrevious className="-left-4 w-8 h-8 border-border bg-background/80 hover:bg-accent" />
-        <CarouselNext className="-right-4 w-8 h-8 border-border bg-background/80 hover:bg-accent" />
+        <CarouselPrevious className="-left-3 w-8 h-8 border-white/30 bg-black/50 text-white hover:bg-primary hover:text-primary-foreground" />
+        <CarouselNext className="-right-3 w-8 h-8 border-white/30 bg-black/50 text-white hover:bg-primary hover:text-primary-foreground" />
       </Carousel>
     </div>
   );
@@ -1040,16 +1040,10 @@ export const HeroDestinationConstellation = () => {
       {/* ============ DESKTOP ============ */}
       <div className="hidden md:block">
         <div ref={desktopWrapperRef} className="w-full">
-          {(() => {
-            const w = (desktopStageWidth - 40) * desktopScale;
-            const h = Math.round(610 * desktopScale);
-            return (
-              <>
-                <DesktopVideoHero width={w} height={h} />
-                <DesktopCardCarousel width={w} cardHeight={Math.round(h / 5)} />
-              </>
-            );
-          })()}
+          <DesktopVideoHero
+            width={(desktopStageWidth - 40) * desktopScale}
+            height={Math.round(610 * desktopScale)}
+          />
         </div>
       </div>
 
