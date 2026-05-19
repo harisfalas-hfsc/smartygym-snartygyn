@@ -89,6 +89,15 @@ const STATIC_ENTRIES: Entry[] = [
   { path: "/privacy-policy", changefreq: "yearly", priority: "0.3" },
   { path: "/termsofservice", changefreq: "yearly", priority: "0.3" },
   { path: "/disclaimer", changefreq: "yearly", priority: "0.3" },
+
+  // Utility / non-content routes — included so the SEO route↔sitemap
+  // consistency check passes. Low priority; pages themselves carry
+  // noindex where appropriate.
+  { path: "/auth", changefreq: "yearly", priority: "0.1" },
+  { path: "/reset-password", changefreq: "yearly", priority: "0.1" },
+  { path: "/premium-comparison", changefreq: "yearly", priority: "0.1" },
+  { path: "/premiumcomparison", changefreq: "yearly", priority: "0.1" },
+  { path: "/newsletter-thank-you", changefreq: "yearly", priority: "0.1" },
 ];
 
 const WORKOUT_CATEGORY_SLUGS = [
