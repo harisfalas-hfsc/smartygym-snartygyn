@@ -210,48 +210,6 @@ const RotatingLinkBanner = () => {
 
 const DesktopVideoHero = ({ width, height }: { width: number; height: number }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const signatureRef = useRef<HTMLAudioElement | null>(null);
-  const [muted, setMuted] = useState(false);
-  const playedSignatureRef = useRef(false);
-
-  const playSignature = () => {
-    const a = signatureRef.current;
-    if (!a) return;
-    a.currentTime = 0;
-    a.volume = 0.9;
-    a.muted = false;
-    const p = a.play();
-    if (p && typeof p.then === "function") {
-      p.then(() => {
-        playedSignatureRef.current = true;
-      }).catch(() => {
-        // Autoplay blocked — will retry on first user interaction
-      });
-    }
-  };
-
-  useEffect(() => {
-    const timer = window.setTimeout(playSignature, 1500);
-    const onInteract = () => {
-      if (playedSignatureRef.current) return;
-      playSignature();
-    };
-    window.addEventListener("pointerdown", onInteract, { once: false });
-    window.addEventListener("keydown", onInteract, { once: false });
-    return () => {
-      window.clearTimeout(timer);
-      window.removeEventListener("pointerdown", onInteract);
-      window.removeEventListener("keydown", onInteract);
-    };
-  }, []);
-
-  const toggleSound = () => {
-    const next = !muted;
-    setMuted(next);
-    const a = signatureRef.current;
-    if (a) a.muted = next;
-    if (!next) playSignature();
-  };
 
   return (
     <div className="mx-auto" style={{ width: `${width}px`, maxWidth: "100%" }}>
@@ -268,15 +226,6 @@ const DesktopVideoHero = ({ width, height }: { width: number; height: number }) 
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
         />
-        <audio ref={signatureRef} src="/audio/smartygym-signature.mp3" preload="auto" />
-        <button
-          type="button"
-          onClick={toggleSound}
-          aria-label={muted ? "Unmute SmartyGym signature" : "Mute"}
-          className="absolute top-4 right-4 z-30 h-10 w-10 rounded-full bg-black/55 backdrop-blur-md text-white flex items-center justify-center ring-1 ring-white/20 hover:bg-black/70 transition"
-        >
-          {muted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
-        </button>
         {/* Readability gradient — lighter so video stays vivid in light mode */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/10 to-transparent" aria-hidden="true" />
         <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/50 to-transparent" aria-hidden="true" />
