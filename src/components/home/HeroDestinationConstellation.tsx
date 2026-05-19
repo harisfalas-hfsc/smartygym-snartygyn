@@ -303,11 +303,17 @@ const DesktopVideoHero = ({ width, height }: { width: number; height: number }) 
 
         {/* Brand message — centered at top */}
         <div className="absolute inset-x-0 top-0 flex items-start justify-center pt-5 px-6 pointer-events-none">
-          <div className="text-center">
-            <h2 className="text-white text-2xl lg:text-4xl font-bold leading-tight drop-shadow-lg">
+          <div
+            className="text-center"
+            style={{
+              textShadow:
+                "0 1px 2px rgba(0,0,0,0.95), 0 2px 8px rgba(0,0,0,0.85), 0 0 18px rgba(0,0,0,0.7)",
+            }}
+          >
+            <h2 className="text-white text-2xl lg:text-4xl font-bold leading-tight">
               100% Human. 0% AI.
             </h2>
-            <p className="text-white/90 text-sm lg:text-base mt-2 drop-shadow-md max-w-lg">
+            <p className="text-white text-sm lg:text-base font-medium mt-2 max-w-lg mx-auto">
               SmartyGym workouts and programs are built to fit YOUR life.
             </p>
           </div>
@@ -353,7 +359,7 @@ const SERVICE_TILES: ServiceTile[] = [
 const DesktopServiceTiles = () => {
   const navigate = useNavigate();
   return (
-    <div className="grid grid-cols-7 gap-2 max-w-5xl mx-auto">
+    <div className="grid grid-cols-7 gap-3 max-w-5xl mx-auto">
       {SERVICE_TILES.map((tile) => {
         const Icon = tile.icon;
         return (
@@ -362,17 +368,23 @@ const DesktopServiceTiles = () => {
             type="button"
             onClick={() => navigate(tile.route)}
             className={cn(
-              "flex flex-col items-center justify-center gap-1 px-2 py-3 rounded-xl",
-              "bg-black/55 backdrop-blur-md border border-white/20",
-              "hover:bg-black/75 hover:border-primary hover:scale-[1.04] transition-all duration-200",
-              "text-center group"
+              "flex flex-col items-center justify-start gap-1 px-1 py-2",
+              "hover:scale-[1.08] transition-transform duration-200",
+              "text-center group cursor-pointer"
             )}
+            style={{
+              textShadow:
+                "0 1px 2px rgba(0,0,0,0.95), 0 2px 6px rgba(0,0,0,0.8)",
+            }}
           >
-            <Icon className={cn("w-6 h-6 transition-transform group-hover:scale-110", tile.color)} />
-            <span className="text-white text-xs font-bold leading-tight drop-shadow">
+            <Icon
+              className={cn("w-7 h-7 transition-transform group-hover:scale-110", tile.color)}
+              style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.8))" }}
+            />
+            <span className="text-white text-xs font-bold leading-tight">
               {tile.title}
             </span>
-            <span className="text-white/75 text-[10px] leading-tight line-clamp-1">
+            <span className="text-white/90 text-[10px] leading-tight line-clamp-2">
               {tile.description}
             </span>
           </button>
