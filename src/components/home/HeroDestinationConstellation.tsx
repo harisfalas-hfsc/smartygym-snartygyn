@@ -358,19 +358,34 @@ const SERVICE_TILES: ServiceTile[] = [
 
 const DesktopServiceTiles = () => {
   const navigate = useNavigate();
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isHovering, setIsHovering] = useState(false);
+
+  useEffect(() => {
+    if (isHovering) return;
+    const id = setInterval(() => {
+      setActiveIndex((i) => (i + 1) % SERVICE_TILES.length);
+    }, 3000);
+    return () => clearInterval(id);
+  }, [isHovering]);
+
   return (
     <div className="grid grid-cols-7 gap-3 max-w-5xl mx-auto">
-      {SERVICE_TILES.map((tile) => {
+      {SERVICE_TILES.map((tile, idx) => {
         const Icon = tile.icon;
+        const isActive = idx === activeIndex;
         return (
           <button
             key={tile.id}
             type="button"
             onClick={() => navigate(tile.route)}
+            onMouseEnter={() => { setIsHovering(true); setActiveIndex(idx); }}
+            onMouseLeave={() => setIsHovering(false)}
             className={cn(
               "flex flex-col items-center justify-start gap-1.5 px-2 py-3",
-              "hover:scale-[1.08] transition-transform duration-200",
-              "text-center group cursor-pointer"
+              "transition-transform duration-300 ease-out",
+              "text-center group cursor-pointer",
+              isActive ? "scale-[1.12]" : "scale-100"
             )}
             style={{
               textShadow:
@@ -378,7 +393,11 @@ const DesktopServiceTiles = () => {
             }}
           >
             <Icon
-              className={cn("w-11 h-11 transition-transform group-hover:scale-110", tile.color)}
+              className={cn(
+                "w-11 h-11 transition-transform duration-300",
+                isActive && "scale-110",
+                tile.color
+              )}
               style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.8))" }}
             />
             <span className="text-white text-sm font-bold leading-tight mt-0.5">
