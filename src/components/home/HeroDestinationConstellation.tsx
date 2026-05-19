@@ -211,20 +211,57 @@ const RotatingLinkBanner = () => {
 };
 
 const DesktopVideoHero = ({ width, height }: { width: number; height: number }) => {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
   const VIDEOS = [heroBannerVideo.url, heroBannerVideoPark.url, heroBannerVideoLivingroom.url];
-  const [videoIndex, setVideoIndex] = useState(0);
+  const videoARef = useRef<HTMLVideoElement | null>(null);
+  const videoBRef = useRef<HTMLVideoElement | null>(null);
+  const [activeLayer, setActiveLayer] = useState<"A" | "B">("A");
+  const [srcA, setSrcA] = useState(VIDEOS[0]);
+  const [srcB, setSrcB] = useState(VIDEOS[1]);
+  const indexRef = useRef(0);
+  const transitioningRef = useRef(false);
 
-  const handleEnded = () => {
-    setVideoIndex((i) => (i + 1) % VIDEOS.length);
+  // Crossfade when the current video is near its end
+  const handleTimeUpdate = (which: "A" | "B") => () => {
+    if (transitioningRef.current) return;
+    if (which !== activeLayer) return;
+    const v = which === "A" ? videoARef.current : videoBRef.current;
+    if (!v || !v.duration || isNaN(v.duration)) return;
+    const remaining = v.duration - v.currentTime;
+    if (remaining > 0.6) return;
+
+    transitioningRef.current = true;
+    const nextIndex = (indexRef.current + 1) % VIDEOS.length;
+    const afterNextIndex = (nextIndex + 1) % VIDEOS.length;
+    const nextSrc = VIDEOS[nextIndex];
+    const afterNextSrc = VIDEOS[afterNextIndex];
+
+    if (which === "A") {
+      // B should already hold nextSrc and be ready
+      const bv = videoBRef.current;
+      if (bv) {
+        bv.currentTime = 0;
+        bv.play().catch(() => {});
+      }
+      setActiveLayer("B");
+      // Preload the following video into A
+      window.setTimeout(() => {
+        setSrcA(afterNextSrc);
+        transitioningRef.current = false;
+      }, 800);
+    } else {
+      const av = videoARef.current;
+      if (av) {
+        av.currentTime = 0;
+        av.play().catch(() => {});
+      }
+      setActiveLayer("A");
+      window.setTimeout(() => {
+        setSrcB(afterNextSrc);
+        transitioningRef.current = false;
+      }, 800);
+    }
+    indexRef.current = nextIndex;
   };
-
-  useEffect(() => {
-    const v = videoRef.current;
-    if (!v) return;
-    v.load();
-    v.play().catch(() => {});
-  }, [videoIndex]);
 
   return (
     <div className="mx-auto" style={{ width: `${width}px`, maxWidth: "100%" }}>
@@ -233,14 +270,29 @@ const DesktopVideoHero = ({ width, height }: { width: number; height: number }) 
         style={{ height: `${height}px` }}
       >
         <video
-          ref={videoRef}
-          key={videoIndex}
-          src={VIDEOS[videoIndex]}
+          ref={videoARef}
+          src={srcA}
           autoPlay
           muted
           playsInline
-          onEnded={handleEnded}
-          className="absolute inset-0 w-full h-full object-cover"
+          preload="auto"
+          onTimeUpdate={handleTimeUpdate("A")}
+          className={cn(
+            "absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out",
+            activeLayer === "A" ? "opacity-100" : "opacity-0"
+          )}
+        />
+        <video
+          ref={videoBRef}
+          src={srcB}
+          muted
+          playsInline
+          preload="auto"
+          onTimeUpdate={handleTimeUpdate("B")}
+          className={cn(
+            "absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out",
+            activeLayer === "B" ? "opacity-100" : "opacity-0"
+          )}
         />
         {/* Readability gradient — lighter so video stays vivid in light mode */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/10 to-transparent" aria-hidden="true" />
