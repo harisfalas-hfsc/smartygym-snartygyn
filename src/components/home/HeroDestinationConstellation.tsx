@@ -9,6 +9,8 @@ import {
   FileText,
   Users,
   User,
+  Volume2,
+  VolumeX,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -209,6 +211,27 @@ const RotatingLinkBanner = () => {
 };
 
 const DesktopVideoHero = ({ width, height }: { width: number; height: number }) => {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const signatureRef = useRef<HTMLAudioElement | null>(null);
+  const [muted, setMuted] = useState(true);
+  const [playedSignature, setPlayedSignature] = useState(false);
+
+  const toggleSound = () => {
+    const next = !muted;
+    setMuted(next);
+    const v = videoRef.current;
+    if (v) v.muted = next;
+    if (!next && !playedSignature) {
+      const a = signatureRef.current;
+      if (a) {
+        a.currentTime = 0;
+        a.volume = 0.9;
+        a.play().catch(() => {});
+      }
+      setPlayedSignature(true);
+    }
+  };
+
   return (
     <div className="mx-auto" style={{ width: `${width}px`, maxWidth: "100%" }}>
       <div
@@ -216,6 +239,7 @@ const DesktopVideoHero = ({ width, height }: { width: number; height: number }) 
         style={{ height: `${height}px` }}
       >
         <video
+          ref={videoRef}
           src={heroBannerVideo.url}
           autoPlay
           loop
@@ -223,6 +247,15 @@ const DesktopVideoHero = ({ width, height }: { width: number; height: number }) 
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
         />
+        <audio ref={signatureRef} src="/audio/smartygym-signature.mp3" preload="auto" />
+        <button
+          type="button"
+          onClick={toggleSound}
+          aria-label={muted ? "Unmute SmartyGym signature" : "Mute"}
+          className="absolute top-4 right-4 z-30 h-10 w-10 rounded-full bg-black/55 backdrop-blur-md text-white flex items-center justify-center ring-1 ring-white/20 hover:bg-black/70 transition"
+        >
+          {muted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+        </button>
         {/* Readability gradient — lighter so video stays vivid in light mode */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/10 to-transparent" aria-hidden="true" />
         <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/50 to-transparent" aria-hidden="true" />
