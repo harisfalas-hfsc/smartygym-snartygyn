@@ -9,6 +9,8 @@ import {
   FileText,
   Users,
   User,
+  Volume2,
+  VolumeX,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -209,6 +211,26 @@ const RotatingLinkBanner = () => {
 };
 
 const DesktopVideoHero = ({ width, height }: { width: number; height: number }) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const signatureRef = useRef<HTMLAudioElement | null>(null);
+  const [muted, setMuted] = useState(true);
+  const [playedSignature, setPlayedSignature] = useState(false);
+
+  const toggleMute = () => {
+    const next = !muted;
+    setMuted(next);
+    if (videoRef.current) videoRef.current.muted = next;
+    if (!next && !playedSignature) {
+      if (!signatureRef.current) {
+        signatureRef.current = new Audio("/audio/smartygym-signature.mp3");
+        signatureRef.current.volume = 0.7;
+      }
+      signatureRef.current.currentTime = 0;
+      signatureRef.current.play().catch(() => {});
+      setPlayedSignature(true);
+    }
+  };
+
   return (
     <div className="mx-auto" style={{ width: `${width}px`, maxWidth: "100%" }}>
       <div
@@ -216,6 +238,7 @@ const DesktopVideoHero = ({ width, height }: { width: number; height: number }) 
         style={{ height: `${height}px` }}
       >
         <video
+          ref={videoRef}
           src={heroBannerVideo.url}
           autoPlay
           loop
@@ -223,6 +246,15 @@ const DesktopVideoHero = ({ width, height }: { width: number; height: number }) 
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
         />
+        {/* Sound toggle — plays SmartyGym signature on unmute */}
+        <button
+          type="button"
+          onClick={toggleMute}
+          aria-label={muted ? "Unmute & play SmartyGym signature" : "Mute"}
+          className="absolute top-4 right-4 z-30 w-11 h-11 rounded-full bg-black/55 backdrop-blur-md border border-white/30 text-white flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors shadow-lg"
+        >
+          {muted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+        </button>
         {/* Readability gradient — lighter so video stays vivid in light mode */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/10 to-transparent" aria-hidden="true" />
         <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/50 to-transparent" aria-hidden="true" />
