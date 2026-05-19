@@ -301,27 +301,21 @@ const DesktopVideoHero = ({ width, height }: { width: number; height: number }) 
         <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/10 to-transparent" aria-hidden="true" />
         <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/50 to-transparent" aria-hidden="true" />
 
-        {/* Brand message — centered at top, no backdrop so the video stays visible */}
+        {/* Brand message — centered at top */}
         <div className="absolute inset-x-0 top-0 flex items-start justify-center pt-5 px-6 pointer-events-none">
-          <div
-            className="text-center"
-            style={{
-              textShadow:
-                "0 1px 2px rgba(0,0,0,0.95), 0 2px 8px rgba(0,0,0,0.85), 0 0 18px rgba(0,0,0,0.7)",
-            }}
-          >
-            <h2 className="text-white text-2xl lg:text-4xl font-extrabold leading-tight tracking-tight">
-              100% Human. <span className="text-red-500">0% AI.</span>
+          <div className="text-center">
+            <h2 className="text-white text-2xl lg:text-4xl font-bold leading-tight drop-shadow-lg">
+              100% Human. 0% AI.
             </h2>
-            <p className="text-white text-sm lg:text-base font-semibold mt-1 max-w-xl mx-auto">
+            <p className="text-white/90 text-sm lg:text-base mt-2 drop-shadow-md max-w-lg">
               SmartyGym workouts and programs are built to fit YOUR life.
             </p>
           </div>
         </div>
 
-        {/* Destination cards — overlaid at bottom of video */}
-        <div className="absolute inset-x-0 bottom-4 px-4">
-          <DesktopCardCarousel cardHeight={Math.max(80, Math.round(height / 5))} />
+        {/* Static service tiles — overlaid at bottom of video */}
+        <div className="absolute inset-x-0 bottom-4 px-6">
+          <DesktopServiceTiles />
         </div>
       </div>
     </div>
