@@ -22,6 +22,12 @@ export function normalizeWorkoutHtml(content: string): string {
   
   // STEP 0: Fix malformed HTML before anything else
   result = sanitizeMalformedHtml(result);
+
+  // STEP 0b: Fix malformed nested exercise tokens BEFORE any whitespace work.
+  // Pattern observed in production:
+  //   {{jumping-jacks:{{exercise:jumping-jacks:Jumping Jacks}} }}
+  // → {{exercise:jumping-jacks:Jumping Jacks}}
+  result = unwrapNestedExerciseTokens(result);
   
   // STEP 1: Strip newlines, collapse whitespace
   result = result.replace(/[\n\r]+/g, '');
@@ -87,11 +93,87 @@ export function normalizeWorkoutHtml(content: string): string {
   
   // STEP 13: Move orphan exercise <p> tags outside lists into the list
   result = absorbOrphanExerciseParagraphs(result);
+
+  // STEP 14: Cool Down consistency — absorb orphan Static Stretching /
+  // Breathing / Diaphragmatic Breathing paragraphs that sit AFTER the
+  // cool-down <ul> into that same list so every line renders as a bullet.
+  result = absorbCoolDownOrphanParagraphs(result);
   
   // Final collapse
   result = result.replace(/(<p class="tiptap-paragraph"><\/p>){2,}/gi, CANONICAL_EMPTY_P);
   
   return result;
+}
+
+/**
+ * Fix malformed nested exercise tokens of the form:
+ *   {{some-slug:{{exercise:some-slug:Name}} }}
+ *   {{exercise:slug:{{exercise:slug:Name}}}}
+ * Reduces them to a single valid {{exercise:ID:Name}} token.
+ */
+export function unwrapNestedExerciseTokens(html: string): string {
+  if (!html || !html.includes('{{')) return html;
+  let result = html;
+  // Run a few passes in case of multiple nestings on a single line.
+  for (let i = 0; i < 3; i++) {
+    const before = result;
+    result = result.replace(
+      /\{\{[^:{}]+:\s*(\{\{(?:exercise|exrcise|excersize|excercise):[^{}]+\}\})\s*\}\}/gi,
+      '$1',
+    );
+    if (result === before) break;
+  }
+  return result;
+}
+
+/**
+ * Cool Down sections sometimes end with detached <p><strong>Static
+ * Stretching:</strong> ...</p> or <p><strong>Breathing:</strong> ...</p>
+ * paragraphs sitting AFTER the </ul>. Move each such paragraph into the
+ * preceding <ul> as a real <li> so the bullet rendering is consistent.
+ */
+export function absorbCoolDownOrphanParagraphs(html: string): string {
+  if (!html || !html.includes('🧘')) return html;
+
+  const coolStart = html.indexOf('🧘');
+  if (coolStart === -1) return html;
+
+  // Operate only on the cool-down slice so we never touch other sections.
+  const before = html.slice(0, coolStart);
+  const coolSlice = html.slice(coolStart);
+
+  // Find the FIRST </ul> after the cool down header. Everything between that
+  // </ul> and the next section boundary is potential orphan content.
+  const ulCloseIdx = coolSlice.indexOf('</ul>');
+  if (ulCloseIdx === -1) return html;
+
+  const head = coolSlice.slice(0, ulCloseIdx); // up to and NOT including </ul>
+  let tail = coolSlice.slice(ulCloseIdx + '</ul>'.length);
+
+  // Match orphan paragraphs whose <strong> opens with one of our labels.
+  const labelRe = /^(?:<p[^>]*>\s*)?<strong>\s*(?:Static Stretching|Diaphragmatic Breathing|Breathing)\b/i;
+  const orphanItems: string[] = [];
+
+  // Iteratively peel paragraphs from the start of `tail`.
+  // Stop at first non-label paragraph or non-paragraph content.
+  while (true) {
+    const trimmed = tail.replace(/^(<p class="tiptap-paragraph"><\/p>)+/, '');
+    const skipped = tail.length - trimmed.length;
+    const pMatch = trimmed.match(/^<p[^>]*>([\s\S]*?)<\/p>/i);
+    if (!pMatch) break;
+    const pContent = pMatch[1];
+    if (!labelRe.test(`<p>${pContent}</p>`)) break;
+    orphanItems.push(`<li class="tiptap-list-item"><p class="tiptap-paragraph">${pContent.trim()}</p></li>`);
+    tail = trimmed.slice(pMatch[0].length);
+    // Re-anchor: consume any single empty <p> separator that the generator left.
+    tail = tail.replace(/^(<p class="tiptap-paragraph"><\/p>)+/, '');
+    // (skipped is intentionally not added back — we drop empty separators.)
+    void skipped;
+  }
+
+  if (orphanItems.length === 0) return html;
+
+  return before + head + orphanItems.join('') + '</ul>' + tail;
 }
 
 /**

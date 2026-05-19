@@ -1,56 +1,41 @@
-# Desktop Hero — Video-First Redesign
+I found the exact failure pattern.
 
-Replace the 7-card bento grid (Workouts, Blog, Library, WOD, Programs, Tools, Community) on the desktop hero with a single large video as the primary visual, and surface those destinations as a rotating link banner overlaid on top of the video (similar to the existing CTA banner pattern).
+What is wrong:
+- `Granite Compass Ascent` has malformed nested exercise markup in Activation, e.g. `{{jumping-jacks:{{exercise:jumping-jacks:Jumping Jacks}} }}`. That is why the visible text looks duplicated/weird.
+- Both `Granite Compass Ascent` and `Athletic Challenge Builder` have Cool Down content after the closing bullet list, so breathing/static stretching renders as plain paragraphs instead of consistent bullets.
+- This is not only those two WODs: the backend scan found many visible workouts with the same Cool Down-after-list pattern, and one visible workout with malformed nested exercise tokens.
 
-Mobile layout stays untouched.
+Implementation plan:
 
-## 1. Remove the desktop bento card grid
+1. Repair tomorrow’s two pre-built WODs immediately
+   - Update `Granite Compass Ascent` Activation so these become clean library-first tokens:
+     - `30 seconds {{exercise:jumping-jacks:Jumping Jacks}}`
+     - `30 seconds {{exercise:high-knees-cardio:High Knees}}`
+     - `30 seconds {{exercise:butt-kicks-cardio:Butt Kicks}}`
+   - Update `Granite Compass Ascent` Cool Down so all stretch items and diaphragmatic breathing live inside the same `<ul class="tiptap-bullet-list">`.
+   - Update `Athletic Challenge Builder` Cool Down so breathing is also inside the same bullet list.
 
-In `src/components/home/HeroDestinationConstellation.tsx`:
-- Hide the entire desktop bento stage (the 530px-tall grid wrapper with Workouts / Programs / Library / WOD / Blog / Tools / Community cards) on `md+`.
-- Keep mobile rendering (HeroThreeColumns carousel) exactly as it is — no change for users under 1024px.
+2. Sweep all currently visible/listed workouts for the same mistakes
+   - Scan `admin_workouts` where `is_visible = true`.
+   - Fix malformed nested tokens like `{{some-id:{{exercise:some-id:Name}} }}` into valid `{{exercise:some-id:Name}}`.
+   - Move orphan Cool Down paragraphs such as `Breathing`, `Diaphragmatic Breathing`, and `Static Stretching` into the existing Cool Down bullet list instead of leaving them as detached paragraphs.
+   - Keep the repair non-destructive: no workout deletion, no visibility changes, no HFSC changes.
 
-## 2. Make the video the full hero
+3. Add a permanent code-level rule so this cannot keep happening
+   - Strengthen the shared HTML normalizer used by WOD generation and bulk repair.
+   - Add a dedicated cleanup step for malformed nested exercise tokens before validation.
+   - Add a dedicated Cool Down post-processor that absorbs post-list breathing/static-stretching paragraphs into the Cool Down `<ul>`.
+   - Make the validator fail if, after the Cool Down `<ul>`, it sees detached breathing/static-stretching paragraphs.
 
-- The `DesktopVideoBanner` becomes the main hero on desktop, not a small strip above cards.
-- Width: same `desktopStageWidth` the cards used (so it stays aligned with the rest of the page container).
-- Height: grow to roughly the space the cards previously occupied (~500–540px) so the hero keeps its current vertical footprint and the page below doesn't jump.
-- Keep `object-cover`, autoplay, muted, loop, playsInline. Add a subtle dark gradient overlay (bottom → top) so overlaid text stays readable.
-- Existing fitness training video stays (`src/assets/hero-banner-video.mp4`).
+4. Run the repair function against all visible workouts
+   - Deploy the updated backend repair logic.
+   - Run a dry-run first to verify affected rows.
+   - Run the live repair for visible workouts.
+   - Re-query the database to confirm:
+     - zero malformed nested exercise tokens
+     - zero visible workouts with detached Cool Down breathing/static-stretching paragraphs
+     - the two tomorrow WODs are clean
 
-## 3. Rotating link banner overlaid on the video
-
-A single banner pinned over the lower-center of the video, cycling through the 7 destinations every ~2.5s:
-
-- Workouts → `/workout`
-- Programs → `/trainingprogram`
-- Exercise Library → `/exerciselibrary`
-- Workout of the Day → `/wod` (current WOD route)
-- Blog & Insights → `/blog`
-- Tools → `/tools`
-- Community → `/community`
-
-Banner design:
-- Glass card (frosted background, rounded, border in `border-white/20`), centered horizontally, sitting ~24px above the bottom of the video.
-- Content: small icon (lucide, matching the card icons already used) + destination title + short tagline + a `ChevronRight`.
-- Whole banner is one clickable link routing to the destination.
-- Crossfade between entries (`animate-fade-in` / opacity transition, ~300ms), 2.5s dwell.
-- Pause rotation on hover; resume on mouse leave.
-- Reuse the existing CTA banner ("Start your fitness journey now") for guests + subscribers, shown above or beside the rotating link banner (premium users still see no CTA, as today).
-
-Accessibility:
-- `aria-live="polite"` on the rotating banner region.
-- Each rotation entry is a real `<a>`/`Link` so keyboard + screen readers can navigate.
-- `prefers-reduced-motion`: disable autorotation, show all 7 as a static inline row of pill links instead.
-
-## 4. Out of scope
-
-- Mobile layout, WOD logic, AccessControl, Stripe, DB, edge functions — all untouched.
-- No new video generation (current fitness clip is reused).
-- No changes to the cards component itself (`HeroThreeColumns.tsx`) — it stays available for mobile.
-
-## Technical notes
-
-- All edits stay inside `src/components/home/HeroDestinationConstellation.tsx` (and a small new internal sub-component for the rotating banner, kept in the same file or a sibling file under `src/components/home/`).
-- Destination list defined once as a typed array reused for both the rotation and the reduced-motion fallback.
-- Premium gating for the CTA reuses the existing `useAccessControl` check already present in this file — no new tier logic.
+5. Validate the generation path
+   - Re-run the formatting audit/repair path after code changes.
+   - Confirm future generated WODs pass the stricter normalizer before they are saved.
