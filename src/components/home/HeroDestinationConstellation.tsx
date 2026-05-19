@@ -311,7 +311,7 @@ const DesktopVideoHero = ({ width, height }: { width: number; height: number }) 
             }}
           >
             <h2 className="text-white text-2xl lg:text-4xl font-bold leading-tight">
-              100% Human. 0% AI.
+              100% Human. <span className="text-red-500">0% AI.</span>
             </h2>
             <p className="text-white text-sm lg:text-base font-medium mt-2 max-w-lg mx-auto">
               SmartyGym workouts and programs are built to fit YOUR life.
