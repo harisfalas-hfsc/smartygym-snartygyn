@@ -1068,7 +1068,7 @@ export const HeroDestinationConstellation = () => {
         <div ref={desktopWrapperRef} className="w-full">
           <DesktopVideoHero
             width={(desktopStageWidth - 40) * desktopScale}
-            height={Math.round(610 * desktopScale)}
+            height={Math.round(702 * desktopScale)}
           />
         </div>
       </div>
