@@ -368,7 +368,7 @@ const DesktopServiceTiles = () => {
             type="button"
             onClick={() => navigate(tile.route)}
             className={cn(
-              "flex flex-col items-center justify-start gap-1 px-1 py-2",
+              "flex flex-col items-center justify-start gap-1.5 px-2 py-3",
               "hover:scale-[1.08] transition-transform duration-200",
               "text-center group cursor-pointer"
             )}
@@ -378,13 +378,13 @@ const DesktopServiceTiles = () => {
             }}
           >
             <Icon
-              className={cn("w-7 h-7 transition-transform group-hover:scale-110", tile.color)}
+              className={cn("w-10 h-10 transition-transform group-hover:scale-110", tile.color)}
               style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.8))" }}
             />
-            <span className="text-white text-xs font-bold leading-tight">
+            <span className="text-white text-sm font-bold leading-tight mt-0.5">
               {tile.title}
             </span>
-            <span className="text-white/90 text-[10px] leading-tight line-clamp-2">
+            <span className="text-white/90 text-xs leading-tight line-clamp-2">
               {tile.description}
             </span>
           </button>
