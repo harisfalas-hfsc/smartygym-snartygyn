@@ -15,6 +15,8 @@ import { cn } from "@/lib/utils";
 import { useTodayWods } from "@/hooks/useTodayWods";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import heroBannerVideo from "@/assets/hero-banner-video.mp4.asset.json";
+import heroBannerVideoPark from "@/assets/hero-banner-video-park.mp4.asset.json";
+import heroBannerVideoLivingroom from "@/assets/hero-banner-video-livingroom.mp4.asset.json";
 import { useIsPortraitMode } from "@/hooks/useIsPortraitMode";
 import type { WorkoutData } from "@/hooks/useWorkoutData";
 import { Badge } from "@/components/ui/badge";
@@ -210,6 +212,19 @@ const RotatingLinkBanner = () => {
 
 const DesktopVideoHero = ({ width, height }: { width: number; height: number }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const VIDEOS = [heroBannerVideo.url, heroBannerVideoPark.url, heroBannerVideoLivingroom.url];
+  const [videoIndex, setVideoIndex] = useState(0);
+
+  const handleEnded = () => {
+    setVideoIndex((i) => (i + 1) % VIDEOS.length);
+  };
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.load();
+    v.play().catch(() => {});
+  }, [videoIndex]);
 
   return (
     <div className="mx-auto" style={{ width: `${width}px`, maxWidth: "100%" }}>
@@ -219,11 +234,12 @@ const DesktopVideoHero = ({ width, height }: { width: number; height: number }) 
       >
         <video
           ref={videoRef}
-          src={heroBannerVideo.url}
+          key={videoIndex}
+          src={VIDEOS[videoIndex]}
           autoPlay
-          loop
           muted
           playsInline
+          onEnded={handleEnded}
           className="absolute inset-0 w-full h-full object-cover"
         />
         {/* Readability gradient — lighter so video stays vivid in light mode */}
