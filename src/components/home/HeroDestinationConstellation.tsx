@@ -281,6 +281,7 @@ const DesktopVideoHero = ({ width, height }: { width: number; height: number }) 
             "absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out",
             activeLayer === "A" ? "opacity-100" : "opacity-0"
           )}
+          style={{ filter: "brightness(1.18) saturate(1.08) contrast(1.02)" }}
         />
         <video
           ref={videoBRef}
@@ -293,6 +294,7 @@ const DesktopVideoHero = ({ width, height }: { width: number; height: number }) 
             "absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out",
             activeLayer === "B" ? "opacity-100" : "opacity-0"
           )}
+          style={{ filter: "brightness(1.18) saturate(1.08) contrast(1.02)" }}
         />
         {/* Readability gradient — lighter so video stays vivid in light mode */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/10 to-transparent" aria-hidden="true" />
