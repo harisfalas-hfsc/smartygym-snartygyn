@@ -301,27 +301,21 @@ const DesktopVideoHero = ({ width, height }: { width: number; height: number }) 
         <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/10 to-transparent" aria-hidden="true" />
         <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/50 to-transparent" aria-hidden="true" />
 
-        {/* Brand message — centered at top, no backdrop so the video stays visible */}
+        {/* Brand message — centered at top */}
         <div className="absolute inset-x-0 top-0 flex items-start justify-center pt-5 px-6 pointer-events-none">
-          <div
-            className="text-center"
-            style={{
-              textShadow:
-                "0 1px 2px rgba(0,0,0,0.95), 0 2px 8px rgba(0,0,0,0.85), 0 0 18px rgba(0,0,0,0.7)",
-            }}
-          >
-            <h2 className="text-white text-2xl lg:text-4xl font-extrabold leading-tight tracking-tight">
-              100% Human. <span className="text-red-500">0% AI.</span>
+          <div className="text-center">
+            <h2 className="text-white text-2xl lg:text-4xl font-bold leading-tight drop-shadow-lg">
+              100% Human. 0% AI.
             </h2>
-            <p className="text-white text-sm lg:text-base font-semibold mt-1 max-w-xl mx-auto">
+            <p className="text-white/90 text-sm lg:text-base mt-2 drop-shadow-md max-w-lg">
               SmartyGym workouts and programs are built to fit YOUR life.
             </p>
           </div>
         </div>
 
-        {/* Destination cards — overlaid at bottom of video */}
-        <div className="absolute inset-x-0 bottom-4 px-4">
-          <DesktopCardCarousel cardHeight={Math.max(80, Math.round(height / 5))} />
+        {/* Static service tiles — overlaid at bottom of video */}
+        <div className="absolute inset-x-0 bottom-4 px-6">
+          <DesktopServiceTiles />
         </div>
       </div>
     </div>
@@ -335,6 +329,57 @@ type DesktopCardItem = {
   icon: LucideIcon;
   route: string;
   image: string;
+};
+
+type ServiceTile = {
+  id: string;
+  title: string;
+  description: string;
+  icon: LucideIcon;
+  route: string;
+  color: string;
+};
+
+const SERVICE_TILES: ServiceTile[] = [
+  { id: "wod",       title: "Workout of the Day", description: "Today's session",     icon: CalendarCheck, route: "/workout/wod",     color: "text-orange-400" },
+  { id: "workouts",  title: "Smarty Workouts",    description: "500+ sessions",        icon: Dumbbell,      route: "/workout",         color: "text-sky-400" },
+  { id: "programs",  title: "Smarty Programs",    description: "Multi-week plans",     icon: Calendar,      route: "/trainingprogram", color: "text-violet-400" },
+  { id: "tools",     title: "Smarty Tools",       description: "Calculators & timers", icon: Calculator,    route: "/tools",           color: "text-emerald-400" },
+  { id: "library",   title: "Exercise Library",   description: "Form & technique",     icon: Video,         route: "/exerciselibrary", color: "text-cyan-400" },
+  { id: "community", title: "Community",          description: "Train together",       icon: Users,         route: "/community",       color: "text-pink-400" },
+  { id: "blog",      title: "Blog & Insights",    description: "Evidence-based",       icon: FileText,      route: "/blog",            color: "text-amber-400" },
+];
+
+const DesktopServiceTiles = () => {
+  const navigate = useNavigate();
+  return (
+    <div className="grid grid-cols-7 gap-2 max-w-5xl mx-auto">
+      {SERVICE_TILES.map((tile) => {
+        const Icon = tile.icon;
+        return (
+          <button
+            key={tile.id}
+            type="button"
+            onClick={() => navigate(tile.route)}
+            className={cn(
+              "flex flex-col items-center justify-center gap-1 px-2 py-3 rounded-xl",
+              "bg-black/55 backdrop-blur-md border border-white/20",
+              "hover:bg-black/75 hover:border-primary hover:scale-[1.04] transition-all duration-200",
+              "text-center group"
+            )}
+          >
+            <Icon className={cn("w-6 h-6 transition-transform group-hover:scale-110", tile.color)} />
+            <span className="text-white text-xs font-bold leading-tight drop-shadow">
+              {tile.title}
+            </span>
+            <span className="text-white/75 text-[10px] leading-tight line-clamp-1">
+              {tile.description}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
 };
 
 const DESKTOP_CARDS: DesktopCardItem[] = [
