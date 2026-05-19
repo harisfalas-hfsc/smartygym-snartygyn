@@ -378,7 +378,7 @@ const DesktopServiceTiles = () => {
             }}
           >
             <Icon
-              className={cn("w-10 h-10 transition-transform group-hover:scale-110", tile.color)}
+              className={cn("w-11 h-11 transition-transform group-hover:scale-110", tile.color)}
               style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.8))" }}
             />
             <span className="text-white text-sm font-bold leading-tight mt-0.5">
@@ -1199,7 +1199,7 @@ export const HeroDestinationConstellation = () => {
         <div ref={desktopWrapperRef} className="w-full">
           <DesktopVideoHero
             width={(desktopStageWidth - 40) * desktopScale}
-            height={Math.round(702 * desktopScale)}
+            height={Math.round(632 * desktopScale)}
           />
         </div>
       </div>
