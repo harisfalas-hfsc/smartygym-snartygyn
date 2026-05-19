@@ -1,5 +1,5 @@
 import { Toaster } from "@/components/ui/toaster";
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
 import { DeviceThemeDefault } from "./components/DeviceThemeDefault";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -25,67 +25,69 @@ import { FixedBackButton } from "./components/FixedBackButton";
 import { Footer } from "./components/Footer";
 import { MobileBottomNav } from "./components/MobileBottomNav";
 import { useAdminRole } from "./hooks/useAdminRole";
-import { ArticleDetail } from "./pages/ArticleDetail";
 import Index from "./pages/Index";
-import Auth from "./pages/Auth";
-import LandingRouter from "./pages/LandingRouter";
-import ResetPassword from "./pages/ResetPassword";
-import UserDashboard from "./pages/UserDashboard";
-import WorkoutFlow from "./pages/WorkoutFlow";
-import WorkoutDetail from "./pages/WorkoutDetail";
-import IndividualWorkout from "./pages/IndividualWorkout";
-import WODArchive from "./pages/WODArchive";
-import DailySmartyRitual from "./pages/DailySmartyRitual";
-import WODCategory from "./pages/WODCategory";
-import TrainingProgramFlow from "./pages/TrainingProgramFlow";
-import TrainingProgramDetail from "./pages/TrainingProgramDetail";
-import IndividualTrainingProgram from "./pages/IndividualTrainingProgram";
-import OneRMCalculator from "./pages/OneRMCalculator";
-import BMRCalculator from "./pages/BMRCalculator";
-import MacroTrackingCalculator from "./pages/MacroTrackingCalculator";
-import ExerciseLibrary from "./pages/ExerciseLibrary";
-import CorporateAdmin from "./pages/CorporateAdmin";
-import CalculatorHistory from "./pages/CalculatorHistory";
-import WorkoutTimer from "./pages/WorkoutTimer";
-import CalorieCounter from "./pages/CalorieCounter";
 
-import Tools from "./pages/Tools";
-import BestOnlineFitnessPlatform from "./pages/BestOnlineFitnessPlatform";
-
-import Blog from "./pages/Blog";
-import About from "./pages/About";
-import FAQ from "./pages/FAQ";
-import CoachProfile from "./pages/CoachProfile";
-import CoachCV from "./pages/CoachCV";
-import Contact from "./pages/Contact";
-import AboutSmartyGym from "./pages/AboutSmartyGym";
-import Shop from "./pages/Shop";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import TermsOfService from "./pages/TermsOfService";
-import Disclaimer from "./pages/Disclaimer";
-import NotFound from "./pages/NotFound";
-import JoinPremium from "./pages/JoinPremium";
-import SmartyCorporate from "./pages/SmartyCorporate";
-import CorporateWellness from "./pages/CorporateWellness";
-import WhyInvestInSmartyGym from "./pages/WhyInvestInSmartyGym";
-import PremiumBenefits from "./pages/PremiumBenefits";
-import SmartyPlans from "./pages/SmartyPlans";
-
-import PaymentSuccess from "./pages/PaymentSuccess";
-import NewsletterThankYou from "./pages/NewsletterThankYou";
-import Unsubscribe from "./pages/Unsubscribe";
-import UnsubscribeHelp from "./pages/UnsubscribeHelp";
-import Community from "./pages/Community";
-import AdminBackoffice from "./pages/AdminBackoffice";
-import ExportVideoPage from "./pages/admin/ExportVideoPage";
-import SEOPreview from "./pages/admin/SEOPreview";
-import ProcessLogo from "./pages/ProcessLogo";
-import AppSubmission from "./pages/AppSubmission";
-import AppSubmissionPrintable from "./pages/AppSubmissionPrintable";
-import BrochureIndividual from "./pages/BrochureIndividual";
-import BrochureCorporate from "./pages/BrochureCorporate";
-import BrochureCronJobs from "./pages/BrochureCronJobs";
-import TheSmartyMethod from "./pages/TheSmartyMethod";
+// Lazy-loaded routes — only the homepage (Index) is loaded eagerly.
+// Everything else is downloaded on demand to keep first paint fast.
+const Auth = lazy(() => import("./pages/Auth"));
+const LandingRouter = lazy(() => import("./pages/LandingRouter"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const UserDashboard = lazy(() => import("./pages/UserDashboard"));
+const WorkoutFlow = lazy(() => import("./pages/WorkoutFlow"));
+const WorkoutDetail = lazy(() => import("./pages/WorkoutDetail"));
+const IndividualWorkout = lazy(() => import("./pages/IndividualWorkout"));
+const WODArchive = lazy(() => import("./pages/WODArchive"));
+const DailySmartyRitual = lazy(() => import("./pages/DailySmartyRitual"));
+const WODCategory = lazy(() => import("./pages/WODCategory"));
+const TrainingProgramFlow = lazy(() => import("./pages/TrainingProgramFlow"));
+const TrainingProgramDetail = lazy(() => import("./pages/TrainingProgramDetail"));
+const IndividualTrainingProgram = lazy(() => import("./pages/IndividualTrainingProgram"));
+const OneRMCalculator = lazy(() => import("./pages/OneRMCalculator"));
+const BMRCalculator = lazy(() => import("./pages/BMRCalculator"));
+const MacroTrackingCalculator = lazy(() => import("./pages/MacroTrackingCalculator"));
+const ExerciseLibrary = lazy(() => import("./pages/ExerciseLibrary"));
+const CorporateAdmin = lazy(() => import("./pages/CorporateAdmin"));
+const CalculatorHistory = lazy(() => import("./pages/CalculatorHistory"));
+const WorkoutTimer = lazy(() => import("./pages/WorkoutTimer"));
+const CalorieCounter = lazy(() => import("./pages/CalorieCounter"));
+const Tools = lazy(() => import("./pages/Tools"));
+const BestOnlineFitnessPlatform = lazy(() => import("./pages/BestOnlineFitnessPlatform"));
+const Blog = lazy(() => import("./pages/Blog"));
+const About = lazy(() => import("./pages/About"));
+const FAQ = lazy(() => import("./pages/FAQ"));
+const CoachProfile = lazy(() => import("./pages/CoachProfile"));
+const CoachCV = lazy(() => import("./pages/CoachCV"));
+const Contact = lazy(() => import("./pages/Contact"));
+const AboutSmartyGym = lazy(() => import("./pages/AboutSmartyGym"));
+const Shop = lazy(() => import("./pages/Shop"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const TermsOfService = lazy(() => import("./pages/TermsOfService"));
+const Disclaimer = lazy(() => import("./pages/Disclaimer"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const JoinPremium = lazy(() => import("./pages/JoinPremium"));
+const SmartyCorporate = lazy(() => import("./pages/SmartyCorporate"));
+const CorporateWellness = lazy(() => import("./pages/CorporateWellness"));
+const WhyInvestInSmartyGym = lazy(() => import("./pages/WhyInvestInSmartyGym"));
+const PremiumBenefits = lazy(() => import("./pages/PremiumBenefits"));
+const SmartyPlans = lazy(() => import("./pages/SmartyPlans"));
+const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
+const NewsletterThankYou = lazy(() => import("./pages/NewsletterThankYou"));
+const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
+const UnsubscribeHelp = lazy(() => import("./pages/UnsubscribeHelp"));
+const Community = lazy(() => import("./pages/Community"));
+const AdminBackoffice = lazy(() => import("./pages/AdminBackoffice"));
+const ExportVideoPage = lazy(() => import("./pages/admin/ExportVideoPage"));
+const SEOPreview = lazy(() => import("./pages/admin/SEOPreview"));
+const ProcessLogo = lazy(() => import("./pages/ProcessLogo"));
+const AppSubmission = lazy(() => import("./pages/AppSubmission"));
+const AppSubmissionPrintable = lazy(() => import("./pages/AppSubmissionPrintable"));
+const BrochureIndividual = lazy(() => import("./pages/BrochureIndividual"));
+const BrochureCorporate = lazy(() => import("./pages/BrochureCorporate"));
+const BrochureCronJobs = lazy(() => import("./pages/BrochureCronJobs"));
+const TheSmartyMethod = lazy(() => import("./pages/TheSmartyMethod"));
+const ArticleDetail = lazy(() =>
+  import("./pages/ArticleDetail").then((m) => ({ default: m.ArticleDetail })),
+);
 import { AccessGate } from "./components/AccessGate";
 
 import { PageTransition } from "./components/PageTransition";
@@ -147,6 +149,7 @@ const AppContent = () => {
               }}
             >
             <PageTransition>
+                <Suspense fallback={null}>
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/start" element={<LandingRouter />} />
@@ -278,6 +281,7 @@ const AppContent = () => {
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
+              </Suspense>
             </PageTransition>
           </main>
         <Footer />
