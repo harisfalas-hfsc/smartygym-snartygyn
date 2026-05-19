@@ -331,6 +331,57 @@ type DesktopCardItem = {
   image: string;
 };
 
+type ServiceTile = {
+  id: string;
+  title: string;
+  description: string;
+  icon: LucideIcon;
+  route: string;
+  color: string;
+};
+
+const SERVICE_TILES: ServiceTile[] = [
+  { id: "wod",       title: "Workout of the Day", description: "Today's session",     icon: CalendarCheck, route: "/workout/wod",     color: "text-orange-400" },
+  { id: "workouts",  title: "Smarty Workouts",    description: "500+ sessions",        icon: Dumbbell,      route: "/workout",         color: "text-sky-400" },
+  { id: "programs",  title: "Smarty Programs",    description: "Multi-week plans",     icon: Calendar,      route: "/trainingprogram", color: "text-violet-400" },
+  { id: "tools",     title: "Smarty Tools",       description: "Calculators & timers", icon: Calculator,    route: "/tools",           color: "text-emerald-400" },
+  { id: "library",   title: "Exercise Library",   description: "Form & technique",     icon: Video,         route: "/exerciselibrary", color: "text-cyan-400" },
+  { id: "community", title: "Community",          description: "Train together",       icon: Users,         route: "/community",       color: "text-pink-400" },
+  { id: "blog",      title: "Blog & Insights",    description: "Evidence-based",       icon: FileText,      route: "/blog",            color: "text-amber-400" },
+];
+
+const DesktopServiceTiles = () => {
+  const navigate = useNavigate();
+  return (
+    <div className="grid grid-cols-7 gap-2 max-w-5xl mx-auto">
+      {SERVICE_TILES.map((tile) => {
+        const Icon = tile.icon;
+        return (
+          <button
+            key={tile.id}
+            type="button"
+            onClick={() => navigate(tile.route)}
+            className={cn(
+              "flex flex-col items-center justify-center gap-1 px-2 py-3 rounded-xl",
+              "bg-black/55 backdrop-blur-md border border-white/20",
+              "hover:bg-black/75 hover:border-primary hover:scale-[1.04] transition-all duration-200",
+              "text-center group"
+            )}
+          >
+            <Icon className={cn("w-6 h-6 transition-transform group-hover:scale-110", tile.color)} />
+            <span className="text-white text-xs font-bold leading-tight drop-shadow">
+              {tile.title}
+            </span>
+            <span className="text-white/75 text-[10px] leading-tight line-clamp-1">
+              {tile.description}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+};
+
 const DESKTOP_CARDS: DesktopCardItem[] = [
   { id: "workouts",  title: "Smarty Workouts",   description: "500+ expert sessions",      icon: Dumbbell,      route: "/workout",          image: heroWorkoutsImage },
   { id: "programs",  title: "Smarty Programs",   description: "Multi-week training plans", icon: Calendar,      route: "/trainingprogram",  image: heroProgramsImage },
