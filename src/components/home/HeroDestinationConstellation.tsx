@@ -9,8 +9,6 @@ import {
   FileText,
   Users,
   User,
-  Volume2,
-  VolumeX,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
