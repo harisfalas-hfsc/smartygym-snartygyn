@@ -2167,8 +2167,20 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://smartygym.com/workout/challenge/WOD-CH-B-1779172204275</loc>
+    <lastmod>2026-05-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://smartygym.com/workout/mobility/WOD-MS-B-1768170609085</loc>
     <lastmod>2026-05-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://smartygym.com/workout/challenge/WOD-CH-E-1779173402985</loc>
+    <lastmod>2026-05-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
