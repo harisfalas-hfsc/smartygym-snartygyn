@@ -129,15 +129,20 @@ const Index = () => {
   }>;
   const activeMobileWod = mobileWodCards.length > 0 ? mobileWodCards[activeWodIndex % mobileWodCards.length] : null;
 
-  // Preload all mobile WOD images so rotation is instant (no flash/loading)
+  // Preload non-active WOD images lazily, after first paint, so the
+  // initial mobile render isn't slowed down by extra image downloads.
   useEffect(() => {
     if (!isMobile) return;
-    mobileWodCards.forEach((card) => {
-      if (card.wod.image_url) {
-        const img = new Image();
-        img.src = card.wod.image_url;
-      }
-    });
+    const t = window.setTimeout(() => {
+      mobileWodCards.forEach((card, i) => {
+        if (i === 0) return; // first one renders via <img>, no need to preload
+        if (card.wod.image_url) {
+          const img = new Image();
+          img.src = card.wod.image_url;
+        }
+      });
+    }, 2500);
+    return () => window.clearTimeout(t);
   }, [isMobile, mobileWodCards.map((c) => c.wod.image_url).join("|")]);
 
   useEffect(() => {
@@ -507,8 +512,8 @@ const Index = () => {
                   const Icon = card.icon;
                   return (
                     <CarouselItem key={card.id} className="pl-2 basis-[75%] sm:basis-[60%]">
-                      <div onClick={() => navigate(card.route)} className="border-2 border-primary/40 rounded-xl overflow-hidden hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300 cursor-pointer bg-card flex flex-col h-[260px] sm:h-[300px]">
-                        <div className="relative h-[70%] overflow-hidden flex-shrink-0">
+                      <div onClick={() => navigate(card.route)} className="border-2 border-primary/40 rounded-xl overflow-hidden hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300 cursor-pointer bg-card flex flex-col">
+                        <div className="relative aspect-[4/3] w-full overflow-hidden flex-shrink-0">
                           <img
                             src={card.image}
                             alt={card.title}
@@ -517,10 +522,10 @@ const Index = () => {
                             loading={index === 0 ? "eager" : "lazy"}
                             decoding="async"
                             fetchPriority={index === 0 ? "high" : "auto"}
-                            className="w-full h-full object-cover object-[center_top]"
+                            className="absolute inset-0 w-full h-full object-cover object-[center_top]"
                           />
                         </div>
-                        <div className="flex flex-col justify-center flex-1 p-3 text-center">
+                        <div className="flex flex-col justify-center flex-1 p-3 text-center min-h-[96px]">
                           <div className="flex items-center justify-center gap-2 mb-1">
                             <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                               <Icon className="w-3.5 h-3.5 text-primary" />
