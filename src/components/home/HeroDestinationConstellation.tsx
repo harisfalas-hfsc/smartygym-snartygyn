@@ -217,29 +217,26 @@ const DesktopVideoHero = ({ width, height }: { width: number; height: number }) 
   const playedSignatureRef = useRef(false);
 
   const playSignature = () => {
-    if (playedSignatureRef.current) return;
     const a = signatureRef.current;
     if (!a) return;
     a.currentTime = 0;
     a.volume = 0.9;
     a.muted = false;
-    a.play()
-      .then(() => {
+    const p = a.play();
+    if (p && typeof p.then === "function") {
+      p.then(() => {
         playedSignatureRef.current = true;
-      })
-      .catch(() => {
-        // Autoplay blocked — retry on first user interaction
+      }).catch(() => {
+        // Autoplay blocked — will retry on first user interaction
       });
+    }
   };
 
   useEffect(() => {
     const timer = window.setTimeout(playSignature, 1500);
     const onInteract = () => {
+      if (playedSignatureRef.current) return;
       playSignature();
-      if (playedSignatureRef.current) {
-        window.removeEventListener("pointerdown", onInteract);
-        window.removeEventListener("keydown", onInteract);
-      }
     };
     window.addEventListener("pointerdown", onInteract, { once: false });
     window.addEventListener("keydown", onInteract, { once: false });
