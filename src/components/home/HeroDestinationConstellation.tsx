@@ -14,7 +14,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useTodayWods } from "@/hooks/useTodayWods";
 import { ChevronRight, ChevronLeft } from "lucide-react";
-import heroBannerVideo from "@/assets/hero-banner-video.mp4.asset.json";
+import heroBannerVideoGym from "@/assets/hero-banner-video-gym.mp4.asset.json";
 import heroBannerVideoPark from "@/assets/hero-banner-video-park.mp4.asset.json";
 import heroBannerVideoLivingroom from "@/assets/hero-banner-video-livingroom.mp4.asset.json";
 import { useIsPortraitMode } from "@/hooks/useIsPortraitMode";
@@ -211,7 +211,8 @@ const RotatingLinkBanner = () => {
 };
 
 const DesktopVideoHero = ({ width, height }: { width: number; height: number }) => {
-  const VIDEOS = [heroBannerVideo.url, heroBannerVideoPark.url, heroBannerVideoLivingroom.url];
+  // Bright, cohesive scene rotation: gym → home → park (~15s total cycle, ~5s per scene)
+  const VIDEOS = [heroBannerVideoGym.url, heroBannerVideoLivingroom.url, heroBannerVideoPark.url];
   const videoARef = useRef<HTMLVideoElement | null>(null);
   const videoBRef = useRef<HTMLVideoElement | null>(null);
   const [activeLayer, setActiveLayer] = useState<"A" | "B">("A");
