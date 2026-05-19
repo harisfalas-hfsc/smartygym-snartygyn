@@ -213,23 +213,49 @@ const RotatingLinkBanner = () => {
 const DesktopVideoHero = ({ width, height }: { width: number; height: number }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const signatureRef = useRef<HTMLAudioElement | null>(null);
-  const [muted, setMuted] = useState(true);
-  const [playedSignature, setPlayedSignature] = useState(false);
+  const [muted, setMuted] = useState(false);
+  const playedSignatureRef = useRef(false);
+
+  const playSignature = () => {
+    if (playedSignatureRef.current) return;
+    const a = signatureRef.current;
+    if (!a) return;
+    a.currentTime = 0;
+    a.volume = 0.9;
+    a.muted = false;
+    a.play()
+      .then(() => {
+        playedSignatureRef.current = true;
+      })
+      .catch(() => {
+        // Autoplay blocked — retry on first user interaction
+      });
+  };
+
+  useEffect(() => {
+    const timer = window.setTimeout(playSignature, 1500);
+    const onInteract = () => {
+      playSignature();
+      if (playedSignatureRef.current) {
+        window.removeEventListener("pointerdown", onInteract);
+        window.removeEventListener("keydown", onInteract);
+      }
+    };
+    window.addEventListener("pointerdown", onInteract, { once: false });
+    window.addEventListener("keydown", onInteract, { once: false });
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("pointerdown", onInteract);
+      window.removeEventListener("keydown", onInteract);
+    };
+  }, []);
 
   const toggleSound = () => {
     const next = !muted;
     setMuted(next);
-    const v = videoRef.current;
-    if (v) v.muted = next;
-    if (!next && !playedSignature) {
-      const a = signatureRef.current;
-      if (a) {
-        a.currentTime = 0;
-        a.volume = 0.9;
-        a.play().catch(() => {});
-      }
-      setPlayedSignature(true);
-    }
+    const a = signatureRef.current;
+    if (a) a.muted = next;
+    if (!next) playSignature();
   };
 
   return (
