@@ -26,7 +26,8 @@ import {
   Check,
   MessageSquare,
   UserMinus,
-  Shield
+  Shield,
+  RefreshCw
 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -39,6 +40,7 @@ interface UserData {
   email: string | null;
   plan_type: string;
   status: string;
+  stripe_status?: string | null;
   current_period_start: string | null;
   current_period_end: string | null;
   created_at: string; // Profile creation date (joined platform)
@@ -47,6 +49,7 @@ interface UserData {
   stripe_customer_id?: string | null;
   stripe_subscription_id?: string | null;
   subscription_source?: string | null;
+  cancel_at_period_end?: boolean;
 }
 
 interface CorporateInfo {
@@ -88,6 +91,7 @@ export function UserDetailModal({
   const [loadingPurchases, setLoadingPurchases] = useState(false);
   const [copied, setCopied] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
+  const [syncLoading, setSyncLoading] = useState(false);
   const [corporateDetails, setCorporateDetails] = useState<{
     periodEnd?: string;
     createdAt?: string;
@@ -202,6 +206,26 @@ export function UserDetailModal({
     }
   };
 
+  const syncStripeSubscription = async () => {
+    if (!user) return;
+    setSyncLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('check-subscription', {
+        body: { target_user_id: user.user_id }
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast.success('Stripe subscription synced');
+      onRefresh();
+      onClose();
+    } catch (error) {
+      console.error('Error syncing Stripe subscription:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to sync Stripe subscription');
+    } finally {
+      setSyncLoading(false);
+    }
+  };
+
   const toggleAdminRole = async () => {
     if (!user) return;
     setActionLoading(true);
@@ -286,6 +310,7 @@ export function UserDetailModal({
   const isPremium = user.status === 'active' && (user.plan_type === 'gold' || user.plan_type === 'platinum');
   const isCorporateAdmin = !!corporateInfo?.adminPlanType;
   const isCorporateMember = !!corporateInfo?.memberPlanType;
+  const hasEndedStripePlan = !!user.stripe_subscription_id && !!user.current_period_end && new Date(user.current_period_end).getTime() < Date.now();
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -317,6 +342,12 @@ export function UserDetailModal({
                   <Badge variant="secondary" className="bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300">
                     Complimentary
                   </Badge>
+                )}
+                {user.subscription_source === 'stripe' && (
+                  <Badge variant="outline">Stripe</Badge>
+                )}
+                {hasEndedStripePlan && user.status === 'active' && (
+                  <Badge variant="destructive">Needs Stripe Sync</Badge>
                 )}
                 {isCorporateAdmin && (
                   <Badge className="bg-blue-600">🏢 Corp Admin ({corporateInfo.adminPlanType})</Badge>
@@ -376,6 +407,14 @@ export function UserDetailModal({
                       </Badge>
                     </div>
                     <div>
+                      <p className="text-muted-foreground">Source</p>
+                      <p className="font-medium">{user.subscription_source || 'N/A'}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Billing State</p>
+                      <p className="font-medium">{hasEndedStripePlan ? 'Ended in Stripe period' : user.cancel_at_period_end ? 'Cancels at period end' : 'Current'}</p>
+                    </div>
+                    <div>
                       <p className="text-muted-foreground">Joined Platform</p>
                       <p>{format(new Date(user.created_at), 'MMM d, yyyy')}</p>
                     </div>
@@ -409,6 +448,15 @@ export function UserDetailModal({
                       <div className="col-span-2">
                         <p className="text-muted-foreground">Stripe Customer</p>
                         <code className="text-xs bg-muted px-1 rounded">{user.stripe_customer_id}</code>
+                      </div>
+                    )}
+                    {user.stripe_subscription_id && (
+                      <div className="col-span-2 flex flex-wrap items-center gap-2 pt-2">
+                        <Button variant="outline" size="sm" onClick={syncStripeSubscription} disabled={syncLoading}>
+                          <RefreshCw className={`h-4 w-4 mr-2 ${syncLoading ? 'animate-spin' : ''}`} />
+                          Sync from Stripe
+                        </Button>
+                        <code className="text-xs bg-muted px-1 rounded">{user.stripe_subscription_id}</code>
                       </div>
                     )}
                   </div>

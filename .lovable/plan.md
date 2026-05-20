@@ -1,118 +1,65 @@
-Yes — this can be fixed permanently at code level. The only honest caveat: the SEO Review scans the published site, so the warnings disappear only after the fixes are implemented and the app is republished. If new routes/images/features are added later without following the same rules, the scanner can flag new issues again. The plan below is to make those rules automatic so the same current issues do not keep returning.
+## What actually happened with Manos Christofi
 
-## What the current warnings mean
-
-### 1. Page loads slowly
-Main cause found: the app currently imports almost every page upfront in `src/App.tsx`. On the homepage mobile load, the browser is downloading many routes that are not needed yet, including dashboard/admin/secondary pages. The performance profile showed around 244 script requests and a very late first paint in the dev preview.
-
-This is fixable.
-
-### 2. Awkward on phones
-The scanner message is not saying the whole design is bad. It specifically says images render at the wrong aspect ratio or appear visually awkward on mobile. On the homepage mobile screenshot, the top carousel cards and WOD card are the main likely triggers: fixed-height image containers, mixed natural image ratios, cropped thumbnails, and cramped/truncated text/badges.
-
-This is fixable without changing the brand style.
-
-### 3. Sitemap needs attention
-The scan is flagging these routes as present in code but missing from the sitemap:
+I pulled the truth directly from Stripe and from your database. The payment system worked correctly. Here is the timeline:
 
 ```text
-/auth
-/reset-password
-/premium-comparison
-/premiumcomparison
-/newsletter-thank-you
+Mar 5, 2026  Account created on SmartyGym
+Mar 9, 2026  Started Gold subscription with 3-day free trial  (€0 invoice — PAID)
+Apr 16, 2026 First real renewal charge                         (€9.99 — PAID)
+May 16, 2026 Second renewal charge                             (€9.99 — PAID)
+May 16, 2026 Subscription ENDED in Stripe (status = canceled)
+May 20, 2026 Today
 ```
 
-Some of these are not ideal SEO pages, but the scanner keeps reporting them because it compares app routes against `public/sitemap.xml`. To stop the recurring warning, the sitemap generator needs to account for them consistently instead of relying on manual edits.
+Stripe shows 3 invoices, all `paid`. The customer was charged every month he was supposed to be. **He has not been "missed" by the billing system.**
 
-### 4. Accessibility barriers
-You said you do not care much about this right now. I will not redesign contrast globally. I will only avoid introducing new contrast problems while fixing performance/mobile/sitemap.
+## Why he looks "Active" in your admin panel
 
-## Implementation plan
+The subscription is **canceled in Stripe** (`status: canceled`, period ended May 16) but in your database `user_subscriptions` still says:
+- `status = active`
+- `cancel_at_period_end = false`
+- `current_period_end = May 16, 2026`
+- `updated_at = April 20, 2026`  ← last time a Stripe webhook touched the row
 
-### Step 1 — Fix slow loading permanently with route-level code splitting
-Refactor `src/App.tsx` so only the homepage and global shell load first. All non-home routes will be lazy-loaded with `React.lazy` and `Suspense`.
+So the `customer.subscription.deleted` webhook from Stripe did not update this user's row when the subscription canceled on May 16. The admin panel is just reading the stale DB row — that's why it shows him as "Gold, Paid, Paying".
 
-This means the homepage will no longer download pages like:
+## What the admin card labels really mean
 
-```text
-UserDashboard
-AboutSmartyGym
-CorporateWellness
-WhyInvestInSmartyGym
-AdminBackoffice
-ExportVideoPage
-Shop
-Tools
-Blog route modules
-```
+- "Joined March 5" → profile `created_at`
+- "First subscribed March 9" → subscription row `created_at` (trial start)
+- "Current plan since April 16" → `current_period_start` (start of current billing cycle)
+- "Last modified April 20" → `updated_at` (last webhook sync from Stripe)
+- "Plan expires May 16" → `current_period_end` (correct — this is when the plan actually ended)
+- "Purchases: 0" → correct. He has no individual standalone purchases. Subscriptions are stored separately from `user_purchases`, so subscribers always show 0 unless they also bought single workouts/programs.
 
-until the user actually visits them.
+## What I will do
 
-Expected result: much smaller initial JavaScript load, faster first paint, and a stronger chance the SEO Review stops showing “Page loads slowly”.
+### 1. Fix Manos's record now
+Run `check-subscription` for his user_id to force a fresh pull from Stripe and update `user_subscriptions` to `status = canceled`, so the admin panel reflects reality immediately.
 
-### Step 2 — Keep homepage above-the-fold lighter on mobile
-On mobile only:
+### 2. Find out why the cancellation webhook didn't sync
+Check Stripe webhook logs and `stripe-webhook` function logs around May 16 for `customer.subscription.deleted` / `customer.subscription.updated` events on `sub_1T8yQgIxQYg9inGKcXc34Sa9`. Two likely causes:
+- Webhook fired but errored.
+- Webhook never reached us (endpoint misconfigured for that event type).
 
-- Keep the visual design, but reduce first-load work.
-- Do not preload or eagerly load non-visible carousel images.
-- Keep only the first visible carousel image high priority.
-- Prevent the WOD rotation preloader from immediately loading every WOD image before the first screen paints.
-- Keep WOD image loading stable with explicit dimensions and fixed aspect-ratio containers.
+Fix whichever is found.
 
-Expected result: less network pressure on mobile and less main-thread work during the first few seconds.
+### 3. Add a daily drift-repair cron (safety net)
+Add a `sync-stripe-subscription-status-daily` cron (e.g. 04:30 UTC) that walks every row in `user_subscriptions` whose `current_period_end < now()` and `status = 'active'`, re-checks each one against Stripe, and corrects `status` / `cancel_at_period_end` / `current_period_end`. This is the same defense-in-depth pattern you already use for `auto-finalize-draft-invoices` and `backfill-subscription-payment-methods` — it guarantees that even if a webhook is ever missed again, the admin panel will be correct within 24 hours.
 
-### Step 3 — Fix the “awkward on phones” image/aspect issues
-Update the homepage mobile cards so every image has a stable, intentional mobile ratio:
+### 4. Admin panel UX improvement (small)
+In the user admin card, add a "Sync from Stripe" button that calls `check-subscription` for the selected user, so you can manually force a refresh on any user in one click. Also show "Subscription source: Stripe" and the real Stripe status next to the local status when they differ.
 
-- Top service carousel: use a consistent `aspect-[4/3]` or `aspect-video` image frame instead of percentage height inside a fixed card.
-- WOD card: use a stable `aspect-video` frame and allow the content area to grow enough so badges/text do not look squeezed.
-- Ensure image tags keep `width`, `height`, `decoding`, and correct `loading`/`fetchPriority`.
-- Use `object-cover` with controlled `object-position` only where cropping is intentional.
-- Remove text/layout combinations that force cramped mobile truncation where it visually looks broken.
+## Technical details
 
-Expected result: no stretched/squashed image ratios and a cleaner mobile first viewport.
+- Stripe customer: `cus_U7CTdKqa9gEq3U`
+- Stripe subscription: `sub_1T8yQgIxQYg9inGKcXc34Sa9` — status **canceled**
+- Stripe invoices (all `paid`): `in_1T8yQC` (trial €0), `in_1TBVm6` (€9.99), `in_1TMkXk` (€9.99)
+- DB row id: `58a87adf-920e-437d-9a31-3c5c95fe1d48`
+- The new cron will reuse the existing `check-subscription` edge function logic refactored into a service-role batch worker so it does not need a user JWT.
 
-### Step 4 — Make sitemap generation match routes every time
-Update `scripts/generate-sitemap.ts` so the routes currently flagged by SEO Review are handled consistently:
+## What this does NOT change
 
-```text
-/auth
-/reset-password
-/premium-comparison
-/premiumcomparison
-/newsletter-thank-you
-```
-
-I will add them deliberately to the sitemap generator with low priority where needed, while keeping canonical/noindex behavior on pages that should not rank directly. This is the practical way to stop the scanner’s route-vs-sitemap mismatch from returning.
-
-I will also add a small route/sitemap consistency check script so future route additions can be caught before publishing, instead of after an SEO scan.
-
-### Step 5 — Verify before marking findings fixed
-After implementation, verify:
-
-- Mobile homepage at 390px and 360px widths.
-- No obvious stretched images or broken first-screen layout.
-- Homepage performance profile improves after lazy-loading routes.
-- `public/sitemap.xml` contains the routes the scanner is currently flagging.
-- SEO findings can be marked fixed only after the code actually addresses them.
-
-### Step 6 — Republish requirement
-Because these findings come from the last published app, the fixes will only disappear from SEO Review after publishing the updated version and scanning again.
-
-## Files likely to change
-
-```text
-src/App.tsx
-src/pages/Index.tsx
-scripts/generate-sitemap.ts
-public/sitemap.xml
-package.json or a new small sitemap-check script, if needed
-```
-
-## What I will not change
-
-- I will not alter your visual brand direction.
-- I will not globally increase contrast or redesign colors for the accessibility warning.
-- I will not remove the homepage content structure unless needed for performance/mobile stability.
-- I will not touch HFSC-related assets/data.
+- No price changes, no Stripe products touched.
+- No customer is re-charged or refunded.
+- The renewal-billing hardening you already have in place (4 layers: checkout default-PM, webhooks, 4h auto-finalize, weekly PM backfill) stays exactly as-is.

@@ -84,12 +84,16 @@ export function UsersManager() {
   const [organizations, setOrganizations] = useState<string[]>([]);
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [syncingUserId, setSyncingUserId] = useState<string | null>(null);
   const SUPER_ADMIN_EMAIL = "harisfalas@gmail.com";
 
   // --- Status determination ---
   const getUserStatus = (user: UserData, hasPurchases: boolean) => {
     // Revoked by admin
     if (user.status === 'revoked') return 'Revoked';
+    const periodEnded = !!user.current_period_end && new Date(user.current_period_end).getTime() < Date.now();
+    if (user.stripe_subscription_id && periodEnded && user.status !== 'active') return 'Expired';
+    if (user.stripe_subscription_id && periodEnded && user.status === 'active') return 'Needs Sync';
     
     // Active subscription
     if (user.status === 'active' && (user.plan_type === 'gold' || user.plan_type === 'platinum')) {
@@ -112,6 +116,7 @@ export function UsersManager() {
       case 'Paying': return 'default';
       case 'Purchase Only': return 'secondary';
       case 'Revoked': return 'outline';
+      case 'Needs Sync': return 'destructive';
       case 'Expired': return 'destructive';
       default: return 'outline';
     }
@@ -221,6 +226,24 @@ export function UsersManager() {
     } finally {
       setActionLoading(false);
       setPendingAction(null);
+    }
+  };
+
+  const syncStripeSubscription = async (userId: string) => {
+    setSyncingUserId(userId);
+    try {
+      const { data, error } = await supabase.functions.invoke('check-subscription', {
+        body: { target_user_id: userId }
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast.success('Stripe subscription synced');
+      fetchUsers();
+    } catch (error) {
+      console.error('Error syncing Stripe subscription:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to sync Stripe subscription');
+    } finally {
+      setSyncingUserId(null);
     }
   };
 
@@ -733,6 +756,7 @@ export function UsersManager() {
                 const corpInfo = corporateInfo[user.user_id];
                 const isCorporateAdmin = !!corpInfo?.adminPlanType;
                 const isCorporateMember = !!corpInfo?.memberPlanType;
+                const hasEndedStripePlan = !!user.stripe_subscription_id && !!user.current_period_end && new Date(user.current_period_end).getTime() < Date.now();
                 
                 return (
                   <div
@@ -774,6 +798,9 @@ export function UsersManager() {
                             {user.stripe_subscription_id && (
                               <Badge variant="outline" className="text-xs border-green-600 text-green-600">Paid</Badge>
                             )}
+                            {user.subscription_source === 'stripe' && (
+                              <Badge variant="outline" className="text-xs">Stripe</Badge>
+                            )}
                           </>
                         )}
                         <Badge 
@@ -786,6 +813,9 @@ export function UsersManager() {
                           <Badge variant="outline" className="text-xs bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20">
                             Cancels at period end
                           </Badge>
+                        )}
+                        {hasEndedStripePlan && user.status === 'active' && (
+                          <Badge variant="destructive" className="text-xs">Stripe sync needed</Badge>
                         )}
                         {hasPurchases && (
                           <Badge variant="outline" className="text-xs">💳 Purchases</Badge>
@@ -833,6 +863,9 @@ export function UsersManager() {
                           : 'N/A'}</span>
                       <span>Subscribed: {user.subscription_created_at && user.plan_type !== 'free'
                         ? format(new Date(user.subscription_created_at), 'MMM d, yyyy')
+                        : '—'}</span>
+                      <span>Last Sync: {user.subscription_updated_at
+                        ? format(new Date(user.subscription_updated_at), 'MMM d, yyyy')
                         : '—'}</span>
                     </div>
 
@@ -888,6 +921,14 @@ export function UsersManager() {
                         disabled={!user.email}>
                         <Mail className="h-3 w-3" />
                       </Button>
+
+                      {user.stripe_customer_id && (
+                        <Button variant="outline" size="sm" className="h-7 text-xs px-2 whitespace-nowrap"
+                          onClick={(e) => { e.stopPropagation(); syncStripeSubscription(user.user_id); }}
+                          disabled={syncingUserId === user.user_id}>
+                          <RefreshCw className={`h-3 w-3 mr-1 ${syncingUserId === user.user_id ? 'animate-spin' : ''}`} />Sync Stripe
+                        </Button>
+                      )}
 
                       {!isCorporateAdmin && !isCorporateMember ? (
                         <>
