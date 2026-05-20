@@ -539,7 +539,7 @@ export const SmartyCoachModal = ({ isOpen, onClose, initialPath = 'menu' }: Smar
                 </>
               ) : (
                 <div className="text-center py-6 text-muted-foreground">
-                  <p>No workouts available to suggest at the moment.</p>
+                  <p>We're refreshing the workout library right now — try the Workout of the Day or explore our programs in the meantime.</p>
                   <Button variant="outline" onClick={goBack} className="mt-4 flex items-center gap-1 mx-auto"><ChevronLeft className="h-4 w-4" />Back</Button>
                 </div>
               )}
@@ -548,6 +548,13 @@ export const SmartyCoachModal = ({ isOpen, onClose, initialPath = 'menu' }: Smar
         </div>
         </div>
         )}
+        {/* Always-available footer */}
+        <div className="px-5 sm:px-7 py-3 bg-muted/40 border-t border-border text-center">
+          <p className="text-xs sm:text-sm text-muted-foreground inline-flex items-center justify-center gap-1.5 flex-wrap">
+            <Sparkles className="h-3.5 w-3.5 text-primary shrink-0" />
+            I'm always here for you — tap the <span className="font-semibold text-foreground">Smarty Coach</span> button anytime to get help.
+          </p>
+        </div>
       </DialogContent>
     </Dialog>
   );
