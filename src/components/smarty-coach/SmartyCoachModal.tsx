@@ -260,92 +260,120 @@ export const SmartyCoachModal = ({ isOpen, onClose, initialPath = 'menu' }: Smar
     }
   };
 
-  const handleMeasurement = () => {
+  const handleNavigateTo = (path: string) => {
     onClose();
-    navigate('/tools');
+    navigate(path);
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleDismiss()}>
-      <DialogContent className="w-[calc(100vw-2rem)] max-w-md mx-auto max-h-[85vh] overflow-y-auto">
+      <DialogContent
+        className={cn(
+          "p-0 border-0 overflow-hidden",
+          "w-[calc(100vw-1rem)] sm:w-[95vw] max-w-lg md:max-w-2xl mx-auto",
+          "max-h-[92vh] sm:max-h-[90vh] overflow-y-auto",
+          "rounded-2xl bg-card border-2 border-primary/30 shadow-2xl shadow-primary/20",
+          activePath === 'menu' ? "[&>button]:hidden" : ""
+        )}
+      >
+        {activePath === 'menu' ? (
+          <>
+            {/* Rich header band */}
+            <div className="relative px-5 sm:px-7 pt-7 pb-5 bg-gradient-to-br from-primary/15 via-primary/5 to-transparent">
+              <button
+                onClick={handleDismiss}
+                aria-label="Close"
+                className="absolute top-3 right-3 p-1.5 rounded-full bg-background/80 hover:bg-background text-foreground transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              <div className="flex items-center gap-3 sm:gap-4">
+                <div className="relative">
+                  <div className="absolute inset-0 rounded-2xl bg-primary/30 blur-xl animate-pulse" />
+                  <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center shadow-lg shadow-primary/40 animate-in zoom-in-50 duration-500">
+                    <Brain className="h-7 w-7 sm:h-8 sm:w-8" />
+                  </div>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-foreground leading-tight">
+                    Hi <span className="inline-block">👋</span> I'm your Smarty Coach
+                  </h2>
+                  <p className="text-sm sm:text-base text-muted-foreground mt-1">
+                    How can I help you today?
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Menu options */}
+            <div className="px-4 sm:px-7 pb-5 pt-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 animate-in fade-in duration-300">
+                <MenuCard
+                  emoji="🔥"
+                  title="Workout of the Day"
+                  description="Check today's bodyweight & equipment WOD"
+                  Icon={Flame}
+                  accent="amber"
+                  onClick={() => handleNavigateTo('/workout/wod')}
+                />
+                <MenuCard
+                  emoji="💪"
+                  title="Start a Workout"
+                  description="Find the perfect workout for right now"
+                  Icon={Activity}
+                  accent="primary"
+                  onClick={() => handleMenuSelect('workout')}
+                />
+                <MenuCard
+                  emoji="🎯"
+                  title="Start a Program"
+                  description="Get a structured multi-week training plan"
+                  Icon={Target}
+                  accent="emerald"
+                  onClick={() => handleMenuSelect('program')}
+                />
+                <MenuCard
+                  emoji="🛠️"
+                  title="Use a Tool"
+                  description="Track weight, body composition, calories & more"
+                  Icon={Wrench}
+                  accent="sky"
+                  onClick={() => handleNavigateTo('/tools')}
+                />
+                <MenuCard
+                  emoji="📚"
+                  title="Upgrade My Knowledge"
+                  description="Discover articles on fitness, nutrition & wellness"
+                  Icon={BookOpen}
+                  accent="violet"
+                  onClick={() => handleMenuSelect('knowledge')}
+                />
+                <MenuCard
+                  emoji="✨"
+                  title="Learn More About Smarty Gym"
+                  description="Discover the method, the coach, the philosophy"
+                  Icon={Sparkles}
+                  accent="rose"
+                  onClick={() => handleNavigateTo('/about-smartygym')}
+                />
+              </div>
+            </div>
+          </>
+        ) : (
+        <div className="px-5 sm:px-7 py-5">
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold flex items-center gap-2">
             <Brain className="h-5 w-5 text-primary" />
             Smarty Coach
           </DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">
-            {activePath === 'menu' ? "I'm your Smarty Coach — here to help you find the right next step. What would you like to do?" : 
-             activePath === 'workout' ? "Let's find the perfect workout" :
+            {activePath === 'workout' ? "Let's find the perfect workout" :
              activePath === 'program' ? "Let's find the right program" :
              "Let's find something to read"}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 pt-2">
-          {/* === MENU SCREEN === */}
-          {activePath === 'menu' && (
-            <div className="space-y-3 animate-in fade-in duration-300">
-              <Button
-                variant="outline"
-                className="group w-full h-auto py-4 px-4 flex items-center gap-3 text-left whitespace-normal border-2 border-border hover:border-primary hover:bg-primary hover:text-primary-foreground"
-                onClick={() => handleMenuSelect('workout')}
-              >
-                <div className="w-10 h-10 min-w-[2.5rem] min-h-[2.5rem] rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary-foreground/20">
-                  <Activity className="h-5 w-5 text-primary group-hover:text-primary-foreground" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-foreground group-hover:text-primary-foreground whitespace-normal break-words">Start a Workout</p>
-                  <p className="text-xs text-muted-foreground group-hover:text-primary-foreground/80 whitespace-normal break-words">Find the perfect workout for right now</p>
-                </div>
-                <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground group-hover:text-primary-foreground" />
-              </Button>
-
-              <Button
-                variant="outline"
-                className="group w-full h-auto py-4 px-4 flex items-center gap-3 text-left whitespace-normal border-2 border-border hover:border-primary hover:bg-primary hover:text-primary-foreground"
-                onClick={() => handleMenuSelect('program')}
-              >
-                <div className="w-10 h-10 min-w-[2.5rem] min-h-[2.5rem] rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary-foreground/20">
-                  <Target className="h-5 w-5 text-primary group-hover:text-primary-foreground" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-foreground group-hover:text-primary-foreground whitespace-normal break-words">Start a Program</p>
-                  <p className="text-xs text-muted-foreground group-hover:text-primary-foreground/80 whitespace-normal break-words">Get a structured training plan</p>
-                </div>
-                <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground group-hover:text-primary-foreground" />
-              </Button>
-
-              <Button
-                variant="outline"
-                className="group w-full h-auto py-4 px-4 flex items-center gap-3 text-left whitespace-normal border-2 border-border hover:border-primary hover:bg-primary hover:text-primary-foreground"
-                onClick={handleMeasurement}
-              >
-                <div className="w-10 h-10 min-w-[2.5rem] min-h-[2.5rem] rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary-foreground/20">
-                  <Wrench className="h-5 w-5 text-primary group-hover:text-primary-foreground" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-foreground group-hover:text-primary-foreground whitespace-normal break-words">Use a Tool</p>
-                  <p className="text-xs text-muted-foreground group-hover:text-primary-foreground/80 whitespace-normal break-words">Open Smarty Tools — track weight, body composition, calories, and more</p>
-                </div>
-                <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground group-hover:text-primary-foreground" />
-              </Button>
-
-              <Button
-                variant="outline"
-                className="group w-full h-auto py-4 px-4 flex items-center gap-3 text-left whitespace-normal border-2 border-border hover:border-primary hover:bg-primary hover:text-primary-foreground"
-                onClick={() => handleMenuSelect('knowledge')}
-              >
-                <div className="w-10 h-10 min-w-[2.5rem] min-h-[2.5rem] rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary-foreground/20">
-                  <BookOpen className="h-5 w-5 text-primary group-hover:text-primary-foreground" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-foreground group-hover:text-primary-foreground whitespace-normal break-words">Upgrade My Knowledge</p>
-                  <p className="text-xs text-muted-foreground group-hover:text-primary-foreground/80 whitespace-normal break-words">Discover articles on fitness, nutrition & wellness</p>
-                </div>
-                <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground group-hover:text-primary-foreground" />
-              </Button>
-            </div>
-          )}
 
           {/* === PROGRAM FLOW === */}
           {activePath === 'program' && (
