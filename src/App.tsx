@@ -116,6 +116,48 @@ const PremiumComparisonRedirect = () => (
 
 const queryClient = new QueryClient();
 
+const criticalRoutePreloaders = [
+  () => import("./pages/WorkoutFlow"),
+  () => import("./pages/WODCategory"),
+  () => import("./pages/TrainingProgramFlow"),
+  () => import("./pages/Tools"),
+  () => import("./pages/ExerciseLibrary"),
+];
+
+const secondaryRoutePreloaders = [
+  () => import("./pages/WorkoutDetail"),
+  () => import("./pages/IndividualWorkout"),
+  () => import("./pages/TrainingProgramDetail"),
+  () => import("./pages/IndividualTrainingProgram"),
+  () => import("./pages/OneRMCalculator"),
+  () => import("./pages/BMRCalculator"),
+  () => import("./pages/MacroTrackingCalculator"),
+  () => import("./pages/WorkoutTimer"),
+  () => import("./pages/CalorieCounter"),
+  () => import("./pages/AboutSmartyGym"),
+  () => import("./pages/SmartyPlans"),
+];
+
+const preloadRouteModules = () => {
+  void Promise.allSettled(criticalRoutePreloaders.map((preload) => preload()));
+
+  const idleWindow = window as Window &
+    typeof globalThis & {
+      requestIdleCallback?: (callback: () => void, options?: { timeout: number }) => number;
+    };
+
+  const preloadSecondary = () => {
+    void Promise.allSettled(secondaryRoutePreloaders.map((preload) => preload()));
+  };
+
+  if (idleWindow.requestIdleCallback) {
+    idleWindow.requestIdleCallback(preloadSecondary, { timeout: 2500 });
+    return;
+  }
+
+  window.setTimeout(preloadSecondary, 1500);
+};
+
 const AppContent = () => {
   const { isAdmin, loading } = useAdminRole();
   useSessionExpiry();
@@ -123,6 +165,9 @@ const AppContent = () => {
   useEffect(() => {
     // Track page visit on initial load
     trackPageVisit();
+
+    const preloadTimer = window.setTimeout(preloadRouteModules, 150);
+    return () => window.clearTimeout(preloadTimer);
   }, []);
 
   return (
