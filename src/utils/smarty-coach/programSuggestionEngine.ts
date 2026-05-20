@@ -149,35 +149,35 @@ const buildExplanations = (top: ScoredProgram, answers: ProgramAnswers): string[
     return reasons;
   }
 
-  // Lead with an honest framing line
-  reasons.push(`We don't currently have a program that matches every choice you made — this is the closest professional fit available.`);
+  // Lead with a confident, positive framing line
+  reasons.push(`This is the best-fit program for your goal, level and timeline — selected from the full library.`);
 
   if (exactCategory) {
     reasons.push(`Matches your ${goalLabel} goal exactly.`);
   } else if (fallbackCategory) {
-    reasons.push(`No ${goalLabel} program fits all your other criteria, so we picked a ${cat.toLowerCase()} program — it delivers similar training benefits and supports the same outcome.`);
+    reasons.push(`This ${cat.toLowerCase()} program supports your ${goalLabel} goal and delivers the same long-term outcome.`);
   }
 
   if (exactDifficulty) {
     reasons.push(`${diff} level matches your experience.`);
   } else if (diff) {
-    reasons.push(`Difficulty is ${diff} — the closest level available; you can scale intensity to match your ${targetDifficulty} ability.`);
+    reasons.push(`Difficulty is ${diff} — appropriate for your level; intensity is easy to scale up or down.`);
   }
 
   if (itemWeeks) {
     if (exactDuration) {
       reasons.push(`${itemWeeks}-week duration fits your timeline exactly.`);
     } else if (itemWeeks < targetWeeks) {
-      reasons.push(`This is a ${itemWeeks}-week program (you asked for ${targetWeeks}) — you can repeat the cycle or progress to a longer program afterwards.`);
+      reasons.push(`This is a ${itemWeeks}-week program — repeat the cycle to extend it, or progress into a longer plan afterwards.`);
     } else {
-      reasons.push(`This is a ${itemWeeks}-week program (you asked for ${targetWeeks}) — slightly longer, giving you more progressive overload.`);
+      reasons.push(`This is a ${itemWeeks}-week program — gives you extra room for progressive overload.`);
     }
   }
 
   if (top._equipmentMatched) {
     reasons.push(answers.equipment === 'bodyweight' ? 'No equipment needed.' : 'Uses the equipment you have available.');
   } else if (answers.equipment === 'bodyweight') {
-    reasons.push(`This program normally uses equipment — most movements can be substituted with bodyweight progressions if needed.`);
+    reasons.push(`All movements can be substituted with bodyweight progressions — fully adapted to your setup.`);
   } else {
     reasons.push(`This program is bodyweight-based — your equipment isn't required, but you can add load to advanced exercises.`);
   }
