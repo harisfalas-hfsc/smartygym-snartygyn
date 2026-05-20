@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Lock, Crown } from "lucide-react";
@@ -32,6 +32,8 @@ export const AccessGate = ({
 }: AccessGateProps) => {
   const { user, userTier, isLoading, hasPurchased } = useAccessControl();
   const navigate = useNavigate();
+  const location = useLocation();
+  const authHref = `/auth?redirect=${encodeURIComponent(location.pathname + location.search)}`;
   const { goBack } = useShowBackButton();
 
   // Debug logging for access control decisions
