@@ -15,6 +15,12 @@ const logStep = (step: string, details?: any) => {
   console.log(`[STRIPE-WEBHOOK] ${step}${detailsStr}`);
 };
 
+const mapStripeSubscriptionStatus = (status: Stripe.Subscription.Status): 'active' | 'canceled' | 'past_due' => {
+  if (status === 'active' || status === 'trialing') return 'active';
+  if (status === 'past_due' || status === 'unpaid' || status === 'incomplete') return 'past_due';
+  return 'canceled';
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -376,6 +382,7 @@ async function handleSubscriptionCheckout(
   
   const priceId = subscription.items.data[0].price.id;
   const productId = subscription.items.data[0].price.product as string;
+  const localStatus = mapStripeSubscriptionStatus(subscription.status);
   
   // Get product details to determine plan type
   const product = await stripe.products.retrieve(productId);
@@ -416,8 +423,7 @@ async function handleSubscriptionCheckout(
         .update({
           stripe_customer_id: customerId,
           stripe_subscription_id: subscriptionId,
-          stripe_price_id: priceId,
-          status: subscription.status,
+          status: localStatus,
           current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
           current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
           cancel_at_period_end: subscription.cancel_at_period_end,
@@ -437,9 +443,8 @@ async function handleSubscriptionCheckout(
           user_id: userId,
           stripe_customer_id: customerId,
           stripe_subscription_id: subscriptionId,
-          stripe_price_id: priceId,
           plan_type: planType,
-          status: subscription.status,
+          status: localStatus,
           current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
           current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
           cancel_at_period_end: subscription.cancel_at_period_end,
@@ -459,9 +464,8 @@ async function handleSubscriptionCheckout(
         user_id: userId,
         stripe_customer_id: customerId,
         stripe_subscription_id: subscriptionId,
-        stripe_price_id: priceId,
         plan_type: planType,
-        status: subscription.status,
+        status: localStatus,
         current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
         current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
         cancel_at_period_end: subscription.cancel_at_period_end,
@@ -755,6 +759,7 @@ async function handleSubscriptionUpdate(
   const userId = existingSub.user_id;
   const oldPlanType = existingSub.plan_type;
   const priceId = subscription.items.data[0].price.id;
+  const localStatus = mapStripeSubscriptionStatus(subscription.status);
 
   logStep("Updating subscription", { userId, status: subscription.status, oldPlan: oldPlanType });
 
@@ -780,8 +785,7 @@ async function handleSubscriptionUpdate(
       .from('user_subscriptions')
       .update({
         stripe_subscription_id: subscription.id,
-        stripe_price_id: priceId,
-        status: subscription.status,
+        status: localStatus,
         current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
         current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
         cancel_at_period_end: subscription.cancel_at_period_end,
@@ -800,8 +804,7 @@ async function handleSubscriptionUpdate(
       .from('user_subscriptions')
       .update({
         stripe_subscription_id: subscription.id,
-        stripe_price_id: priceId,
-        status: subscription.status,
+        status: localStatus,
         current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
         current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
         cancel_at_period_end: subscription.cancel_at_period_end,

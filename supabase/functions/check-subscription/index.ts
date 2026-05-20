@@ -30,6 +30,9 @@ serve(async (req) => {
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
     logStep("Stripe key verified");
 
+    const body = req.method === "POST" ? await req.json().catch(() => ({})) : {};
+    const targetUserId = typeof body?.target_user_id === "string" ? body.target_user_id : null;
+
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) throw new Error("No authorization header provided");
     logStep("Authorization header found");
@@ -39,9 +42,31 @@ serve(async (req) => {
     
     const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
     if (userError) throw new Error(`Authentication error: ${userError.message}`);
-    const user = userData.user;
+    let user = userData.user;
     if (!user?.email) throw new Error("User not authenticated or email not available");
-    logStep("User authenticated", { userId: user.id, email: user.email });
+    logStep("Caller authenticated", { userId: user.id, email: user.email });
+
+    if (targetUserId && targetUserId !== user.id) {
+      const { data: adminRole, error: roleError } = await supabaseClient
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .maybeSingle();
+
+      if (roleError || !adminRole) {
+        throw new Error("Unauthorized: Admin access required to sync another user");
+      }
+
+      const { data: targetUserData, error: targetUserError } = await supabaseClient.auth.admin.getUserById(targetUserId);
+      if (targetUserError || !targetUserData?.user?.email) {
+        throw new Error("Target user not found or email missing");
+      }
+
+      user = targetUserData.user;
+    }
+
+    logStep("Syncing subscription for user", { userId: user.id, email: user.email });
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
@@ -87,6 +112,7 @@ serve(async (req) => {
     // Get all subscriptions with expanded data
     const subscriptions = await stripe.subscriptions.list({
       customer: customerId,
+      status: 'all',
       limit: 10,
       expand: ['data.items.data.price']
     });
@@ -219,6 +245,8 @@ serve(async (req) => {
       const wasCancelled = previousSub && 
         previousSub.plan_type !== 'free' && 
         previousSub.status === 'active';
+      const remainsCanceled = previousSub?.status === 'canceled' || previousSub?.status === 'past_due';
+      const latestSubscription = subscriptions.data[0];
       
       // Update to free plan
       const { error: upsertError } = await supabaseClient
@@ -227,12 +255,16 @@ serve(async (req) => {
           {
             user_id: user.id,
             plan_type: 'free',
-            status: 'active',
+            status: wasCancelled || remainsCanceled ? 'canceled' : 'active',
             stripe_customer_id: customerId,
-            stripe_subscription_id: null,
-            current_period_start: null,
-            current_period_end: null,
-            cancel_at_period_end: false,
+            stripe_subscription_id: wasCancelled || remainsCanceled ? latestSubscription?.id ?? null : null,
+            current_period_start: (wasCancelled || remainsCanceled) && latestSubscription?.current_period_start
+              ? new Date(latestSubscription.current_period_start * 1000).toISOString()
+              : null,
+            current_period_end: (wasCancelled || remainsCanceled) && latestSubscription?.current_period_end
+              ? new Date(latestSubscription.current_period_end * 1000).toISOString()
+              : null,
+            cancel_at_period_end: wasCancelled || remainsCanceled ? true : false,
           },
           {
             onConflict: 'user_id',
