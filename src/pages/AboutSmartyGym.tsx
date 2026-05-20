@@ -734,12 +734,6 @@ export default function AboutSmartyGym() {
                 SmartyGym offers flexible plans to fit your fitness journey, plus the option to purchase 
                 individual workouts or programs if you want to give us a try.
               </p>
-              <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-3 text-center">
-                <p className="text-sm font-semibold text-green-600 dark:text-green-400">
-                  🎉 Try free for 3 days — cancel anytime. No commitment.
-                </p>
-              </div>
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
                 {/* Gold Plan */}
                 <div className="p-5 rounded-lg border-2 border-[#D4AF37] shadow-lg">
@@ -830,9 +824,9 @@ export default function AboutSmartyGym() {
                   <Link to="/joinpremium">
                     <Button size="sm">View All Plans</Button>
                   </Link>
-                  <Link to="/auth?mode=signup&trial=true">
+                  <Link to="/smarty-plans">
                     <Button size="sm" variant="default" className="bg-green-600 hover:bg-green-700">
-                      Start 3-Day Free Trial
+                      Start Your Plan
                     </Button>
                   </Link>
                 </div>

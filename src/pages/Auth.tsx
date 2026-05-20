@@ -20,7 +20,6 @@ import { lovable } from "@/integrations/lovable";
 import { checkPasswordBreach } from "@/utils/passwordBreachCheck";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { OfflineBanner } from "@/components/OfflineBanner";
-import { STRIPE_PRICE_IDS } from "@/config/pricing";
 import { Helmet } from "react-helmet";
 
 export default function Auth() {
@@ -72,25 +71,6 @@ export default function Auth() {
 
         setShowAvatarSetup(true);
         return; // Don't navigate yet — avatar setup dialog will handle it
-      }
-
-      // Check if trial=true param exists, redirect to checkout
-      const params = new URLSearchParams(window.location.search);
-      if (params.get("trial") === "true") {
-        // Honor the plan the user chose (?plan=gold|platinum); default to gold
-        const planParam = params.get("plan") === "platinum" ? "platinum" : "gold";
-        const trialPriceId = STRIPE_PRICE_IDS[planParam];
-        try {
-          const { data } = await supabase.functions.invoke('create-checkout', {
-            body: { priceId: trialPriceId, trial: true }
-          });
-          if (data?.url) {
-            window.location.href = data.url;
-            return;
-          }
-        } catch (e) {
-          console.error('Trial checkout failed:', e);
-        }
       }
 
       navigate("/");

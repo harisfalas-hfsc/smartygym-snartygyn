@@ -80,7 +80,7 @@ const FAQ = () => {
                 "name": "Is there a free trial?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Yes. SmartyGym Gold and Platinum plans include a 3-day free trial so you can experience the full premium library before your subscription begins. You can also explore free tools, the exercise library, blog resources, and selected free content before upgrading."
+                  "text": "No free trial. SmartyGym Gold (€9.99/month) and Platinum (€89.99/year) start the day you subscribe and auto-renew until cancelled. You can also explore free tools, the exercise library, blog resources, and selected free content before upgrading, or buy individual workouts and programs as standalone purchases."
                 }
               },
               {
@@ -336,9 +336,9 @@ const FAQ = () => {
                   <AccordionItem value="item-8">
                     <AccordionTrigger className="text-left">Is there a free trial?</AccordionTrigger>
                     <AccordionContent className="py-2 leading-relaxed">
-                      Yes. SmartyGym Gold and Platinum plans include a <strong>3-day free trial</strong>, so you can experience the full premium library before your subscription begins. 
-                      You can also explore our free tools, exercise library, blog resources, and selected free content before upgrading. 
-                      Check out our <a href="/smarty-plans" className="text-primary hover:underline font-medium">Smarty Plans</a> to see the compare access levels and what's included.
+                      No free trial. SmartyGym <strong>Gold (€9.99/month)</strong> and <strong>Platinum (€89.99/year)</strong> start the day you subscribe and auto-renew until cancelled — cancel anytime from your dashboard. 
+                      You can also explore our free tools, exercise library, blog resources, and selected free content before upgrading, or buy individual workouts and programs as standalone purchases. 
+                      Check out our <a href="/smarty-plans" className="text-primary hover:underline font-medium">Smarty Plans</a> to compare access levels and what's included.
                     </AccordionContent>
                   </AccordionItem>
 

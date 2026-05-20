@@ -263,7 +263,7 @@ export const ArticleDetail = () => {
 
           <div className="mt-8 flex gap-4">
             <Button onClick={() => navigate('/join-premium')} className="flex-1">
-              Start Your Free Trial
+              Start Your Plan
             </Button>
           </div>
         </article>

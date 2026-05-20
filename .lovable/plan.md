@@ -1,98 +1,60 @@
 ## Goal
+Eliminate the 3-day free trial across the app, copy, and Stripe so Gold (monthly) and Platinum (yearly) become plain auto-renewing subscriptions that start the day the user pays.
 
-Replace the current 3-Day Free Trial popup with a brand-new, visually rich **Smarty Coach Welcome Popup** that greets every visitor — logged-in or not, free, subscriber, or premium — the first time they land on the site (and once again after they log in). It should feel like the first thing your brand says to a person walking in.
+## 1. Checkout — stop sending trial to Stripe
+**`supabase/functions/create-checkout/index.ts`**
+- Remove the `trial` parameter from the request body destructure.
+- Remove `...(trial ? { trial_period_days: 3 } : {})` from `subscription_data`.
+- Update `logStep` to drop the trial field.
 
----
+Result: every new Gold/Platinum checkout starts billing immediately on day 1, auto-renews monthly (Gold) or yearly (Platinum) using the saved default payment method (Layer 1 hardening stays intact).
 
-## 1. Hide the Free Trial popup (no delete)
+## 2. Auth flow — drop ?trial=true redirect
+**`src/pages/Auth.tsx`** (lines ~77–94)
+- Delete the entire `if (params.get("trial") === "true") { ... }` block that auto-invokes create-checkout with `trial: true` after signup.
+- After signup the user simply lands on `/` (or `/smarty-plans` if `?plan=…` is present — optional, but current behavior already goes to `/`, so leave as `/`).
 
-- In `src/App.tsx`, comment out the `<FreeTrialPopup />` mount (line 178) and add a short comment explaining it's intentionally disabled.
-- Keep `src/components/growth/FreeTrialPopup.tsx` and its image asset fully intact so it can be re-enabled later with a one-line change.
-- Memory will be updated: the active "first impression" popup is now the Smarty Coach Welcome, not the trial popup.
+## 3. SmartyPlans page — remove all trial copy & CTAs
+**`src/pages/SmartyPlans.tsx`**
+- Line 310: remove the “🎉 Try free for 3 days. Cancel anytime.” paragraph (keep the surrounding box with the "Join thousands…" line, or remove the inner `<p>` only).
+- Line 492 + 537: delete the `🎉 3 days free trial included` lines under both Gold and Platinum cards.
+- Line 515 + 560: change button label from `Start 3-Day Free Trial` → `Start Your Plan` (loading text stays `Processing...`).
+- Ensure the checkout invoke call does NOT pass `trial: true` (verify and strip if present).
 
-## 2. New component: `SmartyCoachWelcomePopup.tsx`
+## 4. About SmartyGym page — remove trial copy & link
+**`src/pages/AboutSmartyGym.tsx`**
+- Line 739: remove “🎉 Try free for 3 days — cancel anytime. No commitment.”
+- Lines 833–835: change `<Link to="/auth?mode=signup&trial=true">` button text `Start 3-Day Free Trial` → `Start Your Plan`, and change link target to `/smarty-plans` (so visitors reach the plans page) — or to `/auth?mode=signup` if a signup-first flow is preferred. Default: `/smarty-plans`.
 
-Location: `src/components/smarty-coach/SmartyCoachWelcomePopup.tsx`
-Mounted globally in `src/App.tsx` (replacing the trial popup's slot).
+## 5. ArticleDetail page
+**`src/pages/ArticleDetail.tsx`** line 266: button label `Start Your Free Trial` → `Start Your Plan`. Keep the `/join-premium` route.
 
-### Trigger rules (one-time per session)
-- Show on **first landing**, ~1.5 s after the page becomes interactive, on any route **except** the same blocked routes already used by the trial popup (`/auth`, `/admin`, `/checkout`, `/payment`, etc.).
-- Show **again immediately** after a user logs in or signs up within the same session (detected via Supabase auth state change), so the welcome greets them as their new self.
-- Audience: **everyone** — visitors, free users, subscribers, premium. No tier gating.
-- Persistence keys in `sessionStorage`:
-  - `smarty-welcome-shown-anon` — set after the visitor sees it.
-  - `smarty-welcome-shown-user-{userId}` — set after a logged-in user sees it.
-  This guarantees "one time per session, plus one time right after login" without ever nagging.
-- A small "Don't show again" link sets a longer-lived `localStorage` flag for power users who want it gone.
+## 6. FAQ page
+**`src/pages/FAQ.tsx`**
+- Remove the entire "Is there a free trial?" Q&A from both the JSON-LD FAQ schema (lines 80–84) and the visible AccordionItem (lines 337–340) — or replace the answer with: "No free trial. Gold (€9.99/month) and Platinum (€89.89/year) start the day you subscribe and auto-renew. Cancel anytime from your dashboard." Default: replace, so the FAQ still answers the natural search question.
 
-### Visual design (bright, big, mobile-optimized)
-- Built on top of shadcn `Dialog` like the existing Smarty Coach modal, but with a much richer look:
-  - Wider container: `max-w-lg` on mobile (`w-[95vw]`), `max-w-2xl` on desktop.
-  - Header band with a soft brand gradient (electric blue → deep navy, using existing tokens `--primary` and `--background`), a glowing 🧠 brain icon, and a friendly bounce-in animation.
-  - Headline: **"Hi 👋 I'm your Smarty Coach"** (large display weight).
-  - Subline: **"How can I help you today?"**
-  - 5 large option cards in a single column on mobile, 2-column grid on desktop ≥ `md`. Each card has:
-    - Colored circular icon badge (Lucide icon + brand accent).
-    - Bold title with an emoji.
-    - One-line description.
-    - Subtle hover lift + arrow chevron.
-- Strictly uses semantic design tokens (no hard-coded colors). Honors light and dark themes.
-- Close (X) in the top-right, plus a "Maybe later" text button at the bottom.
-- Re-uses the existing `Brain` icon for header continuity with the floating Smarty Coach button.
+## 7. Free trial popup component
+**`src/components/growth/FreeTrialPopup.tsx`** — already commented out from `src/App.tsx`. Leave the file on disk (user said "keep in background"), no further changes needed.
 
-### The five options (in order)
+## 8. Stripe — cancel any trialing subscriptions
+- Verified via `stripe.subscriptions.list({ status: 'trialing' })`: **0 active trialing subscriptions** at this moment. Nothing to clean up.
+- Stripe Prices for Gold (`price_1SJ9q1…`) and Platinum (`price_1SJ9qG…`) have no `trial_period_days` set on the price itself — the 3-day trial was only ever attached at checkout-session creation. Once step 1 ships, no new subscription will ever receive a trial.
+- No webhook, product, or price changes needed in the Stripe dashboard.
 
-| # | Title | Icon + emoji | Action |
-|---|---|---|---|
-| 1 | **Check the Workout of the Day** | `Flame` 🔥 | `navigate('/workout/wod')` |
-| 2 | **Start a Workout** | `Activity` 💪 | Open the existing `SmartyCoachModal` pre-set to the `workout` path |
-| 3 | **Start a Program** | `Target` 🎯 | Open the existing `SmartyCoachModal` pre-set to the `program` path |
-| 4 | **Use a Tool** | `Wrench` 🛠️ | `navigate('/tools')` |
-| 5 | **Upgrade My Knowledge** | `BookOpen` 📚 | Open the existing `SmartyCoachModal` pre-set to the `knowledge` path |
-| 6 | **Learn More About Smarty Gym** | `Sparkles` ✨ | `navigate('/about-smartygym')` |
+## 9. Renewal-reminders edge function — no change
+`supabase/functions/send-renewal-reminders/index.ts` references "3 days" only as the lead time for **renewal** reminders (3 days before `current_period_end`), unrelated to the free trial. Leave as-is.
 
-Selecting any option closes the welcome popup and either navigates or hands off to the existing Smarty Coach modal — so the brand experience continues seamlessly.
+## 10. Memory cleanup
+- Delete `mem://business-rules/3-day-free-trial-system`.
+- Remove the "[3-Day Free Trial]" line from `mem://index.md` and update `[Free Trial Popup]` / `[Renewal Reminders]` notes that mention the trial.
 
-## 3. Rename "Make a Measurement" → "Use a Tool"
+## 11. Verification (after implementation)
+- `rg -i "3.day free trial|free for 3 days|trial=true|trial_period_days|Start.*Free Trial"` on `src/` and `supabase/functions/` → expect only `FreeTrialPopup.tsx` (kept intentionally).
+- Confirm `create-checkout` no longer reads `trial` and Stripe call no longer includes `subscription_data.trial_period_days`.
+- Re-run `stripe--list_subscriptions status=trialing` → expect `[]`.
+- Manual smoke test of one checkout (Gold) in the preview to confirm Stripe Checkout shows "Pay now" instead of "Start trial".
 
-In `src/components/smarty-coach/SmartyCoachModal.tsx` (line ~283):
-- Change the option label to **"Use a Tool"**.
-- Change the description to **"Open Smarty Tools — track weight, body composition, calories, and more."**
-- Swap the `Dumbbell` icon for `Wrench` so it visually matches a tool, not a workout.
-- The route stays `/tools` (unchanged).
-
-This keeps the floating Smarty Coach button and the new welcome popup consistent.
-
-## 4. Smarty Coach modal handoff
-
-To open the existing `SmartyCoachModal` already on a chosen path (workout / program / knowledge), I'll add a tiny enhancement:
-- Add an optional `initialPath?: 'menu' | 'workout' | 'program' | 'knowledge'` prop to `SmartyCoachModal`.
-- The internal `useEffect` that resets state on open will respect this prop (defaulting to `'menu'`, preserving current behavior everywhere else).
-- The welcome popup renders a single shared `<SmartyCoachModal>` instance it controls, so handoff is instant and doesn't reload data.
-
-## 5. Memory updates
-
-- Update `mem://features/growth/free-trial-popup-standard` to note: popup is intentionally disabled in App.tsx; component preserved for future use.
-- Update `mem://features/smarty-coach-system`: add the welcome popup as the first-impression entry point with trigger rules and option list, and record the "Use a Tool" rename.
-
----
-
-## Technical details (for reference)
-
-```text
-src/
-├── App.tsx                                    // comment out <FreeTrialPopup />, mount <SmartyCoachWelcomePopup />
-├── components/
-│   ├── growth/FreeTrialPopup.tsx              // unchanged (kept dormant)
-│   └── smarty-coach/
-│       ├── SmartyCoachWelcomePopup.tsx        // NEW
-│       └── SmartyCoachModal.tsx               // + initialPath prop, rename label, swap icon
-```
-
-Session/login trigger logic uses `supabase.auth.onAuthStateChange` to detect `SIGNED_IN` events and re-trigger the popup once per session per user id. No new tables, no edge functions, no schema changes — purely frontend.
-
-## Out of scope
-
-- No changes to subscription, billing, or any paid flow.
-- No structural layout changes elsewhere on the site.
-- No new translations / copy beyond the popup itself.
+## Technical notes
+- All copy changes are surface-level Tailwind/JSX; no design tokens or component variants change.
+- `STRIPE_PRICE_IDS` import in `Auth.tsx` becomes unused after step 2 — remove the import if it's only used there.
+- The `popup-free-trial-bright.jpg` asset stays untouched (used by the kept-but-disabled `FreeTrialPopup`).
