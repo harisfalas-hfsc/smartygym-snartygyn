@@ -7,8 +7,8 @@ export default {
   theme: {
     screens: {
       sm: "640px",
-      		md: { raw: "(min-width: 1100px), (orientation: landscape) and (min-width: 1024px) and (min-height: 600px)" },
-      		lg: { raw: "(min-width: 1100px), (orientation: landscape) and (min-width: 1024px) and (min-height: 600px)" },
+      		md: { raw: "(min-width: 1100px) and (min-height: 600px)" },
+      		lg: { raw: "(min-width: 1100px) and (min-height: 600px)" },
       xl: "1280px",
       "2xl": "1536px",
     },

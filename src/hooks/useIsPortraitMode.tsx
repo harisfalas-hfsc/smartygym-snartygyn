@@ -19,7 +19,7 @@ export function useIsPortraitMode() {
     const checkOrientation = () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
-      const isTabletLandscape = width >= 1024 && height >= 600 && width > height;
+      const isTabletLandscape = width >= 1100 && height >= 600 && width > height;
       
       // Portrait: height > width
       // Landscape: width >= height
