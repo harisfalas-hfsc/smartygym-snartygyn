@@ -93,7 +93,10 @@ import { AccessGate } from "./components/AccessGate";
 import { PageTransition } from "./components/PageTransition";
 import { LoadingBar } from "./components/LoadingBar";
 import { AnnouncementManager } from "./components/announcements/AnnouncementManager";
-import { FreeTrialPopup } from "./components/growth/FreeTrialPopup";
+// FreeTrialPopup intentionally disabled — replaced by SmartyCoachWelcomePopup.
+// Kept dormant for easy re-enable later.
+// import { FreeTrialPopup } from "./components/growth/FreeTrialPopup";
+import { SmartyCoachWelcomePopup } from "./components/smarty-coach/SmartyCoachWelcomePopup";
 
 import { SocialProofToast } from "./components/growth/SocialProofToast";
 
@@ -175,7 +178,8 @@ const AppContent = () => {
       <LoadingBar />
       <AccessControlProvider>
         <AnnouncementManager />
-        <FreeTrialPopup />
+        {/* <FreeTrialPopup /> */}
+        <SmartyCoachWelcomePopup />
         <SocialProofToast />
         <ScrollToTop />
         <AnalyticsTracker />
