@@ -22,7 +22,7 @@
  * content is shorter than the screen. We only exclude the App's own outer
  * sticky-footer column via the `data-app-shell` attribute below.
  */
-@media (max-width: 1023px) {
+@media (max-width: 1099px) and (orientation: portrait), (max-width: 767px) {
   .min-h-screen:not([data-app-shell]) {
     min-height: 0 !important;
   }
@@ -32,7 +32,7 @@
  * prefers the footer to sit immediately under the content even when content
  * is shorter than the viewport, instead of being pushed to the bottom edge.
  */
-@media (max-width: 1023px) {
+@media (max-width: 1099px) and (orientation: portrait), (max-width: 767px) {
   [data-app-shell] {
     min-height: 0 !important;
   }

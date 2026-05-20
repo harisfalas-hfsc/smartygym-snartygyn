@@ -5,6 +5,7 @@ import { useNavigationHistory } from "@/contexts/NavigationHistoryContext";
 import { SmartyCoachModal } from "@/components/smarty-coach";
 import smartyCoachIcon from "@/assets/smarty-coach-icon.png";
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const HIDDEN_PATHS = ["/auth", "/reset-password", "/payment-success", "/payment-cancelled"];
 
@@ -16,10 +17,11 @@ const HIDDEN_PATHS = ["/auth", "/reset-password", "/payment-success", "/payment-
 export const MobileBottomNav = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const { goBack, canGoBack, goForward, canGoForward } = useNavigationHistory();
   const [coachOpen, setCoachOpen] = useState(false);
 
-  if (HIDDEN_PATHS.includes(location.pathname)) return null;
+  if (!isMobile || HIDDEN_PATHS.includes(location.pathname)) return null;
 
   const isHome = location.pathname === "/" || location.pathname === "/home";
 
@@ -60,7 +62,7 @@ export const MobileBottomNav = () => {
     <>
       <nav
         className={cn(
-          "lg:hidden fixed bottom-0 left-0 right-0 z-50",
+          "fixed bottom-0 left-0 right-0 z-50",
           "bg-background/95 backdrop-blur-md",
           "border-t border-primary/20",
           "shadow-[0_-4px_16px_-4px_hsl(var(--primary)/0.15)]"
