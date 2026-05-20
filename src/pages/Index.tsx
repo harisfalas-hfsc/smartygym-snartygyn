@@ -16,7 +16,7 @@ import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import smartyGymIcon from "@/assets/smarty-gym-icon.png";
 import harisPhoto from "@/assets/haris-falas-coach.png";
 import { MobilePhoneIllustration } from "@/components/MobilePhoneIllustration";
-import { useIsPortraitMode } from "@/hooks/useIsPortraitMode";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { openExternal } from "@/utils/native";
 import { cn } from "@/lib/utils";
 import { useAccessControl } from "@/hooks/useAccessControl";
@@ -67,7 +67,7 @@ const Index = () => {
     userTier
   } = useAccessControl();
   const isPremium = userTier === "premium";
-  const { isPortrait: isMobile, isPhoneLandscape } = useIsPortraitMode();
+  const isMobile = useIsMobile();
 
   // State for pinned audience tooltip (click to toggle)
   const [activeAudienceTooltip, setActiveAudienceTooltip] = useState<string | null>(null);

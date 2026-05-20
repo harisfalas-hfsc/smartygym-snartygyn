@@ -27,7 +27,7 @@ export function useIsPortraitMode() {
       
       // Phone in landscape: not portrait AND screen height is small (< 500px)
       // This helps detect when we're on a phone vs tablet in landscape
-      const isPhoneLandscape = !isPortrait && height < 500;
+      const isPhoneLandscape = width > height && height < 500;
       
       setState({ isPortrait, isPhoneLandscape });
     };
