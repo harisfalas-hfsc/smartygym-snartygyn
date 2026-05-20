@@ -19,10 +19,10 @@ export function useIsPortraitMode() {
     const checkOrientation = () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
-      const isDesktopLayout = width >= 1100 && height >= 600;
+      const isLandscape = width > height;
+      const isDesktopLayout = (width >= 1024 && isLandscape) || width >= 1200;
       
-      // In the Lovable tablet preview, the portrait tablet frame can report
-      // a wide inner viewport. Treat every viewport below 1100px as mobile.
+      // Tablet rule: portrait behaves like mobile, landscape behaves like desktop.
       const isPortrait = !isDesktopLayout;
       
       // Phone in landscape: not portrait AND screen height is small (< 500px)

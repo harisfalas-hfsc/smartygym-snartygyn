@@ -1,13 +1,16 @@
 import * as React from "react";
 
-// Match Lovable's tablet preview: anything below 1100px must render mobile.
-const DESKTOP_MIN_WIDTH = 1100;
-const DESKTOP_MIN_HEIGHT = 600;
+// Tablet rule: portrait behaves like mobile, landscape behaves like desktop.
+const TABLET_LANDSCAPE_MIN_WIDTH = 1024;
+const DESKTOP_MIN_WIDTH = 1200;
 
 function computeIsMobile() {
   const w = window.innerWidth;
   const h = window.innerHeight;
-  return !(w >= DESKTOP_MIN_WIDTH && h >= DESKTOP_MIN_HEIGHT);
+  const isLandscape = w > h;
+  const isTabletLandscapeOrWider = w >= TABLET_LANDSCAPE_MIN_WIDTH && isLandscape;
+  const isWideDesktop = w >= DESKTOP_MIN_WIDTH;
+  return !(isTabletLandscapeOrWider || isWideDesktop);
 }
 
 export function useIsMobile() {
