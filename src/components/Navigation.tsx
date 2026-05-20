@@ -18,12 +18,14 @@ import { User as UserIcon, Settings, LogOut, LayoutDashboard, Crown, Bell, Faceb
 import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 import { SafeNotificationBadge } from "@/components/NotificationBadge";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useAdminRole } from "@/hooks/useAdminRole";
 import { SmartyCoachModal } from "@/components/smarty-coach";
 import smartyCoachIcon from "@/assets/smarty-coach-icon.png";
+import { cn } from "@/lib/utils";
 
 interface SubscriptionInfo {
   subscribed: boolean;
@@ -48,6 +50,7 @@ export const Navigation = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [desktopMenuOpen, setDesktopMenuOpen] = useState(false);
   const [smartyCoachOpen, setSmartyCoachOpen] = useState(false);
+  const isMobile = useIsMobile();
   const { data: unreadCount = 0, refetch: refetchUnread } = useUnreadMessages();
   const { isAdmin } = useAdminRole();
   const headerRef = useRef<HTMLElement>(null);
@@ -282,7 +285,7 @@ export const Navigation = () => {
       <div className="mx-auto max-w-7xl">
         <div className="relative flex items-center justify-between gap-2 lg:gap-4">
           {/* LEFT SECTION - Hamburger Menu + Social Media Icons */}
-          <div className="hidden lg:flex items-center gap-12">
+          <div className={cn("items-center gap-12", isMobile ? "hidden" : "flex")}>
             {/* Desktop Menu - original layout */}
             <Sheet open={desktopMenuOpen} onOpenChange={setDesktopMenuOpen}>
                 <SheetTrigger asChild>
@@ -368,7 +371,7 @@ export const Navigation = () => {
           </div>
 
           {/* Mobile Left Controls - Discovery + Smarty Coach */}
-          <div className="flex shrink-0 items-center gap-1.5 lg:hidden">
+          <div className={cn("shrink-0 items-center gap-1.5", isMobile ? "flex" : "hidden")}>
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
                 <Button

@@ -24,6 +24,7 @@ import { Navigation } from "./components/Navigation";
 import { FixedBackButton } from "./components/FixedBackButton";
 import { Footer } from "./components/Footer";
 import { MobileBottomNav } from "./components/MobileBottomNav";
+import { useIsMobile } from "./hooks/use-mobile";
 import { useAdminRole } from "./hooks/useAdminRole";
 import Index from "./pages/Index";
 
@@ -162,6 +163,7 @@ const preloadRouteModules = () => {
 
 const AppContent = () => {
   const { isAdmin, loading } = useAdminRole();
+  const isMobile = useIsMobile();
   useSessionExpiry();
 
   useEffect(() => {
@@ -184,7 +186,7 @@ const AppContent = () => {
         <BackgroundSEO />
         <div
           data-app-shell
-          className="flex flex-col min-h-screen pb-[calc(3.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0"
+          className={`flex flex-col min-h-screen ${isMobile ? "pb-[calc(3.5rem+env(safe-area-inset-bottom,0px))]" : "pb-0"}`}
         >
           <Navigation />
           <FixedBackButton />

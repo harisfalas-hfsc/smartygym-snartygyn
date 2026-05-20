@@ -11,45 +11,7 @@
     </script>
     
     <meta charset="UTF-8" />
-    <meta name="viewport" id="viewport-meta" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <script>
-      (function() {
-        var meta = document.getElementById('viewport-meta');
-        if (!meta) return;
-        // Orientation-driven viewport:
-        //  - Phones (smallest side < 600px): native device-width.
-        //  - Tablet PORTRAIT  → force width=500  → app renders in mobile layout.
-        //  - Tablet LANDSCAPE → force width=1280 → app renders in desktop layout.
-        //  - Desktop: native device-width with pinch-zoom.
-        function updateViewport() {
-          var w = window.screen && window.screen.width  ? window.screen.width  : window.innerWidth;
-          var h = window.screen && window.screen.height ? window.screen.height : window.innerHeight;
-          // Use visual viewport for orientation so it updates on rotate
-          var vw = window.innerWidth;
-          var vh = window.innerHeight;
-          var minSide = Math.min(w, h);
-          var isPhone = minSide < 600;
-          var isDesktop = minSide >= 1100; // large screens treated as desktop regardless of orientation
-          var isPortrait = vh > vw;
-          var content;
-          if (isPhone) {
-            content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
-          } else if (isDesktop) {
-            content = 'width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes';
-          } else if (isPortrait) {
-            // Tablet portrait → mobile layout
-            content = 'width=500, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
-          } else {
-            // Tablet landscape → desktop layout
-            content = 'width=1280, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes';
-          }
-          meta.setAttribute('content', content);
-        }
-        updateViewport();
-        window.addEventListener('resize', updateViewport);
-        window.addEventListener('orientationchange', updateViewport);
-      })();
-    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     
     <!-- PWA & Mobile Meta Tags -->
     <meta name="mobile-web-app-capable" content="yes" />

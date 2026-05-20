@@ -19,10 +19,11 @@ export function useIsPortraitMode() {
     const checkOrientation = () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
+      const isTabletLandscape = width >= 700 && height >= 600 && width > height;
       
       // Portrait: height > width
       // Landscape: width >= height
-      const isPortrait = height > width;
+      const isPortrait = !isTabletLandscape && height > width;
       
       // Phone in landscape: not portrait AND screen height is small (< 500px)
       // This helps detect when we're on a phone vs tablet in landscape
