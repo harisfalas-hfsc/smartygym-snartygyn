@@ -98,7 +98,6 @@ import { AnnouncementManager } from "./components/announcements/AnnouncementMana
 // import { FreeTrialPopup } from "./components/growth/FreeTrialPopup";
 import { SmartyCoachWelcomePopup } from "./components/smarty-coach/SmartyCoachWelcomePopup";
 
-import { SocialProofToast } from "./components/growth/SocialProofToast";
 
 // Redirect component for /dashboard to /userdashboard
 const DashboardRedirect = () => {
@@ -180,7 +179,6 @@ const AppContent = () => {
         <AnnouncementManager />
         {/* <FreeTrialPopup /> */}
         <SmartyCoachWelcomePopup />
-        <SocialProofToast />
         <ScrollToTop />
         <AnalyticsTracker />
         <BackgroundSEO />
