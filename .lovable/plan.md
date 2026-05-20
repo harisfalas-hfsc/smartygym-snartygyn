@@ -1,64 +1,50 @@
-## Smarty Coach Welcome Popup — 4 fixes
+## Problem
 
-### 1. Welcome popup already IS the Smarty Coach — verify behavior
+When a logged-out (or non-premium) visitor completes the Smarty Coach flow and presses **Start Workout**, the app navigates to the workout URL, but the auth gate sends them to `/auth` and after login dumps them on `/`. Their whole conversation is lost and they have to start over. Same thing happens if they enter the flow from the floating **Smarty Coach** button.
 
-The welcome popup (`SmartyCoachWelcomePopup`) already renders `SmartyCoachModal` with `initialPath="menu"`. Clicking **"Start a Workout"** triggers `handleMenuSelect('workout')` which switches into the full question flow (mood → energy → focus → duration → equipment → result). Same for **"Start a Program"** and **"Upgrade My Knowledge"**.
+## Solution (single, simple pattern)
 
-No code change needed here — the behavior the user wants already exists. I will simply confirm in the response that pressing any menu card from the welcome popup behaves identically to pressing the Smarty Coach floating button.
+Use the destination URL itself as the "memory". The Smarty Coach already ends with `navigate(getWorkoutUrl(...))`. We just need every auth/paywall gate to **come back to that URL after login**. No need to persist quiz answers — the user is taken straight to the recommended workout/program page, where the paywall (if any) is already shown.
 
-### 2. Remove all "we don't have…" phrasing — always frame results positively
+### 1. `/auth` honors a `redirect` query param
 
-Two files contain the negative lead-in lines. Replace them with confident, positive framing, and soften the per-criterion fallback lines so they never start with "No …" or "doesn't".
+`src/pages/Auth.tsx`
+- Read `searchParams.get("redirect")`. Default to `/`.
+- After successful login / signup / Google / Apple, replace `navigate("/")` with `navigate(safeRedirect)`.
+- `safeRedirect` = the param only if it starts with `/` and not `//` (prevents open redirect). Otherwise `/`.
+- Pass the same redirect through `emailRedirectTo` and OAuth `redirectTo` as `${origin}/?redirect=<encoded>` — the homepage already has the auth listener, but simpler: keep OAuth `redirectTo` = `${origin}/auth?redirect=<encoded>` so the same logic on /auth fires.
 
-**`src/utils/smarty-coach/suggestionEngine.ts`** (line 158)
-- Replace `"We don't have a workout matching every choice you made — this is the closest professional fit."`
-- With `"This is the best-fit workout for your mood, energy and focus right now — hand-picked from the library."`
-- Line 162: change `"No exact ${goalLabel} session was available — this ${cat} workout delivers similar training benefits."` → `"This ${cat} workout aligns with your ${goalLabel} focus and delivers the same training stimulus."`
-- Line 167: change `"Difficulty is X — closest available to your energy level."` → `"Difficulty is X — well-suited to your current energy level."`
-- Lines 172–173 (duration fallbacks): rephrase without "you have X" comparison wording — e.g. `"Runs ${itemDuration} minutes — leaves room for warm-up or cool-down."` / `"Runs ${itemDuration} minutes — easy to trim the last circuit if needed."`
-- Line 179 (equipment fallback): change `"Normally uses equipment — most movements can be substituted with bodyweight versions."` → `"Every movement can be done bodyweight-only — fully adapted to your setup."`
+### 2. Gates send users to `/auth?redirect=<currentPath>`
 
-**`src/utils/smarty-coach/programSuggestionEngine.ts`** (line 153)
-- Replace `"We don't currently have a program that matches every choice you made — this is the closest professional fit available."`
-- With `"This is the best-fit program for your goal, level and timeline — selected from the full library."`
-- Line 158: change `"No ${goalLabel} program fits all your other criteria, so we picked a ${cat} program — it delivers similar training benefits and supports the same outcome."` → `"This ${cat} program supports your ${goalLabel} goal and delivers the same long-term outcome."`
-- Line 164: change `"Difficulty is X — the closest level available; you can scale intensity…"` → `"Difficulty is X — appropriate for your level; intensity is easy to scale up or down."`
-- Lines 171–173 (duration fallbacks): rephrase to drop "you asked for X" — e.g. `"This is a ${itemWeeks}-week program — repeat the cycle to extend it, or progress into a longer plan afterwards."` / `"This is a ${itemWeeks}-week program — gives you extra room for progressive overload."`
-- Line 180 (equipment fallback): change to `"All movements can be substituted with bodyweight progressions — fully adapted to your setup."`
+- `src/components/ProtectedRoute.tsx` — change `<Navigate to="/auth" replace />` to include `?redirect=${encodeURIComponent(location.pathname + location.search)}`.
+- `src/components/AccessGate.tsx` (both `navigate("/auth")` calls) — same pattern.
 
-**Empty-result fallbacks** (when 0 content rows in DB)
-- `src/components/smarty-coach/SmartyCoachModal.tsx` line 542: change `"No workouts available to suggest at the moment."` → `"We're refreshing the library right now — try the Workout of the Day or explore our programs in the meantime."`
-- `src/components/smarty-coach/ProgramSuggestionFlow.tsx` line 188: same positive rephrasing for programs.
-- `src/components/smarty-coach/KnowledgeSuggestionFlow.tsx` line 162: same for articles.
+### 3. Smarty Coach unchanged, but recommendation works for everyone
 
-### 3. Add "I'm always available" footer to the modal
+`SmartyCoachModal.handleSelectSuggestion` already calls `navigate(getWorkoutUrl(...))`. With (1) + (2) in place:
 
-In `src/components/smarty-coach/SmartyCoachModal.tsx`, add a small footer band inside `DialogContent` (after the menu grid AND after the question/result content — i.e. once at the bottom of the dialog so it shows on every screen). Content:
+- **Logged-out user** → workout page → ProtectedRoute redirects to `/auth?redirect=/workout/...` → after login they land on the exact recommended workout.
+- **Logged-in free user without premium access** → workout page renders normally; the existing `AccessGate` / `SubscriptionGate` / `PurchaseButton` on that page handles the upsell (subscribe or buy standalone). No extra work needed.
+- **Premium user** → workout opens directly. Already works.
 
-> 💬 I'm always here for you — tap the **Smarty Coach** button anytime to get help.
+### 4. Same fix automatically covers the floating Smarty Coach button
 
-Styling: muted background strip (`bg-muted/30 border-t border-border`), small text, centered, with a brain/sparkles icon. Visible in both menu mode and inside the flows. Mobile-safe (wraps, padded for safe area).
+The button opens the same `SmartyCoachModal`, which ends with the same `navigate(...)`. Once (1)+(2) are in place, the button-driven flow gets the same continuity.
 
-### 4. First-visit + first-login trigger — verify it fires on login
+## Files touched
 
-Current logic in `SmartyCoachWelcomePopup.tsx`:
-- On mount: shows once per anonymous browser session OR once per signed-in session per user id (`sessionStorage`).
-- On `SIGNED_IN` auth event: re-triggers IF the new uid differs from `lastUserIdRef`.
+- `src/pages/Auth.tsx` — read & honor `redirect` param in all 4 success paths (email login, signup-verified, Google, Apple).
+- `src/components/ProtectedRoute.tsx` — append `?redirect=` when bouncing to `/auth`.
+- `src/components/AccessGate.tsx` — append `?redirect=` on both signup CTA buttons.
 
-Issue the user hit: they were anonymous → popup shown → key `smarty-welcome-shown-anon` set → then signed in → `onAuthStateChange` fires `SIGNED_IN` with new uid → modal SHOULD re-open with the user-specific key. This already works in code, but to be safe I will:
+## Out of scope (intentionally)
 
-- Confirm the `SIGNED_IN` branch always calls `tryShow(uid)` even if the user already saw the anon popup this session (it does — anon key is separate from user key).
-- Add a small additional guard: clear `lastUserIdRef` on initial mount so the very first `SIGNED_IN` event (which fires shortly after page load when restoring a session) is treated as a transition and triggers the popup once per session per user — but only if the user hasn't seen it yet for that user id.
-- Leave the permanent `NEVER_KEY` opt-out untouched (users who closed it forever stay opted out).
+- Persisting the quiz answers across login. The recommendation is already shown and acted on before the redirect; re-running the quiz post-login isn't needed because the user already chose a specific workout.
+- Backend, Stripe, or schema changes.
+- Any visual redesign of the modal or gates.
 
-No DB or auth changes — purely client logic refinement.
+## Technical notes
 
-### Files touched
-- `src/utils/smarty-coach/suggestionEngine.ts` — positive rewording
-- `src/utils/smarty-coach/programSuggestionEngine.ts` — positive rewording
-- `src/components/smarty-coach/SmartyCoachModal.tsx` — empty-state copy + "always available" footer
-- `src/components/smarty-coach/ProgramSuggestionFlow.tsx` — empty-state copy
-- `src/components/smarty-coach/KnowledgeSuggestionFlow.tsx` — empty-state copy
-- `src/components/smarty-coach/SmartyCoachWelcomePopup.tsx` — small SIGNED_IN trigger refinement
-
-No backend, Stripe, or schema changes.
+- `safeRedirect` guard: `redirect.startsWith('/') && !redirect.startsWith('//') ? redirect : '/'`.
+- For OAuth, set `redirectTo: ${origin}/auth?redirect=<encoded>` so the same `/auth` logic runs after the provider round-trip.
+- `AvatarSetupDialog` completion path: also forward to `safeRedirect` instead of hard-coded `/`.
