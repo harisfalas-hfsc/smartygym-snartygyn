@@ -5,33 +5,34 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { 
    
-  Heart, 
-  Dumbbell,
-  Calendar,
-  Sparkles,
-  BookOpen,
-  BarChart3,
-  CheckCircle2,
-  Check,
-  Clock,
-  Target,
-  Sunrise,
-  Sun,
-  Moon,
-  Crown,
-  Zap,
-  Brain,
-  TrendingUp,
-  Timer,
-  Flame,
-  Activity,
-  User,
-  Trophy,
-  Wrench,
-  Users,
-  Newspaper,
-  Info,
-  ListChecks
+   Heart, 
+   Dumbbell,
+   Calendar,
+   Sparkles,
+   BookOpen,
+   BarChart3,
+   CheckCircle2,
+   Check,
+   Clock,
+   Target,
+   Sunrise,
+   Sun,
+   Moon,
+   Crown,
+   Zap,
+   Brain,
+   TrendingUp,
+   Timer,
+   Flame,
+   Activity,
+   User,
+   Trophy,
+   Wrench,
+   Users,
+   Newspaper,
+   Info,
+   ListChecks,
+   Apple
 } from "lucide-react";
 
 import { SEOEnhancer } from "@/components/SEOEnhancer";
@@ -671,8 +672,7 @@ export default function AboutSmartyGym() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-muted-foreground">
-                The SmartyGym <strong>Blog</strong> is your go-to resource for science-based articles on training,
-                nutrition, recovery, and healthy aging — all written and curated by{" "}
+                The SmartyGym <strong>Blog</strong> is your go-to resource for science-based articles across three sections: <strong>Fitness</strong>, <strong>Wellness</strong>, and <strong>Nutrition</strong> — all written and curated by{" "}
                 <Link to="/coach-profile" className="text-primary font-semibold hover:underline">
                   Haris Falas
                 </Link>
@@ -681,24 +681,24 @@ export default function AboutSmartyGym() {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div className="flex items-start gap-2 p-3 bg-muted/30 rounded-lg border border-border">
-                  <Brain className="h-4 w-4 text-purple-500 mt-0.5 shrink-0" />
+                  <Dumbbell className="h-4 w-4 text-rose-500 mt-0.5 shrink-0" />
                   <div>
-                    <h5 className="font-bold text-sm">Evidence-Based</h5>
-                    <p className="text-xs text-muted-foreground">Backed by sports science and real coaching</p>
+                    <h5 className="font-bold text-sm">Fitness</h5>
+                    <p className="text-xs text-muted-foreground">Evidence-based training, workouts, and performance</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2 p-3 bg-muted/30 rounded-lg border border-border">
-                  <Heart className="h-4 w-4 text-rose-500 mt-0.5 shrink-0" />
+                  <Sun className="h-4 w-4 text-amber-500 mt-0.5 shrink-0" />
                   <div>
-                    <h5 className="font-bold text-sm">Healthy Aging</h5>
-                    <p className="text-xs text-muted-foreground">Train and eat for long-term performance</p>
+                    <h5 className="font-bold text-sm">Wellness</h5>
+                    <p className="text-xs text-muted-foreground">Recovery, sleep, mindfulness, and lifestyle optimization</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2 p-3 bg-muted/30 rounded-lg border border-border">
-                  <TrendingUp className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
+                  <Apple className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
                   <div>
-                    <h5 className="font-bold text-sm">Practical Guides</h5>
-                    <p className="text-xs text-muted-foreground">Actionable advice you can use today</p>
+                    <h5 className="font-bold text-sm">Nutrition</h5>
+                    <p className="text-xs text-muted-foreground">Evidence-based eating, supplementation, and metabolic health</p>
                   </div>
                 </div>
               </div>
