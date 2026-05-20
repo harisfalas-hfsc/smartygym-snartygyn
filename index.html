@@ -16,16 +16,38 @@
       (function() {
         var meta = document.getElementById('viewport-meta');
         if (!meta) return;
-        var MOBILE_BREAKPOINT = 1024;
+        // Orientation-driven viewport:
+        //  - Phones (smallest side < 600px): native device-width.
+        //  - Tablet PORTRAIT  → force width=500  → app renders in mobile layout.
+        //  - Tablet LANDSCAPE → force width=1280 → app renders in desktop layout.
+        //  - Desktop: native device-width with pinch-zoom.
         function updateViewport() {
-          if (window.innerWidth >= MOBILE_BREAKPOINT) {
-            meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes');
+          var w = window.screen && window.screen.width  ? window.screen.width  : window.innerWidth;
+          var h = window.screen && window.screen.height ? window.screen.height : window.innerHeight;
+          // Use visual viewport for orientation so it updates on rotate
+          var vw = window.innerWidth;
+          var vh = window.innerHeight;
+          var minSide = Math.min(w, h);
+          var isPhone = minSide < 600;
+          var isDesktop = minSide >= 1100; // large screens treated as desktop regardless of orientation
+          var isPortrait = vh > vw;
+          var content;
+          if (isPhone) {
+            content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+          } else if (isDesktop) {
+            content = 'width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes';
+          } else if (isPortrait) {
+            // Tablet portrait → mobile layout
+            content = 'width=500, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
           } else {
-            meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+            // Tablet landscape → desktop layout
+            content = 'width=1280, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes';
           }
+          meta.setAttribute('content', content);
         }
         updateViewport();
         window.addEventListener('resize', updateViewport);
+        window.addEventListener('orientationchange', updateViewport);
       })();
     </script>
     
