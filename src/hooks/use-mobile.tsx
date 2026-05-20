@@ -6,7 +6,7 @@ import * as React from "react";
 // - Tablet in landscape → desktop
 // - Desktop → desktop
 const PHONE_MAX = 600;
-const TABLET_LANDSCAPE_MIN_WIDTH = 700;
+const TABLET_LANDSCAPE_MIN_WIDTH = 1024;
 const TABLET_LANDSCAPE_MIN_HEIGHT = 600;
 
 function computeIsMobile() {
