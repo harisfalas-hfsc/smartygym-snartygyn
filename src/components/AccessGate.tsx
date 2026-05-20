@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Lock, Crown } from "lucide-react";
@@ -32,6 +32,8 @@ export const AccessGate = ({
 }: AccessGateProps) => {
   const { user, userTier, isLoading, hasPurchased } = useAccessControl();
   const navigate = useNavigate();
+  const location = useLocation();
+  const authHref = `/auth?redirect=${encodeURIComponent(location.pathname + location.search)}`;
   const { goBack } = useShowBackButton();
 
   // Debug logging for access control decisions
@@ -66,7 +68,7 @@ export const AccessGate = ({
                 Please log in or create an account to access {contentType === "workout" ? "workouts" : contentType === "program" ? "training programs" : "this content"}.
               </p>
               <div className="space-y-2 pt-4">
-                <Button onClick={() => navigate("/auth")} className="w-full" size="lg" data-track-cta="signup-gate">
+                <Button onClick={() => navigate(authHref)} className="w-full" size="lg" data-track-cta="signup-gate">
                   <Lock className="w-4 h-4 mr-2" />
                   Log In / Sign Up
                 </Button>
@@ -115,7 +117,7 @@ export const AccessGate = ({
               Please log in or create an account to access {contentType === "workout" ? "workouts" : contentType === "program" ? "training programs" : "this content"}.
             </p>
             <div className="space-y-2 pt-4">
-              <Button onClick={() => navigate("/auth")} className="w-full" size="lg" data-track-cta="signup-gate">
+              <Button onClick={() => navigate(authHref)} className="w-full" size="lg" data-track-cta="signup-gate">
                 <Lock className="w-4 h-4 mr-2" />
                 Log In / Sign Up
               </Button>
