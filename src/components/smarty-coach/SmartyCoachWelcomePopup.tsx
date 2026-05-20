@@ -46,8 +46,11 @@ export const SmartyCoachWelcomePopup = () => {
       if (cancelled) return;
       const { data } = await supabase.auth.getSession();
       const uid = data.session?.user?.id ?? null;
-      lastUserIdRef.current = uid;
       void tryShow(uid);
+      // Record uid AFTER attempting to show, so the SIGNED_IN auth event that fires
+      // moments later (when a stored session restores) is treated as the same user
+      // and does NOT re-open the popup a second time in the same load.
+      lastUserIdRef.current = uid;
     }, INITIAL_DELAY_MS);
     return () => { cancelled = true; window.clearTimeout(timer); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
