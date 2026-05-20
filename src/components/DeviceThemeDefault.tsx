@@ -11,14 +11,10 @@ export const DeviceThemeDefault = () => {
   useEffect(() => {
     const sessionTheme = sessionStorage.getItem("smartygym-session-theme");
     
-    if (sessionTheme) {
-      setTheme(sessionTheme);
-    } else {
-      const isMobile = window.innerWidth < 1024;
-      const defaultTheme = isMobile ? "dark" : "light";
-      setTheme(defaultTheme);
-      sessionStorage.setItem("smartygym-session-theme", defaultTheme);
-    }
+    // Force dark mode as default for all devices. Theme toggle is hidden,
+    // so we always apply dark and ignore any previously stored preference.
+    setTheme("dark");
+    sessionStorage.setItem("smartygym-session-theme", "dark");
   }, [setTheme]);
 
   useEffect(() => {

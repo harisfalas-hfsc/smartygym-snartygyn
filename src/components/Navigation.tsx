@@ -470,7 +470,8 @@ export const Navigation = () => {
                </div>
                <span className="sr-only">Smarty Coach</span>
              </Button>
-             <div><ThemeToggle /></div>
+              {/* Theme toggle hidden — dark mode is enforced as the default across all devices. Component kept for future re-enable. */}
+              <div className="hidden"><ThemeToggle /></div>
              {/* Admin Button - only visible to admins */}
             {isAdmin && (
               <Button
