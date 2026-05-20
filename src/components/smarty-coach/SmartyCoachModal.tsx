@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { ChevronRight, ChevronLeft, Clock, Dumbbell, Zap, Brain, BookOpen, Target, Activity, Wrench } from "lucide-react";
+import { ChevronRight, ChevronLeft, Clock, Dumbbell, Zap, Brain, BookOpen, Target, Activity, Wrench, Flame, Sparkles, X } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -24,6 +24,49 @@ import { cn } from "@/lib/utils";
 import { getWorkoutUrl } from "@/utils/smarty-coach/routes";
 import { DialogDescription } from "@/components/ui/dialog";
 import { fetchVisibleWorkoutMetadata } from "@/hooks/useTodayWods";
+
+type MenuAccent = 'primary' | 'amber' | 'emerald' | 'violet' | 'rose' | 'sky';
+const menuAccentClasses: Record<MenuAccent, string> = {
+  primary: 'bg-primary/10 text-primary',
+  amber: 'bg-amber-500/15 text-amber-600 dark:text-amber-400',
+  emerald: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400',
+  violet: 'bg-violet-500/15 text-violet-600 dark:text-violet-400',
+  rose: 'bg-rose-500/15 text-rose-600 dark:text-rose-400',
+  sky: 'bg-sky-500/15 text-sky-600 dark:text-sky-400',
+};
+
+interface MenuCardProps {
+  emoji: string;
+  title: string;
+  description: string;
+  Icon: React.ComponentType<{ className?: string }>;
+  accent: MenuAccent;
+  onClick: () => void;
+}
+
+const MenuCard = ({ emoji, title, description, Icon, accent, onClick }: MenuCardProps) => (
+  <button
+    onClick={onClick}
+    className={cn(
+      "group relative w-full text-left rounded-2xl border-2 border-border bg-card p-4",
+      "transition-all duration-200 hover:border-primary hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/10",
+      "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
+    )}
+  >
+    <div className="flex items-center gap-3">
+      <div className={cn("w-11 h-11 min-w-[2.75rem] rounded-xl flex items-center justify-center", menuAccentClasses[accent])}>
+        <Icon className="h-5 w-5" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="font-bold text-foreground text-sm sm:text-base leading-tight whitespace-normal break-words">
+          <span className="mr-1.5">{emoji}</span>{title}
+        </p>
+        <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 leading-snug whitespace-normal break-words">{description}</p>
+      </div>
+      <ChevronRight className="h-5 w-5 shrink-0 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-transform" />
+    </div>
+  </button>
+);
 
 interface SmartyCoachModalProps {
   isOpen: boolean;
