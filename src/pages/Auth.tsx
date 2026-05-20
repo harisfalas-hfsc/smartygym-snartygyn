@@ -35,6 +35,15 @@ export default function Auth() {
   // Get the mode from URL params, default to login
   const defaultTab = searchParams.get("mode") === "signup" ? "signup" : "login";
 
+  // Honor ?redirect=<path> so users return to where they were gated (Smarty Coach
+  // suggestion, paywalled workout, etc.). Only accept same-origin relative paths.
+  const rawRedirect = searchParams.get("redirect");
+  const safeRedirect =
+    rawRedirect && rawRedirect.startsWith("/") && !rawRedirect.startsWith("//")
+      ? rawRedirect
+      : "/";
+  const hasRedirect = safeRedirect !== "/";
+
   // Set up listener first, then check if user is already authenticated
   useEffect(() => {
     let mounted = true;
@@ -73,7 +82,7 @@ export default function Auth() {
         return; // Don't navigate yet — avatar setup dialog will handle it
       }
 
-      navigate("/");
+      navigate(safeRedirect);
     };
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -135,7 +144,9 @@ export default function Auth() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/`,
+          redirectTo: `${window.location.origin}/auth${
+            hasRedirect ? `?redirect=${encodeURIComponent(safeRedirect)}` : ""
+          }`,
         },
       });
 
@@ -170,7 +181,9 @@ export default function Auth() {
     setAppleLoading(true);
     try {
       const result = await lovable.auth.signInWithOAuth("apple", {
-        redirect_uri: `${window.location.origin}/`,
+        redirect_uri: `${window.location.origin}/auth${
+          hasRedirect ? `?redirect=${encodeURIComponent(safeRedirect)}` : ""
+        }`,
       });
 
       if (result.redirected) {
@@ -263,7 +276,9 @@ export default function Auth() {
         email: signUpData.email,
         password: signUpData.password,
         options: {
-          emailRedirectTo: `${window.location.origin}/`,
+          emailRedirectTo: `${window.location.origin}/auth${
+            hasRedirect ? `?redirect=${encodeURIComponent(safeRedirect)}` : ""
+          }`,
           data: {
             full_name: signUpData.fullName,
           },
@@ -345,7 +360,7 @@ export default function Auth() {
           title: "Success!",
           description: rememberMe ? "Logged in successfully. You'll stay logged in for 30 days." : "Logged in successfully. Redirecting...",
         });
-        setTimeout(() => navigate("/"), 1500);
+        setTimeout(() => navigate(safeRedirect), 1500);
       }
     } catch (error: any) {
       toast({
@@ -410,7 +425,10 @@ export default function Auth() {
           onOpenChange={(open) => {
             setShowAvatarSetup(open);
             if (!open) {
-              setTimeout(() => navigate("/about-smartygym"), 500);
+              setTimeout(
+                () => navigate(hasRedirect ? safeRedirect : "/about-smartygym"),
+                500,
+              );
             }
           }}
           userId={newUserId}
