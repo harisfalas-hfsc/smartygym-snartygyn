@@ -185,7 +185,7 @@ export const ProgramSuggestionFlow = ({ onBack, onClose }: ProgramSuggestionFlow
   if (currentStep === 'result' && !suggestion) {
     return (
       <div className="text-center py-6 text-muted-foreground">
-        <p>No programs available to suggest at the moment.</p>
+        <p>We're refreshing the program library right now — explore the Workout of the Day or our training tools in the meantime.</p>
         <Button variant="outline" onClick={goBack} className="mt-4 flex items-center gap-1 mx-auto">
           <ChevronLeft className="h-4 w-4" />Back
         </Button>

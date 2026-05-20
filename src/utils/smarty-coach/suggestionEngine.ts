@@ -155,28 +155,28 @@ const buildWorkoutExplanations = (top: ScoredContent, answers: QuestionAnswers):
     return reasons;
   }
 
-  reasons.push(`We don't have a workout matching every choice you made — this is the closest professional fit.`);
+  reasons.push(`This is the best-fit workout for your mood, energy and focus right now — hand-picked from the library.`);
 
   if (goal) {
     if (exactCategory) reasons.push(`Targets your ${goalLabel} focus directly.`);
-    else if (fallbackCategory) reasons.push(`No exact ${goalLabel} session was available — this ${cat.toLowerCase()} workout delivers similar training benefits.`);
+    else if (fallbackCategory) reasons.push(`This ${cat.toLowerCase()} workout aligns with your ${goalLabel} focus and delivers the same training stimulus.`);
   }
 
   if (desiredDifficulty && top.item.difficulty) {
     if (top._difficultyMatchedEnergy) reasons.push(`${top.item.difficulty} matches your current energy.`);
-    else reasons.push(`Difficulty is ${top.item.difficulty} — closest available to your energy level.`);
+    else reasons.push(`Difficulty is ${top.item.difficulty} — well-suited to your current energy level.`);
   }
 
   if (time && itemDuration) {
     if (exactTime) reasons.push(`Fits your ${time}-minute window.`);
-    else if (itemDuration < time) reasons.push(`Runs ${itemDuration} minutes (you have ${time}) — leaves room for warm-up or a short cool-down.`);
-    else reasons.push(`Runs ${itemDuration} minutes (you have ${time}) — slightly longer; you can shorten the last circuit if pressed for time.`);
+    else if (itemDuration < time) reasons.push(`Runs ${itemDuration} minutes — leaves room for warm-up or cool-down.`);
+    else reasons.push(`Runs ${itemDuration} minutes — easy to trim the last circuit if needed.`);
   }
 
   if (top._equipmentMatched) {
     reasons.push(equipment === 'bodyweight' ? 'No equipment needed.' : 'Uses the equipment you have available.');
   } else if (equipment === 'bodyweight') {
-    reasons.push('Normally uses equipment — most movements can be substituted with bodyweight versions.');
+    reasons.push('Every movement can be done bodyweight-only — fully adapted to your setup.');
   } else {
     reasons.push('Bodyweight-based — equipment not required today.');
   }

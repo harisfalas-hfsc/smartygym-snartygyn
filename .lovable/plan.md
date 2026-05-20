@@ -1,60 +1,64 @@
-## Goal
-Eliminate the 3-day free trial across the app, copy, and Stripe so Gold (monthly) and Platinum (yearly) become plain auto-renewing subscriptions that start the day the user pays.
+## Smarty Coach Welcome Popup — 4 fixes
 
-## 1. Checkout — stop sending trial to Stripe
-**`supabase/functions/create-checkout/index.ts`**
-- Remove the `trial` parameter from the request body destructure.
-- Remove `...(trial ? { trial_period_days: 3 } : {})` from `subscription_data`.
-- Update `logStep` to drop the trial field.
+### 1. Welcome popup already IS the Smarty Coach — verify behavior
 
-Result: every new Gold/Platinum checkout starts billing immediately on day 1, auto-renews monthly (Gold) or yearly (Platinum) using the saved default payment method (Layer 1 hardening stays intact).
+The welcome popup (`SmartyCoachWelcomePopup`) already renders `SmartyCoachModal` with `initialPath="menu"`. Clicking **"Start a Workout"** triggers `handleMenuSelect('workout')` which switches into the full question flow (mood → energy → focus → duration → equipment → result). Same for **"Start a Program"** and **"Upgrade My Knowledge"**.
 
-## 2. Auth flow — drop ?trial=true redirect
-**`src/pages/Auth.tsx`** (lines ~77–94)
-- Delete the entire `if (params.get("trial") === "true") { ... }` block that auto-invokes create-checkout with `trial: true` after signup.
-- After signup the user simply lands on `/` (or `/smarty-plans` if `?plan=…` is present — optional, but current behavior already goes to `/`, so leave as `/`).
+No code change needed here — the behavior the user wants already exists. I will simply confirm in the response that pressing any menu card from the welcome popup behaves identically to pressing the Smarty Coach floating button.
 
-## 3. SmartyPlans page — remove all trial copy & CTAs
-**`src/pages/SmartyPlans.tsx`**
-- Line 310: remove the “🎉 Try free for 3 days. Cancel anytime.” paragraph (keep the surrounding box with the "Join thousands…" line, or remove the inner `<p>` only).
-- Line 492 + 537: delete the `🎉 3 days free trial included` lines under both Gold and Platinum cards.
-- Line 515 + 560: change button label from `Start 3-Day Free Trial` → `Start Your Plan` (loading text stays `Processing...`).
-- Ensure the checkout invoke call does NOT pass `trial: true` (verify and strip if present).
+### 2. Remove all "we don't have…" phrasing — always frame results positively
 
-## 4. About SmartyGym page — remove trial copy & link
-**`src/pages/AboutSmartyGym.tsx`**
-- Line 739: remove “🎉 Try free for 3 days — cancel anytime. No commitment.”
-- Lines 833–835: change `<Link to="/auth?mode=signup&trial=true">` button text `Start 3-Day Free Trial` → `Start Your Plan`, and change link target to `/smarty-plans` (so visitors reach the plans page) — or to `/auth?mode=signup` if a signup-first flow is preferred. Default: `/smarty-plans`.
+Two files contain the negative lead-in lines. Replace them with confident, positive framing, and soften the per-criterion fallback lines so they never start with "No …" or "doesn't".
 
-## 5. ArticleDetail page
-**`src/pages/ArticleDetail.tsx`** line 266: button label `Start Your Free Trial` → `Start Your Plan`. Keep the `/join-premium` route.
+**`src/utils/smarty-coach/suggestionEngine.ts`** (line 158)
+- Replace `"We don't have a workout matching every choice you made — this is the closest professional fit."`
+- With `"This is the best-fit workout for your mood, energy and focus right now — hand-picked from the library."`
+- Line 162: change `"No exact ${goalLabel} session was available — this ${cat} workout delivers similar training benefits."` → `"This ${cat} workout aligns with your ${goalLabel} focus and delivers the same training stimulus."`
+- Line 167: change `"Difficulty is X — closest available to your energy level."` → `"Difficulty is X — well-suited to your current energy level."`
+- Lines 172–173 (duration fallbacks): rephrase without "you have X" comparison wording — e.g. `"Runs ${itemDuration} minutes — leaves room for warm-up or cool-down."` / `"Runs ${itemDuration} minutes — easy to trim the last circuit if needed."`
+- Line 179 (equipment fallback): change `"Normally uses equipment — most movements can be substituted with bodyweight versions."` → `"Every movement can be done bodyweight-only — fully adapted to your setup."`
 
-## 6. FAQ page
-**`src/pages/FAQ.tsx`**
-- Remove the entire "Is there a free trial?" Q&A from both the JSON-LD FAQ schema (lines 80–84) and the visible AccordionItem (lines 337–340) — or replace the answer with: "No free trial. Gold (€9.99/month) and Platinum (€89.89/year) start the day you subscribe and auto-renew. Cancel anytime from your dashboard." Default: replace, so the FAQ still answers the natural search question.
+**`src/utils/smarty-coach/programSuggestionEngine.ts`** (line 153)
+- Replace `"We don't currently have a program that matches every choice you made — this is the closest professional fit available."`
+- With `"This is the best-fit program for your goal, level and timeline — selected from the full library."`
+- Line 158: change `"No ${goalLabel} program fits all your other criteria, so we picked a ${cat} program — it delivers similar training benefits and supports the same outcome."` → `"This ${cat} program supports your ${goalLabel} goal and delivers the same long-term outcome."`
+- Line 164: change `"Difficulty is X — the closest level available; you can scale intensity…"` → `"Difficulty is X — appropriate for your level; intensity is easy to scale up or down."`
+- Lines 171–173 (duration fallbacks): rephrase to drop "you asked for X" — e.g. `"This is a ${itemWeeks}-week program — repeat the cycle to extend it, or progress into a longer plan afterwards."` / `"This is a ${itemWeeks}-week program — gives you extra room for progressive overload."`
+- Line 180 (equipment fallback): change to `"All movements can be substituted with bodyweight progressions — fully adapted to your setup."`
 
-## 7. Free trial popup component
-**`src/components/growth/FreeTrialPopup.tsx`** — already commented out from `src/App.tsx`. Leave the file on disk (user said "keep in background"), no further changes needed.
+**Empty-result fallbacks** (when 0 content rows in DB)
+- `src/components/smarty-coach/SmartyCoachModal.tsx` line 542: change `"No workouts available to suggest at the moment."` → `"We're refreshing the library right now — try the Workout of the Day or explore our programs in the meantime."`
+- `src/components/smarty-coach/ProgramSuggestionFlow.tsx` line 188: same positive rephrasing for programs.
+- `src/components/smarty-coach/KnowledgeSuggestionFlow.tsx` line 162: same for articles.
 
-## 8. Stripe — cancel any trialing subscriptions
-- Verified via `stripe.subscriptions.list({ status: 'trialing' })`: **0 active trialing subscriptions** at this moment. Nothing to clean up.
-- Stripe Prices for Gold (`price_1SJ9q1…`) and Platinum (`price_1SJ9qG…`) have no `trial_period_days` set on the price itself — the 3-day trial was only ever attached at checkout-session creation. Once step 1 ships, no new subscription will ever receive a trial.
-- No webhook, product, or price changes needed in the Stripe dashboard.
+### 3. Add "I'm always available" footer to the modal
 
-## 9. Renewal-reminders edge function — no change
-`supabase/functions/send-renewal-reminders/index.ts` references "3 days" only as the lead time for **renewal** reminders (3 days before `current_period_end`), unrelated to the free trial. Leave as-is.
+In `src/components/smarty-coach/SmartyCoachModal.tsx`, add a small footer band inside `DialogContent` (after the menu grid AND after the question/result content — i.e. once at the bottom of the dialog so it shows on every screen). Content:
 
-## 10. Memory cleanup
-- Delete `mem://business-rules/3-day-free-trial-system`.
-- Remove the "[3-Day Free Trial]" line from `mem://index.md` and update `[Free Trial Popup]` / `[Renewal Reminders]` notes that mention the trial.
+> 💬 I'm always here for you — tap the **Smarty Coach** button anytime to get help.
 
-## 11. Verification (after implementation)
-- `rg -i "3.day free trial|free for 3 days|trial=true|trial_period_days|Start.*Free Trial"` on `src/` and `supabase/functions/` → expect only `FreeTrialPopup.tsx` (kept intentionally).
-- Confirm `create-checkout` no longer reads `trial` and Stripe call no longer includes `subscription_data.trial_period_days`.
-- Re-run `stripe--list_subscriptions status=trialing` → expect `[]`.
-- Manual smoke test of one checkout (Gold) in the preview to confirm Stripe Checkout shows "Pay now" instead of "Start trial".
+Styling: muted background strip (`bg-muted/30 border-t border-border`), small text, centered, with a brain/sparkles icon. Visible in both menu mode and inside the flows. Mobile-safe (wraps, padded for safe area).
 
-## Technical notes
-- All copy changes are surface-level Tailwind/JSX; no design tokens or component variants change.
-- `STRIPE_PRICE_IDS` import in `Auth.tsx` becomes unused after step 2 — remove the import if it's only used there.
-- The `popup-free-trial-bright.jpg` asset stays untouched (used by the kept-but-disabled `FreeTrialPopup`).
+### 4. First-visit + first-login trigger — verify it fires on login
+
+Current logic in `SmartyCoachWelcomePopup.tsx`:
+- On mount: shows once per anonymous browser session OR once per signed-in session per user id (`sessionStorage`).
+- On `SIGNED_IN` auth event: re-triggers IF the new uid differs from `lastUserIdRef`.
+
+Issue the user hit: they were anonymous → popup shown → key `smarty-welcome-shown-anon` set → then signed in → `onAuthStateChange` fires `SIGNED_IN` with new uid → modal SHOULD re-open with the user-specific key. This already works in code, but to be safe I will:
+
+- Confirm the `SIGNED_IN` branch always calls `tryShow(uid)` even if the user already saw the anon popup this session (it does — anon key is separate from user key).
+- Add a small additional guard: clear `lastUserIdRef` on initial mount so the very first `SIGNED_IN` event (which fires shortly after page load when restoring a session) is treated as a transition and triggers the popup once per session per user — but only if the user hasn't seen it yet for that user id.
+- Leave the permanent `NEVER_KEY` opt-out untouched (users who closed it forever stay opted out).
+
+No DB or auth changes — purely client logic refinement.
+
+### Files touched
+- `src/utils/smarty-coach/suggestionEngine.ts` — positive rewording
+- `src/utils/smarty-coach/programSuggestionEngine.ts` — positive rewording
+- `src/components/smarty-coach/SmartyCoachModal.tsx` — empty-state copy + "always available" footer
+- `src/components/smarty-coach/ProgramSuggestionFlow.tsx` — empty-state copy
+- `src/components/smarty-coach/KnowledgeSuggestionFlow.tsx` — empty-state copy
+- `src/components/smarty-coach/SmartyCoachWelcomePopup.tsx` — small SIGNED_IN trigger refinement
+
+No backend, Stripe, or schema changes.
