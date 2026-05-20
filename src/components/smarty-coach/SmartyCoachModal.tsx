@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { ChevronRight, ChevronLeft, Clock, Dumbbell, Zap, Brain, BookOpen, Target, Activity } from "lucide-react";
+import { ChevronRight, ChevronLeft, Clock, Dumbbell, Zap, Brain, BookOpen, Target, Activity, Wrench } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -28,6 +28,7 @@ import { fetchVisibleWorkoutMetadata } from "@/hooks/useTodayWods";
 interface SmartyCoachModalProps {
   isOpen: boolean;
   onClose: () => void;
+  initialPath?: 'menu' | 'workout' | 'program' | 'knowledge';
 }
 
 const moodEmojis = [
@@ -66,12 +67,12 @@ const equipmentOptions = [
 type MainPath = 'menu' | 'workout' | 'program' | 'knowledge';
 type WorkoutStep = 1 | 2 | 3 | 4 | 5 | 'result';
 
-export const SmartyCoachModal = ({ isOpen, onClose }: SmartyCoachModalProps) => {
+export const SmartyCoachModal = ({ isOpen, onClose, initialPath = 'menu' }: SmartyCoachModalProps) => {
   const navigate = useNavigate();
   const { user } = useAccessControl();
   const context = useSmartyContext();
   
-  const [activePath, setActivePath] = useState<MainPath>('menu');
+  const [activePath, setActivePath] = useState<MainPath>(initialPath);
   const [currentStep, setCurrentStep] = useState<WorkoutStep>(1);
   const [answers, setAnswers] = useState<QuestionAnswers>({});
   const [energyValue, setEnergyValue] = useState(5);
@@ -144,12 +145,12 @@ export const SmartyCoachModal = ({ isOpen, onClose }: SmartyCoachModalProps) => 
 
   useEffect(() => {
     if (isOpen) {
-      setActivePath('menu');
+      setActivePath(initialPath);
       setCurrentStep(1);
       setAnswers({});
       setEnergyValue(5);
     }
-  }, [isOpen]);
+  }, [isOpen, initialPath]);
 
   const goBack = () => {
     if (currentStep === 1) setActivePath('menu');
@@ -277,11 +278,11 @@ export const SmartyCoachModal = ({ isOpen, onClose }: SmartyCoachModalProps) => 
                 onClick={handleMeasurement}
               >
                 <div className="w-10 h-10 min-w-[2.5rem] min-h-[2.5rem] rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary-foreground/20">
-                  <Dumbbell className="h-5 w-5 text-primary group-hover:text-primary-foreground" />
+                  <Wrench className="h-5 w-5 text-primary group-hover:text-primary-foreground" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-foreground group-hover:text-primary-foreground whitespace-normal break-words">Make a Measurement</p>
-                  <p className="text-xs text-muted-foreground group-hover:text-primary-foreground/80 whitespace-normal break-words">Open Smarty Tools and choose what you want to track</p>
+                  <p className="font-medium text-foreground group-hover:text-primary-foreground whitespace-normal break-words">Use a Tool</p>
+                  <p className="text-xs text-muted-foreground group-hover:text-primary-foreground/80 whitespace-normal break-words">Open Smarty Tools — track weight, body composition, calories, and more</p>
                 </div>
                 <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground group-hover:text-primary-foreground" />
               </Button>
