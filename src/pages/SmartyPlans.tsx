@@ -92,7 +92,7 @@ export default function SmartyPlans() {
 
     try {
     const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: { priceId: priceIds[plan], trial: true }
+        body: { priceId: priceIds[plan] }
       });
 
       // Handle already subscribed response from backend
