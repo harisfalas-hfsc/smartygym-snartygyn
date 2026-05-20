@@ -546,6 +546,8 @@ export const SmartyCoachModal = ({ isOpen, onClose, initialPath = 'menu' }: Smar
             </>
           )}
         </div>
+        </div>
+        )}
       </DialogContent>
     </Dialog>
   );
