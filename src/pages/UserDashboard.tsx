@@ -1486,53 +1486,31 @@ export default function UserDashboard() {
                 <div>
             <h3 className="text-lg font-semibold mb-2">Workout Activity</h3>
             <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-4 mb-3">
-              <Card>
-                <CardHeader className="pb-0 pt-3">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <Heart className="h-4 w-4 text-red-500" />
-                    Favorites
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="py-1 px-4">
-                  <div className="text-lg font-bold">{favoriteWorkouts.length}</div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-0 pt-3">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-blue-500" />
-                    Viewed
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="py-1 px-4">
-                  <div className="text-lg font-bold">{viewedWorkouts.length}</div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-0 pt-3">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    Completed
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="py-1 px-4">
-                  <div className="text-lg font-bold">{completedWorkouts.length}</div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-0 pt-3">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <Star className="h-4 w-4 text-yellow-500" />
-                    Rated
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="py-1 px-4">
-                  <div className="text-lg font-bold">{ratedWorkouts.length}</div>
-                </CardContent>
-              </Card>
+              {([
+                { bucket: "favorites" as const, label: "Favorites", icon: <Heart className="h-4 w-4 text-red-500" />, count: favoriteWorkouts.length },
+                { bucket: "viewed" as const, label: "Viewed", icon: <Clock className="h-4 w-4 text-blue-500" />, count: viewedWorkouts.length },
+                { bucket: "completed" as const, label: "Completed", icon: <CheckCircle className="h-4 w-4 text-green-500" />, count: completedWorkouts.length },
+                { bucket: "rated" as const, label: "Rated", icon: <Star className="h-4 w-4 text-yellow-500" />, count: ratedWorkouts.length },
+              ]).map(s => (
+                <Card
+                  key={s.bucket}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setActivitySheet({ kind: "workout", bucket: s.bucket })}
+                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setActivitySheet({ kind: "workout", bucket: s.bucket }); } }}
+                  className="cursor-pointer transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                >
+                  <CardHeader className="pb-0 pt-3">
+                    <CardTitle className="text-sm font-medium flex items-center justify-between gap-2">
+                      <span className="flex items-center gap-2">{s.icon}{s.label}</span>
+                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="py-1 px-4">
+                    <div className="text-lg font-bold">{s.count}</div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
                 </div>
 
@@ -1540,65 +1518,32 @@ export default function UserDashboard() {
                 <div>
             <h3 className="text-lg font-semibold mb-2">Program Activity</h3>
             <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-5 mb-3">
-              <Card>
-                <CardHeader className="pb-0 pt-3">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <Heart className="h-4 w-4 text-red-500" />
-                    Favorites
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="py-1 px-4">
-                  <div className="text-lg font-bold">{favoritePrograms.length}</div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-0 pt-3">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-blue-500" />
-                    Viewed
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="py-1 px-4">
-                  <div className="text-lg font-bold">{viewedPrograms.length}</div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-0 pt-3">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <Play className="h-4 w-4 text-purple-500" />
-                    In Progress
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="py-1 px-4">
-                  <div className="text-lg font-bold">{inProgressPrograms.length}</div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-0 pt-3">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    Completed
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="py-1 px-4">
-                  <div className="text-lg font-bold">{completedPrograms.length}</div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-0 pt-3">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <Star className="h-4 w-4 text-yellow-500" />
-                    Rated
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="py-1 px-4">
-                  <div className="text-lg font-bold">{ratedPrograms.length}</div>
-                </CardContent>
-              </Card>
+              {([
+                { bucket: "favorites" as const, label: "Favorites", icon: <Heart className="h-4 w-4 text-red-500" />, count: favoritePrograms.length },
+                { bucket: "viewed" as const, label: "Viewed", icon: <Clock className="h-4 w-4 text-blue-500" />, count: viewedPrograms.length },
+                { bucket: "inprogress" as const, label: "In Progress", icon: <Play className="h-4 w-4 text-purple-500" />, count: inProgressPrograms.length },
+                { bucket: "completed" as const, label: "Completed", icon: <CheckCircle className="h-4 w-4 text-green-500" />, count: completedPrograms.length },
+                { bucket: "rated" as const, label: "Rated", icon: <Star className="h-4 w-4 text-yellow-500" />, count: ratedPrograms.length },
+              ]).map(s => (
+                <Card
+                  key={s.bucket}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setActivitySheet({ kind: "program", bucket: s.bucket })}
+                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setActivitySheet({ kind: "program", bucket: s.bucket }); } }}
+                  className="cursor-pointer transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                >
+                  <CardHeader className="pb-0 pt-3">
+                    <CardTitle className="text-sm font-medium flex items-center justify-between gap-2">
+                      <span className="flex items-center gap-2">{s.icon}{s.label}</span>
+                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="py-1 px-4">
+                    <div className="text-lg font-bold">{s.count}</div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
                 </div>
 
