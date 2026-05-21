@@ -159,6 +159,12 @@ export default function UserDashboard() {
   const [showNightForm, setShowNightForm] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; type: string; id: string } | null>(null);
 
+  // Activity drill-in sheet (Favorites / Completed / Viewed / Rated / In Progress)
+  const [activitySheet, setActivitySheet] = useState<
+    | { kind: "workout" | "program"; bucket: "favorites" | "completed" | "viewed" | "rated" | "inprogress" }
+    | null
+  >(null);
+
   // Check-in hooks
   const {
     bannerState,
