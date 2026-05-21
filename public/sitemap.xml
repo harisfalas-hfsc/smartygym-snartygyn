@@ -2545,8 +2545,20 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://smartygym.com/workout/cardio/WOD-CA-B-1779345005137</loc>
+    <lastmod>2026-05-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://smartygym.com/workout/strength/WOD-S-B-1769812208957</loc>
     <lastmod>2026-05-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://smartygym.com/workout/cardio/WOD-CA-E-1779346202788</loc>
+    <lastmod>2026-05-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
