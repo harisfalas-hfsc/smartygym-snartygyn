@@ -291,9 +291,16 @@ export const SmartyCoachModal = ({ isOpen, onClose, initialPath = 'menu' }: Smar
               </button>
               <div className="grid grid-cols-[3rem_minmax(0,1fr)_3rem] items-center gap-3 sm:grid-cols-[4rem_minmax(0,1fr)_3.5rem] sm:gap-4">
                 <div className="relative">
-                  <div className="absolute inset-0 rounded-2xl bg-primary/30 blur-xl animate-pulse" />
-                  <div className="relative h-12 w-12 sm:w-16 sm:h-16 shrink-0 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center shadow-lg shadow-primary/40 animate-in zoom-in-50 duration-500">
-                    <Brain className="h-6 w-6 sm:h-8 sm:w-8" />
+                  <div className="absolute inset-0 rounded-full bg-primary/30 blur-xl animate-pulse" />
+                  <div className="relative h-12 w-12 sm:h-16 sm:w-16 shrink-0 rounded-full border border-white/20 bg-[#1a1f2e] p-1.5 shadow-lg shadow-blue-500/30 flex items-center justify-center animate-in zoom-in-50 duration-500">
+                    <img
+                      src={smartyCoachIcon}
+                      alt="Smarty Coach"
+                      width={64}
+                      height={64}
+                      decoding="async"
+                      className="h-full w-full rounded-full object-contain drop-shadow-md"
+                    />
                   </div>
                 </div>
                 <div className="min-w-0">
@@ -366,7 +373,15 @@ export const SmartyCoachModal = ({ isOpen, onClose, initialPath = 'menu' }: Smar
         <div className="px-5 sm:px-7 py-5">
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold flex items-center gap-2">
-            <Brain className="h-5 w-5 text-primary" />
+            <img
+              src={smartyCoachIcon}
+              alt=""
+              aria-hidden="true"
+              width={28}
+              height={28}
+              decoding="async"
+              className="h-7 w-7 rounded-full border border-white/20 bg-[#1a1f2e] p-0.5 object-contain"
+            />
             Smarty Coach
           </DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">
