@@ -111,13 +111,6 @@ serve(async (req) => {
           project: "SMARTYGYM",
           user_id: user.id,
         },
-        // CRITICAL: Save the checkout payment method as the subscription's
-        // default. Without this, Stripe may fail to auto-charge renewals
-        // when the customer has multiple cards or the default isn't set.
-        // This is the #1 cause of stuck draft renewal invoices.
-        payment_settings: {
-          save_default_payment_method: 'on_subscription',
-        },
       },
     });
 
