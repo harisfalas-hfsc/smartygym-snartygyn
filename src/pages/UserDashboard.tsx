@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { usePurchases } from "@/hooks/usePurchases";
@@ -50,6 +49,8 @@ import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 
 import { AccountSettingsSection } from "@/components/dashboard/AccountSettingsSection";
 import { ParQAssessmentSection } from "@/components/dashboard/ParQAssessmentSection";
+import { ActivityListSheet, type ActivityItem } from "@/components/dashboard/ActivityListSheet";
+import { ChevronRight } from "lucide-react";
 interface WorkoutInteraction {
   id: string;
   workout_id: string;
@@ -156,6 +157,12 @@ export default function UserDashboard() {
   const [showMorningForm, setShowMorningForm] = useState(false);
   const [showNightForm, setShowNightForm] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; type: string; id: string } | null>(null);
+
+  // Activity drill-in sheet (Favorites / Completed / Viewed / Rated / In Progress)
+  const [activitySheet, setActivitySheet] = useState<
+    | { kind: "workout" | "program"; bucket: "favorites" | "completed" | "viewed" | "rated" | "inprogress" }
+    | null
+  >(null);
 
   // Check-in hooks
   const {
@@ -592,6 +599,24 @@ export default function UserDashboard() {
   const handleNavigateToProgram = (programType: string, programId: string) => {
     navigate(`/trainingprogram/${programType}/${programId}`);
   };
+
+  // Map a WorkoutInteraction / ProgramInteraction to a generic ActivityItem for the sheet
+  const toWorkoutItem = (w: WorkoutInteraction): ActivityItem => ({
+    id: w.id,
+    name: w.workout_name,
+    type: w.workout_type,
+    rating: w.rating,
+    is_completed: w.is_completed,
+    is_favorite: w.is_favorite,
+  });
+  const toProgramItem = (p: ProgramInteraction): ActivityItem => ({
+    id: p.id,
+    name: p.program_name,
+    type: p.program_type,
+    rating: p.rating,
+    is_completed: p.is_completed,
+    is_favorite: p.is_favorite,
+  });
   const handleManageSubscription = async () => {
     if (!user) {
       if (import.meta.env.DEV) {
@@ -1239,115 +1264,32 @@ export default function UserDashboard() {
                   </CardContent>
                 </Card>}
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <Heart className="h-4 w-4 text-red-500" />
-                    Favorites
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{favoriteWorkouts.length}</div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    Completed
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{completedWorkouts.length}</div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-blue-500" />
-                    Viewed
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{viewedWorkouts.length}</div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <Star className="h-4 w-4 text-yellow-500" />
-                    Rated
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{ratedWorkouts.length}</div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Workout Lists */}
-            <div className="grid gap-6 md:grid-cols-2">
-              {/* Favorites */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Favorite Workouts</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {favoriteWorkouts.length === 0 ? <p className="text-sm text-muted-foreground">No favorite workouts yet</p> : <ScrollArea className="max-h-[300px] pr-4">
-                      <div className="space-y-2">
-                        {favoriteWorkouts.map(workout => <div key={workout.id} className="p-3 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleNavigateToWorkout(workout.workout_type, workout.workout_id)}>
-                            <div className="flex items-center justify-between">
-                              <div className="flex-1">
-                                <p className="font-medium text-sm">{workout.workout_name}</p>
-                                <div className="flex items-center gap-2 mt-1">
-                                  <Badge variant="outline" className="text-xs">
-                                    {workout.workout_type}
-                                  </Badge>
-                                  {workout.rating && <div className="flex items-center gap-1">
-                                      <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
-                                      <span className="text-xs">{workout.rating}</span>
-                                    </div>}
-                                </div>
-                              </div>
-                              {workout.is_completed && <CheckCircle className="h-4 w-4 text-green-500 ml-2" />}
-                            </div>
-                          </div>)}
-                      </div>
-                    </ScrollArea>}
-                </CardContent>
-              </Card>
-
-              {/* Completed */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Completed Workouts</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {completedWorkouts.length === 0 ? <p className="text-sm text-muted-foreground">No completed workouts yet</p> : <ScrollArea className="max-h-[300px] pr-4">
-                      <div className="space-y-2">
-                        {completedWorkouts.map(workout => <div key={workout.id} className="p-3 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleNavigateToWorkout(workout.workout_type, workout.workout_id)}>
-                            <div className="flex items-center justify-between">
-                              <div className="flex-1">
-                                <p className="font-medium text-sm">{workout.workout_name}</p>
-                                <div className="flex items-center gap-2 mt-1">
-                                  <Badge variant="outline" className="text-xs">
-                                    {workout.workout_type}
-                                  </Badge>
-                                  {workout.rating && <div className="flex items-center gap-1">
-                                      <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
-                                      <span className="text-xs">{workout.rating}</span>
-                                    </div>}
-                                </div>
-                              </div>
-                            </div>
-                          </div>)}
-                      </div>
-                    </ScrollArea>}
-                </CardContent>
-              </Card>
+              {([
+                { bucket: "favorites" as const, label: "Favorites", icon: <Heart className="h-4 w-4 text-red-500" />, count: favoriteWorkouts.length },
+                { bucket: "completed" as const, label: "Completed", icon: <CheckCircle className="h-4 w-4 text-green-500" />, count: completedWorkouts.length },
+                { bucket: "viewed" as const, label: "Viewed", icon: <Clock className="h-4 w-4 text-blue-500" />, count: viewedWorkouts.length },
+                { bucket: "rated" as const, label: "Rated", icon: <Star className="h-4 w-4 text-yellow-500" />, count: ratedWorkouts.length },
+              ]).map(s => (
+                <Card
+                  key={s.bucket}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setActivitySheet({ kind: "workout", bucket: s.bucket })}
+                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setActivitySheet({ kind: "workout", bucket: s.bucket }); } }}
+                  className="cursor-pointer transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                >
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-medium flex items-center justify-between gap-2">
+                      <span className="flex items-center gap-2">{s.icon}{s.label}</span>
+                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{s.count}</div>
+                    <p className="text-xs text-muted-foreground mt-1">Tap to view all</p>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
             </>}
             </div>}
@@ -1377,112 +1319,33 @@ export default function UserDashboard() {
                   </CardContent>
                 </Card>}
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <Heart className="h-4 w-4 text-red-500" />
-                    Favorites
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{favoritePrograms.length}</div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    Completed
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{completedPrograms.length}</div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-blue-500" />
-                    Viewed
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{viewedPrograms.length}</div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <Star className="h-4 w-4 text-yellow-500" />
-                    Rated
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{ratedPrograms.length}</div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Program Lists */}
-            <div className="grid gap-6 md:grid-cols-2">
-              {/* Favorites */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Favorite Programs</CardTitle>
-                </CardHeader>
-                <CardContent>
-{favoritePrograms.length === 0 ? <p className="text-sm text-muted-foreground">No favorite programs yet</p> : <ScrollArea className="max-h-[300px] pr-4"><div className="space-y-2">
-                      {favoritePrograms.map(program => <div key={program.id} className="p-3 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleNavigateToProgram(program.program_type, program.program_id)}>
-                          <div className="flex items-center justify-between">
-                            <div className="flex-1">
-                              <p className="font-medium text-sm">{program.program_name}</p>
-                              <div className="flex items-center gap-2 mt-1">
-                                <Badge variant="outline" className="text-xs">
-                                  {program.program_type}
-                                </Badge>
-                                {program.rating && <div className="flex items-center gap-1">
-                                    <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
-                                    <span className="text-xs">{program.rating}</span>
-                                  </div>}
-                              </div>
-                            </div>
-                            {program.is_completed && <CheckCircle className="h-4 w-4 text-green-500 ml-2" />}
-                          </div>
-                        </div>)}
-                    </div></ScrollArea>}
-                </CardContent>
-              </Card>
-
-              {/* Completed */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Completed Programs</CardTitle>
-                </CardHeader>
-                <CardContent>
-{completedPrograms.length === 0 ? <p className="text-sm text-muted-foreground">No completed programs yet</p> : <ScrollArea className="max-h-[300px] pr-4"><div className="space-y-2">
-                      {completedPrograms.map(program => <div key={program.id} className="p-3 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleNavigateToProgram(program.program_type, program.program_id)}>
-                          <div className="flex items-center justify-between">
-                            <div className="flex-1">
-                              <p className="font-medium text-sm">{program.program_name}</p>
-                              <div className="flex items-center gap-2 mt-1">
-                                <Badge variant="outline" className="text-xs">
-                                  {program.program_type}
-                                </Badge>
-                                {program.rating && <div className="flex items-center gap-1">
-                                    <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
-                                    <span className="text-xs">{program.rating}</span>
-                                  </div>}
-                              </div>
-                            </div>
-                            {program.is_favorite && <Heart className="h-4 w-4 fill-red-500 text-red-500 ml-2" />}
-                          </div>
-                        </div>)}
-                    </div></ScrollArea>}
-                </CardContent>
-              </Card>
+              {([
+                { bucket: "favorites" as const, label: "Favorites", icon: <Heart className="h-4 w-4 text-red-500" />, count: favoritePrograms.length },
+                { bucket: "inprogress" as const, label: "In Progress", icon: <Play className="h-4 w-4 text-purple-500" />, count: inProgressPrograms.length },
+                { bucket: "completed" as const, label: "Completed", icon: <CheckCircle className="h-4 w-4 text-green-500" />, count: completedPrograms.length },
+                { bucket: "viewed" as const, label: "Viewed", icon: <Clock className="h-4 w-4 text-blue-500" />, count: viewedPrograms.length },
+                { bucket: "rated" as const, label: "Rated", icon: <Star className="h-4 w-4 text-yellow-500" />, count: ratedPrograms.length },
+              ]).map(s => (
+                <Card
+                  key={s.bucket}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setActivitySheet({ kind: "program", bucket: s.bucket })}
+                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setActivitySheet({ kind: "program", bucket: s.bucket }); } }}
+                  className="cursor-pointer transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                >
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-medium flex items-center justify-between gap-2">
+                      <span className="flex items-center gap-2">{s.icon}{s.label}</span>
+                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{s.count}</div>
+                    <p className="text-xs text-muted-foreground mt-1">Tap to view all</p>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
             </>}
             </div>}
@@ -1622,53 +1485,31 @@ export default function UserDashboard() {
                 <div>
             <h3 className="text-lg font-semibold mb-2">Workout Activity</h3>
             <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-4 mb-3">
-              <Card>
-                <CardHeader className="pb-0 pt-3">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <Heart className="h-4 w-4 text-red-500" />
-                    Favorites
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="py-1 px-4">
-                  <div className="text-lg font-bold">{favoriteWorkouts.length}</div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-0 pt-3">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-blue-500" />
-                    Viewed
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="py-1 px-4">
-                  <div className="text-lg font-bold">{viewedWorkouts.length}</div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-0 pt-3">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    Completed
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="py-1 px-4">
-                  <div className="text-lg font-bold">{completedWorkouts.length}</div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-0 pt-3">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <Star className="h-4 w-4 text-yellow-500" />
-                    Rated
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="py-1 px-4">
-                  <div className="text-lg font-bold">{ratedWorkouts.length}</div>
-                </CardContent>
-              </Card>
+              {([
+                { bucket: "favorites" as const, label: "Favorites", icon: <Heart className="h-4 w-4 text-red-500" />, count: favoriteWorkouts.length },
+                { bucket: "viewed" as const, label: "Viewed", icon: <Clock className="h-4 w-4 text-blue-500" />, count: viewedWorkouts.length },
+                { bucket: "completed" as const, label: "Completed", icon: <CheckCircle className="h-4 w-4 text-green-500" />, count: completedWorkouts.length },
+                { bucket: "rated" as const, label: "Rated", icon: <Star className="h-4 w-4 text-yellow-500" />, count: ratedWorkouts.length },
+              ]).map(s => (
+                <Card
+                  key={s.bucket}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setActivitySheet({ kind: "workout", bucket: s.bucket })}
+                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setActivitySheet({ kind: "workout", bucket: s.bucket }); } }}
+                  className="cursor-pointer transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                >
+                  <CardHeader className="pb-0 pt-3">
+                    <CardTitle className="text-sm font-medium flex items-center justify-between gap-2">
+                      <span className="flex items-center gap-2">{s.icon}{s.label}</span>
+                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="py-1 px-4">
+                    <div className="text-lg font-bold">{s.count}</div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
                 </div>
 
@@ -1676,65 +1517,32 @@ export default function UserDashboard() {
                 <div>
             <h3 className="text-lg font-semibold mb-2">Program Activity</h3>
             <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-5 mb-3">
-              <Card>
-                <CardHeader className="pb-0 pt-3">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <Heart className="h-4 w-4 text-red-500" />
-                    Favorites
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="py-1 px-4">
-                  <div className="text-lg font-bold">{favoritePrograms.length}</div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-0 pt-3">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-blue-500" />
-                    Viewed
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="py-1 px-4">
-                  <div className="text-lg font-bold">{viewedPrograms.length}</div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-0 pt-3">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <Play className="h-4 w-4 text-purple-500" />
-                    In Progress
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="py-1 px-4">
-                  <div className="text-lg font-bold">{inProgressPrograms.length}</div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-0 pt-3">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    Completed
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="py-1 px-4">
-                  <div className="text-lg font-bold">{completedPrograms.length}</div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-0 pt-3">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <Star className="h-4 w-4 text-yellow-500" />
-                    Rated
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="py-1 px-4">
-                  <div className="text-lg font-bold">{ratedPrograms.length}</div>
-                </CardContent>
-              </Card>
+              {([
+                { bucket: "favorites" as const, label: "Favorites", icon: <Heart className="h-4 w-4 text-red-500" />, count: favoritePrograms.length },
+                { bucket: "viewed" as const, label: "Viewed", icon: <Clock className="h-4 w-4 text-blue-500" />, count: viewedPrograms.length },
+                { bucket: "inprogress" as const, label: "In Progress", icon: <Play className="h-4 w-4 text-purple-500" />, count: inProgressPrograms.length },
+                { bucket: "completed" as const, label: "Completed", icon: <CheckCircle className="h-4 w-4 text-green-500" />, count: completedPrograms.length },
+                { bucket: "rated" as const, label: "Rated", icon: <Star className="h-4 w-4 text-yellow-500" />, count: ratedPrograms.length },
+              ]).map(s => (
+                <Card
+                  key={s.bucket}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setActivitySheet({ kind: "program", bucket: s.bucket })}
+                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setActivitySheet({ kind: "program", bucket: s.bucket }); } }}
+                  className="cursor-pointer transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                >
+                  <CardHeader className="pb-0 pt-3">
+                    <CardTitle className="text-sm font-medium flex items-center justify-between gap-2">
+                      <span className="flex items-center gap-2">{s.icon}{s.label}</span>
+                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="py-1 px-4">
+                    <div className="text-lg font-bold">{s.count}</div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
                 </div>
 
@@ -2037,6 +1845,59 @@ export default function UserDashboard() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Activity drill-in sheet (Favorites/Completed/Viewed/Rated/In Progress) */}
+      {(() => {
+        const s = activitySheet;
+        const isWorkout = s?.kind === "workout";
+        const sourceWorkouts: Record<string, WorkoutInteraction[]> = {
+          favorites: favoriteWorkouts,
+          completed: completedWorkouts,
+          viewed: viewedWorkouts,
+          rated: ratedWorkouts,
+          inprogress: [],
+        };
+        const sourcePrograms: Record<string, ProgramInteraction[]> = {
+          favorites: favoritePrograms,
+          completed: completedPrograms,
+          viewed: viewedPrograms,
+          rated: ratedPrograms,
+          inprogress: inProgressPrograms,
+        };
+        const titleMap: Record<string, string> = {
+          favorites: isWorkout ? "Favorite Workouts" : "Favorite Programs",
+          completed: isWorkout ? "Completed Workouts" : "Completed Programs",
+          viewed: isWorkout ? "Viewed Workouts" : "Viewed Programs",
+          rated: isWorkout ? "Rated Workouts" : "Rated Programs",
+          inprogress: "In-Progress Programs",
+        };
+        const iconMap: Record<string, ReactNode> = {
+          favorites: <Heart className="h-4 w-4 text-red-500" />,
+          completed: <CheckCircle className="h-4 w-4 text-green-500" />,
+          viewed: <Clock className="h-4 w-4 text-blue-500" />,
+          rated: <Star className="h-4 w-4 text-yellow-500" />,
+          inprogress: <Play className="h-4 w-4 text-purple-500" />,
+        };
+        const items: ActivityItem[] = s
+          ? isWorkout
+            ? sourceWorkouts[s.bucket].map(toWorkoutItem)
+            : sourcePrograms[s.bucket].map(toProgramItem)
+          : [];
+        return (
+          <ActivityListSheet
+            open={!!s}
+            onOpenChange={(o) => { if (!o) setActivitySheet(null); }}
+            title={s ? titleMap[s.bucket] : ""}
+            icon={s ? iconMap[s.bucket] : null}
+            items={items}
+            emptyText={isWorkout ? "No workouts in this list yet" : "No programs in this list yet"}
+            onItemClick={(item) => {
+              if (isWorkout) handleNavigateToWorkout(item.type, (sourceWorkouts[s!.bucket].find(w => w.id === item.id))?.workout_id || item.id);
+              else handleNavigateToProgram(item.type, (sourcePrograms[s!.bucket].find(p => p.id === item.id))?.program_id || item.id);
+            }}
+          />
+        );
+      })()}
     </div>
   </>;
 }
