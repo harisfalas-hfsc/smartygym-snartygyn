@@ -50,6 +50,8 @@ import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 
 import { AccountSettingsSection } from "@/components/dashboard/AccountSettingsSection";
 import { ParQAssessmentSection } from "@/components/dashboard/ParQAssessmentSection";
+import { ActivityListSheet, type ActivityItem } from "@/components/dashboard/ActivityListSheet";
+import { ChevronRight } from "lucide-react";
 interface WorkoutInteraction {
   id: string;
   workout_id: string;
