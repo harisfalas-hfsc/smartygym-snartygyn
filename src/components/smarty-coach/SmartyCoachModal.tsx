@@ -270,11 +270,17 @@ export const SmartyCoachModal = ({ isOpen, onClose, initialPath = 'menu' }: Smar
       <DialogContent
         className={cn(
           "p-0 border-0 overflow-hidden",
-          "w-[calc(100vw-1rem)] sm:w-[95vw] max-w-lg md:max-w-2xl mx-auto",
-          "max-h-[92vh] sm:max-h-[90vh] overflow-y-auto",
+          "w-[calc(100vw-2rem)] sm:w-[95vw] max-w-lg md:max-w-2xl mx-auto",
+          "max-h-[calc(100dvh-2rem)] sm:max-h-[90vh] overflow-y-auto overscroll-contain",
           "rounded-2xl bg-card border-2 border-primary/30 shadow-2xl shadow-primary/20",
           activePath === 'menu' ? "[&>button]:hidden" : ""
         )}
+        style={{
+          marginLeft: "max(1rem, env(safe-area-inset-left))",
+          marginRight: "max(1rem, env(safe-area-inset-right))",
+          marginTop: "max(1rem, env(safe-area-inset-top))",
+          marginBottom: "max(1rem, env(safe-area-inset-bottom))",
+        }}
       >
         {activePath === 'menu' ? (
           <>
