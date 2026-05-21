@@ -23,6 +23,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { getWorkoutUrl } from "@/utils/smarty-coach/routes";
 import { DialogDescription } from "@/components/ui/dialog";
+import smartyCoachIcon from "@/assets/smarty-coach-icon.png";
 import { fetchVisibleWorkoutMetadata } from "@/hooks/useTodayWods";
 
 type MenuAccent = 'primary' | 'amber' | 'emerald' | 'violet' | 'rose' | 'sky';
