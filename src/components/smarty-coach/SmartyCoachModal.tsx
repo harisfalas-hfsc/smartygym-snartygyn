@@ -270,12 +270,9 @@ export const SmartyCoachModal = ({ isOpen, onClose, initialPath = 'menu' }: Smar
       <DialogContent
         className={cn(
           "p-0 border-0 overflow-hidden",
-          // Leave breathing room from the viewport edges so the modal doesn't
-          // touch the screen on Edge / Samsung Internet / Safari where the
-          // browser chrome and safe-area insets eat into the viewport.
-          "w-[min(calc(100vw-2rem),32rem)] sm:w-[95vw] max-w-lg md:max-w-2xl mx-auto",
-          // Use dynamic viewport height so mobile browser toolbars don't clip it.
-          "max-h-[calc(100dvh-2rem)] sm:max-h-[90vh] overflow-y-auto overscroll-contain",
+          // Use small/dynamic viewport units for consistent mobile-browser chrome behavior.
+          "w-[calc(100svw-2rem)] max-w-[32rem] sm:w-[95vw] md:max-w-2xl mx-auto",
+          "max-h-[calc(100svh-2rem)] supports-[height:100dvh]:max-h-[calc(100dvh-2rem)] sm:max-h-[90vh] overflow-y-auto overscroll-contain",
           "rounded-2xl bg-card border-2 border-primary/30 shadow-2xl shadow-primary/20",
           activePath === 'menu' ? "[&>button]:hidden" : ""
         )}
@@ -283,29 +280,30 @@ export const SmartyCoachModal = ({ isOpen, onClose, initialPath = 'menu' }: Smar
         {activePath === 'menu' ? (
           <>
             {/* Rich header band */}
-            <div className="relative px-5 sm:px-7 pt-7 pb-5 bg-gradient-to-br from-primary/15 via-primary/5 to-transparent">
+            <div className="relative px-4 sm:px-7 pt-5 sm:pt-7 pb-5 bg-gradient-to-br from-primary/15 via-primary/5 to-transparent">
               <button
                 onClick={handleDismiss}
                 aria-label="Close"
-                className="absolute top-3 right-3 p-1.5 rounded-full bg-background/80 hover:bg-background text-foreground transition-colors"
+                className="absolute top-3 right-3 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-border bg-background/90 text-foreground shadow-sm transition-colors hover:bg-background focus:outline-none focus:ring-2 focus:ring-primary"
               >
-                <X className="w-5 h-5" />
+                <X className="h-5 w-5" />
               </button>
-              <div className="flex items-center gap-3 sm:gap-4">
+              <div className="grid grid-cols-[3rem_minmax(0,1fr)_3rem] items-center gap-3 sm:grid-cols-[4rem_minmax(0,1fr)_3.5rem] sm:gap-4">
                 <div className="relative">
                   <div className="absolute inset-0 rounded-2xl bg-primary/30 blur-xl animate-pulse" />
-                  <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center shadow-lg shadow-primary/40 animate-in zoom-in-50 duration-500">
-                    <Brain className="h-7 w-7 sm:h-8 sm:w-8" />
+                  <div className="relative h-12 w-12 sm:w-16 sm:h-16 shrink-0 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center shadow-lg shadow-primary/40 animate-in zoom-in-50 duration-500">
+                    <Brain className="h-6 w-6 sm:h-8 sm:w-8" />
                   </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-foreground leading-tight">
+                <div className="min-w-0">
+                  <h2 className="text-lg sm:text-2xl md:text-3xl font-extrabold text-foreground leading-tight break-words">
                     Hi <span className="inline-block">👋</span> I'm your Smarty Coach
                   </h2>
                   <p className="text-sm sm:text-base text-muted-foreground mt-1">
                     How can I help you today?
                   </p>
                 </div>
+                <div aria-hidden="true" />
               </div>
             </div>
 
