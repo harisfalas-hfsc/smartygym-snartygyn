@@ -288,14 +288,14 @@ export const SmartyCoachModal = ({ isOpen, onClose, initialPath = 'menu' }: Smar
               >
                 <X className="h-5 w-5" />
               </button>
-              <div className="flex items-center gap-3 sm:gap-4 pr-12 sm:pr-14">
+              <div className="grid grid-cols-[3rem_minmax(0,1fr)_3rem] items-center gap-3 sm:grid-cols-[4rem_minmax(0,1fr)_3.5rem] sm:gap-4">
                 <div className="relative">
                   <div className="absolute inset-0 rounded-2xl bg-primary/30 blur-xl animate-pulse" />
                   <div className="relative h-12 w-12 sm:w-16 sm:h-16 shrink-0 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center shadow-lg shadow-primary/40 animate-in zoom-in-50 duration-500">
                     <Brain className="h-6 w-6 sm:h-8 sm:w-8" />
                   </div>
                 </div>
-                <div className="flex-1 min-w-0">
+                <div className="min-w-0">
                   <h2 className="text-lg sm:text-2xl md:text-3xl font-extrabold text-foreground leading-tight break-words">
                     Hi <span className="inline-block">👋</span> I'm your Smarty Coach
                   </h2>
@@ -303,6 +303,7 @@ export const SmartyCoachModal = ({ isOpen, onClose, initialPath = 'menu' }: Smar
                     How can I help you today?
                   </p>
                 </div>
+                <div aria-hidden="true" />
               </div>
             </div>
 
