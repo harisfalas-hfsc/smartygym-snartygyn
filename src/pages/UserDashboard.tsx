@@ -2063,6 +2063,59 @@ export default function UserDashboard() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Activity drill-in sheet (Favorites/Completed/Viewed/Rated/In Progress) */}
+      {(() => {
+        const s = activitySheet;
+        const isWorkout = s?.kind === "workout";
+        const sourceWorkouts: Record<string, WorkoutInteraction[]> = {
+          favorites: favoriteWorkouts,
+          completed: completedWorkouts,
+          viewed: viewedWorkouts,
+          rated: ratedWorkouts,
+          inprogress: [],
+        };
+        const sourcePrograms: Record<string, ProgramInteraction[]> = {
+          favorites: favoritePrograms,
+          completed: completedPrograms,
+          viewed: viewedPrograms,
+          rated: ratedPrograms,
+          inprogress: inProgressPrograms,
+        };
+        const titleMap: Record<string, string> = {
+          favorites: isWorkout ? "Favorite Workouts" : "Favorite Programs",
+          completed: isWorkout ? "Completed Workouts" : "Completed Programs",
+          viewed: isWorkout ? "Viewed Workouts" : "Viewed Programs",
+          rated: isWorkout ? "Rated Workouts" : "Rated Programs",
+          inprogress: "In-Progress Programs",
+        };
+        const iconMap: Record<string, JSX.Element> = {
+          favorites: <Heart className="h-4 w-4 text-red-500" />,
+          completed: <CheckCircle className="h-4 w-4 text-green-500" />,
+          viewed: <Clock className="h-4 w-4 text-blue-500" />,
+          rated: <Star className="h-4 w-4 text-yellow-500" />,
+          inprogress: <Play className="h-4 w-4 text-purple-500" />,
+        };
+        const items: ActivityItem[] = s
+          ? isWorkout
+            ? sourceWorkouts[s.bucket].map(toWorkoutItem)
+            : sourcePrograms[s.bucket].map(toProgramItem)
+          : [];
+        return (
+          <ActivityListSheet
+            open={!!s}
+            onOpenChange={(o) => { if (!o) setActivitySheet(null); }}
+            title={s ? titleMap[s.bucket] : ""}
+            icon={s ? iconMap[s.bucket] : null}
+            items={items}
+            emptyText={isWorkout ? "No workouts in this list yet" : "No programs in this list yet"}
+            onItemClick={(item) => {
+              if (isWorkout) handleNavigateToWorkout(item.type, (sourceWorkouts[s!.bucket].find(w => w.id === item.id))?.workout_id || item.id);
+              else handleNavigateToProgram(item.type, (sourcePrograms[s!.bucket].find(p => p.id === item.id))?.program_id || item.id);
+            }}
+          />
+        );
+      })()}
     </div>
   </>;
 }
