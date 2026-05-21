@@ -270,17 +270,15 @@ export const SmartyCoachModal = ({ isOpen, onClose, initialPath = 'menu' }: Smar
       <DialogContent
         className={cn(
           "p-0 border-0 overflow-hidden",
-          "w-[calc(100vw-2rem)] sm:w-[95vw] max-w-lg md:max-w-2xl mx-auto",
+          // Leave breathing room from the viewport edges so the modal doesn't
+          // touch the screen on Edge / Samsung Internet / Safari where the
+          // browser chrome and safe-area insets eat into the viewport.
+          "w-[min(calc(100vw-2rem),32rem)] sm:w-[95vw] max-w-lg md:max-w-2xl mx-auto",
+          // Use dynamic viewport height so mobile browser toolbars don't clip it.
           "max-h-[calc(100dvh-2rem)] sm:max-h-[90vh] overflow-y-auto overscroll-contain",
           "rounded-2xl bg-card border-2 border-primary/30 shadow-2xl shadow-primary/20",
           activePath === 'menu' ? "[&>button]:hidden" : ""
         )}
-        style={{
-          marginLeft: "max(1rem, env(safe-area-inset-left))",
-          marginRight: "max(1rem, env(safe-area-inset-right))",
-          marginTop: "max(1rem, env(safe-area-inset-top))",
-          marginBottom: "max(1rem, env(safe-area-inset-bottom))",
-        }}
       >
         {activePath === 'menu' ? (
           <>
