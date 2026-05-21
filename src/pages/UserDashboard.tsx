@@ -600,6 +600,24 @@ export default function UserDashboard() {
   const handleNavigateToProgram = (programType: string, programId: string) => {
     navigate(`/trainingprogram/${programType}/${programId}`);
   };
+
+  // Map a WorkoutInteraction / ProgramInteraction to a generic ActivityItem for the sheet
+  const toWorkoutItem = (w: WorkoutInteraction): ActivityItem => ({
+    id: w.id,
+    name: w.workout_name,
+    type: w.workout_type,
+    rating: w.rating,
+    is_completed: w.is_completed,
+    is_favorite: w.is_favorite,
+  });
+  const toProgramItem = (p: ProgramInteraction): ActivityItem => ({
+    id: p.id,
+    name: p.program_name,
+    type: p.program_type,
+    rating: p.rating,
+    is_completed: p.is_completed,
+    is_favorite: p.is_favorite,
+  });
   const handleManageSubscription = async () => {
     if (!user) {
       if (import.meta.env.DEV) {
