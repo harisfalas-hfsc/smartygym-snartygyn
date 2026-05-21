@@ -22,16 +22,26 @@ serve(async (req) => {
       });
     }
 
-    const supabaseClient = createClient(
+    // Auth client (anon) is used ONLY to resolve the caller from their JWT.
+    const supabaseAuth = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_ANON_KEY") ?? ""
+    );
+    // Data client (service-role) bypasses RLS so we can read premium/paid
+    // admin_workouts and admin_training_programs rows during validation.
+    // All business-rule checks (visibility, standalone, price, premium-block,
+    // duplicate purchase, Stripe-link integrity) are enforced below.
+    const supabaseClient = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
     const authHeader = req.headers.get("Authorization")!;
     const token = authHeader.replace("Bearer ", "");
-    const { data } = await supabaseClient.auth.getUser(token);
+    const { data } = await supabaseAuth.auth.getUser(token);
     const user = data.user;
     if (!user?.email) throw new Error("User not authenticated");
+    console.log("[INDIV-CHECKOUT] Request", { userId: user.id, contentType, contentId });
 
     // 🚨 CRITICAL: Check if user is premium (cannot purchase standalone)
     const { data: subscription } = await supabaseClient
@@ -96,11 +106,19 @@ serve(async (req) => {
     const contentRecord = contentRecordRaw as any;
 
     if (contentError || !contentRecord) {
+      console.log("[INDIV-CHECKOUT] Content not found", { contentType, contentId, contentError });
       return new Response(JSON.stringify({ error: "Content not found" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 404,
       });
     }
+    console.log("[INDIV-CHECKOUT] Content loaded", {
+      id: contentRecord.id,
+      is_visible: contentRecord.is_visible,
+      is_standalone_purchase: contentRecord.is_standalone_purchase,
+      price: contentRecord.price,
+      has_stripe_price: !!contentRecord.stripe_price_id,
+    });
 
     if (contentRecord.is_visible === false || !contentRecord.is_standalone_purchase || !contentRecord.price) {
       return new Response(JSON.stringify({ error: "This content is not available for individual purchase." }), {
