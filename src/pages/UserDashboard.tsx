@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { supabase } from "@/integrations/supabase/client";
@@ -1871,7 +1871,7 @@ export default function UserDashboard() {
           rated: isWorkout ? "Rated Workouts" : "Rated Programs",
           inprogress: "In-Progress Programs",
         };
-        const iconMap: Record<string, React.ReactNode> = {
+        const iconMap: Record<string, ReactNode> = {
           favorites: <Heart className="h-4 w-4 text-red-500" />,
           completed: <CheckCircle className="h-4 w-4 text-green-500" />,
           viewed: <Clock className="h-4 w-4 text-blue-500" />,
