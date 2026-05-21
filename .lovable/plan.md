@@ -1,69 +1,86 @@
-## Why everything is broken right now
+# Plan — Clickable Activity Lists with Full Scrollable Views
 
-There are **two independent bugs**, both introduced by recent edge-function changes. Each one breaks one purchase path. Together they break every paid flow on the site.
+## Problem
 
-### Bug 1 — Individual purchases (any workout, WOD, training program)
-**Function:** `supabase/functions/create-individual-purchase-checkout/index.ts`
+In `src/pages/UserDashboard.tsx`:
+- **My Workouts / My Programs tabs**: Only Favorites and Completed are rendered as lists (and only the first ~4 visible without obvious scroll). Viewed and Rated have count cards but no list at all.
+- **My Logbook tab**: Workout Activity and Program Activity show only counts. There is no way to drill in. Check-ins / Calculators / Measurements already have "View All" — Workouts/Programs do not.
+- **My Purchases tab**: same drill-in is missing for the equivalent stat cards.
 
-Verified from edge-function HTTP logs: every `POST` is returning **HTTP 404 "Content not found"**, which the UI surfaces as *"Failed to initiate purchase. Please try again."*
+The user wants a single universal pattern: every stat card (Favorites / Completed / Viewed / Rated / In Progress / Purchased) becomes **clickable** and opens a **mobile-optimized scrollable popup** listing every item in that bucket. Remove the big duplicated "Favorite Workouts" / "Completed Workouts" list cards in favor of this.
 
-Root cause: the function builds its Supabase client with the **anon key** and never attaches the caller's JWT. It then reads `admin_workouts` / `admin_training_programs` to validate the item. RLS on those tables only lets the anon role see **free** rows:
+## Solution
 
+Build one reusable component and wire every stat card to it.
+
+### 1. New component: `src/components/dashboard/ActivityListSheet.tsx`
+
+A controlled Radix `Sheet` (shadcn) that:
+- On desktop: opens as a right-side sheet, max width ~480px, full height.
+- On mobile: opens as a bottom sheet, max height `85vh`, rounded top, with a drag handle. Internal body is a flex column with header + scrollable list (`overflow-y-auto`) so the X stays pinned and content never overlaps it. Safe-area padding bottom (`pb-[env(safe-area-inset-bottom)]`).
+- Header: icon + title + count + close button (already provided by Sheet).
+- Body: list of cards (workout or program) reusing the existing row markup from the current Favorites/Completed lists. Each row is clickable → navigates via existing `handleNavigateToWorkout` / `handleNavigateToProgram` and closes the sheet.
+- Empty state: same "No X yet" muted copy currently used.
+- Optional search/filter input at top when list length > 10 (nice-to-have, kept simple).
+
+Props:
+```ts
+{ open, onOpenChange, title, icon, items, kind: 'workout' | 'program', onItemClick }
 ```
-Public can view visible free workouts: is_visible=true AND is_premium=false
-```
 
-Every paid/standalone row is `is_premium = true`, so the lookup returns `null`, the function returns 404, and the toast fires. This affects 100% of free users buying any premium content (WOD, premium workout, premium program).
+### 2. Wire stat cards as triggers (universal)
 
-### Bug 2 — Subscription plans (Gold / Platinum)
-**Function:** `supabase/functions/create-checkout/index.ts`
+Convert every stat `Card` in these sections into `<button>` / `Card role="button"` that opens the sheet for that bucket. Add a tiny "View all" chevron in the corner so the affordance is obvious. Keyboard accessible (`Enter`/`Space`).
 
-Verified from edge-function logs (16:12:21 UTC today):
-```
-StripeInvalidRequestError: Received unknown parameter:
-  subscription_data[payment_settings]
-```
+Sections to update in `src/pages/UserDashboard.tsx`:
 
-Root cause: the checkout session is sending `subscription_data.payment_settings.save_default_payment_method = 'on_subscription'`. That field is **not valid on Checkout Session** (it belongs on the Subscription object). Stripe rejects the whole request with a 400, the function returns 500, and the UI shows *"Failed to initiate purchase"*. This blocks 100% of new Gold and Platinum signups.
+- **My Workouts tab** (~lines 1241–1351):
+  - Favorites, Completed, Viewed, Rated → all clickable.
+  - **Delete** the duplicated "Favorite Workouts" + "Completed Workouts" big list cards (lines 1292–1351). The sheet replaces them.
+- **My Programs tab** (~lines 1379–1488):
+  - Favorites, Completed, Viewed, Rated (and any In Progress count) → clickable.
+  - **Delete** the duplicated big list cards (lines 1430–1486).
+- **My Logbook tab** — Workout Activity (~1624–1672) and Program Activity (~1678–1738): every count card becomes clickable into the same sheet. (Already-existing Check-ins/Calculators/Measurements row stays as-is.)
+- **My Purchases tab**: same treatment for the equivalent stat cards there.
 
-The session already sets `payment_method_collection: 'always'`, which is the supported way to force payment-method collection at checkout, so the broken block can simply be removed.
+State: one `useState` per tab with `{ kind, bucket } | null`, or a single shared `activeSheet` state at page level. Selecting an item also handles `free-workout`/`free-program` types because navigation already does.
 
-## Why it "used to work"
+### 3. Data sources (already in component)
 
-Both regressions are recent edge-function edits:
-- `create-individual-purchase-checkout` was changed to do server-side content validation but the client was downgraded from service-role to anon, so RLS now hides the very rows it needs to read.
-- `create-checkout` had the `subscription_data.payment_settings` block added as part of the "auto-finalize renewal" hardening — that field name was wrong and Stripe started rejecting it.
+Reuse existing arrays already computed in `UserDashboard`:
+- `favoriteWorkouts`, `completedWorkouts`, `viewedWorkouts`, `ratedWorkouts`
+- `favoritePrograms`, `completedPrograms`, `viewedPrograms`, `ratedPrograms`, `inProgressPrograms`
+- For Purchases: existing purchased list (`purchasedWorkoutIds` / matching enriched arrays already used in that section).
 
-Neither bug is a Stripe-account or app-store issue. They are pure code regressions inside two edge functions.
+No new queries, no schema changes, no backend changes.
 
-## Fix
+### 4. Access-level behavior (per existing rules in `docs/access_rules.md` and `AccessControlContext`)
 
-### File 1 — `supabase/functions/create-individual-purchase-checkout/index.ts`
-- Build the Supabase client with `SUPABASE_SERVICE_ROLE_KEY` (same pattern already used by `verify-purchase`, `check-subscription`, etc.). The function already enforces every business rule server-side (`is_visible`, `is_standalone_purchase`, `price > 0`, premium-block, duplicate-purchase, Stripe-link integrity), so service-role read access on those two admin tables is safe.
-- Keep authenticating the caller via `auth.getUser(token)` so we still know which user is purchasing.
-- Add `console.log` lines for `contentType`, `contentId`, lookup result, and any early return reason so future regressions show up in logs immediately.
+- Free users with purchases: same buckets shown but lists are already filtered by `purchasedWorkoutIds` / `purchasedProgramIds` upstream. The sheet just shows whatever is in those arrays — so Favorites/Completed/Viewed/Rated for a free user will only contain their purchased items. No new gating logic needed.
+- Premium-only tabs (Programs, Logbook) keep their existing premium gate Card above; sheet never opens for non-eligible users because the trigger cards live inside the gated branch.
+- Rating / favoriting permissions are unchanged — this PR is read-only display.
 
-### File 2 — `supabase/functions/create-checkout/index.ts`
-- Remove the entire invalid block:
-  ```
-  subscription_data: {
-    metadata: {...},
-    payment_settings: { save_default_payment_method: 'on_subscription' }
-  }
-  ```
-  Keep only the `subscription_data.metadata` portion (move metadata back as a plain `subscription_data: { metadata: {...} }`). `payment_method_collection: 'always'` is already set at the top level and is the correct mechanism.
-- Add a short comment explaining why `payment_settings` is not allowed on Checkout Session so the hardening intent isn't lost.
+### 5. Mobile optimization (universal)
 
-No frontend changes. No database/RLS changes. No Stripe products, prices, or webhooks touched.
+- Sheet `side="bottom"` when `useIsMobile()` is true, `side="right"` otherwise.
+- Max 92vh on mobile so the user always sees the browser chrome / back gesture area; internal body scrolls.
+- Tap targets ≥ 44px. Close (X) has `min-h-11 min-w-11` and sits in a sticky header so list content cannot overlap it (the Edge/Samsung overlap issue from the prior thread does not repeat).
+- No horizontal scroll; long names truncate with `line-clamp-2`.
+- Test viewports during verification: 360, 390, 414, 768, 1024, 1280.
 
-## How we make sure it stays stable (pre-app-store)
+## Technical notes
 
-1. Deploy the two edge-function fixes.
-2. Verify as the same free account `hfsc.nicosia@gmail.com`:
-   - Click Purchase on today's WOD (`WOD-REC-V-1779261604369`) → must receive a Stripe Checkout URL (200), not a 404.
-   - Click Purchase on a premium training program → same result.
-   - Click subscribe to Gold → must receive a Stripe Checkout URL (200), not the `payment_settings` error.
-3. Re-check edge-function logs after each attempt to confirm a 200 response and no exceptions.
-4. Add the new diagnostic logs so any future regression in either function surfaces in the first failed call instead of presenting as a generic toast.
+- Use existing shadcn `Sheet`, `ScrollArea`, `Badge`, `Button`. No new deps.
+- Keep all changes inside `src/pages/UserDashboard.tsx` plus one new file `src/components/dashboard/ActivityListSheet.tsx`. No DB, no edge functions, no RLS, no Stripe.
+- Preserve the existing "Upgrade to Premium" banner for free users above the stat grid.
+- Keep semantic tokens (no raw colors). Reuse the existing icon + color combos (`Heart text-red-500`, `CheckCircle text-green-500`, `Clock text-blue-500`, `Star text-yellow-500`, `Play text-purple-500`).
 
-That is the complete fix — two small, surgical edge-function edits, no risk to anything outside the checkout paths.
+## Verification (will be done before reporting done)
+
+After implementing, I will:
+1. Run the build to confirm no TS / lint errors.
+2. Open the preview at `/dashboard` (or wherever UserDashboard mounts) and click every stat card in: My Workouts, My Programs, My Logbook, My Purchases — confirming each opens a sheet with a fully scrollable list and a reachable close button.
+3. Switch the preview to mobile viewport (390×844) and repeat — confirming the bottom sheet scrolls, the X is not overlapped, and no horizontal overflow.
+4. Confirm clicking a row navigates to the workout/program and closes the sheet.
+5. Confirm the duplicated big "Favorite Workouts"/"Completed Workouts" list cards are gone and layout doesn't break on desktop.
+6. Only after all six checks pass will I report done.
