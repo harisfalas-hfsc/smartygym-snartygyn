@@ -898,7 +898,16 @@ const Index = () => {
         <LazySection minHeight="400px" rootMargin="300px">
         <div className="container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6">
           {/* Mission Statement with Cards */}
-          <section className="mb-16 mt-8">
+          <section className="mb-20 mt-12">
+            <div className="relative mb-10 md:mb-14">
+              <span aria-hidden="true" className="ghost-headline absolute -top-6 md:-top-10 left-0 right-0 text-center text-[80px] md:text-[160px] hidden sm:block">
+                THE PROMISE
+              </span>
+              <div className="relative pt-6 md:pt-12 text-center">
+                <p className="text-xs md:text-sm font-bold tracking-[0.3em] text-primary uppercase mb-3">Why SmartyGym</p>
+                <h2 className="text-3xl md:text-5xl font-black tracking-tight uppercase">Built for Real Life</h2>
+              </div>
+            </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
             <Card className="border-2 border-border text-center hover:shadow-lg transition-all hover:-translate-y-1">
