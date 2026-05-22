@@ -741,7 +741,30 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
 
           {/* 9. Workout Content - Single Box with Exercise Search in toolbar */}
           <div className="space-y-2 pt-4 border-t">
-            <Label htmlFor="main_workout">9. Workout Content *</Label>
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+              <Label htmlFor="main_workout">9. Workout Content *</Label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const current = (formData.main_workout || '').replace(/<[^>]*>/g, '').trim();
+                  if (current.length > 0) {
+                    const ok = window.confirm(
+                      "Replace current content with the standard 5-section structure? This cannot be undone."
+                    );
+                    if (!ok) return;
+                  }
+                  setFormData(prev => ({ ...prev, main_workout: STANDARD_SECTIONS_TEMPLATE }));
+                  toast({
+                    title: "Structure inserted",
+                    description: "Fill in exercises in each section, then save.",
+                  });
+                }}
+              >
+                Insert standard structure
+              </Button>
+            </div>
             <A4Container>
               <RichTextEditor
                 value={formData.main_workout}
