@@ -1,58 +1,53 @@
-# Admin Workout Creation — Reliability & UX Fixes
+# Plan: Generate 6 Premium Intermediate Workouts
 
-Four fixes to make manual workout creation in the admin panel trustworthy, format-consistent, and faster.
+Create 6 premium workouts using the existing `generate-category-difficulty-batch` edge function — the same orchestrator used to produce the current `PREM-*` library entries (Kinetic Cascade Apex, Metabolic Mesh, Cadence Pulse Trail, etc.). Same style, structure, formatting, image, and Stripe wiring as those workouts.
 
-## 1. Repair serial numbers (one-time data migration)
+## Matrix (6 workouts)
 
-Problem: `admin_workouts.serial_number` is sparse on legacy rows. STRENGTH has 130 rows but `MAX(serial_number)=79`, and the counter in `system_settings.serial_number_counters.workouts.STRENGTH` says `80`. Creating a new workout today would generate `STR-080`, which likely collides with an existing ID.
+| Category | Equipment | Difficulty | Format | Duration |
+|---|---|---|---|---|
+| CALORIE BURNING | BODYWEIGHT | Intermediate (3★) | AMRAP   | 30 min |
+| CALORIE BURNING | EQUIPMENT  | Intermediate (4★) | AMRAP   | 30 min |
+| METABOLIC       | BODYWEIGHT | Intermediate (3★) | CIRCUIT | 30 min |
+| METABOLIC       | EQUIPMENT  | Intermediate (4★) | CIRCUIT | 30 min |
+| CARDIO          | BODYWEIGHT | Intermediate (3★) | EMOM    | 30 min |
+| CARDIO          | EQUIPMENT  | Intermediate (4★) | EMOM    | 30 min |
 
-Steps:
-- Backfill `serial_number` on every legacy `admin_workouts` row where it is NULL, per category, using a deterministic order (`created_at ASC, id ASC`) so existing IDs keep their numeric ordering. Skip WOD-flagged rows so they don't poison library counters.
-- Rewrite `system_settings.serial_number_counters.workouts` so each category equals `MAX(serial_number) + 1` across the now-backfilled `admin_workouts` table.
-- Same treatment for `admin_training_programs` / `serial_number_counters.programs` (same drift is likely there).
-- Run as a one-time SQL migration with a per-category before/after log.
+All: `is_premium=true`, `is_standalone_purchase=true`, `tier_required="gold"`, `price=3.99`, `is_visible=true`, `is_workout_of_day=false`.
 
-Note: existing `admin_workouts.id` values are NOT changed. Only NULL `serial_number` fields are filled and the counter is reset. Public URLs stay intact.
+## Execution
 
-## 2. Duplicate-ID guard in `handleSave`
+1. **Invoke** `generate-category-difficulty-batch` with:
+   ```json
+   { "difficulty": "Intermediate",
+     "categories": ["CALORIE BURNING","METABOLIC","CARDIO"],
+     "equipment":  ["BODYWEIGHT","EQUIPMENT"],
+     "price": 3.99, "tier_required": "gold" }
+   ```
+   For each job the orchestrator handles:
+   - Library-first exercise selection (intermediate-tagged) with `rejectNonLibraryExercises` guard
+   - 5-section structure (Soft Tissue Preparation 🧘 / Activation 🔥 / Main Workout 💪 / Finisher ⚡ / Cool Down 🧊) with bullet lists, bold+underlined section titles, `{{exercise:ID:Name}}` markup
+   - Banned-name check against every existing workout (no duplicates or near-variants)
+   - AI image generation via `generate-workout-image` saved to `image_url`
+   - Stripe product + price creation with `project:"SMARTYGYM"`, `content_type:"Workout"` metadata, persisted to `stripe_product_id` / `stripe_price_id`
+   - Description, instructions, tips populated per the master formatting standard
+   - Auto serial number via the (now-resynced) category counter
 
-In `src/components/admin/WorkoutEditDialog.tsx`, before insert (create mode only):
-- Check `select id from admin_workouts where id = $newId`.
-- If it exists, auto-increment the serial (and matching ID) up to 50 attempts, showing a toast: "ID was taken — bumped to {newId}".
-- If still colliding, show a hard error toast and abort.
-- Wrap the insert in a try/catch on Postgres `code === '23505'` (unique violation) as a final safety net.
+   The function runs jobs sequentially with 1.5s spacing. 6 jobs is ~1–3 min; if there's any risk of hitting the 150s Edge timeout, split into 2 calls of 3 jobs each (one category per request).
 
-## 3. "Insert standard 5-section structure" button
+2. **Post-run DB audit** on the 6 new rows: verify `image_url`, `stripe_product_id`, `stripe_price_id`, `price=3.99`, `is_premium`, `is_standalone_purchase`, `tier_required="gold"`, `difficulty="Intermediate"`, `difficulty_stars` (3 BW / 4 EQ), `format`, `duration="30 min"`, `is_visible=true`, and exercise-token counts in content.
 
-Next to the "9. Workout Content *" label in `WorkoutEditDialog.tsx`:
-- Add a small secondary button: "Insert standard structure".
-- Disabled when the editor already has content (or shows a confirm before overwriting).
-- Inserts the canonical scaffold into the `RichTextEditor`:
-  - 🧘 Soft Tissue Preparation
-  - 🔥 Activation
-  - 💪 Main Workout
-  - ⚡ Finisher
-  - 🧊 Cool Down
-- Each section is an `<h3>` plus an empty bullet list, wrapped in the `workout-content` container so the normalizer and density validator treat it identically to AI/library output.
+3. **Stripe sync audit** — invoke `verify-workout-stripe-sync` (audit mode, no `?fix=1`) to confirm products/prices are EUR, one-time, active, correct metadata, and amounts match the DB. If any row reports issues, re-run with `?fix=1` and re-audit.
 
-## 4. "Duplicate from library" action in `WorkoutsManager`
+4. **Content quality sanity check** on each workout body:
+   - 5 section headings present in order
+   - Main Workout uses the declared format (AMRAP / CIRCUIT / EMOM) with measurable prescriptions before every exercise token
+   - Finisher present and short; Cool Down present
+   - No durations embedded inside protocol headers (per `protocol-block-formatting-standard`)
+   - Description ≥ 2 sentences; Instructions explains the protocol; Tips are coaching cues, not instructions
 
-In `src/components/admin/WorkoutsManager.tsx`, each row gets a new Duplicate action (icon + tooltip) alongside Edit/Delete:
-- Opens `WorkoutEditDialog` in create mode, prefilled with the source workout's content (main_workout, description, instructions, tips, equipment, format, duration, difficulty, category, focus).
-- Cleared/regenerated: `id`, `serial_number`, `name` (suggested as `"<source> (Copy)"`), `image_url`, `stripe_*`, `is_workout_of_day`, `generated_for_date`, `wod_source`.
-- Serial number is auto-generated via the existing category counter (correct after fix #1).
+## Notes
 
-## Technical notes
-
-- Files touched:
-  - `supabase/migrations/<timestamp>_repair_serial_counters.sql` (new)
-  - `src/components/admin/WorkoutEditDialog.tsx` (duplicate guard + template button + optional `prefillFrom` prop)
-  - `src/components/admin/WorkoutsManager.tsx` (Duplicate action wiring)
-- No schema changes — only data backfill + `system_settings` update.
-- Existing triggers (`validate_public_workout_integrity`, `enforce_workout_format_rules`, image auto-generation) keep working unchanged.
-
-## Out of scope
-
-- No changes to the WOD library-mode picker.
-- No changes to `{{exercise:ID:Name}}` markup or View-button rendering.
-- No changes to public workout pages.
+- No code or schema changes. Pure orchestration + verification.
+- Naming uniqueness enforced both by prompt banned list and DB index — collisions auto-retry inside the function.
+- HFSC is untouched.
