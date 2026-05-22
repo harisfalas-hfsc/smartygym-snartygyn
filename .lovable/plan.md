@@ -1,53 +1,38 @@
-# Plan: Generate 6 Premium Intermediate Workouts
+# Plan: Generate 4 Premium Workouts (2 Beginner + 2 Advanced)
 
-Create 6 premium workouts using the existing `generate-category-difficulty-batch` edge function — the same orchestrator used to produce the current `PREM-*` library entries (Kinetic Cascade Apex, Metabolic Mesh, Cadence Pulse Trail, etc.). Same style, structure, formatting, image, and Stripe wiring as those workouts.
+Same flow as the previous intermediate batch — invoke `generate-category-difficulty-batch` with the existing orchestration (library-first exercises, 5-section structure, AI image, Stripe product + EUR €3.99 one-time price with SMARTYGYM metadata, banned-name uniqueness, density validation).
 
-## Matrix (6 workouts)
+## Matrix (4 workouts)
 
-| Category | Equipment | Difficulty | Format | Duration |
-|---|---|---|---|---|
-| CALORIE BURNING | BODYWEIGHT | Intermediate (3★) | AMRAP   | 30 min |
-| CALORIE BURNING | EQUIPMENT  | Intermediate (4★) | AMRAP   | 30 min |
-| METABOLIC       | BODYWEIGHT | Intermediate (3★) | CIRCUIT | 30 min |
-| METABOLIC       | EQUIPMENT  | Intermediate (4★) | CIRCUIT | 30 min |
-| CARDIO          | BODYWEIGHT | Intermediate (3★) | EMOM    | 30 min |
-| CARDIO          | EQUIPMENT  | Intermediate (4★) | EMOM    | 30 min |
+Same three categories as before (Calorie Burning, Metabolic, Cardio) rotated across the 4 slots so each level has 1 BW + 1 EQ:
+
+| # | Category         | Equipment  | Difficulty        | Stars | Format  | Duration |
+|---|------------------|------------|-------------------|-------|---------|----------|
+| 1 | CALORIE BURNING  | BODYWEIGHT | Beginner          | 2★    | AMRAP   | 30 min   |
+| 2 | METABOLIC        | EQUIPMENT  | Beginner          | 2★    | CIRCUIT | 30 min   |
+| 3 | CARDIO           | BODYWEIGHT | Advanced          | 5★    | EMOM    | 30 min   |
+| 4 | CALORIE BURNING  | EQUIPMENT  | Advanced          | 6★    | AMRAP   | 30 min   |
 
 All: `is_premium=true`, `is_standalone_purchase=true`, `tier_required="gold"`, `price=3.99`, `is_visible=true`, `is_workout_of_day=false`.
 
+Difficulty-aware exercise selection (per the standing rule): beginner = simpler bodyweight/light-load picks, longer rest cues, fewer complex compounds; advanced = heavier compounds, advanced progressions, higher density.
+
 ## Execution
 
-1. **Invoke** `generate-category-difficulty-batch` with:
-   ```json
-   { "difficulty": "Intermediate",
-     "categories": ["CALORIE BURNING","METABOLIC","CARDIO"],
-     "equipment":  ["BODYWEIGHT","EQUIPMENT"],
-     "price": 3.99, "tier_required": "gold" }
-   ```
-   For each job the orchestrator handles:
-   - Library-first exercise selection (intermediate-tagged) with `rejectNonLibraryExercises` guard
-   - 5-section structure (Soft Tissue Preparation 🧘 / Activation 🔥 / Main Workout 💪 / Finisher ⚡ / Cool Down 🧊) with bullet lists, bold+underlined section titles, `{{exercise:ID:Name}}` markup
-   - Banned-name check against every existing workout (no duplicates or near-variants)
-   - AI image generation via `generate-workout-image` saved to `image_url`
-   - Stripe product + price creation with `project:"SMARTYGYM"`, `content_type:"Workout"` metadata, persisted to `stripe_product_id` / `stripe_price_id`
-   - Description, instructions, tips populated per the master formatting standard
-   - Auto serial number via the (now-resynced) category counter
+1. Invoke `generate-category-difficulty-batch` in two calls (one per difficulty) to keep each run well under the 150s Edge ceiling:
+   - Call A — Beginner: `{ difficulty: "Beginner", jobs: [{cat:"CALORIE BURNING",eq:"BODYWEIGHT",stars:2,format:"AMRAP"},{cat:"METABOLIC",eq:"EQUIPMENT",stars:2,format:"CIRCUIT"}], price:3.99, tier_required:"gold" }`
+   - Call B — Advanced: `{ difficulty: "Advanced", jobs: [{cat:"CARDIO",eq:"BODYWEIGHT",stars:5,format:"EMOM"},{cat:"CALORIE BURNING",eq:"EQUIPMENT",stars:6,format:"AMRAP"}], price:3.99, tier_required:"gold" }`
 
-   The function runs jobs sequentially with 1.5s spacing. 6 jobs is ~1–3 min; if there's any risk of hitting the 150s Edge timeout, split into 2 calls of 3 jobs each (one category per request).
+2. Post-run DB audit on the 4 new rows: verify `image_url`, `stripe_product_id`, `stripe_price_id`, `price=3.99`, `is_premium`, `is_standalone_purchase`, `tier_required="gold"`, correct `difficulty` + `difficulty_stars`, format, duration, visibility, and exercise-token counts.
 
-2. **Post-run DB audit** on the 6 new rows: verify `image_url`, `stripe_product_id`, `stripe_price_id`, `price=3.99`, `is_premium`, `is_standalone_purchase`, `tier_required="gold"`, `difficulty="Intermediate"`, `difficulty_stars` (3 BW / 4 EQ), `format`, `duration="30 min"`, `is_visible=true`, and exercise-token counts in content.
+3. Stripe audit via `verify-workout-stripe-sync` (audit mode). If anything is off, re-run with `?fix=1`.
 
-3. **Stripe sync audit** — invoke `verify-workout-stripe-sync` (audit mode, no `?fix=1`) to confirm products/prices are EUR, one-time, active, correct metadata, and amounts match the DB. If any row reports issues, re-run with `?fix=1` and re-audit.
+4. Content sanity check: 5-section order; Main Workout uses the declared format with measurable prescriptions before every `{{exercise:ID:Name}}` token; Finisher + Cool Down present; no durations embedded in protocol headers; Description ≥ 2 sentences; Instructions explains the protocol; Tips are coaching cues.
 
-4. **Content quality sanity check** on each workout body:
-   - 5 section headings present in order
-   - Main Workout uses the declared format (AMRAP / CIRCUIT / EMOM) with measurable prescriptions before every exercise token
-   - Finisher present and short; Cool Down present
-   - No durations embedded inside protocol headers (per `protocol-block-formatting-standard`)
-   - Description ≥ 2 sentences; Instructions explains the protocol; Tips are coaching cues, not instructions
+5. If any generated name lands on a placeholder/collision suffix (as happened last time), rename cleanly in both DB and Stripe.
 
 ## Notes
 
 - No code or schema changes. Pure orchestration + verification.
-- Naming uniqueness enforced both by prompt banned list and DB index — collisions auto-retry inside the function.
-- HFSC is untouched.
+- HFSC untouched. Non-destructive policy applies.
+- If you want a different category split (e.g. cover all 3 categories at one level, or mirror the previous 6-slot matrix), say so before approving and I'll update the matrix.
