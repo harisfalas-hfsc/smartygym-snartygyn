@@ -1187,30 +1187,33 @@ const Index = () => {
 
 
         {/* CTA Section */}
-        <section className="mb-16">
-          <Card className="bg-gradient-to-r from-primary/10 to-accent/10 border-2 border-primary/20">
-            <CardContent className="p-6 text-center space-y-6">
+        <section className="mb-20">
+          <Card className="dark-band border-2 border-primary/30 overflow-hidden relative rounded-2xl">
+            <span aria-hidden="true" className="ghost-headline ghost-headline-on-dark absolute -top-6 left-1/2 -translate-x-1/2 text-[100px] md:text-[180px] opacity-60 hidden md:block">
+              JOIN
+            </span>
+            <CardContent className="p-10 md:p-16 text-center space-y-6 relative">
               <div className="flex items-center justify-center gap-2">
                 <Sparkles className="h-6 w-6 text-primary" />
-                <h2 className="text-3xl font-bold">Ready to Start Your Journey?</h2>
+                <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight">Ready to Start Your Journey?</h2>
                 <Sparkles className="h-6 w-6 text-primary" />
               </div>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
                 Join thousands of people who are training smarter with SmartyGym.
               </p>
               <p className="text-muted-foreground max-w-2xl mx-auto">
                 Work with a real coach who designed every program personally — not an AI.
               </p>
               <div className="flex flex-wrap gap-4 justify-center pt-4">
-                <Button size="lg" onClick={() => navigate("/workout")} className="gap-2">
+                <Button size="lg" onClick={() => navigate("/workout")} className="gap-2 rounded-full px-8 uppercase tracking-wider font-bold">
                   <Target className="h-5 w-5" />
                   Browse Workouts
                 </Button>
-                <Button size="lg" variant="outline" onClick={() => navigate("/trainingprogram")} className="gap-2">
+                <Button size="lg" variant="outline" onClick={() => navigate("/trainingprogram")} className="gap-2 rounded-full px-8 uppercase tracking-wider font-bold border-primary text-primary hover:bg-primary hover:text-primary-foreground">
                   <Calendar className="h-5 w-5" />
                   Explore Programs
                 </Button>
-                {!isPremium && <Button size="lg" variant="outline" onClick={() => navigate("/smarty-plans")} className="gap-2">
+                {!isPremium && <Button size="lg" variant="outline" onClick={() => navigate("/smarty-plans")} className="gap-2 rounded-full px-8 uppercase tracking-wider font-bold border-primary text-primary hover:bg-primary hover:text-primary-foreground">
                     <UserCheck className="h-5 w-5" />
                     Join Premium
                   </Button>}
