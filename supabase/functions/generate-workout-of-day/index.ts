@@ -466,7 +466,7 @@ async function runWodGeneration(params: {
     // CRITICAL: Fetch FULL workout details including main_workout for section validation
     const { data: existingWODsForDate, error: existingWODsError } = await supabase
       .from("admin_workouts")
-      .select("id, name, equipment, generated_for_date, category, difficulty, difficulty_stars, format, main_workout")
+      .select("id, name, equipment, generated_for_date, category, difficulty, difficulty_stars, format, main_workout, stripe_product_id")
       .eq("generated_for_date", effectiveDate)
       .eq("is_workout_of_day", true);
 
@@ -503,12 +503,15 @@ async function runWodGeneration(params: {
           else if (existingWod.equipment === "EQUIPMENT") equipmentComplete = false;
           else if (existingWod.equipment === "VARIOUS") variousComplete = false;
           
-          // Archive the malformed WOD if retryMissing (so it doesn't block regeneration)
+          // Delete the malformed WOD if retryMissing (so it doesn't block regeneration or leave active Stripe orphans)
           if (retryMissing) {
-            logStep(`Archiving malformed WOD ${existingWod.id} and hiding from gallery`, { equipment: existingWod.equipment });
+            logStep(`Deleting malformed WOD ${existingWod.id} and archiving Stripe product`, { equipment: existingWod.equipment });
+            if (existingWod.stripe_product_id) {
+              await archiveStripeProductSafely(stripe, existingWod.stripe_product_id, "malformed_wod_retry_cleanup");
+            }
             await supabase
               .from("admin_workouts")
-              .update({ is_workout_of_day: false, generated_for_date: null, is_visible: false })
+              .delete()
               .eq("id", existingWod.id);
           }
         }
