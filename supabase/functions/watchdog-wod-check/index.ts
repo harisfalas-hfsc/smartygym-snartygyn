@@ -7,11 +7,15 @@ const corsHeaders = {
 };
 
 /**
- * Watchdog WOD Check — VERIFY-ONLY safety net (CHAIN FIX).
+ * Watchdog WOD Check — LIBRARY MODE.
  *
- * Identical behaviour to backup-wod-generation: calls the orchestrator
- * in verify-only mode. Never regenerates, never pulls from library.
- * Sends an admin alert if today's expected slots are missing.
+ * AI generation has been removed entirely. This watchdog now:
+ *  1. Verifies today's WOD slots exist (bodyweight + equipment, or recovery).
+ *  2. If any slot is missing, calls `select-wod-from-library` to pick one
+ *     from the existing library according to the periodization plan.
+ *  3. Re-kicks the Stripe linker / image generator for any active WOD
+ *     missing those assets.
+ *  4. Emails the admin if a slot still cannot be filled (empty library bucket).
  */
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -21,61 +25,39 @@ serve(async (req) => {
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const supabase = createClient(supabaseUrl, serviceKey);
 
-  // ────────────────────────────────────────────────────────────
-  // CRON SELF-HEAL: detect silently-dead WOD jobs and re-register
-  // ────────────────────────────────────────────────────────────
-  // Background: pg_cron rows can show active=true while never producing
-  // run rows in cron.job_run_details (observed in production). If any of
-  // the 7 critical WOD jobs has not produced an execution row in the last
-  // 24h, re-register them all and email admin.
-  try {
-    const supabase = createClient(supabaseUrl, serviceKey);
-    // Detection + healing happens inside the SECURITY DEFINER DB function
-    // `heal_wod_crons()` which has access to the cron schema. It returns
-    // { healed_count, healed_jobs }.
-    const { data: healResult, error: healErr } = await supabase.rpc("heal_wod_crons");
-    if (healErr) {
-      console.error("[WATCHDOG] heal_wod_crons RPC failed:", healErr.message);
-    } else if (healResult && (healResult as any).healed_count > 0) {
-      console.log(`[WATCHDOG] Self-healed ${ (healResult as any).healed_count } cron job(s):`, (healResult as any).healed_jobs);
-      // Email admin about the self-heal event
-      fetch(`${supabaseUrl}/functions/v1/run-system-health-audit`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${serviceKey}` },
-        body: JSON.stringify({
-          sendEmail: true,
-          triggerSource: "watchdog-cron-self-heal",
-          extraContext: {
-            healed_jobs: (healResult as any).healed_jobs,
-            note: "Watchdog detected silently-dead WOD cron jobs and re-registered them.",
-          },
-        }),
-      }).catch((e) => console.error("[WATCHDOG] self-heal email failed:", e));
-    } else {
-      console.log("[WATCHDOG] All 7 critical WOD cron jobs ran in the last 24h.");
-    }
-  } catch (cronHealErr) {
-    console.error("[WATCHDOG] Cron self-heal scan failed:", cronHealErr);
-  }
+  const cyprusToday = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Athens",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
 
-  // PLAN B+E asset re-kick: if any of today's WODs are missing image_url or
-  // Stripe IDs, re-fire the background linker / image generator. Skip the
-  // re-kick within the first 10 minutes after creation so the initial
-  // background job has a chance to finish first.
+  const found: string[] = [];
+  const missing: string[] = [];
+  const filled: string[] = [];
+  const stillMissing: string[] = [];
+
   try {
-    const supabase = createClient(supabaseUrl, serviceKey);
-    const tenMinAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
-    const { data: pending } = await supabase
+    const { data: todayWods } = await supabase
       .from("admin_workouts")
-      .select("id, image_url, stripe_product_id, stripe_price_id, created_at")
+      .select("id, name, equipment, image_url, stripe_product_id, stripe_price_id")
       .eq("is_workout_of_day", true)
-      .eq("is_visible", true)
-      .lt("created_at", tenMinAgo);
+      .eq("generated_for_date", cyprusToday);
 
-    for (const w of pending || []) {
+    const equipments = new Set((todayWods || []).map((w: any) => (w.equipment || "").toUpperCase()));
+    for (const slot of ["BODYWEIGHT", "EQUIPMENT"]) {
+      if (equipments.has(slot) || equipments.has("VARIOUS")) {
+        found.push(slot);
+      } else {
+        missing.push(slot);
+      }
+    }
+
+    // Asset re-kick for any active WOD missing image/Stripe
+    for (const w of todayWods || []) {
       if (!w.stripe_product_id || !w.stripe_price_id) {
-        console.log(`[WATCHDOG] re-kick wod-stripe-link for ${w.id}`);
         fetch(`${supabaseUrl}/functions/v1/wod-stripe-link`, {
           method: "POST",
           headers: { "Content-Type": "application/json", "Authorization": `Bearer ${serviceKey}` },
@@ -83,7 +65,6 @@ serve(async (req) => {
         }).catch((e) => console.error("[WATCHDOG] linker re-kick failed", e));
       }
       if (!w.image_url) {
-        console.log(`[WATCHDOG] re-kick auto-generate-workout-image for ${w.id}`);
         fetch(`${supabaseUrl}/functions/v1/auto-generate-workout-image`, {
           method: "POST",
           headers: { "Content-Type": "application/json", "Authorization": `Bearer ${serviceKey}` },
@@ -91,27 +72,67 @@ serve(async (req) => {
         }).catch((e) => console.error("[WATCHDOG] image re-kick failed", e));
       }
     }
-  } catch (assetErr) {
-    console.error("[WATCHDOG] asset re-kick scan failed", assetErr);
-  }
 
-  console.log("[WATCHDOG] Triggering orchestrator in verify-only mode");
+    // Fill any missing slot from the library
+    if (missing.length > 0) {
+      console.log(`[WATCHDOG] Missing slots for ${cyprusToday}:`, missing);
+      try {
+        const resp = await fetch(`${supabaseUrl}/functions/v1/select-wod-from-library`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${anonKey}` },
+          body: JSON.stringify({ targetDate: cyprusToday, triggerSource: "watchdog" }),
+        });
+        const text = await resp.text();
+        console.log(`[WATCHDOG] select-wod-from-library response ${resp.status}:`, text.substring(0, 300));
 
-  try {
-    const resp = await fetch(`${supabaseUrl}/functions/v1/wod-generation-orchestrator`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${anonKey}` },
-      body: JSON.stringify({ mode: "verify", triggerSource: "watchdog" }),
-    });
-    const text = await resp.text();
-    console.log(`[WATCHDOG] Orchestrator verify response ${resp.status}: ${text.substring(0, 300)}`);
+        // Re-check
+        const { data: after } = await supabase
+          .from("admin_workouts")
+          .select("equipment")
+          .eq("is_workout_of_day", true)
+          .eq("generated_for_date", cyprusToday);
+        const afterEq = new Set((after || []).map((w: any) => (w.equipment || "").toUpperCase()));
+        for (const slot of missing) {
+          if (afterEq.has(slot) || afterEq.has("VARIOUS")) filled.push(slot);
+          else stillMissing.push(slot);
+        }
+      } catch (e) {
+        console.error("[WATCHDOG] library picker call failed:", e);
+        stillMissing.push(...missing);
+      }
+    }
 
-    return new Response(text, {
-      status: resp.status,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    // If anything still missing, email admin
+    if (stillMissing.length > 0) {
+      fetch(`${supabaseUrl}/functions/v1/run-system-health-audit`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${serviceKey}` },
+        body: JSON.stringify({
+          sendEmail: true,
+          triggerSource: "watchdog-still-missing",
+          extraContext: {
+            cyprus_date: cyprusToday,
+            still_missing: stillMissing,
+            note: "Watchdog tried to fill missing WOD slot(s) from the library but the library has no eligible workout for today's periodization. Publish a matching workout in the admin panel.",
+          },
+        }),
+      }).catch((e) => console.error("[WATCHDOG] alert email failed:", e));
+    }
+
+    return new Response(
+      JSON.stringify({
+        success: stillMissing.length === 0,
+        cyprus_date: cyprusToday,
+        found,
+        missing,
+        filled,
+        still_missing: stillMissing,
+        mode: "library",
+      }),
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
   } catch (error) {
-    console.error("[WATCHDOG] Failed to call orchestrator:", error);
+    console.error("[WATCHDOG] failure:", error);
     return new Response(
       JSON.stringify({ success: false, error: error instanceof Error ? error.message : String(error) }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
