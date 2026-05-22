@@ -13,6 +13,22 @@ import { normalizeWorkoutHtml } from "@/utils/htmlNormalizer";
 
 import { WORKOUT_CATEGORIES, STRENGTH_FOCUS_OPTIONS, isStrengthFocus } from "@/constants/workoutCategories";
 
+// Canonical 5-section scaffold for manual workout creation.
+// Matches the structure produced by AI / library generators so the
+// downstream normalizer and density validator treat it the same.
+const STANDARD_SECTIONS_TEMPLATE = `<div class="workout-content">
+<h3>🧘 Soft Tissue Preparation</h3>
+<ul><li></li></ul>
+<h3>🔥 Activation</h3>
+<ul><li></li></ul>
+<h3>💪 Main Workout</h3>
+<ul><li></li></ul>
+<h3>⚡ Finisher</h3>
+<ul><li></li></ul>
+<h3>🧊 Cool Down</h3>
+<ul><li></li></ul>
+</div>`;
+
 // Micro-workout fixed values (enforced by DB trigger too)
 const MICRO_WORKOUT_RULES = {
   equipment: 'BODYWEIGHT',
