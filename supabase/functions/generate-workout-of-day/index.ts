@@ -547,8 +547,8 @@ async function runWodGeneration(params: {
     if (retryMissing && existingWODsForDate && existingWODsForDate.length === 1) {
       const existingWOD = existingWODsForDate[0];
       if (existingWOD.category && existingWOD.difficulty_stars) {
-        // Only force format for STRENGTH and MOBILITY & STABILITY (must be REPS & SETS)
-        const forceFormat = existingWOD.category === "STRENGTH" || existingWOD.category === "MOBILITY & STABILITY";
+        // Force format for controlled categories that must stay REPS & SETS.
+        const forceFormat = existingWOD.category === "STRENGTH" || existingWOD.category === "MOBILITY & STABILITY" || existingWOD.category === "PILATES";
         
         forcedParameters = {
           category: existingWOD.category,
@@ -1280,7 +1280,8 @@ Every workout in the above categories MUST include 5 sections in this order:
 4. ⚡ FINISHER (10-25 min)
    Purpose: Complement the main workout with a DIFFERENT format/structure
    • Must be RELATED to the category theme
-   • Must have DIFFERENT format than main workout
+    • Must have DIFFERENT format than main workout where the category allows it
+    • For STRENGTH, MOBILITY & STABILITY, and PILATES, the finisher MUST stay REPS & SETS
    • Intensity is governed by the RPE BALANCING RULE below
    Examples:
    • STRENGTH main (heavy compounds) → Finisher (lighter volume, higher reps)
@@ -1362,8 +1363,9 @@ If the main workout is moderate, the finisher can push harder. But it MUST exist
 
 FINISHER RULES BY CATEGORY:
 
-STRENGTH and MOBILITY & STABILITY:
+STRENGTH, MOBILITY & STABILITY, and PILATES:
 • Format: REPS & SETS ONLY (respecting category format rule)
+• NEVER use For Time, AMRAP, EMOM, Tabata, or Circuit for these finishers
 • Load: Reduced compared to main workout
 • Reps: Increased compared to main workout
 • Purpose: Volume completion without heavy loading
