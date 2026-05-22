@@ -669,26 +669,22 @@ const handler = async (req: Request): Promise<Response> => {
       if (actualCount === 0) {
         detailMessage = isRecoveryDay
           ? `ISSUE: 0 active WODs found. Expected: 1 Recovery WOD (VARIOUS) for ${today} (Cyprus).\n\n` +
-            `POSSIBLE CAUSES:\n` +
-            `• Automatic generation at ${wodAutoGenConfig?.generation_hour_utc ?? 6}:30 UTC failed\n` +
-            `• Edge function 'generate-workout-of-day' returned an error\n` +
-            `• Recovery WOD was created but not tagged correctly\n\n` +
-            `SOLUTION: Go to Admin → WOD Manager → click 'Generate New WOD' → select 'Generate for Today'`
+            `LIBRARY MODE — POSSIBLE CAUSES:\n` +
+            `• Library picker (select-wod-from-library) at 06:30/06:50 UTC failed\n` +
+            `• No eligible Recovery workout exists in the published library for this slot\n\n` +
+            `SOLUTION: Admin → WOD Manager → click 'WOD Watchdog' to fill from the library now.`
           : `ISSUE: 0 active WODs found. Expected: 2 (bodyweight + equipment) for ${today} (Cyprus).\n\n` +
-            `POSSIBLE CAUSES:\n` +
-            `• Automatic generation at ${wodAutoGenConfig?.generation_hour_utc ?? 6}:30 UTC failed\n` +
-            `• Edge function 'generate-workout-of-day' returned an error\n` +
-            `• Workouts were created but not tagged with is_workout_of_day=true\n` +
-            `• Workouts created with wrong generated_for_date\n\n` +
-            `SOLUTION: Go to Admin → WOD Manager → click 'Generate New WOD' → select 'Generate for Today'`;
+            `LIBRARY MODE — POSSIBLE CAUSES:\n` +
+            `• Library picker (select-wod-from-library) at 06:30/06:50 UTC failed\n` +
+            `• No eligible bodyweight/equipment workout in this category exists in the published library\n\n` +
+            `SOLUTION: Admin → WOD Manager → click 'WOD Watchdog' to fill from the library now.`;
       } else if (actualCount < expectedWodCount) {
         detailMessage = isRecoveryDay
           ? `Recovery day should have 1 VARIOUS WOD. Found: ${actualCount}. generated_for_date: ${activeWodDates.join(', ') || 'n/a'}`
           : `ISSUE: Only ${actualCount} active WOD found. Expected: 2 (bodyweight + equipment).\n\n` +
-            `POSSIBLE CAUSES:\n` +
-            `• Generation partially failed (one variant created, one failed)\n` +
-            `• Stripe product creation timed out for second variant\n\n` +
-            `SOLUTION: Regenerate today's WOD. generated_for_date: ${activeWodDates.join(', ') || 'n/a'}`;
+            `LIBRARY MODE — POSSIBLE CAUSES:\n` +
+            `• Library picker filled one slot but couldn't find a match for the other\n\n` +
+            `SOLUTION: Admin → WOD Manager → click 'WOD Watchdog'. generated_for_date: ${activeWodDates.join(', ') || 'n/a'}`;
       } else if (actualCount > expectedWodCount) {
         detailMessage = `${actualCount} active WODs found, expected ${expectedWodCount}${isRecoveryDay ? ' (Recovery day)' : ' (training day)'}. ` +
           `generated_for_date: ${activeWodDates.join(', ') || 'n/a'}. ` +
@@ -1676,7 +1672,8 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("⚡ Checking edge functions...");
 
     const criticalFunctions = [
-      'generate-workout-of-day',
+      'select-wod-from-library',
+      'watchdog-wod-check',
       'generate-daily-ritual',
       'send-welcome-email',
       'stripe-webhook',
