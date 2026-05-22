@@ -29,7 +29,7 @@ function log(step: string, details?: any) {
 
 type CategoryKey = "CALORIE BURNING" | "METABOLIC" | "CARDIO";
 type EquipmentKey = "BODYWEIGHT" | "EQUIPMENT";
-type DifficultyKey = "Advanced" | "Intermediate";
+type DifficultyKey = "Advanced" | "Intermediate" | "Beginner";
 
 interface Job {
   category: CategoryKey;
@@ -47,7 +47,8 @@ const CATEGORY_FORMAT: Record<CategoryKey, string> = {
 
 function starsFor(difficulty: DifficultyKey, equipment: EquipmentKey): number {
   if (difficulty === "Advanced") return equipment === "BODYWEIGHT" ? 5 : 6;
-  return equipment === "BODYWEIGHT" ? 3 : 4;
+  if (difficulty === "Intermediate") return equipment === "BODYWEIGHT" ? 3 : 4;
+  return equipment === "BODYWEIGHT" ? 1 : 2;
 }
 
 function categoryGuidance(category: CategoryKey, equipment: EquipmentKey): string {
@@ -146,7 +147,9 @@ PRESCRIPTION RULE (${difficulty}):
 Every exercise line MUST include a clear prescription — reps, time, or distance.
 ${difficulty === "Advanced"
     ? `Advanced volume: high density, longer work intervals (40-60s work / 15-20s rest), heavier loads on equipment work, complex movements.`
-    : `Intermediate volume: moderate density (30-40s work / 20-30s rest), moderate loads, fundamental movement patterns.`}
+    : difficulty === "Intermediate"
+    ? `Intermediate volume: moderate density (30-40s work / 20-30s rest), moderate loads, fundamental movement patterns.`
+    : `Beginner volume: low density, shorter work intervals (20-30s work / 30-40s rest), light loads, simple fundamental patterns, avoid advanced plyometrics or complex compounds. Emphasize technique cues and longer recovery.`}
 NEVER list an exercise without a prescription.
 
 ${equipment === "BODYWEIGHT"
@@ -442,7 +445,7 @@ serve(async (req) => {
 
     try {
       const body = await req.json();
-      if (body?.difficulty === "Advanced" || body?.difficulty === "Intermediate") difficulty = body.difficulty;
+      if (body?.difficulty === "Advanced" || body?.difficulty === "Intermediate" || body?.difficulty === "Beginner") difficulty = body.difficulty;
       if (Array.isArray(body?.categories) && body.categories.length) categories = body.categories;
       if (Array.isArray(body?.equipment) && body.equipment.length) equipments = body.equipment;
       if (typeof body?.price === "number") price = body.price;
