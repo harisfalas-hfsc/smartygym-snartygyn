@@ -219,6 +219,14 @@ export function applyWodQualityGate(args: {
   //    to slip through the loose keyword regex below.
   const mainSection = extractSection(mainWorkoutHtml, "💪", ["⚡", "🧘"]);
   const finisherSection = extractSection(mainWorkoutHtml, "⚡", ["🧘"]);
+  const controlledRepsSetsCategory = ["STRENGTH", "MOBILITY & STABILITY", "PILATES"].includes((category || "").toUpperCase());
+  if (controlledRepsSetsCategory) {
+    const mainFmt = detectSectionFormat(mainSection);
+    const finFmt = detectSectionFormat(finisherSection);
+    if (mainFmt && mainFmt !== "REPS & SETS") failures.push(`${category} Main Workout must stay REPS & SETS, not ${mainFmt}.`);
+    if (finFmt && finFmt !== "REPS & SETS") failures.push(`${category} Finisher must stay REPS & SETS, not ${finFmt}.`);
+    if (!finFmt) failures.push(`${category} Finisher must explicitly declare REPS & SETS.`);
+  }
   const mainStructureFail = validateSectionStructure("Main Workout", mainSection);
   const finStructureFail = validateSectionStructure("Finisher", finisherSection);
   if (mainStructureFail) failures.push(mainStructureFail);
