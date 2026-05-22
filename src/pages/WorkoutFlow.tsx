@@ -286,7 +286,7 @@ const WorkoutFlow = () => {
                 ) : (
                   <>
                     <p className="text-sm sm:text-base text-center font-bold">
-                      <span className="text-primary font-semibold">Smarty Workouts</span> are single-session training routines designed to fit your lifestyle and goals. Whether you're targeting strength, calorie burning, metabolic conditioning, cardio endurance, mobility & stability, or looking for a challenge — we have you covered. Hit the gym without a plan? In the home? On the go? <span className="text-primary font-semibold">Smarty Workouts</span> are designed to deliver results in any setting.
+                      <span className="text-primary font-semibold">Smarty Workouts</span> are single-session training routines designed to fit your lifestyle and goals. Whether you're targeting strength, calorie burning, metabolic conditioning, cardio endurance, mobility & stability, or looking for a challenge — we have you covered. At the gym, at home, or on the go — <span className="text-primary font-semibold">Smarty Workouts</span> deliver results in any setting.
                     </p>
                     
                     <p className="text-sm sm:text-base font-semibold text-foreground text-center mt-6">
