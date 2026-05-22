@@ -292,17 +292,17 @@ const Index = () => {
         <title>SmartyGym | Online Gym | 500+ Workouts by Haris Falas</title>
         <meta name="description" content="SmartyGym online gym: 500+ expert workouts and training programs by Sports Scientist Haris Falas. HIIT, TABATA, strength, cardio. Train anywhere." />
         <meta name="keywords" content="smartygym, smarty gym, online gym, online fitness, personal trainer, HFSC, HFSC Performance, Haris Falas, Sports Scientist, AMRAP workouts, TABATA training, HIIT workouts, strength training, cardio workouts, functional training, home workouts, bodyweight workouts, online training programs, workout programs online, fitness calculators, smartygym.com" />
-        
+
         <meta name="semantic-keywords" content="online-fitness, home-workouts, virtual-training, digital-gym, remote-coaching, bodyweight-training, functional-fitness, strength-conditioning" />
         <meta name="workout-formats" content="AMRAP, TABATA, HIIT, circuit-training, interval-training, metabolic-conditioning, functional-training, strength-training" />
         <meta name="training-categories" content="strength, cardio, metabolic, mobility, power, challenge, calorie-burning, core-stability" />
         <meta name="equipment-types" content="bodyweight, no-equipment, kettlebell, dumbbells, resistance-bands, minimal-equipment" />
         <meta name="expertise-areas" content="sports-science, strength-conditioning, functional-fitness, performance-training, evidence-based-training" />
-        
+
         <meta property="schema:name" content="SmartyGym" />
         <meta property="schema:founder" content="Haris Falas" />
         <meta property="schema:serviceType" content="Online Fitness Training" />
-        
+
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://smartygym.com/" />
         <meta property="og:title" content="Online Gym | SmartyGym by Haris Falas | Professional Fitness Training" />
@@ -313,27 +313,27 @@ const Index = () => {
         <meta property="og:site_name" content="SmartyGym" />
         <meta property="og:locale" content="en_GB" />
         <meta property="og:locale:alternate" content="en_US" />
-        
+
         <meta property="twitter:card" content="summary_large_image" />
         <meta property="twitter:site" content="@smartygym" />
         <meta property="twitter:title" content="Online Gym | SmartyGym by Haris Falas" />
         <meta property="twitter:description" content="Professional online fitness training by Sports Scientist Haris Falas at smartygym.com - Train anywhere, anytime" />
         <meta property="twitter:image" content={smartyGymLogo} />
-        
+
         <link rel="alternate" hrefLang="en-gb" href="https://smartygym.com" />
         <link rel="alternate" hrefLang="en" href="https://smartygym.com" />
         <link rel="alternate" hrefLang="x-default" href="https://smartygym.com" />
         <link rel="preload" as="image" href={heroWorkoutsImage} />
-        
+
         <link rel="preconnect" href="https://smartygym.com" />
         <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
-        
+
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-        
+
         <link rel="canonical" href="https://smartygym.com/" />
-        
+
         <script type="application/ld+json">
           {JSON.stringify({
           "@context": "https://schema.org",
@@ -385,7 +385,7 @@ const Index = () => {
           }]
         })}
         </script>
-        
+
         <script type="application/ld+json">
           {JSON.stringify({
           "@context": "https://schema.org",
@@ -403,7 +403,7 @@ const Index = () => {
           }
         })}
         </script>
-        
+
         <script type="application/ld+json">
           {JSON.stringify({
           "@context": "https://schema.org",
@@ -449,7 +449,7 @@ const Index = () => {
           }]
         })}
         </script>
-        
+
         <script type="application/ld+json">
           {JSON.stringify({
           "@context": "https://schema.org",
@@ -462,7 +462,7 @@ const Index = () => {
           }]
         })}
         </script>
-        
+
         {/* Organization with AggregateRating Schema */}
         {reviewStats && (
           <script type="application/ld+json">
@@ -470,7 +470,7 @@ const Index = () => {
           </script>
         )}
       </Helmet>
-      
+
       {/* Citation-ready about section for AI crawlers */}
       <section className="sr-only" aria-label="About SmartyGym">
         <h2>About SmartyGym - Online Fitness Platform</h2>
@@ -478,12 +478,12 @@ const Index = () => {
         <p>Unlike AI-generated fitness apps, every SmartyGym workout is 100% human-designed by a BSc Sports Science, CSCS-certified coach with 20+ years experience. SmartyGym serves fitness enthusiasts worldwide with workouts in AMRAP, TABATA, EMOM, HIIT, circuit training, and traditional formats.</p>
         <p>Membership starts at €9.99/month (Gold) or €89.99/year (Platinum). Free content includes selected workouts, fitness calculators (1RM, BMR, Macro), blog articles, and the exercise library.</p>
       </section>
-      
+
       <div className="min-h-screen bg-background overflow-x-hidden">
         <div className="container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6">
           <PageBreadcrumbs items={[{ label: "Home" }]} />
         </div>
-        
+
         {isMobile ? <section className="pt-0 pb-2 px-4">
             {/* Mobile swipe indicator (homepage carousel) */}
             <div className="flex items-center justify-center gap-3 mb-3">
@@ -569,8 +569,8 @@ const Index = () => {
         {/* Quick Access Menu */}
         <div className="mt-8 space-y-3">
           {/* WOD Card - Always visible with "Being Prepared" fallback */}
-          <div 
-            onClick={() => navigate('/workout/wod')} 
+          <div
+            onClick={() => navigate('/workout/wod')}
             className="py-3 px-4 bg-primary/5 border-2 border-emerald-400 dark:border-emerald-500 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 transition-all cursor-pointer hover:shadow-md"
           >
             {/* Header */}
@@ -579,7 +579,7 @@ const Index = () => {
               <span className="text-sm font-bold text-foreground">Your Workout of the Day</span>
               <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
             </div>
-            
+
             {hasWods ? (
               activeMobileWod && (() => {
                 const wod = activeMobileWod.wod;
@@ -695,19 +695,19 @@ const Index = () => {
             <span className="text-base font-medium">About SmartyGym</span>
             <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
           </div>
-          
+
           <div onClick={() => navigate('/smarty-plans')} className="flex items-center gap-2.5 py-1.5 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md">
             <Crown className="w-5 h-5 text-primary flex-shrink-0" />
             <span className="text-base font-medium">Smarty Plans</span>
             <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
           </div>
-          
+
               <div onClick={() => navigate('/faq')} className="flex items-center gap-2.5 py-1.5 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md">
             <HelpCircle className="w-5 h-5 text-primary flex-shrink-0" />
             <span className="text-base font-medium">FAQ</span>
             <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
           </div>
-          
+
           {!isPremium && (
               <div onClick={() => navigate('/joinpremium')} className="flex items-center gap-2.5 py-1.5 px-4 bg-primary/10 border-2 border-primary rounded-lg hover:bg-primary/20 transition-all cursor-pointer hover:shadow-md">
               <Crown className="w-5 h-5 text-primary flex-shrink-0" />
@@ -721,21 +721,21 @@ const Index = () => {
           </section> : <>
             {/* Desktop: Hero Section */}
             <section className="relative pt-0 pb-2 bg-background overflow-hidden my-0">
-          
+
           <div className="container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6 relative z-10 overflow-x-hidden">
             <ScrollReveal>
               <Card itemScope itemType="https://schema.org/Organization" data-hero-section="true" data-keywords="smarty gym, online gym, online fitness, smartygym.com, Haris Falas, global online gym" aria-label="SmartyGym - Your online gym and fitness platform - smartygym.com" className="border-2 border-primary overflow-hidden relative">
-                
 
-                
+
+
                 {/* Decorative circles */}
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -mr-16 -mt-16 z-20" aria-hidden="true"></div>
                 <div className="absolute bottom-0 left-0 w-24 h-24 bg-accent/20 rounded-full -ml-12 -mb-12 z-20" aria-hidden="true"></div>
-                
+
                 {/* Hidden SEO metadata */}
                 <meta itemProp="url" content="https://smartygym.com" />
                 <meta itemProp="description" content="SmartyGym - #1 online gym and fitness platform by Haris Falas - smartygym.com" />
-                
+
                 <CardContent className="p-6 md:pt-5 md:pb-2 md:px-0 relative z-20">
                         {/* Interactive constellation of destination bubbles */}
                         <div className="mt-0">
@@ -766,7 +766,7 @@ const Index = () => {
                                   <p className="text-xs text-muted-foreground leading-relaxed" itemProp="description">Sports science degree & years of professional coaching experience</p>
                                 </div>
                               </article>
-                              
+
                               <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20 h-full min-h-[88px]" itemScope itemType="https://schema.org/Thing" data-feature="smarty-gym-personalized" role="article">
                                 <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
                                 <div className="flex-1 text-left">
@@ -774,7 +774,7 @@ const Index = () => {
                                   <p className="text-xs text-muted-foreground leading-relaxed" itemProp="description">Workouts designed to fit YOUR unique schedule and lifestyle</p>
                                 </div>
                               </article>
-                              
+
                               <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20 h-full min-h-[88px]" itemScope itemType="https://schema.org/Thing" data-feature="smarty-gym-science" role="article">
                                 <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
                                 <div className="flex-1 text-left">
@@ -784,7 +784,7 @@ const Index = () => {
                               </article>
                             </div>
                           </div>
-                        
+
                         {/* Science-based training text */}
                         <div className="space-y-2 text-center mt-6 pt-4 border-t border-primary/20">
                           <p className="text-base font-semibold text-primary">
@@ -800,7 +800,7 @@ const Index = () => {
                             Never by AI. Never by algorithms. Always by a real human expert who understands YOUR needs. Training designed by humans, for humans.
                           </p>
                         </div>
-                        
+
                         {/* Who is SmartyGym For? - Now at the bottom */}
                         <div className="mt-6 pt-4 border-t border-primary/20">
                           <h4 className="text-sm font-semibold text-muted-foreground mb-3 text-center">
@@ -847,12 +847,12 @@ const Index = () => {
                             ].map((audience) => {
                               const Icon = audience.icon;
                               return (
-                                <Tooltip 
+                                <Tooltip
                                   key={audience.label}
                                   open={activeAudienceTooltip === audience.label}
                                 >
                                   <TooltipTrigger asChild>
-                                    <div 
+                                    <div
                                       className="flex flex-col items-center gap-1 cursor-pointer"
                                       onMouseEnter={() => setActiveAudienceTooltip(audience.label)}
                                       onMouseLeave={() => setActiveAudienceTooltip(null)}
@@ -862,8 +862,8 @@ const Index = () => {
                                       <span className="text-sm font-bold text-foreground text-center">{audience.label}</span>
                                     </div>
                                   </TooltipTrigger>
-                                  <TooltipContent 
-                                    side="top" 
+                                  <TooltipContent
+                                    side="top"
                                     className="max-w-xs text-center"
                                   >
                                     {audience.description}
@@ -873,15 +873,15 @@ const Index = () => {
                             })}
                           </div>
                           <div className="flex items-center justify-center gap-6 mt-4">
-                            <Link 
-                              to="/why-invest-in-smartygym" 
+                            <Link
+                              to="/why-invest-in-smartygym"
                               className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
                             >
                               Why Invest in SmartyGym
                               <ChevronRight className="w-4 h-4" />
                             </Link>
-                            <Link 
-                              to="/best-online-fitness-platform" 
+                            <Link
+                              to="/best-online-fitness-platform"
                               className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
                             >
                               Why We Are the Best
@@ -1001,8 +1001,8 @@ const Index = () => {
               <h3 className="text-3xl md:text-5xl font-black uppercase tracking-tight mb-8 text-center">The SmartyGym Promise</h3>
               <div className="max-w-3xl mx-auto space-y-4">
               <p className="text-base md:text-lg leading-relaxed text-center">
-                Every workout and training program at <span className="text-primary font-semibold">SmartyGym</span> is crafted with one goal: to help you reach YOUR fitness goals, 
-                whatever they may be. Whether you're building muscle, losing weight, improving endurance, or simply staying active, 
+                Every workout and training program at <span className="text-primary font-semibold">SmartyGym</span> is crafted with one goal: to help you reach YOUR fitness goals,
+                whatever they may be. Whether you're building muscle, losing weight, improving endurance, or simply staying active,
                 we provide the structure, guidance, and flexibility you need to succeed — on your terms, in your time, wherever you are.
               </p>
                 <p className="text-base md:text-lg font-semibold text-center text-primary tracking-wide">
@@ -1112,7 +1112,7 @@ const Index = () => {
         <section className="mb-16">
           <Card className="bg-gradient-to-br from-primary/5 to-accent/5 border-2 border-primary/20 overflow-hidden relative">
             <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 rounded-full -mr-20 -mt-20" aria-hidden="true"></div>
-            
+
             <CardHeader className="relative">
               <div className="flex items-center gap-4 mb-4">
               <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-primary/30">
@@ -1124,7 +1124,7 @@ const Index = () => {
                 </div>
               </div>
             </CardHeader>
-            
+
             <CardContent className="space-y-4 relative">
               <div className="bg-background/80 backdrop-blur-sm p-4 rounded-lg border border-primary/20">
                 <p className="text-lg font-bold mb-1">
@@ -1132,7 +1132,7 @@ const Index = () => {
                 </p>
                 <p className="text-sm text-muted-foreground">Sports Scientist and Strength & Conditioning Coach</p>
               </div>
-              
+
               <p className="text-base leading-relaxed">
                 For more than twenty years I've coached athletes, teams, and everyday people — beginners, busy professionals, and gym-goers who simply want to train with purpose. If there's one thing I've learned, it's that people don't struggle because they're lazy. They struggle because they walk into their training without a clear plan, without structure, and without guidance they can trust.
               </p>
@@ -1148,14 +1148,14 @@ const Index = () => {
               <p className="text-base leading-relaxed">
                 I built this platform for people who want real training, not random exercises. For those who want to feel stronger, move better, improve performance, and see results — with a system that removes confusion and brings clarity every step of the way.
               </p>
-              
+
               <div className="bg-primary/10 p-4 rounded-lg border-l-4 border-primary">
                 <p className="text-base leading-relaxed font-medium">
-                  Every single program you see here? I designed it myself. No AI. No automation. No copy-paste templates. 
+                  Every single program you see here? I designed it myself. No AI. No automation. No copy-paste templates.
                   Just years of education, experience, and a genuine commitment to YOUR success.
                 </p>
               </div>
-              
+
               <p className="text-base leading-relaxed">
                 This project isn't just another fitness idea. It's the result of decades of experience, passion for coaching, and a deep belief that everyone deserves access to smart, effective training, no matter their level or lifestyle.
               </p>
@@ -1167,7 +1167,7 @@ const Index = () => {
               <p className="text-base leading-relaxed font-medium">
                 Every day is a game day.
               </p>
-              
+
               <div className="flex items-center justify-center gap-2 pt-4">
                 <div className="h-px flex-grow bg-border"></div>
                 <p className="font-bold text-primary">
