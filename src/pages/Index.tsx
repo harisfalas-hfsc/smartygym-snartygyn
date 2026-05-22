@@ -1109,30 +1109,34 @@ const Index = () => {
 
         {/* Message from Head Coach */}
         {/* Message from Head Coach */}
-        <section className="mb-16">
-          <Card className="bg-gradient-to-br from-primary/5 to-accent/5 border-2 border-primary/20 overflow-hidden relative">
-            <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 rounded-full -mr-20 -mt-20" aria-hidden="true"></div>
+        <section className="mb-20">
+          <div className="relative mb-10 md:mb-14">
+            <span aria-hidden="true" className="ghost-headline absolute -top-6 md:-top-10 left-0 right-0 text-center text-[80px] md:text-[160px] hidden sm:block">
+              THE COACH
+            </span>
+            <div className="relative pt-6 md:pt-12 text-center">
+              <p className="text-xs md:text-sm font-bold tracking-[0.3em] text-primary uppercase mb-3">A Word From</p>
+              <h2 className="text-3xl md:text-5xl font-black tracking-tight uppercase">Message from Haris Falas</h2>
+            </div>
+          </div>
+          <Card className="dark-band border-2 border-primary/30 overflow-hidden relative rounded-2xl">
+            <div className="absolute top-0 right-0 w-40 h-40 bg-primary/10 rounded-full -mr-20 -mt-20" aria-hidden="true"></div>
 
-            <CardHeader className="relative">
-              <div className="flex items-center gap-4 mb-4">
-              <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-primary/30">
-                <img src={harisPhoto} alt="Haris Falas - Personal Coach" className="w-full h-full object-cover" />
-              </div>
+            <CardContent className="relative p-8 md:p-14 grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-10 items-start">
+              <div className="flex flex-col items-center lg:items-start text-center lg:text-left gap-4">
+                <div className="w-40 h-40 lg:w-64 lg:h-64 rounded-2xl overflow-hidden border-2 border-primary/40 shadow-2xl">
+                  <img src={harisPhoto} alt="Haris Falas - Personal Coach" className="w-full h-full object-cover" />
+                </div>
                 <div>
-                  <CardTitle className="text-2xl md:text-3xl">Message from Haris Falas</CardTitle>
-                  <p className="text-muted-foreground">SmartyGym Founder & Your Personal Coach</p>
+                  <p className="text-2xl font-black uppercase tracking-tight">
+                    <a href="/coach-profile" className="text-primary hover:underline">Haris Falas</a>
+                  </p>
+                  <p className="text-sm uppercase tracking-[0.2em] text-primary/80 mt-1">Founder · Head Coach</p>
+                  <p className="text-sm text-muted-foreground mt-2">Sports Scientist · Strength & Conditioning Coach</p>
                 </div>
               </div>
-            </CardHeader>
 
-            <CardContent className="space-y-4 relative">
-              <div className="bg-background/80 backdrop-blur-sm p-4 rounded-lg border border-primary/20">
-                <p className="text-lg font-bold mb-1">
-                  <a href="/coach-profile" className="text-primary hover:underline">Haris Falas</a>
-                </p>
-                <p className="text-sm text-muted-foreground">Sports Scientist and Strength & Conditioning Coach</p>
-              </div>
-
+              <div className="space-y-4">
               <p className="text-base leading-relaxed">
                 For more than twenty years I've coached athletes, teams, and everyday people — beginners, busy professionals, and gym-goers who simply want to train with purpose. If there's one thing I've learned, it's that people don't struggle because they're lazy. They struggle because they walk into their training without a clear plan, without structure, and without guidance they can trust.
               </p>
@@ -1149,7 +1153,7 @@ const Index = () => {
                 I built this platform for people who want real training, not random exercises. For those who want to feel stronger, move better, improve performance, and see results — with a system that removes confusion and brings clarity every step of the way.
               </p>
 
-              <div className="bg-primary/10 p-4 rounded-lg border-l-4 border-primary">
+              <div className="bg-primary/15 p-4 rounded-lg border-l-4 border-primary">
                 <p className="text-base leading-relaxed font-medium">
                   Every single program you see here? I designed it myself. No AI. No automation. No copy-paste templates.
                   Just years of education, experience, and a genuine commitment to YOUR success.
@@ -1169,13 +1173,14 @@ const Index = () => {
               </p>
 
               <div className="flex items-center justify-center gap-2 pt-4">
-                <div className="h-px flex-grow bg-border"></div>
-                <p className="font-bold text-primary">
+                <div className="h-px flex-grow bg-primary/30"></div>
+                <p className="font-black uppercase tracking-[0.2em] text-primary">
                   <a href="/coach-profile" className="hover:underline">Haris Falas</a>
                 </p>
-                <div className="h-px flex-grow bg-border"></div>
+                <div className="h-px flex-grow bg-primary/30"></div>
               </div>
               <p className="text-center text-sm text-muted-foreground">Founder, SmartyGym</p>
+              </div>
             </CardContent>
           </Card>
         </section>
