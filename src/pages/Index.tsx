@@ -1192,7 +1192,7 @@ const Index = () => {
             <span aria-hidden="true" className="ghost-headline ghost-headline-on-dark absolute top-4 left-1/2 -translate-x-1/2 text-[60px] md:text-[110px] leading-none opacity-40 hidden md:block pointer-events-none whitespace-nowrap">
               JOIN
             </span>
-            <CardContent className="p-10 md:p-16 text-center space-y-6 relative">
+            <CardContent className="p-10 md:p-16 md:pt-24 text-center space-y-6 relative">
               <div className="flex items-center justify-center gap-2">
                 <Sparkles className="h-6 w-6 text-primary" />
                 <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight">Ready to Start Your Journey?</h2>
