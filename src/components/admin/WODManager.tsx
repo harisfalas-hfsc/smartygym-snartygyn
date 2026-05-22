@@ -479,6 +479,11 @@ export const WODManager = () => {
           setEditingWorkout(null);
         }}
       />
+
+      <TomorrowWODPreviewDialog
+        open={tomorrowPreviewOpen}
+        onOpenChange={setTomorrowPreviewOpen}
+      />
     </div>
   );
 };
