@@ -224,6 +224,10 @@ const HERO_ROTATING_IMAGES: { url: string; alt: string }[] = [
     url: "https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/avatars/workout-covers/workout-1776661824882-0hiig.png",
     alt: "Anchor Point Flow workout",
   },
+  {
+    url: "https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/avatars/workout-covers/workout-regen-1779439836806-5lots.png",
+    alt: "Jump Starter micro-workout",
+  },
 ];
 
 const DesktopVideoHero = ({ width, height }: { width: number; height: number }) => {
