@@ -3636,12 +3636,8 @@ export type Database = {
         }
         Returns: boolean
       }
-      heal_wod_crons: { Args: never; Returns: Json }
       is_user_banned: { Args: { user_id_param: string }; Returns: boolean }
       pg_cron_enabled: { Args: never; Returns: boolean }
-      update_wod_cron_schedule:
-        | { Args: { new_hour: number }; Returns: Json }
-        | { Args: { new_hour: number; new_minute?: number }; Returns: Json }
       user_has_active_premium_access: {
         Args: { _user_id: string }
         Returns: boolean

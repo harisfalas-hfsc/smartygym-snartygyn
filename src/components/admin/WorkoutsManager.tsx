@@ -208,20 +208,13 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
         .limit(1);
       hasPurchases = (purchases?.length || 0) > 0;
 
+      // [LIBRARY MODE] AI WOD generation is gone — no new "failed hidden WODs" can be created.
+      // For any legacy hidden WOD record without purchases, allow a plain DB delete.
       if (workout && isFailedHiddenWod(workout) && !hasPurchases) {
-        if (!confirm(`Permanently delete failed hidden WOD "${workout.name}" and deactivate its Stripe product?`)) return;
-
-        const { data, error } = await supabase.functions.invoke('cleanup-wod-stripe-orphans', {
-          body: { dryRun: false, failedWorkoutId: id, reason: 'admin-delete-failed-hidden-wod' },
-        });
-
-        if (error) throw error;
-        if (data?.success === false || data?.error) throw new Error(data?.error || 'Failed WOD cleanup failed');
-
-        toast({
-          title: "Failed WOD Deleted",
-          description: `"${workout.name}" was removed and its Stripe product was deactivated.`,
-        });
+        if (!confirm(`Permanently delete legacy hidden WOD "${workout.name}"?`)) return;
+        const { error: delErr } = await supabase.from('admin_workouts').delete().eq('id', id);
+        if (delErr) throw delErr;
+        toast({ title: "Deleted", description: `"${workout.name}" was removed.` });
         loadWorkouts();
         return;
       }
@@ -443,16 +436,13 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
       const toArchive = purchaseChecks.filter(w => !failedHiddenWods.some(f => f.id === w.id) && (w.stripe_product_id || w.hasPurchases));
       const regularDeletes = purchaseChecks.filter(w => !failedHiddenWods.some(f => f.id === w.id) && !w.stripe_product_id && !w.hasPurchases);
 
+      // [LIBRARY MODE] Plain DB delete for legacy hidden WODs without purchases.
       if (failedHiddenWods.length > 0) {
-        const { data, error } = await supabase.functions.invoke('cleanup-wod-stripe-orphans', {
-          body: {
-            dryRun: false,
-            failedWorkoutIds: failedHiddenWods.map(w => w.id),
-            reason: 'admin-bulk-delete-failed-hidden-wods',
-          },
-        });
+        const { error } = await supabase
+          .from('admin_workouts')
+          .delete()
+          .in('id', failedHiddenWods.map(w => w.id));
         if (error) throw error;
-        if (data?.success === false || data?.error) throw new Error(data?.error || 'Failed WOD cleanup failed');
       }
 
       // Archive protected workouts to gallery

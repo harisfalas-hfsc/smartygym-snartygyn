@@ -50,7 +50,7 @@ const CATEGORIES = [
 ];
 
 const AVAILABLE_FUNCTIONS = [
-  'generate-workout-of-day',
+  'select-wod-from-library',
   'generate-daily-ritual',
   'generate-weekly-blog-articles',
   'send-scheduled-notifications',
@@ -61,6 +61,8 @@ const AVAILABLE_FUNCTIONS = [
   'send-checkin-reminders',
   'run-system-health-audit',
   'archive-old-wods',
+  'verify-wod-rollover',
+  'watchdog-wod-check',
   'refresh-seo-metadata',
   'sync-stripe-subscriptions',
   'process-pending-notifications'
