@@ -14,9 +14,6 @@ import {
 import { cn } from "@/lib/utils";
 import { useTodayWods } from "@/hooks/useTodayWods";
 import { ChevronRight, ChevronLeft } from "lucide-react";
-import heroBannerVideoGym from "@/assets/hero-banner-video-gym.mp4.asset.json";
-import heroBannerVideoPark from "@/assets/hero-banner-video-park.mp4.asset.json";
-import heroBannerVideoLivingroom from "@/assets/hero-banner-video-livingroom.mp4.asset.json";
 import { useIsPortraitMode } from "@/hooks/useIsPortraitMode";
 import type { WorkoutData } from "@/hooks/useWorkoutData";
 import { Badge } from "@/components/ui/badge";
