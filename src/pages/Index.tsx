@@ -993,10 +993,10 @@ const Index = () => {
 
           {/* The SmartyGym Promise */}
           <Card className="dark-band border-2 border-primary/30 overflow-hidden relative rounded-2xl">
-            <span aria-hidden="true" className="ghost-headline ghost-headline-on-dark absolute -top-6 left-1/2 -translate-x-1/2 text-[100px] md:text-[180px] opacity-60 hidden md:block">
+            <span aria-hidden="true" className="ghost-headline ghost-headline-on-dark absolute top-4 left-1/2 -translate-x-1/2 text-[60px] md:text-[110px] leading-none opacity-40 hidden md:block pointer-events-none whitespace-nowrap">
               PROMISE
             </span>
-            <CardContent className="p-8 md:p-14 relative">
+            <CardContent className="p-8 md:p-14 md:pt-24 relative">
               <p className="text-xs md:text-sm font-bold tracking-[0.3em] text-primary uppercase mb-3 text-center">Our Commitment</p>
               <h3 className="text-3xl md:text-5xl font-black uppercase tracking-tight mb-8 text-center">The SmartyGym Promise</h3>
               <div className="max-w-3xl mx-auto space-y-4">
@@ -1189,7 +1189,7 @@ const Index = () => {
         {/* CTA Section */}
         <section className="mb-20">
           <Card className="dark-band border-2 border-primary/30 overflow-hidden relative rounded-2xl">
-            <span aria-hidden="true" className="ghost-headline ghost-headline-on-dark absolute -top-6 left-1/2 -translate-x-1/2 text-[100px] md:text-[180px] opacity-60 hidden md:block">
+            <span aria-hidden="true" className="ghost-headline ghost-headline-on-dark absolute top-4 left-1/2 -translate-x-1/2 text-[60px] md:text-[110px] leading-none opacity-40 hidden md:block pointer-events-none whitespace-nowrap">
               JOIN
             </span>
             <CardContent className="p-10 md:p-16 text-center space-y-6 relative">
