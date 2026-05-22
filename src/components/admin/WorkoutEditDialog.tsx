@@ -388,6 +388,32 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
       } else {
         // NEW WORKOUT: First increment the counter, then save to DB, then create Stripe product
         
+        // Duplicate-ID guard: if the auto-generated ID already exists,
+        // bump the serial number until we find a free slot (max 50 tries).
+        let candidateId = dataToSave.id;
+        let candidateSerial = formData.serial_number;
+        const prefix = getCategoryPrefix(formData.category);
+        let bumped = false;
+        for (let attempt = 0; attempt < 50; attempt++) {
+          const { data: existing } = await supabase
+            .from('admin_workouts')
+            .select('id')
+            .eq('id', candidateId)
+            .maybeSingle();
+          if (!existing) break;
+          candidateSerial += 1;
+          candidateId = `${prefix}-${candidateSerial.toString().padStart(3, '0')}`;
+          bumped = true;
+        }
+        if (bumped) {
+          toast({
+            title: "ID was taken",
+            description: `Auto-bumped to ${candidateId}`,
+          });
+          dataToSave.id = candidateId;
+          (dataToSave as any).serial_number = candidateSerial;
+        }
+
         // Step 1: Increment counter atomically BEFORE saving
         const { data: counterSettings, error: counterError } = await supabase
           .from('system_settings')
@@ -397,18 +423,20 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
         
         if (!counterError && counterSettings) {
           const counters = counterSettings.setting_value as { workouts?: Record<string, number>, programs?: Record<string, number> };
-          const currentSerial = counters.workouts?.[formData.category] || 1;
-          
-          // Increment for next use
+          // Advance the counter past whatever serial we actually used (handles bump above).
           counters.workouts = counters.workouts || {};
-          counters.workouts[formData.category] = currentSerial + 1;
+          const desiredNext = candidateSerial + 1;
+          counters.workouts[formData.category] = Math.max(
+            counters.workouts[formData.category] || 1,
+            desiredNext
+          );
           
           await supabase
             .from('system_settings')
             .update({ setting_value: counters, updated_at: new Date().toISOString() })
             .eq('setting_key', 'serial_number_counters');
           
-          console.log(`✅ Counter incremented: ${formData.category} now at ${currentSerial + 1}`);
+          console.log(`✅ Counter advanced: ${formData.category} now at ${counters.workouts[formData.category]}`);
         }
         
         // Step 2: Save to database FIRST (before Stripe)
@@ -420,7 +448,17 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
             stripe_price_id: null,
           }]);
 
-        if (insertError) throw insertError;
+        if (insertError) {
+          if ((insertError as any).code === '23505') {
+            toast({
+              variant: "destructive",
+              title: "Duplicate workout ID",
+              description: `A workout with ID ${dataToSave.id} already exists. Change the serial number and try again.`,
+            });
+            return;
+          }
+          throw insertError;
+        }
         
         // Step 3: Create Stripe product AFTER DB save succeeds
         let stripeProductId = null;
