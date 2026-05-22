@@ -1,0 +1,1 @@
+DELETE FROM public.admin_workouts WHERE id = 'WOD-S-E-1779438003529' AND is_visible = false AND COALESCE(is_workout_of_day, false) = false AND NOT EXISTS (SELECT 1 FROM public.user_purchases up WHERE up.content_id = 'WOD-S-E-1779438003529' AND up.content_type = 'workout');
