@@ -67,7 +67,7 @@ export const MobileBottomNav = () => {
           </Item>
 
           <Item onClick={() => window.location.reload()} label="Refresh">
-            <RotateCw className="h-7 w-7" strokeWidth={2.25} />
+            <RotateCw className="h-6 w-6" strokeWidth={2.25} />
           </Item>
 
           <Item onClick={goForward} disabled={!canGoForward} label="Forward">
