@@ -409,12 +409,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://smartygym.com/workout/micro-workouts/MW-009</loc>
-    <lastmod>2026-05-17</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://smartygym.com/workout/challenge/WOD-CH-B-1778308203806</loc>
     <lastmod>2026-05-10</lastmod>
     <changefreq>weekly</changefreq>
@@ -602,7 +596,7 @@
   </url>
   <url>
     <loc>https://smartygym.com/workout/micro-workouts/MW-004</loc>
-    <lastmod>2026-05-17</lastmod>
+    <lastmod>2026-05-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -1981,14 +1975,14 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://smartygym.com/workout/micro-workouts/MW-002</loc>
-    <lastmod>2026-05-17</lastmod>
+    <loc>https://smartygym.com/workout/strength/PREM-STR-low-push-and-upper-pull-E-int-1779073111070</loc>
+    <lastmod>2026-05-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://smartygym.com/workout/strength/PREM-STR-low-push-and-upper-pull-E-int-1779073111070</loc>
-    <lastmod>2026-05-18</lastmod>
+    <loc>https://smartygym.com/workout/micro-workouts/MW-002</loc>
+    <lastmod>2026-05-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -2041,12 +2035,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://smartygym.com/workout/micro-workouts/MW-007</loc>
-    <lastmod>2026-05-17</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://smartygym.com/workout/metabolic/WOD-M-E-1766181607636</loc>
     <lastmod>2026-04-30</lastmod>
     <changefreq>weekly</changefreq>
@@ -2055,6 +2043,12 @@
   <url>
     <loc>https://smartygym.com/workout/pilates/PIL-003</loc>
     <lastmod>2026-05-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://smartygym.com/workout/micro-workouts/MW-007</loc>
+    <lastmod>2026-05-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -2156,12 +2150,6 @@
   </url>
   <url>
     <loc>https://smartygym.com/workout/pilates/PIL-001</loc>
-    <lastmod>2026-05-19</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://smartygym.com/workout/micro-workouts/MW-003</loc>
     <lastmod>2026-05-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -2629,6 +2617,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://smartygym.com/workout/micro-workouts/MW-003</loc>
+    <lastmod>2026-05-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://smartygym.com/workout/mobility/FREE-beg-mobility-stability-E-1776661814230</loc>
     <lastmod>2026-05-08</lastmod>
     <changefreq>weekly</changefreq>
@@ -2643,6 +2637,12 @@
   <url>
     <loc>https://smartygym.com/workout/cardio/C-002</loc>
     <lastmod>2026-05-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://smartygym.com/workout/micro-workouts/MW-009</loc>
+    <lastmod>2026-05-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -2677,20 +2677,20 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://smartygym.com/workout/micro-workouts/MW-006</loc>
-    <lastmod>2026-05-17</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://smartygym.com/workout/cardio/WOD-CA-E-1774564202061</loc>
     <lastmod>2026-04-30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://smartygym.com/workout/micro-workouts/MW-006</loc>
+    <lastmod>2026-05-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://smartygym.com/workout/micro-workouts/MW-008</loc>
-    <lastmod>2026-05-17</lastmod>
+    <lastmod>2026-05-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -2822,7 +2822,7 @@
   </url>
   <url>
     <loc>https://smartygym.com/workout/micro-workouts/MW-001</loc>
-    <lastmod>2026-05-17</lastmod>
+    <lastmod>2026-05-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -2972,7 +2972,7 @@
   </url>
   <url>
     <loc>https://smartygym.com/workout/micro-workouts/MW-005</loc>
-    <lastmod>2026-05-19</lastmod>
+    <lastmod>2026-05-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -3121,12 +3121,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://smartygym.com/workout/micro-workouts/MW-010</loc>
-    <lastmod>2026-05-17</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://smartygym.com/workout/strength/WOD-S-B-1768084204024</loc>
     <lastmod>2026-05-08</lastmod>
     <changefreq>weekly</changefreq>
@@ -3141,6 +3135,12 @@
   <url>
     <loc>https://smartygym.com/workout/challenge/WOD-CH-B-1775514603787</loc>
     <lastmod>2026-04-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://smartygym.com/workout/micro-workouts/MW-010</loc>
+    <lastmod>2026-05-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
