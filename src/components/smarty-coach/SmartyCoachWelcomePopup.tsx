@@ -23,8 +23,17 @@ export const SmartyCoachWelcomePopup = () => {
   const location = useLocation();
   const [open, setOpen] = useState(false);
   const lastUserIdRef = useRef<string | null>(null);
+  const isBlockedRouteRef = useRef(false);
 
   const isBlockedRoute = BLOCKED_ROUTE_PREFIXES.some(p => location.pathname.startsWith(p));
+
+  // Keep latest blocked-route status available to async timers / auth listeners,
+  // and auto-close the welcome popup if the user navigates onto a blocked route
+  // (e.g. taps the avatar to go to /auth while the 1.5s timer is still pending).
+  useEffect(() => {
+    isBlockedRouteRef.current = isBlockedRoute;
+    if (isBlockedRoute && open) setOpen(false);
+  }, [isBlockedRoute, open]);
 
   const tryShow = useCallback(async (forUserId: string | null) => {
     try {
@@ -44,6 +53,9 @@ export const SmartyCoachWelcomePopup = () => {
     let cancelled = false;
     const timer = window.setTimeout(async () => {
       if (cancelled) return;
+      // Re-check at fire time: user may have navigated to /auth (or another
+      // blocked route) during the 1.5s delay. Don't cover the auth form.
+      if (isBlockedRouteRef.current) return;
       const { data } = await supabase.auth.getSession();
       const uid = data.session?.user?.id ?? null;
       void tryShow(uid);
@@ -62,7 +74,7 @@ export const SmartyCoachWelcomePopup = () => {
       const uid = session?.user?.id ?? null;
       if (event === 'SIGNED_IN' && uid && uid !== lastUserIdRef.current) {
         lastUserIdRef.current = uid;
-        if (!isBlockedRoute) void tryShow(uid);
+        if (!isBlockedRouteRef.current) void tryShow(uid);
       }
       if (event === 'SIGNED_OUT') {
         lastUserIdRef.current = null;
