@@ -992,16 +992,20 @@ const Index = () => {
           </div>
 
           {/* The SmartyGym Promise */}
-          <Card className="bg-gradient-to-r from-primary/5 to-accent/5 border-2 border-primary/20">
-            <CardContent className="p-6">
-              <h3 className="text-2xl font-bold mb-6 text-center">The SmartyGym Promise</h3>
+          <Card className="dark-band border-2 border-primary/30 overflow-hidden relative rounded-2xl">
+            <span aria-hidden="true" className="ghost-headline ghost-headline-on-dark absolute -top-6 left-1/2 -translate-x-1/2 text-[100px] md:text-[180px] opacity-60 hidden md:block">
+              PROMISE
+            </span>
+            <CardContent className="p-8 md:p-14 relative">
+              <p className="text-xs md:text-sm font-bold tracking-[0.3em] text-primary uppercase mb-3 text-center">Our Commitment</p>
+              <h3 className="text-3xl md:text-5xl font-black uppercase tracking-tight mb-8 text-center">The SmartyGym Promise</h3>
               <div className="max-w-3xl mx-auto space-y-4">
-              <p className="text-base leading-relaxed text-center">
+              <p className="text-base md:text-lg leading-relaxed text-center">
                 Every workout and training program at <span className="text-primary font-semibold">SmartyGym</span> is crafted with one goal: to help you reach YOUR fitness goals, 
                 whatever they may be. Whether you're building muscle, losing weight, improving endurance, or simply staying active, 
                 we provide the structure, guidance, and flexibility you need to succeed — on your terms, in your time, wherever you are.
               </p>
-                <p className="text-base font-semibold text-center text-primary">
+                <p className="text-base md:text-lg font-semibold text-center text-primary tracking-wide">
                   Real coaching. Real results. Anywhere you train.
                 </p>
               </div>
@@ -1010,8 +1014,16 @@ const Index = () => {
         </section>
 
         {/* Core Values Section */}
-        <section className="mb-16">
-          <h2 className="text-3xl font-bold text-center mb-8">What We Stand For</h2>
+        <section className="mb-20">
+          <div className="relative mb-10 md:mb-14">
+            <span aria-hidden="true" className="ghost-headline absolute -top-6 md:-top-10 left-0 right-0 text-center text-[80px] md:text-[160px] hidden sm:block">
+              VALUES
+            </span>
+            <div className="relative pt-6 md:pt-12 text-center">
+              <p className="text-xs md:text-sm font-bold tracking-[0.3em] text-primary uppercase mb-3">Our Principles</p>
+              <h2 className="text-3xl md:text-5xl font-black tracking-tight uppercase">What We Stand For</h2>
+            </div>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Card className="border-2 border-border text-center hover:shadow-lg transition-all hover:-translate-y-1">
               <CardHeader>
