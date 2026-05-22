@@ -1079,20 +1079,6 @@ body,
   overflow-x: hidden;
 }
 
-/* Disable browser/WebView pull-to-refresh globally (Android WebView wrappers, Chrome) */
-html,
-body {
-  overscroll-behavior-y: contain;
-  overscroll-behavior-x: contain;
-}
-
-/* When a modal/sheet is open, fully lock the page from native pull-to-refresh */
-body[data-scroll-locked],
-body.overflow-hidden {
-  overscroll-behavior: none !important;
-  touch-action: pan-y;
-}
-
 /* Global textarea behavior - prevent horizontal scrolling */
 textarea {
   white-space: pre-wrap;

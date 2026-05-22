@@ -296,7 +296,7 @@ export const Navigation = () => {
                     <Menu className="h-8 w-8 text-primary" strokeWidth={2} />
                   </button>
                 </SheetTrigger>
-                <SheetContent side="left" className="w-64 overflow-y-auto overscroll-contain max-h-screen">
+                <SheetContent side="left" className="w-64 overflow-y-auto max-h-screen">
                   <nav className="flex flex-col gap-2 mt-8 pb-8">
                     {discoveryItems.map(({ label, path, icon: Icon, iconClass, track }) => (
                       <Button
@@ -384,7 +384,7 @@ export const Navigation = () => {
                   <span className="sr-only">Discovery</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" hideClose className="left-4 top-6 bottom-6 h-auto w-[calc(100vw-2rem)] max-w-none overflow-y-auto overscroll-contain rounded-2xl border-2 border-primary/40 p-4 shadow-xl">
+              <SheetContent side="left" hideClose className="left-4 top-6 bottom-6 h-auto w-[calc(100vw-2rem)] max-w-none overflow-y-auto rounded-2xl border-2 border-primary/40 p-4 shadow-xl">
                 <SheetClose asChild>
                   <Button variant="ghost" className="mb-4 h-10 gap-2 rounded-full border-2 border-primary px-4 text-primary hover:bg-primary hover:text-primary-foreground">
                     <ArrowLeft className="h-4 w-4" />
