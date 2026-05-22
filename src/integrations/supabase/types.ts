@@ -3054,6 +3054,109 @@ export type Database = {
         }
         Relationships: []
       }
+      wod_tomorrow_preview: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          bodyweight_workout_id: string | null
+          category: string | null
+          created_at: string
+          date: string
+          difficulty: string | null
+          difficulty_stars_max: number | null
+          difficulty_stars_min: number | null
+          equipment_workout_id: string | null
+          is_recovery_day: boolean
+          notes: string | null
+          picked_at: string
+          picked_by: string
+          recovery_workout_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          bodyweight_workout_id?: string | null
+          category?: string | null
+          created_at?: string
+          date: string
+          difficulty?: string | null
+          difficulty_stars_max?: number | null
+          difficulty_stars_min?: number | null
+          equipment_workout_id?: string | null
+          is_recovery_day?: boolean
+          notes?: string | null
+          picked_at?: string
+          picked_by?: string
+          recovery_workout_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          bodyweight_workout_id?: string | null
+          category?: string | null
+          created_at?: string
+          date?: string
+          difficulty?: string | null
+          difficulty_stars_max?: number | null
+          difficulty_stars_min?: number | null
+          equipment_workout_id?: string | null
+          is_recovery_day?: boolean
+          notes?: string | null
+          picked_at?: string
+          picked_by?: string
+          recovery_workout_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wod_tomorrow_preview_bodyweight_workout_id_fkey"
+            columns: ["bodyweight_workout_id"]
+            isOneToOne: false
+            referencedRelation: "admin_workouts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wod_tomorrow_preview_bodyweight_workout_id_fkey"
+            columns: ["bodyweight_workout_id"]
+            isOneToOne: false
+            referencedRelation: "public_workout_metadata"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wod_tomorrow_preview_equipment_workout_id_fkey"
+            columns: ["equipment_workout_id"]
+            isOneToOne: false
+            referencedRelation: "admin_workouts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wod_tomorrow_preview_equipment_workout_id_fkey"
+            columns: ["equipment_workout_id"]
+            isOneToOne: false
+            referencedRelation: "public_workout_metadata"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wod_tomorrow_preview_recovery_workout_id_fkey"
+            columns: ["recovery_workout_id"]
+            isOneToOne: false
+            referencedRelation: "admin_workouts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wod_tomorrow_preview_recovery_workout_id_fkey"
+            columns: ["recovery_workout_id"]
+            isOneToOne: false
+            referencedRelation: "public_workout_metadata"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workout_comments: {
         Row: {
           comment_text: string
