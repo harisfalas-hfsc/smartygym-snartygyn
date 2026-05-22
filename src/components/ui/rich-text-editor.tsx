@@ -277,7 +277,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     const incoming = value || '';
     const current = editor.getHTML();
     if (incoming !== current) {
-      editor.commands.setContent(incoming, false);
+      editor.commands.setContent(incoming, { emitUpdate: false });
     }
   }, [value, editor]);
 
