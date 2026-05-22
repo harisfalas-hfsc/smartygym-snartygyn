@@ -45,7 +45,19 @@ serve(async (req) => {
     const categoryUpper = category?.toUpperCase() || "";
     let visualDirection: string;
     
-    if (categoryUpper === "PILATES") {
+    if (categoryUpper === "MICRO-WORKOUTS" || categoryUpper === "MICRO") {
+      visualDirection = `
+- Show a real-life "exercise snack" scene that captures "${name}" — a 5-minute workout someone does WITHOUT going to a gym
+- Setting MUST be everyday-life, not a gym: home living room, bedroom, hallway, kitchen, home office / desk area, indoor stairwell, outdoor stairs, against a wall, on a chair or sofa, sidewalk, park bench, hotel room, balcony
+- Subject wears CASUAL everyday clothing (jeans, t-shirt, hoodie, sweatpants, office wear) — NOT professional gym attire
+- Exercise must use ONLY the body, plus AT MOST one of: a regular chair, a wall, stairs, a sofa, a desk, a resistance band, a foam roller, a medicine ball, a Swiss / fit ball
+- Good moves to depict: chair tricep dips, wall sit, stair step-ups, sofa Bulgarian split squat, desk incline push-up, standing calf raise on a step, wall push-up, bodyweight squat in the living room, seated leg raises, banded rows in a hallway
+- Mood: quick, accessible, realistic, "I can do this right now in 5 minutes" — NOT dramatic sports photography
+- Soft, natural indoor light or candid outdoor light; warm everyday colors
+- BANNED settings: commercial gyms, CrossFit boxes, weight rooms, performance studios
+- BANNED equipment: barbells, dumbbells, kettlebells, weight plates, cable machines, squat racks, weight benches, treadmills, ellipticals, rowing machines, battle ropes
+- BANNED poses: mid-air "flying" jumps with no ground reference, athletes posing like fitness models, gym-magazine cover energy`;
+    } else if (categoryUpper === "PILATES") {
       visualDirection = `
 - Show a ${difficultyLabel}-level Pilates scene that captures the essence of "${name}"
 - Pilates-specific imagery: controlled stretching, flexibility exercises, graceful movements

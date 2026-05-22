@@ -1,54 +1,69 @@
-## Goal
+## Problem
 
-Restyle the homepage to feel like **smarttgym.co.uk** — bold uppercase display typography, dark cinematic sections, a signature "ghost outline" word sitting behind a solid section heading, generous vertical rhythm, alternating image/text rows — **without changing the content, the order, or removing/adding any sections**.
+The 10 micro-workout covers (`MICRO-WORKOUTS` category) are generic gym shots — flying jumps, gym push-ups — that contradict the category's description: *"No time for a run or a trip to the gym? Exercise snacks are the answers. All you need is some stairs, a chair, a wall, or just your body."*
 
-Same sections, same copy, new clothes.
+Root cause: none of the three image generators (`auto-generate-workout-image`, `regenerate-workout-image`, `generate-workout-image`) has a branch for `MICRO-WORKOUTS`. They fall through to the generic "gym/outdoor/home" prompt, so the AI defaults to gym scenes.
 
-## Scope (do not change)
+Stripe products are linked 1:1 to each micro-workout (all 10 have `stripe_product_id`), and the existing sync pushes `images[0]` on update — but we need to verify each product actually shows the new image after the run, not assume.
 
-- The hero video block ("Your gym, reimagined…")
-- "Who is SmartyGym for"
-- 4-card row: Built for Real Life · Scientific Approach · Accessible to All · Safe & Effective
-- "The SmartyGym Promise" block
-- "What We Stand For" 4-card row
-- "Message from Haris Falas"
-- Final CTA
+## Fix
 
-All copy, images, links, and buttons remain identical. Only visual treatment changes.
+### 1. Add a MICRO-WORKOUTS branch to all three image generators
 
-Hard constraints from project memory:
-- **Brand colors stay**: electric blue `#29B6D2` primary + existing gold border. No yellow/gold accent replacement. The *style language* of smarttgym.co.uk is adopted, not its palette.
-- Light theme remains the default. Dark sections are local to the page (full-bleed dark bands), not a global theme switch.
-- Authority links, footer, navigation: untouched.
+Files:
+- `supabase/functions/auto-generate-workout-image/index.ts`
+- `supabase/functions/regenerate-workout-image/index.ts`
+- `supabase/functions/generate-workout-image/index.ts`
 
-## Visual language (borrowed from smarttgym.co.uk)
+New `isMicro` branch (placed BEFORE the generic else), with strict allowed/banned imagery:
 
-1. **Section header pattern**: a huge outlined ghost word (e.g. `WHO WE ARE`, `OUR VALUES`, `THE PROMISE`, `FROM THE COACH`) sitting behind the real H2, slightly offset, ~120–160px, transparent fill with 1px primary-tinted stroke. Pure CSS — `-webkit-text-stroke` + `color: transparent`. Decorative only (`aria-hidden`); the real semantic H2 stays in DOM.
-2. **Display typography**: H2/H3 promoted to uppercase, tight tracking, heavy weight. Use existing Tailwind tokens (`text-4xl md:text-6xl font-black tracking-tight uppercase`). No new font files.
-3. **Full-bleed dark bands**: alternate sections between default surface and a `bg-foreground text-background` (or `bg-[hsl(var(--background-inverse))]` if defined; otherwise inline `bg-neutral-950 text-neutral-50` via semantic token) band. Edge-to-edge backgrounds, inner content stays inside the standard desktop container width.
-4. **Zig-zag image/text rows** for narrative sections: "Who is SmartyGym for" and "Message from Haris Falas" become two-column split (image left/right alternating) on `lg:`, stacked on mobile.
-5. **Card refresh** (4-card rows): keep current card content + images, but switch to flat dark cards with thin primary-tinted hairline border, large numeral `01–04` in the top-left, icon top-right, uppercase title, generous padding. Hover: lift + primary glow shadow.
-6. **Pill CTAs**: existing buttons restyled to fully-rounded pill outline-on-dark / solid-on-light, with chevron arrow, matching reference.
-7. **Vertical rhythm**: bump section vertical padding to `py-20 md:py-28`, mirroring the airy spacing of the reference.
+```text
+- Show a real-life "exercise snack" scene — someone training in 5 minutes WITHOUT a gym
+- Setting MUST be one of: home living room, bedroom, hallway, kitchen, office/desk area,
+  outdoor stairs, indoor stairwell, against a wall, on a chair/sofa, sidewalk, park bench,
+  hotel room, street corner. Casual everyday clothing (not gym attire).
+- Exercise MUST use only the body + at most one of: chair, wall, stairs, sofa, desk,
+  resistance band, foam roller, medicine ball, Swiss/fit ball
+- Example moves to show: chair tricep dips, wall sits, stair step-ups, sofa Bulgarian
+  split squats, desk incline push-ups, standing calf raises on a stair, wall push-ups,
+  bodyweight squats in the living room
+- Mood: quick, accessible, real, "I can do this right now"
+- BANNED: gym interiors, barbells, dumbbells, kettlebells, weight plates, cable machines,
+  squat racks, benches, treadmills, mid-air "flying" jumps, athletes in professional gym
+  attire, dramatic sports photography energy
+```
 
-## Files to touch
+The existing PHYSICAL REALITY / BANNED POSES block stays in place.
 
-- `src/pages/Index.tsx` — desktop branch only (lines ~723–1194). The mobile branch (lines 487–721) stays as-is since the reference is desktop-heavy and mobile is already curated.
-- `src/index.css` — add 3 small utility classes only if needed: `.ghost-headline`, `.dark-band`, `.section-eyebrow`. No token changes.
+### 2. Regenerate all 10 existing micro-workout covers
 
-No new components are created; the markup is restructured inline because each section has unique content. No router, no data, no backend changes.
+Loop the 10 `MICRO-WORKOUTS` rows and call `regenerate-workout-image` for each. The function already:
+- saves the new file to `avatars/workout-covers/`,
+- updates `admin_workouts.image_url`,
+- POSTs `images[0]` to the linked Stripe product.
 
-## Out of scope
+### 3. Verify Stripe sync — actually verify, not assume
 
-- The hero video card itself (already strong, keep as-is).
-- The mobile branch of `Index.tsx`.
-- Navigation, footer, announcements, popups.
-- Any other page.
+After each regeneration:
+1. Read `admin_workouts.image_url` back from the DB.
+2. Call Stripe `GET /v1/products/{id}` for that workout's `stripe_product_id`.
+3. Assert `product.images[0] === image_url`.
+4. Build a results table (workout id, name, db image, stripe image, match Y/N).
 
-## Verification
+If any row mismatches, retry the Stripe update once, then re-verify. Only report "done" once all 10 rows are `match=Y`.
 
-1. `/` at 1440×900: every section in original order; new ghost headlines visible behind each H2; alternating dark/light bands; zig-zag rows render correctly; brand blue + gold accents preserved (no yellow drift).
-2. `/` at 1024×768: layout collapses cleanly, ghost headlines scale down, no overflow.
-3. `/` at 390×844: **unchanged** — mobile branch still renders the existing curated layout.
-4. All buttons still navigate to the same routes.
-5. Lighthouse/console: no new errors, no layout shift.
+### 4. Persist the rule
+
+Add a project memory `mem://content-creation/micro-workout-image-standard` capturing:
+- Allowed settings + props (chair/wall/stairs/sofa/desk + optional band/foam roller/medicine ball/Swiss ball)
+- Banned: gyms, barbells/dumbbells/kettlebells/machines, flying poses
+- Every micro-workout cover MUST be regenerated through these generators and re-synced to Stripe; no manual gym stock photos.
+
+Add the rule reference to the index Core list so future micro-workout image jobs respect it.
+
+## Technical notes
+
+- All three generators share the same prompt skeleton; the new `isMicro` branch is a copy-paste pattern matching the existing `isPilates` / `isRecovery` branches.
+- Stripe verification uses the `STRIPE_SECRET_KEY` secret already present.
+- No schema changes, no migrations, no UI changes — backend prompt + one-time regenerate + verification only.
+- Existing `enforce_micro_workout_rules` DB trigger already normalizes category metadata; we are only changing imagery, not touching that trigger.
