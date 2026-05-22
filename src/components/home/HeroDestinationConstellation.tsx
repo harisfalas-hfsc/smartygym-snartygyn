@@ -210,59 +210,35 @@ const RotatingLinkBanner = () => {
   );
 };
 
+const HERO_ROTATING_IMAGES: { url: string; alt: string }[] = [
+  {
+    url: "https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/avatars/workout-covers/workout-1779073118535-9mhdvb.jpg",
+    alt: "Helix Cascade workout",
+  },
+  {
+    url: "https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/avatars/workout-covers/workout-1777869241282-flncqe.png",
+    alt: "Compass Blitz workout",
+  },
+  {
+    url: "https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/avatars/workout-covers/workout-1779011505148-69g6w7.jpg",
+    alt: "Metabolic Mesh workout",
+  },
+  {
+    url: "https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/avatars/workout-covers/workout-1776661824882-0hiig.png",
+    alt: "Anchor Point Flow workout",
+  },
+];
+
 const DesktopVideoHero = ({ width, height }: { width: number; height: number }) => {
-  // Bright, cohesive scene rotation: gym → home → park (~15s total cycle, ~5s per scene)
-  const VIDEOS = [heroBannerVideoGym.url, heroBannerVideoLivingroom.url, heroBannerVideoPark.url];
-  const videoARef = useRef<HTMLVideoElement | null>(null);
-  const videoBRef = useRef<HTMLVideoElement | null>(null);
-  const [activeLayer, setActiveLayer] = useState<"A" | "B">("A");
-  const [srcA, setSrcA] = useState(VIDEOS[0]);
-  const [srcB, setSrcB] = useState(VIDEOS[1]);
-  const indexRef = useRef(0);
-  const transitioningRef = useRef(false);
+  // Rotate workout cover images every 2.5s with a soft crossfade.
+  const [index, setIndex] = useState(0);
 
-  // Crossfade when the current video is near its end
-  const handleTimeUpdate = (which: "A" | "B") => () => {
-    if (transitioningRef.current) return;
-    if (which !== activeLayer) return;
-    const v = which === "A" ? videoARef.current : videoBRef.current;
-    if (!v || !v.duration || isNaN(v.duration)) return;
-    const remaining = v.duration - v.currentTime;
-    if (remaining > 0.6) return;
-
-    transitioningRef.current = true;
-    const nextIndex = (indexRef.current + 1) % VIDEOS.length;
-    const afterNextIndex = (nextIndex + 1) % VIDEOS.length;
-    const nextSrc = VIDEOS[nextIndex];
-    const afterNextSrc = VIDEOS[afterNextIndex];
-
-    if (which === "A") {
-      // B should already hold nextSrc and be ready
-      const bv = videoBRef.current;
-      if (bv) {
-        bv.currentTime = 0;
-        bv.play().catch(() => {});
-      }
-      setActiveLayer("B");
-      // Preload the following video into A
-      window.setTimeout(() => {
-        setSrcA(afterNextSrc);
-        transitioningRef.current = false;
-      }, 800);
-    } else {
-      const av = videoARef.current;
-      if (av) {
-        av.currentTime = 0;
-        av.play().catch(() => {});
-      }
-      setActiveLayer("A");
-      window.setTimeout(() => {
-        setSrcB(afterNextSrc);
-        transitioningRef.current = false;
-      }, 800);
-    }
-    indexRef.current = nextIndex;
-  };
+  useEffect(() => {
+    const t = window.setInterval(() => {
+      setIndex((i) => (i + 1) % HERO_ROTATING_IMAGES.length);
+    }, 2500);
+    return () => window.clearInterval(t);
+  }, []);
 
   return (
     <div className="mx-auto" style={{ width: `${width}px`, maxWidth: "100%" }}>
@@ -270,33 +246,23 @@ const DesktopVideoHero = ({ width, height }: { width: number; height: number }) 
         className="relative rounded-2xl overflow-hidden ring-1 ring-border/60 shadow-2xl shadow-primary/15"
         style={{ height: `${height}px` }}
       >
-        <video
-          ref={videoARef}
-          src={srcA}
-          autoPlay
-          muted
-          playsInline
-          preload="auto"
-          onTimeUpdate={handleTimeUpdate("A")}
-          className={cn(
-            "absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out",
-            activeLayer === "A" ? "opacity-100" : "opacity-0"
-          )}
-          style={{ filter: "brightness(1.18) saturate(1.08) contrast(1.02)" }}
-        />
-        <video
-          ref={videoBRef}
-          src={srcB}
-          muted
-          playsInline
-          preload="auto"
-          onTimeUpdate={handleTimeUpdate("B")}
-          className={cn(
-            "absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out",
-            activeLayer === "B" ? "opacity-100" : "opacity-0"
-          )}
-          style={{ filter: "brightness(1.18) saturate(1.08) contrast(1.02)" }}
-        />
+        {HERO_ROTATING_IMAGES.map((img, i) => (
+          <img
+            key={img.url}
+            src={img.url}
+            alt={img.alt}
+            width={Math.round(width)}
+            height={Math.round(height)}
+            loading={i === 0 ? "eager" : "lazy"}
+            fetchPriority={i === 0 ? "high" : "auto"}
+            decoding="async"
+            className={cn(
+              "absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out",
+              index === i ? "opacity-100" : "opacity-0"
+            )}
+            style={{ filter: "brightness(1.1) saturate(1.05) contrast(1.02)" }}
+          />
+        ))}
         {/* Readability gradient — lighter so video stays vivid in light mode */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/10 to-transparent" aria-hidden="true" />
         <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/50 to-transparent" aria-hidden="true" />
