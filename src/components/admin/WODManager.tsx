@@ -23,6 +23,7 @@ import { format, addDays } from "date-fns";
 import { WODSchedulePreview } from "./WODSchedulePreview";
 import { PeriodizationSystemDialog } from "./PeriodizationSystemDialog";
 import { WorkoutEditDialog } from "./WorkoutEditDialog";
+import { TomorrowWODPreviewDialog } from "./TomorrowWODPreviewDialog";
 import { getWODInfoForDate, getDayIn84Cycle } from "@/lib/wodCycle";
 import { getCyprusTodayStr } from "@/lib/cyprusDate";
 
@@ -42,6 +43,7 @@ export const WODManager = () => {
   const [isCheckingFuture, setIsCheckingFuture] = useState(false);
   const [isRunningWatchdog, setIsRunningWatchdog] = useState(false);
   const [periodizationDialogOpen, setPeriodizationDialogOpen] = useState(false);
+  const [tomorrowPreviewOpen, setTomorrowPreviewOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingWorkout, setEditingWorkout] = useState<any>(null);
   const queryClient = useQueryClient();
