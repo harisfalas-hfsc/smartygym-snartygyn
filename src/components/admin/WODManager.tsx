@@ -23,6 +23,7 @@ import { format, addDays } from "date-fns";
 import { WODSchedulePreview } from "./WODSchedulePreview";
 import { PeriodizationSystemDialog } from "./PeriodizationSystemDialog";
 import { WorkoutEditDialog } from "./WorkoutEditDialog";
+import { TomorrowWODPreviewDialog } from "./TomorrowWODPreviewDialog";
 import { getWODInfoForDate, getDayIn84Cycle } from "@/lib/wodCycle";
 import { getCyprusTodayStr } from "@/lib/cyprusDate";
 
@@ -42,6 +43,7 @@ export const WODManager = () => {
   const [isCheckingFuture, setIsCheckingFuture] = useState(false);
   const [isRunningWatchdog, setIsRunningWatchdog] = useState(false);
   const [periodizationDialogOpen, setPeriodizationDialogOpen] = useState(false);
+  const [tomorrowPreviewOpen, setTomorrowPreviewOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingWorkout, setEditingWorkout] = useState<any>(null);
   const queryClient = useQueryClient();
@@ -283,6 +285,18 @@ export const WODManager = () => {
             <span className="hidden sm:inline">View Periodization</span>
             <span className="sm:hidden">Period.</span>
           </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-1 sm:gap-2 border-amber-500 text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3"
+            onClick={() => setTomorrowPreviewOpen(true)}
+            title="Review, edit, swap, or approve the workouts pre-picked for tomorrow"
+          >
+            <Calendar className="h-4 w-4 text-amber-500" />
+            <span className="hidden sm:inline">Tomorrow's WOD Preview</span>
+            <span className="sm:hidden">Preview</span>
+          </Button>
         </div>
       </div>
 
@@ -464,6 +478,11 @@ export const WODManager = () => {
           setEditDialogOpen(false);
           setEditingWorkout(null);
         }}
+      />
+
+      <TomorrowWODPreviewDialog
+        open={tomorrowPreviewOpen}
+        onOpenChange={setTomorrowPreviewOpen}
       />
     </div>
   );
