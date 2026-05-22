@@ -1,9 +1,6 @@
-import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Home } from "lucide-react";
+import { useLocation } from "react-router-dom";
+import { ChevronLeft, ChevronRight, RotateCw } from "lucide-react";
 import { useNavigationHistory } from "@/contexts/NavigationHistoryContext";
-import { SmartyCoachModal } from "@/components/smarty-coach";
-import smartyCoachIcon from "@/assets/smarty-coach-icon.png";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -11,19 +8,14 @@ const HIDDEN_PATHS = ["/auth", "/reset-password", "/payment-success", "/payment-
 
 /**
  * Persistent native-style bottom navigation bar — mobile only (< 768px).
- * Layout: Back · Smarty Coach · Home · Forward.
- * Forward mirrors browser/native swipe-forward via NavigationHistoryContext's forwardStack.
+ * Layout: Back · Refresh · Forward.
  */
 export const MobileBottomNav = () => {
   const location = useLocation();
-  const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { goBack, canGoBack, goForward, canGoForward } = useNavigationHistory();
-  const [coachOpen, setCoachOpen] = useState(false);
 
   if (!isMobile || HIDDEN_PATHS.includes(location.pathname)) return null;
-
-  const isHome = location.pathname === "/" || location.pathname === "/home";
 
   const Item = ({
     onClick,
@@ -59,8 +51,7 @@ export const MobileBottomNav = () => {
   );
 
   return (
-    <>
-      <nav
+    <nav
         className={cn(
           "fixed bottom-0 left-0 right-0 z-50",
           "bg-background/95 backdrop-blur-md",
@@ -75,26 +66,14 @@ export const MobileBottomNav = () => {
             <ChevronLeft className="h-7 w-7" strokeWidth={2.25} />
           </Item>
 
-          <Item onClick={() => setCoachOpen(true)} label="Smarty Coach">
-            <img
-              src={smartyCoachIcon}
-              alt=""
-              className="h-9 w-9 rounded-full drop-shadow"
-              loading="lazy"
-            />
-          </Item>
-
-          <Item onClick={() => navigate("/")} label="Home" active={isHome}>
-            <Home className="h-7 w-7" strokeWidth={2.25} />
+          <Item onClick={() => window.location.reload()} label="Refresh">
+            <RotateCw className="h-7 w-7" strokeWidth={2.25} />
           </Item>
 
           <Item onClick={goForward} disabled={!canGoForward} label="Forward">
             <ChevronRight className="h-7 w-7" strokeWidth={2.25} />
           </Item>
         </div>
-      </nav>
-
-      <SmartyCoachModal isOpen={coachOpen} onClose={() => setCoachOpen(false)} />
-    </>
+    </nav>
   );
 };
