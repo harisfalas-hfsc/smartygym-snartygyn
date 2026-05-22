@@ -218,7 +218,7 @@ async function rollbackActiveWodsForDate(
 
   let fetchQuery = supabase
     .from("admin_workouts")
-    .select("id, name, equipment")
+    .select("id, name, equipment, stripe_product_id")
     .eq("generated_for_date", effectiveDate)
     .eq("is_workout_of_day", true);
   if (slot) fetchQuery = fetchQuery.eq("equipment", slot);
@@ -234,25 +234,28 @@ async function rollbackActiveWodsForDate(
     return;
   }
 
-  let updateQuery = supabase
+  const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+  if (stripeKey) {
+    const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
+    for (const wod of activeWods) {
+      await archiveStripeProductSafely(stripe, wod.stripe_product_id || null, `partial_wod_rollback:${reason}`);
+    }
+  }
+
+  let deleteQuery = supabase
     .from("admin_workouts")
-    .update({
-      is_workout_of_day: false,
-      generated_for_date: null,
-      is_visible: false,
-      updated_at: new Date().toISOString(),
-    })
+    .delete()
     .eq("generated_for_date", effectiveDate)
     .eq("is_workout_of_day", true);
-  if (slot) updateQuery = updateQuery.eq("equipment", slot);
-  const { error: rollbackError } = await updateQuery;
+  if (slot) deleteQuery = deleteQuery.eq("equipment", slot);
+  const { error: rollbackError } = await deleteQuery;
 
   if (rollbackError) {
-    logStep("ROLLBACK: Failed to clear partial WOD publish", { effectiveDate, error: rollbackError.message });
+    logStep("ROLLBACK: Failed to delete partial WOD publish", { effectiveDate, error: rollbackError.message });
     return;
   }
 
-  logStep("ROLLBACK: Cleared partial WOD publish", {
+  logStep("ROLLBACK: Deleted partial WOD publish and archived Stripe products", {
     effectiveDate,
     cleared: activeWods.map((w: any) => ({ id: w.id, name: w.name, equipment: w.equipment })),
   });
