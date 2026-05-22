@@ -706,7 +706,9 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredWorkouts.map((workout) => (
+                filteredWorkouts.map((workout) => {
+                  const failedHiddenWod = isFailedHiddenWod(workout);
+                  return (
                   <TableRow key={workout.id} className={!workout.is_visible ? 'opacity-50' : ''}>
                     <TableCell>
                       <Checkbox
@@ -767,7 +769,8 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
                           size="icon"
                           className="h-7 w-7 sm:h-8 sm:w-8"
                           onClick={() => window.open(`/workout/${workout.category.toLowerCase().replace(/\s+/g, '-')}/${workout.id}`, '_blank')}
-                          title="Preview"
+                          title={failedHiddenWod ? "Hidden failed WODs do not have a public preview" : "Preview"}
+                          disabled={failedHiddenWod}
                         >
                           <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
                         </Button>
@@ -804,14 +807,15 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
                           size="icon"
                           className="h-7 w-7 sm:h-8 sm:w-8"
                           onClick={() => handleDelete(workout.id)}
-                          title="Delete"
+                          title={failedHiddenWod ? "Delete failed WOD" : "Delete"}
                         >
                           <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                         </Button>
                       </div>
                     </TableCell>
                   </TableRow>
-                ))
+                  );
+                })
               )}
             </TableBody>
           </Table>
