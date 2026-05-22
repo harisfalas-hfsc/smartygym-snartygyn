@@ -269,6 +269,18 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     };
   }, [editor]);
 
+  // Sync external value changes into the editor (e.g. "Insert standard structure"
+  // button, template prefills, programmatic resets). Tiptap only reads `content`
+  // on init, so without this the editor stays static while formData updates.
+  useEffect(() => {
+    if (!editor) return;
+    const incoming = value || '';
+    const current = editor.getHTML();
+    if (incoming !== current) {
+      editor.commands.setContent(incoming, false);
+    }
+  }, [value, editor]);
+
   if (!editor) {
     return null;
   }
