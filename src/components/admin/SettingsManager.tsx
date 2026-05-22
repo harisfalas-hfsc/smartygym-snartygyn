@@ -43,10 +43,7 @@ export const SettingsManager = () => {
   const [cleanupResult, setCleanupResult] = useState<{ updated: number; message: string } | null>(null);
 
   // Admin Tools Loading States
-  const [syncImagesLoading, setSyncImagesLoading] = useState(false);
-  const [syncImagesResult, setSyncImagesResult] = useState<string | null>(null);
-  const [regenerateWodLoading, setRegenerateWodLoading] = useState(false);
-  const [regenerateWodResult, setRegenerateWodResult] = useState<string | null>(null);
+  // [REMOVED] syncImages / regenerateWod state — WOD generation deleted; library mode only.
   const [refreshSeoLoading, setRefreshSeoLoading] = useState(false);
   const [refreshSeoResult, setRefreshSeoResult] = useState<string | null>(null);
   const [generateImagesLoading, setGenerateImagesLoading] = useState(false);
@@ -277,64 +274,7 @@ export const SettingsManager = () => {
     }
   };
 
-  const handleSyncStripeImages = async () => {
-    if (!confirm("This will sync all workout/program images to their Stripe products. Continue?")) {
-      return;
-    }
-    
-    setSyncImagesLoading(true);
-    setSyncImagesResult(null);
-    try {
-      const { data, error } = await supabase.functions.invoke('sync-stripe-images');
-      
-      if (error) throw error;
-
-      setSyncImagesResult(`Synced ${data.synced || 0} images to Stripe`);
-      toast({
-        title: "Sync Complete",
-        description: `Successfully synced ${data.synced || 0} images to Stripe products.`,
-      });
-    } catch (error: any) {
-      toast({
-        title: "Sync Failed",
-        description: error.message || "Failed to sync images to Stripe.",
-        variant: "destructive",
-      });
-    } finally {
-      setSyncImagesLoading(false);
-    }
-  };
-
-  const handleRegenerateWod = async () => {
-    if (!confirm("This will regenerate today's Workout of the Day. Continue?")) {
-      return;
-    }
-    
-    setRegenerateWodLoading(true);
-    setRegenerateWodResult(null);
-    try {
-      // Archive existing WODs first (never delete - preserves Stripe products & purchase records)
-      await supabase.functions.invoke('archive-old-wods', {});
-      
-      const { data, error } = await supabase.functions.invoke('generate-workout-of-day');
-      
-      if (error) throw error;
-
-      setRegenerateWodResult(`Generated: ${data.workout?.name || 'New WOD'}`);
-      toast({
-        title: "WOD Generated",
-        description: `Successfully generated: ${data.workout?.name || 'New Workout of the Day'}`,
-      });
-    } catch (error: any) {
-      toast({
-        title: "Generation Failed",
-        description: error.message || "Failed to generate WOD.",
-        variant: "destructive",
-      });
-    } finally {
-      setRegenerateWodLoading(false);
-    }
-  };
+  // [REMOVED] handleSyncStripeImages + handleRegenerateWod — WOD generation deleted (library mode only).
 
   const handleRefreshSeo = async () => {
     if (!confirm("This will refresh SEO metadata for all content. This may take a while. Continue?")) {
@@ -816,29 +756,6 @@ export const SettingsManager = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {/* Sync Stripe Images */}
-                  <div className="p-4 border rounded-lg space-y-3">
-                    <div className="flex items-center gap-2">
-                      <Image className="h-5 w-5 text-blue-500" />
-                      <h4 className="font-medium text-sm">Sync Stripe Images</h4>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      Sync workout images to their Stripe products
-                    </p>
-                    <Button 
-                      onClick={handleSyncStripeImages} 
-                      disabled={syncImagesLoading}
-                      variant="outline"
-                      size="sm"
-                      className="w-full"
-                    >
-                      {syncImagesLoading ? "Syncing..." : "Sync Images"}
-                    </Button>
-                    {syncImagesResult && (
-                      <p className="text-xs text-green-600">✅ {syncImagesResult}</p>
-                    )}
-                  </div>
-
                   {/* Audit Stripe Images */}
                   <div className="p-4 border rounded-lg space-y-3">
                     <div className="flex items-center gap-2">
@@ -859,29 +776,6 @@ export const SettingsManager = () => {
                     </Button>
                     {auditStripeImagesResult && (
                       <p className="text-xs text-green-600">✅ {auditStripeImagesResult}</p>
-                    )}
-                  </div>
-
-                  {/* Regenerate WOD */}
-                  <div className="p-4 border rounded-lg space-y-3">
-                    <div className="flex items-center gap-2">
-                      <RefreshCw className="h-5 w-5 text-orange-500" />
-                      <h4 className="font-medium text-sm">Regenerate WOD</h4>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      Manually trigger today's Workout of the Day
-                    </p>
-                    <Button 
-                      onClick={handleRegenerateWod} 
-                      disabled={regenerateWodLoading}
-                      variant="outline"
-                      size="sm"
-                      className="w-full"
-                    >
-                      {regenerateWodLoading ? "Generating..." : "Regenerate WOD"}
-                    </Button>
-                    {regenerateWodResult && (
-                      <p className="text-xs text-green-600">✅ {regenerateWodResult}</p>
                     )}
                   </div>
 
