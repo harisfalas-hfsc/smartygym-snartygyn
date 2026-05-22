@@ -1,53 +1,39 @@
-# Plan: Generate 12 Premium Workouts (Beginner + Advanced full matrix)
+Approving this plan switches me to build mode so I can ship the code (I can't edit project files from plan mode). Scope is locked — no more questions.
 
-Same orchestration as the previous intermediate batch via `generate-category-difficulty-batch`: library-first exercise selection, 5-section structure, AI image, Stripe product + EUR €3.99 one-time price with SMARTYGYM metadata, banned-name uniqueness, density + protocol validation.
+## What gets built
 
-## Matrix (3 × 2 × 2 = 12 workouts)
+### 1. New table `wod_tomorrow_preview` (migration ✅ already applied)
+One row per future date, admin-only RLS:
+- `bodyweight_workout_id`, `equipment_workout_id`, `recovery_workout_id`
+- `is_recovery_day`, `category`, `difficulty`, `difficulty_stars_min/max`
+- `status` (`pending` / `approved` / `rejected`), `picked_by`, `approved_by`, `approved_at`, `notes`
 
-| # | Category         | Equipment  | Difficulty | Stars | Format  | Duration |
-|---|------------------|------------|------------|-------|---------|----------|
-| 1 | CALORIE BURNING  | BODYWEIGHT | Beginner   | 2★    | AMRAP   | 30 min   |
-| 2 | CALORIE BURNING  | EQUIPMENT  | Beginner   | 2★    | AMRAP   | 30 min   |
-| 3 | METABOLIC        | BODYWEIGHT | Beginner   | 2★    | CIRCUIT | 30 min   |
-| 4 | METABOLIC        | EQUIPMENT  | Beginner   | 2★    | CIRCUIT | 30 min   |
-| 5 | CARDIO           | BODYWEIGHT | Beginner   | 2★    | EMOM    | 30 min   |
-| 6 | CARDIO           | EQUIPMENT  | Beginner   | 2★    | EMOM    | 30 min   |
-| 7 | CALORIE BURNING  | BODYWEIGHT | Advanced   | 5★    | AMRAP   | 30 min   |
-| 8 | CALORIE BURNING  | EQUIPMENT  | Advanced   | 6★    | AMRAP   | 30 min   |
-| 9 | METABOLIC        | BODYWEIGHT | Advanced   | 5★    | CIRCUIT | 30 min   |
-| 10| METABOLIC        | EQUIPMENT  | Advanced   | 6★    | CIRCUIT | 30 min   |
-| 11| CARDIO           | BODYWEIGHT | Advanced   | 5★    | EMOM    | 30 min   |
-| 12| CARDIO           | EQUIPMENT  | Advanced   | 6★    | EMOM    | 30 min   |
+### 2. New cron job (metadata row ✅ already inserted)
+`preview-tomorrow-wod-evening` — `0 16 * * *` (18:00 Europe/Athens), category `wod`.
+Already shows up in the existing **Cron Jobs admin panel** with the same Edit / Test / History parity as every other job. A `cron.schedule(...)` insert via the platform's secret-aware insert tool wires up the actual pg_cron entry.
 
-Mirrors the intermediate batch (3★ BW / 4★ EQ) → Beginner uses 2★ both, Advanced uses 5★ BW / 6★ EQ.
+### 3. New edge function `preview-tomorrow-wod`
+Single endpoint, action-routed:
+- `preview` (default, called by the 6 PM cron) — picks tomorrow's BW + EQ from the library using the same 84-day periodization and exhaustion-first rotation as `select-wod-from-library`, **without publishing**. Upserts into `wod_tomorrow_preview`.
+- `repick` — re-runs picker for that date, marks `picked_by='admin'`.
+- `set { slot, workoutId }` — admin swap.
+- `approve` — promotes the preview to active WOD: ensures Stripe product/price, sets `is_workout_of_day=true, generated_for_date=date`, runs the existing `validateWodPublishContract` quality gate, inserts cooldown rows. The morning 06:30/06:50 UTC picker safely no-ops because it already skips when WODs exist for the date.
+- `reject` — deletes the preview row so the morning job re-picks fresh.
+- `list` — returns upcoming preview rows for the UI.
 
-All flags: `is_premium=true`, `is_standalone_purchase=true`, `tier_required="gold"`, `price=3.99`, `is_visible=true`, `is_workout_of_day=false`.
+The morning library picker is **not modified** — approval just publishes early and the existing skip-if-exists guard handles the rest. This keeps the live WOD rollover regression-proof.
 
-Difficulty-aware exercise selection per the standing rule: beginner = simpler picks, longer rest cues, fewer complex compounds; advanced = heavier compounds, advanced progressions, higher density.
+### 4. Admin UI — new button + dialog in `WODManager.tsx`
+A new **"Tomorrow's WOD Preview"** button placed next to **"View Periodization"** in the WODManager header (Content Library → Workouts section). Opens `<TomorrowWODPreviewDialog />` which shows:
+- Header with the target date, category, difficulty.
+- **Date selector** so the admin can preview/override any future date, not just tomorrow.
+- Two cards (BW + EQ, or one Recovery card) each showing image, name, focus, difficulty stars, duration. Per-card actions: **View**, **Edit** (reuses `WorkoutEditDialog`), **Swap…** (opens a small library picker filtered by category + equipment + difficulty band).
+- Footer: **Re-pick automatically**, **Approve & publish**, **Reject**.
+- Live status badge (`pending` / `approved` / `rejected`) with who approved.
 
-## Execution
+### 5. Cron Jobs admin panel
+No code changes needed — `CronJobsManager` and `CronJobsDocumentation` read from `cron_job_metadata`, so the new job appears automatically with Edit/Test/Toggle controls.
 
-1. Six sequential invocations of `generate-category-difficulty-batch` (one per category × difficulty pair = 2 jobs each), to stay safely under the 150s Edge ceiling:
+---
 
-   - **B1** Beginner / CALORIE BURNING → [BW 2★ AMRAP, EQ 2★ AMRAP]
-   - **B2** Beginner / METABOLIC → [BW 2★ CIRCUIT, EQ 2★ CIRCUIT]
-   - **B3** Beginner / CARDIO → [BW 2★ EMOM, EQ 2★ EMOM]
-   - **A1** Advanced / CALORIE BURNING → [BW 5★ AMRAP, EQ 6★ AMRAP]
-   - **A2** Advanced / METABOLIC → [BW 5★ CIRCUIT, EQ 6★ CIRCUIT]
-   - **A3** Advanced / CARDIO → [BW 5★ EMOM, EQ 6★ EMOM]
-
-   Each call: `{ price: 3.99, tier_required: "gold", is_premium: true, is_standalone_purchase: true, is_visible: true }`.
-
-2. Per-call DB audit on the 2 new rows: `image_url`, `stripe_product_id`, `stripe_price_id`, `price=3.99`, `is_premium`, `is_standalone_purchase`, `tier_required="gold"`, correct `difficulty` + `difficulty_stars`, format, duration, visibility, exercise-token counts.
-
-3. Final Stripe audit via `verify-workout-stripe-sync` (audit mode). Re-run with `?fix=1` if any of the 12 are off.
-
-4. Content sanity sweep: 5-section order; Main Workout uses declared format with measurable prescription before every `{{exercise:ID:Name}}`; Finisher + Cool Down present; no durations in protocol headers; Description ≥ 2 sentences; Instructions explains the protocol; Tips are coaching cues.
-
-5. Clean-name pass: if any generated name falls back to a generic/collision suffix, rename in both DB and Stripe (as done last time).
-
-## Notes
-
-- No code or schema changes — pure orchestration + verification.
-- HFSC untouched. Non-destructive policy applies.
-- Total expected cost: 12 AI workouts + 12 images + 24 Stripe writes. Runs in ~6 sequential batches.
+Approve to flip into build mode and I'll ship steps 3, 4 and the `cron.schedule(...)` wiring immediately.
