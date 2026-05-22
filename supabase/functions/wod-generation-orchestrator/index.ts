@@ -179,8 +179,15 @@ async function callGenerateWod(
     const responseText = await response.text();
 
     if (!response.ok) {
-      console.error(`[ORCHESTRATOR] generate-workout-of-day failed status ${response.status}:`, responseText.substring(0, 300));
-      return { success: false, error: `HTTP ${response.status}: ${responseText.substring(0, 200)}` };
+      let parsedError = responseText;
+      try {
+        const json = JSON.parse(responseText);
+        parsedError = json?.error || json?.message || responseText;
+      } catch (_e) {
+        // Keep raw response text.
+      }
+      console.error(`[ORCHESTRATOR] generate-workout-of-day failed status ${response.status}:`, parsedError.substring(0, 800));
+      return { success: false, error: `HTTP ${response.status}: ${parsedError.substring(0, 700)}` };
     }
 
     console.log(`[ORCHESTRATOR] generate-workout-of-day accepted/returned OK`);
@@ -839,7 +846,7 @@ serve(async (req) => {
           completed_at: new Date().toISOString(),
           found_count: finalResult?.found?.length || 0,
           wods_created: finalResult?.found || [],
-          error_message: `${failureType} failure after ${MAX_ATTEMPTS} attempts. Missing: ${finalResult?.missing?.join(", ")}. Found: ${finalResult?.found?.join(", ") || "none"}.`,
+          error_message: `${failureType} failure after ${MAX_ATTEMPTS} attempts. Missing: ${finalResult?.missing?.join(", ")}. Found: ${finalResult?.found?.join(", ") || "none"}. Attempt errors: ${attempts.map(a => `#${a.attempt}: ${a.error || "no generator error"}`).join(" || ")}`,
         })
         .eq("id", runLog.id);
     }
@@ -849,7 +856,7 @@ serve(async (req) => {
       notification_type: isPartialFailure ? "wod_partial_generation_failure" : "wod_generation_failure",
       message_type: "email",
       subject: `WOD ${failureType} Failure - ${effectiveDate}`,
-      content: `${failureType} failure after ${MAX_ATTEMPTS} attempts. Missing: ${finalResult?.missing.join(", ")}. Found: ${finalResult?.found?.join(", ") || "none"}.`,
+      content: `${failureType} failure after ${MAX_ATTEMPTS} attempts. Missing: ${finalResult?.missing.join(", ")}. Found: ${finalResult?.found?.join(", ") || "none"}. Attempt errors: ${attempts.map(a => `#${a.attempt}: ${a.error || "no generator error"}`).join(" || ")}`,
       recipient_count: 1,
       success_count: 0,
       failed_count: 1,
