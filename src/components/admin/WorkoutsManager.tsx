@@ -27,6 +27,9 @@ interface Workout {
   stripe_price_id: string | null;
   is_ai_generated: boolean;
   is_visible: boolean;
+  is_workout_of_day: boolean | null;
+  generated_for_date: string | null;
+  wod_source: string | null;
   created_at: string | null;
 }
 
@@ -182,33 +185,52 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
     }
   };
 
+  const isFailedHiddenWod = (workout: Pick<Workout, 'id' | 'is_visible' | 'is_workout_of_day'>) =>
+    workout.id.startsWith('WOD-') && workout.is_visible === false && workout.is_workout_of_day !== true;
+
   const handleDelete = async (id: string) => {
     try {
       // Get workout details to check if it's a WOD with standalone purchase
       const { data: workout, error: fetchError } = await supabase
         .from('admin_workouts')
-        .select('stripe_product_id, is_workout_of_day, is_standalone_purchase, name')
+        .select('id, stripe_product_id, is_workout_of_day, is_visible, is_standalone_purchase, name')
         .eq('id', id)
         .single();
 
       if (fetchError) throw fetchError;
 
-      // Check if this workout has a Stripe product OR existing purchases — never delete these
-      const hasStripeProduct = !!workout?.stripe_product_id;
-      
       let hasPurchases = false;
-      if (!hasStripeProduct) {
-        const { data: purchases } = await supabase
-          .from('user_purchases')
-          .select('id')
-          .eq('content_id', id)
-          .eq('content_type', 'workout')
-          .limit(1);
-        hasPurchases = (purchases?.length || 0) > 0;
+      const { data: purchases } = await supabase
+        .from('user_purchases')
+        .select('id')
+        .eq('content_id', id)
+        .eq('content_type', 'workout')
+        .limit(1);
+      hasPurchases = (purchases?.length || 0) > 0;
+
+      if (workout && isFailedHiddenWod(workout) && !hasPurchases) {
+        if (!confirm(`Permanently delete failed hidden WOD "${workout.name}" and deactivate its Stripe product?`)) return;
+
+        const { data, error } = await supabase.functions.invoke('cleanup-wod-stripe-orphans', {
+          body: { dryRun: false, failedWorkoutId: id, reason: 'admin-delete-failed-hidden-wod' },
+        });
+
+        if (error) throw error;
+        if (data?.success === false || data?.error) throw new Error(data?.error || 'Failed WOD cleanup failed');
+
+        toast({
+          title: "Failed WOD Deleted",
+          description: `"${workout.name}" was removed and its Stripe product was deactivated.`,
+        });
+        loadWorkouts();
+        return;
       }
 
+      // Check if this workout has a Stripe product OR existing purchases — never delete these
+      const hasStripeProduct = !!workout?.stripe_product_id;
+
       if (hasStripeProduct || hasPurchases) {
-        if (!confirm(`"${workout.name}" has ${hasStripeProduct ? 'a Stripe product' : 'customer purchases'}. Instead of deleting, it will be archived to the gallery. Continue?`)) return;
+        if (!confirm(`"${workout.name}" has ${hasStripeProduct ? 'a Stripe product' : 'customer purchases'}. It cannot be permanently deleted; it will be hidden and removed from WOD rotation. Continue?`)) return;
 
         // Archive to gallery - preserve Stripe product & purchase records
         const { error: updateError } = await supabase
@@ -223,8 +245,8 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
         if (updateError) throw updateError;
 
         toast({
-          title: "Archived to Gallery",
-          description: `"${workout.name}" moved to gallery. Stripe product & purchase records preserved.`,
+          title: "Protected Content Archived",
+          description: `"${workout.name}" was hidden from WOD rotation. Stripe and purchase records were preserved.`,
         });
         loadWorkouts();
         return;
@@ -398,7 +420,7 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
       // Get all workouts to check for WODs with Stripe products
       const { data: workoutsToDelete, error: fetchError } = await supabase
         .from('admin_workouts')
-        .select('id, stripe_product_id, is_workout_of_day, is_standalone_purchase, name')
+        .select('id, stripe_product_id, is_workout_of_day, is_visible, is_standalone_purchase, name')
         .in('id', selectedWorkouts);
 
       if (fetchError) throw fetchError;
@@ -416,9 +438,22 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
         })
       );
 
-      // Any workout with Stripe product OR purchases gets archived, never deleted
-      const toArchive = purchaseChecks.filter(w => w.stripe_product_id || w.hasPurchases);
-      const regularDeletes = purchaseChecks.filter(w => !w.stripe_product_id && !w.hasPurchases);
+      const failedHiddenWods = purchaseChecks.filter(w => isFailedHiddenWod(w) && !w.hasPurchases);
+      // Any real workout with Stripe product OR purchases gets archived, never deleted
+      const toArchive = purchaseChecks.filter(w => !failedHiddenWods.some(f => f.id === w.id) && (w.stripe_product_id || w.hasPurchases));
+      const regularDeletes = purchaseChecks.filter(w => !failedHiddenWods.some(f => f.id === w.id) && !w.stripe_product_id && !w.hasPurchases);
+
+      if (failedHiddenWods.length > 0) {
+        const { data, error } = await supabase.functions.invoke('cleanup-wod-stripe-orphans', {
+          body: {
+            dryRun: false,
+            failedWorkoutIds: failedHiddenWods.map(w => w.id),
+            reason: 'admin-bulk-delete-failed-hidden-wods',
+          },
+        });
+        if (error) throw error;
+        if (data?.success === false || data?.error) throw new Error(data?.error || 'Failed WOD cleanup failed');
+      }
 
       // Archive protected workouts to gallery
       if (toArchive.length > 0) {
@@ -442,14 +477,15 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
 
       const movedCount = toArchive.length;
       const deletedCount = regularDeletes.length;
+      const failedDeletedCount = failedHiddenWods.length;
       
       toast({
         title: "Success",
-        description: movedCount > 0 && deletedCount > 0 
-          ? `Moved ${movedCount} WOD(s) to gallery, deleted ${deletedCount} workout(s)`
-          : movedCount > 0 
-            ? `Moved ${movedCount} WOD(s) to gallery (Stripe products preserved)`
-            : `Deleted ${deletedCount} workout(s) from database and Stripe`,
+        description: [
+          failedDeletedCount > 0 ? `Deleted ${failedDeletedCount} failed hidden WOD(s) and deactivated Stripe` : null,
+          movedCount > 0 ? `Archived ${movedCount} protected workout(s)` : null,
+          deletedCount > 0 ? `Deleted ${deletedCount} regular workout(s)` : null,
+        ].filter(Boolean).join(', '),
       });
       setSelectedWorkouts([]);
       loadWorkouts();
@@ -670,7 +706,9 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredWorkouts.map((workout) => (
+                filteredWorkouts.map((workout) => {
+                  const failedHiddenWod = isFailedHiddenWod(workout);
+                  return (
                   <TableRow key={workout.id} className={!workout.is_visible ? 'opacity-50' : ''}>
                     <TableCell>
                       <Checkbox
@@ -731,7 +769,8 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
                           size="icon"
                           className="h-7 w-7 sm:h-8 sm:w-8"
                           onClick={() => window.open(`/workout/${workout.category.toLowerCase().replace(/\s+/g, '-')}/${workout.id}`, '_blank')}
-                          title="Preview"
+                          title={failedHiddenWod ? "Hidden failed WODs do not have a public preview" : "Preview"}
+                          disabled={failedHiddenWod}
                         >
                           <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
                         </Button>
@@ -768,14 +807,15 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
                           size="icon"
                           className="h-7 w-7 sm:h-8 sm:w-8"
                           onClick={() => handleDelete(workout.id)}
-                          title="Delete"
+                          title={failedHiddenWod ? "Delete failed WOD" : "Delete"}
                         >
                           <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                         </Button>
                       </div>
                     </TableCell>
                   </TableRow>
-                ))
+                  );
+                })
               )}
             </TableBody>
           </Table>

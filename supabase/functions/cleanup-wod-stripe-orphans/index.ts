@@ -60,11 +60,83 @@ serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const dryRun = body.dryRun !== false; // Default to dry run for safety
     const scope = body.scope === "all-paid-content" ? "all-paid-content" : "wod";
+    const failedWorkoutIds = [body.failedWorkoutId, ...(Array.isArray(body.failedWorkoutIds) ? body.failedWorkoutIds : [])]
+      .filter((id: unknown): id is string => typeof id === "string" && id.startsWith("WOD-"));
+
+    const hasPurchases = async (workoutId: string): Promise<boolean> => {
+      const { data, error } = await supabase
+        .from("user_purchases")
+        .select("id")
+        .eq("content_id", workoutId)
+        .eq("content_type", "workout")
+        .limit(1);
+      if (error) throw new Error(`Purchase check failed for ${workoutId}: ${error.message}`);
+      return (data?.length || 0) > 0;
+    };
+
+    if (failedWorkoutIds.length > 0) {
+      const { data: failedRows, error: failedRowsError } = await supabase
+        .from("admin_workouts")
+        .select("id, name, stripe_product_id, stripe_price_id, is_visible, is_workout_of_day")
+        .in("id", failedWorkoutIds);
+
+      if (failedRowsError) throw new Error(`Failed WOD lookup failed: ${failedRowsError.message}`);
+
+      const cleaned: string[] = [];
+      const skipped: string[] = [];
+      const errors: string[] = [];
+
+      for (const workout of failedRows || []) {
+        const safeToDelete = workout.id.startsWith("WOD-") && workout.is_visible === false && workout.is_workout_of_day !== true && !(await hasPurchases(workout.id));
+        if (!safeToDelete) {
+          skipped.push(`${workout.id} - protected or not a failed hidden WOD`);
+          continue;
+        }
+
+        try {
+          if (workout.stripe_product_id && !dryRun) {
+            await stripe.products.update(workout.stripe_product_id, {
+              active: false,
+              metadata: {
+                cleanup_reason: body.reason || "admin_failed_hidden_wod_delete",
+                archived_by: "cleanup-wod-stripe-orphans",
+                archived_at: new Date().toISOString(),
+                deleted_workout_id: workout.id,
+              },
+            });
+          }
+
+          if (!dryRun) {
+            const { error: deleteError } = await supabase
+              .from("admin_workouts")
+              .delete()
+              .eq("id", workout.id);
+            if (deleteError) throw deleteError;
+          }
+
+          cleaned.push(`${dryRun ? "[DRY RUN] " : ""}${workout.id} - ${workout.name}`);
+        } catch (err: any) {
+          errors.push(`${workout.id}: ${err?.message || String(err)}`);
+        }
+      }
+
+      return new Response(JSON.stringify({
+        success: errors.length === 0,
+        dryRun,
+        mode: "failed-hidden-wod-delete",
+        requested: failedWorkoutIds.length,
+        cleaned,
+        skipped,
+        errors,
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" }, status: errors.length ? 500 : 200,
+      });
+    }
 
     // 1. Get all Stripe product IDs currently linked from trusted paid content tables
     const { data: linkedWorkouts, error: workoutError } = await supabase
       .from("admin_workouts")
-      .select("id, name, stripe_product_id")
+      .select("id, name, stripe_product_id, is_visible, is_workout_of_day")
       .not("stripe_product_id", "is", null);
 
     if (workoutError) throw new Error(`Workout DB query failed: ${workoutError.message}`);
@@ -76,13 +148,22 @@ serve(async (req) => {
 
     if (programError) throw new Error(`Program DB query failed: ${programError.message}`);
 
-    const linkedProductIds = new Set(
-      [...(linkedWorkouts || []), ...(linkedPrograms || [])]
-        .map((item: any) => item.stripe_product_id)
-        .filter(Boolean)
-    );
+    const failedHiddenCandidates: any[] = [];
+    for (const workout of linkedWorkouts || []) {
+      if (workout.id?.startsWith("WOD-") && workout.is_visible === false && workout.is_workout_of_day !== true && !(await hasPurchases(workout.id))) {
+        failedHiddenCandidates.push(workout);
+      }
+    }
+    const failedHiddenProductIds = new Set(failedHiddenCandidates.map((item: any) => item.stripe_product_id).filter(Boolean));
 
-    console.log(`[CLEANUP] Found ${linkedProductIds.size} linked Stripe product IDs across paid content`);
+    const linkedProductIds = new Set([
+      ...((linkedWorkouts || []) as any[])
+        .filter((item: any) => !failedHiddenProductIds.has(item.stripe_product_id))
+        .map((item: any) => item.stripe_product_id),
+      ...((linkedPrograms || []) as any[]).map((item: any) => item.stripe_product_id),
+    ].filter(Boolean));
+
+    console.log(`[CLEANUP] Found ${linkedProductIds.size} protected linked Stripe product IDs and ${failedHiddenCandidates.length} failed hidden WOD cleanup candidates`);
 
     // 2. Search only for active SmartyGym products with trusted project metadata
     const productQuery = scope === "all-paid-content"

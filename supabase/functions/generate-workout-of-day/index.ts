@@ -131,7 +131,7 @@ function ensureFiveSectionWorkoutHtml(
     "🧽": `<p class="tiptap-paragraph">🧽 <strong><u>Soft Tissue Preparation 5'</u></strong></p><ul class="tiptap-bullet-list"><li class="tiptap-list-item"><p class="tiptap-paragraph">Foam roll quads, hamstrings, calves, glutes, lats, and upper back (30-45 sec per area)</p></li><li class="tiptap-list-item"><p class="tiptap-paragraph">Lacrosse ball work for feet and hips (focus on tension spots)</p></li></ul>`,
     "🔥": `<p class="tiptap-paragraph">🔥 <strong><u>Activation 15'</u></strong></p><ul class="tiptap-bullet-list"><li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Mobility (5 min):</strong> 10 reps ${exerciseToken(mobility)} each side</p></li><li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Activation (5 min):</strong> 12 reps ${exerciseToken(activation)}</p></li><li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Core Prep (5 min):</strong> 30 sec ${exerciseToken(prep)}</p></li></ul>`,
     "💪": `<p class="tiptap-paragraph">💪 <strong><u>Main Workout (${format})</u></strong></p><ul class="tiptap-bullet-list"><li class="tiptap-list-item"><p class="tiptap-paragraph">4 sets x 6 reps ${exerciseToken(mainA)}</p></li><li class="tiptap-list-item"><p class="tiptap-paragraph">3 sets x 8 reps ${exerciseToken(mainB)}</p></li><li class="tiptap-list-item"><p class="tiptap-paragraph">3 sets x 10 reps ${exerciseToken(mainC)}</p></li></ul>`,
-    "⚡": `<p class="tiptap-paragraph">⚡ <strong><u>Finisher (For Time)</u></strong></p><ul class="tiptap-bullet-list"><li class="tiptap-list-item"><p class="tiptap-paragraph">12 reps ${exerciseToken(finisherA)}</p></li><li class="tiptap-list-item"><p class="tiptap-paragraph">16 reps ${exerciseToken(finisherB)}</p></li><li class="tiptap-list-item"><p class="tiptap-paragraph">12 reps ${exerciseToken(finisherC)}</p></li></ul>`,
+    "⚡": `<p class="tiptap-paragraph">⚡ <strong><u>Finisher (REPS & SETS)</u></strong></p><ul class="tiptap-bullet-list"><li class="tiptap-list-item"><p class="tiptap-paragraph">3 sets x 12 reps ${exerciseToken(finisherA)}</p></li><li class="tiptap-list-item"><p class="tiptap-paragraph">3 sets x 16 reps ${exerciseToken(finisherB)}</p></li><li class="tiptap-list-item"><p class="tiptap-paragraph">3 sets x 12 reps ${exerciseToken(finisherC)}</p></li></ul>`,
     "🧘": `<p class="tiptap-paragraph">🧘 <strong><u>Cool Down 10'</u></strong></p><ul class="tiptap-bullet-list"><li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Static Stretching (8 min):</strong> 45 sec ${exerciseToken(stretchA)} each side</p></li><li class="tiptap-list-item"><p class="tiptap-paragraph">45 sec ${exerciseToken(stretchB)} each side</p></li><li class="tiptap-list-item"><p class="tiptap-paragraph"><strong>Breathing (2 min):</strong> Slow nasal inhale, long mouth exhale, calm the nervous system</p></li></ul>`,
   };
 
@@ -218,7 +218,7 @@ async function rollbackActiveWodsForDate(
 
   let fetchQuery = supabase
     .from("admin_workouts")
-    .select("id, name, equipment")
+    .select("id, name, equipment, stripe_product_id")
     .eq("generated_for_date", effectiveDate)
     .eq("is_workout_of_day", true);
   if (slot) fetchQuery = fetchQuery.eq("equipment", slot);
@@ -234,25 +234,28 @@ async function rollbackActiveWodsForDate(
     return;
   }
 
-  let updateQuery = supabase
+  const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+  if (stripeKey) {
+    const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
+    for (const wod of activeWods) {
+      await archiveStripeProductSafely(stripe, wod.stripe_product_id || null, `partial_wod_rollback:${reason}`);
+    }
+  }
+
+  let deleteQuery = supabase
     .from("admin_workouts")
-    .update({
-      is_workout_of_day: false,
-      generated_for_date: null,
-      is_visible: false,
-      updated_at: new Date().toISOString(),
-    })
+    .delete()
     .eq("generated_for_date", effectiveDate)
     .eq("is_workout_of_day", true);
-  if (slot) updateQuery = updateQuery.eq("equipment", slot);
-  const { error: rollbackError } = await updateQuery;
+  if (slot) deleteQuery = deleteQuery.eq("equipment", slot);
+  const { error: rollbackError } = await deleteQuery;
 
   if (rollbackError) {
-    logStep("ROLLBACK: Failed to clear partial WOD publish", { effectiveDate, error: rollbackError.message });
+    logStep("ROLLBACK: Failed to delete partial WOD publish", { effectiveDate, error: rollbackError.message });
     return;
   }
 
-  logStep("ROLLBACK: Cleared partial WOD publish", {
+  logStep("ROLLBACK: Deleted partial WOD publish and archived Stripe products", {
     effectiveDate,
     cleared: activeWods.map((w: any) => ({ id: w.id, name: w.name, equipment: w.equipment })),
   });
@@ -463,7 +466,7 @@ async function runWodGeneration(params: {
     // CRITICAL: Fetch FULL workout details including main_workout for section validation
     const { data: existingWODsForDate, error: existingWODsError } = await supabase
       .from("admin_workouts")
-      .select("id, name, equipment, generated_for_date, category, difficulty, difficulty_stars, format, main_workout")
+      .select("id, name, equipment, generated_for_date, category, difficulty, difficulty_stars, format, main_workout, stripe_product_id")
       .eq("generated_for_date", effectiveDate)
       .eq("is_workout_of_day", true);
 
@@ -500,12 +503,15 @@ async function runWodGeneration(params: {
           else if (existingWod.equipment === "EQUIPMENT") equipmentComplete = false;
           else if (existingWod.equipment === "VARIOUS") variousComplete = false;
           
-          // Archive the malformed WOD if retryMissing (so it doesn't block regeneration)
+          // Delete the malformed WOD if retryMissing (so it doesn't block regeneration or leave active Stripe orphans)
           if (retryMissing) {
-            logStep(`Archiving malformed WOD ${existingWod.id} and hiding from gallery`, { equipment: existingWod.equipment });
+            logStep(`Deleting malformed WOD ${existingWod.id} and archiving Stripe product`, { equipment: existingWod.equipment });
+            if (existingWod.stripe_product_id) {
+              await archiveStripeProductSafely(stripe, existingWod.stripe_product_id, "malformed_wod_retry_cleanup");
+            }
             await supabase
               .from("admin_workouts")
-              .update({ is_workout_of_day: false, generated_for_date: null, is_visible: false })
+              .delete()
               .eq("id", existingWod.id);
           }
         }
@@ -547,8 +553,8 @@ async function runWodGeneration(params: {
     if (retryMissing && existingWODsForDate && existingWODsForDate.length === 1) {
       const existingWOD = existingWODsForDate[0];
       if (existingWOD.category && existingWOD.difficulty_stars) {
-        // Only force format for STRENGTH and MOBILITY & STABILITY (must be REPS & SETS)
-        const forceFormat = existingWOD.category === "STRENGTH" || existingWOD.category === "MOBILITY & STABILITY";
+        // Force format for controlled categories that must stay REPS & SETS.
+        const forceFormat = existingWOD.category === "STRENGTH" || existingWOD.category === "MOBILITY & STABILITY" || existingWOD.category === "PILATES";
         
         forcedParameters = {
           category: existingWOD.category,
@@ -1280,7 +1286,8 @@ Every workout in the above categories MUST include 5 sections in this order:
 4. ⚡ FINISHER (10-25 min)
    Purpose: Complement the main workout with a DIFFERENT format/structure
    • Must be RELATED to the category theme
-   • Must have DIFFERENT format than main workout
+    • Must have DIFFERENT format than main workout where the category allows it
+    • For STRENGTH, MOBILITY & STABILITY, and PILATES, the finisher MUST stay REPS & SETS
    • Intensity is governed by the RPE BALANCING RULE below
    Examples:
    • STRENGTH main (heavy compounds) → Finisher (lighter volume, higher reps)
@@ -1362,8 +1369,9 @@ If the main workout is moderate, the finisher can push harder. But it MUST exist
 
 FINISHER RULES BY CATEGORY:
 
-STRENGTH and MOBILITY & STABILITY:
+STRENGTH, MOBILITY & STABILITY, and PILATES:
 • Format: REPS & SETS ONLY (respecting category format rule)
+• NEVER use For Time, AMRAP, EMOM, Tabata, or Circuit for these finishers
 • Load: Reduced compared to main workout
 • Reps: Increased compared to main workout
 • Purpose: Volume completion without heavy loading
