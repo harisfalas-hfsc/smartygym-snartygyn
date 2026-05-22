@@ -438,9 +438,7 @@ export const Navigation = () => {
               className="relative inline-flex h-11 w-11 rounded-full"
               aria-label="Open Smarty Coach"
             >
-              <div className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-primary transition-colors hover:bg-primary hover:text-primary-foreground">
-                <img src={smartyCoachIcon} alt="" className="h-8 w-8 rounded-full" loading="lazy" width={32} height={32} />
-              </div>
+              <img src={smartyCoachIcon} alt="" className="h-8 w-8 rounded-full" loading="lazy" width={32} height={32} />
               <span className="sr-only">Smarty Coach</span>
             </Button>
           </div>
