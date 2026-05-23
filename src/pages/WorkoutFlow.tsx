@@ -303,7 +303,7 @@ const WorkoutFlow = () => {
           </Card>
 
           {/* Desktop: Grid Layout - Stacked blog-card style */}
-          <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div className="hidden lg:grid lg:grid-cols-3 gap-4 sm:gap-6">
             {workoutTypes.map(workout => {
               const Icon = workout.icon;
               const isWodCard = workout.id === "wod";
@@ -392,7 +392,7 @@ const WorkoutFlow = () => {
           </div>
 
           {/* Mobile: Dynamic Description Card */}
-          <div className="md:hidden mb-4">
+          <div className="lg:hidden mb-4">
             <Card className="bg-card border border-primary/20">
               <div className="p-4 text-center">
                 <p className="text-sm text-muted-foreground transition-opacity duration-300">
@@ -403,7 +403,7 @@ const WorkoutFlow = () => {
           </div>
 
           {/* Mobile: Carousel Layout */}
-          <div className="md:hidden relative">
+          <div className="lg:hidden relative">
             <SwipeToExplore onPrev={() => carouselApi?.scrollPrev()} onNext={() => carouselApi?.scrollNext()} />
             <Carousel
               className="w-full"
