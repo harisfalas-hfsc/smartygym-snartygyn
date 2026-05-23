@@ -210,13 +210,13 @@ const Tools = () => {
               {tools.map((tool) => {
                 const Icon = tool.icon;
                 return (
-                  <CarouselItem key={tool.id} className="pl-2 basis-[75%] md:basis-[55%]">
+                  <CarouselItem key={tool.id} className="pl-2 basis-[75%] sm:basis-[60%]">
                     <div
                       onClick={() => navigate(tool.route)}
-                      className="flex flex-col h-[260px] md:h-auto bg-card border-2 border-primary/40 rounded-xl overflow-hidden cursor-pointer hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300"
+                      className="flex flex-col h-[260px] min-[540px]:h-auto bg-card border-2 border-primary/40 rounded-xl overflow-hidden cursor-pointer hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300"
                     >
                       {/* Image section */}
-                      <div className="relative h-[70%] md:h-auto md:aspect-[25/16] overflow-hidden flex-shrink-0">
+                      <div className="relative h-[70%] min-[540px]:h-auto min-[540px]:aspect-[25/16] overflow-hidden flex-shrink-0">
                         <img 
                           src={tool.mobileImage} 
                           alt={tool.title}
@@ -225,12 +225,12 @@ const Tools = () => {
                         />
                       </div>
                       {/* Content section */}
-                      <div className="flex flex-col justify-center flex-1 px-3 py-2 text-center">
+                      <div className="flex flex-col justify-center flex-1 px-3 py-2 min-[540px]:p-3 min-[540px]:min-h-[96px] text-center">
                         <div className="flex items-center justify-center gap-2 mb-0.5">
                           <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                             <Icon className="w-4 h-4 text-primary" />
                           </div>
-                          <h3 className="text-sm font-bold text-foreground whitespace-nowrap">
+                          <h3 className="text-sm font-bold text-foreground leading-tight whitespace-nowrap">
                             {tool.title}
                           </h3>
                         </div>
