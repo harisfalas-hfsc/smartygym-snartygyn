@@ -210,13 +210,13 @@ const Tools = () => {
               {tools.map((tool) => {
                 const Icon = tool.icon;
                 return (
-                  <CarouselItem key={tool.id} className="pl-2 basis-[75%]">
+                  <CarouselItem key={tool.id} className="pl-2 basis-[75%] md:basis-[55%]">
                     <div
                       onClick={() => navigate(tool.route)}
-                      className="flex flex-col h-[260px] bg-card border-2 border-primary/40 rounded-xl overflow-hidden cursor-pointer hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300"
+                      className="flex flex-col h-[260px] md:h-auto bg-card border-2 border-primary/40 rounded-xl overflow-hidden cursor-pointer hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300"
                     >
                       {/* Image section */}
-                      <div className="relative h-[70%] overflow-hidden">
+                      <div className="relative h-[70%] md:h-auto md:aspect-[25/16] overflow-hidden flex-shrink-0">
                         <img 
                           src={tool.mobileImage} 
                           alt={tool.title}
