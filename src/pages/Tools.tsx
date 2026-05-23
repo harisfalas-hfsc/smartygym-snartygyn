@@ -199,7 +199,7 @@ const Tools = () => {
         </Card>
 
         {/* Mobile Carousel - With descriptions in cards */}
-        <div className="md:hidden">
+        <div className="lg:hidden">
           <SwipeToExplore onPrev={() => toolsCarouselApi?.scrollPrev()} onNext={() => toolsCarouselApi?.scrollNext()} />
           <Carousel 
             setApi={setToolsCarouselApi}
@@ -261,7 +261,7 @@ const Tools = () => {
         </div>
 
         {/* Desktop Grid - Big timer card + 4 smaller cards */}
-        <div className="hidden md:block space-y-4">
+        <div className="hidden lg:block space-y-4">
           {/* Big Workout Timer Card */}
           {(() => {
             const timerTool = tools.find(t => t.id === "workout-timer");
