@@ -166,6 +166,33 @@ All colors MUST be HSL.
 }
 
 @layer utilities {
+  @media (min-width: 540px) and (max-width: 1023px) and (orientation: portrait) {
+    .smarty-carousel-card-portrait-tablet {
+      height: 720px !important;
+    }
+
+    .smarty-carousel-image-portrait-tablet {
+      height: 78% !important;
+      aspect-ratio: auto !important;
+      background-color: hsl(var(--muted));
+    }
+
+    .smarty-carousel-image-portrait-tablet img {
+      object-fit: contain !important;
+      object-position: center !important;
+    }
+
+    .smarty-carousel-content-portrait-tablet {
+      padding: 1rem !important;
+      justify-content: center !important;
+    }
+
+    .smarty-carousel-title-row-portrait-tablet {
+      align-items: center !important;
+      margin-bottom: 0.5rem !important;
+    }
+  }
+
   /* Preserve empty paragraphs created in rich text editor */
   .prose .tiptap-paragraph:empty,
   .text-display .tiptap-paragraph:empty,
