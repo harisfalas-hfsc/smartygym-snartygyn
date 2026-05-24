@@ -426,12 +426,12 @@ const WorkoutFlow = () => {
                          itemScope
                          itemType="https://schema.org/ExercisePlan"
                          onClick={() => handleWorkoutSelect(workout.id)}
-                           className="flex flex-col h-[300px] min-[540px]:h-[600px] bg-card border-2 border-primary/40 rounded-xl overflow-hidden cursor-pointer hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300"
+                            className="smarty-carousel-card-portrait-tablet flex flex-col h-[300px] min-[540px]:h-[600px] bg-card border-2 border-primary/40 rounded-xl overflow-hidden cursor-pointer hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300"
                          role="button"
                          aria-label={`${workout.title} workouts`}
                        >
                          {/* Image section */}
-                           <div className="relative h-[58%] min-[540px]:h-[72%] min-[540px]:aspect-auto overflow-hidden flex-shrink-0 bg-muted">
+                           <div className="smarty-carousel-image-portrait-tablet relative h-[58%] min-[540px]:h-[72%] min-[540px]:aspect-auto overflow-hidden flex-shrink-0 bg-muted">
                           {isWodCard && wodImages.length > 0 ? (
                             wodImages.map((imageUrl, index) => (
                               <img
@@ -456,8 +456,8 @@ const WorkoutFlow = () => {
                           )}
                         </div>
                         {/* Content section */}
-                          <div className="flex flex-col justify-center flex-1 px-3 py-3 min-[540px]:p-4 text-center">
-                           <div className="flex items-center justify-center gap-2 mb-1 min-[540px]:mb-2">
+                          <div className="smarty-carousel-content-portrait-tablet flex flex-col justify-center flex-1 px-3 py-3 min-[540px]:p-4 text-center">
+                           <div className="smarty-carousel-title-row-portrait-tablet flex items-center justify-center gap-2 mb-1 min-[540px]:mb-2">
                             <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                               <Icon className="w-4 h-4 text-primary" />
                             </div>
