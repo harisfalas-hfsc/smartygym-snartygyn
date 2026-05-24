@@ -2439,6 +2439,69 @@ export type Database = {
         }
         Relationships: []
       }
+      system_health_events: {
+        Row: {
+          attempt_count: number
+          autofix_attempted: boolean
+          autofix_result: Json | null
+          autofix_status: string | null
+          candidate_rejection_reasons: Json | null
+          category: string | null
+          check_type: string
+          created_at: string
+          day_in_84: number | null
+          difficulty: string | null
+          equipment_slot: string | null
+          id: string
+          issue_message: string | null
+          resolved_at: string | null
+          scheduled_for_date: string | null
+          severity: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          attempt_count?: number
+          autofix_attempted?: boolean
+          autofix_result?: Json | null
+          autofix_status?: string | null
+          candidate_rejection_reasons?: Json | null
+          category?: string | null
+          check_type: string
+          created_at?: string
+          day_in_84?: number | null
+          difficulty?: string | null
+          equipment_slot?: string | null
+          id?: string
+          issue_message?: string | null
+          resolved_at?: string | null
+          scheduled_for_date?: string | null
+          severity?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          attempt_count?: number
+          autofix_attempted?: boolean
+          autofix_result?: Json | null
+          autofix_status?: string | null
+          candidate_rejection_reasons?: Json | null
+          category?: string | null
+          check_type?: string
+          created_at?: string
+          day_in_84?: number | null
+          difficulty?: string | null
+          equipment_slot?: string | null
+          id?: string
+          issue_message?: string | null
+          resolved_at?: string | null
+          scheduled_for_date?: string | null
+          severity?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       system_settings: {
         Row: {
           created_at: string | null
