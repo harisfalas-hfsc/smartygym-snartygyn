@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { getDayIn84Cycle, getPeriodizationForDay } from "../_shared/periodization-84day.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -34,6 +35,11 @@ serve(async (req) => {
     day: "2-digit",
   }).format(new Date());
 
+  const dayIn84 = getDayIn84Cycle(cyprusToday);
+  const periodization = getPeriodizationForDay(dayIn84);
+  const isRecoveryDay = periodization.category === "RECOVERY";
+  const expectedSlots = isRecoveryDay ? ["VARIOUS"] : ["BODYWEIGHT", "EQUIPMENT"];
+
   const found: string[] = [];
   const missing: string[] = [];
   const filled: string[] = [];
@@ -47,8 +53,8 @@ serve(async (req) => {
       .eq("generated_for_date", cyprusToday);
 
     const equipments = new Set((todayWods || []).map((w: any) => (w.equipment || "").toUpperCase()));
-    for (const slot of ["BODYWEIGHT", "EQUIPMENT"]) {
-      if (equipments.has(slot) || equipments.has("VARIOUS")) {
+    for (const slot of expectedSlots) {
+      if (equipments.has(slot)) {
         found.push(slot);
       } else {
         missing.push(slot);
@@ -93,7 +99,7 @@ serve(async (req) => {
           .eq("generated_for_date", cyprusToday);
         const afterEq = new Set((after || []).map((w: any) => (w.equipment || "").toUpperCase()));
         for (const slot of missing) {
-          if (afterEq.has(slot) || afterEq.has("VARIOUS")) filled.push(slot);
+          if (afterEq.has(slot)) filled.push(slot);
           else stillMissing.push(slot);
         }
       } catch (e) {
@@ -123,6 +129,10 @@ serve(async (req) => {
       JSON.stringify({
         success: stillMissing.length === 0,
         cyprus_date: cyprusToday,
+        day_in_84: dayIn84,
+        category: periodization.category,
+        difficulty: periodization.difficulty,
+        expected_slots: expectedSlots,
         found,
         missing,
         filled,
