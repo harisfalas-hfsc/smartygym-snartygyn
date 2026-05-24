@@ -57,22 +57,15 @@ async function selectCandidates(
       .lte("difficulty_stars", difficultyStars[1]);
   }
   const { data: candidates } = await query;
-  let pool: any[] = candidates || [];
+  const pool: any[] = candidates || [];
 
   if (pool.length === 0) {
-    let fallback = supabase
-      .from("admin_workouts")
-      .select("*")
-      .eq("category", category)
-      .eq("is_workout_of_day", false)
-      .eq("is_visible", true)
-      .eq("is_premium", true)
-      .eq("is_free", false)
-      .not("main_workout", "is", null)
-      .ilike("image_url", "https://%");
-    if (equipment) fallback = fallback.eq("equipment", equipment);
-    const { data: fb } = await fallback;
-    pool = fb || [];
+    log("No preview candidates found with exact periodization filters; refusing difficulty fallback", {
+      category,
+      difficultyStars,
+      equipment,
+    });
+    return [];
   }
 
   const neverUsed = pool.filter((c) => !cooldownIds.has(c.id));
