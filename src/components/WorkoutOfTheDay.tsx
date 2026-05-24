@@ -6,23 +6,27 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CalendarCheck, Clock, Dumbbell, Star, Crown, ShoppingBag, Archive, Home, TrendingUp, Layers, Target } from "lucide-react";
 import { useTodayWods } from "@/hooks/useTodayWods";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
+import { SwipeToExplore } from "@/components/ui/SwipeToExplore";
+import { cn } from "@/lib/utils";
 
 export const WorkoutOfTheDay = () => {
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
-  const [rotatingIndex, setRotatingIndex] = useState(0);
+  const [wodCarouselApi, setWodCarouselApi] = useState<CarouselApi>();
+  const [currentWodSlide, setCurrentWodSlide] = useState(0);
 
   const { bodyweightWod: bodyweightWOD, equipmentWod: equipmentWOD, variousWod: variousWOD, isRecoveryDay, hasWods: hasWODs, isLoading } = useTodayWods();
 
-  // Mobile-only: rotate between the two WODs every 2.5 seconds
+  // Mobile-only: let users swipe between the two daily WOD cards.
   useEffect(() => {
-    if (!isMobile || isRecoveryDay || !bodyweightWOD || !equipmentWOD) return;
-    const t = setInterval(() => {
-      setRotatingIndex((prev) => (prev + 1) % 2);
-    }, 2500);
-    return () => clearInterval(t);
-  }, [isMobile, isRecoveryDay, bodyweightWOD, equipmentWOD]);
+    if (!wodCarouselApi) return;
+    const onSelect = () => setCurrentWodSlide(wodCarouselApi.selectedScrollSnap());
+    onSelect();
+    wodCarouselApi.on("select", onSelect);
+    return () => {
+      wodCarouselApi.off("select", onSelect);
+    };
+  }, [wodCarouselApi]);
 
   const getDifficultyColor = (stars: number | null) => {
     if (!stars) return "bg-gray-500/20 text-gray-600 border-gray-500/40";
@@ -232,18 +236,46 @@ export const WorkoutOfTheDay = () => {
               {renderRecoveryCard(variousWOD)}
             </div>
           ) : (
-            isMobile ? (
-              <div className="max-w-xl mx-auto mb-4">
-                {rotatingIndex === 0 && bodyweightWOD
-                  ? renderMiniCard(bodyweightWOD, true)
-                  : renderMiniCard(equipmentWOD, false)}
+            <>
+              <div className="sm:hidden max-w-xl mx-auto mb-4 -mx-4">
+                <SwipeToExplore onPrev={() => wodCarouselApi?.scrollPrev()} onNext={() => wodCarouselApi?.scrollNext()} />
+                <Carousel className="w-full" opts={{ align: "center", loop: false }} setApi={setWodCarouselApi}>
+                  <CarouselContent className="-ml-3">
+                    {bodyweightWOD && (
+                      <CarouselItem className="pl-3 basis-[82%]">
+                        {renderMiniCard(bodyweightWOD, true)}
+                      </CarouselItem>
+                    )}
+                    {equipmentWOD && (
+                      <CarouselItem className="pl-3 basis-[82%]">
+                        {renderMiniCard(equipmentWOD, false)}
+                      </CarouselItem>
+                    )}
+                  </CarouselContent>
+                </Carousel>
+                {bodyweightWOD && equipmentWOD && (
+                  <div className="flex justify-center gap-2 mt-3">
+                    {[0, 1].map((index) => (
+                      <button
+                        key={index}
+                        onClick={() => wodCarouselApi?.scrollTo(index)}
+                        className={cn(
+                          "w-2.5 h-2.5 rounded-full border-2 transition-all duration-300",
+                          currentWodSlide === index
+                            ? "border-primary bg-transparent scale-125"
+                            : "border-primary/40 bg-transparent hover:border-primary/60"
+                        )}
+                        aria-label={`Go to ${index === 0 ? "Home" : "Gym"} workout`}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-xl mx-auto mb-4">
+              <div className="hidden sm:grid sm:grid-cols-2 gap-3 max-w-xl mx-auto mb-4">
                 {renderMiniCard(bodyweightWOD, true)}
                 {renderMiniCard(equipmentWOD, false)}
               </div>
-            )
+            </>
           )
         ) : (
           <div className="bg-background/80 backdrop-blur-sm rounded-xl p-6 border-2 border-dashed border-primary/30 max-w-md mx-auto text-center mb-4">

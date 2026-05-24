@@ -289,8 +289,8 @@ const WODCategory = () => {
                 </div>
               ) : bodyweightWOD || equipmentWOD ? (
                 <>
-                  {/* Mobile Carousel */}
-                  <div className="md:hidden">
+                  {/* Phone Carousel */}
+                  <div className="sm:hidden">
                     <Carousel 
                       setApi={setWodCarouselApi}
                       opts={{ align: "center", loop: true, startIndex: 0 }}
@@ -325,8 +325,8 @@ const WODCategory = () => {
                     </div>
                   </div>
                   
-                  {/* Desktop Grid */}
-                  <div className="hidden md:grid md:grid-cols-2 gap-6">
+                  {/* Tablet/Desktop Grid */}
+                  <div className="hidden sm:grid sm:grid-cols-2 gap-4 lg:gap-6">
                     {renderWODCard(bodyweightWOD, true)}
                     {renderWODCard(equipmentWOD, false)}
                   </div>
