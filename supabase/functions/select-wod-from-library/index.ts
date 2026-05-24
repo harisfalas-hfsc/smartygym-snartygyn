@@ -532,27 +532,11 @@ async function selectWorkoutCandidates(
     return [];
   }
 
-  let pool: any[] = candidates || [];
+  const pool: any[] = candidates || [];
 
   if (pool.length === 0) {
-    logStep("No candidates found, trying without difficulty filter");
-    let fallbackQuery = supabase
-      .from("admin_workouts")
-      .select("*")
-      .eq("category", category)
-      .eq("is_workout_of_day", false)
-      .eq("is_visible", true)
-      .eq("is_premium", true)
-      .eq("is_free", false)
-      .not("main_workout", "is", null)
-      .ilike("image_url", "https://%");
-    if (equipment) fallbackQuery = fallbackQuery.eq("equipment", equipment);
-    const { data: fallbackCandidates } = await fallbackQuery;
-    pool = fallbackCandidates || [];
-    if (pool.length === 0) {
-      logStep("No candidates even without difficulty filter");
-      return [];
-    }
+    logStep("No candidates found with exact periodization filters; refusing difficulty fallback");
+    return [];
   }
 
   // EXHAUSTION-FIRST: workouts never picked before in this slot go first
