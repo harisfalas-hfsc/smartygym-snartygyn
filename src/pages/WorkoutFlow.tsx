@@ -426,12 +426,12 @@ const WorkoutFlow = () => {
                          itemScope
                          itemType="https://schema.org/ExercisePlan"
                          onClick={() => handleWorkoutSelect(workout.id)}
-                          className="flex flex-col h-[300px] min-[540px]:h-auto bg-card border-2 border-primary/40 rounded-xl overflow-hidden cursor-pointer hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300"
+                           className="flex flex-col h-[300px] min-[540px]:h-[600px] bg-card border-2 border-primary/40 rounded-xl overflow-hidden cursor-pointer hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300"
                          role="button"
                          aria-label={`${workout.title} workouts`}
                        >
                          {/* Image section */}
-                          <div className="relative h-[58%] min-[540px]:h-auto min-[540px]:aspect-[16/11] overflow-hidden flex-shrink-0">
+                           <div className="relative h-[58%] min-[540px]:h-[72%] min-[540px]:aspect-auto overflow-hidden flex-shrink-0 bg-muted">
                           {isWodCard && wodImages.length > 0 ? (
                             wodImages.map((imageUrl, index) => (
                               <img
@@ -439,7 +439,7 @@ const WorkoutFlow = () => {
                                 src={imageUrl}
                                 alt=""
                                 loading="lazy"
-                                className="absolute inset-0 w-full h-full object-cover object-[center_top] transition-opacity duration-1000 ease-in-out"
+                                 className="absolute inset-0 w-full h-full object-cover object-[center_top] min-[540px]:object-contain transition-opacity duration-1000 ease-in-out"
                                 style={{ opacity: currentWodImageIndex === index ? 1 : 0 }}
                               />
                             ))
@@ -448,7 +448,7 @@ const WorkoutFlow = () => {
                               src={mobileImage} 
                               alt={workout.title}
                               loading="lazy"
-                              className="w-full h-full object-cover object-[center_top]"
+                               className="w-full h-full object-cover object-[center_top] min-[540px]:object-contain"
                             />
                           )}
                           {!isWodCard && (
@@ -456,16 +456,16 @@ const WorkoutFlow = () => {
                           )}
                         </div>
                         {/* Content section */}
-                          <div className="flex flex-col justify-center flex-1 px-3 py-3 min-[540px]:p-4 min-[540px]:min-h-[120px] text-center">
-                           <div className="flex items-center justify-center gap-2 mb-0.5">
+                          <div className="flex flex-col justify-center flex-1 px-3 py-3 min-[540px]:p-4 text-center">
+                           <div className="flex items-center justify-center gap-2 mb-1 min-[540px]:mb-2">
                             <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                               <Icon className="w-4 h-4 text-primary" />
                             </div>
-                              <h3 className="text-sm font-bold text-foreground leading-tight line-clamp-2 min-h-[2.5rem]" itemProp="name">
+                              <h3 className="text-sm min-[540px]:text-base font-bold text-foreground leading-tight line-clamp-2 min-h-[2.5rem] min-[540px]:min-h-0 self-center" itemProp="name">
                               {workout.title}
                             </h3>
                           </div>
-                          <p className="text-xs text-muted-foreground leading-snug line-clamp-2 min-h-[2.5rem]">
+                          <p className="text-xs min-[540px]:text-sm text-muted-foreground leading-snug line-clamp-2 min-h-[2.5rem] min-[540px]:min-h-0">
                             {workoutDescriptions[workout.id] || workout.description}
                           </p>
                         </div>
