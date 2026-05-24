@@ -276,9 +276,11 @@ const WODCategory = () => {
 
               {/* WOD Cards - Training days show 2 cards, Recovery shows 1 */}
               {isRecoveryDay && variousWOD ? (
-                /* Recovery Day - Single Card using unified renderWODCard */
-                <div className="max-w-2xl mx-auto">
-                  {renderWODCard(variousWOD, false, true)}
+                /* Recovery Day - Single Card spanning full container width */
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="md:col-span-2">
+                    {renderWODCard(variousWOD, false, true)}
+                  </div>
                 </div>
               ) : bodyweightWOD || equipmentWOD ? (
                 <>
