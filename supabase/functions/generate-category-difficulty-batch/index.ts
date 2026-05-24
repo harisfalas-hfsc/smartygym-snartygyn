@@ -157,7 +157,9 @@ ${difficulty === "Advanced"
     : `Beginner volume: low density, shorter work intervals (20-30s work / 30-40s rest), light loads, simple fundamental patterns, avoid advanced plyometrics or complex compounds. Emphasize technique cues and longer recovery.`}
 NEVER list an exercise without a prescription.
 
-${equipment === "BODYWEIGHT"
+${category === "MOBILITY & STABILITY"
+    ? `MOBILITY & STABILITY: prioritize controlled tempo, isometric holds, single-leg/single-arm stability work, joint mobility, banded mobility (if equipment) or PNF/CARs (if bodyweight). HARD BAN: no jump squats, jumps, burpees, mountain climbers, high knees, running/sprints, kettlebell swings/snatches, slams, tire flips, heavy squats/deadlifts/lunges, presses/rows/curls/dips, push-ups, crunches, sit-ups, or dynamic leg-raise core work.`
+    : equipment === "BODYWEIGHT"
     ? `BODYWEIGHT CONDITIONING: rely on plyometrics, calisthenics, and high-density bodyweight work. NO machines/barbells/dumbbells/kettlebells.`
     : `EQUIPMENT CONDITIONING: use kettlebells, dumbbells, barbells, ropes, rower/bike, sled, box. Combine implements for complexes.`}
 
