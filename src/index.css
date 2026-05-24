@@ -166,6 +166,26 @@ All colors MUST be HSL.
 }
 
 @layer utilities {
+  @media (max-width: 539px) {
+    .smarty-carousel-card-title,
+    .smarty-carousel-card-copy {
+      display: -webkit-box !important;
+      -webkit-box-orient: vertical !important;
+      -webkit-line-clamp: 2 !important;
+      overflow: hidden !important;
+    }
+
+    .smarty-carousel-card-title {
+      max-height: 2.5rem !important;
+      overflow-wrap: normal !important;
+      word-break: normal !important;
+    }
+
+    .smarty-carousel-card-copy {
+      max-height: 2rem !important;
+    }
+  }
+
   @media (min-width: 540px) and (max-width: 1023px) and (orientation: portrait) {
     .smarty-carousel-card-portrait-tablet {
       height: 720px !important;
