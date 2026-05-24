@@ -66,6 +66,10 @@ function categoryGuidance(category: CategoryKey, equipment: EquipmentKey): strin
       return eq
         ? "Cardiovascular conditioning emphasizing sustained heart rate: jumping jacks, skater jumps, high knees, mountain climbers, burpees, jump rope simulation, shuttle steps, plyo lunges."
         : "Cardiovascular conditioning with implements: rower, assault bike, jump rope, KB swings, light DB intervals, ski erg, sled work, box jumps, battle ropes.";
+    case "MOBILITY & STABILITY":
+      return eq
+        ? "Controlled bodyweight mobility and stability only: CARs, balance holds, bird dog, side bridge, cat-cow, ankle/wrist circles, hip mobility, spine stretch, slow breathing. No conditioning, plyometrics, heavy strength, crunches, sit-ups, or leg raises."
+        : "Controlled equipment-assisted mobility and stability only: bands, balance board, foam roller, exercise ball, rope-assisted stretches, controlled hip rotation, quiet balance. No kettlebell power work, heavy strength, conditioning, crunches, sit-ups, or leg raises.";
   }
 }
 
