@@ -1,56 +1,52 @@
-# Permanent Security Fixes — Pre-Submission
+Reality confirmed:
 
-Goal: clear all 4 outstanding warnings/errors so they do not reappear in the Security panel before Apple/Google submission.
+- Today, 2026-05-24 Cyprus date, is Day 13 of the 84-day cycle: MOBILITY & STABILITY, Advanced, 5-6 stars.
+- Tomorrow, 2026-05-25, is Day 14: CHALLENGE, Intermediate, 3-4 stars.
+- The public calendar is correct. The earlier “Challenge today” statement was wrong.
 
-## Findings to fix
+Root cause found:
 
-1. **ERROR — `workout_comments` exposes `user_id` to anonymous visitors**
-   The `SELECT` policy is still `USING (true)`. Even though we discussed it before, the policy was never tightened.
+- The library picker correctly knows Mobility & Stability should have 2 WODs: BODYWEIGHT + EQUIPMENT.
+- Today currently has only 1 active WOD: BODYWEIGHT, “Align Flow Restore”.
+- The bug is in `select-wod-from-library`: if it finds any WOD already active for the date, it skips the entire selection.
+- So when the watchdog sees the missing Equipment slot and calls the picker, the picker says “a WOD already exists” and exits instead of filling only the missing Equipment slot.
+- The Health System Audit is mostly correct about the missing slot, but it still contains old “generation / pre-built / Generate New WOD” wording from the previous AI-generation system, which makes the message confusing.
 
-2. **WARN — Public can EXECUTE `SECURITY DEFINER` functions (anon role)**
-   Sensitive admin/maintenance functions are callable without signing in.
+Implementation plan:
 
-3. **WARN — Signed-in users can EXECUTE `SECURITY DEFINER` functions (authenticated role)**
-   Same functions are also callable by any logged-in user.
+1. Fix `select-wod-from-library` to be slot-aware
+   - Do not skip the whole day when one WOD already exists.
+   - For Recovery days: require 1 slot only.
+   - For all other days: check BODYWEIGHT and EQUIPMENT separately.
+   - If BODYWEIGHT exists but EQUIPMENT is missing, select only EQUIPMENT.
+   - If EQUIPMENT exists but BODYWEIGHT is missing, select only BODYWEIGHT.
+   - If both exist, skip safely.
+   - Keep the existing safeguards: visible only, premium only, not free, has image, has Stripe product/price, passes WOD publish contract.
 
-4. **WARN — Public storage bucket allows listing**
-   At least one public bucket has a broad `SELECT` policy on `storage.objects` that lets clients list every file in the bucket (URL access still works; only directory listing is blocked).
+2. Fix `watchdog-wod-check`
+   - Import/use the same 84-day periodization logic.
+   - Treat only RECOVERY as 1 WOD.
+   - Treat Mobility & Stability, Strength, Pilates, Cardio, Metabolic, Calorie Burning, and Challenge as 2-slot days.
+   - Report the expected category/difficulty in the watchdog response so it is clear what day it is checking.
 
-## Fix plan (single migration)
+3. Clean Health System Audit logic and wording
+   - Rename “WOD Auto-Generation Config” / “Workout of Day Generation” wording to “Library WOD Selection”.
+   - Remove old admin instructions like “Generate New WOD” and “Pre-Generate manually”.
+   - Replace with correct library-mode instructions: “Run WOD Watchdog / Repick from Library”.
+   - Make the audit message explicit:
+     - Today: Day 13 / Mobility & Stability / Advanced / expected 2 slots.
+     - Found: BODYWEIGHT only.
+     - Missing: EQUIPMENT.
+   - Keep tomorrow checks, but describe them as tomorrow library picks/preview, not AI pre-built generation.
 
-### 1. Lock down `workout_comments`
-- Drop the `Anyone can view comments` policy.
-- Add: `CREATE POLICY "Authenticated users can view comments" ON public.workout_comments FOR SELECT TO authenticated USING (true);`
-- Comments remain visible to logged-in users (community feature preserved). Anonymous visitors no longer see `user_id`.
+4. Repair today’s missing WOD after code is fixed
+   - Trigger the library picker/watchdog for today.
+   - Confirm today has exactly 2 WODs:
+     - 1 BODYWEIGHT Mobility & Stability Advanced.
+     - 1 EQUIPMENT Mobility & Stability Advanced.
+   - Confirm both have image + Stripe product + Stripe price.
 
-### 2. Harden `SECURITY DEFINER` functions
-- Enumerate all `SECURITY DEFINER` functions in `public` via `pg_proc`.
-- For functions that must only run from cron / edge functions / admins (e.g. SQL execution helpers, cron managers, archival/maintenance, role grants, internal sync):
-  `REVOKE EXECUTE ON FUNCTION ... FROM PUBLIC, anon, authenticated;`
-  `GRANT EXECUTE ON FUNCTION ... TO service_role;`
-- For user-facing helpers that legitimately need authenticated callers (e.g. `has_role`, profile helpers): keep `EXECUTE` for `authenticated` only, revoke from `anon` and `PUBLIC`.
-- Keep behavior identical for the app — only the role grants change.
-
-### 3. Block storage directory listing
-- For each public bucket (avatars, blog images, exercise GIFs, etc.), replace any broad `SELECT` on `storage.objects` with policies that:
-  - Allow reading a specific object by id/name (so existing `getPublicUrl` links keep working).
-  - Disallow unscoped listing (`SELECT *` without a filter).
-- Keep owner-scoped write/update/delete policies as they are.
-
-### 4. Update security memory
-- Record: comments require auth, definer functions are service-role/admin-only, public buckets are read-by-URL not listable.
-- Mark all 4 findings as fixed via `manage_security_finding` after the migration runs.
-
-## What does NOT change
-- No frontend code changes.
-- No edge function logic changes (they use `service_role` and keep working).
-- Avatars, blog images, GIFs, etc. continue to load via their public URLs.
-- Logged-in users keep seeing comments and profile data exactly as today.
-
-## Verification
-After migration runs:
-1. Re-run the security scan — expect 0 findings.
-2. Spot-check: load a workout page as a logged-in user (comments visible), load a public image URL (works), try to list a bucket as anon (blocked).
-3. Mark each finding fixed and update `@security-memory`.
-
-Approve this plan and I will implement it in one migration + memory update.
+5. Validate the fix
+   - Query today’s active WODs.
+   - Query tomorrow’s WODs separately to confirm Challenge belongs to tomorrow, not today.
+   - Run/check the Health System Audit output to confirm it no longer reports confusing old generation/pre-built messages.

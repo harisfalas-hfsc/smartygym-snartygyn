@@ -739,10 +739,10 @@ const handler = async (req: Request): Promise<Response> => {
         `${tomorrowCount}/${expectedTomorrowCount} WOD(s) ready for ${tomorrowCyprus} (Cyprus)`,
         ok ? 'pass' : enforce ? 'fail' : 'warning',
         ok
-          ? `✅ Tomorrow's WODs already built — midnight rollover will be seamless`
+          ? `✅ Tomorrow's WODs already picked from the library — midnight rollover will be seamless`
           : enforce
-            ? `CRITICAL: Morning crons (06:30 / 06:50 UTC) and 4 retry passes (07:20, 07:50, 08:20, 08:50 UTC) all failed to build tomorrow's WODs. Inspect wod_generation_runs for the failure reason and trigger Admin → WOD Manager → Generate New WOD → Pre-Generate for Future Date manually.`
-            : `Morning crons run at 06:30 / 06:50 UTC with retries through 08:50 UTC; check again after 09:00 UTC.`
+            ? `CRITICAL: Library picker (06:30 / 06:50 UTC) and 4 retry passes (07:20, 07:50, 08:20, 08:50 UTC) all failed to pick tomorrow's WODs from the library. Inspect wod_generation_runs for the failure reason, then run Admin → WOD Manager → WOD Watchdog or open Tomorrow's WOD Preview to repick.`
+            : `Library picker runs at 06:30 / 06:50 UTC with retries through 08:50 UTC; check again after 09:00 UTC.`
       );
     } catch (tmrErr) {
       console.error('[HEALTH-AUDIT] tomorrow WOD check failed:', tmrErr);
