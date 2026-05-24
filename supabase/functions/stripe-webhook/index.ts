@@ -71,6 +71,24 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
+    // Idempotency guard: record the event id; if it already exists, skip processing.
+    const { error: idemError } = await supabase
+      .from("stripe_webhook_events")
+      .insert({ event_id: event.id, event_type: event.type });
+
+    if (idemError) {
+      // Duplicate key => already processed. Return 200 so Stripe stops retrying.
+      if ((idemError as any).code === "23505") {
+        logStep("Duplicate event ignored (idempotent)", { id: event.id, type: event.type });
+        return new Response(JSON.stringify({ received: true, duplicate: true }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        });
+      }
+      // Any other error: log but continue (do not block legitimate processing).
+      logStep("WARN: Failed to record idempotency row, continuing", { error: idemError });
+    }
+
     // Handle different event types
     switch (event.type) {
       case "checkout.session.completed": {
