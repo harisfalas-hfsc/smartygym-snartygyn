@@ -170,6 +170,8 @@ export function validateWodSections(
       finisherExerciseCount: 0,
       hasMinimumExercises: false,
       exerciseContentIssues: ["No content provided"],
+      softTissueIssues: ["No content provided"],
+      softTissueValid: false,
     };
   }
 
