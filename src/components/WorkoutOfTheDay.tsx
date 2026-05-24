@@ -7,22 +7,26 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { CalendarCheck, Clock, Dumbbell, Star, Crown, ShoppingBag, Archive, Home, TrendingUp, Layers, Target } from "lucide-react";
 import { useTodayWods } from "@/hooks/useTodayWods";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
+import { SwipeToExplore } from "@/components/ui/SwipeToExplore";
+import { cn } from "@/lib/utils";
 
 export const WorkoutOfTheDay = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const [rotatingIndex, setRotatingIndex] = useState(0);
+  const [wodCarouselApi, setWodCarouselApi] = useState<CarouselApi>();
+  const [currentWodSlide, setCurrentWodSlide] = useState(0);
 
   const { bodyweightWod: bodyweightWOD, equipmentWod: equipmentWOD, variousWod: variousWOD, isRecoveryDay, hasWods: hasWODs, isLoading } = useTodayWods();
 
-  // Mobile-only: rotate between the two WODs every 2.5 seconds
+  // Mobile-only: let users swipe between the two daily WOD cards.
   useEffect(() => {
-    if (!isMobile || isRecoveryDay || !bodyweightWOD || !equipmentWOD) return;
-    const t = setInterval(() => {
-      setRotatingIndex((prev) => (prev + 1) % 2);
-    }, 2500);
-    return () => clearInterval(t);
-  }, [isMobile, isRecoveryDay, bodyweightWOD, equipmentWOD]);
+    if (!wodCarouselApi) return;
+    const onSelect = () => setCurrentWodSlide(wodCarouselApi.selectedScrollSnap());
+    onSelect();
+    wodCarouselApi.on("select", onSelect);
+    return () => wodCarouselApi.off("select", onSelect);
+  }, [wodCarouselApi]);
 
   const getDifficultyColor = (stars: number | null) => {
     if (!stars) return "bg-gray-500/20 text-gray-600 border-gray-500/40";
