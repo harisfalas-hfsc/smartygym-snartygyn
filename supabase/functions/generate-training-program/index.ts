@@ -138,7 +138,7 @@ Heart rate and cardiovascular development. Think like a coach for runners/swimme
 - This is for people building endurance capacity
 
 CARDIO WORKOUT STRUCTURE (5 SECTIONS FOR EACH WORKOUT):
-• 🧽 Soft Tissue Prep (5 min): Foam rolling posterior chain + feet
+• 🧽 Soft Tissue Prep (5 min): FOAM ROLLING ONLY — posterior chain + feet (no stretches, no library exercises)
 • 🔥 Activation (15 min): Mobility drills + Stability + Dynamic warm-up
 • 💪 Main Workout: Intervals, EMOM, sustained cardio (20-35 min)
 • ⚡ Finisher: EMOM or AMRAP with high-intensity bursts (15-25 min)
@@ -228,7 +228,10 @@ You MUST select exercises ONLY from the EXERCISE LIBRARY provided above. You sho
    Icons go BEFORE the <strong><u>Section Title</u></strong> with a space after the emoji.
    
    5-SECTION STRUCTURE (for Strength, Calorie Burning, Metabolic, Cardio, Mobility & Stability, Challenge):
-   1. 🧽 Soft Tissue Preparation (5 min): Foam rolling, trigger point release
+   1. 🧽 Soft Tissue Preparation (5 min): FOAM ROLLING ONLY. Each line must start with
+      "Foam roll", "Lacrosse ball", "Tennis ball", "Trigger point", "Self-massage", or "Myofascial release".
+      NEVER use {{exercise:...}} markup. NEVER list stretches, mobility drills, circles, swings, lunges, poses, bridges, raises, cobra, cat-cow.
+      Stretches go in Activation (dynamic) or Cool Down (static).
    2. 🔥 Activation (10-15 min): Mobility + Stability + Dynamic warm-up
    3. 💪 Main Workout: Core training following category logic
    4. ⚡ Finisher: Related to category, different format/intensity than main
