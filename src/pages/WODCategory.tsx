@@ -48,6 +48,8 @@ const WODCategory = () => {
 
   // Fetch workouts, interactions, and WOD state from database
   const { isLoading, bodyweightWod: bodyweightWOD, equipmentWod: equipmentWOD, variousWod: variousWOD, isRecoveryDay } = useTodayWods();
+  const availableTrainingWODs = [bodyweightWOD, equipmentWOD].filter(Boolean);
+  const hasSingleTrainingWOD = !isRecoveryDay && availableTrainingWODs.length === 1;
   const {
     data: interactions = []
   } = useWorkoutInteractions(userId);
@@ -141,7 +143,7 @@ const WODCategory = () => {
         {/* Card Content */}
         <CardContent className="p-3 sm:p-4">
           {/* Title */}
-          <h3 className="text-lg sm:text-xl font-bold text-foreground mb-1.5 group-hover:text-primary transition-colors line-clamp-1">
+          <h3 className="text-lg sm:text-xl font-bold leading-tight text-foreground mb-1.5 group-hover:text-primary transition-colors line-clamp-2 min-h-[3.5rem]">
             {wod.name}
           </h3>
 
@@ -279,6 +281,11 @@ const WODCategory = () => {
                 /* Recovery Day - Single Card fills full available width on all breakpoints */
                 <div className="w-full">
                   {renderWODCard(variousWOD, false, true)}
+                </div>
+              ) : hasSingleTrainingWOD ? (
+                /* Any single WOD day must fill the full row instead of occupying half of a two-card grid */
+                <div className="w-full">
+                  {bodyweightWOD ? renderWODCard(bodyweightWOD, true) : renderWODCard(equipmentWOD, false)}
                 </div>
               ) : bodyweightWOD || equipmentWOD ? (
                 <>
