@@ -593,9 +593,10 @@ const Index = () => {
                 const formatMetaLabel = (value: string | null | undefined) => value ? value.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase()) : "";
                 const isRecovery = wod.category?.toUpperCase() === "RECOVERY";
                 return (
-                  <Card
-                    className="group h-[330px] cursor-pointer overflow-hidden hover:shadow-xl transition-all duration-300 hover:border-primary/60"
-                  >
+                  <div className="space-y-3">
+                    <Card
+                      className="group h-[330px] cursor-pointer overflow-hidden hover:shadow-xl transition-all duration-300 hover:border-primary/60"
+                    >
                     <div className="relative aspect-video overflow-hidden">
                       <img
                         key={wod.id}
@@ -661,21 +662,30 @@ const Index = () => {
                           <span className="max-w-full truncate text-purple-700 dark:text-purple-400 font-medium">{wod.duration || "45-60 min"}</span>
                         </div>
                       </div>
-                      {mobileWodCards.length > 1 && (
-                        <div className="flex justify-center gap-1.5 mt-1">
-                          {mobileWodCards.map((card, index) => (
-                            <span
-                              key={card.id}
-                              className={cn(
-                                "h-1.5 w-1.5 rounded-full transition-colors",
-                                index === activeWodIndex % mobileWodCards.length ? "bg-primary" : "bg-muted-foreground/30"
-                              )}
-                            />
-                          ))}
-                        </div>
-                      )}
                     </CardContent>
-                  </Card>
+                    </Card>
+                    {mobileWodCards.length > 1 && (
+                      <div className="flex justify-center items-center gap-3 pb-1" aria-label="Workout of the Day slides">
+                        {mobileWodCards.map((card, index) => (
+                          <button
+                            key={card.id}
+                            type="button"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              setActiveWodIndex(index);
+                            }}
+                            className={cn(
+                              "rounded-full transition-all duration-300 shadow-sm",
+                              index === activeWodIndex % mobileWodCards.length
+                                ? "h-3 w-3 bg-primary shadow-[0_0_8px_hsl(var(--primary))]"
+                                : "h-2.5 w-2.5 bg-primary/45 hover:bg-primary/70"
+                            )}
+                            aria-label={`Show ${card.label} workout`}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 );
               })()
             ) : (
