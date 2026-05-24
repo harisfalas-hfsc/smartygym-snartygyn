@@ -138,7 +138,12 @@ Never use plain exercise names. Never invent exercises not present above.
 ═══════════════════════════════════════════════════════════════════════════════
 MANDATORY 5-SECTION STRUCTURE (icons in this exact order):
 ═══════════════════════════════════════════════════════════════════════════════
-1. 🧽 Soft Tissue Preparation — plain text foam-roll/lacrosse-ball cues (NOT library exercises)
+1. 🧽 Soft Tissue Preparation — FOAM ROLLING ONLY. Each line MUST start with one of:
+   "Foam roll", "Foam-roll", "Lacrosse ball", "Tennis ball", "Trigger point", "Self-massage", "Myofascial release".
+   NEVER use {{exercise:...}} markup here. NEVER list stretches, mobility drills, circles, swings, lunges,
+   poses, bridges, raises, hydrants, cobra, cat-cow, sun salutations, or any library movement.
+   Stretches go in 🔥 Activation (dynamic) or 🧘 Cool Down (static). This section is exclusively
+   foam-rolling/ball-release work targeting the muscles the workout trains.
 2. 🔥 Activation — library exercises with markup
 3. 💪 Main Workout — library exercises with markup (minimum 3 exercises)
 4. ⚡ Finisher — library exercises with markup (minimum 1 exercise)
