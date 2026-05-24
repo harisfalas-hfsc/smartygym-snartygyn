@@ -126,7 +126,7 @@ export const WorkoutOfTheDay = () => {
     
     return (
       <div 
-        className="bg-background/80 backdrop-blur-sm rounded-lg p-4 border border-cyan-500/40 cursor-pointer hover:border-cyan-500/60 transition-all max-w-md mx-auto"
+        className="w-full bg-background/80 backdrop-blur-sm rounded-lg p-4 border border-cyan-500/40 cursor-pointer hover:border-cyan-500/60 transition-all"
         onClick={() => navigate(`/workout/wod/${wod.id}`)}
       >
         {wod.image_url && (
@@ -135,7 +135,7 @@ export const WorkoutOfTheDay = () => {
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
           </div>
         )}
-        <h4 className="text-base font-bold text-foreground mb-2">{wod.name}</h4>
+        <h4 className="text-base font-bold leading-tight text-foreground mb-2 line-clamp-2 min-h-[2.5rem]">{wod.name}</h4>
         <div className="flex flex-wrap items-center gap-2 text-xs mb-2">
           <Badge variant="outline" className="bg-cyan-500/20 text-cyan-700 dark:text-cyan-400 border-cyan-500/40">
             {wod.category}
