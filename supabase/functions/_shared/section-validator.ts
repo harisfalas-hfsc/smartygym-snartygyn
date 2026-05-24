@@ -44,6 +44,26 @@ const ICON_LABELS: Record<string, string> = {
 const MIN_MAIN_WORKOUT_EXERCISES = 3;
 const MIN_FINISHER_EXERCISES = 3;
 
+// Valid keywords for the 🧽 Soft Tissue Preparation block. Each line in that
+// section must contain at least one of these. Library-exercise markup
+// ({{exercise:...}}) and stretch/mobility verbs are forbidden here.
+const SOFT_TISSUE_VALID_KEYWORDS = [
+  "foam roll",
+  "foam-roll",
+  "foam roller",
+  "lacrosse",
+  "tennis ball",
+  "trigger point",
+  "trigger-point",
+  "self-massage",
+  "self massage",
+  "myofascial",
+  "release",
+];
+
+const SOFT_TISSUE_FORBIDDEN_WORDS =
+  /\b(stretch|circle|raise|swing|lunge|pose|march|bridge|squat|press|row|curl|twist|hydrant|cobra|cat-cow|catcow|sun salutation)\b/i;
+
 export interface SectionValidationResult {
   isComplete: boolean;
   missingSections: string[];
@@ -54,6 +74,9 @@ export interface SectionValidationResult {
   finisherExerciseCount: number;
   hasMinimumExercises: boolean;
   exerciseContentIssues: string[];
+  // Soft-tissue validation
+  softTissueIssues: string[];
+  softTissueValid: boolean;
 }
 
 /**
@@ -79,6 +102,49 @@ function countExerciseTagsBetween(
   const sectionContent = html.substring(startIdx, endIdx);
   const matches = sectionContent.match(/\{\{exercise:/g);
   return matches ? matches.length : 0;
+}
+
+/**
+ * Validates the 🧽 Soft Tissue Preparation block: must contain at least one
+ * foam-rolling / ball / release keyword, must NOT contain {{exercise:...}}
+ * markup, and must NOT list stretches or mobility drills.
+ */
+export function validateSoftTissueBlock(html: string | null | undefined): string[] {
+  if (!html) return [];
+  const start = html.indexOf(SECTION_ICONS.SOFT_TISSUE);
+  if (start === -1) return [];
+  // find next section icon
+  const otherIcons = [
+    SECTION_ICONS.ACTIVATION,
+    SECTION_ICONS.MAIN_WORKOUT,
+    SECTION_ICONS.FINISHER,
+    SECTION_ICONS.COOL_DOWN,
+  ];
+  let end = html.length;
+  for (const icon of otherIcons) {
+    const idx = html.indexOf(icon, start + 1);
+    if (idx !== -1 && idx < end) end = idx;
+  }
+  const block = html.slice(start, end);
+  const issues: string[] = [];
+  if (/\{\{exercise:/i.test(block)) {
+    issues.push("Soft Tissue Preparation contains library-exercise markup ({{exercise:...}}). It must be foam-rolling only.");
+  }
+  // body lines (strip header paragraph and tags)
+  const body = block.replace(/<p[^>]*>\s*🧽[\s\S]*?<\/p>/, "");
+  const text = body.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().toLowerCase();
+  if (!text) {
+    issues.push("Soft Tissue Preparation section is empty.");
+    return issues;
+  }
+  const hasValid = SOFT_TISSUE_VALID_KEYWORDS.some((kw) => text.includes(kw));
+  if (!hasValid) {
+    issues.push("Soft Tissue Preparation has no foam-roll / lacrosse-ball / tennis-ball / trigger-point / self-massage / release cue.");
+  }
+  if (SOFT_TISSUE_FORBIDDEN_WORDS.test(text)) {
+    issues.push("Soft Tissue Preparation contains stretches/mobility moves. Move them to Activation or Cool Down.");
+  }
+  return issues;
 }
 
 /**
@@ -152,9 +218,10 @@ export function validateWodSections(
   }
 
   const hasMinimumExercises = exerciseContentIssues.length === 0;
+  const softTissueIssues = validateSoftTissueBlock(mainWorkoutHtml);
 
   return {
-    isComplete: missingIcons.length === 0 && exerciseContentIssues.length === 0,
+    isComplete: missingIcons.length === 0 && exerciseContentIssues.length === 0 && softTissueIssues.length === 0,
     missingSections,
     missingIcons,
     foundIcons,
@@ -162,5 +229,7 @@ export function validateWodSections(
     finisherExerciseCount,
     hasMinimumExercises,
     exerciseContentIssues,
+    softTissueIssues,
+    softTissueValid: softTissueIssues.length === 0,
   };
 }
