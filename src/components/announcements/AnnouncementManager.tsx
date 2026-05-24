@@ -14,6 +14,21 @@ const PARQ_REMINDER_SHOWN_KEY = "smartygym_parq_reminder_shown";
 // Key to track if user was EVER authenticated (prevents false triggers)
 const USER_AUTHENTICATED_KEY = "smartygym_user_authenticated";
 
+/**
+ * Close any open Radix overlays (DropdownMenu, Popover, Tooltip) so an
+ * announcement modal doesn't open on top of a stuck Login/Sign-Up dropdown.
+ * Radix listens for Escape on the document and closes the active overlay.
+ */
+const closeOpenOverlays = () => {
+  try {
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    // Also blur any focused trigger element so the dropdown doesn't reopen.
+    (document.activeElement as HTMLElement | null)?.blur?.();
+  } catch {
+    /* no-op */
+  }
+};
+
 export const AnnouncementManager = () => {
   const [showRitualModal, setShowRitualModal] = useState(false);
   const [showParQModal, setShowParQModal] = useState(false);
@@ -55,6 +70,7 @@ export const AnnouncementManager = () => {
     // Schedule PAR-Q popup for 30 seconds later
     console.log("[AnnouncementManager] First sign-in detected - scheduling PAR-Q popup in 30 seconds");
     parqTimerRef.current = setTimeout(() => {
+      closeOpenOverlays();
       setShowParQModal(true);
     }, PARQ_POPUP_DELAY_MS);
   }, []);
@@ -90,6 +106,7 @@ export const AnnouncementManager = () => {
 
     console.log("[AnnouncementManager] Triggering Ritual modal (WOD was skipped/unavailable)");
     setTimeout(() => {
+      closeOpenOverlays();
       setShowRitualModal(true);
     }, 2000); // Short delay when no WOD
   }, []);

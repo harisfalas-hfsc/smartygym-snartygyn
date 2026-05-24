@@ -14,7 +14,8 @@ import {
   XCircle, 
   RefreshCw,
   Wrench,
-  ListChecks
+  ListChecks,
+  Droplets
 } from "lucide-react";
 
 interface FormatIssue {
@@ -72,6 +73,48 @@ export const ContentFormattingAudit = () => {
   const [auditResult, setAuditResult] = useState<AuditResult | null>(null);
   const [repairResult, setRepairResult] = useState<RepairResult | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [isRepairingSoftTissue, setIsRepairingSoftTissue] = useState(false);
+
+  const runSoftTissueRepair = async () => {
+    setIsRepairingSoftTissue(true);
+    try {
+      let offset = 0;
+      let totalRepaired = 0;
+      let totalScanned = 0;
+      const allRepaired: { id: string; name: string; reason: string }[] = [];
+      // Paginate through everything in 200-row batches
+      // (the edge function returns next_offset when more remain).
+      // Hard stop at 50 batches to avoid runaway loops.
+      for (let i = 0; i < 50; i++) {
+        const { data, error } = await supabase.functions.invoke("repair-soft-tissue-sections", {
+          body: { batch_size: 200, offset },
+        });
+        if (error) throw error;
+        totalScanned += data.scanned || 0;
+        totalRepaired += data.repaired || 0;
+        allRepaired.push(...(data.repaired_details || []));
+        if (!data.next_offset) break;
+        offset = data.next_offset;
+      }
+      toast({
+        title: "Soft Tissue Repair Complete",
+        description: `Scanned ${totalScanned} workouts. Repaired ${totalRepaired}.`,
+        variant: totalRepaired > 0 ? "default" : "default",
+      });
+      if (allRepaired.length) {
+        console.log("[SoftTissueRepair] repaired:", allRepaired);
+      }
+    } catch (e) {
+      console.error("Soft tissue repair failed", e);
+      toast({
+        title: "Soft Tissue Repair Failed",
+        description: String((e as Error)?.message || e),
+        variant: "destructive",
+      });
+    } finally {
+      setIsRepairingSoftTissue(false);
+    }
+  };
 
   const runAudit = async () => {
     setIsAuditing(true);
@@ -210,6 +253,22 @@ export const ContentFormattingAudit = () => {
             <li>Exercises formatted as bullet lists</li>
             <li>HTML attribute formatting (double quotes)</li>
           </ul>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant="outline"
+            className="flex items-center gap-2 border-cyan-500"
+            onClick={runSoftTissueRepair}
+            disabled={isRepairingSoftTissue}
+          >
+            {isRepairingSoftTissue ? (
+              <RefreshCw className="h-4 w-4 animate-spin" />
+            ) : (
+              <Droplets className="h-4 w-4 text-cyan-500" />
+            )}
+            {isRepairingSoftTissue ? "Repairing Soft Tissue…" : "🧽 Repair Soft Tissue Sections"}
+          </Button>
         </div>
 
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
