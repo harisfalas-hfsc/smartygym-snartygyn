@@ -92,7 +92,7 @@ const WODCategory = () => {
       equipmentBadgeClass = "bg-orange-500";
     }
     
-    return <Card className="group cursor-pointer overflow-hidden hover:shadow-xl transition-all duration-300 hover:border-primary/60 flex-1" onClick={() => navigate(`/workout/wod/${wod.id}`)}>
+    return <Card className="group cursor-pointer overflow-hidden hover:shadow-xl transition-all duration-300 hover:border-primary/60 w-full h-full" onClick={() => navigate(`/workout/wod/${wod.id}`)}>
         {/* Image */}
         <div className="relative aspect-video overflow-hidden">
           <img src={wod.image_url || "/placeholder.svg"} alt={`${wod.name} - online workout by Haris Falas at SmartyGym SmartGym Smart Gym smartygym.com`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -276,11 +276,9 @@ const WODCategory = () => {
 
               {/* WOD Cards - Training days show 2 cards, Recovery shows 1 */}
               {isRecoveryDay && variousWOD ? (
-                /* Recovery Day - Single Card spanning full container width */
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="md:col-span-2">
-                    {renderWODCard(variousWOD, false, true)}
-                  </div>
+                /* Recovery Day - Single Card fills full available width on all breakpoints */
+                <div className="w-full">
+                  {renderWODCard(variousWOD, false, true)}
                 </div>
               ) : bodyweightWOD || equipmentWOD ? (
                 <>
