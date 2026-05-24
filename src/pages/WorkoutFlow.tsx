@@ -32,7 +32,8 @@ const WorkoutFlow = () => {
   const { allTodayWods } = useTodayWods();
   const wodImages = allTodayWods.filter((w) => w.image_url).map((w) => w.image_url as string);
 
-  // Fetch workout counts by category (excluding WOD)
+  // Fetch workout counts by category. Library-picked WODs must remain counted
+  // because they are existing library workouts temporarily promoted to WOD.
   const { data: workoutCounts = {} } = useQuery({
     queryKey: ["workout-category-counts"],
     queryFn: async () => {
@@ -40,7 +41,7 @@ const WorkoutFlow = () => {
       
       const counts: Record<string, number> = {};
       data
-        ?.filter((w) => w.is_workout_of_day !== true)
+        ?.filter((w) => w.is_workout_of_day !== true || w.wod_source === "library")
         .forEach(w => {
         if (w.category) {
           // Map DB category to card ID

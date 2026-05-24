@@ -3706,6 +3706,7 @@ export type Database = {
           tier_required: string
           type: string
           updated_at: string
+          wod_source: string
         }[]
       }
       get_website_analytics_summary: {
