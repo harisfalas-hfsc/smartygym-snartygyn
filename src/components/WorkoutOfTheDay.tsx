@@ -6,14 +6,12 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CalendarCheck, Clock, Dumbbell, Star, Crown, ShoppingBag, Archive, Home, TrendingUp, Layers, Target } from "lucide-react";
 import { useTodayWods } from "@/hooks/useTodayWods";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
 import { SwipeToExplore } from "@/components/ui/SwipeToExplore";
 import { cn } from "@/lib/utils";
 
 export const WorkoutOfTheDay = () => {
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
   const [wodCarouselApi, setWodCarouselApi] = useState<CarouselApi>();
   const [currentWodSlide, setCurrentWodSlide] = useState(0);
 
@@ -238,8 +236,8 @@ export const WorkoutOfTheDay = () => {
               {renderRecoveryCard(variousWOD)}
             </div>
           ) : (
-            isMobile ? (
-              <div className="max-w-xl mx-auto mb-4 -mx-4 sm:mx-auto">
+            <>
+              <div className="sm:hidden max-w-xl mx-auto mb-4 -mx-4">
                 <SwipeToExplore onPrev={() => wodCarouselApi?.scrollPrev()} onNext={() => wodCarouselApi?.scrollNext()} />
                 <Carousel className="w-full" opts={{ align: "center", loop: false }} setApi={setWodCarouselApi}>
                   <CarouselContent className="-ml-3">
@@ -273,12 +271,11 @@ export const WorkoutOfTheDay = () => {
                   </div>
                 )}
               </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-xl mx-auto mb-4">
+              <div className="hidden sm:grid sm:grid-cols-2 gap-3 max-w-xl mx-auto mb-4">
                 {renderMiniCard(bodyweightWOD, true)}
                 {renderMiniCard(equipmentWOD, false)}
               </div>
-            )
+            </>
           )
         ) : (
           <div className="bg-background/80 backdrop-blur-sm rounded-xl p-6 border-2 border-dashed border-primary/30 max-w-md mx-auto text-center mb-4">
