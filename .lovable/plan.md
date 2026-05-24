@@ -1,41 +1,57 @@
-## What's actually going on
+## Goal
 
-I checked both findings against the live database and the codebase. Here's the truth:
+Give the carousel cards on the **Smarty Workouts**, **Smarty Programs**, and **Smarty Tools** pages enough vertical breathing room so the description text never touches the bottom edge on mobile, and is ~25% taller on tablet portrait.
 
-### 1. Testimonials — FALSE ALARM, no real problem
-- The `testimonials` table SELECT policy is correctly locked down: only the owner or admins can read raw rows.
-- Public reads happen through two `SECURITY DEFINER` functions (`get_public_testimonials`, `get_testimonial_rating_stats`) that are intentionally callable by anonymous visitors for SEO and the public testimonials section.
-- Even the scanner's own note says: *"No issue — this is a documentation note. (No actionable finding.)"*
-- So this is exactly how we designed it. Nothing to fix. We just need to tell the scanner to stop re-flagging it.
+## The problem
 
-### 2. Calendar OAuth tokens — REAL leftover, but from a removed feature
-- The `user_calendar_connections` table still stores Google `access_token` and `refresh_token` in plaintext.
-- RLS limits each user to their own row, but the user can still read their own tokens through the client API. That's the real risk the scanner is flagging.
-- BUT: per project memory, the Google Calendar feature was removed and replaced with internal reminders + native `.ics` export. I searched the entire codebase and there are zero references to `user_calendar_connections` anywhere (no edge functions, no frontend, nothing). The table is orphaned.
+All three pages share the same mobile carousel card markup. The cards have:
 
-## Plan
+- A fixed mobile height of `h-[260px]` with the image taking `h-[70%]` (~182px) and only ~78px left for the icon + title + description. With `line-clamp-2 min-h-[2.5rem]` on both title and description, the description sits flush against the bottom border — no breathing space.
+- A tablet portrait sizing (`min-[540px]:`) that uses `aspect-[25/16]` for the image and `min-h-[96px]` for the content. The user wants this ~25% taller.
 
-### Step 1 — Remove the orphaned calendar tokens table
-Migration that drops `public.user_calendar_connections` entirely. This eliminates the plaintext OAuth tokens completely — nothing to encrypt because nothing reads or writes them anymore.
+## Files to change (same edit applied to each)
 
-Safety:
-- Confirmed zero code references.
-- Aligned with the existing "Calendar Removal" memory (internal reminders only).
-- Not HFSC-related, not paid content — safe to drop.
+1. `src/pages/WorkoutFlow.tsx` — mobile carousel `CarouselItem` (around line 424–472)
+2. `src/pages/TrainingProgramFlow.tsx` — mobile carousel `CarouselItem` (around line 359–397)
+3. `src/pages/Tools.tsx` — mobile carousel `CarouselItem` (around line 213–242)
 
-### Step 2 — Mark the testimonials finding as intentional
-Use `manage_security_finding` to ignore `testimonials_select_restricted_to_owner_admin` with the reason: public reads go through `get_public_testimonials` / `get_testimonial_rating_stats` SECURITY DEFINER functions; the restrictive table policy is the correct design.
+The desktop grid (`lg:` branch) is **not** touched.
 
-### Step 3 — Update security memory
-Record that:
-- Calendar OAuth tokens table was dropped; feature is internal reminders only.
-- Testimonials are intentionally read-restricted at the table level; SEO reads use SECURITY DEFINER functions.
+## Concrete CSS changes
 
-So future scans don't re-raise these.
+For the outer card div (currently):
+```
+flex flex-col h-[260px] min-[540px]:h-auto ...
+```
+→
+```
+flex flex-col h-[300px] min-[540px]:h-auto ...
+```
+(+40px mobile height = roughly one extra line of breathing space below the description)
 
-### What I will NOT touch
-- The shop products / `contact-files` finding (you asked to skip it since shop is hidden).
-- Any HFSC asset.
-- Any working feature.
+For the image wrapper (currently):
+```
+relative h-[70%] min-[540px]:h-auto min-[540px]:aspect-[25/16] ...
+```
+→
+```
+relative h-[58%] min-[540px]:h-auto min-[540px]:aspect-[16/11] ...
+```
+(reduces image share on mobile so content area grows; changes tablet aspect from 25/16 → 16/11 so the image isn't disproportionately tall when the content area grows)
 
-After Step 1 the scanner's `error`-level finding disappears for real. After Step 2 the testimonials `warn` is acknowledged as by-design.
+For the content wrapper (currently):
+```
+flex flex-col justify-center flex-1 px-3 py-2 min-[540px]:p-3 min-[540px]:min-h-[96px] text-center
+```
+→
+```
+flex flex-col justify-center flex-1 px-3 py-3 min-[540px]:p-4 min-[540px]:min-h-[120px] text-center
+```
+(adds vertical padding on mobile = bottom breathing space; raises tablet `min-h` from 96px → 120px = ~25% taller as requested; bumps tablet padding from `p-3` → `p-4`)
+
+## Out of scope
+
+- Desktop grid layouts on all three pages (untouched)
+- The "Smarty Tools" desktop big-timer + 4-card grid (untouched)
+- Any text content, icons, or navigation behavior
+- Carousel arrows, dots, swipe hint
