@@ -100,7 +100,10 @@ export function validateMobilityStabilityExerciseCompatibility(
     .filter(Boolean);
 
   return exerciseNames
-    .filter((name) => MOBILITY_STABILITY_FORBIDDEN_EXERCISES.some((pattern) => pattern.test(name)))
+    .filter((name) => {
+      if (/\bscapula\s+push-?up\b/i.test(name)) return false;
+      return MOBILITY_STABILITY_FORBIDDEN_EXERCISES.some((pattern) => pattern.test(name));
+    })
     .map((name) => `Mobility & Stability contains incompatible exercise: ${name}`);
 }
 
