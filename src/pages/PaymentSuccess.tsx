@@ -43,6 +43,14 @@ const PaymentSuccess = () => {
         if (error) throw error;
         setVerified(true);
         
+        // Refresh subscription/access state immediately so premium features unlock
+        // without waiting for the next auth event or polling cycle.
+        try {
+          await supabase.functions.invoke('check-subscription');
+        } catch (e) {
+          console.warn('check-subscription refresh failed (non-blocking):', e);
+        }
+
         // Track purchase event
         const { data: { session: userSession } } = await supabase.auth.getSession();
         if (userSession?.user) {
