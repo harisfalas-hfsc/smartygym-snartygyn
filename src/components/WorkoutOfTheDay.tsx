@@ -254,16 +254,16 @@ export const WorkoutOfTheDay = () => {
                   </CarouselContent>
                 </Carousel>
                 {bodyweightWOD && equipmentWOD && (
-                  <div className="flex justify-center gap-2 mt-3">
+                  <div className="flex justify-center items-center gap-2 mt-3 pb-1">
                     {[0, 1].map((index) => (
                       <button
                         key={index}
                         onClick={() => wodCarouselApi?.scrollTo(index)}
                         className={cn(
-                          "w-2.5 h-2.5 rounded-full border-2 transition-all duration-300",
+                          "rounded-full transition-all duration-300",
                           currentWodSlide === index
-                            ? "border-primary bg-transparent scale-125"
-                            : "border-primary/40 bg-transparent hover:border-primary/60"
+                            ? "w-3 h-3 bg-primary shadow-[0_0_8px_hsl(var(--primary))]"
+                            : "w-2.5 h-2.5 bg-primary/40 hover:bg-primary/70"
                         )}
                         aria-label={`Go to ${index === 0 ? "Home" : "Gym"} workout`}
                       />
