@@ -177,7 +177,7 @@ TIMED FORMAT RULES:
 - For Time: list reps to complete as fast as possible.
 `}
 
-${category === "MOBILITY & STABILITY" ? `MOBILITY & STABILITY: prioritize controlled tempo, isometric holds, single-leg/single-arm stability work, banded mobility (if equipment) or PNF/CARs (if bodyweight).` : ""}
+${category === "MOBILITY & STABILITY" ? `MOBILITY & STABILITY: prioritize controlled tempo, isometric holds, single-leg/single-arm stability work, joint mobility, banded mobility (if equipment) or PNF/CARs (if bodyweight). HARD BAN: no jump squats, jumps, burpees, mountain climbers, high knees, running/sprints, kettlebell swings/snatches, slams, tire flips, heavy squats/deadlifts/lunges, presses/rows/curls/dips, push-ups, crunches, sit-ups, or dynamic leg-raise core work.` : ""}
 ${category === "CARDIO" ? `CARDIO: continuous activity. If BODYWEIGHT: jumping jacks, mountain climbers, burpees, high knees, shuttle drills. If EQUIPMENT: rower, ski erg, assault bike, jump rope. NO REPS & SETS.` : ""}
 ${category === "CHALLENGE" ? `CHALLENGE: a benchmark feel. For Time or AMRAP. High demand but completable by intermediate athletes.` : ""}
 ${category === "METABOLIC" ? `METABOLIC: full-body conditioning, compound movements, minimal rest. Big breath demand.` : ""}
@@ -365,9 +365,9 @@ async function generateOne(
       const htmlValid = validateWorkoutHtml(mainNorm);
       if (!htmlValid.isValid) log("HTML validation issues (continuing)", { issues: htmlValid.issues });
 
-      const sectionCheck = validateWodSections(mainNorm, false);
+      const sectionCheck = validateWodSections(mainNorm, false, category);
       if (!sectionCheck.isComplete) {
-        throw new Error(`Section/density validation failed: missing=[${sectionCheck.missingSections.join(", ")}], issues=[${sectionCheck.exerciseContentIssues.join("; ")}]`);
+        throw new Error(`Section/density validation failed: missing=[${sectionCheck.missingSections.join(", ")}], issues=[${[...sectionCheck.exerciseContentIssues, ...sectionCheck.softTissueIssues, ...sectionCheck.mobilityCompatibilityIssues].join("; ")}]`);
       }
 
       // Build ID + insert

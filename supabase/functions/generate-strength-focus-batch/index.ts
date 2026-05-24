@@ -339,9 +339,9 @@ async function generateOne(
       const htmlValid = validateWorkoutHtml(mainNorm);
       if (!htmlValid.isValid) log("HTML validation issues (continuing)", { issues: htmlValid.issues });
 
-      const sectionCheck = validateWodSections(mainNorm, false);
+      const sectionCheck = validateWodSections(mainNorm, false, "STRENGTH");
       if (!sectionCheck.isComplete) {
-        throw new Error(`Section/density validation failed: missing=[${sectionCheck.missingSections.join(", ")}], issues=[${sectionCheck.exerciseContentIssues.join("; ")}]`);
+        throw new Error(`Section/density validation failed: missing=[${sectionCheck.missingSections.join(", ")}], issues=[${[...sectionCheck.exerciseContentIssues, ...sectionCheck.softTissueIssues, ...sectionCheck.mobilityCompatibilityIssues].join("; ")}]`);
       }
 
       const ts = Date.now();

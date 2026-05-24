@@ -151,13 +151,19 @@ export function validateWodPublishContract(
   if (tips.length < 80) failures.push("tips too short or missing (min 80 chars)");
 
   // Sections + density on main_workout
-  const sectionResult = validateWodSections(mainWorkout, slots.isRecoveryDay);
+  const sectionResult = validateWodSections(mainWorkout, slots.isRecoveryDay, wod.category);
   if (!sectionResult.isComplete) {
     if (sectionResult.missingSections.length > 0) {
       failures.push(`main_workout missing sections: ${sectionResult.missingSections.join(", ")}`);
     }
     if (sectionResult.exerciseContentIssues.length > 0) {
       failures.push(`main_workout exercise density: ${sectionResult.exerciseContentIssues.join("; ")}`);
+    }
+    if (sectionResult.softTissueIssues.length > 0) {
+      failures.push(`main_workout soft tissue rules: ${sectionResult.softTissueIssues.join("; ")}`);
+    }
+    if (sectionResult.mobilityCompatibilityIssues.length > 0) {
+      failures.push(`main_workout category compatibility: ${sectionResult.mobilityCompatibilityIssues.join("; ")}`);
     }
   }
 

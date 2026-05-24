@@ -64,6 +64,14 @@ const SOFT_TISSUE_VALID_KEYWORDS = [
 const SOFT_TISSUE_FORBIDDEN_WORDS =
   /\b(stretch|circle|raise|swing|lunge|pose|march|bridge|squat|press|row|curl|twist|hydrant|cobra|cat-cow|catcow|sun salutation)\b/i;
 
+const MOBILITY_STABILITY_FORBIDDEN_EXERCISES: RegExp[] = [
+  /\b(jump\s*squat|squat\s*jump|drop\s*jump|box\s*jump|broad\s*jump|tuck\s*jump|forward\s*jump|backward\s*jump|skater\s*jump|jumping\s*lunge|jumping\s*jacks?|high\s*knees?|burpees?|mountain\s*climbers?|sprints?|shuttle\s*runs?|\brun\b|fast\s*feet)\b/i,
+  /\b(kettlebell\s*swings?|kettlebell\s.*snatch|snatch|clean\s*(?:and|&)\s*jerk|power\s*clean|thrusters?|battle\s*ropes?|wall\s*balls?|slam\s*balls?|medicine\s*ball\s*slams?|tire\s*flips?)\b/i,
+  /\b(bench\s*press|shoulder\s*press|triceps\s*press|biceps\s*curl|weighted\s*curl|seated\s*row|high\s*row|chin-?ups?|pull-?ups?|bench\s*dips?|lever\s*seated\s*dips?|push-?ups?)\b/i,
+  /\b(barbell\s*full\s*squat|dumbbell\s*squat|goblet\s*squat|pistol\s*squat|one\s*leg\s*squat|walking\s*lunge|dumbbell\s*lunge|romanian\s*deadlift|stiff\s*leg\s*deadlift|straight\s*leg\s*deadlift)\b/i,
+  /\b(crunch(?:es)?|sit-?ups?|russian\s*twists?|bicycle\s*crunch|leg\s*raise\s*crunch|vertical\s*leg\s*raise|hanging\s*(?:straight\s*)?leg\s*raise|seated\s*leg\s*raise|twisted\s*leg\s*raise|frog\s*crunch|reverse\s*crunch)\b/i,
+];
+
 export interface SectionValidationResult {
   isComplete: boolean;
   missingSections: string[];
@@ -77,6 +85,26 @@ export interface SectionValidationResult {
   // Soft-tissue validation
   softTissueIssues: string[];
   softTissueValid: boolean;
+  // Category-specific coaching validation
+  mobilityCompatibilityIssues: string[];
+  mobilityCompatible: boolean;
+}
+
+export function validateMobilityStabilityExerciseCompatibility(
+  html: string | null | undefined,
+  category: string | null | undefined,
+): string[] {
+  if (!html || (category || "").toUpperCase() !== "MOBILITY & STABILITY") return [];
+  const exerciseNames = [...html.matchAll(/\{\{exercise:[^:}]+:([^}]+)\}\}/gi)]
+    .map((match) => match[1].replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim())
+    .filter(Boolean);
+
+  return exerciseNames
+    .filter((name) => {
+      if (/\bscapula\s+push-?up\b/i.test(name)) return false;
+      return MOBILITY_STABILITY_FORBIDDEN_EXERCISES.some((pattern) => pattern.test(name));
+    })
+    .map((name) => `Mobility & Stability contains incompatible exercise: ${name}`);
 }
 
 /**
@@ -157,7 +185,8 @@ export function validateSoftTissueBlock(html: string | null | undefined): string
  */
 export function validateWodSections(
   mainWorkoutHtml: string | null | undefined,
-  isRecovery: boolean = false
+  isRecovery: boolean = false,
+  category?: string | null
 ): SectionValidationResult {
   if (!mainWorkoutHtml) {
     const required = isRecovery ? RECOVERY_REQUIRED : NON_RECOVERY_REQUIRED;
@@ -172,6 +201,8 @@ export function validateWodSections(
       exerciseContentIssues: ["No content provided"],
       softTissueIssues: ["No content provided"],
       softTissueValid: false,
+      mobilityCompatibilityIssues: [],
+      mobilityCompatible: true,
     };
   }
 
@@ -221,9 +252,10 @@ export function validateWodSections(
 
   const hasMinimumExercises = exerciseContentIssues.length === 0;
   const softTissueIssues = validateSoftTissueBlock(mainWorkoutHtml);
+  const mobilityCompatibilityIssues = validateMobilityStabilityExerciseCompatibility(mainWorkoutHtml, category);
 
   return {
-    isComplete: missingIcons.length === 0 && exerciseContentIssues.length === 0 && softTissueIssues.length === 0,
+    isComplete: missingIcons.length === 0 && exerciseContentIssues.length === 0 && softTissueIssues.length === 0 && mobilityCompatibilityIssues.length === 0,
     missingSections,
     missingIcons,
     foundIcons,
@@ -233,5 +265,7 @@ export function validateWodSections(
     exerciseContentIssues,
     softTissueIssues,
     softTissueValid: softTissueIssues.length === 0,
+    mobilityCompatibilityIssues,
+    mobilityCompatible: mobilityCompatibilityIssues.length === 0,
   };
 }

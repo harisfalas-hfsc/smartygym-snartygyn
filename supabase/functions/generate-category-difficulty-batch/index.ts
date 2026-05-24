@@ -66,6 +66,10 @@ function categoryGuidance(category: CategoryKey, equipment: EquipmentKey): strin
       return eq
         ? "Cardiovascular conditioning emphasizing sustained heart rate: jumping jacks, skater jumps, high knees, mountain climbers, burpees, jump rope simulation, shuttle steps, plyo lunges."
         : "Cardiovascular conditioning with implements: rower, assault bike, jump rope, KB swings, light DB intervals, ski erg, sled work, box jumps, battle ropes.";
+    case "MOBILITY & STABILITY":
+      return eq
+        ? "Controlled bodyweight mobility and stability only: CARs, balance holds, bird dog, side bridge, cat-cow, ankle/wrist circles, hip mobility, spine stretch, slow breathing. No conditioning, plyometrics, heavy strength, crunches, sit-ups, or leg raises."
+        : "Controlled equipment-assisted mobility and stability only: bands, balance board, foam roller, exercise ball, rope-assisted stretches, controlled hip rotation, quiet balance. No kettlebell power work, heavy strength, conditioning, crunches, sit-ups, or leg raises.";
   }
 }
 
@@ -157,7 +161,9 @@ ${difficulty === "Advanced"
     : `Beginner volume: low density, shorter work intervals (20-30s work / 30-40s rest), light loads, simple fundamental patterns, avoid advanced plyometrics or complex compounds. Emphasize technique cues and longer recovery.`}
 NEVER list an exercise without a prescription.
 
-${equipment === "BODYWEIGHT"
+${category === "MOBILITY & STABILITY"
+    ? `MOBILITY & STABILITY: prioritize controlled tempo, isometric holds, single-leg/single-arm stability work, joint mobility, banded mobility (if equipment) or PNF/CARs (if bodyweight). HARD BAN: no jump squats, jumps, burpees, mountain climbers, high knees, running/sprints, kettlebell swings/snatches, slams, tire flips, heavy squats/deadlifts/lunges, presses/rows/curls/dips, push-ups, crunches, sit-ups, or dynamic leg-raise core work.`
+    : equipment === "BODYWEIGHT"
     ? `BODYWEIGHT CONDITIONING: rely on plyometrics, calisthenics, and high-density bodyweight work. NO machines/barbells/dumbbells/kettlebells.`
     : `EQUIPMENT CONDITIONING: use kettlebells, dumbbells, barbells, ropes, rower/bike, sled, box. Combine implements for complexes.`}
 
@@ -330,9 +336,9 @@ async function generateOne(
       const htmlValid = validateWorkoutHtml(mainNorm);
       if (!htmlValid.isValid) log("HTML validation issues (continuing)", { issues: htmlValid.issues });
 
-      const sectionCheck = validateWodSections(mainNorm, false);
+      const sectionCheck = validateWodSections(mainNorm, false, category);
       if (!sectionCheck.isComplete) {
-        throw new Error(`Section/density validation failed: missing=[${sectionCheck.missingSections.join(", ")}], issues=[${sectionCheck.exerciseContentIssues.join("; ")}]`);
+        throw new Error(`Section/density validation failed: missing=[${sectionCheck.missingSections.join(", ")}], issues=[${[...sectionCheck.exerciseContentIssues, ...sectionCheck.softTissueIssues, ...sectionCheck.mobilityCompatibilityIssues].join("; ")}]`);
       }
 
       const ts = Date.now();
