@@ -68,7 +68,7 @@ serve(async (req) => {
       logStep("Archiving WOD", { id: wod.id, name: wod.name, category: wod.category, generated_for_date: wod.generated_for_date, wod_source: wod.wod_source });
 
       const isRecovery = wod.category === "RECOVERY";
-      const sectionCheck = validateWodSections(wod.main_workout, isRecovery);
+      const sectionCheck = validateWodSections(wod.main_workout, isRecovery, wod.category);
       const shouldHideFromGallery = !sectionCheck.isComplete;
 
       if (shouldHideFromGallery) {
