@@ -230,11 +230,11 @@ const Tools = () => {
                           <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                             <Icon className="w-4 h-4 text-primary" />
                           </div>
-                          <h3 className="text-sm font-bold text-foreground leading-tight whitespace-nowrap">
+                          <h3 className="text-sm font-bold text-foreground leading-tight line-clamp-2 min-h-[2.5rem]">
                             {tool.title}
                           </h3>
                         </div>
-                        <p className="text-xs text-muted-foreground leading-snug line-clamp-2">
+                        <p className="text-xs text-muted-foreground leading-snug line-clamp-2 min-h-[2.5rem]">
                           {tool.description}
                         </p>
                       </div>
