@@ -177,7 +177,37 @@ serve(async (req: Request): Promise<Response> => {
         details: `${sentCount} emails sent` 
       });
     }
-    
+
+    // 8. Watchdog self-healing status (last 24h)
+    const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const { data: watchdogEvents } = await supabase
+      .from('system_health_events')
+      .select('check_type, status, autofix_status, severity, scheduled_for_date, equipment_slot, issue_message, candidate_rejection_reasons, created_at')
+      .gte('created_at', since)
+      .order('created_at', { ascending: false })
+      .limit(50);
+    const openIssues = (watchdogEvents || []).filter(e => e.status === 'open');
+    const fixedIssues = (watchdogEvents || []).filter(e => e.status === 'resolved');
+    if (openIssues.length > 0) {
+      checks.push({
+        name: 'WOD Watchdog (24h)',
+        status: 'fail',
+        details: `${openIssues.length} unresolved issue(s); ${fixedIssues.length} auto-fixed. Most recent: ${openIssues[0].issue_message?.substring(0, 140)}`,
+      });
+    } else if (fixedIssues.length > 0) {
+      checks.push({
+        name: 'WOD Watchdog (24h)',
+        status: 'pass',
+        details: `${fixedIssues.length} issue(s) detected and auto-fixed by the watchdog.`,
+      });
+    } else {
+      checks.push({
+        name: 'WOD Watchdog (24h)',
+        status: 'pass',
+        details: 'No issues detected in last 24h.',
+      });
+    }
+
     const duration = Date.now() - startTime;
     const passed = checks.filter(c => c.status === 'pass').length;
     const warnings = checks.filter(c => c.status === 'warning').length;
@@ -194,6 +224,7 @@ serve(async (req: Request): Promise<Response> => {
       warnings,
       failed,
       checks,
+      watchdog_recent_events: (watchdogEvents || []).slice(0, 20),
       overall_status: failed > 0 ? 'critical' : warnings > 0 ? 'warning' : 'healthy'
     }), {
       status: 200,
