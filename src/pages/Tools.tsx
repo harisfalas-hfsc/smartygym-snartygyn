@@ -213,10 +213,10 @@ const Tools = () => {
                   <CarouselItem key={tool.id} className="pl-2 basis-[75%] sm:basis-[60%]">
                     <div
                       onClick={() => navigate(tool.route)}
-                      className="flex flex-col h-[260px] min-[540px]:h-auto bg-card border-2 border-primary/40 rounded-xl overflow-hidden cursor-pointer hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300"
+                      className="flex flex-col h-[300px] min-[540px]:h-auto bg-card border-2 border-primary/40 rounded-xl overflow-hidden cursor-pointer hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300"
                     >
                       {/* Image section */}
-                      <div className="relative h-[70%] min-[540px]:h-auto min-[540px]:aspect-[25/16] overflow-hidden flex-shrink-0">
+                      <div className="relative h-[58%] min-[540px]:h-auto min-[540px]:aspect-[16/11] overflow-hidden flex-shrink-0">
                         <img 
                           src={tool.mobileImage} 
                           alt={tool.title}
@@ -225,7 +225,7 @@ const Tools = () => {
                         />
                       </div>
                       {/* Content section */}
-                      <div className="flex flex-col justify-center flex-1 px-3 py-2 min-[540px]:p-3 min-[540px]:min-h-[96px] text-center">
+                      <div className="flex flex-col justify-center flex-1 px-3 py-3 min-[540px]:p-4 min-[540px]:min-h-[120px] text-center">
                         <div className="flex items-center justify-center gap-2 mb-0.5">
                           <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                             <Icon className="w-4 h-4 text-primary" />
