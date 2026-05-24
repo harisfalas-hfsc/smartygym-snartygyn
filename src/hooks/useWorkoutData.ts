@@ -30,6 +30,7 @@ export interface WorkoutData {
   focus: string | null;
   is_workout_of_day: boolean | null;
   generated_for_date: string | null;
+  wod_source: string | null;
   created_at: string | null;
 }
 
