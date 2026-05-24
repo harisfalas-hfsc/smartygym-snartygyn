@@ -183,25 +183,45 @@ serve(async (req) => {
       isRecoveryDay,
     });
 
-    // Check if WODs already exist for today
+    // Check which WOD slots already exist for the target date.
+    // SLOT-AWARE: do NOT skip the whole day if one slot is filled —
+    // fill only the missing slot(s). This is what watchdog/repair relies on.
     const { data: existingWods } = await supabase
       .from("admin_workouts")
       .select("id, name, equipment")
       .eq("is_workout_of_day", true)
       .eq("generated_for_date", targetDate);
 
-    if (existingWods && existingWods.length > 0) {
-      logStep("WODs already exist for today, skipping", { count: existingWods.length });
+    const existingEquipments = new Set(
+      (existingWods || []).map((w: any) => (w.equipment || "").toUpperCase())
+    );
+
+    const requiredSlots = isRecoveryDay
+      ? (existingEquipments.has("VARIOUS") ? [] : ["VARIOUS"])
+      : (() => {
+          const need: string[] = [];
+          if (!existingEquipments.has("BODYWEIGHT")) need.push("BODYWEIGHT");
+          if (!existingEquipments.has("EQUIPMENT")) need.push("EQUIPMENT");
+          return need;
+        })();
+
+    if (requiredSlots.length === 0) {
+      logStep("All WOD slots already filled for date, skipping", {
+        count: (existingWods || []).length,
+        equipments: Array.from(existingEquipments),
+      });
       return new Response(
         JSON.stringify({
           success: true,
           skipped: true,
-          message: `WODs already exist for ${targetDate}`,
-          existing: existingWods.map(w => w.name),
+          message: `All WOD slots already filled for ${targetDate}`,
+          existing: (existingWods || []).map((w: any) => w.name),
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
       );
     }
+
+    logStep("Slots to fill", { requiredSlots, alreadyFilled: Array.from(existingEquipments) });
 
     // EXHAUSTION-FIRST ROTATION:
     // `wod_selection_cooldown` is treated as a permanent "ever-used" ledger.
@@ -224,55 +244,24 @@ serve(async (req) => {
 
     const selectedWorkouts: any[] = [];
 
-    if (isRecoveryDay) {
-      // Recovery day: pick 1 workout from RECOVERY category
-      const selected = await selectWorkoutCandidates(supabase, {
-        category: "RECOVERY",
-        difficulty: null,
-        difficultyStars: null,
-        equipment: null, // Any equipment for recovery
+    for (const slot of requiredSlots) {
+      const isRecoverySlot = slot === "VARIOUS";
+      const candidates = await selectWorkoutCandidates(supabase, {
+        category: isRecoverySlot ? "RECOVERY" : periodization.category,
+        difficulty: isRecoverySlot ? null : periodization.difficulty,
+        difficultyStars: isRecoverySlot ? null : periodization.difficultyStars,
+        equipment: isRecoverySlot ? null : slot,
         cooldownIds,
         lastUsedAt,
-        strengthFocus: null,
+        strengthFocus: isRecoverySlot ? null : (periodization.strengthFocus || null),
       });
-
-      if (selected && selected.length > 0) {
-        selectedWorkouts.push({ slot: "RECOVERY", candidates: selected });
+      if (candidates && candidates.length > 0) {
+        selectedWorkouts.push({ slot, candidates });
       } else {
-        logStep("WARNING: No recovery workout found in library");
-      }
-    } else {
-      // Normal day: pick 1 BODYWEIGHT + 1 EQUIPMENT
-      const bwSelected = await selectWorkoutCandidates(supabase, {
-        category: periodization.category,
-        difficulty: periodization.difficulty,
-        difficultyStars: periodization.difficultyStars,
-        equipment: "BODYWEIGHT",
-        cooldownIds,
-        lastUsedAt,
-        strengthFocus: periodization.strengthFocus || null,
-      });
-
-      if (bwSelected && bwSelected.length > 0) {
-        selectedWorkouts.push({ slot: "BODYWEIGHT", candidates: bwSelected });
-      } else {
-        logStep("WARNING: No BODYWEIGHT workout found for", { category: periodization.category, difficulty: periodization.difficulty });
-      }
-
-      const eqSelected = await selectWorkoutCandidates(supabase, {
-        category: periodization.category,
-        difficulty: periodization.difficulty,
-        difficultyStars: periodization.difficultyStars,
-        equipment: "EQUIPMENT",
-        cooldownIds,
-        lastUsedAt,
-        strengthFocus: periodization.strengthFocus || null,
-      });
-
-      if (eqSelected && eqSelected.length > 0) {
-        selectedWorkouts.push({ slot: "EQUIPMENT", candidates: eqSelected });
-      } else {
-        logStep("WARNING: No EQUIPMENT workout found for", { category: periodization.category, difficulty: periodization.difficulty });
+        logStep(`WARNING: No ${slot} workout found for`, {
+          category: isRecoverySlot ? "RECOVERY" : periodization.category,
+          difficulty: isRecoverySlot ? null : periodization.difficulty,
+        });
       }
     }
 
@@ -400,16 +389,16 @@ serve(async (req) => {
       }
     } // end slot loop
 
-    const expectedCount = isRecoveryDay ? 1 : 2;
+    const expectedCount = requiredSlots.length;
     if (promotedCount < expectedCount) {
-      throw new Error(`Library fallback promoted ${promotedCount}/${expectedCount} WODs; refusing to report success without image + Stripe associations`);
+      throw new Error(`Library fallback promoted ${promotedCount}/${expectedCount} WOD slot(s) (${requiredSlots.join(", ")}); refusing to report success without image + Stripe associations`);
     }
 
     // Log to wod_generation_runs
     await supabase.from("wod_generation_runs").insert({
       cyprus_date: targetDate,
       status: "success",
-      expected_count: isRecoveryDay ? 1 : 2,
+      expected_count: expectedCount,
       found_count: promotedCount,
       is_recovery_day: isRecoveryDay,
       expected_category: periodization.category,
