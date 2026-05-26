@@ -23,6 +23,12 @@ export function normalizeWorkoutHtml(content: string): string {
   // STEP 0: Fix malformed HTML before anything else
   result = sanitizeMalformedHtml(result);
 
+  // STEP 0a: Collapse repeated gender-variant suffix tokens that occasionally
+  // leak out of the exercise-matching pipeline. Pattern seen in production:
+  //   "dynamic chest stretch (male) (male) (male) (male) ..."
+  // Any run of 2+ "(male)"/"(female)" tokens is pure noise and is removed.
+  result = result.replace(/(\s*\((?:male|female)\)){2,}/gi, '');
+
   // STEP 0b: Fix malformed nested exercise tokens BEFORE any whitespace work.
   // Pattern observed in production:
   //   {{jumping-jacks:{{exercise:jumping-jacks:Jumping Jacks}} }}
