@@ -89,11 +89,13 @@ const energyLabels: Record<number, string> = {
 };
 
 const goalOptions = [
-  { label: "Burn fat", value: "fat_loss" },
-  { label: "Build muscle", value: "muscle_gain" },
   { label: "Get stronger", value: "strength" },
-  { label: "Improve mobility", value: "flexibility" },
-  { label: "Just move", value: "general_fitness" },
+  { label: "Burn calories", value: "calorie_burning" },
+  { label: "Improve metabolic", value: "metabolic" },
+  { label: "Improve endurance", value: "endurance" },
+  { label: "Move better", value: "move_better" },
+  { label: "Challenge me", value: "challenge" },
+  { label: "Regenerate", value: "regenerate" },
 ];
 
 const durationOptions = [
@@ -107,6 +109,17 @@ const equipmentOptions = [
   { label: "No equipment", value: "bodyweight" },
   { label: "Equipment available", value: "equipment" },
 ];
+
+// Map legacy stored primary_goal values to the new category-aligned options.
+const LEGACY_GOAL_MAP: Record<string, string> = {
+  fat_loss: 'calorie_burning',
+  muscle_gain: 'strength',
+  flexibility: 'move_better',
+  general_fitness: 'strength',
+  recovery: 'regenerate',
+};
+const normalizeGoal = (g: string | null | undefined): string | null =>
+  g ? (LEGACY_GOAL_MAP[g] ?? g) : null;
 
 type MainPath = 'menu' | 'workout' | 'program' | 'knowledge';
 type WorkoutStep = 1 | 2 | 3 | 4 | 5 | 'result';
