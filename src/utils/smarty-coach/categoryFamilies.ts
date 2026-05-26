@@ -9,13 +9,20 @@ export const PROGRAM_CATEGORY_FAMILIES: Record<string, string[]> = {
 };
 
 export const WORKOUT_CATEGORY_FAMILIES: Record<string, string[]> = {
-  fat_loss: ['CALORIE BURNING', 'METABOLIC', 'HIIT', 'TABATA', 'CARDIO', 'CARDIO ENDURANCE', 'WEIGHT LOSS'],
-  muscle_gain: ['MUSCLE HYPERTROPHY', 'HYPERTROPHY', 'STRENGTH', 'RESISTANCE', 'FUNCTIONAL STRENGTH'],
+  // New category-aligned goals (one per workout category)
   strength: ['STRENGTH', 'FUNCTIONAL STRENGTH', 'POWER', 'MUSCLE HYPERTROPHY'],
-  endurance: ['CARDIO ENDURANCE', 'CARDIO', 'METABOLIC', 'HIIT'],
-  flexibility: ['MOBILITY & STABILITY', 'MOBILITY', 'PILATES', 'RECOVERY', 'STRETCHING'],
+  calorie_burning: ['CALORIE BURNING', 'METABOLIC', 'HIIT', 'TABATA', 'CARDIO', 'CARDIO ENDURANCE', 'WEIGHT LOSS'],
+  metabolic: ['METABOLIC', 'CALORIE BURNING', 'HIIT', 'TABATA', 'CARDIO'],
+  endurance: ['CARDIO', 'CARDIO ENDURANCE', 'METABOLIC', 'HIIT'],
+  move_better: ['MOBILITY & STABILITY', 'MOBILITY', 'PILATES', 'STRETCHING', 'RECOVERY'],
+  challenge: ['CHALLENGE', 'METABOLIC', 'STRENGTH'],
+  regenerate: ['RECOVERY', 'MOBILITY & STABILITY', 'PILATES', 'STRETCHING'],
+  // Legacy aliases (kept so saved user goals still resolve)
+  fat_loss: ['CALORIE BURNING', 'METABOLIC', 'HIIT', 'TABATA', 'CARDIO', 'CARDIO ENDURANCE', 'WEIGHT LOSS'],
+  muscle_gain: ['STRENGTH', 'MUSCLE HYPERTROPHY', 'HYPERTROPHY', 'RESISTANCE', 'FUNCTIONAL STRENGTH'],
+  flexibility: ['MOBILITY & STABILITY', 'MOBILITY', 'PILATES', 'STRETCHING', 'RECOVERY'],
   general_fitness: ['FUNCTIONAL STRENGTH', 'METABOLIC', 'CARDIO', 'STRENGTH'],
-  recovery: ['RECOVERY', 'PILATES', 'MOBILITY & STABILITY', 'STRETCHING'],
+  recovery: ['RECOVERY', 'MOBILITY & STABILITY', 'PILATES', 'STRETCHING'],
 };
 
 export const GOAL_LABELS: Record<string, string> = {
@@ -26,14 +33,20 @@ export const GOAL_LABELS: Record<string, string> = {
   weight_loss: 'weight loss',
   low_back_pain: 'back care',
   mobility_stability: 'mobility & stability',
-  // workout
-  fat_loss: 'fat loss',
-  muscle_gain: 'muscle building',
+  // workout (category-aligned)
   strength: 'strength',
-  endurance: 'endurance',
-  flexibility: 'mobility & flexibility',
+  calorie_burning: 'calorie burning',
+  metabolic: 'metabolic conditioning',
+  endurance: 'cardio endurance',
+  move_better: 'mobility & movement quality',
+  challenge: 'challenge',
+  regenerate: 'recovery & regeneration',
+  // Legacy aliases
+  fat_loss: 'calorie burning',
+  muscle_gain: 'strength',
+  flexibility: 'mobility & movement quality',
   general_fitness: 'general fitness',
-  recovery: 'recovery',
+  recovery: 'recovery & regeneration',
 };
 
 /**

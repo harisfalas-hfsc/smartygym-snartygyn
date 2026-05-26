@@ -38,11 +38,13 @@ export const QUESTION_POOL: Record<string, Question> = {
     id: 'goal',
     question: "What's your focus right now?",
     options: [
-      { label: "Burn fat", value: "fat_loss" },
-      { label: "Build muscle", value: "muscle_gain" },
       { label: "Get stronger", value: "strength" },
-      { label: "Improve mobility", value: "flexibility" },
-      { label: "Just move", value: "general_fitness" }
+      { label: "Burn calories", value: "calorie_burning" },
+      { label: "Improve metabolic", value: "metabolic" },
+      { label: "Improve endurance", value: "endurance" },
+      { label: "Move better", value: "move_better" },
+      { label: "Challenge me", value: "challenge" },
+      { label: "Regenerate", value: "regenerate" }
     ]
   },
   
