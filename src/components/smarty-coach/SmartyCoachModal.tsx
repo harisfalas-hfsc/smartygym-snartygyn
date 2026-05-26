@@ -171,10 +171,10 @@ export const SmartyCoachModal = ({ isOpen, onClose, initialPath = 'menu' }: Smar
   const hasAnyGoals = hasFitnessGoals || hasMeasurementGoals;
 
   const defaultGoal = useMemo(() => {
-    if (context.userGoal?.primary_goal) return context.userGoal.primary_goal;
+    if (context.userGoal?.primary_goal) return normalizeGoal(context.userGoal.primary_goal);
     if (measurementGoals) {
-      if (measurementGoals.target_weight || measurementGoals.target_body_fat) return 'fat_loss';
-      if (measurementGoals.target_muscle_mass) return 'muscle_gain';
+      if (measurementGoals.target_weight || measurementGoals.target_body_fat) return 'calorie_burning';
+      if (measurementGoals.target_muscle_mass) return 'strength';
     }
     return null;
   }, [context.userGoal?.primary_goal, measurementGoals]);
