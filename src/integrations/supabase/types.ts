@@ -3713,6 +3713,7 @@ export type Database = {
           difficulty_stars: number
           duration: string
           equipment: string
+          expected_results: string
           id: string
           image_url: string
           is_free: boolean
@@ -3720,43 +3721,57 @@ export type Database = {
           is_standalone_purchase: boolean
           is_visible: boolean
           name: string
+          nutrition_tips: string
+          overview: string
           price: number
+          program_structure: string
+          progression_plan: string
           serial_number: number
           stripe_price_id: string
           stripe_product_id: string
+          target_audience: string
           tier_required: string
           updated_at: string
+          weekly_schedule: string
           weeks: number
         }[]
       }
       get_visible_workout_metadata: {
         Args: { _workout_id?: string }
         Returns: {
+          activation: string
           category: string
+          cool_down: string
           created_at: string
           description: string
           difficulty: string
           difficulty_stars: number
           duration: string
           equipment: string
+          finisher: string
           focus: string
           format: string
           generated_for_date: string
           id: string
           image_url: string
+          instructions: string
           is_free: boolean
           is_premium: boolean
           is_standalone_purchase: boolean
           is_visible: boolean
           is_workout_of_day: boolean
+          main_workout: string
           name: string
+          notes: string
           price: number
           serial_number: number
           stripe_price_id: string
           stripe_product_id: string
           tier_required: string
+          tips: string
           type: string
           updated_at: string
+          warm_up: string
           wod_source: string
         }[]
       }
