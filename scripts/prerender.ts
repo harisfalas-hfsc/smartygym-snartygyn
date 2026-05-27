@@ -66,7 +66,7 @@ export async function prerenderSeoHtml(options: {
       // write an exact extensionless file so /blog/my-article returns article
       // HTML. Keep shallow/category routes as directory indexes so they do not
       // block deeper child routes such as /blog/<slug> or /workout/<cat>/<id>.
-      const isDeepLeaf = cleanPath.split("/").length >= 2;
+      const isDeepLeaf = ["blog-article", "workout", "program"].includes(route.kind);
       if (isDeepLeaf) {
         writeHtml(join(distDir, cleanPath), html);
       } else {
