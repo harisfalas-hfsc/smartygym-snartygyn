@@ -21,6 +21,12 @@ import {
 const DIST = resolve("dist");
 const TEMPLATE_PATH = join(DIST, "index.html");
 
+function normalizeTemplate(html: string) {
+  return html
+    .replace(/<script\s+type=["']application\/ld\+json["']\s+data-prerender=["']1["']>[\s\S]*?<\/script>\s*/gi, "")
+    .replace(/<div id="root">[\s\S]*?<\/div>\s*<script type="module"/i, '<div id="root"></div>\n    <script type="module"');
+}
+
 export async function prerenderSeoHtml(options: {
   distDir?: string;
   templatePath?: string;
@@ -33,7 +39,7 @@ export async function prerenderSeoHtml(options: {
       `[prerender] dist/index.html not found at ${templatePath}. Run after Vite writes the HTML bundle.`,
     );
   }
-  const template = readFileSync(templatePath, "utf8");
+  const template = normalizeTemplate(readFileSync(templatePath, "utf8"));
 
   const { routes, counts } = await buildSeoRoutes();
   console.log(
