@@ -27,14 +27,12 @@ function normalizeTemplate(html: string) {
     .replace(/<div id="root">\s*<main[\s\S]*?<\/main>\s*<\/div>/i, '<div id="root"></div>');
 }
 
-function hasChildRoute(routePath: string, allPaths: string[]) {
-  return allPaths.some((p) => p.startsWith(`${routePath}/`));
-}
-
-function clearDirectoryBeforeWritingFile(outPath: string) {
-  if (existsSync(outPath) && statSync(outPath).isDirectory()) {
-    rmSync(outPath, { recursive: true, force: true });
+function ensureParentDirectoryForFile(outPath: string) {
+  const parentDir = dirname(outPath);
+  if (existsSync(parentDir) && !statSync(parentDir).isDirectory()) {
+    rmSync(parentDir, { force: true });
   }
+  mkdirSync(parentDir, { recursive: true });
 }
 
 function writeCleanUrlRewrites(distDir: string, cleanPaths: string[]) {
@@ -47,8 +45,8 @@ function writeCleanUrlRewrites(distDir: string, cleanPaths: string[]) {
   for (const p of [...cleanPaths].sort()) {
     if (seen.has(p)) continue;
     seen.add(p);
-    rules.push(`${p} ${p}.html 200!`);
-    rules.push(`${p}/ ${p}.html 200!`);
+    rules.push(`${p} ${p}/index.html 200!`);
+    rules.push(`${p}/ ${p}/index.html 200!`);
   }
   if (!rules.length) return;
   writeFileSync(
