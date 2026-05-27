@@ -88,7 +88,29 @@ export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
       assertIncludes(html, `<main class="seo-prerender seo-article">`, `${route.path} prerendered article shell`);
       assertIncludes(html, `<h1>${htmlEscape(title)}</h1>`, `${route.path} article h1`);
       assertIncludes(html, `<div class="seo-article-body">`, `${route.path} article body wrapper`);
-      assertIncludes(html, String(payload.content || "").slice(0, 80), `${route.path} article body content`);
+      assertPayloadText(html, payload.content, `${route.path} article body content`);
+    }
+
+    if (route.kind === "workout") {
+      const payload = route.payload || {};
+      assertIncludes(html, `<main class="seo-prerender seo-workout">`, `${route.path} prerendered workout shell`);
+      assertIncludes(html, `<h1>${htmlEscape(String(payload.name || ""))}</h1>`, `${route.path} workout h1`);
+      assertPayloadText(
+        html,
+        (payload as any).main_workout || (payload as any).description || (payload as any).warm_up,
+        `${route.path} workout body content`,
+      );
+    }
+
+    if (route.kind === "program") {
+      const payload = route.payload || {};
+      assertIncludes(html, `<main class="seo-prerender seo-program">`, `${route.path} prerendered program shell`);
+      assertIncludes(html, `<h1>${htmlEscape(String(payload.name || ""))}</h1>`, `${route.path} program h1`);
+      assertPayloadText(
+        html,
+        (payload as any).program_structure || (payload as any).overview || (payload as any).description,
+        `${route.path} program body content`,
+      );
     }
 
     if (route.path !== "/") {
