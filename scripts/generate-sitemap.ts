@@ -17,7 +17,14 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
   process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
   process.env.SUPABASE_PUBLISHABLE_KEY ||
-  "";
+  // Safe public fallback: publish builds do not always expose VITE_* env vars
+  // to prebuild scripts. Without this, the sitemap silently shipped only the
+  // 58 static/category URLs and omitted every dynamic content URL.
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJIUzI1NiIsInJlZiI6ImN2Y2NydnlpbXl6cnhjd3pteHdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA2MTc2NjIsImV4cCI6MjA3NjE5MzY2Mn0.XU_h4CYRiQ7VN079laFHSVMrzB6urOhQZFoTagU_Wno";
+
+const MIN_EXPECTED_DYNAMIC_WORKOUTS = 100;
+const MIN_EXPECTED_DYNAMIC_PROGRAMS = 10;
+const MIN_EXPECTED_DYNAMIC_BLOG_ARTICLES = 1;
 
 interface Entry {
   path: string;
@@ -220,27 +227,26 @@ async function main() {
   let dynamicPrograms = 0;
   let dynamicBlog = 0;
 
-  if (SUPABASE_KEY) {
-    try {
-      const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
-        auth: { persistSession: false },
-      });
+  try {
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
+      auth: { persistSession: false },
+    });
 
-      const [workoutsRes, programsRes, blogRes] = await Promise.all([
-        // Use public RPCs that bypass RLS for visibility-safe metadata —
-        // direct table reads with the anon key only see a tiny subset.
-        (supabase as any).rpc("get_visible_workout_metadata", {
-          _workout_id: null,
-        }),
-        (supabase as any).rpc("get_visible_program_metadata", {
-          _program_id: null,
-        }),
-        supabase
-          .from("blog_articles")
-          .select("slug, updated_at, created_at, is_published")
-          .eq("is_published", true)
-          .limit(500),
-      ]);
+    const [workoutsRes, programsRes, blogRes] = await Promise.all([
+      // Use public RPCs that bypass RLS for visibility-safe metadata —
+      // direct table reads with the anon key only see a tiny subset.
+      (supabase as any).rpc("get_visible_workout_metadata", {
+        _workout_id: null,
+      }),
+      (supabase as any).rpc("get_visible_program_metadata", {
+        _program_id: null,
+      }),
+      supabase
+        .from("blog_articles")
+        .select("slug, updated_at, created_at, is_published")
+        .eq("is_published", true)
+        .limit(500),
+    ]);
 
       if (workoutsRes.error) {
         console.warn("[sitemap] workouts query error:", workoutsRes.error.message);
@@ -288,16 +294,18 @@ async function main() {
           dynamicBlog++;
         }
       }
-    } catch (err) {
-      console.warn(
-        "[sitemap] failed to fetch dynamic rows, falling back to static entries only:",
-        err,
+    if (
+      dynamicWorkouts < MIN_EXPECTED_DYNAMIC_WORKOUTS ||
+      dynamicPrograms < MIN_EXPECTED_DYNAMIC_PROGRAMS ||
+      dynamicBlog < MIN_EXPECTED_DYNAMIC_BLOG_ARTICLES
+    ) {
+      throw new Error(
+        `[sitemap] unsafe dynamic counts: workouts=${dynamicWorkouts}, programs=${dynamicPrograms}, blog=${dynamicBlog}. Refusing to publish a static-only or incomplete sitemap.`,
       );
     }
-  } else {
-    console.warn(
-      "[sitemap] VITE_SUPABASE_PUBLISHABLE_KEY not set; emitting static-only sitemap.",
-    );
+  } catch (err) {
+    console.error("[sitemap] failed to fetch required dynamic rows:", err);
+    throw err;
   }
 
   const xml = [
@@ -319,6 +327,6 @@ async function main() {
 
 main().catch((err) => {
   console.error("[sitemap] generation failed:", err);
-  // Do not fail the build — keep any existing sitemap.xml in place.
-  process.exit(0);
+  // Fail the publish/build instead of shipping an incomplete 58-URL sitemap.
+  process.exit(1);
 });
