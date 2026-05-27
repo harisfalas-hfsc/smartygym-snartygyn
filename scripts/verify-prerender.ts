@@ -18,6 +18,17 @@ function assertIncludes(html: string, needle: string, label: string) {
   }
 }
 
+function assertSingleCanonical(html: string, expectedHref: string, label: string) {
+  const canonicals = [...html.matchAll(/<link\s+[^>]*rel=["']canonical["'][^>]*>/gi)].map((match) => match[0]);
+  if (canonicals.length !== 1) {
+    throw new Error(`[verify-prerender] ${label} must have exactly one canonical tag, found ${canonicals.length}`);
+  }
+  const href = canonicals[0].match(/href=["']([^"']+)["']/i)?.[1] || "";
+  if (href !== expectedHref) {
+    throw new Error(`[verify-prerender] ${label} canonical is ${href}, expected ${expectedHref}`);
+  }
+}
+
 function exactFileFor(distDir: string, routePath: string) {
   if (routePath === "/") return join(distDir, "index.html");
   return join(distDir, routePath.replace(/^\//, ""));
@@ -43,13 +54,18 @@ export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
     }
 
     const html = readFileSync(artifactPath, "utf8");
+    const canonicalUrl = `https://smartygym.com${route.path}`;
     assertIncludes(html, `<title>${htmlEscape(route.title)}</title>`, `${route.path} title`);
-    assertIncludes(html, `href="https://smartygym.com${route.path}"`, `${route.path} canonical`);
+    assertSingleCanonical(html, canonicalUrl, route.path);
+    assertIncludes(html, `content="${canonicalUrl}"`, `${route.path} og:url`);
 
     if (route.kind === "blog-article") {
       const payload = route.payload || {};
       const title = String(payload.title || route.title.replace(/\s*\|\s*SmartyGym Blog$/, ""));
-      assertIncludes(html, title, `${route.path} article title`);
+      assertIncludes(html, `<main class="seo-prerender seo-article">`, `${route.path} prerendered article shell`);
+      assertIncludes(html, `<h1>${htmlEscape(title)}</h1>`, `${route.path} article h1`);
+      assertIncludes(html, `<div class="seo-article-body">`, `${route.path} article body wrapper`);
+      assertIncludes(html, String(payload.content || "").slice(0, 80), `${route.path} article body content`);
       if (artifactPath !== exactPath) {
         throw new Error(`[verify-prerender] ${route.path} must be an exact extensionless file for the published clean URL`);
       }
