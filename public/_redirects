@@ -1,4 +1,0 @@
-# Rewrite the well-known sitemap URL to the live edge function so newly
-# published blog articles, workouts, and programs appear automatically
-# without a redeploy. 200 = transparent proxy (URL stays /sitemap.xml).
-/sitemap.xml  https://cvccrvyimyzrxcwzmxwk.supabase.co/functions/v1/sitemap  200

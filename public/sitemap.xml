@@ -3559,6 +3559,12 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://smartygym.com/blog/kinetic-longevity-future-proofing-your-joints</loc>
+    <lastmod>2026-05-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://smartygym.com/blog/muscle-hypertrophy-complete-guide-building-muscle-losing-fat</loc>
     <lastmod>2025-11-28</lastmod>
     <changefreq>monthly</changefreq>
@@ -3733,12 +3739,6 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://smartygym.com/blog/metabolic-engine-evolution-the-hiit-revolution</loc>
-    <lastmod>2026-04-27</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://smartygym.com/blog/metabolic-flexibility-the-new-frontier-of-fat-loss</loc>
     <lastmod>2026-04-27</lastmod>
     <changefreq>monthly</changefreq>
@@ -3787,12 +3787,6 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://smartygym.com/blog/kinetic-longevity-future-proofing-your-joints</loc>
-    <lastmod>2026-05-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://smartygym.com/blog/fueling-the-engine-the-science-of-sustained-glycemic-flow</loc>
     <lastmod>2026-05-18</lastmod>
     <changefreq>monthly</changefreq>
@@ -3819,6 +3813,12 @@
   <url>
     <loc>https://smartygym.com/blog/respiratory-mechanics-the-science-of-performance-breathing</loc>
     <lastmod>2026-05-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://smartygym.com/blog/metabolic-engine-evolution-the-hiit-revolution</loc>
+    <lastmod>2026-05-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
