@@ -551,7 +551,20 @@ async function selectWorkoutCandidates(
 
   const pool: any[] = candidates || [];
 
-  if (pool.length === 0) {
+  // Filter candidates whose public name would be rejected by the DB
+  // validation trigger. Doing this here prevents the slot from "failing"
+  // simply because random shuffling kept landing on internal/AI-flavoured
+  // names like "Helix", "Matrix", "Protocol", "Sequence" etc.
+  const filtered = pool.filter((c) => !hasForbiddenPublicName(c.name));
+  if (filtered.length < pool.length) {
+    logStep("Filtered out candidates with forbidden public names", {
+      total: pool.length,
+      kept: filtered.length,
+      dropped: pool.length - filtered.length,
+    });
+  }
+
+  if (filtered.length === 0) {
     logStep("No candidates found with exact periodization filters; refusing difficulty fallback");
     return [];
   }
@@ -559,8 +572,8 @@ async function selectWorkoutCandidates(
   // EXHAUSTION-FIRST: workouts never picked before in this slot go first
   // (shuffled). Only when every workout in the pool has been used at least
   // once do we recycle, and then we recycle the LEAST-RECENTLY-USED first.
-  const neverUsed = pool.filter(c => !cooldownIds.has(c.id));
-  const alreadyUsed = pool.filter(c => cooldownIds.has(c.id));
+  const neverUsed = filtered.filter(c => !cooldownIds.has(c.id));
+  const alreadyUsed = filtered.filter(c => cooldownIds.has(c.id));
 
   // Optional focus prioritisation within never-used pool
   let prioritised = neverUsed;
