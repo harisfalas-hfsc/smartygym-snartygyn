@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchVisibleWorkoutMetadata } from "@/hooks/useTodayWods";
+import { slugifyContentName } from "@/lib/seo-slugs";
 
 export interface WorkoutData {
   id: string;
@@ -39,6 +40,10 @@ export const useWorkoutData = (workoutId: string | undefined) => {
     queryKey: ["workout", workoutId],
     queryFn: async () => {
       if (!workoutId) throw new Error("Workout ID is required");
+      const resolveFromMetadata = async () => {
+        const metadata = await fetchVisibleWorkoutMetadata(null);
+        return metadata.find((workout) => workout.id === workoutId || slugifyContentName(workout.name || workout.id) === workoutId);
+      };
       
       const { data, error } = await supabase
         .from("admin_workouts")
@@ -48,14 +53,12 @@ export const useWorkoutData = (workoutId: string | undefined) => {
         .maybeSingle();
 
       if (error) {
-        const metadata = await fetchVisibleWorkoutMetadata(workoutId);
-        const fallback = metadata[0];
+        const fallback = await resolveFromMetadata();
         if (!fallback) throw error;
         return fallback as WorkoutData;
       }
       if (!data) {
-        const metadata = await fetchVisibleWorkoutMetadata(workoutId);
-        const fallback = metadata[0];
+        const fallback = await resolveFromMetadata();
         if (!fallback) throw new Error("Workout not found");
 
         return fallback as WorkoutData;
