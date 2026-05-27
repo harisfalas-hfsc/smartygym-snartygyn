@@ -1,5 +1,8 @@
 project_id = "cvccrvyimyzrxcwzmxwk"
 
+[functions.sitemap]
+verify_jwt = false
+
 [functions.fix-stripe-metadata]
 verify_jwt = true
 
