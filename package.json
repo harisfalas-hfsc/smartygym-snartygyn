@@ -11,8 +11,7 @@
     "preview": "vite preview",
     "generate:sitemap": "bunx tsx scripts/generate-sitemap.ts",
     "predev": "bunx tsx scripts/generate-sitemap.ts",
-    "prebuild": "bunx tsx scripts/generate-sitemap.ts",
-    "postbuild": "bunx tsx scripts/prerender.ts"
+    "prebuild": "bunx tsx scripts/generate-sitemap.ts"
   },
   "dependencies": {
     "@capacitor/android": "^7.4.3",

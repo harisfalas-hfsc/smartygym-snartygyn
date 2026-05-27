@@ -1,7 +1,28 @@
-import { defineConfig } from "vite";
+import { defineConfig, type ResolvedConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
+import { generateSitemap } from "./scripts/generate-sitemap";
+import { prerenderSeoHtml } from "./scripts/prerender";
+
+function smartySeoPrerenderPlugin() {
+  let outDir = path.resolve(__dirname, "dist");
+
+  return {
+    name: "smarty-seo-prerender",
+    apply: "build" as const,
+    configResolved(config: ResolvedConfig) {
+      outDir = path.resolve(config.root, config.build.outDir);
+    },
+    async closeBundle() {
+      await prerenderSeoHtml({ distDir: outDir });
+      await generateSitemap([
+        path.resolve(__dirname, "public/sitemap.xml"),
+        path.join(outDir, "sitemap.xml"),
+      ]);
+    },
+  };
+}
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -11,6 +32,7 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react(),
+    smartySeoPrerenderPlugin(),
     mode === "development" && componentTagger()
   ].filter(Boolean),
   resolve: {
