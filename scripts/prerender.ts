@@ -103,6 +103,9 @@ export async function prerenderSeoHtml(options: {
       const isDeepLeaf = !hasChildren.has(route.path);
       if (isDeepLeaf) {
         writeHtml(join(distDir, cleanPath), html);
+        if (route.kind === "blog-article") {
+          writeHtml(join(distDir, `${cleanPath}.html`), html);
+        }
       } else {
         writeHtml(join(distDir, cleanPath, "index.html"), html);
         writeHtml(join(distDir, `${cleanPath}.html`), html);
