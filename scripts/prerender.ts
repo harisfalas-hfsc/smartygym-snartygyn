@@ -87,13 +87,21 @@ export async function prerenderSeoHtml(options: {
 
   let written = 0;
   const writeHtml = (outPath: string, html: string) => {
-    mkdirSync(dirname(outPath), { recursive: true });
+    ensureParentDirectoryForFile(outPath);
     writeFileSync(outPath, html);
     written++;
   };
 
   const cleanPaths: string[] = [];
-  const allPaths = routes.map((route) => route.path);
+  const reportRows: string[] = [
+    "# SmartyGym SEO prerender report",
+    "",
+    `Generated: ${new Date().toISOString()}`,
+    `Routes: ${counts.total}`,
+    "",
+    "| URL | Static source file |",
+    "| --- | --- |",
+  ];
   for (const route of routes) {
     const { bodyHtml, jsonLd } = renderRouteBody(route);
     let html = applyHeadOverrides(template, route);
@@ -106,24 +114,17 @@ export async function prerenderSeoHtml(options: {
     }
 
     const cleanPath = route.path.replace(/^\//, "");
-    // Universal static-host pattern: ALWAYS write `<cleanPath>/index.html`.
-    // Every static host (Lovable, Netlify, Vercel, Cloudflare Pages, S3)
-    // serves `/foo/bar` → `/foo/bar/index.html` automatically without any
-    // rewrite rules. This is the only pattern that survives a host that
-    // ignores _redirects (which is what we observed in production).
-    // Also keep the `.html` sibling for explicit links and for the rewrite
-    // rules in case the host eventually starts honoring _redirects.
-    writeHtml(join(distDir, `${cleanPath}.html`), html);
-    if (hasChildRoute(route.path, allPaths)) {
-      writeHtml(join(distDir, cleanPath, "index.html"), html);
-    } else {
-      const exactCleanUrlFile = join(distDir, cleanPath);
-      clearDirectoryBeforeWritingFile(exactCleanUrlFile);
-      writeHtml(exactCleanUrlFile, html);
-    }
+    // Crawler-safe static output: the clean public URL `/foo/bar` maps to a
+    // real static file at `dist/foo/bar/index.html`. We deliberately avoid
+    // extensionless files (`dist/foo/bar`) because they conflict with this
+    // directory pattern and were not reliable on the live host.
+    const sourceFile = join(distDir, cleanPath, "index.html");
+    writeHtml(sourceFile, html);
+    reportRows.push(`| ${route.path} | ${sourceFile.replace(`${distDir}/`, "dist/")} |`);
     cleanPaths.push(route.path);
   }
   writeCleanUrlRewrites(distDir, cleanPaths);
+  writeFileSync(join(distDir, "seo-prerender-report.md"), `${reportRows.join("\n")}\n`);
   console.log(`[prerender] wrote ${written} HTML files into ${distDir.replace(process.cwd() + "/", "")}/`);
 }
 
