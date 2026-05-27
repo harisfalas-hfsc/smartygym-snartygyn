@@ -1,47 +1,65 @@
-I verified the live raw HTML directly:
+I will implement the SEO fix as a routing problem, not just a metadata problem.
 
-- `https://smartygym.com/blog/why-ai-fitness-apps-are-dangerous` still returns the generic SPA shell.
-- `https://smartygym.com/blog/why-ai-fitness-apps-are-dangerous.html` already returns the correct article title and full article HTML.
-
-So the content generation is working, but the clean URL is not being mapped to the generated `.html` file. The previous directory `index.html` fallback is not being honored by the host for this deployment.
+The current failure means this: the app is still letting clean URLs like `/blog/article-slug` fall through to the SPA homepage shell. So even if article HTML exists somewhere else, crawlers and “View Source” are not receiving it at the real URL.
 
 Plan:
 
-1. Update the prerender output to make clean URLs deterministic
-   - Keep generating per-route `.html` files.
-   - Keep generating per-route `index.html` files.
-   - Add an explicit static routing file that maps every clean route to its generated `.html` file for the current hosting environment.
-   - Add fallback rules for blog, workouts, training programs, tools, and category routes so `/blog/:slug`, `/workout/:slug`, `/trainingprogram/:slug`, and tool URLs cannot fall back to the homepage shell.
-
-2. Strengthen future-content coverage
-   - Ensure the route builder continues to pull every published blog article, visible workout, visible training program, workout category, program category, and Smarty tool on every build.
-   - Future content will be included automatically when you publish again because the build queries the database and regenerates the route map.
-   - No manual code change should be needed for new blog articles, workouts, or training programs.
-
-3. Strengthen verification so this cannot silently ship broken again
-   - Update the verifier to check both the generated `.html` route and the clean-route mapping.
-   - For dynamic content, fail the build if canonical, title, or real body text is missing.
-   - Specifically verify representative blog, workout, training program, and Smarty tool routes.
-
-4. Validate the exact failure mode
-   - After implementation, confirm that the generated build contains:
-     - `/blog/why-ai-fitness-apps-are-dangerous.html`
+1. Replace the fragile clean-URL strategy
+   - Stop relying only on `_redirects`, `.html` siblings, or extensionless files.
+   - Generate the static HTML in the exact directory form that static hosts reliably serve:
      - `/blog/why-ai-fitness-apps-are-dangerous/index.html`
-     - a host routing entry mapping `/blog/why-ai-fitness-apps-are-dangerous` to the article HTML
-   - Then publish. The clean URL must return the article HTML, not the homepage shell.
+     - `/workouts/<category>/<slug>/index.html`
+     - `/trainingprogram/<category>/<slug>/index.html`
+     - `/tools/<tool>/index.html`
+   - This is the most crawler-safe static output pattern because the clean URL maps directly to a real folder index file.
 
-Technical detail:
+2. Remove the risky extensionless-file workaround
+   - The previous attempt wrote files like `dist/blog/slug` without `.html`.
+   - That can conflict with directory-based routes and may be ignored by the host.
+   - I will simplify this so every public SEO URL has a real `index.html` inside its own folder.
 
-The existing prerenderer is correctly producing the article HTML at `.html`; the live clean URL is failing because hosting is serving the SPA fallback for extensionless nested URLs. The fix is not to change the article system — it is to harden static route serving so every clean public URL resolves to its prerendered HTML file before the SPA fallback.
+3. Generate per-page source HTML for all public content
+   - Blog articles: title, description, canonical, OG tags, JSON-LD, H1, and full article text inside the initial HTML.
+   - Free workouts: unique title, canonical, workout body, metadata, JSON-LD.
+   - Free training programs: unique title, canonical, program body, metadata, JSON-LD.
+   - Smarty tools and public static pages: unique title/canonical/source content.
+   - Category pages: unique titles and crawlable lists.
 
-Scope covered:
+4. Future-proof the build
+   - The route builder will continue querying the backend during every production build.
+   - Any newly published blog article, free workout, free training program, category, or Smarty tool gets a new static `index.html` automatically on the next publish.
+   - No manual code change for new content.
 
-- Existing blog articles
-- Existing free workouts
-- Existing free training programs
-- Existing Smarty tools
-- Future blog articles
-- Future workouts
-- Future training programs
-- Future category pages
-- Future content published through the existing content systems
+5. Add a source-level verification that cannot pass falsely
+   - The verifier will read the exact file that should be served for the clean URL, e.g. `dist/blog/why-ai-fitness-apps-are-dangerous/index.html`.
+   - It will fail the build if that file contains the homepage title instead of the article title.
+   - It will fail if the article body text is missing.
+   - It will fail if canonical/OG URL points to the wrong URL.
+   - It will verify representative blog, workout, training program, tool, and category URLs.
+
+6. Add a deployment sanity file/report
+   - Generate a small SEO verification report during build listing the exact files created and checked.
+   - This makes it clear whether the published build contains the static source files.
+
+7. After implementation
+   - The only acceptable result is:
+     - `view-source:https://smartygym.com/blog/why-ai-fitness-apps-are-dangerous`
+     - shows the article title and article text in raw HTML before JavaScript.
+   - If Lovable hosting still serves the SPA shell despite real `/route/index.html` files, then the platform hosting layer is overriding static route files, and the next required step is support/platform escalation or moving the public site to SSR/static hosting that honors generated route files.
+
+Technical details:
+
+```text
+During production build:
+
+backend content
+  -> scripts/lib/seo-routes.ts
+  -> scripts/prerender.ts
+  -> dist/blog/article-slug/index.html
+  -> dist/workouts/category/slug/index.html
+  -> dist/trainingprogram/category/slug/index.html
+  -> dist/tools/tool-name/index.html
+  -> scripts/verify-prerender.ts checks exact source files
+```
+
+I will not touch the protected generated backend client/type files. I will only adjust the prerenderer/verifier and, if needed, the SEO route/body renderer.

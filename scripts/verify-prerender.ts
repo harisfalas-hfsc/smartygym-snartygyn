@@ -29,18 +29,31 @@ function assertSingleCanonical(html: string, expectedHref: string, label: string
   }
 }
 
-function exactFileFor(distDir: string, routePath: string) {
-  if (routePath === "/") return join(distDir, "index.html");
-  return join(distDir, routePath.replace(/^\//, ""));
+function assertNotHomepageShell(html: string, routePath: string) {
+  if (routePath !== "/" && html.includes("SmartyGym | Online Fitness Platform by Haris Falas")) {
+    throw new Error(`[verify-prerender] ${routePath} still contains the homepage <title>; clean URL source is not unique`);
+  }
 }
 
-function htmlFileFor(distDir: string, routePath: string) {
-  if (routePath === "/") return join(distDir, "index.html");
-  return join(distDir, `${routePath.replace(/^\//, "")}.html`);
+function assertPayloadText(html: string, raw: unknown, label: string) {
+  const normalize = (value: string) => value
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/\s+/g, " ")
+    .trim();
+  const text = normalize(String(raw || ""));
+  if (text.length >= 40) {
+    assertIncludes(normalize(html), text.slice(0, 80), label);
+  }
 }
 
-function hasChildRoute(routePath: string, allPaths: string[]) {
-  return allPaths.some((p) => p.startsWith(`${routePath}/`));
+function sourceFileForCleanUrl(distDir: string, routePath: string) {
+  if (routePath === "/") return join(distDir, "index.html");
+  return join(distDir, routePath.replace(/^\//, ""), "index.html");
 }
 
 function isFile(path: string) {
@@ -48,8 +61,8 @@ function isFile(path: string) {
 }
 
 function assertRewriteForRoute(redirects: string, routePath: string) {
-  const expected = `${routePath} ${routePath}.html 200!`;
-  const expectedTrailing = `${routePath}/ ${routePath}.html 200!`;
+  const expected = `${routePath} ${routePath}/index.html 200!`;
+  const expectedTrailing = `${routePath}/ ${routePath}/index.html 200!`;
   if (!redirects.includes(expected) || !redirects.includes(expectedTrailing)) {
     throw new Error(`[verify-prerender] missing _redirects rules for ${routePath}`);
   }
@@ -58,7 +71,6 @@ function assertRewriteForRoute(redirects: string, routePath: string) {
 export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
   const distDir = options.distDir || DIST;
   const { routes, counts } = await buildSeoRoutes();
-  const allPaths = routes.map((route) => route.path);
   const redirectsPath = join(distDir, "_redirects");
   if (!isFile(redirectsPath)) {
     throw new Error("[verify-prerender] missing dist/_redirects for clean URL rewrites");
@@ -67,27 +79,14 @@ export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
 
   let checked = 0;
   for (const route of routes) {
-    const htmlPath = htmlFileFor(distDir, route.path);
-    const artifactPath = route.path === "/" ? join(distDir, "index.html") : htmlPath;
+    const artifactPath = sourceFileForCleanUrl(distDir, route.path);
     if (!isFile(artifactPath)) {
-      throw new Error(`[verify-prerender] missing HTML for ${route.path}: expected ${artifactPath}`);
-    }
-
-    if (route.path !== "/") {
-      const cleanPath = route.path.replace(/^\//, "");
-      // Routes with children keep `<cleanPath>/index.html`; leaf routes also
-      // get an exact extensionless file (`dist/blog/slug`) because Lovable's
-      // host serves extensionless static files before the SPA fallback.
-      const cleanArtifact = hasChildRoute(route.path, allPaths)
-        ? join(distDir, cleanPath, "index.html")
-        : exactFileFor(distDir, route.path);
-      if (!isFile(cleanArtifact)) {
-        throw new Error(`[verify-prerender] missing clean URL HTML for ${route.path}: expected ${cleanArtifact}`);
-      }
+      throw new Error(`[verify-prerender] missing clean URL source HTML for ${route.path}: expected ${artifactPath}`);
     }
 
     const html = readFileSync(artifactPath, "utf8");
     const canonicalUrl = `https://smartygym.com${route.path}`;
+    assertNotHomepageShell(html, route.path);
     assertIncludes(html, `<title>${htmlEscape(route.title)}</title>`, `${route.path} title`);
     assertSingleCanonical(html, canonicalUrl, route.path);
     assertIncludes(html, `content="${canonicalUrl}"`, `${route.path} og:url`);
@@ -98,7 +97,29 @@ export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
       assertIncludes(html, `<main class="seo-prerender seo-article">`, `${route.path} prerendered article shell`);
       assertIncludes(html, `<h1>${htmlEscape(title)}</h1>`, `${route.path} article h1`);
       assertIncludes(html, `<div class="seo-article-body">`, `${route.path} article body wrapper`);
-      assertIncludes(html, String(payload.content || "").slice(0, 80), `${route.path} article body content`);
+      assertPayloadText(html, payload.content, `${route.path} article body content`);
+    }
+
+    if (route.kind === "workout") {
+      const payload = route.payload || {};
+      assertIncludes(html, `<main class="seo-prerender seo-workout">`, `${route.path} prerendered workout shell`);
+      assertIncludes(html, `<h1>${htmlEscape(String(payload.name || ""))}</h1>`, `${route.path} workout h1`);
+      assertPayloadText(
+        html,
+        (payload as any).main_workout || (payload as any).description || (payload as any).warm_up,
+        `${route.path} workout body content`,
+      );
+    }
+
+    if (route.kind === "program") {
+      const payload = route.payload || {};
+      assertIncludes(html, `<main class="seo-prerender seo-program">`, `${route.path} prerendered program shell`);
+      assertIncludes(html, `<h1>${htmlEscape(String(payload.name || ""))}</h1>`, `${route.path} program h1`);
+      assertPayloadText(
+        html,
+        (payload as any).program_structure || (payload as any).overview || (payload as any).description,
+        `${route.path} program body content`,
+      );
     }
 
     if (route.path !== "/") {

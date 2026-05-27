@@ -27,28 +27,26 @@ function normalizeTemplate(html: string) {
     .replace(/<div id="root">\s*<main[\s\S]*?<\/main>\s*<\/div>/i, '<div id="root"></div>');
 }
 
-function hasChildRoute(routePath: string, allPaths: string[]) {
-  return allPaths.some((p) => p.startsWith(`${routePath}/`));
-}
-
-function clearDirectoryBeforeWritingFile(outPath: string) {
-  if (existsSync(outPath) && statSync(outPath).isDirectory()) {
-    rmSync(outPath, { recursive: true, force: true });
+function ensureParentDirectoryForFile(outPath: string) {
+  const parentDir = dirname(outPath);
+  if (existsSync(parentDir) && !statSync(parentDir).isDirectory()) {
+    rmSync(parentDir, { force: true });
   }
+  mkdirSync(parentDir, { recursive: true });
 }
 
 function writeCleanUrlRewrites(distDir: string, cleanPaths: string[]) {
-  // Lovable's static host serves the SPA fallback (index.html) for clean URLs
-  // like /blog/<slug> unless we explicitly tell it to rewrite to the
-  // prerendered .html file. Without these 200 rewrites, Googlebot sees the
+  // Lovable's static host can serve the SPA fallback for clean URLs like
+  // /blog/<slug> unless we explicitly point them at their generated folder
+  // index files. Without these forced 200 rewrites, Googlebot can see the
   // homepage HTML for every article — wrong canonical, wrong content.
   const seen = new Set<string>();
   const rules: string[] = [];
   for (const p of [...cleanPaths].sort()) {
     if (seen.has(p)) continue;
     seen.add(p);
-    rules.push(`${p} ${p}.html 200!`);
-    rules.push(`${p}/ ${p}.html 200!`);
+    rules.push(`${p} ${p}/index.html 200!`);
+    rules.push(`${p}/ ${p}/index.html 200!`);
   }
   if (!rules.length) return;
   writeFileSync(
@@ -89,13 +87,21 @@ export async function prerenderSeoHtml(options: {
 
   let written = 0;
   const writeHtml = (outPath: string, html: string) => {
-    mkdirSync(dirname(outPath), { recursive: true });
+    ensureParentDirectoryForFile(outPath);
     writeFileSync(outPath, html);
     written++;
   };
 
   const cleanPaths: string[] = [];
-  const allPaths = routes.map((route) => route.path);
+  const reportRows: string[] = [
+    "# SmartyGym SEO prerender report",
+    "",
+    `Generated: ${new Date().toISOString()}`,
+    `Routes: ${counts.total}`,
+    "",
+    "| URL | Static source file |",
+    "| --- | --- |",
+  ];
   for (const route of routes) {
     const { bodyHtml, jsonLd } = renderRouteBody(route);
     let html = applyHeadOverrides(template, route);
@@ -104,28 +110,22 @@ export async function prerenderSeoHtml(options: {
 
     if (route.path === "/") {
       writeHtml(join(distDir, "index.html"), html);
+      reportRows.push("| / | dist/index.html |");
       continue;
     }
 
     const cleanPath = route.path.replace(/^\//, "");
-    // Universal static-host pattern: ALWAYS write `<cleanPath>/index.html`.
-    // Every static host (Lovable, Netlify, Vercel, Cloudflare Pages, S3)
-    // serves `/foo/bar` → `/foo/bar/index.html` automatically without any
-    // rewrite rules. This is the only pattern that survives a host that
-    // ignores _redirects (which is what we observed in production).
-    // Also keep the `.html` sibling for explicit links and for the rewrite
-    // rules in case the host eventually starts honoring _redirects.
-    writeHtml(join(distDir, `${cleanPath}.html`), html);
-    if (hasChildRoute(route.path, allPaths)) {
-      writeHtml(join(distDir, cleanPath, "index.html"), html);
-    } else {
-      const exactCleanUrlFile = join(distDir, cleanPath);
-      clearDirectoryBeforeWritingFile(exactCleanUrlFile);
-      writeHtml(exactCleanUrlFile, html);
-    }
+    // Crawler-safe static output: the clean public URL `/foo/bar` maps to a
+    // real static file at `dist/foo/bar/index.html`. We deliberately avoid
+    // extensionless files (`dist/foo/bar`) because they conflict with this
+    // directory pattern and were not reliable on the live host.
+    const sourceFile = join(distDir, cleanPath, "index.html");
+    writeHtml(sourceFile, html);
+    reportRows.push(`| ${route.path} | ${sourceFile.replace(`${distDir}/`, "dist/")} |`);
     cleanPaths.push(route.path);
   }
   writeCleanUrlRewrites(distDir, cleanPaths);
+  writeFileSync(join(distDir, "seo-prerender-report.md"), `${reportRows.join("\n")}\n`);
   console.log(`[prerender] wrote ${written} HTML files into ${distDir.replace(process.cwd() + "/", "")}/`);
 }
 
