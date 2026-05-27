@@ -44,19 +44,41 @@ export async function prerenderSeoHtml(options: {
   );
 
   let written = 0;
+  const writeHtml = (outPath: string, html: string) => {
+    mkdirSync(dirname(outPath), { recursive: true });
+    writeFileSync(outPath, html);
+    written++;
+  };
+
+  const hasChildren = new Set(
+    routes
+      .filter((route) => route.path !== "/" && routes.some((candidate) => candidate.path.startsWith(`${route.path}/`)))
+      .map((route) => route.path),
+  );
+
   for (const route of routes) {
     const { bodyHtml, jsonLd } = renderRouteBody(route);
     let html = applyHeadOverrides(template, route);
     html = injectJsonLd(html, jsonLd);
     html = injectBody(html, bodyHtml);
 
-    const outPath =
-      route.path === "/"
-        ? join(distDir, "index.html")
-        : join(distDir, route.path.replace(/^\//, ""), "index.html");
-    mkdirSync(dirname(outPath), { recursive: true });
-    writeFileSync(outPath, html);
-    written++;
+    if (route.path === "/") {
+      writeHtml(join(distDir, "index.html"), html);
+    } else {
+      const cleanPath = route.path.replace(/^\//, "");
+
+      // Lovable's static host serves SPA fallback HTML for clean deep URLs
+      // before resolving nested directory indexes. For leaf content routes,
+      // write an exact extensionless file so /blog/my-article returns article
+      // HTML. Keep shallow/category routes as directory indexes so they do not
+      // block deeper child routes such as /blog/<slug> or /workout/<cat>/<id>.
+      const isDeepLeaf = !hasChildren.has(route.path);
+      if (isDeepLeaf) {
+        writeHtml(join(distDir, cleanPath), html);
+      } else {
+        writeHtml(join(distDir, cleanPath, "index.html"), html);
+      }
+    }
   }
   console.log(`[prerender] wrote ${written} HTML files into ${distDir.replace(process.cwd() + "/", "")}/`);
 }

@@ -4,6 +4,7 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { generateSitemap } from "./scripts/generate-sitemap";
 import { prerenderSeoHtml } from "./scripts/prerender";
+import { verifyPrerenderedSeo } from "./scripts/verify-prerender";
 
 function smartySeoPrerenderPlugin() {
   let outDir = path.resolve(__dirname, "dist");
@@ -20,6 +21,7 @@ function smartySeoPrerenderPlugin() {
         path.resolve(__dirname, "public/sitemap.xml"),
         path.join(outDir, "sitemap.xml"),
       ]);
+      await verifyPrerenderedSeo({ distDir: outDir });
     },
   };
 }
