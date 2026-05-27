@@ -36,9 +36,9 @@ function ensureParentDirectoryForFile(outPath: string) {
 }
 
 function writeCleanUrlRewrites(distDir: string, cleanPaths: string[]) {
-  // Lovable's static host serves the SPA fallback (index.html) for clean URLs
-  // like /blog/<slug> unless we explicitly tell it to rewrite to the
-  // prerendered .html file. Without these 200 rewrites, Googlebot sees the
+  // Lovable's static host can serve the SPA fallback for clean URLs like
+  // /blog/<slug> unless we explicitly point them at their generated folder
+  // index files. Without these forced 200 rewrites, Googlebot can see the
   // homepage HTML for every article — wrong canonical, wrong content.
   const seen = new Set<string>();
   const rules: string[] = [];
@@ -110,6 +110,7 @@ export async function prerenderSeoHtml(options: {
 
     if (route.path === "/") {
       writeHtml(join(distDir, "index.html"), html);
+      reportRows.push("| / | dist/index.html |");
       continue;
     }
 
