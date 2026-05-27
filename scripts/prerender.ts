@@ -73,16 +73,18 @@ export async function prerenderSeoHtml(options: {
     } else {
       const cleanPath = route.path.replace(/^\//, "");
 
-      // Lovable's static host serves SPA fallback HTML for clean deep URLs
-      // before resolving nested directory indexes. For leaf content routes,
-      // write an exact extensionless file so /blog/my-article returns article
-      // HTML. Keep shallow/category routes as directory indexes so they do not
-      // block deeper child routes such as /blog/<slug> or /workout/<cat>/<id>.
+      // Lovable's static host serves SPA fallback HTML for clean URLs before
+      // resolving nested directory indexes. Leaf routes can be exact
+      // extensionless files. Parent routes such as /blog cannot be exact files
+      // because /blog/<slug> also needs /blog as a directory, so we also write
+      // /blog.html. Static hosts that support clean-url HTML resolution will
+      // serve that instead of the homepage fallback.
       const isDeepLeaf = !hasChildren.has(route.path);
       if (isDeepLeaf) {
         writeHtml(join(distDir, cleanPath), html);
       } else {
         writeHtml(join(distDir, cleanPath, "index.html"), html);
+        writeHtml(join(distDir, `${cleanPath}.html`), html);
       }
     }
   }
