@@ -9,6 +9,7 @@ import { existsSync, readFileSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildSeoRoutes, htmlEscape } from "./lib/seo-routes";
+import { slugifyContentName } from "../src/lib/seo-slugs";
 
 const DIST = resolve("dist");
 
@@ -102,6 +103,8 @@ export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
 
     if (route.kind === "workout") {
       const payload = route.payload || {};
+      const expectedSlug = slugifyContentName(String(payload.name || payload.id || ""));
+      assertIncludes(route.path, `/${expectedSlug}`, `${route.path} readable workout URL slug`);
       assertIncludes(html, `<main class="seo-prerender seo-workout">`, `${route.path} prerendered workout shell`);
       assertIncludes(html, `<h1>${htmlEscape(String(payload.name || ""))}</h1>`, `${route.path} workout h1`);
       assertPayloadText(
@@ -113,6 +116,8 @@ export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
 
     if (route.kind === "program") {
       const payload = route.payload || {};
+      const expectedSlug = slugifyContentName(String(payload.name || payload.id || ""));
+      assertIncludes(route.path, `/${expectedSlug}`, `${route.path} readable program URL slug`);
       assertIncludes(html, `<main class="seo-prerender seo-program">`, `${route.path} prerendered program shell`);
       assertIncludes(html, `<h1>${htmlEscape(String(payload.name || ""))}</h1>`, `${route.path} program h1`);
       assertPayloadText(
