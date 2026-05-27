@@ -41,7 +41,7 @@ async function main() {
   await generateSitemap();
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
   main().catch((err) => {
     console.error("[sitemap] generation failed:", err);
     process.exit(1);
