@@ -408,7 +408,52 @@ serve(async (req) => {
 
     const expectedCount = requiredSlots.length;
     if (promotedCount < expectedCount) {
-      throw new Error(`Library fallback promoted ${promotedCount}/${expectedCount} WOD slot(s) (${requiredSlots.join(", ")}); refusing to report success without image + Stripe associations`);
+      // ALL-OR-NONE: if we could not complete every required slot, roll back
+      // the ones we already promoted in this run so the day never goes live
+      // with a half-published WOD set. Without this, a partial promote leaked
+      // into production (e.g. one Pilates BODYWEIGHT WOD with no matching
+      // EQUIPMENT WOD) and the watchdog had no signal to fix it.
+      for (const promoted of finallyPromoted) {
+        try {
+          await supabase
+            .from("admin_workouts")
+            .update({
+              is_workout_of_day: false,
+              generated_for_date: null,
+              wod_source: null,
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", promoted.id);
+          await supabase
+            .from("wod_selection_cooldown")
+            .delete()
+            .eq("source_workout_id", promoted.id)
+            .eq("selected_for_date", targetDate);
+          logStep("Rolled back partial promotion (all-or-none)", {
+            id: promoted.id,
+            equipment: promoted.equipment,
+          });
+        } catch (rollbackErr) {
+          logStep("ERROR during partial-promotion rollback", {
+            id: promoted.id,
+            error: (rollbackErr as Error).message,
+          });
+        }
+      }
+
+      await supabase.from("wod_generation_runs").insert({
+        cyprus_date: targetDate,
+        status: "failed",
+        expected_count: expectedCount,
+        found_count: 0,
+        is_recovery_day: isRecoveryDay,
+        expected_category: periodization.category,
+        trigger_source: "library-selection",
+        completed_at: new Date().toISOString(),
+        error_message: `Library fallback could only fill ${promotedCount}/${expectedCount} slot(s) (${requiredSlots.join(", ")}); rolled back to keep day all-or-none`,
+      });
+
+      throw new Error(`Library fallback promoted ${promotedCount}/${expectedCount} WOD slot(s) (${requiredSlots.join(", ")}); rolled back partial publish to enforce all-or-none`);
     }
 
     // Log to wod_generation_runs
