@@ -24,7 +24,7 @@ const TEMPLATE_PATH = join(DIST, "index.html");
 function normalizeTemplate(html: string) {
   return html
     .replace(/<script\s+type=["']application\/ld\+json["']\s+data-prerender=["']1["']>[\s\S]*?<\/script>\s*/gi, "")
-    .replace(/<div id="root">[\s\S]*?<\/div>\s*<script type="module"/i, '<div id="root"></div>\n    <script type="module"');
+    .replace(/<div id="root">\s*<main[\s\S]*?<\/main>\s*<\/div>/i, '<div id="root"></div>');
 }
 
 export async function prerenderSeoHtml(options: {
