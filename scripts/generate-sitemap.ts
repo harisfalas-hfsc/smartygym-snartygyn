@@ -4,10 +4,11 @@
  * source so sitemap and pre-rendered HTML never drift apart.
  */
 import { writeFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { mkdirSync } from "node:fs";
+import { dirname, resolve } from "node:path";
 import { BASE_URL, buildSeoRoutes, xmlEscape } from "./lib/seo-routes";
 
-async function main() {
+export async function generateSitemap(outputPaths = [resolve("public/sitemap.xml")]) {
   const { routes, counts } = await buildSeoRoutes();
   const xml = [
     '<?xml version="1.0" encoding="UTF-8"?>',
@@ -27,10 +28,17 @@ async function main() {
     "</urlset>",
     "",
   ].join("\n");
-  writeFileSync(resolve("public/sitemap.xml"), xml);
+  for (const outputPath of outputPaths) {
+    mkdirSync(dirname(outputPath), { recursive: true });
+    writeFileSync(outputPath, xml);
+  }
   console.log(
-    `[sitemap] wrote public/sitemap.xml — ${counts.total} URLs (static=${counts.static}, workout-cat=${counts.workoutCategory}, program-cat=${counts.programCategory}, workouts=${counts.workouts}, programs=${counts.programs}, blog=${counts.blogArticles})`,
+    `[sitemap] wrote ${outputPaths.map((p) => p.replace(process.cwd() + "/", "")).join(", ")} — ${counts.total} URLs (static=${counts.static}, workout-cat=${counts.workoutCategory}, program-cat=${counts.programCategory}, workouts=${counts.workouts}, programs=${counts.programs}, blog=${counts.blogArticles})`,
   );
+}
+
+async function main() {
+  await generateSitemap();
 }
 
 main().catch((err) => {
