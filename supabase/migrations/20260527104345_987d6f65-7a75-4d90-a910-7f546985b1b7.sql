@@ -1,0 +1,2 @@
+UPDATE public.blog_articles SET image_url='https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/metabolic-engine-evolution-hiit-1764500000001.jpg', updated_at=now() WHERE slug='metabolic-engine-evolution-the-hiit-revolution';
+UPDATE public.blog_articles SET image_url='https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/kinetic-longevity-joints-1764500000002.jpg', updated_at=now() WHERE slug='kinetic-longevity-future-proofing-your-joints';
