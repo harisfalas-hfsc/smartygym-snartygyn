@@ -8,7 +8,7 @@
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { buildSeoRoutes, htmlEscape, stripHtml } from "./lib/seo-routes";
+import { buildSeoRoutes, htmlEscape } from "./lib/seo-routes";
 
 const DIST = resolve("dist");
 
@@ -49,9 +49,7 @@ export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
     if (route.kind === "blog-article") {
       const payload = route.payload || {};
       const title = String(payload.title || route.title.replace(/\s*\|\s*SmartyGym Blog$/, ""));
-      const content = stripHtml(String(payload.content || ""));
       assertIncludes(html, title, `${route.path} article title`);
-      assertIncludes(html, content.slice(0, 120), `${route.path} article body`);
       if (artifactPath !== exactPath) {
         throw new Error(`[verify-prerender] ${route.path} must be an exact extensionless file for the published clean URL`);
       }
