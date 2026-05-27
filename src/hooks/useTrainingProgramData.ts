@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { slugifyContentName } from "@/lib/seo-slugs";
 
 export interface TrainingProgramData {
   id: string;
@@ -31,6 +32,16 @@ export const useTrainingProgramData = (programId: string | undefined) => {
     queryKey: ["training-program", programId],
     queryFn: async () => {
       if (!programId) throw new Error("Program ID is required");
+      const resolveFromMetadata = async () => {
+        const { data: metadata, error: metadataError } = await (supabase as any)
+          .rpc("get_visible_program_metadata", { _program_id: null });
+
+        if (metadataError) throw metadataError;
+        return (Array.isArray(metadata) ? metadata : []).find(
+          (program: TrainingProgramData) =>
+            program.id === programId || slugifyContentName(program.name || program.id) === programId,
+        );
+      };
 
       const { data, error } = await supabase
         .from("admin_training_programs")
@@ -40,11 +51,7 @@ export const useTrainingProgramData = (programId: string | undefined) => {
 
       if (error) throw error;
       if (!data) {
-        const { data: metadata, error: metadataError } = await (supabase as any)
-          .rpc("get_visible_program_metadata", { _program_id: programId });
-
-        if (metadataError) throw metadataError;
-        const fallback = Array.isArray(metadata) ? metadata[0] : metadata;
+        const fallback = await resolveFromMetadata();
         if (!fallback) throw new Error("Training program not found");
 
         return fallback as TrainingProgramData;

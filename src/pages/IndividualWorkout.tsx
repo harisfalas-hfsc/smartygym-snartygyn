@@ -11,6 +11,7 @@ import { ContentNotFound } from "@/components/ContentNotFound";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { ReaderModeDialog } from "@/components/ReaderModeDialog";
 import { ExerciseHTMLContent } from "@/components/ExerciseHTMLContent";
+import { getWorkoutCategorySlug, slugifyContentName } from "@/lib/seo-slugs";
 
 // Helper function to generate SEO-optimized alt text
 const generateWorkoutAltText = (workout: any): string => {
@@ -80,23 +81,8 @@ const IndividualWorkout = () => {
   }
 
   if (dbWorkout) {
-    const workoutCategorySlug = (() => {
-      const c = (dbWorkout.category || "").toUpperCase().trim();
-      const map: Record<string, string> = {
-        STRENGTH: "strength",
-        "CALORIE BURNING": "calorie-burning",
-        METABOLIC: "metabolic",
-        CARDIO: "cardio",
-        "MOBILITY & STABILITY": "mobility",
-        MOBILITY: "mobility",
-        CHALLENGE: "challenge",
-        PILATES: "pilates",
-        RECOVERY: "recovery",
-        "MICRO-WORKOUTS": "micro-workouts",
-      };
-      return map[c] || type || "strength";
-    })();
-    const workoutUrl = `https://smartygym.com/workout/${workoutCategorySlug}/${dbWorkout.id}`;
+    const workoutCategorySlug = getWorkoutCategorySlug(dbWorkout.category, type || "strength");
+    const workoutUrl = `https://smartygym.com/workout/${workoutCategorySlug}/${slugifyContentName(dbWorkout.name || dbWorkout.id)}`;
     const imageAlt = generateWorkoutAltText(dbWorkout);
     
     // Generate HowTo steps from workout sections
