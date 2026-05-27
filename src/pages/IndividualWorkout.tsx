@@ -80,7 +80,23 @@ const IndividualWorkout = () => {
   }
 
   if (dbWorkout) {
-    const workoutUrl = `https://smartygym.com/individualworkout/${dbWorkout.id}`;
+    const workoutCategorySlug = (() => {
+      const c = (dbWorkout.category || "").toUpperCase().trim();
+      const map: Record<string, string> = {
+        STRENGTH: "strength",
+        "CALORIE BURNING": "calorie-burning",
+        METABOLIC: "metabolic",
+        CARDIO: "cardio",
+        "MOBILITY & STABILITY": "mobility",
+        MOBILITY: "mobility",
+        CHALLENGE: "challenge",
+        PILATES: "pilates",
+        RECOVERY: "recovery",
+        "MICRO-WORKOUTS": "micro-workouts",
+      };
+      return map[c] || type || "strength";
+    })();
+    const workoutUrl = `https://smartygym.com/workout/${workoutCategorySlug}/${dbWorkout.id}`;
     const imageAlt = generateWorkoutAltText(dbWorkout);
     
     // Generate HowTo steps from workout sections
