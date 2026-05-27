@@ -7,7 +7,7 @@
  * Google sees the static HTML on first response (no JavaScript required).
  * React's createRoot then hydrates and renders the live app on top.
  */
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync, rmSync, statSync } from "node:fs";
 import { dirname, resolve, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildSeoRoutes } from "./lib/seo-routes";
@@ -25,6 +25,16 @@ function normalizeTemplate(html: string) {
   return html
     .replace(/<script\s+type=["']application\/ld\+json["']\s+data-prerender=["']1["']>[\s\S]*?<\/script>\s*/gi, "")
     .replace(/<div id="root">\s*<main[\s\S]*?<\/main>\s*<\/div>/i, '<div id="root"></div>');
+}
+
+function hasChildRoute(routePath: string, allPaths: string[]) {
+  return allPaths.some((p) => p.startsWith(`${routePath}/`));
+}
+
+function clearDirectoryBeforeWritingFile(outPath: string) {
+  if (existsSync(outPath) && statSync(outPath).isDirectory()) {
+    rmSync(outPath, { recursive: true, force: true });
+  }
 }
 
 function writeCleanUrlRewrites(distDir: string, cleanPaths: string[]) {
@@ -85,6 +95,7 @@ export async function prerenderSeoHtml(options: {
   };
 
   const cleanPaths: string[] = [];
+  const allPaths = routes.map((route) => route.path);
   for (const route of routes) {
     const { bodyHtml, jsonLd } = renderRouteBody(route);
     let html = applyHeadOverrides(template, route);
@@ -105,7 +116,13 @@ export async function prerenderSeoHtml(options: {
     // Also keep the `.html` sibling for explicit links and for the rewrite
     // rules in case the host eventually starts honoring _redirects.
     writeHtml(join(distDir, `${cleanPath}.html`), html);
-    writeHtml(join(distDir, cleanPath, "index.html"), html);
+    if (hasChildRoute(route.path, allPaths)) {
+      writeHtml(join(distDir, cleanPath, "index.html"), html);
+    } else {
+      const exactCleanUrlFile = join(distDir, cleanPath);
+      clearDirectoryBeforeWritingFile(exactCleanUrlFile);
+      writeHtml(exactCleanUrlFile, html);
+    }
     cleanPaths.push(route.path);
   }
   writeCleanUrlRewrites(distDir, cleanPaths);
