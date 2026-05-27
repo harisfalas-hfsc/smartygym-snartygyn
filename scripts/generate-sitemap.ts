@@ -20,7 +20,7 @@ const SUPABASE_KEY =
   // Safe public fallback: publish builds do not always expose VITE_* env vars
   // to prebuild scripts. Without this, the sitemap silently shipped only the
   // 58 static/category URLs and omitted every dynamic content URL.
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJIUzI1NiIsInJlZiI6ImN2Y2NydnlpbXl6cnhjd3pteHdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA2MTc2NjIsImV4cCI6MjA3NjE5MzY2Mn0.XU_h4CYRiQ7VN079laFHSVMrzB6urOhQZFoTagU_Wno";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN2Y2NydnlpbXl6cnhjd3pteHdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA2MTc2NjIsImV4cCI6MjA3NjE5MzY2Mn0.XU_h4CYRiQ7VN079laFHSVMrzB6urOhQZFoTagU_Wno";
 
 const MIN_EXPECTED_DYNAMIC_WORKOUTS = 100;
 const MIN_EXPECTED_DYNAMIC_PROGRAMS = 10;
