@@ -5,7 +5,7 @@
  * static HTML artifacts in dist. This catches the failure where nested
  * dist/<route>/index.html files exist but clean URLs receive the SPA homepage.
  */
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildSeoRoutes, stripHtml } from "./lib/seo-routes";
@@ -23,6 +23,10 @@ function exactFileFor(distDir: string, routePath: string) {
   return join(distDir, routePath.replace(/^\//, ""));
 }
 
+function isFile(path: string) {
+  return existsSync(path) && statSync(path).isFile();
+}
+
 export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
   const distDir = options.distDir || DIST;
   const { routes, counts } = await buildSeoRoutes();
@@ -32,7 +36,7 @@ export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
     const exactPath = exactFileFor(distDir, route.path);
     const directoryIndexPath =
       route.path === "/" ? exactPath : join(distDir, route.path.replace(/^\//, ""), "index.html");
-    const artifactPath = existsSync(exactPath) ? exactPath : directoryIndexPath;
+    const artifactPath = isFile(exactPath) ? exactPath : directoryIndexPath;
 
     if (!existsSync(artifactPath)) {
       throw new Error(`[verify-prerender] missing HTML for ${route.path}: expected ${exactPath} or ${directoryIndexPath}`);
