@@ -43,12 +43,7 @@ function isFile(path: string) {
   return existsSync(path) && statSync(path).isFile();
 }
 
-function assertRewriteForParentRoute(distDir: string, routePath: string) {
-  const redirectsPath = join(distDir, "_redirects");
-  if (!isFile(redirectsPath)) {
-    throw new Error("[verify-prerender] missing dist/_redirects for parent clean URL rewrites");
-  }
-  const redirects = readFileSync(redirectsPath, "utf8");
+function assertRewriteForRoute(redirects: string, routePath: string) {
   const expected = `${routePath} ${routePath}.html 200`;
   const expectedTrailing = `${routePath}/ ${routePath}.html 200`;
   if (!redirects.includes(expected) || !redirects.includes(expectedTrailing)) {
@@ -59,22 +54,18 @@ function assertRewriteForParentRoute(distDir: string, routePath: string) {
 export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
   const distDir = options.distDir || DIST;
   const { routes, counts } = await buildSeoRoutes();
-  const parentRoutes = new Set(
-    routes
-      .filter((route) => route.path !== "/" && routes.some((candidate) => candidate.path.startsWith(`${route.path}/`)))
-      .map((route) => route.path),
-  );
+  const redirectsPath = join(distDir, "_redirects");
+  if (!isFile(redirectsPath)) {
+    throw new Error("[verify-prerender] missing dist/_redirects for clean URL rewrites");
+  }
+  const redirects = readFileSync(redirectsPath, "utf8");
 
   let checked = 0;
   for (const route of routes) {
-    const exactPath = exactFileFor(distDir, route.path);
     const htmlPath = htmlFileFor(distDir, route.path);
-    const directoryIndexPath =
-      route.path === "/" ? exactPath : join(distDir, route.path.replace(/^\//, ""), "index.html");
-    const artifactPath = isFile(exactPath) ? exactPath : isFile(htmlPath) ? htmlPath : directoryIndexPath;
-
-    if (!existsSync(artifactPath)) {
-      throw new Error(`[verify-prerender] missing HTML for ${route.path}: expected ${exactPath}, ${htmlPath}, or ${directoryIndexPath}`);
+    const artifactPath = route.path === "/" ? join(distDir, "index.html") : htmlPath;
+    if (!isFile(artifactPath)) {
+      throw new Error(`[verify-prerender] missing HTML for ${route.path}: expected ${artifactPath}`);
     }
 
     const html = readFileSync(artifactPath, "utf8");
@@ -90,17 +81,10 @@ export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
       assertIncludes(html, `<h1>${htmlEscape(title)}</h1>`, `${route.path} article h1`);
       assertIncludes(html, `<div class="seo-article-body">`, `${route.path} article body wrapper`);
       assertIncludes(html, String(payload.content || "").slice(0, 80), `${route.path} article body content`);
-      if (artifactPath !== exactPath) {
-        throw new Error(`[verify-prerender] ${route.path} must be an exact extensionless file for the published clean URL`);
-      }
     }
 
-    if (route.path !== "/" && route.kind !== "blog-article" && !isFile(exactPath) && !isFile(htmlPath)) {
-      throw new Error(`[verify-prerender] ${route.path} must have ${htmlPath} because parent clean URLs do not reliably serve directory indexes`);
-    }
-
-    if (parentRoutes.has(route.path)) {
-      assertRewriteForParentRoute(distDir, route.path);
+    if (route.path !== "/") {
+      assertRewriteForRoute(redirects, route.path);
     }
 
     checked++;

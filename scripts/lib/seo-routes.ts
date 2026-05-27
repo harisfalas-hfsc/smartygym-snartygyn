@@ -128,7 +128,7 @@ const STATIC_ROUTES: Array<
     priority: "0.6",
   },
   {
-    path: "/blog.html",
+    path: "/blog",
     title: "SmartyGym Blog | Evidence-Based Training Articles",
     description:
       "Human-written, evidence-based fitness, nutrition and recovery articles by Sports Scientist Haris Falas. Learn how to train smart.",

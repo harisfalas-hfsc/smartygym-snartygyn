@@ -93,7 +93,7 @@ export function renderRouteBody(route: SeoRoute): {
     jsonLd.push(
       breadcrumb([
         { name: "Home", path: "/" },
-        { name: "Blog", path: "/blog.html" },
+        { name: "Blog", path: "/blog" },
         { name: a.title, path: route.path },
       ]),
     );
@@ -119,7 +119,7 @@ export function renderRouteBody(route: SeoRoute): {
       bodyHtml: `
 <main class="seo-prerender seo-article">
   <nav class="seo-breadcrumbs" aria-label="Breadcrumb">
-    <a href="/">Home</a> &rsaquo; <a href="/blog.html">Blog</a> &rsaquo; <span>${htmlEscape(a.title || "")}</span>
+    <a href="/">Home</a> &rsaquo; <a href="/blog">Blog</a> &rsaquo; <span>${htmlEscape(a.title || "")}</span>
   </nav>
   <article>
     <header>
@@ -288,7 +288,7 @@ export function renderRouteBody(route: SeoRoute): {
         <li><a href="/workout">Smarty Workouts</a></li>
         <li><a href="/trainingprogram">Smarty Training Programs</a></li>
         <li><a href="/workout/wod">Workout of the Day</a></li>
-        <li><a href="/blog.html">SmartyGym Blog</a></li>
+        <li><a href="/blog">SmartyGym Blog</a></li>
         <li><a href="/tools">Smarty Tools</a></li>
         <li><a href="/exerciselibrary">Exercise Library</a></li>
       </ul>
