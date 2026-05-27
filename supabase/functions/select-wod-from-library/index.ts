@@ -145,6 +145,23 @@ function getCyprusDateStr(): string {
   return cyprusFormatter.format(now);
 }
 
+// Same forbidden-name patterns enforced by the DB trigger
+// `validate_public_workout_integrity`. We pre-filter candidates here so we
+// never burn promotion attempts on workouts the trigger will reject.
+const FORBIDDEN_NAME_PATTERNS: RegExp[] = [
+  /\d/,
+  /\b\d{4}(BW|EQ|V)\b$/i,
+  /\b\d{6,}\b$/,
+  /\b(v\d+|#\d+)\b$/i,
+  /\b(II|III|IV|V|VI|VII|VIII|IX|X)\b$/,
+  /\b(axial|matrix|meridian|protocol|helix|arcus|synergy|conduit|integration|current|vector|quantum|algorithm|neural|system|module|phase|sequence)\b/i,
+];
+function hasForbiddenPublicName(name?: string | null): boolean {
+  if (!name) return true;
+  const trimmed = name.trim();
+  return FORBIDDEN_NAME_PATTERNS.some((re) => re.test(trimmed));
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
