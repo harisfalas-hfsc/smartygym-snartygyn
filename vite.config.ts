@@ -1,4 +1,4 @@
-import { defineConfig } from "vite";
+import { defineConfig, type ResolvedConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
@@ -11,7 +11,7 @@ function smartySeoPrerenderPlugin() {
   return {
     name: "smarty-seo-prerender",
     apply: "build" as const,
-    configResolved(config) {
+    configResolved(config: ResolvedConfig) {
       outDir = path.resolve(config.root, config.build.outDir);
     },
     async closeBundle() {
