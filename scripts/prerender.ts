@@ -44,19 +44,29 @@ export async function prerenderSeoHtml(options: {
   );
 
   let written = 0;
+  const writeHtml = (outPath: string, html: string) => {
+    mkdirSync(dirname(outPath), { recursive: true });
+    writeFileSync(outPath, html);
+    written++;
+  };
+
   for (const route of routes) {
     const { bodyHtml, jsonLd } = renderRouteBody(route);
     let html = applyHeadOverrides(template, route);
     html = injectJsonLd(html, jsonLd);
     html = injectBody(html, bodyHtml);
 
-    const outPath =
-      route.path === "/"
-        ? join(distDir, "index.html")
-        : join(distDir, route.path.replace(/^\//, ""), "index.html");
-    mkdirSync(dirname(outPath), { recursive: true });
-    writeFileSync(outPath, html);
-    written++;
+    if (route.path === "/") {
+      writeHtml(join(distDir, "index.html"), html);
+    } else {
+      const cleanPath = route.path.replace(/^\//, "");
+
+      // Lovable's static host serves SPA fallback HTML for clean URLs before
+      // resolving nested directory indexes. Writing an exact extensionless
+      // file makes /blog/my-article return article HTML, not root index.html.
+      writeHtml(join(distDir, cleanPath), html);
+      writeHtml(join(distDir, cleanPath, "index.html"), html);
+    }
   }
   console.log(`[prerender] wrote ${written} HTML files into ${distDir.replace(process.cwd() + "/", "")}/`);
 }
