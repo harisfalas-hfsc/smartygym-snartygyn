@@ -20,13 +20,19 @@ import {
 const DIST = resolve("dist");
 const TEMPLATE_PATH = join(DIST, "index.html");
 
-async function main() {
-  if (!existsSync(TEMPLATE_PATH)) {
+export async function prerenderSeoHtml(options: {
+  distDir?: string;
+  templatePath?: string;
+} = {}) {
+  const distDir = options.distDir || DIST;
+  const templatePath = options.templatePath || join(distDir, "index.html");
+
+  if (!existsSync(templatePath)) {
     throw new Error(
-      `[prerender] dist/index.html not found at ${TEMPLATE_PATH}. Run after \`vite build\`.`,
+      `[prerender] dist/index.html not found at ${templatePath}. Run after Vite writes the HTML bundle.`,
     );
   }
-  const template = readFileSync(TEMPLATE_PATH, "utf8");
+  const template = readFileSync(templatePath, "utf8");
 
   const { routes, counts } = await buildSeoRoutes();
   console.log(
@@ -45,13 +51,17 @@ async function main() {
 
     const outPath =
       route.path === "/"
-        ? join(DIST, "index.html")
-        : join(DIST, route.path.replace(/^\//, ""), "index.html");
+        ? join(distDir, "index.html")
+        : join(distDir, route.path.replace(/^\//, ""), "index.html");
     mkdirSync(dirname(outPath), { recursive: true });
     writeFileSync(outPath, html);
     written++;
   }
-  console.log(`[prerender] wrote ${written} HTML files into dist/`);
+  console.log(`[prerender] wrote ${written} HTML files into ${distDir.replace(process.cwd() + "/", "")}/`);
+}
+
+async function main() {
+  await prerenderSeoHtml();
 }
 
 main().catch((err) => {
