@@ -29,6 +29,19 @@ function assertSingleCanonical(html: string, expectedHref: string, label: string
   }
 }
 
+function assertNotHomepageShell(html: string, routePath: string) {
+  if (routePath !== "/" && html.includes("SmartyGym | Online Fitness Platform by Haris Falas")) {
+    throw new Error(`[verify-prerender] ${routePath} still contains the homepage <title>; clean URL source is not unique`);
+  }
+}
+
+function assertPayloadText(html: string, raw: unknown, label: string) {
+  const text = String(raw || "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  if (text.length >= 40) {
+    assertIncludes(html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " "), text.slice(0, 80), label);
+  }
+}
+
 function sourceFileForCleanUrl(distDir: string, routePath: string) {
   if (routePath === "/") return join(distDir, "index.html");
   return join(distDir, routePath.replace(/^\//, ""), "index.html");
@@ -64,6 +77,7 @@ export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
 
     const html = readFileSync(artifactPath, "utf8");
     const canonicalUrl = `https://smartygym.com${route.path}`;
+    assertNotHomepageShell(html, route.path);
     assertIncludes(html, `<title>${htmlEscape(route.title)}</title>`, `${route.path} title`);
     assertSingleCanonical(html, canonicalUrl, route.path);
     assertIncludes(html, `content="${canonicalUrl}"`, `${route.path} og:url`);
