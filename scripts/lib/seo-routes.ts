@@ -128,7 +128,7 @@ const STATIC_ROUTES: Array<
     priority: "0.6",
   },
   {
-    path: "/blog",
+    path: "/blog.html",
     title: "SmartyGym Blog | Evidence-Based Training Articles",
     description:
       "Human-written, evidence-based fitness, nutrition and recovery articles by Sports Scientist Haris Falas. Learn how to train smart.",
@@ -667,7 +667,7 @@ export async function buildSeoRoutes(): Promise<SeoRouteBundle> {
       if (!b.slug) continue;
       const cleanExcerpt = stripHtml(b.excerpt) || stripHtml(b.content);
       routes.push({
-        path: `/blog/${b.slug}`,
+        path: `/blog/${b.slug}.html`,
         kind: "blog-article",
         title: clamp(`${b.title} | SmartyGym Blog`, 90),
         description: clamp(cleanExcerpt, 160),
