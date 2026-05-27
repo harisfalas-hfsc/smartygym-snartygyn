@@ -49,7 +49,6 @@ function assertRewriteForRoute(redirects: string, routePath: string) {
 export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
   const distDir = options.distDir || DIST;
   const { routes, counts } = await buildSeoRoutes();
-  const allPaths = routes.map((route) => route.path);
   const redirectsPath = join(distDir, "_redirects");
   if (!isFile(redirectsPath)) {
     throw new Error("[verify-prerender] missing dist/_redirects for clean URL rewrites");
@@ -58,23 +57,9 @@ export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
 
   let checked = 0;
   for (const route of routes) {
-    const htmlPath = htmlFileFor(distDir, route.path);
-    const artifactPath = route.path === "/" ? join(distDir, "index.html") : htmlPath;
+    const artifactPath = sourceFileForCleanUrl(distDir, route.path);
     if (!isFile(artifactPath)) {
-      throw new Error(`[verify-prerender] missing HTML for ${route.path}: expected ${artifactPath}`);
-    }
-
-    if (route.path !== "/") {
-      const cleanPath = route.path.replace(/^\//, "");
-      // Routes with children keep `<cleanPath>/index.html`; leaf routes also
-      // get an exact extensionless file (`dist/blog/slug`) because Lovable's
-      // host serves extensionless static files before the SPA fallback.
-      const cleanArtifact = hasChildRoute(route.path, allPaths)
-        ? join(distDir, cleanPath, "index.html")
-        : exactFileFor(distDir, route.path);
-      if (!isFile(cleanArtifact)) {
-        throw new Error(`[verify-prerender] missing clean URL HTML for ${route.path}: expected ${cleanArtifact}`);
-      }
+      throw new Error(`[verify-prerender] missing clean URL source HTML for ${route.path}: expected ${artifactPath}`);
     }
 
     const html = readFileSync(artifactPath, "utf8");
