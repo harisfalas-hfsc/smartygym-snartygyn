@@ -8,7 +8,7 @@
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { buildSeoRoutes, stripHtml } from "./lib/seo-routes";
+import { buildSeoRoutes, htmlEscape, stripHtml } from "./lib/seo-routes";
 
 const DIST = resolve("dist");
 
@@ -43,7 +43,7 @@ export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
     }
 
     const html = readFileSync(artifactPath, "utf8");
-    assertIncludes(html, `<title>${route.title}</title>`, `${route.path} title`);
+    assertIncludes(html, `<title>${htmlEscape(route.title)}</title>`, `${route.path} title`);
     assertIncludes(html, `href="https://smartygym.com${route.path}"`, `${route.path} canonical`);
 
     if (route.kind === "blog-article") {
