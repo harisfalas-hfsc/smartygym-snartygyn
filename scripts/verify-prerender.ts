@@ -29,18 +29,9 @@ function assertSingleCanonical(html: string, expectedHref: string, label: string
   }
 }
 
-function exactFileFor(distDir: string, routePath: string) {
+function sourceFileForCleanUrl(distDir: string, routePath: string) {
   if (routePath === "/") return join(distDir, "index.html");
-  return join(distDir, routePath.replace(/^\//, ""));
-}
-
-function htmlFileFor(distDir: string, routePath: string) {
-  if (routePath === "/") return join(distDir, "index.html");
-  return join(distDir, `${routePath.replace(/^\//, "")}.html`);
-}
-
-function hasChildRoute(routePath: string, allPaths: string[]) {
-  return allPaths.some((p) => p.startsWith(`${routePath}/`));
+  return join(distDir, routePath.replace(/^\//, ""), "index.html");
 }
 
 function isFile(path: string) {
@@ -48,8 +39,8 @@ function isFile(path: string) {
 }
 
 function assertRewriteForRoute(redirects: string, routePath: string) {
-  const expected = `${routePath} ${routePath}.html 200!`;
-  const expectedTrailing = `${routePath}/ ${routePath}.html 200!`;
+  const expected = `${routePath} ${routePath}/index.html 200!`;
+  const expectedTrailing = `${routePath}/ ${routePath}/index.html 200!`;
   if (!redirects.includes(expected) || !redirects.includes(expectedTrailing)) {
     throw new Error(`[verify-prerender] missing _redirects rules for ${routePath}`);
   }
