@@ -65,7 +65,7 @@ async function main() {
   await prerenderSeoHtml();
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
   main().catch((err) => {
     console.error("[prerender] failed:", err);
     process.exit(1);
