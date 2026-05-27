@@ -196,6 +196,14 @@ export function renderRouteBody(route: SeoRoute): {
       <p class="seo-excerpt">${htmlEscape(stripHtml(w.description) || "")}</p>
       <p class="seo-author">By <a href="/coach-profile">${htmlEscape(AUTHOR.name)}</a> &middot; ${htmlEscape(AUTHOR.jobTitle)}</p>
     </header>
+    ${sectionHtml("Warm-Up", w.warm_up)}
+    ${sectionHtml("Activation", w.activation)}
+    ${sectionHtml("Main Workout", w.main_workout)}
+    ${sectionHtml("Finisher", w.finisher)}
+    ${sectionHtml("Cool-Down", w.cool_down)}
+    ${sectionHtml("Instructions", w.instructions)}
+    ${sectionHtml("Tips", w.tips)}
+    ${sectionHtml("Notes", w.notes)}
     ${w.is_premium ? `<p class="seo-access">This workout is part of SmartyGym Premium. Full workout structure is available to members and standalone buyers.</p>` : ""}
   </article>
 </main>`,
@@ -256,6 +264,13 @@ export function renderRouteBody(route: SeoRoute): {
       <p class="seo-excerpt">${htmlEscape(stripHtml(p.description) || "")}</p>
       <p class="seo-author">Designed by <a href="/coach-profile">${htmlEscape(AUTHOR.name)}</a> &middot; ${htmlEscape(AUTHOR.jobTitle)}</p>
     </header>
+    ${sectionHtml("Overview", p.overview)}
+    ${sectionHtml("Target Audience", p.target_audience)}
+    ${sectionHtml("Program Structure", p.program_structure)}
+    ${sectionHtml("Weekly Schedule", p.weekly_schedule)}
+    ${sectionHtml("Progression Plan", p.progression_plan)}
+    ${sectionHtml("Nutrition Tips", p.nutrition_tips)}
+    ${sectionHtml("Expected Results", p.expected_results)}
     ${p.is_premium ? `<p class="seo-access">This program is part of SmartyGym Premium. Full week-by-week structure is available to members and standalone buyers.</p>` : ""}
   </article>
 </main>`,

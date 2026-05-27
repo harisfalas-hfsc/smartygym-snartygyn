@@ -1,6 +1,6 @@
 /**
  * Build-time pre-renderer.
- * Runs after `vite build` and writes dist/<path>/index.html for every public
+ * Runs after `vite build` and writes real static HTML for every public
  * route, with unique <title>, <meta description>, canonical, OG tags, JSON-LD
  * and real crawlable body content inside <div id="root">.
  *
@@ -25,6 +25,10 @@ function normalizeTemplate(html: string) {
   return html
     .replace(/<script\s+type=["']application\/ld\+json["']\s+data-prerender=["']1["']>[\s\S]*?<\/script>\s*/gi, "")
     .replace(/<div id="root">\s*<main[\s\S]*?<\/main>\s*<\/div>/i, '<div id="root"></div>');
+}
+
+function hasChildRoute(routePath: string, allPaths: string[]) {
+  return allPaths.some((p) => p.startsWith(`${routePath}/`));
 }
 
 function writeCleanUrlRewrites(distDir: string, cleanPaths: string[]) {
@@ -83,6 +87,7 @@ export async function prerenderSeoHtml(options: {
     written++;
   };
 
+  const allPaths = routes.map((route) => route.path);
   const cleanPaths: string[] = [];
   for (const route of routes) {
     const { bodyHtml, jsonLd } = renderRouteBody(route);
@@ -96,11 +101,17 @@ export async function prerenderSeoHtml(options: {
     }
 
     const cleanPath = route.path.replace(/^\//, "");
-    // Always write the .html file. The _redirects rule maps the clean URL
-    // (and trailing-slash variant) to this file with a 200 rewrite, so the
-    // browser address bar keeps the clean URL while the host serves the
-    // prerendered HTML. Canonical tags point to the clean URL.
+    // Write every non-conflicting static shape the host may try for a clean
+    // URL. Leaf pages get an exact extensionless file because that is the
+    // strongest guarantee for /blog/slug, /workout/type/id, and
+    // /trainingprogram/type/id. Parent pages keep directory indexes because
+    // they must also contain child routes.
     writeHtml(join(distDir, `${cleanPath}.html`), html);
+    if (!hasChildRoute(route.path, allPaths)) {
+      writeHtml(join(distDir, cleanPath), html);
+    } else {
+      writeHtml(join(distDir, cleanPath, "index.html"), html);
+    }
     cleanPaths.push(route.path);
   }
   writeCleanUrlRewrites(distDir, cleanPaths);

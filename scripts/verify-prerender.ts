@@ -39,6 +39,10 @@ function htmlFileFor(distDir: string, routePath: string) {
   return join(distDir, `${routePath.replace(/^\//, "")}.html`);
 }
 
+function hasChildRoute(routePath: string, allPaths: string[]) {
+  return allPaths.some((p) => p.startsWith(`${routePath}/`));
+}
+
 function isFile(path: string) {
   return existsSync(path) && statSync(path).isFile();
 }
@@ -54,6 +58,7 @@ function assertRewriteForRoute(redirects: string, routePath: string) {
 export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
   const distDir = options.distDir || DIST;
   const { routes, counts } = await buildSeoRoutes();
+  const allPaths = routes.map((route) => route.path);
   const redirectsPath = join(distDir, "_redirects");
   if (!isFile(redirectsPath)) {
     throw new Error("[verify-prerender] missing dist/_redirects for clean URL rewrites");
@@ -66,6 +71,16 @@ export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
     const artifactPath = route.path === "/" ? join(distDir, "index.html") : htmlPath;
     if (!isFile(artifactPath)) {
       throw new Error(`[verify-prerender] missing HTML for ${route.path}: expected ${artifactPath}`);
+    }
+
+    if (route.path !== "/") {
+      const cleanPath = route.path.replace(/^\//, "");
+      const cleanArtifact = hasChildRoute(route.path, allPaths)
+        ? join(distDir, cleanPath, "index.html")
+        : exactFileFor(distDir, route.path);
+      if (!isFile(cleanArtifact)) {
+        throw new Error(`[verify-prerender] missing clean URL HTML for ${route.path}: expected ${cleanArtifact}`);
+      }
     }
 
     const html = readFileSync(artifactPath, "utf8");
