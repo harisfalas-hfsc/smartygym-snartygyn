@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { slugifyContentName } from "@/lib/seo-slugs";
+import { buildUniqueContentSlugs, slugifyContentName } from "@/lib/seo-slugs";
 
 export interface TrainingProgramData {
   id: string;
@@ -37,9 +37,13 @@ export const useTrainingProgramData = (programId: string | undefined) => {
           .rpc("get_visible_program_metadata", { _program_id: null });
 
         if (metadataError) throw metadataError;
-        return (Array.isArray(metadata) ? metadata : []).find(
+        const programs = (Array.isArray(metadata) ? metadata : []) as TrainingProgramData[];
+        const uniqueSlugs = buildUniqueContentSlugs(programs);
+        return programs.find(
           (program: TrainingProgramData) =>
-            program.id === programId || slugifyContentName(program.name || program.id) === programId,
+            program.id === programId ||
+            slugifyContentName(program.name || program.id) === programId ||
+            uniqueSlugs.get(program.id) === programId,
         );
       };
 

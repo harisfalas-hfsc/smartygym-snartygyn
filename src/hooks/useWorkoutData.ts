@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchVisibleWorkoutMetadata } from "@/hooks/useTodayWods";
-import { slugifyContentName } from "@/lib/seo-slugs";
+import { buildUniqueContentSlugs, slugifyContentName } from "@/lib/seo-slugs";
 
 export interface WorkoutData {
   id: string;
@@ -42,7 +42,13 @@ export const useWorkoutData = (workoutId: string | undefined) => {
       if (!workoutId) throw new Error("Workout ID is required");
       const resolveFromMetadata = async () => {
         const metadata = await fetchVisibleWorkoutMetadata(null);
-        return metadata.find((workout) => workout.id === workoutId || slugifyContentName(workout.name || workout.id) === workoutId);
+        const uniqueSlugs = buildUniqueContentSlugs(metadata);
+        return metadata.find(
+          (workout) =>
+            workout.id === workoutId ||
+            slugifyContentName(workout.name || workout.id) === workoutId ||
+            uniqueSlugs.get(workout.id) === workoutId,
+        );
       };
       
       const { data, error } = await supabase
