@@ -27,10 +27,6 @@ function normalizeTemplate(html: string) {
     .replace(/<div id="root">\s*<main[\s\S]*?<\/main>\s*<\/div>/i, '<div id="root"></div>');
 }
 
-function hasChildRoute(routePath: string, allPaths: string[]) {
-  return allPaths.some((p) => p.startsWith(`${routePath}/`));
-}
-
 function writeCleanUrlRewrites(distDir: string, cleanPaths: string[]) {
   // Lovable's static host serves the SPA fallback (index.html) for clean URLs
   // like /blog/<slug> unless we explicitly tell it to rewrite to the
@@ -88,7 +84,6 @@ export async function prerenderSeoHtml(options: {
     written++;
   };
 
-  const allPaths = routes.map((route) => route.path);
   const cleanPaths: string[] = [];
   for (const route of routes) {
     const { bodyHtml, jsonLd } = renderRouteBody(route);
