@@ -667,7 +667,7 @@ export async function buildSeoRoutes(): Promise<SeoRouteBundle> {
       if (!b.slug) continue;
       const cleanExcerpt = stripHtml(b.excerpt) || stripHtml(b.content);
       routes.push({
-        path: `/blog/${b.slug}.html`,
+        path: `/blog/${b.slug}`,
         kind: "blog-article",
         title: clamp(`${b.title} | SmartyGym Blog`, 90),
         description: clamp(cleanExcerpt, 160),

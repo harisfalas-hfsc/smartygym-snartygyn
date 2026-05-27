@@ -87,7 +87,7 @@ export const ArticleDetail = () => {
     );
   }
 
-  const articleUrl = `https://smartygym.com/blog/${article.slug}.html`;
+  const articleUrl = `https://smartygym.com/blog/${article.slug}`;
   const publishedDate = new Date(article.published_at || article.created_at).toISOString();
   const modifiedDate = new Date(article.updated_at || article.created_at).toISOString();
 
@@ -105,14 +105,14 @@ export const ArticleDetail = () => {
     datePublished: publishedDate,
     dateModified: modifiedDate,
     imageUrl: article.image_url || undefined,
-    url: `/blog/${article.slug}.html`,
+    url: `/blog/${article.slug}`,
     category: article.category,
   });
 
   const breadcrumbSchema = generateBreadcrumbSchema([
     { name: "Home", url: "/" },
     { name: "Blog", url: "/blog.html" },
-    { name: article.title, url: `/blog/${article.slug}.html` },
+    { name: article.title, url: `/blog/${article.slug}` },
   ]);
 
   // Build AI keywords from seo_metadata or defaults
