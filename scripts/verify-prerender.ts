@@ -34,6 +34,11 @@ function exactFileFor(distDir: string, routePath: string) {
   return join(distDir, routePath.replace(/^\//, ""));
 }
 
+function htmlFileFor(distDir: string, routePath: string) {
+  if (routePath === "/") return join(distDir, "index.html");
+  return join(distDir, `${routePath.replace(/^\//, "")}.html`);
+}
+
 function isFile(path: string) {
   return existsSync(path) && statSync(path).isFile();
 }
@@ -45,12 +50,13 @@ export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
   let checked = 0;
   for (const route of routes) {
     const exactPath = exactFileFor(distDir, route.path);
+    const htmlPath = htmlFileFor(distDir, route.path);
     const directoryIndexPath =
       route.path === "/" ? exactPath : join(distDir, route.path.replace(/^\//, ""), "index.html");
-    const artifactPath = isFile(exactPath) ? exactPath : directoryIndexPath;
+    const artifactPath = isFile(exactPath) ? exactPath : isFile(htmlPath) ? htmlPath : directoryIndexPath;
 
     if (!existsSync(artifactPath)) {
-      throw new Error(`[verify-prerender] missing HTML for ${route.path}: expected ${exactPath} or ${directoryIndexPath}`);
+      throw new Error(`[verify-prerender] missing HTML for ${route.path}: expected ${exactPath}, ${htmlPath}, or ${directoryIndexPath}`);
     }
 
     const html = readFileSync(artifactPath, "utf8");
@@ -69,6 +75,10 @@ export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
       if (artifactPath !== exactPath) {
         throw new Error(`[verify-prerender] ${route.path} must be an exact extensionless file for the published clean URL`);
       }
+    }
+
+    if (route.path !== "/" && route.kind !== "blog-article" && !isFile(exactPath) && !isFile(htmlPath)) {
+      throw new Error(`[verify-prerender] ${route.path} must have ${htmlPath} because parent clean URLs do not reliably serve directory indexes`);
     }
 
     checked++;
