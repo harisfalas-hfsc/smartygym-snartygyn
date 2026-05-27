@@ -101,15 +101,16 @@ export async function prerenderSeoHtml(options: {
     }
 
     const cleanPath = route.path.replace(/^\//, "");
-    // Write every static shape the host may try for a clean URL. This avoids
-    // depending on JavaScript or on a single hosting rewrite behavior:
-    //   /path             -> dist/path (only when /path has no children)
-    //   /path/            -> dist/path/index.html
-    //   /path.html        -> dist/path.html fallback/alias
+    // Write every non-conflicting static shape the host may try for a clean
+    // URL. Leaf pages get an exact extensionless file because that is the
+    // strongest guarantee for /blog/slug, /workout/type/id, and
+    // /trainingprogram/type/id. Parent pages keep directory indexes because
+    // they must also contain child routes.
     writeHtml(join(distDir, `${cleanPath}.html`), html);
-    writeHtml(join(distDir, cleanPath, "index.html"), html);
     if (!hasChildRoute(route.path, allPaths)) {
       writeHtml(join(distDir, cleanPath), html);
+    } else {
+      writeHtml(join(distDir, cleanPath, "index.html"), html);
     }
     cleanPaths.push(route.path);
   }
