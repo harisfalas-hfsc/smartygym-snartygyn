@@ -244,7 +244,6 @@ const AppContent = () => {
                 {/* Exercise library is public */}
                 <Route path="/exerciselibrary" element={<ExerciseLibrary />} />
                 <Route path="/blog/:slug" element={<ArticleDetail />} />
-                <Route path="/blog/:slugWithExt" element={<ArticleDetail />} />
                 
                 {/* Public Smarty Tools - no auth required */}
                 <Route path="/1rmcalculator" element={<OneRMCalculator />} />
