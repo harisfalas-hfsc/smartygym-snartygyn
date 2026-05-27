@@ -2,29 +2,12 @@
  * Auto-generated sitemap. Runs before `vite dev` and `vite build`
  * via the `predev` / `prebuild` scripts in package.json.
  *
- * Source of truth = real React routes in src/App.tsx + real DB rows.
- * Writes to public/sitemap.xml (served as /sitemap.xml).
+ * Uses the shared SEO route source in scripts/lib/seo-routes.ts so the
+ * sitemap and the pre-rendered HTML can never drift apart.
  */
-import { createClient } from "@supabase/supabase-js";
 import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
-
-const BASE_URL = "https://smartygym.com";
-const SUPABASE_URL =
-  process.env.VITE_SUPABASE_URL ||
-  process.env.SUPABASE_URL ||
-  "https://cvccrvyimyzrxcwzmxwk.supabase.co";
-const SUPABASE_KEY =
-  process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
-  process.env.SUPABASE_PUBLISHABLE_KEY ||
-  // Safe public fallback: publish builds do not always expose VITE_* env vars
-  // to prebuild scripts. Without this, the sitemap silently shipped only the
-  // 58 static/category URLs and omitted every dynamic content URL.
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN2Y2NydnlpbXl6cnhjd3pteHdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA2MTc2NjIsImV4cCI6MjA3NjE5MzY2Mn0.XU_h4CYRiQ7VN079laFHSVMrzB6urOhQZFoTagU_Wno";
-
-const MIN_EXPECTED_DYNAMIC_WORKOUTS = 100;
-const MIN_EXPECTED_DYNAMIC_PROGRAMS = 10;
-const MIN_EXPECTED_DYNAMIC_BLOG_ARTICLES = 1;
+import { BASE_URL, buildSeoRoutes, xmlEscape } from "./lib/seo-routes";
 
 interface Entry {
   path: string;
@@ -40,9 +23,7 @@ interface Entry {
   priority?: string;
 }
 
-// Public, indexable static routes pulled from src/App.tsx.
-// Protected, admin, auth, payment, unsubscribe, and printable routes are
-// intentionally excluded — they must never end up in the sitemap.
+// (Legacy entries removed — see scripts/lib/seo-routes.ts for the source of truth.)
 const STATIC_ENTRIES: Entry[] = [
   { path: "/", changefreq: "daily", priority: "1.0" },
   { path: "/home", changefreq: "daily", priority: "0.9" },
