@@ -50,6 +50,12 @@ export async function prerenderSeoHtml(options: {
     written++;
   };
 
+  const hasChildren = new Set(
+    routes
+      .filter((route) => route.path !== "/" && routes.some((candidate) => candidate.path.startsWith(`${route.path}/`)))
+      .map((route) => route.path),
+  );
+
   for (const route of routes) {
     const { bodyHtml, jsonLd } = renderRouteBody(route);
     let html = applyHeadOverrides(template, route);
@@ -66,7 +72,7 @@ export async function prerenderSeoHtml(options: {
       // write an exact extensionless file so /blog/my-article returns article
       // HTML. Keep shallow/category routes as directory indexes so they do not
       // block deeper child routes such as /blog/<slug> or /workout/<cat>/<id>.
-      const isDeepLeaf = ["blog-article", "workout", "program"].includes(route.kind);
+      const isDeepLeaf = !hasChildren.has(route.path);
       if (isDeepLeaf) {
         writeHtml(join(distDir, cleanPath), html);
       } else {
