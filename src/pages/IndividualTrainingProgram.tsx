@@ -11,6 +11,7 @@ import { ContentNotFound } from "@/components/ContentNotFound";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { ReaderModeDialog } from "@/components/ReaderModeDialog";
 import { HTMLContent } from "@/components/ui/html-content";
+import { getProgramCategorySlug, slugifyContentName } from "@/lib/seo-slugs";
 
 // Helper function to generate SEO-optimized alt text
 const generateProgramAltText = (program: any): string => {
@@ -66,19 +67,8 @@ const IndividualTrainingProgram = () => {
     const alreadyPurchased = hasPurchased(dbProgram.id, "program");
     const hasAccess = userTier === "premium" || alreadyPurchased || !isPremium;
     
-    const programCategorySlug = (() => {
-      const c = (dbProgram.category || "").toUpperCase().trim();
-      const map: Record<string, string> = {
-        "CARDIO ENDURANCE": "cardio-endurance",
-        "FUNCTIONAL STRENGTH": "functional-strength",
-        "MUSCLE HYPERTROPHY": "muscle-hypertrophy",
-        "WEIGHT LOSS": "weight-loss",
-        "LOW BACK PAIN": "low-back-pain",
-        "MOBILITY & STABILITY": "mobility-stability",
-      };
-      return map[c] || type || "functional-strength";
-    })();
-    const programUrl = `https://smartygym.com/trainingprogram/${programCategorySlug}/${dbProgram.id}`;
+    const programCategorySlug = getProgramCategorySlug(dbProgram.category, type || "functional-strength");
+    const programUrl = `https://smartygym.com/trainingprogram/${programCategorySlug}/${slugifyContentName(dbProgram.name || dbProgram.id)}`;
     const imageAlt = generateProgramAltText(dbProgram);
 
     return (

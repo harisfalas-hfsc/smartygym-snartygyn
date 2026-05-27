@@ -1,65 +1,89 @@
-I will implement the SEO fix as a routing problem, not just a metadata problem.
+To be crystal clear: this applies to **every single page** on the site, not one workout. That means:
 
-The current failure means this: the app is still letting clean URLs like `/blog/article-slug` fall through to the SPA homepage shell. So even if article HTML exists somewhere else, crawlers and “View Source” are not receiving it at the real URL.
+- **All ~500+ workouts** (free and premium, existing and any added in the future)
+- **All training programs** (free and premium, existing and future)
+- **All blog articles** (existing and future, auto-included on next publish)
+- **All Smarty Tools** (`/tools`, `/1rmcalculator`, `/bmrcalculator`, `/macrocalculator`, `/caloriecalculator`, `/caloriecounter`, `/workouttimer`)
+- **All category and static pages** (`/workout`, `/workout/strength`, `/trainingprogram`, `/trainingprogram/weight-loss`, `/blog`, `/about`, `/coach-profile`, etc.)
 
-Plan:
+No page is skipped. No page keeps the homepage title. No page is hand-picked.
 
-1. Replace the fragile clean-URL strategy
-   - Stop relying only on `_redirects`, `.html` siblings, or extensionless files.
-   - Generate the static HTML in the exact directory form that static hosts reliably serve:
-     - `/blog/why-ai-fitness-apps-are-dangerous/index.html`
-     - `/workouts/<category>/<slug>/index.html`
-     - `/trainingprogram/<category>/<slug>/index.html`
-     - `/tools/<tool>/index.html`
-   - This is the most crawler-safe static output pattern because the clean URL maps directly to a real folder index file.
+## What every page will have after this fix
 
-2. Remove the risky extensionless-file workaround
-   - The previous attempt wrote files like `dist/blog/slug` without `.html`.
-   - That can conflict with directory-based routes and may be ignored by the host.
-   - I will simplify this so every public SEO URL has a real `index.html` inside its own folder.
+For every URL above:
+- A unique `<title>` based on the actual content name.
+- A unique `<meta description>`.
+- A correct canonical URL pointing to that exact page.
+- Open Graph + Twitter tags matching the page.
+- JSON-LD schema appropriate to the type (Article, ExercisePlan, Course, WebApplication, etc.).
+- The actual content (H1, body text, workout sections, article text, tool description) inside the raw HTML — visible in `view-source:` before any JavaScript runs.
 
-3. Generate per-page source HTML for all public content
-   - Blog articles: title, description, canonical, OG tags, JSON-LD, H1, and full article text inside the initial HTML.
-   - Free workouts: unique title, canonical, workout body, metadata, JSON-LD.
-   - Free training programs: unique title, canonical, program body, metadata, JSON-LD.
-   - Smarty tools and public static pages: unique title/canonical/source content.
-   - Category pages: unique titles and crawlable lists.
+## What I will change
 
-4. Future-proof the build
-   - The route builder will continue querying the backend during every production build.
-   - Any newly published blog article, free workout, free training program, category, or Smarty tool gets a new static `index.html` automatically on the next publish.
-   - No manual code change for new content.
-
-5. Add a source-level verification that cannot pass falsely
-   - The verifier will read the exact file that should be served for the clean URL, e.g. `dist/blog/why-ai-fitness-apps-are-dangerous/index.html`.
-   - It will fail the build if that file contains the homepage title instead of the article title.
-   - It will fail if the article body text is missing.
-   - It will fail if canonical/OG URL points to the wrong URL.
-   - It will verify representative blog, workout, training program, tool, and category URLs.
-
-6. Add a deployment sanity file/report
-   - Generate a small SEO verification report during build listing the exact files created and checked.
-   - This makes it clear whether the published build contains the static source files.
-
-7. After implementation
-   - The only acceptable result is:
-     - `view-source:https://smartygym.com/blog/why-ai-fitness-apps-are-dangerous`
-     - shows the article title and article text in raw HTML before JavaScript.
-   - If Lovable hosting still serves the SPA shell despite real `/route/index.html` files, then the platform hosting layer is overriding static route files, and the next required step is support/platform escalation or moving the public site to SSR/static hosting that honors generated route files.
-
-Technical details:
+### 1. Readable, standardized URLs for dynamic content
+Move workouts and programs off serial-ID URLs and onto readable slugs based on the content name:
 
 ```text
-During production build:
-
-backend content
-  -> scripts/lib/seo-routes.ts
-  -> scripts/prerender.ts
-  -> dist/blog/article-slug/index.html
-  -> dist/workouts/category/slug/index.html
-  -> dist/trainingprogram/category/slug/index.html
-  -> dist/tools/tool-name/index.html
-  -> scripts/verify-prerender.ts checks exact source files
+/blog/<article-slug>
+/workout/<category>/<workout-slug>
+/trainingprogram/<category>/<program-slug>
+/tools, /1rmcalculator, /bmrcalculator, /macrocalculator,
+/caloriecalculator, /caloriecounter, /workouttimer
 ```
 
-I will not touch the protected generated backend client/type files. I will only adjust the prerenderer/verifier and, if needed, the SEO route/body renderer.
+Slugs are derived from the visible name (with a numeric suffix only if two items collide). Old ID-based URLs keep working, but canonical URLs point to the readable slug version so Google indexes one clean URL per item.
+
+### 2. Update app navigation links
+Workout/program list and detail components will link using the readable slug URLs so users and crawlers land directly on the canonical pages.
+
+### 3. Prerender every public page, automatically
+The build process already queries the backend for every published article, every visible workout, every visible program. I will make sure the route generator covers 100% of those plus every Smarty Tool and every static page, and that each one writes its own `dist/<route>/index.html` containing:
+
+- Unique `<title>` and meta description
+- Canonical and OG/Twitter tags
+- JSON-LD
+- Full H1 + body text (workout sections, article content, program structure, tool description) inside `<div id="root">`
+
+This runs on every publish. **Any new blog article, workout, program, or tool is automatically included on the next publish — no manual step.**
+
+### 4. Force every clean URL to its prerendered file
+`_redirects` will explicitly map every public clean URL to its own `index.html` so the static host cannot fall back to the homepage shell.
+
+### 5. Hard verification — the build fails if any page is wrong
+`scripts/verify-prerender.ts` will fail the build if **any** route:
+- Still has the homepage title
+- Has a serial ID where the content name should be
+- Has a missing or wrong canonical
+- Is missing its actual body content in raw HTML
+- Is missing its `_redirects` rule
+
+If even one workout, one program, one article, or one tool is broken, the build stops. Nothing partial ever ships.
+
+### 6. Live deployed-source verification script
+After publish, a script fetches the raw HTML of representative URLs from each category (multiple workouts, multiple programs, multiple articles, every tool, key static pages) and confirms each one returns its own unique title and content — not the homepage. Failures are reported clearly.
+
+## Files affected
+- `scripts/lib/seo-routes.ts` (route + slug generation)
+- `scripts/lib/seo-render.ts` (per-page body and JSON-LD)
+- `scripts/prerender.ts` (file output)
+- `scripts/verify-prerender.ts` (strict checks)
+- `scripts/generate-sitemap.ts` (URL format alignment)
+- New: `scripts/verify-deployed-seo.ts`
+- Workout/program list/detail link generation in `src/pages` and related components
+
+## Acceptance test — must pass for ALL types
+After publish, `view-source:` on these patterns must show the page's own title and content, not the homepage:
+
+```text
+https://smartygym.com/blog/<any published article slug>
+https://smartygym.com/workout/<category>/<any workout slug>
+https://smartygym.com/trainingprogram/<category>/<any program slug>
+https://smartygym.com/1rmcalculator
+https://smartygym.com/bmrcalculator
+https://smartygym.com/macrocalculator
+https://smartygym.com/caloriecounter
+https://smartygym.com/workouttimer
+https://smartygym.com/tools
+```
+
+This must be true for **every** published article, **every** visible workout, **every** visible program, and **every** tool — current and future.

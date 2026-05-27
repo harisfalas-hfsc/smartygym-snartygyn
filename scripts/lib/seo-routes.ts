@@ -11,6 +11,10 @@
  * visible training program exists in the database, it appears in both.
  */
 import { createClient } from "@supabase/supabase-js";
+import {
+  buildUniqueContentSlugs,
+  slugifyContentName,
+} from "../../src/lib/seo-slugs";
 
 export const BASE_URL = "https://smartygym.com";
 
@@ -602,9 +606,11 @@ export async function buildSeoRoutes(): Promise<SeoRouteBundle> {
   if (workoutsRes.error) {
     console.warn("[seo-routes] workouts query error:", workoutsRes.error.message);
   } else if (workoutsRes.data) {
+    const workoutSlugs = buildUniqueContentSlugs(workoutsRes.data as any[]);
     for (const w of workoutsRes.data as any[]) {
       const slug = workoutSlugFor(w.category);
       if (!slug || !w.id) continue;
+      const workoutSlug = workoutSlugs.get(String(w.id)) || slugifyContentName(w.name || w.id);
       const cleanDesc = stripHtml(w.description);
       const titleParts = [
         w.name,
@@ -616,7 +622,7 @@ export async function buildSeoRoutes(): Promise<SeoRouteBundle> {
         cleanDesc || `${w.name} by Sports Scientist Haris Falas.`,
       ].filter(Boolean) as string[];
       routes.push({
-        path: `/workout/${slug}/${w.id}`,
+        path: `/workout/${slug}/${workoutSlug}`,
         kind: "workout",
         title: clamp(titleParts.join(" "), 90),
         description: clamp(descParts.join(" — "), 160),
@@ -633,9 +639,11 @@ export async function buildSeoRoutes(): Promise<SeoRouteBundle> {
   if (programsRes.error) {
     console.warn("[seo-routes] programs query error:", programsRes.error.message);
   } else if (programsRes.data) {
+    const programSlugs = buildUniqueContentSlugs(programsRes.data as any[]);
     for (const p of programsRes.data as any[]) {
       const slug = programSlugFor(p.category);
       if (!slug || !p.id) continue;
+      const programSlug = programSlugs.get(String(p.id)) || slugifyContentName(p.name || p.id);
       const cleanDesc = stripHtml(p.description);
       const title = `${p.name} | Online Training Program by Haris Falas | SmartyGym`;
       const descBits = [
@@ -646,7 +654,7 @@ export async function buildSeoRoutes(): Promise<SeoRouteBundle> {
         cleanDesc,
       ].filter(Boolean) as string[];
       routes.push({
-        path: `/trainingprogram/${slug}/${p.id}`,
+        path: `/trainingprogram/${slug}/${programSlug}`,
         kind: "program",
         title: clamp(title, 90),
         description: clamp(descBits.join(" "), 160),

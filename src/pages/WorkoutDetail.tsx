@@ -31,6 +31,7 @@ import { useAccessControl } from "@/hooks/useAccessControl";
 import { useWorkoutInteractions } from "@/hooks/useWorkoutInteractions";
 import { supabase } from "@/integrations/supabase/client";
 import { stripHtmlTags } from "@/lib/text";
+import { slugifyContentName } from "@/lib/seo-slugs";
 import { STRENGTH_FOCUS_OPTIONS, isStrengthFocus, type StrengthFocus } from "@/constants/workoutCategories";
 
 type EquipmentFilter = "all" | "bodyweight" | "equipment";
@@ -582,7 +583,7 @@ const WorkoutDetail = () => {
               <Card
                 key={workout.id}
                 className="overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-primary bg-card border-border relative"
-                onClick={() => navigate(`/workout/${type}/${workout.id}`)}
+                onClick={() => navigate(`/workout/${type}/${slugifyContentName(workout.name || workout.id)}`)}
               >
                 <div className="relative h-48 w-full overflow-hidden">
                   {/* Equipment Badge - Top Left */}
