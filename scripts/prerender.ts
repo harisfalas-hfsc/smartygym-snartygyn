@@ -101,17 +101,15 @@ export async function prerenderSeoHtml(options: {
     }
 
     const cleanPath = route.path.replace(/^\//, "");
-    // Write every non-conflicting static shape the host may try for a clean
-    // URL. Leaf pages get an exact extensionless file because that is the
-    // strongest guarantee for /blog/slug, /workout/type/id, and
-    // /trainingprogram/type/id. Parent pages keep directory indexes because
-    // they must also contain child routes.
+    // Universal static-host pattern: ALWAYS write `<cleanPath>/index.html`.
+    // Every static host (Lovable, Netlify, Vercel, Cloudflare Pages, S3)
+    // serves `/foo/bar` → `/foo/bar/index.html` automatically without any
+    // rewrite rules. This is the only pattern that survives a host that
+    // ignores _redirects (which is what we observed in production).
+    // Also keep the `.html` sibling for explicit links and for the rewrite
+    // rules in case the host eventually starts honoring _redirects.
     writeHtml(join(distDir, `${cleanPath}.html`), html);
-    if (!hasChildRoute(route.path, allPaths)) {
-      writeHtml(join(distDir, cleanPath), html);
-    } else {
-      writeHtml(join(distDir, cleanPath, "index.html"), html);
-    }
+    writeHtml(join(distDir, cleanPath, "index.html"), html);
     cleanPaths.push(route.path);
   }
   writeCleanUrlRewrites(distDir, cleanPaths);
