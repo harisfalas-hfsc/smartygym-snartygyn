@@ -218,6 +218,7 @@ const AppContent = () => {
                 <Route path="/unsubscribe" element={<Unsubscribe />} />
                 <Route path="/unsubscribe-help" element={<UnsubscribeHelp />} />
                 <Route path="/blog" element={<Blog />} />
+                <Route path="/blog.html" element={<Blog />} />
                 <Route path="/coach-profile" element={<CoachProfile />} />
                 <Route path="/coach-cv" element={<CoachCV />} />
                 
