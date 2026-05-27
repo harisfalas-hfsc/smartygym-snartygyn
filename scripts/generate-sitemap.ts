@@ -3,8 +3,8 @@
  * `predev` / `prebuild` scripts in package.json. Uses the shared SEO route
  * source so sitemap and pre-rendered HTML never drift apart.
  */
-import { writeFileSync } from "node:fs";
-import { mkdirSync } from "node:fs";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 import { BASE_URL, buildSeoRoutes, xmlEscape } from "./lib/seo-routes";
 
@@ -41,7 +41,9 @@ async function main() {
   await generateSitemap();
 }
 
-main().catch((err) => {
-  console.error("[sitemap] generation failed:", err);
-  process.exit(1);
-});
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+  main().catch((err) => {
+    console.error("[sitemap] generation failed:", err);
+    process.exit(1);
+  });
+}
