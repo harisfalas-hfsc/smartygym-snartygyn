@@ -218,6 +218,7 @@ const AppContent = () => {
                 <Route path="/unsubscribe" element={<Unsubscribe />} />
                 <Route path="/unsubscribe-help" element={<UnsubscribeHelp />} />
                 <Route path="/blog" element={<Blog />} />
+                <Route path="/blog.html" element={<Blog />} />
                 <Route path="/coach-profile" element={<CoachProfile />} />
                 <Route path="/coach-cv" element={<CoachCV />} />
                 
@@ -243,6 +244,7 @@ const AppContent = () => {
                 {/* Exercise library is public */}
                 <Route path="/exerciselibrary" element={<ExerciseLibrary />} />
                 <Route path="/blog/:slug" element={<ArticleDetail />} />
+                <Route path="/blog/:slugWithExt" element={<ArticleDetail />} />
                 
                 {/* Public Smarty Tools - no auth required */}
                 <Route path="/1rmcalculator" element={<OneRMCalculator />} />
