@@ -36,9 +36,18 @@ function assertNotHomepageShell(html: string, routePath: string) {
 }
 
 function assertPayloadText(html: string, raw: unknown, label: string) {
-  const text = String(raw || "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  const normalize = (value: string) => value
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/\s+/g, " ")
+    .trim();
+  const text = normalize(String(raw || ""));
   if (text.length >= 40) {
-    assertIncludes(html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " "), text.slice(0, 80), label);
+    assertIncludes(normalize(html), text.slice(0, 80), label);
   }
 }
 
