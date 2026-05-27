@@ -19,8 +19,6 @@
 
         if (path === "/blog" || path === "/blog/") {
           target = "/blog.html";
-        } else if (/^\/blog\/[^/.]+\/?$/.test(path)) {
-          target = path.replace(/\/$/, "") + ".html";
         }
 
         if (target) {
