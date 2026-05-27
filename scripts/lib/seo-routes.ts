@@ -606,10 +606,11 @@ export async function buildSeoRoutes(): Promise<SeoRouteBundle> {
   if (workoutsRes.error) {
     console.warn("[seo-routes] workouts query error:", workoutsRes.error.message);
   } else if (workoutsRes.data) {
+    const workoutSlugs = buildUniqueContentSlugs(workoutsRes.data as any[]);
     for (const w of workoutsRes.data as any[]) {
       const slug = workoutSlugFor(w.category);
       if (!slug || !w.id) continue;
-      const workoutSlug = buildUniqueContentSlugs(workoutsRes.data as any[]).get(String(w.id)) || slugifyContentName(w.name || w.id);
+      const workoutSlug = workoutSlugs.get(String(w.id)) || slugifyContentName(w.name || w.id);
       const cleanDesc = stripHtml(w.description);
       const titleParts = [
         w.name,
@@ -638,10 +639,11 @@ export async function buildSeoRoutes(): Promise<SeoRouteBundle> {
   if (programsRes.error) {
     console.warn("[seo-routes] programs query error:", programsRes.error.message);
   } else if (programsRes.data) {
+    const programSlugs = buildUniqueContentSlugs(programsRes.data as any[]);
     for (const p of programsRes.data as any[]) {
       const slug = programSlugFor(p.category);
       if (!slug || !p.id) continue;
-      const programSlug = buildUniqueContentSlugs(programsRes.data as any[]).get(String(p.id)) || slugifyContentName(p.name || p.id);
+      const programSlug = programSlugs.get(String(p.id)) || slugifyContentName(p.name || p.id);
       const cleanDesc = stripHtml(p.description);
       const title = `${p.name} | Online Training Program by Haris Falas | SmartyGym`;
       const descBits = [
