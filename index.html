@@ -12,6 +12,22 @@
     
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <script>
+      (function () {
+        var path = window.location.pathname;
+        var target = "";
+
+        if (path === "/blog" || path === "/blog/") {
+          target = "/blog.html";
+        } else if (/^\/blog\/[^/.]+\/?$/.test(path)) {
+          target = path.replace(/\/$/, "") + ".html";
+        }
+
+        if (target) {
+          window.location.replace(target + window.location.search + window.location.hash);
+        }
+      })();
+    </script>
     
     <!-- PWA & Mobile Meta Tags -->
     <meta name="mobile-web-app-capable" content="yes" />
