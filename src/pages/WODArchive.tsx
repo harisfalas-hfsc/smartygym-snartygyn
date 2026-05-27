@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
@@ -161,6 +162,21 @@ const WODArchive = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>Workout of the Day Archive | SmartyGym</title>
+        <meta
+          name="description"
+          content="Browse SmartyGym's full Workout of the Day archive — every past WOD by Haris Falas, filterable by date, category, equipment, and difficulty."
+        />
+        <link rel="canonical" href="https://smartygym.com/wod-archive" />
+        <meta property="og:title" content="Workout of the Day Archive | SmartyGym" />
+        <meta
+          property="og:description"
+          content="Browse every past Workout of the Day on SmartyGym. 100% human-designed by Haris Falas."
+        />
+        <meta property="og:url" content="https://smartygym.com/wod-archive" />
+        <meta property="og:type" content="website" />
+      </Helmet>
       <div className="container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6 pb-8">
         {/* Breadcrumbs */}
         <PageBreadcrumbs 

@@ -1235,6 +1235,39 @@ export type Database = {
         }
         Relationships: []
       }
+      indexnow_queue: {
+        Row: {
+          attempts: number
+          content_id: string | null
+          content_type: string
+          id: number
+          last_error: string | null
+          processed_at: string | null
+          queued_at: string
+          url: string
+        }
+        Insert: {
+          attempts?: number
+          content_id?: string | null
+          content_type: string
+          id?: number
+          last_error?: string | null
+          processed_at?: string | null
+          queued_at?: string
+          url: string
+        }
+        Update: {
+          attempts?: number
+          content_id?: string | null
+          content_type?: string
+          id?: number
+          last_error?: string | null
+          processed_at?: string | null
+          queued_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
       mismatched_exercises: {
         Row: {
           created_at: string | null
