@@ -1,219 +1,39 @@
-## The problem
-Right now SmartyGym is a Vite/React single-page app. Many URLs exist only after JavaScript runs. Google may crawl `/blog/why-ai-fitness-apps-are-dangerous` and initially see the same generic `index.html` metadata instead of the real article/workout/program content.
+## Status: both requirements already exist in your codebase
 
-This is why the sitemap alone is not enough. The sitemap can list 600+ URLs, but each URL must also return unique HTML before JavaScript loads.
+Before writing new code, here's what's already in place from our prior work — this matters because reinstalling/replacing it would actually break what's working:
 
-## What I will build
+**1. Dynamic per-page metadata — DONE**
+- `react-helmet` is installed and used in every public route (`ArticleDetail.tsx`, `WorkoutDetail.tsx`, `TrainingProgramDetail.tsx`, tools pages, etc.).
+- Each page sets its own `<title>`, `<meta description>`, `og:*`, and `<link rel="canonical">` from the live data.
 
-### 1. Create one shared SEO route source of truth
-I will create a shared script module that fetches and builds the full public URL list from:
+**2. Pre-rendering — DONE**
+- `scripts/prerender.ts` runs automatically via a Vite plugin (`smartySeoPrerenderPlugin` in `vite.config.ts`) on every `vite build`.
+- It pulls every blog article, workout, program, and tool route from Supabase and writes a real static HTML file per URL: `dist/blog/<slug>.html`, a directory index, and an extensionless leaf file.
+- Each file contains the unique title, description, canonical, OG tags, JSON-LD, **and the full article body inside `<div id="root">`** — so Google sees the content with zero JS.
+- `dist/_redirects` maps every clean URL (`/blog/<slug>`, `/blog/<slug>/`) → its `.html` file with a 200 rewrite, so the host serves the prerendered HTML instead of the SPA shell.
+- `scripts/verify-prerender.ts` runs after every build and **fails the build** if any route is missing its file, canonical, or body content.
 
-- Static public pages: home, about, FAQ, tools, calculators, blog index, workout categories, program categories, legal pages, etc.
-- Blog articles from `blog_articles` where `is_published = true`
-- Public visible workouts from the existing public workout metadata function
-- Public visible training programs from the existing public program metadata function
+Switching to `react-helmet-async` or installing `vite-plugin-ssg` / `prerender-spa-plugin` now would tear out this working pipeline and re-introduce the exact bug you just paid to fix. The correct next step is to confirm the live deploy is actually serving these files.
 
-This shared source will be used by both:
+## Plan
 
-- `sitemap.xml`
-- the new pre-rendering system
+### Step 1 — Verify live deploy
+Fetch raw HTML (no JS) from the live URL and confirm:
+- `curl -s https://smartygym.com/blog/why-ai-fitness-apps-are-dangerous` returns the article title in `<title>`, the article canonical in `<link rel="canonical">`, and the article body text inside `<div id="root">`.
+- Same check for one free workout URL and one free program URL.
 
-That prevents the future problem where sitemap and HTML generation drift apart.
+### Step 2 — If live HTML is still the homepage shell
+Two known possible causes, both fixable without changing the architecture:
+- **Cause A — last build didn't actually publish.** Hit Publish once; the existing plugin chain handles the rest.
+- **Cause B — Lovable host isn't honoring `_redirects`.** Patch `scripts/prerender.ts` to also write the prerendered HTML at the exact extensionless path served by the host (we already do this for leaf routes; extend to parents if needed) and to write a `200.html` fallback per top-level section. No new dependencies.
 
-### 2. Fix the sitemap system permanently
-I will refactor `scripts/generate-sitemap.ts` so it uses the shared route source.
+### Step 3 — If live HTML is correct
+Confirm to you it's working and close this out. No code changes needed.
 
-The sitemap will continue to regenerate automatically on every publish/build and will include:
+### Technical notes
+- Keep `react-helmet` (sync) — it's what the prerender's hydration expects. Swapping to `react-helmet-async` requires wrapping the app in `HelmetProvider` and updating every page; high-risk for zero SEO gain because the static HTML is already correct.
+- Do NOT install `vite-plugin-ssg` or `prerender-spa-plugin` — they would conflict with the existing `smartySeoPrerenderPlugin` and our DB-driven route discovery.
+- Build process: `vite build` → SWC bundles client → `closeBundle` hook runs `prerenderSeoHtml` (writes static HTML per route + `_redirects`) → `generateSitemap` → `verifyPrerenderedSeo` (fails build on any SEO regression).
 
-- Every existing published blog article
-- Every existing visible workout
-- Every existing visible training program
-- Every public tool page
-- Every public static page
-- Future new articles/workouts/programs automatically, as long as they are in the existing content types
-
-I will keep the existing safety guard: if dynamic content suddenly drops back to a tiny number like 58 URLs, the build fails instead of publishing a broken sitemap.
-
-### 3. Add build-time pre-rendering for every public URL
-I will add a `postbuild` script that runs after Vite builds the app.
-
-It will create real static HTML files in `dist/` for every public route, for example:
-
-```text
-/blog/why-ai-fitness-apps-are-dangerous/index.html
-/workout/strength/<id>/index.html
-/trainingprogram/weight-loss/<id>/index.html
-/1rmcalculator/index.html
-/macrocalculator/index.html
-/about/index.html
-/tools/index.html
-```
-
-Each generated HTML file will contain real crawlable content inside the HTML response before JavaScript loads.
-
-### 4. Add unique SEO tags for every generated page
-Each public URL will get its own server-readable head tags:
-
-- Unique `<title>`
-- Unique `<meta name="description">`
-- Unique canonical URL
-- Unique Open Graph title/description/url
-- Twitter title/description
-- Correct robots tag
-- JSON-LD structured data where appropriate
-
-Examples:
-
-```text
-/blog/why-ai-fitness-apps-are-dangerous
-Title: Why AI Fitness Apps Are Dangerous | SmartyGym
-Description: A human-coaching article by Haris Falas explaining why automated fitness apps can create unsafe training decisions.
-```
-
-```text
-/workout/strength/<id>
-Title: <Workout Name> | Workout by Haris Falas | SmartyGym
-Description: <duration>, <format>, <difficulty>, <equipment>, and summary from the workout.
-```
-
-```text
-/trainingprogram/weight-loss/<id>
-Title: <Program Name> | Training Program by Haris Falas | SmartyGym
-Description: <weeks>, <days per week>, category, equipment, and program summary.
-```
-
-### 5. Render real page content before JavaScript loads
-For Google without JavaScript, the generated HTML will include:
-
-#### Blog articles
-- H1 article title
-- Author: Haris Falas
-- Credentials if available
-- Category
-- Published/updated date
-- Excerpt
-- Cover image with alt text
-- Full article HTML body
-- Internal links preserved
-- Article JSON-LD
-- Breadcrumb JSON-LD
-
-#### Workouts
-- H1 workout name
-- Category, difficulty, duration, format, equipment
-- Description
-- Warm-up
-- Activation
-- Main workout
-- Finisher
-- Cool-down
-- Visible workout content available to the public
-- ExercisePlan JSON-LD
-- HowTo JSON-LD where possible
-- Breadcrumb JSON-LD
-
-#### Training programs
-- H1 program name
-- Category, weeks, days per week, difficulty, equipment
-- Description
-- Overview
-- Target audience
-- Program structure/content fields available publicly
-- Course JSON-LD
-- ExercisePlan JSON-LD
-- Breadcrumb JSON-LD
-
-#### Tool pages and static pages
-- Unique title and description
-- H1
-- Crawlable explanatory content for the tool/page
-- Canonical URL
-- WebPage or SoftwareApplication JSON-LD where appropriate
-
-The interactive app will still load normally after JavaScript hydrates.
-
-### 6. Fix existing wrong canonical URLs on workout/program pages
-I found an existing SEO bug:
-
-- Individual workout pages currently build canonical URLs like `/individualworkout/<id>`
-- Individual program pages currently build canonical URLs like `/individualtrainingprogram/<id>`
-
-But the real app routes are:
-
-- `/workout/:type/:id`
-- `/trainingprogram/:type/:id`
-
-I will fix those so Google does not receive wrong canonical signals.
-
-### 7. Keep React metadata, but make static HTML the SEO source
-The current React pages already use Helmet, but Helmet only updates metadata after JavaScript loads.
-
-I will keep that for users and JS-capable crawlers, but the new pre-rendered files will be the reliable source for Google when JavaScript is not available.
-
-### 8. Add automated verification so this does not break again
-I will add a verification script that checks the generated output after build/pre-render.
-
-It will verify:
-
-- Sitemap URL count is not suspiciously low
-- Every sitemap URL has a matching generated HTML file
-- Blog article HTML contains the article title and body text
-- Workout HTML contains workout-specific content
-- Program HTML contains program-specific content
-- Each tested page has a unique title
-- Each tested page has a unique meta description
-- Each tested page has a canonical URL matching the sitemap URL
-- No generated page falls back to only the generic homepage metadata
-- No broken internal links in the generated crawlable content where they can be checked safely
-
-If the SEO generation breaks in the future, the build will fail instead of silently publishing broken pages.
-
-## What this fixes for existing published content
-After implementation and the next publish:
-
-- Existing blog articles will have static crawlable HTML
-- Existing workouts will have static crawlable HTML
-- Existing training programs will have static crawlable HTML
-- Existing tool/static pages will have unique SEO HTML
-- The sitemap will point to those same URLs
-- Google URL Inspection should show the real page-specific title, description, and body content
-
-## What this fixes for future content
-For future content inside existing content types:
-
-- New published blog article: automatically added to sitemap and pre-rendered HTML on the next publish
-- New visible workout: automatically added to sitemap and pre-rendered HTML on the next publish
-- New visible training program: automatically added to sitemap and pre-rendered HTML on the next publish
-
-For brand-new route types added later, for example a completely new `/challenges` section, a one-time code update is still required so the new route type is included in the shared SEO route source.
-
-## Important truth
-This will be build-time pre-rendering, not live server-side rendering on every request.
-
-That means the fix becomes live when the site is published. New database content created after a publish will appear in the app for users through JavaScript, but Google-readable static HTML for that new content appears after the next publish.
-
-Given the current hosting/app architecture, this is the safest fix without migrating the whole app to a true SSR framework.
-
-## Files I expect to change
-
-- `package.json` — add `postbuild` for pre-rendering and optional SEO verification
-- `scripts/generate-sitemap.ts` — refactor to use shared route source
-- `scripts/lib/seo-routes.ts` — new shared public route/content source
-- `scripts/lib/seo-render.ts` — new SEO/head/content rendering helpers
-- `scripts/prerender.ts` — new build-time HTML generator
-- `scripts/verify-prerender.ts` — new safety checker
-- `src/pages/IndividualWorkout.tsx` — fix canonical/OG URL route
-- `src/pages/IndividualTrainingProgram.tsx` — fix canonical/OG URL route
-
-## Final validation before I tell you it is done
-I will verify the generated output contains real HTML for representative pages:
-
-- One blog article, including `why-ai-fitness-apps-are-dangerous`
-- One workout page
-- One training program page
-- Several tool pages
-- Sitemap count and sitemap URL matching
-- Correct canonical URLs
-- No generic homepage title/description on dynamic content pages
-
-If you approve this plan, I will implement it.
+## What I need from you to proceed
+Approve this plan and I'll run the Step 1 verification against the live URL. Based on what the raw HTML shows, I'll either confirm it's fixed or apply the minimal Step 2 patch — without touching the helmet/prerender architecture.
