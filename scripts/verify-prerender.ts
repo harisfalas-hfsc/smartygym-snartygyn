@@ -48,8 +48,8 @@ function isFile(path: string) {
 }
 
 function assertRewriteForRoute(redirects: string, routePath: string) {
-  const expected = `${routePath} ${routePath}.html 200`;
-  const expectedTrailing = `${routePath}/ ${routePath}.html 200`;
+  const expected = `${routePath} ${routePath}.html 200!`;
+  const expectedTrailing = `${routePath}/ ${routePath}.html 200!`;
   if (!redirects.includes(expected) || !redirects.includes(expectedTrailing)) {
     throw new Error(`[verify-prerender] missing _redirects rules for ${routePath}`);
   }
@@ -75,9 +75,12 @@ export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
 
     if (route.path !== "/") {
       const cleanPath = route.path.replace(/^\//, "");
-      // Universal static-host pattern: every clean URL is served by its
-      // `<cleanPath>/index.html`. This works on every host without _redirects.
-      const cleanArtifact = join(distDir, cleanPath, "index.html");
+      // Routes with children keep `<cleanPath>/index.html`; leaf routes also
+      // get an exact extensionless file (`dist/blog/slug`) because Lovable's
+      // host serves extensionless static files before the SPA fallback.
+      const cleanArtifact = hasChildRoute(route.path, allPaths)
+        ? join(distDir, cleanPath, "index.html")
+        : exactFileFor(distDir, route.path);
       if (!isFile(cleanArtifact)) {
         throw new Error(`[verify-prerender] missing clean URL HTML for ${route.path}: expected ${cleanArtifact}`);
       }
