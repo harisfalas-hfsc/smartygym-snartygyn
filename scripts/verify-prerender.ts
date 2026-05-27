@@ -43,9 +43,27 @@ function isFile(path: string) {
   return existsSync(path) && statSync(path).isFile();
 }
 
+function assertRewriteForParentRoute(distDir: string, routePath: string) {
+  const redirectsPath = join(distDir, "_redirects");
+  if (!isFile(redirectsPath)) {
+    throw new Error("[verify-prerender] missing dist/_redirects for parent clean URL rewrites");
+  }
+  const redirects = readFileSync(redirectsPath, "utf8");
+  const expected = `${routePath} ${routePath}.html 200`;
+  const expectedTrailing = `${routePath}/ ${routePath}.html 200`;
+  if (!redirects.includes(expected) || !redirects.includes(expectedTrailing)) {
+    throw new Error(`[verify-prerender] missing _redirects rules for ${routePath}`);
+  }
+}
+
 export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
   const distDir = options.distDir || DIST;
   const { routes, counts } = await buildSeoRoutes();
+  const parentRoutes = new Set(
+    routes
+      .filter((route) => route.path !== "/" && routes.some((candidate) => candidate.path.startsWith(`${route.path}/`)))
+      .map((route) => route.path),
+  );
 
   let checked = 0;
   for (const route of routes) {
@@ -79,6 +97,10 @@ export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
 
     if (route.path !== "/" && route.kind !== "blog-article" && !isFile(exactPath) && !isFile(htmlPath)) {
       throw new Error(`[verify-prerender] ${route.path} must have ${htmlPath} because parent clean URLs do not reliably serve directory indexes`);
+    }
+
+    if (parentRoutes.has(route.path)) {
+      assertRewriteForParentRoute(distDir, route.path);
     }
 
     checked++;
