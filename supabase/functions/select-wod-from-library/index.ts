@@ -145,6 +145,23 @@ function getCyprusDateStr(): string {
   return cyprusFormatter.format(now);
 }
 
+// Same forbidden-name patterns enforced by the DB trigger
+// `validate_public_workout_integrity`. We pre-filter candidates here so we
+// never burn promotion attempts on workouts the trigger will reject.
+const FORBIDDEN_NAME_PATTERNS: RegExp[] = [
+  /\d/,
+  /\b\d{4}(BW|EQ|V)\b$/i,
+  /\b\d{6,}\b$/,
+  /\b(v\d+|#\d+)\b$/i,
+  /\b(II|III|IV|V|VI|VII|VIII|IX|X)\b$/,
+  /\b(axial|matrix|meridian|protocol|helix|arcus|synergy|conduit|integration|current|vector|quantum|algorithm|neural|system|module|phase|sequence)\b/i,
+];
+function hasForbiddenPublicName(name?: string | null): boolean {
+  if (!name) return true;
+  const trimmed = name.trim();
+  return FORBIDDEN_NAME_PATTERNS.some((re) => re.test(trimmed));
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -391,7 +408,52 @@ serve(async (req) => {
 
     const expectedCount = requiredSlots.length;
     if (promotedCount < expectedCount) {
-      throw new Error(`Library fallback promoted ${promotedCount}/${expectedCount} WOD slot(s) (${requiredSlots.join(", ")}); refusing to report success without image + Stripe associations`);
+      // ALL-OR-NONE: if we could not complete every required slot, roll back
+      // the ones we already promoted in this run so the day never goes live
+      // with a half-published WOD set. Without this, a partial promote leaked
+      // into production (e.g. one Pilates BODYWEIGHT WOD with no matching
+      // EQUIPMENT WOD) and the watchdog had no signal to fix it.
+      for (const promoted of finallyPromoted) {
+        try {
+          await supabase
+            .from("admin_workouts")
+            .update({
+              is_workout_of_day: false,
+              generated_for_date: null,
+              wod_source: null,
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", promoted.id);
+          await supabase
+            .from("wod_selection_cooldown")
+            .delete()
+            .eq("source_workout_id", promoted.id)
+            .eq("selected_for_date", targetDate);
+          logStep("Rolled back partial promotion (all-or-none)", {
+            id: promoted.id,
+            equipment: promoted.equipment,
+          });
+        } catch (rollbackErr) {
+          logStep("ERROR during partial-promotion rollback", {
+            id: promoted.id,
+            error: (rollbackErr as Error).message,
+          });
+        }
+      }
+
+      await supabase.from("wod_generation_runs").insert({
+        cyprus_date: targetDate,
+        status: "failed",
+        expected_count: expectedCount,
+        found_count: 0,
+        is_recovery_day: isRecoveryDay,
+        expected_category: periodization.category,
+        trigger_source: "library-selection",
+        completed_at: new Date().toISOString(),
+        error_message: `Library fallback could only fill ${promotedCount}/${expectedCount} slot(s) (${requiredSlots.join(", ")}); rolled back to keep day all-or-none`,
+      });
+
+      throw new Error(`Library fallback promoted ${promotedCount}/${expectedCount} WOD slot(s) (${requiredSlots.join(", ")}); rolled back partial publish to enforce all-or-none`);
     }
 
     // Log to wod_generation_runs
@@ -534,7 +596,20 @@ async function selectWorkoutCandidates(
 
   const pool: any[] = candidates || [];
 
-  if (pool.length === 0) {
+  // Filter candidates whose public name would be rejected by the DB
+  // validation trigger. Doing this here prevents the slot from "failing"
+  // simply because random shuffling kept landing on internal/AI-flavoured
+  // names like "Helix", "Matrix", "Protocol", "Sequence" etc.
+  const filtered = pool.filter((c) => !hasForbiddenPublicName(c.name));
+  if (filtered.length < pool.length) {
+    logStep("Filtered out candidates with forbidden public names", {
+      total: pool.length,
+      kept: filtered.length,
+      dropped: pool.length - filtered.length,
+    });
+  }
+
+  if (filtered.length === 0) {
     logStep("No candidates found with exact periodization filters; refusing difficulty fallback");
     return [];
   }
@@ -542,8 +617,8 @@ async function selectWorkoutCandidates(
   // EXHAUSTION-FIRST: workouts never picked before in this slot go first
   // (shuffled). Only when every workout in the pool has been used at least
   // once do we recycle, and then we recycle the LEAST-RECENTLY-USED first.
-  const neverUsed = pool.filter(c => !cooldownIds.has(c.id));
-  const alreadyUsed = pool.filter(c => cooldownIds.has(c.id));
+  const neverUsed = filtered.filter(c => !cooldownIds.has(c.id));
+  const alreadyUsed = filtered.filter(c => cooldownIds.has(c.id));
 
   // Optional focus prioritisation within never-used pool
   let prioritised = neverUsed;
