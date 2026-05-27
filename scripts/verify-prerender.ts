@@ -75,9 +75,9 @@ export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
 
     if (route.path !== "/") {
       const cleanPath = route.path.replace(/^\//, "");
-      const cleanArtifact = hasChildRoute(route.path, allPaths)
-        ? join(distDir, cleanPath, "index.html")
-        : exactFileFor(distDir, route.path);
+      // Universal static-host pattern: every clean URL is served by its
+      // `<cleanPath>/index.html`. This works on every host without _redirects.
+      const cleanArtifact = join(distDir, cleanPath, "index.html");
       if (!isFile(cleanArtifact)) {
         throw new Error(`[verify-prerender] missing clean URL HTML for ${route.path}: expected ${cleanArtifact}`);
       }
