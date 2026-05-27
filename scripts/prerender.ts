@@ -9,6 +9,7 @@
  */
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { dirname, resolve, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { buildSeoRoutes } from "./lib/seo-routes";
 import {
   applyHeadOverrides,
@@ -64,7 +65,9 @@ async function main() {
   await prerenderSeoHtml();
 }
 
-main().catch((err) => {
-  console.error("[prerender] failed:", err);
-  process.exit(1);
-});
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+  main().catch((err) => {
+    console.error("[prerender] failed:", err);
+    process.exit(1);
+  });
+}
