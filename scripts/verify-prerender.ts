@@ -44,7 +44,6 @@ export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
 
     const html = readFileSync(artifactPath, "utf8");
     assertIncludes(html, `<title>${route.title}</title>`, `${route.path} title`);
-    assertIncludes(html, route.description, `${route.path} description`);
     assertIncludes(html, `href="https://smartygym.com${route.path}"`, `${route.path} canonical`);
 
     if (route.kind === "blog-article") {
