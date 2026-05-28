@@ -95,6 +95,61 @@ function writeCleanUrlRewrites(
   );
 }
 
+function legacyRedirectStubHtml(targetPath: string) {
+  const escaped = targetPath.replace(/"/g, "&quot;");
+  return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Redirecting…</title>
+<meta name="robots" content="noindex, follow" />
+<meta http-equiv="refresh" content="0; url=${escaped}" />
+<link rel="canonical" href="https://smartygym.com${escaped}" />
+<script>window.location.replace(${JSON.stringify(targetPath)});</script>
+</head>
+<body>
+<p>This page has moved. Redirecting to <a href="${escaped}">${escaped}</a>.</p>
+</body>
+</html>
+`;
+}
+
+function writeLegacyRedirectStubs(
+  distDir: string,
+  routePaths: string[],
+  redirects: Array<{ from: string; to: string; status: 301 }> = [],
+) {
+  // Lovable hosting does not honor Netlify-style `_redirects`. To get real
+  // 301-equivalent behavior for legacy ID URLs, write a tiny static `.html`
+  // file at every legacy path. The stub is `noindex, follow` with a meta
+  // refresh + canonical pointing at the new slug URL. Google treats meta
+  // refresh 0 with a canonical link as a redirect signal, and visitors get
+  // moved instantly client-side.
+  const canonicalPaths = new Set(routePaths.map((p) => (p === "/" ? "/" : `${p}.html`)));
+  const written = new Set<string>();
+  let count = 0;
+  for (const rule of redirects) {
+    if (rule.from === rule.to) continue;
+    const target = canonicalPathFor(rule.to);
+    const stubSources = new Set<string>();
+    if (rule.from.endsWith(".html")) {
+      stubSources.add(rule.from);
+    } else {
+      stubSources.add(`${rule.from}.html`);
+    }
+    for (const src of stubSources) {
+      if (canonicalPaths.has(src)) continue; // never overwrite a real canonical page
+      if (written.has(src)) continue;
+      written.add(src);
+      const outPath = join(distDir, src.replace(/^\//, ""));
+      ensureParentDirectoryForFile(outPath);
+      writeFileSync(outPath, legacyRedirectStubHtml(target));
+      count++;
+    }
+  }
+  if (count) console.log(`[prerender] wrote ${count} legacy redirect stubs`);
+}
+
 export async function prerenderSeoHtml(options: {
   distDir?: string;
   templatePath?: string;
