@@ -327,14 +327,6 @@ const STATIC_ROUTES: Array<
     priority: "0.6",
   },
   {
-    path: "/tools/calorie-calculator",
-    title: "Calorie Calculator | Daily Calorie Needs | SmartyGym",
-    description:
-      "Free calorie calculator by SmartyGym. Estimate your daily calorie needs based on goals, body composition and activity.",
-    changefreq: "monthly",
-    priority: "0.6",
-  },
-  {
     path: "/tools/workout-timer",
     title: "Workout Timer | Interval, EMOM and Tabata | SmartyGym",
     description:
@@ -564,7 +556,7 @@ export interface SeoRouteBundle {
 export async function buildSeoRoutes(): Promise<SeoRouteBundle> {
   const today = new Date().toISOString().split("T")[0];
   const routes: SeoRoute[] = [];
-  const redirects: Array<{ from: string; to: string; status: 301 }> = [];
+  const redirects: Array<{ from: string; to: string; status: 301 }> = [...STATIC_LEGACY_REDIRECTS];
 
   for (const r of STATIC_ROUTES) {
     routes.push({ ...r, kind: "static", lastmod: today });
