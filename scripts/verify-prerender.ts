@@ -8,7 +8,7 @@
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { buildSeoRoutes, htmlEscape } from "./lib/seo-routes";
+import { buildSeoRoutes, canonicalPathFor, canonicalUrlFor, htmlEscape } from "./lib/seo-routes";
 import { slugifyContentName } from "../src/lib/seo-slugs";
 
 const DIST = resolve("dist");
@@ -52,39 +52,27 @@ function assertPayloadText(html: string, raw: unknown, label: string) {
   }
 }
 
-function sourceFileForCleanUrl(distDir: string, routePath: string) {
+function artifactFileFor(distDir: string, routePath: string) {
   if (routePath === "/") return join(distDir, "index.html");
-  return join(distDir, routePath.replace(/^\//, ""));
-}
-
-function isAncestorRoute(routePath: string, allPaths: Set<string>) {
-  if (routePath === "/") return true;
-  const prefix = `${routePath.replace(/\/$/, "")}/`;
-  return [...allPaths].some((candidate) => candidate.startsWith(prefix));
+  return join(distDir, routePath.replace(/^\//, "") + ".html");
 }
 
 function isFile(path: string) {
   return existsSync(path) && statSync(path).isFile();
 }
 
-function assertLeafRewriteForRoute(redirects: string, routePath: string) {
-  const expected = `${routePath} ${routePath}.html 200!`;
-  const expectedTrailing = `${routePath}/ ${routePath} 301!`;
+function assertCleanUrlRedirect(redirects: string, routePath: string) {
+  const expected = `${routePath} ${routePath}.html 301!`;
+  const expectedTrailing = `${routePath}/ ${routePath}.html 301!`;
   if (!redirects.includes(expected) || !redirects.includes(expectedTrailing)) {
-    throw new Error(`[verify-prerender] missing leaf _redirects rules for ${routePath}`);
-  }
-}
-
-function assertAncestorRewriteForRoute(redirects: string, routePath: string) {
-  const expectedTrailing = `${routePath}/ ${routePath} 301!`;
-  if (!redirects.includes(expectedTrailing)) {
-    throw new Error(`[verify-prerender] missing ancestor trailing-slash 301 for ${routePath}`);
+    throw new Error(`[verify-prerender] missing clean-URL .html redirect for ${routePath}`);
   }
 }
 
 function assertRedirectRule(redirectsFile: string, from: string, to: string) {
-  const expected = `${from} ${to} 301!`;
-  const expectedTrailing = `${from}/ ${to} 301!`;
+  const target = canonicalPathFor(to);
+  const expected = `${from} ${target} 301!`;
+  const expectedTrailing = `${from}/ ${target} 301!`;
   if (!redirectsFile.includes(expected) || !redirectsFile.includes(expectedTrailing)) {
     throw new Error(`[verify-prerender] missing legacy ID redirect from ${from} to ${to}`);
   }
@@ -93,7 +81,6 @@ function assertRedirectRule(redirectsFile: string, from: string, to: string) {
 export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
   const distDir = options.distDir || DIST;
   const { routes, redirects: legacyRedirects, counts } = await buildSeoRoutes();
-  const allPaths = new Set(routes.map((route) => route.path));
   const redirectsPath = join(distDir, "_redirects");
   if (!isFile(redirectsPath)) {
     throw new Error("[verify-prerender] missing dist/_redirects for clean URL rewrites");
@@ -110,22 +97,13 @@ export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
 
   let checked = 0;
   for (const route of routes) {
-    const artifactPath = isAncestorRoute(route.path, allPaths)
-      ? join(distDir, route.path.replace(/^\//, ""), "index.html")
-      : sourceFileForCleanUrl(distDir, route.path);
+    const artifactPath = artifactFileFor(distDir, route.path);
     if (!isFile(artifactPath)) {
       throw new Error(`[verify-prerender] missing clean URL source HTML for ${route.path}: expected ${artifactPath}`);
     }
-    // Leaf routes should also ship a .html sibling for crawler-friendly variants.
-    if (route.path !== "/" && !isAncestorRoute(route.path, allPaths)) {
-      const dotHtml = join(distDir, route.path.replace(/^\//, "") + ".html");
-      if (!isFile(dotHtml)) {
-        throw new Error(`[verify-prerender] missing .html sibling for ${route.path}: expected ${dotHtml}`);
-      }
-    }
 
     const html = readFileSync(artifactPath, "utf8");
-    const canonicalUrl = `https://smartygym.com${route.path}`;
+    const canonicalUrl = canonicalUrlFor(route.path);
     assertNotHomepageShell(html, route.path);
     assertIncludes(html, `<title>${htmlEscape(route.title)}</title>`, `${route.path} title`);
     assertSingleCanonical(html, canonicalUrl, route.path);
@@ -173,11 +151,7 @@ export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
     }
 
     if (route.path !== "/") {
-      if (isAncestorRoute(route.path, allPaths)) {
-        assertAncestorRewriteForRoute(redirects, route.path);
-      } else {
-        assertLeafRewriteForRoute(redirects, route.path);
-      }
+      assertCleanUrlRedirect(redirects, route.path);
     }
 
     checked++;
