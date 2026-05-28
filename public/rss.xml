@@ -5,7 +5,7 @@
     <link>https://smartygym.com/blog</link>
     <description>Workouts, training science, and recovery insights from Sports Scientist Haris Falas.</description>
     <language>en-GB</language>
-    <lastBuildDate>Thu, 28 May 2026 11:32:49 GMT</lastBuildDate>
+    <lastBuildDate>Thu, 28 May 2026 11:33:01 GMT</lastBuildDate>
     <atom:link href="https://smartygym.com/rss.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Low Back Pain? 5 Exercises That Actually Help</title>
@@ -16,6 +16,7 @@
       <category>Fitness</category>
       <description>Five evidence-based exercises that calm acute lumbar pain and rebuild a resilient lower back — what to do, what to avoid, and when to see a professional.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/low-back-pain-5-exercises-that-actually-help-1779880579105.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>HIIT vs Strength Training — Which Burns More Fat?</title>
       <link>https://smartygym.com/blog/hiit-vs-strength-training-which-burns-more-fat</link>
@@ -25,6 +26,7 @@
       <category>Fitness</category>
       <description>HIIT torches calories in the moment. Strength training reshapes your metabolism for years. Here is what the research really shows about fat loss.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/hiit-vs-strength-training-which-burns-more-fat-1779880575800.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>How Many Sets Per Week Do You Actually Need?</title>
       <link>https://smartygym.com/blog/how-many-sets-per-week-do-you-actually-need</link>
@@ -34,6 +36,7 @@
       <category>Fitness</category>
       <description>The current research on weekly training volume — minimum effective dose, sweet spot, and the point of diminishing returns for every muscle group.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/how-many-sets-per-week-do-you-actually-need-1779880574884.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>AMRAP vs EMOM vs TABATA — Which Is Best?</title>
       <link>https://smartygym.com/blog/amrap-vs-emom-vs-tabata-which-is-best</link>
@@ -43,6 +46,7 @@
       <category>Fitness</category>
       <description>AMRAP, EMOM and Tabata look similar but train very different qualities. Here is exactly when to use each — and when to avoid them.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/amrap-vs-emom-vs-tabata-which-is-best-1779880576325.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>Why AI Fitness Apps Are Dangerous</title>
       <link>https://smartygym.com/blog/why-ai-fitness-apps-are-dangerous</link>
@@ -52,6 +56,7 @@
       <category>Fitness</category>
       <description>AI fitness apps generate random workouts with no understanding of your body, injuries, or progression. Here is why human-designed training is non-negotiable.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/why-ai-fitness-apps-are-dangerous-1779880576508.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>Respiratory Mechanics: The Science of Performance Breathing</title>
       <link>https://smartygym.com/blog/respiratory-mechanics-the-science-of-performance-breathing</link>
@@ -61,6 +66,7 @@
       <category>Wellness</category>
       <description>Discover how mastering respiratory mechanics can optimize gas exchange, reduce metabolic stress, and unlock elite-level athletic performance.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/respiratory-mechanics-the-science-of-performance-b-1779681664931.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>Amino Architecture: The Molecular Science of Protein</title>
       <link>https://smartygym.com/blog/amino-architecture-the-molecular-science-of-protein</link>
@@ -70,6 +76,7 @@
       <category>Nutrition</category>
       <description>Discover how amino acid profiles and systemic bioavailability dictate muscle protein synthesis for elite athletic performance.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/amino-architecture-the-molecular-science-of-protei-1779681647376.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>Unlocking Elasticity: The Science of Functional Mobility</title>
       <link>https://smartygym.com/blog/unlocking-elasticity-the-science-of-functional-mobility</link>
@@ -79,6 +86,7 @@
       <category>Fitness</category>
       <description>Discover how functional mobility training bridges the gap between passive flexibility and raw strength to optimize athletic performance and prevent injury.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/unlocking-elasticity-the-science-of-functional-mob-1779681629280.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>Cognitive Reserve: The New Frontier of Functional Longevity</title>
       <link>https://smartygym.com/blog/cognitive-reserve-the-new-frontier-of-functional-longevity</link>
@@ -88,6 +96,7 @@
       <category>Wellness</category>
       <description>Discover how targeted movement and sensory enrichment build cognitive reserve, protecting your brain while fostering long-term physical independence.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/cognitive-reserve-the-new-frontier-of-functional-l-1779076852522.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>Fueling the Engine: The Science of Sustained Glycemic Flow</title>
       <link>https://smartygym.com/blog/fueling-the-engine-the-science-of-sustained-glycemic-flow</link>
@@ -97,6 +106,7 @@
       <category>Nutrition</category>
       <description>Discover how strategic fueling and glycemic control maximize athletic output and prevent energy crashes for high-performance active adults.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/fueling-the-engine-the-science-of-sustained-glycem-1779076833992.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>Kinetic Longevity: Future-Proofing Your Joints</title>
       <link>https://smartygym.com/blog/kinetic-longevity-future-proofing-your-joints</link>
@@ -106,6 +116,7 @@
       <category>Fitness</category>
       <description>Discover how joint-centric training and low-impact loading can extend your athletic lifespan and prevent chronic injury through biomechanical optimization.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/kinetic-longevity-joints-1764500000002.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>Dopamine Architecture: The Science of Sustainable Motivation</title>
       <link>https://smartygym.com/blog/dopamine-architecture-the-science-of-sustainable-motivation</link>
@@ -115,6 +126,7 @@
       <category>Wellness</category>
       <description>Discover how to leverage neuroscience to build lasting fitness habits, optimize your dopamine baseline, and overcome the trap of temporary motivation.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/dopamine-architecture-the-science-of-sustainable-m-1778472055435.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>Post-Exercise Synthesis: The Science of Recovery Nutrition</title>
       <link>https://smartygym.com/blog/post-exercise-synthesis-the-science-of-recovery-nutrition</link>
@@ -124,6 +136,7 @@
       <category>Nutrition</category>
       <description>Maximize your gains with evidence-based post-workout strategies for glycogen replenishment, muscle protein synthesis, and metabolic recovery.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/post-exercise-synthesis-the-science-of-recovery-nu-1778472037846.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>Progressive Overload: The Biological Blueprint for Growth</title>
       <link>https://smartygym.com/blog/progressive-overload-the-biological-blueprint-for-growth</link>
@@ -133,6 +146,7 @@
       <category>Fitness</category>
       <description>Discover the scientific principles of progressive overload and how to systematically scale your training for long-term physiological adaptation.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/progressive-overload-the-biological-blueprint-for--1778472019128.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>Biophilic Biohacking: The Science of Nature-Driven Recovery</title>
       <link>https://smartygym.com/blog/biophilic-biohacking-the-science-of-nature-driven-recovery</link>
@@ -142,6 +156,7 @@
       <category>Wellness</category>
       <description>Discover how green exercise and nature immersion accelerate physiological recovery and enhance cognitive performance through the lens of sports science.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/biophilic-biohacking-the-science-of-nature-driven--1777867255576.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>Natural Anabolics: The Micronutrient Science of Hormonal Optimization</title>
       <link>https://smartygym.com/blog/natural-anabolics-the-micronutrient-science-of-hormonal-optimization</link>
@@ -151,6 +166,7 @@
       <category>Nutrition</category>
       <description>Discover how specific micronutrients and lifestyle shifts optimize your natural hormonal profile for maximum muscle protein synthesis and recovery.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/natural-anabolics-the-micronutrient-science-of-hor-1777867237064.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>Hybrid Synergy: Integrating Resistance and Endurance</title>
       <link>https://smartygym.com/blog/hybrid-synergy-integrating-resistance-and-endurance</link>
@@ -160,6 +176,7 @@
       <category>Fitness</category>
       <description>Discover the science of hybrid training to build strength and cardiovascular health simultaneously without compromising your athletic performance.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/hybrid-synergy-integrating-resistance-and-enduranc-1777867219403.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>Emotional Fitness: The Missing Metric in Performance</title>
       <link>https://smartygym.com/blog/emotional-fitness-the-missing-metric-in-performance</link>
@@ -169,6 +186,7 @@
       <category>Wellness</category>
       <description>Discover how emotional fitness and stress resilience translate to physical performance and long-term wellness in this guide by sports scientist Haris Falas.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/emotional-fitness-the-missing-metric-in-performanc-1777262455291.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>Metabolic Flexibility: The New Frontier of Fat Loss</title>
       <link>https://smartygym.com/blog/metabolic-flexibility-the-new-frontier-of-fat-loss</link>
@@ -178,6 +196,7 @@
       <category>Nutrition</category>
       <description>Discover how to optimize metabolic flexibility for sustainable fat loss and peak performance through evidence-based nutritional strategies.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/metabolic-flexibility-the-new-frontier-of-fat-loss-1777262436787.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>Metabolic Engine Evolution: The HIIT Revolution</title>
       <link>https://smartygym.com/blog/metabolic-engine-evolution-the-hiit-revolution</link>
@@ -187,6 +206,7 @@
       <category>Fitness</category>
       <description>Discover the science of High-Intensity Interval Training and how to optimize cardiovascular health and fat loss through evidence-based interval protocols.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/metabolic-engine-evolution-hiit-1764500000001.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>Digital Sabbaticals: The Science of Sensory Recovery</title>
       <link>https://smartygym.com/blog/digital-sabbaticals-the-science-of-sensory-recovery</link>
@@ -196,6 +216,7 @@
       <category>Wellness</category>
       <description>Discover how strategic digital detoxing recalibrates the dopamine system, improves cognitive focus, and enhances physical recovery for total wellness.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/digital-sabbaticals-the-science-of-sensory-recover-1776657665157.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>Macro Mastery: The Strategic Blueprint for Sustainable Gains</title>
       <link>https://smartygym.com/blog/macro-mastery-the-strategic-blueprint-for-sustainable-gains</link>
@@ -205,6 +226,7 @@
       <category>Nutrition</category>
       <description>Discover how to optimize macronutrient ratios for muscle protein synthesis and metabolic health with this evidence-based guide by Haris Falas.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/macro-mastery-the-strategic-blueprint-for-sustaina-1776657636912.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>Biometric Optimization: The New Frontier of Recovery Management</title>
       <link>https://smartygym.com/blog/biometric-optimization-the-new-frontier-of-recovery-management</link>
@@ -214,6 +236,7 @@
       <category>Fitness</category>
       <description>Discover how to leverage HRV, RPE, and biometric feedback to prevent overtraining and maximize your athletic potential through data-driven recovery.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/biometric-optimization-the-new-frontier-of-recover-1776657620014.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>Trendy Fitness: Scientific Look vs. Structured Training</title>
       <link>https://smartygym.com/blog/trendy-fitness-scientific-look-vs-structured-training</link>
@@ -223,6 +246,7 @@
       <category>Fitness</category>
       <description>Dive deep into CrossFit, HYROX, F45, OTF, and Calisthenics. We analyze their science, pros, cons, and injury risks to reveal the best path to long-term fitness.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/trendy-fitness-scientific-look-vs-structured-train-1776059946755.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>Diet Showdown: Keto, Carnivore, IF, Med, Paleo Analyzed</title>
       <link>https://smartygym.com/blog/diet-showdown-keto-carnivore-if-med-paleo-analyzed</link>
@@ -232,6 +256,7 @@
       <category>Nutrition</category>
       <description>Dive deep into five popular nutrition strategies. We break down the science, sustainability, and risks of Keto, Carnivore, Intermittent Fasting, Mediterranean, and Paleo diets.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/diet-showdown-keto-carnivore-if-med-paleo-analyzed-1776059957809.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>GLP-1s: Weight Loss Wonder or Risky Business?</title>
       <link>https://smartygym.com/blog/glp-1s-weight-loss-wonder-or-risky-business</link>
@@ -241,6 +266,7 @@
       <category>Wellness</category>
       <description>Dive deep into GLP-1 receptor agonists like Ozempic, Wegovy, and Mounjaro for weight loss. Understand mechanisms, efficacy, risks, and crucial considerations.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/glp-1s-weight-loss-wonder-or-risky-business-1776059968957.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>Daily Workout vs Gym Program: Which Is Better?</title>
       <link>https://smartygym.com/blog/daily-workout-vs-gym-program</link>
@@ -250,6 +276,7 @@
       <category>Fitness</category>
       <description>Daily workout vs gym program? SmartyGym helps you choose the best fitness plan for your goals.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/daily-workout-vs-gym-program-1775123564248.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>How to Stay Consistent with Training</title>
       <link>https://smartygym.com/blog/how-to-stay-consistent-with-training</link>
@@ -259,6 +286,7 @@
       <category>Fitness</category>
       <description>Master consistency! Learn SMART goal setting, habit building &amp; motivation hacks for lasting fitness results with SmartyGym.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/how-to-stay-consistent-with-training-1775123549212.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>Best 10-Minute Workouts for Busy People</title>
       <link>https://smartygym.com/blog/best-10-minute-workouts-for-busy-people</link>
@@ -268,6 +296,7 @@
       <category>Fitness</category>
       <description>Get a quick, effective workout in just 10 minutes! Discover SmartyGym&apos;s best routines for busy schedules. Fitness made easy.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/best-10-minute-workouts-for-busy-people-1775123535337.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>The Myth of Cholesterol</title>
       <link>https://smartygym.com/blog/the-myth-of-cholesterol</link>
@@ -277,6 +306,7 @@
       <category>Nutrition</category>
       <description>The 60-year-old narrative that cholesterol causes heart disease is crumbling. Modern research reveals that oxidized LDL — not total cholesterol — drives plaque buildup, while statins may cause more harm than good.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/the-myth-of-cholesterol.png" type="image/jpeg" />
+    </item>
     <item>
       <title>Aging Isn&apos;t Optional: How You Age Is</title>
       <link>https://smartygym.com/blog/aging-isnt-optional-how-you-age-is</link>
@@ -286,6 +316,7 @@
       <category>Wellness</category>
       <description>Aging is inevitable, but how you age is your choice. Discover how exercise fights muscle loss, bone decline, and hormonal changes in both women and men.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/aging-isnt-optional-how-you-age-is.png" type="image/jpeg" />
+    </item>
     <item>
       <title>Periodization: The Science of Sustained Progress</title>
       <link>https://smartygym.com/blog/periodization-the-science-of-sustained-progress</link>
@@ -295,6 +326,7 @@
       <category>Fitness</category>
       <description>Learn how to use training periodization to break through plateaus and optimize long-term athletic performance with expert sports science insights.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/periodization-the-science-of-sustained-progress-1770636907523.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>The Fiber Layering Method: Optimizing Satiety and Fueling Fat Loss</title>
       <link>https://smartygym.com/blog/the-fiber-layering-method-optimizing-satiety-and-fueling-fat-loss</link>
@@ -304,6 +336,7 @@
       <category>Nutrition</category>
       <description>Master the art of fiber layering to control blood sugar, enhance gut health, and maximize fat loss results using science-backed nutritional strategies.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/the-fiber-layering-method-optimizing-satiety-and-f-1770636934510.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>Functional Aging: The Blueprint for Lifetime Independence</title>
       <link>https://smartygym.com/blog/functional-aging-the-blueprint-for-lifetime-independence</link>
@@ -313,6 +346,7 @@
       <category>Wellness</category>
       <description>Discover how functional movement and strength training preserve independence and cognitive health as you age with expert insights from SmartyGym.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/functional-aging-the-blueprint-for-lifetime-indepe-1770636960492.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>Mental Health and Longevity: Why the Future of Fitness Is Preventive</title>
       <link>https://smartygym.com/blog/mental-health-longevity-future-fitness-preventive</link>
@@ -322,6 +356,7 @@
       <category>Wellness</category>
       <description>Mental wellbeing is now the #1 reason people exercise. Explore how fitness is shifting toward stress management, better sleep, and longevity performance.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/mental-health-longevity-future-fitness-preventive-1770626144211.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>High Protein, High Fiber, and Gut Health: The New Nutrition Blueprint</title>
       <link>https://smartygym.com/blog/high-protein-fiber-gut-health-new-nutrition-blueprint</link>
@@ -331,6 +366,7 @@
       <category>Nutrition</category>
       <description>The nutrition industry is shifting toward high-protein, high-fiber, and gut-friendly eating. Learn the science behind the new blueprint for fat loss and longevity.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/high-protein-fiber-gut-health-new-nutrition-bluepr-1770626142970.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>Data-Driven Fitness: How Wearable Technology Is Changing the Way We Train</title>
       <link>https://smartygym.com/blog/data-driven-fitness-wearable-technology-changing-training</link>
@@ -340,6 +376,7 @@
       <category>Fitness</category>
       <description>Wearable technology is the #1 fitness trend for 2026. Discover how data-driven training improves performance, recovery, and injury prevention.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/data-driven-fitness-wearable-technology-changing-t-1770626143574.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>Exercise After 50: How Fitness Prevents Decline and Transforms Your Health</title>
       <link>https://smartygym.com/blog/exercise-after-50-fitness-prevents-decline-transforms-health</link>
@@ -349,6 +386,7 @@
       <category>Fitness</category>
       <description>Discover how regular exercise after 50 combats muscle loss, strengthens bones, balances hormones, and dramatically improves quality of life for both men and women.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/exercise-after-50-fitness-prevents-decline-transfo-1770617415561.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>Creatine: The Most Researched Supplement in Fitness History</title>
       <link>https://smartygym.com/blog/creatine-most-researched-supplement-fitness-history</link>
@@ -358,6 +396,7 @@
       <category>Nutrition</category>
       <description>Is creatine good or bad? Discover why creatine is the most studied and beneficial supplement available, backed by decades of research and thousands of studies proving its safety and effectiveness.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/creatine-most-researched-supplement-fitness-histor-1764314402294.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>Muscle Hypertrophy: The Complete Guide to Building Muscle While Losing Fat</title>
       <link>https://smartygym.com/blog/muscle-hypertrophy-complete-guide-building-muscle-losing-fat</link>
@@ -367,6 +406,7 @@
       <category>Fitness</category>
       <description>Discover the science behind muscle hypertrophy and body recomposition. Learn the training protocols, protein requirements, and strategies to build muscle while simultaneously losing body fat.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/muscle-hypertrophy-complete-guide-building-muscle--1764314359693.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>The Science of Strength: Why Getting Stronger Changes Everything</title>
       <link>https://smartygym.com/blog/science-of-strength-why-getting-stronger-changes-everything</link>
@@ -376,6 +416,7 @@
       <category>Fitness</category>
       <description>Discover why strength training is essential for everyone—from general population to elite athletes. Learn how building strength improves health, bone density, hormones, and human performance.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/science-of-strength-why-getting-stronger-changes-e-1764314370152.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>Bodyweight vs Equipment Training: The Ultimate Comparison</title>
       <link>https://smartygym.com/blog/bodyweight-vs-equipment-training-ultimate-comparison</link>
@@ -385,6 +426,7 @@
       <category>Fitness</category>
       <description>Should you train with bodyweight or equipment? Discover the pros and cons of each approach, when to use bodyweight exercises, and how to combine both methods for optimal results.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/bodyweight-vs-equipment-training-ultimate-comparis-1764314380109.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>Time Management for Fitness: How Busy People Stay Active</title>
       <link>https://smartygym.com/blog/time-management-fitness-how-busy-people-stay-active</link>
@@ -394,6 +436,7 @@
       <category>Wellness</category>
       <description>No time for fitness? Think again. Learn practical strategies for fitting exercise into a busy schedule, the importance of daily steps, and how small changes add up to big results.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/time-management-fitness-how-busy-people-stay-activ-1764314470407.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>How to Lose Fat: The Science-Based Step-by-Step Guide</title>
       <link>https://smartygym.com/blog/how-to-lose-fat-science-based-step-by-step-guide</link>
@@ -403,6 +446,7 @@
       <category>Nutrition</category>
       <description>Fat loss is simple but not easy. Learn the proven science of fat loss, why calorie deficit is king, the role of exercise, protein, and a complete step-by-step implementation plan.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/how-to-lose-fat-science-based-step-by-step-guide-1764314423791.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>The Importance of Muscle: Your Body&apos;s Hidden Health System</title>
       <link>https://smartygym.com/blog/importance-of-muscle-body-hidden-health-system</link>
@@ -412,6 +456,7 @@
       <category>Fitness</category>
       <description>Muscles are more than just for aesthetics. Discover how muscle tissue impacts your health, prevents injuries, supports your hormonal system, and enhances everyday functionality.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/importance-of-muscle-body-hidden-health-system-1764314390431.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>Intermittent Fasting: A Complete Guide to Time-Restricted Eating</title>
       <link>https://smartygym.com/blog/intermittent-fasting-complete-guide-time-restricted-eating</link>
@@ -421,6 +466,7 @@
       <category>Nutrition</category>
       <description>What is intermittent fasting and should you try it? Learn about different fasting protocols, the science behind their benefits, and how to determine if fasting is right for you.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/intermittent-fasting-complete-guide-time-restricte-1764314411917.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>Muscle Hypertrophy Through Nutrition: The Protein Masterclass</title>
       <link>https://smartygym.com/blog/muscle-hypertrophy-nutrition-protein-masterclass</link>
@@ -430,6 +476,7 @@
       <category>Nutrition</category>
       <description>Building muscle requires more than just training—nutrition is equally critical. Learn exactly how much protein you need, the best sources, and practical strategies to hit your daily targets.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/muscle-hypertrophy-nutrition-protein-masterclass-1764314434465.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>The Science of Sleep: Why Rest Is Your Secret Weapon</title>
       <link>https://smartygym.com/blog/science-of-sleep-why-rest-secret-weapon</link>
@@ -439,6 +486,7 @@
       <category>Wellness</category>
       <description>Sleep is when your body transforms. Discover why quality sleep is essential for muscle recovery, hormone production, cognitive function, and overall health.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/science-of-sleep-why-rest-secret-weapon-1764314450820.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>Exercise for Working Professionals: Stay Fit at Your Desk Job</title>
       <link>https://smartygym.com/blog/exercise-working-professionals-stay-fit-desk-job</link>
@@ -448,6 +496,7 @@
       <category>Wellness</category>
       <description>Desk jobs are destroying our bodies. Learn why exercise is critical for office workers, how to prevent common pains, and practical workout strategies for busy professionals.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/exercise-working-professionals-stay-fit-desk-job-1764314460415.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>Understanding BMR: Your Metabolism Explained</title>
       <link>https://smartygym.com/blog/understanding-bmr-metabolism-explained</link>
@@ -457,5 +506,6 @@
       <category>Wellness</category>
       <description>What is Basal Metabolic Rate and why does it matter? Learn how BMR affects your weight, energy, and health—and discover proven strategies to boost your metabolism.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/understanding-bmr-metabolism-explained-1764314480249.jpg" type="image/jpeg" />
+    </item>
   </channel>
 </rss>
