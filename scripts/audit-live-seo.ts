@@ -34,12 +34,13 @@ function arg(name: string, fallback?: string): string | undefined {
   return fallback;
 }
 
-async function fetchUrl(url: string): Promise<{ status: number; contentType: string; body: string }> {
+async function fetchUrl(url: string): Promise<{ status: number; contentType: string; location: string; body: string }> {
   const res = await fetch(url, { headers: { "User-Agent": UA }, redirect: "manual" });
   const body = res.status >= 200 && res.status < 400 ? await res.text() : "";
   return {
     status: res.status,
     contentType: res.headers.get("content-type") || "",
+    location: res.headers.get("location") || "",
     body,
   };
 }
@@ -79,14 +80,15 @@ async function audit(url: string, expectedCanonical: string, isHome: boolean): P
 
 async function main() {
   const base = arg("base", BASE_URL)!.replace(/\/$/, "");
-  const sample = Number(arg("sample", "4"));
+  const sampleArg = arg("sample", "4")!;
+  const sample = sampleArg === "all" ? Number.POSITIVE_INFINITY : Number(sampleArg);
 
-  const { routes } = await buildSeoRoutes();
+  const { routes, redirects } = await buildSeoRoutes();
   const byKind: Record<string, typeof routes> = {};
   for (const r of routes) (byKind[r.kind] = byKind[r.kind] || []).push(r);
 
   const pick = <T,>(arr: T[], n: number): T[] => {
-    if (arr.length <= n) return arr;
+    if (!Number.isFinite(n) || arr.length <= n) return arr;
     const step = Math.floor(arr.length / n);
     return Array.from({ length: n }, (_, i) => arr[i * step]);
   };
@@ -103,6 +105,7 @@ async function main() {
   console.log(`[audit] base=${base} routes=${routes.length} sampled=${targets.length}`);
   let passed = 0;
   const cleanFails: string[] = [];
+  const legacyFails: string[] = [];
 
   for (const route of targets) {
     const canonical = canonicalUrlFor(route.path).replace(BASE_URL, base);
@@ -122,27 +125,40 @@ async function main() {
     if (route.path !== "/") {
       const cleanUrl = `${base}${route.path}`;
       const c = await fetchUrl(cleanUrl);
-      const ctitle = extract(c.body, /<title[^>]*>([\s\S]*?)<\/title>/i);
-      const ccanon = c.body.match(/<link[^>]+rel=["']canonical["'][^>]*href=["']([^"']+)/i)?.[1] || "";
-      // Acceptable: either real per-page HTML (title not homepage), or shell
-      // with a boot redirect that targets the .html URL.
-      const hasBootRedirect = /window\.location\.replace\(\s*clean\s*\+\s*"\.html"/i.test(c.body) ||
-        /\.replace\([^)]*\+\s*['"]\.html/i.test(c.body);
-      const cleanOk = ctitle !== HOMEPAGE_TITLE_SIGNATURE || hasBootRedirect;
+      const expectedPath = new URL(canonical).pathname;
+      const cleanOk = [301, 302, 307, 308].includes(c.status) && c.location.includes(expectedPath);
       if (!cleanOk) {
-        cleanFails.push(`${cleanUrl} (title=${ctitle}, canonical=${ccanon})`);
+        cleanFails.push(`${cleanUrl} (status=${c.status}, content-type=${c.contentType}, location=${c.location || "(none)"})`);
+      }
+    }
+  }
+
+  for (const rule of redirects) {
+    const from = `${base}${rule.from}`;
+    const to = canonicalUrlFor(rule.to).replace(BASE_URL, base);
+    for (const source of [from, `${from}.html`]) {
+      const r = await fetchUrl(source);
+      const expectedPath = new URL(to).pathname;
+      if (![301, 302, 307, 308].includes(r.status) || !r.location.includes(expectedPath)) {
+        legacyFails.push(`${source} (status=${r.status}, content-type=${r.contentType}, location=${r.location || "(none)"}, expected=${expectedPath})`);
       }
     }
   }
 
   console.log(`\n[audit] ${passed}/${targets.length} canonical URLs passed`);
   if (cleanFails.length) {
-    console.log(`[audit] ${cleanFails.length} clean URL(s) still serving homepage shell without a boot redirect:`);
+    console.log(`[audit] ${cleanFails.length} clean URL(s) are not redirecting to their .html canonical:`);
     for (const f of cleanFails) console.log(`        - ${f}`);
   } else {
     console.log(`[audit] clean URL probes OK`);
   }
-  if (passed !== targets.length) process.exitCode = 1;
+  if (legacyFails.length) {
+    console.log(`[audit] ${legacyFails.length} legacy redirect(s) failed:`);
+    for (const f of legacyFails) console.log(`        - ${f}`);
+  } else {
+    console.log(`[audit] legacy redirects OK`);
+  }
+  if (passed !== targets.length || cleanFails.length || legacyFails.length) process.exitCode = 1;
 }
 
 main().catch((err) => {
