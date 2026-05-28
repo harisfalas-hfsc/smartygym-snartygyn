@@ -324,15 +324,15 @@ export function renderRouteBody(route: SeoRoute): {
       <h1>${htmlEscape(route.title.replace(/\s*\|\s*SmartyGym.*$/, ""))}</h1>
       <p class="seo-excerpt">${htmlEscape(route.description)}</p>
     </header>
-    <p>This page is part of <a href="/">SmartyGym</a>, the online fitness platform by Sports Scientist <a href="/coach-profile">Haris Falas</a>. 100% human-designed training — no AI-generated workouts.</p>
+    <p>This page is part of <a href="/">SmartyGym</a>, the online fitness platform by Sports Scientist <a href="/coach-profile.html">Haris Falas</a>. 100% human-designed training — no AI-generated workouts.</p>
     <nav class="seo-nav" aria-label="Explore SmartyGym">
       <ul>
-        <li><a href="/workout">Smarty Workouts</a></li>
-        <li><a href="/trainingprogram">Smarty Training Programs</a></li>
-        <li><a href="/workout/wod">Workout of the Day</a></li>
-        <li><a href="/blog">SmartyGym Blog</a></li>
-        <li><a href="/tools">Smarty Tools</a></li>
-        <li><a href="/exerciselibrary">Exercise Library</a></li>
+        <li><a href="/workout.html">Smarty Workouts</a></li>
+        <li><a href="/trainingprogram.html">Smarty Training Programs</a></li>
+        <li><a href="/workout/wod.html">Workout of the Day</a></li>
+        <li><a href="/blog.html">SmartyGym Blog</a></li>
+        <li><a href="/tools.html">Smarty Tools</a></li>
+        <li><a href="/exerciselibrary.html">Exercise Library</a></li>
       </ul>
     </nav>
   </article>
