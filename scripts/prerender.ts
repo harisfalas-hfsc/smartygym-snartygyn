@@ -35,7 +35,7 @@ function ensureParentDirectoryForFile(outPath: string) {
   mkdirSync(parentDir, { recursive: true });
 }
 
-function writeHeadersFile(distDir: string) {
+function writeHeadersFile(distDir: string, routePaths: string[] = []) {
   // Force HTML MIME type for every prerendered .html artifact (all non-root
   // canonical URLs end in .html in Option A).
   const lines: string[] = [
@@ -49,6 +49,15 @@ function writeHeadersFile(distDir: string) {
     "  Content-Type: text/html; charset=utf-8",
     "  X-Robots-Tag: index, follow",
     "",
+    ...routePaths
+      .filter((p) => p !== "/")
+      .sort()
+      .flatMap((p) => [
+        p,
+        "  Content-Type: text/html; charset=utf-8",
+        "  X-Robots-Tag: index, follow",
+        "",
+      ]),
   ];
   writeFileSync(join(distDir, "_headers"), lines.join("\n"));
 }
@@ -146,20 +155,20 @@ export async function prerenderSeoHtml(options: {
       continue;
     }
 
-    // Option A: every non-root route is written to `dist/<path>.html`. The
-    // host serves `.html` files as `text/html`, which the SPA fallback does
-    // not currently do for extensionless artifacts. `_redirects` 301s the
-    // clean URL to the `.html` canonical so users + crawlers land on the
-    // correct content. Folder structure is preserved naturally because
-    // child paths still write into nested directories.
+    // Option A primary: every non-root route is written to `dist/<path>.html`.
+    // Belt-and-braces fallback: also write an exact extensionless artifact so
+    // clean URLs receive real prerendered HTML even when the host ignores
+    // `_redirects` and would otherwise serve the SPA homepage shell.
     const cleanPath = route.path.replace(/^\//, "");
     const dotHtmlFile = join(distDir, `${cleanPath}.html`);
+    const cleanUrlFile = join(distDir, cleanPath);
     writeHtml(dotHtmlFile, html);
+    writeHtml(cleanUrlFile, html);
     allRoutePaths.push(route.path);
-    reportRows.push(`| ${route.path} | ${dotHtmlFile.replace(`${distDir}/`, "dist/")} |`);
+    reportRows.push(`| ${route.path} | ${dotHtmlFile.replace(`${distDir}/`, "dist/")} + clean URL artifact |`);
   }
   writeCleanUrlRewrites(distDir, allRoutePaths, redirects);
-  writeHeadersFile(distDir);
+  writeHeadersFile(distDir, allRoutePaths);
   writeFileSync(join(distDir, "seo-prerender-report.md"), `${reportRows.join("\n")}\n`);
   console.log(`[prerender] wrote ${written} HTML files into ${distDir.replace(process.cwd() + "/", "")}/`);
 }
