@@ -11,7 +11,7 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
-import { BASE_URL, buildSeoRoutes, xmlEscape } from "./lib/seo-routes";
+import { BASE_URL, buildSeoRoutes, canonicalUrlFor, xmlEscape } from "./lib/seo-routes";
 
 const FEED_TITLE = "SmartyGym Blog";
 const FEED_DESCRIPTION =
@@ -47,10 +47,15 @@ export async function generateRss(
         payload.created_at ||
         r.lastmod ||
         new Date().toISOString();
+      // Always link to the canonical ".html" version so RSS readers and
+      // crawlers (Google, AI assistants) discover the prerendered, fully
+      // readable HTML — not the clean URL that the host serves as the SPA
+      // shell.
+      const canonical = canonicalUrlFor(r.path);
       return {
         title: payload.title || r.title,
-        link: `${BASE_URL}${r.path}`,
-        guid: `${BASE_URL}${r.path}`,
+        link: canonical,
+        guid: canonical,
         description: stripHtml(payload.excerpt) || r.description || "",
         author: payload.author_name as string | undefined,
         category: payload.category as string | undefined,
@@ -70,7 +75,7 @@ export async function generateRss(
     '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/">',
     "  <channel>",
     `    <title>${xmlEscape(FEED_TITLE)}</title>`,
-    `    <link>${xmlEscape(`${BASE_URL}/blog`)}</link>`,
+    `    <link>${xmlEscape(`${BASE_URL}/blog.html`)}</link>`,
     `    <description>${xmlEscape(FEED_DESCRIPTION)}</description>`,
     `    <language>${FEED_LANGUAGE}</language>`,
     `    <lastBuildDate>${lastBuild}</lastBuildDate>`,
