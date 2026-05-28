@@ -86,6 +86,11 @@ function assertRedirectRule(redirectsFile: string, from: string, to: string) {
 export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
   const distDir = options.distDir || DIST;
   const { routes, redirects: legacyRedirects, counts } = await buildSeoRoutes();
+  const parentRoutePaths = new Set(
+    routes
+      .filter((route) => route.path !== "/" && routes.some((other) => other.path.startsWith(`${route.path}/`)))
+      .map((route) => route.path),
+  );
   const redirectsPath = join(distDir, "_redirects");
   if (!isFile(redirectsPath)) {
     throw new Error("[verify-prerender] missing dist/_redirects for clean URL rewrites");
@@ -108,13 +113,15 @@ export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
     }
 
     const html = readFileSync(artifactPath, "utf8");
-    const cleanArtifactPath = cleanArtifactFileFor(distDir, route.path);
-    if (!isFile(cleanArtifactPath)) {
-      throw new Error(`[verify-prerender] missing extensionless clean URL artifact for ${route.path}: expected ${cleanArtifactPath}`);
-    }
-    const cleanHtml = readFileSync(cleanArtifactPath, "utf8");
-    if (route.path !== "/" && cleanHtml !== html) {
-      throw new Error(`[verify-prerender] clean URL artifact does not match .html artifact for ${route.path}`);
+    if (!parentRoutePaths.has(route.path)) {
+      const cleanArtifactPath = cleanArtifactFileFor(distDir, route.path);
+      if (!isFile(cleanArtifactPath)) {
+        throw new Error(`[verify-prerender] missing extensionless clean URL artifact for ${route.path}: expected ${cleanArtifactPath}`);
+      }
+      const cleanHtml = readFileSync(cleanArtifactPath, "utf8");
+      if (route.path !== "/" && cleanHtml !== html) {
+        throw new Error(`[verify-prerender] clean URL artifact does not match .html artifact for ${route.path}`);
+      }
     }
     const canonicalUrl = canonicalUrlFor(route.path);
     assertNotHomepageShell(html, route.path);
