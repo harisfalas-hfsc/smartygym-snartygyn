@@ -320,7 +320,7 @@ export function applyHeadOverrides(
   templateHtml: string,
   route: SeoRoute,
 ): string {
-  const canonical = `${BASE_URL}${route.path}`;
+  const canonical = canonicalUrlFor(route.path);
   const title = route.title;
   const description = route.description;
   const image = safeImg(route.image);
