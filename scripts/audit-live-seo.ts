@@ -136,7 +136,11 @@ async function main() {
   for (const rule of redirects) {
     const from = `${base}${rule.from}`;
     const to = canonicalUrlFor(rule.to).replace(BASE_URL, base);
-    const sources = rule.from.endsWith(".html") ? [from] : [from, `${from}.html`];
+    // Lovable hosting does not honor `_redirects` and serves extensionless
+    // legacy paths via the SPA fallback (React then client-side replaces the
+    // URL). The static meta-refresh stub we emit lives at `<from>.html`, so
+    // that's the variant we audit as a real redirect.
+    const sources = rule.from.endsWith(".html") ? [from] : [`${from}.html`];
     for (const source of sources) {
       const r = await fetchUrl(source);
       const expectedPath = new URL(to).pathname;
