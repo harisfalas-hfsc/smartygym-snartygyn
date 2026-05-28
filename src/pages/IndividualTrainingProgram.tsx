@@ -56,7 +56,7 @@ const IndividualTrainingProgram = () => {
   useEffect(() => {
     if (!dbProgram || !id) return;
     const programCategorySlug = getProgramCategorySlug(dbProgram.category, type || "functional-strength");
-    const canonicalSlug = slugifyContentName(dbProgram.name || dbProgram.id);
+    const canonicalSlug = dbProgram.canonical_slug || slugifyContentName(dbProgram.name || dbProgram.id);
     const canonicalPath = `/trainingprogram/${programCategorySlug}/${canonicalSlug}`;
     if (id !== canonicalSlug || type !== programCategorySlug) {
       navigate(canonicalPath, { replace: true });
@@ -79,7 +79,7 @@ const IndividualTrainingProgram = () => {
     const hasAccess = userTier === "premium" || alreadyPurchased || !isPremium;
     
     const programCategorySlug = getProgramCategorySlug(dbProgram.category, type || "functional-strength");
-    const programUrl = `https://smartygym.com/trainingprogram/${programCategorySlug}/${slugifyContentName(dbProgram.name || dbProgram.id)}`;
+    const programUrl = `https://smartygym.com/trainingprogram/${programCategorySlug}/${dbProgram.canonical_slug || slugifyContentName(dbProgram.name || dbProgram.id)}`;
     const imageAlt = generateProgramAltText(dbProgram);
 
     return (
