@@ -6,7 +6,7 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
-import { BASE_URL, buildSeoRoutes, xmlEscape } from "./lib/seo-routes";
+import { canonicalUrlFor, buildSeoRoutes, xmlEscape } from "./lib/seo-routes";
 
 export async function generateSitemap(outputPaths = [resolve("public/sitemap.xml")]) {
   const { routes, counts } = await buildSeoRoutes();
@@ -16,7 +16,7 @@ export async function generateSitemap(outputPaths = [resolve("public/sitemap.xml
     ...routes.map((e) =>
       [
         "  <url>",
-        `    <loc>${xmlEscape(BASE_URL + e.path)}</loc>`,
+        `    <loc>${xmlEscape(canonicalUrlFor(e.path))}</loc>`,
         e.lastmod ? `    <lastmod>${e.lastmod}</lastmod>` : "",
         e.changefreq ? `    <changefreq>${e.changefreq}</changefreq>` : "",
         e.priority ? `    <priority>${e.priority}</priority>` : "",

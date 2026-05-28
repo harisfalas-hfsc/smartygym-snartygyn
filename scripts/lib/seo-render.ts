@@ -8,6 +8,7 @@
  */
 import {
   BASE_URL,
+  canonicalUrlFor,
   attrEscape,
   htmlEscape,
   stripHtml,
@@ -69,7 +70,7 @@ export function renderRouteBody(route: SeoRoute): {
   bodyHtml: string;
   jsonLd: unknown[];
 } {
-  const canonical = `${BASE_URL}${route.path}`;
+  const canonical = canonicalUrlFor(route.path);
   const jsonLd: unknown[] = [];
 
   if (route.kind === "blog-article") {
@@ -319,7 +320,7 @@ export function applyHeadOverrides(
   templateHtml: string,
   route: SeoRoute,
 ): string {
-  const canonical = `${BASE_URL}${route.path}`;
+  const canonical = canonicalUrlFor(route.path);
   const title = route.title;
   const description = route.description;
   const image = safeImg(route.image);

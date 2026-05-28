@@ -18,6 +18,27 @@ import {
 
 export const BASE_URL = "https://smartygym.com";
 
+/**
+ * Canonical URL for a route path.
+ *
+ * Option A SEO workaround: Lovable's static host serves extensionless
+ * prerendered files as `application/octet-stream` and does not resolve
+ * directory index files for clean URLs, so Google sees the SPA shell for
+ * every clean URL (wrong title/content). Until the host issue is fixed, we
+ * canonicalize every non-root URL to its `.html` sibling. Those files ARE
+ * served as `text/html` with the correct per-page content, so Google can
+ * index them.
+ */
+export function canonicalUrlFor(path: string): string {
+  if (path === "/" || path === "") return `${BASE_URL}/`;
+  return `${BASE_URL}${path}.html`;
+}
+
+export function canonicalPathFor(path: string): string {
+  if (path === "/" || path === "") return "/";
+  return `${path}.html`;
+}
+
 const SUPABASE_URL =
   process.env.VITE_SUPABASE_URL ||
   process.env.SUPABASE_URL ||
