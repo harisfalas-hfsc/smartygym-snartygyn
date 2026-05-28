@@ -2,15 +2,15 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/">
   <channel>
     <title>SmartyGym Blog</title>
-    <link>https://smartygym.com/blog</link>
+    <link>https://smartygym.com/blog.html</link>
     <description>Workouts, training science, and recovery insights from Sports Scientist Haris Falas.</description>
     <language>en-GB</language>
-    <lastBuildDate>Thu, 28 May 2026 13:39:17 GMT</lastBuildDate>
+    <lastBuildDate>Thu, 28 May 2026 15:07:49 GMT</lastBuildDate>
     <atom:link href="https://smartygym.com/rss.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Low Back Pain? 5 Exercises That Actually Help</title>
-      <link>https://smartygym.com/blog/low-back-pain-5-exercises-that-actually-help</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/low-back-pain-5-exercises-that-actually-help</guid>
+      <link>https://smartygym.com/blog/low-back-pain-5-exercises-that-actually-help.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/low-back-pain-5-exercises-that-actually-help.html</guid>
       <pubDate>Wed, 27 May 2026 11:18:51 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Fitness</category>
@@ -19,8 +19,8 @@
     </item>
     <item>
       <title>HIIT vs Strength Training — Which Burns More Fat?</title>
-      <link>https://smartygym.com/blog/hiit-vs-strength-training-which-burns-more-fat</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/hiit-vs-strength-training-which-burns-more-fat</guid>
+      <link>https://smartygym.com/blog/hiit-vs-strength-training-which-burns-more-fat.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/hiit-vs-strength-training-which-burns-more-fat.html</guid>
       <pubDate>Wed, 27 May 2026 11:18:51 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Fitness</category>
@@ -29,8 +29,8 @@
     </item>
     <item>
       <title>How Many Sets Per Week Do You Actually Need?</title>
-      <link>https://smartygym.com/blog/how-many-sets-per-week-do-you-actually-need</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/how-many-sets-per-week-do-you-actually-need</guid>
+      <link>https://smartygym.com/blog/how-many-sets-per-week-do-you-actually-need.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/how-many-sets-per-week-do-you-actually-need.html</guid>
       <pubDate>Wed, 27 May 2026 11:18:51 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Fitness</category>
@@ -39,8 +39,8 @@
     </item>
     <item>
       <title>AMRAP vs EMOM vs TABATA — Which Is Best?</title>
-      <link>https://smartygym.com/blog/amrap-vs-emom-vs-tabata-which-is-best</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/amrap-vs-emom-vs-tabata-which-is-best</guid>
+      <link>https://smartygym.com/blog/amrap-vs-emom-vs-tabata-which-is-best.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/amrap-vs-emom-vs-tabata-which-is-best.html</guid>
       <pubDate>Wed, 27 May 2026 11:18:51 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Fitness</category>
@@ -49,8 +49,8 @@
     </item>
     <item>
       <title>Why AI Fitness Apps Are Dangerous</title>
-      <link>https://smartygym.com/blog/why-ai-fitness-apps-are-dangerous</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/why-ai-fitness-apps-are-dangerous</guid>
+      <link>https://smartygym.com/blog/why-ai-fitness-apps-are-dangerous.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/why-ai-fitness-apps-are-dangerous.html</guid>
       <pubDate>Wed, 27 May 2026 11:18:50 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Fitness</category>
@@ -59,8 +59,8 @@
     </item>
     <item>
       <title>Respiratory Mechanics: The Science of Performance Breathing</title>
-      <link>https://smartygym.com/blog/respiratory-mechanics-the-science-of-performance-breathing</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/respiratory-mechanics-the-science-of-performance-breathing</guid>
+      <link>https://smartygym.com/blog/respiratory-mechanics-the-science-of-performance-breathing.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/respiratory-mechanics-the-science-of-performance-breathing.html</guid>
       <pubDate>Mon, 25 May 2026 04:01:05 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Wellness</category>
@@ -69,8 +69,8 @@
     </item>
     <item>
       <title>Amino Architecture: The Molecular Science of Protein</title>
-      <link>https://smartygym.com/blog/amino-architecture-the-molecular-science-of-protein</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/amino-architecture-the-molecular-science-of-protein</guid>
+      <link>https://smartygym.com/blog/amino-architecture-the-molecular-science-of-protein.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/amino-architecture-the-molecular-science-of-protein.html</guid>
       <pubDate>Mon, 25 May 2026 04:00:47 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Nutrition</category>
@@ -79,8 +79,8 @@
     </item>
     <item>
       <title>Unlocking Elasticity: The Science of Functional Mobility</title>
-      <link>https://smartygym.com/blog/unlocking-elasticity-the-science-of-functional-mobility</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/unlocking-elasticity-the-science-of-functional-mobility</guid>
+      <link>https://smartygym.com/blog/unlocking-elasticity-the-science-of-functional-mobility.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/unlocking-elasticity-the-science-of-functional-mobility.html</guid>
       <pubDate>Mon, 25 May 2026 04:00:30 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Fitness</category>
@@ -89,8 +89,8 @@
     </item>
     <item>
       <title>Cognitive Reserve: The New Frontier of Functional Longevity</title>
-      <link>https://smartygym.com/blog/cognitive-reserve-the-new-frontier-of-functional-longevity</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/cognitive-reserve-the-new-frontier-of-functional-longevity</guid>
+      <link>https://smartygym.com/blog/cognitive-reserve-the-new-frontier-of-functional-longevity.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/cognitive-reserve-the-new-frontier-of-functional-longevity.html</guid>
       <pubDate>Mon, 18 May 2026 04:00:52 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Wellness</category>
@@ -99,8 +99,8 @@
     </item>
     <item>
       <title>Fueling the Engine: The Science of Sustained Glycemic Flow</title>
-      <link>https://smartygym.com/blog/fueling-the-engine-the-science-of-sustained-glycemic-flow</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/fueling-the-engine-the-science-of-sustained-glycemic-flow</guid>
+      <link>https://smartygym.com/blog/fueling-the-engine-the-science-of-sustained-glycemic-flow.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/fueling-the-engine-the-science-of-sustained-glycemic-flow.html</guid>
       <pubDate>Mon, 18 May 2026 04:00:34 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Nutrition</category>
@@ -109,8 +109,8 @@
     </item>
     <item>
       <title>Kinetic Longevity: Future-Proofing Your Joints</title>
-      <link>https://smartygym.com/blog/kinetic-longevity-future-proofing-your-joints</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/kinetic-longevity-future-proofing-your-joints</guid>
+      <link>https://smartygym.com/blog/kinetic-longevity-future-proofing-your-joints.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/kinetic-longevity-future-proofing-your-joints.html</guid>
       <pubDate>Mon, 18 May 2026 04:00:16 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Fitness</category>
@@ -119,8 +119,8 @@
     </item>
     <item>
       <title>Dopamine Architecture: The Science of Sustainable Motivation</title>
-      <link>https://smartygym.com/blog/dopamine-architecture-the-science-of-sustainable-motivation</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/dopamine-architecture-the-science-of-sustainable-motivation</guid>
+      <link>https://smartygym.com/blog/dopamine-architecture-the-science-of-sustainable-motivation.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/dopamine-architecture-the-science-of-sustainable-motivation.html</guid>
       <pubDate>Mon, 11 May 2026 04:00:55 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Wellness</category>
@@ -129,8 +129,8 @@
     </item>
     <item>
       <title>Post-Exercise Synthesis: The Science of Recovery Nutrition</title>
-      <link>https://smartygym.com/blog/post-exercise-synthesis-the-science-of-recovery-nutrition</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/post-exercise-synthesis-the-science-of-recovery-nutrition</guid>
+      <link>https://smartygym.com/blog/post-exercise-synthesis-the-science-of-recovery-nutrition.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/post-exercise-synthesis-the-science-of-recovery-nutrition.html</guid>
       <pubDate>Mon, 11 May 2026 04:00:38 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Nutrition</category>
@@ -139,8 +139,8 @@
     </item>
     <item>
       <title>Progressive Overload: The Biological Blueprint for Growth</title>
-      <link>https://smartygym.com/blog/progressive-overload-the-biological-blueprint-for-growth</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/progressive-overload-the-biological-blueprint-for-growth</guid>
+      <link>https://smartygym.com/blog/progressive-overload-the-biological-blueprint-for-growth.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/progressive-overload-the-biological-blueprint-for-growth.html</guid>
       <pubDate>Mon, 11 May 2026 04:00:19 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Fitness</category>
@@ -149,8 +149,8 @@
     </item>
     <item>
       <title>Biophilic Biohacking: The Science of Nature-Driven Recovery</title>
-      <link>https://smartygym.com/blog/biophilic-biohacking-the-science-of-nature-driven-recovery</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/biophilic-biohacking-the-science-of-nature-driven-recovery</guid>
+      <link>https://smartygym.com/blog/biophilic-biohacking-the-science-of-nature-driven-recovery.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/biophilic-biohacking-the-science-of-nature-driven-recovery.html</guid>
       <pubDate>Mon, 04 May 2026 04:00:55 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Wellness</category>
@@ -159,8 +159,8 @@
     </item>
     <item>
       <title>Natural Anabolics: The Micronutrient Science of Hormonal Optimization</title>
-      <link>https://smartygym.com/blog/natural-anabolics-the-micronutrient-science-of-hormonal-optimization</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/natural-anabolics-the-micronutrient-science-of-hormonal-optimization</guid>
+      <link>https://smartygym.com/blog/natural-anabolics-the-micronutrient-science-of-hormonal-optimization.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/natural-anabolics-the-micronutrient-science-of-hormonal-optimization.html</guid>
       <pubDate>Mon, 04 May 2026 04:00:37 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Nutrition</category>
@@ -169,8 +169,8 @@
     </item>
     <item>
       <title>Hybrid Synergy: Integrating Resistance and Endurance</title>
-      <link>https://smartygym.com/blog/hybrid-synergy-integrating-resistance-and-endurance</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/hybrid-synergy-integrating-resistance-and-endurance</guid>
+      <link>https://smartygym.com/blog/hybrid-synergy-integrating-resistance-and-endurance.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/hybrid-synergy-integrating-resistance-and-endurance.html</guid>
       <pubDate>Mon, 04 May 2026 04:00:19 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Fitness</category>
@@ -179,8 +179,8 @@
     </item>
     <item>
       <title>Emotional Fitness: The Missing Metric in Performance</title>
-      <link>https://smartygym.com/blog/emotional-fitness-the-missing-metric-in-performance</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/emotional-fitness-the-missing-metric-in-performance</guid>
+      <link>https://smartygym.com/blog/emotional-fitness-the-missing-metric-in-performance.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/emotional-fitness-the-missing-metric-in-performance.html</guid>
       <pubDate>Mon, 27 Apr 2026 04:00:55 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Wellness</category>
@@ -189,8 +189,8 @@
     </item>
     <item>
       <title>Metabolic Flexibility: The New Frontier of Fat Loss</title>
-      <link>https://smartygym.com/blog/metabolic-flexibility-the-new-frontier-of-fat-loss</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/metabolic-flexibility-the-new-frontier-of-fat-loss</guid>
+      <link>https://smartygym.com/blog/metabolic-flexibility-the-new-frontier-of-fat-loss.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/metabolic-flexibility-the-new-frontier-of-fat-loss.html</guid>
       <pubDate>Mon, 27 Apr 2026 04:00:37 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Nutrition</category>
@@ -199,8 +199,8 @@
     </item>
     <item>
       <title>Metabolic Engine Evolution: The HIIT Revolution</title>
-      <link>https://smartygym.com/blog/metabolic-engine-evolution-the-hiit-revolution</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/metabolic-engine-evolution-the-hiit-revolution</guid>
+      <link>https://smartygym.com/blog/metabolic-engine-evolution-the-hiit-revolution.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/metabolic-engine-evolution-the-hiit-revolution.html</guid>
       <pubDate>Mon, 27 Apr 2026 04:00:12 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Fitness</category>
@@ -209,8 +209,8 @@
     </item>
     <item>
       <title>Digital Sabbaticals: The Science of Sensory Recovery</title>
-      <link>https://smartygym.com/blog/digital-sabbaticals-the-science-of-sensory-recovery</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/digital-sabbaticals-the-science-of-sensory-recovery</guid>
+      <link>https://smartygym.com/blog/digital-sabbaticals-the-science-of-sensory-recovery.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/digital-sabbaticals-the-science-of-sensory-recovery.html</guid>
       <pubDate>Mon, 20 Apr 2026 04:01:05 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Wellness</category>
@@ -219,8 +219,8 @@
     </item>
     <item>
       <title>Macro Mastery: The Strategic Blueprint for Sustainable Gains</title>
-      <link>https://smartygym.com/blog/macro-mastery-the-strategic-blueprint-for-sustainable-gains</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/macro-mastery-the-strategic-blueprint-for-sustainable-gains</guid>
+      <link>https://smartygym.com/blog/macro-mastery-the-strategic-blueprint-for-sustainable-gains.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/macro-mastery-the-strategic-blueprint-for-sustainable-gains.html</guid>
       <pubDate>Mon, 20 Apr 2026 04:00:37 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Nutrition</category>
@@ -229,8 +229,8 @@
     </item>
     <item>
       <title>Biometric Optimization: The New Frontier of Recovery Management</title>
-      <link>https://smartygym.com/blog/biometric-optimization-the-new-frontier-of-recovery-management</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/biometric-optimization-the-new-frontier-of-recovery-management</guid>
+      <link>https://smartygym.com/blog/biometric-optimization-the-new-frontier-of-recovery-management.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/biometric-optimization-the-new-frontier-of-recovery-management.html</guid>
       <pubDate>Mon, 20 Apr 2026 04:00:20 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Fitness</category>
@@ -239,8 +239,8 @@
     </item>
     <item>
       <title>Trendy Fitness: Scientific Look vs. Structured Training</title>
-      <link>https://smartygym.com/blog/trendy-fitness-scientific-look-vs-structured-training</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/trendy-fitness-scientific-look-vs-structured-training</guid>
+      <link>https://smartygym.com/blog/trendy-fitness-scientific-look-vs-structured-training.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/trendy-fitness-scientific-look-vs-structured-training.html</guid>
       <pubDate>Mon, 13 Apr 2026 06:06:58 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Fitness</category>
@@ -249,8 +249,8 @@
     </item>
     <item>
       <title>Diet Showdown: Keto, Carnivore, IF, Med, Paleo Analyzed</title>
-      <link>https://smartygym.com/blog/diet-showdown-keto-carnivore-if-med-paleo-analyzed</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/diet-showdown-keto-carnivore-if-med-paleo-analyzed</guid>
+      <link>https://smartygym.com/blog/diet-showdown-keto-carnivore-if-med-paleo-analyzed.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/diet-showdown-keto-carnivore-if-med-paleo-analyzed.html</guid>
       <pubDate>Mon, 13 Apr 2026 06:06:58 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Nutrition</category>
@@ -259,8 +259,8 @@
     </item>
     <item>
       <title>GLP-1s: Weight Loss Wonder or Risky Business?</title>
-      <link>https://smartygym.com/blog/glp-1s-weight-loss-wonder-or-risky-business</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/glp-1s-weight-loss-wonder-or-risky-business</guid>
+      <link>https://smartygym.com/blog/glp-1s-weight-loss-wonder-or-risky-business.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/glp-1s-weight-loss-wonder-or-risky-business.html</guid>
       <pubDate>Mon, 13 Apr 2026 06:06:58 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Wellness</category>
@@ -269,8 +269,8 @@
     </item>
     <item>
       <title>Daily Workout vs Gym Program: Which Is Better?</title>
-      <link>https://smartygym.com/blog/daily-workout-vs-gym-program</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/daily-workout-vs-gym-program</guid>
+      <link>https://smartygym.com/blog/daily-workout-vs-gym-program.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/daily-workout-vs-gym-program.html</guid>
       <pubDate>Thu, 02 Apr 2026 09:56:18 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Fitness</category>
@@ -279,8 +279,8 @@
     </item>
     <item>
       <title>How to Stay Consistent with Training</title>
-      <link>https://smartygym.com/blog/how-to-stay-consistent-with-training</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/how-to-stay-consistent-with-training</guid>
+      <link>https://smartygym.com/blog/how-to-stay-consistent-with-training.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/how-to-stay-consistent-with-training.html</guid>
       <pubDate>Thu, 02 Apr 2026 09:55:28 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Fitness</category>
@@ -289,8 +289,8 @@
     </item>
     <item>
       <title>Best 10-Minute Workouts for Busy People</title>
-      <link>https://smartygym.com/blog/best-10-minute-workouts-for-busy-people</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/best-10-minute-workouts-for-busy-people</guid>
+      <link>https://smartygym.com/blog/best-10-minute-workouts-for-busy-people.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/best-10-minute-workouts-for-busy-people.html</guid>
       <pubDate>Thu, 02 Apr 2026 09:54:31 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Fitness</category>
@@ -299,8 +299,8 @@
     </item>
     <item>
       <title>The Myth of Cholesterol</title>
-      <link>https://smartygym.com/blog/the-myth-of-cholesterol</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/the-myth-of-cholesterol</guid>
+      <link>https://smartygym.com/blog/the-myth-of-cholesterol.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/the-myth-of-cholesterol.html</guid>
       <pubDate>Thu, 26 Mar 2026 10:41:21 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Nutrition</category>
@@ -309,8 +309,8 @@
     </item>
     <item>
       <title>Aging Isn&apos;t Optional: How You Age Is</title>
-      <link>https://smartygym.com/blog/aging-isnt-optional-how-you-age-is</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/aging-isnt-optional-how-you-age-is</guid>
+      <link>https://smartygym.com/blog/aging-isnt-optional-how-you-age-is.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/aging-isnt-optional-how-you-age-is.html</guid>
       <pubDate>Thu, 26 Mar 2026 09:32:54 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Wellness</category>
@@ -319,8 +319,8 @@
     </item>
     <item>
       <title>Periodization: The Science of Sustained Progress</title>
-      <link>https://smartygym.com/blog/periodization-the-science-of-sustained-progress</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/periodization-the-science-of-sustained-progress</guid>
+      <link>https://smartygym.com/blog/periodization-the-science-of-sustained-progress.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/periodization-the-science-of-sustained-progress.html</guid>
       <pubDate>Mon, 09 Feb 2026 12:08:16 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Fitness</category>
@@ -329,8 +329,8 @@
     </item>
     <item>
       <title>The Fiber Layering Method: Optimizing Satiety and Fueling Fat Loss</title>
-      <link>https://smartygym.com/blog/the-fiber-layering-method-optimizing-satiety-and-fueling-fat-loss</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/the-fiber-layering-method-optimizing-satiety-and-fueling-fat-loss</guid>
+      <link>https://smartygym.com/blog/the-fiber-layering-method-optimizing-satiety-and-fueling-fat-loss.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/the-fiber-layering-method-optimizing-satiety-and-fueling-fat-loss.html</guid>
       <pubDate>Mon, 09 Feb 2026 12:08:14 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Nutrition</category>
@@ -339,8 +339,8 @@
     </item>
     <item>
       <title>Functional Aging: The Blueprint for Lifetime Independence</title>
-      <link>https://smartygym.com/blog/functional-aging-the-blueprint-for-lifetime-independence</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/functional-aging-the-blueprint-for-lifetime-independence</guid>
+      <link>https://smartygym.com/blog/functional-aging-the-blueprint-for-lifetime-independence.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/functional-aging-the-blueprint-for-lifetime-independence.html</guid>
       <pubDate>Mon, 09 Feb 2026 12:08:12 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Wellness</category>
@@ -349,8 +349,8 @@
     </item>
     <item>
       <title>Mental Health and Longevity: Why the Future of Fitness Is Preventive</title>
-      <link>https://smartygym.com/blog/mental-health-longevity-future-fitness-preventive</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/mental-health-longevity-future-fitness-preventive</guid>
+      <link>https://smartygym.com/blog/mental-health-longevity-future-fitness-preventive.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/mental-health-longevity-future-fitness-preventive.html</guid>
       <pubDate>Mon, 09 Feb 2026 08:37:30 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Wellness</category>
@@ -359,8 +359,8 @@
     </item>
     <item>
       <title>High Protein, High Fiber, and Gut Health: The New Nutrition Blueprint</title>
-      <link>https://smartygym.com/blog/high-protein-fiber-gut-health-new-nutrition-blueprint</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/high-protein-fiber-gut-health-new-nutrition-blueprint</guid>
+      <link>https://smartygym.com/blog/high-protein-fiber-gut-health-new-nutrition-blueprint.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/high-protein-fiber-gut-health-new-nutrition-blueprint.html</guid>
       <pubDate>Mon, 09 Feb 2026 08:36:59 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Nutrition</category>
@@ -369,8 +369,8 @@
     </item>
     <item>
       <title>Data-Driven Fitness: How Wearable Technology Is Changing the Way We Train</title>
-      <link>https://smartygym.com/blog/data-driven-fitness-wearable-technology-changing-training</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/data-driven-fitness-wearable-technology-changing-training</guid>
+      <link>https://smartygym.com/blog/data-driven-fitness-wearable-technology-changing-training.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/data-driven-fitness-wearable-technology-changing-training.html</guid>
       <pubDate>Mon, 09 Feb 2026 08:36:27 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Fitness</category>
@@ -379,8 +379,8 @@
     </item>
     <item>
       <title>Exercise After 50: How Fitness Prevents Decline and Transforms Your Health</title>
-      <link>https://smartygym.com/blog/exercise-after-50-fitness-prevents-decline-transforms-health</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/exercise-after-50-fitness-prevents-decline-transforms-health</guid>
+      <link>https://smartygym.com/blog/exercise-after-50-fitness-prevents-decline-transforms-health.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/exercise-after-50-fitness-prevents-decline-transforms-health.html</guid>
       <pubDate>Mon, 09 Feb 2026 06:08:51 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Fitness</category>
@@ -389,8 +389,8 @@
     </item>
     <item>
       <title>Creatine: The Most Researched Supplement in Fitness History</title>
-      <link>https://smartygym.com/blog/creatine-most-researched-supplement-fitness-history</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/creatine-most-researched-supplement-fitness-history</guid>
+      <link>https://smartygym.com/blog/creatine-most-researched-supplement-fitness-history.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/creatine-most-researched-supplement-fitness-history.html</guid>
       <pubDate>Fri, 28 Nov 2025 07:09:49 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Nutrition</category>
@@ -399,8 +399,8 @@
     </item>
     <item>
       <title>Muscle Hypertrophy: The Complete Guide to Building Muscle While Losing Fat</title>
-      <link>https://smartygym.com/blog/muscle-hypertrophy-complete-guide-building-muscle-losing-fat</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/muscle-hypertrophy-complete-guide-building-muscle-losing-fat</guid>
+      <link>https://smartygym.com/blog/muscle-hypertrophy-complete-guide-building-muscle-losing-fat.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/muscle-hypertrophy-complete-guide-building-muscle-losing-fat.html</guid>
       <pubDate>Fri, 28 Nov 2025 07:09:49 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Fitness</category>
@@ -409,8 +409,8 @@
     </item>
     <item>
       <title>The Science of Strength: Why Getting Stronger Changes Everything</title>
-      <link>https://smartygym.com/blog/science-of-strength-why-getting-stronger-changes-everything</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/science-of-strength-why-getting-stronger-changes-everything</guid>
+      <link>https://smartygym.com/blog/science-of-strength-why-getting-stronger-changes-everything.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/science-of-strength-why-getting-stronger-changes-everything.html</guid>
       <pubDate>Fri, 28 Nov 2025 07:09:49 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Fitness</category>
@@ -419,8 +419,8 @@
     </item>
     <item>
       <title>Bodyweight vs Equipment Training: The Ultimate Comparison</title>
-      <link>https://smartygym.com/blog/bodyweight-vs-equipment-training-ultimate-comparison</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/bodyweight-vs-equipment-training-ultimate-comparison</guid>
+      <link>https://smartygym.com/blog/bodyweight-vs-equipment-training-ultimate-comparison.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/bodyweight-vs-equipment-training-ultimate-comparison.html</guid>
       <pubDate>Fri, 28 Nov 2025 07:09:49 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Fitness</category>
@@ -429,8 +429,8 @@
     </item>
     <item>
       <title>Time Management for Fitness: How Busy People Stay Active</title>
-      <link>https://smartygym.com/blog/time-management-fitness-how-busy-people-stay-active</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/time-management-fitness-how-busy-people-stay-active</guid>
+      <link>https://smartygym.com/blog/time-management-fitness-how-busy-people-stay-active.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/time-management-fitness-how-busy-people-stay-active.html</guid>
       <pubDate>Fri, 28 Nov 2025 07:09:49 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Wellness</category>
@@ -439,8 +439,8 @@
     </item>
     <item>
       <title>How to Lose Fat: The Science-Based Step-by-Step Guide</title>
-      <link>https://smartygym.com/blog/how-to-lose-fat-science-based-step-by-step-guide</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/how-to-lose-fat-science-based-step-by-step-guide</guid>
+      <link>https://smartygym.com/blog/how-to-lose-fat-science-based-step-by-step-guide.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/how-to-lose-fat-science-based-step-by-step-guide.html</guid>
       <pubDate>Fri, 28 Nov 2025 07:09:49 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Nutrition</category>
@@ -449,8 +449,8 @@
     </item>
     <item>
       <title>The Importance of Muscle: Your Body&apos;s Hidden Health System</title>
-      <link>https://smartygym.com/blog/importance-of-muscle-body-hidden-health-system</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/importance-of-muscle-body-hidden-health-system</guid>
+      <link>https://smartygym.com/blog/importance-of-muscle-body-hidden-health-system.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/importance-of-muscle-body-hidden-health-system.html</guid>
       <pubDate>Fri, 28 Nov 2025 07:09:49 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Fitness</category>
@@ -459,8 +459,8 @@
     </item>
     <item>
       <title>Intermittent Fasting: A Complete Guide to Time-Restricted Eating</title>
-      <link>https://smartygym.com/blog/intermittent-fasting-complete-guide-time-restricted-eating</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/intermittent-fasting-complete-guide-time-restricted-eating</guid>
+      <link>https://smartygym.com/blog/intermittent-fasting-complete-guide-time-restricted-eating.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/intermittent-fasting-complete-guide-time-restricted-eating.html</guid>
       <pubDate>Fri, 28 Nov 2025 07:09:49 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Nutrition</category>
@@ -469,8 +469,8 @@
     </item>
     <item>
       <title>Muscle Hypertrophy Through Nutrition: The Protein Masterclass</title>
-      <link>https://smartygym.com/blog/muscle-hypertrophy-nutrition-protein-masterclass</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/muscle-hypertrophy-nutrition-protein-masterclass</guid>
+      <link>https://smartygym.com/blog/muscle-hypertrophy-nutrition-protein-masterclass.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/muscle-hypertrophy-nutrition-protein-masterclass.html</guid>
       <pubDate>Fri, 28 Nov 2025 07:09:49 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Nutrition</category>
@@ -479,8 +479,8 @@
     </item>
     <item>
       <title>The Science of Sleep: Why Rest Is Your Secret Weapon</title>
-      <link>https://smartygym.com/blog/science-of-sleep-why-rest-secret-weapon</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/science-of-sleep-why-rest-secret-weapon</guid>
+      <link>https://smartygym.com/blog/science-of-sleep-why-rest-secret-weapon.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/science-of-sleep-why-rest-secret-weapon.html</guid>
       <pubDate>Fri, 28 Nov 2025 07:09:49 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Wellness</category>
@@ -489,8 +489,8 @@
     </item>
     <item>
       <title>Exercise for Working Professionals: Stay Fit at Your Desk Job</title>
-      <link>https://smartygym.com/blog/exercise-working-professionals-stay-fit-desk-job</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/exercise-working-professionals-stay-fit-desk-job</guid>
+      <link>https://smartygym.com/blog/exercise-working-professionals-stay-fit-desk-job.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/exercise-working-professionals-stay-fit-desk-job.html</guid>
       <pubDate>Fri, 28 Nov 2025 07:09:49 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Wellness</category>
@@ -499,8 +499,8 @@
     </item>
     <item>
       <title>Understanding BMR: Your Metabolism Explained</title>
-      <link>https://smartygym.com/blog/understanding-bmr-metabolism-explained</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/understanding-bmr-metabolism-explained</guid>
+      <link>https://smartygym.com/blog/understanding-bmr-metabolism-explained.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/understanding-bmr-metabolism-explained.html</guid>
       <pubDate>Fri, 28 Nov 2025 07:09:49 GMT</pubDate>
       <dc:creator>Haris Falas</dc:creator>
       <category>Wellness</category>
