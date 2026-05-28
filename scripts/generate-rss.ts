@@ -90,6 +90,7 @@ export async function generateRss(
         it.image
           ? `      <enclosure url="${xmlEscape(it.image)}" type="image/jpeg" />`
           : "",
+        "    </item>",
       ].filter(Boolean),
     ),
     "  </channel>",
