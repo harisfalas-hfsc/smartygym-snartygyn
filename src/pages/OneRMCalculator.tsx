@@ -137,7 +137,7 @@ const OneRMCalculator = () => {
           <meta property="og:title" content="Free 1RM Calculator | One Rep Max Calculator | SmartyGym" />
           <meta property="og:description" content="Calculate your one rep max with our free online 1RM calculator at smartygym.com - Professional strength training tool by Haris Falas" />
           <meta property="og:type" content="website" />
-          <meta property="og:url" content="https://smartygym.com/1rmcalculator" />
+          <meta property="og:url" content="https://smartygym.com/tools/1rm-calculator" />
           <meta property="og:image" content="https://smartygym.com/smarty-gym-logo.png" />
           <meta property="og:image:width" content="1200" />
           <meta property="og:image:height" content="630" />
@@ -148,21 +148,21 @@ const OneRMCalculator = () => {
           <meta name="twitter:description" content="Calculate your one rep max for strength training at smartygym.com" />
           <meta name="twitter:image" content="https://smartygym.com/smarty-gym-logo.png" />
           
-          <link rel="canonical" href="https://smartygym.com/1rmcalculator" />
+          <link rel="canonical" href="https://smartygym.com/tools/1rm-calculator" />
           
           <script type="application/ld+json">
             {JSON.stringify(generateSoftwareApplicationSchema({
               name: "1RM Calculator - One Rep Max Calculator",
               description: "Free online one rep max calculator using Brzycki formula. Calculate your 1RM and training percentages for powerlifting, strength training, and gym workouts.",
               category: "HealthApplication",
-              url: "/1rmcalculator"
+              url: "/tools/1rm-calculator"
             }))}
           </script>
           <script type="application/ld+json">
             {JSON.stringify(generateBreadcrumbSchema([
               { name: "Home", url: "/" },
               { name: "Tools", url: "/tools" },
-              { name: "1RM Calculator", url: "/1rmcalculator" }
+              { name: "1RM Calculator", url: "/tools/1rm-calculator" }
             ]))}
           </script>
         </Helmet>
