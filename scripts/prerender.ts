@@ -118,6 +118,11 @@ export async function prerenderSeoHtml(options: {
   const template = normalizeTemplate(readFileSync(templatePath, "utf8"));
 
   const { routes, redirects, counts } = await buildSeoRoutes();
+  const parentRoutePaths = new Set(
+    routes
+      .filter((route) => route.path !== "/" && routes.some((other) => other.path.startsWith(`${route.path}/`)))
+      .map((route) => route.path),
+  );
   console.log(
     `[prerender] rendering ${counts.total} routes (` +
       `static=${counts.static}, workout-cat=${counts.workoutCategory}, ` +
@@ -163,7 +168,9 @@ export async function prerenderSeoHtml(options: {
     const dotHtmlFile = join(distDir, `${cleanPath}.html`);
     const cleanUrlFile = join(distDir, cleanPath);
     writeHtml(dotHtmlFile, html);
-    writeHtml(cleanUrlFile, html);
+    if (!parentRoutePaths.has(route.path)) {
+      writeHtml(cleanUrlFile, html);
+    }
     allRoutePaths.push(route.path);
     reportRows.push(`| ${route.path} | ${dotHtmlFile.replace(`${distDir}/`, "dist/")} + clean URL artifact |`);
   }
