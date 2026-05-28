@@ -1,129 +1,81 @@
-I found the remaining causes: some code still creates public workout/program URLs with IDs, and old ID URLs are still accepted without automatically moving the browser/canonical source to the readable slug URL.
+I checked the live site directly, not just the client app.
 
-## Final fix scope
+What is actually happening right now:
 
-This will apply globally, not to one workout:
+- Your website is public. Published visibility is public.
+- `https://smartygym.com/robots.txt` allows Googlebot and other crawlers.
+- `https://smartygym.com/sitemap.xml` is live and currently lists 640 URLs.
+- The two article examples I tested now return raw server HTML with the article title and article text:
+  - `/blog/why-ai-fitness-apps-are-dangerous` returns title `Why AI Fitness Apps Are Dangerous | SmartyGym Blog` and article text is present.
+  - `/blog/low-back-pain-5-exercises-that-actually-help` returns title `Low Back Pain? 5 Exercises That Actually Help | SmartyGym Blog` and article text is present.
+- There is no sitewide `noindex` blocking the public pages.
 
-- All workouts, current and future
-- All training programs, current and future
-- All blog articles, current and future
-- All Smarty Tools and static public pages
-- All app links, coach suggestion links, sitemap links, prerendered HTML, canonicals, and redirects
+The real problems I found:
 
-## What I will change
+1. Some URL variants are still broken for raw crawlers.
+   - Clean URL without trailing slash works.
+   - `.html` article URL works.
+   - But trailing-slash article URL, e.g. `/blog/why-ai-fitness-apps-are-dangerous/`, still returns the generic homepage shell.
+   - That can confuse crawlers and diagnostic tools.
 
-### 1. Replace every remaining ID-based public link
-Update all remaining URL helpers and callers so they build URLs from the content name, not the database ID.
+2. The generated static route files are being served with `content-type: application/octet-stream` for extensionless clean URLs.
+   - Google can still read the HTML body, but this is not ideal.
+   - Search/SEO tools may treat it as a bad response because it is not declared as `text/html`.
 
-Examples:
+3. The current prerender system exists and is working for exact clean URLs, but it needs hardening.
+   - It writes exact extensionless files like `dist/blog/article-slug`.
+   - It also writes `_redirects`, but trailing slash variants are not reliably reaching the prerendered HTML.
+   - It does not currently generate host header rules to force HTML MIME type.
 
-```text
-Wrong:
-/workout/strength/FREE-int-strength-E-1777866547411
-/trainingprogram/weight-loss/PROGRAM-12345
+4. Indexing is separate from crawlability.
+   - The live raw HTML is now readable for the tested exact URLs.
+   - But Google having zero indexed results means the domain likely has not been submitted/verified properly in Google Search Console yet, or Google has not processed it.
+   - I can connect to the Search Console connector in this project after implementation to submit the sitemap if ownership/access is available.
 
-Correct:
-/workout/strength/bedrock-lift
-/trainingprogram/weight-loss/<program-name-slug>
-```
+Plan to fix this once and harden it for all current and future pages:
 
-Known remaining sources to fix:
+1. Fix static HTML output for every route variant
+   - Update `scripts/prerender.ts` so every public route writes:
+     - the exact clean URL file used now, e.g. `dist/blog/article-slug`
+     - a trailing-slash fallback, e.g. `dist/blog/article-slug/index.html`
+     - an optional `.html` fallback where appropriate, e.g. `dist/blog/article-slug.html`
+   - Keep parent routes as directories where needed so children still work.
 
-- `src/utils/smarty-coach/routes.ts` currently returns `/workout/<category>/<id>` and `/trainingprogram/<category>/<id>`.
-- `SmartyCoachModal` and `ProgramSuggestionFlow` pass IDs into those helpers.
-- Any stale/legacy `individualworkout` route references will be removed or redirected to canonical URLs.
-- Old schema/helper references like `/individualworkout/<id>` will be updated to canonical `/workout/<category>/<name-slug>`.
+2. Add hosting headers for crawler compatibility
+   - Generate a `dist/_headers` file during prerender.
+   - Force all prerendered clean URL files, `.html` files, and route folders to serve as:
+     - `Content-Type: text/html; charset=utf-8`
+     - `X-Robots-Tag: index, follow`
+   - This removes the `application/octet-stream` problem on exact extensionless HTML files.
 
-### 2. Add a single canonical URL helper used everywhere
-Create/extend shared helpers so every part of the app uses the same logic:
+3. Harden redirects and canonical consistency
+   - Update `_redirects` generation so trailing slash variants resolve to the canonical non-trailing URL or the correct prerendered page.
+   - Keep legacy ID URLs redirecting to readable title slugs.
+   - Make sure `/workout/:category/:title`, `/trainingprogram/:category/:title`, `/blog/:slug`, and `/tools/:tool-slug` stay canonical.
 
-```text
-getWorkoutPath(workout) -> /workout/<category>/<unique-name-slug>
-getProgramPath(program) -> /trainingprogram/<category>/<unique-name-slug>
-getArticlePath(article) -> /blog/<slug>
-```
+4. Strengthen build verification
+   - Update `scripts/verify-prerender.ts` to fail the build if any public route is missing:
+     - exact clean URL HTML
+     - trailing-slash fallback or redirect rule
+     - correct `<title>`
+     - one canonical tag only
+     - real body text for blog/workout/program pages
+     - no database ID in canonical URLs
+     - `_headers` HTML MIME rule
+   - Add live-style checks for route variants in the verification logic so this does not regress again.
 
-This prevents different components from generating different URLs for the same content.
+5. Re-audit sitemap/robots after changes
+   - Confirm sitemap still includes all published blog articles, visible workouts, visible programs, category pages, tools, and important static pages.
+   - Remove any indexable/private conflict if found, especially low-value auth/payment routes if they are in sitemap but blocked by robots.
 
-### 3. Redirect old ID URLs automatically
-If someone opens an old URL like:
+6. Search Console submission step
+   - After the code fix is approved and implemented, I will check whether the Search Console connector can access `smartygym.com`.
+   - If available, I will submit `https://smartygym.com/sitemap.xml` for indexing.
+   - If the property is not verified, I will tell you exactly what is missing and what needs to be done.
 
-```text
-/workout/strength/FREE-int-strength-E-1777866547411
-```
+Expected result after publish:
 
-then after the workout is resolved, the app will immediately replace the browser URL with:
-
-```text
-/workout/strength/bedrock-lift
-```
-
-Same for training programs.
-
-### 4. Generate host-level redirects for every existing workout/program ID URL
-During prerender/publish, generate redirect rules for every visible workout and program:
-
-```text
-/workout/<category>/<id>              /workout/<category>/<name-slug> 301!
-/trainingprogram/<category>/<id>      /trainingprogram/<category>/<name-slug> 301!
-```
-
-This means old public ID URLs do not stay indexable and crawlers are pushed to the readable URL.
-
-### 5. Keep readable slug pages fully prerendered
-For every canonical URL, keep writing:
-
-```text
-dist/workout/<category>/<name-slug>/index.html
-dist/trainingprogram/<category>/<name-slug>/index.html
-dist/blog/<article-slug>/index.html
-```
-
-Each must contain its own:
-
-- unique title
-- unique meta description
-- canonical URL
-- OG/Twitter tags
-- JSON-LD
-- H1 and crawlable body text inside raw HTML
-
-### 6. Strengthen verification so this cannot return
-Update the verification script to fail if any of these exist:
-
-- `/workout/<category>/<database-id>` in generated routes, sitemap, or redirects as a final canonical URL
-- `/trainingprogram/<category>/<database-id>` as a final canonical URL
-- any `individualworkout` or `individualtrainingprogram` public SEO URL
-- any workout/program canonical using the ID instead of the name slug
-- any app source code helper returning ID-based public URLs
-- any prerendered page showing homepage title/content instead of page-specific title/content
-
-## Acceptance test after implementation
-
-These must be true after publish:
-
-```text
-https://smartygym.com/workout/strength/bedrock-lift
-```
-
-shows source with:
-
-```text
-<title>Bedrock Lift | Online Workout by Haris Falas | SmartyGym</title>
-<h1>Bedrock Lift</h1>
-<link rel="canonical" href="https://smartygym.com/workout/strength/bedrock-lift" />
-```
-
-and the old ID URL:
-
-```text
-https://smartygym.com/workout/strength/FREE-int-strength-E-1777866547411
-```
-
-redirects or replaces to:
-
-```text
-https://smartygym.com/workout/strength/bedrock-lift
-```
-
-Same rule for every workout, every training program, every blog article, and every tool.
+- Exact clean URLs, trailing-slash URLs, and `.html` variants will no longer expose the generic homepage shell.
+- Raw HTML for blog articles, workouts, programs, and tools will contain the correct title, canonical, metadata, JSON-LD, and visible text before JavaScript runs.
+- Build will fail automatically if future pages regress to generic shell HTML.
+- Google will be able to crawl the pages; indexing/ranking then depends on Google processing the submitted sitemap.
