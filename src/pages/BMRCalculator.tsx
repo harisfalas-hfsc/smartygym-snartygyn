@@ -122,7 +122,7 @@ const BMRCalculator = () => {
           <meta property="og:title" content="Free BMR Calculator | Basal Metabolic Rate Calculator | SmartyGym" />
           <meta property="og:description" content="Calculate your BMR and daily calorie needs with our free online calculator at smartygym.com - Professional nutrition tool by Haris Falas" />
           <meta property="og:type" content="website" />
-          <meta property="og:url" content="https://smartygym.com/bmrcalculator" />
+          <meta property="og:url" content="https://smartygym.com/tools/bmr-calculator" />
           <meta property="og:image" content="https://smartygym.com/smarty-gym-logo.png" />
           <meta property="og:image:width" content="1200" />
           <meta property="og:image:height" content="630" />
@@ -133,21 +133,21 @@ const BMRCalculator = () => {
           <meta name="twitter:description" content="Calculate your basal metabolic rate and daily calories at smartygym.com" />
           <meta name="twitter:image" content="https://smartygym.com/smarty-gym-logo.png" />
           
-          <link rel="canonical" href="https://smartygym.com/bmrcalculator" />
+          <link rel="canonical" href="https://smartygym.com/tools/bmr-calculator" />
           
           <script type="application/ld+json">
             {JSON.stringify(generateSoftwareApplicationSchema({
               name: "BMR Calculator - Basal Metabolic Rate Calculator",
               description: "Free online BMR calculator using Mifflin-St Jeor equation. Calculate your basal metabolic rate, TDEE, and daily calorie needs for weight loss or muscle gain.",
               category: "HealthApplication",
-              url: "/bmrcalculator"
+              url: "/tools/bmr-calculator"
             }))}
           </script>
           <script type="application/ld+json">
             {JSON.stringify(generateBreadcrumbSchema([
               { name: "Home", url: "/" },
               { name: "Tools", url: "/tools" },
-              { name: "BMR Calculator", url: "/bmrcalculator" }
+              { name: "BMR Calculator", url: "/tools/bmr-calculator" }
             ]))}
           </script>
         </Helmet>
