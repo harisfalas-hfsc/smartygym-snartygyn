@@ -157,6 +157,7 @@ export async function prerenderSeoHtml(options: {
     reportRows.push(`| ${route.path} | ${dotHtmlFile.replace(`${distDir}/`, "dist/")} |`);
   }
   writeCleanUrlRewrites(distDir, allRoutePaths, redirects);
+  writeLegacyRedirectStubs(distDir, allRoutePaths, redirects);
   writeHeadersFile(distDir);
   writeFileSync(join(distDir, "seo-prerender-report.md"), `${reportRows.join("\n")}\n`);
   console.log(`[prerender] wrote ${written} HTML files into ${distDir.replace(process.cwd() + "/", "")}/`);
