@@ -69,10 +69,15 @@ serve(async (req) => {
 
       const isRecovery = wod.category === "RECOVERY";
       const sectionCheck = validateWodSections(wod.main_workout, isRecovery, wod.category);
-      const shouldHideFromGallery = !sectionCheck.isComplete;
 
-      if (shouldHideFromGallery) {
-        logStep("WOD incomplete during archival; forcing hidden visibility", { id: wod.id, missing: sectionCheck.missingSections });
+      if (!sectionCheck.isComplete) {
+        logStep("WOD incomplete during archival; preserving visibility and reporting only", {
+          id: wod.id,
+          missing: sectionCheck.missingSections,
+          exerciseIssues: sectionCheck.exerciseContentIssues,
+          softTissueIssues: sectionCheck.softTissueIssues,
+          mobilityIssues: sectionCheck.mobilityCompatibilityIssues,
+        });
       }
 
       // Library-selected WODs: just clear the WOD flags, no serial number changes
@@ -83,7 +88,6 @@ serve(async (req) => {
             is_workout_of_day: false,
             generated_for_date: null,
             wod_source: null,
-            ...(shouldHideFromGallery ? { is_visible: false } : {}),
             updated_at: new Date().toISOString()
           })
           .eq("id", wod.id);
@@ -142,7 +146,6 @@ serve(async (req) => {
           is_workout_of_day: false,
           serial_number: nextSerialNumber,
           generated_for_date: null,
-          ...(shouldHideFromGallery ? { is_visible: false } : {}),
           updated_at: new Date().toISOString()
         })
         .eq("id", wod.id);
