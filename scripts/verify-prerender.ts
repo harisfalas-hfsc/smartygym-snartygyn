@@ -69,7 +69,7 @@ function isFile(path: string) {
 
 function assertRewriteForRoute(redirects: string, routePath: string) {
   const expected = `${routePath} ${routePath} 200!`;
-  const expectedTrailing = `${routePath}/ ${routePath} 200!`;
+  const expectedTrailing = `${routePath}/ ${routePath} 301!`;
   if (!redirects.includes(expected) || !redirects.includes(expectedTrailing)) {
     throw new Error(`[verify-prerender] missing _redirects rules for ${routePath}`);
   }
@@ -92,6 +92,14 @@ export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
     throw new Error("[verify-prerender] missing dist/_redirects for clean URL rewrites");
   }
   const redirects = readFileSync(redirectsPath, "utf8");
+  const headersPath = join(distDir, "_headers");
+  if (!isFile(headersPath)) {
+    throw new Error("[verify-prerender] missing dist/_headers for HTML MIME type rules");
+  }
+  const headers = readFileSync(headersPath, "utf8");
+  if (!/Content-Type:\s*text\/html/i.test(headers)) {
+    throw new Error("[verify-prerender] dist/_headers missing text/html Content-Type rule");
+  }
 
   let checked = 0;
   for (const route of routes) {
@@ -100,6 +108,13 @@ export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
       : sourceFileForCleanUrl(distDir, route.path);
     if (!isFile(artifactPath)) {
       throw new Error(`[verify-prerender] missing clean URL source HTML for ${route.path}: expected ${artifactPath}`);
+    }
+    // Leaf routes should also ship a .html sibling for crawler-friendly variants.
+    if (route.path !== "/" && !isAncestorRoute(route.path, allPaths)) {
+      const dotHtml = join(distDir, route.path.replace(/^\//, "") + ".html");
+      if (!isFile(dotHtml)) {
+        throw new Error(`[verify-prerender] missing .html sibling for ${route.path}: expected ${dotHtml}`);
+      }
     }
 
     const html = readFileSync(artifactPath, "utf8");
