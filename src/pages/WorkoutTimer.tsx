@@ -132,6 +132,9 @@ const WorkoutTimer = () => {
       <Helmet>
         <title>Workout Timer | Interval Training Timer | SmartyGym</title>
         <meta name="description" content="Free workout interval timer for your training sessions. Customizable work/rest periods and rounds. Perfect for HIIT, Tabata, and circuit training." />
+        <link rel="canonical" href="https://smartygym.com/tools/workout-timer" />
+        <meta property="og:url" content="https://smartygym.com/tools/workout-timer" />
+        <meta property="og:title" content="Workout Timer | Interval Training Timer | SmartyGym" />
       </Helmet>
 
       <SEOEnhancer

@@ -39,7 +39,7 @@ import { useProgramInteractions } from "@/hooks/useProgramInteractions";
 import { supabase } from "@/integrations/supabase/client";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { stripHtmlTags } from "@/lib/text";
-import { slugifyContentName } from "@/lib/seo-slugs";
+import { buildUniqueContentSlugs, slugifyContentName } from "@/lib/seo-slugs";
 
 type EquipmentFilter = "all" | "bodyweight" | "equipment";
 type LevelFilter = "all" | "beginner" | "intermediate" | "advanced";
@@ -278,6 +278,8 @@ const TrainingProgramDetail = () => {
   }, [currentTypePrograms, debouncedSearch, equipmentFilter, levelFilter, durationFilter, 
       statusFilter, sortBy, accessFilter, userId, interactions]);
 
+  const programSlugs = useMemo(() => buildUniqueContentSlugs(currentTypePrograms), [currentTypePrograms]);
+
   return (
     <>
       {isLoading ? (
@@ -515,7 +517,7 @@ const TrainingProgramDetail = () => {
               <Card
                 key={program.id}
                 className="overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-primary bg-card border-border relative"
-                onClick={() => navigate(`/trainingprogram/${type}/${slugifyContentName(program.name || program.id)}`)}
+                onClick={() => navigate(`/trainingprogram/${type}/${programSlugs.get(program.id) || slugifyContentName(program.name || program.id)}`)}
               >
                 <div className="relative h-48 w-full overflow-hidden">
                   {/* Equipment Badge - Top Left */}

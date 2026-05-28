@@ -163,37 +163,31 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://smartygym.com/1rmcalculator</loc>
+    <loc>https://smartygym.com/tools/1rm-calculator</loc>
     <lastmod>2026-05-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://smartygym.com/bmrcalculator</loc>
+    <loc>https://smartygym.com/tools/bmr-calculator</loc>
     <lastmod>2026-05-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://smartygym.com/macrocalculator</loc>
+    <loc>https://smartygym.com/tools/macro-calculator</loc>
     <lastmod>2026-05-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://smartygym.com/caloriecalculator</loc>
+    <loc>https://smartygym.com/tools/workout-timer</loc>
     <lastmod>2026-05-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://smartygym.com/workouttimer</loc>
-    <lastmod>2026-05-28</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://smartygym.com/caloriecounter</loc>
+    <loc>https://smartygym.com/tools/calorie-counter</loc>
     <lastmod>2026-05-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>

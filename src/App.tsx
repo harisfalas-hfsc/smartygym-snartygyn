@@ -246,11 +246,15 @@ const AppContent = () => {
                 <Route path="/blog/:slug" element={<ArticleDetail />} />
                 
                 {/* Public Smarty Tools - no auth required */}
-                <Route path="/1rmcalculator" element={<OneRMCalculator />} />
-                <Route path="/bmrcalculator" element={<BMRCalculator />} />
-                <Route path="/macrocalculator" element={<MacroTrackingCalculator />} />
-                <Route path="/caloriecalculator" element={<MacroTrackingCalculator />} />
-                <Route path="/workouttimer" element={<WorkoutTimer />} />
+                <Route path="/tools/1rm-calculator" element={<OneRMCalculator />} />
+                <Route path="/tools/bmr-calculator" element={<BMRCalculator />} />
+                <Route path="/tools/macro-calculator" element={<MacroTrackingCalculator />} />
+                <Route path="/tools/workout-timer" element={<WorkoutTimer />} />
+                <Route path="/1rmcalculator" element={<Navigate to="/tools/1rm-calculator" replace />} />
+                <Route path="/bmrcalculator" element={<Navigate to="/tools/bmr-calculator" replace />} />
+                <Route path="/macrocalculator" element={<Navigate to="/tools/macro-calculator" replace />} />
+                <Route path="/caloriecalculator" element={<Navigate to="/tools/macro-calculator" replace />} />
+                <Route path="/workouttimer" element={<Navigate to="/tools/workout-timer" replace />} />
 
                 <Route element={<ProtectedRoute><AuthenticatedLayout /></ProtectedRoute>}>
                   <Route path="/userdashboard" element={<UserDashboard />} />
@@ -258,7 +262,8 @@ const AppContent = () => {
                 </Route>
                 
                 {/* Public calorie counter - no auth required */}
-                <Route path="/caloriecounter" element={<CalorieCounter />} />
+                <Route path="/tools/calorie-counter" element={<CalorieCounter />} />
+                <Route path="/caloriecounter" element={<Navigate to="/tools/calorie-counter" replace />} />
                 
                 {/* Redirect /dashboard to /userdashboard */}
                 <Route path="/dashboard" element={<DashboardRedirect />} />

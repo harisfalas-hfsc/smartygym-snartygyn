@@ -219,17 +219,17 @@ const MacroTrackingCalculator = () => {
         <meta property="og:title" content="Macro Calculator - Smarty Gym" />
         <meta property="og:description" content="Free macronutrient calculator - convenient nutrition tool at smartygym.com" />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://smartygym.com/macrocalculator" />
+        <meta property="og:url" content="https://smartygym.com/tools/macro-calculator" />
         
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Macro Calculator - Smarty Gym" />
         <meta name="twitter:description" content="Free macro calculator at smartygym.com for personalized nutrition" />
         
-        <link rel="canonical" href="https://smartygym.com/macrocalculator" />
+        <link rel="canonical" href="https://smartygym.com/tools/macro-calculator" />
         <script type="application/ld+json">{JSON.stringify(generateToolWebApplicationSchema({
           name: "Macro Tracking Calculator",
           description: "Free macronutrient calculator by Sports Scientist Haris Falas. Personalized protein, carbs, and fat targets for weight loss, maintenance, or muscle gain.",
-          url: "/macrocalculator",
+          url: "/tools/macro-calculator",
           keywords: ["macro calculator", "macronutrient calculator", "protein calculator", "TDEE", "nutrition planning", "Haris Falas", "SmartyGym"]
         }))}</script>
       </Helmet>
