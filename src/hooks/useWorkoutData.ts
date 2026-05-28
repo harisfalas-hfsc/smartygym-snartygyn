@@ -5,6 +5,7 @@ import { buildUniqueContentSlugs, slugifyContentName } from "@/lib/seo-slugs";
 
 export interface WorkoutData {
   id: string;
+  canonical_slug?: string | null;
   category: string;
   name: string;
   difficulty_stars: number | null;
@@ -43,13 +44,17 @@ export const useWorkoutData = (workoutId: string | undefined) => {
       const resolveFromMetadata = async () => {
         const metadata = await fetchVisibleWorkoutMetadata(null);
         const uniqueSlugs = buildUniqueContentSlugs(metadata);
-        return metadata.find(
+        const workout = metadata.find(
           (workout) =>
             workout.id === workoutId ||
             slugifyContentName(workout.name || workout.id) === workoutId ||
             uniqueSlugs.get(workout.id) === workoutId,
         );
+        return workout ? { ...workout, canonical_slug: uniqueSlugs.get(workout.id) || slugifyContentName(workout.name || workout.id) } : undefined;
       };
+
+      const metadataMatch = await resolveFromMetadata();
+      if (metadataMatch) return metadataMatch as WorkoutData;
       
       const { data, error } = await supabase
         .from("admin_workouts")
@@ -59,18 +64,13 @@ export const useWorkoutData = (workoutId: string | undefined) => {
         .maybeSingle();
 
       if (error) {
-        const fallback = await resolveFromMetadata();
-        if (!fallback) throw error;
-        return fallback as WorkoutData;
+        throw error;
       }
       if (!data) {
-        const fallback = await resolveFromMetadata();
-        if (!fallback) throw new Error("Workout not found");
-
-        return fallback as WorkoutData;
+        throw new Error("Workout not found");
       }
 
-      return data as WorkoutData;
+      return { ...data, canonical_slug: slugifyContentName(data.name || data.id) } as WorkoutData;
     },
     enabled: !!workoutId,
     // Ensure detail pages always reflect latest backend content updates
