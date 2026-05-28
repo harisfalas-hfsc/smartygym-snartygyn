@@ -48,7 +48,7 @@ const toSafeCanonicalHref = (href: string): string => {
   }
 };
 
-const normalizeInternalLinks = (html: string): string =>
+export const normalizeInternalLinks = (html: string): string =>
   html.replace(/href=(['"])(.*?)\1/gi, (_match, quote: string, href: string) => `href=${quote}${toSafeCanonicalHref(href)}${quote}`);
 
 export const HTMLContent: React.FC<HTMLContentProps> = ({ content, className }) => {
