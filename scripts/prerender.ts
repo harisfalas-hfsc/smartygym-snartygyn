@@ -55,24 +55,6 @@ function cleanUrlSourceFile(distDir: string, routePath: string, allPaths: Set<st
     : join(distDir, cleanPath);
 }
 
-function redirectHtml(from: string, to: string) {
-  const escapedTo = to.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
-  return `<!doctype html>
-<html lang="en-GB">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="robots" content="noindex, follow" />
-    <meta http-equiv="refresh" content="0;url=${escapedTo}" />
-    <link rel="canonical" href="https://smartygym.com${escapedTo}" />
-    <title>Redirecting | SmartyGym</title>
-  </head>
-  <body>
-    <p>Redirecting to <a href="${escapedTo}">${escapedTo}</a>.</p>
-    <script>location.replace(${JSON.stringify(to)});</script>
-  </body>
-</html>`;
-}
-
 function writeCleanUrlRewrites(distDir: string, cleanPaths: string[], redirects: Array<{ from: string; to: string; status: 301 }> = []) {
   // Lovable's static host can serve the SPA fallback for clean URLs like
   // /blog/<slug> unless we explicitly point them at their generated folder
@@ -138,6 +120,7 @@ export async function prerenderSeoHtml(options: {
   };
 
   const cleanPaths: string[] = [];
+  const allPaths = new Set(routes.map((route) => route.path));
   const reportRows: string[] = [
     "# SmartyGym SEO prerender report",
     "",
@@ -159,12 +142,12 @@ export async function prerenderSeoHtml(options: {
       continue;
     }
 
-    const cleanPath = route.path.replace(/^\//, "");
-    // Crawler-safe static output: the clean public URL `/foo/bar` maps to a
-    // real static file at `dist/foo/bar/index.html`. We deliberately avoid
-    // extensionless files (`dist/foo/bar`) because they conflict with this
-    // directory pattern and were not reliable on the live host.
-    const sourceFile = join(distDir, cleanPath, "index.html");
+    // Crawler-safe static output: leaf clean URLs like `/blog/article-slug`
+    // are written as exact files (`dist/blog/article-slug`). The live host was
+    // serving the SPA shell for those URLs even when `_redirects` pointed at
+    // `dist/blog/article-slug/index.html`; exact files make raw curl/page-source
+    // receive the real per-page HTML before JavaScript.
+    const sourceFile = cleanUrlSourceFile(distDir, route.path, allPaths);
     writeHtml(sourceFile, html);
     reportRows.push(`| ${route.path} | ${sourceFile.replace(`${distDir}/`, "dist/")} |`);
     cleanPaths.push(route.path);
