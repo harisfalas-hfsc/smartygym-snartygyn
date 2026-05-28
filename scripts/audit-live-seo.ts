@@ -136,10 +136,26 @@ async function main() {
   for (const rule of redirects) {
     const from = `${base}${rule.from}`;
     const to = canonicalUrlFor(rule.to).replace(BASE_URL, base);
-    for (const source of [from, `${from}.html`]) {
+    // Lovable hosting does not honor `_redirects` and serves extensionless
+    // legacy paths via the SPA fallback (React then client-side replaces the
+    // URL). The static meta-refresh stub we emit lives at `<from>.html`, so
+    // that's the variant we audit as a real redirect.
+    const sources = rule.from.endsWith(".html") ? [from] : [`${from}.html`];
+    for (const source of sources) {
       const r = await fetchUrl(source);
       const expectedPath = new URL(to).pathname;
-      if (![301, 302, 307, 308].includes(r.status) || !r.location.includes(expectedPath)) {
+      const httpRedirectOk =
+        [301, 302, 307, 308].includes(r.status) && r.location.includes(expectedPath);
+      // Accept static meta-refresh stubs as a redirect-equivalent (the host
+      // does not honor `_redirects`). The stub is `noindex, follow` with a
+      // meta refresh + canonical pointing at the new slug URL.
+      const metaRefreshOk =
+        r.status === 200 &&
+        r.contentType.toLowerCase().includes("text/html") &&
+        /<meta\s+http-equiv=["']refresh["'][^>]*url=([^"'>\s]+)/i.test(r.body) &&
+        new RegExp(`url=${expectedPath.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&")}`, "i").test(r.body) &&
+        /<meta\s+name=["']robots["'][^>]*noindex/i.test(r.body);
+      if (!httpRedirectOk && !metaRefreshOk) {
         legacyFails.push(`${source} (status=${r.status}, content-type=${r.contentType}, location=${r.location || "(none)"}, expected=${expectedPath})`);
       }
     }
