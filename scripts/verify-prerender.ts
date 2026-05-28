@@ -78,7 +78,8 @@ function assertRedirectRule(redirectsFile: string, from: string, to: string) {
   const target = canonicalPathFor(to);
   const expected = `${from} ${target} 301!`;
   const expectedTrailing = `${from}/ ${target} 301!`;
-  if (!redirectsFile.includes(expected) || !redirectsFile.includes(expectedTrailing)) {
+  const expectedHtml = from.endsWith(".html") ? expected : `${from}.html ${target} 301!`;
+  if (!redirectsFile.includes(expected) || !redirectsFile.includes(expectedTrailing) || !redirectsFile.includes(expectedHtml)) {
     throw new Error(`[verify-prerender] missing legacy ID redirect from ${from} to ${to}`);
   }
 }
