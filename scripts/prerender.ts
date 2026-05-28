@@ -35,7 +35,7 @@ function ensureParentDirectoryForFile(outPath: string) {
   mkdirSync(parentDir, { recursive: true });
 }
 
-function writeHeadersFile(distDir: string, routePaths: string[] = []) {
+function writeHeadersFile(distDir: string) {
   // Force HTML MIME type for every prerendered .html artifact (all non-root
   // canonical URLs end in .html in Option A).
   const lines: string[] = [
@@ -110,11 +110,6 @@ export async function prerenderSeoHtml(options: {
   const template = normalizeTemplate(readFileSync(templatePath, "utf8"));
 
   const { routes, redirects, counts } = await buildSeoRoutes();
-  const parentRoutePaths = new Set(
-    routes
-      .filter((route) => route.path !== "/" && routes.some((other) => other.path.startsWith(`${route.path}/`)))
-      .map((route) => route.path),
-  );
   console.log(
     `[prerender] rendering ${counts.total} routes (` +
       `static=${counts.static}, workout-cat=${counts.workoutCategory}, ` +
@@ -162,7 +157,7 @@ export async function prerenderSeoHtml(options: {
     reportRows.push(`| ${route.path} | ${dotHtmlFile.replace(`${distDir}/`, "dist/")} |`);
   }
   writeCleanUrlRewrites(distDir, allRoutePaths, redirects);
-  writeHeadersFile(distDir, allRoutePaths);
+  writeHeadersFile(distDir);
   writeFileSync(join(distDir, "seo-prerender-report.md"), `${reportRows.join("\n")}\n`);
   console.log(`[prerender] wrote ${written} HTML files into ${distDir.replace(process.cwd() + "/", "")}/`);
 }
