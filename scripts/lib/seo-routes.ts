@@ -53,6 +53,7 @@ export const MIN_EXPECTED_DYNAMIC_PROGRAMS = 10;
 export const MIN_EXPECTED_DYNAMIC_BLOG_ARTICLES = 1;
 
 const STATIC_LEGACY_REDIRECTS: Array<{ from: string; to: string; status: 301 }> = [
+  { from: "/blog/amrap-vs-emom-vs-tabata", to: "/blog/amrap-vs-emom-vs-tabata-which-is-best", status: 301 },
   { from: "/1rmcalculator", to: "/tools/1rm-calculator", status: 301 },
   { from: "/bmrcalculator", to: "/tools/bmr-calculator", status: 301 },
   { from: "/macrocalculator", to: "/tools/macro-calculator", status: 301 },
@@ -679,6 +680,13 @@ export async function buildSeoRoutes(): Promise<SeoRouteBundle> {
         priority: "0.6",
         payload: b,
       });
+      if (String(b.slug).endsWith("-which-is-best")) {
+        redirects.push({
+          from: `/blog/${String(b.slug).replace(/-which-is-best$/, "")}`,
+          to: `/blog/${b.slug}`,
+          status: 301,
+        });
+      }
       dynamicBlog++;
     }
   }

@@ -79,7 +79,7 @@ const IndividualTrainingProgram = () => {
     const hasAccess = userTier === "premium" || alreadyPurchased || !isPremium;
     
     const programCategorySlug = getProgramCategorySlug(dbProgram.category, type || "functional-strength");
-    const programUrl = `https://smartygym.com/trainingprogram/${programCategorySlug}/${dbProgram.canonical_slug || slugifyContentName(dbProgram.name || dbProgram.id)}`;
+    const programUrl = `https://smartygym.com/trainingprogram/${programCategorySlug}/${dbProgram.canonical_slug || slugifyContentName(dbProgram.name || dbProgram.id)}.html`;
     const imageAlt = generateProgramAltText(dbProgram);
 
     return (

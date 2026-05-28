@@ -3,6 +3,7 @@ import DOMPurify from 'dompurify';
 import { cn } from '@/lib/utils';
 import { parseExerciseMarkup } from '@/utils/exerciseMatching';
 import ExerciseLinkButton from '@/components/ExerciseLinkButton';
+import { normalizeInternalLinks } from '@/components/ui/html-content';
 
 interface ExerciseHTMLContentProps {
   content: string;
@@ -136,11 +137,11 @@ export const ExerciseHTMLContent: React.FC<ExerciseHTMLContentProps> = ({
 
   // Fallback: render without exercise linking
   if (!processedContent) {
-    const sanitizedContent = DOMPurify.sanitize(content, {
+    const sanitizedContent = normalizeInternalLinks(DOMPurify.sanitize(content, {
       ALLOWED_TAGS,
       ALLOWED_ATTR,
       ALLOW_DATA_ATTR: false,
-    });
+    }));
 
     return (
       <div
@@ -153,11 +154,11 @@ export const ExerciseHTMLContent: React.FC<ExerciseHTMLContentProps> = ({
   
   const { html, exercises: exerciseList } = processedContent;
   
-  const sanitizedHtml = DOMPurify.sanitize(html, {
+  const sanitizedHtml = normalizeInternalLinks(DOMPurify.sanitize(html, {
     ALLOWED_TAGS,
     ALLOWED_ATTR,
     ALLOW_DATA_ATTR: false,
-  });
+  }));
   
   if (exerciseList.length === 0) {
     return (

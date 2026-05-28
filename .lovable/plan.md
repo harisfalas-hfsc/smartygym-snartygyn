@@ -1,148 +1,95 @@
-## Findings from the audit
+Yes — I can fix this. I checked the live website, not just the one article.
 
-The current problem is systemic, not one broken blog article.
+Here is the clear truth in human language:
 
-1. **Google Search Console sees the sitemap but indexes 0 submitted URLs**
-   - Search Console API reports:
-     - `sitemap.xml` submitted: **640 URLs**
-     - indexed: **0**
-     - sitemap errors: **0**
+What is still correct:
+- Google can open your sitemap.
+- Your sitemap currently has 636 URLs.
+- Every URL inside the current sitemap returns 200, not 404.
+- Robots.txt and firewall are not blocking Google.
+- The real `.html` pages are mostly available as pages.
 
-2. **The `.html` URLs are mostly correct**
-   - Example: `https://smartygym.com/blog/amrap-vs-emom-vs-tabata-which-is-best.html`
-   - Returns `200`, `text/html`, correct title, correct canonical, correct H1/content.
+What is wrong:
+- The clean version of almost every page is broken as a normal web URL.
+- I tested the live site and found 616 clean URLs returning `application/octet-stream`.
+- That means Chrome can download them as files instead of opening them as pages.
+- This is why you saw links starting a download.
+- The screenshot URL is also an old/stale article URL:
+  `https://smartygym.com/blog/amrap-vs-emom-vs-tabata.html`
+  That exact URL is live 404.
+- The current correct article URL is:
+  `https://smartygym.com/blog/amrap-vs-emom-vs-tabata-which-is-best.html`
+- So the problem is not only one article. The bigger problem is the clean URL / `.html` URL system created during the SEO fixes.
 
-3. **The clean URLs are still wrong on the live domain**
-   - Example: `https://smartygym.com/blog/amrap-vs-emom-vs-tabata-which-is-best`
-   - Returns `200`, but serves the **homepage SEO shell**:
-     - title: `SmartyGym | Online Fitness Platform by Haris Falas`
-     - canonical: `https://smartygym.com/`
-     - H1: homepage H1
-   - Same issue confirmed for workouts and tools.
+What I will fix:
 
-4. **The previous `_redirects` approach is not reliable on the live host**
-   - The code writes `_redirects`, but the live clean URLs are not redirecting to `.html`.
-   - So the build currently passes locally while the deployed website is still wrong for Google.
+1. Stop pages from downloading
+- Remove the generated extensionless files that the host serves as downloads.
+- Keep real public pages on `.html` URLs because those are currently served correctly as `text/html`.
+- Make clean URLs redirect to the `.html` page instead of downloading a file.
 
-5. **The sitemap still includes some utility/private URLs**
-   - Routes like auth/reset/newsletter pages should not be in the indexable sitemap if robots blocks or noindexes them.
+Example:
+- Bad now: `/blog/amrap-vs-emom-vs-tabata-which-is-best` downloads.
+- Fixed: `/blog/amrap-vs-emom-vs-tabata-which-is-best` redirects to `/blog/amrap-vs-emom-vs-tabata-which-is-best.html`.
 
-## Plan to fix it properly
+2. Restore old URLs that Google already knows
+- Add permanent redirects for old article/workout/program URLs that changed.
+- The screenshot URL will not stay 404.
+- It will redirect to the correct current article.
 
-### 1. Choose one canonical URL system and enforce it everywhere
-Use `.html` as the canonical public URL format for all indexable pages until the hosting layer reliably serves clean URLs with correct static HTML.
+Example:
+- Bad now: `/blog/amrap-vs-emom-vs-tabata.html` is 404.
+- Fixed: it redirects to `/blog/amrap-vs-emom-vs-tabata-which-is-best.html`.
 
-That means these must all agree:
-- sitemap URLs
-- canonical tags
-- Open Graph URLs
-- prerendered HTML files
-- internal links to public SEO pages
-- generated breadcrumbs
-- runtime route handling
+3. Check every sitemap URL, not only one example
+- Recheck all 636 sitemap URLs.
+- Confirm no sitemap URL returns 404.
+- Confirm no sitemap URL returns download content.
+- Confirm Googlebot gets proper HTML pages.
 
-No mixed clean/`.html` system.
+4. Check every clean version of sitemap URLs
+- For each `.html` sitemap URL, test the clean version too.
+- Clean versions must redirect to `.html`.
+- Clean versions must not return `application/octet-stream`.
+- Clean versions must not download.
 
-### 2. Fix clean URL damage instead of pretending redirects work
-Since live `_redirects` is not working, I will add a client-side safety redirect for public SEO routes:
+5. Fix internal links inside pages
+- Check blog article content links.
+- Check workout links.
+- Check training program links.
+- Fix links that point to clean URLs if those clean URLs can download.
+- Public links should point to stable page URLs.
 
-```text
-/blog/article-slug        -> /blog/article-slug.html
-/workout/type/slug        -> /workout/type/slug.html
-/trainingprogram/type/slug -> /trainingprogram/type/slug.html
-/tools/bmr-calculator     -> /tools/bmr-calculator.html
-/about                    -> /about.html
-```
+6. Fix the build safety check
+- Add a rule that fails the SEO build if a clean URL artifact would be generated again.
+- Add a rule that fails if clean URLs are not redirected properly.
+- This prevents the same mess from coming back in the next publish.
 
-The existing route normalization will still let React render `.html` URLs correctly, but the browser URL and canonical target will be the same `.html` URL.
+7. Keep sitemap numbers honest
+- I will not invent pages to make the number look bigger.
+- I will report the exact final count by type:
+  - static pages
+  - workout category pages
+  - training program category pages
+  - workout pages
+  - training program pages
+  - blog pages
+- If a page is missing, I will identify which one, not guess.
 
-### 3. Remove non-indexable utility pages from the sitemap
-Remove from `scripts/lib/seo-routes.ts` sitemap generation:
-- `/auth`
-- `/reset-password`
-- `/newsletter-thank-you`
-- `/premium-comparison`
-- `/premiumcomparison`
-- any private/admin/success/unsubscribe route that should not be indexed
+8. Final live verification after publish
+After implementation and publish, I will test live `smartygym.com` again and report:
+- screenshot URL status
+- correct article URL status
+- clean URL redirect status
+- download-risk count
+- sitemap URL count
+- sitemap 404 count
+- robots/firewall status
 
-These can still exist in the app; they just should not be submitted to Google as public content pages.
+What you need to do:
+- Approve this plan.
+- I will implement the cleanup.
+- Then you publish once.
+- Then I recheck the live website before saying it is done.
 
-### 4. Make internal public links use the canonical `.html` URLs
-Add a central SEO URL helper and update public-facing generated links for:
-- blog list/article links
-- workout category/detail links
-- training program category/detail links
-- tool links
-- static public nav/footer links where appropriate
-- prerendered breadcrumb/body links
-
-This prevents Google from discovering clean URLs from inside the site.
-
-### 5. Strengthen build verification so it cannot lie again
-Update the verification scripts so the build fails if:
-- any sitemap URL lacks a matching prerendered `.html` file
-- any prerendered page has homepage title/canonical by mistake
-- any page has more than one canonical
-- any blog/workout/program page lacks real H1/body content
-- any blocked/private route appears in sitemap
-- dynamic counts suddenly drop below safe thresholds
-
-Also remove false confidence around `_redirects` as the main fix, because live testing proved it is not enough.
-
-### 6. Add a real live-domain SEO audit script
-Create a post-publish audit script that checks the actual live website, not just `dist`.
-
-It will test samples across:
-- homepage
-- blog index
-- blog articles
-- workout categories
-- individual workouts
-- training program categories
-- individual training programs
-- tools
-- about/coach/legal pages
-
-For each sampled URL it will verify:
-- HTTP status is `200`
-- content type is `text/html`
-- title is not the homepage title unless it is the homepage
-- canonical equals the expected sitemap URL
-- H1 exists and is not the homepage H1 on non-home pages
-- page contains real prerendered content
-- robots are not blocking it
-
-It will also test clean URL counterparts and report whether they redirect/render to the canonical `.html` page.
-
-### 7. Re-submit and re-check in Google Search Console after publish
-After the code is implemented and published, I will use the Search Console connector to:
-- confirm verified property access
-- re-submit `https://smartygym.com/sitemap.xml`
-- re-read sitemap status
-- confirm Google can download it with zero sitemap errors
-- report the submitted URL count again
-
-### 8. Final acceptance checklist before saying “done”
-I will not say done until these pass:
-
-```text
-Local build verification: PASS
-Generated sitemap count: PASS
-No blocked/private URLs in sitemap: PASS
-Representative .html pages live: PASS
-Representative clean URLs handled safely: PASS
-Google Search Console sitemap status: PASS
-Report delivered with exact tested URLs: PASS
-```
-
-## Files expected to change
-
-- `scripts/lib/seo-routes.ts`
-- `scripts/lib/seo-render.ts`
-- `scripts/verify-prerender.ts`
-- `scripts/prerender.ts` if needed
-- `src/App.tsx`
-- selected public link components/pages that generate clean links
-- possibly a new `scripts/audit-live-seo.ts`
-
-No workout/program/blog content will be deleted. This is an SEO routing, sitemap, canonical, and verification fix.
+This is the cleanup: remove the download-causing clean files, force clean URLs to real page redirects, restore stale Google URLs, and audit the whole sitemap instead of one page.

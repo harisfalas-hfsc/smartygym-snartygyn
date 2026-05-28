@@ -78,7 +78,8 @@ function assertRedirectRule(redirectsFile: string, from: string, to: string) {
   const target = canonicalPathFor(to);
   const expected = `${from} ${target} 301!`;
   const expectedTrailing = `${from}/ ${target} 301!`;
-  if (!redirectsFile.includes(expected) || !redirectsFile.includes(expectedTrailing)) {
+  const expectedHtml = from.endsWith(".html") ? expected : `${from}.html ${target} 301!`;
+  if (!redirectsFile.includes(expected) || !redirectsFile.includes(expectedTrailing) || !redirectsFile.includes(expectedHtml)) {
     throw new Error(`[verify-prerender] missing legacy ID redirect from ${from} to ${to}`);
   }
 }
@@ -86,11 +87,6 @@ function assertRedirectRule(redirectsFile: string, from: string, to: string) {
 export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
   const distDir = options.distDir || DIST;
   const { routes, redirects: legacyRedirects, counts } = await buildSeoRoutes();
-  const parentRoutePaths = new Set(
-    routes
-      .filter((route) => route.path !== "/" && routes.some((other) => other.path.startsWith(`${route.path}/`)))
-      .map((route) => route.path),
-  );
   const redirectsPath = join(distDir, "_redirects");
   if (!isFile(redirectsPath)) {
     throw new Error("[verify-prerender] missing dist/_redirects for clean URL rewrites");
@@ -113,15 +109,9 @@ export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
     }
 
     const html = readFileSync(artifactPath, "utf8");
-    if (!parentRoutePaths.has(route.path)) {
-      const cleanArtifactPath = cleanArtifactFileFor(distDir, route.path);
-      if (!isFile(cleanArtifactPath)) {
-        throw new Error(`[verify-prerender] missing extensionless clean URL artifact for ${route.path}: expected ${cleanArtifactPath}`);
-      }
-      const cleanHtml = readFileSync(cleanArtifactPath, "utf8");
-      if (route.path !== "/" && cleanHtml !== html) {
-        throw new Error(`[verify-prerender] clean URL artifact does not match .html artifact for ${route.path}`);
-      }
+    const cleanArtifactPath = cleanArtifactFileFor(distDir, route.path);
+    if (route.path !== "/" && isFile(cleanArtifactPath)) {
+      throw new Error(`[verify-prerender] extensionless clean URL artifact would be served as a download: ${cleanArtifactPath}`);
     }
     const canonicalUrl = canonicalUrlFor(route.path);
     assertNotHomepageShell(html, route.path);

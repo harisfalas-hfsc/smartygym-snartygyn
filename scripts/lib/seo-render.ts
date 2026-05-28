@@ -62,7 +62,33 @@ function sectionHtml(label: string, raw: string | null | undefined): string {
   if (!raw || !stripHtml(raw)) return "";
   // Admin-authored HTML is already sanitized in the app; we trust it the same
   // way the React app does and insert as-is.
-  return `<section class="seo-section"><h2>${htmlEscape(label)}</h2>${raw}</section>`;
+  return `<section class="seo-section"><h2>${htmlEscape(label)}</h2>${normalizeInternalLinks(raw)}</section>`;
+}
+
+const HTML_CANONICAL_PREFIXES = [
+  "/blog", "/workout", "/trainingprogram", "/tools", "/coach-profile", "/coach-cv",
+  "/the-smarty-method", "/about", "/about-smartygym", "/best-online-fitness-platform",
+  "/why-invest-in-smartygym", "/wod-archive", "/daily-ritual", "/exerciselibrary",
+  "/community", "/shop", "/contact", "/faq", "/smarty-plans", "/joinpremium",
+  "/join-premium", "/corporate", "/corporate-wellness",
+];
+
+function normalizeInternalLinks(html: string): string {
+  return html.replace(/href=(["'])(.*?)\1/gi, (_match, quote: string, href: string) => {
+    if (!href || href.startsWith("#") || href.startsWith("mailto:") || href.startsWith("tel:")) return `href=${quote}${href}${quote}`;
+    try {
+      const url = href.startsWith("http") ? new URL(href) : new URL(href, BASE_URL);
+      if (url.hostname && !["smartygym.com", "www.smartygym.com"].includes(url.hostname)) return `href=${quote}${href}${quote}`;
+      const path = url.pathname.replace(/\/+$/g, "") || "/";
+      if (path === "/" || path.endsWith(".html")) return `href=${quote}${href}${quote}`;
+      if (!HTML_CANONICAL_PREFIXES.some((prefix) => path === prefix || path.startsWith(`${prefix}/`))) return `href=${quote}${href}${quote}`;
+      const canonicalPath = `${path}.html${url.search}${url.hash}`;
+      const nextHref = href.startsWith("http") ? `${BASE_URL}${canonicalPath}` : canonicalPath;
+      return `href=${quote}${attrEscape(nextHref)}${quote}`;
+    } catch {
+      return `href=${quote}${href}${quote}`;
+    }
+  });
 }
 
 /** Build a list of JSON-LD blocks + the crawlable body HTML for a route. */
@@ -120,20 +146,20 @@ export function renderRouteBody(route: SeoRoute): {
       bodyHtml: `
 <main class="seo-prerender seo-article">
   <nav class="seo-breadcrumbs" aria-label="Breadcrumb">
-    <a href="/">Home</a> &rsaquo; <a href="/blog">Blog</a> &rsaquo; <span>${htmlEscape(a.title || "")}</span>
+    <a href="/">Home</a> &rsaquo; <a href="/blog.html">Blog</a> &rsaquo; <span>${htmlEscape(a.title || "")}</span>
   </nav>
   <article>
     <header>
       <p class="seo-eyebrow">${htmlEscape(a.category || "Fitness")}</p>
       <h1>${htmlEscape(a.title || "")}</h1>
-      <p class="seo-byline">By <a href="/coach-profile">${htmlEscape(author)}</a>${
+      <p class="seo-byline">By <a href="/coach-profile.html">${htmlEscape(author)}</a>${
         dateLabel ? ` &middot; <time datetime="${attrEscape(published)}">${htmlEscape(dateLabel)}</time>` : ""
       }${a.read_time ? ` &middot; ${htmlEscape(String(a.read_time))}` : ""}</p>
       ${credentials}
       <p class="seo-excerpt">${htmlEscape(stripHtml(a.excerpt) || "")}</p>
       ${cover}
     </header>
-    <div class="seo-article-body">${a.content || ""}</div>
+    <div class="seo-article-body">${normalizeInternalLinks(a.content || "")}</div>
   </article>
 </main>`,
       jsonLd,
@@ -187,7 +213,7 @@ export function renderRouteBody(route: SeoRoute): {
       bodyHtml: `
 <main class="seo-prerender seo-workout">
   <nav class="seo-breadcrumbs" aria-label="Breadcrumb">
-    <a href="/">Home</a> &rsaquo; <a href="/workout">Smarty Workouts</a> &rsaquo; <span>${htmlEscape(w.name || "")}</span>
+    <a href="/">Home</a> &rsaquo; <a href="/workout.html">Smarty Workouts</a> &rsaquo; <span>${htmlEscape(w.name || "")}</span>
   </nav>
   <article>
     <header>
@@ -195,7 +221,7 @@ export function renderRouteBody(route: SeoRoute): {
       <ul class="seo-meta">${metaRow}</ul>
       ${cover}
       <p class="seo-excerpt">${htmlEscape(stripHtml(w.description) || "")}</p>
-      <p class="seo-author">By <a href="/coach-profile">${htmlEscape(AUTHOR.name)}</a> &middot; ${htmlEscape(AUTHOR.jobTitle)}</p>
+      <p class="seo-author">By <a href="/coach-profile.html">${htmlEscape(AUTHOR.name)}</a> &middot; ${htmlEscape(AUTHOR.jobTitle)}</p>
     </header>
     ${sectionHtml("Warm-Up", w.warm_up)}
     ${sectionHtml("Activation", w.activation)}
@@ -255,7 +281,7 @@ export function renderRouteBody(route: SeoRoute): {
       bodyHtml: `
 <main class="seo-prerender seo-program">
   <nav class="seo-breadcrumbs" aria-label="Breadcrumb">
-    <a href="/">Home</a> &rsaquo; <a href="/trainingprogram">Smarty Programs</a> &rsaquo; <span>${htmlEscape(p.name || "")}</span>
+    <a href="/">Home</a> &rsaquo; <a href="/trainingprogram.html">Smarty Programs</a> &rsaquo; <span>${htmlEscape(p.name || "")}</span>
   </nav>
   <article>
     <header>
@@ -263,7 +289,7 @@ export function renderRouteBody(route: SeoRoute): {
       <ul class="seo-meta">${metaRow}</ul>
       ${cover}
       <p class="seo-excerpt">${htmlEscape(stripHtml(p.description) || "")}</p>
-      <p class="seo-author">Designed by <a href="/coach-profile">${htmlEscape(AUTHOR.name)}</a> &middot; ${htmlEscape(AUTHOR.jobTitle)}</p>
+      <p class="seo-author">Designed by <a href="/coach-profile.html">${htmlEscape(AUTHOR.name)}</a> &middot; ${htmlEscape(AUTHOR.jobTitle)}</p>
     </header>
     ${sectionHtml("Overview", p.overview)}
     ${sectionHtml("Target Audience", p.target_audience)}
@@ -298,15 +324,15 @@ export function renderRouteBody(route: SeoRoute): {
       <h1>${htmlEscape(route.title.replace(/\s*\|\s*SmartyGym.*$/, ""))}</h1>
       <p class="seo-excerpt">${htmlEscape(route.description)}</p>
     </header>
-    <p>This page is part of <a href="/">SmartyGym</a>, the online fitness platform by Sports Scientist <a href="/coach-profile">Haris Falas</a>. 100% human-designed training — no AI-generated workouts.</p>
+    <p>This page is part of <a href="/">SmartyGym</a>, the online fitness platform by Sports Scientist <a href="/coach-profile.html">Haris Falas</a>. 100% human-designed training — no AI-generated workouts.</p>
     <nav class="seo-nav" aria-label="Explore SmartyGym">
       <ul>
-        <li><a href="/workout">Smarty Workouts</a></li>
-        <li><a href="/trainingprogram">Smarty Training Programs</a></li>
-        <li><a href="/workout/wod">Workout of the Day</a></li>
-        <li><a href="/blog">SmartyGym Blog</a></li>
-        <li><a href="/tools">Smarty Tools</a></li>
-        <li><a href="/exerciselibrary">Exercise Library</a></li>
+        <li><a href="/workout.html">Smarty Workouts</a></li>
+        <li><a href="/trainingprogram.html">Smarty Training Programs</a></li>
+        <li><a href="/workout/wod.html">Workout of the Day</a></li>
+        <li><a href="/blog.html">SmartyGym Blog</a></li>
+        <li><a href="/tools.html">Smarty Tools</a></li>
+        <li><a href="/exerciselibrary.html">Exercise Library</a></li>
       </ul>
     </nav>
   </article>

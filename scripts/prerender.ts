@@ -35,7 +35,7 @@ function ensureParentDirectoryForFile(outPath: string) {
   mkdirSync(parentDir, { recursive: true });
 }
 
-function writeHeadersFile(distDir: string, routePaths: string[] = []) {
+function writeHeadersFile(distDir: string) {
   // Force HTML MIME type for every prerendered .html artifact (all non-root
   // canonical URLs end in .html in Option A).
   const lines: string[] = [
@@ -49,15 +49,6 @@ function writeHeadersFile(distDir: string, routePaths: string[] = []) {
     "  Content-Type: text/html; charset=utf-8",
     "  X-Robots-Tag: index, follow",
     "",
-    ...routePaths
-      .filter((p) => p !== "/")
-      .sort()
-      .flatMap((p) => [
-        p,
-        "  Content-Type: text/html; charset=utf-8",
-        "  X-Robots-Tag: index, follow",
-        "",
-      ]),
   ];
   writeFileSync(join(distDir, "_headers"), lines.join("\n"));
 }
@@ -78,8 +69,9 @@ function writeCleanUrlRewrites(
     if (seen.has(key) || rule.from === rule.to) continue;
     seen.add(key);
     const target = canonicalPathFor(rule.to);
-    rules.push(`${rule.from} ${target} ${rule.status}!`);
-    rules.push(`${rule.from}/ ${target} ${rule.status}!`);
+    const legacySources = new Set([rule.from, `${rule.from}/`]);
+    if (!rule.from.endsWith(".html")) legacySources.add(`${rule.from}.html`);
+    for (const source of legacySources) rules.push(`${source} ${target} ${rule.status}!`);
   }
   for (const p of [...routePaths].sort()) {
     if (p === "/") continue;
@@ -118,11 +110,6 @@ export async function prerenderSeoHtml(options: {
   const template = normalizeTemplate(readFileSync(templatePath, "utf8"));
 
   const { routes, redirects, counts } = await buildSeoRoutes();
-  const parentRoutePaths = new Set(
-    routes
-      .filter((route) => route.path !== "/" && routes.some((other) => other.path.startsWith(`${route.path}/`)))
-      .map((route) => route.path),
-  );
   console.log(
     `[prerender] rendering ${counts.total} routes (` +
       `static=${counts.static}, workout-cat=${counts.workoutCategory}, ` +
@@ -160,22 +147,17 @@ export async function prerenderSeoHtml(options: {
       continue;
     }
 
-    // Option A primary: every non-root route is written to `dist/<path>.html`.
-    // Belt-and-braces fallback: also write an exact extensionless artifact so
-    // clean URLs receive real prerendered HTML even when the host ignores
-    // `_redirects` and would otherwise serve the SPA homepage shell.
+    // Option A primary: every non-root route is written only to
+    // `dist/<path>.html`. Do NOT write extensionless files: this host serves
+    // them as application/octet-stream, which makes browsers download pages.
     const cleanPath = route.path.replace(/^\//, "");
     const dotHtmlFile = join(distDir, `${cleanPath}.html`);
-    const cleanUrlFile = join(distDir, cleanPath);
     writeHtml(dotHtmlFile, html);
-    if (!parentRoutePaths.has(route.path)) {
-      writeHtml(cleanUrlFile, html);
-    }
     allRoutePaths.push(route.path);
-    reportRows.push(`| ${route.path} | ${dotHtmlFile.replace(`${distDir}/`, "dist/")} + clean URL artifact |`);
+    reportRows.push(`| ${route.path} | ${dotHtmlFile.replace(`${distDir}/`, "dist/")} |`);
   }
   writeCleanUrlRewrites(distDir, allRoutePaths, redirects);
-  writeHeadersFile(distDir, allRoutePaths);
+  writeHeadersFile(distDir);
   writeFileSync(join(distDir, "seo-prerender-report.md"), `${reportRows.join("\n")}\n`);
   console.log(`[prerender] wrote ${written} HTML files into ${distDir.replace(process.cwd() + "/", "")}/`);
 }
