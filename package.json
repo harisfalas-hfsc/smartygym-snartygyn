@@ -10,8 +10,9 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "generate:sitemap": "bunx tsx scripts/generate-sitemap.ts",
-    "predev": "bunx tsx scripts/generate-sitemap.ts",
-    "prebuild": "bunx tsx scripts/generate-sitemap.ts"
+    "generate:rss": "bunx tsx scripts/generate-rss.ts",
+    "predev": "bunx tsx scripts/generate-sitemap.ts && bunx tsx scripts/generate-rss.ts",
+    "prebuild": "bunx tsx scripts/generate-sitemap.ts && bunx tsx scripts/generate-rss.ts"
   },
   "dependencies": {
     "@capacitor/android": "^7.4.3",
@@ -123,6 +124,7 @@
     "eslint": "^9.32.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
+    "fast-xml-parser": "^5.8.0",
     "globals": "^15.15.0",
     "lovable-tagger": "^1.1.11",
     "postcss": "^8.5.6",
