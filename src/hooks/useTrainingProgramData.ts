@@ -4,6 +4,7 @@ import { buildUniqueContentSlugs, slugifyContentName } from "@/lib/seo-slugs";
 
 export interface TrainingProgramData {
   id: string;
+  canonical_slug?: string | null;
   category: string;
   name: string;
   difficulty_stars: number | null;
@@ -39,13 +40,17 @@ export const useTrainingProgramData = (programId: string | undefined) => {
         if (metadataError) throw metadataError;
         const programs = (Array.isArray(metadata) ? metadata : []) as TrainingProgramData[];
         const uniqueSlugs = buildUniqueContentSlugs(programs);
-        return programs.find(
+        const program = programs.find(
           (program: TrainingProgramData) =>
             program.id === programId ||
             slugifyContentName(program.name || program.id) === programId ||
             uniqueSlugs.get(program.id) === programId,
         );
+        return program ? { ...program, canonical_slug: uniqueSlugs.get(program.id) || slugifyContentName(program.name || program.id) } : undefined;
       };
+
+      const metadataMatch = await resolveFromMetadata();
+      if (metadataMatch) return metadataMatch as TrainingProgramData;
 
       const { data, error } = await supabase
         .from("admin_training_programs")
@@ -54,14 +59,9 @@ export const useTrainingProgramData = (programId: string | undefined) => {
         .maybeSingle();
 
       if (error) throw error;
-      if (!data) {
-        const fallback = await resolveFromMetadata();
-        if (!fallback) throw new Error("Training program not found");
+      if (!data) throw new Error("Training program not found");
 
-        return fallback as TrainingProgramData;
-      }
-
-      return data as TrainingProgramData;
+      return { ...data, canonical_slug: slugifyContentName(data.name || data.id) } as TrainingProgramData;
     },
     enabled: !!programId,
   });
