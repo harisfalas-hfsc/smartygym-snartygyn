@@ -408,42 +408,10 @@ const STATIC_ROUTES: Array<
     priority: "0.3",
   },
 
-  // Utility routes (kept for sitemap consistency, low priority)
-  {
-    path: "/auth",
-    title: "Sign In or Create an Account | SmartyGym",
-    description: "Sign in to SmartyGym or create a free account to start training.",
-    changefreq: "yearly",
-    priority: "0.1",
-  },
-  {
-    path: "/reset-password",
-    title: "Reset Password | SmartyGym",
-    description: "Reset your SmartyGym account password.",
-    changefreq: "yearly",
-    priority: "0.1",
-  },
-  {
-    path: "/premium-comparison",
-    title: "Compare SmartyGym Premium Plans",
-    description: "Compare SmartyGym Premium plan options side by side.",
-    changefreq: "yearly",
-    priority: "0.1",
-  },
-  {
-    path: "/premiumcomparison",
-    title: "Premium Comparison | SmartyGym",
-    description: "Compare SmartyGym Premium plan options side by side.",
-    changefreq: "yearly",
-    priority: "0.1",
-  },
-  {
-    path: "/newsletter-thank-you",
-    title: "Thank You | SmartyGym Newsletter",
-    description: "You're subscribed to the SmartyGym newsletter.",
-    changefreq: "yearly",
-    priority: "0.1",
-  },
+  // NOTE: utility, auth, redirect-only and thank-you routes are intentionally
+  // excluded from the sitemap. They are either blocked by robots.txt or are
+  // not meaningful indexable content. Submitting them was creating noise that
+  // Google reports as "discovered, not indexed".
 ];
 
 export const WORKOUT_CATEGORY_SLUGS = [
