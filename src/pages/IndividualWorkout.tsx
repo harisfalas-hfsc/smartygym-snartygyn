@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { BookOpen } from "lucide-react";
@@ -28,6 +28,7 @@ const generateWorkoutAltText = (workout: any): string => {
 };
 
 const IndividualWorkout = () => {
+  const navigate = useNavigate();
   const [readerModeOpen, setReaderModeOpen] = useState(false);
   const { type, id } = useParams();
   const { userTier, hasPurchased } = useAccessControl();
@@ -70,6 +71,16 @@ const IndividualWorkout = () => {
     if (!id) return;
     refetch();
   }, [id, refetch]);
+
+  useEffect(() => {
+    if (!dbWorkout || !id) return;
+    const workoutCategorySlug = getWorkoutCategorySlug(dbWorkout.category, type || "strength");
+    const canonicalSlug = slugifyContentName(dbWorkout.name || dbWorkout.id);
+    const canonicalPath = `/workout/${workoutCategorySlug}/${canonicalSlug}`;
+    if (id !== canonicalSlug || type !== workoutCategorySlug) {
+      navigate(canonicalPath, { replace: true });
+    }
+  }, [dbWorkout, id, navigate, type]);
 
   // If we have database workout, use it directly
   if (isLoadingDb) {
