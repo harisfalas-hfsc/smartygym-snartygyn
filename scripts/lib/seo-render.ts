@@ -8,6 +8,7 @@
  */
 import {
   BASE_URL,
+  canonicalUrlFor,
   attrEscape,
   htmlEscape,
   stripHtml,
