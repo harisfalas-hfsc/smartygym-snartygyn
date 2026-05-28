@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { generateSitemap } from "./scripts/generate-sitemap";
+import { generateRss } from "./scripts/generate-rss";
 import { prerenderSeoHtml } from "./scripts/prerender";
 import { verifyPrerenderedSeo } from "./scripts/verify-prerender";
 
@@ -20,6 +21,10 @@ function smartySeoPrerenderPlugin() {
       await generateSitemap([
         path.resolve(__dirname, "public/sitemap.xml"),
         path.join(outDir, "sitemap.xml"),
+      ]);
+      await generateRss([
+        path.resolve(__dirname, "public/rss.xml"),
+        path.join(outDir, "rss.xml"),
       ]);
       await verifyPrerenderedSeo({ distDir: outDir });
     },
