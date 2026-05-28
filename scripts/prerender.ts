@@ -35,6 +35,26 @@ function ensureParentDirectoryForFile(outPath: string) {
   mkdirSync(parentDir, { recursive: true });
 }
 
+function isAncestorRoute(routePath: string, allPaths: Set<string>) {
+  if (routePath === "/") return true;
+  const prefix = `${routePath.replace(/\/$/, "")}/`;
+  return [...allPaths].some((candidate) => candidate.startsWith(prefix));
+}
+
+function cleanUrlSourceFile(distDir: string, routePath: string, allPaths: Set<string>) {
+  if (routePath === "/") return join(distDir, "index.html");
+  const cleanPath = routePath.replace(/^\//, "");
+
+  // Lovable's live host currently ignores generated _redirects rewrite rules
+  // for deep SPA paths. Leaf routes therefore need to exist as exact files
+  // (`dist/blog/article-slug`) so `curl /blog/article-slug` receives the
+  // prerendered HTML before JavaScript. Parent routes keep index.html because
+  // they must remain directories for their children.
+  return isAncestorRoute(routePath, allPaths)
+    ? join(distDir, cleanPath, "index.html")
+    : join(distDir, cleanPath);
+}
+
 function writeCleanUrlRewrites(distDir: string, cleanPaths: string[], redirects: Array<{ from: string; to: string; status: 301 }> = []) {
   // Lovable's static host can serve the SPA fallback for clean URLs like
   // /blog/<slug> unless we explicitly point them at their generated folder
@@ -52,8 +72,8 @@ function writeCleanUrlRewrites(distDir: string, cleanPaths: string[], redirects:
   for (const p of [...cleanPaths].sort()) {
     if (seen.has(p)) continue;
     seen.add(p);
-    rules.push(`${p} ${p}/index.html 200!`);
-    rules.push(`${p}/ ${p}/index.html 200!`);
+    rules.push(`${p} ${p} 200!`);
+    rules.push(`${p}/ ${p} 200!`);
   }
   if (!rules.length) return;
   writeFileSync(
@@ -100,6 +120,7 @@ export async function prerenderSeoHtml(options: {
   };
 
   const cleanPaths: string[] = [];
+  const allPaths = new Set(routes.map((route) => route.path));
   const reportRows: string[] = [
     "# SmartyGym SEO prerender report",
     "",
@@ -121,12 +142,12 @@ export async function prerenderSeoHtml(options: {
       continue;
     }
 
-    const cleanPath = route.path.replace(/^\//, "");
-    // Crawler-safe static output: the clean public URL `/foo/bar` maps to a
-    // real static file at `dist/foo/bar/index.html`. We deliberately avoid
-    // extensionless files (`dist/foo/bar`) because they conflict with this
-    // directory pattern and were not reliable on the live host.
-    const sourceFile = join(distDir, cleanPath, "index.html");
+    // Crawler-safe static output: leaf clean URLs like `/blog/article-slug`
+    // are written as exact files (`dist/blog/article-slug`). The live host was
+    // serving the SPA shell for those URLs even when `_redirects` pointed at
+    // `dist/blog/article-slug/index.html`; exact files make raw curl/page-source
+    // receive the real per-page HTML before JavaScript.
+    const sourceFile = cleanUrlSourceFile(distDir, route.path, allPaths);
     writeHtml(sourceFile, html);
     reportRows.push(`| ${route.path} | ${sourceFile.replace(`${distDir}/`, "dist/")} |`);
     cleanPaths.push(route.path);

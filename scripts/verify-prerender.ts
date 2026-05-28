@@ -54,7 +54,13 @@ function assertPayloadText(html: string, raw: unknown, label: string) {
 
 function sourceFileForCleanUrl(distDir: string, routePath: string) {
   if (routePath === "/") return join(distDir, "index.html");
-  return join(distDir, routePath.replace(/^\//, ""), "index.html");
+  return join(distDir, routePath.replace(/^\//, ""));
+}
+
+function isAncestorRoute(routePath: string, allPaths: Set<string>) {
+  if (routePath === "/") return true;
+  const prefix = `${routePath.replace(/\/$/, "")}/`;
+  return [...allPaths].some((candidate) => candidate.startsWith(prefix));
 }
 
 function isFile(path: string) {
@@ -62,8 +68,8 @@ function isFile(path: string) {
 }
 
 function assertRewriteForRoute(redirects: string, routePath: string) {
-  const expected = `${routePath} ${routePath}/index.html 200!`;
-  const expectedTrailing = `${routePath}/ ${routePath}/index.html 200!`;
+  const expected = `${routePath} ${routePath} 200!`;
+  const expectedTrailing = `${routePath}/ ${routePath} 200!`;
   if (!redirects.includes(expected) || !redirects.includes(expectedTrailing)) {
     throw new Error(`[verify-prerender] missing _redirects rules for ${routePath}`);
   }
@@ -80,6 +86,7 @@ function assertRedirectRule(redirectsFile: string, from: string, to: string) {
 export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
   const distDir = options.distDir || DIST;
   const { routes, redirects: legacyRedirects, counts } = await buildSeoRoutes();
+  const allPaths = new Set(routes.map((route) => route.path));
   const redirectsPath = join(distDir, "_redirects");
   if (!isFile(redirectsPath)) {
     throw new Error("[verify-prerender] missing dist/_redirects for clean URL rewrites");
@@ -88,7 +95,9 @@ export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
 
   let checked = 0;
   for (const route of routes) {
-    const artifactPath = sourceFileForCleanUrl(distDir, route.path);
+    const artifactPath = isAncestorRoute(route.path, allPaths)
+      ? join(distDir, route.path.replace(/^\//, ""), "index.html")
+      : sourceFileForCleanUrl(distDir, route.path);
     if (!isFile(artifactPath)) {
       throw new Error(`[verify-prerender] missing clean URL source HTML for ${route.path}: expected ${artifactPath}`);
     }
