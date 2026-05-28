@@ -93,7 +93,7 @@ export const ProgramSuggestionFlow = ({ onBack, onClose }: ProgramSuggestionFlow
 
   const handleSelectSuggestion = (item: ProgramItem) => {
     onClose();
-    navigate(getProgramUrl(item.category, item.id));
+    navigate(getProgramUrl(item));
   };
 
   if (isLoading) {
