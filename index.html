@@ -38,7 +38,23 @@
           if (/\.[a-z0-9]{2,5}$/i.test(p)) return;
           var clean = p.replace(/\/+$/, "");
           if (!clean) return;
-          window.location.replace(clean + ".html" + window.location.search + window.location.hash);
+          var canonicalPath = clean + ".html";
+          var canonicalHref = "https://smartygym.com" + canonicalPath;
+          // Inject a canonical hint + robots noindex for the SPA shell so any
+          // crawler that does NOT execute the redirect below still learns
+          // (a) this URL is not the canonical version, and
+          // (b) the canonical version lives at the ".html" sibling.
+          try {
+            var link = document.createElement("link");
+            link.setAttribute("rel", "canonical");
+            link.setAttribute("href", canonicalHref);
+            document.head.appendChild(link);
+            var robots = document.createElement("meta");
+            robots.setAttribute("name", "robots");
+            robots.setAttribute("content", "noindex, follow");
+            document.head.appendChild(robots);
+          } catch (e2) {}
+          window.location.replace(canonicalPath + window.location.search + window.location.hash);
         } catch (e) {}
       })();
     </script>
