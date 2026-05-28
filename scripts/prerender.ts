@@ -168,19 +168,18 @@ export async function prerenderSeoHtml(options: {
       continue;
     }
 
-    // Crawler-safe static output: every leaf clean URL like `/blog/slug`
-    // is written in THREE forms so every crawler/diagnostic variant works:
-    //   1. exact extensionless file        -> dist/blog/slug
-    //   2. trailing-slash directory index  -> dist/blog/slug/index.html
-    //   3. .html sibling                   -> dist/blog/slug.html
-    // Ancestor routes (parents of other routes) only need the directory
-    // index form so their children can still resolve.
+    // Crawler-safe static output. Leaf routes (no child paths) are written as
+    // the exact extensionless file PLUS a `.html` sibling so curl/page-source
+    // works for `/path`, `/path.html` reliably. The trailing-slash variant is
+    // handled in _redirects by 301-ing `/path/` -> `/path`.
+    // Ancestor routes are written as the folder index so children can resolve.
     const cleanPath = route.path.replace(/^\//, "");
     const isAncestor = isAncestorRoute(route.path, allPaths);
-    const dirIndex = join(distDir, cleanPath, "index.html");
-    writeHtml(dirIndex, html);
-    let primarySource = dirIndex;
-    if (!isAncestor) {
+    let primarySource: string;
+    if (isAncestor) {
+      primarySource = join(distDir, cleanPath, "index.html");
+      writeHtml(primarySource, html);
+    } else {
       const exactFile = join(distDir, cleanPath);
       const dotHtmlFile = join(distDir, `${cleanPath}.html`);
       writeHtml(exactFile, html);
