@@ -8,7 +8,7 @@
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { buildSeoRoutes, canonicalPathFor, canonicalUrlFor, htmlEscape } from "./lib/seo-routes";
+import { BASE_URL, buildSeoRoutes, canonicalPathFor, canonicalUrlFor, htmlEscape } from "./lib/seo-routes";
 import { slugifyContentName } from "../src/lib/seo-slugs";
 
 const DIST = resolve("dist");
@@ -169,6 +169,46 @@ export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
 
   for (const rule of legacyRedirects) {
     assertRedirectRule(redirects, rule.from, rule.to);
+  }
+
+  // RSS must point every blog item at its canonical ".html" URL so feed
+  // readers and crawlers land on the prerendered, fully readable page.
+  const rssPath = join(distDir, "rss.xml");
+  if (!isFile(rssPath)) {
+    throw new Error("[verify-prerender] missing dist/rss.xml");
+  }
+  const rssXml = readFileSync(rssPath, "utf8");
+  const rssLinks = [...rssXml.matchAll(/<link>([^<]+)<\/link>/g)].map((m) => m[1]);
+  for (const link of rssLinks) {
+    if (!link.startsWith(BASE_URL)) continue;
+    if (link === `${BASE_URL}/` || link === `${BASE_URL}/blog.html`) continue;
+    if (!link.endsWith(".html")) {
+      throw new Error(`[verify-prerender] RSS link is not a canonical .html URL: ${link}`);
+    }
+  }
+  const rssGuids = [...rssXml.matchAll(/<guid[^>]*>([^<]+)<\/guid>/g)].map((m) => m[1]);
+  for (const guid of rssGuids) {
+    if (!guid.startsWith(BASE_URL)) continue;
+    if (!guid.endsWith(".html")) {
+      throw new Error(`[verify-prerender] RSS guid is not a canonical .html URL: ${guid}`);
+    }
+  }
+
+  // llms-full.txt is the AI-crawler index. Every smartygym.com link in it
+  // must point at the canonical ".html" version (homepage "/" excluded).
+  const llmsPath = join(distDir, "llms-full.txt");
+  if (isFile(llmsPath)) {
+    const llms = readFileSync(llmsPath, "utf8");
+    const llmsLinks = [...llms.matchAll(/https:\/\/smartygym\.com(\/[^\s)\]"']*)/g)].map(
+      (m) => m[1],
+    );
+    for (const path of llmsLinks) {
+      if (path === "/" || path === "") continue;
+      if (/\.(html|xml|txt|png|jpg|jpeg|svg|ico|webp)$/i.test(path)) continue;
+      throw new Error(
+        `[verify-prerender] llms-full.txt contains a non-canonical clean URL: https://smartygym.com${path}`,
+      );
+    }
   }
 
   console.log(
