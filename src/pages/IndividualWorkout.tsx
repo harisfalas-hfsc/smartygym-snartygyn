@@ -75,7 +75,7 @@ const IndividualWorkout = () => {
   useEffect(() => {
     if (!dbWorkout || !id) return;
     const workoutCategorySlug = getWorkoutCategorySlug(dbWorkout.category, type || "strength");
-    const canonicalSlug = slugifyContentName(dbWorkout.name || dbWorkout.id);
+    const canonicalSlug = dbWorkout.canonical_slug || slugifyContentName(dbWorkout.name || dbWorkout.id);
     const canonicalPath = `/workout/${workoutCategorySlug}/${canonicalSlug}`;
     if (id !== canonicalSlug || type !== workoutCategorySlug) {
       navigate(canonicalPath, { replace: true });
@@ -93,7 +93,7 @@ const IndividualWorkout = () => {
 
   if (dbWorkout) {
     const workoutCategorySlug = getWorkoutCategorySlug(dbWorkout.category, type || "strength");
-    const workoutUrl = `https://smartygym.com/workout/${workoutCategorySlug}/${slugifyContentName(dbWorkout.name || dbWorkout.id)}`;
+    const workoutUrl = `https://smartygym.com/workout/${workoutCategorySlug}/${dbWorkout.canonical_slug || slugifyContentName(dbWorkout.name || dbWorkout.id)}`;
     const imageAlt = generateWorkoutAltText(dbWorkout);
     
     // Generate HowTo steps from workout sections
