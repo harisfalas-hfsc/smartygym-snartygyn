@@ -31,6 +31,15 @@ export const MIN_EXPECTED_DYNAMIC_WORKOUTS = 100;
 export const MIN_EXPECTED_DYNAMIC_PROGRAMS = 10;
 export const MIN_EXPECTED_DYNAMIC_BLOG_ARTICLES = 1;
 
+const STATIC_LEGACY_REDIRECTS: Array<{ from: string; to: string; status: 301 }> = [
+  { from: "/1rmcalculator", to: "/tools/1rm-calculator", status: 301 },
+  { from: "/bmrcalculator", to: "/tools/bmr-calculator", status: 301 },
+  { from: "/macrocalculator", to: "/tools/macro-calculator", status: 301 },
+  { from: "/caloriecalculator", to: "/tools/macro-calculator", status: 301 },
+  { from: "/workouttimer", to: "/tools/workout-timer", status: 301 },
+  { from: "/caloriecounter", to: "/tools/calorie-counter", status: 301 },
+];
+
 export type RouteKind =
   | "static"
   | "workout-category"
@@ -294,7 +303,7 @@ const STATIC_ROUTES: Array<
     priority: "0.7",
   },
   {
-    path: "/1rmcalculator",
+    path: "/tools/1rm-calculator",
     title: "1RM Calculator | Estimate Your One-Rep Max | SmartyGym",
     description:
       "Free 1RM calculator by SmartyGym. Estimate your one-rep max across major lifts using validated formulas. No signup required.",
@@ -302,7 +311,7 @@ const STATIC_ROUTES: Array<
     priority: "0.6",
   },
   {
-    path: "/bmrcalculator",
+    path: "/tools/bmr-calculator",
     title: "BMR Calculator | Basal Metabolic Rate | SmartyGym",
     description:
       "Free BMR calculator by SmartyGym. Calculate your basal metabolic rate and daily calorie needs with science-based formulas.",
@@ -310,7 +319,7 @@ const STATIC_ROUTES: Array<
     priority: "0.6",
   },
   {
-    path: "/macrocalculator",
+    path: "/tools/macro-calculator",
     title: "Macro Calculator | Protein, Carbs and Fat | SmartyGym",
     description:
       "Free macro calculator by SmartyGym. Get personalized protein, carb and fat targets for fat loss, maintenance or muscle gain.",
@@ -318,7 +327,7 @@ const STATIC_ROUTES: Array<
     priority: "0.6",
   },
   {
-    path: "/caloriecalculator",
+    path: "/tools/calorie-calculator",
     title: "Calorie Calculator | Daily Calorie Needs | SmartyGym",
     description:
       "Free calorie calculator by SmartyGym. Estimate your daily calorie needs based on goals, body composition and activity.",
@@ -326,7 +335,7 @@ const STATIC_ROUTES: Array<
     priority: "0.6",
   },
   {
-    path: "/workouttimer",
+    path: "/tools/workout-timer",
     title: "Workout Timer | Interval, EMOM and Tabata | SmartyGym",
     description:
       "Free interval timer by SmartyGym for EMOM, AMRAP, Tabata and circuits. Built for real training, by Haris Falas.",
@@ -334,7 +343,7 @@ const STATIC_ROUTES: Array<
     priority: "0.6",
   },
   {
-    path: "/caloriecounter",
+    path: "/tools/calorie-counter",
     title: "Calorie Counter | Food Lookup and Tracking | SmartyGym",
     description:
       "Free SmartyGym calorie counter. Search foods, log meals and stay on top of your daily nutrition.",
