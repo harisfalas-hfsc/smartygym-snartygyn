@@ -35,6 +35,44 @@ function ensureParentDirectoryForFile(outPath: string) {
   mkdirSync(parentDir, { recursive: true });
 }
 
+function isAncestorRoute(routePath: string, allPaths: Set<string>) {
+  if (routePath === "/") return true;
+  const prefix = `${routePath.replace(/\/$/, "")}/`;
+  return [...allPaths].some((candidate) => candidate.startsWith(prefix));
+}
+
+function cleanUrlSourceFile(distDir: string, routePath: string, allPaths: Set<string>) {
+  if (routePath === "/") return join(distDir, "index.html");
+  const cleanPath = routePath.replace(/^\//, "");
+
+  // Lovable's live host currently ignores generated _redirects rewrite rules
+  // for deep SPA paths. Leaf routes therefore need to exist as exact files
+  // (`dist/blog/article-slug`) so `curl /blog/article-slug` receives the
+  // prerendered HTML before JavaScript. Parent routes keep index.html because
+  // they must remain directories for their children.
+  return isAncestorRoute(routePath, allPaths)
+    ? join(distDir, cleanPath, "index.html")
+    : join(distDir, cleanPath);
+}
+
+function redirectHtml(from: string, to: string) {
+  const escapedTo = to.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+  return `<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="robots" content="noindex, follow" />
+    <meta http-equiv="refresh" content="0;url=${escapedTo}" />
+    <link rel="canonical" href="https://smartygym.com${escapedTo}" />
+    <title>Redirecting | SmartyGym</title>
+  </head>
+  <body>
+    <p>Redirecting to <a href="${escapedTo}">${escapedTo}</a>.</p>
+    <script>location.replace(${JSON.stringify(to)});</script>
+  </body>
+</html>`;
+}
+
 function writeCleanUrlRewrites(distDir: string, cleanPaths: string[], redirects: Array<{ from: string; to: string; status: 301 }> = []) {
   // Lovable's static host can serve the SPA fallback for clean URLs like
   // /blog/<slug> unless we explicitly point them at their generated folder
@@ -52,8 +90,8 @@ function writeCleanUrlRewrites(distDir: string, cleanPaths: string[], redirects:
   for (const p of [...cleanPaths].sort()) {
     if (seen.has(p)) continue;
     seen.add(p);
-    rules.push(`${p} ${p}/index.html 200!`);
-    rules.push(`${p}/ ${p}/index.html 200!`);
+    rules.push(`${p} ${p} 200!`);
+    rules.push(`${p}/ ${p} 200!`);
   }
   if (!rules.length) return;
   writeFileSync(
