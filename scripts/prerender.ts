@@ -98,8 +98,10 @@ function writeCleanUrlRewrites(distDir: string, cleanPaths: string[], redirects:
   for (const p of [...cleanPaths].sort()) {
     if (seen.has(p)) continue;
     seen.add(p);
+    // Exact file already exists at dist<p>, so just collapse the trailing
+    // slash variant via a 301 redirect so crawlers don't see a homepage shell.
     rules.push(`${p} ${p} 200!`);
-    rules.push(`${p}/ ${p} 200!`);
+    rules.push(`${p}/ ${p} 301!`);
   }
   if (!rules.length) return;
   writeFileSync(
