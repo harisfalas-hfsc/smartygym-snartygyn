@@ -4,7 +4,7 @@ import { DeviceThemeDefault } from "./components/DeviceThemeDefault";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation, type Location } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { Helmet } from "react-helmet";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -117,6 +117,17 @@ const PremiumComparisonRedirect = () => (
   </>
 );
 
+const normalizeRouteLocation = (location: Location): Location => {
+  const withoutTrailingSlash = location.pathname !== "/"
+    ? location.pathname.replace(/\/+$/g, "")
+    : location.pathname;
+  const normalizedPathname = withoutTrailingSlash.replace(/\.html$/i, "") || "/";
+
+  return normalizedPathname === location.pathname
+    ? location
+    : { ...location, pathname: normalizedPathname };
+};
+
 const queryClient = new QueryClient();
 
 const criticalRoutePreloaders = [
@@ -164,6 +175,8 @@ const preloadRouteModules = () => {
 const AppContent = () => {
   const { isAdmin, loading } = useAdminRole();
   const isMobile = useIsMobile();
+  const location = useLocation();
+  const routeLocation = normalizeRouteLocation(location);
   useSessionExpiry();
 
   useEffect(() => {
@@ -199,7 +212,7 @@ const AppContent = () => {
             >
             <PageTransition>
                 <Suspense fallback={null}>
-                <Routes>
+                <Routes location={routeLocation}>
                   <Route path="/" element={<Index />} />
                   <Route path="/start" element={<LandingRouter />} />
                   <Route path="/home" element={<Index />} />
