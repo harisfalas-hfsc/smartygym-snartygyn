@@ -1,6 +1,21 @@
 <!doctype html>
-<html lang="en-GB">
+<html lang="en-GB" class="dark">
   <head>
+    <script>
+      document.documentElement.classList.add("js-enabled");
+    </script>
+    <style>
+      .js-enabled #root > .seo-prerender {
+        position: fixed !important;
+        left: -10000px !important;
+        top: auto !important;
+        width: 1px !important;
+        height: 1px !important;
+        overflow: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+      }
+    </style>
     <!-- SEO clean-URL boot redirect.
          The static host serves dist/index.html (the homepage shell) for any
          unknown clean URL like /blog/foo or /workout/cardio/bar. Google then
@@ -24,6 +39,18 @@
           var clean = p.replace(/\/+$/, "");
           if (!clean) return;
           window.location.replace(clean + ".html" + window.location.search + window.location.hash);
+        } catch (e) {}
+      })();
+    </script>
+    <script>
+      (function() {
+        try {
+          var theme = localStorage.getItem("theme");
+          if (theme === "light") {
+            document.documentElement.classList.remove("dark");
+          } else if (theme === "dark" || (!theme && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+            document.documentElement.classList.add("dark");
+          }
         } catch (e) {}
       })();
     </script>
