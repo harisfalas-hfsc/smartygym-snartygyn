@@ -223,36 +223,6 @@
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://smartygym.com/auth.html</loc>
-    <lastmod>2026-05-28</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.1</priority>
-  </url>
-  <url>
-    <loc>https://smartygym.com/reset-password.html</loc>
-    <lastmod>2026-05-28</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.1</priority>
-  </url>
-  <url>
-    <loc>https://smartygym.com/premium-comparison.html</loc>
-    <lastmod>2026-05-28</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.1</priority>
-  </url>
-  <url>
-    <loc>https://smartygym.com/premiumcomparison.html</loc>
-    <lastmod>2026-05-28</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.1</priority>
-  </url>
-  <url>
-    <loc>https://smartygym.com/newsletter-thank-you.html</loc>
-    <lastmod>2026-05-28</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.1</priority>
-  </url>
-  <url>
     <loc>https://smartygym.com/workout/strength.html</loc>
     <lastmod>2026-05-28</lastmod>
     <changefreq>daily</changefreq>
