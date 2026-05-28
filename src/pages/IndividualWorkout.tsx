@@ -93,7 +93,7 @@ const IndividualWorkout = () => {
 
   if (dbWorkout) {
     const workoutCategorySlug = getWorkoutCategorySlug(dbWorkout.category, type || "strength");
-    const workoutUrl = `https://smartygym.com/workout/${workoutCategorySlug}/${dbWorkout.canonical_slug || slugifyContentName(dbWorkout.name || dbWorkout.id)}`;
+    const workoutUrl = `https://smartygym.com/workout/${workoutCategorySlug}/${dbWorkout.canonical_slug || slugifyContentName(dbWorkout.name || dbWorkout.id)}.html`;
     const imageAlt = generateWorkoutAltText(dbWorkout);
     
     // Generate HowTo steps from workout sections
