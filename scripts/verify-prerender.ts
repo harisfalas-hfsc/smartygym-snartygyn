@@ -57,6 +57,11 @@ function artifactFileFor(distDir: string, routePath: string) {
   return join(distDir, routePath.replace(/^\//, "") + ".html");
 }
 
+function cleanArtifactFileFor(distDir: string, routePath: string) {
+  if (routePath === "/") return join(distDir, "index.html");
+  return join(distDir, routePath.replace(/^\//, ""));
+}
+
 function isFile(path: string) {
   return existsSync(path) && statSync(path).isFile();
 }
@@ -103,6 +108,14 @@ export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
     }
 
     const html = readFileSync(artifactPath, "utf8");
+    const cleanArtifactPath = cleanArtifactFileFor(distDir, route.path);
+    if (!isFile(cleanArtifactPath)) {
+      throw new Error(`[verify-prerender] missing extensionless clean URL artifact for ${route.path}: expected ${cleanArtifactPath}`);
+    }
+    const cleanHtml = readFileSync(cleanArtifactPath, "utf8");
+    if (route.path !== "/" && cleanHtml !== html) {
+      throw new Error(`[verify-prerender] clean URL artifact does not match .html artifact for ${route.path}`);
+    }
     const canonicalUrl = canonicalUrlFor(route.path);
     assertNotHomepageShell(html, route.path);
     assertIncludes(html, `<title>${htmlEscape(route.title)}</title>`, `${route.path} title`);
