@@ -10,8 +10,9 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "generate:sitemap": "bunx tsx scripts/generate-sitemap.ts",
-    "predev": "bunx tsx scripts/generate-sitemap.ts",
-    "prebuild": "bunx tsx scripts/generate-sitemap.ts"
+    "generate:rss": "bunx tsx scripts/generate-rss.ts",
+    "predev": "bunx tsx scripts/generate-sitemap.ts && bunx tsx scripts/generate-rss.ts",
+    "prebuild": "bunx tsx scripts/generate-sitemap.ts && bunx tsx scripts/generate-rss.ts"
   },
   "dependencies": {
     "@capacitor/android": "^7.4.3",
