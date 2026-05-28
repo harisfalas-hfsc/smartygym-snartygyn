@@ -62,9 +62,11 @@ const Contact = () => {
 
   const uploadFiles = async (files: File[]) => {
     const uploadedUrls = [];
+    const { data: { session } } = await supabase.auth.getSession();
+    const pathPrefix = session?.user?.id ?? 'anonymous';
     for (const file of files) {
       const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
+      const fileName = `${pathPrefix}/${crypto.randomUUID()}.${fileExt}`;
       const { error: uploadError } = await supabase.storage.from('contact-files').upload(fileName, file);
       if (uploadError) throw uploadError;
       const { data: { publicUrl } } = supabase.storage.from('contact-files').getPublicUrl(fileName);
