@@ -145,6 +145,17 @@ function getCyprusDateStr(): string {
   return cyprusFormatter.format(now);
 }
 
+function getCyprusDateOffsetStr(daysAhead: number): string {
+  const now = new Date();
+  const offset = new Date(now.getTime() + daysAhead * 24 * 60 * 60 * 1000);
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Athens",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(offset);
+}
+
 // Same forbidden-name patterns enforced by the DB trigger
 // `validate_public_workout_integrity`. We pre-filter candidates here so we
 // never burn promotion attempts on workouts the trigger will reject.
@@ -174,14 +185,17 @@ serve(async (req) => {
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY") || "";
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" as any });
 
-    // Determine today's date in Cyprus timezone
+    // Determine target date in Cyprus timezone. Scheduled WOD picker jobs must
+    // pre-build TOMORROW by default; explicit targetDate/date still wins for
+    // watchdog, admin, and repair invocations.
     let targetDate: string;
     let parsedBody: any = {};
     try {
       parsedBody = await req.json();
-      targetDate = parsedBody?.targetDate || getCyprusDateStr();
+      const daysAhead = Number.isFinite(Number(parsedBody?.daysAhead)) ? Number(parsedBody.daysAhead) : 1;
+      targetDate = parsedBody?.targetDate || parsedBody?.date || getCyprusDateOffsetStr(daysAhead);
     } catch {
-      targetDate = getCyprusDateStr();
+      targetDate = getCyprusDateOffsetStr(1);
     }
 
     logStep("Starting library selection", { targetDate });
