@@ -1,35 +1,44 @@
-## In plain words
+## What I will do
 
-Right now Google can read most of your pages, BUT some signals on your site still point to the wrong addresses. That confuses Google and makes it look like every page is the same homepage. I am going to fix those signals so Google sees one clean, consistent version of every page.
+Create 4 new blog articles in your database, fully published, with the exact same structure, voice, and SEO quality as your existing articles — readable by Google immediately.
 
-You don't need to do anything. No buttons to click. No Search Console. No copy-paste. I do all of it.
+### The 4 articles
 
-## What I will fix (simple list)
+1. **Fitness** — "No Time, No Excuse: How to Stay Fit When You Have a Brutally Busy Life"
+2. **Fitness** — "The Best Exercises for People Over 40 — What the Science Actually Says"
+3. **Nutrition** — "Red Meat, Cholesterol and Heart Disease: Everything You Were Told Is Wrong"
+4. **Wellness** — "The Family That Trains Together: How to Build a Healthy Home for Every Age"
 
-1. **Blog feed (RSS)** — It currently sends Google to the weak versions of blog articles. I'll point it to the strong, readable versions.
+### For each article you get
 
-2. **Internal links inside pages** — Some links inside articles, workouts and programs still point to the weak URL format. I'll make them all point to the readable format.
+- **Author:** Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
+- **Hand-written body** (900–1300 words), same HTML structure as your existing articles: H2 sections, paragraphs, lists, bold key terms, evidence-based tone
+- **AI-generated featured image** matching the category (via your existing image generator)
+- **Internal links** woven naturally into the text, pointing to:
+  - your Smarty tools (Calorie Calculator, BMR, 1RM, etc.)
+  - your workout library and training programs
+  - your Daily Smarty Ritual
+  - relevant existing blog articles where useful
+- **SEO metadata** auto-created (meta title, description, keywords, JSON-LD Article schema, image alt)
+- **Canonical URL** = `/blog/<slug>.html` so Google reads the full article, not the homepage shell
+- **Auto-published** + queued in your normal dashboard + email notification pipeline (same as your weekly auto-articles)
 
-3. **AI crawler index file** (`llms-full.txt`) — Same fix. Every link in there will point to the readable version.
+### Consistency rule going forward
 
-4. **Old "clean" URLs** — When Google or a person visits the weak URL, the page will now immediately tell Google "the real page is over here" in a way Google understands even without running JavaScript.
+Every new article — whether I write it or your weekly generator writes it — will follow the same standard: real body content, `.html` canonical, valid internal links only, author = Haris Falas, full SEO metadata, image included. This is already enforced for the auto-generator and will be applied identically here.
 
-5. **Safety check at build time** — I'll add an automatic check so this problem can never silently come back. If anything points to a weak URL again, the build stops and warns me.
+### What I will NOT touch
 
-6. **Homepage and main pages** — I'll make sure the homepage, blog index, workouts index, programs index and tools pages all contain real readable text for Google (not just a logo + menu).
+- No changes to existing articles
+- No layout, design, pricing, payments, or HFSC changes
+- No deletions
 
-## What I will NOT do
+### Technical details (for reference)
 
-- I will NOT change how the site looks. Zero visual change.
-- I will NOT touch your workouts, programs, articles, prices, payments, or login.
-- I will NOT delete anything.
-- I will NOT touch HFSC.
-- I will NOT ask you to do anything in Google, Stripe, or anywhere else.
+- Insert 4 rows into `blog_articles` with `is_published=true`, `is_ai_generated=false`, `author_name="Haris Falas"`
+- Call `generate-blog-image` edge function once per article for the featured image
+- Insert matching `seo_metadata` rows with Article JSON-LD pointing to `/blog/<slug>.html`
+- Queue 4 rows in `pending_content_notifications` so subscribers get notified
+- All internal links validated against your whitelist (workout, trainingprogram, tools, daily-ritual, disclaimer, blog cross-links)
 
-## What you will see after
-
-- Your site looks exactly the same.
-- Google starts seeing every page properly over the next few weeks (Google is slow, this is normal).
-- The "everything looks like the homepage" problem goes away.
-
-That's it. Approve and I do all of it end to end.
+Approve and I'll write all 4 and publish them.
