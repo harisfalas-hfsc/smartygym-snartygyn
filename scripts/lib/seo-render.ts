@@ -146,20 +146,20 @@ export function renderRouteBody(route: SeoRoute): {
       bodyHtml: `
 <main class="seo-prerender seo-article">
   <nav class="seo-breadcrumbs" aria-label="Breadcrumb">
-    <a href="/">Home</a> &rsaquo; <a href="/blog">Blog</a> &rsaquo; <span>${htmlEscape(a.title || "")}</span>
+    <a href="/">Home</a> &rsaquo; <a href="/blog.html">Blog</a> &rsaquo; <span>${htmlEscape(a.title || "")}</span>
   </nav>
   <article>
     <header>
       <p class="seo-eyebrow">${htmlEscape(a.category || "Fitness")}</p>
       <h1>${htmlEscape(a.title || "")}</h1>
-      <p class="seo-byline">By <a href="/coach-profile">${htmlEscape(author)}</a>${
+      <p class="seo-byline">By <a href="/coach-profile.html">${htmlEscape(author)}</a>${
         dateLabel ? ` &middot; <time datetime="${attrEscape(published)}">${htmlEscape(dateLabel)}</time>` : ""
       }${a.read_time ? ` &middot; ${htmlEscape(String(a.read_time))}` : ""}</p>
       ${credentials}
       <p class="seo-excerpt">${htmlEscape(stripHtml(a.excerpt) || "")}</p>
       ${cover}
     </header>
-    <div class="seo-article-body">${a.content || ""}</div>
+    <div class="seo-article-body">${normalizeInternalLinks(a.content || "")}</div>
   </article>
 </main>`,
       jsonLd,
@@ -213,7 +213,7 @@ export function renderRouteBody(route: SeoRoute): {
       bodyHtml: `
 <main class="seo-prerender seo-workout">
   <nav class="seo-breadcrumbs" aria-label="Breadcrumb">
-    <a href="/">Home</a> &rsaquo; <a href="/workout">Smarty Workouts</a> &rsaquo; <span>${htmlEscape(w.name || "")}</span>
+    <a href="/">Home</a> &rsaquo; <a href="/workout.html">Smarty Workouts</a> &rsaquo; <span>${htmlEscape(w.name || "")}</span>
   </nav>
   <article>
     <header>
@@ -221,7 +221,7 @@ export function renderRouteBody(route: SeoRoute): {
       <ul class="seo-meta">${metaRow}</ul>
       ${cover}
       <p class="seo-excerpt">${htmlEscape(stripHtml(w.description) || "")}</p>
-      <p class="seo-author">By <a href="/coach-profile">${htmlEscape(AUTHOR.name)}</a> &middot; ${htmlEscape(AUTHOR.jobTitle)}</p>
+      <p class="seo-author">By <a href="/coach-profile.html">${htmlEscape(AUTHOR.name)}</a> &middot; ${htmlEscape(AUTHOR.jobTitle)}</p>
     </header>
     ${sectionHtml("Warm-Up", w.warm_up)}
     ${sectionHtml("Activation", w.activation)}
@@ -281,7 +281,7 @@ export function renderRouteBody(route: SeoRoute): {
       bodyHtml: `
 <main class="seo-prerender seo-program">
   <nav class="seo-breadcrumbs" aria-label="Breadcrumb">
-    <a href="/">Home</a> &rsaquo; <a href="/trainingprogram">Smarty Programs</a> &rsaquo; <span>${htmlEscape(p.name || "")}</span>
+    <a href="/">Home</a> &rsaquo; <a href="/trainingprogram.html">Smarty Programs</a> &rsaquo; <span>${htmlEscape(p.name || "")}</span>
   </nav>
   <article>
     <header>
@@ -289,7 +289,7 @@ export function renderRouteBody(route: SeoRoute): {
       <ul class="seo-meta">${metaRow}</ul>
       ${cover}
       <p class="seo-excerpt">${htmlEscape(stripHtml(p.description) || "")}</p>
-      <p class="seo-author">Designed by <a href="/coach-profile">${htmlEscape(AUTHOR.name)}</a> &middot; ${htmlEscape(AUTHOR.jobTitle)}</p>
+      <p class="seo-author">Designed by <a href="/coach-profile.html">${htmlEscape(AUTHOR.name)}</a> &middot; ${htmlEscape(AUTHOR.jobTitle)}</p>
     </header>
     ${sectionHtml("Overview", p.overview)}
     ${sectionHtml("Target Audience", p.target_audience)}
