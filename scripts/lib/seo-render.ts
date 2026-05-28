@@ -62,7 +62,33 @@ function sectionHtml(label: string, raw: string | null | undefined): string {
   if (!raw || !stripHtml(raw)) return "";
   // Admin-authored HTML is already sanitized in the app; we trust it the same
   // way the React app does and insert as-is.
-  return `<section class="seo-section"><h2>${htmlEscape(label)}</h2>${raw}</section>`;
+  return `<section class="seo-section"><h2>${htmlEscape(label)}</h2>${normalizeInternalLinks(raw)}</section>`;
+}
+
+const HTML_CANONICAL_PREFIXES = [
+  "/blog", "/workout", "/trainingprogram", "/tools", "/coach-profile", "/coach-cv",
+  "/the-smarty-method", "/about", "/about-smartygym", "/best-online-fitness-platform",
+  "/why-invest-in-smartygym", "/wod-archive", "/daily-ritual", "/exerciselibrary",
+  "/community", "/shop", "/contact", "/faq", "/smarty-plans", "/joinpremium",
+  "/join-premium", "/corporate", "/corporate-wellness",
+];
+
+function normalizeInternalLinks(html: string): string {
+  return html.replace(/href=(["'])(.*?)\1/gi, (_match, quote: string, href: string) => {
+    if (!href || href.startsWith("#") || href.startsWith("mailto:") || href.startsWith("tel:")) return `href=${quote}${href}${quote}`;
+    try {
+      const url = href.startsWith("http") ? new URL(href) : new URL(href, BASE_URL);
+      if (url.hostname && !["smartygym.com", "www.smartygym.com"].includes(url.hostname)) return `href=${quote}${href}${quote}`;
+      const path = url.pathname.replace(/\/+$/g, "") || "/";
+      if (path === "/" || path.endsWith(".html")) return `href=${quote}${href}${quote}`;
+      if (!HTML_CANONICAL_PREFIXES.some((prefix) => path === prefix || path.startsWith(`${prefix}/`))) return `href=${quote}${href}${quote}`;
+      const canonicalPath = `${path}.html${url.search}${url.hash}`;
+      const nextHref = href.startsWith("http") ? `${BASE_URL}${canonicalPath}` : canonicalPath;
+      return `href=${quote}${attrEscape(nextHref)}${quote}`;
+    } catch {
+      return `href=${quote}${href}${quote}`;
+    }
+  });
 }
 
 /** Build a list of JSON-LD blocks + the crawlable body HTML for a route. */
