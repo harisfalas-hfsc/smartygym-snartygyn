@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { getCyprusTodayStr } from "@/lib/cyprusDate";
 import type { WorkoutData } from "@/hooks/useWorkoutData";
 
+const todayWodCache = new Map<string, WorkoutData[]>();
+
 export const normalizeWodEquipment = (equipment?: string | null) => {
   const value = (equipment || "").trim().toUpperCase();
 
@@ -29,17 +31,26 @@ export const useTodayWods = (enabled = true) => {
     queryKey: ["today-wods", cyprusToday],
     queryFn: async () => {
       const workouts = await fetchVisibleWorkoutMetadata(null);
-      return workouts.filter(
+      const todayWods = workouts.filter(
         (wod) => wod.is_workout_of_day === true && wod.generated_for_date === cyprusToday
       );
+      if (todayWods.length > 0) {
+        todayWodCache.set(cyprusToday, todayWods);
+      }
+      return todayWods;
     },
     enabled,
     staleTime: 1000 * 60 * 5,
-    refetchOnWindowFocus: true,
+    retry: 2,
+    placeholderData: () => todayWodCache.get(cyprusToday),
+    refetchOnWindowFocus: false,
   });
 
   const normalized = useMemo(() => {
-    const allTodayWods = query.data || [];
+    const cachedTodayWods = todayWodCache.get(cyprusToday) || [];
+    const allTodayWods = query.data && query.data.length > 0
+      ? query.data
+      : cachedTodayWods;
     const bodyweightWod = allTodayWods.find((wod) => normalizeWodEquipment(wod.equipment) === "BODYWEIGHT");
     const equipmentWod = allTodayWods.find((wod) => normalizeWodEquipment(wod.equipment) === "EQUIPMENT");
     const variousWod = allTodayWods.find((wod) => normalizeWodEquipment(wod.equipment) === "VARIOUS");
@@ -57,6 +68,7 @@ export const useTodayWods = (enabled = true) => {
 
   return {
     ...query,
+    isLoading: query.isLoading && !todayWodCache.has(cyprusToday),
     cyprusToday,
     ...normalized,
   };
