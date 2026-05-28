@@ -76,3 +76,12 @@ export const getWorkoutPath = (workout: ContentRecord, fallbackCategory?: string
 
 export const getProgramPath = (program: ContentRecord, fallbackCategory?: string): string =>
   `/trainingprogram/${getProgramCategorySlug(program.category, fallbackCategory || "functional-strength")}/${slugifyContentName(program.name || program.title || program.id)}`;
+
+export const getWorkoutPathWithSlug = (workout: ContentRecord, slug?: string, fallbackCategory?: string): string =>
+  `/workout/${getWorkoutCategorySlug(workout.category, fallbackCategory || "strength")}/${slug || slugifyContentName(workout.name || workout.title || workout.id)}`;
+
+export const getProgramPathWithSlug = (program: ContentRecord, slug?: string, fallbackCategory?: string): string =>
+  `/trainingprogram/${getProgramCategorySlug(program.category, fallbackCategory || "functional-strength")}/${slug || slugifyContentName(program.name || program.title || program.id)}`;
+
+export const getArticlePath = (article: { slug?: string | null; title?: string | null }): string =>
+  `/blog/${article.slug || slugifyContentName(article.title)}`;

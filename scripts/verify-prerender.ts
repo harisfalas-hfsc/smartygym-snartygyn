@@ -69,9 +69,17 @@ function assertRewriteForRoute(redirects: string, routePath: string) {
   }
 }
 
+function assertRedirectRule(redirectsFile: string, from: string, to: string) {
+  const expected = `${from} ${to} 301!`;
+  const expectedTrailing = `${from}/ ${to} 301!`;
+  if (!redirectsFile.includes(expected) || !redirectsFile.includes(expectedTrailing)) {
+    throw new Error(`[verify-prerender] missing legacy ID redirect from ${from} to ${to}`);
+  }
+}
+
 export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
   const distDir = options.distDir || DIST;
-  const { routes, counts } = await buildSeoRoutes();
+  const { routes, redirects: legacyRedirects, counts } = await buildSeoRoutes();
   const redirectsPath = join(distDir, "_redirects");
   if (!isFile(redirectsPath)) {
     throw new Error("[verify-prerender] missing dist/_redirects for clean URL rewrites");
@@ -103,6 +111,9 @@ export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
 
     if (route.kind === "workout") {
       const payload = route.payload || {};
+      if (route.path.includes(String(payload.id || "__never__"))) {
+        throw new Error(`[verify-prerender] ${route.path} still exposes workout database ID in canonical URL`);
+      }
       const expectedSlug = slugifyContentName(String(payload.name || payload.id || ""));
       assertIncludes(route.path, `/${expectedSlug}`, `${route.path} readable workout URL slug`);
       assertIncludes(html, `<main class="seo-prerender seo-workout">`, `${route.path} prerendered workout shell`);
@@ -116,6 +127,9 @@ export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
 
     if (route.kind === "program") {
       const payload = route.payload || {};
+      if (route.path.includes(String(payload.id || "__never__"))) {
+        throw new Error(`[verify-prerender] ${route.path} still exposes program database ID in canonical URL`);
+      }
       const expectedSlug = slugifyContentName(String(payload.name || payload.id || ""));
       assertIncludes(route.path, `/${expectedSlug}`, `${route.path} readable program URL slug`);
       assertIncludes(html, `<main class="seo-prerender seo-program">`, `${route.path} prerendered program shell`);
@@ -132,6 +146,10 @@ export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
     }
 
     checked++;
+  }
+
+  for (const rule of legacyRedirects) {
+    assertRedirectRule(redirects, rule.from, rule.to);
   }
 
   console.log(

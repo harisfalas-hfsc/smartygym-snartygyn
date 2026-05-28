@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { BookOpen } from "lucide-react";
@@ -27,6 +27,7 @@ const generateProgramAltText = (program: any): string => {
 };
 
 const IndividualTrainingProgram = () => {
+  const navigate = useNavigate();
   const [readerModeOpen, setReaderModeOpen] = useState(false);
   const { type, id } = useParams();
   const { userTier, hasPurchased } = useAccessControl();
@@ -51,6 +52,16 @@ const IndividualTrainingProgram = () => {
   
   // Fetch program from database
   const { data: dbProgram, isLoading: isLoadingDb } = useTrainingProgramData(id);
+
+  useEffect(() => {
+    if (!dbProgram || !id) return;
+    const programCategorySlug = getProgramCategorySlug(dbProgram.category, type || "functional-strength");
+    const canonicalSlug = slugifyContentName(dbProgram.name || dbProgram.id);
+    const canonicalPath = `/trainingprogram/${programCategorySlug}/${canonicalSlug}`;
+    if (id !== canonicalSlug || type !== programCategorySlug) {
+      navigate(canonicalPath, { replace: true });
+    }
+  }, [dbProgram, id, navigate, type]);
 
   // If we have database program, use it directly
   if (isLoadingDb) {

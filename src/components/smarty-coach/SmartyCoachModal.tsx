@@ -227,7 +227,7 @@ export const SmartyCoachModal = ({ isOpen, onClose, initialPath = 'menu' }: Smar
   const handleSelectSuggestion = (item: ContentItem) => {
     logInteraction.mutate({ suggested_content_id: item.id, action_taken: 'accepted' });
     onClose();
-    navigate(getWorkoutUrl(item.category, item.id));
+    navigate(getWorkoutUrl(item));
   };
 
   const handleDismiss = () => {

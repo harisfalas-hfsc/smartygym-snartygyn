@@ -5,6 +5,8 @@
  * Updated: December 2025 - Multi-Domain Network Support
  */
 
+import { getWorkoutPath } from "@/lib/seo-slugs";
+
 export interface WorkoutSEO {
   name: string;
   category: string;
@@ -1108,10 +1110,11 @@ export const generateMicroWorkoutSchema = (workout: {
   format?: string;
   difficulty?: string;
   imageUrl?: string;
+  category?: string;
 }) => ({
   "@context": "https://schema.org",
   "@type": "ExercisePlan",
-  "@id": `https://smartygym.com/individualworkout/${workout.id}`,
+  "@id": `https://smartygym.com${getWorkoutPath({ id: workout.id, name: workout.name, category: workout.category || "MICRO-WORKOUTS" })}`,
   "name": workout.name,
   "alternateName": `${workout.name} - 5 Minute Micro Workout`,
   "description": workout.description || `Quick 5-minute micro workout designed by Sports Scientist Haris Falas. Perfect for office, home, or anywhere. No equipment needed.`,

@@ -536,6 +536,7 @@ function clamp(s: string, max: number): string {
 
 export interface SeoRouteBundle {
   routes: SeoRoute[];
+  redirects: Array<{ from: string; to: string; status: 301 }>;
   counts: {
     static: number;
     workoutCategory: number;
@@ -554,6 +555,7 @@ export interface SeoRouteBundle {
 export async function buildSeoRoutes(): Promise<SeoRouteBundle> {
   const today = new Date().toISOString().split("T")[0];
   const routes: SeoRoute[] = [];
+  const redirects: Array<{ from: string; to: string; status: 301 }> = [];
 
   for (const r of STATIC_ROUTES) {
     routes.push({ ...r, kind: "static", lastmod: today });
@@ -632,6 +634,7 @@ export async function buildSeoRoutes(): Promise<SeoRouteBundle> {
         priority: "0.7",
         payload: w,
       });
+      redirects.push({ from: `/workout/${slug}/${w.id}`, to: `/workout/${slug}/${workoutSlug}`, status: 301 });
       dynamicWorkouts++;
     }
   }
@@ -664,6 +667,7 @@ export async function buildSeoRoutes(): Promise<SeoRouteBundle> {
         priority: "0.7",
         payload: p,
       });
+      redirects.push({ from: `/trainingprogram/${slug}/${p.id}`, to: `/trainingprogram/${slug}/${programSlug}`, status: 301 });
       dynamicPrograms++;
     }
   }
@@ -701,6 +705,7 @@ export async function buildSeoRoutes(): Promise<SeoRouteBundle> {
 
   return {
     routes,
+    redirects: redirects.filter((rule) => rule.from !== rule.to),
     counts: {
       static: STATIC_ROUTES.length,
       workoutCategory: WORKOUT_CATEGORY_SLUGS.length,

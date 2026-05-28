@@ -35,13 +35,20 @@ function ensureParentDirectoryForFile(outPath: string) {
   mkdirSync(parentDir, { recursive: true });
 }
 
-function writeCleanUrlRewrites(distDir: string, cleanPaths: string[]) {
+function writeCleanUrlRewrites(distDir: string, cleanPaths: string[], redirects: Array<{ from: string; to: string; status: 301 }> = []) {
   // Lovable's static host can serve the SPA fallback for clean URLs like
   // /blog/<slug> unless we explicitly point them at their generated folder
   // index files. Without these forced 200 rewrites, Googlebot can see the
   // homepage HTML for every article — wrong canonical, wrong content.
   const seen = new Set<string>();
   const rules: string[] = [];
+  for (const rule of redirects.sort((a, b) => a.from.localeCompare(b.from))) {
+    const key = `${rule.from}>${rule.to}`;
+    if (seen.has(key) || rule.from === rule.to) continue;
+    seen.add(key);
+    rules.push(`${rule.from} ${rule.to} ${rule.status}!`);
+    rules.push(`${rule.from}/ ${rule.to} ${rule.status}!`);
+  }
   for (const p of [...cleanPaths].sort()) {
     if (seen.has(p)) continue;
     seen.add(p);
@@ -77,7 +84,7 @@ export async function prerenderSeoHtml(options: {
   }
   const template = normalizeTemplate(readFileSync(templatePath, "utf8"));
 
-  const { routes, counts } = await buildSeoRoutes();
+  const { routes, redirects, counts } = await buildSeoRoutes();
   console.log(
     `[prerender] rendering ${counts.total} routes (` +
       `static=${counts.static}, workout-cat=${counts.workoutCategory}, ` +
@@ -124,7 +131,7 @@ export async function prerenderSeoHtml(options: {
     reportRows.push(`| ${route.path} | ${sourceFile.replace(`${distDir}/`, "dist/")} |`);
     cleanPaths.push(route.path);
   }
-  writeCleanUrlRewrites(distDir, cleanPaths);
+  writeCleanUrlRewrites(distDir, cleanPaths, redirects);
   writeFileSync(join(distDir, "seo-prerender-report.md"), `${reportRows.join("\n")}\n`);
   console.log(`[prerender] wrote ${written} HTML files into ${distDir.replace(process.cwd() + "/", "")}/`);
 }

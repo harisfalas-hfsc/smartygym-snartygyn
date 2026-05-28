@@ -1,89 +1,129 @@
-To be crystal clear: this applies to **every single page** on the site, not one workout. That means:
+I found the remaining causes: some code still creates public workout/program URLs with IDs, and old ID URLs are still accepted without automatically moving the browser/canonical source to the readable slug URL.
 
-- **All ~500+ workouts** (free and premium, existing and any added in the future)
-- **All training programs** (free and premium, existing and future)
-- **All blog articles** (existing and future, auto-included on next publish)
-- **All Smarty Tools** (`/tools`, `/1rmcalculator`, `/bmrcalculator`, `/macrocalculator`, `/caloriecalculator`, `/caloriecounter`, `/workouttimer`)
-- **All category and static pages** (`/workout`, `/workout/strength`, `/trainingprogram`, `/trainingprogram/weight-loss`, `/blog`, `/about`, `/coach-profile`, etc.)
+## Final fix scope
 
-No page is skipped. No page keeps the homepage title. No page is hand-picked.
+This will apply globally, not to one workout:
 
-## What every page will have after this fix
-
-For every URL above:
-- A unique `<title>` based on the actual content name.
-- A unique `<meta description>`.
-- A correct canonical URL pointing to that exact page.
-- Open Graph + Twitter tags matching the page.
-- JSON-LD schema appropriate to the type (Article, ExercisePlan, Course, WebApplication, etc.).
-- The actual content (H1, body text, workout sections, article text, tool description) inside the raw HTML — visible in `view-source:` before any JavaScript runs.
+- All workouts, current and future
+- All training programs, current and future
+- All blog articles, current and future
+- All Smarty Tools and static public pages
+- All app links, coach suggestion links, sitemap links, prerendered HTML, canonicals, and redirects
 
 ## What I will change
 
-### 1. Readable, standardized URLs for dynamic content
-Move workouts and programs off serial-ID URLs and onto readable slugs based on the content name:
+### 1. Replace every remaining ID-based public link
+Update all remaining URL helpers and callers so they build URLs from the content name, not the database ID.
+
+Examples:
 
 ```text
-/blog/<article-slug>
-/workout/<category>/<workout-slug>
-/trainingprogram/<category>/<program-slug>
-/tools, /1rmcalculator, /bmrcalculator, /macrocalculator,
-/caloriecalculator, /caloriecounter, /workouttimer
+Wrong:
+/workout/strength/FREE-int-strength-E-1777866547411
+/trainingprogram/weight-loss/PROGRAM-12345
+
+Correct:
+/workout/strength/bedrock-lift
+/trainingprogram/weight-loss/<program-name-slug>
 ```
 
-Slugs are derived from the visible name (with a numeric suffix only if two items collide). Old ID-based URLs keep working, but canonical URLs point to the readable slug version so Google indexes one clean URL per item.
+Known remaining sources to fix:
 
-### 2. Update app navigation links
-Workout/program list and detail components will link using the readable slug URLs so users and crawlers land directly on the canonical pages.
+- `src/utils/smarty-coach/routes.ts` currently returns `/workout/<category>/<id>` and `/trainingprogram/<category>/<id>`.
+- `SmartyCoachModal` and `ProgramSuggestionFlow` pass IDs into those helpers.
+- Any stale/legacy `individualworkout` route references will be removed or redirected to canonical URLs.
+- Old schema/helper references like `/individualworkout/<id>` will be updated to canonical `/workout/<category>/<name-slug>`.
 
-### 3. Prerender every public page, automatically
-The build process already queries the backend for every published article, every visible workout, every visible program. I will make sure the route generator covers 100% of those plus every Smarty Tool and every static page, and that each one writes its own `dist/<route>/index.html` containing:
+### 2. Add a single canonical URL helper used everywhere
+Create/extend shared helpers so every part of the app uses the same logic:
 
-- Unique `<title>` and meta description
-- Canonical and OG/Twitter tags
+```text
+getWorkoutPath(workout) -> /workout/<category>/<unique-name-slug>
+getProgramPath(program) -> /trainingprogram/<category>/<unique-name-slug>
+getArticlePath(article) -> /blog/<slug>
+```
+
+This prevents different components from generating different URLs for the same content.
+
+### 3. Redirect old ID URLs automatically
+If someone opens an old URL like:
+
+```text
+/workout/strength/FREE-int-strength-E-1777866547411
+```
+
+then after the workout is resolved, the app will immediately replace the browser URL with:
+
+```text
+/workout/strength/bedrock-lift
+```
+
+Same for training programs.
+
+### 4. Generate host-level redirects for every existing workout/program ID URL
+During prerender/publish, generate redirect rules for every visible workout and program:
+
+```text
+/workout/<category>/<id>              /workout/<category>/<name-slug> 301!
+/trainingprogram/<category>/<id>      /trainingprogram/<category>/<name-slug> 301!
+```
+
+This means old public ID URLs do not stay indexable and crawlers are pushed to the readable URL.
+
+### 5. Keep readable slug pages fully prerendered
+For every canonical URL, keep writing:
+
+```text
+dist/workout/<category>/<name-slug>/index.html
+dist/trainingprogram/<category>/<name-slug>/index.html
+dist/blog/<article-slug>/index.html
+```
+
+Each must contain its own:
+
+- unique title
+- unique meta description
+- canonical URL
+- OG/Twitter tags
 - JSON-LD
-- Full H1 + body text (workout sections, article content, program structure, tool description) inside `<div id="root">`
+- H1 and crawlable body text inside raw HTML
 
-This runs on every publish. **Any new blog article, workout, program, or tool is automatically included on the next publish — no manual step.**
+### 6. Strengthen verification so this cannot return
+Update the verification script to fail if any of these exist:
 
-### 4. Force every clean URL to its prerendered file
-`_redirects` will explicitly map every public clean URL to its own `index.html` so the static host cannot fall back to the homepage shell.
+- `/workout/<category>/<database-id>` in generated routes, sitemap, or redirects as a final canonical URL
+- `/trainingprogram/<category>/<database-id>` as a final canonical URL
+- any `individualworkout` or `individualtrainingprogram` public SEO URL
+- any workout/program canonical using the ID instead of the name slug
+- any app source code helper returning ID-based public URLs
+- any prerendered page showing homepage title/content instead of page-specific title/content
 
-### 5. Hard verification — the build fails if any page is wrong
-`scripts/verify-prerender.ts` will fail the build if **any** route:
-- Still has the homepage title
-- Has a serial ID where the content name should be
-- Has a missing or wrong canonical
-- Is missing its actual body content in raw HTML
-- Is missing its `_redirects` rule
+## Acceptance test after implementation
 
-If even one workout, one program, one article, or one tool is broken, the build stops. Nothing partial ever ships.
-
-### 6. Live deployed-source verification script
-After publish, a script fetches the raw HTML of representative URLs from each category (multiple workouts, multiple programs, multiple articles, every tool, key static pages) and confirms each one returns its own unique title and content — not the homepage. Failures are reported clearly.
-
-## Files affected
-- `scripts/lib/seo-routes.ts` (route + slug generation)
-- `scripts/lib/seo-render.ts` (per-page body and JSON-LD)
-- `scripts/prerender.ts` (file output)
-- `scripts/verify-prerender.ts` (strict checks)
-- `scripts/generate-sitemap.ts` (URL format alignment)
-- New: `scripts/verify-deployed-seo.ts`
-- Workout/program list/detail link generation in `src/pages` and related components
-
-## Acceptance test — must pass for ALL types
-After publish, `view-source:` on these patterns must show the page's own title and content, not the homepage:
+These must be true after publish:
 
 ```text
-https://smartygym.com/blog/<any published article slug>
-https://smartygym.com/workout/<category>/<any workout slug>
-https://smartygym.com/trainingprogram/<category>/<any program slug>
-https://smartygym.com/1rmcalculator
-https://smartygym.com/bmrcalculator
-https://smartygym.com/macrocalculator
-https://smartygym.com/caloriecounter
-https://smartygym.com/workouttimer
-https://smartygym.com/tools
+https://smartygym.com/workout/strength/bedrock-lift
 ```
 
-This must be true for **every** published article, **every** visible workout, **every** visible program, and **every** tool — current and future.
+shows source with:
+
+```text
+<title>Bedrock Lift | Online Workout by Haris Falas | SmartyGym</title>
+<h1>Bedrock Lift</h1>
+<link rel="canonical" href="https://smartygym.com/workout/strength/bedrock-lift" />
+```
+
+and the old ID URL:
+
+```text
+https://smartygym.com/workout/strength/FREE-int-strength-E-1777866547411
+```
+
+redirects or replaces to:
+
+```text
+https://smartygym.com/workout/strength/bedrock-lift
+```
+
+Same rule for every workout, every training program, every blog article, and every tool.
