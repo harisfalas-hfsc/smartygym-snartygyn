@@ -70,7 +70,7 @@ export function renderRouteBody(route: SeoRoute): {
   bodyHtml: string;
   jsonLd: unknown[];
 } {
-  const canonical = `${BASE_URL}${route.path}`;
+  const canonical = canonicalUrlFor(route.path);
   const jsonLd: unknown[] = [];
 
   if (route.kind === "blog-article") {
