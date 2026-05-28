@@ -48,7 +48,7 @@ const Tools = () => {
       icon: Calculator,
       title: "1RM Calculator",
       description: "Calculate your one-rep maximum for any exercise",
-      route: "/1rmcalculator",
+      route: "/tools/1rm-calculator",
       image: oneRmBg,
       mobileImage: oneRmCardMobile
     },
@@ -57,7 +57,7 @@ const Tools = () => {
       icon: Activity,
       title: "BMR Calculator",
       description: "Calculate your basal metabolic rate using the Mifflin-St Jeor formula",
-      route: "/bmrcalculator",
+      route: "/tools/bmr-calculator",
       image: bmrBg,
       mobileImage: bmrCardMobile
     },
@@ -66,7 +66,7 @@ const Tools = () => {
       icon: Flame,
       title: "Macro Tracking Calculator",
       description: "Get personalized nutrition and macro recommendations",
-      route: "/macrocalculator",
+      route: "/tools/macro-calculator",
       image: macroBg,
       mobileImage: macroCardMobile
     },
@@ -75,7 +75,7 @@ const Tools = () => {
       icon: Timer,
       title: "Workout Timer",
       description: "Customizable interval timer for HIIT, Tabata, and circuit training sessions",
-      route: "/workouttimer",
+      route: "/tools/workout-timer",
       image: timerBg,
       mobileImage: timerCardMobile
     },
@@ -84,7 +84,7 @@ const Tools = () => {
       icon: Search,
       title: "Calorie Counter",
       description: "Search any food and instantly see calories and macros per serving",
-      route: "/caloriecounter",
+      route: "/tools/calorie-counter",
       image: calorieBg,
       mobileImage: calorieCardMobile
     }
@@ -110,25 +110,25 @@ const Tools = () => {
         <script type="application/ld+json">{JSON.stringify(generateToolWebApplicationSchema({
           name: "1RM Calculator",
           description: "Free One Rep Max calculator by Sports Scientist Haris Falas. Estimate your 1RM using validated strength formulas (Epley, Brzycki, Lombardi).",
-          url: "/1rmcalculator",
+          url: "/tools/1rm-calculator",
           keywords: ["1RM calculator", "one rep max", "strength calculator", "Epley formula", "Brzycki formula", "Haris Falas", "SmartyGym"]
         }))}</script>
         <script type="application/ld+json">{JSON.stringify(generateToolWebApplicationSchema({
           name: "BMR Calculator",
           description: "Free Basal Metabolic Rate calculator by Sports Scientist Haris Falas. Mifflin-St Jeor formula for accurate daily calorie needs.",
-          url: "/bmrcalculator",
+          url: "/tools/bmr-calculator",
           keywords: ["BMR calculator", "basal metabolic rate", "TDEE", "calorie calculator", "Mifflin-St Jeor", "Haris Falas", "SmartyGym"]
         }))}</script>
         <script type="application/ld+json">{JSON.stringify(generateToolWebApplicationSchema({
           name: "Macro Tracking Calculator",
           description: "Free macronutrient calculator by Sports Scientist Haris Falas. Personalized protein, carbs, and fat targets for weight loss, maintenance, or muscle gain.",
-          url: "/macrocalculator",
+          url: "/tools/macro-calculator",
           keywords: ["macro calculator", "macronutrient calculator", "protein calculator", "nutrition planning", "Haris Falas", "SmartyGym"]
         }))}</script>
         <script type="application/ld+json">{JSON.stringify(generateToolWebApplicationSchema({
           name: "Calorie Counter",
           description: "Free calorie and macro food search tool by SmartyGym. Look up any food and instantly see calories, protein, carbs, and fat per serving.",
-          url: "/caloriecounter",
+          url: "/tools/calorie-counter",
           keywords: ["calorie counter", "food calorie lookup", "macro tracking", "USDA food database", "Haris Falas", "SmartyGym"]
         }))}</script>
         <script type="application/ld+json">{JSON.stringify(generateSpeakableSchema())}</script>
