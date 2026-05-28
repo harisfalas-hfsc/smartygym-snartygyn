@@ -81,26 +81,39 @@ function writeHeadersFile(distDir: string, cleanPaths: string[]) {
   writeFileSync(join(distDir, "_headers"), lines.join("\n"));
 }
 
-function writeCleanUrlRewrites(distDir: string, cleanPaths: string[], redirects: Array<{ from: string; to: string; status: 301 }> = []) {
-  // Lovable's static host can serve the SPA fallback for clean URLs like
-  // /blog/<slug> unless we explicitly point them at their generated folder
-  // index files. Without these forced 200 rewrites, Googlebot can see the
-  // homepage HTML for every article — wrong canonical, wrong content.
+function writeCleanUrlRewrites(
+  distDir: string,
+  leafPaths: string[],
+  ancestorPaths: string[],
+  redirects: Array<{ from: string; to: string; status: 301 }> = [],
+) {
+  // Lovable's static host serves extensionless artifacts with
+  // `Content-Type: application/octet-stream`, and ignores `_headers` overrides
+  // for them. To force `text/html`, we rewrite every canonical clean URL to
+  // its `.html` sibling (which the host serves as text/html by extension).
+  // Trailing-slash variants 301 to the canonical clean URL.
   const seen = new Set<string>();
   const rules: string[] = [];
   for (const rule of redirects.sort((a, b) => a.from.localeCompare(b.from))) {
-    const key = `${rule.from}>${rule.to}`;
+    const key = `R:${rule.from}>${rule.to}`;
     if (seen.has(key) || rule.from === rule.to) continue;
     seen.add(key);
     rules.push(`${rule.from} ${rule.to} ${rule.status}!`);
     rules.push(`${rule.from}/ ${rule.to} ${rule.status}!`);
   }
-  for (const p of [...cleanPaths].sort()) {
-    if (seen.has(p)) continue;
-    seen.add(p);
-    // Exact file already exists at dist<p>, so just collapse the trailing
-    // slash variant via a 301 redirect so crawlers don't see a homepage shell.
-    rules.push(`${p} ${p} 200!`);
+  for (const p of [...leafPaths].sort()) {
+    const k = `L:${p}`;
+    if (seen.has(k)) continue;
+    seen.add(k);
+    // Force HTML content-type by rewriting clean URL to the .html sibling.
+    rules.push(`${p} ${p}.html 200!`);
+    rules.push(`${p}/ ${p} 301!`);
+  }
+  for (const p of [...ancestorPaths].sort()) {
+    const k = `A:${p}`;
+    if (seen.has(k)) continue;
+    seen.add(k);
+    // Ancestor routes are served from folder index.html; collapse trailing slash.
     rules.push(`${p}/ ${p} 301!`);
   }
   if (!rules.length) return;
@@ -147,7 +160,8 @@ export async function prerenderSeoHtml(options: {
     written++;
   };
 
-  const cleanPaths: string[] = [];
+  const leafPaths: string[] = [];
+  const ancestorPaths: string[] = [];
   const allPaths = new Set(routes.map((route) => route.path));
   const reportRows: string[] = [
     "# SmartyGym SEO prerender report",
@@ -181,18 +195,19 @@ export async function prerenderSeoHtml(options: {
     if (isAncestor) {
       primarySource = join(distDir, cleanPath, "index.html");
       writeHtml(primarySource, html);
+      ancestorPaths.push(route.path);
     } else {
       const exactFile = join(distDir, cleanPath);
       const dotHtmlFile = join(distDir, `${cleanPath}.html`);
       writeHtml(exactFile, html);
       writeHtml(dotHtmlFile, html);
       primarySource = exactFile;
+      leafPaths.push(route.path);
     }
     reportRows.push(`| ${route.path} | ${primarySource.replace(`${distDir}/`, "dist/")} |`);
-    cleanPaths.push(route.path);
   }
-  writeCleanUrlRewrites(distDir, cleanPaths, redirects);
-  writeHeadersFile(distDir, cleanPaths);
+  writeCleanUrlRewrites(distDir, leafPaths, ancestorPaths, redirects);
+  writeHeadersFile(distDir, [...leafPaths, ...ancestorPaths]);
   writeFileSync(join(distDir, "seo-prerender-report.md"), `${reportRows.join("\n")}\n`);
   console.log(`[prerender] wrote ${written} HTML files into ${distDir.replace(process.cwd() + "/", "")}/`);
 }
