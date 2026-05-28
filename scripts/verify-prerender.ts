@@ -67,11 +67,18 @@ function isFile(path: string) {
   return existsSync(path) && statSync(path).isFile();
 }
 
-function assertRewriteForRoute(redirects: string, routePath: string) {
-  const expected = `${routePath} ${routePath} 200!`;
+function assertLeafRewriteForRoute(redirects: string, routePath: string) {
+  const expected = `${routePath} ${routePath}.html 200!`;
   const expectedTrailing = `${routePath}/ ${routePath} 301!`;
   if (!redirects.includes(expected) || !redirects.includes(expectedTrailing)) {
-    throw new Error(`[verify-prerender] missing _redirects rules for ${routePath}`);
+    throw new Error(`[verify-prerender] missing leaf _redirects rules for ${routePath}`);
+  }
+}
+
+function assertAncestorRewriteForRoute(redirects: string, routePath: string) {
+  const expectedTrailing = `${routePath}/ ${routePath} 301!`;
+  if (!redirects.includes(expectedTrailing)) {
+    throw new Error(`[verify-prerender] missing ancestor trailing-slash 301 for ${routePath}`);
   }
 }
 
@@ -166,7 +173,11 @@ export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
     }
 
     if (route.path !== "/") {
-      assertRewriteForRoute(redirects, route.path);
+      if (isAncestorRoute(route.path, allPaths)) {
+        assertAncestorRewriteForRoute(redirects, route.path);
+      } else {
+        assertLeafRewriteForRoute(redirects, route.path);
+      }
     }
 
     checked++;
