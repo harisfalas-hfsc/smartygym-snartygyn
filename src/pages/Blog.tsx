@@ -160,6 +160,9 @@ const Blog = () => {
                 <p className="text-sm sm:text-base text-center font-bold">
                   Evidence-based articles by <a href="/coach-profile" className="text-primary hover:underline font-semibold">Haris Falas</a> on Fitness, Nutrition, and Wellness to empower your journey.
                 </p>
+                <p className="text-sm sm:text-base text-center font-semibold text-foreground">
+                  Explore all <span className="text-primary font-bold">{allArticles.length} free articles</span> across Fitness, Nutrition, and Wellness.
+                </p>
               </div>
             </CardContent>
           </Card>
