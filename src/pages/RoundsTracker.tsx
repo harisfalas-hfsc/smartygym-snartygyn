@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RotateCcw, Plus, Minus, Volume2, VolumeX, Vibrate } from "lucide-react";
+import { RotateCcw, Plus, Minus, Volume2, VolumeX, Vibrate, Lock, Unlock, Maximize2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 
@@ -28,16 +28,70 @@ const RoundsTracker = () => {
   const [flash, setFlash] = useState<"none" | "tap" | "done">("none");
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
+  const [locked, setLocked] = useState(false);
+  const [unlockHold, setUnlockHold] = useState(0);
+  const unlockTimerRef = useRef<number | null>(null);
+  const rootRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const request = async () => {
       if ("wakeLock" in navigator) {
-        try { wakeLockRef.current = await navigator.wakeLock.request("screen"); } catch { /* ignore */ }
+        try { wakeLockRef.current = await (navigator as any).wakeLock.request("screen"); } catch { /* ignore */ }
       }
     };
     request();
-    return () => { wakeLockRef.current?.release(); wakeLockRef.current = null; };
+    const onVis = () => { if (document.visibilityState === "visible") request(); };
+    document.addEventListener("visibilitychange", onVis);
+    return () => {
+      document.removeEventListener("visibilitychange", onVis);
+      wakeLockRef.current?.release(); wakeLockRef.current = null;
+    };
   }, []);
+
+  // Exit lock if user leaves fullscreen via system gesture
+  useEffect(() => {
+    const onFs = () => {
+      if (!document.fullscreenElement && locked) setLocked(false);
+    };
+    document.addEventListener("fullscreenchange", onFs);
+    return () => document.removeEventListener("fullscreenchange", onFs);
+  }, [locked]);
+
+  const enterLock = async () => {
+    setLocked(true);
+    try {
+      const el: any = rootRef.current || document.documentElement;
+      if (el.requestFullscreen) await el.requestFullscreen();
+      else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    } catch { /* ignore */ }
+    try { (screen.orientation as any)?.lock?.("portrait").catch(() => {}); } catch { /* ignore */ }
+  };
+
+  const exitLock = async () => {
+    setLocked(false);
+    setUnlockHold(0);
+    if (unlockTimerRef.current) { window.clearInterval(unlockTimerRef.current); unlockTimerRef.current = null; }
+    try { if (document.fullscreenElement) await document.exitFullscreen(); } catch { /* ignore */ }
+  };
+
+  const startUnlock = () => {
+    if (unlockTimerRef.current) return;
+    const start = Date.now();
+    unlockTimerRef.current = window.setInterval(() => {
+      const pct = Math.min(100, ((Date.now() - start) / 1200) * 100);
+      setUnlockHold(pct);
+      if (pct >= 100) {
+        window.clearInterval(unlockTimerRef.current!);
+        unlockTimerRef.current = null;
+        exitLock();
+      }
+    }, 50);
+  };
+
+  const cancelUnlock = () => {
+    if (unlockTimerRef.current) { window.clearInterval(unlockTimerRef.current); unlockTimerRef.current = null; }
+    setUnlockHold(0);
+  };
 
   const beep = useCallback((freq = 800, dur = 0.15) => {
     if (!soundOn) return;
@@ -161,7 +215,7 @@ const RoundsTracker = () => {
         relatedContent={["workouts", "workout timer"]}
       />
 
-      <div className="lg:min-h-screen bg-background flex flex-col">
+      <div ref={rootRef} className="lg:min-h-screen bg-background flex flex-col">
         <div className="container mx-auto max-w-2xl px-3 lg:px-4 pt-1 lg:pt-4 pb-2 lg:pb-8 flex flex-col">
           <div className="hidden lg:block">
             <PageBreadcrumbs
@@ -269,6 +323,15 @@ const RoundsTracker = () => {
                   <Vibrate className="w-4 h-4 mr-1.5" />
                   <span>Vibrate {hapticOn ? "on" : "off"}</span>
                 </Button>
+                <Button
+                  variant="outline"
+                  onClick={enterLock}
+                  className="h-10 lg:h-9 px-3 lg:px-3 text-sm font-semibold"
+                  aria-label="Lock screen for workout"
+                >
+                  <Maximize2 className="w-4 h-4 mr-1.5" />
+                  <span>Lock screen</span>
+                </Button>
               </div>
 
               <button
@@ -334,6 +397,71 @@ const RoundsTracker = () => {
           </Card>
         </div>
       </div>
+
+      {locked && (
+        <div
+          className="fixed inset-0 z-[9999] bg-background flex flex-col"
+          style={{ touchAction: "manipulation" }}
+        >
+          <button
+            onClick={handleBigTap}
+            aria-label="Tap to count"
+            className={cn(
+              "flex-1 w-full select-none touch-manipulation",
+              "text-center transition-colors duration-150",
+              flash === "done"
+                ? "bg-emerald-500"
+                : flash === "tap"
+                  ? "bg-primary/90"
+                  : "bg-primary"
+            )}
+          >
+            <div className="flex flex-col items-center justify-center h-full text-primary-foreground px-4">
+              {mode === "rounds-reps" && (
+                <div className="text-lg font-semibold opacity-90 mb-2">
+                  Round {Math.min(roundsDone + (isDone ? 0 : 1), targetRounds)} / {targetRounds}
+                </div>
+              )}
+              <div
+                className="leading-none font-black tabular-nums drop-shadow-lg"
+                style={{ fontSize: "clamp(120px, 32vh, 360px)" }}
+              >
+                {bigDisplay}
+              </div>
+              <div className="text-xl font-semibold opacity-90 mt-4">
+                {isDone ? "🎉 Done!" : bigSub}
+              </div>
+              <div className="text-sm opacity-70 mt-2">
+                {isDone
+                  ? "Hold the lock button to exit"
+                  : mode === "rounds" ? "Tap anywhere to count a round" : "Tap anywhere to count a rep"}
+              </div>
+            </div>
+          </button>
+
+          {/* Hold-to-unlock button — corner, away from tap zone */}
+          <button
+            onPointerDown={(e) => { e.stopPropagation(); startUnlock(); }}
+            onPointerUp={(e) => { e.stopPropagation(); cancelUnlock(); }}
+            onPointerLeave={(e) => { e.stopPropagation(); cancelUnlock(); }}
+            onPointerCancel={(e) => { e.stopPropagation(); cancelUnlock(); }}
+            onClick={(e) => e.stopPropagation()}
+            aria-label="Hold to unlock"
+            className="fixed bottom-4 right-4 z-[10000] h-16 w-16 rounded-full bg-background/80 backdrop-blur border-2 border-primary/60 shadow-xl flex items-center justify-center text-foreground touch-manipulation"
+            style={{
+              backgroundImage: `conic-gradient(hsl(var(--primary)) ${unlockHold}%, transparent ${unlockHold}%)`,
+            }}
+          >
+            <div className="h-12 w-12 rounded-full bg-background flex items-center justify-center">
+              {unlockHold > 0 ? <Unlock className="w-5 h-5" /> : <Lock className="w-5 h-5" />}
+            </div>
+          </button>
+
+          <div className="fixed top-3 left-1/2 -translate-x-1/2 z-[10000] text-xs text-muted-foreground bg-background/70 backdrop-blur px-3 py-1 rounded-full border">
+            Hold the lock icon to exit
+          </div>
+        </div>
+      )}
     </>
   );
 };
