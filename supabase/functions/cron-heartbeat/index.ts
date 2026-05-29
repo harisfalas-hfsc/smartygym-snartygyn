@@ -379,7 +379,8 @@ serve(async (req) => {
     success: true,
     total_checked: filtered.length,
     overdue_count: overdueJobs.length,
-    critical_overdue_count: criticalOverdueJobs.length,
+    failed_24h_count: failed24h.length,
+    healthy_24h_count: healthy24h.length,
     alert_status,
     report,
   }), {
