@@ -119,16 +119,10 @@ Deno.serve(async (req) => {
     pings["google_search_console"] = `error:${String(e)}`;
   }
 
-  // Bing: legacy sitemap ping (still accepted)
-  try {
-    const r = await fetch(
-      `https://www.bing.com/ping?sitemap=${encodeURIComponent(SITEMAP_URL)}`,
-      { method: "GET" },
-    );
-    pings["bing"] = r.status;
-  } catch (e) {
-    pings["bing"] = `error:${String(e)}`;
-  }
+  // Bing: legacy /ping?sitemap= was deprecated (returns 410). Bing now relies
+  // entirely on IndexNow, which is already pinged every 5 min by the
+  // process-indexnow-queue-frequent cron — no separate sitemap ping needed.
+  pings["bing"] = "uses_indexnow";
 
   return new Response(
     JSON.stringify({
