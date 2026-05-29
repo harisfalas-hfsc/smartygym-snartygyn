@@ -397,6 +397,71 @@ const RoundsTracker = () => {
           </Card>
         </div>
       </div>
+
+      {locked && (
+        <div
+          className="fixed inset-0 z-[9999] bg-background flex flex-col"
+          style={{ touchAction: "manipulation" }}
+        >
+          <button
+            onClick={handleBigTap}
+            aria-label="Tap to count"
+            className={cn(
+              "flex-1 w-full select-none touch-manipulation",
+              "text-center transition-colors duration-150",
+              flash === "done"
+                ? "bg-emerald-500"
+                : flash === "tap"
+                  ? "bg-primary/90"
+                  : "bg-primary"
+            )}
+          >
+            <div className="flex flex-col items-center justify-center h-full text-primary-foreground px-4">
+              {mode === "rounds-reps" && (
+                <div className="text-lg font-semibold opacity-90 mb-2">
+                  Round {Math.min(roundsDone + (isDone ? 0 : 1), targetRounds)} / {targetRounds}
+                </div>
+              )}
+              <div
+                className="leading-none font-black tabular-nums drop-shadow-lg"
+                style={{ fontSize: "clamp(120px, 32vh, 360px)" }}
+              >
+                {bigDisplay}
+              </div>
+              <div className="text-xl font-semibold opacity-90 mt-4">
+                {isDone ? "🎉 Done!" : bigSub}
+              </div>
+              <div className="text-sm opacity-70 mt-2">
+                {isDone
+                  ? "Hold the lock button to exit"
+                  : mode === "rounds" ? "Tap anywhere to count a round" : "Tap anywhere to count a rep"}
+              </div>
+            </div>
+          </button>
+
+          {/* Hold-to-unlock button — corner, away from tap zone */}
+          <button
+            onPointerDown={(e) => { e.stopPropagation(); startUnlock(); }}
+            onPointerUp={(e) => { e.stopPropagation(); cancelUnlock(); }}
+            onPointerLeave={(e) => { e.stopPropagation(); cancelUnlock(); }}
+            onPointerCancel={(e) => { e.stopPropagation(); cancelUnlock(); }}
+            onClick={(e) => e.stopPropagation()}
+            aria-label="Hold to unlock"
+            className="fixed bottom-4 right-4 z-[10000] h-16 w-16 rounded-full bg-background/80 backdrop-blur border-2 border-primary/60 shadow-xl flex items-center justify-center text-foreground touch-manipulation"
+            style={{
+              backgroundImage: `conic-gradient(hsl(var(--primary)) ${unlockHold}%, transparent ${unlockHold}%)`,
+            }}
+          >
+            <div className="h-12 w-12 rounded-full bg-background flex items-center justify-center">
+              {unlockHold > 0 ? <Unlock className="w-5 h-5" /> : <Lock className="w-5 h-5" />}
+            </div>
+          </button>
+
+          <div className="fixed top-3 left-1/2 -translate-x-1/2 z-[10000] text-xs text-muted-foreground bg-background/70 backdrop-blur px-3 py-1 rounded-full border">
+            Hold the lock icon to exit
+          </div>
+        </div>
+      )}
     </>
   );
 };
