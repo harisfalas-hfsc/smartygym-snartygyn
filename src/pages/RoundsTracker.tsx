@@ -12,6 +12,50 @@ import { SEOEnhancer } from "@/components/SEOEnhancer";
 type Mode = "rounds" | "rounds-reps";
 type Direction = "down" | "up";
 
+const Stepper = ({
+  label, value, inputValue, onInputChange, onCommit, onDec, onInc,
+}: {
+  label: string; value: number; inputValue: string;
+  onInputChange: (s: string) => void; onCommit: () => void;
+  onDec: () => void; onInc: () => void;
+}) => (
+  <div className="flex flex-col gap-1">
+    <Label className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground px-1">{label}</Label>
+    <div className="flex items-center bg-muted/60 rounded-xl h-11 overflow-hidden">
+      <button onClick={onDec} className="h-full w-11 flex items-center justify-center text-foreground hover:bg-muted active:scale-95 transition" aria-label={`Decrease ${label}`}>
+        <Minus className="w-4 h-4" />
+      </button>
+      <Input
+        type="number"
+        inputMode="numeric"
+        value={inputValue}
+        onChange={(e) => onInputChange(e.target.value)}
+        onBlur={onCommit}
+        className="flex-1 h-full border-0 bg-transparent text-lg font-bold text-center focus-visible:ring-0 focus-visible:ring-offset-0 p-0 tabular-nums"
+      />
+      <button onClick={onInc} className="h-full w-11 flex items-center justify-center text-foreground hover:bg-muted active:scale-95 transition" aria-label={`Increase ${label}`}>
+        <Plus className="w-4 h-4" />
+      </button>
+    </div>
+  </div>
+);
+
+const IconToggle = ({ active, onClick, label, children }: {
+  active: boolean; onClick: () => void; label: string; children: React.ReactNode;
+}) => (
+  <button
+    onClick={onClick}
+    aria-label={label}
+    aria-pressed={active}
+    className={cn(
+      "h-9 w-9 rounded-full flex items-center justify-center transition-colors",
+      active ? "bg-primary text-primary-foreground" : "bg-muted/60 hover:bg-muted text-foreground"
+    )}
+  >
+    {children}
+  </button>
+);
+
 const RoundsTracker = () => {
   const [mode, setMode] = useState<Mode>("rounds");
   const [direction, setDirection] = useState<Direction>("down");
