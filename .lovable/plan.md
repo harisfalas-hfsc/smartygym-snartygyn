@@ -1,32 +1,51 @@
-## Goal
+## Plan: New blog article — "Either Way, You'll End Up in the Gym"
 
-Mirror the counter pattern from Smarty Workouts/Programs ("Unlock all N…") on the **Blog** and **Smarty Tools** "About" cards — but without paywall wording, since both are free. Apply on mobile and desktop. Preserve the existing line count of each description card so alignment stays intact.
+A personal, ~2,000-word message-from-the-coach article authored by Haris Falas, with a custom realistic image of normal everyday people, published into the existing Blog system.
 
-## Changes
+### 1. Generate the hero image
+- Use `imagegen--generate_image` (model `standard`, 1920×1080, .jpg) into `/tmp/either-way-gym.jpg`.
+- Prompt: candid, documentary-style photo of ordinary everyday people of mixed ages and body types in a normal community gym — a middle-aged man on a treadmill, a woman in her 60s lifting a light dumbbell, a young dad stretching, natural lighting, real-life feel, no models, no fitness influencers, no logos, no text.
+- Upload the file to the existing `blog-images` Supabase storage bucket via `supabase--storage_upload` and use the resulting public URL as `image_url`.
 
-### 1. `src/pages/Blog.tsx` — About Blog card (lines 156–165)
+### 2. Write the article (~2,000 words, HTML)
+Tone: first-person message from Coach Haris Falas. Honest, warm, direct.
 
-Add a second short line under the existing description showing the total article count.
+Structure (H2 sections):
+1. **Sooner or later, the gym finds you** — the two doors: you walk in, or the doctor sends you in.
+2. **Door #1: You choose it** — investing in health, strength, energy, confidence, body composition, injury prevention, being a better parent/partner/professional, performing in your sport, exploring what your body can do.
+3. **Door #2: The doctor sends you** — high blood pressure, overweight, heart issues, osteoporosis, arthritis, chondromalacia, chronic neck/shoulder/lower-back pain, prediabetes, sarcopenia. Exercise prescribed as medicine.
+4. **Why Door #1 is the smarter door** — you keep agency, you train *before* damage, results compound, recovery is easier, the cost (time, money, pain) is a fraction.
+5. **How you actually choose Door #1** — set goals, respect your body, train for the people you love, measure something, show up on bad days. Practical first steps.
+6. **A message from Coach Haris Falas** — closing personal note, signed off.
 
-- Existing line stays unchanged.
-- New line uses the same styling pattern as Workouts: `text-primary font-bold` on the number.
-- Wording (no paywall, since articles are free):
-  - `Explore all <b>{allArticles.length}</b> free articles across Fitness, Nutrition, and Wellness.`
-- Count source: `allArticles.length` (already fetched on the page).
-- Mobile + desktop both render this line (no `isMobile` split needed — the card currently has just one line on both, we add exactly one more on both → still tightly bounded, no alignment break with the cards grid below).
+Internal links woven naturally into the body (using the project's whitelist):
+- `/caloriecalculator` — Calorie Calculator
+- `/1rmcalculator` — One Rep Max Calculator
+- `/bmrcalculator` — BMR Calculator
+- `/workout` — workout library
+- `/trainingprogram` — training programs
+- `/daily-ritual` — Daily Smarty Ritual
+- `/disclaimer` — health disclaimer & PAR-Q
 
-### 2. `src/pages/Tools.tsx` — About Smarty Tools card (lines 156–199)
+Formatting: `<h2>`, `<p>`, `<ul>/<li>`, `<strong>` for emphasis. No H1 (title rendered separately). Read time auto-estimated (~9–11 min).
 
-Add a free counter line for the number of available tools.
+### 3. Insert into the database
+Single `INSERT` into `public.blog_articles` via migration:
+- `title`: *Either Way, You'll End Up in the Gym — A Message from Coach Haris Falas*
+- `slug`: `either-way-you-will-end-up-in-the-gym`
+- `category`: `Wellness`
+- `excerpt`: one-sentence SEO summary (<160 chars)
+- `content`: the full HTML
+- `author_name`: `Haris Falas`
+- `author_credentials`: `Sports Scientist | CSCS Certified | 20+ Years Experience`
+- `is_ai_generated`: `false` (this is a coach message, not auto-generated)
+- `is_published`: `true`, `published_at`: now
+- `read_time`: computed
+- `image_url`: uploaded hero image URL
 
-- Existing bold intro line stays unchanged.
-- New short line below it (visible on mobile + desktop, above the desktop-only 5-column grid):
-  - `Use all <b>5</b> tools — completely free, no signup required.`
-- Count is static `5` (1RM, BMR, Macro, Workout Timer, Calorie Counter), derived from the existing tools array length to stay in sync if a tool is added later.
-- The desktop 5-column detailed grid below remains unchanged so card alignment with the tool cards stays identical.
+### 4. SEO metadata
+Insert matching row into `public.seo_metadata` (same pattern the weekly generator uses): meta_title, meta_description, keywords (Haris Falas, SmartyGym, exercise as medicine, why go to the gym, longevity, preventive health…), image_alt_text, and Article JSON-LD pointing to `https://smartygym.com/blog/either-way-you-will-end-up-in-the-gym.html`.
 
-## Notes
-
-- No paywall/"Unlock" wording, per request.
-- Only the About card text changes; tool cards, article cards, filters, and layout are untouched, so grid alignment is preserved.
-- Both views (mobile + desktop) receive the new line consistently.
+### What I will NOT touch
+- No changes to `Blog.tsx`, `ArticleDetail.tsx`, navigation, or any UI — the article will appear automatically through the existing blog pipeline.
+- No edits to the weekly generator.
