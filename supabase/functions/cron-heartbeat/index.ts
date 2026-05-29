@@ -320,31 +320,58 @@ serve(async (req) => {
     })
     .eq("job_name", "cron-heartbeat-hourly");
 
-  const criticalOverdueJobs = overdueJobs.filter(j => j.job.is_critical);
+  // Build the 24h daily report sections
+  const cutoffMs = nowMs - 24 * 60 * 60 * 1000;
+  const failed24h: DailyReport["failed24h"] = [];
+  const healthy24h: DailyReport["healthy24h"] = [];
+  const inactive: DailyReport["inactive"] = [];
 
-  let alert_status: "not_needed" | "sent" | "throttled" | "failed" = "not_needed";
-
-  if (criticalOverdueJobs.length > 0) {
-    const alreadySentToday = await wasAlertAlreadySentToday(supabase, nowMs);
-    if (alreadySentToday) {
-      alert_status = "throttled";
-      console.log("[cron-heartbeat] daily alert already sent; suppressing duplicate email");
-    } else {
-      try {
-        await sendAlert(criticalOverdueJobs);
-        await recordDailyAlertAttempt(supabase, nowMs, "success", {
-          critical_overdue_count: criticalOverdueJobs.length,
-          jobs: criticalOverdueJobs.map(({ job, reason }) => ({ job_name: job.job_name, reason })),
+  for (const row of (jobs ?? []) as CronSnapshotRow[]) {
+    if (!row.is_active) {
+      inactive.push({ job_name: row.job_name, display_name: row.display_name });
+      continue;
+    }
+    const lastRun = row.scheduler_last_run_at || row.metadata_last_run_at;
+    const lastRunMs = lastRun ? new Date(lastRun).getTime() : 0;
+    const status = row.scheduler_last_status || row.metadata_last_run_status;
+    if (lastRun && lastRunMs >= cutoffMs) {
+      if (status && status !== "succeeded" && status !== "success") {
+        failed24h.push({
+          job_name: row.job_name,
+          display_name: row.display_name,
+          last_status: status,
+          last_run_at: lastRun,
+          message: row.scheduler_last_message,
+          is_critical: row.is_critical,
         });
-        alert_status = "sent";
-      } catch (e) {
-        console.error("[cron-heartbeat] alert send failed", e);
-        await recordDailyAlertAttempt(supabase, nowMs, "failed", {
-          critical_overdue_count: criticalOverdueJobs.length,
-          error: e instanceof Error ? e.message : String(e),
-        });
-        alert_status = "failed";
+      } else {
+        healthy24h.push({ job_name: row.job_name, display_name: row.display_name, last_run_at: lastRun });
       }
+    }
+  }
+
+  const dailyReport: DailyReport = { overdue: overdueJobs, failed24h, healthy24h, inactive };
+
+  let alert_status: "sent" | "throttled" | "failed" = "sent";
+  const alreadySentToday = await wasAlertAlreadySentToday(supabase, nowMs);
+  if (alreadySentToday) {
+    alert_status = "throttled";
+    console.log("[cron-heartbeat] daily summary already sent today; skipping");
+  } else {
+    try {
+      await sendDailySummary(dailyReport);
+      await recordDailyAlertAttempt(supabase, nowMs, "success", {
+        overdue: overdueJobs.length,
+        failed24h: failed24h.length,
+        healthy24h: healthy24h.length,
+      });
+      alert_status = "sent";
+    } catch (e) {
+      console.error("[cron-heartbeat] summary send failed", e);
+      await recordDailyAlertAttempt(supabase, nowMs, "failed", {
+        error: e instanceof Error ? e.message : String(e),
+      });
+      alert_status = "failed";
     }
   }
 
