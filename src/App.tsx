@@ -51,6 +51,7 @@ const CorporateAdmin = lazy(() => import("./pages/CorporateAdmin"));
 const CalculatorHistory = lazy(() => import("./pages/CalculatorHistory"));
 const WorkoutTimer = lazy(() => import("./pages/WorkoutTimer"));
 const CalorieCounter = lazy(() => import("./pages/CalorieCounter"));
+const RoundsTracker = lazy(() => import("./pages/RoundsTracker"));
 const Tools = lazy(() => import("./pages/Tools"));
 const BestOnlineFitnessPlatform = lazy(() => import("./pages/BestOnlineFitnessPlatform"));
 const Blog = lazy(() => import("./pages/Blog"));
@@ -148,6 +149,7 @@ const secondaryRoutePreloaders = [
   () => import("./pages/MacroTrackingCalculator"),
   () => import("./pages/WorkoutTimer"),
   () => import("./pages/CalorieCounter"),
+  () => import("./pages/RoundsTracker"),
   () => import("./pages/AboutSmartyGym"),
   () => import("./pages/SmartyPlans"),
 ];
@@ -265,6 +267,7 @@ const AppContent = () => {
                 <Route path="/tools/bmr-calculator" element={<BMRCalculator />} />
                 <Route path="/tools/macro-calculator" element={<MacroTrackingCalculator />} />
                 <Route path="/tools/workout-timer" element={<WorkoutTimer />} />
+                <Route path="/tools/rounds-tracker" element={<RoundsTracker />} />
                 <Route path="/1rmcalculator" element={<Navigate to="/tools/1rm-calculator" replace />} />
                 <Route path="/bmrcalculator" element={<Navigate to="/tools/bmr-calculator" replace />} />
                 <Route path="/macrocalculator" element={<Navigate to="/tools/macro-calculator" replace />} />
