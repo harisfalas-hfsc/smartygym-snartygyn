@@ -384,7 +384,7 @@ export const Navigation = () => {
                   <span className="sr-only">Discovery</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" hideClose className="left-4 top-6 bottom-6 h-auto w-[calc(100vw-2rem)] max-w-none overflow-y-auto overscroll-contain rounded-2xl border-2 border-primary/40 p-4 shadow-xl" style={{ touchAction: "pan-y" }}>
+              <SheetContent side="left" hideClose className="left-4 top-6 bottom-6 h-auto w-[calc(100vw-2rem)] max-w-none overflow-y-auto rounded-2xl border-2 border-primary/40 p-4 shadow-xl">
                 <SheetClose asChild>
                   <Button variant="ghost" className="mb-4 h-10 gap-2 rounded-full border-2 border-primary px-4 text-primary hover:bg-primary hover:text-primary-foreground">
                     <ArrowLeft className="h-4 w-4" />
