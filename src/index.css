@@ -1152,6 +1152,13 @@ html {
   --sal: env(safe-area-inset-left, 0px);
 }
 
+/* Disable browser pull-to-refresh on mobile (we have a Refresh button in the bottom bar) */
+@media (max-width: 1023px) {
+  html, body {
+    overscroll-behavior-y: contain;
+  }
+}
+
 /* Main app wrapper gets safe-area padding */
 body {
   padding-top: var(--sat);
