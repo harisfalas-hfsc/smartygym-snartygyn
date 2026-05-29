@@ -1,19 +1,21 @@
 import { useLocation } from "react-router-dom";
-import { ChevronLeft, ChevronRight, RotateCw } from "lucide-react";
+import { ChevronLeft, ChevronRight, RotateCw, Sun, Moon } from "lucide-react";
 import { useNavigationHistory } from "@/contexts/NavigationHistoryContext";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useTheme } from "next-themes";
 
 const HIDDEN_PATHS = ["/auth", "/reset-password", "/payment-success", "/payment-cancelled"];
 
 /**
  * Persistent native-style bottom navigation bar — mobile only (< 768px).
- * Layout: Back · Refresh · Forward.
+ * Layout: Back · Refresh · Theme · Forward.
  */
 export const MobileBottomNav = () => {
   const location = useLocation();
   const isMobile = useIsMobile();
   const { goBack, canGoBack, goForward, canGoForward } = useNavigationHistory();
+  const { resolvedTheme, setTheme } = useTheme();
 
   if (!isMobile || HIDDEN_PATHS.includes(location.pathname)) return null;
 
@@ -68,6 +70,16 @@ export const MobileBottomNav = () => {
 
           <Item onClick={() => window.location.reload()} label="Refresh">
             <RotateCw className="h-6 w-6" strokeWidth={2.25} />
+          </Item>
+
+          <Item
+            onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+            label={resolvedTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            <div className="relative flex h-6 w-6 items-center justify-center">
+              <Sun className="h-6 w-6 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" strokeWidth={2.25} />
+              <Moon className="absolute h-6 w-6 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" strokeWidth={2.25} />
+            </div>
           </Item>
 
           <Item onClick={goForward} disabled={!canGoForward} label="Forward">
