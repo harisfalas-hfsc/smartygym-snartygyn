@@ -27,6 +27,7 @@ const RoundsTracker = () => {
   const [hapticOn, setHapticOn] = useState(true);
   const [flash, setFlash] = useState<"none" | "tap" | "done">("none");
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
+  const audioCtxRef = useRef<AudioContext | null>(null);
 
   useEffect(() => {
     const request = async () => {
@@ -41,13 +42,20 @@ const RoundsTracker = () => {
   const beep = useCallback((freq = 800, dur = 0.15) => {
     if (!soundOn) return;
     try {
-      const ctx = new AudioContext();
+      let ctx = audioCtxRef.current;
+      if (!ctx) {
+        const Ctor = (window.AudioContext || (window as any).webkitAudioContext);
+        if (!Ctor) return;
+        ctx = new Ctor();
+        audioCtxRef.current = ctx;
+      }
+      if (ctx.state === "suspended") ctx.resume().catch(() => {});
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.connect(gain); gain.connect(ctx.destination);
       osc.frequency.value = freq;
       osc.type = "sine";
-      gain.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain.gain.setValueAtTime(0.4, ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + dur);
       osc.start(ctx.currentTime);
       osc.stop(ctx.currentTime + dur);
