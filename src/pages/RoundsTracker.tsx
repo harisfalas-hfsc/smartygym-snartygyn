@@ -446,14 +446,23 @@ const RoundsTracker = () => {
             onPointerLeave={(e) => { e.stopPropagation(); cancelUnlock(); }}
             onPointerCancel={(e) => { e.stopPropagation(); cancelUnlock(); }}
             onClick={(e) => e.stopPropagation()}
+            onContextMenu={(e) => { e.preventDefault(); e.stopPropagation(); }}
             aria-label="Hold to unlock"
-            className="fixed right-4 z-[10000] h-20 w-20 rounded-full bg-background border-4 border-primary shadow-2xl flex items-center justify-center text-foreground touch-manipulation"
+            className="fixed right-4 z-[10000] h-20 w-20 rounded-full bg-background border-4 border-primary shadow-2xl flex items-center justify-center text-foreground select-none"
             style={{
               bottom: "calc(env(safe-area-inset-bottom, 0px) + 96px)",
               backgroundImage: `conic-gradient(hsl(var(--primary)) ${unlockHold}%, transparent ${unlockHold}%)`,
+              touchAction: "none",
+              WebkitUserSelect: "none",
+              userSelect: "none",
+              WebkitTouchCallout: "none",
+              WebkitTapHighlightColor: "transparent",
             }}
           >
-            <div className="h-14 w-14 rounded-full bg-background flex flex-col items-center justify-center gap-0.5">
+            <div
+              className="h-14 w-14 rounded-full bg-background flex flex-col items-center justify-center gap-0.5 pointer-events-none select-none"
+              style={{ WebkitUserSelect: "none", userSelect: "none", WebkitTouchCallout: "none" }}
+            >
               {unlockHold > 0 ? <Unlock className="w-5 h-5" /> : <Lock className="w-5 h-5" />}
               <span className="text-[9px] font-bold leading-none">HOLD</span>
             </div>
