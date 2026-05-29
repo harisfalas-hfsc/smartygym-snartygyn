@@ -458,7 +458,7 @@ export const Navigation = () => {
           </div>
 
            {/* Right Side - Auth */}
-           <div className="flex shrink-0 items-center gap-1 sm:gap-1.5 lg:gap-2">
+           <div className="flex shrink-0 items-center gap-2 sm:gap-1.5 lg:gap-2">
              <Button
                variant="ghost"
                size="icon"

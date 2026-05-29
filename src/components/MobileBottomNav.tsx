@@ -1,8 +1,9 @@
 import { useLocation } from "react-router-dom";
-import { ChevronLeft, ChevronRight, RotateCw } from "lucide-react";
+import { ChevronLeft, ChevronRight, RotateCw, Sun, Moon } from "lucide-react";
 import { useNavigationHistory } from "@/contexts/NavigationHistoryContext";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useTheme } from "next-themes";
 
 const HIDDEN_PATHS = ["/auth", "/reset-password", "/payment-success", "/payment-cancelled"];
 
