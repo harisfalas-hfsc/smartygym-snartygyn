@@ -811,11 +811,21 @@ serve(async (req) => {
     console.log(`Found ${alreadyOptimized} items already optimized`);
 
     // Filter to only NEW items that don't have SEO yet
-    const newContent = allContent.filter(item => 
+    let newContent = allContent.filter(item =>
       !existingKeys.has(`${item.content_type}:${item.id}`)
     );
 
-    console.log(`Found ${newContent.length} NEW items to optimize`);
+    // Optional contentTypes filter (e.g. process only 'workout' this run)
+    if (Array.isArray(contentTypes) && contentTypes.length > 0) {
+      newContent = newContent.filter(item => contentTypes.includes(item.content_type));
+    }
+
+    // Optional cap to avoid 150s timeout
+    if (typeof maxItems === 'number' && maxItems > 0) {
+      newContent = newContent.slice(0, maxItems);
+    }
+
+    console.log(`Found ${newContent.length} NEW items to optimize (after filters)`);
 
     // Process only NEW items (with rate limiting)
     for (const item of newContent) {
