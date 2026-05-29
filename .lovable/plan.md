@@ -1,24 +1,32 @@
-I verified the problem. The 12 workouts have content in the database, but the live workout pages are not showing it because the public workout metadata function returns premium workout text as null before purchase/subscription. That means the detail page receives the image and payment metadata, but not the workout sections, so it renders like “only the picture”.
+## Goal
 
-Plan:
-1. Restore the 12 workouts into the exact standardized section columns
-   - Move each workout from one oversized `main_workout` blob into the proper fields: `warm_up`, `activation`, `main_workout`, `finisher`, `cool_down`, plus `instructions` and `tips`.
-   - Preserve all existing exercise-library tokens so the eye/exercise linking remains available.
+Mirror the counter pattern from Smarty Workouts/Programs ("Unlock all N…") on the **Blog** and **Smarty Tools** "About" cards — but without paywall wording, since both are free. Apply on mobile and desktop. Preserve the existing line count of each description card so alignment stays intact.
 
-2. Fix the detail-page data path for entitled users only
-   - Keep public visitors/paywall users protected.
-   - After `AccessGate` confirms the user has premium/subscription or purchased access, load the full workout row for that entitled user so content appears.
-   - Do not expose paid workout content through the public metadata list.
+## Changes
 
-3. Add a visible fail-safe for purchased/premium users
-   - If an entitled user lands on a workout with missing sections, show a clear content-loading/error state instead of silently showing only the image.
+### 1. `src/pages/Blog.tsx` — About Blog card (lines 156–165)
 
-4. Verify properly before reporting done
-   - Database audit: 12/12 workouts have content in all standard section fields.
-   - Library-token audit: exercise IDs still resolve to exercise library entries.
-   - Stripe audit: product and price IDs remain linked.
-   - Browser verification: open one bodyweight and one equipment workout page and confirm sections render beyond the hero image.
+Add a second short line under the existing description showing the total article count.
 
-Technical notes:
-- Files involved: `src/hooks/useWorkoutData.ts`, `src/pages/IndividualWorkout.tsx`, and a one-time database update for these 12 workout rows.
-- The public RPC should remain metadata-only for premium content; the fix should load full content only through the authenticated table query after access is validated.
+- Existing line stays unchanged.
+- New line uses the same styling pattern as Workouts: `text-primary font-bold` on the number.
+- Wording (no paywall, since articles are free):
+  - `Explore all <b>{allArticles.length}</b> free articles across Fitness, Nutrition, and Wellness.`
+- Count source: `allArticles.length` (already fetched on the page).
+- Mobile + desktop both render this line (no `isMobile` split needed — the card currently has just one line on both, we add exactly one more on both → still tightly bounded, no alignment break with the cards grid below).
+
+### 2. `src/pages/Tools.tsx` — About Smarty Tools card (lines 156–199)
+
+Add a free counter line for the number of available tools.
+
+- Existing bold intro line stays unchanged.
+- New short line below it (visible on mobile + desktop, above the desktop-only 5-column grid):
+  - `Use all <b>5</b> tools — completely free, no signup required.`
+- Count is static `5` (1RM, BMR, Macro, Workout Timer, Calorie Counter), derived from the existing tools array length to stay in sync if a tool is added later.
+- The desktop 5-column detailed grid below remains unchanged so card alignment with the tool cards stays identical.
+
+## Notes
+
+- No paywall/"Unlock" wording, per request.
+- Only the About card text changes; tool cards, article cards, filters, and layout are untouched, so grid alignment is preserved.
+- Both views (mobile + desktop) receive the new line consistently.

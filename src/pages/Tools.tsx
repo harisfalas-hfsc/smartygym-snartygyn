@@ -161,6 +161,9 @@ const Tools = () => {
               <p className="text-sm sm:text-base text-center font-bold">
                 <span className="text-primary font-semibold">Smarty Tools</span> are fitness calculators to understand your body and optimize training using validated formulas.
               </p>
+              <p className="text-sm sm:text-base text-center font-semibold text-foreground mt-2">
+                Use all <span className="text-primary font-bold">{tools.length} tools</span> — completely free, no signup required.
+              </p>
               {/* Desktop only - detailed calculator descriptions */}
               <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-5 gap-4 mt-4">
                 <div>
