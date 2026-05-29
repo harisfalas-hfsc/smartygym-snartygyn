@@ -902,6 +902,7 @@ export type Database = {
       cron_job_metadata: {
         Row: {
           category: string | null
+          consecutive_failures: number
           created_at: string | null
           description: string | null
           display_name: string
@@ -910,6 +911,9 @@ export type Database = {
           is_active: boolean | null
           is_critical: boolean | null
           job_name: string
+          last_run_at: string | null
+          last_run_duration_ms: number | null
+          last_run_status: string | null
           next_run_estimate: string | null
           request_body: Json | null
           schedule: string | null
@@ -919,6 +923,7 @@ export type Database = {
         }
         Insert: {
           category?: string | null
+          consecutive_failures?: number
           created_at?: string | null
           description?: string | null
           display_name: string
@@ -927,6 +932,9 @@ export type Database = {
           is_active?: boolean | null
           is_critical?: boolean | null
           job_name: string
+          last_run_at?: string | null
+          last_run_duration_ms?: number | null
+          last_run_status?: string | null
           next_run_estimate?: string | null
           request_body?: Json | null
           schedule?: string | null
@@ -936,6 +944,7 @@ export type Database = {
         }
         Update: {
           category?: string | null
+          consecutive_failures?: number
           created_at?: string | null
           description?: string | null
           display_name?: string
@@ -944,12 +953,54 @@ export type Database = {
           is_active?: boolean | null
           is_critical?: boolean | null
           job_name?: string
+          last_run_at?: string | null
+          last_run_duration_ms?: number | null
+          last_run_status?: string | null
           next_run_estimate?: string | null
           request_body?: Json | null
           schedule?: string | null
           schedule_human_readable?: string | null
           timezone?: string | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      cron_job_runs: {
+        Row: {
+          created_at: string
+          duration_ms: number | null
+          error_message: string | null
+          finished_at: string | null
+          http_status: number | null
+          id: string
+          job_name: string
+          metadata: Json | null
+          started_at: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          duration_ms?: number | null
+          error_message?: string | null
+          finished_at?: string | null
+          http_status?: number | null
+          id?: string
+          job_name: string
+          metadata?: Json | null
+          started_at?: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          duration_ms?: number | null
+          error_message?: string | null
+          finished_at?: string | null
+          http_status?: number | null
+          id?: string
+          job_name?: string
+          metadata?: Json | null
+          started_at?: string
+          status?: string
         }
         Relationships: []
       }
