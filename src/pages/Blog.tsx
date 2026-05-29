@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { CompactFilters } from "@/components/CompactFilters";
 import { Link } from "react-router-dom";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
+import { generateHarisFalasSchema } from "@/utils/seoSchemas";
 interface Article {
   id: string;
   slug: string;
@@ -67,9 +68,9 @@ const Blog = () => {
   });
   return <>
       <Helmet>
-        <title>Fitness Blog | Expert Articles | SmartyGym</title>
-        <meta name="description" content="Expert fitness, nutrition, and wellness articles by Sports Scientist Haris Falas for smarter training." />
-        <meta name="keywords" content="fitness blog, fitness articles, online personal trainer blog, HFSC, Haris Falas, Sports Scientist, strength training articles, cardio training tips, nutrition guides, online gym, workout guides, training tips, smartygym.com, HFSC Performance, evidence-based fitness" />
+        <title>Fitness, Nutrition & Wellness Blog by Haris Falas | SmartyGym</title>
+        <meta name="description" content="Evidence-based fitness, nutrition, and wellness articles by Sports Scientist Haris Falas (CSCS, 20+ yrs). Strength training, fat loss, recovery, longevity." />
+        <meta name="keywords" content="fitness blog, nutrition blog, wellness blog, strength training, fat loss, muscle hypertrophy, HIIT, recovery, longevity, healthy aging, Haris Falas, Sports Scientist, CSCS, online personal trainer, SmartyGym, evidence-based fitness" />
         
         <meta property="og:title" content="Fitness Blog - Expert Training & Nutrition Advice by Haris Falas | SmartyGym" />
         <meta property="og:description" content="Expert fitness articles by sports scientist Haris Falas. Training tips, nutrition advice, and performance insights." />
@@ -82,29 +83,56 @@ const Blog = () => {
         <meta name="twitter:description" content="Expert fitness articles by sports scientist Haris Falas. Training tips, nutrition advice, and performance insights." />
         <meta name="twitter:image" content="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=1200" />
         
-        <link rel="canonical" href={window.location.href} />
-        
+        <link rel="canonical" href="https://smartygym.com/blog.html" />
+
         {/* Structured Data for Blog */}
         <script type="application/ld+json">
           {JSON.stringify({
           "@context": "https://schema.org",
           "@type": "Blog",
           "name": "SmartyGym Fitness Blog",
-          "description": "Expert fitness and nutrition advice by sports scientist Haris Falas",
-          "url": "https://smartygym.com/blog",
+          "description": "Expert fitness, nutrition and wellness articles by Sports Scientist Haris Falas (CSCS).",
+          "url": "https://smartygym.com/blog.html",
           "author": {
             "@type": "Person",
+            "@id": "https://smartygym.com/coach-profile#person",
             "name": "Haris Falas",
-            "jobTitle": "Sports Scientist & Strength and Conditioning Coach"
+            "jobTitle": "Sports Scientist & Strength and Conditioning Coach",
+            "url": "https://smartygym.com/coach-profile"
           },
           "inLanguage": "en",
           "publisher": {
             "@type": "Organization",
             "name": "SmartyGym",
-            "url": "https://smartygym.com"
+            "url": "https://smartygym.com",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://smartygym.com/smarty-gym-logo.png"
+            }
           }
         })}
         </script>
+        {/* Author Person schema (E-E-A-T) */}
+        <script type="application/ld+json">
+          {JSON.stringify(generateHarisFalasSchema())}
+        </script>
+        {/* ItemList of all articles so Google sees /blog as a real publication */}
+        {allArticles.length > 0 && (
+          <script type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "ItemList",
+              "name": "SmartyGym Blog Articles",
+              "numberOfItems": allArticles.length,
+              "itemListElement": allArticles.map((a, i) => ({
+                "@type": "ListItem",
+                "position": i + 1,
+                "url": `https://smartygym.com/blog/${a.slug}.html`,
+                "name": a.title
+              }))
+            })}
+          </script>
+        )}
       </Helmet>
 
       <SEOEnhancer entities={["Fitness Blog", "Training Articles", "Workout Tips", "Nutrition Advice"]} topics={["fitness education", "training science", "workout techniques", "health tips"]} expertise={["sports science", "exercise physiology", "nutrition", "training methods"]} contentType="Blog Articles" aiSummary="SmartyGym Blog: Expert fitness articles by Sports Scientist Haris Falas. Training tips, workout techniques, nutrition advice, exercise science, and evidence-based fitness education for all levels." aiKeywords={["fitness blog", "training articles", "workout tips", "exercise science", "fitness education", "sports science blog"]} relatedContent={["Workouts", "Training Programs", "Exercise Library", "Fitness Tools"]} targetAudience="fitness enthusiasts seeking knowledge" pageType="Blog" />
