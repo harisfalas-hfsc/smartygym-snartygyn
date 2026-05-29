@@ -5,8 +5,17 @@
     <link>https://smartygym.com/blog.html</link>
     <description>Workouts, training science, and recovery insights from Sports Scientist Haris Falas.</description>
     <language>en-GB</language>
-    <lastBuildDate>Fri, 29 May 2026 13:03:30 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 29 May 2026 15:09:22 GMT</lastBuildDate>
     <atom:link href="https://smartygym.com/rss.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>How Men Over 50 Can Lose Belly Fat — The Science-Backed Protocol</title>
+      <link>https://smartygym.com/blog/how-men-over-50-can-lose-belly-fat-protocol.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/how-men-over-50-can-lose-belly-fat-protocol.html</guid>
+      <pubDate>Fri, 29 May 2026 13:09:48 GMT</pubDate>
+      <dc:creator>Haris Falas</dc:creator>
+      <category>Fitness</category>
+      <description>Belly fat after 50 is not a willpower problem — it&apos;s a hormonal, metabolic, and muscular one. Here is the exact protocol I use with my clients to strip visceral fat without crash diets or endless cardio.</description>
+    </item>
     <item>
       <title>Either Way, You&apos;ll End Up in the Gym — A Message from Coach Haris Falas</title>
       <link>https://smartygym.com/blog/either-way-you-will-end-up-in-the-gym.html</link>
@@ -496,16 +505,6 @@
       <category>Fitness</category>
       <description>Discover why strength training is essential for everyone—from general population to elite athletes. Learn how building strength improves health, bone density, hormones, and human performance.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/science-of-strength-why-getting-stronger-changes-e-1764314370152.jpg" type="image/jpeg" />
-    </item>
-    <item>
-      <title>Bodyweight vs Equipment Training: The Ultimate Comparison</title>
-      <link>https://smartygym.com/blog/bodyweight-vs-equipment-training-ultimate-comparison.html</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/bodyweight-vs-equipment-training-ultimate-comparison.html</guid>
-      <pubDate>Fri, 28 Nov 2025 07:09:49 GMT</pubDate>
-      <dc:creator>Haris Falas</dc:creator>
-      <category>Fitness</category>
-      <description>Should you train with bodyweight or equipment? Discover the pros and cons of each approach, when to use bodyweight exercises, and how to combine both methods for optimal results.</description>
-      <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/bodyweight-vs-equipment-training-ultimate-comparis-1764314380109.jpg" type="image/jpeg" />
     </item>
   </channel>
 </rss>
