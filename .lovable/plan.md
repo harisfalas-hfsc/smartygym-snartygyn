@@ -1,51 +1,43 @@
-## Plan: New blog article — "Either Way, You'll End Up in the Gym"
+## What's already in place (no new infra needed)
 
-A personal, ~2,000-word message-from-the-coach article authored by Haris Falas, with a custom realistic image of normal everyday people, published into the existing Blog system.
+- DB triggers `queue_workout_for_indexnow`, `queue_program_for_indexnow`, `queue_article_for_indexnow` already push every new/newly-visible workout, program, and blog article into `public.indexnow_queue`.
+- Edge function `process-indexnow-queue` already drains that queue (batches of 100) and submits URLs to Bing + Yandex IndexNow.
+- What's missing is a scheduled job that calls that drainer — and visibility/control of it in the admin Cron panel.
 
-### 1. Generate the hero image
-- Use `imagegen--generate_image` (model `standard`, 1920×1080, .jpg) into `/tmp/either-way-gym.jpg`.
-- Prompt: candid, documentary-style photo of ordinary everyday people of mixed ages and body types in a normal community gym — a middle-aged man on a treadmill, a woman in her 60s lifting a light dumbbell, a young dad stretching, natural lighting, real-life feel, no models, no fitness influencers, no logos, no text.
-- Upload the file to the existing `blog-images` Supabase storage bucket via `supabase--storage_upload` and use the resulting public URL as `image_url`.
+## Part 1 — Finish the 58 workouts today
 
-### 2. Write the article (~2,000 words, HTML)
-Tone: first-person message from Coach Haris Falas. Honest, warm, direct.
+- Confirmed: 463 of 521 workouts have SEO metadata in `seo_metadata`; **58 still missing**.
+- Call `refresh-seo-metadata` in **3 small batches** today, each well under the 150s Edge timeout (~20 workouts × ~2s each ≈ 40s per call). Wait for each batch to finish before the next.
+- After the third run, verify `SELECT count(*) FROM admin_workouts WHERE is_visible=true AND id NOT IN (SELECT content_id FROM seo_metadata WHERE content_type='workout')` returns 0.
+- No code changes required — just running the existing function until the backlog hits zero.
 
-Structure (H2 sections):
-1. **Sooner or later, the gym finds you** — the two doors: you walk in, or the doctor sends you in.
-2. **Door #1: You choose it** — investing in health, strength, energy, confidence, body composition, injury prevention, being a better parent/partner/professional, performing in your sport, exploring what your body can do.
-3. **Door #2: The doctor sends you** — high blood pressure, overweight, heart issues, osteoporosis, arthritis, chondromalacia, chronic neck/shoulder/lower-back pain, prediabetes, sarcopenia. Exercise prescribed as medicine.
-4. **Why Door #1 is the smarter door** — you keep agency, you train *before* damage, results compound, recovery is easier, the cost (time, money, pain) is a fraction.
-5. **How you actually choose Door #1** — set goals, respect your body, train for the people you love, measure something, show up on bad days. Practical first steps.
-6. **A message from Coach Haris Falas** — closing personal note, signed off.
+## Part 2 — Event-driven IndexNow auto-ping cron
 
-Internal links woven naturally into the body (using the project's whitelist):
-- `/caloriecalculator` — Calorie Calculator
-- `/1rmcalculator` — One Rep Max Calculator
-- `/bmrcalculator` — BMR Calculator
-- `/workout` — workout library
-- `/trainingprogram` — training programs
-- `/daily-ritual` — Daily Smarty Ritual
-- `/disclaimer` — health disclaimer & PAR-Q
+Approach: pg_cron cannot fire "on row insert" — Postgres triggers already do that, and they already populate `indexnow_queue` the moment any new workout, program, or article goes live. We just need a frequent drain.
 
-Formatting: `<h2>`, `<p>`, `<ul>/<li>`, `<strong>` for emphasis. No H1 (title rendered separately). Read time auto-estimated (~9–11 min).
+**New cron job**: `process-indexnow-queue-frequent`
+- Schedule: `*/5 * * * *` (every 5 minutes — practically "as soon as new content is added")
+- Calls: existing `process-indexnow-queue` edge function
+- Behavior: if queue is empty it returns instantly; if anything was added in the last 5 minutes it gets pinged to Bing + Yandex automatically
+- Category: `maintenance` (alongside the other SEO jobs)
 
-### 3. Insert into the database
-Single `INSERT` into `public.blog_articles` via migration:
-- `title`: *Either Way, You'll End Up in the Gym — A Message from Coach Haris Falas*
-- `slug`: `either-way-you-will-end-up-in-the-gym`
-- `category`: `Wellness`
-- `excerpt`: one-sentence SEO summary (<160 chars)
-- `content`: the full HTML
-- `author_name`: `Haris Falas`
-- `author_credentials`: `Sports Scientist | CSCS Certified | 20+ Years Experience`
-- `is_ai_generated`: `false` (this is a coach message, not auto-generated)
-- `is_published`: `true`, `published_at`: now
-- `read_time`: computed
-- `image_url`: uploaded hero image URL
+**Registered in the admin panel** (`cron_job_metadata` table → shows in your Cron Jobs admin section) with:
+- `display_name`: "IndexNow Auto-Ping (new content)"
+- `description`: "Drains the IndexNow queue every 5 min and submits any new/updated workout, program, or article URLs to Bing & Yandex."
+- `is_critical`: true
+- Fully editable / pausable / deletable from the admin Cron panel via the existing `manage-cron-jobs` function
 
-### 4. SEO metadata
-Insert matching row into `public.seo_metadata` (same pattern the weekly generator uses): meta_title, meta_description, keywords (Haris Falas, SmartyGym, exercise as medicine, why go to the gym, longevity, preventive health…), image_alt_text, and Article JSON-LD pointing to `https://smartygym.com/blog/either-way-you-will-end-up-in-the-gym.html`.
+**Optional cleanup**: leave the existing weekly `refresh-seo-weekly` cron in place — it does a different job (generates SEO metadata for newly-added items + regenerates sitemap). It is NOT the IndexNow ping. If you want it removed, say so and I'll delete it from the same panel.
 
-### What I will NOT touch
-- No changes to `Blog.tsx`, `ArticleDetail.tsx`, navigation, or any UI — the article will appear automatically through the existing blog pipeline.
-- No edits to the weekly generator.
+## Implementation steps (in build mode)
+
+1. Run `refresh-seo-metadata` 3× to clear the 58-workout backlog and verify count = 0.
+2. Insert a row in `cron_job_metadata` for `process-indexnow-queue-frequent`.
+3. Call `manage-cron-jobs` with `action: 'sync'` for that job_name → registers it in pg_cron.
+4. Verify it shows up in the admin Cron Jobs panel and that the next run drains any pending queue rows.
+
+## Out of scope
+
+- No new tables, no new triggers (the auto-queue triggers already exist).
+- No changes to the workout/program/article publishing flow.
+- No touching of HFSC-related assets.
