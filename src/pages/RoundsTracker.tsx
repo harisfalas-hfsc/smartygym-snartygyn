@@ -12,6 +12,50 @@ import { SEOEnhancer } from "@/components/SEOEnhancer";
 type Mode = "rounds" | "rounds-reps";
 type Direction = "down" | "up";
 
+const Stepper = ({
+  label, value, inputValue, onInputChange, onCommit, onDec, onInc,
+}: {
+  label: string; value: number; inputValue: string;
+  onInputChange: (s: string) => void; onCommit: () => void;
+  onDec: () => void; onInc: () => void;
+}) => (
+  <div className="flex flex-col gap-1">
+    <Label className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground px-1">{label}</Label>
+    <div className="flex items-center bg-muted/60 rounded-xl h-11 overflow-hidden">
+      <button onClick={onDec} className="h-full w-11 flex items-center justify-center text-foreground hover:bg-muted active:scale-95 transition" aria-label={`Decrease ${label}`}>
+        <Minus className="w-4 h-4" />
+      </button>
+      <Input
+        type="number"
+        inputMode="numeric"
+        value={inputValue}
+        onChange={(e) => onInputChange(e.target.value)}
+        onBlur={onCommit}
+        className="flex-1 h-full border-0 bg-transparent text-lg font-bold text-center focus-visible:ring-0 focus-visible:ring-offset-0 p-0 tabular-nums"
+      />
+      <button onClick={onInc} className="h-full w-11 flex items-center justify-center text-foreground hover:bg-muted active:scale-95 transition" aria-label={`Increase ${label}`}>
+        <Plus className="w-4 h-4" />
+      </button>
+    </div>
+  </div>
+);
+
+const IconToggle = ({ active, onClick, label, children }: {
+  active: boolean; onClick: () => void; label: string; children: React.ReactNode;
+}) => (
+  <button
+    onClick={onClick}
+    aria-label={label}
+    aria-pressed={active}
+    className={cn(
+      "h-9 w-9 rounded-full flex items-center justify-center transition-colors",
+      active ? "bg-primary text-primary-foreground" : "bg-muted/60 hover:bg-muted text-foreground"
+    )}
+  >
+    {children}
+  </button>
+);
+
 const RoundsTracker = () => {
   const [mode, setMode] = useState<Mode>("rounds");
   const [direction, setDirection] = useState<Direction>("down");
@@ -240,98 +284,52 @@ const RoundsTracker = () => {
             </CardContent>
           </Card>
 
-          <Card className="flex flex-col bg-card border-2 border-primary/30 shadow-lg lg:shadow-none lg:border lg:border-border">
-            <CardContent className="p-2 sm:p-3 lg:p-6 flex flex-col">
-              <div className="grid grid-cols-2 gap-2 mb-2 lg:mb-4">
-                <Button
-                  variant={mode === "rounds" ? "default" : "outline"}
+          <Card className="flex flex-col bg-card border border-border shadow-sm rounded-2xl overflow-hidden">
+            <CardContent className="p-3 sm:p-4 lg:p-6 flex flex-col gap-3 lg:gap-4">
+              {/* Segmented mode toggle */}
+              <div className="inline-flex rounded-full bg-muted p-1 self-center w-full max-w-sm">
+                <button
                   onClick={() => { setMode("rounds"); handleReset(); }}
-                  className="h-11 lg:h-10 text-sm font-semibold"
+                  className={cn(
+                    "flex-1 h-9 rounded-full text-sm font-semibold transition-colors",
+                    mode === "rounds" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
+                  )}
                 >
-                  Rounds only
-                </Button>
-                <Button
-                  variant={mode === "rounds-reps" ? "default" : "outline"}
+                  Rounds
+                </button>
+                <button
                   onClick={() => { setMode("rounds-reps"); handleReset(); }}
-                  className="h-11 lg:h-10 text-sm font-semibold"
+                  className={cn(
+                    "flex-1 h-9 rounded-full text-sm font-semibold transition-colors",
+                    mode === "rounds-reps" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
+                  )}
                 >
-                  Rounds + reps
-                </Button>
+                  Rounds + Reps
+                </button>
               </div>
 
-              <div className={cn("grid gap-2 lg:gap-3 mb-2 lg:mb-4", mode === "rounds-reps" ? "grid-cols-2" : "grid-cols-1")}>
-                <div>
-                  <Label className="text-xs lg:text-xs font-semibold leading-none">Target rounds</Label>
-                  <Input
-                    type="number"
-                    inputMode="numeric"
-                    value={targetRoundsInput}
-                    onChange={(e) => setTargetRoundsInput(e.target.value)}
-                    onBlur={() => commitNumber(targetRoundsInput, setTargetRounds, setTargetRoundsInput)}
-                    className="mt-1 h-11 lg:h-10 text-base font-semibold text-center"
-                  />
-                </div>
+              {/* Compact stepper inputs */}
+              <div className={cn("grid gap-2", mode === "rounds-reps" ? "grid-cols-2" : "grid-cols-1")}>
+                <Stepper
+                  label="Rounds"
+                  value={targetRounds}
+                  inputValue={targetRoundsInput}
+                  onInputChange={setTargetRoundsInput}
+                  onCommit={() => commitNumber(targetRoundsInput, setTargetRounds, setTargetRoundsInput)}
+                  onDec={() => { const n = Math.max(1, targetRounds - 1); setTargetRounds(n); setTargetRoundsInput(String(n)); }}
+                  onInc={() => { const n = targetRounds + 1; setTargetRounds(n); setTargetRoundsInput(String(n)); }}
+                />
                 {mode === "rounds-reps" && (
-                  <div>
-                    <Label className="text-xs lg:text-xs font-semibold leading-none">Reps per round</Label>
-                    <Input
-                      type="number"
-                      inputMode="numeric"
-                      value={targetRepsInput}
-                      onChange={(e) => setTargetRepsInput(e.target.value)}
-                      onBlur={() => commitNumber(targetRepsInput, setTargetReps, setTargetRepsInput)}
-                      className="mt-1 h-11 lg:h-10 text-base font-semibold text-center"
-                    />
-                  </div>
+                  <Stepper
+                    label="Reps"
+                    value={targetReps}
+                    inputValue={targetRepsInput}
+                    onInputChange={setTargetRepsInput}
+                    onCommit={() => commitNumber(targetRepsInput, setTargetReps, setTargetRepsInput)}
+                    onDec={() => { const n = Math.max(1, targetReps - 1); setTargetReps(n); setTargetRepsInput(String(n)); }}
+                    onInc={() => { const n = targetReps + 1; setTargetReps(n); setTargetRepsInput(String(n)); }}
+                  />
                 )}
-              </div>
-
-              <div className="flex flex-wrap items-center justify-center gap-2 mb-2 lg:mb-4">
-                {mode === "rounds" && (
-                  <>
-                    <Button
-                      variant={direction === "down" ? "default" : "outline"}
-                      onClick={() => { setDirection("down"); handleReset(); }}
-                      className="h-10 lg:h-9 px-3 lg:px-3 text-sm font-semibold"
-                    >
-                      ⬇ Count down
-                    </Button>
-                    <Button
-                      variant={direction === "up" ? "default" : "outline"}
-                      onClick={() => { setDirection("up"); handleReset(); }}
-                      className="h-10 lg:h-9 px-3 lg:px-3 text-sm font-semibold"
-                    >
-                      ⬆ Count up
-                    </Button>
-                  </>
-                )}
-                <Button
-                  variant={soundOn ? "default" : "outline"}
-                  onClick={() => setSoundOn((s) => !s)}
-                  className="h-10 lg:h-9 px-3 lg:px-3 text-sm font-semibold"
-                  aria-label="Toggle sound"
-                >
-                  {soundOn ? <Volume2 className="w-4 h-4 mr-1.5" /> : <VolumeX className="w-4 h-4 mr-1.5" />}
-                  <span>Sound {soundOn ? "on" : "off"}</span>
-                </Button>
-                <Button
-                  variant={hapticOn ? "default" : "outline"}
-                  onClick={() => setHapticOn((s) => !s)}
-                  className="h-10 lg:h-9 px-3 lg:px-3 text-sm font-semibold"
-                  aria-label="Toggle vibration"
-                >
-                  <Vibrate className="w-4 h-4 mr-1.5" />
-                  <span>Vibrate {hapticOn ? "on" : "off"}</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={enterLock}
-                  className="h-10 lg:h-9 px-3 lg:px-3 text-sm font-semibold"
-                  aria-label="Lock screen for workout"
-                >
-                  <Maximize2 className="w-4 h-4 mr-1.5" />
-                  <span>Lock screen</span>
-                </Button>
               </div>
 
               <button
@@ -372,26 +370,47 @@ const RoundsTracker = () => {
                 </div>
               </button>
 
-              <div className="grid grid-cols-3 gap-2 mt-2 lg:mt-4">
-                <Button variant="outline" onClick={handleUndo} className="h-12 lg:h-11 text-sm font-semibold px-1 flex-col gap-0.5 lg:flex-row lg:gap-2">
-                  <Minus className="w-5 h-5 lg:w-4 lg:h-4" />
-                  <span>Undo</span>
+              {/* Primary actions row */}
+              <div className="grid grid-cols-3 gap-2">
+                <Button variant="ghost" onClick={handleUndo} className="h-11 text-sm font-semibold rounded-xl bg-muted/60 hover:bg-muted">
+                  <Minus className="w-4 h-4 mr-1.5" />Undo
                 </Button>
-                <Button variant="outline" onClick={handleReset} className="h-12 lg:h-11 text-sm font-semibold px-1 flex-col gap-0.5 lg:flex-row lg:gap-2">
-                  <RotateCcw className="w-5 h-5 lg:w-4 lg:h-4" />
-                  <span>Reset</span>
+                <Button variant="ghost" onClick={handleReset} className="h-11 text-sm font-semibold rounded-xl bg-muted/60 hover:bg-muted">
+                  <RotateCcw className="w-4 h-4 mr-1.5" />Reset
                 </Button>
-                <Button variant="outline" onClick={tapRound} disabled={isDone} className="h-12 lg:h-11 text-sm font-semibold px-1 flex-col gap-0.5 lg:flex-row lg:gap-2">
-                  <Plus className="w-5 h-5 lg:w-4 lg:h-4" />
-                  <span>+Round</span>
+                <Button variant="ghost" onClick={tapRound} disabled={isDone} className="h-11 text-sm font-semibold rounded-xl bg-muted/60 hover:bg-muted">
+                  <Plus className="w-4 h-4 mr-1.5" />Round
                 </Button>
               </div>
 
-              <div className="mt-2 lg:mt-4 text-center text-xs lg:text-sm text-muted-foreground leading-tight">
-                Rounds done: <span className="font-semibold text-foreground">{roundsDone}</span> / {targetRounds}
-                {mode === "rounds-reps" && (
-                  <> · Reps this round: <span className="font-semibold text-foreground">{repsDone}</span> / {targetReps}</>
-                )}
+              {/* Subtle settings row — icon-only toggles */}
+              <div className="flex items-center justify-between gap-2 pt-1">
+                <div className="text-xs text-muted-foreground tabular-nums">
+                  <span className="font-semibold text-foreground">{roundsDone}</span>/{targetRounds}
+                  {mode === "rounds-reps" && (
+                    <> · <span className="font-semibold text-foreground">{repsDone}</span>/{targetReps}</>
+                  )}
+                </div>
+                <div className="flex items-center gap-1">
+                  {mode === "rounds" && (
+                    <button
+                      onClick={() => { setDirection(direction === "down" ? "up" : "down"); handleReset(); }}
+                      className="h-9 px-2.5 rounded-full text-xs font-semibold bg-muted/60 hover:bg-muted text-foreground transition-colors"
+                      aria-label="Toggle count direction"
+                    >
+                      {direction === "down" ? "⬇ Down" : "⬆ Up"}
+                    </button>
+                  )}
+                  <IconToggle active={soundOn} onClick={() => setSoundOn((s) => !s)} label="Sound">
+                    {soundOn ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+                  </IconToggle>
+                  <IconToggle active={hapticOn} onClick={() => setHapticOn((s) => !s)} label="Vibrate">
+                    <Vibrate className="w-4 h-4" />
+                  </IconToggle>
+                  <IconToggle active={false} onClick={enterLock} label="Lock screen">
+                    <Maximize2 className="w-4 h-4" />
+                  </IconToggle>
+                </div>
               </div>
             </CardContent>
           </Card>
