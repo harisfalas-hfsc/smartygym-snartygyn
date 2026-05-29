@@ -215,7 +215,7 @@ const RoundsTracker = () => {
         relatedContent={["workouts", "workout timer"]}
       />
 
-      <div className="lg:min-h-screen bg-background flex flex-col">
+      <div ref={rootRef} className="lg:min-h-screen bg-background flex flex-col">
         <div className="container mx-auto max-w-2xl px-3 lg:px-4 pt-1 lg:pt-4 pb-2 lg:pb-8 flex flex-col">
           <div className="hidden lg:block">
             <PageBreadcrumbs
@@ -322,6 +322,15 @@ const RoundsTracker = () => {
                 >
                   <Vibrate className="w-4 h-4 mr-1.5" />
                   <span>Vibrate {hapticOn ? "on" : "off"}</span>
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={enterLock}
+                  className="h-10 lg:h-9 px-3 lg:px-3 text-sm font-semibold"
+                  aria-label="Lock screen for workout"
+                >
+                  <Maximize2 className="w-4 h-4 mr-1.5" />
+                  <span>Lock screen</span>
                 </Button>
               </div>
 
