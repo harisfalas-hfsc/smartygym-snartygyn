@@ -9,12 +9,13 @@ const HIDDEN_PATHS = ["/auth", "/reset-password", "/payment-success", "/payment-
 
 /**
  * Persistent native-style bottom navigation bar — mobile only (< 768px).
- * Layout: Back · Refresh · Forward.
+ * Layout: Back · Refresh · Theme · Forward.
  */
 export const MobileBottomNav = () => {
   const location = useLocation();
   const isMobile = useIsMobile();
   const { goBack, canGoBack, goForward, canGoForward } = useNavigationHistory();
+  const { resolvedTheme, setTheme } = useTheme();
 
   if (!isMobile || HIDDEN_PATHS.includes(location.pathname)) return null;
 
