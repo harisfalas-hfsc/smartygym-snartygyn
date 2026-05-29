@@ -1,43 +1,64 @@
-## What's already in place (no new infra needed)
+## Goal
 
-- DB triggers `queue_workout_for_indexnow`, `queue_program_for_indexnow`, `queue_article_for_indexnow` already push every new/newly-visible workout, program, and blog article into `public.indexnow_queue`.
-- Edge function `process-indexnow-queue` already drains that queue (batches of 100) and submits URLs to Bing + Yandex IndexNow.
-- What's missing is a scheduled job that calls that drainer — and visibility/control of it in the admin Cron panel.
+Create a real, on-brand blog article and use it as a live test of the SEO ping pipeline (IndexNow → Bing/Yandex; Search Console sitemap resubmit → Google).
 
-## Part 1 — Finish the 58 workouts today
+## 1. Write the article
 
-- Confirmed: 463 of 521 workouts have SEO metadata in `seo_metadata`; **58 still missing**.
-- Call `refresh-seo-metadata` in **3 small batches** today, each well under the 150s Edge timeout (~20 workouts × ~2s each ≈ 40s per call). Wait for each batch to finish before the next.
-- After the third run, verify `SELECT count(*) FROM admin_workouts WHERE is_visible=true AND id NOT IN (SELECT content_id FROM seo_metadata WHERE content_type='workout')` returns 0.
-- No code changes required — just running the existing function until the backlog hits zero.
+- **Title:** "How Men Over 50 Can Lose Belly Fat — The Science-Backed Protocol"
+- **Slug:** `how-men-over-50-can-lose-belly-fat-protocol`
+- **Category:** Fitness
+- **Author:** Haris Falas (with full credentials, per Author Credentials memory)
+- **Length:** ~1,400–1,700 words, ~7 min read
+- **Structure** (matches existing standardized articles like "Why Walking Is the Most Underrated Exercise"):
+  1. Intro framing the visceral-fat problem for men 50+
+  2. Why belly fat behaves differently after 50 (testosterone, insulin resistance, cortisol, sarcopenia)
+  3. The 4-pillar protocol: strength first, walking/NEAT, nutrition (protein + fiber), sleep & stress
+  4. What to stop doing (excessive cardio, crash diets, late-night eating)
+  5. Realistic timeline & how to measure progress
+  6. Closing CTA
+- **Internal links** (only from the whitelisted paths in the Valid Internal Links memory):
+  - `/workout` — workout library
+  - `/trainingprogram` — training programs (e.g. weight-loss, functional-strength)
+  - `/caloriecalculator` — calorie calculator
+  - `/macrocalculator` — macro calculator
+  - `/about` — Haris Falas credibility link
+  - Each rendered as `<a href="..." class="text-primary hover:underline font-medium">…</a>` like existing articles
+- **Formatting:** same HTML rhythm as current articles — `<p>`, `<h2>`, `<ul><li>`, `<strong>`, `<em>`, scientific citations inline (JAMA, Mayo Clinic, Diabetes Care, etc.)
+- **Excerpt:** 1–2 sentence SEO-friendly summary
+- **Image:** leave `image_url` NULL — the existing trigger will auto-generate one
+- **Publish:** `is_published = true`, `published_at = now()`
 
-## Part 2 — Event-driven IndexNow auto-ping cron
+Insert via a single SQL INSERT into `public.blog_articles`.
 
-Approach: pg_cron cannot fire "on row insert" — Postgres triggers already do that, and they already populate `indexnow_queue` the moment any new workout, program, or article goes live. We just need a frequent drain.
+## 2. Watch the cron pipeline fire
 
-**New cron job**: `process-indexnow-queue-frequent`
-- Schedule: `*/5 * * * *` (every 5 minutes — practically "as soon as new content is added")
-- Calls: existing `process-indexnow-queue` edge function
-- Behavior: if queue is empty it returns instantly; if anything was added in the last 5 minutes it gets pinged to Bing + Yandex automatically
-- Category: `maintenance` (alongside the other SEO jobs)
+Right after insert, the DB trigger `queue_article_for_indexnow` will push the new URL into `public.indexnow_queue` with `status='pending'`.
 
-**Registered in the admin panel** (`cron_job_metadata` table → shows in your Cron Jobs admin section) with:
-- `display_name`: "IndexNow Auto-Ping (new content)"
-- `description`: "Drains the IndexNow queue every 5 min and submits any new/updated workout, program, or article URLs to Bing & Yandex."
-- `is_critical`: true
-- Fully editable / pausable / deletable from the admin Cron panel via the existing `manage-cron-jobs` function
+**Step A — IndexNow (Bing / Yandex), ≤ 5 min:**
+- Poll `indexnow_queue` for our new row every ~30s
+- Wait for `status` to flip from `pending` → `sent` (the cron `process-indexnow-queue-frequent` runs every 5 min)
+- Once flipped, fetch the latest `process-indexnow-queue` edge function logs and confirm Bing + Yandex returned 200/202 for our URL
+- If patience runs out (>5 min), manually invoke the function once via `supabase--curl_edge_functions` to force the test and re-verify the logs
 
-**Optional cleanup**: leave the existing weekly `refresh-seo-weekly` cron in place — it does a different job (generates SEO metadata for newly-added items + regenerates sitemap). It is NOT the IndexNow ping. If you want it removed, say so and I'll delete it from the same panel.
+**Step B — Google Search Console sitemap resubmit:**
+- The scheduled run is 02:00 / 09:15 UTC, so we won't naturally hit it during this test
+- Manually invoke `refresh-sitemap-ping` via `supabase--curl_edge_functions`
+- Read the function logs and confirm the `PUT …/sites/{site}/sitemaps/{sitemap}` call to the Search Console gateway returned `204 No Content`
 
-## Implementation steps (in build mode)
+## 3. Report results in plain English
 
-1. Run `refresh-seo-metadata` 3× to clear the 58-workout backlog and verify count = 0.
-2. Insert a row in `cron_job_metadata` for `process-indexnow-queue-frequent`.
-3. Call `manage-cron-jobs` with `action: 'sync'` for that job_name → registers it in pg_cron.
-4. Verify it shows up in the admin Cron Jobs panel and that the next run drains any pending queue rows.
+Final summary table:
+- Article live at `/blog/how-men-over-50-can-lose-belly-fat-protocol` ✅ / ❌
+- IndexNow → Bing ✅ / ❌ (with timestamp + status code)
+- IndexNow → Yandex ✅ / ❌
+- Google Search Console sitemap resubmit ✅ / ❌
 
-## Out of scope
+If any step fails, show the actual error from logs and propose the fix.
 
-- No new tables, no new triggers (the auto-queue triggers already exist).
-- No changes to the workout/program/article publishing flow.
-- No touching of HFSC-related assets.
+## Technical notes
+
+- Article insert: `supabase--insert` (single INSERT, no migration needed)
+- Queue polling: `supabase--read_query`
+- Manual edge invocations: `supabase--curl_edge_functions` (POST, empty body)
+- Log inspection: `supabase--edge_function_logs` for `process-indexnow-queue` and `refresh-sitemap-ping`
+- No code changes to the cron functions themselves — this is a live test of the system as it stands after the previous turn's fixes
