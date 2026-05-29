@@ -135,10 +135,28 @@ function evaluateSnapshot(row: CronSnapshotRow, nowMs: number): { overdue: boole
   if (!row.live_job_active) {
     return { overdue: true, reason: "registered but disabled in the live scheduler", thresholdMinutes: 0, job };
   }
-  if (row.scheduler_last_status && row.scheduler_last_status !== "succeeded") {
+  if (row.scheduler_last_status && !isHealthyRunStatus(row.scheduler_last_status)) {
     return { overdue: true, reason: `scheduler reported ${row.scheduler_last_status}: ${row.scheduler_last_message || "no details"}`, thresholdMinutes: 0, job };
   }
   return { ...isOverdue(job, nowMs), job };
+}
+
+function isHealthyRunStatus(status: string | null | undefined): boolean {
+  if (!status) return false;
+  const normalized = status.toLowerCase();
+  return [
+    "success",
+    "succeeded",
+    "scheduler-succeeded",
+    "assumed-healthy",
+    "fixed-rerouted-to-library-picker",
+  ].includes(normalized) || normalized.startsWith("fixed-") || normalized.startsWith("resolved-");
+}
+
+function isFailedRunStatus(status: string | null | undefined): boolean {
+  if (!status || isHealthyRunStatus(status)) return false;
+  const normalized = status.toLowerCase();
+  return normalized.includes("fail") || normalized.includes("error") || normalized.includes("timeout") || normalized.includes("exception");
 }
 
 type DailyReport = {
@@ -335,7 +353,7 @@ serve(async (req) => {
     const lastRunMs = lastRun ? new Date(lastRun).getTime() : 0;
     const status = row.scheduler_last_status || row.metadata_last_run_status;
     if (lastRun && lastRunMs >= cutoffMs) {
-      if (status && status !== "succeeded" && status !== "success") {
+      if (isFailedRunStatus(status)) {
         failed24h.push({
           job_name: row.job_name,
           display_name: row.display_name,
