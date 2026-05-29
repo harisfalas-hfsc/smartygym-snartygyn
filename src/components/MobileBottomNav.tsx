@@ -72,6 +72,16 @@ export const MobileBottomNav = () => {
             <RotateCw className="h-6 w-6" strokeWidth={2.25} />
           </Item>
 
+          <Item
+            onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+            label={resolvedTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            <div className="relative flex h-6 w-6 items-center justify-center">
+              <Sun className="h-6 w-6 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" strokeWidth={2.25} />
+              <Moon className="absolute h-6 w-6 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" strokeWidth={2.25} />
+            </div>
+          </Item>
+
           <Item onClick={goForward} disabled={!canGoForward} label="Forward">
             <ChevronRight className="h-7 w-7" strokeWidth={2.25} />
           </Item>
