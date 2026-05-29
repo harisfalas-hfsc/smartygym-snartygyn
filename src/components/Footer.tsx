@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Facebook, Instagram, Youtube } from "lucide-react";
+import { Facebook, Instagram, Youtube, Rss } from "lucide-react";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
@@ -26,6 +26,9 @@ export const Footer = () => {
             </a>
             <a href="https://www.youtube.com/@TheSmartyGym" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors" aria-label="YouTube">
               <Youtube className="h-5 w-5" />
+            </a>
+            <a href="https://smartygym.com/rss.xml" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors" aria-label="SmartyGym blog RSS feed" title="Subscribe to our blog RSS feed">
+              <Rss className="h-5 w-5" />
             </a>
           </div>
           
