@@ -15,6 +15,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ContentLoadingSkeleton } from "@/components/ContentLoadingSkeleton";
 import { ReaderModeDialog } from "@/components/ReaderModeDialog";
 import { generateArticleSchema, generateBreadcrumbSchema } from "@/utils/seoHelpers";
+import { generateHarisFalasSchema } from "@/utils/seoSchemas";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { useAccessControl } from "@/contexts/AccessControlContext";
 
@@ -145,6 +146,8 @@ export const ArticleDetail = () => {
         {article.author_name && <meta property="article:author" content={article.author_name} />}
         <script type="application/ld+json">{JSON.stringify(articleSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>
+        {/* Author Person schema for E-E-A-T (Google's #1 signal for health content) */}
+        <script type="application/ld+json">{JSON.stringify(generateHarisFalasSchema())}</script>
         {seoMeta?.json_ld && (
           <script type="application/ld+json">{JSON.stringify(seoMeta.json_ld)}</script>
         )}
