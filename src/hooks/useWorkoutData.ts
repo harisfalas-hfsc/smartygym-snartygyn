@@ -54,23 +54,37 @@ export const useWorkoutData = (workoutId: string | undefined) => {
       };
 
       const metadataMatch = await resolveFromMetadata();
-      if (metadataMatch) return metadataMatch as WorkoutData;
-      
+      // If metadata matched but section content is null (premium content hidden by RPC),
+      // fall through to a direct table query — RLS will enforce access for entitled users.
+      const hasFullContent =
+        metadataMatch &&
+        (metadataMatch.main_workout || metadataMatch.warm_up || metadataMatch.activation);
+      if (metadataMatch && hasFullContent) return metadataMatch as WorkoutData;
+
+      const resolvedId = metadataMatch?.id || workoutId;
       const { data, error } = await supabase
         .from("admin_workouts")
         .select("*")
-        .eq("id", workoutId)
+        .eq("id", resolvedId)
         .neq("is_visible", false)
         .maybeSingle();
 
       if (error) {
+        // If RLS blocked the direct fetch and we have metadata, return metadata so the
+        // paywall renders correctly instead of a "not found" state.
+        if (metadataMatch) return metadataMatch as WorkoutData;
         throw error;
       }
       if (!data) {
+        if (metadataMatch) return metadataMatch as WorkoutData;
         throw new Error("Workout not found");
       }
 
-      return { ...data, canonical_slug: slugifyContentName(data.name || data.id) } as WorkoutData;
+      return {
+        ...data,
+        canonical_slug:
+          (metadataMatch as any)?.canonical_slug || slugifyContentName(data.name || data.id),
+      } as WorkoutData;
     },
     enabled: !!workoutId,
     // Ensure detail pages always reflect latest backend content updates
