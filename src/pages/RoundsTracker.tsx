@@ -36,12 +36,62 @@ const RoundsTracker = () => {
   useEffect(() => {
     const request = async () => {
       if ("wakeLock" in navigator) {
-        try { wakeLockRef.current = await navigator.wakeLock.request("screen"); } catch { /* ignore */ }
+        try { wakeLockRef.current = await (navigator as any).wakeLock.request("screen"); } catch { /* ignore */ }
       }
     };
     request();
-    return () => { wakeLockRef.current?.release(); wakeLockRef.current = null; };
+    const onVis = () => { if (document.visibilityState === "visible") request(); };
+    document.addEventListener("visibilitychange", onVis);
+    return () => {
+      document.removeEventListener("visibilitychange", onVis);
+      wakeLockRef.current?.release(); wakeLockRef.current = null;
+    };
   }, []);
+
+  // Exit lock if user leaves fullscreen via system gesture
+  useEffect(() => {
+    const onFs = () => {
+      if (!document.fullscreenElement && locked) setLocked(false);
+    };
+    document.addEventListener("fullscreenchange", onFs);
+    return () => document.removeEventListener("fullscreenchange", onFs);
+  }, [locked]);
+
+  const enterLock = async () => {
+    setLocked(true);
+    try {
+      const el: any = rootRef.current || document.documentElement;
+      if (el.requestFullscreen) await el.requestFullscreen();
+      else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    } catch { /* ignore */ }
+    try { (screen.orientation as any)?.lock?.("portrait").catch(() => {}); } catch { /* ignore */ }
+  };
+
+  const exitLock = async () => {
+    setLocked(false);
+    setUnlockHold(0);
+    if (unlockTimerRef.current) { window.clearInterval(unlockTimerRef.current); unlockTimerRef.current = null; }
+    try { if (document.fullscreenElement) await document.exitFullscreen(); } catch { /* ignore */ }
+  };
+
+  const startUnlock = () => {
+    if (unlockTimerRef.current) return;
+    const start = Date.now();
+    unlockTimerRef.current = window.setInterval(() => {
+      const pct = Math.min(100, ((Date.now() - start) / 1200) * 100);
+      setUnlockHold(pct);
+      if (pct >= 100) {
+        window.clearInterval(unlockTimerRef.current!);
+        unlockTimerRef.current = null;
+        exitLock();
+      }
+    }, 50);
+  };
+
+  const cancelUnlock = () => {
+    if (unlockTimerRef.current) { window.clearInterval(unlockTimerRef.current); unlockTimerRef.current = null; }
+    setUnlockHold(0);
+  };
 
   const beep = useCallback((freq = 800, dur = 0.15) => {
     if (!soundOn) return;
