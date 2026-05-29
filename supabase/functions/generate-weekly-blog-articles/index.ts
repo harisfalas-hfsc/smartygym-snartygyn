@@ -344,7 +344,22 @@ RESPOND WITH EXACTLY THIS JSON FORMAT (no markdown, no code blocks, just raw JSO
         }
 
         // Auto-generate SEO metadata for the new article
-        const seoKeywords = ["Haris Falas", "SmartyGym", "smartygym.com", "SmartGym", "Smart-Gym", "Sports Scientist", "CSCS", category, "online fitness", "evidence-based training"];
+        // Base brand keywords + category-level keyword boost (so the article
+        // surfaces for broad searches like "strength training" or "nutrition")
+        const baseKeywords = [
+          "Haris Falas", "SmartyGym", "smartygym.com", "Sports Scientist", "CSCS",
+          "evidence-based fitness", "online personal trainer", "online gym",
+        ];
+        const categoryKeywords: Record<string, string[]> = {
+          Fitness: ["fitness", "strength training", "workout", "training", "exercise", "home workout", "online fitness", "workout program"],
+          Nutrition: ["nutrition", "diet", "protein", "macros", "healthy eating", "nutrition coach", "meal planning", "fat loss nutrition"],
+          Wellness: ["wellness", "health", "longevity", "recovery", "sleep", "stress management", "healthy aging", "mindful movement"],
+        };
+        const seoKeywords = Array.from(new Set([
+          ...baseKeywords,
+          ...(categoryKeywords[category] || []),
+          category,
+        ]));
         await supabase.from("seo_metadata").insert({
           content_id: insertedArticle.id,
           content_type: "article",
@@ -357,8 +372,13 @@ RESPOND WITH EXACTLY THIS JSON FORMAT (no markdown, no code blocks, just raw JSO
             "@type": "Article",
             headline: parsed.title,
             author: { "@type": "Person", name: "Haris Falas", jobTitle: "Sports Scientist, CSCS Certified", url: "https://smartygym.com/coach-profile" },
-            publisher: { "@type": "Organization", name: "SmartyGym", url: "https://smartygym.com" },
-            mainEntityOfPage: `https://smartygym.com/blog/${slug}`,
+            publisher: {
+              "@type": "Organization",
+              name: "SmartyGym",
+              url: "https://smartygym.com",
+              logo: { "@type": "ImageObject", url: "https://smartygym.com/smarty-gym-logo.png" },
+            },
+            mainEntityOfPage: `https://smartygym.com/blog/${slug}.html`,
           },
           last_refreshed_at: new Date().toISOString(),
         });
