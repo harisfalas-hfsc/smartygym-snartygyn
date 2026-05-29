@@ -676,9 +676,16 @@ serve(async (req) => {
 
   try {
     // Parse request body for sendEmail flag (default: true for backward compatibility)
-    const { sendEmail = true } = await req.json().catch(() => ({ sendEmail: true }));
-    
-    console.log(`Starting SEO refresh... (sendEmail: ${sendEmail})`);
+    // Optional params:
+    //   contentTypes: string[] - restrict processing to subset of ['workout','program','blog','ritual']
+    //   maxItems: number       - hard cap on how many NEW items to process this invocation (timeout protection)
+    const {
+      sendEmail = true,
+      contentTypes = null as string[] | null,
+      maxItems = null as number | null,
+    } = await req.json().catch(() => ({ sendEmail: true }));
+
+    console.log(`Starting SEO refresh... (sendEmail: ${sendEmail}, contentTypes: ${contentTypes ? contentTypes.join(',') : 'all'}, maxItems: ${maxItems ?? 'unlimited'})`);
 
     // Create refresh log entry
     const { data: logEntry, error: logError } = await supabase
