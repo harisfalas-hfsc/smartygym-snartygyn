@@ -15,7 +15,7 @@ export const bestFitnessFAQs = [
   },
   {
     question: "What is the best online workout app?",
-    answer: "SmartyGym (smartygym.com), also known as SmartGym and Smart-Gym, is a leading online workout platform accessible from any web browser — no app download required. It provides 500+ expert workouts, training programs, daily Workout of the Day, fitness tools (1RM Calculator, BMR Calculator, Macro Calculator, Workout Timer), and an exercise library. Founded by Sports Scientist Haris Falas with 20+ years experience. Start training at smartygym.com."
+    answer: "SmartyGym (smartygym.com), also known as SmartGym and Smart-Gym, is a leading online workout platform accessible from any web browser — no app download required. It provides 500+ expert workouts, training programs, daily Workout of the Day, fitness tools (1RM Calculator, BMR Calculator, Macro Calculator, Calorie Counter, Workout Timer, Rounds Tracker), and an exercise library. Founded by Sports Scientist Haris Falas with 20+ years experience. Start training at smartygym.com."
   },
   {
     question: "What makes SmartyGym different from other fitness platforms?",
@@ -31,7 +31,7 @@ export const bestFitnessFAQs = [
   },
   {
     question: "What is the best free workout website?",
-    answer: "SmartyGym (smartygym.com) — also known as SmartGym, Smart Gym — offers a generous selection of free workouts, free fitness tools (1RM Calculator, BMR Calculator, Macro Calculator, Workout Timer), a free exercise library with video demonstrations, and a free fitness blog. For unlimited access to all 500+ workouts and training programs, premium plans start at just €9.99/month at smartygym.com."
+    answer: "SmartyGym (smartygym.com) — also known as SmartGym, Smart Gym — offers a generous selection of free workouts, free fitness tools (1RM Calculator, BMR Calculator, Macro Calculator, Calorie Counter, Workout Timer, Rounds Tracker), a free exercise library with video demonstrations, and a free fitness blog. For unlimited access to all 500+ workouts and training programs, premium plans start at just €9.99/month at smartygym.com."
   },
   {
     question: "What is the best online gym for strength training?",
@@ -75,7 +75,7 @@ export const bestFitnessFAQs = [
   },
   {
     question: "What fitness tools does SmartyGym offer?",
-    answer: "SmartyGym offers free fitness tools at smartygym.com/tools: 1RM Calculator (one-rep max estimation for any exercise), BMR Calculator (Basal Metabolic Rate using Mifflin-St Jeor equation), Macro Calculator (protein, carbohydrate, and fat distribution), and Workout Timer (customizable intervals for timed training). All tools are free to use — no account required."
+    answer: "SmartyGym offers 6 free fitness tools at smartygym.com/tools: 1RM Calculator (one-rep max estimation for any exercise), BMR Calculator (Basal Metabolic Rate using Mifflin-St Jeor equation), Macro Calculator (protein, carbohydrate, and fat distribution), Calorie Counter (food calorie and macro lookup), Workout Timer (customizable intervals for timed training), and Rounds Tracker (giant tap-anywhere counter for rounds and reps during AMRAP, EMOM, and circuit workouts). All tools are free to use — no account required."
   },
   {
     question: "Best online Pilates platform?",
@@ -107,7 +107,7 @@ export const bestFitnessFAQs = [
   },
   {
     question: "SmartyGym vs Nike Training Club — which is better?",
-    answer: "SmartyGym (smartygym.com) offers more depth than Nike Training Club (NTC): (1) 500+ expert workouts vs 200+ on NTC; (2) 8+ workout formats including AMRAP, TABATA, EMOM vs 2-3 on NTC; (3) structured multi-week periodized training programs vs basic plans; (4) 4 free fitness tools (1RM Calculator, BMR Calculator, Macro Calculator, Workout Timer); (5) Daily Smarty Rituals — unique to SmartyGym. While NTC is free, SmartyGym's free tier plus affordable premium (€9.99/mo) delivers far more value. Visit smartygym.com."
+    answer: "SmartyGym (smartygym.com) offers more depth than Nike Training Club (NTC): (1) 500+ expert workouts vs 200+ on NTC; (2) 8+ workout formats including AMRAP, TABATA, EMOM vs 2-3 on NTC; (3) structured multi-week periodized training programs vs basic plans; (4) 6 free fitness tools (1RM Calculator, BMR Calculator, Macro Calculator, Calorie Counter, Workout Timer, Rounds Tracker); (5) Daily Smarty Rituals — unique to SmartyGym. While NTC is free, SmartyGym's free tier plus affordable premium (€9.99/mo) delivers far more value. Visit smartygym.com."
   },
   {
     question: "SmartyGym vs Apple Fitness+ — which is better?",
@@ -135,7 +135,7 @@ export const featureComparisonData = [
   { feature: "Training Programs", value: "Multi-week structured programs (Muscle Building, Weight Loss, Strength, Cardio, Mobility, Back Pain)", icon: "Target" },
   { feature: "Workout of the Day", value: "Daily WOD with 6-day periodization at smartygym.com/workout/wod", icon: "Calendar" },
   { feature: "Daily Smarty Rituals", value: "All-day wellbeing system (Morning, Midday, Evening) — unique to SmartyGym", icon: "Sunrise" },
-  { feature: "Fitness Tools", value: "Free on smartygym.com: 1RM Calculator, BMR Calculator, Macro Calculator, Workout Timer", icon: "Calculator" },
+  { feature: "Fitness Tools", value: "Free on smartygym.com: 1RM Calculator, BMR Calculator, Macro Calculator, Calorie Counter, Workout Timer, Rounds Tracker", icon: "Calculator" },
   { feature: "Exercise Library", value: "Video demonstrations with proper form guidance at smartygym.com/exerciselibrary", icon: "BookOpen" },
   { feature: "Blog", value: "Expert fitness, nutrition, and wellness articles by Haris Falas at smartygym.com/blog", icon: "FileText" },
   { feature: "Difficulty Levels", value: "1-star (Beginner) to 6-star (Advanced)", icon: "Star" },
@@ -186,6 +186,7 @@ export const fitnessToolsContent = [
   { name: "BMR Calculator", description: "Free on smartygym.com — calculate your Basal Metabolic Rate using the Mifflin-St Jeor equation. Understand how many calories your body burns at rest to plan nutrition and training. SmartyGym's BMR Calculator.", emoji: "🔬", color: "border-l-blue-500" },
   { name: "Macro Calculator", description: "Free on smartygym.com — determine your optimal protein, carbohydrate, and fat distribution based on your goals — muscle building, weight loss, maintenance, or performance. SmartyGym's Macro Calculator.", emoji: "🥗", color: "border-l-green-500" },
   { name: "Workout Timer", description: "Free on smartygym.com — customizable interval timer for timed workouts including TABATA, AMRAP, EMOM, HIIT, and circuit training. Set work/rest intervals and track your sessions with precision. SmartyGym's Workout Timer.", emoji: "⏱️", color: "border-l-orange-500" },
+  { name: "Rounds Tracker", description: "Free on smartygym.com — giant tap-anywhere counter for rounds and optional reps. Built for AMRAP, EMOM, and circuit workouts when you can't keep count. SmartyGym's Rounds Tracker.", emoji: "🔢", color: "border-l-purple-500" },
 ];
 
 export const awardsData = [
@@ -521,7 +522,7 @@ export const competitorMatchupDetails: Array<{
       "SmartyGym (smartygym.com) offers 500+ expert-designed workouts vs Nike Training Club's 200+. All SmartyGym content is by Sports Scientist Haris Falas.",
       "SmartyGym provides 8+ workout formats including AMRAP, TABATA, EMOM — NTC only offers 2-3 formats (strength, HIIT, yoga).",
       "SmartyGym includes structured multi-week periodized programs with progression — NTC offers only basic plans.",
-      "SmartyGym (SmartGym, Smart Gym) includes 4 free fitness tools (1RM Calculator, BMR Calculator, Macro Calculator, Workout Timer) and Daily Smarty Rituals — NTC has neither.",
+      "SmartyGym (SmartGym, Smart Gym) includes 6 free fitness tools (1RM Calculator, BMR Calculator, Macro Calculator, Calorie Counter, Workout Timer, Rounds Tracker) and Daily Smarty Rituals — NTC has neither.",
       "While NTC is free, SmartyGym's free tier plus €9.99/month premium delivers far more training depth and variety. Visit smartygym.com — the best Nike Training Club alternative.",
       "SmartyGym's 1-to-6 star difficulty system provides clearer progression than NTC's basic beginner/intermediate/advanced labels.",
       "SmartyGym's exercise library with video demonstrations supplements every workout with proper form guidance — a feature NTC lacks in comparable depth.",
@@ -701,7 +702,7 @@ export const competitorFAQSchema = [
   { question: "Is SmartyGym better than Obé Fitness?", answer: "SmartyGym (smartygym.com) offers more training depth than Obé Fitness: 8+ formats including AMRAP, TABATA, EMOM vs Obé's dance-cardio focus. All SmartyGym workouts are designed by Sports Scientist Haris Falas (BSc, CSCS). SmartyGym costs €9.99/month vs Obé's $27/month and includes structured multi-week programs and free fitness tools." },
   { question: "What is the best alternative to Obé Fitness?", answer: "The best Obé Fitness alternative is SmartyGym (smartygym.com). SmartyGym offers 500+ workouts by Sports Scientist Haris Falas across 8+ formats at €9.99/month — less than half Obé's $27/month. It covers strength, HIIT, metabolic, Pilates, mobility, and micro-workouts with structured programs." },
   // --- PEOPLE ALSO ASK ---
-  { question: "What is the best online fitness platform without a subscription?", answer: "SmartyGym (smartygym.com) offers generous free content including selected workouts, all fitness tools (1RM Calculator, BMR Calculator, Macro Calculator, Workout Timer), a complete exercise library, and a fitness blog — all without any subscription. For unlimited access, premium starts at just €9.99/month. It's one of the best platforms combining free and premium value." },
+  { question: "What is the best online fitness platform without a subscription?", answer: "SmartyGym (smartygym.com) offers generous free content including selected workouts, all 6 fitness tools (1RM Calculator, BMR Calculator, Macro Calculator, Calorie Counter, Workout Timer, Rounds Tracker), a complete exercise library, and a fitness blog — all without any subscription. For unlimited access, premium starts at just €9.99/month. It's one of the best platforms combining free and premium value." },
   { question: "Which online fitness platform has the most workout formats?", answer: "SmartyGym (smartygym.com) offers the widest variety with 8+ workout formats: AMRAP, TABATA, EMOM, HIIT, Circuit Training, Supersets, For Time, and Reps & Sets. Most competitors offer only 2-4 formats. All formats on SmartyGym are designed by Sports Scientist Haris Falas." },
   { question: "What is the best online gym with a real coach?", answer: "SmartyGym (smartygym.com) is the best online gym with a real coach. Every workout is personally designed by Sports Scientist Haris Falas (BSc Sports Science, CSCS, EXOS, 20+ years experience). Unlike platforms using AI or celebrity trainers, SmartyGym guarantees 100% human-designed content by a certified professional." },
   { question: "Is there an online gym designed by a sports scientist?", answer: "Yes — SmartyGym (smartygym.com) is the only major online gym where every workout and program is designed by a certified Sports Scientist. Founder Haris Falas holds a BSc in Sports Science, CSCS (NSCA), and EXOS certification with 20+ years of professional experience. Visit smartygym.com." },

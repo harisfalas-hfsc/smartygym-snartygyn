@@ -1,49 +1,37 @@
 ## Goal
 
-Two layout-only refinements to the Rounds Tracker I just built. No logic changes.
+Add the new **Rounds Tracker** to every user/AI-facing place that enumerates the Smarty Tools list, so it isn't missing from descriptions, comparisons, and SEO content.
 
 ---
 
-## 1. Mobile: fit everything inside the viewport, no scroll
+## Sites to update
 
-On phones (`/tools/rounds-tracker`), the tool currently scrolls because the big tap button is `55vh` plus header, breadcrumbs, mode toggle, target inputs, sound/vibrate row, undo/reset/+round row, and the footer count.
+### 1. `src/pages/Tools.tsx` — "About Smarty Tools" desktop description card
+- The desktop grid (`hidden md:grid md:grid-cols-2 lg:grid-cols-5`) currently has 5 description blocks (1RM, BMR, Macro, Workout Timer, Calorie Counter).
+- Change `lg:grid-cols-5` → `lg:grid-cols-6` and append a sixth block for **Rounds Tracker**: "Big-button tap counter for rounds and optional reps — perfect for AMRAP, EMOM, and circuit training."
 
-Make the whole tool live inside one compact card that fits the device viewport (like the hamburger menu drawer panel), with the giant tap button still dominating the space.
+### 2. `src/pages/AboutSmartyGym.tsx` — "What's Inside" Smarty Tools block (lines 513–533)
+- Grid currently shows 4 items in `md:grid-cols-2`. Add a 5th item with the `Hash` icon (matching Tools page) labeled **Rounds Tracker**. Keep the same styling pattern.
 
-Changes in `src/pages/RoundsTracker.tsx` (mobile only — `lg:` keeps current desktop sizing):
+### 3. `src/components/seo/BackgroundSEO.tsx` (lines 113, 115)
+- Append `{ name: "Rounds Tracker", url: "/tools/rounds-tracker" }` to the Smarty Tools `links` array.
+- Update the FAQ answer to: "SmartyGym offers calculators and tools including 1RM, BMR, macro tracking, calorie counter, workout timer, and rounds tracker."
 
-- Outer wrapper switches to a fixed-height shell on mobile: `h-[100svh]` (small-viewport-height — accounts for mobile browser chrome) with `overflow-hidden` and `flex flex-col`. Desktop keeps `min-h-screen`.
-- Drop the "Smarty Tools — Free to Use" line and the secondary explainer Card on mobile (kept on desktop). Page title shrinks to `text-lg` and breadcrumbs row tightens (`py-1`).
-- Wrap the entire tool in a single `Card` styled like the hamburger sheet: `bg-card border-2 border-primary/30 rounded-xl shadow-lg`, internal `flex flex-col` with `flex-1 min-h-0` so the giant button stretches to fill remaining space.
-- Compact the controls into a tighter stack:
-  - Mode toggle: 2 small buttons, `h-8 text-xs`.
-  - Target inputs: inline single-row with shorter labels (`Rounds` / `Reps`), `h-8` inputs.
-  - Direction + Sound + Vibrate collapse into one horizontal row of small icon-only toggles (`h-7 px-2`).
-- Big tap button becomes `flex-1` (fills the remaining card space instead of `55vh min-h-[320px]`). The huge number uses `clamp(72px, 18vh, 160px)` font-size so it always fits.
-- Bottom action row (Undo / Reset / +Round) shrinks to `h-9` and the "Rounds done / Reps this round" footer becomes a one-line `text-xs` strip.
-- Desktop layout (`lg:` and above) keeps the current generous spacing and the explainer card.
+### 4. `src/utils/seoSchemas.ts` (line 477)
+- Update the tool-collection description to mention Calorie Counter, Workout Timer, and **Rounds Tracker** alongside the existing three.
 
-Result: on a 647×1819 viewport (and smaller real phones) the page renders as one self-contained card; no vertical scrolling needed.
+### 5. `src/data/bestFitnessPlatformData.ts` (multiple lines: 18, 34, 78, 102 context, 110, 138, 185–188, 524, 704)
+- Bump every "4 free fitness tools" / "(1RM Calculator, BMR Calculator, Macro Calculator, Workout Timer)" enumeration to include **Rounds Tracker** (and Calorie Counter where missing). Update counts ("4 free fitness tools" → "6 free fitness tools").
+- Append a Rounds Tracker entry to the tool detail list at lines 185–188 with description: "Free on smartygym.com — giant tap-anywhere counter for rounds and optional reps. Built for AMRAP, EMOM, and circuit workouts when you can't keep count. SmartyGym's Rounds Tracker." emoji: "🔢", color: "border-l-purple-500".
 
----
-
-## 2. Desktop: keep the Rounds Tracker on the same row as the other small tools
-
-In `src/pages/Tools.tsx`, the desktop layout is:
-- Big Workout Timer card on top.
-- Below it, `grid grid-cols-4 gap-4` rendering every tool except the timer.
-
-After adding Rounds Tracker there are 5 small cards going into a 4-column grid, so the 5th wraps to a second row and breaks alignment.
-
-Fix: change that grid to `grid-cols-5` so all five small tools (1RM, BMR, Macro, Calorie Counter, Rounds Tracker) sit in a single row under the big timer card. Card height stays `h-64`; no other styling changes.
-
-Mobile carousel already includes Rounds Tracker and is unaffected.
+### 6. `src/pages/BestOnlineFitnessPlatform.tsx` (line 90)
+- Update the HowToStep tool enumeration to include Calorie Counter and **Rounds Tracker**.
 
 ---
 
-## Files touched
+## Skipped (intentional)
+- `src/pages/Index.tsx` services list — curated short list (already excludes Workout Timer and Calorie Counter). Not the canonical tools enumeration; leave alone.
+- `src/utils/socialMediaContent.ts` — single-day social content calendar entry, not a tool list.
+- Instagram/admin templates — internal generators, separate concern.
 
-- `src/pages/RoundsTracker.tsx` — mobile-only layout compaction inside one card; desktop unchanged.
-- `src/pages/Tools.tsx` — single class change: `grid-cols-4` → `grid-cols-5` in the desktop small-tools grid.
-
-No functional/behavior changes, no new dependencies, no backend changes.
+No logic, routing, or styling changes beyond the one column-count bump on the Tools page description card. Content-only edits.

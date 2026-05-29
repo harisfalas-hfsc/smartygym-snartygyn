@@ -474,7 +474,7 @@ export const generateServicesArraySchema = () => ({
     {
       "@type": "Service",
       "name": "Smarty Tools",
-      "description": "Free fitness calculators including 1RM Calculator, BMR Calculator, and Macro Tracking Calculator.",
+      "description": "Free fitness calculators and tools including 1RM Calculator, BMR Calculator, Macro Tracking Calculator, Calorie Counter, Workout Timer, and Rounds Tracker.",
       "url": "https://smartygym.com/tools",
       "serviceType": "Fitness Tools",
       "provider": { "@type": "Organization", "name": "SmartyGym" }
