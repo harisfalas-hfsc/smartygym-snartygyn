@@ -166,7 +166,7 @@ type DailyReport = {
   inactive: Array<{ job_name: string; display_name: string }>;
 };
 
-async function sendDailySummary(report: DailyReport) {
+async function sendDailySummary(report: DailyReport, adminEmail: string) {
   if (!RESEND_KEY) {
     console.error("[cron-heartbeat] RESEND_API_KEY not set — cannot send summary");
     return;
@@ -238,7 +238,7 @@ async function sendDailySummary(report: DailyReport) {
 
   await resend.emails.send({
     from: "SmartyGym System <notifications@smartygym.com>",
-    to: [ADMIN_EMAIL],
+    to: [adminEmail],
     subject,
     html,
   });
