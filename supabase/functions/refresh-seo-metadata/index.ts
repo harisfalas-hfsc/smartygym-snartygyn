@@ -776,13 +776,24 @@ serve(async (req) => {
     itemsScanned = allContent.length;
     console.log(`Scanned ${itemsScanned} total content items`);
 
-    // Get all existing SEO entries to avoid reprocessing
-    const { data: existingSEO, error: existingSEOError } = await supabase
-      .from('seo_metadata')
-      .select('content_type, content_id');
-
-    if (existingSEOError) {
-      console.error('Error fetching existing SEO entries:', existingSEOError);
+    // Get all existing SEO entries to avoid reprocessing (paginated — Supabase default cap is 1000)
+    const existingSEO: Array<{ content_type: string; content_id: string }> = [];
+    {
+      const PAGE = 1000;
+      for (let from = 0; ; from += PAGE) {
+        const { data, error } = await supabase
+          .from('seo_metadata')
+          .select('content_type, content_id')
+          .range(from, from + PAGE - 1);
+        if (error) {
+          console.error('Error fetching existing SEO entries:', error);
+          break;
+        }
+        if (!data || data.length === 0) break;
+        existingSEO.push(...data);
+        if (data.length < PAGE) break;
+      }
+      console.log(`Loaded ${existingSEO.length} existing SEO entries (paginated)`);
     }
 
     // Create a Set of already-optimized content IDs for fast lookup
