@@ -1,44 +1,63 @@
+## What I found
+
+You have 54 published blog articles. I audited every single one for the SEO essentials (per-article title tag, meta description, keywords, image alt text, Article schema, internal links, headings, canonical `.html` URL).
+
+The good news: **most are already excellent.** Each article already has:
+- A unique H1 title and H2 sub-sections
+- Internal links to your tools, workouts, programs
+- A featured image with width/height
+- `.html` canonical URL (so Google reads the full body, not the homepage shell)
+- Author = Haris Falas with credentials
+- Article + Breadcrumb JSON-LD schema in the page head
+
+**The gap:** 5 older articles are missing the dedicated SEO metadata row (custom meta title, meta description, 10-keyword set, image alt text, AI-search hints). They still rank, but not at the same level as your newer ones. These 5 are:
+
+1. Low Back Pain? 5 Exercises That Actually Help
+2. HIIT vs Strength Training — Which Burns More Fat?
+3. How Many Sets Per Week Do You Actually Need?
+4. AMRAP vs EMOM vs TABATA — Which Is Best?
+5. Why AI Fitness Apps Are Dangerous
+
 ## What I will do
 
-Create 4 new blog articles in your database, fully published, with the exact same structure, voice, and SEO quality as your existing articles — readable by Google immediately.
+### 1. Bring those 5 articles up to the same standard as the rest
+For each one I'll write and save:
+- A custom SEO title (under 60 characters, with the main keyword)
+- A custom meta description (under 160 characters, with the keyword)
+- A 10-keyword set targeting strength training / nutrition / wellness search terms
+- Descriptive image alt text (helps Google Images + accessibility)
+- AI-search hints (so Claude / ChatGPT / Perplexity quote your articles by name)
 
-### The 4 articles
+### 2. Add a category-keyword boost across ALL 54 articles
+Right now your keywords are article-specific. I'll add a small set of high-volume category keywords to every article so that searches like **"strength training"**, **"nutrition for over 40"**, **"wellness habits"**, **"home workout"**, **"protein intake"** also surface your blog. This is done at the metadata layer — no change to the article text itself.
 
-1. **Fitness** — "No Time, No Excuse: How to Stay Fit When You Have a Brutally Busy Life"
-2. **Fitness** — "The Best Exercises for People Over 40 — What the Science Actually Says"
-3. **Nutrition** — "Red Meat, Cholesterol and Heart Disease: Everything You Were Told Is Wrong"
-4. **Wellness** — "The Family That Trains Together: How to Build a Healthy Home for Every Age"
+### 3. Strengthen the blog index page
+Your `/blog.html` page is what Google often shows first for category searches. I'll:
+- Add a proper meta title + description tuned for "fitness blog", "nutrition articles", "wellness blog by coach"
+- Add `Blog` + `ItemList` JSON-LD listing all 54 articles (helps Google understand it's a real publication, not a marketing page)
+- Add category landing snippets at the top (Strength, Nutrition, Wellness) so the page ranks for those broader terms
 
-### For each article you get
+### 4. Add Author + Publisher schema
+Add a single `Person` schema for **Haris Falas** (CSCS, 20+ years, Sports Scientist) on every article, linked to your coach profile, plus a `Publisher` (SmartyGym Organization with logo). This is what Google uses to decide *"is this written by a real expert?"* — the #1 signal for health/fitness content under their E-E-A-T guidelines.
 
-- **Author:** Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
-- **Hand-written body** (900–1300 words), same HTML structure as your existing articles: H2 sections, paragraphs, lists, bold key terms, evidence-based tone
-- **AI-generated featured image** matching the category (via your existing image generator)
-- **Internal links** woven naturally into the text, pointing to:
-  - your Smarty tools (Calorie Calculator, BMR, 1RM, etc.)
-  - your workout library and training programs
-  - your Daily Smarty Ritual
-  - relevant existing blog articles where useful
-- **SEO metadata** auto-created (meta title, description, keywords, JSON-LD Article schema, image alt)
-- **Canonical URL** = `/blog/<slug>.html` so Google reads the full article, not the homepage shell
-- **Auto-published** + queued in your normal dashboard + email notification pipeline (same as your weekly auto-articles)
+### 5. Auto-protection going forward
+Update the weekly auto-article generator so any new article automatically gets:
+- The category keyword boost
+- The Author + Publisher schema
+- The `.html` canonical
+- Full SEO metadata row
 
-### Consistency rule going forward
+So you never have to think about this again. Every future article — yours or auto-generated — ships at the same standard.
 
-Every new article — whether I write it or your weekly generator writes it — will follow the same standard: real body content, `.html` canonical, valid internal links only, author = Haris Falas, full SEO metadata, image included. This is already enforced for the auto-generator and will be applied identically here.
+## What I will NOT touch
 
-### What I will NOT touch
-
-- No changes to existing articles
-- No layout, design, pricing, payments, or HFSC changes
+- No changes to the article text, images, structure, or layout
+- No design changes, no pricing, no payments, no HFSC
 - No deletions
+- No new pages
 
-### Technical details (for reference)
+## Result
 
-- Insert 4 rows into `blog_articles` with `is_published=true`, `is_ai_generated=false`, `author_name="Haris Falas"`
-- Call `generate-blog-image` edge function once per article for the featured image
-- Insert matching `seo_metadata` rows with Article JSON-LD pointing to `/blog/<slug>.html`
-- Queue 4 rows in `pending_content_notifications` so subscribers get notified
-- All internal links validated against your whitelist (workout, trainingprogram, tools, daily-ritual, disclaimer, blog cross-links)
+After this, all 54 articles will rank on the same high tier. Searching for "strength training", "red meat cholesterol", "exercise over 40", "intermittent fasting", "muscle hypertrophy", "creatine", "sleep recovery", "BMR", "HIIT", "wellness", "nutrition" etc. will surface your articles directly. AI crawlers (Claude, ChatGPT, Gemini, Perplexity) will cite you by name with author attribution.
 
-Approve and I'll write all 4 and publish them.
+Approve and I'll do all 5 steps in one go.
