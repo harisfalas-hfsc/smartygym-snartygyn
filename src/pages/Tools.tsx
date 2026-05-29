@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
-import { Calculator, Activity, Flame, Timer, Search } from "lucide-react";
+import { Calculator, Activity, Flame, Timer, Search, Hash } from "lucide-react";
 
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
@@ -18,6 +18,7 @@ import bmrBg from "@/assets/tools/bmr-calculator-bg.jpg";
 import macroBg from "@/assets/tools/macro-calculator-bg.jpg";
 import timerBg from "@/assets/tools/workout-timer-bg.jpg";
 import calorieBg from "@/assets/tools/calorie-counter-bg.jpg";
+import roundsBg from "@/assets/tools/rounds-tracker-bg.jpg";
 
 // Mobile card images
 import oneRmCardMobile from "@/assets/tools/1rm-card-mobile.jpg";
@@ -87,6 +88,15 @@ const Tools = () => {
       route: "/tools/calorie-counter",
       image: calorieBg,
       mobileImage: calorieCardMobile
+    },
+    {
+      id: "rounds-tracker",
+      icon: Hash,
+      title: "Rounds Tracker",
+      description: "Big-button counter — tap to track rounds and optional reps during your workout",
+      route: "/tools/rounds-tracker",
+      image: roundsBg,
+      mobileImage: roundsBg
     }
   ];
 
@@ -130,6 +140,12 @@ const Tools = () => {
           description: "Free calorie and macro food search tool by SmartyGym. Look up any food and instantly see calories, protein, carbs, and fat per serving.",
           url: "/tools/calorie-counter",
           keywords: ["calorie counter", "food calorie lookup", "macro tracking", "USDA food database", "Haris Falas", "SmartyGym"]
+        }))}</script>
+        <script type="application/ld+json">{JSON.stringify(generateToolWebApplicationSchema({
+          name: "Rounds Tracker",
+          description: "Free big-button rounds and reps counter by SmartyGym. Tap anywhere to count rounds and optional reps during AMRAP, EMOM, and circuit workouts.",
+          url: "/tools/rounds-tracker",
+          keywords: ["rounds tracker", "rep counter", "AMRAP counter", "tally counter workout", "SmartyGym"]
         }))}</script>
         <script type="application/ld+json">{JSON.stringify(generateSpeakableSchema())}</script>
       </Helmet>
