@@ -3700,6 +3700,27 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_cron_heartbeat_snapshot: {
+        Args: never
+        Returns: {
+          consecutive_failures: number
+          created_at: string
+          display_name: string
+          edge_function_name: string
+          is_active: boolean
+          is_critical: boolean
+          job_name: string
+          live_job_active: boolean
+          live_job_exists: boolean
+          live_schedule: string
+          metadata_last_run_at: string
+          metadata_last_run_status: string
+          registered_schedule: string
+          scheduler_last_message: string
+          scheduler_last_run_at: string
+          scheduler_last_status: string
+        }[]
+      }
       get_cron_jobs: {
         Args: never
         Returns: {
@@ -3874,6 +3895,7 @@ export type Database = {
       }
       is_user_banned: { Args: { user_id_param: string }; Returns: boolean }
       pg_cron_enabled: { Args: never; Returns: boolean }
+      sync_cron_metadata_from_live_scheduler: { Args: never; Returns: number }
       user_has_active_premium_access: {
         Args: { _user_id: string }
         Returns: boolean

@@ -39,6 +39,40 @@ type CronRow = {
   created_at: string;
 };
 
+type CronSnapshotRow = {
+  job_name: string;
+  display_name: string;
+  registered_schedule: string;
+  live_schedule: string | null;
+  edge_function_name: string | null;
+  is_critical: boolean;
+  is_active: boolean;
+  metadata_last_run_at: string | null;
+  metadata_last_run_status: string | null;
+  consecutive_failures: number;
+  created_at: string;
+  live_job_exists: boolean;
+  live_job_active: boolean;
+  scheduler_last_run_at: string | null;
+  scheduler_last_status: string | null;
+  scheduler_last_message: string | null;
+};
+
+function snapshotToCronRow(row: CronSnapshotRow): CronRow {
+  return {
+    job_name: row.job_name,
+    display_name: row.display_name,
+    schedule: row.live_schedule || row.registered_schedule,
+    edge_function_name: row.edge_function_name,
+    is_critical: row.is_critical,
+    is_active: row.is_active,
+    last_run_at: row.scheduler_last_run_at || row.metadata_last_run_at,
+    last_run_status: row.scheduler_last_status || row.metadata_last_run_status,
+    consecutive_failures: row.consecutive_failures,
+    created_at: row.created_at,
+  };
+}
+
 /** Roughly estimate the expected interval (in minutes) between runs from a cron expression. */
 function estimateIntervalMinutes(cron: string): number {
   const parts = cron.trim().split(/\s+/);
@@ -89,6 +123,20 @@ function isOverdue(job: CronRow, nowMs: number): { overdue: boolean; reason: str
     return { overdue: true, reason: `last ran ${ageMin} minutes ago (threshold ${graceMin} min)`, thresholdMinutes: graceMin };
   }
   return { overdue: false, reason: `last ran ${ageMin} minutes ago`, thresholdMinutes: graceMin };
+}
+
+function evaluateSnapshot(row: CronSnapshotRow, nowMs: number): { overdue: boolean; reason: string; thresholdMinutes: number; job: CronRow } {
+  const job = snapshotToCronRow(row);
+  if (!row.live_job_exists) {
+    return { overdue: true, reason: "not registered in the live scheduler", thresholdMinutes: 0, job };
+  }
+  if (!row.live_job_active) {
+    return { overdue: true, reason: "registered but disabled in the live scheduler", thresholdMinutes: 0, job };
+  }
+  if (row.scheduler_last_status && row.scheduler_last_status !== "succeeded") {
+    return { overdue: true, reason: `scheduler reported ${row.scheduler_last_status}: ${row.scheduler_last_message || "no details"}`, thresholdMinutes: 0, job };
+  }
+  return { ...isOverdue(job, nowMs), job };
 }
 
 async function sendAlert(overdueJobs: Array<{ job: CronRow; reason: string }>) {
@@ -150,10 +198,10 @@ serve(async (req) => {
   const supabase = createClient(PROJECT_URL, SERVICE_KEY);
   const nowMs = Date.now();
 
+  await supabase.rpc("sync_cron_metadata_from_live_scheduler");
+
   const { data: jobs, error } = await supabase
-    .from("cron_job_metadata")
-    .select("job_name, display_name, schedule, edge_function_name, is_critical, is_active, last_run_at, last_run_status, consecutive_failures, created_at")
-    .eq("is_active", true);
+    .rpc("get_cron_heartbeat_snapshot");
 
   if (error) {
     console.error("[cron-heartbeat] failed to load jobs", error);
@@ -163,13 +211,22 @@ serve(async (req) => {
   }
 
   // Don't alert on the heartbeat itself — it would alert about its own absence
-  const filtered = (jobs ?? []).filter((j: CronRow) => j.job_name !== "cron-heartbeat-hourly");
+  const filtered = (jobs ?? []).filter((j: CronSnapshotRow) => j.job_name !== "cron-heartbeat-hourly");
 
   const overdueJobs: Array<{ job: CronRow; reason: string }> = [];
-  const report = filtered.map((job: CronRow) => {
-    const r = isOverdue(job, nowMs);
-    if (r.overdue) overdueJobs.push({ job, reason: r.reason });
-    return { job_name: job.job_name, is_critical: job.is_critical, overdue: r.overdue, reason: r.reason };
+  const report = filtered.map((row: CronSnapshotRow) => {
+    const r = evaluateSnapshot(row, nowMs);
+    if (r.overdue) overdueJobs.push({ job: r.job, reason: r.reason });
+    return {
+      job_name: row.job_name,
+      is_critical: row.is_critical,
+      live_job_exists: row.live_job_exists,
+      live_job_active: row.live_job_active,
+      scheduler_last_run_at: row.scheduler_last_run_at,
+      scheduler_last_status: row.scheduler_last_status,
+      overdue: r.overdue,
+      reason: r.reason,
+    };
   });
 
   // Record the heartbeat itself
