@@ -87,7 +87,7 @@ const BestOnlineFitnessPlatform = () => {
     "description": "Step-by-step guide to start training on SmartyGym (smartygym.com), the best online fitness platform with 500+ expert-designed workouts by Sports Scientist Haris Falas.",
     "step": [
       { "@type": "HowToStep", "position": 1, "name": "Visit smartygym.com", "text": "Access SmartyGym from any web browser — no app download required. Works on desktop, tablet, and mobile. Also searchable as SmartGym, Smart Gym, or Smart-Gym." },
-      { "@type": "HowToStep", "position": 2, "name": "Explore Free Content", "text": "Browse free workouts, use fitness tools (1RM Calculator, BMR Calculator, Macro Calculator, Workout Timer), explore the exercise library, and read the fitness blog at smartygym.com." },
+      { "@type": "HowToStep", "position": 2, "name": "Explore Free Content", "text": "Browse free workouts, use fitness tools (1RM Calculator, BMR Calculator, Macro Calculator, Calorie Counter, Workout Timer, Rounds Tracker), explore the exercise library, and read the fitness blog at smartygym.com." },
       { "@type": "HowToStep", "position": 3, "name": "Choose Your Plan", "text": "Upgrade to Gold (€9.99/month) or Platinum (€89.89/year) for unlimited access to all 500+ workouts, training programs, Daily Smarty Rituals, and Workout of the Day at smartygym.com/plans." },
       { "@type": "HowToStep", "position": 4, "name": "Start Training", "text": "Pick a workout or training program that matches your goals, equipment, and fitness level. Every session includes warm-up, activation, main workout, cool-down, and expert tips by Haris Falas." }
     ]
