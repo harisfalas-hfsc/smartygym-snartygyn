@@ -530,6 +530,10 @@ export default function AboutSmartyGym() {
                     <Activity className="h-4 w-4 text-red-500" />
                     <span>Calorie Counter</span>
                   </div>
+                  <div className="flex items-center gap-2 p-2 bg-background rounded-lg text-sm border border-border">
+                    <Hash className="h-4 w-4 text-purple-500" />
+                    <span>Rounds Tracker</span>
+                  </div>
                 </div>
               </div>
 
