@@ -141,6 +141,12 @@ const Tools = () => {
           url: "/tools/calorie-counter",
           keywords: ["calorie counter", "food calorie lookup", "macro tracking", "USDA food database", "Haris Falas", "SmartyGym"]
         }))}</script>
+        <script type="application/ld+json">{JSON.stringify(generateToolWebApplicationSchema({
+          name: "Rounds Tracker",
+          description: "Free big-button rounds and reps counter by SmartyGym. Tap anywhere to count rounds and optional reps during AMRAP, EMOM, and circuit workouts.",
+          url: "/tools/rounds-tracker",
+          keywords: ["rounds tracker", "rep counter", "AMRAP counter", "tally counter workout", "SmartyGym"]
+        }))}</script>
         <script type="application/ld+json">{JSON.stringify(generateSpeakableSchema())}</script>
       </Helmet>
       
