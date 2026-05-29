@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RotateCcw, Plus, Minus, Volume2, VolumeX, Vibrate } from "lucide-react";
+import { RotateCcw, Plus, Minus, Volume2, VolumeX, Vibrate, Lock, Unlock, Maximize2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 
@@ -28,6 +28,10 @@ const RoundsTracker = () => {
   const [flash, setFlash] = useState<"none" | "tap" | "done">("none");
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
+  const [locked, setLocked] = useState(false);
+  const [unlockHold, setUnlockHold] = useState(0);
+  const unlockTimerRef = useRef<number | null>(null);
+  const rootRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const request = async () => {
