@@ -256,6 +256,25 @@ export function renderRouteBody(route: SeoRoute): {
       educationalLevel: p.difficulty || undefined,
       identifier: p.id,
     });
+    // Additional ExercisePlan schema (per SEO spec) so search and AI
+    // crawlers also surface programs as exercise plans, not only courses.
+    jsonLd.push({
+      "@context": "https://schema.org",
+      "@type": "ExercisePlan",
+      "@id": `${canonical}#exerciseplan`,
+      name: p.name,
+      description: stripHtml(p.description) || route.description,
+      image: img,
+      activityDuration: p.weeks ? `${p.weeks} weeks` : undefined,
+      exerciseType: p.category,
+      category: p.category,
+      intensity: p.difficulty_stars ? `${p.difficulty_stars}/6 stars` : p.difficulty,
+      workLocation: "Online / Home / Gym",
+      isAccessibleForFree: !p.is_premium,
+      author: person(),
+      provider: { "@type": "Organization", name: ORG.name, url: ORG.url },
+      identifier: p.id,
+    });
     jsonLd.push(
       breadcrumb([
         { name: "Home", path: "/" },
