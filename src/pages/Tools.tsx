@@ -310,8 +310,8 @@ const Tools = () => {
             );
           })()}
 
-          {/* 4 Smaller Cards */}
-          <div className="grid grid-cols-4 gap-4">
+          {/* Smaller Cards — single row alongside the big timer above */}
+          <div className="grid grid-cols-5 gap-4">
             {tools.filter(t => t.id !== "workout-timer").map((tool) => {
               const Icon = tool.icon;
               return (

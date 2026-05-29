@@ -153,22 +153,24 @@ const RoundsTracker = () => {
         relatedContent={["workouts", "workout timer"]}
       />
 
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto max-w-2xl px-4 pb-8">
-          <PageBreadcrumbs
-            items={[
-              { label: "Home", href: "/" },
-              { label: "Smarty Tools", href: "/tools" },
-              { label: "Rounds Tracker" }
-            ]}
-          />
-
-          <div className="text-center mb-6">
-            <p className="text-sm text-muted-foreground mb-2">Smarty Tools — Free to Use</p>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">Rounds Tracker</h1>
+      <div className="lg:min-h-screen bg-background h-[100svh] lg:h-auto overflow-hidden lg:overflow-visible flex flex-col">
+        <div className="container mx-auto max-w-2xl px-3 lg:px-4 pb-2 lg:pb-8 flex-1 min-h-0 flex flex-col">
+          <div className="lg:block">
+            <PageBreadcrumbs
+              items={[
+                { label: "Home", href: "/" },
+                { label: "Smarty Tools", href: "/tools" },
+                { label: "Rounds Tracker" }
+              ]}
+            />
           </div>
 
-          <Card className="md:hidden mb-4 border-2 border-primary/40">
+          <div className="text-center mb-2 lg:mb-6">
+            <p className="hidden lg:block text-sm text-muted-foreground mb-2">Smarty Tools — Free to Use</p>
+            <h1 className="text-lg lg:text-3xl xl:text-4xl font-bold lg:mb-2">Rounds Tracker</h1>
+          </div>
+
+          <Card className="hidden lg:block mb-4 border-2 border-primary/40">
             <CardContent className="p-3">
               <p className="text-sm text-muted-foreground text-center">
                 Tap the <span className="text-primary font-semibold">big button</span> to count rounds — optionally count reps inside each round.
@@ -176,79 +178,92 @@ const RoundsTracker = () => {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="p-4 sm:p-6">
-              <div className="grid grid-cols-2 gap-2 mb-4">
+          <Card className="flex-1 min-h-0 flex flex-col bg-card border-2 border-primary/30 shadow-lg lg:shadow-none lg:border lg:border-border">
+            <CardContent className="p-3 sm:p-4 lg:p-6 flex-1 min-h-0 flex flex-col">
+              <div className="grid grid-cols-2 gap-2 mb-2 lg:mb-4">
                 <Button
                   variant={mode === "rounds" ? "default" : "outline"}
                   onClick={() => { setMode("rounds"); handleReset(); }}
-                  className="h-10"
+                  className="h-8 lg:h-10 text-xs lg:text-sm"
                 >
                   Rounds only
                 </Button>
                 <Button
                   variant={mode === "rounds-reps" ? "default" : "outline"}
                   onClick={() => { setMode("rounds-reps"); handleReset(); }}
-                  className="h-10"
+                  className="h-8 lg:h-10 text-xs lg:text-sm"
                 >
                   Rounds + reps
                 </Button>
               </div>
 
-              <div className={cn("grid gap-3 mb-4", mode === "rounds-reps" ? "grid-cols-2" : "grid-cols-1")}>
+              <div className={cn("grid gap-2 lg:gap-3 mb-2 lg:mb-4", mode === "rounds-reps" ? "grid-cols-2" : "grid-cols-1")}>
                 <div>
-                  <Label className="text-xs font-semibold">Target rounds</Label>
+                  <Label className="text-[10px] lg:text-xs font-semibold">Target rounds</Label>
                   <Input
                     type="number"
                     inputMode="numeric"
                     value={targetRoundsInput}
                     onChange={(e) => setTargetRoundsInput(e.target.value)}
                     onBlur={() => commitNumber(targetRoundsInput, setTargetRounds, setTargetRoundsInput)}
-                    className="mt-1"
+                    className="mt-1 h-8 lg:h-10"
                   />
                 </div>
                 {mode === "rounds-reps" && (
                   <div>
-                    <Label className="text-xs font-semibold">Reps per round</Label>
+                    <Label className="text-[10px] lg:text-xs font-semibold">Reps per round</Label>
                     <Input
                       type="number"
                       inputMode="numeric"
                       value={targetRepsInput}
                       onChange={(e) => setTargetRepsInput(e.target.value)}
                       onBlur={() => commitNumber(targetRepsInput, setTargetReps, setTargetRepsInput)}
-                      className="mt-1"
+                      className="mt-1 h-8 lg:h-10"
                     />
                   </div>
                 )}
               </div>
 
-              {mode === "rounds" && (
-                <div className="flex items-center justify-center gap-2 mb-4">
-                  <Button
-                    size="sm"
-                    variant={direction === "down" ? "default" : "outline"}
-                    onClick={() => { setDirection("down"); handleReset(); }}
-                  >
-                    Count down
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={direction === "up" ? "default" : "outline"}
-                    onClick={() => { setDirection("up"); handleReset(); }}
-                  >
-                    Count up
-                  </Button>
-                </div>
-              )}
-
-              <div className="flex items-center justify-center gap-2 mb-4">
-                <Button size="sm" variant={soundOn ? "default" : "outline"} onClick={() => setSoundOn((s) => !s)}>
-                  {soundOn ? <Volume2 className="w-4 h-4 mr-1" /> : <VolumeX className="w-4 h-4 mr-1" />}
-                  Sound
+              <div className="flex flex-wrap items-center justify-center gap-1.5 lg:gap-2 mb-2 lg:mb-4">
+                {mode === "rounds" && (
+                  <>
+                    <Button
+                      size="sm"
+                      variant={direction === "down" ? "default" : "outline"}
+                      onClick={() => { setDirection("down"); handleReset(); }}
+                      className="h-7 lg:h-9 px-2 lg:px-3 text-[11px] lg:text-sm"
+                    >
+                      Count down
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant={direction === "up" ? "default" : "outline"}
+                      onClick={() => { setDirection("up"); handleReset(); }}
+                      className="h-7 lg:h-9 px-2 lg:px-3 text-[11px] lg:text-sm"
+                    >
+                      Count up
+                    </Button>
+                  </>
+                )}
+                <Button
+                  size="sm"
+                  variant={soundOn ? "default" : "outline"}
+                  onClick={() => setSoundOn((s) => !s)}
+                  className="h-7 lg:h-9 px-2 lg:px-3 text-[11px] lg:text-sm"
+                  aria-label="Toggle sound"
+                >
+                  {soundOn ? <Volume2 className="w-3.5 h-3.5 lg:w-4 lg:h-4 lg:mr-1" /> : <VolumeX className="w-3.5 h-3.5 lg:w-4 lg:h-4 lg:mr-1" />}
+                  <span className="hidden lg:inline">Sound</span>
                 </Button>
-                <Button size="sm" variant={hapticOn ? "default" : "outline"} onClick={() => setHapticOn((s) => !s)}>
-                  <Vibrate className="w-4 h-4 mr-1" />
-                  Vibrate
+                <Button
+                  size="sm"
+                  variant={hapticOn ? "default" : "outline"}
+                  onClick={() => setHapticOn((s) => !s)}
+                  className="h-7 lg:h-9 px-2 lg:px-3 text-[11px] lg:text-sm"
+                  aria-label="Toggle vibration"
+                >
+                  <Vibrate className="w-3.5 h-3.5 lg:w-4 lg:h-4 lg:mr-1" />
+                  <span className="hidden lg:inline">Vibrate</span>
                 </Button>
               </div>
 
@@ -257,9 +272,9 @@ const RoundsTracker = () => {
                 aria-label="Tap to count"
                 className={cn(
                   "relative w-full rounded-2xl select-none touch-manipulation",
-                  "h-[55vh] min-h-[320px] sm:h-[420px]",
+                  "flex-1 min-h-0 lg:flex-none lg:h-[420px]",
                   "text-center transition-all duration-150 active:scale-[0.99]",
-                  "border-4 shadow-2xl",
+                  "border-4 shadow-xl",
                   flash === "done"
                     ? "bg-emerald-500 border-emerald-300"
                     : flash === "tap"
@@ -267,19 +282,22 @@ const RoundsTracker = () => {
                       : "bg-primary border-primary/70 hover:bg-primary/95"
                 )}
               >
-                <div className="flex flex-col items-center justify-center h-full text-primary-foreground px-4">
+                <div className="flex flex-col items-center justify-center h-full text-primary-foreground px-3 lg:px-4">
                   {mode === "rounds-reps" && (
-                    <div className="text-base sm:text-lg font-semibold opacity-90 mb-2">
+                    <div className="text-sm lg:text-lg font-semibold opacity-90 mb-1 lg:mb-2">
                       Round {Math.min(roundsDone + (isDone ? 0 : 1), targetRounds)} / {targetRounds}
                     </div>
                   )}
-                  <div className="text-[20vw] sm:text-[140px] leading-none font-black tabular-nums drop-shadow-lg">
+                  <div
+                    className="leading-none font-black tabular-nums drop-shadow-lg"
+                    style={{ fontSize: "clamp(72px, 22vh, 160px)" }}
+                  >
                     {bigDisplay}
                   </div>
-                  <div className="text-base sm:text-xl font-semibold opacity-90 mt-2">
+                  <div className="text-sm lg:text-xl font-semibold opacity-90 mt-1 lg:mt-2">
                     {isDone ? "🎉 Done!" : bigSub}
                   </div>
-                  <div className="text-xs sm:text-sm opacity-70 mt-3">
+                  <div className="text-[10px] lg:text-sm opacity-70 mt-1 lg:mt-3">
                     {isDone
                       ? "Reset to start again"
                       : mode === "rounds" ? "Tap anywhere to count a round" : "Tap anywhere to count a rep"}
@@ -287,19 +305,19 @@ const RoundsTracker = () => {
                 </div>
               </button>
 
-              <div className="grid grid-cols-3 gap-2 mt-4">
-                <Button variant="outline" onClick={handleUndo} className="h-11">
+              <div className="grid grid-cols-3 gap-2 mt-2 lg:mt-4">
+                <Button variant="outline" onClick={handleUndo} className="h-9 lg:h-11 text-xs lg:text-sm">
                   <Minus className="w-4 h-4 mr-1" /> Undo
                 </Button>
-                <Button variant="outline" onClick={handleReset} className="h-11">
+                <Button variant="outline" onClick={handleReset} className="h-9 lg:h-11 text-xs lg:text-sm">
                   <RotateCcw className="w-4 h-4 mr-1" /> Reset
                 </Button>
-                <Button variant="outline" onClick={tapRound} disabled={isDone} className="h-11">
+                <Button variant="outline" onClick={tapRound} disabled={isDone} className="h-9 lg:h-11 text-xs lg:text-sm">
                   <Plus className="w-4 h-4 mr-1" /> +Round
                 </Button>
               </div>
 
-              <div className="mt-4 text-center text-sm text-muted-foreground">
+              <div className="mt-1.5 lg:mt-4 text-center text-[11px] lg:text-sm text-muted-foreground">
                 Rounds done: <span className="font-semibold text-foreground">{roundsDone}</span> / {targetRounds}
                 {mode === "rounds-reps" && (
                   <> · Reps this round: <span className="font-semibold text-foreground">{repsDone}</span> / {targetReps}</>
