@@ -377,11 +377,13 @@ serve(async (req) => {
     console.log("[cron-heartbeat] daily summary already sent today; skipping");
   } else {
     try {
-      await sendDailySummary(dailyReport);
+      const adminEmail = await getAdminNotificationEmail(supabase);
+      await sendDailySummary(dailyReport, adminEmail);
       await recordDailyAlertAttempt(supabase, nowMs, "success", {
         overdue: overdueJobs.length,
         failed24h: failed24h.length,
         healthy24h: healthy24h.length,
+        sent_to: adminEmail,
       });
       alert_status = "sent";
     } catch (e) {
