@@ -447,18 +447,23 @@ const RoundsTracker = () => {
             onPointerCancel={(e) => { e.stopPropagation(); cancelUnlock(); }}
             onClick={(e) => e.stopPropagation()}
             aria-label="Hold to unlock"
-            className="fixed bottom-4 right-4 z-[10000] h-16 w-16 rounded-full bg-background/80 backdrop-blur border-2 border-primary/60 shadow-xl flex items-center justify-center text-foreground touch-manipulation"
+            className="fixed right-4 z-[10000] h-20 w-20 rounded-full bg-background border-4 border-primary shadow-2xl flex items-center justify-center text-foreground touch-manipulation"
             style={{
+              bottom: "calc(env(safe-area-inset-bottom, 0px) + 96px)",
               backgroundImage: `conic-gradient(hsl(var(--primary)) ${unlockHold}%, transparent ${unlockHold}%)`,
             }}
           >
-            <div className="h-12 w-12 rounded-full bg-background flex items-center justify-center">
+            <div className="h-14 w-14 rounded-full bg-background flex flex-col items-center justify-center gap-0.5">
               {unlockHold > 0 ? <Unlock className="w-5 h-5" /> : <Lock className="w-5 h-5" />}
+              <span className="text-[9px] font-bold leading-none">HOLD</span>
             </div>
           </button>
 
-          <div className="fixed top-3 left-1/2 -translate-x-1/2 z-[10000] text-xs text-muted-foreground bg-background/70 backdrop-blur px-3 py-1 rounded-full border">
-            Hold the lock icon to exit
+          <div
+            className="fixed left-1/2 -translate-x-1/2 z-[10000] text-xs font-semibold text-foreground bg-background/90 backdrop-blur px-3 py-1.5 rounded-full border-2 border-primary/40 shadow"
+            style={{ top: "calc(env(safe-area-inset-top, 0px) + 12px)" }}
+          >
+            🔒 Locked — hold the lock button to exit
           </div>
         </div>
       )}
