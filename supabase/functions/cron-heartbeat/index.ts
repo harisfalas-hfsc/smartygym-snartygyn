@@ -10,10 +10,9 @@ const corsHeaders = {
 /**
  * Cron Heartbeat
  *
- * Runs hourly. Reads cron_job_metadata and verifies each active job has run
- * within a reasonable window of its schedule. Emails the admin the moment
- * any CRITICAL job is overdue. This is the watchdog that would have caught
- * the dead system-health-audit cron on day 1.
+ * Runs daily. Reads cron_job_metadata and verifies each active job has run
+ * within a reasonable window of its schedule. Sends at most one admin email
+ * per UTC day if any CRITICAL job is overdue.
  *
  * Heuristic for "overdue":
  *   - We approximate the expected interval between runs from the cron expression.
