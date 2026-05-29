@@ -65,6 +65,49 @@ function sectionHtml(label: string, raw: string | null | undefined): string {
   return `<section class="seo-section"><h2>${htmlEscape(label)}</h2>${normalizeInternalLinks(raw)}</section>`;
 }
 
+/**
+ * FAQ blocks for tool pages. Baked into the static prerendered HTML so
+ * Google can show Featured Snippets and AI crawlers can answer questions
+ * directly from the page, without waiting for client-side hydration.
+ */
+const TOOL_FAQS: Record<string, Array<{ q: string; a: string }>> = {
+  "/tools/1rm-calculator": [
+    { q: "What is a 1RM calculator?", a: "A one-rep max (1RM) calculator estimates the maximum weight you can lift for a single repetition of a given exercise, based on the weight and reps you completed in a recent set." },
+    { q: "Which formula does this 1RM calculator use?", a: "SmartyGym's 1RM calculator uses validated strength science formulas (Epley, Brzycki, Lombardi) so you get a reliable estimate without having to test a true one-rep max." },
+    { q: "Is the SmartyGym 1RM calculator free?", a: "Yes. The 1RM calculator is 100% free, requires no signup, and works on any device at smartygym.com/tools/1rm-calculator." },
+    { q: "How accurate is a 1RM estimator?", a: "Estimators are most accurate in the 2–10 rep range. Sets above 10 reps reduce accuracy because fatigue affects the bar speed and force output." },
+  ],
+  "/tools/bmr-calculator": [
+    { q: "What does a BMR calculator do?", a: "A basal metabolic rate (BMR) calculator estimates how many calories your body burns at complete rest to keep basic functions running — heart, brain, breathing, temperature." },
+    { q: "How is BMR different from TDEE?", a: "BMR is calories burned at rest. TDEE (total daily energy expenditure) is BMR plus everything you do — walking, training, digestion, NEAT. SmartyGym shows both." },
+    { q: "Which BMR formula is most accurate?", a: "SmartyGym uses the Mifflin–St Jeor equation, the most accurate BMR formula for the general adult population according to peer-reviewed nutrition research." },
+    { q: "Is the BMR calculator free?", a: "Yes. The BMR calculator is free, no signup, and works on any device at smartygym.com/tools/bmr-calculator." },
+  ],
+  "/tools/macro-calculator": [
+    { q: "What is a macro calculator?", a: "A macro calculator gives you personalised daily protein, carbohydrate and fat targets based on your weight, height, age, activity level and goal (fat loss, maintenance or muscle gain)." },
+    { q: "How does the SmartyGym macro calculator set protein?", a: "Protein is anchored to bodyweight (typically 1.6–2.2 g/kg depending on goal) so you preserve lean mass in a deficit and support muscle gain in a surplus." },
+    { q: "Can I use the macro calculator while losing weight?", a: "Yes. Pick the 'fat loss' goal and the macro calculator applies an evidence-based caloric deficit and a protein floor to protect lean mass." },
+    { q: "Is the macro calculator free?", a: "Yes. The macro calculator is free, requires no signup, and saves your results in your SmartyGym logbook if you're signed in." },
+  ],
+  "/tools/workout-timer": [
+    { q: "What workout formats does the timer support?", a: "SmartyGym's free workout timer supports EMOM, AMRAP, Tabata, intervals, and standard work/rest circuits — built for real strength and metabolic training." },
+    { q: "Does the workout timer keep the screen on?", a: "Yes. The timer uses the browser wake-lock API so your screen stays on during training, no separate app required." },
+    { q: "Is the SmartyGym workout timer free?", a: "Yes. The workout timer is 100% free, runs in any browser, no signup, no ads." },
+    { q: "Can I use the timer offline?", a: "The timer caches once loaded, so short connection drops do not interrupt your session." },
+  ],
+  "/tools/calorie-counter": [
+    { q: "Where does the calorie data come from?", a: "SmartyGym's calorie counter pulls from the USDA FoodData Central database — over 300,000 verified foods with calories, protein, carbs, fat and fibre." },
+    { q: "Is the calorie counter free?", a: "Yes. The calorie counter is 100% free, no signup, and you can search any food in seconds." },
+    { q: "Does the calorie counter save my entries?", a: "Yes. Logged-in members can save daily entries to their SmartyGym logbook for trend tracking." },
+    { q: "Can the calorie counter handle European foods?", a: "Yes. The USDA database covers globally common foods, and the counter supports both metric (grams, ml) and imperial (oz) units." },
+  ],
+  "/tools": [
+    { q: "What free fitness tools does SmartyGym offer?", a: "SmartyGym offers a free 1RM calculator, BMR calculator, macro calculator, calorie counter and workout timer — all designed by Sports Scientist Haris Falas." },
+    { q: "Do the SmartyGym tools require a subscription?", a: "No. Every Smarty Tool is free to use, no signup required, on any device at smartygym.com/tools." },
+    { q: "Who built the SmartyGym fitness tools?", a: "All SmartyGym tools were designed by Haris Falas — BSc Sports Science, CSCS, with 20+ years of strength and conditioning experience." },
+  ],
+};
+
 const HTML_CANONICAL_PREFIXES = [
   "/blog", "/workout", "/trainingprogram", "/tools", "/coach-profile", "/coach-cv",
   "/the-smarty-method", "/about", "/about-smartygym", "/best-online-fitness-platform",
@@ -256,6 +299,25 @@ export function renderRouteBody(route: SeoRoute): {
       educationalLevel: p.difficulty || undefined,
       identifier: p.id,
     });
+    // Additional ExercisePlan schema (per SEO spec) so search and AI
+    // crawlers also surface programs as exercise plans, not only courses.
+    jsonLd.push({
+      "@context": "https://schema.org",
+      "@type": "ExercisePlan",
+      "@id": `${canonical}#exerciseplan`,
+      name: p.name,
+      description: stripHtml(p.description) || route.description,
+      image: img,
+      activityDuration: p.weeks ? `${p.weeks} weeks` : undefined,
+      exerciseType: p.category,
+      category: p.category,
+      intensity: p.difficulty_stars ? `${p.difficulty_stars}/6 stars` : p.difficulty,
+      workLocation: "Online / Home / Gym",
+      isAccessibleForFree: !p.is_premium,
+      author: person(),
+      provider: { "@type": "Organization", name: ORG.name, url: ORG.url },
+      identifier: p.id,
+    });
     jsonLd.push(
       breadcrumb([
         { name: "Home", path: "/" },
@@ -306,6 +368,41 @@ export function renderRouteBody(route: SeoRoute): {
   }
 
   // Static / category pages — a clean, crawlable shell.
+  // Tool routes get extra WebApplication + FAQPage schema so the static
+  // prerendered HTML carries them (not just client-side after hydration).
+  if (route.path.startsWith("/tools/") || route.path === "/tools") {
+    const toolFaq = TOOL_FAQS[route.path];
+    if (toolFaq) {
+      jsonLd.push({
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "@id": canonical,
+        name: route.title.replace(/\s*\|\s*SmartyGym.*$/, "").trim(),
+        description: route.description,
+        url: canonical,
+        applicationCategory: "HealthApplication",
+        applicationSubCategory: "Fitness Calculator",
+        operatingSystem: "Web Browser",
+        isAccessibleForFree: true,
+        offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" },
+        author: person(),
+        creator: { "@type": "Person", name: AUTHOR.name },
+        provider: { "@type": "Organization", name: ORG.name, url: ORG.url },
+        publisher: { "@type": "Organization", name: ORG.name, url: ORG.url },
+        inLanguage: ["en-GB", "en-US"],
+      });
+      jsonLd.push({
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: toolFaq.map((q) => ({
+          "@type": "Question",
+          name: q.q,
+          acceptedAnswer: { "@type": "Answer", text: q.a },
+        })),
+      });
+    }
+  }
+
   jsonLd.push({
     "@context": "https://schema.org",
     "@type": "WebPage",

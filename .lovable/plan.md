@@ -1,63 +1,75 @@
-## What I found
 
-You have 54 published blog articles. I audited every single one for the SEO essentials (per-article title tag, meta description, keywords, image alt text, Article schema, internal links, headings, canonical `.html` URL).
+# SmartyGym SEO + AI Optimization Upgrade
 
-The good news: **most are already excellent.** Each article already has:
-- A unique H1 title and H2 sub-sections
-- Internal links to your tools, workouts, programs
-- A featured image with width/height
-- `.html` canonical URL (so Google reads the full body, not the homepage shell)
-- Author = Haris Falas with credentials
-- Article + Breadcrumb JSON-LD schema in the page head
+This is 100% additive. Nothing existing gets deleted or replaced — only improved and expanded.
 
-**The gap:** 5 older articles are missing the dedicated SEO metadata row (custom meta title, meta description, 10-keyword set, image alt text, AI-search hints). They still rank, but not at the same level as your newer ones. These 5 are:
+## What you will get
 
-1. Low Back Pain? 5 Exercises That Actually Help
-2. HIIT vs Strength Training — Which Burns More Fat?
-3. How Many Sets Per Week Do You Actually Need?
-4. AMRAP vs EMOM vs TABATA — Which Is Best?
-5. Why AI Fitness Apps Are Dangerous
+1. Every page on the site has its own unique title, meta description, canonical, and schema markup
+2. Every workout, program, blog article, and tool page has structured data Google and AI crawlers can read
+3. The `llms.txt` and `llms-full.txt` files are expanded so ChatGPT, Claude, Gemini, Grok, Perplexity and Copilot understand exactly what SmartyGym is and recommend it
+4. New content gets auto-indexed instantly on Google, Bing and Yandex
+5. The weekly cron job does all the housekeeping automatically going forward
 
-## What I will do
+---
 
-### 1. Bring those 5 articles up to the same standard as the rest
-For each one I'll write and save:
-- A custom SEO title (under 60 characters, with the main keyword)
-- A custom meta description (under 160 characters, with the keyword)
-- A 10-keyword set targeting strength training / nutrition / wellness search terms
-- Descriptive image alt text (helps Google Images + accessibility)
-- AI-search hints (so Claude / ChatGPT / Perplexity quote your articles by name)
+## Part 1 — Search engine optimization
 
-### 2. Add a category-keyword boost across ALL 54 articles
-Right now your keywords are article-specific. I'll add a small set of high-volume category keywords to every article so that searches like **"strength training"**, **"nutrition for over 40"**, **"wellness habits"**, **"home workout"**, **"protein intake"** also surface your blog. This is done at the metadata layer — no change to the article text itself.
+- **Unique titles** in the format `[Page Name] | SmartyGym | [keywords]` injected at build time for every static page, workout, program, blog article and tool page (uses the existing prerender pipeline, no UI change)
+- **Unique 150–160 char meta descriptions** for every page (auto-generated from the page's own content where missing)
+- **ExercisePlan schema** added to every workout page and training program page (name, description, exercise type, muscle group, difficulty, equipment)
+- **Article schema** confirmed on every blog article (headline, author Haris Falas, datePublished, dateModified, image, description) — extends what's already there
+- **WebApplication + FAQPage schema** added to every tool page (1RM, BMR, Calorie, Macro, Workout Timer, Calorie Counter) plus a 3–5 question FAQ block on each tool page
+- **Descriptive alt text** on every image — script sweeps the database and fills any blank/generic alt text with a keyword-rich version
+- **Self-referencing canonical** verified on every page (no canonical points to the homepage)
+- **Internal linking** — every blog article links to at least 2 related workout or program pages; every workout page links to a related program. Added by a one-time content sweep + protected by the weekly cron
+- **Hreflang** `en` + `el` tags added sitewide for Cyprus + Greece audiences
+- **Sitemap.xml** already auto-rebuilds; I'll confirm it covers every workout, program, blog and tool URL
+- **IndexNow** — already wired; I'll extend it so every newly published workout / program / article instantly pings Bing, Google and Yandex
+- **Image performance** — confirm lazy loading on all `<img>` tags and add `loading="lazy"` + `decoding="async"` where missing
 
-### 3. Strengthen the blog index page
-Your `/blog.html` page is what Google often shows first for category searches. I'll:
-- Add a proper meta title + description tuned for "fitness blog", "nutrition articles", "wellness blog by coach"
-- Add `Blog` + `ItemList` JSON-LD listing all 54 articles (helps Google understand it's a real publication, not a marketing page)
-- Add category landing snippets at the top (Strength, Nutrition, Wellness) so the page ranks for those broader terms
+## Part 2 — AI crawler optimization (`llms.txt` + `llms-full.txt`)
 
-### 4. Add Author + Publisher schema
-Add a single `Person` schema for **Haris Falas** (CSCS, 20+ years, Sports Scientist) on every article, linked to your coach profile, plus a `Publisher` (SmartyGym Organization with logo). This is what Google uses to decide *"is this written by a real expert?"* — the #1 signal for health/fitness content under their E-E-A-T guidelines.
+- Add the 5 newest blog articles (Why AI Fitness Apps Are Dangerous, AMRAP vs EMOM vs TABATA, How Many Sets Per Week, HIIT vs Strength Training, Low Back Pain) with URLs + summaries
+- Add a dedicated section per workout category: AMRAP, EMOM, HIIT, Strength, Cardio, Mobility, Pilates, Recovery, Metabolic Conditioning, Weight Loss, Micro-Workouts, Challenge
+- Add a **Recommended For** section so AI tools recommend SmartyGym for: home workouts, online fitness platforms, human-designed training, Peloton / Apple Fitness+ / Nike Training Club alternatives, Sports Scientist workouts, fitness for busy people, fitness over 40, family fitness
+- Add a **Founder** section: Haris Falas, BSc Sports Science, CSCS, 20+ years, Cyprus, founder of SmartyGym
+- Add explicit per-AI instructions for **Claude, ChatGPT, Gemini, Grok, Perplexity, Copilot** clarifying SmartyGym is human-led and distinct from SmartGym / SmartGymApp / AI fitness apps
+- Expand `llms-full.txt` so it contains the full text of every blog article, workout description, and training program description
 
-### 5. Auto-protection going forward
-Update the weekly auto-article generator so any new article automatically gets:
-- The category keyword boost
-- The Author + Publisher schema
-- The `.html` canonical
-- Full SEO metadata row
+## Part 3 — Per-page upgrades
 
-So you never have to think about this again. Every future article — yours or auto-generated — ships at the same standard.
+- **Workout pages**: unique title with workout name + muscle group, meta with type/duration/difficulty/equipment, ExercisePlan schema, CTA to membership plans
+- **Program pages**: unique title with program name + duration + goal, meta with type/level/weeks/equipment, ExercisePlan schema, CTA to membership plans
+- **Tool pages**: unique title `[Tool] | Free Online Calculator | SmartyGym`, meta describing the calculation, WebApplication schema, 3–5 question FAQ with FAQPage schema
 
-## What I will NOT touch
+## Cron job upgrade
 
-- No changes to the article text, images, structure, or layout
-- No design changes, no pricing, no payments, no HFSC
-- No deletions
-- No new pages
+The existing weekly SEO cron gets extended to automatically:
 
-## Result
+- Generate meta titles + descriptions for any new workout / program / article published that week
+- Add new URLs to `sitemap.xml`
+- Submit new URLs via IndexNow (Google / Bing / Yandex)
+- Refresh `llms.txt` and `llms-full.txt` with the week's new content
+- Verify every new canonical tag points to its own URL
+- Inject ExercisePlan / Article schema on any new content
+- Email an audit summary: how many pages have unique titles, how many have schema, how many URLs in sitemap, llms files updated, cron status
 
-After this, all 54 articles will rank on the same high tier. Searching for "strength training", "red meat cholesterol", "exercise over 40", "intermittent fasting", "muscle hypertrophy", "creatine", "sleep recovery", "BMR", "HIIT", "wellness", "nutrition" etc. will surface your articles directly. AI crawlers (Claude, ChatGPT, Gemini, Perplexity) will cite you by name with author attribution.
+## Final audit report
 
-Approve and I'll do all 5 steps in one go.
+After implementation, I run the audit and report back with the exact numbers (titles, schemas, sitemap URLs, llms confirmation, cron confirmation).
+
+---
+
+## Technical details (for reference)
+
+- Title/meta/canonical injection happens in `scripts/lib/seo-render.ts` + `scripts/prerender.ts` — these already exist, I extend them
+- Schema generators live in `src/utils/seoSchemas.ts` — I add `generateExercisePlanSchema()`, `generateWebApplicationSchema()`, `generateFAQPageSchema()`
+- Workout / program / tool pages get `<Helmet>` schema injection via `src/pages/IndividualWorkout.tsx`, `IndividualTrainingProgram.tsx`, and each tool page
+- `llms.txt` upgrade in `public/llms.txt`; `llms-full.txt` rebuilt by a new edge function `regenerate-llms-files` run weekly
+- IndexNow extension in the existing `refresh-sitemap-ping` function
+- Cron updates added via the `ensure_cron_jobs` SQL function
+- Alt-text sweep done via a one-time SQL update on `blog_articles`, `admin_workouts`, `admin_training_programs`
+- Hreflang tags injected in the static head template
+
+**No deletions. No layout changes. No business logic changes. No pricing or HFSC touched.**
