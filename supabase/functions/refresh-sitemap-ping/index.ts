@@ -88,19 +88,41 @@ Deno.serve(async (req) => {
     await supabase.from("indexnow_queue").insert(queued);
   }
 
-  // Ping Google + Bing about the sitemap (legacy ping endpoints still accepted).
-  const pings: Record<string, number> = {};
-  for (const u of [
-    `https://www.google.com/ping?sitemap=${encodeURIComponent(SITEMAP_URL)}`,
-    `https://www.bing.com/ping?sitemap=${encodeURIComponent(SITEMAP_URL)}`,
-  ]) {
-    try {
-      const r = await fetch(u, { method: "GET" });
-      pings[u] = r.status;
-    } catch (e) {
-      pings[u] = 0;
+  // Sitemap notifications.
+  // - Google deprecated /ping?sitemap= in June 2023 (returns 404). Replaced
+  //   with a Search Console API resubmit via the Lovable connector gateway.
+  // - Bing still accepts the legacy ping endpoint.
+  const pings: Record<string, number | string> = {};
+
+  // Google: Search Console sitemap (re)submit
+  try {
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const GSC_API_KEY = Deno.env.get("GOOGLE_SEARCH_CONSOLE_API_KEY");
+    if (!LOVABLE_API_KEY || !GSC_API_KEY) {
+      pings["google_search_console"] = "missing_credentials";
+    } else {
+      const siteUrl = encodeURIComponent("https://smartygym.com/");
+      const feedpath = encodeURIComponent(SITEMAP_URL);
+      const res = await fetch(
+        `https://connector-gateway.lovable.dev/google_search_console/webmasters/v3/sites/${siteUrl}/sitemaps/${feedpath}`,
+        {
+          method: "PUT",
+          headers: {
+            "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+            "X-Connection-Api-Key": GSC_API_KEY,
+          },
+        },
+      );
+      pings["google_search_console"] = res.status;
     }
+  } catch (e) {
+    pings["google_search_console"] = `error:${String(e)}`;
   }
+
+  // Bing: legacy /ping?sitemap= was deprecated (returns 410). Bing now relies
+  // entirely on IndexNow, which is already pinged every 5 min by the
+  // process-indexnow-queue-frequent cron — no separate sitemap ping needed.
+  pings["bing"] = "uses_indexnow";
 
   return new Response(
     JSON.stringify({
