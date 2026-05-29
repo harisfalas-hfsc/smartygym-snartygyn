@@ -10,9 +10,10 @@ const corsHeaders = {
 /**
  * Cron Heartbeat
  *
- * Runs daily. Reads cron_job_metadata and verifies each active job has run
- * within a reasonable window of its schedule. Sends at most one admin email
- * per UTC day if any CRITICAL job is overdue.
+ * Runs daily at 12:00 UTC. Reads cron_job_metadata + the live scheduler and
+ * sends ONE daily summary email covering the last 24 hours: which jobs ran
+ * successfully, which failed, and which are overdue. Throttled to at most
+ * one email per UTC day.
  *
  * Heuristic for "overdue":
  *   - We approximate the expected interval between runs from the cron expression.
@@ -140,47 +141,80 @@ function evaluateSnapshot(row: CronSnapshotRow, nowMs: number): { overdue: boole
   return { ...isOverdue(job, nowMs), job };
 }
 
-async function sendAlert(overdueJobs: Array<{ job: CronRow; reason: string }>) {
+type DailyReport = {
+  overdue: Array<{ job: CronRow; reason: string }>;
+  failed24h: Array<{ job_name: string; display_name: string; last_status: string; last_run_at: string | null; message: string | null; is_critical: boolean }>;
+  healthy24h: Array<{ job_name: string; display_name: string; last_run_at: string | null }>;
+  inactive: Array<{ job_name: string; display_name: string }>;
+};
+
+async function sendDailySummary(report: DailyReport) {
   if (!RESEND_KEY) {
-    console.error("[cron-heartbeat] RESEND_API_KEY not set — cannot send alert");
+    console.error("[cron-heartbeat] RESEND_API_KEY not set — cannot send summary");
     return;
   }
   const resend = new Resend(RESEND_KEY);
-  const critical = overdueJobs.filter(j => j.job.is_critical);
-  const subject = critical.length > 0
-    ? `🚨 SmartyGym: ${critical.length} CRITICAL cron job(s) not running`
-    : `⚠️ SmartyGym: ${overdueJobs.length} cron job(s) overdue`;
+  const criticalCount = report.overdue.filter(o => o.job.is_critical).length + report.failed24h.filter(f => f.is_critical).length;
+  const subject = criticalCount > 0
+    ? `🚨 SmartyGym 24h cron report — ${criticalCount} critical issue(s)`
+    : report.overdue.length + report.failed24h.length > 0
+      ? `⚠️ SmartyGym 24h cron report — ${report.overdue.length + report.failed24h.length} issue(s)`
+      : `✅ SmartyGym 24h cron report — all systems healthy`;
 
-  const rows = overdueJobs.map(({ job, reason }) => `
-    <tr style="background: ${job.is_critical ? '#fee2e2' : '#fef3c7'};">
-      <td style="padding:10px;border:1px solid #ddd;font-weight:${job.is_critical ? 'bold' : 'normal'}">
-        ${job.is_critical ? '🚨 ' : '⚠️ '}${job.display_name}
-      </td>
-      <td style="padding:10px;border:1px solid #ddd"><code>${job.job_name}</code></td>
-      <td style="padding:10px;border:1px solid #ddd"><code>${job.schedule}</code></td>
-      <td style="padding:10px;border:1px solid #ddd">${reason}</td>
-      <td style="padding:10px;border:1px solid #ddd">${job.last_run_at ?? '— never —'}</td>
-    </tr>
-  `).join("");
+  const overdueRows = report.overdue.map(({ job, reason }) => `
+    <tr style="background:${job.is_critical ? '#fee2e2' : '#fef3c7'}">
+      <td style="padding:8px;border:1px solid #ddd">${job.is_critical ? '🚨 ' : '⚠️ '}${job.display_name}</td>
+      <td style="padding:8px;border:1px solid #ddd"><code>${job.schedule}</code></td>
+      <td style="padding:8px;border:1px solid #ddd">${reason}</td>
+      <td style="padding:8px;border:1px solid #ddd">${job.last_run_at ?? '— never —'}</td>
+    </tr>`).join("");
+
+  const failedRows = report.failed24h.map(f => `
+    <tr style="background:#fee2e2">
+      <td style="padding:8px;border:1px solid #ddd">${f.is_critical ? '🚨 ' : ''}${f.display_name}</td>
+      <td style="padding:8px;border:1px solid #ddd">${f.last_status}</td>
+      <td style="padding:8px;border:1px solid #ddd">${f.last_run_at ?? '—'}</td>
+      <td style="padding:8px;border:1px solid #ddd"><code style="font-size:11px">${(f.message ?? '').slice(0, 200)}</code></td>
+    </tr>`).join("");
+
+  const healthyRows = report.healthy24h.map(h => `
+    <tr><td style="padding:6px;border:1px solid #eee">✅ ${h.display_name}</td>
+        <td style="padding:6px;border:1px solid #eee">${h.last_run_at ?? '—'}</td></tr>`).join("");
 
   const html = `
     <h2>${subject}</h2>
-    <p>The cron heartbeat detected ${overdueJobs.length} job(s) that have not run within their expected window.</p>
-    <table style="border-collapse:collapse;width:100%;font-family:Arial,sans-serif;font-size:14px">
-      <thead>
-        <tr style="background:#f3f4f6">
-          <th style="padding:10px;border:1px solid #ddd;text-align:left">Job</th>
-          <th style="padding:10px;border:1px solid #ddd;text-align:left">Internal name</th>
-          <th style="padding:10px;border:1px solid #ddd;text-align:left">Schedule</th>
-          <th style="padding:10px;border:1px solid #ddd;text-align:left">Status</th>
-          <th style="padding:10px;border:1px solid #ddd;text-align:left">Last run</th>
-        </tr>
-      </thead>
-      <tbody>${rows}</tbody>
+    <p style="color:#555">Daily cron report covering the last 24 hours (generated ${new Date().toISOString()}).</p>
+
+    <h3 style="color:#b91c1c">Overdue (${report.overdue.length})</h3>
+    ${report.overdue.length === 0 ? '<p style="color:#16a34a">None — all jobs ran within their expected window.</p>' : `
+    <table style="border-collapse:collapse;width:100%;font-family:Arial,sans-serif;font-size:13px">
+      <thead><tr style="background:#f3f4f6">
+        <th style="padding:8px;border:1px solid #ddd;text-align:left">Job</th>
+        <th style="padding:8px;border:1px solid #ddd;text-align:left">Schedule</th>
+        <th style="padding:8px;border:1px solid #ddd;text-align:left">Reason</th>
+        <th style="padding:8px;border:1px solid #ddd;text-align:left">Last run</th>
+      </tr></thead><tbody>${overdueRows}</tbody></table>`}
+
+    <h3 style="color:#b91c1c;margin-top:24px">Failed in last 24h (${report.failed24h.length})</h3>
+    ${report.failed24h.length === 0 ? '<p style="color:#16a34a">None.</p>' : `
+    <table style="border-collapse:collapse;width:100%;font-family:Arial,sans-serif;font-size:13px">
+      <thead><tr style="background:#f3f4f6">
+        <th style="padding:8px;border:1px solid #ddd;text-align:left">Job</th>
+        <th style="padding:8px;border:1px solid #ddd;text-align:left">Status</th>
+        <th style="padding:8px;border:1px solid #ddd;text-align:left">Last run</th>
+        <th style="padding:8px;border:1px solid #ddd;text-align:left">Message</th>
+      </tr></thead><tbody>${failedRows}</tbody></table>`}
+
+    <h3 style="margin-top:24px">Healthy in last 24h (${report.healthy24h.length})</h3>
+    <table style="border-collapse:collapse;width:100%;font-family:Arial,sans-serif;font-size:12px">
+      <tbody>${healthyRows}</tbody>
     </table>
-    <p style="margin-top:20px;color:#666;font-size:12px">
-      Heartbeat run at ${new Date().toISOString()}. Re-register dead jobs from
-      Admin → Cron Jobs Manager → Sync.
+
+    ${report.inactive.length > 0 ? `<h3 style="margin-top:24px;color:#666">Inactive / disabled (${report.inactive.length})</h3>
+    <ul style="font-size:12px;color:#666">${report.inactive.map(i => `<li>${i.display_name} (<code>${i.job_name}</code>)</li>`).join("")}</ul>` : ''}
+
+    <p style="margin-top:24px;color:#666;font-size:12px">
+      Manage these in Admin → Cron Jobs Manager.
     </p>
   `;
 
@@ -190,7 +224,7 @@ async function sendAlert(overdueJobs: Array<{ job: CronRow; reason: string }>) {
     subject,
     html,
   });
-  console.log(`[cron-heartbeat] alert sent for ${overdueJobs.length} overdue job(s)`);
+  console.log(`[cron-heartbeat] daily summary sent (overdue=${report.overdue.length}, failed=${report.failed24h.length}, healthy=${report.healthy24h.length})`);
 }
 
 async function wasAlertAlreadySentToday(supabase: ReturnType<typeof createClient>, nowMs: number): Promise<boolean> {
@@ -286,31 +320,58 @@ serve(async (req) => {
     })
     .eq("job_name", "cron-heartbeat-hourly");
 
-  const criticalOverdueJobs = overdueJobs.filter(j => j.job.is_critical);
+  // Build the 24h daily report sections
+  const cutoffMs = nowMs - 24 * 60 * 60 * 1000;
+  const failed24h: DailyReport["failed24h"] = [];
+  const healthy24h: DailyReport["healthy24h"] = [];
+  const inactive: DailyReport["inactive"] = [];
 
-  let alert_status: "not_needed" | "sent" | "throttled" | "failed" = "not_needed";
-
-  if (criticalOverdueJobs.length > 0) {
-    const alreadySentToday = await wasAlertAlreadySentToday(supabase, nowMs);
-    if (alreadySentToday) {
-      alert_status = "throttled";
-      console.log("[cron-heartbeat] daily alert already sent; suppressing duplicate email");
-    } else {
-      try {
-        await sendAlert(criticalOverdueJobs);
-        await recordDailyAlertAttempt(supabase, nowMs, "success", {
-          critical_overdue_count: criticalOverdueJobs.length,
-          jobs: criticalOverdueJobs.map(({ job, reason }) => ({ job_name: job.job_name, reason })),
+  for (const row of (jobs ?? []) as CronSnapshotRow[]) {
+    if (!row.is_active) {
+      inactive.push({ job_name: row.job_name, display_name: row.display_name });
+      continue;
+    }
+    const lastRun = row.scheduler_last_run_at || row.metadata_last_run_at;
+    const lastRunMs = lastRun ? new Date(lastRun).getTime() : 0;
+    const status = row.scheduler_last_status || row.metadata_last_run_status;
+    if (lastRun && lastRunMs >= cutoffMs) {
+      if (status && status !== "succeeded" && status !== "success") {
+        failed24h.push({
+          job_name: row.job_name,
+          display_name: row.display_name,
+          last_status: status,
+          last_run_at: lastRun,
+          message: row.scheduler_last_message,
+          is_critical: row.is_critical,
         });
-        alert_status = "sent";
-      } catch (e) {
-        console.error("[cron-heartbeat] alert send failed", e);
-        await recordDailyAlertAttempt(supabase, nowMs, "failed", {
-          critical_overdue_count: criticalOverdueJobs.length,
-          error: e instanceof Error ? e.message : String(e),
-        });
-        alert_status = "failed";
+      } else {
+        healthy24h.push({ job_name: row.job_name, display_name: row.display_name, last_run_at: lastRun });
       }
+    }
+  }
+
+  const dailyReport: DailyReport = { overdue: overdueJobs, failed24h, healthy24h, inactive };
+
+  let alert_status: "sent" | "throttled" | "failed" = "sent";
+  const alreadySentToday = await wasAlertAlreadySentToday(supabase, nowMs);
+  if (alreadySentToday) {
+    alert_status = "throttled";
+    console.log("[cron-heartbeat] daily summary already sent today; skipping");
+  } else {
+    try {
+      await sendDailySummary(dailyReport);
+      await recordDailyAlertAttempt(supabase, nowMs, "success", {
+        overdue: overdueJobs.length,
+        failed24h: failed24h.length,
+        healthy24h: healthy24h.length,
+      });
+      alert_status = "sent";
+    } catch (e) {
+      console.error("[cron-heartbeat] summary send failed", e);
+      await recordDailyAlertAttempt(supabase, nowMs, "failed", {
+        error: e instanceof Error ? e.message : String(e),
+      });
+      alert_status = "failed";
     }
   }
 
@@ -318,7 +379,8 @@ serve(async (req) => {
     success: true,
     total_checked: filtered.length,
     overdue_count: overdueJobs.length,
-    critical_overdue_count: criticalOverdueJobs.length,
+    failed_24h_count: failed24h.length,
+    healthy_24h_count: healthy24h.length,
     alert_status,
     report,
   }), {
