@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { getAdminNotificationEmail } from "../_shared/admin-settings.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -24,7 +25,6 @@ const corsHeaders = {
 const PROJECT_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const RESEND_KEY = Deno.env.get("RESEND_API_KEY");
-const ADMIN_EMAIL = "harisfalas@gmail.com"; // SmartyGym admin
 const DAILY_ALERT_JOB_NAME = "cron-heartbeat-alert";
 
 type CronRow = {
@@ -166,7 +166,7 @@ type DailyReport = {
   inactive: Array<{ job_name: string; display_name: string }>;
 };
 
-async function sendDailySummary(report: DailyReport) {
+async function sendDailySummary(report: DailyReport, adminEmail: string) {
   if (!RESEND_KEY) {
     console.error("[cron-heartbeat] RESEND_API_KEY not set — cannot send summary");
     return;
@@ -238,7 +238,7 @@ async function sendDailySummary(report: DailyReport) {
 
   await resend.emails.send({
     from: "SmartyGym System <notifications@smartygym.com>",
-    to: [ADMIN_EMAIL],
+    to: [adminEmail],
     subject,
     html,
   });
@@ -377,11 +377,13 @@ serve(async (req) => {
     console.log("[cron-heartbeat] daily summary already sent today; skipping");
   } else {
     try {
-      await sendDailySummary(dailyReport);
+      const adminEmail = await getAdminNotificationEmail(supabase);
+      await sendDailySummary(dailyReport, adminEmail);
       await recordDailyAlertAttempt(supabase, nowMs, "success", {
         overdue: overdueJobs.length,
         failed24h: failed24h.length,
         healthy24h: healthy24h.length,
+        sent_to: adminEmail,
       });
       alert_status = "sent";
     } catch (e) {
