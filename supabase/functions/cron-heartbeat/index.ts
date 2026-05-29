@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { getAdminNotificationEmail } from "../_shared/admin-settings.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -24,7 +25,6 @@ const corsHeaders = {
 const PROJECT_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const RESEND_KEY = Deno.env.get("RESEND_API_KEY");
-const ADMIN_EMAIL = "harisfalas@gmail.com"; // SmartyGym admin
 const DAILY_ALERT_JOB_NAME = "cron-heartbeat-alert";
 
 type CronRow = {
