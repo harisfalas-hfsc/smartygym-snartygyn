@@ -5,8 +5,18 @@
     <link>https://smartygym.com/blog.html</link>
     <description>Workouts, training science, and recovery insights from Sports Scientist Haris Falas.</description>
     <language>en-GB</language>
-    <lastBuildDate>Fri, 29 May 2026 10:08:07 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 29 May 2026 11:33:24 GMT</lastBuildDate>
     <atom:link href="https://smartygym.com/rss.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Either Way, You&apos;ll End Up in the Gym — A Message from Coach Haris Falas</title>
+      <link>https://smartygym.com/blog/either-way-you-will-end-up-in-the-gym.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/either-way-you-will-end-up-in-the-gym.html</guid>
+      <pubDate>Fri, 29 May 2026 10:31:24 GMT</pubDate>
+      <dc:creator>Haris Falas</dc:creator>
+      <category>Wellness</category>
+      <description>Sooner or later, every human being ends up in a gym — either because they chose it, or because their doctor sent them. A personal message from Coach Haris Falas on why choosing matters.</description>
+      <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/either-way-you-will-end-up-in-the-gym.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>Why Sleep Is Your Most Powerful Performance Drug — And How to Use It</title>
       <link>https://smartygym.com/blog/sleep-most-powerful-performance-drug-how-to-use-it.html</link>
@@ -496,16 +506,6 @@
       <category>Fitness</category>
       <description>Should you train with bodyweight or equipment? Discover the pros and cons of each approach, when to use bodyweight exercises, and how to combine both methods for optimal results.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/bodyweight-vs-equipment-training-ultimate-comparis-1764314380109.jpg" type="image/jpeg" />
-    </item>
-    <item>
-      <title>Time Management for Fitness: How Busy People Stay Active</title>
-      <link>https://smartygym.com/blog/time-management-fitness-how-busy-people-stay-active.html</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/time-management-fitness-how-busy-people-stay-active.html</guid>
-      <pubDate>Fri, 28 Nov 2025 07:09:49 GMT</pubDate>
-      <dc:creator>Haris Falas</dc:creator>
-      <category>Wellness</category>
-      <description>No time for fitness? Think again. Learn practical strategies for fitting exercise into a busy schedule, the importance of daily steps, and how small changes add up to big results.</description>
-      <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/time-management-fitness-how-busy-people-stay-activ-1764314470407.jpg" type="image/jpeg" />
     </item>
   </channel>
 </rss>
