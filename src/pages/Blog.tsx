@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -24,7 +24,13 @@ interface Article {
 }
 const Blog = () => {
   const navigate = useNavigate();
-  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const { category: categoryParam } = useParams<{ category?: string }>();
+  const [categoryFilter, setCategoryFilter] = useState<string>(
+    categoryParam ? categoryParam.toLowerCase() : "all",
+  );
+  useEffect(() => {
+    setCategoryFilter(categoryParam ? categoryParam.toLowerCase() : "all");
+  }, [categoryParam]);
   const [sortFilter, setSortFilter] = useState<string>("newest");
   const [allArticles, setAllArticles] = useState<Article[]>([]);
   useEffect(() => {
