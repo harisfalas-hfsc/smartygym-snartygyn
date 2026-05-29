@@ -386,16 +386,16 @@ export const Navigation = () => {
               </SheetTrigger>
               <SheetContent side="left" hideClose className="left-4 top-6 bottom-6 h-auto w-[calc(100vw-2rem)] max-w-none overflow-y-auto rounded-2xl border-2 border-primary/40 p-4 shadow-xl">
                 <SheetClose asChild>
-                  <Button variant="ghost" className="mb-4 h-10 gap-2 rounded-full border-2 border-primary px-4 text-primary hover:bg-primary hover:text-primary-foreground">
-                    <ArrowLeft className="h-4 w-4" />
+                  <Button variant="ghost" className="mb-2 h-8 gap-2 rounded-full border-2 border-primary px-3 text-sm text-primary hover:bg-primary hover:text-primary-foreground">
+                    <ArrowLeft className="h-3.5 w-3.5" />
                     Back
                   </Button>
                 </SheetClose>
-                <div className="mb-5">
+                <div className="mb-3">
                   <p className="text-xs font-semibold uppercase tracking-normal text-primary">Discovery</p>
-                  <h2 className="mt-1 text-2xl font-bold leading-tight text-foreground">Explore SmartyGym</h2>
+                  <h2 className="mt-1 text-xl font-bold leading-tight text-foreground">Explore SmartyGym</h2>
                 </div>
-                <nav className="grid grid-cols-2 gap-3 pb-8">
+                <nav className="grid grid-cols-2 gap-2 pb-2">
                   {discoveryItems.map(({ label, path, icon: Icon, iconClass, track }) => {
                     const active = location.pathname === path;
                     return (
@@ -404,12 +404,12 @@ export const Navigation = () => {
                         type="button"
                         onClick={() => handleNavigate(path)}
                         data-track-cta={track}
-                        className={`min-h-[112px] rounded-2xl border-2 p-3 text-center font-semibold transition-all duration-200 ${active ? 'border-primary bg-primary/15 text-primary shadow-sm' : 'border-primary/25 bg-card text-foreground hover:border-primary hover:bg-primary/10'}`}
+                        className={`min-h-[72px] rounded-2xl border-2 p-2 text-center font-semibold transition-all duration-200 ${active ? 'border-primary bg-primary/15 text-primary shadow-sm' : 'border-primary/25 bg-card text-foreground hover:border-primary hover:bg-primary/10'}`}
                       >
-                        <span className={`mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 ${iconClass}`}>
-                          <Icon className="h-6 w-6" />
+                        <span className={`mx-auto mb-1 flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 ${iconClass}`}>
+                          <Icon className="h-4 w-4" />
                         </span>
-                        <span className="block text-sm leading-tight">{label}</span>
+                        <span className="block text-xs leading-tight">{label}</span>
                       </button>
                     );
                   })}
@@ -420,12 +420,12 @@ export const Navigation = () => {
                         window.open('/admin', '_blank', 'noopener,noreferrer');
                         setMobileMenuOpen(false);
                       }}
-                      className="min-h-[112px] rounded-2xl border-2 border-destructive/25 bg-card p-3 text-center font-semibold text-destructive transition-all duration-200 hover:border-destructive hover:bg-destructive/10"
+                      className="min-h-[72px] rounded-2xl border-2 border-destructive/25 bg-card p-2 text-center font-semibold text-destructive transition-all duration-200 hover:border-destructive hover:bg-destructive/10"
                     >
-                      <span className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 text-destructive">
-                        <Shield className="h-6 w-6" />
+                      <span className="mx-auto mb-1 flex h-8 w-8 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+                        <Shield className="h-4 w-4" />
                       </span>
-                      <span className="block text-sm leading-tight">Admin</span>
+                      <span className="block text-xs leading-tight">Admin</span>
                     </button>
                   )}
                 </nav>
