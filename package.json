@@ -12,7 +12,9 @@
     "generate:sitemap": "bunx tsx scripts/generate-sitemap.ts",
     "generate:rss": "bunx tsx scripts/generate-rss.ts",
     "predev": "bunx tsx scripts/generate-sitemap.ts && bunx tsx scripts/generate-rss.ts",
-    "prebuild": "bunx tsx scripts/generate-sitemap.ts && bunx tsx scripts/generate-rss.ts"
+    "prebuild": "bunx tsx scripts/generate-sitemap.ts && bunx tsx scripts/generate-rss.ts",
+    "postbuild": "bunx tsx scripts/ping-search-engines.ts || true",
+    "ping:search-engines": "bunx tsx scripts/ping-search-engines.ts"
   },
   "dependencies": {
     "@capacitor/android": "^7.4.3",
