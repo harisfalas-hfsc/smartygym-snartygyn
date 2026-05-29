@@ -110,9 +110,9 @@ const pages: SeoPage[] = [
     keywords: ["fitness tools", "BMI calculator", "1RM calculator", "calorie calculator", "macro calculator", "fitness plan"],
     intent: ["Calculate training numbers", "Estimate calories and macros", "Plan strength training loads", "Support a structured fitness plan"],
     steps: ["Choose the calculator that matches the decision you need to make.", "Enter accurate body, food, or training data.", "Use the result to guide training loads, calories, macros, or pacing.", "Recheck numbers when weight, goals, or performance changes."],
-    links: [{ name: "1RM Calculator", url: "/1rmcalculator" }, { name: "BMR Calculator", url: "/bmrcalculator" }, { name: "Macro Calculator", url: "/macrocalculator" }, { name: "Calorie Counter", url: "/caloriecounter" }],
+    links: [{ name: "1RM Calculator", url: "/1rmcalculator" }, { name: "BMR Calculator", url: "/bmrcalculator" }, { name: "Macro Calculator", url: "/macrocalculator" }, { name: "Calorie Counter", url: "/caloriecounter" }, { name: "Workout Timer", url: "/tools/workout-timer" }, { name: "Rounds Tracker", url: "/tools/rounds-tracker" }],
     faqs: [
-      { question: "What fitness calculators does SmartyGym offer?", answer: "SmartyGym offers calculators and tools including 1RM, BMR, macro tracking, calorie counter, and workout timer tools." },
+      { question: "What fitness calculators does SmartyGym offer?", answer: "SmartyGym offers calculators and tools including 1RM, BMR, macro tracking, calorie counter, workout timer, and rounds tracker." },
       { question: "Why use a 1RM calculator?", answer: "A 1RM calculator estimates maximum strength and helps structure strength training loads without needing to test a true max every session." },
       { question: "Can calculators help with fat loss?", answer: "Calculators can support fat loss by estimating calories, macros, and training targets, but results still depend on consistency and appropriate behavior." }
     ]
