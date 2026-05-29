@@ -5,8 +5,48 @@
     <link>https://smartygym.com/blog.html</link>
     <description>Workouts, training science, and recovery insights from Sports Scientist Haris Falas.</description>
     <language>en-GB</language>
-    <lastBuildDate>Thu, 28 May 2026 15:07:49 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 29 May 2026 02:46:49 GMT</lastBuildDate>
     <atom:link href="https://smartygym.com/rss.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>The Family That Trains Together: How to Build a Healthy Home for Every Age</title>
+      <link>https://smartygym.com/blog/family-that-trains-together-healthy-home.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/family-that-trains-together-healthy-home.html</guid>
+      <pubDate>Thu, 28 May 2026 15:12:18 GMT</pubDate>
+      <dc:creator>Haris Falas</dc:creator>
+      <category>Wellness</category>
+      <description>Health is contagious. When parents move, kids move. Here is how to build a home where every generation gets stronger together — without lectures or pressure.</description>
+      <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/family-that-trains-together-healthy-home-1779981113027.jpg" type="image/jpeg" />
+    </item>
+    <item>
+      <title>Red Meat, Cholesterol and Heart Disease: Everything You Were Told Is Wrong</title>
+      <link>https://smartygym.com/blog/red-meat-cholesterol-heart-disease-myth.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/red-meat-cholesterol-heart-disease-myth.html</guid>
+      <pubDate>Thu, 28 May 2026 15:12:18 GMT</pubDate>
+      <dc:creator>Haris Falas</dc:creator>
+      <category>Nutrition</category>
+      <description>For 50 years we were told red meat and cholesterol cause heart disease. The science has moved on. The headlines have not. Here is what actually matters.</description>
+      <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/red-meat-cholesterol-heart-disease-myth-1779981105171.jpg" type="image/jpeg" />
+    </item>
+    <item>
+      <title>The Best Exercises for People Over 40 — What the Science Actually Says</title>
+      <link>https://smartygym.com/blog/best-exercises-over-40-science.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/best-exercises-over-40-science.html</guid>
+      <pubDate>Thu, 28 May 2026 15:12:18 GMT</pubDate>
+      <dc:creator>Haris Falas</dc:creator>
+      <category>Fitness</category>
+      <description>After 40, your body changes. The right training reverses most of it. Here are the exercises science says actually matter — from a coach who is living proof at 50.</description>
+      <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/best-exercises-over-40-science-1779981097382.jpg" type="image/jpeg" />
+    </item>
+    <item>
+      <title>No Time, No Excuse: How to Stay Fit When You Have a Brutally Busy Life</title>
+      <link>https://smartygym.com/blog/no-time-no-excuse-stay-fit-busy-life.html</link>
+      <guid isPermaLink="true">https://smartygym.com/blog/no-time-no-excuse-stay-fit-busy-life.html</guid>
+      <pubDate>Thu, 28 May 2026 15:12:18 GMT</pubDate>
+      <dc:creator>Haris Falas</dc:creator>
+      <category>Fitness</category>
+      <description>Real strategies for staying strong, lean and energized when work, family and life leave almost no time. No gimmicks — just what works.</description>
+      <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/no-time-no-excuse-stay-fit-busy-life-1779981090100.jpg" type="image/jpeg" />
+    </item>
     <item>
       <title>Low Back Pain? 5 Exercises That Actually Help</title>
       <link>https://smartygym.com/blog/low-back-pain-5-exercises-that-actually-help.html</link>
@@ -466,46 +506,6 @@
       <category>Nutrition</category>
       <description>What is intermittent fasting and should you try it? Learn about different fasting protocols, the science behind their benefits, and how to determine if fasting is right for you.</description>
       <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/intermittent-fasting-complete-guide-time-restricte-1764314411917.jpg" type="image/jpeg" />
-    </item>
-    <item>
-      <title>Muscle Hypertrophy Through Nutrition: The Protein Masterclass</title>
-      <link>https://smartygym.com/blog/muscle-hypertrophy-nutrition-protein-masterclass.html</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/muscle-hypertrophy-nutrition-protein-masterclass.html</guid>
-      <pubDate>Fri, 28 Nov 2025 07:09:49 GMT</pubDate>
-      <dc:creator>Haris Falas</dc:creator>
-      <category>Nutrition</category>
-      <description>Building muscle requires more than just training—nutrition is equally critical. Learn exactly how much protein you need, the best sources, and practical strategies to hit your daily targets.</description>
-      <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/muscle-hypertrophy-nutrition-protein-masterclass-1764314434465.jpg" type="image/jpeg" />
-    </item>
-    <item>
-      <title>The Science of Sleep: Why Rest Is Your Secret Weapon</title>
-      <link>https://smartygym.com/blog/science-of-sleep-why-rest-secret-weapon.html</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/science-of-sleep-why-rest-secret-weapon.html</guid>
-      <pubDate>Fri, 28 Nov 2025 07:09:49 GMT</pubDate>
-      <dc:creator>Haris Falas</dc:creator>
-      <category>Wellness</category>
-      <description>Sleep is when your body transforms. Discover why quality sleep is essential for muscle recovery, hormone production, cognitive function, and overall health.</description>
-      <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/science-of-sleep-why-rest-secret-weapon-1764314450820.jpg" type="image/jpeg" />
-    </item>
-    <item>
-      <title>Exercise for Working Professionals: Stay Fit at Your Desk Job</title>
-      <link>https://smartygym.com/blog/exercise-working-professionals-stay-fit-desk-job.html</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/exercise-working-professionals-stay-fit-desk-job.html</guid>
-      <pubDate>Fri, 28 Nov 2025 07:09:49 GMT</pubDate>
-      <dc:creator>Haris Falas</dc:creator>
-      <category>Wellness</category>
-      <description>Desk jobs are destroying our bodies. Learn why exercise is critical for office workers, how to prevent common pains, and practical workout strategies for busy professionals.</description>
-      <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/exercise-working-professionals-stay-fit-desk-job-1764314460415.jpg" type="image/jpeg" />
-    </item>
-    <item>
-      <title>Understanding BMR: Your Metabolism Explained</title>
-      <link>https://smartygym.com/blog/understanding-bmr-metabolism-explained.html</link>
-      <guid isPermaLink="true">https://smartygym.com/blog/understanding-bmr-metabolism-explained.html</guid>
-      <pubDate>Fri, 28 Nov 2025 07:09:49 GMT</pubDate>
-      <dc:creator>Haris Falas</dc:creator>
-      <category>Wellness</category>
-      <description>What is Basal Metabolic Rate and why does it matter? Learn how BMR affects your weight, energy, and health—and discover proven strategies to boost your metabolism.</description>
-      <enclosure url="https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/blog-images/understanding-bmr-metabolism-explained-1764314480249.jpg" type="image/jpeg" />
     </item>
   </channel>
 </rss>
