@@ -488,10 +488,11 @@ const RoundsTracker = () => {
           </button>
 
           <div
-            className="fixed left-1/2 -translate-x-1/2 z-[10000] text-xs font-semibold text-foreground bg-background/90 backdrop-blur px-3 py-1.5 rounded-full border-2 border-primary/40 shadow"
-            style={{ top: "calc(env(safe-area-inset-top, 0px) + 12px)" }}
+            className="fixed left-1/2 -translate-x-1/2 z-[10000] text-[10px] font-medium text-muted-foreground bg-background/60 backdrop-blur-sm px-3 py-1 rounded-full border border-border/50"
+            style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 180px)" }}
           >
-            🔒 Locked — hold the lock button to exit
+            <Lock className="w-3 h-3 inline-block mr-1 -mt-0.5" />
+            Locked — hold button to exit
           </div>
         </div>
       )}
