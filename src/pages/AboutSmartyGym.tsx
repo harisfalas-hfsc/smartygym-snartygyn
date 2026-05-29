@@ -32,7 +32,8 @@ import {
    Newspaper,
    Info,
    ListChecks,
-   Apple
+   Apple,
+   Hash
 } from "lucide-react";
 
 import { SEOEnhancer } from "@/components/SEOEnhancer";
