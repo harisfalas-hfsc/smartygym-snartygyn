@@ -1,52 +1,56 @@
-## What already exists (don't rebuild)
-- ✅ `scripts/generate-rss.ts` — generates `public/rss.xml` on every `predev`/`prebuild`
-- ✅ `<link rel="alternate" type="application/rss+xml">` autodiscovery already in `index.html` (line 131)
-- ✅ `scripts/generate-sitemap.ts` — regenerates `public/sitemap.xml` on `predev`/`prebuild`
-- ✅ Edge function `refresh-sitemap-ping` — pings Google + Bing `?sitemap=` endpoints and queues IndexNow
-- ✅ Edge function `process-indexnow-queue` — submits URLs to IndexNow (Bing/Yandex/Seznam — also picked up by Google)
+## Goal
 
-## What's missing
-1. The post-build ping isn't fired automatically — it relies on whatever cron schedule (or nothing) calls `refresh-sitemap-ping`.
-2. The RSS feed is autodiscoverable by crawlers, but there's **no visible RSS link** in the footer for humans/readers.
+Generate **12 new premium STRENGTH workouts** following the exact same pattern as the most recent batch (`PREM-STR-*-adv-1779072*`).
 
-## The plan (purely additive)
+## Matrix (12 workouts)
 
-### 1. Auto-ping Google + Bing after each build/deploy
+| # | Focus | Equipment |
+|---|---|---|
+| 1-2 | LOWER BODY | BODYWEIGHT, EQUIPMENT |
+| 3-4 | UPPER BODY | BODYWEIGHT, EQUIPMENT |
+| 5-6 | FULL BODY | BODYWEIGHT, EQUIPMENT |
+| 7-8 | LOW PUSH & UPPER PULL | BODYWEIGHT, EQUIPMENT |
+| 9-10 | LOW PULL & UPPER PUSH | BODYWEIGHT, EQUIPMENT |
+| 11-12 | CORE & GLUTES | BODYWEIGHT, EQUIPMENT |
 
-Add a small `scripts/ping-search-engines.ts` that:
-- Pings the existing `refresh-sitemap-ping` Supabase Edge Function (so the same logic runs from one place: pings Google `?sitemap=`, pings Bing `?sitemap=`, queues IndexNow for content changed in last 24h)
-- Falls back to direct GET on the two legacy ping endpoints if the function call fails
-- Logs results, never fails the build (exits 0 even on ping errors so deploys aren't blocked)
+## Fixed attributes (all 12)
 
-Wire it in `package.json`:
-- Add `"postbuild": "bunx tsx scripts/ping-search-engines.ts || true"`
-- The script reads `VITE_SUPABASE_URL` + `VITE_SUPABASE_PUBLISHABLE_KEY` from the build env
+- `category = STRENGTH`
+- `difficulty = Advanced`, `difficulty_stars = 5`
+- `is_premium = true`, `tier_required = gold`
+- `is_standalone_purchase = true`, `price = 3.99`, `is_free = false`, `is_visible = true`
+- `format = REPS & SETS`, `duration = 45 min`
+- Unique, evocative name (no numbers, no internal suffixes — validation trigger enforces this)
+- Unique `id` of form `PREM-STR-<focus-slug>-<B|E>-adv-<timestamp>`
 
-**Belt-and-braces:** also add a daily cron (9:15 UTC) calling `refresh-sitemap-ping` via `pg_cron` so the ping still happens even on days without a deploy. Inserted with the supabase insert tool (per project standard — these are project-specific URLs/keys, not migrations).
+## Content (standardized format)
 
-**Honest note on Google/Bing ping endpoints:** Google deprecated `google.com/ping?sitemap=` in mid-2023 (it now returns 410). Bing also recommends IndexNow over the legacy ping. The implementation keeps the legacy hits (zero cost, occasionally still consumed by mirrors and aggregators) but **the real discovery happens via**:
-- `robots.txt` already advertising the sitemap location (Google's recommended path)
-- IndexNow queue submitting individual URLs (covers Bing + Yandex; Microsoft confirmed Google reads IndexNow signals too)
-- Google Search Console picks up sitemap changes on its own schedule from `robots.txt`
+Each workout follows the gold-standard 5-section structure with mandatory icons + `<strong><u>` headers + bullet lists + empty paragraphs between sections:
 
-This combination is the modern equivalent of "ping Google + Bing on deploy."
+1. 🧽 **Soft Tissue Preparation 5'** — foam rolling block
+2. 🔥 **Activation** — bullet list, library exercises via `{{exercise:ID:Name}}` markup
+3. 💪 **Main Workout** — 4–6 strength exercises with reps × sets, rest, tempo; library tokens only
+4. ⚡ **Finisher** — short metabolic or AMRAP block (every line has measurable dose before token)
+5. 🧘 **Cool Down 5'** — stretches
 
-### 2. Add visible RSS link in the footer
+Plus filled `instructions`, `tips`, `notes`, `description`. All exercises pulled from `exercise_library` (verified by ID lookup before insert). Bodyweight variants: no machines/dumbbells/barbells. Equipment variants: gym tools allowed.
 
-Edit `src/components/Footer.tsx` only:
-- Add an `Rss` icon (lucide) next to the existing social icons, linking to `https://smartygym.com/rss.xml` with `aria-label="RSS feed"`, opens in new tab
-- Matches existing button style (rounded border, primary color, hover state) — no layout change
+## Pipeline (step-by-step)
 
-Header `<link rel="alternate">` for autodiscovery is already in `index.html` — leave it alone.
+1. **Pull library snapshot** — query `exercise_library` filtered by primary muscle groups matching each focus; cache IDs + names so every `{{exercise:ID:Name}}` token is verified.
+2. **Generate 12 unique images** via `imagegen--generate_image` (premium tier, JPG, 1024×1024), saved to `/tmp/` then uploaded to `workout-images` Supabase Storage bucket → public URL.
+3. **Create Stripe products** via `create-stripe-product` edge function (auto-tags `project: SMARTYGYM`, `content_type: Workout`, attaches image URL).
+4. **Insert into `admin_workouts`** with all fields including `image_url`, `stripe_product_id`, `stripe_price_id`. Triggers will auto-queue notifications + IndexNow.
+5. **QA verification** (before reporting done):
+   - SQL audit: confirm 12 rows, all `is_premium=true`, all have `stripe_product_id`, `image_url`, all 5 sections non-empty, every exercise ID exists in `exercise_library`.
+   - Stripe audit: fetch each product, verify metadata + image present.
+   - Visual check: render 1 sample workout in preview and screenshot it, verify the 👁 eye icon (exercise modal trigger) appears next to exercise tokens, formatting is correct, premium gate works.
+6. **Report**: table of 12 workouts (name, focus, equipment, ID, Stripe product ID, image URL) + QA results.
 
-## What this does NOT touch
-- No changes to existing RSS generation, sitemap generation, IndexNow logic, robots.txt, or any business logic
-- No HFSC, layout, pricing, or color changes
-- No new tables, no migrations
-- Build/deploy continues working even if pings fail
+## Out of scope
 
-## Verification
-1. Run `bunx tsx scripts/ping-search-engines.ts` and confirm it returns ping status for Google + Bing + IndexNow queue count
-2. Confirm footer renders the RSS icon and it links to `/rss.xml`
-3. Confirm the daily cron job was registered (query `cron.job` via SECURITY DEFINER `get_cron_jobs` function)
-4. Report ping results
+No layout/UI changes, no schema migrations, no changes to existing workouts.
+
+## Approve to proceed
+
+On approval, I switch to build mode and execute steps 1–6 in order, with the QA report as the final deliverable.
