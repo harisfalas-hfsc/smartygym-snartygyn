@@ -84,12 +84,12 @@ function estimateIntervalMinutes(cron: string): number {
       && dom === "*" && month === "*" && dow === "*") {
     return 24 * 60;
   }
-  // Weekly
-  if (dow !== "*" && !dow.startsWith("*/")) return 7 * 24 * 60;
-  // Monthly
-  if (dom !== "*" && !dom.startsWith("*/")) return 30 * 24 * 60;
   // Yearly
   if (month !== "*") return 365 * 24 * 60;
+  // Monthly
+  if (dom !== "*" && !dom.startsWith("*/")) return 30 * 24 * 60;
+  // Weekly
+  if (dow !== "*" && !dow.startsWith("*/")) return 7 * 24 * 60;
   // Hourly step
   if (hour.startsWith("*/")) return parseInt(hour.slice(2), 10) * 60;
   // Minute step (every N minutes)
@@ -250,7 +250,9 @@ serve(async (req) => {
     })
     .eq("job_name", "cron-heartbeat-hourly");
 
-  if (overdueJobs.length > 0) {
+  const criticalOverdueJobs = overdueJobs.filter(j => j.job.is_critical);
+
+  if (criticalOverdueJobs.length > 0) {
     try {
       await sendAlert(overdueJobs);
     } catch (e) {
@@ -262,7 +264,7 @@ serve(async (req) => {
     success: true,
     total_checked: filtered.length,
     overdue_count: overdueJobs.length,
-    critical_overdue_count: overdueJobs.filter(j => j.job.is_critical).length,
+    critical_overdue_count: criticalOverdueJobs.length,
     report,
   }), {
     status: 200,
