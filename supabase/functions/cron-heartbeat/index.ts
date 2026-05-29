@@ -289,11 +289,29 @@ serve(async (req) => {
 
   const criticalOverdueJobs = overdueJobs.filter(j => j.job.is_critical);
 
+  let alert_status: "not_needed" | "sent" | "throttled" | "failed" = "not_needed";
+
   if (criticalOverdueJobs.length > 0) {
-    try {
-      await sendAlert(overdueJobs);
-    } catch (e) {
-      console.error("[cron-heartbeat] alert send failed", e);
+    const alreadySentToday = await wasAlertAlreadySentToday(supabase, nowMs);
+    if (alreadySentToday) {
+      alert_status = "throttled";
+      console.log("[cron-heartbeat] daily alert already sent; suppressing duplicate email");
+    } else {
+      try {
+        await sendAlert(criticalOverdueJobs);
+        await recordDailyAlertAttempt(supabase, nowMs, "success", {
+          critical_overdue_count: criticalOverdueJobs.length,
+          jobs: criticalOverdueJobs.map(({ job, reason }) => ({ job_name: job.job_name, reason })),
+        });
+        alert_status = "sent";
+      } catch (e) {
+        console.error("[cron-heartbeat] alert send failed", e);
+        await recordDailyAlertAttempt(supabase, nowMs, "failed", {
+          critical_overdue_count: criticalOverdueJobs.length,
+          error: e instanceof Error ? e.message : String(e),
+        });
+        alert_status = "failed";
+      }
     }
   }
 
@@ -302,6 +320,7 @@ serve(async (req) => {
     total_checked: filtered.length,
     overdue_count: overdueJobs.length,
     critical_overdue_count: criticalOverdueJobs.length,
+    alert_status,
     report,
   }), {
     status: 200,
