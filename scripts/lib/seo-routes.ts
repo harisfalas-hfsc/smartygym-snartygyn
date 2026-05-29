@@ -436,6 +436,14 @@ export const PROGRAM_CATEGORY_SLUGS = [
   "mobility-stability",
 ];
 
+export const BLOG_CATEGORY_SLUGS = ["fitness", "nutrition", "wellness"];
+
+const BLOG_CATEGORY_TITLE: Record<string, string> = {
+  fitness: "Fitness Articles",
+  nutrition: "Nutrition Articles",
+  wellness: "Wellness Articles",
+};
+
 const WORKOUT_CATEGORY_TITLE: Record<string, string> = {
   strength: "Strength Workouts",
   "calorie-burning": "Calorie-Burning Workouts",
@@ -573,6 +581,18 @@ export async function buildSeoRoutes(): Promise<SeoRouteBundle> {
       lastmod: today,
       changefreq: "weekly",
       priority: "0.8",
+    });
+  }
+
+  for (const slug of BLOG_CATEGORY_SLUGS) {
+    routes.push({
+      path: `/blog/category/${slug}`,
+      kind: "static",
+      title: `${BLOG_CATEGORY_TITLE[slug]} | SmartyGym Blog`,
+      description: `Evidence-based ${slug} articles by Sports Scientist Haris Falas. Human-written, science-backed, no AI fluff.`,
+      lastmod: today,
+      changefreq: "weekly",
+      priority: "0.7",
     });
   }
 

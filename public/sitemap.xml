@@ -313,6 +313,24 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://smartygym.com/blog/category/fitness.html</loc>
+    <lastmod>2026-05-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://smartygym.com/blog/category/nutrition.html</loc>
+    <lastmod>2026-05-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://smartygym.com/blog/category/wellness.html</loc>
+    <lastmod>2026-05-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://smartygym.com/workout/challenge/summit-endurance-trial.html</loc>
     <lastmod>2026-05-24</lastmod>
     <changefreq>weekly</changefreq>
