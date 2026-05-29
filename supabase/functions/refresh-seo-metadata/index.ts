@@ -676,9 +676,16 @@ serve(async (req) => {
 
   try {
     // Parse request body for sendEmail flag (default: true for backward compatibility)
-    const { sendEmail = true } = await req.json().catch(() => ({ sendEmail: true }));
-    
-    console.log(`Starting SEO refresh... (sendEmail: ${sendEmail})`);
+    // Optional params:
+    //   contentTypes: string[] - restrict processing to subset of ['workout','program','blog','ritual']
+    //   maxItems: number       - hard cap on how many NEW items to process this invocation (timeout protection)
+    const {
+      sendEmail = true,
+      contentTypes = null as string[] | null,
+      maxItems = null as number | null,
+    } = await req.json().catch(() => ({ sendEmail: true }));
+
+    console.log(`Starting SEO refresh... (sendEmail: ${sendEmail}, contentTypes: ${contentTypes ? contentTypes.join(',') : 'all'}, maxItems: ${maxItems ?? 'unlimited'})`);
 
     // Create refresh log entry
     const { data: logEntry, error: logError } = await supabase
@@ -769,13 +776,24 @@ serve(async (req) => {
     itemsScanned = allContent.length;
     console.log(`Scanned ${itemsScanned} total content items`);
 
-    // Get all existing SEO entries to avoid reprocessing
-    const { data: existingSEO, error: existingSEOError } = await supabase
-      .from('seo_metadata')
-      .select('content_type, content_id');
-
-    if (existingSEOError) {
-      console.error('Error fetching existing SEO entries:', existingSEOError);
+    // Get all existing SEO entries to avoid reprocessing (paginated — Supabase default cap is 1000)
+    const existingSEO: Array<{ content_type: string; content_id: string }> = [];
+    {
+      const PAGE = 1000;
+      for (let from = 0; ; from += PAGE) {
+        const { data, error } = await supabase
+          .from('seo_metadata')
+          .select('content_type, content_id')
+          .range(from, from + PAGE - 1);
+        if (error) {
+          console.error('Error fetching existing SEO entries:', error);
+          break;
+        }
+        if (!data || data.length === 0) break;
+        existingSEO.push(...data);
+        if (data.length < PAGE) break;
+      }
+      console.log(`Loaded ${existingSEO.length} existing SEO entries (paginated)`);
     }
 
     // Create a Set of already-optimized content IDs for fast lookup
@@ -804,11 +822,21 @@ serve(async (req) => {
     console.log(`Found ${alreadyOptimized} items already optimized`);
 
     // Filter to only NEW items that don't have SEO yet
-    const newContent = allContent.filter(item => 
+    let newContent = allContent.filter(item =>
       !existingKeys.has(`${item.content_type}:${item.id}`)
     );
 
-    console.log(`Found ${newContent.length} NEW items to optimize`);
+    // Optional contentTypes filter (e.g. process only 'workout' this run)
+    if (Array.isArray(contentTypes) && contentTypes.length > 0) {
+      newContent = newContent.filter(item => contentTypes.includes(item.content_type));
+    }
+
+    // Optional cap to avoid 150s timeout
+    if (typeof maxItems === 'number' && maxItems > 0) {
+      newContent = newContent.slice(0, maxItems);
+    }
+
+    console.log(`Found ${newContent.length} NEW items to optimize (after filters)`);
 
     // Process only NEW items (with rate limiting)
     for (const item of newContent) {
