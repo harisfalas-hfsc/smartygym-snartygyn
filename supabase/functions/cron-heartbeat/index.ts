@@ -103,15 +103,16 @@ function estimateIntervalMinutes(cron: string): number {
 
 function isOverdue(job: CronRow, nowMs: number): { overdue: boolean; reason: string; thresholdMinutes: number } {
   const intervalMin = estimateIntervalMinutes(job.schedule);
-  // grace = 2x interval + 30 min, capped at 25h for daily jobs (so we alert ~1h after a daily missed run)
+  // grace = 2x interval + 30 min. Only cap daily jobs at 25h so weekly/yearly
+  // jobs are not falsely flagged between legitimate scheduled runs.
   let graceMin = intervalMin * 2 + 30;
-  if (intervalMin >= 24 * 60) graceMin = 25 * 60;
+  if (intervalMin === 24 * 60) graceMin = 25 * 60;
   const thresholdMs = graceMin * 60 * 1000;
 
   if (!job.last_run_at) {
-    // Never ran. Allow 24h after metadata creation before alerting.
+    // Never ran. Allow at least one full expected window before alerting.
     const createdMs = new Date(job.created_at).getTime();
-    if (nowMs - createdMs > 24 * 60 * 60 * 1000) {
+    if (nowMs - createdMs > thresholdMs) {
       return { overdue: true, reason: "never ran since registration", thresholdMinutes: graceMin };
     }
     return { overdue: false, reason: "new job, still in grace window", thresholdMinutes: graceMin };
