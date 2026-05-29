@@ -4,6 +4,7 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { generateSitemap } from "./scripts/generate-sitemap";
 import { generateRss } from "./scripts/generate-rss";
+import { generateLlmsFull } from "./scripts/generate-llms-full";
 import { prerenderSeoHtml } from "./scripts/prerender";
 import { verifyPrerenderedSeo } from "./scripts/verify-prerender";
 
@@ -25,6 +26,10 @@ function smartySeoPrerenderPlugin() {
       await generateRss([
         path.resolve(__dirname, "public/rss.xml"),
         path.join(outDir, "rss.xml"),
+      ]);
+      await generateLlmsFull([
+        path.resolve(__dirname, "public/llms-full.txt"),
+        path.join(outDir, "llms-full.txt"),
       ]);
       await verifyPrerenderedSeo({ distDir: outDir });
     },
