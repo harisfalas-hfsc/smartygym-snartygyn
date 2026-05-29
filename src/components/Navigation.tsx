@@ -384,18 +384,18 @@ export const Navigation = () => {
                   <span className="sr-only">Discovery</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" hideClose className="left-4 top-6 bottom-6 h-auto w-[calc(100vw-2rem)] max-w-none overflow-y-auto rounded-2xl border-2 border-primary/40 p-4 shadow-xl">
+              <SheetContent side="left" hideClose className="left-4 top-10 bottom-10 h-auto w-[calc(100vw-2rem)] max-w-none overflow-y-auto rounded-2xl border-2 border-primary/40 p-3 shadow-xl">
                 <SheetClose asChild>
-                  <Button variant="ghost" className="mb-2 h-8 gap-2 rounded-full border-2 border-primary px-3 text-sm text-primary hover:bg-primary hover:text-primary-foreground">
+                  <Button variant="ghost" className="mb-1 h-8 gap-2 rounded-full border-2 border-primary px-3 text-sm text-primary hover:bg-primary hover:text-primary-foreground">
                     <ArrowLeft className="h-3.5 w-3.5" />
                     Back
                   </Button>
                 </SheetClose>
-                <div className="mb-3">
+                <div className="mb-2">
                   <p className="text-xs font-semibold uppercase tracking-normal text-primary">Discovery</p>
-                  <h2 className="mt-1 text-xl font-bold leading-tight text-foreground">Explore SmartyGym</h2>
+                  <h2 className="mt-0.5 text-lg font-bold leading-tight text-foreground">Explore SmartyGym</h2>
                 </div>
-                <nav className="grid grid-cols-2 gap-2 pb-2">
+                <nav className="grid grid-cols-2 gap-2">
                   {discoveryItems.map(({ label, path, icon: Icon, iconClass, track }) => {
                     const active = location.pathname === path;
                     return (
@@ -404,10 +404,10 @@ export const Navigation = () => {
                         type="button"
                         onClick={() => handleNavigate(path)}
                         data-track-cta={track}
-                        className={`min-h-[72px] rounded-2xl border-2 p-2 text-center font-semibold transition-all duration-200 ${active ? 'border-primary bg-primary/15 text-primary shadow-sm' : 'border-primary/25 bg-card text-foreground hover:border-primary hover:bg-primary/10'}`}
+                        className={`rounded-2xl border-2 p-2 text-center font-semibold transition-all duration-200 ${active ? 'border-primary bg-primary/15 text-primary shadow-sm' : 'border-primary/25 bg-card text-foreground hover:border-primary hover:bg-primary/10'}`}
                       >
-                        <span className={`mx-auto mb-1 flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 ${iconClass}`}>
-                          <Icon className="h-4 w-4" />
+                        <span className={`mx-auto mb-1 flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 ${iconClass}`}>
+                          <Icon className="h-5 w-5" />
                         </span>
                         <span className="block text-xs leading-tight">{label}</span>
                       </button>
@@ -420,10 +420,10 @@ export const Navigation = () => {
                         window.open('/admin', '_blank', 'noopener,noreferrer');
                         setMobileMenuOpen(false);
                       }}
-                      className="min-h-[72px] rounded-2xl border-2 border-destructive/25 bg-card p-2 text-center font-semibold text-destructive transition-all duration-200 hover:border-destructive hover:bg-destructive/10"
+                      className="rounded-2xl border-2 border-destructive/25 bg-card p-2 text-center font-semibold text-destructive transition-all duration-200 hover:border-destructive hover:bg-destructive/10"
                     >
-                      <span className="mx-auto mb-1 flex h-8 w-8 items-center justify-center rounded-full bg-destructive/10 text-destructive">
-                        <Shield className="h-4 w-4" />
+                      <span className="mx-auto mb-1 flex h-9 w-9 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+                        <Shield className="h-5 w-5" />
                       </span>
                       <span className="block text-xs leading-tight">Admin</span>
                     </button>
