@@ -325,6 +325,41 @@ export function renderRouteBody(route: SeoRoute): {
   }
 
   // Static / category pages — a clean, crawlable shell.
+  // Tool routes get extra WebApplication + FAQPage schema so the static
+  // prerendered HTML carries them (not just client-side after hydration).
+  if (route.path.startsWith("/tools/") || route.path === "/tools") {
+    const toolFaq = TOOL_FAQS[route.path];
+    if (toolFaq) {
+      jsonLd.push({
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "@id": canonical,
+        name: route.title.replace(/\s*\|\s*SmartyGym.*$/, "").trim(),
+        description: route.description,
+        url: canonical,
+        applicationCategory: "HealthApplication",
+        applicationSubCategory: "Fitness Calculator",
+        operatingSystem: "Web Browser",
+        isAccessibleForFree: true,
+        offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" },
+        author: person(),
+        creator: { "@type": "Person", name: AUTHOR.name },
+        provider: { "@type": "Organization", name: ORG.name, url: ORG.url },
+        publisher: { "@type": "Organization", name: ORG.name, url: ORG.url },
+        inLanguage: ["en-GB", "en-US"],
+      });
+      jsonLd.push({
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: toolFaq.map((q) => ({
+          "@type": "Question",
+          name: q.q,
+          acceptedAnswer: { "@type": "Answer", text: q.a },
+        })),
+      });
+    }
+  }
+
   jsonLd.push({
     "@context": "https://schema.org",
     "@type": "WebPage",
