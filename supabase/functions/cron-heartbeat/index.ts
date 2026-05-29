@@ -10,10 +10,9 @@ const corsHeaders = {
 /**
  * Cron Heartbeat
  *
- * Runs hourly. Reads cron_job_metadata and verifies each active job has run
- * within a reasonable window of its schedule. Emails the admin the moment
- * any CRITICAL job is overdue. This is the watchdog that would have caught
- * the dead system-health-audit cron on day 1.
+ * Runs daily. Reads cron_job_metadata and verifies each active job has run
+ * within a reasonable window of its schedule. Sends at most one admin email
+ * per UTC day if any CRITICAL job is overdue.
  *
  * Heuristic for "overdue":
  *   - We approximate the expected interval between runs from the cron expression.
@@ -25,6 +24,7 @@ const PROJECT_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const RESEND_KEY = Deno.env.get("RESEND_API_KEY");
 const ADMIN_EMAIL = "harisfalas@gmail.com"; // SmartyGym admin
+const DAILY_ALERT_JOB_NAME = "cron-heartbeat-alert";
 
 type CronRow = {
   job_name: string;
@@ -193,6 +193,42 @@ async function sendAlert(overdueJobs: Array<{ job: CronRow; reason: string }>) {
   console.log(`[cron-heartbeat] alert sent for ${overdueJobs.length} overdue job(s)`);
 }
 
+async function wasAlertAlreadySentToday(supabase: ReturnType<typeof createClient>, nowMs: number): Promise<boolean> {
+  const startOfUtcDay = new Date(nowMs);
+  startOfUtcDay.setUTCHours(0, 0, 0, 0);
+
+  const { data, error } = await supabase
+    .from("cron_job_runs")
+    .select("id")
+    .eq("job_name", DAILY_ALERT_JOB_NAME)
+    .eq("status", "success")
+    .gte("started_at", startOfUtcDay.toISOString())
+    .limit(1);
+
+  if (error) {
+    console.error("[cron-heartbeat] failed to check daily alert throttle", error);
+    return true;
+  }
+
+  return (data ?? []).length > 0;
+}
+
+async function recordDailyAlertAttempt(
+  supabase: ReturnType<typeof createClient>,
+  nowMs: number,
+  status: "success" | "failed",
+  metadata: Record<string, unknown>,
+) {
+  await supabase.from("cron_job_runs").insert({
+    job_name: DAILY_ALERT_JOB_NAME,
+    started_at: new Date(nowMs).toISOString(),
+    finished_at: new Date().toISOString(),
+    duration_ms: Date.now() - nowMs,
+    status,
+    metadata,
+  });
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -252,11 +288,29 @@ serve(async (req) => {
 
   const criticalOverdueJobs = overdueJobs.filter(j => j.job.is_critical);
 
+  let alert_status: "not_needed" | "sent" | "throttled" | "failed" = "not_needed";
+
   if (criticalOverdueJobs.length > 0) {
-    try {
-      await sendAlert(overdueJobs);
-    } catch (e) {
-      console.error("[cron-heartbeat] alert send failed", e);
+    const alreadySentToday = await wasAlertAlreadySentToday(supabase, nowMs);
+    if (alreadySentToday) {
+      alert_status = "throttled";
+      console.log("[cron-heartbeat] daily alert already sent; suppressing duplicate email");
+    } else {
+      try {
+        await sendAlert(criticalOverdueJobs);
+        await recordDailyAlertAttempt(supabase, nowMs, "success", {
+          critical_overdue_count: criticalOverdueJobs.length,
+          jobs: criticalOverdueJobs.map(({ job, reason }) => ({ job_name: job.job_name, reason })),
+        });
+        alert_status = "sent";
+      } catch (e) {
+        console.error("[cron-heartbeat] alert send failed", e);
+        await recordDailyAlertAttempt(supabase, nowMs, "failed", {
+          critical_overdue_count: criticalOverdueJobs.length,
+          error: e instanceof Error ? e.message : String(e),
+        });
+        alert_status = "failed";
+      }
     }
   }
 
@@ -265,6 +319,7 @@ serve(async (req) => {
     total_checked: filtered.length,
     overdue_count: overdueJobs.length,
     critical_overdue_count: criticalOverdueJobs.length,
+    alert_status,
     report,
   }), {
     status: 200,
