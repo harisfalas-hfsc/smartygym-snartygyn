@@ -25,6 +25,7 @@ const PROJECT_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const RESEND_KEY = Deno.env.get("RESEND_API_KEY");
 const ADMIN_EMAIL = "harisfalas@gmail.com"; // SmartyGym admin
+const DAILY_ALERT_JOB_NAME = "cron-heartbeat-alert";
 
 type CronRow = {
   job_name: string;
@@ -191,6 +192,42 @@ async function sendAlert(overdueJobs: Array<{ job: CronRow; reason: string }>) {
     html,
   });
   console.log(`[cron-heartbeat] alert sent for ${overdueJobs.length} overdue job(s)`);
+}
+
+async function wasAlertAlreadySentToday(supabase: ReturnType<typeof createClient>, nowMs: number): Promise<boolean> {
+  const startOfUtcDay = new Date(nowMs);
+  startOfUtcDay.setUTCHours(0, 0, 0, 0);
+
+  const { data, error } = await supabase
+    .from("cron_job_runs")
+    .select("id")
+    .eq("job_name", DAILY_ALERT_JOB_NAME)
+    .eq("status", "success")
+    .gte("started_at", startOfUtcDay.toISOString())
+    .limit(1);
+
+  if (error) {
+    console.error("[cron-heartbeat] failed to check daily alert throttle", error);
+    return true;
+  }
+
+  return (data ?? []).length > 0;
+}
+
+async function recordDailyAlertAttempt(
+  supabase: ReturnType<typeof createClient>,
+  nowMs: number,
+  status: "success" | "failed",
+  metadata: Record<string, unknown>,
+) {
+  await supabase.from("cron_job_runs").insert({
+    job_name: DAILY_ALERT_JOB_NAME,
+    started_at: new Date(nowMs).toISOString(),
+    finished_at: new Date().toISOString(),
+    duration_ms: Date.now() - nowMs,
+    status,
+    metadata,
+  });
 }
 
 serve(async (req) => {
