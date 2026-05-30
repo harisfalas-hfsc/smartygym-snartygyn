@@ -65,20 +65,21 @@ serve(async (req: Request): Promise<Response> => {
       }
     }
     
-    // 2. Check today's ritual
-    const { data: todayRitual, error: ritualError } = await supabase
-      .from('daily_smarty_rituals')
-      .select('id')
+    // 2. Check today's ritual ASSIGNMENT (library rotation model — no AI generation)
+    // Rituals are no longer generated daily; assign-daily-ritual picks one from the
+    // existing library and writes a row to daily_ritual_assignments for today.
+    const { data: todayAssignment, error: ritualError } = await supabase
+      .from('daily_ritual_assignments')
+      .select('ritual_id, daily_smarty_rituals!inner(id, is_visible)')
       .eq('ritual_date', cyprusDate)
-      .eq('is_visible', true)
       .maybeSingle();
-    
+
     if (ritualError) {
       checks.push({ name: "Today's Ritual", status: 'fail', details: ritualError.message });
-    } else if (!todayRitual) {
-      checks.push({ name: "Today's Ritual", status: 'warning', details: `No ritual for ${cyprusDate}` });
+    } else if (!todayAssignment) {
+      checks.push({ name: "Today's Ritual", status: 'warning', details: `No ritual assigned for ${cyprusDate} (library rotation pending)` });
     } else {
-      checks.push({ name: "Today's Ritual", status: 'pass', details: 'Ritual available' });
+      checks.push({ name: "Today's Ritual", status: 'pass', details: 'Ritual assigned from library' });
     }
     
     // 3. Check active subscriptions exist
