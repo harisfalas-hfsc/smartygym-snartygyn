@@ -1004,6 +1004,35 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_ritual_assignments: {
+        Row: {
+          assigned_at: string
+          cycle_number: number
+          ritual_date: string
+          ritual_id: string
+        }
+        Insert: {
+          assigned_at?: string
+          cycle_number?: number
+          ritual_date: string
+          ritual_id: string
+        }
+        Update: {
+          assigned_at?: string
+          cycle_number?: number
+          ritual_date?: string
+          ritual_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_ritual_assignments_ritual_id_fkey"
+            columns: ["ritual_id"]
+            isOneToOne: false
+            referencedRelation: "daily_smarty_rituals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       daily_smarty_rituals: {
         Row: {
           created_at: string | null
