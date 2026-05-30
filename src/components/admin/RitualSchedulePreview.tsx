@@ -5,9 +5,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Calendar, Edit2, Shuffle, Clock, Sparkles, Loader2 } from "lucide-react";
+import { Calendar, Edit2, Shuffle, Clock, Sparkles, Loader2, Eye, Pencil } from "lucide-react";
 import { format, addDays } from "date-fns";
 import { RitualSwapDialog } from "./RitualSwapDialog";
+import { RitualViewDialog } from "./RitualViewDialog";
+import { RitualEditDialog } from "./RitualEditDialog";
 
 const WINDOW = 7;
 
@@ -25,6 +27,9 @@ export const RitualSchedulePreview = () => {
   const queryClient = useQueryClient();
   const [swapDate, setSwapDate] = useState<string | null>(null);
   const [rerollingDate, setRerollingDate] = useState<string | null>(null);
+  const [viewRitual, setViewRitual] = useState<any>(null);
+  const [viewDate, setViewDate] = useState<string | null>(null);
+  const [editRitual, setEditRitual] = useState<any>(null);
 
   const today = format(new Date(), "yyyy-MM-dd");
   const end = format(addDays(new Date(), WINDOW), "yyyy-MM-dd");
@@ -141,6 +146,28 @@ export const RitualSchedulePreview = () => {
                       )}
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
+                      {ritual && (
+                        <>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => { setViewRitual(ritual); setViewDate(dateStr); }}
+                            title="View"
+                          >
+                            <Eye className="h-4 w-4 mr-1" />
+                            View
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setEditRitual(ritual)}
+                            title="Edit"
+                          >
+                            <Pencil className="h-4 w-4 mr-1" />
+                            Edit
+                          </Button>
+                        </>
+                      )}
                       <Button
                         variant="outline"
                         size="sm"
@@ -179,6 +206,24 @@ export const RitualSchedulePreview = () => {
           queryClient.invalidateQueries({ queryKey: ["ritual-schedule"] });
           queryClient.invalidateQueries({ queryKey: ["ritual-today"] });
           setSwapDate(null);
+        }}
+      />
+
+      <RitualViewDialog
+        open={!!viewRitual}
+        onOpenChange={(o) => { if (!o) { setViewRitual(null); setViewDate(null); } }}
+        ritual={viewRitual}
+        contextDate={viewDate}
+      />
+
+      <RitualEditDialog
+        open={!!editRitual}
+        onOpenChange={(o) => !o && setEditRitual(null)}
+        ritual={editRitual}
+        onSave={() => {
+          setEditRitual(null);
+          queryClient.invalidateQueries({ queryKey: ["ritual-schedule"] });
+          queryClient.invalidateQueries({ queryKey: ["ritual-today"] });
         }}
       />
     </>
