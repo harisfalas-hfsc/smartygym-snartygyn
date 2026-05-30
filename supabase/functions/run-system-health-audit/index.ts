@@ -925,15 +925,21 @@ const handler = async (req: Request): Promise<Response> => {
 
 
 
-    const { data: todayRitual } = await supabase
-      .from('daily_smarty_rituals')
-      .select('*')
+    // Library-rotation model: today's ritual is assigned (not generated) from
+    // daily_smarty_rituals via daily_ritual_assignments. Never warn about
+    // "missing generation" — only about a missing assignment.
+    const { data: todayAssignment } = await supabase
+      .from('daily_ritual_assignments')
+      .select('ritual_id, daily_smarty_rituals!inner(*)')
       .eq('ritual_date', today)
-      .single();
+      .maybeSingle();
+    const todayRitual: any = todayAssignment?.daily_smarty_rituals ?? null;
 
-    addCheck('Daily Ritual', "Today's Ritual Exists", `Ritual for ${today}`, 
-      todayRitual ? 'pass' : 'fail',
-      todayRitual ? 'Generated' : 'Missing - users cannot see ritual today'
+    addCheck('Daily Ritual', "Today's Ritual Assigned", `Assignment for ${today}`,
+      todayRitual ? 'pass' : 'warning',
+      todayRitual
+        ? 'Library rotation assigned a ritual for today (no AI generation needed)'
+        : 'No assignment yet — assign-daily-ritual cron will pick one from the library'
     );
 
     if (todayRitual) {
