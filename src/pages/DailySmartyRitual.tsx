@@ -40,6 +40,14 @@ const DailySmartyRitual = () => {
   const isAuthenticated = userTier !== "guest";
   const isPremium = userTier === "premium";
 
+  // Today in Cyprus timezone — used for display so the page always shows the real
+  // current date, never the library row's original `ritual_date`.
+  const todayCyprus = new Date(
+    new Date().toLocaleString("en-US", { timeZone: "Europe/Nicosia" })
+  )
+    .toISOString()
+    .split("T")[0];
+
   // Fetch ritual - rituals are generated at 00:05 Cyprus time and available immediately
   useEffect(() => {
     const fetchRitual = async () => {
@@ -398,7 +406,7 @@ const DailySmartyRitual = () => {
         <RitualShareDialog 
           open={showShareDialog} 
           onOpenChange={setShowShareDialog}
-          ritualDate={ritual.ritual_date}
+          ritualDate={todayCyprus}
           dayNumber={ritual.day_number}
         />
       )}
@@ -408,7 +416,7 @@ const DailySmartyRitual = () => {
         <ReaderModeDialog
           open={showReaderMode}
           onOpenChange={setShowReaderMode}
-          title={`Daily Smarty Ritual - ${new Date(ritual.ritual_date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}`}
+          title={`Daily Smarty Ritual - ${new Date(todayCyprus).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}`}
           content={`
             <h2>🌅 Morning Ritual</h2>
             ${ritual.morning_content}
@@ -419,7 +427,7 @@ const DailySmartyRitual = () => {
             <h2>🌙 Evening Ritual</h2>
             ${ritual.evening_content}
           `}
-          metadata={{ author: "Haris Falas", date: ritual.ritual_date }}
+          metadata={{ author: "Haris Falas", date: todayCyprus }}
         />
       )}
     </>
