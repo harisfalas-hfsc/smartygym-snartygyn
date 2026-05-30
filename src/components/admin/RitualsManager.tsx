@@ -118,9 +118,9 @@ export const RitualsManager = ({ externalDialog, setExternalDialog }: RitualsMan
     const issues: string[] = [];
     const passed: string[] = [];
     if (!todayAssignment) issues.push(`No ritual assigned for today (${todayStr}) — click Refresh Schedule.`);
-    else passed.push(`Today: Day ${(todayAssignment as any)?.daily_smarty_rituals?.day_number} assigned`);
+    else passed.push(`Today: Ritual ${(todayAssignment as any)?.daily_smarty_rituals?.day_number} assigned`);
     if (!tomorrowAssignment) issues.push(`No ritual assigned for tomorrow (${tomorrowStr}).`);
-    else passed.push(`Tomorrow: Day ${(tomorrowAssignment as any)?.daily_smarty_rituals?.day_number} assigned`);
+    else passed.push(`Tomorrow: Ritual ${(tomorrowAssignment as any)?.daily_smarty_rituals?.day_number} assigned`);
     if ((cycleStats?.library ?? 0) === 0) issues.push("Ritual library is empty.");
     else passed.push(`Library has ${cycleStats?.library} rituals`);
     if (issues.length === 0) sonnerToast.success("Ritual Health Check passed", { description: passed.join(" • ") });
@@ -394,7 +394,7 @@ export const RitualsManager = ({ externalDialog, setExternalDialog }: RitualsMan
               {todayAssignment ? (
                 <>
                   <Badge variant="outline" className="text-sm font-semibold">
-                    Day {(todayAssignment as any)?.daily_smarty_rituals?.day_number}
+                    Ritual {(todayAssignment as any)?.daily_smarty_rituals?.day_number}
                   </Badge>
                   <p className="text-xs text-muted-foreground mt-1">
                     {format(new Date(), "EEE, MMM d")} • Cycle {(todayAssignment as any).cycle_number}
@@ -415,7 +415,7 @@ export const RitualsManager = ({ externalDialog, setExternalDialog }: RitualsMan
               {tomorrowAssignment ? (
                 <>
                   <Badge variant="outline" className="text-sm font-semibold">
-                    Day {(tomorrowAssignment as any)?.daily_smarty_rituals?.day_number}
+                    Ritual {(tomorrowAssignment as any)?.daily_smarty_rituals?.day_number}
                   </Badge>
                   <p className="text-xs text-muted-foreground mt-1">
                     {format(addDays(new Date(), 1), "EEE, MMM d")} • Cycle {(tomorrowAssignment as any).cycle_number}
@@ -496,7 +496,7 @@ export const RitualsManager = ({ externalDialog, setExternalDialog }: RitualsMan
                     />
                   </TableHead>
                   <TableHead>Date</TableHead>
-                  <TableHead>Day #</TableHead>
+                  <TableHead>Ritual #</TableHead>
                   <TableHead className="hidden md:table-cell">Morning</TableHead>
                   <TableHead className="hidden md:table-cell">Midday</TableHead>
                   <TableHead className="hidden md:table-cell">Evening</TableHead>
@@ -516,7 +516,7 @@ export const RitualsManager = ({ externalDialog, setExternalDialog }: RitualsMan
                       {format(new Date(ritual.ritual_date), 'MMM dd, yyyy')}
                     </TableCell>
                     <TableCell>
-                      <Badge variant="secondary">Day {ritual.day_number}</Badge>
+                      <Badge variant="secondary">Ritual {ritual.day_number}</Badge>
                     </TableCell>
                     <TableCell className="hidden md:table-cell max-w-[150px]">
                       <span className="text-sm text-muted-foreground">{truncate(ritual.morning_content)}</span>
