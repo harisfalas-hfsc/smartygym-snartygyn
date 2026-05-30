@@ -49,12 +49,15 @@ const DailySmartyRitual = () => {
         const cyprusTime = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Nicosia" }));
         const today = cyprusTime.toISOString().split('T')[0];
 
-        // Fetch today's ritual (generated at 00:05, available all day)
-        const { data, error } = await supabase
-          .from("daily_smarty_rituals")
-          .select("*")
+        // Today's ritual is selected from the library by daily_ritual_assignments
+        // (rotation through all 180 rituals, random within each cycle).
+        const { data: assignment } = await supabase
+          .from("daily_ritual_assignments")
+          .select("ritual_id, daily_smarty_rituals(*)")
           .eq("ritual_date", today)
           .maybeSingle();
+
+        const data = (assignment?.daily_smarty_rituals ?? null) as DailyRitual | null;
 
         if (!data) {
           // For non-premium users, RLS blocks the data but ritual likely exists

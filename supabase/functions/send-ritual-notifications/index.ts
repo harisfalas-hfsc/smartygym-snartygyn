@@ -83,15 +83,17 @@ serve(async (req) => {
 
     logStep("Looking for today's ritual", { todayStr });
 
-    // Find today's ritual
-    const { data: todaysRitual, error: ritualError } = await supabase
-      .from("daily_smarty_rituals")
-      .select("*")
+    // Today's ritual = the one assigned to today by the rotation cron.
+    const { data: assignment, error: assignErr } = await supabase
+      .from("daily_ritual_assignments")
+      .select("ritual_id, daily_smarty_rituals(*)")
       .eq("ritual_date", todayStr)
-      .single();
+      .maybeSingle();
 
-    if (ritualError || !todaysRitual) {
-      logStep("No ritual found for today", { error: ritualError?.message });
+    const todaysRitual: any = assignment?.daily_smarty_rituals ?? null;
+
+    if (assignErr || !todaysRitual) {
+      logStep("No ritual assigned for today", { error: assignErr?.message });
       return new Response(
         JSON.stringify({ success: true, sent: false, reason: "No ritual for today" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
