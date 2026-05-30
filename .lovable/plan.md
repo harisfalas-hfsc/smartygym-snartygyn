@@ -1,78 +1,87 @@
 ## Goal
 
-Stop AI ritual generation entirely. Each day, automatically assign one ritual from the existing library of 180 to "today". Random pick, but every ritual must play once per cycle before any repeats. Admin keeps full manual control via the back office.
+Make the Smarty Ritual admin section behave **exactly like Workout of the Day**:
 
-## What gets removed
+1. See the next 7 days of upcoming rituals (date, day #, content preview).
+2. Swap any day's ritual for a different one from the 180-ritual library.
+3. Re-roll a random pick for any day.
+4. **Users see no change.** Emails, push, web, and the daily ritual page all keep loading "today's ritual" via the same `daily_ritual_assignments` join we already deployed. Nothing in the notification copy, schedule, or behavior changes.
 
-1. **Cron job** `generate-daily-ritual-midnight` (id 44, `5 22 * * *`) — `cron.unschedule`.
-2. **Edge function** `supabase/functions/generate-daily-ritual/` — deleted from code and from Supabase.
-3. **`cron_job_metadata`** row `generate-daily-ritual-job` — marked inactive/deleted.
-4. **References** in `CronJobsManager.tsx`, `run-system-health-audit/index.ts`, `portabilityDocContent.ts`, `supabase/config.toml`, and the two docs/mem files that name it.
-5. **Memory**: remove/update any rule that implies the AI generates rituals.
+## Confirming your first question
 
-## What gets added — rotation system
+Yes — users will never notice. The reader page (`DailySmartyRitual.tsx`), `send-morning-notifications`, and `send-ritual-notifications` already read from `daily_ritual_assignments` joined to `daily_smarty_rituals`. As long as today's row exists in `daily_ritual_assignments`, the user sees a normal daily ritual exactly like before. The cycle/rotation/admin overrides all live on the admin side only.
 
-### New table `daily_ritual_assignments`
-```
-ritual_date  date primary key
-ritual_id    uuid references daily_smarty_rituals(id)
-cycle_number int not null
-assigned_at  timestamptz default now()
-```
-GRANT SELECT to anon/authenticated, full to service_role. RLS enabled, public read policy (rituals are already publicly listed in the library; the gate stays at the ritual content level via existing logic). 
+## What changes (admin only)
 
-### New edge function `assign-daily-ritual`
-Logic each run:
-1. Compute today (Cyprus tz).
-2. If a row for today already exists → exit.
-3. Find current `cycle_number` = max in table (or 1 if empty).
-4. Pick a ritual whose `id` is NOT yet used in this cycle, `ORDER BY random() LIMIT 1`.
-5. If none left → start `cycle_number + 1` and pick from full library.
-6. Insert `(today, picked_id, cycle)`.
+### 1. Pre-assign 7 days ahead (instead of just today)
 
-Idempotent, no AI calls, < 1s.
+Today, `assign-daily-ritual` only fills today's date. To preview the next 7 days like WOD does, we extend it to loop through dates `today … today+7` and insert any missing assignment. Same random-from-unused-in-cycle logic; cycle still resets when all 180 are used.
 
-### New cron job
-Same slot as the old one (`5 22 * * *` = 00:05 Cyprus winter), via `supabase--insert`. Registered in `cron_job_metadata` as `assign-daily-ritual-job` so it shows in `CronJobsManager`. Added to `run-system-health-audit` allowlist.
+- Idempotent: existing rows are skipped.
+- Cron stays at `5 22 * * *` (00:05 Cyprus). Each run keeps the 7-day window full.
+- One-time backfill: run the updated function once after deploy so the preview is populated immediately.
 
-### Backfill today
-Run `assign-daily-ritual` once immediately so today already has a pick.
+### 2. New component: `RitualSchedulePreview.tsx`
 
-## Read-path changes (frontend + notifications)
+Mirrors `WODSchedulePreview.tsx` visually and structurally. Lists the next 7 days, each row showing:
 
-The two callers that look up by `ritual_date = today`:
-- `src/pages/DailySmartyRitual.tsx` (line 54)
-- `supabase/functions/send-morning-notifications/index.ts` (line 251)
-- `supabase/functions/send-ritual-notifications/index.ts` (line 88)
+- Date (e.g. `Mon, Jun 2`)
+- `Day X/180` badge (the ritual's `day_number`)
+- `Cycle N` badge + `Override` badge if swapped
+- Short preview of morning / midday / evening content
+- Buttons: **Swap Ritual** (opens picker) and **Re-roll Random**
 
-Change each from:
+### 3. Swap dialog
+
+Opens a searchable list of all 180 library rituals (search by day #, date, or content — same logic already in `RitualsManager`). Picking one updates that date's `daily_ritual_assignments.ritual_id`. The chosen ritual is then treated as "used" in the current cycle for that date; the previously assigned ritual is freed up to be picked again later in the cycle.
+
+### 4. Re-roll button
+
+Calls `assign-daily-ritual` with `{ date, force: true }` — deletes that date's row and re-inserts a fresh random pick from the unused pool.
+
+### 5. New status widget in `RitualsManager` header
+
+Mirrors `WODManager` header layout:
+
+- **Today's Ritual** card — shows current assignment + link to `/daily-smarty-ritual`
+- **Tomorrow's Ritual** card — shows tomorrow's pre-assigned pick
+- **Cycle Progress** card — `Cycle N • X/180 used • Y remaining`
+- Buttons: `Ritual Health Check` (does today have an assignment? does the library still have rituals?), `Tomorrow's Ritual Preview` (opens a dialog with full content), `Refresh Schedule` (calls `assign-daily-ritual` to top up the 7-day window)
+
+The existing rituals table (create / edit / delete / duplicate / bulk-delete) stays untouched below the new header + schedule preview.
+
+## Technical details
+
+**Edge function `assign-daily-ritual` — extend:**
+- Accept optional body `{ date?: string, force?: boolean }`.
+- Default: loop dates `today … today+7`, insert any missing assignment.
+- `force=true` + `date`: delete that date's row, re-pick.
+- Cycle logic unchanged: pick from `library_ids − used_in_current_cycle`; bump cycle when pool empty.
+
+**Edge function call for swap:** done client-side with a direct `update` on `daily_ritual_assignments` (RLS already allows admin). No new function needed.
+
+**Schedule preview query:**
 ```ts
-.from("daily_smarty_rituals").eq("ritual_date", todayStr)
+supabase
+  .from("daily_ritual_assignments")
+  .select("ritual_date, cycle_number, ritual_id, daily_smarty_rituals(*)")
+  .gte("ritual_date", today)
+  .lte("ritual_date", today+7)
+  .order("ritual_date")
 ```
-to:
-```ts
-.from("daily_ritual_assignments")
-  .select("ritual_id, daily_smarty_rituals(*)")
-  .eq("ritual_date", todayStr)
-```
-…and unwrap the joined ritual. No UI / template / placeholder changes — `day_number` still flows through.
 
-## Library decoupling
+**Files touched:**
+- `supabase/functions/assign-daily-ritual/index.ts` — add 7-day loop + `force` + `date` params
+- `src/components/admin/RitualSchedulePreview.tsx` — new
+- `src/components/admin/RitualSwapDialog.tsx` — new (picker)
+- `src/components/admin/TomorrowRitualPreviewDialog.tsx` — new (mirrors `TomorrowWODPreviewDialog`)
+- `src/components/admin/RitualsManager.tsx` — add header widgets + buttons + mount `<RitualSchedulePreview />` above the existing table
+- One-time run of `assign-daily-ritual` after deploy to backfill the next 7 days
 
-The library currently uses `ritual_date` as a unique key, which was only meaningful for the old "one per day" model. We keep the column (existing 180 rows already have unique dates), but it is no longer the lookup key — only the new `daily_ritual_assignments` table drives "today's ritual". Admin can edit/delete rituals freely; the next cron run will simply skip deleted ids.
+**No DB schema changes.** `daily_ritual_assignments` already has everything we need (`ritual_date`, `ritual_id`, `cycle_number`).
 
-## Risks (all small)
+**No changes to:** `DailySmartyRitual.tsx`, `send-morning-notifications`, `send-ritual-notifications`, cron schedule, notification copy, or any user-facing surface.
 
-- **send-morning-notifications** also still reads ritual to embed Day-N. Updated identically. Zero behavior change for users.
-- **Unique constraint on `ritual_date`** stays — does not block rotation because we no longer insert into the library.
-- **Admin delete of a ritual currently in today's assignment** → handled by `ON DELETE CASCADE` so the row vanishes and tomorrow's cron picks a new one. We log a warning if the page loads with no assignment.
-- **Time window**: identical cron slot, identical behavior surface for users.
+## Risk
 
-## Files changed
-
-Code: `DailySmartyRitual.tsx`, `send-morning-notifications/index.ts`, `send-ritual-notifications/index.ts`, `CronJobsManager.tsx`, `run-system-health-audit/index.ts`, `portabilityDocContent.ts`, `supabase/config.toml`, `docs/DEVELOPMENT_STANDARDS.md`, `docs/SMARTYWOD_SETUP_GUIDE.md`, `mem/system/workout-generation-rescue-plan.md`.
-New: `supabase/functions/assign-daily-ritual/index.ts`.
-Deleted: `supabase/functions/generate-daily-ritual/`.
-Migrations: create `daily_ritual_assignments` + RLS + grants.
-DB ops (via insert tool): unschedule old cron, schedule new cron, deactivate old metadata, insert new metadata, run `assign-daily-ritual` once for today.
-Memory: update index + replace any "AI generates rituals" entries with "Rituals are admin-curated; daily pick rotates the library".
+Minimal. The reader path is unchanged. The cycle accounting tolerates manual swaps because cycle membership is derived from `daily_ritual_assignments` rows — swapping just changes which `ritual_id` is recorded for that date.
