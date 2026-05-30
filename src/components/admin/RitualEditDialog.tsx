@@ -152,7 +152,7 @@ export const RitualEditDialog = ({ open, onOpenChange, ritual, onSave }: RitualE
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="day_number">Day Number</Label>
+              <Label htmlFor="day_number">Ritual Number</Label>
               <Input
                 id="day_number"
                 type="number"

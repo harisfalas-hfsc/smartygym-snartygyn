@@ -28,7 +28,7 @@ export const RitualViewDialog = ({ open, onOpenChange, ritual, contextDate }: Pr
         <DialogHeader>
           <DialogTitle className="flex flex-wrap items-center gap-2">
             <span>Daily Ritual</span>
-            <Badge variant="secondary">Day {ritual.day_number}</Badge>
+            <Badge variant="secondary">Ritual {ritual.day_number}</Badge>
             {dateStr && (
               <Badge variant="outline" className="text-xs">
                 {(() => { try { return format(new Date(dateStr), "EEE, MMM d, yyyy"); } catch { return dateStr; } })()}
