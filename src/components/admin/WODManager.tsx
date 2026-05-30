@@ -18,6 +18,8 @@ import {
   Rocket,
   Shield,
   Library,
+  Eye,
+  Trash2,
 } from "lucide-react";
 import { format, addDays } from "date-fns";
 import { WODSchedulePreview } from "./WODSchedulePreview";
@@ -47,6 +49,19 @@ export const WODManager = () => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingWorkout, setEditingWorkout] = useState<any>(null);
   const queryClient = useQueryClient();
+
+  const handleDeleteWorkout = async (wod: any) => {
+    if (!confirm(`Delete "${wod.name}"? This permanently removes the workout from the library.`)) return;
+    try {
+      const { error } = await supabase.from("admin_workouts").delete().eq("id", wod.id);
+      if (error) throw error;
+      toast.success("Workout deleted", { description: wod.name });
+      queryClient.invalidateQueries({ queryKey: ["current-wod"] });
+      queryClient.invalidateQueries({ queryKey: ["wod-history"] });
+    } catch (e: any) {
+      toast.error("Delete failed", { description: e?.message || String(e) });
+    }
+  };
 
   const cyprusToday = getCyprusTodayStr();
 
@@ -446,9 +461,19 @@ export const WODManager = () => {
                         )}
                       </TableCell>
                       <TableCell>
-                        <Button variant="ghost" size="sm" onClick={() => { setEditingWorkout(wod); setEditDialogOpen(true); }}>
-                          <Edit className="h-4 w-4" />
-                        </Button>
+                        <div className="flex gap-0.5 justify-end">
+                          <Button variant="ghost" size="icon" className="h-8 w-8" asChild title="View on site">
+                            <a href={`/workout/${wod.type}/${wod.id}`} target="_blank" rel="noopener noreferrer">
+                              <Eye className="h-4 w-4" />
+                            </a>
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit" onClick={() => { setEditingWorkout(wod); setEditDialogOpen(true); }}>
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" title="Delete" onClick={() => handleDeleteWorkout(wod)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}

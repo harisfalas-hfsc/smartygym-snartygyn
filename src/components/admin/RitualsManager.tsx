@@ -6,10 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, Edit, Trash2, Search, Copy, Loader2, Sparkles, Calendar, RefreshCw, HeartPulse, ExternalLink } from "lucide-react";
+import { Plus, Edit, Trash2, Search, Copy, Loader2, Sparkles, Calendar, RefreshCw, HeartPulse, ExternalLink, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { RitualEditDialog } from "./RitualEditDialog";
 import { RitualSchedulePreview } from "./RitualSchedulePreview";
+import { RitualViewDialog } from "./RitualViewDialog";
 import { format } from "date-fns";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast as sonnerToast } from "sonner";
@@ -36,6 +37,7 @@ export const RitualsManager = ({ externalDialog, setExternalDialog }: RitualsMan
   const [loading, setLoading] = useState(true);
   const [editingRitual, setEditingRitual] = useState<Ritual | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [viewingRitual, setViewingRitual] = useState<Ritual | null>(null);
   const [selectedRituals, setSelectedRituals] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [refreshingSchedule, setRefreshingSchedule] = useState(false);
@@ -531,6 +533,15 @@ export const RitualsManager = ({ externalDialog, setExternalDialog }: RitualsMan
                           variant="ghost"
                           size="icon"
                           className="h-7 w-7 sm:h-8 sm:w-8"
+                          onClick={() => setViewingRitual(ritual)}
+                          title="View"
+                        >
+                          <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 sm:h-8 sm:w-8"
                           onClick={() => handleDuplicate(ritual)}
                           title="Duplicate"
                         >
@@ -576,6 +587,12 @@ export const RitualsManager = ({ externalDialog, setExternalDialog }: RitualsMan
         onOpenChange={setIsDialogOpen}
         ritual={editingRitual}
         onSave={handleSave}
+      />
+
+      <RitualViewDialog
+        open={!!viewingRitual}
+        onOpenChange={(o) => !o && setViewingRitual(null)}
+        ritual={viewingRitual}
       />
     </div>
   );
