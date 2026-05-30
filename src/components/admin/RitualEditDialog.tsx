@@ -19,6 +19,54 @@ interface Ritual {
   created_at: string;
 }
 
+const MORNING_TEMPLATE = `<div class="ritual-content">
+  <h3>🌅 Activation (5–7 min)</h3>
+  <ul>
+    <li><strong>Breath reset:</strong> 4-7-8 breathing × 3 rounds</li>
+    <li><strong>Joint mobility:</strong> neck, shoulders, hips, ankles — 5 reps each</li>
+    <li><strong>Wake-up flow:</strong> cat-cow × 8, world's greatest stretch × 4/side</li>
+  </ul>
+  <h3>🎯 Intention</h3>
+  <p>One sentence to set the tone for the day.</p>
+</div>`;
+
+const MIDDAY_TEMPLATE = `<div class="ritual-content">
+  <h3>☀️ Desk Reset (3–5 min)</h3>
+  <ul>
+    <li><strong>Posture release:</strong> chin tucks × 10, thoracic extensions × 8</li>
+    <li><strong>Hip openers:</strong> seated figure-4 × 30s/side, standing hip flexor × 30s/side</li>
+    <li><strong>Energy boost:</strong> 20 bodyweight squats or 10 push-ups</li>
+  </ul>
+  <h3>💧 Mindful Pause</h3>
+  <p>Hydrate. 5 slow breaths. Refocus.</p>
+</div>`;
+
+const EVENING_TEMPLATE = `<div class="ritual-content">
+  <h3>🌙 Decompression (5–8 min)</h3>
+  <ul>
+    <li><strong>Soft-tissue release:</strong> calves, glutes, upper back — 30s each</li>
+    <li><strong>Long holds:</strong> child's pose 60s, supine twist 45s/side, legs-up-the-wall 2 min</li>
+    <li><strong>Breath down-regulation:</strong> box breathing 4-4-4-4 × 5 rounds</li>
+  </ul>
+  <h3>😴 Wind-Down</h3>
+  <p>Dim lights. No screens. Reflect on one win from today.</p>
+</div>`;
+
+const insertTemplate = (
+  current: string,
+  template: string,
+  apply: (next: string) => void
+) => {
+  const plain = (current || "").replace(/<[^>]*>/g, "").trim();
+  if (plain.length > 0) {
+    const ok = window.confirm(
+      "Replace current content with the standard structure? This cannot be undone."
+    );
+    if (!ok) return;
+  }
+  apply(template);
+};
+
 interface RitualEditDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -182,7 +230,22 @@ export const RitualEditDialog = ({ open, onOpenChange, ritual, onSave }: RitualE
 
             <TabsContent value="morning" className="mt-4">
               <div className="space-y-2">
-                <Label>Morning Content (Activation ~8:00 AM)</Label>
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <Label>Morning Content (Activation ~8:00 AM)</Label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      insertTemplate(formData.morning_content, MORNING_TEMPLATE, (next) => {
+                        setFormData((prev) => ({ ...prev, morning_content: next }));
+                        toast({ title: "Structure inserted", description: "Edit the morning template, then save." });
+                      })
+                    }
+                  >
+                    Insert standard structure
+                  </Button>
+                </div>
                 <RichTextEditor
                   value={formData.morning_content}
                   onChange={(value) => setFormData(prev => ({ ...prev, morning_content: value }))}
@@ -193,7 +256,22 @@ export const RitualEditDialog = ({ open, onOpenChange, ritual, onSave }: RitualE
 
             <TabsContent value="midday" className="mt-4">
               <div className="space-y-2">
-                <Label>Midday Content (Reset ~1:00 PM)</Label>
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <Label>Midday Content (Reset ~1:00 PM)</Label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      insertTemplate(formData.midday_content, MIDDAY_TEMPLATE, (next) => {
+                        setFormData((prev) => ({ ...prev, midday_content: next }));
+                        toast({ title: "Structure inserted", description: "Edit the midday template, then save." });
+                      })
+                    }
+                  >
+                    Insert standard structure
+                  </Button>
+                </div>
                 <RichTextEditor
                   value={formData.midday_content}
                   onChange={(value) => setFormData(prev => ({ ...prev, midday_content: value }))}
@@ -204,7 +282,22 @@ export const RitualEditDialog = ({ open, onOpenChange, ritual, onSave }: RitualE
 
             <TabsContent value="evening" className="mt-4">
               <div className="space-y-2">
-                <Label>Evening Content (Unwind ~5:00 PM)</Label>
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <Label>Evening Content (Unwind ~5:00 PM)</Label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      insertTemplate(formData.evening_content, EVENING_TEMPLATE, (next) => {
+                        setFormData((prev) => ({ ...prev, evening_content: next }));
+                        toast({ title: "Structure inserted", description: "Edit the evening template, then save." });
+                      })
+                    }
+                  >
+                    Insert standard structure
+                  </Button>
+                </div>
                 <RichTextEditor
                   value={formData.evening_content}
                   onChange={(value) => setFormData(prev => ({ ...prev, evening_content: value }))}
