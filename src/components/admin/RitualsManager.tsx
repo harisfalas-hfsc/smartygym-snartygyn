@@ -6,10 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, Edit, Trash2, Search, Copy, Loader2 } from "lucide-react";
+import { Plus, Edit, Trash2, Search, Copy, Loader2, Sparkles, Calendar, RefreshCw, HeartPulse, ExternalLink } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { RitualEditDialog } from "./RitualEditDialog";
+import { RitualSchedulePreview } from "./RitualSchedulePreview";
 import { format } from "date-fns";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast as sonnerToast } from "sonner";
+import { addDays } from "date-fns";
 
 interface Ritual {
   id: string;
@@ -34,7 +38,92 @@ export const RitualsManager = ({ externalDialog, setExternalDialog }: RitualsMan
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedRituals, setSelectedRituals] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [refreshingSchedule, setRefreshingSchedule] = useState(false);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const todayStr = format(new Date(), "yyyy-MM-dd");
+  const tomorrowStr = format(addDays(new Date(), 1), "yyyy-MM-dd");
+
+  const { data: todayAssignment } = useQuery({
+    queryKey: ["ritual-today", todayStr],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("daily_ritual_assignments")
+        .select("ritual_date, cycle_number, daily_smarty_rituals(day_number)")
+        .eq("ritual_date", todayStr)
+        .maybeSingle();
+      return data;
+    },
+  });
+
+  const { data: tomorrowAssignment } = useQuery({
+    queryKey: ["ritual-tomorrow", tomorrowStr],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("daily_ritual_assignments")
+        .select("ritual_date, cycle_number, daily_smarty_rituals(day_number)")
+        .eq("ritual_date", tomorrowStr)
+        .maybeSingle();
+      return data;
+    },
+  });
+
+  const { data: cycleStats } = useQuery({
+    queryKey: ["ritual-cycle-stats"],
+    queryFn: async () => {
+      const [{ count: libCount }, { data: latest }] = await Promise.all([
+        supabase.from("daily_smarty_rituals").select("id", { count: "exact", head: true }),
+        supabase
+          .from("daily_ritual_assignments")
+          .select("cycle_number")
+          .order("cycle_number", { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+      ]);
+      const cycle = latest?.cycle_number ?? 1;
+      const { count: usedCount } = await supabase
+        .from("daily_ritual_assignments")
+        .select("ritual_id", { count: "exact", head: true })
+        .eq("cycle_number", cycle);
+      return {
+        library: libCount || 0,
+        cycle,
+        used: usedCount || 0,
+        remaining: (libCount || 0) - (usedCount || 0),
+      };
+    },
+  });
+
+  const handleRefreshSchedule = async () => {
+    setRefreshingSchedule(true);
+    try {
+      const { error } = await supabase.functions.invoke("assign-daily-ritual", { body: { action: "topup" } });
+      if (error) throw error;
+      sonnerToast.success("Schedule refreshed", { description: "Next 7 days topped up." });
+      queryClient.invalidateQueries({ queryKey: ["ritual-schedule"] });
+      queryClient.invalidateQueries({ queryKey: ["ritual-today"] });
+      queryClient.invalidateQueries({ queryKey: ["ritual-tomorrow"] });
+      queryClient.invalidateQueries({ queryKey: ["ritual-cycle-stats"] });
+    } catch (e: any) {
+      sonnerToast.error("Refresh failed", { description: e?.message || String(e) });
+    } finally {
+      setRefreshingSchedule(false);
+    }
+  };
+
+  const handleHealthCheck = () => {
+    const issues: string[] = [];
+    const passed: string[] = [];
+    if (!todayAssignment) issues.push(`No ritual assigned for today (${todayStr}) — click Refresh Schedule.`);
+    else passed.push(`Today: Day ${(todayAssignment as any)?.daily_smarty_rituals?.day_number} assigned`);
+    if (!tomorrowAssignment) issues.push(`No ritual assigned for tomorrow (${tomorrowStr}).`);
+    else passed.push(`Tomorrow: Day ${(tomorrowAssignment as any)?.daily_smarty_rituals?.day_number} assigned`);
+    if ((cycleStats?.library ?? 0) === 0) issues.push("Ritual library is empty.");
+    else passed.push(`Library has ${cycleStats?.library} rituals`);
+    if (issues.length === 0) sonnerToast.success("Ritual Health Check passed", { description: passed.join(" • ") });
+    else sonnerToast.error(`${issues.length} issue(s)`, { description: issues[0] });
+  };
 
   // Handle external dialog control
   useEffect(() => {
@@ -254,6 +343,107 @@ export const RitualsManager = ({ externalDialog, setExternalDialog }: RitualsMan
 
   return (
     <div className="pt-6">
+      {/* Header status + actions (mirrors WOD Manager) */}
+      <div className="space-y-6 mb-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-primary" />
+              Smarty Ritual Management
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Library rotation — each day picks one ritual from your library; cycle resets after all are used.
+            </p>
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <Button variant="outline" size="sm" onClick={handleHealthCheck} className="border-green-500">
+              <HeartPulse className="h-4 w-4 text-green-500 mr-1" />
+              <span className="hidden sm:inline">Ritual Health Check</span>
+              <span className="sm:hidden">Health</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefreshSchedule}
+              disabled={refreshingSchedule}
+              className="border-cyan-500"
+            >
+              {refreshingSchedule ? <RefreshCw className="h-4 w-4 animate-spin mr-1" /> : <Sparkles className="h-4 w-4 text-cyan-500 mr-1" />}
+              <span className="hidden sm:inline">Refresh Schedule</span>
+              <span className="sm:hidden">Refresh</span>
+            </Button>
+            <Button variant="outline" size="sm" asChild>
+              <a href="/daily-smarty-ritual" target="_blank" rel="noopener noreferrer">
+                <ExternalLink className="h-4 w-4 mr-1" />
+                View Live
+              </a>
+            </Button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardDescription className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4" /> Today's Ritual
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {todayAssignment ? (
+                <>
+                  <Badge variant="outline" className="text-sm font-semibold">
+                    Day {(todayAssignment as any)?.daily_smarty_rituals?.day_number}
+                  </Badge>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {format(new Date(), "EEE, MMM d")} • Cycle {(todayAssignment as any).cycle_number}
+                  </p>
+                </>
+              ) : (
+                <Badge className="bg-yellow-500/20 text-yellow-600 border-yellow-500/30">Not assigned</Badge>
+              )}
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardDescription className="flex items-center gap-2">
+                <Calendar className="h-4 w-4" /> Tomorrow's Ritual
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {tomorrowAssignment ? (
+                <>
+                  <Badge variant="outline" className="text-sm font-semibold">
+                    Day {(tomorrowAssignment as any)?.daily_smarty_rituals?.day_number}
+                  </Badge>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {format(addDays(new Date(), 1), "EEE, MMM d")} • Cycle {(tomorrowAssignment as any).cycle_number}
+                  </p>
+                </>
+              ) : (
+                <Badge className="bg-yellow-500/20 text-yellow-600 border-yellow-500/30">Not assigned</Badge>
+              )}
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardDescription className="flex items-center gap-2">
+                <RefreshCw className="h-4 w-4" /> Cycle Progress
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
+                Cycle {cycleStats?.cycle ?? 1}
+              </Badge>
+              <p className="text-xs text-muted-foreground mt-1">
+                {cycleStats?.used ?? 0}/{cycleStats?.library ?? 0} used • {cycleStats?.remaining ?? 0} remaining
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        <RitualSchedulePreview />
+      </div>
+
       <Card>
         <CardHeader>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
