@@ -126,7 +126,7 @@ export const RitualSchedulePreview = () => {
                         )}
                         {ritual ? (
                           <>
-                            <Badge variant="outline" className="text-xs">Day {ritual.day_number}</Badge>
+                            <Badge variant="outline" className="text-xs">Ritual {ritual.day_number}</Badge>
                             <Badge variant="secondary" className="text-xs">
                               Cycle {(row as any).cycle_number}
                             </Badge>

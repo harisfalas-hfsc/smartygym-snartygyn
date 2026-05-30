@@ -104,7 +104,7 @@ export const RitualSwapDialog = ({ open, onOpenChange, date, onSwapped }: Props)
                 >
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <Badge variant="secondary">Day {r.day_number}</Badge>
+                      <Badge variant="secondary">Ritual {r.day_number}</Badge>
                       {isCurrent && (
                         <Badge className="bg-primary/20 text-primary border-primary/30 text-xs">
                           <Check className="h-3 w-3 mr-1" /> Current
