@@ -99,9 +99,6 @@ verify_jwt = false
 [functions.fix-program-images]
 verify_jwt = false
 
-[functions.generate-daily-ritual]
-verify_jwt = false
-
 [functions.upload-ritual-image]
 verify_jwt = false
 

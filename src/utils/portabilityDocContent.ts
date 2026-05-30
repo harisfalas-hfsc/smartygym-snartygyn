@@ -78,7 +78,7 @@ export const portabilityDocContent: DocSection[] = [
   { type: 'bullet', content: 'generate-training-program (AI program creation)' },
   { type: 'bullet', content: 'smarty-coach (AI chatbot)' },
   { type: 'bullet', content: 'generate-blog-image, generate-workout-image, generate-program-image' },
-  { type: 'bullet', content: 'generate-daily-ritual (Smarty Rituals)' },
+  { type: 'bullet', content: 'assign-daily-ritual (rotates today\'s Smarty Ritual from the admin-curated library — no AI)' },
   { type: 'heading', level: 3, content: 'Example: Direct Google AI Call' },
   { type: 'code', content: '// Before (Lovable Gateway)\nconst response = await fetch("https://api.lovable.dev/ai/...", {...});\n\n// After (Direct Google AI)\nimport { GoogleGenerativeAI } from "@google/generative-ai";\nconst genAI = new GoogleGenerativeAI(Deno.env.get("GOOGLE_AI_API_KEY"));\nconst model = genAI.getGenerativeModel({ model: "gemini-pro" });\nconst result = await model.generateContent(prompt);' },
   { type: 'paragraph', content: 'The prompts, logic, and formatting remain exactly the same. Only the API call method changes.' },

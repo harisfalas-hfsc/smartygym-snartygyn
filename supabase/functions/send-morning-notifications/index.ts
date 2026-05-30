@@ -246,15 +246,16 @@ serve(async (req) => {
     // ============================================
     // FETCH TODAY'S RITUAL
     // ============================================
+    // Today's ritual is the one assigned by the rotation cron — pulled via join.
     let todaysRitual: any = null;
-    const { data: ritualData, error: ritualError } = await supabase
-      .from("daily_smarty_rituals")
-      .select("*")
+    const { data: ritualAssignment } = await supabase
+      .from("daily_ritual_assignments")
+      .select("ritual_id, daily_smarty_rituals(*)")
       .eq("ritual_date", todayStr)
-      .single();
+      .maybeSingle();
 
-    if (!ritualError && ritualData) {
-      todaysRitual = ritualData;
+    if (ritualAssignment?.daily_smarty_rituals) {
+      todaysRitual = ritualAssignment.daily_smarty_rituals;
     }
 
     const hasRitual = !!todaysRitual;

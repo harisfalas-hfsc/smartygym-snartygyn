@@ -51,7 +51,7 @@ const CATEGORIES = [
 
 const AVAILABLE_FUNCTIONS = [
   'select-wod-from-library',
-  'generate-daily-ritual',
+  'assign-daily-ritual',
   'generate-weekly-blog-articles',
   'send-scheduled-notifications',
   'send-scheduled-emails',

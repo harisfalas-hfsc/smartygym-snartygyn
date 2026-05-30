@@ -1674,7 +1674,7 @@ const handler = async (req: Request): Promise<Response> => {
     const criticalFunctions = [
       'select-wod-from-library',
       'watchdog-wod-check',
-      'generate-daily-ritual',
+      'assign-daily-ritual',
       'send-welcome-email',
       'stripe-webhook',
       'create-checkout',
