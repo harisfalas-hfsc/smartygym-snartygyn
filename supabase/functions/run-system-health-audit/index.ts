@@ -2356,13 +2356,14 @@ const handler = async (req: Request): Promise<Response> => {
         : 'Description, image, and overview present'
     );
 
-    // Check today's ritual content for suspicious patterns (use different variable name)
-    const { data: todayRitualQuality } = await supabase
-      .from('daily_smarty_rituals')
-      .select('*')
+    // Check today's ASSIGNED ritual content (library rotation model) for suspicious patterns
+    const { data: todayRitualAssignmentQ } = await supabase
+      .from('daily_ritual_assignments')
+      .select('daily_smarty_rituals!inner(*)')
       .eq('ritual_date', today)
       .maybeSingle();
-    
+    const todayRitualQuality: any = todayRitualAssignmentQ?.daily_smarty_rituals ?? null;
+
     if (todayRitualQuality) {
       const suspiciousPatterns = [
         /Day \d+/i,           // "Day 1", "Day 42" etc
@@ -2386,11 +2387,11 @@ const handler = async (req: Request): Promise<Response> => {
       );
     } else {
       addCheck('Content Quality', "Today's Ritual Content", 
-        'No ritual content for today', 
-        cyprusNow.getHours() < 5 ? 'pass' : 'fail', // Before 5am Cyprus is OK
-        cyprusNow.getHours() < 5 
-          ? 'Ritual will be generated at 00:05 UTC'
-          : 'Ritual should exist - check generation logs'
+        'No ritual assigned for today',
+        cyprusNow.getHours() < 5 ? 'pass' : 'warning', // No longer "fail" — library rotation, not generation
+        cyprusNow.getHours() < 5
+          ? 'assign-daily-ritual will pick one from the library at 00:05 Cyprus'
+          : 'No assignment found — check assign-daily-ritual-midnight cron logs'
       );
     }
 
