@@ -153,12 +153,12 @@ function buildScheduledJobs(wodConfig: WodAutoGenConfig | null, automationRules:
       disabledReason: wodPaused ? wodPauseReason : undefined
     },
     'ritual_generation': {
-      name: 'Daily Ritual Generation',
-      cronHourUTC: 22, // 22:05 UTC (previous day) → 00:05 Cyprus winter
+      name: 'Daily Ritual Assignment (Library Rotation)',
+      cronHourUTC: 22, // 22:05 UTC → 00:05 Cyprus winter
       cronMinuteUTC: 5,
       frequency: 'daily',
-      messageTypes: [], // Doesn't send messages, generates content
-      description: 'Generates the daily Smarty Ritual content'
+      messageTypes: [], // Doesn't send messages, assigns content from library
+      description: 'Picks today\'s Smarty Ritual from the admin-curated library (no AI generation). Runs via assign-daily-ritual-midnight cron.'
     }
   };
 }
