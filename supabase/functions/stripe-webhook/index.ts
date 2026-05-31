@@ -21,6 +21,31 @@ const mapStripeSubscriptionStatus = (status: Stripe.Subscription.Status): 'activ
   return 'canceled';
 };
 
+// In Stripe API 2025-08-27.basil, current_period_start/end are on the
+// subscription item, not the root subscription. Fall back to root for
+// older API versions just in case.
+const getSubPeriod = (sub: Stripe.Subscription): { start: number | null; end: number | null } => {
+  const item: any = sub.items?.data?.[0];
+  const start = (item?.current_period_start ?? (sub as any).current_period_start) ?? null;
+  const end = (item?.current_period_end ?? (sub as any).current_period_end) ?? null;
+  return {
+    start: typeof start === 'number' ? start : null,
+    end: typeof end === 'number' ? end : null,
+  };
+};
+
+const periodIso = (ts: number | null): string | null =>
+  ts && typeof ts === 'number' ? new Date(ts * 1000).toISOString() : null;
+
+// Map a Stripe price ID to our internal plan_type. Mirrors the logic in
+// check-subscription so upgrades/downgrades via Customer Portal stay in sync.
+const planTypeFromPriceId = (priceId: string | undefined | null): 'gold' | 'platinum' | null => {
+  if (!priceId) return null;
+  if (priceId === 'price_1SJ9q1IxQYg9inGKZzxxqPbD') return 'gold';
+  if (priceId === 'price_1SJ9qGIxQYg9inGKFbgqVRjj') return 'platinum';
+  return null;
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -286,8 +311,7 @@ async function handleCorporateSubscriptionCheckout(
 
   // Get subscription details
   const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-  
-  const periodEnd = new Date(subscription.current_period_end * 1000);
+  const corpPeriod = getSubPeriod(subscription);
 
   // Create corporate subscription record
   const { data: corpSub, error: corpError } = await supabase
@@ -298,8 +322,8 @@ async function handleCorporateSubscriptionCheckout(
       plan_type: planType,
       max_users: maxUsers,
       current_users_count: 0,
-      current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-      current_period_end: periodEnd.toISOString(),
+      current_period_start: periodIso(corpPeriod.start),
+      current_period_end: periodIso(corpPeriod.end),
       stripe_subscription_id: subscriptionId,
       stripe_customer_id: customerId,
       status: 'active',
@@ -323,8 +347,8 @@ async function handleCorporateSubscriptionCheckout(
       stripe_subscription_id: subscriptionId,
       plan_type: 'platinum',
       status: 'active',
-      current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-      current_period_end: periodEnd.toISOString(),
+      current_period_start: periodIso(corpPeriod.start),
+      current_period_end: periodIso(corpPeriod.end),
     }, {
       onConflict: 'user_id'
     });
@@ -397,14 +421,18 @@ async function handleSubscriptionCheckout(
   // Get subscription details
   const subscriptionId = session.subscription as string;
   const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-  
+  const subPeriod = getSubPeriod(subscription);
   const priceId = subscription.items.data[0].price.id;
   const productId = subscription.items.data[0].price.product as string;
   const localStatus = mapStripeSubscriptionStatus(subscription.status);
   
-  // Get product details to determine plan type
+  // Get product details to determine plan type (prefer product metadata,
+  // fall back to known price-ID mapping for Gold/Platinum)
   const product = await stripe.products.retrieve(productId);
-  const planType = product.metadata?.plan_type || 'gold';
+  const planType =
+    product.metadata?.plan_type ||
+    planTypeFromPriceId(priceId) ||
+    'gold';
 
   logStep("Creating subscription record", { userId, planType, subscriptionId });
 
@@ -442,8 +470,8 @@ async function handleSubscriptionCheckout(
           stripe_customer_id: customerId,
           stripe_subscription_id: subscriptionId,
           status: localStatus,
-          current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-          current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+          current_period_start: periodIso(subPeriod.start),
+          current_period_end: periodIso(subPeriod.end),
           cancel_at_period_end: subscription.cancel_at_period_end,
         })
         .eq('user_id', userId);
@@ -463,8 +491,8 @@ async function handleSubscriptionCheckout(
           stripe_subscription_id: subscriptionId,
           plan_type: planType,
           status: localStatus,
-          current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-          current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+          current_period_start: periodIso(subPeriod.start),
+          current_period_end: periodIso(subPeriod.end),
           cancel_at_period_end: subscription.cancel_at_period_end,
         });
 
@@ -484,8 +512,8 @@ async function handleSubscriptionCheckout(
         stripe_subscription_id: subscriptionId,
         plan_type: planType,
         status: localStatus,
-        current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-        current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+        current_period_start: periodIso(subPeriod.start),
+        current_period_end: periodIso(subPeriod.end),
         cancel_at_period_end: subscription.cancel_at_period_end,
       }, {
         onConflict: 'user_id'
@@ -778,6 +806,25 @@ async function handleSubscriptionUpdate(
   const oldPlanType = existingSub.plan_type;
   const priceId = subscription.items.data[0].price.id;
   const localStatus = mapStripeSubscriptionStatus(subscription.status);
+  const updPeriod = getSubPeriod(subscription);
+
+  // Recompute plan_type from current price so upgrades/downgrades via
+  // Customer Portal stay in sync. Prefer product metadata, fall back to
+  // our known Gold/Platinum price-ID mapping.
+  let newPlanType: string | null = null;
+  try {
+    const productId = subscription.items.data[0].price.product as string;
+    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY") || "";
+    const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
+    const product = await stripe.products.retrieve(productId);
+    newPlanType =
+      (product.metadata?.plan_type as string | undefined) ||
+      planTypeFromPriceId(priceId) ||
+      null;
+  } catch (e) {
+    logStep("WARN: Failed to retrieve product for plan_type recompute", { error: e });
+    newPlanType = planTypeFromPriceId(priceId);
+  }
 
   logStep("Updating subscription", { userId, status: subscription.status, oldPlan: oldPlanType });
 
@@ -804,8 +851,8 @@ async function handleSubscriptionUpdate(
       .update({
         stripe_subscription_id: subscription.id,
         status: localStatus,
-        current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-        current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+        current_period_start: periodIso(updPeriod.start),
+        current_period_end: periodIso(updPeriod.end),
         cancel_at_period_end: subscription.cancel_at_period_end,
         // NOTE: plan_type is intentionally NOT updated for corporate users
       })
@@ -823,9 +870,10 @@ async function handleSubscriptionUpdate(
       .update({
         stripe_subscription_id: subscription.id,
         status: localStatus,
-        current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-        current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+        current_period_start: periodIso(updPeriod.start),
+        current_period_end: periodIso(updPeriod.end),
         cancel_at_period_end: subscription.cancel_at_period_end,
+        ...(newPlanType ? { plan_type: newPlanType } : {}),
       })
       .eq('user_id', userId);
 
@@ -841,7 +889,7 @@ async function handleSubscriptionUpdate(
   const userEmail = userData?.user?.email;
 
   if (userEmail) {
-    const nextBillingDate = new Date(subscription.current_period_end * 1000).toLocaleDateString('en-US', {
+    const nextBillingDate = (updPeriod.end ? new Date(updPeriod.end * 1000) : new Date()).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
@@ -925,8 +973,9 @@ async function handleSubscriptionCancellation(
   logStep("Fetched user email for cancellation", { email: userEmail });
 
   // Calculate subscription end date
-  const endDate = subscription.current_period_end 
-    ? new Date(subscription.current_period_end * 1000).toLocaleDateString('en-US', {
+  const cancelPeriod = getSubPeriod(subscription);
+  const endDate = cancelPeriod.end
+    ? new Date(cancelPeriod.end * 1000).toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
         day: 'numeric'
