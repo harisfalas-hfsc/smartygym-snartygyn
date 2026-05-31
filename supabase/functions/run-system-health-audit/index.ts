@@ -733,17 +733,53 @@ const handler = async (req: Request): Promise<Response> => {
       // After 09:00 UTC tomorrow's WODs MUST exist or it's a critical failure.
       const enforce = nowUtcHour > 9 || (nowUtcHour === 9 && nowUtcMinute >= 0);
       const ok = tomorrowCount >= expectedTomorrowCount;
-      addCheck(
-        'WOD System',
-        "Tomorrow's WODs Pre-Generated",
-        `${tomorrowCount}/${expectedTomorrowCount} WOD(s) ready for ${tomorrowCyprus} (Cyprus)`,
-        ok ? 'pass' : enforce ? 'fail' : 'warning',
-        ok
-          ? `✅ Tomorrow's WODs already picked from the library — midnight rollover will be seamless`
-          : enforce
-            ? `CRITICAL: Library picker (06:30 / 06:50 UTC) and 4 retry passes (07:20, 07:50, 08:20, 08:50 UTC) all failed to pick tomorrow's WODs from the library. Inspect wod_generation_runs for the failure reason, then run Admin → WOD Manager → WOD Watchdog or open Tomorrow's WOD Preview to repick.`
+      // Distinguish three states:
+      //   (A) Published WODs exist for tomorrow  → pass
+      //   (B) Preview row picked but not approved → warning (admin approval pending)
+      //   (C) No preview row and no published WODs → real picker failure
+      let previewSelectedSlots = 0;
+      let previewStatus: string | null = null;
+      try {
+        const { data: previewRow } = await supabase
+          .from('wod_tomorrow_preview')
+          .select('bodyweight_workout_id, equipment_workout_id, recovery_workout_id, is_recovery_day, status')
+          .eq('date', tomorrowCyprus)
+          .maybeSingle();
+        if (previewRow) {
+          previewStatus = previewRow.status || 'pending';
+          previewSelectedSlots = previewRow.is_recovery_day
+            ? (previewRow.recovery_workout_id ? 1 : 0)
+            : (previewRow.bodyweight_workout_id ? 1 : 0) + (previewRow.equipment_workout_id ? 1 : 0);
+        }
+      } catch (_) { /* preview table optional */ }
+
+      if (ok) {
+        addCheck(
+          'WOD System',
+          "Tomorrow's WODs Pre-Generated",
+          `${tomorrowCount}/${expectedTomorrowCount} WOD(s) published for ${tomorrowCyprus} (Cyprus)`,
+          'pass',
+          `✅ Tomorrow's WODs are published — midnight rollover will be seamless.`
+        );
+      } else if (previewSelectedSlots >= expectedTomorrowCount && previewStatus !== 'approved') {
+        addCheck(
+          'WOD System',
+          "Tomorrow's WODs Pre-Generated",
+          `${previewSelectedSlots}/${expectedTomorrowCount} picked for ${tomorrowCyprus}, awaiting admin approval`,
+          'warning',
+          `Library picker already selected tomorrow's WODs. They are visible in Admin → WOD Manager → Tomorrow's WOD Preview and need to be approved & published before midnight Cyprus to roll over. No content fix required.`
+        );
+      } else {
+        addCheck(
+          'WOD System',
+          "Tomorrow's WODs Pre-Generated",
+          `${tomorrowCount}/${expectedTomorrowCount} WOD(s) published for ${tomorrowCyprus} (preview slots: ${previewSelectedSlots})`,
+          enforce ? 'fail' : 'warning',
+          enforce
+            ? `Library picker (06:30 / 06:50 UTC) and retries (07:20, 07:50, 08:20, 08:50 UTC) finished but no preview row was created. Open Admin → WOD Manager → Tomorrow's WOD Preview → Re-pick automatically.`
             : `Library picker runs at 06:30 / 06:50 UTC with retries through 08:50 UTC; check again after 09:00 UTC.`
-      );
+        );
+      }
     } catch (tmrErr) {
       console.error('[HEALTH-AUDIT] tomorrow WOD check failed:', tmrErr);
     }
