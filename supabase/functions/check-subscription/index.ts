@@ -69,9 +69,24 @@ serve(async (req) => {
     logStep("Syncing subscription for user", { userId: user.id, email: user.email });
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
-    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
-    
-    if (customers.data.length === 0) {
+
+    // Prefer the Stripe customer ID we already stored — survives email changes.
+    const { data: storedSub } = await supabaseClient
+      .from('user_subscriptions')
+      .select('stripe_customer_id')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    let customerId: string | null = storedSub?.stripe_customer_id || null;
+
+    if (!customerId) {
+      const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+      if (customers.data.length > 0) {
+        customerId = customers.data[0].id;
+      }
+    }
+
+    if (!customerId) {
       logStep("No customer found, setting free plan");
       
       const { error: upsertError } = await supabaseClient
@@ -106,7 +121,6 @@ serve(async (req) => {
       });
     }
 
-    const customerId = customers.data[0].id;
     logStep("Found Stripe customer", { customerId });
 
     // Get all subscriptions with expanded data
@@ -114,7 +128,7 @@ serve(async (req) => {
       customer: customerId,
       status: 'all',
       limit: 10,
-      expand: ['data.items.data.price']
+      expand: ['data.items.data.price', 'data.items.data.price.product']
     });
     
     logStep("Found subscriptions", { count: subscriptions.data.length });
@@ -150,18 +164,30 @@ serve(async (req) => {
       // Determine plan type based on price
       const priceId = activeSubscription.items.data[0]?.price?.id;
       logStep("Checking price ID", { priceId });
-      
-      // Gold Plan: €9.99/month
-      if (priceId === "price_1SJ9q1IxQYg9inGKZzxxqPbD") {
+
+      // 1) Prefer product metadata.plan_type (set when we create products).
+      //    Works for any future price (promos, regional pricing, etc.).
+      const priceObj: any = activeSubscription.items.data[0]?.price;
+      const productMetaPlan: string | undefined =
+        priceObj?.product && typeof priceObj.product === 'object'
+          ? priceObj.product?.metadata?.plan_type
+          : undefined;
+
+      if (productMetaPlan === 'gold' || productMetaPlan === 'platinum') {
+        planType = productMetaPlan;
+        logStep("Matched plan via product metadata", { priceId, planType });
+      } else if (priceId === "price_1SJ9q1IxQYg9inGKZzxxqPbD") {
         planType = 'gold';
-        logStep("Matched Gold Plan", { priceId, productId: "prod_TFfAcybp438BH6" });
-      } 
-      // Platinum Plan: €89.99/year
-      else if (priceId === "price_1SJ9qGIxQYg9inGKFbgqVRjj") {
+        logStep("Matched Gold Plan (price-id fallback)", { priceId });
+      } else if (priceId === "price_1SJ9qGIxQYg9inGKFbgqVRjj") {
         planType = 'platinum';
-        logStep("Matched Platinum Plan", { priceId, productId: "prod_TFfAPp1tq7RdUk" });
+        logStep("Matched Platinum Plan (price-id fallback)", { priceId });
       } else {
-        logStep("Unknown price ID - defaulting to free", { priceId });
+        // Recurring subscription on a price we don't recognize — assume the
+        // lowest paid tier rather than dropping the user to free. Safer
+        // default while we investigate.
+        planType = 'gold';
+        logStep("WARN: Unknown price ID — defaulting to gold to preserve access", { priceId });
       }
       
       logStep("Determined plan type", { planType, interval: activeSubscription.items.data[0]?.price?.recurring?.interval });
