@@ -285,6 +285,7 @@ serve(async (req) => {
         cooldownIds,
         lastUsedAt,
         strengthFocus: isRecoverySlot ? null : (periodization.strengthFocus || null),
+        targetDate,
       });
       if (candidates && candidates.length > 0) {
         selectedWorkouts.push({ slot, candidates });
@@ -545,6 +546,7 @@ async function selectWorkout(
     cooldownIds: Set<string>;
     lastUsedAt?: Map<string, string>;
     strengthFocus: string | null;
+    targetDate?: string;
   }
 ): Promise<any | null> {
   const list = await selectWorkoutCandidates(supabase, params);
@@ -566,9 +568,10 @@ async function selectWorkoutCandidates(
     cooldownIds: Set<string>;
     lastUsedAt?: Map<string, string>;
     strengthFocus: string | null;
+    targetDate?: string;
   }
 ): Promise<any[]> {
-  const { category, difficulty, difficultyStars, equipment, cooldownIds, lastUsedAt, strengthFocus } = params;
+  const { category, difficulty, difficultyStars, equipment, cooldownIds, lastUsedAt, strengthFocus, targetDate } = params;
 
   logStep("Selecting candidate list", { category, difficulty, equipment, strengthFocus, cooldownSize: cooldownIds.size });
 
@@ -656,13 +659,29 @@ async function selectWorkoutCandidates(
   });
 
   const ordered = [...shuffle(prioritised), ...recycled];
+  const publishable = targetDate
+    ? ordered.filter((candidate) => {
+        const result = validateWodPublishContract({
+          ...candidate,
+          is_workout_of_day: true,
+          generated_for_date: targetDate,
+          is_standalone_purchase: true,
+          price: WOD_PRICE_EUR,
+        }, targetDate, { mode: "structural" });
+        if (!result.ok) {
+          logStep("Filtered out structurally unpublishable candidate", { id: candidate.id, name: candidate.name, failures: result.failures });
+        }
+        return result.ok;
+      })
+    : ordered;
 
   logStep("Candidate list built (exhaustion-first)", {
-    total: ordered.length,
+    total: publishable.length,
     neverUsed: neverUsed.length,
     recycled: recycled.length,
+    structurallyRejected: ordered.length - publishable.length,
   });
-  return ordered;
+  return publishable;
 }
 
 /**

@@ -36,9 +36,10 @@ async function selectCandidates(
     cooldownIds: Set<string>;
     lastUsedAt: Map<string, string>;
     strengthFocus: string | null;
+    targetDate: string;
   }
 ): Promise<any[]> {
-  const { category, difficultyStars, equipment, cooldownIds, lastUsedAt, strengthFocus } = params;
+  const { category, difficultyStars, equipment, cooldownIds, lastUsedAt, strengthFocus, targetDate } = params;
 
   let query = supabase
     .from("admin_workouts")
@@ -91,7 +92,22 @@ async function selectCandidates(
     return da.localeCompare(db);
   });
 
-  return [...shuffle(prioritised), ...recycled];
+  const ordered = [...shuffle(prioritised), ...recycled];
+  const publishable = ordered.filter((candidate) => {
+    const result = validateWodPublishContract({
+      ...candidate,
+      is_workout_of_day: true,
+      generated_for_date: targetDate,
+      is_standalone_purchase: true,
+      price: WOD_PRICE_EUR,
+    }, targetDate, { mode: "structural" });
+    if (!result.ok) {
+      log("Rejecting preview candidate that cannot publish", { id: candidate.id, name: candidate.name, failures: result.failures });
+    }
+    return result.ok;
+  });
+
+  return publishable;
 }
 
 async function loadCooldown(supabase: any) {
@@ -123,6 +139,7 @@ async function buildPreviewForDate(supabase: any, targetDate: string) {
       cooldownIds,
       lastUsedAt,
       strengthFocus: null,
+      targetDate,
     });
     recoveryId = cands[0]?.id || null;
   } else {
@@ -133,6 +150,7 @@ async function buildPreviewForDate(supabase: any, targetDate: string) {
       cooldownIds,
       lastUsedAt,
       strengthFocus: p.strengthFocus || null,
+      targetDate,
     });
     const eq = await selectCandidates(supabase, {
       category: p.category,
@@ -141,6 +159,7 @@ async function buildPreviewForDate(supabase: any, targetDate: string) {
       cooldownIds,
       lastUsedAt,
       strengthFocus: p.strengthFocus || null,
+      targetDate,
     });
     bodyweightId = bw[0]?.id || null;
     equipmentId = eq[0]?.id || null;

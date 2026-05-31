@@ -82,6 +82,24 @@ async function callLibraryPicker(
   }
 }
 
+async function autoPublishPreview(
+  supabaseUrl: string,
+  serviceKey: string,
+  targetDate: string,
+): Promise<{ ok: boolean; status: number; body: string }> {
+  try {
+    const resp = await fetch(`${supabaseUrl}/functions/v1/preview-tomorrow-wod`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${serviceKey}` },
+      body: JSON.stringify({ action: "approve", date: targetDate, approvedBy: "watchdog-auto" }),
+    });
+    const body = await resp.text();
+    return { ok: resp.ok, status: resp.status, body };
+  } catch (e) {
+    return { ok: false, status: 0, body: e instanceof Error ? e.message : String(e) };
+  }
+}
+
 async function explainLibraryCandidates(
   supabase: any,
   category: string,
@@ -203,9 +221,9 @@ serve(async (req) => {
       // STEP 2: detect missing slots and fill from library
       const missingSlots = expectedSlots.filter((s) => !presentByEquipment.has(s));
       if (missingSlots.length > 0) {
-        // If the tomorrow/day-after preview already has these slots picked,
-        // this is NOT a picker failure — it's pending admin approval.
-        // Do not re-call the picker and do not log a "manual fix required" fail.
+        // If the preview already has these slots picked, it is automation-ready.
+        // The admin screen is only an override surface; the system must publish it
+        // automatically so the owner never has to approve WODs every day.
         let previewRow: any = null;
         try {
           const { data } = await supabase
@@ -223,21 +241,34 @@ serve(async (req) => {
           : false;
 
         if (previewCovered && previewRow?.status !== "approved") {
+          const publish = await autoPublishPreview(supabaseUrl, serviceKey, targetDate);
+          const { data: afterPreviewPublish } = await supabase
+            .from("admin_workouts")
+            .select("equipment")
+            .eq("is_workout_of_day", true)
+            .eq("generated_for_date", targetDate);
+          const afterPreviewEq = new Set((afterPreviewPublish || []).map((w: any) => (w.equipment || "").toUpperCase()));
+          const fixedByPreview = missingSlots.every((slot) => afterPreviewEq.has(slot));
+
           allIssues.push({
-            check_type: "wod_pending_admin_approval",
-            severity: "info",
+            check_type: fixedByPreview ? "wod_preview_auto_published" : "wod_preview_auto_publish_failed",
+            severity: fixedByPreview ? "info" : "fail",
             scheduled_for_date: targetDate,
             equipment_slot: missingSlots.join("+"),
             category: periodization.category,
             difficulty: periodization.difficulty,
             day_in_84: dayIn84,
-            issue_message: `${label} WODs are picked in Tomorrow's WOD Preview and awaiting admin approval. No picker action taken.`,
-            autofix_attempted: false,
-            autofix_status: "skipped",
-            autofix_result: { reason: "preview_pending_admin_approval" },
+            issue_message: fixedByPreview
+              ? `${label} WODs were already picked in preview and were automatically published for rollover.`
+              : `${label} WODs were picked in preview, but automatic publishing failed.`,
+            autofix_attempted: true,
+            autofix_status: fixedByPreview ? "fixed" : "blocked",
+            autofix_result: { publisher_status: publish.status, publisher_body: publish.body.substring(0, 500) },
             candidate_rejection_reasons: null,
           });
-          continue;
+          if (fixedByPreview) continue;
+
+          await supabase.from("wod_tomorrow_preview").delete().eq("date", targetDate);
         }
 
         const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
@@ -245,6 +276,7 @@ serve(async (req) => {
           .from("system_health_events")
           .select("*", { count: "exact", head: true })
           .eq("check_type", "wod_missing_slot")
+          .eq("status", "open")
           .eq("scheduled_for_date", targetDate)
           .gte("created_at", since);
 
@@ -257,7 +289,7 @@ serve(async (req) => {
             category: periodization.category,
             difficulty: periodization.difficulty,
             day_in_84: dayIn84,
-            issue_message: `${label} ${missingSlots.join(" + ")} still missing after ${priorAttempts} watchdog attempts in last 24h. Manual content fix required.`,
+            issue_message: `${label} ${missingSlots.join(" + ")} still missing after ${priorAttempts} open watchdog attempts in last 24h. Automatic recovery is blocked by library quality/availability.`,
             autofix_attempted: false,
             autofix_status: "skipped",
             autofix_result: { reason: "attempt_cap_reached", attempts: priorAttempts },
