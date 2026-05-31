@@ -814,6 +814,8 @@ async function handleSubscriptionUpdate(
   let newPlanType: string | null = null;
   try {
     const productId = subscription.items.data[0].price.product as string;
+    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY") || "";
+    const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
     const product = await stripe.products.retrieve(productId);
     newPlanType =
       (product.metadata?.plan_type as string | undefined) ||
