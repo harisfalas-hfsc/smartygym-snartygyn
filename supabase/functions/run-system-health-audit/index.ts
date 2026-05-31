@@ -802,8 +802,8 @@ const handler = async (req: Request): Promise<Response> => {
           `${tomorrowCount}/${expectedTomorrowCount} WOD(s) published for ${tomorrowCyprus} (preview slots: ${previewSelectedSlots})`,
           enforce ? 'fail' : 'warning',
           enforce
-            ? `Library picker (06:30 / 06:50 UTC) and retries (07:20, 07:50, 08:20, 08:50 UTC) finished but no preview row was created. Open Admin → WOD Manager → Tomorrow's WOD Preview → Re-pick automatically.`
-            : `Library picker runs at 06:30 / 06:50 UTC with retries through 08:50 UTC; check again after 09:00 UTC.`
+            ? `Library picker (06:30 / 06:50 UTC) and retries (07:20, 07:50, 08:20, 08:50 UTC) finished without publishing tomorrow's WODs. Watchdog will keep retrying automatically; this is a system/library issue, not a manual approval task.`
+            : `Library picker runs at 06:30 / 06:50 UTC with retries through 08:50 UTC; watchdog handles retries automatically.`
         );
       }
     } catch (tmrErr) {
