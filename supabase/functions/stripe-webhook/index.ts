@@ -421,14 +421,18 @@ async function handleSubscriptionCheckout(
   // Get subscription details
   const subscriptionId = session.subscription as string;
   const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-  
+  const subPeriod = getSubPeriod(subscription);
   const priceId = subscription.items.data[0].price.id;
   const productId = subscription.items.data[0].price.product as string;
   const localStatus = mapStripeSubscriptionStatus(subscription.status);
   
-  // Get product details to determine plan type
+  // Get product details to determine plan type (prefer product metadata,
+  // fall back to known price-ID mapping for Gold/Platinum)
   const product = await stripe.products.retrieve(productId);
-  const planType = product.metadata?.plan_type || 'gold';
+  const planType =
+    product.metadata?.plan_type ||
+    planTypeFromPriceId(priceId) ||
+    'gold';
 
   logStep("Creating subscription record", { userId, planType, subscriptionId });
 
@@ -466,8 +470,8 @@ async function handleSubscriptionCheckout(
           stripe_customer_id: customerId,
           stripe_subscription_id: subscriptionId,
           status: localStatus,
-          current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-          current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+          current_period_start: periodIso(subPeriod.start),
+          current_period_end: periodIso(subPeriod.end),
           cancel_at_period_end: subscription.cancel_at_period_end,
         })
         .eq('user_id', userId);
@@ -487,8 +491,8 @@ async function handleSubscriptionCheckout(
           stripe_subscription_id: subscriptionId,
           plan_type: planType,
           status: localStatus,
-          current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-          current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+          current_period_start: periodIso(subPeriod.start),
+          current_period_end: periodIso(subPeriod.end),
           cancel_at_period_end: subscription.cancel_at_period_end,
         });
 
