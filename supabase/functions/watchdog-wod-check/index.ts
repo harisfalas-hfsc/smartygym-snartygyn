@@ -276,6 +276,7 @@ serve(async (req) => {
           .from("system_health_events")
           .select("*", { count: "exact", head: true })
           .eq("check_type", "wod_missing_slot")
+          .eq("status", "open")
           .eq("scheduled_for_date", targetDate)
           .gte("created_at", since);
 
@@ -288,7 +289,7 @@ serve(async (req) => {
             category: periodization.category,
             difficulty: periodization.difficulty,
             day_in_84: dayIn84,
-            issue_message: `${label} ${missingSlots.join(" + ")} still missing after ${priorAttempts} watchdog attempts in last 24h. Manual content fix required.`,
+            issue_message: `${label} ${missingSlots.join(" + ")} still missing after ${priorAttempts} open watchdog attempts in last 24h. Automatic recovery is blocked by library quality/availability.`,
             autofix_attempted: false,
             autofix_status: "skipped",
             autofix_result: { reason: "attempt_cap_reached", attempts: priorAttempts },
