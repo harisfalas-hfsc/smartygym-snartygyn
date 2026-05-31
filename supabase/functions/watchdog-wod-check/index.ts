@@ -267,6 +267,8 @@ serve(async (req) => {
             candidate_rejection_reasons: null,
           });
           if (fixedByPreview) continue;
+
+          await supabase.from("wod_tomorrow_preview").delete().eq("date", targetDate);
         }
 
         const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
