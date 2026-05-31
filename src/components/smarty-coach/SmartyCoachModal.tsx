@@ -49,22 +49,22 @@ const MenuCard = ({ emoji, title, description, Icon, accent, onClick }: MenuCard
   <button
     onClick={onClick}
     className={cn(
-      "group relative w-full text-left rounded-2xl border-2 border-border bg-card p-4",
+      "group relative w-full text-left rounded-xl border-2 border-border bg-card p-2.5",
       "transition-all duration-200 hover:border-primary hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/10",
       "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
     )}
   >
-    <div className="flex items-center gap-3">
-      <div className={cn("w-11 h-11 min-w-[2.75rem] rounded-xl flex items-center justify-center", menuAccentClasses[accent])}>
-        <Icon className="h-5 w-5" />
+    <div className="flex items-center gap-2.5">
+      <div className={cn("w-9 h-9 min-w-[2.25rem] rounded-lg flex items-center justify-center", menuAccentClasses[accent])}>
+        <Icon className="h-4 w-4" />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="font-bold text-foreground text-sm sm:text-base leading-tight whitespace-normal break-words">
-          <span className="mr-1.5">{emoji}</span>{title}
+        <p className="font-semibold text-foreground text-sm leading-tight whitespace-normal break-words">
+          <span className="mr-1">{emoji}</span>{title}
         </p>
-        <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 leading-snug whitespace-normal break-words">{description}</p>
+        <p className="text-[11px] text-muted-foreground mt-0.5 leading-snug whitespace-normal break-words line-clamp-2">{description}</p>
       </div>
-      <ChevronRight className="h-5 w-5 shrink-0 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-transform" />
+      <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-transform" />
     </div>
   </button>
 );
