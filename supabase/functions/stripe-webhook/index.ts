@@ -973,8 +973,9 @@ async function handleSubscriptionCancellation(
   logStep("Fetched user email for cancellation", { email: userEmail });
 
   // Calculate subscription end date
-  const endDate = subscription.current_period_end 
-    ? new Date(subscription.current_period_end * 1000).toLocaleDateString('en-US', {
+  const cancelPeriod = getSubPeriod(subscription);
+  const endDate = cancelPeriod.end
+    ? new Date(cancelPeriod.end * 1000).toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
         day: 'numeric'
