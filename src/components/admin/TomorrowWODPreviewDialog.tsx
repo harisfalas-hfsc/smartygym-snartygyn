@@ -167,6 +167,28 @@ export const TomorrowWODPreviewDialog = ({ open, onOpenChange }: Props) => {
     return <Badge variant="outline">Pending</Badge>;
   };
 
+  const publishStateBanner = () => {
+    if (!preview) return null;
+    if (preview.status === "approved") {
+      return (
+        <Alert className="mb-3 border-green-500/40 bg-green-500/10">
+          <CheckCircle className="h-4 w-4 text-green-600" />
+          <AlertDescription className="text-sm">
+            <strong>Published for rollover.</strong> These WODs are live for {targetDate} and will roll over at midnight Cyprus.
+          </AlertDescription>
+        </Alert>
+      );
+    }
+    return (
+      <Alert className="mb-3 border-amber-500/40 bg-amber-500/10">
+        <AlertTriangle className="h-4 w-4 text-amber-600" />
+        <AlertDescription className="text-sm">
+          <strong>Picked only — not live yet.</strong> The library picker chose these workouts for {targetDate}, but they will NOT roll over at midnight until you click <em>Approve &amp; publish tomorrow's WODs</em>. The health audit will keep warning until then.
+        </AlertDescription>
+      </Alert>
+    );
+  };
+
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
@@ -198,6 +220,8 @@ export const TomorrowWODPreviewDialog = ({ open, onOpenChange }: Props) => {
               {preview.approved_at && <> • approved {new Date(preview.approved_at).toLocaleString()}</>}
             </div>
           )}
+
+          {publishStateBanner()}
 
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -267,7 +291,7 @@ export const TomorrowWODPreviewDialog = ({ open, onOpenChange }: Props) => {
               onClick={() => runAction("approve", {}, "Approve")}
               disabled={!!busy || !preview || preview.status === "approved"}
             >
-              <CheckCircle className="h-4 w-4 mr-1" /> Approve & publish
+              <CheckCircle className="h-4 w-4 mr-1" /> Approve &amp; publish tomorrow's WODs
             </Button>
           </DialogFooter>
         </DialogContent>
