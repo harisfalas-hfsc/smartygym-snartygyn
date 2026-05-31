@@ -129,6 +129,10 @@ function isOverdue(job: CronRow, nowMs: number): { overdue: boolean; reason: str
 
 function evaluateSnapshot(row: CronSnapshotRow, nowMs: number): { overdue: boolean; reason: string; thresholdMinutes: number; job: CronRow } {
   const job = snapshotToCronRow(row);
+  // Retired/inactive jobs must never be reported as overdue or critical.
+  if (!row.is_active) {
+    return { overdue: false, reason: "inactive (retired)", thresholdMinutes: 0, job };
+  }
   if (!row.live_job_exists) {
     return { overdue: true, reason: "not registered in the live scheduler", thresholdMinutes: 0, job };
   }
