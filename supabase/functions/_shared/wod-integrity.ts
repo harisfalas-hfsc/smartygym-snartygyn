@@ -152,7 +152,11 @@ export function validateWodPublishContract(
 
   // Sections + density on main_workout
   const sectionResult = validateWodSections(mainWorkout, slots.isRecoveryDay, wod.category);
-  if (!sectionResult.isComplete) {
+  const hasHardSectionFailures =
+    sectionResult.missingSections.length > 0 ||
+    sectionResult.exerciseContentIssues.length > 0 ||
+    sectionResult.softTissueIssues.length > 0;
+  if (hasHardSectionFailures) {
     if (sectionResult.missingSections.length > 0) {
       failures.push(`main_workout missing sections: ${sectionResult.missingSections.join(", ")}`);
     }
@@ -162,9 +166,9 @@ export function validateWodPublishContract(
     if (sectionResult.softTissueIssues.length > 0) {
       failures.push(`main_workout soft tissue rules: ${sectionResult.softTissueIssues.join("; ")}`);
     }
-    if (sectionResult.mobilityCompatibilityIssues.length > 0) {
-      failures.push(`main_workout category compatibility: ${sectionResult.mobilityCompatibilityIssues.join("; ")}`);
-    }
+  }
+  if (sectionResult.mobilityCompatibilityIssues.length > 0) {
+    warnings.push(`main_workout category compatibility: ${sectionResult.mobilityCompatibilityIssues.join("; ")}`);
   }
 
   // Instructions and tips MUST NOT contain raw exercise placeholders.

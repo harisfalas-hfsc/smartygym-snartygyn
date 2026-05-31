@@ -162,9 +162,9 @@ export const TomorrowWODPreviewDialog = ({ open, onOpenChange }: Props) => {
 
   const statusBadge = () => {
     if (!preview) return null;
-    if (preview.status === "approved") return <Badge className="bg-green-500/20 text-green-600 border-green-500/30">Approved</Badge>;
+    if (preview.status === "approved") return <Badge className="bg-green-500/20 text-green-600 border-green-500/30">Published</Badge>;
     if (preview.status === "rejected") return <Badge variant="destructive">Rejected</Badge>;
-    return <Badge variant="outline">Pending</Badge>;
+    return <Badge variant="outline">Queued</Badge>;
   };
 
   const publishStateBanner = () => {
@@ -198,7 +198,7 @@ export const TomorrowWODPreviewDialog = ({ open, onOpenChange }: Props) => {
               <Calendar className="h-5 w-5" /> Tomorrow's WOD Preview
             </DialogTitle>
             <DialogDescription>
-              Review, edit, swap, and approve the workouts pre-picked for any upcoming day.
+              Review, edit, or swap the workouts pre-picked for any upcoming day. Publishing is automatic.
             </DialogDescription>
           </DialogHeader>
 
