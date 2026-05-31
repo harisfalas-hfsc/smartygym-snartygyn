@@ -49,22 +49,22 @@ const MenuCard = ({ emoji, title, description, Icon, accent, onClick }: MenuCard
   <button
     onClick={onClick}
     className={cn(
-      "group relative w-full text-left rounded-2xl border-2 border-border bg-card p-4",
+      "group relative w-full text-left rounded-xl border-2 border-border bg-card p-2.5",
       "transition-all duration-200 hover:border-primary hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/10",
       "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
     )}
   >
-    <div className="flex items-center gap-3">
-      <div className={cn("w-11 h-11 min-w-[2.75rem] rounded-xl flex items-center justify-center", menuAccentClasses[accent])}>
-        <Icon className="h-5 w-5" />
+    <div className="flex items-center gap-2.5">
+      <div className={cn("w-9 h-9 min-w-[2.25rem] rounded-lg flex items-center justify-center", menuAccentClasses[accent])}>
+        <Icon className="h-4 w-4" />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="font-bold text-foreground text-sm sm:text-base leading-tight whitespace-normal break-words">
-          <span className="mr-1.5">{emoji}</span>{title}
+        <p className="font-semibold text-foreground text-sm leading-tight whitespace-normal break-words">
+          <span className="mr-1">{emoji}</span>{title}
         </p>
-        <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 leading-snug whitespace-normal break-words">{description}</p>
+        <p className="text-[11px] text-muted-foreground mt-0.5 leading-snug whitespace-normal break-words line-clamp-2">{description}</p>
       </div>
-      <ChevronRight className="h-5 w-5 shrink-0 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-transform" />
+      <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-transform" />
     </div>
   </button>
 );
@@ -285,8 +285,8 @@ export const SmartyCoachModal = ({ isOpen, onClose, initialPath = 'menu' }: Smar
         className={cn(
           "p-0 border-0 overflow-hidden",
           // Use small/dynamic viewport units for consistent mobile-browser chrome behavior.
-          "w-[calc(100svw-2rem)] max-w-[32rem] sm:w-[95vw] md:max-w-2xl mx-auto",
-          "max-h-[calc(100svh-2rem)] supports-[height:100dvh]:max-h-[calc(100dvh-2rem)] sm:max-h-[90vh] overflow-y-auto overscroll-contain",
+          "w-[calc(100svw-2rem)] max-w-[22rem] sm:max-w-md mx-auto",
+          "max-h-[calc(100svh-2rem)] supports-[height:100dvh]:max-h-[calc(100dvh-2rem)] sm:max-h-[85vh] overflow-y-auto overscroll-contain",
           "rounded-2xl bg-card border-2 border-primary/30 shadow-2xl shadow-primary/20",
           activePath === 'menu' ? "[&>button]:hidden" : ""
         )}
@@ -294,33 +294,30 @@ export const SmartyCoachModal = ({ isOpen, onClose, initialPath = 'menu' }: Smar
         {activePath === 'menu' ? (
           <>
             {/* Rich header band */}
-            <div className="relative px-4 sm:px-7 pt-5 sm:pt-7 pb-5 bg-gradient-to-br from-primary/15 via-primary/5 to-transparent">
+            <div className="relative px-3 sm:px-5 pt-4 pb-3 bg-gradient-to-br from-primary/15 via-primary/5 to-transparent">
               <button
                 onClick={handleDismiss}
                 aria-label="Close"
-                className="absolute top-3 right-3 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-border bg-background/90 text-foreground shadow-sm transition-colors hover:bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                className="absolute top-2 right-2 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-border bg-background/90 text-foreground shadow-sm transition-colors hover:bg-background focus:outline-none focus:ring-2 focus:ring-primary"
               >
-                <X className="h-5 w-5" />
+                <X className="h-4 w-4" />
               </button>
-              <div className="grid grid-cols-[3rem_minmax(0,1fr)_3rem] items-center gap-3 sm:grid-cols-[4rem_minmax(0,1fr)_3.5rem] sm:gap-4">
+              <div className="grid grid-cols-[2.5rem_minmax(0,1fr)_2rem] items-center gap-2.5">
                 <div className="relative">
-                  <div className="absolute inset-0 rounded-full bg-primary/30 blur-xl animate-pulse" />
-                  <div className="relative h-12 w-12 sm:h-16 sm:w-16 shrink-0 rounded-full border border-white/20 bg-[#1a1f2e] p-1.5 shadow-lg shadow-blue-500/30 flex items-center justify-center animate-in zoom-in-50 duration-500">
-                    <img
-                      src={smartyCoachIcon}
-                      alt="Smarty Coach"
-                      width={64}
-                      height={64}
-                      decoding="async"
-                      className="h-full w-full rounded-full object-contain drop-shadow-md"
-                    />
-                  </div>
+                  <img
+                    src={smartyCoachIcon}
+                    alt="Smarty Coach"
+                    width={40}
+                    height={40}
+                    decoding="async"
+                    className="h-10 w-10 rounded-full object-contain"
+                  />
                 </div>
                 <div className="min-w-0">
-                  <h2 className="text-lg sm:text-2xl md:text-3xl font-extrabold text-foreground leading-tight break-words">
+                  <h2 className="text-base sm:text-lg font-bold text-foreground leading-tight break-words">
                     Hi <span className="inline-block">👋</span> I'm your Smarty Coach
                   </h2>
-                  <p className="text-sm sm:text-base text-muted-foreground mt-1">
+                  <p className="text-xs text-muted-foreground mt-0.5">
                     How can I help you today?
                   </p>
                 </div>
@@ -329,8 +326,8 @@ export const SmartyCoachModal = ({ isOpen, onClose, initialPath = 'menu' }: Smar
             </div>
 
             {/* Menu options */}
-            <div className="px-4 sm:px-7 pb-5 pt-2">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 animate-in fade-in duration-300">
+            <div className="px-3 sm:px-4 pb-4 pt-2">
+              <div className="grid grid-cols-1 gap-2 animate-in fade-in duration-300">
                 <MenuCard
                   emoji="🔥"
                   title="Workout of the Day"
@@ -383,7 +380,7 @@ export const SmartyCoachModal = ({ isOpen, onClose, initialPath = 'menu' }: Smar
             </div>
           </>
         ) : (
-        <div className="px-5 sm:px-7 py-5">
+        <div className="px-4 py-4">
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold flex items-center gap-2">
             <img
@@ -393,7 +390,7 @@ export const SmartyCoachModal = ({ isOpen, onClose, initialPath = 'menu' }: Smar
               width={28}
               height={28}
               decoding="async"
-              className="h-7 w-7 rounded-full border border-white/20 bg-[#1a1f2e] p-0.5 object-contain"
+              className="h-7 w-7 rounded-full object-contain"
             />
             Smarty Coach
           </DialogTitle>
