@@ -21,6 +21,31 @@ const mapStripeSubscriptionStatus = (status: Stripe.Subscription.Status): 'activ
   return 'canceled';
 };
 
+// In Stripe API 2025-08-27.basil, current_period_start/end are on the
+// subscription item, not the root subscription. Fall back to root for
+// older API versions just in case.
+const getSubPeriod = (sub: Stripe.Subscription): { start: number | null; end: number | null } => {
+  const item: any = sub.items?.data?.[0];
+  const start = (item?.current_period_start ?? (sub as any).current_period_start) ?? null;
+  const end = (item?.current_period_end ?? (sub as any).current_period_end) ?? null;
+  return {
+    start: typeof start === 'number' ? start : null,
+    end: typeof end === 'number' ? end : null,
+  };
+};
+
+const periodIso = (ts: number | null): string | null =>
+  ts && typeof ts === 'number' ? new Date(ts * 1000).toISOString() : null;
+
+// Map a Stripe price ID to our internal plan_type. Mirrors the logic in
+// check-subscription so upgrades/downgrades via Customer Portal stay in sync.
+const planTypeFromPriceId = (priceId: string | undefined | null): 'gold' | 'platinum' | null => {
+  if (!priceId) return null;
+  if (priceId === 'price_1SJ9q1IxQYg9inGKZzxxqPbD') return 'gold';
+  if (priceId === 'price_1SJ9qGIxQYg9inGKFbgqVRjj') return 'platinum';
+  return null;
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
