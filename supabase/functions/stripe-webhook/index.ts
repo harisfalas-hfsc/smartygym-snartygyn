@@ -512,8 +512,8 @@ async function handleSubscriptionCheckout(
         stripe_subscription_id: subscriptionId,
         plan_type: planType,
         status: localStatus,
-        current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-        current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+        current_period_start: periodIso(subPeriod.start),
+        current_period_end: periodIso(subPeriod.end),
         cancel_at_period_end: subscription.cancel_at_period_end,
       }, {
         onConflict: 'user_id'
