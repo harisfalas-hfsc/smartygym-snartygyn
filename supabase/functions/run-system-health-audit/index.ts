@@ -735,7 +735,7 @@ const handler = async (req: Request): Promise<Response> => {
       const ok = tomorrowCount >= expectedTomorrowCount;
       // Distinguish three states:
       //   (A) Published WODs exist for tomorrow  → pass
-      //   (B) Preview row picked but not approved → warning (admin approval pending)
+      //   (B) Preview row picked but not published → auto-publish it; manual approval is not required
       //   (C) No preview row and no published WODs → real picker failure
       let previewSelectedSlots = 0;
       let previewStatus: string | null = null;
@@ -753,21 +753,47 @@ const handler = async (req: Request): Promise<Response> => {
         }
       } catch (_) { /* preview table optional */ }
 
-      if (ok) {
+      let finalTomorrowCount = tomorrowCount;
+
+      if (!ok && previewSelectedSlots >= expectedTomorrowCount && previewStatus !== 'approved') {
+        try {
+          const publishResp = await fetch(`${supabaseUrl}/functions/v1/preview-tomorrow-wod`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${supabaseServiceKey}` },
+            body: JSON.stringify({ action: 'approve', date: tomorrowCyprus, approvedBy: 'health-audit-auto' })
+          });
+          if (!publishResp.ok) {
+            const body = await publishResp.text();
+            console.error('[HEALTH-AUDIT] auto-publish preview failed:', publishResp.status, body.substring(0, 500));
+          }
+          const { data: refreshedTomorrowWods } = await supabase
+            .from('admin_workouts')
+            .select('id, equipment, is_visible')
+            .eq('generated_for_date', tomorrowCyprus)
+            .eq('is_workout_of_day', true);
+          finalTomorrowCount = refreshedTomorrowWods?.length ?? 0;
+        } catch (publishErr) {
+          console.error('[HEALTH-AUDIT] auto-publish preview threw:', publishErr);
+        }
+      }
+
+      if (finalTomorrowCount >= expectedTomorrowCount) {
         addCheck(
           'WOD System',
           "Tomorrow's WODs Pre-Generated",
-          `${tomorrowCount}/${expectedTomorrowCount} WOD(s) published for ${tomorrowCyprus} (Cyprus)`,
+          `${finalTomorrowCount}/${expectedTomorrowCount} WOD(s) ready for ${tomorrowCyprus} (Cyprus)`,
           'pass',
-          `✅ Tomorrow's WODs are published — midnight rollover will be seamless.`
+          tomorrowCount >= expectedTomorrowCount
+            ? `✅ Tomorrow's WODs are published — midnight rollover will be seamless.`
+            : `✅ Tomorrow's WODs were picked in preview and automatically published. No manual admin approval required.`
         );
       } else if (previewSelectedSlots >= expectedTomorrowCount && previewStatus !== 'approved') {
         addCheck(
           'WOD System',
           "Tomorrow's WODs Pre-Generated",
-          `${previewSelectedSlots}/${expectedTomorrowCount} picked for ${tomorrowCyprus}, awaiting admin approval`,
-          'warning',
-          `Library picker already selected tomorrow's WODs. They are visible in Admin → WOD Manager → Tomorrow's WOD Preview and need to be approved & published before midnight Cyprus to roll over. No content fix required.`
+          `${previewSelectedSlots}/${expectedTomorrowCount} picked for ${tomorrowCyprus}, auto-publish did not complete`,
+          enforce ? 'fail' : 'warning',
+          `Library picker selected tomorrow's WODs, but the automatic publish step did not complete. This is a system issue, not a daily manual task.`
         );
       } else {
         addCheck(
