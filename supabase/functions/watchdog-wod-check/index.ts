@@ -203,6 +203,43 @@ serve(async (req) => {
       // STEP 2: detect missing slots and fill from library
       const missingSlots = expectedSlots.filter((s) => !presentByEquipment.has(s));
       if (missingSlots.length > 0) {
+        // If the tomorrow/day-after preview already has these slots picked,
+        // this is NOT a picker failure — it's pending admin approval.
+        // Do not re-call the picker and do not log a "manual fix required" fail.
+        let previewRow: any = null;
+        try {
+          const { data } = await supabase
+            .from("wod_tomorrow_preview")
+            .select("bodyweight_workout_id, equipment_workout_id, recovery_workout_id, is_recovery_day, status")
+            .eq("date", targetDate)
+            .maybeSingle();
+          previewRow = data;
+        } catch (_) { /* preview table optional */ }
+
+        const previewCovered = previewRow
+          ? (previewRow.is_recovery_day
+              ? !!previewRow.recovery_workout_id
+              : !!previewRow.bodyweight_workout_id && !!previewRow.equipment_workout_id)
+          : false;
+
+        if (previewCovered && previewRow?.status !== "approved") {
+          allIssues.push({
+            check_type: "wod_pending_admin_approval",
+            severity: "info",
+            scheduled_for_date: targetDate,
+            equipment_slot: missingSlots.join("+"),
+            category: periodization.category,
+            difficulty: periodization.difficulty,
+            day_in_84: dayIn84,
+            issue_message: `${label} WODs are picked in Tomorrow's WOD Preview and awaiting admin approval. No picker action taken.`,
+            autofix_attempted: false,
+            autofix_status: "skipped",
+            autofix_result: { reason: "preview_pending_admin_approval" },
+            candidate_rejection_reasons: null,
+          });
+          continue;
+        }
+
         const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
         const { count: priorAttempts } = await supabase
           .from("system_health_events")
