@@ -311,8 +311,7 @@ async function handleCorporateSubscriptionCheckout(
 
   // Get subscription details
   const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-  
-  const periodEnd = new Date(subscription.current_period_end * 1000);
+  const corpPeriod = getSubPeriod(subscription);
 
   // Create corporate subscription record
   const { data: corpSub, error: corpError } = await supabase
@@ -323,8 +322,8 @@ async function handleCorporateSubscriptionCheckout(
       plan_type: planType,
       max_users: maxUsers,
       current_users_count: 0,
-      current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-      current_period_end: periodEnd.toISOString(),
+      current_period_start: periodIso(corpPeriod.start),
+      current_period_end: periodIso(corpPeriod.end),
       stripe_subscription_id: subscriptionId,
       stripe_customer_id: customerId,
       status: 'active',
@@ -348,8 +347,8 @@ async function handleCorporateSubscriptionCheckout(
       stripe_subscription_id: subscriptionId,
       plan_type: 'platinum',
       status: 'active',
-      current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-      current_period_end: periodEnd.toISOString(),
+      current_period_start: periodIso(corpPeriod.start),
+      current_period_end: periodIso(corpPeriod.end),
     }, {
       onConflict: 'user_id'
     });
