@@ -806,6 +806,23 @@ async function handleSubscriptionUpdate(
   const oldPlanType = existingSub.plan_type;
   const priceId = subscription.items.data[0].price.id;
   const localStatus = mapStripeSubscriptionStatus(subscription.status);
+  const updPeriod = getSubPeriod(subscription);
+
+  // Recompute plan_type from current price so upgrades/downgrades via
+  // Customer Portal stay in sync. Prefer product metadata, fall back to
+  // our known Gold/Platinum price-ID mapping.
+  let newPlanType: string | null = null;
+  try {
+    const productId = subscription.items.data[0].price.product as string;
+    const product = await stripe.products.retrieve(productId);
+    newPlanType =
+      (product.metadata?.plan_type as string | undefined) ||
+      planTypeFromPriceId(priceId) ||
+      null;
+  } catch (e) {
+    logStep("WARN: Failed to retrieve product for plan_type recompute", { error: e });
+    newPlanType = planTypeFromPriceId(priceId);
+  }
 
   logStep("Updating subscription", { userId, status: subscription.status, oldPlan: oldPlanType });
 
@@ -832,8 +849,8 @@ async function handleSubscriptionUpdate(
       .update({
         stripe_subscription_id: subscription.id,
         status: localStatus,
-        current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-        current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+        current_period_start: periodIso(updPeriod.start),
+        current_period_end: periodIso(updPeriod.end),
         cancel_at_period_end: subscription.cancel_at_period_end,
         // NOTE: plan_type is intentionally NOT updated for corporate users
       })
@@ -851,9 +868,10 @@ async function handleSubscriptionUpdate(
       .update({
         stripe_subscription_id: subscription.id,
         status: localStatus,
-        current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-        current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+        current_period_start: periodIso(updPeriod.start),
+        current_period_end: periodIso(updPeriod.end),
         cancel_at_period_end: subscription.cancel_at_period_end,
+        ...(newPlanType ? { plan_type: newPlanType } : {}),
       })
       .eq('user_id', userId);
 
@@ -869,7 +887,7 @@ async function handleSubscriptionUpdate(
   const userEmail = userData?.user?.email;
 
   if (userEmail) {
-    const nextBillingDate = new Date(subscription.current_period_end * 1000).toLocaleDateString('en-US', {
+    const nextBillingDate = (updPeriod.end ? new Date(updPeriod.end * 1000) : new Date()).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
