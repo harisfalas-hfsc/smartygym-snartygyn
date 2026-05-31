@@ -183,7 +183,7 @@ export const TomorrowWODPreviewDialog = ({ open, onOpenChange }: Props) => {
       <Alert className="mb-3 border-amber-500/40 bg-amber-500/10">
         <AlertTriangle className="h-4 w-4 text-amber-600" />
         <AlertDescription className="text-sm">
-          <strong>Picked only — not live yet.</strong> The library picker chose these workouts for {targetDate}, but they will NOT roll over at midnight until you click <em>Approve &amp; publish tomorrow's WODs</em>. The health audit will keep warning until then.
+          <strong>Picked and queued.</strong> The automated system will publish these WODs for rollover. Use the button only if you want to force-publish immediately.
         </AlertDescription>
       </Alert>
     );
@@ -288,10 +288,10 @@ export const TomorrowWODPreviewDialog = ({ open, onOpenChange }: Props) => {
               <Trash2 className="h-4 w-4 mr-1" /> Reject
             </Button>
             <Button
-              onClick={() => runAction("approve", {}, "Approve")}
+              onClick={() => runAction("approve", {}, "Publish now")}
               disabled={!!busy || !preview || preview.status === "approved"}
             >
-              <CheckCircle className="h-4 w-4 mr-1" /> Approve &amp; publish tomorrow's WODs
+              <CheckCircle className="h-4 w-4 mr-1" /> Publish now
             </Button>
           </DialogFooter>
         </DialogContent>
