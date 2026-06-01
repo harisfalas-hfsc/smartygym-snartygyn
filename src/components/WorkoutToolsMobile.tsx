@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Timer, Calculator, Dumbbell } from "lucide-react";
+import { Timer, ListOrdered, Dumbbell } from "lucide-react";
 import { WorkoutTimerPopup } from "./WorkoutTimerPopup";
-import { OneRMCalculatorPopup } from "./OneRMCalculatorPopup";
+import { RoundsCounterPopup } from "./RoundsCounterPopup";
 import { ExerciseLibraryPopup } from "./ExerciseLibraryPopup";
 
 export const WorkoutToolsMobile = () => {
   const [timerOpen, setTimerOpen] = useState(false);
-  const [calculatorOpen, setCalculatorOpen] = useState(false);
+  const [roundsOpen, setRoundsOpen] = useState(false);
   const [libraryOpen, setLibraryOpen] = useState(false);
 
   return (
@@ -30,11 +30,11 @@ export const WorkoutToolsMobile = () => {
         <Button
           variant="outline"
           size="sm"
-          onClick={() => setCalculatorOpen(true)}
+          onClick={() => setRoundsOpen(true)}
           className="gap-1.5 h-9 px-3 sm:px-4"
         >
-          <Calculator className="h-4 w-4" />
-          <span className="text-xs sm:text-sm">1RM</span>
+          <ListOrdered className="h-4 w-4" />
+          <span className="text-xs sm:text-sm">Rounds</span>
         </Button>
         
         <Button
@@ -49,7 +49,7 @@ export const WorkoutToolsMobile = () => {
       </div>
 
       <WorkoutTimerPopup open={timerOpen} onOpenChange={setTimerOpen} />
-      <OneRMCalculatorPopup open={calculatorOpen} onOpenChange={setCalculatorOpen} />
+      <RoundsCounterPopup open={roundsOpen} onOpenChange={setRoundsOpen} />
       <ExerciseLibraryPopup open={libraryOpen} onOpenChange={setLibraryOpen} />
     </>
   );
