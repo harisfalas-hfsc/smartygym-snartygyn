@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en-GB" class="dark">
+<html lang="en-GB">
   <head>
     <script>
       document.documentElement.classList.add("js-enabled");
@@ -62,10 +62,10 @@
       (function() {
         try {
           var theme = localStorage.getItem("theme");
-          if (theme === "light") {
-            document.documentElement.classList.remove("dark");
-          } else if (theme === "dark" || (!theme && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+          if (theme === "dark") {
             document.documentElement.classList.add("dark");
+          } else {
+            document.documentElement.classList.remove("dark");
           }
         } catch (e) {}
       })();

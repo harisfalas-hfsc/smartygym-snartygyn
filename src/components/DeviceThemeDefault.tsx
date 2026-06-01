@@ -11,12 +11,12 @@ export const DeviceThemeDefault = () => {
   useEffect(() => {
     const sessionTheme = sessionStorage.getItem("smartygym-session-theme");
     
-    // Respect user preference if they've toggled before; otherwise default to dark
+    // Respect user preference if they've toggled before; otherwise default to light
     if (sessionTheme) {
       setTheme(sessionTheme);
     } else {
-      setTheme("dark");
-      sessionStorage.setItem("smartygym-session-theme", "dark");
+      setTheme("light");
+      sessionStorage.setItem("smartygym-session-theme", "light");
     }
   }, [setTheme]);
 
