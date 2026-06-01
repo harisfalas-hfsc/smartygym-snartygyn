@@ -487,6 +487,7 @@ const BestOnlineFitnessPlatform = () => {
         <script type="application/ld+json">{JSON.stringify(softwareAppSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(videoObjectSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(profilePageSchema)}</script>
+        <script type="application/ld+json">{JSON.stringify(semrushQuestionsFAQSchema)}</script>
         {definedTermSchemas.map((schema, i) => (
           <script key={`dt-${i}`} type="application/ld+json">{JSON.stringify(schema)}</script>
         ))}
