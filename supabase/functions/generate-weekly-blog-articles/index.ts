@@ -37,7 +37,27 @@ const CATEGORY_TOPICS: Record<string, string[]> = {
     // App-category authority topics
     "best home workout app picks for 2026", "best free workout app comparison",
     "best HIIT workout app comparison", "best strength training app comparison",
-    "cheaper alternatives to Peloton, Fitbod and Sweat"
+    "cheaper alternatives to Peloton, Fitbod and Sweat",
+    // Freeletics & Peloton conquest topics (June 2026 — direct competitor targeting)
+    "best peloton alternative without the bike",
+    "is the peloton app worth it without the bike",
+    "how to cancel peloton and keep training at home",
+    "peloton app one vs peloton app plus: honest review",
+    "freeletics-style bodyweight workouts you can do anywhere",
+    "is freeletics worth it in 2026: an honest review by a human coach",
+    "is freeletics coach worth it for serious lifters",
+    "is freeletics nutrition worth it or skip it",
+    "best free freeletics alternatives, ranked by a certified coach",
+    "freeletics vs traditional periodized strength training",
+    "peloton app without the bike: what you actually get vs what's missing",
+    "yoga and mobility routines for people leaving peloton",
+    "correct push up form: the coach checklist",
+    "daily stretching routine for desk-bound adults",
+    "ab wheel exercises that actually build core strength",
+    "weighted vest training: when it works and when it wastes time",
+    "hybrid athlete training: strength plus endurance the right way",
+    "plank shoulder taps progressions and common mistakes",
+    "kettlebell swing full technique guide"
   ],
   Nutrition: [
     "protein requirements for muscle growth", "meal timing and performance", "hydration science",

@@ -539,6 +539,13 @@ const BestOnlineFitnessPlatform = () => {
             
             <EnhancedCTA />
             <AIExtractableBlock />
+
+            {/* Conquest cross-links — direct competitor comparison pages */}
+            <section className="mt-10 pt-6 border-t border-border text-sm text-muted-foreground">
+              <p>
+                Compare us head-to-head: <a href="/smartygym-vs-peloton" className="text-primary hover:underline">SmartyGym vs Peloton</a> · <a href="/smartygym-vs-freeletics" className="text-primary hover:underline">SmartyGym vs Freeletics</a>
+              </p>
+            </section>
           </article>
         </div>
       </div>
