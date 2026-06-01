@@ -35,7 +35,7 @@ export const RoundsCounterPopup = ({ open, onOpenChange }: RoundsCounterPopupPro
     try {
       let ctx = audioCtxRef.current;
       if (!ctx) {
-        const Ctor = window.AudioContext || (window as any).webkitAudioContext;
+        const Ctor = window.AudioContext || (window as Window & typeof globalThis & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
         if (!Ctor) return;
         ctx = new Ctor();
         audioCtxRef.current = ctx;
