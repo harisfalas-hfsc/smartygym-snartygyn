@@ -20,7 +20,24 @@ const CATEGORY_TOPICS: Record<string, string[]> = {
     "postural correction exercises", "training frequency and volume",
     "wearable technology and data-driven training", "fitness trends and industry shifts",
     "training for longevity after 40", "heart rate zone training methods",
-    "recovery monitoring and biometric feedback", "progressive overload science"
+    "recovery monitoring and biometric feedback", "progressive overload science",
+    // Competitor blog-cluster targets (Semrush US — high-traffic exercise tutorials
+    // currently owned by Peloton, Fitbod, Sweat, Centr, Bodi, Alo Moves)
+    "how to do a perfect push up", "how to do a perfect squat", "how to do a plank for beginners",
+    "how to do a pull up from zero", "how to build muscle the right way",
+    "complete push day workout guide", "complete pull day workout guide",
+    "dumbbell leg workout at home", "best biceps workout with dumbbells",
+    "best tricep exercises that build mass", "glute exercises that actually work",
+    "goblet squat technique and progressions", "shoulder press variations explained",
+    "arnold press technique and benefits", "compound lifts every lifter should master",
+    "cable chest workout from beginner to advanced", "reverse lunges vs forward lunges",
+    // Pilates / mobility cluster (Alo Moves territory)
+    "pilates exercises for beginners at home", "pilates ring exercises full body",
+    "pilates reformer exercises without the reformer",
+    // App-category authority topics
+    "best home workout app picks for 2026", "best free workout app comparison",
+    "best HIIT workout app comparison", "best strength training app comparison",
+    "cheaper alternatives to Peloton, Fitbod and Sweat"
   ],
   Nutrition: [
     "protein requirements for muscle growth", "meal timing and performance", "hydration science",
