@@ -1264,21 +1264,23 @@ const handler = async (req: Request): Promise<Response> => {
         : 'All emails delivered successfully'
     );
 
-    // Check today's email success rate
-    const { count: todayEmailsSent } = await supabase
+    // Check today's email success rate (count successes explicitly to avoid
+    // mislabeled / legacy status values polluting the denominator).
+    const { count: todayEmailsSuccess } = await supabase
       .from('email_delivery_log')
       .select('*', { count: 'exact', head: true })
+      .in('status', ['sent', 'success'])
       .gte('sent_at', todayStart.toISOString());
-    
+
     const { count: todayEmailsFailed } = await supabase
       .from('email_delivery_log')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'failed')
       .gte('sent_at', todayStart.toISOString());
-    
-    const todayTotal = (todayEmailsSent || 0);
-    const todayFailed = (todayEmailsFailed || 0);
-    const todaySuccess = todayTotal - todayFailed;
+
+    const todaySuccess = todayEmailsSuccess || 0;
+    const todayFailed = todayEmailsFailed || 0;
+    const todayTotal = todaySuccess + todayFailed;
     const successRate = todayTotal > 0 ? Math.round((todaySuccess / todayTotal) * 100) : 100;
 
     addCheck('Email System', "Today's Delivery Rate", 
