@@ -1,58 +1,72 @@
-## Goal
+# Plan: Freeletics & Peloton Conquest — 100% Additive Update
 
-Identify the keywords and phrases that drive Google + Bing + AI-crawler visibility for the 12 competitors listed in the comparison table on `/best-online-fitness-platform`, then bake the winning ones into SmartyGym's SEO layer (meta tags, AI-entity tags, JSON-LD, page copy, internal links, sitemap, etc.) so we can rank for the same demand.
+## Confirmation: this is an UPDATE, not a re-orientation
 
-## Competitors in the comparison table (source: `src/components/seo/BestFitnessSections.tsx` + `src/pages/BestOnlineFitnessPlatform.tsx`)
+Nothing already working gets removed, rewritten, or re-oriented. Every existing system stays exactly as it is:
 
-1. Peloton — `onepeloton.com`
-2. Nike Training Club — `nike.com` (NTC section)
-3. Apple Fitness+ — `apple.com/apple-fitness-plus`
-4. Les Mills On Demand — `lesmills.com`
-5. Beachbody / BODi — `bodi.com`
-6. Freeletics — `freeletics.com`
-7. Fitbod — `fitbod.me`
-8. Sweat (Kayla Itsines) — `sweat.com`
-9. FIIT — `fiit.tv`
-10. Centr (Chris Hemsworth) — `centr.com`
-11. Alo Moves — `alomoves.com`
-12. Obé Fitness — `obefitness.com`
+- ✅ The existing `/best-online-fitness-platform` comparison page — **untouched** (only cross-linked from the new pages).
+- ✅ The weekly Sunday blog cron — **untouched logic**, we only **append** new topics to its seed list.
+- ✅ The weekly SEO refresh cron — **untouched logic**, we only **append** keywords to its bank.
+- ✅ All 36 existing meta tags, FAQ schema, and AI-entity tags from last week's work — **kept as-is**.
+- ✅ Existing sitemap entries, routes, brand positioning ("100% Human, 0% AI"), Haris Falas attribution — **all preserved**.
+- ✅ No DB migrations, no auth changes, no business logic changes, no UI restructuring, no removed pages.
 
-## Phase 1 — Research (read-only, no code changes)
+What changes = pure additions on top of what's already winning.
 
-For each of the 12 domains, run two Semrush calls in parallel batches:
+## What gets ADDED (nothing replaced)
 
-- `semrush--domain_analysis` (database `us`) → top 25 organic keywords + traffic snapshot.
-- `semrush--top_pages` (database `us`) → top 25 highest-traffic URLs (reveals which content types win: "free workout plan", "HIIT app", "yoga at home", branded queries, etc.).
+### 1. Semrush recon (read-only, no code impact)
+Pull Freeletics + Peloton data → save report to `/mnt/documents/freeletics-peloton-attack-report.md`. Zero code touched.
 
-Then for the strongest non-branded clusters that appear across multiple competitors, run `semrush--keyword_research` on 5–8 head terms (e.g. "home workout app", "HIIT workouts", "best workout app", "strength training app", "pilates app", "free workout plan", "weight loss workout") to pull volume, KDI, related terms, and people-also-ask questions — those PAA strings are exactly what AI crawlers (ChatGPT, Claude, Perplexity, Gemini, Grok) cite.
+### 2. Two NEW conquest pages (additive routes)
+- `/smartygym-vs-freeletics` (new file)
+- `/smartygym-vs-peloton` (new file)
 
-Deliverable for the user: a written report grouped by:
-- **Branded queries** each competitor owns (and the "X alternative" variants we should target — most of these already exist in our `ai-entity` / `ai-topic` tags, we'll fill the gaps).
-- **Generic high-intent clusters** shared across competitors (home workout app, HIIT app, strength app, women's workout app, etc.), with volume + KDI bands.
-- **Question-format keywords** (PAA) that AI crawlers love to cite.
-- **Format/category keywords** (TABATA, AMRAP, EMOM, pilates at home, mobility routine…).
+Each follows the existing `BestOnlineFitnessPlatform.tsx` pattern (same components, same design system, same brand voice). Registered as **new** routes in `src/App.tsx` — no existing routes modified.
 
-Note on scope: Semrush returns Google data. Bing/Yandex generally mirror Google's keyword demand, so the same target list applies. For AI crawlers, the question-format PAA keywords from `keyword_research` are the primary signal.
+### 3. Blog cron seed list — APPEND only
+Add ~40 new topics to the array in `generate-weekly-blog-articles/index.ts`. The 25 topics already seeded last week stay. Generation logic untouched.
 
-## Phase 2 — SEO injection plan (the build that will follow)
+### 4. SEO refresh cron keyword bank — APPEND only
+Add new Freeletics/Peloton conquest keywords to the bank. Existing keywords stay. Logic untouched.
 
-Once the report is approved, the implementation will touch ONLY SEO surfaces — no UI/business-logic changes:
+### 5. Homepage meta tags — APPEND only
+Add 8–10 new `article:tag` / `ai-entity` / `ai-topic` entries to `index.html` + `src/pages/Index.tsx`. Nothing removed.
 
-1. **`/best-online-fitness-platform`** — extend `<meta name="ai-entity">`, `ai-topic`, `ai-comparison`, `article:tag` and add an `<meta name="keywords">` with the new clusters; add missing "X alternative" tags for any competitor not already covered; expand the comparison-table `aria-label` (already keyword-heavy) only if new competitor terms surface.
-2. **JSON-LD on the same page** — add a `FAQPage` block built from the highest-volume PAA questions (e.g. "what is the best home workout app", "is Fitbod worth it") with SmartyGym-positioned answers. AI crawlers consume FAQPage schema directly.
-3. **Homepage (`index.html` + `src/pages/Index.tsx` head)** — add the top 5–7 generic head terms to the site-wide `<meta name="keywords">` and AI-entity tag (without changing visible copy).
-4. **Per-cluster landing-page deltas** — update the `<title>`/`<meta description>` of existing pages that already target a cluster (e.g. `Tools`, `ExerciseLibrary`, `WhyInvestInSmartyGym`, `TheSmartyMethod`, `SmartyPlans`, blog index) to lead with the winning keyword phrasing from Semrush.
-5. **`weekly-seo-refresh` cron prompt** — extend the SEO-metadata generator's system prompt with the approved keyword bank so future workouts / programs / blog posts auto-include them in their generated `meta_title`, `meta_description`, `keywords`, and JSON-LD.
-6. **`generate-weekly-blog-articles` topic seed** — add a curated list of "SmartyGym vs <competitor>" and "Best <cluster> app 2026" titles so the Sunday automation publishes articles that capture competitor-alternative demand.
-7. **`public/sitemap.xml` + IndexNow trigger** — re-include the updated `/best-online-fitness-platform` URL with a fresh `lastmod` so Bing/Yandex re-crawl immediately via the existing IndexNow cron.
-8. **`public/robots.txt`** — confirm `GPTBot`, `ClaudeBot`, `PerplexityBot`, `Google-Extended`, `Applebot-Extended`, `Bytespider`, `CCBot`, `cohere-ai`, `Grok`, `Gemini` user-agents are explicitly Allowed (add any missing) so AI crawlers can index the freshly enriched pages.
+### 6. Sitemap — APPEND only
+Add the two new routes to `public/sitemap.xml` + `scripts/generate-sitemap.ts`. Existing entries untouched (only `lastmod` refresh on homepage to trigger re-crawl — same pattern we already use).
 
-## Technical details
+### 7. robots.txt — VERIFY + harden (no removals)
+Confirm GPTBot, ClaudeBot, PerplexityBot, Google-Extended, Applebot-Extended, Bytespider, CCBot, cohere-ai, Grok, Gemini are all explicitly allowed. Add any missing. Nothing existing removed.
 
-- All Semrush calls use database `us` first (largest dataset and the market most of these competitors target); for FIIT and Les Mills I'll add a `uk` pass since those are UK-anchored.
-- No edits to `src/integrations/supabase/*`, no DB migrations, no UI changes in Phase 2 — strictly head tags, JSON-LD, robots/sitemap, and edge-function prompt strings.
-- Memory rules respected: no marketing banners, no structural layout changes, no AI-coach mentions, brand stays "100% Human, 0% AI".
+### 8. Cross-links from existing pages — additive only
+Add small "Compare us with…" links from `/best-online-fitness-platform` and footer to the two new pages. No layout restructuring, no marketing banners (memory rule respected).
 
-## What I need from you
+## Files touched — additive summary
 
-Approve this plan and I'll run the 24 Semrush calls (12 × `domain_analysis` + 12 × `top_pages`) plus the 5–8 `keyword_research` calls, then come back with the full report and the concrete keyword list ready for Phase 2.
+| File | Action |
+|---|---|
+| `src/pages/SmartygymVsFreeletics.tsx` | **NEW file** |
+| `src/pages/SmartygymVsPeloton.tsx` | **NEW file** |
+| `src/App.tsx` | **Add** 2 route registrations |
+| `src/pages/BestOnlineFitnessPlatform.tsx` | **Add** cross-links only |
+| `src/pages/Index.tsx` + `index.html` | **Append** meta tags |
+| `supabase/functions/generate-weekly-blog-articles/index.ts` | **Append** topics |
+| `supabase/functions/weekly-seo-refresh/index.ts` | **Append** keywords |
+| `public/sitemap.xml` + `scripts/generate-sitemap.ts` | **Append** entries |
+| `public/robots.txt` | **Verify**, append missing crawlers if any |
+| `/mnt/documents/freeletics-peloton-attack-report.md` | **NEW deliverable** |
+
+## What is explicitly NOT touched
+- `src/integrations/supabase/*` (forbidden anyway)
+- Any existing route, page, or component logic
+- HFSC (off-limits per memory)
+- Brand positioning, color palette, layout standards
+- WOD generation, workout structure, exercise library
+- Auth, payments, RLS, DB schema
+- Existing blog topics, existing SEO keywords, existing meta tags
+
+## Bottom line
+This is a strict **append-and-add** update. Every existing winning system keeps running unchanged; we're stacking a focused Freeletics + Peloton conquest layer on top.
+
+Approve and I execute immediately.

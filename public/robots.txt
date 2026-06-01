@@ -567,6 +567,8 @@ Allow: /faq
 Allow: /community
 Allow: /wod-archive
 Allow: /best-online-fitness-platform
+Allow: /smartygym-vs-peloton
+Allow: /smartygym-vs-freeletics
 Allow: /caloriecounter
 Allow: /llms.txt
 Allow: /llms-full.txt

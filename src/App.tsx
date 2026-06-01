@@ -54,6 +54,8 @@ const CalorieCounter = lazy(() => import("./pages/CalorieCounter"));
 const RoundsTracker = lazy(() => import("./pages/RoundsTracker"));
 const Tools = lazy(() => import("./pages/Tools"));
 const BestOnlineFitnessPlatform = lazy(() => import("./pages/BestOnlineFitnessPlatform"));
+const SmartygymVsPeloton = lazy(() => import("./pages/SmartygymVsPeloton"));
+const SmartygymVsFreeletics = lazy(() => import("./pages/SmartygymVsFreeletics"));
 const Blog = lazy(() => import("./pages/Blog"));
 const About = lazy(() => import("./pages/About"));
 const FAQ = lazy(() => import("./pages/FAQ"));
@@ -349,6 +351,10 @@ const AppContent = () => {
                 <Route path="/tools" element={<Tools />} />
                 <Route path="/shop" element={<Shop />} />
                 <Route path="/best-online-fitness-platform" element={<BestOnlineFitnessPlatform />} />
+                <Route path="/smartygym-vs-peloton" element={<SmartygymVsPeloton />} />
+                <Route path="/smartygym-vs-peloton.html" element={<SmartygymVsPeloton />} />
+                <Route path="/smartygym-vs-freeletics" element={<SmartygymVsFreeletics />} />
+                <Route path="/smartygym-vs-freeletics.html" element={<SmartygymVsFreeletics />} />
                 <Route path="/the-smarty-method" element={<TheSmartyMethod />} />
                 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -37,6 +37,16 @@ const BRAND_KEYWORDS = [
   'exercise at home', 'workout anywhere'
 ];
 
+// Competitor conquest keywords (June 2026 — Freeletics & Peloton targeting)
+const CONQUEST_KEYWORDS = [
+  'peloton alternative', 'best peloton alternative', 'cheaper than peloton',
+  'peloton app without bike', 'peloton app worth it',
+  'freeletics alternative', 'best freeletics alternative',
+  'is freeletics worth it', 'freeletics coach alternative',
+  'human-designed workouts', 'no equipment workout app',
+  'best online fitness platform alternative'
+];
+
 // Multi-domain keywords (owned domains that redirect to smartygym.com)
 const DOMAIN_KEYWORDS = [
   'smartygym.com', 'i-training.net', 'itraining', 'i-training',
@@ -47,7 +57,7 @@ const DOMAIN_KEYWORDS = [
 ];
 
 // Combined - priority keywords come FIRST
-const KEYWORD_FAMILY = [...PRIORITY_KEYWORDS, ...BRAND_KEYWORDS, ...DOMAIN_KEYWORDS];
+const KEYWORD_FAMILY = [...PRIORITY_KEYWORDS, ...BRAND_KEYWORDS, ...CONQUEST_KEYWORDS, ...DOMAIN_KEYWORDS];
 
 interface ContentItem {
   id: string;
