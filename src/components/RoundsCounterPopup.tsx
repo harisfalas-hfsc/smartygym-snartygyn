@@ -108,22 +108,35 @@ export const RoundsCounterPopup = ({ open, onOpenChange }: RoundsCounterPopupPro
 
   if (isMinimized) {
     return (
-      <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-2 rounded-full bg-background/80 backdrop-blur-md border-2 border-primary/50 shadow-lg">
-        <div className="text-xl font-bold tabular-nums text-primary">
-          {bigDisplay}
-        </div>
-        <span className="text-xs text-muted-foreground">
-          {mode === "rounds-reps"
-            ? `R${roundsDone}/${targetRounds} · ${repsDone}/${targetReps}`
-            : `R${roundsDone}/${targetRounds}`}
-        </span>
-        <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => (mode === "rounds" ? tapRound() : tapRep())} disabled={isDone}>
-          <Plus className="h-4 w-4" />
-        </Button>
-        <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setIsMinimized(false)}>
+      <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 pl-2 pr-3 py-2 rounded-full bg-background/80 backdrop-blur-md border-2 border-primary/50 shadow-lg">
+        <button
+          onClick={handleBigTap}
+          disabled={isDone}
+          aria-label="Tap to count"
+          className={cn(
+            "flex items-center gap-2 px-4 py-2 rounded-full select-none touch-manipulation transition-all active:scale-95",
+            flash === "done"
+              ? "bg-emerald-500 text-white"
+              : flash === "tap"
+                ? "bg-primary/90 text-primary-foreground"
+                : "bg-primary text-primary-foreground hover:bg-primary/95",
+            isDone && "opacity-70"
+          )}
+        >
+          <div className="text-2xl font-black tabular-nums leading-none">
+            {bigDisplay}
+          </div>
+          <div className="text-[10px] font-semibold opacity-90 text-left leading-tight">
+            {isDone ? "🎉" : (mode === "rounds-reps" ? `R${roundsDone}/${targetRounds}` : "tap +1")}
+            {mode === "rounds-reps" && !isDone && (
+              <div className="opacity-80">{repsDone}/{targetReps}</div>
+            )}
+          </div>
+        </button>
+        <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={() => setIsMinimized(false)} aria-label="Expand">
           <Maximize2 className="h-4 w-4" />
         </Button>
-        <Button size="icon" variant="ghost" className="h-7 w-7" onClick={handleClose}>
+        <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={handleClose} aria-label="Close">
           <X className="h-4 w-4" />
         </Button>
       </div>
