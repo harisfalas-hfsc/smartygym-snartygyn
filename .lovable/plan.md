@@ -1,72 +1,75 @@
-# Plan: Freeletics & Peloton Conquest — 100% Additive Update
 
-## Confirmation: this is an UPDATE, not a re-orientation
+## What the audit really shows
 
-Nothing already working gets removed, rewritten, or re-oriented. Every existing system stays exactly as it is:
+The "0% delivery / 3 emails failed / Critical" alert in today's audit is **mostly a false alarm caused by a database bug**, plus **3 real Resend send failures** mixed in. I diagnosed both below.
 
-- ✅ The existing `/best-online-fitness-platform` comparison page — **untouched** (only cross-linked from the new pages).
-- ✅ The weekly Sunday blog cron — **untouched logic**, we only **append** new topics to its seed list.
-- ✅ The weekly SEO refresh cron — **untouched logic**, we only **append** keywords to its bank.
-- ✅ All 36 existing meta tags, FAQ schema, and AI-entity tags from last week's work — **kept as-is**.
-- ✅ Existing sitemap entries, routes, brand positioning ("100% Human, 0% AI"), Haris Falas attribution — **all preserved**.
-- ✅ No DB migrations, no auth changes, no business logic changes, no UI restructuring, no removed pages.
+### Issue A — False 0% delivery rate (silent logging bug)
 
-What changes = pure additions on top of what's already winning.
+`public.email_delivery_log` has this CHECK constraint:
 
-## What gets ADDED (nothing replaced)
+```
+status IN ('success', 'failed', 'skipped')
+```
 
-### 1. Semrush recon (read-only, no code impact)
-Pull Freeletics + Peloton data → save report to `/mnt/documents/freeletics-peloton-attack-report.md`. Zero code touched.
+But the shared helper `supabase/functions/_shared/email-log.ts` and **26+ call sites** across every email-sending edge function insert `status: 'sent'`. Every successful send tries to insert `'sent'`, the CHECK rejects it, the helper's `try/catch` swallows the error silently → **no successful sends ever get persisted**. Only failures land in the table.
 
-### 2. Two NEW conquest pages (additive routes)
-- `/smartygym-vs-freeletics` (new file)
-- `/smartygym-vs-peloton` (new file)
+Result: the audit divides `today_success / today_total` and sees only the 3 failed rows → reports "0% success (0/3)". In reality many more emails went out successfully today; they just never got logged.
 
-Each follows the existing `BestOnlineFitnessPlatform.tsx` pattern (same components, same design system, same brand voice). Registered as **new** routes in `src/App.tsx` — no existing routes modified.
+### Issue B — 3 real Resend failures today
 
-### 3. Blog cron seed list — APPEND only
-Add ~40 new topics to the array in `generate-weekly-blog-articles/index.ts`. The 25 topics already seeded last week stay. Generation logic untouched.
+The 3 rows in the table are genuine. All 3 are this week's `weekly-motivation` cron run on 2026-06-01 08:00 UTC:
 
-### 4. SEO refresh cron keyword bank — APPEND only
-Add new Freeletics/Peloton conquest keywords to the bank. Existing keywords stay. Logic untouched.
+```
+example@example.com       failed  Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+ar.andreas@gmail.com      failed  Failed to process email sending
+antoinc597@bellsouth.net  failed  Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+```
 
-### 5. Homepage meta tags — APPEND only
-Add 8–10 new `article:tag` / `ai-entity` / `ai-topic` entries to `index.html` + `src/pages/Index.tsx`. Nothing removed.
+"Unexpected token `<`, `<!DOCTYPE`" is the Resend SDK choking on an HTML response — Resend returned an HTML error page (typically 429 rate-limit, 5xx, or auth/quota page) instead of JSON. The send-weekly-motivation function already delays 600 ms between sends, but if Resend's free-tier daily quota or per-second rate limit was hit, this is what it looks like.
 
-### 6. Sitemap — APPEND only
-Add the two new routes to `public/sitemap.xml` + `scripts/generate-sitemap.ts`. Existing entries untouched (only `lastmod` refresh on homepage to trigger re-crawl — same pattern we already use).
+Also notable: `example@example.com` is a junk address that shouldn't be in `profiles` at all — it pollutes every weekly run.
 
-### 7. robots.txt — VERIFY + harden (no removals)
-Confirm GPTBot, ClaudeBot, PerplexityBot, Google-Extended, Applebot-Extended, Bytespider, CCBot, cohere-ai, Grok, Gemini are all explicitly allowed. Add any missing. Nothing existing removed.
+---
 
-### 8. Cross-links from existing pages — additive only
-Add small "Compare us with…" links from `/best-online-fitness-platform` and footer to the two new pages. No layout restructuring, no marketing banners (memory rule respected).
+## Plan
 
-## Files touched — additive summary
+### 1. Fix the status-mismatch (kills the false alarm permanently)
 
-| File | Action |
-|---|---|
-| `src/pages/SmartygymVsFreeletics.tsx` | **NEW file** |
-| `src/pages/SmartygymVsPeloton.tsx` | **NEW file** |
-| `src/App.tsx` | **Add** 2 route registrations |
-| `src/pages/BestOnlineFitnessPlatform.tsx` | **Add** cross-links only |
-| `src/pages/Index.tsx` + `index.html` | **Append** meta tags |
-| `supabase/functions/generate-weekly-blog-articles/index.ts` | **Append** topics |
-| `supabase/functions/weekly-seo-refresh/index.ts` | **Append** keywords |
-| `public/sitemap.xml` + `scripts/generate-sitemap.ts` | **Append** entries |
-| `public/robots.txt` | **Verify**, append missing crawlers if any |
-| `/mnt/documents/freeletics-peloton-attack-report.md` | **NEW deliverable** |
+Migration: widen the CHECK constraint to accept both `'sent'` and `'success'` so the existing 26+ call sites work and old rows stay valid:
 
-## What is explicitly NOT touched
-- `src/integrations/supabase/*` (forbidden anyway)
-- Any existing route, page, or component logic
-- HFSC (off-limits per memory)
-- Brand positioning, color palette, layout standards
-- WOD generation, workout structure, exercise library
-- Auth, payments, RLS, DB schema
-- Existing blog topics, existing SEO keywords, existing meta tags
+```sql
+ALTER TABLE public.email_delivery_log DROP CONSTRAINT email_delivery_log_status_check;
+ALTER TABLE public.email_delivery_log ADD CONSTRAINT email_delivery_log_status_check
+  CHECK (status IN ('sent', 'success', 'failed', 'skipped'));
+```
 
-## Bottom line
-This is a strict **append-and-add** update. Every existing winning system keeps running unchanged; we're stacking a focused Freeletics + Peloton conquest layer on top.
+Then update the audit query in `supabase/functions/run-system-health-audit/index.ts` (lines 1268–1290) and `run-quick-health-audit/index.ts` to count successes as `status IN ('sent','success')` rather than "total minus failed" — that way one stale junk row can't drag the rate to 0%.
 
-Approve and I execute immediately.
+No code changes needed in the 26 call sites — they keep writing `'sent'` and it now persists.
+
+### 2. Harden Resend error handling
+
+In `_shared/email-log.ts` and in `send-weekly-motivation/index.ts`:
+- When the Resend SDK throws the "Unexpected token '<'" JSON-parse error, capture and log the raw response status/text snippet into `metadata` so future failures are diagnosable instead of opaque.
+- In the weekly-motivation loop, on a rate-limit / HTML response, back off (e.g. 5 s) and retry once before logging `failed`.
+
+### 3. Clean junk recipient
+
+Add a guard in `send-weekly-motivation` (and the other bulk senders) to skip obvious placeholder addresses (`@example.com`, `@test.com`, `noreply@`) so they never count against delivery health.
+
+### 4. Verify
+
+After deploy:
+- Trigger `send-test-admin-email` once → confirm a row with `status='sent'` actually persists.
+- Re-run `run-quick-health-audit` → "Today's Delivery Rate" should now reflect reality (not 0%).
+- Check Resend dashboard for any quota/billing flag explaining the HTML response. (User-visible: I'll surface what I find; no manual action expected from you unless Resend's quota is actually exceeded.)
+
+### Files touched
+- New migration: widen `email_delivery_log_status_check`.
+- `supabase/functions/run-system-health-audit/index.ts` — fix success-rate query.
+- `supabase/functions/run-quick-health-audit/index.ts` — same fix.
+- `supabase/functions/_shared/email-log.ts` — richer error metadata.
+- `supabase/functions/send-weekly-motivation/index.ts` — retry + junk-email skip.
+
+### Not touched
+HFSC, WOD generation, SEO conquest pages, brand, layout, auth, payments, RLS, the 26 other email-sending functions' call sites.

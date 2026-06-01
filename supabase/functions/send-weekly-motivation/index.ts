@@ -366,6 +366,14 @@ serve(async (req) => {
           const userEmail = userData?.user?.email;
 
           if (userEmail) {
+            // Skip obvious placeholder / junk addresses so they never count
+            // against delivery health and never trigger Resend rate-limit errors.
+            const lowerEmail = userEmail.toLowerCase();
+            const isJunk = /@(example|test|invalid|localhost)\.|^noreply@|^no-reply@/.test(lowerEmail);
+            if (isJunk) {
+              logStep("Skipping junk/placeholder email", { userId: user.user_id, email: userEmail });
+              continue;
+            }
             try {
               // Check notification preferences - FIXED to use correct preference
               const { data: profile } = await supabaseAdmin
@@ -392,7 +400,8 @@ serve(async (req) => {
                 ctaText
               );
 
-              const emailResult = await resend.emails.send({
+              // Send with one retry on transient Resend errors (HTML / rate-limit / 5xx).
+              const sendOnce = () => resend.emails.send({
                 from: "SmartyGym <notifications@smartygym.com>",
                 reply_to: "smartygym@outlook.com",
                 to: [userEmail],
@@ -400,6 +409,21 @@ serve(async (req) => {
                 headers: getEmailHeaders(userEmail),
                 html: emailHtml,
               });
+              let emailResult: any;
+              try {
+                emailResult = await sendOnce();
+              } catch (transient: any) {
+                const msg = transient?.message || String(transient);
+                if (/Unexpected token '<'|rate|429|5\d\d/i.test(msg)) {
+                  logStep("Transient Resend error, backing off 5s and retrying once", {
+                    userId: user.user_id, email: userEmail, error: msg,
+                  });
+                  await new Promise((r) => setTimeout(r, 5000));
+                  emailResult = await sendOnce();
+                } else {
+                  throw transient;
+                }
+              }
               
               if (emailResult.error) {
                 logStep("Email API error", { userId: user.user_id, email: userEmail, error: emailResult.error });

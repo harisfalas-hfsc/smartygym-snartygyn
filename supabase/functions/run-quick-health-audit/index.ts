@@ -162,7 +162,7 @@ serve(async (req: Request): Promise<Response> => {
       .select('status')
       .gte('sent_at', yesterday);
     
-    const sentCount = emailStats?.filter(e => e.status === 'sent').length || 0;
+    const sentCount = emailStats?.filter(e => e.status === 'sent' || e.status === 'success').length || 0;
     const failedCount = emailStats?.filter(e => e.status === 'failed').length || 0;
     
     if (failedCount > 0 && failedCount > sentCount * 0.1) {
