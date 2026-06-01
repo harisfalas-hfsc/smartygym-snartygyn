@@ -287,6 +287,9 @@ export const SmartyCoachModal = ({ isOpen, onClose, initialPath = 'menu' }: Smar
           // Use small/dynamic viewport units for consistent mobile-browser chrome behavior.
           "w-[calc(100svw-2rem)] max-w-[22rem] sm:max-w-md mx-auto",
           "max-h-[calc(100svh-2rem)] supports-[height:100dvh]:max-h-[calc(100dvh-2rem)] sm:max-h-[85vh] overflow-y-auto overscroll-contain",
+          // Re-center vertically using small/dynamic viewport units so the modal
+          // is truly centered in the visible area on mobile (where vh != svh).
+          "!top-[50svh] supports-[height:100dvh]:!top-[50dvh]",
           "rounded-2xl bg-card border-2 border-primary/30 shadow-2xl shadow-primary/20",
           activePath === 'menu' ? "[&>button]:hidden" : ""
         )}
