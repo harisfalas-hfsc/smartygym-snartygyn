@@ -163,10 +163,10 @@ export const WorkoutTimerPopup = ({ open, onOpenChange }: WorkoutTimerPopupProps
     );
   }
 
-  // Expanded floating timer - transparent overlay
+  // Expanded floating timer - centered on screen
   return (
-    <div className="fixed inset-x-0 bottom-16 z-50 mx-auto max-w-sm px-4">
-      <div className="bg-background/50 backdrop-blur-sm border-2 border-primary/50 rounded-xl shadow-2xl p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+      <div className="bg-background/85 backdrop-blur-md border-2 border-primary/50 rounded-xl shadow-2xl p-4 w-full max-w-sm max-h-[85vh] overflow-y-auto pointer-events-auto">
         {/* Header with minimize/close */}
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-semibold text-primary">Workout Timer</h3>
