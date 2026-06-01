@@ -489,7 +489,7 @@ export const Navigation = () => {
              <Button
                variant="ghost"
                size="icon"
-               className="relative h-9 w-9 lg:h-11 lg:w-11"
+               className="relative h-9 w-9 mr-1.5 lg:h-11 lg:w-11 lg:mr-2"
                onClick={() => {
                  navigate("/userdashboard?tab=messages");
                  setTimeout(() => window.scrollTo(0, 0), 0);
