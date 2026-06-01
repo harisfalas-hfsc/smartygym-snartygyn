@@ -1,12 +1,28 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 export const useUnreadMessages = () => {
   const queryClient = useQueryClient();
+  const [userId, setUserId] = useState<string | null>(null);
+
+  // Track auth state so the query re-runs immediately after login
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUserId(session?.user?.id ?? null);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUserId(session?.user?.id ?? null);
+      queryClient.invalidateQueries({ queryKey: ['unread-messages-count'] });
+    });
+
+    return () => subscription.unsubscribe();
+  }, [queryClient]);
 
   const query = useQuery({
-    queryKey: ['unread-messages-count'],
+    queryKey: ['unread-messages-count', userId],
+    enabled: !!userId,
     queryFn: async () => {
       try {
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
