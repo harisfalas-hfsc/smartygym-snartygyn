@@ -351,6 +351,10 @@ const AppContent = () => {
                 <Route path="/tools" element={<Tools />} />
                 <Route path="/shop" element={<Shop />} />
                 <Route path="/best-online-fitness-platform" element={<BestOnlineFitnessPlatform />} />
+                <Route path="/smartygym-vs-peloton" element={<SmartygymVsPeloton />} />
+                <Route path="/smartygym-vs-peloton.html" element={<SmartygymVsPeloton />} />
+                <Route path="/smartygym-vs-freeletics" element={<SmartygymVsFreeletics />} />
+                <Route path="/smartygym-vs-freeletics.html" element={<SmartygymVsFreeletics />} />
                 <Route path="/the-smarty-method" element={<TheSmartyMethod />} />
                 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
