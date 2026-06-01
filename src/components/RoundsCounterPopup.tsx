@@ -189,10 +189,10 @@ export const RoundsCounterPopup = ({ open, onOpenChange }: RoundsCounterPopupPro
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
-      <div className="bg-background/85 backdrop-blur-md border-2 border-primary/50 rounded-xl shadow-2xl p-4 w-full max-w-sm max-h-[85vh] overflow-y-auto pointer-events-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-3 py-6 pointer-events-none">
+      <div className="bg-background/90 backdrop-blur-md border-2 border-primary/50 rounded-xl shadow-2xl p-3 w-full max-w-sm max-h-[calc(100svh-8rem)] overflow-y-auto pointer-events-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-2">
           <h3 className="text-sm font-semibold text-primary">Rounds Counter</h3>
           <div className="flex gap-1">
             <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => setIsMinimized(true)}>
@@ -205,7 +205,7 @@ export const RoundsCounterPopup = ({ open, onOpenChange }: RoundsCounterPopupPro
         </div>
 
         {/* Mode toggle */}
-        <div className="inline-flex rounded-full bg-muted p-0.5 w-full mb-3">
+        <div className="inline-flex rounded-full bg-muted p-0.5 w-full mb-2">
           <button
             onClick={() => { setMode("rounds"); handleReset(); }}
             className={cn(
@@ -227,7 +227,7 @@ export const RoundsCounterPopup = ({ open, onOpenChange }: RoundsCounterPopupPro
         </div>
 
         {/* Targets */}
-        <div className={cn("grid gap-2 mb-3", mode === "rounds-reps" ? "grid-cols-2" : "grid-cols-1")}>
+        <div className={cn("grid gap-2 mb-2", mode === "rounds-reps" ? "grid-cols-2" : "grid-cols-1")}>
           <div>
             <Label className="text-[10px] font-semibold">Target Rounds</Label>
             <Input
@@ -256,7 +256,7 @@ export const RoundsCounterPopup = ({ open, onOpenChange }: RoundsCounterPopupPro
         <button
           onClick={handleBigTap}
           className={cn(
-            "relative w-full rounded-lg select-none touch-manipulation h-28 transition-all duration-150 active:scale-[0.99] border-2 mb-3",
+            "relative w-full rounded-lg select-none touch-manipulation h-24 transition-all duration-150 active:scale-[0.99] border-2 mb-2",
             flash === "done"
               ? "bg-emerald-500 border-emerald-300"
               : flash === "tap"
@@ -270,7 +270,7 @@ export const RoundsCounterPopup = ({ open, onOpenChange }: RoundsCounterPopupPro
                 Round {Math.min(roundsDone + (isDone ? 0 : 1), targetRounds)} / {targetRounds}
               </div>
             )}
-            <div className="leading-none font-black tabular-nums drop-shadow-lg text-4xl">
+            <div className="leading-none font-black tabular-nums drop-shadow-lg text-3xl">
               {bigDisplay}
             </div>
             <div className="text-[11px] font-semibold opacity-90 mt-1">
@@ -292,20 +292,45 @@ export const RoundsCounterPopup = ({ open, onOpenChange }: RoundsCounterPopupPro
           </Button>
         </div>
 
-        {/* Direction toggle (rounds-only) */}
-        {mode === "rounds" && (
-          <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-            <span className="tabular-nums">
-              <span className="font-semibold text-foreground">{roundsDone}</span>/{targetRounds}
-            </span>
+        <div className="flex items-center justify-between gap-2 text-[11px] text-muted-foreground">
+          <span className="tabular-nums shrink-0">
+            <span className="font-semibold text-foreground">{roundsDone}</span>/{targetRounds}
+            {mode === "rounds-reps" && <span> · {repsDone}/{targetReps}</span>}
+          </span>
+          <div className="flex items-center gap-1">
+            {mode === "rounds" && (
             <button
               onClick={() => { setDirection(direction === "down" ? "up" : "down"); handleReset(); }}
               className="h-7 px-2 rounded-full text-[11px] font-semibold bg-muted/60 hover:bg-muted text-foreground transition-colors"
+              aria-label="Toggle count direction"
             >
-              {direction === "down" ? "⬇ Count Down" : "⬆ Count Up"}
+              {direction === "down" ? "⬇ Down" : "⬆ Up"}
+            </button>
+            )}
+            <button
+              onClick={() => setSoundOn((s) => !s)}
+              aria-label={soundOn ? "Turn sound off" : "Turn sound on"}
+              aria-pressed={soundOn}
+              className={cn(
+                "h-8 w-8 rounded-full flex items-center justify-center transition-colors",
+                soundOn ? "bg-primary text-primary-foreground" : "bg-muted/60 hover:bg-muted text-foreground"
+              )}
+            >
+              {soundOn ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+            </button>
+            <button
+              onClick={() => setHapticOn((s) => !s)}
+              aria-label={hapticOn ? "Turn vibration off" : "Turn vibration on"}
+              aria-pressed={hapticOn}
+              className={cn(
+                "h-8 w-8 rounded-full flex items-center justify-center transition-colors",
+                hapticOn ? "bg-primary text-primary-foreground" : "bg-muted/60 hover:bg-muted text-foreground"
+              )}
+            >
+              <Vibrate className="h-4 w-4" />
             </button>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
