@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RotateCcw, Plus, Minus, X, Minimize2, Maximize2 } from "lucide-react";
+import { RotateCcw, Plus, Minus, X, Minimize2, Maximize2, Volume2, VolumeX, Vibrate } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface RoundsCounterPopupProps {
@@ -24,8 +24,42 @@ export const RoundsCounterPopup = ({ open, onOpenChange }: RoundsCounterPopupPro
   const [repsDone, setRepsDone] = useState(0);
   const [flash, setFlash] = useState<"none" | "tap" | "done">("none");
   const [isMinimized, setIsMinimized] = useState(false);
+  const [soundOn, setSoundOn] = useState(true);
+  const [hapticOn, setHapticOn] = useState(true);
+  const audioCtxRef = useRef<AudioContext | null>(null);
 
   const isDone = roundsDone >= targetRounds;
+
+  const beep = useCallback((freq = 800, dur = 0.15) => {
+    if (!soundOn) return;
+    try {
+      let ctx = audioCtxRef.current;
+      if (!ctx) {
+        const Ctor = window.AudioContext || (window as any).webkitAudioContext;
+        if (!Ctor) return;
+        ctx = new Ctor();
+        audioCtxRef.current = ctx;
+      }
+      if (ctx.state === "suspended") ctx.resume().catch(() => {});
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value = freq;
+      osc.type = "sine";
+      gain.gain.setValueAtTime(0.32, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + dur);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + dur);
+    } catch {
+      // Ignore unsupported audio contexts.
+    }
+  }, [soundOn]);
+
+  const vibrate = useCallback((ms: number | number[]) => {
+    if (!hapticOn) return;
+    try { navigator.vibrate?.(ms); } catch { /* ignore */ }
+  }, [hapticOn]);
 
   const commit = (val: string, setVal: (n: number) => void, setInput: (s: string) => void) => {
     const n = Math.max(1, parseInt(val) || 1);
@@ -50,9 +84,13 @@ export const RoundsCounterPopup = ({ open, onOpenChange }: RoundsCounterPopupPro
     setRoundsDone(next);
     setRepsDone(0);
     if (next >= targetRounds) {
+      beep(1200, 0.6);
+      vibrate([80, 60, 160]);
       setFlash("done");
       setTimeout(() => setFlash("none"), 1200);
     } else {
+      beep(800, 0.15);
+      vibrate(45);
       setFlash("tap");
       setTimeout(() => setFlash("none"), 180);
     }
@@ -65,14 +103,20 @@ export const RoundsCounterPopup = ({ open, onOpenChange }: RoundsCounterPopupPro
       setRoundsDone(nextRounds);
       setRepsDone(0);
       if (nextRounds >= targetRounds) {
+        beep(1200, 0.6);
+        vibrate([80, 60, 160]);
         setFlash("done");
         setTimeout(() => setFlash("none"), 1200);
       } else {
+        beep(1000, 0.25);
+        vibrate([55, 35, 55]);
         setFlash("tap");
         setTimeout(() => setFlash("none"), 220);
       }
     } else {
       setRepsDone(nextReps);
+      beep(700, 0.08);
+      vibrate(25);
       setFlash("tap");
       setTimeout(() => setFlash("none"), 120);
     }
@@ -94,6 +138,7 @@ export const RoundsCounterPopup = ({ open, onOpenChange }: RoundsCounterPopupPro
         setRepsDone(Math.max(0, targetReps - 1));
       }
     }
+    vibrate(20);
   };
 
   const roundsRemaining = Math.max(0, targetRounds - roundsDone);
