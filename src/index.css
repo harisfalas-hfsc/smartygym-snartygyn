@@ -1154,9 +1154,17 @@ html {
 
 /* Main app wrapper gets safe-area padding */
 body {
-  padding-top: var(--sat);
+  /*
+   * IMPORTANT: do NOT pad the body with safe-area-inset-top/bottom.
+   * Our header is `position: fixed; top: 0` and our mobile bottom nav is
+   * `position: fixed; bottom: 0` — both are positioned relative to the
+   * viewport, so padding the body doesn't move them but DOES push the
+   * in-flow content down, leaving an empty gap between the fixed header
+   * and the page content in PWA standalone / edge-to-edge Android, and
+   * a gap above the bottom nav. Each fixed element handles its own
+   * safe-area inset internally instead.
+   */
   padding-right: var(--sar);
-  padding-bottom: var(--sab);
   padding-left: var(--sal);
 }
 
