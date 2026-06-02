@@ -892,8 +892,7 @@ export default function AboutSmartyGym() {
               <div className="p-4 bg-muted/30 rounded-lg border border-border text-center">
                 <h4 className="font-semibold mb-2">Want to Try Before You Subscribe?</h4>
                 <p className="text-sm text-muted-foreground mb-3">
-                  Purchase individual premium workouts or training programs without a subscription. 
-                  Perfect for trying out SmartyGym!
+                  Browse and filter free workouts and free training programs, or buy individual premium workouts and programs as standalone purchases — no subscription required.
                 </p>
                 <div className="flex flex-wrap justify-center gap-2">
                   <Link to="/workout">
@@ -906,23 +905,6 @@ export default function AboutSmartyGym() {
               </div>
             </CardContent>
           </Card>
-
-          {/* CTA */}
-          <div className="text-center space-y-4">
-            <p className="text-muted-foreground">Ready to start your journey?</p>
-            <div className="flex flex-wrap justify-center gap-3">
-              <Link to="/auth">
-                <Button size="lg">
-                  Get Started Free
-                </Button>
-              </Link>
-              <Link to="/coach-profile">
-                <Button variant="outline" size="lg">
-                  Meet Your Coach
-                </Button>
-              </Link>
-            </div>
-          </div>
         </main>
       </div>
     </>
