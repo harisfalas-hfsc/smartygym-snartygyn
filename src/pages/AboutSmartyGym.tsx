@@ -557,6 +557,10 @@ export default function AboutSmartyGym() {
                 <h4 className="font-semibold mb-3">What's Inside</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   <div className="flex items-center gap-2 p-2 bg-background rounded-lg text-sm border border-border">
+                    <Timer className="h-4 w-4 text-blue-500" />
+                    <span>Workout Timer</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-2 bg-background rounded-lg text-sm border border-border">
                     <Dumbbell className="h-4 w-4 text-rose-500" />
                     <span>1RM Calculator</span>
                   </div>
