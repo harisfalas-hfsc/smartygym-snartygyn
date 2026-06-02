@@ -335,7 +335,7 @@ export default function AboutSmartyGym() {
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
-                    <span><strong>Standalone Purchase:</strong> Buy individual premium workouts without a subscription</span>
+                    <span><strong>Standalone Purchase:</strong> Buy individual premium workouts — no paid plan required</span>
                   </li>
                 </ul>
               </div>
@@ -402,7 +402,7 @@ export default function AboutSmartyGym() {
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
-                    <span><strong>Standalone Purchase:</strong> Buy individual premium programs without a subscription</span>
+                    <span><strong>Standalone Purchase:</strong> Buy individual premium programs — no paid plan required</span>
                   </li>
                 </ul>
               </div>
@@ -890,9 +890,9 @@ export default function AboutSmartyGym() {
 
               {/* Standalone Purchase */}
               <div className="p-4 bg-muted/30 rounded-lg border border-border text-center">
-                <h4 className="font-semibold mb-2">Want to Try Before You Subscribe?</h4>
+                <h4 className="font-semibold mb-2">Not Ready for a Plan?</h4>
                 <p className="text-sm text-muted-foreground mb-3">
-                  Browse and filter free workouts and free training programs, or buy individual premium workouts and programs as standalone purchases — no subscription required.
+                  Create a free SmartyGym account to browse and filter our free workouts and free training programs, or buy individual premium workouts and programs as standalone purchases — no paid plan required.
                 </p>
                 <div className="flex flex-wrap justify-center gap-2">
                   <Link to="/workout">
