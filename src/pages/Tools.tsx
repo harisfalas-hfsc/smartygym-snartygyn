@@ -45,6 +45,24 @@ const Tools = () => {
 
   const tools = [
     {
+      id: "workout-timer",
+      icon: Timer,
+      title: "Workout Timer",
+      description: "Customizable interval timer for HIIT, Tabata, and circuit training sessions",
+      route: "/tools/workout-timer",
+      image: timerBg,
+      mobileImage: timerCardMobile
+    },
+    {
+      id: "rounds-tracker",
+      icon: Hash,
+      title: "Rounds Tracker",
+      description: "Big-button counter — tap to track rounds and optional reps during your workout",
+      route: "/tools/rounds-tracker",
+      image: roundsBg,
+      mobileImage: roundsBg
+    },
+    {
       id: "1rm-calculator",
       icon: Calculator,
       title: "1RM Calculator",
@@ -72,15 +90,6 @@ const Tools = () => {
       mobileImage: macroCardMobile
     },
     {
-      id: "workout-timer",
-      icon: Timer,
-      title: "Workout Timer",
-      description: "Customizable interval timer for HIIT, Tabata, and circuit training sessions",
-      route: "/tools/workout-timer",
-      image: timerBg,
-      mobileImage: timerCardMobile
-    },
-    {
       id: "calorie-counter",
       icon: Search,
       title: "Calorie Counter",
@@ -88,15 +97,6 @@ const Tools = () => {
       route: "/tools/calorie-counter",
       image: calorieBg,
       mobileImage: calorieCardMobile
-    },
-    {
-      id: "rounds-tracker",
-      icon: Hash,
-      title: "Rounds Tracker",
-      description: "Big-button counter — tap to track rounds and optional reps during your workout",
-      route: "/tools/rounds-tracker",
-      image: roundsBg,
-      mobileImage: roundsBg
     }
   ];
 
