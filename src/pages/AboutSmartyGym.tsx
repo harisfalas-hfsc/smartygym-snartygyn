@@ -335,7 +335,7 @@ export default function AboutSmartyGym() {
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
-                    <span><strong>Standalone Purchase:</strong> Buy individual premium workouts without a subscription</span>
+                    <span><strong>Standalone Purchase:</strong> Buy individual premium workouts — no paid plan required</span>
                   </li>
                 </ul>
               </div>
@@ -402,7 +402,7 @@ export default function AboutSmartyGym() {
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
-                    <span><strong>Standalone Purchase:</strong> Buy individual premium programs without a subscription</span>
+                    <span><strong>Standalone Purchase:</strong> Buy individual premium programs — no paid plan required</span>
                   </li>
                 </ul>
               </div>
