@@ -1,5 +1,11 @@
 import { Helmet } from "react-helmet";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAccessControl } from "@/hooks/useAccessControl";
+import { useToast } from "@/hooks/use-toast";
+import { STRIPE_PRICE_IDS } from "@/config/pricing";
+import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -40,7 +46,43 @@ import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 
 export default function AboutSmartyGym() {
-  
+  const navigate = useNavigate();
+  const { user, userTier } = useAccessControl();
+  const { toast } = useToast();
+  const [loadingPlan, setLoadingPlan] = useState<"gold" | "platinum" | null>(null);
+  const isPremium = userTier === "premium";
+
+  const handlePlanClick = async (plan: "gold" | "platinum") => {
+    if (isPremium) {
+      navigate("/userdashboard");
+      return;
+    }
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+    setLoadingPlan(plan);
+    try {
+      const priceId = plan === "gold" ? STRIPE_PRICE_IDS.gold : STRIPE_PRICE_IDS.platinum;
+      const { data, error } = await supabase.functions.invoke("create-checkout", {
+        body: { priceId },
+      });
+      if (error) throw error;
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error("No checkout URL returned");
+      }
+    } catch (err) {
+      console.error("Checkout error:", err);
+      toast({
+        title: "Error",
+        description: err instanceof Error ? err.message : "Could not start checkout. Please try again.",
+        variant: "destructive",
+      });
+      setLoadingPlan(null);
+    }
+  };
 
   const workoutCategories = [
     { name: "Strength", icon: <Dumbbell className="h-4 w-4 text-rose-500" /> },
@@ -515,6 +557,10 @@ export default function AboutSmartyGym() {
                 <h4 className="font-semibold mb-3">What's Inside</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   <div className="flex items-center gap-2 p-2 bg-background rounded-lg text-sm border border-border">
+                    <Timer className="h-4 w-4 text-blue-500" />
+                    <span>Workout Timer</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-2 bg-background rounded-lg text-sm border border-border">
                     <Dumbbell className="h-4 w-4 text-rose-500" />
                     <span>1RM Calculator</span>
                   </div>
@@ -741,7 +787,13 @@ export default function AboutSmartyGym() {
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
                 {/* Gold Plan */}
-                <div className="p-5 rounded-lg border-2 border-[#D4AF37] shadow-lg">
+                <button
+                  type="button"
+                  onClick={() => handlePlanClick("gold")}
+                  disabled={loadingPlan !== null}
+                  className="text-left p-5 rounded-lg border-2 border-[#D4AF37] shadow-lg transition-all hover:shadow-xl hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-[#D4AF37] focus:ring-offset-2 cursor-pointer disabled:opacity-70 disabled:cursor-wait"
+                  aria-label={isPremium ? "Go to your dashboard" : "Subscribe to Gold Plan"}
+                >
                   <div className="text-center mb-3">
                     <h4 className="text-xl font-bold text-[#D4AF37] mb-2">Gold Plan</h4>
                     <Badge className="bg-[#D4AF37] text-white mb-3">MONTHLY</Badge>
@@ -770,10 +822,25 @@ export default function AboutSmartyGym() {
                       Flexible monthly billing
                     </li>
                   </ul>
-                </div>
+                  <div className="mt-4 text-center text-xs font-semibold text-[#D4AF37] flex items-center justify-center gap-1">
+                    {loadingPlan === "gold" ? (
+                      <><Loader2 className="h-3 w-3 animate-spin" /> Starting checkout…</>
+                    ) : isPremium ? (
+                      "✓ Included in your plan"
+                    ) : (
+                      "Click to subscribe →"
+                    )}
+                  </div>
+                </button>
 
                 {/* Platinum Plan */}
-                <div className="p-5 rounded-lg border-2 border-[#A8A9AD] shadow-lg bg-gradient-to-br from-[#A8A9AD]/5 to-[#C0C0C0]/10 relative">
+                <button
+                  type="button"
+                  onClick={() => handlePlanClick("platinum")}
+                  disabled={loadingPlan !== null}
+                  className="text-left p-5 rounded-lg border-2 border-[#A8A9AD] shadow-lg bg-gradient-to-br from-[#A8A9AD]/5 to-[#C0C0C0]/10 relative transition-all hover:shadow-xl hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-[#A8A9AD] focus:ring-offset-2 cursor-pointer disabled:opacity-70 disabled:cursor-wait"
+                  aria-label={isPremium ? "Go to your dashboard" : "Subscribe to Platinum Plan"}
+                >
                   <Badge className="absolute -top-2 right-2 bg-green-600 text-white px-3 py-1 text-xs shadow-md z-10">
                     BEST VALUE
                   </Badge>
@@ -809,7 +876,16 @@ export default function AboutSmartyGym() {
                       Best value - save 25%
                     </li>
                   </ul>
-                </div>
+                  <div className="mt-4 text-center text-xs font-semibold text-[#A8A9AD] flex items-center justify-center gap-1">
+                    {loadingPlan === "platinum" ? (
+                      <><Loader2 className="h-3 w-3 animate-spin" /> Starting checkout…</>
+                    ) : isPremium ? (
+                      "✓ Included in your plan"
+                    ) : (
+                      "Click to subscribe →"
+                    )}
+                  </div>
+                </button>
               </div>
 
               {/* Standalone Purchase */}
@@ -825,14 +901,6 @@ export default function AboutSmartyGym() {
                   </Link>
                   <Link to="/trainingprogram">
                     <Button variant="outline" size="sm">Browse Programs</Button>
-                  </Link>
-                  <Link to="/joinpremium">
-                    <Button size="sm">View All Plans</Button>
-                  </Link>
-                  <Link to="/smarty-plans">
-                    <Button size="sm" variant="default" className="bg-green-600 hover:bg-green-700">
-                      Start Your Plan
-                    </Button>
                   </Link>
                 </div>
               </div>
