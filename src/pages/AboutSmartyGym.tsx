@@ -787,7 +787,13 @@ export default function AboutSmartyGym() {
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
                 {/* Gold Plan */}
-                <div className="p-5 rounded-lg border-2 border-[#D4AF37] shadow-lg">
+                <button
+                  type="button"
+                  onClick={() => handlePlanClick("gold")}
+                  disabled={loadingPlan !== null}
+                  className="text-left p-5 rounded-lg border-2 border-[#D4AF37] shadow-lg transition-all hover:shadow-xl hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-[#D4AF37] focus:ring-offset-2 cursor-pointer disabled:opacity-70 disabled:cursor-wait"
+                  aria-label={isPremium ? "Go to your dashboard" : "Subscribe to Gold Plan"}
+                >
                   <div className="text-center mb-3">
                     <h4 className="text-xl font-bold text-[#D4AF37] mb-2">Gold Plan</h4>
                     <Badge className="bg-[#D4AF37] text-white mb-3">MONTHLY</Badge>
@@ -816,10 +822,25 @@ export default function AboutSmartyGym() {
                       Flexible monthly billing
                     </li>
                   </ul>
-                </div>
+                  <div className="mt-4 text-center text-xs font-semibold text-[#D4AF37] flex items-center justify-center gap-1">
+                    {loadingPlan === "gold" ? (
+                      <><Loader2 className="h-3 w-3 animate-spin" /> Starting checkout…</>
+                    ) : isPremium ? (
+                      "✓ Included in your plan"
+                    ) : (
+                      "Click to subscribe →"
+                    )}
+                  </div>
+                </button>
 
                 {/* Platinum Plan */}
-                <div className="p-5 rounded-lg border-2 border-[#A8A9AD] shadow-lg bg-gradient-to-br from-[#A8A9AD]/5 to-[#C0C0C0]/10 relative">
+                <button
+                  type="button"
+                  onClick={() => handlePlanClick("platinum")}
+                  disabled={loadingPlan !== null}
+                  className="text-left p-5 rounded-lg border-2 border-[#A8A9AD] shadow-lg bg-gradient-to-br from-[#A8A9AD]/5 to-[#C0C0C0]/10 relative transition-all hover:shadow-xl hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-[#A8A9AD] focus:ring-offset-2 cursor-pointer disabled:opacity-70 disabled:cursor-wait"
+                  aria-label={isPremium ? "Go to your dashboard" : "Subscribe to Platinum Plan"}
+                >
                   <Badge className="absolute -top-2 right-2 bg-green-600 text-white px-3 py-1 text-xs shadow-md z-10">
                     BEST VALUE
                   </Badge>
@@ -855,7 +876,16 @@ export default function AboutSmartyGym() {
                       Best value - save 25%
                     </li>
                   </ul>
-                </div>
+                  <div className="mt-4 text-center text-xs font-semibold text-[#A8A9AD] flex items-center justify-center gap-1">
+                    {loadingPlan === "platinum" ? (
+                      <><Loader2 className="h-3 w-3 animate-spin" /> Starting checkout…</>
+                    ) : isPremium ? (
+                      "✓ Included in your plan"
+                    ) : (
+                      "Click to subscribe →"
+                    )}
+                  </div>
+                </button>
               </div>
 
               {/* Standalone Purchase */}
@@ -871,14 +901,6 @@ export default function AboutSmartyGym() {
                   </Link>
                   <Link to="/trainingprogram">
                     <Button variant="outline" size="sm">Browse Programs</Button>
-                  </Link>
-                  <Link to="/joinpremium">
-                    <Button size="sm">View All Plans</Button>
-                  </Link>
-                  <Link to="/smarty-plans">
-                    <Button size="sm" variant="default" className="bg-green-600 hover:bg-green-700">
-                      Start Your Plan
-                    </Button>
                   </Link>
                 </div>
               </div>
