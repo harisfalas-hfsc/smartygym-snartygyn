@@ -283,8 +283,7 @@ export const Navigation = () => {
     <>
     <header
       ref={headerRef}
-      className="fixed top-0 left-0 right-0 z-50 bg-background pb-0.5 px-4"
-      style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 0.5rem)' }}
+      className="fixed top-0 left-0 right-0 z-50 bg-background pt-2 pb-0.5 px-4"
     >
       <div className="mx-auto max-w-7xl">
         <div className="relative flex items-center justify-between gap-2 lg:gap-4">
