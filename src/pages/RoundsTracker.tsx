@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { RotateCcw, Plus, Minus, Volume2, VolumeX, Vibrate, Lock, Unlock, Maximize2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
+import { useKeepScreenAwake } from "@/hooks/useKeepScreenAwake";
 
 type Mode = "rounds" | "rounds-reps";
 type Direction = "down" | "up";
@@ -70,27 +71,15 @@ const RoundsTracker = () => {
   const [soundOn, setSoundOn] = useState(true);
   const [hapticOn, setHapticOn] = useState(true);
   const [flash, setFlash] = useState<"none" | "tap" | "done">("none");
-  const wakeLockRef = useRef<WakeLockSentinel | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const [locked, setLocked] = useState(false);
   const [unlockHold, setUnlockHold] = useState(0);
   const unlockTimerRef = useRef<number | null>(null);
   const rootRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    const request = async () => {
-      if ("wakeLock" in navigator) {
-        try { wakeLockRef.current = await (navigator as any).wakeLock.request("screen"); } catch { /* ignore */ }
-      }
-    };
-    request();
-    const onVis = () => { if (document.visibilityState === "visible") request(); };
-    document.addEventListener("visibilitychange", onVis);
-    return () => {
-      document.removeEventListener("visibilitychange", onVis);
-      wakeLockRef.current?.release(); wakeLockRef.current = null;
-    };
-  }, []);
+  // Keep screen awake the whole time the user is on this tool — covers iOS,
+  // Android, PWA, and in-app WebViews. Re-acquires after visibility changes.
+  useKeepScreenAwake(true);
 
   // Exit lock if user leaves fullscreen via system gesture
   useEffect(() => {
