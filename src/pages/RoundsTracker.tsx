@@ -103,10 +103,14 @@ const RoundsTracker = () => {
 
   const enterLock = async () => {
     setLocked(true);
+    // Best-effort native fullscreen + orientation lock — visual lock overlay
+    // renders regardless so behavior is identical on iOS Safari, Android
+    // Chrome, PWA standalone, and in-app WebViews where these APIs may not
+    // be supported.
     try {
-      const el: any = rootRef.current || document.documentElement;
-      if (el.requestFullscreen) await el.requestFullscreen();
-      else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+      const el: any = document.documentElement;
+      if (el.requestFullscreen) { el.requestFullscreen().catch(() => {}); }
+      else if (el.webkitRequestFullscreen) { try { el.webkitRequestFullscreen(); } catch { /* ignore */ } }
     } catch { /* ignore */ }
     try { (screen.orientation as any)?.lock?.("portrait").catch(() => {}); } catch { /* ignore */ }
   };
@@ -117,6 +121,14 @@ const RoundsTracker = () => {
     if (unlockTimerRef.current) { window.clearInterval(unlockTimerRef.current); unlockTimerRef.current = null; }
     try { if (document.fullscreenElement) await document.exitFullscreen(); } catch { /* ignore */ }
   };
+
+  // Prevent body scroll while locked overlay is open (mobile/PWA reliability)
+  useEffect(() => {
+    if (!locked) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, [locked]);
 
   const startUnlock = () => {
     if (unlockTimerRef.current) return;

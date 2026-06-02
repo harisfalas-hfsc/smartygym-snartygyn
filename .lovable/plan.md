@@ -1,38 +1,42 @@
-## About Smarty Gym page — two small fixes
+## What I found
 
-### 1. Smarty Tools section — add Workout Timer
+The screenshots you attached are not the real fullscreen/locked state. They show the normal Rounds Tracker card with the small maximize icon still visible in the bottom-right. The true locked state already exists in `RoundsTracker.tsx` and should show:
 
-In Section 6 ("Smarty Tools"), the "What's Inside" grid currently lists 5 tools but is missing the Workout Timer (which is actually the first/most-used tool).
+- a full-screen blue tap area
+- no normal card chrome
+- a floating circular HOLD/Unlock control
+- the text “Locked — hold button to exit”
 
-Add a 6th entry to the grid (between 1RM Calculator and the rest, as the first item) using the existing `Timer` icon (already imported) and a blue accent color, matching the visual style of the other rows:
+So if the website/PWA stays like your screenshots after pressing maximize, the click is not reliably entering the `locked` UI state on that environment.
 
-- Workout Timer
-- 1RM Calculator
-- BMR Calculator
-- Macro Tracking Calculator
-- Calorie Counter
-- Rounds Tracker
+## Why APK can be different
 
-No other changes to that section.
+Your APK/native wrapper is detected as a native platform and the app clears old PWA service workers/caches there. The browser/PWA version can still be affected by browser display/fullscreen limitations and older cached PWA behavior. Also, `requestFullscreen()` is not equally supported in every mobile browser/PWA shell, so the current code ties the visual lock action too closely to browser fullscreen support.
 
-### 2. Plans section — make Gold and Platinum cards clickable
+## Implementation plan
 
-Currently the two plan cards are static and the user has to scroll down to extra buttons ("View All Plans" / "Start Your Plan") to subscribe.
+1. **Make the visual lock independent from browser fullscreen**
+   - When the user taps the maximize icon, immediately render the locked full-screen overlay.
+   - Treat native fullscreen/orientation lock as optional enhancements only.
+   - If browser fullscreen fails, the visual locked overlay will still appear identically.
 
-Change to:
+2. **Harden mobile/PWA behavior**
+   - Add mobile-safe viewport sizing using `100dvh/100svh` fallback styling for the locked overlay.
+   - Prevent page scrolling/body movement while locked.
+   - Keep the HOLD unlock button visible above safe-area/bottom navigation on Android, iOS, PWA, and browser.
 
-- Wrap each plan card (Gold and Platinum) in a clickable container with hover state (cursor-pointer, subtle lift/shadow on hover, focus ring for accessibility).
-- On click:
-  - If the user is **already premium** (`userTier === "premium"` from `useAccessControl`) → navigate to `/userdashboard` (same destination as the "Already Premium" flow).
-  - If the user is **not logged in** → navigate to `/auth` with intent to subscribe.
-  - Otherwise → call the existing `create-checkout` edge function with the matching `STRIPE_PRICE_IDS.gold` or `STRIPE_PRICE_IDS.platinum` (same pattern used in `src/pages/SmartyPlans.tsx` and `JoinPremium.tsx`) and redirect to the returned Stripe checkout URL.
-- Show a small loading state on the clicked card while the checkout session is being created.
-- Add a hint line ("Click to subscribe" or "✓ Your plan" for premium users) so the affordance is clear.
-- Remove the redundant "View All Plans" and "Start Your Plan" buttons from the "Want to Try Before You Subscribe?" block. Keep "Browse Workouts" and "Browse Programs" since those serve a different purpose (standalone purchases).
+3. **Improve the maximize button reliability**
+   - Use pointer/touch-safe handling so one tap reliably triggers locked mode.
+   - Stop accidental event conflicts with the surrounding card/tap area.
+   - Keep changes only inside the standalone `/tools/rounds-tracker` page.
 
-### Technical notes
+4. **Do not touch workout/training program tool popups**
+   - No changes to `RoundsCounterPopup.tsx`, workout pages, or training program pages.
 
-- File touched: `src/pages/AboutSmartyGym.tsx` only.
-- Reuse: `STRIPE_PRICE_IDS` from `@/config/pricing`, `supabase.functions.invoke('create-checkout', ...)`, `useAccessControl`, `useNavigate`, `useToast`.
-- No backend, schema, or pricing changes. No changes to any other page.
-- Scope is global (any visitor to /about benefits automatically — no per-page rollout needed).
+5. **Verification**
+   - Check the standalone Rounds Tracker route at a mobile viewport similar to your screenshots.
+   - Confirm pressing maximize switches to the locked overlay and shows the HOLD unlock control.
+
+## Files to change
+
+- `src/pages/RoundsTracker.tsx` only.
