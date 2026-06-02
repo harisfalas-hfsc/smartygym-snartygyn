@@ -1,5 +1,11 @@
 import { Helmet } from "react-helmet";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAccessControl } from "@/hooks/useAccessControl";
+import { useToast } from "@/hooks/use-toast";
+import { STRIPE_PRICE_IDS } from "@/config/pricing";
+import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -40,7 +46,43 @@ import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 
 export default function AboutSmartyGym() {
-  
+  const navigate = useNavigate();
+  const { user, userTier } = useAccessControl();
+  const { toast } = useToast();
+  const [loadingPlan, setLoadingPlan] = useState<"gold" | "platinum" | null>(null);
+  const isPremium = userTier === "premium";
+
+  const handlePlanClick = async (plan: "gold" | "platinum") => {
+    if (isPremium) {
+      navigate("/userdashboard");
+      return;
+    }
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+    setLoadingPlan(plan);
+    try {
+      const priceId = plan === "gold" ? STRIPE_PRICE_IDS.gold : STRIPE_PRICE_IDS.platinum;
+      const { data, error } = await supabase.functions.invoke("create-checkout", {
+        body: { priceId },
+      });
+      if (error) throw error;
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error("No checkout URL returned");
+      }
+    } catch (err) {
+      console.error("Checkout error:", err);
+      toast({
+        title: "Error",
+        description: err instanceof Error ? err.message : "Could not start checkout. Please try again.",
+        variant: "destructive",
+      });
+      setLoadingPlan(null);
+    }
+  };
 
   const workoutCategories = [
     { name: "Strength", icon: <Dumbbell className="h-4 w-4 text-rose-500" /> },
