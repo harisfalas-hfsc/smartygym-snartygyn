@@ -183,6 +183,18 @@ const Tools = () => {
               {/* Desktop only - detailed calculator descriptions */}
               <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-6 gap-4 mt-4">
                 <div>
+                  <h3 className="font-semibold text-foreground mb-2 whitespace-nowrap"><span className="text-primary font-semibold">Workout Timer</span></h3>
+                  <p className="text-sm">
+                    Customizable interval timer for HIIT, Tabata, and circuit training sessions.
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground mb-2 whitespace-nowrap"><span className="text-primary font-semibold">Rounds Tracker</span></h3>
+                  <p className="text-sm">
+                    Big-button tap counter for rounds and optional reps — perfect for AMRAP, EMOM, and circuit training.
+                  </p>
+                </div>
+                <div>
                   <h3 className="font-semibold text-foreground mb-2 whitespace-nowrap"><span className="text-primary font-semibold">1RM Calculator</span></h3>
                   <p className="text-sm">
                     Uses the Brzycki formula to estimate your one-rep maximum. Essential for programming strength training.
@@ -201,21 +213,9 @@ const Tools = () => {
                   </p>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-foreground mb-2 whitespace-nowrap"><span className="text-primary font-semibold">Workout Timer</span></h3>
-                  <p className="text-sm">
-                    Customizable interval timer for HIIT, Tabata, and circuit training sessions.
-                  </p>
-                </div>
-                <div>
                   <h3 className="font-semibold text-foreground mb-2 whitespace-nowrap"><span className="text-primary font-semibold">Calorie Counter</span></h3>
                   <p className="text-sm">
                     Search any food from 300,000+ items and instantly see calories, protein, carbs, fat, and fiber.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-foreground mb-2 whitespace-nowrap"><span className="text-primary font-semibold">Rounds Tracker</span></h3>
-                  <p className="text-sm">
-                    Big-button tap counter for rounds and optional reps — perfect for AMRAP, EMOM, and circuit training.
                   </p>
                 </div>
               </div>
