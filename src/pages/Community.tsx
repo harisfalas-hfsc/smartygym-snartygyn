@@ -1,7 +1,8 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { Helmet } from "react-helmet";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useAccessControl } from "@/hooks/useAccessControl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { InfoRibbon } from "@/components/InfoRibbon";
@@ -32,7 +33,7 @@ import {
   CarouselNext,
   type CarouselApi,
 } from "@/components/ui/carousel";
-import { Trophy, MessageSquare, Star, User, Calendar, ClipboardCheck, Eye, Award, Quote } from "lucide-react";
+import { Trophy, MessageSquare, Star, User, Calendar, ClipboardCheck, Eye, Award, Quote, Lock, Crown } from "lucide-react";
 import { SwipeToExplore } from "@/components/ui/SwipeToExplore";
 import { TestimonialsSection } from "@/components/community/TestimonialsSection";
 import { formatDistanceToNow } from "date-fns";
@@ -88,7 +89,12 @@ interface Testimonial {
 }
 
 const Community = () => {
-  
+  const navigate = useNavigate();
+  const { userTier, purchasedContent } = useAccessControl();
+  const canViewLeaderboard =
+    userTier === "premium" ||
+    (userTier === "subscriber" && purchasedContent.size > 0);
+
   const [workoutLeaderboard, setWorkoutLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [programLeaderboard, setProgramLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [checkinLeaderboard, setCheckinLeaderboard] = useState<LeaderboardEntry[]>([]);
@@ -167,10 +173,14 @@ const Community = () => {
 
 
   useEffect(() => {
-    fetchLeaderboards();
+    if (canViewLeaderboard) {
+      fetchLeaderboards();
+    } else {
+      setIsLoadingLeaderboard(false);
+    }
     fetchRatedContent();
     fetchTestimonials();
-  }, []);
+  }, [canViewLeaderboard]);
 
   useEffect(() => {
     fetchComments();
