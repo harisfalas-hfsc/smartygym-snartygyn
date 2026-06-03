@@ -290,29 +290,35 @@ const WorkoutTimer = () => {
           style={{ touchAction: "manipulation" }}
         >
           <div className={cn(
-            "flex-1 w-full flex flex-col items-center justify-center px-4 transition-colors duration-150",
+            "flex-1 w-full flex flex-col items-center justify-center px-6 py-10 transition-colors duration-150",
             isRunning ? (isWorking ? "bg-primary" : "bg-orange-500") : "bg-muted"
           )}>
             <div className={cn(
-              "text-lg font-semibold opacity-90 mb-4",
+              "text-sm sm:text-base font-semibold uppercase tracking-[0.2em] opacity-80 mb-8",
               isRunning ? "text-primary-foreground" : "text-foreground"
             )}>
-              {isRunning ? (isWorking ? '💪 Work' : '😮‍💨 Rest') : 'Ready'} • Round {currentRound}/{rounds}
+              {isRunning ? (isWorking ? 'Work' : 'Rest') : 'Ready'} · Round {currentRound}/{rounds}
             </div>
             <div
               className={cn(
-                "leading-none font-black tabular-nums drop-shadow-lg",
+                "leading-none font-black tabular-nums drop-shadow-md text-center",
                 isRunning ? "text-primary-foreground" : "text-foreground"
               )}
-              style={{ fontSize: "clamp(120px, 32vh, 360px)" }}
+              style={{ fontSize: "clamp(80px, min(22vh, 38vw), 220px)" }}
             >
-              {timeLeft}s
+              {timeLeft}
+              <span
+                className="font-semibold opacity-60 ml-2"
+                style={{ fontSize: "clamp(28px, 6vh, 64px)" }}
+              >
+                s
+              </span>
             </div>
-            <div className="flex gap-3 mt-10">
+            <div className="flex gap-3 mt-12">
               <Button
                 onClick={handleStartStop}
-                className="h-14 px-8 text-lg"
-                variant={isRunning ? "destructive" : "default"}
+                className="h-14 px-8 text-base"
+                variant={isRunning ? "destructive" : "secondary"}
               >
                 {isRunning ? <><Pause className="w-5 h-5 mr-2" /> Pause</> : <><Play className="w-5 h-5 mr-2" /> Start</>}
               </Button>
