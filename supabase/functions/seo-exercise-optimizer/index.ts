@@ -52,24 +52,21 @@ Deno.serve(async (req) => {
       });
     }
 
-    let updated = 0, seoCount = 0, skipped = 0;
+    let seoCount = 0, cleaned = 0;
     const errors: string[] = [];
 
     for (const ex of exercises) {
-      const block = buildKeywordBlock(ex.name);
-
-      if (ex.description && ex.description.includes("SmartyGym")) {
-        skipped++;
-      } else {
-        const base = ex.description?.trim()
-          ? ex.description
-          : `${ex.name} is a ${ex.body_part} exercise using ${ex.equipment} that targets the ${ex.target}.`;
+      // SAFETY: Never write branded SEO keywords into the user-facing description.
+      // Branded keywords live in seo_metadata only (meta tags). If a legacy
+      // pollution suffix is still present, strip it now.
+      if (ex.description && /\|\s*SmartyGym/i.test(ex.description)) {
+        const cleanedDesc = ex.description.replace(/\s*\|\s*SmartyGym.*$/i, "").trim();
         const { error } = await supabase
           .from("exercises")
-          .update({ description: `${base} | ${block}` })
+          .update({ description: cleanedDesc })
           .eq("id", ex.id);
-        if (error) { errors.push(`${ex.name}: ${error.message}`); continue; }
-        updated++;
+        if (error) { errors.push(`clean ${ex.name}: ${error.message}`); continue; }
+        cleaned++;
       }
 
       // Upsert SEO metadata
@@ -86,7 +83,7 @@ Deno.serve(async (req) => {
       seoCount++;
     }
 
-    return new Response(JSON.stringify({ done: exercises.length < limit, fetched: exercises.length, updated, seo: seoCount, skipped, errors: errors.slice(0, 10) }), {
+    return new Response(JSON.stringify({ done: exercises.length < limit, fetched: exercises.length, cleaned, seo: seoCount, errors: errors.slice(0, 10) }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {
