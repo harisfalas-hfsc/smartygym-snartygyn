@@ -590,6 +590,7 @@ const Community = () => {
                         <Trophy className="h-5 w-5 text-primary" />
                         Leaderboard
                       </CardTitle>
+                      {canViewLeaderboard && (
                       <CompactFilters
                         filters={[
                           {
@@ -605,9 +606,12 @@ const Community = () => {
                           }
                         ]}
                       />
+                      )}
                     </CardHeader>
                     <CardContent className="p-3 flex-1">
-                      {isLoadingLeaderboard ? (
+                      {!canViewLeaderboard ? (
+                        <LockedLeaderboardBody compact />
+                      ) : isLoadingLeaderboard ? (
                         <div className="space-y-2">
                           {[...Array(10)].map((_, i) => (
                             <Skeleton key={i} className="h-10 w-full" />
