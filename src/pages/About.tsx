@@ -498,13 +498,20 @@ const About = () => {
           {/* Desktop/Tablet: Who Is SmartyGym For? - Grid Layout */}
           <ScrollReveal>
             <Card className="mb-12 border-2 border-border hidden md:block">
-              <CardContent className="p-6">
-                <div className="text-center space-y-4">
-                  <Users className="w-12 h-12 text-primary mx-auto" />
-                  <h2 className="text-2xl md:text-3xl font-bold text-foreground">
-                    Who Is <span className="text-primary">SmartyGym</span> For
-                  </h2>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-w-4xl mx-auto mt-6">
+              <CardContent className="p-8 lg:p-10">
+                <div className="space-y-6">
+                  <div className="flex items-center gap-5">
+                    <div className="hidden md:flex w-14 h-14 rounded-xl bg-primary/15 items-center justify-center shrink-0">
+                      <Users className="w-7 h-7 text-primary" />
+                    </div>
+                    <div className="text-center md:text-left flex-1">
+                      <p className="text-xs uppercase tracking-[0.25em] text-primary font-semibold mb-1">Designed for you</p>
+                      <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+                        Who Is <span className="text-primary">SmartyGym</span> For
+                      </h2>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
                       <Users className="w-5 h-5 text-primary flex-shrink-0" />
                       <span className="text-sm font-semibold text-foreground">Busy adults</span>
@@ -530,7 +537,7 @@ const About = () => {
                       <span className="text-sm font-semibold text-foreground">Gym-goers</span>
                     </div>
                   </div>
-                  <div className="flex items-center justify-center gap-6 mt-4">
+                  <div className="flex flex-wrap items-center gap-6 pt-4 border-t border-border">
                     <Link 
                       to="/why-invest-in-smartygym" 
                       className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
