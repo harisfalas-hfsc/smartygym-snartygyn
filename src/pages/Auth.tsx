@@ -426,7 +426,7 @@ export default function Auth() {
             setShowAvatarSetup(open);
             if (!open) {
               setTimeout(
-                () => navigate(hasRedirect ? safeRedirect : "/about-smartygym"),
+                () => navigate(hasRedirect ? safeRedirect : "/about"),
                 500,
               );
             }

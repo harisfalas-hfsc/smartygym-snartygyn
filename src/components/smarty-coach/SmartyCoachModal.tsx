@@ -377,7 +377,7 @@ export const SmartyCoachModal = ({ isOpen, onClose, initialPath = 'menu' }: Smar
                   description="Discover the method, the coach, the philosophy"
                   Icon={Sparkles}
                   accent="rose"
-                  onClick={() => handleNavigateTo('/about-smartygym')}
+                  onClick={() => handleNavigateTo('/about')}
                 />
               </div>
             </div>
