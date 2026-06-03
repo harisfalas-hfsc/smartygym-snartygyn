@@ -1,29 +1,44 @@
-## Plan
+## Goal
 
-### 1. Add Subscription Plans section to `src/pages/About.tsx`
-Port the "Section 10: Subscription Plans" block from `AboutSmartyGym.tsx` (lines 775-907) into `About.tsx`, placed right before the final CTA (line 525). Includes:
-- Gold / Platinum clickable cards (same styling, prices, copy)
-- `handlePlanClick` handler invoking Stripe checkout via `STRIPE_PRICE_IDS`
-- "Not Ready for a Plan?" standalone-purchase block with Browse Workouts / Programs buttons
-- Required imports: `useState`, `STRIPE_PRICE_IDS`, `supabase`, `toast`, `Crown`, `Check`, `Loader2`, `Badge`, `Card*` (already imported)
-- Replace the inline "Read More About SmartyGym" link (line 434-440) — point it to `/the-smarty-method` instead (since target page is being deleted), or remove it.
+Restrict the Community **Leaderboard** (which exposes real names) to users who can actually compete in it, while keeping comments and ratings fully accessible.
 
-### 2. Delete `/about-smartygym`
-- Delete file `src/pages/AboutSmartyGym.tsx`
-- Remove from `src/App.tsx`:
-  - lazy import (line 65)
-  - prefetch (line 155)
-  - routes: `/about-smartygym`, `/takeatour`, `/take-a-tour` (lines 342-344)
-  - redirects on lines 258-259 (`/why-smartygym`, `/human-performance`) → repoint to `/about`
+## Access matrix (Community page)
 
-### 3. Update all references from `/about-smartygym` → `/about`
-- `src/components/Navigation.tsx` line 267
-- `src/pages/Auth.tsx` line 429
-- `src/components/smarty-coach/SmartyCoachModal.tsx` line 380
-- `src/components/growth/FreeTrialPopup.tsx` line 40 (path list)
-- `src/components/ui/html-content.tsx` line 19 (whitelist)
-- `src/pages/WhyInvestInSmartyGym.tsx` line 199
-- `public/llms.txt` line 10
-- `public/sitemap.xml` line 28
+| Section | Guest | Free subscriber (no purchase) | Subscriber with standalone purchase | Premium |
+|---|---|---|---|---|
+| Comments | ✅ read & (signed-in) post | ✅ | ✅ | ✅ |
+| Ratings (top-rated workouts/programs) | ✅ | ✅ | ✅ | ✅ |
+| **Leaderboard** | 🔒 locked card | 🔒 locked card | ✅ | ✅ |
 
-### 4. No backend / DB / design-token changes.
+Rationale:
+- Comments + ratings are content discovery — same tier as blog / exercise library (everyone).
+- Leaderboard publishes real display names and is a competition. Only users who can earn entries (premium, or subscribers who unlocked interactions via a standalone purchase) should see it.
+
+## Implementation
+
+1. **`src/pages/Community.tsx`**
+   - Compute `canViewLeaderboard` from `useAccessControl`:
+     - `userTier === "premium"` → true
+     - `userTier === "subscriber"` AND `purchasedContent.size > 0` → true
+     - otherwise → false
+   - When false, replace the Leaderboard card body (desktop column + mobile carousel slot) with a locked-state card:
+     - Lock icon + title "Leaderboard"
+     - Copy: "The leaderboard is reserved for premium members and customers with purchased workouts or programs."
+     - Primary CTA → `/premiumbenefits` ("View Premium Plans")
+     - Secondary CTA (guests only) → `/auth` ("Log In / Sign Up")
+   - Skip the `get_*_leaderboard` RPC calls when `canViewLeaderboard` is false (saves a round-trip + avoids leaking names via devtools).
+   - Keep the same card height ref logic so mobile carousel heights still match.
+
+2. **No DB / RLS changes needed.**
+   The leaderboard RPCs only return aggregated counts + display name; gating is purely UX. We do NOT revoke the EXECUTE grants from the previous migration — ratings still need them, and aggregate counts are not sensitive on their own. The display-name exposure is what we're hiding behind the UI gate.
+
+3. **No changes to comments or ratings** — they stay public as you specified.
+
+## Files touched
+
+- `src/pages/Community.tsx` (only)
+
+## Out of scope
+
+- Changing what content a standalone purchase unlocks (already correct: full interactions on the purchased item).
+- Touching the `workout_interactions` / `program_interactions` RLS — server-side rules already restrict writes to the owning user.

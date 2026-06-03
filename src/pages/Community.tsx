@@ -1,7 +1,8 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { Helmet } from "react-helmet";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useAccessControl } from "@/hooks/useAccessControl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { InfoRibbon } from "@/components/InfoRibbon";
@@ -32,7 +33,7 @@ import {
   CarouselNext,
   type CarouselApi,
 } from "@/components/ui/carousel";
-import { Trophy, MessageSquare, Star, User, Calendar, ClipboardCheck, Eye, Award, Quote } from "lucide-react";
+import { Trophy, MessageSquare, Star, User, Calendar, ClipboardCheck, Eye, Award, Quote, Lock, Crown } from "lucide-react";
 import { SwipeToExplore } from "@/components/ui/SwipeToExplore";
 import { TestimonialsSection } from "@/components/community/TestimonialsSection";
 import { formatDistanceToNow } from "date-fns";
@@ -88,7 +89,12 @@ interface Testimonial {
 }
 
 const Community = () => {
-  
+  const navigate = useNavigate();
+  const { userTier, purchasedContent } = useAccessControl();
+  const canViewLeaderboard =
+    userTier === "premium" ||
+    (userTier === "subscriber" && purchasedContent.size > 0);
+
   const [workoutLeaderboard, setWorkoutLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [programLeaderboard, setProgramLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [checkinLeaderboard, setCheckinLeaderboard] = useState<LeaderboardEntry[]>([]);
@@ -167,10 +173,14 @@ const Community = () => {
 
 
   useEffect(() => {
-    fetchLeaderboards();
+    if (canViewLeaderboard) {
+      fetchLeaderboards();
+    } else {
+      setIsLoadingLeaderboard(false);
+    }
     fetchRatedContent();
     fetchTestimonials();
-  }, []);
+  }, [canViewLeaderboard]);
 
   useEffect(() => {
     fetchComments();
@@ -434,6 +444,29 @@ const Community = () => {
     return comments.slice(0, 6);
   };
 
+  const LockedLeaderboardBody = ({ compact = false }: { compact?: boolean }) => (
+    <div className={`flex flex-col items-center justify-center text-center ${compact ? "py-8 px-4" : "py-16 px-6"} h-full`}>
+      <div className="p-4 bg-primary/10 rounded-full mb-4">
+        <Lock className="h-8 w-8 text-primary" />
+      </div>
+      <h3 className="font-semibold text-base md:text-lg mb-2">Leaderboard is for competitors</h3>
+      <p className="text-sm text-muted-foreground mb-5 max-w-xs">
+        The leaderboard is reserved for premium members and customers who purchased a workout or program — the people who can earn entries here.
+      </p>
+      <div className="flex flex-col gap-2 w-full max-w-[220px]">
+        <Button onClick={() => navigate("/premiumbenefits")} size="sm" className="w-full">
+          <Crown className="h-4 w-4 mr-2" />
+          View Premium Plans
+        </Button>
+        {userTier === "guest" && (
+          <Button onClick={() => navigate("/auth")} variant="outline" size="sm" className="w-full">
+            Log In / Sign Up
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+
   return (
     <>
       <Helmet>
@@ -557,6 +590,7 @@ const Community = () => {
                         <Trophy className="h-5 w-5 text-primary" />
                         Leaderboard
                       </CardTitle>
+                      {canViewLeaderboard && (
                       <CompactFilters
                         filters={[
                           {
@@ -572,9 +606,12 @@ const Community = () => {
                           }
                         ]}
                       />
+                      )}
                     </CardHeader>
                     <CardContent className="p-3 flex-1">
-                      {isLoadingLeaderboard ? (
+                      {!canViewLeaderboard ? (
+                        <LockedLeaderboardBody compact />
+                      ) : isLoadingLeaderboard ? (
                         <div className="space-y-2">
                           {[...Array(10)].map((_, i) => (
                             <Skeleton key={i} className="h-10 w-full" />
@@ -882,6 +919,7 @@ const Community = () => {
                         <Trophy className="h-5 w-5 md:h-6 md:w-6 text-primary" />
                         Leaderboard
                       </CardTitle>
+                      {canViewLeaderboard && (
                       <CompactFilters
                         filters={[
                           {
@@ -897,9 +935,12 @@ const Community = () => {
                           }
                         ]}
                       />
+                      )}
                     </CardHeader>
                     <CardContent className="p-4 md:pt-6 flex-1 overflow-auto">
-                      {isLoadingLeaderboard ? (
+                      {!canViewLeaderboard ? (
+                        <LockedLeaderboardBody />
+                      ) : isLoadingLeaderboard ? (
                         <div className="space-y-3">
                           {[...Array(10)].map((_, i) => (
                             <Skeleton key={i} className="h-12 w-full" />
