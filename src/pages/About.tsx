@@ -440,12 +440,19 @@ const About = () => {
           {/* The SmartyGym Promise */}
           <ScrollReveal>
             <Card className="mb-12 border-2 border-border bg-primary/5">
-              <CardContent className="p-6">
-                <div className="text-center space-y-6">
-                  <Compass className="w-12 h-12 text-primary mx-auto" />
-                  <h2 className="text-2xl md:text-3xl font-bold text-foreground">The <span className="text-primary">SmartyGym</span> Promise</h2>
-                  
-                  <div className="grid md:grid-cols-3 gap-6 text-left max-w-5xl mx-auto">
+              <CardContent className="p-8 lg:p-10">
+                <div className="space-y-8">
+                  <div className="flex items-center gap-5">
+                    <div className="hidden md:flex w-14 h-14 rounded-xl bg-primary/15 items-center justify-center shrink-0">
+                      <Compass className="w-7 h-7 text-primary" />
+                    </div>
+                    <div className="text-center md:text-left flex-1">
+                      <p className="text-xs uppercase tracking-[0.25em] text-primary font-semibold mb-1">Our commitment</p>
+                      <h2 className="text-2xl md:text-3xl font-bold text-foreground">The <span className="text-primary">SmartyGym</span> Promise</h2>
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-3 gap-6 text-left">
                     
                     <div className="space-y-2">
                       <CheckCircle2 className="w-8 h-8 text-primary" />
@@ -473,13 +480,15 @@ const About = () => {
 
                   </div>
 
-                  <a
-                    href="/the-smarty-method"
-                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
-                  >
-                    Discover The Smarty Method
-                    <ChevronRight className="w-4 h-4" />
-                  </a>
+                  <div className="pt-2 border-t border-border">
+                    <a
+                      href="/the-smarty-method"
+                      className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline mt-4"
+                    >
+                      Discover The Smarty Method
+                      <ChevronRight className="w-4 h-4" />
+                    </a>
+                  </div>
                 </div>
               </CardContent>
             </Card>
