@@ -7,7 +7,7 @@
 ## Pages
 
 - [Home](/): SmartyGym overview, featured content, and entry to the platform.
-- [About SmartyGym](/about-smartygym): What SmartyGym is and how it works.
+- [About SmartyGym](/about): What SmartyGym is and how it works.
 - [About](/about): Story and mission behind SmartyGym.
 - [The Smarty Method](/the-smarty-method): Coaching philosophy and ecosystem overview.
 - [Coach Haris Falas](/coach-profile): Founder bio, credentials, and expertise.

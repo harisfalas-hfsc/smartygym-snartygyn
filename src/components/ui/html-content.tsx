@@ -16,7 +16,7 @@ const CANONICAL_HTML_PREFIXES = [
   '/coach-cv',
   '/the-smarty-method',
   '/about',
-  '/about-smartygym',
+  '/about',
   '/best-online-fitness-platform',
   '/why-invest-in-smartygym',
   '/wod-archive',

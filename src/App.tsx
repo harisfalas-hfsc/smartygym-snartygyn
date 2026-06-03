@@ -62,7 +62,6 @@ const FAQ = lazy(() => import("./pages/FAQ"));
 const CoachProfile = lazy(() => import("./pages/CoachProfile"));
 const CoachCV = lazy(() => import("./pages/CoachCV"));
 const Contact = lazy(() => import("./pages/Contact"));
-const AboutSmartyGym = lazy(() => import("./pages/AboutSmartyGym"));
 const Shop = lazy(() => import("./pages/Shop"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const TermsOfService = lazy(() => import("./pages/TermsOfService"));
@@ -152,7 +151,6 @@ const secondaryRoutePreloaders = [
   () => import("./pages/WorkoutTimer"),
   () => import("./pages/CalorieCounter"),
   () => import("./pages/RoundsTracker"),
-  () => import("./pages/AboutSmartyGym"),
   () => import("./pages/SmartyPlans"),
 ];
 
@@ -255,8 +253,8 @@ const AppContent = () => {
                 {/* Corporate page is public */}
                 <Route path="/corporate" element={<SmartyCorporate />} />
                 <Route path="/corporate-wellness" element={<CorporateWellness />} />
-                <Route path="/why-smartygym" element={<Navigate to="/about-smartygym" replace />} />
-                <Route path="/human-performance" element={<Navigate to="/about-smartygym" replace />} />
+                <Route path="/why-smartygym" element={<Navigate to="/about" replace />} />
+                <Route path="/human-performance" element={<Navigate to="/about" replace />} />
                 <Route path="/why-invest-in-smartygym" element={<WhyInvestInSmartyGym />} />
                 <Route path="/corporate-admin" element={<ProtectedRoute><CorporateAdmin /></ProtectedRoute>} />
                 
@@ -339,9 +337,9 @@ const AppContent = () => {
                 {/* Public routes */}
                 
                 <Route path="/community" element={<Community />} />
-                <Route path="/about-smartygym" element={<AboutSmartyGym />} />
-                <Route path="/takeatour" element={<AboutSmartyGym />} />
-                <Route path="/take-a-tour" element={<AboutSmartyGym />} />
+                <Route path="/about-smartygym" element={<Navigate to="/about" replace />} />
+                <Route path="/takeatour" element={<Navigate to="/about" replace />} />
+                <Route path="/take-a-tour" element={<Navigate to="/about" replace />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/payment-success" element={<PaymentSuccess />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />

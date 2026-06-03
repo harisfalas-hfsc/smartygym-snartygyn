@@ -2,17 +2,56 @@ import { Helmet } from "react-helmet";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { ScrollReveal } from "@/components/ScrollReveal";
-import { CheckCircle2, Target, Heart, Users, Shield, Award, Compass, GraduationCap, Plane, Dumbbell, UserCheck, Smartphone, Calendar, Video, Wrench, FileText, BookOpen, ChevronRight, Flame } from "lucide-react";
+import { CheckCircle2, Target, Heart, Users, Shield, Award, Compass, GraduationCap, Plane, Dumbbell, UserCheck, Smartphone, Calendar, Video, Wrench, FileText, BookOpen, ChevronRight, Flame, Crown, Check, Loader2 } from "lucide-react";
 import harisPhoto from "@/assets/haris-falas-coach.png";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
+import { useState } from "react";
+import { STRIPE_PRICE_IDS } from "@/config/pricing";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const About = () => {
   const navigate = useNavigate();
-  const { userTier } = useAccessControl();
+  const { user, userTier } = useAccessControl();
   const isPremium = userTier === "premium";
+  const { toast } = useToast();
+  const [loadingPlan, setLoadingPlan] = useState<"gold" | "platinum" | null>(null);
+
+  const handlePlanClick = async (plan: "gold" | "platinum") => {
+    if (isPremium) {
+      navigate("/userdashboard");
+      return;
+    }
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+    setLoadingPlan(plan);
+    try {
+      const priceId = plan === "gold" ? STRIPE_PRICE_IDS.gold : STRIPE_PRICE_IDS.platinum;
+      const { data, error } = await supabase.functions.invoke("create-checkout", {
+        body: { priceId },
+      });
+      if (error) throw error;
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error("No checkout URL returned");
+      }
+    } catch (err) {
+      console.error("Checkout error:", err);
+      toast({
+        title: "Error",
+        description: err instanceof Error ? err.message : "Could not start checkout. Please try again.",
+        variant: "destructive",
+      });
+      setLoadingPlan(null);
+    }
+  };
 
   return (
     <>
@@ -432,10 +471,10 @@ const About = () => {
                   </div>
 
                   <a
-                    href="https://smartygym.com/about-smartygym"
+                    href="/the-smarty-method"
                     className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
                   >
-                    Read More About SmartyGym
+                    Discover The Smarty Method
                     <ChevronRight className="w-4 h-4" />
                   </a>
                 </div>
@@ -519,6 +558,108 @@ const About = () => {
                   <ChevronRight className="w-4 h-4" />
                 </Link>
               </div>
+            </Card>
+          </ScrollReveal>
+
+          {/* Subscription Plans */}
+          <ScrollReveal>
+            <Card className="mb-12 border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-background">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Crown className="h-5 w-5 text-primary" />
+                  Subscription Plans
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-muted-foreground">
+                  SmartyGym offers flexible plans to fit your fitness journey, plus the option to purchase
+                  individual workouts or programs if you want to give us a try.
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+                  {/* Gold Plan */}
+                  <button
+                    type="button"
+                    onClick={() => handlePlanClick("gold")}
+                    disabled={loadingPlan !== null}
+                    className="text-left p-5 rounded-lg border-2 border-[#D4AF37] shadow-lg transition-all hover:shadow-xl hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-[#D4AF37] focus:ring-offset-2 cursor-pointer disabled:opacity-70 disabled:cursor-wait"
+                    aria-label={isPremium ? "Go to your dashboard" : "Subscribe to Gold Plan"}
+                  >
+                    <div className="text-center mb-3">
+                      <h4 className="text-xl font-bold text-[#D4AF37] mb-2">Gold Plan</h4>
+                      <Badge className="bg-[#D4AF37] text-white mb-3">MONTHLY</Badge>
+                      <p className="text-2xl font-bold">€9.99<span className="text-sm font-normal text-muted-foreground">/month</span></p>
+                      <p className="text-xs text-[#D4AF37] font-semibold mt-2">🔄 Auto-renews monthly</p>
+                    </div>
+                    <ul className="space-y-2 text-sm text-muted-foreground">
+                      <li className="flex items-center gap-2"><Check className="h-4 w-4 text-green-500 shrink-0" />Full access to all Smarty Workouts</li>
+                      <li className="flex items-center gap-2"><Check className="h-4 w-4 text-green-500 shrink-0" />Full access to all Smarty Programs</li>
+                      <li className="flex items-center gap-2"><Check className="h-4 w-4 text-green-500 shrink-0" />Full access to Smarty Ritual</li>
+                      <li className="flex items-center gap-2"><Check className="h-4 w-4 text-green-500 shrink-0" />Full access to Smarty Tools</li>
+                      <li className="flex items-center gap-2"><Check className="h-4 w-4 text-green-500 shrink-0" />Flexible monthly billing</li>
+                    </ul>
+                    <div className="mt-4 text-center text-xs font-semibold text-[#D4AF37] flex items-center justify-center gap-1">
+                      {loadingPlan === "gold" ? (
+                        <><Loader2 className="h-3 w-3 animate-spin" /> Starting checkout…</>
+                      ) : isPremium ? (
+                        "✓ Included in your plan"
+                      ) : (
+                        "Click to subscribe →"
+                      )}
+                    </div>
+                  </button>
+
+                  {/* Platinum Plan */}
+                  <button
+                    type="button"
+                    onClick={() => handlePlanClick("platinum")}
+                    disabled={loadingPlan !== null}
+                    className="text-left p-5 rounded-lg border-2 border-[#A8A9AD] shadow-lg bg-gradient-to-br from-[#A8A9AD]/5 to-[#C0C0C0]/10 relative transition-all hover:shadow-xl hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-[#A8A9AD] focus:ring-offset-2 cursor-pointer disabled:opacity-70 disabled:cursor-wait"
+                    aria-label={isPremium ? "Go to your dashboard" : "Subscribe to Platinum Plan"}
+                  >
+                    <Badge className="absolute -top-2 right-2 bg-green-600 text-white px-3 py-1 text-xs shadow-md z-10">
+                      BEST VALUE
+                    </Badge>
+                    <div className="text-center mb-3 pt-2">
+                      <div className="flex items-center justify-center gap-2 mb-2">
+                        <Crown className="h-5 w-5 text-[#A8A9AD]" />
+                        <h4 className="text-xl font-bold text-[#A8A9AD]">Platinum</h4>
+                      </div>
+                      <Badge className="bg-[#A8A9AD] text-white mb-3">YEARLY</Badge>
+                      <p className="text-2xl font-bold">€89.99<span className="text-sm font-normal text-muted-foreground">/year</span></p>
+                      <p className="text-sm text-green-600 font-bold mt-1">Save €29.89!</p>
+                      <p className="text-xs text-muted-foreground">Just €7.50/month • 🔄 Auto-renews yearly</p>
+                    </div>
+                    <ul className="space-y-2 text-sm text-muted-foreground">
+                      <li className="flex items-center gap-2"><Check className="h-4 w-4 text-green-500 shrink-0" />Full access to all Smarty Workouts</li>
+                      <li className="flex items-center gap-2"><Check className="h-4 w-4 text-green-500 shrink-0" />Full access to all Smarty Programs</li>
+                      <li className="flex items-center gap-2"><Check className="h-4 w-4 text-green-500 shrink-0" />Full access to Smarty Ritual</li>
+                      <li className="flex items-center gap-2"><Check className="h-4 w-4 text-green-500 shrink-0" />Full access to Smarty Tools</li>
+                      <li className="flex items-center gap-2"><Check className="h-4 w-4 text-green-500 shrink-0" />Best value - save 25%</li>
+                    </ul>
+                    <div className="mt-4 text-center text-xs font-semibold text-[#A8A9AD] flex items-center justify-center gap-1">
+                      {loadingPlan === "platinum" ? (
+                        <><Loader2 className="h-3 w-3 animate-spin" /> Starting checkout…</>
+                      ) : isPremium ? (
+                        "✓ Included in your plan"
+                      ) : (
+                        "Click to subscribe →"
+                      )}
+                    </div>
+                  </button>
+                </div>
+
+                {/* Standalone Purchase */}
+                <div className="p-4 bg-muted/30 rounded-lg border border-border text-center">
+                  <h4 className="font-semibold mb-2">Not Ready for a Plan?</h4>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Create a free SmartyGym account to browse and filter our free workouts and free training programs, or buy individual premium workouts and programs as standalone purchases — no paid plan required.
+                  </p>
+                  <div className="flex flex-wrap justify-center gap-2">
+                    <Link to="/workout"><Button variant="outline" size="sm">Browse Workouts</Button></Link>
+                    <Link to="/trainingprogram"><Button variant="outline" size="sm">Browse Programs</Button></Link>
+                  </div>
+                </div>
+              </CardContent>
             </Card>
           </ScrollReveal>
 

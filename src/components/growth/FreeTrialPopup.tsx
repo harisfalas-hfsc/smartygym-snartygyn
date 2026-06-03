@@ -37,7 +37,7 @@ export function FreeTrialPopup() {
   const location = useLocation();
   const { user, userTier, isLoading } = useAccessControl();
 
-  const isAboutPage = ["/about-smartygym", "/takeatour", "/take-a-tour"].includes(location.pathname);
+  const isAboutPage = ["/about", "/takeatour", "/take-a-tour"].includes(location.pathname);
   const isCriticalContentRoute = ["/", "/home", "/workout", "/workout/wod"].includes(location.pathname);
   const isBlockedRoute = BLOCKED_ROUTE_PREFIXES.some(p => location.pathname.startsWith(p));
   const initialDelay = isAboutPage ? 0 : DEFAULT_INITIAL_DELAY_MS;
