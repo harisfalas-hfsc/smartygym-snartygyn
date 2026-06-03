@@ -444,6 +444,29 @@ const Community = () => {
     return comments.slice(0, 6);
   };
 
+  const LockedLeaderboardBody = ({ compact = false }: { compact?: boolean }) => (
+    <div className={`flex flex-col items-center justify-center text-center ${compact ? "py-8 px-4" : "py-16 px-6"} h-full`}>
+      <div className="p-4 bg-primary/10 rounded-full mb-4">
+        <Lock className="h-8 w-8 text-primary" />
+      </div>
+      <h3 className="font-semibold text-base md:text-lg mb-2">Leaderboard is for competitors</h3>
+      <p className="text-sm text-muted-foreground mb-5 max-w-xs">
+        The leaderboard is reserved for premium members and customers who purchased a workout or program — the people who can earn entries here.
+      </p>
+      <div className="flex flex-col gap-2 w-full max-w-[220px]">
+        <Button onClick={() => navigate("/premiumbenefits")} size="sm" className="w-full">
+          <Crown className="h-4 w-4 mr-2" />
+          View Premium Plans
+        </Button>
+        {userTier === "guest" && (
+          <Button onClick={() => navigate("/auth")} variant="outline" size="sm" className="w-full">
+            Log In / Sign Up
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+
   return (
     <>
       <Helmet>
