@@ -1,11 +1,11 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Helmet } from "react-helmet";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Play, Pause, RotateCcw } from "lucide-react";
+import { Play, Pause, RotateCcw, Maximize2, Lock, Unlock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { useKeepScreenAwake } from "@/hooks/useKeepScreenAwake";
@@ -22,9 +22,65 @@ const WorkoutTimer = () => {
   const [isWorking, setIsWorking] = useState(true);
   const [isRunning, setIsRunning] = useState(false);
 
+  const [locked, setLocked] = useState(false);
+  const [unlockHold, setUnlockHold] = useState(0);
+  const unlockTimerRef = useRef<number | null>(null);
+
   // Keep the screen awake the entire time the user is on this tool.
   // Covers iOS Safari, Android Chrome, PWA, and in-app WebViews.
   useKeepScreenAwake(true);
+
+  // Exit lock if user exits fullscreen via system gesture
+  useEffect(() => {
+    const onFs = () => {
+      if (!document.fullscreenElement && locked) setLocked(false);
+    };
+    document.addEventListener("fullscreenchange", onFs);
+    return () => document.removeEventListener("fullscreenchange", onFs);
+  }, [locked]);
+
+  useEffect(() => {
+    if (!locked) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, [locked]);
+
+  const enterLock = async () => {
+    setLocked(true);
+    try {
+      const el: any = document.documentElement;
+      if (el.requestFullscreen) { el.requestFullscreen().catch(() => {}); }
+      else if (el.webkitRequestFullscreen) { try { el.webkitRequestFullscreen(); } catch { /* ignore */ } }
+    } catch { /* ignore */ }
+    try { (screen.orientation as any)?.lock?.("portrait").catch(() => {}); } catch { /* ignore */ }
+  };
+
+  const exitLock = async () => {
+    setLocked(false);
+    setUnlockHold(0);
+    if (unlockTimerRef.current) { window.clearInterval(unlockTimerRef.current); unlockTimerRef.current = null; }
+    try { if (document.fullscreenElement) await document.exitFullscreen(); } catch { /* ignore */ }
+  };
+
+  const startUnlock = () => {
+    if (unlockTimerRef.current) return;
+    const start = Date.now();
+    unlockTimerRef.current = window.setInterval(() => {
+      const pct = Math.min(100, ((Date.now() - start) / 1200) * 100);
+      setUnlockHold(pct);
+      if (pct >= 100) {
+        window.clearInterval(unlockTimerRef.current!);
+        unlockTimerRef.current = null;
+        exitLock();
+      }
+    }, 50);
+  };
+
+  const cancelUnlock = () => {
+    if (unlockTimerRef.current) { window.clearInterval(unlockTimerRef.current); unlockTimerRef.current = null; }
+    setUnlockHold(0);
+  };
 
   // Auto-sync timer display when workTime changes and timer is idle
   useEffect(() => {
@@ -219,11 +275,91 @@ const WorkoutTimer = () => {
                 <Button onClick={handleReset} variant="outline" className="h-12 px-6">
                   <RotateCcw className="w-5 h-5" />
                 </Button>
+                <Button onClick={enterLock} variant="outline" className="h-12 px-6" aria-label="Maximize fullscreen">
+                  <Maximize2 className="w-5 h-5" />
+                </Button>
               </div>
             </CardContent>
           </Card>
         </div>
       </div>
+
+      {locked && (
+        <div
+          className="fixed inset-0 z-[9999] bg-background flex flex-col"
+          style={{ touchAction: "manipulation" }}
+        >
+          <div className={cn(
+            "flex-1 w-full flex flex-col items-center justify-center px-4 transition-colors duration-150",
+            isRunning ? (isWorking ? "bg-primary" : "bg-orange-500") : "bg-muted"
+          )}>
+            <div className={cn(
+              "text-lg font-semibold opacity-90 mb-4",
+              isRunning ? "text-primary-foreground" : "text-foreground"
+            )}>
+              {isRunning ? (isWorking ? '💪 Work' : '😮‍💨 Rest') : 'Ready'} • Round {currentRound}/{rounds}
+            </div>
+            <div
+              className={cn(
+                "leading-none font-black tabular-nums drop-shadow-lg",
+                isRunning ? "text-primary-foreground" : "text-foreground"
+              )}
+              style={{ fontSize: "clamp(120px, 32vh, 360px)" }}
+            >
+              {timeLeft}s
+            </div>
+            <div className="flex gap-3 mt-10">
+              <Button
+                onClick={handleStartStop}
+                className="h-14 px-8 text-lg"
+                variant={isRunning ? "destructive" : "default"}
+              >
+                {isRunning ? <><Pause className="w-5 h-5 mr-2" /> Pause</> : <><Play className="w-5 h-5 mr-2" /> Start</>}
+              </Button>
+              <Button onClick={handleReset} variant="outline" className="h-14 px-6">
+                <RotateCcw className="w-5 h-5" />
+              </Button>
+            </div>
+          </div>
+
+          {/* Hold-to-unlock button */}
+          <button
+            onPointerDown={(e) => { e.stopPropagation(); startUnlock(); }}
+            onPointerUp={(e) => { e.stopPropagation(); cancelUnlock(); }}
+            onPointerLeave={(e) => { e.stopPropagation(); cancelUnlock(); }}
+            onPointerCancel={(e) => { e.stopPropagation(); cancelUnlock(); }}
+            onClick={(e) => e.stopPropagation()}
+            onContextMenu={(e) => { e.preventDefault(); e.stopPropagation(); }}
+            aria-label="Hold to unlock"
+            className="fixed right-4 z-[10000] h-20 w-20 rounded-full bg-background border-4 border-primary shadow-2xl flex items-center justify-center text-foreground select-none"
+            style={{
+              bottom: "calc(env(safe-area-inset-bottom, 0px) + 96px)",
+              backgroundImage: `conic-gradient(hsl(var(--primary)) ${unlockHold}%, transparent ${unlockHold}%)`,
+              touchAction: "none",
+              WebkitUserSelect: "none",
+              userSelect: "none",
+              WebkitTouchCallout: "none",
+              WebkitTapHighlightColor: "transparent",
+            }}
+          >
+            <div
+              className="h-14 w-14 rounded-full bg-background flex flex-col items-center justify-center gap-0.5 pointer-events-none select-none"
+              style={{ WebkitUserSelect: "none", userSelect: "none", WebkitTouchCallout: "none" }}
+            >
+              {unlockHold > 0 ? <Unlock className="w-5 h-5" /> : <Lock className="w-5 h-5" />}
+              <span className="text-[9px] font-bold leading-none">HOLD</span>
+            </div>
+          </button>
+
+          <div
+            className="fixed left-1/2 -translate-x-1/2 z-[10000] text-[10px] font-medium text-muted-foreground bg-background/60 backdrop-blur-sm px-3 py-1 rounded-full border border-border/50"
+            style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 180px)" }}
+          >
+            <Lock className="w-3 h-3 inline-block mr-1 -mt-0.5" />
+            Locked — hold button to exit
+          </div>
+        </div>
+      )}
     </>
   );
 };
