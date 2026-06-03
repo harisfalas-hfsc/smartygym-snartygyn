@@ -471,10 +471,10 @@ const About = () => {
                   </div>
 
                   <a
-                    href="https://smartygym.com/about-smartygym"
+                    href="/the-smarty-method"
                     className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
                   >
-                    Read More About SmartyGym
+                    Discover The Smarty Method
                     <ChevronRight className="w-4 h-4" />
                   </a>
                 </div>
