@@ -166,50 +166,24 @@ const About = () => {
           {/* Desktop: Single card with both paragraphs */}
           <ScrollReveal>
             <Card className="mb-12 border-2 border-primary hidden md:block">
-              <CardContent className="p-6">
-                <div className="text-center space-y-4">
-                  <Target className="w-12 h-12 text-primary mx-auto" />
-                  <h2 className="text-2xl md:text-3xl font-bold text-foreground">
-                    Your Gym Re-imagined. Anywhere, Anytime.
-                  </h2>
-                  <div className="space-y-4 max-w-4xl mx-auto">
-                    <div className="space-y-3 max-w-md mx-auto">
-                      <div className="flex items-center gap-3">
-                        <Flame className="w-6 h-6 text-red-500 flex-shrink-0" />
-                        <span className="text-base font-semibold text-foreground">Workout of the Day</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Dumbbell className="w-6 h-6 text-orange-500 flex-shrink-0" />
-                        <span className="text-base font-semibold text-foreground">Expert-Crafted Workouts</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Calendar className="w-6 h-6 text-blue-500 flex-shrink-0" />
-                        <span className="text-base font-semibold text-foreground">Structured Training Programs</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Video className="w-6 h-6 text-emerald-500 flex-shrink-0" />
-                        <span className="text-base font-semibold text-foreground">Exercise Library</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Wrench className="w-6 h-6 text-purple-500 flex-shrink-0" />
-                        <span className="text-base font-semibold text-foreground">Smarty Tools</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <FileText className="w-6 h-6 text-cyan-500 flex-shrink-0" />
-                        <span className="text-base font-semibold text-foreground">Articles</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <BookOpen className="w-6 h-6 text-pink-500 flex-shrink-0" />
-                        <span className="text-base font-semibold text-foreground">LogBook</span>
-                      </div>
+              <CardContent className="p-8 lg:p-10">
+                <div className="grid lg:grid-cols-[1.1fr_1fr] gap-10 items-start">
+                  <div className="space-y-5">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
+                      <Target className="w-4 h-4 text-primary" />
+                      <span className="text-xs uppercase tracking-wider font-semibold text-primary">Our Mission</span>
                     </div>
-                    <p className="text-base text-muted-foreground text-center leading-relaxed">
+                    <h2 className="text-3xl lg:text-4xl font-bold text-foreground leading-tight">
+                      Your Gym Re-imagined.<br />
+                      <span className="text-primary">Anywhere, Anytime.</span>
+                    </h2>
+                    <p className="text-base text-muted-foreground leading-relaxed">
                       Everything a complete gym must offer, built by real professionals, in your pocket at <strong className="text-foreground">smartygym.com</strong>.
                     </p>
-                    <p className="text-base text-muted-foreground text-center leading-relaxed">
+                    <p className="text-base text-muted-foreground leading-relaxed">
                       We are not here to replace your gym. We are here to back you up when life gets in the way. Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed — <span className="text-primary font-semibold">SmartyGym</span> is your backup plan. Or, if you prefer training from home entirely, we've got you covered. Or, if you go to your gym but want to follow a professional, science-based workout or training program designed by{' '}
-                      <a 
-                        href="/coach-profile" 
+                      <a
+                        href="/coach-profile"
                         onClick={(e) => {
                           e.preventDefault();
                           navigate('/coach-profile');
@@ -219,6 +193,18 @@ const About = () => {
                         Haris Falas
                       </a>, we provide that expert guidance. <span className="font-semibold text-primary">Wherever you are, your gym comes with you.</span>
                     </p>
+                  </div>
+                  <div className="rounded-xl border border-primary/20 bg-primary/5 p-6">
+                    <p className="text-xs uppercase tracking-wider font-semibold text-primary mb-4">What's inside</p>
+                    <div className="grid sm:grid-cols-2 gap-3">
+                      <div className="flex items-center gap-3"><Flame className="w-5 h-5 text-red-500 flex-shrink-0" /><span className="text-sm font-semibold text-foreground">Workout of the Day</span></div>
+                      <div className="flex items-center gap-3"><Dumbbell className="w-5 h-5 text-orange-500 flex-shrink-0" /><span className="text-sm font-semibold text-foreground">Expert Workouts</span></div>
+                      <div className="flex items-center gap-3"><Calendar className="w-5 h-5 text-blue-500 flex-shrink-0" /><span className="text-sm font-semibold text-foreground">Training Programs</span></div>
+                      <div className="flex items-center gap-3"><Video className="w-5 h-5 text-emerald-500 flex-shrink-0" /><span className="text-sm font-semibold text-foreground">Exercise Library</span></div>
+                      <div className="flex items-center gap-3"><Wrench className="w-5 h-5 text-purple-500 flex-shrink-0" /><span className="text-sm font-semibold text-foreground">Smarty Tools</span></div>
+                      <div className="flex items-center gap-3"><FileText className="w-5 h-5 text-cyan-500 flex-shrink-0" /><span className="text-sm font-semibold text-foreground">Articles</span></div>
+                      <div className="flex items-center gap-3"><BookOpen className="w-5 h-5 text-pink-500 flex-shrink-0" /><span className="text-sm font-semibold text-foreground">LogBook</span></div>
+                    </div>
                   </div>
                 </div>
               </CardContent>
