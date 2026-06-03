@@ -389,38 +389,44 @@ const About = () => {
           {/* Desktop: Core Values - Grid Layout */}
           <ScrollReveal>
             <section className="mb-12 hidden md:block">
-              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center">What We Stand For</h2>
+              <div className="flex items-end justify-between mb-6 border-b border-border pb-3">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.25em] text-primary font-semibold mb-1">Principles</p>
+                  <h2 className="text-2xl md:text-3xl font-bold">What We Stand For</h2>
+                </div>
+                <span className="text-sm text-muted-foreground hidden lg:block">04 pillars</span>
+              </div>
               <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <Card className="border-2 border-border hover:border-primary transition-all">
-                  <CardContent className="p-6 text-center space-y-3">
-                    <Heart className="w-10 h-10 text-orange-500 mx-auto" />
+                <Card className="border-2 border-border hover:border-primary transition-all group">
+                  <CardContent className="p-6 text-left space-y-3">
+                    <Heart className="w-10 h-10 text-orange-500 group-hover:scale-110 transition-transform" />
                     <h3 className="font-bold text-lg">Built for Real Life</h3>
                     <p className="text-sm text-muted-foreground">
                       Flexible training that fits your schedule, location, and lifestyle — not the other way around.
                     </p>
                   </CardContent>
                 </Card>
-                <Card className="border-2 border-border hover:border-primary transition-all">
-                  <CardContent className="p-6 text-center space-y-3">
-                    <Award className="w-10 h-10 text-purple-500 mx-auto" />
+                <Card className="border-2 border-border hover:border-primary transition-all group">
+                  <CardContent className="p-6 text-left space-y-3">
+                    <Award className="w-10 h-10 text-purple-500 group-hover:scale-110 transition-transform" />
                     <h3 className="font-bold text-lg">Science-Based Approach</h3>
                     <p className="text-sm text-muted-foreground">
                       Every workout is designed using evidence-based training principles, not trends or fads.
                     </p>
                   </CardContent>
                 </Card>
-                <Card className="border-2 border-border hover:border-primary transition-all">
-                  <CardContent className="p-6 text-center space-y-3">
-                    <Users className="w-10 h-10 text-emerald-500 mx-auto" />
+                <Card className="border-2 border-border hover:border-primary transition-all group">
+                  <CardContent className="p-6 text-left space-y-3">
+                    <Users className="w-10 h-10 text-emerald-500 group-hover:scale-110 transition-transform" />
                     <h3 className="font-bold text-lg">Accessible to Everyone</h3>
                     <p className="text-sm text-muted-foreground">
                       From beginners to advanced athletes, everyone deserves access to quality fitness guidance.
                     </p>
                   </CardContent>
                 </Card>
-                <Card className="border-2 border-border hover:border-primary transition-all">
-                  <CardContent className="p-6 text-center space-y-3">
-                    <Shield className="w-10 h-10 text-blue-500 mx-auto" />
+                <Card className="border-2 border-border hover:border-primary transition-all group">
+                  <CardContent className="p-6 text-left space-y-3">
+                    <Shield className="w-10 h-10 text-blue-500 group-hover:scale-110 transition-transform" />
                     <h3 className="font-bold text-lg">Safe and Effective</h3>
                     <p className="text-sm text-muted-foreground">
                       Proper technique, realistic progressions, and injury prevention are at the core of everything we do.
