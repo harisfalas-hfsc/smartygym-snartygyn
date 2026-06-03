@@ -259,21 +259,19 @@ const RoundsTracker = () => {
         relatedContent={["workouts", "workout timer"]}
       />
 
-      <div ref={rootRef} className="lg:min-h-screen bg-background flex flex-col">
-        <div className="container mx-auto max-w-2xl px-3 lg:px-4 pt-1 lg:pt-4 pb-2 lg:pb-8 flex flex-col">
-          <div className="hidden lg:block">
-            <PageBreadcrumbs
-              items={[
-                { label: "Home", href: "/" },
-                { label: "Smarty Tools", href: "/tools" },
-                { label: "Rounds Tracker" }
-              ]}
-            />
-          </div>
+      <div ref={rootRef} className="min-h-screen bg-background">
+        <div className="container mx-auto max-w-2xl px-4 pb-8">
+          <PageBreadcrumbs
+            items={[
+              { label: "Home", href: "/" },
+              { label: "Smarty Tools", href: "/tools" },
+              { label: "Rounds Tracker" }
+            ]}
+          />
 
-          <div className="text-center mb-1 lg:mb-6">
-            <p className="hidden lg:block text-sm text-muted-foreground mb-2">Smarty Tools — Free to Use</p>
-            <h1 className="text-base lg:text-3xl xl:text-4xl font-bold lg:mb-2">Rounds Tracker</h1>
+          <div className="text-center mb-6">
+            <p className="text-sm text-muted-foreground mb-2">Smarty Tools — Free to Use</p>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">Rounds Tracker</h1>
           </div>
 
           <Card className="mb-4 border-2 border-primary/40">
