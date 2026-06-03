@@ -560,22 +560,32 @@ const About = () => {
 
           {/* Everywhere, Anywhere Card */}
           <ScrollReveal className="hidden md:block">
-            <Card className="mb-12 border-[3px] border-primary/40 p-4">
-              <h2 className="text-2xl font-bold text-center mb-3 text-primary">
-                Everywhere - Anywhere
-              </h2>
-              <p className="text-sm text-muted-foreground leading-relaxed text-center">
-                Whether you're <span className="text-primary font-bold">traveling</span>, <span className="text-primary font-bold">busy</span> with life, or simply <span className="text-primary font-bold">can't make it</span> to the gym, we've got you covered. And even if you do go to the <span className="text-primary font-bold">gym</span>, we're here with <span className="text-primary font-bold">structured, science-based, professional workouts and training programs</span> to back you up.
-              </p>
-              <p className="text-sm text-primary font-bold leading-relaxed mt-5 text-center">
-                Wherever you are, your gym comes with you, right in your pocket.
-              </p>
-              <div className="mt-4 text-center">
-                <Link to="/the-smarty-method" className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline">
-                  <BookOpen className="w-4 h-4" />
-                  Discover The Smarty Method
-                  <ChevronRight className="w-4 h-4" />
-                </Link>
+            <Card className="mb-12 border-[3px] border-primary/40 overflow-hidden">
+              <div className="grid md:grid-cols-[auto_1fr] items-stretch">
+                <div className="hidden md:flex items-center justify-center bg-primary/10 px-10 py-6 border-r border-primary/20">
+                  <div className="text-center">
+                    <Plane className="w-10 h-10 text-primary mx-auto mb-2" />
+                    <p className="text-xs uppercase tracking-widest font-semibold text-primary">Anywhere</p>
+                  </div>
+                </div>
+                <div className="p-6 lg:p-8">
+                  <h2 className="text-2xl font-bold mb-3 text-primary">
+                    Everywhere — Anywhere
+                  </h2>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Whether you're <span className="text-primary font-bold">traveling</span>, <span className="text-primary font-bold">busy</span> with life, or simply <span className="text-primary font-bold">can't make it</span> to the gym, we've got you covered. And even if you do go to the <span className="text-primary font-bold">gym</span>, we're here with <span className="text-primary font-bold">structured, science-based, professional workouts and training programs</span> to back you up.
+                  </p>
+                  <p className="text-sm text-primary font-bold leading-relaxed mt-4">
+                    Wherever you are, your gym comes with you, right in your pocket.
+                  </p>
+                  <div className="mt-4">
+                    <Link to="/the-smarty-method" className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline">
+                      <BookOpen className="w-4 h-4" />
+                      Discover The Smarty Method
+                      <ChevronRight className="w-4 h-4" />
+                    </Link>
+                  </div>
+                </div>
               </div>
             </Card>
           </ScrollReveal>
