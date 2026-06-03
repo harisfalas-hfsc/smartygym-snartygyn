@@ -76,8 +76,6 @@ const RoundsTracker = () => {
   const [unlockHold, setUnlockHold] = useState(0);
   const unlockTimerRef = useRef<number | null>(null);
   const rootRef = useRef<HTMLDivElement | null>(null);
-  const [descOpen, setDescOpen] = useState(false);
-
   // Keep screen awake the whole time the user is on this tool — covers iOS,
   // Android, PWA, and in-app WebViews. Re-acquires after visibility changes.
   useKeepScreenAwake(true);
@@ -278,35 +276,13 @@ const RoundsTracker = () => {
             <h1 className="text-base lg:text-3xl xl:text-4xl font-bold lg:mb-2">Rounds Tracker</h1>
           </div>
 
-          <Card className="hidden lg:block mb-4 border-2 border-primary/40">
+          <Card className="mb-4 border-2 border-primary/40">
             <CardContent className="p-3">
               <p className="text-sm text-muted-foreground text-center">
-                Tap the <span className="text-primary font-semibold">big button</span> to count rounds — optionally count reps inside each round.
+                Big-button <span className="text-primary font-semibold">rounds and reps counter</span> for AMRAP, EMOM, and circuit training sessions.
               </p>
             </CardContent>
           </Card>
-
-          {/* Mobile description — collapsible so the counter stays above the fold */}
-          <div className="lg:hidden mb-2">
-            <button
-              type="button"
-              onClick={() => setDescOpen((v) => !v)}
-              aria-expanded={descOpen}
-              className="w-full flex items-center justify-between gap-2 rounded-lg border-2 border-primary/40 bg-card px-3 py-1.5 text-left"
-            >
-              <span className="text-[11px] font-semibold uppercase tracking-wide text-primary">
-                About this tool
-              </span>
-              <span className="text-[11px] font-semibold text-muted-foreground">
-                {descOpen ? "Hide" : "Show"}
-              </span>
-            </button>
-            {descOpen && (
-              <p className="text-xs text-muted-foreground px-1 pt-2 leading-snug">
-                Big-button tap <span className="text-primary font-semibold">rounds & reps counter</span> — perfect for AMRAP, EMOM, and circuit training. Set your target, then tap the big button anywhere to count.
-              </p>
-            )}
-          </div>
 
           <Card className="flex flex-col bg-card border border-border shadow-sm rounded-2xl overflow-hidden">
             <CardContent className="p-3 sm:p-4 lg:p-6 flex flex-col gap-3 lg:gap-4">

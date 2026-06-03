@@ -193,8 +193,7 @@ const OneRMCalculator = () => {
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">1RM Calculator</h1>
         </div>
 
-        {/* Mobile description card */}
-        <Card className="md:hidden mb-4 border-2 border-primary/40">
+        <Card className="mb-4 border-2 border-primary/40">
           <CardContent className="p-3">
             <p className="text-sm text-muted-foreground text-center">
               Uses the <span className="text-primary font-semibold">Brzycki formula</span> to estimate your one-rep maximum. Essential for programming strength training.
