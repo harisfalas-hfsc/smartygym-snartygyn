@@ -185,7 +185,7 @@ const Tools = () => {
                 <div className="min-w-0 text-center">
                   <h3 className="font-semibold text-foreground mb-2"><span className="text-primary font-semibold">Workout Timer</span></h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    Customizable interval timer for HIIT, Tabata, and circuit training sessions.
+                    Set up custom work and rest intervals for any training style. Choose from HIIT, Tabata, EMOM, or circuit protocols and let the timer guide every round so you stay focused on form, not the clock.
                   </p>
                 </div>
                 <div className="min-w-0 text-center">
