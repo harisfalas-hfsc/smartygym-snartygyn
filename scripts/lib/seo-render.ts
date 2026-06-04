@@ -142,6 +142,13 @@ export function renderRouteBody(route: SeoRoute): {
   const canonical = canonicalUrlFor(route.path);
   const jsonLd: unknown[] = [];
 
+  // Per-item structured data authored in seo_metadata, if any.
+  if ((route as any).extraJsonLd) {
+    const extra = (route as any).extraJsonLd;
+    if (Array.isArray(extra)) jsonLd.push(...extra);
+    else jsonLd.push(extra);
+  }
+
   if (route.kind === "blog-article") {
     const a = (route.payload || {}) as any;
     const published = a.published_at || a.created_at;
