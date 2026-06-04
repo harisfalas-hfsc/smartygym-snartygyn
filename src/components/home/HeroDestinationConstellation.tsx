@@ -213,12 +213,38 @@ const RotatingLinkBanner = () => {
 };
 
 const DesktopVideoHero = ({ width, height }: { width: number; height: number }) => {
+  const [photoIndex, setPhotoIndex] = useState(0);
+
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      setPhotoIndex((i) => (i + 1) % HERO_ROTATING_PHOTOS.length);
+    }, 3000);
+    return () => window.clearInterval(id);
+  }, []);
+
   return (
     <div className="mx-auto" style={{ width: `${width}px`, maxWidth: "100%" }}>
       <div
         className="relative rounded-2xl overflow-hidden ring-1 ring-border/60 shadow-2xl shadow-primary/15 bg-background"
         style={{ height: `${height}px` }}
       >
+        <div className="absolute inset-0 bg-background" aria-hidden="true" />
+        <div className="absolute inset-y-0 left-1/2 w-[52%] -translate-x-1/2 overflow-hidden" aria-hidden="true">
+          {HERO_ROTATING_PHOTOS.map((src, index) => (
+            <img
+              key={src}
+              src={src}
+              alt=""
+              className={cn(
+                "absolute inset-0 w-full h-full object-cover transition-opacity duration-1000",
+                index === photoIndex ? "opacity-100" : "opacity-0"
+              )}
+            />
+          ))}
+          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/0 to-background" />
+          <div className="absolute inset-0 bg-gradient-to-b from-background via-background/0 to-background" />
+        </div>
+
         {/* Brand message — centered at top */}
         <div className="absolute inset-x-0 top-0 flex items-start justify-center pt-5 px-6 pointer-events-none">
           <div className="text-center">
