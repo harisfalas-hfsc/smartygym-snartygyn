@@ -92,6 +92,10 @@ export interface SeoRoute {
   image?: string;
   /** Full attached row payload, used by pre-render to build body content. */
   payload?: Record<string, unknown>;
+  /** Per-page keywords (from seo_metadata table when present). */
+  keywords?: string[];
+  /** Extra JSON-LD blocks (from seo_metadata table when present). */
+  extraJsonLd?: unknown;
 }
 
 /** Public static routes (no DB-backed content). */
