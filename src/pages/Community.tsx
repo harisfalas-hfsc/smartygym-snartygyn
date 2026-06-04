@@ -135,9 +135,9 @@ const Community = () => {
   const [desktopCarouselApi, setDesktopCarouselApi] = useState<CarouselApi>();
   const [desktopSelectedSlide, setDesktopSelectedSlide] = useState(0);
 
-  // Keep all mobile carousel cards the same height as the Leaderboard card
-  const leaderboardCardRef = useRef<HTMLDivElement | null>(null);
-  const [mobileCarouselCardHeight, setMobileCarouselCardHeight] = useState<number | null>(null);
+  // Fixed height for all mobile carousel slides so cards stay consistent
+  // regardless of auth state or which slide has the tallest content.
+  const MOBILE_CAROUSEL_CARD_CLASS = "h-[min(640px,70vh)]";
 
   // Update selected slide when mobile carousel changes
   useEffect(() => {
@@ -185,33 +185,6 @@ const Community = () => {
   useEffect(() => {
     fetchComments();
   }, [sortOrder, commentsFilter]);
-
-  useEffect(() => {
-    const el = leaderboardCardRef.current;
-    if (!el) return;
-
-    let raf = 0;
-    const update = () => {
-      if (!leaderboardCardRef.current) return;
-      const h = Math.round(leaderboardCardRef.current.getBoundingClientRect().height);
-      if (h > 0) {
-        setMobileCarouselCardHeight((prev) => (prev === h ? prev : h));
-      }
-    };
-
-    raf = window.requestAnimationFrame(update);
-
-    const ro = new ResizeObserver(() => {
-      window.cancelAnimationFrame(raf);
-      raf = window.requestAnimationFrame(update);
-    });
-    ro.observe(el);
-
-    return () => {
-      window.cancelAnimationFrame(raf);
-      ro.disconnect();
-    };
-  }, []);
 
   const fetchTestimonials = async () => {
     try {
