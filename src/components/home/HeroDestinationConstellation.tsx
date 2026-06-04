@@ -229,7 +229,7 @@ const DesktopVideoHero = ({ width, height }: { width: number; height: number }) 
         style={{ height: `${height}px` }}
       >
         <div className="absolute inset-0 bg-background" aria-hidden="true" />
-        <div className="absolute inset-y-0 left-1/2 w-[52%] -translate-x-1/2 overflow-hidden" aria-hidden="true">
+        <div className="absolute inset-x-6 top-24 bottom-24 overflow-hidden rounded-xl ring-1 ring-border/40 bg-background" aria-hidden="true">
           {HERO_ROTATING_PHOTOS.map((src, index) => (
             <img
               key={src}
@@ -241,8 +241,7 @@ const DesktopVideoHero = ({ width, height }: { width: number; height: number }) 
               )}
             />
           ))}
-          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/0 to-background" />
-          <div className="absolute inset-0 bg-gradient-to-b from-background via-background/0 to-background" />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/5 via-transparent to-background/35" />
         </div>
 
         {/* Brand message — centered at top */}
