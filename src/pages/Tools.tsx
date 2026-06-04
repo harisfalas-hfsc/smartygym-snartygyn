@@ -191,31 +191,31 @@ const Tools = () => {
                 <div className="min-w-0 text-center">
                   <h3 className="font-semibold text-foreground mb-2"><span className="text-primary font-semibold">Rounds Tracker</span></h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    Big-button tap counter for rounds and optional reps — perfect for AMRAP, EMOM, and circuit training.
+                    A big-button tap counter that logs every round and optional reps in a single touch. Ideal for AMRAP, EMOM, and circuit sessions where you need to stay moving without losing count.
                   </p>
                 </div>
                 <div className="min-w-0 text-center">
                   <h3 className="font-semibold text-foreground mb-2"><span className="text-primary font-semibold">1RM Calculator</span></h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    Uses the Brzycki formula to estimate your one-rep maximum. Essential for programming strength training.
+                    Estimate your true one-rep maximum using the validated Brzycki formula from any submaximal set. Essential for programming strength blocks, percentage-based work, and tracking long-term progress safely.
                   </p>
                 </div>
                 <div className="min-w-0 text-center">
                   <h3 className="font-semibold text-foreground mb-2"><span className="text-primary font-semibold">BMR Calculator</span></h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    Uses the Mifflin-St Jeor equation to calculate your basal metabolic rate, the calories you burn at rest.
+                    Calculate the calories your body burns at complete rest using the Mifflin-St Jeor equation, the gold standard in clinical nutrition. The foundation for any cut, bulk, or maintenance plan you build.
                   </p>
                 </div>
                 <div className="min-w-0 text-center">
                   <h3 className="font-semibold text-foreground mb-2"><span className="text-primary font-semibold">Macro Calculator</span></h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    Get complete nutrition recommendations including calories, macros, fiber, water, and meal frequency.
+                    Get a complete nutrition blueprint tailored to your goal, including daily calories, protein, carbs, fats, fiber, water intake, and recommended meal frequency. Everything you need to eat with intention every day.
                   </p>
                 </div>
                 <div className="min-w-0 text-center">
                   <h3 className="font-semibold text-foreground mb-2"><span className="text-primary font-semibold">Calorie Counter</span></h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    Search any food from 300,000+ items and instantly see calories, protein, carbs, fat, and fiber.
+                    Search over 300,000 foods from the USDA database and instantly see calories, protein, carbs, fat, and fiber per serving. Log meals on the fly and keep your daily nutrition honest and accurate.
                   </p>
                 </div>
               </div>
