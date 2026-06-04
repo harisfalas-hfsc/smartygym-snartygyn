@@ -26,10 +26,9 @@ import heroToolsImage from "@/assets/hero-tools.jpg";
 import heroLibraryImage from "@/assets/hero-exercise-library-new.jpg";
 import heroBlogImage from "@/assets/hero-blog.jpg";
 import heroCommunityImage from "@/assets/hero-community-new.jpg";
-import heroWhite1 from "@/assets/hero-white-gym-1.webp";
-import heroWhite2 from "@/assets/hero-white-gym-2.jpg";
-import heroWhite3 from "@/assets/hero-white-gym-3.jpg";
-import heroWhite4 from "@/assets/hero-white-gym-4.jpg";
+import heroVideoGym from "@/assets/hero-banner-video-gym.mp4.asset.json";
+import heroVideoLivingroom from "@/assets/hero-banner-video-livingroom.mp4.asset.json";
+import heroVideoPark from "@/assets/hero-banner-video-park.mp4.asset.json";
 import {
   Carousel,
   CarouselContent,
@@ -58,7 +57,7 @@ const ROTATING_LINKS: RotatingLink[] = [
   { id: "community", title: "Community",          tagline: "Train together",             icon: Users,         route: "/community" },
 ];
 
-const HERO_ROTATING_PHOTOS = [heroWhite1, heroWhite2, heroWhite3, heroWhite4];
+const HERO_ROTATING_VIDEOS = [heroVideoGym.url, heroVideoLivingroom.url, heroVideoPark.url];
 
 const RotatingLinkBanner = () => {
   const navigate = useNavigate();
@@ -214,33 +213,37 @@ const RotatingLinkBanner = () => {
 };
 
 const DesktopVideoHero = ({ width, height }: { width: number; height: number }) => {
-  const [photoIndex, setPhotoIndex] = useState(0);
+  const [videoIndex, setVideoIndex] = useState(0);
 
   useEffect(() => {
     const id = window.setInterval(() => {
-      setPhotoIndex((i) => (i + 1) % HERO_ROTATING_PHOTOS.length);
-    }, 3000);
+      setVideoIndex((i) => (i + 1) % HERO_ROTATING_VIDEOS.length);
+    }, 6000);
     return () => window.clearInterval(id);
   }, []);
 
   return (
     <div className="mx-auto" style={{ width: `${width}px`, maxWidth: "100%" }}>
       <div
-        className="relative rounded-2xl overflow-hidden bg-background"
+        className="relative rounded-2xl overflow-hidden ring-1 ring-border/60 shadow-2xl shadow-primary/15"
         style={{ height: `${height}px` }}
       >
-        <div className="absolute inset-0 bg-background" aria-hidden="true" />
-        {HERO_ROTATING_PHOTOS.map((src, index) => (
-          <img
+        {HERO_ROTATING_VIDEOS.map((src, index) => (
+          <video
             key={src}
             src={src}
-            alt=""
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
             className={cn(
               "absolute inset-0 w-full h-full object-cover transition-opacity duration-1000",
-              index === photoIndex ? "opacity-100" : "opacity-0"
+              index === videoIndex ? "opacity-100" : "opacity-0"
             )}
           />
         ))}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/10 to-black/55" aria-hidden="true" />
 
         {/* Brand message — centered at top */}
         <div className="absolute inset-x-0 top-0 flex items-start justify-center pt-5 px-6 pointer-events-none">
