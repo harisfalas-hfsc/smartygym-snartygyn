@@ -173,47 +173,47 @@ const Tools = () => {
         <Card className="mb-8 bg-white dark:bg-card border-2 border-primary/40 shadow-primary">
           <div className="p-5">
             <h2 className="text-2xl font-bold mb-3 text-center">About Smarty Tools</h2>
-            <div className="text-muted-foreground max-w-3xl mx-auto">
-              <p className="text-sm sm:text-base text-center font-bold">
+            <div className="text-muted-foreground w-full mx-auto">
+              <p className="text-sm sm:text-base text-center font-bold max-w-3xl mx-auto">
                 <span className="text-primary font-semibold">Smarty Tools</span> are fitness calculators to understand your body and optimize training using validated formulas.
               </p>
-              <p className="text-sm sm:text-base text-center font-semibold text-foreground mt-2">
+              <p className="text-sm sm:text-base text-center font-semibold text-foreground mt-2 max-w-3xl mx-auto">
                 Use all <span className="text-primary font-bold">{tools.length} tools</span> — completely free, no signup required.
               </p>
               {/* Desktop only - detailed calculator descriptions */}
-              <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-6 gap-6 mt-6">
-                <div className="border-r border-border/60 pr-4 last:border-r-0 last:pr-0">
-                  <h3 className="font-semibold text-foreground mb-2 whitespace-nowrap"><span className="text-primary font-semibold">Workout Timer</span></h3>
+              <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-6 gap-x-8 gap-y-6 mt-6 w-full items-start">
+                <div className="min-w-0 text-center">
+                  <h3 className="font-semibold text-foreground mb-2"><span className="text-primary font-semibold">Workout Timer</span></h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
                     Customizable interval timer for HIIT, Tabata, and circuit training sessions.
                   </p>
                 </div>
-                <div className="border-r border-border/60 pr-4 last:border-r-0 last:pr-0">
-                  <h3 className="font-semibold text-foreground mb-2 whitespace-nowrap"><span className="text-primary font-semibold">Rounds Tracker</span></h3>
+                <div className="min-w-0 text-center">
+                  <h3 className="font-semibold text-foreground mb-2"><span className="text-primary font-semibold">Rounds Tracker</span></h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
                     Big-button tap counter for rounds and optional reps — perfect for AMRAP, EMOM, and circuit training.
                   </p>
                 </div>
-                <div className="border-r border-border/60 pr-4 last:border-r-0 last:pr-0">
-                  <h3 className="font-semibold text-foreground mb-2 whitespace-nowrap"><span className="text-primary font-semibold">1RM Calculator</span></h3>
+                <div className="min-w-0 text-center">
+                  <h3 className="font-semibold text-foreground mb-2"><span className="text-primary font-semibold">1RM Calculator</span></h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
                     Uses the Brzycki formula to estimate your one-rep maximum. Essential for programming strength training.
                   </p>
                 </div>
-                <div className="border-r border-border/60 pr-4 last:border-r-0 last:pr-0">
-                  <h3 className="font-semibold text-foreground mb-2 whitespace-nowrap"><span className="text-primary font-semibold">BMR Calculator</span></h3>
+                <div className="min-w-0 text-center">
+                  <h3 className="font-semibold text-foreground mb-2"><span className="text-primary font-semibold">BMR Calculator</span></h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
                     Uses the Mifflin-St Jeor equation to calculate your basal metabolic rate, the calories you burn at rest.
                   </p>
                 </div>
-                <div className="border-r border-border/60 pr-4 last:border-r-0 last:pr-0">
-                  <h3 className="font-semibold text-foreground mb-2 whitespace-nowrap"><span className="text-primary font-semibold">Macro Calculator</span></h3>
+                <div className="min-w-0 text-center">
+                  <h3 className="font-semibold text-foreground mb-2"><span className="text-primary font-semibold">Macro Calculator</span></h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
                     Get complete nutrition recommendations including calories, macros, fiber, water, and meal frequency.
                   </p>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-foreground mb-2 whitespace-nowrap"><span className="text-primary font-semibold">Calorie Counter</span></h3>
+                <div className="min-w-0 text-center">
+                  <h3 className="font-semibold text-foreground mb-2"><span className="text-primary font-semibold">Calorie Counter</span></h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
                     Search any food from 300,000+ items and instantly see calories, protein, carbs, fat, and fiber.
                   </p>
