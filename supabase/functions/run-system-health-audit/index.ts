@@ -1005,7 +1005,8 @@ const handler = async (req: Request): Promise<Response> => {
     );
 
     if (todayRitual) {
-      const hasGoodMorning = todayRitual.morning_content?.includes('Good morning, Smarty');
+      const morningPlainText = (todayRitual.morning_content || '').replace(/<[^>]*>/g, '').trim();
+      const hasGoodMorning = /^\s*(🌅\s*)?Good morning, Smarty\b/i.test(morningPlainText);
       addCheck('Daily Ritual', 'Morning Format', 'Starts with "Good morning, Smarty"', 
         hasGoodMorning ? 'pass' : 'warning',
         hasGoodMorning ? 'Correct format' : 'Missing branded greeting'
@@ -1245,9 +1246,10 @@ const handler = async (req: Request): Promise<Response> => {
     // NEW: CHECK EMAIL DELIVERY LOG FOR RATE LIMITING / DELIVERY FAILURES
     // This catches Resend rate-limit errors that were previously invisible
     // ============================================
+    const last24HoursForDelivery = new Date(Date.now() - 86400000).toISOString();
     const { data: emailDeliveryFailures, count: deliveryFailureCount } = await supabase
       .from('email_delivery_log')
-      .select('to_email, error_message, message_type', { count: 'exact' })
+      .select('to_email, error_message, message_type, sent_at', { count: 'exact' })
       .eq('status', 'failed')
       .gte('sent_at', weekAgo);
     
@@ -1255,13 +1257,17 @@ const handler = async (req: Request): Promise<Response> => {
       e.error_message?.toLowerCase().includes('rate') || 
       e.error_message?.toLowerCase().includes('too many')
     ) || [];
+    const recentDeliveryFailures = emailDeliveryFailures?.filter(e => e.sent_at >= last24HoursForDelivery) || [];
+    const historicalFailureCount = Math.max((deliveryFailureCount || 0) - recentDeliveryFailures.length, 0);
 
     addCheck('Email System', 'Email Delivery Failures', 
-      `${deliveryFailureCount || 0} delivery failures in last 7 days`,
-      (deliveryFailureCount || 0) === 0 ? 'pass' : (deliveryFailureCount || 0) <= 5 ? 'warning' : 'fail',
-      deliveryFailureCount && deliveryFailureCount > 0
-        ? `Rate-limit errors: ${rateLimitErrors.length}. Affected emails: ${emailDeliveryFailures?.slice(0, 5).map(e => e.to_email).join(', ')}${(deliveryFailureCount || 0) > 5 ? '...' : ''}`
-        : 'All emails delivered successfully'
+      `${recentDeliveryFailures.length} failures in last 24h; ${historicalFailureCount} historical in last 7 days`,
+      recentDeliveryFailures.length === 0 ? 'pass' : recentDeliveryFailures.length <= 5 ? 'warning' : 'fail',
+      recentDeliveryFailures.length > 0
+        ? `Rate-limit errors: ${rateLimitErrors.length}. Affected emails: ${recentDeliveryFailures.slice(0, 5).map(e => e.to_email).join(', ')}${recentDeliveryFailures.length > 5 ? '...' : ''}`
+        : historicalFailureCount > 0
+          ? 'No failures in the last 24 hours. Older 7-day failures are retained for context but no longer create a repeated daily warning.'
+          : 'All emails delivered successfully'
     );
 
     // Check today's email success rate (count successes explicitly to avoid

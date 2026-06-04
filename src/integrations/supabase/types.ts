@@ -3923,6 +3923,10 @@ export type Database = {
         Returns: boolean
       }
       is_user_banned: { Args: { user_id_param: string }; Returns: boolean }
+      normalize_ritual_morning_content: {
+        Args: { _content: string }
+        Returns: string
+      }
       pg_cron_enabled: { Args: never; Returns: boolean }
       sync_cron_metadata_from_live_scheduler: { Args: never; Returns: number }
       user_has_active_premium_access: {
