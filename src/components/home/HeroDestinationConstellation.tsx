@@ -212,7 +212,7 @@ const RotatingLinkBanner = () => {
   );
 };
 
-const DesktopVideoHero = ({ width, height }: { width: number; height: number }) => {
+const DesktopVideoHero = ({ height }: { height: number }) => {
   const [photoIndex, setPhotoIndex] = useState(0);
 
   useEffect(() => {
@@ -223,9 +223,9 @@ const DesktopVideoHero = ({ width, height }: { width: number; height: number }) 
   }, []);
 
   return (
-    <div className="mx-auto" style={{ width: `${width}px`, maxWidth: "100%" }}>
+    <div className="w-full">
       <div
-        className="relative rounded-2xl overflow-hidden ring-1 ring-border/60 shadow-2xl shadow-primary/15"
+        className="relative overflow-hidden"
         style={{ height: `${height}px` }}
       >
         {HERO_ROTATING_PHOTOS.map((src, index) => (
@@ -1152,10 +1152,7 @@ export const HeroDestinationConstellation = () => {
       {/* ============ DESKTOP ============ */}
       <div className="hidden md:block">
         <div ref={desktopWrapperRef} className="w-full">
-          <DesktopVideoHero
-            width={(desktopStageWidth - 40) * desktopScale}
-            height={Math.round(632 * desktopScale)}
-          />
+          <DesktopVideoHero height={Math.round(632 * desktopScale)} />
         </div>
       </div>
 
