@@ -207,29 +207,6 @@ const RotatingLinkBanner = () => {
   );
 };
 
-const HERO_ROTATING_IMAGES: { url: string; alt: string }[] = [
-  {
-    url: "https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/avatars/workout-covers/workout-1779073118535-9mhdvb.jpg",
-    alt: "Helix Cascade workout",
-  },
-  {
-    url: "https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/avatars/workout-covers/workout-1777869241282-flncqe.png",
-    alt: "Compass Blitz workout",
-  },
-  {
-    url: "https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/avatars/workout-covers/workout-1779011505148-69g6w7.jpg",
-    alt: "Metabolic Mesh workout",
-  },
-  {
-    url: "https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/avatars/workout-covers/workout-1776661824882-0hiig.png",
-    alt: "Anchor Point Flow workout",
-  },
-  {
-    url: "https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/avatars/workout-covers/workout-regen-1779439836806-5lots.png",
-    alt: "Jump Starter micro-workout",
-  },
-];
-
 const DesktopVideoHero = ({ width, height }: { width: number; height: number }) => {
   return (
     <div className="mx-auto" style={{ width: `${width}px`, maxWidth: "100%" }}>
