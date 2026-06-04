@@ -26,6 +26,9 @@ import heroToolsImage from "@/assets/hero-tools.jpg";
 import heroLibraryImage from "@/assets/hero-exercise-library-new.jpg";
 import heroBlogImage from "@/assets/hero-blog.jpg";
 import heroCommunityImage from "@/assets/hero-community-new.jpg";
+import heroGymGroup from "@/assets/hero-gym-group.jpg";
+import heroHomeCouple from "@/assets/hero-home-couple.jpg";
+import heroParkCouple from "@/assets/hero-park-couple.jpg";
 import {
   Carousel,
   CarouselContent,
@@ -53,6 +56,8 @@ const ROTATING_LINKS: RotatingLink[] = [
   { id: "tools",     title: "Smarty Tools",       tagline: "Calculators & timers",       icon: Calculator,    route: "/tools" },
   { id: "community", title: "Community",          tagline: "Train together",             icon: Users,         route: "/community" },
 ];
+
+const HERO_ROTATING_PHOTOS = [heroParkCouple, heroGymGroup, heroHomeCouple];
 
 const RotatingLinkBanner = () => {
   const navigate = useNavigate();
@@ -86,7 +91,7 @@ const RotatingLinkBanner = () => {
     else if (dx < -threshold) goNext();
     dragStartX.current = null;
     dragDeltaX.current = 0;
-    try { (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId); } catch {}
+    try { (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId); } catch { void 0; }
     setPaused(false);
   };
 
@@ -208,12 +213,37 @@ const RotatingLinkBanner = () => {
 };
 
 const DesktopVideoHero = ({ width, height }: { width: number; height: number }) => {
+  const [photoIndex, setPhotoIndex] = useState(0);
+
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      setPhotoIndex((i) => (i + 1) % HERO_ROTATING_PHOTOS.length);
+    }, 3000);
+    return () => window.clearInterval(id);
+  }, []);
+
   return (
     <div className="mx-auto" style={{ width: `${width}px`, maxWidth: "100%" }}>
       <div
         className="relative rounded-2xl overflow-hidden ring-1 ring-border/60 shadow-2xl shadow-primary/15 bg-background"
         style={{ height: `${height}px` }}
       >
+        <div className="absolute inset-0 bg-background" aria-hidden="true" />
+        <div className="absolute inset-x-6 top-24 bottom-24 overflow-hidden rounded-xl ring-1 ring-border/40 bg-background" aria-hidden="true">
+          {HERO_ROTATING_PHOTOS.map((src, index) => (
+            <img
+              key={src}
+              src={src}
+              alt=""
+              className={cn(
+                "absolute inset-0 w-full h-full object-cover transition-opacity duration-1000",
+                index === photoIndex ? "opacity-100" : "opacity-0"
+              )}
+            />
+          ))}
+          <div className="absolute inset-0 bg-gradient-to-b from-background/5 via-transparent to-background/35" />
+        </div>
+
         {/* Brand message — centered at top */}
         <div className="absolute inset-x-0 top-0 flex items-start justify-center pt-5 px-6 pointer-events-none">
           <div className="text-center">
@@ -595,8 +625,8 @@ const Bubble = ({
       style={
         {
           ...style,
-          ["--hover-scale" as any]: hoverScale,
-        } as React.CSSProperties
+          "--hover-scale": hoverScale,
+        } as React.CSSProperties & { "--hover-scale": number }
       }
     >
       <span
@@ -792,8 +822,8 @@ const BentoTile = ({
           style={{
             width: `${width}px`,
             height: `${height}px`,
-            ["--bento-hover-scale" as any]: hoverScale,
-          } as React.CSSProperties}
+            "--bento-hover-scale": hoverScale,
+          } as React.CSSProperties & { "--bento-hover-scale": number }}
         >
           {/* Image layer with hover zoom */}
           <div className="absolute inset-0 overflow-hidden transition-transform duration-700 ease-out motion-safe:group-hover:scale-105">
