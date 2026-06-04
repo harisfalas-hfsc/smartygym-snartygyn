@@ -1,38 +1,25 @@
-## Goal
+## Why heights differ today
 
-Restrict the Community **Leaderboard** (which exposes real names) to users who can actually compete in it, while keeping comments and ratings fully accessible.
+In `src/pages/Community.tsx`, all mobile carousel slides (Leaderboard, Ratings, Comments, Testimonials) are sized to match the **Leaderboard card** via `leaderboardCardRef` → `mobileCarouselCardHeight`.
 
-## Access matrix (Community page)
+- Logged out / non-premium: Leaderboard renders the small `LockedLeaderboardBody` → short reference height → every slide is short.
+- Logged in (premium / purchaser): Leaderboard renders the full ranked table (10 rows) → tall reference height → every slide is tall.
 
-| Section | Guest | Free subscriber (no purchase) | Subscriber with standalone purchase | Premium |
-|---|---|---|---|---|
-| Comments | ✅ read & (signed-in) post | ✅ | ✅ | ✅ |
-| Ratings (top-rated workouts/programs) | ✅ | ✅ | ✅ | ✅ |
-| **Leaderboard** | 🔒 locked card | 🔒 locked card | ✅ | ✅ |
+That's why the carousel "shrinks" for visitors and "grows" once you log in.
 
-Rationale:
-- Comments + ratings are content discovery — same tier as blog / exercise library (everyone).
-- Leaderboard publishes real display names and is a competition. Only users who can earn entries (premium, or subscribers who unlocked interactions via a standalone purchase) should see it.
+## Fix
 
-## Implementation
+Stop using the leaderboard card as the height reference. Use a single deterministic height for the mobile carousel that does not depend on auth state or leaderboard contents.
 
-1. **`src/pages/Community.tsx`**
-   - Compute `canViewLeaderboard` from `useAccessControl`:
-     - `userTier === "premium"` → true
-     - `userTier === "subscriber"` AND `purchasedContent.size > 0` → true
-     - otherwise → false
-   - When false, replace the Leaderboard card body (desktop column + mobile carousel slot) with a locked-state card:
-     - Lock icon + title "Leaderboard"
-     - Copy: "The leaderboard is reserved for premium members and customers with purchased workouts or programs."
-     - Primary CTA → `/premiumbenefits` ("View Premium Plans")
-     - Secondary CTA (guests only) → `/auth` ("Log In / Sign Up")
-   - Skip the `get_*_leaderboard` RPC calls when `canViewLeaderboard` is false (saves a round-trip + avoids leaking names via devtools).
-   - Keep the same card height ref logic so mobile carousel heights still match.
+Approach: use a viewport-based fixed height for all mobile carousel slides.
 
-2. **No DB / RLS changes needed.**
-   The leaderboard RPCs only return aggregated counts + display name; gating is purely UX. We do NOT revoke the EXECUTE grants from the previous migration — ratings still need them, and aggregate counts are not sensitive on their own. The display-name exposure is what we're hiding behind the UI gate.
+- Replace the `leaderboardCardRef` + ResizeObserver measurement with a constant:
+  `const MOBILE_CAROUSEL_HEIGHT = "70vh";` (clamped, e.g. `min(640px, 70vh)` via Tailwind arbitrary value `h-[min(640px,70vh)]`).
+- Apply this height to every mobile carousel `<Card>` (Leaderboard, Ratings, Comments, Testimonials) instead of the inline `style={{ height: mobileCarouselCardHeight }}`.
+- Keep the existing `min-h-0 overflow-auto` on each `CardContent` so inner content scrolls within the fixed card.
+- Remove now-unused state: `mobileCarouselCardHeight`, `setMobileCarouselCardHeight`, `leaderboardCardRef`, and the measurement `useEffect`.
 
-3. **No changes to comments or ratings** — they stay public as you specified.
+Result: identical card size for guests, free subscribers, subscribers-with-purchase, and premium users. Tall content (full leaderboard, long comments list) scrolls inside the card, exactly like the Comments slide already does.
 
 ## Files touched
 
@@ -40,5 +27,5 @@ Rationale:
 
 ## Out of scope
 
-- Changing what content a standalone purchase unlocks (already correct: full interactions on the purchased item).
-- Touching the `workout_interactions` / `program_interactions` RLS — server-side rules already restrict writes to the owning user.
+- Desktop layout (columns already have their own heights; user only reported mobile inconsistency).
+- Any access-control / data-fetching changes.
