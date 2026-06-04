@@ -207,80 +207,20 @@ const RotatingLinkBanner = () => {
   );
 };
 
-const HERO_ROTATING_IMAGES: { url: string; alt: string }[] = [
-  {
-    url: "https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/avatars/workout-covers/workout-1779073118535-9mhdvb.jpg",
-    alt: "Helix Cascade workout",
-  },
-  {
-    url: "https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/avatars/workout-covers/workout-1777869241282-flncqe.png",
-    alt: "Compass Blitz workout",
-  },
-  {
-    url: "https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/avatars/workout-covers/workout-1779011505148-69g6w7.jpg",
-    alt: "Metabolic Mesh workout",
-  },
-  {
-    url: "https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/avatars/workout-covers/workout-1776661824882-0hiig.png",
-    alt: "Anchor Point Flow workout",
-  },
-  {
-    url: "https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/avatars/workout-covers/workout-regen-1779439836806-5lots.png",
-    alt: "Jump Starter micro-workout",
-  },
-];
-
 const DesktopVideoHero = ({ width, height }: { width: number; height: number }) => {
-  // Rotate workout cover images every 2.5s with a soft crossfade.
-  const [index, setIndex] = useState(0);
-
-  useEffect(() => {
-    const t = window.setInterval(() => {
-      setIndex((i) => (i + 1) % HERO_ROTATING_IMAGES.length);
-    }, 2500);
-    return () => window.clearInterval(t);
-  }, []);
-
   return (
     <div className="mx-auto" style={{ width: `${width}px`, maxWidth: "100%" }}>
       <div
-        className="relative rounded-2xl overflow-hidden ring-1 ring-border/60 shadow-2xl shadow-primary/15"
+        className="relative rounded-2xl overflow-hidden ring-1 ring-border/60 shadow-2xl shadow-primary/15 bg-background"
         style={{ height: `${height}px` }}
       >
-        {HERO_ROTATING_IMAGES.map((img, i) => (
-          <img
-            key={img.url}
-            src={img.url}
-            alt={img.alt}
-            width={Math.round(width)}
-            height={Math.round(height)}
-            loading={i === 0 ? "eager" : "lazy"}
-            fetchPriority={i === 0 ? "high" : "auto"}
-            decoding="async"
-            className={cn(
-              "absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out",
-              index === i ? "opacity-100" : "opacity-0"
-            )}
-            style={{ filter: "brightness(1.1) saturate(1.05) contrast(1.02)" }}
-          />
-        ))}
-        {/* Readability gradient — lighter so video stays vivid in light mode */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/10 to-transparent" aria-hidden="true" />
-        <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/50 to-transparent" aria-hidden="true" />
-
         {/* Brand message — centered at top */}
         <div className="absolute inset-x-0 top-0 flex items-start justify-center pt-5 px-6 pointer-events-none">
-          <div
-            className="text-center"
-            style={{
-              textShadow:
-                "0 1px 2px rgba(0,0,0,0.95), 0 2px 8px rgba(0,0,0,0.85), 0 0 18px rgba(0,0,0,0.7)",
-            }}
-          >
-            <h2 className="text-white text-2xl lg:text-4xl font-bold leading-tight">
+          <div className="text-center">
+            <h2 className="text-foreground text-2xl lg:text-4xl font-bold leading-tight">
               100% Human. <span className="text-red-500">0% AI.</span>
             </h2>
-            <p className="text-white text-sm lg:text-base font-medium mt-2 max-w-lg mx-auto">
+            <p className="text-muted-foreground text-sm lg:text-base font-medium mt-2 max-w-lg mx-auto">
               SmartyGym workouts and programs are built to fit YOUR life.
             </p>
           </div>
