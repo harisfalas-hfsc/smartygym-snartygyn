@@ -367,6 +367,66 @@ export function renderRouteBody(route: SeoRoute): {
     };
   }
 
+  if (route.path === "/blog") {
+    const articles = Array.isArray((route.payload as any)?.articles)
+      ? ((route.payload as any).articles as any[])
+      : [];
+    jsonLd.push({
+      "@context": "https://schema.org",
+      "@type": "Blog",
+      "@id": canonical,
+      name: "SmartyGym Fitness Blog Articles",
+      description: route.description,
+      url: canonical,
+      author: person(),
+      publisher: { "@type": "Organization", name: ORG.name, url: ORG.url },
+      inLanguage: "en-GB",
+      blogPost: articles.slice(0, 50).map((article) => ({
+        "@type": "BlogPosting",
+        headline: article.title,
+        url: `${BASE_URL}/blog/${article.slug}.html`,
+        description: article.excerpt,
+        articleSection: article.category,
+        author: person(),
+        datePublished: article.published_at,
+        dateModified: article.updated_at || article.published_at,
+      })),
+    });
+    jsonLd.push(
+      breadcrumb([
+        { name: "Home", path: "/" },
+        { name: "Blog", path: "/blog" },
+      ]),
+    );
+    const articleList = articles
+      .slice(0, 80)
+      .map(
+        (article) => `<li>
+          <a href="/blog/${attrEscape(String(article.slug || ""))}.html">${htmlEscape(String(article.title || ""))}</a>
+          ${article.category ? `<span>${htmlEscape(String(article.category))}</span>` : ""}
+          ${article.excerpt ? `<p>${htmlEscape(String(article.excerpt))}</p>` : ""}
+        </li>`,
+      )
+      .join("");
+    return {
+      bodyHtml: `
+<main class="seo-prerender seo-blog-index">
+  <article>
+    <header>
+      <h1>Fitness Blog Articles by Haris Falas</h1>
+      <p class="seo-excerpt">${htmlEscape(route.description)}</p>
+      <p>Human-written fitness, nutrition, recovery and healthy aging articles by Sports Scientist <a href="/coach-profile.html">Haris Falas</a>.</p>
+    </header>
+    <section class="seo-section">
+      <h2>Latest SmartyGym Articles</h2>
+      <ul class="seo-article-list">${articleList}</ul>
+    </section>
+  </article>
+</main>`,
+      jsonLd,
+    };
+  }
+
   // Static / category pages — a clean, crawlable shell.
   // Tool routes get extra WebApplication + FAQPage schema so the static
   // prerendered HTML carries them (not just client-side after hydration).
