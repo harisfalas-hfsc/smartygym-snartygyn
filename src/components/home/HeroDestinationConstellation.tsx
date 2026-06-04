@@ -26,6 +26,9 @@ import heroToolsImage from "@/assets/hero-tools.jpg";
 import heroLibraryImage from "@/assets/hero-exercise-library-new.jpg";
 import heroBlogImage from "@/assets/hero-blog.jpg";
 import heroCommunityImage from "@/assets/hero-community-new.jpg";
+import heroGymGroup from "@/assets/hero-gym-group.jpg";
+import heroHomeCouple from "@/assets/hero-home-couple.jpg";
+import heroParkCouple from "@/assets/hero-park-couple.jpg";
 import {
   Carousel,
   CarouselContent,
@@ -53,6 +56,8 @@ const ROTATING_LINKS: RotatingLink[] = [
   { id: "tools",     title: "Smarty Tools",       tagline: "Calculators & timers",       icon: Calculator,    route: "/tools" },
   { id: "community", title: "Community",          tagline: "Train together",             icon: Users,         route: "/community" },
 ];
+
+const HERO_ROTATING_PHOTOS = [heroParkCouple, heroGymGroup, heroHomeCouple];
 
 const RotatingLinkBanner = () => {
   const navigate = useNavigate();
