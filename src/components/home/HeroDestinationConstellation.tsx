@@ -91,7 +91,7 @@ const RotatingLinkBanner = () => {
     else if (dx < -threshold) goNext();
     dragStartX.current = null;
     dragDeltaX.current = 0;
-    try { (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId); } catch {}
+    try { (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId); } catch { void 0; }
     setPaused(false);
   };
 
@@ -626,8 +626,8 @@ const Bubble = ({
       style={
         {
           ...style,
-          ["--hover-scale" as any]: hoverScale,
-        } as React.CSSProperties
+          "--hover-scale": hoverScale,
+        } as React.CSSProperties & Record<string, number>
       }
     >
       <span
@@ -823,8 +823,8 @@ const BentoTile = ({
           style={{
             width: `${width}px`,
             height: `${height}px`,
-            ["--bento-hover-scale" as any]: hoverScale,
-          } as React.CSSProperties}
+            "--bento-hover-scale": hoverScale,
+          } as React.CSSProperties & Record<string, number>}
         >
           {/* Image layer with hover zoom */}
           <div className="absolute inset-0 overflow-hidden transition-transform duration-700 ease-out motion-safe:group-hover:scale-105">
