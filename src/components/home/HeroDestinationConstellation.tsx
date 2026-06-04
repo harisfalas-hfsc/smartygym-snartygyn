@@ -26,9 +26,9 @@ import heroToolsImage from "@/assets/hero-tools.jpg";
 import heroLibraryImage from "@/assets/hero-exercise-library-new.jpg";
 import heroBlogImage from "@/assets/hero-blog.jpg";
 import heroCommunityImage from "@/assets/hero-community-new.jpg";
-import heroVideoGym from "@/assets/hero-banner-video-gym.mp4.asset.json";
-import heroVideoLivingroom from "@/assets/hero-banner-video-livingroom.mp4.asset.json";
-import heroVideoPark from "@/assets/hero-banner-video-park.mp4.asset.json";
+import heroParkCouple from "@/assets/hero-park-couple.jpg";
+import heroGymGroup from "@/assets/hero-gym-group.jpg";
+import heroHomeCouple from "@/assets/hero-home-couple.jpg";
 import {
   Carousel,
   CarouselContent,
@@ -57,7 +57,7 @@ const ROTATING_LINKS: RotatingLink[] = [
   { id: "community", title: "Community",          tagline: "Train together",             icon: Users,         route: "/community" },
 ];
 
-const HERO_ROTATING_VIDEOS = [heroVideoGym.url, heroVideoLivingroom.url, heroVideoPark.url];
+const HERO_ROTATING_PHOTOS = [heroParkCouple, heroGymGroup, heroHomeCouple];
 
 const RotatingLinkBanner = () => {
   const navigate = useNavigate();
@@ -213,12 +213,12 @@ const RotatingLinkBanner = () => {
 };
 
 const DesktopVideoHero = ({ width, height }: { width: number; height: number }) => {
-  const [videoIndex, setVideoIndex] = useState(0);
+  const [photoIndex, setPhotoIndex] = useState(0);
 
   useEffect(() => {
     const id = window.setInterval(() => {
-      setVideoIndex((i) => (i + 1) % HERO_ROTATING_VIDEOS.length);
-    }, 6000);
+      setPhotoIndex((i) => (i + 1) % HERO_ROTATING_PHOTOS.length);
+    }, 5000);
     return () => window.clearInterval(id);
   }, []);
 
@@ -228,19 +228,17 @@ const DesktopVideoHero = ({ width, height }: { width: number; height: number }) 
         className="relative rounded-2xl overflow-hidden ring-1 ring-border/60 shadow-2xl shadow-primary/15"
         style={{ height: `${height}px` }}
       >
-        {HERO_ROTATING_VIDEOS.map((src, index) => (
-          <video
+        {HERO_ROTATING_PHOTOS.map((src, index) => (
+          <img
             key={src}
             src={src}
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="auto"
+            alt=""
+            aria-hidden="true"
             className={cn(
               "absolute inset-0 w-full h-full object-cover transition-opacity duration-1000",
-              index === videoIndex ? "opacity-100" : "opacity-0"
+              index === photoIndex ? "opacity-100" : "opacity-0"
             )}
+            loading={index === 0 ? "eager" : "lazy"}
           />
         ))}
         <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/10 to-black/55" aria-hidden="true" />
