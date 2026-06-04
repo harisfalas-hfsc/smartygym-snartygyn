@@ -526,6 +526,22 @@ export function applyHeadOverrides(
     `<meta name="description" content="${attrEscape(description)}" />`,
   );
 
+  // Keywords (per-page, from seo_metadata when present)
+  if (route.keywords && route.keywords.length) {
+    const kw = route.keywords.join(", ");
+    if (/<meta\s+name=["']keywords["'][^>]*>/i.test(html)) {
+      html = html.replace(
+        /<meta\s+name=["']keywords["'][^>]*>/i,
+        `<meta name="keywords" content="${attrEscape(kw)}" />`,
+      );
+    } else {
+      html = html.replace(
+        /<\/head>/i,
+        `  <meta name="keywords" content="${attrEscape(kw)}" />\n</head>`,
+      );
+    }
+  }
+
   // Canonical
   if (/<link\s+rel=["']canonical["'][^>]*>/i.test(html)) {
     html = html.replace(
