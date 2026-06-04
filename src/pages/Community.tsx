@@ -608,7 +608,7 @@ const Community = () => {
                       />
                       )}
                     </CardHeader>
-                    <CardContent className="p-3 flex-1">
+                    <CardContent className="p-3 flex-1 min-h-0 overflow-auto">
                       {!canViewLeaderboard ? (
                         <LockedLeaderboardBody compact />
                       ) : isLoadingLeaderboard ? (
@@ -686,7 +686,7 @@ const Community = () => {
                         ]}
                       />
                     </CardHeader>
-                    <CardContent className="p-3 flex-1">
+                    <CardContent className="p-3 flex-1 min-h-0 overflow-auto">
                       {isLoadingRatings ? (
                         <div className="space-y-2">
                           {[...Array(10)].map((_, i) => (
