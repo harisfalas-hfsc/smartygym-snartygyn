@@ -557,7 +557,7 @@ const Community = () => {
               <CarouselContent className="-ml-2">
                 {/* Slide 1: Leaderboard */}
                 <CarouselItem className="pl-2 basis-[88%]">
-                  <Card ref={leaderboardCardRef} className="border-2 border-primary/30 shadow-lg flex flex-col">
+                  <Card className={`border-2 border-primary/30 shadow-lg flex flex-col ${MOBILE_CAROUSEL_CARD_CLASS}`}>
                     <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4">
                       <CardTitle className="flex items-center gap-2 text-lg">
                         <Trophy className="h-5 w-5 text-primary" />
@@ -635,10 +635,7 @@ const Community = () => {
 
                 {/* Slide 2: Ratings */}
                 <CarouselItem className="pl-2 basis-[88%]">
-                  <Card
-                    style={mobileCarouselCardHeight ? { height: mobileCarouselCardHeight } : undefined}
-                    className="border-2 border-primary/30 shadow-lg flex flex-col"
-                  >
+                  <Card className={`border-2 border-primary/30 shadow-lg flex flex-col ${MOBILE_CAROUSEL_CARD_CLASS}`}>
                     <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4">
                       <CardTitle className="flex items-center gap-2 text-lg">
                         <Star className="h-5 w-5 text-primary" />
@@ -717,10 +714,7 @@ const Community = () => {
 
                 {/* Slide 3: Comments */}
                 <CarouselItem className="pl-2 basis-[88%]">
-                  <Card
-                    style={mobileCarouselCardHeight ? { height: mobileCarouselCardHeight } : undefined}
-                    className="border-2 border-primary/30 shadow-lg flex flex-col"
-                  >
+                  <Card className={`border-2 border-primary/30 shadow-lg flex flex-col ${MOBILE_CAROUSEL_CARD_CLASS}`}>
                     <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4">
                       <CardTitle className="flex items-center gap-2 text-lg">
                         <MessageSquare className="h-5 w-5 text-primary" />
@@ -843,7 +837,7 @@ const Community = () => {
 
                 {/* Slide 4: Testimonials */}
                 <CarouselItem className="pl-2 basis-[88%]">
-                  <div style={mobileCarouselCardHeight ? { height: mobileCarouselCardHeight } : undefined}>
+                  <div className={MOBILE_CAROUSEL_CARD_CLASS}>
                     <TestimonialsSection compact />
                   </div>
                 </CarouselItem>
