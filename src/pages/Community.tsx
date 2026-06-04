@@ -137,7 +137,7 @@ const Community = () => {
 
   // Fixed height for all mobile carousel slides so cards stay consistent
   // regardless of auth state or which slide has the tallest content.
-  const MOBILE_CAROUSEL_CARD_CLASS = "h-[min(640px,70vh)]";
+  const MOBILE_CAROUSEL_CARD_CLASS = "h-[480px]";
 
   // Update selected slide when mobile carousel changes
   useEffect(() => {
