@@ -40,6 +40,46 @@ const getDaysRemaining = (targetDate: string | null): number | null => {
   return diffDays > 0 ? diffDays : 0;
 };
 
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const getEmailErrorMessage = (error: any): string => {
+  if (!error) return "Unknown email error";
+  if (typeof error === "string") return error;
+  return error.message || error.error?.message || JSON.stringify(error);
+};
+
+const isTransientEmailError = (message: string) =>
+  /Unexpected token '<'|<!DOCTYPE|rate|too many|429|quota|timeout|network|5\d\d|temporar/i.test(message);
+
+const sendEmailWithRetry = async (
+  sendOnce: () => Promise<any>,
+  context: { userId: string; email: string },
+) => {
+  let lastResult: any = null;
+  let lastError: any = null;
+
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const result = await sendOnce();
+      lastResult = result;
+      const apiErrorMessage = getEmailErrorMessage(result?.error);
+      if (!result?.error) return result;
+      if (!isTransientEmailError(apiErrorMessage) || attempt === 3) return result;
+      logStep("Transient email API error, retrying", { ...context, attempt, error: apiErrorMessage });
+    } catch (error: any) {
+      lastError = error;
+      const errorMessage = getEmailErrorMessage(error);
+      if (!isTransientEmailError(errorMessage) || attempt === 3) throw error;
+      logStep("Transient email send error, retrying", { ...context, attempt, error: errorMessage });
+    }
+
+    await delay(3000 * attempt);
+  }
+
+  if (lastError) throw lastError;
+  return lastResult;
+};
+
 // Generate personalized content based on user's goals
 const generatePersonalizedContent = (
   userName: string,
@@ -400,7 +440,6 @@ serve(async (req) => {
                 ctaText
               );
 
-              // Send with one retry on transient Resend errors (HTML / rate-limit / 5xx).
               const sendOnce = () => resend.emails.send({
                 from: "SmartyGym <notifications@smartygym.com>",
                 reply_to: "smartygym@outlook.com",
@@ -409,31 +448,17 @@ serve(async (req) => {
                 headers: getEmailHeaders(userEmail),
                 html: emailHtml,
               });
-              let emailResult: any;
-              try {
-                emailResult = await sendOnce();
-              } catch (transient: any) {
-                const msg = transient?.message || String(transient);
-                if (/Unexpected token '<'|rate|429|5\d\d/i.test(msg)) {
-                  logStep("Transient Resend error, backing off 5s and retrying once", {
-                    userId: user.user_id, email: userEmail, error: msg,
-                  });
-                  await new Promise((r) => setTimeout(r, 5000));
-                  emailResult = await sendOnce();
-                } else {
-                  throw transient;
-                }
-              }
+              const emailResult = await sendEmailWithRetry(sendOnce, { userId: user.user_id, email: userEmail });
               
               if (emailResult.error) {
                 logStep("Email API error", { userId: user.user_id, email: userEmail, error: emailResult.error });
-                emailErrors.push(`${userEmail}: ${emailResult.error.message || String(emailResult.error)}`);
+                emailErrors.push(`${userEmail}: ${getEmailErrorMessage(emailResult.error)}`);
                 await logEmailDelivery({
                   userId: user.user_id,
                   toEmail: userEmail,
                   messageType: "weekly-motivation",
                   status: "failed",
-                  errorMessage: emailResult.error.message || String(emailResult.error),
+                  errorMessage: getEmailErrorMessage(emailResult.error),
                 });
               } else {
                 emailsSent++;
@@ -444,11 +469,11 @@ serve(async (req) => {
                   status: "sent",
                   resendId: (emailResult as any)?.data?.id ?? null,
                 });
-                // Rate limiting: 600ms delay to respect Resend's 2 requests/second limit
-                await new Promise(resolve => setTimeout(resolve, 600));
               }
+              // Rate limiting: delay after every attempted send, success or failure.
+              await delay(1000);
             } catch (emailError: any) {
-              const errorMsg = emailError.message || String(emailError);
+              const errorMsg = getEmailErrorMessage(emailError);
               logStep("Email send error", { userId: user.user_id, email: userEmail, error: errorMsg });
               emailErrors.push(`${userEmail}: ${errorMsg}`);
               await logEmailDelivery({
