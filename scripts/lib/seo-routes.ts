@@ -164,9 +164,9 @@ const STATIC_ROUTES: Array<
   },
   {
     path: "/blog",
-    title: "SmartyGym Blog | Evidence-Based Training Articles",
+    title: "Fitness Blog Articles by Haris Falas | SmartyGym",
     description:
-      "Human-written, evidence-based fitness, nutrition and recovery articles by Sports Scientist Haris Falas. Learn how to train smart.",
+      "Evidence-based fitness blog articles by Sports Scientist Haris Falas: strength training, nutrition, recovery and healthy aging.",
     changefreq: "weekly",
     priority: "0.8",
   },
@@ -603,6 +603,7 @@ export async function buildSeoRoutes(): Promise<SeoRouteBundle> {
   let dynamicWorkouts = 0;
   let dynamicPrograms = 0;
   let dynamicBlog = 0;
+  const blogIndexArticles: Record<string, unknown>[] = [];
 
   const [workoutsRes, programsRes, blogRes] = await Promise.all([
     (supabase as any).rpc("get_visible_workout_metadata", { _workout_id: null }),
@@ -689,6 +690,14 @@ export async function buildSeoRoutes(): Promise<SeoRouteBundle> {
     for (const b of blogRes.data as any[]) {
       if (!b.slug) continue;
       const cleanExcerpt = stripHtml(b.excerpt) || stripHtml(b.content);
+      blogIndexArticles.push({
+        slug: b.slug,
+        title: b.title,
+        excerpt: cleanExcerpt,
+        category: b.category,
+        published_at: b.published_at,
+        updated_at: b.updated_at,
+      });
       routes.push({
         path: `/blog/${b.slug}`,
         kind: "blog-article",
@@ -709,6 +718,8 @@ export async function buildSeoRoutes(): Promise<SeoRouteBundle> {
       }
       dynamicBlog++;
     }
+    const blogRoute = routes.find((route) => route.path === "/blog");
+    if (blogRoute) blogRoute.payload = { articles: blogIndexArticles };
   }
 
   if (
