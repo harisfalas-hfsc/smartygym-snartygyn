@@ -74,8 +74,8 @@ const Blog = () => {
   });
   return <>
       <Helmet>
-        <title>Fitness, Nutrition & Wellness Blog by Haris Falas | SmartyGym</title>
-        <meta name="description" content="Evidence-based fitness, nutrition, and wellness articles by Sports Scientist Haris Falas (CSCS, 20+ yrs). Strength training, fat loss, recovery, longevity." />
+        <title>Fitness Blog Articles by Haris Falas | SmartyGym</title>
+        <meta name="description" content="Evidence-based fitness blog articles by Sports Scientist Haris Falas: strength training, nutrition, recovery and healthy aging." />
         <meta name="keywords" content="fitness blog, nutrition blog, wellness blog, strength training, fat loss, muscle hypertrophy, HIIT, recovery, longevity, healthy aging, Haris Falas, Sports Scientist, CSCS, online personal trainer, SmartyGym, evidence-based fitness" />
         
         <meta property="og:title" content="Fitness Blog - Expert Training & Nutrition Advice by Haris Falas | SmartyGym" />
@@ -200,7 +200,7 @@ const Blog = () => {
         }]} />
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredArticles.map(article => <Card key={article.id} itemScope itemType="https://schema.org/BlogPosting" className="overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg" onClick={() => navigate(`/blog/${article.slug}`)} data-article-id={article.id} data-keywords="smarty gym blog, online fitness tips, smartygym.com, Haris Falas, online gym advice" aria-label={`${article.title} - SmartyGym blog - Online fitness at smartygym.com`}>
+            {filteredArticles.map(article => <Card key={article.id} itemScope itemType="https://schema.org/BlogPosting" className="overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg" onClick={() => navigate(`/blog/${article.slug}.html`)} data-article-id={article.id} data-keywords="smarty gym blog, online fitness tips, smartygym.com, Haris Falas, online gym advice" aria-label={`${article.title} - SmartyGym blog - Online fitness at smartygym.com`}>
                 <div className="relative aspect-video overflow-hidden">
                   <img
                     src={article.image}
