@@ -248,10 +248,10 @@ const DesktopVideoHero = ({ width, height }: { width: number; height: number }) 
         {/* Brand message — centered at top */}
         <div className="absolute inset-x-0 top-0 flex items-start justify-center pt-5 px-6 pointer-events-none">
           <div className="text-center">
-            <h2 className="text-foreground text-2xl lg:text-4xl font-bold leading-tight">
-              100% Human. <span className="text-red-500">0% AI.</span>
+            <h2 className="text-white text-2xl lg:text-4xl font-bold leading-tight drop-shadow-lg">
+              100% Human. <span className="text-red-400">0% AI.</span>
             </h2>
-            <p className="text-muted-foreground text-sm lg:text-base font-medium mt-2 max-w-lg mx-auto">
+            <p className="text-white/90 text-sm lg:text-base font-medium mt-2 max-w-lg mx-auto drop-shadow">
               SmartyGym workouts and programs are built to fit YOUR life.
             </p>
           </div>
