@@ -92,6 +92,10 @@ export interface SeoRoute {
   image?: string;
   /** Full attached row payload, used by pre-render to build body content. */
   payload?: Record<string, unknown>;
+  /** Per-page keywords (from seo_metadata table when present). */
+  keywords?: string[];
+  /** Extra JSON-LD blocks (from seo_metadata table when present). */
+  extraJsonLd?: unknown;
 }
 
 /** Public static routes (no DB-backed content). */
@@ -617,6 +621,47 @@ export async function buildSeoRoutes(): Promise<SeoRouteBundle> {
       .limit(2000),
   ]);
 
+  // Per-item SEO overrides (title/description/keywords/json_ld) authored in
+  // the seo_metadata table. We merge these on top of the generated defaults
+  // so every blog article, workout and training program has its OWN unique
+  // title, description, keyword set and structured data.
+  const seoOverrides = new Map<string, {
+    meta_title?: string | null;
+    meta_description?: string | null;
+    keywords?: string[] | null;
+    json_ld?: unknown;
+  }>();
+  try {
+    const { data: seoRows } = await (supabase as any)
+      .from("seo_metadata")
+      .select("content_type, content_id, meta_title, meta_description, keywords, json_ld")
+      .in("content_type", ["workout", "program", "article", "blog"])
+      .limit(10000);
+    for (const row of (seoRows as any[]) || []) {
+      seoOverrides.set(`${row.content_type}:${row.content_id}`, row);
+    }
+  } catch (e) {
+    console.warn("[seo-routes] seo_metadata query failed:", (e as Error).message);
+  }
+
+  function applySeoOverride(
+    type: "workout" | "program" | "article",
+    id: string | null | undefined,
+    route: SeoRoute,
+  ): void {
+    if (!id) return;
+    const row =
+      seoOverrides.get(`${type}:${id}`) ||
+      (type === "article" ? seoOverrides.get(`blog:${id}`) : undefined);
+    if (!row) return;
+    if (row.meta_title) route.title = clamp(row.meta_title, 90);
+    if (row.meta_description) route.description = clamp(row.meta_description, 160);
+    if (Array.isArray(row.keywords) && row.keywords.length) {
+      route.keywords = row.keywords.filter((k) => typeof k === "string" && k.trim().length > 0);
+    }
+    if (row.json_ld) route.extraJsonLd = row.json_ld;
+  }
+
   if (workoutsRes.error) {
     console.warn("[seo-routes] workouts query error:", workoutsRes.error.message);
   } else if (workoutsRes.data) {
@@ -646,6 +691,7 @@ export async function buildSeoRoutes(): Promise<SeoRouteBundle> {
         priority: "0.7",
         payload: w,
       });
+      applySeoOverride("workout", String(w.id), routes[routes.length - 1]);
       redirects.push({ from: `/workout/${slug}/${w.id}`, to: `/workout/${slug}/${workoutSlug}`, status: 301 });
       dynamicWorkouts++;
     }
@@ -679,6 +725,7 @@ export async function buildSeoRoutes(): Promise<SeoRouteBundle> {
         priority: "0.7",
         payload: p,
       });
+      applySeoOverride("program", String(p.id), routes[routes.length - 1]);
       redirects.push({ from: `/trainingprogram/${slug}/${p.id}`, to: `/trainingprogram/${slug}/${programSlug}`, status: 301 });
       dynamicPrograms++;
     }
@@ -709,6 +756,7 @@ export async function buildSeoRoutes(): Promise<SeoRouteBundle> {
         priority: "0.6",
         payload: b,
       });
+      applySeoOverride("article", String(b.id), routes[routes.length - 1]);
       if (String(b.slug).endsWith("-which-is-best")) {
         redirects.push({
           from: `/blog/${String(b.slug).replace(/-which-is-best$/, "")}`,

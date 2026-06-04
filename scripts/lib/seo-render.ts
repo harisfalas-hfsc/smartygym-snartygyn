@@ -142,6 +142,13 @@ export function renderRouteBody(route: SeoRoute): {
   const canonical = canonicalUrlFor(route.path);
   const jsonLd: unknown[] = [];
 
+  // Per-item structured data authored in seo_metadata, if any.
+  if ((route as any).extraJsonLd) {
+    const extra = (route as any).extraJsonLd;
+    if (Array.isArray(extra)) jsonLd.push(...extra);
+    else jsonLd.push(extra);
+  }
+
   if (route.kind === "blog-article") {
     const a = (route.payload || {}) as any;
     const published = a.published_at || a.created_at;
@@ -518,6 +525,22 @@ export function applyHeadOverrides(
     /<meta\s+name=["']description["'][^>]*>/i,
     `<meta name="description" content="${attrEscape(description)}" />`,
   );
+
+  // Keywords (per-page, from seo_metadata when present)
+  if (route.keywords && route.keywords.length) {
+    const kw = route.keywords.join(", ");
+    if (/<meta\s+name=["']keywords["'][^>]*>/i.test(html)) {
+      html = html.replace(
+        /<meta\s+name=["']keywords["'][^>]*>/i,
+        `<meta name="keywords" content="${attrEscape(kw)}" />`,
+      );
+    } else {
+      html = html.replace(
+        /<\/head>/i,
+        `  <meta name="keywords" content="${attrEscape(kw)}" />\n</head>`,
+      );
+    }
+  }
 
   // Canonical
   if (/<link\s+rel=["']canonical["'][^>]*>/i.test(html)) {
