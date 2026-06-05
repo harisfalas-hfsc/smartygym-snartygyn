@@ -11,6 +11,7 @@ import { CompactFilters } from "@/components/CompactFilters";
 import { Link } from "react-router-dom";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { generateHarisFalasSchema } from "@/utils/seoSchemas";
+import { getBlogArticleImage } from "@/utils/blogImages";
 interface Article {
   id: string;
   slug: string;
@@ -49,7 +50,7 @@ const Blog = () => {
             slug: article.slug,
             title: article.title,
             excerpt: article.excerpt,
-            image: article.image_url || 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=800',
+            image: getBlogArticleImage(article.image_url, article.slug),
             readTime: article.read_time || '5 min read',
             date: new Date(article.published_at || article.created_at).toLocaleDateString('en-US', {
               year: 'numeric',
