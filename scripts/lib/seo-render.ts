@@ -154,9 +154,14 @@ export function renderRouteBody(route: SeoRoute): {
     const published = a.published_at || a.created_at;
     const modified = a.updated_at || published;
     const img = safeImg(a.image_url);
+    const plainContent = stripHtml(a.content || "");
+    const wordCount = plainContent ? plainContent.split(/\s+/).filter(Boolean).length : undefined;
+    const keywords = Array.isArray((route as any).keywords) && (route as any).keywords.length
+      ? (route as any).keywords
+      : [a.category, "SmartyGym", "Haris Falas", "fitness", "health"].filter(Boolean);
     jsonLd.push({
       "@context": "https://schema.org",
-      "@type": "Article",
+      "@type": "BlogPosting",
       headline: a.title,
       description: route.description,
       datePublished: published,
@@ -166,6 +171,10 @@ export function renderRouteBody(route: SeoRoute): {
       publisher: { "@type": "Organization", name: ORG.name, url: ORG.url },
       mainEntityOfPage: canonical,
       articleSection: a.category,
+      keywords: Array.isArray(keywords) ? keywords.join(", ") : undefined,
+      wordCount,
+      inLanguage: "en",
+      url: canonical,
     });
     jsonLd.push(
       breadcrumb([
@@ -210,6 +219,22 @@ export function renderRouteBody(route: SeoRoute): {
       ${cover}
     </header>
     <div class="seo-article-body">${normalizeInternalLinks(a.content || "")}</div>
+    <aside class="seo-related-resources">
+      <h2>Related SmartyGym Resources</h2>
+      <ul>
+        <li><a href="/wod-archive.html">Try today&rsquo;s Workout of the Day</a></li>
+        <li><a href="/trainingprogram.html">Explore training programs by Coach Haris Falas</a></li>
+        <li><a href="/tools.html">Use the free SmartyGym fitness tools</a></li>
+        <li><a href="/blog.html">Read more articles on strength, fat loss and recovery</a></li>
+        <li><a href="/joinpremium.html">Join SmartyGym &mdash; train anywhere, anytime</a></li>
+      </ul>
+    </aside>
+    <aside class="seo-disclaimer">
+      <p><strong>Disclaimer:</strong> This article is for educational purposes only and does not replace medical advice. If you have pain, injury, or a medical condition, consult a qualified professional before starting any exercise program.</p>
+    </aside>
+    <aside class="seo-cta">
+      <p><a href="/joinpremium.html"><strong>Start training with SmartyGym &mdash; 100% human-designed by Coach Haris Falas.</strong></a></p>
+    </aside>
   </article>
 </main>`,
       jsonLd,
