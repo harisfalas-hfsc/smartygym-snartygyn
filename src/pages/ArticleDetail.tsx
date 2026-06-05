@@ -162,7 +162,7 @@ export const ArticleDetail = () => {
       />
 
       <div className="min-h-screen bg-background py-2">
-        <article className="container mx-auto px-4 max-w-4xl">
+        <article className="container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6">
           <div className="flex items-center justify-between mb-4">
             <PageBreadcrumbs
               items={[
