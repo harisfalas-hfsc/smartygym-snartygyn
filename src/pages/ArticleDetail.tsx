@@ -17,6 +17,7 @@ import { generateArticleSchema, generateBreadcrumbSchema } from "@/utils/seoHelp
 import { generateHarisFalasSchema } from "@/utils/seoSchemas";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { useAccessControl } from "@/contexts/AccessControlContext";
+import fallbackBlogImage from "@/assets/blog/how-to-lose-fat.jpg";
 
 
 export const ArticleDetail = () => {
@@ -97,6 +98,10 @@ export const ArticleDetail = () => {
   const pageKeywords = seoMeta?.keywords?.length
     ? seoMeta.keywords.join(', ')
     : `${article.category}, SmartyGym, SmartGym, Smart-Gym, Haris Falas, fitness, health, ${article.title}`;
+  const articleImageUrl = article.image_url?.trim() || fallbackBlogImage;
+  const articleSeoImageUrl = articleImageUrl.startsWith('http')
+    ? articleImageUrl
+    : `https://smartygym.com${articleImageUrl.startsWith('/') ? articleImageUrl : `/${articleImageUrl}`}`;
   const imageAltText = seoMeta?.image_alt_text || article.title;
 
   const articleSchema = generateArticleSchema({
@@ -104,7 +109,7 @@ export const ArticleDetail = () => {
     description: pageDescription,
     datePublished: publishedDate,
     dateModified: modifiedDate,
-    imageUrl: article.image_url || undefined,
+    imageUrl: articleSeoImageUrl,
     url: `/blog/${article.slug}.html`,
     category: article.category,
   });
@@ -132,13 +137,13 @@ export const ArticleDetail = () => {
         <meta property="og:title" content={article.title} />
         <meta property="og:description" content={pageDescription} />
         <meta property="og:site_name" content="SmartyGym" />
-        {article.image_url && <meta property="og:image" content={article.image_url} />}
-        {article.image_url && <meta property="og:image:width" content="1200" />}
-        {article.image_url && <meta property="og:image:height" content="630" />}
+        <meta property="og:image" content={articleSeoImageUrl} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={article.title} />
         <meta name="twitter:description" content={pageDescription} />
-        {article.image_url && <meta name="twitter:image" content={article.image_url} />}
+        <meta name="twitter:image" content={articleSeoImageUrl} />
         <meta property="article:published_time" content={publishedDate} />
         <meta property="article:modified_time" content={modifiedDate} />
         <meta property="article:section" content={article.category} />
@@ -241,17 +246,15 @@ export const ArticleDetail = () => {
                 )}
               </div>
 
-              {article.image_url && (
-                <img
-                  src={article.image_url}
-                  alt={imageAltText}
-                  width={1280}
-                  height={720}
-                  loading="lazy"
-                  decoding="async"
-                  className="w-full h-auto rounded-lg shadow-lg object-cover aspect-[16/9] md:max-h-[280px] md:sticky md:top-4"
-                />
-              )}
+              <img
+                src={articleImageUrl}
+                alt={imageAltText}
+                width={1280}
+                height={720}
+                loading="lazy"
+                decoding="async"
+                className="w-full h-auto rounded-lg shadow-lg object-cover aspect-[16/9] md:max-h-[280px] md:sticky md:top-4"
+              />
             </div>
 
             <div className="blog-article-content mb-8">
