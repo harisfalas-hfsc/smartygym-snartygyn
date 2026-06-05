@@ -1249,68 +1249,78 @@ body {
 }
 
 /* ============================================================
-   Blog article body — readable paragraph rhythm
+   Blog article body — compact reading rhythm
    Applied via .blog-article-content wrapper on ArticleDetail.
    Scoped to NOT affect workout/program/exercise content.
    ============================================================ */
-.blog-article-content {
+.blog-article-content,
+.blog-article-content .prose,
+.blog-article-content .text-display {
   font-size: 1.0625rem;
-  line-height: 1.8;
+  line-height: 1.62;
 }
-.blog-article-content p {
-  margin: 0 0 1.25em 0;
+.blog-article-content p,
+.blog-article-content .prose p,
+.blog-article-content .text-display p {
+  margin: 0 0 0.65em 0 !important;
 }
 .blog-article-content p:last-child {
-  margin-bottom: 0;
+  margin-bottom: 0 !important;
 }
 .blog-article-content h1,
 .blog-article-content h2,
 .blog-article-content h3,
-.blog-article-content h4 {
-  margin-top: 2em;
-  margin-bottom: 0.75em;
-  line-height: 1.3;
+.blog-article-content h4,
+.blog-article-content .prose h1,
+.blog-article-content .prose h2,
+.blog-article-content .prose h3,
+.blog-article-content .prose h4 {
+  margin-top: 1.15em !important;
+  margin-bottom: 0.35em !important;
+  line-height: 1.22;
   font-weight: 700;
 }
-.blog-article-content h2 { font-size: 1.625rem; }
-.blog-article-content h3 { font-size: 1.3rem; }
+.blog-article-content h2 { font-size: 1.5rem; }
+.blog-article-content h3 { font-size: 1.25rem; }
 .blog-article-content h4 { font-size: 1.125rem; }
 .blog-article-content ul,
-.blog-article-content ol {
-  margin: 0 0 1.25em 0;
-  padding-left: 1.5rem;
+.blog-article-content ol,
+.blog-article-content .prose ul,
+.blog-article-content .prose ol {
+  margin: 0.35em 0 0.75em 0 !important;
+  padding-left: 1.35rem;
 }
-.blog-article-content li {
-  margin: 0.4em 0;
-  line-height: 1.7;
+.blog-article-content li,
+.blog-article-content .prose li {
+  margin: 0.12em 0 !important;
+  line-height: 1.55;
 }
-.blog-article-content li p {
-  margin: 0;
+.blog-article-content li p,
+.blog-article-content .prose li p {
+  margin: 0 !important;
 }
 .blog-article-content blockquote {
-  margin: 1.5em 0;
-  padding: 0.75em 1.25em;
+  margin: 1em 0;
+  padding: 0.65em 1em;
   border-left: 4px solid hsl(var(--primary));
   background: hsl(var(--accent) / 0.08);
   border-radius: 0.25rem;
   font-style: italic;
 }
 .blog-article-content img {
-  margin: 1.5em auto;
+  margin: 1em auto;
   border-radius: 0.5rem;
   max-width: 100%;
   height: auto;
 }
 .blog-article-content table {
-  margin: 1.5em 0;
+  margin: 1em 0;
 }
 .blog-article-content hr {
-  margin: 2em 0;
+  margin: 1.25em 0;
   border-color: hsl(var(--border));
 }
-/* Preserve empty paragraphs as visible spacers */
 .blog-article-content p.tiptap-paragraph:empty,
 .blog-article-content p:empty {
-  min-height: 0.75em;
-  margin: 0 0 1em 0;
+  display: none !important;
 }

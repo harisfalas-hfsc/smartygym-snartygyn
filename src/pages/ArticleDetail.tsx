@@ -254,7 +254,7 @@ export const ArticleDetail = () => {
               )}
             </div>
 
-            <div className="blog-article-content prose prose-lg max-w-none mb-8">
+            <div className="blog-article-content mb-8">
               <HTMLContent content={article.content} />
             </div>
 
