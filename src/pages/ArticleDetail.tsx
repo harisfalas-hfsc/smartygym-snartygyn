@@ -17,7 +17,7 @@ import { generateArticleSchema, generateBreadcrumbSchema } from "@/utils/seoHelp
 import { generateHarisFalasSchema } from "@/utils/seoSchemas";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { useAccessControl } from "@/contexts/AccessControlContext";
-import fallbackBlogImage from "@/assets/blog/how-to-lose-fat.jpg";
+import { getBlogArticleImage, toAbsoluteBlogImageUrl } from "@/utils/blogImages";
 
 
 export const ArticleDetail = () => {
@@ -98,10 +98,8 @@ export const ArticleDetail = () => {
   const pageKeywords = seoMeta?.keywords?.length
     ? seoMeta.keywords.join(', ')
     : `${article.category}, SmartyGym, SmartGym, Smart-Gym, Haris Falas, fitness, health, ${article.title}`;
-  const articleImageUrl = article.image_url?.trim() || fallbackBlogImage;
-  const articleSeoImageUrl = articleImageUrl.startsWith('http')
-    ? articleImageUrl
-    : `https://smartygym.com${articleImageUrl.startsWith('/') ? articleImageUrl : `/${articleImageUrl}`}`;
+  const articleImageUrl = getBlogArticleImage(article.image_url, article.slug);
+  const articleSeoImageUrl = toAbsoluteBlogImageUrl(articleImageUrl);
   const imageAltText = seoMeta?.image_alt_text || article.title;
 
   const articleSchema = generateArticleSchema({
