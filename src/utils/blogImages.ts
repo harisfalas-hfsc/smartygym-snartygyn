@@ -1,7 +1,7 @@
-import menOver50BellyFatImage from "@/assets/blog/how-men-over-50-belly-fat-protocol.jpg";
+import menOver50BellyFatImage from "@/assets/blog/how-men-over-50-belly-fat-protocol.jpg.asset.json";
 
 const slugSpecificImages: Record<string, string> = {
-  "how-men-over-50-can-lose-belly-fat-protocol": menOver50BellyFatImage,
+  "how-men-over-50-can-lose-belly-fat-protocol": menOver50BellyFatImage.url,
 };
 
 const genericBlogFallbackImage = "/smartygym-social-share.png";
