@@ -76,7 +76,7 @@ export const ArticleDetail = () => {
   if (!article || error) {
     return (
       <div className="min-h-screen bg-background py-12">
-        <div className="container mx-auto px-4 max-w-4xl">
+        <div className="container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6">
           <Card className="p-12 text-center">
             <h1 className="text-2xl font-bold mb-4">Article Not Found</h1>
             <p className="text-muted-foreground mb-6">
