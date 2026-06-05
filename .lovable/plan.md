@@ -1,34 +1,35 @@
-## Problem
+Yes — I understand the problem: the article card is now the correct brand width, but the hero image became too dominant, and the article body formatting has poor paragraph rhythm.
 
-Every blog article page (`/blog/...`) is rendered inside a narrow `max-w-4xl` (≈896px) container. The rest of the site — Blog index, Tools, workout galleries, training program galleries — uses the standard wide container `max-w-6xl md:max-w-[1500px]` (per the Desktop Container Width Standard memory). That mismatch is why:
+Plan:
 
-- The article card looks visibly smaller/narrower than every other card on the site.
-- The hero image is forced into a smaller frame instead of filling a full-width card.
-- The article reads as a tall, narrow column → much more vertical scrolling than necessary.
+1. Keep the blog article page on the standard wide card
+- Keep the outer blog article card aligned with the rest of the site.
+- Do not go back to the narrow old layout.
+- This preserves consistency with workout pages, program pages, and the rest of the brand system.
 
-## Fix
+2. Stop the image from becoming a huge full-width block
+- On desktop/tablet, place the article image beside the article intro/header area instead of making it a massive full-width banner.
+- Use a controlled image column with a fixed visual ratio so it feels premium but not oversized.
+- Let the title, category, read time, date, author box, and image form one clean top section.
+- On mobile, keep the image stacked under the title so it stays readable and does not squeeze the text.
 
-In `src/pages/ArticleDetail.tsx`, replace the two narrow wrappers with the standard widened container used everywhere else on desktop. Mobile stays untouched (per the Desktop Container Width Standard).
+3. Fix the article body readability
+- Add a blog-specific content style so paragraphs have proper spacing after each paragraph.
+- Improve line-height, heading spacing, list spacing, blockquote spacing, and image/table behavior inside blog articles.
+- Avoid changing workout formatting, because workouts intentionally use compact spacing.
 
-Specifically:
-1. Outer wrapper `<div className="container mx-auto px-4 max-w-4xl">` → `container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6`
-2. `<article className="container mx-auto px-4 max-w-4xl">` → same standard widths
-3. Keep the inner `<A4Container>` around the article HTML body so the *reading text itself* stays at a comfortable line length (the A4 container already caps text width for readability). This means:
-   - The **card** (background, padding, hero image, title, share buttons) fills the full standard width like every other card on the site.
-   - The **article body text** still wraps at A4 width inside that card, so we don't create 1500px-wide lines of prose that are hard to read.
-4. The hero image (`article.image_url`) already uses `w-full h-auto` — it will automatically fill the new wider card, matching how images render on workout/program pages.
+4. Remove the messy A4-style reading box from normal blog display
+- Keep article content inside the main card, but avoid the document-like A4 padding/shadow that makes the article feel inconsistent.
+- Preserve Reader Mode separately if it still needs document-style formatting.
 
-## Out of scope
+5. Make it future-proof for all blog articles
+- Apply the structure in `ArticleDetail.tsx`, not individual article data.
+- Apply the formatting through a reusable blog article CSS class.
+- Every existing and future blog article will inherit the same layout and spacing automatically.
 
-- No changes to mobile layout (already correct).
-- No changes to typography, colors, schema, SEO, or article content rendering.
-- No changes to Reader Mode dialog.
-- No changes to other pages.
-
-## Files touched
-
-- `src/pages/ArticleDetail.tsx` (only — two className edits)
-
-## Result
-
-Blog article pages will visually match the width of Blog index, Tools, workout pages, and training program pages. The hero image fills the full card width. The card looks like part of the same design system. Body text stays at A4 width for readability, so the page won't feel emptier — it just stops feeling artificially narrow.
+Technical details:
+- Update only the blog article template and blog-specific CSS.
+- Main target files:
+  - `src/pages/ArticleDetail.tsx`
+  - `src/index.css`
+- No article content, SEO metadata, database data, workout pages, program pages, or tool pages will be changed.

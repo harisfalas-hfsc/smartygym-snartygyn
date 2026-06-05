@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { ShareButtons } from "@/components/ShareButtons";
 import { Card } from "@/components/ui/card";
 import { HTMLContent } from "@/components/ui/html-content";
-import { A4Container } from "@/components/ui/a4-container";
 import { Badge } from "@/components/ui/badge";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { Link } from "react-router-dom";
@@ -200,63 +199,63 @@ export const ArticleDetail = () => {
           />
 
           <Card className="p-6 md:p-8">
-            <div className="mb-8">
-              <Badge variant="secondary" className="mb-4">{article.category}</Badge>
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight">
-                {article.title}
-              </h1>
-              <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-4">
-                <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4" />
-                  <span>{article.read_time || '5 min read'}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
-                  <time dateTime={new Date(article.published_at || article.created_at).toISOString()}>
-                    {new Date(article.published_at || article.created_at).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}
-                  </time>
-                </div>
-              </div>
-
-              {article.author_name && (
-                <div className="flex items-start gap-2 mb-6 p-4 bg-accent/10 rounded-lg border border-border">
-                  <span className="text-sm text-muted-foreground">By:</span>
-                  <div>
-                    <Link to="/coach-profile" className="font-semibold text-primary hover:underline whitespace-nowrap inline-block">
-                      {article.author_name}
-                    </Link>
-                    {article.author_credentials && (
-                      <div className="text-sm text-muted-foreground mt-1 space-y-0.5">
-                        {article.author_credentials.split('\n').map((line, i) => (
-                          <div key={i}>{line}</div>
-                        ))}
-                      </div>
-                    )}
+            <div className="grid grid-cols-1 md:grid-cols-[1.2fr_1fr] gap-6 md:gap-8 mb-8 items-start">
+              <div>
+                <Badge variant="secondary" className="mb-4">{article.category}</Badge>
+                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight">
+                  {article.title}
+                </h1>
+                <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-4">
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4" />
+                    <span>{article.read_time || '5 min read'}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    <time dateTime={new Date(article.published_at || article.created_at).toISOString()}>
+                      {new Date(article.published_at || article.created_at).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </time>
                   </div>
                 </div>
+
+                {article.author_name && (
+                  <div className="flex items-start gap-2 p-4 bg-accent/10 rounded-lg border border-border">
+                    <span className="text-sm text-muted-foreground">By:</span>
+                    <div>
+                      <Link to="/coach-profile" className="font-semibold text-primary hover:underline whitespace-nowrap inline-block">
+                        {article.author_name}
+                      </Link>
+                      {article.author_credentials && (
+                        <div className="text-sm text-muted-foreground mt-1 space-y-0.5">
+                          {article.author_credentials.split('\n').map((line, i) => (
+                            <div key={i}>{line}</div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {article.image_url && (
+                <img
+                  src={article.image_url}
+                  alt={imageAltText}
+                  width={1280}
+                  height={720}
+                  loading="lazy"
+                  decoding="async"
+                  className="w-full h-auto rounded-lg shadow-lg object-cover aspect-[16/10] md:sticky md:top-4"
+                />
               )}
             </div>
 
-            {article.image_url && (
-              <img
-                src={article.image_url}
-                alt={imageAltText}
-                width={1280}
-                height={720}
-                loading="lazy"
-                decoding="async"
-                className="w-full h-auto rounded-lg mb-8 shadow-lg"
-              />
-            )}
-
-            <div className="prose prose-lg max-w-none mb-8">
-              <A4Container>
-                <HTMLContent content={article.content} />
-              </A4Container>
+            <div className="blog-article-content prose prose-lg max-w-none mb-8">
+              <HTMLContent content={article.content} />
             </div>
 
             <div className="pt-6">
