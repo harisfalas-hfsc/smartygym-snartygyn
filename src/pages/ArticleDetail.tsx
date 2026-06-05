@@ -198,14 +198,14 @@ export const ArticleDetail = () => {
             content={<HTMLContent content={article.content} />}
           />
 
-          <Card className="p-6 md:p-8">
-            <div className="grid grid-cols-1 md:grid-cols-[1.2fr_1fr] gap-6 md:gap-8 mb-8 items-start">
+          <Card className="p-4 md:p-6">
+            <div className="grid grid-cols-1 md:grid-cols-[1.35fr_0.9fr] gap-4 md:gap-6 mb-5 items-start">
               <div>
-                <Badge variant="secondary" className="mb-4">{article.category}</Badge>
-                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight">
+                <Badge variant="secondary" className="mb-3">{article.category}</Badge>
+                <h1 className="text-3xl md:text-4xl font-bold mb-3 leading-tight">
                   {article.title}
                 </h1>
-                <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-4">
+                <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-3">
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4" />
                     <span>{article.read_time || '5 min read'}</span>
@@ -223,7 +223,7 @@ export const ArticleDetail = () => {
                 </div>
 
                 {article.author_name && (
-                  <div className="flex items-start gap-2 p-4 bg-accent/10 rounded-lg border border-border">
+                  <div className="flex items-start gap-2 p-3 bg-accent/10 rounded-lg border border-border">
                     <span className="text-sm text-muted-foreground">By:</span>
                     <div>
                       <Link to="/coach-profile" className="font-semibold text-primary hover:underline whitespace-nowrap inline-block">
@@ -249,12 +249,12 @@ export const ArticleDetail = () => {
                   height={720}
                   loading="lazy"
                   decoding="async"
-                  className="w-full h-auto rounded-lg shadow-lg object-cover aspect-[16/10] md:sticky md:top-4"
+                  className="w-full h-auto rounded-lg shadow-lg object-cover aspect-[16/9] md:max-h-[280px] md:sticky md:top-4"
                 />
               )}
             </div>
 
-            <div className="blog-article-content prose prose-lg max-w-none mb-8">
+            <div className="blog-article-content mb-8">
               <HTMLContent content={article.content} />
             </div>
 
