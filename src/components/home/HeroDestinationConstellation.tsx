@@ -58,7 +58,7 @@ const ROTATING_LINKS: RotatingLink[] = [
   { id: "community", title: "Community",          tagline: "Train together",             icon: Users,         route: "/community" },
 ];
 
-const HERO_ROTATING_PHOTOS = [heroCityRunning, heroGymGroup, heroHomeCouple];
+const HERO_ROTATING_PHOTOS = [heroCityRunning];
 
 const RotatingLinkBanner = () => {
   const navigate = useNavigate();
