@@ -2,17 +2,19 @@ import { useEffect } from "react";
 import { useTheme } from "next-themes";
 
 /**
- * Sets default theme to light mode for all devices (mobile + desktop).
- * User can override during session; persists on refresh within same session.
+ * Desktop is always dark mode with no toggle.
+ * Mobile defaults to dark and can be overridden by the user.
  */
 export const DeviceThemeDefault = () => {
   const { setTheme, theme } = useTheme();
 
   useEffect(() => {
+    const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
     const sessionTheme = sessionStorage.getItem("smartygym-session-theme");
-    
-    // Respect user preference if they've toggled before; otherwise default to light
-    if (sessionTheme) {
+
+    if (isDesktop) {
+      setTheme("dark");
+    } else if (sessionTheme) {
       setTheme(sessionTheme);
     } else {
       setTheme("dark");

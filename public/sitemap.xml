@@ -3979,12 +3979,6 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://smartygym.com/blog/unlocking-glute-growth-the-biomechanics-of-modern-hypertrophy.html</loc>
-    <lastmod>2026-06-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://smartygym.com/blog/circadian-nutrition-the-science-of-meal-timing-mastery.html</loc>
     <lastmod>2026-06-08</lastmod>
     <changefreq>monthly</changefreq>
@@ -3992,6 +3986,12 @@
   </url>
   <url>
     <loc>https://smartygym.com/blog/cognitive-clarity-the-morning-protocol-for-mental-peak.html</loc>
+    <lastmod>2026-06-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://smartygym.com/blog/unlocking-glute-growth-the-biomechanics-of-modern-hypertrophy.html</loc>
     <lastmod>2026-06-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>

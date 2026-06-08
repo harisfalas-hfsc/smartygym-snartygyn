@@ -21,7 +21,7 @@ import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 import { SafeNotificationBadge } from "@/components/NotificationBadge";
-import { ThemeToggle } from "@/components/ThemeToggle";
+
 import { useAdminRole } from "@/hooks/useAdminRole";
 import { SmartyCoachModal } from "@/components/smarty-coach";
 import smartyCoachIcon from "@/assets/smarty-coach-icon.png";
@@ -472,9 +472,7 @@ export const Navigation = () => {
                  <img src={smartyCoachIcon} alt="" className="h-8 w-8 rounded-full" loading="lazy" width={32} height={32} />
                </div>
                <span className="sr-only">Smarty Coach</span>
-             </Button>
-               {/* Theme toggle — desktop only (mobile has it in the bottom nav). */}
-               <div className="hidden lg:inline-flex"><ThemeToggle /></div>
+              </Button>
              {/* Admin Button - only visible to admins */}
             {isAdmin && (
               <Button
