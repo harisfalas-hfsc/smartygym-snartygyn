@@ -326,21 +326,6 @@ export const Navigation = () => {
                         </button>
                       );
                     })}
-                    {isAdmin && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          window.open('/admin', '_blank', 'noopener,noreferrer');
-                          setDesktopMenuOpen(false);
-                        }}
-                        className="flex flex-col items-center justify-center rounded-2xl border-2 border-destructive/25 bg-card p-3 text-center font-semibold text-destructive transition-all duration-200 hover:border-destructive hover:bg-destructive/10"
-                      >
-                        <span className="mx-auto mb-1 flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10 text-destructive">
-                          <Shield className="h-8 w-8" />
-                        </span>
-                        <span className="block text-sm leading-tight">Admin</span>
-                      </button>
-                    )}
                   </nav>
                 </SheetContent>
               </Sheet>
@@ -430,21 +415,6 @@ export const Navigation = () => {
                       </button>
                     );
                   })}
-                  {isAdmin && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        window.open('/admin', '_blank', 'noopener,noreferrer');
-                        setMobileMenuOpen(false);
-                      }}
-                      className="flex flex-col items-center justify-center rounded-2xl border-2 border-destructive/25 bg-card p-2 text-center font-semibold text-destructive transition-all duration-200 hover:border-destructive hover:bg-destructive/10"
-                    >
-                      <span className="mx-auto mb-1 flex h-10 w-10 items-center justify-center rounded-full bg-destructive/10 text-destructive">
-                        <Shield className="h-5 w-5" />
-                      </span>
-                      <span className="block text-xs leading-tight">Admin</span>
-                    </button>
-                  )}
                 </nav>
               </SheetContent>
             </Sheet>
@@ -617,6 +587,19 @@ export const Navigation = () => {
                     <span>Dashboard</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
+                  {isAdmin && (
+                    <>
+                      <DropdownMenuItem
+                        onSelect={() => {
+                          window.open('/admin', '_blank', 'noopener,noreferrer');
+                        }}
+                      >
+                        <Shield className="mr-2 h-4 w-4" />
+                        <span>Admin</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                    </>
+                  )}
                   <DropdownMenuItem 
                     onSelect={() => {
                       handleLogout();
