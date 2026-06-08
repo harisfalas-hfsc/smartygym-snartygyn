@@ -33,8 +33,9 @@ const buildArticleSpecificPrompt = ({
   const subjectRules: string[] = [];
 
   if (/glute|hip thrust|gluteal|posterior chain|rdl|romanian deadlift|lunge/.test(text)) {
-    subjectRules.push("Show glute hypertrophy training: a barbell hip thrust, Romanian deadlift, or reverse lunge setup with the glutes/posterior chain as the clear visual subject.");
-    subjectRules.push("Do not use a generic upper-body, treadmill, boxing, yoga, nutrition, or unrelated gym image.");
+    subjectRules.push("GLUTE MEANS BUTT/HIPS: show a correct lower-body glute hypertrophy scene where the butt/glute muscles and hip extension are the unmistakable main subject.");
+    subjectRules.push("Prefer a barbell hip thrust or glute bridge with the padded bar across the hips/pelvis, bench behind the upper back, knees bent, and feet planted.");
+    subjectRules.push("Forbidden for glute articles: bar on shoulders/neck, back squat, good morning, seated upper-body lift, deadlift-only image, head-hanging pose, treadmill, boxing, yoga, nutrition, or any generic gym image.");
   }
   if (/belly fat|waist|abdominal|over 50|men over 50/.test(text)) {
     subjectRules.push("Show a realistic adult male waist/body-composition scene; do not show a young model or a woman when the article is about men.");
@@ -54,12 +55,13 @@ Article brief: ${articleBrief}
 
 Mandatory subject selection protocol:
 - The visual subject must come from the article title and article brief first; category is only secondary context.
-- If the article names a body part, movement, demographic, food, supplement, health marker, or training method, the image must show that exact subject.
+- If the article names a body part, movement, demographic, food, supplement, health marker, or training method, the image must show that exact subject in the foreground.
 - Avoid generic category imagery. Fitness does not mean random gym photo; nutrition does not mean random food photo; wellness does not mean random meditation photo.
 - ${subjectRules.length ? subjectRules.join("\n- ") : "Choose the most literal, article-specific visual subject from the title and brief."}
 
 Style: premium editorial fitness/health photography, clean bright lighting, professional and realistic.
 Composition: horizontal 16:9, strong first-glance relevance to the article.
+Quality gate before finalizing: if the generated image could be mistaken for a different exercise, body part, demographic, food, or topic than the article title, reject it and generate a more literal image.
 Forbidden: text, title overlays, captions, letters, numbers, logos, watermarks, unrelated stock-photo scenes, sexualized imagery, exaggerated anatomy.`;
 };
 
