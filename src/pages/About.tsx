@@ -197,6 +197,7 @@ const About = () => {
                       <div className="flex items-center gap-3"><Flame className="w-5 h-5 text-red-500 flex-shrink-0" /><span className="text-sm font-semibold text-foreground">Workout of the Day</span></div>
                       <div className="flex items-center gap-3"><Dumbbell className="w-5 h-5 text-orange-500 flex-shrink-0" /><span className="text-sm font-semibold text-foreground">Expert Workouts</span></div>
                       <div className="flex items-center gap-3"><Calendar className="w-5 h-5 text-blue-500 flex-shrink-0" /><span className="text-sm font-semibold text-foreground">Training Programs</span></div>
+                      <div className="flex items-center gap-3"><Sparkles className="w-5 h-5 text-yellow-500 flex-shrink-0" /><span className="text-sm font-semibold text-foreground">Smarty Ritual</span></div>
                       <div className="flex items-center gap-3"><Video className="w-5 h-5 text-emerald-500 flex-shrink-0" /><span className="text-sm font-semibold text-foreground">Exercise Library</span></div>
                       <div className="flex items-center gap-3"><Wrench className="w-5 h-5 text-purple-500 flex-shrink-0" /><span className="text-sm font-semibold text-foreground">Smarty Tools</span></div>
                       <div className="flex items-center gap-3"><FileText className="w-5 h-5 text-cyan-500 flex-shrink-0" /><span className="text-sm font-semibold text-foreground">Articles</span></div>
