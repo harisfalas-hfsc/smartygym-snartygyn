@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollReveal } from "@/components/ScrollReveal";
-import { CheckCircle2, Target, Heart, Users, Shield, Award, Compass, GraduationCap, Plane, Dumbbell, UserCheck, Smartphone, Calendar, Video, Wrench, FileText, BookOpen, ChevronRight, Flame, Crown, Check, Loader2 } from "lucide-react";
+import { CheckCircle2, Target, Heart, Users, Shield, Award, Compass, GraduationCap, Plane, Dumbbell, UserCheck, Smartphone, Calendar, Video, Wrench, FileText, BookOpen, ChevronRight, Flame, Crown, Check, Loader2, Sparkles } from "lucide-react";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import harisPhoto from "@/assets/haris-falas-coach.png";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
@@ -20,6 +21,16 @@ const About = () => {
   const isPremium = userTier === "premium";
   const { toast } = useToast();
   const [loadingPlan, setLoadingPlan] = useState<"gold" | "platinum" | null>(null);
+  const [activeAudienceTooltip, setActiveAudienceTooltip] = useState<string | null>(null);
+
+  const audienceList = [
+    { icon: Users, label: "Busy Adults", color: "text-blue-500", description: "Perfect for professionals juggling work and life. Get effective workouts that fit your schedule—no commute, no waiting for equipment. Train when you have time, not when the gym is open." },
+    { icon: Heart, label: "Parents", color: "text-pink-500", description: "Train at home while kids nap or play nearby. No babysitter needed, no guilt about \"me time.\" Quick, focused sessions that work around your family's schedule." },
+    { icon: GraduationCap, label: "Beginners", color: "text-emerald-500", description: "Start your fitness journey with confidence. Clear instructions, proper form guidance, and progressive programs designed to build your foundation safely." },
+    { icon: Target, label: "Intermediate", color: "text-orange-500", description: "Break through plateaus with structured periodization. Challenge yourself with varied programming that keeps you progressing without the guesswork." },
+    { icon: Plane, label: "Travelers", color: "text-cyan-500", description: "Stay consistent no matter where you are. Hotel room, Airbnb, or park—these workouts adapt to any space with minimal or no equipment needed." },
+    { icon: Dumbbell, label: "Gym-Goers", color: "text-purple-500", description: "Enhance your gym routine with expert programming. Follow structured plans that maximize your gym time and ensure balanced, progressive training." },
+  ];
 
   const handlePlanClick = async (plan: "gold" | "platinum") => {
     if (isPremium) {
@@ -186,6 +197,7 @@ const About = () => {
                       <div className="flex items-center gap-3"><Flame className="w-5 h-5 text-red-500 flex-shrink-0" /><span className="text-sm font-semibold text-foreground">Workout of the Day</span></div>
                       <div className="flex items-center gap-3"><Dumbbell className="w-5 h-5 text-orange-500 flex-shrink-0" /><span className="text-sm font-semibold text-foreground">Expert Workouts</span></div>
                       <div className="flex items-center gap-3"><Calendar className="w-5 h-5 text-blue-500 flex-shrink-0" /><span className="text-sm font-semibold text-foreground">Training Programs</span></div>
+                      <div className="flex items-center gap-3"><Sparkles className="w-5 h-5 text-yellow-500 flex-shrink-0" /><span className="text-sm font-semibold text-foreground">Smarty Ritual</span></div>
                       <div className="flex items-center gap-3"><Video className="w-5 h-5 text-emerald-500 flex-shrink-0" /><span className="text-sm font-semibold text-foreground">Exercise Library</span></div>
                       <div className="flex items-center gap-3"><Wrench className="w-5 h-5 text-purple-500 flex-shrink-0" /><span className="text-sm font-semibold text-foreground">Smarty Tools</span></div>
                       <div className="flex items-center gap-3"><FileText className="w-5 h-5 text-cyan-500 flex-shrink-0" /><span className="text-sm font-semibold text-foreground">Articles</span></div>
@@ -218,6 +230,10 @@ const About = () => {
                     <div className="flex items-center gap-3 cursor-pointer active:opacity-70" onClick={() => navigate('/trainingprogram')}>
                       <Calendar className="w-6 h-6 text-blue-500 flex-shrink-0" />
                       <span className="text-sm font-semibold text-primary hover:underline">Structured Training Programs</span>
+                    </div>
+                    <div className="flex items-center gap-3 cursor-pointer active:opacity-70" onClick={() => navigate('/daily-ritual')}>
+                      <Sparkles className="w-6 h-6 text-yellow-500 flex-shrink-0" />
+                      <span className="text-sm font-semibold text-primary hover:underline">Smarty Ritual</span>
                     </div>
                     <div className="flex items-center gap-3 cursor-pointer active:opacity-70" onClick={() => navigate('/exerciselibrary')}>
                       <Video className="w-6 h-6 text-emerald-500 flex-shrink-0" />
@@ -257,31 +273,26 @@ const About = () => {
                   <h2 className="text-2xl font-bold text-foreground">
                     Who Is <span className="text-primary">SmartyGym</span> For
                   </h2>
-                  <div className="space-y-3 text-left">
-                    <div className="flex items-center gap-3">
-                      <Users className="w-6 h-6 text-blue-500 flex-shrink-0" />
-                      <span className="text-sm font-semibold text-foreground">Busy adults</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Heart className="w-6 h-6 text-pink-500 flex-shrink-0" />
-                      <span className="text-sm font-semibold text-foreground">Parents</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <GraduationCap className="w-6 h-6 text-emerald-500 flex-shrink-0" />
-                      <span className="text-sm font-semibold text-foreground">Beginners</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Target className="w-6 h-6 text-orange-500 flex-shrink-0" />
-                      <span className="text-sm font-semibold text-foreground">Intermediate lifters</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Plane className="w-6 h-6 text-cyan-500 flex-shrink-0" />
-                      <span className="text-sm font-semibold text-foreground">Travelers</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Dumbbell className="w-6 h-6 text-purple-500 flex-shrink-0" />
-                      <span className="text-sm font-semibold text-foreground">Gym-goers</span>
-                    </div>
+                  <div className="grid grid-cols-3 gap-3">
+                    {audienceList.map((audience) => {
+                      const Icon = audience.icon;
+                      return (
+                        <Tooltip key={audience.label} open={activeAudienceTooltip === audience.label}>
+                          <TooltipTrigger asChild>
+                            <div
+                              className="flex flex-col items-center gap-1 cursor-pointer"
+                              onClick={() => setActiveAudienceTooltip(activeAudienceTooltip === audience.label ? null : audience.label)}
+                            >
+                              <Icon className={`w-7 h-7 ${audience.color}`} />
+                              <span className="text-xs font-bold text-foreground text-center">{audience.label}</span>
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent side="top" className="max-w-xs text-center">
+                            {audience.description}
+                          </TooltipContent>
+                        </Tooltip>
+                      );
+                    })}
                   </div>
                   <div className="pt-4 space-y-2">
                     <p className="text-sm text-muted-foreground leading-relaxed">
@@ -490,31 +501,28 @@ const About = () => {
                       Who Is <span className="text-primary">SmartyGym</span> For
                     </h2>
                   </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
-                      <Users className="w-5 h-5 text-primary flex-shrink-0" />
-                      <span className="text-sm font-semibold text-foreground">Busy adults</span>
-                    </div>
-                    <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
-                      <Heart className="w-5 h-5 text-primary flex-shrink-0" />
-                      <span className="text-sm font-semibold text-foreground">Parents</span>
-                    </div>
-                    <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
-                      <GraduationCap className="w-5 h-5 text-primary flex-shrink-0" />
-                      <span className="text-sm font-semibold text-foreground">Beginners</span>
-                    </div>
-                    <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
-                      <Target className="w-5 h-5 text-primary flex-shrink-0" />
-                      <span className="text-sm font-semibold text-foreground">Intermediate lifters</span>
-                    </div>
-                    <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
-                      <Plane className="w-5 h-5 text-primary flex-shrink-0" />
-                      <span className="text-sm font-semibold text-foreground">Travelers</span>
-                    </div>
-                    <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
-                      <Dumbbell className="w-5 h-5 text-primary flex-shrink-0" />
-                      <span className="text-sm font-semibold text-foreground">Gym-goers</span>
-                    </div>
+                  <div className="grid grid-cols-6 gap-2 max-w-2xl mx-auto">
+                    {audienceList.map((audience) => {
+                      const Icon = audience.icon;
+                      return (
+                        <Tooltip key={audience.label} open={activeAudienceTooltip === audience.label}>
+                          <TooltipTrigger asChild>
+                            <div
+                              className="flex flex-col items-center gap-1 cursor-pointer"
+                              onMouseEnter={() => setActiveAudienceTooltip(audience.label)}
+                              onMouseLeave={() => setActiveAudienceTooltip(null)}
+                              onClick={() => setActiveAudienceTooltip(audience.label)}
+                            >
+                              <Icon className={`w-6 h-6 ${audience.color}`} />
+                              <span className="text-sm font-bold text-foreground text-center">{audience.label}</span>
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent side="top" className="max-w-xs text-center">
+                            {audience.description}
+                          </TooltipContent>
+                        </Tooltip>
+                      );
+                    })}
                   </div>
                   <div className="flex flex-wrap items-center justify-center gap-6 pt-4 border-t border-border">
                     <Link 
