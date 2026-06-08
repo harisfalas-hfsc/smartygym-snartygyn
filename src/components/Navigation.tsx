@@ -309,7 +309,7 @@ export const Navigation = () => {
                   <div className="mb-2 shrink-0">
                     <h2 className="text-lg font-bold leading-tight text-foreground">Explore SmartyGym</h2>
                   </div>
-                  <nav className="grid grid-cols-3 gap-2 overflow-y-auto">
+                  <nav className="grid grid-cols-3 gap-3 overflow-y-auto">
                     {discoveryItems.map(({ label, path, icon: Icon, iconClass, track }) => {
                       const active = location.pathname === path;
                       return (
@@ -318,12 +318,12 @@ export const Navigation = () => {
                           type="button"
                           onClick={() => handleNavigate(path)}
                           data-track-cta={track}
-                          className={`flex flex-col items-center justify-center rounded-2xl border-2 p-2 text-center font-semibold transition-all duration-200 ${active ? 'border-primary bg-primary/15 text-primary shadow-sm' : 'border-primary/25 bg-card text-foreground hover:border-primary hover:bg-primary/10'}`}
+                          className={`flex flex-col items-center justify-center rounded-2xl border-2 p-3 text-center font-semibold transition-all duration-200 ${active ? 'border-primary bg-primary/15 text-primary shadow-sm' : 'border-primary/25 bg-card text-foreground hover:border-primary hover:bg-primary/10'}`}
                         >
-                          <span className={`mx-auto mb-1 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 ${iconClass}`}>
-                            <Icon className="h-5 w-5" />
+                          <span className={`mx-auto mb-1 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 ${iconClass}`}>
+                            <Icon className="h-8 w-8" />
                           </span>
-                          <span className="block text-xs leading-tight">{label}</span>
+                          <span className="block text-sm leading-tight">{label}</span>
                         </button>
                       );
                     })}
@@ -334,12 +334,12 @@ export const Navigation = () => {
                           window.open('/admin', '_blank', 'noopener,noreferrer');
                           setDesktopMenuOpen(false);
                         }}
-                        className="flex flex-col items-center justify-center rounded-2xl border-2 border-destructive/25 bg-card p-2 text-center font-semibold text-destructive transition-all duration-200 hover:border-destructive hover:bg-destructive/10"
+                        className="flex flex-col items-center justify-center rounded-2xl border-2 border-destructive/25 bg-card p-3 text-center font-semibold text-destructive transition-all duration-200 hover:border-destructive hover:bg-destructive/10"
                       >
-                        <span className="mx-auto mb-1 flex h-10 w-10 items-center justify-center rounded-full bg-destructive/10 text-destructive">
-                          <Shield className="h-5 w-5" />
+                        <span className="mx-auto mb-1 flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+                          <Shield className="h-8 w-8" />
                         </span>
-                        <span className="block text-xs leading-tight">Admin</span>
+                        <span className="block text-sm leading-tight">Admin</span>
                       </button>
                     )}
                   </nav>
