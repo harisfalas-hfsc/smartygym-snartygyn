@@ -243,6 +243,15 @@ const DesktopVideoHero = ({ height }: { height: number }) => {
           />
         ))}
         <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/10 to-black/55" aria-hidden="true" />
+        {/* Edge vignette — fades images to dark at borders to match city running image */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          aria-hidden="true"
+          style={{
+            background:
+              "radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.55) 85%, rgba(0,0,0,0.85) 100%)",
+          }}
+        />
 
         {/* Brand message — centered at top */}
         <div className="absolute inset-x-0 top-0 flex items-start justify-center pt-5 px-6 pointer-events-none">
