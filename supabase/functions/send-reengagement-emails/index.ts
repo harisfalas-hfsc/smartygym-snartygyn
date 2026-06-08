@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { MESSAGE_TYPES } from "../_shared/notification-types.ts";
+import { requireServiceRole } from "../_shared/cron-auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -18,6 +19,9 @@ serve(async (req) => {
   }
 
   try {
+    const unauthorized = requireServiceRole(req, corsHeaders);
+    if (unauthorized) return unauthorized;
+
     logStep("Function started");
 
     const supabaseAdmin = createClient(

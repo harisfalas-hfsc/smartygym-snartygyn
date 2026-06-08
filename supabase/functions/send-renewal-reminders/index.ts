@@ -4,6 +4,7 @@ import { Resend } from "https://esm.sh/resend@2.0.0";
 import { getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
 import { MESSAGE_TYPES } from "../_shared/notification-types.ts";
 import { logEmailDelivery } from "../_shared/email-log.ts";
+import { requireServiceRole } from "../_shared/cron-auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -16,6 +17,9 @@ serve(async (req) => {
   }
 
   try {
+    const unauthorized = requireServiceRole(req, corsHeaders);
+    if (unauthorized) return unauthorized;
+
     console.log("[SEND-RENEWAL-REMINDERS] Starting subscription expiration check");
 
     const supabaseAdmin = createClient(
