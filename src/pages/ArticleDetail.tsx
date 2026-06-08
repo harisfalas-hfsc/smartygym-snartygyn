@@ -202,8 +202,8 @@ export const ArticleDetail = () => {
           />
 
           <Card className="p-4 md:p-6">
-            <div className="grid grid-cols-1 md:grid-cols-[1.35fr_0.9fr] gap-4 md:gap-6 mb-5 items-start">
-              <div>
+            <div className="grid grid-cols-1 md:grid-cols-[1.35fr_0.9fr] gap-4 md:gap-6 mb-5 md:items-stretch">
+              <div className="flex flex-col">
                 <Badge variant="secondary" className="mb-3">{article.category}</Badge>
                 <h1 className="text-3xl md:text-4xl font-bold mb-3 leading-tight">
                   {article.title}
@@ -226,7 +226,7 @@ export const ArticleDetail = () => {
                 </div>
 
                 {article.author_name && (
-                  <div className="flex items-start gap-2 p-3 bg-accent/10 rounded-lg border border-border">
+                  <div className="flex items-start gap-2 p-3 bg-accent/10 rounded-lg border border-border mt-auto">
                     <span className="text-sm text-muted-foreground">By:</span>
                     <div>
                       <Link to="/coach-profile" className="font-semibold text-primary hover:underline whitespace-nowrap inline-block">
@@ -251,7 +251,7 @@ export const ArticleDetail = () => {
                 height={720}
                 loading="lazy"
                 decoding="async"
-                className="w-full h-auto rounded-lg shadow-lg object-cover aspect-[16/9] md:max-h-[280px] md:sticky md:top-4"
+                className="w-full h-auto md:h-full rounded-lg shadow-lg object-cover aspect-[16/9] md:aspect-auto md:min-h-full"
               />
             </div>
 
