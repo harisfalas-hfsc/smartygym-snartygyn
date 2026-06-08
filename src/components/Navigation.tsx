@@ -473,18 +473,6 @@ export const Navigation = () => {
                </div>
                <span className="sr-only">Smarty Coach</span>
               </Button>
-             {/* Admin Button - only visible to admins */}
-            {isAdmin && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => window.open('/admin', '_blank', 'noopener,noreferrer')}
-                className="hidden sm:flex items-center gap-1.5 border-red-500/50 text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-950/30"
-              >
-                <Shield className="h-4 w-4" />
-                Admin
-              </Button>
-            )}
             
            {user && unreadCount > 0 && (
              <Button
