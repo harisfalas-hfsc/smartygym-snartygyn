@@ -273,31 +273,26 @@ const About = () => {
                   <h2 className="text-2xl font-bold text-foreground">
                     Who Is <span className="text-primary">SmartyGym</span> For
                   </h2>
-                  <div className="space-y-3 text-left">
-                    <div className="flex items-center gap-3">
-                      <Users className="w-6 h-6 text-blue-500 flex-shrink-0" />
-                      <span className="text-sm font-semibold text-foreground">Busy adults</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Heart className="w-6 h-6 text-pink-500 flex-shrink-0" />
-                      <span className="text-sm font-semibold text-foreground">Parents</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <GraduationCap className="w-6 h-6 text-emerald-500 flex-shrink-0" />
-                      <span className="text-sm font-semibold text-foreground">Beginners</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Target className="w-6 h-6 text-orange-500 flex-shrink-0" />
-                      <span className="text-sm font-semibold text-foreground">Intermediate lifters</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Plane className="w-6 h-6 text-cyan-500 flex-shrink-0" />
-                      <span className="text-sm font-semibold text-foreground">Travelers</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Dumbbell className="w-6 h-6 text-purple-500 flex-shrink-0" />
-                      <span className="text-sm font-semibold text-foreground">Gym-goers</span>
-                    </div>
+                  <div className="grid grid-cols-3 gap-3">
+                    {audienceList.map((audience) => {
+                      const Icon = audience.icon;
+                      return (
+                        <Tooltip key={audience.label} open={activeAudienceTooltip === audience.label}>
+                          <TooltipTrigger asChild>
+                            <div
+                              className="flex flex-col items-center gap-1 cursor-pointer"
+                              onClick={() => setActiveAudienceTooltip(activeAudienceTooltip === audience.label ? null : audience.label)}
+                            >
+                              <Icon className={`w-7 h-7 ${audience.color}`} />
+                              <span className="text-xs font-bold text-foreground text-center">{audience.label}</span>
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent side="top" className="max-w-xs text-center">
+                            {audience.description}
+                          </TooltipContent>
+                        </Tooltip>
+                      );
+                    })}
                   </div>
                   <div className="pt-4 space-y-2">
                     <p className="text-sm text-muted-foreground leading-relaxed">
