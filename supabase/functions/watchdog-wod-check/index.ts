@@ -66,13 +66,13 @@ function cyprusDateOffset(daysAhead: number): string {
 
 async function callLibraryPicker(
   supabaseUrl: string,
-  anonKey: string,
+  serviceKey: string,
   targetDate: string,
 ): Promise<{ ok: boolean; status: number; body: string }> {
   try {
     const resp = await fetch(`${supabaseUrl}/functions/v1/select-wod-from-library`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${anonKey}` },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${serviceKey}` },
       body: JSON.stringify({ targetDate, triggerSource: "watchdog-autofix" }),
     });
     const body = await resp.text();

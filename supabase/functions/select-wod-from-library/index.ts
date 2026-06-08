@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { getDayIn84Cycle, getPeriodizationForDay } from "../_shared/periodization-84day.ts";
 import { validateWodPublishContract } from "../_shared/wod-integrity.ts";
+import { requireServiceRole } from "../_shared/cron-auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -179,6 +180,9 @@ serve(async (req) => {
   }
 
   try {
+    const unauthorized = requireServiceRole(req, corsHeaders);
+    if (unauthorized) return unauthorized;
+
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);

@@ -184,6 +184,7 @@ serve(async (req: Request) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const cronAuthKey = supabaseServiceKey;
     
     // Create client with user's auth token
     const authHeader = req.headers.get("Authorization");
@@ -366,7 +367,7 @@ serve(async (req: Request) => {
             $$
             SELECT net.http_post(
               url:='${functionUrl}',
-              headers:='{"Content-Type": "application/json", "Authorization": "Bearer ${supabaseAnonKey}"}'::jsonb,
+              headers:='{"Content-Type": "application/json", "Authorization": "Bearer ${cronAuthKey}"}'::jsonb,
               body:='${escapedBodyJson}'::jsonb
             ) as request_id;
             $$
@@ -444,7 +445,7 @@ serve(async (req: Request) => {
           $$
           SELECT net.http_post(
             url:='${functionUrl}',
-            headers:='{"Content-Type": "application/json", "Authorization": "Bearer ${supabaseAnonKey}"}'::jsonb,
+            headers:='{"Content-Type": "application/json", "Authorization": "Bearer ${cronAuthKey}"}'::jsonb,
             body:='${escapedRequestBodyJson}'::jsonb
           ) as request_id;
           $$
@@ -606,7 +607,7 @@ serve(async (req: Request) => {
               $$
               SELECT net.http_post(
                 url:='${functionUrl}',
-                headers:='{"Content-Type": "application/json", "Authorization": "Bearer ${supabaseAnonKey}"}'::jsonb,
+                headers:='{"Content-Type": "application/json", "Authorization": "Bearer ${cronAuthKey}"}'::jsonb,
                 body:='${escapedBodyJson}'::jsonb
               ) as request_id;
               $$
