@@ -141,24 +141,10 @@ const About = () => {
 
           {/* Hero Section */}
           <ScrollReveal>
-            <div className="mb-12 text-center md:text-left">
-              <div className="md:flex md:items-end md:justify-between md:gap-8 md:border-b md:border-border md:pb-8">
-                <div>
-                  <p className="hidden md:block text-xs uppercase tracking-[0.25em] text-primary font-semibold mb-3">
-                    About the platform
-                  </p>
-                  <h1 className="text-4xl md:text-6xl font-bold mb-4 text-foreground leading-tight">
-                    About <span className="text-primary">SmartyGym</span>
-                  </h1>
-                  <p className="hidden md:block text-lg text-muted-foreground max-w-2xl">
-                    We're redefining online fitness — making quality training accessible, flexible, and designed for real life.
-                  </p>
-                </div>
-                <div className="hidden md:flex flex-col items-end text-right shrink-0">
-                  <span className="text-5xl font-bold text-primary leading-none">20+</span>
-                  <span className="text-xs uppercase tracking-widest text-muted-foreground mt-1">Years of coaching</span>
-                </div>
-              </div>
+            <div className="mb-12 text-center">
+              <h1 className="text-4xl md:text-6xl font-bold mb-4 text-foreground leading-tight">
+                About <span className="text-primary">SmartyGym</span>
+              </h1>
             </div>
           </ScrollReveal>
 
