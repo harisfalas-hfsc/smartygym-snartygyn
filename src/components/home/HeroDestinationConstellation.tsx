@@ -243,15 +243,18 @@ const DesktopVideoHero = ({ height }: { height: number }) => {
           />
         ))}
         <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/10 to-black/55" aria-hidden="true" />
-        {/* Edge vignette — strong radial fade to dark at borders */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          aria-hidden="true"
-          style={{
-            background:
-              "radial-gradient(ellipse at center, transparent 25%, rgba(0,0,0,0.6) 55%, rgba(0,0,0,0.85) 80%, rgba(0,0,0,0.98) 100%)",
-          }}
-        />
+        {/* Edge vignette — strong radial fade to dark at borders.
+            Skip for the city running image which already has its own dark edges. */}
+        {HERO_ROTATING_PHOTOS[photoIndex] !== heroCityRunning && (
+          <div
+            className="absolute inset-0 pointer-events-none transition-opacity duration-1000"
+            aria-hidden="true"
+            style={{
+              background:
+                "radial-gradient(ellipse at center, transparent 25%, rgba(0,0,0,0.6) 55%, rgba(0,0,0,0.85) 80%, rgba(0,0,0,0.98) 100%)",
+            }}
+          />
+        )}
 
         {/* Brand message — centered at top */}
         <div className="absolute inset-x-0 top-0 flex items-start justify-center pt-5 px-6 pointer-events-none">
