@@ -566,14 +566,14 @@ const About = () => {
           {/* Subscription Plans */}
           <ScrollReveal>
             <Card className="mb-12 border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-background">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+              <CardHeader className="text-center">
+                <CardTitle className="flex items-center justify-center gap-2">
                   <Crown className="h-5 w-5 text-primary" />
                   Subscription Plans
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <p className="text-muted-foreground">
+                <p className="text-muted-foreground text-center max-w-3xl mx-auto">
                   SmartyGym offers flexible plans to fit your fitness journey, plus the option to purchase
                   individual workouts or programs if you want to give us a try.
                 </p>
