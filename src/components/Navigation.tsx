@@ -472,9 +472,7 @@ export const Navigation = () => {
                  <img src={smartyCoachIcon} alt="" className="h-8 w-8 rounded-full" loading="lazy" width={32} height={32} />
                </div>
                <span className="sr-only">Smarty Coach</span>
-             </Button>
-               {/* Theme toggle — desktop only (mobile has it in the bottom nav). */}
-               <div className="hidden lg:inline-flex"><ThemeToggle /></div>
+              </Button>
              {/* Admin Button - only visible to admins */}
             {isAdmin && (
               <Button
