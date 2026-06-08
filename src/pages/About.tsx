@@ -278,11 +278,11 @@ const About = () => {
                     {audienceList.map((audience) => {
                       const Icon = audience.icon;
                       return (
-                        <Tooltip key={audience.label} open={activeAudienceTooltip === audience.label}>
+                        <Tooltip key={audience.label} open={activeAudienceTooltipMobile === audience.label}>
                           <TooltipTrigger asChild>
                             <div
                               className="flex flex-col items-center gap-1 cursor-pointer"
-                              onClick={() => setActiveAudienceTooltip(activeAudienceTooltip === audience.label ? null : audience.label)}
+                              onClick={() => setActiveAudienceTooltipMobile(activeAudienceTooltipMobile === audience.label ? null : audience.label)}
                             >
                               <Icon className={`w-7 h-7 ${audience.color}`} />
                               <span className="text-xs font-bold text-foreground text-center">{audience.label}</span>
