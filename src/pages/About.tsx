@@ -22,6 +22,7 @@ const About = () => {
   const { toast } = useToast();
   const [loadingPlan, setLoadingPlan] = useState<"gold" | "platinum" | null>(null);
   const [activeAudienceTooltip, setActiveAudienceTooltip] = useState<string | null>(null);
+  const [activeAudienceTooltipMobile, setActiveAudienceTooltipMobile] = useState<string | null>(null);
 
   const audienceList = [
     { icon: Users, label: "Busy Adults", color: "text-blue-500", description: "Perfect for professionals juggling work and life. Get effective workouts that fit your schedule—no commute, no waiting for equipment. Train when you have time, not when the gym is open." },
