@@ -168,7 +168,8 @@ const Blog = () => {
             </CardContent>
           </Card>
 
-          <CompactFilters filters={[{
+          <div className="mb-6 sm:mb-8">
+            <CompactFilters filters={[{
           name: "Sort by",
           value: sortFilter,
           onChange: setSortFilter,
@@ -199,6 +200,7 @@ const Blog = () => {
           }],
           placeholder: "Category"
         }]} />
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredArticles.map(article => <Card key={article.id} itemScope itemType="https://schema.org/BlogPosting" className="overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg" onClick={() => navigate(`/blog/${article.slug}.html`)} data-article-id={article.id} data-keywords="smarty gym blog, online fitness tips, smartygym.com, Haris Falas, online gym advice" aria-label={`${article.title} - SmartyGym blog - Online fitness at smartygym.com`}>
