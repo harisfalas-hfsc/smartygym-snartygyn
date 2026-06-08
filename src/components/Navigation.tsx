@@ -298,7 +298,7 @@ export const Navigation = () => {
                     <Menu className="h-8 w-8 text-primary" strokeWidth={2} />
                   </button>
                 </SheetTrigger>
-                <SheetContent side="left" hideClose className="left-1/2 top-1/2 bottom-auto flex h-auto max-h-[calc(100vh-2rem)] w-[calc(100vw-2rem)] max-w-[108rem] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border-2 border-primary/40 p-3 shadow-xl">
+                <SheetContent side="left" hideClose className="left-1/2 top-1/2 bottom-auto flex h-auto max-h-[calc(100vh-2rem)] !w-[96vw] !max-w-none sm:!max-w-none -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border-2 border-primary/40 p-3 shadow-xl">
                   <SheetClose asChild>
                     <Button variant="ghost" className="mb-1 h-8 shrink-0 gap-2 self-start rounded-full border-2 border-primary px-3 text-sm text-primary hover:bg-primary hover:text-primary-foreground">
                       <ArrowLeft className="h-3.5 w-3.5" />
