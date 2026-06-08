@@ -66,13 +66,13 @@ function cyprusDateOffset(daysAhead: number): string {
 
 async function callLibraryPicker(
   supabaseUrl: string,
-  anonKey: string,
+  serviceKey: string,
   targetDate: string,
 ): Promise<{ ok: boolean; status: number; body: string }> {
   try {
     const resp = await fetch(`${supabaseUrl}/functions/v1/select-wod-from-library`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${anonKey}` },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${serviceKey}` },
       body: JSON.stringify({ targetDate, triggerSource: "watchdog-autofix" }),
     });
     const body = await resp.text();
@@ -141,7 +141,6 @@ serve(async (req) => {
   }
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-  const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
   const supabase = createClient(supabaseUrl, serviceKey);
 
@@ -296,7 +295,7 @@ serve(async (req) => {
             candidate_rejection_reasons: null,
           });
         } else {
-          const pick = await callLibraryPicker(supabaseUrl, anonKey, targetDate);
+          const pick = await callLibraryPicker(supabaseUrl, serviceKey, targetDate);
 
           const { data: after } = await supabase
             .from("admin_workouts")

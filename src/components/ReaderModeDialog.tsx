@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import DOMPurify from "dompurify";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { X, Plus, Minus, Sun, Moon } from "lucide-react";
@@ -45,6 +46,12 @@ export const ReaderModeDialog = ({
 
   const increaseFontSize = () => setFontSize((prev) => Math.min(prev + 2, 28));
   const decreaseFontSize = () => setFontSize((prev) => Math.max(prev - 2, 14));
+
+  const sanitizedContent = typeof content === "string" ? DOMPurify.sanitize(content, {
+    ALLOWED_TAGS: ["p", "br", "strong", "b", "em", "i", "u", "h1", "h2", "h3", "h4", "h5", "h6", "ul", "ol", "li", "a", "span", "div", "blockquote", "code", "pre", "img", "table", "thead", "tbody", "tr", "th", "td", "hr", "sub", "sup"],
+    ALLOWED_ATTR: ["href", "target", "rel", "class", "id", "style", "src", "alt", "width", "height", "colspan", "rowspan"],
+    ALLOW_DATA_ATTR: false,
+  }) : "";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -207,7 +214,7 @@ export const ReaderModeDialog = ({
             >
               {typeof content === "string" ? (
                 <div
-                  dangerouslySetInnerHTML={{ __html: content }}
+                  dangerouslySetInnerHTML={{ __html: sanitizedContent }}
                   style={{ color: "inherit" }}
                 />
               ) : (

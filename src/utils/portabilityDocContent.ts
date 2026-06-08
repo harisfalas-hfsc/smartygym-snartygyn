@@ -63,7 +63,7 @@ export const portabilityDocContent: DocSection[] = [
 
   // Section 4: AI Features Migration
   { type: 'heading', level: 2, content: '4. AI Features Migration' },
-  { type: 'paragraph', content: 'SmartyGym uses AI for workout generation, training programs, blog articles, and WOD auto-generation. Here\'s what you need to know:' },
+  { type: 'paragraph', content: 'SmartyGym uses AI for admin-assisted content workflows, blog articles, and image generation. Here\'s what you need to know:' },
   { type: 'heading', level: 3, content: 'Current Setup' },
   { type: 'bullet', content: 'AI calls go through Lovable\'s AI Gateway (no API key needed while on Lovable)' },
   { type: 'bullet', content: 'Uses Google Gemini models for generation' },
@@ -75,7 +75,6 @@ export const portabilityDocContent: DocSection[] = [
   { type: 'heading', level: 3, content: 'Edge Functions to Update' },
   { type: 'bullet', content: 'select-wod-from-library (daily library-mode WOD picker)' },
   { type: 'bullet', content: 'watchdog-wod-check (fills missing WOD slots from the library)' },
-  { type: 'bullet', content: 'generate-training-program (AI program creation)' },
   { type: 'bullet', content: 'smarty-coach (AI chatbot)' },
   { type: 'bullet', content: 'generate-blog-image, generate-workout-image, generate-program-image' },
   { type: 'bullet', content: 'assign-daily-ritual (rotates today\'s Smarty Ritual from the admin-curated library — no AI)' },
