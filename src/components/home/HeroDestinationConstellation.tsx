@@ -243,13 +243,13 @@ const DesktopVideoHero = ({ height }: { height: number }) => {
           />
         ))}
         <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/10 to-black/55" aria-hidden="true" />
-        {/* Edge vignette — fades images to dark at borders to match city running image */}
+        {/* Edge vignette — strong radial fade to dark at borders */}
         <div
           className="absolute inset-0 pointer-events-none"
           aria-hidden="true"
           style={{
             background:
-              "radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.55) 85%, rgba(0,0,0,0.85) 100%)",
+              "radial-gradient(ellipse at center, transparent 25%, rgba(0,0,0,0.6) 55%, rgba(0,0,0,0.85) 80%, rgba(0,0,0,0.98) 100%)",
           }}
         />
 
