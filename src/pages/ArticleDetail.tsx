@@ -244,15 +244,17 @@ export const ArticleDetail = () => {
                 )}
               </div>
 
-              <img
-                src={articleImageUrl}
-                alt={imageAltText}
-                width={1280}
-                height={720}
-                loading="lazy"
-                decoding="async"
-                className="w-full h-auto md:h-[260px] rounded-lg shadow-lg object-cover aspect-[16/9] md:aspect-auto"
-              />
+              <div className="relative w-full overflow-hidden rounded-lg shadow-lg aspect-[16/9] md:aspect-auto md:h-full md:min-h-0">
+                <img
+                  src={articleImageUrl}
+                  alt={imageAltText}
+                  width={1280}
+                  height={720}
+                  loading="lazy"
+                  decoding="async"
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
+              </div>
             </div>
 
             <div className="blog-article-content mb-8">
