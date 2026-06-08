@@ -3,12 +3,14 @@ import { cn } from "@/lib/utils";
 
 import heroGymGroup from "@/assets/hero-gym-group.jpg";
 import heroHomeCouple from "@/assets/hero-home-couple.jpg";
-import heroParkCouple from "@/assets/hero-park-couple.jpg";
+import heroCityRunningAsset from "@/assets/hero-city-running.jpg.asset.json";
+
+const heroCityRunning = heroCityRunningAsset.url;
 
 const heroImages = [
-  { src: heroParkCouple, filter: "" },
+  { src: heroCityRunning, filter: "brightness-[0.7]" },
   { src: heroGymGroup, filter: "brightness-[0.6]" },
-  { src: heroParkCouple, filter: "" },
+  { src: heroCityRunning, filter: "brightness-[0.7]" },
   { src: heroHomeCouple, filter: "brightness-[0.65]" },
 ];
 
