@@ -506,31 +506,28 @@ const About = () => {
                       Who Is <span className="text-primary">SmartyGym</span> For
                     </h2>
                   </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
-                      <Users className="w-5 h-5 text-primary flex-shrink-0" />
-                      <span className="text-sm font-semibold text-foreground">Busy adults</span>
-                    </div>
-                    <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
-                      <Heart className="w-5 h-5 text-primary flex-shrink-0" />
-                      <span className="text-sm font-semibold text-foreground">Parents</span>
-                    </div>
-                    <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
-                      <GraduationCap className="w-5 h-5 text-primary flex-shrink-0" />
-                      <span className="text-sm font-semibold text-foreground">Beginners</span>
-                    </div>
-                    <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
-                      <Target className="w-5 h-5 text-primary flex-shrink-0" />
-                      <span className="text-sm font-semibold text-foreground">Intermediate lifters</span>
-                    </div>
-                    <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
-                      <Plane className="w-5 h-5 text-primary flex-shrink-0" />
-                      <span className="text-sm font-semibold text-foreground">Travelers</span>
-                    </div>
-                    <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
-                      <Dumbbell className="w-5 h-5 text-primary flex-shrink-0" />
-                      <span className="text-sm font-semibold text-foreground">Gym-goers</span>
-                    </div>
+                  <div className="grid grid-cols-6 gap-2 max-w-2xl mx-auto">
+                    {audienceList.map((audience) => {
+                      const Icon = audience.icon;
+                      return (
+                        <Tooltip key={audience.label} open={activeAudienceTooltip === audience.label}>
+                          <TooltipTrigger asChild>
+                            <div
+                              className="flex flex-col items-center gap-1 cursor-pointer"
+                              onMouseEnter={() => setActiveAudienceTooltip(audience.label)}
+                              onMouseLeave={() => setActiveAudienceTooltip(null)}
+                              onClick={() => setActiveAudienceTooltip(audience.label)}
+                            >
+                              <Icon className={`w-6 h-6 ${audience.color}`} />
+                              <span className="text-sm font-bold text-foreground text-center">{audience.label}</span>
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent side="top" className="max-w-xs text-center">
+                            {audience.description}
+                          </TooltipContent>
+                        </Tooltip>
+                      );
+                    })}
                   </div>
                   <div className="flex flex-wrap items-center justify-center gap-6 pt-4 border-t border-border">
                     <Link 
