@@ -7,13 +7,69 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
+const stripHtml = (value = "") =>
+  value
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&nbsp;|&#160;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;|&apos;/gi, "'")
+    .replace(/\s+/g, " ")
+    .trim();
+
+const buildArticleSpecificPrompt = ({
+  title,
+  category,
+  excerpt,
+  content,
+}: {
+  title: string;
+  category: string;
+  excerpt?: string;
+  content?: string;
+}) => {
+  const articleBrief = stripHtml(`${title}. ${excerpt || ""}. ${content || ""}`).slice(0, 1800);
+  const text = articleBrief.toLowerCase();
+  const subjectRules: string[] = [];
+
+  if (/glute|hip thrust|gluteal|posterior chain|rdl|romanian deadlift|lunge/.test(text)) {
+    subjectRules.push("Show glute hypertrophy training: a barbell hip thrust, Romanian deadlift, or reverse lunge setup with the glutes/posterior chain as the clear visual subject.");
+    subjectRules.push("Do not use a generic upper-body, treadmill, boxing, yoga, nutrition, or unrelated gym image.");
+  }
+  if (/belly fat|waist|abdominal|over 50|men over 50/.test(text)) {
+    subjectRules.push("Show a realistic adult male waist/body-composition scene; do not show a young model or a woman when the article is about men.");
+  }
+  if (/hydration|water|electrolyte|dehydration/.test(text)) {
+    subjectRules.push("Show water, hydration, electrolytes, or an athlete drinking water; never show meat, fish, or unrelated food.");
+  }
+  if (/protein|meal|nutrition|diet|cholesterol|ldl|supplement/.test(text)) {
+    subjectRules.push("Show the specific nutrition subject from the article, not a generic salad unless the article is actually about salads.");
+  }
+
+  return `Create ONE professional, realistic, text-free featured image for this SmartyGym blog article.
+
+Article title: "${title}"
+Article category: ${category}
+Article brief: ${articleBrief}
+
+Mandatory subject selection protocol:
+- The visual subject must come from the article title and article brief first; category is only secondary context.
+- If the article names a body part, movement, demographic, food, supplement, health marker, or training method, the image must show that exact subject.
+- Avoid generic category imagery. Fitness does not mean random gym photo; nutrition does not mean random food photo; wellness does not mean random meditation photo.
+- ${subjectRules.length ? subjectRules.join("\n- ") : "Choose the most literal, article-specific visual subject from the title and brief."}
+
+Style: premium editorial fitness/health photography, clean bright lighting, professional and realistic.
+Composition: horizontal 16:9, strong first-glance relevance to the article.
+Forbidden: text, title overlays, captions, letters, numbers, logos, watermarks, unrelated stock-photo scenes, sexualized imagery, exaggerated anatomy.`;
+};
+
 serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { title, category, slug } = await req.json();
+    const { title, category, slug, excerpt, content } = await req.json();
 
     if (!title || !category) {
       throw new Error("Title and category are required");
@@ -28,29 +84,7 @@ serve(async (req: Request) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Create a detailed prompt based on category
-    let categoryContext = "";
-    switch (category.toLowerCase()) {
-      case "fitness":
-        categoryContext = "fitness, strength training, athletic performance, gym equipment, exercise, muscular athlete";
-        break;
-      case "nutrition":
-        categoryContext = "healthy food, nutrition, meal prep, vitamins, supplements, balanced diet, fresh ingredients";
-        break;
-      case "wellness":
-        categoryContext = "wellness, meditation, sleep, recovery, mental health, peaceful, relaxation, balance";
-        break;
-      default:
-        categoryContext = "fitness, health, wellness";
-    }
-
-    const prompt = `Professional blog article featured image for an article titled "${title}". 
-The image should visually represent: ${categoryContext}.
-Create a high-quality, professional photograph suitable for a fitness blog.
-Style: Modern, clean, vibrant colors, excellent lighting.
-NO TEXT OR WORDS in the image - just the visual scene.
-Horizontal aspect ratio (16:9).
-Ultra high resolution.`;
+    const prompt = buildArticleSpecificPrompt({ title, category, excerpt, content });
 
     console.log("Generating blog image with prompt:", prompt);
 

@@ -1,7 +1,9 @@
 import menOver50BellyFatImage from "@/assets/blog/how-men-over-50-belly-fat-protocol.jpg.asset.json";
+import gluteGrowthImage from "@/assets/blog/unlocking-glute-growth-hypertrophy.jpg.asset.json";
 
 const slugSpecificImages: Record<string, string> = {
   "how-men-over-50-can-lose-belly-fat-protocol": menOver50BellyFatImage.url,
+  "unlocking-glute-growth-the-biomechanics-of-modern-hypertrophy": gluteGrowthImage.url,
 };
 
 const genericBlogFallbackImage = "/smartygym-social-share.png";

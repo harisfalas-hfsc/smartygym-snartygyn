@@ -247,6 +247,8 @@ export const ArticleEditDialog = ({ article, open, onOpenChange, onSave }: Artic
             title: formData.title,
             category: formData.category,
             slug: formData.slug,
+            excerpt: formData.excerpt,
+            content: formData.content,
           },
         });
 

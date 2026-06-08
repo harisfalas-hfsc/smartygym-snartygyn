@@ -172,7 +172,9 @@ async function generateBlogImage(
   anonKey: string,
   title: string,
   category: string,
-  slug: string
+  slug: string,
+  excerpt: string,
+  content: string
 ): Promise<string | null> {
   try {
     const response = await fetch(`${supabaseUrl}/functions/v1/generate-blog-image`, {
@@ -181,7 +183,7 @@ async function generateBlogImage(
         "Content-Type": "application/json",
         Authorization: `Bearer ${anonKey}`,
       },
-      body: JSON.stringify({ title, category, slug }),
+      body: JSON.stringify({ title, category, slug, excerpt, content }),
     });
 
     if (!response.ok) {
@@ -338,7 +340,15 @@ RESPOND WITH EXACTLY THIS JSON FORMAT (no markdown, no code blocks, just raw JSO
 
         // Generate image
         console.log(`Generating image for: ${parsed.title}`);
-        const imageUrl = await generateBlogImage(supabaseUrl, supabaseAnonKey, parsed.title, category, slug);
+        const imageUrl = await generateBlogImage(
+          supabaseUrl,
+          supabaseAnonKey,
+          parsed.title,
+          category,
+          slug,
+          parsed.excerpt || parsed.title,
+          parsed.content
+        );
 
         // Insert and auto-publish
         const { data: insertedArticle, error: insertError } = await supabase
