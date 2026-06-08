@@ -1,5 +1,5 @@
 import menOver50BellyFatImage from "@/assets/blog/how-men-over-50-belly-fat-protocol.jpg.asset.json";
-import gluteGrowthImage from "@/assets/blog/unlocking-glute-growth-hypertrophy.jpg.asset.json";
+import gluteGrowthImage from "@/assets/blog/unlocking-glute-growth-clear-hip-thrust.jpg.asset.json";
 
 const slugSpecificImages: Record<string, string> = {
   "how-men-over-50-can-lose-belly-fat-protocol": menOver50BellyFatImage.url,
