@@ -275,7 +275,6 @@ export const Navigation = () => {
     { label: "Smarty Plans", path: "/smarty-plans", icon: Crown, iconClass: "text-yellow-500", track: "view-plans-nav" },
     { label: "Smarty Corporate", path: "/corporate", icon: Building2, iconClass: "text-sky-500", track: undefined },
     { label: "FAQ", path: "/faq", icon: HelpCircle, iconClass: "text-purple-500", track: undefined },
-    { label: "The Smarty Method", path: "/the-smarty-method", icon: BookOpen, iconClass: "text-amber-500", track: undefined },
     { label: "Contact", path: "/contact", icon: Mail, iconClass: "text-indigo-500", track: undefined },
   ];
 

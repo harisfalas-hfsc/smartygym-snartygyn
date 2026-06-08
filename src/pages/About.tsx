@@ -141,24 +141,10 @@ const About = () => {
 
           {/* Hero Section */}
           <ScrollReveal>
-            <div className="mb-12 text-center md:text-left">
-              <div className="md:flex md:items-end md:justify-between md:gap-8 md:border-b md:border-border md:pb-8">
-                <div>
-                  <p className="hidden md:block text-xs uppercase tracking-[0.25em] text-primary font-semibold mb-3">
-                    About the platform
-                  </p>
-                  <h1 className="text-4xl md:text-6xl font-bold mb-4 text-foreground leading-tight">
-                    About <span className="text-primary">SmartyGym</span>
-                  </h1>
-                  <p className="hidden md:block text-lg text-muted-foreground max-w-2xl">
-                    We're redefining online fitness — making quality training accessible, flexible, and designed for real life.
-                  </p>
-                </div>
-                <div className="hidden md:flex flex-col items-end text-right shrink-0">
-                  <span className="text-5xl font-bold text-primary leading-none">20+</span>
-                  <span className="text-xs uppercase tracking-widest text-muted-foreground mt-1">Years of coaching</span>
-                </div>
-              </div>
+            <div className="mb-12 text-center">
+              <h1 className="text-4xl md:text-6xl font-bold mb-4 text-foreground leading-tight">
+                About <span className="text-primary">SmartyGym</span>
+              </h1>
             </div>
           </ScrollReveal>
 
@@ -167,9 +153,9 @@ const About = () => {
           <ScrollReveal>
             <Card className="mb-12 border-2 border-primary hidden md:block">
               <CardContent className="p-8 lg:p-10">
-                <div className="grid lg:grid-cols-[1.1fr_1fr] gap-10 items-start">
+                <div className="space-y-8 text-center">
                   <div className="space-y-5">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mx-auto">
                       <Target className="w-4 h-4 text-primary" />
                       <span className="text-xs uppercase tracking-wider font-semibold text-primary">Our Mission</span>
                     </div>
@@ -177,10 +163,10 @@ const About = () => {
                       Your Gym Re-imagined.<br />
                       <span className="text-primary">Anywhere, Anytime.</span>
                     </h2>
-                    <p className="text-base text-muted-foreground leading-relaxed">
+                    <p className="text-base text-muted-foreground leading-relaxed max-w-3xl mx-auto">
                       Everything a complete gym must offer, built by real professionals, in your pocket at <strong className="text-foreground">smartygym.com</strong>.
                     </p>
-                    <p className="text-base text-muted-foreground leading-relaxed">
+                    <p className="text-base text-muted-foreground leading-relaxed max-w-3xl mx-auto">
                       We are not here to replace your gym. We are here to back you up when life gets in the way. Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed — <span className="text-primary font-semibold">SmartyGym</span> is your backup plan. Or, if you prefer training from home entirely, we've got you covered. Or, if you go to your gym but want to follow a professional, science-based workout or training program designed by{' '}
                       <a
                         href="/coach-profile"
@@ -195,8 +181,8 @@ const About = () => {
                     </p>
                   </div>
                   <div className="rounded-xl border border-primary/20 bg-primary/5 p-6">
-                    <p className="text-xs uppercase tracking-wider font-semibold text-primary mb-4">What's inside</p>
-                    <div className="grid sm:grid-cols-2 gap-3">
+                    <p className="text-xs uppercase tracking-wider font-semibold text-primary mb-4 text-center">What's inside</p>
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 text-left">
                       <div className="flex items-center gap-3"><Flame className="w-5 h-5 text-red-500 flex-shrink-0" /><span className="text-sm font-semibold text-foreground">Workout of the Day</span></div>
                       <div className="flex items-center gap-3"><Dumbbell className="w-5 h-5 text-orange-500 flex-shrink-0" /><span className="text-sm font-semibold text-foreground">Expert Workouts</span></div>
                       <div className="flex items-center gap-3"><Calendar className="w-5 h-5 text-blue-500 flex-shrink-0" /><span className="text-sm font-semibold text-foreground">Training Programs</span></div>
@@ -389,17 +375,14 @@ const About = () => {
           {/* Desktop: Core Values - Grid Layout */}
           <ScrollReveal>
             <section className="mb-12 hidden md:block">
-              <div className="flex items-end justify-between mb-6 border-b border-border pb-3">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.25em] text-primary font-semibold mb-1">Principles</p>
-                  <h2 className="text-2xl md:text-3xl font-bold">What We Stand For</h2>
-                </div>
-                <span className="text-sm text-muted-foreground hidden lg:block">04 pillars</span>
+              <div className="text-center mb-6 pb-3 border-b border-border">
+                <p className="text-xs uppercase tracking-[0.25em] text-primary font-semibold mb-1">Principles</p>
+                <h2 className="text-2xl md:text-3xl font-bold">What We Stand For</h2>
               </div>
               <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <Card className="border-2 border-border hover:border-primary transition-all group">
-                  <CardContent className="p-6 text-left space-y-3">
-                    <Heart className="w-10 h-10 text-orange-500 group-hover:scale-110 transition-transform" />
+                  <CardContent className="p-6 text-center space-y-3">
+                    <Heart className="w-10 h-10 text-orange-500 group-hover:scale-110 transition-transform mx-auto" />
                     <h3 className="font-bold text-lg">Built for Real Life</h3>
                     <p className="text-sm text-muted-foreground">
                       Flexible training that fits your schedule, location, and lifestyle — not the other way around.
@@ -407,8 +390,8 @@ const About = () => {
                   </CardContent>
                 </Card>
                 <Card className="border-2 border-border hover:border-primary transition-all group">
-                  <CardContent className="p-6 text-left space-y-3">
-                    <Award className="w-10 h-10 text-purple-500 group-hover:scale-110 transition-transform" />
+                  <CardContent className="p-6 text-center space-y-3">
+                    <Award className="w-10 h-10 text-purple-500 group-hover:scale-110 transition-transform mx-auto" />
                     <h3 className="font-bold text-lg">Science-Based Approach</h3>
                     <p className="text-sm text-muted-foreground">
                       Every workout is designed using evidence-based training principles, not trends or fads.
@@ -416,8 +399,8 @@ const About = () => {
                   </CardContent>
                 </Card>
                 <Card className="border-2 border-border hover:border-primary transition-all group">
-                  <CardContent className="p-6 text-left space-y-3">
-                    <Users className="w-10 h-10 text-emerald-500 group-hover:scale-110 transition-transform" />
+                  <CardContent className="p-6 text-center space-y-3">
+                    <Users className="w-10 h-10 text-emerald-500 group-hover:scale-110 transition-transform mx-auto" />
                     <h3 className="font-bold text-lg">Accessible to Everyone</h3>
                     <p className="text-sm text-muted-foreground">
                       From beginners to advanced athletes, everyone deserves access to quality fitness guidance.
@@ -425,8 +408,8 @@ const About = () => {
                   </CardContent>
                 </Card>
                 <Card className="border-2 border-border hover:border-primary transition-all group">
-                  <CardContent className="p-6 text-left space-y-3">
-                    <Shield className="w-10 h-10 text-blue-500 group-hover:scale-110 transition-transform" />
+                  <CardContent className="p-6 text-center space-y-3">
+                    <Shield className="w-10 h-10 text-blue-500 group-hover:scale-110 transition-transform mx-auto" />
                     <h3 className="font-bold text-lg">Safe and Effective</h3>
                     <p className="text-sm text-muted-foreground">
                       Proper technique, realistic progressions, and injury prevention are at the core of everything we do.
@@ -442,20 +425,18 @@ const About = () => {
             <Card className="mb-12 border-2 border-border bg-primary/5">
               <CardContent className="p-8 lg:p-10">
                 <div className="space-y-8">
-                  <div className="flex items-center gap-5">
-                    <div className="hidden md:flex w-14 h-14 rounded-xl bg-primary/15 items-center justify-center shrink-0">
+                  <div className="text-center">
+                    <div className="hidden md:inline-flex w-14 h-14 rounded-xl bg-primary/15 items-center justify-center mb-3">
                       <Compass className="w-7 h-7 text-primary" />
                     </div>
-                    <div className="text-center md:text-left flex-1">
-                      <p className="text-xs uppercase tracking-[0.25em] text-primary font-semibold mb-1">Our commitment</p>
-                      <h2 className="text-2xl md:text-3xl font-bold text-foreground">The <span className="text-primary">SmartyGym</span> Promise</h2>
-                    </div>
+                    <p className="text-xs uppercase tracking-[0.25em] text-primary font-semibold mb-1">Our commitment</p>
+                    <h2 className="text-2xl md:text-3xl font-bold text-foreground">The <span className="text-primary">SmartyGym</span> Promise</h2>
                   </div>
 
-                  <div className="grid md:grid-cols-3 gap-6 text-left">
+                  <div className="grid md:grid-cols-3 gap-6 text-center">
                     
                     <div className="space-y-2">
-                      <CheckCircle2 className="w-8 h-8 text-primary" />
+                      <CheckCircle2 className="w-8 h-8 text-primary mx-auto" />
                       <h3 className="font-bold">Real Expertise</h3>
                       <p className="text-sm text-muted-foreground">
                         Every program is designed by certified coach <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> — never by AI, always with 20+ years of experience.
@@ -463,7 +444,7 @@ const About = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <CheckCircle2 className="w-8 h-8 text-primary" />
+                      <CheckCircle2 className="w-8 h-8 text-primary mx-auto" />
                       <h3 className="font-bold">Personal Touch</h3>
                       <p className="text-sm text-muted-foreground">
                         Direct access to the coach who created your program. Real support, real guidance, real results.
@@ -471,7 +452,7 @@ const About = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <CheckCircle2 className="w-8 h-8 text-primary" />
+                      <CheckCircle2 className="w-8 h-8 text-primary mx-auto" />
                       <h3 className="font-bold">Not a Robot</h3>
                       <p className="text-sm text-muted-foreground">
                         We don't generate workouts with algorithms. We design them with care, experience, and your goals in mind.
@@ -480,7 +461,7 @@ const About = () => {
 
                   </div>
 
-                  <div className="pt-2 border-t border-border">
+                  <div className="pt-2 border-t border-border text-center">
                     <a
                       href="/the-smarty-method"
                       className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline mt-4"
@@ -500,16 +481,14 @@ const About = () => {
             <Card className="mb-12 border-2 border-border hidden md:block">
               <CardContent className="p-8 lg:p-10">
                 <div className="space-y-6">
-                  <div className="flex items-center gap-5">
-                    <div className="hidden md:flex w-14 h-14 rounded-xl bg-primary/15 items-center justify-center shrink-0">
+                  <div className="text-center">
+                    <div className="hidden md:inline-flex w-14 h-14 rounded-xl bg-primary/15 items-center justify-center mb-3">
                       <Users className="w-7 h-7 text-primary" />
                     </div>
-                    <div className="text-center md:text-left flex-1">
-                      <p className="text-xs uppercase tracking-[0.25em] text-primary font-semibold mb-1">Designed for you</p>
-                      <h2 className="text-2xl md:text-3xl font-bold text-foreground">
-                        Who Is <span className="text-primary">SmartyGym</span> For
-                      </h2>
-                    </div>
+                    <p className="text-xs uppercase tracking-[0.25em] text-primary font-semibold mb-1">Designed for you</p>
+                    <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+                      Who Is <span className="text-primary">SmartyGym</span> For
+                    </h2>
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
@@ -537,7 +516,7 @@ const About = () => {
                       <span className="text-sm font-semibold text-foreground">Gym-goers</span>
                     </div>
                   </div>
-                  <div className="flex flex-wrap items-center gap-6 pt-4 border-t border-border">
+                  <div className="flex flex-wrap items-center justify-center gap-6 pt-4 border-t border-border">
                     <Link 
                       to="/why-invest-in-smartygym" 
                       className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
@@ -561,46 +540,40 @@ const About = () => {
           {/* Everywhere, Anywhere Card */}
           <ScrollReveal className="hidden md:block">
             <Card className="mb-12 border-[3px] border-primary/40 overflow-hidden">
-              <div className="grid md:grid-cols-[auto_1fr] items-stretch">
-                <div className="hidden md:flex items-center justify-center bg-primary/10 px-10 py-6 border-r border-primary/20">
-                  <div className="text-center">
-                    <Plane className="w-10 h-10 text-primary mx-auto mb-2" />
-                    <p className="text-xs uppercase tracking-widest font-semibold text-primary">Anywhere</p>
-                  </div>
+              <CardContent className="p-8 lg:p-10 text-center">
+                <Plane className="w-10 h-10 text-primary mx-auto mb-2" />
+                <p className="text-xs uppercase tracking-widest font-semibold text-primary mb-3">Anywhere</p>
+                <h2 className="text-2xl font-bold mb-3 text-primary">
+                  Everywhere — Anywhere
+                </h2>
+                <p className="text-sm text-muted-foreground leading-relaxed max-w-3xl mx-auto">
+                  Whether you're <span className="text-primary font-bold">traveling</span>, <span className="text-primary font-bold">busy</span> with life, or simply <span className="text-primary font-bold">can't make it</span> to the gym, we've got you covered. And even if you do go to the <span className="text-primary font-bold">gym</span>, we're here with <span className="text-primary font-bold">structured, science-based, professional workouts and training programs</span> to back you up.
+                </p>
+                <p className="text-sm text-primary font-bold leading-relaxed mt-4">
+                  Wherever you are, your gym comes with you, right in your pocket.
+                </p>
+                <div className="mt-4 flex justify-center">
+                  <Link to="/the-smarty-method" className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline">
+                    <BookOpen className="w-4 h-4" />
+                    Discover The Smarty Method
+                    <ChevronRight className="w-4 h-4" />
+                  </Link>
                 </div>
-                <div className="p-6 lg:p-8">
-                  <h2 className="text-2xl font-bold mb-3 text-primary">
-                    Everywhere — Anywhere
-                  </h2>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    Whether you're <span className="text-primary font-bold">traveling</span>, <span className="text-primary font-bold">busy</span> with life, or simply <span className="text-primary font-bold">can't make it</span> to the gym, we've got you covered. And even if you do go to the <span className="text-primary font-bold">gym</span>, we're here with <span className="text-primary font-bold">structured, science-based, professional workouts and training programs</span> to back you up.
-                  </p>
-                  <p className="text-sm text-primary font-bold leading-relaxed mt-4">
-                    Wherever you are, your gym comes with you, right in your pocket.
-                  </p>
-                  <div className="mt-4">
-                    <Link to="/the-smarty-method" className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline">
-                      <BookOpen className="w-4 h-4" />
-                      Discover The Smarty Method
-                      <ChevronRight className="w-4 h-4" />
-                    </Link>
-                  </div>
-                </div>
-              </div>
+              </CardContent>
             </Card>
           </ScrollReveal>
 
           {/* Subscription Plans */}
           <ScrollReveal>
             <Card className="mb-12 border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-background">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+              <CardHeader className="text-center">
+                <CardTitle className="flex items-center justify-center gap-2">
                   <Crown className="h-5 w-5 text-primary" />
                   Subscription Plans
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <p className="text-muted-foreground">
+                <p className="text-muted-foreground text-center max-w-3xl mx-auto">
                   SmartyGym offers flexible plans to fit your fitness journey, plus the option to purchase
                   individual workouts or programs if you want to give us a try.
                 </p>
