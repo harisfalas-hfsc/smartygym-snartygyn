@@ -226,7 +226,7 @@ export const ArticleDetail = () => {
                 </div>
 
                 {article.author_name && (
-                  <div className="flex items-start gap-2 p-3 bg-accent/10 rounded-lg border border-border mt-auto">
+                  <div className="flex items-start gap-2 p-3 bg-accent/10 rounded-lg border border-border">
                     <span className="text-sm text-muted-foreground">By:</span>
                     <div>
                       <Link to="/coach-profile" className="font-semibold text-primary hover:underline whitespace-nowrap inline-block">
@@ -251,7 +251,7 @@ export const ArticleDetail = () => {
                 height={720}
                 loading="lazy"
                 decoding="async"
-                className="w-full h-auto md:h-full rounded-lg shadow-lg object-cover aspect-[16/9] md:aspect-auto md:min-h-full"
+                className="w-full h-auto md:h-full rounded-lg shadow-lg object-cover aspect-[16/9] md:aspect-auto"
               />
             </div>
 
