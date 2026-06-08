@@ -264,12 +264,6 @@ export const ArticleDetail = () => {
               <ShareButtons url={articleUrl} title={article.title} />
             </div>
           </Card>
-
-          <div className="mt-8 flex gap-4">
-            <Button onClick={() => navigate('/join-premium')} className="flex-1">
-              Start Your Plan
-            </Button>
-          </div>
         </article>
       </div>
     </>
