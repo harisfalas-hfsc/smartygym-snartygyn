@@ -21,7 +21,7 @@ import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 import { SafeNotificationBadge } from "@/components/NotificationBadge";
-import { ThemeToggle } from "@/components/ThemeToggle";
+
 import { useAdminRole } from "@/hooks/useAdminRole";
 import { SmartyCoachModal } from "@/components/smarty-coach";
 import smartyCoachIcon from "@/assets/smarty-coach-icon.png";
