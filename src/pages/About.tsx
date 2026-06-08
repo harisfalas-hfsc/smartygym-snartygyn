@@ -231,6 +231,10 @@ const About = () => {
                       <Calendar className="w-6 h-6 text-blue-500 flex-shrink-0" />
                       <span className="text-sm font-semibold text-primary hover:underline">Structured Training Programs</span>
                     </div>
+                    <div className="flex items-center gap-3 cursor-pointer active:opacity-70" onClick={() => navigate('/daily-ritual')}>
+                      <Sparkles className="w-6 h-6 text-yellow-500 flex-shrink-0" />
+                      <span className="text-sm font-semibold text-primary hover:underline">Smarty Ritual</span>
+                    </div>
                     <div className="flex items-center gap-3 cursor-pointer active:opacity-70" onClick={() => navigate('/exerciselibrary')}>
                       <Video className="w-6 h-6 text-emerald-500 flex-shrink-0" />
                       <span className="text-sm font-semibold text-primary hover:underline">Exercise Library</span>
