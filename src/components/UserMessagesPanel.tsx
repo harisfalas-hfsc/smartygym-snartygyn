@@ -1038,13 +1038,8 @@ export const UserMessagesPanel = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete {deletableCount} Messages</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete {deletableCount} system message{deletableCount !== 1 ? 's' : ''}? 
+              Are you sure you want to delete {deletableCount} selected message{deletableCount !== 1 ? 's' : ''}? 
               This action cannot be undone.
-              {validSelectedMessages.size > deletableCount && (
-                <span className="block mt-2 text-muted-foreground">
-                  Note: {validSelectedMessages.size - deletableCount} contact message{validSelectedMessages.size - deletableCount !== 1 ? 's' : ''} will not be deleted as contact messages cannot be removed.
-                </span>
-              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

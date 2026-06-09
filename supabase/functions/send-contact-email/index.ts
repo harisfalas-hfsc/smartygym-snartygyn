@@ -315,6 +315,20 @@ const handler = async (req: Request): Promise<Response> => {
 
             // Log AI response to history if messageId provided
             if (messageId) {
+              const { error: contactUpdateError } = await supabaseAdmin
+                .from('contact_messages')
+                .update({
+                  response: aiData.response,
+                  responded_at: new Date().toISOString(),
+                  status: 'responded',
+                  response_read_at: null,
+                })
+                .eq('id', messageId);
+
+              if (contactUpdateError) {
+                console.error("Failed to save AI response to contact message:", contactUpdateError);
+              }
+
               const { error: aiHistoryError } = await supabaseAdmin
                 .from('contact_message_history')
                 .insert({
