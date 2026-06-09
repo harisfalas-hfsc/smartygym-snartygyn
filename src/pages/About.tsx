@@ -168,39 +168,47 @@ const About = () => {
                   <h2 className="text-2xl font-bold text-foreground">
                     Your Gym Re-imagined. Anywhere, Anytime.
                   </h2>
-                  <div className="space-y-3 text-left">
-                    <div className="flex items-center gap-3 cursor-pointer active:opacity-70" onClick={() => navigate('/workout/wod')}>
-                      <Flame className="w-6 h-6 text-red-500 flex-shrink-0" />
-                      <span className="text-sm font-semibold text-primary hover:underline">Workout of the Day</span>
-                    </div>
-                    <div className="flex items-center gap-3 cursor-pointer active:opacity-70" onClick={() => navigate('/workout')}>
-                      <Dumbbell className="w-6 h-6 text-orange-500 flex-shrink-0" />
-                      <span className="text-sm font-semibold text-primary hover:underline">Expert-Crafted Workouts</span>
-                    </div>
-                    <div className="flex items-center gap-3 cursor-pointer active:opacity-70" onClick={() => navigate('/trainingprogram')}>
-                      <Calendar className="w-6 h-6 text-blue-500 flex-shrink-0" />
-                      <span className="text-sm font-semibold text-primary hover:underline">Structured Training Programs</span>
-                    </div>
-                    <div className="flex items-center gap-3 cursor-pointer active:opacity-70" onClick={() => navigate('/daily-ritual')}>
-                      <Sparkles className="w-6 h-6 text-yellow-500 flex-shrink-0" />
-                      <span className="text-sm font-semibold text-primary hover:underline">Smarty Ritual</span>
-                    </div>
-                    <div className="flex items-center gap-3 cursor-pointer active:opacity-70" onClick={() => navigate('/exerciselibrary')}>
-                      <Video className="w-6 h-6 text-emerald-500 flex-shrink-0" />
-                      <span className="text-sm font-semibold text-primary hover:underline">Exercise Library</span>
-                    </div>
-                    <div className="flex items-center gap-3 cursor-pointer active:opacity-70" onClick={() => navigate('/tools')}>
-                      <Wrench className="w-6 h-6 text-purple-500 flex-shrink-0" />
-                      <span className="text-sm font-semibold text-primary hover:underline">Smarty Tools</span>
-                    </div>
-                    <div className="flex items-center gap-3 cursor-pointer active:opacity-70" onClick={() => navigate('/blog')}>
-                      <FileText className="w-6 h-6 text-cyan-500 flex-shrink-0" />
-                      <span className="text-sm font-semibold text-primary hover:underline">Articles</span>
-                    </div>
-                    <div className="flex items-center gap-3 cursor-pointer active:opacity-70" onClick={() => navigate('/userdashboard?tab=logbook')}>
-                      <BookOpen className="w-6 h-6 text-pink-500 flex-shrink-0" />
-                      <span className="text-sm font-semibold text-primary hover:underline">LogBook</span>
-                    </div>
+                  {/* Mobile: vertical list */}
+                  <div className="space-y-3 text-left md:hidden">
+                    {[
+                      { icon: Flame, color: "text-red-500", label: "Workout of the Day", to: "/workout/wod" },
+                      { icon: Dumbbell, color: "text-orange-500", label: "Expert-Crafted Workouts", to: "/workout" },
+                      { icon: Calendar, color: "text-blue-500", label: "Structured Training Programs", to: "/trainingprogram" },
+                      { icon: Sparkles, color: "text-yellow-500", label: "Smarty Ritual", to: "/daily-ritual" },
+                      { icon: Video, color: "text-emerald-500", label: "Exercise Library", to: "/exerciselibrary" },
+                      { icon: Wrench, color: "text-purple-500", label: "Smarty Tools", to: "/tools" },
+                      { icon: FileText, color: "text-cyan-500", label: "Articles", to: "/blog" },
+                      { icon: BookOpen, color: "text-pink-500", label: "LogBook", to: "/userdashboard?tab=logbook" },
+                    ].map(({ icon: Icon, color, label, to }) => (
+                      <div key={label} className="flex items-center gap-3 cursor-pointer active:opacity-70" onClick={() => navigate(to)}>
+                        <Icon className={`w-6 h-6 ${color} flex-shrink-0`} />
+                        <span className="text-sm font-semibold text-primary hover:underline">{label}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Desktop: 4×2 grid of bordered tiles */}
+                  <div className="hidden md:grid grid-cols-4 gap-4">
+                    {[
+                      { icon: Flame, color: "text-red-500", label: "Workout of the Day", to: "/workout/wod" },
+                      { icon: Dumbbell, color: "text-orange-500", label: "Expert-Crafted Workouts", to: "/workout" },
+                      { icon: Calendar, color: "text-blue-500", label: "Structured Training Programs", to: "/trainingprogram" },
+                      { icon: Sparkles, color: "text-yellow-500", label: "Smarty Ritual", to: "/daily-ritual" },
+                      { icon: Video, color: "text-emerald-500", label: "Exercise Library", to: "/exerciselibrary" },
+                      { icon: Wrench, color: "text-purple-500", label: "Smarty Tools", to: "/tools" },
+                      { icon: FileText, color: "text-cyan-500", label: "Articles", to: "/blog" },
+                      { icon: BookOpen, color: "text-pink-500", label: "LogBook", to: "/userdashboard?tab=logbook" },
+                    ].map(({ icon: Icon, color, label, to }) => (
+                      <button
+                        key={label}
+                        type="button"
+                        onClick={() => navigate(to)}
+                        className="aspect-square flex flex-col items-center justify-center gap-3 p-4 rounded-xl border-2 border-border bg-card hover:border-primary hover:bg-primary/5 hover:-translate-y-0.5 transition-all group"
+                      >
+                        <Icon className={`w-12 h-12 ${color} group-hover:scale-110 transition-transform`} />
+                        <span className="text-sm font-semibold text-foreground text-center leading-tight">{label}</span>
+                      </button>
+                    ))}
                   </div>
                   <p className="text-base text-muted-foreground text-center leading-relaxed">
                     Everything a complete gym must offer, built by real professionals, in your pocket at <strong className="text-primary">smartygym.com</strong>.
