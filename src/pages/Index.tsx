@@ -270,7 +270,8 @@ const Index = () => {
         error
       } = await supabase.functions.invoke('create-checkout', {
         body: {
-          priceId: priceIds[plan]
+          priceId: priceIds[plan],
+          cancelPath: window.location.pathname + window.location.search
         }
       });
       if (error) throw error;
