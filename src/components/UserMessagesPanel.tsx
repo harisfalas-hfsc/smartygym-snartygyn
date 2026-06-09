@@ -579,9 +579,40 @@ export const UserMessagesPanel = () => {
   };
 
   const extractLink = (content: string): string | null => {
-    void 0;
     const hrefMatch = content.match(/href="([^"]+)"/);
     return hrefMatch ? hrefMatch[1] : null;
+  };
+
+  const handleSendReply = async (messageId: string) => {
+    const draft = (replyDrafts[messageId] || "").trim();
+    if (!draft) {
+      toast.error("Please type a reply first");
+      return;
+    }
+    setSendingReplyFor(messageId);
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "send-customer-reply-notification",
+        { body: { messageId, replyContent: draft } }
+      );
+      if (error || (data as any)?.error) {
+        throw new Error((error as any)?.message || (data as any)?.error || "Failed to send reply");
+      }
+      toast.success("Reply sent — our team has been notified");
+      setReplyDrafts((prev) => {
+        const next = { ...prev };
+        delete next[messageId];
+        return next;
+      });
+      await refetchContact();
+      await refetchHistory();
+      queryClient.invalidateQueries({ queryKey: ["unread-messages-count"] });
+    } catch (e: any) {
+      console.error("[UserMessagesPanel] Send reply failed:", e);
+      toast.error(e?.message || "Failed to send reply");
+    } finally {
+      setSendingReplyFor(null);
+    }
   };
 
   const getCategoryIcon = (category: string) => {
