@@ -205,7 +205,7 @@ const About = () => {
                         onClick={() => navigate(to)}
                         className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border border-border bg-card hover:border-primary hover:bg-primary/5 transition-all group"
                       >
-                        <Icon className={`w-10 h-10 ${color} group-hover:scale-110 transition-transform`} />
+                        <Icon className={`w-12 h-12 ${color} group-hover:scale-110 transition-transform`} />
                         <span className="text-xs font-semibold text-foreground text-center leading-tight">{label}</span>
                       </button>
                     ))}
