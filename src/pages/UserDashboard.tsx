@@ -208,14 +208,25 @@ export default function UserDashboard() {
     queryKey: ['unread-messages-count', user?.id],
     queryFn: async () => {
       if (!user) return 0;
-      const [contactResult, systemResult] = await Promise.all([supabase.from('contact_messages').select('*', {
-        count: 'exact',
-        head: true
-      }).eq('user_id', user.id).not('response', 'is', null).is('response_read_at', null), supabase.from('user_system_messages').select('*', {
+      const [contactResult, systemResult] = await Promise.all([supabase.from('contact_messages').select('id, response').eq('user_id', user.id).is('response_read_at', null), supabase.from('user_system_messages').select('*', {
         count: 'exact',
         head: true
       }).eq('user_id', user.id).eq('is_read', false)]);
-      const contactCount = contactResult.count || 0;
+      if (contactResult.error) throw contactResult.error;
+
+      const contactIds = (contactResult.data || []).map((thread) => thread.id);
+      let historyReplyIds = new Set<string>();
+      if (contactIds.length > 0) {
+        const { data: historyReplies, error: historyError } = await supabase
+          .from('contact_message_history')
+          .select('contact_message_id')
+          .in('contact_message_id', contactIds)
+          .neq('sender', 'customer');
+        if (historyError) throw historyError;
+        historyReplyIds = new Set((historyReplies || []).map((reply) => reply.contact_message_id));
+      }
+
+      const contactCount = (contactResult.data || []).filter((thread) => Boolean(thread.response) || historyReplyIds.has(thread.id)).length;
       const systemCount = systemResult.count || 0;
       return contactCount + systemCount;
     },
