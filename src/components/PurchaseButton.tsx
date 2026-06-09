@@ -35,14 +35,33 @@ export const PurchaseButton = ({
   // Check if already purchased
   const alreadyPurchased = hasPurchased(contentId, contentType);
   const currentPath = `${location.pathname}${location.search}`;
-  const canonicalContentPath = contentType === "workout"
-    ? `/workout/${contentId}`
-    : `/trainingprogram/${contentId}`;
+
+  const stripCheckoutReturn = (path: string) => {
+    const [pathname, search = ""] = path.split("?");
+    const normalizedPathname = pathname !== "/" ? pathname.replace(/\.html$/i, "") : pathname;
+    if (!search) return normalizedPathname;
+
+    const params = new URLSearchParams(search);
+    params.delete("checkout_return");
+    const nextSearch = params.toString();
+    return nextSearch ? `${normalizedPathname}?${nextSearch}` : normalizedPathname;
+  };
+
+  const addCheckoutReturn = (path: string, returnPath: string) => {
+    const [pathname, search = ""] = path.split("?");
+    const params = new URLSearchParams(search);
+    params.set("checkout_return", returnPath);
+    return `${pathname}?${params.toString()}`;
+  };
+
+  const exactCheckoutReturnPath = stripCheckoutReturn(currentPath);
+  const exactCheckoutReturnBasePath = exactCheckoutReturnPath.split("?")[0];
   const preCheckoutPath = [...history]
     .reverse()
-    .find((path) => path !== currentPath && !path.startsWith(canonicalContentPath))
+    .map(stripCheckoutReturn)
+    .find((path) => path !== exactCheckoutReturnPath && !path.startsWith(exactCheckoutReturnBasePath))
     || (contentType === "workout" ? "/workout" : "/trainingprogram");
-  const checkoutCancelPath = `${canonicalContentPath}?checkout_return=${encodeURIComponent(preCheckoutPath)}`;
+  const checkoutCancelPath = addCheckoutReturn(exactCheckoutReturnPath, preCheckoutPath);
   
   // NEW: Check if user is premium (cannot purchase)
   const isPremium = userTier === "premium";
