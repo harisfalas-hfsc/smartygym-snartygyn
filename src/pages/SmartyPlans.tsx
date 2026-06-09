@@ -150,7 +150,7 @@ export default function SmartyPlans() {
 
     try {
     const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: { priceId: priceIds[plan] }
+        body: { priceId: priceIds[plan], cancelPath: window.location.pathname + window.location.search }
       });
 
       // Handle already subscribed response from backend
