@@ -10,7 +10,7 @@ import harisPhoto from "@/assets/haris-falas-coach.png";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { STRIPE_PRICE_IDS } from "@/config/pricing";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -22,6 +22,18 @@ const About = () => {
   const { toast } = useToast();
   const [loadingPlan, setLoadingPlan] = useState<"gold" | "platinum" | null>(null);
   const [activeAudienceTooltipMobile, setActiveAudienceTooltipMobile] = useState<string | null>(null);
+  const audienceGridRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!activeAudienceTooltipMobile) return;
+    const handlePointerDown = (e: PointerEvent) => {
+      if (audienceGridRef.current && !audienceGridRef.current.contains(e.target as Node)) {
+        setActiveAudienceTooltipMobile(null);
+      }
+    };
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, [activeAudienceTooltipMobile]);
 
   const audienceList = [
     { icon: Users, label: "Busy Adults", color: "text-blue-500", description: "Perfect for professionals juggling work and life. Get effective workouts that fit your schedule—no commute, no waiting for equipment. Train when you have time, not when the gym is open." },
@@ -231,7 +243,7 @@ const About = () => {
                   <h2 className="text-2xl font-bold text-foreground">
                     Who Is <span className="text-primary">SmartyGym</span> For
                   </h2>
-                  <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+                  <div ref={audienceGridRef} className="grid grid-cols-3 md:grid-cols-6 gap-3">
                     {audienceList.map((audience) => {
                       const Icon = audience.icon;
                       return (
