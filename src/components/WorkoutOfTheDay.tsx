@@ -59,7 +59,7 @@ export const WorkoutOfTheDay = () => {
   };
 
   // Render card for regular WODs (BODYWEIGHT/EQUIPMENT)
-  const renderMiniCard = (wod: typeof bodyweightWOD, isBodyweight: boolean) => {
+  const renderMiniCard = (wod: typeof bodyweightWOD, isBodyweight: boolean, compact: boolean = false) => {
     if (!wod) return null;
     
     const equipmentIcon = isBodyweight ? <Home className="w-3 h-3" /> : <Dumbbell className="w-3 h-3" />;
@@ -67,11 +67,11 @@ export const WorkoutOfTheDay = () => {
 
     return (
       <div 
-        className="bg-background/80 backdrop-blur-sm rounded-lg p-3 border border-primary/30 cursor-pointer hover:border-primary/60 transition-all"
+        className={cn("bg-background/80 backdrop-blur-sm rounded-lg border border-primary/30 cursor-pointer hover:border-primary/60 transition-all", compact ? "p-2" : "p-3")}
         onClick={() => navigate(`/workout/wod/${wod.id}`)}
       >
         {wod.image_url && (
-          <div className="relative w-full h-20 rounded-md overflow-hidden mb-2">
+          <div className={cn("relative w-full rounded-md overflow-hidden mb-2", compact ? "h-14" : "h-20")}>
             <img src={wod.image_url} alt={`${wod.name || "Workout"} - ${wod.format || ''} ${wod.category || ''} workout - ${wod.difficulty_stars}★ ${wod.difficulty || ''} - ${wod.duration || ''} - by Sports Scientist Haris Falas - SmartyGym SmartGym Smart Gym smartygym.com`} className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
             <Badge className={`absolute top-2 left-2 ${bgColor} text-white border-0 text-xs py-0.5`}>
@@ -190,10 +190,10 @@ export const WorkoutOfTheDay = () => {
 
   return (
     <Card className="mb-8 bg-gradient-to-br from-primary/10 via-background to-primary/10 border-2 border-primary/50 shadow-primary overflow-hidden">
-      <div className="p-4 sm:p-6">
+      <div className="p-3 sm:p-6">
         {/* Icon Container */}
         <div className="flex flex-col items-center text-center">
-          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-3">
+          <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-primary/10 flex items-center justify-center mb-3">
             <CalendarCheck className="w-8 h-8 text-primary" />
           </div>
           
@@ -243,12 +243,12 @@ export const WorkoutOfTheDay = () => {
                   <CarouselContent className="-ml-3">
                     {bodyweightWOD && (
                       <CarouselItem className="pl-3 basis-[82%]">
-                        {renderMiniCard(bodyweightWOD, true)}
+                        {renderMiniCard(bodyweightWOD, true, true)}
                       </CarouselItem>
                     )}
                     {equipmentWOD && (
                       <CarouselItem className="pl-3 basis-[82%]">
-                        {renderMiniCard(equipmentWOD, false)}
+                        {renderMiniCard(equipmentWOD, false, true)}
                       </CarouselItem>
                     )}
                   </CarouselContent>

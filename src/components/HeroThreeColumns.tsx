@@ -135,7 +135,7 @@ export const HeroThreeColumns = () => {
                     "cursor-pointer group border-2 border-primary/40 rounded-xl overflow-hidden",
                     "hover:border-primary hover:shadow-2xl hover:scale-[1.05] hover:z-10",
                     "transition-all duration-300 ease-out",
-                    "h-[220px] md:h-[180px]",
+                    "h-[165px] md:h-[180px]",
                     "flex flex-col md:relative bg-card"
                   )}
                 >
