@@ -43,17 +43,32 @@ export const useUnreadMessages = () => {
 
         if (systemError) throw systemError;
 
-        // Count unread responses in contact messages
-        const { count: contactCount, error: contactError } = await supabase
+        // Count unread contact threads that have either a saved response or history replies
+        const { data: contactThreads, error: contactError } = await supabase
           .from('contact_messages')
-          .select('*', { count: 'exact', head: true })
+          .select('id, response, response_read_at')
           .eq('user_id', userId)
-          .not('response', 'is', null)
           .is('response_read_at', null);
 
         if (contactError) throw contactError;
 
-        return (systemCount || 0) + (contactCount || 0);
+        const contactThreadIds = (contactThreads || []).map((thread) => thread.id);
+        let historyReplyIds = new Set<string>();
+
+        if (contactThreadIds.length > 0) {
+          const { data: historyReplies, error: historyError } = await supabase
+            .from('contact_message_history')
+            .select('contact_message_id')
+            .in('contact_message_id', contactThreadIds)
+            .neq('sender', 'customer');
+
+          if (historyError) throw historyError;
+          historyReplyIds = new Set((historyReplies || []).map((reply) => reply.contact_message_id));
+        }
+
+        const contactCount = (contactThreads || []).filter((thread) => Boolean(thread.response) || historyReplyIds.has(thread.id)).length;
+
+        return (systemCount || 0) + contactCount;
       } catch (error: any) {
         console.error('[useUnreadMessages] Query failed:', error);
         return 0;
