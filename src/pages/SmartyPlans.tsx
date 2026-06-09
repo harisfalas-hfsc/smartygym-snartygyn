@@ -253,8 +253,8 @@ export default function SmartyPlans() {
   );
 
   const PlatinumPlanCard = (
-    <Card className="relative border-2 border-[#A8A9AD] shadow-lg flex flex-col h-full bg-gradient-to-br from-[#A8A9AD]/5 to-[#C0C0C0]/10">
-        <Badge className="absolute -top-2 right-2 sm:-top-3 sm:right-3 bg-green-600 text-white px-2 sm:px-3 py-1 z-10">
+    <Card className="relative overflow-hidden border-2 border-[#A8A9AD] shadow-lg flex flex-col h-full bg-gradient-to-br from-[#A8A9AD]/5 to-[#C0C0C0]/10">
+        <Badge className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-green-600 text-white px-2 sm:px-3 py-1 z-10">
           BEST VALUE
         </Badge>
         <CardHeader className="text-center pb-2 sm:pb-4 pt-4 sm:pt-6">
