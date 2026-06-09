@@ -19,6 +19,15 @@ const stripCheckoutReturn = (path: string) => {
   return nextSearch ? `${pathname}?${nextSearch}` : pathname;
 };
 
+const getCheckoutReturn = (search: string) => {
+  const value = new URLSearchParams(search).get(CHECKOUT_RETURN_PARAM);
+  try {
+    return value ? decodeURIComponent(value) : null;
+  } catch {
+    return value;
+  }
+};
+
 interface NavigationHistoryContextType {
   history: string[];
   goBack: () => void;
@@ -76,7 +85,7 @@ export const NavigationHistoryProvider = ({ children }: { children: ReactNode })
   }, [location.pathname, location.search, navigationType]);
 
   const goBack = () => {
-    const checkoutReturn = new URLSearchParams(location.search).get(CHECKOUT_RETURN_PARAM);
+    const checkoutReturn = getCheckoutReturn(location.search);
     if (isSafeInternalPath(checkoutReturn)) {
       const cleanCurrentPath = stripCheckoutReturn(`${location.pathname}${location.search}`);
       isGoingBack.current = true;
@@ -125,7 +134,7 @@ export const NavigationHistoryProvider = ({ children }: { children: ReactNode })
     navigate(next);
   };
 
-  const canGoBack = history.length > 1 || isSafeInternalPath(new URLSearchParams(location.search).get(CHECKOUT_RETURN_PARAM));
+  const canGoBack = history.length > 1 || isSafeInternalPath(getCheckoutReturn(location.search));
   const canGoForward = forwardStack.length > 0;
 
   return (
