@@ -184,6 +184,91 @@ export default function SmartyPlans() {
     "Full access to all features"
   ];
 
+  const PricingPlansBlock = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      {/* Gold Plan */}
+      <Card className="relative border-2 border-[#D4AF37] shadow-lg flex flex-col">
+        <CardHeader className="text-center pb-2 sm:pb-4">
+          <h2 className="text-xl sm:text-2xl font-bold text-[#D4AF37]">Gold Plan</h2>
+          <Badge className="bg-[#D4AF37] text-white mx-auto mb-3 sm:mb-4">MONTHLY</Badge>
+          <CardTitle className="text-2xl sm:text-3xl font-bold">€{goldOriginal.toFixed(2)}</CardTitle>
+          <p className="text-xs sm:text-sm text-muted-foreground">per month</p>
+          <p className="text-xs text-[#D4AF37] font-semibold mt-1">🔄 Auto-renews monthly</p>
+        </CardHeader>
+        <CardContent className="space-y-2 sm:space-y-4 flex-1 flex flex-col">
+          <div className="space-y-1.5 sm:space-y-2 flex-1">
+            {["Full access to all Smarty Workouts", "Full access to all Smarty Programs", "Full access to Smarty Ritual", "Full access to Smarty Tools", "Flexible monthly billing", "Cancel anytime"].map((item, i) => (
+              <div key={i} className="flex items-start gap-2">
+                <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 shrink-0 mt-0.5" />
+                <span className="text-xs sm:text-sm">{item}</span>
+              </div>
+            ))}
+          </div>
+          <div className="space-y-3 mt-auto">
+            {isIOSNative() ? (
+              <div className="text-center text-xs sm:text-sm text-muted-foreground p-3 border rounded">
+                Subscribe at <span className="text-primary font-semibold">smartygym.com</span>
+              </div>
+            ) : (
+            <Button
+              className="w-full py-4 sm:py-6 text-white bg-[#D4AF37] hover:bg-[#C9A431]"
+              onClick={() => handleSubscribe('gold')}
+              disabled={loading}
+            >
+              {loading ? "Processing..." : "Start Your Plan"}
+            </Button>
+            )}
+            <p className="text-xs text-center text-muted-foreground">Auto-renews each month</p>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Platinum Plan */}
+      <Card className="relative border-2 border-[#A8A9AD] shadow-lg flex flex-col bg-gradient-to-br from-[#A8A9AD]/5 to-[#C0C0C0]/10">
+        <Badge className="absolute -top-2 right-2 sm:-top-3 sm:right-3 bg-green-600 text-white px-2 sm:px-3 py-1 z-10">
+          BEST VALUE
+        </Badge>
+        <CardHeader className="text-center pb-2 sm:pb-4 pt-4 sm:pt-6">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <Crown className="h-5 w-5 sm:h-6 sm:w-6 text-[#A8A9AD]" />
+            <h2 className="text-xl sm:text-2xl font-bold text-[#A8A9AD]">Platinum</h2>
+          </div>
+          <Badge className="bg-[#A8A9AD] text-white mx-auto mb-3 sm:mb-4">YEARLY</Badge>
+          <CardTitle className="text-2xl sm:text-3xl font-bold">€{platinumOriginal.toFixed(2)}</CardTitle>
+          <p className="text-xs sm:text-sm text-muted-foreground">per year</p>
+          <p className="text-sm text-green-600 font-bold mt-2">Save €29.89!</p>
+          <p className="text-xs text-muted-foreground">Just €7.50/month • 🔄 Auto-renews yearly</p>
+        </CardHeader>
+        <CardContent className="space-y-2 sm:space-y-4 flex-1 flex flex-col">
+          <div className="space-y-1.5 sm:space-y-2 flex-1">
+            {["Full access to all Smarty Workouts", "Full access to all Smarty Programs", "Full access to Smarty Ritual", "Full access to Smarty Tools", "25% savings vs monthly", "Cancel anytime"].map((item, i) => (
+              <div key={i} className="flex items-start gap-2">
+                <Check className={`h-4 w-4 sm:h-5 sm:w-5 shrink-0 mt-0.5 ${item.includes("25%") ? "text-green-600" : "text-green-500"}`} />
+                <span className={`text-xs sm:text-sm ${item.includes("25%") ? "font-bold text-green-600" : ""}`}>{item}</span>
+              </div>
+            ))}
+          </div>
+          <div className="space-y-3 mt-auto">
+            {isIOSNative() ? (
+              <div className="text-center text-xs sm:text-sm text-muted-foreground p-3 border rounded">
+                Subscribe at <span className="text-primary font-semibold">smartygym.com</span>
+              </div>
+            ) : (
+            <Button
+              className="w-full py-4 sm:py-6 text-white bg-[#A8A9AD] hover:bg-[#9A9B9F]"
+              onClick={() => handleSubscribe('platinum')}
+              disabled={loading}
+            >
+              {loading ? "Processing..." : "Start Your Plan"}
+            </Button>
+            )}
+            <p className="text-xs text-center text-muted-foreground">Auto-renews each year</p>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+
   return (
     <>
       <Helmet>
@@ -301,7 +386,10 @@ export default function SmartyPlans() {
           {/* Header */}
           <div className="text-center mb-8">
             <Crown className="h-16 w-16 text-primary mx-auto mb-4" />
-            <h1 className="text-3xl sm:text-4xl font-bold mb-4">Transform Your Fitness Journey</h1>
+            <h1 className="text-3xl sm:text-4xl font-bold mb-4">
+              <span className="block">Transform your fitness journey.</span>
+              <span className="block">Join Premium</span>
+            </h1>
             <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 max-w-2xl mx-auto">
               <p className="text-sm text-muted-foreground">
                 Join thousands of members who've upgraded to premium and achieved their fitness goals
@@ -333,6 +421,9 @@ export default function SmartyPlans() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Pricing Plans (after What You Get) - Hidden for premium users */}
+          {!isPremium && <PricingPlansBlock />}
 
           {/* Compare Access Levels */}
           <Card className="mb-8 overflow-hidden border-2 border-[hsl(var(--primary)/0.6)] shadow-xl">
@@ -480,89 +571,8 @@ export default function SmartyPlans() {
           {/* Pricing Plans - Hidden for premium users */}
           {!isPremium && (
             <>
-              {/* Pricing Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                {/* Gold Plan */}
-                <Card className="relative border-2 border-[#D4AF37] shadow-lg flex flex-col">
-                  <CardHeader className="text-center pb-2 sm:pb-4">
-                    <h2 className="text-xl sm:text-2xl font-bold text-[#D4AF37]">Gold Plan</h2>
-                    <Badge className="bg-[#D4AF37] text-white mx-auto mb-3 sm:mb-4">MONTHLY</Badge>
-                    <CardTitle className="text-2xl sm:text-3xl font-bold">€{goldOriginal.toFixed(2)}</CardTitle>
-                    <p className="text-xs sm:text-sm text-muted-foreground">per month</p>
-                    <p className="text-xs text-[#D4AF37] font-semibold mt-1">🔄 Auto-renews monthly</p>
-                  </CardHeader>
-                  <CardContent className="space-y-2 sm:space-y-4 flex-1 flex flex-col">
-                    <div className="space-y-1.5 sm:space-y-2 flex-1">
-                      {["Full access to all Smarty Workouts", "Full access to all Smarty Programs", "Full access to Smarty Ritual", "Full access to Smarty Tools", "Flexible monthly billing", "Cancel anytime"].map((item, i) => (
-                        <div key={i} className="flex items-start gap-2">
-                          <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 shrink-0 mt-0.5" />
-                          <span className="text-xs sm:text-sm">{item}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="space-y-3 mt-auto">
-                      {isIOSNative() ? (
-                        <div className="text-center text-xs sm:text-sm text-muted-foreground p-3 border rounded">
-                          Subscribe at <span className="text-primary font-semibold">smartygym.com</span>
-                        </div>
-                      ) : (
-                      <Button 
-                        className="w-full py-4 sm:py-6 text-white bg-[#D4AF37] hover:bg-[#C9A431]"
-                        onClick={() => handleSubscribe('gold')}
-                        disabled={loading}
-                      >
-                        {loading ? "Processing..." : "Start Your Plan"}
-                      </Button>
-                      )}
-                      <p className="text-xs text-center text-muted-foreground">Auto-renews each month</p>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Platinum Plan */}
-                <Card className="relative border-2 border-[#A8A9AD] shadow-lg flex flex-col bg-gradient-to-br from-[#A8A9AD]/5 to-[#C0C0C0]/10">
-                  <Badge className="absolute -top-2 right-2 sm:-top-3 sm:right-3 bg-green-600 text-white px-2 sm:px-3 py-1 z-10">
-                    BEST VALUE
-                  </Badge>
-                  <CardHeader className="text-center pb-2 sm:pb-4 pt-4 sm:pt-6">
-                    <div className="flex items-center justify-center gap-2 mb-2">
-                      <Crown className="h-5 w-5 sm:h-6 sm:w-6 text-[#A8A9AD]" />
-                      <h2 className="text-xl sm:text-2xl font-bold text-[#A8A9AD]">Platinum</h2>
-                    </div>
-                    <Badge className="bg-[#A8A9AD] text-white mx-auto mb-3 sm:mb-4">YEARLY</Badge>
-                    <CardTitle className="text-2xl sm:text-3xl font-bold">€{platinumOriginal.toFixed(2)}</CardTitle>
-                    <p className="text-xs sm:text-sm text-muted-foreground">per year</p>
-                    <p className="text-sm text-green-600 font-bold mt-2">Save €29.89!</p>
-                    <p className="text-xs text-muted-foreground">Just €7.50/month • 🔄 Auto-renews yearly</p>
-                  </CardHeader>
-                  <CardContent className="space-y-2 sm:space-y-4 flex-1 flex flex-col">
-                    <div className="space-y-1.5 sm:space-y-2 flex-1">
-                      {["Full access to all Smarty Workouts", "Full access to all Smarty Programs", "Full access to Smarty Ritual", "Full access to Smarty Tools", "25% savings vs monthly", "Cancel anytime"].map((item, i) => (
-                        <div key={i} className="flex items-start gap-2">
-                          <Check className={`h-4 w-4 sm:h-5 sm:w-5 shrink-0 mt-0.5 ${item.includes("25%") ? "text-green-600" : "text-green-500"}`} />
-                          <span className={`text-xs sm:text-sm ${item.includes("25%") ? "font-bold text-green-600" : ""}`}>{item}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="space-y-3 mt-auto">
-                      {isIOSNative() ? (
-                        <div className="text-center text-xs sm:text-sm text-muted-foreground p-3 border rounded">
-                          Subscribe at <span className="text-primary font-semibold">smartygym.com</span>
-                        </div>
-                      ) : (
-                      <Button 
-                        className="w-full py-4 sm:py-6 text-white bg-[#A8A9AD] hover:bg-[#9A9B9F]"
-                        onClick={() => handleSubscribe('platinum')}
-                        disabled={loading}
-                      >
-                        {loading ? "Processing..." : "Start Your Plan"}
-                      </Button>
-                      )}
-                      <p className="text-xs text-center text-muted-foreground">Auto-renews each year</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
+              {/* Pricing Cards (after Compare Access Levels) */}
+              <PricingPlansBlock />
 
               {/* Why Choose Yearly - Compact */}
               <Card className="mb-6 border-2 border-primary">
@@ -598,6 +608,9 @@ export default function SmartyPlans() {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Pricing Cards (after Why Choose Yearly) */}
+              <PricingPlansBlock />
             </>
           )}
 
