@@ -38,12 +38,13 @@ export const PurchaseButton = ({
 
   const stripCheckoutReturn = (path: string) => {
     const [pathname, search = ""] = path.split("?");
-    if (!search) return pathname;
+    const normalizedPathname = pathname !== "/" ? pathname.replace(/\.html$/i, "") : pathname;
+    if (!search) return normalizedPathname;
 
     const params = new URLSearchParams(search);
     params.delete("checkout_return");
     const nextSearch = params.toString();
-    return nextSearch ? `${pathname}?${nextSearch}` : pathname;
+    return nextSearch ? `${normalizedPathname}?${nextSearch}` : normalizedPathname;
   };
 
   const addCheckoutReturn = (path: string, returnPath: string) => {
