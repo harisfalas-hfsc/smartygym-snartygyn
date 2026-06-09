@@ -223,7 +223,7 @@ const About = () => {
                   <h2 className="text-2xl font-bold text-foreground">
                     Who Is <span className="text-primary">SmartyGym</span> For
                   </h2>
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
                     {audienceList.map((audience) => {
                       const Icon = audience.icon;
                       return (
@@ -264,8 +264,8 @@ const About = () => {
             </Card>
           </div>
 
-          {/* Core Values - compact card (mobile + desktop) */}
-          <Card className="mb-12 border-2 border-primary">
+          {/* Core Values - compact card (mobile only) */}
+          <Card className="mb-12 border-2 border-primary md:hidden">
             <CardContent className="p-6">
               <div className="text-center space-y-4">
                 <h2 className="text-2xl font-bold text-foreground">What We Stand For</h2>
@@ -299,6 +299,61 @@ const About = () => {
                 </div>
               </CardContent>
             </Card>
+
+          {/* Core Values - Desktop grid with descriptions */}
+          <ScrollReveal>
+            <section className="mb-12 hidden md:block">
+              <div className="text-center mb-6 pb-3 border-b border-border">
+                <p className="text-xs uppercase tracking-[0.25em] text-primary font-semibold mb-1">Principles</p>
+                <h2 className="text-2xl md:text-3xl font-bold">What We Stand For</h2>
+              </div>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <Card className="border-2 border-border hover:border-primary transition-all group">
+                  <CardContent className="p-6 text-center space-y-3">
+                    <Heart className="w-10 h-10 text-orange-500 group-hover:scale-110 transition-transform mx-auto" />
+                    <h3 className="font-bold text-lg">Built for Real Life</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Flexible training that fits your schedule, location, and lifestyle — not the other way around.
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card className="border-2 border-border hover:border-primary transition-all group">
+                  <CardContent className="p-6 text-center space-y-3">
+                    <Award className="w-10 h-10 text-purple-500 group-hover:scale-110 transition-transform mx-auto" />
+                    <h3 className="font-bold text-lg">Science-Based Approach</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Every workout is designed using evidence-based training principles, not trends or fads.
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card className="border-2 border-border hover:border-primary transition-all group">
+                  <CardContent className="p-6 text-center space-y-3">
+                    <Users className="w-10 h-10 text-emerald-500 group-hover:scale-110 transition-transform mx-auto" />
+                    <h3 className="font-bold text-lg">Accessible to Everyone</h3>
+                    <p className="text-sm text-muted-foreground">
+                      From beginners to advanced athletes, everyone deserves access to quality fitness guidance.
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card className="border-2 border-border hover:border-primary transition-all group">
+                  <CardContent className="p-6 text-center space-y-3">
+                    <Shield className="w-10 h-10 text-blue-500 group-hover:scale-110 transition-transform mx-auto" />
+                    <h3 className="font-bold text-lg">Safe and Effective</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Proper technique, realistic progressions, and injury prevention are at the core of everything we do.
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+              <div className="text-center mt-6">
+                <Link to="/the-smarty-method" className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline">
+                  <BookOpen className="w-4 h-4" />
+                  Discover The Smarty Method
+                  <ChevronRight className="w-4 h-4" />
+                </Link>
+              </div>
+            </section>
+          </ScrollReveal>
 
           {/* Meet the Coach Card (mobile + desktop) */}
           <Card className="mb-12 border-2 border-primary">
