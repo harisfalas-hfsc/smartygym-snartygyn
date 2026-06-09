@@ -290,7 +290,7 @@ export const Navigation = () => {
     <>
     <header
       ref={headerRef}
-      className="fixed top-0 left-0 right-0 z-50 bg-background pt-2 pb-0.5 px-4"
+      className="fixed top-0 left-0 right-0 z-50 bg-background pt-2 pb-0.5 px-4 border-b border-primary/20"
     >
       <div className="mx-auto max-w-7xl">
         <div className="relative flex items-center justify-between gap-2 lg:gap-4">
