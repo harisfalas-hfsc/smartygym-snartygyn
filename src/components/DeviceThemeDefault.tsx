@@ -3,7 +3,7 @@ import { useTheme } from "next-themes";
 
 /**
  * Desktop is always dark mode with no toggle.
- * Mobile defaults to dark and can be overridden by the user.
+ * Mobile defaults to light and can be overridden by the user.
  */
 export const DeviceThemeDefault = () => {
   const { setTheme, theme } = useTheme();
@@ -17,8 +17,8 @@ export const DeviceThemeDefault = () => {
     } else if (sessionTheme) {
       setTheme(sessionTheme);
     } else {
-      setTheme("dark");
-      sessionStorage.setItem("smartygym-session-theme", "dark");
+      setTheme("light");
+      sessionStorage.setItem("smartygym-session-theme", "light");
     }
   }, [setTheme]);
 
