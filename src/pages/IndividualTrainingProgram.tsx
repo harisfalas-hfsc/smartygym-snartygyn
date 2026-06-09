@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { BookOpen } from "lucide-react";
 import { WorkoutDisplay } from "@/components/WorkoutDisplay";
 import { AccessGate } from "@/components/AccessGate";
-import { useTrainingProgramData } from "@/hooks/useTrainingProgramData";
+import { useTrainingProgramData, type TrainingProgramData } from "@/hooks/useTrainingProgramData";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { ContentNotFound } from "@/components/ContentNotFound";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
@@ -14,7 +14,7 @@ import { HTMLContent } from "@/components/ui/html-content";
 import { getProgramCategorySlug, slugifyContentName } from "@/lib/seo-slugs";
 
 // Helper function to generate SEO-optimized alt text
-const generateProgramAltText = (program: any): string => {
+const generateProgramAltText = (program: TrainingProgramData): string => {
   const parts = [
     program.name,
     program.weeks ? `${program.weeks} week` : '',
@@ -30,6 +30,7 @@ const IndividualTrainingProgram = () => {
   const navigate = useNavigate();
   const [readerModeOpen, setReaderModeOpen] = useState(false);
   const { type, id } = useParams();
+  const lookupId = id || type;
   const { userTier, hasPurchased } = useAccessControl();
   
   // Helper function to format focus label
@@ -51,17 +52,17 @@ const IndividualTrainingProgram = () => {
 
   
   // Fetch program from database
-  const { data: dbProgram, isLoading: isLoadingDb } = useTrainingProgramData(id);
+  const { data: dbProgram, isLoading: isLoadingDb } = useTrainingProgramData(lookupId);
 
   useEffect(() => {
-    if (!dbProgram || !id) return;
+    if (!dbProgram || !lookupId) return;
     const programCategorySlug = getProgramCategorySlug(dbProgram.category, type || "functional-strength");
     const canonicalSlug = dbProgram.canonical_slug || slugifyContentName(dbProgram.name || dbProgram.id);
     const canonicalPath = `/trainingprogram/${programCategorySlug}/${canonicalSlug}`;
-    if (id !== canonicalSlug || type !== programCategorySlug) {
+    if (!id || id !== canonicalSlug || type !== programCategorySlug) {
       navigate(canonicalPath, { replace: true });
     }
-  }, [dbProgram, id, navigate, type]);
+  }, [dbProgram, id, lookupId, navigate, type]);
 
   // If we have database program, use it directly
   if (isLoadingDb) {
@@ -335,8 +336,8 @@ const IndividualTrainingProgram = () => {
                 progression_plan={dbProgram.progression_plan}
                 nutrition_tips={dbProgram.nutrition_tips}
                 expected_results={dbProgram.expected_results}
-                programId={id}
-                programType={type || ''}
+                programId={dbProgram.id}
+                programType={programCategorySlug}
                 isFreeContent={!isPremium}
               />
             </AccessGate>
@@ -348,7 +349,7 @@ const IndividualTrainingProgram = () => {
 
   // No program found in database
   return (
-    <ContentNotFound contentType="program" contentId={id || 'unknown'} />
+    <ContentNotFound contentType="program" contentId={lookupId || 'unknown'} />
   );
 };
 

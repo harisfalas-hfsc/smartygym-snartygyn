@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { BookOpen } from "lucide-react";
 import { WorkoutDisplay } from "@/components/WorkoutDisplay";
 import { AccessGate } from "@/components/AccessGate";
-import { useWorkoutData } from "@/hooks/useWorkoutData";
+import { useWorkoutData, type WorkoutData } from "@/hooks/useWorkoutData";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { ContentNotFound } from "@/components/ContentNotFound";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
@@ -14,7 +14,7 @@ import { ExerciseHTMLContent } from "@/components/ExerciseHTMLContent";
 import { getWorkoutCategorySlug, slugifyContentName } from "@/lib/seo-slugs";
 
 // Helper function to generate SEO-optimized alt text
-const generateWorkoutAltText = (workout: any): string => {
+const generateWorkoutAltText = (workout: WorkoutData): string => {
   const parts = [
     workout.name,
     workout.difficulty ? `${workout.difficulty} level` : '',
@@ -31,6 +31,7 @@ const IndividualWorkout = () => {
   const navigate = useNavigate();
   const [readerModeOpen, setReaderModeOpen] = useState(false);
   const { type, id } = useParams();
+  const lookupId = id || type;
   const { userTier, hasPurchased } = useAccessControl();
   
   // Use centralized category labels
@@ -64,23 +65,23 @@ const IndividualWorkout = () => {
 
 
   // Fetch from database
-  const { data: dbWorkout, isLoading: isLoadingDb, refetch } = useWorkoutData(id);
+  const { data: dbWorkout, isLoading: isLoadingDb, refetch } = useWorkoutData(lookupId);
 
   // Force a refetch when opening this page so backend content updates appear immediately
   useEffect(() => {
-    if (!id) return;
+    if (!lookupId) return;
     refetch();
-  }, [id, refetch]);
+  }, [lookupId, refetch]);
 
   useEffect(() => {
-    if (!dbWorkout || !id) return;
+    if (!dbWorkout || !lookupId) return;
     const workoutCategorySlug = getWorkoutCategorySlug(dbWorkout.category, type || "strength");
     const canonicalSlug = dbWorkout.canonical_slug || slugifyContentName(dbWorkout.name || dbWorkout.id);
     const canonicalPath = `/workout/${workoutCategorySlug}/${canonicalSlug}`;
-    if (id !== canonicalSlug || type !== workoutCategorySlug) {
+    if (!id || id !== canonicalSlug || type !== workoutCategorySlug) {
       navigate(canonicalPath, { replace: true });
     }
-  }, [dbWorkout, id, navigate, type]);
+  }, [dbWorkout, id, lookupId, navigate, type]);
 
   // If we have database workout, use it directly
   if (isLoadingDb) {
@@ -369,8 +370,8 @@ const IndividualWorkout = () => {
                 main_workout={dbWorkout.main_workout}
                 finisher={dbWorkout.finisher}
                 cool_down={dbWorkout.cool_down}
-                workoutId={id}
-                workoutCategory={type || ''}
+                workoutId={dbWorkout.id}
+                workoutCategory={workoutCategorySlug}
                 isFreeContent={!dbWorkout.is_premium}
               />
             </AccessGate>
@@ -382,7 +383,7 @@ const IndividualWorkout = () => {
 
   // No workout found in database
   return (
-    <ContentNotFound contentType="workout" contentId={id || 'unknown'} />
+    <ContentNotFound contentType="workout" contentId={lookupId || 'unknown'} />
   );
 };
 
