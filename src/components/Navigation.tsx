@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User as UserIcon, Settings, LogOut, LayoutDashboard, Crown, Bell, Facebook, Instagram, Youtube, ShoppingBag, Info, Dumbbell, ListChecks, Wrench, BookOpen, Users, Newspaper, Mail, Sparkles, Building2, Shield, HelpCircle, Compass, ArrowLeft, Menu } from "lucide-react";
+import { User as UserIcon, Settings, LogOut, LayoutDashboard, Crown, Bell, Facebook, Instagram, Youtube, ShoppingBag, Info, Dumbbell, ListChecks, Wrench, BookOpen, Users, Newspaper, Mail, Sparkles, Building2, Shield, HelpCircle, Compass, ArrowLeft, Menu, Home } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
@@ -278,6 +278,14 @@ export const Navigation = () => {
     { label: "Contact", path: "/contact", icon: Mail, iconClass: "text-indigo-500", track: undefined },
   ];
 
+  // Desktop menu replaces "About SmartyGym" with "Home" because the About page
+  // is intentionally hidden from desktop (content overlaps with the homepage).
+  const desktopDiscoveryItems = discoveryItems.map((item) =>
+    item.path === "/about"
+      ? { label: "Home", path: "/", icon: Home, iconClass: "text-teal-500", track: undefined }
+      : item,
+  );
+
   return (
     <>
     <header
@@ -309,7 +317,7 @@ export const Navigation = () => {
                     <h2 className="text-lg font-bold leading-tight text-foreground">Explore SmartyGym</h2>
                   </div>
                   <nav className="grid grid-cols-3 gap-3 overflow-y-auto">
-                    {discoveryItems.map(({ label, path, icon: Icon, iconClass, track }) => {
+                    {desktopDiscoveryItems.map(({ label, path, icon: Icon, iconClass, track }) => {
                       const active = location.pathname === path;
                       return (
                         <button
