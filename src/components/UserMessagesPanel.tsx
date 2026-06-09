@@ -230,7 +230,8 @@ export const UserMessagesPanel = () => {
       }
     } else if (type === 'contact') {
       const message = contactMessages.find(m => m.id === messageId);
-      if (message && message.response && !message.response_read_at) {
+      const hasReply = message ? getTeamReplies(message).length > 0 : false;
+      if (message && hasReply && !message.response_read_at) {
         try {
           const { error } = await supabase
             .from('contact_messages')
@@ -245,6 +246,7 @@ export const UserMessagesPanel = () => {
           }
 
           await refetchContact();
+          await refetchHistory();
           queryClient.invalidateQueries({ queryKey: ['unread-messages-count'] });
         } catch (e: any) {
           console.error('[UserMessagesPanel] Unexpected error:', e);
@@ -292,6 +294,7 @@ export const UserMessagesPanel = () => {
         
         toast.success(!currentState ? "Response marked as read" : "Response marked as unread");
         refetchContact();
+        refetchHistory();
       }
       
       queryClient.invalidateQueries({ queryKey: ['unread-messages-count'] });
