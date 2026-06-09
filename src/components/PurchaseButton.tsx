@@ -31,6 +31,9 @@ export const PurchaseButton = ({
 
   // Check if already purchased
   const alreadyPurchased = hasPurchased(contentId, contentType);
+  const checkoutCancelPath = contentType === "workout"
+    ? `/workout/${contentId}`
+    : `/trainingprogram/${contentId}`;
   
   // NEW: Check if user is premium (cannot purchase)
   const isPremium = userTier === "premium";
@@ -70,7 +73,7 @@ export const PurchaseButton = ({
             price,
             stripeProductId,
             stripePriceId,
-            cancelPath: window.location.pathname + window.location.search,
+            cancelPath: checkoutCancelPath,
           },
           headers: {
             Authorization: `Bearer ${session.access_token}`,
