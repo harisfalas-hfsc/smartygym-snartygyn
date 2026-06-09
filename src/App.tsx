@@ -67,7 +67,6 @@ const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const TermsOfService = lazy(() => import("./pages/TermsOfService"));
 const Disclaimer = lazy(() => import("./pages/Disclaimer"));
 const NotFound = lazy(() => import("./pages/NotFound"));
-const JoinPremium = lazy(() => import("./pages/JoinPremium"));
 const SmartyCorporate = lazy(() => import("./pages/SmartyCorporate"));
 const CorporateWellness = lazy(() => import("./pages/CorporateWellness"));
 const WhyInvestInSmartyGym = lazy(() => import("./pages/WhyInvestInSmartyGym"));
@@ -220,8 +219,8 @@ const AppContent = () => {
                   <Route path="/home" element={<Index />} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/reset-password" element={<ResetPassword />} />
-                  <Route path="/joinpremium" element={<JoinPremium />} />
-                  <Route path="/join-premium" element={<JoinPremium />} />
+                  <Route path="/joinpremium" element={<Navigate to="/smarty-plans" replace />} />
+                  <Route path="/join-premium" element={<Navigate to="/smarty-plans" replace />} />
                   <Route path="/premiumbenefits" element={<PremiumBenefits />} />
                   <Route path="/premium-comparison" element={<PremiumComparisonRedirect />} />
                   <Route path="/premiumcomparison" element={<PremiumComparisonRedirect />} />

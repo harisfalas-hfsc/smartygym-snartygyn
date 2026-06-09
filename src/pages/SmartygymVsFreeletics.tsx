@@ -195,7 +195,7 @@ const SmartygymVsFreeletics = () => {
             <h2 className="text-2xl font-bold mb-3">Try SmartyGym free for 3 days</h2>
             <p className="text-muted-foreground mb-6">Real human coaching. No algorithm. €9.99/month after the trial.</p>
             <div className="flex flex-wrap justify-center gap-3">
-              <Button asChild size="lg"><Link to="/join-premium">Start free trial</Link></Button>
+              <Button asChild size="lg"><Link to="/smarty-plans">Start free trial</Link></Button>
               <Button asChild variant="outline" size="lg"><Link to="/best-online-fitness-platform">See full platform comparison</Link></Button>
             </div>
           </section>

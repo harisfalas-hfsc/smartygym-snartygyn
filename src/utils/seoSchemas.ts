@@ -238,7 +238,7 @@ export const generateSubscriptionProductSchema = (plan: 'gold' | 'platinum') => 
       "price": p.price,
       "priceCurrency": "EUR",
       "availability": "https://schema.org/InStock",
-      "url": "https://smartygym.com/join-premium",
+      "url": "https://smartygym.com/smarty-plans",
       "priceValidUntil": "2026-12-31",
       "seller": {
         "@type": "Organization",
@@ -403,7 +403,7 @@ export const generateNavigationSchema = () => ({
     { "@type": "WebPage", "name": "Community", "url": "https://smartygym.com/community" },
     { "@type": "WebPage", "name": "Exercise Library", "url": "https://smartygym.com/exerciselibrary" },
     { "@type": "WebPage", "name": "Coach Profile", "url": "https://smartygym.com/coach-profile" },
-    { "@type": "WebPage", "name": "Premium", "url": "https://smartygym.com/join-premium" }
+    { "@type": "WebPage", "name": "Premium", "url": "https://smartygym.com/smarty-plans" }
   ]
 });
 

@@ -142,7 +142,7 @@ const pages: SeoPage[] = [
     keywords: ["Join SmartyGym", "online gym membership", "fitness plan", "online coaching", "workout program", "training program"],
     intent: ["Compare access levels", "Join an online gym", "Start training today", "Get a program"],
     steps: ["Compare the access levels on Smarty Plans.", "Choose the plan that fits your training needs.", "Start with workouts, training programs, WOD, or tools.", "Build consistency through weekly structure."],
-    links: [{ name: "Smarty Plans", url: "/smarty-plans" }, { name: "Join Premium", url: "/join-premium" }, { name: "Workout Library", url: "/workout" }, { name: "Training Programs", url: "/trainingprogram" }],
+    links: [{ name: "Smarty Plans", url: "/smarty-plans" }, { name: "Workout Library", url: "/workout" }, { name: "Training Programs", url: "/trainingprogram" }],
     faqs: [
       { question: "How do I join SmartyGym?", answer: "Visit the Smarty Plans page to compare access levels and choose the option that fits your training needs." },
       { question: "What outcomes does SmartyGym focus on?", answer: "SmartyGym focuses on fat loss, strength, better movement, pain-free training, performance, consistency, and practical real-life fitness." },
