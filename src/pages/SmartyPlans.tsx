@@ -6,6 +6,11 @@ import { STRIPE_PRICE_IDS } from "@/config/pricing";
 import { isIOSNative } from "@/utils/platform";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from "@/components/ui/carousel";
 import { 
   Crown, 
   Check, 
@@ -185,9 +190,32 @@ export default function SmartyPlans() {
   ];
 
   const PricingPlansBlock = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-      {/* Gold Plan */}
-      <Card className="relative border-2 border-[#D4AF37] shadow-lg flex flex-col">
+    <>
+      {/* Mobile: swipeable carousel */}
+      <div className="md:hidden mb-8">
+        <Carousel className="w-full">
+          <CarouselContent className="-ml-2">
+            <CarouselItem className="pl-2 basis-[88%]">
+              {GoldPlanCard}
+            </CarouselItem>
+            <CarouselItem className="pl-2 basis-[88%]">
+              {PlatinumPlanCard}
+            </CarouselItem>
+          </CarouselContent>
+        </Carousel>
+        <p className="text-center text-xs text-muted-foreground mt-2">← Swipe to compare plans →</p>
+      </div>
+
+      {/* Desktop: side-by-side grid */}
+      <div className="hidden md:grid grid-cols-2 gap-6 mb-8">
+        {GoldPlanCard}
+        {PlatinumPlanCard}
+      </div>
+    </>
+  );
+
+  const GoldPlanCard = (
+    <Card className="relative border-2 border-[#D4AF37] shadow-lg flex flex-col h-full">
         <CardHeader className="text-center pb-2 sm:pb-4">
           <h2 className="text-xl sm:text-2xl font-bold text-[#D4AF37]">Gold Plan</h2>
           <Badge className="bg-[#D4AF37] text-white mx-auto mb-3 sm:mb-4">MONTHLY</Badge>
@@ -222,9 +250,10 @@ export default function SmartyPlans() {
           </div>
         </CardContent>
       </Card>
+  );
 
-      {/* Platinum Plan */}
-      <Card className="relative border-2 border-[#A8A9AD] shadow-lg flex flex-col bg-gradient-to-br from-[#A8A9AD]/5 to-[#C0C0C0]/10">
+  const PlatinumPlanCard = (
+    <Card className="relative border-2 border-[#A8A9AD] shadow-lg flex flex-col h-full bg-gradient-to-br from-[#A8A9AD]/5 to-[#C0C0C0]/10">
         <Badge className="absolute -top-2 right-2 sm:-top-3 sm:right-3 bg-green-600 text-white px-2 sm:px-3 py-1 z-10">
           BEST VALUE
         </Badge>
@@ -266,7 +295,6 @@ export default function SmartyPlans() {
           </div>
         </CardContent>
       </Card>
-    </div>
   );
 
   return (
@@ -406,7 +434,18 @@ export default function SmartyPlans() {
               <CardTitle className="text-2xl">What You Get with Premium</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* Mobile: ultra-compact icon + title pills */}
+              <div className="grid grid-cols-2 gap-2 md:hidden">
+                {benefits.map((benefit, index) => (
+                  <div key={index} className="flex items-center gap-2 py-2 px-2 border-b border-primary/10">
+                    <benefit.icon className="h-4 w-4 text-primary shrink-0" />
+                    <span className="text-sm font-medium leading-tight">{benefit.title}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Desktop / tablet: full description grid */}
+              <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {benefits.map((benefit, index) => (
                   <div key={index} className="flex items-start gap-3 p-4 bg-muted rounded-lg">
                     <div className="p-2 bg-primary/10 rounded-full shrink-0">
@@ -432,8 +471,11 @@ export default function SmartyPlans() {
             </CardHeader>
             <CardContent>
               {/* Mobile View */}
-              <div className="md:hidden space-y-6">
-                <Card className="border-2 border-[hsl(var(--primary)/0.3)]">
+              <div className="md:hidden">
+                <Carousel className="w-full">
+                  <CarouselContent className="-ml-2">
+                    <CarouselItem className="pl-2 basis-[88%]">
+                      <Card className="border-2 border-[hsl(var(--primary)/0.3)] h-full">
                   <CardContent className="pt-6">
                     <div className="flex items-center justify-center gap-2 mb-4">
                       <Eye className="w-6 h-6 text-primary" />
@@ -455,9 +497,11 @@ export default function SmartyPlans() {
                       })}
                     </div>
                   </CardContent>
-                </Card>
+                      </Card>
+                    </CarouselItem>
 
-                <Card className="border-2 border-[hsl(var(--primary)/0.5)]">
+                    <CarouselItem className="pl-2 basis-[88%]">
+                      <Card className="border-2 border-[hsl(var(--primary)/0.5)] h-full">
                   <CardContent className="pt-6">
                     <div className="flex items-center justify-center gap-2 mb-4">
                       <UserCheck className="w-6 h-6 text-primary" />
@@ -484,9 +528,11 @@ export default function SmartyPlans() {
                       </Button>
                     )}
                   </CardContent>
-                </Card>
+                      </Card>
+                    </CarouselItem>
 
-                <Card className="border-2 border-[hsl(var(--primary)/0.8)] bg-gradient-to-br from-[hsl(var(--primary)/0.1)] to-[hsl(var(--primary)/0.2)]">
+                    <CarouselItem className="pl-2 basis-[88%]">
+                      <Card className="border-2 border-[hsl(var(--primary)/0.8)] h-full bg-gradient-to-br from-[hsl(var(--primary)/0.1)] to-[hsl(var(--primary)/0.2)]">
                   <CardContent className="pt-6">
                     <div className="flex items-center justify-center gap-2 mb-4">
                       <Crown className="w-6 h-6 text-primary" />
@@ -508,7 +554,11 @@ export default function SmartyPlans() {
                       })}
                     </div>
                   </CardContent>
-                </Card>
+                      </Card>
+                    </CarouselItem>
+                  </CarouselContent>
+                </Carousel>
+                <p className="text-center text-xs text-muted-foreground mt-2">← Swipe Visitor · Subscriber · Premium →</p>
               </div>
 
               {/* Desktop View */}
