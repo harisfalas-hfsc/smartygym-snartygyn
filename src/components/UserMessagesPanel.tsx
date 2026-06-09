@@ -10,6 +10,7 @@ import { useState, useMemo } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
 import { EmailSubscriptionManager } from "@/components/EmailSubscriptionManager";
 import { DashboardNotificationSubscriptionManager } from "@/components/DashboardNotificationSubscriptionManager";
 import { MobilePushNotificationManager } from "@/components/MobilePushNotificationManager";
@@ -76,6 +77,8 @@ export const UserMessagesPanel = () => {
   const [viewFilter, setViewFilter] = useState<ViewFilter>('all');
   const [selectedMessages, setSelectedMessages] = useState<Set<string>>(new Set());
   const [activeTab, setActiveTab] = useState('all');
+  const [replyDrafts, setReplyDrafts] = useState<Record<string, string>>({});
+  const [sendingReplyFor, setSendingReplyFor] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
   const { data: rawContactMessages = [], isLoading: contactLoading, refetch: refetchContact } = useQuery({
@@ -580,6 +583,38 @@ export const UserMessagesPanel = () => {
     return hrefMatch ? hrefMatch[1] : null;
   };
 
+  const handleSendReply = async (messageId: string) => {
+    const draft = (replyDrafts[messageId] || "").trim();
+    if (!draft) {
+      toast.error("Please type a reply first");
+      return;
+    }
+    setSendingReplyFor(messageId);
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "send-customer-reply-notification",
+        { body: { messageId, replyContent: draft } }
+      );
+      if (error || (data as any)?.error) {
+        throw new Error((error as any)?.message || (data as any)?.error || "Failed to send reply");
+      }
+      toast.success("Reply sent — our team has been notified");
+      setReplyDrafts((prev) => {
+        const next = { ...prev };
+        delete next[messageId];
+        return next;
+      });
+      await refetchContact();
+      await refetchHistory();
+      queryClient.invalidateQueries({ queryKey: ["unread-messages-count"] });
+    } catch (e: any) {
+      console.error("[UserMessagesPanel] Send reply failed:", e);
+      toast.error(e?.message || "Failed to send reply");
+    } finally {
+      setSendingReplyFor(null);
+    }
+  };
+
   const getCategoryIcon = (category: string) => {
     switch (category) {
       case 'support':
@@ -814,19 +849,69 @@ export const UserMessagesPanel = () => {
                     </div>
                   </div>
 
-                  {teamReplies.length > 0 && (
-                    <div className="space-y-3">
-                      <p className="text-sm font-semibold text-green-600">Team replies:</p>
-                      {teamReplies.map((reply) => (
-                        <div key={reply.id} className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 p-3 rounded-lg text-sm text-display break-words-safe content-container">
-                          <p className="whitespace-pre-wrap">{reply.content}</p>
-                          <p className="text-xs text-muted-foreground mt-2">
-                            {format(new Date(reply.created_at), 'MMM dd, yyyy HH:mm')}
-                          </p>
-                        </div>
-                      ))}
+                  {(() => {
+                    const fullThread = [
+                      ...teamReplies,
+                      ...((historyByContactId[message.id] || []).filter((item) => item.sender === 'customer')),
+                    ].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+
+                    if (fullThread.length === 0) return null;
+                    return (
+                      <div className="space-y-3">
+                        <p className="text-sm font-semibold">Conversation:</p>
+                        {fullThread.map((reply) => {
+                          const isCustomer = reply.sender === 'customer';
+                          return (
+                            <div
+                              key={reply.id}
+                              className={`p-3 rounded-lg text-sm text-display break-words-safe content-container border ${
+                                isCustomer
+                                  ? 'bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800'
+                                  : 'bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-800'
+                              }`}
+                            >
+                              <p className="text-xs font-semibold mb-1">
+                                {isCustomer ? 'You' : 'SmartyGym Team'}
+                              </p>
+                              <p className="whitespace-pre-wrap">{reply.content}</p>
+                              <p className="text-xs text-muted-foreground mt-2">
+                                {format(new Date(reply.created_at), 'MMM dd, yyyy HH:mm')}
+                              </p>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })()}
+
+                  <div className="space-y-2" onClick={(e) => e.stopPropagation()}>
+                    <p className="text-sm font-semibold">Reply to this conversation:</p>
+                    <Textarea
+                      value={replyDrafts[message.id] || ''}
+                      onChange={(e) =>
+                        setReplyDrafts((prev) => ({ ...prev, [message.id]: e.target.value }))
+                      }
+                      placeholder="Type your reply… our team will receive it by email and respond in this same thread."
+                      rows={4}
+                      maxLength={5000}
+                      disabled={sendingReplyFor === message.id}
+                    />
+                    <div className="flex justify-end">
+                      <Button
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSendReply(message.id);
+                        }}
+                        disabled={
+                          sendingReplyFor === message.id ||
+                          !(replyDrafts[message.id] || '').trim()
+                        }
+                      >
+                        {sendingReplyFor === message.id ? 'Sending…' : 'Send Reply'}
+                      </Button>
                     </div>
-                  )}
+                  </div>
                 </div>
               )}
 
