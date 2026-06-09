@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { SmartyCoachModal } from "./SmartyCoachModal";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const INITIAL_DELAY_MS = 1500;
 const NEVER_KEY = "smarty-welcome-never";
@@ -24,8 +25,11 @@ export const SmartyCoachWelcomePopup = () => {
   const [open, setOpen] = useState(false);
   const lastUserIdRef = useRef<string | null>(null);
   const isBlockedRouteRef = useRef(false);
+  const isMobile = useIsMobile();
 
-  const isBlockedRoute = BLOCKED_ROUTE_PREFIXES.some(p => location.pathname.startsWith(p));
+  // On mobile, never auto-open: user must tap the Smarty Coach icon in the bottom nav.
+  const isBlockedRoute =
+    isMobile || BLOCKED_ROUTE_PREFIXES.some(p => location.pathname.startsWith(p));
 
   // Keep latest blocked-route status available to async timers / auth listeners,
   // and auto-close the welcome popup if the user navigates onto a blocked route

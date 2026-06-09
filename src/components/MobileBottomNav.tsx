@@ -1,9 +1,12 @@
 import { useLocation } from "react-router-dom";
+import { useState } from "react";
 import { ChevronLeft, ChevronRight, RotateCw, Sun, Moon } from "lucide-react";
 import { useNavigationHistory } from "@/contexts/NavigationHistoryContext";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useTheme } from "next-themes";
+import { SmartyCoachModal } from "@/components/smarty-coach/SmartyCoachModal";
+import smartyCoachIcon from "@/assets/smarty-coach-icon.png";
 
 const HIDDEN_PATHS = ["/auth", "/reset-password", "/payment-success", "/payment-cancelled"];
 
@@ -16,6 +19,7 @@ export const MobileBottomNav = () => {
   const isMobile = useIsMobile();
   const { goBack, canGoBack, goForward, canGoForward } = useNavigationHistory();
   const { resolvedTheme, setTheme } = useTheme();
+  const [coachOpen, setCoachOpen] = useState(false);
 
   if (!isMobile || HIDDEN_PATHS.includes(location.pathname)) return null;
 
@@ -53,6 +57,7 @@ export const MobileBottomNav = () => {
   );
 
   return (
+    <>
     <nav
         className={cn(
           "fixed bottom-0 left-0 right-0 z-50",
@@ -72,6 +77,28 @@ export const MobileBottomNav = () => {
             <RotateCw className="h-6 w-6" strokeWidth={2.25} />
           </Item>
 
+          <button
+            type="button"
+            onClick={() => setCoachOpen(true)}
+            aria-label="Smarty Coach"
+            className={cn(
+              "flex h-full flex-1 items-center justify-center",
+              "transition-all duration-150 active:scale-90",
+              "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-inset"
+            )}
+          >
+            <span className="flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-[#1a1f2e] shadow-md shadow-blue-500/30">
+              <img
+                src={smartyCoachIcon}
+                alt=""
+                aria-hidden="true"
+                className="h-7 w-7 rounded-full"
+                width={28}
+                height={28}
+              />
+            </span>
+          </button>
+
           <Item
             onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
             label={resolvedTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
@@ -87,5 +114,7 @@ export const MobileBottomNav = () => {
           </Item>
         </div>
     </nav>
+    <SmartyCoachModal isOpen={coachOpen} onClose={() => setCoachOpen(false)} />
+    </>
   );
 };
