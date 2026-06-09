@@ -221,7 +221,11 @@ export default function SmartyPlans() {
     <>
       {/* Mobile: swipeable carousel */}
       <div className="md:hidden mb-8">
-        <Carousel className="w-full" opts={{ align: "start", loop: false, containScroll: "trimSnaps" }}>
+        <Carousel
+          className="w-full"
+          opts={{ align: "start", loop: false, containScroll: "trimSnaps" }}
+          setApi={setMobileCarouselApi}
+        >
           <CarouselContent className="-ml-2">
             <CarouselItem className="pl-2 basis-[88%]">
               {GoldPlanCard}
@@ -271,7 +275,7 @@ export default function SmartyPlans() {
               onClick={() => handleSubscribe('gold')}
               disabled={loading}
             >
-              {loading ? "Processing..." : "Start Your Plan"}
+              {loadingPlan === 'gold' ? "Processing..." : "Start Your Plan"}
             </Button>
             )}
             <p className="text-xs text-center text-muted-foreground">Auto-renews each month</p>
@@ -316,7 +320,7 @@ export default function SmartyPlans() {
               onClick={() => handleSubscribe('platinum')}
               disabled={loading}
             >
-              {loading ? "Processing..." : "Start Your Plan"}
+              {loadingPlan === 'platinum' ? "Processing..." : "Start Your Plan"}
             </Button>
             )}
             <p className="text-xs text-center text-muted-foreground">Auto-renews each year</p>
