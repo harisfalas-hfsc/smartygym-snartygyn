@@ -437,9 +437,9 @@ export default function SmartyPlans() {
               {/* Mobile: ultra-compact icon + title pills */}
               <div className="grid grid-cols-2 gap-2 md:hidden">
                 {benefits.map((benefit, index) => (
-                  <div key={index} className="flex items-center gap-2 py-2 px-2 border-b border-primary/10">
-                    <benefit.icon className="h-4 w-4 text-primary shrink-0" />
-                    <span className="text-sm font-medium leading-tight">{benefit.title}</span>
+                  <div key={index} className="flex items-center gap-1.5 py-2 px-1 border-b border-primary/10 min-w-0">
+                    <benefit.icon className="h-3.5 w-3.5 text-primary shrink-0" />
+                    <span className="text-xs font-medium whitespace-nowrap truncate">{benefit.title}</span>
                   </div>
                 ))}
               </div>
