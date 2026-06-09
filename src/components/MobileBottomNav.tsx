@@ -87,7 +87,7 @@ export const MobileBottomNav = () => {
               "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-inset"
             )}
           >
-            <span className="flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-[#1a1f2e] shadow-md shadow-blue-500/30">
+            <span className="flex h-9 w-9 items-center justify-center rounded-full border border-primary/30 bg-background shadow-sm">
               <img
                 src={smartyCoachIcon}
                 alt=""
