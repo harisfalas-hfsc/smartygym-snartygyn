@@ -170,14 +170,14 @@ export default function SmartyPlans() {
   };
 
   const benefits = [
-    { icon: Dumbbell, title: "Unlimited Workouts", description: "Access to all personalized workout plans" },
+    { icon: Dumbbell, title: "All Workouts", description: "Access to all personalized workout plans" },
     { icon: Calendar, title: "Training Programs", description: "Structured training programs to achieve long-term goals" },
     { icon: Heart, title: "Track Favorites", description: "Save and organize your favorite workouts" },
-    { icon: TrendingUp, title: "Progress Tracking", description: "Monitor completed workouts and achievements" },
+    { icon: TrendingUp, title: "Progress", description: "Monitor completed workouts and achievements" },
     { icon: Target, title: "Goal Setting", description: "Set and track your fitness goals" },
     { icon: BookOpen, title: "Exercise Library", description: "Complete exercise database with videos" },
     { icon: Calculator, title: "Fitness Tools", description: "BMR, 1RM, and macro calculators with history" },
-    { icon: Sparkles, title: "Smarty Rituals & Check-ins", description: "Daily wellness routines and fitness tracking check-ins" },
+    { icon: Sparkles, title: "Rituals & Check-ins", description: "Daily wellness routines and fitness tracking check-ins" },
     { icon: Zap, title: "Priority Support", description: "Get help when you need it" }
   ];
 
