@@ -77,6 +77,8 @@ export const UserMessagesPanel = () => {
   const [viewFilter, setViewFilter] = useState<ViewFilter>('all');
   const [selectedMessages, setSelectedMessages] = useState<Set<string>>(new Set());
   const [activeTab, setActiveTab] = useState('all');
+  const [replyDrafts, setReplyDrafts] = useState<Record<string, string>>({});
+  const [sendingReplyFor, setSendingReplyFor] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
   const { data: rawContactMessages = [], isLoading: contactLoading, refetch: refetchContact } = useQuery({
