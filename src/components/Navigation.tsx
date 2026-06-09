@@ -426,16 +426,6 @@ export const Navigation = () => {
                 </nav>
               </SheetContent>
             </Sheet>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setSmartyCoachOpen(true)}
-              className="relative inline-flex h-11 w-11 rounded-full"
-              aria-label="Open Smarty Coach"
-            >
-              <img src={smartyCoachIcon} alt="" className="h-8 w-8 rounded-full" loading="lazy" width={32} height={32} />
-              <span className="sr-only">Smarty Coach</span>
-            </Button>
           </div>
 
           {/* CENTER SECTION - Logo */}
