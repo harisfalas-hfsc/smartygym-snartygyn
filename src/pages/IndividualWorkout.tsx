@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { BookOpen } from "lucide-react";
 import { WorkoutDisplay } from "@/components/WorkoutDisplay";
 import { AccessGate } from "@/components/AccessGate";
-import { useWorkoutData } from "@/hooks/useWorkoutData";
+import { useWorkoutData, type WorkoutData } from "@/hooks/useWorkoutData";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { ContentNotFound } from "@/components/ContentNotFound";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
@@ -14,7 +14,7 @@ import { ExerciseHTMLContent } from "@/components/ExerciseHTMLContent";
 import { getWorkoutCategorySlug, slugifyContentName } from "@/lib/seo-slugs";
 
 // Helper function to generate SEO-optimized alt text
-const generateWorkoutAltText = (workout: any): string => {
+const generateWorkoutAltText = (workout: WorkoutData): string => {
   const parts = [
     workout.name,
     workout.difficulty ? `${workout.difficulty} level` : '',

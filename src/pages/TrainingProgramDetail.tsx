@@ -210,7 +210,7 @@ const TrainingProgramDetail = () => {
 
   // Filter and sort programs with memoization
   const filteredPrograms = useMemo(() => {
-    let filtered = currentTypePrograms.filter(program => {
+    const filtered = currentTypePrograms.filter(program => {
       // Search filter
       if (debouncedSearch) {
         const searchLower = debouncedSearch.toLowerCase();

@@ -210,7 +210,7 @@ const WorkoutDetail = () => {
   // First filter by category from URL - EXCLUDE active WODs (they should only appear on WOD page)
   const currentTypeWorkouts = allWorkouts.filter(workout => {
     const categoryMatch = workout.category?.toUpperCase().includes(mappedCategory);
-    const isNotActiveWOD = workout.is_workout_of_day !== true || (workout as any).wod_source === 'library'; // Library-selected WODs remain visible in categories
+    const isNotActiveWOD = workout.is_workout_of_day !== true || workout.wod_source === 'library'; // Library-selected WODs remain visible in categories
     return categoryMatch && isNotActiveWOD;
   });
   
@@ -220,7 +220,7 @@ const WorkoutDetail = () => {
 
   // Filter and sort workouts with memoization
   const filteredWorkouts = useMemo(() => {
-    let filtered = currentTypeWorkouts.filter(workout => {
+    const filtered = currentTypeWorkouts.filter(workout => {
       // Search filter
       if (debouncedSearch) {
         const searchLower = debouncedSearch.toLowerCase();
