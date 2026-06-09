@@ -128,29 +128,7 @@ export default function SmartyPlans() {
     return () => subscription.unsubscribe();
   }, []);
 
-  useEffect(() => {
-    if (!mobileCarouselApi) return;
-
-    const syncSelectedPlan = () => {
-      selectedPlanRef.current = mobileCarouselApi.selectedScrollSnap() === 1 ? 'platinum' : 'gold';
-    };
-
-    const restoreSelectedPlan = () => {
-      const index = selectedPlanRef.current === 'platinum' ? 1 : 0;
-      requestAnimationFrame(() => mobileCarouselApi.scrollTo(index, true));
-    };
-
-    restoreSelectedPlan();
-    mobileCarouselApi.on('select', syncSelectedPlan);
-    mobileCarouselApi.on('reInit', restoreSelectedPlan);
-
-    return () => {
-      mobileCarouselApi.off('select', syncSelectedPlan);
-      mobileCarouselApi.off('reInit', restoreSelectedPlan);
-    };
-  }, [mobileCarouselApi]);
-
-  const handleSubscribe = async (plan: 'gold' | 'platinum') => {
+  const handleSubscribe = async (plan: PlanTier) => {
     if (isPremium) {
       toast({
         title: "Already Premium",
@@ -165,8 +143,6 @@ export default function SmartyPlans() {
       return;
     }
 
-    selectedPlanRef.current = plan;
-    mobileCarouselApi?.scrollTo(plan === 'platinum' ? 1 : 0, true);
     setLoadingPlan(plan);
     const priceIds = {
       gold: STRIPE_PRICE_IDS.gold,
@@ -270,35 +246,6 @@ export default function SmartyPlans() {
     "Best value for committed users",
     "Full access to all features"
   ];
-
-  const PricingPlansBlock = () => (
-    <>
-      {/* Mobile: swipeable carousel */}
-      <div className="md:hidden mb-8">
-        <Carousel
-          className="w-full"
-          opts={{ align: "start", loop: false, containScroll: "trimSnaps" }}
-          setApi={setMobileCarouselApi}
-        >
-          <CarouselContent className="-ml-2">
-            <CarouselItem className="pl-2 basis-[88%]">
-              {GoldPlanCard}
-            </CarouselItem>
-            <CarouselItem className="pl-2 basis-[88%]">
-              {PlatinumPlanCard}
-            </CarouselItem>
-          </CarouselContent>
-        </Carousel>
-        <p className="text-center text-xs text-muted-foreground mt-2">← Swipe to compare plans →</p>
-      </div>
-
-      {/* Desktop: side-by-side grid */}
-      <div className="hidden md:grid grid-cols-2 gap-6 mb-8">
-        {GoldPlanCard}
-        {PlatinumPlanCard}
-      </div>
-    </>
-  );
 
   const GoldPlanCard = (
     <Card className="relative border-2 border-[#D4AF37] shadow-lg flex flex-col h-full">
