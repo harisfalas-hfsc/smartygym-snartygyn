@@ -7,6 +7,7 @@ export interface TrainingProgramData {
   canonical_slug?: string | null;
   category: string;
   name: string;
+  difficulty: string | null;
   difficulty_stars: number | null;
   weeks: number | null;
   days_per_week: number | null;
