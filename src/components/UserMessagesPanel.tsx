@@ -791,29 +791,42 @@ export const UserMessagesPanel = () => {
                   </Button>
                 </div>
               </div>
-              <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+              <p className={`text-sm text-muted-foreground mb-3 ${isExpanded ? 'whitespace-pre-wrap' : 'line-clamp-2'}`}>
                 {message.message}
               </p>
               <div className="flex items-center gap-4 flex-wrap">
                 <span className="text-xs text-muted-foreground">
                   {format(new Date(message.created_at), 'MMM dd, yyyy HH:mm')}
                 </span>
-                {message.response ? (
+                {hasTeamReply ? (
                   <Badge variant="default" className="bg-green-600">Coach Replied</Badge>
                 ) : (
                   <Badge variant="secondary">Pending</Badge>
                 )}
               </div>
 
-              {message.response && (
-                <div className="mt-4 pt-4 border-t">
-                  <p className="text-sm font-semibold mb-2 text-green-600">Coach Response:</p>
-                  <div className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 p-3 rounded-lg text-sm text-display break-words-safe content-container">
-                    {message.response}
+              {isExpanded && (
+                <div className="mt-4 space-y-4 border-t pt-4">
+                  <div>
+                    <p className="text-sm font-semibold mb-2">Your full message:</p>
+                    <div className="bg-muted p-3 rounded-lg text-sm whitespace-pre-wrap break-words-safe content-container">
+                      {message.message}
+                    </div>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    {format(new Date(message.responded_at!), 'MMM dd, yyyy HH:mm')}
-                  </p>
+
+                  {teamReplies.length > 0 && (
+                    <div className="space-y-3">
+                      <p className="text-sm font-semibold text-green-600">Team replies:</p>
+                      {teamReplies.map((reply) => (
+                        <div key={reply.id} className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 p-3 rounded-lg text-sm text-display break-words-safe content-container">
+                          <p className="whitespace-pre-wrap">{reply.content}</p>
+                          <p className="text-xs text-muted-foreground mt-2">
+                            {format(new Date(reply.created_at), 'MMM dd, yyyy HH:mm')}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -829,7 +842,10 @@ export const UserMessagesPanel = () => {
                           size="sm"
                           variant="ghost"
                           className="h-5 w-5 p-0"
-                          onClick={() => window.open(attachment.url, '_blank')}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            window.open(attachment.url, '_blank');
+                          }}
                         >
                           <Download className="h-3 w-3" />
                         </Button>
