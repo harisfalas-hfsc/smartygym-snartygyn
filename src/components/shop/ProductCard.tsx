@@ -71,6 +71,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
             contentName: product.title,
             stripePriceId: product.stripe_price_id,
             imageUrl: product.image_url,
+            cancelPath: window.location.pathname + window.location.search,
           }
         }
       );

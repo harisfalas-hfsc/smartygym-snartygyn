@@ -13,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const { contentType, contentId } = await req.json();
+    const { contentType, contentId, cancelPath } = await req.json();
 
     if (!['workout', 'program'].includes(contentType) || !contentId) {
       return new Response(JSON.stringify({ error: "Invalid purchase request" }), {
@@ -212,7 +212,7 @@ serve(async (req) => {
       ],
       mode: "payment",
       success_url: `${req.headers.get("origin")}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${req.headers.get("origin")}/${contentType}/${contentId}`,
+      cancel_url: `${req.headers.get("origin")}${typeof cancelPath === 'string' && cancelPath.startsWith('/') ? cancelPath : `/${contentType}/${contentId}`}`,
       shipping_address_collection: contentType === 'shop_product' ? {
         allowed_countries: ['US', 'CA', 'GB', 'DE', 'FR', 'ES', 'IT', 'GR', 'CY', 'NL', 'BE', 'AT', 'PT', 'IE', 'SE', 'DK', 'FI', 'NO', 'CH', 'PL'],
       } : undefined,

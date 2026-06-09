@@ -57,7 +57,7 @@ const About = () => {
     try {
       const priceId = plan === "gold" ? STRIPE_PRICE_IDS.gold : STRIPE_PRICE_IDS.platinum;
       const { data, error } = await supabase.functions.invoke("create-checkout", {
-        body: { priceId },
+        body: { priceId, cancelPath: window.location.pathname + window.location.search },
       });
       if (error) throw error;
       if (data?.url) {
