@@ -579,6 +579,7 @@ export const UserMessagesPanel = () => {
   };
 
   const extractLink = (content: string): string | null => {
+    void 0;
     const hrefMatch = content.match(/href="([^"]+)"/);
     return hrefMatch ? hrefMatch[1] : null;
   };
