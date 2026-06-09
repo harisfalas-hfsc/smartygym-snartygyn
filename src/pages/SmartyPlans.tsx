@@ -193,7 +193,7 @@ export default function SmartyPlans() {
     <>
       {/* Mobile: swipeable carousel */}
       <div className="md:hidden mb-8">
-        <Carousel className="w-full">
+        <Carousel className="w-full" opts={{ align: "start", loop: false, containScroll: "trimSnaps" }}>
           <CarouselContent className="-ml-2">
             <CarouselItem className="pl-2 basis-[88%]">
               {GoldPlanCard}
@@ -472,7 +472,7 @@ export default function SmartyPlans() {
             <CardContent>
               {/* Mobile View */}
               <div className="md:hidden">
-                <Carousel className="w-full">
+                <Carousel className="w-full" opts={{ align: "start", loop: false, containScroll: "trimSnaps" }}>
                   <CarouselContent className="-ml-2">
                     <CarouselItem className="pl-2 basis-[88%]">
                       <Card className="border-2 border-[hsl(var(--primary)/0.3)] h-full">
