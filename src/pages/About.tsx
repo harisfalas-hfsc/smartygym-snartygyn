@@ -21,7 +21,6 @@ const About = () => {
   const isPremium = userTier === "premium";
   const { toast } = useToast();
   const [loadingPlan, setLoadingPlan] = useState<"gold" | "platinum" | null>(null);
-  const [activeAudienceTooltip, setActiveAudienceTooltip] = useState<string | null>(null);
   const [activeAudienceTooltipMobile, setActiveAudienceTooltipMobile] = useState<string | null>(null);
 
   const audienceList = [
