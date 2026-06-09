@@ -8,7 +8,7 @@ import { useNavigationHistory } from "@/contexts/NavigationHistoryContext";
  */
 export const useShowBackButton = () => {
   const navigate = useNavigate();
-  const { history, goBack: contextGoBack } = useNavigationHistory();
+  const { canGoBack: contextCanGoBack, goBack: contextGoBack } = useNavigationHistory();
 
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
 
@@ -22,7 +22,7 @@ export const useShowBackButton = () => {
   const canGoBack = !isMobile;
 
   const goBack = () => {
-    if (history.length > 1) {
+    if (contextCanGoBack) {
       contextGoBack();
     } else {
       navigate("/");

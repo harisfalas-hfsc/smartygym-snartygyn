@@ -4,7 +4,8 @@ import { ShoppingCart, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAccessControl } from "@/hooks/useAccessControl";
-import { useNavigate } from "react-router-dom";
+import { useNavigationHistory } from "@/contexts/NavigationHistoryContext";
+import { useLocation, useNavigate } from "react-router-dom";
 import { isIOSNative } from "@/utils/platform";
 
 interface PurchaseButtonProps {
@@ -27,13 +28,21 @@ export const PurchaseButton = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
   const { user, hasPurchased, userTier } = useAccessControl();
+  const { history } = useNavigationHistory();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Check if already purchased
   const alreadyPurchased = hasPurchased(contentId, contentType);
-  const checkoutCancelPath = contentType === "workout"
+  const currentPath = `${location.pathname}${location.search}`;
+  const canonicalContentPath = contentType === "workout"
     ? `/workout/${contentId}`
     : `/trainingprogram/${contentId}`;
+  const preCheckoutPath = [...history]
+    .reverse()
+    .find((path) => path !== currentPath && !path.startsWith(canonicalContentPath))
+    || (contentType === "workout" ? "/workout" : "/trainingprogram");
+  const checkoutCancelPath = `${canonicalContentPath}?checkout_return=${encodeURIComponent(preCheckoutPath)}`;
   
   // NEW: Check if user is premium (cannot purchase)
   const isPremium = userTier === "premium";
