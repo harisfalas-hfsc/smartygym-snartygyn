@@ -50,7 +50,7 @@ serve(async (req) => {
     logStep("User authenticated", { userId: user.id, email: user.email });
 
     // Parse request body
-    const { planType, organizationName } = await req.json();
+    const { planType, organizationName, cancelPath } = await req.json();
     
     if (!planType || !CORPORATE_PLANS[planType as keyof typeof CORPORATE_PLANS]) {
       throw new Error("Invalid plan type");
@@ -96,7 +96,7 @@ serve(async (req) => {
       ],
       mode: "subscription",
       success_url: `${origin}/corporate-admin?success=true`,
-      cancel_url: `${origin}/corporate?canceled=true`,
+      cancel_url: `${origin}${typeof cancelPath === 'string' && cancelPath.startsWith('/') ? cancelPath : '/corporate?canceled=true'}`,
       metadata: {
         user_id: user.id,
         corporate_plan_type: planType,
