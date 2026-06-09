@@ -627,16 +627,13 @@ export default function SmartyPlans() {
               {/* Why Choose Yearly - Compact */}
               <Card className="mb-6 border-2 border-primary">
                 <CardHeader className="bg-primary/5 py-3">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-xl">Why Choose the Yearly Plan?</CardTitle>
-                    <Badge className="bg-green-600 text-white">BEST VALUE</Badge>
-                  </div>
+                  <CardTitle className="text-xl text-center">Why Choose the Yearly Plan?</CardTitle>
                 </CardHeader>
                 <CardContent className="pt-4 pb-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <h3 className="text-lg font-bold mb-3">Save Big with Annual Membership</h3>
-                      <div className="space-y-2">
+                      <h3 className="text-base font-bold mb-2">Save Big with Annual Membership</h3>
+                      <div className="space-y-1.5">
                         {yearlyBenefits.map((benefit, index) => (
                           <div key={index} className="flex items-start gap-2">
                             <Check className="h-4 w-4 text-green-600 shrink-0 mt-0.5" />
@@ -645,13 +642,13 @@ export default function SmartyPlans() {
                         ))}
                       </div>
                     </div>
-                    <div className="bg-primary/5 rounded-lg p-4 flex flex-col justify-center">
+                    <div className="bg-primary/5 rounded-lg p-3 flex flex-col justify-center">
                       <div className="text-center">
                         <p className="text-xs text-muted-foreground mb-1">Monthly Plan</p>
-                        <div className="text-lg font-bold line-through text-muted-foreground mb-1">€9.99 × 12 = €119.88</div>
+                        <div className="text-base font-bold line-through text-muted-foreground mb-1">€9.99 × 12 = €119.88</div>
                         <p className="text-xs text-muted-foreground mb-2">per year</p>
                         <p className="text-xs text-muted-foreground mb-1">Annual Plan (Save 25%)</p>
-                        <div className="text-2xl font-bold text-primary mb-1">€89.99</div>
+                        <div className="text-xl font-bold text-primary mb-1">€89.99</div>
                         <p className="text-sm text-green-600 font-semibold">You save €29.89!</p>
                       </div>
                     </div>
