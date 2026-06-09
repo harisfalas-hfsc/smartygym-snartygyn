@@ -203,10 +203,10 @@ const About = () => {
                         key={label}
                         type="button"
                         onClick={() => navigate(to)}
-                        className="aspect-square flex flex-col items-center justify-center gap-3 p-4 rounded-xl border-2 border-border bg-card hover:border-primary hover:bg-primary/5 hover:-translate-y-0.5 transition-all group"
+                        className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border border-border bg-card hover:border-primary hover:bg-primary/5 transition-all group"
                       >
-                        <Icon className={`w-12 h-12 ${color} group-hover:scale-110 transition-transform`} />
-                        <span className="text-sm font-semibold text-foreground text-center leading-tight">{label}</span>
+                        <Icon className={`w-10 h-10 ${color} group-hover:scale-110 transition-transform`} />
+                        <span className="text-xs font-semibold text-foreground text-center leading-tight">{label}</span>
                       </button>
                     ))}
                   </div>
