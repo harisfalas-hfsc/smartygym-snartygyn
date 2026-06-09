@@ -91,7 +91,7 @@ export const NavigationHistoryProvider = ({ children }: { children: ReactNode })
       const popped = newHistory.pop();
 
       // Skip any excluded paths when going back
-      while (newHistory.length > 0 && EXCLUDED_PATHS.includes(newHistory[newHistory.length - 1])) {
+      while (newHistory.length > 0 && EXCLUDED_PATHS.includes(newHistory[newHistory.length - 1].split("?")[0])) {
         newHistory.pop();
       }
 
