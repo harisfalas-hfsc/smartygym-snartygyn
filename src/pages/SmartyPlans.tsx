@@ -42,7 +42,6 @@ import { useToast } from "@/hooks/use-toast";
 
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
-import { isNativePlatform, openExternal } from "@/utils/native";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { AlreadyPremiumCard } from "@/components/pricing/AlreadyPremiumCard";
 
@@ -149,10 +148,6 @@ export default function SmartyPlans() {
       platinum: STRIPE_PRICE_IDS.platinum,
     };
 
-    // In native Capacitor, skip pre-opening a blank window (not needed)
-    // In browser, open window BEFORE async call to avoid Safari/iOS popup blocker
-    const checkoutWindow = isNativePlatform() ? null : window.open('', '_blank');
-
     try {
     const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: { priceId: priceIds[plan] }
@@ -160,7 +155,6 @@ export default function SmartyPlans() {
 
       // Handle already subscribed response from backend
       if (data?.hasActiveSubscription) {
-        checkoutWindow?.close();
         toast({
           title: "You're Already Subscribed!",
           description: "You already have an active premium subscription.",
@@ -170,26 +164,13 @@ export default function SmartyPlans() {
       }
 
       if (error) {
-        checkoutWindow?.close();
         throw error;
       }
 
       if (data?.url) {
-        if (isNativePlatform()) {
-          // Navigate the current webview to Stripe Checkout so the user stays
-          // inside one window. Stripe will redirect back to success_url which
-          // re-opens the app via Android assetlinks / iOS universal links.
-          window.location.href = data.url;
-          return;
-        } else if (checkoutWindow) {
-          checkoutWindow.location.href = data.url;
-          toast({
-            title: "Checkout opened",
-            description: "Complete your purchase in the opened window",
-          });
-        }
+        window.location.href = data.url;
+        return;
       } else {
-        checkoutWindow?.close();
         throw new Error("No checkout URL returned");
       }
     } catch (error) {
