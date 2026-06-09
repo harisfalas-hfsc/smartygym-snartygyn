@@ -23,6 +23,7 @@ const getCategoryColor = (category: string | null) => {
   return "text-red-600 dark:text-red-400";
 };
 import { AccessGate } from "@/components/AccessGate";
+import IndividualWorkout from "@/pages/IndividualWorkout";
 import { CompactFilters } from "@/components/CompactFilters";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { ContentLoadingSkeleton } from "@/components/ContentLoadingSkeleton";
@@ -312,6 +313,10 @@ const WorkoutDetail = () => {
       durationFilter, statusFilter, sortBy, accessFilter, userId, interactions, mappedCategory]);
 
   const workoutSlugs = useMemo(() => buildUniqueContentSlugs(currentTypeWorkouts), [currentTypeWorkouts]);
+
+  if (type && !Object.prototype.hasOwnProperty.call(categoryMap, type)) {
+    return <IndividualWorkout />;
+  }
 
   return (
     <>

@@ -31,6 +31,7 @@ const getDifficultyFromStars = (difficulty: string | null, stars: number | null)
   return "Advanced";
 };
 import { AccessGate } from "@/components/AccessGate";
+import IndividualTrainingProgram from "@/pages/IndividualTrainingProgram";
 import { CompactFilters } from "@/components/CompactFilters";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { ContentLoadingSkeleton } from "@/components/ContentLoadingSkeleton";
@@ -279,6 +280,10 @@ const TrainingProgramDetail = () => {
       statusFilter, sortBy, accessFilter, userId, interactions]);
 
   const programSlugs = useMemo(() => buildUniqueContentSlugs(currentTypePrograms), [currentTypePrograms]);
+
+  if (type && !Object.prototype.hasOwnProperty.call(categoryMap, type)) {
+    return <IndividualTrainingProgram />;
+  }
 
   return (
     <>
