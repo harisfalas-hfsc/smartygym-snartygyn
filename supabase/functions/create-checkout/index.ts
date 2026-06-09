@@ -29,8 +29,8 @@ serve(async (req) => {
   );
 
   try {
-    const { priceId } = await req.json();
-    logStep("Request received", { priceId });
+    const { priceId, cancelPath } = await req.json();
+    logStep("Request received", { priceId, cancelPath });
     
     if (!priceId) {
       throw new Error("Price ID is required");
@@ -100,7 +100,7 @@ serve(async (req) => {
       ],
       mode: "subscription",
       success_url: `${req.headers.get("origin")}/userdashboard?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${req.headers.get("origin")}/`,
+      cancel_url: `${req.headers.get("origin")}${typeof cancelPath === 'string' && cancelPath.startsWith('/') ? cancelPath : '/'}`,
       payment_method_collection: 'always',
       metadata: {
         user_id: user.id,
