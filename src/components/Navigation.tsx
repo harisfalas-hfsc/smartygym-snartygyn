@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User as UserIcon, Settings, LogOut, LayoutDashboard, Crown, Bell, Facebook, Instagram, Youtube, ShoppingBag, Info, Dumbbell, ListChecks, Wrench, BookOpen, Users, Newspaper, Mail, Sparkles, Building2, Shield, HelpCircle, Compass, ArrowLeft, Menu } from "lucide-react";
+import { User as UserIcon, Settings, LogOut, LayoutDashboard, Crown, Bell, Facebook, Instagram, Youtube, ShoppingBag, Info, Dumbbell, ListChecks, Wrench, BookOpen, Users, Newspaper, Mail, Sparkles, Building2, Shield, HelpCircle, Compass, ArrowLeft, Menu, Home } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
@@ -277,6 +277,14 @@ export const Navigation = () => {
     { label: "FAQ", path: "/faq", icon: HelpCircle, iconClass: "text-purple-500", track: undefined },
     { label: "Contact", path: "/contact", icon: Mail, iconClass: "text-indigo-500", track: undefined },
   ];
+
+  // Desktop menu replaces "About SmartyGym" with "Home" because the About page
+  // is intentionally hidden from desktop (content overlaps with the homepage).
+  const desktopDiscoveryItems = discoveryItems.map((item) =>
+    item.path === "/about"
+      ? { label: "Home", path: "/", icon: Home, iconClass: "text-teal-500", track: undefined }
+      : item,
+  );
 
   return (
     <>
