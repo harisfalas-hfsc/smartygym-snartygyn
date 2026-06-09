@@ -84,13 +84,15 @@ export const MobileBottomNav = () => {
             className={cn(
               "flex h-full flex-1 items-center justify-center",
               "transition-all duration-150 active:scale-90",
-              "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-inset",
-              resolvedTheme === "dark"
-                ? ""
-                : "text-foreground/80 hover:text-primary"
+              "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-inset"
             )}
           >
-            <span className="flex h-9 w-9 items-center justify-center rounded-full border border-primary/30 bg-background shadow-sm">
+            <span className={cn(
+              "flex h-9 w-9 items-center justify-center rounded-full border shadow-sm",
+              resolvedTheme === "dark"
+                ? "border-primary/30 bg-background"
+                : "border-primary/50 bg-[#0f172a]"
+            )}>
               <img
                 src={smartyCoachIcon}
                 alt=""
