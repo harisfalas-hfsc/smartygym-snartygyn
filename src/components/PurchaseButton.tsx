@@ -70,6 +70,7 @@ export const PurchaseButton = ({
             price,
             stripeProductId,
             stripePriceId,
+            cancelPath: window.location.pathname + window.location.search,
           },
           headers: {
             Authorization: `Bearer ${session.access_token}`,
