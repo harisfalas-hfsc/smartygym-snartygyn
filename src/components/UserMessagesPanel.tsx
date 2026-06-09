@@ -406,7 +406,7 @@ export const UserMessagesPanel = () => {
           if (msg && !msg.is_read) systemIds.push(id);
         } else if (type === 'contact') {
           const msg = contactMessages.find(m => m.id === id);
-          if (msg && msg.response && !msg.response_read_at) contactIds.push(id);
+          if (msg && getTeamReplies(msg).length > 0 && !msg.response_read_at) contactIds.push(id);
         }
       });
 
@@ -462,7 +462,7 @@ export const UserMessagesPanel = () => {
           if (msg && msg.is_read) systemIds.push(id);
         } else if (type === 'contact') {
           const msg = contactMessages.find(m => m.id === id);
-          if (msg && msg.response && msg.response_read_at) contactIds.push(id);
+          if (msg && getTeamReplies(msg).length > 0 && msg.response_read_at) contactIds.push(id);
         }
       });
 
@@ -861,7 +861,7 @@ export const UserMessagesPanel = () => {
     );
   };
 
-  const deletableCount = [...validSelectedMessages].filter(key => key.startsWith('system-')).length;
+  const deletableCount = validSelectedMessages.size;
 
   return (
     <div className="space-y-4">
