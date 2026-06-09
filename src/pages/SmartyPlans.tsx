@@ -170,14 +170,14 @@ export default function SmartyPlans() {
   };
 
   const benefits = [
-    { icon: Dumbbell, title: "Unlimited Workouts", description: "Access to all personalized workout plans" },
+    { icon: Dumbbell, title: "All Workouts", description: "Access to all personalized workout plans" },
     { icon: Calendar, title: "Training Programs", description: "Structured training programs to achieve long-term goals" },
     { icon: Heart, title: "Track Favorites", description: "Save and organize your favorite workouts" },
-    { icon: TrendingUp, title: "Progress Tracking", description: "Monitor completed workouts and achievements" },
+    { icon: TrendingUp, title: "Progress", description: "Monitor completed workouts and achievements" },
     { icon: Target, title: "Goal Setting", description: "Set and track your fitness goals" },
     { icon: BookOpen, title: "Exercise Library", description: "Complete exercise database with videos" },
     { icon: Calculator, title: "Fitness Tools", description: "BMR, 1RM, and macro calculators with history" },
-    { icon: Sparkles, title: "Smarty Rituals & Check-ins", description: "Daily wellness routines and fitness tracking check-ins" },
+    { icon: Sparkles, title: "Rituals & Check-ins", description: "Daily wellness routines and fitness tracking check-ins" },
     { icon: Zap, title: "Priority Support", description: "Get help when you need it" }
   ];
 
@@ -253,8 +253,8 @@ export default function SmartyPlans() {
   );
 
   const PlatinumPlanCard = (
-    <Card className="relative border-2 border-[#A8A9AD] shadow-lg flex flex-col h-full bg-gradient-to-br from-[#A8A9AD]/5 to-[#C0C0C0]/10">
-        <Badge className="absolute -top-2 right-2 sm:-top-3 sm:right-3 bg-green-600 text-white px-2 sm:px-3 py-1 z-10">
+    <Card className="relative overflow-hidden border-2 border-[#A8A9AD] shadow-lg flex flex-col h-full bg-gradient-to-br from-[#A8A9AD]/5 to-[#C0C0C0]/10">
+        <Badge className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-green-600 text-white px-2 sm:px-3 py-1 z-10">
           BEST VALUE
         </Badge>
         <CardHeader className="text-center pb-2 sm:pb-4 pt-4 sm:pt-6">
@@ -437,9 +437,9 @@ export default function SmartyPlans() {
               {/* Mobile: ultra-compact icon + title pills */}
               <div className="grid grid-cols-2 gap-2 md:hidden">
                 {benefits.map((benefit, index) => (
-                  <div key={index} className="flex items-center gap-2 py-2 px-2 border-b border-primary/10">
-                    <benefit.icon className="h-4 w-4 text-primary shrink-0" />
-                    <span className="text-sm font-medium leading-tight">{benefit.title}</span>
+                  <div key={index} className="flex items-center gap-1.5 py-2 px-1 border-b border-primary/10 min-w-0">
+                    <benefit.icon className="h-3.5 w-3.5 text-primary shrink-0" />
+                    <span className="text-xs font-medium whitespace-nowrap truncate">{benefit.title}</span>
                   </div>
                 ))}
               </div>
@@ -627,16 +627,13 @@ export default function SmartyPlans() {
               {/* Why Choose Yearly - Compact */}
               <Card className="mb-6 border-2 border-primary">
                 <CardHeader className="bg-primary/5 py-3">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-xl">Why Choose the Yearly Plan?</CardTitle>
-                    <Badge className="bg-green-600 text-white">BEST VALUE</Badge>
-                  </div>
+                  <CardTitle className="text-xl text-center">Why Choose the Yearly Plan?</CardTitle>
                 </CardHeader>
                 <CardContent className="pt-4 pb-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <h3 className="text-lg font-bold mb-3">Save Big with Annual Membership</h3>
-                      <div className="space-y-2">
+                      <h3 className="text-base font-bold mb-2">Save Big with Annual Membership</h3>
+                      <div className="space-y-1.5">
                         {yearlyBenefits.map((benefit, index) => (
                           <div key={index} className="flex items-start gap-2">
                             <Check className="h-4 w-4 text-green-600 shrink-0 mt-0.5" />
@@ -645,13 +642,13 @@ export default function SmartyPlans() {
                         ))}
                       </div>
                     </div>
-                    <div className="bg-primary/5 rounded-lg p-4 flex flex-col justify-center">
+                    <div className="bg-primary/5 rounded-lg p-3 flex flex-col justify-center">
                       <div className="text-center">
                         <p className="text-xs text-muted-foreground mb-1">Monthly Plan</p>
-                        <div className="text-lg font-bold line-through text-muted-foreground mb-1">€9.99 × 12 = €119.88</div>
+                        <div className="text-base font-bold line-through text-muted-foreground mb-1">€9.99 × 12 = €119.88</div>
                         <p className="text-xs text-muted-foreground mb-2">per year</p>
                         <p className="text-xs text-muted-foreground mb-1">Annual Plan (Save 25%)</p>
-                        <div className="text-2xl font-bold text-primary mb-1">€89.99</div>
+                        <div className="text-xl font-bold text-primary mb-1">€89.99</div>
                         <p className="text-sm text-green-600 font-semibold">You save €29.89!</p>
                       </div>
                     </div>
@@ -685,28 +682,21 @@ export default function SmartyPlans() {
           </Card>
 
           {/* FAQ */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Frequently Asked Questions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <h3 className="font-semibold mb-1">What's the difference between Gold and Platinum?</h3>
-                <p className="text-sm text-muted-foreground">
-                  Both plans include the same premium features - the only difference is billing frequency. Gold is billed monthly, while Platinum is billed yearly and saves you 25%.
-                </p>
-              </div>
-              <div>
-                <h3 className="font-semibold mb-1">Can I cancel anytime?</h3>
-                <p className="text-sm text-muted-foreground">
-                  Yes! You can cancel your subscription at any time from your dashboard. You'll keep access until the end of your current billing period.
-                </p>
-              </div>
-              <div>
-                <h3 className="font-semibold mb-1">Can I switch plans?</h3>
-                <p className="text-sm text-muted-foreground">
-                  Yes, you can upgrade from Gold to Platinum anytime. Contact support for assistance with plan changes.
-                </p>
+          <Card className="mb-8 bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
+            <CardContent className="p-6">
+              <div className="flex flex-col md:flex-row items-center gap-6">
+                <div className="p-4 bg-primary/10 rounded-full">
+                  <MessageCircle className="h-10 w-10 text-primary" />
+                </div>
+                <div className="flex-1 text-center md:text-left">
+                  <h3 className="text-xl font-bold mb-2">Frequently Asked Questions</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Want to know more? Find answers to common questions about plans, billing, and access.
+                  </p>
+                  <Button variant="outline" onClick={() => navigate("/faq")}>
+                    View FAQ
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
