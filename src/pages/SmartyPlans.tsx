@@ -495,7 +495,7 @@ export default function SmartyPlans() {
           </Card>
 
           {/* Pricing Plans (after What You Get) - Hidden for premium users */}
-          {!isPremium && <PricingPlansBlock />}
+          {!isPremium && <PricingPlansBlock goldPlanCard={GoldPlanCard} platinumPlanCard={PlatinumPlanCard} />}
 
           {/* Compare Access Levels */}
           <Card className="mb-8 overflow-hidden border-2 border-[hsl(var(--primary)/0.6)] shadow-xl">
@@ -655,7 +655,7 @@ export default function SmartyPlans() {
           {!isPremium && (
             <>
               {/* Pricing Cards (after Compare Access Levels) */}
-              <PricingPlansBlock />
+              <PricingPlansBlock goldPlanCard={GoldPlanCard} platinumPlanCard={PlatinumPlanCard} />
 
               {/* Why Choose Yearly - Compact */}
               <Card className="mb-6 border-2 border-primary">
@@ -690,7 +690,7 @@ export default function SmartyPlans() {
               </Card>
 
               {/* Pricing Cards (after Why Choose Yearly) */}
-              <PricingPlansBlock />
+              <PricingPlansBlock goldPlanCard={GoldPlanCard} platinumPlanCard={PlatinumPlanCard} />
             </>
           )}
 
