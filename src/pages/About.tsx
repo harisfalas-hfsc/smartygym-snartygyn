@@ -160,58 +160,8 @@ const About = () => {
             </div>
           </ScrollReveal>
 
-          {/* Mission Statement */}
-          {/* Desktop: Single card with both paragraphs */}
-          <ScrollReveal>
-            <Card className="mb-12 border-2 border-primary hidden md:block">
-              <CardContent className="p-8 lg:p-10">
-                <div className="space-y-8 text-center">
-                  <div className="space-y-5">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mx-auto">
-                      <Target className="w-4 h-4 text-primary" />
-                      <span className="text-xs uppercase tracking-wider font-semibold text-primary">Our Mission</span>
-                    </div>
-                    <h2 className="text-3xl lg:text-4xl font-bold text-foreground leading-tight">
-                      Your Gym Re-imagined.<br />
-                      <span className="text-primary">Anywhere, Anytime.</span>
-                    </h2>
-                    <p className="text-base text-muted-foreground leading-relaxed max-w-3xl mx-auto">
-                      Everything a complete gym must offer, built by real professionals, in your pocket at <strong className="text-foreground">smartygym.com</strong>.
-                    </p>
-                    <p className="text-base text-muted-foreground leading-relaxed max-w-3xl mx-auto">
-                      We are not here to replace your gym. We are here to back you up when life gets in the way. Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed — <span className="text-primary font-semibold">SmartyGym</span> is your backup plan. Or, if you prefer training from home entirely, we've got you covered. Or, if you go to your gym but want to follow a professional, science-based workout or training program designed by{' '}
-                      <a
-                        href="/coach-profile"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          navigate('/coach-profile');
-                        }}
-                        className="text-primary hover:underline font-medium cursor-pointer"
-                      >
-                        Haris Falas
-                      </a>, we provide that expert guidance. <span className="font-semibold text-primary">Wherever you are, your gym comes with you.</span>
-                    </p>
-                  </div>
-                  <div className="rounded-xl border border-primary/20 bg-primary/5 p-6">
-                    <p className="text-xs uppercase tracking-wider font-semibold text-primary mb-4 text-center">What's inside</p>
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 text-left">
-                      <div className="flex items-center gap-3"><Flame className="w-5 h-5 text-red-500 flex-shrink-0" /><span className="text-sm font-semibold text-foreground">Workout of the Day</span></div>
-                      <div className="flex items-center gap-3"><Dumbbell className="w-5 h-5 text-orange-500 flex-shrink-0" /><span className="text-sm font-semibold text-foreground">Expert Workouts</span></div>
-                      <div className="flex items-center gap-3"><Calendar className="w-5 h-5 text-blue-500 flex-shrink-0" /><span className="text-sm font-semibold text-foreground">Training Programs</span></div>
-                      <div className="flex items-center gap-3"><Sparkles className="w-5 h-5 text-yellow-500 flex-shrink-0" /><span className="text-sm font-semibold text-foreground">Smarty Ritual</span></div>
-                      <div className="flex items-center gap-3"><Video className="w-5 h-5 text-emerald-500 flex-shrink-0" /><span className="text-sm font-semibold text-foreground">Exercise Library</span></div>
-                      <div className="flex items-center gap-3"><Wrench className="w-5 h-5 text-purple-500 flex-shrink-0" /><span className="text-sm font-semibold text-foreground">Smarty Tools</span></div>
-                      <div className="flex items-center gap-3"><FileText className="w-5 h-5 text-cyan-500 flex-shrink-0" /><span className="text-sm font-semibold text-foreground">Articles</span></div>
-                      <div className="flex items-center gap-3"><BookOpen className="w-5 h-5 text-pink-500 flex-shrink-0" /><span className="text-sm font-semibold text-foreground">LogBook</span></div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </ScrollReveal>
-
-          {/* Mobile: Two separate cards */}
-          <div className="md:hidden space-y-6 mb-12">
+          {/* Cards (mobile layout, also used on desktop) */}
+          <div className="space-y-6 mb-12">
             <Card className="border-2 border-primary">
               <CardContent className="p-6">
                 <div className="text-center space-y-4">
