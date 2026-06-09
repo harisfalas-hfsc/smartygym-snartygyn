@@ -940,7 +940,7 @@ export const UserMessagesPanel = () => {
                     onClick={handleBulkDeleteClick}
                     className="h-8 text-destructive hover:text-destructive"
                     disabled={deletableCount === 0}
-                    title={deletableCount === 0 ? "Contact messages cannot be deleted" : `Delete ${deletableCount} system messages`}
+                    title={deletableCount === 0 ? "No messages selected" : `Delete ${deletableCount} selected messages`}
                   >
                     <Trash2 className="h-3 w-3 mr-1" />
                     Delete {deletableCount > 0 && `(${deletableCount})`}
