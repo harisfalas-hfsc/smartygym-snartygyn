@@ -176,8 +176,8 @@ export const UserMessagesPanel = () => {
 
   const filteredContactMessages = useMemo(() => {
     if (viewFilter === 'all') return contactMessages;
-    return contactMessages.filter(m => m.response && !m.response_read_at);
-  }, [contactMessages, viewFilter]);
+    return contactMessages.filter(m => (m.response || (historyByContactId[m.id] || []).some(item => item.sender !== 'customer')) && !m.response_read_at);
+  }, [contactMessages, historyByContactId, viewFilter]);
 
   // Get visible messages based on active tab
   const visibleMessageIds = useMemo(() => {
@@ -713,9 +713,16 @@ export const UserMessagesPanel = () => {
   const renderContactMessage = (message: ContactMessage, showBorder = true) => {
     const messageKey = `contact-${message.id}`;
     const isSelected = validSelectedMessages.has(messageKey);
+    const isExpanded = expandedMessages.has(message.id);
+    const teamReplies = getTeamReplies(message);
+    const hasTeamReply = Boolean(message.response) || teamReplies.length > 0;
     
     return (
-      <Card key={messageKey} className={!message.response_read_at && message.response && showBorder ? 'border-green-500' : ''}>
+      <Card
+        key={messageKey}
+        className={`${!message.response_read_at && hasTeamReply && showBorder ? 'border-green-500' : ''} cursor-pointer transition-colors hover:bg-muted/40`}
+        onClick={() => handleMessageClick(message.id, 'contact')}
+      >
         <CardContent className="pt-6">
           <div className="flex items-start gap-3">
             <div className="flex items-center gap-2">
@@ -730,7 +737,7 @@ export const UserMessagesPanel = () => {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-2 flex-wrap">
                 <h3 className="font-semibold">{message.subject}</h3>
-                {!message.response_read_at && message.response && (
+                {!message.response_read_at && hasTeamReply && (
                   <Badge variant="destructive">New Response</Badge>
                 )}
                 <Badge variant="outline" className="text-xs">
@@ -738,12 +745,26 @@ export const UserMessagesPanel = () => {
                   Your Message
                 </Badge>
                 <div className="ml-auto flex items-center gap-1">
-                  {message.response && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleMessageClick(message.id, 'contact');
+                    }}
+                  >
+                    {isExpanded ? 'Hide' : 'Open'}
+                  </Button>
+                  {hasTeamReply && (
                     <Button
                       variant="ghost"
                       size="icon"
                       className="h-7 w-7"
-                      onClick={() => handleToggleRead(message.id, 'contact', !!message.response_read_at)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleToggleRead(message.id, 'contact', !!message.response_read_at);
+                      }}
                       title={message.response_read_at ? "Mark response as unread" : "Mark response as read"}
                     >
                       {message.response_read_at ? (
@@ -757,7 +778,10 @@ export const UserMessagesPanel = () => {
                     variant="ghost"
                     size="icon"
                     className="h-7 w-7 text-destructive hover:text-destructive"
-                    onClick={() => handleDeleteClick(message.id, 'contact')}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteClick(message.id, 'contact');
+                    }}
                     title="Delete message"
                   >
                     <Trash2 className="h-4 w-4" />
