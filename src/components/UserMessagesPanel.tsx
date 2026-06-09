@@ -10,6 +10,7 @@ import { useState, useMemo } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
 import { EmailSubscriptionManager } from "@/components/EmailSubscriptionManager";
 import { DashboardNotificationSubscriptionManager } from "@/components/DashboardNotificationSubscriptionManager";
 import { MobilePushNotificationManager } from "@/components/MobilePushNotificationManager";
