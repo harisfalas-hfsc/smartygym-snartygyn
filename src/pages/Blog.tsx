@@ -12,6 +12,7 @@ import { Link } from "react-router-dom";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { generateHarisFalasSchema } from "@/utils/seoSchemas";
 import { getBlogArticleImage } from "@/utils/blogImages";
+import { BlogSEOEnhancement } from "@/components/seo/BlogSEOEnhancement";
 interface Article {
   id: string;
   slug: string;
@@ -245,6 +246,8 @@ const Blog = () => {
                 </div>
               </Card>)}
           </div>
+
+          <BlogSEOEnhancement articleCount={allArticles.length} />
         </div>
       </div>
     </>;

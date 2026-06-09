@@ -18,6 +18,7 @@ import { generateHarisFalasSchema } from "@/utils/seoSchemas";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { useAccessControl } from "@/contexts/AccessControlContext";
 import { getBlogArticleImage, toAbsoluteBlogImageUrl } from "@/utils/blogImages";
+import { ArticleSEOEnhancement } from "@/components/seo/ArticleSEOEnhancement";
 
 
 export const ArticleDetail = () => {
@@ -260,6 +261,17 @@ export const ArticleDetail = () => {
             <div className="blog-article-content mb-8">
               <HTMLContent content={article.content} />
             </div>
+
+            <ArticleSEOEnhancement
+              title={article.title}
+              slug={article.slug}
+              excerpt={article.excerpt}
+              category={article.category}
+              publishedAt={publishedDate}
+              modifiedAt={modifiedDate}
+              imageUrl={articleSeoImageUrl}
+              authorName={article.author_name}
+            />
 
             <div className="pt-6">
               <h3 className="text-lg font-semibold mb-4">Share this article</h3>
