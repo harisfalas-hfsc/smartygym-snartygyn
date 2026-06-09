@@ -107,11 +107,8 @@ export default function SmartyCorporate() {
       });
       if (error) throw error;
       if (data?.url) {
-        openExternal(data.url);
-        toast({
-          title: "Checkout opened",
-          description: "Complete your purchase in the new tab"
-        });
+        window.location.href = data.url;
+        return;
       }
     } catch (error) {
       console.error('Error creating checkout:', error);

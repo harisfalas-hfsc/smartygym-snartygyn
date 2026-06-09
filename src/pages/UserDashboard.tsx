@@ -669,11 +669,8 @@ export default function UserDashboard() {
         if (import.meta.env.DEV) {
           console.log("Opening portal URL:", data.url);
         }
-        openExternal(data.url);
-        toast({
-          title: "Opening subscription portal",
-          description: "Manage your subscription in the new tab"
-        });
+        window.location.href = data.url;
+        return;
       } else if (data?.portalNotConfigured) {
         toast({
           title: "Portal Setup Required",
