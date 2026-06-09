@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   Carousel,
+  type CarouselApi,
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
@@ -45,6 +46,62 @@ import { isNativePlatform, openExternal } from "@/utils/native";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { AlreadyPremiumCard } from "@/components/pricing/AlreadyPremiumCard";
 
+type PlanTier = 'gold' | 'platinum';
+
+function PricingPlansBlock({ goldPlanCard, platinumPlanCard }: { goldPlanCard: ReactNode; platinumPlanCard: ReactNode }) {
+  const [mobileCarouselApi, setMobileCarouselApi] = useState<CarouselApi>();
+  const selectedPlanRef = useRef<PlanTier>('gold');
+
+  useEffect(() => {
+    if (!mobileCarouselApi) return;
+
+    const syncSelectedPlan = () => {
+      selectedPlanRef.current = mobileCarouselApi.selectedScrollSnap() === 1 ? 'platinum' : 'gold';
+    };
+
+    const restoreSelectedPlan = () => {
+      const index = selectedPlanRef.current === 'platinum' ? 1 : 0;
+      requestAnimationFrame(() => mobileCarouselApi.scrollTo(index, true));
+    };
+
+    restoreSelectedPlan();
+    mobileCarouselApi.on('select', syncSelectedPlan);
+    mobileCarouselApi.on('reInit', restoreSelectedPlan);
+
+    return () => {
+      mobileCarouselApi.off('select', syncSelectedPlan);
+      mobileCarouselApi.off('reInit', restoreSelectedPlan);
+    };
+  }, [mobileCarouselApi]);
+
+  return (
+    <>
+      <div className="md:hidden mb-8">
+        <Carousel
+          className="w-full"
+          opts={{ align: "start", loop: false, containScroll: "trimSnaps" }}
+          setApi={setMobileCarouselApi}
+        >
+          <CarouselContent className="-ml-2">
+            <CarouselItem className="pl-2 basis-[88%]">
+              {goldPlanCard}
+            </CarouselItem>
+            <CarouselItem className="pl-2 basis-[88%]">
+              {platinumPlanCard}
+            </CarouselItem>
+          </CarouselContent>
+        </Carousel>
+        <p className="text-center text-xs text-muted-foreground mt-2">← Swipe to compare plans →</p>
+      </div>
+
+      <div className="hidden md:grid grid-cols-2 gap-6 mb-8">
+        {goldPlanCard}
+        {platinumPlanCard}
+      </div>
+    </>
+  );
+}
+
 export default function SmartyPlans() {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -52,7 +109,8 @@ export default function SmartyPlans() {
   const { userTier } = useAccessControl();
   const isPremium = userTier === "premium";
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loadingPlan, setLoadingPlan] = useState<PlanTier | null>(null);
+  const loading = loadingPlan !== null;
   
   // Pricing
   const goldOriginal = 9.99;
@@ -70,7 +128,7 @@ export default function SmartyPlans() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const handleSubscribe = async (plan: 'gold' | 'platinum') => {
+  const handleSubscribe = async (plan: PlanTier) => {
     if (isPremium) {
       toast({
         title: "Already Premium",
@@ -85,7 +143,7 @@ export default function SmartyPlans() {
       return;
     }
 
-    setLoading(true);
+    setLoadingPlan(plan);
     const priceIds = {
       gold: STRIPE_PRICE_IDS.gold,
       platinum: STRIPE_PRICE_IDS.platinum,
@@ -138,7 +196,7 @@ export default function SmartyPlans() {
         variant: "destructive"
       });
     } finally {
-      setLoading(false);
+      setLoadingPlan(null);
     }
   };
 
@@ -189,31 +247,6 @@ export default function SmartyPlans() {
     "Full access to all features"
   ];
 
-  const PricingPlansBlock = () => (
-    <>
-      {/* Mobile: swipeable carousel */}
-      <div className="md:hidden mb-8">
-        <Carousel className="w-full" opts={{ align: "start", loop: false, containScroll: "trimSnaps" }}>
-          <CarouselContent className="-ml-2">
-            <CarouselItem className="pl-2 basis-[88%]">
-              {GoldPlanCard}
-            </CarouselItem>
-            <CarouselItem className="pl-2 basis-[88%]">
-              {PlatinumPlanCard}
-            </CarouselItem>
-          </CarouselContent>
-        </Carousel>
-        <p className="text-center text-xs text-muted-foreground mt-2">← Swipe to compare plans →</p>
-      </div>
-
-      {/* Desktop: side-by-side grid */}
-      <div className="hidden md:grid grid-cols-2 gap-6 mb-8">
-        {GoldPlanCard}
-        {PlatinumPlanCard}
-      </div>
-    </>
-  );
-
   const GoldPlanCard = (
     <Card className="relative border-2 border-[#D4AF37] shadow-lg flex flex-col h-full">
         <CardHeader className="text-center pb-2 sm:pb-4">
@@ -243,7 +276,7 @@ export default function SmartyPlans() {
               onClick={() => handleSubscribe('gold')}
               disabled={loading}
             >
-              {loading ? "Processing..." : "Start Your Plan"}
+              {loadingPlan === 'gold' ? "Processing..." : "Start Your Plan"}
             </Button>
             )}
             <p className="text-xs text-center text-muted-foreground">Auto-renews each month</p>
@@ -288,7 +321,7 @@ export default function SmartyPlans() {
               onClick={() => handleSubscribe('platinum')}
               disabled={loading}
             >
-              {loading ? "Processing..." : "Start Your Plan"}
+              {loadingPlan === 'platinum' ? "Processing..." : "Start Your Plan"}
             </Button>
             )}
             <p className="text-xs text-center text-muted-foreground">Auto-renews each year</p>
@@ -462,7 +495,7 @@ export default function SmartyPlans() {
           </Card>
 
           {/* Pricing Plans (after What You Get) - Hidden for premium users */}
-          {!isPremium && <PricingPlansBlock />}
+          {!isPremium && <PricingPlansBlock goldPlanCard={GoldPlanCard} platinumPlanCard={PlatinumPlanCard} />}
 
           {/* Compare Access Levels */}
           <Card className="mb-8 overflow-hidden border-2 border-[hsl(var(--primary)/0.6)] shadow-xl">
@@ -622,7 +655,7 @@ export default function SmartyPlans() {
           {!isPremium && (
             <>
               {/* Pricing Cards (after Compare Access Levels) */}
-              <PricingPlansBlock />
+              <PricingPlansBlock goldPlanCard={GoldPlanCard} platinumPlanCard={PlatinumPlanCard} />
 
               {/* Why Choose Yearly - Compact */}
               <Card className="mb-6 border-2 border-primary">
@@ -657,7 +690,7 @@ export default function SmartyPlans() {
               </Card>
 
               {/* Pricing Cards (after Why Choose Yearly) */}
-              <PricingPlansBlock />
+              <PricingPlansBlock goldPlanCard={GoldPlanCard} platinumPlanCard={PlatinumPlanCard} />
             </>
           )}
 
