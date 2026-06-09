@@ -35,7 +35,7 @@ export const useTrainingProgramData = (programId: string | undefined) => {
     queryFn: async () => {
       if (!programId) throw new Error("Program ID is required");
       const resolveFromMetadata = async () => {
-        const { data: metadata, error: metadataError } = await (supabase as any)
+        const { data: metadata, error: metadataError } = await supabase
           .rpc("get_visible_program_metadata", { _program_id: null });
 
         if (metadataError) throw metadataError;
