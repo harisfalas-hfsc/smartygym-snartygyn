@@ -57,6 +57,15 @@ interface SystemMessage {
   created_at: string;
 }
 
+interface ContactMessageHistoryItem {
+  id: string;
+  contact_message_id: string;
+  message_type: string;
+  content: string;
+  sender: string;
+  created_at: string;
+}
+
 type ViewFilter = 'all' | 'unread';
 
 export const UserMessagesPanel = () => {
@@ -103,12 +112,61 @@ export const UserMessagesPanel = () => {
     },
   });
 
+  const contactMessageIds = useMemo(
+    () => (rawContactMessages || []).map((message) => message.id),
+    [rawContactMessages]
+  );
+
+  const { data: contactMessageHistory = [], isLoading: historyLoading, refetch: refetchHistory } = useQuery({
+    queryKey: ['user-contact-message-history', contactMessageIds],
+    enabled: contactMessageIds.length > 0,
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { data, error } = await supabase
+        .from('contact_message_history')
+        .select('*')
+        .in('contact_message_id', contactMessageIds)
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+      return data as ContactMessageHistoryItem[];
+    },
+  });
+
   const contactMessages: ContactMessage[] = (rawContactMessages || []).map(msg => ({
     ...msg,
     attachments: Array.isArray(msg.attachments) ? msg.attachments : []
   }));
 
-  const isLoading = contactLoading || systemLoading;
+  const isLoading = contactLoading || systemLoading || historyLoading;
+
+  const historyByContactId = useMemo(() => {
+    return (contactMessageHistory || []).reduce<Record<string, ContactMessageHistoryItem[]>>((acc, item) => {
+      if (!acc[item.contact_message_id]) acc[item.contact_message_id] = [];
+      acc[item.contact_message_id].push(item);
+      return acc;
+    }, {});
+  }, [contactMessageHistory]);
+
+  const getTeamReplies = (message: ContactMessage) => {
+    const historyReplies = (historyByContactId[message.id] || []).filter((item) => item.sender !== 'customer');
+    const directResponse = message.response
+      ? [{
+          id: `direct-${message.id}`,
+          contact_message_id: message.id,
+          message_type: 'admin_response',
+          content: message.response,
+          sender: 'admin',
+          created_at: message.responded_at || message.created_at,
+        }]
+      : [];
+
+    return [...historyReplies, ...directResponse]
+      .filter((reply, index, replies) => replies.findIndex((candidate) => candidate.content.trim() === reply.content.trim()) === index)
+      .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+  };
 
   // Filter messages based on viewFilter
   const filteredSystemMessages = useMemo(() => {
