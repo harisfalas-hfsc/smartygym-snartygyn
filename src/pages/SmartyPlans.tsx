@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   Carousel,
+  type CarouselApi,
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
@@ -52,7 +53,10 @@ export default function SmartyPlans() {
   const { userTier } = useAccessControl();
   const isPremium = userTier === "premium";
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loadingPlan, setLoadingPlan] = useState<'gold' | 'platinum' | null>(null);
+  const [mobileCarouselApi, setMobileCarouselApi] = useState<CarouselApi>();
+  const selectedPlanRef = useRef<'gold' | 'platinum'>('gold');
+  const loading = loadingPlan !== null;
   
   // Pricing
   const goldOriginal = 9.99;
@@ -70,6 +74,28 @@ export default function SmartyPlans() {
     return () => subscription.unsubscribe();
   }, []);
 
+  useEffect(() => {
+    if (!mobileCarouselApi) return;
+
+    const syncSelectedPlan = () => {
+      selectedPlanRef.current = mobileCarouselApi.selectedScrollSnap() === 1 ? 'platinum' : 'gold';
+    };
+
+    const restoreSelectedPlan = () => {
+      const index = selectedPlanRef.current === 'platinum' ? 1 : 0;
+      requestAnimationFrame(() => mobileCarouselApi.scrollTo(index, true));
+    };
+
+    restoreSelectedPlan();
+    mobileCarouselApi.on('select', syncSelectedPlan);
+    mobileCarouselApi.on('reInit', restoreSelectedPlan);
+
+    return () => {
+      mobileCarouselApi.off('select', syncSelectedPlan);
+      mobileCarouselApi.off('reInit', restoreSelectedPlan);
+    };
+  }, [mobileCarouselApi]);
+
   const handleSubscribe = async (plan: 'gold' | 'platinum') => {
     if (isPremium) {
       toast({
@@ -85,7 +111,9 @@ export default function SmartyPlans() {
       return;
     }
 
-    setLoading(true);
+    selectedPlanRef.current = plan;
+    mobileCarouselApi?.scrollTo(plan === 'platinum' ? 1 : 0, true);
+    setLoadingPlan(plan);
     const priceIds = {
       gold: STRIPE_PRICE_IDS.gold,
       platinum: STRIPE_PRICE_IDS.platinum,
@@ -138,7 +166,7 @@ export default function SmartyPlans() {
         variant: "destructive"
       });
     } finally {
-      setLoading(false);
+      setLoadingPlan(null);
     }
   };
 
