@@ -17,7 +17,6 @@ import smartyGymIcon from "@/assets/smarty-gym-icon.png";
 import harisPhoto from "@/assets/haris-falas-coach.png";
 import { MobilePhoneIllustration } from "@/components/MobilePhoneIllustration";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { openExternal } from "@/utils/native";
 import { cn } from "@/lib/utils";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { ScrollReveal } from "@/components/ScrollReveal";
@@ -276,7 +275,7 @@ const Index = () => {
       });
       if (error) throw error;
       if (data?.url) {
-        openExternal(data.url);
+        window.location.href = data.url;
       }
     } catch (error) {
       console.error('Error creating checkout:', error);
