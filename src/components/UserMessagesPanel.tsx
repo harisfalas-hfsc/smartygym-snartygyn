@@ -57,6 +57,15 @@ interface SystemMessage {
   created_at: string;
 }
 
+interface ContactMessageHistoryItem {
+  id: string;
+  contact_message_id: string;
+  message_type: string;
+  content: string;
+  sender: string;
+  created_at: string;
+}
+
 type ViewFilter = 'all' | 'unread';
 
 export const UserMessagesPanel = () => {
@@ -103,12 +112,61 @@ export const UserMessagesPanel = () => {
     },
   });
 
+  const contactMessageIds = useMemo(
+    () => (rawContactMessages || []).map((message) => message.id),
+    [rawContactMessages]
+  );
+
+  const { data: contactMessageHistory = [], isLoading: historyLoading, refetch: refetchHistory } = useQuery({
+    queryKey: ['user-contact-message-history', contactMessageIds],
+    enabled: contactMessageIds.length > 0,
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { data, error } = await supabase
+        .from('contact_message_history')
+        .select('*')
+        .in('contact_message_id', contactMessageIds)
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+      return data as ContactMessageHistoryItem[];
+    },
+  });
+
   const contactMessages: ContactMessage[] = (rawContactMessages || []).map(msg => ({
     ...msg,
     attachments: Array.isArray(msg.attachments) ? msg.attachments : []
   }));
 
-  const isLoading = contactLoading || systemLoading;
+  const isLoading = contactLoading || systemLoading || historyLoading;
+
+  const historyByContactId = useMemo(() => {
+    return (contactMessageHistory || []).reduce<Record<string, ContactMessageHistoryItem[]>>((acc, item) => {
+      if (!acc[item.contact_message_id]) acc[item.contact_message_id] = [];
+      acc[item.contact_message_id].push(item);
+      return acc;
+    }, {});
+  }, [contactMessageHistory]);
+
+  const getTeamReplies = (message: ContactMessage) => {
+    const historyReplies = (historyByContactId[message.id] || []).filter((item) => item.sender !== 'customer');
+    const directResponse = message.response
+      ? [{
+          id: `direct-${message.id}`,
+          contact_message_id: message.id,
+          message_type: 'admin_response',
+          content: message.response,
+          sender: 'admin',
+          created_at: message.responded_at || message.created_at,
+        }]
+      : [];
+
+    return [...historyReplies, ...directResponse]
+      .filter((reply, index, replies) => replies.findIndex((candidate) => candidate.content.trim() === reply.content.trim()) === index)
+      .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+  };
 
   // Filter messages based on viewFilter
   const filteredSystemMessages = useMemo(() => {
@@ -118,8 +176,8 @@ export const UserMessagesPanel = () => {
 
   const filteredContactMessages = useMemo(() => {
     if (viewFilter === 'all') return contactMessages;
-    return contactMessages.filter(m => m.response && !m.response_read_at);
-  }, [contactMessages, viewFilter]);
+    return contactMessages.filter(m => (m.response || (historyByContactId[m.id] || []).some(item => item.sender !== 'customer')) && !m.response_read_at);
+  }, [contactMessages, historyByContactId, viewFilter]);
 
   // Get visible messages based on active tab
   const visibleMessageIds = useMemo(() => {
@@ -172,7 +230,8 @@ export const UserMessagesPanel = () => {
       }
     } else if (type === 'contact') {
       const message = contactMessages.find(m => m.id === messageId);
-      if (message && message.response && !message.response_read_at) {
+      const hasReply = message ? getTeamReplies(message).length > 0 : false;
+      if (message && hasReply && !message.response_read_at) {
         try {
           const { error } = await supabase
             .from('contact_messages')
@@ -187,6 +246,7 @@ export const UserMessagesPanel = () => {
           }
 
           await refetchContact();
+          await refetchHistory();
           queryClient.invalidateQueries({ queryKey: ['unread-messages-count'] });
         } catch (e: any) {
           console.error('[UserMessagesPanel] Unexpected error:', e);
@@ -234,6 +294,7 @@ export const UserMessagesPanel = () => {
         
         toast.success(!currentState ? "Response marked as read" : "Response marked as unread");
         refetchContact();
+        refetchHistory();
       }
       
       queryClient.invalidateQueries({ queryKey: ['unread-messages-count'] });
@@ -345,7 +406,7 @@ export const UserMessagesPanel = () => {
           if (msg && !msg.is_read) systemIds.push(id);
         } else if (type === 'contact') {
           const msg = contactMessages.find(m => m.id === id);
-          if (msg && msg.response && !msg.response_read_at) contactIds.push(id);
+          if (msg && getTeamReplies(msg).length > 0 && !msg.response_read_at) contactIds.push(id);
         }
       });
 
@@ -401,7 +462,7 @@ export const UserMessagesPanel = () => {
           if (msg && msg.is_read) systemIds.push(id);
         } else if (type === 'contact') {
           const msg = contactMessages.find(m => m.id === id);
-          if (msg && msg.response && msg.response_read_at) contactIds.push(id);
+          if (msg && getTeamReplies(msg).length > 0 && msg.response_read_at) contactIds.push(id);
         }
       });
 
@@ -655,9 +716,16 @@ export const UserMessagesPanel = () => {
   const renderContactMessage = (message: ContactMessage, showBorder = true) => {
     const messageKey = `contact-${message.id}`;
     const isSelected = validSelectedMessages.has(messageKey);
+    const isExpanded = expandedMessages.has(message.id);
+    const teamReplies = getTeamReplies(message);
+    const hasTeamReply = Boolean(message.response) || teamReplies.length > 0;
     
     return (
-      <Card key={messageKey} className={!message.response_read_at && message.response && showBorder ? 'border-green-500' : ''}>
+      <Card
+        key={messageKey}
+        className={`${!message.response_read_at && hasTeamReply && showBorder ? 'border-green-500' : ''} cursor-pointer transition-colors hover:bg-muted/40`}
+        onClick={() => handleMessageClick(message.id, 'contact')}
+      >
         <CardContent className="pt-6">
           <div className="flex items-start gap-3">
             <div className="flex items-center gap-2">
@@ -672,7 +740,7 @@ export const UserMessagesPanel = () => {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-2 flex-wrap">
                 <h3 className="font-semibold">{message.subject}</h3>
-                {!message.response_read_at && message.response && (
+                {!message.response_read_at && hasTeamReply && (
                   <Badge variant="destructive">New Response</Badge>
                 )}
                 <Badge variant="outline" className="text-xs">
@@ -680,12 +748,26 @@ export const UserMessagesPanel = () => {
                   Your Message
                 </Badge>
                 <div className="ml-auto flex items-center gap-1">
-                  {message.response && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleMessageClick(message.id, 'contact');
+                    }}
+                  >
+                    {isExpanded ? 'Hide' : 'Open'}
+                  </Button>
+                  {hasTeamReply && (
                     <Button
                       variant="ghost"
                       size="icon"
                       className="h-7 w-7"
-                      onClick={() => handleToggleRead(message.id, 'contact', !!message.response_read_at)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleToggleRead(message.id, 'contact', !!message.response_read_at);
+                      }}
                       title={message.response_read_at ? "Mark response as unread" : "Mark response as read"}
                     >
                       {message.response_read_at ? (
@@ -699,36 +781,52 @@ export const UserMessagesPanel = () => {
                     variant="ghost"
                     size="icon"
                     className="h-7 w-7 text-destructive hover:text-destructive"
-                    onClick={() => handleDeleteClick(message.id, 'contact')}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteClick(message.id, 'contact');
+                    }}
                     title="Delete message"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
-              <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+              <p className={`text-sm text-muted-foreground mb-3 ${isExpanded ? 'whitespace-pre-wrap' : 'line-clamp-2'}`}>
                 {message.message}
               </p>
               <div className="flex items-center gap-4 flex-wrap">
                 <span className="text-xs text-muted-foreground">
                   {format(new Date(message.created_at), 'MMM dd, yyyy HH:mm')}
                 </span>
-                {message.response ? (
+                {hasTeamReply ? (
                   <Badge variant="default" className="bg-green-600">Coach Replied</Badge>
                 ) : (
                   <Badge variant="secondary">Pending</Badge>
                 )}
               </div>
 
-              {message.response && (
-                <div className="mt-4 pt-4 border-t">
-                  <p className="text-sm font-semibold mb-2 text-green-600">Coach Response:</p>
-                  <div className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 p-3 rounded-lg text-sm text-display break-words-safe content-container">
-                    {message.response}
+              {isExpanded && (
+                <div className="mt-4 space-y-4 border-t pt-4">
+                  <div>
+                    <p className="text-sm font-semibold mb-2">Your full message:</p>
+                    <div className="bg-muted p-3 rounded-lg text-sm whitespace-pre-wrap break-words-safe content-container">
+                      {message.message}
+                    </div>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    {format(new Date(message.responded_at!), 'MMM dd, yyyy HH:mm')}
-                  </p>
+
+                  {teamReplies.length > 0 && (
+                    <div className="space-y-3">
+                      <p className="text-sm font-semibold text-green-600">Team replies:</p>
+                      {teamReplies.map((reply) => (
+                        <div key={reply.id} className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 p-3 rounded-lg text-sm text-display break-words-safe content-container">
+                          <p className="whitespace-pre-wrap">{reply.content}</p>
+                          <p className="text-xs text-muted-foreground mt-2">
+                            {format(new Date(reply.created_at), 'MMM dd, yyyy HH:mm')}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -744,7 +842,10 @@ export const UserMessagesPanel = () => {
                           size="sm"
                           variant="ghost"
                           className="h-5 w-5 p-0"
-                          onClick={() => window.open(attachment.url, '_blank')}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            window.open(attachment.url, '_blank');
+                          }}
                         >
                           <Download className="h-3 w-3" />
                         </Button>
@@ -760,7 +861,7 @@ export const UserMessagesPanel = () => {
     );
   };
 
-  const deletableCount = [...validSelectedMessages].filter(key => key.startsWith('system-')).length;
+  const deletableCount = validSelectedMessages.size;
 
   return (
     <div className="space-y-4">
@@ -839,7 +940,7 @@ export const UserMessagesPanel = () => {
                     onClick={handleBulkDeleteClick}
                     className="h-8 text-destructive hover:text-destructive"
                     disabled={deletableCount === 0}
-                    title={deletableCount === 0 ? "Contact messages cannot be deleted" : `Delete ${deletableCount} system messages`}
+                    title={deletableCount === 0 ? "No messages selected" : `Delete ${deletableCount} selected messages`}
                   >
                     <Trash2 className="h-3 w-3 mr-1" />
                     Delete {deletableCount > 0 && `(${deletableCount})`}
@@ -937,13 +1038,8 @@ export const UserMessagesPanel = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete {deletableCount} Messages</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete {deletableCount} system message{deletableCount !== 1 ? 's' : ''}? 
+              Are you sure you want to delete {deletableCount} selected message{deletableCount !== 1 ? 's' : ''}? 
               This action cannot be undone.
-              {validSelectedMessages.size > deletableCount && (
-                <span className="block mt-2 text-muted-foreground">
-                  Note: {validSelectedMessages.size - deletableCount} contact message{validSelectedMessages.size - deletableCount !== 1 ? 's' : ''} will not be deleted as contact messages cannot be removed.
-                </span>
-              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
