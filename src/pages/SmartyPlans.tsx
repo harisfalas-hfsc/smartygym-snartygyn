@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
@@ -46,6 +46,62 @@ import { isNativePlatform, openExternal } from "@/utils/native";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { AlreadyPremiumCard } from "@/components/pricing/AlreadyPremiumCard";
 
+type PlanTier = 'gold' | 'platinum';
+
+function PricingPlansBlock({ goldPlanCard, platinumPlanCard }: { goldPlanCard: ReactNode; platinumPlanCard: ReactNode }) {
+  const [mobileCarouselApi, setMobileCarouselApi] = useState<CarouselApi>();
+  const selectedPlanRef = useRef<PlanTier>('gold');
+
+  useEffect(() => {
+    if (!mobileCarouselApi) return;
+
+    const syncSelectedPlan = () => {
+      selectedPlanRef.current = mobileCarouselApi.selectedScrollSnap() === 1 ? 'platinum' : 'gold';
+    };
+
+    const restoreSelectedPlan = () => {
+      const index = selectedPlanRef.current === 'platinum' ? 1 : 0;
+      requestAnimationFrame(() => mobileCarouselApi.scrollTo(index, true));
+    };
+
+    restoreSelectedPlan();
+    mobileCarouselApi.on('select', syncSelectedPlan);
+    mobileCarouselApi.on('reInit', restoreSelectedPlan);
+
+    return () => {
+      mobileCarouselApi.off('select', syncSelectedPlan);
+      mobileCarouselApi.off('reInit', restoreSelectedPlan);
+    };
+  }, [mobileCarouselApi]);
+
+  return (
+    <>
+      <div className="md:hidden mb-8">
+        <Carousel
+          className="w-full"
+          opts={{ align: "start", loop: false, containScroll: "trimSnaps" }}
+          setApi={setMobileCarouselApi}
+        >
+          <CarouselContent className="-ml-2">
+            <CarouselItem className="pl-2 basis-[88%]">
+              {goldPlanCard}
+            </CarouselItem>
+            <CarouselItem className="pl-2 basis-[88%]">
+              {platinumPlanCard}
+            </CarouselItem>
+          </CarouselContent>
+        </Carousel>
+        <p className="text-center text-xs text-muted-foreground mt-2">← Swipe to compare plans →</p>
+      </div>
+
+      <div className="hidden md:grid grid-cols-2 gap-6 mb-8">
+        {goldPlanCard}
+        {platinumPlanCard}
+      </div>
+    </>
+  );
+}
+
 export default function SmartyPlans() {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -53,9 +109,7 @@ export default function SmartyPlans() {
   const { userTier } = useAccessControl();
   const isPremium = userTier === "premium";
   const [user, setUser] = useState<User | null>(null);
-  const [loadingPlan, setLoadingPlan] = useState<'gold' | 'platinum' | null>(null);
-  const [mobileCarouselApi, setMobileCarouselApi] = useState<CarouselApi>();
-  const selectedPlanRef = useRef<'gold' | 'platinum'>('gold');
+  const [loadingPlan, setLoadingPlan] = useState<PlanTier | null>(null);
   const loading = loadingPlan !== null;
   
   // Pricing
