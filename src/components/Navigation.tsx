@@ -457,22 +457,29 @@ export const Navigation = () => {
                <span className="sr-only">Smarty Coach</span>
               </Button>
             
-           {user && unreadCount > 0 && (
-             <Button
-               variant="ghost"
-               size="icon"
-               className="relative h-11 w-11 rounded-full p-0 mr-1.5 lg:mr-2"
-               onClick={() => {
-                 navigate("/userdashboard?tab=messages");
-                 setTimeout(() => window.scrollTo(0, 0), 0);
-               }}
-             >
-               <div className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-primary text-primary transition-colors hover:bg-primary hover:text-primary-foreground">
-                 <Bell className="h-5 w-5" />
-               </div>
-               <SafeNotificationBadge count={unreadCount} />
-             </Button>
-           )}
+            {user && unreadCount > 0 && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className={cn(
+                  "relative",
+                  !isMobile && "h-11 w-11 rounded-full p-0 mr-1.5 lg:mr-2"
+                )}
+                onClick={() => {
+                  navigate("/userdashboard?tab=messages");
+                  setTimeout(() => window.scrollTo(0, 0), 0);
+                }}
+              >
+                {isMobile ? (
+                  <Bell className="h-5 w-5" />
+                ) : (
+                  <div className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-primary text-primary transition-colors hover:bg-primary hover:text-primary-foreground">
+                    <Bell className="h-5 w-5" />
+                  </div>
+                )}
+                <SafeNotificationBadge count={unreadCount} />
+              </Button>
+            )}
             
             {user ? (
               <DropdownMenu>
