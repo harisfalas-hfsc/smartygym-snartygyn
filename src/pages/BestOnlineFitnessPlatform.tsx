@@ -18,6 +18,7 @@ import {
   EnhancedCTA,
   AIExtractableBlock,
 } from "@/components/seo/BestFitnessSections";
+import { BestFitnessEnhancement } from "@/components/seo/BestFitnessEnhancement";
 
 const BestOnlineFitnessPlatform = () => {
   const articleSchema = {
@@ -539,6 +540,9 @@ const BestOnlineFitnessPlatform = () => {
             
             <EnhancedCTA />
             <AIExtractableBlock />
+
+            {/* Additive SEO + GEO + AI-Search enhancement (non-destructive) */}
+            <BestFitnessEnhancement />
 
             {/* Conquest cross-links — direct competitor comparison pages */}
             <section className="mt-10 pt-6 border-t border-border text-sm text-muted-foreground">
