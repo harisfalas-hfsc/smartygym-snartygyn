@@ -265,8 +265,8 @@ const About = () => {
             </Card>
           </div>
 
-          {/* Mobile: Core Values - Single compact card */}
-          <Card className="mb-12 border-2 border-primary md:hidden">
+          {/* Core Values - compact card (mobile + desktop) */}
+          <Card className="mb-12 border-2 border-primary">
             <CardContent className="p-6">
               <div className="text-center space-y-4">
                 <h2 className="text-2xl font-bold text-foreground">What We Stand For</h2>
@@ -301,8 +301,8 @@ const About = () => {
               </CardContent>
             </Card>
 
-          {/* Mobile: Meet the Coach Card */}
-          <Card className="mb-12 border-2 border-primary md:hidden">
+          {/* Meet the Coach Card (mobile + desktop) */}
+          <Card className="mb-12 border-2 border-primary">
             <CardContent className="p-6">
               <div className="flex flex-col items-center text-center space-y-4">
                 <h2 className="text-2xl font-bold text-foreground">Meet the Coach</h2>
