@@ -102,7 +102,8 @@ export default function SmartyCorporate() {
       } = await supabase.functions.invoke('create-corporate-checkout', {
         body: {
           planType: selectedPlan,
-          organizationName: organizationName.trim()
+          organizationName: organizationName.trim(),
+          cancelPath: window.location.pathname + window.location.search
         }
       });
       if (error) throw error;
