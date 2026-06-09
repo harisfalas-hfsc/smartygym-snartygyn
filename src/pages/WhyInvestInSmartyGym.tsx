@@ -676,7 +676,7 @@ export default function WhyInvestInSmartyGym() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button asChild size="lg" className="gap-2">
-                  <Link to="/joinpremium">
+                  <Link to="/smarty-plans">
                     <Crown className="h-5 w-5" />
                     Start Your Journey
                   </Link>

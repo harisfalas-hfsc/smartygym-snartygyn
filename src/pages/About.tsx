@@ -574,7 +574,7 @@ const About = () => {
                   <h2 className="text-2xl md:text-3xl font-bold">Ready to Start Your Journey?</h2>
                   <Button 
                     size="lg" 
-                    onClick={() => navigate('/joinpremium')}
+                    onClick={() => navigate('/smarty-plans')}
                     className="mt-4"
                   >
                     Start Now

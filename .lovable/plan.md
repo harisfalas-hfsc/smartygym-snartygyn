@@ -1,35 +1,39 @@
-Yes — I understand the problem: the article card is now the correct brand width, but the hero image became too dominant, and the article body formatting has poor paragraph rhythm.
+## Goal
 
-Plan:
+Consolidate the duplicate "Join Premium" page into the existing **Smarty Plans** page (`/smarty-plans`). Keep Smarty Plans exactly as it is — same name, same content, same URL. Remove the standalone Join Premium page and point every link that used to go there to `/smarty-plans` instead. `/premiumbenefits` is untouched.
 
-1. Keep the blog article page on the standard wide card
-- Keep the outer blog article card aligned with the rest of the site.
-- Do not go back to the narrow old layout.
-- This preserves consistency with workout pages, program pages, and the rest of the brand system.
+## Changes
 
-2. Stop the image from becoming a huge full-width block
-- On desktop/tablet, place the article image beside the article intro/header area instead of making it a massive full-width banner.
-- Use a controlled image column with a fixed visual ratio so it feels premium but not oversized.
-- Let the title, category, read time, date, author box, and image form one clean top section.
-- On mobile, keep the image stacked under the title so it stays readable and does not squeeze the text.
+### 1. Routing (`src/App.tsx`)
+- Replace the two JoinPremium routes with permanent redirects:
+  - `/joinpremium` → `<Navigate to="/smarty-plans" replace />`
+  - `/join-premium` → `<Navigate to="/smarty-plans" replace />`
+- Remove the lazy `JoinPremium` import (no longer used).
 
-3. Fix the article body readability
-- Add a blog-specific content style so paragraphs have proper spacing after each paragraph.
-- Improve line-height, heading spacing, list spacing, blockquote spacing, and image/table behavior inside blog articles.
-- Avoid changing workout formatting, because workouts intentionally use compact spacing.
+### 2. Delete the page
+- Delete `src/pages/JoinPremium.tsx`.
 
-4. Remove the messy A4-style reading box from normal blog display
-- Keep article content inside the main card, but avoid the document-like A4 padding/shadow that makes the article feel inconsistent.
-- Preserve Reader Mode separately if it still needs document-style formatting.
+### 3. Update internal links to `/joinpremium` or `/join-premium` → `/smarty-plans`
+- `src/pages/About.tsx` (line 577) — "Start your journey" button.
+- `src/pages/WhyInvestInSmartyGym.tsx` (line 679) — CTA link.
+- `src/pages/FAQ.tsx` (lines 312, 368) — inline anchor links.
+- `src/pages/SmartygymVsPeloton.tsx` (line 197) — "Start free trial" button.
+- `src/pages/SmartygymVsFreeletics.tsx` (line 198) — "Start free trial" button.
+- `src/pages/Index.tsx` (line 722) — hero CTA tile.
+- `src/components/seo/BestFitnessSections.tsx` (line 342) — CTA button (keep `data-track-cta="join-premium"` so analytics continue to track).
+- `src/components/ui/html-content.tsx` (lines 30–31) — keep `/joinpremium` and `/join-premium` in the safe-link whitelist so any legacy rich-text content still resolves through the redirect.
 
-5. Make it future-proof for all blog articles
-- Apply the structure in `ArticleDetail.tsx`, not individual article data.
-- Apply the formatting through a reusable blog article CSS class.
-- Every existing and future blog article will inherit the same layout and spacing automatically.
+### 4. SEO / metadata
+- `src/utils/seoSchemas.ts` (lines 241, 406) — change `https://smartygym.com/join-premium` URLs to `https://smartygym.com/smarty-plans`.
+- `src/utils/seoHelpers.ts` (line 507) — same swap.
+- `src/components/seo/BackgroundSEO.tsx` — drop the `/join-premium` entry from the related-links block (line 145) and keep the existing canonical map entries (`/join-premium` → `/smarty-plans`, `/joinpremium` → `/smarty-plans`) which already point the right way.
+- `public/sitemap.xml` and `public/llms.txt` — remove the `/join-premium` (and `/joinpremium`) URL entries so search engines stop indexing the retired page; Smarty Plans is already listed.
 
-Technical details:
-- Update only the blog article template and blog-specific CSS.
-- Main target files:
-  - `src/pages/ArticleDetail.tsx`
-  - `src/index.css`
-- No article content, SEO metadata, database data, workout pages, program pages, or tool pages will be changed.
+### 5. Not changed
+- `/smarty-plans` page, content, hero heading, name — untouched.
+- `/premiumbenefits` page and every existing `navigate("/premiumbenefits")` call — untouched.
+- All other functionality, design, SEO components, schemas, analytics tracking attributes (`data-track-cta="join-premium"`) — untouched.
+
+## Result
+
+Every old Join Premium link continues to work (via redirect or direct link rewrite) and lands on Smarty Plans. The duplicate page is gone, SEO points to a single canonical URL, and no design or feature changes are introduced.

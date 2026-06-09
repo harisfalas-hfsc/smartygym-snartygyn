@@ -27,8 +27,7 @@
 - [Blog](/blog): Evidence-based articles on fitness, nutrition, and recovery.
 - [Community](/community): Leaderboards, ratings, and member activity.
 - [Shop](/shop): Standalone workouts and programs.
-- [Join Premium](/joinpremium): Subscription plans and benefits.
-- [Smarty Plans](/smarty-plans): Plan comparison and pricing.
+- [Smarty Plans](/smarty-plans): Plan comparison, pricing, and subscription benefits.
 - [Premium Benefits](/premiumbenefits): What premium membership includes.
 - [Corporate Wellness](/corporate-wellness): Programs for teams and companies.
 - [Smarty Corporate](/corporate): Corporate offering overview.
@@ -339,7 +338,7 @@
 - **Offer**: 35% off your first billing cycle
 - **Applies to**: Both Gold and Platinum plans
 - **Eligibility**: New subscribers who have never had a premium subscription
-- **How to claim**: Visit /join-premium or /smarty-plans and click "Claim Discount"
+- **How to claim**: Visit /smarty-plans and click "Claim Discount"
 - **Discounted Gold**: €6.49 first month (normally €9.99)
 - **Discounted Platinum**: €58.49 first year (normally €89.99)
 
