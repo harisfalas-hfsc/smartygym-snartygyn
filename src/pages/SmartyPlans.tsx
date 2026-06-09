@@ -682,28 +682,21 @@ export default function SmartyPlans() {
           </Card>
 
           {/* FAQ */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Frequently Asked Questions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <h3 className="font-semibold mb-1">What's the difference between Gold and Platinum?</h3>
-                <p className="text-sm text-muted-foreground">
-                  Both plans include the same premium features - the only difference is billing frequency. Gold is billed monthly, while Platinum is billed yearly and saves you 25%.
-                </p>
-              </div>
-              <div>
-                <h3 className="font-semibold mb-1">Can I cancel anytime?</h3>
-                <p className="text-sm text-muted-foreground">
-                  Yes! You can cancel your subscription at any time from your dashboard. You'll keep access until the end of your current billing period.
-                </p>
-              </div>
-              <div>
-                <h3 className="font-semibold mb-1">Can I switch plans?</h3>
-                <p className="text-sm text-muted-foreground">
-                  Yes, you can upgrade from Gold to Platinum anytime. Contact support for assistance with plan changes.
-                </p>
+          <Card className="mb-8 bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
+            <CardContent className="p-6">
+              <div className="flex flex-col md:flex-row items-center gap-6">
+                <div className="p-4 bg-primary/10 rounded-full">
+                  <MessageCircle className="h-10 w-10 text-primary" />
+                </div>
+                <div className="flex-1 text-center md:text-left">
+                  <h3 className="text-xl font-bold mb-2">Frequently Asked Questions</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Want to know more? Find answers to common questions about plans, billing, and access.
+                  </p>
+                  <Button variant="outline" onClick={() => navigate("/faq")}>
+                    View FAQ
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
