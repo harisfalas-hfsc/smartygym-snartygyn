@@ -129,7 +129,17 @@ const normalizeRouteLocation = (location: Location): Location => {
     : { ...location, pathname: normalizedPathname };
 };
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes — reuse cached lists between navigations
+      gcTime: 30 * 60 * 1000, // 30 minutes — keep data around for back-navigation
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: true,
+      retry: 1,
+    },
+  },
+});
 
 const criticalRoutePreloaders = [
   () => import("./pages/WorkoutFlow"),
