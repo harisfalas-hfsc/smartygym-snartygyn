@@ -1,6 +1,6 @@
 import { useLocation } from "react-router-dom";
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, RotateCw } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigationHistory } from "@/contexts/NavigationHistoryContext";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -12,7 +12,7 @@ const HIDDEN_PATHS = ["/auth", "/reset-password", "/payment-success", "/payment-
 
 /**
  * Persistent native-style bottom navigation bar — mobile only (< 768px).
- * Layout: Back · Refresh · Theme · Forward.
+ * Layout: Back · Smarty Coach · Forward.
  */
 export const MobileBottomNav = () => {
   const location = useLocation();
@@ -73,9 +73,6 @@ export const MobileBottomNav = () => {
             <ChevronLeft className="h-7 w-7" strokeWidth={2.25} />
           </Item>
 
-          <Item onClick={() => window.location.reload()} label="Refresh">
-            <RotateCw className="h-6 w-6" strokeWidth={2.25} />
-          </Item>
 
           <button
             type="button"
