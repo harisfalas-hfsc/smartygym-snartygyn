@@ -700,22 +700,21 @@ const Index = () => {
             )}
           </div>
 
-          <div onClick={() => navigate('/about')} className="flex items-center gap-2.5 py-3 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md">
-            <Info className="w-5 h-5 text-primary flex-shrink-0" />
-            <span className="text-base font-medium">About SmartyGym</span>
-            <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
-          </div>
+          <div className="grid grid-cols-3 gap-3">
+            <div onClick={() => navigate('/about')} className="flex flex-col items-center justify-center gap-1.5 aspect-square bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md p-2">
+              <Info className="w-6 h-6 text-primary" />
+              <span className="text-[10px] font-medium text-center leading-tight line-clamp-2">About SmartyGym</span>
+            </div>
 
-          <div onClick={() => navigate('/smarty-plans')} className="flex items-center gap-2.5 py-1.5 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md">
-            <Crown className="w-5 h-5 text-primary flex-shrink-0" />
-            <span className="text-base font-medium">Smarty Plans</span>
-            <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
-          </div>
+            <div onClick={() => navigate('/smarty-plans')} className="flex flex-col items-center justify-center gap-1.5 aspect-square bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md p-2">
+              <Crown className="w-6 h-6 text-primary" />
+              <span className="text-[10px] font-medium text-center leading-tight line-clamp-2">Smarty Plans</span>
+            </div>
 
-              <div onClick={() => navigate('/faq')} className="flex items-center gap-2.5 py-1.5 px-4 bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md">
-            <HelpCircle className="w-5 h-5 text-primary flex-shrink-0" />
-            <span className="text-base font-medium">FAQ</span>
-            <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
+            <div onClick={() => navigate('/faq')} className="flex flex-col items-center justify-center gap-1.5 aspect-square bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md p-2">
+              <HelpCircle className="w-6 h-6 text-primary" />
+              <span className="text-[10px] font-medium text-center leading-tight">FAQ</span>
+            </div>
           </div>
 
           {!isPremium && (
