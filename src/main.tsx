@@ -1,23 +1,12 @@
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
-import { isNativePlatform, configureStatusBar } from "./utils/native";
+import { configureStatusBar } from "./utils/native";
+import { registerAppServiceWorker } from "./utils/registerServiceWorker";
+import { Capacitor } from "@capacitor/core";
 
 // Configure native status bar on app launch
 configureStatusBar();
-
-
-const isInIframe = (() => {
-  try {
-    return window.self !== window.top;
-  } catch {
-    return true;
-  }
-})();
-
-const isLovablePreviewHost =
-  window.location.hostname.includes("id-preview--") ||
-  window.location.hostname.includes("lovableproject.com");
 
 
 const clearLovableDeploymentPinCookie = () => {
@@ -43,33 +32,22 @@ const clearLovableDeploymentPinCookie = () => {
 // older deployment until cookies are cleared. Remove it on every app start.
 clearLovableDeploymentPinCookie();
 
-const clearServiceWorkersAndCaches = () => {
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.getRegistrations().then((registrations) => {
-      registrations.forEach((registration) => registration.unregister());
+// In a true Capacitor native shell we don't want a web SW — the native
+// container handles caching. Everywhere else (browser + WebView APK wrappers
+// like AppMySite) we register the guarded service worker for fast repeat
+// loads + offline support. The guard inside registerAppServiceWorker handles
+// dev, iframe, and Lovable preview hosts.
+if (Capacitor.isNativePlatform()) {
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.getRegistrations().then((regs) => {
+      regs.forEach((r) => r.unregister());
     });
   }
-
-  if ('caches' in window) {
-    caches.keys().then((names) => names.forEach((name) => caches.delete(name)));
+  if ("caches" in window) {
+    caches.keys().then((names) => names.forEach((n) => caches.delete(n)));
   }
-};
-
-// Inside Capacitor native shell: unregister any PWA service workers to prevent
-// caching conflicts in WebView. The native app handles caching differently.
-if (isNativePlatform()) {
-  clearServiceWorkersAndCaches();
-}
-
-// Lovable preview runs inside an iframe/preview host. Service workers should not
-// control that environment because they can keep old editor builds alive.
-if (!isNativePlatform() && (isInIframe || isLovablePreviewHost)) {
-  clearServiceWorkersAndCaches();
-}
-
-// DEV-only: Clear stuck service workers and caches from previous PWA builds
-if (import.meta.env.DEV && !isNativePlatform()) {
-  clearServiceWorkersAndCaches();
+} else {
+  registerAppServiceWorker();
 }
 
 createRoot(document.getElementById("root")!).render(<App />);
