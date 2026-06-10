@@ -72,7 +72,7 @@ export default defineConfig(({ mode }) => ({
           /^\/api\//,
           /^\/functions\//,
         ],
-        globPatterns: ["**/*.{js,css,html,woff2,svg,png,ico,webmanifest}"],
+        globPatterns: ["**/*.{js,css,woff2,ico,webmanifest}"],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         runtimeCaching: [
           {
