@@ -251,14 +251,14 @@ export const BestFitnessEnhancement = () => {
         <ul className="grid sm:grid-cols-2 gap-2 text-sm">
           {[
             ["/", "Home — SmartyGym Online Fitness Platform"],
-            ["/workouts", "Online Workouts Library"],
-            ["/training-programs", "Online Training Programs"],
-            ["/exercise-library", "Exercise Library"],
+            ["/workout", "Online Workouts Library"],
+            ["/trainingprogram", "Online Training Programs"],
+            ["/exerciselibrary", "Exercise Library"],
             ["/tools", "Free Fitness Tools"],
             ["/blog", "Fitness Blog by Haris Falas"],
             ["/coach-profile", "Coach Profile — Haris Falas"],
             ["/about", "About SmartyGym"],
-            ["/premium-benefits", "Premium Membership Benefits"],
+            ["/premiumbenefits", "Premium Membership Benefits"],
             ["/smartygym-vs-peloton", "SmartyGym vs Peloton"],
             ["/smartygym-vs-freeletics", "SmartyGym vs Freeletics"],
           ].map(([href, label]) => (
