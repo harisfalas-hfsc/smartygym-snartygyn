@@ -1,12 +1,19 @@
-import { useLocation } from "react-router-dom";
-import { useState } from "react";
-import { ChevronLeft, ChevronRight, Sun, Moon } from "lucide-react";
-import { useNavigationHistory } from "@/contexts/NavigationHistoryContext";
+import { useLocation, useNavigate, Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Bell, Menu, ArrowLeft, User as UserIcon, Crown, Building2, LayoutDashboard, LogOut, Shield, Users, Info, Dumbbell, ListChecks, Sparkles, Wrench, BookOpen, Newspaper, HelpCircle, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useTheme } from "next-themes";
 import { SmartyCoachModal } from "@/components/smarty-coach/SmartyCoachModal";
 import smartyCoachIcon from "@/assets/smarty-coach-icon.png";
+import { supabase } from "@/integrations/supabase/client";
+import type { User } from "@supabase/supabase-js";
+import { Sheet, SheetClose, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useUnreadMessages } from "@/hooks/useUnreadMessages";
+import { useAdminRole } from "@/hooks/useAdminRole";
+import { SafeNotificationBadge } from "@/components/NotificationBadge";
+import { useToast } from "@/hooks/use-toast";
 
 const HIDDEN_PATHS = ["/auth", "/reset-password", "/payment-success", "/payment-cancelled"];
 
@@ -16,45 +23,81 @@ const HIDDEN_PATHS = ["/auth", "/reset-password", "/payment-success", "/payment-
  */
 export const MobileBottomNav = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { goBack, canGoBack, goForward, canGoForward } = useNavigationHistory();
-  const { resolvedTheme, setTheme } = useTheme();
   const [coachOpen, setCoachOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [profileName, setProfileName] = useState<string | null>(null);
+  const { data: unreadCount = 0 } = useUnreadMessages();
+  const { isAdmin } = useAdminRole();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      if (session?.user) loadProfile(session.user.id);
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+      setUser(session?.user ?? null);
+      if (session?.user) setTimeout(() => loadProfile(session.user.id), 0);
+      else { setAvatarUrl(null); setProfileName(null); }
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const loadProfile = async (uid: string) => {
+    const { data } = await supabase.from("profiles").select("avatar_url, full_name").eq("user_id", uid).maybeSingle();
+    if (data) { setAvatarUrl(data.avatar_url); setProfileName(data.full_name || null); }
+  };
+
+  const getInitials = () => {
+    const name = (profileName || user?.user_metadata?.full_name || "").trim();
+    if (name) {
+      const parts = name.split(" ").filter(Boolean);
+      return parts.length > 1 ? `${parts[0][0]}${parts[1][0]}` : parts[0][0];
+    }
+    return user?.email?.[0].toUpperCase() || "U";
+  };
+
+  const handleNav = (path: string) => {
+    navigate(path);
+    setMenuOpen(false);
+    setTimeout(() => window.scrollTo(0, 0), 0);
+  };
+
+  const handleLogout = async () => {
+    try {
+      setUser(null);
+      setAvatarUrl(null);
+      await supabase.auth.signOut({ scope: 'global' });
+      toast({ title: "Logged out", description: "You have been logged out successfully" });
+      navigate("/");
+      setTimeout(() => { window.scrollTo(0, 0); window.location.reload(); }, 100);
+    } catch {
+      toast({ title: "Error", description: "Failed to log out.", variant: "destructive" });
+    }
+  };
+
+  const discoveryItems = [
+    { label: "About SmartyGym", path: "/about", icon: Info, iconClass: "text-teal-500" },
+    { label: "Smarty Workouts", path: "/workout", icon: Dumbbell, iconClass: "text-primary" },
+    { label: "Smarty Programs", path: "/trainingprogram", icon: ListChecks, iconClass: "text-blue-500" },
+    { label: "Smarty Ritual", path: "/daily-ritual", icon: Sparkles, iconClass: "text-purple-500" },
+    { label: "Smarty Tools", path: "/tools", icon: Wrench, iconClass: "text-orange-500" },
+    { label: "Exercise Library", path: "/exerciselibrary", icon: BookOpen, iconClass: "text-emerald-500" },
+    { label: "Community", path: "/community", icon: Users, iconClass: "text-cyan-500" },
+    { label: "Blog", path: "/blog", icon: Newspaper, iconClass: "text-red-500" },
+    { label: "Smarty Plans", path: "/smarty-plans", icon: Crown, iconClass: "text-yellow-500" },
+    { label: "Smarty Corporate", path: "/corporate", icon: Building2, iconClass: "text-sky-500" },
+    { label: "FAQ", path: "/faq", icon: HelpCircle, iconClass: "text-purple-500" },
+    { label: "Contact", path: "/contact", icon: Mail, iconClass: "text-indigo-500" },
+  ];
 
   if (!isMobile || HIDDEN_PATHS.includes(location.pathname)) return null;
 
-  const Item = ({
-    onClick,
-    disabled,
-    label,
-    children,
-    active,
-  }: {
-    onClick: () => void;
-    disabled?: boolean;
-    label: string;
-    children: React.ReactNode;
-    active?: boolean;
-  }) => (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      aria-label={label}
-      className={cn(
-        "flex h-full flex-1 items-center justify-center",
-        "transition-all duration-150 active:scale-90",
-        "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-inset",
-        disabled
-          ? "text-muted-foreground/40"
-          : active
-          ? "text-primary"
-          : "text-foreground/80 hover:text-primary"
-      )}
-    >
-      {children}
-    </button>
-  );
+  const itemClass = "flex h-full flex-1 items-center justify-center transition-all duration-150 active:scale-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-inset text-foreground/80 hover:text-primary";
 
   return (
     <>
@@ -69,52 +112,114 @@ export const MobileBottomNav = () => {
         aria-label="Mobile navigation bar"
       >
         <div className="flex h-14 items-stretch">
-          <Item onClick={goBack} disabled={!canGoBack} label="Back">
-            <ChevronLeft className="h-7 w-7" strokeWidth={2.25} />
-          </Item>
+          {/* Discovery */}
+          <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+            <SheetTrigger asChild>
+              <button type="button" aria-label="Discovery" className={itemClass}>
+                <Menu className="h-7 w-7" strokeWidth={2.25} />
+              </button>
+            </SheetTrigger>
+            <SheetContent side="left" hideClose className="left-4 top-1/2 bottom-auto flex h-auto max-h-[calc(100vh-2rem)] w-[calc(100vw-2rem)] max-w-none -translate-y-1/2 flex-col overflow-hidden rounded-2xl border-2 border-primary/40 p-3 shadow-xl !animate-none transition-opacity duration-200 ease-out data-[state=closed]:opacity-0 data-[state=open]:opacity-100">
+              <SheetClose asChild>
+                <button className="mb-1 inline-flex h-8 shrink-0 items-center gap-2 self-start rounded-full border-2 border-primary px-3 text-sm text-primary hover:bg-primary hover:text-primary-foreground">
+                  <ArrowLeft className="h-3.5 w-3.5" /> Back
+                </button>
+              </SheetClose>
+              <div className="mb-2 shrink-0">
+                <h2 className="text-lg font-bold leading-tight text-foreground">Explore SmartyGym</h2>
+              </div>
+              <nav className="grid grid-cols-2 gap-2 overflow-y-auto">
+                {discoveryItems.map(({ label, path, icon: Icon, iconClass }) => {
+                  const active = location.pathname === path;
+                  return (
+                    <button
+                      key={path}
+                      type="button"
+                      onClick={() => handleNav(path)}
+                      className={`flex flex-col items-center justify-center rounded-2xl border-2 p-2 text-center font-semibold transition-all duration-200 ${active ? 'border-primary bg-primary/15 text-primary shadow-sm' : 'border-primary/25 bg-card text-foreground hover:border-primary hover:bg-primary/10'}`}
+                    >
+                      <span className={`mx-auto mb-1 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 ${iconClass}`}>
+                        <Icon className="h-5 w-5" />
+                      </span>
+                      <span className="block text-xs leading-tight">{label}</span>
+                    </button>
+                  );
+                })}
+              </nav>
+            </SheetContent>
+          </Sheet>
 
-
+          {/* Smarty Coach */}
           <button
             type="button"
             onClick={() => setCoachOpen(true)}
             aria-label="Smarty Coach"
-            className={cn(
-              "flex h-full flex-1 items-center justify-center",
-              "transition-all duration-150 active:scale-90",
-              "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-inset"
-            )}
+            className={itemClass}
           >
-            <span className={cn(
-              "flex h-9 w-9 items-center justify-center rounded-full border shadow-sm",
-              resolvedTheme === "dark"
-                ? "border-primary/30 bg-background"
-                : "border-primary/50 bg-background"
-            )}>
-              <img
-                src={smartyCoachIcon}
-                alt=""
-                aria-hidden="true"
-                className="h-7 w-7 rounded-full"
-                width={28}
-                height={28}
-              />
-            </span>
+            <img src={smartyCoachIcon} alt="" aria-hidden="true" className="h-7 w-7 rounded-full" width={28} height={28} />
           </button>
 
-          <Item
-            onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-            label="Toggle theme"
+          {/* Notifications */}
+          <button
+            type="button"
+            onClick={() => {
+              if (!user) { navigate("/auth?mode=login"); return; }
+              navigate("/userdashboard?tab=messages");
+              setTimeout(() => window.scrollTo(0, 0), 0);
+            }}
+            aria-label="Notifications"
+            className={cn(itemClass, "relative")}
           >
-            {resolvedTheme === "dark" ? (
-              <Sun className="h-6 w-6" strokeWidth={2} />
-            ) : (
-              <Moon className="h-6 w-6" strokeWidth={2} />
-            )}
-          </Item>
+            <Bell className="h-7 w-7" strokeWidth={2.25} />
+            {user && unreadCount > 0 && <SafeNotificationBadge count={unreadCount} />}
+          </button>
 
-          <Item onClick={goForward} disabled={!canGoForward} label="Forward">
-            <ChevronRight className="h-7 w-7" strokeWidth={2.25} />
-          </Item>
+          {/* Avatar / Login */}
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button type="button" aria-label="Account" className={itemClass}>
+                  <Avatar className="h-7 w-7 border-2 border-primary">
+                    <AvatarImage src={avatarUrl || undefined} alt="Profile" />
+                    <AvatarFallback className="text-xs">{getInitials()}</AvatarFallback>
+                  </Avatar>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56 max-w-[calc(100vw-2rem)] bg-popover" align="end" sideOffset={8} side="top" forceMount>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">{profileName || user.user_metadata?.full_name || "User"}</p>
+                    <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={() => { navigate("/userdashboard"); setTimeout(() => window.scrollTo(0, 0), 0); }}>
+                  <LayoutDashboard className="mr-2 h-4 w-4" /><span>Dashboard</span>
+                </DropdownMenuItem>
+                {isAdmin && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onSelect={() => window.open('/admin', '_blank', 'noopener,noreferrer')}>
+                      <Shield className="mr-2 h-4 w-4" /><span>Admin</span>
+                    </DropdownMenuItem>
+                  </>
+                )}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" /><span>Logout</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <button
+              type="button"
+              aria-label="Login"
+              onClick={() => { navigate("/auth?mode=login"); setTimeout(() => window.scrollTo(0, 0), 0); }}
+              className={itemClass}
+            >
+              <UserIcon className="h-7 w-7" strokeWidth={2.25} />
+            </button>
+          )}
         </div>
     </nav>
     <SmartyCoachModal isOpen={coachOpen} onClose={() => setCoachOpen(false)} />
