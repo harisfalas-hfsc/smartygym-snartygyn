@@ -526,10 +526,8 @@ const Index = () => {
         {isMobile ? <section className="pt-0 pb-2 px-4">
             {/* Workouts carousel title */}
             <div className="flex items-center justify-center gap-2 mb-3">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary text-primary-foreground shadow-md">
-                <Dumbbell className="w-5 h-5" />
-                <span className="text-2xl font-extrabold tracking-tight">Smarty Workouts</span>
-              </div>
+              <Dumbbell className="w-6 h-6 text-primary" />
+              <span className="text-2xl font-extrabold tracking-tight text-primary">Smarty Workouts</span>
             </div>
             <div className="flex items-center justify-center gap-3 mb-4">
               <button
@@ -614,10 +612,8 @@ const Index = () => {
           {/* Training Programs Carousel */}
           <div className="pt-2">
             <div className="flex items-center justify-center gap-2 mb-3">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary text-primary-foreground shadow-md">
-                <Calendar className="w-5 h-5" />
-                <span className="text-2xl font-extrabold tracking-tight">Smarty Programs</span>
-              </div>
+              <Calendar className="w-6 h-6 text-primary" />
+              <span className="text-2xl font-extrabold tracking-tight text-primary">Smarty Programs</span>
             </div>
             <div className="flex items-center justify-center gap-3 mb-4">
               <button type="button" onClick={() => programsCarouselApi?.scrollPrev()} className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Previous program">
@@ -666,10 +662,8 @@ const Index = () => {
           {/* Blog Categories Carousel */}
           <div className="pt-2">
             <div className="flex items-center justify-center gap-2 mb-3">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary text-primary-foreground shadow-md">
-                <FileText className="w-5 h-5" />
-                <span className="text-2xl font-extrabold tracking-tight">Smarty Blog</span>
-              </div>
+              <FileText className="w-6 h-6 text-primary" />
+              <span className="text-2xl font-extrabold tracking-tight text-primary">Smarty Blog</span>
             </div>
             <div className="flex items-center justify-center gap-3 mb-4">
               <button type="button" onClick={() => blogCarouselApi?.scrollPrev()} className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Previous category">
