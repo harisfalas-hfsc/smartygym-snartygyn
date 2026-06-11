@@ -88,7 +88,7 @@ export const MobileBottomNav = () => {
               "flex h-9 w-9 items-center justify-center rounded-full border shadow-sm",
               resolvedTheme === "dark"
                 ? "border-primary/30 bg-background"
-                : "border-primary/50 bg-[#0f172a]"
+                : "border-primary/50 bg-background"
             )}>
               <img
                 src={smartyCoachIcon}
