@@ -4,7 +4,6 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { VitePWA } from "vite-plugin-pwa";
 import { generateSitemap } from "./scripts/generate-sitemap";
-import { generateRss } from "./scripts/generate-rss";
 import { generateLlmsFull } from "./scripts/generate-llms-full";
 import { prerenderSeoHtml } from "./scripts/prerender";
 import { verifyPrerenderedSeo } from "./scripts/verify-prerender";
