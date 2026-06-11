@@ -1,6 +1,6 @@
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Bell, Menu, ArrowLeft, User as UserIcon, Crown, Building2, LayoutDashboard, LogOut, Shield, Users, Info, Dumbbell, ListChecks, Sparkles, Wrench, BookOpen, Newspaper, HelpCircle, Mail } from "lucide-react";
+import { Bell, Menu, ArrowLeft, Home, User as UserIcon, Crown, Building2, LayoutDashboard, LogOut, Shield, Users, Info, Dumbbell, ListChecks, Sparkles, Wrench, BookOpen, Newspaper, HelpCircle, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SmartyCoachModal } from "@/components/smarty-coach/SmartyCoachModal";
@@ -156,6 +156,16 @@ export const MobileBottomNav = () => {
             className={itemClass}
           >
             <img src={smartyCoachIcon} alt="" aria-hidden="true" className="h-7 w-7 rounded-full" width={28} height={28} />
+          </button>
+
+          {/* Home */}
+          <button
+            type="button"
+            onClick={() => { navigate("/"); setTimeout(() => window.scrollTo(0, 0), 0); }}
+            aria-label="Home"
+            className={itemClass}
+          >
+            <Home className="h-7 w-7" strokeWidth={2.25} />
           </button>
 
           {/* Notifications */}
