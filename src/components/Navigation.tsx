@@ -306,7 +306,7 @@ export const Navigation = () => {
     <header
       ref={headerRef}
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 bg-background pt-2 pb-0.5 px-4 transition-transform duration-300 will-change-transform",
+        "fixed top-0 left-0 right-0 z-50 bg-background pt-1 pb-0 px-4 lg:pt-2 lg:pb-0.5 transition-transform duration-300 will-change-transform",
         headerHidden && "-translate-y-full"
       )}
     >
@@ -406,10 +406,10 @@ export const Navigation = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="relative h-11 w-11 rounded-full text-primary hover:bg-primary/10 hover:text-primary [&_svg]:!h-8 [&_svg]:!w-8 [&_svg]:!text-primary"
+                  className="relative h-9 w-9 rounded-full text-primary hover:bg-primary/10 hover:text-primary [&_svg]:!h-6 [&_svg]:!w-6 [&_svg]:!text-primary"
                   aria-label="Open Discovery"
                 >
-                  <Menu className="h-8 w-8 text-primary" strokeWidth={2.25} />
+                  <Menu className="h-6 w-6 text-primary" strokeWidth={2.25} />
                   <span className="sr-only">Discovery</span>
                 </Button>
               </SheetTrigger>
@@ -455,7 +455,7 @@ export const Navigation = () => {
               <img
                 src={smartyGymLogo}
                 alt="SmartyGym"
-                className="h-14 xs:h-[60px] sm:h-[72px] md:h-20 lg:h-24 w-auto max-w-[min(28vw,120px)] object-contain dark:mix-blend-lighten lg:max-w-none"
+                className="h-11 xs:h-[60px] sm:h-[72px] md:h-20 lg:h-24 w-auto max-w-[min(28vw,120px)] object-contain dark:mix-blend-lighten lg:max-w-none"
               />
             </Link>
           </div>
@@ -481,7 +481,7 @@ export const Navigation = () => {
                 size="icon"
                 className={cn(
                   "relative",
-                  !isMobile && "h-11 w-11 rounded-full p-0 mr-1.5 lg:mr-2"
+                  isMobile ? "h-8 w-8 p-0" : "h-11 w-11 rounded-full p-0 mr-1.5 lg:mr-2"
                 )}
                 onClick={() => {
                   navigate("/userdashboard?tab=messages");
@@ -502,13 +502,13 @@ export const Navigation = () => {
             {user ? (
               <DropdownMenu>
                <DropdownMenuTrigger asChild>
-                 <Button variant="ghost" size="icon" className="relative h-9 w-9 lg:h-11 lg:w-11 rounded-full">
-                   <div className={`flex h-9 w-9 lg:h-11 lg:w-11 items-center justify-center rounded-full border-2 border-primary transition-colors hover:bg-primary/10 ${subscriptionInfo?.subscribed ? 'ring-2 ring-yellow-500 ring-offset-2 ring-offset-background' : ''} ${corporateSubscription ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-background' : ''}`}>
-                     <Avatar className="h-7 w-7 lg:h-8 lg:w-8">
-                        <AvatarImage src={avatarUrl || undefined} alt="Profile" />
-                        <AvatarFallback className="text-xs">{getUserInitials()}</AvatarFallback>
-                      </Avatar>
-                    </div>
+                  <Button variant="ghost" size="icon" className="relative h-8 w-8 lg:h-11 lg:w-11 rounded-full">
+                    <div className={`flex h-8 w-8 lg:h-11 lg:w-11 items-center justify-center rounded-full border-2 border-primary transition-colors hover:bg-primary/10 ${subscriptionInfo?.subscribed ? 'ring-2 ring-yellow-500 ring-offset-2 ring-offset-background' : ''} ${corporateSubscription ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-background' : ''}`}>
+                      <Avatar className="h-6 w-6 lg:h-8 lg:w-8">
+                         <AvatarImage src={avatarUrl || undefined} alt="Profile" />
+                         <AvatarFallback className="text-xs">{getUserInitials()}</AvatarFallback>
+                       </Avatar>
+                     </div>
                     {/* Premium Badge */}
                     {subscriptionInfo?.subscribed && (
                       <div className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-yellow-500 flex items-center justify-center">
@@ -637,7 +637,7 @@ export const Navigation = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button
-                    className="inline-flex h-11 w-11 items-center justify-center rounded-full border-2 border-primary p-0 text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+                    className="inline-flex h-9 w-9 lg:h-11 lg:w-11 items-center justify-center rounded-full border-2 border-primary p-0 text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
                     aria-label="Login or Sign Up"
                   >
                     <UserIcon className="h-5 w-5" />
