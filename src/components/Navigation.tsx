@@ -481,7 +481,7 @@ export const Navigation = () => {
                 size="icon"
                 className={cn(
                   "relative",
-                  !isMobile && "h-11 w-11 rounded-full p-0 mr-1.5 lg:mr-2"
+                  isMobile ? "h-8 w-8 p-0" : "h-11 w-11 rounded-full p-0 mr-1.5 lg:mr-2"
                 )}
                 onClick={() => {
                   navigate("/userdashboard?tab=messages");
