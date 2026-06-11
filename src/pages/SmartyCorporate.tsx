@@ -329,7 +329,7 @@ export default function SmartyCorporate() {
             </Card>
 
             {/* Smarty Elite - 30 users */}
-            <Card className="relative border-2 border-border hover:border-primary/50 transition-colors flex flex-col">
+            <Card className="relative border-2 border-primary transition-colors flex flex-col">
               <CardHeader className="text-center pb-2">
                 <div className="flex items-center justify-center gap-2 min-h-[56px]">
                   <Users className="h-5 w-5 text-primary shrink-0" />
