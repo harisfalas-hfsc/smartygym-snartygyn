@@ -158,6 +158,16 @@ export const MobileBottomNav = () => {
             <img src={smartyCoachIcon} alt="" aria-hidden="true" className="h-7 w-7 rounded-full" width={28} height={28} />
           </button>
 
+          {/* Home */}
+          <button
+            type="button"
+            onClick={() => { navigate("/"); setTimeout(() => window.scrollTo(0, 0), 0); }}
+            aria-label="Home"
+            className={itemClass}
+          >
+            <Home className="h-7 w-7" strokeWidth={2.25} />
+          </button>
+
           {/* Notifications */}
           <button
             type="button"
