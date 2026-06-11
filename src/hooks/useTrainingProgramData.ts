@@ -51,7 +51,21 @@ export const useTrainingProgramData = (programId: string | undefined) => {
       };
 
       const metadataMatch = await resolveFromMetadata();
-      if (metadataMatch) return metadataMatch as TrainingProgramData;
+      if (metadataMatch) {
+        // The metadata RPC strips content fields (overview, schedule, etc.) for premium
+        // programs. Always try to fetch the FULL row directly — RLS grants it to
+        // admins, premium users, and purchasers. Fall back to metadata if denied.
+        const { data: fullRow, error: fullError } = await supabase
+          .from("admin_training_programs")
+          .select("*")
+          .eq("id", metadataMatch.id)
+          .maybeSingle();
+
+        if (!fullError && fullRow) {
+          return { ...fullRow, canonical_slug: metadataMatch.canonical_slug } as TrainingProgramData;
+        }
+        return metadataMatch as TrainingProgramData;
+      }
 
       const { data, error } = await supabase
         .from("admin_training_programs")
