@@ -526,8 +526,8 @@ const Index = () => {
         {isMobile ? <section className="pt-0 pb-2 px-4">
             {/* Workouts carousel title + swipe indicator */}
             <div className="flex items-center justify-center gap-2 mb-1">
-              <Dumbbell className="w-4 h-4 text-primary" />
-              <span className="text-sm font-bold text-foreground">Smarty Workouts</span>
+              <Dumbbell className="w-5 h-5 text-primary" />
+              <span className="text-xl font-extrabold text-foreground tracking-tight">Smarty Workouts</span>
             </div>
             <div className="flex items-center justify-center gap-3 mb-2">
               <button
@@ -612,8 +612,8 @@ const Index = () => {
           {/* Training Programs Carousel */}
           <div className="pt-2">
             <div className="flex items-center justify-center gap-2 mb-2">
-              <Calendar className="w-4 h-4 text-primary" />
-              <span className="text-sm font-bold text-foreground">Training Programs</span>
+              <Calendar className="w-5 h-5 text-primary" />
+              <span className="text-xl font-extrabold text-foreground tracking-tight">Training Programs</span>
             </div>
             <Carousel className="w-full" opts={{ align: "center", loop: true }} setApi={setProgramsCarouselApi}>
               <CarouselContent className="-ml-2">
@@ -653,8 +653,8 @@ const Index = () => {
           {/* Blog Categories Carousel */}
           <div className="pt-2">
             <div className="flex items-center justify-center gap-2 mb-2">
-              <FileText className="w-4 h-4 text-primary" />
-              <span className="text-sm font-bold text-foreground">Blog & Insights</span>
+              <FileText className="w-5 h-5 text-primary" />
+              <span className="text-xl font-extrabold text-foreground tracking-tight">Blog & Insights</span>
             </div>
             <Carousel className="w-full" opts={{ align: "center", loop: true }} setApi={setBlogCarouselApi}>
               <CarouselContent className="-ml-2">
