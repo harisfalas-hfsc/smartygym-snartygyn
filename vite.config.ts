@@ -23,10 +23,6 @@ function smartySeoPrerenderPlugin() {
         path.resolve(__dirname, "public/sitemap.xml"),
         path.join(outDir, "sitemap.xml"),
       ]);
-      await generateRss([
-        path.resolve(__dirname, "public/rss.xml"),
-        path.join(outDir, "rss.xml"),
-      ]);
       await generateLlmsFull([
         path.resolve(__dirname, "public/llms-full.txt"),
         path.join(outDir, "llms-full.txt"),
