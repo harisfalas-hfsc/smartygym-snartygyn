@@ -525,28 +525,41 @@ const Index = () => {
         </div>
 
         {isMobile ? <section className="pt-0 pb-2 px-4">
-            {/* Workouts carousel title */}
-            <div className="flex items-center justify-center gap-2 mb-3">
-              <Dumbbell className="w-6 h-6 text-primary" />
-              <span className="text-2xl font-extrabold tracking-tight text-primary">Smarty Workouts</span>
+            {/* Mobile hero tagline */}
+            <div className="text-center mb-6 mt-2">
+              <p className="text-[11px] font-bold tracking-[0.2em] uppercase text-primary mb-2">
+                Science-Backed · Expert-Designed
+              </p>
+              <h1 className="text-3xl font-extrabold tracking-tight uppercase leading-[1.05] text-foreground">
+                Train <span className="text-primary">Smarter.</span>
+                <br />
+                Not Harder.
+              </h1>
+              <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-muted-foreground mt-3 leading-snug">
+                500+ Expert Workouts · Training Programs · Smarty Tools
+                <br />
+                <span className="text-primary">All In Your Pocket.</span>
+              </p>
             </div>
-            <div className="flex items-center justify-center gap-3 mb-4">
+
+            {/* Workouts carousel title */}
+            <div className="flex items-center justify-center gap-4 mb-4">
               <button
                 type="button"
                 onClick={() => carouselApi?.scrollPrev()}
                 className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors"
                 aria-label="Previous card"
               >
-                <ChevronLeft className="h-4 w-4 text-primary" />
+                <ChevronLeft className="h-5 w-5 text-primary" />
               </button>
-              <span className="text-[11px] text-muted-foreground font-medium">Swipe to explore</span>
+              <span className="text-2xl font-extrabold tracking-tight text-primary uppercase">Smarty Workouts</span>
               <button
                 type="button"
                 onClick={() => carouselApi?.scrollNext()}
                 className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors"
                 aria-label="Next card"
               >
-                <ChevronRight className="h-4 w-4 text-primary" />
+                <ChevronRight className="h-5 w-5 text-primary" />
               </button>
             </div>
 
@@ -612,17 +625,13 @@ const Index = () => {
         <div className="mt-8 space-y-6">
           {/* Training Programs Carousel */}
           <div className="pt-2">
-            <div className="flex items-center justify-center gap-2 mb-3">
-              <Calendar className="w-6 h-6 text-primary" />
-              <span className="text-2xl font-extrabold tracking-tight text-primary">Smarty Programs</span>
-            </div>
-            <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="flex items-center justify-center gap-4 mb-4">
               <button type="button" onClick={() => programsCarouselApi?.scrollPrev()} className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Previous program">
-                <ChevronLeft className="h-4 w-4 text-primary" />
+                <ChevronLeft className="h-5 w-5 text-primary" />
               </button>
-              <span className="text-[11px] text-muted-foreground font-medium">Swipe to explore</span>
+              <span className="text-2xl font-extrabold tracking-tight text-primary uppercase">Smarty Programs</span>
               <button type="button" onClick={() => programsCarouselApi?.scrollNext()} className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Next program">
-                <ChevronRight className="h-4 w-4 text-primary" />
+                <ChevronRight className="h-5 w-5 text-primary" />
               </button>
             </div>
             <Carousel className="w-full" opts={{ align: "center", loop: true }} setApi={setProgramsCarouselApi}>
@@ -662,17 +671,13 @@ const Index = () => {
 
           {/* Blog Categories Carousel */}
           <div className="pt-2">
-            <div className="flex items-center justify-center gap-2 mb-3">
-              <FileText className="w-6 h-6 text-primary" />
-              <span className="text-2xl font-extrabold tracking-tight text-primary">Smarty Blog</span>
-            </div>
-            <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="flex items-center justify-center gap-4 mb-4">
               <button type="button" onClick={() => blogCarouselApi?.scrollPrev()} className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Previous category">
-                <ChevronLeft className="h-4 w-4 text-primary" />
+                <ChevronLeft className="h-5 w-5 text-primary" />
               </button>
-              <span className="text-[11px] text-muted-foreground font-medium">Swipe to explore</span>
+              <span className="text-2xl font-extrabold tracking-tight text-primary uppercase">Smarty Blog</span>
               <button type="button" onClick={() => blogCarouselApi?.scrollNext()} className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Next category">
-                <ChevronRight className="h-4 w-4 text-primary" />
+                <ChevronRight className="h-5 w-5 text-primary" />
               </button>
             </div>
             <Carousel className="w-full" opts={{ align: "center", loop: true }} setApi={setBlogCarouselApi}>
