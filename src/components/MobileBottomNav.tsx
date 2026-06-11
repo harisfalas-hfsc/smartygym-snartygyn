@@ -1,6 +1,6 @@
 import { useLocation } from "react-router-dom";
 import { useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Sun, Moon } from "lucide-react";
 import { useNavigationHistory } from "@/contexts/NavigationHistoryContext";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -18,7 +18,7 @@ export const MobileBottomNav = () => {
   const location = useLocation();
   const isMobile = useIsMobile();
   const { goBack, canGoBack, goForward, canGoForward } = useNavigationHistory();
-  const { resolvedTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
   const [coachOpen, setCoachOpen] = useState(false);
 
   if (!isMobile || HIDDEN_PATHS.includes(location.pathname)) return null;
@@ -100,6 +100,17 @@ export const MobileBottomNav = () => {
               />
             </span>
           </button>
+
+          <Item
+            onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+            label="Toggle theme"
+          >
+            {resolvedTheme === "dark" ? (
+              <Sun className="h-6 w-6" strokeWidth={2} />
+            ) : (
+              <Moon className="h-6 w-6" strokeWidth={2} />
+            )}
+          </Item>
 
           <Item onClick={goForward} disabled={!canGoForward} label="Forward">
             <ChevronRight className="h-7 w-7" strokeWidth={2.25} />
