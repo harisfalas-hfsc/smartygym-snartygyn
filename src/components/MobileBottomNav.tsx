@@ -212,7 +212,7 @@ export const MobileBottomNav = () => {
                 {isAdmin && (
                   <>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onSelect={() => window.open('/admin', '_blank', 'noopener,noreferrer')}>
+                    <DropdownMenuItem onSelect={() => { navigate("/admin"); setTimeout(() => window.scrollTo(0, 0), 0); }}>
                       <Shield className="mr-2 h-4 w-4" /><span>Admin</span>
                     </DropdownMenuItem>
                   </>

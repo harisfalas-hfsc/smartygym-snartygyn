@@ -6,38 +6,47 @@ export const useAdminRole = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    checkAdminRole();
-  }, []);
+    let cancelled = false;
 
-  const checkAdminRole = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        setIsAdmin(false);
-        setLoading(false);
+    const checkAdminRole = async (userId: string | null) => {
+      if (!userId) {
+        if (!cancelled) {
+          setIsAdmin(false);
+          setLoading(false);
+        }
         return;
       }
-
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-        .eq('role', 'admin')
-        .maybeSingle();
-
-      if (error) {
-        // Don't log — non-admin users will simply have no row, which is expected.
-        setIsAdmin(false);
-      } else {
-        setIsAdmin(!!data);
+      try {
+        const { data, error } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', userId)
+          .eq('role', 'admin')
+          .maybeSingle();
+        if (cancelled) return;
+        setIsAdmin(!error && !!data);
+      } catch {
+        if (!cancelled) setIsAdmin(false);
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-    } catch (error) {
-      setIsAdmin(false);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    // Initial session check (restores from storage in APK/PWA)
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      checkAdminRole(session?.user?.id ?? null);
+    });
+
+    // React to subsequent auth changes (sign-in, token refresh)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      checkAdminRole(session?.user?.id ?? null);
+    });
+
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
+  }, []);
 
   return { isAdmin, loading };
 };
