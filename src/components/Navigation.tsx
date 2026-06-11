@@ -502,13 +502,13 @@ export const Navigation = () => {
             {user ? (
               <DropdownMenu>
                <DropdownMenuTrigger asChild>
-                 <Button variant="ghost" size="icon" className="relative h-9 w-9 lg:h-11 lg:w-11 rounded-full">
-                   <div className={`flex h-9 w-9 lg:h-11 lg:w-11 items-center justify-center rounded-full border-2 border-primary transition-colors hover:bg-primary/10 ${subscriptionInfo?.subscribed ? 'ring-2 ring-yellow-500 ring-offset-2 ring-offset-background' : ''} ${corporateSubscription ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-background' : ''}`}>
-                     <Avatar className="h-7 w-7 lg:h-8 lg:w-8">
-                        <AvatarImage src={avatarUrl || undefined} alt="Profile" />
-                        <AvatarFallback className="text-xs">{getUserInitials()}</AvatarFallback>
-                      </Avatar>
-                    </div>
+                  <Button variant="ghost" size="icon" className="relative h-8 w-8 lg:h-11 lg:w-11 rounded-full">
+                    <div className={`flex h-8 w-8 lg:h-11 lg:w-11 items-center justify-center rounded-full border-2 border-primary transition-colors hover:bg-primary/10 ${subscriptionInfo?.subscribed ? 'ring-2 ring-yellow-500 ring-offset-2 ring-offset-background' : ''} ${corporateSubscription ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-background' : ''}`}>
+                      <Avatar className="h-6 w-6 lg:h-8 lg:w-8">
+                         <AvatarImage src={avatarUrl || undefined} alt="Profile" />
+                         <AvatarFallback className="text-xs">{getUserInitials()}</AvatarFallback>
+                       </Avatar>
+                     </div>
                     {/* Premium Badge */}
                     {subscriptionInfo?.subscribed && (
                       <div className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-yellow-500 flex items-center justify-center">
