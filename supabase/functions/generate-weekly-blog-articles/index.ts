@@ -347,7 +347,7 @@ RESPOND WITH EXACTLY THIS JSON FORMAT (no markdown, no code blocks, just raw JSO
         console.log(`Generating image for: ${parsed.title}`);
         const imageUrl = await generateBlogImage(
           supabaseUrl,
-          supabaseAnonKey,
+          supabaseServiceKey,
           parsed.title,
           category,
           slug,
