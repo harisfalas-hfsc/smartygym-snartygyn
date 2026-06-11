@@ -637,7 +637,7 @@ export const Navigation = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button
-                    className="inline-flex h-11 w-11 items-center justify-center rounded-full border-2 border-primary p-0 text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+                    className="inline-flex h-9 w-9 lg:h-11 lg:w-11 items-center justify-center rounded-full border-2 border-primary p-0 text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
                     aria-label="Login or Sign Up"
                   >
                     <UserIcon className="h-5 w-5" />
