@@ -526,8 +526,8 @@ const Index = () => {
         {isMobile ? <section className="pt-0 pb-2 px-4">
             {/* Workouts carousel title + swipe indicator */}
             <div className="flex items-center justify-center gap-2 mb-1">
-              <Dumbbell className="w-4 h-4 text-primary" />
-              <span className="text-sm font-bold text-foreground">Smarty Workouts</span>
+              <Dumbbell className="w-5 h-5 text-primary" />
+              <span className="text-xl font-extrabold text-foreground tracking-tight">Smarty Workouts</span>
             </div>
             <div className="flex items-center justify-center gap-3 mb-2">
               <button
