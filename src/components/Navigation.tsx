@@ -72,6 +72,11 @@ export const Navigation = () => {
 
   // Dynamically set --app-header-h CSS variable based on actual header height
   useLayoutEffect(() => {
+    // On mobile the header is fully removed; content starts at the top.
+    if (isMobile) {
+      document.documentElement.style.setProperty('--app-header-h', '0px');
+      return;
+    }
     let frame = 0;
     const updateHeaderHeight = () => {
       if (headerRef.current) {
@@ -94,7 +99,7 @@ export const Navigation = () => {
       cancelAnimationFrame(frame);
       resizeObserver.disconnect();
     };
-  }, []);
+  }, [isMobile]);
 
   // Listen for messages being read to update badge immediately
   useEffect(() => {
@@ -303,6 +308,7 @@ export const Navigation = () => {
 
   return (
     <>
+    {!isMobile && (
     <header
       ref={headerRef}
       className={cn(
@@ -672,6 +678,7 @@ export const Navigation = () => {
         </div>
       </div>
     </header>
+    )}
     <SmartyCoachModal isOpen={smartyCoachOpen} onClose={() => setSmartyCoachOpen(false)} />
     </>
   );
