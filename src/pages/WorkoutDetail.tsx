@@ -396,7 +396,7 @@ const WorkoutDetail = () => {
         {categoryDescriptions[type || ""] && (
           <Card className="mb-6 bg-white dark:bg-card border-2 border-primary/40 shadow-primary">
             <div className="p-4 sm:p-5">
-              <h1 className="text-xl sm:text-2xl font-bold mb-3 text-center">{title}</h1>
+              <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight uppercase mb-3 text-center">{title}</h1>
               <div className="max-w-3xl mx-auto">
                 <p className="text-sm sm:text-base text-muted-foreground text-center mb-4">
                   {categoryDescriptions[type || ""]?.description}

@@ -29,7 +29,7 @@ const Disclaimer = () => {
 
           <div className="flex items-center gap-2 sm:gap-3 mb-6 sm:mb-8">
             <AlertTriangle className="h-8 w-8 sm:h-10 sm:w-10 text-primary flex-shrink-0" />
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight">Disclaimer - SmartyGym.com</h1>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight uppercase leading-[1.05] leading-tight">Disclaimer - SmartyGym.com</h1>
           </div>
 
           <Card className="p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8">

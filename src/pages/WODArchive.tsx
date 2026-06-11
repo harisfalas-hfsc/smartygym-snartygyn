@@ -193,7 +193,7 @@ const WODArchive = () => {
             <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
               <Archive className="w-10 h-10 text-primary" />
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-primary mb-3">
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight uppercase text-primary mb-3">
               WOD Archive
             </h1>
             <p className="text-muted-foreground max-w-2xl mx-auto mb-4">

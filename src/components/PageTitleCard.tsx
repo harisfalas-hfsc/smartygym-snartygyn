@@ -23,7 +23,7 @@ export const PageTitleCard = ({ title, subtitle, icon: Icon, imageSrc, children 
             <img src={imageSrc} alt="" className="w-8 h-8 sm:w-12 sm:h-12 object-contain" />
           </div>
         )}
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight uppercase leading-[1.05] text-foreground">
           {title}
         </h1>
         {subtitle && (

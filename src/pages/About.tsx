@@ -165,7 +165,7 @@ const About = () => {
           {/* Hero Section */}
           <ScrollReveal>
             <div className="mb-12 text-center">
-              <h1 className="text-4xl md:text-6xl font-bold mb-4 text-foreground leading-tight">
+              <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight uppercase mb-4 text-foreground leading-tight">
                 About <span className="text-primary">SmartyGym</span>
               </h1>
             </div>

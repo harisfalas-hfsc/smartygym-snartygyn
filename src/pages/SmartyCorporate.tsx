@@ -174,7 +174,7 @@ export default function SmartyCorporate() {
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-3 mb-2">
               <Building2 className="h-8 w-8 text-primary" />
-              <h1 className="text-3xl sm:text-4xl font-bold">Smarty Corporate</h1>
+              <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight uppercase">Smarty Corporate</h1>
             </div>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               Premium fitness access for teams, businesses, and organizations. One subscription, unlimited possibilities.

@@ -506,7 +506,7 @@ const BestOnlineFitnessPlatform = () => {
 
           <article>
             <header className="mb-10 text-center">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight uppercase leading-[1.05] mb-4">
                 Best Online Fitness Platforms in 2026 — Complete Guide
               </h1>
               <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">

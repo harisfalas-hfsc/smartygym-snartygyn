@@ -190,7 +190,7 @@ const OneRMCalculator = () => {
         
         <div className="text-center mb-6">
           <p className="text-sm text-muted-foreground mb-2">Smarty Tools — Free to Use</p>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">1RM Calculator</h1>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight uppercase leading-[1.05] mb-2">1RM Calculator</h1>
         </div>
 
         <Card className="mb-4 border-2 border-primary/40">
