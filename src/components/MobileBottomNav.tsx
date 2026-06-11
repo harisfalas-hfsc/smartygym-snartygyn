@@ -169,10 +169,12 @@ export const MobileBottomNav = () => {
             aria-label="Notifications"
             className={cn(itemClass, "relative")}
           >
-            <Bell className="h-7 w-7" strokeWidth={2.25} />
-            {user && unreadCount > 0 && (
-              <span className="absolute top-1 right-2 h-2.5 w-2.5 rounded-full bg-red-500" />
-            )}
+            <span className="relative inline-flex">
+              <Bell className="h-7 w-7" strokeWidth={2.25} />
+              {user && unreadCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-red-500" />
+              )}
+            </span>
           </button>
 
           {/* Avatar / Login */}
