@@ -239,17 +239,22 @@ export default function SmartyCorporate() {
             </CardContent>
           </Card>
 
-          {/* Info Ribbon */}
-          <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-8 text-center">
-            <p className="text-sm text-muted-foreground">
-              <strong>All plans include 1-year subscription.</strong> Team members receive Platinum access from the date the administrator purchases the plan until the subscription expires.
-            </p>
-          </div>
+          {/* Plans Section Header */}
+          <Card className="mb-8 bg-white dark:bg-card border-2 border-primary/40 shadow-primary">
+            <CardHeader className="text-center pb-2">
+              <CardTitle className="text-xl">Smarty Corporate Plans</CardTitle>
+            </CardHeader>
+            <CardContent className="text-center">
+              <p className="text-sm text-muted-foreground">
+                <strong>All plans include 1-year subscription.</strong> Team members receive Platinum access from the date the administrator purchases the plan until the subscription expires.
+              </p>
+            </CardContent>
+          </Card>
 
           {/* Pricing Plans */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {/* Smarty Dynamic - 10 users */}
-            <Card className="relative border-2 border-border hover:border-primary/50 transition-colors flex flex-col">
+            <Card className="relative border-2 border-primary transition-colors flex flex-col">
               <CardHeader className="text-center pb-2">
                 <div className="flex items-center justify-center gap-2 min-h-[56px]">
                   <Users className="h-5 w-5 text-primary shrink-0" />
@@ -289,7 +294,7 @@ export default function SmartyCorporate() {
             </Card>
 
             {/* Smarty Power - 20 users */}
-            <Card className="relative border-2 border-border hover:border-primary/50 transition-colors flex flex-col">
+            <Card className="relative border-2 border-primary transition-colors flex flex-col">
               <CardHeader className="text-center pb-2">
                 <div className="flex items-center justify-center gap-2 min-h-[56px]">
                   <Users className="h-5 w-5 text-primary shrink-0" />
@@ -329,7 +334,7 @@ export default function SmartyCorporate() {
             </Card>
 
             {/* Smarty Elite - 30 users */}
-            <Card className="relative border-2 border-border hover:border-primary/50 transition-colors flex flex-col">
+            <Card className="relative border-2 border-primary transition-colors flex flex-col">
               <CardHeader className="text-center pb-2">
                 <div className="flex items-center justify-center gap-2 min-h-[56px]">
                   <Users className="h-5 w-5 text-primary shrink-0" />
