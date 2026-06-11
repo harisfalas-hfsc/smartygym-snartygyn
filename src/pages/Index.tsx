@@ -30,6 +30,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import heroWodImage from "@/assets/hero-wod.jpg";
 import heroWorkoutsImage from "@/assets/hero-workouts-bright.jpg";
 import heroBlogImage from "@/assets/hero-blog.jpg";
+import heroNutritionImage from "@/assets/hero-nutrition.jpg";
 import heroProgramsImage from "@/assets/hero-programs.jpg";
 import heroToolsImage from "@/assets/hero-tools.jpg";
 import heroLibraryImage from "@/assets/hero-exercise-library-new.jpg";
@@ -131,7 +132,7 @@ const Index = () => {
   // Third carousel: blog categories
   const blogCards = [
     { id: "fitness", title: "Fitness", description: "Training science, programming and performance", icon: Dumbbell, route: "/blog/category/fitness", image: heroWorkoutsImage },
-    { id: "nutrition", title: "Nutrition", description: "Evidence-based nutrition for body composition", icon: Flame, route: "/blog/category/nutrition", image: heroBlogImage },
+    { id: "nutrition", title: "Nutrition", description: "Evidence-based nutrition for body composition", icon: Flame, route: "/blog/category/nutrition", image: heroNutritionImage },
     { id: "wellness", title: "Wellness", description: "Recovery, sleep and longevity insights", icon: Heart, route: "/blog/category/wellness", image: heroCommunityImage },
   ];
 
