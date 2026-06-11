@@ -111,7 +111,7 @@ const TheSmartyMethod = () => {
           {/* Hero / Introduction */}
           <ScrollReveal>
             <section className="text-center mb-16">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight uppercase mb-6">
                 More Than Workouts.{" "}
                 <span className="text-primary">A Complete Performance System.</span>
               </h1>

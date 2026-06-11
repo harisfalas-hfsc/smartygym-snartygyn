@@ -166,7 +166,7 @@ const FAQ = () => {
           <ScrollReveal>
             <div className="text-center mb-10">
               <HelpCircle className="w-16 h-16 text-primary mx-auto mb-4" />
-              <h1 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">
+              <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight uppercase mb-4 text-foreground">
                 Frequently Asked Questions
               </h1>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">

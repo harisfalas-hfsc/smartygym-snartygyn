@@ -196,7 +196,7 @@ export default function CorporateWellness() {
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-3 mb-2">
               <Lightbulb className="h-8 w-8 text-green-500" />
-              <h1 className="text-3xl sm:text-4xl font-bold">Why Invest in Corporate Wellness?</h1>
+              <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight uppercase">Why Invest in Corporate Wellness?</h1>
             </div>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               Research-backed insights on the transformative power of corporate fitness programs

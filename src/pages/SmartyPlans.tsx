@@ -432,7 +432,7 @@ export default function SmartyPlans() {
           {/* Header */}
           <div className="text-center mb-8">
             <Crown className="h-16 w-16 text-primary mx-auto mb-4" />
-            <h1 className="text-3xl sm:text-4xl font-bold mb-4">
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight uppercase mb-4">
               <span className="block">Transform your fitness journey.</span>
               <span className="block">Join Premium</span>
             </h1>
