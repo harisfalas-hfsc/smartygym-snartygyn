@@ -8,11 +8,10 @@ import smartyCoachIcon from "@/assets/smarty-coach-icon.png";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import { Sheet, SheetClose, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 import { useAdminRole } from "@/hooks/useAdminRole";
-import { SafeNotificationBadge } from "@/components/NotificationBadge";
 import { useToast } from "@/hooks/use-toast";
 
 const HIDDEN_PATHS = ["/auth", "/reset-password", "/payment-success", "/payment-cancelled"];
@@ -171,7 +170,9 @@ export const MobileBottomNav = () => {
             className={cn(itemClass, "relative")}
           >
             <Bell className="h-7 w-7" strokeWidth={2.25} />
-            {user && unreadCount > 0 && <SafeNotificationBadge count={unreadCount} />}
+            {user && unreadCount > 0 && (
+              <span className="absolute top-1 right-2 h-2.5 w-2.5 rounded-full bg-red-500" />
+            )}
           </button>
 
           {/* Avatar / Login */}
