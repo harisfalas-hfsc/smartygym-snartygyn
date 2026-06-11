@@ -71,9 +71,13 @@ const Index = () => {
   // State for pinned audience tooltip (click to toggle)
   const [activeAudienceTooltip, setActiveAudienceTooltip] = useState<string | null>(null);
 
-  // Mobile hero carousel state (cards are wider than viewport, swipeable)
+  // Mobile hero carousels: workout categories, program categories, blog categories
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [programsCarouselApi, setProgramsCarouselApi] = useState<CarouselApi>();
+  const [programsSlide, setProgramsSlide] = useState(0);
+  const [blogCarouselApi, setBlogCarouselApi] = useState<CarouselApi>();
+  const [blogSlide, setBlogSlide] = useState(0);
   const [activeWodIndex, setActiveWodIndex] = useState(0);
 
   useEffect(() => {
@@ -81,19 +85,54 @@ const Index = () => {
     const onSelect = () => setCurrentSlide(carouselApi.selectedScrollSnap());
     onSelect();
     carouselApi.on("select", onSelect);
-    return () => {
-      carouselApi.off("select", onSelect);
-    };
+    return () => { carouselApi.off("select", onSelect); };
   }, [carouselApi]);
 
-  // Mobile hero swipeable cards
+  useEffect(() => {
+    if (!programsCarouselApi) return;
+    const onSelect = () => setProgramsSlide(programsCarouselApi.selectedScrollSnap());
+    onSelect();
+    programsCarouselApi.on("select", onSelect);
+    return () => { programsCarouselApi.off("select", onSelect); };
+  }, [programsCarouselApi]);
+
+  useEffect(() => {
+    if (!blogCarouselApi) return;
+    const onSelect = () => setBlogSlide(blogCarouselApi.selectedScrollSnap());
+    onSelect();
+    blogCarouselApi.on("select", onSelect);
+    return () => { blogCarouselApi.off("select", onSelect); };
+  }, [blogCarouselApi]);
+
+  // First carousel: workout categories (matches WorkoutFlow)
   const heroCards = [
-    { id: "workouts", title: "Smarty Workouts", description: "500+ expert-designed workout routines for every fitness level and goal", icon: Dumbbell, route: "/workout", image: heroWorkoutsImage, imageWidth: 1024, imageHeight: 1024 },
-    { id: "programs", title: "Smarty Programs", description: "Structured multi-week programs designed to transform your fitness journey", icon: Calendar, route: "/trainingprogram", image: heroProgramsImage, imageWidth: 768, imageHeight: 768 },
-    { id: "tools", title: "Smarty Tools", description: "Professional fitness calculators and tracking tools to optimize your training", icon: Calculator, route: "/tools", image: heroToolsImage, imageWidth: 768, imageHeight: 768 },
-    { id: "exerciselibrary", title: "Exercise Library", description: "Comprehensive video library with proper form demonstrations and technique guides", icon: Video, route: "/exerciselibrary", image: heroLibraryImage, imageWidth: 800, imageHeight: 512 },
-    { id: "blog", title: "Blog & Insights", description: "Evidence-based fitness articles and expert insights from professional coaches", icon: FileText, route: "/blog", image: heroBlogImage, imageWidth: 400, imageHeight: 300 },
-    { id: "community", title: "Community", description: "Connect, share and grow with fellow fitness enthusiasts worldwide", icon: Users, route: "/community", image: heroCommunityImage, imageWidth: 1024, imageHeight: 1024 },
+    { id: "strength", title: "Strength", description: "Build muscle and power with resistance training", icon: Dumbbell, route: "/workout/strength", image: "/images/workouts/strength-card-mobile.jpg" },
+    { id: "calorie-burning", title: "Calorie Burning", description: "High-intensity workouts to maximize calorie burn", icon: Flame, route: "/workout/calorie-burning", image: "/images/workouts/calorie-burning-card-mobile.jpg" },
+    { id: "metabolic", title: "Metabolic", description: "Boost your metabolism with dynamic conditioning", icon: Zap, route: "/workout/metabolic", image: "/images/workouts/metabolic-card-mobile.jpg" },
+    { id: "cardio", title: "Cardio", description: "Improve cardiovascular endurance and stamina", icon: Heart, route: "/workout/cardio", image: "/images/workouts/cardio-card-mobile.jpg" },
+    { id: "mobility", title: "Mobility & Stability", description: "Enhance flexibility and movement quality", icon: Move, route: "/workout/mobility", image: "/images/workouts/mobility-card-mobile.jpg" },
+    { id: "challenge", title: "Challenge", description: "Push your limits with advanced workouts", icon: Activity, route: "/workout/challenge", image: "/images/workouts/challenge-card-mobile.jpg" },
+    { id: "pilates", title: "Pilates", description: "Controlled movements and alignment", icon: Sparkles, route: "/workout/pilates", image: "/images/workouts/pilates-card-mobile.jpg" },
+    { id: "recovery", title: "Recovery", description: "Regeneration and active recovery workouts", icon: Heart, route: "/workout/recovery", image: "/images/workouts/recovery-card-mobile.jpg" },
+    { id: "micro-workouts", title: "Micro-Workouts", description: "Quick 5-minute exercise snacks, anytime", icon: Clock, route: "/workout/micro-workouts", image: "/images/workouts/micro-workouts-card-mobile.jpg" },
+    { id: "wod", title: "Workout of the Day", description: "Today's expert-designed featured session", icon: CalendarCheck, route: "/workout/wod", image: heroWodImage },
+  ];
+
+  // Second carousel: training program categories (matches TrainingProgramFlow)
+  const programCards = [
+    { id: "cardio-endurance", title: "Cardio Endurance", description: "Multi-week plans to build aerobic capacity", icon: Heart, route: "/trainingprogram/cardio-endurance", image: "/images/programs/cardio-endurance-card-mobile.jpg" },
+    { id: "functional-strength", title: "Functional Strength", description: "Real-world strength for daily life and sport", icon: Dumbbell, route: "/trainingprogram/functional-strength", image: "/images/programs/functional-strength-card-mobile.jpg" },
+    { id: "muscle-hypertrophy", title: "Muscle Hypertrophy", description: "Strategic programs for muscle growth", icon: Activity, route: "/trainingprogram/muscle-hypertrophy", image: "/images/programs/muscle-hypertrophy-card-mobile.jpg" },
+    { id: "weight-loss", title: "Weight Loss", description: "Sustainable fat loss with smart programming", icon: Flame, route: "/trainingprogram/weight-loss", image: "/images/programs/weight-loss-card-mobile.jpg" },
+    { id: "low-back-pain", title: "Low Back Pain", description: "Targeted plans for back pain relief", icon: User, route: "/trainingprogram/low-back-pain", image: "/images/programs/low-back-pain-card-mobile.jpg" },
+    { id: "mobility-stability", title: "Mobility & Stability", description: "Movement quality and injury prevention", icon: Move, route: "/trainingprogram/mobility-stability", image: "/images/programs/mobility-stability-card-mobile.jpg" },
+  ];
+
+  // Third carousel: blog categories
+  const blogCards = [
+    { id: "fitness", title: "Fitness", description: "Training science, programming and performance", icon: Dumbbell, route: "/blog/category/fitness", image: heroWorkoutsImage },
+    { id: "nutrition", title: "Nutrition", description: "Evidence-based nutrition for body composition", icon: Flame, route: "/blog/category/nutrition", image: heroBlogImage },
+    { id: "wellness", title: "Wellness", description: "Recovery, sleep and longevity insights", icon: Heart, route: "/blog/category/wellness", image: heroCommunityImage },
   ];
 
   // Fetch review stats for SEO schema - low priority, don't block render
