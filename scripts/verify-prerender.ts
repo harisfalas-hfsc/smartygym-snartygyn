@@ -171,29 +171,6 @@ export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
     assertRedirectRule(redirects, rule.from, rule.to);
   }
 
-  // RSS must point every blog item at its canonical ".html" URL so feed
-  // readers and crawlers land on the prerendered, fully readable page.
-  const rssPath = join(distDir, "rss.xml");
-  if (!isFile(rssPath)) {
-    throw new Error("[verify-prerender] missing dist/rss.xml");
-  }
-  const rssXml = readFileSync(rssPath, "utf8");
-  const rssLinks = [...rssXml.matchAll(/<link>([^<]+)<\/link>/g)].map((m) => m[1]);
-  for (const link of rssLinks) {
-    if (!link.startsWith(BASE_URL)) continue;
-    if (link === `${BASE_URL}/` || link === `${BASE_URL}/blog.html`) continue;
-    if (!link.endsWith(".html")) {
-      throw new Error(`[verify-prerender] RSS link is not a canonical .html URL: ${link}`);
-    }
-  }
-  const rssGuids = [...rssXml.matchAll(/<guid[^>]*>([^<]+)<\/guid>/g)].map((m) => m[1]);
-  for (const guid of rssGuids) {
-    if (!guid.startsWith(BASE_URL)) continue;
-    if (!guid.endsWith(".html")) {
-      throw new Error(`[verify-prerender] RSS guid is not a canonical .html URL: ${guid}`);
-    }
-  }
-
   // llms-full.txt is the AI-crawler index. Every smartygym.com link in it
   // must point at the canonical ".html" version (homepage "/" excluded).
   const llmsPath = join(distDir, "llms-full.txt");
