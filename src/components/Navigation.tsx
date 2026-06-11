@@ -54,6 +54,21 @@ export const Navigation = () => {
   const { data: unreadCount = 0, refetch: refetchUnread } = useUnreadMessages();
   const { isAdmin } = useAdminRole();
   const headerRef = useRef<HTMLElement>(null);
+  const [headerHidden, setHeaderHidden] = useState(false);
+
+  // Mobile: hide header when scrolled past top, show again at the very top
+  useEffect(() => {
+    if (!isMobile) {
+      setHeaderHidden(false);
+      return;
+    }
+    const onScroll = () => {
+      setHeaderHidden(window.scrollY > 10);
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [isMobile]);
 
   // Dynamically set --app-header-h CSS variable based on actual header height
   useLayoutEffect(() => {
@@ -290,7 +305,10 @@ export const Navigation = () => {
     <>
     <header
       ref={headerRef}
-      className="fixed top-0 left-0 right-0 z-50 bg-background pt-2 pb-0.5 px-4"
+      className={cn(
+        "fixed top-0 left-0 right-0 z-50 bg-background pt-2 pb-0.5 px-4 transition-transform duration-300 will-change-transform",
+        headerHidden && "-translate-y-full"
+      )}
     >
       <div className="mx-auto max-w-7xl">
         <div className="relative flex items-center justify-between gap-2 lg:gap-4">
