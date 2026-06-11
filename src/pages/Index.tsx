@@ -106,6 +106,7 @@ const Index = () => {
 
   // First carousel: workout categories (matches WorkoutFlow)
   const heroCards = [
+    { id: "wod", title: "Workout of the Day", description: "Today's expert-designed featured session", icon: CalendarCheck, route: "/workout/wod", image: heroWodImage },
     { id: "strength", title: "Strength", description: "Build muscle and power with resistance training", icon: Dumbbell, route: "/workout/strength", image: "/images/workouts/strength-card-mobile.jpg" },
     { id: "calorie-burning", title: "Calorie Burning", description: "High-intensity workouts to maximize calorie burn", icon: Flame, route: "/workout/calorie-burning", image: "/images/workouts/calorie-burning-card-mobile.jpg" },
     { id: "metabolic", title: "Metabolic", description: "Boost your metabolism with dynamic conditioning", icon: Zap, route: "/workout/metabolic", image: "/images/workouts/metabolic-card-mobile.jpg" },
@@ -115,7 +116,6 @@ const Index = () => {
     { id: "pilates", title: "Pilates", description: "Controlled movements and alignment", icon: Sparkles, route: "/workout/pilates", image: "/images/workouts/pilates-card-mobile.jpg" },
     { id: "recovery", title: "Recovery", description: "Regeneration and active recovery workouts", icon: Heart, route: "/workout/recovery", image: "/images/workouts/recovery-card-mobile.jpg" },
     { id: "micro-workouts", title: "Micro-Workouts", description: "Quick 5-minute exercise snacks, anytime", icon: Clock, route: "/workout/micro-workouts", image: "/images/workouts/micro-workouts-card-mobile.jpg" },
-    { id: "wod", title: "Workout of the Day", description: "Today's expert-designed featured session", icon: CalendarCheck, route: "/workout/wod", image: heroWodImage },
   ];
 
   // Second carousel: training program categories (matches TrainingProgramFlow)
