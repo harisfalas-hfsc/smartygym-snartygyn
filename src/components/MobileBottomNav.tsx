@@ -11,9 +11,7 @@ import { Sheet, SheetClose, SheetContent, SheetTrigger } from "@/components/ui/s
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 import { useAdminRole } from "@/hooks/useAdminRole";
-import { SafeNotificationBadge } from "@/components/NotificationBadge";
 import { useToast } from "@/hooks/use-toast";
 
 const HIDDEN_PATHS = ["/auth", "/reset-password", "/payment-success", "/payment-cancelled"];
