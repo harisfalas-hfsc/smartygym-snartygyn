@@ -16,6 +16,7 @@ import {
 } from "../_shared/exercise-matching.ts";
 import { normalizeWorkoutHtml, validateWorkoutHtml } from "../_shared/html-normalizer.ts";
 import { validateWodSections } from "../_shared/section-validator.ts";
+import { requireAdminOrServiceRole } from "../_shared/admin-or-service-auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -470,6 +471,10 @@ async function generateOne(
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  // SECURITY: only admins or server-to-server (service role) callers allowed
+  const unauthorizedResponse = await requireAdminOrServiceRole(req, corsHeaders);
+  if (unauthorizedResponse) return unauthorizedResponse;
 
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
