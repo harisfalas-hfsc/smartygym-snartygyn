@@ -191,17 +191,20 @@ export default function SmartyCorporate() {
             </CardHeader>
             <CardContent className="prose prose-sm dark:prose-invert max-w-none">
               <p>
-                <span className="text-primary font-semibold">Smarty Corporate</span> is designed for teams, businesses, and organizations that want to provide premium fitness access to their members. 
-                With one master account, an administrator can create and manage multiple user accounts, each receiving full Platinum-level access 
+                <span className="text-primary font-semibold">Smarty Corporate</span> is designed for teams, businesses, and organizations that want to provide premium fitness access to their members.
+                With one master account, an administrator can create and manage multiple user accounts, each receiving full Platinum-level access
                 to all <span className="text-primary font-semibold">SmartyGym</span> features including workouts, training programs, daily rituals, and fitness tools.
               </p>
               <p>
-                All team members enjoy the same benefits as individual Platinum subscribers for the duration of the subscription. 
-                The administrator has access to a dedicated dashboard to manage team members, monitor usage, and control access.{' '}
-                <Link to="/corporate-wellness" className="hover:underline font-medium text-green-500">
-                  Why Invest in Corporate Wellness
-                </Link>
+                All team members enjoy the same benefits as individual Platinum subscribers for the duration of the subscription.
+                The administrator has access to a dedicated dashboard to manage team members, monitor usage, and control access.
               </p>
+              <div className="text-center mt-4 not-prose">
+                <Link to="/corporate-wellness" className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline">
+                  Why Invest in Corporate Wellness
+                  <ChevronRight className="w-4 h-4" />
+                </Link>
+              </div>
             </CardContent>
           </Card>
 
