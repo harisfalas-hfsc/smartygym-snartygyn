@@ -7,6 +7,7 @@ import {
   stripExerciseMarkup,
   type ExerciseBasic,
 } from "../_shared/exercise-matching.ts";
+import { requireAdminOrServiceRole } from "../_shared/admin-or-service-auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -28,6 +29,10 @@ serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
+
+  // SECURITY: only admins or server-to-server (service role) callers allowed
+  const unauthorizedResponse = await requireAdminOrServiceRole(req, corsHeaders);
+  if (unauthorizedResponse) return unauthorizedResponse;
 
   try {
     let dryRun = false;
