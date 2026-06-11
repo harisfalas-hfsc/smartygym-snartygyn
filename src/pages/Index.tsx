@@ -605,136 +605,86 @@ const Index = () => {
 
         {/* Quick Access Menu */}
         <div className="mt-8 space-y-3">
-          {/* WOD Card - Always visible with "Being Prepared" fallback */}
-          <div
-            onClick={() => navigate('/workout/wod')}
-            className="py-3 px-4 bg-primary/5 border-2 border-emerald-400 dark:border-emerald-500 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 transition-all cursor-pointer hover:shadow-md"
-          >
-            {/* Header */}
-            <div className="flex items-center gap-2 mb-3">
-              <Dumbbell className="w-5 h-5 text-primary flex-shrink-0" />
-              <span className="text-sm font-bold text-foreground">Your Workout of the Day</span>
-              <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
+          {/* Training Programs Carousel */}
+          <div className="pt-2">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <Calendar className="w-4 h-4 text-primary" />
+              <span className="text-sm font-bold text-foreground">Training Programs</span>
             </div>
-
-            {hasWods ? (
-              activeMobileWod && (() => {
-                const wod = activeMobileWod.wod;
-                const isVarious = activeMobileWod.id === "various";
-                const isBodyweight = activeMobileWod.id === "bodyweight";
-                const equipmentIcon = isVarious ? <Shuffle className="w-4 h-4" /> : isBodyweight ? <Home className="w-4 h-4" /> : <Dumbbell className="w-4 h-4" />;
-                const equipmentLabel = isVarious ? "Mixed/Minimal" : isBodyweight ? "No Equipment" : "With Equipment";
-                const equipmentBadgeClass = isVarious ? "bg-purple-500" : isBodyweight ? "bg-blue-500" : "bg-orange-500";
-                const isNew = wod.created_at ? (Date.now() - new Date(wod.created_at).getTime()) / (1000 * 60 * 60 * 24) <= 2 : false;
-                const stripHtml = (html: string | null | undefined) => (html ? html.replace(/<[^>]*>/g, "") : "");
-                const formatMetaLabel = (value: string | null | undefined) => value ? value.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase()) : "";
-                const isRecovery = wod.category?.toUpperCase() === "RECOVERY";
-                return (
-                  <div className="space-y-3">
-                    <Card
-                      className="group h-[330px] cursor-pointer overflow-hidden hover:shadow-xl transition-all duration-300 hover:border-primary/60"
-                    >
-                    <div className="relative aspect-video overflow-hidden">
-                      <img
-                        key={wod.id}
-                        src={wod.image_url || "/placeholder.svg"}
-                        alt={wod.name}
-                        width={1280}
-                        height={720}
-                        className="w-full h-full object-cover transition-opacity duration-500"
-                        loading="lazy"
-                        decoding="async"
-                        fetchPriority="auto"
-                        onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
-                      />
-                      <Badge className={cn("absolute top-3 left-3 text-white border-0", equipmentBadgeClass)}>
-                        {equipmentIcon}
-                        <span className="ml-1">{equipmentLabel}</span>
-                      </Badge>
-                      {isNew && (
-                        <Badge className="absolute top-3 right-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white border-0">NEW</Badge>
-                      )}
-                      <div className="absolute bottom-3 right-3">
-                        {wod.is_premium ? (
-                          <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0 shadow-lg">
-                            <Crown className="w-3 h-3 mr-1" />Premium
-                          </Badge>
-                        ) : wod.is_standalone_purchase && wod.price ? (
-                          <Badge className="bg-gradient-to-r from-green-500 to-emerald-600 text-white border-0 shadow-lg">
-                            <ShoppingCart className="w-3 h-3 mr-1" />€{wod.price.toFixed(2)}
-                          </Badge>
-                        ) : (
-                          <Badge className="bg-gradient-to-r from-blue-500 to-cyan-600 text-white border-0 shadow-lg">
-                            <Check className="w-3 h-3 mr-1" />Free
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                    <CardContent className="p-3">
-                      <h3 className="text-base font-bold text-foreground mb-1 group-hover:text-primary transition-colors line-clamp-1">
-                        {wod.name}
-                      </h3>
-                      <p className="text-muted-foreground text-xs mb-2 line-clamp-2 h-8 leading-4">
-                        {stripHtml(wod.description).substring(0, 120) || "Today's expert-designed Workout of the Day."}...
-                      </p>
-                      <div className="grid h-8 grid-cols-4 items-center gap-1 text-xs mb-1 overflow-hidden">
-                        {wod.category && (
-                          <div className="min-w-0 overflow-hidden rounded-md bg-primary/10 px-1.5 py-1 text-center leading-none">
-                            <span className="max-w-full truncate text-muted-foreground font-medium">{formatMetaLabel(wod.category)}</span>
+            <Carousel className="w-full" opts={{ align: "center", loop: true }} setApi={setProgramsCarouselApi}>
+              <CarouselContent className="-ml-2">
+                {programCards.map((card) => {
+                  const Icon = card.icon;
+                  return (
+                    <CarouselItem key={card.id} className="pl-2 basis-[75%] sm:basis-[60%]">
+                      <div onClick={() => navigate(card.route)} className="border-2 border-primary/40 rounded-xl overflow-hidden hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300 cursor-pointer bg-card flex flex-col">
+                        <div className="relative aspect-[25/16] w-full overflow-hidden flex-shrink-0">
+                          <img src={card.image} alt={card.title} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover object-[center_top]" />
+                        </div>
+                        <div className="flex flex-col justify-center flex-1 p-3 text-center min-h-[96px]">
+                          <div className="flex items-center justify-center gap-2 mb-1">
+                            <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                              <Icon className="w-3.5 h-3.5 text-primary" />
+                            </div>
+                            <h3 className="text-sm font-bold text-foreground leading-tight whitespace-nowrap">{card.title}</h3>
                           </div>
-                        )}
-                        <div className="min-w-0 overflow-hidden rounded-md bg-primary/10 px-1.5 py-1 text-center leading-none">
-                          <span className="max-w-full truncate text-blue-700 dark:text-blue-400 font-medium">{wod.format || "General"}</span>
-                        </div>
-                        <div className="min-w-0 overflow-hidden rounded-md bg-primary/10 px-1.5 py-1 text-center leading-none">
-                          <span className={`max-w-full truncate font-medium capitalize ${isRecovery ? "text-green-600 dark:text-green-400" : getDifficultyColorClasses(wod.difficulty_stars || wod.difficulty).text}`}>
-                            {isRecovery
-                              ? "All"
-                              : wod.difficulty_stars
-                                ? `${wod.difficulty_stars}★`
-                                : (wod.difficulty || "Beginner")}
-                          </span>
-                        </div>
-                        <div className="min-w-0 overflow-hidden rounded-md bg-primary/10 px-1.5 py-1 text-center leading-none">
-                          <span className="max-w-full truncate text-purple-700 dark:text-purple-400 font-medium">{wod.duration || "45-60 min"}</span>
+                          <p className="text-xs text-muted-foreground leading-snug line-clamp-2">{card.description}</p>
+                          <div className="flex items-center justify-center gap-1 text-primary text-[10px] font-medium mt-1">
+                            Explore<ChevronRight className="w-3 h-3" />
+                          </div>
                         </div>
                       </div>
-                    </CardContent>
-                    </Card>
-                    {mobileWodCards.length > 1 && (
-                      <div className="flex justify-center items-center gap-3 pb-1" aria-label="Workout of the Day slides">
-                        {mobileWodCards.map((card, index) => (
-                          <button
-                            key={card.id}
-                            type="button"
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              setActiveWodIndex(index);
-                            }}
-                            className={cn(
-                              "rounded-full transition-all duration-300 shadow-sm",
-                              index === activeWodIndex % mobileWodCards.length
-                                ? "h-3 w-3 bg-primary shadow-[0_0_8px_hsl(var(--primary))]"
-                                : "h-2.5 w-2.5 bg-primary/45 hover:bg-primary/70"
-                            )}
-                            aria-label={`Show ${card.label} workout`}
-                          />
-                        ))}
+                    </CarouselItem>
+                  );
+                })}
+              </CarouselContent>
+            </Carousel>
+            <div className="flex justify-center gap-2 mt-3">
+              {programCards.map((_, index) => (
+                <button key={index} onClick={() => programsCarouselApi?.scrollTo(index)} className={cn("w-2.5 h-2.5 rounded-full transition-all duration-300", programsSlide === index ? "bg-primary scale-125" : "bg-primary/30 hover:bg-primary/50")} aria-label={`Go to program ${index + 1}`} />
+              ))}
+            </div>
+          </div>
+
+          {/* Blog Categories Carousel */}
+          <div className="pt-2">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <FileText className="w-4 h-4 text-primary" />
+              <span className="text-sm font-bold text-foreground">Blog & Insights</span>
+            </div>
+            <Carousel className="w-full" opts={{ align: "center", loop: true }} setApi={setBlogCarouselApi}>
+              <CarouselContent className="-ml-2">
+                {blogCards.map((card) => {
+                  const Icon = card.icon;
+                  return (
+                    <CarouselItem key={card.id} className="pl-2 basis-[75%] sm:basis-[60%]">
+                      <div onClick={() => navigate(card.route)} className="border-2 border-primary/40 rounded-xl overflow-hidden hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300 cursor-pointer bg-card flex flex-col">
+                        <div className="relative aspect-[25/16] w-full overflow-hidden flex-shrink-0">
+                          <img src={card.image} alt={card.title} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover object-[center_top]" />
+                        </div>
+                        <div className="flex flex-col justify-center flex-1 p-3 text-center min-h-[96px]">
+                          <div className="flex items-center justify-center gap-2 mb-1">
+                            <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                              <Icon className="w-3.5 h-3.5 text-primary" />
+                            </div>
+                            <h3 className="text-sm font-bold text-foreground leading-tight whitespace-nowrap">{card.title}</h3>
+                          </div>
+                          <p className="text-xs text-muted-foreground leading-snug line-clamp-2">{card.description}</p>
+                          <div className="flex items-center justify-center gap-1 text-primary text-[10px] font-medium mt-1">
+                            Read<ChevronRight className="w-3 h-3" />
+                          </div>
+                        </div>
                       </div>
-                    )}
-                  </div>
-                );
-              })()
-            ) : (
-              /* Being Prepared fallback */
-              <div className="text-center py-4">
-                <Clock className="w-10 h-10 text-primary/50 mx-auto mb-2" />
-                <p className="text-sm font-semibold text-foreground">Today's Workouts are Being Prepared</p>
-                <p className="text-xs text-muted-foreground">
-                  Check back <span className="text-primary font-semibold">soon</span> for your fresh Workouts of the Day!
-                </p>
-              </div>
-            )}
+                    </CarouselItem>
+                  );
+                })}
+              </CarouselContent>
+            </Carousel>
+            <div className="flex justify-center gap-2 mt-3">
+              {blogCards.map((_, index) => (
+                <button key={index} onClick={() => blogCarouselApi?.scrollTo(index)} className={cn("w-2.5 h-2.5 rounded-full transition-all duration-300", blogSlide === index ? "bg-primary scale-125" : "bg-primary/30 hover:bg-primary/50")} aria-label={`Go to blog category ${index + 1}`} />
+              ))}
+            </div>
           </div>
 
           <div className="grid grid-cols-3 gap-3">
