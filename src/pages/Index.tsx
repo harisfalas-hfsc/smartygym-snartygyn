@@ -622,19 +622,19 @@ const Index = () => {
                   return (
                     <CarouselItem key={card.id} className="pl-2 basis-[75%] sm:basis-[60%]">
                       <div onClick={() => navigate(card.route)} className="border-2 border-primary/40 rounded-xl overflow-hidden hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300 cursor-pointer bg-card flex flex-col">
-                        <div className="relative aspect-[25/16] w-full overflow-hidden flex-shrink-0">
+                        <div className="relative aspect-[16/8] w-full overflow-hidden flex-shrink-0">
                           <img src={card.image} alt={card.title} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover object-[center_top]" />
                         </div>
-                        <div className="flex flex-col justify-center flex-1 p-3 text-center min-h-[96px]">
-                          <div className="flex items-center justify-center gap-2 mb-1">
-                            <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                              <Icon className="w-3.5 h-3.5 text-primary" />
+                        <div className="flex flex-col justify-center flex-1 p-2 text-center">
+                          <div className="flex items-center justify-center gap-1.5 mb-0.5">
+                            <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                              <Icon className="w-3 h-3 text-primary" />
                             </div>
-                            <h3 className="text-sm font-bold text-foreground leading-tight whitespace-nowrap">{card.title}</h3>
+                            <h3 className="text-xs font-bold text-foreground leading-tight whitespace-nowrap">{card.title}</h3>
                           </div>
-                          <p className="text-xs text-muted-foreground leading-snug line-clamp-2">{card.description}</p>
-                          <div className="flex items-center justify-center gap-1 text-primary text-[10px] font-medium mt-1">
-                            Explore<ChevronRight className="w-3 h-3" />
+                          <p className="text-[10px] text-muted-foreground leading-snug line-clamp-2">{card.description}</p>
+                          <div className="flex items-center justify-center gap-1 text-primary text-[9px] font-medium mt-0.5">
+                            Explore<ChevronRight className="w-2.5 h-2.5" />
                           </div>
                         </div>
                       </div>
@@ -663,19 +663,19 @@ const Index = () => {
                   return (
                     <CarouselItem key={card.id} className="pl-2 basis-[75%] sm:basis-[60%]">
                       <div onClick={() => navigate(card.route)} className="border-2 border-primary/40 rounded-xl overflow-hidden hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300 cursor-pointer bg-card flex flex-col">
-                        <div className="relative aspect-[25/16] w-full overflow-hidden flex-shrink-0">
+                        <div className="relative aspect-[16/8] w-full overflow-hidden flex-shrink-0">
                           <img src={card.image} alt={card.title} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover object-[center_top]" />
                         </div>
-                        <div className="flex flex-col justify-center flex-1 p-3 text-center min-h-[96px]">
-                          <div className="flex items-center justify-center gap-2 mb-1">
-                            <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                              <Icon className="w-3.5 h-3.5 text-primary" />
+                        <div className="flex flex-col justify-center flex-1 p-2 text-center">
+                          <div className="flex items-center justify-center gap-1.5 mb-0.5">
+                            <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                              <Icon className="w-3 h-3 text-primary" />
                             </div>
-                            <h3 className="text-sm font-bold text-foreground leading-tight whitespace-nowrap">{card.title}</h3>
+                            <h3 className="text-xs font-bold text-foreground leading-tight whitespace-nowrap">{card.title}</h3>
                           </div>
-                          <p className="text-xs text-muted-foreground leading-snug line-clamp-2">{card.description}</p>
-                          <div className="flex items-center justify-center gap-1 text-primary text-[10px] font-medium mt-1">
-                            Read<ChevronRight className="w-3 h-3" />
+                          <p className="text-[10px] text-muted-foreground leading-snug line-clamp-2">{card.description}</p>
+                          <div className="flex items-center justify-center gap-1 text-primary text-[9px] font-medium mt-0.5">
+                            Read<ChevronRight className="w-2.5 h-2.5" />
                           </div>
                         </div>
                       </div>
