@@ -552,7 +552,7 @@ const Index = () => {
               >
                 <ChevronLeft className="h-5 w-5 text-primary" />
               </button>
-              <span className="text-2xl font-extrabold tracking-tight text-primary uppercase">Smarty Workouts</span>
+              <span className="text-lg sm:text-2xl font-extrabold tracking-tight text-primary uppercase whitespace-nowrap">Smarty Workouts</span>
               <button
                 type="button"
                 onClick={() => carouselApi?.scrollNext()}
@@ -629,7 +629,7 @@ const Index = () => {
               <button type="button" onClick={() => programsCarouselApi?.scrollPrev()} className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Previous program">
                 <ChevronLeft className="h-5 w-5 text-primary" />
               </button>
-              <span className="text-2xl font-extrabold tracking-tight text-primary uppercase">Smarty Programs</span>
+              <span className="text-lg sm:text-2xl font-extrabold tracking-tight text-primary uppercase whitespace-nowrap">Smarty Programs</span>
               <button type="button" onClick={() => programsCarouselApi?.scrollNext()} className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Next program">
                 <ChevronRight className="h-5 w-5 text-primary" />
               </button>
@@ -675,7 +675,7 @@ const Index = () => {
               <button type="button" onClick={() => blogCarouselApi?.scrollPrev()} className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Previous category">
                 <ChevronLeft className="h-5 w-5 text-primary" />
               </button>
-              <span className="text-2xl font-extrabold tracking-tight text-primary uppercase">Smarty Blog</span>
+              <span className="text-lg sm:text-2xl font-extrabold tracking-tight text-primary uppercase whitespace-nowrap">Smarty Blog</span>
               <button type="button" onClick={() => blogCarouselApi?.scrollNext()} className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Next category">
                 <ChevronRight className="h-5 w-5 text-primary" />
               </button>
