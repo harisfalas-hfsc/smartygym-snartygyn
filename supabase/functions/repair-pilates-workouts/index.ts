@@ -1,13 +1,13 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import {
-import { requireAdminOrServiceRole } from "../_shared/admin-or-service-auth.ts";
   processContentSectionAware,
   guaranteeAllExercisesLinked,
   rejectNonLibraryExercises,
   stripExerciseMarkup,
   type ExerciseBasic,
 } from "../_shared/exercise-matching.ts";
+import { requireAdminOrServiceRole } from "../_shared/admin-or-service-auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
