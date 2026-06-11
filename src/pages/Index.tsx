@@ -556,8 +556,6 @@ const Index = () => {
                           <img
                             src={card.image}
                             alt={card.title}
-                            width={card.imageWidth}
-                            height={card.imageHeight}
                             loading={index === 0 ? "eager" : "lazy"}
                             decoding="async"
                             fetchPriority={index === 0 ? "high" : "auto"}
