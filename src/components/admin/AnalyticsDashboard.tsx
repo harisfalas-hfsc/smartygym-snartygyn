@@ -156,7 +156,7 @@ export function AnalyticsDashboard() {
       // Fetch subscription data - include stripe_subscription_id to identify paid vs manual
       const { data: subscriptions } = await supabase
         .from("user_subscriptions")
-        .select("plan_type, status, created_at, current_period_end, stripe_subscription_id");
+        .select("plan_type, status, created_at, current_period_end, stripe_subscription_id, stripe_customer_id, subscription_source");
 
       // Centralized premium counts (matches live product rules)
       const premiumCounts = computePremiumCounts(subscriptions as any);
@@ -166,15 +166,20 @@ export function AnalyticsDashboard() {
 
       const premiumPlans = new Set(["lifetime", "gold", "platinum", "premium"]);
       const premiumSubscribers = subscriptions?.filter(s => s.status === "active" && premiumPlans.has(s.plan_type)).length || 0;
-      const premiumPaid = subscriptions?.filter(s => s.status === "active" && premiumPlans.has(s.plan_type) && (s.stripe_subscription_id || s.plan_type === "lifetime")).length || 0;
+      // PAID = real Stripe payments only — admin-granted memberships are complimentary.
+      const isPaidSub = (s: any) =>
+        s.subscription_source !== "admin_grant" &&
+        (!!s.stripe_subscription_id || (s.plan_type === "lifetime" && s.subscription_source === "stripe" && !!s.stripe_customer_id));
+      const premiumPaid = subscriptions?.filter(s => s.status === "active" && premiumPlans.has(s.plan_type) && isPaidSub(s)).length || 0;
       
       // Non-premium users = total profiles minus distinct active premium users.
       // (Counting only `user_subscriptions` rows missed all profiles without any
       // subscription row, undercounting free users dramatically.)
       const freeUsers = computeNonPremiumUsers(totalUsers, premiumCounts.distinctPremiumUsers);
 
-      // Calculate revenue from Premium memberships (lifetime €89.99 one-time)
-      const lifetimePaid = subscriptions?.filter(s => s.status === "active" && s.plan_type === "lifetime").length || 0;
+      // Calculate revenue from Premium memberships (lifetime €89.99 one-time).
+      // Only count REAL Stripe-paid lifetimes — admin grants are €0.
+      const lifetimePaid = subscriptions?.filter(s => s.status === "active" && s.plan_type === "lifetime" && isPaidSub(s)).length || 0;
       let totalRevenue = lifetimePaid * SUBSCRIPTION_PRICES.lifetime;
 
       // Fetch purchases for standalone sales
@@ -224,7 +229,7 @@ export function AnalyticsDashboard() {
 
         const premiumCount = subscriptions?.filter(s => {
           const startDate = new Date(s.created_at);
-          return premiumPlans.has(s.plan_type) && startDate <= monthEnd &&
+          return premiumPlans.has(s.plan_type) && isPaidSub(s) && startDate <= monthEnd &&
                  (!s.current_period_end || new Date(s.current_period_end) >= monthStart);
         }).length || 0;
 

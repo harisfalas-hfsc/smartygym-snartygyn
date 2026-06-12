@@ -108,7 +108,7 @@ export function RevenueAnalytics() {
       if (planFilter === "all" || planFilter === "premium") {
         let subQuery = supabase
           .from("user_subscriptions")
-          .select("id, user_id, plan_type, status, created_at, current_period_end, stripe_subscription_id")
+          .select("id, user_id, plan_type, status, created_at, current_period_end, stripe_subscription_id, stripe_customer_id, subscription_source")
           .eq("status", "active")
           .lte("created_at", endDate.toISOString())
           .or(`current_period_end.is.null,current_period_end.gte.${startDate.toISOString()}`);
@@ -131,7 +131,10 @@ export function RevenueAnalytics() {
           });
 
           subscriptions.forEach((sub) => {
-            const isPaid = !!sub.stripe_subscription_id || sub.plan_type === 'lifetime';
+            // Real money only: admin-granted memberships are complimentary (€0).
+            const isPaid = (sub as any).subscription_source !== 'admin_grant' &&
+              (!!sub.stripe_subscription_id ||
+                (sub.plan_type === 'lifetime' && (sub as any).subscription_source === 'stripe' && !!(sub as any).stripe_customer_id));
             const month = new Date(sub.created_at).toLocaleDateString("en-US", {
               year: "numeric",
               month: "short",
