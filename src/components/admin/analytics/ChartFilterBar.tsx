@@ -44,6 +44,7 @@ export function ChartFilterBar({
           <SelectItem value="90">90 Days</SelectItem>
           <SelectItem value="180">6 Months</SelectItem>
           <SelectItem value="365">1 Year</SelectItem>
+          <SelectItem value="all">All Time</SelectItem>
           <SelectItem value="custom">Custom</SelectItem>
         </SelectContent>
       </Select>

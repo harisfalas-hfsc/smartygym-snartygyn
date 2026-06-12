@@ -52,7 +52,10 @@ serve(async (req) => {
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY not configured");
 
-    const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
+    // Pin to a pre-Basil API version: newer versions removed `charge.invoice`
+    // and `invoice.lines[].price.product`, which made every subscription
+    // charge unattributable (revenue showed 0).
+    const stripe = new Stripe(stripeKey, { apiVersion: "2024-06-20" as any });
     logStep("Stripe initialized");
 
     // ============================================================
