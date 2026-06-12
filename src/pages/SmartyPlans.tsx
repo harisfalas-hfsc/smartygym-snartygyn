@@ -155,13 +155,10 @@ export default function SmartyPlans() {
 
   const LifetimeCard = (
     <Card className="relative overflow-hidden border-2 border-[#D4AF37] shadow-lg flex flex-col h-full bg-gradient-to-br from-[#D4AF37]/5 to-[#F5D87A]/10 max-w-xl mx-auto w-full">
-      <Badge className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-green-600 text-white px-2 sm:px-3 py-1 z-10">
-        BEST VALUE
-      </Badge>
       <CardHeader className="text-center pb-2 sm:pb-4 pt-4 sm:pt-6">
         <div className="flex items-center justify-center gap-2 mb-2">
           <Crown className="h-6 w-6 sm:h-7 sm:w-7 text-[#D4AF37]" />
-          <h2 className="text-2xl sm:text-3xl font-bold text-[#D4AF37]">Lifetime Membership</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-[#D4AF37]">Premium Membership</h2>
         </div>
         <Badge className="bg-[#D4AF37] text-white mx-auto mb-3 sm:mb-4">ONE-TIME PAYMENT</Badge>
         <CardTitle className="text-3xl sm:text-4xl font-bold">€{lifetimePrice.toFixed(2)}</CardTitle>
@@ -173,10 +170,10 @@ export default function SmartyPlans() {
       <CardContent className="space-y-2 sm:space-y-4 flex-1 flex flex-col">
         <div className="space-y-1.5 sm:space-y-2 flex-1">
           {[
-            "Lifetime access to all Smarty Workouts",
-            "Lifetime access to all Smarty Programs",
-            "Lifetime access to Smarty Ritual",
-            "Lifetime access to Smarty Tools",
+            "Premium access to all Smarty Workouts",
+            "Premium access to all Smarty Programs",
+            "Premium access to Smarty Ritual",
+            "Premium access to Smarty Tools",
             "Smarty Check-ins included",
             "All future content included — no extra cost",
             "No subscriptions. No renewals. Ever.",
@@ -198,10 +195,10 @@ export default function SmartyPlans() {
               onClick={handleSubscribe}
               disabled={loading}
             >
-              {loading ? "Processing..." : "Get Lifetime Access"}
+              {loading ? "Processing..." : "Get Premium Access"}
             </Button>
           )}
-          <p className="text-xs text-center text-muted-foreground">One single payment. Lifetime access.</p>
+          <p className="text-xs text-center text-muted-foreground">One single payment. Premium for life.</p>
         </div>
       </CardContent>
     </Card>
@@ -281,9 +278,11 @@ export default function SmartyPlans() {
           {/* Header */}
           <div className="text-center mb-8">
             <Crown className="h-16 w-16 text-primary mx-auto mb-4" />
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight uppercase mb-4">
-              <span className="block">Transform your fitness journey.</span>
-              <span className="block">Lifetime Membership</span>
+            <h1 className="font-extrabold tracking-tight uppercase mb-4">
+              <span className="block text-3xl sm:text-4xl">Transform your fitness journey.</span>
+              <span className="block text-base sm:text-lg font-semibold mt-2 text-muted-foreground normal-case tracking-normal">
+                Unlock everything for life
+              </span>
             </h1>
             <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 max-w-2xl mx-auto">
               <p className="text-sm text-muted-foreground">
