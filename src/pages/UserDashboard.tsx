@@ -552,7 +552,7 @@ export default function UserDashboard() {
         });
         return;
       }
-      const isSubscribed = dbData?.status === 'active' && (dbData.plan_type === 'gold' || dbData.plan_type === 'platinum');
+      const isSubscribed = dbData?.status === 'active' && ['gold', 'platinum', 'premium', 'lifetime'].includes(dbData.plan_type);
       setSubscriptionInfo({
         subscribed: isSubscribed,
         product_id: dbData?.plan_type || null,
