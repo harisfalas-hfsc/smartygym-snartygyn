@@ -171,8 +171,8 @@ export function StripeRevenueTruth() {
   return (
     <div className="space-y-6">
       <Card>
-        <CardHeader className="flex flex-row items-start justify-between gap-4">
-          <div>
+        <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
             <CardTitle className="flex items-center gap-2">
               <Receipt className="h-5 w-5" /> Stripe Revenue — Source of Truth
             </CardTitle>
@@ -181,7 +181,7 @@ export function StripeRevenueTruth() {
               Numbers below = sum of these exact payments.
             </CardDescription>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2 shrink-0">
             <Button size="sm" variant="outline" onClick={load} disabled={loading}>
               <RefreshCw className={`h-4 w-4 mr-1 ${loading ? "animate-spin" : ""}`} /> Refresh
             </Button>
@@ -282,7 +282,18 @@ export function StripeRevenueTruth() {
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                     <XAxis dataKey="month" tick={{ fontSize: 11 }} />
                     <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `€${v}`} />
-                    <Tooltip formatter={(v: any) => `€${Number(v).toFixed(2)}`} />
+                    <Tooltip
+                      formatter={(v: any) => `€${Number(v).toFixed(2)}`}
+                      contentStyle={{
+                        background: "hsl(var(--popover))",
+                        border: "1px solid hsl(var(--border))",
+                        color: "hsl(var(--popover-foreground))",
+                        borderRadius: 8,
+                        fontSize: 12,
+                      }}
+                      labelStyle={{ color: "hsl(var(--popover-foreground))" }}
+                      itemStyle={{ color: "hsl(var(--popover-foreground))" }}
+                    />
                     <Legend wrapperStyle={{ fontSize: 11 }} />
                     {(Object.keys(CATEGORY_COLORS) as Category[]).map(cat => (
                       <Bar key={cat} dataKey={cat} stackId="r" fill={CATEGORY_COLORS[cat]} />
@@ -308,7 +319,7 @@ export function StripeRevenueTruth() {
                       Best sellers — {cat}
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="overflow-x-auto">
                     <Table>
                       <TableHeader>
                         <TableRow>
@@ -334,16 +345,16 @@ export function StripeRevenueTruth() {
 
           {/* Every single payment */}
           <Card>
-            <CardHeader className="pb-2 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-              <div>
+            <CardHeader className="pb-2 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div className="min-w-0">
                 <CardTitle className="text-sm">Every Payment (drill‑down)</CardTitle>
                 <CardDescription className="text-xs">
                   Click‑level transparency: each row is one Stripe charge that adds to the total above.
                 </CardDescription>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2 shrink-0">
                 <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                  <SelectTrigger className="w-[220px] h-9 text-sm">
+                  <SelectTrigger className="w-full sm:w-[220px] h-9 text-sm">
                     <SelectValue placeholder="All categories" />
                   </SelectTrigger>
                   <SelectContent>
@@ -357,7 +368,7 @@ export function StripeRevenueTruth() {
                   value={search}
                   onChange={e => setSearch(e.target.value)}
                   placeholder="Search email, product, charge id…"
-                  className="h-9 w-[260px]"
+                  className="h-9 w-full sm:w-[260px]"
                 />
               </div>
             </CardHeader>
