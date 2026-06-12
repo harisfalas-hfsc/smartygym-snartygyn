@@ -653,6 +653,7 @@ export function UsersManager() {
                 <SelectItem value="all">All Plans</SelectItem>
                 <SelectItem value="free">Free</SelectItem>
                 <SelectItem value="premium">Premium</SelectItem>
+                <SelectItem value="purchase">Standalone Purchase</SelectItem>
                 <SelectItem value="corporate">Corporate</SelectItem>
               </SelectContent>
             </Select>
