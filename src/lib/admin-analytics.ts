@@ -107,6 +107,7 @@ export interface SubscriptionRow {
   plan_type: string | null;
   status: string | null;
   stripe_subscription_id?: string | null;
+  subscription_source?: string | null;
 }
 
 export interface PremiumCounts {
@@ -128,14 +129,15 @@ export function computePremiumCounts(subs: SubscriptionRow[] | null | undefined)
     s.status === "active" && !!s.plan_type && PREMIUM_PLANS.has(s.plan_type);
 
   const active = list.filter(isActivePremium);
-  // Lifetime/Premium are one-time payments with no recurring stripe_subscription_id —
-  // still count them as PAID (revenue collected), not complimentary.
-  const paid = active.filter(
-    (s) => !!s.stripe_subscription_id || s.plan_type === "lifetime" || s.plan_type === "premium",
-  );
-  const manual = active.filter(
-    (s) => !s.stripe_subscription_id && s.plan_type !== "lifetime" && s.plan_type !== "premium",
-  );
+  // PAID = real Stripe money only. Admin-granted memberships (subscription_source
+  // = 'admin_grant') are complimentary, even if plan_type is 'lifetime'.
+  const isPaidSub = (s: SubscriptionRow) =>
+    s.subscription_source !== "admin_grant" &&
+    (!!s.stripe_subscription_id ||
+      ((s.plan_type === "lifetime" || s.plan_type === "premium") &&
+        s.subscription_source === "stripe" && !!(s as any).stripe_customer_id));
+  const paid = active.filter(isPaidSub);
+  const manual = active.filter((s) => !isPaidSub(s));
   const distinctUsers = new Set(active.map((s) => s.user_id).filter(Boolean));
 
   return {

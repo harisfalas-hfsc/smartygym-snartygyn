@@ -83,7 +83,7 @@ export function BusinessReportExport({ dashboardRef }: BusinessReportExportProps
     // Fetch subscriptions
     const { data: subscriptions } = await supabase
       .from("user_subscriptions")
-      .select("plan_type, status, stripe_subscription_id");
+      .select("plan_type, status, stripe_subscription_id, stripe_customer_id, subscription_source");
 
     // Use the same premium-counting rules as the dashboard
     const premium = computePremiumCounts(subscriptions as any);
