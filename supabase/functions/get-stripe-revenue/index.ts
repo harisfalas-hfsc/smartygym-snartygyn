@@ -20,7 +20,6 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    // Verify admin authentication
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
@@ -33,12 +32,11 @@ serve(async (req) => {
     const token = authHeader.replace("Bearer ", "");
     const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
     if (userError) throw new Error(`Authentication error: ${userError.message}`);
-    
+
     const user = userData.user;
     if (!user) throw new Error("User not authenticated");
     logStep("User authenticated", { userId: user.id });
 
-    // Check if user is admin
     const { data: roleData, error: roleError } = await supabaseClient
       .from('user_roles')
       .select('role')
@@ -51,114 +49,140 @@ serve(async (req) => {
     }
     logStep("Admin verified");
 
-    // Initialize Stripe
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY not configured");
-    
+
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
     logStep("Stripe initialized");
 
-    // Fetch all active subscriptions (with pagination)
-    let allSubscriptions: any[] = [];
+    // ============================================================
+    // ACTUAL COLLECTED REVENUE: sum every successful Stripe CHARGE
+    // (net of refunds), including payments from since-canceled
+    // subscriptions. This is real money, not an estimate.
+    // ============================================================
+
+    const allCharges: any[] = [];
     let hasMore = true;
     let startingAfter: string | undefined = undefined;
-
     while (hasMore) {
-      const params: any = { status: "active", limit: 100 };
-      if (startingAfter) {
-        params.starting_after = startingAfter;
-      }
-      
-      const subscriptions = await stripe.subscriptions.list(params);
-      allSubscriptions = allSubscriptions.concat(subscriptions.data);
-      hasMore = subscriptions.has_more;
-      
-      if (subscriptions.data.length > 0) {
-        startingAfter = subscriptions.data[subscriptions.data.length - 1].id;
-      }
+      const params: any = { limit: 100 };
+      if (startingAfter) params.starting_after = startingAfter;
+      const page = await stripe.charges.list(params);
+      allCharges.push(...page.data);
+      hasMore = page.has_more;
+      if (page.data.length > 0) startingAfter = page.data[page.data.length - 1].id;
     }
+    logStep("Fetched charges", { count: allCharges.length });
 
-    logStep("Fetched all subscriptions", { count: allSubscriptions.length });
-
-    // Calculate total monthly recurring revenue - ONLY for SMARTYGYM products
-    let totalRevenue = 0;
-    const revenueByPlan: { [key: string]: number } = {};
-    const subscriptionDetails: any[] = [];
-    let skippedNonSmartyGym = 0;
-
-    for (const subscription of allSubscriptions) {
-      // Get the product ID to check metadata
-      const productId = subscription.items.data[0].price.product as string;
-      
-      // Fetch the product to check its metadata
-      let product;
+    const productCache = new Map<string, any>();
+    const getProduct = async (productId: string) => {
+      if (productCache.has(productId)) return productCache.get(productId);
       try {
-        product = await stripe.products.retrieve(productId);
-      } catch (error) {
-        logStep("Failed to fetch product, skipping", { productId });
+        const p = await stripe.products.retrieve(productId);
+        productCache.set(productId, p);
+        return p;
+      } catch {
+        productCache.set(productId, null);
+        return null;
+      }
+    };
+
+    const isSmartyGymProduct = (product: any) =>
+      !!product &&
+      (product.metadata?.project === "SMARTYGYM" || /smarty/i.test(product.name || ""));
+
+    const invoiceCache = new Map<string, string | null>();
+    const resolveProductId = async (charge: any): Promise<string | null> => {
+      const invoiceId = typeof charge.invoice === "string" ? charge.invoice : charge.invoice?.id;
+      if (invoiceId) {
+        if (invoiceCache.has(invoiceId)) return invoiceCache.get(invoiceId)!;
+        try {
+          const invoice: any = await stripe.invoices.retrieve(invoiceId);
+          const line: any = invoice.lines?.data?.[0];
+          const productId: string | null =
+            (typeof line?.price?.product === "string" ? line.price.product : null) ??
+            (typeof line?.pricing?.price_details?.product === "string" ? line.pricing.price_details.product : null) ??
+            (typeof line?.plan?.product === "string" ? line.plan.product : null);
+          invoiceCache.set(invoiceId, productId);
+          return productId;
+        } catch {
+          invoiceCache.set(invoiceId, null);
+          return null;
+        }
+      }
+      const metaProduct = charge.metadata?.product_id || charge.metadata?.stripe_product_id;
+      return typeof metaProduct === "string" ? metaProduct : null;
+    };
+
+    let totalCollected = 0;
+    let totalRefunded = 0;
+    const byMonth: { [month: string]: number } = {};
+    const payments: any[] = [];
+    let skippedNonSmartyGym = 0;
+    let unattributed = 0;
+    let unattributedAmount = 0;
+
+    for (const charge of allCharges) {
+      if (charge.status !== "succeeded" || !charge.paid) continue;
+      const gross = (charge.amount_captured ?? charge.amount) / 100;
+      const refunded = (charge.amount_refunded ?? 0) / 100;
+      const net = gross - refunded;
+      if (net <= 0) continue;
+
+      const productId = await resolveProductId(charge);
+      const product = productId ? await getProduct(productId) : null;
+
+      if (productId && product && !isSmartyGymProduct(product)) {
         skippedNonSmartyGym++;
         continue;
       }
-      
-      // FILTER: Only include SMARTYGYM products
-      if (product.metadata?.project !== "SMARTYGYM") {
-        logStep("Skipping non-SMARTYGYM product", { 
-          productId, 
-          productName: product.name,
-          projectTag: product.metadata?.project || "none"
-        });
-        skippedNonSmartyGym++;
-        continue;
+      if (!productId) {
+        if (charge.metadata?.project && charge.metadata.project !== "SMARTYGYM") {
+          skippedNonSmartyGym++;
+          continue;
+        }
+        unattributed++;
+        unattributedAmount += net;
       }
 
-      // Get the price amount (in cents) and convert to dollars/euros
-      const amount = subscription.items.data[0].price.unit_amount || 0;
-      const currency = subscription.items.data[0].price.currency;
-      const amountInCurrency = amount / 100;
-      
-      totalRevenue += amountInCurrency;
+      totalCollected += net;
+      totalRefunded += refunded;
 
-      // Get product name for grouping
-      const priceId = subscription.items.data[0].price.id;
-      
-      if (!revenueByPlan[productId]) {
-        revenueByPlan[productId] = 0;
-      }
-      revenueByPlan[productId] += amountInCurrency;
+      const month = new Date(charge.created * 1000).toISOString().slice(0, 7);
+      byMonth[month] = (byMonth[month] || 0) + net;
 
-      // Safely handle current_period_end which may be undefined
-      const periodEnd = subscription.current_period_end 
-        ? new Date(subscription.current_period_end * 1000).toISOString()
-        : null;
-
-      subscriptionDetails.push({
-        id: subscription.id,
-        customer: subscription.customer,
-        amount: amountInCurrency,
-        currency: currency.toUpperCase(),
-        priceId,
-        productId,
-        productName: product.name,
-        status: subscription.status,
-        currentPeriodEnd: periodEnd,
+      payments.push({
+        id: charge.id,
+        amount: net,
+        gross,
+        refunded,
+        currency: (charge.currency || "eur").toUpperCase(),
+        date: new Date(charge.created * 1000).toISOString(),
+        customer: typeof charge.customer === "string" ? charge.customer : charge.customer?.id ?? null,
+        email: charge.billing_details?.email ?? charge.receipt_email ?? null,
+        description: charge.description ?? null,
+        productName: product?.name ?? null,
+        recurring: !!charge.invoice,
       });
     }
 
-    logStep("Revenue calculated (SMARTYGYM only)", { 
-      totalRevenue, 
-      smartyGymSubscriptions: subscriptionDetails.length,
+    logStep("Collected revenue calculated", {
+      totalCollected,
+      payments: payments.length,
       skippedNonSmartyGym,
-      totalSubscriptions: allSubscriptions.length
+      unattributed,
     });
 
     return new Response(
       JSON.stringify({
-        totalRevenue,
-        subscriptionCount: subscriptionDetails.length,
+        totalCollected: Math.round(totalCollected * 100) / 100,
+        totalRefunded: Math.round(totalRefunded * 100) / 100,
+        paymentCount: payments.length,
+        byMonth,
+        payments,
         skippedNonSmartyGym,
-        totalSubscriptionsChecked: allSubscriptions.length,
-        revenueByPlan,
-        subscriptions: subscriptionDetails,
+        unattributed,
+        unattributedAmount: Math.round(unattributedAmount * 100) / 100,
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -169,7 +193,7 @@ serve(async (req) => {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logStep("ERROR", { message: errorMessage });
-    
+
     return new Response(
       JSON.stringify({ error: errorMessage }),
       {
