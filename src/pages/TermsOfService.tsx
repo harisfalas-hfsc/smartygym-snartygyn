@@ -176,14 +176,14 @@ const TermsOfService = () => {
               <div className="flex items-start gap-3">
                 <CreditCard className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
                 <div>
-                  <h2 className="text-2xl font-bold mb-3">5. Subscription & Payments</h2>
+                  <h2 className="text-2xl font-bold mb-3">5. Membership & Payments</h2>
                   <ul className="space-y-2 text-muted-foreground">
-                    <li>Smarty Gym operates on a subscription model (Gold or Platinum plans, monthly or yearly).</li>
+                    <li>Smarty Gym offers a single <strong>Premium Membership</strong> — a one-time payment that unlocks all premium content for life.</li>
+                    <li>There are no recurring charges, no monthly or yearly subscriptions, and no automatic renewals.</li>
                     <li>Payments are processed securely via <strong>Stripe</strong>, a PCI DSS compliant payment processor.</li>
                     <li>All fees are stated in Euros (€) and include VAT where applicable.</li>
-                    <li>Subscriptions automatically renew unless cancelled prior to the renewal date.</li>
-                    <li>Some content and programs may be available for standalone purchase.</li>
-                    <li>Corporate/team subscriptions are available with custom pricing.</li>
+                    <li>Individual workouts and programs may also be available as standalone purchases.</li>
+                    <li>Corporate/team memberships are available with custom pricing.</li>
                   </ul>
                 </div>
               </div>
@@ -191,13 +191,12 @@ const TermsOfService = () => {
               <div className="flex items-start gap-3">
                 <CreditCard className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
                 <div>
-                  <h2 className="text-2xl font-bold mb-3">6. Cancellation & Refunds</h2>
+                  <h2 className="text-2xl font-bold mb-3">6. Refunds & Withdrawal</h2>
                   <ul className="space-y-2 text-muted-foreground">
-                    <li>You may cancel your subscription anytime via your account settings (Dashboard → Subscription).</li>
-                    <li>Upon cancellation, you retain access until the end of your current billing period.</li>
-                    <li>No refunds will be provided for partial subscription periods.</li>
+                    <li>The Premium Membership is a one-time purchase. There is nothing to cancel and no recurring billing.</li>
                     <li>If required by applicable consumer protection laws (EU Directive 2011/83/EU), you may have a <strong>14-day right of withdrawal</strong> for digital services that have not yet started.</li>
                     <li>By starting to use premium content immediately after purchase, you acknowledge that you waive your withdrawal right.</li>
+                    <li>No refunds will be provided once premium content has been accessed.</li>
                   </ul>
                 </div>
               </div>
@@ -336,7 +335,7 @@ const TermsOfService = () => {
                       <strong>What may be retained:</strong> Anonymized analytics data, transaction records (required by law for 7 years), and data required for legal compliance.
                     </li>
                     <li>
-                      <strong>Active subscriptions:</strong> Deleting your account does not automatically cancel active subscriptions. Please cancel your subscription first.
+                      <strong>Premium Membership:</strong> Deleting your account permanently removes your access to premium content. The Premium Membership is a one-time purchase and is non-refundable once content has been accessed.
                     </li>
                     <li>
                       <strong>Irreversible:</strong> Account deletion is permanent and cannot be undone. You will need to create a new account to use our services again.

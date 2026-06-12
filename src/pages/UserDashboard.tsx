@@ -136,8 +136,6 @@ export default function UserDashboard() {
   } = useToast();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [managingSubscription, setManagingSubscription] = useState(false);
-  const [openingPortal, setOpeningPortal] = useState(false);
   const [workoutInteractions, setWorkoutInteractions] = useState<WorkoutInteraction[]>([]);
   const [programInteractions, setProgramInteractions] = useState<ProgramInteraction[]>([]);
   const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo | null>(null);
@@ -628,92 +626,6 @@ export default function UserDashboard() {
     is_completed: p.is_completed,
     is_favorite: p.is_favorite,
   });
-  const handleManageSubscription = async () => {
-    if (!user) {
-      if (import.meta.env.DEV) {
-        console.error("No user found when trying to manage subscription");
-      }
-      toast({
-        title: "Error",
-        description: "Please log in to manage your subscription.",
-        variant: "destructive"
-      });
-      return;
-    }
-    if (import.meta.env.DEV) {
-      console.log("Opening customer portal for user:", user.id);
-    }
-    setOpeningPortal(true);
-    try {
-      const {
-        data: {
-          session
-        }
-      } = await supabase.auth.getSession();
-      if (!session) {
-        throw new Error("No active session found");
-      }
-      if (import.meta.env.DEV) {
-        console.log("Invoking customer-portal function...");
-      }
-      const {
-        data,
-        error
-      } = await supabase.functions.invoke('customer-portal', {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`
-        }
-      });
-      if (import.meta.env.DEV) {
-        console.log("Customer portal response:", {
-          data,
-          error
-        });
-      }
-      if (error) {
-        if (import.meta.env.DEV) {
-          console.error("Customer portal error:", error);
-        }
-        throw error;
-      }
-      if (data?.url) {
-        if (import.meta.env.DEV) {
-          console.log("Opening portal URL:", data.url);
-        }
-        window.location.href = data.url;
-        return;
-      } else if (data?.portalNotConfigured) {
-        toast({
-          title: "Portal Setup Required",
-          description: "The subscription management portal is being set up. Please contact support for subscription changes.",
-          variant: "destructive"
-        });
-      } else {
-        throw new Error("No portal URL returned");
-      }
-    } catch (error) {
-      if (import.meta.env.DEV) {
-        console.error('Error opening customer portal:', error);
-      }
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      const isConfigError = errorMessage.includes("No configuration") || errorMessage.includes("default configuration");
-      if (isConfigError) {
-        toast({
-          title: "Portal Setup Required",
-          description: "The subscription management portal is being configured. Please contact support for subscription changes.",
-          variant: "destructive"
-        });
-      } else {
-        toast({
-          title: "Error",
-          description: `Failed to open subscription management: ${errorMessage}`,
-          variant: "destructive"
-        });
-      }
-    } finally {
-      setOpeningPortal(false);
-    }
-  };
   const handleRefreshSubscription = async () => {
     if (!user) return;
     setLoading(true);
@@ -990,12 +902,6 @@ export default function UserDashboard() {
                         {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <>
                             <RefreshCw className="h-3 w-3 mr-1" />
                             Refresh
-                          </>}
-                      </Button>
-                      <Button onClick={handleManageSubscription} disabled={openingPortal} className="h-7 px-2 text-xs">
-                        {openingPortal ? <Loader2 className="h-3 w-3 animate-spin" /> : <>
-                            <ExternalLink className="h-3 w-3 mr-1" />
-                            Manage
                           </>}
                       </Button>
                     </div>
