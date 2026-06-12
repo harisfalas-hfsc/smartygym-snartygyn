@@ -225,7 +225,8 @@ const AppContent = () => {
                 <Routes location={routeLocation}>
                   <Route path="/" element={<Index />} />
                   <Route path="/start" element={<LandingRouter />} />
-                  <Route path="/home" element={<Index />} />
+                  <Route path="/home" element={<Navigate to="/" replace />} />
+                  <Route path="/home.html" element={<Navigate to="/" replace />} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/joinpremium" element={<Navigate to="/smarty-premium" replace />} />
