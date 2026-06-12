@@ -552,7 +552,7 @@ export default function UserDashboard() {
         });
         return;
       }
-      const isSubscribed = dbData?.status === 'active' && (dbData.plan_type === 'gold' || dbData.plan_type === 'platinum');
+      const isSubscribed = dbData?.status === 'active' && ['gold', 'platinum', 'premium', 'lifetime'].includes(dbData.plan_type);
       setSubscriptionInfo({
         subscribed: isSubscribed,
         product_id: dbData?.plan_type || null,
@@ -573,10 +573,7 @@ export default function UserDashboard() {
   };
   const getPlanName = (productId: string | null) => {
     if (!productId) return "Free";
-    // Use plan_type from database (gold, platinum, free)
     const planType = productId.toLowerCase();
-    if (planType === "gold") return "Gold";
-    if (planType === "platinum") return "Platinum";
     if (planType === "free") return "Free";
     return "Premium";
   };
@@ -859,42 +856,18 @@ export default function UserDashboard() {
                         <Badge variant="outline" className="text-xs h-5 px-1.5 bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20">
                           Active
                         </Badge>
-                        {stripeDetails?.cancel_at_period_end && <Badge variant="outline" className="text-xs h-5 px-1.5 bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20">
-                            Cancels at period end
-                          </Badge>}
                       </div>
                     </div>
 
                     {/* Subscription Details */}
-                    {subscriptionInfo.subscription_end ? (
-                      <div className="space-y-1 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">
-                            {stripeDetails?.cancel_at_period_end ? "Expires:" : "Next Billing:"}
-                          </span>
-                          <span className="font-medium">{formatDate(subscriptionInfo.subscription_end)}</span>
-                        </div>
-                        {getDaysRemaining() !== null && <div className="flex justify-between">
-                            <span className="text-muted-foreground">Days Left:</span>
-                            <span className="font-medium text-primary">{getDaysRemaining()} days</span>
-                          </div>}
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Billing:</span>
-                          <span className="font-medium">
-                            {stripeDetails?.cancel_at_period_end ? "One-time" : "Auto-renewing"}
-                          </span>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="space-y-2 text-sm">
-                        <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300">
-                          Lifetime Access
-                        </Badge>
-                        <p className="text-xs text-muted-foreground">
-                          Your membership has no expiration date
-                        </p>
-                      </div>
-                    )}
+                    <div className="space-y-2 text-sm">
+                      <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300">
+                        Lifetime Access
+                      </Badge>
+                      <p className="text-xs text-muted-foreground">
+                        Your membership has no expiration date
+                      </p>
+                    </div>
 
                     {/* Action Buttons */}
                     <div className="flex gap-2 pt-1">
