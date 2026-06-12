@@ -137,12 +137,20 @@ serve(async (req) => {
         continue;
       }
       if (!productId) {
-        if (charge.metadata?.project && charge.metadata.project !== "SMARTYGYM") {
+        // STRICT MODE: a charge with no resolvable SmartyGym product is only
+        // counted if it explicitly declares SMARTYGYM metadata or mentions
+        // Smarty in its description. Everything else (e.g. other businesses
+        // sharing this Stripe account, like HFSC) is EXCLUDED.
+        const isExplicitSmartyGym =
+          charge.metadata?.project === "SMARTYGYM" ||
+          /smarty/i.test(charge.description || "") ||
+          /smarty/i.test(charge.statement_descriptor || "");
+        if (!isExplicitSmartyGym) {
           skippedNonSmartyGym++;
+          unattributed++;
+          unattributedAmount += net;
           continue;
         }
-        unattributed++;
-        unattributedAmount += net;
       }
 
       totalCollected += net;

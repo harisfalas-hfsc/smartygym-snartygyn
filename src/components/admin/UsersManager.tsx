@@ -322,6 +322,11 @@ export function UsersManager() {
     if (planFilter !== "all") {
       if (planFilter === "corporate") {
         filtered = filtered.filter(user => corporateInfo[user.user_id]?.adminPlanType || corporateInfo[user.user_id]?.memberPlanType);
+      } else if (planFilter === "premium") {
+        // Granted premium rows use legacy plan types (lifetime/gold/platinum)
+        filtered = filtered.filter(user => user.status === 'active' && PREMIUM_PLAN_TYPES.has(user.plan_type));
+      } else if (planFilter === "free") {
+        filtered = filtered.filter(user => !(user.status === 'active' && PREMIUM_PLAN_TYPES.has(user.plan_type)) && !(corporateInfo[user.user_id]?.adminPlanType || corporateInfo[user.user_id]?.memberPlanType));
       } else {
         filtered = filtered.filter(user => user.plan_type === planFilter);
       }
@@ -538,7 +543,7 @@ export function UsersManager() {
             </AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to make "{pendingCorpAction?.userName}" a Corporate Administrator for the{' '}
-              {pendingCorpAction?.planType?.toUpperCase()} plan? They will receive Platinum access and can manage up to{' '}
+              {pendingCorpAction?.planType?.toUpperCase()} plan? They will receive Premium access and can manage up to{' '}
               {pendingCorpAction?.planType === 'dynamic' ? '10' : 
                pendingCorpAction?.planType === 'power' ? '20' : 
                pendingCorpAction?.planType === 'elite' ? '30' : 'unlimited'} team members.
@@ -588,7 +593,7 @@ export function UsersManager() {
               <strong>Organization:</strong> {pendingMemberRevoke?.organizationName}<br />
               <strong>Plan:</strong> {pendingMemberRevoke?.planType?.toUpperCase()}
               <br /><br />
-              This will remove their Platinum access and set their subscription to FREE.
+              This will remove their Premium access and set their subscription to FREE.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
