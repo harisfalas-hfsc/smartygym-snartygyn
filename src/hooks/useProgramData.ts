@@ -43,10 +43,9 @@ export const useProgramData = (programId: string | undefined) => {
 export const useAllPrograms = () => {
   return useQuery({
     queryKey: ["all-programs"],
-    staleTime: 0,
-    gcTime: 0,
-    refetchOnMount: "always",
-    refetchOnWindowFocus: true,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    refetchOnWindowFocus: false,
     queryFn: async () => {
       if (import.meta.env.DEV) {
         console.log("🔍 Fetching ALL programs...");
