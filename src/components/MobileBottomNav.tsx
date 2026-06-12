@@ -89,7 +89,6 @@ export const MobileBottomNav = () => {
     { label: "Community", path: "/community", icon: Users, iconClass: "text-cyan-500" },
     { label: "Blog", path: "/blog", icon: Newspaper, iconClass: "text-red-500" },
     { label: "Smarty Plans", path: "/smarty-plans", icon: Crown, iconClass: "text-yellow-500" },
-    { label: "Smarty Corporate", path: "/corporate", icon: Building2, iconClass: "text-sky-500" },
     { label: "FAQ", path: "/faq", icon: HelpCircle, iconClass: "text-purple-500" },
     { label: "Contact", path: "/contact", icon: Mail, iconClass: "text-indigo-500" },
   ];

@@ -293,7 +293,6 @@ export const Navigation = () => {
     { label: "Community", path: "/community", icon: Users, iconClass: "text-cyan-500", track: undefined },
     { label: "Blog", path: "/blog", icon: Newspaper, iconClass: "text-red-500", track: undefined },
     { label: "Smarty Plans", path: "/smarty-plans", icon: Crown, iconClass: "text-yellow-500", track: "view-plans-nav" },
-    { label: "Smarty Corporate", path: "/corporate", icon: Building2, iconClass: "text-sky-500", track: undefined },
     { label: "FAQ", path: "/faq", icon: HelpCircle, iconClass: "text-purple-500", track: undefined },
     { label: "Contact", path: "/contact", icon: Mail, iconClass: "text-indigo-500", track: undefined },
   ];
