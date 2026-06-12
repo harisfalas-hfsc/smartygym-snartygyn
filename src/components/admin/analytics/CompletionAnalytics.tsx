@@ -258,9 +258,9 @@ export function CompletionAnalytics() {
                     type="monotone" 
                     dataKey="workoutRate" 
                     name="Workout Completion" 
-                    stroke="#3B82F6" 
+                    stroke="#22C55E" 
                     strokeWidth={2} 
-                    dot={{ r: 4, fill: "#3B82F6" }} 
+                    dot={{ r: 4, fill: "#22C55E" }}
                   />
                   <Line 
                     type="monotone" 
@@ -338,7 +338,7 @@ export function CompletionAnalytics() {
               <YAxis tick={{ fontSize: 11 }} />
               <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
               <Legend />
-              <Bar dataKey="workoutCount" name="Workouts Completed" fill="#3B82F6" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="workoutCount" name="Workouts Completed" fill="#22C55E" radius={[4, 4, 0, 0]} />
               <Bar dataKey="programCount" name="Programs Completed" fill="#10B981" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
