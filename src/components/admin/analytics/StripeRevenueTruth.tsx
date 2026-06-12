@@ -26,30 +26,25 @@ interface Payment {
   recurring: boolean;
 }
 
-type Category = "Premium Plan" | "Standalone Workout" | "Standalone Training Program" | "Daily Ritual" | "Shop / Other";
+type Category = "Premium Plan" | "Standalone Workout" | "Standalone Training Program";
 
 const CATEGORY_COLORS: Record<Category, string> = {
   "Premium Plan": "hsl(var(--primary))",
   "Standalone Workout": "hsl(var(--chart-2))",
   "Standalone Training Program": "hsl(var(--chart-3))",
-  "Daily Ritual": "hsl(var(--chart-4))",
-  "Shop / Other": "hsl(var(--chart-5))",
 };
 
 function categorize(p: Payment): Category {
   const ct = (p.contentType || "").toLowerCase();
   const name = (p.productName || "").toLowerCase();
-  if (p.recurring || ct === "subscription" || /plan|membership|premium|gold|platinum|lifetime/.test(name)) {
-    return "Premium Plan";
-  }
   if (ct.includes("training program") || ct === "program" || /training program/.test(name)) {
     return "Standalone Training Program";
   }
-  if (ct === "workout" || ct === "micro-workout" || /workout/.test(name)) {
+  if (ct === "workout" || ct === "micro-workout" || /\bworkout\b/.test(name)) {
     return "Standalone Workout";
   }
-  if (ct === "ritual" || /ritual/.test(name)) return "Daily Ritual";
-  return "Shop / Other";
+  // Everything else (recurring subscriptions, lifetime, gold, platinum, premium) = Premium Plan
+  return "Premium Plan";
 }
 
 export function StripeRevenueTruth() {
@@ -115,8 +110,6 @@ export function StripeRevenueTruth() {
       "Premium Plan": [],
       "Standalone Workout": [],
       "Standalone Training Program": [],
-      "Daily Ritual": [],
-      "Shop / Other": [],
     };
     for (const item of all) grouped[item.category].push(item);
     (Object.keys(grouped) as Category[]).forEach(k =>
