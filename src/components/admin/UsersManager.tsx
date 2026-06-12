@@ -45,8 +45,12 @@ interface SubscriptionAction {
   userId: string;
   userName: string;
   action: 'grant' | 'revoke';
-  planType: 'gold' | 'platinum' | 'free';
+  planType: 'lifetime' | 'free';
 }
+
+// Any active paid/granted plan tier — legacy gold/platinum rows still exist in
+// the DB so we treat them as Premium for display purposes.
+const PREMIUM_PLAN_TYPES = new Set(['lifetime', 'premium', 'gold', 'platinum']);
 
 interface CorporateInfo {
   adminPlanType: string | null;
@@ -96,7 +100,7 @@ export function UsersManager() {
     if (user.stripe_subscription_id && periodEnded && user.status === 'active') return 'Needs Sync';
     
     // Active subscription
-    if (user.status === 'active' && (user.plan_type === 'gold' || user.plan_type === 'platinum')) {
+    if (user.status === 'active' && PREMIUM_PLAN_TYPES.has(user.plan_type)) {
       if (user.stripe_status === 'trialing') return 'Trial';
       return 'Paying';
     }
@@ -398,10 +402,11 @@ export function UsersManager() {
           return aDate - bDate;
         });
         break;
-      case 'plan_tier':
-        const tierOrder: Record<string, number> = { platinum: 0, gold: 1, free: 2 };
+      case 'plan_tier': {
+        const tierOrder: Record<string, number> = { lifetime: 0, premium: 0, platinum: 0, gold: 0, free: 2 };
         sorted.sort((a, b) => (tierOrder[a.plan_type] ?? 3) - (tierOrder[b.plan_type] ?? 3));
         break;
+      }
     }
 
     return sorted;
@@ -412,7 +417,7 @@ export function UsersManager() {
     let trialCount = 0;
     let payingCount = 0;
     users.forEach(u => {
-      if (u.status === 'active' && (u.plan_type === 'gold' || u.plan_type === 'platinum')) {
+      if (u.status === 'active' && PREMIUM_PLAN_TYPES.has(u.plan_type)) {
         if (u.stripe_status === 'trialing') trialCount++;
         else payingCount++;
       }
@@ -421,8 +426,7 @@ export function UsersManager() {
       total: users.length,
       trial: trialCount,
       paying: payingCount,
-      gold: users.filter(u => u.plan_type === 'gold' && u.status === 'active').length,
-      platinum: users.filter(u => u.plan_type === 'platinum' && u.status === 'active').length,
+      premium: users.filter(u => u.status === 'active' && PREMIUM_PLAN_TYPES.has(u.plan_type)).length,
       purchases: userPurchases.length,
       admins: Object.values(userRoles).filter(roles => roles.includes('admin')).length,
     };
@@ -462,21 +466,23 @@ export function UsersManager() {
   };
 
   const getPlanBadgeVariant = (plan: string) => {
-    switch (plan) {
-      case 'platinum': return 'default' as const;
-      case 'gold': return 'secondary' as const;
-      default: return 'outline' as const;
-    }
+    if (PREMIUM_PLAN_TYPES.has(plan)) return 'default' as const;
+    return 'outline' as const;
+  };
+
+  const getPlanLabel = (plan: string) => {
+    if (PREMIUM_PLAN_TYPES.has(plan)) return 'Premium';
+    return plan.charAt(0).toUpperCase() + plan.slice(1);
   };
 
   const isActivePremium = (user: UserData) => {
-    return user.status === 'active' && (user.plan_type === 'gold' || user.plan_type === 'platinum');
+    return user.status === 'active' && PREMIUM_PLAN_TYPES.has(user.plan_type);
   };
 
   const getDialogTitle = () => {
     if (!pendingAction) return '';
     if (pendingAction.action === 'grant') {
-      return `Grant ${pendingAction.planType.charAt(0).toUpperCase() + pendingAction.planType.slice(1)} Membership`;
+      return 'Grant Premium Membership';
     }
     return 'Revoke Premium Access';
   };
