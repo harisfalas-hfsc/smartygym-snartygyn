@@ -74,7 +74,7 @@ export function RevenueAnalytics() {
   const [subscriptionDetails, setSubscriptionDetails] = useState<SubscriptionDetail[]>([]);
   const [purchaseDetails, setPurchaseDetails] = useState<PurchaseDetail[]>([]);
   const [corporateDetails, setCorporateDetails] = useState<CorporateDetail[]>([]);
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState("stripe");
   const chartRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
