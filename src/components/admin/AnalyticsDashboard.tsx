@@ -363,10 +363,8 @@ export function AnalyticsDashboard() {
         activeSubscribers,
         paidSubscribers,
         manualSubscribers,
-        goldSubscribers,
-        goldPaid,
-        platinumSubscribers,
-        platinumPaid,
+        premiumSubscribers,
+        premiumPaid,
         freeUsers,
         totalRevenue,
         avgWorkoutCompletionRate,
@@ -488,15 +486,9 @@ export function AnalyticsDashboard() {
           icon={TrendingUp}
         />
         <AnalyticsMetricCard 
-          title="Gold Members" 
-          value={`${analytics.goldPaid} paid`} 
-          subtitle={`€${SUBSCRIPTION_PRICES.gold}/month • ${analytics.goldSubscribers - analytics.goldPaid} free`}
-          icon={Award}
-        />
-        <AnalyticsMetricCard 
-          title="Platinum Members" 
-          value={`${analytics.platinumPaid} paid`} 
-          subtitle={`€${SUBSCRIPTION_PRICES.platinum}/year • ${analytics.platinumSubscribers - analytics.platinumPaid} free`}
+          title="Premium Members"
+          value={`${analytics.premiumPaid} paid`}
+          subtitle={`€${SUBSCRIPTION_PRICES.lifetime} lifetime • ${Math.max(analytics.premiumSubscribers - analytics.premiumPaid, 0)} comp`}
           icon={Star}
         />
         <AnalyticsMetricCard 
