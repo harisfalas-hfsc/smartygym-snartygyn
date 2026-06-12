@@ -860,35 +860,14 @@ export default function UserDashboard() {
                     </div>
 
                     {/* Subscription Details */}
-                    {subscriptionInfo.subscription_end ? (
-                      <div className="space-y-1 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">
-                            {stripeDetails?.cancel_at_period_end ? "Expires:" : "Next Billing:"}
-                          </span>
-                          <span className="font-medium">{formatDate(subscriptionInfo.subscription_end)}</span>
-                        </div>
-                        {getDaysRemaining() !== null && <div className="flex justify-between">
-                            <span className="text-muted-foreground">Days Left:</span>
-                            <span className="font-medium text-primary">{getDaysRemaining()} days</span>
-                          </div>}
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Billing:</span>
-                          <span className="font-medium">
-                            {stripeDetails?.cancel_at_period_end ? "One-time" : "Auto-renewing"}
-                          </span>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="space-y-2 text-sm">
-                        <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300">
-                          Lifetime Access
-                        </Badge>
-                        <p className="text-xs text-muted-foreground">
-                          Your membership has no expiration date
-                        </p>
-                      </div>
-                    )}
+                    <div className="space-y-2 text-sm">
+                      <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300">
+                        Lifetime Access
+                      </Badge>
+                      <p className="text-xs text-muted-foreground">
+                        Your membership has no expiration date
+                      </p>
+                    </div>
 
                     {/* Action Buttons */}
                     <div className="flex gap-2 pt-1">
