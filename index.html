@@ -32,7 +32,7 @@
           if (p === "/" || /\.html$/i.test(p)) return;
           // Skip private / utility / asset routes — they should never be
           // canonicalized to a ".html" URL.
-          var skip = /^\/(admin|api|auth|reset-password|userdashboard|calculator-history|dashboard|payment-success|newsletter-thank-you|unsubscribe|unsubscribe-help|app-submission|app-submission-printable|process-logo|corporate-admin|assets|workout-images|program-covers|images|videos|audio|app-icons|app-store-screenshots|data|\.well-known|sitemap|robots|favicon|manifest|sw|service-worker|llms|ai)(\/|\.|$)/i;
+          var skip = /^\/(admin|api|auth|reset-password|userdashboard|calculator-history|dashboard|payment-success|newsletter-thank-you|unsubscribe|unsubscribe-help|app-submission|app-submission-printable|process-logo|corporate-admin|assets|workout-images|program-covers|images|videos|audio|app-icons|app-store-screenshots|data|home|\.well-known|sitemap|robots|favicon|manifest|sw|service-worker|llms|ai)(\/|\.|$)/i;
           if (skip.test(p)) return;
           // Skip anything that already looks like a file (extension).
           if (/\.[a-z0-9]{2,5}$/i.test(p)) return;
@@ -593,6 +593,7 @@
       "founder": { "@id": "https://smartygym.com/#organization" },
       "parentOrganization": { "@id": "https://smartygym.com/#organization" },
       "priceRange": "$$",
+      "telephone": "+35796000620",
       "address": {
         "@type": "PostalAddress",
         "addressCountry": "CY"
