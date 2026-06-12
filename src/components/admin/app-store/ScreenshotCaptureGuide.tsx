@@ -16,7 +16,7 @@ export const ScreenshotCaptureGuide = ({ platform }: ScreenshotCaptureGuideProps
     { name: "User Dashboard", path: "/dashboard", description: "User's personal dashboard (requires login)" },
     { name: "Smarty Tools", path: "/smarty-tools", description: "Calculator and tools section" },
     { name: "Community", path: "/community", description: "Community leaderboard and ratings" },
-    { name: "Smarty Plans", path: "/smarty-plans", description: "Pricing and subscription options" },
+    { name: "Smarty Plans", path: "/smarty-premium", description: "Pricing and subscription options" },
   ];
 
   const viewportPresets = platform === 'ios' ? [

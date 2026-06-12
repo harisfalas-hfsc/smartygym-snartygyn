@@ -220,7 +220,7 @@ const CoachProfile = () => {
             {!isPremium && (
               <div className="text-center py-8">
                 <h3 className="text-xl sm:text-2xl font-semibold mb-6">Join me inside <span className="text-primary font-semibold">SmartyGym</span> and start your training today.</h3>
-                <Button size="lg" onClick={() => navigate("/smarty-plans")} className="cta-button">
+                <Button size="lg" onClick={() => navigate("/smarty-premium")} className="cta-button">
                   Start Training
                 </Button>
               </div>

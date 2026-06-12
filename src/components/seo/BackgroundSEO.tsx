@@ -46,7 +46,7 @@ const pages: SeoPage[] = [
     keywords: ["online fitness platform", "online gym", "fitness coaching", "home workout", "gym workout", "SmartyGym"],
     intent: ["Find a trusted online gym", "Start structured fitness training", "Compare online fitness platforms", "Train consistently from home or gym"],
     steps: ["Choose whether your goal is fat loss, strength, mobility, muscle building, cardio, or performance.", "Browse workouts, training programs, tools, and blog education from the homepage.", "Start with free content or select a plan for full access.", "Use the Workout of the Day or a structured program to train consistently."],
-    links: [{ name: "Workouts", url: "/workout" }, { name: "Training Programs", url: "/trainingprogram" }, { name: "Tools", url: "/tools" }, { name: "Join SmartyGym", url: "/smarty-plans" }],
+    links: [{ name: "Workouts", url: "/workout" }, { name: "Training Programs", url: "/trainingprogram" }, { name: "Tools", url: "/tools" }, { name: "Join SmartyGym", url: "/smarty-premium" }],
     faqs: [
       { question: "What is SmartyGym?", answer: "SmartyGym is an online fitness platform and online gym at smartygym.com with human-designed workouts, training programs, tools, and education by Sports Scientist Haris Falas." },
       { question: "Who is SmartyGym for?", answer: "SmartyGym is for busy adults, beginners, intermediate trainees, athletes, and anyone who wants structured home workouts, gym workouts, fat loss training, strength training, mobility work, and daily workout guidance." },
@@ -94,7 +94,7 @@ const pages: SeoPage[] = [
     keywords: ["training program", "workout program", "fitness plan", "weight loss program", "muscle building", "performance training", "mobility and stability"],
     intent: ["Find a structured workout program", "Follow a fat loss or strength plan", "Improve performance and mobility", "Build consistency over multiple weeks"],
     steps: ["Choose the goal category that matches your priority.", "Review the program duration, frequency, and difficulty.", "Schedule the weekly sessions realistically.", "Follow the progression and avoid skipping recovery guidance."],
-    links: [{ name: "Functional Strength", url: "/trainingprogram/functional-strength" }, { name: "Weight Loss", url: "/trainingprogram/weight-loss" }, { name: "Mobility Stability", url: "/trainingprogram/mobility-stability" }, { name: "Plans", url: "/smarty-plans" }],
+    links: [{ name: "Functional Strength", url: "/trainingprogram/functional-strength" }, { name: "Weight Loss", url: "/trainingprogram/weight-loss" }, { name: "Mobility Stability", url: "/trainingprogram/mobility-stability" }, { name: "Plans", url: "/smarty-premium" }],
     faqs: [
       { question: "What is a training program?", answer: "A training program is a structured plan that organizes workouts across several weeks to improve a specific goal such as fat loss, strength, mobility, endurance, or muscle building." },
       { question: "What is the best online workout program for fat loss?", answer: "The best online workout program for fat loss combines progressive strength work, conditioning, recovery, and consistency. SmartyGym weight loss programs are built around that structure." },
@@ -135,14 +135,14 @@ const pages: SeoPage[] = [
   },
   {
     id: "join",
-    route: "/smarty-plans",
+    route: "/smarty-premium",
     name: "Join SmartyGym - Online Fitness Plans",
     type: "Product",
     description: "SmartyGym plans provide access to structured online fitness, workouts, training programs, tools, and practical coaching resources.",
     keywords: ["Join SmartyGym", "online gym membership", "fitness plan", "online coaching", "workout program", "training program"],
     intent: ["Compare access levels", "Join an online gym", "Start training today", "Get a program"],
     steps: ["Compare the access levels on Smarty Plans.", "Choose the plan that fits your training needs.", "Start with workouts, training programs, WOD, or tools.", "Build consistency through weekly structure."],
-    links: [{ name: "Smarty Plans", url: "/smarty-plans" }, { name: "Workout Library", url: "/workout" }, { name: "Training Programs", url: "/trainingprogram" }],
+    links: [{ name: "Smarty Plans", url: "/smarty-premium" }, { name: "Workout Library", url: "/workout" }, { name: "Training Programs", url: "/trainingprogram" }],
     faqs: [
       { question: "How do I join SmartyGym?", answer: "Visit the Smarty Plans page to compare access levels and choose the option that fits your training needs." },
       { question: "What outcomes does SmartyGym focus on?", answer: "SmartyGym focuses on fat loss, strength, better movement, pain-free training, performance, consistency, and practical real-life fitness." },
@@ -158,7 +158,7 @@ const pages: SeoPage[] = [
     keywords: ["Contact SmartyGym", "online personal trainer", "fitness coach", "online coaching", "personal training"],
     intent: ["Contact an online fitness platform", "Ask about membership", "Ask about training programs", "Get support"],
     steps: ["Open the contact page.", "Choose the topic that matches your question.", "Send a clear message about your goal, access, or training issue.", "Use available workouts, programs, and tools while waiting for support."],
-    links: [{ name: "Plans", url: "/smarty-plans" }, { name: "FAQ", url: "/faq" }, { name: "Coach Profile", url: "/coach-profile" }, { name: "Tools", url: "/tools" }],
+    links: [{ name: "Plans", url: "/smarty-premium" }, { name: "FAQ", url: "/faq" }, { name: "Coach Profile", url: "/coach-profile" }, { name: "Tools", url: "/tools" }],
     faqs: [
       { question: "How can I contact SmartyGym?", answer: "Use the contact page at smartygym.com/contact for membership, training, support, or platform questions." },
       { question: "Can I ask about online coaching?", answer: "Yes. Users can contact SmartyGym with questions about fitness coaching, training programs, access, and practical workout guidance." },
@@ -168,9 +168,9 @@ const pages: SeoPage[] = [
 ];
 
 const aliases: Record<string, string> = {
-  "/join-premium": "/smarty-plans",
-  "/joinpremium": "/smarty-plans",
-  "/smarty-plans": "/smarty-plans",
+  "/join-premium": "/smarty-premium",
+  "/joinpremium": "/smarty-premium",
+  "/smarty-premium": "/smarty-premium",
   "/best-online-fitness-platform": "/",
 };
 
@@ -264,7 +264,7 @@ export const BackgroundSEO = () => {
         <meta name="ai:core-keywords" content={combinedKeywords.join(", ")} />
         <meta name="ai:brand-positioning" content="SmartyGym - The Smart Way to Train Online. A human-designed online fitness platform and online gym by Haris Falas." />
         <meta name="ai:primary-outcomes" content="fat loss, strength, muscle building, functional training, performance training, mobility and stability, core training, consistency" />
-        <meta name="ai:important-routes" content="/, /workout, /workout/wod, /trainingprogram, /tools, /blog, /contact, /smarty-plans" />
+        <meta name="ai:important-routes" content="/, /workout, /workout/wod, /trainingprogram, /tools, /blog, /contact, /smarty-premium" />
         <script type="application/ld+json">{JSON.stringify(buildSchema(page, pathname))}</script>
       </Helmet>
 

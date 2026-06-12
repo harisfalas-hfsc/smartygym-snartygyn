@@ -42,7 +42,7 @@ import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { AlreadyPremiumCard } from "@/components/pricing/AlreadyPremiumCard";
 
-export default function SmartyPlans() {
+export default function SmartyPremium() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -214,13 +214,13 @@ export default function SmartyPlans() {
         <meta property="og:title" content="Premium Membership | SmartyGym" />
         <meta property="og:description" content="One payment of €89.99. Premium access to every SmartyGym workout, program and tool." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://smartygym.com/smarty-plans" />
+        <meta property="og:url" content="https://smartygym.com/smarty-premium" />
 
         <meta name="twitter:card" content="summary" />
         <meta name="twitter:title" content="Premium Membership | SmartyGym" />
         <meta name="twitter:description" content="One payment. Train for life." />
 
-        <link rel="canonical" href="https://smartygym.com/smarty-plans" />
+        <link rel="canonical" href="https://smartygym.com/smarty-premium" />
 
         <meta name="ai-pricing-lifetime" content="€89.99 one-time payment, lifetime access" />
         <meta name="ai-value-proposition" content="100% human-designed workouts by certified Sports Scientist Haris Falas — one payment, lifetime access" />
@@ -237,7 +237,7 @@ export default function SmartyPlans() {
               "price": lifetimePrice.toString(),
               "priceCurrency": "EUR",
               "availability": "https://schema.org/InStock",
-              "url": "https://smartygym.com/smarty-plans"
+              "url": "https://smartygym.com/smarty-premium"
             },
             "category": "Online Fitness Membership"
           })}
@@ -249,7 +249,7 @@ export default function SmartyPlans() {
             "@type": "BreadcrumbList",
             "itemListElement": [
               { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://smartygym.com" },
-              { "@type": "ListItem", "position": 2, "name": "Smarty Premium", "item": "https://smartygym.com/smarty-plans" }
+              { "@type": "ListItem", "position": 2, "name": "Smarty Premium", "item": "https://smartygym.com/smarty-premium" }
             ]
           })}
         </script>

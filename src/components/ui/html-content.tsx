@@ -26,7 +26,7 @@ const CANONICAL_HTML_PREFIXES = [
   '/shop',
   '/contact',
   '/faq',
-  '/smarty-plans',
+  '/smarty-premium',
   '/joinpremium',
   '/join-premium',
   '/corporate',

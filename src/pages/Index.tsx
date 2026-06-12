@@ -544,7 +544,7 @@ const Index = () => {
               {!isPremium && (
                 <Button
                   size="sm"
-                  onClick={() => navigate('/smarty-plans')}
+                  onClick={() => navigate('/smarty-premium')}
                   className="mt-4 bg-green-500 hover:bg-green-600 text-white"
                 >
                   <Crown className="w-4 h-4 mr-1.5" />
@@ -1234,7 +1234,7 @@ const Index = () => {
                   <Calendar className="h-5 w-5" />
                   Explore Programs
                 </Button>
-                {!isPremium && <Button size="lg" variant="outline" onClick={() => navigate("/smarty-plans")} className="gap-2 rounded-full px-8 uppercase tracking-wider font-bold border-primary text-primary hover:bg-primary hover:text-primary-foreground">
+                {!isPremium && <Button size="lg" variant="outline" onClick={() => navigate("/smarty-premium")} className="gap-2 rounded-full px-8 uppercase tracking-wider font-bold border-primary text-primary hover:bg-primary hover:text-primary-foreground">
                     <UserCheck className="h-5 w-5" />
                     Join Premium
                   </Button>}

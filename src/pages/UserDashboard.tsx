@@ -813,7 +813,7 @@ export default function UserDashboard() {
                       Upgrade for unlimited access to all content!
                     </p>
                   </div>
-                  <Button onClick={() => navigate("/smarty-plans")} className="w-full sm:w-auto cta-button">
+                  <Button onClick={() => navigate("/smarty-premium")} className="w-full sm:w-auto cta-button">
                     Upgrade to Premium
                   </Button>
                 </div>}
@@ -830,7 +830,7 @@ export default function UserDashboard() {
                       You're currently on the free plan with limited access.
                     </p>
                   </div>
-                  <Button onClick={() => navigate("/smarty-plans")} className="w-full sm:w-auto cta-button">
+                  <Button onClick={() => navigate("/smarty-premium")} className="w-full sm:w-auto cta-button">
                     Upgrade Now
                   </Button>
                 </div>}
@@ -1135,7 +1135,7 @@ export default function UserDashboard() {
                   <p className="text-muted-foreground mb-6">
                     Track your workouts, mark favorites, and monitor your progress with a Gold or Platinum plan.
                   </p>
-                  <Button onClick={() => navigate("/smarty-plans")} className="cta-button">
+                  <Button onClick={() => navigate("/smarty-premium")} className="cta-button">
                     Upgrade to Premium
                   </Button>
                 </CardContent>
@@ -1145,7 +1145,7 @@ export default function UserDashboard() {
                     <p className="text-sm text-muted-foreground">
                       Showing activity for your <strong>{purchasedWorkoutIds.size}</strong> purchased workout{purchasedWorkoutIds.size === 1 ? '' : 's'}. Upgrade to Premium to track every workout.
                     </p>
-                    <Button size="sm" variant="outline" onClick={() => navigate("/smarty-plans")}>
+                    <Button size="sm" variant="outline" onClick={() => navigate("/smarty-premium")}>
                       <Crown className="h-3 w-3 mr-1" /> Upgrade
                     </Button>
                   </CardContent>
@@ -1190,7 +1190,7 @@ export default function UserDashboard() {
                   <p className="text-muted-foreground mb-6">
                     Access structured training programs, track your progress, and achieve your fitness goals with a Gold or Platinum plan.
                   </p>
-                  <Button onClick={() => navigate("/smarty-plans")} className="cta-button">
+                  <Button onClick={() => navigate("/smarty-premium")} className="cta-button">
                     Upgrade to Premium
                   </Button>
                 </CardContent>
@@ -1200,7 +1200,7 @@ export default function UserDashboard() {
                     <p className="text-sm text-muted-foreground">
                       Showing activity for your <strong>{purchasedProgramIds.size}</strong> purchased program{purchasedProgramIds.size === 1 ? '' : 's'}. Upgrade to Premium to track every program.
                     </p>
-                    <Button size="sm" variant="outline" onClick={() => navigate("/smarty-plans")}>
+                    <Button size="sm" variant="outline" onClick={() => navigate("/smarty-premium")}>
                       <Crown className="h-3 w-3 mr-1" /> Upgrade
                     </Button>
                   </CardContent>
@@ -1353,7 +1353,7 @@ export default function UserDashboard() {
                   <p className="text-muted-foreground mb-6">
                     Track all your fitness activities in one place with a Gold or Platinum plan.
                   </p>
-                  <Button onClick={() => navigate("/smarty-plans")} className="cta-button">
+                  <Button onClick={() => navigate("/smarty-premium")} className="cta-button">
                     Upgrade to Premium
                   </Button>
                 </CardContent>
@@ -1363,7 +1363,7 @@ export default function UserDashboard() {
                     <p className="text-sm text-muted-foreground">
                       Showing logbook activity for your purchased content. Upgrade to Premium to log every workout, program, and check-in.
                     </p>
-                    <Button size="sm" variant="outline" onClick={() => navigate("/smarty-plans")}>
+                    <Button size="sm" variant="outline" onClick={() => navigate("/smarty-premium")}>
                       <Crown className="h-3 w-3 mr-1" /> Upgrade
                     </Button>
                   </CardContent>

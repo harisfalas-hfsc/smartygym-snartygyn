@@ -111,7 +111,7 @@ export function FreeTrialPopup() {
   const handleCTA = () => {
     handleDismiss();
     if (user) {
-      navigate("/smarty-plans");
+      navigate("/smarty-premium");
     } else {
       navigate("/auth?mode=signup&trial=true");
     }

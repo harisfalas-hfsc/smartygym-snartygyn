@@ -430,7 +430,7 @@ const TrainingProgramFlow = () => {
               <p className="text-muted-foreground mb-4">
                 Join SmartyGym Premium for full access to all training programs.
               </p>
-              <Button size="lg" onClick={() => navigate("/smarty-plans")} className="cta-button">
+              <Button size="lg" onClick={() => navigate("/smarty-premium")} className="cta-button">
                 Join Premium
               </Button>
             </div>

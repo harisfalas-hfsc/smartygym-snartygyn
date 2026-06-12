@@ -18,7 +18,7 @@ export const PremiumContentGate = ({ children }: PremiumContentGateProps) => {
     if (userTier === "guest") {
       navigate("/auth");
     } else {
-      navigate("/smarty-plans");
+      navigate("/smarty-premium");
     }
   };
 

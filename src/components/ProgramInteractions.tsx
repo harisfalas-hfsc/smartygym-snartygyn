@@ -115,7 +115,7 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
       title: "Premium Feature",
       description: message,
       action: (
-        <Button size="sm" onClick={() => navigate("/smarty-plans")}>
+        <Button size="sm" onClick={() => navigate("/smarty-premium")}>
           <Crown className="w-4 h-4 mr-2" />
           Upgrade
         </Button>

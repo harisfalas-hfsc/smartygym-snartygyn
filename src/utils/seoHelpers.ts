@@ -504,7 +504,7 @@ export const generateProductSchema = (product: {
       "price": product.price,
       "priceCurrency": product.currency,
       "availability": "https://schema.org/InStock",
-      "url": "https://smartygym.com/smarty-plans",
+      "url": "https://smartygym.com/smarty-premium",
       "seller": {
         "@type": "Organization",
         "name": "SmartyGym"
