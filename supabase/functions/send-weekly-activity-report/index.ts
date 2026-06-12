@@ -449,8 +449,10 @@ const handler = async (req: Request): Promise<Response> => {
 
         const subject = `📊 Your Weekly Activity Report (${weekStart} - ${weekEnd})`;
 
+        const { canSend } = await import("../_shared/notification-preferences.ts");
+
         // Check dashboard preference (default: true)
-        if (prefs.dashboard_weekly_activity !== false) {
+        if (canSend(prefs, "weekly_activity_report", "dashboard")) {
           const dashboardContent = generateDashboardMessage(userData, weekStart, weekEnd);
           
           const { error: messageError } = await supabase
@@ -471,7 +473,7 @@ const handler = async (req: Request): Promise<Response> => {
         }
 
         // Check email preference (default: true)
-        if (prefs.email_weekly_activity !== false) {
+        if (canSend(prefs, "weekly_activity_report", "email")) {
           const emailHtml = generateEmailHtml(userData, weekStart, weekEnd);
           
           const emailResponse = await fetch("https://api.resend.com/emails", {
