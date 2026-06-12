@@ -289,7 +289,7 @@ export const Navigation = () => {
     { label: "Smarty Programs", path: "/trainingprogram", icon: ListChecks, iconClass: "text-blue-500", track: undefined },
     { label: "Smarty Ritual", path: "/daily-ritual", icon: Sparkles, iconClass: "text-purple-500", track: undefined },
     { label: "Smarty Tools", path: "/tools", icon: Wrench, iconClass: "text-orange-500", track: undefined },
-    { label: "Blog", path: "/blog", icon: Newspaper, iconClass: "text-red-500", track: undefined },
+    { label: "Smarty Blog", path: "/blog", icon: Newspaper, iconClass: "text-red-500", track: undefined },
     { label: "Exercise Library", path: "/exerciselibrary", icon: BookOpen, iconClass: "text-emerald-500", track: undefined },
     { label: "Community", path: "/community", icon: Users, iconClass: "text-cyan-500", track: undefined },
     { label: "FAQ", path: "/faq", icon: HelpCircle, iconClass: "text-purple-500", track: undefined },

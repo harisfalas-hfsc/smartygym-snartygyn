@@ -87,9 +87,9 @@ export const MobileBottomNav = () => {
     { label: "Smarty Programs", path: "/trainingprogram", icon: ListChecks, iconClass: "text-blue-500" },
     { label: "Smarty Ritual", path: "/daily-ritual", icon: Sparkles, iconClass: "text-purple-500" },
     { label: "Smarty Tools", path: "/tools", icon: Wrench, iconClass: "text-orange-500" },
+    { label: "Smarty Blog", path: "/blog", icon: Newspaper, iconClass: "text-red-500" },
     { label: "Exercise Library", path: "/exerciselibrary", icon: BookOpen, iconClass: "text-emerald-500" },
     { label: "Community", path: "/community", icon: Users, iconClass: "text-cyan-500" },
-    { label: "Blog", path: "/blog", icon: Newspaper, iconClass: "text-red-500" },
     { label: "FAQ", path: "/faq", icon: HelpCircle, iconClass: "text-purple-500" },
     { label: "Contact", path: "/contact", icon: Mail, iconClass: "text-indigo-500" },
   ];
