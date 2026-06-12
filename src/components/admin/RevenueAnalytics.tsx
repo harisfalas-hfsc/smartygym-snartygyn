@@ -15,8 +15,7 @@ import { SUBSCRIPTION_PRICES, CORPORATE_PRICES } from "@/config/pricing";
 
 interface RevenueData {
   period: string;
-  gold: number;
-  platinum: number;
+  premium: number;
   standalone: number;
   personal_training: number;
   corporate: number;
@@ -97,7 +96,7 @@ export function RevenueAnalytics() {
     setLoading(true);
     try {
       const { startDate, endDate } = getDateRange();
-      const revenueByMonth: { [key: string]: { gold: number; platinum: number; standalone: number; personal_training: number; corporate: number } } = {};
+      const revenueByMonth: { [key: string]: { premium: number; standalone: number; personal_training: number; corporate: number } } = {};
       let total = 0;
       const subDetails: SubscriptionDetail[] = [];
       const purDetails: PurchaseDetail[] = [];
@@ -106,17 +105,13 @@ export function RevenueAnalytics() {
       // Fetch subscriptions with user emails — use ACTIVE-OVERLAP semantics so
       // recurring revenue created before the window but still active in it is
       // counted. (Filtering by `created_at` alone undercounts MRR.)
-      if (planFilter === "all" || planFilter === "gold" || planFilter === "platinum") {
+      if (planFilter === "all" || planFilter === "premium") {
         let subQuery = supabase
           .from("user_subscriptions")
           .select("id, user_id, plan_type, status, created_at, current_period_end, stripe_subscription_id")
           .eq("status", "active")
           .lte("created_at", endDate.toISOString())
           .or(`current_period_end.is.null,current_period_end.gte.${startDate.toISOString()}`);
-
-        if (planFilter === "gold" || planFilter === "platinum") {
-          subQuery = subQuery.eq("plan_type", planFilter);
-        }
 
         const { data: subscriptions } = await subQuery;
 
@@ -136,23 +131,24 @@ export function RevenueAnalytics() {
           });
 
           subscriptions.forEach((sub) => {
-            const isPaid = !!sub.stripe_subscription_id;
+            const isPaid = !!sub.stripe_subscription_id || sub.plan_type === 'lifetime';
             const month = new Date(sub.created_at).toLocaleDateString("en-US", {
               year: "numeric",
               month: "short",
             });
 
             if (!revenueByMonth[month]) {
-              revenueByMonth[month] = { gold: 0, platinum: 0, standalone: 0, personal_training: 0, corporate: 0 };
+              revenueByMonth[month] = { premium: 0, standalone: 0, personal_training: 0, corporate: 0 };
             }
 
-            // Use CORRECT prices from config - only count PAID subscriptions
-            const monthlyRevenue = isPaid 
-              ? (sub.plan_type === "gold" ? SUBSCRIPTION_PRICES.gold : sub.plan_type === "platinum" ? SUBSCRIPTION_PRICES.platinum : 0)
+            const monthlyRevenue = isPaid
+              ? (sub.plan_type === "lifetime" ? SUBSCRIPTION_PRICES.lifetime
+                : sub.plan_type === "gold" ? SUBSCRIPTION_PRICES.gold
+                : sub.plan_type === "platinum" ? SUBSCRIPTION_PRICES.platinum : 0)
               : 0;
-            
+
             if (isPaid) {
-              revenueByMonth[month][sub.plan_type as "gold" | "platinum"] += monthlyRevenue;
+              revenueByMonth[month].premium += monthlyRevenue;
               total += monthlyRevenue;
             }
 
@@ -198,7 +194,7 @@ export function RevenueAnalytics() {
             });
 
             if (!revenueByMonth[month]) {
-              revenueByMonth[month] = { gold: 0, platinum: 0, standalone: 0, personal_training: 0, corporate: 0 };
+              revenueByMonth[month] = { premium: 0, standalone: 0, personal_training: 0, corporate: 0 };
             }
 
             const revenue = parseFloat(purchase.price?.toString() || "0");
@@ -245,7 +241,7 @@ export function RevenueAnalytics() {
             });
 
             if (!revenueByMonth[month]) {
-              revenueByMonth[month] = { gold: 0, platinum: 0, standalone: 0, personal_training: 0, corporate: 0 };
+              revenueByMonth[month] = { premium: 0, standalone: 0, personal_training: 0, corporate: 0 };
             }
 
             const revenue = parseFloat(purchase.price?.toString() || "0");
@@ -281,7 +277,7 @@ export function RevenueAnalytics() {
           });
 
           if (!revenueByMonth[month]) {
-            revenueByMonth[month] = { gold: 0, platinum: 0, standalone: 0, personal_training: 0, corporate: 0 };
+            revenueByMonth[month] = { premium: 0, standalone: 0, personal_training: 0, corporate: 0 };
           }
 
           // Only count revenue for PAID corporate plans
@@ -315,12 +311,11 @@ export function RevenueAnalytics() {
         const plans = revenueByMonth[period];
         return {
           period,
-          gold: plans.gold,
-          platinum: plans.platinum,
+          premium: plans.premium,
           standalone: plans.standalone,
           personal_training: plans.personal_training,
           corporate: plans.corporate,
-          total: plans.gold + plans.platinum + plans.standalone + plans.personal_training + plans.corporate,
+          total: plans.premium + plans.standalone + plans.personal_training + plans.corporate,
         };
       });
 
@@ -371,16 +366,14 @@ export function RevenueAnalytics() {
 
   // Calculate totals for breakdown
   const totals = revenueData.reduce((acc, item) => ({
-    gold: acc.gold + item.gold,
-    platinum: acc.platinum + item.platinum,
+    premium: acc.premium + item.premium,
     standalone: acc.standalone + item.standalone,
     personal_training: acc.personal_training + item.personal_training,
     corporate: acc.corporate + item.corporate,
-  }), { gold: 0, platinum: 0, standalone: 0, personal_training: 0, corporate: 0 });
+  }), { premium: 0, standalone: 0, personal_training: 0, corporate: 0 });
 
   const pieData = [
-    { name: `Gold (€${SUBSCRIPTION_PRICES.gold}/mo)`, value: totals.gold },
-    { name: `Platinum (€${SUBSCRIPTION_PRICES.platinum}/yr)`, value: totals.platinum },
+    { name: `Premium (€${SUBSCRIPTION_PRICES.lifetime})`, value: totals.premium },
     { name: "Standalone", value: totals.standalone },
     { name: "Personal Training", value: totals.personal_training },
     { name: "Corporate", value: totals.corporate },
@@ -418,8 +411,7 @@ export function RevenueAnalytics() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Sources</SelectItem>
-                  <SelectItem value="gold">Gold Plans</SelectItem>
-                  <SelectItem value="platinum">Platinum Plans</SelectItem>
+                  <SelectItem value="premium">Premium Memberships</SelectItem>
                   <SelectItem value="standalone_purchases">Standalone</SelectItem>
                   <SelectItem value="personal_training">Personal Training</SelectItem>
                   <SelectItem value="corporate">Corporate Plans</SelectItem>
@@ -442,8 +434,8 @@ export function RevenueAnalytics() {
             </Card>
             <Card>
               <CardContent className="p-4">
-                <div className="text-sm text-muted-foreground mb-1">Subscriptions</div>
-                <p className="text-xl font-bold">€{(totals.gold + totals.platinum).toFixed(2)}</p>
+                <div className="text-sm text-muted-foreground mb-1">Premium Memberships</div>
+                <p className="text-xl font-bold">€{totals.premium.toFixed(2)}</p>
                 <p className="text-xs text-muted-foreground">
                   {paidSubscriptionsCount} paid • {freeSubscriptionsCount} free
                 </p>
@@ -562,8 +554,7 @@ export function RevenueAnalytics() {
                       <TableHeader>
                         <TableRow>
                           <TableHead>Period</TableHead>
-                          <TableHead className="text-right">Gold</TableHead>
-                          <TableHead className="text-right">Platinum</TableHead>
+                          <TableHead className="text-right">Premium</TableHead>
                           <TableHead className="text-right">Standalone</TableHead>
                           <TableHead className="text-right">Personal Training</TableHead>
                           <TableHead className="text-right">Corporate</TableHead>
@@ -574,8 +565,7 @@ export function RevenueAnalytics() {
                         {revenueData.map((row) => (
                           <TableRow key={row.period}>
                             <TableCell>{row.period}</TableCell>
-                            <TableCell className="text-right">€{row.gold.toFixed(2)}</TableCell>
-                            <TableCell className="text-right">€{row.platinum.toFixed(2)}</TableCell>
+                            <TableCell className="text-right">€{row.premium.toFixed(2)}</TableCell>
                             <TableCell className="text-right">€{row.standalone.toFixed(2)}</TableCell>
                             <TableCell className="text-right">€{row.personal_training.toFixed(2)}</TableCell>
                             <TableCell className="text-right">€{row.corporate.toFixed(2)}</TableCell>
@@ -584,8 +574,7 @@ export function RevenueAnalytics() {
                         ))}
                         <TableRow className="bg-muted/50 font-bold">
                           <TableCell>Total</TableCell>
-                          <TableCell className="text-right">€{totals.gold.toFixed(2)}</TableCell>
-                          <TableCell className="text-right">€{totals.platinum.toFixed(2)}</TableCell>
+                          <TableCell className="text-right">€{totals.premium.toFixed(2)}</TableCell>
                           <TableCell className="text-right">€{totals.standalone.toFixed(2)}</TableCell>
                           <TableCell className="text-right">€{totals.personal_training.toFixed(2)}</TableCell>
                           <TableCell className="text-right">€{totals.corporate.toFixed(2)}</TableCell>
