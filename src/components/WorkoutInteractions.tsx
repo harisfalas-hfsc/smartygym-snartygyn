@@ -311,7 +311,7 @@ export const WorkoutInteractions = ({ workoutId, workoutType, workoutName, isFre
           {promptMessage}
         </p>
         <Button size="sm" onClick={() => navigate(userTier === "guest" ? "/auth" : "/")}>
-          {userTier === "guest" ? "Log In" : "View Plans"}
+          {userTier === "guest" ? "Log In" : "Upgrade to Premium"}
         </Button>
       </div>
     );

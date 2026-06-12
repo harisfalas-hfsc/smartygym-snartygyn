@@ -175,7 +175,7 @@ export const AccessGate = ({
               )}
               <Button onClick={() => navigate("/smarty-premium")} className="w-full" size="lg" variant={isStandalonePurchase ? "outline" : "default"}>
                 <Crown className="w-4 h-4 mr-2" />
-                View Premium Plans
+                Upgrade to Premium
               </Button>
               <Button 
                 onClick={goBack} 
@@ -213,7 +213,7 @@ export const AccessGate = ({
             <div className="space-y-2 pt-4">
               <Button onClick={() => navigate("/smarty-premium")} className="w-full" size="lg">
                 <Crown className="w-4 h-4 mr-2" />
-                View Premium Plans
+                Upgrade to Premium
               </Button>
               <Button 
                 onClick={goBack} 

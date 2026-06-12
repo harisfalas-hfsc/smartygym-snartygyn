@@ -56,7 +56,7 @@ export const PremiumContentGate = ({ children }: PremiumContentGateProps) => {
             {!isLoading && (
               <div className="space-y-2 pt-4">
                 <Button onClick={handleSubscribe} className="w-full" size="lg">
-                  View Subscription Plans
+                  Upgrade to Premium
                 </Button>
                 <Button 
                   onClick={() => navigate("/")} 

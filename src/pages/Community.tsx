@@ -429,7 +429,7 @@ const Community = () => {
       <div className="flex flex-col gap-2 w-full max-w-[220px]">
         <Button onClick={() => navigate("/smarty-premium")} size="sm" className="w-full">
           <Crown className="h-4 w-4 mr-2" />
-          View Premium Plans
+          Upgrade to Premium
         </Button>
         {userTier === "guest" && (
           <Button onClick={() => navigate("/auth")} variant="outline" size="sm" className="w-full">
