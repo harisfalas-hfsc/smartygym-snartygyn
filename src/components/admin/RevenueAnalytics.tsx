@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import html2canvas from "html2canvas";
 import { SUBSCRIPTION_PRICES, CORPORATE_PRICES } from "@/config/pricing";
+import { StripeRevenueTruth } from "./analytics/StripeRevenueTruth";
 
 interface RevenueData {
   period: string;
@@ -474,12 +475,17 @@ export function RevenueAnalytics() {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-4 mb-4">
+            <TabsList className="grid w-full grid-cols-5 mb-4">
+              <TabsTrigger value="stripe">Stripe (truth)</TabsTrigger>
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="subscriptions">Subscriptions</TabsTrigger>
               <TabsTrigger value="purchases">Purchases</TabsTrigger>
               <TabsTrigger value="corporate">Corporate</TabsTrigger>
             </TabsList>
+
+            <TabsContent value="stripe" className="space-y-4">
+              <StripeRevenueTruth />
+            </TabsContent>
 
             {/* Overview Tab */}
             <TabsContent value="overview" className="space-y-6">
