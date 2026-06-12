@@ -38,10 +38,8 @@ interface AnalyticsData {
   activeSubscribers: number;
   paidSubscribers: number;       // Only with stripe_subscription_id
   manualSubscribers: number;     // Manual/complimentary (no stripe_subscription_id)
-  goldSubscribers: number;
-  goldPaid: number;
-  platinumSubscribers: number;
-  platinumPaid: number;
+  premiumSubscribers: number;
+  premiumPaid: number;
   freeUsers: number;
   totalRevenue: number;          // Only from PAID subscriptions
   avgWorkoutCompletionRate: number;
@@ -82,10 +80,8 @@ export function AnalyticsDashboard() {
     activeSubscribers: 0,
     paidSubscribers: 0,
     manualSubscribers: 0,
-    goldSubscribers: 0,
-    goldPaid: 0,
-    platinumSubscribers: 0,
-    platinumPaid: 0,
+    premiumSubscribers: 0,
+    premiumPaid: 0,
     freeUsers: 0,
     totalRevenue: 0,
     avgWorkoutCompletionRate: 0,
