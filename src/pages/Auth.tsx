@@ -437,6 +437,16 @@ export default function Auth() {
       )}
 
       <div className="w-full max-w-md">
+        <div className="mb-3">
+          <button
+            type="button"
+            onClick={() => navigate("/")}
+            className="inline-flex items-center gap-1.5 text-sm text-primary hover:text-primary/80 transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Home
+          </button>
+        </div>
         <Card className="w-full">
           <CardHeader className="space-y-1 flex flex-col items-center">
             <img src={smartyGymLogo} alt="SmartyGym" className="h-20 w-auto mb-2" />

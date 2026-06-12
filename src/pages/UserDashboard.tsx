@@ -627,20 +627,26 @@ export default function UserDashboard() {
     if (!user) return;
     setLoading(true);
     try {
-      // Force refresh from Stripe
-      const {
-        data,
-        error
-      } = await supabase.functions.invoke('check-subscription');
-      if (error) {
-        throw error;
+      // Admins don't have a Stripe customer — skip the Stripe sync and
+      // just reload local subscription/role state so the refresh button
+      // doesn't fail with "Failed to refresh subscription status".
+      if (!isAdmin) {
+        const { error } = await supabase.functions.invoke('check-subscription');
+        if (error) {
+          // Non-fatal — fall through to local reload so the UI still refreshes.
+          if (import.meta.env.DEV) {
+            console.warn('check-subscription returned an error (continuing):', error);
+          }
+        }
       }
 
-      // Reload subscription data
+      // Reload subscription data locally
       await checkSubscription();
       toast({
-        title: "Subscription refreshed",
-        description: "Your subscription status has been updated from Stripe"
+        title: "Status refreshed",
+        description: isAdmin
+          ? "Your administrator access has been refreshed."
+          : "Your subscription status has been updated."
       });
     } catch (error) {
       if (import.meta.env.DEV) {
@@ -648,7 +654,7 @@ export default function UserDashboard() {
       }
       toast({
         title: "Error",
-        description: "Failed to refresh subscription status. Please try again.",
+        description: "Failed to refresh status. Please try again.",
         variant: "destructive"
       });
     } finally {

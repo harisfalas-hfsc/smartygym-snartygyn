@@ -239,10 +239,10 @@ export const GoalsSummaryCard = ({ userId }: GoalsSummaryCardProps) => {
 
         <div className="pt-2 flex justify-end">
           <Button 
-            variant="ghost" 
+            variant="outline" 
             size="sm" 
             onClick={() => navigate("/calculator-history?tab=measurements")}
-            className="text-primary hover:text-primary/80"
+            className="border-primary/40 text-primary hover:bg-primary/10 hover:text-primary"
           >
             View Details
             <ChevronRight className="h-4 w-4 ml-1" />
