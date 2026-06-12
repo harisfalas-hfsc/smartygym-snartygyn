@@ -1,11 +1,8 @@
-import { Crown, Settings, LayoutDashboard, CheckCircle } from "lucide-react";
+import { Crown, LayoutDashboard, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
 
 interface AlreadyPremiumCardProps {
   className?: string;
@@ -13,30 +10,6 @@ interface AlreadyPremiumCardProps {
 
 export function AlreadyPremiumCard({ className }: AlreadyPremiumCardProps) {
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [loadingPortal, setLoadingPortal] = useState(false);
-
-  const handleManageSubscription = async () => {
-    setLoadingPortal(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('customer-portal');
-      
-      if (error) throw error;
-      
-      if (data?.url) {
-        window.location.href = data.url;
-      }
-    } catch (error) {
-      console.error('Error opening customer portal:', error);
-      toast({
-        title: "Error",
-        description: "Could not open subscription management. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setLoadingPortal(false);
-    }
-  };
 
   return (
     <Card className={`bg-gradient-to-br from-primary/20 via-primary/10 to-background border-2 border-primary/50 shadow-lg ${className}`}>
@@ -62,7 +35,7 @@ export function AlreadyPremiumCard({ className }: AlreadyPremiumCardProps) {
         
         <p className="text-muted-foreground mb-6 max-w-md mx-auto">
           You have full access to all premium features, workouts, and training programs. 
-          No need to subscribe again!
+          Premium for life — nothing to renew, nothing to manage.
         </p>
         
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -72,16 +45,6 @@ export function AlreadyPremiumCard({ className }: AlreadyPremiumCardProps) {
           >
             <LayoutDashboard className="h-4 w-4" />
             Go to Dashboard
-          </Button>
-          
-          <Button 
-            variant="outline" 
-            onClick={handleManageSubscription}
-            disabled={loadingPortal}
-            className="gap-2"
-          >
-            <Settings className="h-4 w-4" />
-            {loadingPortal ? "Loading..." : "Manage Subscription"}
           </Button>
         </div>
       </CardContent>

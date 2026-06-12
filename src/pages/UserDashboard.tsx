@@ -992,12 +992,6 @@ export default function UserDashboard() {
                             Refresh
                           </>}
                       </Button>
-                      <Button onClick={handleManageSubscription} disabled={openingPortal} className="h-7 px-2 text-xs">
-                        {openingPortal ? <Loader2 className="h-3 w-3 animate-spin" /> : <>
-                            <ExternalLink className="h-3 w-3 mr-1" />
-                            Manage
-                          </>}
-                      </Button>
                     </div>
 
                     {/* Motivational Message from Coach */}
