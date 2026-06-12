@@ -155,16 +155,16 @@ serve(async (req: Request) => {
       throw profilesError;
     }
 
-    // Filter users with checkin_reminders enabled for email (opt-out model like all other emails)
-    const usersForEmail = profiles?.filter(p => {
-      const prefs = p.notification_preferences as Record<string, any> || {};
-      return prefs.opt_out_all !== true && prefs.email_checkin_reminders !== false;
-    }) || [];
+    const { canSend } = await import("../_shared/notification-preferences.ts");
 
-    const usersForDashboard = profiles?.filter(p => {
-      const prefs = p.notification_preferences as Record<string, any> || {};
-      return prefs.opt_out_all !== true && prefs.dashboard_checkin_reminders !== false;
-    }) || [];
+    // Filter users with checkin_reminders enabled for email (opt-out model like all other emails)
+    const usersForEmail = profiles?.filter(p =>
+      canSend(p.notification_preferences as any, "checkin_reminder", "email")
+    ) || [];
+
+    const usersForDashboard = profiles?.filter(p =>
+      canSend(p.notification_preferences as any, "checkin_reminder", "dashboard")
+    ) || [];
 
     console.log(`Found ${usersForEmail.length} users for email, ${usersForDashboard.length} for dashboard`);
 
