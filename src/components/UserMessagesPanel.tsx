@@ -32,6 +32,18 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
+// Strip noisy email-style formatting for the compact in-dashboard notification view.
+// Keeps content text identical to the email but removes horizontal rules, empty
+// paragraphs and runs of <br>/whitespace that create huge gaps on mobile.
+const compactMessageHtml = (html: string): string => {
+  if (!html) return '';
+  return html
+    .replace(/<hr[^>]*>/gi, '')
+    .replace(/<p[^>]*>(\s|&nbsp;|<br\s*\/?>)*<\/p>/gi, '')
+    .replace(/(<br\s*\/?>\s*){2,}/gi, '<br/>')
+    .replace(/(\r?\n){2,}/g, '\n');
+};
+
 interface ContactMessage {
   id: string;
   name: string;
@@ -722,8 +734,8 @@ export const UserMessagesPanel = () => {
                   </Button>
                 </div>
               </div>
-              <div className="bg-muted p-4 rounded-lg text-sm content-container mb-3">
-                <HTMLContent content={message.content} />
+              <div className="text-sm content-container mb-3 [&_hr]:hidden [&_p:empty]:hidden [&_p]:my-1 [&_h1]:mt-2 [&_h1]:mb-1 [&_h2]:mt-2 [&_h2]:mb-1 [&_h3]:mt-2 [&_h3]:mb-1 [&_br+br]:hidden [&_ul]:my-1 [&_ol]:my-1">
+                <HTMLContent content={compactMessageHtml(message.content)} />
               </div>
               <div className="flex items-center gap-4 flex-wrap">
                 <span className="text-xs text-muted-foreground">
