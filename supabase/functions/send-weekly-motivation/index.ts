@@ -374,8 +374,10 @@ serve(async (req) => {
           continue;
         }
 
-        // Send dashboard message - check dashboard_monday_motivation preference (default: true)
-        if (automationRule.sends_dashboard_message && userPrefs.dashboard_monday_motivation !== false) {
+        const { canSend } = await import("../_shared/notification-preferences.ts");
+
+        // Send dashboard message
+        if (automationRule.sends_dashboard_message && canSend(userPrefs, "monday_motivation", "dashboard")) {
           const { error: msgError } = await supabaseAdmin
             .from("user_system_messages")
             .insert({
@@ -423,10 +425,7 @@ serve(async (req) => {
                 .single();
 
               const prefs = profile?.notification_preferences as any;
-              // Fixed: Check email_monday_motivation preference specifically
-              const emailEnabled = prefs?.email_monday_motivation !== false && prefs?.opt_out_all !== true;
-
-              if (!emailEnabled) {
+              if (!canSend(prefs, "monday_motivation", "email")) {
                 logStep("Monday motivation email disabled for user", { userId: user.user_id });
                 continue;
               }

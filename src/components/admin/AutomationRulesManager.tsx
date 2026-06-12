@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { AutomationRuleEditDialog } from "./AutomationRuleEditDialog";
-import { Settings, Calendar, Zap, Mail, MessageSquare, Clock, Users, Archive, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Settings, Calendar, Zap, Mail, MessageSquare, Clock, Users, Archive, Eye, EyeOff, Loader2, Bell } from "lucide-react";
 import { format } from "date-fns";
 
 interface AutomationRule {
@@ -23,6 +23,7 @@ interface AutomationRule {
   is_active: boolean;
   sends_email: boolean;
   sends_dashboard_message: boolean;
+  sends_push: boolean | null;
   last_triggered_at: string | null;
   next_trigger_at: string | null;
   total_executions: number;
@@ -236,6 +237,12 @@ export const AutomationRulesManager = () => {
               <Badge variant="secondary" className="text-xs">
                 <MessageSquare className="w-3 h-3 mr-1" />
                 Dashboard
+              </Badge>
+            )}
+            {rule.sends_push && (
+              <Badge variant="secondary" className="text-xs">
+                <Bell className="w-3 h-3 mr-1" />
+                Push
               </Badge>
             )}
           </div>

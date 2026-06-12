@@ -4,6 +4,7 @@ import { Resend } from "https://esm.sh/resend@2.0.0";
 import { getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
 import { MESSAGE_TYPES } from "../_shared/notification-types.ts";
 import { logEmailDelivery } from "../_shared/email-log.ts";
+import { canSend, AutomationKey } from "../_shared/notification-preferences.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -174,7 +175,7 @@ serve(async (req) => {
         }
 
         // Check dashboard_new_article preference (default true)
-        if (prefs.dashboard_new_article !== false) {
+        if (canSend(prefs, "new_article", "dashboard")) {
           const { error: msgError } = await supabase.from("user_system_messages").insert({
             user_id: user.id,
             message_type: MESSAGE_TYPES.NEW_ARTICLE,
@@ -194,7 +195,7 @@ serve(async (req) => {
         }
 
         // Check email_new_article preference (default true)
-        if (user.email && prefs.email_new_article !== false) {
+        if (user.email && canSend(prefs, "new_article", "email")) {
           const result = await sendEmail(user.email, articleSubject, articleEmailHtml);
           if (result.success) {
             emailSuccess++;
@@ -329,19 +330,13 @@ serve(async (req) => {
 
     // Send workout/program notifications if there are any
     if (workoutCount > 0 || programCount > 0) {
-      // Determine which dashboard preference to check
-      const dashboardPrefKey = workoutCount > 0 && programCount > 0 
-        ? ['dashboard_new_workout', 'dashboard_new_program']
-        : workoutCount > 0 
-          ? ['dashboard_new_workout']
-          : ['dashboard_new_program'];
-      
-      // Determine which email preference to check
-      const emailPrefKey = workoutCount > 0 && programCount > 0 
-        ? ['email_new_workout', 'email_new_program']
-        : workoutCount > 0 
-          ? ['email_new_workout']
-          : ['email_new_program'];
+      // Determine relevant automation keys
+      const automationKeys: AutomationKey[] =
+        workoutCount > 0 && programCount > 0
+          ? ["new_workout", "new_program"]
+          : workoutCount > 0
+            ? ["new_workout"]
+            : ["new_program"];
 
       // Send notifications to all users
       for (const user of users) {
@@ -356,7 +351,7 @@ serve(async (req) => {
         }
 
         // Check dashboard preferences - if ANY of the relevant prefs are enabled (default true)
-        const dashboardEnabled = dashboardPrefKey.some(key => prefs[key] !== false);
+        const dashboardEnabled = automationKeys.some((k) => canSend(prefs, k, "dashboard"));
         
         if (dashboardEnabled) {
           const { error: msgError } = await supabase
@@ -377,13 +372,13 @@ serve(async (req) => {
             dashboardSuccess++;
           }
         } else {
-          logStep("⏭️ Dashboard disabled for user", { userId: user.id, prefs: dashboardPrefKey });
+            logStep("⏭️ Dashboard disabled for user", { userId: user.id });
           dashboardSkipped++;
         }
 
         // Check email preferences
         if (user.email) {
-          const emailEnabled = emailPrefKey.some(key => prefs[key] !== false);
+          const emailEnabled = automationKeys.some((k) => canSend(prefs, k, "email"));
 
           if (emailEnabled) {
             const result = await sendEmail(user.email, subject, emailHtml);
@@ -397,7 +392,7 @@ serve(async (req) => {
               logStep("❌ Email failed", { email: user.email, error: result.error });
             }
           } else {
-            logStep("⏭️ Email disabled for user", { userId: user.id, prefs: emailPrefKey });
+            logStep("⏭️ Email disabled for user", { userId: user.id });
             emailSkipped++;
           }
         }

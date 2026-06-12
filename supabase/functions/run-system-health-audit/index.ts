@@ -3044,6 +3044,12 @@ const allStripeItems = [
     if (!isApproachingTimeout()) {
       console.log("🔄 Running scheduler reconciliation...");
       try {
+        // Legacy/removed jobs that may still appear in cron.job but are
+        // intentionally retired. Do not flag these as orphaned or untracked.
+        const IGNORED_LEGACY_JOBS = new Set<string>([
+          'process-strength-library-item-every-minute',
+          'send-scheduled-notifications-job',
+        ]);
         // Get actual cron jobs from database
         const { data: actualJobs } = await supabase.rpc('get_cron_jobs');
         
@@ -3053,23 +3059,25 @@ const allStripeItems = [
           .select('job_name, schedule, is_active, display_name');
 
         if (actualJobs && metadataJobs) {
-          const actualJobNames = new Set((actualJobs as any[]).map((j: any) => j.jobname));
-          const metadataJobNames = new Set(metadataJobs.map((m: any) => m.job_name));
+          const filteredActualJobs = (actualJobs as any[]).filter((j: any) => !IGNORED_LEGACY_JOBS.has(j.jobname));
+          const filteredMetadataJobs = metadataJobs.filter((m: any) => !IGNORED_LEGACY_JOBS.has(m.job_name));
+          const actualJobNames = new Set(filteredActualJobs.map((j: any) => j.jobname));
+          const metadataJobNames = new Set(filteredMetadataJobs.map((m: any) => m.job_name));
 
           // Find orphaned metadata (metadata exists but no actual cron job)
-          const orphanedMetadata = metadataJobs.filter((m: any) => !actualJobNames.has(m.job_name));
+          const orphanedMetadata = filteredMetadataJobs.filter((m: any) => !actualJobNames.has(m.job_name));
           
           // Find schedule mismatches
           const mismatches: string[] = [];
-          for (const meta of metadataJobs) {
-            const actual = (actualJobs as any[]).find((j: any) => j.jobname === meta.job_name);
+          for (const meta of filteredMetadataJobs) {
+            const actual = filteredActualJobs.find((j: any) => j.jobname === meta.job_name);
             if (actual && meta.schedule && actual.schedule !== meta.schedule) {
               mismatches.push(`${meta.job_name}: metadata="${meta.schedule}" actual="${actual.schedule}"`);
             }
           }
 
           // Find untracked jobs (actual cron exists but no metadata)
-          const untrackedJobs = (actualJobs as any[]).filter((j: any) => !metadataJobNames.has(j.jobname));
+          const untrackedJobs = filteredActualJobs.filter((j: any) => !metadataJobNames.has(j.jobname));
 
           const issues: string[] = [];
           if (orphanedMetadata.length > 0) {
