@@ -94,8 +94,18 @@ serve(async (req) => {
     // explicit project=SMARTYGYM metadata tag. Name heuristics are gone —
     // they previously matched HFSC products that happened to mention
     // unrelated words. Every real SmartyGym product is tagged.
+    // STRICT: a product counts as SmartyGym ONLY when it carries the
+    // explicit project=SMARTYGYM metadata tag, AND it's not a test product.
+    const isTestProduct = (product: any) => {
+      if (!product) return false;
+      const name = (product.name || "").toUpperCase();
+      if (name.startsWith("TEST")) return true;
+      const meta = product.metadata || {};
+      if (meta.test === "true" || meta.is_test === "true" || meta.environment === "test") return true;
+      return false;
+    };
     const isSmartyGymProduct = (product: any) =>
-      !!product && product.metadata?.project === "SMARTYGYM";
+      !!product && product.metadata?.project === "SMARTYGYM" && !isTestProduct(product);
 
     const invoiceCache = new Map<string, string | null>();
     const resolveProductId = async (charge: any): Promise<string | null> => {
