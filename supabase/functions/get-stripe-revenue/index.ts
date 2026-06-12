@@ -171,6 +171,8 @@ serve(async (req) => {
         email: charge.billing_details?.email ?? charge.receipt_email ?? null,
         description: charge.description ?? null,
         productName: product?.name ?? null,
+        productId: productId ?? null,
+        contentType: (product?.metadata?.content_type as string) ?? (charge.metadata?.content_type as string) ?? null,
         recurring: !!charge.invoice,
       });
     }
