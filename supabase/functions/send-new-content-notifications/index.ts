@@ -392,7 +392,7 @@ serve(async (req) => {
               logStep("❌ Email failed", { email: user.email, error: result.error });
             }
           } else {
-            logStep("⏭️ Email disabled for user", { userId: user.id, prefs: emailPrefKey });
+            logStep("⏭️ Email disabled for user", { userId: user.id });
             emailSkipped++;
           }
         }
