@@ -260,8 +260,9 @@ const AppContent = () => {
                 <Route path="/trainingprogram/:type/:id" element={<IndividualTrainingProgram />} />
                 
                 {/* Corporate page is public */}
-                <Route path="/corporate" element={<SmartyCorporate />} />
-                <Route path="/corporate-wellness" element={<CorporateWellness />} />
+                {/* Corporate offering is hidden — redirect public corporate URLs to Smarty Plans */}
+                <Route path="/corporate" element={<Navigate to="/smarty-plans" replace />} />
+                <Route path="/corporate-wellness" element={<Navigate to="/smarty-plans" replace />} />
                 <Route path="/why-smartygym" element={<Navigate to="/about" replace />} />
                 <Route path="/human-performance" element={<Navigate to="/about" replace />} />
                 <Route path="/why-invest-in-smartygym" element={<WhyInvestInSmartyGym />} />

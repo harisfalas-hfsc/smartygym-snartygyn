@@ -1,0 +1,102 @@
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import Stripe from "https://esm.sh/stripe@18.5.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+const LIFETIME_PRICE_ID = "price_1ThP4MIxQYg9inGKAUQEJ0tD";
+const LIFETIME_PRODUCT_ID = "prod_UgmdX60UPJxWeS";
+
+const logStep = (step: string, details?: unknown) => {
+  const d = details ? ` - ${JSON.stringify(details)}` : "";
+  console.log(`[CREATE-LIFETIME-CHECKOUT] ${step}${d}`);
+};
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  const supabaseClient = createClient(
+    Deno.env.get("SUPABASE_URL") ?? "",
+    Deno.env.get("SUPABASE_ANON_KEY") ?? ""
+  );
+
+  try {
+    const { cancelPath } = await req.json().catch(() => ({}));
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) throw new Error("Not authenticated");
+    const token = authHeader.replace("Bearer ", "");
+    const { data: userData } = await supabaseClient.auth.getUser(token);
+    const user = userData.user;
+    if (!user?.email) throw new Error("User not authenticated");
+    logStep("User authenticated", { userId: user.id });
+
+    // Block if already premium (subscription or prior lifetime purchase)
+    const supabaseAdmin = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { auth: { persistSession: false } }
+    );
+    const { data: hasPremium } = await supabaseAdmin.rpc("user_has_active_premium_access", {
+      _user_id: user.id,
+    });
+    if (hasPremium === true) {
+      return new Response(
+        JSON.stringify({
+          error: "You already have premium access.",
+          alreadyPremium: true,
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
+      );
+    }
+
+    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+      apiVersion: "2025-08-27.basil",
+    });
+
+    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+    const customerId = customers.data.length > 0 ? customers.data[0].id : undefined;
+
+    const origin = req.headers.get("origin") || "https://smartygym.com";
+    const safeCancel =
+      typeof cancelPath === "string" && cancelPath.startsWith("/") ? cancelPath : "/smarty-plans";
+
+    const session = await stripe.checkout.sessions.create({
+      customer: customerId,
+      customer_email: customerId ? undefined : user.email,
+      mode: "payment",
+      line_items: [{ price: LIFETIME_PRICE_ID, quantity: 1 }],
+      success_url: `${origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}${safeCancel}`,
+      payment_intent_data: {
+        metadata: {
+          project: "SMARTYGYM",
+          purchase_type: "lifetime_membership",
+          user_id: user.id,
+        },
+      },
+      metadata: {
+        project: "SMARTYGYM",
+        purchase_type: "lifetime_membership",
+        user_id: user.id,
+        product_id: LIFETIME_PRODUCT_ID,
+      },
+    });
+
+    logStep("Lifetime checkout session created", { sessionId: session.id });
+
+    return new Response(JSON.stringify({ url: session.url }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 200,
+    });
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : "Unknown error";
+    logStep("ERROR", { msg });
+    return new Response(JSON.stringify({ error: msg }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 500,
+    });
+  }
+});

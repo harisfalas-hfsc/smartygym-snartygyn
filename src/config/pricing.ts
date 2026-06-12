@@ -4,6 +4,7 @@
 export const SUBSCRIPTION_PRICES = {
   gold: 9.99,        // €9.99/month
   platinum: 89.89,   // €89.89/year (NOT monthly!)
+  lifetime: 89.99,   // €89.99 one-time lifetime membership
 } as const;
 
 // ============================================================
@@ -14,6 +15,7 @@ export const SUBSCRIPTION_PRICES = {
 export const STRIPE_PRICE_IDS = {
   gold:     'price_1SJ9q1IxQYg9inGKZzxxqPbD', // Gold Monthly €9.99
   platinum: 'price_1SJ9qGIxQYg9inGKFbgqVRjj', // Platinum Yearly €89.89
+  lifetime: 'price_1ThP4MIxQYg9inGKAUQEJ0tD', // Lifetime One-Time €89.99
 
   // Corporate plans
   corporate_dynamic:    'price_1Sc28CIxQYg9inGKfoqZgtXZ',
@@ -27,6 +29,7 @@ export type StripePlanKey = keyof typeof STRIPE_PRICE_IDS;
 export const SUBSCRIPTION_BILLING_PERIODS = {
   gold: 'monthly',
   platinum: 'yearly',
+  lifetime: 'one-time',
 } as const;
 
 export const CORPORATE_PRICES = {
@@ -42,6 +45,8 @@ export const OUR_STRIPE_PRODUCT_IDS = [
   // Subscription products
   'prod_TFfAcybp438BH6', // Smarty Gym Gold Plan
   'prod_TFfAPp1tq7RdUk', // Smarty Gym Platinum Plan
+  // Lifetime membership (one-time)
+  'prod_UgmdX60UPJxWeS', // Smarty Gym Lifetime Membership
   // Corporate products
   'prod_TZATAcAlqgc1P7', // Smarty Dynamic
   'prod_TZATDsKcDvMtHc', // Smarty Power

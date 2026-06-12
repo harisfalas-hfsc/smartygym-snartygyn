@@ -638,6 +638,44 @@ async function handleOneTimePurchase(
   const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
   const amount = paymentIntent.amount / 100; // Convert from cents
 
+  // Handle lifetime membership one-time purchase
+  if (session.metadata?.purchase_type === "lifetime_membership") {
+    logStep("Recording lifetime membership purchase", { userId, amount });
+
+    const { error: subError } = await supabase
+      .from("user_subscriptions")
+      .upsert(
+        {
+          user_id: userId,
+          plan_type: "lifetime",
+          status: "active",
+          stripe_customer_id: (session.customer as string) || null,
+          stripe_subscription_id: null,
+          current_period_end: null,
+        },
+        { onConflict: "user_id" }
+      );
+
+    if (subError) {
+      logStep("ERROR: Failed to record lifetime subscription", { error: subError });
+    } else {
+      logStep("Lifetime subscription recorded successfully");
+    }
+
+    // Also log as a purchase for audit/history
+    await supabase.from("user_purchases").insert({
+      user_id: userId,
+      content_id: "lifetime_membership",
+      content_type: "membership",
+      content_name: "SmartyGym Lifetime Membership",
+      price: amount,
+      stripe_payment_intent_id: paymentIntentId,
+      stripe_checkout_session_id: session.id,
+    });
+
+    return;
+  }
+
   // Handle standalone workout/program/shop product/ritual purchases
   const contentType = session.metadata?.content_type;
   const contentId = session.metadata?.content_id;

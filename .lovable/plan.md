@@ -1,70 +1,92 @@
 
-# Why the app feels slow
+# Switch to a Single Lifetime Membership
 
-The root cause is the current service worker. Both `public/sw.js` and `public/service-worker.js` are "kill-switch" cleanup workers — on every visit they:
+Goal: retire recurring Gold (monthly) and Platinum (yearly) plans and introduce **one** lifetime membership — **€89.99 one-time, unlocks everything forever**.
 
-1. Delete **every** cache in the browser.
-2. Unregister themselves.
-3. Force a navigation reload.
+---
 
-The result: nothing is ever cached. Every page open re-downloads the JavaScript bundle, the fonts, and the images from the network. That's exactly what you describe — 4–5 s on first open of Workouts / Programs / Payments, slightly faster the second time only because the browser memory cache survives within the same session, and zero offline capability. The APK is just a WebView pointing at the same site, so it inherits the same problem.
+## 1. Stripe: new Lifetime product
 
-Routes are already code-split with `React.lazy`, so the fix is purely the caching layer.
+Create one new Stripe product in live + test:
 
-# Plan
+- Name: **SmartyGym Lifetime Membership**
+- Type: **one-time** (no recurring interval) — €89.99 EUR
+- Image: reuse the Gold plan visual (gold crown/banner image already used on the page)
+- Metadata: `project: "SMARTYGYM"`, `content_type: "Lifetime Membership"`
 
-## 1. Replace the kill-switch SW with a real PWA service worker
+Add the resulting `prod_…` and `price_…` to `src/config/pricing.ts` as `STRIPE_PRICE_IDS.lifetime` and `OUR_STRIPE_PRODUCT_IDS`. Existing Gold/Platinum price IDs stay in the file (so historical subscribers keep working) but are no longer surfaced in the UI.
 
-- Add `vite-plugin-pwa` (using `generateSW` + Workbox) to `vite.config.ts`.
-- Output filename stays `/sw.js` so already-installed browsers/APKs adopt the new worker on the next visit instead of staying stuck on the cleanup loop.
-- Delete `public/sw.js` and `public/service-worker.js` (the kill-switch files) once the new SW is wired up — Workbox generates them.
-- Strategies:
-  - **HTML navigations** → `NetworkFirst` (so a new publish still appears immediately; falls back to cache when offline).
-  - **Hashed JS / CSS / fonts under `/assets/*`** → `CacheFirst` with long expiration. Filenames change on every deploy so this is safe.
-  - **Images (Supabase storage + same-origin)** → `StaleWhileRevalidate`, capped entries.
-  - **Supabase REST/Edge API calls** → `NetworkFirst` with a short timeout so offline still returns the last response.
-  - Exclude `/~oauth`, `/payment-success`, and any Stripe redirect URLs from precache/navigation fallback.
+## 2. Database
 
-## 2. Guarded registration (Lovable-preview safe)
+New migration:
 
-- Single registration wrapper, imported once from `src/main.tsx`.
-- Refuses to register when:
-  - not `import.meta.env.PROD`
-  - running inside an iframe
-  - hostname is `id-preview--*`, `*.lovableproject.com`, `*.lovable.app`, `*.beta.lovable.dev`
-  - URL has `?sw=off` (manual kill switch)
-- In those refused contexts, it actively unregisters any existing `/sw.js` so the editor preview is never controlled by a worker.
-- Capacitor/APK already passes these checks → SW will register there and give you offline + instant reloads.
+- Extend `plan_type` enum with `'lifetime'`.
+- Update `has_premium_subscription` and `user_has_active_premium_access` to also treat any row in `user_subscriptions` with `plan_type = 'lifetime'` (status `active`, no expiry) as premium.
+- Existing Gold/Platinum subscribers are **grandfathered**: their rows are untouched and they remain premium until their natural end (per non-destructive policy).
 
-## 3. Faster data layer
+## 3. Checkout flow
 
-- Set sensible defaults on the existing `QueryClient` in `src/App.tsx`:
-  - `staleTime: 5 * 60 * 1000` (5 min) so re-opening Workouts/Programs reuses the cached list instead of refetching.
-  - `gcTime: 30 * 60 * 1000`.
-  - `refetchOnWindowFocus: false`.
-- This alone removes most of the "spinner appears every time I navigate back" feeling.
+- New edge function `create-lifetime-checkout` based on `create-checkout`, but `mode: "payment"` (one-off), success → `/payment-success`, cancel → original page.
+- On `checkout.session.completed` for the lifetime price in `stripe-webhook`: insert/update `user_subscriptions` with `plan_type = 'lifetime'`, `status = 'active'`, `current_period_end = null` (or far-future). No renewal logic needed.
+- Block re-purchase if the user already has lifetime or any active premium plan (return friendly "Already premium" toast, same pattern as today).
 
-## 4. Prefetch on hover/tap for heavy routes
+## 4. SmartyPlans page (`src/pages/SmartyPlans.tsx`)
 
-- In the workout/program cards, prefetch the route module + its first data query on `onPointerEnter` / `onTouchStart`. By the time the user releases the tap, the chunk is already in cache.
+Replace the dual-card carousel and yearly comparison with a **single Lifetime card** (centered, max ~480px on desktop, full-width on mobile — no swipe carousel needed).
 
-## 5. APK note
+Card content:
+- Title: **Lifetime Membership**
+- Price: **€89.99 · one-time**
+- Tagline: "Pay once. Train for life."
+- Bullets: Full access to all Workouts · Training Programs · Smarty Ritual · Smarty Tools · Check-ins · Dashboard & LogBook · Coach support · All future updates included
+- CTA: "Get Lifetime Access" → `create-lifetime-checkout`
+- Footnote: "One-time payment. No subscription. Yours forever."
 
-The APK is a WebView of the published site. Once steps 1–3 ship and you reinstall (or just relaunch) the APK once online, the SW takes over and subsequent opens load from cache — including offline. The "log in once and it works offline" promise will actually hold from that point on.
+Other sections on the page:
+- **Header banner**: remove "Cancel anytime. Auto-renews until cancelled." Replace with "One payment. Lifetime access. Forever yours."
+- **"What You Get with Premium"**: keep grid; rename to **"What's Included for Life"**; refresh copy to lifetime tone ("All yours, forever").
+- **"Compare Access Levels"**: keep (Visitor / Subscriber / Premium); change Premium sub-label from "Gold / Platinum" to "Lifetime".
+- **"Why Choose Yearly" card**: delete entirely.
+- **The 3 instances of `PricingPlansBlock`**: collapse to a single `LifetimeCard` rendered once (top) and once (bottom, after the comparison table). Remove the helper `PricingPlansBlock` component and the `PlanTier` type.
+- **"Looking for Corporate Plans?" card**: remove (hide).
+- **FAQ teaser card**: keep.
+- SEO/Helmet/JSON-LD: replace the two Product schemas with one Product schema for the Lifetime Membership (€89.99 one-time). Update title, description, OG, Twitter, AI-pricing meta tags, `SEOEnhancer` props, and the `aiSummary` to reflect a single lifetime plan.
 
-# Files touched (technical)
+## 5. FAQ (`src/pages/FAQ.tsx`)
 
-- `vite.config.ts` — add `VitePWA({ registerType: "autoUpdate", filename: "sw.js", strategies: "generateSW", workbox: { … } })`.
-- `public/sw.js`, `public/service-worker.js` — delete (Workbox emits the new `/sw.js`).
-- `src/main.tsx` — replace the unconditional `clearServiceWorkersAndCaches` with the guarded registration wrapper. Keep the existing iframe/preview/native unregister behavior.
-- `src/App.tsx` — add `defaultOptions` to `QueryClient`.
-- `src/components/workouts/*Card.tsx`, `src/components/programs/*Card.tsx` — add hover/touch prefetch (small change, no UI change).
-- `public/manifest.webmanifest` — verify it still matches (no install behavior change for already-installed apps).
+Rewrite the "Is there a free trial?" entry (and any other mention of Gold/Platinum, monthly/yearly, "cancel anytime") to describe the single Lifetime Membership — both the visible accordion text **and** the FAQPage JSON-LD `mainEntity`.
 
-# What you will see after this ships
+Search-replace any other "Gold" / "Platinum" / "monthly" / "yearly" / "auto-renew" / "cancel anytime" copy that still references the two-plan model on this page.
 
-- First visit: same speed as today (one network download).
-- Every visit after that: pages open instantly from cache, including the APK.
-- New publishes still go live immediately (HTML is NetworkFirst; hashed JS filenames change per deploy).
-- Logging in once online → app keeps working offline afterwards, as originally promised.
-- No change to the editor preview behavior (SW stays disabled there).
+## 6. Hide Corporate
+
+- Remove the `<Route path="/corporate" …>` from `src/App.tsx` (also `/corporate-wellness` if the user wants the public corporate surface fully hidden — confirmed by their wording: hide the entire corporate page). Keep the file `SmartyCorporate.tsx` and the admin `corporate-admin` route untouched.
+- Remove every navigation link pointing to `/corporate` (footer, nav, About page, the SmartyPlans corporate CTA card).
+- Add a fallback: `/corporate` → redirect to `/smarty-plans` so old links don't 404.
+
+## 7. Homepage CTA
+
+`src/pages/Index.tsx` "Join Premium" button keeps its current destination (`/smarty-plans`) — no change beyond the page itself now showing the single lifetime plan.
+
+## 8. Out of scope (intentional)
+
+- No migration of existing Gold/Platinum subscribers — they keep their current subscription per the non-destructive policy. Stripe webhooks, renewal reminders, and the 4-hour auto-finalize cron continue to serve them until natural end.
+- No price changes for already-bought standalone workouts/programs/micro-workouts.
+- The two existing Stripe subscription products are **not deleted** in Stripe (keeps historical reporting intact); they are simply no longer linked from the UI.
+
+---
+
+## Files touched
+
+- `src/config/pricing.ts` — add lifetime IDs
+- `src/pages/SmartyPlans.tsx` — single-card rewrite + section cleanup
+- `src/pages/FAQ.tsx` — copy + JSON-LD
+- `src/App.tsx` — remove `/corporate` route, add redirect
+- `src/components/Navigation.tsx` + footer + `src/pages/About.tsx` — drop corporate links
+- New `supabase/functions/create-lifetime-checkout/index.ts`
+- `supabase/functions/stripe-webhook/index.ts` — handle one-time lifetime purchase
+- New migration: extend `plan_type` enum, update access helpers
+
+## Open question
+
+After approval I'll need the actual Stripe Lifetime **product ID** and **price ID** once I create the product (I'll create it via the `stripe--create_stripe_product_and_price` tool with `project: SMARTYGYM` metadata, then paste the IDs into `pricing.ts`).
