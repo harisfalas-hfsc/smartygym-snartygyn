@@ -573,10 +573,7 @@ export default function UserDashboard() {
   };
   const getPlanName = (productId: string | null) => {
     if (!productId) return "Free";
-    // Use plan_type from database (gold, platinum, free)
     const planType = productId.toLowerCase();
-    if (planType === "gold") return "Gold";
-    if (planType === "platinum") return "Platinum";
     if (planType === "free") return "Free";
     return "Premium";
   };
