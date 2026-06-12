@@ -322,6 +322,11 @@ export function UsersManager() {
     if (planFilter !== "all") {
       if (planFilter === "corporate") {
         filtered = filtered.filter(user => corporateInfo[user.user_id]?.adminPlanType || corporateInfo[user.user_id]?.memberPlanType);
+      } else if (planFilter === "premium") {
+        // Granted premium rows use legacy plan types (lifetime/gold/platinum)
+        filtered = filtered.filter(user => user.status === 'active' && PREMIUM_PLAN_TYPES.has(user.plan_type));
+      } else if (planFilter === "free") {
+        filtered = filtered.filter(user => !(user.status === 'active' && PREMIUM_PLAN_TYPES.has(user.plan_type)) && !(corporateInfo[user.user_id]?.adminPlanType || corporateInfo[user.user_id]?.memberPlanType));
       } else {
         filtered = filtered.filter(user => user.plan_type === planFilter);
       }
