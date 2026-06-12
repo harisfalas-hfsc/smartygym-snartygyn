@@ -856,9 +856,6 @@ export default function UserDashboard() {
                         <Badge variant="outline" className="text-xs h-5 px-1.5 bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20">
                           Active
                         </Badge>
-                        {stripeDetails?.cancel_at_period_end && <Badge variant="outline" className="text-xs h-5 px-1.5 bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20">
-                            Cancels at period end
-                          </Badge>}
                       </div>
                     </div>
 
