@@ -164,22 +164,18 @@ export function AnalyticsDashboard() {
       const paidSubscribers = premiumCounts.paidSubscribers;
       const manualSubscribers = premiumCounts.manualSubscribers;
 
-      const goldSubscribers = subscriptions?.filter(s => s.status === "active" && s.plan_type === "gold").length || 0;
-      const goldPaid = subscriptions?.filter(s => s.status === "active" && s.plan_type === "gold" && s.stripe_subscription_id).length || 0;
-      
-      const platinumSubscribers = subscriptions?.filter(s => s.status === "active" && s.plan_type === "platinum").length || 0;
-      const platinumPaid = subscriptions?.filter(s => s.status === "active" && s.plan_type === "platinum" && s.stripe_subscription_id).length || 0;
+      const premiumPlans = new Set(["lifetime", "gold", "platinum", "premium"]);
+      const premiumSubscribers = subscriptions?.filter(s => s.status === "active" && premiumPlans.has(s.plan_type)).length || 0;
+      const premiumPaid = subscriptions?.filter(s => s.status === "active" && premiumPlans.has(s.plan_type) && (s.stripe_subscription_id || s.plan_type === "lifetime")).length || 0;
       
       // Non-premium users = total profiles minus distinct active premium users.
       // (Counting only `user_subscriptions` rows missed all profiles without any
       // subscription row, undercounting free users dramatically.)
       const freeUsers = computeNonPremiumUsers(totalUsers, premiumCounts.distinctPremiumUsers);
 
-      // Calculate ACTUAL revenue from PAID subscriptions only
-      // Gold = €9.99/month, Platinum = €89.89/year
-      const goldRevenue = goldPaid * SUBSCRIPTION_PRICES.gold;
-      const platinumRevenue = platinumPaid * SUBSCRIPTION_PRICES.platinum;
-      let totalRevenue = goldRevenue + platinumRevenue;
+      // Calculate revenue from Premium memberships (lifetime €89.99 one-time)
+      const lifetimePaid = subscriptions?.filter(s => s.status === "active" && s.plan_type === "lifetime").length || 0;
+      let totalRevenue = lifetimePaid * SUBSCRIPTION_PRICES.lifetime;
 
       // Fetch purchases for standalone sales
       const { data: purchases } = await supabase
@@ -204,10 +200,8 @@ export function AnalyticsDashboard() {
       });
       const bestSellingProgram = Object.entries(programSales).sort((a, b) => b[1] - a[1])[0]?.[0] || "-";
 
-      // Revenue chart data - use CORRECT prices and PAID subscribers only
       const revenueChartData = [
-        { name: `Gold Plans (€${SUBSCRIPTION_PRICES.gold}/mo)`, value: goldPaid * SUBSCRIPTION_PRICES.gold },
-        { name: `Platinum Plans (€${SUBSCRIPTION_PRICES.platinum}/yr)`, value: platinumPaid * SUBSCRIPTION_PRICES.platinum },
+        { name: `Premium Memberships (€${SUBSCRIPTION_PRICES.lifetime})`, value: lifetimePaid * SUBSCRIPTION_PRICES.lifetime },
         { name: "Standalone Purchases", value: standaloneRevenue }
       ];
 
@@ -228,16 +222,9 @@ export function AnalyticsDashboard() {
         const monthStart = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1);
         const monthEnd = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0);
 
-        // Only count PAID subscriptions (with stripe_subscription_id)
-        const goldCount = subscriptions?.filter(s => {
+        const premiumCount = subscriptions?.filter(s => {
           const startDate = new Date(s.created_at);
-          return s.plan_type === "gold" && s.stripe_subscription_id && startDate <= monthEnd && 
-                 (!s.current_period_end || new Date(s.current_period_end) >= monthStart);
-        }).length || 0;
-
-        const platinumCount = subscriptions?.filter(s => {
-          const startDate = new Date(s.created_at);
-          return s.plan_type === "platinum" && s.stripe_subscription_id && startDate <= monthEnd && 
+          return premiumPlans.has(s.plan_type) && startDate <= monthEnd &&
                  (!s.current_period_end || new Date(s.current_period_end) >= monthStart);
         }).length || 0;
 
@@ -249,8 +236,7 @@ export function AnalyticsDashboard() {
 
         trendsData.push({
           name: monthName,
-          "Gold Plans": goldCount * SUBSCRIPTION_PRICES.gold,
-          "Platinum Plans": platinumCount * SUBSCRIPTION_PRICES.platinum,
+          "Premium Memberships": premiumCount * SUBSCRIPTION_PRICES.lifetime,
           "Standalone Purchases": monthPurchaseRevenue
         });
       }
