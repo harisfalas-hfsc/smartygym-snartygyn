@@ -1,25 +1,22 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
-import { STRIPE_PRICE_IDS } from "@/config/pricing";
 import { isIOSNative } from "@/utils/platform";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   Carousel,
-  type CarouselApi,
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
-import { 
-  Crown, 
-  Check, 
-  Dumbbell, 
-  Calendar, 
+import {
+  Crown,
+  Check,
+  Dumbbell,
+  Calendar,
   Calculator,
   BookOpen,
-  
   Zap,
   Sparkles,
   Heart,
@@ -32,9 +29,9 @@ import {
   LayoutDashboard,
   MessageCircle,
   Flame,
-  Building2,
   CircleMinus,
-  FileText
+  FileText,
+  Infinity as InfinityIcon,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
@@ -45,75 +42,16 @@ import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { AlreadyPremiumCard } from "@/components/pricing/AlreadyPremiumCard";
 
-type PlanTier = 'gold' | 'platinum';
-
-function PricingPlansBlock({ goldPlanCard, platinumPlanCard }: { goldPlanCard: ReactNode; platinumPlanCard: ReactNode }) {
-  const [mobileCarouselApi, setMobileCarouselApi] = useState<CarouselApi>();
-  const selectedPlanRef = useRef<PlanTier>('gold');
-
-  useEffect(() => {
-    if (!mobileCarouselApi) return;
-
-    const syncSelectedPlan = () => {
-      selectedPlanRef.current = mobileCarouselApi.selectedScrollSnap() === 1 ? 'platinum' : 'gold';
-    };
-
-    const restoreSelectedPlan = () => {
-      const index = selectedPlanRef.current === 'platinum' ? 1 : 0;
-      requestAnimationFrame(() => mobileCarouselApi.scrollTo(index, true));
-    };
-
-    restoreSelectedPlan();
-    mobileCarouselApi.on('select', syncSelectedPlan);
-    mobileCarouselApi.on('reInit', restoreSelectedPlan);
-
-    return () => {
-      mobileCarouselApi.off('select', syncSelectedPlan);
-      mobileCarouselApi.off('reInit', restoreSelectedPlan);
-    };
-  }, [mobileCarouselApi]);
-
-  return (
-    <>
-      <div className="md:hidden mb-8">
-        <Carousel
-          className="w-full"
-          opts={{ align: "start", loop: false, containScroll: "trimSnaps" }}
-          setApi={setMobileCarouselApi}
-        >
-          <CarouselContent className="-ml-2">
-            <CarouselItem className="pl-2 basis-[88%]">
-              {goldPlanCard}
-            </CarouselItem>
-            <CarouselItem className="pl-2 basis-[88%]">
-              {platinumPlanCard}
-            </CarouselItem>
-          </CarouselContent>
-        </Carousel>
-        <p className="text-center text-xs text-muted-foreground mt-2">← Swipe to compare plans →</p>
-      </div>
-
-      <div className="hidden md:grid grid-cols-2 gap-6 mb-8">
-        {goldPlanCard}
-        {platinumPlanCard}
-      </div>
-    </>
-  );
-}
-
 export default function SmartyPlans() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  
+
   const { userTier } = useAccessControl();
   const isPremium = userTier === "premium";
   const [user, setUser] = useState<User | null>(null);
-  const [loadingPlan, setLoadingPlan] = useState<PlanTier | null>(null);
-  const loading = loadingPlan !== null;
-  
-  // Pricing
-  const goldOriginal = 9.99;
-  const platinumOriginal = 89.99;
+  const [loading, setLoading] = useState(false);
+
+  const lifetimePrice = 89.99;
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -127,7 +65,7 @@ export default function SmartyPlans() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const handleSubscribe = async (plan: PlanTier) => {
+  const handleSubscribe = async () => {
     if (isPremium) {
       toast({
         title: "Already Premium",
@@ -142,37 +80,28 @@ export default function SmartyPlans() {
       return;
     }
 
-    setLoadingPlan(plan);
-    const priceIds = {
-      gold: STRIPE_PRICE_IDS.gold,
-      platinum: STRIPE_PRICE_IDS.platinum,
-    };
-
+    setLoading(true);
     try {
-    const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: { priceId: priceIds[plan], cancelPath: window.location.pathname + window.location.search }
+      const { data, error } = await supabase.functions.invoke('create-lifetime-checkout', {
+        body: { cancelPath: window.location.pathname + window.location.search }
       });
 
-      // Handle already subscribed response from backend
       if (data?.hasActiveSubscription) {
         toast({
-          title: "You're Already Subscribed!",
-          description: "You already have an active premium subscription.",
+          title: "You're Already Premium!",
+          description: "You already have lifetime access.",
         });
         navigate('/userdashboard');
         return;
       }
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       if (data?.url) {
         window.location.href = data.url;
         return;
-      } else {
-        throw new Error("No checkout URL returned");
       }
+      throw new Error("No checkout URL returned");
     } catch (error) {
       console.error('Error creating checkout:', error);
       toast({
@@ -181,7 +110,7 @@ export default function SmartyPlans() {
         variant: "destructive"
       });
     } finally {
-      setLoadingPlan(null);
+      setLoading(false);
     }
   };
 
@@ -224,199 +153,120 @@ export default function SmartyPlans() {
     { icon: Zap, title: "Priority Support", description: "Get help when you need it" }
   ];
 
-  const yearlyBenefits = [
-    "Save €29.89 (25% off) compared to monthly",
-    "Only €7.50 per month when paid annually",
-    "Lock in your rate for 12 months",
-    "Best value for committed users",
-    "Full access to all features"
-  ];
-
-  const GoldPlanCard = (
-    <Card className="relative border-2 border-[#D4AF37] shadow-lg flex flex-col h-full">
-        <CardHeader className="text-center pb-2 sm:pb-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-[#D4AF37]">Gold Plan</h2>
-          <Badge className="bg-[#D4AF37] text-white mx-auto mb-3 sm:mb-4">MONTHLY</Badge>
-          <CardTitle className="text-2xl sm:text-3xl font-bold">€{goldOriginal.toFixed(2)}</CardTitle>
-          <p className="text-xs sm:text-sm text-muted-foreground">per month</p>
-          <p className="text-xs text-[#D4AF37] font-semibold mt-1">🔄 Auto-renews monthly</p>
-        </CardHeader>
-        <CardContent className="space-y-2 sm:space-y-4 flex-1 flex flex-col">
-          <div className="space-y-1.5 sm:space-y-2 flex-1">
-            {["Full access to all Smarty Workouts", "Full access to all Smarty Programs", "Full access to Smarty Ritual", "Full access to Smarty Tools", "Flexible monthly billing", "Cancel anytime"].map((item, i) => (
-              <div key={i} className="flex items-start gap-2">
-                <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 shrink-0 mt-0.5" />
-                <span className="text-xs sm:text-sm">{item}</span>
-              </div>
-            ))}
-          </div>
-          <div className="space-y-3 mt-auto">
-            {isIOSNative() ? (
-              <div className="text-center text-xs sm:text-sm text-muted-foreground p-3 border rounded">
-                Subscribe at <span className="text-primary font-semibold">smartygym.com</span>
-              </div>
-            ) : (
+  const LifetimeCard = (
+    <Card className="relative overflow-hidden border-2 border-[#D4AF37] shadow-lg flex flex-col h-full bg-gradient-to-br from-[#D4AF37]/5 to-[#F5D87A]/10 max-w-xl mx-auto w-full">
+      <Badge className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-green-600 text-white px-2 sm:px-3 py-1 z-10">
+        BEST VALUE
+      </Badge>
+      <CardHeader className="text-center pb-2 sm:pb-4 pt-4 sm:pt-6">
+        <div className="flex items-center justify-center gap-2 mb-2">
+          <Crown className="h-6 w-6 sm:h-7 sm:w-7 text-[#D4AF37]" />
+          <h2 className="text-2xl sm:text-3xl font-bold text-[#D4AF37]">Lifetime Membership</h2>
+        </div>
+        <Badge className="bg-[#D4AF37] text-white mx-auto mb-3 sm:mb-4">ONE-TIME PAYMENT</Badge>
+        <CardTitle className="text-3xl sm:text-4xl font-bold">€{lifetimePrice.toFixed(2)}</CardTitle>
+        <p className="text-xs sm:text-sm text-muted-foreground">Pay once. Train for life.</p>
+        <p className="text-xs text-[#D4AF37] font-semibold mt-2 flex items-center justify-center gap-1">
+          <InfinityIcon className="h-3.5 w-3.5" /> Unlock everything, forever
+        </p>
+      </CardHeader>
+      <CardContent className="space-y-2 sm:space-y-4 flex-1 flex flex-col">
+        <div className="space-y-1.5 sm:space-y-2 flex-1">
+          {[
+            "Lifetime access to all Smarty Workouts",
+            "Lifetime access to all Smarty Programs",
+            "Lifetime access to Smarty Ritual",
+            "Lifetime access to Smarty Tools",
+            "Smarty Check-ins included",
+            "All future content included — no extra cost",
+            "No subscriptions. No renewals. Ever.",
+          ].map((item, i) => (
+            <div key={i} className="flex items-start gap-2">
+              <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 shrink-0 mt-0.5" />
+              <span className="text-xs sm:text-sm">{item}</span>
+            </div>
+          ))}
+        </div>
+        <div className="space-y-3 mt-auto">
+          {isIOSNative() ? (
+            <div className="text-center text-xs sm:text-sm text-muted-foreground p-3 border rounded">
+              Purchase at <span className="text-primary font-semibold">smartygym.com</span>
+            </div>
+          ) : (
             <Button
-              className="w-full py-4 sm:py-6 text-white bg-[#D4AF37] hover:bg-[#C9A431]"
-              onClick={() => handleSubscribe('gold')}
+              className="w-full py-5 sm:py-6 text-white bg-[#D4AF37] hover:bg-[#C9A431] text-base sm:text-lg font-semibold"
+              onClick={handleSubscribe}
               disabled={loading}
             >
-              {loadingPlan === 'gold' ? "Processing..." : "Start Your Plan"}
+              {loading ? "Processing..." : "Get Lifetime Access"}
             </Button>
-            )}
-            <p className="text-xs text-center text-muted-foreground">Auto-renews each month</p>
-          </div>
-        </CardContent>
-      </Card>
-  );
-
-  const PlatinumPlanCard = (
-    <Card className="relative overflow-hidden border-2 border-[#A8A9AD] shadow-lg flex flex-col h-full bg-gradient-to-br from-[#A8A9AD]/5 to-[#C0C0C0]/10">
-        <Badge className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-green-600 text-white px-2 sm:px-3 py-1 z-10">
-          BEST VALUE
-        </Badge>
-        <CardHeader className="text-center pb-2 sm:pb-4 pt-4 sm:pt-6">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <Crown className="h-5 w-5 sm:h-6 sm:w-6 text-[#A8A9AD]" />
-            <h2 className="text-xl sm:text-2xl font-bold text-[#A8A9AD]">Platinum</h2>
-          </div>
-          <Badge className="bg-[#A8A9AD] text-white mx-auto mb-3 sm:mb-4">YEARLY</Badge>
-          <CardTitle className="text-2xl sm:text-3xl font-bold">€{platinumOriginal.toFixed(2)}</CardTitle>
-          <p className="text-xs sm:text-sm text-muted-foreground">per year</p>
-          <p className="text-sm text-green-600 font-bold mt-2">Save €29.89!</p>
-          <p className="text-xs text-muted-foreground">Just €7.50/month • 🔄 Auto-renews yearly</p>
-        </CardHeader>
-        <CardContent className="space-y-2 sm:space-y-4 flex-1 flex flex-col">
-          <div className="space-y-1.5 sm:space-y-2 flex-1">
-            {["Full access to all Smarty Workouts", "Full access to all Smarty Programs", "Full access to Smarty Ritual", "Full access to Smarty Tools", "25% savings vs monthly", "Cancel anytime"].map((item, i) => (
-              <div key={i} className="flex items-start gap-2">
-                <Check className={`h-4 w-4 sm:h-5 sm:w-5 shrink-0 mt-0.5 ${item.includes("25%") ? "text-green-600" : "text-green-500"}`} />
-                <span className={`text-xs sm:text-sm ${item.includes("25%") ? "font-bold text-green-600" : ""}`}>{item}</span>
-              </div>
-            ))}
-          </div>
-          <div className="space-y-3 mt-auto">
-            {isIOSNative() ? (
-              <div className="text-center text-xs sm:text-sm text-muted-foreground p-3 border rounded">
-                Subscribe at <span className="text-primary font-semibold">smartygym.com</span>
-              </div>
-            ) : (
-            <Button
-              className="w-full py-4 sm:py-6 text-white bg-[#A8A9AD] hover:bg-[#9A9B9F]"
-              onClick={() => handleSubscribe('platinum')}
-              disabled={loading}
-            >
-              {loadingPlan === 'platinum' ? "Processing..." : "Start Your Plan"}
-            </Button>
-            )}
-            <p className="text-xs text-center text-muted-foreground">Auto-renews each year</p>
-          </div>
-        </CardContent>
-      </Card>
+          )}
+          <p className="text-xs text-center text-muted-foreground">One single payment. Lifetime access.</p>
+        </div>
+      </CardContent>
+    </Card>
   );
 
   return (
     <>
       <Helmet>
-        <title>Smarty Plans | Premium Membership | SmartyGym | Compare Gold vs Platinum</title>
-        <meta name="description" content="Compare SmartyGym membership plans - Gold €9.99/month or Platinum €89.99/year (save 25%). 500+ workouts, training programs, fitness tools. Cancel anytime." />
-        <meta name="keywords" content="SmartyGym plans, compare gym memberships, Gold vs Platinum, online gym pricing, monthly vs yearly gym, affordable online fitness, gym subscription comparison, premium fitness plans, smartygym pricing" />
-        
-        <meta property="og:title" content="Compare Premium Plans | SmartyGym" />
-        <meta property="og:description" content="Gold €9.99/month or Platinum €89.99/year. Compare features and choose your perfect fitness plan." />
+        <title>Lifetime Membership | SmartyGym | One Payment. Train for Life.</title>
+        <meta name="description" content="Unlock SmartyGym forever with a single €89.99 Lifetime Membership. 500+ human-designed workouts, training programs, and fitness tools. No subscriptions. No renewals." />
+        <meta name="keywords" content="SmartyGym lifetime, lifetime gym membership, one-time payment fitness, no subscription gym, smartygym pricing, lifetime fitness access" />
+
+        <meta property="og:title" content="Lifetime Membership | SmartyGym" />
+        <meta property="og:description" content="One payment of €89.99. Lifetime access to every SmartyGym workout, program and tool." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://smartygym.com/smarty-plans" />
-        
+
         <meta name="twitter:card" content="summary" />
-        <meta name="twitter:title" content="Compare Premium Plans | SmartyGym" />
-        <meta name="twitter:description" content="Gold vs Platinum - Find your perfect membership plan." />
-        
+        <meta name="twitter:title" content="Lifetime Membership | SmartyGym" />
+        <meta name="twitter:description" content="One payment. Train for life." />
+
         <link rel="canonical" href="https://smartygym.com/smarty-plans" />
-        
-        {/* AI Search Optimization Meta Tags */}
-        <meta name="ai-pricing-gold" content="€9.99/month recurring subscription" />
-        <meta name="ai-pricing-platinum" content="€89.99/year (save 25% vs monthly)" />
-        <meta name="ai-comparison" content="Gold: monthly billing, Platinum: yearly billing with 25% savings" />
-        <meta name="ai-value-proposition" content="100% human-designed workouts by certified Sports Scientist Haris Falas" />
-        
-        {/* Product Schema - Gold Plan */}
+
+        <meta name="ai-pricing-lifetime" content="€89.99 one-time payment, lifetime access" />
+        <meta name="ai-value-proposition" content="100% human-designed workouts by certified Sports Scientist Haris Falas — one payment, lifetime access" />
+
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Product",
-            "name": "SmartyGym Gold Plan",
-            "description": "Monthly premium membership with unlimited workouts, training programs, and fitness calculators",
-            "brand": {
-              "@type": "Brand",
-              "name": "SmartyGym"
-            },
+            "name": "SmartyGym Lifetime Membership",
+            "description": "One-time payment for lifetime premium access to all SmartyGym workouts, programs, and tools.",
+            "brand": { "@type": "Brand", "name": "SmartyGym" },
             "offers": {
               "@type": "Offer",
-              "price": goldOriginal.toString(),
+              "price": lifetimePrice.toString(),
               "priceCurrency": "EUR",
               "availability": "https://schema.org/InStock",
-              "url": "https://smartygym.com/smarty-plans",
-              "priceValidUntil": "2026-12-31"
+              "url": "https://smartygym.com/smarty-plans"
             },
             "category": "Online Fitness Membership"
           })}
         </script>
-        
-        {/* Product Schema - Platinum Plan */}
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Product",
-            "name": "SmartyGym Platinum Plan",
-            "description": "Yearly premium membership with unlimited workouts, training programs, and fitness calculators. Best value - save 25%.",
-            "brand": {
-              "@type": "Brand",
-              "name": "SmartyGym"
-            },
-            "offers": {
-              "@type": "Offer",
-              "price": platinumOriginal.toString(),
-              "priceCurrency": "EUR",
-              "availability": "https://schema.org/InStock",
-              "url": "https://smartygym.com/smarty-plans",
-              "priceValidUntil": "2026-12-31"
-            },
-            "category": "Online Fitness Membership"
-          })}
-        </script>
-        
-        {/* BreadcrumbList Schema */}
+
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "BreadcrumbList",
             "itemListElement": [
-              {
-                "@type": "ListItem",
-                "position": 1,
-                "name": "Home",
-                "item": "https://smartygym.com"
-              },
-              {
-                "@type": "ListItem",
-                "position": 2,
-                "name": "Smarty Plans",
-                "item": "https://smartygym.com/smarty-plans"
-              }
+              { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://smartygym.com" },
+              { "@type": "ListItem", "position": 2, "name": "Smarty Plans", "item": "https://smartygym.com/smarty-plans" }
             ]
           })}
         </script>
       </Helmet>
-      
+
       <SEOEnhancer
-        entities={["Premium Membership", "Online Gym Subscription", "Gold Plan", "Platinum Plan", "SmartyGym"]}
-        topics={["online gym membership comparison", "fitness subscription pricing", "premium vs free gym", "monthly vs yearly fitness plans"]}
-        expertise={["subscription management", "membership comparison", "fitness pricing"]}
-        contentType="Product Comparison"
-        aiSummary="SmartyGym Premium Plans comparison: Gold Plan €9.99/month vs Platinum Plan €89.99/year (save 25%). Both include 500+ workouts, training programs, fitness calculators, and expert coaching. Cancel anytime."
-        aiKeywords={["compare gym plans", "Gold vs Platinum", "online gym pricing", "fitness subscription comparison", "best value gym membership"]}
+        entities={["Lifetime Membership", "One-Time Payment", "SmartyGym"]}
+        topics={["lifetime gym membership", "one-time fitness payment", "no-subscription fitness platform"]}
+        expertise={["membership pricing", "lifetime access"]}
+        contentType="Product"
+        aiSummary="SmartyGym Lifetime Membership: a single €89.99 payment unlocks every workout, program, ritual, check-in, and tool — forever. No subscriptions, no renewals."
+        aiKeywords={["lifetime gym membership", "one-time payment fitness", "smartygym lifetime"]}
         relatedContent={["Premium Benefits", "Workout Library", "Training Programs", "Fitness Tools"]}
-        targetAudience="fitness enthusiasts comparing membership options"
+        targetAudience="fitness enthusiasts looking for a one-time lifetime gym membership"
         pageType="Product"
       />
 
@@ -424,7 +274,6 @@ export default function SmartyPlans() {
         <main className="container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6 pb-8">
           <PageBreadcrumbs items={[{ label: "Home", href: "/" }, { label: "Smarty Plans" }]} />
 
-          {/* Show Already Premium Card for premium users */}
           {isPremium && (
             <AlreadyPremiumCard className="mb-8" />
           )}
@@ -434,25 +283,24 @@ export default function SmartyPlans() {
             <Crown className="h-16 w-16 text-primary mx-auto mb-4" />
             <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight uppercase mb-4">
               <span className="block">Transform your fitness journey.</span>
-              <span className="block">Join Premium</span>
+              <span className="block">Lifetime Membership</span>
             </h1>
             <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 max-w-2xl mx-auto">
               <p className="text-sm text-muted-foreground">
-                Join thousands of members who've upgraded to premium and achieved their fitness goals
+                Join thousands of members who unlocked SmartyGym for life with one single payment.
               </p>
               <p className="text-sm font-semibold text-primary mt-2">
-                Cancel anytime. Auto-renews until cancelled.
+                One payment. Lifetime access. No renewals.
               </p>
             </div>
           </div>
 
-          {/* What You Get with Premium */}
+          {/* What You Get for Life */}
           <Card className="mb-8 bg-white dark:bg-card border-2 border-primary/40 shadow-primary">
             <CardHeader>
-              <CardTitle className="text-2xl">What You Get with Premium</CardTitle>
+              <CardTitle className="text-2xl">What's Included for Life</CardTitle>
             </CardHeader>
             <CardContent>
-              {/* Mobile: ultra-compact icon + title pills */}
               <div className="grid grid-cols-2 gap-2 md:hidden">
                 {benefits.map((benefit, index) => (
                   <div key={index} className="flex items-center gap-1.5 py-2 px-1 border-b border-primary/10 min-w-0">
@@ -462,7 +310,6 @@ export default function SmartyPlans() {
                 ))}
               </div>
 
-              {/* Desktop / tablet: full description grid */}
               <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {benefits.map((benefit, index) => (
                   <div key={index} className="flex items-start gap-3 p-4 bg-muted rounded-lg">
@@ -479,8 +326,12 @@ export default function SmartyPlans() {
             </CardContent>
           </Card>
 
-          {/* Pricing Plans (after What You Get) - Hidden for premium users */}
-          {!isPremium && <PricingPlansBlock goldPlanCard={GoldPlanCard} platinumPlanCard={PlatinumPlanCard} />}
+          {/* Lifetime card (after What's Included) */}
+          {!isPremium && (
+            <div className="mb-8">
+              {LifetimeCard}
+            </div>
+          )}
 
           {/* Compare Access Levels */}
           <Card className="mb-8 overflow-hidden border-2 border-[hsl(var(--primary)/0.6)] shadow-xl">
@@ -494,84 +345,84 @@ export default function SmartyPlans() {
                   <CarouselContent className="-ml-2">
                     <CarouselItem className="pl-2 basis-[88%]">
                       <Card className="border-2 border-[hsl(var(--primary)/0.3)] h-full">
-                  <CardContent className="pt-6">
-                    <div className="flex items-center justify-center gap-2 mb-4">
-                      <Eye className="w-6 h-6 text-primary" />
-                      <h3 className="text-2xl font-bold">Visitor</h3>
-                    </div>
-                    <div className="text-center text-sm text-muted-foreground mb-4">Free • No login</div>
-                    <div className="space-y-3">
-                      {comparisonFeatures.map((feature, idx) => {
-                        const Icon = feature.icon;
-                        return (
-                          <div key={idx} className="flex justify-between items-center py-2 border-b border-primary/10">
-                            <div className="flex items-center gap-2">
-                              <Icon className="w-4 h-4 text-primary" />
-                              <span className="text-sm font-medium">{feature.category}</span>
-                            </div>
-                            <div>{renderFeatureValue(feature.visitor)}</div>
+                        <CardContent className="pt-6">
+                          <div className="flex items-center justify-center gap-2 mb-4">
+                            <Eye className="w-6 h-6 text-primary" />
+                            <h3 className="text-2xl font-bold">Visitor</h3>
                           </div>
-                        );
-                      })}
-                    </div>
-                  </CardContent>
+                          <div className="text-center text-sm text-muted-foreground mb-4">Free • No login</div>
+                          <div className="space-y-3">
+                            {comparisonFeatures.map((feature, idx) => {
+                              const Icon = feature.icon;
+                              return (
+                                <div key={idx} className="flex justify-between items-center py-2 border-b border-primary/10">
+                                  <div className="flex items-center gap-2">
+                                    <Icon className="w-4 h-4 text-primary" />
+                                    <span className="text-sm font-medium">{feature.category}</span>
+                                  </div>
+                                  <div>{renderFeatureValue(feature.visitor)}</div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </CardContent>
                       </Card>
                     </CarouselItem>
 
                     <CarouselItem className="pl-2 basis-[88%]">
                       <Card className="border-2 border-[hsl(var(--primary)/0.5)] h-full">
-                  <CardContent className="pt-6">
-                    <div className="flex items-center justify-center gap-2 mb-4">
-                      <UserCheck className="w-6 h-6 text-primary" />
-                      <h3 className="text-2xl font-bold">Subscriber</h3>
-                    </div>
-                    <div className="text-center text-sm text-muted-foreground mb-4">Free • Login required</div>
-                    <div className="space-y-3">
-                      {comparisonFeatures.map((feature, idx) => {
-                        const Icon = feature.icon;
-                        return (
-                          <div key={idx} className="flex justify-between items-center py-2 border-b border-primary/10">
-                            <div className="flex items-center gap-2">
-                              <Icon className="w-4 h-4 text-primary" />
-                              <span className="text-sm font-medium">{feature.category}</span>
-                            </div>
-                            <div>{renderFeatureValue(feature.subscriber)}</div>
+                        <CardContent className="pt-6">
+                          <div className="flex items-center justify-center gap-2 mb-4">
+                            <UserCheck className="w-6 h-6 text-primary" />
+                            <h3 className="text-2xl font-bold">Subscriber</h3>
                           </div>
-                        );
-                      })}
-                    </div>
-                    {!user && (
-                      <Button className="w-full mt-6" onClick={() => navigate("/auth")}>
-                        Sign Up Free
-                      </Button>
-                    )}
-                  </CardContent>
+                          <div className="text-center text-sm text-muted-foreground mb-4">Free • Login required</div>
+                          <div className="space-y-3">
+                            {comparisonFeatures.map((feature, idx) => {
+                              const Icon = feature.icon;
+                              return (
+                                <div key={idx} className="flex justify-between items-center py-2 border-b border-primary/10">
+                                  <div className="flex items-center gap-2">
+                                    <Icon className="w-4 h-4 text-primary" />
+                                    <span className="text-sm font-medium">{feature.category}</span>
+                                  </div>
+                                  <div>{renderFeatureValue(feature.subscriber)}</div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                          {!user && (
+                            <Button className="w-full mt-6" onClick={() => navigate("/auth")}>
+                              Sign Up Free
+                            </Button>
+                          )}
+                        </CardContent>
                       </Card>
                     </CarouselItem>
 
                     <CarouselItem className="pl-2 basis-[88%]">
                       <Card className="border-2 border-[hsl(var(--primary)/0.8)] h-full bg-gradient-to-br from-[hsl(var(--primary)/0.1)] to-[hsl(var(--primary)/0.2)]">
-                  <CardContent className="pt-6">
-                    <div className="flex items-center justify-center gap-2 mb-4">
-                      <Crown className="w-6 h-6 text-primary" />
-                      <h3 className="text-2xl font-bold">Premium</h3>
-                    </div>
-                    <div className="text-center text-sm font-semibold text-primary mb-4">Gold / Platinum</div>
-                    <div className="space-y-3">
-                      {comparisonFeatures.map((feature, idx) => {
-                        const Icon = feature.icon;
-                        return (
-                          <div key={idx} className="flex justify-between items-center py-2 border-b border-primary/10">
-                            <div className="flex items-center gap-2">
-                              <Icon className="w-4 h-4 text-primary" />
-                              <span className="text-sm font-medium">{feature.category}</span>
-                            </div>
-                            <div>{renderFeatureValue(feature.premium)}</div>
+                        <CardContent className="pt-6">
+                          <div className="flex items-center justify-center gap-2 mb-4">
+                            <Crown className="w-6 h-6 text-primary" />
+                            <h3 className="text-2xl font-bold">Premium</h3>
                           </div>
-                        );
-                      })}
-                    </div>
-                  </CardContent>
+                          <div className="text-center text-sm font-semibold text-primary mb-4">Lifetime</div>
+                          <div className="space-y-3">
+                            {comparisonFeatures.map((feature, idx) => {
+                              const Icon = feature.icon;
+                              return (
+                                <div key={idx} className="flex justify-between items-center py-2 border-b border-primary/10">
+                                  <div className="flex items-center gap-2">
+                                    <Icon className="w-4 h-4 text-primary" />
+                                    <span className="text-sm font-medium">{feature.category}</span>
+                                  </div>
+                                  <div>{renderFeatureValue(feature.premium)}</div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </CardContent>
                       </Card>
                     </CarouselItem>
                   </CarouselContent>
@@ -609,7 +460,7 @@ export default function SmartyPlans() {
                           <Crown className="w-5 h-5 text-primary" />
                           <div className="text-lg">Premium</div>
                         </div>
-                        <div className="text-sm font-semibold text-primary">Gold / Platinum</div>
+                        <div className="text-sm font-semibold text-primary">Lifetime</div>
                       </th>
                     </tr>
                   </thead>
@@ -636,68 +487,12 @@ export default function SmartyPlans() {
             </CardContent>
           </Card>
 
-          {/* Pricing Plans - Hidden for premium users */}
+          {/* Lifetime card (after Compare Access Levels) */}
           {!isPremium && (
-            <>
-              {/* Pricing Cards (after Compare Access Levels) */}
-              <PricingPlansBlock goldPlanCard={GoldPlanCard} platinumPlanCard={PlatinumPlanCard} />
-
-              {/* Why Choose Yearly - Compact */}
-              <Card className="mb-6 border-2 border-primary">
-                <CardHeader className="bg-primary/5 py-3">
-                  <CardTitle className="text-xl text-center">Why Choose the Yearly Plan?</CardTitle>
-                </CardHeader>
-                <CardContent className="pt-4 pb-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <h3 className="text-base font-bold mb-2">Save Big with Annual Membership</h3>
-                      <div className="space-y-1.5">
-                        {yearlyBenefits.map((benefit, index) => (
-                          <div key={index} className="flex items-start gap-2">
-                            <Check className="h-4 w-4 text-green-600 shrink-0 mt-0.5" />
-                            <span className="text-sm">{benefit}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="bg-primary/5 rounded-lg p-3 flex flex-col justify-center">
-                      <div className="text-center">
-                        <p className="text-xs text-muted-foreground mb-1">Monthly Plan</p>
-                        <div className="text-base font-bold line-through text-muted-foreground mb-1">€9.99 × 12 = €119.88</div>
-                        <p className="text-xs text-muted-foreground mb-2">per year</p>
-                        <p className="text-xs text-muted-foreground mb-1">Annual Plan (Save 25%)</p>
-                        <div className="text-xl font-bold text-primary mb-1">€89.99</div>
-                        <p className="text-sm text-green-600 font-semibold">You save €29.89!</p>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Pricing Cards (after Why Choose Yearly) */}
-              <PricingPlansBlock goldPlanCard={GoldPlanCard} platinumPlanCard={PlatinumPlanCard} />
-            </>
+            <div className="mb-8">
+              {LifetimeCard}
+            </div>
           )}
-
-          {/* Corporate Section */}
-          <Card className="mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
-            <CardContent className="p-6">
-              <div className="flex flex-col md:flex-row items-center gap-6">
-                <div className="p-4 bg-blue-100 dark:bg-blue-900/30 rounded-full">
-                  <Building2 className="h-10 w-10 text-blue-600 dark:text-blue-400" />
-                </div>
-                <div className="flex-1 text-center md:text-left">
-                  <h3 className="text-xl font-bold mb-2">Looking for Corporate Plans?</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    We offer special pricing for teams and organizations. Get premium access for your entire team with bulk discounts and dedicated support.
-                  </p>
-                  <Button variant="outline" onClick={() => navigate("/corporate")}>
-                    View Corporate Plans
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
 
           {/* FAQ */}
           <Card className="mb-8 bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
@@ -709,7 +504,7 @@ export default function SmartyPlans() {
                 <div className="flex-1 text-center md:text-left">
                   <h3 className="text-xl font-bold mb-2">Frequently Asked Questions</h3>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Want to know more? Find answers to common questions about plans, billing, and access.
+                    Want to know more? Find answers to common questions about the Lifetime Membership and access.
                   </p>
                   <Button variant="outline" onClick={() => navigate("/faq")}>
                     View FAQ
@@ -719,7 +514,6 @@ export default function SmartyPlans() {
             </CardContent>
           </Card>
 
-          {/* CTA for non-authenticated users */}
           {!user && (
             <div className="mt-8 text-center">
               <p className="text-sm text-muted-foreground mb-4">
