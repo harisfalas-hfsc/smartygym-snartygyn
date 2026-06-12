@@ -434,8 +434,8 @@ export function RevenueAnalytics() {
             </Card>
             <Card>
               <CardContent className="p-4">
-                <div className="text-sm text-muted-foreground mb-1">Subscriptions</div>
-                <p className="text-xl font-bold">€{(totals.gold + totals.platinum).toFixed(2)}</p>
+                <div className="text-sm text-muted-foreground mb-1">Premium Memberships</div>
+                <p className="text-xl font-bold">€{totals.premium.toFixed(2)}</p>
                 <p className="text-xs text-muted-foreground">
                   {paidSubscriptionsCount} paid • {freeSubscriptionsCount} free
                 </p>
