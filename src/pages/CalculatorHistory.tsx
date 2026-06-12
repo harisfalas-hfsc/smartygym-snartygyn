@@ -142,7 +142,7 @@ const MEASUREMENT_TYPES = ["Weight", "Body Fat", "Muscle Mass"] as const;
 
 // Exercise colors for multi-line chart
 const EXERCISE_COLORS: Record<string, string> = {
-  "Bench Press": "hsl(195, 82%, 55%)",
+  "Bench Press": "hsl(150, 82%, 55%)",
   "Back Squats": "hsl(142, 71%, 45%)",
   "Deadlifts": "hsl(24, 95%, 53%)",
   "Bulgarian Split Squats, Right Leg": "hsl(262, 83%, 58%)",
