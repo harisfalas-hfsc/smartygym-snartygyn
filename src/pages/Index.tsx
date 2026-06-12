@@ -526,7 +526,7 @@ const Index = () => {
 
         {isMobile ? <section className="pt-0 pb-2 px-4">
             {/* Mobile hero tagline */}
-            <div className="text-center mb-6 mt-2">
+            <div className="text-center mb-4 mt-2">
               <p className="text-[11px] font-bold tracking-[0.2em] uppercase text-primary mb-2">
                 Science-Backed · Expert-Designed
               </p>
@@ -540,6 +540,17 @@ const Index = () => {
                 <br />
                 <span className="text-primary">All In Your Pocket.</span>
               </p>
+
+              {!isPremium && (
+                <Button
+                  size="sm"
+                  onClick={() => navigate('/smarty-plans')}
+                  className="mt-4"
+                >
+                  <Crown className="w-4 h-4 mr-1.5" />
+                  Join Premium
+                </Button>
+              )}
             </div>
 
             {/* Workouts carousel title */}
@@ -732,15 +743,6 @@ const Index = () => {
             </div>
           </div>
 
-          {!isPremium && (
-              <div onClick={() => navigate('/smarty-plans')} className="flex items-center gap-2.5 py-1.5 px-4 bg-primary/10 border-2 border-primary rounded-lg hover:bg-primary/20 transition-all cursor-pointer hover:shadow-md">
-              <Crown className="w-5 h-5 text-primary flex-shrink-0" />
-              <span className="text-base font-medium text-primary">
-                {userTier === "subscriber" ? "Upgrade to Premium" : "Join SmartyGym now"}
-              </span>
-              <ChevronRight className="w-5 h-5 ml-auto text-primary" />
-            </div>
-          )}
         </div>
 
 
