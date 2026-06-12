@@ -56,7 +56,6 @@ const AVAILABLE_FUNCTIONS = [
   'send-scheduled-notifications',
   'send-scheduled-emails',
   'send-automated-messages',
-  'send-renewal-reminders',
   'send-workout-reminders',
   'send-checkin-reminders',
   'run-system-health-audit',
@@ -64,7 +63,6 @@ const AVAILABLE_FUNCTIONS = [
   'verify-wod-rollover',
   'watchdog-wod-check',
   'refresh-seo-metadata',
-  'sync-stripe-subscriptions',
   'process-pending-notifications'
 ];
 
