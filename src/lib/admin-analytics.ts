@@ -46,7 +46,7 @@ export interface WorkoutLibraryCounts {
 }
 
 export async function fetchWorkoutLibraryCounts(): Promise<WorkoutLibraryCounts> {
-  const [{ count: totalRows }, { count: visibleIncludingWOD }, { count: activeWODs }, { count: hidden }] =
+  const [{ count: totalRows }, { count: visibleIncludingWOD }, { count: activeWODs }, { count: nonLibraryWODs }, { count: hidden }] =
     await Promise.all([
       supabase.from("admin_workouts").select("id", { count: "exact", head: true }),
       supabase
@@ -60,19 +60,27 @@ export async function fetchWorkoutLibraryCounts(): Promise<WorkoutLibraryCounts>
       supabase
         .from("admin_workouts")
         .select("id", { count: "exact", head: true })
+        .eq("is_workout_of_day", true)
+        .neq("wod_source", "library"),
+      supabase
+        .from("admin_workouts")
+        .select("id", { count: "exact", head: true })
         .eq("is_visible", false),
     ]);
 
   const visibleIncludingWODNum = visibleIncludingWOD ?? 0;
   const activeWODsNum = activeWODs ?? 0;
+  const nonLibraryWODsNum = nonLibraryWODs ?? 0;
 
   return {
     totalRows: totalRows ?? 0,
     visibleWorkoutsIncludingWOD: visibleIncludingWODNum,
     activeWODs: activeWODsNum,
     hiddenWorkouts: hidden ?? 0,
-    // Library = visible AND not active WOD (matches /workouts page rules)
-    availableWorkouts: Math.max(visibleIncludingWODNum - activeWODsNum, 0),
+    // Library = visible workouts, excluding only non-library WODs (AI-generated daily WODs).
+    // Library-sourced WODs ARE existing library workouts temporarily promoted, so they count.
+    // This matches the public /workouts page filter exactly.
+    availableWorkouts: Math.max(visibleIncludingWODNum - nonLibraryWODsNum, 0),
   };
 }
 
@@ -114,12 +122,20 @@ export interface PremiumCounts {
 
 export function computePremiumCounts(subs: SubscriptionRow[] | null | undefined): PremiumCounts {
   const list = subs ?? [];
+  // Include all paid plan types: current "lifetime"/"premium" and legacy "gold"/"platinum".
+  const PREMIUM_PLANS = new Set(["lifetime", "premium", "gold", "platinum"]);
   const isActivePremium = (s: SubscriptionRow) =>
-    s.status === "active" && (s.plan_type === "gold" || s.plan_type === "platinum");
+    s.status === "active" && !!s.plan_type && PREMIUM_PLANS.has(s.plan_type);
 
   const active = list.filter(isActivePremium);
-  const paid = active.filter((s) => !!s.stripe_subscription_id);
-  const manual = active.filter((s) => !s.stripe_subscription_id);
+  // Lifetime/Premium are one-time payments with no recurring stripe_subscription_id —
+  // still count them as PAID (revenue collected), not complimentary.
+  const paid = active.filter(
+    (s) => !!s.stripe_subscription_id || s.plan_type === "lifetime" || s.plan_type === "premium",
+  );
+  const manual = active.filter(
+    (s) => !s.stripe_subscription_id && s.plan_type !== "lifetime" && s.plan_type !== "premium",
+  );
   const distinctUsers = new Set(active.map((s) => s.user_id).filter(Boolean));
 
   return {
