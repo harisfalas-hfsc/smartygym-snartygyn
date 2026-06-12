@@ -398,7 +398,9 @@ export function UserDetailModal({
                   <div className="grid grid-cols-2 gap-2">
                     <div>
                       <p className="text-muted-foreground">Plan</p>
-                      <p className="font-medium">{user.plan_type.toUpperCase()}</p>
+                      <p className="font-medium">
+                        {isPremium ? 'PREMIUM' : (user.plan_type || 'FREE').toUpperCase()}
+                      </p>
                     </div>
                     <div>
                       <p className="text-muted-foreground">Status</p>
