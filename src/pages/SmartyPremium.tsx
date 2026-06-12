@@ -154,7 +154,7 @@ export default function SmartyPremium() {
   ];
 
   const LifetimeCard = (
-    <Card className="relative overflow-hidden border-2 border-[#D4AF37] shadow-lg flex flex-col h-full bg-gradient-to-br from-[#D4AF37]/5 to-[#F5D87A]/10 max-w-xl mx-auto w-full">
+    <Card className="relative overflow-hidden border-2 border-[#D4AF37] shadow-lg flex flex-col h-full bg-gradient-to-br from-[#D4AF37]/5 to-[#F5D87A]/10 w-full">
       <CardHeader className="text-center pb-2 sm:pb-4 pt-4 sm:pt-6">
         <div className="flex items-center justify-center gap-2 mb-2">
           <Crown className="h-6 w-6 sm:h-7 sm:w-7 text-[#D4AF37]" />
