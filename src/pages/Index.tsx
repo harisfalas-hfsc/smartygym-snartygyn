@@ -768,9 +768,9 @@ const Index = () => {
                               We are not here to replace your gym. We are here to back you up when life gets in the way. Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed, SmartyGym is your backup plan. Or, if you go to your gym but want to follow a professional, science-based workout or training program designed by{' '}
                               <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>, we provide that expert guidance.
                             </p>
-                            <Link to="/the-smarty-method" className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline mt-2">
-                              <BookOpen className="w-4 h-4" />
-                              Discover The Smarty Method
+                            <Link to="/smarty-premium" className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline mt-2">
+                              <Crown className="w-4 h-4" />
+                              Unlock Everything for Life — €89.99
                               <ChevronRight className="w-4 h-4" />
                             </Link>
 
@@ -889,12 +889,20 @@ const Index = () => {
                               );
                             })}
                           </div>
-                          <div className="flex items-center justify-center gap-6 mt-4">
+                          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mt-4">
                             <Link
                               to="/why-invest-in-smartygym"
                               className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
                             >
                               Why Invest in SmartyGym
+                              <ChevronRight className="w-4 h-4" />
+                            </Link>
+                            <Link
+                              to="/the-smarty-method"
+                              className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+                            >
+                              <BookOpen className="w-4 h-4" />
+                              Discover The Smarty Method
                               <ChevronRight className="w-4 h-4" />
                             </Link>
                           </div>

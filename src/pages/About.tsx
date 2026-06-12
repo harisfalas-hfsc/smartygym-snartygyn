@@ -124,9 +124,9 @@ const About = () => {
             { label: "About" }
           ]} />
 
-          {/* Hero Section */}
+          {/* Hero Section (desktop only) */}
           <ScrollReveal>
-            <div className="mb-12 text-center">
+            <div className="mb-12 text-center hidden md:block">
               <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight uppercase mb-4 text-foreground leading-tight">
                 About <span className="text-primary">SmartyGym</span>
               </h1>
@@ -266,14 +266,38 @@ const About = () => {
                     <span className="text-sm font-semibold text-foreground">Safe and Effective</span>
                   </div>
                   </div>
-                  <Link to="/the-smarty-method" className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline mt-2">
-                    <BookOpen className="w-4 h-4" />
-                    Discover The Smarty Method
-                    <ChevronRight className="w-4 h-4" />
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
+                   <Link to="/the-smarty-method" className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline mt-2">
+                     <BookOpen className="w-4 h-4" />
+                     Discover The Smarty Method
+                     <ChevronRight className="w-4 h-4" />
+                   </Link>
+                 </div>
+               </CardContent>
+             </Card>
+
+           {/* Premium CTA card (mobile only) */}
+           <Card
+             role="button"
+             tabIndex={0}
+             onClick={() => navigate('/smarty-premium')}
+             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate('/smarty-premium'); }}
+             className="mb-12 border-2 border-primary md:hidden cursor-pointer active:opacity-80 hover:bg-primary/5 transition-colors"
+           >
+             <CardContent className="p-6">
+               <div className="text-center space-y-3">
+                 <Crown className="w-12 h-12 text-primary mx-auto" />
+                 <h2 className="text-2xl font-bold text-foreground">Get the Full Experience</h2>
+                 <p className="text-sm text-muted-foreground leading-relaxed">
+                   Every workout, program, ritual and tool — designed 100% by humans. One-time payment, lifetime access.
+                 </p>
+                 <p className="text-3xl font-extrabold text-primary">€89.99</p>
+                 <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
+                   Unlock Smarty Premium
+                   <ChevronRight className="w-4 h-4" />
+                 </span>
+               </div>
+             </CardContent>
+           </Card>
 
           {/* Core Values - Desktop grid with descriptions */}
           <ScrollReveal>
