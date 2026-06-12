@@ -554,8 +554,7 @@ export function RevenueAnalytics() {
                       <TableHeader>
                         <TableRow>
                           <TableHead>Period</TableHead>
-                          <TableHead className="text-right">Gold</TableHead>
-                          <TableHead className="text-right">Platinum</TableHead>
+                          <TableHead className="text-right">Premium</TableHead>
                           <TableHead className="text-right">Standalone</TableHead>
                           <TableHead className="text-right">Personal Training</TableHead>
                           <TableHead className="text-right">Corporate</TableHead>
@@ -566,8 +565,7 @@ export function RevenueAnalytics() {
                         {revenueData.map((row) => (
                           <TableRow key={row.period}>
                             <TableCell>{row.period}</TableCell>
-                            <TableCell className="text-right">€{row.gold.toFixed(2)}</TableCell>
-                            <TableCell className="text-right">€{row.platinum.toFixed(2)}</TableCell>
+                            <TableCell className="text-right">€{row.premium.toFixed(2)}</TableCell>
                             <TableCell className="text-right">€{row.standalone.toFixed(2)}</TableCell>
                             <TableCell className="text-right">€{row.personal_training.toFixed(2)}</TableCell>
                             <TableCell className="text-right">€{row.corporate.toFixed(2)}</TableCell>
@@ -576,8 +574,7 @@ export function RevenueAnalytics() {
                         ))}
                         <TableRow className="bg-muted/50 font-bold">
                           <TableCell>Total</TableCell>
-                          <TableCell className="text-right">€{totals.gold.toFixed(2)}</TableCell>
-                          <TableCell className="text-right">€{totals.platinum.toFixed(2)}</TableCell>
+                          <TableCell className="text-right">€{totals.premium.toFixed(2)}</TableCell>
                           <TableCell className="text-right">€{totals.standalone.toFixed(2)}</TableCell>
                           <TableCell className="text-right">€{totals.personal_training.toFixed(2)}</TableCell>
                           <TableCell className="text-right">€{totals.corporate.toFixed(2)}</TableCell>
