@@ -123,7 +123,7 @@ export const WorkoutInteractions = ({ workoutId, workoutType, workoutName, isFre
       title: "Premium Feature",
       description: message,
       action: (
-        <Button size="sm" onClick={() => navigate("/premiumbenefits")}>
+        <Button size="sm" onClick={() => navigate("/smarty-plans")}>
           <Crown className="w-4 h-4 mr-2" />
           Upgrade
         </Button>

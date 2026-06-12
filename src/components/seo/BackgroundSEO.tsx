@@ -170,7 +170,7 @@ const pages: SeoPage[] = [
 const aliases: Record<string, string> = {
   "/join-premium": "/smarty-plans",
   "/joinpremium": "/smarty-plans",
-  "/premiumbenefits": "/smarty-plans",
+  "/smarty-plans": "/smarty-plans",
   "/best-online-fitness-platform": "/",
 };
 

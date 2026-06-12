@@ -790,7 +790,7 @@ const Contact = () => {
                     </p>
                     {!isPremium && (
                       <Button 
-                        onClick={() => navigate("/premiumbenefits")} 
+                        onClick={() => navigate("/smarty-plans")} 
                         className="w-full"
                         variant="default"
                       >

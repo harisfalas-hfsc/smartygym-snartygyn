@@ -491,7 +491,7 @@ export const WorkoutDisplay = ({
           <p className="text-muted-foreground mb-4">
             Unlock 100+ workouts and all programs with SmartyGym Premium.
           </p>
-          <Button size="lg" onClick={() => navigate("/premiumbenefits")}>
+          <Button size="lg" onClick={() => navigate("/smarty-plans")}>
             Join Premium
           </Button>
         </div>

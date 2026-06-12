@@ -58,7 +58,7 @@ export const CommentDialog = ({
         description: "Upgrade to Premium to leave comments and join the community!",
         variant: "destructive",
       });
-      navigate("/premiumbenefits");
+      navigate("/smarty-plans");
       return;
     }
 
