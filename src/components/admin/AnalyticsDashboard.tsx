@@ -130,7 +130,11 @@ export function AnalyticsDashboard() {
       // Calculate date range based on time filter
       const endDate = new Date();
       const startDate = new Date();
-      startDate.setDate(startDate.getDate() - parseInt(timeFilter));
+      if (timeFilter === "all") {
+        startDate.setFullYear(2020, 0, 1);
+      } else {
+        startDate.setDate(startDate.getDate() - parseInt(timeFilter));
+      }
 
       // Fetch ALL users (no date filter for total count)
       const { data: allProfiles, count: totalUsersCount } = await supabase
@@ -481,6 +485,7 @@ export function AnalyticsDashboard() {
               <SelectItem value="90">Last 90 Days</SelectItem>
               <SelectItem value="180">Last 6 Months</SelectItem>
               <SelectItem value="365">Last Year</SelectItem>
+            <SelectItem value="all">All Time</SelectItem>
             </SelectContent>
           </Select>
           <Button onClick={fetchAnalytics} variant="outline" disabled={loading}>
