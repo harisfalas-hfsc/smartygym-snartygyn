@@ -72,8 +72,16 @@ serve(async (req) => {
       throw new Error('Invalid action. Must be "grant" or "revoke"');
     }
 
-    if (action === 'grant' && !['gold', 'platinum'].includes(plan_type)) {
-      throw new Error('Invalid plan_type for grant. Must be "gold" or "platinum"');
+    // Only one plan exists now: lifetime Premium Membership.
+    // We still accept legacy 'gold'/'platinum' values from older clients but
+    // normalize them to 'lifetime' so the database holds a single value.
+    let normalizedPlan = plan_type;
+    if (action === 'grant') {
+      if (['lifetime', 'premium', 'gold', 'platinum'].includes(plan_type)) {
+        normalizedPlan = 'lifetime';
+      } else {
+        throw new Error('Invalid plan_type for grant. Must be "lifetime"');
+      }
     }
 
     // Prevent modifying super admin (the main admin account)
@@ -87,35 +95,17 @@ serve(async (req) => {
     const nowISO = now.toISOString();
 
     if (action === 'grant') {
-      logStep("Granting subscription", { user_id, plan_type });
-      
-      // Calculate expiration based on plan type
-      // Gold = 1 month, Platinum = 12 months
-      let periodEnd: Date;
-      if (plan_type === 'gold') {
-        periodEnd = new Date(now);
-        periodEnd.setMonth(periodEnd.getMonth() + 1);
-      } else {
-        // Platinum = 12 months
-        periodEnd = new Date(now);
-        periodEnd.setFullYear(periodEnd.getFullYear() + 1);
-      }
-      
-      logStep("Calculated expiration", { 
-        plan_type, 
-        duration: plan_type === 'gold' ? '1 month' : '12 months',
-        expires: periodEnd.toISOString() 
-      });
-      
+      logStep("Granting Premium Membership", { user_id });
+
       const { error: upsertError } = await supabaseAdmin
         .from('user_subscriptions')
         .upsert({
           user_id,
-          plan_type: plan_type,
+          plan_type: 'lifetime',
           status: 'active',
           current_period_start: nowISO,
-          current_period_end: periodEnd.toISOString(), // Expires based on plan duration
-          cancel_at_period_end: true, // Will not auto-renew
+          current_period_end: null, // Lifetime — no expiration
+          cancel_at_period_end: false,
           stripe_customer_id: null,
           stripe_subscription_id: null,
           subscription_source: 'admin_grant',
@@ -175,13 +165,12 @@ serve(async (req) => {
         }
       }
 
-      const durationText = plan_type === 'gold' ? '1 month' : '12 months';
-      logStep("Subscription granted successfully", { expires: periodEnd.toISOString() });
+      logStep("Premium Membership granted successfully");
       return new Response(
         JSON.stringify({ 
           success: true, 
-          message: `${plan_type.charAt(0).toUpperCase() + plan_type.slice(1)} subscription granted for ${durationText} (expires ${periodEnd.toLocaleDateString()})`,
-          expires: periodEnd.toISOString()
+          message: 'Premium Membership granted (lifetime access).',
+          expires: null
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
