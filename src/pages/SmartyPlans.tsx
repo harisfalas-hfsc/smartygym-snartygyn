@@ -207,17 +207,17 @@ export default function SmartyPlans() {
   return (
     <>
       <Helmet>
-        <title>Lifetime Membership | SmartyGym | One Payment. Train for Life.</title>
-        <meta name="description" content="Unlock SmartyGym forever with a single €89.99 Lifetime Membership. 500+ human-designed workouts, training programs, and fitness tools. No subscriptions. No renewals." />
+        <title>Premium Membership | SmartyGym | One Payment. Train for Life.</title>
+        <meta name="description" content="Unlock SmartyGym forever with a single €89.99 Premium Membership. 500+ human-designed workouts, training programs, and fitness tools. No subscriptions. No renewals." />
         <meta name="keywords" content="SmartyGym lifetime, lifetime gym membership, one-time payment fitness, no subscription gym, smartygym pricing, lifetime fitness access" />
 
-        <meta property="og:title" content="Lifetime Membership | SmartyGym" />
-        <meta property="og:description" content="One payment of €89.99. Lifetime access to every SmartyGym workout, program and tool." />
+        <meta property="og:title" content="Premium Membership | SmartyGym" />
+        <meta property="og:description" content="One payment of €89.99. Premium access to every SmartyGym workout, program and tool." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://smartygym.com/smarty-plans" />
 
         <meta name="twitter:card" content="summary" />
-        <meta name="twitter:title" content="Lifetime Membership | SmartyGym" />
+        <meta name="twitter:title" content="Premium Membership | SmartyGym" />
         <meta name="twitter:description" content="One payment. Train for life." />
 
         <link rel="canonical" href="https://smartygym.com/smarty-plans" />
@@ -229,7 +229,7 @@ export default function SmartyPlans() {
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Product",
-            "name": "SmartyGym Lifetime Membership",
+            "name": "SmartyGym Premium Membership",
             "description": "One-time payment for lifetime premium access to all SmartyGym workouts, programs, and tools.",
             "brand": { "@type": "Brand", "name": "SmartyGym" },
             "offers": {
@@ -256,11 +256,11 @@ export default function SmartyPlans() {
       </Helmet>
 
       <SEOEnhancer
-        entities={["Lifetime Membership", "One-Time Payment", "SmartyGym"]}
+        entities={["Premium Membership", "One-Time Payment", "SmartyGym"]}
         topics={["lifetime gym membership", "one-time fitness payment", "no-subscription fitness platform"]}
         expertise={["membership pricing", "lifetime access"]}
         contentType="Product"
-        aiSummary="SmartyGym Lifetime Membership: a single €89.99 payment unlocks every workout, program, ritual, check-in, and tool — forever. No subscriptions, no renewals."
+        aiSummary="SmartyGym Premium Membership: a single €89.99 payment unlocks every workout, program, ritual, check-in, and tool — forever. No subscriptions, no renewals."
         aiKeywords={["lifetime gym membership", "one-time payment fitness", "smartygym lifetime"]}
         relatedContent={["Premium Benefits", "Workout Library", "Training Programs", "Fitness Tools"]}
         targetAudience="fitness enthusiasts looking for a one-time lifetime gym membership"
@@ -289,7 +289,7 @@ export default function SmartyPlans() {
                 Join thousands of members who unlocked SmartyGym for life with one single payment.
               </p>
               <p className="text-sm font-semibold text-primary mt-2">
-                One payment. Lifetime access. No renewals.
+                One payment. Premium access. No renewals.
               </p>
             </div>
           </div>
@@ -503,7 +503,7 @@ export default function SmartyPlans() {
                 <div className="flex-1 text-center md:text-left">
                   <h3 className="text-xl font-bold mb-2">Frequently Asked Questions</h3>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Want to know more? Find answers to common questions about the Lifetime Membership and access.
+                    Want to know more? Find answers to common questions about the Premium Membership and access.
                   </p>
                   <Button variant="outline" onClick={() => navigate("/faq")}>
                     View FAQ
