@@ -4,23 +4,18 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollReveal } from "@/components/ScrollReveal";
-import { CheckCircle2, Target, Heart, Users, Shield, Award, Compass, GraduationCap, Plane, Dumbbell, UserCheck, Smartphone, Calendar, Video, Wrench, FileText, BookOpen, ChevronRight, Flame, Crown, Check, Loader2, Sparkles } from "lucide-react";
+import { CheckCircle2, Target, Heart, Users, Shield, Award, Compass, GraduationCap, Plane, Dumbbell, UserCheck, Smartphone, Calendar, Video, Wrench, FileText, BookOpen, ChevronRight, Flame, Crown, Sparkles } from "lucide-react";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import harisPhoto from "@/assets/haris-falas-coach.png";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { useState, useEffect, useRef } from "react";
-import { STRIPE_PRICE_IDS } from "@/config/pricing";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
 
 const About = () => {
   const navigate = useNavigate();
   const { user, userTier } = useAccessControl();
   const isPremium = userTier === "premium";
-  const { toast } = useToast();
-  const [loadingPlan, setLoadingPlan] = useState<"gold" | "platinum" | null>(null);
   const [activeAudienceTooltipMobile, setActiveAudienceTooltipMobile] = useState<string | null>(null);
   const audienceGridRef = useRef<HTMLDivElement>(null);
 
@@ -43,38 +38,6 @@ const About = () => {
     { icon: Plane, label: "Travelers", color: "text-cyan-500", description: "Stay consistent no matter where you are. Hotel room, Airbnb, or park—these workouts adapt to any space with minimal or no equipment needed." },
     { icon: Dumbbell, label: "Gym-Goers", color: "text-purple-500", description: "Enhance your gym routine with expert programming. Follow structured plans that maximize your gym time and ensure balanced, progressive training." },
   ];
-
-  const handlePlanClick = async (plan: "gold" | "platinum") => {
-    if (isPremium) {
-      navigate("/userdashboard");
-      return;
-    }
-    if (!user) {
-      navigate("/auth");
-      return;
-    }
-    setLoadingPlan(plan);
-    try {
-      const priceId = plan === "gold" ? STRIPE_PRICE_IDS.gold : STRIPE_PRICE_IDS.platinum;
-      const { data, error } = await supabase.functions.invoke("create-checkout", {
-        body: { priceId, cancelPath: window.location.pathname + window.location.search },
-      });
-      if (error) throw error;
-      if (data?.url) {
-        window.location.href = data.url;
-      } else {
-        throw new Error("No checkout URL returned");
-      }
-    } catch (err) {
-      console.error("Checkout error:", err);
-      toast({
-        title: "Error",
-        description: err instanceof Error ? err.message : "Could not start checkout. Please try again.",
-        variant: "destructive",
-      });
-      setLoadingPlan(null);
-    }
-  };
 
   return (
     <>
