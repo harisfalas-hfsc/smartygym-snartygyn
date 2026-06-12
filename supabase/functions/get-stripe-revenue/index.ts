@@ -68,7 +68,7 @@ serve(async (req) => {
     let hasMore = true;
     let startingAfter: string | undefined = undefined;
     while (hasMore) {
-      const params: any = { limit: 100 };
+      const params: any = { limit: 100, expand: ["data.invoice"] };
       if (startingAfter) params.starting_after = startingAfter;
       const page = await stripe.charges.list(params);
       allCharges.push(...page.data);
