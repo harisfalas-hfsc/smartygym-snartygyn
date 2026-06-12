@@ -90,7 +90,6 @@ export const MobileBottomNav = () => {
     { label: "Exercise Library", path: "/exerciselibrary", icon: BookOpen, iconClass: "text-emerald-500" },
     { label: "Community", path: "/community", icon: Users, iconClass: "text-cyan-500" },
     { label: "Blog", path: "/blog", icon: Newspaper, iconClass: "text-red-500" },
-    { label: "Smarty Plans", path: "/smarty-plans", icon: Crown, iconClass: "text-yellow-500" },
     { label: "FAQ", path: "/faq", icon: HelpCircle, iconClass: "text-purple-500" },
     { label: "Contact", path: "/contact", icon: Mail, iconClass: "text-indigo-500" },
   ];
