@@ -250,7 +250,7 @@ const WODCategory = () => {
               {/* About Workout of the Day Card */}
               <Card className="mb-8 bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2 border-primary/40 shadow-primary">
                 <div className="p-4 sm:p-6">
-                  <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight uppercase mb-3 text-center">About Workout of the Day</h1>
+                  <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight uppercase mb-3 text-center">Workout of the Day</h1>
                   {/* Desktop description */}
                   <p className="hidden sm:block text-base text-center text-muted-foreground max-w-3xl mx-auto">
                     Every training day <span className="text-primary font-semibold">SmartyGym</span> delivers TWO fresh, expertly designed workouts following a strategic periodization cycle — one with equipment and one without. On recovery days, we provide a single guided recovery session. Each day focuses on a different category and difficulty level. Our workouts follow a science-based periodization approach designed by{" "}

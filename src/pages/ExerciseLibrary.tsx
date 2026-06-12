@@ -77,7 +77,7 @@ const ExerciseLibrary = () => {
           {/* About Exercise Library */}
           <Card className="mb-8 bg-white dark:bg-card border-2 border-primary/40 shadow-primary">
             <CardContent className="p-4 sm:p-5">
-              <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight uppercase mb-3 text-center">About Exercise Library</h2>
+              <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight uppercase mb-3 text-center">Exercise Library</h2>
               <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
                 {/* Mobile: Short description only */}
                 <p className="md:hidden text-sm text-center">
