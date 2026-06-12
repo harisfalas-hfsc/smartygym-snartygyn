@@ -579,5 +579,40 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <!-- LocalBusiness schema — links smartygym.com to Google Business Profile for the GBP↔site authority loop -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "@id": "https://smartygym.com/#localbusiness",
+      "name": "SmartyGym — Haris Falas Sports Scientist",
+      "url": "https://smartygym.com",
+      "image": "https://smartygym.com/smarty-gym-logo.png",
+      "logo": "https://smartygym.com/smarty-gym-logo.png",
+      "description": "Online fitness platform and personal training by Sports Scientist Haris Falas (BSc Sports Science, CSCS). 500+ human-designed workouts, training programs, and nutrition guidance.",
+      "founder": { "@id": "https://smartygym.com/#organization" },
+      "parentOrganization": { "@id": "https://smartygym.com/#organization" },
+      "priceRange": "$$",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "CY"
+      },
+      "areaServed": [
+        { "@type": "Country", "name": "Cyprus" },
+        { "@type": "AdministrativeArea", "name": "Worldwide (online)" }
+      ],
+      "knowsAbout": [
+        "Personal Training", "Strength and Conditioning", "Sports Science",
+        "Healthy Aging", "Nutrition Coaching", "Online Fitness Coaching"
+      ],
+      "sameAs": [
+        "https://maps.app.goo.gl/nqHscuyWoaGdpdzU9",
+        "https://www.instagram.com/thesmartygym/",
+        "https://www.tiktok.com/@thesmartygym",
+        "https://www.youtube.com/@TheSmartyGym",
+        "https://www.facebook.com/profile.php?id=61579302997368"
+      ]
+    }
+    </script>
   </body>
 </html>
