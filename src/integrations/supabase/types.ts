@@ -3345,6 +3345,24 @@ export type Database = {
         }
         Relationships: []
       }
+      workout_fix_staging: {
+        Row: {
+          finisher: string | null
+          id: string
+          main_workout: string | null
+        }
+        Insert: {
+          finisher?: string | null
+          id: string
+          main_workout?: string | null
+        }
+        Update: {
+          finisher?: string | null
+          id?: string
+          main_workout?: string | null
+        }
+        Relationships: []
+      }
       workout_interactions: {
         Row: {
           created_at: string | null
