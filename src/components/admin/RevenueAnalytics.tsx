@@ -475,13 +475,15 @@ export function RevenueAnalytics() {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-5 mb-4">
-              <TabsTrigger value="stripe">Stripe (truth)</TabsTrigger>
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="subscriptions">Subscriptions</TabsTrigger>
-              <TabsTrigger value="purchases">Purchases</TabsTrigger>
-              <TabsTrigger value="corporate">Corporate</TabsTrigger>
-            </TabsList>
+            <div className="-mx-1 mb-4 overflow-x-auto">
+              <TabsList className="inline-flex w-max gap-1 px-1 md:grid md:w-full md:grid-cols-5">
+                <TabsTrigger value="stripe" className="whitespace-nowrap">Stripe (truth)</TabsTrigger>
+                <TabsTrigger value="overview" className="whitespace-nowrap">Overview</TabsTrigger>
+                <TabsTrigger value="subscriptions" className="whitespace-nowrap">Subscriptions</TabsTrigger>
+                <TabsTrigger value="purchases" className="whitespace-nowrap">Purchases</TabsTrigger>
+                <TabsTrigger value="corporate" className="whitespace-nowrap">Corporate</TabsTrigger>
+              </TabsList>
+            </div>
 
             <TabsContent value="stripe" className="space-y-4">
               <StripeRevenueTruth />
