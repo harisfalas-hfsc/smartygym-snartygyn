@@ -14,7 +14,7 @@ interface ConfettiProps {
 }
 
 const COLORS = [
-  "hsl(150, 82%, 55%)", // Primary green
+  "hsl(195, 82%, 55%)", // Primary blue
   "hsl(142, 71%, 45%)", // Green
   "hsl(43, 96%, 56%)",  // Yellow/Gold
   "hsl(340, 75%, 55%)", // Pink

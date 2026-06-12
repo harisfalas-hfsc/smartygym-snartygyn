@@ -224,7 +224,7 @@ export function PopularAnalytics() {
                     <YAxis type="category" dataKey="name" width={120} tick={{ fontSize: 9 }} />
                     <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
                     <Legend />
-                    <Bar dataKey="completions" name="Completions" fill="#22C55E" radius={[0, 4, 4, 0]} />
+                    <Bar dataKey="completions" name="Completions" fill="#3B82F6" radius={[0, 4, 4, 0]} />
                     <Bar dataKey="views" name="Views" fill="#10B981" radius={[0, 4, 4, 0]} />
                     <Bar dataKey="favorites" name="Favorites" fill="#F59E0B" radius={[0, 4, 4, 0]} />
                   </BarChart>

@@ -545,7 +545,7 @@ const Index = () => {
                 <Button
                   size="sm"
                   onClick={() => navigate('/smarty-plans')}
-                  className="mt-4"
+                  className="mt-4 bg-green-500 hover:bg-green-600 text-white"
                 >
                   <Crown className="w-4 h-4 mr-1.5" />
                   Join Premium

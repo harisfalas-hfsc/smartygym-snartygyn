@@ -50,7 +50,7 @@ export const LogBookCharts = ({ userId, filter }: LogBookChartsProps) => {
 
   const COLORS = {
     'Workout': '#10B981',
-    'Program': '#22C55E',
+    'Program': '#3B82F6',
     'Personal Training': '#F97316',
     'Tool': '#A855F7',
   };
