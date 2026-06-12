@@ -98,10 +98,9 @@ export const useWorkoutData = (workoutId: string | undefined) => {
 export const useAllWorkouts = () => {
   return useQuery({
     queryKey: ["all-workouts"],
-    staleTime: 0,
-    gcTime: 0,
-    refetchOnMount: "always",
-    refetchOnWindowFocus: true,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    refetchOnWindowFocus: false,
     queryFn: async () => {
       if (import.meta.env.DEV) {
         console.log("🔍 Fetching ALL workouts...");
