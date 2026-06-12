@@ -116,7 +116,7 @@ serve(async (req: Request) => {
     // Morning reminder: 8:00 AM Cyprus (called at 06:00 UTC)
     // Night reminder: 8:00 PM Cyprus (called at 18:00 UTC)
     const isMorning = hour >= 7 && hour < 12;
-    const reminderType = isMorning ? 'morning' : 'night';
+    const reminderType: 'morning' | 'evening' = isMorning ? 'morning' : 'evening';
     const templateType = isMorning ? 'checkin_reminder_morning' : 'checkin_reminder_evening';
     
     console.log(`Sending ${reminderType} check-in reminders at Cyprus hour ${hour}`);
@@ -136,7 +136,7 @@ serve(async (req: Request) => {
     }
 
     // Use custom template or fall back to defaults
-    const defaults = DEFAULT_TEMPLATES[reminderType as 'morning' | 'evening'];
+    const defaults = DEFAULT_TEMPLATES[reminderType];
     const dashboardSubject = template?.subject || defaults.subject;
     const dashboardContent = template?.content || defaults.content;
     const emailSubject = template?.email_subject || template?.subject || defaults.subject;
@@ -269,8 +269,9 @@ serve(async (req: Request) => {
     console.log(`Check-in reminders complete: ${dashboardCount} dashboard, ${sentCount} emails sent, ${failedCount} failed`);
 
     // Log to notification_audit_log for health audit tracking
+    // notification_type must satisfy the table's CHECK constraint — use 'reminder'.
     await supabase.from('notification_audit_log').insert({
-      notification_type: MESSAGE_TYPES.CHECKIN_REMINDER,
+      notification_type: 'reminder',
       message_type: MESSAGE_TYPES.CHECKIN_REMINDER,
       recipient_count: usersForDashboard.length + usersForEmail.length,
       success_count: dashboardCount + sentCount,
