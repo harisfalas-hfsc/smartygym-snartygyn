@@ -722,8 +722,8 @@ export const UserMessagesPanel = () => {
                   </Button>
                 </div>
               </div>
-              <div className="bg-muted p-4 rounded-lg text-sm content-container mb-3">
-                <HTMLContent content={message.content} />
+              <div className="text-sm content-container mb-3 [&_hr]:hidden [&_p:empty]:hidden [&_p]:my-1 [&_h1]:mt-2 [&_h1]:mb-1 [&_h2]:mt-2 [&_h2]:mb-1 [&_h3]:mt-2 [&_h3]:mb-1 [&_br+br]:hidden [&_ul]:my-1 [&_ol]:my-1">
+                <HTMLContent content={compactMessageHtml(message.content)} />
               </div>
               <div className="flex items-center gap-4 flex-wrap">
                 <span className="text-xs text-muted-foreground">
