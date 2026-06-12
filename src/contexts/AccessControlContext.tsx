@@ -207,7 +207,7 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
       // 3. Active corporate member status, OR
       // 4. Admin role (admins bypass all access locks)
       const isPersonalPremium = dbData?.status === 'active' && 
-                         (dbData?.plan_type === 'gold' || dbData?.plan_type === 'platinum');
+                         (dbData?.plan_type === 'gold' || dbData?.plan_type === 'platinum' || dbData?.plan_type === 'lifetime');
       const isCorporatePremium = !!corpAdmin || isCorporateMemberActive;
       const isPremium = isPersonalPremium || isCorporatePremium || isAdmin;
       
