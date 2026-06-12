@@ -249,7 +249,7 @@ export default function SmartyPlans() {
             "@type": "BreadcrumbList",
             "itemListElement": [
               { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://smartygym.com" },
-              { "@type": "ListItem", "position": 2, "name": "Smarty Plans", "item": "https://smartygym.com/smarty-plans" }
+              { "@type": "ListItem", "position": 2, "name": "Smarty Premium", "item": "https://smartygym.com/smarty-plans" }
             ]
           })}
         </script>
@@ -269,7 +269,7 @@ export default function SmartyPlans() {
 
       <div className="min-h-screen bg-background">
         <main className="container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6 pb-8">
-          <PageBreadcrumbs items={[{ label: "Home", href: "/" }, { label: "Smarty Plans" }]} />
+          <PageBreadcrumbs items={[{ label: "Home", href: "/" }, { label: "Smarty Premium" }]} />
 
           {isPremium && (
             <AlreadyPremiumCard className="mb-8" />
