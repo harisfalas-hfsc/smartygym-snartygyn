@@ -4,6 +4,7 @@ import { Resend } from "https://esm.sh/resend@2.0.0";
 import { getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
 import { MESSAGE_TYPES } from "../_shared/notification-types.ts";
 import { requireServiceRole } from "../_shared/cron-auth.ts";
+import { canSend } from "../_shared/notification-preferences.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -496,15 +497,14 @@ serve(async (req) => {
 
     for (const profile of allProfiles) {
       const prefs = (profile.notification_preferences as Record<string, any>) || {};
-      
-      // Check if user has opted out of all notifications
-      if (prefs.opt_out_all === true) {
+
+      // Single dashboard gate for the combined Morning Daily Digest
+      if (!canSend(prefs, "morning_daily_digest", "dashboard")) {
         dashboardSkipped++;
         continue;
       }
 
-      // Check WOD dashboard preference (default: true)
-      if (hasWods && prefs.dashboard_wod !== false) {
+      if (hasWods) {
         dashboardInserts.push({
           user_id: profile.user_id,
           message_type: MESSAGE_TYPES.WOD_NOTIFICATION,
@@ -515,8 +515,7 @@ serve(async (req) => {
         wodDashboardSent++;
       }
 
-      // Check Ritual dashboard preference (default: true)
-      if (hasRitual && prefs.dashboard_ritual !== false) {
+      if (hasRitual) {
         dashboardInserts.push({
           user_id: profile.user_id,
           message_type: MESSAGE_TYPES.DAILY_RITUAL,
@@ -581,16 +580,11 @@ serve(async (req) => {
 
       const prefs = (profilesMap.get(authUser.id) as Record<string, any>) || {};
 
-      // Check if user has opted out of all emails
-      if (prefs.opt_out_all === true) {
-        emailsSkipped++;
-        continue;
-      }
+      // Single email gate for the combined Morning Daily Digest
+      const allowEmail = canSend(prefs, "morning_daily_digest", "email");
+      const wantsWodEmail = allowEmail && hasWods;
+      const wantsRitualEmail = allowEmail && hasRitual;
 
-      // Check if user wants WOD or Ritual emails
-      const wantsWodEmail = prefs.email_wod !== false && hasWods;
-      const wantsRitualEmail = prefs.email_ritual !== false && hasRitual;
-      
       if (!wantsWodEmail && !wantsRitualEmail) {
         emailsSkipped++;
         continue;
