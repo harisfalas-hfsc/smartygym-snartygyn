@@ -87,9 +87,12 @@ serve(async (req) => {
       }
     };
 
+    // STRICT: a product counts as SmartyGym ONLY when it carries the
+    // explicit project=SMARTYGYM metadata tag. Name heuristics are gone —
+    // they previously matched HFSC products that happened to mention
+    // unrelated words. Every real SmartyGym product is tagged.
     const isSmartyGymProduct = (product: any) =>
-      !!product &&
-      (product.metadata?.project === "SMARTYGYM" || /smarty/i.test(product.name || ""));
+      !!product && product.metadata?.project === "SMARTYGYM";
 
     const invoiceCache = new Map<string, string | null>();
     const resolveProductId = async (charge: any): Promise<string | null> => {
@@ -132,25 +135,20 @@ serve(async (req) => {
       const productId = await resolveProductId(charge);
       const product = productId ? await getProduct(productId) : null;
 
-      if (productId && product && !isSmartyGymProduct(product)) {
+      // STRICT REVENUE RULE:
+      // A charge is counted ONLY when it resolves to a SmartyGym product
+      // (project=SMARTYGYM metadata) OR the charge itself carries
+      // project=SMARTYGYM metadata. Nothing else. HFSC and any other
+      // business sharing this Stripe account are EXCLUDED.
+      const chargeIsSmartyGym = charge.metadata?.project === "SMARTYGYM";
+      const productIsSmartyGym = isSmartyGymProduct(product);
+      if (!productIsSmartyGym && !chargeIsSmartyGym) {
         skippedNonSmartyGym++;
-        continue;
-      }
-      if (!productId) {
-        // STRICT MODE: a charge with no resolvable SmartyGym product is only
-        // counted if it explicitly declares SMARTYGYM metadata or mentions
-        // Smarty in its description. Everything else (e.g. other businesses
-        // sharing this Stripe account, like HFSC) is EXCLUDED.
-        const isExplicitSmartyGym =
-          charge.metadata?.project === "SMARTYGYM" ||
-          /smarty/i.test(charge.description || "") ||
-          /smarty/i.test(charge.statement_descriptor || "");
-        if (!isExplicitSmartyGym) {
-          skippedNonSmartyGym++;
+        if (!productId) {
           unattributed++;
           unattributedAmount += net;
-          continue;
         }
+        continue;
       }
 
       totalCollected += net;
