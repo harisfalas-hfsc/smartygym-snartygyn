@@ -490,7 +490,7 @@ export function UsersManager() {
   const getDialogDescription = () => {
     if (!pendingAction) return '';
     if (pendingAction.action === 'grant') {
-      return `Are you sure you want to grant ${pendingAction.planType.toUpperCase()} membership to "${pendingAction.userName}"? This will give them full premium access.`;
+      return `Are you sure you want to grant PREMIUM membership to "${pendingAction.userName}"? This will give them full premium access for life (complimentary — not counted as paid revenue).`;
     }
     return `Are you sure you want to revoke premium access from "${pendingAction.userName}"? This will set them to the FREE plan and remove their premium benefits.`;
   };

@@ -182,6 +182,24 @@ export function AnalyticsDashboard() {
       const lifetimePaid = subscriptions?.filter(s => s.status === "active" && s.plan_type === "lifetime" && isPaidSub(s)).length || 0;
       let totalRevenue = lifetimePaid * SUBSCRIPTION_PRICES.lifetime;
 
+      // REAL collected revenue from Stripe charges (net of refunds) — includes
+      // historical payments from since-canceled subscriptions (e.g. old monthly plans).
+      let stripeCollected: number | null = null;
+      let stripePaymentCount = 0;
+      try {
+        const { data: stripeRev, error: stripeRevError } = await supabase.functions.invoke('get-stripe-revenue');
+        if (!stripeRevError && stripeRev && typeof stripeRev.totalCollected === "number") {
+          stripeCollected = stripeRev.totalCollected;
+          stripePaymentCount = stripeRev.paymentCount || 0;
+        }
+      } catch (e) {
+        console.error("Failed to fetch real Stripe revenue:", e);
+      }
+      // Prefer the real Stripe number when available.
+      if (stripeCollected !== null) {
+        totalRevenue = stripeCollected;
+      }
+
       // Fetch purchases for standalone sales
       const { data: purchases } = await supabase
         .from("user_purchases")
@@ -350,10 +368,13 @@ export function AnalyticsDashboard() {
       const corporatePaid = corporateSubs?.filter(c => c.status === "active" && c.stripe_subscription_id && c.stripe_customer_id).length || 0;
       const corporateFree = corporateSubs?.filter(c => c.status === "active" && (!c.stripe_subscription_id || !c.stripe_customer_id)).length || 0;
       
-      // Add corporate revenue only for PAID corporate plans
+      // Add corporate revenue only for PAID corporate plans.
+      // Skip when real Stripe collected revenue is used — those charges are already included.
       const paidCorporatePlans = corporateSubs?.filter(c => c.status === "active" && c.stripe_subscription_id && c.stripe_customer_id) || [];
       const corporateRevenue = paidCorporatePlans.reduce((sum, c) => sum + (CORPORATE_PRICES[c.plan_type as keyof typeof CORPORATE_PRICES] || 0), 0);
-      totalRevenue += corporateRevenue;
+      if (stripeCollected === null) {
+        totalRevenue += corporateRevenue;
+      }
       
       // Best selling corporate plan (only count PAID)
       const corporatePlanCounts: { [key: string]: number } = {};
