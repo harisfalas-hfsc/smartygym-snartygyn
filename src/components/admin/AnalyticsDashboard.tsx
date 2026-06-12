@@ -182,6 +182,24 @@ export function AnalyticsDashboard() {
       const lifetimePaid = subscriptions?.filter(s => s.status === "active" && s.plan_type === "lifetime" && isPaidSub(s)).length || 0;
       let totalRevenue = lifetimePaid * SUBSCRIPTION_PRICES.lifetime;
 
+      // REAL collected revenue from Stripe charges (net of refunds) — includes
+      // historical payments from since-canceled subscriptions (e.g. old monthly plans).
+      let stripeCollected: number | null = null;
+      let stripePaymentCount = 0;
+      try {
+        const { data: stripeRev, error: stripeRevError } = await supabase.functions.invoke('get-stripe-revenue');
+        if (!stripeRevError && stripeRev && typeof stripeRev.totalCollected === "number") {
+          stripeCollected = stripeRev.totalCollected;
+          stripePaymentCount = stripeRev.paymentCount || 0;
+        }
+      } catch (e) {
+        console.error("Failed to fetch real Stripe revenue:", e);
+      }
+      // Prefer the real Stripe number when available.
+      if (stripeCollected !== null) {
+        totalRevenue = stripeCollected;
+      }
+
       // Fetch purchases for standalone sales
       const { data: purchases } = await supabase
         .from("user_purchases")
