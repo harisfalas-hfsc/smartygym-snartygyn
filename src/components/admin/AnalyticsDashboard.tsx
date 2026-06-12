@@ -714,13 +714,36 @@ export function AnalyticsDashboard() {
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={revenueData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip formatter={(value) => `€${value}`} />
-                    <Legend />
-                    <Bar dataKey="value" name="Revenue (€)" fill="hsl(var(--primary))" />
+                  <BarChart data={revenueData} margin={{ top: 10, right: 12, left: 0, bottom: 8 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis
+                      dataKey="name"
+                      tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                      interval={0}
+                      tickFormatter={(v: string) => (v.length > 14 ? v.slice(0, 13) + "…" : v)}
+                    />
+                    <YAxis
+                      tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                      tickFormatter={(v: number) =>
+                        v >= 1000 ? `€${(v / 1000).toFixed(v >= 10000 ? 0 : 1)}k` : `€${v}`
+                      }
+                      width={50}
+                    />
+                    <Tooltip
+                      formatter={(value: any) => [`€${Number(value).toLocaleString()}`, "Revenue"]}
+                      cursor={{ fill: "hsl(var(--muted) / 0.3)" }}
+                      contentStyle={{
+                        background: "hsl(var(--popover))",
+                        border: "1px solid hsl(var(--border))",
+                        color: "hsl(var(--popover-foreground))",
+                        borderRadius: 8,
+                        fontSize: 12,
+                      }}
+                      labelStyle={{ color: "hsl(var(--popover-foreground))" }}
+                      itemStyle={{ color: "hsl(var(--popover-foreground))" }}
+                    />
+                    <Legend wrapperStyle={{ fontSize: 11 }} />
+                    <Bar dataKey="value" name="Revenue (€)" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} maxBarSize={80} />
                   </BarChart>
                 </ResponsiveContainer>
                 
@@ -760,7 +783,18 @@ export function AnalyticsDashboard() {
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value: any, name: any, props: any) => [`€${value}`, `${props.payload.percentage}%`]} />
+                    <Tooltip
+                      formatter={(value: any, name: any, props: any) => [`€${Number(value).toLocaleString()}`, `${props.payload.percentage}%`]}
+                      contentStyle={{
+                        background: "hsl(var(--popover))",
+                        border: "1px solid hsl(var(--border))",
+                        color: "hsl(var(--popover-foreground))",
+                        borderRadius: 8,
+                        fontSize: 12,
+                      }}
+                      labelStyle={{ color: "hsl(var(--popover-foreground))" }}
+                      itemStyle={{ color: "hsl(var(--popover-foreground))" }}
+                    />
                     <Legend 
                       verticalAlign="bottom" 
                       height={50}
@@ -779,12 +813,29 @@ export function AnalyticsDashboard() {
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={350}>
-                <LineChart data={revenueTrends}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip formatter={(value) => `€${value}`} />
-                  <Legend />
+                <LineChart data={revenueTrends} margin={{ top: 10, right: 12, left: 0, bottom: 8 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis dataKey="name" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
+                  <YAxis
+                    tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                    tickFormatter={(v: number) =>
+                      v >= 1000 ? `€${(v / 1000).toFixed(v >= 10000 ? 0 : 1)}k` : `€${v}`
+                    }
+                    width={50}
+                  />
+                  <Tooltip
+                    formatter={(value: any) => `€${Number(value).toLocaleString()}`}
+                    contentStyle={{
+                      background: "hsl(var(--popover))",
+                      border: "1px solid hsl(var(--border))",
+                      color: "hsl(var(--popover-foreground))",
+                      borderRadius: 8,
+                      fontSize: 12,
+                    }}
+                    labelStyle={{ color: "hsl(var(--popover-foreground))" }}
+                    itemStyle={{ color: "hsl(var(--popover-foreground))" }}
+                  />
+                  <Legend wrapperStyle={{ fontSize: 11 }} />
                   <Line type="monotone" dataKey="Gold Plans" stroke="hsl(var(--primary))" strokeWidth={2} />
                   <Line type="monotone" dataKey="Platinum Plans" stroke="hsl(var(--secondary))" strokeWidth={2} />
                   <Line type="monotone" dataKey="Standalone Purchases" stroke="hsl(var(--accent))" strokeWidth={2} />
