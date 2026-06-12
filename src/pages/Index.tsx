@@ -768,10 +768,10 @@ const Index = () => {
                               We are not here to replace your gym. We are here to back you up when life gets in the way. Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed, SmartyGym is your backup plan. Or, if you go to your gym but want to follow a professional, science-based workout or training program designed by{' '}
                               <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a>, we provide that expert guidance.
                             </p>
-                            <Link to="/smarty-premium" className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline mt-2">
-                              <Crown className="w-4 h-4" />
-                              Unlock Everything for Life — €89.99
-                              <ChevronRight className="w-4 h-4" />
+                            <Link to="/smarty-premium" className="inline-flex items-center gap-2 text-base font-semibold text-green-500 hover:text-green-600 hover:underline mt-2">
+                              <Crown className="w-5 h-5" />
+                              Unlock Everything for Life
+                              <ChevronRight className="w-5 h-5" />
                             </Link>
 
                             {/* Three feature cards inside */}
