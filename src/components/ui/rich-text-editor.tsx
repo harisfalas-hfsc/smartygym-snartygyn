@@ -1473,9 +1473,9 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           border-color: #9CA3AF !important;
         }
 
-        .ProseMirror table.table-border-green td,
-        .ProseMirror table.table-border-green th {
-          border-color: #22C55E !important;
+        .ProseMirror table.table-border-blue td,
+        .ProseMirror table.table-border-blue th {
+          border-color: #3B82F6 !important;
         }
 
         .ProseMirror table.table-border-red td,
@@ -1507,8 +1507,8 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           background-color: #F3F4F6 !important;
         }
 
-        .ProseMirror table.table-bg-green {
-          background-color: #F0FDF4 !important;
+        .ProseMirror table.table-bg-blue {
+          background-color: #EFF6FF !important;
         }
 
         .ProseMirror table.table-bg-red {
