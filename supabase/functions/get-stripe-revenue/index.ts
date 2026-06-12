@@ -153,6 +153,11 @@ serve(async (req) => {
       // (project=SMARTYGYM metadata) OR the charge itself carries
       // project=SMARTYGYM metadata. Nothing else. HFSC and any other
       // business sharing this Stripe account are EXCLUDED.
+      // Reject test charges/products outright (TEST PRODUCT, test mode, etc.)
+      if (isTestProduct(product) || charge.metadata?.test === "true" || charge.livemode === false) {
+        skippedNonSmartyGym++;
+        continue;
+      }
       const chargeIsSmartyGym = charge.metadata?.project === "SMARTYGYM";
       const productIsSmartyGym = isSmartyGymProduct(product);
       if (!productIsSmartyGym && !chargeIsSmartyGym) {
