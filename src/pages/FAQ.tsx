@@ -80,7 +80,7 @@ const FAQ = () => {
                 "name": "Is there a free trial?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "We don't offer a free trial, but you can explore a selection of free workouts, free training programs, and our fitness tools at no cost before deciding to upgrade. SmartyGym Gold (€9.99/month) and Platinum (€89.99/year) start the day you subscribe and auto-renew until cancelled — you can cancel anytime from your dashboard."
+                  "text": "We don't offer a free trial, but you can explore a selection of free workouts, free training programs, and our fitness tools at no cost before deciding to upgrade. SmartyGym now offers a single Lifetime Membership — one payment of €89.99 unlocks every workout, program, ritual and tool forever, with all future updates included. No subscription, no renewals, nothing to cancel."
                 }
               },
               {
@@ -336,7 +336,7 @@ const FAQ = () => {
                   <AccordionItem value="item-8">
                     <AccordionTrigger className="text-left">Is there a free trial?</AccordionTrigger>
                     <AccordionContent className="py-2 leading-relaxed">
-                      We don't offer a free trial, but you can explore a selection of <strong>free workouts</strong>, <strong>free training programs</strong>, and our <strong>fitness tools</strong> at no cost before deciding to upgrade. SmartyGym <strong>Gold (€9.99/month)</strong> and <strong>Platinum (€89.99/year)</strong> start the day you subscribe and auto-renew until cancelled — you can cancel anytime from your dashboard. You can also buy individual workouts and programs as standalone purchases. Check out our <a href="/smarty-plans" className="text-primary hover:underline font-medium">Smarty Plans</a> to compare access levels and what's included.
+                      We don't offer a free trial, but you can explore a selection of <strong>free workouts</strong>, <strong>free training programs</strong>, and our <strong>fitness tools</strong> at no cost before deciding to upgrade. SmartyGym now offers a single <strong>Lifetime Membership</strong> — one payment of <strong>€89.99</strong> unlocks every workout, program, ritual and tool <strong>forever</strong>, with all future updates included. No subscription, no renewals, nothing to cancel. You can also buy individual workouts and programs as standalone purchases. Check out our <a href="/smarty-plans" className="text-primary hover:underline font-medium">Smarty Plans</a> to see what's included.
                     </AccordionContent>
                   </AccordionItem>
 
