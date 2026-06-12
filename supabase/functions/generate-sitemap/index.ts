@@ -26,7 +26,7 @@ serve(async (req) => {
       { loc: '/workout', priority: '0.9', changefreq: 'daily' },
       { loc: '/trainingprogram', priority: '0.9', changefreq: 'weekly' },
       { loc: '/join-premium', priority: '0.95', changefreq: 'weekly' }, // High priority - subscription page
-      { loc: '/smarty-plans', priority: '0.95', changefreq: 'weekly' }, // High priority - plan comparison page
+      { loc: '/smarty-premium', priority: '0.95', changefreq: 'weekly' }, // High priority - plan comparison page
       { loc: '/blog', priority: '0.8', changefreq: 'weekly' },
       { loc: '/smartyritual', priority: '0.8', changefreq: 'daily' },
       { loc: '/about', priority: '0.7', changefreq: 'monthly' },

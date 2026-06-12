@@ -29,7 +29,7 @@ const STATIC_ENTRIES: { path: string; changefreq?: string; priority?: string }[]
   { path: "/trainingprogram", changefreq: "weekly", priority: "0.9" },
   { path: "/joinpremium", changefreq: "weekly", priority: "0.9" },
   { path: "/join-premium", changefreq: "weekly", priority: "0.9" },
-  { path: "/smarty-plans", changefreq: "weekly", priority: "0.9" },
+  { path: "/smarty-premium", changefreq: "weekly", priority: "0.9" },
   { path: "/premiumbenefits", changefreq: "monthly", priority: "0.7" },
   { path: "/corporate", changefreq: "monthly", priority: "0.7" },
   { path: "/corporate-wellness", changefreq: "monthly", priority: "0.7" },

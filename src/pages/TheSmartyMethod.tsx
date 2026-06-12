@@ -312,7 +312,7 @@ const TheSmartyMethod = () => {
                       Full ecosystem access with the flexibility to manage your membership month to month. No long-term commitment required.
                     </p>
                     <Button asChild variant="outline" size="sm">
-                      <Link to="/smarty-plans">View Plans</Link>
+                      <Link to="/smarty-premium">View Plans</Link>
                     </Button>
                   </CardContent>
                 </Card>
@@ -325,7 +325,7 @@ const TheSmartyMethod = () => {
                       The same full access at the best value. Commit to a year of structured training and save. Serious results require serious commitment.
                     </p>
                     <Button asChild size="sm">
-                      <Link to="/smarty-plans">View Plans</Link>
+                      <Link to="/smarty-premium">View Plans</Link>
                     </Button>
                   </CardContent>
                 </Card>
@@ -371,7 +371,7 @@ const TheSmartyMethod = () => {
                   </div>
 
                   <Button asChild size="lg">
-                    <Link to="/smarty-plans">
+                    <Link to="/smarty-premium">
                       <Crown className="mr-2 h-5 w-5" />
                       Start Your Journey
                     </Link>

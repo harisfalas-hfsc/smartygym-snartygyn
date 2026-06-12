@@ -61,7 +61,7 @@ serve(async (req) => {
 
     const origin = req.headers.get("origin") || "https://smartygym.com";
     const safeCancel =
-      typeof cancelPath === "string" && cancelPath.startsWith("/") ? cancelPath : "/smarty-plans";
+      typeof cancelPath === "string" && cancelPath.startsWith("/") ? cancelPath : "/smarty-premium";
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,

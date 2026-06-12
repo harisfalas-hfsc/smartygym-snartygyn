@@ -111,9 +111,9 @@ const PremiumComparisonRedirect = () => (
     <Helmet>
       <title>Smarty Plans | SmartyGym</title>
       <meta name="robots" content="noindex, follow" />
-      <link rel="canonical" href="https://smartygym.com/smarty-plans" />
+      <link rel="canonical" href="https://smartygym.com/smarty-premium" />
     </Helmet>
-    <Navigate to="/smarty-plans" replace />
+    <Navigate to="/smarty-premium" replace />
   </>
 );
 
@@ -228,11 +228,11 @@ const AppContent = () => {
                   <Route path="/home" element={<Index />} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/reset-password" element={<ResetPassword />} />
-                  <Route path="/joinpremium" element={<Navigate to="/smarty-plans" replace />} />
-                  <Route path="/join-premium" element={<Navigate to="/smarty-plans" replace />} />
+                  <Route path="/joinpremium" element={<Navigate to="/smarty-premium" replace />} />
+                  <Route path="/join-premium" element={<Navigate to="/smarty-premium" replace />} />
                   <Route path="/premium-comparison" element={<PremiumComparisonRedirect />} />
                   <Route path="/premiumcomparison" element={<PremiumComparisonRedirect />} />
-                  <Route path="/smarty-plans" element={<SmartyPlans />} />
+                  <Route path="/smarty-premium" element={<SmartyPlans />} />
                   <Route path="/about" element={<About />} />
                   <Route path="/faq" element={<FAQ />} />
                 
@@ -259,8 +259,8 @@ const AppContent = () => {
                 
                 {/* Corporate page is public */}
                 {/* Corporate offering is hidden — redirect public corporate URLs to Smarty Plans */}
-                <Route path="/corporate" element={<Navigate to="/smarty-plans" replace />} />
-                <Route path="/corporate-wellness" element={<Navigate to="/smarty-plans" replace />} />
+                <Route path="/corporate" element={<Navigate to="/smarty-premium" replace />} />
+                <Route path="/corporate-wellness" element={<Navigate to="/smarty-premium" replace />} />
                 <Route path="/why-smartygym" element={<Navigate to="/about" replace />} />
                 <Route path="/human-performance" element={<Navigate to="/about" replace />} />
                 <Route path="/why-invest-in-smartygym" element={<WhyInvestInSmartyGym />} />

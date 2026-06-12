@@ -258,7 +258,7 @@ export const BestFitnessEnhancement = () => {
             ["/blog", "Fitness Blog by Haris Falas"],
             ["/coach-profile", "Coach Profile — Haris Falas"],
             ["/about", "About SmartyGym"],
-            ["/smarty-plans", "Premium Membership Benefits"],
+            ["/smarty-premium", "Premium Membership Benefits"],
             ["/smartygym-vs-peloton", "SmartyGym vs Peloton"],
             ["/smartygym-vs-freeletics", "SmartyGym vs Freeletics"],
           ].map(([href, label]) => (

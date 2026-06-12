@@ -309,7 +309,7 @@ const FAQ = () => {
                       
                       Every ritual is personally designed by <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> and 
                       delivered fresh each morning at 7:00 AM. You can even add the ritual phases to your calendar with one click. 
-                      Smarty Ritual is exclusively available for <a href="/smarty-plans" className="text-primary hover:underline font-medium">Premium members</a>.
+                      Smarty Ritual is exclusively available for <a href="/smarty-premium" className="text-primary hover:underline font-medium">Premium members</a>.
                     </AccordionContent>
                   </AccordionItem>
 
@@ -336,7 +336,7 @@ const FAQ = () => {
                   <AccordionItem value="item-8">
                     <AccordionTrigger className="text-left">Is there a free trial?</AccordionTrigger>
                     <AccordionContent className="py-2 leading-relaxed">
-                      We don't offer a free trial, but you can explore a selection of <strong>free workouts</strong>, <strong>free training programs</strong>, and our <strong>fitness tools</strong> at no cost before deciding to upgrade. SmartyGym now offers a single <strong>Lifetime Membership</strong> — one payment of <strong>€89.99</strong> unlocks every workout, program, ritual and tool <strong>forever</strong>, with all future updates included. No subscription, no renewals, nothing to cancel. You can also buy individual workouts and programs as standalone purchases. Check out our <a href="/smarty-plans" className="text-primary hover:underline font-medium">Smarty Plans</a> to see what's included.
+                      We don't offer a free trial, but you can explore a selection of <strong>free workouts</strong>, <strong>free training programs</strong>, and our <strong>fitness tools</strong> at no cost before deciding to upgrade. SmartyGym now offers a single <strong>Lifetime Membership</strong> — one payment of <strong>€89.99</strong> unlocks every workout, program, ritual and tool <strong>forever</strong>, with all future updates included. No subscription, no renewals, nothing to cancel. You can also buy individual workouts and programs as standalone purchases. Check out our <a href="/smarty-premium" className="text-primary hover:underline font-medium">Smarty Plans</a> to see what's included.
                     </AccordionContent>
                   </AccordionItem>
 
@@ -365,7 +365,7 @@ const FAQ = () => {
                       Getting started is simple:<br/>
                       1. <strong>Browse</strong> our free workouts and tools to get a feel for the platform.<br/>
                       2. <a href="/auth?mode=signup" className="text-primary hover:underline font-medium"><strong>Sign up</strong></a> for a free account to save your progress and track your training.<br/>
-                      3. <a href="/smarty-plans" className="text-primary hover:underline font-medium"><strong>Become a Premium Member</strong></a> with one single payment and unlock everything for life — every workout, every training program, the Smarty Ritual, Smarty Tools, check-ins and all future content. No subscriptions. No renewals. Ever.<br/>
+                      3. <a href="/smarty-premium" className="text-primary hover:underline font-medium"><strong>Become a Premium Member</strong></a> with one single payment and unlock everything for life — every workout, every training program, the Smarty Ritual, Smarty Tools, check-ins and all future content. No subscriptions. No renewals. Ever.<br/>
                       4. <strong>Start training</strong> — pick a workout or program and get moving!<br/><br/>
                       
                       If you need guidance, <a href="/contact" className="text-primary hover:underline font-medium">contact us</a> directly.
