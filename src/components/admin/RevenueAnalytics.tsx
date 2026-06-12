@@ -88,7 +88,11 @@ export function RevenueAnalytics() {
       return { startDate: customStartDate, endDate: customEndDate };
     }
 
-    startDate.setDate(startDate.getDate() - parseInt(timeFilter));
+    if (timeFilter === "all") {
+      startDate.setFullYear(2020, 0, 1);
+    } else {
+      startDate.setDate(startDate.getDate() - parseInt(timeFilter));
+    }
     return { startDate, endDate };
   };
 
