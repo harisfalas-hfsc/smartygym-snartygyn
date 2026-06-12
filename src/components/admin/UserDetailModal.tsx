@@ -307,7 +307,7 @@ export function UserDetailModal({
 
   if (!user) return null;
 
-  const isPremium = user.status === 'active' && (user.plan_type === 'gold' || user.plan_type === 'platinum');
+  const isPremium = user.status === 'active' && ['gold','platinum','lifetime','premium'].includes(user.plan_type);
   const isCorporateAdmin = !!corporateInfo?.adminPlanType;
   const isCorporateMember = !!corporateInfo?.memberPlanType;
   const hasEndedStripePlan = !!user.stripe_subscription_id && !!user.current_period_end && new Date(user.current_period_end).getTime() < Date.now();
@@ -335,8 +335,8 @@ export function UserDetailModal({
                 {isAdmin && (
                   <Badge variant="destructive">👑 Admin</Badge>
                 )}
-                <Badge variant={user.plan_type === 'platinum' ? 'default' : user.plan_type === 'gold' ? 'secondary' : 'outline'}>
-                  {user.plan_type.toUpperCase()}
+                <Badge variant={isPremium ? 'default' : 'outline'}>
+                  {isPremium ? 'PREMIUM' : user.plan_type.toUpperCase()}
                 </Badge>
                 {user.subscription_source === 'admin_grant' && (
                   <Badge variant="secondary" className="bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300">
@@ -589,63 +589,25 @@ export function UserDetailModal({
                 </CardHeader>
                 <CardContent className="flex flex-wrap gap-2">
                   {!isPremium ? (
-                    <>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => manageSubscription('grant', 'gold')}
-                        disabled={actionLoading}
-                        className="text-primary border-primary hover:bg-primary/10"
-                      >
-                        <Crown className="h-4 w-4 mr-2" />
-                        Grant Gold
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => manageSubscription('grant', 'platinum')}
-                        disabled={actionLoading}
-                        className="text-purple-600 border-purple-600 hover:bg-purple-50"
-                      >
-                        <Gem className="h-4 w-4 mr-2" />
-                        Grant Platinum
-                      </Button>
-                    </>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => manageSubscription('grant', 'lifetime')}
+                      disabled={actionLoading}
+                      className="text-primary border-primary hover:bg-primary/10"
+                    >
+                      <Crown className="h-4 w-4 mr-2" />
+                      Grant Premium
+                    </Button>
                   ) : (
-                    <>
-                      {user.plan_type === 'gold' && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => manageSubscription('grant', 'platinum')}
-                          disabled={actionLoading}
-                          className="text-purple-600 border-purple-600 hover:bg-purple-50"
-                        >
-                          <Gem className="h-4 w-4 mr-2" />
-                          Upgrade to Platinum
-                        </Button>
-                      )}
-                      {user.plan_type === 'platinum' && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => manageSubscription('grant', 'gold')}
-                          disabled={actionLoading}
-                          className="text-primary border-primary hover:bg-primary/10"
-                        >
-                          <Crown className="h-4 w-4 mr-2" />
-                          Downgrade to Gold
-                        </Button>
-                      )}
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => manageSubscription('revoke', 'free')}
-                        disabled={actionLoading}
-                      >
-                        Revoke Premium
-                      </Button>
-                    </>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => manageSubscription('revoke', 'free')}
+                      disabled={actionLoading}
+                    >
+                      Revoke Premium
+                    </Button>
                   )}
                 </CardContent>
               </Card>
