@@ -642,8 +642,7 @@ export function UsersManager() {
               <SelectContent>
                 <SelectItem value="all">All Plans</SelectItem>
                 <SelectItem value="free">Free</SelectItem>
-                <SelectItem value="gold">Gold</SelectItem>
-                <SelectItem value="platinum">Platinum</SelectItem>
+                <SelectItem value="premium">Premium</SelectItem>
                 <SelectItem value="corporate">Corporate</SelectItem>
               </SelectContent>
             </Select>
@@ -730,12 +729,8 @@ export function UsersManager() {
               <p className="text-2xl font-bold text-green-600">{stats.paying}</p>
             </div>
             <div className="bg-muted/50 p-3 rounded-lg">
-              <p className="text-xs text-muted-foreground">Gold</p>
-              <p className="text-2xl font-bold">{stats.gold}</p>
-            </div>
-            <div className="bg-muted/50 p-3 rounded-lg">
-              <p className="text-xs text-muted-foreground">Platinum</p>
-              <p className="text-2xl font-bold">{stats.platinum}</p>
+              <p className="text-xs text-muted-foreground">Premium</p>
+              <p className="text-2xl font-bold">{stats.premium}</p>
             </div>
             <div className="bg-muted/50 p-3 rounded-lg">
               <p className="text-xs text-muted-foreground">Purchases</p>
@@ -794,10 +789,10 @@ export function UsersManager() {
                           </Badge>
                         )}
                         {isCorporateMember && !user.stripe_subscription_id && user.subscription_source !== 'admin_grant' ? (
-                          <Badge className="bg-teal-600 hover:bg-teal-700 text-white text-xs">Platinum (Corporate)</Badge>
+                          <Badge className="bg-teal-600 hover:bg-teal-700 text-white text-xs">Premium (Corporate)</Badge>
                         ) : (
                           <>
-                            <Badge variant={getPlanBadgeVariant(user.plan_type)} className="text-xs">{user.plan_type}</Badge>
+                            <Badge variant={getPlanBadgeVariant(user.plan_type)} className="text-xs">{getPlanLabel(user.plan_type)}</Badge>
                             {user.subscription_source === 'admin_grant' && (
                               <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300">Complimentary</Badge>
                             )}
@@ -844,7 +839,7 @@ export function UsersManager() {
                         )}
                         {isCorporateMember && (
                           <>
-                            <Badge className="text-xs bg-teal-600 hover:bg-teal-700 text-white">👥 Platinum (Corporate)</Badge>
+                            <Badge className="text-xs bg-teal-600 hover:bg-teal-700 text-white">👥 Premium (Corporate)</Badge>
                             {corpInfo.organizationName && (
                               <Badge 
                                 variant="outline" 
@@ -864,7 +859,7 @@ export function UsersManager() {
                       <span>Joined: {format(new Date(user.created_at), 'MMM d, yyyy')}</span>
                       <span>Period End: {user.current_period_end
                         ? format(new Date(user.current_period_end), 'MMM d, yyyy')
-                        : user.subscription_source === 'admin_grant' && (user.plan_type === 'gold' || user.plan_type === 'platinum')
+                        : user.subscription_source === 'admin_grant' && PREMIUM_PLAN_TYPES.has(user.plan_type)
                           ? 'Lifetime'
                           : 'N/A'}</span>
                       <span>Subscribed: {user.subscription_created_at && user.plan_type !== 'free'
@@ -891,30 +886,12 @@ export function UsersManager() {
                       </Button>
 
                       {!isPremium ? (
-                        <>
-                          <Button variant="outline" size="sm" className="h-7 text-xs px-2 text-primary border-primary hover:bg-primary/10 whitespace-nowrap"
-                            onClick={(e) => { e.stopPropagation(); setPendingAction({ userId: user.user_id, userName, action: 'grant', planType: 'gold' }); }}>
-                            <Crown className="h-3 w-3 mr-1" />Gold
-                          </Button>
-                          <Button variant="outline" size="sm" className="h-7 text-xs px-2 text-purple-600 border-purple-600 hover:bg-purple-50 whitespace-nowrap"
-                            onClick={(e) => { e.stopPropagation(); setPendingAction({ userId: user.user_id, userName, action: 'grant', planType: 'platinum' }); }}>
-                            <Gem className="h-3 w-3 mr-1" />Platinum
-                          </Button>
-                        </>
+                        <Button variant="outline" size="sm" className="h-7 text-xs px-2 text-primary border-primary hover:bg-primary/10 whitespace-nowrap"
+                          onClick={(e) => { e.stopPropagation(); setPendingAction({ userId: user.user_id, userName, action: 'grant', planType: 'lifetime' }); }}>
+                          <Crown className="h-3 w-3 mr-1" />Grant Premium
+                        </Button>
                       ) : (
                         <>
-                          {user.plan_type === 'gold' && (
-                            <Button variant="outline" size="sm" className="h-7 text-xs px-2 text-purple-600 border-purple-600 hover:bg-purple-50 whitespace-nowrap"
-                              onClick={(e) => { e.stopPropagation(); setPendingAction({ userId: user.user_id, userName, action: 'grant', planType: 'platinum' }); }}>
-                              <Gem className="h-3 w-3 mr-1" />Upgrade
-                            </Button>
-                          )}
-                          {user.plan_type === 'platinum' && (
-                            <Button variant="outline" size="sm" className="h-7 text-xs px-2 text-primary border-primary hover:bg-primary/10 whitespace-nowrap"
-                              onClick={(e) => { e.stopPropagation(); setPendingAction({ userId: user.user_id, userName, action: 'grant', planType: 'gold' }); }}>
-                              <Crown className="h-3 w-3 mr-1" />Downgrade
-                            </Button>
-                          )}
                           <Button variant="destructive" size="sm" className="h-7 text-xs px-2 whitespace-nowrap"
                             onClick={(e) => { e.stopPropagation(); setPendingAction({ userId: user.user_id, userName, action: 'revoke', planType: 'free' }); }}>
                             Revoke
