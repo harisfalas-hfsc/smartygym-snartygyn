@@ -42,7 +42,7 @@ import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { AlreadyPremiumCard } from "@/components/pricing/AlreadyPremiumCard";
 
-export default function SmartyPlans() {
+export default function SmartyPremium() {
   const navigate = useNavigate();
   const { toast } = useToast();
 

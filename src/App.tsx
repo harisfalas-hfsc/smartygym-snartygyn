@@ -70,7 +70,7 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const SmartyCorporate = lazy(() => import("./pages/SmartyCorporate"));
 const CorporateWellness = lazy(() => import("./pages/CorporateWellness"));
 const WhyInvestInSmartyGym = lazy(() => import("./pages/WhyInvestInSmartyGym"));
-const SmartyPlans = lazy(() => import("./pages/SmartyPlans"));
+const SmartyPremium = lazy(() => import("./pages/SmartyPremium"));
 const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
 const NewsletterThankYou = lazy(() => import("./pages/NewsletterThankYou"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
@@ -159,7 +159,7 @@ const secondaryRoutePreloaders = [
   () => import("./pages/WorkoutTimer"),
   () => import("./pages/CalorieCounter"),
   () => import("./pages/RoundsTracker"),
-  () => import("./pages/SmartyPlans"),
+  () => import("./pages/SmartyPremium"),
 ];
 
 const preloadRouteModules = () => {
@@ -232,7 +232,7 @@ const AppContent = () => {
                   <Route path="/join-premium" element={<Navigate to="/smarty-premium" replace />} />
                   <Route path="/premium-comparison" element={<PremiumComparisonRedirect />} />
                   <Route path="/premiumcomparison" element={<PremiumComparisonRedirect />} />
-                  <Route path="/smarty-premium" element={<SmartyPlans />} />
+                  <Route path="/smarty-premium" element={<SmartyPremium />} />
                   <Route path="/about" element={<About />} />
                   <Route path="/faq" element={<FAQ />} />
                 
