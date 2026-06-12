@@ -134,7 +134,7 @@ const CoachCV = () => {
 
           {/* CTA */}
           {!isPremium && <div className="text-center space-y-4">
-              <Button size="lg" onClick={() => navigate("/premiumbenefits")} className="bg-primary text-primary-foreground hover:bg-primary/90">
+              <Button size="lg" onClick={() => navigate("/smarty-plans")} className="bg-primary text-primary-foreground hover:bg-primary/90">
                 Join SmartyGym Today
               </Button>
               <p className="text-sm text-muted-foreground">

@@ -427,7 +427,7 @@ const Community = () => {
         The leaderboard is reserved for premium members and customers who purchased a workout or program — the people who can earn entries here.
       </p>
       <div className="flex flex-col gap-2 w-full max-w-[220px]">
-        <Button onClick={() => navigate("/premiumbenefits")} size="sm" className="w-full">
+        <Button onClick={() => navigate("/smarty-plans")} size="sm" className="w-full">
           <Crown className="h-4 w-4 mr-2" />
           View Premium Plans
         </Button>

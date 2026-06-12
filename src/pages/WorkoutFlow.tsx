@@ -507,7 +507,7 @@ const WorkoutFlow = () => {
                 <p className="text-muted-foreground mb-4">
                   Unlock 500+ more exclusive sessions with SmartyGym Premium.
                 </p>
-                <Button size="lg" onClick={() => navigate("/premiumbenefits")} className="cta-button">
+                <Button size="lg" onClick={() => navigate("/smarty-plans")} className="cta-button">
                   Join Premium
                 </Button>
               </div>

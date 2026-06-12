@@ -173,7 +173,7 @@ export const AccessGate = ({
                   stripeProductId={stripeProductId}
                 />
               )}
-              <Button onClick={() => navigate("/premiumbenefits")} className="w-full" size="lg" variant={isStandalonePurchase ? "outline" : "default"}>
+              <Button onClick={() => navigate("/smarty-plans")} className="w-full" size="lg" variant={isStandalonePurchase ? "outline" : "default"}>
                 <Crown className="w-4 h-4 mr-2" />
                 View Premium Plans
               </Button>
@@ -211,7 +211,7 @@ export const AccessGate = ({
               This {contentType} is only available to premium members.
             </p>
             <div className="space-y-2 pt-4">
-              <Button onClick={() => navigate("/premiumbenefits")} className="w-full" size="lg">
+              <Button onClick={() => navigate("/smarty-plans")} className="w-full" size="lg">
                 <Crown className="w-4 h-4 mr-2" />
                 View Premium Plans
               </Button>

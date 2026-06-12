@@ -1,11 +1,12 @@
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Bell, Menu, ArrowLeft, Home, User as UserIcon, Crown, Building2, LayoutDashboard, LogOut, Shield, Users, Info, Dumbbell, ListChecks, Sparkles, Wrench, BookOpen, Newspaper, HelpCircle, Mail } from "lucide-react";
+import { Bell, Menu, ArrowLeft, Home, User as UserIcon, Crown, Building2, LayoutDashboard, LogOut, Shield, Users, Info, Dumbbell, ListChecks, Sparkles, Wrench, BookOpen, Newspaper, HelpCircle, Mail, Moon, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SmartyCoachModal } from "@/components/smarty-coach/SmartyCoachModal";
 import smartyCoachIcon from "@/assets/smarty-coach-icon.png";
 import { supabase } from "@/integrations/supabase/client";
+import { useTheme } from "next-themes";
 import type { User } from "@supabase/supabase-js";
 import { Sheet, SheetClose, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
@@ -32,6 +33,7 @@ export const MobileBottomNav = () => {
   const { data: unreadCount = 0 } = useUnreadMessages();
   const { isAdmin } = useAdminRole();
   const { toast } = useToast();
+  const { resolvedTheme, setTheme } = useTheme();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -147,6 +149,16 @@ export const MobileBottomNav = () => {
             </SheetContent>
           </Sheet>
 
+          {/* Home */}
+          <button
+            type="button"
+            onClick={() => { navigate("/"); setTimeout(() => window.scrollTo(0, 0), 0); }}
+            aria-label="Home"
+            className={itemClass}
+          >
+            <Home className="h-7 w-7" strokeWidth={2.25} />
+          </button>
+
           {/* Smarty Coach */}
           <button
             type="button"
@@ -157,14 +169,18 @@ export const MobileBottomNav = () => {
             <img src={smartyCoachIcon} alt="" aria-hidden="true" className="h-7 w-7 rounded-full" width={28} height={28} />
           </button>
 
-          {/* Home */}
+          {/* Theme Toggle */}
           <button
             type="button"
-            onClick={() => { navigate("/"); setTimeout(() => window.scrollTo(0, 0), 0); }}
-            aria-label="Home"
+            onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+            aria-label={`Switch to ${resolvedTheme === "dark" ? "light" : "dark"} mode`}
             className={itemClass}
           >
-            <Home className="h-7 w-7" strokeWidth={2.25} />
+            {resolvedTheme === "dark" ? (
+              <Sun className="h-7 w-7" strokeWidth={2.25} />
+            ) : (
+              <Moon className="h-7 w-7" strokeWidth={2.25} />
+            )}
           </button>
 
           {/* Notifications */}

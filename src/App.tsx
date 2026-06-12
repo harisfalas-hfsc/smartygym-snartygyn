@@ -70,7 +70,6 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const SmartyCorporate = lazy(() => import("./pages/SmartyCorporate"));
 const CorporateWellness = lazy(() => import("./pages/CorporateWellness"));
 const WhyInvestInSmartyGym = lazy(() => import("./pages/WhyInvestInSmartyGym"));
-const PremiumBenefits = lazy(() => import("./pages/PremiumBenefits"));
 const SmartyPlans = lazy(() => import("./pages/SmartyPlans"));
 const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
 const NewsletterThankYou = lazy(() => import("./pages/NewsletterThankYou"));
@@ -231,7 +230,6 @@ const AppContent = () => {
                   <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/joinpremium" element={<Navigate to="/smarty-plans" replace />} />
                   <Route path="/join-premium" element={<Navigate to="/smarty-plans" replace />} />
-                  <Route path="/premiumbenefits" element={<PremiumBenefits />} />
                   <Route path="/premium-comparison" element={<PremiumComparisonRedirect />} />
                   <Route path="/premiumcomparison" element={<PremiumComparisonRedirect />} />
                   <Route path="/smarty-plans" element={<SmartyPlans />} />
