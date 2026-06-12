@@ -454,6 +454,7 @@ export type Database = {
           rule_type: string
           sends_dashboard_message: boolean | null
           sends_email: boolean | null
+          sends_push: boolean
           target_audience: string | null
           total_executions: number | null
           trigger_config: Json | null
@@ -473,6 +474,7 @@ export type Database = {
           rule_type: string
           sends_dashboard_message?: boolean | null
           sends_email?: boolean | null
+          sends_push?: boolean
           target_audience?: string | null
           total_executions?: number | null
           trigger_config?: Json | null
@@ -492,6 +494,7 @@ export type Database = {
           rule_type?: string
           sends_dashboard_message?: boolean | null
           sends_email?: boolean | null
+          sends_push?: boolean
           target_audience?: string | null
           total_executions?: number | null
           trigger_config?: Json | null
