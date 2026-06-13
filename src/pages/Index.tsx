@@ -37,6 +37,12 @@ import heroLibraryImage from "@/assets/hero-exercise-library-new.jpg";
 import heroCommunityImage from "@/assets/hero-community-new.jpg";
 import heroCommunityCelebratingImage from "@/assets/hero-community-celebrating.jpg";
 import heroLibraryBookImage from "@/assets/hero-library-book.jpg";
+import tool1RmImage from "@/assets/tools/1rm-card-mobile.jpg";
+import toolBmrImage from "@/assets/tools/bmr-card-mobile.jpg";
+import toolMacroImage from "@/assets/tools/macro-card-mobile.jpg";
+import toolTimerImage from "@/assets/tools/timer-card-mobile.jpg";
+import toolCalorieImage from "@/assets/tools/calorie-card-mobile.jpg";
+import toolRoundsImage from "@/assets/tools/rounds-tracker-bg.jpg";
 import valueBuiltForRealLife from "@/assets/value-built-for-real-life.jpg";
 import valueScientificApproach from "@/assets/value-scientific-approach.jpg";
 import valueAccessibleToAll from "@/assets/value-accessible-to-all.jpg";
@@ -150,10 +156,12 @@ const Index = () => {
 
   // Fourth carousel: Smarty Tools
   const toolsCards = [
-    { id: "1rm", title: "1RM Calculator", description: "Calculate your one-rep maximum", icon: Calculator, route: "/1rmcalculator", image: heroToolsImage },
-    { id: "bmr", title: "BMR Calculator", description: "Know your daily calorie needs", icon: Activity, route: "/bmrcalculator", image: heroToolsImage },
-    { id: "macro", title: "Macro Calculator", description: "Personalized nutrition targets", icon: Flame, route: "/macrocalculator", image: heroToolsImage },
-    { id: "timer", title: "Workout Timer", description: "Interval timer for any workout", icon: Clock, route: "/workouttimer", image: heroToolsImage },
+    { id: "timer", title: "Workout Timer", description: "Interval timer for HIIT, Tabata & circuits", icon: Clock, route: "/tools/workout-timer", image: toolTimerImage },
+    { id: "rounds", title: "Rounds Tracker", description: "Tap to track rounds and reps", icon: Activity, route: "/tools/rounds-tracker", image: toolRoundsImage },
+    { id: "1rm", title: "1RM Calculator", description: "Calculate your one-rep maximum", icon: Calculator, route: "/tools/1rm-calculator", image: tool1RmImage },
+    { id: "bmr", title: "BMR Calculator", description: "Know your daily calorie needs", icon: Activity, route: "/tools/bmr-calculator", image: toolBmrImage },
+    { id: "macro", title: "Macro Calculator", description: "Personalized nutrition targets", icon: Flame, route: "/tools/macro-calculator", image: toolMacroImage },
+    { id: "calorie", title: "Calorie Counter", description: "Search any food for calories & macros", icon: Flame, route: "/tools/calorie-counter", image: toolCalorieImage },
   ];
 
   // Fetch review stats for SEO schema - low priority, don't block render
@@ -781,6 +789,10 @@ const Index = () => {
           </div>
 
           {/* Exercise Library + Community quick access (2 taller image cards) */}
+          <div className="flex items-center gap-2 mb-2 mt-1">
+            <span className="text-sm font-extrabold tracking-tight text-primary uppercase">Explore</span>
+            <div className="h-px flex-1 bg-primary/20" />
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <div
               onClick={() => navigate('/exerciselibrary')}
