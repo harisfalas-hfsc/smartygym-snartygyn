@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollReveal } from "@/components/ScrollReveal";
-import { CheckCircle2, Target, Heart, Users, Shield, Award, Compass, GraduationCap, Plane, Dumbbell, UserCheck, Smartphone, Calendar, Video, Wrench, FileText, BookOpen, ChevronRight, Flame, Crown, Sparkles } from "lucide-react";
+import { CheckCircle2, Target, Heart, Users, Shield, Award, Compass, GraduationCap, Plane, Dumbbell, UserCheck, Smartphone, Calendar, Video, Wrench, FileText, BookOpen, ChevronRight, Flame, Crown, Sparkles, Rocket } from "lucide-react";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import harisPhoto from "@/assets/haris-falas-coach.png";
 import { useAccessControl } from "@/hooks/useAccessControl";
@@ -410,7 +410,7 @@ const About = () => {
                     <h2 className="text-2xl md:text-3xl font-bold text-foreground">The <span className="text-primary">SmartyGym</span> Promise</h2>
                   </div>
 
-                  <div className="grid md:grid-cols-3 gap-6 text-center">
+                  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 text-center">
                     
                     <div className="space-y-2">
                       <CheckCircle2 className="w-8 h-8 text-primary mx-auto" />
@@ -433,6 +433,14 @@ const About = () => {
                       <h3 className="font-bold">Not a Robot</h3>
                       <p className="text-sm text-muted-foreground">
                         We don't generate workouts with algorithms. We design them with care, experience, and your goals in mind.
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Rocket className="w-8 h-8 text-primary mx-auto" />
+                      <h3 className="font-bold">Never Stop Expanding</h3>
+                      <p className="text-sm text-muted-foreground">
+                        New workouts, programs, tools, and articles — keeping you current with the latest science and trends.
                       </p>
                     </div>
 
