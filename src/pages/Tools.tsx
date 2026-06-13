@@ -246,7 +246,7 @@ const Tools = () => {
                           src={tool.mobileImage} 
                           alt={tool.title}
                           loading="lazy"
-                          className="w-full h-full object-cover object-[center_top] min-[540px]:object-contain"
+                          className="w-full h-full object-cover object-center"
                         />
                       </div>
                       {/* Content section */}
@@ -298,7 +298,7 @@ const Tools = () => {
                 className="group relative h-72 rounded-xl overflow-hidden cursor-pointer transition-all duration-500 ease-out transform-gpu hover:scale-[1.02] hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/40 hover:z-10"
               >
                 <img 
-                  src={timerTool.mobileImage} 
+                  src={timerTool.image} 
                   alt={timerTool.title}
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
