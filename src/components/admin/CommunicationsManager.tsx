@@ -1,14 +1,13 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AutomatedMessagesManager } from "./AutomatedMessagesManager";
-import { ScheduledNotificationsManager } from "./ScheduledNotificationsManager";
 import { MassNotificationManager } from "./MassNotificationManager";
 import { TestMessageSender } from "./TestMessageSender";
 import { UnifiedAnnouncementSender } from "./UnifiedAnnouncementSender";
 import { AutomationRulesManager } from "./AutomationRulesManager";
 import { MessagingMonitoringDashboard } from "./MessagingMonitoringDashboard";
 import { MobileAppPushManager } from "./MobileAppPushManager";
-import { MessageSquare, Calendar, Bell, Send, Megaphone, Settings, BarChart3, Smartphone } from "lucide-react";
+import { MessageSquare, Bell, Send, Megaphone, Settings, BarChart3, Smartphone } from "lucide-react";
 
 export const CommunicationsManager = () => {
   return (
@@ -42,10 +41,6 @@ export const CommunicationsManager = () => {
                 <MessageSquare className="w-4 h-4 flex-shrink-0" />
                 <span>Templates</span>
               </TabsTrigger>
-              <TabsTrigger value="scheduled" className="flex-shrink-0 flex items-center gap-2 whitespace-nowrap text-xs px-3 py-2">
-                <Calendar className="w-4 h-4 flex-shrink-0" />
-                <span>Scheduled</span>
-              </TabsTrigger>
               <TabsTrigger value="mass" className="flex-shrink-0 flex items-center gap-2 whitespace-nowrap text-xs px-3 py-2">
                 <Bell className="w-4 h-4 flex-shrink-0" />
                 <span>Mass</span>
@@ -75,10 +70,6 @@ export const CommunicationsManager = () => {
           
           <TabsContent value="automated">
             <AutomatedMessagesManager />
-          </TabsContent>
-          
-          <TabsContent value="scheduled">
-            <ScheduledNotificationsManager />
           </TabsContent>
           
           <TabsContent value="mass">

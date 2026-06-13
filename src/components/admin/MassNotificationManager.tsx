@@ -7,9 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Send, Users, Loader2, Clock, Zap, Bell } from "lucide-react";
-import { ScheduledNotificationsManager } from "./ScheduledNotificationsManager";
+import { Send, Users, Loader2 } from "lucide-react";
 
 interface Template {
   id: string;
@@ -137,19 +135,7 @@ export function MassNotificationManager() {
 
   return (
     <div className="pt-6 space-y-6">
-      <Tabs defaultValue="instant" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="instant" className="flex items-center gap-2">
-            <Zap className="h-4 w-4" />
-            Instant Notifications
-          </TabsTrigger>
-          <TabsTrigger value="scheduled" className="flex items-center gap-2">
-            <Clock className="h-4 w-4" />
-            Scheduled Notifications
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="instant" className="mt-6 space-y-6">
+      <div className="space-y-6">
           {/* Mass Notification Card */}
           <Card>
             <CardHeader>
@@ -265,12 +251,7 @@ export function MassNotificationManager() {
               </Button>
             </CardContent>
           </Card>
-        </TabsContent>
-
-        <TabsContent value="scheduled" className="mt-6">
-          <ScheduledNotificationsManager />
-        </TabsContent>
-      </Tabs>
+      </div>
     </div>
   );
 }
