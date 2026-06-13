@@ -703,6 +703,8 @@ export const UserMessagesPanel = () => {
     const link = extractLink(message.content);
     const messageKey = `system-${message.id}`;
     const isSelected = validSelectedMessages.has(messageKey);
+    const isExpanded = expandedSystemMessages.has(message.id);
+    const isLong = (message.content || '').length > 600;
     
     return (
       <Card key={messageKey} className={!message.is_read && showBorder ? 'border-blue-500' : ''}>
@@ -750,9 +752,25 @@ export const UserMessagesPanel = () => {
                   </Button>
                 </div>
               </div>
-              <div className="text-sm content-container mb-3 [&_hr]:hidden [&_p:empty]:hidden [&_p]:my-1 [&_h1]:mt-2 [&_h1]:mb-1 [&_h2]:mt-2 [&_h2]:mb-1 [&_h3]:mt-2 [&_h3]:mb-1 [&_br+br]:hidden [&_ul]:my-1 [&_ol]:my-1">
+              <div
+                className={`text-sm content-container mb-2 [&_hr]:hidden [&_p:empty]:hidden [&_p]:my-3 [&_p]:leading-relaxed [&_h1]:mt-3 [&_h1]:mb-2 [&_h2]:mt-3 [&_h2]:mb-2 [&_h3]:mt-3 [&_h3]:mb-2 [&_br+br]:hidden [&_ul]:my-2 [&_ol]:my-2 ${isLong && !isExpanded ? 'max-h-40 overflow-hidden relative after:content-[""] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-12 after:bg-gradient-to-t after:from-card after:to-transparent' : ''}`}
+              >
                 <HTMLContent content={compactMessageHtml(message.content)} />
               </div>
+              {isLong && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2 mb-2 text-primary"
+                  onClick={() => setExpandedSystemMessages(prev => {
+                    const next = new Set(prev);
+                    if (next.has(message.id)) next.delete(message.id); else next.add(message.id);
+                    return next;
+                  })}
+                >
+                  {isExpanded ? 'Show less' : 'Read more'}
+                </Button>
+              )}
               <div className="flex items-center gap-4 flex-wrap">
                 <span className="text-xs text-muted-foreground">
                   {format(new Date(message.created_at), 'MMM dd, yyyy HH:mm')}
@@ -762,7 +780,7 @@ export const UserMessagesPanel = () => {
                     variant="outline"
                     size="sm"
                     className="h-7"
-                    onClick={() => window.open(link, '_blank')}
+                    onClick={() => openLinkInternally(link)}
                   >
                     <ExternalLink className="h-3 w-3 mr-1" />
                     View Content
