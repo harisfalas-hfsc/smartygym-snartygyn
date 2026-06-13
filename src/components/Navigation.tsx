@@ -327,7 +327,7 @@ export const Navigation = () => {
             <img src={smartyCoachIcon} alt="" aria-hidden="true" className="h-6 w-6 rounded-full" width={24} height={24} />
           </button>
           {user ? (
-            <DropdownMenu>
+            <DropdownMenu open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <DropdownMenuTrigger asChild>
                 <button
                   type="button"
@@ -355,9 +355,9 @@ export const Navigation = () => {
                   <LayoutDashboard className="mr-2 h-4 w-4" /><span>Dashboard</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onSelect={(e) => {
-                    e.preventDefault();
+                  onSelect={() => {
                     setTheme(resolvedTheme === "dark" ? "light" : "dark");
+                    setMobileMenuOpen(false);
                   }}
                 >
                   {resolvedTheme === "dark" ? (
@@ -381,7 +381,7 @@ export const Navigation = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <DropdownMenu>
+            <DropdownMenu open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <DropdownMenuTrigger asChild>
                 <button
                   type="button"
@@ -399,9 +399,9 @@ export const Navigation = () => {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
-                  onSelect={(e) => {
-                    e.preventDefault();
+                  onSelect={() => {
                     setTheme(resolvedTheme === "dark" ? "light" : "dark");
+                    setMobileMenuOpen(false);
                   }}
                 >
                   {resolvedTheme === "dark" ? (
