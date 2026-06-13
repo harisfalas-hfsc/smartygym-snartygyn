@@ -164,7 +164,7 @@ const LEGACY_PREF_KEYS: Record<AutomationKey, Record<Channel, string[]>> = {
     push: ["mobile_push_weekly_activity"],
   },
   checkin_reminder: {
-    email: ["email_checkin_reminders", "checkin_reminders"],
+    email: ["email_checkin_reminders"],
     dashboard: ["dashboard_checkin_reminders"],
     push: ["mobile_push_checkin_reminders"],
   },
@@ -191,6 +191,7 @@ const LEGACY_PREF_KEYS: Record<AutomationKey, Record<Channel, string[]>> = {
 };
 
 function legacyChannelValue(raw: Record<string, any>, key: AutomationKey, channel: Channel): boolean {
+  if (key === "checkin_reminder" && raw.checkin_reminders === false) return false;
   if (channel === "push" && raw.mobile_push_master === false) return false;
   const legacyKeys = LEGACY_PREF_KEYS[key][channel];
   if (legacyKeys.length === 0) return true;
@@ -198,6 +199,7 @@ function legacyChannelValue(raw: Record<string, any>, key: AutomationKey, channe
 }
 
 function mergeLegacyKeys(raw: Record<string, any>, key: AutomationKey, channel: Channel, value: boolean) {
+  if (key === "checkin_reminder" && value) raw.checkin_reminders = true;
   for (const legacyKey of LEGACY_PREF_KEYS[key][channel]) {
     raw[legacyKey] = value;
   }

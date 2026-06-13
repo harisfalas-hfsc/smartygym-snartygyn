@@ -146,11 +146,6 @@ serve(async (req) => {
         [`${prefKey}_unsubscribed_at`]: new Date().toISOString(),
       };
 
-      // Also update legacy field for checkin_reminders
-      if (emailType === 'checkin_reminders') {
-        updatedPrefs.checkin_reminders = false;
-      }
-
       const { error: updateError } = await supabaseAdmin
         .from("profiles")
         .update({ notification_preferences: updatedPrefs })

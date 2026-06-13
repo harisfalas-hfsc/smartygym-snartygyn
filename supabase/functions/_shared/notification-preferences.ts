@@ -51,7 +51,7 @@ const LEGACY_FALLBACK: Record<AutomationKey, { email: string[]; dashboard: strin
     push: ["mobile_push_weekly_activity"],
   },
   checkin_reminder: {
-    email: ["email_checkin_reminders", "checkin_reminders"],
+    email: ["email_checkin_reminders"],
     dashboard: ["dashboard_checkin_reminders"],
     push: ["mobile_push_checkin_reminders"],
   },
@@ -84,7 +84,8 @@ export function canSend(
   if (prefs.opt_out_all === true) return false;
 
   const legacyKeys = LEGACY_FALLBACK[key]?.[channel] ?? [];
-  const legacyAllowed = legacyKeys.length === 0 || legacyKeys.every((k) => prefs[k] !== false);
+  const legacyAllowed = (key !== "checkin_reminder" || prefs.checkin_reminders !== false) &&
+    (legacyKeys.length === 0 || legacyKeys.every((k) => prefs[k] !== false));
   const pushAllowed = channel !== "push" || (prefs.push !== false && prefs.mobile_push_master !== false);
 
   const node = prefs[key];
