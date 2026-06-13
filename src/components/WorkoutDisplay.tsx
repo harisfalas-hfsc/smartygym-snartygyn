@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Star, Info } from "lucide-react";
+import { Star, Info, BookOpen } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useNavigate } from "react-router-dom";
 import { WorkoutToolsCards } from "@/components/WorkoutToolsCards";
@@ -16,6 +16,7 @@ import { HTMLContent } from "@/components/ui/html-content";
 import { ExerciseHTMLContent } from "@/components/ExerciseHTMLContent";
 import { A4Container } from "@/components/ui/a4-container";
 import { ExerciseLibraryBanner } from "@/components/ExerciseLibraryBanner";
+import { ReaderModeDialog } from "@/components/ReaderModeDialog";
 
 interface Exercise {
   name: string;
@@ -143,6 +144,24 @@ export const WorkoutDisplay = ({
   const { userTier } = useAccessControl();
   const isPremium = userTier === "premium";
   const [currentVideoId, setCurrentVideoId] = useState<string>(exercises[0]?.video_id || "");
+  const [reader, setReader] = useState<{ open: boolean; title: string; content: string; meta?: { duration?: string; equipment?: string; category?: string } }>({
+    open: false,
+    title: "",
+    content: "",
+  });
+
+  const openReader = (sectionTitle: string, html: string) => {
+    setReader({
+      open: true,
+      title: title ? `${title} — ${sectionTitle}` : sectionTitle,
+      content: html,
+      meta: {
+        duration: duration || undefined,
+        equipment: equipment || undefined,
+        category: focus || undefined,
+      },
+    });
+  };
 
   const getDifficultyText = (diff: number) => {
     if (diff <= 2) return 'Beginner';
@@ -278,9 +297,20 @@ export const WorkoutDisplay = ({
         {(activation || warm_up || main_workout || finisher || cool_down) && (
           <Card className="border-2 border-primary/30">
             <CardHeader className="bg-primary/5">
-              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
-                💪 Workout
-              </CardTitle>
+              <div className="flex items-center justify-between gap-2">
+                <CardTitle className="flex items-center gap-2 text-2xl font-bold">
+                  💪 Workout
+                </CardTitle>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 shrink-0"
+                  onClick={() => openReader("Workout", joinWorkoutSections([activation, warm_up, main_workout, finisher, cool_down]))}
+                >
+                  <BookOpen className="h-4 w-4" />
+                  <span className="hidden sm:inline">Reader Mode</span>
+                </Button>
+              </div>
             </CardHeader>
             <CardContent className="content-container pt-6">
               <A4Container>
@@ -300,9 +330,20 @@ export const WorkoutDisplay = ({
         {weekly_schedule && (
           <Card className="border-2 border-primary/30">
             <CardHeader className="bg-primary/5">
-              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
-                📆 Training Program
-              </CardTitle>
+              <div className="flex items-center justify-between gap-2">
+                <CardTitle className="flex items-center gap-2 text-2xl font-bold">
+                  📆 Training Program
+                </CardTitle>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 shrink-0"
+                  onClick={() => openReader("Training Program", weekly_schedule)}
+                >
+                  <BookOpen className="h-4 w-4" />
+                  <span className="hidden sm:inline">Reader Mode</span>
+                </Button>
+              </div>
             </CardHeader>
             <CardContent className="content-container pt-6">
               <A4Container>
@@ -318,9 +359,20 @@ export const WorkoutDisplay = ({
         {programContent && (
           <Card className="border-2 border-primary/30">
             <CardHeader className="bg-primary/5">
-              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
-                📆 Training Program
-              </CardTitle>
+              <div className="flex items-center justify-between gap-2">
+                <CardTitle className="flex items-center gap-2 text-2xl font-bold">
+                  📆 Training Program
+                </CardTitle>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 shrink-0"
+                  onClick={() => openReader("Training Program", programContent)}
+                >
+                  <BookOpen className="h-4 w-4" />
+                  <span className="hidden sm:inline">Reader Mode</span>
+                </Button>
+              </div>
             </CardHeader>
             <CardContent className="content-container pt-6">
               <A4Container>
