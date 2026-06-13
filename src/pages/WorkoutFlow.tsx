@@ -59,6 +59,27 @@ const WorkoutFlow = () => {
 
   const totalWorkoutCount = Object.values(workoutCounts).reduce((sum, c) => sum + c, 0);
 
+  // Latest 3 workouts for mobile "Featured" section
+  const { data: latestWorkouts = [] } = useQuery({
+    queryKey: ["featured-latest-workouts"],
+    queryFn: async () => {
+      const data = await fetchVisibleWorkoutMetadata(null);
+      return (data || [])
+        .filter((w) => w.is_workout_of_day !== true || w.wod_source === "library")
+        .filter((w) => !!w.created_at)
+        .sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""))
+        .slice(0, 3);
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const workoutCategoryToSlug = (cat?: string | null) =>
+    (cat || "")
+      .toLowerCase()
+      .replace("calorie burning", "calorie-burning")
+      .replace("mobility & stability", "mobility")
+      .replace(/\s+/g, "-");
+
   // Rotate WOD images every 2.5 seconds
   useEffect(() => {
     if (wodImages.length <= 1) return;
