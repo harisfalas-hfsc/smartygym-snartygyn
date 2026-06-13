@@ -338,6 +338,19 @@ const Blog = () => {
                   ← All categories
                 </button>
               </div>
+              <CompactFilters filters={[{
+                name: "Sort by",
+                value: sortFilter,
+                onChange: setSortFilter,
+                options: [{
+                  value: "newest",
+                  label: "Newest"
+                }, {
+                  value: "oldest",
+                  label: "Oldest"
+                }],
+                placeholder: "Sort"
+              }]} compact />
               <div className="flex flex-col gap-3">
                 {filteredArticles.map((article) => (
                   <button
