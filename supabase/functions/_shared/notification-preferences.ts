@@ -83,18 +83,21 @@ export function canSend(
   if (!prefs) return true; // No prefs row = receive everything (safe default for new users)
   if (prefs.opt_out_all === true) return false;
 
+  const legacyKeys = LEGACY_FALLBACK[key]?.[channel] ?? [];
+  const legacyAllowed = legacyKeys.length === 0 || legacyKeys.every((k) => prefs[k] !== false);
+  const pushAllowed = channel !== "push" || (prefs.push !== false && prefs.mobile_push_master !== false);
+
   const node = prefs[key];
   if (node && typeof node === "object") {
     const v = node[channel];
-    return v !== false; // default ON when key exists but channel missing
+    return v !== false && legacyAllowed && pushAllowed; // default ON when key exists but channel missing
   }
 
   // Legacy fallback (returns true unless explicitly false on every legacy key)
-  if (channel === "push" && (prefs.push === false || prefs.mobile_push_master === false)) return false;
-  const legacyKeys = LEGACY_FALLBACK[key]?.[channel] ?? [];
+  if (!pushAllowed) return false;
   if (legacyKeys.length === 0) return true;
   // ALL legacy keys must be NOT false to consider channel enabled
-  return legacyKeys.every((k) => prefs[k] !== false);
+  return legacyAllowed;
 }
 
 export function anyChannelEnabled(
