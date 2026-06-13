@@ -331,6 +331,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://smartygym.com/workout/strength/hinge-and-press-foundations.html</loc>
+    <lastmod>2026-06-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://smartygym.com/workout/calorie-burning/sweat-surge.html</loc>
     <lastmod>2026-06-12</lastmod>
     <changefreq>weekly</changefreq>
@@ -458,7 +464,7 @@
   </url>
   <url>
     <loc>https://smartygym.com/workout/metabolic/kinetic-surge.html</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -866,12 +872,6 @@
   </url>
   <url>
     <loc>https://smartygym.com/workout/cardio/cadence-pulse-rhythm.html</loc>
-    <lastmod>2026-06-12</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://smartygym.com/workout/strength/hinge-and-press-foundations.html</loc>
     <lastmod>2026-06-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -1885,6 +1885,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://smartygym.com/workout/metabolic/engine-tempo-circuit.html</loc>
+    <lastmod>2026-06-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://smartygym.com/workout/strength/loaded-strength-session.html</loc>
     <lastmod>2026-06-12</lastmod>
     <changefreq>weekly</changefreq>
@@ -1892,12 +1898,6 @@
   </url>
   <url>
     <loc>https://smartygym.com/workout/pilates/apex-helix-flow.html</loc>
-    <lastmod>2026-06-12</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://smartygym.com/workout/metabolic/engine-tempo-circuit.html</loc>
     <lastmod>2026-06-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -2882,7 +2882,7 @@
   </url>
   <url>
     <loc>https://smartygym.com/workout/strength/foundation-push-hinge.html</loc>
-    <lastmod>2026-06-12</lastmod>
+    <lastmod>2026-06-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
