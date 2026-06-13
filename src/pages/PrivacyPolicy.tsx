@@ -279,7 +279,6 @@ const PrivacyPolicy = () => {
                   <h3 className="text-lg font-semibold mt-4 mb-2">Third-Party Cookies</h3>
                   <ul className="space-y-2 text-muted-foreground">
                     <li><strong>Stripe:</strong> Payment processing and fraud prevention.</li>
-                    <li><strong>YouTube:</strong> Embedded video player (when viewing exercise demonstrations).</li>
                   </ul>
 
                   <p className="text-muted-foreground mt-3">
@@ -313,57 +312,18 @@ const PrivacyPolicy = () => {
               </div>
 
               <div className="flex items-start gap-3">
-                <Smartphone className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
-                <div>
-                  <h2 className="text-2xl font-bold mb-3">10. Third-Party Integrations</h2>
-                  <p className="text-muted-foreground mb-3">
-                    SmartyGym offers optional integrations with third-party services:
-                  </p>
-
-                  <h3 className="text-lg font-semibold mt-4 mb-2">Google Calendar</h3>
-                  <ul className="space-y-2 text-muted-foreground">
-                    <li><strong>What we access:</strong> Read/write permissions for calendar events.</li>
-                    <li><strong>What we do:</strong> Create workout schedule events, reminders for check-ins and rituals.</li>
-                    <li><strong>How to disconnect:</strong> Dashboard → Settings → Connected Services → Disconnect Google Calendar.</li>
-                  </ul>
-
-                  <h3 className="text-lg font-semibold mt-4 mb-2">Strava</h3>
-                  <ul className="space-y-2 text-muted-foreground">
-                    <li><strong>What we access:</strong> Your fitness activities and workout data.</li>
-                    <li><strong>What we do:</strong> Sync completed workouts for progress tracking.</li>
-                    <li><strong>How to disconnect:</strong> Dashboard → Settings → Connected Services → Disconnect Strava, or revoke access in Strava settings.</li>
-                  </ul>
-
-                  <h3 className="text-lg font-semibold mt-4 mb-2">YouTube (Embedded Content)</h3>
-                  <ul className="space-y-2 text-muted-foreground">
-                    <li>Exercise demonstration videos are embedded from YouTube.</li>
-                    <li>YouTube may set cookies when you watch videos. See <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Google's Privacy Policy</a>.</li>
-                  </ul>
-
-                  <p className="text-muted-foreground mt-3">
-                    You can disconnect any integration at any time. Disconnecting removes our access to that service's data but does not delete data already processed.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
                 <Brain className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
                 <div>
-                  <h2 className="text-2xl font-bold mb-3">11. AI-Powered Features</h2>
+                  <h2 className="text-2xl font-bold mb-3">10. Human-Designed Content & In-App Suggestions</h2>
                   <p className="text-muted-foreground mb-3">
-                    SmartyGym uses artificial intelligence to enhance your fitness experience:
+                    SmartyGym is built on a strict <strong>100% Human, 0% AI</strong> content policy:
                   </p>
                   <ul className="space-y-2 text-muted-foreground">
-                    <li><strong>Personalized Recommendations:</strong> AI analyzes your preferences, goals, and progress to suggest workouts and meals.</li>
-                    <li><strong>Workout Generation:</strong> AI can create custom workout plans based on your inputs.</li>
-                    <li><strong>Smart Suggestions:</strong> The Smartly Suggest feature uses AI to recommend content based on your activity.</li>
+                    <li><strong>Human Authorship:</strong> All workouts, training programs, exercises, and articles are personally designed by Sports Scientist <strong>Haris Falas</strong>.</li>
+                    <li><strong>No AI Generation:</strong> We do not use AI to generate workouts, meal plans, or fitness recommendations for users.</li>
+                    <li><strong>Smart Suggestions:</strong> Built-in suggestion logic surfaces existing human-designed library content based on your activity history. No personal data is sent to external AI providers to generate user-facing content.</li>
+                    <li><strong>No Automated Decisions:</strong> No automated decisions producing legal or similarly significant effects are made about you.</li>
                   </ul>
-                  <p className="text-muted-foreground mt-3">
-                    <strong>Data handling:</strong> AI queries are processed in real-time and not stored for training purposes. We do not use your personal data to train AI models.
-                  </p>
-                  <p className="text-muted-foreground mt-2">
-                    <strong>Automated decisions:</strong> AI recommendations are suggestions only. You maintain full control over which programs and workouts you follow. No automated decisions with legal effects are made.
-                  </p>
                 </div>
               </div>
 
