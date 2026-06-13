@@ -9,6 +9,7 @@ import { Play, Pause, RotateCcw, Maximize2, Lock, Unlock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { useKeepScreenAwake } from "@/hooks/useKeepScreenAwake";
+import workoutTimerImage from "@/assets/tools/timer-card-mobile.jpg";
 
 const WorkoutTimer = () => {
   const [workTime, setWorkTime] = useState(20);
@@ -199,6 +200,16 @@ const WorkoutTimer = () => {
           <div className="text-center mb-6">
             <p className="text-sm text-muted-foreground mb-2">Smarty Tools — Free to Use</p>
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight uppercase leading-[1.05] mb-2">Workout Timer</h1>
+          </div>
+
+          <div className="mb-4 overflow-hidden rounded-2xl border-2 border-primary/40 bg-muted aspect-[16/9]">
+            <img
+              src={workoutTimerImage}
+              alt="Coach holding a traditional stopwatch for interval training"
+              loading="lazy"
+              decoding="async"
+              className="h-full w-full object-cover object-center"
+            />
           </div>
 
           <Card className="mb-4 border-2 border-primary/40">

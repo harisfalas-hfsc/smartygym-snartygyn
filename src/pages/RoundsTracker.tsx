@@ -9,6 +9,7 @@ import { RotateCcw, Plus, Minus, Volume2, VolumeX, Vibrate, Lock, Unlock, Maximi
 import { cn } from "@/lib/utils";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { useKeepScreenAwake } from "@/hooks/useKeepScreenAwake";
+import roundsTrackerImage from "@/assets/tools/rounds-tracker-bg.jpg";
 
 type Mode = "rounds" | "rounds-reps";
 type Direction = "down" | "up";
@@ -272,6 +273,16 @@ const RoundsTracker = () => {
           <div className="text-center mb-6">
             <p className="text-sm text-muted-foreground mb-2">Smarty Tools — Free to Use</p>
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight uppercase leading-[1.05] mb-2">Rounds Tracker</h1>
+          </div>
+
+          <div className="mb-4 overflow-hidden rounded-2xl border-2 border-primary/40 bg-muted aspect-[16/9]">
+            <img
+              src={roundsTrackerImage}
+              alt="Coach holding a tally counter for tracking workout rounds"
+              loading="lazy"
+              decoding="async"
+              className="h-full w-full object-cover object-center"
+            />
           </div>
 
           <Card className="mb-4 border-2 border-primary/40">
