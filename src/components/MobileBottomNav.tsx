@@ -108,7 +108,7 @@ export const MobileBottomNav = () => {
       style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
       aria-label="Mobile navigation bar"
     >
-      <div className="flex h-16 items-stretch gap-1 overflow-x-auto px-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+      <div className="flex h-12 items-center justify-between gap-0.5 px-1">
         {discoveryItems.map(({ label, path, icon: Icon, iconClass }) => {
           const active = location.pathname === path;
           return (
@@ -117,15 +117,15 @@ export const MobileBottomNav = () => {
               type="button"
               onClick={() => handleNav(path)}
               aria-label={label}
+              title={label}
               className={cn(
-                "flex shrink-0 basis-[68px] flex-col items-center justify-center gap-0.5 rounded-lg px-1 py-1 transition-all duration-150 active:scale-95",
+                "flex flex-1 items-center justify-center rounded-lg py-1 transition-all duration-150 active:scale-95",
                 active ? "text-primary" : "text-foreground/75 hover:text-primary"
               )}
             >
-              <span className={cn("flex h-7 w-7 items-center justify-center rounded-full bg-primary/10", iconClass)}>
-                <Icon className="h-4 w-4" />
+              <span className={cn("flex h-8 w-8 items-center justify-center rounded-full bg-primary/10", iconClass)}>
+                <Icon className="h-[18px] w-[18px]" />
               </span>
-              <span className="block w-full truncate text-[10px] font-medium leading-tight">{label}</span>
             </button>
           );
         })}
