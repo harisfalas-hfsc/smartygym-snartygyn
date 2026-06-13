@@ -331,7 +331,7 @@ const TermsOfService = () => {
                 <div>
                   <h2 className="text-2xl font-bold mb-3">12. Intellectual Property</h2>
                   <ul className="space-y-2 text-muted-foreground">
-                    <li>All content on the Website (programs, videos, graphics, text, logos, and AI-generated content) is the property of Smarty Gym or its licensors.</li>
+                    <li>All content on the Website (programs, workouts, videos, graphics, text, and logos) is the property of Smarty Gym and its founder Haris Falas, or its licensors.</li>
                     <li>Content may not be copied, distributed, or reproduced without prior written permission.</li>
                     <li>Users are granted a limited, personal, non-transferable license to access the content for personal use only.</li>
                     <li>You may not use automated tools to scrape, copy, or download content from our platform.</li>
@@ -350,7 +350,6 @@ const TermsOfService = () => {
                     <li>Use the Website for unlawful or harmful activities.</li>
                     <li>Attempt to access other users' accounts or data.</li>
                     <li>Upload malicious content, viruses, or spam.</li>
-                    <li>Abuse AI features by submitting harmful, illegal, or inappropriate queries.</li>
                     <li>Circumvent security measures or access restrictions.</li>
                   </ul>
                 </div>
@@ -364,17 +363,14 @@ const TermsOfService = () => {
                     To the maximum extent permitted by applicable international law and EU regulations:
                   </p>
                   <ul className="space-y-2 text-muted-foreground">
-                    <li>Smarty Gym provides fitness programs and AI-generated content "as is" without warranties of any kind, express or implied.</li>
+                    <li>Smarty Gym provides fitness programs and content "as is" without warranties of any kind, express or implied.</li>
                     <li>
                       We shall not be liable for any direct, indirect, incidental, consequential, special, or punitive 
                       damages arising from your use of our services, including but not limited to personal injury, 
                       property damage, lost profits, or data loss.
                     </li>
                     <li>
-                      We are not liable for errors or inaccuracies in AI-generated content.
-                    </li>
-                    <li>
-                      We are not liable for actions of third-party service providers (Google, Strava, Stripe, etc.).
+                      We are not liable for actions of third-party service providers (Stripe, Resend, hosting infrastructure, etc.).
                     </li>
                     <li>
                       This limitation applies even if we have been advised of the possibility of such damages.
