@@ -347,7 +347,7 @@ export const Navigation = () => {
                           type="button"
                           onClick={() => handleNavigate(path)}
                           data-track-cta={track}
-                          className={`flex flex-col items-center justify-center rounded-2xl border-2 p-3 text-center font-semibold transition-all duration-200 ${active ? 'border-primary bg-primary/15 text-primary shadow-sm' : 'border-primary/25 bg-card text-foreground hover:border-primary hover:bg-primary/10'}`}
+                          className={`flex flex-col items-center justify-center rounded-2xl border-2 p-3 text-center font-semibold transition-all duration-200 ${active ? 'border-primary bg-primary/15 text-primary shadow-sm' : 'border-primary/25 bg-card text-foreground hover:border-primary hover:bg-primary/10'} ${label === 'Contact' ? 'col-span-3' : ''}`}
                         >
                           <span className={`mx-auto mb-1 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 ${iconClass}`}>
                             <Icon className="h-8 w-8" />
