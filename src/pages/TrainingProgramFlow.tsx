@@ -73,6 +73,31 @@ const TrainingProgramFlow = () => {
 
   const totalProgramCount = Object.values(programCounts).reduce((sum, c) => sum + c, 0);
 
+  // Latest 3 programs for mobile "Featured" section
+  const { data: latestPrograms = [] } = useQuery({
+    queryKey: ["featured-latest-programs"],
+    queryFn: async () => {
+      const { data } = await (supabase as any)
+        .rpc("get_visible_program_metadata", { _program_id: null });
+      return ((data || []) as any[])
+        .filter((p) => p.is_visible !== false && !!p.created_at)
+        .sort((a, b) => String(b.created_at || "").localeCompare(String(a.created_at || "")))
+        .slice(0, 3);
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const programCategoryToSlug = (cat?: string | null) =>
+    (cat || "")
+      .toLowerCase()
+      .replace("cardio endurance", "cardio-endurance")
+      .replace("functional strength", "functional-strength")
+      .replace("muscle hypertrophy", "muscle-hypertrophy")
+      .replace("weight loss", "weight-loss")
+      .replace("low back pain", "low-back-pain")
+      .replace("mobility & stability", "mobility-stability")
+      .replace(/\s+/g, "-");
+
   // Category background images for programs
   const programBackgrounds: Record<string, string> = {
     "cardio-endurance": "/images/programs/cardio-endurance-bg.jpg",
