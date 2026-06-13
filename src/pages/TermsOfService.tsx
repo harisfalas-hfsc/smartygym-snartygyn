@@ -128,17 +128,15 @@ const TermsOfService = () => {
                     <li>Exercise library with video demonstrations.</li>
                   </ul>
 
-                  <h3 className="text-lg font-semibold mt-4 mb-2">AI-Powered Features</h3>
+                  <h3 className="text-lg font-semibold mt-4 mb-2">In-App Suggestions</h3>
                   <ul className="space-y-2 text-muted-foreground">
-                    <li>AI-generated personalized workout suggestions based on your preferences and goals.</li>
-                    <li>AI-powered meal planning and nutrition recommendations.</li>
-                    <li>Smart suggestions for workouts and programs based on your activity history.</li>
+                    <li>Smart suggestions that recommend existing workouts and programs from our human-designed library based on your activity history.</li>
+                    <li>Built-in tools such as the workout timer, macro calculator, BMR calculator, and 1RM calculator.</li>
                   </ul>
 
-                  <h3 className="text-lg font-semibold mt-4 mb-2">Connected Services & Integrations</h3>
+                  <h3 className="text-lg font-semibold mt-4 mb-2">Notifications</h3>
                   <ul className="space-y-2 text-muted-foreground">
-                    <li>Google Calendar integration for workout scheduling and reminders.</li>
-                    <li>Strava integration for fitness activity tracking (optional).</li>
+                    <li>Internal in-app reminders for scheduled workouts, check-ins, and Smarty Rituals.</li>
                     <li>Push notifications for workout reminders, check-ins, and updates.</li>
                   </ul>
 
@@ -150,7 +148,7 @@ const TermsOfService = () => {
                   </ul>
 
                   <p className="text-muted-foreground mt-3">
-                    <strong>Important:</strong> While we offer AI-generated content, our core programs are <strong>professionally designed by certified trainers</strong>. 
+                    <strong>Important:</strong> All workouts, training programs, and content on SmartyGym are <strong>100% human-designed by Sports Scientist Haris Falas</strong> — 0% AI-generated. 
                     All services are intended for <strong>personal fitness and wellness purposes only</strong> and are not a substitute for medical advice.
                   </p>
                 </div>
@@ -167,7 +165,6 @@ const TermsOfService = () => {
                     <li>You are responsible for maintaining the confidentiality of your login details.</li>
                     <li>You agree not to share your account with others.</li>
                     <li>Any unauthorized use of your account must be reported immediately.</li>
-                    <li>You may connect third-party accounts (Google, Strava) at your discretion. You can disconnect these at any time.</li>
                     <li>You are responsible for any activity that occurs under your account.</li>
                   </ul>
                 </div>
@@ -236,25 +233,25 @@ const TermsOfService = () => {
               <div className="flex items-start gap-3">
                 <Brain className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
                 <div>
-                  <h2 className="text-2xl font-bold mb-3">8. AI-Generated Content</h2>
+                  <h2 className="text-2xl font-bold mb-3">8. Human-Designed Content</h2>
                   <p className="text-muted-foreground mb-3">
-                    SmartyGym uses artificial intelligence to enhance your fitness experience:
+                    SmartyGym is built on a strict <strong>100% Human, 0% AI</strong> content policy:
                   </p>
                   <ul className="space-y-2 text-muted-foreground">
                     <li>
-                      <strong>Nature of AI Content:</strong> AI-generated workout suggestions, meal plans, and recommendations are created by machine learning models and are not reviewed by humans before being shown to you.
+                      <strong>Authorship:</strong> Every workout, training program, exercise description, and editorial article is personally designed and written by <strong>Sports Scientist Haris Falas</strong> based on 20+ years of coaching experience.
                     </li>
                     <li>
-                      <strong>No Medical Advice:</strong> AI recommendations are for informational purposes only and do not constitute medical, nutritional, or professional fitness advice.
+                      <strong>No AI Generation:</strong> We do not use AI to generate workouts, meal plans, nutrition programs, or fitness recommendations for users. Any internal automation only reorganises or surfaces existing human-designed library content.
                     </li>
                     <li>
-                      <strong>User Responsibility:</strong> You are responsible for evaluating whether AI-generated content is appropriate for your fitness level, health conditions, and goals.
+                      <strong>No Medical Advice:</strong> All content is for general fitness and informational purposes only and does not constitute medical, nutritional, or therapeutic advice.
                     </li>
                     <li>
-                      <strong>Professional Guidance:</strong> AI recommendations should complement, not replace, guidance from certified fitness professionals and healthcare providers.
+                      <strong>User Responsibility:</strong> You are responsible for evaluating whether the selected workouts and programs are appropriate for your fitness level, health conditions, and goals.
                     </li>
                     <li>
-                      <strong>Accuracy Disclaimer:</strong> While we strive for accuracy, AI-generated content may contain errors or inappropriate suggestions. Always use your judgment.
+                      <strong>Professional Guidance:</strong> SmartyGym content should complement, not replace, guidance from your physician or other qualified healthcare professionals.
                     </li>
                   </ul>
                 </div>
@@ -265,35 +262,20 @@ const TermsOfService = () => {
                 <div>
                   <h2 className="text-2xl font-bold mb-3">9. Third-Party Integrations</h2>
                   <p className="text-muted-foreground mb-3">
-                    SmartyGym integrates with third-party services to enhance your experience:
+                    SmartyGym relies on a small number of third-party services to operate the platform:
                   </p>
-                  
-                  <h3 className="text-lg font-semibold mt-4 mb-2">Google Calendar</h3>
-                  <ul className="space-y-2 text-muted-foreground">
-                    <li>You may connect your Google Calendar to sync workout schedules.</li>
-                    <li>By connecting, you grant SmartyGym permission to create and manage calendar events related to your workouts.</li>
-                    <li>You can disconnect at any time from Dashboard → Settings → Connected Services.</li>
-                    <li>Google's Terms of Service and Privacy Policy apply to your use of Google Calendar.</li>
-                  </ul>
-
-                  <h3 className="text-lg font-semibold mt-4 mb-2">Strava</h3>
-                  <ul className="space-y-2 text-muted-foreground">
-                    <li>You may connect your Strava account to track fitness activities.</li>
-                    <li>By connecting, you authorize SmartyGym to access your activity data.</li>
-                    <li>Strava's Terms of Service and Privacy Policy apply to your use of Strava.</li>
-                  </ul>
-
-                  <h3 className="text-lg font-semibold mt-4 mb-2">YouTube</h3>
-                  <ul className="space-y-2 text-muted-foreground">
-                    <li>Exercise demonstrations may include embedded YouTube videos.</li>
-                    <li>By viewing these videos, you agree to YouTube's Terms of Service.</li>
-                  </ul>
 
                   <h3 className="text-lg font-semibold mt-4 mb-2">Payment Processing (Stripe)</h3>
                   <ul className="space-y-2 text-muted-foreground">
                     <li>All payments are processed by Stripe.</li>
                     <li>We do not store your complete credit card information on our servers.</li>
                     <li>Stripe's Terms of Service and Privacy Policy apply.</li>
+                  </ul>
+
+                  <h3 className="text-lg font-semibold mt-4 mb-2">Email Delivery (Resend)</h3>
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li>Transactional and account-related emails are sent through Resend.</li>
+                    <li>Resend's Terms of Service and Privacy Policy apply.</li>
                   </ul>
 
                   <p className="text-muted-foreground mt-3">
@@ -349,7 +331,7 @@ const TermsOfService = () => {
                 <div>
                   <h2 className="text-2xl font-bold mb-3">12. Intellectual Property</h2>
                   <ul className="space-y-2 text-muted-foreground">
-                    <li>All content on the Website (programs, videos, graphics, text, logos, and AI-generated content) is the property of Smarty Gym or its licensors.</li>
+                    <li>All content on the Website (programs, workouts, videos, graphics, text, and logos) is the property of Smarty Gym and its founder Haris Falas, or its licensors.</li>
                     <li>Content may not be copied, distributed, or reproduced without prior written permission.</li>
                     <li>Users are granted a limited, personal, non-transferable license to access the content for personal use only.</li>
                     <li>You may not use automated tools to scrape, copy, or download content from our platform.</li>
@@ -368,7 +350,6 @@ const TermsOfService = () => {
                     <li>Use the Website for unlawful or harmful activities.</li>
                     <li>Attempt to access other users' accounts or data.</li>
                     <li>Upload malicious content, viruses, or spam.</li>
-                    <li>Abuse AI features by submitting harmful, illegal, or inappropriate queries.</li>
                     <li>Circumvent security measures or access restrictions.</li>
                   </ul>
                 </div>
@@ -382,17 +363,14 @@ const TermsOfService = () => {
                     To the maximum extent permitted by applicable international law and EU regulations:
                   </p>
                   <ul className="space-y-2 text-muted-foreground">
-                    <li>Smarty Gym provides fitness programs and AI-generated content "as is" without warranties of any kind, express or implied.</li>
+                    <li>Smarty Gym provides fitness programs and content "as is" without warranties of any kind, express or implied.</li>
                     <li>
                       We shall not be liable for any direct, indirect, incidental, consequential, special, or punitive 
                       damages arising from your use of our services, including but not limited to personal injury, 
                       property damage, lost profits, or data loss.
                     </li>
                     <li>
-                      We are not liable for errors or inaccuracies in AI-generated content.
-                    </li>
-                    <li>
-                      We are not liable for actions of third-party service providers (Google, Strava, Stripe, etc.).
+                      We are not liable for actions of third-party service providers (Stripe, Resend, hosting infrastructure, etc.).
                     </li>
                     <li>
                       This limitation applies even if we have been advised of the possibility of such damages.
