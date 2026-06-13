@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@3.5.0";
 import { getEmailHeaders, getEmailFooter, wrapInEmailTemplateWithFooter } from "../_shared/email-utils.ts";
 import { logEmailDelivery } from "../_shared/email-log.ts";
+import { canSend, type AutomationKey } from "../_shared/notification-preferences.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -23,6 +24,11 @@ interface SendMessageRequest {
     content?: string;
   };
 }
+
+const OPTIONAL_AUTOMATION_BY_MESSAGE_TYPE: Record<string, AutomationKey> = {
+  goal_achievement: "goal_achievement",
+  welcome_onboarding: "welcome_onboarding",
+};
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -99,9 +105,8 @@ serve(async (req) => {
 
     const dashPrefs = profileForDashboard?.notification_preferences as Record<string, any> || {};
 
-    // Map messageType to dashboard preference key
-    const dashboardPrefKey = `dashboard_${messageType}`;
-    const shouldSendDashboard = dashPrefs[dashboardPrefKey] !== false;
+    const automationKey = OPTIONAL_AUTOMATION_BY_MESSAGE_TYPE[messageType];
+    const shouldSendDashboard = automationKey ? canSend(dashPrefs, automationKey, "dashboard") : true;
 
     let insertError = null;
     if (shouldSendDashboard) {
@@ -117,7 +122,7 @@ serve(async (req) => {
         });
       insertError = result.error;
     } else {
-      console.log(`[SEND-SYSTEM-MESSAGE] User has disabled dashboard_${messageType}, skipping dashboard message`);
+      console.log(`[SEND-SYSTEM-MESSAGE] User has disabled dashboard ${messageType}, skipping dashboard message`);
     }
 
     if (insertError) {
@@ -168,17 +173,10 @@ serve(async (req) => {
         
         const prefs = profile?.notification_preferences as Record<string, any> || {};
         
-        // Check if user has opted out
-        if (prefs.opt_out_all === true) {
-          console.log('[SEND-SYSTEM-MESSAGE] User has opted out of all notifications, skipping email');
-        } else if (prefs.email === false) {
-          console.log('[SEND-SYSTEM-MESSAGE] User has disabled email notifications, skipping email');
+        const shouldSendEmail = automationKey ? canSend(prefs, automationKey, "email") : true;
+        if (!shouldSendEmail) {
+          console.log(`[SEND-SYSTEM-MESSAGE] User has disabled email ${messageType}, skipping email`);
         } else {
-          // Check per-message-type email preference (e.g. email_goal_achievement for goal_achievement)
-          const emailPrefKey = `email_${messageType}`;
-          if (prefs[emailPrefKey] === false) {
-            console.log(`[SEND-SYSTEM-MESSAGE] User has disabled ${emailPrefKey}, skipping email`);
-          } else {
           // Send email with headers and footer
           // Use goals link for goal_achievement notifications
           const ctaLink = 'https://smartygym.lovable.app/userdashboard';
@@ -209,7 +207,6 @@ serve(async (req) => {
             status: "sent",
             resendId: emailResponse?.data?.id ?? null,
           });
-          }
         }
       }
     } catch (emailError) {
