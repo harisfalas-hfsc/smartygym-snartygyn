@@ -23,6 +23,7 @@ import { ScrollReveal } from "@/components/ScrollReveal";
 import { LazySection } from "@/components/LazySection";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useTodayWods } from "@/hooks/useTodayWods";
+import { fetchVisibleWorkoutMetadata } from "@/hooks/useTodayWods";
 import { getDifficultyColorClasses } from "@/lib/wodCycle";
 import { HeroDestinationConstellation } from "@/components/home/HeroDestinationConstellation";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
@@ -182,6 +183,54 @@ const Index = () => {
     gcTime: 1000 * 60 * 60 * 2, // Keep in cache for 2 hours
     refetchOnWindowFocus: false, // Don't refetch on tab focus
   });
+
+  // Latest 3 workouts for mobile "Featured Workouts" section
+  const { data: latestWorkouts = [] } = useQuery({
+    queryKey: ["home-featured-latest-workouts"],
+    queryFn: async () => {
+      const data = await fetchVisibleWorkoutMetadata(null);
+      return (data || [])
+        .filter((w: any) => w.is_workout_of_day !== true || w.wod_source === "library")
+        .filter((w: any) => !!w.created_at)
+        .sort((a: any, b: any) => (b.created_at || "").localeCompare(a.created_at || ""))
+        .slice(0, 3);
+    },
+    staleTime: 1000 * 60 * 5,
+    enabled: isMobile,
+  });
+
+  // Latest 3 programs for mobile "Featured Training Programs" section
+  const { data: latestPrograms = [] } = useQuery({
+    queryKey: ["home-featured-latest-programs"],
+    queryFn: async () => {
+      const { data } = await (supabase as any)
+        .rpc("get_visible_program_metadata", { _program_id: null });
+      return ((data || []) as any[])
+        .filter((p) => p.is_visible !== false && !!p.created_at)
+        .sort((a, b) => String(b.created_at || "").localeCompare(String(a.created_at || "")))
+        .slice(0, 3);
+    },
+    staleTime: 1000 * 60 * 5,
+    enabled: isMobile,
+  });
+
+  const workoutCategoryToSlug = (cat?: string | null) =>
+    (cat || "")
+      .toLowerCase()
+      .replace("calorie burning", "calorie-burning")
+      .replace("mobility & stability", "mobility")
+      .replace(/\s+/g, "-");
+
+  const programCategoryToSlug = (cat?: string | null) =>
+    (cat || "")
+      .toLowerCase()
+      .replace("cardio endurance", "cardio-endurance")
+      .replace("functional strength", "functional-strength")
+      .replace("muscle hypertrophy", "muscle-hypertrophy")
+      .replace("weight loss", "weight-loss")
+      .replace("low back pain", "low-back-pain")
+      .replace("mobility & stability", "mobility-stability")
+      .replace(/\s+/g, "-");
 
   const { bodyweightWod, equipmentWod, variousWod, hasWods } = useTodayWods(isMobile);
   const mobileWodCards = [
@@ -655,6 +704,48 @@ const Index = () => {
               ))}
             </div>
 
+            {/* Mobile: Featured Workouts (latest 3) */}
+            {latestWorkouts.length > 0 && (
+              <div className="mt-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-sm font-extrabold tracking-tight text-primary uppercase">Featured Workouts</span>
+                  <div className="h-px flex-1 bg-primary/20" />
+                </div>
+                <div className="flex flex-col gap-3">
+                  {latestWorkouts.map((w: any) => {
+                    const slug = workoutCategoryToSlug(w.category);
+                    const image = w.image_url || "/images/workouts/wod-card-mobile.jpg";
+                    return (
+                      <button
+                        key={w.id}
+                        type="button"
+                        onClick={() => navigate(`/workout/${slug}/${w.id}`)}
+                        className="flex items-stretch bg-card border-2 border-green-500/60 rounded-xl overflow-hidden hover:border-green-500 hover:shadow-xl transition-all duration-300 text-left"
+                      >
+                        <div className="relative w-28 flex-shrink-0 bg-muted">
+                          <img
+                            src={image}
+                            alt={w.name}
+                            loading="lazy"
+                            className="absolute inset-0 w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0 p-3 flex flex-col justify-center">
+                          <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">{w.category}</span>
+                          <h3 className="text-sm font-bold text-foreground leading-tight line-clamp-2 mt-0.5">{w.name}</h3>
+                          {(w.duration || w.difficulty) && (
+                            <p className="text-[11px] text-muted-foreground mt-1 line-clamp-1">
+                              {[w.duration, w.difficulty].filter(Boolean).join(" · ")}
+                            </p>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
         {/* Quick Access Menu */}
         <div className="mt-8 space-y-6">
           {/* Training Programs Carousel */}
@@ -708,6 +799,48 @@ const Index = () => {
                 <button key={index} onClick={() => programsCarouselApi?.scrollTo(index)} className={cn("w-2.5 h-2.5 rounded-full transition-all duration-300", programsSlide === index ? "bg-primary scale-125" : "bg-primary/30 hover:bg-primary/50")} aria-label={`Go to program ${index + 1}`} />
               ))}
             </div>
+
+            {/* Mobile: Featured Training Programs (latest 3) */}
+            {latestPrograms.length > 0 && (
+              <div className="mt-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-sm font-extrabold tracking-tight text-primary uppercase">Featured Training Programs</span>
+                  <div className="h-px flex-1 bg-primary/20" />
+                </div>
+                <div className="flex flex-col gap-3">
+                  {latestPrograms.map((p: any) => {
+                    const slug = programCategoryToSlug(p.category);
+                    const image = p.image_url || "/images/programs/functional-strength-card-mobile.jpg";
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={() => navigate(`/trainingprogram/${slug}/${p.id}`)}
+                        className="flex items-stretch bg-card border-2 border-green-500/60 rounded-xl overflow-hidden hover:border-green-500 hover:shadow-xl transition-all duration-300 text-left"
+                      >
+                        <div className="relative w-28 flex-shrink-0 bg-muted">
+                          <img
+                            src={image}
+                            alt={p.name}
+                            loading="lazy"
+                            className="absolute inset-0 w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0 p-3 flex flex-col justify-center">
+                          <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">{p.category}</span>
+                          <h3 className="text-sm font-bold text-foreground leading-tight line-clamp-2 mt-0.5">{p.name}</h3>
+                          {(p.weeks || p.difficulty) && (
+                            <p className="text-[11px] text-muted-foreground mt-1 line-clamp-1">
+                              {[p.weeks ? `${p.weeks} weeks` : null, p.difficulty].filter(Boolean).join(" · ")}
+                            </p>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Blog Categories Carousel */}
