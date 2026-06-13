@@ -7,7 +7,7 @@ import { ServiceCard } from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap, Check, Crown, ChevronDown, ChevronLeft, ChevronRight, Move, Ban, Brain, CheckCircle2, Award, Shield, Compass, Sparkles, Info, User, HelpCircle, ShoppingBag, Star, Clock, CalendarCheck, Home, Shuffle, ShoppingCart, Sunrise } from "lucide-react";
+import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap, Check, Crown, ChevronDown, ChevronLeft, ChevronRight, Move, Ban, Brain, CheckCircle2, Award, Shield, Compass, Sparkles, Info, User, HelpCircle, ShoppingBag, Star, Clock, CalendarCheck, Home, Shuffle, ShoppingCart, Sunrise, Rocket } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { getBlogArticleImage } from "@/utils/blogImages";
@@ -1109,28 +1109,36 @@ const Index = () => {
                             </Link>
 
                             {/* Three feature cards inside */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-5">
                               <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20 h-full min-h-[88px]" itemScope itemType="https://schema.org/Thing" data-feature="smarty-gym-expertise" role="article">
-                                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
+                                <GraduationCap className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
                                 <div className="flex-1 text-left">
                                   <p className="font-semibold text-sm mb-1" itemProp="name">Real Expertise</p>
-                                  <p className="text-xs text-muted-foreground leading-relaxed" itemProp="description">Sports science degree & years of professional coaching experience</p>
+                                  <p className="text-xs text-muted-foreground leading-relaxed" itemProp="description">Every program designed by certified coach Haris Falas — never by AI, always with 20+ years of experience.</p>
                                 </div>
                               </article>
 
                               <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20 h-full min-h-[88px]" itemScope itemType="https://schema.org/Thing" data-feature="smarty-gym-personalized" role="article">
-                                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
+                                <Heart className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
                                 <div className="flex-1 text-left">
                                   <p className="font-semibold text-sm mb-1" itemProp="name">Personal Touch</p>
-                                  <p className="text-xs text-muted-foreground leading-relaxed" itemProp="description">Workouts designed to fit YOUR unique schedule and lifestyle</p>
+                                  <p className="text-xs text-muted-foreground leading-relaxed" itemProp="description">Direct access to the coach who created your program. Real support, real guidance, real results.</p>
                                 </div>
                               </article>
 
                               <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20 h-full min-h-[88px]" itemScope itemType="https://schema.org/Thing" data-feature="smarty-gym-science" role="article">
-                                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
+                                <UserCheck className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
                                 <div className="flex-1 text-left">
                                   <p className="font-semibold text-sm mb-1" itemProp="name">Not a Robot</p>
-                                  <p className="text-xs text-muted-foreground leading-relaxed" itemProp="description">Human-designed workouts backed by science, never by AI</p>
+                                  <p className="text-xs text-muted-foreground leading-relaxed" itemProp="description">We don't generate workouts with algorithms. We design them with care, experience, and your goals in mind.</p>
+                                </div>
+                              </article>
+
+                              <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20 h-full min-h-[88px]" itemScope itemType="https://schema.org/Thing" data-feature="smarty-gym-expanding" role="article">
+                                <Rocket className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
+                                <div className="flex-1 text-left">
+                                  <p className="font-semibold text-sm mb-1" itemProp="name">Never Stop Expanding</p>
+                                  <p className="text-xs text-muted-foreground leading-relaxed" itemProp="description">New workouts, programs, tools, and articles — keeping you current with the latest science and trends.</p>
                                 </div>
                               </article>
                             </div>
