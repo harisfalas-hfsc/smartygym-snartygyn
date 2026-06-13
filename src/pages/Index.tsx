@@ -1349,6 +1349,9 @@ const Index = () => {
                 whatever they may be. Whether you're building muscle, losing weight, improving endurance, or simply staying active,
                 we provide the structure, guidance, and flexibility you need to succeed — on your terms, in your time, wherever you are.
               </p>
+              <p className="text-base md:text-lg leading-relaxed text-center">
+                This promise also means we never stop developing SmartyGym — adding new workouts, training programs, tools, and blog articles — and staying on top of the latest trends and science-based evidence so you always have the most current, effective approach to your fitness.
+              </p>
                 <p className="text-base md:text-lg font-semibold text-center text-primary tracking-wide">
                   Real coaching. Real results. Anywhere you train.
                 </p>

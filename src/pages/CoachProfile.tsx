@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Award, GraduationCap, Building2, Target, CheckCircle, Smartphone, Shield } from "lucide-react";
+import { Award, GraduationCap, Building2, Target, CheckCircle, Smartphone, Shield, Rocket } from "lucide-react";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { supabase } from "@/integrations/supabase/client";
