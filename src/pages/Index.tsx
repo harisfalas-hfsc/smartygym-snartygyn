@@ -1021,11 +1021,11 @@ const Index = () => {
           <div className="flex flex-col gap-3">
             {([
               { route: '/exerciselibrary', title: 'Exercise Library', label: 'Library', description: 'Video demonstrations for every exercise', image: heroLibraryBookImage },
-              { route: '/daily-ritual', title: 'Smarty Ritual', label: 'Daily', description: 'Your morning, midday and evening micro-routine', icon: Sunrise },
+              { route: '/daily-ritual', title: 'Smarty Ritual', label: 'Daily', description: 'Your morning, midday and evening micro-routine', icon: Sparkles, iconClass: 'text-purple-500' },
               { route: '/community', title: 'Community', label: 'Connect', description: 'Share progress, leaderboards and challenges', image: heroCommunityCelebratingImage },
-              { route: '/faq', title: 'Frequently Asked Questions', label: 'Help', description: 'Answers about plans, training and access', icon: HelpCircle },
+              { route: '/faq', title: 'Frequently Asked Questions', label: 'Help', description: 'Answers about plans, training and access', icon: HelpCircle, iconClass: 'text-purple-500' },
               { route: '/coach-profile', title: 'Meet the Coach', label: 'Coach', description: 'Haris Falas — Sports Scientist & Founder', image: harisPhoto },
-            ] as Array<{ route: string; title: string; label: string; description: string; image?: string; icon?: any }>).map((card) => (
+            ] as Array<{ route: string; title: string; label: string; description: string; image?: string; icon?: any; iconClass?: string }>).map((card) => (
               <button
                 key={card.route}
                 type="button"
@@ -1042,8 +1042,8 @@ const Index = () => {
                       className="absolute inset-0 w-full h-full object-cover"
                     />
                   ) : card.icon ? (
-                    <div className="absolute inset-0 flex items-center justify-center bg-primary/10">
-                      <card.icon className="w-10 h-10 text-primary" />
+                    <div className="absolute inset-0 flex items-center justify-center bg-purple-500/10">
+                      <card.icon className={`w-10 h-10 ${card.iconClass || 'text-primary'}`} />
                     </div>
                   ) : null}
                 </div>
