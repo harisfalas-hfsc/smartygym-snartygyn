@@ -178,9 +178,8 @@ const Blog = () => {
           label: "Blog"
         }]} />
 
-          {/* About Blog (desktop only) */}
-          {!isMobile && (
-          <Card className="mb-8 bg-white dark:bg-card border-2 border-primary/40 shadow-primary">
+          {/* About Blog */}
+          <Card className="mb-6 md:mb-8 bg-white dark:bg-card border-2 border-primary/40 shadow-primary">
             <CardContent className="p-4 sm:p-5">
               <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight uppercase mb-3 text-center">Smarty Blog</h2>
               <div className="space-y-2 text-muted-foreground max-w-3xl mx-auto">
@@ -193,7 +192,6 @@ const Blog = () => {
               </div>
             </CardContent>
           </Card>
-          )}
 
           {!isMobile && (
           <div className="mb-6 sm:mb-8">
@@ -282,6 +280,41 @@ const Blog = () => {
                     )}
                     aria-label={`Go to category ${index + 1}`}
                   />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {showMobileCategoryHub && allArticles.length > 0 && (
+            <div className="mb-6">
+              <h2 className="text-lg font-bold mb-3">Featured Articles</h2>
+              <div className="flex flex-col gap-3">
+                {allArticles.slice(0, 3).map((article) => (
+                  <button
+                    key={article.id}
+                    onClick={() => navigate(`/blog/${article.slug}.html`)}
+                    className="flex gap-3 items-stretch rounded-lg overflow-hidden border-2 border-blue-500/60 hover:border-blue-500 bg-card text-left transition-colors"
+                    aria-label={article.title}
+                  >
+                    <div className="w-24 shrink-0 aspect-square overflow-hidden">
+                      <img
+                        src={article.image}
+                        alt={`${article.title} - SmartyGym blog by Haris Falas`}
+                        width={400}
+                        height={400}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0 py-2 pr-3">
+                      <div className="text-sm font-bold line-clamp-2 mb-1">{article.title}</div>
+                      <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
+                        <div className="flex items-center gap-1"><Clock className="h-3 w-3" />{article.readTime}</div>
+                        <div className="flex items-center gap-1"><Calendar className="h-3 w-3" />{article.date}</div>
+                      </div>
+                    </div>
+                  </button>
                 ))}
               </div>
             </div>
