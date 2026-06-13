@@ -1018,44 +1018,33 @@ const Index = () => {
             <span className="text-sm font-extrabold tracking-tight text-primary uppercase">Explore</span>
             <div className="h-px flex-1 bg-primary/20" />
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div
-              onClick={() => navigate('/exerciselibrary')}
-              className="relative h-32 rounded-xl overflow-hidden border-2 border-primary/40 hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300 cursor-pointer group"
-            >
-              <img
-                src={heroLibraryBookImage}
-                alt="Exercise Library"
-                loading="lazy"
-                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-              <div className="absolute inset-0 flex flex-col items-center justify-end p-3 text-center">
-                <div className="w-8 h-8 rounded-full bg-background/90 flex items-center justify-center mb-1 shadow-md">
-                  <BookOpen className="w-4 h-4 text-primary" />
+          <div className="flex flex-col gap-3">
+            {[
+              { route: '/exerciselibrary', title: 'Exercise Library', label: 'Library', description: 'Video demonstrations for every exercise', image: heroLibraryBookImage },
+              { route: '/community', title: 'Community', label: 'Connect', description: 'Share progress, leaderboards and challenges', image: heroCommunityCelebratingImage },
+            ].map((card) => (
+              <button
+                key={card.route}
+                type="button"
+                onClick={() => navigate(card.route)}
+                className="flex items-stretch bg-card border-2 border-green-500/60 rounded-xl overflow-hidden hover:border-green-500 hover:shadow-xl transition-all duration-300 text-left"
+                aria-label={card.title}
+              >
+                <div className="relative w-28 flex-shrink-0 bg-muted">
+                  <img
+                    src={card.image}
+                    alt={card.title}
+                    loading="lazy"
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
                 </div>
-                <span className="text-sm font-bold text-white leading-tight">Exercise Library</span>
-              </div>
-            </div>
-
-            <div
-              onClick={() => navigate('/community')}
-              className="relative h-32 rounded-xl overflow-hidden border-2 border-primary/40 hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300 cursor-pointer group"
-            >
-              <img
-                src={heroCommunityCelebratingImage}
-                alt="Community"
-                loading="lazy"
-                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-              <div className="absolute inset-0 flex flex-col items-center justify-end p-3 text-center">
-                <div className="w-8 h-8 rounded-full bg-background/90 flex items-center justify-center mb-1 shadow-md">
-                  <Users className="w-4 h-4 text-primary" />
+                <div className="flex-1 min-w-0 p-3 flex flex-col justify-center">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">{card.label}</span>
+                  <h3 className="text-sm font-bold text-foreground leading-tight line-clamp-2 mt-0.5">{card.title}</h3>
+                  <p className="text-[11px] text-muted-foreground mt-1 line-clamp-1">{card.description}</p>
                 </div>
-                <span className="text-sm font-bold text-white leading-tight">Community</span>
-              </div>
-            </div>
+              </button>
+            ))}
           </div>
 
         </div>
