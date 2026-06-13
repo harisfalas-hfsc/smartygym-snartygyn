@@ -96,85 +96,40 @@ export const MobileBottomNav = () => {
 
   if (!isMobile || HIDDEN_PATHS.includes(location.pathname)) return null;
 
-  const itemClass = "flex h-full flex-1 items-center justify-center transition-all duration-150 active:scale-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-inset text-foreground/80 hover:text-primary";
-
   return (
     <>
     <nav
-        className={cn(
-          "fixed bottom-0 left-0 right-0 z-50",
-          "bg-background/95 backdrop-blur-md",
-          "border-t border-primary/20",
-          "shadow-[0_-4px_16px_-4px_hsl(var(--primary)/0.15)]"
-        )}
-        style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
-        aria-label="Mobile navigation bar"
-      >
-        <div className="flex h-14 items-stretch">
-          {/* Discovery */}
-          <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
-            <SheetTrigger asChild>
-              <button type="button" aria-label="Discovery" className={itemClass}>
-                <Menu className="h-7 w-7" strokeWidth={2.25} />
-              </button>
-            </SheetTrigger>
-            <SheetContent side="left" hideClose className="left-4 top-1/2 bottom-auto flex h-auto max-h-[calc(100vh-2rem)] w-[calc(100vw-2rem)] max-w-none -translate-y-1/2 flex-col overflow-hidden rounded-2xl border-2 border-primary/40 p-3 shadow-xl !animate-none transition-opacity duration-200 ease-out data-[state=closed]:opacity-0 data-[state=open]:opacity-100">
-              <SheetClose asChild>
-                <button className="mb-1 inline-flex h-8 shrink-0 items-center gap-2 self-start rounded-full border-2 border-primary px-3 text-sm text-primary hover:bg-primary hover:text-primary-foreground">
-                  <ArrowLeft className="h-3.5 w-3.5" /> Back
-                </button>
-              </SheetClose>
-              <div className="mb-2 shrink-0">
-                <h2 className="text-lg font-bold leading-tight text-foreground">Explore SmartyGym</h2>
-              </div>
-              <nav className="grid grid-cols-2 gap-2 overflow-y-auto">
-                {discoveryItems.map(({ label, path, icon: Icon, iconClass }) => {
-                  const active = location.pathname === path;
-                  return (
-                    <button
-                      key={path}
-                      type="button"
-                      onClick={() => handleNav(path)}
-                      className={`flex flex-col items-center justify-center rounded-2xl border-2 p-2 text-center font-semibold transition-all duration-200 ${active ? 'border-primary bg-primary/15 text-primary shadow-sm' : 'border-primary/25 bg-card text-foreground hover:border-primary hover:bg-primary/10'}`}
-                    >
-                      <span className={`mx-auto mb-1 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 ${iconClass}`}>
-                        <Icon className="h-5 w-5" />
-                      </span>
-                      <span className="block text-xs leading-tight">{label}</span>
-                    </button>
-                  );
-                })}
-              </nav>
-            </SheetContent>
-          </Sheet>
-
-          {/* Smarty Coach — center, prominent */}
-          <button
-            type="button"
-            onClick={() => setCoachOpen(true)}
-            aria-label="Smarty Coach"
-            className="flex h-full flex-1 items-center justify-center transition-all duration-150 active:scale-90 focus:outline-none"
-          >
-            <span className="inline-flex h-12 w-12 -mt-4 items-center justify-center rounded-full border-2 border-primary bg-background shadow-[0_4px_12px_-2px_hsl(var(--primary)/0.4)]">
-              <img src={smartyCoachIcon} alt="" aria-hidden="true" className="h-9 w-9 rounded-full" width={36} height={36} />
-            </span>
-          </button>
-
-          {/* Theme Toggle */}
-          <button
-            type="button"
-            onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-            aria-label={`Switch to ${resolvedTheme === "dark" ? "light" : "dark"} mode`}
-            className={itemClass}
-          >
-            {resolvedTheme === "dark" ? (
-              <Sun className="h-7 w-7" strokeWidth={2.25} />
-            ) : (
-              <Moon className="h-7 w-7" strokeWidth={2.25} />
-            )}
-          </button>
-
-        </div>
+      className={cn(
+        "fixed bottom-0 left-0 right-0 z-50",
+        "bg-background/95 backdrop-blur-md",
+        "border-t border-primary/20",
+        "shadow-[0_-4px_16px_-4px_hsl(var(--primary)/0.15)]"
+      )}
+      style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+      aria-label="Mobile navigation bar"
+    >
+      <div className="flex h-16 items-stretch gap-1 overflow-x-auto px-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        {discoveryItems.map(({ label, path, icon: Icon, iconClass }) => {
+          const active = location.pathname === path;
+          return (
+            <button
+              key={path}
+              type="button"
+              onClick={() => handleNav(path)}
+              aria-label={label}
+              className={cn(
+                "flex shrink-0 basis-[68px] flex-col items-center justify-center gap-0.5 rounded-lg px-1 py-1 transition-all duration-150 active:scale-95",
+                active ? "text-primary" : "text-foreground/75 hover:text-primary"
+              )}
+            >
+              <span className={cn("flex h-7 w-7 items-center justify-center rounded-full bg-primary/10", iconClass)}>
+                <Icon className="h-4 w-4" />
+              </span>
+              <span className="block w-full truncate text-[10px] font-medium leading-tight">{label}</span>
+            </button>
+          );
+        })}
+      </div>
     </nav>
     <SmartyCoachModal isOpen={coachOpen} onClose={() => setCoachOpen(false)} />
     </>
