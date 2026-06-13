@@ -148,16 +148,6 @@ export const MobileBottomNav = () => {
             </SheetContent>
           </Sheet>
 
-          {/* Home */}
-          <button
-            type="button"
-            onClick={() => { navigate("/"); setTimeout(() => window.scrollTo(0, 0), 0); }}
-            aria-label="Home"
-            className={itemClass}
-          >
-            <Home className="h-7 w-7" strokeWidth={2.25} />
-          </button>
-
           {/* Smarty Coach — center, prominent */}
           <button
             type="button"
