@@ -580,7 +580,14 @@ const Index = () => {
               >
                 <ChevronLeft className="h-5 w-5 text-primary" />
               </button>
-              <span className="text-lg sm:text-2xl font-extrabold tracking-tight text-primary uppercase whitespace-nowrap">Smarty Workouts</span>
+              <button
+                type="button"
+                onClick={() => navigate('/workout')}
+                className="text-lg sm:text-2xl font-extrabold tracking-tight text-primary uppercase whitespace-nowrap hover:underline"
+                aria-label="Open Smarty Workouts"
+              >
+                Smarty Workouts
+              </button>
               <button
                 type="button"
                 onClick={() => carouselApi?.scrollNext()}
@@ -656,7 +663,14 @@ const Index = () => {
               <button type="button" onClick={() => programsCarouselApi?.scrollPrev()} className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Previous program">
                 <ChevronLeft className="h-5 w-5 text-primary" />
               </button>
-              <span className="text-lg sm:text-2xl font-extrabold tracking-tight text-primary uppercase whitespace-nowrap">Smarty Programs</span>
+              <button
+                type="button"
+                onClick={() => navigate('/trainingprogram')}
+                className="text-lg sm:text-2xl font-extrabold tracking-tight text-primary uppercase whitespace-nowrap hover:underline"
+                aria-label="Open Smarty Programs"
+              >
+                Smarty Programs
+              </button>
               <button type="button" onClick={() => programsCarouselApi?.scrollNext()} className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Next program">
                 <ChevronRight className="h-5 w-5 text-primary" />
               </button>
@@ -702,7 +716,14 @@ const Index = () => {
               <button type="button" onClick={() => blogCarouselApi?.scrollPrev()} className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Previous category">
                 <ChevronLeft className="h-5 w-5 text-primary" />
               </button>
-              <span className="text-lg sm:text-2xl font-extrabold tracking-tight text-primary uppercase whitespace-nowrap">Smarty Blog</span>
+              <button
+                type="button"
+                onClick={() => navigate('/blog')}
+                className="text-lg sm:text-2xl font-extrabold tracking-tight text-primary uppercase whitespace-nowrap hover:underline"
+                aria-label="Open Smarty Blog"
+              >
+                Smarty Blog
+              </button>
               <button type="button" onClick={() => blogCarouselApi?.scrollNext()} className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Next category">
                 <ChevronRight className="h-5 w-5 text-primary" />
               </button>
@@ -748,7 +769,14 @@ const Index = () => {
               <button type="button" onClick={() => toolsCarouselApi?.scrollPrev()} className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Previous tool">
                 <ChevronLeft className="h-5 w-5 text-primary" />
               </button>
-              <span className="text-lg sm:text-2xl font-extrabold tracking-tight text-primary uppercase whitespace-nowrap">Smarty Tools</span>
+              <button
+                type="button"
+                onClick={() => navigate('/tools')}
+                className="text-lg sm:text-2xl font-extrabold tracking-tight text-primary uppercase whitespace-nowrap hover:underline"
+                aria-label="Open Smarty Tools"
+              >
+                Smarty Tools
+              </button>
               <button type="button" onClick={() => toolsCarouselApi?.scrollNext()} className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Next tool">
                 <ChevronRight className="h-5 w-5 text-primary" />
               </button>
