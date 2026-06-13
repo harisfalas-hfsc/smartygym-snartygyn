@@ -122,6 +122,18 @@ serve(async (req) => {
     exportData.progress_logs = await safeFetch("progress_logs");
     logStep("Fetched progress logs");
 
+    // PAR-Q health questionnaire responses
+    exportData.parq_responses = await safeFetch("parq_responses");
+    logStep("Fetched PAR-Q responses");
+
+    // Blog reading history
+    exportData.blog_article_views = await safeFetch("blog_article_views");
+    logStep("Fetched blog article views");
+
+    // Testimonials authored by the user
+    exportData.testimonials = await safeFetch("testimonials");
+    logStep("Fetched testimonials");
+
     // Messages
     const contactMessages = await safeFetch("contact_messages");
     const systemMessages = await safeFetch("user_system_messages");
@@ -163,10 +175,6 @@ serve(async (req) => {
     } catch (e) {
       logStep("No corporate admin data");
     }
-
-    // Calendar connections
-    exportData.calendar_connections = await safeFetch("user_calendar_connections");
-    logStep("Fetched calendar connections");
 
     // Smartly suggest interactions
     exportData.smartly_suggestions = await safeFetch("smartly_suggest_interactions");
