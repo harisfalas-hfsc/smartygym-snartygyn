@@ -249,35 +249,6 @@ serve(async (req) => {
       );
     }
 
-    const premiumUserIds = new Set<string>();
-    const { data: premiumSubs } = await supabaseAdmin
-      .from("user_subscriptions")
-      .select("user_id")
-      .eq("status", "active")
-      .in("plan_type", ["gold", "platinum", "lifetime"]);
-    premiumSubs?.forEach((sub) => premiumUserIds.add(sub.user_id));
-
-    const { data: adminRoles } = await supabaseAdmin
-      .from("user_roles")
-      .select("user_id")
-      .eq("role", "admin");
-    adminRoles?.forEach((role) => premiumUserIds.add(role.user_id));
-
-    const { data: corporateSubs } = await supabaseAdmin
-      .from("corporate_subscriptions")
-      .select("id, admin_user_id")
-      .eq("status", "active");
-    const activeCorporateIds = new Set((corporateSubs || []).map((sub) => sub.id));
-    corporateSubs?.forEach((sub) => premiumUserIds.add(sub.admin_user_id));
-
-    const { data: corporateMembers } = await supabaseAdmin
-      .from("corporate_members")
-      .select("user_id, corporate_subscription_id");
-    corporateMembers
-      ?.filter((member) => activeCorporateIds.has(member.corporate_subscription_id))
-      .forEach((member) => premiumUserIds.add(member.user_id));
-
-    logStep("Premium-eligible Monday motivation users", { count: premiumUserIds.size });
 
     let dashboardSent = 0;
     let emailsSent = 0;
