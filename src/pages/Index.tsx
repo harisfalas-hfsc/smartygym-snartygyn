@@ -643,9 +643,10 @@ const Index = () => {
               </p>
               <Link
                 to="/about"
-                className="inline-block mt-2 text-sm font-semibold text-green-500 hover:text-green-600 transition-colors"
+                className="inline-flex items-center gap-1.5 mt-2 text-sm font-semibold text-green-500 hover:text-green-600 hover:underline transition-colors"
               >
-                About Smarty Gym
+                About SmartyGym
+                <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
 
