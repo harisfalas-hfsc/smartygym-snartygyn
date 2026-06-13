@@ -18,6 +18,17 @@ const EMAIL_TYPE_TO_PREF_KEY: Record<string, string> = {
   checkin_reminders: "email_checkin_reminders",
 };
 
+const EMAIL_TYPE_TO_AUTOMATION_KEY: Record<string, string> = {
+  wod: "morning_daily_digest",
+  ritual: "morning_daily_digest",
+  monday_motivation: "monday_motivation",
+  new_workout: "new_workout",
+  new_program: "new_program",
+  new_article: "new_article",
+  weekly_activity: "weekly_activity_report",
+  checkin_reminders: "checkin_reminder",
+};
+
 // Friendly names for email types
 const EMAIL_TYPE_NAMES: Record<string, string> = {
   wod: "Workout of the Day",
@@ -107,9 +118,11 @@ serve(async (req) => {
     // Handle type-specific unsubscribe
     if (isTypeSpecific) {
       const prefKey = EMAIL_TYPE_TO_PREF_KEY[emailType];
+      const automationKey = EMAIL_TYPE_TO_AUTOMATION_KEY[emailType];
+      const nestedPref = currentPrefs[automationKey];
       
       // Check if already unsubscribed from this type
-      if (currentPrefs[prefKey] === false) {
+      if (currentPrefs[prefKey] === false || nestedPref?.email === false) {
         console.log(`[UNSUBSCRIBE] User already unsubscribed from ${emailType}: ${email}`);
         return new Response(
           JSON.stringify({ 
@@ -125,6 +138,10 @@ serve(async (req) => {
       // Update only the specific preference
       const updatedPrefs = {
         ...currentPrefs,
+        [automationKey]: {
+          ...(typeof nestedPref === "object" && nestedPref !== null ? nestedPref : {}),
+          email: false,
+        },
         [prefKey]: false,
         [`${prefKey}_unsubscribed_at`]: new Date().toISOString(),
       };
