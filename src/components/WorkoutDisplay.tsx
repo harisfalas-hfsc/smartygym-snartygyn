@@ -548,6 +548,19 @@ export const WorkoutDisplay = ({
           </Button>
         </div>
       )}
+
+      <ReaderModeDialog
+        open={reader.open}
+        onOpenChange={(o) => setReader((r) => ({ ...r, open: o }))}
+        title={reader.title}
+        metadata={reader.meta}
+        content={
+          <ExerciseHTMLContent
+            content={reader.content}
+            enableExerciseLinking={true}
+          />
+        }
+      />
     </div>
   );
 };
