@@ -916,6 +916,48 @@ const Index = () => {
                 <button key={index} onClick={() => blogCarouselApi?.scrollTo(index)} className={cn("w-2.5 h-2.5 rounded-full transition-all duration-300", blogSlide === index ? "bg-primary scale-125" : "bg-primary/30 hover:bg-primary/50")} aria-label={`Go to blog category ${index + 1}`} />
               ))}
             </div>
+
+            {/* Mobile: Featured Articles (latest 3) */}
+            {latestArticles.length > 0 && (
+              <div className="mt-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-sm font-extrabold tracking-tight text-primary uppercase">Featured Articles</span>
+                  <div className="h-px flex-1 bg-primary/20" />
+                </div>
+                <div className="flex flex-col gap-3">
+                  {latestArticles.map((a: any) => {
+                    const image = getBlogArticleImage(a.image_url, a.slug);
+                    return (
+                      <button
+                        key={a.id}
+                        type="button"
+                        onClick={() => navigate(`/blog/${a.slug}.html`)}
+                        className="flex items-stretch bg-card border-2 border-green-500/60 rounded-xl overflow-hidden hover:border-green-500 hover:shadow-xl transition-all duration-300 text-left"
+                        aria-label={a.title}
+                      >
+                        <div className="relative w-28 flex-shrink-0 bg-muted">
+                          <img
+                            src={image}
+                            alt={a.title}
+                            loading="lazy"
+                            className="absolute inset-0 w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0 p-3 flex flex-col justify-center">
+                          <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">{a.category}</span>
+                          <h3 className="text-sm font-bold text-foreground leading-tight line-clamp-2 mt-0.5">{a.title}</h3>
+                          {(a.read_time || a.published_at || a.created_at) && (
+                            <p className="text-[11px] text-muted-foreground mt-1 line-clamp-1">
+                              {[a.read_time, new Date(a.published_at || a.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })].filter(Boolean).join(" · ")}
+                            </p>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Smarty Tools Carousel */}
