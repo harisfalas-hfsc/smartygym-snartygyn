@@ -413,7 +413,7 @@ const About = () => {
                   <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 text-center">
                     
                     <div className="space-y-2">
-                      <CheckCircle2 className="w-8 h-8 text-primary mx-auto" />
+                      <GraduationCap className="w-8 h-8 text-primary mx-auto" />
                       <h3 className="font-bold">Real Expertise</h3>
                       <p className="text-sm text-muted-foreground">
                         Every program is designed by certified coach <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> — never by AI, always with 20+ years of experience.
@@ -421,7 +421,7 @@ const About = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <CheckCircle2 className="w-8 h-8 text-primary mx-auto" />
+                      <Heart className="w-8 h-8 text-primary mx-auto" />
                       <h3 className="font-bold">Personal Touch</h3>
                       <p className="text-sm text-muted-foreground">
                         Direct access to the coach who created your program. Real support, real guidance, real results.
@@ -429,7 +429,7 @@ const About = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <CheckCircle2 className="w-8 h-8 text-primary mx-auto" />
+                      <UserCheck className="w-8 h-8 text-primary mx-auto" />
                       <h3 className="font-bold">Not a Robot</h3>
                       <p className="text-sm text-muted-foreground">
                         We don't generate workouts with algorithms. We design them with care, experience, and your goals in mind.
