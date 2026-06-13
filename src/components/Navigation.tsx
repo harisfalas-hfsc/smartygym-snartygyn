@@ -299,7 +299,6 @@ export const Navigation = () => {
       <header
         ref={headerRef}
         className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-primary/20"
-        style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
       >
         <div className="flex h-11 items-center justify-between gap-2 px-3">
           <button
