@@ -94,7 +94,7 @@ const WODCategory = () => {
       equipmentBadgeClass = "bg-orange-500";
     }
     
-    return <Card className="group cursor-pointer overflow-hidden hover:shadow-xl transition-all duration-300 hover:border-primary/60 w-full h-full" onClick={() => navigate(`/workout/wod/${wod.id}`)}>
+    return <Card className="group cursor-pointer overflow-hidden border-2 border-green-500/60 hover:border-green-500 hover:shadow-xl transition-all duration-300 w-full h-full" onClick={() => navigate(`/workout/wod/${wod.id}`)}>
         {/* Image */}
         <div className="relative aspect-video overflow-hidden">
           <img src={wod.image_url || "/placeholder.svg"} alt={`${wod.name} - online workout by Haris Falas at SmartyGym SmartGym Smart Gym smartygym.com`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
