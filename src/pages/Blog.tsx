@@ -13,6 +13,10 @@ import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { generateHarisFalasSchema } from "@/utils/seoSchemas";
 import { getBlogArticleImage } from "@/utils/blogImages";
 import { BlogSEOEnhancement } from "@/components/seo/BlogSEOEnhancement";
+import { useIsMobile } from "@/hooks/use-mobile";
+import categoryFitnessImg from "@/assets/blog/category-fitness.jpg";
+import categoryNutritionImg from "@/assets/blog/category-nutrition.jpg";
+import categoryWellnessImg from "@/assets/blog/category-wellness.jpg";
 interface Article {
   id: string;
   slug: string;
@@ -26,6 +30,7 @@ interface Article {
 }
 const Blog = () => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const { category: categoryParam } = useParams<{ category?: string }>();
   const [categoryFilter, setCategoryFilter] = useState<string>(
     categoryParam ? categoryParam.toLowerCase() : "all",
@@ -74,6 +79,14 @@ const Blog = () => {
     const dateB = new Date(b.date).getTime();
     return sortFilter === "newest" ? dateB - dateA : dateA - dateB;
   });
+
+  const blogCategories = [
+    { key: "fitness", label: "Fitness", image: categoryFitnessImg, description: "Training, strength, and performance" },
+    { key: "nutrition", label: "Nutrition", image: categoryNutritionImg, description: "Fueling for results and health" },
+    { key: "wellness", label: "Wellness", image: categoryWellnessImg, description: "Recovery, mobility, and healthy aging" },
+  ];
+  const showMobileCategoryHub = isMobile && !categoryParam;
+  const showMobileCompactList = isMobile && !!categoryParam;
   return <>
       <Helmet>
         <title>Fitness Blog Articles by Haris Falas | SmartyGym</title>
