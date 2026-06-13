@@ -211,6 +211,10 @@ const CoachProfile = () => {
                       <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" />
                       <p className="text-sm sm:text-base font-semibold">100% training quality as if I was coaching you in person.</p>
                     </div>
+                    <div className="flex items-center justify-start gap-2">
+                      <Rocket className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" />
+                      <p className="text-sm sm:text-base font-semibold">Never stop expanding — new workouts, programs, tools, and articles to keep you current.</p>
+                    </div>
                   </div>
                 </Card>
               </section>
