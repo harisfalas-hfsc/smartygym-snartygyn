@@ -119,10 +119,8 @@ const PrivacyPolicy = () => {
                     <li>Process payments and subscriptions via Stripe.</li>
                     <li>Communicate with you regarding updates, offers, or support via email (Resend) or push notifications.</li>
                     <li>Improve our website, services, and customer experience through analytics.</li>
-                    <li>Generate personalized workout and nutrition recommendations using AI.</li>
-                    <li>Sync your workout schedules with connected calendars (Google Calendar).</li>
-                    <li>Track your fitness activities through connected apps (Strava).</li>
-                    <li>Send reminders for check-ins, scheduled workouts, and Smarty Rituals.</li>
+                    <li>Surface relevant human-designed workouts and programs from our library based on your activity.</li>
+                    <li>Send in-app reminders for check-ins, scheduled workouts, and Smarty Rituals.</li>
                     <li>Ensure legal compliance and security.</li>
                   </ul>
                   <p className="text-muted-foreground mt-3 font-semibold">We will never sell or rent your data to third parties.</p>
@@ -135,7 +133,7 @@ const PrivacyPolicy = () => {
                   <h2 className="text-2xl font-bold mb-3">3. Legal Basis for Processing (GDPR Article 6)</h2>
                   <p className="text-muted-foreground mb-3">We process your personal data based on:</p>
                   <ul className="space-y-2 text-muted-foreground">
-                    <li><strong>Consent (Art. 6(1)(a)):</strong> When signing up for newsletters, enabling push notifications, or connecting third-party services like Google Calendar or Strava.</li>
+                    <li><strong>Consent (Art. 6(1)(a)):</strong> When signing up for newsletters or enabling push notifications.</li>
                     <li><strong>Contractual necessity (Art. 6(1)(b)):</strong> When you subscribe to a program or use our fitness services.</li>
                     <li><strong>Legal obligations (Art. 6(1)(c)):</strong> Tax or accounting requirements, fraud prevention.</li>
                     <li><strong>Legitimate interests (Art. 6(1)(f)):</strong> Improving our services, security measures, and analytics.</li>
@@ -157,18 +155,6 @@ const PrivacyPolicy = () => {
                   <h3 className="text-lg font-semibold mt-4 mb-2">Communication Services</h3>
                   <ul className="space-y-2 text-muted-foreground">
                     <li><strong>Resend:</strong> Email delivery service for transactional and marketing emails. <a href="https://resend.com/privacy" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Resend Privacy Policy</a></li>
-                  </ul>
-
-                  <h3 className="text-lg font-semibold mt-4 mb-2">Connected Integrations</h3>
-                  <ul className="space-y-2 text-muted-foreground">
-                    <li><strong>Google (Calendar, YouTube):</strong> Calendar sync and embedded exercise demonstration videos. <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Google Privacy Policy</a></li>
-                    <li><strong>Strava:</strong> Fitness activity tracking (optional). <a href="https://www.strava.com/legal/privacy" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Strava Privacy Policy</a></li>
-                  </ul>
-
-                  <h3 className="text-lg font-semibold mt-4 mb-2">AI & Content Services</h3>
-                  <ul className="space-y-2 text-muted-foreground">
-                    <li><strong>AI Services:</strong> We use AI models to generate personalized workout and nutrition recommendations. AI queries do not include personally identifiable information beyond necessary context.</li>
-                    <li><strong>ExerciseDB/RapidAPI:</strong> Exercise database for workout content.</li>
                   </ul>
 
                   <h3 className="text-lg font-semibold mt-4 mb-2">Infrastructure</h3>
