@@ -564,7 +564,7 @@ const Index = () => {
                 Not Harder.
               </h1>
               <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-muted-foreground mt-3 leading-snug">
-                500+ Expert Workouts · Training Programs · Smarty Tools
+                500+ Expert Workouts · Training Programs · Blog Insights · Smarty Tools
                 <br />
                 <span className="text-primary">All In Your Pocket.</span>
               </p>
