@@ -1006,10 +1006,14 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (todayRitual) {
       const morningPlainText = (todayRitual.morning_content || '').replace(/<[^>]*>/g, '').trim();
-      const hasGoodMorning = /^\s*(🌅\s*)?Good morning, Smarty\b/i.test(morningPlainText);
-      addCheck('Daily Ritual', 'Morning Format', 'Starts with "Good morning, Smarty"', 
-        hasGoodMorning ? 'pass' : 'warning',
-        hasGoodMorning ? 'Correct format' : 'Missing branded greeting'
+      // Library-rotation model: rituals are authored by Haris and curated in the
+      // library. The legacy "Good morning, Smarty" greeting was retired — we now
+      // verify the morning section has real content instead.
+      addCheck('Daily Ritual', 'Morning Content', 'Morning section has authored content',
+        morningPlainText.length >= 40 ? 'pass' : 'warning',
+        morningPlainText.length >= 40
+          ? `Authored content present (${morningPlainText.length} chars)`
+          : 'Morning section is empty or too short'
       );
 
       addCheck('Daily Ritual', 'All Sections Present', 'Morning, Midday, Evening content', 
