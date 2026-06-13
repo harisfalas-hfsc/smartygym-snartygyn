@@ -72,11 +72,6 @@ export const Navigation = () => {
 
   // Dynamically set --app-header-h CSS variable based on actual header height
   useLayoutEffect(() => {
-    // On mobile the header is fully removed; content starts at the top.
-    if (isMobile) {
-      document.documentElement.style.setProperty('--app-header-h', '0px');
-      return;
-    }
     let frame = 0;
     const updateHeaderHeight = () => {
       if (headerRef.current) {
