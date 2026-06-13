@@ -520,6 +520,48 @@ const WorkoutFlow = () => {
             </div>
           </div>
 
+          {/* Mobile: Featured Workouts (latest 3) */}
+          {latestWorkouts.length > 0 && (
+            <div className="lg:hidden mt-8">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-sm font-extrabold tracking-tight text-primary uppercase">Featured Workouts</span>
+                <div className="h-px flex-1 bg-primary/20" />
+              </div>
+              <div className="flex flex-col gap-3">
+                {latestWorkouts.map((w) => {
+                  const slug = workoutCategoryToSlug(w.category);
+                  const image = w.image_url || categoryMobileImages[slug] || "/images/workouts/wod-card-mobile.jpg";
+                  return (
+                    <button
+                      key={w.id}
+                      type="button"
+                      onClick={() => navigate(`/workout/${slug}/${w.id}`)}
+                      className="flex items-stretch bg-card border-2 border-primary/40 rounded-xl overflow-hidden hover:border-primary hover:shadow-xl transition-all duration-300 text-left"
+                    >
+                      <div className="relative w-28 flex-shrink-0 bg-muted">
+                        <img
+                          src={image}
+                          alt={w.name}
+                          loading="lazy"
+                          className="absolute inset-0 w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0 p-3 flex flex-col justify-center">
+                        <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">{w.category}</span>
+                        <h3 className="text-sm font-bold text-foreground leading-tight line-clamp-2 mt-0.5">{w.name}</h3>
+                        {(w.duration || w.difficulty) && (
+                          <p className="text-[11px] text-muted-foreground mt-1 line-clamp-1">
+                            {[w.duration, w.difficulty].filter(Boolean).join(" · ")}
+                          </p>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           {/* Bottom Premium Banner */}
           {!isPremium && (
             <ScrollReveal delay={700}>
