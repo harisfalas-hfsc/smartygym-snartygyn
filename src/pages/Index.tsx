@@ -1019,10 +1019,13 @@ const Index = () => {
             <div className="h-px flex-1 bg-primary/20" />
           </div>
           <div className="flex flex-col gap-3">
-            {[
+            {([
               { route: '/exerciselibrary', title: 'Exercise Library', label: 'Library', description: 'Video demonstrations for every exercise', image: heroLibraryBookImage },
+              { route: '/daily-ritual', title: 'Smarty Ritual', label: 'Daily', description: 'Your morning, midday and evening micro-routine', icon: Sunrise },
               { route: '/community', title: 'Community', label: 'Connect', description: 'Share progress, leaderboards and challenges', image: heroCommunityCelebratingImage },
-            ].map((card) => (
+              { route: '/faq', title: 'Frequently Asked Questions', label: 'Help', description: 'Answers about plans, training and access', icon: HelpCircle },
+              { route: '/coach-profile', title: 'Meet the Coach', label: 'Coach', description: 'Haris Falas — Sports Scientist & Founder', image: harisPhoto },
+            ] as Array<{ route: string; title: string; label: string; description: string; image?: string; icon?: any }>).map((card) => (
               <button
                 key={card.route}
                 type="button"
@@ -1031,12 +1034,18 @@ const Index = () => {
                 aria-label={card.title}
               >
                 <div className="relative w-28 flex-shrink-0 bg-muted">
-                  <img
-                    src={card.image}
-                    alt={card.title}
-                    loading="lazy"
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
+                  {card.image ? (
+                    <img
+                      src={card.image}
+                      alt={card.title}
+                      loading="lazy"
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  ) : card.icon ? (
+                    <div className="absolute inset-0 flex items-center justify-center bg-primary/10">
+                      <card.icon className="w-10 h-10 text-primary" />
+                    </div>
+                  ) : null}
                 </div>
                 <div className="flex-1 min-w-0 p-3 flex flex-col justify-center">
                   <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">{card.label}</span>
