@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Sunrise, Sun, Moon, Share2, Lock, Crown, Loader2, BookOpen, Clock } from "lucide-react";
+import { ArrowLeft, Sunrise, Sun, Moon, Share2, Lock, Crown, Loader2, BookOpen, Clock, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAccessControl } from "@/hooks/useAccessControl";
 
@@ -15,8 +15,6 @@ import { RitualShareDialog } from "@/components/ritual/RitualShareDialog";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { ReaderModeDialog } from "@/components/ReaderModeDialog";
-
-import ritualIcon from "@/assets/daily-smarty-ritual-icon.jpg";
 
 interface DailyRitual {
   id: string;
@@ -221,13 +219,7 @@ const DailySmartyRitual = () => {
             <Card className="overflow-hidden">
               <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-6">
                 <div className="flex flex-col items-center text-center">
-                  <div className="mb-3">
-                    <img 
-                      src={ritualIcon} 
-                      alt="Smarty Ritual" 
-                      className="w-20 h-20 rounded-full object-cover border-4 border-primary/20 shadow-lg"
-                    />
-                  </div>
+                  <Sparkles aria-label="Smarty Ritual" className="mb-3 h-16 w-16 text-purple-500" />
                   <p className="text-sm text-muted-foreground mb-2">
                     Designed by <a href="/coach-profile" className="text-primary font-semibold hover:underline">Haris Falas</a>
                   </p>
@@ -276,14 +268,7 @@ const DailySmartyRitual = () => {
               {/* Header Section - Elegant Centered Layout */}
               <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-8 relative">
                 <div className="flex flex-col items-center text-center">
-                  {/* Smarty Ritual Icon - centered above title */}
-                  <div className="mb-3">
-                    <img 
-                      src={ritualIcon} 
-                      alt="Smarty Ritual" 
-                      className="w-24 h-24 rounded-full object-cover border-4 border-primary/20 shadow-lg"
-                    />
-                  </div>
+                  <Sparkles aria-label="Smarty Ritual" className="mb-3 h-20 w-20 text-purple-500" />
                   <p className="text-sm text-muted-foreground mb-3">
                     Designed by <a href="/coach-profile" className="text-primary font-semibold hover:underline">Haris Falas</a>
                   </p>
