@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Award, GraduationCap, Building2, Target, CheckCircle, Smartphone, Shield } from "lucide-react";
+import { Award, GraduationCap, Building2, Target, CheckCircle, Smartphone, Shield, Rocket } from "lucide-react";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { supabase } from "@/integrations/supabase/client";
@@ -210,6 +210,10 @@ const CoachProfile = () => {
                     <div className="flex items-center justify-start gap-2">
                       <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" />
                       <p className="text-sm sm:text-base font-semibold">100% training quality as if I was coaching you in person.</p>
+                    </div>
+                    <div className="flex items-center justify-start gap-2">
+                      <Rocket className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" />
+                      <p className="text-sm sm:text-base font-semibold">Never stop expanding — new workouts, programs, tools, and articles to keep you current.</p>
                     </div>
                   </div>
                 </Card>
