@@ -731,6 +731,7 @@ export default function UserDashboard() {
   const canAccessWorkoutsTab = isPremium || hasPurchasedWorkouts;
   const canAccessProgramsTab = isPremium || hasPurchasedPrograms;
   const canAccessLogbookTab = isPremium || hasStandalonePurchases;
+  const canAccessCheckinsTab = isPremium;
   return <>
     <Helmet>
       <title>My Dashboard | SmartyGym</title>
@@ -1348,6 +1349,32 @@ export default function UserDashboard() {
             {/* Messages Section */}
             {activeTab === "messages" && <div className="space-y-6">
               <UserMessagesPanel />
+            </div>}
+
+            {/* Smarty Check-ins Section - direct target for check-in reminder messages */}
+            {activeTab === "checkins" && <div className="space-y-6">
+              {!canAccessCheckinsTab ? <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-primary/10">
+                <CardContent className="text-center py-12">
+                  <Crown className="h-12 w-12 text-primary mx-auto mb-4" />
+                  <h3 className="text-xl font-bold mb-2">Premium Feature</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Smarty Check-ins are available with a Gold or Platinum plan.
+                  </p>
+                  <Button onClick={() => navigate("/smarty-premium")} className="cta-button">
+                    Upgrade to Premium
+                  </Button>
+                </CardContent>
+              </Card> : <Card className="bg-primary/5 border-primary/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <ClipboardCheck className="h-5 w-5 text-primary" />
+                    Smarty Check-ins
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <SmartyCheckinsTab />
+                </CardContent>
+              </Card>}
             </div>}
 
             {/* LogBook Section */}
