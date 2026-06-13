@@ -41,6 +41,9 @@ export const Footer = () => {
             <button onClick={() => navigate("/disclaimer")} className="hover:text-primary transition-colors">
               Disclaimer
             </button>
+            <button onClick={() => navigate("/smarty-premium")} className="hover:text-primary transition-colors">
+              Pricing
+            </button>
             <button onClick={() => navigate("/contact")} className="hidden md:block hover:text-primary transition-colors">
               Contact
             </button>
