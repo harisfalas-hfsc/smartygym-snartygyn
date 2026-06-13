@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTheme } from "next-themes";
 import DOMPurify from "dompurify";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -31,18 +32,18 @@ export const ReaderModeDialog = ({
     return saved ? parseInt(saved) : 18;
   });
 
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    const saved = localStorage.getItem("readerModeDarkMode");
-    return saved !== "false"; // Default to dark mode
-  });
+  // Default reader theme follows the app's current theme.
+  const { resolvedTheme } = useTheme();
+  const [isDarkMode, setIsDarkMode] = useState(resolvedTheme !== "light");
+
+  // Sync to current app theme each time the dialog opens.
+  useEffect(() => {
+    if (open) setIsDarkMode(resolvedTheme !== "light");
+  }, [open, resolvedTheme]);
 
   useEffect(() => {
     localStorage.setItem("readerModeFontSize", fontSize.toString());
   }, [fontSize]);
-
-  useEffect(() => {
-    localStorage.setItem("readerModeDarkMode", isDarkMode.toString());
-  }, [isDarkMode]);
 
   const increaseFontSize = () => setFontSize((prev) => Math.min(prev + 2, 28));
   const decreaseFontSize = () => setFontSize((prev) => Math.max(prev - 2, 14));
