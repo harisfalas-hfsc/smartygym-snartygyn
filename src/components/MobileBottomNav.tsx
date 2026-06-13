@@ -1,9 +1,10 @@
-import { useLocation, useNavigate, Link } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { Compass, Users, Info, Dumbbell, ListChecks, Sparkles, Wrench, BookOpen, Newspaper, HelpCircle, Mail } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Compass, ArrowLeft, Users, Info, Dumbbell, ListChecks, Sparkles, Wrench, BookOpen, Newspaper, HelpCircle, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetClose, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
 
 const HIDDEN_PATHS = ["/auth", "/reset-password", "/payment-success", "/payment-cancelled"];
 
@@ -29,7 +30,12 @@ export const MobileBottomNav = () => {
 
   const discoveryItems = [
     { label: "About SmartyGym", path: "/about", icon: Info, iconClass: "text-teal-500" },
+    { label: "Smarty Workouts", path: "/workout", icon: Dumbbell, iconClass: "text-primary" },
+    { label: "Smarty Programs", path: "/trainingprogram", icon: ListChecks, iconClass: "text-blue-500" },
     { label: "Smarty Ritual", path: "/daily-ritual", icon: Sparkles, iconClass: "text-purple-500" },
+    { label: "Smarty Tools", path: "/tools", icon: Wrench, iconClass: "text-orange-500" },
+    { label: "Smarty Blog", path: "/blog", icon: Newspaper, iconClass: "text-red-500" },
+    { label: "Exercise Library", path: "/exerciselibrary", icon: BookOpen, iconClass: "text-emerald-500" },
     { label: "Community", path: "/community", icon: Users, iconClass: "text-cyan-500" },
     { label: "FAQ", path: "/faq", icon: HelpCircle, iconClass: "text-purple-500" },
     { label: "Contact", path: "/contact", icon: Mail, iconClass: "text-indigo-500" },
@@ -85,26 +91,34 @@ export const MobileBottomNav = () => {
               <span className="text-[10px] font-medium leading-none">Discover</span>
             </button>
           </SheetTrigger>
-          <SheetContent side="bottom" className="rounded-t-2xl pb-[calc(env(safe-area-inset-bottom,0px)+1rem)]">
-            <SheetHeader>
-              <SheetTitle>Discover</SheetTitle>
-            </SheetHeader>
-            <div className="mt-4 grid grid-cols-3 gap-3">
-              {discoveryItems.map(({ label, path, icon: Icon, iconClass }) => (
-                <SheetClose asChild key={path}>
+          <SheetContent side="left" hideClose className="left-4 top-1/2 bottom-auto flex h-auto max-h-[calc(100vh-2rem)] w-[calc(100vw-2rem)] max-w-none -translate-y-1/2 flex-col overflow-hidden rounded-2xl border-2 border-primary/40 p-3 shadow-xl !animate-none transition-opacity duration-200 ease-out data-[state=closed]:opacity-0 data-[state=open]:opacity-100">
+            <SheetClose asChild>
+              <Button variant="ghost" className="mb-1 h-8 shrink-0 gap-2 self-start rounded-full border-2 border-primary px-3 text-sm text-primary hover:bg-primary hover:text-primary-foreground">
+                <ArrowLeft className="h-3.5 w-3.5" />
+                Back
+              </Button>
+            </SheetClose>
+            <div className="mb-2 shrink-0">
+              <h2 className="text-lg font-bold leading-tight text-foreground">Explore SmartyGym</h2>
+            </div>
+            <nav className="grid grid-cols-2 gap-2 overflow-y-auto">
+              {discoveryItems.map(({ label, path, icon: Icon, iconClass }) => {
+                const active = location.pathname === path;
+                return (
                   <button
+                    key={path}
                     type="button"
                     onClick={() => handleNav(path)}
-                    className="flex flex-col items-center justify-center gap-1.5 rounded-xl border border-border bg-card p-3 text-center transition-colors hover:border-primary/40"
+                    className={`flex flex-col items-center justify-center rounded-2xl border-2 p-2 text-center font-semibold transition-all duration-200 ${active ? 'border-primary bg-primary/15 text-primary shadow-sm' : 'border-primary/25 bg-card text-foreground hover:border-primary hover:bg-primary/10'}`}
                   >
-                    <span className={cn("flex h-10 w-10 items-center justify-center rounded-full bg-primary/10", iconClass)}>
+                    <span className={`mx-auto mb-1 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 ${iconClass}`}>
                       <Icon className="h-5 w-5" />
                     </span>
-                    <span className="text-xs font-medium leading-tight">{label}</span>
+                    <span className="block text-xs leading-tight">{label}</span>
                   </button>
-                </SheetClose>
-              ))}
-            </div>
+                );
+              })}
+            </nav>
           </SheetContent>
         </Sheet>
       </div>
