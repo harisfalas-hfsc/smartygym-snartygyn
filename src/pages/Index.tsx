@@ -184,6 +184,54 @@ const Index = () => {
     refetchOnWindowFocus: false, // Don't refetch on tab focus
   });
 
+  // Latest 3 workouts for mobile "Featured Workouts" section
+  const { data: latestWorkouts = [] } = useQuery({
+    queryKey: ["home-featured-latest-workouts"],
+    queryFn: async () => {
+      const data = await fetchVisibleWorkoutMetadata(null);
+      return (data || [])
+        .filter((w: any) => w.is_workout_of_day !== true || w.wod_source === "library")
+        .filter((w: any) => !!w.created_at)
+        .sort((a: any, b: any) => (b.created_at || "").localeCompare(a.created_at || ""))
+        .slice(0, 3);
+    },
+    staleTime: 1000 * 60 * 5,
+    enabled: isMobile,
+  });
+
+  // Latest 3 programs for mobile "Featured Training Programs" section
+  const { data: latestPrograms = [] } = useQuery({
+    queryKey: ["home-featured-latest-programs"],
+    queryFn: async () => {
+      const { data } = await (supabase as any)
+        .rpc("get_visible_program_metadata", { _program_id: null });
+      return ((data || []) as any[])
+        .filter((p) => p.is_visible !== false && !!p.created_at)
+        .sort((a, b) => String(b.created_at || "").localeCompare(String(a.created_at || "")))
+        .slice(0, 3);
+    },
+    staleTime: 1000 * 60 * 5,
+    enabled: isMobile,
+  });
+
+  const workoutCategoryToSlug = (cat?: string | null) =>
+    (cat || "")
+      .toLowerCase()
+      .replace("calorie burning", "calorie-burning")
+      .replace("mobility & stability", "mobility")
+      .replace(/\s+/g, "-");
+
+  const programCategoryToSlug = (cat?: string | null) =>
+    (cat || "")
+      .toLowerCase()
+      .replace("cardio endurance", "cardio-endurance")
+      .replace("functional strength", "functional-strength")
+      .replace("muscle hypertrophy", "muscle-hypertrophy")
+      .replace("weight loss", "weight-loss")
+      .replace("low back pain", "low-back-pain")
+      .replace("mobility & stability", "mobility-stability")
+      .replace(/\s+/g, "-");
+
   const { bodyweightWod, equipmentWod, variousWod, hasWods } = useTodayWods(isMobile);
   const mobileWodCards = [
     bodyweightWod && { id: "bodyweight", label: "No Equipment", badgeClassName: "bg-green-500 hover:bg-green-500", wod: bodyweightWod },
