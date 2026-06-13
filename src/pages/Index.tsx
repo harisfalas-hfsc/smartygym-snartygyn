@@ -214,6 +214,27 @@ const Index = () => {
     enabled: isMobile,
   });
 
+  // Latest 3 blog articles for mobile "Featured Articles" section
+  const { data: latestArticles = [] } = useQuery({
+    queryKey: ["home-featured-latest-articles"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('blog_articles')
+        .select('id, slug, title, image_url, read_time, category, published_at, created_at')
+        .eq('is_published', true);
+      if (error) throw error;
+      return ((data || []) as any[])
+        .map((a) => ({
+          ...a,
+          timestamp: new Date(a.published_at || a.created_at).getTime(),
+        }))
+        .sort((a, b) => b.timestamp - a.timestamp)
+        .slice(0, 3);
+    },
+    staleTime: 1000 * 60 * 5,
+    enabled: isMobile,
+  });
+
   const workoutCategoryToSlug = (cat?: string | null) =>
     (cat || "")
       .toLowerCase()
