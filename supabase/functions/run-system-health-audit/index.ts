@@ -1361,16 +1361,21 @@ const handler = async (req: Request): Promise<Response> => {
     // ============================================
     console.log("⚙️ Checking notification preferences...");
 
-    const expectedPreferenceKeys = [
-      'opt_out_all',
-      'email_wod', 'dashboard_wod',
-      'email_ritual', 'dashboard_ritual',
-      'email_monday_motivation', 'dashboard_monday_motivation',
-      'email_new_workout', 'dashboard_new_workout',
-      'email_new_program', 'dashboard_new_program',
-      'email_new_article', 'dashboard_new_article',
-      'email_weekly_activity', 'dashboard_weekly_activity',
-      'email_checkin_reminders', 'dashboard_checkin_reminders'
+    // Current preference shape (NotificationPreferencesManager): nested per-automation
+    // objects { email, dashboard, push }. Legacy flat keys (email_wod, dashboard_wod…)
+    // are deprecated and no longer written.
+    const expectedAutomationKeys = [
+      'morning_daily_digest',
+      'monday_motivation',
+      'new_workout',
+      'new_program',
+      'new_article',
+      'weekly_activity_report',
+      'checkin_reminder',
+      'scheduled_workout_reminder',
+      'scheduled_program_reminder',
+      'goal_achievement',
+      'welcome_onboarding',
     ];
 
     const { data: sampleProfiles } = await supabase
@@ -1379,24 +1384,22 @@ const handler = async (req: Request): Promise<Response> => {
       .limit(10);
     
     if (sampleProfiles && sampleProfiles.length > 0) {
-      let usersWithOldFormat = 0;
-      let usersWithNewFormat = 0;
-      
+      let usersWithCurrentFormat = 0;
+      let usersWithLegacyFormat = 0;
+
       for (const profile of sampleProfiles) {
-        const prefs = profile.notification_preferences as Record<string, unknown> || {};
-        const hasNewKeys = 'dashboard_wod' in prefs || 'email_wod' in prefs;
-        if (hasNewKeys) {
-          usersWithNewFormat++;
-        } else {
-          usersWithOldFormat++;
-        }
+        const prefs = (profile.notification_preferences as Record<string, unknown>) || {};
+        const node = prefs['morning_daily_digest'];
+        const isCurrent = node && typeof node === 'object' && 'email' in (node as object);
+        if (isCurrent) usersWithCurrentFormat++;
+        else usersWithLegacyFormat++;
       }
-      
-      addCheck('Notification Preferences', 'Preference Structure', 'Users have updated preference format', 
-        usersWithOldFormat === 0 ? 'pass' : 'warning',
-        usersWithOldFormat > 0 
-          ? `${usersWithOldFormat}/${sampleProfiles.length} sampled users have old format (will use defaults)` 
-          : 'All sampled users have new format'
+
+      addCheck('Notification Preferences', 'Preference Structure', 'Users have current 3-channel preference format',
+        usersWithLegacyFormat === 0 ? 'pass' : 'warning',
+        usersWithLegacyFormat > 0
+          ? `${usersWithLegacyFormat}/${sampleProfiles.length} sampled users still on legacy shape (defaults will apply)`
+          : `${usersWithCurrentFormat}/${sampleProfiles.length} sampled users have nested {email,dashboard,push} shape`
       );
     }
 
