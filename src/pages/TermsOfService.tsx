@@ -128,17 +128,15 @@ const TermsOfService = () => {
                     <li>Exercise library with video demonstrations.</li>
                   </ul>
 
-                  <h3 className="text-lg font-semibold mt-4 mb-2">AI-Powered Features</h3>
+                  <h3 className="text-lg font-semibold mt-4 mb-2">In-App Suggestions</h3>
                   <ul className="space-y-2 text-muted-foreground">
-                    <li>AI-generated personalized workout suggestions based on your preferences and goals.</li>
-                    <li>AI-powered meal planning and nutrition recommendations.</li>
-                    <li>Smart suggestions for workouts and programs based on your activity history.</li>
+                    <li>Smart suggestions that recommend existing workouts and programs from our human-designed library based on your activity history.</li>
+                    <li>Built-in tools such as the workout timer, macro calculator, BMR calculator, and 1RM calculator.</li>
                   </ul>
 
-                  <h3 className="text-lg font-semibold mt-4 mb-2">Connected Services & Integrations</h3>
+                  <h3 className="text-lg font-semibold mt-4 mb-2">Notifications</h3>
                   <ul className="space-y-2 text-muted-foreground">
-                    <li>Google Calendar integration for workout scheduling and reminders.</li>
-                    <li>Strava integration for fitness activity tracking (optional).</li>
+                    <li>Internal in-app reminders for scheduled workouts, check-ins, and Smarty Rituals.</li>
                     <li>Push notifications for workout reminders, check-ins, and updates.</li>
                   </ul>
 
@@ -150,7 +148,7 @@ const TermsOfService = () => {
                   </ul>
 
                   <p className="text-muted-foreground mt-3">
-                    <strong>Important:</strong> While we offer AI-generated content, our core programs are <strong>professionally designed by certified trainers</strong>. 
+                    <strong>Important:</strong> All workouts, training programs, and content on SmartyGym are <strong>100% human-designed by Sports Scientist Haris Falas</strong> — 0% AI-generated. 
                     All services are intended for <strong>personal fitness and wellness purposes only</strong> and are not a substitute for medical advice.
                   </p>
                 </div>
@@ -167,7 +165,6 @@ const TermsOfService = () => {
                     <li>You are responsible for maintaining the confidentiality of your login details.</li>
                     <li>You agree not to share your account with others.</li>
                     <li>Any unauthorized use of your account must be reported immediately.</li>
-                    <li>You may connect third-party accounts (Google, Strava) at your discretion. You can disconnect these at any time.</li>
                     <li>You are responsible for any activity that occurs under your account.</li>
                   </ul>
                 </div>
