@@ -187,6 +187,16 @@ const About = () => {
                   <p className="text-base text-muted-foreground text-center leading-relaxed">
                     Everything a complete gym must offer, built by real professionals, in your pocket at <strong className="text-primary">smartygym.com</strong>.
                   </p>
+                  {!isPremium && (
+                    <Link
+                      to="/smarty-premium"
+                      className="inline-flex items-center gap-1.5 text-sm font-semibold text-green-500 hover:text-green-600 hover:underline md:hidden"
+                    >
+                      <Crown className="w-4 h-4" />
+                      Unlock everything for life
+                      <ChevronRight className="w-4 h-4" />
+                    </Link>
+                  )}
                 </div>
               </CardContent>
             </Card>
