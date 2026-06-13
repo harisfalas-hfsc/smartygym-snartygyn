@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Plane, GraduationCap, Check, Crown, ChevronDown, ChevronLeft, ChevronRight, Move, Ban, Brain, CheckCircle2, Award, Shield, Compass, Sparkles, Info, User, HelpCircle, ShoppingBag, Star, Clock, CalendarCheck, Home, Shuffle, ShoppingCart } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { getBlogArticleImage } from "@/utils/blogImages";
 import { User as SupabaseUser } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
@@ -208,6 +209,27 @@ const Index = () => {
       return ((data || []) as any[])
         .filter((p) => p.is_visible !== false && !!p.created_at)
         .sort((a, b) => String(b.created_at || "").localeCompare(String(a.created_at || "")))
+        .slice(0, 3);
+    },
+    staleTime: 1000 * 60 * 5,
+    enabled: isMobile,
+  });
+
+  // Latest 3 blog articles for mobile "Featured Articles" section
+  const { data: latestArticles = [] } = useQuery({
+    queryKey: ["home-featured-latest-articles"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('blog_articles')
+        .select('id, slug, title, image_url, read_time, category, published_at, created_at')
+        .eq('is_published', true);
+      if (error) throw error;
+      return ((data || []) as any[])
+        .map((a) => ({
+          ...a,
+          timestamp: new Date(a.published_at || a.created_at).getTime(),
+        }))
+        .sort((a, b) => b.timestamp - a.timestamp)
         .slice(0, 3);
     },
     staleTime: 1000 * 60 * 5,
@@ -894,6 +916,48 @@ const Index = () => {
                 <button key={index} onClick={() => blogCarouselApi?.scrollTo(index)} className={cn("w-2.5 h-2.5 rounded-full transition-all duration-300", blogSlide === index ? "bg-primary scale-125" : "bg-primary/30 hover:bg-primary/50")} aria-label={`Go to blog category ${index + 1}`} />
               ))}
             </div>
+
+            {/* Mobile: Featured Articles (latest 3) */}
+            {latestArticles.length > 0 && (
+              <div className="mt-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-sm font-extrabold tracking-tight text-primary uppercase">Featured Articles</span>
+                  <div className="h-px flex-1 bg-primary/20" />
+                </div>
+                <div className="flex flex-col gap-3">
+                  {latestArticles.map((a: any) => {
+                    const image = getBlogArticleImage(a.image_url, a.slug);
+                    return (
+                      <button
+                        key={a.id}
+                        type="button"
+                        onClick={() => navigate(`/blog/${a.slug}.html`)}
+                        className="flex items-stretch bg-card border-2 border-green-500/60 rounded-xl overflow-hidden hover:border-green-500 hover:shadow-xl transition-all duration-300 text-left"
+                        aria-label={a.title}
+                      >
+                        <div className="relative w-28 flex-shrink-0 bg-muted">
+                          <img
+                            src={image}
+                            alt={a.title}
+                            loading="lazy"
+                            className="absolute inset-0 w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0 p-3 flex flex-col justify-center">
+                          <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">{a.category}</span>
+                          <h3 className="text-sm font-bold text-foreground leading-tight line-clamp-2 mt-0.5">{a.title}</h3>
+                          {(a.read_time || a.published_at || a.created_at) && (
+                            <p className="text-[11px] text-muted-foreground mt-1 line-clamp-1">
+                              {[a.read_time, new Date(a.published_at || a.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })].filter(Boolean).join(" · ")}
+                            </p>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Smarty Tools Carousel */}
@@ -954,44 +1018,33 @@ const Index = () => {
             <span className="text-sm font-extrabold tracking-tight text-primary uppercase">Explore</span>
             <div className="h-px flex-1 bg-primary/20" />
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div
-              onClick={() => navigate('/exerciselibrary')}
-              className="relative h-32 rounded-xl overflow-hidden border-2 border-primary/40 hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300 cursor-pointer group"
-            >
-              <img
-                src={heroLibraryBookImage}
-                alt="Exercise Library"
-                loading="lazy"
-                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-              <div className="absolute inset-0 flex flex-col items-center justify-end p-3 text-center">
-                <div className="w-8 h-8 rounded-full bg-background/90 flex items-center justify-center mb-1 shadow-md">
-                  <BookOpen className="w-4 h-4 text-primary" />
+          <div className="flex flex-col gap-3">
+            {[
+              { route: '/exerciselibrary', title: 'Exercise Library', label: 'Library', description: 'Video demonstrations for every exercise', image: heroLibraryBookImage },
+              { route: '/community', title: 'Community', label: 'Connect', description: 'Share progress, leaderboards and challenges', image: heroCommunityCelebratingImage },
+            ].map((card) => (
+              <button
+                key={card.route}
+                type="button"
+                onClick={() => navigate(card.route)}
+                className="flex items-stretch bg-card border-2 border-green-500/60 rounded-xl overflow-hidden hover:border-green-500 hover:shadow-xl transition-all duration-300 text-left"
+                aria-label={card.title}
+              >
+                <div className="relative w-28 flex-shrink-0 bg-muted">
+                  <img
+                    src={card.image}
+                    alt={card.title}
+                    loading="lazy"
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
                 </div>
-                <span className="text-sm font-bold text-white leading-tight">Exercise Library</span>
-              </div>
-            </div>
-
-            <div
-              onClick={() => navigate('/community')}
-              className="relative h-32 rounded-xl overflow-hidden border-2 border-primary/40 hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300 cursor-pointer group"
-            >
-              <img
-                src={heroCommunityCelebratingImage}
-                alt="Community"
-                loading="lazy"
-                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-              <div className="absolute inset-0 flex flex-col items-center justify-end p-3 text-center">
-                <div className="w-8 h-8 rounded-full bg-background/90 flex items-center justify-center mb-1 shadow-md">
-                  <Users className="w-4 h-4 text-primary" />
+                <div className="flex-1 min-w-0 p-3 flex flex-col justify-center">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">{card.label}</span>
+                  <h3 className="text-sm font-bold text-foreground leading-tight line-clamp-2 mt-0.5">{card.title}</h3>
+                  <p className="text-[11px] text-muted-foreground mt-1 line-clamp-1">{card.description}</p>
                 </div>
-                <span className="text-sm font-bold text-white leading-tight">Community</span>
-              </div>
-            </div>
+              </button>
+            ))}
           </div>
 
         </div>
