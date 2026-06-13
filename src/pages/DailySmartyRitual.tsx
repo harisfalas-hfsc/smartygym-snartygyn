@@ -16,7 +16,7 @@ import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { ReaderModeDialog } from "@/components/ReaderModeDialog";
 
-import harisPhoto from "@/assets/haris-falas-coach.png";
+import ritualIcon from "@/assets/daily-smarty-ritual-icon.jpg";
 
 interface DailyRitual {
   id: string;
@@ -223,8 +223,8 @@ const DailySmartyRitual = () => {
                 <div className="flex flex-col items-center text-center">
                   <div className="mb-3">
                     <img 
-                      src={harisPhoto} 
-                      alt="Haris Falas" 
+                      src={ritualIcon} 
+                      alt="Smarty Ritual" 
                       className="w-20 h-20 rounded-full object-cover border-4 border-primary/20 shadow-lg"
                     />
                   </div>
@@ -276,11 +276,11 @@ const DailySmartyRitual = () => {
               {/* Header Section - Elegant Centered Layout */}
               <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-8 relative">
                 <div className="flex flex-col items-center text-center">
-                  {/* Haris Photo - centered above title */}
+                  {/* Smarty Ritual Icon - centered above title */}
                   <div className="mb-3">
                     <img 
-                      src={harisPhoto} 
-                      alt="Haris Falas" 
+                      src={ritualIcon} 
+                      alt="Smarty Ritual" 
                       className="w-24 h-24 rounded-full object-cover border-4 border-primary/20 shadow-lg"
                     />
                   </div>
