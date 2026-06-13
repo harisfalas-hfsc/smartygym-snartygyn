@@ -24,6 +24,8 @@ import { ScrollReveal } from "@/components/ScrollReveal";
 import { LazySection } from "@/components/LazySection";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useTodayWods } from "@/hooks/useTodayWods";
+import ritualWellbeingImage from "@/assets/ritual-wellbeing.jpg";
+import faqPlacardImage from "@/assets/faq-placard.jpg";
 import { fetchVisibleWorkoutMetadata } from "@/hooks/useTodayWods";
 import { getDifficultyColorClasses } from "@/lib/wodCycle";
 import { HeroDestinationConstellation } from "@/components/home/HeroDestinationConstellation";
