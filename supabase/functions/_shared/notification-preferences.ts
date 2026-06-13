@@ -35,33 +35,38 @@ export interface NotificationPreferences {
 
 // Legacy key fallback map (read-side compatibility for in-flight users
 // whose row was created between migration moments). Defaults to true.
-const LEGACY_FALLBACK: Record<AutomationKey, { email: string[]; dashboard: string[] }> = {
+const LEGACY_FALLBACK: Record<AutomationKey, { email: string[]; dashboard: string[]; push: string[] }> = {
   morning_daily_digest: {
     email: ["email_wod", "email_ritual"],
     dashboard: ["dashboard_wod", "dashboard_ritual"],
+    push: ["mobile_push_wod", "mobile_push_ritual"],
   },
-  monday_motivation: { email: ["email_monday_motivation"], dashboard: ["dashboard_monday_motivation"] },
-  new_workout: { email: ["email_new_workout"], dashboard: ["dashboard_new_workout"] },
-  new_program: { email: ["email_new_program"], dashboard: ["dashboard_new_program"] },
-  new_article: { email: ["email_new_article"], dashboard: ["dashboard_new_article"] },
+  monday_motivation: { email: ["email_monday_motivation"], dashboard: ["dashboard_monday_motivation"], push: ["mobile_push_monday_motivation"] },
+  new_workout: { email: ["email_new_workout"], dashboard: ["dashboard_new_workout"], push: ["mobile_push_new_workout"] },
+  new_program: { email: ["email_new_program"], dashboard: ["dashboard_new_program"], push: ["mobile_push_new_program"] },
+  new_article: { email: ["email_new_article"], dashboard: ["dashboard_new_article"], push: ["mobile_push_new_article"] },
   weekly_activity_report: {
     email: ["email_weekly_activity"],
     dashboard: ["dashboard_weekly_activity"],
+    push: ["mobile_push_weekly_activity"],
   },
   checkin_reminder: {
     email: ["email_checkin_reminders", "checkin_reminders"],
     dashboard: ["dashboard_checkin_reminders"],
+    push: ["mobile_push_checkin_reminders"],
   },
   scheduled_workout_reminder: {
     email: ["email_scheduled_workout_reminders"],
-    dashboard: [],
+    dashboard: ["dashboard_scheduled_workout_reminders"],
+    push: ["mobile_push_scheduled_workout_reminders"],
   },
   scheduled_program_reminder: {
     email: ["email_scheduled_program_reminders"],
-    dashboard: [],
+    dashboard: ["dashboard_scheduled_program_reminders"],
+    push: ["mobile_push_scheduled_program_reminders"],
   },
-  goal_achievement: { email: ["email_goal_achievement"], dashboard: [] },
-  welcome_onboarding: { email: ["email_welcome_onboarding"], dashboard: [] },
+  goal_achievement: { email: ["email_goal_achievement"], dashboard: ["dashboard_goal_achievement"], push: ["mobile_push_goal_achievement"] },
+  welcome_onboarding: { email: ["email_welcome_onboarding"], dashboard: ["dashboard_welcome_onboarding"], push: [] },
 };
 
 /**
@@ -85,9 +90,7 @@ export function canSend(
   }
 
   // Legacy fallback (returns true unless explicitly false on every legacy key)
-  if (channel === "push") {
-    return prefs.push !== false;
-  }
+  if (channel === "push" && (prefs.push === false || prefs.mobile_push_master === false)) return false;
   const legacyKeys = LEGACY_FALLBACK[key]?.[channel] ?? [];
   if (legacyKeys.length === 0) return true;
   // ALL legacy keys must be NOT false to consider channel enabled
