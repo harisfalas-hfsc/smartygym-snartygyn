@@ -13,6 +13,10 @@ import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { generateHarisFalasSchema } from "@/utils/seoSchemas";
 import { getBlogArticleImage } from "@/utils/blogImages";
 import { BlogSEOEnhancement } from "@/components/seo/BlogSEOEnhancement";
+import { useIsMobile } from "@/hooks/use-mobile";
+import categoryFitnessImg from "@/assets/blog/category-fitness.jpg";
+import categoryNutritionImg from "@/assets/blog/category-nutrition.jpg";
+import categoryWellnessImg from "@/assets/blog/category-wellness.jpg";
 interface Article {
   id: string;
   slug: string;
@@ -26,6 +30,7 @@ interface Article {
 }
 const Blog = () => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const { category: categoryParam } = useParams<{ category?: string }>();
   const [categoryFilter, setCategoryFilter] = useState<string>(
     categoryParam ? categoryParam.toLowerCase() : "all",
@@ -74,6 +79,14 @@ const Blog = () => {
     const dateB = new Date(b.date).getTime();
     return sortFilter === "newest" ? dateB - dateA : dateA - dateB;
   });
+
+  const blogCategories = [
+    { key: "fitness", label: "Fitness", image: categoryFitnessImg, description: "Training, strength, and performance" },
+    { key: "nutrition", label: "Nutrition", image: categoryNutritionImg, description: "Fueling for results and health" },
+    { key: "wellness", label: "Wellness", image: categoryWellnessImg, description: "Recovery, mobility, and healthy aging" },
+  ];
+  const showMobileCategoryHub = isMobile && !categoryParam;
+  const showMobileCompactList = isMobile && !!categoryParam;
   return <>
       <Helmet>
         <title>Fitness Blog Articles by Haris Falas | SmartyGym</title>
@@ -169,6 +182,7 @@ const Blog = () => {
             </CardContent>
           </Card>
 
+          {!isMobile && (
           <div className="mb-6 sm:mb-8">
             <CompactFilters filters={[{
           name: "Sort by",
@@ -202,7 +216,91 @@ const Blog = () => {
           placeholder: "Category"
         }]} />
           </div>
+          )}
 
+          {showMobileCategoryHub && (
+            <div className="mb-6">
+              <h2 className="text-lg font-bold mb-3">Browse by category</h2>
+              <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-3 -mx-4 px-4">
+                {blogCategories.map((cat) => (
+                  <button
+                    key={cat.key}
+                    onClick={() => navigate(`/blog/category/${cat.key}`)}
+                    className="snap-center shrink-0 w-[78%] rounded-xl overflow-hidden border-2 border-blue-500/60 hover:border-blue-500 bg-card shadow-md text-left transition-colors"
+                    aria-label={`Browse ${cat.label} articles`}
+                  >
+                    <div className="relative aspect-[16/10] overflow-hidden">
+                      <img
+                        src={cat.image}
+                        alt={`${cat.label} blog articles by Haris Falas - SmartyGym`}
+                        width={1280}
+                        height={800}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                      <div className="absolute bottom-3 left-3 right-3 text-white">
+                        <div className="text-xl font-extrabold uppercase tracking-tight">{cat.label}</div>
+                        <div className="text-xs opacity-90">{cat.description}</div>
+                      </div>
+                    </div>
+                    <div className="p-3 text-xs text-muted-foreground">
+                      {allArticles.filter(a => a.category.toLowerCase() === cat.key).length} articles
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {showMobileCompactList && (
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-lg font-bold capitalize">{categoryParam} Articles</h2>
+                <button
+                  onClick={() => navigate('/blog')}
+                  className="text-xs text-primary hover:underline"
+                >
+                  ← All categories
+                </button>
+              </div>
+              <div className="flex flex-col gap-3">
+                {filteredArticles.map((article) => (
+                  <button
+                    key={article.id}
+                    onClick={() => navigate(`/blog/${article.slug}.html`)}
+                    className="flex gap-3 items-stretch rounded-lg overflow-hidden border-2 border-blue-500/60 hover:border-blue-500 bg-card text-left transition-colors"
+                    aria-label={article.title}
+                  >
+                    <div className="w-24 shrink-0 aspect-square overflow-hidden">
+                      <img
+                        src={article.image}
+                        alt={`${article.title} - SmartyGym blog by Haris Falas`}
+                        width={400}
+                        height={400}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0 py-2 pr-3">
+                      <div className="text-sm font-bold line-clamp-2 mb-1">{article.title}</div>
+                      <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
+                        <div className="flex items-center gap-1"><Clock className="h-3 w-3" />{article.readTime}</div>
+                        <div className="flex items-center gap-1"><Calendar className="h-3 w-3" />{article.date}</div>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+                {filteredArticles.length === 0 && (
+                  <div className="text-sm text-muted-foreground text-center py-6">No articles yet in this category.</div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {!isMobile && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredArticles.map(article => <Card key={article.id} itemScope itemType="https://schema.org/BlogPosting" className="overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg" onClick={() => navigate(`/blog/${article.slug}.html`)} data-article-id={article.id} data-keywords="smarty gym blog, online fitness tips, smartygym.com, Haris Falas, online gym advice" aria-label={`${article.title} - SmartyGym blog - Online fitness at smartygym.com`}>
                 <div className="relative aspect-video overflow-hidden">
@@ -246,6 +344,7 @@ const Blog = () => {
                 </div>
               </Card>)}
           </div>
+          )}
 
           <BlogSEOEnhancement articleCount={allArticles.length} />
         </div>
