@@ -4,6 +4,7 @@ import { Resend } from "https://esm.sh/resend@3.5.0";
 import { MESSAGE_TYPES } from "../_shared/notification-types.ts";
 import { getEmailHeaders, wrapInEmailTemplateWithFooter } from "../_shared/email-utils.ts";
 import { logEmailDelivery } from "../_shared/email-log.ts";
+import { canSend } from "../_shared/notification-preferences.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -56,9 +57,8 @@ async function sendOnboardingToUser(supabaseAdmin: any, userId: string) {
   const prefs = (profile?.notification_preferences as Record<string, any>) || {};
 
   // Dashboard message
-  const dashPrefKey = `dashboard_${ONBOARDING_MESSAGE_TYPE}`;
   let dashboardSent = false;
-  if (prefs[dashPrefKey] !== false) {
+  if (canSend(prefs, "welcome_onboarding", "dashboard")) {
     await supabaseAdmin.from('user_system_messages').insert({
       user_id: userId,
       message_type: ONBOARDING_MESSAGE_TYPE,
@@ -72,7 +72,7 @@ async function sendOnboardingToUser(supabaseAdmin: any, userId: string) {
 
   // Email
   let emailSent = false;
-  if (prefs.opt_out_all !== true && prefs.email !== false && prefs[`email_${ONBOARDING_MESSAGE_TYPE}`] !== false) {
+  if (canSend(prefs, "welcome_onboarding", "email")) {
     try {
       const { data: userData } = await supabaseAdmin.auth.admin.getUserById(userId);
       if (userData?.user?.email) {

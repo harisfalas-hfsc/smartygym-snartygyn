@@ -4,6 +4,7 @@ import { Resend } from "https://esm.sh/resend@2.0.0";
 import { getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
 import { MESSAGE_TYPES } from "../_shared/notification-types.ts";
 import { logEmailDelivery } from "../_shared/email-log.ts";
+import { canSend } from "../_shared/notification-preferences.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -170,10 +171,10 @@ serve(async (req) => {
 
     const profilesMap = new Map(allProfiles?.map(p => [p.user_id, p.notification_preferences as Record<string, any>]) || []);
 
-    // Filter users who have dashboard_ritual enabled (default true)
+    // Filter users who have ritual dashboard notifications enabled (default true)
     const usersForDashboard = allProfiles?.filter(p => {
       const prefs = p.notification_preferences as Record<string, any> || {};
-      return prefs.opt_out_all !== true && prefs.dashboard_ritual !== false;
+      return canSend(prefs, "morning_daily_digest", "dashboard");
     }).map(p => p.user_id) || [];
 
     if (usersForDashboard.length === 0) {
@@ -216,7 +217,7 @@ serve(async (req) => {
 
       const prefs = profilesMap.get(authUser.id) || {};
 
-      if (prefs.opt_out_all === true || prefs.email_ritual === false) {
+      if (!canSend(prefs, "morning_daily_digest", "email")) {
         logStep(`Skipping Ritual email for ${authUser.email} (opted out)`);
         emailsSkipped++;
         continue;
