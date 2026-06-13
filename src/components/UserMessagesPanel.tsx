@@ -1,4 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -39,7 +40,8 @@ const compactMessageHtml = (html: string): string => {
   return html
     .replace(/<hr[^>]*>/gi, '')
     .replace(/<p[^>]*>(\s|&nbsp;|<br\s*\/?>)*<\/p>/gi, '')
-    .replace(/(<br\s*\/?>\s*){2,}/gi, '<br/>')
+    .replace(/(<br\s*\/?>\s*){2,}/gi, '</p><p>')
+    .replace(/<br\s*\/?>/gi, '</p><p>')
     .replace(/(\r?\n){2,}/g, '\n');
 };
 
@@ -90,7 +92,22 @@ export const UserMessagesPanel = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [replyDrafts, setReplyDrafts] = useState<Record<string, string>>({});
   const [sendingReplyFor, setSendingReplyFor] = useState<string | null>(null);
+  const [expandedSystemMessages, setExpandedSystemMessages] = useState<Set<string>>(new Set());
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  const openLinkInternally = (link: string) => {
+    try {
+      const url = new URL(link, window.location.origin);
+      const sameOrigin = url.origin === window.location.origin
+        || /smartygym\.(com|lovable\.app|lovableproject\.com)$/i.test(url.hostname);
+      if (sameOrigin) {
+        navigate(url.pathname + url.search + url.hash);
+        return;
+      }
+    } catch {}
+    window.location.href = link;
+  };
 
   const { data: rawContactMessages = [], isLoading: contactLoading, refetch: refetchContact } = useQuery({
     queryKey: ['user-contact-messages'],
