@@ -131,10 +131,10 @@ export default function SmartyPremium() {
   ];
 
   const renderFeatureValue = (value: string | boolean) => {
-    if (value === false) return <X className="w-5 h-5 text-destructive ml-auto" />;
-    if (value === true) return <Check className="w-5 h-5 text-green-600 ml-auto" />;
+    if (value === false) return <X className="w-5 h-5 text-destructive" />;
+    if (value === true) return <Check className="w-5 h-5 text-green-600" />;
     if (value === "limited") return (
-      <div className="relative inline-flex items-center justify-center w-8 h-8 ml-auto">
+      <div className="relative inline-flex items-center justify-center w-8 h-8">
         <Check className="w-6 h-6 text-green-600" strokeWidth={3} />
         <CircleMinus className="absolute -bottom-0.5 -right-0.5 w-4 h-4 text-amber-500 bg-background rounded-full" strokeWidth={2.6} />
       </div>
