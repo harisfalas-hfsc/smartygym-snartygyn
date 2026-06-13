@@ -14,6 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { NotificationPreferencesManager } from "@/components/NotificationPreferencesManager";
 import { MobilePushNotificationManager } from "@/components/MobilePushNotificationManager";
+import { useAccessControl } from "@/contexts/AccessControlContext";
 import {
   Select,
   SelectContent,
@@ -96,8 +97,32 @@ export const UserMessagesPanel = () => {
   const [expandedSystemMessages, setExpandedSystemMessages] = useState<Set<string>>(new Set());
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const { userTier } = useAccessControl();
+  const isPremiumUser = userTier === "premium";
 
-  const openLinkInternally = (link: string) => {
+  // Message types whose linked destination requires premium access.
+  // For free/guest users we redirect to the upgrade page so they see
+  // a clear "why you can't access this" screen instead of a bare dashboard.
+  const PREMIUM_ONLY_MESSAGE_TYPES = new Set<string>([
+    'weekly_activity_report',
+    'motivational_weekly',
+    'daily_ritual',
+    'checkin_reminder',
+    'wod_notification',
+  ]);
+
+  const openLinkInternally = (link: string, messageType?: string) => {
+    // If this message points at a premium-only area and the user
+    // doesn't have premium access, send them to the upgrade page
+    // (mirrors the behaviour of the weekly activity report link).
+    if (
+      messageType &&
+      PREMIUM_ONLY_MESSAGE_TYPES.has(messageType) &&
+      !isPremiumUser
+    ) {
+      navigate('/smarty-premium');
+      return;
+    }
     try {
       const url = new URL(link, window.location.origin);
       const sameOrigin = url.origin === window.location.origin
@@ -784,7 +809,7 @@ export const UserMessagesPanel = () => {
                     variant="outline"
                     size="sm"
                     className="h-7"
-                    onClick={() => openLinkInternally(link)}
+                    onClick={() => openLinkInternally(link, message.message_type)}
                   >
                     <ExternalLink className="h-3 w-3 mr-1" />
                     View Content
