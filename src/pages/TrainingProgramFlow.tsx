@@ -73,6 +73,31 @@ const TrainingProgramFlow = () => {
 
   const totalProgramCount = Object.values(programCounts).reduce((sum, c) => sum + c, 0);
 
+  // Latest 3 programs for mobile "Featured" section
+  const { data: latestPrograms = [] } = useQuery({
+    queryKey: ["featured-latest-programs"],
+    queryFn: async () => {
+      const { data } = await (supabase as any)
+        .rpc("get_visible_program_metadata", { _program_id: null });
+      return ((data || []) as any[])
+        .filter((p) => p.is_visible !== false && !!p.created_at)
+        .sort((a, b) => String(b.created_at || "").localeCompare(String(a.created_at || "")))
+        .slice(0, 3);
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const programCategoryToSlug = (cat?: string | null) =>
+    (cat || "")
+      .toLowerCase()
+      .replace("cardio endurance", "cardio-endurance")
+      .replace("functional strength", "functional-strength")
+      .replace("muscle hypertrophy", "muscle-hypertrophy")
+      .replace("weight loss", "weight-loss")
+      .replace("low back pain", "low-back-pain")
+      .replace("mobility & stability", "mobility-stability")
+      .replace(/\s+/g, "-");
+
   // Category background images for programs
   const programBackgrounds: Record<string, string> = {
     "cardio-endurance": "/images/programs/cardio-endurance-bg.jpg",
@@ -421,6 +446,48 @@ const TrainingProgramFlow = () => {
             ))}
           </div>
         </div>
+
+        {/* Mobile: Featured Training Programs (latest 3) */}
+        {latestPrograms.length > 0 && (
+          <div className="lg:hidden mt-8">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-sm font-extrabold tracking-tight text-primary uppercase">Featured Training Programs</span>
+              <div className="h-px flex-1 bg-primary/20" />
+            </div>
+            <div className="flex flex-col gap-3">
+              {latestPrograms.map((p: any) => {
+                const slug = programCategoryToSlug(p.category);
+                const image = p.image_url || programMobileImages[slug] || "/images/programs/functional-strength-card-mobile.jpg";
+                return (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() => navigate(`/trainingprogram/${slug}/${p.id}`)}
+                    className="flex items-stretch bg-card border-2 border-primary/40 rounded-xl overflow-hidden hover:border-primary hover:shadow-xl transition-all duration-300 text-left"
+                  >
+                    <div className="relative w-28 flex-shrink-0 bg-muted">
+                      <img
+                        src={image}
+                        alt={p.name}
+                        loading="lazy"
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0 p-3 flex flex-col justify-center">
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">{p.category}</span>
+                      <h3 className="text-sm font-bold text-foreground leading-tight line-clamp-2 mt-0.5">{p.name}</h3>
+                      {(p.weeks || p.difficulty) && (
+                        <p className="text-[11px] text-muted-foreground mt-1 line-clamp-1">
+                          {[p.weeks ? `${p.weeks} weeks` : null, p.difficulty].filter(Boolean).join(" · ")}
+                        </p>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Bottom Premium Banner */}
         {!isPremium && (
