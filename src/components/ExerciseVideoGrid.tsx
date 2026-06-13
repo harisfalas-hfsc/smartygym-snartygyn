@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Play, Video, X, Filter, Search } from "lucide-react";
+import { Play, Video, X, Search } from "lucide-react";
 import { getYouTubeThumbnail } from "@/utils/youtube";
 import ExerciseVideoModal from "./ExerciseVideoModal";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -155,7 +155,6 @@ const ExerciseVideoGrid = () => {
       {/* Filter Bar */}
       <div className="mb-6 space-y-4">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Filter className="h-4 w-4" />
           <span>Filter by:</span>
         </div>
         

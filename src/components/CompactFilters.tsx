@@ -5,7 +5,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Filter } from "lucide-react";
+
 
 interface FilterOption {
   value: string;
@@ -28,7 +28,6 @@ export const CompactFilters = ({ filters, compact = false }: CompactFiltersProps
   return (
     <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 border-2 border-primary/40 rounded-lg p-3 mb-4">
       <div className="flex items-center gap-2 mb-2">
-        <Filter className="h-3.5 w-3.5 text-primary flex-shrink-0" />
         <span className="text-xs font-semibold uppercase tracking-wide text-primary">Filters</span>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
