@@ -84,6 +84,45 @@ interface ContactMessageHistoryItem {
 
 type ViewFilter = 'all' | 'unread';
 
+const MESSAGE_TYPE_DESTINATIONS: Record<string, string> = {
+  checkin_reminder: '/userdashboard?tab=checkins',
+  weekly_activity_report: '/userdashboard?tab=logbook',
+  motivational_weekly: '/userdashboard?tab=logbook&scroll=active-goals',
+  goal_achievement: '/userdashboard?tab=logbook&scroll=active-goals',
+  daily_ritual: '/daily-ritual',
+  wod_notification: '/workout/wod',
+  morning_notification: '/workout/wod',
+  renewal_reminder: '/userdashboard?tab=account',
+  renewal_thank_you: '/userdashboard?tab=account',
+  cancellation: '/userdashboard?tab=account',
+  subscription_expired: '/smarty-premium',
+  payment_failed: '/userdashboard?tab=account',
+  purchase_subscription: '/userdashboard?tab=account',
+  purchase_workout: '/userdashboard?tab=purchases',
+  purchase_program: '/userdashboard?tab=purchases',
+  purchase_ritual: '/daily-ritual',
+  purchase_shop_product: '/userdashboard?tab=purchases',
+  purchase_thank_you: '/userdashboard?tab=purchases',
+  first_purchase: '/userdashboard?tab=purchases',
+  welcome: '/userdashboard',
+  welcome_onboarding: '/userdashboard',
+  reactivation: '/smarty-premium',
+  announcement_new_workout: '/workout',
+  announcement_new_program: '/trainingprogram',
+  announcement_new_article: '/blog',
+  announcement_update: '/userdashboard?tab=messages',
+  announcement_new_service: '/userdashboard?tab=messages',
+  announcement_special_offer: '/smarty-premium',
+  announcement_event: '/userdashboard?tab=messages',
+  program_delivered: '/userdashboard?tab=purchases',
+  status_update: '/userdashboard?tab=messages',
+  support: '/userdashboard?tab=messages',
+  mass_notification: '/userdashboard?tab=messages',
+  unified_announcement: '/userdashboard?tab=messages',
+  corporate_member_added: '/userdashboard',
+  corporate_subscription: '/corporate-admin',
+};
+
 export const UserMessagesPanel = () => {
   const [expandedMessages, setExpandedMessages] = useState<Set<string>>(new Set());
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -100,27 +139,10 @@ export const UserMessagesPanel = () => {
   const { userTier } = useAccessControl();
   const isPremiumUser = userTier === "premium";
 
-  // Message types whose linked destination requires premium access.
-  // For free/guest users we redirect to the upgrade page so they see
-  // a clear "why you can't access this" screen instead of a bare dashboard.
-  const PREMIUM_ONLY_MESSAGE_TYPES = new Set<string>([
-    'weekly_activity_report',
-    'motivational_weekly',
-    'daily_ritual',
-    'checkin_reminder',
-    'wod_notification',
-  ]);
-
   const openLinkInternally = (link: string, messageType?: string) => {
-    // If this message points at a premium-only area and the user
-    // doesn't have premium access, send them to the upgrade page
-    // (mirrors the behaviour of the weekly activity report link).
-    if (
-      messageType &&
-      PREMIUM_ONLY_MESSAGE_TYPES.has(messageType) &&
-      !isPremiumUser
-    ) {
-      navigate('/smarty-premium');
+    const destination = messageType ? MESSAGE_TYPE_DESTINATIONS[messageType] : null;
+    if (destination) {
+      navigate(destination);
       return;
     }
     try {
