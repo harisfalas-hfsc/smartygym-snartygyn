@@ -23,6 +23,7 @@ import { ScrollReveal } from "@/components/ScrollReveal";
 import { LazySection } from "@/components/LazySection";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useTodayWods } from "@/hooks/useTodayWods";
+import { fetchVisibleWorkoutMetadata } from "@/hooks/useTodayWods";
 import { getDifficultyColorClasses } from "@/lib/wodCycle";
 import { HeroDestinationConstellation } from "@/components/home/HeroDestinationConstellation";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
