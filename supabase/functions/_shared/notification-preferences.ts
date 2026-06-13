@@ -26,7 +26,8 @@ export type AutomationKey =
   | "scheduled_workout_reminder"
   | "scheduled_program_reminder"
   | "goal_achievement"
-  | "welcome_onboarding";
+  | "welcome_onboarding"
+  | "general_announcement";
 
 export interface NotificationPreferences {
   opt_out_all?: boolean;
@@ -67,6 +68,7 @@ const LEGACY_FALLBACK: Record<AutomationKey, { email: string[]; dashboard: strin
   },
   goal_achievement: { email: ["email_goal_achievement"], dashboard: ["dashboard_goal_achievement"], push: ["mobile_push_goal_achievement"] },
   welcome_onboarding: { email: ["email_welcome_onboarding"], dashboard: ["dashboard_welcome_onboarding"], push: [] },
+  general_announcement: { email: [], dashboard: [], push: [] },
 };
 
 /**
