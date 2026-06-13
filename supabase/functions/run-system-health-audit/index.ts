@@ -1539,14 +1539,16 @@ const handler = async (req: Request): Promise<Response> => {
       .limit(5);
     
     if (samplePrefsForCheck && samplePrefsForCheck.length > 0) {
-      const prefs = samplePrefsForCheck[0].notification_preferences as Record<string, unknown>;
-      const hasEmailKeys = 'email_wod' in prefs || 'email_ritual' in prefs;
-      const hasDashboardKeys = 'dashboard_wod' in prefs || 'dashboard_ritual' in prefs;
-      
-      addCheck('Notifications', 'Preference Structure', 
-        'Notification preferences have correct structure', 
-        hasEmailKeys && hasDashboardKeys ? 'pass' : 'warning',
-        `Email prefs: ${hasEmailKeys ? '✅' : '❌'}, Dashboard prefs: ${hasDashboardKeys ? '✅' : '❌'}`
+      const prefs = samplePrefsForCheck[0].notification_preferences as Record<string, any>;
+      const node = prefs?.['morning_daily_digest'];
+      const hasEmailChannel = !!(node && typeof node === 'object' && 'email' in node);
+      const hasDashboardChannel = !!(node && typeof node === 'object' && 'dashboard' in node);
+      const hasPushChannel = !!(node && typeof node === 'object' && 'push' in node);
+
+      addCheck('Notifications', 'Preference Structure',
+        'Notification preferences have correct 3-channel structure',
+        hasEmailChannel && hasDashboardChannel && hasPushChannel ? 'pass' : 'warning',
+        `Email: ${hasEmailChannel ? '✅' : '❌'}, Dashboard: ${hasDashboardChannel ? '✅' : '❌'}, Push: ${hasPushChannel ? '✅' : '❌'}`
       );
     } else {
       addCheck('Notifications', 'Preference Structure', 
