@@ -1216,14 +1216,14 @@ const Index = () => {
                           <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mt-4">
                             <Link
                               to="/why-invest-in-smartygym"
-                              className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+                              className="inline-flex items-center gap-1.5 text-sm font-semibold text-green-500 hover:text-green-600 hover:underline"
                             >
                               Why Invest in SmartyGym
                               <ChevronRight className="w-4 h-4" />
                             </Link>
                             <Link
                               to="/the-smarty-method"
-                              className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+                              className="inline-flex items-center gap-1.5 text-sm font-semibold text-green-500 hover:text-green-600 hover:underline"
                             >
                               <BookOpen className="w-4 h-4" />
                               Discover The Smarty Method
