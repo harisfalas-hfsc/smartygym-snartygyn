@@ -148,24 +148,16 @@ export const MobileBottomNav = () => {
             </SheetContent>
           </Sheet>
 
-          {/* Home */}
-          <button
-            type="button"
-            onClick={() => { navigate("/"); setTimeout(() => window.scrollTo(0, 0), 0); }}
-            aria-label="Home"
-            className={itemClass}
-          >
-            <Home className="h-7 w-7" strokeWidth={2.25} />
-          </button>
-
-          {/* Smarty Coach */}
+          {/* Smarty Coach — center, prominent */}
           <button
             type="button"
             onClick={() => setCoachOpen(true)}
             aria-label="Smarty Coach"
-            className={itemClass}
+            className="flex h-full flex-1 items-center justify-center transition-all duration-150 active:scale-90 focus:outline-none"
           >
-            <img src={smartyCoachIcon} alt="" aria-hidden="true" className="h-7 w-7 rounded-full" width={28} height={28} />
+            <span className="inline-flex h-12 w-12 -mt-4 items-center justify-center rounded-full border-2 border-primary bg-background shadow-[0_4px_12px_-2px_hsl(var(--primary)/0.4)]">
+              <img src={smartyCoachIcon} alt="" aria-hidden="true" className="h-9 w-9 rounded-full" width={36} height={36} />
+            </span>
           </button>
 
           {/* Theme Toggle */}
@@ -182,57 +174,6 @@ export const MobileBottomNav = () => {
             )}
           </button>
 
-          {/* Avatar / Login */}
-          {user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button type="button" aria-label="Account" className={itemClass}>
-                  <span className="relative inline-flex">
-                    <Avatar className="h-7 w-7 border-2 border-primary">
-                      <AvatarImage src={avatarUrl || undefined} alt="Profile" />
-                      <AvatarFallback className="text-xs">{getInitials()}</AvatarFallback>
-                    </Avatar>
-                    {unreadCount > 0 && (
-                      <span className="pointer-events-none absolute top-0 right-0 h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-background" />
-                    )}
-                  </span>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56 max-w-[calc(100vw-2rem)] bg-popover" align="end" sideOffset={8} side="top" forceMount>
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">{profileName || user.user_metadata?.full_name || "User"}</p>
-                    <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onSelect={() => { navigate("/userdashboard"); setTimeout(() => window.scrollTo(0, 0), 0); }}>
-                  <LayoutDashboard className="mr-2 h-4 w-4" /><span>Dashboard</span>
-                </DropdownMenuItem>
-                {isAdmin && (
-                  <>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onSelect={() => { navigate("/admin"); setTimeout(() => window.scrollTo(0, 0), 0); }}>
-                      <Shield className="mr-2 h-4 w-4" /><span>Admin</span>
-                    </DropdownMenuItem>
-                  </>
-                )}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onSelect={handleLogout}>
-                  <LogOut className="mr-2 h-4 w-4" /><span>Logout</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <button
-              type="button"
-              aria-label="Login"
-              onClick={() => { navigate("/auth?mode=login"); setTimeout(() => window.scrollTo(0, 0), 0); }}
-              className={itemClass}
-            >
-              <UserIcon className="h-7 w-7" strokeWidth={2.25} />
-            </button>
-          )}
         </div>
     </nav>
     <SmartyCoachModal isOpen={coachOpen} onClose={() => setCoachOpen(false)} />

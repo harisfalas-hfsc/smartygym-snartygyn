@@ -72,11 +72,6 @@ export const Navigation = () => {
 
   // Dynamically set --app-header-h CSS variable based on actual header height
   useLayoutEffect(() => {
-    // On mobile the header is fully removed; content starts at the top.
-    if (isMobile) {
-      document.documentElement.style.setProperty('--app-header-h', '0px');
-      return;
-    }
     let frame = 0;
     const updateHeaderHeight = () => {
       if (headerRef.current) {
@@ -306,6 +301,86 @@ export const Navigation = () => {
 
   return (
     <>
+    {isMobile && (
+      <header
+        ref={headerRef}
+        className={cn(
+          "fixed top-0 left-0 right-0 z-50 bg-background border-b border-primary/20 transition-transform duration-300 will-change-transform",
+          headerHidden && "-translate-y-full"
+        )}
+        style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
+      >
+        <div className="flex h-11 items-center justify-between px-3">
+          <button
+            type="button"
+            onClick={() => {
+              if (location.pathname === "/") {
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              } else {
+                navigate("/");
+                setTimeout(() => window.scrollTo(0, 0), 0);
+              }
+            }}
+            aria-label="SmartyGym home"
+            className="text-lg font-extrabold tracking-tight leading-none"
+          >
+            <span className="text-primary">Smarty</span>
+            <span className="text-green-500">Gym</span>
+          </button>
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  aria-label="Account"
+                  className="relative inline-flex items-center justify-center rounded-full"
+                >
+                  <Avatar className="h-8 w-8 border-2 border-primary">
+                    <AvatarImage src={avatarUrl || undefined} alt="Profile" />
+                    <AvatarFallback className="text-xs">{getUserInitials()}</AvatarFallback>
+                  </Avatar>
+                  {unreadCount > 0 && (
+                    <span className="pointer-events-none absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-background" />
+                  )}
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56 max-w-[calc(100vw-2rem)] bg-popover" align="end" sideOffset={6}>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">{profileName || user.user_metadata?.full_name || "User"}</p>
+                    <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={() => handleProfileNavigate("/userdashboard")}>
+                  <LayoutDashboard className="mr-2 h-4 w-4" /><span>Dashboard</span>
+                </DropdownMenuItem>
+                {isAdmin && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onSelect={() => { navigate("/admin"); setTimeout(() => window.scrollTo(0, 0), 0); }}>
+                      <Shield className="mr-2 h-4 w-4" /><span>Admin</span>
+                    </DropdownMenuItem>
+                  </>
+                )}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" /><span>Logout</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <button
+              type="button"
+              onClick={() => { navigate("/auth?mode=login"); setTimeout(() => window.scrollTo(0, 0), 0); }}
+              className="inline-flex h-7 items-center justify-center rounded-full border-2 border-primary px-3 text-xs font-semibold text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+            >
+              Log In
+            </button>
+          )}
+        </div>
+      </header>
+    )}
     {!isMobile && (
     <header
       ref={headerRef}
