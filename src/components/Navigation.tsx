@@ -452,16 +452,24 @@ export const Navigation = () => {
 
           {/* CENTER SECTION - Logo */}
           <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 justify-center lg:static lg:top-auto lg:flex-1 lg:translate-x-0 lg:translate-y-0 lg:justify-center">
-            <Link
-              to="/"
-              className="cursor-pointer flex-shrink-0"
+            <button
+              onClick={() => {
+                if (location.pathname === '/') {
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                  navigate('/');
+                  setTimeout(() => window.scrollTo(0, 0), 0);
+                }
+              }}
+              className="cursor-pointer flex-shrink-0 bg-transparent border-0 p-0"
+              aria-label="Go to homepage"
             >
               <img
                 src={smartyGymLogo}
                 alt="SmartyGym"
                 className="h-11 xs:h-[60px] sm:h-[72px] md:h-20 lg:h-24 w-auto max-w-[min(28vw,120px)] object-contain dark:mix-blend-lighten lg:max-w-none"
               />
-            </Link>
+            </button>
           </div>
 
            {/* Right Side - Auth */}
