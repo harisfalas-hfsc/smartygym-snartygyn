@@ -288,13 +288,6 @@ serve(async (req) => {
     }
 
     for (const user of users) {
-      // Goal setting/progress is a Premium dashboard feature, so do not send
-      // this CTA to free subscribers who cannot open the destination screen.
-      if (!premiumUserIds.has(user.user_id)) {
-        skipped++;
-        continue;
-      }
-
       // Skip if already sent today
       if (alreadySentUserIds.has(user.user_id)) {
         skipped++;
