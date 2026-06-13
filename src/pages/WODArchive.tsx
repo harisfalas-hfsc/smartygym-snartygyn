@@ -17,7 +17,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { CalendarCheck, CalendarIcon, Clock, Dumbbell, Star, Crown, ShoppingBag, Archive, Filter, X } from "lucide-react";
+import { CalendarCheck, CalendarIcon, Clock, Dumbbell, Star, Crown, ShoppingBag, Archive, X } from "lucide-react";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { cn } from "@/lib/utils";
 import { fetchVisibleWorkoutMetadata } from "@/hooks/useTodayWods";
