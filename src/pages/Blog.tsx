@@ -287,32 +287,32 @@ const Blog = () => {
 
           {showMobileCategoryHub && allArticles.length > 0 && (
             <div className="mb-6">
-              <h2 className="text-lg font-bold mb-3">Featured Articles</h2>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-sm font-extrabold tracking-tight text-primary uppercase">Featured Articles</span>
+                <div className="h-px flex-1 bg-primary/20" />
+              </div>
               <div className="flex flex-col gap-3">
                 {allArticles.slice(0, 3).map((article) => (
                   <button
                     key={article.id}
+                    type="button"
                     onClick={() => navigate(`/blog/${article.slug}.html`)}
-                    className="flex gap-3 items-stretch rounded-lg overflow-hidden border-2 border-blue-500/60 hover:border-blue-500 bg-card text-left transition-colors"
+                    className="flex items-stretch bg-card border-2 border-green-500/60 rounded-xl overflow-hidden hover:border-green-500 hover:shadow-xl transition-all duration-300 text-left"
                     aria-label={article.title}
                   >
-                    <div className="w-24 shrink-0 aspect-square overflow-hidden">
+                    <div className="relative w-28 flex-shrink-0 bg-muted">
                       <img
                         src={article.image}
                         alt={`${article.title} - SmartyGym blog by Haris Falas`}
-                        width={400}
-                        height={400}
                         loading="lazy"
                         decoding="async"
-                        className="w-full h-full object-cover"
+                        className="absolute inset-0 w-full h-full object-cover"
                       />
                     </div>
-                    <div className="flex-1 min-w-0 py-2 pr-3">
-                      <div className="text-sm font-bold line-clamp-2 mb-1">{article.title}</div>
-                      <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
-                        <div className="flex items-center gap-1"><Clock className="h-3 w-3" />{article.readTime}</div>
-                        <div className="flex items-center gap-1"><Calendar className="h-3 w-3" />{article.date}</div>
-                      </div>
+                    <div className="flex-1 min-w-0 p-3 flex flex-col justify-center">
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">{article.category}</span>
+                      <h3 className="text-sm font-bold text-foreground leading-tight line-clamp-2 mt-0.5">{article.title}</h3>
+                      <p className="text-[11px] text-muted-foreground mt-1 line-clamp-1">{article.readTime} · {article.date}</p>
                     </div>
                   </button>
                 ))}
@@ -322,9 +322,11 @@ const Blog = () => {
 
           {showMobileCompactList && (
             <div className="mb-6">
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-lg font-bold capitalize">{categoryParam} Articles</h2>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-sm font-extrabold tracking-tight text-primary uppercase capitalize">{categoryParam} Articles</span>
+                <div className="h-px flex-1 bg-primary/20" />
                 <button
+                  type="button"
                   onClick={() => navigate('/blog')}
                   className="text-xs text-primary hover:underline"
                 >
@@ -335,27 +337,24 @@ const Blog = () => {
                 {filteredArticles.map((article) => (
                   <button
                     key={article.id}
+                    type="button"
                     onClick={() => navigate(`/blog/${article.slug}.html`)}
-                    className="flex gap-3 items-stretch rounded-lg overflow-hidden border-2 border-blue-500/60 hover:border-blue-500 bg-card text-left transition-colors"
+                    className="flex items-stretch bg-card border-2 border-green-500/60 rounded-xl overflow-hidden hover:border-green-500 hover:shadow-xl transition-all duration-300 text-left"
                     aria-label={article.title}
                   >
-                    <div className="w-24 shrink-0 aspect-square overflow-hidden">
+                    <div className="relative w-28 flex-shrink-0 bg-muted">
                       <img
                         src={article.image}
                         alt={`${article.title} - SmartyGym blog by Haris Falas`}
-                        width={400}
-                        height={400}
                         loading="lazy"
                         decoding="async"
-                        className="w-full h-full object-cover"
+                        className="absolute inset-0 w-full h-full object-cover"
                       />
                     </div>
-                    <div className="flex-1 min-w-0 py-2 pr-3">
-                      <div className="text-sm font-bold line-clamp-2 mb-1">{article.title}</div>
-                      <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
-                        <div className="flex items-center gap-1"><Clock className="h-3 w-3" />{article.readTime}</div>
-                        <div className="flex items-center gap-1"><Calendar className="h-3 w-3" />{article.date}</div>
-                      </div>
+                    <div className="flex-1 min-w-0 p-3 flex flex-col justify-center">
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">{article.category}</span>
+                      <h3 className="text-sm font-bold text-foreground leading-tight line-clamp-2 mt-0.5">{article.title}</h3>
+                      <p className="text-[11px] text-muted-foreground mt-1 line-clamp-1">{article.readTime} · {article.date}</p>
                     </div>
                   </button>
                 ))}
