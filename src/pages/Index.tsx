@@ -24,6 +24,8 @@ import { ScrollReveal } from "@/components/ScrollReveal";
 import { LazySection } from "@/components/LazySection";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useTodayWods } from "@/hooks/useTodayWods";
+import ritualWellbeingImage from "@/assets/ritual-wellbeing.jpg";
+import faqPlacardImage from "@/assets/faq-placard.jpg";
 import { fetchVisibleWorkoutMetadata } from "@/hooks/useTodayWods";
 import { getDifficultyColorClasses } from "@/lib/wodCycle";
 import { HeroDestinationConstellation } from "@/components/home/HeroDestinationConstellation";
@@ -1021,9 +1023,9 @@ const Index = () => {
           <div className="flex flex-col gap-3">
             {([
               { route: '/exerciselibrary', title: 'Exercise Library', label: 'Library', description: 'Video demonstrations for every exercise', image: heroLibraryBookImage },
-              { route: '/daily-ritual', title: 'Smarty Ritual', label: 'Daily', description: 'Your morning, midday and evening micro-routine', icon: Sparkles, iconClass: 'text-purple-500' },
+              { route: '/daily-ritual', title: 'Smarty Ritual', label: 'Daily', description: 'Your morning, midday and evening micro-routine', image: ritualWellbeingImage },
               { route: '/community', title: 'Community', label: 'Connect', description: 'Share progress, leaderboards and challenges', image: heroCommunityCelebratingImage },
-              { route: '/faq', title: 'Frequently Asked Questions', label: 'Help', description: 'Answers about plans, training and access', icon: HelpCircle, iconClass: 'text-purple-500' },
+              { route: '/faq', title: 'Frequently Asked Questions', label: 'Help', description: 'Answers about plans, training and access', image: faqPlacardImage },
               { route: '/coach-profile', title: 'Meet the Coach', label: 'Coach', description: 'Haris Falas — Sports Scientist & Founder', image: harisPhoto },
             ] as Array<{ route: string; title: string; label: string; description: string; image?: string; icon?: any; iconClass?: string }>).map((card) => (
               <button
