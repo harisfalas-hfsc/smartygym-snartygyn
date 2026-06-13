@@ -356,12 +356,12 @@ export default function SmartyPremium() {
                             {comparisonFeatures.map((feature, idx) => {
                               const Icon = feature.icon;
                               return (
-                                <div key={idx} className="flex justify-between items-center py-2 border-b border-primary/10">
-                                  <div className="flex items-center gap-2">
-                                    <Icon className="w-4 h-4 text-primary" />
-                                    <span className="text-sm font-medium">{feature.category}</span>
+                                <div key={idx} className="flex justify-between items-center gap-2 py-2 min-h-[56px] border-b border-primary/10">
+                                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                                    <Icon className="w-4 h-4 text-primary shrink-0" />
+                                    <span className="text-sm font-medium leading-tight">{feature.category}</span>
                                   </div>
-                                  <div>{renderFeatureValue(feature.visitor)}</div>
+                                  <div className="w-10 flex justify-end shrink-0">{renderFeatureValue(feature.visitor)}</div>
                                 </div>
                               );
                             })}
@@ -382,12 +382,12 @@ export default function SmartyPremium() {
                             {comparisonFeatures.map((feature, idx) => {
                               const Icon = feature.icon;
                               return (
-                                <div key={idx} className="flex justify-between items-center py-2 border-b border-primary/10">
-                                  <div className="flex items-center gap-2">
-                                    <Icon className="w-4 h-4 text-primary" />
-                                    <span className="text-sm font-medium">{feature.category}</span>
+                                <div key={idx} className="flex justify-between items-center gap-2 py-2 min-h-[56px] border-b border-primary/10">
+                                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                                    <Icon className="w-4 h-4 text-primary shrink-0" />
+                                    <span className="text-sm font-medium leading-tight">{feature.category}</span>
                                   </div>
-                                  <div>{renderFeatureValue(feature.subscriber)}</div>
+                                  <div className="w-10 flex justify-end shrink-0">{renderFeatureValue(feature.subscriber)}</div>
                                 </div>
                               );
                             })}
@@ -413,12 +413,12 @@ export default function SmartyPremium() {
                             {comparisonFeatures.map((feature, idx) => {
                               const Icon = feature.icon;
                               return (
-                                <div key={idx} className="flex justify-between items-center py-2 border-b border-primary/10">
-                                  <div className="flex items-center gap-2">
-                                    <Icon className="w-4 h-4 text-primary" />
-                                    <span className="text-sm font-medium">{feature.category}</span>
+                                <div key={idx} className="flex justify-between items-center gap-2 py-2 min-h-[56px] border-b border-primary/10">
+                                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                                    <Icon className="w-4 h-4 text-primary shrink-0" />
+                                    <span className="text-sm font-medium leading-tight">{feature.category}</span>
                                   </div>
-                                  <div>{renderFeatureValue(feature.premium)}</div>
+                                  <div className="w-10 flex justify-end shrink-0">{renderFeatureValue(feature.premium)}</div>
                                 </div>
                               );
                             })}
