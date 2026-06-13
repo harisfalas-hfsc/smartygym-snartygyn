@@ -120,7 +120,7 @@ export default function SmartyPremium() {
     { category: "Smarty Training Programs", icon: Flame, visitor: false, subscriber: "limited", premium: true },
     { category: "Smarty Ritual", icon: Sparkles, visitor: false, subscriber: true, premium: true },
     { category: "Smarty Check-ins", icon: ClipboardCheck, visitor: false, subscriber: false, premium: true },
-    { category: "Smarty Tools (1RM, BMR, Macro, Calories, Timer)", icon: Calculator, visitor: true, subscriber: true, premium: true },
+    { category: "Smarty Tools (Workout Timer, Rounds Tracker, 1RM, BMR, Macro, Calorie Counter)", icon: Calculator, visitor: true, subscriber: true, premium: true },
     { category: "Dashboard", icon: LayoutDashboard, visitor: false, subscriber: "limited", premium: true },
     { category: "LogBook", icon: FileText, visitor: false, subscriber: false, premium: true },
     { category: "Exercise Library", icon: BookOpen, visitor: true, subscriber: true, premium: true },
