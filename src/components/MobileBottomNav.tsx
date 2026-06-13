@@ -1,6 +1,6 @@
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Bell, Menu, ArrowLeft, Home, User as UserIcon, Crown, Building2, LayoutDashboard, LogOut, Shield, Users, Info, Dumbbell, ListChecks, Sparkles, Wrench, BookOpen, Newspaper, HelpCircle, Mail, Moon, Sun } from "lucide-react";
+import { Menu, ArrowLeft, Home, User as UserIcon, LayoutDashboard, LogOut, Shield, Users, Info, Dumbbell, ListChecks, Sparkles, Wrench, BookOpen, Newspaper, HelpCircle, Mail, Moon, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SmartyCoachModal } from "@/components/smarty-coach/SmartyCoachModal";
@@ -182,34 +182,20 @@ export const MobileBottomNav = () => {
             )}
           </button>
 
-          {/* Notifications */}
-          <button
-            type="button"
-            onClick={() => {
-              if (!user) { navigate("/auth?mode=login"); return; }
-              navigate("/userdashboard?tab=messages");
-              setTimeout(() => window.scrollTo(0, 0), 0);
-            }}
-            aria-label="Notifications"
-            className={cn(itemClass, "relative")}
-          >
-            <span className="relative inline-flex">
-              <Bell className="h-7 w-7" strokeWidth={2.25} />
-              {user && unreadCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-red-500" />
-              )}
-            </span>
-          </button>
-
           {/* Avatar / Login */}
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button type="button" aria-label="Account" className={itemClass}>
-                  <Avatar className="h-7 w-7 border-2 border-primary">
-                    <AvatarImage src={avatarUrl || undefined} alt="Profile" />
-                    <AvatarFallback className="text-xs">{getInitials()}</AvatarFallback>
-                  </Avatar>
+                  <span className="relative inline-flex">
+                    <Avatar className="h-7 w-7 border-2 border-primary">
+                      <AvatarImage src={avatarUrl || undefined} alt="Profile" />
+                      <AvatarFallback className="text-xs">{getInitials()}</AvatarFallback>
+                    </Avatar>
+                    {unreadCount > 0 && (
+                      <span className="pointer-events-none absolute top-0 right-0 h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-background" />
+                    )}
+                  </span>
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56 max-w-[calc(100vw-2rem)] bg-popover" align="end" sideOffset={8} side="top" forceMount>
