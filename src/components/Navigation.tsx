@@ -467,7 +467,7 @@ export const Navigation = () => {
               <img
                 src={smartyGymLogo}
                 alt="SmartyGym"
-                className="h-11 xs:h-[60px] sm:h-[72px] md:h-20 lg:h-16 w-auto max-w-[min(28vw,120px)] object-contain dark:mix-blend-lighten lg:max-w-none"
+                className="h-11 xs:h-[60px] sm:h-[72px] md:h-20 lg:h-11 w-auto max-w-[min(28vw,120px)] object-contain dark:mix-blend-lighten lg:max-w-none"
               />
             </button>
           </div>
