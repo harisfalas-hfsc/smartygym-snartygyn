@@ -15,8 +15,8 @@ export const DeviceThemeDefault = () => {
     if (sessionTheme) {
       setTheme(sessionTheme);
     } else {
-      setTheme("dark");
-      sessionStorage.setItem("smartygym-session-theme", "dark");
+      setTheme("light");
+      sessionStorage.setItem("smartygym-session-theme", "light");
     }
   }, [setTheme]);
 
