@@ -187,6 +187,16 @@ const About = () => {
                   <p className="text-base text-muted-foreground text-center leading-relaxed">
                     Everything a complete gym must offer, built by real professionals, in your pocket at <strong className="text-primary">smartygym.com</strong>.
                   </p>
+                  {!isPremium && (
+                    <Link
+                      to="/smarty-premium"
+                      className="inline-flex items-center gap-1.5 text-sm font-semibold text-green-500 hover:text-green-600 hover:underline md:hidden"
+                    >
+                      <Crown className="w-4 h-4" />
+                      Unlock everything for life
+                      <ChevronRight className="w-4 h-4" />
+                    </Link>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -229,7 +239,7 @@ const About = () => {
                   </div>
                   <Link 
                     to="/why-invest-in-smartygym" 
-                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-green-500 hover:text-green-600 hover:underline"
                   >
                     Why Invest in SmartyGym
                     <ChevronRight className="w-4 h-4" />
@@ -266,7 +276,7 @@ const About = () => {
                     <span className="text-sm font-semibold text-foreground">Safe and Effective</span>
                   </div>
                   </div>
-                   <Link to="/the-smarty-method" className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline mt-2">
+                   <Link to="/the-smarty-method" className="inline-flex items-center gap-1.5 text-sm font-semibold text-green-500 hover:text-green-600 hover:underline mt-2">
                      <BookOpen className="w-4 h-4" />
                      Discover The Smarty Method
                      <ChevronRight className="w-4 h-4" />
@@ -291,10 +301,10 @@ const About = () => {
                    Every workout, program, ritual and tool — designed 100% by humans. One-time payment, lifetime access.
                  </p>
                  <p className="text-3xl font-extrabold text-primary">€89.99</p>
-                 <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
-                   Unlock Smarty Premium
-                   <ChevronRight className="w-4 h-4" />
-                 </span>
+                  <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-green-500">
+                    Unlock Smarty Premium
+                    <ChevronRight className="w-4 h-4" />
+                  </span>
                </div>
              </CardContent>
            </Card>
@@ -345,7 +355,7 @@ const About = () => {
                 </Card>
               </div>
               <div className="text-center mt-6">
-                <Link to="/the-smarty-method" className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline">
+                <Link to="/the-smarty-method" className="inline-flex items-center gap-1.5 text-sm font-semibold text-green-500 hover:text-green-600 hover:underline">
                   <BookOpen className="w-4 h-4" />
                   Discover The Smarty Method
                   <ChevronRight className="w-4 h-4" />
@@ -431,7 +441,7 @@ const About = () => {
                   <div className="pt-2 border-t border-border text-center">
                     <a
                       href="/the-smarty-method"
-                      className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline mt-4"
+                      className="inline-flex items-center gap-1.5 text-sm font-semibold text-green-500 hover:text-green-600 hover:underline mt-4"
                     >
                       Discover The Smarty Method
                       <ChevronRight className="w-4 h-4" />
