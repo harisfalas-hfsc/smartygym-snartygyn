@@ -315,10 +315,18 @@ export const Navigation = () => {
             aria-label="SmartyGym home"
             className="text-lg font-extrabold tracking-tight leading-none"
           >
-            <span className="text-primary">Smarty</span>
-            <span className="text-green-500">Gym</span>
+            <span className="text-primary">SMARTY</span>
+            <span className="text-green-500">GYM</span>
           </button>
           <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setSmartyCoachOpen(true)}
+            aria-label="Smarty Coach"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full border-2 border-primary bg-background shadow-[0_2px_8px_-2px_hsl(var(--primary)/0.4)]"
+          >
+            <img src={smartyCoachIcon} alt="" aria-hidden="true" className="h-6 w-6 rounded-full" width={24} height={24} />
+          </button>
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -347,6 +355,18 @@ export const Navigation = () => {
                 <DropdownMenuItem onSelect={() => handleProfileNavigate("/userdashboard")}>
                   <LayoutDashboard className="mr-2 h-4 w-4" /><span>Dashboard</span>
                 </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    setTheme(resolvedTheme === "dark" ? "light" : "dark");
+                  }}
+                >
+                  {resolvedTheme === "dark" ? (
+                    <><Sun className="mr-2 h-4 w-4" /><span>Light Mode</span></>
+                  ) : (
+                    <><Moon className="mr-2 h-4 w-4" /><span>Dark Mode</span></>
+                  )}
+                </DropdownMenuItem>
                 {isAdmin && (
                   <>
                     <DropdownMenuSeparator />
@@ -362,22 +382,38 @@ export const Navigation = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <button
-              type="button"
-              onClick={() => { navigate("/auth?mode=login"); setTimeout(() => window.scrollTo(0, 0), 0); }}
-              className="inline-flex h-7 items-center justify-center rounded-full border-2 border-primary px-3 text-xs font-semibold text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
-            >
-              Log In
-            </button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  className="inline-flex h-7 items-center justify-center rounded-full border-2 border-primary px-3 text-xs font-semibold text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+                >
+                  Log In
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-48 max-w-[calc(100vw-2rem)] bg-popover" align="end" sideOffset={6}>
+                <DropdownMenuItem onSelect={() => { navigate("/auth?mode=login"); setTimeout(() => window.scrollTo(0, 0), 0); }}>
+                  <UserIcon className="mr-2 h-4 w-4" /><span>Login</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => { navigate("/auth?mode=signup"); setTimeout(() => window.scrollTo(0, 0), 0); }}>
+                  <UserIcon className="mr-2 h-4 w-4" /><span>Sign Up</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    setTheme(resolvedTheme === "dark" ? "light" : "dark");
+                  }}
+                >
+                  {resolvedTheme === "dark" ? (
+                    <><Sun className="mr-2 h-4 w-4" /><span>Light Mode</span></>
+                  ) : (
+                    <><Moon className="mr-2 h-4 w-4" /><span>Dark Mode</span></>
+                  )}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
-          <button
-            type="button"
-            onClick={() => setSmartyCoachOpen(true)}
-            aria-label="Smarty Coach"
-            className="inline-flex h-8 w-8 items-center justify-center rounded-full border-2 border-primary bg-background shadow-[0_2px_8px_-2px_hsl(var(--primary)/0.4)]"
-          >
-            <img src={smartyCoachIcon} alt="" aria-hidden="true" className="h-6 w-6 rounded-full" width={24} height={24} />
-          </button>
           </div>
         </div>
       </header>
