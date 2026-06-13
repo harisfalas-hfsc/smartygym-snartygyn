@@ -444,13 +444,13 @@ const About = () => {
           </ScrollReveal>
 
 
-          {/* Subscription Plans */}
+          {/* Ready to Start Your Journey */}
           <ScrollReveal>
             <Card className="mb-12 border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-background">
               <CardHeader className="text-center">
                 <CardTitle className="flex items-center justify-center gap-2">
                   <Crown className="h-5 w-5 text-primary" />
-                  Smarty Premium
+                  Ready to Start Your Journey
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -482,24 +482,6 @@ const About = () => {
               </CardContent>
             </Card>
           </ScrollReveal>
-
-          {/* CTA - Only visible to non-premium users */}
-          {!isPremium && (
-            <ScrollReveal>
-              <Card className="border-2 border-primary bg-primary/5 text-center">
-                <CardContent className="p-6 space-y-4">
-                  <h2 className="text-2xl md:text-3xl font-bold">Ready to Start Your Journey?</h2>
-                  <Button 
-                    size="lg" 
-                    onClick={() => navigate('/smarty-premium')}
-                    className="mt-4"
-                  >
-                    Start Now
-                  </Button>
-                </CardContent>
-              </Card>
-            </ScrollReveal>
-          )}
 
         </div>
       </div>
