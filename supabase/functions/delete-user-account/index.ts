@@ -139,7 +139,8 @@ serve(async (req) => {
       "ritual_purchases",
       "user_purchases",
       "user_activity_log",
-      "user_calendar_connections",
+      "blog_article_views",
+      "parq_responses",
     ];
 
     for (const table of tier3Tables) {
@@ -180,6 +181,19 @@ serve(async (req) => {
     } catch (e) {
       const errMsg = e instanceof Error ? e.message : String(e);
       logStep("Error with contact messages", { error: errMsg });
+    }
+
+    // Newsletter subscribers are keyed by email, not user_id
+    try {
+      const { error } = await supabaseAdmin
+        .from("newsletter_subscribers")
+        .delete()
+        .eq("email", userEmail);
+      if (error) logStep("Error deleting newsletter_subscribers", { error: error.message });
+      else logStep("Deleted newsletter_subscribers");
+    } catch (e) {
+      const errMsg = e instanceof Error ? e.message : String(e);
+      logStep("Error with newsletter_subscribers", { error: errMsg });
     }
 
     // Tier 4: Corporate handling
