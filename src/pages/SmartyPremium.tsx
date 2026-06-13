@@ -32,6 +32,7 @@ import {
   CircleMinus,
   FileText,
   Infinity as InfinityIcon,
+  Rocket,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
@@ -150,7 +151,8 @@ export default function SmartyPremium() {
     { icon: BookOpen, title: "Exercise Library", description: "Complete exercise database with videos" },
     { icon: Calculator, title: "Fitness Tools", description: "BMR, 1RM, and macro calculators with history" },
     { icon: Sparkles, title: "Rituals & Check-ins", description: "Daily wellness routines and fitness tracking check-ins" },
-    { icon: Zap, title: "Priority Support", description: "Get help when you need it" }
+    { icon: Zap, title: "Priority Support", description: "Get help when you need it" },
+    { icon: Rocket, title: "Future Content", description: "All new workouts, programs & features — no extra cost", highlight: true }
   ];
 
   const LifetimeCard = (
