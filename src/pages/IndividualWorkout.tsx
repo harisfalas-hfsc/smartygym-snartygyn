@@ -1,16 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet";
-import { Button } from "@/components/ui/button";
-import { BookOpen } from "lucide-react";
 import { WorkoutDisplay } from "@/components/WorkoutDisplay";
 import { AccessGate } from "@/components/AccessGate";
 import { useWorkoutData, type WorkoutData } from "@/hooks/useWorkoutData";
-import { useAccessControl } from "@/hooks/useAccessControl";
 import { ContentNotFound } from "@/components/ContentNotFound";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
-import { ReaderModeDialog } from "@/components/ReaderModeDialog";
-import { ExerciseHTMLContent } from "@/components/ExerciseHTMLContent";
 import { getWorkoutCategorySlug, slugifyContentName } from "@/lib/seo-slugs";
 
 // Helper function to generate SEO-optimized alt text
@@ -30,10 +25,8 @@ const generateWorkoutAltText = (workout: WorkoutData): string => {
 const IndividualWorkout = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [readerModeOpen, setReaderModeOpen] = useState(false);
   const { type, id } = useParams();
   const lookupId = id || type;
-  const { userTier, hasPurchased } = useAccessControl();
   
   // Use centralized category labels
   const getCategoryLabel = (category: string | undefined | null): string => {
