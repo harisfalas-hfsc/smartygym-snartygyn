@@ -27,6 +27,7 @@ interface Article {
   image: string;
   readTime: string;
   date: string;
+  timestamp: number;
   category: string;
   author_name?: string;
 }
@@ -48,26 +49,30 @@ const Blog = () => {
         const {
           data,
           error
-        } = await supabase.from('blog_articles').select('*').eq('is_published', true).order('published_at', {
-          ascending: false
-        });
+        } = await supabase.from('blog_articles').select('*').eq('is_published', true);
         if (error) throw error;
         if (data && data.length > 0) {
-          const formattedArticles: Article[] = data.map((article: any) => ({
-            id: article.id,
-            slug: article.slug,
-            title: article.title,
-            excerpt: article.excerpt,
-            image: getBlogArticleImage(article.image_url, article.slug),
-            readTime: article.read_time || '5 min read',
-            date: new Date(article.published_at || article.created_at).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
-            }),
-            category: article.category,
-            author_name: article.author_name
-          }));
+          const formattedArticles: Article[] = data
+            .map((article: any) => {
+              const articleDate = article.published_at || article.created_at;
+              return {
+                id: article.id,
+                slug: article.slug,
+                title: article.title,
+                excerpt: article.excerpt,
+                image: getBlogArticleImage(article.image_url, article.slug),
+                readTime: article.read_time || '5 min read',
+                date: new Date(articleDate).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                }),
+                timestamp: new Date(articleDate).getTime(),
+                category: article.category,
+                author_name: article.author_name
+              };
+            })
+            .sort((a, b) => b.timestamp - a.timestamp);
           setAllArticles(formattedArticles);
         }
       } catch (error) {
@@ -77,8 +82,8 @@ const Blog = () => {
     fetchArticles();
   }, []);
   const filteredArticles = allArticles.filter(article => categoryFilter === "all" || article.category.toLowerCase() === categoryFilter.toLowerCase()).sort((a, b) => {
-    const dateA = new Date(a.date).getTime();
-    const dateB = new Date(b.date).getTime();
+    const dateA = a.timestamp;
+    const dateB = b.timestamp;
     return sortFilter === "newest" ? dateB - dateA : dateA - dateB;
   });
 
@@ -333,6 +338,19 @@ const Blog = () => {
                   ← All categories
                 </button>
               </div>
+              <CompactFilters filters={[{
+                name: "Sort by",
+                value: sortFilter,
+                onChange: setSortFilter,
+                options: [{
+                  value: "newest",
+                  label: "Newest"
+                }, {
+                  value: "oldest",
+                  label: "Oldest"
+                }],
+                placeholder: "Sort"
+              }]} compact />
               <div className="flex flex-col gap-3">
                 {filteredArticles.map((article) => (
                   <button
