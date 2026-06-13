@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { InfoRibbon } from "@/components/InfoRibbon";
-import { Clock, Calendar } from "lucide-react";
+import { Clock, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { CompactFilters } from "@/components/CompactFilters";
 import { Link } from "react-router-dom";
@@ -14,6 +14,8 @@ import { generateHarisFalasSchema } from "@/utils/seoSchemas";
 import { getBlogArticleImage } from "@/utils/blogImages";
 import { BlogSEOEnhancement } from "@/components/seo/BlogSEOEnhancement";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
+import { cn } from "@/lib/utils";
 import categoryFitnessImg from "@/assets/blog/category-fitness.jpg";
 import categoryNutritionImg from "@/assets/blog/category-nutrition.jpg";
 import categoryWellnessImg from "@/assets/blog/category-wellness.jpg";
@@ -87,6 +89,15 @@ const Blog = () => {
   ];
   const showMobileCategoryHub = isMobile && !categoryParam;
   const showMobileCompactList = isMobile && !!categoryParam;
+  const [blogCatApi, setBlogCatApi] = useState<CarouselApi>();
+  const [blogCatSlide, setBlogCatSlide] = useState(0);
+  useEffect(() => {
+    if (!blogCatApi) return;
+    const onSelect = () => setBlogCatSlide(blogCatApi.selectedScrollSnap());
+    onSelect();
+    blogCatApi.on("select", onSelect);
+    return () => { blogCatApi.off("select", onSelect); };
+  }, [blogCatApi]);
   return <>
       <Helmet>
         <title>Fitness Blog Articles by Haris Falas | SmartyGym</title>
