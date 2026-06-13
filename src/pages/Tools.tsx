@@ -238,7 +238,7 @@ const Tools = () => {
                   <CarouselItem key={tool.id} className="pl-2 basis-[75%] sm:basis-[60%]">
                     <div
                       onClick={() => navigate(tool.route)}
-                      className="smarty-carousel-card-portrait-tablet flex flex-col h-[300px] min-[540px]:h-[600px] bg-card border-2 border-primary/40 rounded-xl overflow-hidden cursor-pointer hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300"
+                      className="smarty-carousel-card-portrait-tablet flex flex-col h-[300px] min-[540px]:h-[600px] bg-card border-2 border-green-500/60 rounded-xl overflow-hidden cursor-pointer hover:border-green-500 hover:scale-[1.02] hover:shadow-xl transition-all duration-300"
                     >
                       {/* Image section */}
                       <div className="smarty-carousel-image-portrait-tablet relative h-[58%] min-[540px]:h-[72%] min-[540px]:aspect-auto overflow-hidden flex-shrink-0 bg-muted">
