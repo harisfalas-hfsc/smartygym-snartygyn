@@ -761,7 +761,7 @@ const Index = () => {
                     <CarouselItem key={card.id} className="pl-3 basis-[75%] sm:basis-[60%]">
                       <div onClick={() => navigate(card.route)} className="border-2 border-primary/40 rounded-xl overflow-hidden hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300 cursor-pointer bg-card flex flex-col">
                         <div className="relative aspect-[16/8] w-full overflow-hidden flex-shrink-0">
-                          <img src={card.image} alt={card.title} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover object-[center_top]" />
+                          <img src={card.image} alt={card.title} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover object-center" />
                         </div>
                         <div className="flex flex-col justify-center flex-1 p-2 text-center">
                           <div className="flex items-center justify-center gap-1.5 mb-0.5">
