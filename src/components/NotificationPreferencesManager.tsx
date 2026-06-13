@@ -211,9 +211,9 @@ function normalise(raw: any): Preferences {
     const node = raw[row.key];
     if (node && typeof node === "object") {
       base[row.key] = {
-        email: node.email !== false,
-        dashboard: node.dashboard !== false,
-        push: node.push !== false,
+        email: node.email !== false && legacyChannelValue(raw, row.key, "email"),
+        dashboard: node.dashboard !== false && legacyChannelValue(raw, row.key, "dashboard"),
+        push: node.push !== false && legacyChannelValue(raw, row.key, "push"),
       };
     } else {
       base[row.key] = {
