@@ -247,98 +247,11 @@ const IndividualWorkout = () => {
         </Helmet>
         <div className="min-h-screen bg-background">
           <div className="container mx-auto px-4 pb-8">
-            {/* Calculate access for Reader Mode */}
-            {(() => {
-              const hasAccess = userTier === "premium" || hasPurchased(dbWorkout.id, "workout") || !dbWorkout.is_premium;
-              return (
-                <>
-                  <div className="mb-4 flex items-center justify-end">
-                    {hasAccess && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setReaderModeOpen(true)}
-                        className="gap-2"
-                      >
-                        <BookOpen className="h-4 w-4" />
-                        <span className="hidden sm:inline">Reader Mode</span>
-                      </Button>
-                    )}
-                  </div>
-
-                  <PageBreadcrumbs items={[
-                    { label: "Home", href: "/" },
-                    { label: "Smarty Workouts", href: "/workout" },
-                    { label: dbWorkout.name }
-                  ]} />
-
-                  {hasAccess && (
-                    <ReaderModeDialog
-                      open={readerModeOpen}
-                      onOpenChange={setReaderModeOpen}
-                      title={dbWorkout.name}
-                      metadata={{
-                        duration: dbWorkout.duration || undefined,
-                        equipment: dbWorkout.equipment || undefined,
-                        category: getCategoryLabel(dbWorkout.category)
-                      }}
-                      content={
-                        <div className="space-y-6 workout-content">
-                            {dbWorkout.description && (
-                            <div>
-                              <h2 className="text-lg font-semibold mb-2">Description</h2>
-                              <ExerciseHTMLContent content={dbWorkout.description} enableExerciseLinking={false} />
-                            </div>
-                          )}
-                          {dbWorkout.warm_up && (
-                            <div>
-                              <h2 className="text-lg font-semibold mb-2">Warm Up</h2>
-                              <ExerciseHTMLContent content={dbWorkout.warm_up} enableExerciseLinking={true} />
-                            </div>
-                          )}
-                          {dbWorkout.activation && (
-                            <div>
-                              <h2 className="text-lg font-semibold mb-2">Activation</h2>
-                              <ExerciseHTMLContent content={dbWorkout.activation} enableExerciseLinking={true} />
-                            </div>
-                          )}
-                          {dbWorkout.main_workout && (
-                            <div>
-                              <h2 className="text-lg font-semibold mb-2">Main Workout</h2>
-                              <ExerciseHTMLContent content={dbWorkout.main_workout} enableExerciseLinking={true} />
-                            </div>
-                          )}
-                          {dbWorkout.finisher && (
-                            <div>
-                              <h2 className="text-lg font-semibold mb-2">Finisher</h2>
-                              <ExerciseHTMLContent content={dbWorkout.finisher} enableExerciseLinking={true} />
-                            </div>
-                          )}
-                          {dbWorkout.cool_down && (
-                            <div>
-                              <h2 className="text-lg font-semibold mb-2">Cool Down</h2>
-                              <ExerciseHTMLContent content={dbWorkout.cool_down} enableExerciseLinking={true} />
-                            </div>
-                          )}
-                          {dbWorkout.instructions && (
-                            <div>
-                              <h2 className="text-lg font-semibold mb-2">Instructions</h2>
-                              <ExerciseHTMLContent content={dbWorkout.instructions} enableExerciseLinking={false} />
-                            </div>
-                          )}
-                          {dbWorkout.tips && (
-                            <div>
-                              <h2 className="text-lg font-semibold mb-2">Tips</h2>
-                              <ExerciseHTMLContent content={dbWorkout.tips} enableExerciseLinking={false} />
-                            </div>
-                          )}
-                        </div>
-                      }
-                    />
-                  )}
-                </>
-              );
-            })()}
+            <PageBreadcrumbs items={[
+              { label: "Home", href: "/" },
+              { label: "Smarty Workouts", href: "/workout" },
+              { label: dbWorkout.name }
+            ]} />
 
 
             <AccessGate 
