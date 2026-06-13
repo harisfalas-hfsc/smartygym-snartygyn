@@ -35,6 +35,8 @@ import heroProgramsImage from "@/assets/hero-programs.jpg";
 import heroToolsImage from "@/assets/hero-tools.jpg";
 import heroLibraryImage from "@/assets/hero-exercise-library-new.jpg";
 import heroCommunityImage from "@/assets/hero-community-new.jpg";
+import heroCommunityCelebratingImage from "@/assets/hero-community-celebrating.jpg";
+import heroLibraryBookImage from "@/assets/hero-library-book.jpg";
 import valueBuiltForRealLife from "@/assets/value-built-for-real-life.jpg";
 import valueScientificApproach from "@/assets/value-scientific-approach.jpg";
 import valueAccessibleToAll from "@/assets/value-accessible-to-all.jpg";
@@ -79,6 +81,8 @@ const Index = () => {
   const [programsSlide, setProgramsSlide] = useState(0);
   const [blogCarouselApi, setBlogCarouselApi] = useState<CarouselApi>();
   const [blogSlide, setBlogSlide] = useState(0);
+  const [toolsCarouselApi, setToolsCarouselApi] = useState<CarouselApi>();
+  const [toolsSlide, setToolsSlide] = useState(0);
   const [activeWodIndex, setActiveWodIndex] = useState(0);
 
   useEffect(() => {
@@ -104,6 +108,14 @@ const Index = () => {
     blogCarouselApi.on("select", onSelect);
     return () => { blogCarouselApi.off("select", onSelect); };
   }, [blogCarouselApi]);
+
+  useEffect(() => {
+    if (!toolsCarouselApi) return;
+    const onSelect = () => setToolsSlide(toolsCarouselApi.selectedScrollSnap());
+    onSelect();
+    toolsCarouselApi.on("select", onSelect);
+    return () => { toolsCarouselApi.off("select", onSelect); };
+  }, [toolsCarouselApi]);
 
   // First carousel: workout categories (matches WorkoutFlow)
   const heroCards = [
@@ -134,6 +146,14 @@ const Index = () => {
     { id: "fitness", title: "Fitness", description: "Training science, programming and performance", icon: Dumbbell, route: "/blog/category/fitness", image: heroWorkoutsImage },
     { id: "nutrition", title: "Nutrition", description: "Evidence-based nutrition for body composition", icon: Flame, route: "/blog/category/nutrition", image: heroNutritionImage },
     { id: "wellness", title: "Wellness", description: "Recovery, sleep and longevity insights", icon: Heart, route: "/blog/category/wellness", image: heroCommunityImage },
+  ];
+
+  // Fourth carousel: Smarty Tools
+  const toolsCards = [
+    { id: "1rm", title: "1RM Calculator", description: "Calculate your one-rep maximum", icon: Calculator, route: "/1rmcalculator", image: heroToolsImage },
+    { id: "bmr", title: "BMR Calculator", description: "Know your daily calorie needs", icon: Activity, route: "/bmrcalculator", image: heroToolsImage },
+    { id: "macro", title: "Macro Calculator", description: "Personalized nutrition targets", icon: Flame, route: "/macrocalculator", image: heroToolsImage },
+    { id: "timer", title: "Workout Timer", description: "Interval timer for any workout", icon: Clock, route: "/workouttimer", image: heroToolsImage },
   ];
 
   // Fetch review stats for SEO schema - low priority, don't block render
