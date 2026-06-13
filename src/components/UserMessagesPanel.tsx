@@ -13,7 +13,6 @@ import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { NotificationPreferencesManager } from "@/components/NotificationPreferencesManager";
-import { MobilePushNotificationManager } from "@/components/MobilePushNotificationManager";
 import {
   Select,
   SelectContent,
@@ -1190,7 +1189,6 @@ export const UserMessagesPanel = () => {
 
         <TabsContent value="subscriptions" className="mt-0 space-y-6">
           <NotificationPreferencesManager />
-          <MobilePushNotificationManager />
         </TabsContent>
       </Tabs>
 
