@@ -56,18 +56,9 @@ export const Navigation = () => {
   const headerRef = useRef<HTMLElement>(null);
   const [headerHidden, setHeaderHidden] = useState(false);
 
-  // Mobile: hide header when scrolled past top, show again at the very top
+  // Header stays permanently visible — no hide-on-scroll.
   useEffect(() => {
-    if (!isMobile) {
-      setHeaderHidden(false);
-      return;
-    }
-    const onScroll = () => {
-      setHeaderHidden(window.scrollY > 10);
-    };
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    setHeaderHidden(false);
   }, [isMobile]);
 
   // Dynamically set --app-header-h CSS variable based on actual header height
@@ -304,13 +295,10 @@ export const Navigation = () => {
     {isMobile && (
       <header
         ref={headerRef}
-        className={cn(
-          "fixed top-0 left-0 right-0 z-50 bg-background border-b border-primary/20 transition-transform duration-300 will-change-transform",
-          headerHidden && "-translate-y-full"
-        )}
+        className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-primary/20"
         style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
       >
-        <div className="flex h-11 items-center justify-between px-3">
+        <div className="flex h-11 items-center justify-between gap-2 px-3">
           <button
             type="button"
             onClick={() => {
@@ -327,6 +315,7 @@ export const Navigation = () => {
             <span className="text-primary">Smarty</span>
             <span className="text-green-500">Gym</span>
           </button>
+          <div className="flex items-center gap-2">
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -378,6 +367,15 @@ export const Navigation = () => {
               Log In
             </button>
           )}
+          <button
+            type="button"
+            onClick={() => setSmartyCoachOpen(true)}
+            aria-label="Smarty Coach"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full border-2 border-primary bg-background shadow-[0_2px_8px_-2px_hsl(var(--primary)/0.4)]"
+          >
+            <img src={smartyCoachIcon} alt="" aria-hidden="true" className="h-6 w-6 rounded-full" width={24} height={24} />
+          </button>
+          </div>
         </div>
       </header>
     )}
