@@ -14,7 +14,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { NotificationPreferencesManager } from "@/components/NotificationPreferencesManager";
 import { MobilePushNotificationManager } from "@/components/MobilePushNotificationManager";
-import { useAccessControl } from "@/contexts/AccessControlContext";
 import {
   Select,
   SelectContent,
@@ -136,8 +135,6 @@ export const UserMessagesPanel = () => {
   const [expandedSystemMessages, setExpandedSystemMessages] = useState<Set<string>>(new Set());
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { userTier } = useAccessControl();
-  const isPremiumUser = userTier === "premium";
 
   const openLinkInternally = (link: string, messageType?: string) => {
     const destination = messageType ? MESSAGE_TYPE_DESTINATIONS[messageType] : null;
