@@ -156,10 +156,12 @@ const Index = () => {
 
   // Fourth carousel: Smarty Tools
   const toolsCards = [
-    { id: "1rm", title: "1RM Calculator", description: "Calculate your one-rep maximum", icon: Calculator, route: "/1rmcalculator", image: heroToolsImage },
-    { id: "bmr", title: "BMR Calculator", description: "Know your daily calorie needs", icon: Activity, route: "/bmrcalculator", image: heroToolsImage },
-    { id: "macro", title: "Macro Calculator", description: "Personalized nutrition targets", icon: Flame, route: "/macrocalculator", image: heroToolsImage },
-    { id: "timer", title: "Workout Timer", description: "Interval timer for any workout", icon: Clock, route: "/workouttimer", image: heroToolsImage },
+    { id: "timer", title: "Workout Timer", description: "Interval timer for HIIT, Tabata & circuits", icon: Clock, route: "/tools/workout-timer", image: toolTimerImage },
+    { id: "rounds", title: "Rounds Tracker", description: "Tap to track rounds and reps", icon: Activity, route: "/tools/rounds-tracker", image: toolRoundsImage },
+    { id: "1rm", title: "1RM Calculator", description: "Calculate your one-rep maximum", icon: Calculator, route: "/tools/1rm-calculator", image: tool1RmImage },
+    { id: "bmr", title: "BMR Calculator", description: "Know your daily calorie needs", icon: Activity, route: "/tools/bmr-calculator", image: toolBmrImage },
+    { id: "macro", title: "Macro Calculator", description: "Personalized nutrition targets", icon: Flame, route: "/tools/macro-calculator", image: toolMacroImage },
+    { id: "calorie", title: "Calorie Counter", description: "Search any food for calories & macros", icon: Flame, route: "/tools/calorie-counter", image: toolCalorieImage },
   ];
 
   // Fetch review stats for SEO schema - low priority, don't block render
