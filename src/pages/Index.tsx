@@ -641,6 +641,12 @@ const Index = () => {
                 <br />
                 <span className="text-primary">All In Your Pocket.</span>
               </p>
+              <Link
+                to="/about"
+                className="inline-block mt-2 text-sm font-semibold text-green-500 hover:text-green-600 transition-colors"
+              >
+                About Smarty Gym
+              </Link>
             </div>
 
             {/* Workouts carousel title */}
