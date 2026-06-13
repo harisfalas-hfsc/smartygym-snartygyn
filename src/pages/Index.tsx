@@ -643,10 +643,11 @@ const Index = () => {
               </p>
               <Link
                 to="/about"
-                className="inline-flex items-center gap-1.5 mt-2 text-sm font-semibold text-green-500 hover:text-green-600 hover:underline transition-colors"
+                className="inline-flex items-center gap-1.5 mt-2 text-base font-semibold text-green-500 hover:text-green-600 hover:underline transition-colors"
               >
+                <Info className="w-5 h-5" />
                 About SmartyGym
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="w-5 h-5" />
               </Link>
             </div>
 
