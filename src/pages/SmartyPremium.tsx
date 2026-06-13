@@ -305,21 +305,21 @@ export default function SmartyPremium() {
               <div className="grid grid-cols-2 gap-2 md:hidden">
                 {benefits.map((benefit, index) => (
                   <div key={index} className="flex items-center gap-1.5 py-2 px-1 border-b border-primary/10 min-w-0">
-                    <benefit.icon className="h-3.5 w-3.5 text-primary shrink-0" />
-                    <span className="text-xs font-medium whitespace-nowrap truncate">{benefit.title}</span>
+                    <benefit.icon className={`h-3.5 w-3.5 shrink-0 ${benefit.highlight ? 'text-green-600' : 'text-primary'}`} />
+                    <span className={`text-xs font-medium whitespace-nowrap truncate ${benefit.highlight ? 'text-green-600' : ''}`}>{benefit.title}</span>
                   </div>
                 ))}
               </div>
 
               <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {benefits.map((benefit, index) => (
-                  <div key={index} className="flex items-start gap-3 p-4 bg-muted rounded-lg">
-                    <div className="p-2 bg-primary/10 rounded-full shrink-0">
-                      <benefit.icon className="h-5 w-5 text-primary" />
+                  <div key={index} className={`flex items-start gap-3 p-4 rounded-lg ${benefit.highlight ? 'bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900' : 'bg-muted'}`}>
+                    <div className={`p-2 rounded-full shrink-0 ${benefit.highlight ? 'bg-green-100 dark:bg-green-900/30' : 'bg-primary/10'}`}>
+                      <benefit.icon className={`h-5 w-5 ${benefit.highlight ? 'text-green-600' : 'text-primary'}`} />
                     </div>
                     <div>
-                      <h3 className="font-semibold mb-1">{benefit.title}</h3>
-                      <p className="text-sm text-muted-foreground">{benefit.description}</p>
+                      <h3 className={`font-semibold mb-1 ${benefit.highlight ? 'text-green-600' : ''}`}>{benefit.title}</h3>
+                      <p className={`text-sm ${benefit.highlight ? 'text-green-600' : 'text-muted-foreground'}`}>{benefit.description}</p>
                     </div>
                   </div>
                 ))}
