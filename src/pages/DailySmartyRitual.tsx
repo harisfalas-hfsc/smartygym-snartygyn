@@ -16,7 +16,7 @@ import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { ReaderModeDialog } from "@/components/ReaderModeDialog";
 
-import harisPhoto from "@/assets/haris-falas-coach.png";
+import ritualIcon from "@/assets/daily-smarty-ritual-icon.jpg";
 
 interface DailyRitual {
   id: string;
