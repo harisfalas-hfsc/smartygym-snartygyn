@@ -35,6 +35,8 @@ import heroProgramsImage from "@/assets/hero-programs.jpg";
 import heroToolsImage from "@/assets/hero-tools.jpg";
 import heroLibraryImage from "@/assets/hero-exercise-library-new.jpg";
 import heroCommunityImage from "@/assets/hero-community-new.jpg";
+import heroCommunityCelebratingImage from "@/assets/hero-community-celebrating.jpg";
+import heroLibraryBookImage from "@/assets/hero-library-book.jpg";
 import valueBuiltForRealLife from "@/assets/value-built-for-real-life.jpg";
 import valueScientificApproach from "@/assets/value-scientific-approach.jpg";
 import valueAccessibleToAll from "@/assets/value-accessible-to-all.jpg";
@@ -79,6 +81,8 @@ const Index = () => {
   const [programsSlide, setProgramsSlide] = useState(0);
   const [blogCarouselApi, setBlogCarouselApi] = useState<CarouselApi>();
   const [blogSlide, setBlogSlide] = useState(0);
+  const [toolsCarouselApi, setToolsCarouselApi] = useState<CarouselApi>();
+  const [toolsSlide, setToolsSlide] = useState(0);
   const [activeWodIndex, setActiveWodIndex] = useState(0);
 
   useEffect(() => {
@@ -104,6 +108,14 @@ const Index = () => {
     blogCarouselApi.on("select", onSelect);
     return () => { blogCarouselApi.off("select", onSelect); };
   }, [blogCarouselApi]);
+
+  useEffect(() => {
+    if (!toolsCarouselApi) return;
+    const onSelect = () => setToolsSlide(toolsCarouselApi.selectedScrollSnap());
+    onSelect();
+    toolsCarouselApi.on("select", onSelect);
+    return () => { toolsCarouselApi.off("select", onSelect); };
+  }, [toolsCarouselApi]);
 
   // First carousel: workout categories (matches WorkoutFlow)
   const heroCards = [
@@ -134,6 +146,14 @@ const Index = () => {
     { id: "fitness", title: "Fitness", description: "Training science, programming and performance", icon: Dumbbell, route: "/blog/category/fitness", image: heroWorkoutsImage },
     { id: "nutrition", title: "Nutrition", description: "Evidence-based nutrition for body composition", icon: Flame, route: "/blog/category/nutrition", image: heroNutritionImage },
     { id: "wellness", title: "Wellness", description: "Recovery, sleep and longevity insights", icon: Heart, route: "/blog/category/wellness", image: heroCommunityImage },
+  ];
+
+  // Fourth carousel: Smarty Tools
+  const toolsCards = [
+    { id: "1rm", title: "1RM Calculator", description: "Calculate your one-rep maximum", icon: Calculator, route: "/1rmcalculator", image: heroToolsImage },
+    { id: "bmr", title: "BMR Calculator", description: "Know your daily calorie needs", icon: Activity, route: "/bmrcalculator", image: heroToolsImage },
+    { id: "macro", title: "Macro Calculator", description: "Personalized nutrition targets", icon: Flame, route: "/macrocalculator", image: heroToolsImage },
+    { id: "timer", title: "Workout Timer", description: "Interval timer for any workout", icon: Clock, route: "/workouttimer", image: heroToolsImage },
   ];
 
   // Fetch review stats for SEO schema - low priority, don't block render
@@ -715,20 +735,90 @@ const Index = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
-            <div onClick={() => navigate('/tools')} className="flex flex-col items-center justify-center gap-1.5 aspect-square bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md p-2">
-              <Wrench className="w-6 h-6 text-primary" />
-              <span className="text-[10px] font-medium text-center leading-tight line-clamp-2">Smarty Tools</span>
+          {/* Smarty Tools Carousel */}
+          <div className="pt-2">
+            <div className="flex items-center justify-center gap-4 mb-4">
+              <button type="button" onClick={() => toolsCarouselApi?.scrollPrev()} className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Previous tool">
+                <ChevronLeft className="h-5 w-5 text-primary" />
+              </button>
+              <span className="text-lg sm:text-2xl font-extrabold tracking-tight text-primary uppercase whitespace-nowrap">Smarty Tools</span>
+              <button type="button" onClick={() => toolsCarouselApi?.scrollNext()} className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Next tool">
+                <ChevronRight className="h-5 w-5 text-primary" />
+              </button>
+            </div>
+            <Carousel className="w-full" opts={{ align: "center", loop: true }} setApi={setToolsCarouselApi}>
+              <CarouselContent className="-ml-3">
+                {toolsCards.map((card) => {
+                  const Icon = card.icon;
+                  return (
+                    <CarouselItem key={card.id} className="pl-3 basis-[75%] sm:basis-[60%]">
+                      <div onClick={() => navigate(card.route)} className="border-2 border-primary/40 rounded-xl overflow-hidden hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300 cursor-pointer bg-card flex flex-col">
+                        <div className="relative aspect-[16/8] w-full overflow-hidden flex-shrink-0">
+                          <img src={card.image} alt={card.title} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover object-[center_top]" />
+                        </div>
+                        <div className="flex flex-col justify-center flex-1 p-2 text-center">
+                          <div className="flex items-center justify-center gap-1.5 mb-0.5">
+                            <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                              <Icon className="w-3 h-3 text-primary" />
+                            </div>
+                            <h3 className="text-xs font-bold text-foreground leading-tight whitespace-nowrap">{card.title}</h3>
+                          </div>
+                          <p className="text-[10px] text-muted-foreground leading-snug line-clamp-2">{card.description}</p>
+                          <div className="flex items-center justify-center gap-1 text-primary text-[9px] font-medium mt-0.5">
+                            Open<ChevronRight className="w-2.5 h-2.5" />
+                          </div>
+                        </div>
+                      </div>
+                    </CarouselItem>
+                  );
+                })}
+              </CarouselContent>
+            </Carousel>
+            <div className="flex justify-center gap-2 mt-3">
+              {toolsCards.map((_, index) => (
+                <button key={index} onClick={() => toolsCarouselApi?.scrollTo(index)} className={cn("w-2.5 h-2.5 rounded-full transition-all duration-300", toolsSlide === index ? "bg-primary scale-125" : "bg-primary/30 hover:bg-primary/50")} aria-label={`Go to tool ${index + 1}`} />
+              ))}
+            </div>
+          </div>
+
+          {/* Exercise Library + Community quick access (2 taller image cards) */}
+          <div className="grid grid-cols-2 gap-3">
+            <div
+              onClick={() => navigate('/exerciselibrary')}
+              className="relative h-32 rounded-xl overflow-hidden border-2 border-primary/40 hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300 cursor-pointer group"
+            >
+              <img
+                src={heroLibraryBookImage}
+                alt="Exercise Library"
+                loading="lazy"
+                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+              <div className="absolute inset-0 flex flex-col items-center justify-end p-3 text-center">
+                <div className="w-8 h-8 rounded-full bg-background/90 flex items-center justify-center mb-1 shadow-md">
+                  <BookOpen className="w-4 h-4 text-primary" />
+                </div>
+                <span className="text-sm font-bold text-white leading-tight">Exercise Library</span>
+              </div>
             </div>
 
-            <div onClick={() => navigate('/exerciselibrary')} className="flex flex-col items-center justify-center gap-1.5 aspect-square bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md p-2">
-              <BookOpen className="w-6 h-6 text-primary" />
-              <span className="text-[10px] font-medium text-center leading-tight line-clamp-2">Exercise Library</span>
-            </div>
-
-            <div onClick={() => navigate('/community')} className="flex flex-col items-center justify-center gap-1.5 aspect-square bg-primary/5 border-2 border-border rounded-lg hover:border-primary transition-all cursor-pointer hover:shadow-md p-2">
-              <Users className="w-6 h-6 text-primary" />
-              <span className="text-[10px] font-medium text-center leading-tight">Community</span>
+            <div
+              onClick={() => navigate('/community')}
+              className="relative h-32 rounded-xl overflow-hidden border-2 border-primary/40 hover:border-primary hover:scale-[1.02] hover:shadow-xl transition-all duration-300 cursor-pointer group"
+            >
+              <img
+                src={heroCommunityCelebratingImage}
+                alt="Community"
+                loading="lazy"
+                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+              <div className="absolute inset-0 flex flex-col items-center justify-end p-3 text-center">
+                <div className="w-8 h-8 rounded-full bg-background/90 flex items-center justify-center mb-1 shadow-md">
+                  <Users className="w-4 h-4 text-primary" />
+                </div>
+                <span className="text-sm font-bold text-white leading-tight">Community</span>
+              </div>
             </div>
           </div>
 
