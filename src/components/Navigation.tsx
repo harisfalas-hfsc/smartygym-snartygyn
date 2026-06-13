@@ -310,7 +310,7 @@ export const Navigation = () => {
     <header
       ref={headerRef}
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 bg-background pt-2 pb-0 px-4 lg:pt-1.5 lg:pb-0.5 transition-transform duration-300 will-change-transform",
+        "fixed top-0 left-0 right-0 z-50 bg-background pt-2 pb-0 px-4 lg:pt-1 lg:pb-0.5 transition-transform duration-300 will-change-transform",
         headerHidden && "-translate-y-full"
       )}
     >
