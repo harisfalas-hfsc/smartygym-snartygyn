@@ -789,6 +789,10 @@ const Index = () => {
           </div>
 
           {/* Exercise Library + Community quick access (2 taller image cards) */}
+          <div className="flex items-center gap-2 mb-2 mt-1">
+            <span className="text-sm font-extrabold tracking-tight text-primary uppercase">Explore</span>
+            <div className="h-px flex-1 bg-primary/20" />
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <div
               onClick={() => navigate('/exerciselibrary')}
