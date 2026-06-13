@@ -354,6 +354,15 @@ export const Navigation = () => {
                 <DropdownMenuItem onSelect={() => handleProfileNavigate("/userdashboard")}>
                   <LayoutDashboard className="mr-2 h-4 w-4" /><span>Dashboard</span>
                 </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => handleProfileNavigate("/userdashboard?tab=messages")}>
+                  <div className="relative mr-2">
+                    <Mail className={`h-4 w-4 ${unreadCount > 0 ? 'text-red-500' : ''}`} />
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-red-500 ring-2 ring-popover" />
+                    )}
+                  </div>
+                  <span>Messages</span>
+                </DropdownMenuItem>
                 <DropdownMenuItem
                   onSelect={() => {
                     setTheme(resolvedTheme === "dark" ? "light" : "dark");
