@@ -282,11 +282,11 @@ serve(async (req) => {
           sent_by: userData.user.id,
           recipient_filter: recipientFilter,
           recipient_count: recipients.length,
-          success_count: recipients.length,
+          success_count: messages.length + emailsSent,
           failed_count: emailsFailed,
           subject: finalSubject,
           content: finalContent,
-          metadata: { emails_sent: emailsSent, emails_failed: emailsFailed }
+          metadata: { dashboard_sent: messages.length, emails_sent: emailsSent, emails_failed: emailsFailed }
         });
     } catch (auditError) {
       console.error('[MASS-NOTIFICATION] Failed to log audit:', auditError);
@@ -296,9 +296,10 @@ serve(async (req) => {
       JSON.stringify({ 
         success: true, 
         recipientCount: recipients.length,
+        dashboardSent: messages.length,
         emailsSent,
         emailsFailed,
-        message: `Notification sent to ${recipients.length} users (${emailsSent} emails sent)` 
+        message: `Notification sent to ${messages.length} dashboards and ${emailsSent} emails` 
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
