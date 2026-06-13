@@ -456,9 +456,9 @@ const TrainingProgramDetail = () => {
               placeholder: "Access Level",
               options: [
                 { value: "all", label: "All Content" },
-                { value: "free", label: "🆓 Free Only" },
-                { value: "premium", label: "👑 Premium Only" },
-                { value: "purchasable", label: "💶 Purchasable" },
+                { value: "free", label: "Free Only" },
+                { value: "premium", label: "Premium Only" },
+                { value: "purchasable", label: "Purchasable" },
               ],
             },
             ...(userId ? [{
@@ -468,10 +468,10 @@ const TrainingProgramDetail = () => {
               placeholder: "Status",
               options: [
                 { value: "all", label: "All Programs" },
-                { value: "viewed", label: "👁️ Viewed" },
-                { value: "completed", label: "✓ Completed" },
-                { value: "not-viewed", label: "✨ Not Viewed Yet" },
-                { value: "favorites", label: "⭐ Favorites" },
+                { value: "viewed", label: "Viewed" },
+                { value: "completed", label: "Completed" },
+                { value: "not-viewed", label: "Not Viewed Yet" },
+                { value: "favorites", label: "Favorites" },
               ],
             }] : []),
             {
@@ -480,10 +480,10 @@ const TrainingProgramDetail = () => {
               onChange: (value) => setSortBy(value as SortByFilter),
               placeholder: "Sort By",
               options: [
-                { value: "newest", label: "🆕 Newest First" },
-                { value: "oldest", label: "📅 Oldest First" },
-                { value: "name-asc", label: "🔤 Name A-Z" },
-                { value: "name-desc", label: "🔤 Name Z-A" },
+                { value: "newest", label: "Newest First" },
+                { value: "oldest", label: "Oldest First" },
+                { value: "name-asc", label: "Name A-Z" },
+                { value: "name-desc", label: "Name Z-A" },
               ],
             },
           ]}
