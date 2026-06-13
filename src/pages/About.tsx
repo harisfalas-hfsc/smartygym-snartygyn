@@ -438,15 +438,6 @@ const About = () => {
 
                   </div>
 
-                  <div className="pt-2 border-t border-border text-center">
-                    <a
-                      href="/the-smarty-method"
-                      className="inline-flex items-center gap-1.5 text-sm font-semibold text-green-500 hover:text-green-600 hover:underline mt-4"
-                    >
-                      Discover The Smarty Method
-                      <ChevronRight className="w-4 h-4" />
-                    </a>
-                  </div>
                 </div>
               </CardContent>
             </Card>
