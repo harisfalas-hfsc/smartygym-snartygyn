@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { getEmailHeaders, getEmailFooter, wrapInEmailTemplate } from "../_shared/email-utils.ts";
 import { logEmailDelivery } from "../_shared/email-log.ts";
+import { canSend } from "../_shared/notification-preferences.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -168,8 +169,20 @@ serve(async (req) => {
 
     console.log('[MASS-NOTIFICATION] Found recipients:', recipients.length);
 
-    // Insert messages for all recipients
-    const messages = recipients.map(recipient => ({
+    const { data: profilesForPrefs } = await supabaseAdmin
+      .from('profiles')
+      .select('user_id, notification_preferences')
+      .in('user_id', recipients.map((recipient) => recipient.user_id));
+
+    const prefsByUserId = new Map(
+      (profilesForPrefs || []).map((profile) => [profile.user_id, profile.notification_preferences as Record<string, any>])
+    );
+
+    // Insert dashboard messages only for users who allow general announcements
+    const messages = recipients.filter((recipient) => {
+      const prefs = prefsByUserId.get(recipient.user_id) || {};
+      return canSend(prefs, "general_announcement", "dashboard");
+    }).map(recipient => ({
       user_id: recipient.user_id,
       message_type: messageType,
       subject: finalSubject,
@@ -177,16 +190,16 @@ serve(async (req) => {
       is_read: false
     }));
 
-    const { error: insertError } = await supabaseAdmin
-      .from('user_system_messages')
-      .insert(messages);
+    const { error: insertError } = messages.length > 0
+      ? await supabaseAdmin.from('user_system_messages').insert(messages)
+      : { error: null };
 
     if (insertError) {
       console.error('[MASS-NOTIFICATION] Insert error:', insertError);
       throw insertError;
     }
 
-    console.log('[MASS-NOTIFICATION] Dashboard messages sent to', recipients.length, 'users');
+    console.log('[MASS-NOTIFICATION] Dashboard messages sent to', messages.length, 'users');
 
     // Send emails to all recipients
     let emailsSent = 0;
@@ -206,8 +219,11 @@ serve(async (req) => {
           continue;
         }
 
-        // Admin messages ALWAYS get delivered - no preference checking
-        // This is a high-priority system message from admin
+        const prefs = prefsByUserId.get(recipient.user_id) || {};
+        if (!canSend(prefs, "general_announcement", "email")) {
+          console.log('[MASS-NOTIFICATION] Email skipped by preference for user:', recipient.user_id);
+          continue;
+        }
 
         // Send email with headers and footer
         const emailResult = await resend.emails.send({
@@ -266,11 +282,11 @@ serve(async (req) => {
           sent_by: userData.user.id,
           recipient_filter: recipientFilter,
           recipient_count: recipients.length,
-          success_count: recipients.length,
+          success_count: messages.length + emailsSent,
           failed_count: emailsFailed,
           subject: finalSubject,
           content: finalContent,
-          metadata: { emails_sent: emailsSent, emails_failed: emailsFailed }
+          metadata: { dashboard_sent: messages.length, emails_sent: emailsSent, emails_failed: emailsFailed }
         });
     } catch (auditError) {
       console.error('[MASS-NOTIFICATION] Failed to log audit:', auditError);
@@ -280,9 +296,10 @@ serve(async (req) => {
       JSON.stringify({ 
         success: true, 
         recipientCount: recipients.length,
+        dashboardSent: messages.length,
         emailsSent,
         emailsFailed,
-        message: `Notification sent to ${recipients.length} users (${emailsSent} emails sent)` 
+        message: `Notification sent to ${messages.length} dashboards and ${emailsSent} emails` 
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },

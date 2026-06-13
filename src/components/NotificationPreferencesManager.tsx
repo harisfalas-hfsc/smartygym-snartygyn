@@ -23,7 +23,8 @@ type AutomationKey =
   | "scheduled_workout_reminder"
   | "scheduled_program_reminder"
   | "goal_achievement"
-  | "welcome_onboarding";
+  | "welcome_onboarding"
+  | "general_announcement";
 
 type Preferences = {
   opt_out_all: boolean;
@@ -44,6 +45,7 @@ const DEFAULT_PREFS: Preferences = {
   scheduled_program_reminder: { ...DEFAULT_CHANNEL },
   goal_achievement: { ...DEFAULT_CHANNEL },
   welcome_onboarding: { ...DEFAULT_CHANNEL },
+  general_announcement: { ...DEFAULT_CHANNEL },
 };
 
 const ROWS: { key: AutomationKey; label: string; description: string; timing: string; icon: any }[] = [
@@ -124,6 +126,13 @@ const ROWS: { key: AutomationKey; label: string; description: string; timing: st
     timing: "Days 1-5 after signup",
     icon: Sparkles,
   },
+  {
+    key: "general_announcement",
+    label: "General Announcements",
+    description: "Platform updates, new services, events, and non-essential admin announcements.",
+    timing: "Only when SmartyGym has an announcement",
+    icon: Bell,
+  },
 ];
 
 const CHANNELS: { id: Channel; label: string; icon: any }[] = [
@@ -186,6 +195,11 @@ const LEGACY_PREF_KEYS: Record<AutomationKey, Record<Channel, string[]>> = {
   welcome_onboarding: {
     email: ["email_welcome_onboarding"],
     dashboard: ["dashboard_welcome_onboarding"],
+    push: [],
+  },
+  general_announcement: {
+    email: [],
+    dashboard: [],
     push: [],
   },
 };

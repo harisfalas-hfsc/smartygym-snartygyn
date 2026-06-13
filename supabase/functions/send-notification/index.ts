@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
 import { logEmailDelivery } from "../_shared/email-log.ts";
+import { canSend, type AutomationKey } from "../_shared/notification-preferences.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -22,6 +23,21 @@ interface NotificationRequest {
     date?: string;
   };
 }
+
+const automationKeyForType = (type: NotificationRequest['type']): AutomationKey | null => {
+  switch (type) {
+    case 'new_content':
+      return 'general_announcement';
+    case 'wod':
+      return 'morning_daily_digest';
+    case 'monday_motivation':
+      return 'monday_motivation';
+    case 'plan_change':
+      return 'general_announcement';
+    default:
+      return null;
+  }
+};
 
 // Helper function to verify admin role
 async function verifyAdminRole(req: Request, supabase: any): Promise<{ isAdmin: boolean; userId: string | null; error?: string }> {
@@ -174,8 +190,21 @@ serve(async (req: Request) => {
       );
     }
 
+    const automationKey = automationKeyForType(body.type);
+    const { data: profilesForPrefs } = await supabase
+      .from('profiles')
+      .select('user_id, notification_preferences')
+      .in('user_id', targetUserIds);
+    const prefsByUserId = new Map(
+      (profilesForPrefs || []).map((profile) => [profile.user_id, profile.notification_preferences as Record<string, any>])
+    );
+
     // Send dashboard notifications
-    const dashboardMessages = targetUserIds.map(userId => ({
+    const dashboardMessages = targetUserIds.filter((userId) => {
+      if (!automationKey) return true;
+      const prefs = prefsByUserId.get(userId) || {};
+      return canSend(prefs, automationKey, "dashboard");
+    }).map(userId => ({
       user_id: userId,
       message_type: messageType,
       subject: subject,
@@ -183,14 +212,14 @@ serve(async (req: Request) => {
       is_read: false,
     }));
 
-    const { error: insertError } = await supabase
-      .from('user_system_messages')
-      .insert(dashboardMessages);
+    const { error: insertError } = dashboardMessages.length > 0
+      ? await supabase.from('user_system_messages').insert(dashboardMessages)
+      : { error: null };
 
     if (insertError) {
       console.error('[SEND-NOTIFICATION] Dashboard insert error:', insertError);
     } else {
-      console.log(`[SEND-NOTIFICATION] ✅ Inserted ${targetUserIds.length} dashboard messages`);
+      console.log(`[SEND-NOTIFICATION] ✅ Inserted ${dashboardMessages.length} dashboard messages`);
     }
 
     // Paginate through ALL users (listUsers defaults to 50 per page)
@@ -211,6 +240,14 @@ serve(async (req: Request) => {
     let emailsSent = 0;
     for (const user of targetEmails) {
       try {
+        if (automationKey) {
+          const prefs = prefsByUserId.get(user.id) || {};
+          if (!canSend(prefs, automationKey, "email")) {
+            console.log(`[SEND-NOTIFICATION] Email skipped by preference for ${user.id}`);
+            continue;
+          }
+        }
+
         const emailHtml = `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h1 style="color: #29B6D2;">${subject}</h1>
@@ -228,7 +265,7 @@ serve(async (req: Request) => {
         });
         emailsSent++;
         await logEmailDelivery({
-          userId: user.user_id ?? null,
+          userId: user.id,
           toEmail: user.email,
           messageType: messageType || body.type || "notification",
           status: "sent",
@@ -240,7 +277,7 @@ serve(async (req: Request) => {
       } catch (emailError) {
         console.error(`[SEND-NOTIFICATION] Email error for ${user.email}:`, emailError);
         await logEmailDelivery({
-          userId: user.user_id ?? null,
+          userId: user.id,
           toEmail: user.email,
           messageType: messageType || body.type || "notification",
           status: "failed",
@@ -256,7 +293,7 @@ serve(async (req: Request) => {
       notification_type: body.type,
       message_type: messageType,
       recipient_count: targetUserIds.length,
-      success_count: targetUserIds.length,
+      success_count: dashboardMessages.length + emailsSent,
       failed_count: 0,
       subject: subject,
       content: content,
@@ -265,7 +302,7 @@ serve(async (req: Request) => {
     return new Response(
       JSON.stringify({ 
         success: true, 
-        dashboardSent: targetUserIds.length,
+        dashboardSent: dashboardMessages.length,
         emailsSent: emailsSent 
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }

@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { wrapInEmailTemplate, getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
 import { logEmailDelivery } from "../_shared/email-log.ts";
+import { canSend, type AutomationKey } from "../_shared/notification-preferences.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -20,6 +21,13 @@ interface AnnouncementRequest {
   subject: string;
   content: string;
 }
+
+const automationKeyForAnnouncement = (messageType: string): AutomationKey => {
+  if (messageType.includes("workout")) return "new_workout";
+  if (messageType.includes("program")) return "new_program";
+  if (messageType.includes("article")) return "new_article";
+  return "general_announcement";
+};
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -76,27 +84,41 @@ serve(async (req) => {
     
     logStep("Using message type", { provided: messageType, using: safeMessageType });
 
+    const automationKey = automationKeyForAnnouncement(messageType);
+    const { data: profilesForPrefs } = await supabaseAdmin
+      .from("profiles")
+      .select("user_id, notification_preferences")
+      .in("user_id", userIds);
+    const prefsByUserId = new Map(
+      (profilesForPrefs || []).map((profile) => [profile.user_id, profile.notification_preferences as Record<string, any>])
+    );
+
     for (const userId of userIds) {
       try {
+        const prefs = prefsByUserId.get(userId) || {};
         // Send dashboard message
-        try {
-          const { error: insertError } = await supabaseAdmin
-            .from("user_system_messages")
-            .insert({
-              user_id: userId,
-              message_type: safeMessageType,
-              subject: subject,
-              content: content,
-              is_read: false,
-            });
-          
-          if (insertError) {
-            logStep("ERROR inserting dashboard message", { userId, error: insertError.message });
-          } else {
-            logStep("Dashboard message inserted", { userId });
+        if (canSend(prefs, automationKey, "dashboard")) {
+          try {
+            const { error: insertError } = await supabaseAdmin
+              .from("user_system_messages")
+              .insert({
+                user_id: userId,
+                message_type: safeMessageType,
+                subject: subject,
+                content: content,
+                is_read: false,
+              });
+            
+            if (insertError) {
+              logStep("ERROR inserting dashboard message", { userId, error: insertError.message });
+            } else {
+              logStep("Dashboard message inserted", { userId });
+            }
+          } catch (msgError) {
+            logStep("ERROR sending dashboard message", { userId, error: msgError });
           }
-        } catch (msgError) {
-          logStep("ERROR sending dashboard message", { userId, error: msgError });
+        } else {
+          logStep("Dashboard skipped by user preference", { userId, automationKey });
         }
 
         // Get user email
@@ -109,8 +131,11 @@ serve(async (req) => {
           continue;
         }
 
-        // Admin messages ALWAYS get delivered - no preference checking
-        // This is a high-priority system message from admin
+        if (!canSend(prefs, automationKey, "email")) {
+          logStep("Email skipped by user preference", { userId, automationKey });
+          sentCount++;
+          continue;
+        }
 
         // Send email with properly formatted HTML, headers, and footer
         try {
