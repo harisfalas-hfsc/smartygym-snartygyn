@@ -448,10 +448,10 @@ const About = () => {
           <ScrollReveal>
             <Card className="mb-12 border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-background">
               <CardHeader className="text-center">
-                <CardTitle className="flex items-center justify-center gap-2">
-                  <Crown className="h-5 w-5 text-primary" />
-                  Ready to Start Your Journey
-                </CardTitle>
+              <CardTitle className="flex items-center justify-center gap-2 text-xl md:text-2xl whitespace-nowrap">
+                <Crown className="h-5 w-5 text-primary flex-shrink-0" />
+                Ready to Start Your Journey
+              </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-muted-foreground text-center max-w-3xl mx-auto">
