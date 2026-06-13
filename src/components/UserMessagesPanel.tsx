@@ -150,7 +150,9 @@ export const UserMessagesPanel = () => {
         navigate(url.pathname + url.search + url.hash);
         return;
       }
-    } catch {}
+    } catch {
+      // Leave malformed links to the browser fallback below.
+    }
     window.location.href = link;
   };
 
