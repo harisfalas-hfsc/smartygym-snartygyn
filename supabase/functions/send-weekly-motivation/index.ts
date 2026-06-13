@@ -249,7 +249,6 @@ serve(async (req) => {
       );
     }
 
-
     let dashboardSent = 0;
     let emailsSent = 0;
     let skipped = 0;
