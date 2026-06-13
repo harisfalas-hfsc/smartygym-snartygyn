@@ -178,7 +178,8 @@ const Blog = () => {
           label: "Blog"
         }]} />
 
-          {/* About Blog */}
+          {/* About Blog (desktop only) */}
+          {!isMobile && (
           <Card className="mb-8 bg-white dark:bg-card border-2 border-primary/40 shadow-primary">
             <CardContent className="p-4 sm:p-5">
               <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight uppercase mb-3 text-center">Smarty Blog</h2>
@@ -192,6 +193,7 @@ const Blog = () => {
               </div>
             </CardContent>
           </Card>
+          )}
 
           {!isMobile && (
           <div className="mb-6 sm:mb-8">
@@ -231,35 +233,55 @@ const Blog = () => {
 
           {showMobileCategoryHub && (
             <div className="mb-6">
-              <h2 className="text-lg font-bold mb-3">Browse by category</h2>
-              <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-3 -mx-4 px-4">
-                {blogCategories.map((cat) => (
-                  <button
-                    key={cat.key}
-                    onClick={() => navigate(`/blog/category/${cat.key}`)}
-                    className="snap-center shrink-0 w-[78%] rounded-xl overflow-hidden border-2 border-blue-500/60 hover:border-blue-500 bg-card shadow-md text-left transition-colors"
-                    aria-label={`Browse ${cat.label} articles`}
-                  >
-                    <div className="relative aspect-[16/10] overflow-hidden">
-                      <img
-                        src={cat.image}
-                        alt={`${cat.label} blog articles by Haris Falas - SmartyGym`}
-                        width={1280}
-                        height={800}
-                        loading="lazy"
-                        decoding="async"
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-                      <div className="absolute bottom-3 left-3 right-3 text-white">
-                        <div className="text-xl font-extrabold uppercase tracking-tight">{cat.label}</div>
-                        <div className="text-xs opacity-90">{cat.description}</div>
-                      </div>
-                    </div>
-                    <div className="p-3 text-xs text-muted-foreground">
-                      {allArticles.filter(a => a.category.toLowerCase() === cat.key).length} articles
-                    </div>
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-lg font-bold">Smarty Blog</h2>
+                <div className="flex items-center gap-2">
+                  <button type="button" onClick={() => blogCatApi?.scrollPrev()} className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Previous category">
+                    <ChevronLeft className="h-5 w-5 text-primary" />
                   </button>
+                  <button type="button" onClick={() => blogCatApi?.scrollNext()} className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Next category">
+                    <ChevronRight className="h-5 w-5 text-primary" />
+                  </button>
+                </div>
+              </div>
+              <Carousel className="w-full" opts={{ align: "center", loop: true }} setApi={setBlogCatApi}>
+                <CarouselContent className="-ml-3">
+                  {blogCategories.map((cat, index) => (
+                    <CarouselItem key={cat.key} className="pl-3 basis-[75%] sm:basis-[60%]">
+                      <div onClick={() => navigate(`/blog/category/${cat.key}`)} className="border-2 border-green-500/60 rounded-xl overflow-hidden hover:border-green-500 hover:scale-[1.02] hover:shadow-xl transition-all duration-300 cursor-pointer bg-card flex flex-col">
+                        <div className="relative aspect-[16/8] w-full overflow-hidden flex-shrink-0">
+                          <img
+                            src={cat.image}
+                            alt={`${cat.label} blog articles by Haris Falas`}
+                            loading={index === 0 ? "eager" : "lazy"}
+                            decoding="async"
+                            className="absolute inset-0 w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="flex flex-col justify-center flex-1 p-2 text-center">
+                          <h3 className="text-xs font-bold text-foreground leading-tight">{cat.label}</h3>
+                          <p className="text-[10px] text-muted-foreground leading-snug line-clamp-2">{cat.description}</p>
+                          <div className="flex items-center justify-center gap-1 text-primary text-[9px] font-medium mt-0.5">
+                            Explore
+                            <ChevronRight className="w-2.5 h-2.5" />
+                          </div>
+                        </div>
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+              </Carousel>
+              <div className="flex justify-center gap-2 mt-4">
+                {blogCategories.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => blogCatApi?.scrollTo(index)}
+                    className={cn(
+                      "w-2.5 h-2.5 rounded-full transition-all duration-300",
+                      blogCatSlide === index ? "bg-primary scale-125" : "bg-primary/30 hover:bg-primary/50"
+                    )}
+                    aria-label={`Go to category ${index + 1}`}
+                  />
                 ))}
               </div>
             </div>
@@ -357,7 +379,7 @@ const Blog = () => {
           </div>
           )}
 
-          <BlogSEOEnhancement articleCount={allArticles.length} />
+          {!isMobile && <BlogSEOEnhancement articleCount={allArticles.length} />}
         </div>
       </div>
     </>;
