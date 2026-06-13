@@ -233,25 +233,25 @@ const TermsOfService = () => {
               <div className="flex items-start gap-3">
                 <Brain className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
                 <div>
-                  <h2 className="text-2xl font-bold mb-3">8. AI-Generated Content</h2>
+                  <h2 className="text-2xl font-bold mb-3">8. Human-Designed Content</h2>
                   <p className="text-muted-foreground mb-3">
-                    SmartyGym uses artificial intelligence to enhance your fitness experience:
+                    SmartyGym is built on a strict <strong>100% Human, 0% AI</strong> content policy:
                   </p>
                   <ul className="space-y-2 text-muted-foreground">
                     <li>
-                      <strong>Nature of AI Content:</strong> AI-generated workout suggestions, meal plans, and recommendations are created by machine learning models and are not reviewed by humans before being shown to you.
+                      <strong>Authorship:</strong> Every workout, training program, exercise description, and editorial article is personally designed and written by <strong>Sports Scientist Haris Falas</strong> based on 20+ years of coaching experience.
                     </li>
                     <li>
-                      <strong>No Medical Advice:</strong> AI recommendations are for informational purposes only and do not constitute medical, nutritional, or professional fitness advice.
+                      <strong>No AI Generation:</strong> We do not use AI to generate workouts, meal plans, nutrition programs, or fitness recommendations for users. Any internal automation only reorganises or surfaces existing human-designed library content.
                     </li>
                     <li>
-                      <strong>User Responsibility:</strong> You are responsible for evaluating whether AI-generated content is appropriate for your fitness level, health conditions, and goals.
+                      <strong>No Medical Advice:</strong> All content is for general fitness and informational purposes only and does not constitute medical, nutritional, or therapeutic advice.
                     </li>
                     <li>
-                      <strong>Professional Guidance:</strong> AI recommendations should complement, not replace, guidance from certified fitness professionals and healthcare providers.
+                      <strong>User Responsibility:</strong> You are responsible for evaluating whether the selected workouts and programs are appropriate for your fitness level, health conditions, and goals.
                     </li>
                     <li>
-                      <strong>Accuracy Disclaimer:</strong> While we strive for accuracy, AI-generated content may contain errors or inappropriate suggestions. Always use your judgment.
+                      <strong>Professional Guidance:</strong> SmartyGym content should complement, not replace, guidance from your physician or other qualified healthcare professionals.
                     </li>
                   </ul>
                 </div>
@@ -262,35 +262,20 @@ const TermsOfService = () => {
                 <div>
                   <h2 className="text-2xl font-bold mb-3">9. Third-Party Integrations</h2>
                   <p className="text-muted-foreground mb-3">
-                    SmartyGym integrates with third-party services to enhance your experience:
+                    SmartyGym relies on a small number of third-party services to operate the platform:
                   </p>
-                  
-                  <h3 className="text-lg font-semibold mt-4 mb-2">Google Calendar</h3>
-                  <ul className="space-y-2 text-muted-foreground">
-                    <li>You may connect your Google Calendar to sync workout schedules.</li>
-                    <li>By connecting, you grant SmartyGym permission to create and manage calendar events related to your workouts.</li>
-                    <li>You can disconnect at any time from Dashboard → Settings → Connected Services.</li>
-                    <li>Google's Terms of Service and Privacy Policy apply to your use of Google Calendar.</li>
-                  </ul>
-
-                  <h3 className="text-lg font-semibold mt-4 mb-2">Strava</h3>
-                  <ul className="space-y-2 text-muted-foreground">
-                    <li>You may connect your Strava account to track fitness activities.</li>
-                    <li>By connecting, you authorize SmartyGym to access your activity data.</li>
-                    <li>Strava's Terms of Service and Privacy Policy apply to your use of Strava.</li>
-                  </ul>
-
-                  <h3 className="text-lg font-semibold mt-4 mb-2">YouTube</h3>
-                  <ul className="space-y-2 text-muted-foreground">
-                    <li>Exercise demonstrations may include embedded YouTube videos.</li>
-                    <li>By viewing these videos, you agree to YouTube's Terms of Service.</li>
-                  </ul>
 
                   <h3 className="text-lg font-semibold mt-4 mb-2">Payment Processing (Stripe)</h3>
                   <ul className="space-y-2 text-muted-foreground">
                     <li>All payments are processed by Stripe.</li>
                     <li>We do not store your complete credit card information on our servers.</li>
                     <li>Stripe's Terms of Service and Privacy Policy apply.</li>
+                  </ul>
+
+                  <h3 className="text-lg font-semibold mt-4 mb-2">Email Delivery (Resend)</h3>
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li>Transactional and account-related emails are sent through Resend.</li>
+                    <li>Resend's Terms of Service and Privacy Policy apply.</li>
                   </ul>
 
                   <p className="text-muted-foreground mt-3">
