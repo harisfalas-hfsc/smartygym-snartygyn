@@ -38,11 +38,12 @@ import {
 const compactMessageHtml = (html: string): string => {
   if (!html) return '';
   return html
+    .replace(/&nbsp;|\u00a0/gi, ' ')
     .replace(/<hr[^>]*>/gi, '')
-    .replace(/<p[^>]*>(\s|&nbsp;|<br\s*\/?>)*<\/p>/gi, '')
-    .replace(/(<br\s*\/?>\s*){2,}/gi, '</p><p>')
-    .replace(/<br\s*\/?>/gi, '</p><p>')
-    .replace(/(\r?\n){2,}/g, '\n');
+    .replace(/<p[^>]*>\s*(?:<br\s*\/?>\s*)*<\/p>/gi, '')
+    .replace(/(?:<br\s*\/?>\s*){2,}/gi, '<br />')
+    .replace(/(\r?\n\s*){2,}/g, '\n')
+    .trim();
 };
 
 interface ContactMessage {
@@ -753,9 +754,12 @@ export const UserMessagesPanel = () => {
                 </div>
               </div>
               <div
-                className={`text-sm content-container mb-2 [&_hr]:hidden [&_p:empty]:hidden [&_p]:my-3 [&_p]:leading-relaxed [&_h1]:mt-3 [&_h1]:mb-2 [&_h2]:mt-3 [&_h2]:mb-2 [&_h3]:mt-3 [&_h3]:mb-2 [&_br+br]:hidden [&_ul]:my-2 [&_ol]:my-2 ${isLong && !isExpanded ? 'max-h-40 overflow-hidden relative after:content-[""] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-12 after:bg-gradient-to-t after:from-card after:to-transparent' : ''}`}
+                className={`text-sm mb-2 ${isLong && !isExpanded ? 'max-h-40 overflow-hidden relative after:content-[""] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-12 after:bg-gradient-to-t after:from-card after:to-transparent' : ''}`}
               >
-                <HTMLContent content={compactMessageHtml(message.content)} />
+                <HTMLContent
+                  content={compactMessageHtml(message.content)}
+                  className="[&_hr]:hidden [&_p:empty]:hidden [&_p]:my-1.5 [&_p]:leading-normal [&_h1]:my-2 [&_h2]:my-2 [&_h3]:my-2 [&_ul]:my-1.5 [&_ol]:my-1.5"
+                />
               </div>
               {isLong && (
                 <Button
