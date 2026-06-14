@@ -491,7 +491,7 @@ const Index = () => {
           "logo": smartyGymLogo,
           "image": smartyGymLogo,
           "description": "Premier online gym offering professional fitness training by Sports Scientist Haris Falas. Evidence-based workout programs, structured training plans, and personalized coaching. Train anywhere, anytime with expert guidance.",
-          "slogan": "Your Gym Re-imagined. Anywhere, Anytime.",
+          "slogan": "YOUR GYM RE-IMAGINED. ANYWHERE, ANYTIME.",
           "founder": {
             "@type": "Person",
             "name": "Haris Falas",
