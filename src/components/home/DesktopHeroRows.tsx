@@ -109,7 +109,7 @@ export const DesktopHeroRows = ({ workouts, programs, articles, workoutCategoryT
                       key={item.id}
                       type="button"
                       onClick={() => navigate(item.route)}
-                      className="group flex flex-col bg-card border-2 border-primary/20 rounded-xl overflow-hidden hover:border-primary hover:shadow-md transition-all text-left"
+                      className="group flex flex-col bg-card border-2 border-green-500/60 rounded-xl overflow-hidden hover:border-green-500 hover:shadow-md transition-all text-left"
                       aria-label={item.title}
                     >
                       <div className="relative h-40 w-full overflow-hidden bg-muted">
