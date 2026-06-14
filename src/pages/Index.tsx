@@ -1071,7 +1071,7 @@ const Index = () => {
                 <p className="text-sm font-bold tracking-[0.2em] uppercase text-primary mb-3">
                   Science-Backed · Expert-Designed
                 </p>
-                <h1 className="text-5xl lg:text-6xl font-extrabold tracking-tight uppercase leading-[1.05] text-foreground">
+                <h1 className="text-6xl lg:text-7xl font-extrabold tracking-tight uppercase leading-[1.05] text-foreground">
                   Train <span className="text-primary">Smarter.</span>
                   <br />
                   Not Harder.
