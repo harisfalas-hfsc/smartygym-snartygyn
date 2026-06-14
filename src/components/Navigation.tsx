@@ -430,378 +430,194 @@ export const Navigation = () => {
     <header
       ref={headerRef}
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 bg-background pt-2 pb-0 px-4 lg:pt-1.5 lg:pb-0.5 transition-transform duration-300 will-change-transform",
+        "fixed top-0 left-0 right-0 z-50 bg-background border-b border-primary/20 transition-transform duration-300 will-change-transform",
         headerHidden && "-translate-y-full"
       )}
     >
-      <div className="mx-auto max-w-7xl">
-        <div className="relative flex items-center justify-between gap-2 lg:gap-4">
-          {/* LEFT SECTION - Hamburger Menu + Social Media Icons */}
-          <div className={cn("items-center gap-12", isMobile ? "hidden" : "flex")}>
-            {/* Desktop Menu - original layout */}
-            <Sheet open={desktopMenuOpen} onOpenChange={setDesktopMenuOpen}>
-                <SheetTrigger asChild>
-                  <button
-                    className="text-primary hover:text-primary/80 transition-colors -ml-2 p-1"
-                    aria-label="Open menu"
-                  >
-                    <Menu className="h-8 w-8 text-primary" strokeWidth={2} />
-                  </button>
-                </SheetTrigger>
-                 <SheetContent side="left" hideClose className="left-1/2 top-1/2 bottom-auto flex h-auto max-h-[calc(100vh-2rem)] !w-[50vw] !min-w-[620px] !max-w-[760px] sm:!max-w-[760px] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border-2 border-primary/40 p-3 shadow-xl !animate-none transition-opacity duration-200 ease-out data-[state=closed]:opacity-0 data-[state=open]:opacity-100">
-                  <SheetClose asChild>
-                    <Button variant="ghost" className="mb-1 h-8 shrink-0 gap-2 self-start rounded-full border-2 border-primary px-3 text-sm text-primary hover:bg-primary hover:text-primary-foreground">
-                      <ArrowLeft className="h-3.5 w-3.5" />
-                      Back
-                    </Button>
-                  </SheetClose>
-                  <div className="mb-2 shrink-0">
-                    <h2 className="text-lg font-bold leading-tight text-foreground">Explore SmartyGym</h2>
-                  </div>
-                  <nav className="grid grid-cols-3 gap-3 overflow-y-auto">
-                    {desktopDiscoveryItems.map(({ label, path, icon: Icon, iconClass, track }) => {
-                      const active = location.pathname === path;
-                      return (
-                        <button
-                          key={path}
-                          type="button"
-                          onClick={() => handleNavigate(path)}
-                          data-track-cta={track}
-                          className={`flex flex-col items-center justify-center rounded-2xl border-2 p-3 text-center font-semibold transition-all duration-200 ${active ? 'border-primary bg-primary/15 text-primary shadow-sm' : 'border-primary/25 bg-card text-foreground hover:border-primary hover:bg-primary/10'} ${label === 'Contact' ? 'col-span-3' : ''}`}
-                        >
-                          <span className={`mx-auto mb-1 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 ${iconClass}`}>
-                            <Icon className="h-8 w-8" />
-                          </span>
-                          <span className="block text-sm leading-tight">{label}</span>
-                        </button>
-                      );
-                    })}
-                  </nav>
-                </SheetContent>
-              </Sheet>
-
-            {/* Social Media Icons */}
-            <div className="hidden sm:flex items-center gap-2">
-              <a
-                href="https://www.facebook.com/profile.php?id=61579302997368"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex h-11 w-11 items-center justify-center rounded-full border-2 border-primary p-0 text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
-                aria-label="Facebook"
-              >
-                <Facebook className="h-5 w-5" />
-              </a>
-              <a
-                href="https://www.instagram.com/thesmartygym/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex h-11 w-11 items-center justify-center rounded-full border-2 border-primary p-0 text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
-                aria-label="Instagram"
-              >
-                <Instagram className="h-5 w-5" />
-              </a>
-              <a
-                href="https://www.tiktok.com/@thesmartygym?lang=en"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex h-11 w-11 items-center justify-center rounded-full border-2 border-primary p-0 text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
-                aria-label="TikTok"
-              >
-                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
-                </svg>
-              </a>
-              <a
-                href="https://www.youtube.com/@TheSmartyGym"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex h-11 w-11 items-center justify-center rounded-full border-2 border-primary p-0 text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
-                aria-label="YouTube"
-              >
-                <Youtube className="h-5 w-5" />
-              </a>
-            </div>
-          </div>
-
-          {/* Mobile Left Controls - Discovery + Smarty Coach */}
-          <div className={cn("shrink-0 items-center gap-1.5", isMobile ? "flex" : "hidden")}>
-            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-              <SheetTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="relative h-9 w-9 rounded-full text-primary hover:bg-primary/10 hover:text-primary [&_svg]:!h-6 [&_svg]:!w-6 [&_svg]:!text-primary"
-                  aria-label="Open Discovery"
-                >
-                  <Menu className="h-6 w-6 text-primary" strokeWidth={2.25} />
-                  <span className="sr-only">Discovery</span>
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" hideClose className="left-4 top-1/2 bottom-auto flex h-auto max-h-[calc(100vh-2rem)] w-[calc(100vw-2rem)] max-w-none -translate-y-1/2 flex-col overflow-hidden rounded-2xl border-2 border-primary/40 p-3 shadow-xl !animate-none transition-opacity duration-200 ease-out data-[state=closed]:opacity-0 data-[state=open]:opacity-100">
-                <SheetClose asChild>
-                  <Button variant="ghost" className="mb-1 h-8 shrink-0 gap-2 self-start rounded-full border-2 border-primary px-3 text-sm text-primary hover:bg-primary hover:text-primary-foreground">
-                    <ArrowLeft className="h-3.5 w-3.5" />
-                    Back
-                  </Button>
-                </SheetClose>
-                <div className="mb-2 shrink-0">
-                  <h2 className="text-lg font-bold leading-tight text-foreground">Explore SmartyGym</h2>
-                </div>
-                <nav className="grid grid-cols-2 gap-2 overflow-y-auto">
-                  {discoveryItems.map(({ label, path, icon: Icon, iconClass, track }) => {
-                    const active = location.pathname === path;
-                    return (
-                      <button
-                        key={path}
-                        type="button"
-                        onClick={() => handleNavigate(path)}
-                        data-track-cta={track}
-                        className={`flex flex-col items-center justify-center rounded-2xl border-2 p-2 text-center font-semibold transition-all duration-200 ${active ? 'border-primary bg-primary/15 text-primary shadow-sm' : 'border-primary/25 bg-card text-foreground hover:border-primary hover:bg-primary/10'}`}
-                      >
-                        <span className={`mx-auto mb-1 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 ${iconClass}`}>
-                          <Icon className="h-5 w-5" />
-                        </span>
-                        <span className="block text-xs leading-tight">{label}</span>
-                      </button>
-                    );
-                  })}
-                </nav>
-              </SheetContent>
-            </Sheet>
-          </div>
-
-          {/* CENTER SECTION - Logo */}
-          <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 justify-center lg:static lg:top-auto lg:flex-1 lg:translate-x-0 lg:translate-y-0 lg:justify-center">
+      <div className="flex h-12 items-center justify-between gap-2 px-4">
+        {/* Far-left: Hamburger menu */}
+        <Sheet open={desktopMenuOpen} onOpenChange={setDesktopMenuOpen}>
+          <SheetTrigger asChild>
             <button
-              onClick={() => {
-                if (location.pathname === '/') {
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                } else {
-                  navigate('/');
-                  setTimeout(() => window.scrollTo(0, 0), 0);
-                }
-              }}
-              className="cursor-pointer flex-shrink-0 bg-transparent border-0 p-0"
-              aria-label="Go to homepage"
+              type="button"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-md text-primary hover:bg-primary/10 transition-colors"
+              aria-label="Open menu"
             >
-              <img
-                src={smartyGymLogo}
-                alt="SmartyGym"
-                className="h-11 xs:h-[60px] sm:h-[72px] md:h-20 lg:h-16 w-auto max-w-[min(28vw,120px)] object-contain dark:mix-blend-lighten lg:max-w-none"
-              />
+              <Menu className="h-6 w-6" strokeWidth={2.25} />
             </button>
-          </div>
-
-           {/* Right Side - Auth */}
-           <div className="flex shrink-0 items-center gap-2 sm:gap-1.5 lg:gap-2">
-             <Button
-               variant="ghost"
-               size="icon"
-               onClick={() => setSmartyCoachOpen(true)}
-                className="relative hidden h-11 w-11 rounded-full lg:inline-flex"
-               aria-label="Open Smarty Coach"
-             >
-               <div className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-primary transition-colors hover:bg-primary hover:text-primary-foreground">
-                 <img src={smartyCoachIcon} alt="" className="h-8 w-8 rounded-full" loading="lazy" width={32} height={32} />
-               </div>
-               <span className="sr-only">Smarty Coach</span>
+          </SheetTrigger>
+          <SheetContent side="left" hideClose className="left-1/2 top-1/2 bottom-auto flex h-auto max-h-[calc(100vh-2rem)] !w-[50vw] !min-w-[620px] !max-w-[760px] sm:!max-w-[760px] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border-2 border-primary/40 p-3 shadow-xl !animate-none transition-opacity duration-200 ease-out data-[state=closed]:opacity-0 data-[state=open]:opacity-100">
+            <SheetClose asChild>
+              <Button variant="ghost" className="mb-1 h-8 shrink-0 gap-2 self-start rounded-full border-2 border-primary px-3 text-sm text-primary hover:bg-primary hover:text-primary-foreground">
+                <ArrowLeft className="h-3.5 w-3.5" />
+                Back
               </Button>
-            
-            {user && unreadCount > 0 && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className={cn(
-                  "relative",
-                  isMobile ? "h-8 w-8 p-0" : "h-11 w-11 rounded-full p-0 mr-1.5 lg:mr-2"
-                )}
-                onClick={() => {
-                  navigate("/userdashboard?tab=messages");
-                  setTimeout(() => window.scrollTo(0, 0), 0);
-                }}
-              >
-                {isMobile ? (
-                  <Bell className="h-5 w-5" />
-                ) : (
-                  <div className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-primary text-primary transition-colors hover:bg-primary hover:text-primary-foreground">
-                    <Bell className="h-5 w-5" />
-                  </div>
-                )}
-                <SafeNotificationBadge count={unreadCount} />
-              </Button>
-            )}
-            
-            {user ? (
-              <DropdownMenu>
-               <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="relative h-8 w-8 lg:h-11 lg:w-11 rounded-full">
-                    <div className={`flex h-8 w-8 lg:h-11 lg:w-11 items-center justify-center rounded-full border-2 border-primary transition-colors hover:bg-primary/10 ${subscriptionInfo?.subscribed ? 'ring-2 ring-yellow-500 ring-offset-2 ring-offset-background' : ''} ${corporateSubscription ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-background' : ''}`}>
-                      <Avatar className="h-6 w-6 lg:h-8 lg:w-8">
-                         <AvatarImage src={avatarUrl || undefined} alt="Profile" />
-                         <AvatarFallback className="text-xs">{getUserInitials()}</AvatarFallback>
-                       </Avatar>
-                     </div>
-                    {/* Premium Badge */}
-                    {subscriptionInfo?.subscribed && (
-                      <div className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-yellow-500 flex items-center justify-center">
-                        <Crown className="h-2.5 w-2.5 text-white" />
-                      </div>
-                    )}
-                    {/* Corporate Admin Badge */}
-                    {corporateSubscription && (
-                      <div className={`absolute ${subscriptionInfo?.subscribed ? '-bottom-1' : '-top-1'} -right-1 h-4 w-4 rounded-full bg-blue-500 flex items-center justify-center`}>
-                        <Building2 className="h-2.5 w-2.5 text-white" />
-                      </div>
-                    )}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56 max-w-[calc(100vw-2rem)] bg-popover" align="end" forceMount sideOffset={5}>
-                  <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">
-                        {profileName || user.user_metadata?.full_name || "User"}
-                      </p>
-                      <p className="text-xs leading-none text-muted-foreground">
-                        {user.email}
-                      </p>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  
-                  {subscriptionInfo && (
-                    <>
-                      <DropdownMenuLabel className="font-normal">
-                        <div className="flex items-center gap-2">
-                          <Crown className={`h-4 w-4 ${subscriptionInfo.subscribed ? 'text-primary' : 'text-muted-foreground'}`} />
-                          <div className="flex flex-col space-y-1 flex-1">
-                            <div className="flex items-center gap-2">
-                              <p className="text-sm font-medium leading-none">
-                                {subscriptionInfo.subscribed
-                                  ? `${getPlanName(subscriptionInfo.product_id)} Plan`
-                                  : "Free Plan"}
-                              </p>
-                              {subscriptionInfo.subscribed && (
-                                <Badge variant="outline" className="text-[10px] bg-gradient-to-r from-primary/20 to-sky-500/20 text-primary border-primary/30 px-1.5 py-0">
-                                  Premium
-                                </Badge>
-                              )}
-                            </div>
-                            {subscriptionInfo.subscribed && subscriptionInfo.subscription_end && (
-                              <p className="text-xs leading-none text-muted-foreground">
-                                Until {new Date(subscriptionInfo.subscription_end).toLocaleDateString()}
-                              </p>
-                            )}
-                            {subscriptionInfo.subscribed && !subscriptionInfo.subscription_end && (
-                              <p className="text-xs leading-none text-muted-foreground">
-                                Active subscription
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      </DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                    </>
-                  )}
-
-                  {/* Corporate Admin Section */}
-                  {corporateSubscription && (
-                    <>
-                      <DropdownMenuLabel className="font-normal">
-                        <div className="flex items-center gap-2">
-                          <Building2 className="h-4 w-4 text-blue-500" />
-                          <div className="flex flex-col space-y-1 flex-1">
-                            <div className="flex items-center gap-2">
-                              <p className="text-sm font-medium leading-none">
-                                Corporate Admin
-                              </p>
-                              <Badge variant="outline" className="text-[10px] bg-gradient-to-r from-blue-500/20 to-blue-600/20 text-blue-600 dark:text-blue-400 border-blue-500/30 px-1.5 py-0">
-                                {getCorporatePlanName(corporateSubscription.plan_type)}
-                              </Badge>
-                            </div>
-                          </div>
-                        </div>
-                      </DropdownMenuLabel>
-                      <DropdownMenuItem 
-                        onSelect={() => {
-                          handleProfileNavigate("/corporate-admin");
-                        }}
-                      >
-                        <Users className="mr-2 h-4 w-4" />
-                        <span>Manage Team</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                    </>
-                  )}
-                  
-                  <DropdownMenuItem
-                    onSelect={() => {
-                      handleProfileNavigate("/userdashboard");
-                    }}
-                  >
-                    <LayoutDashboard className="mr-2 h-4 w-4" />
-                    <span>Dashboard</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  {isAdmin && (
-                    <>
-                      <DropdownMenuItem
-                        onSelect={() => {
-                          navigate('/admin');
-                          setTimeout(() => window.scrollTo(0, 0), 0);
-                        }}
-                      >
-                        <Shield className="mr-2 h-4 w-4" />
-                        <span>Admin</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                    </>
-                  )}
-                  <DropdownMenuItem 
-                    onSelect={() => {
-                      handleLogout();
-                    }}
-                  >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Logout</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+            </SheetClose>
+            <div className="mb-2 shrink-0">
+              <h2 className="text-lg font-bold leading-tight text-foreground">Explore SmartyGym</h2>
+            </div>
+            <nav className="grid grid-cols-3 gap-3 overflow-y-auto">
+              {desktopDiscoveryItems.map(({ label, path, icon: Icon, iconClass, track }) => {
+                const active = location.pathname === path;
+                return (
                   <button
-                    className="inline-flex h-9 w-9 lg:h-11 lg:w-11 items-center justify-center rounded-full border-2 border-primary p-0 text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
-                    aria-label="Login or Sign Up"
+                    key={path}
+                    type="button"
+                    onClick={() => handleNavigate(path)}
+                    data-track-cta={track}
+                    className={`flex flex-col items-center justify-center rounded-2xl border-2 p-3 text-center font-semibold transition-all duration-200 ${active ? 'border-primary bg-primary/15 text-primary shadow-sm' : 'border-primary/25 bg-card text-foreground hover:border-primary hover:bg-primary/10'} ${label === 'Contact' ? 'col-span-3' : ''}`}
                   >
-                    <UserIcon className="h-5 w-5" />
+                    <span className={`mx-auto mb-1 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 ${iconClass}`}>
+                      <Icon className="h-8 w-8" />
+                    </span>
+                    <span className="block text-sm leading-tight">{label}</span>
                   </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-48 max-w-[calc(100vw-2rem)] bg-background" align="end">
-                  <DropdownMenuItem 
-                    onSelect={(e) => {
-                      e.preventDefault();
-                      navigate("/auth?mode=login");
-                      setTimeout(() => window.scrollTo(0, 0), 0);
-                    }}
-                  >
-                    <UserIcon className="mr-2 h-4 w-4" />
-                    <span>Login</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem 
-                    onSelect={(e) => {
-                      e.preventDefault();
-                      navigate("/auth?mode=signup");
-                      setTimeout(() => window.scrollTo(0, 0), 0);
-                    }}
-                  >
-                    <UserIcon className="mr-2 h-4 w-4" />
-                    <span>Sign Up</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-          </div>
+                );
+              })}
+            </nav>
+          </SheetContent>
+        </Sheet>
+
+        {/* Center: SMARTYGYM wordmark (matches mobile) */}
+        <button
+          type="button"
+          onClick={() => {
+            if (location.pathname === "/") {
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            } else {
+              navigate("/");
+              setTimeout(() => window.scrollTo(0, 0), 0);
+            }
+          }}
+          aria-label="SmartyGym home"
+          className="absolute left-1/2 -translate-x-1/2 text-xl font-extrabold tracking-tight leading-none"
+        >
+          <span className="text-primary">SMARTY</span>
+          <span className="text-green-500">GYM</span>
+        </button>
+
+        {/* Far-right: Smarty Coach + Avatar/Login */}
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setSmartyCoachOpen(true)}
+            aria-label="Smarty Coach"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-primary bg-background hover:bg-primary/10 transition-colors"
+          >
+            <img src={smartyCoachIcon} alt="" aria-hidden="true" className="h-7 w-7 rounded-full" width={28} height={28} />
+          </button>
+
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  aria-label="Account"
+                  className="relative inline-flex items-center justify-center rounded-full"
+                >
+                  <div className={`flex h-9 w-9 items-center justify-center rounded-full border-2 border-primary transition-colors hover:bg-primary/10 ${subscriptionInfo?.subscribed ? 'ring-2 ring-yellow-500 ring-offset-2 ring-offset-background' : ''} ${corporateSubscription ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-background' : ''}`}>
+                    <Avatar className="h-7 w-7">
+                      <AvatarImage src={avatarUrl || undefined} alt="Profile" />
+                      <AvatarFallback className="text-xs">{getUserInitials()}</AvatarFallback>
+                    </Avatar>
+                  </div>
+                  {unreadCount > 0 && (
+                    <span className="pointer-events-none absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-background" />
+                  )}
+                  {subscriptionInfo?.subscribed && (
+                    <div className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-yellow-500 flex items-center justify-center">
+                      <Crown className="h-2.5 w-2.5 text-white" />
+                    </div>
+                  )}
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56 bg-popover" align="end" forceMount sideOffset={6}>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">{profileName || user.user_metadata?.full_name || "User"}</p>
+                    <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {subscriptionInfo && (
+                  <>
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex items-center gap-2">
+                        <Crown className={`h-4 w-4 ${subscriptionInfo.subscribed ? 'text-primary' : 'text-muted-foreground'}`} />
+                        <p className="text-sm font-medium leading-none">
+                          {subscriptionInfo.subscribed ? `${getPlanName(subscriptionInfo.product_id)} Plan` : "Free Plan"}
+                        </p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
+                {corporateSubscription && (
+                  <>
+                    <DropdownMenuItem onSelect={() => handleProfileNavigate("/corporate-admin")}>
+                      <Users className="mr-2 h-4 w-4" /><span>Manage Team</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
+                <DropdownMenuItem onSelect={() => handleProfileNavigate("/userdashboard")}>
+                  <LayoutDashboard className="mr-2 h-4 w-4" /><span>Dashboard</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => handleProfileNavigate("/userdashboard?tab=messages")}>
+                  <div className="relative mr-2">
+                    <Mail className={`h-4 w-4 ${unreadCount > 0 ? 'text-red-500' : ''}`} />
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-red-500 ring-2 ring-popover" />
+                    )}
+                  </div>
+                  <span>Messages</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    setTheme(resolvedTheme === "dark" ? "light" : "dark");
+                  }}
+                >
+                  {resolvedTheme === "dark" ? (
+                    <><Sun className="mr-2 h-4 w-4" /><span>Light Mode</span></>
+                  ) : (
+                    <><Moon className="mr-2 h-4 w-4" /><span>Dark Mode</span></>
+                  )}
+                </DropdownMenuItem>
+                {isAdmin && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onSelect={() => { navigate("/admin"); setTimeout(() => window.scrollTo(0, 0), 0); }}>
+                      <Shield className="mr-2 h-4 w-4" /><span>Admin</span>
+                    </DropdownMenuItem>
+                  </>
+                )}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" /><span>Logout</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  className="inline-flex h-9 items-center justify-center rounded-full border-2 border-primary px-4 text-sm font-semibold text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+                >
+                  Log In
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-48 bg-popover" align="end" sideOffset={6}>
+                <DropdownMenuItem onSelect={() => { navigate("/auth?mode=login"); setTimeout(() => window.scrollTo(0, 0), 0); }}>
+                  <UserIcon className="mr-2 h-4 w-4" /><span>Login</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => { navigate("/auth?mode=signup"); setTimeout(() => window.scrollTo(0, 0), 0); }}>
+                  <UserIcon className="mr-2 h-4 w-4" /><span>Sign Up</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
       </div>
     </header>
