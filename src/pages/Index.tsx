@@ -1081,12 +1081,9 @@ const Index = () => {
                   <br />
                   <span className="text-primary">All In Your Pocket.</span>
                 </p>
-                <div className="mt-6 flex items-center justify-center gap-3">
-                  <Brain className="w-7 h-7 text-green-500" aria-hidden="true" />
-                  <p className="text-2xl lg:text-3xl font-extrabold tracking-tight">
-                    100% Human. <span className="text-red-500">0% AI.</span>
-                  </p>
-                </div>
+                <p className="mt-6 text-2xl lg:text-3xl font-extrabold tracking-tight text-center">
+                  100% Human. <span className="text-red-500">0% AI.</span>
+                </p>
                 <p className="text-sm text-muted-foreground mt-2 max-w-xl mx-auto">
                   Every workout and program designed by{" "}
                   <Link to="/coach-profile" className="text-primary hover:underline font-medium">
