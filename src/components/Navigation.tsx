@@ -490,7 +490,7 @@ export const Navigation = () => {
             }
           }}
           aria-label="SmartyGym home"
-          className="absolute left-1/2 -translate-x-1/2 text-xl font-extrabold tracking-tight leading-none"
+          className="absolute left-1/2 -translate-x-1/2 text-[2.1875rem] font-extrabold tracking-tight leading-none"
         >
           <span className="text-primary">SMARTY</span>
           <span className="text-green-500">GYM</span>
