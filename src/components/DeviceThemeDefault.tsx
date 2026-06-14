@@ -35,9 +35,12 @@ export const DeviceThemeDefault = () => {
   useEffect(() => {
     if (!theme) return;
     const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
-    if (isDesktop) return; // don't persist user toggles on desktop
+    if (isDesktop) {
+      if (theme !== "dark") setTheme("dark");
+      return;
+    }
     sessionStorage.setItem("smartygym-session-theme", theme);
-  }, [theme]);
+  }, [setTheme, theme]);
 
   return null;
 };
