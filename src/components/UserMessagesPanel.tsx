@@ -39,6 +39,8 @@ const compactMessageHtml = (html: string): string => {
   return html
     .replace(/&nbsp;|\u00a0/gi, ' ')
     .replace(/<hr[^>]*>/gi, '')
+    .replace(/<p\b[^>]*>\s*(?:<(?:strong|b)\b[^>]*>\s*)?[━─—–\-_\s]{8,}(?:\s*<\/(?:strong|b)>)?\s*<\/p>/gi, '')
+    .replace(/<(?:strong|b)\b[^>]*>\s*[━─—–\-_\s]{8,}\s*<\/(?:strong|b)>/gi, '')
     .replace(/<p[^>]*>\s*(?:<br\s*\/?>\s*)*<\/p>/gi, '')
     .replace(/(?:<br\s*\/?>\s*){2,}/gi, '<br />')
     .replace(/(\r?\n\s*){2,}/g, '\n')
