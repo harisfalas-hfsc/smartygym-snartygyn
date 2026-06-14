@@ -634,7 +634,10 @@ const Index = () => {
               <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-muted-foreground mt-3 leading-snug">
                 500+ Expert Workouts · Training Programs · Blog Insights · Smarty Tools
                 <br />
-                <span className="text-primary">All In Your Pocket.</span>
+              <span className="text-primary">All In Your Pocket.</span>
+              </p>
+              <p className="text-lg font-extrabold tracking-tight mt-3 mb-1">
+                100% Human. <span className="text-red-500">0% AI.</span>
               </p>
               <Link
                 to="/about"
