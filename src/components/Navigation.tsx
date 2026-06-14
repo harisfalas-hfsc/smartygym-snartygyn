@@ -574,7 +574,6 @@ export const Navigation = () => {
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onSelect={(e) => {
-                    e.preventDefault();
                     setTheme(resolvedTheme === "dark" ? "light" : "dark");
                   }}
                 >
@@ -618,7 +617,6 @@ export const Navigation = () => {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onSelect={(e) => {
-                    e.preventDefault();
                     setTheme(resolvedTheme === "dark" ? "light" : "dark");
                   }}
                 >

@@ -2,10 +2,10 @@ import { useNavigate } from "react-router-dom";
 import { ChevronRight, Dumbbell, Calendar, Newspaper, Wrench, Clock, Calculator, Flame, Activity } from "lucide-react";
 import { getBlogArticleImage } from "@/utils/blogImages";
 import { cn } from "@/lib/utils";
-import heroWorkoutsImage from "@/assets/hero-workouts-bright.jpg";
-import heroProgramsImage from "@/assets/hero-programs.jpg";
-import heroBlogImage from "@/assets/hero-blog.jpg";
-import heroToolsImage from "@/assets/hero-tools.jpg";
+import heroWorkoutsImage from "@/assets/hero-workouts-bright2.jpg";
+import heroProgramsImage from "@/assets/hero-programs-bright2.jpg";
+import heroBlogImage from "@/assets/hero-blog-bright2.jpg";
+import heroToolsImage from "@/assets/hero-tools-bright2.jpg";
 import toolTimerImage from "@/assets/tools/timer-card-mobile.jpg";
 import tool1RmImage from "@/assets/tools/1rm-card-mobile.jpg";
 import toolMacroImage from "@/assets/tools/macro-card-mobile.jpg";
@@ -96,9 +96,9 @@ export const DesktopHeroRows = ({ workouts, programs, articles, workoutCategoryT
                   loading="lazy"
                   className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-[1.03] transition-transform duration-500"
                 />
-                <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-black/10" />
+                <div className="absolute inset-0 bg-gradient-to-r from-white/85 via-white/55 to-white/10 dark:from-black/80 dark:via-black/50 dark:to-black/10" />
                 <div className="relative h-full flex items-center justify-between gap-4 px-6">
-                  <div className="flex items-center gap-4 text-white">
+                  <div className="flex items-center gap-4 text-foreground dark:text-white">
                     <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary/90 shadow-lg">
                       <Icon className="h-6 w-6 text-primary-foreground" />
                     </span>
@@ -125,7 +125,7 @@ export const DesktopHeroRows = ({ workouts, programs, articles, workoutCategoryT
                       className="group flex flex-col bg-card border-2 border-primary/20 rounded-xl overflow-hidden hover:border-primary hover:shadow-md transition-all text-left"
                       aria-label={item.title}
                     >
-                      <div className="relative aspect-[16/9] w-full overflow-hidden bg-muted">
+                      <div className="relative h-40 w-full overflow-hidden bg-muted">
                         <img
                           src={item.image}
                           alt={item.title}
@@ -147,7 +147,7 @@ export const DesktopHeroRows = ({ workouts, programs, articles, workoutCategoryT
                       key={idx}
                       className="flex flex-col bg-card border-2 border-primary/20 rounded-xl overflow-hidden"
                     >
-                      <div className="aspect-[16/9] w-full bg-muted animate-pulse" />
+                      <div className="h-40 w-full bg-muted animate-pulse" />
                       <div className="px-3 py-2">
                         <div className="h-4 w-3/4 bg-muted animate-pulse rounded" />
                         <div className="h-3 w-1/2 bg-muted animate-pulse rounded mt-1.5" />
