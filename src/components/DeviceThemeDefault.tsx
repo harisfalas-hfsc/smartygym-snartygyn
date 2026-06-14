@@ -1,45 +1,31 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useTheme } from "next-themes";
 
 /**
- * Desktop (>=1024px): dark mode only, always forced.
- * Mobile (<1024px): defaults to light, user can toggle.
+ * Default theme is light on both desktop and mobile.
+ * Users can freely toggle dark/light; the choice is remembered for the session.
  */
 export const DeviceThemeDefault = () => {
   const { setTheme, theme } = useTheme();
+  const initialized = useRef(false);
 
   useEffect(() => {
-    const mq = window.matchMedia("(min-width: 1024px)");
-
-    const apply = () => {
-      if (mq.matches) {
-        // Desktop: always dark
-        setTheme("dark");
-        sessionStorage.setItem("smartygym-session-theme", "dark");
-      } else {
-        const sessionTheme = sessionStorage.getItem("smartygym-session-theme");
-        if (sessionTheme) {
-          setTheme(sessionTheme);
-        } else {
-          setTheme("light");
-          sessionStorage.setItem("smartygym-session-theme", "light");
-        }
-      }
-    };
-
-    apply();
-    mq.addEventListener("change", apply);
-    return () => mq.removeEventListener("change", apply);
+    if (initialized.current) return;
+    initialized.current = true;
+    const sessionTheme = sessionStorage.getItem("smartygym-session-theme");
+    if (sessionTheme === "dark" || sessionTheme === "light") {
+      setTheme(sessionTheme);
+    } else {
+      setTheme("light");
+      sessionStorage.setItem("smartygym-session-theme", "light");
+    }
   }, [setTheme]);
 
   useEffect(() => {
     if (!theme) return;
-    const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
-    if (isDesktop) {
-      if (theme !== "dark") setTheme("dark");
-      return;
+    if (theme === "dark" || theme === "light") {
+      sessionStorage.setItem("smartygym-session-theme", theme);
     }
-    sessionStorage.setItem("smartygym-session-theme", theme);
   }, [setTheme, theme]);
 
   return null;

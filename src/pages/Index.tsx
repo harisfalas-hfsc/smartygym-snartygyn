@@ -7,7 +7,8 @@ import { ServiceCard } from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Check, ChevronDown, ChevronLeft, ChevronRight, Move, Ban, Brain, CheckCircle2, Award, Shield, Compass, Sparkles, Info, User, HelpCircle, ShoppingBag, Star, Clock, CalendarCheck, Home, Shuffle, ShoppingCart, Sunrise } from "lucide-react";
+import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Check, ChevronDown, ChevronLeft, ChevronRight, Move, Ban, Brain, CheckCircle2, Award, Shield, Compass, Sparkles, Info, User, HelpCircle, ShoppingBag, Star, Clock, CalendarCheck, Home, Shuffle, ShoppingCart, Sunrise, Crown, GraduationCap, Rocket, Plane } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { getBlogArticleImage } from "@/utils/blogImages";
@@ -90,6 +91,7 @@ const Index = () => {
   const [toolsCarouselApi, setToolsCarouselApi] = useState<CarouselApi>();
   const [toolsSlide, setToolsSlide] = useState(0);
   const [activeWodIndex, setActiveWodIndex] = useState(0);
+  const [activeAudienceTooltip, setActiveAudienceTooltip] = useState<string | null>(null);
 
   useEffect(() => {
     if (!carouselApi) return;
@@ -1088,6 +1090,114 @@ const Index = () => {
               workoutCategoryToSlug={workoutCategoryToSlug}
               programCategoryToSlug={programCategoryToSlug}
             />
+
+            {/* Desktop: "Your Gym Re-imagined" content block (no hero picture) */}
+            <section className="hidden md:block bg-background mt-8">
+              <div className="container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6">
+                <div className="bg-background/60 backdrop-blur-sm p-6 rounded-lg border-2 border-primary/30 text-center">
+                  <p className="text-xl font-bold text-primary mb-2">
+                    Your Gym Re-imagined Anywhere, Anytime
+                  </p>
+                  <p className="text-base text-muted-foreground leading-relaxed">
+                    We are not here to replace your gym. We are here to back you up when life gets in the way. Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed, SmartyGym is your backup plan. Or, if you go to your gym but want to follow a professional, science-based workout or training program designed by{' '}
+                    <Link to="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</Link>, we provide that expert guidance.
+                  </p>
+                  <Link to="/smarty-premium" className="inline-flex items-center gap-2 text-base font-semibold text-green-500 hover:text-green-600 hover:underline mt-2">
+                    <Crown className="w-5 h-5" />
+                    Unlock Everything for Life
+                    <ChevronRight className="w-5 h-5" />
+                  </Link>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-5">
+                    <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20 h-full min-h-[88px]">
+                      <GraduationCap className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
+                      <div className="flex-1 text-left">
+                        <p className="font-semibold text-sm mb-1">Real Expertise</p>
+                        <p className="text-xs text-muted-foreground leading-relaxed">Every program designed by certified coach Haris Falas — never by AI, always with 20+ years of experience.</p>
+                      </div>
+                    </article>
+                    <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20 h-full min-h-[88px]">
+                      <Heart className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
+                      <div className="flex-1 text-left">
+                        <p className="font-semibold text-sm mb-1">Personal Touch</p>
+                        <p className="text-xs text-muted-foreground leading-relaxed">Direct access to the coach who created your program. Real support, real guidance, real results.</p>
+                      </div>
+                    </article>
+                    <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20 h-full min-h-[88px]">
+                      <UserCheck className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
+                      <div className="flex-1 text-left">
+                        <p className="font-semibold text-sm mb-1">Not a Robot</p>
+                        <p className="text-xs text-muted-foreground leading-relaxed">We don't generate workouts with algorithms. We design them with care, experience, and your goals in mind.</p>
+                      </div>
+                    </article>
+                    <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20 h-full min-h-[88px]">
+                      <Rocket className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
+                      <div className="flex-1 text-left">
+                        <p className="font-semibold text-sm mb-1">Never Stop Expanding</p>
+                        <p className="text-xs text-muted-foreground leading-relaxed">New workouts, programs, tools, and articles — keeping you current with the latest science and trends.</p>
+                      </div>
+                    </article>
+                  </div>
+
+                  <div className="space-y-2 text-center mt-6 pt-4 border-t border-primary/20">
+                    <p className="text-base font-semibold text-primary">
+                      Every workout and training program is science-based and personally created by{' '}
+                      <Link to="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</Link>.
+                    </p>
+                    <p className="text-base text-muted-foreground leading-relaxed">
+                      Never by AI. Never by algorithms. Always by a real human expert who understands YOUR needs. Training designed by humans, for humans.
+                    </p>
+                  </div>
+
+                  <div className="mt-6 pt-4 border-t border-primary/20">
+                    <h4 className="text-sm font-semibold text-muted-foreground mb-3 text-center">
+                      Who is <span className="text-primary">SmartyGym</span> For?
+                    </h4>
+                    <div className="grid grid-cols-6 gap-2 max-w-2xl mx-auto">
+                      {[
+                        { icon: Users, label: "Busy Adults", color: "text-blue-500", description: "Perfect for professionals juggling work and life. Get effective workouts that fit your schedule—no commute, no waiting for equipment. Train when you have time, not when the gym is open." },
+                        { icon: Heart, label: "Parents", color: "text-pink-500", description: "Train at home while kids nap or play nearby. No babysitter needed, no guilt about \"me time.\" Quick, focused sessions that work around your family's schedule." },
+                        { icon: GraduationCap, label: "Beginners", color: "text-emerald-500", description: "Start your fitness journey with confidence. Clear instructions, proper form guidance, and progressive programs designed to build your foundation safely." },
+                        { icon: Target, label: "Intermediate", color: "text-orange-500", description: "Break through plateaus with structured periodization. Challenge yourself with varied programming that keeps you progressing without the guesswork." },
+                        { icon: Plane, label: "Travelers", color: "text-cyan-500", description: "Stay consistent no matter where you are. Hotel room, Airbnb, or park—these workouts adapt to any space with minimal or no equipment needed." },
+                        { icon: Dumbbell, label: "Gym-Goers", color: "text-purple-500", description: "Enhance your gym routine with expert programming. Follow structured plans that maximize your gym time and ensure balanced, progressive training." },
+                      ].map((audience) => {
+                        const Icon = audience.icon;
+                        return (
+                          <Tooltip key={audience.label} open={activeAudienceTooltip === audience.label}>
+                            <TooltipTrigger asChild>
+                              <div
+                                className="flex flex-col items-center gap-1 cursor-pointer"
+                                onMouseEnter={() => setActiveAudienceTooltip(audience.label)}
+                                onMouseLeave={() => setActiveAudienceTooltip(null)}
+                                onClick={() => setActiveAudienceTooltip(audience.label)}
+                              >
+                                <Icon className={`w-6 h-6 ${audience.color}`} />
+                                <span className="text-sm font-bold text-foreground text-center">{audience.label}</span>
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent side="top" className="max-w-xs text-center">
+                              {audience.description}
+                            </TooltipContent>
+                          </Tooltip>
+                        );
+                      })}
+                    </div>
+                    <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mt-4">
+                      <Link to="/why-invest-in-smartygym" className="inline-flex items-center gap-1.5 text-sm font-semibold text-green-500 hover:text-green-600 hover:underline">
+                        Why Invest in SmartyGym
+                        <ChevronRight className="w-4 h-4" />
+                      </Link>
+                      <Link to="/the-smarty-method" className="inline-flex items-center gap-1.5 text-sm font-semibold text-green-500 hover:text-green-600 hover:underline">
+                        <BookOpen className="w-4 h-4" />
+                        Discover The Smarty Method
+                        <ChevronRight className="w-4 h-4" />
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
 
         <LazySection minHeight="400px" rootMargin="300px">
         <div className="container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6">
