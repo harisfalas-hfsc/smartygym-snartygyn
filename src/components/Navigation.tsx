@@ -615,6 +615,19 @@ export const Navigation = () => {
                 <DropdownMenuItem onSelect={() => { navigate("/auth?mode=signup"); setTimeout(() => window.scrollTo(0, 0), 0); }}>
                   <UserIcon className="mr-2 h-4 w-4" /><span>Sign Up</span>
                 </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    setTheme(resolvedTheme === "dark" ? "light" : "dark");
+                  }}
+                >
+                  {resolvedTheme === "dark" ? (
+                    <><Sun className="mr-2 h-4 w-4" /><span>Light Mode</span></>
+                  ) : (
+                    <><Moon className="mr-2 h-4 w-4" /><span>Dark Mode</span></>
+                  )}
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           )}
