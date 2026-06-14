@@ -81,7 +81,8 @@ export const DesktopHeroRows = ({ workouts, programs, articles, workoutCategoryT
         {rows.map((row) => {
           const Icon = row.icon;
           return (
-            <article key={row.key} className="flex flex-col gap-3">
+            <article key={row.key} className="flex flex-col gap-2">
+              <h2 className="text-sm font-extrabold tracking-tight text-primary uppercase">{row.title}</h2>
               {/* Wide pillar banner */}
               <button
                 type="button"
