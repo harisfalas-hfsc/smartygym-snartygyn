@@ -51,6 +51,20 @@ function stripDayReferences(text: string): string {
   return result;
 }
 
+function compactDashboardNotificationHtml(html: string): string {
+  if (!html) return html;
+
+  return html
+    .replace(/&nbsp;|\u00a0/gi, " ")
+    .replace(/<hr[^>]*>/gi, "")
+    .replace(/<p\b[^>]*>\s*(?:<(?:strong|b)\b[^>]*>\s*)?[━─—–\-_\s]{8,}(?:\s*<\/(?:strong|b)>)?\s*<\/p>/gi, "")
+    .replace(/<(?:strong|b)\b[^>]*>\s*[━─—–\-_\s]{8,}\s*<\/(?:strong|b)>/gi, "")
+    .replace(/<p[^>]*>\s*(?:<br\s*\/?>\s*)*<\/p>/gi, "")
+    .replace(/(?:<br\s*\/?>\s*){2,}/gi, "<br />")
+    .replace(/(\r?\n\s*){2,}/g, "\n")
+    .trim();
+}
+
 // Strip "Good Morning, Smarty!" greeting from template content to prevent duplicates
 // The main email wrapper already includes this greeting, so we remove it from sections
 function stripMorningGreeting(html: string): string {
@@ -509,7 +523,7 @@ serve(async (req) => {
           user_id: profile.user_id,
           message_type: MESSAGE_TYPES.WOD_NOTIFICATION,
           subject: stripDayReferences(wodDashboardSubject),
-          content: stripDayReferences(wodDashboardContent),
+          content: compactDashboardNotificationHtml(stripDayReferences(wodDashboardContent)),
           is_read: false,
         });
         wodDashboardSent++;
@@ -520,7 +534,7 @@ serve(async (req) => {
           user_id: profile.user_id,
           message_type: MESSAGE_TYPES.DAILY_RITUAL,
           subject: stripDayReferences(ritualDashboardSubject),
-          content: stripDayReferences(ritualDashboardContent),
+          content: compactDashboardNotificationHtml(stripDayReferences(ritualDashboardContent)),
           is_read: false,
         });
         ritualDashboardSent++;
