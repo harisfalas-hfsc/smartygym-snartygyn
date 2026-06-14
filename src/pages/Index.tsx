@@ -491,7 +491,7 @@ const Index = () => {
           "logo": smartyGymLogo,
           "image": smartyGymLogo,
           "description": "Premier online gym offering professional fitness training by Sports Scientist Haris Falas. Evidence-based workout programs, structured training plans, and personalized coaching. Train anywhere, anytime with expert guidance.",
-          "slogan": "Your Gym Re-imagined. Anywhere, Anytime.",
+          "slogan": "YOUR GYM RE-IMAGINED. ANYWHERE, ANYTIME.",
           "founder": {
             "@type": "Person",
             "name": "Haris Falas",
@@ -626,7 +626,7 @@ const Index = () => {
               <p className="text-[11px] font-bold tracking-[0.2em] uppercase text-primary mb-2">
                 Science-Backed · Expert-Designed
               </p>
-              <h1 className="text-3xl font-extrabold tracking-tight uppercase leading-[1.05] text-foreground">
+              <h1 className="text-4xl font-extrabold tracking-tight uppercase leading-[1.05] text-foreground">
                 Train <span className="text-primary">Smarter.</span>
                 <br />
                 Not Harder.
@@ -1071,7 +1071,7 @@ const Index = () => {
                 <p className="text-sm font-bold tracking-[0.2em] uppercase text-primary mb-3">
                   Science-Backed · Expert-Designed
                 </p>
-                <h1 className="text-5xl lg:text-6xl font-extrabold tracking-tight uppercase leading-[1.05] text-foreground">
+                <h1 className="text-6xl lg:text-7xl font-extrabold tracking-tight uppercase leading-[1.05] text-foreground">
                   Train <span className="text-primary">Smarter.</span>
                   <br />
                   Not Harder.
@@ -1081,12 +1081,9 @@ const Index = () => {
                   <br />
                   <span className="text-primary">All In Your Pocket.</span>
                 </p>
-                <div className="mt-6 flex items-center justify-center gap-3">
-                  <Brain className="w-7 h-7 text-green-500" aria-hidden="true" />
-                  <p className="text-2xl lg:text-3xl font-extrabold tracking-tight">
-                    100% Human. <span className="text-red-500">0% AI.</span>
-                  </p>
-                </div>
+                <p className="mt-6 text-2xl lg:text-3xl font-extrabold tracking-tight text-center">
+                  100% Human. <span className="text-red-500">0% AI.</span>
+                </p>
                 <p className="text-sm text-muted-foreground mt-2 max-w-xl mx-auto">
                   Every workout and program designed by{" "}
                   <Link to="/coach-profile" className="text-primary hover:underline font-medium">
@@ -1108,8 +1105,8 @@ const Index = () => {
             <section className="hidden md:block bg-background mt-8">
               <div className="container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6">
                 <div className="bg-background/60 backdrop-blur-sm p-6 rounded-lg border-2 border-primary/30 text-center">
-                  <p className="text-xl font-bold text-primary mb-2">
-                    Your Gym Re-imagined Anywhere, Anytime
+                  <p className="text-2xl font-bold text-primary mb-2 uppercase">
+                    YOUR GYM RE-IMAGINED ANYWHERE, ANYTIME
                   </p>
                   <p className="text-base text-muted-foreground leading-relaxed">
                     We are not here to replace your gym. We are here to back you up when life gets in the way. Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed, SmartyGym is your backup plan. Or, if you go to your gym but want to follow a professional, science-based workout or training program designed by{' '}
