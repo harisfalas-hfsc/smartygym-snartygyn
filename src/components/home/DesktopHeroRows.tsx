@@ -132,7 +132,7 @@ export const DesktopHeroRows = ({ workouts, programs, articles, workoutCategoryT
                   Array.from({ length: 3 }).map((_, idx) => (
                     <div
                       key={idx}
-                      className="flex flex-col bg-card border-2 border-primary/20 rounded-xl overflow-hidden"
+                      className="flex flex-col bg-card border-2 border-green-500/60 rounded-xl overflow-hidden"
                     >
                       <div className="h-40 w-full bg-muted animate-pulse" />
                       <div className="px-3 py-2">
