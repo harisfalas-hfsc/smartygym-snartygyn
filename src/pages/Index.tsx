@@ -199,7 +199,6 @@ const Index = () => {
         .slice(0, 3);
     },
     staleTime: 1000 * 60 * 5,
-    enabled: isMobile,
   });
 
   // Latest 3 programs for mobile "Featured Training Programs" section
@@ -214,7 +213,6 @@ const Index = () => {
         .slice(0, 3);
     },
     staleTime: 1000 * 60 * 5,
-    enabled: isMobile,
   });
 
   // Latest 3 blog articles for mobile "Featured Articles" section
@@ -235,7 +233,6 @@ const Index = () => {
         .slice(0, 3);
     },
     staleTime: 1000 * 60 * 5,
-    enabled: isMobile,
   });
 
   const workoutCategoryToSlug = (cat?: string | null) =>
