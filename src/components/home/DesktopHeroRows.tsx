@@ -82,37 +82,24 @@ export const DesktopHeroRows = ({ workouts, programs, articles, workoutCategoryT
           const Icon = row.icon;
           return (
             <article key={row.key} className="flex flex-col gap-2">
-              <h2 className="text-sm font-extrabold tracking-tight text-primary uppercase">{row.title}</h2>
-              {/* Wide pillar banner */}
-              <button
-                type="button"
-                onClick={() => navigate(row.route)}
-                className="relative w-full h-[140px] group overflow-hidden rounded-2xl border-2 border-primary/40 hover:border-primary transition-colors text-left"
-                aria-label={row.ctaLabel}
-              >
-                <img
-                  src={row.image}
-                  alt={row.title}
-                  loading="lazy"
-                  className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-[1.03] transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-r from-white/85 via-white/55 to-white/10 dark:from-black/80 dark:via-black/50 dark:to-black/10" />
-                <div className="relative h-full flex items-center justify-between gap-4 px-6">
-                  <div className="flex items-center gap-4 text-foreground dark:text-white">
-                    <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary/90 shadow-lg">
-                      <Icon className="h-6 w-6 text-primary-foreground" />
-                    </span>
-                    <div>
-                      <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-primary mb-0.5">Featured</p>
-                      <h2 className="text-2xl font-extrabold leading-none uppercase tracking-tight">{row.title}</h2>
-                    </div>
-                  </div>
-                  <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full border-2 border-primary bg-background/10 backdrop-blur-sm px-4 py-2 text-xs font-semibold text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                    {row.ctaLabel}
-                    <ChevronRight className="h-3.5 w-3.5" />
-                  </span>
+              {/* Section header: icon + title + Explore link */}
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <Icon className="h-5 w-5 text-primary" />
+                  <h2 className="text-base font-extrabold tracking-tight text-primary uppercase">
+                    Featured {row.title.replace(/^Smarty\s+/i, "")}
+                  </h2>
                 </div>
-              </button>
+                <button
+                  type="button"
+                  onClick={() => navigate(row.route)}
+                  className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+                  aria-label={row.ctaLabel}
+                >
+                  {row.ctaLabel}
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </button>
+              </div>
 
               {/* Featured items — uniform 3-up grid */}
               <div className="grid grid-cols-3 gap-3">
