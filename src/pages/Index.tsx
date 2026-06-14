@@ -1105,8 +1105,8 @@ const Index = () => {
             <section className="hidden md:block bg-background mt-8">
               <div className="container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6">
                 <div className="bg-background/60 backdrop-blur-sm p-6 rounded-lg border-2 border-primary/30 text-center">
-                  <p className="text-xl font-bold text-primary mb-2">
-                    Your Gym Re-imagined Anywhere, Anytime
+                  <p className="text-2xl font-bold text-primary mb-2 uppercase">
+                    YOUR GYM RE-IMAGINED ANYWHERE, ANYTIME
                   </p>
                   <p className="text-base text-muted-foreground leading-relaxed">
                     We are not here to replace your gym. We are here to back you up when life gets in the way. Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed, SmartyGym is your backup plan. Or, if you go to your gym but want to follow a professional, science-based workout or training program designed by{' '}
