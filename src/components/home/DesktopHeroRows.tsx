@@ -86,7 +86,7 @@ export const DesktopHeroRows = ({ workouts, programs, articles, workoutCategoryT
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
                   <Icon className="h-5 w-5 text-primary" />
-                  <h2 className="text-base font-extrabold tracking-tight text-primary uppercase">
+                  <h2 className="text-xl lg:text-2xl font-extrabold tracking-tight text-primary uppercase">
                     Featured {row.title.replace(/^Smarty\s+/i, "")}
                   </h2>
                 </div>
