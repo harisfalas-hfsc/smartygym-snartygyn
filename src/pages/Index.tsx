@@ -91,6 +91,7 @@ const Index = () => {
   const [toolsCarouselApi, setToolsCarouselApi] = useState<CarouselApi>();
   const [toolsSlide, setToolsSlide] = useState(0);
   const [activeWodIndex, setActiveWodIndex] = useState(0);
+  const [activeAudienceTooltip, setActiveAudienceTooltip] = useState<string | null>(null);
 
   useEffect(() => {
     if (!carouselApi) return;
