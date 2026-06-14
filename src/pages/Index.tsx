@@ -1069,6 +1069,31 @@ const Index = () => {
 
           </section> : <>
             {/* Desktop: Compact hero with 4 stacked pillar rows */}
+            <div className="hidden md:block container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6 pt-8 pb-4">
+              <div className="text-center mb-6">
+                <p className="text-sm font-bold tracking-[0.2em] uppercase text-primary mb-3">
+                  Science-Backed · Expert-Designed
+                </p>
+                <h1 className="text-5xl lg:text-6xl font-extrabold tracking-tight uppercase leading-[1.05] text-foreground">
+                  Train <span className="text-primary">Smarter.</span>
+                  <br />
+                  Not Harder.
+                </h1>
+                <p className="text-sm font-semibold tracking-[0.15em] uppercase text-muted-foreground mt-4 leading-snug">
+                  500+ Expert Workouts · Training Programs · Blog Insights · Smarty Tools
+                  <br />
+                  <span className="text-primary">All In Your Pocket.</span>
+                </p>
+                <Link
+                  to="/about"
+                  className="inline-flex items-center gap-1.5 mt-4 text-lg font-semibold text-green-500 hover:text-green-600 hover:underline transition-colors"
+                >
+                  <Info className="w-6 h-6" />
+                  About SmartyGym
+                  <ChevronRight className="w-6 h-6" />
+                </Link>
+              </div>
+            </div>
             <DesktopHeroRows
               workouts={latestWorkouts as any[]}
               programs={latestPrograms as any[]}
