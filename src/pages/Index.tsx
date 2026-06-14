@@ -29,6 +29,7 @@ import faqPlacardImage from "@/assets/faq-placard.jpg";
 import { fetchVisibleWorkoutMetadata } from "@/hooks/useTodayWods";
 import { getDifficultyColorClasses } from "@/lib/wodCycle";
 import { HeroDestinationConstellation } from "@/components/home/HeroDestinationConstellation";
+import { DesktopHeroRows } from "@/components/home/DesktopHeroRows";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
 
 import heroWodImage from "@/assets/hero-wod.jpg";
