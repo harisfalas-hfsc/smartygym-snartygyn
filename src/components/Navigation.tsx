@@ -478,35 +478,36 @@ export const Navigation = () => {
           </SheetContent>
         </Sheet>
 
-        {/* Center: SMARTYGYM wordmark (matches mobile) */}
-        <button
-          type="button"
-          onClick={() => {
-            if (location.pathname === "/") {
-              window.scrollTo({ top: 0, behavior: "smooth" });
-            } else {
-              navigate("/");
-              setTimeout(() => window.scrollTo(0, 0), 0);
-            }
-          }}
-          aria-label="SmartyGym home"
-          className="absolute left-1/2 -translate-x-1/2 text-[2.1875rem] font-extrabold tracking-tight leading-none"
-        >
-          <span className="text-primary">SMARTY</span>
-          <span className="text-green-500">GYM</span>
-        </button>
-
-        {/* Far-right: Smarty Coach + Avatar/Login */}
-        <div className="flex items-center gap-2">
+        {/* Center: SMARTYGYM wordmark + Smarty Coach grouped, centered as one */}
+        <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              if (location.pathname === "/") {
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              } else {
+                navigate("/");
+                setTimeout(() => window.scrollTo(0, 0), 0);
+              }
+            }}
+            aria-label="SmartyGym home"
+            className="text-[2.734375rem] font-extrabold tracking-tight leading-none"
+          >
+            <span className="text-primary">SMARTY</span>
+            <span className="text-green-500">GYM</span>
+          </button>
           <button
             type="button"
             onClick={() => setSmartyCoachOpen(true)}
             aria-label="Smarty Coach"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-primary bg-background hover:bg-primary/10 transition-colors"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full border-2 border-primary bg-background hover:bg-primary/10 transition-colors"
           >
-            <img src={smartyCoachIcon} alt="" aria-hidden="true" className="h-7 w-7 rounded-full" width={28} height={28} />
+            <img src={smartyCoachIcon} alt="" aria-hidden="true" className="h-9 w-9 rounded-full" width={36} height={36} />
           </button>
+        </div>
 
+        {/* Far-right: Avatar/Login */}
+        <div className="ml-auto flex items-center gap-2">
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -515,8 +516,8 @@ export const Navigation = () => {
                   aria-label="Account"
                   className="relative inline-flex items-center justify-center rounded-full"
                 >
-                  <div className={`flex h-9 w-9 items-center justify-center rounded-full border-2 border-primary transition-colors hover:bg-primary/10 ${subscriptionInfo?.subscribed ? 'ring-2 ring-yellow-500 ring-offset-2 ring-offset-background' : ''} ${corporateSubscription ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-background' : ''}`}>
-                    <Avatar className="h-7 w-7">
+                  <div className={`flex h-11 w-11 items-center justify-center rounded-full border-2 border-primary transition-colors hover:bg-primary/10 ${subscriptionInfo?.subscribed ? 'ring-2 ring-yellow-500 ring-offset-2 ring-offset-background' : ''} ${corporateSubscription ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-background' : ''}`}>
+                    <Avatar className="h-9 w-9">
                       <AvatarImage src={avatarUrl || undefined} alt="Profile" />
                       <AvatarFallback className="text-xs">{getUserInitials()}</AvatarFallback>
                     </Avatar>
