@@ -613,8 +613,9 @@ export const ContentCreationWizard = ({
                 }
               />
               <p className="text-xs text-muted-foreground pt-2 border-t mt-3">
-                Click <strong>Open Editor</strong> to fill in the body using our protocols
-                (library-first exercises, 5-section structure, description / instructions / tips).
+                <strong>Generate Workout</strong> builds the full session (name, description, 5-section body,
+                instructions, tips, image) using library-first exercises and saves it directly. Or click
+                <strong> Open Editor </strong> to write everything by hand.
               </p>
             </Card>
           )}
