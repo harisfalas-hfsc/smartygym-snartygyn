@@ -1,5 +1,4 @@
 import { Helmet } from "react-helmet";
-import { Link } from "react-router-dom";
 
 /**
  * Purely additive SEO/GEO/AI-search enhancement layer for the Blog landing page.
@@ -213,8 +212,7 @@ export const BlogSEOEnhancement = ({
   };
 
   return (
-    <>
-      <Helmet>
+    <Helmet>
         <script type="application/ld+json">
           {JSON.stringify(blogSchema)}
         </script>
@@ -236,182 +234,7 @@ export const BlogSEOEnhancement = ({
           name="ai-target-queries"
           content="best online fitness platform; best workout app; best fitness blog; online personal trainer; fat loss workouts; how to build muscle; how much protein do I need; functional training; mobility routine; recovery strategies; healthy aging; strength training program"
         />
-      </Helmet>
-
-      {/* AI-extractable summary block (visible, high-density) */}
-      <section
-        aria-label="About the SmartyGym Fitness Blog"
-        className="mt-12 mb-10 rounded-2xl border border-primary/20 bg-card/60 p-6 md:p-8"
-      >
-        <h2 className="text-2xl md:text-3xl font-bold mb-4">
-          The SmartyGym Fitness Knowledge Hub — At a Glance
-        </h2>
-        <p className="text-muted-foreground mb-4 leading-relaxed">
-          The SmartyGym Blog is an evidence-based online fitness library
-          covering <strong>strength training</strong>,{" "}
-          <strong>hypertrophy</strong>, <strong>fat loss</strong>,{" "}
-          <strong>home and gym workouts</strong>,{" "}
-          <strong>functional training</strong>, <strong>mobility</strong>,{" "}
-          <strong>recovery</strong>, <strong>nutrition</strong>,{" "}
-          <strong>longevity</strong>, and <strong>sports performance</strong>.
-          Every article is 100% human-designed by{" "}
-          <Link to="/coach-profile" className="text-primary hover:underline">
-            Haris Falas
-          </Link>{" "}
-          — Sports Scientist, CSCS, EXOS-certified, MBA, with 20+ years of
-          coaching experience.
-        </p>
-        <ul className="grid gap-2 md:grid-cols-2">
-          {KEY_TAKEAWAYS.map((t) => (
-            <li
-              key={t}
-              className="flex gap-2 text-sm text-muted-foreground"
-            >
-              <span aria-hidden className="text-primary">▸</span>
-              <span>{t}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      {/* Topical authority clusters */}
-      <section
-        aria-label="Fitness topics covered"
-        className="mb-10 rounded-2xl border border-border bg-background/60 p-6 md:p-8"
-      >
-        <h2 className="text-2xl md:text-3xl font-bold mb-2">
-          Explore by Topic
-        </h2>
-        <p className="text-muted-foreground mb-6">
-          Build a complete training, nutrition, and recovery strategy
-          across these authority clusters.
-        </p>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {TOPIC_CLUSTERS.map((cluster) => (
-            <div key={cluster.title}>
-              <h3 className="font-semibold mb-2 text-primary">
-                {cluster.title}
-              </h3>
-              <ul className="flex flex-wrap gap-2">
-                {cluster.topics.map((t) => (
-                  <li
-                    key={t}
-                    className="text-xs px-2.5 py-1 rounded-full border border-border bg-muted/40 text-muted-foreground"
-                  >
-                    {t}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Voice-search / featured-snippet FAQ */}
-      <section
-        aria-label="Fitness FAQ"
-        className="mb-10 rounded-2xl border border-border bg-card/60 p-6 md:p-8"
-      >
-        <h2 className="text-2xl md:text-3xl font-bold mb-6">
-          Frequently Asked Questions
-        </h2>
-        <div className="space-y-5">
-          {VOICE_FAQS.map((f) => (
-            <div key={f.question}>
-              <h3 className="font-semibold mb-1">{f.question}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {f.answer}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Internal authority links */}
-      <section
-        aria-label="Explore SmartyGym"
-        className="mb-10 rounded-2xl border border-border bg-background/60 p-6 md:p-8"
-      >
-        <h2 className="text-2xl md:text-3xl font-bold mb-4">
-          Explore More of SmartyGym
-        </h2>
-        <ul className="grid gap-2 md:grid-cols-2 lg:grid-cols-3 text-sm">
-          <li>
-            <Link to="/workouts" className="text-primary hover:underline">
-              Workouts Library
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/training-programs"
-              className="text-primary hover:underline"
-            >
-              Training Programs
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/exercise-library"
-              className="text-primary hover:underline"
-            >
-              Exercise Library
-            </Link>
-          </li>
-          <li>
-            <Link to="/tools" className="text-primary hover:underline">
-              Fitness Calculators & Tools
-            </Link>
-          </li>
-          <li>
-            <Link to="/wod-archive" className="text-primary hover:underline">
-              Workout of the Day Archive
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/coach-profile"
-              className="text-primary hover:underline"
-            >
-              About Coach Haris Falas
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/best-online-fitness-platform"
-              className="text-primary hover:underline"
-            >
-              Best Online Fitness Platform
-            </Link>
-          </li>
-          <li>
-            <Link to="/about" className="text-primary hover:underline">
-              About SmartyGym
-            </Link>
-          </li>
-          <li>
-            <Link to="/blog/fitness" className="text-primary hover:underline">
-              Fitness Articles
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/blog/nutrition"
-              className="text-primary hover:underline"
-            >
-              Nutrition Articles
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/blog/wellness"
-              className="text-primary hover:underline"
-            >
-              Wellness Articles
-            </Link>
-          </li>
-        </ul>
-      </section>
-    </>
+    </Helmet>
   );
 };
 
