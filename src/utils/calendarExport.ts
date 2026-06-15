@@ -112,15 +112,22 @@ export function downloadICSFile(icsContent: string, filename: string) {
   const url = URL.createObjectURL(blob);
   const safeName = `${filename.replace(/[^a-zA-Z0-9]/g, "_")}.ics`;
 
-  // iOS Safari ignores the `download` attribute and often refuses to handle
-  // blob: URLs for .ics. Use a data URL opened in a new tab so the OS hands
-  // the file to the Calendar app.
+  // Mobile (iOS Safari + Android WebView/APK wrappers like AppMySite) ignores
+  // the `download` attribute on blob URLs. Navigating to a data: URL lets the
+  // OS hand the .ics straight to the Calendar app via intent.
   const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
   const isIOS = /iPad|iPhone|iPod/.test(ua) && !(window as any).MSStream;
+  const isAndroid = /Android/i.test(ua);
+  const isMobile = isIOS || isAndroid;
 
-  if (isIOS) {
+  if (isMobile) {
     const dataUrl = `data:text/calendar;charset=utf-8,${encodeURIComponent(icsContent)}`;
-    window.location.href = dataUrl;
+    // Try opening in a new tab first (lets Android WebView fire VIEW intent);
+    // fall back to same-window navigation if the popup is blocked.
+    const opened = window.open(dataUrl, "_blank");
+    if (!opened) {
+      window.location.href = dataUrl;
+    }
     URL.revokeObjectURL(url);
     return;
   }
