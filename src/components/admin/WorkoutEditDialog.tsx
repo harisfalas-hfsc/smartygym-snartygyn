@@ -139,6 +139,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
 
   // Check if current category is micro-workout (fields should be locked)
   const isMicroWorkout = formData.category === 'MICRO-WORKOUTS';
+  const isExistingWorkout = Boolean(workout?.id);
 
   useEffect(() => {
     if (workout && workout.id) {
@@ -352,7 +353,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
       // Remove the generate_unique_image flag before saving
       const { generate_unique_image, stripe_product_id: existingStripeProductId, stripe_price_id: existingStripePriceId, ...dataToSave } = saveData;
 
-      if (workout) {
+      if (isExistingWorkout) {
         // Update existing workout
         const { error } = await supabase
           .from('admin_workouts')
@@ -562,9 +563,9 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[95vw] max-w-5xl max-h-[95vh] overflow-y-auto overflow-x-hidden">
         <DialogHeader>
-          <DialogTitle>{workout ? 'Edit Workout' : 'Create New Workout'}</DialogTitle>
+          <DialogTitle>{isExistingWorkout ? 'Edit Workout' : 'Create New Workout'}</DialogTitle>
           <DialogDescription>
-            {workout ? 'Update workout details' : 'Add a new workout to your library'}
+            {isExistingWorkout ? 'Update workout details' : 'Add a new workout to your library'}
           </DialogDescription>
         </DialogHeader>
 
@@ -856,7 +857,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
           </div>
 
           {/* Notification Toggle - Only for NEW workouts */}
-          {!workout && (
+          {!isExistingWorkout && (
             <div className="space-y-2 pt-4 border-t border-orange-200 bg-orange-50/50 p-4 rounded-lg">
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
