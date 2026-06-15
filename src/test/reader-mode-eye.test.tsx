@@ -1,22 +1,27 @@
 import { render } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { describe, expect, it } from "vitest";
 import { ReaderModeDialog } from "@/components/ReaderModeDialog";
 import { ExerciseHTMLContent } from "@/components/ExerciseHTMLContent";
 
 describe("ReaderModeDialog exercise eye styling", () => {
   it("keeps exercise eye icons on the primary blue stroke inside reader mode", () => {
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+
     render(
-      <ReaderModeDialog
-        open
-        onOpenChange={() => undefined}
-        title="Reader check"
-        content={
-          <ExerciseHTMLContent
-            content={'<ul><li>{{exercise:exercise-id:Bird Dog}}</li></ul>'}
-            enableExerciseLinking
-          />
-        }
-      />,
+      <QueryClientProvider client={queryClient}>
+        <ReaderModeDialog
+          open
+          onOpenChange={() => undefined}
+          title="Reader check"
+          content={
+            <ExerciseHTMLContent
+              content={'<ul><li>{{exercise:exercise-id:Bird Dog}}</li></ul>'}
+              enableExerciseLinking
+            />
+          }
+        />
+      </QueryClientProvider>,
     );
 
     const eyeIcon = document.querySelector(
