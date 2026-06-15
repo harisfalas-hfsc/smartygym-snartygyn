@@ -175,7 +175,7 @@ All colors MUST be HSL.
     #main-content,
     footer,
     header > div {
-      width: var(--site-desktop-preview-w);
+      width: min(100vw, var(--site-desktop-preview-w));
       max-width: var(--site-desktop-preview-w);
       margin-left: auto;
       margin-right: auto;
