@@ -91,9 +91,10 @@ function validateSectionStructure(
   if (fmt === "EMOM") {
     const explicitTotal = /\b\d+[\s-]*minute\s+EMOM\b/i.test(text);
     const hasLabels = /\bMinute\s+\d+\b/i.test(text);
+    const repeatRounds = /\brepeat\s+\d+\s+rounds?\b/i.test(text);
     const repeatTotal = /\brepeat\s+\d+\s+rounds?\s*=\s*\d+\s*min(?:utes?)?\b/i.test(text);
     const totalEquals = /=\s*\d+\s*min(?:utes?)?\b/i.test(text);
-    if (!(explicitTotal || (hasLabels && (repeatTotal || totalEquals)))) {
+    if (!(explicitTotal || (hasLabels && (repeatRounds || repeatTotal || totalEquals)))) {
       return `${label} (EMOM) is missing total duration. Add either "N-minute EMOM" in the header body or a "Repeat N rounds = M minutes" line.`;
     }
     return null;
