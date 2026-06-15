@@ -100,6 +100,10 @@ export const ScheduleWorkoutDialog = ({
 
       // Trigger calendar dialog in parent after a small delay for dialog close animation
       setTimeout(() => {
+        // Radix can leave pointer-events: none on body when stacking dialogs back-to-back on mobile
+        if (typeof document !== "undefined") {
+          document.body.style.pointerEvents = "";
+        }
         const label = contentType === "workout" ? "workout" : "training program";
         const motivationalNote = notes
           ? `${notes}\n\nYou've got a ${label} locked in -- show up, stay focused, and crush it! Open in SmartyGym for full details.`
@@ -114,7 +118,7 @@ export const ScheduleWorkoutDialog = ({
           contentRouteType,
           contentId,
         });
-      }, 300);
+      }, 450);
 
       // Reset form
       setSelectedDate(addDays(new Date(), 1));

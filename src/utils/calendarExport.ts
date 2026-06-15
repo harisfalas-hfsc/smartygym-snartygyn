@@ -110,11 +110,27 @@ export function generateICSFile(params: CalendarEventParams): string {
 export function downloadICSFile(icsContent: string, filename: string) {
   const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
   const url = URL.createObjectURL(blob);
+  const safeName = `${filename.replace(/[^a-zA-Z0-9]/g, "_")}.ics`;
+
+  // iOS Safari ignores the `download` attribute and often refuses to handle
+  // blob: URLs for .ics. Use a data URL opened in a new tab so the OS hands
+  // the file to the Calendar app.
+  const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
+  const isIOS = /iPad|iPhone|iPod/.test(ua) && !(window as any).MSStream;
+
+  if (isIOS) {
+    const dataUrl = `data:text/calendar;charset=utf-8,${encodeURIComponent(icsContent)}`;
+    window.location.href = dataUrl;
+    URL.revokeObjectURL(url);
+    return;
+  }
+
   const link = document.createElement("a");
   link.href = url;
-  link.download = `${filename.replace(/[^a-zA-Z0-9]/g, "_")}.ics`;
+  link.download = safeName;
+  link.rel = "noopener";
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }

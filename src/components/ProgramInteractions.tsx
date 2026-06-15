@@ -246,6 +246,9 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
       // Show calendar dialog for completed program
       const now = new Date();
       setTimeout(() => {
+        if (typeof document !== "undefined") {
+          document.body.style.pointerEvents = "";
+        }
         setCalendarDialogData({
           title: `Completed: ${programName}`,
           date: format(now, 'yyyy-MM-dd'),
@@ -256,7 +259,7 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
           contentRouteType: programType,
           contentId: programId,
         });
-      }, 300);
+      }, 450);
       
       toast({
         title: "Amazing Work! 🎉",
