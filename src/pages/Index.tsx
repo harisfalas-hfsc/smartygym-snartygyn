@@ -1070,7 +1070,7 @@ const Index = () => {
           </section> : <>
             {/* Desktop: Compact hero with 4 stacked pillar rows */}
             <div className="hidden md:block container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6 pt-1 pb-4">
-              <div className="text-center mb-4">
+              <div className="relative text-center mb-4">
                 <p className="text-sm font-bold tracking-[0.2em] uppercase text-primary mb-3">
                   Science-Backed · Expert-Designed
                 </p>
