@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, Edit, Trash2, Eye, EyeOff, Search, Download, Filter, Bot, User, Copy, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { WorkoutEditDialog } from "./WorkoutEditDialog";
+import { ContentCreationWizard, WizardResult } from "./ContentCreationWizard";
 
 interface Workout {
   id: string;
@@ -45,6 +46,7 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
   const [editLoading, setEditLoading] = useState(false);
   const [editingWorkout, setEditingWorkout] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [wizardOpen, setWizardOpen] = useState(false);
   const [selectedWorkouts, setSelectedWorkouts] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
@@ -298,7 +300,21 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
 
   const handleNew = () => {
     setEditingWorkout(null);
-    setIsDialogOpen(true);
+    setWizardOpen(true);
+  };
+
+  const handleWizardComplete = (result: WizardResult) => {
+    if (result.type === "workout") {
+      setEditingWorkout(result.payload as any);
+      setIsDialogOpen(true);
+    } else {
+      // Program path — tell the user to switch tabs. The wizard's program
+      // payload is consumed by ProgramsManager via its own button.
+      toast({
+        title: "Switch to Programs tab",
+        description: "You picked Training Program. Open the Programs tab and click Create to build it there.",
+      });
+    }
   };
 
   const handleSave = () => {
@@ -817,6 +833,13 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         onSave={handleSave}
+      />
+      <ContentCreationWizard
+        open={wizardOpen}
+        onOpenChange={setWizardOpen}
+        initialType="workout"
+        allowTypeSwitch={false}
+        onComplete={handleWizardComplete}
       />
     </div>
   );
