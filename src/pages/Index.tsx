@@ -1079,6 +1079,15 @@ const Index = () => {
                   <br />
                   Not Harder.
                 </h1>
+                {/* Best Online Fitness Platform badge */}
+                <div className="absolute left-0 lg:left-[5%] top-[70%] z-10 -rotate-12">
+                  <div className="bg-gradient-to-br from-amber-300 via-yellow-500 to-amber-600 text-amber-950 rounded-lg px-3 py-1.5 shadow-lg border border-amber-400">
+                    <div className="flex items-center gap-1.5">
+                      <Trophy className="w-4 h-4 shrink-0" />
+                      <span className="text-[10px] lg:text-xs font-extrabold uppercase tracking-wider whitespace-nowrap">Best Online Fitness Platform</span>
+                    </div>
+                  </div>
+                </div>
                 <p className="text-sm font-semibold tracking-[0.15em] uppercase text-muted-foreground mt-4 leading-snug">
                   500+ Expert Workouts · Training Programs · Blog Insights · Smarty Tools
                   <br />
