@@ -116,6 +116,9 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
   });
   const [sendNotification, setSendNotification] = useState(false);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+  // When the wizard pre-fills access/pricing, collapse those toggles into a
+  // read-only summary so admins don't think the editor is asking them again.
+  const [showAccessEditor, setShowAccessEditor] = useState(false);
 
   const getCategoryPrefix = (category: string) => {
     const prefixMap: { [key: string]: string } = {
@@ -140,11 +143,17 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
   // Check if current category is micro-workout (fields should be locked)
   const isMicroWorkout = formData.category === 'MICRO-WORKOUTS';
   const isExistingWorkout = Boolean(workout?.id);
+  // Treat as "wizard prefill" when there's no saved id but the wizard set any
+  // of the access flags (free / premium / standalone).
+  const isFromWizard =
+    !isExistingWorkout &&
+    (formData.is_free || formData.is_premium || formData.is_standalone_purchase);
 
   useLayoutEffect(() => {
     if (workout && workout.id) {
       setFormData(workout);
       setSendNotification(false); // Don't send notifications for edits by default
+      setShowAccessEditor(true); // existing workouts: show toggles as before
     } else if (workout && !workout.id) {
       // Wizard prefill: a partial new-content seed from ContentCreationWizard.
       // Treat as "new" but pre-populate the metadata fields the user already picked.
@@ -178,6 +187,8 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
         ...workout,
       });
       setSendNotification(false);
+      // Wizard prefill: hide the toggles by default, show summary card instead.
+      setShowAccessEditor(false);
     } else {
       setFormData({
         id: '',
@@ -208,6 +219,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
           focus: '',
       });
       setSendNotification(false); // Default to NOT sending notifications
+      setShowAccessEditor(true); // blank manual create: show toggles
     }
   }, [workout]);
 
@@ -915,6 +927,45 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
             </div>
           )}
 
+          {/* 13-15. Access / Pricing — collapsed summary when prefilled by wizard */}
+          {!showAccessEditor && (
+            <div className="space-y-2 pt-4 border-t">
+              <div className="flex items-center justify-between gap-2">
+                <Label>Access & Pricing</Label>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowAccessEditor(true)}
+                >
+                  Change
+                </Button>
+              </div>
+              <div className="text-sm bg-muted/40 border rounded p-3 space-y-1">
+                <div>
+                  <span className="text-muted-foreground">Type: </span>
+                  {formData.is_free
+                    ? "🆓 Free content (no Stripe product)"
+                    : formData.is_standalone_purchase
+                    ? `💳 Premium + Standalone purchase (€${formData.price || "—"})`
+                    : formData.is_premium
+                    ? "🔒 Premium (Gold / Platinum subscribers)"
+                    : "Not set"}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  These were chosen in the creation wizard. Click <em>Change</em> to override.
+                </div>
+                <div className="text-xs text-muted-foreground pt-1">
+                  🖼️ A unique cover image will be generated automatically when you click
+                  <strong> Save Workout</strong>
+                  {formData.is_standalone_purchase ? " and synced to Stripe." : "."}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {showAccessEditor && (
+          <>
           {/* 13. Free Content Toggle */}
           <div className="space-y-4 pt-4 border-t">
             <Label>13. Content Type *</Label>
@@ -1025,6 +1076,8 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
                 </div>
               )}
             </div>
+          )}
+          </>
           )}
 
           <div className="flex justify-end gap-2 pt-4">
