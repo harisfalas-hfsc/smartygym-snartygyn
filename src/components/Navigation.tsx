@@ -434,16 +434,16 @@ export const Navigation = () => {
         headerHidden && "-translate-y-full"
       )}
     >
-      <div className="flex h-12 items-center justify-between gap-2 px-4">
+      <div className="relative flex h-[3.75rem] items-center px-4">
         {/* Far-left: Hamburger menu */}
         <Sheet open={desktopMenuOpen} onOpenChange={setDesktopMenuOpen}>
           <SheetTrigger asChild>
             <button
               type="button"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-md text-primary hover:bg-primary/10 transition-colors"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-md text-primary hover:bg-primary/10 transition-colors"
               aria-label="Open menu"
             >
-              <Menu className="h-6 w-6" strokeWidth={2.25} />
+              <Menu className="h-[1.875rem] w-[1.875rem]" strokeWidth={2.25} />
             </button>
           </SheetTrigger>
           <SheetContent side="left" hideClose className="left-1/2 top-1/2 bottom-auto flex h-auto max-h-[calc(100vh-2rem)] !w-[50vw] !min-w-[620px] !max-w-[760px] sm:!max-w-[760px] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border-2 border-primary/40 p-3 shadow-xl !animate-none transition-opacity duration-200 ease-out data-[state=closed]:opacity-0 data-[state=open]:opacity-100">
