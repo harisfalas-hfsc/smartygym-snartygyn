@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useLayoutEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -84,7 +84,7 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
     return prefixMap[category] || 'P';
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const generateSerialNumber = async (category: string) => {
       const prefix = getCategoryPrefix(category);
       const { data } = await supabase

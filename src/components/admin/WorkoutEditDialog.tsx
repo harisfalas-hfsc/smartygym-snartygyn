@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useLayoutEffect, useRef, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -141,7 +141,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
   const isMicroWorkout = formData.category === 'MICRO-WORKOUTS';
   const isExistingWorkout = Boolean(workout?.id);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (workout && workout.id) {
       setFormData(workout);
       setSendNotification(false); // Don't send notifications for edits by default
