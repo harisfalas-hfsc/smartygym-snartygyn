@@ -148,7 +148,7 @@ Please provide a helpful, personalized response to ${contactMessage.name}'s mess
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "google/gemini-2.5-pro",
         messages: [
           { role: "system", content: SMARTYGYM_SYSTEM_PROMPT },
           { role: "user", content: userPrompt }
@@ -184,7 +184,7 @@ Please provide a helpful, personalized response to ${contactMessage.name}'s mess
       JSON.stringify({ 
         success: true, 
         response: aiResponse,
-        model: "google/gemini-2.5-flash"
+        model: "google/gemini-2.5-pro"
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

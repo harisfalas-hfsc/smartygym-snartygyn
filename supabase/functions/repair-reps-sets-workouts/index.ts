@@ -153,7 +153,7 @@ Return ONLY the corrected HTML. Nothing else.`;
             "Authorization": `Bearer ${apiKey}`,
           },
           body: JSON.stringify({
-            model: "google/gemini-2.5-flash",
+            model: "google/gemini-2.5-pro",
             messages: [{ role: "user", content: prompt }],
             temperature: 0.3,
             max_tokens: 8000,
