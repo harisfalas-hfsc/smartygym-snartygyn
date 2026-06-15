@@ -289,7 +289,7 @@ RESPOND WITH EXACTLY THIS JSON FORMAT (no markdown, no code blocks, just raw JSO
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            model: "google/gemini-3-flash-preview",
+            model: "google/gemini-2.5-pro",
             messages: [
               { role: "system", content: "You are a professional fitness blog content writer. Always respond with valid JSON only, no markdown formatting." },
               { role: "user", content: prompt }
