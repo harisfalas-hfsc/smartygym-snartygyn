@@ -1,5 +1,13 @@
 const PUBLISHED_URL = "https://smartygym.lovable.app";
 
+export type CalendarExportMethod = "native-share" | "browser-download" | "mobile-open";
+
+export interface CalendarExportResult {
+  success: boolean;
+  method: CalendarExportMethod;
+  error?: unknown;
+}
+
 interface CalendarEventParams {
   title: string;
   date: string; // yyyy-MM-dd
@@ -107,29 +115,61 @@ export function generateICSFile(params: CalendarEventParams): string {
   return lines.join("\r\n");
 }
 
-export function downloadICSFile(icsContent: string, filename: string) {
-  const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const safeName = `${filename.replace(/[^a-zA-Z0-9]/g, "_")}.ics`;
-
-  // Mobile (iOS Safari + Android WebView/APK wrappers like AppMySite) ignores
-  // the `download` attribute on blob URLs. Navigating to a data: URL lets the
-  // OS hand the .ics straight to the Calendar app via intent.
+function getCalendarRuntime() {
   const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
   const isIOS = /iPad|iPhone|iPod/.test(ua) && !(window as any).MSStream;
   const isAndroid = /Android/i.test(ua);
-  const isMobile = isIOS || isAndroid;
+  const isAndroidWebView = isAndroid && /; wv\)|\bwv\b|Version\/\d+(?:\.\d+)?\s+Chrome\//i.test(ua);
+  const isStandalonePwa =
+    typeof window !== "undefined" &&
+    (window.matchMedia?.("(display-mode: standalone)").matches || Boolean((navigator as Navigator & { standalone?: boolean }).standalone));
 
-  if (isMobile) {
-    const dataUrl = `data:text/calendar;charset=utf-8,${encodeURIComponent(icsContent)}`;
-    // Try opening in a new tab first (lets Android WebView fire VIEW intent);
-    // fall back to same-window navigation if the popup is blocked.
-    const opened = window.open(dataUrl, "_blank");
-    if (!opened) {
-      window.location.href = dataUrl;
+  return { isIOS, isAndroid, isAndroidWebView, isStandalonePwa };
+}
+
+function openCalendarDataUrl(icsContent: string): CalendarExportResult {
+  const dataUrl = `data:text/calendar;charset=utf-8,${encodeURIComponent(icsContent)}`;
+  const opened = window.open(dataUrl, "_blank", "noopener,noreferrer");
+
+  if (!opened) {
+    window.location.href = dataUrl;
+  }
+
+  return { success: true, method: "mobile-open" };
+}
+
+export async function downloadICSFile(icsContent: string, filename: string): Promise<CalendarExportResult> {
+  const safeName = `${filename.replace(/[^a-zA-Z0-9]/g, "_")}.ics`;
+  const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const { isIOS, isAndroid, isAndroidWebView, isStandalonePwa } = getCalendarRuntime();
+  const shouldUseNativeMobilePath = isIOS || isAndroid || isAndroidWebView || isStandalonePwa;
+
+  if (shouldUseNativeMobilePath && typeof File !== "undefined" && typeof navigator.share === "function") {
+    const calendarFile = new File([blob], safeName, { type: "text/calendar" });
+    const shareData: ShareData = {
+      title: filename,
+      text: "Add this SmartyGym event to your calendar.",
+      files: [calendarFile],
+    };
+
+    try {
+      if (!navigator.canShare || navigator.canShare(shareData)) {
+        await navigator.share(shareData);
+        URL.revokeObjectURL(url);
+        return { success: true, method: "native-share" };
+      }
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        URL.revokeObjectURL(url);
+        return { success: false, method: "native-share", error };
+      }
     }
+  }
+
+  if (shouldUseNativeMobilePath) {
     URL.revokeObjectURL(url);
-    return;
+    return openCalendarDataUrl(icsContent);
   }
 
   const link = document.createElement("a");
@@ -140,4 +180,5 @@ export function downloadICSFile(icsContent: string, filename: string) {
   link.click();
   document.body.removeChild(link);
   setTimeout(() => URL.revokeObjectURL(url), 1000);
+  return { success: true, method: "browser-download" };
 }
