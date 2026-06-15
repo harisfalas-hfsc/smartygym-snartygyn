@@ -305,6 +305,11 @@ export const WorkoutsManager = ({ externalDialog, setExternalDialog }: WorkoutsM
 
   const handleWizardComplete = (result: WizardResult) => {
     if (result.type === "workout") {
+      if (result.generated) {
+        // AI-generated and already saved — just refresh the list.
+        loadWorkouts();
+        return;
+      }
       setEditingWorkout(result.payload as any);
       setIsDialogOpen(true);
     } else {

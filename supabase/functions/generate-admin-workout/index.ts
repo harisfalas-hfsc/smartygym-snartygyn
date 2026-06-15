@@ -1,0 +1,514 @@
+// Generate ONE custom admin workout from wizard metadata.
+// Mirrors generate-category-difficulty-batch but accepts arbitrary
+// (category, equipment, difficulty_stars, format, duration, focus, access)
+// from the admin Content Creation Wizard.
+
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import Stripe from "https://esm.sh/stripe@18.5.0";
+import {
+  processContentSectionAware,
+  fetchAndBuildExerciseReference,
+  guaranteeAllExercisesLinked,
+  rejectNonLibraryExercises,
+  logUnmatchedExercises,
+} from "../_shared/exercise-matching.ts";
+import { normalizeWorkoutHtml, validateWorkoutHtml } from "../_shared/html-normalizer.ts";
+import { validateWodSections } from "../_shared/section-validator.ts";
+import { requireAdminOrServiceRole } from "../_shared/admin-or-service-auth.ts";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+function log(step: string, details?: any) {
+  const d = details ? ` - ${JSON.stringify(details)}` : "";
+  console.log(`[WIZARD-GEN] ${step}${d}`);
+}
+
+interface WizardBody {
+  category: string;
+  equipment: "BODYWEIGHT" | "EQUIPMENT" | string;
+  difficulty_stars: number;       // 0..6
+  format?: string;                 // TABATA / CIRCUIT / AMRAP / FOR TIME / EMOM / REPS & SETS / MIX
+  duration?: string;               // e.g. "30 min" or "5 min"
+  focus?: string;                  // STRENGTH only
+  access?: "free" | "premium" | "standalone";
+  price?: string | number;         // standalone only
+  tier_required?: string;          // premium only
+}
+
+const CATEGORY_PREFIX: Record<string, string> = {
+  STRENGTH: "S",
+  "CALORIE BURNING": "CB",
+  METABOLIC: "ME",
+  CARDIO: "C",
+  "MOBILITY & STABILITY": "M",
+  CHALLENGE: "CH",
+  PILATES: "PIL",
+  RECOVERY: "REC",
+  "MICRO-WORKOUTS": "MW",
+};
+
+function difficultyLabel(stars: number): "Beginner" | "Intermediate" | "Advanced" | "All Levels" {
+  if (stars <= 0) return "All Levels";
+  if (stars <= 2) return "Beginner";
+  if (stars <= 4) return "Intermediate";
+  return "Advanced";
+}
+
+function categoryGuidance(category: string, equipment: string, focus?: string): string {
+  const eq = equipment === "BODYWEIGHT";
+  switch (category) {
+    case "STRENGTH":
+      return `STRENGTH (focus: ${focus || "FULL BODY"}). Heavy compound lifts with reps & sets prescriptions. Long rest (90-180s). ${eq ? "Bodyweight progressions only." : "Use barbell/DB/KB/cable as appropriate."}`;
+    case "CALORIE BURNING":
+      return eq
+        ? "High-output bodyweight conditioning: burpees, jump squats, mountain climbers, plyo push-ups, jumping lunges."
+        : "High-output conditioning with implements: KB swings, DB thrusters, rowing intervals, sled push, battle ropes.";
+    case "METABOLIC":
+      return eq
+        ? "Full-body metabolic circuits — push/pull/squat/hinge bodyweight movements with minimal rest."
+        : "Full-body metabolic circuits combining strength + conditioning: DB/KB/barbell complexes, thrusters, devil press.";
+    case "CARDIO":
+      return eq
+        ? "Sustained heart-rate work: jumping jacks, skater jumps, high knees, mountain climbers, burpees."
+        : "Cardiovascular conditioning: rower, assault bike, jump rope, KB swings, ski erg, sled work.";
+    case "MOBILITY & STABILITY":
+      return eq
+        ? "Controlled bodyweight mobility & stability ONLY: CARs, balance holds, bird dog, side bridge, cat-cow, ankle/wrist circles, slow breathing. HARD BAN: jumps, burpees, plyometrics, heavy strength, push-ups, crunches, sit-ups, dynamic leg-raise core."
+        : "Controlled equipment-assisted mobility & stability ONLY: bands, balance board, foam roller, ex-ball, rope-assisted stretches. HARD BAN: KB power work, heavy strength, conditioning, crunches, sit-ups.";
+    case "CHALLENGE":
+      return eq
+        ? "Test-style bodyweight challenge: AMRAP/For-Time pieces with multiple rounds, varied movement patterns."
+        : "Test-style challenge with implements: rounds-for-time, complex chippers, mixed modality.";
+    case "PILATES":
+      return "Pilates studio standard: mat, reformer, magic circle, Pilates ball, light dumbbells, resistance bands ONLY. FORBIDDEN: kettlebells, barbells, heavy DBs, machines, cables, plyometrics, conditioning movements. Focus on controlled spinal articulation, deep core, breath-led tempo, REPS & SETS prescriptions.";
+    case "RECOVERY":
+      return "Recovery protocol: PNF stretching, CARs (controlled articular rotations), nasal breathing/box breathing, gentle mobility. No plyometrics, no conditioning, no heavy lifting, no crunches/sit-ups.";
+    case "MICRO-WORKOUTS":
+      return "MICRO-WORKOUT (5 minutes total). Equipment allowed: bodyweight ONLY plus chair / sofa / desk / stairs / wall — items found at home or office. FORBIDDEN: dumbbells, kettlebells, barbells, bands, machines, air bike, rower, jump rope, treadmill, sled. Movements must be doable in office clothes in a small space. Total time 5 minutes including warm-up + main + cooldown.";
+    default:
+      return `General ${category} workout. Use library exercises appropriate for the category and equipment.`;
+  }
+}
+
+function formatGuidanceFor(format: string): string {
+  switch (format) {
+    case "AMRAP":
+      return `AMRAP block: "Main Workout (20-minute AMRAP)" — list 4-6 exercises with rep targets.`;
+    case "EMOM":
+      return `EMOM block: "Main Workout (20-minute EMOM)" — alternate 2-4 exercises by minute with rep targets.`;
+    case "CIRCUIT":
+      return `CIRCUIT block: "Main Workout (5 rounds CIRCUIT)" — list 5-7 stations with reps/time and rest.`;
+    case "TABATA":
+      return `TABATA block: 8 rounds × 20s work / 10s rest. List 2-4 exercises rotating.`;
+    case "FOR TIME":
+      return `FOR TIME block: chipper or rounds-for-time. Total reps then descending or fixed rounds.`;
+    case "REPS & SETS":
+      return `REPS & SETS block: each exercise with explicit sets × reps × tempo × rest (e.g. "4 sets × 8 reps @ 31X1, rest 90s").`;
+    case "MIX":
+      return `MIX block: combine REPS & SETS for strength portion with a metabolic finisher.`;
+    default:
+      return `List each exercise with explicit prescription (reps/time/sets).`;
+  }
+}
+
+function buildPrompt(args: {
+  body: WizardBody;
+  referenceList: string;
+  bannedNames: string[];
+}): string {
+  const { body, referenceList, bannedNames } = args;
+  const { category, equipment, difficulty_stars, format = "MIX", duration = "30 min", focus } = body;
+  const difficulty = difficultyLabel(difficulty_stars);
+  const isMicro = category === "MICRO-WORKOUTS";
+  const bannedBlock = bannedNames.length
+    ? `\n⛔ BANNED NAMES — already in library; DO NOT reuse or trivially vary:\n${bannedNames.slice(0, 200).map(n => `   ❌ "${n}"`).join("\n")}\n`
+    : "";
+
+  const sectionRules = isMicro
+    ? `MICRO-WORKOUT 5-MINUTE STRUCTURE (TOTAL = 5 MIN):
+1. 🔥 Activation 1' — 1-2 library exercises with markup, 20-30s each.
+2. 💪 Main Workout 3' — 3-4 library exercises with markup, body-only or chair/desk/wall/stairs.
+3. 🧘 Cool Down 1' — 1-2 library stretches with markup.
+NO Soft Tissue section (no time). NO Finisher section (no time).
+Duration headers MUST sum to exactly 5'.`
+    : `MANDATORY 5-SECTION STRUCTURE (icons in this exact order):
+1. 🧽 Soft Tissue Preparation — FOAM ROLLING ONLY (no library markup). Lines start with "Foam roll", "Lacrosse ball", "Trigger point", etc.
+2. 🔥 Activation — library exercises with markup.
+3. 💪 Main Workout — library exercises with markup (minimum 4).
+4. ⚡ Finisher — library exercises with markup (MINIMUM 3, duration 10+ minutes).
+5. 🧘 Cool Down — library stretches & breathing with markup.`;
+
+  return `You are Haris Falas, Sports Scientist (CSCS), creating a custom ${difficulty.toUpperCase()} ${category} workout for SmartyGym.
+
+WORKOUT SPEC:
+- Category: ${category}
+- Equipment: ${equipment === "BODYWEIGHT" ? "BODYWEIGHT ONLY (home/office friendly)" : "GYM EQUIPMENT (barbell/DB/KB/cable/machines/bands as appropriate)"}
+- Difficulty: ${difficulty} (${difficulty_stars} stars out of 6)
+- Format: ${format}
+- Total Duration: ${duration}
+${focus ? `- Strength Focus: ${focus}\n` : ""}
+CATEGORY COACHING RULES:
+${categoryGuidance(category, equipment, focus)}
+
+NAMING:
+- 2-4 word creative name, premium signature feel.
+- AVOID overused: Inferno, Blaze, Fire, Burn, Fury, Storm, Thunder, Power, Beast, Warrior, Elite, Ultimate, Extreme, Foundation, Torch, Melt, Engine, Drive, Catalyst, Flow, Restore, Gauntlet, Summit, Crucible.
+- Must hint at the category${focus ? ` and focus (${focus})` : ""}.${bannedBlock}
+
+EXERCISE LIBRARY (USE EXCLUSIVELY — library-first):
+${referenceList}
+
+Every exercise reference in main_workout MUST use the markup {{exercise:ID:Name}}.
+Never invent exercises. Never use plain names.
+
+${sectionRules}
+
+SECTION TITLE FORMAT: <p class="tiptap-paragraph">🔥 <strong><u>Activation 5'</u></strong></p>
+ONLY ONE icon per section.
+
+EXERCISE LINES — bullet lists ONLY:
+<ul class="tiptap-bullet-list"><li class="tiptap-list-item"><p class="tiptap-paragraph">{{exercise:ID:Name}} (prescription)</p></li></ul>
+
+SECTION SEPARATORS: ONE empty paragraph between sections only: <p class="tiptap-paragraph"></p>
+
+MAIN WORKOUT TITLE: "Main Workout (${format} ${isMicro ? "3'" : "20'"})"
+${isMicro ? "" : "FINISHER TITLE: \"Finisher (For Time)\" or \"Finisher (10-minute AMRAP)\" — never under 10 minutes."}
+
+FORMAT GUIDANCE:
+${formatGuidanceFor(format)}
+
+PRESCRIPTION RULE: every exercise line MUST include reps/time/distance/sets.
+
+RESPONSE FORMAT (JSON ONLY — NO MARKDOWN):
+{
+  "name": "2-4 word creative name (unique)",
+  "description": "<p class=\\"tiptap-paragraph\\">2-3 sentence description tied to ${category}.</p>",
+  "main_workout": "Full structured HTML following the rules above with library-first markup",
+  "instructions": "<p class=\\"tiptap-paragraph\\">How to perform this workout</p>",
+  "tips": "<p class=\\"tiptap-paragraph\\">Coaching tip 1</p><p class=\\"tiptap-paragraph\\">Coaching tip 2</p><p class=\\"tiptap-paragraph\\">Coaching tip 3</p>"
+}`;
+}
+
+interface WorkoutContent {
+  name: string;
+  description: string;
+  main_workout: string;
+  instructions: string;
+  tips: string;
+}
+
+const wodTool = {
+  type: "function" as const,
+  function: {
+    name: "generate_workout",
+    description: "Generate a structured workout with all required fields",
+    parameters: {
+      type: "object",
+      properties: {
+        name: { type: "string" },
+        description: { type: "string" },
+        main_workout: { type: "string" },
+        instructions: { type: "string" },
+        tips: { type: "string" },
+      },
+      required: ["name", "description", "main_workout", "instructions", "tips"],
+      additionalProperties: false,
+    },
+  },
+};
+
+const AI_MODELS = ["google/gemini-2.5-flash", "google/gemini-2.5-flash-lite", "openai/gpt-5-mini"];
+
+async function callAI(apiKey: string, prompt: string): Promise<WorkoutContent | null> {
+  for (const model of AI_MODELS) {
+    try {
+      const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: "system", content: "You are an expert fitness coach. Generate workouts using the provided tool." },
+            { role: "user", content: prompt },
+          ],
+          tools: [wodTool],
+          tool_choice: { type: "function", function: { name: "generate_workout" } },
+        }),
+      });
+      if (r.ok) {
+        const d = await r.json();
+        const tc = d.choices?.[0]?.message?.tool_calls?.[0];
+        if (tc?.function?.arguments) {
+          try { return JSON.parse(tc.function.arguments) as WorkoutContent; } catch {}
+        }
+      }
+    } catch (e: any) { log("AI tool-call error", { model, err: e.message }); }
+
+    try {
+      const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: "system", content: "Return ONLY valid JSON. No markdown. No code blocks. Start with { and end with }." },
+            { role: "user", content: prompt },
+          ],
+        }),
+      });
+      if (r.ok) {
+        const d = await r.json();
+        let c: string = d.choices?.[0]?.message?.content || "";
+        c = c.replace(/^```(?:json|JSON)?\s*\n?/gm, "").replace(/\n?```\s*$/gm, "");
+        const a = c.indexOf("{"), b = c.lastIndexOf("}");
+        if (a !== -1 && b > a) c = c.substring(a, b + 1);
+        try { return JSON.parse(c.trim()) as WorkoutContent; } catch {}
+      }
+    } catch (e: any) { log("AI text-fallback error", { model, err: e.message }); }
+  }
+  return null;
+}
+
+async function nextSerial(supabase: any, category: string): Promise<{ id: string; serial: number }> {
+  const prefix = CATEGORY_PREFIX[category] || "W";
+  const { data: settings } = await supabase
+    .from("system_settings")
+    .select("setting_value")
+    .eq("setting_key", "serial_number_counters")
+    .single();
+
+  let nextN = 1;
+  if (settings?.setting_value?.workouts?.[category]) {
+    nextN = settings.setting_value.workouts[category];
+  } else {
+    const { data } = await supabase
+      .from("admin_workouts")
+      .select("serial_number")
+      .eq("category", category)
+      .eq("is_workout_of_day", false)
+      .order("serial_number", { ascending: false, nullsFirst: false })
+      .limit(1);
+    nextN = (data?.[0]?.serial_number || 0) + 1;
+  }
+
+  // bump counter
+  const newCounters = {
+    ...(settings?.setting_value || {}),
+    workouts: {
+      ...((settings?.setting_value?.workouts) || {}),
+      [category]: nextN + 1,
+    },
+  };
+  await supabase
+    .from("system_settings")
+    .upsert({ setting_key: "serial_number_counters", setting_value: newCounters }, { onConflict: "setting_key" });
+
+  return { id: `${prefix}-${String(nextN).padStart(3, "0")}`, serial: nextN };
+}
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  const unauthorizedResponse = await requireAdminOrServiceRole(req, corsHeaders);
+  if (unauthorizedResponse) return unauthorizedResponse;
+
+  try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const lovableApiKey = Deno.env.get("LOVABLE_API_KEY");
+    if (!lovableApiKey) throw new Error("LOVABLE_API_KEY not configured");
+
+    const supabase = createClient(supabaseUrl, supabaseKey);
+    const body = (await req.json()) as WizardBody;
+    if (!body?.category || !body?.equipment) throw new Error("category and equipment are required");
+
+    const access = body.access || "free";
+    const isMicro = body.category === "MICRO-WORKOUTS";
+    const equipment = isMicro ? "BODYWEIGHT" : body.equipment;
+    const duration = isMicro ? "5 min" : (body.duration || "30 min");
+    const difficulty = difficultyLabel(body.difficulty_stars);
+    const format = body.format || (body.category === "STRENGTH" || body.category === "PILATES" || body.category === "MOBILITY & STABILITY" ? "REPS & SETS" : "MIX");
+
+    log("Wizard request", { category: body.category, equipment, difficulty, format, duration, access });
+
+    // Build banned names
+    const { data: allNames } = await supabase.from("admin_workouts").select("name");
+    const bannedNames = (allNames || []).map((w: any) => w.name);
+
+    // Library
+    const equipFilter = equipment === "BODYWEIGHT" ? "body weight" : undefined;
+    const { exercises: library, referenceList } =
+      await fetchAndBuildExerciseReference(supabase, "[WIZ]", equipFilter, difficulty.toLowerCase());
+
+    const MAX_ATTEMPTS = 2;
+    let lastErr = "";
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      try {
+        const prompt = buildPrompt({ body: { ...body, equipment, duration, format }, referenceList, bannedNames });
+        const content = await callAI(lovableApiKey, prompt);
+        if (!content) throw new Error("All AI models failed");
+
+        // name collision
+        const nameLc = content.name.trim().toLowerCase();
+        if (bannedNames.some((n: string) => n.trim().toLowerCase() === nameLc)) {
+          content.name = `${content.name.trim()} ${body.category.split(" ")[0].slice(0, 3).toUpperCase()}-${Date.now().toString().slice(-3)}`;
+        }
+
+        // exercise markup cleanup
+        const libById = new Map(library.map((ex: any) => [ex.id, ex]));
+        const markupPattern = /\{\{(?:exercise|exrcise|excersize|excercise):([^:]+):([^}]+)\}\}/gi;
+        const invalidIds: string[] = [];
+        let m: RegExpExecArray | null;
+        while ((m = markupPattern.exec(content.main_workout)) !== null) {
+          if (!libById.has(m[1])) invalidIds.push(`${m[1]}:${m[2]}`);
+        }
+        if (invalidIds.length > 0) {
+          let cleaned = content.main_workout;
+          for (const inv of invalidIds) {
+            const [id, name] = inv.split(":");
+            cleaned = cleaned.replace(
+              new RegExp(`\\{\\{(?:exercise|exrcise|excersize|excercise):${id.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}:[^}]+\\}\\}`, "gi"),
+              name
+            );
+          }
+          content.main_workout = cleaned;
+        }
+
+        const matched = processContentSectionAware(content.main_workout, library, `[WIZ-MATCH]`);
+        content.main_workout = matched.processedContent;
+        const sweep = guaranteeAllExercisesLinked(content.main_workout, library, `[WIZ-SWEEP]`);
+        content.main_workout = sweep.processedContent;
+        const reject = rejectNonLibraryExercises(content.main_workout, library, `[WIZ-REJECT]`);
+        content.main_workout = reject.processedContent;
+
+        const trulyUnmatched = [...new Set(matched.unmatched)].filter(n =>
+          !sweep.forcedMatches.some(f => f.original.toLowerCase() === n.toLowerCase()) &&
+          !reject.substituted.some(s => s.original.toLowerCase() === n.toLowerCase())
+        );
+        if (trulyUnmatched.length > 0) {
+          await logUnmatchedExercises(supabase as any, trulyUnmatched, "workout", `WIZ-${body.category}`, content.name, `[WIZ-MISMATCH]`);
+        }
+
+        const mainNorm = normalizeWorkoutHtml(content.main_workout);
+        const descNorm = normalizeWorkoutHtml(content.description || "");
+        const insNorm = normalizeWorkoutHtml(content.instructions || "");
+        const tipsNorm = normalizeWorkoutHtml(content.tips || "");
+
+        const htmlValid = validateWorkoutHtml(mainNorm);
+        if (!htmlValid.isValid) log("HTML validation issues (continuing)", { issues: htmlValid.issues });
+
+        // Section validator only enforces 5-section for non-micro
+        if (!isMicro) {
+          const sectionCheck = validateWodSections(mainNorm, false, body.category);
+          if (!sectionCheck.isComplete) {
+            throw new Error(`Section validation failed: missing=[${sectionCheck.missingSections.join(", ")}], issues=[${[...sectionCheck.exerciseContentIssues, ...sectionCheck.softTissueIssues, ...sectionCheck.mobilityCompatibilityIssues].join("; ")}]`);
+          }
+        }
+
+        const { id: workoutId, serial } = await nextSerial(supabase, body.category);
+
+        // Image
+        let imageUrl: string | null = null;
+        try {
+          const { data: imgData } = await supabase.functions.invoke("generate-workout-image", {
+            body: { name: content.name, category: body.category, format, difficulty_stars: body.difficulty_stars },
+          });
+          if (imgData?.image_url) imageUrl = imgData.image_url;
+        } catch (e: any) { log("Image gen exception", { err: e.message }); }
+        if (!imageUrl) throw new Error("Image generation failed");
+
+        // Stripe (standalone only)
+        let stripeProductId: string | null = null;
+        let stripePriceId: string | null = null;
+        if (access === "standalone") {
+          const priceNum = Number(body.price);
+          if (!priceNum || priceNum <= 0) throw new Error("standalone access requires a positive price");
+          const stripeKey = Deno.env.get("STRIPE_SECRET_KEY") || "";
+          if (!stripeKey) throw new Error("STRIPE_SECRET_KEY not configured");
+          const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
+          const product = await stripe.products.create({
+            name: content.name,
+            description: `Workout: ${content.name}`,
+            images: [imageUrl],
+            metadata: {
+              project: "SMARTYGYM",
+              content_type: "Workout",
+              source: "generate-admin-workout",
+              category: body.category,
+              equipment,
+              difficulty,
+              difficulty_stars: String(body.difficulty_stars),
+            },
+          }, { idempotencyKey: `prod-${workoutId}` });
+          const priceObj = await stripe.prices.create({
+            product: product.id,
+            unit_amount: Math.round(priceNum * 100),
+            currency: "eur",
+            metadata: { project: "SMARTYGYM", content_type: "Workout" },
+          }, { idempotencyKey: `price-${workoutId}` });
+          await stripe.products.update(product.id, { default_price: priceObj.id });
+          stripeProductId = product.id;
+          stripePriceId = priceObj.id;
+        }
+
+        const insertRow: any = {
+          id: workoutId,
+          serial_number: serial,
+          name: content.name,
+          type: "workout",
+          category: body.category,
+          format,
+          equipment,
+          difficulty,
+          difficulty_stars: body.difficulty_stars,
+          duration,
+          description: descNorm,
+          main_workout: mainNorm,
+          instructions: insNorm,
+          tips: tipsNorm,
+          focus: body.category === "STRENGTH" ? (body.focus || null) : null,
+          image_url: imageUrl,
+          is_free: access === "free",
+          is_premium: access === "premium",
+          tier_required: access === "premium" ? (body.tier_required || "gold") : null,
+          is_standalone_purchase: access === "standalone",
+          price: access === "standalone" ? Number(body.price) : null,
+          stripe_product_id: stripeProductId,
+          stripe_price_id: stripePriceId,
+          is_workout_of_day: false,
+          is_ai_generated: true,
+          is_visible: true,
+        };
+
+        const { error: insErr } = await (supabase as any).from("admin_workouts").insert(insertRow);
+        if (insErr) throw new Error(`DB insert failed: ${insErr.message}`);
+
+        log("✅ Created", { id: workoutId, name: content.name });
+        return new Response(JSON.stringify({ ok: true, id: workoutId, name: content.name }), {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      } catch (e: any) {
+        lastErr = e.message || String(e);
+        log(`Attempt ${attempt} failed`, { err: lastErr });
+        if (attempt === MAX_ATTEMPTS) break;
+        await new Promise(r => setTimeout(r, 4000));
+      }
+    }
+
+    return new Response(JSON.stringify({ ok: false, error: lastErr || "exhausted retries" }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  } catch (e: any) {
+    log("Fatal", { err: e.message });
+    return new Response(JSON.stringify({ ok: false, error: e.message }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+});
