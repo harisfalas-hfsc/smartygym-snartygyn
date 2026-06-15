@@ -117,6 +117,21 @@ function cleanStrayAfterToken(
   // When the trailing text is just a duplicate of the token's display name, safely remove it.
   const pattern = /(\{\{exercise:[^:}]+:([^}]+)\}\})([^<\n]*?)(?=<|$)/gi;
 
+  const isBenignTokenQualifier = (value: string): boolean => {
+    const normalized = value
+      .trim()
+      .replace(/^[:\-–—,;\s]+/, "")
+      .replace(/^\((.*)\)$/s, "$1")
+      .replace(/[.,;:]$/g, "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .toLowerCase();
+
+    return /^(?:left|right|both|each|alternating)\s+(?:side|sides|leg|legs|arm|arms|shoulder|shoulders|hip|hips|knee|knees|ankle|ankles|wrist|wrists|foot|feet|hand|hands)$/.test(normalized)
+      || /^\d+(?:\s*-\s*\d+)?\s+(?:each|per)\s+(?:side|leg|legs|arm|arms)$/.test(normalized)
+      || /^(?:each|per)\s+(?:side|leg|legs|arm|arms)$/.test(normalized);
+  };
+
   return html.replace(pattern, (match, token, exerciseName, trailing) => {
     const trimmed = trailing.trim();
     if (trimmed.length === 0) return match; // pure whitespace, fine
@@ -137,6 +152,10 @@ function cleanStrayAfterToken(
       });
       fixes.push(`Removed duplicated exercise text after token: "${trimmed.slice(0, 60)}"`);
       return token;
+    }
+
+    if (isBenignTokenQualifier(trimmed)) {
+      return match;
     }
 
     // Heuristic: if it starts with a digit, "sec", "interval", or an orphan ")",
