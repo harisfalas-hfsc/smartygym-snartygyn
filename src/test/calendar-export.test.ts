@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { downloadICSFile, generateICSFile } from "@/utils/calendarExport";
+import { buildAndroidCalendarIntentUrl, buildHostedICSUrl, downloadICSFile, generateICSFile } from "@/utils/calendarExport";
 
 const originalUserAgent = navigator.userAgent;
 
@@ -58,6 +58,46 @@ describe("calendar export", () => {
         files: [expect.any(File)],
       }),
     );
+  });
+
+  it("builds a real hosted ICS URL for app WebViews instead of a generated blob URL", () => {
+    const url = buildHostedICSUrl({
+      title: "Granite Flow Restore",
+      date: "2026-06-16",
+      time: "09:00",
+      reminderMinutes: 30,
+      contentType: "workout",
+      contentRouteType: "recovery",
+      contentId: "granite-flow-restore",
+    });
+
+    expect(url).toContain("/functions/v1/generate-calendar-ics?");
+    expect(url).toContain("title=Granite+Flow+Restore");
+    expect(url).toContain("date=2026-06-16");
+    expect(url).toContain("time=09%3A00");
+    expect(url).toContain("contentId=granite-flow-restore");
+  });
+
+  it("builds an Android calendar insert intent for APK wrappers", () => {
+    const url = buildAndroidCalendarIntentUrl({
+      title: "Granite Flow Restore",
+      date: "2026-06-16",
+      time: "09:00",
+      reminderMinutes: 30,
+      notes: "Recovery session",
+      contentType: "workout",
+      contentRouteType: "recovery",
+      contentId: "granite-flow-restore",
+    });
+
+    expect(url).toContain("intent://com.android.calendar/events#Intent");
+    expect(url).toContain("scheme=content");
+    expect(url).toContain("action=android.intent.action.INSERT");
+    expect(url).toContain("type=vnd.android.cursor.dir/event");
+    expect(url).toContain("S.title=Granite%20Flow%20Restore");
+    expect(url).toContain("S.description=Recovery%20session");
+    expect(url).toContain("l.beginTime=");
+    expect(url).toContain("l.endTime=");
   });
 
   it("does not close the dialog flow when the mobile share sheet is cancelled", async () => {
