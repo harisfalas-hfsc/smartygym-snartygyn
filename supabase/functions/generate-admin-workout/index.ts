@@ -516,19 +516,23 @@ serve(async (req) => {
         const insNorm = normalizeWorkoutHtml(content.instructions || "");
         const tipsNorm = normalizeWorkoutHtml(content.tips || "");
 
+        const reviewWarnings: string[] = [];
         const htmlValid = validateWorkoutHtml(mainNorm);
-        if (!htmlValid.isValid) log("HTML validation issues (continuing)", { issues: htmlValid.issues });
+        if (!htmlValid.isValid) {
+          reviewWarnings.push(...htmlValid.issues.map((issue) => `HTML: ${issue}`));
+          log("HTML validation issues (continuing)", { issues: htmlValid.issues });
+        }
 
         // Section validator only enforces 5-section for non-micro
         if (!isMicro) {
           const sectionCheck = validateWodSections(mainNorm, false, body.category);
           if (!sectionCheck.isComplete) {
-            throw new Error(`Section validation failed: missing=[${sectionCheck.missingSections.join(", ")}], issues=[${[...sectionCheck.exerciseContentIssues, ...sectionCheck.softTissueIssues, ...sectionCheck.mobilityCompatibilityIssues].join("; ")}]`);
+            reviewWarnings.push(`Section validation: missing=[${sectionCheck.missingSections.join(", ")}], issues=[${[...sectionCheck.exerciseContentIssues, ...sectionCheck.softTissueIssues, ...sectionCheck.mobilityCompatibilityIssues].join("; ")}]`);
           }
 
           const protocolIssues = validateProtocolBlocks(mainNorm);
           if (protocolIssues.length > 0) {
-            throw new Error(`Protocol validation failed: ${protocolIssues.slice(0, 4).join("; ")}`);
+            reviewWarnings.push(`Protocol validation: ${protocolIssues.slice(0, 4).join("; ")}`);
           }
 
           const qualityGate = applyWodQualityGate({
@@ -539,13 +543,13 @@ serve(async (req) => {
             isRecoveryDay: body.category === "RECOVERY",
           });
           if (!qualityGate.ok) {
-            throw new Error(`Quality gate failed: ${qualityGate.failures.slice(0, 4).join("; ")}`);
+            reviewWarnings.push(`Quality gate: ${qualityGate.failures.slice(0, 4).join("; ")}`);
           }
         }
 
         const prescriptionSafetyIssues = validatePrescriptionSafety(mainNorm, body.category);
         if (prescriptionSafetyIssues.length > 0) {
-          throw new Error(`Prescription safety failed: ${prescriptionSafetyIssues.slice(0, 4).join("; ")}`);
+          reviewWarnings.push(`Prescription safety: ${prescriptionSafetyIssues.slice(0, 4).join("; ")}`);
         }
 
         // Preview-only draft. Saving / Stripe / image / serial is the editor's job.
@@ -573,10 +577,12 @@ serve(async (req) => {
           price: access === "standalone" ? String(body.price ?? "") : "",
           stripe_product_id: "",
           stripe_price_id: "",
+          needs_review: reviewWarnings.length > 0,
+          generation_review_warnings: reviewWarnings,
         };
 
-      log("✅ Drafted (not saved)", { name: content.name });
-      return new Response(JSON.stringify({ ok: true, draft }), {
+      log("✅ Drafted (not saved)", { name: content.name, reviewWarnings: reviewWarnings.length });
+      return new Response(JSON.stringify({ ok: true, draft, needs_review: reviewWarnings.length > 0, review_warnings: reviewWarnings }), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
