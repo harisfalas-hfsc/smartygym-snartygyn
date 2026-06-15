@@ -146,12 +146,12 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
         weeks: program.weeks ?? 4,
         days_per_week: program.days_per_week ?? 4,
         equipment: program.equipment || '',
-        training_program: '',
-        program_description: '',
-        construction: '',
-        final_tips: '',
-        image_url: '',
-        generate_unique_image: false,
+        training_program: program.training_program || '',
+        program_description: program.program_description || '',
+        construction: program.construction || '',
+        final_tips: program.final_tips || '',
+        image_url: program.image_url || '',
+        generate_unique_image: !!program.generate_unique_image,
         is_free: !!program.is_free,
         is_premium: !!program.is_premium,
         is_standalone_purchase: !!program.is_standalone_purchase,
@@ -159,7 +159,22 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
         stripe_product_id: '',
         stripe_price_id: '',
       });
-      setWeekDayContents([]);
+      // Try to parse a JSON grid if the wizard supplied one; otherwise leave the
+      // schedule as a single HTML blob in training_program (M-3 gold-standard).
+      if (program.training_program) {
+        try {
+          const parsed = JSON.parse(program.training_program);
+          if (Array.isArray(parsed)) {
+            setWeekDayContents(parsed);
+          } else {
+            setWeekDayContents([]);
+          }
+        } catch {
+          setWeekDayContents([]);
+        }
+      } else {
+        setWeekDayContents([]);
+      }
     } else {
       setFormData({
         id: '',
