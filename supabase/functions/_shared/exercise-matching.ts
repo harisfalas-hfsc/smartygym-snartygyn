@@ -1210,7 +1210,11 @@ export function rejectNonLibraryExercises(
     if (forceResult && forceResult.match.confidence >= 0.50) {
       const markup = `{{exercise:${forceResult.match.exercise.id}:${forceResult.match.exercise.name}}}`;
       const escapedCandidate = candidate.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const newInnerHtml = innerHtml.replace(new RegExp(escapedCandidate, 'i'), markup);
+      const escapedLibraryName = forceResult.match.exercise.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      let newInnerHtml = innerHtml.replace(new RegExp(`${escapedLibraryName}(?:s)?(?:\\s+machine)?`, 'i'), markup);
+      if (newInnerHtml === innerHtml) {
+        newInnerHtml = innerHtml.replace(new RegExp(escapedCandidate, 'i'), markup);
+      }
       
       if (newInnerHtml !== innerHtml) {
         replacements.push({ original: liMatch[0], replacement: liMatch[0].replace(innerHtml, newInnerHtml) });
