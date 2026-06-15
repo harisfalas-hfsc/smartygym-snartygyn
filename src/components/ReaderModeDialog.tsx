@@ -236,6 +236,11 @@ export const ReaderModeDialog = ({
           .reader-mode-dark.prose * {
             color: #f4f4f5 !important;
           }
+
+          .reader-mode-light.prose .exercise-view-eye,
+          .reader-mode-dark.prose .exercise-view-eye {
+            color: hsl(var(--primary)) !important;
+          }
         `}</style>
       </DialogContent>
     </Dialog>
