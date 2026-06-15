@@ -603,7 +603,7 @@ export const Navigation = () => {
               <DropdownMenuTrigger asChild>
                 <button
                   type="button"
-                  className="inline-flex h-9 items-center justify-center rounded-full border-2 border-primary px-4 text-sm font-semibold text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+                  className="inline-flex h-11 items-center justify-center rounded-full border-2 border-primary px-5 text-base font-semibold text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
                 >
                   Log In
                 </button>
