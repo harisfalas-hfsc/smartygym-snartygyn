@@ -502,7 +502,12 @@ serve(async (req) => {
           await logUnmatchedExercises(supabase as any, trulyUnmatched, "workout", `WIZ-${body.category}`, content.name, `[WIZ-MISMATCH]`);
         }
 
-        const mainNorm = normalizeWorkoutHtml(content.main_workout);
+        const protocolSweep = sanitizeProtocolBlocks(stripWorkoutProtocolHeaderDurations(content.main_workout));
+        if (protocolSweep.flaggedForReview.length > 0) {
+          throw new Error(`Protocol validation failed: ${protocolSweep.flaggedForReview.slice(0, 4).map((i) => `${i.type}: ${i.detail}`).join("; ")}`);
+        }
+
+        const mainNorm = normalizeWorkoutHtml(protocolSweep.cleaned);
         const descNorm = normalizeWorkoutHtml(content.description || "");
         const insNorm = normalizeWorkoutHtml(content.instructions || "");
         const tipsNorm = normalizeWorkoutHtml(content.tips || "");
@@ -516,6 +521,27 @@ serve(async (req) => {
           if (!sectionCheck.isComplete) {
             throw new Error(`Section validation failed: missing=[${sectionCheck.missingSections.join(", ")}], issues=[${[...sectionCheck.exerciseContentIssues, ...sectionCheck.softTissueIssues, ...sectionCheck.mobilityCompatibilityIssues].join("; ")}]`);
           }
+
+          const protocolIssues = validateProtocolBlocks(mainNorm);
+          if (protocolIssues.length > 0) {
+            throw new Error(`Protocol validation failed: ${protocolIssues.slice(0, 4).join("; ")}`);
+          }
+
+          const qualityGate = applyWodQualityGate({
+            mainWorkoutHtml: mainNorm,
+            category: body.category,
+            difficultyStars: body.difficulty_stars,
+            format,
+            isRecoveryDay: body.category === "RECOVERY",
+          });
+          if (!qualityGate.ok) {
+            throw new Error(`Quality gate failed: ${qualityGate.failures.slice(0, 4).join("; ")}`);
+          }
+        }
+
+        const prescriptionSafetyIssues = validatePrescriptionSafety(mainNorm, body.category);
+        if (prescriptionSafetyIssues.length > 0) {
+          throw new Error(`Prescription safety failed: ${prescriptionSafetyIssues.slice(0, 4).join("; ")}`);
         }
 
         // Preview-only draft. Saving / Stripe / image / serial is the editor's job.
