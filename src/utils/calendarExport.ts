@@ -1,6 +1,6 @@
 const PUBLISHED_URL = "https://smartygym.lovable.app";
 
-export type CalendarExportMethod = "native-share" | "browser-download" | "mobile-open";
+export type CalendarExportMethod = "native-share" | "browser-download" | "mobile-open" | "hosted-ics" | "android-intent";
 
 export interface CalendarExportResult {
   success: boolean;
@@ -72,6 +72,55 @@ export function buildHostedICSUrl(params: CalendarEventParams): string {
   if (params.notes) searchParams.set("notes", params.notes);
 
   return `${baseUrl}/functions/v1/generate-calendar-ics?${searchParams.toString()}`;
+}
+
+export function buildAndroidCalendarIntentUrl(params: CalendarEventParams): string {
+  const start = new Date(`${params.date}T${params.time || "09:00"}:00`).getTime();
+  const end = start + (params.time ? 60 * 60 * 1000 : 24 * 60 * 60 * 1000);
+  const descriptionParts: string[] = [];
+
+  if (params.notes) descriptionParts.push(params.notes);
+  descriptionParts.push(`Open in SmartyGym: ${buildContentUrl(params.contentType, params.contentRouteType, params.contentId)}`);
+
+  return [
+    "intent://com.android.calendar/events#Intent",
+    "action=android.intent.action.INSERT",
+    "type=vnd.android.cursor.item/event",
+    `S.title=${encodeURIComponent(sanitizeTitle(params.title))}`,
+    `S.description=${encodeURIComponent(descriptionParts.join("\n"))}`,
+    `l.beginTime=${start}`,
+    `l.endTime=${end}`,
+    "end",
+  ].join(";");
+}
+
+export function openCalendarEvent(params: CalendarEventParams): CalendarExportResult {
+  const { isAndroid } = getCalendarRuntime();
+  const hostedUrl = buildHostedICSUrl(params);
+
+  if (isAndroid) {
+    let fallbackTimer: number | undefined;
+    const cancelFallback = () => {
+      if (fallbackTimer) window.clearTimeout(fallbackTimer);
+      window.removeEventListener("pagehide", cancelFallback);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+    const handleVisibilityChange = () => {
+      if (document.hidden) cancelFallback();
+    };
+
+    window.addEventListener("pagehide", cancelFallback, { once: true });
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    fallbackTimer = window.setTimeout(() => {
+      window.location.href = hostedUrl;
+    }, 1400);
+
+    window.location.href = buildAndroidCalendarIntentUrl(params);
+    return { success: true, method: "android-intent" };
+  }
+
+  window.location.href = hostedUrl;
+  return { success: true, method: "hosted-ics" };
 }
 
 export function generateICSFile(params: CalendarEventParams): string {
