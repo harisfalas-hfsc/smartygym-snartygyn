@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useTheme } from "next-themes";
 import DOMPurify from "dompurify";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -27,23 +26,22 @@ export const ReaderModeDialog = ({
   content,
   metadata,
 }: ReaderModeDialogProps) => {
-  const [fontSize, setFontSize] = useState(() => {
-    const saved = localStorage.getItem("readerModeFontSize");
-    return saved ? parseInt(saved) : 18;
-  });
+  // Default font size: 14px on mobile (<1024px), 18px on desktop.
+  const getDefaultFontSize = () =>
+    typeof window !== "undefined" && window.innerWidth < 1024 ? 14 : 18;
 
-  // Default reader theme follows the app's current theme.
-  const { resolvedTheme } = useTheme();
-  const [isDarkMode, setIsDarkMode] = useState(resolvedTheme !== "light");
+  const [fontSize, setFontSize] = useState<number>(getDefaultFontSize);
 
-  // Sync to current app theme each time the dialog opens.
+  // Reader mode always defaults to dark on both desktop and mobile.
+  const [isDarkMode, setIsDarkMode] = useState(true);
+
+  // Re-apply defaults each time the dialog opens.
   useEffect(() => {
-    if (open) setIsDarkMode(resolvedTheme !== "light");
-  }, [open, resolvedTheme]);
-
-  useEffect(() => {
-    localStorage.setItem("readerModeFontSize", fontSize.toString());
-  }, [fontSize]);
+    if (open) {
+      setIsDarkMode(true);
+      setFontSize(getDefaultFontSize());
+    }
+  }, [open]);
 
   const increaseFontSize = () => setFontSize((prev) => Math.min(prev + 2, 28));
   const decreaseFontSize = () => setFontSize((prev) => Math.max(prev - 2, 14));
