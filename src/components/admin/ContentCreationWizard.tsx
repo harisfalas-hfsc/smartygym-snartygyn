@@ -23,36 +23,12 @@ export type WizardContentType = "workout" | "program";
 
 export interface WizardWorkoutResult {
   type: "workout";
-  payload: {
-    name: "";
-    category: string;
-    difficulty_stars: number;
-    equipment: string;
-    format: string;
-    duration: string;
-    focus: string;
-    is_free: boolean;
-    is_premium: boolean;
-    is_standalone_purchase: boolean;
-    price: string;
-    tier_required: string;
-  };
+  payload: Record<string, any>;
 }
 
 export interface WizardProgramResult {
   type: "program";
-  payload: {
-    name: "";
-    category: string;
-    difficulty_stars: number;
-    weeks: number;
-    days_per_week: number;
-    equipment: string;
-    is_free: boolean;
-    is_premium: boolean;
-    is_standalone_purchase: boolean;
-    price: string;
-  };
+  payload: Record<string, any>;
 }
 
 export type WizardResult = WizardWorkoutResult | WizardProgramResult;
@@ -227,6 +203,8 @@ export const ContentCreationWizard = ({
       onComplete({
         type: "workout",
         payload: {
+          id: "",
+          serial_number: 0,
           name: "",
           category,
           difficulty_stars: difficultyStars,
@@ -234,10 +212,22 @@ export const ContentCreationWizard = ({
           format,
           duration,
           focus: isStrength ? focus : "",
+          activation: "",
+          warm_up: "",
+          main_workout: "",
+          finisher: "",
+          cool_down: "",
+          description: "",
+          instructions: "",
+          tips: "",
+          image_url: "",
+          generate_unique_image: false,
           is_free: isFree,
           is_premium: isPremium,
           is_standalone_purchase: isStandalone,
           price: isStandalone ? price : "",
+          stripe_product_id: "",
+          stripe_price_id: "",
           tier_required: isPremium ? "gold" : "",
         },
       });
@@ -245,16 +235,26 @@ export const ContentCreationWizard = ({
       onComplete({
         type: "program",
         payload: {
+          id: "",
+          serial_number: 0,
           name: "",
           category,
           difficulty_stars: difficultyStars,
           weeks,
           days_per_week: daysPerWeek,
           equipment,
+          training_program: "",
+          program_description: "",
+          construction: "",
+          final_tips: "",
+          image_url: "",
+          generate_unique_image: false,
           is_free: isFree,
           is_premium: isPremium,
           is_standalone_purchase: isStandalone,
           price: isStandalone ? price : "",
+          stripe_product_id: "",
+          stripe_price_id: "",
         },
       });
     }
