@@ -5,7 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, ArrowRight, Check, Dumbbell, Calendar } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Dumbbell, Calendar, Loader2, Sparkles } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import {
   WORKOUT_CATEGORIES,
   STRENGTH_FOCUS_OPTIONS,
@@ -24,6 +26,10 @@ export type WizardContentType = "workout" | "program";
 export interface WizardWorkoutResult {
   type: "workout";
   payload: Record<string, any>;
+  /** True when the workout has already been generated + saved to DB by the wizard. */
+  generated?: boolean;
+  /** When generated=true, the new workout id so the list can reload to it. */
+  id?: string;
 }
 
 export interface WizardProgramResult {
@@ -86,6 +92,7 @@ export const ContentCreationWizard = ({
   allowTypeSwitch = true,
   onComplete,
 }: Props) => {
+  const { toast } = useToast();
   const [step, setStep] = useState(0);
   const [type, setType] = useState<WizardContentType>(initialType);
   const [category, setCategory] = useState<string>("");
@@ -98,6 +105,7 @@ export const ContentCreationWizard = ({
   const [daysPerWeek, setDaysPerWeek] = useState<number>(4);
   const [access, setAccess] = useState<AccessChoice>("free");
   const [price, setPrice] = useState<string>("");
+  const [generating, setGenerating] = useState(false);
 
   useEffect(() => {
     if (open) {
@@ -113,6 +121,7 @@ export const ContentCreationWizard = ({
       setDaysPerWeek(4);
       setAccess("free");
       setPrice("");
+      setGenerating(false);
     }
   }, [open, initialType]);
 
@@ -259,6 +268,55 @@ export const ContentCreationWizard = ({
       });
     }
     onOpenChange(false);
+  };
+
+  /**
+   * Generate the full workout via AI (library-first) and save it to the
+   * database. On success the wizard closes and tells the manager to
+   * refresh — no manual editing required.
+   */
+  const handleGenerate = async () => {
+    if (type !== "workout") {
+      // programs still hand off to manual editor for now
+      handleFinish();
+      return;
+    }
+    setGenerating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-admin-workout", {
+        body: {
+          category,
+          equipment,
+          difficulty_stars: difficultyStars,
+          format,
+          duration,
+          focus: isStrength ? focus : undefined,
+          access,
+          price: access === "standalone" ? price : undefined,
+          tier_required: access === "premium" ? "gold" : undefined,
+        },
+      });
+      if (error) throw error;
+      if (!data?.ok) throw new Error(data?.error || "Generation failed");
+
+      toast({
+        title: "Workout created",
+        description: `${data.name} was generated and saved to the library.`,
+      });
+      onComplete({ type: "workout", payload: { id: data.id }, generated: true, id: data.id });
+      onOpenChange(false);
+    } catch (e: any) {
+      console.error("[Wizard] generate-admin-workout failed", e);
+      toast({
+        title: "Generation failed",
+        description: e.message || "Could not generate the workout. Opening the manual editor as a fallback.",
+        variant: "destructive",
+      });
+      // Fallback: hand off to manual editor with prefilled metadata
+      handleFinish();
+    } finally {
+      setGenerating(false);
+    }
   };
 
   /**
@@ -563,16 +621,35 @@ export const ContentCreationWizard = ({
         </div>
 
         <div className="flex items-center justify-between gap-2 pt-4 mt-4 border-t">
-          <Button variant="outline" onClick={goBack} disabled={step === 0}>
+          <Button variant="outline" onClick={goBack} disabled={step === 0 || generating}>
             <ArrowLeft className="w-4 h-4 mr-1" /> Back
           </Button>
           <Badge variant="outline" className="text-xs">
             {step + 1} / {totalSteps}
           </Badge>
           {currentKey === "review" ? (
-            <Button onClick={handleFinish}>
-              Open Editor <ArrowRight className="w-4 h-4 ml-1" />
-            </Button>
+            type === "workout" ? (
+              <div className="flex items-center gap-2">
+                <Button variant="outline" onClick={handleFinish} disabled={generating}>
+                  Open Editor
+                </Button>
+                <Button onClick={handleGenerate} disabled={generating}>
+                  {generating ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-1 animate-spin" /> Generating…
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4 mr-1" /> Generate Workout
+                    </>
+                  )}
+                </Button>
+              </div>
+            ) : (
+              <Button onClick={handleFinish}>
+                Open Editor <ArrowRight className="w-4 h-4 ml-1" />
+              </Button>
+            )
           ) : (
             <Button onClick={goNext} disabled={!canContinue()}>
               Next <ArrowRight className="w-4 h-4 ml-1" />
