@@ -15,6 +15,8 @@ import {
 import { normalizeWorkoutHtml, validateWorkoutHtml } from "../_shared/html-normalizer.ts";
 import { validateWodSections } from "../_shared/section-validator.ts";
 import { requireAdminOrServiceRole } from "../_shared/admin-or-service-auth.ts";
+import { sanitizeProtocolBlocks, validateProtocolBlocks } from "../_shared/protocol-sanitizer.ts";
+import { applyWodQualityGate } from "../_shared/wod-quality-gate.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -96,21 +98,21 @@ function categoryGuidance(category: string, equipment: string, focus?: string): 
 function formatGuidanceFor(format: string): string {
   switch (format) {
     case "AMRAP":
-      return `AMRAP block: "Main Workout (20-minute AMRAP)" — list 4-6 exercises with rep targets.`;
+      return `AMRAP block: header "Main Workout (AMRAP)" — state the time cap in a separate paragraph, then list 4-6 exercises with rep targets BEFORE each exercise token.`;
     case "EMOM":
-      return `EMOM block: "Main Workout (20-minute EMOM)" — alternate 2-4 exercises by minute with rep targets.`;
+      return `EMOM block: header "Main Workout (EMOM)" — label every minute and put reps/time BEFORE each exercise token.`;
     case "CIRCUIT":
-      return `CIRCUIT block: "Main Workout (5 rounds CIRCUIT)" — list 5-7 stations with reps/time and rest.`;
+      return `CIRCUIT block: header "Main Workout (CIRCUIT)" — state rounds/rest in a separate paragraph, then list 5-7 stations with reps/time BEFORE each exercise token.`;
     case "TABATA":
-      return `TABATA block: 8 rounds × 20s work / 10s rest. List 2-4 exercises rotating.`;
+      return `TABATA block: header "Main Workout (TABATA)" — 8 rounds × 20s work / 10s rest, with "20 sec" BEFORE every exercise token.`;
     case "FOR TIME":
-      return `FOR TIME block: chipper or rounds-for-time. Total reps then descending or fixed rounds.`;
+      return `FOR TIME block: header "Main Workout (For Time)" — chipper or rounds-for-time with reps BEFORE every exercise token.`;
     case "REPS & SETS":
-      return `REPS & SETS block: each exercise with explicit sets × reps × tempo × rest (e.g. "4 sets × 8 reps @ 31X1, rest 90s").`;
+      return `REPS & SETS block: each exercise starts with sets × reps, then exercise token, then tempo/rest (e.g. "4 sets × 8 reps {{exercise:ID:Name}} @ 31X1, rest 90s").`;
     case "MIX":
-      return `MIX block: combine REPS & SETS for strength portion with a metabolic finisher.`;
+      return `MIX block: combine a properly prescribed REPS & SETS strength portion with a properly prescribed metabolic finisher. Every exercise token needs reps/time/sets BEFORE it.`;
     default:
-      return `List each exercise with explicit prescription (reps/time/sets).`;
+      return `List each exercise with explicit prescription (reps/time/sets) BEFORE the exercise token.`;
   }
 }
 
