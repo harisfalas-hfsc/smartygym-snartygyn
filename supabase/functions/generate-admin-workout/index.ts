@@ -352,10 +352,47 @@ serve(async (req) => {
         const content = await callAI(lovableApiKey, prompt);
         if (!content) throw new Error("All AI models failed");
 
-        // name collision
-        const nameLc = content.name.trim().toLowerCase();
-        if (bannedNames.some((n: string) => n.trim().toLowerCase() === nameLc)) {
-          content.name = `${content.name.trim()} ${body.category.split(" ")[0].slice(0, 3).toUpperCase()}-${Date.now().toString().slice(-3)}`;
+        // Sanitize internal-style codes/suffixes the model may have slipped in
+        const stripInternalCodes = (n: string): string =>
+          n
+            .replace(/\s+\d{3,}[A-Z]*\b/gi, "")          // "813", "1230BW"
+            .replace(/\s+[A-Z]{2,4}[-\s]?\d{2,}\b/g, "") // "CAL-813", "STR 204"
+            .replace(/\s+(v\d+|#\d+)\b/gi, "")           // "v2", "#3"
+            .replace(/\s+(II|III|IV|V|VI|VII|VIII|IX|X)\b/g, "")
+            .replace(/\s+/g, " ")
+            .trim();
+        content.name = stripInternalCodes(content.name);
+
+        // name collision → append the workout FORMAT word (Circuit, AMRAP, EMOM…)
+        const norm = (s: string) => s.trim().toLowerCase();
+        const taken = new Set(bannedNames.map((n: string) => norm(n)));
+        if (taken.has(norm(content.name))) {
+          const fmt = String(format || "").trim();
+          const fmtWord = /amrap/i.test(fmt) ? "AMRAP"
+            : /emom/i.test(fmt) ? "EMOM"
+            : /tabata/i.test(fmt) ? "Tabata"
+            : /for\s*time/i.test(fmt) ? "For Time"
+            : /ladder/i.test(fmt) ? "Ladder"
+            : /pyramid/i.test(fmt) ? "Pyramid"
+            : /interval/i.test(fmt) ? "Intervals"
+            : /circuit/i.test(fmt) ? "Circuit"
+            : "Session";
+          const categoryWord = body.category === "STRENGTH" ? "Strength"
+            : body.category === "CALORIE BURNING" ? "Conditioning"
+            : body.category === "METABOLIC" ? "Engine"
+            : body.category === "CARDIO" ? "Cardio"
+            : body.category === "MOBILITY & STABILITY" ? "Control"
+            : body.category === "PILATES" ? "Pilates"
+            : body.category === "RECOVERY" ? "Recovery"
+            : body.category === "CHALLENGE" ? "Challenge"
+            : "Training";
+          const candidates = [
+            `${content.name} ${fmtWord}`,
+            `${content.name} ${categoryWord}`,
+            `${content.name} ${categoryWord} ${fmtWord}`,
+          ];
+          const pick = candidates.find((c) => !taken.has(norm(c))) || `${content.name} ${fmtWord} ${categoryWord}`;
+          content.name = pick;
         }
 
         // exercise markup cleanup
