@@ -1023,16 +1023,31 @@ export function guaranteeAllExercisesLinked(
     // Skip structural/instructional text
     if (/^(rest|repeat|complete|perform all|focus on|record|note|slow inhale|lie supine|maintain|alternate|foam|foam roll|lacrosse|tennis ball|trigger point|self-?massage|myofascial|release)/i.test(plainText)) continue;
     if (/^\d+\s*(seconds?|minutes?|min|sec)\s*(rest|recovery|break)/i.test(plainText)) continue;
-    if (plainText.split(/\s+/).length > 8) continue; // Long sentences are instructions
+    const strippedForCount = plainText
+      .replace(/^\d+\s*sets?\s*(?:x|×)\s*\d+(?:\s*-\s*\d+)?\s*(?:reps?)?\s+/i, '')
+      .replace(/^\d+(?:\.\d+)?(?:\s*-\s*\d+(?:\.\d+)?)?\s*(?:reps?(?:\s*\/\s*(?:side|leg|arm))?|reps?\s*(?:per|each)\s*(?:side|leg|arm)|sec(?:onds?)?|s\b|min(?:utes?)?|m\b|meters?|metres?|km\b|cal(?:ories)?|rounds?)\s+/i, '')
+      .replace(/\s*\([^)]*\)\s*/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    if (strippedForCount.split(/\s+/).length > 8) continue; // Long sentences are instructions
     
-    // Clean the text to extract exercise name candidate
+    const stripLeadingPrescription = (value: string): string => value
+      .replace(/^\d+\s*sets?\s*(?:x|×)\s*\d+(?:\s*-\s*\d+)?\s*(?:reps?)?\s+/i, '')
+      .replace(/^\d+(?:\.\d+)?(?:\s*-\s*\d+(?:\.\d+)?)?\s*(?:reps?(?:\s*\/\s*(?:side|leg|arm))?|reps?\s*(?:per|each)\s*(?:side|leg|arm)|sec(?:onds?)?|s\b|min(?:utes?)?|m\b|meters?|metres?|km\b|cal(?:ories)?|rounds?)\s+/i, '')
+      .replace(/^\d+\s+(?=[A-Za-z])/i, '')
+      .trim();
+
+    // Clean the text to extract exercise name candidate while preserving the
+    // prescription in the original line. Previously "10 reps Squat" became a
+    // candidate of "reps Squat", so replacing the candidate deleted "reps" and
+    // downstream validation rejected the draft after AI credits were spent.
     let candidate = plainText;
     // Strip leading bold time labels: "Minute 1:", "Round 2:", "Stability (5 min):"
     candidate = candidate.replace(/^(?:Minute|Round|Set|Station)\s*\d*\s*:\s*/i, '');
     // Strip leading sub-section labels: "Mobility (2 min):", "Dynamic Warm-up (8 min):"
     candidate = candidate.replace(/^[A-Za-z\s]+\(\d+\s*min\)\s*:\s*/i, '');
-    // Strip leading numbers: "15 Kettlebell Swings"
-    candidate = candidate.replace(/^\d+\s+/, '');
+    // Strip leading prescriptions: "15 reps Kettlebell Swings", "10 reps/side Bird Dog"
+    candidate = stripLeadingPrescription(candidate);
     // Strip trailing reps/sets/duration info
     candidate = candidate.replace(/\s*[-–—]\s*\d+\s*sets?\s*x\s*\d+.*$/i, '');
     candidate = candidate.replace(/\s*\(\d+[-–]?\d*\s*(?:kg|lb|sec|reps?|per|each).*?\)\s*$/i, '');
@@ -1174,11 +1189,17 @@ export function rejectNonLibraryExercises(
       .trim();
     if (strippedForCount.split(/\s+/).length > 12) continue;
     
-    // Extract exercise candidate
+    const stripLeadingPrescription = (value: string): string => value
+      .replace(/^\d+\s*sets?\s*(?:x|×)\s*\d+(?:\s*-\s*\d+)?\s*(?:reps?)?\s+/i, '')
+      .replace(/^\d+(?:\.\d+)?(?:\s*-\s*\d+(?:\.\d+)?)?\s*(?:reps?(?:\s*\/\s*(?:side|leg|arm))?|reps?\s*(?:per|each)\s*(?:side|leg|arm)|sec(?:onds?)?|s\b|min(?:utes?)?|m\b|meters?|metres?|km\b|cal(?:ories)?|rounds?)\s+/i, '')
+      .replace(/^\d+\s+(?=[A-Za-z])/i, '')
+      .trim();
+
+    // Extract exercise candidate while keeping prescription text in-place.
     let candidate = plainText;
     candidate = candidate.replace(/^(?:Minute|Round|Set|Station)\s*\d*\s*:\s*/i, '');
     candidate = candidate.replace(/^[A-Za-z\s]+\(\d+\s*min\)\s*:\s*/i, '');
-    candidate = candidate.replace(/^\d+\s+/, '');
+    candidate = stripLeadingPrescription(candidate);
     candidate = candidate.replace(/\s*[-–—]\s*\d+\s*sets?\s*x\s*\d+.*$/i, '');
     candidate = candidate.replace(/\s*\(\d+[-–]?\d*\s*(?:kg|lb|sec|reps?|per|each).*?\)\s*$/i, '');
     candidate = candidate.replace(/\s*\d+\s*(?:sets?\s*x|x)\s*\d+.*$/i, '');
@@ -1195,7 +1216,11 @@ export function rejectNonLibraryExercises(
     if (forceResult && forceResult.match.confidence >= 0.50) {
       const markup = `{{exercise:${forceResult.match.exercise.id}:${forceResult.match.exercise.name}}}`;
       const escapedCandidate = candidate.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const newInnerHtml = innerHtml.replace(new RegExp(escapedCandidate, 'i'), markup);
+      const escapedLibraryName = forceResult.match.exercise.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      let newInnerHtml = innerHtml.replace(new RegExp(`${escapedLibraryName}(?:s)?(?:\\s+machine)?`, 'i'), markup);
+      if (newInnerHtml === innerHtml) {
+        newInnerHtml = innerHtml.replace(new RegExp(escapedCandidate, 'i'), markup);
+      }
       
       if (newInnerHtml !== innerHtml) {
         replacements.push({ original: liMatch[0], replacement: liMatch[0].replace(innerHtml, newInnerHtml) });

@@ -232,57 +232,39 @@ const wodTool = {
   },
 };
 
-// Admin wizard uses Pro for stronger instruction-following on long prompts
-// (library-first rules, prescription validation, naming rules). Flash kept
-// as fallback only if Pro rate-limits/errors. All prompts/rules unchanged.
-const AI_MODELS = ["google/gemini-2.5-pro", "google/gemini-2.5-flash", "openai/gpt-5-mini"];
+// One generate click must equal one AI request. No fallback model cascade: it
+// wastes credits when validation/parsing fails downstream.
+const AI_MODEL = "google/gemini-2.5-pro";
 
 async function callAI(apiKey: string, prompt: string): Promise<WorkoutContent | null> {
-  for (const model of AI_MODELS) {
-    try {
-      const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model,
-          messages: [
-            { role: "system", content: "You are an expert fitness coach. Generate workouts using the provided tool." },
-            { role: "user", content: prompt },
-          ],
-          tools: [wodTool],
-          tool_choice: { type: "function", function: { name: "generate_workout" } },
-        }),
-      });
-      if (r.ok) {
-        const d = await r.json();
-        const tc = d.choices?.[0]?.message?.tool_calls?.[0];
-        if (tc?.function?.arguments) {
-          try { return JSON.parse(tc.function.arguments) as WorkoutContent; } catch {}
-        }
-      }
-    } catch (e: any) { log("AI tool-call error", { model, err: e.message }); }
-
-    try {
-      const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model,
-          messages: [
-            { role: "system", content: "Return ONLY valid JSON. No markdown. No code blocks. Start with { and end with }." },
-            { role: "user", content: prompt },
-          ],
-        }),
-      });
-      if (r.ok) {
-        const d = await r.json();
-        let c: string = d.choices?.[0]?.message?.content || "";
-        c = c.replace(/^```(?:json|JSON)?\s*\n?/gm, "").replace(/\n?```\s*$/gm, "");
-        const a = c.indexOf("{"), b = c.lastIndexOf("}");
-        if (a !== -1 && b > a) c = c.substring(a, b + 1);
-        try { return JSON.parse(c.trim()) as WorkoutContent; } catch {}
-      }
-    } catch (e: any) { log("AI text-fallback error", { model, err: e.message }); }
+  try {
+    const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: AI_MODEL,
+        messages: [
+          { role: "system", content: "You are an expert fitness coach. Generate workouts using the provided tool." },
+          { role: "user", content: prompt },
+        ],
+        tools: [wodTool],
+        tool_choice: { type: "function", function: { name: "generate_workout" } },
+      }),
+    });
+    const raw = await r.text();
+    if (!r.ok) {
+      log("AI request failed", { model: AI_MODEL, status: r.status, body: raw.slice(0, 300) });
+      return null;
+    }
+    const d = JSON.parse(raw);
+    const args = d.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments;
+    if (!args) {
+      log("AI response missing tool arguments", { model: AI_MODEL, finishReason: d.choices?.[0]?.finish_reason });
+      return null;
+    }
+    return JSON.parse(args) as WorkoutContent;
+  } catch (e: any) {
+    log("AI call error", { model: AI_MODEL, err: e.message });
   }
   return null;
 }
@@ -516,19 +498,23 @@ serve(async (req) => {
         const insNorm = normalizeWorkoutHtml(content.instructions || "");
         const tipsNorm = normalizeWorkoutHtml(content.tips || "");
 
+        const reviewWarnings: string[] = [];
         const htmlValid = validateWorkoutHtml(mainNorm);
-        if (!htmlValid.isValid) log("HTML validation issues (continuing)", { issues: htmlValid.issues });
+        if (!htmlValid.isValid) {
+          reviewWarnings.push(...htmlValid.issues.map((issue) => `HTML: ${issue}`));
+          log("HTML validation issues (continuing)", { issues: htmlValid.issues });
+        }
 
         // Section validator only enforces 5-section for non-micro
         if (!isMicro) {
           const sectionCheck = validateWodSections(mainNorm, false, body.category);
           if (!sectionCheck.isComplete) {
-            throw new Error(`Section validation failed: missing=[${sectionCheck.missingSections.join(", ")}], issues=[${[...sectionCheck.exerciseContentIssues, ...sectionCheck.softTissueIssues, ...sectionCheck.mobilityCompatibilityIssues].join("; ")}]`);
+            reviewWarnings.push(`Section validation: missing=[${sectionCheck.missingSections.join(", ")}], issues=[${[...sectionCheck.exerciseContentIssues, ...sectionCheck.softTissueIssues, ...sectionCheck.mobilityCompatibilityIssues].join("; ")}]`);
           }
 
           const protocolIssues = validateProtocolBlocks(mainNorm);
           if (protocolIssues.length > 0) {
-            throw new Error(`Protocol validation failed: ${protocolIssues.slice(0, 4).join("; ")}`);
+            reviewWarnings.push(`Protocol validation: ${protocolIssues.slice(0, 4).join("; ")}`);
           }
 
           const qualityGate = applyWodQualityGate({
@@ -539,13 +525,13 @@ serve(async (req) => {
             isRecoveryDay: body.category === "RECOVERY",
           });
           if (!qualityGate.ok) {
-            throw new Error(`Quality gate failed: ${qualityGate.failures.slice(0, 4).join("; ")}`);
+            reviewWarnings.push(`Quality gate: ${qualityGate.failures.slice(0, 4).join("; ")}`);
           }
         }
 
         const prescriptionSafetyIssues = validatePrescriptionSafety(mainNorm, body.category);
         if (prescriptionSafetyIssues.length > 0) {
-          throw new Error(`Prescription safety failed: ${prescriptionSafetyIssues.slice(0, 4).join("; ")}`);
+          reviewWarnings.push(`Prescription safety: ${prescriptionSafetyIssues.slice(0, 4).join("; ")}`);
         }
 
         // Preview-only draft. Saving / Stripe / image / serial is the editor's job.
@@ -573,10 +559,12 @@ serve(async (req) => {
           price: access === "standalone" ? String(body.price ?? "") : "",
           stripe_product_id: "",
           stripe_price_id: "",
+          needs_review: reviewWarnings.length > 0,
+          generation_review_warnings: reviewWarnings,
         };
 
-      log("✅ Drafted (not saved)", { name: content.name });
-      return new Response(JSON.stringify({ ok: true, draft }), {
+      log("✅ Drafted (not saved)", { name: content.name, reviewWarnings: reviewWarnings.length });
+      return new Response(JSON.stringify({ ok: true, draft, needs_review: reviewWarnings.length > 0, review_warnings: reviewWarnings }), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

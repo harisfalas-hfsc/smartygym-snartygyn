@@ -1,6 +1,7 @@
 import { assertEquals } from "https://deno.land/std@0.224.0/assert/mod.ts";
 import { sanitizeProtocolBlocks } from "../_shared/protocol-sanitizer.ts";
 import { applyWodQualityGate } from "../_shared/wod-quality-gate.ts";
+import { guaranteeAllExercisesLinked, rejectNonLibraryExercises } from "../_shared/exercise-matching.ts";
 
 Deno.test("sanitizer removes duplicated exercise names after library tokens", () => {
   const input = `<p class="tiptap-paragraph">12 reps {{exercise:0001:Scapula Push-up}}:Scapula Push-up</p>`;
@@ -50,4 +51,30 @@ Deno.test("quality gate accepts EMOM minute labels with repeat rounds", () => {
   });
 
   assertEquals(result.ok, true);
+});
+
+Deno.test("final exercise linking preserves leading rep prescriptions", () => {
+  const library = [
+    { id: "1759", name: "single leg squat (pistol) male", body_part: "legs", equipment: "body weight", target: "quads" },
+    { id: "3663", name: "reverse plank with leg lift", body_part: "core", equipment: "body weight", target: "abs" },
+  ];
+  const input = `<ul class="tiptap-bullet-list"><li class="tiptap-list-item"><p class="tiptap-paragraph">10 reps single leg squat (pistol) male (5 per side)</p></li><li class="tiptap-list-item"><p class="tiptap-paragraph">10 reps reverse plank with leg lift (5 per side)</p></li></ul>`;
+
+  const result = guaranteeAllExercisesLinked(input, library, "[TEST]");
+
+  assertEquals(result.processedContent.includes("10 reps {{exercise:1759:single leg squat (pistol) male}} (5 per side)"), true);
+  assertEquals(result.processedContent.includes("10 reps {{exercise:3663:reverse plank with leg lift}} (5 per side)"), true);
+  assertEquals(result.processedContent.includes("10 {{exercise:"), false);
+});
+
+Deno.test("non-library rejection substitution preserves leading rep prescriptions", () => {
+  const library = [
+    { id: "1759", name: "single leg squat (pistol) male", body_part: "legs", equipment: "body weight", target: "quads" },
+  ];
+  const input = `<ul class="tiptap-bullet-list"><li class="tiptap-list-item"><p class="tiptap-paragraph">10 reps single leg squat (pistol) male (5 per side)</p></li></ul>`;
+
+  const result = rejectNonLibraryExercises(input, library, "[TEST]");
+
+  assertEquals(result.processedContent.includes("10 reps {{exercise:1759:single leg squat (pistol) male}} (5 per side)"), true);
+  assertEquals(result.processedContent.includes("10 {{exercise:"), false);
 });
