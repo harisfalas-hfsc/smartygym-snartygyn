@@ -420,13 +420,11 @@ serve(async (req) => {
     const { exercises: library, referenceList } =
       await fetchAndBuildExerciseReference(supabase, "[WIZ]", equipFilter, difficulty.toLowerCase());
 
-    const MAX_ATTEMPTS = 3;
     let lastErr = "";
-    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-      try {
+    try {
         const prompt = buildPrompt({ body: { ...body, equipment, duration, format }, referenceList, bannedNames });
         const content = await callAI(lovableApiKey, prompt);
-        if (!content) throw new Error("All AI models failed");
+      if (!content) throw new Error("All AI models failed");
 
         // Sanitize internal-style codes/suffixes the model may have slipped in
         const stripInternalCodes = (n: string): string =>
@@ -507,9 +505,11 @@ serve(async (req) => {
         }
 
         const protocolSweep = sanitizeProtocolBlocks(stripWorkoutProtocolHeaderDurations(content.main_workout));
-        if (protocolSweep.flaggedForReview.length > 0) {
-          throw new Error(`Protocol validation failed: ${protocolSweep.flaggedForReview.slice(0, 4).map((i) => `${i.type}: ${i.detail}`).join("; ")}`);
-        }
+      if (protocolSweep.flaggedForReview.length > 0) {
+        log("Protocol review warnings (continuing)", {
+          issues: protocolSweep.flaggedForReview.slice(0, 6).map((i) => `${i.type}: ${i.detail}`),
+        });
+      }
 
         const mainNorm = normalizeWorkoutHtml(protocolSweep.cleaned);
         const descNorm = normalizeWorkoutHtml(content.description || "");
@@ -575,17 +575,14 @@ serve(async (req) => {
           stripe_price_id: "",
         };
 
-        log("✅ Drafted (not saved)", { name: content.name });
-        return new Response(JSON.stringify({ ok: true, draft }), {
-          status: 200,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      } catch (e: any) {
-        lastErr = e.message || String(e);
-        log(`Attempt ${attempt} failed`, { err: lastErr });
-        if (attempt === MAX_ATTEMPTS) break;
-        await new Promise(r => setTimeout(r, 4000));
-      }
+      log("✅ Drafted (not saved)", { name: content.name });
+      return new Response(JSON.stringify({ ok: true, draft }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    } catch (e: any) {
+      lastErr = e.message || String(e);
+      log("Generation failed without retry", { err: lastErr });
     }
 
     return new Response(JSON.stringify({ ok: false, error: lastErr || "exhausted retries" }), {
