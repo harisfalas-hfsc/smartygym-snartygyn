@@ -8,7 +8,7 @@ export interface CalendarExportResult {
   error?: unknown;
 }
 
-interface CalendarEventParams {
+export interface CalendarEventParams {
   title: string;
   date: string; // yyyy-MM-dd
   time?: string; // HH:mm
@@ -55,6 +55,23 @@ function sanitizeTitle(text: string): string {
 export function buildContentUrl(contentType: "workout" | "program", contentRouteType: string, contentId: string): string {
   const routePrefix = contentType === "workout" ? "workout" : "trainingprogram";
   return `${PUBLISHED_URL}/${routePrefix}/${encodeURIComponent(contentRouteType)}/${encodeURIComponent(contentId)}`;
+}
+
+export function buildHostedICSUrl(params: CalendarEventParams): string {
+  const baseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const searchParams = new URLSearchParams({
+    title: params.title,
+    date: params.date,
+    reminderMinutes: String(params.reminderMinutes),
+    contentType: params.contentType,
+    contentRouteType: params.contentRouteType,
+    contentId: params.contentId,
+  });
+
+  if (params.time) searchParams.set("time", params.time);
+  if (params.notes) searchParams.set("notes", params.notes);
+
+  return `${baseUrl}/functions/v1/generate-calendar-ics?${searchParams.toString()}`;
 }
 
 export function generateICSFile(params: CalendarEventParams): string {
