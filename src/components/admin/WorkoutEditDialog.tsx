@@ -390,8 +390,15 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
         price: formData.price ? parseFloat(formData.price) : null,
       };
 
-      // Remove the generate_unique_image flag before saving
-      const { generate_unique_image, stripe_product_id: existingStripeProductId, stripe_price_id: existingStripePriceId, ...dataToSave } = saveData;
+      // Remove transient wizard/review fields before saving
+      const {
+        generate_unique_image,
+        stripe_product_id: existingStripeProductId,
+        stripe_price_id: existingStripePriceId,
+        needs_review,
+        generation_review_warnings,
+        ...dataToSave
+      } = saveData;
 
       if (isExistingWorkout) {
         // Update existing workout
