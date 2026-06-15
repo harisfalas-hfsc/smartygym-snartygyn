@@ -500,9 +500,9 @@ export const Navigation = () => {
             type="button"
             onClick={() => setSmartyCoachOpen(true)}
             aria-label="Smarty Coach"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-primary bg-background hover:bg-primary/10 transition-colors"
+            className="inline-flex h-[1.9375rem] w-[1.9375rem] items-center justify-center rounded-full border-2 border-primary bg-background hover:bg-primary/10 transition-colors"
           >
-            <img src={smartyCoachIcon} alt="" aria-hidden="true" className="h-9 w-9 rounded-full" width={36} height={36} />
+            <img src={smartyCoachIcon} alt="" aria-hidden="true" className="h-[1.9375rem] w-[1.9375rem] rounded-full" width={31} height={31} />
           </button>
         </div>
 
