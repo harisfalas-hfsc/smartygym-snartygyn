@@ -297,13 +297,28 @@ export const ContentCreationWizard = ({
         },
       });
       if (error) throw error;
-      if (!data?.ok) throw new Error(data?.error || "Generation failed");
+      if (!data?.ok || !data?.draft) throw new Error(data?.error || "Generation failed");
 
       toast({
-        title: "Workout created",
-        description: `${data.name} was generated and saved to the library.`,
+        title: "Workout drafted",
+        description: `"${data.draft.name}" is ready — review and click Save to publish.`,
       });
-      onComplete({ type: "workout", payload: { id: data.id }, generated: true, id: data.id });
+      // Hand the AI-generated draft to the manual editor. The user can edit
+      // anything and the editor's Save button handles serial/image/Stripe/DB.
+      onComplete({
+        type: "workout",
+        payload: {
+          ...data.draft,
+          // explicit category/equipment/etc. from the wizard in case the
+          // draft omitted them (defensive)
+          category: data.draft.category || category,
+          equipment: data.draft.equipment || equipment,
+          difficulty_stars: data.draft.difficulty_stars ?? difficultyStars,
+          duration: data.draft.duration || duration,
+          format: data.draft.format || format,
+          focus: isStrength ? (data.draft.focus || focus) : "",
+        },
+      });
       onOpenChange(false);
     } catch (e: any) {
       console.error("[Wizard] generate-admin-workout failed", e);
