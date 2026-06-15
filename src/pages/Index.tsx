@@ -1090,7 +1090,7 @@ const Index = () => {
                     className="w-[6.25rem] lg:w-[7.5rem] h-auto drop-shadow-lg"
                   />
                   <span className="mt-2 text-[10px] lg:text-xs font-extrabold uppercase tracking-wider text-green-600 dark:text-green-400 text-center leading-tight">
-                    Best Online<br />Fitness Platform
+                    Best<br />Online Fitness<br />Platform
                   </span>
                 </div>
                 <p className="text-sm font-semibold tracking-[0.15em] uppercase text-muted-foreground mt-4 leading-snug">
