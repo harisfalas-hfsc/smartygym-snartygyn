@@ -106,8 +106,6 @@ function formatGuidanceFor(format: string): string {
       return `TABATA block: 8 rounds × 20s work / 10s rest. List 2-4 exercises rotating.`;
     case "FOR TIME":
       return `FOR TIME block: chipper or rounds-for-time. Total reps then descending or fixed rounds.`;
-    case "EMOM":
-      return `EMOM block: minute-by-minute prescriptions.`;
     case "REPS & SETS":
       return `REPS & SETS block: each exercise with explicit sets × reps × tempo × rest (e.g. "4 sets × 8 reps @ 31X1, rest 90s").`;
     case "MIX":
