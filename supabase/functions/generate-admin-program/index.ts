@@ -85,7 +85,10 @@ function buildCondensedReference(exercises: ExerciseBasic[]): string {
   return lines.join("\n");
 }
 
-const AI_MODELS = ["google/gemini-2.5-flash", "google/gemini-2.5-flash-lite"];
+// Admin wizard uses Pro for stronger instruction-following on long prompts
+// (library-first rules, sets×reps math, M-3 format). Flash kept as fallback
+// only if Pro rate-limits/errors. All prompts/rules unchanged.
+const AI_MODELS = ["google/gemini-2.5-pro", "google/gemini-2.5-flash"];
 
 async function callAI(apiKey: string, system: string, user: string, maxTokens = 16000): Promise<string | null> {
   for (const model of AI_MODELS) {

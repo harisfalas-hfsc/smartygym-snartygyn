@@ -232,7 +232,10 @@ const wodTool = {
   },
 };
 
-const AI_MODELS = ["google/gemini-2.5-flash", "google/gemini-2.5-flash-lite", "openai/gpt-5-mini"];
+// Admin wizard uses Pro for stronger instruction-following on long prompts
+// (library-first rules, prescription validation, naming rules). Flash kept
+// as fallback only if Pro rate-limits/errors. All prompts/rules unchanged.
+const AI_MODELS = ["google/gemini-2.5-pro", "google/gemini-2.5-flash", "openai/gpt-5-mini"];
 
 async function callAI(apiKey: string, prompt: string): Promise<WorkoutContent | null> {
   for (const model of AI_MODELS) {
