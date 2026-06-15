@@ -5,7 +5,6 @@
 
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import Stripe from "https://esm.sh/stripe@18.5.0";
 import {
   processContentSectionAware,
   fetchAndBuildExerciseReference,
@@ -409,57 +408,11 @@ serve(async (req) => {
           }
         }
 
-        const { id: workoutId, serial } = await nextSerial(supabase, body.category);
-
-        // Image
-        let imageUrl: string | null = null;
-        try {
-          const { data: imgData } = await supabase.functions.invoke("generate-workout-image", {
-            body: { name: content.name, category: body.category, format, difficulty_stars: body.difficulty_stars },
-          });
-          if (imgData?.image_url) imageUrl = imgData.image_url;
-        } catch (e: any) { log("Image gen exception", { err: e.message }); }
-        if (!imageUrl) throw new Error("Image generation failed");
-
-        // Stripe (standalone only)
-        let stripeProductId: string | null = null;
-        let stripePriceId: string | null = null;
-        if (access === "standalone") {
-          const priceNum = Number(body.price);
-          if (!priceNum || priceNum <= 0) throw new Error("standalone access requires a positive price");
-          const stripeKey = Deno.env.get("STRIPE_SECRET_KEY") || "";
-          if (!stripeKey) throw new Error("STRIPE_SECRET_KEY not configured");
-          const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
-          const product = await stripe.products.create({
-            name: content.name,
-            description: `Workout: ${content.name}`,
-            images: [imageUrl],
-            metadata: {
-              project: "SMARTYGYM",
-              content_type: "Workout",
-              source: "generate-admin-workout",
-              category: body.category,
-              equipment,
-              difficulty,
-              difficulty_stars: String(body.difficulty_stars),
-            },
-          }, { idempotencyKey: `prod-${workoutId}` });
-          const priceObj = await stripe.prices.create({
-            product: product.id,
-            unit_amount: Math.round(priceNum * 100),
-            currency: "eur",
-            metadata: { project: "SMARTYGYM", content_type: "Workout" },
-          }, { idempotencyKey: `price-${workoutId}` });
-          await stripe.products.update(product.id, { default_price: priceObj.id });
-          stripeProductId = product.id;
-          stripePriceId = priceObj.id;
-        }
-
-        const insertRow: any = {
-          id: workoutId,
-          serial_number: serial,
+        // Preview-only draft. Saving / Stripe / image / serial is the editor's job.
+        const draft = {
+          // id/serial intentionally omitted — the editor's open-as-new flow
+          // (workout && !workout.id) will allocate them when the admin saves.
           name: content.name,
-          type: "workout",
           category: body.category,
           format,
           equipment,
@@ -470,25 +423,20 @@ serve(async (req) => {
           main_workout: mainNorm,
           instructions: insNorm,
           tips: tipsNorm,
-          focus: body.category === "STRENGTH" ? (body.focus || null) : null,
-          image_url: imageUrl,
+          focus: body.category === "STRENGTH" ? (body.focus || "") : "",
+          image_url: "",
+          generate_unique_image: true,
           is_free: access === "free",
           is_premium: access === "premium",
-          tier_required: access === "premium" ? (body.tier_required || "gold") : null,
+          tier_required: access === "premium" ? (body.tier_required || "gold") : "",
           is_standalone_purchase: access === "standalone",
-          price: access === "standalone" ? Number(body.price) : null,
-          stripe_product_id: stripeProductId,
-          stripe_price_id: stripePriceId,
-          is_workout_of_day: false,
-          is_ai_generated: true,
-          is_visible: true,
+          price: access === "standalone" ? String(body.price ?? "") : "",
+          stripe_product_id: "",
+          stripe_price_id: "",
         };
 
-        const { error: insErr } = await (supabase as any).from("admin_workouts").insert(insertRow);
-        if (insErr) throw new Error(`DB insert failed: ${insErr.message}`);
-
-        log("✅ Created", { id: workoutId, name: content.name });
-        return new Response(JSON.stringify({ ok: true, id: workoutId, name: content.name }), {
+        log("✅ Drafted (not saved)", { id: workoutId, name: content.name });
+        return new Response(JSON.stringify({ ok: true, draft }), {
           status: 200,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
