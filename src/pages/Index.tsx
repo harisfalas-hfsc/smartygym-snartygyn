@@ -1081,7 +1081,7 @@ const Index = () => {
                   Not Harder.
                 </h1>
                 {/* Best Online Fitness Platform award rosette */}
-                <div className="absolute left-2 lg:left-[5%] top-[14%] z-10 flex flex-col items-center w-20 lg:w-24">
+                <div className="absolute left-2 lg:left-[12%] top-[14%] z-10 flex flex-col items-center w-20 lg:w-24">
                   <img
                     src={awardRosette}
                     alt="Best Online Fitness Platform award"
