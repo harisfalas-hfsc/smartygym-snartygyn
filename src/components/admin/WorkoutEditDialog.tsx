@@ -927,6 +927,45 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
             </div>
           )}
 
+          {/* 13-15. Access / Pricing — collapsed summary when prefilled by wizard */}
+          {!showAccessEditor && (
+            <div className="space-y-2 pt-4 border-t">
+              <div className="flex items-center justify-between gap-2">
+                <Label>Access & Pricing</Label>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowAccessEditor(true)}
+                >
+                  Change
+                </Button>
+              </div>
+              <div className="text-sm bg-muted/40 border rounded p-3 space-y-1">
+                <div>
+                  <span className="text-muted-foreground">Type: </span>
+                  {formData.is_free
+                    ? "🆓 Free content (no Stripe product)"
+                    : formData.is_standalone_purchase
+                    ? `💳 Premium + Standalone purchase (€${formData.price || "—"})`
+                    : formData.is_premium
+                    ? "🔒 Premium (Gold / Platinum subscribers)"
+                    : "Not set"}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  These were chosen in the creation wizard. Click <em>Change</em> to override.
+                </div>
+                <div className="text-xs text-muted-foreground pt-1">
+                  🖼️ A unique cover image will be generated automatically when you click
+                  <strong> Save Workout</strong>
+                  {formData.is_standalone_purchase ? " and synced to Stripe." : "."}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {showAccessEditor && (
+          <>
           {/* 13. Free Content Toggle */}
           <div className="space-y-4 pt-4 border-t">
             <Label>13. Content Type *</Label>
@@ -1037,6 +1076,8 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
                 </div>
               )}
             </div>
+          )}
+          </>
           )}
 
           <div className="flex justify-end gap-2 pt-4">
