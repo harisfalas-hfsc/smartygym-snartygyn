@@ -435,7 +435,7 @@ serve(async (req) => {
           stripe_price_id: "",
         };
 
-        log("✅ Drafted (not saved)", { id: workoutId, name: content.name });
+        log("✅ Drafted (not saved)", { name: content.name });
         return new Response(JSON.stringify({ ok: true, draft }), {
           status: 200,
           headers: { ...corsHeaders, "Content-Type": "application/json" },

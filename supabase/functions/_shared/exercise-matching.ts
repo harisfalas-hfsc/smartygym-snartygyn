@@ -692,11 +692,12 @@ export function processContentWithExerciseMatching(
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // SECTION-AWARE PROCESSING
-// Applies exercise matching to ALL sections — every library exercise gets a View button.
+// Applies exercise matching to exercise-bearing sections only.
+// Soft tissue must stay foam-rolling / release work, never {{exercise:...}} markup.
 // ═══════════════════════════════════════════════════════════════════════════════
 
 const SECTION_PATTERNS = [
-  { emoji: '🧽', name: 'soft_tissue', process: true },
+  { emoji: '🧽', name: 'soft_tissue', process: false },
   { emoji: '🔥', name: 'warm_up', process: true },
   { emoji: '💪', name: 'main_workout', process: true },
   { emoji: '⚡', name: 'finisher', process: true },
@@ -791,13 +792,8 @@ export function processContentSectionAware(
       allMatched.push(...result.matched);
       allUnmatched.push(...result.unmatched);
     } else {
-      // All sections are now processed — this branch should not be reached
-      console.log(`${logPrefix} ✅ Processing section: ${section.name}`);
-      const strippedContent = stripExerciseMarkup(section.content);
-      const result = processContentWithExerciseMatching(strippedContent, exerciseLibrary, `${logPrefix}[${section.name}]`);
-      rebuiltContent += result.processedContent;
-      allMatched.push(...result.matched);
-      allUnmatched.push(...result.unmatched);
+      console.log(`${logPrefix} ⏭️ Skipping exercise matching for section: ${section.name}`);
+      rebuiltContent += section.content;
     }
   }
   
@@ -1025,7 +1021,7 @@ export function guaranteeAllExercisesLinked(
     if (!plainText || plainText.length < 3) continue;
     
     // Skip structural/instructional text
-    if (/^(rest|repeat|complete|perform all|focus on|record|note|slow inhale|lie supine|maintain|alternate)/i.test(plainText)) continue;
+    if (/^(rest|repeat|complete|perform all|focus on|record|note|slow inhale|lie supine|maintain|alternate|foam|foam roll|lacrosse|tennis ball|trigger point|self-?massage|myofascial|release)/i.test(plainText)) continue;
     if (/^\d+\s*(seconds?|minutes?|min|sec)\s*(rest|recovery|break)/i.test(plainText)) continue;
     if (plainText.split(/\s+/).length > 8) continue; // Long sentences are instructions
     
@@ -1167,7 +1163,7 @@ export function rejectNonLibraryExercises(
     if (!plainText || plainText.length < 3) continue;
     
     // Skip instructional text
-    if (/^(rest|repeat|complete|perform|focus|record|note|slow|lie|maintain|alternate|foam|lacrosse|light jog|walking|breathing|diaphragm|inhale|exhale|box breath|tip\s*\d|quality|if an exercise|not cause|not hurt)/i.test(plainText)) continue;
+    if (/^(rest|repeat|complete|perform|focus|record|note|slow|lie|maintain|alternate|foam|foam roll|lacrosse|tennis ball|trigger point|self-?massage|myofascial|release|light jog|walking|breathing|diaphragm|inhale|exhale|box breath|tip\s*\d|quality|if an exercise|not cause|not hurt)/i.test(plainText)) continue;
     // Strip rep/set info before counting words to avoid skipping valid exercise lines
     const strippedForCount = plainText
       .replace(/\s*[-–—]\s*\d+\s*sets?\s*x\s*\d+.*$/i, '')
