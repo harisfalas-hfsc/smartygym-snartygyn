@@ -669,28 +669,22 @@ export const ContentCreationWizard = ({
             {step + 1} / {totalSteps}
           </Badge>
           {currentKey === "review" ? (
-            type === "workout" ? (
-              <div className="flex items-center gap-2">
-                <Button variant="outline" onClick={handleFinish} disabled={generating}>
-                  Open Editor
-                </Button>
-                <Button onClick={handleGenerate} disabled={generating}>
-                  {generating ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-1 animate-spin" /> Generating…
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-4 h-4 mr-1" /> Generate &amp; Review
-                    </>
-                  )}
-                </Button>
-              </div>
-            ) : (
-              <Button onClick={handleFinish}>
-                Open Editor <ArrowRight className="w-4 h-4 ml-1" />
+            <div className="flex items-center gap-2">
+              <Button variant="outline" onClick={handleFinish} disabled={generating}>
+                Open Editor
               </Button>
-            )
+              <Button onClick={handleGenerate} disabled={generating}>
+                {generating ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-1 animate-spin" /> Generating…
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4 mr-1" /> Generate &amp; Review
+                  </>
+                )}
+              </Button>
+            </div>
           ) : (
             <Button onClick={goNext} disabled={!canContinue()}>
               Next <ArrowRight className="w-4 h-4 ml-1" />
