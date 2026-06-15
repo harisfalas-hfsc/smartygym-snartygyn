@@ -112,13 +112,32 @@ function cleanStrayAfterToken(
   fixes: string[],
   flagged: ProtocolIssue[],
 ): string {
-  // Match tokens followed immediately by characters that aren't whitespace/HTML
-  // Capture up to the next HTML tag or end of paragraph.
-  const pattern = /(\}\})([^<\n]+?)(?=<|$)/g;
+  // Match exercise tokens followed by text before the next HTML tag/end of line.
+  // Common AI mistake: {{exercise:ID:Name}}:Name or {{exercise:ID:Name}} Name.
+  // When the trailing text is just a duplicate of the token's display name, safely remove it.
+  const pattern = /(\{\{exercise:[^:}]+:([^}]+)\}\})([^<\n]*?)(?=<|$)/gi;
 
-  return html.replace(pattern, (match, closing, trailing) => {
+  return html.replace(pattern, (match, token, exerciseName, trailing) => {
     const trimmed = trailing.trim();
     if (trimmed.length === 0) return match; // pure whitespace, fine
+
+    const normalize = (s: string) => s
+      .replace(/^[:\-–—\s]+/, "")
+      .replace(/[.,;:()\[\]{}]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+      .toLowerCase();
+    const trailingNormalized = normalize(trimmed);
+    const exerciseNormalized = normalize(exerciseName || "");
+    if (exerciseNormalized && trailingNormalized.startsWith(exerciseNormalized)) {
+      issues.push({
+        type: "stray_after_token",
+        detail: trimmed.slice(0, 120),
+        snippet: `${token}${trimmed.slice(0, 120)}`,
+      });
+      fixes.push(`Removed duplicated exercise text after token: "${trimmed.slice(0, 60)}"`);
+      return token;
+    }
 
     // Heuristic: if it starts with a digit, "sec", "interval", or an orphan ")",
     // treat as auto-removable noise.
@@ -130,7 +149,7 @@ function cleanStrayAfterToken(
         snippet: `}}${trimmed}`,
       });
       fixes.push(`Removed stray noise after exercise token: "${trimmed.slice(0, 60)}"`);
-      return closing; // drop the trailing junk
+      return token; // drop the trailing junk
     }
 
     // Anything else: flag, keep as-is for human review.
