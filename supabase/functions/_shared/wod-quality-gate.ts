@@ -208,7 +208,10 @@ export function applyWodQualityGate(args: {
   // depends on load, tempo, rest, and set execution. The calculator may still
   // estimate a short finisher, so never reject strength-style WODs on partial
   // computed minutes. Prescription/section density gates below remain strict.
-  if (!isRepsAndSets && computedMinutes > 0 && computedMinutes < minMinutes) {
+  // Allow a 1-minute tolerance: AI minute-math is approximate (e.g. an EMOM
+  // ladder that computes to 37 min vs a 38 min target should not kill the
+  // whole generation). Structural gates below remain strict.
+  if (!isRepsAndSets && computedMinutes > 0 && computedMinutes < minMinutes - 1) {
     failures.push(
       `Main+Finisher duration ${computedMinutes} min is below the ${minMinutes} min minimum for ${category} ${difficultyStars}-star (${format}).`,
     );

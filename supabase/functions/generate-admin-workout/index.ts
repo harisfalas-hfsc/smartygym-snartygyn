@@ -420,7 +420,7 @@ serve(async (req) => {
     const { exercises: library, referenceList } =
       await fetchAndBuildExerciseReference(supabase, "[WIZ]", equipFilter, difficulty.toLowerCase());
 
-    const MAX_ATTEMPTS = 2;
+    const MAX_ATTEMPTS = 3;
     let lastErr = "";
     for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
       try {
