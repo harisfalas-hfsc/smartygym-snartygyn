@@ -283,6 +283,68 @@ async function callAI(apiKey: string, prompt: string): Promise<WorkoutContent | 
   return null;
 }
 
+function stripWorkoutProtocolHeaderDurations(html: string): string {
+  return (html || "").replace(
+    /(Main Workout|Finisher)\s*\(\s*(REPS\s*(?:&|&amp;)\s*SETS|TABATA|EMOM|AMRAP|FOR\s*TIME|CIRCUIT|MIX)[^)]*\)/gi,
+    (_match, label: string, proto: string) => {
+      const cleanProto = proto.replace(/&amp;/gi, "&").replace(/\s+/g, " ").trim().toUpperCase();
+      return `${label} (${cleanProto})`;
+    },
+  );
+}
+
+function extractIconSection(html: string, startIcon: string, endIcons: string[]): string {
+  const start = html.indexOf(startIcon);
+  if (start === -1) return "";
+  const ends = endIcons.map((icon) => html.indexOf(icon, start + startIcon.length)).filter((idx) => idx > start);
+  return html.slice(start, ends.length ? Math.min(...ends) : html.length);
+}
+
+function exerciseLines(section: string): string[] {
+  return section
+    .split(/<li[^>]*>/i)
+    .slice(1)
+    .map((seg) => (seg.split(/<\/li>/i)[0] || "").replace(/<[^>]+>/g, " ").replace(/&nbsp;/gi, " ").replace(/\s+/g, " ").trim())
+    .filter((line) => /\{\{exercise:/i.test(line));
+}
+
+function validatePrescriptionSafety(html: string, category: string): string[] {
+  const failures: string[] = [];
+  const main = extractIconSection(html, "💪", ["⚡", "🧘"]);
+  const finisher = extractIconSection(html, "⚡", ["🧘"]);
+  const sections = [
+    { label: "Main Workout", html: main },
+    { label: "Finisher", html: finisher },
+  ];
+
+  for (const section of sections) {
+    const isRepsSets = /REPS\s*(?:&|&amp;)\s*SETS/i.test(section.html) || /STRENGTH|PILATES|MOBILITY & STABILITY/i.test(category || "");
+    for (const line of exerciseLines(section.html)) {
+      const tokenIndex = line.search(/\{\{exercise:[^}]+\}\}/i);
+      const before = line.slice(0, tokenIndex).trim();
+      const after = line.slice(tokenIndex).trim();
+
+      const hasDoseBefore = /(?:\d+(?:\.\d+)?(?:\s*-\s*\d+(?:\.\d+)?)?\s*(?:reps?|sec(?:onds?)?|s\b|min(?:utes?)?|m\b|meters?|km\b|cal(?:ories)?|rounds?)\b|\d+\s*(?:sets?\s*)?(?:x|×)\s*\d+(?:\s*-\s*\d+)?|minute\s+\d+)/i.test(before);
+      if (!hasDoseBefore) failures.push(`${section.label}: missing reps/time/sets before exercise token — ${line.slice(0, 160)}`);
+
+      const tempoWithoutDose = /^\{\{exercise:[^}]+\}\}\s*(?:@\s*)?\d{2}[0-9X]{2}\b/i.test(after) && !/\d+\s*(?:sets?\s*)?(?:x|×)\s*\d+/i.test(before);
+      if (tempoWithoutDose) failures.push(`${section.label}: tempo code is present without sets × reps before the exercise — ${line.slice(0, 160)}`);
+
+      if (isRepsSets) {
+        const setRep = before.match(/(\d+)\s*(?:sets?\s*)?(?:x|×)\s*(\d+)(?:\s*-\s*(\d+))?/i);
+        if (!setRep) failures.push(`${section.label}: REPS & SETS line must start with sets × reps — ${line.slice(0, 160)}`);
+        if (setRep) {
+          const sets = Number(setRep[1]);
+          const reps = Number(setRep[3] || setRep[2]);
+          if (sets < 1 || sets > 6) failures.push(`${section.label}: impossible set count (${sets}) — ${line.slice(0, 160)}`);
+          if (reps < 1 || reps > 25) failures.push(`${section.label}: impossible rep target (${reps}) — ${line.slice(0, 160)}`);
+        }
+      }
+    }
+  }
+  return failures;
+}
+
 async function nextSerial(supabase: any, category: string): Promise<{ id: string; serial: number }> {
   const prefix = CATEGORY_PREFIX[category] || "W";
   const { data: settings } = await supabase
