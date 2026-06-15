@@ -5,6 +5,8 @@
 /* Mobile bottom navigation bar height — reserves bottom padding on content */
 :root {
   --mobile-bottom-nav-h: 0px;
+  --site-desktop-preview-w: 1202px;
+  --site-mobile-preview-w: 390px;
 }
 @media (max-width: 767px) {
   :root {
@@ -162,6 +164,39 @@ All colors MUST be HSL.
   .text-display a:hover {
     color: hsl(var(--primary-hover));
     text-decoration-color: hsl(var(--primary));
+  }
+}
+
+@layer components {
+  /* Stable preview/published canvas: keep page sections anchored to the same
+   * desktop and mobile widths instead of reflowing when the editor side panel
+   * is opened/closed or when a larger monitor expands the browser window. */
+  @media (min-width: 1024px) and (orientation: landscape), (min-width: 1200px) {
+    #main-content,
+    footer,
+    header > div {
+      width: min(100vw, var(--site-desktop-preview-w));
+      max-width: var(--site-desktop-preview-w);
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    #main-content .container,
+    footer .container {
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+  }
+
+  @media (max-width: 767px) {
+    #main-content,
+    footer,
+    header > div {
+      width: min(100vw, var(--site-mobile-preview-w));
+      max-width: var(--site-mobile-preview-w);
+      margin-left: auto;
+      margin-right: auto;
+    }
   }
 }
 
