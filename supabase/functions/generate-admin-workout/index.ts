@@ -232,57 +232,39 @@ const wodTool = {
   },
 };
 
-// Admin wizard uses Pro for stronger instruction-following on long prompts
-// (library-first rules, prescription validation, naming rules). Flash kept
-// as fallback only if Pro rate-limits/errors. All prompts/rules unchanged.
-const AI_MODELS = ["google/gemini-2.5-pro", "google/gemini-2.5-flash", "openai/gpt-5-mini"];
+// One generate click must equal one AI request. No fallback model cascade: it
+// wastes credits when validation/parsing fails downstream.
+const AI_MODEL = "google/gemini-2.5-pro";
 
 async function callAI(apiKey: string, prompt: string): Promise<WorkoutContent | null> {
-  for (const model of AI_MODELS) {
-    try {
-      const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model,
-          messages: [
-            { role: "system", content: "You are an expert fitness coach. Generate workouts using the provided tool." },
-            { role: "user", content: prompt },
-          ],
-          tools: [wodTool],
-          tool_choice: { type: "function", function: { name: "generate_workout" } },
-        }),
-      });
-      if (r.ok) {
-        const d = await r.json();
-        const tc = d.choices?.[0]?.message?.tool_calls?.[0];
-        if (tc?.function?.arguments) {
-          try { return JSON.parse(tc.function.arguments) as WorkoutContent; } catch {}
-        }
-      }
-    } catch (e: any) { log("AI tool-call error", { model, err: e.message }); }
-
-    try {
-      const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model,
-          messages: [
-            { role: "system", content: "Return ONLY valid JSON. No markdown. No code blocks. Start with { and end with }." },
-            { role: "user", content: prompt },
-          ],
-        }),
-      });
-      if (r.ok) {
-        const d = await r.json();
-        let c: string = d.choices?.[0]?.message?.content || "";
-        c = c.replace(/^```(?:json|JSON)?\s*\n?/gm, "").replace(/\n?```\s*$/gm, "");
-        const a = c.indexOf("{"), b = c.lastIndexOf("}");
-        if (a !== -1 && b > a) c = c.substring(a, b + 1);
-        try { return JSON.parse(c.trim()) as WorkoutContent; } catch {}
-      }
-    } catch (e: any) { log("AI text-fallback error", { model, err: e.message }); }
+  try {
+    const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: AI_MODEL,
+        messages: [
+          { role: "system", content: "You are an expert fitness coach. Generate workouts using the provided tool." },
+          { role: "user", content: prompt },
+        ],
+        tools: [wodTool],
+        tool_choice: { type: "function", function: { name: "generate_workout" } },
+      }),
+    });
+    const raw = await r.text();
+    if (!r.ok) {
+      log("AI request failed", { model: AI_MODEL, status: r.status, body: raw.slice(0, 300) });
+      return null;
+    }
+    const d = JSON.parse(raw);
+    const args = d.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments;
+    if (!args) {
+      log("AI response missing tool arguments", { model: AI_MODEL, finishReason: d.choices?.[0]?.finish_reason });
+      return null;
+    }
+    return JSON.parse(args) as WorkoutContent;
+  } catch (e: any) {
+    log("AI call error", { model: AI_MODEL, err: e.message });
   }
   return null;
 }
