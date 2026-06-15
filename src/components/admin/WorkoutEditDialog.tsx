@@ -116,6 +116,9 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
   });
   const [sendNotification, setSendNotification] = useState(false);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+  // When the wizard pre-fills access/pricing, collapse those toggles into a
+  // read-only summary so admins don't think the editor is asking them again.
+  const [showAccessEditor, setShowAccessEditor] = useState(false);
 
   const getCategoryPrefix = (category: string) => {
     const prefixMap: { [key: string]: string } = {
@@ -140,6 +143,11 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
   // Check if current category is micro-workout (fields should be locked)
   const isMicroWorkout = formData.category === 'MICRO-WORKOUTS';
   const isExistingWorkout = Boolean(workout?.id);
+  // Treat as "wizard prefill" when there's no saved id but the wizard set any
+  // of the access flags (free / premium / standalone).
+  const isFromWizard =
+    !isExistingWorkout &&
+    (formData.is_free || formData.is_premium || formData.is_standalone_purchase);
 
   useLayoutEffect(() => {
     if (workout && workout.id) {
