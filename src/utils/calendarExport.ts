@@ -84,8 +84,9 @@ export function buildAndroidCalendarIntentUrl(params: CalendarEventParams): stri
 
   return [
     "intent://com.android.calendar/events#Intent",
+    "scheme=content",
     "action=android.intent.action.INSERT",
-    "type=vnd.android.cursor.item/event",
+    "type=vnd.android.cursor.dir/event",
     `S.title=${encodeURIComponent(sanitizeTitle(params.title))}`,
     `S.description=${encodeURIComponent(descriptionParts.join("\n"))}`,
     `l.beginTime=${start}`,
