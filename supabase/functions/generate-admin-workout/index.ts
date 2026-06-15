@@ -15,6 +15,8 @@ import {
 import { normalizeWorkoutHtml, validateWorkoutHtml } from "../_shared/html-normalizer.ts";
 import { validateWodSections } from "../_shared/section-validator.ts";
 import { requireAdminOrServiceRole } from "../_shared/admin-or-service-auth.ts";
+import { sanitizeProtocolBlocks, validateProtocolBlocks } from "../_shared/protocol-sanitizer.ts";
+import { applyWodQualityGate } from "../_shared/wod-quality-gate.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -96,21 +98,21 @@ function categoryGuidance(category: string, equipment: string, focus?: string): 
 function formatGuidanceFor(format: string): string {
   switch (format) {
     case "AMRAP":
-      return `AMRAP block: "Main Workout (20-minute AMRAP)" — list 4-6 exercises with rep targets.`;
+      return `AMRAP block: header "Main Workout (AMRAP)" — state the time cap in a separate paragraph, then list 4-6 exercises with rep targets BEFORE each exercise token.`;
     case "EMOM":
-      return `EMOM block: "Main Workout (20-minute EMOM)" — alternate 2-4 exercises by minute with rep targets.`;
+      return `EMOM block: header "Main Workout (EMOM)" — label every minute and put reps/time BEFORE each exercise token.`;
     case "CIRCUIT":
-      return `CIRCUIT block: "Main Workout (5 rounds CIRCUIT)" — list 5-7 stations with reps/time and rest.`;
+      return `CIRCUIT block: header "Main Workout (CIRCUIT)" — state rounds/rest in a separate paragraph, then list 5-7 stations with reps/time BEFORE each exercise token.`;
     case "TABATA":
-      return `TABATA block: 8 rounds × 20s work / 10s rest. List 2-4 exercises rotating.`;
+      return `TABATA block: header "Main Workout (TABATA)" — 8 rounds × 20s work / 10s rest, with "20 sec" BEFORE every exercise token.`;
     case "FOR TIME":
-      return `FOR TIME block: chipper or rounds-for-time. Total reps then descending or fixed rounds.`;
+      return `FOR TIME block: header "Main Workout (For Time)" — chipper or rounds-for-time with reps BEFORE every exercise token.`;
     case "REPS & SETS":
-      return `REPS & SETS block: each exercise with explicit sets × reps × tempo × rest (e.g. "4 sets × 8 reps @ 31X1, rest 90s").`;
+      return `REPS & SETS block: each exercise starts with sets × reps, then exercise token, then tempo/rest (e.g. "4 sets × 8 reps {{exercise:ID:Name}} @ 31X1, rest 90s").`;
     case "MIX":
-      return `MIX block: combine REPS & SETS for strength portion with a metabolic finisher.`;
+      return `MIX block: combine a properly prescribed REPS & SETS strength portion with a properly prescribed metabolic finisher. Every exercise token needs reps/time/sets BEFORE it.`;
     default:
-      return `List each exercise with explicit prescription (reps/time/sets).`;
+      return `List each exercise with explicit prescription (reps/time/sets) BEFORE the exercise token.`;
   }
 }
 
@@ -123,6 +125,7 @@ function buildPrompt(args: {
   const { category, equipment, difficulty_stars, format = "MIX", duration = "30 min", focus } = body;
   const difficulty = difficultyLabel(difficulty_stars);
   const isMicro = category === "MICRO-WORKOUTS";
+  const isControlledRepsSets = ["STRENGTH", "MOBILITY & STABILITY", "PILATES"].includes(category);
   const bannedBlock = bannedNames.length
     ? `\n⛔ BANNED NAMES — already in library; DO NOT reuse or trivially vary:\n${bannedNames.slice(0, 200).map(n => `   ❌ "${n}"`).join("\n")}\n`
     : "";
@@ -170,18 +173,26 @@ ${sectionRules}
 SECTION TITLE FORMAT: <p class="tiptap-paragraph">🔥 <strong><u>Activation 5'</u></strong></p>
 ONLY ONE icon per section.
 
-EXERCISE LINES — bullet lists ONLY:
-<ul class="tiptap-bullet-list"><li class="tiptap-list-item"><p class="tiptap-paragraph">{{exercise:ID:Name}} (prescription)</p></li></ul>
+EXERCISE LINES — bullet lists ONLY, prescription FIRST:
+<ul class="tiptap-bullet-list"><li class="tiptap-list-item"><p class="tiptap-paragraph">12 reps {{exercise:ID:Name}}</p></li></ul>
+
+NON-NEGOTIABLE PRESCRIPTION RULES:
+- Every Main Workout and Finisher exercise line MUST put the measurable dose BEFORE the {{exercise:...}} token.
+- Correct REPS & SETS: "4 sets × 6 reps {{exercise:0043:barbell full squat}} @ 31X1, rest 150s".
+- WRONG and forbidden: "{{exercise:0043:barbell full squat}} 41X1" because 41X1 is tempo, not sets/reps.
+- Tempo codes (20X0, 31X1, 41X1, 21X1) are ONLY allowed AFTER an explicit sets × reps prescription.
+- Conditioning examples: "15 reps {{exercise:1160:burpee}}", "40 sec {{exercise:0630:mountain climber}}", "200m {{exercise:0685:run}}".
+- Never list naked exercises. Never write an exercise token alone and explain reps later.
 
 SECTION SEPARATORS: ONE empty paragraph between sections only: <p class="tiptap-paragraph"></p>
 
-MAIN WORKOUT TITLE: "Main Workout (${format} ${isMicro ? "3'" : "20'"})"
-${isMicro ? "" : "FINISHER TITLE: \"Finisher (For Time)\" or \"Finisher (10-minute AMRAP)\" — never under 10 minutes."}
+MAIN WORKOUT TITLE: "Main Workout (${format})" — no duration inside protocol headers.
+${isMicro ? "" : isControlledRepsSets ? "FINISHER TITLE: \"Finisher (REPS & SETS)\" — short controlled accessory/core finisher with sets × reps before every exercise token." : "FINISHER TITLE: \"Finisher (For Time)\" or \"Finisher (AMRAP)\" — no duration inside protocol headers. Put time cap/rounds in the paragraph below the header."}
 
 FORMAT GUIDANCE:
 ${formatGuidanceFor(format)}
 
-PRESCRIPTION RULE: every exercise line MUST include reps/time/distance/sets.
+PRESCRIPTION RULE: every Main Workout and Finisher exercise line MUST include reps/time/distance/sets BEFORE the exercise token.
 
 RESPONSE FORMAT (JSON ONLY — NO MARKDOWN):
 {
@@ -271,6 +282,68 @@ async function callAI(apiKey: string, prompt: string): Promise<WorkoutContent | 
     } catch (e: any) { log("AI text-fallback error", { model, err: e.message }); }
   }
   return null;
+}
+
+function stripWorkoutProtocolHeaderDurations(html: string): string {
+  return (html || "").replace(
+    /(Main Workout|Finisher)\s*\(\s*(REPS\s*(?:&|&amp;)\s*SETS|TABATA|EMOM|AMRAP|FOR\s*TIME|CIRCUIT|MIX)[^)]*\)/gi,
+    (_match, label: string, proto: string) => {
+      const cleanProto = proto.replace(/&amp;/gi, "&").replace(/\s+/g, " ").trim().toUpperCase();
+      return `${label} (${cleanProto})`;
+    },
+  );
+}
+
+function extractIconSection(html: string, startIcon: string, endIcons: string[]): string {
+  const start = html.indexOf(startIcon);
+  if (start === -1) return "";
+  const ends = endIcons.map((icon) => html.indexOf(icon, start + startIcon.length)).filter((idx) => idx > start);
+  return html.slice(start, ends.length ? Math.min(...ends) : html.length);
+}
+
+function exerciseLines(section: string): string[] {
+  return section
+    .split(/<li[^>]*>/i)
+    .slice(1)
+    .map((seg) => (seg.split(/<\/li>/i)[0] || "").replace(/<[^>]+>/g, " ").replace(/&nbsp;/gi, " ").replace(/\s+/g, " ").trim())
+    .filter((line) => /\{\{exercise:/i.test(line));
+}
+
+function validatePrescriptionSafety(html: string, category: string): string[] {
+  const failures: string[] = [];
+  const main = extractIconSection(html, "💪", ["⚡", "🧘"]);
+  const finisher = extractIconSection(html, "⚡", ["🧘"]);
+  const sections = [
+    { label: "Main Workout", html: main },
+    { label: "Finisher", html: finisher },
+  ];
+
+  for (const section of sections) {
+    const isRepsSets = /REPS\s*(?:&|&amp;)\s*SETS/i.test(section.html) || /STRENGTH|PILATES|MOBILITY & STABILITY/i.test(category || "");
+    for (const line of exerciseLines(section.html)) {
+      const tokenIndex = line.search(/\{\{exercise:[^}]+\}\}/i);
+      const before = line.slice(0, tokenIndex).trim();
+      const after = line.slice(tokenIndex).trim();
+
+      const hasDoseBefore = /(?:\d+(?:\.\d+)?(?:\s*-\s*\d+(?:\.\d+)?)?\s*(?:reps?|sec(?:onds?)?|s\b|min(?:utes?)?|m\b|meters?|km\b|cal(?:ories)?|rounds?)\b|\d+\s*(?:sets?\s*)?(?:x|×)\s*\d+(?:\s*-\s*\d+)?|minute\s+\d+)/i.test(before);
+      if (!hasDoseBefore) failures.push(`${section.label}: missing reps/time/sets before exercise token — ${line.slice(0, 160)}`);
+
+      const tempoWithoutDose = /^\{\{exercise:[^}]+\}\}\s*(?:@\s*)?\d{2}[0-9X]{2}\b/i.test(after) && !/\d+\s*(?:sets?\s*)?(?:x|×)\s*\d+/i.test(before);
+      if (tempoWithoutDose) failures.push(`${section.label}: tempo code is present without sets × reps before the exercise — ${line.slice(0, 160)}`);
+
+      if (isRepsSets) {
+        const setRep = before.match(/(\d+)\s*(?:sets?\s*)?(?:x|×)\s*(\d+)(?:\s*-\s*(\d+))?/i);
+        if (!setRep) failures.push(`${section.label}: REPS & SETS line must start with sets × reps — ${line.slice(0, 160)}`);
+        if (setRep) {
+          const sets = Number(setRep[1]);
+          const reps = Number(setRep[3] || setRep[2]);
+          if (sets < 1 || sets > 6) failures.push(`${section.label}: impossible set count (${sets}) — ${line.slice(0, 160)}`);
+          if (reps < 1 || reps > 25) failures.push(`${section.label}: impossible rep target (${reps}) — ${line.slice(0, 160)}`);
+        }
+      }
+    }
+  }
+  return failures;
 }
 
 async function nextSerial(supabase: any, category: string): Promise<{ id: string; serial: number }> {
@@ -430,7 +503,12 @@ serve(async (req) => {
           await logUnmatchedExercises(supabase as any, trulyUnmatched, "workout", `WIZ-${body.category}`, content.name, `[WIZ-MISMATCH]`);
         }
 
-        const mainNorm = normalizeWorkoutHtml(content.main_workout);
+        const protocolSweep = sanitizeProtocolBlocks(stripWorkoutProtocolHeaderDurations(content.main_workout));
+        if (protocolSweep.flaggedForReview.length > 0) {
+          throw new Error(`Protocol validation failed: ${protocolSweep.flaggedForReview.slice(0, 4).map((i) => `${i.type}: ${i.detail}`).join("; ")}`);
+        }
+
+        const mainNorm = normalizeWorkoutHtml(protocolSweep.cleaned);
         const descNorm = normalizeWorkoutHtml(content.description || "");
         const insNorm = normalizeWorkoutHtml(content.instructions || "");
         const tipsNorm = normalizeWorkoutHtml(content.tips || "");
@@ -444,6 +522,27 @@ serve(async (req) => {
           if (!sectionCheck.isComplete) {
             throw new Error(`Section validation failed: missing=[${sectionCheck.missingSections.join(", ")}], issues=[${[...sectionCheck.exerciseContentIssues, ...sectionCheck.softTissueIssues, ...sectionCheck.mobilityCompatibilityIssues].join("; ")}]`);
           }
+
+          const protocolIssues = validateProtocolBlocks(mainNorm);
+          if (protocolIssues.length > 0) {
+            throw new Error(`Protocol validation failed: ${protocolIssues.slice(0, 4).join("; ")}`);
+          }
+
+          const qualityGate = applyWodQualityGate({
+            mainWorkoutHtml: mainNorm,
+            category: body.category,
+            difficultyStars: body.difficulty_stars,
+            format,
+            isRecoveryDay: body.category === "RECOVERY",
+          });
+          if (!qualityGate.ok) {
+            throw new Error(`Quality gate failed: ${qualityGate.failures.slice(0, 4).join("; ")}`);
+          }
+        }
+
+        const prescriptionSafetyIssues = validatePrescriptionSafety(mainNorm, body.category);
+        if (prescriptionSafetyIssues.length > 0) {
+          throw new Error(`Prescription safety failed: ${prescriptionSafetyIssues.slice(0, 4).join("; ")}`);
         }
 
         // Preview-only draft. Saving / Stripe / image / serial is the editor's job.
