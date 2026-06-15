@@ -1,0 +1,1 @@
+GRANT EXECUTE ON FUNCTION public.get_cron_jobs() TO service_role, authenticated;
