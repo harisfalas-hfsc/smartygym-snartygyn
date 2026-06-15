@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { Table } from '@tiptap/extension-table';
@@ -272,7 +272,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   // Sync external value changes into the editor (e.g. "Insert standard structure"
   // button, template prefills, programmatic resets). Tiptap only reads `content`
   // on init, so without this the editor stays static while formData updates.
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!editor) return;
     const incoming = value || '';
     const current = editor.getHTML();
