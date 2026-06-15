@@ -141,9 +141,14 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
   const isMicroWorkout = formData.category === 'MICRO-WORKOUTS';
 
   useEffect(() => {
-    if (workout) {
+    if (workout && workout.id) {
       setFormData(workout);
       setSendNotification(false); // Don't send notifications for edits by default
+    } else if (workout && !workout.id) {
+      // Wizard prefill: a partial new-content seed from ContentCreationWizard.
+      // Treat as "new" but pre-populate the metadata fields the user already picked.
+      setFormData((prev) => ({ ...prev, ...workout }));
+      setSendNotification(false);
     } else {
       setFormData({
         id: '',
@@ -179,7 +184,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
 
   // Auto-generate serial number when category changes using persistent counters
   useEffect(() => {
-    if (!workout && formData.category) {
+    if ((!workout || !workout.id) && formData.category) {
       const generateSerialNumber = async () => {
         const prefix = getCategoryPrefix(formData.category);
         
