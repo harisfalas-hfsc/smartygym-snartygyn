@@ -46,7 +46,7 @@ export const ExerciseLinkButton = ({
           }}
           title={`View ${exerciseName} details`}
         >
-          <Eye className="h-3.5 w-3.5 text-primary" />
+          <Eye className="exercise-view-eye h-3.5 w-3.5 text-primary" />
         </Button>
       </span>
       
