@@ -261,6 +261,20 @@ export const ContentCreationWizard = ({
     onOpenChange(false);
   };
 
+  /**
+   * Skip the wizard entirely and open the manual editor with a clean
+   * blank form — same behavior the old "+ Create" button had before
+   * the wizard was added.
+   */
+  const handleSkipToManual = () => {
+    onComplete(
+      type === "workout"
+        ? { type: "workout", payload: {} as any }
+        : { type: "program", payload: {} as any },
+    );
+    onOpenChange(false);
+  };
+
   // --- choice grid helper ---
   const ChoiceGrid = ({
     options,
@@ -322,6 +336,18 @@ export const ContentCreationWizard = ({
             same protocols as the rest of the library.
           </DialogDescription>
         </DialogHeader>
+
+        {/* Skip-to-manual shortcut — preserves the pre-wizard behavior */}
+        <div className="flex items-center justify-end -mt-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-xs text-muted-foreground hover:text-primary"
+            onClick={handleSkipToManual}
+          >
+            Skip wizard — open manual editor →
+          </Button>
+        </div>
 
         {/* Progress dots */}
         <div className="flex items-center gap-1.5 my-3">
