@@ -657,7 +657,7 @@ export const ContentCreationWizard = ({
                     </>
                   ) : (
                     <>
-                      <Sparkles className="w-4 h-4 mr-1" /> Generate Workout
+                      <Sparkles className="w-4 h-4 mr-1" /> Generate &amp; Review
                     </>
                   )}
                 </Button>
