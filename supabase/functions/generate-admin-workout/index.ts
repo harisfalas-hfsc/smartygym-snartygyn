@@ -125,6 +125,7 @@ function buildPrompt(args: {
   const { category, equipment, difficulty_stars, format = "MIX", duration = "30 min", focus } = body;
   const difficulty = difficultyLabel(difficulty_stars);
   const isMicro = category === "MICRO-WORKOUTS";
+  const isControlledRepsSets = ["STRENGTH", "MOBILITY & STABILITY", "PILATES"].includes(category);
   const bannedBlock = bannedNames.length
     ? `\n⛔ BANNED NAMES — already in library; DO NOT reuse or trivially vary:\n${bannedNames.slice(0, 200).map(n => `   ❌ "${n}"`).join("\n")}\n`
     : "";
@@ -186,7 +187,7 @@ NON-NEGOTIABLE PRESCRIPTION RULES:
 SECTION SEPARATORS: ONE empty paragraph between sections only: <p class="tiptap-paragraph"></p>
 
 MAIN WORKOUT TITLE: "Main Workout (${format})" — no duration inside protocol headers.
-${isMicro ? "" : "FINISHER TITLE: \"Finisher (For Time)\" or \"Finisher (AMRAP)\" — no duration inside protocol headers. Put time cap/rounds in the paragraph below the header."}
+${isMicro ? "" : isControlledRepsSets ? "FINISHER TITLE: \"Finisher (REPS & SETS)\" — short controlled accessory/core finisher with sets × reps before every exercise token." : "FINISHER TITLE: \"Finisher (For Time)\" or \"Finisher (AMRAP)\" — no duration inside protocol headers. Put time cap/rounds in the paragraph below the header."}
 
 FORMAT GUIDANCE:
 ${formatGuidanceFor(format)}
