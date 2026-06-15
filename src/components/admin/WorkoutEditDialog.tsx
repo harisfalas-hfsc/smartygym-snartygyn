@@ -148,7 +148,35 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
     } else if (workout && !workout.id) {
       // Wizard prefill: a partial new-content seed from ContentCreationWizard.
       // Treat as "new" but pre-populate the metadata fields the user already picked.
-      setFormData((prev) => ({ ...prev, ...workout }));
+      setFormData({
+        id: '',
+        serial_number: 0,
+        name: '',
+        category: '',
+        difficulty_stars: 3,
+        equipment: '',
+        format: '',
+        duration: '',
+        activation: '',
+        warm_up: '',
+        main_workout: '',
+        finisher: '',
+        cool_down: '',
+        description: '',
+        instructions: '',
+        tips: '',
+        image_url: '',
+        generate_unique_image: false,
+        is_free: false,
+        is_premium: false,
+        tier_required: '',
+        is_standalone_purchase: false,
+        price: '',
+        stripe_product_id: '',
+        stripe_price_id: '',
+        focus: '',
+        ...workout,
+      });
       setSendNotification(false);
     } else {
       setFormData({
