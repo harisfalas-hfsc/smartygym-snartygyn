@@ -102,7 +102,7 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
       return 1;
     };
 
-    if (program) {
+    if (program && program.id) {
       setFormData({
         id: program.id,
         serial_number: program.serial_number || 0,
@@ -135,6 +135,31 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
           setWeekDayContents([]);
         }
       }
+    } else if (program && !program.id) {
+      // Wizard prefill: partial seed from ContentCreationWizard.
+      setFormData({
+        id: '',
+        serial_number: 0,
+        name: program.name || '',
+        category: program.category || '',
+        difficulty_stars: program.difficulty_stars ?? 1,
+        weeks: program.weeks ?? 4,
+        days_per_week: program.days_per_week ?? 4,
+        equipment: program.equipment || '',
+        training_program: '',
+        program_description: '',
+        construction: '',
+        final_tips: '',
+        image_url: '',
+        generate_unique_image: false,
+        is_free: !!program.is_free,
+        is_premium: !!program.is_premium,
+        is_standalone_purchase: !!program.is_standalone_purchase,
+        price: program.price ? String(program.price) : '',
+        stripe_product_id: '',
+        stripe_price_id: '',
+      });
+      setWeekDayContents([]);
     } else {
       setFormData({
         id: '',
@@ -164,7 +189,7 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
 
   // Auto-generate serial number when category changes using persistent counters
   useEffect(() => {
-    if (!program && formData.category) {
+    if ((!program || !program.id) && formData.category) {
       const generateSerialNumber = async () => {
         const prefix = getCategoryPrefix(formData.category);
         
