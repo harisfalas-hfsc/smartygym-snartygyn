@@ -408,13 +408,10 @@ serve(async (req) => {
           }
         }
 
-        // Reserve a serial + ID so the editor can show it, but DO NOT insert.
-        // Saving / Stripe / image is the editor's job — the wizard is preview-only.
-        const { id: workoutId, serial } = await nextSerial(supabase, body.category);
-
+        // Preview-only draft. Saving / Stripe / image / serial is the editor's job.
         const draft = {
-          id: workoutId,
-          serial_number: serial,
+          // id/serial intentionally omitted — the editor's open-as-new flow
+          // (workout && !workout.id) will allocate them when the admin saves.
           name: content.name,
           category: body.category,
           format,
