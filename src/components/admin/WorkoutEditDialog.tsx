@@ -391,14 +391,9 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
       };
 
       // Remove transient wizard/review fields before saving
-      const {
-        generate_unique_image,
-        stripe_product_id: existingStripeProductId,
-        stripe_price_id: existingStripePriceId,
-        needs_review,
-        generation_review_warnings,
-        ...dataToSave
-      } = saveData;
+      const { generate_unique_image, stripe_product_id: existingStripeProductId, stripe_price_id: existingStripePriceId, ...dataToSave } = saveData;
+      delete (dataToSave as any).needs_review;
+      delete (dataToSave as any).generation_review_warnings;
 
       if (isExistingWorkout) {
         // Update existing workout
