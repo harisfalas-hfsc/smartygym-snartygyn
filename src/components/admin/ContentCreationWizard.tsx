@@ -276,55 +276,79 @@ export const ContentCreationWizard = ({
    * refresh — no manual editing required.
    */
   const handleGenerate = async () => {
-    if (type !== "workout") {
-      // programs still hand off to manual editor for now
-      handleFinish();
-      return;
-    }
     setGenerating(true);
     try {
-      const { data, error } = await supabase.functions.invoke("generate-admin-workout", {
-        body: {
-          category,
-          equipment,
-          difficulty_stars: difficultyStars,
-          format,
-          duration,
-          focus: isStrength ? focus : undefined,
-          access,
-          price: access === "standalone" ? price : undefined,
-          tier_required: access === "premium" ? "gold" : undefined,
-        },
-      });
-      if (error) throw error;
-      if (!data?.ok || !data?.draft) throw new Error(data?.error || "Generation failed");
+      if (type === "workout") {
+        const { data, error } = await supabase.functions.invoke("generate-admin-workout", {
+          body: {
+            category,
+            equipment,
+            difficulty_stars: difficultyStars,
+            format,
+            duration,
+            focus: isStrength ? focus : undefined,
+            access,
+            price: access === "standalone" ? price : undefined,
+            tier_required: access === "premium" ? "gold" : undefined,
+          },
+        });
+        if (error) throw error;
+        if (!data?.ok || !data?.draft) throw new Error(data?.error || "Generation failed");
 
-      toast({
-        title: "Workout drafted",
-        description: `"${data.draft.name}" is ready — review and click Save to publish.`,
-      });
-      // Hand the AI-generated draft to the manual editor. The user can edit
-      // anything and the editor's Save button handles serial/image/Stripe/DB.
-      onComplete({
-        type: "workout",
-        payload: {
-          ...data.draft,
-          // explicit category/equipment/etc. from the wizard in case the
-          // draft omitted them (defensive)
-          category: data.draft.category || category,
-          equipment: data.draft.equipment || equipment,
-          difficulty_stars: data.draft.difficulty_stars ?? difficultyStars,
-          duration: data.draft.duration || duration,
-          format: data.draft.format || format,
-          focus: isStrength ? (data.draft.focus || focus) : "",
-        },
-      });
+        toast({
+          title: "Workout drafted",
+          description: `"${data.draft.name}" is ready — review and click Save to publish.`,
+        });
+        onComplete({
+          type: "workout",
+          payload: {
+            ...data.draft,
+            category: data.draft.category || category,
+            equipment: data.draft.equipment || equipment,
+            difficulty_stars: data.draft.difficulty_stars ?? difficultyStars,
+            duration: data.draft.duration || duration,
+            format: data.draft.format || format,
+            focus: isStrength ? (data.draft.focus || focus) : "",
+          },
+        });
+      } else {
+        const { data, error } = await supabase.functions.invoke("generate-admin-program", {
+          body: {
+            category,
+            equipment,
+            difficulty_stars: difficultyStars,
+            weeks,
+            days_per_week: daysPerWeek,
+            access,
+            price: access === "standalone" ? price : undefined,
+            tier_required: access === "premium" ? "gold" : undefined,
+          },
+        });
+        if (error) throw error;
+        if (!data?.ok || !data?.draft) throw new Error(data?.error || "Generation failed");
+
+        toast({
+          title: "Program drafted",
+          description: `"${data.draft.name}" is ready — review and click Save to publish.`,
+        });
+        onComplete({
+          type: "program",
+          payload: {
+            ...data.draft,
+            category: data.draft.category || category,
+            equipment: data.draft.equipment || equipment,
+            difficulty_stars: data.draft.difficulty_stars ?? difficultyStars,
+            weeks: data.draft.weeks ?? weeks,
+            days_per_week: data.draft.days_per_week ?? daysPerWeek,
+          },
+        });
+      }
       onOpenChange(false);
     } catch (e: any) {
-      console.error("[Wizard] generate-admin-workout failed", e);
+      console.error(`[Wizard] generate-${type} failed`, e);
       toast({
         title: "Generation failed",
-        description: e.message || "Could not generate the workout. Opening the manual editor as a fallback.",
+        description: e.message || `Could not generate the ${type}. Opening the manual editor as a fallback.`,
         variant: "destructive",
       });
       // Fallback: hand off to manual editor with prefilled metadata
