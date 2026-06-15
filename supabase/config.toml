@@ -276,3 +276,6 @@ verify_jwt = false
 
 [functions.generate-admin-workout]
 verify_jwt = true
+
+[functions.generate-admin-program]
+verify_jwt = true
