@@ -273,3 +273,6 @@ verify_jwt = false
 
 [functions.generate-free-category-workouts]
 verify_jwt = false
+
+[functions.generate-admin-workout]
+verify_jwt = true
