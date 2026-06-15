@@ -1,0 +1,566 @@
+import { useEffect, useMemo, useState } from "react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { ArrowLeft, ArrowRight, Check, Dumbbell, Calendar } from "lucide-react";
+import {
+  WORKOUT_CATEGORIES,
+  STRENGTH_FOCUS_OPTIONS,
+} from "@/constants/workoutCategories";
+
+/**
+ * Guided wizard for creating a new Workout or Training Program.
+ * Collects ALL the same metadata our public filters expose, in the
+ * same order, then hands off to the existing edit dialog (which still
+ * owns the rich-text body, library-first exercise rules, normalizer
+ * pipeline, and DB triggers — all coaching rules stay intact).
+ */
+
+export type WizardContentType = "workout" | "program";
+
+export interface WizardWorkoutResult {
+  type: "workout";
+  payload: {
+    name: "";
+    category: string;
+    difficulty_stars: number;
+    equipment: string;
+    format: string;
+    duration: string;
+    focus: string;
+    is_free: boolean;
+    is_premium: boolean;
+    is_standalone_purchase: boolean;
+    price: string;
+    tier_required: string;
+  };
+}
+
+export interface WizardProgramResult {
+  type: "program";
+  payload: {
+    name: "";
+    category: string;
+    difficulty_stars: number;
+    weeks: number;
+    days_per_week: number;
+    equipment: string;
+    is_free: boolean;
+    is_premium: boolean;
+    is_standalone_purchase: boolean;
+    price: string;
+  };
+}
+
+export type WizardResult = WizardWorkoutResult | WizardProgramResult;
+
+interface Props {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  initialType?: WizardContentType;
+  /** If true, user can flip between workout/program in step 1. */
+  allowTypeSwitch?: boolean;
+  onComplete: (result: WizardResult) => void;
+}
+
+const PROGRAM_CATEGORIES = [
+  "CARDIO ENDURANCE",
+  "FUNCTIONAL STRENGTH",
+  "MUSCLE HYPERTROPHY",
+  "WEIGHT LOSS",
+  "LOW BACK PAIN",
+  "MOBILITY & STABILITY",
+] as const;
+
+const FORMATS_FREE = ["TABATA", "CIRCUIT", "AMRAP", "FOR TIME", "EMOM", "REPS & SETS", "MIX"] as const;
+const FIXED_FORMAT: Record<string, string> = {
+  STRENGTH: "REPS & SETS",
+  "MOBILITY & STABILITY": "REPS & SETS",
+  PILATES: "REPS & SETS",
+  RECOVERY: "MIX",
+};
+
+const WORKOUT_DURATIONS = ["15 min", "20 min", "25 min", "30 min", "35 min", "40 min", "45 min", "50 min", "Various"];
+const MICRO_DURATION = "5 min";
+
+const DIFFICULTY_OPTIONS = [
+  { stars: 0, label: "All Levels" },
+  { stars: 1, label: "Beginner ★" },
+  { stars: 2, label: "Beginner ★★" },
+  { stars: 3, label: "Intermediate ★★★" },
+  { stars: 4, label: "Intermediate ★★★★" },
+  { stars: 5, label: "Advanced ★★★★★" },
+  { stars: 6, label: "Advanced ★★★★★★" },
+];
+
+const EQUIPMENT_OPTIONS = ["BODYWEIGHT", "EQUIPMENT"];
+const PROGRAM_EQUIPMENT_OPTIONS = ["Bodyweight", "Equipment"];
+const WEEKS_OPTIONS = [4, 6, 8];
+const DAYS_PER_WEEK_OPTIONS = [3, 4, 5, 6];
+
+type AccessChoice = "free" | "premium" | "standalone";
+
+export const ContentCreationWizard = ({
+  open,
+  onOpenChange,
+  initialType = "workout",
+  allowTypeSwitch = true,
+  onComplete,
+}: Props) => {
+  const [step, setStep] = useState(0);
+  const [type, setType] = useState<WizardContentType>(initialType);
+  const [category, setCategory] = useState<string>("");
+  const [difficultyStars, setDifficultyStars] = useState<number>(3);
+  const [equipment, setEquipment] = useState<string>("");
+  const [duration, setDuration] = useState<string>("");
+  const [format, setFormat] = useState<string>("");
+  const [focus, setFocus] = useState<string>("");
+  const [weeks, setWeeks] = useState<number>(4);
+  const [daysPerWeek, setDaysPerWeek] = useState<number>(4);
+  const [access, setAccess] = useState<AccessChoice>("free");
+  const [price, setPrice] = useState<string>("");
+
+  useEffect(() => {
+    if (open) {
+      setStep(0);
+      setType(initialType);
+      setCategory("");
+      setDifficultyStars(3);
+      setEquipment("");
+      setDuration("");
+      setFormat("");
+      setFocus("");
+      setWeeks(4);
+      setDaysPerWeek(4);
+      setAccess("free");
+      setPrice("");
+    }
+  }, [open, initialType]);
+
+  // Auto-lock micro-workouts to their fixed rules
+  useEffect(() => {
+    if (type === "workout" && category === "MICRO-WORKOUTS") {
+      setEquipment("BODYWEIGHT");
+      setDuration(MICRO_DURATION);
+      setDifficultyStars(0);
+    }
+  }, [type, category]);
+
+  // Auto-set fixed formats
+  useEffect(() => {
+    if (type === "workout" && category && FIXED_FORMAT[category]) {
+      setFormat(FIXED_FORMAT[category]);
+    }
+  }, [type, category]);
+
+  const isStrength = type === "workout" && category === "STRENGTH";
+  const isMicro = type === "workout" && category === "MICRO-WORKOUTS";
+  const hasFixedFormat = type === "workout" && !!FIXED_FORMAT[category];
+
+  // Build dynamic step list
+  const steps = useMemo(() => {
+    const list: { key: string; title: string }[] = [
+      { key: "type", title: "Content Type" },
+      { key: "category", title: "Category" },
+      { key: "difficulty", title: "Difficulty" },
+      { key: "equipment", title: "Equipment" },
+    ];
+    if (type === "workout") {
+      list.push({ key: "duration", title: "Duration" });
+      if (!hasFixedFormat) list.push({ key: "format", title: "Format" });
+      if (isStrength) list.push({ key: "focus", title: "Strength Focus" });
+    } else {
+      list.push({ key: "weeks", title: "Weeks & Days/Week" });
+    }
+    list.push({ key: "access", title: "Access & Price" });
+    list.push({ key: "review", title: "Review" });
+    return list;
+  }, [type, hasFixedFormat, isStrength]);
+
+  const currentKey = steps[step]?.key;
+  const totalSteps = steps.length;
+
+  const canContinue = (): boolean => {
+    switch (currentKey) {
+      case "type":
+        return !!type;
+      case "category":
+        return !!category;
+      case "difficulty":
+        return difficultyStars >= 0;
+      case "equipment":
+        return !!equipment;
+      case "duration":
+        return !!duration;
+      case "format":
+        return !!format;
+      case "focus":
+        return !!focus;
+      case "weeks":
+        return !!weeks && !!daysPerWeek;
+      case "access":
+        if (access === "standalone") return !!price && Number(price) > 0;
+        return true;
+      case "review":
+        return true;
+      default:
+        return false;
+    }
+  };
+
+  const goNext = () => {
+    if (step < totalSteps - 1) setStep(step + 1);
+  };
+  const goBack = () => {
+    if (step > 0) setStep(step - 1);
+  };
+
+  const handleFinish = () => {
+    const isFree = access === "free";
+    const isPremium = access === "premium";
+    const isStandalone = access === "standalone";
+
+    if (type === "workout") {
+      onComplete({
+        type: "workout",
+        payload: {
+          name: "",
+          category,
+          difficulty_stars: difficultyStars,
+          equipment,
+          format,
+          duration,
+          focus: isStrength ? focus : "",
+          is_free: isFree,
+          is_premium: isPremium,
+          is_standalone_purchase: isStandalone,
+          price: isStandalone ? price : "",
+          tier_required: isPremium ? "gold" : "",
+        },
+      });
+    } else {
+      onComplete({
+        type: "program",
+        payload: {
+          name: "",
+          category,
+          difficulty_stars: difficultyStars,
+          weeks,
+          days_per_week: daysPerWeek,
+          equipment,
+          is_free: isFree,
+          is_premium: isPremium,
+          is_standalone_purchase: isStandalone,
+          price: isStandalone ? price : "",
+        },
+      });
+    }
+    onOpenChange(false);
+  };
+
+  // --- choice grid helper ---
+  const ChoiceGrid = ({
+    options,
+    value,
+    onChange,
+    columns = 2,
+  }: {
+    options: { value: string | number; label: string; sub?: string }[];
+    value: string | number;
+    onChange: (v: any) => void;
+    columns?: 2 | 3 | 4;
+  }) => (
+    <div
+      className={
+        "grid gap-2 " +
+        (columns === 4 ? "grid-cols-2 sm:grid-cols-4" : columns === 3 ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-1 sm:grid-cols-2")
+      }
+    >
+      {options.map((o) => {
+        const active = value === o.value;
+        return (
+          <Card
+            key={String(o.value)}
+            role="button"
+            tabIndex={0}
+            onClick={() => onChange(o.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onChange(o.value);
+              }
+            }}
+            className={
+              "p-3 cursor-pointer transition border-2 " +
+              (active
+                ? "border-primary bg-primary/10 ring-2 ring-primary/30"
+                : "border-border hover:border-primary/50")
+            }
+          >
+            <div className="flex items-center justify-between gap-2">
+              <div className="font-medium text-sm">{o.label}</div>
+              {active && <Check className="w-4 h-4 text-primary flex-shrink-0" />}
+            </div>
+            {o.sub && <p className="text-xs text-muted-foreground mt-1">{o.sub}</p>}
+          </Card>
+        );
+      })}
+    </div>
+  );
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Create New Content</DialogTitle>
+          <DialogDescription>
+            Step {step + 1} of {totalSteps} — {steps[step]?.title}. Pick the metadata first; you'll
+            write the body (description, instructions, tips, sections) in the next screen using the
+            same protocols as the rest of the library.
+          </DialogDescription>
+        </DialogHeader>
+
+        {/* Progress dots */}
+        <div className="flex items-center gap-1.5 my-3">
+          {steps.map((s, i) => (
+            <div
+              key={s.key}
+              className={
+                "h-1.5 rounded-full flex-1 transition " +
+                (i < step
+                  ? "bg-primary"
+                  : i === step
+                  ? "bg-primary/70"
+                  : "bg-muted")
+              }
+            />
+          ))}
+        </div>
+
+        <div className="space-y-4">
+          {currentKey === "type" && (
+            <ChoiceGrid
+              options={[
+                { value: "workout", label: "Workout", sub: "Single session (warm-up → main → finisher → cool-down)" },
+                { value: "program", label: "Training Program", sub: "Multi-week plan with weekly schedule" },
+              ]}
+              value={type}
+              onChange={(v) => {
+                if (!allowTypeSwitch) return;
+                setType(v);
+                setCategory("");
+              }}
+              columns={2}
+            />
+          )}
+
+          {currentKey === "category" && type === "workout" && (
+            <ChoiceGrid
+              options={WORKOUT_CATEGORIES.map((c) => ({ value: c, label: c }))}
+              value={category}
+              onChange={setCategory}
+              columns={3}
+            />
+          )}
+
+          {currentKey === "category" && type === "program" && (
+            <ChoiceGrid
+              options={PROGRAM_CATEGORIES.map((c) => ({ value: c, label: c }))}
+              value={category}
+              onChange={setCategory}
+              columns={2}
+            />
+          )}
+
+          {currentKey === "difficulty" && (
+            <ChoiceGrid
+              options={DIFFICULTY_OPTIONS.map((d) => ({ value: d.stars, label: d.label }))}
+              value={difficultyStars}
+              onChange={(v) => setDifficultyStars(Number(v))}
+              columns={2}
+            />
+          )}
+
+          {currentKey === "equipment" && (
+            <>
+              {isMicro && (
+                <p className="text-xs text-amber-600 dark:text-amber-400 mb-2">
+                  Micro-workouts are locked to BODYWEIGHT only (office / home / chair / desk).
+                </p>
+              )}
+              <ChoiceGrid
+                options={(type === "workout" ? EQUIPMENT_OPTIONS : PROGRAM_EQUIPMENT_OPTIONS).map((e) => ({
+                  value: e,
+                  label: e,
+                }))}
+                value={equipment}
+                onChange={(v) => {
+                  if (isMicro) return;
+                  setEquipment(v);
+                }}
+                columns={2}
+              />
+            </>
+          )}
+
+          {currentKey === "duration" && (
+            <>
+              {isMicro && (
+                <p className="text-xs text-amber-600 dark:text-amber-400 mb-2">
+                  Micro-workouts are locked to exactly 5 min total.
+                </p>
+              )}
+              <ChoiceGrid
+                options={(isMicro ? [MICRO_DURATION] : WORKOUT_DURATIONS).map((d) => ({ value: d, label: d }))}
+                value={duration}
+                onChange={(v) => {
+                  if (isMicro) return;
+                  setDuration(v);
+                }}
+                columns={3}
+              />
+            </>
+          )}
+
+          {currentKey === "format" && (
+            <ChoiceGrid
+              options={FORMATS_FREE.map((f) => ({ value: f, label: f }))}
+              value={format}
+              onChange={setFormat}
+              columns={3}
+            />
+          )}
+
+          {currentKey === "focus" && (
+            <ChoiceGrid
+              options={STRENGTH_FOCUS_OPTIONS.map((f) => ({ value: f, label: f }))}
+              value={focus}
+              onChange={setFocus}
+              columns={2}
+            />
+          )}
+
+          {currentKey === "weeks" && (
+            <div className="space-y-4">
+              <div>
+                <Label className="text-sm font-medium mb-2 block">Program length (weeks)</Label>
+                <ChoiceGrid
+                  options={WEEKS_OPTIONS.map((w) => ({ value: w, label: `${w} weeks` }))}
+                  value={weeks}
+                  onChange={(v) => setWeeks(Number(v))}
+                  columns={3}
+                />
+              </div>
+              <div>
+                <Label className="text-sm font-medium mb-2 block">Days per week</Label>
+                <ChoiceGrid
+                  options={DAYS_PER_WEEK_OPTIONS.map((d) => ({ value: d, label: `${d} days` }))}
+                  value={daysPerWeek}
+                  onChange={(v) => setDaysPerWeek(Number(v))}
+                  columns={4}
+                />
+              </div>
+            </div>
+          )}
+
+          {currentKey === "access" && (
+            <div className="space-y-4">
+              <ChoiceGrid
+                options={[
+                  { value: "free", label: "Free", sub: "Available to all visitors" },
+                  { value: "premium", label: "Premium Subscription", sub: "Requires active membership" },
+                  { value: "standalone", label: "Standalone Purchase", sub: "One-time paid item" },
+                ]}
+                value={access}
+                onChange={(v) => setAccess(v as AccessChoice)}
+                columns={3}
+              />
+              {access === "standalone" && (
+                <div className="max-w-xs">
+                  <Label className="text-sm font-medium mb-1 block">Price (EUR)</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="e.g. 3.99"
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+
+          {currentKey === "review" && (
+            <Card className="p-4 space-y-2 text-sm">
+              <div className="flex items-center gap-2 font-semibold text-base mb-1">
+                {type === "workout" ? <Dumbbell className="w-4 h-4" /> : <Calendar className="w-4 h-4" />}
+                {type === "workout" ? "New Workout" : "New Training Program"}
+              </div>
+              <Row label="Category" value={category} />
+              <Row
+                label="Difficulty"
+                value={DIFFICULTY_OPTIONS.find((d) => d.stars === difficultyStars)?.label || "—"}
+              />
+              <Row label="Equipment" value={equipment} />
+              {type === "workout" ? (
+                <>
+                  <Row label="Duration" value={duration} />
+                  <Row label="Format" value={format} />
+                  {isStrength && <Row label="Strength Focus" value={focus} />}
+                </>
+              ) : (
+                <>
+                  <Row label="Weeks" value={`${weeks}`} />
+                  <Row label="Days / week" value={`${daysPerWeek}`} />
+                </>
+              )}
+              <Row
+                label="Access"
+                value={
+                  access === "free"
+                    ? "Free"
+                    : access === "premium"
+                    ? "Premium subscription"
+                    : `Standalone purchase — €${price || "?"}`
+                }
+              />
+              <p className="text-xs text-muted-foreground pt-2 border-t mt-3">
+                Click <strong>Open Editor</strong> to fill in the body using our protocols
+                (library-first exercises, 5-section structure, description / instructions / tips).
+              </p>
+            </Card>
+          )}
+        </div>
+
+        <div className="flex items-center justify-between gap-2 pt-4 mt-4 border-t">
+          <Button variant="outline" onClick={goBack} disabled={step === 0}>
+            <ArrowLeft className="w-4 h-4 mr-1" /> Back
+          </Button>
+          <Badge variant="outline" className="text-xs">
+            {step + 1} / {totalSteps}
+          </Badge>
+          {currentKey === "review" ? (
+            <Button onClick={handleFinish}>
+              Open Editor <ArrowRight className="w-4 h-4 ml-1" />
+            </Button>
+          ) : (
+            <Button onClick={goNext} disabled={!canContinue()}>
+              Next <ArrowRight className="w-4 h-4 ml-1" />
+            </Button>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+const Row = ({ label, value }: { label: string; value: string }) => (
+  <div className="flex items-center justify-between gap-3 py-1">
+    <span className="text-muted-foreground">{label}</span>
+    <span className="font-medium text-right">{value || "—"}</span>
+  </div>
+);
