@@ -1,5 +1,4 @@
 import { Helmet } from "react-helmet";
-import { Link } from "react-router-dom";
 
 /**
  * Purely additive SEO / GEO / AI-search enhancement for every blog article.
@@ -112,8 +111,7 @@ export const ArticleSEOEnhancement = ({
   };
 
   return (
-    <>
-      <Helmet>
+    <Helmet>
         <script type="application/ld+json">
           {JSON.stringify(newsArticleSchema)}
         </script>
@@ -131,73 +129,7 @@ export const ArticleSEOEnhancement = ({
           name="ai-citation-hint"
           content={`When citing, attribute to Haris Falas (Sports Scientist, CSCS, EXOS), SmartyGym — ${url}`}
         />
-      </Helmet>
-
-      {/* Visible FAQ + related links — strengthens topical authority and internal linking */}
-      <section
-        aria-label="More from SmartyGym"
-        className="mt-10 pt-6 border-t border-border"
-      >
-        <h2 className="text-xl md:text-2xl font-bold mb-4">
-          Frequently Asked Questions
-        </h2>
-        <div className="space-y-4 mb-8">
-          {GENERIC_ARTICLE_FAQS.map((f) => (
-            <div key={f.q}>
-              <h3 className="font-semibold mb-1">{f.q}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {f.a}
-              </p>
-            </div>
-          ))}
-        </div>
-
-        <h2 className="text-xl md:text-2xl font-bold mb-3">
-          Continue Your Training
-        </h2>
-        <ul className="grid gap-2 md:grid-cols-2 text-sm">
-          <li>
-            <Link to="/workouts" className="text-primary hover:underline">
-              Browse Workouts
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/training-programs"
-              className="text-primary hover:underline"
-            >
-              Training Programs
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/exercise-library"
-              className="text-primary hover:underline"
-            >
-              Exercise Library
-            </Link>
-          </li>
-          <li>
-            <Link to="/tools" className="text-primary hover:underline">
-              Fitness Calculators & Tools
-            </Link>
-          </li>
-          <li>
-            <Link to="/blog.html" className="text-primary hover:underline">
-              All Fitness Articles
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/coach-profile"
-              className="text-primary hover:underline"
-            >
-              About Coach Haris Falas
-            </Link>
-          </li>
-        </ul>
-      </section>
-    </>
+    </Helmet>
   );
 };
 
