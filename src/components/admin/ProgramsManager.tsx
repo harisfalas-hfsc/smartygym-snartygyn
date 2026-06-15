@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, Edit, Trash2, Eye, EyeOff, Search, Download, Filter, Bot, User, Copy, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ProgramEditDialog } from "./ProgramEditDialog";
+import { ContentCreationWizard, WizardResult } from "./ContentCreationWizard";
 
 interface Program {
   id: string;
@@ -38,6 +39,7 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
   const [editLoading, setEditLoading] = useState(false);
   const [editingProgram, setEditingProgram] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [wizardOpen, setWizardOpen] = useState(false);
   const [selectedPrograms, setSelectedPrograms] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
@@ -230,7 +232,19 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
 
   const handleNew = () => {
     setEditingProgram(null);
-    setIsDialogOpen(true);
+    setWizardOpen(true);
+  };
+
+  const handleWizardComplete = (result: WizardResult) => {
+    if (result.type === "program") {
+      setEditingProgram(result.payload as any);
+      setIsDialogOpen(true);
+    } else {
+      toast({
+        title: "Switch to Workouts tab",
+        description: "You picked Workout. Open the Workouts tab and click Create to build it there.",
+      });
+    }
   };
 
   const handleSave = () => {
@@ -669,6 +683,13 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         onSave={handleSave}
+      />
+      <ContentCreationWizard
+        open={wizardOpen}
+        onOpenChange={setWizardOpen}
+        initialType="program"
+        allowTypeSwitch={false}
+        onComplete={handleWizardComplete}
       />
     </div>
   );
