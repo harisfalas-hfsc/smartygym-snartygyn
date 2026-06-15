@@ -282,7 +282,7 @@ export const Navigation = () => {
     { label: "Exercise Library", path: "/exerciselibrary", icon: BookOpen, iconClass: "text-emerald-500", track: undefined },
     { label: "Community", path: "/community", icon: Users, iconClass: "text-cyan-500", track: undefined },
     { label: "FAQ", path: "/faq", icon: HelpCircle, iconClass: "text-purple-500", track: undefined },
-    { label: "Contact", path: "/contact", icon: Mail, iconClass: "text-indigo-500", track: undefined },
+    { label: "Contact", path: "/contact", icon: Mail, iconClass: "text-indigo-500", track: undefined, subtitle: "One click away, always." },
   ];
 
   // Desktop menu replaces "About SmartyGym" with "Home" because the About page
@@ -457,7 +457,7 @@ export const Navigation = () => {
               <h2 className="text-lg font-bold leading-tight text-foreground">Explore SmartyGym</h2>
             </div>
             <nav className="grid grid-cols-3 gap-3 overflow-y-auto">
-              {desktopDiscoveryItems.map(({ label, path, icon: Icon, iconClass, track }) => {
+              {desktopDiscoveryItems.map(({ label, path, icon: Icon, iconClass, track, subtitle }) => {
                 const active = location.pathname === path;
                 return (
                   <button
@@ -471,6 +471,9 @@ export const Navigation = () => {
                       <Icon className="h-8 w-8" />
                     </span>
                     <span className="block text-sm leading-tight">{label}</span>
+                    {subtitle && (
+                      <span className="mt-0.5 block text-xs font-normal text-muted-foreground leading-tight">{subtitle}</span>
+                    )}
                   </button>
                 );
               })}
