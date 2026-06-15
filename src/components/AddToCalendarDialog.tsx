@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { CalendarPlus, X } from "lucide-react";
 import { generateICSFile, downloadICSFile } from "@/utils/calendarExport";
 import { format } from "date-fns";
+import { toast } from "@/hooks/use-toast";
 
 interface AddToCalendarDialogProps {
   isOpen: boolean;
@@ -41,9 +42,16 @@ function getDialogCopy(title: string, contentType: "workout" | "program") {
 export const AddToCalendarDialog = ({ isOpen, onClose, eventDetails }: AddToCalendarDialogProps) => {
   if (!eventDetails) return null;
 
-  const handleAddToCalendar = () => {
+  const handleAddToCalendar = async () => {
     const icsContent = generateICSFile(eventDetails);
-    downloadICSFile(icsContent, eventDetails.title);
+    const result = await downloadICSFile(icsContent, eventDetails.title);
+    if (!result.success) {
+      toast({
+        title: "Calendar export cancelled",
+        description: "Tap Add to Calendar again and choose your phone calendar app from the share options.",
+      });
+      return;
+    }
     onClose();
   };
 
