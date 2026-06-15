@@ -7,7 +7,7 @@ import { ServiceCard } from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Check, ChevronDown, ChevronLeft, ChevronRight, Move, Ban, Brain, CheckCircle2, Award, Shield, Compass, Sparkles, Info, User, HelpCircle, ShoppingBag, Star, Clock, CalendarCheck, Home, Shuffle, ShoppingCart, Sunrise, Crown, GraduationCap, Rocket, Plane } from "lucide-react";
+import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, Facebook, Youtube, UserCheck, Wrench, Video, FileText, Smartphone, Users, Target, Heart, Zap, Check, ChevronDown, ChevronLeft, ChevronRight, Move, Ban, Brain, CheckCircle2, Award, Shield, Compass, Sparkles, Info, User, HelpCircle, ShoppingBag, Star, Clock, CalendarCheck, Home, Shuffle, ShoppingCart, Sunrise, Crown, GraduationCap, Rocket, Plane, Trophy } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -1070,7 +1070,7 @@ const Index = () => {
           </section> : <>
             {/* Desktop: Compact hero with 4 stacked pillar rows */}
             <div className="hidden md:block container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6 pt-1 pb-4">
-              <div className="text-center mb-4">
+              <div className="relative text-center mb-4">
                 <p className="text-sm font-bold tracking-[0.2em] uppercase text-primary mb-3">
                   Science-Backed · Expert-Designed
                 </p>
@@ -1079,6 +1079,15 @@ const Index = () => {
                   <br />
                   Not Harder.
                 </h1>
+                {/* Best Online Fitness Platform badge */}
+                <div className="absolute left-0 lg:left-[5%] top-[70%] z-10 -rotate-12">
+                  <div className="bg-gradient-to-br from-amber-300 via-yellow-500 to-amber-600 text-amber-950 rounded-lg px-3 py-1.5 shadow-lg border border-amber-400">
+                    <div className="flex items-center gap-1.5">
+                      <Trophy className="w-4 h-4 shrink-0" />
+                      <span className="text-[10px] lg:text-xs font-extrabold uppercase tracking-wider whitespace-nowrap">Best Online Fitness Platform</span>
+                    </div>
+                  </div>
+                </div>
                 <p className="text-sm font-semibold tracking-[0.15em] uppercase text-muted-foreground mt-4 leading-snug">
                   500+ Expert Workouts · Training Programs · Blog Insights · Smarty Tools
                   <br />
