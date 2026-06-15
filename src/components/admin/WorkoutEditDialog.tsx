@@ -153,6 +153,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
     if (workout && workout.id) {
       setFormData(workout);
       setSendNotification(false); // Don't send notifications for edits by default
+      setShowAccessEditor(true); // existing workouts: show toggles as before
     } else if (workout && !workout.id) {
       // Wizard prefill: a partial new-content seed from ContentCreationWizard.
       // Treat as "new" but pre-populate the metadata fields the user already picked.
@@ -186,6 +187,8 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
         ...workout,
       });
       setSendNotification(false);
+      // Wizard prefill: hide the toggles by default, show summary card instead.
+      setShowAccessEditor(false);
     } else {
       setFormData({
         id: '',
@@ -216,6 +219,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
           focus: '',
       });
       setSendNotification(false); // Default to NOT sending notifications
+      setShowAccessEditor(true); // blank manual create: show toggles
     }
   }, [workout]);
 
