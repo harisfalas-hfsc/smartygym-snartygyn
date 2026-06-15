@@ -219,6 +219,9 @@ export const WorkoutInteractions = ({ workoutId, workoutType, workoutName, isFre
         // Show calendar dialog for completed workout
         const now = new Date();
         setTimeout(() => {
+          if (typeof document !== "undefined") {
+            document.body.style.pointerEvents = "";
+          }
           setCalendarDialogData({
             title: `Completed: ${workoutName}`,
             date: format(now, 'yyyy-MM-dd'),
@@ -229,7 +232,7 @@ export const WorkoutInteractions = ({ workoutId, workoutType, workoutName, isFre
             contentRouteType: workoutType,
             contentId: workoutId,
           });
-        }, 300);
+        }, 450);
       }
 
       setIsCompleted(newCompletedStatus);
