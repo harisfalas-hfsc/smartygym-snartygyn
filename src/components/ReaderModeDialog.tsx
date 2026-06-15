@@ -238,8 +238,17 @@ export const ReaderModeDialog = ({
           }
 
           .reader-mode-light.prose .exercise-view-eye,
-          .reader-mode-dark.prose .exercise-view-eye {
+          .reader-mode-dark.prose .exercise-view-eye,
+          .reader-mode-light.prose button .exercise-view-eye,
+          .reader-mode-dark.prose button .exercise-view-eye {
             color: hsl(var(--primary)) !important;
+            stroke: hsl(var(--primary)) !important;
+          }
+
+          .reader-mode-light.prose .exercise-view-eye *,
+          .reader-mode-dark.prose .exercise-view-eye * {
+            color: hsl(var(--primary)) !important;
+            stroke: hsl(var(--primary)) !important;
           }
         `}</style>
       </DialogContent>
