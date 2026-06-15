@@ -1023,7 +1023,13 @@ export function guaranteeAllExercisesLinked(
     // Skip structural/instructional text
     if (/^(rest|repeat|complete|perform all|focus on|record|note|slow inhale|lie supine|maintain|alternate|foam|foam roll|lacrosse|tennis ball|trigger point|self-?massage|myofascial|release)/i.test(plainText)) continue;
     if (/^\d+\s*(seconds?|minutes?|min|sec)\s*(rest|recovery|break)/i.test(plainText)) continue;
-    if (plainText.split(/\s+/).length > 8) continue; // Long sentences are instructions
+    const strippedForCount = plainText
+      .replace(/^\d+\s*sets?\s*(?:x|×)\s*\d+(?:\s*-\s*\d+)?\s*(?:reps?)?\s+/i, '')
+      .replace(/^\d+(?:\.\d+)?(?:\s*-\s*\d+(?:\.\d+)?)?\s*(?:reps?(?:\s*\/\s*(?:side|leg|arm))?|reps?\s*(?:per|each)\s*(?:side|leg|arm)|sec(?:onds?)?|s\b|min(?:utes?)?|m\b|meters?|metres?|km\b|cal(?:ories)?|rounds?)\s+/i, '')
+      .replace(/\s*\([^)]*\)\s*/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    if (strippedForCount.split(/\s+/).length > 8) continue; // Long sentences are instructions
     
     const stripLeadingPrescription = (value: string): string => value
       .replace(/^\d+\s*sets?\s*(?:x|×)\s*\d+(?:\s*-\s*\d+)?\s*(?:reps?)?\s+/i, '')
