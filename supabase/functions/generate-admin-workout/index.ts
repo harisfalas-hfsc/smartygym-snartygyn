@@ -172,18 +172,26 @@ ${sectionRules}
 SECTION TITLE FORMAT: <p class="tiptap-paragraph">🔥 <strong><u>Activation 5'</u></strong></p>
 ONLY ONE icon per section.
 
-EXERCISE LINES — bullet lists ONLY:
-<ul class="tiptap-bullet-list"><li class="tiptap-list-item"><p class="tiptap-paragraph">{{exercise:ID:Name}} (prescription)</p></li></ul>
+EXERCISE LINES — bullet lists ONLY, prescription FIRST:
+<ul class="tiptap-bullet-list"><li class="tiptap-list-item"><p class="tiptap-paragraph">12 reps {{exercise:ID:Name}}</p></li></ul>
+
+NON-NEGOTIABLE PRESCRIPTION RULES:
+- Every Main Workout and Finisher exercise line MUST put the measurable dose BEFORE the {{exercise:...}} token.
+- Correct REPS & SETS: "4 sets × 6 reps {{exercise:0043:barbell full squat}} @ 31X1, rest 150s".
+- WRONG and forbidden: "{{exercise:0043:barbell full squat}} 41X1" because 41X1 is tempo, not sets/reps.
+- Tempo codes (20X0, 31X1, 41X1, 21X1) are ONLY allowed AFTER an explicit sets × reps prescription.
+- Conditioning examples: "15 reps {{exercise:1160:burpee}}", "40 sec {{exercise:0630:mountain climber}}", "200m {{exercise:0685:run}}".
+- Never list naked exercises. Never write an exercise token alone and explain reps later.
 
 SECTION SEPARATORS: ONE empty paragraph between sections only: <p class="tiptap-paragraph"></p>
 
-MAIN WORKOUT TITLE: "Main Workout (${format} ${isMicro ? "3'" : "20'"})"
-${isMicro ? "" : "FINISHER TITLE: \"Finisher (For Time)\" or \"Finisher (10-minute AMRAP)\" — never under 10 minutes."}
+MAIN WORKOUT TITLE: "Main Workout (${format})" — no duration inside protocol headers.
+${isMicro ? "" : "FINISHER TITLE: \"Finisher (For Time)\" or \"Finisher (AMRAP)\" — no duration inside protocol headers. Put time cap/rounds in the paragraph below the header."}
 
 FORMAT GUIDANCE:
 ${formatGuidanceFor(format)}
 
-PRESCRIPTION RULE: every exercise line MUST include reps/time/distance/sets.
+PRESCRIPTION RULE: every Main Workout and Finisher exercise line MUST include reps/time/distance/sets BEFORE the exercise token.
 
 RESPONSE FORMAT (JSON ONLY — NO MARKDOWN):
 {
