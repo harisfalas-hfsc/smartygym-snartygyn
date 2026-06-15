@@ -628,8 +628,9 @@ export const ContentCreationWizard = ({
                 }
               />
               <p className="text-xs text-muted-foreground pt-2 border-t mt-3">
-                <strong>Generate Workout</strong> builds the full session (name, description, 5-section body,
-                instructions, tips, image) using library-first exercises and saves it directly. Or click
+                <strong>Generate &amp; Review</strong> drafts the full session (name, description,
+                5-section body, instructions, tips) using library-first exercises and opens it in
+                the editor — nothing is saved until you click <strong>Save</strong> there. Or use
                 <strong> Open Editor </strong> to write everything by hand.
               </p>
             </Card>
