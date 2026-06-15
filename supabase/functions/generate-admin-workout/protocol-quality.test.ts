@@ -11,6 +11,14 @@ Deno.test("sanitizer removes duplicated exercise names after library tokens", ()
   assertEquals(result.cleaned, `<p class="tiptap-paragraph">12 reps {{exercise:0001:Scapula Push-up}}</p>`);
 });
 
+Deno.test("sanitizer accepts side and per-limb qualifiers after library tokens", () => {
+  const input = `<p class="tiptap-paragraph">10 reps {{exercise:0002:Bird Dog}} (alternating sides)</p><p class="tiptap-paragraph">50 reps {{exercise:0003:Leg Slide}} (50 each leg)</p><p class="tiptap-paragraph">30 sec {{exercise:0004:Side Plank}} (right side)</p>`;
+  const result = sanitizeProtocolBlocks(input);
+
+  assertEquals(result.flaggedForReview.length, 0);
+  assertEquals(result.cleaned, input);
+});
+
 Deno.test("quality gate accepts EMOM minute labels with repeat rounds", () => {
   const html = `
     <p class="tiptap-paragraph">💪 <strong><u>Main Workout (EMOM)</u></strong></p>
