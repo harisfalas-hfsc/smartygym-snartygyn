@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { CalendarPlus, X } from "lucide-react";
-import { buildHostedICSUrl } from "@/utils/calendarExport";
+import { openCalendarEvent } from "@/utils/calendarExport";
 import { format } from "date-fns";
 
 interface AddToCalendarDialogProps {
@@ -42,7 +42,7 @@ export const AddToCalendarDialog = ({ isOpen, onClose, eventDetails }: AddToCale
   if (!eventDetails) return null;
 
   const handleAddToCalendar = () => {
-    window.location.href = buildHostedICSUrl(eventDetails);
+    openCalendarEvent(eventDetails);
     onClose();
   };
 
