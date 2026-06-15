@@ -348,11 +348,9 @@ export const ContentCreationWizard = ({
       console.error(`[Wizard] generate-${type} failed`, e);
       toast({
         title: "Generation failed",
-        description: e.message || `Could not generate the ${type}. Opening the manual editor as a fallback.`,
+        description: e.message || `Could not generate the ${type}. Please adjust the settings and try again.`,
         variant: "destructive",
       });
-      // Fallback: hand off to manual editor with prefilled metadata
-      handleFinish();
     } finally {
       setGenerating(false);
     }

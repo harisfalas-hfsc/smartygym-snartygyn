@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useLayoutEffect, useRef, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -139,15 +139,44 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
 
   // Check if current category is micro-workout (fields should be locked)
   const isMicroWorkout = formData.category === 'MICRO-WORKOUTS';
+  const isExistingWorkout = Boolean(workout?.id);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (workout && workout.id) {
       setFormData(workout);
       setSendNotification(false); // Don't send notifications for edits by default
     } else if (workout && !workout.id) {
       // Wizard prefill: a partial new-content seed from ContentCreationWizard.
       // Treat as "new" but pre-populate the metadata fields the user already picked.
-      setFormData((prev) => ({ ...prev, ...workout }));
+      setFormData({
+        id: '',
+        serial_number: 0,
+        name: '',
+        category: '',
+        difficulty_stars: 3,
+        equipment: '',
+        format: '',
+        duration: '',
+        activation: '',
+        warm_up: '',
+        main_workout: '',
+        finisher: '',
+        cool_down: '',
+        description: '',
+        instructions: '',
+        tips: '',
+        image_url: '',
+        generate_unique_image: false,
+        is_free: false,
+        is_premium: false,
+        tier_required: '',
+        is_standalone_purchase: false,
+        price: '',
+        stripe_product_id: '',
+        stripe_price_id: '',
+        focus: '',
+        ...workout,
+      });
       setSendNotification(false);
     } else {
       setFormData({
@@ -352,7 +381,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
       // Remove the generate_unique_image flag before saving
       const { generate_unique_image, stripe_product_id: existingStripeProductId, stripe_price_id: existingStripePriceId, ...dataToSave } = saveData;
 
-      if (workout) {
+      if (isExistingWorkout) {
         // Update existing workout
         const { error } = await supabase
           .from('admin_workouts')
@@ -562,9 +591,9 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[95vw] max-w-5xl max-h-[95vh] overflow-y-auto overflow-x-hidden">
         <DialogHeader>
-          <DialogTitle>{workout ? 'Edit Workout' : 'Create New Workout'}</DialogTitle>
+          <DialogTitle>{isExistingWorkout ? 'Edit Workout' : 'Create New Workout'}</DialogTitle>
           <DialogDescription>
-            {workout ? 'Update workout details' : 'Add a new workout to your library'}
+            {isExistingWorkout ? 'Update workout details' : 'Add a new workout to your library'}
           </DialogDescription>
         </DialogHeader>
 
@@ -856,7 +885,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
           </div>
 
           {/* Notification Toggle - Only for NEW workouts */}
-          {!workout && (
+          {!isExistingWorkout && (
             <div className="space-y-2 pt-4 border-t border-orange-200 bg-orange-50/50 p-4 rounded-lg">
               <div className="flex items-center justify-between">
                 <div className="space-y-1">

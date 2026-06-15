@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useLayoutEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -70,6 +70,7 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
   const [weekDayContents, setWeekDayContents] = useState<WeekDayContent[]>([]);
   const [sendNotification, setSendNotification] = useState(false);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+  const isExistingProgram = Boolean(program?.id);
 
   const getCategoryPrefix = (category: string) => {
     const prefixMap: { [key: string]: string } = {
@@ -83,7 +84,7 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
     return prefixMap[category] || 'P';
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const generateSerialNumber = async (category: string) => {
       const prefix = getCategoryPrefix(category);
       const { data } = await supabase
@@ -366,7 +367,7 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
         price: formData.is_premium && formData.price ? parseFloat(formData.price) : null,
       };
 
-      if (program) {
+      if (isExistingProgram) {
         // Update existing program
         const { error } = await supabase
           .from('admin_training_programs')
@@ -537,9 +538,9 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[95vw] max-w-5xl max-h-[95vh] overflow-y-auto overflow-x-hidden">
         <DialogHeader>
-          <DialogTitle>{program ? 'Edit Program' : 'Create New Program'}</DialogTitle>
+          <DialogTitle>{isExistingProgram ? 'Edit Program' : 'Create New Program'}</DialogTitle>
           <DialogDescription>
-            {program ? 'Update program details' : 'Add a new training program to your library'}
+            {isExistingProgram ? 'Update program details' : 'Add a new training program to your library'}
           </DialogDescription>
         </DialogHeader>
 
@@ -756,7 +757,7 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
           </div>
 
           {/* Notification Toggle - Only show for new programs */}
-          {!program && (
+          {!isExistingProgram && (
             <div className="space-y-2 pt-4 border-t border-orange-200 bg-orange-50/50 p-4 rounded-lg">
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
