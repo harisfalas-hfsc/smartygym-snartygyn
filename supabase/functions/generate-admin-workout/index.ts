@@ -156,7 +156,8 @@ ${categoryGuidance(category, equipment, focus)}
 NAMING:
 - 2-4 word creative name, premium signature feel.
 - AVOID overused: Inferno, Blaze, Fire, Burn, Fury, Storm, Thunder, Power, Beast, Warrior, Elite, Ultimate, Extreme, Foundation, Torch, Melt, Engine, Drive, Catalyst, Flow, Restore, Gauntlet, Summit, Crucible.
-- Must hint at the category${focus ? ` and focus (${focus})` : ""}.${bannedBlock}
+- Must hint at the category${focus ? ` and focus (${focus})` : ""}.
+- STRICTLY FORBIDDEN: internal-style codes or suffixes like "CAL-813", "STR-204", "BW1230", "V2", "#3", roman numerals (II, III, IV…), any digits, or any 3-letter uppercase abbreviations followed by a number. Names must read like a human-written workout title, not a database ID. If the candidate name collides with an existing one, rephrase it using the workout format word (Circuit, AMRAP, EMOM, Ladder, Intervals, Tabata, For Time, Pyramid, etc.) — e.g. "Kinetic Cascade Circuit" or "Kinetic Cascade AMRAP".${bannedBlock}
 
 EXERCISE LIBRARY (USE EXCLUSIVELY — library-first):
 ${referenceList}
