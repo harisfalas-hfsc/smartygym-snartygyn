@@ -346,7 +346,15 @@ export const ContentCreationWizard = ({
       onOpenChange(false);
     } catch (e: any) {
       console.error(`[Wizard] generate-${type} failed`, e);
-      const message = e?.context?.error || e?.message || `Could not generate the ${type}. Please adjust the settings and try again.`;
+      let message = e?.message || `Could not generate the ${type}. Please adjust the settings and try again.`;
+      if (e?.context && typeof e.context.json === "function") {
+        try {
+          const backendError = await e.context.json();
+          message = backendError?.error || message;
+        } catch {
+          // Keep the SDK message if the backend did not return JSON.
+        }
+      }
       toast({
         title: "Generation failed",
         description: message,
