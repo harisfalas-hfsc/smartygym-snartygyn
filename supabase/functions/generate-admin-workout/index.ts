@@ -234,7 +234,34 @@ const wodTool = {
 
 // One generate click must equal one AI request. No fallback model cascade: it
 // wastes credits when validation/parsing fails downstream.
-const AI_MODEL = "google/gemini-2.5-pro";
+const AI_MODEL = "google/gemini-3-flash-preview";
+
+function contentToText(content: unknown): string {
+  if (typeof content === "string") return content;
+  if (Array.isArray(content)) {
+    return content
+      .map((part: any) => (typeof part === "string" ? part : part?.text || part?.content || ""))
+      .join("\n");
+  }
+  return "";
+}
+
+function parseWorkoutJson(rawText: string): WorkoutContent | null {
+  const cleaned = rawText
+    .trim()
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/```$/i, "")
+    .trim();
+  const start = cleaned.indexOf("{");
+  const end = cleaned.lastIndexOf("}");
+  if (start === -1 || end === -1 || end <= start) return null;
+
+  const parsed = JSON.parse(cleaned.slice(start, end + 1)) as Partial<WorkoutContent>;
+  if (!parsed.name || !parsed.description || !parsed.main_workout || !parsed.instructions || !parsed.tips) {
+    return null;
+  }
+  return parsed as WorkoutContent;
+}
 
 async function callAI(apiKey: string, prompt: string): Promise<WorkoutContent | null> {
   try {
@@ -247,8 +274,7 @@ async function callAI(apiKey: string, prompt: string): Promise<WorkoutContent | 
           { role: "system", content: "You are an expert fitness coach. Generate workouts using the provided tool." },
           { role: "user", content: prompt },
         ],
-        tools: [wodTool],
-        tool_choice: { type: "function", function: { name: "generate_workout" } },
+        temperature: 0.4,
       }),
     });
     const raw = await r.text();
@@ -257,12 +283,21 @@ async function callAI(apiKey: string, prompt: string): Promise<WorkoutContent | 
       return null;
     }
     const d = JSON.parse(raw);
-    const args = d.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments;
-    if (!args) {
-      log("AI response missing tool arguments", { model: AI_MODEL, finishReason: d.choices?.[0]?.finish_reason });
+    const message = d.choices?.[0]?.message;
+    const args = message?.tool_calls?.[0]?.function?.arguments;
+    if (args) return JSON.parse(args) as WorkoutContent;
+
+    const contentText = contentToText(message?.content);
+    const parsed = contentText ? parseWorkoutJson(contentText) : null;
+    if (!parsed) {
+      log("AI response missing workout JSON", {
+        model: AI_MODEL,
+        finishReason: d.choices?.[0]?.finish_reason,
+        preview: contentText.slice(0, 240),
+      });
       return null;
     }
-    return JSON.parse(args) as WorkoutContent;
+    return parsed;
   } catch (e: any) {
     log("AI call error", { model: AI_MODEL, err: e.message });
   }
@@ -406,7 +441,7 @@ serve(async (req) => {
     try {
         const prompt = buildPrompt({ body: { ...body, equipment, duration, format }, referenceList, bannedNames });
         const content = await callAI(lovableApiKey, prompt);
-      if (!content) throw new Error("All AI models failed");
+      if (!content) throw new Error("AI generation returned no usable workout JSON");
 
         // Sanitize internal-style codes/suffixes the model may have slipped in
         const stripInternalCodes = (n: string): string =>
