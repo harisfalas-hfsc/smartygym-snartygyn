@@ -431,7 +431,7 @@ export const ContentCreationWizard = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="w-[calc(100vw-2rem)] max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden px-4 sm:px-6">
+        <DialogContent className="w-[calc(100vw-2rem)] max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden px-3 sm:px-6">
         <DialogHeader>
           <DialogTitle>Create New Content</DialogTitle>
           <DialogDescription>
@@ -676,7 +676,7 @@ export const ContentCreationWizard = ({
             {step + 1} / {totalSteps}
           </Badge>
           {currentKey === "review" ? (
-            <div className="flex min-w-0 flex-1 items-center justify-end gap-2">
+            <div className="grid min-w-0 flex-1 grid-cols-2 gap-2 sm:flex sm:items-center sm:justify-end">
               <Button variant="outline" className="min-w-0 flex-1 sm:flex-none" onClick={handleFinish} disabled={generating}>
                 Open Editor
               </Button>
