@@ -385,7 +385,7 @@ export const generateBrandDisambiguationSchema = () => ({
   "logo": "https://smartygym.com/smarty-gym-logo.png",
   "slogan": "100% Human. 0% AI.",
   "description": "SmartyGym is an online fitness platform founded by Sports Scientist Haris Falas. It is NOT related to 'Smartgym' fitness equipment or machines.",
-  "disambiguatingDescription": "SmartyGym (smartygym.com) is an ONLINE FITNESS PLATFORM with 500+ expert-designed workouts. It is NOT the same as 'Smartgym' or 'Smart Gym' which are fitness equipment/machine products. SmartyGym was founded by Haris Falas, a BSc Sports Science and CSCS certified coach with 20+ years experience.",
+  "disambiguatingDescription": "SmartyGym (smartygym.com) is an ONLINE FITNESS PLATFORM with expert-designed workouts. It is NOT the same as 'Smartgym' or 'Smart Gym' which are fitness equipment/machine products. SmartyGym was founded by Haris Falas, a BSc Sports Science and CSCS certified coach with 20+ years experience.",
   "founder": {
     "@type": "Person",
     "name": "Haris Falas",
@@ -398,7 +398,7 @@ export const generateBrandDisambiguationSchema = () => ({
     "itemOffered": {
       "@type": "Service",
       "name": "Online Fitness Training",
-      "description": "500+ expert-designed workouts and training programs"
+      "description": "expert-designed workouts and training programs"
     }
   },
   "additionalType": "https://schema.org/HealthAndBeautyBusiness"
@@ -597,7 +597,7 @@ export const generateFitnessCenterSchema = () => ({
   "@id": "https://smartygym.com/#healthclub",
   "name": "SmartyGym",
   "alternateName": ["Smarty Gym", "SmartyGym Online", "HFSC Performance"],
-  "description": "Global online fitness platform with 500+ expert-designed workouts and training programs. 100% human-designed by Sports Scientist Haris Falas. Train anywhere, anytime.",
+  "description": "Global online fitness platform with expert-designed workouts and training programs. 100% human-designed by Sports Scientist Haris Falas. Train anywhere, anytime.",
   "url": "https://smartygym.com",
   "logo": "https://smartygym.com/smarty-gym-logo.png",
   "priceRange": "€€",
@@ -608,7 +608,7 @@ export const generateFitnessCenterSchema = () => ({
     "closes": "23:59"
   },
   "amenityFeature": [
-    { "@type": "LocationFeatureSpecification", "name": "500+ Expert Workouts", "value": true },
+    { "@type": "LocationFeatureSpecification", "name": "expert workouts", "value": true },
     { "@type": "LocationFeatureSpecification", "name": "Multi-Week Training Programs", "value": true },
     { "@type": "LocationFeatureSpecification", "name": "Daily Workout of the Day", "value": true },
     { "@type": "LocationFeatureSpecification", "name": "Daily Movement Ritual", "value": true },
@@ -649,7 +649,7 @@ export const generateMobileApplicationSchema = () => ({
   "@type": "MobileApplication",
   "name": "SmartyGym",
   "alternateName": "SmartyGym - Expert Fitness",
-  "description": "Global online fitness platform with 500+ expert-designed workouts and training programs. 100% human-made by Sports Scientist Haris Falas. Zero AI.",
+  "description": "Global online fitness platform with expert-designed workouts and training programs. 100% human-made by Sports Scientist Haris Falas. Zero AI.",
   "applicationCategory": "HealthApplication",
   "operatingSystem": ["Web", "iOS", "Android"],
   "offers": {
@@ -670,7 +670,7 @@ export const generateMobileApplicationSchema = () => ({
     "founder": { "@type": "Person", "name": "Haris Falas" }
   },
   "featureList": [
-    "500+ Expert-Designed Workouts",
+    "expert-designed workouts",
     "Multi-Week Training Programs",
     "Daily Workout of the Day",
     "Daily Smarty Ritual",
@@ -884,7 +884,7 @@ export const generateTestimonialsSchema = (testimonials: Array<{
     "@id": "https://smartygym.com/#product",
     "name": "SmartyGym - Online Fitness Platform",
     "alternateName": ["Smarty Gym", "SmartyGym.com", "HFM Fitness", "Haris Falas Fitness"],
-    "description": "Premier online fitness platform with 500+ expert-designed workouts and training programs by Sports Scientist Haris Falas. Read verified SmartyGym reviews and testimonials. 100% Human. Zero AI.",
+    "description": "Premier online fitness platform with expert-designed workouts and training programs by Sports Scientist Haris Falas. Read verified SmartyGym reviews and testimonials. 100% Human. Zero AI.",
     "brand": {
       "@type": "Organization",
       "name": "SmartyGym",
@@ -951,7 +951,7 @@ export const generateEnhancedCoachSchema = (reviewCount?: number, averageRating?
   "givenName": "Haris",
   "familyName": "Falas",
   "jobTitle": "Sports Scientist & Strength and Conditioning Coach",
-  "description": "Founder of SmartyGym. BSc Sports Science and CSCS certified coach with 20+ years experience in functional training, strength conditioning, and online fitness coaching. Creator of 500+ workouts and 25+ training programs. 100% Human-designed content.",
+  "description": "Founder of SmartyGym. BSc Sports Science and CSCS certified coach with 20+ years experience in functional training, strength conditioning, and online fitness coaching. Creator of expert workouts and 25+ training programs. 100% Human-designed content.",
   "image": {
     "@type": "ImageObject",
     "url": "https://smartygym.com/haris-falas-coach.png",
@@ -1011,7 +1011,7 @@ export const generateEnhancedCoachSchema = (reviewCount?: number, averageRating?
     "https://www.youtube.com/@TheSmartyGym",
     "https://www.facebook.com/smartygym"
   ],
-  "award": ["20+ Years Coaching Experience", "Creator of 500+ Expert Workouts", "Founder of SmartyGym"],
+  "award": ["20+ Years Coaching Experience", "Creator of expert workouts", "Founder of SmartyGym"],
   "publishingPrinciples": "100% Human-designed content. Zero AI. Evidence-based training methods.",
   ...(reviewCount && averageRating ? {
     "aggregateRating": {
@@ -1035,7 +1035,7 @@ export const generateOrganizationWithRatingSchema = (reviewCount: number, averag
   "alternateName": ["Smarty Gym", "smartygym.com", "HFSC Performance"],
   "url": "https://smartygym.com",
   "logo": "https://smartygym.com/smarty-gym-logo.png",
-  "description": "Leading global online fitness platform. 500+ expert-designed workouts and training programs by Sports Scientist Haris Falas. 100% Human. Zero AI.",
+  "description": "Leading global online fitness platform. expert-designed workouts and training programs by Sports Scientist Haris Falas. 100% Human. Zero AI.",
   "slogan": "100% Human. 0% AI.",
   "founder": {
     "@type": "Person",
