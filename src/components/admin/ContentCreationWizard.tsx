@@ -346,9 +346,18 @@ export const ContentCreationWizard = ({
       onOpenChange(false);
     } catch (e: any) {
       console.error(`[Wizard] generate-${type} failed`, e);
+      let message = e?.message || `Could not generate the ${type}. Please adjust the settings and try again.`;
+      if (e?.context && typeof e.context.json === "function") {
+        try {
+          const backendError = await e.context.json();
+          message = backendError?.error || message;
+        } catch {
+          // Keep the SDK message if the backend did not return JSON.
+        }
+      }
       toast({
         title: "Generation failed",
-        description: e.message || `Could not generate the ${type}. Please adjust the settings and try again.`,
+        description: message,
         variant: "destructive",
       });
     } finally {
@@ -422,7 +431,7 @@ export const ContentCreationWizard = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="w-[calc(100vw-2rem)] max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden px-3 sm:px-6">
         <DialogHeader>
           <DialogTitle>Create New Content</DialogTitle>
           <DialogDescription>
@@ -667,18 +676,18 @@ export const ContentCreationWizard = ({
             {step + 1} / {totalSteps}
           </Badge>
           {currentKey === "review" ? (
-            <div className="flex items-center gap-2">
-              <Button variant="outline" onClick={handleFinish} disabled={generating}>
-                Open Editor
+            <div className="grid min-w-0 flex-1 grid-cols-2 gap-2 sm:flex sm:items-center sm:justify-end">
+              <Button variant="outline" className="min-w-0 flex-1 sm:flex-none" onClick={handleFinish} disabled={generating}>
+                <span className="truncate sm:hidden">Editor</span><span className="hidden sm:inline">Open Editor</span>
               </Button>
-              <Button onClick={handleGenerate} disabled={generating}>
+              <Button className="min-w-0 flex-1 sm:flex-none" onClick={handleGenerate} disabled={generating}>
                 {generating ? (
                   <>
-                    <Loader2 className="w-4 h-4 mr-1 animate-spin" /> Generating…
+                    <Loader2 className="w-4 h-4 mr-1 shrink-0 animate-spin" /> <span className="truncate sm:hidden">Generating</span><span className="hidden sm:inline">Generating…</span>
                   </>
                 ) : (
                   <>
-                    <Sparkles className="w-4 h-4 mr-1" /> Generate &amp; Review
+                    <Sparkles className="w-4 h-4 mr-1 shrink-0" /> <span className="truncate sm:hidden">Generate</span><span className="hidden sm:inline">Generate &amp; Review</span>
                   </>
                 )}
               </Button>
