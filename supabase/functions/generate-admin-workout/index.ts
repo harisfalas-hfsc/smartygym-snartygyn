@@ -212,26 +212,6 @@ interface WorkoutContent {
   tips: string;
 }
 
-const wodTool = {
-  type: "function" as const,
-  function: {
-    name: "generate_workout",
-    description: "Generate a structured workout with all required fields",
-    parameters: {
-      type: "object",
-      properties: {
-        name: { type: "string" },
-        description: { type: "string" },
-        main_workout: { type: "string" },
-        instructions: { type: "string" },
-        tips: { type: "string" },
-      },
-      required: ["name", "description", "main_workout", "instructions", "tips"],
-      additionalProperties: false,
-    },
-  },
-};
-
 // One generate click must equal one AI request. No fallback model cascade: it
 // wastes credits when validation/parsing fails downstream.
 const AI_MODEL = "google/gemini-3-flash-preview";
