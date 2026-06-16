@@ -346,9 +346,10 @@ export const ContentCreationWizard = ({
       onOpenChange(false);
     } catch (e: any) {
       console.error(`[Wizard] generate-${type} failed`, e);
+      const message = e?.context?.error || e?.message || `Could not generate the ${type}. Please adjust the settings and try again.`;
       toast({
         title: "Generation failed",
-        description: e.message || `Could not generate the ${type}. Please adjust the settings and try again.`,
+        description: message,
         variant: "destructive",
       });
     } finally {
@@ -422,7 +423,7 @@ export const ContentCreationWizard = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="w-[calc(100vw-2rem)] max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden px-4 sm:px-6">
         <DialogHeader>
           <DialogTitle>Create New Content</DialogTitle>
           <DialogDescription>
@@ -667,18 +668,18 @@ export const ContentCreationWizard = ({
             {step + 1} / {totalSteps}
           </Badge>
           {currentKey === "review" ? (
-            <div className="flex items-center gap-2">
-              <Button variant="outline" onClick={handleFinish} disabled={generating}>
+            <div className="flex min-w-0 flex-1 items-center justify-end gap-2">
+              <Button variant="outline" className="min-w-0 flex-1 sm:flex-none" onClick={handleFinish} disabled={generating}>
                 Open Editor
               </Button>
-              <Button onClick={handleGenerate} disabled={generating}>
+              <Button className="min-w-0 flex-1 sm:flex-none" onClick={handleGenerate} disabled={generating}>
                 {generating ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-1 animate-spin" /> Generating…
                   </>
                 ) : (
                   <>
-                    <Sparkles className="w-4 h-4 mr-1" /> Generate &amp; Review
+                    <Sparkles className="w-4 h-4 mr-1 shrink-0" /> <span className="truncate sm:hidden">Generate</span><span className="hidden sm:inline">Generate &amp; Review</span>
                   </>
                 )}
               </Button>
