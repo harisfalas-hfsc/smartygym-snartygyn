@@ -678,12 +678,12 @@ export const ContentCreationWizard = ({
           {currentKey === "review" ? (
             <div className="grid min-w-0 flex-1 grid-cols-2 gap-2 sm:flex sm:items-center sm:justify-end">
               <Button variant="outline" className="min-w-0 flex-1 sm:flex-none" onClick={handleFinish} disabled={generating}>
-                Open Editor
+                <span className="truncate sm:hidden">Editor</span><span className="hidden sm:inline">Open Editor</span>
               </Button>
               <Button className="min-w-0 flex-1 sm:flex-none" onClick={handleGenerate} disabled={generating}>
                 {generating ? (
                   <>
-                    <Loader2 className="w-4 h-4 mr-1 animate-spin" /> Generating…
+                    <Loader2 className="w-4 h-4 mr-1 shrink-0 animate-spin" /> <span className="truncate sm:hidden">Generating</span><span className="hidden sm:inline">Generating…</span>
                   </>
                 ) : (
                   <>
