@@ -50,7 +50,7 @@ type RotatingLink = {
 
 const ROTATING_LINKS: RotatingLink[] = [
   { id: "wod",       title: "Workout of the Day", tagline: "Today's featured session",   icon: CalendarCheck, route: "/workout/wod" },
-  { id: "workouts",  title: "Smarty Workouts",    tagline: "500+ expert sessions",       icon: Dumbbell,      route: "/workout" },
+  { id: "workouts",  title: "Smarty Workouts",    tagline: "Expert sessions",       icon: Dumbbell,      route: "/workout" },
   { id: "programs",  title: "Smarty Programs",    tagline: "Multi-week training plans",  icon: Calendar,      route: "/trainingprogram" },
   { id: "library",   title: "Exercise Library",   tagline: "Form & technique videos",    icon: Video,         route: "/exerciselibrary" },
   { id: "blog",      title: "Blog & Insights",    tagline: "Evidence-based articles",    icon: FileText,      route: "/blog" },
@@ -300,7 +300,7 @@ type ServiceTile = {
 
 const SERVICE_TILES: ServiceTile[] = [
   { id: "wod",       title: "Workout of the Day", description: "Today's session",     icon: CalendarCheck, route: "/workout/wod",     color: "text-orange-400" },
-  { id: "workouts",  title: "Smarty Workouts",    description: "500+ sessions",        icon: Dumbbell,      route: "/workout",         color: "text-sky-400" },
+  { id: "workouts",  title: "Smarty Workouts",    description: "Expert sessions",        icon: Dumbbell,      route: "/workout",         color: "text-sky-400" },
   { id: "programs",  title: "Smarty Programs",    description: "Multi-week plans",     icon: Calendar,      route: "/trainingprogram", color: "text-violet-400" },
   { id: "tools",     title: "Smarty Tools",       description: "Calculators & timers", icon: Calculator,    route: "/tools",           color: "text-emerald-400" },
   { id: "library",   title: "Exercise Library",   description: "Form & technique",     icon: Video,         route: "/exerciselibrary", color: "text-cyan-400" },
@@ -366,7 +366,7 @@ const DesktopServiceTiles = () => {
 };
 
 const DESKTOP_CARDS: DesktopCardItem[] = [
-  { id: "workouts",  title: "Smarty Workouts",   description: "500+ expert sessions",      icon: Dumbbell,      route: "/workout",          image: heroWorkoutsImage },
+  { id: "workouts",  title: "Smarty Workouts",   description: "Expert sessions",      icon: Dumbbell,      route: "/workout",          image: heroWorkoutsImage },
   { id: "programs",  title: "Smarty Programs",   description: "Multi-week training plans", icon: Calendar,      route: "/trainingprogram",  image: heroProgramsImage },
   { id: "library",   title: "Exercise Library",  description: "Form & technique videos",   icon: Video,         route: "/exerciselibrary",  image: heroLibraryImage },
   { id: "wod",       title: "Workout of the Day",description: "Today's featured session",  icon: CalendarCheck, route: "/workout/wod",      image: heroWodImage },
