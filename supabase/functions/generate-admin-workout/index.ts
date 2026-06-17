@@ -183,6 +183,7 @@ NON-NEGOTIABLE PRESCRIPTION RULES:
 - Tempo codes (20X0, 31X1, 41X1, 21X1) are ONLY allowed AFTER an explicit sets × reps prescription.
 - Conditioning examples: "15 reps {{exercise:1160:burpee}}", "40 sec {{exercise:0630:mountain climber}}", "200m {{exercise:0685:run}}".
 - Never list naked exercises. Never write an exercise token alone and explain reps later.
+- ABSOLUTELY FORBIDDEN: putting tempo (e.g. "32X1") or rest (e.g. "rest 100s") on a SEPARATE bullet/line after the exercise. Tempo + rest MUST be inline on the SAME <li> as the exercise token, e.g. "5 sets × 5 reps {{exercise:ID:Name}} @ 32X1, rest 100s". Never produce a bullet whose entire content is a tempo code, "rest Ns", or "tempo X, rest Y".
 
 SECTION SEPARATORS: ONE empty paragraph between sections only: <p class="tiptap-paragraph"></p>
 
