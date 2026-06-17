@@ -343,7 +343,7 @@ export function MyRecordsReport({ userId }: MyRecordsReportProps) {
     const diff = current - previous;
     if (diff === 0) {
       return (
-        <div className="text-xs mt-1 flex items-center justify-center gap-1 text-gray-400">
+        <div className="text-xs mt-1 flex items-center justify-center gap-1 text-muted-foreground">
           <Minus className="h-3 w-3" />
           <span>same</span>
         </div>
