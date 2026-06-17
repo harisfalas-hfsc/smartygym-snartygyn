@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
@@ -11,6 +11,7 @@ import { Dumbbell, Calendar, BookOpen, Calculator, Activity, Flame, Instagram, F
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
 import { getBlogArticleImage } from "@/utils/blogImages";
 import { User as SupabaseUser } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
@@ -27,6 +28,7 @@ import { useTodayWods } from "@/hooks/useTodayWods";
 import ritualWellbeingImage from "@/assets/ritual-wellbeing.jpg";
 import faqPlacardImage from "@/assets/faq-placard.jpg";
 import { fetchVisibleWorkoutMetadata } from "@/hooks/useTodayWods";
+import type { WorkoutData } from "@/hooks/useWorkoutData";
 import { getDifficultyColorClasses } from "@/lib/wodCycle";
 import { DesktopHeroRows } from "@/components/home/DesktopHeroRows";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
@@ -59,6 +61,11 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { generateOrganizationWithRatingSchema } from "@/utils/seoHelpers";
+
+type VisibleProgramMetadata = Database["public"]["Functions"]["get_visible_program_metadata"]["Returns"][number];
+type BlogArticleCard = Pick<Database["public"]["Tables"]["blog_articles"]["Row"], "id" | "slug" | "title" | "image_url" | "read_time" | "category" | "published_at" | "created_at"> & {
+  timestamp: number;
+};
 
 const homepageFAQs = [
   { question: "What is SmartyGym?", answer: "SmartyGym (smartygym.com) is a leading global online fitness platform offering expert-designed workouts, structured multi-week training programs, blog insights and smart tools. All content is 100% human-designed by Sports Scientist Haris Falas — zero AI-generated workouts." },
@@ -191,9 +198,9 @@ const Index = () => {
     queryFn: async () => {
       const data = await fetchVisibleWorkoutMetadata(null);
       return (data || [])
-        .filter((w: any) => w.is_workout_of_day !== true || w.wod_source === "library")
-        .filter((w: any) => !!w.created_at)
-        .sort((a: any, b: any) => (b.created_at || "").localeCompare(a.created_at || ""))
+        .filter((w) => w.is_workout_of_day !== true || w.wod_source === "library")
+        .filter((w) => !!w.created_at)
+        .sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""))
         .slice(0, 3);
     },
     staleTime: 1000 * 60 * 5,
@@ -203,9 +210,8 @@ const Index = () => {
   const { data: latestPrograms = [] } = useQuery({
     queryKey: ["home-featured-latest-programs"],
     queryFn: async () => {
-      const { data } = await (supabase as any)
-        .rpc("get_visible_program_metadata", { _program_id: null });
-      return ((data || []) as any[])
+      const { data } = await supabase.rpc("get_visible_program_metadata", {});
+      return (data || [])
         .filter((p) => p.is_visible !== false && !!p.created_at)
         .sort((a, b) => String(b.created_at || "").localeCompare(String(a.created_at || "")))
         .slice(0, 3);
@@ -222,7 +228,7 @@ const Index = () => {
         .select('id, slug, title, image_url, read_time, category, published_at, created_at')
         .eq('is_published', true);
       if (error) throw error;
-      return ((data || []) as any[])
+      return (data || [])
         .map((a) => ({
           ...a,
           timestamp: new Date(a.published_at || a.created_at).getTime(),
@@ -251,8 +257,13 @@ const Index = () => {
       .replace("mobility & stability", "mobility-stability")
       .replace(/\s+/g, "-");
 
+  const getProgramCardImage = (category?: string | null, fallback?: string | null) => {
+    const slug = programCategoryToSlug(category);
+    return programCards.find((card) => card.id === slug)?.image || fallback || "/images/programs/functional-strength-card-mobile.jpg";
+  };
+
   const { bodyweightWod, equipmentWod, variousWod, hasWods } = useTodayWods(isMobile);
-  const mobileWodCards = [
+  const mobileWodCards = useMemo(() => [
     bodyweightWod && { id: "bodyweight", label: "No Equipment", badgeClassName: "bg-green-500 hover:bg-green-500", wod: bodyweightWod },
     equipmentWod && { id: "equipment", label: "With Equipment", badgeClassName: "bg-orange-500 hover:bg-orange-500", wod: equipmentWod },
     variousWod && { id: "various", label: "Recovery", badgeClassName: "bg-cyan-500 hover:bg-cyan-500", wod: variousWod },
@@ -261,7 +272,8 @@ const Index = () => {
     label: string;
     badgeClassName: string;
     wod: NonNullable<typeof bodyweightWod>;
-  }>;
+  }>, [bodyweightWod, equipmentWod, variousWod]);
+  const mobileWodImageSignature = mobileWodCards.map((c) => c.wod.image_url).join("|");
   const activeMobileWod = mobileWodCards.length > 0 ? mobileWodCards[activeWodIndex % mobileWodCards.length] : null;
 
   // Preload non-active WOD images lazily, after first paint, so the
@@ -278,7 +290,7 @@ const Index = () => {
       });
     }, 2500);
     return () => window.clearTimeout(t);
-  }, [isMobile, mobileWodCards.map((c) => c.wod.image_url).join("|")]);
+  }, [isMobile, mobileWodCards, mobileWodImageSignature]);
 
   useEffect(() => {
     if (!isMobile || mobileWodCards.length <= 1) {
@@ -742,7 +754,7 @@ const Index = () => {
                   <div className="h-px flex-1 bg-primary/20" />
                 </div>
                 <div className="flex flex-col gap-3">
-                  {latestWorkouts.map((w: any) => {
+                  {latestWorkouts.map((w: WorkoutData) => {
                     const slug = workoutCategoryToSlug(w.category);
                     const image = w.image_url || "/images/workouts/wod-card-mobile.jpg";
                     return (
@@ -838,22 +850,22 @@ const Index = () => {
                   <div className="h-px flex-1 bg-primary/20" />
                 </div>
                 <div className="flex flex-col gap-3">
-                  {latestPrograms.map((p: any) => {
+                  {latestPrograms.map((p: VisibleProgramMetadata) => {
                     const slug = programCategoryToSlug(p.category);
-                    const image = p.image_url || "/images/programs/functional-strength-card-mobile.jpg";
+                    const image = getProgramCardImage(p.category, p.image_url);
                     return (
                       <button
                         key={p.id}
                         type="button"
                         onClick={() => navigate(`/trainingprogram/${slug}/${p.id}`)}
-                        className="flex items-stretch bg-card border-2 border-green-500/60 rounded-xl overflow-hidden hover:border-green-500 hover:shadow-xl transition-all duration-300 text-left"
+                        className="group flex h-[96px] items-stretch overflow-hidden rounded-xl border-2 border-green-500/60 bg-card text-left transition-all duration-300 hover:border-green-500 hover:shadow-xl"
                       >
-                        <div className="relative w-28 flex-shrink-0 bg-muted">
+                        <div className="relative h-full w-28 flex-shrink-0 overflow-hidden bg-muted">
                           <img
                             src={image}
                             alt={p.name}
                             loading="lazy"
-                            className="absolute inset-0 w-full h-full object-cover"
+                            className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
                           />
                         </div>
                         <div className="flex-1 min-w-0 p-3 flex flex-col justify-center">
@@ -933,7 +945,7 @@ const Index = () => {
                   <div className="h-px flex-1 bg-primary/20" />
                 </div>
                 <div className="flex flex-col gap-3">
-                  {latestArticles.map((a: any) => {
+                  {latestArticles.map((a: BlogArticleCard) => {
                     const image = getBlogArticleImage(a.image_url, a.slug);
                     return (
                       <button
@@ -1033,7 +1045,7 @@ const Index = () => {
               { route: '/community', title: 'Community', label: 'Connect', description: 'Share progress, leaderboards and challenges', image: heroCommunityCelebratingImage },
               { route: '/faq', title: 'Frequently Asked Questions', label: 'Help', description: 'Answers about plans, training and access', image: faqPlacardImage },
               { route: '/coach-profile', title: 'Meet the Coach', label: 'Coach', description: 'Haris Falas — Sports Scientist & Founder', image: harisPhoto },
-            ] as Array<{ route: string; title: string; label: string; description: string; image?: string; icon?: any; iconClass?: string }>).map((card) => (
+            ] as Array<{ route: string; title: string; label: string; description: string; image?: string }>).map((card) => (
               <button
                 key={card.route}
                 type="button"
@@ -1049,10 +1061,6 @@ const Index = () => {
                       loading="lazy"
                       className="absolute inset-0 w-full h-full object-cover"
                     />
-                  ) : card.icon ? (
-                    <div className="absolute inset-0 flex items-center justify-center bg-purple-500/10">
-                      <card.icon className={`w-10 h-10 ${card.iconClass || 'text-primary'}`} />
-                    </div>
                   ) : null}
                 </div>
                 <div className="flex-1 min-w-0 p-3 flex flex-col justify-center">
@@ -1097,9 +1105,9 @@ const Index = () => {
               </div>
             </div>
             <DesktopHeroRows
-              workouts={latestWorkouts as any[]}
-              programs={latestPrograms as any[]}
-              articles={latestArticles as any[]}
+              workouts={latestWorkouts}
+              programs={latestPrograms}
+              articles={latestArticles}
               workoutCategoryToSlug={workoutCategoryToSlug}
               programCategoryToSlug={programCategoryToSlug}
             />
@@ -1248,7 +1256,7 @@ const Index = () => {
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-sm text-muted-foreground">
-                  Flexible, effective training designed for busy professionals who want real results     
+                  Flexible, effective training designed for busy professionals who want real results
                 </CardDescription>
               </CardContent>
             </Card>

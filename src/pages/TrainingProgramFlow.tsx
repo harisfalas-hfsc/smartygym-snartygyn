@@ -188,18 +188,18 @@ const TrainingProgramFlow = () => {
         type="button"
         onClick={() => navigate(`/trainingprogram/${slug}/${program.id}`)}
         className={cn(
-          "group flex h-full min-h-[88px] items-stretch overflow-hidden rounded-xl bg-card text-left transition-all duration-300",
+          "group flex h-[88px] items-stretch overflow-hidden rounded-xl bg-card text-left transition-all duration-300",
           isDesktop
             ? "border border-border hover:border-green-400 hover:shadow-lg"
             : "border-2 border-primary/40 hover:border-primary hover:shadow-xl"
         )}
       >
-        <div className="relative h-full min-h-[88px] w-28 flex-shrink-0 overflow-hidden bg-muted">
+        <div className="relative h-full w-28 flex-shrink-0 overflow-hidden bg-muted">
           <img
             src={image}
             alt={program.name}
             loading="lazy"
-            className="block h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
+            className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
           />
         </div>
         <div className="flex min-w-0 flex-1 flex-col justify-center p-3">
