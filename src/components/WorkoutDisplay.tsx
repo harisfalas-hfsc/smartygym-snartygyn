@@ -17,6 +17,7 @@ import { ExerciseHTMLContent } from "@/components/ExerciseHTMLContent";
 import { A4Container } from "@/components/ui/a4-container";
 import { ExerciseLibraryBanner } from "@/components/ExerciseLibraryBanner";
 import { ReaderModeDialog } from "@/components/ReaderModeDialog";
+import { normalizeWorkoutHtml } from "@/utils/htmlNormalizer";
 
 interface Exercise {
   name: string;
@@ -97,11 +98,13 @@ function joinWorkoutSections(sections: (string | undefined | null)[]): string {
   const EMPTY_P = '<p class="tiptap-paragraph"></p>';
   const EMPTY_P_PATTERN = /^(?:\s*<p[^>]*>\s*<\/p>\s*)+|(?:\s*<p[^>]*>\s*<\/p>\s*)+$/gi;
   
-  return sections
+  const joined = sections
     .filter((s): s is string => Boolean(s && s.trim()))
     .map(section => section.replace(EMPTY_P_PATTERN, '').trim())
     .filter(s => s.length > 0)
     .join(EMPTY_P);
+
+  return normalizeWorkoutHtml(joined);
 }
 
 export const WorkoutDisplay = ({
