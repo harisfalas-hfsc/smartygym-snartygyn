@@ -53,6 +53,10 @@ import valueBuiltForRealLife from "@/assets/value-built-for-real-life.jpg";
 import valueScientificApproach from "@/assets/value-scientific-approach.jpg";
 import valueAccessibleToAll from "@/assets/value-accessible-to-all.jpg";
 import valueSafeEffective from "@/assets/value-safe-effective.jpg";
+import valueRealExpertise from "@/assets/value-real-expertise.jpg";
+import valuePersonalTouch from "@/assets/value-personal-touch.jpg";
+import valueNotARobot from "@/assets/value-not-a-robot.jpg";
+import valueNeverStopExpanding from "@/assets/value-never-stop-expanding.jpg";
 import valueEvidenceBased from "@/assets/value-evidence-based.jpg";
 import valueStructureClarity from "@/assets/value-structure-clarity.jpg";
 import valueHumanConnection from "@/assets/value-human-connection.jpg";
@@ -1137,30 +1141,54 @@ const Index = () => {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-5">
                     <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20 h-full min-h-[88px]">
-                      <GraduationCap className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
+                      <GraduationCap className="w-5 h-5 text-primary flex-shrink-0 mt-0.5 lg:hidden" aria-hidden="true" />
                       <div className="flex-1 text-left">
-                        <p className="font-semibold text-sm mb-1">Real Expertise</p>
+                        <div className="hidden lg:block aspect-[16/9] overflow-hidden rounded-md mb-3">
+                          <img src={valueRealExpertise} alt="Certified expert coach with clipboard" loading="lazy" width={1280} height={720} className="w-full h-full object-cover" />
+                        </div>
+                        <p className="font-semibold text-sm mb-1 flex items-center gap-1.5">
+                          <GraduationCap className="w-4 h-4 text-primary hidden lg:inline-block" aria-hidden="true" />
+                          Real Expertise
+                        </p>
                         <p className="text-xs text-muted-foreground leading-relaxed">Every program designed by certified coach Haris Falas — never by AI, always with 20+ years of experience.</p>
                       </div>
                     </article>
                     <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20 h-full min-h-[88px]">
-                      <Heart className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
+                      <Heart className="w-5 h-5 text-primary flex-shrink-0 mt-0.5 lg:hidden" aria-hidden="true" />
                       <div className="flex-1 text-left">
-                        <p className="font-semibold text-sm mb-1">Personal Touch</p>
+                        <div className="hidden lg:block aspect-[16/9] overflow-hidden rounded-md mb-3">
+                          <img src={valuePersonalTouch} alt="Coach guiding a client's form" loading="lazy" width={1280} height={720} className="w-full h-full object-cover" />
+                        </div>
+                        <p className="font-semibold text-sm mb-1 flex items-center gap-1.5">
+                          <Heart className="w-4 h-4 text-primary hidden lg:inline-block" aria-hidden="true" />
+                          Personal Touch
+                        </p>
                         <p className="text-xs text-muted-foreground leading-relaxed">Direct access to the coach who created your program. Real support, real guidance, real results.</p>
                       </div>
                     </article>
                     <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20 h-full min-h-[88px]">
-                      <UserCheck className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
+                      <UserCheck className="w-5 h-5 text-primary flex-shrink-0 mt-0.5 lg:hidden" aria-hidden="true" />
                       <div className="flex-1 text-left">
-                        <p className="font-semibold text-sm mb-1">Not a Robot</p>
+                        <div className="hidden lg:block aspect-[16/9] overflow-hidden rounded-md mb-3">
+                          <img src={valueNotARobot} alt="Coach hand-writing a workout plan in a notebook" loading="lazy" width={1280} height={720} className="w-full h-full object-cover" />
+                        </div>
+                        <p className="font-semibold text-sm mb-1 flex items-center gap-1.5">
+                          <UserCheck className="w-4 h-4 text-primary hidden lg:inline-block" aria-hidden="true" />
+                          Not a Robot
+                        </p>
                         <p className="text-xs text-muted-foreground leading-relaxed">We don't generate workouts with algorithms. We design them with care, experience, and your goals in mind.</p>
                       </div>
                     </article>
                     <article className="flex items-start gap-3 p-4 bg-background/50 rounded-lg border border-primary/20 h-full min-h-[88px]">
-                      <Rocket className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
+                      <Rocket className="w-5 h-5 text-primary flex-shrink-0 mt-0.5 lg:hidden" aria-hidden="true" />
                       <div className="flex-1 text-left">
-                        <p className="font-semibold text-sm mb-1">Never Stop Expanding</p>
+                        <div className="hidden lg:block aspect-[16/9] overflow-hidden rounded-md mb-3">
+                          <img src={valueNeverStopExpanding} alt="Upward growth chart with rocket launching" loading="lazy" width={1280} height={720} className="w-full h-full object-cover" />
+                        </div>
+                        <p className="font-semibold text-sm mb-1 flex items-center gap-1.5">
+                          <Rocket className="w-4 h-4 text-primary hidden lg:inline-block" aria-hidden="true" />
+                          Never Stop Expanding
+                        </p>
                         <p className="text-xs text-muted-foreground leading-relaxed">New workouts, programs, tools, and articles — keeping you current with the latest science and trends.</p>
                       </div>
                     </article>
@@ -1323,7 +1351,7 @@ const Index = () => {
           </div>
 
           {/* The SmartyGym Promise */}
-          <Card className="dark-band border-2 border-primary/30 overflow-hidden relative rounded-2xl">
+          <Card className="dark-band border-2 border-green-500 overflow-hidden relative rounded-2xl">
             <span aria-hidden="true" className="ghost-headline ghost-headline-on-dark absolute top-4 left-1/2 -translate-x-1/2 text-[60px] md:text-[110px] leading-none opacity-40 hidden md:block pointer-events-none whitespace-nowrap">
               PROMISE
             </span>
