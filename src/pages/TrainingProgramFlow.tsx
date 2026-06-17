@@ -176,6 +176,49 @@ const TrainingProgramFlow = () => {
     navigate(`/trainingprogram/${programId}`);
   };
 
+  const renderFeaturedProgramCard = (program: any, variant: "desktop" | "mobile") => {
+    const slug = programCategoryToSlug(program.category);
+    const image = program.image_url || programMobileImages[slug] || "/images/programs/functional-strength-card-mobile.jpg";
+    const isDesktop = variant === "desktop";
+
+    return (
+      <button
+        key={program.id}
+        type="button"
+        onClick={() => navigate(`/trainingprogram/${slug}/${program.id}`)}
+        className={cn(
+          "group flex h-full min-h-[88px] items-stretch overflow-hidden rounded-xl bg-card text-left transition-all duration-300",
+          isDesktop
+            ? "border border-border hover:border-green-400 hover:shadow-lg"
+            : "border-2 border-primary/40 hover:border-primary hover:shadow-xl"
+        )}
+      >
+        <div className="relative h-full min-h-[88px] w-28 flex-shrink-0 overflow-hidden bg-muted">
+          <img
+            src={image}
+            alt={program.name}
+            loading="lazy"
+            className="block h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
+          />
+        </div>
+        <div className="flex min-w-0 flex-1 flex-col justify-center p-3">
+          <span className={cn(
+            "text-[10px] font-semibold uppercase tracking-wider",
+            isDesktop ? "text-green-400" : "text-primary"
+          )}>
+            {program.category}
+          </span>
+          <h3 className="mt-0.5 line-clamp-2 text-sm font-bold leading-tight text-foreground">{program.name}</h3>
+          {(program.weeks || program.difficulty) && (
+            <p className="mt-1 line-clamp-1 text-[11px] text-muted-foreground">
+              {[program.weeks ? `${program.weeks} weeks` : null, program.difficulty].filter(Boolean).join(" · ")}
+            </p>
+          )}
+        </div>
+      </button>
+    );
+  };
+
   return (
     <>
       <Helmet>
@@ -455,37 +498,8 @@ const TrainingProgramFlow = () => {
                 <span className="text-sm font-extrabold tracking-tight text-green-400 uppercase">Featured Training Programs</span>
                 <div className="h-px flex-1 bg-green-500/30" />
               </div>
-              <div className="grid grid-cols-3 gap-4">
-                {latestPrograms.slice(0, 3).map((p: any) => {
-                  const slug = programCategoryToSlug(p.category);
-                  const image = p.image_url || programMobileImages[slug] || "/images/programs/functional-strength-card-mobile.jpg";
-                  return (
-                    <button
-                      key={p.id}
-                      type="button"
-                      onClick={() => navigate(`/trainingprogram/${slug}/${p.id}`)}
-                      className="flex items-stretch bg-card border border-border rounded-xl overflow-hidden hover:border-green-400 hover:shadow-lg transition-all duration-300 text-left"
-                    >
-                      <div className="relative w-28 flex-shrink-0 bg-muted">
-                        <img
-                          src={image}
-                          alt={p.name}
-                          loading="lazy"
-                          className="absolute inset-0 w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0 p-3 flex flex-col justify-center">
-                        <span className="text-[10px] font-semibold uppercase tracking-wider text-green-400">{p.category}</span>
-                        <h3 className="text-sm font-bold text-foreground leading-tight line-clamp-2 mt-0.5">{p.name}</h3>
-                        {(p.weeks || p.difficulty) && (
-                          <p className="text-[11px] text-muted-foreground mt-1 line-clamp-1">
-                            {[p.weeks ? `${p.weeks} weeks` : null, p.difficulty].filter(Boolean).join(" · ")}
-                          </p>
-                        )}
-                      </div>
-                    </button>
-                  );
-                })}
+              <div className="grid grid-cols-3 items-stretch gap-4">
+                {latestPrograms.slice(0, 3).map((p: any) => renderFeaturedProgramCard(p, "desktop"))}
               </div>
             </div>
           </div>
@@ -499,36 +513,7 @@ const TrainingProgramFlow = () => {
               <div className="h-px flex-1 bg-primary/20" />
             </div>
             <div className="flex flex-col gap-3">
-              {latestPrograms.map((p: any) => {
-                const slug = programCategoryToSlug(p.category);
-                const image = p.image_url || programMobileImages[slug] || "/images/programs/functional-strength-card-mobile.jpg";
-                return (
-                  <button
-                    key={p.id}
-                    type="button"
-                    onClick={() => navigate(`/trainingprogram/${slug}/${p.id}`)}
-                    className="flex items-stretch bg-card border-2 border-primary/40 rounded-xl overflow-hidden hover:border-primary hover:shadow-xl transition-all duration-300 text-left"
-                  >
-                    <div className="relative w-28 flex-shrink-0 bg-muted">
-                      <img
-                        src={image}
-                        alt={p.name}
-                        loading="lazy"
-                        className="absolute inset-0 w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0 p-3 flex flex-col justify-center">
-                      <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">{p.category}</span>
-                      <h3 className="text-sm font-bold text-foreground leading-tight line-clamp-2 mt-0.5">{p.name}</h3>
-                      {(p.weeks || p.difficulty) && (
-                        <p className="text-[11px] text-muted-foreground mt-1 line-clamp-1">
-                          {[p.weeks ? `${p.weeks} weeks` : null, p.difficulty].filter(Boolean).join(" · ")}
-                        </p>
-                      )}
-                    </div>
-                  </button>
-                );
-              })}
+              {latestPrograms.map((p: any) => renderFeaturedProgramCard(p, "mobile"))}
             </div>
           </div>
         )}
