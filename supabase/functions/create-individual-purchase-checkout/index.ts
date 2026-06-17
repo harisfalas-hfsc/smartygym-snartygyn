@@ -94,12 +94,12 @@ serve(async (req) => {
     const contentQuery = contentType === 'workout'
       ? supabaseClient
           .from('admin_workouts')
-          .select('id, name, is_visible, is_standalone_purchase, price, stripe_product_id, stripe_price_id, is_workout_of_day, generated_for_date')
+          .select('id, name, is_visible, is_standalone_purchase, price, image_url, stripe_product_id, stripe_price_id, is_workout_of_day, generated_for_date')
           .eq('id', contentId)
           .maybeSingle()
       : supabaseClient
           .from('admin_training_programs')
-          .select('id, name, is_visible, is_standalone_purchase, price, stripe_product_id, stripe_price_id')
+          .select('id, name, is_visible, is_standalone_purchase, price, image_url, stripe_product_id, stripe_price_id')
           .eq('id', contentId)
           .maybeSingle();
     const { data: contentRecordRaw, error: contentError } = await contentQuery;
@@ -129,6 +129,9 @@ serve(async (req) => {
 
     const finalContentName = contentRecord.name;
     const finalPrice = Number(contentRecord.price);
+    const finalImageUrl = typeof contentRecord.image_url === 'string' && contentRecord.image_url.startsWith('http')
+      ? contentRecord.image_url
+      : undefined;
 
     if (!finalContentName || !Number.isFinite(finalPrice) || finalPrice <= 0) {
       return new Response(JSON.stringify({ error: "This content is not configured correctly for purchase." }), {
@@ -162,6 +165,7 @@ serve(async (req) => {
       if (!productIdToUse) {
         const product = await stripe.products.create({
           name: finalContentName,
+          images: finalImageUrl ? [finalImageUrl] : undefined,
           metadata: {
             project: "SMARTYGYM",
             content_type: contentType,
@@ -172,6 +176,11 @@ serve(async (req) => {
           idempotencyKey: `SMARTYGYM:${contentType}:${contentId}:product`,
         });
         productIdToUse = product.id;
+      } else if (finalImageUrl) {
+        const existingProduct = await stripe.products.retrieve(productIdToUse);
+        if (!existingProduct.images?.includes(finalImageUrl)) {
+          await stripe.products.update(productIdToUse, { images: [finalImageUrl] });
+        }
       }
 
       const priceObj = await stripe.prices.create({
