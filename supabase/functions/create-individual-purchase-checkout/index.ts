@@ -7,6 +7,18 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+type PurchaseContentRecord = {
+  id: string;
+  name: string;
+  is_visible: boolean | null;
+  is_standalone_purchase: boolean | null;
+  price: number | string | null;
+  image_url: string | null;
+  stripe_product_id: string | null;
+  stripe_price_id: string | null;
+  is_workout_of_day?: boolean | null;
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -103,7 +115,7 @@ serve(async (req) => {
           .eq('id', contentId)
           .maybeSingle();
     const { data: contentRecordRaw, error: contentError } = await contentQuery;
-    const contentRecord = contentRecordRaw as any;
+    const contentRecord = contentRecordRaw as PurchaseContentRecord | null;
 
     if (contentError || !contentRecord) {
       console.log("[INDIV-CHECKOUT] Content not found", { contentType, contentId, contentError });
@@ -237,9 +249,10 @@ serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error creating checkout session:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    const message = error instanceof Error ? error.message : "Unknown checkout error";
+    return new Response(JSON.stringify({ error: message }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });
