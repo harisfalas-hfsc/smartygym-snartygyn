@@ -169,6 +169,13 @@ serve(async (req) => {
         status: 409,
       });
     }
+
+    if (existingProductId && finalImageUrl) {
+      const existingProduct = await stripe.products.retrieve(existingProductId);
+      if (!existingProduct.images?.includes(finalImageUrl)) {
+        await stripe.products.update(existingProductId, { images: [finalImageUrl] });
+      }
+    }
     
     if (!finalPriceId) {
       // Create or reuse product, then create price
@@ -188,11 +195,6 @@ serve(async (req) => {
           idempotencyKey: `SMARTYGYM:${contentType}:${contentId}:product`,
         });
         productIdToUse = product.id;
-      } else if (finalImageUrl) {
-        const existingProduct = await stripe.products.retrieve(productIdToUse);
-        if (!existingProduct.images?.includes(finalImageUrl)) {
-          await stripe.products.update(productIdToUse, { images: [finalImageUrl] });
-        }
       }
 
       const priceObj = await stripe.prices.create({
