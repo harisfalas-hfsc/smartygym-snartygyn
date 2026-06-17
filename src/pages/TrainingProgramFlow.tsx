@@ -450,41 +450,43 @@ const TrainingProgramFlow = () => {
         {/* Desktop: Featured Training Programs (latest 3) — below the category grid */}
         {latestPrograms.length > 0 && (
           <div className="hidden lg:block mt-8">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-sm font-extrabold tracking-tight text-primary uppercase">Featured Training Programs</span>
-              <div className="h-px flex-1 bg-primary/20" />
-            </div>
-            <div className="grid grid-cols-3 gap-4">
-              {latestPrograms.slice(0, 3).map((p: any) => {
-                const slug = programCategoryToSlug(p.category);
-                const image = p.image_url || programMobileImages[slug] || "/images/programs/functional-strength-card-mobile.jpg";
-                return (
-                  <button
-                    key={p.id}
-                    type="button"
-                    onClick={() => navigate(`/trainingprogram/${slug}/${p.id}`)}
-                    className="flex items-stretch bg-card border-2 border-primary/40 rounded-xl overflow-hidden hover:border-primary hover:shadow-xl transition-all duration-300 text-left"
-                  >
-                    <div className="relative w-28 flex-shrink-0 bg-muted">
-                      <img
-                        src={image}
-                        alt={p.name}
-                        loading="lazy"
-                        className="absolute inset-0 w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0 p-3 flex flex-col justify-center">
-                      <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">{p.category}</span>
-                      <h3 className="text-sm font-bold text-foreground leading-tight line-clamp-2 mt-0.5">{p.name}</h3>
-                      {(p.weeks || p.difficulty) && (
-                        <p className="text-[11px] text-muted-foreground mt-1 line-clamp-1">
-                          {[p.weeks ? `${p.weeks} weeks` : null, p.difficulty].filter(Boolean).join(" · ")}
-                        </p>
-                      )}
-                    </div>
-                  </button>
-                );
-              })}
+            <div className="rounded-xl border-2 border-green-500/60 bg-green-500/[0.05] p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-sm font-extrabold tracking-tight text-green-400 uppercase">Featured Training Programs</span>
+                <div className="h-px flex-1 bg-green-500/30" />
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                {latestPrograms.slice(0, 3).map((p: any) => {
+                  const slug = programCategoryToSlug(p.category);
+                  const image = p.image_url || programMobileImages[slug] || "/images/programs/functional-strength-card-mobile.jpg";
+                  return (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => navigate(`/trainingprogram/${slug}/${p.id}`)}
+                      className="flex items-stretch bg-card border border-border rounded-xl overflow-hidden hover:border-green-400 hover:shadow-lg transition-all duration-300 text-left"
+                    >
+                      <div className="relative w-28 flex-shrink-0 bg-muted">
+                        <img
+                          src={image}
+                          alt={p.name}
+                          loading="lazy"
+                          className="absolute inset-0 w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0 p-3 flex flex-col justify-center">
+                        <span className="text-[10px] font-semibold uppercase tracking-wider text-green-400">{p.category}</span>
+                        <h3 className="text-sm font-bold text-foreground leading-tight line-clamp-2 mt-0.5">{p.name}</h3>
+                        {(p.weeks || p.difficulty) && (
+                          <p className="text-[11px] text-muted-foreground mt-1 line-clamp-1">
+                            {[p.weeks ? `${p.weeks} weeks` : null, p.difficulty].filter(Boolean).join(" · ")}
+                          </p>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
         )}
