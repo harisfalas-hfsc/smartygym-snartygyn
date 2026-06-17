@@ -1,6 +1,6 @@
 # SmartyGym — Full Knowledge File for AI Systems
 # URL: https://smartygym.com
-# Generated: 2026-06-17T11:07:15.133Z
+# Generated: 2026-06-17T14:22:35.796Z
 # Source: live database (auto-regenerated on every publish)
 #
 # This file gives ChatGPT, Claude, Gemini, Grok, Perplexity, Copilot and
@@ -770,7 +770,7 @@ Creatine monohydrate stands as the most extensively studied supplement in sports
 
 ---
 
-## Workouts (526 visible)
+## Workouts (527 visible)
 
 - Total Body Anchor (STRENGTH, Beginner, 45 min, REPS & SETS) — This beginner-friendly full-body strength workout focuses on fundamental movement patterns using gym equipment. Build a solid foundation by prioritizing proper form and controlled movements. You'll engage all major muscle groups,…
 - Hinge & Press Foundations (STRENGTH, Beginner, 45 min, REPS & SETS) — This beginner-friendly workout focuses on building a solid foundation in lower body pulling and upper body pushing patterns. You'll improve hamstring and glute strength, as well as developing your chest, shoulders, and triceps. Expect a…
@@ -926,6 +926,7 @@ Creatine monohydrate stands as the most extensively studied supplement in sports
 - Full Pillar Strength (STRENGTH, Advanced, 50 min, REPS & SETS) — An advanced bodyweight protocol designed to maximize mechanical tension and neuromuscular drive. We utilize high-threshold progressions to stimulate full-body hypertrophy and absolute strength without external loads.
 - Pillar Press Pull (STRENGTH, Beginner, 45 min, REPS & SETS) — Forge a solid upper body foundation with this beginner-friendly strength session. Focus on controlled movements and proper form to build foundational strength in your chest, back, and arms. This workout emphasizes quality over speed,…
 - Granite Descent Challenge (CHALLENGE, Intermediate, 35 min, AMRAP) — Descend into a relentless AMRAP challenge designed to test your mental fortitude and physical endurance. This workout combines compound movements with unilateral actions, pushing you to maintain intensity and form under accumulating…
+- Calorie Crusher (CALORIE BURNING, Advanced, Various, CIRCUIT) — An advanced high-output conditioning session designed to maximize metabolic demand using explosive plyometrics and rapid transitions. This workout utilizes compound bodyweight movements to elevate the heart rate and sustain a high…
 - Granite Compass Ascent (CHALLENGE, Advanced, 110 min, FOR TIME) — Today's challenge is a true test of grit and determination. Navigate a demanding series of movements designed to push your cardiovascular and muscular endurance to their limits. This workout demands relentless effort and strategic pacing;…
 - Trial Gauntlet Grinder (CHALLENGE, Intermediate, 35 min, AMRAP) — This challenge pushes your bodyweight endurance and mental grit. It's a true test of how much work you can get done when the clock is ticking. Prepare to dig deep and find your limits in this high-intensity AMRAP session.
 - Velocity Core Burst (CALORIE BURNING, Beginner, 35 min, CIRCUIT) — This beginner-friendly, bodyweight circuit focuses on igniting your metabolism and building foundational strength. Expect a high-energy flow that will leave you feeling invigorated and accomplished. You'll work through a series of…
@@ -1464,14 +1465,6 @@ A 6-week intermediate mobility program focusing on joint health, dynamic stretch
 
 A 6-week intermediate program designed to alleviate low back pain through targeted core strengthening, hip mobility, and proper movement patterns. Safe, effective, and equipment-free.
 
-### Spine Strength Master
-- Category: LOW BACK PAIN
-- Duration: 8 weeks, 4 days/week
-- Difficulty: Advanced
-- Equipment: Bodyweight, Light Dumbbells, Stability Ball
-
-An advanced 8-week program for those who have completed basic rehabilitation, focusing on building resilient spine strength and injury prevention.
-
 ### 90-Day Shred Challenge
 - Category: WEIGHT LOSS
 - Duration: 12 weeks, 5 days/week
@@ -1479,6 +1472,14 @@ An advanced 8-week program for those who have completed basic rehabilitation, fo
 - Equipment: Equipment
 
 An intense 12-week advanced weight loss program combining HIIT, Tabata, metabolic conditioning, and multi-modality cardio training for maximum fat burning. This comprehensive program utilizes gym equipment including treadmills, bikes, ellipticals, air bikes, and battle ropes to create variety and challenge your body continuously.
+
+### Spine Strength Master
+- Category: LOW BACK PAIN
+- Duration: 8 weeks, 4 days/week
+- Difficulty: Advanced
+- Equipment: Bodyweight, Light Dumbbells, Stability Ball
+
+An advanced 8-week program for those who have completed basic rehabilitation, focusing on building resilient spine strength and injury prevention.
 
 ### Run Your First 10K
 - Category: CARDIO ENDURANCE
