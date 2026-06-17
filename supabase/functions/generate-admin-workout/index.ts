@@ -363,11 +363,15 @@ function humanizeTempoRestInExerciseLines(html: string): string {
     let tail = li.slice(splitAt);
 
     tail = tail.replace(
-      /(?:@\s*|tempo\s*[:\-]?\s*)?([0-9X]{4})\b(?:\s*[,;]?\s*rest\s*[:\-]?\s*(\d+)\s*(?:s|sec|secs|seconds?))?/gi,
+      /(?:@\s*|tempo\s*[:\-]?\s*)([0-9X]{4})\b(?:\s*[,;]?\s*rest\s*[:\-]?\s*(\d+)\s*(?:s|sec|secs|seconds?))?/gi,
       (_match, code: string, restSeconds?: string) => {
         const rest = restSeconds ? `; rest ${restSeconds} sec` : "";
         return ` — ${describeTempoCode(code)}${rest}`;
       },
+    );
+    tail = tail.replace(
+      /\b([0-9X]{4})\b\s*[,;]?\s*rest\s*[:\-]?\s*(\d+)\s*(?:s|sec|secs|seconds?)\b/gi,
+      (_match, code: string, restSeconds: string) => ` — ${describeTempoCode(code)}; rest ${restSeconds} sec`,
     );
 
     tail = tail.replace(/\s*,\s*rest\s*[:\-]?\s*(\d+)\s*(?:s|sec|secs|seconds?)\b/gi, "; rest $1 sec");
