@@ -341,6 +341,43 @@ function mergeOrphanTempoRestBullets(html: string): string {
   return result;
 }
 
+function describeTempoCode(code: string): string {
+  const phases = ["lower", "pause", "lift", "reset"];
+  const parts = code.toUpperCase().split("").map((char, index) => {
+    const phase = phases[index] || "phase";
+    if (char === "X") return `explosive ${phase}`;
+    if (char === "0") return `no ${phase}`;
+    return `${char}-sec ${phase}`;
+  });
+  return `tempo ${parts.join(", ")}`;
+}
+
+function humanizeTempoRestInExerciseLines(html: string): string {
+  if (!html) return html;
+  return html.replace(/<li\b[^>]*>[\s\S]*?<\/li>/gi, (li) => {
+    const tokenMatch = /\{\{exercise:[^}]+\}\}/i.exec(li);
+    if (!tokenMatch) return li;
+
+    const splitAt = tokenMatch.index + tokenMatch[0].length;
+    const head = li.slice(0, splitAt);
+    let tail = li.slice(splitAt);
+
+    tail = tail.replace(
+      /(?:@\s*|tempo\s*[:\-]?\s*)?([0-9X]{4})\b(?:\s*[,;]?\s*rest\s*[:\-]?\s*(\d+)\s*(?:s|sec|secs|seconds?))?/gi,
+      (_match, code: string, restSeconds?: string) => {
+        const rest = restSeconds ? `; rest ${restSeconds} sec` : "";
+        return ` — ${describeTempoCode(code)}${rest}`;
+      },
+    );
+
+    tail = tail.replace(/\s*,\s*rest\s*[:\-]?\s*(\d+)\s*(?:s|sec|secs|seconds?)\b/gi, "; rest $1 sec");
+    tail = tail.replace(/\brest\s*[:\-]?\s*(\d+)\s*(?:s|sec|secs|seconds?)\b/gi, "rest $1 sec");
+    tail = tail.replace(/\s+([,;])/g, "$1").replace(/\s{2,}/g, " ");
+
+    return head + tail;
+  });
+}
+
 function extractIconSection(html: string, startIcon: string, endIcons: string[]): string {
   const start = html.indexOf(startIcon);
   if (start === -1) return "";
@@ -549,7 +586,7 @@ serve(async (req) => {
         }
 
         const mergedOrphans = mergeOrphanTempoRestBullets(content.main_workout);
-        content.main_workout = mergedOrphans;
+        content.main_workout = humanizeTempoRestInExerciseLines(mergedOrphans);
         const protocolSweep = sanitizeProtocolBlocks(stripWorkoutProtocolHeaderDurations(content.main_workout));
       if (protocolSweep.flaggedForReview.length > 0) {
         log("Protocol review warnings (continuing)", {
