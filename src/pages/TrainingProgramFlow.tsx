@@ -16,9 +16,11 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, type CarouselApi } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
 import { CategoryCountBadge } from "@/components/ui/category-count-badge";
 import { SwipeToExplore } from "@/components/ui/SwipeToExplore";
 
+type VisibleProgramMetadata = Database["public"]["Functions"]["get_visible_program_metadata"]["Returns"][number];
 
 const TrainingProgramFlow = () => {
   const navigate = useNavigate();
@@ -77,9 +79,8 @@ const TrainingProgramFlow = () => {
   const { data: latestPrograms = [] } = useQuery({
     queryKey: ["featured-latest-programs"],
     queryFn: async () => {
-      const { data } = await (supabase as any)
-        .rpc("get_visible_program_metadata", { _program_id: null });
-      return ((data || []) as any[])
+      const { data } = await supabase.rpc("get_visible_program_metadata", {});
+      return (data || [])
         .filter((p) => p.is_visible !== false && !!p.created_at)
         .sort((a, b) => String(b.created_at || "").localeCompare(String(a.created_at || "")))
         .slice(0, 3);
@@ -176,7 +177,7 @@ const TrainingProgramFlow = () => {
     navigate(`/trainingprogram/${programId}`);
   };
 
-  const renderFeaturedProgramCard = (program: any, variant: "desktop" | "mobile") => {
+  const renderFeaturedProgramCard = (program: VisibleProgramMetadata, variant: "desktop" | "mobile") => {
     const slug = programCategoryToSlug(program.category);
     const image = program.image_url || programMobileImages[slug] || "/images/programs/functional-strength-card-mobile.jpg";
     const isDesktop = variant === "desktop";
@@ -499,7 +500,7 @@ const TrainingProgramFlow = () => {
                 <div className="h-px flex-1 bg-green-500/30" />
               </div>
               <div className="grid grid-cols-3 items-stretch gap-4">
-                {latestPrograms.slice(0, 3).map((p: any) => renderFeaturedProgramCard(p, "desktop"))}
+                {latestPrograms.slice(0, 3).map((p) => renderFeaturedProgramCard(p, "desktop"))}
               </div>
             </div>
           </div>
@@ -513,7 +514,7 @@ const TrainingProgramFlow = () => {
               <div className="h-px flex-1 bg-primary/20" />
             </div>
             <div className="flex flex-col gap-3">
-              {latestPrograms.map((p: any) => renderFeaturedProgramCard(p, "mobile"))}
+              {latestPrograms.map((p) => renderFeaturedProgramCard(p, "mobile"))}
             </div>
           </div>
         )}
