@@ -232,5 +232,5 @@ function wrapLooseExerciseParagraphRuns(html: string): string {
 
     return `<ul class="tiptap-bullet-list">${items.join('')}</ul>`;
     });
-  });
+  }).join('');
 }
