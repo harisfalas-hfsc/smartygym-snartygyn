@@ -756,32 +756,20 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
             )}
           </div>
 
-          {/* Notification Toggle - Only show for new programs */}
+          {/* Notification info — sending is handled automatically by the new-content cron.
+              The manual toggle was removed to avoid duplicate notifications. */}
           {!isExistingProgram && (
-            <div className="space-y-2 pt-4 border-t border-orange-200 bg-orange-50/50 p-4 rounded-lg">
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <Label htmlFor="send_notification" className="text-orange-800 font-semibold">
-                    📢 Send Notification to Users
-                  </Label>
-                  <p className="text-sm text-orange-700">
-                    Enable to notify all users about this new program via email and dashboard
-                  </p>
-                </div>
-                <Switch
-                  id="send_notification"
-                  checked={sendNotification}
-                  onCheckedChange={setSendNotification}
-                />
-              </div>
-              {sendNotification && (
-                <p className="text-sm text-orange-600 bg-orange-100 p-2 rounded mt-2">
-                  ⚠️ Users will receive a notification about this program. Make sure content is ready!
-                </p>
-              )}
+            <div className="space-y-1 pt-4 border-t border-orange-200 bg-orange-50/50 p-4 rounded-lg">
+              <p className="text-sm text-orange-800 font-semibold">
+                📢 Users will be notified automatically
+              </p>
+              <p className="text-sm text-orange-700">
+                A new-content notification (email + dashboard) is sent by the scheduled job once this
+                program goes live. Users who don't want these can opt out in their notification settings.
+              </p>
               {formData.name && /test/i.test(formData.name) && (
                 <p className="text-sm text-amber-600 bg-amber-100 p-2 rounded mt-2">
-                  🧪 Test program detected - notifications will be automatically skipped
+                  🧪 Test program detected — notifications will be automatically skipped.
                 </p>
               )}
             </div>
