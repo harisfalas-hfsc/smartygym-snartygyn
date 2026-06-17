@@ -295,6 +295,52 @@ function stripWorkoutProtocolHeaderDurations(html: string): string {
   );
 }
 
+// Merge orphan tempo/rest <li> items into the previous <li>.
+// Matches lines whose visible text is only things like:
+//   "32X1", "@ 32X1", "rest 100s", "rest 100 seconds",
+//   "32X1, rest 100s", "tempo 32X1, rest 100s", "31X1 rest 90 sec"
+function mergeOrphanTempoRestBullets(html: string): string {
+  if (!html) return html;
+  const liRegex = /<li\b[^>]*>[\s\S]*?<\/li>/gi;
+  const items = html.match(liRegex);
+  if (!items || items.length < 2) return html;
+
+  const visibleText = (li: string) =>
+    li.replace(/<[^>]+>/g, " ").replace(/&nbsp;/gi, " ").replace(/\s+/g, " ").trim();
+
+  // Strict orphan pattern: tempo code and/or rest directive only, no exercise token.
+  const orphanPattern = /^(?:@\s*)?(?:tempo\s*[:\-]?\s*)?(?:\d{2}[X0-9]{2})?\s*[,;]?\s*(?:rest\s*[:\-]?\s*\d+\s*(?:s|sec|secs|seconds?|m|min|mins|minutes?))?\s*$/i;
+  const containsExerciseToken = (s: string) => /\{\{exercise:/i.test(s);
+
+  let result = html;
+  for (let i = 1; i < items.length; i++) {
+    const cur = items[i];
+    const text = visibleText(cur);
+    if (!text) continue;
+    if (containsExerciseToken(cur)) continue;
+    if (!orphanPattern.test(text)) continue;
+
+    const prev = items[i - 1];
+    if (!containsExerciseToken(prev)) continue;
+
+    // Inject the orphan text at the end of the previous <li>'s last <p> (or before </li>).
+    const inline = " @ " + text.replace(/^@\s*/, "").replace(/^tempo\s*[:\-]?\s*/i, "");
+    let mergedPrev: string;
+    if (/<\/p>\s*<\/li>\s*$/i.test(prev)) {
+      mergedPrev = prev.replace(/<\/p>(\s*<\/li>\s*)$/i, inline + "</p>$1");
+    } else {
+      mergedPrev = prev.replace(/<\/li>\s*$/i, inline + "</li>");
+    }
+    // Remove the orphan <li> from the html and update prev in place.
+    result = result.replace(cur, "");
+    result = result.replace(prev, mergedPrev);
+    items[i - 1] = mergedPrev;
+  }
+  // Collapse any empty <ul>...</ul> left behind or stray whitespace.
+  result = result.replace(/<ul[^>]*>\s*<\/ul>/gi, "");
+  return result;
+}
+
 function extractIconSection(html: string, startIcon: string, endIcons: string[]): string {
   const start = html.indexOf(startIcon);
   if (start === -1) return "";
