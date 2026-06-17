@@ -1351,7 +1351,7 @@ const Index = () => {
           </div>
 
           {/* The SmartyGym Promise */}
-          <Card className="dark-band border-2 border-primary/30 overflow-hidden relative rounded-2xl">
+          <Card className="dark-band border-2 border-green-500 overflow-hidden relative rounded-2xl">
             <span aria-hidden="true" className="ghost-headline ghost-headline-on-dark absolute top-4 left-1/2 -translate-x-1/2 text-[60px] md:text-[110px] leading-none opacity-40 hidden md:block pointer-events-none whitespace-nowrap">
               PROMISE
             </span>
