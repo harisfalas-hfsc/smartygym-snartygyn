@@ -153,6 +153,12 @@ export const WorkoutDisplay = ({
     content: "",
   });
 
+  const workoutContentHtml = joinWorkoutSections([activation, warm_up, main_workout, finisher, cool_down]);
+  const trainingScheduleHtml = weekly_schedule ? normalizeWorkoutHtml(weekly_schedule) : '';
+  const personalProgramHtml = programContent ? normalizeWorkoutHtml(programContent) : '';
+  const instructionsHtml = instructions || program_structure ? normalizeWorkoutHtml(instructions || program_structure || '') : '';
+  const tipsHtml = tips || nutrition_tips ? normalizeWorkoutHtml(tips || nutrition_tips || '') : '';
+
   const openReader = (sectionTitle: string, html: string) => {
     setReader({
       open: true,
@@ -297,7 +303,7 @@ export const WorkoutDisplay = ({
       <div className="mt-8">
         
         {/* WORKOUT CONTENT - All workout fields displayed as single combined block */}
-        {(activation || warm_up || main_workout || finisher || cool_down) && (
+        {workoutContentHtml && (
           <Card className="border-2 border-primary/30">
             <CardHeader className="bg-primary/5">
               <div className="flex items-center justify-between gap-2">
@@ -308,7 +314,7 @@ export const WorkoutDisplay = ({
                   variant="outline"
                   size="sm"
                   className="gap-2 shrink-0"
-                  onClick={() => openReader("Workout", joinWorkoutSections([activation, warm_up, main_workout, finisher, cool_down]))}
+                  onClick={() => openReader("Workout", workoutContentHtml)}
                 >
                   <BookOpen className="h-4 w-4" />
                   <span className="hidden sm:inline">Reader Mode</span>
@@ -319,7 +325,7 @@ export const WorkoutDisplay = ({
               <A4Container>
                 <div className="workout-content">
                   <ExerciseHTMLContent 
-                    content={joinWorkoutSections([activation, warm_up, main_workout, finisher, cool_down])} 
+                    content={workoutContentHtml} 
                     className="text-base" 
                     enableExerciseLinking={true} 
                   />
@@ -330,7 +336,7 @@ export const WorkoutDisplay = ({
         )}
 
         {/* TRAINING PROGRAM CONTENT - Display exactly as written */}
-        {weekly_schedule && (
+        {trainingScheduleHtml && (
           <Card className="border-2 border-primary/30">
             <CardHeader className="bg-primary/5">
               <div className="flex items-center justify-between gap-2">
@@ -341,7 +347,7 @@ export const WorkoutDisplay = ({
                   variant="outline"
                   size="sm"
                   className="gap-2 shrink-0"
-                  onClick={() => openReader("Training Program", weekly_schedule)}
+                  onClick={() => openReader("Training Program", trainingScheduleHtml)}
                 >
                   <BookOpen className="h-4 w-4" />
                   <span className="hidden sm:inline">Reader Mode</span>
@@ -351,7 +357,7 @@ export const WorkoutDisplay = ({
             <CardContent className="content-container pt-6">
               <A4Container>
                 <div className="workout-content">
-                  <ExerciseHTMLContent content={weekly_schedule} className="text-base" enableExerciseLinking={true} />
+                  <ExerciseHTMLContent content={trainingScheduleHtml} className="text-base" enableExerciseLinking={true} />
                 </div>
               </A4Container>
             </CardContent>
@@ -359,7 +365,7 @@ export const WorkoutDisplay = ({
         )}
 
         {/* PERSONAL TRAINING PROGRAM CONTENT - Display exactly as written */}
-        {programContent && (
+        {personalProgramHtml && (
           <Card className="border-2 border-primary/30">
             <CardHeader className="bg-primary/5">
               <div className="flex items-center justify-between gap-2">
@@ -370,7 +376,7 @@ export const WorkoutDisplay = ({
                   variant="outline"
                   size="sm"
                   className="gap-2 shrink-0"
-                  onClick={() => openReader("Training Program", programContent)}
+                  onClick={() => openReader("Training Program", personalProgramHtml)}
                 >
                   <BookOpen className="h-4 w-4" />
                   <span className="hidden sm:inline">Reader Mode</span>
@@ -380,7 +386,7 @@ export const WorkoutDisplay = ({
             <CardContent className="content-container pt-6">
               <A4Container>
                 <div className="workout-content">
-                  <ExerciseHTMLContent content={programContent} className="text-base" enableExerciseLinking={true} />
+                  <ExerciseHTMLContent content={personalProgramHtml} className="text-base" enableExerciseLinking={true} />
                 </div>
               </A4Container>
             </CardContent>
@@ -388,7 +394,7 @@ export const WorkoutDisplay = ({
         )}
 
         {/* INSTRUCTIONS - Display exactly as written */}
-        {(instructions || program_structure) && (
+        {instructionsHtml && (
           <Card className="border-2 border-primary/30">
             <CardHeader className="bg-primary/5">
               <CardTitle className="flex items-center gap-2 text-2xl font-bold">
@@ -400,7 +406,7 @@ export const WorkoutDisplay = ({
               <A4Container>
                 <div className="workout-content">
                   <ExerciseHTMLContent
-                    content={instructions || program_structure || ''}
+                    content={instructionsHtml}
                     className="text-base"
                     enableExerciseLinking={true}
                   />
@@ -411,7 +417,7 @@ export const WorkoutDisplay = ({
         )}
 
         {/* TIPS - Display exactly as written */}
-        {(tips || nutrition_tips) && (
+        {tipsHtml && (
           <Card className="border-2 border-primary/30">
             <CardHeader className="bg-primary/5">
               <CardTitle className="flex items-center gap-2 text-2xl font-bold">
@@ -422,7 +428,7 @@ export const WorkoutDisplay = ({
               <A4Container>
                 <div className="workout-content">
                   <ExerciseHTMLContent
-                    content={tips || nutrition_tips || ''}
+                    content={tipsHtml}
                     className="text-base"
                     enableExerciseLinking={true}
                   />
