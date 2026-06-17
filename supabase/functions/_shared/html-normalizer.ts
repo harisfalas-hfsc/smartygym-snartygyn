@@ -362,21 +362,25 @@ export function wrapLooseExerciseParagraphRuns(html: string): string {
   const exerciseParagraph = '<p[^>]*>(?:(?!<\\/p>)[\\s\\S])*?\\{\\{exercise:[^}]+\\}\\}(?:(?!<\\/p>)[\\s\\S])*?<\\/p>';
   const runPattern = new RegExp(`((?:${exerciseParagraph})+)`, 'gi');
 
-  return html.replace(runPattern, (run) => {
-    const items: string[] = [];
-    run.replace(/<p[^>]*>([\s\S]*?)<\/p>/gi, (_match, pContent) => {
-      if (/\{\{exercise:[^}]+\}\}/i.test(pContent) && !/[🧽🔥💪⚡🧘]/.test(pContent)) {
-        items.push(`<li class="tiptap-list-item"><p class="tiptap-paragraph">${pContent.trim()}</p></li>`);
+  return html.split(/(<ul\b[\s\S]*?<\/ul>)/gi).map((part) => {
+    if (/^<ul\b/i.test(part.trim())) return part;
+
+    return part.replace(runPattern, (run) => {
+      const items: string[] = [];
+      run.replace(/<p[^>]*>([\s\S]*?)<\/p>/gi, (_match, pContent) => {
+        if (/\{\{exercise:[^}]+\}\}/i.test(pContent) && !/[🧽🔥💪⚡🧘]/.test(pContent)) {
+          items.push(`<li class="tiptap-list-item"><p class="tiptap-paragraph">${pContent.trim()}</p></li>`);
+        }
+        return '';
+      });
+
+      if (items.length === 0) {
+        return run;
       }
-      return '';
+
+      return `<ul class="tiptap-bullet-list">${items.join('')}</ul>`;
     });
-
-    if (items.length === 0) {
-      return run;
-    }
-
-    return `<ul class="tiptap-bullet-list">${items.join('')}</ul>`;
-  });
+  }).join('');
 }
 
 export function validateWorkoutHtml(content: string): { isValid: boolean; issues: string[] } {
