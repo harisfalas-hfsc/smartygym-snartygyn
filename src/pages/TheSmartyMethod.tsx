@@ -12,7 +12,7 @@ import {
   ChevronRight, Award, Flame, Brain, Zap,
   BarChart3, CheckCircle2, Activity, Waves, Mountain,
   Timer, Baby, Plane, Briefcase, Star,
-  LineChart, Goal
+  LineChart, Goal, Smartphone
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, ResponsiveContainer,
@@ -56,6 +56,7 @@ const TheSmartyMethod = () => {
     { icon: Baby, title: "Designed for Real Life", description: "Whether you're a parent, a traveler, a busy professional, or a student — the Workout of the Day handles the planning so you don't have to." },
     { icon: Mountain, title: "Progressive & Purposeful", description: "No random workouts. Each day builds on the previous one. Each week follows a structured plan. Every session has a clear objective." },
     { icon: Timer, title: "Time-Efficient Programming", description: "Sessions designed to deliver maximum results in realistic timeframes. Because your time is valuable and every minute must count." },
+    { icon: Smartphone, title: "Total Convenience", description: "Your entire training system fits in your pocket. Access workouts, programs, and tracking wherever you are — no spreadsheets, no guesswork, no excuses." },
   ];
 
   const workoutStructure = [
