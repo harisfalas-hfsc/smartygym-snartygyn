@@ -114,7 +114,7 @@ const TrainingProgramFlow = () => {
     "cardio-endurance": "/images/programs/cardio-endurance-card-mobile.jpg",
     "functional-strength": "/images/programs/functional-strength-card-mobile.jpg",
     "muscle-hypertrophy": "/images/programs/muscle-hypertrophy-card-mobile.jpg",
-    "weight-loss": "/images/programs/weight-loss-healthy-meal.jpg",
+    "weight-loss": "/images/programs/weight-loss-training.jpg",
     "low-back-pain": "/images/programs/low-back-pain-card-mobile.jpg",
     "mobility-stability": "/images/programs/mobility-stability-card-mobile.jpg",
   };
