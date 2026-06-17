@@ -78,8 +78,10 @@ export function normalizeWorkoutHtml(content: string): string {
   // STEP 12: Remove orphan bullets
   result = removeOrphanExerciseListItems(result);
   
-  // STEP 13: Absorb orphan exercise paragraphs
+  // STEP 13: Absorb/wrap orphan exercise paragraphs so every exercise line is a bullet
   result = absorbOrphanExerciseParagraphs(result);
+  result = wrapLooseExerciseParagraphRuns(result);
+  result = result.replace(/<\/ul>(?:<p[^>]*>\s*<\/p>)*<ul[^>]*>/gi, '');
   
   // Final collapse
   result = result.replace(/(<p class="tiptap-paragraph"><\/p>){2,}/gi, CANONICAL_EMPTY_P);
@@ -188,13 +190,47 @@ function removeOrphanExerciseListItems(html: string): string {
 
 function absorbOrphanExerciseParagraphs(html: string): string {
   if (!html) return html;
-  return html.replace(
-    /<\/ul>(<p[^>]*>([\s\S]*?)<\/p>)(?=<|\s*$)/gi,
-    (match, _pTag, pContent) => {
-      if (/\{\{exercise:[^}]+\}\}/.test(pContent)) {
-        return `<li class="tiptap-list-item"><p class="tiptap-paragraph">${pContent.trim()}</p></li></ul>`;
+  let result = html;
+  let previous: string;
+
+  do {
+    previous = result;
+    result = result.replace(
+      /<\/ul>(?:<p[^>]*>\s*<\/p>)*(<p[^>]*>([\s\S]*?)<\/p>)/gi,
+      (match, _pTag, pContent) => {
+        if (/\{\{exercise:[^}]+\}\}/i.test(pContent)) {
+          return `<li class="tiptap-list-item"><p class="tiptap-paragraph">${pContent.trim()}</p></li></ul>`;
+        }
+        return match;
       }
-      return match;
+    );
+  } while (result !== previous);
+
+  return result;
+}
+
+function wrapLooseExerciseParagraphRuns(html: string): string {
+  if (!html) return html;
+  const exerciseParagraph = '<p[^>]*>(?:(?!<\\/p>)[\\s\\S])*?\\{\\{exercise:[^}]+\\}\\}(?:(?!<\\/p>)[\\s\\S])*?<\\/p>';
+  const runPattern = new RegExp(`((?:${exerciseParagraph})+)`, 'gi');
+
+  return html.split(/(<ul\b[\s\S]*?<\/ul>)/gi).map((part) => {
+    if (/^<ul\b/i.test(part.trim())) return part;
+
+    return part.replace(runPattern, (run) => {
+    const items: string[] = [];
+    run.replace(/<p[^>]*>([\s\S]*?)<\/p>/gi, (_match, pContent) => {
+      if (/\{\{exercise:[^}]+\}\}/i.test(pContent) && !/[🧽🔥💪⚡🧘]/.test(pContent)) {
+        items.push(`<li class="tiptap-list-item"><p class="tiptap-paragraph">${pContent.trim()}</p></li>`);
+      }
+      return '';
+    });
+
+    if (items.length === 0) {
+      return run;
     }
-  );
+
+    return `<ul class="tiptap-bullet-list">${items.join('')}</ul>`;
+    });
+  }).join('');
 }

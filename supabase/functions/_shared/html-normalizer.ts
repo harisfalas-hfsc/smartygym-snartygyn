@@ -97,8 +97,10 @@ export function normalizeWorkoutHtml(content: string): string {
   // STEP 12: Remove orphan bullets
   result = removeOrphanExerciseListItems(result);
   
-  // STEP 13: Move orphan exercise <p> tags outside lists into the list
+  // STEP 13: Move/wrap orphan exercise <p> tags outside lists into bullets
   result = absorbOrphanExerciseParagraphs(result);
+  result = wrapLooseExerciseParagraphRuns(result);
+  result = result.replace(/<\/ul>(?:<p[^>]*>\s*<\/p>)*<ul[^>]*>/gi, '');
 
   // STEP 14: Cool Down consistency — absorb orphan Static Stretching /
   // Breathing / Diaphragmatic Breathing paragraphs that sit AFTER the
@@ -335,20 +337,50 @@ export function removeOrphanExerciseListItems(html: string): string {
  */
 export function absorbOrphanExerciseParagraphs(html: string): string {
   if (!html) return html;
-  
-  // Pattern: </ul><p...>...{{exercise:...}}...</p> → absorb into preceding list
-  let result = html.replace(
-    /<\/ul>(<p[^>]*>([\s\S]*?)<\/p>)(?=<|\s*$)/gi,
-    (match, pTag, pContent) => {
-      if (/\{\{exercise:[^}]+\}\}/.test(pContent)) {
-        // This orphan <p> has an exercise - absorb it as a <li> into the preceding list
-        return `<li class="tiptap-list-item"><p class="tiptap-paragraph">${pContent.trim()}</p></li></ul>`;
+
+  let result = html;
+  let previous: string;
+
+  do {
+    previous = result;
+    result = result.replace(
+      /<\/ul>(?:<p[^>]*>\s*<\/p>)*(<p[^>]*>([\s\S]*?)<\/p>)/gi,
+      (match, _pTag, pContent) => {
+        if (/\{\{exercise:[^}]+\}\}/i.test(pContent)) {
+          return `<li class="tiptap-list-item"><p class="tiptap-paragraph">${pContent.trim()}</p></li></ul>`;
+        }
+        return match;
       }
-      return match;
-    }
-  );
+    );
+  } while (result !== previous);
   
   return result;
+}
+
+export function wrapLooseExerciseParagraphRuns(html: string): string {
+  if (!html) return html;
+  const exerciseParagraph = '<p[^>]*>(?:(?!<\\/p>)[\\s\\S])*?\\{\\{exercise:[^}]+\\}\\}(?:(?!<\\/p>)[\\s\\S])*?<\\/p>';
+  const runPattern = new RegExp(`((?:${exerciseParagraph})+)`, 'gi');
+
+  return html.split(/(<ul\b[\s\S]*?<\/ul>)/gi).map((part) => {
+    if (/^<ul\b/i.test(part.trim())) return part;
+
+    return part.replace(runPattern, (run) => {
+      const items: string[] = [];
+      run.replace(/<p[^>]*>([\s\S]*?)<\/p>/gi, (_match, pContent) => {
+        if (/\{\{exercise:[^}]+\}\}/i.test(pContent) && !/[🧽🔥💪⚡🧘]/.test(pContent)) {
+          items.push(`<li class="tiptap-list-item"><p class="tiptap-paragraph">${pContent.trim()}</p></li>`);
+        }
+        return '';
+      });
+
+      if (items.length === 0) {
+        return run;
+      }
+
+      return `<ul class="tiptap-bullet-list">${items.join('')}</ul>`;
+    });
+  }).join('');
 }
 
 export function validateWorkoutHtml(content: string): { isValid: boolean; issues: string[] } {
