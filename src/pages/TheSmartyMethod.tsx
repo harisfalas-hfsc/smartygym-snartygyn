@@ -4,7 +4,7 @@ import { ScrollReveal } from "@/components/ScrollReveal";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { SUBSCRIPTION_PRICES, SUBSCRIPTION_BILLING_PERIODS } from "@/config/pricing";
+import { SUBSCRIPTION_PRICES } from "@/config/pricing";
 import {
   Shield, TrendingUp, Target, Heart, Clock,
   Dumbbell, CalendarDays, ListChecks, Sparkles, Wrench,
@@ -56,7 +56,7 @@ const TheSmartyMethod = () => {
     { icon: Baby, title: "Designed for Real Life", description: "Whether you're a parent, a traveler, a busy professional, or a student — the Workout of the Day handles the planning so you don't have to." },
     { icon: Mountain, title: "Progressive & Purposeful", description: "No random workouts. Each day builds on the previous one. Each week follows a structured plan. Every session has a clear objective." },
     { icon: Timer, title: "Time-Efficient Programming", description: "Sessions designed to deliver maximum results in realistic timeframes. Because your time is valuable and every minute must count." },
-    { icon: Smartphone, title: "Total Convenience", description: "Your entire training system fits in your pocket. Access workouts, programs, and tracking wherever you are — no spreadsheets, no guesswork, no excuses." },
+    { icon: Smartphone, title: "Total Convenience", description: "Train anywhere, anytime. Access workouts, programs, tracking, and tools from your pocket — no spreadsheets, no guesswork." },
   ];
 
   const workoutStructure = [
@@ -296,37 +296,24 @@ const TheSmartyMethod = () => {
             </section>
           </ScrollReveal>
 
-          {/* Two Smarty Plans */}
+          {/* Smarty Premium Plan */}
           <ScrollReveal delay={100}>
             <section className="mb-16">
-              <h2 className="text-2xl sm:text-3xl font-bold mb-2 text-center">Two Smarty Plans</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold mb-2 text-center">One Smarty Plan</h2>
               <p className="text-muted-foreground text-center mb-8 max-w-2xl mx-auto">
-                Full access to the entire <SG /> ecosystem. Choose the commitment that fits your life.
+                One payment unlocks the entire <SG /> ecosystem forever.
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
-                <Card className="border-primary/30 hover:border-primary transition-colors">
-                  <CardContent className="p-6 text-center">
-                    <Crown className="w-8 h-8 text-primary/70 mx-auto mb-3" />
-                    <h3 className="text-xl font-bold mb-1">Gold Plan</h3>
-                    <p className="text-2xl font-bold text-primary mb-1">€{SUBSCRIPTION_PRICES.gold}<span className="text-sm font-normal text-muted-foreground">/month</span></p>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Full ecosystem access with the flexibility to manage your membership month to month. No long-term commitment required.
-                    </p>
-                    <Button asChild variant="outline" size="sm">
-                      <Link to="/smarty-premium">Upgrade to Premium</Link>
-                    </Button>
-                  </CardContent>
-                </Card>
+              <div className="max-w-md mx-auto">
                 <Card className="border-primary hover:shadow-lg hover:shadow-primary/10 transition-all">
                   <CardContent className="p-6 text-center">
                     <Crown className="w-8 h-8 text-primary mx-auto mb-3" />
-                    <h3 className="text-xl font-bold mb-1">Platinum Plan</h3>
-                    <p className="text-2xl font-bold text-primary mb-1">€{SUBSCRIPTION_PRICES.platinum}<span className="text-sm font-normal text-muted-foreground">/year</span></p>
+                    <h3 className="text-xl font-bold mb-1">Lifetime Membership</h3>
+                    <p className="text-2xl font-bold text-primary mb-1">€{SUBSCRIPTION_PRICES.lifetime}<span className="text-sm font-normal text-muted-foreground"> one-time</span></p>
                     <p className="text-sm text-muted-foreground mb-4">
-                      The same full access at the best value. Commit to a year of structured training and save. Serious results require serious commitment.
+                      Full access to every workout, training program, ritual, tool, and future update. No subscription, no renewals, nothing to cancel.
                     </p>
                     <Button asChild size="sm">
-                      <Link to="/smarty-premium">Upgrade to Premium</Link>
+                      <Link to="/smarty-premium">Unlock Premium</Link>
                     </Button>
                   </CardContent>
                 </Card>
