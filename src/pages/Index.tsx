@@ -259,7 +259,7 @@ const Index = () => {
 
   const getProgramCardImage = (category?: string | null, fallback?: string | null) => {
     const slug = programCategoryToSlug(category);
-    return programCards.find((card) => card.id === slug)?.image || fallback || "/images/programs/functional-strength-card-mobile.jpg";
+    return fallback || programCards.find((card) => card.id === slug)?.image || "/images/programs/functional-strength-card-mobile.jpg";
   };
 
   const { bodyweightWod, equipmentWod, variousWod, hasWods } = useTodayWods(isMobile);
