@@ -179,7 +179,7 @@ const TrainingProgramFlow = () => {
 
   const renderFeaturedProgramCard = (program: VisibleProgramMetadata, variant: "desktop" | "mobile") => {
     const slug = programCategoryToSlug(program.category);
-    const image = programMobileImages[slug] || program.image_url || "/images/programs/functional-strength-card-mobile.jpg";
+    const image = program.image_url || programMobileImages[slug] || "/images/programs/functional-strength-card-mobile.jpg";
     const isDesktop = variant === "desktop";
 
     return (
