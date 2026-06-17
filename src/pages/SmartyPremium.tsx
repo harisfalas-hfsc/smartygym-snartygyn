@@ -476,9 +476,9 @@ export default function SmartyPremium() {
                               <span>{feature.category}</span>
                             </div>
                           </td>
-                          <td className="p-4 text-right">{renderFeatureValue(feature.visitor)}</td>
-                          <td className="p-4 text-right">{renderFeatureValue(feature.subscriber)}</td>
-                          <td className="p-4 text-right">{renderFeatureValue(feature.premium)}</td>
+                          <td className="p-4 text-center"><div className="flex justify-center">{renderFeatureValue(feature.visitor)}</div></td>
+                          <td className="p-4 text-center"><div className="flex justify-center">{renderFeatureValue(feature.subscriber)}</div></td>
+                          <td className="p-4 text-center"><div className="flex justify-center">{renderFeatureValue(feature.premium)}</div></td>
                         </tr>
                       );
                     })}
