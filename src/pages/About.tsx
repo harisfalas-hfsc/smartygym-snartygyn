@@ -399,7 +399,7 @@ const About = () => {
 
           {/* The SmartyGym Promise */}
           <ScrollReveal>
-            <Card className="mb-12 border-2 border-border bg-primary/5">
+            <Card className="mb-12 border-2 border-green-500 md:border-border bg-primary/5">
               <CardContent className="p-8 lg:p-10">
                 <div className="space-y-8">
                   <div className="text-center">

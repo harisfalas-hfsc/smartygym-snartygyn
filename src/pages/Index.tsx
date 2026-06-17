@@ -1183,7 +1183,7 @@ const Index = () => {
                       <Rocket className="w-5 h-5 text-primary flex-shrink-0 mt-0.5 lg:hidden" aria-hidden="true" />
                       <div className="flex-1 text-left">
                         <div className="hidden lg:block aspect-[16/9] overflow-hidden rounded-md mb-3">
-                          <img src={valueNeverStopExpanding} alt="Upward growth chart with rocket launching" loading="lazy" width={1280} height={720} className="w-full h-full object-cover" />
+                          <img src={valueNeverStopExpanding} alt="Modern fitness gym interior representing continuous growth" loading="lazy" width={1280} height={720} className="w-full h-full object-cover" />
                         </div>
                         <p className="font-semibold text-sm mb-1 flex items-center gap-1.5">
                           <Rocket className="w-4 h-4 text-primary hidden lg:inline-block" aria-hidden="true" />
