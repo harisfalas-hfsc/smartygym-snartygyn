@@ -410,55 +410,39 @@ const About = () => {
                     <h2 className="text-2xl md:text-3xl font-bold text-foreground">The <span className="text-primary">SmartyGym</span> Promise</h2>
                   </div>
 
-                  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5 text-center">
+                  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 text-center">
                     
-                    <Card className="border-2 border-primary bg-background/80 backdrop-blur-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
-                      <CardContent className="p-5 space-y-3">
-                        <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto group-hover:bg-primary/20 transition-colors">
-                          <GraduationCap className="w-7 h-7 text-primary group-hover:scale-110 transition-transform" />
-                        </div>
-                        <h3 className="font-bold text-xl">Real Expertise</h3>
-                        <p className="text-base text-muted-foreground leading-relaxed">
-                          Every program is designed by certified coach <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> — never by AI, always with 20+ years of experience.
-                        </p>
-                      </CardContent>
-                    </Card>
+                    <div className="space-y-2">
+                      <GraduationCap className="w-8 h-8 text-primary mx-auto" />
+                      <h3 className="font-bold">Real Expertise</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Every program is designed by certified coach <a href="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</a> — never by AI, always with 20+ years of experience.
+                      </p>
+                    </div>
 
-                    <Card className="border-2 border-primary bg-background/80 backdrop-blur-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
-                      <CardContent className="p-5 space-y-3">
-                        <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto group-hover:bg-primary/20 transition-colors">
-                          <Heart className="w-7 h-7 text-primary group-hover:scale-110 transition-transform" />
-                        </div>
-                        <h3 className="font-bold text-xl">Personal Touch</h3>
-                        <p className="text-base text-muted-foreground leading-relaxed">
-                          Direct access to the coach who created your program. Real support, real guidance, real results.
-                        </p>
-                      </CardContent>
-                    </Card>
+                    <div className="space-y-2">
+                      <Heart className="w-8 h-8 text-primary mx-auto" />
+                      <h3 className="font-bold">Personal Touch</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Direct access to the coach who created your program. Real support, real guidance, real results.
+                      </p>
+                    </div>
 
-                    <Card className="border-2 border-primary bg-background/80 backdrop-blur-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
-                      <CardContent className="p-5 space-y-3">
-                        <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto group-hover:bg-primary/20 transition-colors">
-                          <UserCheck className="w-7 h-7 text-primary group-hover:scale-110 transition-transform" />
-                        </div>
-                        <h3 className="font-bold text-xl">Not a Robot</h3>
-                        <p className="text-base text-muted-foreground leading-relaxed">
-                          We don't generate workouts with algorithms. We design them with care, experience, and your goals in mind.
-                        </p>
-                      </CardContent>
-                    </Card>
+                    <div className="space-y-2">
+                      <UserCheck className="w-8 h-8 text-primary mx-auto" />
+                      <h3 className="font-bold">Not a Robot</h3>
+                      <p className="text-sm text-muted-foreground">
+                        We don't generate workouts with algorithms. We design them with care, experience, and your goals in mind.
+                      </p>
+                    </div>
 
-                    <Card className="border-2 border-primary bg-background/80 backdrop-blur-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
-                      <CardContent className="p-5 space-y-3">
-                        <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto group-hover:bg-primary/20 transition-colors">
-                          <Rocket className="w-7 h-7 text-primary group-hover:scale-110 transition-transform" />
-                        </div>
-                        <h3 className="font-bold text-xl">Never Stop Expanding</h3>
-                        <p className="text-base text-muted-foreground leading-relaxed">
-                          New workouts, programs, tools, and articles — keeping you current with the latest science and trends.
-                        </p>
-                      </CardContent>
-                    </Card>
+                    <div className="space-y-2">
+                      <Rocket className="w-8 h-8 text-primary mx-auto" />
+                      <h3 className="font-bold">Never Stop Expanding</h3>
+                      <p className="text-sm text-muted-foreground">
+                        New workouts, programs, tools, and articles — keeping you current with the latest science and trends.
+                      </p>
+                    </div>
 
                   </div>
 
