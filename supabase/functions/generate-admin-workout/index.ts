@@ -108,7 +108,7 @@ function formatGuidanceFor(format: string): string {
     case "FOR TIME":
       return `FOR TIME block: header "Main Workout (For Time)" — chipper or rounds-for-time with reps BEFORE every exercise token.`;
     case "REPS & SETS":
-      return `REPS & SETS block: each exercise starts with sets × reps, then exercise token, then tempo/rest (e.g. "4 sets × 8 reps {{exercise:ID:Name}} @ 31X1, rest 90s").`;
+      return `REPS & SETS block: each exercise starts with sets × reps, then exercise token, then readable tempo/rest (e.g. "4 sets × 8 reps {{exercise:ID:Name}} — tempo 3-sec lower, 1-sec pause, explosive lift, 1-sec reset; rest 90 sec").`;
     case "MIX":
       return `MIX block: combine a properly prescribed REPS & SETS strength portion with a properly prescribed metabolic finisher. Every exercise token needs reps/time/sets BEFORE it.`;
     default:
@@ -178,12 +178,12 @@ EXERCISE LINES — bullet lists ONLY, prescription FIRST:
 
 NON-NEGOTIABLE PRESCRIPTION RULES:
 - Every Main Workout and Finisher exercise line MUST put the measurable dose BEFORE the {{exercise:...}} token.
-- Correct REPS & SETS: "4 sets × 6 reps {{exercise:0043:barbell full squat}} @ 31X1, rest 150s".
-- WRONG and forbidden: "{{exercise:0043:barbell full squat}} 41X1" because 41X1 is tempo, not sets/reps.
-- Tempo codes (20X0, 31X1, 41X1, 21X1) are ONLY allowed AFTER an explicit sets × reps prescription.
+- Correct REPS & SETS: "4 sets × 6 reps {{exercise:0043:barbell full squat}} — tempo 3-sec lower, 1-sec pause, explosive lift, 1-sec reset; rest 150 sec".
+- WRONG and forbidden: "{{exercise:0043:barbell full squat}} 41X1" because 41X1 is tempo shorthand, not sets/reps.
+- Do NOT print compact tempo codes in final content (20X0, 31X1, 41X1, 21X1). Convert them to readable coaching language.
 - Conditioning examples: "15 reps {{exercise:1160:burpee}}", "40 sec {{exercise:0630:mountain climber}}", "200m {{exercise:0685:run}}".
 - Never list naked exercises. Never write an exercise token alone and explain reps later.
-- ABSOLUTELY FORBIDDEN: putting tempo (e.g. "32X1") or rest (e.g. "rest 100s") on a SEPARATE bullet/line after the exercise. Tempo + rest MUST be inline on the SAME <li> as the exercise token, e.g. "5 sets × 5 reps {{exercise:ID:Name}} @ 32X1, rest 100s". Never produce a bullet whose entire content is a tempo code, "rest Ns", or "tempo X, rest Y".
+- ABSOLUTELY FORBIDDEN: putting tempo or rest on a SEPARATE bullet/line after the exercise. Tempo + rest MUST be inline on the SAME <li> as the exercise token, e.g. "5 sets × 5 reps {{exercise:ID:Name}} — tempo 3-sec lower, 2-sec pause, explosive lift, 1-sec reset; rest 100 sec". Never produce a bullet whose entire content is a tempo code, "rest Ns", or "tempo X, rest Y".
 
 SECTION SEPARATORS: ONE empty paragraph between sections only: <p class="tiptap-paragraph"></p>
 
@@ -339,6 +339,47 @@ function mergeOrphanTempoRestBullets(html: string): string {
   // Collapse any empty <ul>...</ul> left behind or stray whitespace.
   result = result.replace(/<ul[^>]*>\s*<\/ul>/gi, "");
   return result;
+}
+
+function describeTempoCode(code: string): string {
+  const phases = ["lower", "pause", "lift", "reset"];
+  const parts = code.toUpperCase().split("").map((char, index) => {
+    const phase = phases[index] || "phase";
+    if (char === "X") return `explosive ${phase}`;
+    if (char === "0") return `no ${phase}`;
+    return `${char}-sec ${phase}`;
+  });
+  return `tempo ${parts.join(", ")}`;
+}
+
+function humanizeTempoRestInExerciseLines(html: string): string {
+  if (!html) return html;
+  return html.replace(/<li\b[^>]*>[\s\S]*?<\/li>/gi, (li) => {
+    const tokenMatch = /\{\{exercise:[^}]+\}\}/i.exec(li);
+    if (!tokenMatch) return li;
+
+    const splitAt = tokenMatch.index + tokenMatch[0].length;
+    const head = li.slice(0, splitAt);
+    let tail = li.slice(splitAt);
+
+    tail = tail.replace(
+      /(?:@\s*|tempo\s*[:\-]?\s*)([0-9X]{4})\b(?:\s*[,;]?\s*rest\s*[:\-]?\s*(\d+)\s*(?:s|sec|secs|seconds?))?/gi,
+      (_match, code: string, restSeconds?: string) => {
+        const rest = restSeconds ? `; rest ${restSeconds} sec` : "";
+        return ` — ${describeTempoCode(code)}${rest}`;
+      },
+    );
+    tail = tail.replace(
+      /\b([0-9X]{4})\b\s*[,;]?\s*rest\s*[:\-]?\s*(\d+)\s*(?:s|sec|secs|seconds?)\b/gi,
+      (_match, code: string, restSeconds: string) => ` — ${describeTempoCode(code)}; rest ${restSeconds} sec`,
+    );
+
+    tail = tail.replace(/\s*,\s*rest\s*[:\-]?\s*(\d+)\s*(?:s|sec|secs|seconds?)\b/gi, "; rest $1 sec");
+    tail = tail.replace(/\brest\s*[:\-]?\s*(\d+)\s*(?:s|sec|secs|seconds?)\b/gi, "rest $1 sec");
+    tail = tail.replace(/\s+([,;])/g, "$1").replace(/\s{2,}/g, " ");
+
+    return head + tail;
+  });
 }
 
 function extractIconSection(html: string, startIcon: string, endIcons: string[]): string {
@@ -549,7 +590,7 @@ serve(async (req) => {
         }
 
         const mergedOrphans = mergeOrphanTempoRestBullets(content.main_workout);
-        content.main_workout = mergedOrphans;
+        content.main_workout = humanizeTempoRestInExerciseLines(mergedOrphans);
         const protocolSweep = sanitizeProtocolBlocks(stripWorkoutProtocolHeaderDurations(content.main_workout));
       if (protocolSweep.flaggedForReview.length > 0) {
         log("Protocol review warnings (continuing)", {
