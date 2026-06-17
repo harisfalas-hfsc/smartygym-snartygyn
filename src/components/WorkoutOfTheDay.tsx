@@ -88,14 +88,14 @@ export const WorkoutOfTheDay = () => {
                 <Layers className="w-2.5 h-2.5 text-primary shrink-0" />
                 <span className={`font-medium whitespace-nowrap ${getCategoryColor(wod.category).split(' ')[1]}`}>{wod.category}</span>
               </div>
-              <span className="text-muted-foreground/50 shrink-0">•</span>
+              <span className="text-muted-foreground shrink-0">•</span>
             </>
           )}
           <div className="flex items-center gap-1 min-w-0">
             <Target className="w-2.5 h-2.5 text-primary shrink-0" />
             <span className="text-blue-600 dark:text-blue-400 font-medium whitespace-nowrap">{wod.format || "General"}</span>
           </div>
-          <span className="text-muted-foreground/50 shrink-0">•</span>
+          <span className="text-muted-foreground shrink-0">•</span>
           <div className="flex items-center gap-1 shrink-0">
             <TrendingUp className="w-2.5 h-2.5 text-primary shrink-0" />
             <span className="text-muted-foreground whitespace-nowrap">
@@ -104,7 +104,7 @@ export const WorkoutOfTheDay = () => {
                 : "All Levels"}
             </span>
           </div>
-          <span className="text-muted-foreground/50 shrink-0">•</span>
+          <span className="text-muted-foreground shrink-0">•</span>
           <div className="flex items-center gap-1 shrink-0">
             <Clock className="w-2.5 h-2.5 text-primary shrink-0" />
             <span className="text-muted-foreground whitespace-nowrap">{wod.duration || "45-60 min"}</span>

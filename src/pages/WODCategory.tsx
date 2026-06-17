@@ -162,14 +162,14 @@ const WODCategory = () => {
                     <Layers className="w-3 h-3 text-primary" />
                     <span className="text-muted-foreground font-medium">{wod.category}</span>
                   </div>
-                  <span className="text-muted-foreground/50">•</span>
+                  <span className="text-muted-foreground">•</span>
                 </>
               )}
               <div className="flex items-center gap-1">
                 <Target className="w-3 h-3 text-primary" />
                 <span className="text-blue-600 dark:text-blue-400 font-medium">{wod.format || "General"}</span>
               </div>
-              <span className="text-muted-foreground/50">•</span>
+              <span className="text-muted-foreground">•</span>
               <div className="flex items-center gap-1">
                 <TrendingUp className={`w-3 h-3 ${wod.category?.toUpperCase() === "RECOVERY" ? "text-green-600 dark:text-green-400" : getDifficultyColorClasses(wod.difficulty_stars || wod.difficulty).icon}`} />
                 <span className={`font-medium capitalize ${wod.category?.toUpperCase() === "RECOVERY" ? "text-green-600 dark:text-green-400" : getDifficultyColorClasses(wod.difficulty_stars || wod.difficulty).text}`}>
@@ -179,7 +179,7 @@ const WODCategory = () => {
                   {wod.category?.toUpperCase() !== "RECOVERY" && wod.difficulty_stars && ` (${wod.difficulty_stars}★)`}
                 </span>
               </div>
-              <span className="text-muted-foreground/50">•</span>
+              <span className="text-muted-foreground">•</span>
               <div className="flex items-center gap-1">
                 <Clock className="w-3 h-3 text-purple-600 dark:text-purple-400" />
                 <span className="text-purple-600 dark:text-purple-400 font-medium">{wod.duration || "45-60 min"}</span>
