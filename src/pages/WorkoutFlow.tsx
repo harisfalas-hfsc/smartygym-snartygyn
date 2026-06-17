@@ -59,7 +59,7 @@ const WorkoutFlow = () => {
 
   const totalWorkoutCount = Object.values(workoutCounts).reduce((sum, c) => sum + c, 0);
 
-  // Latest 3 workouts for mobile "Featured" section
+  // Latest workouts for "Featured" section (mobile: 6, desktop: 6 inside grid)
   const { data: latestWorkouts = [] } = useQuery({
     queryKey: ["featured-latest-workouts"],
     queryFn: async () => {
@@ -68,7 +68,7 @@ const WorkoutFlow = () => {
         .filter((w) => w.is_workout_of_day !== true || w.wod_source === "library")
         .filter((w) => !!w.created_at)
         .sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""))
-        .slice(0, 3);
+        .slice(0, 6);
     },
     staleTime: 1000 * 60 * 5,
   });
