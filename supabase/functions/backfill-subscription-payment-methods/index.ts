@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
+import { requireAdminOrServiceRole } from "../_shared/admin-or-service-auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -26,6 +27,9 @@ const log = (step: string, details?: Record<string, unknown>) => {
  */
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  const authError = await requireAdminOrServiceRole(req, corsHeaders);
+  if (authError) return authError;
 
   try {
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");

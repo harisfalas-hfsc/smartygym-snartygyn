@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Search, Mail, Bell, Users, Eye, CheckCircle, XCircle, Clock } from "lucide-react";
 import { format } from "date-fns";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import DOMPurify from "dompurify";
 
 interface SentMessage {
   id: string;
@@ -310,7 +311,7 @@ export const SentMessagesTab = () => {
                   <p className="text-sm font-semibold mb-2">Content</p>
                   <div 
                     className="text-sm bg-muted p-4 rounded prose prose-sm max-w-none dark:prose-invert"
-                    dangerouslySetInnerHTML={{ __html: selectedMessage.content }}
+                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(selectedMessage.content || "") }}
                   />
                 </div>
 

@@ -2,6 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Badge } from "@/components/ui/badge";
 import { Sunrise, Sun, Moon } from "lucide-react";
 import { format } from "date-fns";
+import DOMPurify from "dompurify";
 
 interface Ritual {
   id: string;
@@ -45,7 +46,7 @@ export const RitualViewDialog = ({ open, onOpenChange, ritual, contextDate }: Pr
             </h3>
             <div
               className="prose prose-sm dark:prose-invert max-w-none rounded-md border p-4 bg-muted/30"
-              dangerouslySetInnerHTML={{ __html: ritual.morning_content || "<em>(empty)</em>" }}
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(ritual.morning_content || "<em>(empty)</em>") }}
             />
           </section>
           <section>
@@ -54,7 +55,7 @@ export const RitualViewDialog = ({ open, onOpenChange, ritual, contextDate }: Pr
             </h3>
             <div
               className="prose prose-sm dark:prose-invert max-w-none rounded-md border p-4 bg-muted/30"
-              dangerouslySetInnerHTML={{ __html: ritual.midday_content || "<em>(empty)</em>" }}
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(ritual.midday_content || "<em>(empty)</em>") }}
             />
           </section>
           <section>
@@ -63,7 +64,7 @@ export const RitualViewDialog = ({ open, onOpenChange, ritual, contextDate }: Pr
             </h3>
             <div
               className="prose prose-sm dark:prose-invert max-w-none rounded-md border p-4 bg-muted/30"
-              dangerouslySetInnerHTML={{ __html: ritual.evening_content || "<em>(empty)</em>" }}
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(ritual.evening_content || "<em>(empty)</em>") }}
             />
           </section>
         </div>

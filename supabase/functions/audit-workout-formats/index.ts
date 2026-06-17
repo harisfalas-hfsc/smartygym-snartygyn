@@ -5,6 +5,7 @@ import {
   shouldFixFormat,
   FormatClassificationResult 
 } from "../_shared/format-classifier.ts";
+import { requireAdminOrServiceRole } from "../_shared/admin-or-service-auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -42,6 +43,9 @@ serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
+
+  const authError = await requireAdminOrServiceRole(req, corsHeaders);
+  if (authError) return authError;
 
   try {
     logStep("Starting comprehensive format audit");

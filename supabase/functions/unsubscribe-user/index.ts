@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { verifyUnsubscribeToken } from "../_shared/unsubscribe-token.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -47,12 +48,44 @@ serve(async (req) => {
   }
 
   try {
-    const { email, type } = await req.json();
+    const { email, type, token } = await req.json();
 
     if (!email) {
       return new Response(
         JSON.stringify({ error: "Email is required" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Require either (a) a valid HMAC unsubscribe token from the original email,
+    // or (b) an authenticated session whose JWT email matches the target email.
+    let authorized = false;
+    if (token && verifyUnsubscribeToken(token, email, type)) {
+      authorized = true;
+    } else {
+      const authHeader = req.headers.get("Authorization") || "";
+      const jwt = authHeader.replace(/^Bearer\s+/i, "").trim();
+      if (jwt) {
+        try {
+          const verifier = createClient(
+            Deno.env.get("SUPABASE_URL") ?? "",
+            Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+          );
+          const { data: { user: jwtUser } } = await verifier.auth.getUser(jwt);
+          if (jwtUser?.email && jwtUser.email.toLowerCase() === email.toLowerCase()) {
+            authorized = true;
+          }
+        } catch (_e) {
+          authorized = false;
+        }
+      }
+    }
+
+    if (!authorized) {
+      console.warn(`[UNSUBSCRIBE] Rejected unauthenticated request for: ${email}`);
+      return new Response(
+        JSON.stringify({ error: "Invalid or expired unsubscribe link" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 

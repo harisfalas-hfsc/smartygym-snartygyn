@@ -30,6 +30,7 @@ const Unsubscribe = () => {
   useEffect(() => {
     const emailParam = searchParams.get("email");
     const typeParam = searchParams.get("type");
+    const tokenParam = searchParams.get("token");
     
     if (emailParam) {
       setEmail(emailParam);
@@ -37,13 +38,13 @@ const Unsubscribe = () => {
       if (typeParam && EMAIL_TYPE_NAMES[typeParam]) {
         setTypeName(EMAIL_TYPE_NAMES[typeParam]);
       }
-      handleUnsubscribe(emailParam, typeParam);
+      handleUnsubscribe(emailParam, typeParam, tokenParam);
     } else {
       setStatus("not_found");
     }
   }, [searchParams]);
 
-  const handleUnsubscribe = async (userEmail: string, type: string | null) => {
+  const handleUnsubscribe = async (userEmail: string, type: string | null, token: string | null) => {
     try {
       // Check newsletter_subscribers table first (for non-type-specific unsubscribe)
       if (!type) {
@@ -72,7 +73,7 @@ const Unsubscribe = () => {
 
       // Call edge function for registered users
       const { data, error } = await supabase.functions.invoke("unsubscribe-user", {
-        body: { email: userEmail, type },
+        body: { email: userEmail, type, token },
       });
 
       if (error) {

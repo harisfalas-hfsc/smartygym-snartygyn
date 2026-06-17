@@ -2,6 +2,7 @@
  * Email utility functions for SmartyGym
  * Provides email deliverability improvements including proper headers, footers, and HTML conversion
  */
+import { buildUnsubscribeUrl } from "./unsubscribe-token.ts";
 
 // Email type mapping for specific unsubscribe links
 export type EmailType = 
@@ -19,8 +20,11 @@ export type EmailType =
  * Includes List-Unsubscribe for one-click unsubscribe support (required by Gmail/Yahoo)
  */
 export function getEmailHeaders(userEmail: string, emailType?: EmailType): Record<string, string> {
-  const typeParam = emailType ? `&type=${emailType}` : '';
-  const unsubscribeUrl = `https://smartygym.com/unsubscribe?email=${encodeURIComponent(userEmail)}${typeParam}`;
+  const unsubscribeUrl = buildUnsubscribeUrl(
+    "https://smartygym.com/unsubscribe",
+    userEmail,
+    emailType,
+  );
   return {
     "List-Unsubscribe": `<${unsubscribeUrl}>, <mailto:unsubscribe@smartygym.com?subject=Unsubscribe>`,
     "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
