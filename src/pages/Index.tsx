@@ -1107,10 +1107,16 @@ const Index = () => {
             {/* Desktop: "Your Gym Re-imagined" content block (no hero picture) */}
             <section className="hidden md:block bg-background mt-8">
               <div className="container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6">
+                <div className="relative mb-10 md:mb-14">
+                  <span aria-hidden="true" className="ghost-headline absolute -top-6 md:-top-10 left-0 right-0 text-center text-[80px] md:text-[160px] hidden sm:block">
+                    THE GYM
+                  </span>
+                  <div className="relative pt-6 md:pt-12 text-center">
+                    <p className="text-xs md:text-sm font-bold tracking-[0.3em] text-primary uppercase mb-3">Your Fitness Partner</p>
+                    <h2 className="text-3xl md:text-5xl font-black tracking-tight uppercase">Your Gym Re-imagined</h2>
+                  </div>
+                </div>
                 <div className="bg-background/60 backdrop-blur-sm p-6 rounded-lg border-2 border-primary/30 text-center">
-                  <p className="text-2xl font-bold text-primary mb-2 uppercase">
-                    YOUR GYM RE-IMAGINED ANYWHERE, ANYTIME
-                  </p>
                   <p className="text-base text-muted-foreground leading-relaxed">
                     We are not here to replace your gym. We are here to back you up when life gets in the way. Whether you're traveling, on holiday, can't make it to the gym, or your gym is closed, SmartyGym is your backup plan. Or, if you go to your gym but want to follow a professional, science-based workout or training program designed by{' '}
                     <Link to="/coach-profile" className="text-primary hover:underline font-medium">Haris Falas</Link>, we provide that expert guidance.
