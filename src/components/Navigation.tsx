@@ -298,7 +298,7 @@ export const Navigation = () => {
     {isMobile && (
       <header
         ref={headerRef}
-        className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-primary/20"
+        className="fixed top-0 left-0 right-0 z-50 bg-background"
       >
         <div className="flex h-11 items-center justify-between gap-2 px-3">
           <button
@@ -430,7 +430,7 @@ export const Navigation = () => {
     <header
       ref={headerRef}
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 bg-background border-b border-primary/20 transition-transform duration-300 will-change-transform",
+        "fixed top-0 left-0 right-0 z-50 bg-background transition-transform duration-300 will-change-transform",
         headerHidden && "-translate-y-full"
       )}
     >
