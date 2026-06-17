@@ -5,6 +5,7 @@ import {
   shouldFixFormat,
   FormatClassificationResult 
 } from "../_shared/format-classifier.ts";
+import { requireAdminOrServiceRole } from "../_shared/admin-or-service-auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
