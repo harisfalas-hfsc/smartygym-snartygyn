@@ -37,8 +37,9 @@ export function verifyUnsubscribeToken(token: string, email: string, type?: stri
   const normalized = `${email.toLowerCase()}|${type || ""}|${exp}`;
   const expected = sign(normalized);
   try {
-    const a = Buffer.from(sig);
-    const b = Buffer.from(expected);
+    const enc = new TextEncoder();
+    const a = enc.encode(sig);
+    const b = enc.encode(expected);
     if (a.length !== b.length) return false;
     return timingSafeEqual(a, b);
   } catch {
