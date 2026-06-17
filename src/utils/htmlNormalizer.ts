@@ -7,6 +7,7 @@
 
 const SECTION_ICONS = ['🧽', '🔥', '💪', '⚡', '🧘'];
 const CANONICAL_EMPTY_P = '<p class="tiptap-paragraph"></p>';
+const EXERCISE_MARKUP_RE = /\{\{exercise:[^}]+\}\}/i;
 
 export function normalizeWorkoutHtml(content: string): string {
   if (!content || !content.trim()) return content;
@@ -188,6 +189,29 @@ function removeOrphanExerciseListItems(html: string): string {
   });
 }
 
+function textFromHtmlFragment(html: string): string {
+  return html
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/\{\{exercise:[^}]+\}\}/gi, 'exercise')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function isExerciseLineContent(content: string): boolean {
+  if (!content || /[🧽🔥💪⚡🧘]/.test(content)) return false;
+  if (EXERCISE_MARKUP_RE.test(content)) return true;
+
+  const text = textFromHtmlFragment(content);
+  if (!text || text.length > 180) return false;
+  if (/^(?:perform|complete|rest|repeat|alternate|focus|goal|note|notes|tempo|rounds?\b|circuit\b|set\b)/i.test(text)) {
+    return false;
+  }
+
+  return /^(?:\d+\s*(?:[-–]\s*\d+\s*)?(?:reps?|sec(?:onds?)?|mins?|minutes?|meters?|metres?|m|cal(?:ories)?|breaths?)\b|\d+\s*x\s*\d+\b|\d+\/\d+\b|amrap\b|emom\b)/i.test(text);
+}
+
 function absorbOrphanExerciseParagraphs(html: string): string {
   if (!html) return html;
   let result = html;
@@ -198,7 +222,7 @@ function absorbOrphanExerciseParagraphs(html: string): string {
     result = result.replace(
       /<\/ul>(?:<p[^>]*>\s*<\/p>)*(<p[^>]*>([\s\S]*?)<\/p>)/gi,
       (match, _pTag, pContent) => {
-        if (/\{\{exercise:[^}]+\}\}/i.test(pContent)) {
+        if (isExerciseLineContent(pContent)) {
           return `<li class="tiptap-list-item"><p class="tiptap-paragraph">${pContent.trim()}</p></li></ul>`;
         }
         return match;
@@ -211,26 +235,40 @@ function absorbOrphanExerciseParagraphs(html: string): string {
 
 function wrapLooseExerciseParagraphRuns(html: string): string {
   if (!html) return html;
-  const exerciseParagraph = '<p[^>]*>(?:(?!<\\/p>)[\\s\\S])*?\\{\\{exercise:[^}]+\\}\\}(?:(?!<\\/p>)[\\s\\S])*?<\\/p>';
-  const runPattern = new RegExp(`((?:${exerciseParagraph})+)`, 'gi');
 
   return html.split(/(<ul\b[\s\S]*?<\/ul>)/gi).map((part) => {
     if (/^<ul\b/i.test(part.trim())) return part;
 
-    return part.replace(runPattern, (run) => {
-    const items: string[] = [];
-    run.replace(/<p[^>]*>([\s\S]*?)<\/p>/gi, (_match, pContent) => {
-      if (/\{\{exercise:[^}]+\}\}/i.test(pContent) && !/[🧽🔥💪⚡🧘]/.test(pContent)) {
-        items.push(`<li class="tiptap-list-item"><p class="tiptap-paragraph">${pContent.trim()}</p></li>`);
+    const paragraphPattern = /<p[^>]*>([\s\S]*?)<\/p>/gi;
+    let output = '';
+    let lastIndex = 0;
+    let pendingItems: string[] = [];
+
+    const flushPending = () => {
+      if (pendingItems.length > 0) {
+        output += `<ul class="tiptap-bullet-list">${pendingItems.join('')}</ul>`;
+        pendingItems = [];
       }
-      return '';
+    };
+
+    part.replace(paragraphPattern, (match, pContent, offset) => {
+      output += part.slice(lastIndex, offset);
+      if (isExerciseLineContent(pContent)) {
+        pendingItems.push(`<li class="tiptap-list-item"><p class="tiptap-paragraph">${pContent.trim()}</p></li>`);
+      } else {
+        flushPending();
+        output += match;
+      }
+      lastIndex = offset + match.length;
+      return match;
     });
 
-    if (items.length === 0) {
-      return run;
+    if (lastIndex === 0) {
+      return part;
     }
 
-    return `<ul class="tiptap-bullet-list">${items.join('')}</ul>`;
-    });
+    output += part.slice(lastIndex);
+    flushPending();
+    return output;
   }).join('');
 }
