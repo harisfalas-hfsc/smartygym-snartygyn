@@ -44,6 +44,9 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const authError = await requireAdminOrServiceRole(req, corsHeaders);
+  if (authError) return authError;
+
   try {
     logStep("Starting comprehensive format audit");
 
