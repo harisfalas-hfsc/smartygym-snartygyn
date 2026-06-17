@@ -12,7 +12,7 @@ import {
   ChevronRight, Award, Flame, Brain, Zap,
   BarChart3, CheckCircle2, Activity, Waves, Mountain,
   Timer, Baby, Plane, Briefcase, Star,
-  LineChart, Goal
+  LineChart, Goal, Smartphone
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, ResponsiveContainer,
