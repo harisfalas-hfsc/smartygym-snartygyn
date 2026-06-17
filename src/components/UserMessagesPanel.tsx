@@ -734,18 +734,9 @@ export const UserMessagesPanel = () => {
     return <div className="text-center py-8">Loading messages...</div>;
   }
 
-  if (contactMessages.length === 0 && systemMessages.length === 0) {
-    return (
-      <Card>
-        <CardContent className="pt-6">
-          <div className="text-center py-8 text-muted-foreground">
-            <MessageSquare className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            <p>You don't have any messages yet</p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+  // Note: Do NOT early-return when there are no messages — users still need
+  // access to the tabs bar (View filter, Settings tab with notification
+  // preferences). The empty state is rendered inside each TabsContent below.
 
   const renderSystemMessage = (message: SystemMessage, showBorder = true) => {
     const link = extractLink(message.content);
