@@ -548,6 +548,8 @@ serve(async (req) => {
           await logUnmatchedExercises(supabase as any, trulyUnmatched, "workout", `WIZ-${body.category}`, content.name, `[WIZ-MISMATCH]`);
         }
 
+        const mergedOrphans = mergeOrphanTempoRestBullets(content.main_workout);
+        content.main_workout = mergedOrphans;
         const protocolSweep = sanitizeProtocolBlocks(stripWorkoutProtocolHeaderDurations(content.main_workout));
       if (protocolSweep.flaggedForReview.length > 0) {
         log("Protocol review warnings (continuing)", {
