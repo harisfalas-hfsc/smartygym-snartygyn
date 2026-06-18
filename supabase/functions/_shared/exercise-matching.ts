@@ -333,6 +333,8 @@ function cleanExerciseName(text: string): string {
   cleaned = cleaned.replace(/^\d+\.\s*/, '');
   // Strip leading sets/reps prescriptions: "5 sets × 5 reps Handstand Push-up" → "Handstand Push-up"
   cleaned = cleaned.replace(/^\d+\s*sets?\s*(?:x|×)\s*\d+(?:\s*-\s*\d+)?\s*(?:reps?)?\s+/i, '').trim();
+  // Strip leading measurable prescriptions: "15 reps Bird Dog", "45 sec Plank", "200m Run" → exercise name
+  cleaned = cleaned.replace(/^\d+(?:\.\d+)?(?:\s*-\s*\d+(?:\.\d+)?)?\s*(?:reps?(?:\s*\/\s*(?:side|leg|arm))?|reps?\s*(?:per|each)\s*(?:side|leg|arm)|sec(?:onds?)?|s\b|min(?:utes?)?|m\b|meters?|metres?|km\b|cal(?:ories)?|rounds?)\s+/i, '').trim();
   // Strip leading quantity: "15 Kettlebell Swing" → "Kettlebell Swing"
   cleaned = cleaned.replace(/^\d+\s+(?=[A-Z])/i, '').trim();
   // Strip superset labels like "A1:", "B:", "C2.", "D)" at the start (case-sensitive: A-D only uppercase)
@@ -1036,6 +1038,8 @@ export function guaranteeAllExercisesLinked(
     const strippedForCount = plainText
       .replace(/^\d+\s*sets?\s*(?:x|×)\s*\d+(?:\s*-\s*\d+)?\s*(?:reps?)?\s+/i, '')
       .replace(/^\d+(?:\.\d+)?(?:\s*-\s*\d+(?:\.\d+)?)?\s*(?:reps?(?:\s*\/\s*(?:side|leg|arm))?|reps?\s*(?:per|each)\s*(?:side|leg|arm)|sec(?:onds?)?|s\b|min(?:utes?)?|m\b|meters?|metres?|km\b|cal(?:ories)?|rounds?)\s+/i, '')
+      .replace(/\s+[-–—]\s+.*$/i, '')
+      .replace(/;\s*rest\s+\d+\s*(?:s|sec|secs|seconds?|m|min|mins|minutes?)\b.*$/i, '')
       .replace(/\s*\([^)]*\)\s*/g, ' ')
       .replace(/\s+/g, ' ')
       .trim();
@@ -1193,6 +1197,9 @@ export function rejectNonLibraryExercises(
     // Strip rep/set info before counting words to avoid skipping valid exercise lines
     const strippedForCount = plainText
       .replace(/^\d+\s*sets?\s*(?:x|×)\s*\d+(?:\s*-\s*\d+)?\s*(?:reps?)?\s+/i, '')
+      .replace(/^\d+(?:\.\d+)?(?:\s*-\s*\d+(?:\.\d+)?)?\s*(?:reps?(?:\s*\/\s*(?:side|leg|arm))?|reps?\s*(?:per|each)\s*(?:side|leg|arm)|sec(?:onds?)?|s\b|min(?:utes?)?|m\b|meters?|metres?|km\b|cal(?:ories)?|rounds?)\s+/i, '')
+      .replace(/\s+[-–—]\s+.*$/i, '')
+      .replace(/;\s*rest\s+\d+\s*(?:s|sec|secs|seconds?|m|min|mins|minutes?)\b.*$/i, '')
       .replace(/\s*[-–—]\s*\d+\s*sets?\s*x\s*\d+.*$/i, '')
       .replace(/\s*\(\d+[-–]?\d*\s*(?:kg|lb|sec|seconds?|reps?|per|each|focused|sustained|controlled|slow|hold).*?\)/gi, '')
       .replace(/\s*\d+\s*(?:sets?\s*x|x)\s*\d+.*$/i, '')
