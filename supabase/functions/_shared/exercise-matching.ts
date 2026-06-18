@@ -1191,6 +1191,7 @@ export function rejectNonLibraryExercises(
     if (/^(rest|repeat|complete|perform|focus|record|note|slow|lie|maintain|alternate|foam|foam roll|lacrosse|tennis ball|trigger point|self-?massage|myofascial|release|light jog|walking|breathing|diaphragm|inhale|exhale|box breath|tip\s*\d|quality|if an exercise|not cause|not hurt)/i.test(plainText)) continue;
     // Strip rep/set info before counting words to avoid skipping valid exercise lines
     const strippedForCount = plainText
+      .replace(/^\d+\s*sets?\s*(?:x|×)\s*\d+(?:\s*-\s*\d+)?\s*(?:reps?)?\s+/i, '')
       .replace(/\s*[-–—]\s*\d+\s*sets?\s*x\s*\d+.*$/i, '')
       .replace(/\s*\(\d+[-–]?\d*\s*(?:kg|lb|sec|seconds?|reps?|per|each|focused|sustained|controlled|slow|hold).*?\)/gi, '')
       .replace(/\s*\d+\s*(?:sets?\s*x|x)\s*\d+.*$/i, '')
