@@ -355,8 +355,8 @@ function cleanExerciseName(text: string): string {
   cleaned = cleaned.replace(/\s*[-–—]\s*$/, '');
   // Strip trailing "x" or "x \d+" (common artifact: "burpeex 5", "Walkouts x")
   cleaned = cleaned.replace(/\s*x\s*\d*\s*$/i, '').trim();
-  // Strip trailing "v" (typo artifact: "jump squatv")
-  cleaned = cleaned.replace(/[vx]\s*$/i, '').trim();
+  // Strip trailing typo artifact only when appended to a longer word ("jump squatv"), not legitimate names like "V-Up".
+  cleaned = cleaned.replace(/(?<=[A-Za-z]{3,})[vx]\s*$/i, '').trim();
   cleaned = cleaned.trim();
   return cleaned;
 }
