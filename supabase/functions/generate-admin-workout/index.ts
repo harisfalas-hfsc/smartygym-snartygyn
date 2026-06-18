@@ -17,6 +17,7 @@ import { validateWodSections } from "../_shared/section-validator.ts";
 import { requireAdminOrServiceRole } from "../_shared/admin-or-service-auth.ts";
 import { sanitizeProtocolBlocks, validateProtocolBlocks } from "../_shared/protocol-sanitizer.ts";
 import { applyWodQualityGate } from "../_shared/wod-quality-gate.ts";
+import { validateGeneratedWorkoutContract } from "../_shared/generated-workout-contract.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
