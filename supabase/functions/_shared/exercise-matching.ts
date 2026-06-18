@@ -1067,7 +1067,7 @@ export function guaranteeAllExercisesLinked(
     candidate = candidate.replace(/\s*\(\d+[-–]?\d*\s*(?:kg|lb|sec|reps?|per|each).*?\)\s*$/i, '');
     candidate = candidate.replace(/\s*\d+\s*(?:sets?\s*x|x)\s*\d+.*$/i, '');
     candidate = candidate.replace(/\s*[-–—]\s*\d+\s*(?:reps?|sets?|sec|min).*$/i, '');
-    candidate = candidate.replace(/\s*[-–—]\s*[a-z].*$/i, '');
+    candidate = candidate.replace(/\s+[-–—]\s+[a-z].*$/i, '');
     candidate = candidate.replace(/\s*\(.*?\)\s*$/g, '');
     candidate = candidate.replace(/,\s+.*$/, ''); // After comma is usually secondary info
     candidate = candidate.trim();
@@ -1223,7 +1223,7 @@ export function rejectNonLibraryExercises(
     candidate = candidate.replace(/\s*\(\d+[-–]?\d*\s*(?:kg|lb|sec|reps?|per|each).*?\)\s*$/i, '');
     candidate = candidate.replace(/\s*\d+\s*(?:sets?\s*x|x)\s*\d+.*$/i, '');
     candidate = candidate.replace(/\s*[-–—]\s*\d+\s*(?:reps?|sets?|sec|min).*$/i, '');
-    candidate = candidate.replace(/\s*[-–—]\s*[a-z].*$/i, '');
+    candidate = candidate.replace(/\s+[-–—]\s+[a-z].*$/i, '');
     candidate = candidate.replace(/\s*\(.*?\)\s*$/g, '');
     candidate = candidate.replace(/,\s+.*$/, '');
     candidate = candidate.trim();
