@@ -13,6 +13,7 @@ const LIB = [
   { id: "1604", name: "world greatest stretch" },
   { id: "1494", name: "butterfly yoga pose" },
   { id: "3021", name: "scapula push-up" },
+  { id: "glute-bridge", name: "Glute Bridge" },
 ];
 
 const VALID_HTML = `
@@ -57,6 +58,15 @@ Deno.test("contract: fake slug ID is rejected (bird-dog)", () => {
   const r = validateGeneratedWorkoutContract(html, LIB);
   assertEquals(r.ok, false);
   assertEquals(r.failures.some((f) => f.includes("fake/slug")), true);
+});
+
+Deno.test("contract: real library slug IDs are accepted", () => {
+  const html = VALID_HTML.replace(
+    "{{exercise:3021:scapula push-up}}",
+    "{{exercise:glute-bridge:Glute Bridge}}",
+  );
+  const r = validateGeneratedWorkoutContract(html, LIB);
+  assertEquals(r.ok, true, r.failures.join(" | "));
 });
 
 Deno.test("contract: missing library ID is rejected", () => {
