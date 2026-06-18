@@ -89,3 +89,23 @@ Deno.test("non-library rejection substitution preserves leading rep prescription
   assertEquals(result.processedContent.includes("10 reps {{exercise:1759:single leg squat (pistol) male}} (5 per side)"), true);
   assertEquals(result.processedContent.includes("10 {{exercise:"), false);
 });
+
+Deno.test("final exercise linking handles prescribed lines with coaching tail text", () => {
+  const library = [
+    { id: "bird-dog", name: "Bird Dog", body_part: "Back", equipment: "Body Weight", target: "Spine" },
+    { id: "glute-bridge", name: "Glute Bridge", body_part: "Upper Legs", equipment: "Body Weight", target: "Glutes" },
+    { id: "0514", name: "jump squat", body_part: "upper legs", equipment: "body weight", target: "glutes" },
+    { id: "1306", name: "plyo push up", body_part: "chest", equipment: "body weight", target: "pectorals" },
+    { id: "3582", name: "lunge with jump", body_part: "upper legs", equipment: "body weight", target: "glutes" },
+    { id: "v-up", name: "V-Up", body_part: "Waist", equipment: "Body Weight", target: "Abs" },
+    { id: "0501", name: "jack burpee", body_part: "cardio", equipment: "body weight", target: "cardiovascular system" },
+  ];
+  const input = `<ul class="tiptap-bullet-list"><li class="tiptap-list-item"><p class="tiptap-paragraph">15 reps Bird Dog — tempo 2-sec hold at extension; rest 0 sec</p></li><li class="tiptap-list-item"><p class="tiptap-paragraph">15 reps Glute Bridge — tempo 1-sec squeeze at top; rest 0 sec</p></li><li class="tiptap-list-item"><p class="tiptap-paragraph">20 reps jump squat — tempo 2-sec lower, explosive lift; rest 0 sec</p></li><li class="tiptap-list-item"><p class="tiptap-paragraph">10 reps plyo push up — hands must leave the floor; rest 0 sec</p></li><li class="tiptap-list-item"><p class="tiptap-paragraph">20 reps lunge with jump — alternating legs in mid-air; rest 0 sec</p></li><li class="tiptap-list-item"><p class="tiptap-paragraph">15 reps V-Up — tempo 1-sec lift, 2-sec lower; rest 0 sec</p></li><li class="tiptap-list-item"><p class="tiptap-paragraph">10 reps jack burpee — combine jumping jack with burpee; rest 0 sec</p></li></ul>`;
+
+  const result = guaranteeAllExercisesLinked(input, library, "[TEST]");
+
+  assertEquals(result.forcedMatches.length, 7);
+  assertEquals(result.processedContent.includes("15 reps {{exercise:bird-dog:Bird Dog}} — tempo 2-sec hold at extension; rest 0 sec"), true);
+  assertEquals(result.processedContent.includes("20 reps {{exercise:0514:jump squat}} — tempo 2-sec lower, explosive lift; rest 0 sec"), true);
+  assertEquals(result.processedContent.includes("10 reps {{exercise:0501:jack burpee}} — combine jumping jack with burpee; rest 0 sec"), true);
+});
