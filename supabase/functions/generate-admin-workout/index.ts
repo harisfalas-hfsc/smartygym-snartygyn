@@ -641,24 +641,20 @@ serve(async (req) => {
         }
 
         // ────────────────────────────────────────────────────────────────
-        // HARD CONTRACT: any failure here means we DO NOT deliver a draft.
-        // This stops broken workouts (fake IDs, plain exercise lines, soft
-        // tissue with movements, missing prescriptions) from ever reaching
-        // the admin editor where they would be saved silently.
+        // QUALITY CONTRACT (advisory): we still deliver the draft so the
+        // admin can fix it in the editor instead of burning AI credits on a
+        // hard regenerate. Any failures are surfaced as review warnings and
+        // force needs_review = true, so a broken draft cannot be saved
+        // silently — the admin sees exactly what to fix.
         // ────────────────────────────────────────────────────────────────
         const contract = validateGeneratedWorkoutContract(mainNorm, library as any, {
           isMicro,
           isRecovery: body.category === "RECOVERY",
         });
         if (!contract.ok) {
-          log("❌ Generation rejected by hard contract", { failures: contract.failures.slice(0, 8) });
-          return new Response(
-            JSON.stringify({
-              ok: false,
-              error: "Generated workout failed quality contract — try regenerating",
-              contract_failures: contract.failures,
-            }),
-            { status: 422, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          log("⚠️ Quality contract warnings (delivering draft)", { failures: contract.failures.slice(0, 8) });
+          reviewWarnings.push(
+            `Quality contract: ${contract.failures.slice(0, 6).join("; ")}`,
           );
         }
 
