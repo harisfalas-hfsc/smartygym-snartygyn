@@ -383,6 +383,34 @@ function humanizeTempoRestInExerciseLines(html: string): string {
   });
 }
 
+function repairInvalidExerciseTokens(html: string, library: any[]): string {
+  if (!html) return html;
+  const libById = new Map(library.map((ex: any) => [String(ex.id), ex]));
+  const byName = new Map(library.map((ex: any) => [String(ex.name).toLowerCase().trim(), ex]));
+
+  return html.replace(/\{\{(?:exercise|exrcise|excersize|excercise):([^:}]+):([^}]+)\}\}/gi, (full, rawId: string, rawName: string) => {
+    const id = String(rawId).trim();
+    const name = String(rawName).trim();
+    const exactId = libById.get(id);
+    if (exactId) return `{{exercise:${exactId.id}:${exactId.name}}}`;
+    const exactName = byName.get(name.toLowerCase());
+    if (exactName) return `{{exercise:${exactName.id}:${exactName.name}}}`;
+    return name;
+  });
+}
+
+function relinkPlainMinuteParagraphs(html: string, library: any[], logPrefix = "[WIZ-MINUTE-P]"): string {
+  if (!html) return html;
+  return html.replace(/<p[^>]*>([\s\S]*?\bMinute\s+\d+\s*:[\s\S]*?)<\/p>/gi, (full, inner: string) => {
+    if (/\{\{exercise:/i.test(inner)) return full;
+    const wrapped = `<ul class="tiptap-bullet-list"><li class="tiptap-list-item"><p class="tiptap-paragraph">${inner}</p></li></ul>`;
+    const linked = guaranteeAllExercisesLinked(wrapped, library, logPrefix).processedContent;
+    const repaired = rejectNonLibraryExercises(linked, library, logPrefix).processedContent;
+    const content = repaired.match(/<li[^>]*>\s*<p[^>]*>([\s\S]*?)<\/p>\s*<\/li>/i)?.[1]?.trim();
+    return content ? `<p class="tiptap-paragraph">${content}</p>` : full;
+  });
+}
+
 function extractIconSection(html: string, startIcon: string, endIcons: string[]): string {
   const start = html.indexOf(startIcon);
   if (start === -1) return "";
@@ -575,12 +603,15 @@ serve(async (req) => {
           content.main_workout = cleaned;
         }
 
+        content.main_workout = repairInvalidExerciseTokens(content.main_workout, library);
+
         const matched = processContentSectionAware(content.main_workout, library, `[WIZ-MATCH]`);
         content.main_workout = matched.processedContent;
         const sweep = guaranteeAllExercisesLinked(content.main_workout, library, `[WIZ-SWEEP]`);
         content.main_workout = sweep.processedContent;
         const reject = rejectNonLibraryExercises(content.main_workout, library, `[WIZ-REJECT]`);
         content.main_workout = reject.processedContent;
+        content.main_workout = relinkPlainMinuteParagraphs(content.main_workout, library);
 
         const trulyUnmatched = [...new Set(matched.unmatched)].filter(n =>
           !sweep.forcedMatches.some(f => f.original.toLowerCase() === n.toLowerCase()) &&
