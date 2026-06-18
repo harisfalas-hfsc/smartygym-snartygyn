@@ -53,6 +53,17 @@ Deno.test("quality gate accepts EMOM minute labels with repeat rounds", () => {
   assertEquals(result.ok, true);
 });
 
+Deno.test("sanitizer rebuilds loose EMOM minute paragraphs in order", () => {
+  const input = `<p class="tiptap-paragraph">💪 <strong><u>Main Workout (EMOM)</u></strong></p><p class="tiptap-paragraph">Repeat 5 rounds.</p><ul class="tiptap-bullet-list"><li class="tiptap-list-item"><p class="tiptap-paragraph">Minute 4: 45 sec {{exercise:0630:mountain climber}}</p></li></ul><p class="tiptap-paragraph">Minute 1: 12 reps {{exercise:1160:burpee}}</p><p class="tiptap-paragraph">Minute 2: 20 reps {{exercise:0283:diamond push-up}}</p><p class="tiptap-paragraph">Minute 3: 15 reps {{exercise:0514:jump squat}}</p><p class="tiptap-paragraph">Minute 5: 10 reps {{exercise:3662:pike-to-cobra push-up}}</p><p class="tiptap-paragraph">🧘 <strong><u>Cool Down 5'</u></strong></p>`;
+
+  const result = sanitizeProtocolBlocks(input);
+  const minutePositions = [1, 2, 3, 4, 5].map((n) => result.cleaned.indexOf(`Minute ${n}:`));
+
+  assertEquals(minutePositions.every((pos) => pos >= 0), true);
+  assertEquals(minutePositions, [...minutePositions].sort((a, b) => a - b));
+  assertEquals(result.cleaned.includes(`<p class="tiptap-paragraph">Minute 1:`), false);
+});
+
 Deno.test("final exercise linking preserves leading rep prescriptions", () => {
   const library = [
     { id: "1759", name: "single leg squat (pistol) male", body_part: "legs", equipment: "body weight", target: "quads" },

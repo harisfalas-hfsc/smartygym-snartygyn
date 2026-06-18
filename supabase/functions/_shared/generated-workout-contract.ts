@@ -116,12 +116,12 @@ function validateTokensInSection(
   while ((m = TOKEN_RE.exec(sectionHtml)) !== null) {
     const id = m[1].trim();
     const name = m[2].trim();
-    if (FAKE_ID_RE.test(id) || !/^[A-Za-z0-9_]+$/.test(id)) {
-      failures.push(`${sectionLabel}: fake/slug exercise ID "${id}" for "${name}" — not a real library ID`);
-      continue;
-    }
     const lib = libById.get(id);
     if (!lib) {
+      if (FAKE_ID_RE.test(id) || !/^[A-Za-z0-9_]+$/.test(id)) {
+        failures.push(`${sectionLabel}: fake/slug exercise ID "${id}" for "${name}" — not a real library ID`);
+        continue;
+      }
       failures.push(`${sectionLabel}: exercise ID "${id}" ("${name}") does not exist in the library`);
       continue;
     }

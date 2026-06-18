@@ -18,7 +18,8 @@ export interface ProtocolIssue {
     | "naked_exercise_prescription"
     | "mixed_rep_time_prescription"
     | "stimulus_mismatch"
-    | "bare_exercise_in_warmup_or_cooldown";
+     | "bare_exercise_in_warmup_or_cooldown"
+     | "emom_minute_order_repaired";
   detail: string;
   snippet?: string;
 }
@@ -226,6 +227,49 @@ function detectEmomOrphans(html: string, flagged: ProtocolIssue[]) {
   }
 }
 
+function normalizeEmomMinuteBlocks(html: string, issues: ProtocolIssue[], fixes: string[]): string {
+  const sectionRe = /(<p[^>]*>\s*(?:💪|⚡)\s*<strong><u>\s*(?:Main Workout|Finisher)\s*\(\s*EMOM\s*\)\s*<\/u><\/strong>\s*<\/p>)([\s\S]*?)(?=<p[^>]*>\s*(?:🧘|⚡|💪|🔥|🧽)|$)/gi;
+
+  return html.replace(sectionRe, (_section, header: string, body: string) => {
+    const minuteEntries: Array<{ minute: number; html: string }> = [];
+    let changed = false;
+
+    const removeAndCollect = (source: string, itemRe: RegExp): string => source.replace(itemRe, (full: string, inner: string) => {
+      const text = stripTags(inner || "");
+      const m = text.match(/\bMinute\s+(\d+)\s*:/i);
+      if (!m) return full;
+      const minute = Number(m[1]);
+      if (!Number.isFinite(minute)) return full;
+      const normalizedInner = inner.replace(/(?:<strong>)?\s*Minute\s+\d+\s*:\s*(?:<\/strong>)?/i, `<strong>Minute ${minute}:</strong> `);
+      minuteEntries.push({
+        minute,
+        html: `<li class="tiptap-list-item"><p class="tiptap-paragraph">${normalizedInner.trim()}</p></li>`,
+      });
+      changed = true;
+      return "";
+    });
+
+    let cleanedBody = removeAndCollect(body, /<li[^>]*>\s*<p[^>]*>([\s\S]*?\bMinute\s+\d+\s*:[\s\S]*?)<\/p>\s*<\/li>/gi);
+    cleanedBody = removeAndCollect(cleanedBody, /<p[^>]*>([\s\S]*?\bMinute\s+\d+\s*:[\s\S]*?)<\/p>/gi);
+
+    if (minuteEntries.length < 2) return `${header}${body}`;
+
+    minuteEntries.sort((a, b) => a.minute - b.minute);
+    cleanedBody = cleanedBody.replace(/<ul[^>]*>\s*<\/ul>/gi, "");
+    const list = `<ul class="tiptap-bullet-list">${minuteEntries.map((entry) => entry.html).join("")}</ul>`;
+    const rebuilt = `${header}${cleanedBody}${list}`;
+
+    if (changed) {
+      issues.push({
+        type: "emom_minute_order_repaired",
+        detail: `Rebuilt EMOM minute list in order: ${minuteEntries.map((entry) => entry.minute).join(", ")}`,
+      });
+      fixes.push("Converted loose EMOM Minute paragraphs into one ordered bullet list");
+    }
+    return rebuilt;
+  });
+}
+
 function stripTags(value: string): string {
   return value.replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim();
 }
@@ -383,6 +427,7 @@ export function sanitizeProtocolBlocks(input: string | null | undefined): Protoc
 
   let cleaned = original;
   cleaned = stripDurationFromHeaders(cleaned, issues, fixes);
+  cleaned = normalizeEmomMinuteBlocks(cleaned, issues, fixes);
   // PRE-STEP: auto-insert a single space when text is glued directly after
   // an exercise token (`}}foo` -> `}} foo`). This is purely cosmetic but
   // unblocks the hard validator below, which forbids `}}` followed by any
