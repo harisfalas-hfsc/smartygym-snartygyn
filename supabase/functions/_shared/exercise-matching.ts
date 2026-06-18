@@ -331,6 +331,8 @@ function isBreathingCueFragment(text: string): boolean {
 function cleanExerciseName(text: string): string {
   let cleaned = text;
   cleaned = cleaned.replace(/^\d+\.\s*/, '');
+  // Strip leading sets/reps prescriptions: "5 sets × 5 reps Handstand Push-up" → "Handstand Push-up"
+  cleaned = cleaned.replace(/^\d+\s*sets?\s*(?:x|×)\s*\d+(?:\s*-\s*\d+)?\s*(?:reps?)?\s+/i, '').trim();
   // Strip leading quantity: "15 Kettlebell Swing" → "Kettlebell Swing"
   cleaned = cleaned.replace(/^\d+\s+(?=[A-Z])/i, '').trim();
   // Strip superset labels like "A1:", "B:", "C2.", "D)" at the start (case-sensitive: A-D only uppercase)
@@ -450,6 +452,14 @@ export function extractExerciseNames(htmlContent: string): string[] {
       continue;
     }
     
+    // "4 sets × 8 reps Push-up" / "20 Air Squats"
+    const setsFirst = text.match(/^\d+\s*sets?\s*(?:x|×)\s*\d+/i);
+    if (setsFirst) {
+      const candidate = cleanExerciseName(text);
+      if (candidate) addExercise(candidate);
+      continue;
+    }
+
     // "20 Air Squats"
     const numberFirst = text.match(/^(\d+)\s+([A-Za-z][A-Za-z\s'-]+)/);
     if (numberFirst && numberFirst[2]) {
@@ -1053,6 +1063,7 @@ export function guaranteeAllExercisesLinked(
     candidate = candidate.replace(/\s*\(\d+[-–]?\d*\s*(?:kg|lb|sec|reps?|per|each).*?\)\s*$/i, '');
     candidate = candidate.replace(/\s*\d+\s*(?:sets?\s*x|x)\s*\d+.*$/i, '');
     candidate = candidate.replace(/\s*[-–—]\s*\d+\s*(?:reps?|sets?|sec|min).*$/i, '');
+    candidate = candidate.replace(/\s*[-–—]\s*[a-z].*$/i, '');
     candidate = candidate.replace(/\s*\(.*?\)\s*$/g, '');
     candidate = candidate.replace(/,\s+.*$/, ''); // After comma is usually secondary info
     candidate = candidate.trim();
@@ -1181,6 +1192,7 @@ export function rejectNonLibraryExercises(
     if (/^(rest|repeat|complete|perform|focus|record|note|slow|lie|maintain|alternate|foam|foam roll|lacrosse|tennis ball|trigger point|self-?massage|myofascial|release|light jog|walking|breathing|diaphragm|inhale|exhale|box breath|tip\s*\d|quality|if an exercise|not cause|not hurt)/i.test(plainText)) continue;
     // Strip rep/set info before counting words to avoid skipping valid exercise lines
     const strippedForCount = plainText
+      .replace(/^\d+\s*sets?\s*(?:x|×)\s*\d+(?:\s*-\s*\d+)?\s*(?:reps?)?\s+/i, '')
       .replace(/\s*[-–—]\s*\d+\s*sets?\s*x\s*\d+.*$/i, '')
       .replace(/\s*\(\d+[-–]?\d*\s*(?:kg|lb|sec|seconds?|reps?|per|each|focused|sustained|controlled|slow|hold).*?\)/gi, '')
       .replace(/\s*\d+\s*(?:sets?\s*x|x)\s*\d+.*$/i, '')
@@ -1204,6 +1216,7 @@ export function rejectNonLibraryExercises(
     candidate = candidate.replace(/\s*\(\d+[-–]?\d*\s*(?:kg|lb|sec|reps?|per|each).*?\)\s*$/i, '');
     candidate = candidate.replace(/\s*\d+\s*(?:sets?\s*x|x)\s*\d+.*$/i, '');
     candidate = candidate.replace(/\s*[-–—]\s*\d+\s*(?:reps?|sets?|sec|min).*$/i, '');
+    candidate = candidate.replace(/\s*[-–—]\s*[a-z].*$/i, '');
     candidate = candidate.replace(/\s*\(.*?\)\s*$/g, '');
     candidate = candidate.replace(/,\s+.*$/, '');
     candidate = candidate.trim();
