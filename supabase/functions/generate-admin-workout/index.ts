@@ -640,6 +640,28 @@ serve(async (req) => {
           reviewWarnings.push(`Prescription safety: ${prescriptionSafetyIssues.slice(0, 4).join("; ")}`);
         }
 
+        // ────────────────────────────────────────────────────────────────
+        // HARD CONTRACT: any failure here means we DO NOT deliver a draft.
+        // This stops broken workouts (fake IDs, plain exercise lines, soft
+        // tissue with movements, missing prescriptions) from ever reaching
+        // the admin editor where they would be saved silently.
+        // ────────────────────────────────────────────────────────────────
+        const contract = validateGeneratedWorkoutContract(mainNorm, library as any, {
+          isMicro,
+          isRecovery: body.category === "RECOVERY",
+        });
+        if (!contract.ok) {
+          log("❌ Generation rejected by hard contract", { failures: contract.failures.slice(0, 8) });
+          return new Response(
+            JSON.stringify({
+              ok: false,
+              error: "Generated workout failed quality contract — try regenerating",
+              contract_failures: contract.failures,
+            }),
+            { status: 422, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          );
+        }
+
         // Preview-only draft. Saving / Stripe / image / serial is the editor's job.
         const draft = {
           // id/serial intentionally omitted — the editor's open-as-new flow
