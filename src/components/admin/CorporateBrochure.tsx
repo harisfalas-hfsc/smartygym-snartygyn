@@ -158,7 +158,7 @@ export const CorporateBrochure = () => {
             <p className="text-sm text-gray-500 mb-3">Up to 10 team members</p>
             <p className="text-3xl font-bold mb-4">€399<span className="text-sm text-gray-500">/year</span></p>
             <ul className="text-sm space-y-2">
-              <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> 10 Platinum accounts</li>
+              <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> 10 Premium accounts</li>
               <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Admin dashboard</li>
               <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Centralized billing</li>
               <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> All premium content</li>
@@ -171,7 +171,7 @@ export const CorporateBrochure = () => {
             <p className="text-sm text-gray-500 mb-3">Up to 20 team members</p>
             <p className="text-3xl font-bold mb-4">€499<span className="text-sm text-gray-500">/year</span></p>
             <ul className="text-sm space-y-2">
-              <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#29B6D2]" /> 20 Platinum accounts</li>
+              <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#29B6D2]" /> 20 Premium accounts</li>
               <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#29B6D2]" /> Admin dashboard</li>
               <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#29B6D2]" /> Centralized billing</li>
               <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#29B6D2]" /> All premium content</li>
@@ -183,7 +183,7 @@ export const CorporateBrochure = () => {
             <p className="text-sm text-gray-500 mb-3">Up to 30 team members</p>
             <p className="text-3xl font-bold mb-4">€599<span className="text-sm text-gray-500">/year</span></p>
             <ul className="text-sm space-y-2">
-              <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> 30 Platinum accounts</li>
+              <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> 30 Premium accounts</li>
               <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Admin dashboard</li>
               <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Centralized billing</li>
               <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Priority support</li>
