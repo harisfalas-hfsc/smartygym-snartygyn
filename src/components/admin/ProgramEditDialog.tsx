@@ -55,6 +55,7 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
     weeks: 4,
     days_per_week: 4,
     equipment: '',
+    overview: '',
     training_program: '',
     program_description: '',
     construction: '',
@@ -114,6 +115,7 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
         weeks: program.weeks || 4,
         days_per_week: program.days_per_week || 4,
         equipment: program.equipment || '',
+        overview: program.overview || '',
         training_program: program.weekly_schedule || '',
         program_description: program.description || '',
         construction: program.program_structure || '',
@@ -148,6 +150,7 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
         weeks: program.weeks ?? 4,
         days_per_week: program.days_per_week ?? 4,
         equipment: program.equipment || '',
+        overview: program.overview || '',
         training_program: program.training_program || '',
         program_description: program.program_description || '',
         construction: program.construction || '',
@@ -187,6 +190,7 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
         weeks: 4,
         days_per_week: 4,
         equipment: '',
+        overview: '',
         training_program: '',
         program_description: '',
         construction: '',
@@ -345,6 +349,7 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
       // GOLD STANDARD: Normalize HTML before saving
       const normalizedWeeklySchedule = normalizeWorkoutHtml(formData.training_program || '');
       const normalizedProgramStructure = normalizeWorkoutHtml(formData.construction || '');
+      const normalizedOverview = normalizeWorkoutHtml(formData.overview || '');
 
       const baseData = {
         id: formData.id,
@@ -357,6 +362,7 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
         days_per_week: formData.days_per_week,
         equipment: formData.equipment,
         duration,
+        overview: normalizedOverview,
         weekly_schedule: normalizedWeeklySchedule,
         description: formData.program_description,
         program_structure: normalizedProgramStructure,
@@ -592,9 +598,25 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
             />
           </div>
 
-          {/* 4. Difficulty Level */}
+          {/* 4. Overview */}
           <div className="space-y-2">
-            <Label htmlFor="difficulty_stars">4. Difficulty Level</Label>
+            <Label htmlFor="overview">4. Overview</Label>
+            <p className="text-sm text-muted-foreground">
+              This is the first text block users see on the public program page. Explain what the program delivers, who it's for, and the expected outcomes.
+            </p>
+            <A4Container>
+              <RichTextEditor
+                value={formData.overview}
+                onChange={(value) => setFormData({ ...formData, overview: value })}
+                placeholder="Enter the program overview..."
+                minHeight="150px"
+              />
+            </A4Container>
+          </div>
+
+          {/* 5. Difficulty Level */}
+          <div className="space-y-2">
+            <Label htmlFor="difficulty_stars">5. Difficulty Level</Label>
             <div className="flex items-center gap-2">
               {[1, 2, 3, 4, 5, 6].map((star) => (
                 <button
