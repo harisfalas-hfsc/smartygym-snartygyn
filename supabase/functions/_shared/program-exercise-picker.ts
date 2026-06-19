@@ -37,7 +37,7 @@ const APPARATUS_DEPENDENT_BODYWEIGHT: RegExp[] = [
 ];
 
 const ABSOLUTE_SKILL_PATTERNS: RegExp[] = [
-  /muscle-?up/i,
+  /muscle[-\s]*up/i,
   /planche/i,
   /maltese/i,
   /one\s*arm\s*push/i,
