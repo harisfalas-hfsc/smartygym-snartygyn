@@ -536,7 +536,7 @@ serve(async (req) => {
     const { exercises: bodyweightExercises, referenceList: bodyweightRefList } =
       await fetchAndBuildExerciseReference(supabase, "[FREE-CAT-GEN-BW]", "body weight", libDifficulty);
     const { exercises: fullExercises, referenceList: fullRefList } =
-      await fetchAndBuildExerciseReference(supabase, "[FREE-CAT-GEN-FULL]", undefined, libDifficulty);
+      await fetchAndBuildExerciseReference(supabase, "[FREE-CAT-GEN-FULL]", "non-bodyweight", libDifficulty);
 
     log("Libraries loaded", { bw: bodyweightExercises.length, full: fullExercises.length });
 
