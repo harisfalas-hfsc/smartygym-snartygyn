@@ -237,7 +237,7 @@ export const ContentCreationWizard = ({
           price: isStandalone ? price : "",
           stripe_product_id: "",
           stripe_price_id: "",
-          tier_required: isPremium ? "gold" : "",
+          tier_required: isPremium ? "premium" : "",
         },
       });
     } else {
@@ -289,7 +289,7 @@ export const ContentCreationWizard = ({
             focus: isStrength ? focus : undefined,
             access,
             price: access === "standalone" ? price : undefined,
-            tier_required: access === "premium" ? "gold" : undefined,
+            tier_required: access === "premium" ? "premium" : undefined,
           },
         });
         if (error) throw error;
@@ -321,7 +321,7 @@ export const ContentCreationWizard = ({
             days_per_week: daysPerWeek,
             access,
             price: access === "standalone" ? price : undefined,
-            tier_required: access === "premium" ? "gold" : undefined,
+            tier_required: access === "premium" ? "premium" : undefined,
           },
         });
         if (error) throw error;
