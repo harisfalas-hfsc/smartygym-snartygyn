@@ -56,7 +56,7 @@ const ABSOLUTE_SKILL_PATTERNS: RegExp[] = [
   /pike\s*push/i,
 ];
 
-const CONDITIONAL_ADVANCED_SKILL_PATTERNS: RegExp[] = [/pistol/i];
+const CONDITIONAL_ADVANCED_SKILL_PATTERNS: RegExp[] = [/pistol|one\s*leg\s*squat/i];
 
 type CategoryRule = {
   preferred: RegExp[];
@@ -210,7 +210,7 @@ function isAdvancedTier(difficulty?: string | null): boolean {
 function isSkillExercise(ex: LibExercise, difficulty?: string | null): boolean {
   const name = ex.name || "";
   if (ABSOLUTE_SKILL_PATTERNS.some((pattern) => pattern.test(name))) return true;
-  if (!isAdvancedTier(difficulty) && CONDITIONAL_ADVANCED_SKILL_PATTERNS.some((pattern) => pattern.test(name))) return true;
+  if (CONDITIONAL_ADVANCED_SKILL_PATTERNS.some((pattern) => pattern.test(name))) return true;
   return false;
 }
 
