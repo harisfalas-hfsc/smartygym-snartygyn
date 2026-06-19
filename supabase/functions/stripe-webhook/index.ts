@@ -548,8 +548,10 @@ async function handleSubscriptionCheckout(
       logStep("ERROR: Failed to track subscription in analytics", { error: analyticsError });
     }
     
-    // Capitalize plan type for display (gold -> Gold, platinum -> Platinum)
-    const planName = planType.charAt(0).toUpperCase() + planType.slice(1);
+    // Display name for the subscription tier (e.g. "Premium", "Lifetime").
+    const planName = planType === 'legacy_premium'
+      ? 'Premium'
+      : planType.charAt(0).toUpperCase() + planType.slice(1);
     
     // Get user email
     const { data: userData } = await supabase.auth.admin.getUserById(userId);
