@@ -149,14 +149,15 @@ serve(async (req: Request) => {
 
     const body = await req.json().catch(() => ({}));
     const title: string = (body?.title || "").toString().trim();
+    const brief: string = (body?.brief || "").toString().trim();
     const category: string = (body?.category || "").toString().trim();
     const requestedWordCount = Number(body?.wordCount || 1000);
     const wordCount: WordCount = WORD_COUNTS.includes(requestedWordCount as WordCount)
       ? requestedWordCount as WordCount
       : 1000;
 
-    if (!title) {
-      return new Response(JSON.stringify({ ok: false, error: "Title is required" }), {
+    if (!title && !brief) {
+      return new Response(JSON.stringify({ ok: false, error: "Provide a title or a brief/prompt" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -174,14 +175,24 @@ serve(async (req: Request) => {
     const minWords = Math.max(650, wordCount - 100);
     const maxWords = wordCount + 100;
 
-    const prompt = `You are a professional fitness content writer for SmartyGym, a premium fitness platform. The admin has provided the EXACT title for this article — your job is to read that title, understand the subject, and write the full article around it. Do NOT change or reinterpret the title.
+    const titleInstruction = title
+      ? `ADMIN-PROVIDED TITLE: "${title}"
+You MUST use this title verbatim — do not rewrite, shorten, or "improve" it.`
+      : `ADMIN-PROVIDED BRIEF / PROMPT: """${brief}"""
+No title was provided. Read the brief carefully and CRAFT an SEO-optimized title (under 70 characters, no quotes, no trailing period) that perfectly fits the brief.`;
+
+    const briefBlock = brief && title
+      ? `\nADDITIONAL ADMIN BRIEF / NOTES / KEYWORDS (must be incorporated into the article):\n"""${brief}"""\n`
+      : "";
+
+    const prompt = `You are a professional fitness content writer for SmartyGym, a premium fitness platform. The admin gives you a subject (title and/or brief) — your job is to write the full article around it, following the brief's intent, keywords, and references.
 
 CATEGORY: ${cat}
-ADMIN-PROVIDED TITLE: "${title}"
+${titleInstruction}${briefBlock}
 TARGET LENGTH: ${wordCount} words. Acceptable range: ${minWords}-${maxWords} words.
 
 REQUIREMENTS:
-1. Use the admin's title verbatim — do not rewrite, shorten, or "improve" it.
+1. ${title ? "Use the admin's title verbatim — do not rewrite, shorten, or \"improve\" it." : "Craft a strong SEO title that matches the brief; keep it under 70 characters and free of surrounding quotes."}
 2. Write an SEO-optimized excerpt (under 160 characters) summarizing the article.
 3. Write the full article body in HTML format at the selected target length: about ${wordCount} words.
 4. Use <h2> tags for section headings (4-6 sections).
@@ -193,6 +204,7 @@ ${linksStr}
 9. Make content evidence-based, citing studies or scientific principles where relevant.
 10. Write in a professional but accessible tone.
 11. Do NOT include the title as an H1 in the content — it is displayed separately.
+12. If a brief is provided, honor every concrete instruction in it: keywords, angle, audience, references, do/don'ts.
 
 VALID INTERNAL LINKS — ONLY use links from this list. Do NOT invent or guess any URLs:
 ${validLinksReference}
@@ -204,7 +216,7 @@ AUTHOR CONTEXT: Written by Haris Falas, Sports Scientist with CSCS certification
 
 RESPOND WITH EXACTLY THIS JSON FORMAT (no markdown, no code blocks, just raw JSON):
 {
-  "title": "${title.replace(/"/g, '\\"')}",
+  "title": ${title ? `"${title.replace(/"/g, '\\"')}"` : `"Your crafted SEO title here"`},
   "excerpt": "Your 1-sentence SEO excerpt here",
   "content": "<p>Your full HTML article content here...</p>"
 }`;
@@ -250,8 +262,17 @@ RESPOND WITH EXACTLY THIS JSON FORMAT (no markdown, no code blocks, just raw JSO
     }
     parsed = parsedResponse as { title: string; excerpt: string; content: string };
 
-    // Lock the title to exactly what the admin gave us, regardless of what the model returned.
-    parsed.title = title;
+    // Lock the title to the admin's exact input when provided; otherwise trust the AI's crafted title.
+    if (title) {
+      parsed.title = title;
+    } else {
+      parsed.title = (parsed.title || "").toString().trim().replace(/^["']|["']$/g, "");
+      if (!parsed.title) {
+        return new Response(JSON.stringify({ ok: false, error: "AI failed to produce a title from the brief" }), {
+          status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
     if (!parsed.content) {
       return new Response(JSON.stringify({ ok: false, error: "AI returned empty content" }), {
         status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
