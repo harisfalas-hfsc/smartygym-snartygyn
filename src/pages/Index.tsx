@@ -407,38 +407,8 @@ const Index = () => {
       navigate(routes[serviceId]);
     }
   };
-  const handleSubscribe = async (plan: 'gold' | 'platinum') => {
-    if (!user) {
-      navigate('/auth');
-      return;
-    }
-    const priceIds = {
-      gold: STRIPE_PRICE_IDS.gold,
-      platinum: STRIPE_PRICE_IDS.platinum,
-    };
-    try {
-      const {
-        data,
-        error
-      } = await supabase.functions.invoke('create-checkout', {
-        body: {
-          priceId: priceIds[plan],
-          cancelPath: window.location.pathname + window.location.search
-        }
-      });
-      if (error) throw error;
-      if (data?.url) {
-        window.location.href = data.url;
-      }
-    } catch (error) {
-      console.error('Error creating checkout:', error);
-      toast({
-        title: "Error",
-        description: "Failed to start checkout process. Please try again.",
-        variant: "destructive"
-      });
-    }
-  };
+  // Legacy Gold/Platinum subscribe handler removed.
+  // Lifetime Premium checkout lives on /smartypremium via create-lifetime-checkout.
   return <>
       <Helmet>
         <title>SmartyGym, Online Gym — Expert Workouts and Training Programs by Haris Falas</title>
