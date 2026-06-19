@@ -264,7 +264,7 @@ serve(async (req) => {
       lovableApiKey, "overview", body.category, weeks, daysPerWeek, difficulty, equipment, philosophy,
     );
 
-    // ── 3. Weekly schedule via STANDARDIZED SKELETON + deterministic library picks ──
+    // ── 3. Compact Week A/B schedule via STANDARDIZED SKELETON + deterministic library picks ──
     // We do NOT ask the model to pick exercises. The picker guarantees every
     // bullet is a real {{exercise:ID:Name}} token (eye icon) and respects the
     // equipment/difficulty constraints exactly.
@@ -283,7 +283,8 @@ serve(async (req) => {
     })();
 
     const exercisesPerDay: string[][][] = [];
-    for (let w = 1; w <= weeks; w++) {
+    const templateCount = 2;
+    for (let w = 1; w <= templateCount; w++) {
       const wk: string[][] = [];
       for (let d = 1; d <= daysPerWeek; d++) {
         const title = dayTitlesByCategory[d - 1] || "Training Day";
