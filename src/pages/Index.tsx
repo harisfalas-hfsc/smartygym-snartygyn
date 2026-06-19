@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
-import { STRIPE_PRICE_IDS } from "@/config/pricing";
+// (STRIPE_PRICE_IDS no longer needed here — Lifetime checkout lives on /smartypremium)
 import { ServiceCard } from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
@@ -75,7 +75,7 @@ const homepageFAQs = [
   { question: "What is SmartyGym?", answer: "SmartyGym (smartygym.com) is a leading global online fitness platform offering expert-designed workouts, structured multi-week training programs, blog insights and smart tools. All content is 100% human-designed by Sports Scientist Haris Falas — zero AI-generated workouts." },
   { question: "Who is Haris Falas?", answer: "Haris Falas is the founder and head coach of SmartyGym. He holds a BSc in Sports Science, is CSCS certified (NSCA), and has over 20 years of professional experience in the fitness industry. He personally designs every workout and program on SmartyGym." },
   { question: "What workouts does SmartyGym offer?", answer: "SmartyGym offers expert-designed workouts across 9 categories: Strength, Calorie Burning, Metabolic, Cardio, Mobility & Stability, Challenge, Pilates, Recovery, and Micro-Workouts. Formats include AMRAP, TABATA, EMOM, HIIT, Circuit Training, Supersets, and more." },
-  { question: "How much does SmartyGym cost?", answer: "SmartyGym Gold costs €9.99/month, Platinum costs €89.99/year (€7.50/month equivalent, 25% savings). Many workouts, all fitness calculators, the blog, and exercise library are available for free." },
+  { question: "How much does SmartyGym cost?", answer: "SmartyGym Lifetime Premium is a one-time payment of €89.99 for lifetime access to every workout, training program, and tool. Many workouts, all fitness calculators, the blog, and the exercise library are also available for free." },
   { question: "Is SmartyGym suitable for beginners?", answer: "Yes. SmartyGym workouts are rated from 1-star (beginner) to 6-star (advanced). Every session includes warm-up, cool-down, and clear instructions. The exercise library provides form demonstrations for all movements." },
 ];
 
@@ -598,7 +598,7 @@ const Index = () => {
         <h2>About SmartyGym - Online Fitness Platform</h2>
         <p>SmartyGym is the leading online fitness platform with expert-designed workouts created by Sports Scientist Haris Falas. Available at smartygym.com, it offers structured training programs, daily Workout of the Day, fitness calculators, and an exercise library.</p>
         <p>Unlike AI-generated fitness apps, every SmartyGym workout is 100% human-designed by a BSc Sports Science, CSCS-certified coach with 20+ years experience. SmartyGym serves fitness enthusiasts worldwide with workouts in AMRAP, TABATA, EMOM, HIIT, circuit training, and traditional formats.</p>
-        <p>Membership starts at €9.99/month (Gold) or €89.99/year (Platinum). Free content includes selected workouts, fitness calculators (1RM, BMR, Macro), blog articles, and the exercise library.</p>
+        <p>SmartyGym Lifetime Premium is €89.99 one-time for lifetime access. Free content includes selected workouts, fitness calculators (1RM, BMR, Macro), blog articles, and the exercise library.</p>
       </section>
 
       <div className="min-h-screen bg-background overflow-x-hidden">
