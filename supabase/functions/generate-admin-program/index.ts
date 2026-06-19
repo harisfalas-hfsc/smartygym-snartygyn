@@ -15,6 +15,8 @@ import {
 } from "../_shared/exercise-matching.ts";
 import { normalizeWorkoutHtml } from "../_shared/html-normalizer.ts";
 import { requireAdminOrServiceRole } from "../_shared/admin-or-service-auth.ts";
+import { buildProgramSkeleton, buildPhaseInstructions, buildDefaultTips } from "../_shared/program-template.ts";
+import { buildDayBullets, filterLibraryForProgram, type LibExercise } from "../_shared/program-exercise-picker.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -239,50 +241,71 @@ serve(async (req) => {
 
     // Library — filter to bodyweight when requested
     const equipFilter = equipment.toLowerCase().includes("bodyweight") ? "body weight" : undefined;
-    const { exercises: library } =
+    const { exercises: rawLibrary } =
       await fetchAndBuildExerciseReference(supabase, "[WIZ-PROG]", equipFilter, difficultyText.toLowerCase());
-    if (!library || library.length === 0) throw new Error("No exercises available for this equipment/difficulty.");
-    const exerciseRef = buildCondensedReference(library);
+    if (!rawLibrary || rawLibrary.length === 0) throw new Error("No exercises available for this equipment/difficulty.");
+    const library: LibExercise[] = filterLibraryForProgram(rawLibrary as LibExercise[], equipment, difficultyText);
+    log("Library filtered", { remaining: library.length });
 
-    // ── 1. Name (cheap) ────────────────────────────────────────────────────
+    // ── 1. Name (cheap AI) ─────────────────────────────────────────────────
     const name = (await generateProse(lovableApiKey, "name", body.category, weeks, daysPerWeek, difficulty, equipment, philosophy))
       || `${body.category.split(" ")[0]} Protocol`;
 
-    // ── 2. Prose (description, structure, nutrition_tips) — parallel ───────
-    const [descriptionRaw, structureRaw, nutritionRaw] = await Promise.all([
-      generateProse(lovableApiKey, "description", body.category, weeks, daysPerWeek, difficulty, equipment, philosophy),
-      generateProse(lovableApiKey, "program_structure", body.category, weeks, daysPerWeek, difficulty, equipment, philosophy),
-      generateProse(lovableApiKey, "nutrition_tips", body.category, weeks, daysPerWeek, difficulty, equipment, philosophy),
-    ]);
+    // ── 2. Description (cheap AI) — overview only, no exercises ────────────
+    const descriptionRaw = await generateProse(
+      lovableApiKey, "description", body.category, weeks, daysPerWeek, difficulty, equipment, philosophy,
+    );
 
-    // ── 3. Weekly schedule in 2-week chunks (sequential to respect rate-limits) ──
-    const chunks: string[] = [];
-    const systemPrompt = buildScheduleSystemPrompt(exerciseRef, philosophy);
-    for (let start = 1; start <= weeks; start += 2) {
-      const end = Math.min(start + 1, weeks);
-      const userPrompt = buildScheduleUserPrompt({
-        name, category: body.category, totalWeeks: weeks, daysPerWeek, difficulty, equipment,
-        startWeek: start, endWeek: end,
-      });
-      const c = await callAI(lovableApiKey, systemPrompt, userPrompt, 12000);
-      if (!c) throw new Error(`AI returned empty content for weeks ${start}-${end}`);
-      chunks.push(c);
+    // ── 3. Weekly schedule via STANDARDIZED SKELETON + deterministic library picks ──
+    // We do NOT ask the model to pick exercises. The picker guarantees every
+    // bullet is a real {{exercise:ID:Name}} token (eye icon) and respects the
+    // equipment/difficulty constraints exactly.
+    const dayTitlesByCategory = (() => {
+      // Light wrapper so we can grab the same day titles the skeleton uses.
+      // We rebuild here ONLY to know each day's focus for exercise picking.
+      const skeleton = buildProgramSkeleton({ category: body.category, weeks: 1, daysPerWeek });
+      const titles: string[] = [];
+      const re = /DAY (\d+) – ([^<]+)<\/strong>/g;
+      let m: RegExpExecArray | null;
+      while ((m = re.exec(skeleton)) !== null) {
+        const dayNum = parseInt(m[1]);
+        if (dayNum <= daysPerWeek) titles.push(m[2].trim());
+      }
+      return titles;
+    })();
+
+    const exercisesPerDay: string[][][] = [];
+    for (let w = 1; w <= weeks; w++) {
+      const wk: string[][] = [];
+      for (let d = 1; d <= daysPerWeek; d++) {
+        const title = dayTitlesByCategory[d - 1] || "Training Day";
+        wk.push(buildDayBullets(library, body.category, title, w, d, 5));
+      }
+      exercisesPerDay.push(wk);
     }
-    let fullSchedule = chunks.join('\n<p class="tiptap-paragraph"></p>\n');
 
-    // ── 4. Library-first matching pipeline ─────────────────────────────────
-    const matched = processContentWithExerciseMatching(fullSchedule, library, `${LOG}[MATCH]`);
+    let fullSchedule = buildProgramSkeleton({
+      category: body.category,
+      weeks,
+      daysPerWeek,
+      exercisesPerDay,
+    });
+
+    // ── 4. Defense-in-depth: re-run library matching to enforce no plain names ──
+    const matched = processContentWithExerciseMatching(fullSchedule, library as ExerciseBasic[], `${LOG}[MATCH]`);
     fullSchedule = matched.processedContent;
-    const sweep = guaranteeAllExercisesLinked(fullSchedule, library, `${LOG}[SWEEP]`);
+    const sweep = guaranteeAllExercisesLinked(fullSchedule, library as ExerciseBasic[], `${LOG}[SWEEP]`);
     fullSchedule = sweep.processedContent;
-    const reject = rejectNonLibraryExercises(fullSchedule, library, `${LOG}[REJECT]`);
+    const reject = rejectNonLibraryExercises(fullSchedule, library as ExerciseBasic[], `${LOG}[REJECT]`);
     fullSchedule = reject.processedContent;
 
-    // ── 5. Normalize all HTML fields ───────────────────────────────────────
+    // ── 5. Phase instructions + tips (deterministic, no AI) ────────────────
+    const construction = buildPhaseInstructions(weeks, body.category);
+    const finalTips = buildDefaultTips(body.category);
+
+    // ── 6. Normalize HTML ──────────────────────────────────────────────────
     fullSchedule = normalizeWorkoutHtml(fullSchedule);
     const description = descriptionRaw ? normalizeWorkoutHtml(descriptionRaw) : "";
-    const construction = structureRaw ? normalizeWorkoutHtml(structureRaw) : "";
-    const finalTips = nutritionRaw ? normalizeWorkoutHtml(nutritionRaw) : "";
 
     const draft = {
       // id/serial intentionally omitted — editor allocates them on Save.
