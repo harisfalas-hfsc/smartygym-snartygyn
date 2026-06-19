@@ -657,11 +657,10 @@ export const generateMobileApplicationSchema = () => ({
     "lowPrice": "0",
     "highPrice": "89.99",
     "priceCurrency": "EUR",
-    "offerCount": 3,
+    "offerCount": 2,
     "offers": [
       { "@type": "Offer", "name": "Free Plan", "price": "0", "priceCurrency": "EUR" },
-      { "@type": "Offer", "name": "Gold Plan", "price": "9.99", "priceCurrency": "EUR" },
-      { "@type": "Offer", "name": "Platinum Plan", "price": "89.99", "priceCurrency": "EUR" }
+      { "@type": "Offer", "name": "SmartyGym Lifetime Premium", "price": "89.99", "priceCurrency": "EUR" }
     ]
   },
   "creator": {
