@@ -239,10 +239,122 @@ function sessionFinisher(category: string, dayTitle: string): string {
 }
 
 function sessionDuration(category: string): string {
+  // legacy — replaced by sessionDurationFor(difficulty)
+  return sessionDurationFor("Intermediate");
+}
+
+export type DifficultyTier = "Beginner" | "Intermediate" | "Advanced";
+
+function tierOf(difficulty?: string | null): DifficultyTier {
+  const d = (difficulty || "").toLowerCase();
+  if (d.startsWith("adv")) return "Advanced";
+  if (d.startsWith("beg")) return "Beginner";
+  return "Intermediate";
+}
+
+function sessionDurationFor(difficulty: DifficultyTier): string {
+  if (difficulty === "Beginner") return "40–50 minutes";
+  if (difficulty === "Advanced") return "70–80 minutes";
+  return "55–65 minutes";
+}
+
+function exerciseCountsFor(difficulty: DifficultyTier): { main: number; finisher: number } {
+  if (difficulty === "Beginner") return { main: 5, finisher: 1 };
+  if (difficulty === "Advanced") return { main: 9, finisher: 2 };
+  return { main: 7, finisher: 2 };
+}
+
+function softTissueLines(category: string): string[] {
   const cat = category.toUpperCase();
-  if (cat.includes("MOBILITY") || cat.includes("LOW BACK")) return "30–40 minutes";
-  if (cat.includes("HYPERTROPHY") || cat.includes("FUNCTIONAL STRENGTH")) return "45–60 minutes";
-  return "35–50 minutes";
+  if (cat.includes("LOW BACK") || cat.includes("MOBILITY")) {
+    return [
+      "• 90 sec diaphragmatic breathing — supine, knees bent, hands on belly",
+      "• 2–3 min gentle self-massage / foam roll on glutes, lats, and thoracic spine — pain-free pressure only",
+    ];
+  }
+  return [
+    "• 1–2 min foam roll quads, glutes, lats, and t-spine — 5–8 slow passes per area",
+    "• 1 min lacrosse-ball or self-massage on tight spots feeding today's main movements",
+  ];
+}
+
+function activationLines(category: string, dayTitle: string): string[] {
+  const cat = category.toUpperCase();
+  const title = dayTitle.toLowerCase();
+  if (cat.includes("LOW BACK")) {
+    return [
+      "• Cat-Cow × 8 slow reps",
+      "• Dead Bug × 6/side, breathing into the brace",
+      "• Glute Bridge × 10, 2-sec squeeze at the top",
+    ];
+  }
+  if (cat.includes("MOBILITY")) {
+    return [
+      "• World's Greatest Stretch × 4/side",
+      "• 90/90 hip switches × 6/side",
+      "• Thoracic open-book × 6/side",
+    ];
+  }
+  if (cat.includes("CARDIO") || title.includes("interval") || title.includes("conditioning") || cat.includes("WEIGHT LOSS")) {
+    return [
+      "• 3 min easy pulse-raiser (jog, bike, jump rope)",
+      "• Leg swings × 10/side, arm circles × 10/direction, A-skips × 20 m",
+      "• Two warm-up rounds at 50% effort of the first main-block movement",
+    ];
+  }
+  if (cat.includes("HYPERTROPHY") || cat.includes("FUNCTIONAL STRENGTH")) {
+    return [
+      "• 3 min easy cardio (row, bike, or rope skips)",
+      "• Dynamic mobility: hip openers, t-spine rotations, scapular CARs × 8/side",
+      "• 2 ramp-up sets of the first main lift at 40% and 60% of working load",
+    ];
+  }
+  return [
+    "• 3 min easy cardio",
+    "• Dynamic mobility flow for hips, shoulders, ankles, t-spine — 5 min",
+  ];
+}
+
+function coolDownLines(category: string): string[] {
+  const cat = category.toUpperCase();
+  if (cat.includes("LOW BACK") || cat.includes("MOBILITY")) {
+    return [
+      "• Child's pose × 60 sec — deep nasal breathing",
+      "• Supine figure-4 stretch × 45 sec/side",
+      "• Box breathing 4-4-4-4 × 6 cycles to down-regulate",
+    ];
+  }
+  return [
+    "• 3 min easy walk or bike — gradually drop heart rate",
+    "• Static stretches for the muscles trained today: 30 sec hold × 2 per area",
+    "• 6 cycles of 4-sec inhale / 6-sec exhale to finish",
+  ];
+}
+
+function coachingNote(category: string, dayTitle: string, weekIndex: number, totalWeeks: number, difficulty: DifficultyTier): string {
+  const cat = category.toUpperCase();
+  const phase = weekIndex === 1 ? "Foundation week"
+    : weekIndex >= Math.ceil(totalWeeks * 0.85) ? "Peak week"
+    : weekIndex === Math.ceil(totalWeeks / 2) ? "Mid-program checkpoint"
+    : "Progressive overload week";
+
+  const focus = (() => {
+    if (cat.includes("LOW BACK")) return "Keep every rep pain-free. If anything pinches, reduce range before reducing load.";
+    if (cat.includes("MOBILITY")) return "Move slowly through full pain-free range. Quality of control beats depth.";
+    if (cat.includes("HYPERTROPHY")) return "Leave 1–2 reps in reserve on the working sets. Control the eccentric (lowering) phase deliberately.";
+    if (cat.includes("FUNCTIONAL STRENGTH")) return "Move heavy loads with technical precision. Stop the set the moment form breaks down.";
+    if (cat.includes("CARDIO")) return "Hold the prescribed pace — don't sprint the early rounds and crash later.";
+    if (cat.includes("WEIGHT LOSS")) return "Move continuously, breathe steadily. The goal is sustained density, not maximum intensity.";
+    return "Focus on movement quality, breathing, and consistency. Stop sets if technique deteriorates.";
+  })();
+
+  const avoid = difficulty === "Beginner"
+    ? "Avoid going to failure today. If you can't speak a short sentence between sets, reduce load or extend rest."
+    : difficulty === "Advanced"
+      ? "Manage fatigue across the session — don't burn out on movement #2 and limp through the rest."
+      : "Build, don't max. Today is one piece of a multi-week plan.";
+
+  return `<em>${phase} — ${dayTitle}. ${focus} ${avoid}</em>`;
 }
 
 /**
@@ -256,31 +368,39 @@ export function buildDayBullets(
   weekIndex: number,
   dayIndex: number,
   count = 5,
+  difficulty?: string | null,
+  totalWeeks: number = 8,
 ): string[] {
-  const picks = pickExercisesForDay(library, dayTitle, weekIndex, dayIndex, count);
-  if (!picks.length) {
-    return [
-      `<strong>Estimated session time: ${sessionDuration(category)}</strong>`,
-      "<strong>Warm-Up — 6–8 minutes</strong>",
-      ...sessionWarmUp(category, dayTitle),
-      "<strong>Main Block — 22–35 minutes</strong>",
-      ...Array.from({ length: count }, (_, i) => `• Exercise ${i + 1} — sets × reps, rest period`),
-      "<strong>Finisher — 4–8 minutes</strong>",
-      sessionFinisher(category, dayTitle),
-      "<strong>Cool Down — 5 minutes</strong>",
-      "• Easy breathing, walking, and targeted stretching for the trained areas",
-    ];
-  }
+  const tier = tierOf(difficulty);
+  const counts = exerciseCountsFor(tier);
+  const totalNeeded = counts.main + counts.finisher;
+  const picks = pickExercisesForDay(library, dayTitle, weekIndex, dayIndex, totalNeeded);
+  const mainPicks = picks.slice(0, counts.main);
+  const finisherPicks = picks.slice(counts.main, counts.main + counts.finisher);
+
+  const mainTimeWindow = tier === "Beginner" ? "22–28 minutes" : tier === "Advanced" ? "40–50 minutes" : "30–38 minutes";
+
+  const mainBullets = mainPicks.length
+    ? mainPicks.map((ex) => buildExerciseBullet(ex, category, dayTitle))
+    : Array.from({ length: counts.main }, (_, i) => `• Exercise ${i + 1} — sets × reps, rest period`);
+
+  const finisherBullets = finisherPicks.length
+    ? finisherPicks.map((ex) => buildExerciseBullet(ex, category, dayTitle))
+    : [sessionFinisher(category, dayTitle)];
+
   return [
-    `<strong>Estimated session time: ${sessionDuration(category)}</strong>`,
-    "<strong>Warm-Up — 6–8 minutes</strong>",
-    ...sessionWarmUp(category, dayTitle),
-    "<strong>Main Block — 22–35 minutes</strong>",
-    ...picks.map((ex) => buildExerciseBullet(ex, category, dayTitle)),
-    "<strong>Finisher — 4–8 minutes</strong>",
-    sessionFinisher(category, dayTitle),
-    "<strong>Cool Down — 5 minutes</strong>",
-    "• Easy breathing, walking, and targeted stretching for the trained areas",
+    coachingNote(category, dayTitle, weekIndex, totalWeeks, tier),
+    `<strong>Estimated session time: ${sessionDurationFor(tier)}</strong>`,
+    "<strong>🔥 Soft Tissue Preparation — 3–5 minutes</strong>",
+    ...softTissueLines(category),
+    "<strong>⚡ Activation / Warm-Up — 6–8 minutes</strong>",
+    ...activationLines(category, dayTitle),
+    `<strong>🏋 Main Workout — ${mainTimeWindow}</strong>`,
+    ...mainBullets,
+    "<strong>💥 Finisher — 4–8 minutes</strong>",
+    ...finisherBullets,
+    "<strong>🧘 Cool Down — 5 minutes</strong>",
+    ...coolDownLines(category),
   ];
 }
 
