@@ -137,7 +137,7 @@ const TrainingProgramDetail = () => {
     "cardio-endurance": "/images/programs/cardio-endurance-bg.jpg",
     "functional-strength": "/images/programs/functional-strength-bg.jpg",
     "muscle-hypertrophy": "/images/programs/muscle-hypertrophy-bg.jpg",
-    "weight-loss": "/images/programs/weight-loss-bg.jpg",
+    "weight-loss": "/images/programs/weight-loss-card-mobile.jpg",
     "low-back-pain": "/images/programs/low-back-pain-bg.jpg",
     "mobility-stability": "/images/programs/mobility-stability-bg.jpg",
   };

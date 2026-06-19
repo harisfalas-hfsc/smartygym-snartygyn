@@ -104,7 +104,7 @@ const TrainingProgramFlow = () => {
     "cardio-endurance": "/images/programs/cardio-endurance-bg.jpg",
     "functional-strength": "/images/programs/functional-strength-bg.jpg",
     "muscle-hypertrophy": "/images/programs/muscle-hypertrophy-bg.jpg",
-    "weight-loss": "/images/programs/weight-loss-bg.jpg",
+    "weight-loss": "/images/programs/weight-loss-card-mobile.jpg",
     "low-back-pain": "/images/programs/low-back-pain-bg.jpg",
     "mobility-stability": "/images/programs/mobility-stability-bg.jpg",
   };
@@ -114,7 +114,7 @@ const TrainingProgramFlow = () => {
     "cardio-endurance": "/images/programs/cardio-endurance-card-mobile.jpg",
     "functional-strength": "/images/programs/functional-strength-card-mobile.jpg",
     "muscle-hypertrophy": "/images/programs/muscle-hypertrophy-card-mobile.jpg",
-    "weight-loss": "/images/programs/weight-loss-training.jpg",
+    "weight-loss": "/images/programs/weight-loss-card-mobile.jpg",
     "low-back-pain": "/images/programs/low-back-pain-card-mobile.jpg",
     "mobility-stability": "/images/programs/mobility-stability-card-mobile.jpg",
   };
