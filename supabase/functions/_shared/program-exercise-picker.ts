@@ -23,6 +23,7 @@ const APPARATUS_DEPENDENT_BODYWEIGHT: RegExp[] = [
   /pull-?up/i,
   /chin-?up/i,
   /front\s*lever/i,
+  /hanging/i,
   /muscle-?up/i,
   /\bdip(s)?\b/i,
   /parallel\s*bars?/i,
@@ -124,6 +125,7 @@ function isStaticHoldExercise(ex: LibExercise): boolean {
     /^back\s+lever$/i,
     /^front\s+lever$/i,
     /\bl-?sit\b/i,
+    /\bplanche\b/i,
     /\bwall\s+sit\b/i,
     /\bdead\s+hang\b/i,
     /\bsupport\s+hold\b/i,
@@ -142,12 +144,12 @@ function excludesStaticHolds(ex: LibExercise): boolean {
 function defaultPrescription(category: string, dayTitle: string): string {
   const cat = category.toUpperCase();
   const title = dayTitle.toLowerCase();
-  if (cat.includes("HYPERTROPHY")) return "3 × 10 reps";
-  if (cat.includes("FUNCTIONAL STRENGTH")) return "4 × 8 reps";
-  if (cat.includes("CARDIO") || title.includes("interval") || title.includes("conditioning")) return "5 × 60 sec";
-  if (cat.includes("WEIGHT LOSS") || title.includes("metabolic")) return "3 rounds × 45 sec";
-  if (cat.includes("MOBILITY") || cat.includes("LOW BACK")) return "2 × 12 reps";
-  return "3 × 10 reps";
+  if (cat.includes("HYPERTROPHY")) return "4 × 8–12 reps, tempo 3-1-1, rest 75–90 sec";
+  if (cat.includes("FUNCTIONAL STRENGTH")) return "4 × 6–10 reps, rest 90 sec";
+  if (cat.includes("CARDIO") || title.includes("interval") || title.includes("conditioning")) return "3 rounds × 45 sec work / 15 sec transition, rest 90 sec after each round";
+  if (cat.includes("WEIGHT LOSS") || title.includes("metabolic")) return "3 rounds × 40 sec work / 20 sec transition, rest 90 sec after each round";
+  if (cat.includes("MOBILITY") || cat.includes("LOW BACK")) return "2–3 × 10–12 controlled reps, rest 45 sec";
+  return "3 × 10–12 reps, rest 60 sec";
 }
 
 export function prescriptionForExercise(ex: LibExercise, category: string, dayTitle: string): string {
@@ -180,18 +182,67 @@ export function pickExercisesForDay(
 ): LibExercise[] {
   if (!library.length) return [];
   const matched = library.filter((ex) => matchesFocus(ex, dayTitle));
-  const pool = matched;
+  const pool = matched.length >= n ? matched : [...matched, ...library.filter((ex) => !matched.some((m) => m.id === ex.id))];
   // Deterministic rotation so weeks vary but stay stable for the same input
   const seed = (weekIndex * 31 + dayIndex * 7) % Math.max(pool.length, 1);
+  const candidates = Array.from({ length: pool.length }, (_, i) => pool[(seed + i) % pool.length]);
+  const movementFamily = (ex: LibExercise): string => {
+    const name = (ex.name || "").toLowerCase();
+    if (/burpee|jack|jump|hop|bound/.test(name)) return "plyometric";
+    if (/push|press|chest/.test(name)) return "push";
+    if (/row|pull|chin/.test(name)) return "pull";
+    if (/squat|lunge|leg/.test(name)) return "lower";
+    if (/run|walk|step|mountain|climber/.test(name)) return "locomotion";
+    if (/plank|crunch|sit|twist|core|abs/.test(name)) return "core";
+    return (ex.body_part || ex.target || "general").toLowerCase();
+  };
   const picks: LibExercise[] = [];
   const usedIds = new Set<string>();
-  for (let i = 0; i < pool.length && picks.length < n; i++) {
-    const ex = pool[(seed + i) % pool.length];
+  const usedFamilies = new Set<string>();
+  for (const ex of candidates) {
+    if (picks.length >= n) break;
+    const family = movementFamily(ex);
+    if (usedIds.has(ex.id)) continue;
+    if (usedFamilies.has(family) && picks.length < Math.min(n, 4)) continue;
+    usedIds.add(ex.id);
+    usedFamilies.add(family);
+    picks.push(ex);
+  }
+  for (const ex of candidates) {
+    if (picks.length >= n) break;
     if (usedIds.has(ex.id)) continue;
     usedIds.add(ex.id);
     picks.push(ex);
   }
   return picks;
+}
+
+function sessionWarmUp(category: string, dayTitle: string): string[] {
+  const cat = category.toUpperCase();
+  if (cat.includes("MOBILITY") || cat.includes("LOW BACK")) {
+    return ["• 3 minutes easy breathing and spinal decompression", "• 4–5 minutes gentle joint circles and pain-free range-of-motion rehearsal"];
+  }
+  if (cat.includes("WEIGHT LOSS") || dayTitle.toLowerCase().includes("metabolic")) {
+    return ["• 3 minutes easy pulse-raiser", "• 3–5 minutes dynamic mobility for hips, shoulders, ankles, and trunk"];
+  }
+  return ["• 3–4 minutes easy cardio", "• 4–6 minutes dynamic mobility and ramp-up sets for the first two movements"];
+}
+
+function sessionFinisher(category: string, dayTitle: string): string {
+  const cat = category.toUpperCase();
+  const title = dayTitle.toLowerCase();
+  if (cat.includes("MOBILITY") || cat.includes("LOW BACK")) return "• 4–6 minutes controlled breathing, unloaded carries, or gentle anti-rotation practice";
+  if (cat.includes("HYPERTROPHY")) return "• 2 rounds of the final two movements with lighter load, controlled tempo, and 45 sec rest";
+  if (cat.includes("FUNCTIONAL STRENGTH")) return "• 6 minutes density work using the safest loaded carry or full-body pattern from the main block";
+  if (cat.includes("CARDIO") || cat.includes("WEIGHT LOSS") || title.includes("conditioning")) return "• 6–8 minutes steady finisher: repeat the final 3 movements at sustainable pace, rest only as needed";
+  return "• 5 minutes easy density work using movements already listed above";
+}
+
+function sessionDuration(category: string): string {
+  const cat = category.toUpperCase();
+  if (cat.includes("MOBILITY") || cat.includes("LOW BACK")) return "30–40 minutes";
+  if (cat.includes("HYPERTROPHY") || cat.includes("FUNCTIONAL STRENGTH")) return "45–60 minutes";
+  return "35–50 minutes";
 }
 
 /**
@@ -208,9 +259,29 @@ export function buildDayBullets(
 ): string[] {
   const picks = pickExercisesForDay(library, dayTitle, weekIndex, dayIndex, count);
   if (!picks.length) {
-    return Array.from({ length: count }, () => "• Exercise");
+    return [
+      `<strong>Estimated session time: ${sessionDuration(category)}</strong>`,
+      "<strong>Warm-Up — 6–8 minutes</strong>",
+      ...sessionWarmUp(category, dayTitle),
+      "<strong>Main Block — 22–35 minutes</strong>",
+      ...Array.from({ length: count }, (_, i) => `• Exercise ${i + 1} — sets × reps, rest period`),
+      "<strong>Finisher — 4–8 minutes</strong>",
+      sessionFinisher(category, dayTitle),
+      "<strong>Cool Down — 5 minutes</strong>",
+      "• Easy breathing, walking, and targeted stretching for the trained areas",
+    ];
   }
-  return picks.map((ex) => buildExerciseBullet(ex, category, dayTitle));
+  return [
+    `<strong>Estimated session time: ${sessionDuration(category)}</strong>`,
+    "<strong>Warm-Up — 6–8 minutes</strong>",
+    ...sessionWarmUp(category, dayTitle),
+    "<strong>Main Block — 22–35 minutes</strong>",
+    ...picks.map((ex) => buildExerciseBullet(ex, category, dayTitle)),
+    "<strong>Finisher — 4–8 minutes</strong>",
+    sessionFinisher(category, dayTitle),
+    "<strong>Cool Down — 5 minutes</strong>",
+    "• Easy breathing, walking, and targeted stretching for the trained areas",
+  ];
 }
 
 /**

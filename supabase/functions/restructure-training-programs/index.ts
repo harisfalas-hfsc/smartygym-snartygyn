@@ -63,6 +63,7 @@ Deno.serve(async (req) => {
     // 1. Load programs
     let q = supabase.from("admin_training_programs").select("*");
     if (programIds && programIds.length) q = q.in("id", programIds);
+    else q = q.eq("is_visible", true);
     const { data: programs, error: pErr } = await q;
     if (pErr) throw pErr;
     if (!programs || !programs.length) {
@@ -90,6 +91,12 @@ Deno.serve(async (req) => {
     const results: Array<{ id: string; name: string; status: string; bullets: number; reused: number }> = [];
 
     for (const p of programs) {
+      const protectedLabel = `${p.id || ""} ${p.name || ""} ${p.category || ""}`.toLowerCase();
+      if (protectedLabel.includes("hfsc")) {
+        results.push({ id: p.id, name: p.name, status: "skipped-protected", bullets: 0, reused: 0 });
+        continue;
+      }
+
       const weeks = Number(p.weeks) || 4;
       const daysPerWeek = Number(p.days_per_week) || 4;
       const diff = difficultyText(p.difficulty_stars);
@@ -128,7 +135,7 @@ Deno.serve(async (req) => {
         const wk: string[][] = [];
         for (let d = 1; d <= daysPerWeek; d++) {
           const title = titles[d - 1] || "Training Day";
-          const picks = buildDayBullets(library, p.category, title, w, d, 5);
+          const picks = buildDayBullets(library, p.category, title, w, d, 6);
           // Swap in a reused exercise for the first slot when available to honor
           // the original program's curated picks.
           if (usedQueue.length) {
