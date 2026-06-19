@@ -254,9 +254,8 @@ WHY SMARTYGYM?
 • Professional Fitness Tools
 • Progress Tracking & Analytics
 
-MEMBERSHIP OPTIONS:
-• Gold: €9.99/month - All premium workouts + programs
-• Platinum: €89.89/year - Everything + exclusive content
+MEMBERSHIP:
+• SmartyGym Lifetime Premium: €89.99 one-time payment — lifetime access to every workout, training program, and tool. No monthly fees.
 
 Start your transformation at smartygym.com`;
 
@@ -271,7 +270,7 @@ SMARTY CORPORATE PLANS:
 • Smarty Enterprise (unlimited): €699/year
 
 BENEFITS:
-• Full Platinum access for all members
+• Full Premium access for all members
 • Centralized billing
 • Team management dashboard
 • Priority support
