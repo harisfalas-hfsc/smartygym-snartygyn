@@ -128,7 +128,7 @@ describe('AccessGate', () => {
 
     const { getByText } = render(
       <TestWrapper>
-        <AccessGate contentId="workout-1" contentType="workout" requirePremium>
+        <AccessGate contentId="workout-1" contentType="workout" requirePremium requireAuth>
           <div>Premium Content</div>
         </AccessGate>
       </TestWrapper>

@@ -3,6 +3,7 @@ import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { PurchaseButton } from '../PurchaseButton';
 import { useAccessControl } from '@/hooks/useAccessControl';
+import { BrowserRouter } from 'react-router-dom';
 
 // Mock the useAccessControl hook
 vi.mock('@/hooks/useAccessControl');
@@ -29,6 +30,10 @@ vi.mock('@/integrations/supabase/client', () => ({
     },
   },
 }));
+
+const TestWrapper = ({ children }: { children: React.ReactNode }) => (
+  <BrowserRouter>{children}</BrowserRouter>
+);
 
 describe('PurchaseButton', () => {
   beforeEach(() => {
