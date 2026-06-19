@@ -55,6 +55,7 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
     weeks: 4,
     days_per_week: 4,
     equipment: '',
+    overview: '',
     training_program: '',
     program_description: '',
     construction: '',
