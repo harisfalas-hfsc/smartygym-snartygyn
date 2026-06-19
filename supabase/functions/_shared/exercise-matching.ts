@@ -12,23 +12,34 @@ export interface ExerciseBasic {
   difficulty?: string | null;
 }
 
+const STATIC_HOLD_PATTERNS: RegExp[] = [
+  /^back\s+lever$/i,
+  /^front\s+lever$/i,
+  /^front\s+lever\s+reps$/i,
+  /\bl-?sit\b/i,
+  /\bwall\s+sit\b/i,
+  /\bdead\s+hang\b/i,
+  /\bsupport\s+hold\b/i,
+  /\bhollow\s+(?:body\s+)?hold\b/i,
+  /\barch\s+hold\b/i,
+  /^flag$/i,
+  /^full\s+planche$/i,
+  /^handstand$/i,
+  /\bforearm\s+plank\b/i,
+  /^bodyweight\s+incline\s+side\s+plank$/i,
+  /\bisometric\s+chest\s+squeeze\b/i,
+];
+
 export function isStaticHoldExerciseName(name: string): boolean {
   const normalized = (name || '').toLowerCase().trim();
+  if (STATIC_HOLD_PATTERNS.some((pattern) => pattern.test(normalized))) return true;
   if (!normalized || /\breps?\b|tap|twist|row|fly|raise|press|push|pull|wiper|walk|crawl/i.test(normalized)) return false;
 
-  return [
-    /^back\s+lever$/i,
-    /^front\s+lever$/i,
-    /\bl-?sit\b/i,
-    /\bwall\s+sit\b/i,
-    /\bdead\s+hang\b/i,
-    /\bsupport\s+hold\b/i,
-    /\bhollow\s+(?:body\s+)?hold\b/i,
-    /\barch\s+hold\b/i,
-    /\bforearm\s+plank\b/i,
-    /^bodyweight\s+incline\s+side\s+plank$/i,
-    /\bisometric\s+chest\s+squeeze\b/i,
-  ].some((pattern) => pattern.test(normalized));
+  return STATIC_HOLD_PATTERNS.some((pattern) => pattern.test(normalized));
+}
+
+export function filterOutStaticHoldExercises<T extends { name?: string | null }>(exercises: T[]): T[] {
+  return exercises.filter((exercise) => !isStaticHoldExerciseName(exercise.name || ''));
 }
 
 export function repairStaticHoldPrescriptions(
@@ -55,6 +66,36 @@ export function repairStaticHoldPrescriptions(
   }
 
   return { processedContent, repaired };
+}
+
+export function removeStaticHoldsFromMomentumSections(
+  content: string,
+  logPrefix = '[HOLD-PLACEMENT]'
+): { processedContent: string; removed: Array<{ section: string; exercise: string }> } {
+  const removed: Array<{ section: string; exercise: string }> = [];
+  if (!content) return { processedContent: content || '', removed };
+
+  const sections = splitIntoSections(content);
+  if (!sections.length) return { processedContent: content, removed };
+
+  const processedContent = sections.map((section) => {
+    if (section.name !== 'main_workout' && section.name !== 'finisher') return section.content;
+
+    return section.content.replace(
+      /<li\b[^>]*>[\s\S]*?\{\{exercise:[^:}]+:([^}]+)\}\}[\s\S]*?<\/li>/gi,
+      (full, exerciseName: string) => {
+        if (!isStaticHoldExerciseName(exerciseName)) return full;
+        removed.push({ section: section.name, exercise: exerciseName });
+        return '';
+      },
+    );
+  }).join('');
+
+  if (removed.length > 0) {
+    console.log(`${logPrefix} Removed ${removed.length} static holds from Main/Finisher momentum sections`);
+  }
+
+  return { processedContent, removed };
 }
 
 const NON_BODYWEIGHT_FILTER = 'non-bodyweight';
@@ -940,6 +981,8 @@ export function buildExerciseReferenceList(exercises: ExerciseBasic[], equipment
       filtered = filtered.filter(ex => (ex.difficulty || '').toLowerCase() === dl);
     }
   }
+  const beforeStaticHoldFilter = filtered.length;
+  filtered = filterOutStaticHoldExercises(filtered);
 
   // Group by TARGET MUSCLE → BODY PART for structured browsing
   const grouped: Record<string, Record<string, Array<{ id: string; name: string; equipment: string; difficulty: string }>>> = {};
@@ -993,6 +1036,11 @@ export function buildExerciseReferenceList(exercises: ExerciseBasic[], equipment
     '- Use {{exercise:ID:Name}} format in ALL sections — Main Workout (💪), Finisher (⚡), Activation (🔥), Warm-Up, and Cool Down (🧘).',
     '- NEVER invent, rename, or create exercises not listed below.',
     '- If the exercise you want does not exist here, pick the closest biomechanical equivalent FROM THIS LIST.',
+    '- Static/isometric holds are NOT allowed in Main Workout or Finisher momentum blocks. They may only appear in Activation, Cool Down, or a dedicated isometric section when intentionally programmed.',
+    '- For hypertrophy, do NOT use static/isometric holds as primary working sets. Use dynamic loaded or rep-based movements that can progress toward failure.',
+    beforeStaticHoldFilter !== filtered.length
+      ? `Static/isometric hold exercises were removed from this selectable list (${beforeStaticHoldFilter - filtered.length} removed). Do not recreate them by name.`
+      : 'No static/isometric hold exercises are available for primary selection.',
     '',
     isBodyweightFilter
       ? `This is a BODYWEIGHT (no-equipment / home / hotel / travel) workout. ${filtered.length} exercises are available. NO benches, NO pull-up bars, NO dip stations, NO glute-ham/GHD benches, NO rings, NO parallel bars, NO boxes, NO captain's chair, NO gym apparatus of any kind. Pick exercises a user can perform on a flat floor with their own bodyweight only. A wall, a doorway, or a sturdy chair for support is acceptable only when explicitly part of the listed exercise.`
@@ -1434,6 +1482,11 @@ export async function fetchAndBuildExerciseReference(
       exercisesForMatching = exercisesForMatching.filter(ex => (ex.difficulty || '').toLowerCase() === dl);
       console.log(`${logPrefix} Strict difficulty filter (${dl}) leaves ${exercisesForMatching.length} exercises`);
     }
+  }
+  const beforeStaticHoldMatchFilter = exercisesForMatching.length;
+  exercisesForMatching = filterOutStaticHoldExercises(exercisesForMatching);
+  if (beforeStaticHoldMatchFilter !== exercisesForMatching.length) {
+    console.log(`${logPrefix} Static-hold guardrail removed ${beforeStaticHoldMatchFilter - exercisesForMatching.length} exercises from generation/matching pool`);
   }
   
   return { exercises: exercisesForMatching, referenceList };

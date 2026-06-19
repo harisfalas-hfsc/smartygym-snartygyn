@@ -1,5 +1,5 @@
 import { assert, assertEquals } from "https://deno.land/std@0.224.0/assert/mod.ts";
-import { buildExerciseReferenceList, repairStaticHoldPrescriptions } from "./exercise-matching.ts";
+import { buildExerciseReferenceList, repairStaticHoldPrescriptions, removeStaticHoldsFromMomentumSections } from "./exercise-matching.ts";
 import { buildExerciseBullet, filterLibraryForProgram, pickExercisesForDay, type LibExercise } from "./program-exercise-picker.ts";
 
 const LIBRARY: LibExercise[] = [
@@ -48,11 +48,11 @@ Deno.test("workout reference list: non-bodyweight and strict difficulty filter r
   assertEquals(ref.includes("machine chest press"), false);
 });
 
-Deno.test("program picker: static holds use timed hold prescriptions, not plain reps", () => {
-  const backLever = LIBRARY.find((ex) => ex.id === "eq-adv-back-lever")!;
+Deno.test("program picker: static holds are excluded from primary program exercise pools", () => {
+  const equipmentAdvanced = filterLibraryForProgram(LIBRARY, "Equipment", "Advanced");
   const sidePlankFly = LIBRARY.find((ex) => ex.id === "eq-adv-side-plank-row")!;
 
-  assertEquals(buildExerciseBullet(backLever, "MUSCLE HYPERTROPHY", "Back & Biceps"), "• {{exercise:eq-adv-back-lever:back lever}} – 3 × 10-sec holds");
+  assertEquals(equipmentAdvanced.some((ex) => ex.id === "eq-adv-back-lever"), false);
   assertEquals(buildExerciseBullet(sidePlankFly, "MUSCLE HYPERTROPHY", "Back & Biceps"), "• {{exercise:eq-adv-side-plank-row:dumbbell side plank with rear fly}} – 3 × 10 reps");
 });
 
@@ -62,4 +62,15 @@ Deno.test("exercise matching: post-processing repairs static hold prescriptions 
 
   assert(repaired.includes("{{exercise:3297:back lever}} – 3 × 10-sec holds"));
   assert(repaired.includes("{{exercise:3664:dumbbell side plank with rear fly}} – 3 × 10"));
+});
+
+Deno.test("exercise matching: static holds are removed from Main Workout momentum sections", () => {
+  const html = `<p>🔥 <strong><u>Activation 5'</u></strong></p><ul><li><p>20 sec {{exercise:forearm-plank:Forearm Plank}}</p></li></ul><p>💪 <strong><u>Main Workout (AMRAP)</u></strong></p><ul><li><p>30 sec {{exercise:forearm-plank:Forearm Plank}}</p></li><li><p>12 reps {{exercise:0662:push-up}}</p></li></ul>`;
+  const result = removeStaticHoldsFromMomentumSections(html);
+
+  assertEquals(result.removed.length, 1);
+  assert(result.processedContent.includes("Activation 5'"));
+  assert(result.processedContent.includes("20 sec {{exercise:forearm-plank:Forearm Plank}}"));
+  assertEquals(result.processedContent.includes("30 sec {{exercise:forearm-plank:Forearm Plank}}"), false);
+  assert(result.processedContent.includes("12 reps {{exercise:0662:push-up}}"));
 });
