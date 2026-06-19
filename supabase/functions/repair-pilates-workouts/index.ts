@@ -4,6 +4,7 @@ import {
   processContentSectionAware,
   guaranteeAllExercisesLinked,
   rejectNonLibraryExercises,
+  repairStaticHoldPrescriptions,
   stripExerciseMarkup,
   type ExerciseBasic,
 } from "../_shared/exercise-matching.ts";
@@ -128,6 +129,7 @@ serve(async (req) => {
         // Strict rejection
         const rejected = rejectNonLibraryExercises(processed, exercisePool, `[REPAIR-REJECT][${field}]`);
         processed = rejected.processedContent;
+        processed = repairStaticHoldPrescriptions(processed, `[REPAIR-HOLD-RX][${field}]`).processedContent;
 
         totalRemoved += rejected.rejected.length;
         totalReplaced += rejected.substituted.length + swept.forcedMatches.length;
