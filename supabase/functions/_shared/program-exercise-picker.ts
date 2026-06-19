@@ -13,6 +13,7 @@ export interface LibExercise {
   equipment?: string | null;
   target?: string | null;
   difficulty?: string | null;
+  description?: string | null;
 }
 
 const BODYWEIGHT_EQUIPMENT = new Set(["body weight", "bodyweight"]);
@@ -113,15 +114,50 @@ function isHomeBodyweightFriendly(ex: LibExercise): boolean {
   return isBodyweightExercise(ex) && !APPARATUS_DEPENDENT_BODYWEIGHT.some((pattern) => pattern.test(ex.name || ""));
 }
 
+function isStaticHoldExercise(ex: LibExercise): boolean {
+  const name = (ex.name || "").toLowerCase().trim();
+  if (!name || /\breps?\b|tap|twist|row|fly|raise|press|push|pull|wiper|walk|crawl/i.test(name)) return false;
+
+  return [
+    /^back\s+lever$/i,
+    /^front\s+lever$/i,
+    /\bl-?sit\b/i,
+    /\bwall\s+sit\b/i,
+    /\bdead\s+hang\b/i,
+    /\bsupport\s+hold\b/i,
+    /\bhollow\s+(?:body\s+)?hold\b/i,
+    /\barch\s+hold\b/i,
+    /\bforearm\s+plank\b/i,
+    /^bodyweight\s+incline\s+side\s+plank$/i,
+    /\bisometric\s+chest\s+squeeze\b/i,
+  ].some((pattern) => pattern.test(name));
+}
+
 function defaultPrescription(category: string, dayTitle: string): string {
   const cat = category.toUpperCase();
   const title = dayTitle.toLowerCase();
-  if (cat.includes("HYPERTROPHY")) return "3 × 10";
-  if (cat.includes("FUNCTIONAL STRENGTH")) return "4 × 8";
+  if (cat.includes("HYPERTROPHY")) return "3 × 10 reps";
+  if (cat.includes("FUNCTIONAL STRENGTH")) return "4 × 8 reps";
   if (cat.includes("CARDIO") || title.includes("interval") || title.includes("conditioning")) return "5 × 60 sec";
   if (cat.includes("WEIGHT LOSS") || title.includes("metabolic")) return "3 rounds × 45 sec";
   if (cat.includes("MOBILITY") || cat.includes("LOW BACK")) return "2 × 12 reps";
-  return "3 × 10";
+  return "3 × 10 reps";
+}
+
+export function prescriptionForExercise(ex: LibExercise, category: string, dayTitle: string): string {
+  if (!isStaticHoldExercise(ex)) return defaultPrescription(category, dayTitle);
+
+  const cat = category.toUpperCase();
+  const title = dayTitle.toLowerCase();
+  if (cat.includes("FUNCTIONAL STRENGTH")) return "4 × 8-sec holds";
+  if (cat.includes("CARDIO") || title.includes("interval") || title.includes("conditioning")) return "4 × 15-sec holds";
+  if (cat.includes("WEIGHT LOSS") || title.includes("metabolic")) return "3 rounds × 20-sec holds";
+  if (cat.includes("MOBILITY") || cat.includes("LOW BACK")) return "2 × 20-sec holds";
+  return "3 × 10-sec holds";
+}
+
+export function buildExerciseBullet(ex: LibExercise, category: string, dayTitle: string): string {
+  return `• {{exercise:${ex.id}:${ex.name}}} – ${prescriptionForExercise(ex, category, dayTitle)}`;
 }
 
 /**
@@ -168,8 +204,7 @@ export function buildDayBullets(
   if (!picks.length) {
     return Array.from({ length: count }, () => "• Exercise");
   }
-  const prescription = defaultPrescription(category, dayTitle);
-  return picks.map((ex) => `• {{exercise:${ex.id}:${ex.name}}} – ${prescription}`);
+  return picks.map((ex) => buildExerciseBullet(ex, category, dayTitle));
 }
 
 /**
