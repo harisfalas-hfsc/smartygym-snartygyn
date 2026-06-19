@@ -233,8 +233,9 @@ function matchesCategoryRule(ex: LibExercise, category: string): boolean {
 
 function categorySelectionPool(library: LibExercise[], category: string, needed: number, difficulty?: string | null): LibExercise[] {
   const safe = library.filter((ex) => excludesSkillExercises(ex, difficulty));
+  if (!ruleForCategory(category)) return safe;
   const categoryMatched = safe.filter((ex) => matchesCategoryRule(ex, category));
-  return categoryMatched.length >= needed ? categoryMatched : safe;
+  return categoryMatched;
 }
 
 function defaultPrescription(category: string, dayTitle: string): string {
