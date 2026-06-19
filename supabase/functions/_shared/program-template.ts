@@ -249,30 +249,11 @@ export function buildProgramSkeleton(input: SkeletonInput): string {
  */
 export function buildPhaseInstructions(weeks: number, category: string): string {
   const lines: string[] = [];
-  lines.push(`<p class="tiptap-paragraph"><strong>📝 Program Periodization</strong></p>`);
-
-  const phases: Array<{ range: string; name: string; desc: string }> = [];
-  if (weeks >= 12) {
-    phases.push({ range: "Weeks 1–3", name: "Foundation Phase", desc: "Focus on movement quality, exercise mastery, and building a foundation for future progression." });
-    phases.push({ range: "Weeks 4–7", name: "Progressive Overload Phase", desc: "Gradually increase loads, repetitions, or total volume whenever all prescribed sets can be completed with excellent technique." });
-    phases.push({ range: "Week 8", name: "Recovery & Deload Phase", desc: "Reduce training volume by approximately 40–50% while maintaining movement quality and technique." });
-    phases.push({ range: "Weeks 9–11", name: "Peak Phase", desc: "Increase training density, intensity, and total workload to maximize adaptations." });
-    phases.push({ range: "Week 12", name: "Final Challenge Phase", desc: "Apply all previous adaptations and complete the highest-performance training week of the program." });
-  } else if (weeks >= 8) {
-    phases.push({ range: "Weeks 1–2", name: "Foundation Phase", desc: "Build technique and baseline volume." });
-    phases.push({ range: `Weeks 3–${Math.ceil(weeks * 0.6)}`, name: "Progressive Overload Phase", desc: "Increase loads and volume with quality technique." });
-    phases.push({ range: `Weeks ${Math.ceil(weeks * 0.6) + 1}–${weeks - 1}`, name: "Peak Phase", desc: "Maximize training intensity and stimulus." });
-    phases.push({ range: `Week ${weeks}`, name: "Final Challenge Phase", desc: "Highest-performance week — apply all adaptations." });
-  } else {
-    phases.push({ range: "Week 1", name: "Foundation Phase", desc: "Establish technique and baseline volume." });
-    phases.push({ range: `Weeks 2–${weeks - 1}`, name: "Progressive Overload Phase", desc: "Increase loads and volume progressively." });
-    phases.push({ range: `Week ${weeks}`, name: "Final Challenge Phase", desc: "Highest performance week of the program." });
-  }
-
-  for (const p of phases) {
-    lines.push(`<p class="tiptap-paragraph"><strong>${p.range} — ${p.name}</strong></p>`);
-    lines.push(`<p class="tiptap-paragraph">${p.desc}</p>`);
-  }
+  lines.push(`<p class="tiptap-paragraph"><strong>📝 Compact Program Instructions</strong></p>`);
+  lines.push(`<p class="tiptap-paragraph">This is a professional repeat-and-progress training plan. It contains Week A and Week B templates only; the athlete repeats those workouts and follows the progression rules instead of scrolling through a brand-new workout for every calendar week.</p>`);
+  lines.push(`<p class="tiptap-paragraph">${categoryProgressionRule(category)}</p>`);
+  lines.push(`<p class="tiptap-paragraph"><strong>Weekly Progression Rules</strong></p>`);
+  for (const line of progressionLines(weeks, category)) lines.push(`<p class="tiptap-paragraph">${line}</p>`);
 
   lines.push(`<p class="tiptap-paragraph"></p>`);
   lines.push(`<p class="tiptap-paragraph"><strong>General Guidelines</strong></p>`);
