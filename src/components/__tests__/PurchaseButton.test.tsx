@@ -53,14 +53,12 @@ describe('PurchaseButton', () => {
       refreshAccess: vi.fn(),
     });
 
-    const { getByText, getByRole } = render(
-      <PurchaseButton
+    const { getByText, getByRole } = render(<TestWrapper><PurchaseButton
         contentId="workout-1"
         contentType="workout"
         contentName="Test Workout"
         price={29.99}
-      />
-    );
+      /></TestWrapper>);
 
     expect(getByText(/Included in Your Premium Plan/i)).toBeInTheDocument();
     expect(getByRole('button')).toBeDisabled();
@@ -79,14 +77,12 @@ describe('PurchaseButton', () => {
       refreshAccess: vi.fn(),
     });
 
-    const { getByText, getByRole } = render(
-      <PurchaseButton
+    const { getByText, getByRole } = render(<TestWrapper><PurchaseButton
         contentId="workout-1"
         contentType="workout"
         contentName="Test Workout"
         price={29.99}
-      />
-    );
+      /></TestWrapper>);
 
     expect(getByText(/Purchase for €29.99/i)).toBeInTheDocument();
     expect(getByRole('button')).not.toBeDisabled();
@@ -105,14 +101,12 @@ describe('PurchaseButton', () => {
       refreshAccess: vi.fn(),
     });
 
-    const { getByText, getByRole } = render(
-      <PurchaseButton
+    const { getByText, getByRole } = render(<TestWrapper><PurchaseButton
         contentId="workout-1"
         contentType="workout"
         contentName="Test Workout"
         price={29.99}
-      />
-    );
+      /></TestWrapper>);
 
     expect(getByText(/Already Purchased/i)).toBeInTheDocument();
     expect(getByRole('button')).toBeDisabled();
@@ -131,14 +125,12 @@ describe('PurchaseButton', () => {
       refreshAccess: vi.fn(),
     });
 
-    const { getByText } = render(
-      <PurchaseButton
+    const { getByText } = render(<TestWrapper><PurchaseButton
         contentId="workout-1"
         contentType="workout"
         contentName="Test Workout"
         price={29.99}
-      />
-    );
+      /></TestWrapper>);
 
     expect(getByText(/Sign in to Purchase/i)).toBeInTheDocument();
   });
@@ -156,14 +148,12 @@ describe('PurchaseButton', () => {
       refreshAccess: vi.fn(),
     });
 
-    const { getByText } = render(
-      <PurchaseButton
+    const { getByText } = render(<TestWrapper><PurchaseButton
         contentId="workout-1"
         contentType="workout"
         contentName="Test Workout"
         price={19.5}
-      />
-    );
+      /></TestWrapper>);
 
     expect(getByText(/€19.50/i)).toBeInTheDocument();
   });
