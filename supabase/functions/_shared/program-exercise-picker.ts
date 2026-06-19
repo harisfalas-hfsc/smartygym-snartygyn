@@ -137,7 +137,7 @@ export function pickExercisesForDay(
 ): LibExercise[] {
   if (!library.length) return [];
   const matched = library.filter((ex) => matchesFocus(ex, dayTitle));
-  const pool = matched.length >= n ? matched : library;
+  const pool = matched;
   // Deterministic rotation so weeks vary but stay stable for the same input
   const seed = (weekIndex * 31 + dayIndex * 7) % Math.max(pool.length, 1);
   const picks: LibExercise[] = [];
@@ -173,9 +173,10 @@ export function buildDayBullets(
 
 /**
  * Filter the full library down to the exercises permitted for a program.
- * - "Bodyweight" programs: only equipment === "body weight"
- * - Equipment programs: keep all (the picker still avoids irrelevant ones via focus)
- * - Difficulty: when supplied, prefer matching tier but fall back if too few.
+ * Order is strict and non-negotiable:
+ * 1. Equipment mode: bodyweight means bodyweight-only; equipment means equipment-only.
+ * 2. Difficulty: exact difficulty only. No silent fallback to easier/harder tiers.
+ * 3. Day focus is applied later in pickExercisesForDay without falling back to unrelated muscles.
  */
 export function filterLibraryForProgram(
   library: LibExercise[],
@@ -185,12 +186,13 @@ export function filterLibraryForProgram(
   const equipLower = (equipment || "").toLowerCase();
   let pool = library;
   if (equipLower.includes("bodyweight") || equipLower === "body weight" || equipLower === "none - running shoes only") {
-    pool = pool.filter((ex) => (ex.equipment || "").toLowerCase() === "body weight");
+    pool = pool.filter(isHomeBodyweightFriendly);
+  } else {
+    pool = pool.filter((ex) => !isBodyweightExercise(ex));
   }
   if (difficulty) {
     const targetDiff = difficulty.toLowerCase();
-    const matched = pool.filter((ex) => (ex.difficulty || "").toLowerCase() === targetDiff);
-    if (matched.length >= 40) pool = matched; // only narrow when we still have enough variety
+    pool = pool.filter((ex) => (ex.difficulty || "").toLowerCase() === targetDiff);
   }
   return pool;
 }
