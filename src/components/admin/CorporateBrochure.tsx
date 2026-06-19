@@ -220,7 +220,7 @@ export const CorporateBrochure = () => {
           <div className="flex-1 text-center">
             <div className="bg-[#29B6D2] text-white rounded-full w-10 h-10 flex items-center justify-center mx-auto mb-2 font-bold">3</div>
             <p className="font-bold text-sm">Start Training</p>
-            <p className="text-xs text-gray-500">Team gets instant Platinum access</p>
+            <p className="text-xs text-gray-500">Team gets instant Premium access</p>
           </div>
           <div className="flex-1 text-center">
             <div className="bg-[#29B6D2] text-white rounded-full w-10 h-10 flex items-center justify-center mx-auto mb-2 font-bold">4</div>
