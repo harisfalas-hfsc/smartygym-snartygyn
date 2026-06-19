@@ -939,7 +939,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
                     : formData.is_standalone_purchase
                     ? `💳 Premium + Standalone purchase (€${formData.price || "—"})`
                     : formData.is_premium
-                    ? "🔒 Premium (Gold / Platinum subscribers)"
+                    ? "🔒 Premium (Lifetime Premium subscribers)"
                     : "Not set"}
                 </div>
                 <div className="text-xs text-muted-foreground">
@@ -1007,7 +1007,7 @@ export const WorkoutEditDialog = ({ workout, open, onOpenChange, onSave }: Worko
               </div>
               <p className="text-sm text-muted-foreground">
                 {formData.is_premium 
-                  ? 'This workout will be available to Gold and Platinum subscribers' 
+                  ? 'This workout will be available to Lifetime Premium subscribers' 
                   : 'This workout will be free for all visitors'}
               </p>
             </div>
