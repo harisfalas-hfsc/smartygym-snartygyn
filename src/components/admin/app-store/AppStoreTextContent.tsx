@@ -138,17 +138,14 @@ Free Tier:
 • Community leaderboard and engagement
 • Track your complete workout history
 
-Gold Membership ($9.99/month):
-• Unlock ALL 500+ premium workouts
-• Access exclusive training programs
-• Advanced progress analytics
+SmartyGym Lifetime Premium (one-time payment):
+• Unlock ALL 500+ premium workouts forever
+• Access every training program
+• Advanced progress analytics and goal tracking
+• Smarty Rituals and Smarty Check-ins
 • Priority support from our team
-
-Platinum Membership ($19.99/month):
-• Everything in Gold membership
-• Custom workout generator (complementary tool)
-• Exclusive premium content
 • Early access to new features
+• No monthly bills, no renewals — yours for life
 
 🎯 KEY FEATURES
 
