@@ -77,7 +77,32 @@ export interface SkeletonInput {
   weeks: number;
   daysPerWeek: number;
   /** Optional library exercises to pre-fill training day bullets. */
-  exercisesPerDay?: string[][]; // exercisesPerDay[weekIndex0][dayIndex0] => list of bullet strings (already with {{exercise:ID:Name}} markup)
+  exercisesPerDay?: string[][][]; // exercisesPerDay[weekIndex0][dayIndex0] => list of session lines (headings + {{exercise:ID:Name}} bullets)
+}
+
+function formatSessionLine(line: string): string {
+  const text = (line || "").trim();
+  if (!text) return "";
+  if (text.startsWith("•") || text.startsWith("<")) return text;
+  return `• ${text}`;
+}
+
+function defaultSessionTemplate(): string[] {
+  return [
+    "<strong>Estimated session time: 35–45 minutes</strong>",
+    "<strong>Warm-Up — 6–8 minutes</strong>",
+    "• Raise body temperature and rehearse the first movement pattern.",
+    "<strong>Main Block — 24–30 minutes</strong>",
+    "• Exercise 1 — sets × reps, rest period",
+    "• Exercise 2 — sets × reps, rest period",
+    "• Exercise 3 — sets × reps, rest period",
+    "• Exercise 4 — sets × reps, rest period",
+    "• Exercise 5 — sets × reps, rest period",
+    "<strong>Finisher — 4–6 minutes</strong>",
+    "• Short conditioning finisher or loaded carry sequence.",
+    "<strong>Cool Down — 5 minutes</strong>",
+    "• Lower intensity gradually, then stretch the trained areas.",
+  ];
 }
 
 /**
@@ -108,10 +133,10 @@ export function buildProgramSkeleton(input: SkeletonInput): string {
       const dayBullets =
         exercisesPerDay?.[w - 1]?.[d - 1] && exercisesPerDay[w - 1][d - 1].length
           ? exercisesPerDay[w - 1][d - 1]
-          : ["• Exercise", "• Exercise", "• Exercise", "• Exercise", "• Exercise"];
+          : defaultSessionTemplate();
 
       for (const line of dayBullets) {
-        const text = line.startsWith("•") ? line : `• ${line}`;
+        const text = formatSessionLine(line);
         out.push(`<p class="tiptap-paragraph">${text}</p>`);
       }
       out.push(sep);
