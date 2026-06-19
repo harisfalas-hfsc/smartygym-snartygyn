@@ -180,7 +180,7 @@ export function pickExercisesForDay(
 ): LibExercise[] {
   if (!library.length) return [];
   const matched = library.filter((ex) => matchesFocus(ex, dayTitle));
-  const pool = matched;
+  const pool = matched.length >= n ? matched : [...matched, ...library.filter((ex) => !matched.some((m) => m.id === ex.id))];
   // Deterministic rotation so weeks vary but stay stable for the same input
   const seed = (weekIndex * 31 + dayIndex * 7) % Math.max(pool.length, 1);
   const candidates = Array.from({ length: pool.length }, (_, i) => pool[(seed + i) % pool.length]);
