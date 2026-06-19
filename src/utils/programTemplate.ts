@@ -250,7 +250,7 @@ export function buildProgramSkeleton(input: SkeletonInput): string {
 export function buildPhaseInstructions(weeks: number, category: string): string {
   const lines: string[] = [];
   lines.push(`<p class="tiptap-paragraph"><strong>📝 Compact Program Instructions</strong></p>`);
-  lines.push(`<p class="tiptap-paragraph">This is a professional repeat-and-progress training plan. It contains Week A and Week B templates only; the athlete repeats those workouts and follows the progression rules instead of scrolling through ${weeks * Math.min(daysPerWeekForInstructionsPlaceholder, 6)} separate daily workouts.</p>`);
+  lines.push(`<p class="tiptap-paragraph">This is a professional repeat-and-progress training plan. It contains Week A and Week B templates only; the athlete repeats those workouts and follows the progression rules instead of scrolling through a brand-new workout for every calendar week.</p>`);
   lines.push(`<p class="tiptap-paragraph">${categoryProgressionRule(category)}</p>`);
   lines.push(`<p class="tiptap-paragraph"><strong>Weekly Progression Rules</strong></p>`);
   for (const line of progressionLines(weeks, category)) lines.push(`<p class="tiptap-paragraph">${line}</p>`);
