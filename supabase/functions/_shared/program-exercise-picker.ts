@@ -42,11 +42,16 @@ const ABSOLUTE_SKILL_PATTERNS: RegExp[] = [
   /maltese/i,
   /one\s*arm\s*push/i,
   /handstand\s*push/i,
+  /^handstand$/i,
   /iron\s*cross/i,
   /front\s*lever/i,
   /back\s*lever/i,
   /human\s*flag|\bflag\b/i,
   /archer\s*push/i,
+  /stalder/i,
+  /skin\s*the\s*cat/i,
+  /\bv-?sit\b/i,
+  /pike\s*push/i,
 ];
 
 const CONDITIONAL_ADVANCED_SKILL_PATTERNS: RegExp[] = [/pistol/i];
@@ -62,12 +67,12 @@ const CATEGORY_RULES: Record<string, CategoryRule> = {
   "CARDIO ENDURANCE": {
     allowCardioBodyPart: true,
     preferred: [/walk|run|jog|step|jump\s*rope|rope|mountain\s*climber|jumping\s*jack|high\s*knee|burpee|bear\s*crawl|squat|lunge|push\s*up|skater|fast\s*feet|bike|row|elliptical|ski\s*erg|cardio/i],
-    forbidden: [/sissy\s*squat|bench\s*press|deadlift|max|heavy|curl|triceps?\s*extension|calf\s*raise/i],
+    forbidden: [/sissy\s*squat|pistol|one\s*leg\s*squat|bench\s*press|deadlift|max|heavy|curl|triceps?\s*extension|calf\s*raise/i],
   },
   "WEIGHT LOSS": {
     allowCardioBodyPart: true,
     preferred: [/squat|lunge|push\s*up|incline\s*push|step|mountain\s*climber|jumping\s*jack|high\s*knee|burpee|bear\s*crawl|dead\s*bug|glute\s*bridge|plank|skater|fast\s*feet|walk|run|jog|bike|row|swing|thruster|crawl/i],
-    forbidden: [/sissy\s*squat|max|heavy|one\s*rep|bench\s*press|leg\s*press|preacher\s*curl|concentration\s*curl/i],
+    forbidden: [/sissy\s*squat|pistol|one\s*leg\s*squat|max|heavy|one\s*rep|bench\s*press|leg\s*press|preacher\s*curl|concentration\s*curl/i],
   },
   "FUNCTIONAL STRENGTH": {
     rejectCardioBodyPart: true,
@@ -77,7 +82,7 @@ const CATEGORY_RULES: Record<string, CategoryRule> = {
   "MUSCLE HYPERTROPHY": {
     rejectCardioBodyPart: true,
     preferred: [/press|bench|row|pulldown|pull\s*up|chin\s*up|\bdip\b|squat|split\s*squat|bulgarian|rdl|deadlift|leg\s*press|shoulder\s*press|curl|extension|raise|fly|glute\s*bridge|push\s*up|lat|chest|biceps|triceps|quad|hamstring/i],
-    forbidden: [/tabata|amrap|emom|burpee|jumping\s*jack|high\s*knee|mountain\s*climber|skater|fast\s*feet|run|jog|bike|elliptical/i],
+    forbidden: [/tabata|amrap|emom|burpee|jumping\s*jack|high\s*knee|mountain\s*climber|skater|fast\s*feet|run|jog|bike|elliptical|pistol|one\s*leg\s*squat/i],
   },
   "LOW BACK PAIN": {
     rejectCardioBodyPart: true,
