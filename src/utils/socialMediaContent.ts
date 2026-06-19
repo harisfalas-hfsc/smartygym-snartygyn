@@ -1399,58 +1399,38 @@ Duration: 25-35 seconds`,
   },
   {
     day: 18,
-    title: "Gold vs Platinum",
+    title: "Lifetime Premium",
     theme: "Plans",
-    instagram: `💎 Gold vs Platinum - Which Plan?
+    instagram: `💎 SmartyGym Lifetime Premium
 
-🥇 GOLD PLAN (€9.99/month)
+ONE payment. €89.99. Lifetime access.
+
 ✅ All 500+ Workouts
 ✅ All Training Programs
-✅ Basic Tools
-✅ Community Access
+✅ Smarty Rituals + Check-ins
+✅ Goal Tracking + Analytics
 ✅ Workout of the Day
-Perfect for: Getting started!
-
-👑 PLATINUM PLAN (€89.89/year)
-Everything in Gold, PLUS:
-✅ Smarty Rituals
-✅ Smarty Check-ins
-✅ Goal Tracking
-✅ Advanced Analytics
+✅ Exercise Library
 ✅ Priority Support
-Perfect for: Serious athletes!
 
-Both plans:
 🎯 Expert-designed content
 🧠 100% Human, 0% AI
-💪 Real results
+💪 Real results, forever
 
-Which path will you choose? 🛤️
+No monthly fees. No renewals. Yours for life. 🛤️
 
 👉 Link in bio`,
-    facebook: `💎 Gold vs Platinum - Choosing Your SmartyGym Plan
+    facebook: `💎 SmartyGym Lifetime Premium — One Payment, Lifetime Access
 
-Both plans give you access to world-class fitness content. The question is: how deep do you want to go?
+€89.99 one-time. No monthly bills. No renewals. Yours forever.
 
-🥇 GOLD PLAN - €9.99/month
-
-THE ESSENTIALS:
+WHAT YOU GET:
 ✅ Full access to 500+ expert workouts
 ✅ All multi-week training programs
-✅ Basic calculators (1RM, BMR, Macro)
+✅ All calculators (1RM, BMR, Macro, Calorie Counter)
 ✅ Community features and leaderboards
 ✅ Daily Workout of the Day
-✅ Exercise library
-
-BEST FOR:
-• Those starting their fitness journey
-• People who want quality workouts without extras
-• Budget-conscious fitness enthusiasts
-• Those who prefer simplicity
-
-👑 PLATINUM PLAN - €89.89/year (Save 25%!)
-
-EVERYTHING IN GOLD, PLUS:
+✅ Exercise library with video demonstrations
 ✅ Smarty Rituals (morning, midday, evening protocols)
 ✅ Smarty Check-ins (readiness tracking)
 ✅ Advanced goal setting and tracking
@@ -1459,39 +1439,32 @@ EVERYTHING IN GOLD, PLUS:
 ✅ Monday Motivation personalized reports
 ✅ Priority support
 
-BEST FOR:
-• Serious fitness enthusiasts
-• Those wanting holistic wellness (not just workouts)
-• Data-driven athletes who track everything
-• Anyone committed to long-term transformation
-
-WHAT'S THE SAME:
-Both plans feature:
+EVERY FEATURE INCLUDED:
 🎯 Expert-designed content by Coach Haris
 🧠 100% Human, 0% AI philosophy
 💪 Real, structured programming
 📱 Full mobile access
 
-The question isn't which plan is better—it's which plan matches YOUR goals.
+One payment is all it takes.
 
-👉 Compare plans at smartygym.com/pricing`,
+👉 Get Lifetime Premium at smartygym.com/smartypremium`,
     tiktok: `🎬 TIKTOK SCRIPT:
 
-Hook (0-3 sec): "Gold or Platinum? Let me help..."
+Hook (0-3 sec): "What if you paid once and got fitness for life?"
 
 Main Content:
-- Split screen comparison
-- Gold features appearing
-- Platinum features appearing
-- Price comparison
-- "Both get you results" message
+- Subscription fatigue montage
+- SmartyGym Lifetime Premium reveal
+- Feature list appearing
+- €89.99 one-time payment emphasis
+- "Yours forever" message
 
-CTA: "Which team are you? Link in bio"
+CTA: "Lifetime access. Link in bio."
 
-Audio suggestion: Decision/choice sound
+Audio suggestion: Empowering/decision sound
 
 Duration: 20-30 seconds`,
-    hashtags: "#GoldVsPlatinum #SubscriptionPlans #FitnessPlans #PremiumFitness #ValueForMoney #FitnessInvestment #SmartyGym #ChooseYourPath"
+    hashtags: "#LifetimePremium #SmartyGym #OnePaymentLifetimeAccess #NoSubscription #PremiumFitness #ValueForMoney #FitnessInvestment #HumanDesigned"
   },
   {
     day: 19,
