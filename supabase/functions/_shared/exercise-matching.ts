@@ -1370,13 +1370,23 @@ export async function fetchAndBuildExerciseReference(
   const referenceList = buildExerciseReferenceList(allExercises, equipmentFilter, difficultyLevel);
   
   // Return filtered exercises for post-processing matching too
-  let exercisesForMatching = equipmentFilter
-    ? allExercises.filter(ex => (ex.equipment || '').toLowerCase() === equipmentFilter.toLowerCase())
-    : allExercises;
+  const normalizedEquipmentFilter = (equipmentFilter || '').toLowerCase();
+  let exercisesForMatching = normalizedEquipmentFilter === NON_BODYWEIGHT_FILTER
+    ? allExercises.filter(ex => !isBodyweightEquipmentValue(ex.equipment))
+    : equipmentFilter
+      ? allExercises.filter(ex => (ex.equipment || '').toLowerCase() === normalizedEquipmentFilter)
+      : allExercises;
   if ((equipmentFilter || '').toLowerCase() === 'body weight') {
     const before = exercisesForMatching.length;
     exercisesForMatching = filterToHomeBodyweight(exercisesForMatching);
     console.log(`${logPrefix} Home-bodyweight guardrail removed ${before - exercisesForMatching.length} apparatus-dependent exercises (${exercisesForMatching.length} remain)`);
+  }
+  if (difficultyLevel) {
+    const dl = difficultyLevel.toLowerCase();
+    if (['beginner', 'intermediate', 'advanced'].includes(dl)) {
+      exercisesForMatching = exercisesForMatching.filter(ex => (ex.difficulty || '').toLowerCase() === dl);
+      console.log(`${logPrefix} Strict difficulty filter (${dl}) leaves ${exercisesForMatching.length} exercises`);
+    }
   }
   
   return { exercises: exercisesForMatching, referenceList };
