@@ -23,7 +23,9 @@ import { useToast } from "@/hooks/use-toast";
  */
 
 const ARTICLE_CATEGORIES = ["Fitness", "Nutrition", "Wellness"] as const;
+const WORD_COUNT_OPTIONS = [800, 1000, 1200, 1500] as const;
 type Category = typeof ARTICLE_CATEGORIES[number];
+type WordCount = typeof WORD_COUNT_OPTIONS[number];
 
 export interface ArticleWizardDraft {
   title: string;
@@ -53,6 +55,7 @@ export const ArticleCreationWizard = ({ open, onOpenChange, onComplete, onSkipTo
   const [step, setStep] = useState(0);
   const [category, setCategory] = useState<Category | "">("");
   const [title, setTitle] = useState("");
+  const [wordCount, setWordCount] = useState<WordCount>(1000);
   const [generating, setGenerating] = useState(false);
 
   useEffect(() => {
@@ -60,6 +63,7 @@ export const ArticleCreationWizard = ({ open, onOpenChange, onComplete, onSkipTo
       setStep(0);
       setCategory("");
       setTitle("");
+      setWordCount(1000);
       setGenerating(false);
     }
   }, [open]);
@@ -67,6 +71,7 @@ export const ArticleCreationWizard = ({ open, onOpenChange, onComplete, onSkipTo
   const steps = [
     { key: "category", title: "Category" },
     { key: "title", title: "Title" },
+    { key: "wordCount", title: "Word Count" },
     { key: "review", title: "Review" },
   ];
   const currentKey = steps[step].key;
@@ -86,7 +91,7 @@ export const ArticleCreationWizard = ({ open, onOpenChange, onComplete, onSkipTo
     setGenerating(true);
     try {
       const { data, error } = await supabase.functions.invoke("generate-admin-article", {
-        body: { title: title.trim(), category },
+        body: { title: title.trim(), category, wordCount },
       });
       if (error) throw error;
       if (!data?.ok || !data?.draft) throw new Error(data?.error || "Generation failed");
@@ -204,6 +209,40 @@ export const ArticleCreationWizard = ({ open, onOpenChange, onComplete, onSkipTo
             </div>
           )}
 
+          {currentKey === "wordCount" && (
+            <div className="grid gap-2 grid-cols-2 sm:grid-cols-4">
+              {WORD_COUNT_OPTIONS.map((count) => {
+                const active = wordCount === count;
+                return (
+                  <Card
+                    key={count}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => setWordCount(count)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setWordCount(count);
+                      }
+                    }}
+                    className={
+                      "p-4 cursor-pointer transition border-2 " +
+                      (active
+                        ? "border-primary bg-primary/10 ring-2 ring-primary/30"
+                        : "border-border hover:border-primary/50")
+                    }
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="font-semibold">{count}</div>
+                      {active && <Check className="w-4 h-4 text-primary" />}
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1">words</div>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
+
           {currentKey === "review" && (
             <Card className="p-4 space-y-2 text-sm">
               <div className="flex items-center gap-2 font-semibold text-base mb-1">
@@ -211,8 +250,9 @@ export const ArticleCreationWizard = ({ open, onOpenChange, onComplete, onSkipTo
               </div>
               <Row label="Category" value={category || "—"} />
               <Row label="Title" value={title.trim() || "—"} />
+              <Row label="Length" value={`${wordCount} words`} />
               <p className="text-xs text-muted-foreground pt-2 border-t mt-3">
-                <strong>Generate &amp; Review</strong> drafts the full article (800-1200 words,
+                <strong>Generate &amp; Review</strong> drafts the full article ({wordCount} words,
                 section headings, internal links, featured image, SEO read time) using the same
                 pipeline as the weekly cron, then opens it in the editor. Nothing is published
                 until you click <strong>Save</strong> there.
