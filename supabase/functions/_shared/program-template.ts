@@ -77,7 +77,7 @@ export interface SkeletonInput {
   weeks: number;
   daysPerWeek: number;
   /** Optional library exercises to pre-fill training day bullets. */
-  exercisesPerDay?: string[][][]; // exercisesPerDay[weekIndex0][dayIndex0] => list of session lines (headings + {{exercise:ID:Name}} bullets)
+  exercisesPerDay?: string[][][]; // exercisesPerDay[templateIndex0][dayIndex0] => Week A/B session lines
 }
 
 function formatSessionLine(line: string): string {
@@ -89,20 +89,92 @@ function formatSessionLine(line: string): string {
 
 function defaultSessionTemplate(): string[] {
   return [
-    "<strong>Estimated session time: 35–45 minutes</strong>",
-    "<strong>Warm-Up — 6–8 minutes</strong>",
-    "• Raise body temperature and rehearse the first movement pattern.",
-    "<strong>Main Block — 24–30 minutes</strong>",
+    "<em>Template session — coach the intent, execution standard, and fatigue target for this day.</em>",
+    "<strong>Estimated session time: 55–65 minutes</strong>",
+    "<strong>🔥 Soft Tissue Preparation — 3–5 minutes</strong>",
+    "• 1–2 min foam roll quads, glutes, lats, t-spine",
+    "• 1 min targeted self-massage on tight spots feeding today's main movements",
+    "<strong>⚡ Activation / Warm-Up — 6–8 minutes</strong>",
+    "• 3 min easy cardio (row, bike, rope skips)",
+    "• Dynamic mobility: hip openers, t-spine rotations, scapular CARs × 8/side",
+    "• 2 ramp-up sets of the first main lift at 40% and 60% of working load",
+    "<strong>🏋 Main Workout — 30–38 minutes</strong>",
     "• Exercise 1 — sets × reps, rest period",
     "• Exercise 2 — sets × reps, rest period",
     "• Exercise 3 — sets × reps, rest period",
     "• Exercise 4 — sets × reps, rest period",
     "• Exercise 5 — sets × reps, rest period",
-    "<strong>Finisher — 4–6 minutes</strong>",
-    "• Short conditioning finisher or loaded carry sequence.",
-    "<strong>Cool Down — 5 minutes</strong>",
-    "• Lower intensity gradually, then stretch the trained areas.",
+    "• Exercise 6 — sets × reps, rest period",
+    "• Exercise 7 — sets × reps, rest period",
+    "<strong>💥 Finisher — 4–8 minutes</strong>",
+    "• Conditioning circuit or loaded carry — 2 rounds",
+    "<strong>🧘 Cool Down — 5 minutes</strong>",
+    "• 3 min easy walk; static stretches for trained areas 30 sec × 2 each",
+    "• 6 cycles of 4-sec inhale / 6-sec exhale",
   ];
+}
+
+function templateDefinitions(totalWeeks: number): Array<{ key: "A" | "B"; range: string; objective: string }> {
+  if (totalWeeks <= 4) {
+    return [
+      { key: "A", range: "Weeks 1–2", objective: "Foundation template: learn the workouts, establish baseline loads, and repeat the same sessions with controlled progression." },
+      { key: "B", range: `Weeks 3–${totalWeeks}`, objective: "Build template: use the second set of workouts and progress through density, load, volume, or complexity rules." },
+    ];
+  }
+  if (totalWeeks <= 6) {
+    return [
+      { key: "A", range: "Weeks 1–2", objective: "Foundation template: repeat the same workouts for two weeks while technique, pacing, and baseline capacity are built." },
+      { key: "B", range: `Weeks 3–${totalWeeks}`, objective: "Progressive template: repeat these workouts for the remaining weeks while the progression rules create the overload." },
+    ];
+  }
+  return [
+    { key: "A", range: "Weeks 1–2", objective: "Foundation template: repeat the same workouts, build quality, and set conservative baselines." },
+    { key: "B", range: `Weeks 3–${totalWeeks}`, objective: "Build and peak template: repeat these workouts while progressing load, density, volume, or difficulty according to the weekly rules." },
+  ];
+}
+
+function categoryProgressionRule(category: string): string {
+  const cat = category.toUpperCase();
+  if (cat.includes("HYPERTROPHY")) return "Progress primarily by load: Week 1 uses about 65% 1RM, Week 2 about 70%, Week 3 about 75%, Week 4 about 80%; later weeks repeat Week B with small load, set, or rep increases without breaking tempo.";
+  if (cat.includes("WEIGHT LOSS")) return "Progress primarily by density: increase work periods by about 10%, reduce rest by about 10%, then add one round or choose the harder listed variation while keeping movement quality realistic.";
+  if (cat.includes("CARDIO")) return "Progress primarily by aerobic volume and interval quality: extend work intervals, reduce recovery slightly, or add one interval while preserving sustainable pacing.";
+  if (cat.includes("FUNCTIONAL STRENGTH")) return "Progress primarily by load and movement quality: add 2–5% load when all reps are clean, then add one set or carry distance before increasing complexity.";
+  if (cat.includes("LOW BACK")) return "Progress only through pain-free control: increase range, time under tension, and stability demand before adding load; never chase fatigue or pain.";
+  if (cat.includes("MOBILITY")) return "Progress through range, control, hold duration, and balance complexity; never force depth or speed.";
+  return "Progress by repeating the same templates and applying small weekly increases in load, volume, density, or movement quality.";
+}
+
+function progressionLines(totalWeeks: number, category: string): string[] {
+  const cat = category.toUpperCase();
+  const hypertrophy = cat.includes("HYPERTROPHY");
+  const weightLoss = cat.includes("WEIGHT LOSS");
+  const base = [
+    "• Week 1 — Perform Week A exactly as written. Learn pacing, technique, and baseline loads.",
+    hypertrophy
+      ? "• Week 2 — Repeat Week A with load raised toward 70% 1RM where form allows."
+      : weightLoss
+        ? "• Week 2 — Repeat Week A; increase work periods by 10% or reduce rest by 10%."
+        : "• Week 2 — Repeat Week A; add a small load, rep, time, or control increase only where quality stays high.",
+    hypertrophy
+      ? "• Week 3 — Move to Week B at roughly 75% 1RM on the main lifts."
+      : "• Week 3 — Move to Week B. New workouts, same professional session structure.",
+    hypertrophy
+      ? "• Week 4 — Repeat Week B at roughly 80% 1RM or add one controlled set to the first main movement."
+      : weightLoss
+        ? "• Week 4 — Repeat Week B; add one round to each main circuit or reduce rest slightly."
+        : "• Week 4 — Repeat Week B; progress load, total reps, time under tension, or density.",
+  ];
+  if (totalWeeks >= 6) {
+    base.push(weightLoss
+      ? "• Week 5 — Repeat Week B with harder-but-realistic variations or another small density increase."
+      : "• Week 5 — Repeat Week B with advanced progression: add one set, add 2–5% load, or increase the hardest safe variation.");
+    base.push("• Week 6 — Repeat Week B as peak week: complete the maximum planned volume without technical failure.");
+  }
+  if (totalWeeks >= 8) {
+    base.push("• Week 7 — Repeat Week B with the strongest sustainable progression; reduce volume if recovery drops.");
+    base.push("• Week 8 — Repeat Week B as final peak/testing week, then evaluate results after recovery.");
+  }
+  return base;
 }
 
 /**
