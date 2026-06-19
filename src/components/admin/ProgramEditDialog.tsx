@@ -614,9 +614,9 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
             </A4Container>
           </div>
 
-          {/* 4. Difficulty Level */}
+          {/* 5. Difficulty Level */}
           <div className="space-y-2">
-            <Label htmlFor="difficulty_stars">4. Difficulty Level</Label>
+            <Label htmlFor="difficulty_stars">5. Difficulty Level</Label>
             <div className="flex items-center gap-2">
               {[1, 2, 3, 4, 5, 6].map((star) => (
                 <button
