@@ -170,9 +170,13 @@ function progressionLines(totalWeeks: number, category: string): string[] {
       : "• Week 5 — Repeat Week B with advanced progression: add one set, add 2–5% load, or increase the hardest safe variation.");
     base.push("• Week 6 — Repeat Week B as peak week: complete the maximum planned volume without technical failure.");
   }
-  if (totalWeeks >= 8) {
-    base.push("• Week 7 — Repeat Week B with the strongest sustainable progression; reduce volume if recovery drops.");
-    base.push("• Week 8 — Repeat Week B as final peak/testing week, then evaluate results after recovery.");
+  if (totalWeeks > 6) {
+    for (let week = 7; week <= totalWeeks; week++) {
+      const finalWeek = week === totalWeeks;
+      base.push(finalWeek
+        ? `• Week ${week} — Repeat Week B as final peak/testing week, then evaluate results after recovery.`
+        : `• Week ${week} — Repeat Week B with the strongest sustainable progression; reduce volume if recovery drops.`);
+    }
   }
   return base;
 }
