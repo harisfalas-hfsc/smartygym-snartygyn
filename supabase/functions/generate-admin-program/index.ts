@@ -183,7 +183,7 @@ OUTPUT — start exactly with the Week header and end after the last day's <p></
 
 async function generateProse(
   apiKey: string,
-  field: "name" | "description" | "program_structure" | "nutrition_tips",
+  field: "name" | "description" | "overview" | "program_structure" | "nutrition_tips",
   category: string,
   weeks: number,
   daysPerWeek: number,
@@ -203,6 +203,7 @@ async function generateProse(
   }
   const titles = {
     description: "2-3 paragraph program overview — what it delivers, who it's for, expected outcomes. No exercise names. No {{exercise:}} markup.",
+    overview: "3-4 paragraph in-depth program overview explaining the training philosophy, split logic, weekly rhythm, progression model, and what the lifter should expect week by week. Different angle from the short description. No exercise names. No {{exercise:}} markup.",
     program_structure: "1-2 paragraph explanation of how the program is structured (split, phases, progression). No exercise names. No {{exercise:}} markup.",
     nutrition_tips: "3-5 sentence nutrition and recovery guidance tied to the program category. No exercise names. No {{exercise:}} markup.",
   } as const;
@@ -258,6 +259,11 @@ serve(async (req) => {
       lovableApiKey, "description", body.category, weeks, daysPerWeek, difficulty, equipment, philosophy,
     );
 
+    // ── 2b. Overview (longer narrative for the program page) ───────────────
+    const overviewRaw = await generateProse(
+      lovableApiKey, "overview", body.category, weeks, daysPerWeek, difficulty, equipment, philosophy,
+    );
+
     // ── 3. Weekly schedule via STANDARDIZED SKELETON + deterministic library picks ──
     // We do NOT ask the model to pick exercises. The picker guarantees every
     // bullet is a real {{exercise:ID:Name}} token (eye icon) and respects the
@@ -309,6 +315,7 @@ serve(async (req) => {
     // ── 6. Normalize HTML ──────────────────────────────────────────────────
     fullSchedule = normalizeWorkoutHtml(fullSchedule);
     const description = descriptionRaw ? normalizeWorkoutHtml(descriptionRaw) : "";
+    const overview = overviewRaw ? normalizeWorkoutHtml(overviewRaw) : description;
 
     const draft = {
       // id/serial intentionally omitted — editor allocates them on Save.
@@ -322,6 +329,7 @@ serve(async (req) => {
       // ProgramEditDialog field names:
       training_program: fullSchedule,
       program_description: description,
+      overview,
       construction,
       final_tips: finalTips,
       image_url: "",
