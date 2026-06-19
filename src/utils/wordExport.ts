@@ -541,10 +541,9 @@ export const smartyGymConceptContent: ContentSection[] = [
   { type: 'bullet', content: 'Comments and discussions' },
   { type: 'bullet', content: 'Testimonials from real users' },
   
-  { type: 'heading', content: '👑 SUBSCRIPTION TIERS', level: 1 },
+  { type: 'heading', content: '👑 MEMBERSHIP', level: 1 },
   { type: 'bullet', content: '🆓 Free - Access to free workouts and basic features' },
-  { type: 'bullet', content: '🥇 Gold (€6.99/mo) - Full access to all workouts and programs' },
-  { type: 'bullet', content: '💎 Platinum (€59.99/yr) - Everything plus Smarty Rituals, Check-ins, and premium features' },
+  { type: 'bullet', content: '💎 SmartyGym Lifetime Premium (€89.99 one-time) - Lifetime access to all workouts, training programs, Smarty Rituals, Check-ins, and every premium feature' },
   
   { type: 'heading', content: '🎯 OUR PROMISE', level: 1 },
   { type: 'paragraph', content: 'SmartyGym promises:' },
