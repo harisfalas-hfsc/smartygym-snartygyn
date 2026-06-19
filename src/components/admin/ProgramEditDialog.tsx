@@ -598,6 +598,22 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
             />
           </div>
 
+          {/* 4. Overview */}
+          <div className="space-y-2">
+            <Label htmlFor="overview">4. Overview</Label>
+            <p className="text-sm text-muted-foreground">
+              This is the first text block users see on the public program page. Explain what the program delivers, who it's for, and the expected outcomes.
+            </p>
+            <A4Container>
+              <RichTextEditor
+                value={formData.overview}
+                onChange={(value) => setFormData({ ...formData, overview: value })}
+                placeholder="Enter the program overview..."
+                minHeight="150px"
+              />
+            </A4Container>
+          </div>
+
           {/* 4. Difficulty Level */}
           <div className="space-y-2">
             <Label htmlFor="difficulty_stars">4. Difficulty Level</Label>
