@@ -552,7 +552,9 @@ export default function UserDashboard() {
         });
         return;
       }
-      const isSubscribed = dbData?.status === 'active' && ['gold', 'platinum', 'premium', 'lifetime'].includes(dbData.plan_type);
+      // Note: 'gold'/'platinum' are legacy plan types no longer offered for purchase.
+      // 'legacy_premium' is used by the webhook for historical Stripe events.
+      const isSubscribed = dbData?.status === 'active' && ['premium', 'lifetime', 'legacy_premium'].includes(dbData.plan_type);
       setSubscriptionInfo({
         subscribed: isSubscribed,
         product_id: dbData?.plan_type || null,
