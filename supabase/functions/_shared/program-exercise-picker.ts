@@ -196,14 +196,45 @@ function excludesStaticHolds(ex: LibExercise): boolean {
   return !isStaticHoldExercise(ex);
 }
 
-function excludesEliteSkills(ex: LibExercise): boolean {
-  return !ELITE_SKILL_PATTERNS.some((pattern) => pattern.test(ex.name || ""));
+function isAdvancedTier(difficulty?: string | null): boolean {
+  return tierOf(difficulty) === "Advanced";
 }
 
-function weightLossSelectionPool(library: LibExercise[], needed: number): LibExercise[] {
-  const safe = library.filter(excludesEliteSkills);
-  const realistic = safe.filter((ex) => REALISTIC_WEIGHT_LOSS_PATTERNS.some((pattern) => pattern.test(ex.name || "")));
-  return realistic.length >= needed ? realistic : safe;
+function isSkillExercise(ex: LibExercise, difficulty?: string | null): boolean {
+  const name = ex.name || "";
+  if (ABSOLUTE_SKILL_PATTERNS.some((pattern) => pattern.test(name))) return true;
+  if (!isAdvancedTier(difficulty) && CONDITIONAL_ADVANCED_SKILL_PATTERNS.some((pattern) => pattern.test(name))) return true;
+  return false;
+}
+
+function excludesSkillExercises(ex: LibExercise, difficulty?: string | null): boolean {
+  return !isSkillExercise(ex, difficulty);
+}
+
+function ruleForCategory(category: string): CategoryRule | null {
+  const cat = (category || "").toUpperCase();
+  const key = Object.keys(CATEGORY_RULES).find((k) => cat.includes(k));
+  return key ? CATEGORY_RULES[key] : null;
+}
+
+function exerciseSearchText(ex: LibExercise): string {
+  return `${ex.name || ""} ${ex.body_part || ""} ${ex.target || ""} ${ex.description || ""}`;
+}
+
+function matchesCategoryRule(ex: LibExercise, category: string): boolean {
+  const rule = ruleForCategory(category);
+  if (!rule) return true;
+  const text = exerciseSearchText(ex);
+  if (rule.forbidden.some((pattern) => pattern.test(text))) return false;
+  if (rule.rejectCardioBodyPart && (ex.body_part || "").toLowerCase() === "cardio") return false;
+  if (rule.allowCardioBodyPart && (ex.body_part || "").toLowerCase() === "cardio") return true;
+  return rule.preferred.some((pattern) => pattern.test(text));
+}
+
+function categorySelectionPool(library: LibExercise[], category: string, needed: number, difficulty?: string | null): LibExercise[] {
+  const safe = library.filter((ex) => excludesSkillExercises(ex, difficulty));
+  const categoryMatched = safe.filter((ex) => matchesCategoryRule(ex, category));
+  return categoryMatched.length >= needed ? categoryMatched : safe;
 }
 
 function defaultPrescription(category: string, dayTitle: string): string {
@@ -244,10 +275,14 @@ export function pickExercisesForDay(
   weekIndex: number,
   dayIndex: number,
   n: number,
+  category = "",
+  difficulty?: string | null,
 ): LibExercise[] {
   if (!library.length) return [];
-  const matched = library.filter((ex) => matchesFocus(ex, dayTitle));
-  const pool = matched.length >= n ? matched : [...matched, ...library.filter((ex) => !matched.some((m) => m.id === ex.id))];
+  const categoryPool = categorySelectionPool(library, category, n, difficulty);
+  const matched = categoryPool.filter((ex) => matchesFocus(ex, dayTitle));
+  const fallbackPool = categoryPool.length ? categoryPool : library.filter((ex) => excludesSkillExercises(ex, difficulty));
+  const pool = matched.length >= n ? matched : [...matched, ...fallbackPool.filter((ex) => !matched.some((m) => m.id === ex.id))];
   // Deterministic rotation so weeks vary but stay stable for the same input
   const seed = (weekIndex * 31 + dayIndex * 7) % Math.max(pool.length, 1);
   const candidates = Array.from({ length: pool.length }, (_, i) => pool[(seed + i) % pool.length]);
