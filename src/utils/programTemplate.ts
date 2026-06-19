@@ -151,6 +151,17 @@ function categoryProgressionRule(category: string): string {
   return "Progress by repeating the same templates and applying small weekly increases in load, volume, density, or movement quality.";
 }
 
+function categoryAdaptationRule(category: string): string {
+  const cat = category.toUpperCase();
+  if (cat.includes("CARDIO")) return "Adaptation target: aerobic capacity, stamina, pacing, and sustained work. Exercise selection must favor locomotion, step-ups, simple calisthenics, intervals, AMRAPs, EMOMs, and circuits — never maximal strength or elite skill work.";
+  if (cat.includes("WEIGHT LOSS")) return "Adaptation target: caloric expenditure, continuous movement, work capacity, and elevated heart rate. Exercise selection must favor squats, lunges, push-ups, step-ups, mountain climbers, jumping jacks, burpees, high knees, bear crawls, bridges, dead bugs, and planks — never complex skill work or heavy strength protocols.";
+  if (cat.includes("FUNCTIONAL STRENGTH")) return "Adaptation target: practical force production and movement quality. Exercise selection must favor presses, rows, squats, hinges, carries, split squats, planks, pull-ups/chin-ups/dips when equipment and level allow — not endless cardio circuits.";
+  if (cat.includes("HYPERTROPHY")) return "Adaptation target: muscle size through mechanical tension and training volume. Exercise selection must favor 6–15 rep strength/hypertrophy movements, compounds, and accessories — not Tabata, EMOM, or long cardio circuits.";
+  if (cat.includes("LOW BACK")) return "Adaptation target: pain reduction, spinal stability, core control, and movement confidence. Exercise selection must favor dead bug, bird dog, McGill curl-up, glute bridge, Pallof press, side plank, cat-camel, hip mobility, and breathing work; use sets/reps only, never HIIT or explosive work.";
+  if (cat.includes("MOBILITY")) return "Adaptation target: mobility, joint control, balance, and movement quality. Exercise selection must favor controlled mobility/stability drills with sets, reps, and holds only — never AMRAP, EMOM, Tabata, HIIT, sprints, burpees, or jump training.";
+  return "Adaptation target comes first: identify the desired training adaptation, then select only exercises that directly create that adaptation.";
+}
+
 function progressionLines(totalWeeks: number, category: string): string[] {
   const cat = category.toUpperCase();
   const hypertrophy = cat.includes("HYPERTROPHY");
@@ -203,6 +214,7 @@ export function buildProgramSkeleton(input: SkeletonInput): string {
   pushSection(out, `<p class="tiptap-paragraph"><strong>🎯 Program Goal</strong></p>`);
   out.push(`<p class="tiptap-paragraph">Complete ${weeks} weeks by repeating only the Week A and Week B workout templates. The weekly progression rules create the full program; the app must not list a brand-new workout for every calendar week.</p>`);
   pushSection(out, `<p class="tiptap-paragraph"><strong>🧭 Program Instructions</strong></p>`);
+  out.push(`<p class="tiptap-paragraph">${categoryAdaptationRule(category)}</p>`);
   out.push(`<p class="tiptap-paragraph">${categoryProgressionRule(category)}</p>`);
   pushSection(out, `<p class="tiptap-paragraph"><strong>📈 Program Progression</strong></p>`);
   for (const line of progressionLines(weeks, category)) out.push(`<p class="tiptap-paragraph">${line}</p>`);
@@ -268,6 +280,7 @@ export function buildPhaseInstructions(weeks: number, category: string): string 
   const lines: string[] = [];
   lines.push(`<p class="tiptap-paragraph"><strong>📝 Compact Program Instructions</strong></p>`);
   lines.push(`<p class="tiptap-paragraph">This is a professional repeat-and-progress training plan. It contains Week A and Week B templates only; the athlete repeats those workouts and follows the progression rules instead of scrolling through a brand-new workout for every calendar week.</p>`);
+  lines.push(`<p class="tiptap-paragraph">${categoryAdaptationRule(category)}</p>`);
   lines.push(`<p class="tiptap-paragraph">${categoryProgressionRule(category)}</p>`);
   lines.push(`<p class="tiptap-paragraph"><strong>Weekly Progression Rules</strong></p>`);
   for (const line of progressionLines(weeks, category)) lines.push(`<p class="tiptap-paragraph">${line}</p>`);
