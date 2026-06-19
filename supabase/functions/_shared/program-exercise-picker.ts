@@ -48,6 +48,8 @@ const ABSOLUTE_SKILL_PATTERNS: RegExp[] = [
   /back\s*lever/i,
   /human\s*flag|\bflag\b/i,
   /archer\s*push/i,
+  /clock\s*push/i,
+  /single\s*arm\s*push|one\s*hand\s*push/i,
   /stalder/i,
   /skin\s*the\s*cat/i,
   /\bv-?sit\b/i,
