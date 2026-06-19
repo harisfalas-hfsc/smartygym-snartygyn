@@ -173,21 +173,23 @@ serve(async (req) => {
           ? priceObj.product?.metadata?.plan_type
           : undefined;
 
-      if (productMetaPlan === 'gold' || productMetaPlan === 'platinum') {
+      // Legacy recurring subscriptions (Gold/Platinum) are no longer sold.
+      // Map any active legacy subscription to `legacy_premium` so the user
+      // keeps premium access while we honor what they already paid for, and
+      // so analytics can still distinguish them from new Lifetime members.
+      if (productMetaPlan === 'gold' || productMetaPlan === 'platinum' ||
+          priceId === 'price_1SJ9q1IxQYg9inGKZzxxqPbD' ||
+          priceId === 'price_1SJ9qGIxQYg9inGKFbgqVRjj') {
+        planType = 'legacy_premium';
+        logStep("Matched legacy premium subscription", { priceId, productMetaPlan });
+      } else if (productMetaPlan === 'premium' || productMetaPlan === 'lifetime') {
         planType = productMetaPlan;
         logStep("Matched plan via product metadata", { priceId, planType });
-      } else if (priceId === "price_1SJ9q1IxQYg9inGKZzxxqPbD") {
-        planType = 'gold';
-        logStep("Matched Gold Plan (price-id fallback)", { priceId });
-      } else if (priceId === "price_1SJ9qGIxQYg9inGKFbgqVRjj") {
-        planType = 'platinum';
-        logStep("Matched Platinum Plan (price-id fallback)", { priceId });
       } else {
-        // Recurring subscription on a price we don't recognize — assume the
-        // lowest paid tier rather than dropping the user to free. Safer
-        // default while we investigate.
-        planType = 'gold';
-        logStep("WARN: Unknown price ID — defaulting to gold to preserve access", { priceId });
+        // Unknown recurring price — preserve premium access for the user
+        // rather than dropping them to free, but flag for investigation.
+        planType = 'legacy_premium';
+        logStep("WARN: Unknown price ID — treating as legacy_premium to preserve access", { priceId });
       }
       
       logStep("Determined plan type", { planType, interval: activeSubscription.items.data[0]?.price?.recurring?.interval });
