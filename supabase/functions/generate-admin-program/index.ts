@@ -142,6 +142,7 @@ RULES:
 - NEVER use <ul>, <li>, or bullet lists. Use <p> with <br> only.
 - EVERY exercise MUST use {{exercise:ID:Name}} from the library — no plain names, no invented exercises.
 - Use the × multiplication sign for sets/reps, not "x".
+- Isometric/static holds MUST be prescribed with seconds (for example 3 × 10-sec holds), never plain reps.
 - Vary exercises week-to-week for proper periodization.
 - Include 1RM Calculator links where percentage-based loading is used.`;
 }
