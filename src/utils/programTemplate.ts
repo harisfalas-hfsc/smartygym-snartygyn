@@ -89,19 +89,28 @@ function formatSessionLine(line: string): string {
 
 function defaultSessionTemplate(): string[] {
   return [
-    "<strong>Estimated session time: 35–45 minutes</strong>",
-    "<strong>Warm-Up — 6–8 minutes</strong>",
-    "• Raise body temperature and rehearse the first movement pattern.",
-    "<strong>Main Block — 24–30 minutes</strong>",
+    "<em>Foundation week — describe today's focus and what to avoid in one short sentence.</em>",
+    "<strong>Estimated session time: 55–65 minutes</strong>",
+    "<strong>🔥 Soft Tissue Preparation — 3–5 minutes</strong>",
+    "• 1–2 min foam roll quads, glutes, lats, t-spine",
+    "• 1 min targeted self-massage on tight spots feeding today's main movements",
+    "<strong>⚡ Activation / Warm-Up — 6–8 minutes</strong>",
+    "• 3 min easy cardio (row, bike, rope skips)",
+    "• Dynamic mobility: hip openers, t-spine rotations, scapular CARs × 8/side",
+    "• 2 ramp-up sets of the first main lift at 40% and 60% of working load",
+    "<strong>🏋 Main Workout — 30–38 minutes</strong>",
     "• Exercise 1 — sets × reps, rest period",
     "• Exercise 2 — sets × reps, rest period",
     "• Exercise 3 — sets × reps, rest period",
     "• Exercise 4 — sets × reps, rest period",
     "• Exercise 5 — sets × reps, rest period",
-    "<strong>Finisher — 4–6 minutes</strong>",
-    "• Short conditioning finisher or loaded carry sequence.",
-    "<strong>Cool Down — 5 minutes</strong>",
-    "• Lower intensity gradually, then stretch the trained areas.",
+    "• Exercise 6 — sets × reps, rest period",
+    "• Exercise 7 — sets × reps, rest period",
+    "<strong>💥 Finisher — 4–8 minutes</strong>",
+    "• Conditioning circuit or loaded carry — 2 rounds",
+    "<strong>🧘 Cool Down — 5 minutes</strong>",
+    "• 3 min easy walk; static stretches for trained areas 30 sec × 2 each",
+    "• 6 cycles of 4-sec inhale / 6-sec exhale",
   ];
 }
 
