@@ -100,7 +100,7 @@ Deno.serve(async (req) => {
       const weeks = Number(p.weeks) || 4;
       const daysPerWeek = Number(p.days_per_week) || 4;
       const diff = difficultyText(p.difficulty_stars);
-      const library = filterLibraryForProgram(allExercises, p.equipment || "Equipment", diff);
+      const library = filterLibraryForProgram(allExercises, p.equipment || "Equipment", diff, p.category || "");
       if (!library.length) {
         results.push({ id: p.id, name: p.name, status: "no-library", bullets: 0, reused: 0 });
         continue;
