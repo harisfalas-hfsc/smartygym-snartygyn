@@ -15,6 +15,25 @@ export interface LibExercise {
   difficulty?: string | null;
 }
 
+const BODYWEIGHT_EQUIPMENT = new Set(["body weight", "bodyweight"]);
+
+const APPARATUS_DEPENDENT_BODYWEIGHT: RegExp[] = [
+  /\bbench\b/i,
+  /pull-?up/i,
+  /chin-?up/i,
+  /front\s*lever/i,
+  /muscle-?up/i,
+  /\bdip(s)?\b/i,
+  /parallel\s*bars?/i,
+  /\brings?\b/i,
+  /captains?\s*chair/i,
+  /vertical\s*bar/i,
+  /straight\s*bar/i,
+  /glute-?ham|\bghd\b/i,
+  /hyperextension/i,
+  /\bbox\b/i,
+];
+
 const DAY_FOCUS_KEYWORDS: Record<string, { body_part?: string[]; target?: string[]; name?: string[] }> = {
   "lower body": { body_part: ["upper legs", "lower legs", "legs", "hips"] },
   "upper body": { body_part: ["chest", "back", "upper arms", "shoulders"] },
@@ -42,23 +61,55 @@ const DAY_FOCUS_KEYWORDS: Record<string, { body_part?: string[]; target?: string
   "power": { name: ["jump", "clean", "snatch", "throw", "swing"] },
   "thoracic": { name: ["thoracic", "t-spine", "rotation"] },
   "posterior": { target: ["glutes", "hamstrings", "lower back"] },
-  "biceps": { body_part: ["upper arms"], target: ["biceps"] },
-  "triceps": { body_part: ["upper arms"], target: ["triceps"] },
-  "hypertrophy": {},
-  "strength": {},
+  "legs": { body_part: ["upper legs", "lower legs", "legs", "hips"] },
+  "glutes": { target: ["glutes"] },
+  "quadriceps": { target: ["quadriceps", "quads"] },
+  "quads": { target: ["quadriceps", "quads"] },
+  "hamstrings": { target: ["hamstrings"] },
+  "calves": { target: ["calves", "gastrocnemius", "soleus"] },
+  "biceps": { target: ["biceps"] },
+  "triceps": { target: ["triceps"] },
 };
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function hasWholePhrase(text: string, phrase: string): boolean {
+  const pattern = phrase
+    .trim()
+    .split(/\s+/)
+    .map(escapeRegExp)
+    .join("[^a-z0-9]+");
+  return new RegExp(`(^|[^a-z0-9])${pattern}($|[^a-z0-9])`, "i").test(text || "");
+}
+
+function fieldMatchesAny(value: string | null | undefined, terms?: string[]): boolean {
+  if (!terms?.length) return false;
+  const text = (value || "").toLowerCase();
+  return terms.some((term) => hasWholePhrase(text, term.toLowerCase()));
+}
 
 function matchesFocus(ex: LibExercise, focus: string): boolean {
   const focusLower = focus.toLowerCase();
-  for (const key of Object.keys(DAY_FOCUS_KEYWORDS)) {
-    if (!focusLower.includes(key)) continue;
+  const activeKeys = Object.keys(DAY_FOCUS_KEYWORDS).filter((key) => hasWholePhrase(focusLower, key));
+  if (!activeKeys.length) return true;
+
+  for (const key of activeKeys) {
     const def = DAY_FOCUS_KEYWORDS[key];
-    if (!def.body_part && !def.target && !def.name) return true; // very broad
-    if (def.body_part?.some((b) => (ex.body_part || "").toLowerCase().includes(b))) return true;
-    if (def.target?.some((t) => (ex.target || "").toLowerCase().includes(t))) return true;
-    if (def.name?.some((n) => ex.name.toLowerCase().includes(n))) return true;
+    if (fieldMatchesAny(ex.body_part, def.body_part)) return true;
+    if (fieldMatchesAny(ex.target, def.target)) return true;
+    if (fieldMatchesAny(ex.name, def.name)) return true;
   }
   return false;
+}
+
+function isBodyweightExercise(ex: LibExercise): boolean {
+  return BODYWEIGHT_EQUIPMENT.has((ex.equipment || "").toLowerCase().trim());
+}
+
+function isHomeBodyweightFriendly(ex: LibExercise): boolean {
+  return isBodyweightExercise(ex) && !APPARATUS_DEPENDENT_BODYWEIGHT.some((pattern) => pattern.test(ex.name || ""));
 }
 
 function defaultPrescription(category: string, dayTitle: string): string {
