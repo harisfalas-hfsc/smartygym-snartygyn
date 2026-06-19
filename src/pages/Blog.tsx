@@ -293,11 +293,16 @@ const Blog = () => {
           {showMobileCategoryHub && allArticles.length > 0 && (
             <div className="mb-6">
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-sm font-extrabold tracking-tight text-primary uppercase">Featured Articles</span>
+                <span className="text-sm font-extrabold tracking-tight text-primary uppercase">
+                  Featured {blogCategories[blogCatSlide]?.label ?? ""} Articles
+                </span>
                 <div className="h-px flex-1 bg-primary/20" />
               </div>
               <div className="flex flex-col gap-3">
-                {allArticles.slice(0, 3).map((article) => (
+                {allArticles
+                  .filter(a => a.category.toLowerCase() === blogCategories[blogCatSlide]?.key)
+                  .slice(0, 3)
+                  .map((article) => (
                   <button
                     key={article.id}
                     type="button"
