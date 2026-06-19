@@ -13,6 +13,7 @@ import {
   findBestMatch,
   guaranteeAllExercisesLinked,
   rejectNonLibraryExercises,
+  repairStaticHoldPrescriptions,
   type ExerciseBasic,
 } from "../_shared/exercise-matching.ts";
 import { normalizeWorkoutHtml } from "../_shared/html-normalizer.ts";
@@ -249,6 +250,7 @@ Deno.serve(async (req) => {
           // Step 5: Strict rejection - remove non-library exercises
           const rejectResult = rejectNonLibraryExercises(content, allExercises, `${LOG}[FIX-REJECT]`);
           content = rejectResult.processedContent;
+          content = repairStaticHoldPrescriptions(content, `${LOG}[FIX-HOLD-RX]`).processedContent;
 
           console.log(`${LOG}   Fix-only: ${matchResult.matched.length} matched, ${sweepResult.forcedMatches.length} swept, ${matchResult.unmatched.length} unmatched`);
 
@@ -350,6 +352,7 @@ Deno.serve(async (req) => {
         // Step 5: Strict rejection - remove non-library exercises
         const rejectResult = rejectNonLibraryExercises(fullSchedule, allExercises, `${LOG}[REJECT]`);
         fullSchedule = rejectResult.processedContent;
+        fullSchedule = repairStaticHoldPrescriptions(fullSchedule, `${LOG}[HOLD-RX]`).processedContent;
 
         console.log(`${LOG}   Exercise matching: ${matchResult.matched.length} matched, ${sweepResult.forcedMatches.length} swept, ${matchResult.unmatched.length} unmatched`);
 
