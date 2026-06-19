@@ -202,20 +202,20 @@ export const AccessControlProvider = ({ children }: { children: ReactNode }) => 
       }
 
       // User is premium if they have:
-      // 1. Gold or Platinum plan with active status, OR
+      // 1. An active Lifetime / Premium / legacy_premium subscription, OR
       // 2. Active corporate admin subscription, OR
       // 3. Active corporate member status, OR
       // 4. Admin role (admins bypass all access locks)
-      const isPersonalPremium = dbData?.status === 'active' && 
-                         (dbData?.plan_type === 'gold' || dbData?.plan_type === 'platinum' || dbData?.plan_type === 'lifetime');
+      const isPersonalPremium = dbData?.status === 'active' &&
+                         ['lifetime', 'premium', 'legacy_premium'].includes(dbData?.plan_type ?? '');
       const isCorporatePremium = !!corpAdmin || isCorporateMemberActive;
       const isPremium = isPersonalPremium || isCorporatePremium || isAdmin;
-      
+
       setState({
         user,
         userTier: isPremium ? "premium" : "subscriber",
         isLoading: false,
-        productId: dbData?.plan_type || (isCorporatePremium ? 'platinum' : null),
+        productId: dbData?.plan_type || (isCorporatePremium ? 'corporate' : null),
         purchasedContent,
       });
     } catch (error) {
