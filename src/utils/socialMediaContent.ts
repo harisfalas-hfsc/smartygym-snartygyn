@@ -867,7 +867,7 @@ Each ritual is designed by Coach Haris, drawing from sports science and wellness
 
 The result? Not just a fitter body—a better life.
 
-This is premium content, available to our Gold and Platinum members.
+This is premium content, included with SmartyGym Lifetime Premium.
 
 Ready to level up your entire day?
 
