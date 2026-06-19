@@ -126,8 +126,8 @@ async function generateProse(
   }
   const titles = {
     description: "2-3 paragraph program overview — what it delivers, who it's for, expected outcomes. No exercise names. No {{exercise:}} markup.",
-    overview: "3-4 paragraph in-depth program overview explaining the training philosophy, split logic, weekly rhythm, progression model, and what the lifter should expect week by week. Different angle from the short description. No exercise names. No {{exercise:}} markup.",
-    program_structure: "1-2 paragraph explanation of how the program is structured (split, phases, progression). No exercise names. No {{exercise:}} markup.",
+    overview: "3-4 paragraph in-depth program overview explaining the training philosophy, split logic, compact Week A/Week B template system, and progression model. Different angle from the short description. No exercise names. No {{exercise:}} markup.",
+    program_structure: "1-2 paragraph explanation that the program uses only Week A and Week B workout templates, repeated with weekly progression rules. No exercise names. No {{exercise:}} markup.",
     nutrition_tips: "3-5 sentence nutrition and recovery guidance tied to the program category. No exercise names. No {{exercise:}} markup.",
   } as const;
   const r = await callAI(
