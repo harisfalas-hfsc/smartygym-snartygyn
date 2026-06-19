@@ -965,14 +965,11 @@ export function buildExerciseReferenceList(exercises: ExerciseBasic[], equipment
     lines.push('═══════════════════════════════════════════════════════════════════════════════');
     lines.push('');
     if (dl === 'beginner') {
-      lines.push('Use ONLY exercises marked [beginner]. Do NOT use [intermediate] or [advanced] exercises.');
-      lines.push('Exercises with no difficulty tag may be used.');
+      lines.push('Use ONLY exercises marked [beginner]. Do NOT use blank, [intermediate], or [advanced] exercises.');
     } else if (dl === 'intermediate') {
-      lines.push('Use exercises marked [beginner] or [intermediate]. Do NOT use [advanced] exercises.');
-      lines.push('Exercises with no difficulty tag may be used.');
+      lines.push('Use ONLY exercises marked [intermediate]. Do NOT use blank, [beginner], or [advanced] exercises.');
     } else if (dl === 'advanced') {
-      lines.push('All difficulty levels are allowed. Prioritize [intermediate] and [advanced] exercises.');
-      lines.push('Exercises with no difficulty tag may be used.');
+      lines.push('Use ONLY exercises marked [advanced]. Do NOT use blank, [beginner], or [intermediate] exercises.');
     }
     lines.push('');
   } else {
