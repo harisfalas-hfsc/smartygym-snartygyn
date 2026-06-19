@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -54,7 +55,7 @@ export const ArticleCreationWizard = ({ open, onOpenChange, onComplete, onSkipTo
   const { toast } = useToast();
   const [step, setStep] = useState(0);
   const [category, setCategory] = useState<Category | "">("");
-  const [title, setTitle] = useState("");
+  const [brief, setBrief] = useState("");
   const [wordCount, setWordCount] = useState<WordCount>(1000);
   const [generating, setGenerating] = useState(false);
 
@@ -62,7 +63,7 @@ export const ArticleCreationWizard = ({ open, onOpenChange, onComplete, onSkipTo
     if (open) {
       setStep(0);
       setCategory("");
-      setTitle("");
+      setBrief("");
       setWordCount(1000);
       setGenerating(false);
     }
@@ -70,7 +71,7 @@ export const ArticleCreationWizard = ({ open, onOpenChange, onComplete, onSkipTo
 
   const steps = [
     { key: "category", title: "Category" },
-    { key: "title", title: "Title" },
+    { key: "brief", title: "Brief" },
     { key: "wordCount", title: "Word Count" },
     { key: "review", title: "Review" },
   ];
@@ -79,7 +80,7 @@ export const ArticleCreationWizard = ({ open, onOpenChange, onComplete, onSkipTo
 
   const canContinue = () => {
     if (currentKey === "category") return !!category;
-    if (currentKey === "title") return title.trim().length >= 8;
+    if (currentKey === "brief") return brief.trim().length >= 15;
     return true;
   };
 
@@ -87,11 +88,11 @@ export const ArticleCreationWizard = ({ open, onOpenChange, onComplete, onSkipTo
   const goBack = () => step > 0 && setStep(step - 1);
 
   const handleGenerate = async () => {
-    if (!category || !title.trim()) return;
+    if (!category || !brief.trim()) return;
     setGenerating(true);
     try {
       const { data, error } = await supabase.functions.invoke("generate-admin-article", {
-        body: { title: title.trim(), category, wordCount },
+        body: { brief: brief.trim(), category, wordCount },
       });
       if (error) throw error;
       if (!data?.ok || !data?.draft) throw new Error(data?.error || "Generation failed");
@@ -191,20 +192,29 @@ export const ArticleCreationWizard = ({ open, onOpenChange, onComplete, onSkipTo
             </div>
           )}
 
-          {currentKey === "title" && (
+          {currentKey === "brief" && (
             <div className="space-y-2">
-              <Label htmlFor="article-title">Article title</Label>
-              <Input
-                id="article-title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g. How to do a perfect push up: the coach checklist"
+              <Label htmlFor="article-brief">What is this article about?</Label>
+              <Textarea
+                id="article-brief"
+                value={brief}
+                onChange={(e) => setBrief(e.target.value)}
+                placeholder={
+                  "Describe the article like a prompt. Examples:\n" +
+                  "• Topic / angle / audience (e.g. men over 50 losing belly fat)\n" +
+                  "• Keywords to include\n" +
+                  "• References, studies, or sources to lean on\n" +
+                  "• Anything to avoid\n\n" +
+                  "The AI will read this brief and craft the title + full article around it."
+                }
                 autoFocus
-                maxLength={120}
+                rows={9}
+                maxLength={2000}
+                className="min-h-[200px]"
               />
               <p className="text-xs text-muted-foreground">
-                Write the exact final title. The AI will use it verbatim and build the entire
-                article around its subject. Aim for under 60 characters for best SEO.
+                Minimum ~15 characters. The more context, keywords and references you give, the
+                more on-point the article will be. The AI will craft the SEO title from your brief.
               </p>
             </div>
           )}
@@ -249,13 +259,13 @@ export const ArticleCreationWizard = ({ open, onOpenChange, onComplete, onSkipTo
                 <FileText className="w-4 h-4" /> New Blog Article
               </div>
               <Row label="Category" value={category || "—"} />
-              <Row label="Title" value={title.trim() || "—"} />
+              <Row label="Brief" value={brief.trim() || "—"} />
               <Row label="Length" value={`${wordCount} words`} />
               <p className="text-xs text-muted-foreground pt-2 border-t mt-3">
                 <strong>Generate &amp; Review</strong> drafts the full article ({wordCount} words,
-                section headings, internal links, featured image, SEO read time) using the same
-                pipeline as the weekly cron, then opens it in the editor. Nothing is published
-                until you click <strong>Save</strong> there.
+                AI-crafted SEO title from your brief, section headings, internal links, featured
+                image, SEO read time) using the same pipeline as the weekly cron, then opens it
+                in the editor. Nothing is published until you click <strong>Save</strong> there.
               </p>
             </Card>
           )}
@@ -269,7 +279,7 @@ export const ArticleCreationWizard = ({ open, onOpenChange, onComplete, onSkipTo
             {step + 1} / {totalSteps}
           </Badge>
           {currentKey === "review" ? (
-            <Button onClick={handleGenerate} disabled={generating || !category || !title.trim()}>
+            <Button onClick={handleGenerate} disabled={generating || !category || !brief.trim()}>
               {generating ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-1 animate-spin" /> Generating…
