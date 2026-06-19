@@ -15,6 +15,7 @@ import { normalizeWorkoutHtml } from "../_shared/html-normalizer.ts";
 import {
   guaranteeAllExercisesLinked,
   rejectNonLibraryExercises,
+  repairStaticHoldPrescriptions,
   type ExerciseBasic,
 } from "../_shared/exercise-matching.ts";
 
@@ -153,6 +154,7 @@ Deno.serve(async (req) => {
       schedule = sweep.processedContent;
       const rej = rejectNonLibraryExercises(schedule, library as ExerciseBasic[], `${LOG}[${p.id}-REJECT]`);
       schedule = rej.processedContent;
+      schedule = repairStaticHoldPrescriptions(schedule, `${LOG}[${p.id}-HOLD-RX]`).processedContent;
       schedule = normalizeWorkoutHtml(schedule);
 
       const structure = normalizeWorkoutHtml(buildPhaseInstructions(weeks, p.category));
