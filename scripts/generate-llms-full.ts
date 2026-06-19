@@ -90,7 +90,7 @@ export async function generateLlmsFull(outputPaths = [resolve("public/llms-full.
     const articleBlocks = blogRes.data.map((a: any) => {
       const date = a.published_at ? new Date(a.published_at).toISOString().split("T")[0] : "";
       const author = a.author_name || "Haris Falas";
-      const url = `https://smartygym.com/blog/${a.slug}.html`;
+      const url = `https://smartygym.com/blog/${a.slug}`;
       const body = clamp(stripHtml(a.content || a.excerpt || ""), 4000);
       return `### ${a.title}
 - URL: ${url}

@@ -418,7 +418,7 @@ export function renderRouteBody(route: SeoRoute): {
       blogPost: articles.slice(0, 50).map((article) => ({
         "@type": "BlogPosting",
         headline: article.title,
-        url: `${BASE_URL}/blog/${article.slug}.html`,
+        url: `${BASE_URL}/blog/${article.slug}`,
         description: article.excerpt,
         articleSection: article.category,
         author: person(),
