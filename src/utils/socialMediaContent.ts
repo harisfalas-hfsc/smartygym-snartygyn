@@ -2000,75 +2000,42 @@ Duration: 20-30 seconds`,
     theme: "Conversion",
     instagram: `🎉 LAUNCH SPECIAL! 🎉
 
-For a limited time:
+SmartyGym Lifetime Premium
+ONE payment. €89.99. Yours forever.
 
-🥇 GOLD PLAN
-Was: €9.99/month
-NOW: Start FREE for 7 days!
-
-👑 PLATINUM PLAN
-Was: €89.89/year
-NOW: €79.99/year (Save 11%!)
-
-What you get:
 ✅ 500+ Expert Workouts
 ✅ Multi-Week Programs
 ✅ Workout of the Day
 ✅ Smarty Tools
 ✅ Community Access
-
-PLATINUM adds:
 ✨ Smarty Rituals
 📊 Smarty Check-ins
 🎯 Goal Tracking
 
-⏰ Offer ends soon!
+No monthly bills. No renewals. ⏰
 
-👉 Link in bio - Don't miss out!`,
-    facebook: `🎉 LAUNCH SPECIAL - Limited Time Offer!
+👉 Link in bio - Get Lifetime access!`,
+    facebook: `🎉 LAUNCH SPECIAL — SmartyGym Lifetime Premium
 
-To celebrate our social media launch, we're offering exclusive pricing for new members.
+One payment. €89.99. Lifetime access. No renewals, ever.
 
-🥇 GOLD PLAN SPECIAL
-Regular: €9.99/month
-Launch Offer: 7-Day FREE Trial!
-No credit card required to start
-Full access to everything in Gold
-Cancel anytime during trial
-
-👑 PLATINUM PLAN SPECIAL
-Regular: €89.89/year
-Launch Offer: €79.99/year (Save €10!)
-That's just €6.67/month
-All Gold features PLUS premium features
-Best value for serious fitness enthusiasts
-
-WHAT'S INCLUDED:
-
-BOTH PLANS:
+EVERYTHING INCLUDED:
 ✅ 500+ Expert-Designed Workouts
 ✅ All Multi-Week Training Programs
 ✅ Daily Workout of the Day
 ✅ Exercise Library
-✅ 1RM, BMR, Macro Calculators
+✅ 1RM, BMR, Macro Calculators + Calorie Counter
 ✅ Community Features & Leaderboards
-
-PLATINUM EXCLUSIVE:
 ✨ Smarty Rituals (morning, midday, evening)
 📊 Smarty Check-ins (readiness tracking)
 🎯 Advanced Goal Setting & Tracking
 📈 Detailed Progress Analytics
 🏆 Monday Motivation Reports
+✅ Priority support
 
-⏰ THIS OFFER WON'T LAST
+No contracts. No hidden fees. No monthly bills. Just expert fitness programming, yours for life.
 
-We're keeping this pricing available for our launch period only. Once it's gone, regular pricing returns.
-
-No contracts. No hidden fees. No pressure.
-
-Just expert fitness programming at an unbeatable price.
-
-👉 Claim your offer at smartygym.com/launch`,
+👉 Get Lifetime Premium at smartygym.com/smartypremium`,
     tiktok: `🎬 TIKTOK SCRIPT:
 
 Hook (0-3 sec): "POV: You find out about this deal..."
