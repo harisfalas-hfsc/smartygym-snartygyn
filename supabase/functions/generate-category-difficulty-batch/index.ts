@@ -457,7 +457,7 @@ serve(async (req) => {
     let categories: CategoryKey[] = ALL_CATEGORIES;
     let equipments: EquipmentKey[] = ["BODYWEIGHT", "EQUIPMENT"];
     let price = 3.99;
-    let tierRequired = "gold";
+    let tierRequired = "premium";
 
     try {
       const body = await req.json();

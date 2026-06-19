@@ -111,7 +111,7 @@ export interface SubscriptionRow {
 }
 
 export interface PremiumCounts {
-  /** All active gold|platinum subscribers (paid + complimentary). */
+  /** All active premium subscribers including legacy gold/platinum tiers (retired). */
   activePremiumSubscribers: number;
   /** Active premium with a real Stripe subscription id. */
   paidSubscribers: number;
@@ -123,7 +123,7 @@ export interface PremiumCounts {
 
 export function computePremiumCounts(subs: SubscriptionRow[] | null | undefined): PremiumCounts {
   const list = subs ?? [];
-  // Include all paid plan types: current "lifetime"/"premium" and legacy "gold"/"platinum".
+  // Include all paid plan types: current "lifetime"/"premium" and legacy "gold"/"platinum" (retired).
   const PREMIUM_PLANS = new Set(["lifetime", "premium", "gold", "platinum"]);
   const isActivePremium = (s: SubscriptionRow) =>
     s.status === "active" && !!s.plan_type && PREMIUM_PLANS.has(s.plan_type);

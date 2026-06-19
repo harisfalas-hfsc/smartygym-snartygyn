@@ -3,9 +3,21 @@ import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { PurchaseButton } from '../PurchaseButton';
 import { useAccessControl } from '@/hooks/useAccessControl';
+import { BrowserRouter } from 'react-router-dom';
 
 // Mock the useAccessControl hook
 vi.mock('@/hooks/useAccessControl');
+
+// Mock NavigationHistory (PurchaseButton uses useNavigationHistory)
+vi.mock('@/contexts/NavigationHistoryContext', () => ({
+  useNavigationHistory: () => ({
+    history: [],
+    goBack: vi.fn(),
+    canGoBack: false,
+    goForward: vi.fn(),
+    canGoForward: false,
+  }),
+}));
 
 // Mock supabase
 vi.mock('@/integrations/supabase/client', () => ({
@@ -18,6 +30,10 @@ vi.mock('@/integrations/supabase/client', () => ({
     },
   },
 }));
+
+const TestWrapper = ({ children }: { children: React.ReactNode }) => (
+  <BrowserRouter>{children}</BrowserRouter>
+);
 
 describe('PurchaseButton', () => {
   beforeEach(() => {
@@ -37,14 +53,12 @@ describe('PurchaseButton', () => {
       refreshAccess: vi.fn(),
     });
 
-    const { getByText, getByRole } = render(
-      <PurchaseButton
+    const { getByText, getByRole } = render(<TestWrapper><PurchaseButton
         contentId="workout-1"
         contentType="workout"
         contentName="Test Workout"
         price={29.99}
-      />
-    );
+      /></TestWrapper>);
 
     expect(getByText(/Included in Your Premium Plan/i)).toBeInTheDocument();
     expect(getByRole('button')).toBeDisabled();
@@ -63,14 +77,12 @@ describe('PurchaseButton', () => {
       refreshAccess: vi.fn(),
     });
 
-    const { getByText, getByRole } = render(
-      <PurchaseButton
+    const { getByText, getByRole } = render(<TestWrapper><PurchaseButton
         contentId="workout-1"
         contentType="workout"
         contentName="Test Workout"
         price={29.99}
-      />
-    );
+      /></TestWrapper>);
 
     expect(getByText(/Purchase for €29.99/i)).toBeInTheDocument();
     expect(getByRole('button')).not.toBeDisabled();
@@ -89,14 +101,12 @@ describe('PurchaseButton', () => {
       refreshAccess: vi.fn(),
     });
 
-    const { getByText, getByRole } = render(
-      <PurchaseButton
+    const { getByText, getByRole } = render(<TestWrapper><PurchaseButton
         contentId="workout-1"
         contentType="workout"
         contentName="Test Workout"
         price={29.99}
-      />
-    );
+      /></TestWrapper>);
 
     expect(getByText(/Already Purchased/i)).toBeInTheDocument();
     expect(getByRole('button')).toBeDisabled();
@@ -115,16 +125,15 @@ describe('PurchaseButton', () => {
       refreshAccess: vi.fn(),
     });
 
-    const { getByText } = render(
-      <PurchaseButton
+    const { getByText } = render(<TestWrapper><PurchaseButton
         contentId="workout-1"
         contentType="workout"
         contentName="Test Workout"
         price={29.99}
-      />
-    );
+      /></TestWrapper>);
 
-    expect(getByText(/Sign in to Purchase/i)).toBeInTheDocument();
+    // Guest sees the regular purchase button; clicking it triggers auth redirect.
+    expect(getByText(/Purchase for €29.99/i)).toBeInTheDocument();
   });
 
   it('formats price correctly', () => {
@@ -140,14 +149,12 @@ describe('PurchaseButton', () => {
       refreshAccess: vi.fn(),
     });
 
-    const { getByText } = render(
-      <PurchaseButton
+    const { getByText } = render(<TestWrapper><PurchaseButton
         contentId="workout-1"
         contentType="workout"
         contentName="Test Workout"
         price={19.5}
-      />
-    );
+      /></TestWrapper>);
 
     expect(getByText(/€19.50/i)).toBeInTheDocument();
   });

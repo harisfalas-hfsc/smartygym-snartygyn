@@ -77,7 +77,7 @@ serve(async (req) => {
     // normalize them to 'lifetime' so the database holds a single value.
     let normalizedPlan = plan_type;
     if (action === 'grant') {
-      if (['lifetime', 'premium', 'gold', 'platinum'].includes(plan_type)) {
+      if (['lifetime', 'premium', 'legacy_premium', 'gold', 'platinum'].includes(plan_type)) {
         normalizedPlan = 'lifetime';
       } else {
         throw new Error('Invalid plan_type for grant. Must be "lifetime"');

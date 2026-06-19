@@ -461,7 +461,7 @@ serve(async (req) => {
     let focuses: FocusKey[] = ALL_FOCUSES;
     let equipments: EquipmentKey[] = ["BODYWEIGHT", "EQUIPMENT"];
     let price = 3.99;
-    let tierRequired = "gold";
+    let tierRequired = "premium";
 
     try {
       const body = await req.json();

@@ -1028,14 +1028,12 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("👥 Checking user statistics...");
 
     const { count: totalUsers } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
-    const { count: goldUsers } = await supabase.from('user_subscriptions').select('*', { count: 'exact', head: true }).eq('plan_type', 'gold').eq('status', 'active');
-    const { count: platinumUsers } = await supabase.from('user_subscriptions').select('*', { count: 'exact', head: true }).eq('plan_type', 'platinum').eq('status', 'active');
+    const { count: premiumUsers } = await supabase.from('user_subscriptions').select('*', { count: 'exact', head: true }).in('plan_type', ['lifetime','premium','legacy_premium']).eq('status', 'active');
     const { count: adminUsers } = await supabase.from('user_roles').select('*', { count: 'exact', head: true }).eq('role', 'admin');
     const { count: corporateSubs } = await supabase.from('corporate_subscriptions').select('*', { count: 'exact', head: true }).eq('status', 'active');
 
     addCheck('Users', 'Total Registered Users', `${totalUsers || 0} users in system`, 'pass');
-    addCheck('Users', 'Gold Subscribers', `${goldUsers || 0} active Gold members`, 'pass');
-    addCheck('Users', 'Platinum Subscribers', `${platinumUsers || 0} active Platinum members`, 'pass');
+    addCheck('Users', 'Premium Subscribers', `${premiumUsers || 0} active Premium members`, 'pass');
     addCheck('Users', 'Admin Users', `${adminUsers || 0} administrators`, adminUsers && adminUsers > 0 ? 'pass' : 'warning');
     addCheck('Users', 'Corporate Subscriptions', `${corporateSubs || 0} active corporate plans`, 'pass');
 
@@ -1059,7 +1057,7 @@ const handler = async (req: Request): Promise<Response> => {
         
         addCheck('Stripe', 'Products Configured', `${products.data?.length || 0} active products`, 
           products.data?.length > 0 ? 'pass' : 'warning',
-          'Gold, Platinum, Corporate plans should exist'
+          'Lifetime Premium and Corporate plans should exist'
         );
 
         const priceResponse = await fetch('https://api.stripe.com/v1/prices?active=true&limit=100', {
@@ -1479,7 +1477,7 @@ const handler = async (req: Request): Promise<Response> => {
     const { count: activeSubscribers } = await supabase
       .from('user_subscriptions')
       .select('*', { count: 'exact', head: true })
-      .in('plan_type', ['gold', 'platinum', 'premium'])
+      .in('plan_type', ['lifetime','premium','legacy_premium'])
       .eq('status', 'active');
     
     addCheck('Access Levels', 'Active Premium Users', 

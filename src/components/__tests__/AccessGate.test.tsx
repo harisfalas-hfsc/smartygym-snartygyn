@@ -8,6 +8,17 @@ import { BrowserRouter } from 'react-router-dom';
 // Mock the useAccessControl hook
 vi.mock('@/hooks/useAccessControl');
 
+// Mock NavigationHistory (AccessGate -> useShowBackButton uses useNavigationHistory)
+vi.mock('@/contexts/NavigationHistoryContext', () => ({
+  useNavigationHistory: () => ({
+    history: [],
+    goBack: vi.fn(),
+    canGoBack: false,
+    goForward: vi.fn(),
+    canGoForward: false,
+  }),
+}));
+
 // Mock supabase
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: {
@@ -93,13 +104,13 @@ describe('AccessGate', () => {
 
     const { getByText } = render(
       <TestWrapper>
-        <AccessGate contentId="workout-1" contentType="workout">
+        <AccessGate contentId="workout-1" contentType="workout" requirePremium>
           <div>Premium Content</div>
         </AccessGate>
       </TestWrapper>
     );
 
-    expect(getByText(/Upgrade to access this content/i)).toBeInTheDocument();
+    expect(getByText(/Upgrade to Premium/i)).toBeInTheDocument();
   });
 
   it('shows login prompt for guests', () => {
@@ -117,13 +128,13 @@ describe('AccessGate', () => {
 
     const { getByText } = render(
       <TestWrapper>
-        <AccessGate contentId="workout-1" contentType="workout">
+        <AccessGate contentId="workout-1" contentType="workout" requirePremium requireAuth>
           <div>Premium Content</div>
         </AccessGate>
       </TestWrapper>
     );
 
-    expect(getByText(/Sign in to access/i)).toBeInTheDocument();
+    expect(getByText(/Login Required/i)).toBeInTheDocument();
   });
 
   it('shows loading state while checking access', () => {
@@ -141,12 +152,12 @@ describe('AccessGate', () => {
 
     const { getByText } = render(
       <TestWrapper>
-        <AccessGate contentId="workout-1" contentType="workout">
+        <AccessGate contentId="workout-1" contentType="workout" requirePremium>
           <div>Premium Content</div>
         </AccessGate>
       </TestWrapper>
     );
 
-    expect(getByText(/Loading/i)).toBeInTheDocument();
+    expect(getByText(/Checking access/i)).toBeInTheDocument();
   });
 });

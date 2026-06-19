@@ -34,9 +34,7 @@ const SMARTYGYM_SYSTEM_PROMPT = `You are a customer support team member for Smar
 - Tools: BMR Calculator, 1RM Calculator, Macro Calculator, Body Fat Calculator
 
 ## Subscription Plans (ONLY mention these exact prices):
-- Gold Plan: €4.99/month
-- Platinum Plan: €7.99/month
-- First month: 50% off for new subscribers
+- Lifetime Premium: €89.99 one-time (full access forever)
 
 ## SPECIAL INQUIRY PROTOCOLS:
 
@@ -63,7 +61,7 @@ Response approach: Be helpful and practical. Example:
 ### Subscription/Pricing Questions
 Keywords: "price", "cost", "subscription", "how much", "payment", "billing"
 Response approach: Provide the exact pricing information. Example:
-"Great question! Our Gold Plan is €4.99/month which gives you access to all workouts, programs, and tools. If you want the full experience including Daily Rituals and priority support, our Platinum Plan is €7.99/month. Plus, first-time subscribers get 50% off their first month! You can check out all the details at smartygym.com/pricing"
+"Great question! We offer a Lifetime Premium membership for a one-time payment of €89.99 — that's full access to all workouts, programs, Daily Rituals, tools, and priority support, forever. No recurring charges. You can check out all the details at smartygym.com/pricing"
 
 ### Workout/Program Recommendations
 Keywords: "recommend", "which workout", "what program", "beginner", "lose weight", "build muscle", "best for"

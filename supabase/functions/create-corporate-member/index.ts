@@ -121,12 +121,12 @@ serve(async (req) => {
 
     logStep("Profile created");
 
-    // Create user subscription with platinum access
+    // Create user subscription with premium access
     await supabase
       .from('user_subscriptions')
       .upsert({
         user_id: newUser.user.id,
-        plan_type: 'platinum',
+        plan_type: 'premium',
         status: 'active',
         current_period_start: corpSub.current_period_start,
         current_period_end: corpSub.current_period_end,
@@ -134,7 +134,7 @@ serve(async (req) => {
         onConflict: 'user_id'
       });
 
-    logStep("Platinum subscription created for member");
+    logStep("Premium subscription created for member");
 
     // Add to corporate members table
     const { error: memberError } = await supabase
@@ -175,7 +175,7 @@ serve(async (req) => {
           message_type: MESSAGE_TYPES.CORPORATE_MEMBER_ADDED,
           subject: `🎉 Welcome to SmartyGym - ${corpSub.organization_name}!`,
           content: `<p class="tiptap-paragraph">Welcome to the team, <strong>${fullName.trim()}</strong>! 🎉</p>
-<p class="tiptap-paragraph">You've been added to <strong>${corpSub.organization_name}</strong>'s SmartyGym corporate account with <strong>Platinum-level access</strong>.</p>
+<p class="tiptap-paragraph">You've been added to <strong>${corpSub.organization_name}</strong>'s SmartyGym corporate account with <strong>Premium-level access</strong>.</p>
 <p class="tiptap-paragraph">You now have full access to all premium features:</p>
 <ul>
 <li>500+ expert-designed workouts by Haris Falas</li>
@@ -219,7 +219,7 @@ serve(async (req) => {
               <div style="background: #f9f9f9; border-radius: 8px; padding: 30px;">
                 <h2 style="margin-top: 0;">Welcome to the Team, ${fullName.trim()}! 🎉</h2>
                 <p>You've been added to <strong>${corpSub.organization_name}</strong>'s SmartyGym corporate account!</p>
-                <p>You now have <strong>Platinum-level access</strong> to all SmartyGym features:</p>
+                <p>You now have <strong>Premium-level access</strong> to all SmartyGym features:</p>
                 <ul style="padding-left: 20px;">
                   <li>500+ expert-designed workouts</li>
                   <li>Premium training programs</li>

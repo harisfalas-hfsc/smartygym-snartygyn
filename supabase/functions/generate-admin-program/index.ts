@@ -326,7 +326,7 @@ serve(async (req) => {
       is_free: access === "free",
       is_premium: access === "premium" || access === "standalone",
       is_standalone_purchase: access === "standalone",
-      tier_required: access === "premium" ? (body.tier_required || "gold") : "",
+      tier_required: access === "premium" ? (body.tier_required || "premium") : "",
       price: access === "standalone" ? String(body.price ?? "") : "",
       stripe_product_id: "",
       stripe_price_id: "",
