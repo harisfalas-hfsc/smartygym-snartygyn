@@ -12,6 +12,13 @@ export interface ExerciseBasic {
   difficulty?: string | null;
 }
 
+const NON_BODYWEIGHT_FILTER = 'non-bodyweight';
+
+function isBodyweightEquipmentValue(equipment: string | null | undefined): boolean {
+  const eq = (equipment || '').toLowerCase().trim();
+  return eq === 'body weight' || eq === 'bodyweight';
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // HOME-BODYWEIGHT GUARDRAIL
 // Some exercises are tagged equipment="body weight" but still require apparatus
@@ -41,8 +48,7 @@ const HOME_BODYWEIGHT_FORBIDDEN_PATTERNS: RegExp[] = [
 ];
 
 export function isHomeBodyweightFriendly(exercise: ExerciseBasic): boolean {
-  const equip = (exercise.equipment || '').toLowerCase().trim();
-  if (equip !== 'body weight') return false;
+  if (!isBodyweightEquipmentValue(exercise.equipment)) return false;
   const name = (exercise.name || '').toLowerCase();
   return !HOME_BODYWEIGHT_FORBIDDEN_PATTERNS.some((re) => re.test(name));
 }
