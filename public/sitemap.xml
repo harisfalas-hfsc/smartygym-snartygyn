@@ -3547,6 +3547,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://smartygym.com/trainingprogram/cardio-endurance/cardio-foundations</loc>
+    <lastmod>2026-06-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://smartygym.com/trainingprogram/weight-loss/shred-protocol-elite</loc>
     <lastmod>2026-06-19</lastmod>
     <changefreq>weekly</changefreq>
@@ -3613,13 +3619,13 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://smartygym.com/trainingprogram/functional-strength/athletic-performance-builder</loc>
+    <loc>https://smartygym.com/trainingprogram/low-back-pain/spine-restore</loc>
     <lastmod>2026-06-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://smartygym.com/trainingprogram/low-back-pain/spine-restore</loc>
+    <loc>https://smartygym.com/trainingprogram/functional-strength/athletic-performance-builder</loc>
     <lastmod>2026-06-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -3631,13 +3637,13 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://smartygym.com/trainingprogram/cardio-endurance/cardio-conquest</loc>
+    <loc>https://smartygym.com/trainingprogram/weight-loss/90-day-shred-challenge</loc>
     <lastmod>2026-06-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://smartygym.com/trainingprogram/weight-loss/90-day-shred-challenge</loc>
+    <loc>https://smartygym.com/trainingprogram/cardio-endurance/cardio-conquest</loc>
     <lastmod>2026-06-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -3667,19 +3673,13 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://smartygym.com/trainingprogram/functional-strength/functional-power</loc>
-    <lastmod>2026-06-19</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://smartygym.com/trainingprogram/cardio-endurance/run-your-first-10k</loc>
     <lastmod>2026-06-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://smartygym.com/trainingprogram/cardio-endurance/cardio-foundations</loc>
+    <loc>https://smartygym.com/trainingprogram/functional-strength/functional-power</loc>
     <lastmod>2026-06-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>

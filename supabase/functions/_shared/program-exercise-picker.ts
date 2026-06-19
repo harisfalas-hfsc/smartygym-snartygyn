@@ -116,6 +116,8 @@ function isHomeBodyweightFriendly(ex: LibExercise): boolean {
 
 function isStaticHoldExercise(ex: LibExercise): boolean {
   const name = (ex.name || "").toLowerCase().trim();
+  if (/^front\s+lever\s+reps$/i.test(name)) return true;
+  if (/^flag$|^full\s+planche$|^handstand$/i.test(name)) return true;
   if (!name || /\breps?\b|tap|twist|row|fly|raise|press|push|pull|wiper|walk|crawl/i.test(name)) return false;
 
   return [
@@ -131,6 +133,10 @@ function isStaticHoldExercise(ex: LibExercise): boolean {
     /^bodyweight\s+incline\s+side\s+plank$/i,
     /\bisometric\s+chest\s+squeeze\b/i,
   ].some((pattern) => pattern.test(name));
+}
+
+function excludesStaticHolds(ex: LibExercise): boolean {
+  return !isStaticHoldExercise(ex);
 }
 
 function defaultPrescription(category: string, dayTitle: string): string {
@@ -226,6 +232,7 @@ export function filterLibraryForProgram(
   } else {
     pool = pool.filter((ex) => !isBodyweightExercise(ex));
   }
+  pool = pool.filter(excludesStaticHolds);
   if (difficulty) {
     const targetDiff = difficulty.toLowerCase();
     pool = pool.filter((ex) => (ex.difficulty || "").toLowerCase() === targetDiff);
