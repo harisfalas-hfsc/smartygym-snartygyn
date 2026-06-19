@@ -283,7 +283,7 @@ export function pickExercisesForDay(
   const categoryPool = categorySelectionPool(library, category, n, difficulty);
   const matched = categoryPool.filter((ex) => matchesFocus(ex, dayTitle));
   const fallbackPool = categoryPool.length ? categoryPool : library.filter((ex) => excludesSkillExercises(ex, difficulty));
-  const pool = matched.length >= n ? matched : [...matched, ...fallbackPool.filter((ex) => !matched.some((m) => m.id === ex.id))];
+  const pool = matched.length > 0 ? matched : fallbackPool;
   // Deterministic rotation so weeks vary but stay stable for the same input
   const seed = (weekIndex * 31 + dayIndex * 7) % Math.max(pool.length, 1);
   const candidates = Array.from({ length: pool.length }, (_, i) => pool[(seed + i) % pool.length]);
