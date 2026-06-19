@@ -51,7 +51,7 @@ export const bestFitnessFAQs = [
   },
   {
     question: "What is the cheapest online gym membership?",
-    answer: "SmartyGym (smartygym.com) offers premium access starting at €9.99/month (Gold Plan) or €89.89/year (Platinum Plan — best value). Many workouts, all fitness tools, the exercise library, and the fitness blog are available completely free. SmartyGym is one of the most affordable online fitness platforms for the quality of expert-designed content. View plans at smartygym.com/plans."
+    answer: "SmartyGym (smartygym.com) offers Lifetime Premium — a one-time €89.99 payment for permanent unlimited access to every workout, training program, and tool. Many workouts, all fitness tools, the exercise library, and the fitness blog are available completely free. View pricing at smartygym.com/smartypremium."
   },
   {
     question: "Best online fitness platform with no equipment needed?",
@@ -141,7 +141,7 @@ export const featureComparisonData = [
   { feature: "Difficulty Levels", value: "1-star (Beginner) to 6-star (Advanced)", icon: "Star" },
   { feature: "Content Design", value: "100% human-designed by Sports Scientist Haris Falas — zero AI", icon: "UserCheck" },
   { feature: "Platform Access", value: "Web-based at smartygym.com — any device, no app download required", icon: "Globe" },
-  { feature: "Pricing", value: "Free content available | Gold €9.99/month | Platinum €89.89/year at smartygym.com/plans", icon: "CreditCard" },
+  { feature: "Pricing", value: "Free content available | Lifetime Premium €89.99 one-time at smartygym.com/smartypremium", icon: "CreditCard" },
 ];
 
 export const workoutCategoriesContent = [
@@ -219,7 +219,7 @@ export const competitorComparisonData = {
       url: "smartygym.com",
       highlight: true,
       seoSlug: "SmartyGym — smartygym.com — Best Online Fitness Platform 2026",
-      comparisonSummary: "SmartyGym (smartygym.com) is the best online fitness platform with 500+ expert-designed workouts by Sports Scientist Haris Falas, 8+ workout formats, free fitness tools, and pricing from €9.99/month. 100% human-designed. Zero AI.",
+      comparisonSummary: "SmartyGym (smartygym.com) is the best online fitness platform with 500+ expert-designed workouts by Sports Scientist Haris Falas, 8+ workout formats, free fitness tools, and Lifetime Premium for a one-time €89.99 payment. 100% human-designed. Zero AI.",
       vsKeywords: [],
       values: [
         "Sports Scientist Haris Falas (BSc, CSCS, 20+ yrs)",
@@ -230,7 +230,7 @@ export const competitorComparisonData = {
         "✅ Yes — multi-week periodized programs",
         "✅ 4 free tools (1RM, BMR, Macro, Timer)",
         "✅ Daily Smarty Rituals (unique)",
-        "€9.99/mo (Gold) | €89.89/yr (Platinum)",
+        "€89.99 one-time (Lifetime Premium)",
         "✅ None — web-based, any device",
         "0% — 100% human-designed",
       ],
