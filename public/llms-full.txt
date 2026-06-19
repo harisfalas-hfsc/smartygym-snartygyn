@@ -1,6 +1,6 @@
 # SmartyGym — Full Knowledge File for AI Systems
 # URL: https://smartygym.com
-# Generated: 2026-06-17T15:38:04.325Z
+# Generated: 2026-06-19T03:21:54.925Z
 # Source: live database (auto-regenerated on every publish)
 #
 # This file gives ChatGPT, Claude, Gemini, Grok, Perplexity, Copilot and
@@ -39,7 +39,7 @@ Haris Falas — Sports Scientist (BSc Sports Science), CSCS-certified through th
 ## Blog Articles (73 published)
 
 ### Data-Driven Fitness: How Wearable Technology Is Changing the Way We Train
-- URL: https://smartygym.com/blog/data-driven-fitness-wearable-technology-changing-training.html
+- URL: https://smartygym.com/blog/data-driven-fitness-wearable-technology-changing-training
 - Category: Fitness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 
@@ -49,7 +49,7 @@ The Rise of Data-Driven Training The fitness industry has undergone a fundamenta
 ---
 
 ### Mental Health and Longevity: Why the Future of Fitness Is Preventive
-- URL: https://smartygym.com/blog/mental-health-longevity-future-fitness-preventive.html
+- URL: https://smartygym.com/blog/mental-health-longevity-future-fitness-preventive
 - Category: Wellness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 
@@ -59,7 +59,7 @@ The Biggest Shift in Fitness History Something remarkable is happening in the fi
 ---
 
 ### High Protein, High Fiber, and Gut Health: The New Nutrition Blueprint
-- URL: https://smartygym.com/blog/high-protein-fiber-gut-health-new-nutrition-blueprint.html
+- URL: https://smartygym.com/blog/high-protein-fiber-gut-health-new-nutrition-blueprint
 - Category: Nutrition
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 
@@ -69,7 +69,7 @@ The End of Extreme Dieting The era of elimination diets, extreme caloric restric
 ---
 
 ### Neuroplasticity in Motion: The Science of Mindful Movement
-- URL: https://smartygym.com/blog/neuroplasticity-in-motion-the-science-of-mindful-movement.html
+- URL: https://smartygym.com/blog/neuroplasticity-in-motion-the-science-of-mindful-movement
 - Category: Wellness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-06-15
@@ -79,7 +79,7 @@ In the realm of elite performance, we often focus on the mechanical: the cross-s
 ---
 
 ### Microbiome Mechanics: The Gut-Performance Blueprint
-- URL: https://smartygym.com/blog/microbiome-mechanics-the-gut-performance-blueprint.html
+- URL: https://smartygym.com/blog/microbiome-mechanics-the-gut-performance-blueprint
 - Category: Nutrition
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-06-15
@@ -89,7 +89,7 @@ For decades, the fitness industry focused almost exclusively on the 'Big Three':
 ---
 
 ### Mastering the Goblet Squat: The Ultimate Foundation for Strength
-- URL: https://smartygym.com/blog/mastering-the-goblet-squat-the-ultimate-foundation-for-strength.html
+- URL: https://smartygym.com/blog/mastering-the-goblet-squat-the-ultimate-foundation-for-strength
 - Category: Fitness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-06-15
@@ -99,7 +99,7 @@ When it comes to building a high-performance physique, the squat is often herald
 ---
 
 ### Thermal Hormesis: The Science of Temperature Contrast
-- URL: https://smartygym.com/blog/thermal-hormesis-the-science-of-temperature-contrast.html
+- URL: https://smartygym.com/blog/thermal-hormesis-the-science-of-temperature-contrast
 - Category: Wellness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-06-15
@@ -109,7 +109,7 @@ In the pursuit of peak performance, we often focus on what we put into our bodie
 ---
 
 ### Fiber Layering: The Gut-Muscle Axis Blueprint
-- URL: https://smartygym.com/blog/fiber-layering-the-gut-muscle-axis-blueprint.html
+- URL: https://smartygym.com/blog/fiber-layering-the-gut-muscle-axis-blueprint
 - Category: Nutrition
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-06-15
@@ -119,7 +119,7 @@ When we discuss high-performance nutrition, the conversation typically gravitate
 ---
 
 ### Social Cohesion: The Biology of Collective Performance
-- URL: https://smartygym.com/blog/social-cohesion-the-biology-of-collective-performance.html
+- URL: https://smartygym.com/blog/social-cohesion-the-biology-of-collective-performance
 - Category: Wellness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-06-15
@@ -129,7 +129,7 @@ In the pursuit of peak physical performance, we often obsess over the minutiae o
 ---
 
 ### Plant-Powered Hypertrophy: The Vegan Muscle Science
-- URL: https://smartygym.com/blog/plant-powered-hypertrophy-the-vegan-muscle-science.html
+- URL: https://smartygym.com/blog/plant-powered-hypertrophy-the-vegan-muscle-science
 - Category: Nutrition
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-06-15
@@ -139,7 +139,7 @@ For decades, the standard narrative in the fitness industry suggested that optim
 ---
 
 ### Zero to Hero: The Definitive Pull-Up Progression Guide
-- URL: https://smartygym.com/blog/zero-to-hero-the-definitive-pull-up-progression-guide.html
+- URL: https://smartygym.com/blog/zero-to-hero-the-definitive-pull-up-progression-guide
 - Category: Fitness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-06-15
@@ -149,7 +149,7 @@ The pull-up is often regarded as the gold standard of upper-body strength. It is
 ---
 
 ### Cognitive Clarity: The Morning Protocol for Mental Peak
-- URL: https://smartygym.com/blog/cognitive-clarity-the-morning-protocol-for-mental-peak.html
+- URL: https://smartygym.com/blog/cognitive-clarity-the-morning-protocol-for-mental-peak
 - Category: Wellness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-06-08
@@ -159,7 +159,7 @@ In the high-stakes world of modern performance, the first sixty minutes of your 
 ---
 
 ### Circadian Nutrition: The Science of Meal Timing Mastery
-- URL: https://smartygym.com/blog/circadian-nutrition-the-science-of-meal-timing-mastery.html
+- URL: https://smartygym.com/blog/circadian-nutrition-the-science-of-meal-timing-mastery
 - Category: Nutrition
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-06-08
@@ -169,7 +169,7 @@ In the pursuit of peak physical performance and longevity, we often obsess over 
 ---
 
 ### Unlocking Glute Growth: The Biomechanics of Modern Hypertrophy
-- URL: https://smartygym.com/blog/unlocking-glute-growth-the-biomechanics-of-modern-hypertrophy.html
+- URL: https://smartygym.com/blog/unlocking-glute-growth-the-biomechanics-of-modern-hypertrophy
 - Category: Fitness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-06-08
@@ -179,7 +179,7 @@ In the realm of physique development and functional performance, few muscle grou
 ---
 
 ### Metabolic Margin: The Science of Burnout Prevention
-- URL: https://smartygym.com/blog/metabolic-margin-the-science-of-burnout-prevention.html
+- URL: https://smartygym.com/blog/metabolic-margin-the-science-of-burnout-prevention
 - Category: Wellness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-06-01
@@ -189,7 +189,7 @@ In the high-stakes world of modern performance, the phrase 'burning the candle a
 ---
 
 ### Thermogenic Synergy: The Science of Fat Loss Nutrition
-- URL: https://smartygym.com/blog/thermogenic-synergy-the-science-of-fat-loss-nutrition.html
+- URL: https://smartygym.com/blog/thermogenic-synergy-the-science-of-fat-loss-nutrition
 - Category: Nutrition
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-06-01
@@ -199,7 +199,7 @@ When it comes to body transformation, the sheer volume of conflicting advice can
 ---
 
 ### Unlocking Transferability: The Science of Real-World Strength
-- URL: https://smartygym.com/blog/unlocking-transferability-the-science-of-real-world-strength.html
+- URL: https://smartygym.com/blog/unlocking-transferability-the-science-of-real-world-strength
 - Category: Fitness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-06-01
@@ -209,7 +209,7 @@ In the modern fitness landscape, there is often a significant disconnect between
 ---
 
 ### How Men Over 50 Can Lose Belly Fat — The Science-Backed Protocol
-- URL: https://smartygym.com/blog/how-men-over-50-can-lose-belly-fat-protocol.html
+- URL: https://smartygym.com/blog/how-men-over-50-can-lose-belly-fat-protocol
 - Category: Fitness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-05-29
@@ -219,7 +219,7 @@ If you are a man over fifty staring down at a belly that did not exist in your f
 ---
 
 ### Either Way, You'll End Up in the Gym — A Message from Coach Haris Falas
-- URL: https://smartygym.com/blog/either-way-you-will-end-up-in-the-gym.html
+- URL: https://smartygym.com/blog/either-way-you-will-end-up-in-the-gym
 - Category: Wellness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-05-29
@@ -229,7 +229,7 @@ I have been coaching real people for more than twenty years, and I will tell you
 ---
 
 ### Why Sleep Is Your Most Powerful Performance Drug — And How to Use It
-- URL: https://smartygym.com/blog/sleep-most-powerful-performance-drug-how-to-use-it.html
+- URL: https://smartygym.com/blog/sleep-most-powerful-performance-drug-how-to-use-it
 - Category: Wellness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-05-29
@@ -239,7 +239,7 @@ If a pharmaceutical company released a drug that increased strength, improved fa
 ---
 
 ### The Truth About Protein: How Much You Actually Need and Why Everyone Is Getting It Wrong
-- URL: https://smartygym.com/blog/truth-about-protein-how-much-you-actually-need.html
+- URL: https://smartygym.com/blog/truth-about-protein-how-much-you-actually-need
 - Category: Nutrition
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-05-29
@@ -249,7 +249,7 @@ Protein is the most argued-about nutrient on the internet — and one of the mos
 ---
 
 ### Why Walking Is the Most Underrated Exercise on the Planet — According to Science
-- URL: https://smartygym.com/blog/why-walking-is-the-most-underrated-exercise-science.html
+- URL: https://smartygym.com/blog/why-walking-is-the-most-underrated-exercise-science
 - Category: Fitness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-05-29
@@ -259,7 +259,7 @@ Ask a hundred people what real exercise looks like and almost none of them will 
 ---
 
 ### The Family That Trains Together: How to Build a Healthy Home for Every Age
-- URL: https://smartygym.com/blog/family-that-trains-together-healthy-home.html
+- URL: https://smartygym.com/blog/family-that-trains-together-healthy-home
 - Category: Wellness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-05-28
@@ -269,7 +269,7 @@ The single biggest predictor of a child's long-term health is not their school's
 ---
 
 ### Red Meat, Cholesterol and Heart Disease: Everything You Were Told Is Wrong
-- URL: https://smartygym.com/blog/red-meat-cholesterol-heart-disease-myth.html
+- URL: https://smartygym.com/blog/red-meat-cholesterol-heart-disease-myth
 - Category: Nutrition
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-05-28
@@ -279,7 +279,7 @@ For half a century, the message was simple: red meat raises cholesterol, cholest
 ---
 
 ### The Best Exercises for People Over 40 — What the Science Actually Says
-- URL: https://smartygym.com/blog/best-exercises-over-40-science.html
+- URL: https://smartygym.com/blog/best-exercises-over-40-science
 - Category: Fitness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-05-28
@@ -289,7 +289,7 @@ After the age of 40, three things start happening whether you like it or not: mu
 ---
 
 ### No Time, No Excuse: How to Stay Fit When You Have a Brutally Busy Life
-- URL: https://smartygym.com/blog/no-time-no-excuse-stay-fit-busy-life.html
+- URL: https://smartygym.com/blog/no-time-no-excuse-stay-fit-busy-life
 - Category: Fitness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-05-28
@@ -299,7 +299,7 @@ If you wait for the "perfect" hour-long window to train, you will never train. M
 ---
 
 ### Low Back Pain? 5 Exercises That Actually Help
-- URL: https://smartygym.com/blog/low-back-pain-5-exercises-that-actually-help.html
+- URL: https://smartygym.com/blog/low-back-pain-5-exercises-that-actually-help
 - Category: Fitness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-05-27
@@ -309,7 +309,7 @@ Most Low Back Pain Is Movement-Solvable Roughly 80% of adults will experience an
 ---
 
 ### HIIT vs Strength Training — Which Burns More Fat?
-- URL: https://smartygym.com/blog/hiit-vs-strength-training-which-burns-more-fat.html
+- URL: https://smartygym.com/blog/hiit-vs-strength-training-which-burns-more-fat
 - Category: Fitness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-05-27
@@ -319,7 +319,7 @@ The Question Everyone Asks Wrong "Which burns more fat — HIIT or weights?" is 
 ---
 
 ### How Many Sets Per Week Do You Actually Need?
-- URL: https://smartygym.com/blog/how-many-sets-per-week-do-you-actually-need.html
+- URL: https://smartygym.com/blog/how-many-sets-per-week-do-you-actually-need
 - Category: Fitness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-05-27
@@ -329,7 +329,7 @@ Volume Is the Most Misunderstood Variable If you ask ten lifters how many sets t
 ---
 
 ### AMRAP vs EMOM vs TABATA — Which Is Best?
-- URL: https://smartygym.com/blog/amrap-vs-emom-vs-tabata-which-is-best.html
+- URL: https://smartygym.com/blog/amrap-vs-emom-vs-tabata-which-is-best
 - Category: Fitness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-05-27
@@ -339,7 +339,7 @@ Three Formats, Three Goals AMRAP, EMOM, and Tabata are three of the most popular
 ---
 
 ### Why AI Fitness Apps Are Dangerous
-- URL: https://smartygym.com/blog/why-ai-fitness-apps-are-dangerous.html
+- URL: https://smartygym.com/blog/why-ai-fitness-apps-are-dangerous
 - Category: Fitness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-05-27
@@ -349,7 +349,7 @@ The Rise of AI-Generated Workouts Open any app store today and you will find doz
 ---
 
 ### Respiratory Mechanics: The Science of Performance Breathing
-- URL: https://smartygym.com/blog/respiratory-mechanics-the-science-of-performance-breathing.html
+- URL: https://smartygym.com/blog/respiratory-mechanics-the-science-of-performance-breathing
 - Category: Wellness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-05-25
@@ -359,7 +359,7 @@ In the world of high-performance athletics, we obsess over macro-distributions, 
 ---
 
 ### Amino Architecture: The Molecular Science of Protein
-- URL: https://smartygym.com/blog/amino-architecture-the-molecular-science-of-protein.html
+- URL: https://smartygym.com/blog/amino-architecture-the-molecular-science-of-protein
 - Category: Nutrition
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-05-25
@@ -369,7 +369,7 @@ When we discuss hypertrophy and athletic longevity at SmartyGym, we often focus 
 ---
 
 ### Unlocking Elasticity: The Science of Functional Mobility
-- URL: https://smartygym.com/blog/unlocking-elasticity-the-science-of-functional-mobility.html
+- URL: https://smartygym.com/blog/unlocking-elasticity-the-science-of-functional-mobility
 - Category: Fitness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-05-25
@@ -379,7 +379,7 @@ In the modern fitness landscape, the pursuit of peak performance often focuses h
 ---
 
 ### Cognitive Reserve: The New Frontier of Functional Longevity
-- URL: https://smartygym.com/blog/cognitive-reserve-the-new-frontier-of-functional-longevity.html
+- URL: https://smartygym.com/blog/cognitive-reserve-the-new-frontier-of-functional-longevity
 - Category: Wellness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-05-18
@@ -389,7 +389,7 @@ For decades, the fitness industry focused almost exclusively on the neck-down ap
 ---
 
 ### Fueling the Engine: The Science of Sustained Glycemic Flow
-- URL: https://smartygym.com/blog/fueling-the-engine-the-science-of-sustained-glycemic-flow.html
+- URL: https://smartygym.com/blog/fueling-the-engine-the-science-of-sustained-glycemic-flow
 - Category: Nutrition
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-05-18
@@ -399,7 +399,7 @@ In the world of elite performance, raw effort is often sidelined by the limiting
 ---
 
 ### Kinetic Longevity: Future-Proofing Your Joints
-- URL: https://smartygym.com/blog/kinetic-longevity-future-proofing-your-joints.html
+- URL: https://smartygym.com/blog/kinetic-longevity-future-proofing-your-joints
 - Category: Fitness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-05-18
@@ -409,7 +409,7 @@ In the pursuit of peak physical performance, we often focus on the metrics that 
 ---
 
 ### Dopamine Architecture: The Science of Sustainable Motivation
-- URL: https://smartygym.com/blog/dopamine-architecture-the-science-of-sustainable-motivation.html
+- URL: https://smartygym.com/blog/dopamine-architecture-the-science-of-sustainable-motivation
 - Category: Wellness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-05-11
@@ -419,7 +419,7 @@ In the world of high-performance fitness, we often focus on the physical mechani
 ---
 
 ### Post-Exercise Synthesis: The Science of Recovery Nutrition
-- URL: https://smartygym.com/blog/post-exercise-synthesis-the-science-of-recovery-nutrition.html
+- URL: https://smartygym.com/blog/post-exercise-synthesis-the-science-of-recovery-nutrition
 - Category: Nutrition
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-05-11
@@ -429,7 +429,7 @@ When it comes to elite performance and aesthetic transitions, what you do in the
 ---
 
 ### Progressive Overload: The Biological Blueprint for Growth
-- URL: https://smartygym.com/blog/progressive-overload-the-biological-blueprint-for-growth.html
+- URL: https://smartygym.com/blog/progressive-overload-the-biological-blueprint-for-growth
 - Category: Fitness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-05-11
@@ -439,7 +439,7 @@ In the world of sports science, there is a fundamental law that dictates whether
 ---
 
 ### Biophilic Biohacking: The Science of Nature-Driven Recovery
-- URL: https://smartygym.com/blog/biophilic-biohacking-the-science-of-nature-driven-recovery.html
+- URL: https://smartygym.com/blog/biophilic-biohacking-the-science-of-nature-driven-recovery
 - Category: Wellness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-05-04
@@ -449,7 +449,7 @@ In the modern fitness landscape, we often measure progress through the cold prec
 ---
 
 ### Natural Anabolics: The Micronutrient Science of Hormonal Optimization
-- URL: https://smartygym.com/blog/natural-anabolics-the-micronutrient-science-of-hormonal-optimization.html
+- URL: https://smartygym.com/blog/natural-anabolics-the-micronutrient-science-of-hormonal-optimization
 - Category: Nutrition
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-05-04
@@ -459,7 +459,7 @@ In the pursuit of peak physical performance, we often find ourselves hyper-focus
 ---
 
 ### Hybrid Synergy: Integrating Resistance and Endurance
-- URL: https://smartygym.com/blog/hybrid-synergy-integrating-resistance-and-endurance.html
+- URL: https://smartygym.com/blog/hybrid-synergy-integrating-resistance-and-endurance
 - Category: Fitness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-05-04
@@ -469,7 +469,7 @@ Historically, the fitness world has been divided into two distinct camps: the st
 ---
 
 ### Emotional Fitness: The Missing Metric in Performance
-- URL: https://smartygym.com/blog/emotional-fitness-the-missing-metric-in-performance.html
+- URL: https://smartygym.com/blog/emotional-fitness-the-missing-metric-in-performance
 - Category: Wellness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-04-27
@@ -479,7 +479,7 @@ In the world of elite athletics and premium health, we often obsess over quantif
 ---
 
 ### Metabolic Flexibility: The New Frontier of Fat Loss
-- URL: https://smartygym.com/blog/metabolic-flexibility-the-new-frontier-of-fat-loss.html
+- URL: https://smartygym.com/blog/metabolic-flexibility-the-new-frontier-of-fat-loss
 - Category: Nutrition
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-04-27
@@ -489,7 +489,7 @@ In the world of elite sports science, we are moving away from the simplistic 'ca
 ---
 
 ### Metabolic Engine Evolution: The HIIT Revolution
-- URL: https://smartygym.com/blog/metabolic-engine-evolution-the-hiit-revolution.html
+- URL: https://smartygym.com/blog/metabolic-engine-evolution-the-hiit-revolution
 - Category: Fitness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-04-27
@@ -499,7 +499,7 @@ In the modern landscape of sports science, few methodologies have undergone as m
 ---
 
 ### Digital Sabbaticals: The Science of Sensory Recovery
-- URL: https://smartygym.com/blog/digital-sabbaticals-the-science-of-sensory-recovery.html
+- URL: https://smartygym.com/blog/digital-sabbaticals-the-science-of-sensory-recovery
 - Category: Wellness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-04-20
@@ -509,7 +509,7 @@ In the modern fitness landscape, we meticulously track every calorie, repetition
 ---
 
 ### Macro Mastery: The Strategic Blueprint for Sustainable Gains
-- URL: https://smartygym.com/blog/macro-mastery-the-strategic-blueprint-for-sustainable-gains.html
+- URL: https://smartygym.com/blog/macro-mastery-the-strategic-blueprint-for-sustainable-gains
 - Category: Nutrition
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-04-20
@@ -519,7 +519,7 @@ In the evolving landscape of fitness nutrition, the quest for the 'perfect diet'
 ---
 
 ### Biometric Optimization: The New Frontier of Recovery Management
-- URL: https://smartygym.com/blog/biometric-optimization-the-new-frontier-of-recovery-management.html
+- URL: https://smartygym.com/blog/biometric-optimization-the-new-frontier-of-recovery-management
 - Category: Fitness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-04-20
@@ -529,7 +529,7 @@ In the high-stakes world of elite performance, the difference between a breakthr
 ---
 
 ### GLP-1s: Weight Loss Wonder or Risky Business?
-- URL: https://smartygym.com/blog/glp-1s-weight-loss-wonder-or-risky-business.html
+- URL: https://smartygym.com/blog/glp-1s-weight-loss-wonder-or-risky-business
 - Category: Wellness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-04-13
@@ -539,7 +539,7 @@ GLP-1 Receptor Agonists: A Scientific Look at Weight Loss Medications In recent 
 ---
 
 ### Diet Showdown: Keto, Carnivore, IF, Med, Paleo Analyzed
-- URL: https://smartygym.com/blog/diet-showdown-keto-carnivore-if-med-paleo-analyzed.html
+- URL: https://smartygym.com/blog/diet-showdown-keto-carnivore-if-med-paleo-analyzed
 - Category: Nutrition
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-04-13
@@ -549,7 +549,7 @@ Decoding Popular Diets: A Scientific Comparison In the vast landscape of health 
 ---
 
 ### Trendy Fitness: Scientific Look vs. Structured Training
-- URL: https://smartygym.com/blog/trendy-fitness-scientific-look-vs-structured-training.html
+- URL: https://smartygym.com/blog/trendy-fitness-scientific-look-vs-structured-training
 - Category: Fitness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-04-13
@@ -559,7 +559,7 @@ The Science Behind Fitness Trends: Fad or Foundation? In the bustling world of f
 ---
 
 ### Daily Workout vs Gym Program: Which Is Better?
-- URL: https://smartygym.com/blog/daily-workout-vs-gym-program.html
+- URL: https://smartygym.com/blog/daily-workout-vs-gym-program
 - Category: Fitness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-04-02
@@ -569,7 +569,7 @@ Daily Workout vs Gym Program: Which Is Better for Your Transformation? In the ev
 ---
 
 ### How to Stay Consistent with Training
-- URL: https://smartygym.com/blog/how-to-stay-consistent-with-training.html
+- URL: https://smartygym.com/blog/how-to-stay-consistent-with-training
 - Category: Fitness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-04-02
@@ -579,7 +579,7 @@ The Science of Adherence: How to Stay Consistent with Your Training In the world
 ---
 
 ### Best 10-Minute Workouts for Busy People
-- URL: https://smartygym.com/blog/best-10-minute-workouts-for-busy-people.html
+- URL: https://smartygym.com/blog/best-10-minute-workouts-for-busy-people
 - Category: Fitness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-04-02
@@ -589,7 +589,7 @@ The Science Behind the 10-Minute Workout: Efficiency Over Duration In the modern
 ---
 
 ### The Myth of Cholesterol
-- URL: https://smartygym.com/blog/the-myth-of-cholesterol.html
+- URL: https://smartygym.com/blog/the-myth-of-cholesterol
 - Category: Nutrition
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-03-26
@@ -599,7 +599,7 @@ For over six decades, we've been told a simple story: eat cholesterol, get high 
 ---
 
 ### Aging Isn't Optional: How You Age Is
-- URL: https://smartygym.com/blog/aging-isnt-optional-how-you-age-is.html
+- URL: https://smartygym.com/blog/aging-isnt-optional-how-you-age-is
 - Category: Wellness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-03-26
@@ -609,7 +609,7 @@ Aging is not a choice. Every single one of us will grow older — that part is n
 ---
 
 ### Periodization: The Science of Sustained Progress
-- URL: https://smartygym.com/blog/periodization-the-science-of-sustained-progress.html
+- URL: https://smartygym.com/blog/periodization-the-science-of-sustained-progress
 - Category: Fitness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-02-09
@@ -619,7 +619,7 @@ In the pursuit of peak physical performance, the biggest enemy is often not the 
 ---
 
 ### The Fiber Layering Method: Optimizing Satiety and Fueling Fat Loss
-- URL: https://smartygym.com/blog/the-fiber-layering-method-optimizing-satiety-and-fueling-fat-loss.html
+- URL: https://smartygym.com/blog/the-fiber-layering-method-optimizing-satiety-and-fueling-fat-loss
 - Category: Nutrition
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-02-09
@@ -629,7 +629,7 @@ In the pursuit of peak physical performance and aesthetic refinement, we often f
 ---
 
 ### Functional Aging: The Blueprint for Lifetime Independence
-- URL: https://smartygym.com/blog/functional-aging-the-blueprint-for-lifetime-independence.html
+- URL: https://smartygym.com/blog/functional-aging-the-blueprint-for-lifetime-independence
 - Category: Wellness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-02-09
@@ -639,7 +639,7 @@ In the world of sports science, we often focus on peak performance, the next per
 ---
 
 ### Exercise After 50: How Fitness Prevents Decline and Transforms Your Health
-- URL: https://smartygym.com/blog/exercise-after-50-fitness-prevents-decline-transforms-health.html
+- URL: https://smartygym.com/blog/exercise-after-50-fitness-prevents-decline-transforms-health
 - Category: Fitness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2026-02-09
@@ -649,7 +649,7 @@ Turning 50 is not a signal to slow down—it's a powerful reason to start moving
 ---
 
 ### Muscle Hypertrophy: The Complete Guide to Building Muscle While Losing Fat
-- URL: https://smartygym.com/blog/muscle-hypertrophy-complete-guide-building-muscle-losing-fat.html
+- URL: https://smartygym.com/blog/muscle-hypertrophy-complete-guide-building-muscle-losing-fat
 - Category: Fitness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2025-11-28
@@ -659,7 +659,7 @@ Building muscle while losing fat—body recomposition—is the holy grail of fit
 ---
 
 ### Understanding BMR: Your Metabolism Explained
-- URL: https://smartygym.com/blog/understanding-bmr-metabolism-explained.html
+- URL: https://smartygym.com/blog/understanding-bmr-metabolism-explained
 - Category: Wellness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2025-11-28
@@ -669,7 +669,7 @@ Your Basal Metabolic Rate (BMR) is the foundation of all nutrition planning. Und
 ---
 
 ### Exercise for Working Professionals: Stay Fit at Your Desk Job
-- URL: https://smartygym.com/blog/exercise-working-professionals-stay-fit-desk-job.html
+- URL: https://smartygym.com/blog/exercise-working-professionals-stay-fit-desk-job
 - Category: Wellness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2025-11-28
@@ -679,7 +679,7 @@ Desk jobs don't have to destroy your fitness. With strategic planning and the ri
 ---
 
 ### The Science of Sleep: Why Rest Is Your Secret Weapon
-- URL: https://smartygym.com/blog/science-of-sleep-why-rest-secret-weapon.html
+- URL: https://smartygym.com/blog/science-of-sleep-why-rest-secret-weapon
 - Category: Wellness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2025-11-28
@@ -689,7 +689,7 @@ Sleep is the most underrated performance enhancer available. While you focus on 
 ---
 
 ### Muscle Hypertrophy Through Nutrition: The Protein Masterclass
-- URL: https://smartygym.com/blog/muscle-hypertrophy-nutrition-protein-masterclass.html
+- URL: https://smartygym.com/blog/muscle-hypertrophy-nutrition-protein-masterclass
 - Category: Nutrition
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2025-11-28
@@ -699,7 +699,7 @@ Protein is the most critical macronutrient for muscle growth, yet it's surrounde
 ---
 
 ### Intermittent Fasting: A Complete Guide to Time-Restricted Eating
-- URL: https://smartygym.com/blog/intermittent-fasting-complete-guide-time-restricted-eating.html
+- URL: https://smartygym.com/blog/intermittent-fasting-complete-guide-time-restricted-eating
 - Category: Nutrition
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2025-11-28
@@ -709,7 +709,7 @@ Intermittent fasting (IF) has exploded in popularity, but what does the science 
 ---
 
 ### The Importance of Muscle: Your Body's Hidden Health System
-- URL: https://smartygym.com/blog/importance-of-muscle-body-hidden-health-system.html
+- URL: https://smartygym.com/blog/importance-of-muscle-body-hidden-health-system
 - Category: Fitness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2025-11-28
@@ -719,7 +719,7 @@ Muscle is far more than aesthetics—it's a metabolically active organ system th
 ---
 
 ### How to Lose Fat: The Science-Based Step-by-Step Guide
-- URL: https://smartygym.com/blog/how-to-lose-fat-science-based-step-by-step-guide.html
+- URL: https://smartygym.com/blog/how-to-lose-fat-science-based-step-by-step-guide
 - Category: Nutrition
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2025-11-28
@@ -729,7 +729,7 @@ Fat loss is fundamentally simple: create a caloric deficit. But sustainable fat 
 ---
 
 ### Time Management for Fitness: How Busy People Stay Active
-- URL: https://smartygym.com/blog/time-management-fitness-how-busy-people-stay-active.html
+- URL: https://smartygym.com/blog/time-management-fitness-how-busy-people-stay-active
 - Category: Wellness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2025-11-28
@@ -739,7 +739,7 @@ Fat loss is fundamentally simple: create a caloric deficit. But sustainable fat 
 ---
 
 ### Bodyweight vs Equipment Training: The Ultimate Comparison
-- URL: https://smartygym.com/blog/bodyweight-vs-equipment-training-ultimate-comparison.html
+- URL: https://smartygym.com/blog/bodyweight-vs-equipment-training-ultimate-comparison
 - Category: Fitness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2025-11-28
@@ -749,7 +749,7 @@ The debate between bodyweight and equipment training has raged for years. The tr
 ---
 
 ### The Science of Strength: Why Getting Stronger Changes Everything
-- URL: https://smartygym.com/blog/science-of-strength-why-getting-stronger-changes-everything.html
+- URL: https://smartygym.com/blog/science-of-strength-why-getting-stronger-changes-everything
 - Category: Fitness
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2025-11-28
@@ -759,7 +759,7 @@ Strength isn't just about lifting heavy weights—it's a fundamental quality tha
 ---
 
 ### Creatine: The Most Researched Supplement in Fitness History
-- URL: https://smartygym.com/blog/creatine-most-researched-supplement-fitness-history.html
+- URL: https://smartygym.com/blog/creatine-most-researched-supplement-fitness-history
 - Category: Nutrition
 - Author: Haris Falas (Sports Scientist | CSCS Certified | 20+ Years Experience)
 - Published: 2025-11-28
@@ -770,7 +770,7 @@ Creatine monohydrate stands as the most extensively studied supplement in sports
 
 ---
 
-## Workouts (527 visible)
+## Workouts (533 visible)
 
 - Total Body Anchor (STRENGTH, Beginner, 45 min, REPS & SETS) — This beginner-friendly full-body strength workout focuses on fundamental movement patterns using gym equipment. Build a solid foundation by prioritizing proper form and controlled movements. You'll engage all major muscle groups,…
 - Hinge & Press Foundations (STRENGTH, Beginner, 45 min, REPS & SETS) — This beginner-friendly workout focuses on building a solid foundation in lower body pulling and upper body pushing patterns. You'll improve hamstring and glute strength, as well as developing your chest, shoulders, and triceps. Expect a…
@@ -929,11 +929,17 @@ Creatine monohydrate stands as the most extensively studied supplement in sports
 - Calorie Crusher (CALORIE BURNING, Advanced, Various, CIRCUIT) — An advanced high-output conditioning session designed to maximize metabolic demand using explosive plyometrics and rapid transitions. This workout utilizes compound bodyweight movements to elevate the heart rate and sustain a high…
 - Granite Compass Ascent (CHALLENGE, Advanced, 110 min, FOR TIME) — Today's challenge is a true test of grit and determination. Navigate a demanding series of movements designed to push your cardiovascular and muscular endurance to their limits. This workout demands relentless effort and strategic pacing;…
 - Trial Gauntlet Grinder (CHALLENGE, Intermediate, 35 min, AMRAP) — This challenge pushes your bodyweight endurance and mental grit. It's a true test of how much work you can get done when the clock is ticking. Prepare to dig deep and find your limits in this high-intensity AMRAP session.
+- Kinetic Hinge Press (STRENGTH, Advanced, Various, REPS & SETS) — An advanced bodyweight strength protocol focusing on the mechanical disadvantage of the low pull and upper push patterns. This session utilizes high-tension isometric holds and eccentric control to drive neurological adaptations and raw…
 - Velocity Core Burst (CALORIE BURNING, Beginner, 35 min, CIRCUIT) — This beginner-friendly, bodyweight circuit focuses on igniting your metabolism and building foundational strength. Expect a high-energy flow that will leave you feeling invigorated and accomplished. You'll work through a series of…
+- Kinetic Meridian Circuit (METABOLIC, Advanced, 50 min, FOR TIME) — An advanced metabolic conditioning session designed to push the anaerobic threshold using high-intensity bodyweight movements. This for-time protocol focuses on maximizing caloric expenditure and muscular endurance through explosive…
 - Core Foundation Flow (PILATES, Intermediate, 35 min, REPS & SETS) — This Pilates workout is designed to build a strong core foundation and improve your body’s overall stability and flexibility. Using gym equipment to mimic reformer movements, you will focus on controlled, precise movements to enhance…
+- Kinetic Pulse EMOM (METABOLIC, Advanced, 45 min, EMOM) — An advanced metabolic conditioning experience designed to redline your aerobic capacity using high-density bodyweight movements. This session utilizes an EMOM structure to force recovery under fatigue, optimizing fat oxidation and muscular…
 - Endurance Crucible (CHALLENGE, Intermediate, 35 min, CIRCUIT) — This intermediate-level circuit workout is designed to test your mental fortitude and physical endurance. Get ready to push your limits as you move through challenging exercises with minimal rest. It's not just about strength; it's about…
 - Arcus Meridian Shift (MOBILITY & STABILITY, Advanced, 35 min, REPS & SETS) — This advanced Mobility & Stability workout focuses on deep foundational movements, enhancing your body's intrinsic strength and control. Prepare to integrate full-body awareness with precision and deliberate execution, fostering remarkable…
+- Kinetic Velocity Circuit (CALORIE BURNING, Advanced, 50 min, CIRCUIT) — An advanced high-output conditioning protocol designed to maximize metabolic demand through explosive plyometrics and continuous movement. This session utilizes compound bodyweight patterns to elevate the heart rate and sustain peak…
+- Axial Glute Meridian (STRENGTH, Advanced, 50 min, REPS & SETS) — An advanced bodyweight strength protocol designed to forge structural integrity through the posterior chain and deep core. This session utilizes high-tension isometric holds and complex unilateral movements to maximize muscle fiber…
 - Foundation Glute Core (EQ) (STRENGTH, Advanced, 45 min, REPS & SETS) — This advanced strength workout targets your core and glutes, building a strong foundation for overall stability and power. Expect a challenging session focused on controlled movements and maximum muscle engagement. You will utilize a…
+- Kinetic Pulse Circuit (METABOLIC, Advanced, 50 min, FOR TIME) — An advanced metabolic conditioning session designed to maximize caloric expenditure and systemic fatigue using high-threshold bodyweight movements. This 'For Time' protocol challenges your aerobic capacity and muscular endurance through a…
 - Canyon Ascent (CHALLENGE, Intermediate, 35 min, MIX) — Canyon Ascent challenges your total body endurance and grit. Navigate through a relentless circuit of bodyweight movements, then climb to new heights with a progressive AMRAP finisher. This workout is a true test of mental fortitude and…
 - Summit Forge Challenge (CHALLENGE, Advanced, 45 min, CIRCUIT) — This advanced bodyweight circuit is designed to test your limits and build unwavering mental fortitude. Each round pushes you further, demanding strength, endurance, and resilience. Prepare to confront your perceived boundaries and emerge…
 - Align & Anchor (PILATES, Beginner, 35 min, REPS & SETS) — This Pilates workout is designed to build foundational core strength and enhance body awareness. Focus on controlled movements and precise engagement to improve stability and alignment. You will use equipment to simulate classic Pilates…
@@ -1303,7 +1309,15 @@ Creatine monohydrate stands as the most extensively studied supplement in sports
 
 ---
 
-## Training Programs (28 visible)
+## Training Programs (29 visible)
+
+### Hypertrophy
+- Category: MUSCLE HYPERTROPHY
+- Duration: 6 weeks, 5 days/week
+- Difficulty: Advanced
+- Equipment: Equipment
+
+This is an uncompromising 6-week hypertrophy program designed for the truly dedicated and experienced lifter. If you've mastered the fundamentals and are searching for a structured, high-intensity challenge to break through stubborn plateaus, this is your
 
 ### Metabolic Transformer
 - Category: WEIGHT LOSS
@@ -1337,14 +1351,6 @@ An advanced 8-week body transformation program combining strength training with 
 
 A 6-week intermediate cardio program designed to boost your cardiovascular endurance and stamina using only bodyweight exercises. Perfect for home workouts with no equipment needed.
 
-### Fat Furnace
-- Category: WEIGHT LOSS
-- Duration: 6 weeks, 4 days/week
-- Difficulty: Beginner
-- Equipment: Bodyweight
-
-A 6-week intermediate fat loss program combining metabolic conditioning with bodyweight strength training. Maximize calorie burn and preserve muscle while losing body fat.
-
 ### Calorie Torch
 - Category: WEIGHT LOSS
 - Duration: 4 weeks, 5 days/week
@@ -1352,14 +1358,6 @@ A 6-week intermediate fat loss program combining metabolic conditioning with bod
 - Equipment: Equipment
 
 Maximize calorie expenditure and kickstart your weight loss journey with this high-frequency cardio machine program. Over 4 weeks, you will progressively increase your metabolic capacity while learning to use gym cardio equipment effectively. Weight loss fundamentally requires a caloric deficit—burning more calories than you consume. This program focuses on the "burn" side of that equation, using varied cardio machines to keep workouts interesting while torching calories. Combined with proper nutrition, expect significant results. Use the Calorie Calculator to determine your daily caloric…
-
-### Mass Builder
-- Category: MUSCLE HYPERTROPHY
-- Duration: 6 weeks, 4 days/week
-- Difficulty: Beginner
-- Equipment: Barbell, Dumbbells, Cables, Machines
-
-A 6-week intermediate muscle-building program using gym equipment to maximize hypertrophy. Follow proven principles of progressive overload to build lean muscle mass effectively.
 
 ### Muscle Building Basics
 - Category: MUSCLE HYPERTROPHY
@@ -1377,6 +1375,14 @@ Begin your muscle-building journey with this scientifically-structured 6-week hy
 
 A scientifically-designed 12-week advanced muscle hypertrophy program utilizing proven bodybuilding principles for maximum muscle growth. Features progressive overload, 1RM-based training intensities, and comprehensive nutrition guidance for optimal gains.
 
+### Fat Furnace
+- Category: WEIGHT LOSS
+- Duration: 6 weeks, 4 days/week
+- Difficulty: Beginner
+- Equipment: Bodyweight
+
+A 6-week intermediate fat loss program combining metabolic conditioning with bodyweight strength training. Maximize calorie burn and preserve muscle while losing body fat.
+
 ### Elite Functional Power
 - Category: FUNCTIONAL STRENGTH
 - Duration: 8 weeks, 5 days/week
@@ -1384,22 +1390,6 @@ A scientifically-designed 12-week advanced muscle hypertrophy program utilizing 
 - Equipment: Barbell, Kettlebells, Dumbbells, Plyo Box, Pull-Up Bar
 
 An advanced 8-week program incorporating explosive power development, Olympic lifting foundations, and sport-specific functional training. Built for athletes who demand elite-level performance.
-
-### Hypertrophy Accelerator
-- Category: MUSCLE HYPERTROPHY
-- Duration: 6 weeks, 4 days/week
-- Difficulty: Intermediate
-- Equipment: Barbell, Dumbbells, Cables, Machines
-
-A scientifically-designed 6-week intermediate muscle building program that maximizes hypertrophy through progressive overload and strategic volume accumulation. Perfect for lifters ready to take their physique to the next level.
-
-### Run Your First 5K
-- Category: CARDIO ENDURANCE
-- Duration: 6 weeks, 4 days/week
-- Difficulty: Advanced
-- Equipment: Equipment
-
-A comprehensive 6-week advanced cardio endurance program designed to take you from beginner to completing your first 5K race. This scientifically-structured program features progressive interval training, tempo runs, threshold workouts, and strategic long runs to build your aerobic capacity, running economy, and mental endurance.
 
 ### Endurance Evolution
 - Category: CARDIO ENDURANCE
@@ -1409,6 +1399,30 @@ A comprehensive 6-week advanced cardio endurance program designed to take you fr
 
 A progressive 6-week intermediate cardio program utilizing treadmill intervals, tempo runs, and steady-state cardio to build exceptional cardiovascular endurance and fat-burning capacity.
 
+### Run Your First 5K
+- Category: CARDIO ENDURANCE
+- Duration: 6 weeks, 4 days/week
+- Difficulty: Advanced
+- Equipment: Equipment
+
+A comprehensive 6-week advanced cardio endurance program designed to take you from beginner to completing your first 5K race. This scientifically-structured program features progressive interval training, tempo runs, threshold workouts, and strategic long runs to build your aerobic capacity, running economy, and mental endurance.
+
+### Mass Builder
+- Category: MUSCLE HYPERTROPHY
+- Duration: 6 weeks, 4 days/week
+- Difficulty: Beginner
+- Equipment: Barbell, Dumbbells, Cables, Machines
+
+A 6-week intermediate muscle-building program using gym equipment to maximize hypertrophy. Follow proven principles of progressive overload to build lean muscle mass effectively.
+
+### Hypertrophy Accelerator
+- Category: MUSCLE HYPERTROPHY
+- Duration: 6 weeks, 4 days/week
+- Difficulty: Intermediate
+- Equipment: Barbell, Dumbbells, Cables, Machines
+
+A scientifically-designed 6-week intermediate muscle building program that maximizes hypertrophy through progressive overload and strategic volume accumulation. Perfect for lifters ready to take their physique to the next level.
+
 ### Athletic Performance Builder
 - Category: FUNCTIONAL STRENGTH
 - Duration: 6 weeks, 4 days/week
@@ -1416,6 +1430,22 @@ A progressive 6-week intermediate cardio program utilizing treadmill intervals, 
 - Equipment: Kettlebells, Dumbbells, Resistance Bands, Barbell
 
 A comprehensive 6-week intermediate functional training program focusing on compound movements, core stability, and explosive power development. Build real-world strength that transfers to sports and daily life.
+
+### Spine Restore
+- Category: LOW BACK PAIN
+- Duration: 6 weeks, 3 days/week
+- Difficulty: Beginner
+- Equipment: Bodyweight
+
+A 6-week intermediate program designed to alleviate low back pain through targeted core strengthening, hip mobility, and proper movement patterns. Safe, effective, and equipment-free.
+
+### Core Resilience
+- Category: LOW BACK PAIN
+- Duration: 6 weeks, 4 days/week
+- Difficulty: Intermediate
+- Equipment: Bodyweight, Resistance Bands
+
+A 6-week intermediate back rehabilitation program focusing on deep core activation, hip mobility, and spine stability for lasting pain relief.
 
 ### Cardio Conquest
 - Category: CARDIO ENDURANCE
@@ -1425,13 +1455,13 @@ A comprehensive 6-week intermediate functional training program focusing on comp
 
 An advanced 8-week cardiovascular conditioning program featuring HIIT, Fartlek training, pyramid intervals, and multi-modality endurance work. Push your limits and conquer new fitness peaks.
 
-### Core Resilience
-- Category: LOW BACK PAIN
-- Duration: 6 weeks, 4 days/week
-- Difficulty: Intermediate
-- Equipment: Bodyweight, Resistance Bands
+### 90-Day Shred Challenge
+- Category: WEIGHT LOSS
+- Duration: 12 weeks, 5 days/week
+- Difficulty: Advanced
+- Equipment: Equipment
 
-A 6-week intermediate back rehabilitation program focusing on deep core activation, hip mobility, and spine stability for lasting pain relief.
+An intense 12-week advanced weight loss program combining HIIT, Tabata, metabolic conditioning, and multi-modality cardio training for maximum fat burning. This comprehensive program utilizes gym equipment including treadmills, bikes, ellipticals, air bikes, and battle ropes to create variety and challenge your body continuously.
 
 ### Move Better
 - Category: MOBILITY & STABILITY
@@ -1457,22 +1487,6 @@ An advanced 8-week flexibility and mobility program featuring sport-specific mob
 
 A 6-week intermediate mobility program focusing on joint health, dynamic stretching, and movement quality improvement.
 
-### Spine Restore
-- Category: LOW BACK PAIN
-- Duration: 6 weeks, 3 days/week
-- Difficulty: Beginner
-- Equipment: Bodyweight
-
-A 6-week intermediate program designed to alleviate low back pain through targeted core strengthening, hip mobility, and proper movement patterns. Safe, effective, and equipment-free.
-
-### 90-Day Shred Challenge
-- Category: WEIGHT LOSS
-- Duration: 12 weeks, 5 days/week
-- Difficulty: Advanced
-- Equipment: Equipment
-
-An intense 12-week advanced weight loss program combining HIIT, Tabata, metabolic conditioning, and multi-modality cardio training for maximum fat burning. This comprehensive program utilizes gym equipment including treadmills, bikes, ellipticals, air bikes, and battle ropes to create variety and challenge your body continuously.
-
 ### Spine Strength Master
 - Category: LOW BACK PAIN
 - Duration: 8 weeks, 4 days/week
@@ -1480,14 +1494,6 @@ An intense 12-week advanced weight loss program combining HIIT, Tabata, metaboli
 - Equipment: Bodyweight, Light Dumbbells, Stability Ball
 
 An advanced 8-week program for those who have completed basic rehabilitation, focusing on building resilient spine strength and injury prevention.
-
-### Run Your First 10K
-- Category: CARDIO ENDURANCE
-- Duration: 6 weeks, 3 days/week
-- Difficulty: Intermediate
-- Equipment: None - Running Shoes Only
-
-Transform from complete beginner to confident 10K runner in just 6 weeks. This science-based program uses progressive interval training to build your aerobic capacity, running form, and mental endurance systematically. Each week builds on the previous, starting with manageable 500m intervals and progressing to continuous running that prepares you for race day success.
 
 ### Functional Power
 - Category: FUNCTIONAL STRENGTH
@@ -1497,6 +1503,14 @@ Transform from complete beginner to confident 10K runner in just 6 weeks. This s
 
 A 6-week intermediate functional strength program focused on building real-world power and movement efficiency using bodyweight exercises. Train your body to move better in daily life.
 
+### Run Your First 10K
+- Category: CARDIO ENDURANCE
+- Duration: 6 weeks, 3 days/week
+- Difficulty: Intermediate
+- Equipment: None - Running Shoes Only
+
+Transform from complete beginner to confident 10K runner in just 6 weeks. This science-based program uses progressive interval training to build your aerobic capacity, running form, and mental endurance systematically. Each week builds on the previous, starting with manageable 500m intervals and progressing to continuous running that prepares you for race day success.
+
 ### Cardio Foundations
 - Category: CARDIO ENDURANCE
 - Duration: 4 weeks, 3 days/week
@@ -1505,14 +1519,6 @@ A 6-week intermediate functional strength program focused on building real-world
 
 Build a solid cardiovascular foundation with this beginner-friendly bodyweight program. No equipment needed—just your body and determination. Over 4 weeks, you will progressively increase your heart rate capacity, improve lung efficiency, and develop the endurance base needed for more advanced training. This program is designed for complete beginners or those returning to fitness after a break. Each session is structured to elevate your heart rate safely while teaching proper breathing techniques and movement patterns that will serve you throughout your fitness journey.
 
-### Functional Foundations
-- Category: FUNCTIONAL STRENGTH
-- Duration: 6 weeks, 4 days/week
-- Difficulty: Beginner
-- Equipment: Equipment
-
-Develop real-world strength that translates to everyday activities with this comprehensive 6-week functional training program. Using kettlebells, dumbbells, and basic gym equipment, you will build strength in movement patterns that matter—pushing, pulling, squatting, hinging, carrying, and rotating. Functional strength is about more than aesthetics; it is about building a body that performs efficiently in daily life. Whether you need to lift groceries, play with your children, or simply move without pain, this program creates the foundation for a capable, resilient body.
-
 ### Flex & Flow
 - Category: MOBILITY & STABILITY
 - Duration: 6 weeks, 4 days/week
@@ -1520,6 +1526,14 @@ Develop real-world strength that translates to everyday activities with this com
 - Equipment: Bodyweight
 
 A 6-week intermediate mobility and stability program to improve flexibility, joint health, and movement quality. Perfect for athletes, desk workers, or anyone wanting to move better.
+
+### Functional Foundations
+- Category: FUNCTIONAL STRENGTH
+- Duration: 6 weeks, 4 days/week
+- Difficulty: Beginner
+- Equipment: Equipment
+
+Develop real-world strength that translates to everyday activities with this comprehensive 6-week functional training program. Using kettlebells, dumbbells, and basic gym equipment, you will build strength in movement patterns that matter—pushing, pulling, squatting, hinging, carrying, and rotating. Functional strength is about more than aesthetics; it is about building a body that performs efficiently in daily life. Whether you need to lift groceries, play with your children, or simply move without pain, this program creates the foundation for a capable, resilient body.
 
 ### Back Care Essentials
 - Category: LOW BACK PAIN
