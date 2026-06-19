@@ -122,10 +122,12 @@ function normalizeInternalLinks(html: string): string {
     try {
       const url = href.startsWith("http") ? new URL(href) : new URL(href, BASE_URL);
       if (url.hostname && !["smartygym.com", "www.smartygym.com"].includes(url.hostname)) return `href=${quote}${href}${quote}`;
-      const path = url.pathname.replace(/\/+$/g, "") || "/";
-      if (path === "/" || path.endsWith(".html")) return `href=${quote}${href}${quote}`;
+      let path = url.pathname.replace(/\/+$/g, "") || "/";
+      // Strip any stale ".html" suffix; clean URL is the new canonical.
+      if (path.endsWith(".html") && path !== "/") path = path.slice(0, -".html".length);
+      if (path === "/") return `href=${quote}${href}${quote}`;
       if (!HTML_CANONICAL_PREFIXES.some((prefix) => path === prefix || path.startsWith(`${prefix}/`))) return `href=${quote}${href}${quote}`;
-      const canonicalPath = `${path}.html${url.search}${url.hash}`;
+      const canonicalPath = `${path}${url.search}${url.hash}`;
       const nextHref = href.startsWith("http") ? `${BASE_URL}${canonicalPath}` : canonicalPath;
       return `href=${quote}${attrEscape(nextHref)}${quote}`;
     } catch {
