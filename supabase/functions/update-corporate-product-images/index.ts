@@ -17,22 +17,22 @@ const CORPORATE_PRODUCTS = {
   dynamic: {
     productId: "prod_TZATAcAlqgc1P7",
     name: "Smarty Dynamic",
-    description: "Corporate fitness plan for teams up to 10 members. Full Platinum access for 1 year.",
+    description: "Corporate fitness plan for teams up to 10 members. Full Premium access for 1 year.",
   },
   power: {
     productId: "prod_TZATDsKcDvMtHc",
     name: "Smarty Power",
-    description: "Corporate fitness plan for teams up to 20 members. Full Platinum access for 1 year.",
+    description: "Corporate fitness plan for teams up to 20 members. Full Premium access for 1 year.",
   },
   elite: {
     productId: "prod_TZATGTAsKalmCn",
     name: "Smarty Elite",
-    description: "Corporate fitness plan for teams up to 30 members. Full Platinum access for 1 year.",
+    description: "Corporate fitness plan for teams up to 30 members. Full Premium access for 1 year.",
   },
   enterprise: {
     productId: "prod_TZATUtaS2jhgtK",
     name: "Smarty Enterprise",
-    description: "Corporate fitness plan for unlimited team members. Full Platinum access for 1 year.",
+    description: "Corporate fitness plan for unlimited team members. Full Premium access for 1 year.",
   },
 };
 

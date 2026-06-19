@@ -63,7 +63,7 @@ serve(async (req) => {
       .eq('status', 'active')
       .maybeSingle();
 
-    if (subscription && (subscription.plan_type === 'gold' || subscription.plan_type === 'platinum')) {
+    if (subscription && (['lifetime','premium','legacy_premium'].includes(subscription.plan_type))) {
       return new Response(
         JSON.stringify({ 
           error: "Premium members have access to all content. Individual purchases are not available." 

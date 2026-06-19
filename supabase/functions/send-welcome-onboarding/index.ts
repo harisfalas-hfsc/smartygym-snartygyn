@@ -259,7 +259,7 @@ serve(async (req) => {
     const { data: subscriptions, error: subError } = await supabaseAdmin
       .from('user_subscriptions')
       .select('user_id')
-      .in('plan_type', ['gold', 'platinum'])
+      .in('plan_type', ['lifetime','premium','legacy_premium'])
       .eq('status', 'active')
       .gte('created_at', fiveDaysAgoStart.toISOString())
       .lte('created_at', fiveDaysAgoEnd.toISOString());

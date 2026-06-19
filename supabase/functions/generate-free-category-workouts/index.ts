@@ -296,7 +296,7 @@ async function generateOne(
   difficultyStars: number,
   mode: "free" | "premium" = "free",
   premiumPrice: number = 4.99,
-  premiumTier: string = "gold",
+  premiumTier: string = "premium",
   callerAuthHeader: string | null = null,
 ): Promise<{ ok: boolean; id?: string; name?: string; error?: string }> {
   const { category, equipment } = job;
@@ -490,7 +490,7 @@ serve(async (req) => {
     let allowDuplicates = false;
     let mode: "free" | "premium" = "free";
     let premiumPrice = 4.99;
-    let premiumTier = "gold";
+    let premiumTier = "premium";
     try {
       const body = await req.json();
       if (Array.isArray(body?.jobs)) onlyJobs = body.jobs;

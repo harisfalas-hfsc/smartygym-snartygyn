@@ -124,14 +124,14 @@ serve(async (req) => {
         .from("user_subscriptions")
         .select("user_id")
         .eq("status", "active")
-        .in("plan_type", ["gold", "platinum", "lifetime"]);
+        .in("plan_type", ["lifetime","premium","legacy_premium"]);
       allowedIds = new Set((subs ?? []).map((s: any) => s.user_id));
     } else if (audience === "free_users") {
       const { data: subs } = await supabase
         .from("user_subscriptions")
         .select("user_id")
         .eq("status", "active")
-        .in("plan_type", ["gold", "platinum", "lifetime"]);
+        .in("plan_type", ["lifetime","premium","legacy_premium"]);
       const premium = new Set((subs ?? []).map((s: any) => s.user_id));
       allowedIds = new Set((profiles ?? []).filter(p => !premium.has(p.user_id)).map(p => p.user_id));
     }
