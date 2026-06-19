@@ -836,8 +836,7 @@ export function AnalyticsDashboard() {
                     itemStyle={{ color: "hsl(var(--popover-foreground))" }}
                   />
                   <Legend wrapperStyle={{ fontSize: 11 }} />
-                  <Line type="monotone" dataKey="Gold Plans" stroke="hsl(var(--primary))" strokeWidth={2} />
-                  <Line type="monotone" dataKey="Platinum Plans" stroke="hsl(var(--secondary))" strokeWidth={2} />
+                  <Line type="monotone" dataKey="Premium Memberships" stroke="hsl(var(--primary))" strokeWidth={2} />
                   <Line type="monotone" dataKey="Standalone Purchases" stroke="hsl(var(--accent))" strokeWidth={2} />
                 </LineChart>
               </ResponsiveContainer>
