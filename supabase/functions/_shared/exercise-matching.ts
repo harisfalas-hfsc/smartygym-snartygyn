@@ -951,8 +951,10 @@ export function buildExerciseReferenceList(exercises: ExerciseBasic[], equipment
     '',
     isBodyweightFilter
       ? `This is a BODYWEIGHT (no-equipment / home / hotel / travel) workout. ${filtered.length} exercises are available. NO benches, NO pull-up bars, NO dip stations, NO glute-ham/GHD benches, NO rings, NO parallel bars, NO boxes, NO captain's chair, NO gym apparatus of any kind. Pick exercises a user can perform on a flat floor with their own bodyweight only. A wall, a doorway, or a sturdy chair for support is acceptable only when explicitly part of the listed exercise.`
-      : equipmentFilter
-        ? `This is a BODYWEIGHT workout. ONLY bodyweight exercises are available (${filtered.length} exercises).`
+      : normalizedEquipmentFilter === NON_BODYWEIGHT_FILTER
+        ? `This is an EQUIPMENT workout. ONLY non-bodyweight equipment exercises are available (${filtered.length} exercises).`
+        : equipmentFilter
+          ? `This workout may use ONLY ${equipmentFilter} exercises (${filtered.length} exercises).`
         : `This is an EQUIPMENT workout. ONLY non-bodyweight equipment exercises are available (${filtered.length} exercises).`,
     '',
   ];
