@@ -110,7 +110,7 @@ describe('AccessGate', () => {
       </TestWrapper>
     );
 
-    expect(getByText(/Upgrade to access this content/i)).toBeInTheDocument();
+    expect(getByText(/Upgrade to Premium/i)).toBeInTheDocument();
   });
 
   it('shows login prompt for guests', () => {
@@ -134,7 +134,7 @@ describe('AccessGate', () => {
       </TestWrapper>
     );
 
-    expect(getByText(/Sign in to access/i)).toBeInTheDocument();
+    expect(getByText(/Login Required/i)).toBeInTheDocument();
   });
 
   it('shows loading state while checking access', () => {
