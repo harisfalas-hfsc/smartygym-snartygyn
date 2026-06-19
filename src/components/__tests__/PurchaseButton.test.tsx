@@ -7,6 +7,17 @@ import { useAccessControl } from '@/hooks/useAccessControl';
 // Mock the useAccessControl hook
 vi.mock('@/hooks/useAccessControl');
 
+// Mock NavigationHistory (PurchaseButton uses useNavigationHistory)
+vi.mock('@/contexts/NavigationHistoryContext', () => ({
+  useNavigationHistory: () => ({
+    history: [],
+    goBack: vi.fn(),
+    canGoBack: false,
+    goForward: vi.fn(),
+    canGoForward: false,
+  }),
+}));
+
 // Mock supabase
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: {
