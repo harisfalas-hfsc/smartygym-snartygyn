@@ -349,6 +349,7 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
       // GOLD STANDARD: Normalize HTML before saving
       const normalizedWeeklySchedule = normalizeWorkoutHtml(formData.training_program || '');
       const normalizedProgramStructure = normalizeWorkoutHtml(formData.construction || '');
+      const normalizedOverview = normalizeWorkoutHtml(formData.overview || '');
 
       const baseData = {
         id: formData.id,
@@ -361,6 +362,7 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
         days_per_week: formData.days_per_week,
         equipment: formData.equipment,
         duration,
+        overview: normalizedOverview,
         weekly_schedule: normalizedWeeklySchedule,
         description: formData.program_description,
         program_structure: normalizedProgramStructure,
