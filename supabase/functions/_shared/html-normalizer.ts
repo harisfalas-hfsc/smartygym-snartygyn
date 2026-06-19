@@ -65,14 +65,9 @@ export function normalizeWorkoutHtml(content: string): string {
   // STEP 6: Normalize empty paragraphs
   result = result.replace(/<p[^>]*>\s*<\/p>/gi, CANONICAL_EMPTY_P);
   
-  // STEP 7: Section header spacing
-  for (const icon of SECTION_ICONS) {
-    const pattern = new RegExp(
-      `(<p[^>]*>[^<]*${icon}[\\s\\S]*?<\\/p>)(<p class="tiptap-paragraph"><\\/p>)+(?=<(?:ul|p|li))`,
-      'gi'
-    );
-    result = result.replace(pattern, '$1');
-  }
+  // STEP 7: Section header spacing. Keep one intentional blank paragraph
+  // before major program/workout headers so generated programs do not render
+  // as one stacked block in the editor or published page.
   for (const icon of SECTION_ICONS) {
     const insertPattern = new RegExp(
       `(<\\/(?:ul|p)>)(?!<p class="tiptap-paragraph"><\\/p>)(<p[^>]*>[^<]*${icon})`,
@@ -110,7 +105,21 @@ export function normalizeWorkoutHtml(content: string): string {
   
   // Final collapse
   result = result.replace(/(<p class="tiptap-paragraph"><\/p>){2,}/gi, CANONICAL_EMPTY_P);
+  result = enforceProgramSectionSpacing(result);
   
+  return result;
+}
+
+function enforceProgramSectionSpacing(html: string): string {
+  if (!html) return html;
+  const majorHeaderPattern = /<p class="tiptap-paragraph"><strong>(?:🎯 Program Goal|🧭 Program Instructions|📈 Program Progression|📅 WEEK [AB] TEMPLATE|🎯 Objective|[①②③④⑤⑥] DAY \d+|😴 DAY \d+|🏁 DAY \d+|🔥 Soft Tissue Preparation|⚡ Activation \/ Warm-Up|🏋 Main Workout|💥 Finisher|🧘 Cool Down)/gi;
+  let result = html.replace(majorHeaderPattern, (match, offset, full) => {
+    if (offset === 0) return match;
+    const before = full.slice(Math.max(0, offset - CANONICAL_EMPTY_P.length), offset);
+    return before === CANONICAL_EMPTY_P ? match : `${CANONICAL_EMPTY_P}${match}`;
+  });
+  result = result.replace(/^(<p class="tiptap-paragraph"><\/p>)+/, '');
+  result = result.replace(/(<p class="tiptap-paragraph"><\/p>){2,}/gi, CANONICAL_EMPTY_P);
   return result;
 }
 
