@@ -57,21 +57,13 @@ function artifactFileFor(distDir: string, routePath: string) {
   return join(distDir, routePath.replace(/^\//, "") + ".html");
 }
 
-function cleanArtifactFileFor(distDir: string, routePath: string) {
+function nestedIndexFileFor(distDir: string, routePath: string) {
   if (routePath === "/") return join(distDir, "index.html");
-  return join(distDir, routePath.replace(/^\//, ""));
+  return join(distDir, routePath.replace(/^\//, ""), "index.html");
 }
 
 function isFile(path: string) {
   return existsSync(path) && statSync(path).isFile();
-}
-
-function assertCleanUrlRedirect(redirects: string, routePath: string) {
-  const expected = `${routePath} ${routePath}.html 301!`;
-  const expectedTrailing = `${routePath}/ ${routePath}.html 301!`;
-  if (!redirects.includes(expected) || !redirects.includes(expectedTrailing)) {
-    throw new Error(`[verify-prerender] missing clean-URL .html redirect for ${routePath}`);
-  }
 }
 
 function assertRedirectRule(redirectsFile: string, from: string, to: string) {
@@ -109,9 +101,11 @@ export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
     }
 
     const html = readFileSync(artifactPath, "utf8");
-    const cleanArtifactPath = cleanArtifactFileFor(distDir, route.path);
-    if (route.path !== "/" && isFile(cleanArtifactPath)) {
-      throw new Error(`[verify-prerender] extensionless clean URL artifact would be served as a download: ${cleanArtifactPath}`);
+    if (route.path !== "/") {
+      const nestedPath = nestedIndexFileFor(distDir, route.path);
+      if (!isFile(nestedPath)) {
+        throw new Error(`[verify-prerender] missing nested clean URL artifact for ${route.path}: expected ${nestedPath}`);
+      }
     }
     const canonicalUrl = canonicalUrlFor(route.path);
     assertNotHomepageShell(html, route.path);
@@ -160,10 +154,6 @@ export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
       );
     }
 
-    if (route.path !== "/") {
-      assertCleanUrlRedirect(redirects, route.path);
-    }
-
     checked++;
   }
 
@@ -172,7 +162,7 @@ export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
   }
 
   // llms-full.txt is the AI-crawler index. Every smartygym.com link in it
-  // must point at the canonical ".html" version (homepage "/" excluded).
+  // must point at a clean (extensionless) canonical URL.
   const llmsPath = join(distDir, "llms-full.txt");
   if (isFile(llmsPath)) {
     const llms = readFileSync(llmsPath, "utf8");
@@ -180,11 +170,11 @@ export async function verifyPrerenderedSeo(options: { distDir?: string } = {}) {
       (m) => m[1],
     );
     for (const path of llmsLinks) {
-      if (path === "/" || path === "") continue;
-      if (/\.(html|xml|txt|png|jpg|jpeg|svg|ico|webp)$/i.test(path)) continue;
-      throw new Error(
-        `[verify-prerender] llms-full.txt contains a non-canonical clean URL: https://smartygym.com${path}`,
-      );
+      if (/\.html(\?|#|$)/.test(path)) {
+        throw new Error(
+          `[verify-prerender] llms-full.txt contains a stale .html URL: https://smartygym.com${path}`,
+        );
+      }
     }
   }
 

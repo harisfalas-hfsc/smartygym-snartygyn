@@ -122,10 +122,12 @@ function normalizeInternalLinks(html: string): string {
     try {
       const url = href.startsWith("http") ? new URL(href) : new URL(href, BASE_URL);
       if (url.hostname && !["smartygym.com", "www.smartygym.com"].includes(url.hostname)) return `href=${quote}${href}${quote}`;
-      const path = url.pathname.replace(/\/+$/g, "") || "/";
-      if (path === "/" || path.endsWith(".html")) return `href=${quote}${href}${quote}`;
+      let path = url.pathname.replace(/\/+$/g, "") || "/";
+      // Strip any stale "" suffix; clean URL is the new canonical.
+      if (path.endsWith("") && path !== "/") path = path.slice(0, -"".length);
+      if (path === "/") return `href=${quote}${href}${quote}`;
       if (!HTML_CANONICAL_PREFIXES.some((prefix) => path === prefix || path.startsWith(`${prefix}/`))) return `href=${quote}${href}${quote}`;
-      const canonicalPath = `${path}.html${url.search}${url.hash}`;
+      const canonicalPath = `${path}${url.search}${url.hash}`;
       const nextHref = href.startsWith("http") ? `${BASE_URL}${canonicalPath}` : canonicalPath;
       return `href=${quote}${attrEscape(nextHref)}${quote}`;
     } catch {
@@ -205,13 +207,13 @@ export function renderRouteBody(route: SeoRoute): {
       bodyHtml: `
 <main class="seo-prerender seo-article">
   <nav class="seo-breadcrumbs" aria-label="Breadcrumb">
-    <a href="/">Home</a> &rsaquo; <a href="/blog.html">Blog</a> &rsaquo; <span>${htmlEscape(a.title || "")}</span>
+    <a href="/">Home</a> &rsaquo; <a href="/blog">Blog</a> &rsaquo; <span>${htmlEscape(a.title || "")}</span>
   </nav>
   <article>
     <header>
       <p class="seo-eyebrow">${htmlEscape(a.category || "Fitness")}</p>
       <h1>${htmlEscape(a.title || "")}</h1>
-      <p class="seo-byline">By <a href="/coach-profile.html">${htmlEscape(author)}</a>${
+      <p class="seo-byline">By <a href="/coach-profile">${htmlEscape(author)}</a>${
         dateLabel ? ` &middot; <time datetime="${attrEscape(published)}">${htmlEscape(dateLabel)}</time>` : ""
       }${a.read_time ? ` &middot; ${htmlEscape(String(a.read_time))}` : ""}</p>
       ${credentials}
@@ -222,18 +224,18 @@ export function renderRouteBody(route: SeoRoute): {
     <aside class="seo-related-resources">
       <h2>Related SmartyGym Resources</h2>
       <ul>
-        <li><a href="/wod-archive.html">Try today&rsquo;s Workout of the Day</a></li>
-        <li><a href="/trainingprogram.html">Explore training programs by Coach Haris Falas</a></li>
-        <li><a href="/tools.html">Use the free SmartyGym fitness tools</a></li>
-        <li><a href="/blog.html">Read more articles on strength, fat loss and recovery</a></li>
-        <li><a href="/joinpremium.html">Join SmartyGym &mdash; train anywhere, anytime</a></li>
+        <li><a href="/wod-archive">Try today&rsquo;s Workout of the Day</a></li>
+        <li><a href="/trainingprogram">Explore training programs by Coach Haris Falas</a></li>
+        <li><a href="/tools">Use the free SmartyGym fitness tools</a></li>
+        <li><a href="/blog">Read more articles on strength, fat loss and recovery</a></li>
+        <li><a href="/joinpremium">Join SmartyGym &mdash; train anywhere, anytime</a></li>
       </ul>
     </aside>
     <aside class="seo-disclaimer">
       <p><strong>Disclaimer:</strong> This article is for educational purposes only and does not replace medical advice. If you have pain, injury, or a medical condition, consult a qualified professional before starting any exercise program.</p>
     </aside>
     <aside class="seo-cta">
-      <p><a href="/joinpremium.html"><strong>Start training with SmartyGym &mdash; 100% human-designed by Coach Haris Falas.</strong></a></p>
+      <p><a href="/joinpremium"><strong>Start training with SmartyGym &mdash; 100% human-designed by Coach Haris Falas.</strong></a></p>
     </aside>
   </article>
 </main>`,
@@ -288,7 +290,7 @@ export function renderRouteBody(route: SeoRoute): {
       bodyHtml: `
 <main class="seo-prerender seo-workout">
   <nav class="seo-breadcrumbs" aria-label="Breadcrumb">
-    <a href="/">Home</a> &rsaquo; <a href="/workout.html">Smarty Workouts</a> &rsaquo; <span>${htmlEscape(w.name || "")}</span>
+    <a href="/">Home</a> &rsaquo; <a href="/workout">Smarty Workouts</a> &rsaquo; <span>${htmlEscape(w.name || "")}</span>
   </nav>
   <article>
     <header>
@@ -296,7 +298,7 @@ export function renderRouteBody(route: SeoRoute): {
       <ul class="seo-meta">${metaRow}</ul>
       ${cover}
       <p class="seo-excerpt">${htmlEscape(stripHtml(w.description) || "")}</p>
-      <p class="seo-author">By <a href="/coach-profile.html">${htmlEscape(AUTHOR.name)}</a> &middot; ${htmlEscape(AUTHOR.jobTitle)}</p>
+      <p class="seo-author">By <a href="/coach-profile">${htmlEscape(AUTHOR.name)}</a> &middot; ${htmlEscape(AUTHOR.jobTitle)}</p>
     </header>
     ${sectionHtml("Warm-Up", w.warm_up)}
     ${sectionHtml("Activation", w.activation)}
@@ -375,7 +377,7 @@ export function renderRouteBody(route: SeoRoute): {
       bodyHtml: `
 <main class="seo-prerender seo-program">
   <nav class="seo-breadcrumbs" aria-label="Breadcrumb">
-    <a href="/">Home</a> &rsaquo; <a href="/trainingprogram.html">Smarty Programs</a> &rsaquo; <span>${htmlEscape(p.name || "")}</span>
+    <a href="/">Home</a> &rsaquo; <a href="/trainingprogram">Smarty Programs</a> &rsaquo; <span>${htmlEscape(p.name || "")}</span>
   </nav>
   <article>
     <header>
@@ -383,7 +385,7 @@ export function renderRouteBody(route: SeoRoute): {
       <ul class="seo-meta">${metaRow}</ul>
       ${cover}
       <p class="seo-excerpt">${htmlEscape(stripHtml(p.description) || "")}</p>
-      <p class="seo-author">Designed by <a href="/coach-profile.html">${htmlEscape(AUTHOR.name)}</a> &middot; ${htmlEscape(AUTHOR.jobTitle)}</p>
+      <p class="seo-author">Designed by <a href="/coach-profile">${htmlEscape(AUTHOR.name)}</a> &middot; ${htmlEscape(AUTHOR.jobTitle)}</p>
     </header>
     ${sectionHtml("Overview", p.overview)}
     ${sectionHtml("Target Audience", p.target_audience)}
@@ -416,7 +418,7 @@ export function renderRouteBody(route: SeoRoute): {
       blogPost: articles.slice(0, 50).map((article) => ({
         "@type": "BlogPosting",
         headline: article.title,
-        url: `${BASE_URL}/blog/${article.slug}.html`,
+        url: `${BASE_URL}/blog/${article.slug}`,
         description: article.excerpt,
         articleSection: article.category,
         author: person(),
@@ -434,7 +436,7 @@ export function renderRouteBody(route: SeoRoute): {
       .slice(0, 80)
       .map(
         (article) => `<li>
-          <a href="/blog/${attrEscape(String(article.slug || ""))}.html">${htmlEscape(String(article.title || ""))}</a>
+          <a href="/blog/${attrEscape(String(article.slug || ""))}">${htmlEscape(String(article.title || ""))}</a>
           ${article.category ? `<span>${htmlEscape(String(article.category))}</span>` : ""}
           ${article.excerpt ? `<p>${htmlEscape(String(article.excerpt))}</p>` : ""}
         </li>`,
@@ -447,7 +449,7 @@ export function renderRouteBody(route: SeoRoute): {
     <header>
       <h1>Fitness Blog Articles by Haris Falas</h1>
       <p class="seo-excerpt">${htmlEscape(route.description)}</p>
-      <p>Human-written fitness, nutrition, recovery and healthy aging articles by Sports Scientist <a href="/coach-profile.html">Haris Falas</a>.</p>
+      <p>Human-written fitness, nutrition, recovery and healthy aging articles by Sports Scientist <a href="/coach-profile">Haris Falas</a>.</p>
     </header>
     <section class="seo-section">
       <h2>Latest SmartyGym Articles</h2>
@@ -513,15 +515,15 @@ export function renderRouteBody(route: SeoRoute): {
       <h1>${htmlEscape(route.title.replace(/\s*\|\s*SmartyGym.*$/, ""))}</h1>
       <p class="seo-excerpt">${htmlEscape(route.description)}</p>
     </header>
-    <p>This page is part of <a href="/">SmartyGym</a>, the online fitness platform by Sports Scientist <a href="/coach-profile.html">Haris Falas</a>. 100% human-designed training — no AI-generated workouts.</p>
+    <p>This page is part of <a href="/">SmartyGym</a>, the online fitness platform by Sports Scientist <a href="/coach-profile">Haris Falas</a>. 100% human-designed training — no AI-generated workouts.</p>
     <nav class="seo-nav" aria-label="Explore SmartyGym">
       <ul>
-        <li><a href="/workout.html">Smarty Workouts</a></li>
-        <li><a href="/trainingprogram.html">Smarty Training Programs</a></li>
-        <li><a href="/workout/wod.html">Workout of the Day</a></li>
-        <li><a href="/blog.html">SmartyGym Blog</a></li>
-        <li><a href="/tools.html">Smarty Tools</a></li>
-        <li><a href="/exerciselibrary.html">Exercise Library</a></li>
+        <li><a href="/workout">Smarty Workouts</a></li>
+        <li><a href="/trainingprogram">Smarty Training Programs</a></li>
+        <li><a href="/workout/wod">Workout of the Day</a></li>
+        <li><a href="/blog">SmartyGym Blog</a></li>
+        <li><a href="/tools">Smarty Tools</a></li>
+        <li><a href="/exerciselibrary">Exercise Library</a></li>
       </ul>
     </nav>
   </article>
