@@ -11,7 +11,7 @@ const faqs = [
   },
   {
     q: "Is there a cheaper alternative to Peloton?",
-    a: "Yes. Peloton's All-Access membership costs $44/month and the App One plan is $12.99/month — and neither replaces a real strength program. SmartyGym is €9.99/month (Gold) or €89.89/year (Platinum) and includes everything: workouts, training programs, the WOD, fitness tools, the exercise library and the Daily Smarty Ritual."
+    a: "Yes. Peloton's All-Access membership costs $44/month and the App One plan is $12.99/month — and neither replaces a real strength program. SmartyGym Lifetime Premium is a one-time €89.99 payment that includes everything: workouts, training programs, the WOD, fitness tools, the exercise library and the Daily Smarty Ritual."
   },
   {
     q: "Can I use the Peloton app without the bike?",
@@ -23,7 +23,7 @@ const faqs = [
   },
   {
     q: "How much is the Peloton app without the bike?",
-    a: "Peloton App One is $12.99/month and App+ is $24/month (US pricing, 2026). SmartyGym Gold is €9.99/month with full access to 500+ workouts and all training programs — and you can train without any equipment if you want."
+    a: "Peloton App One is $12.99/month and App+ is $24/month (US pricing, 2026). SmartyGym Lifetime Premium is a one-time €89.99 payment with full access to 500+ workouts and all training programs — and you can train without any equipment if you want."
   },
   {
     q: "How does SmartyGym compare to Peloton for strength training?",
@@ -48,7 +48,7 @@ const faqs = [
 ];
 
 const comparisonRows = [
-  { feature: "Monthly price", smarty: "€9.99 (Gold)", peloton: "$12.99–$44" },
+  { feature: "Pricing", smarty: "€89.99 one-time (Lifetime Premium)", peloton: "$12.99–$44 / month" },
   { feature: "Equipment required", smarty: "None — bodyweight friendly", peloton: "Bike, Tread or hardware ecosystem" },
   { feature: "Workouts designed by", smarty: "Sports Scientist (CSCS) — 100% human", peloton: "Mixed instructors + algorithms" },
   { feature: "Periodized strength programs", smarty: "Yes — 84-day super-cycle", peloton: "Class library, no periodization" },
