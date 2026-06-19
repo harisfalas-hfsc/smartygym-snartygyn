@@ -36,23 +36,60 @@ const APPARATUS_DEPENDENT_BODYWEIGHT: RegExp[] = [
   /\bbox\b/i,
 ];
 
-const ELITE_SKILL_PATTERNS: RegExp[] = [
+const ABSOLUTE_SKILL_PATTERNS: RegExp[] = [
   /muscle-?up/i,
   /planche/i,
   /maltese/i,
   /one\s*arm\s*push/i,
   /handstand\s*push/i,
-  /pistol/i,
   /iron\s*cross/i,
   /front\s*lever/i,
   /back\s*lever/i,
-  /flag/i,
+  /human\s*flag|\bflag\b/i,
   /archer\s*push/i,
 ];
 
-const REALISTIC_WEIGHT_LOSS_PATTERNS: RegExp[] = [
-  /squat|lunge|push\s*up|incline\s*push|glute\s*bridge|mountain\s*climber|plank|jumping\s*jack|high\s*knee|bear\s*crawl|burpee|dead\s*bug|bird\s*dog|step|walk|run|crunch|sit\s*up|bridge|crawl/i,
-];
+const CONDITIONAL_ADVANCED_SKILL_PATTERNS: RegExp[] = [/pistol/i];
+
+type CategoryRule = {
+  preferred: RegExp[];
+  forbidden: RegExp[];
+  allowCardioBodyPart?: boolean;
+  rejectCardioBodyPart?: boolean;
+};
+
+const CATEGORY_RULES: Record<string, CategoryRule> = {
+  "CARDIO ENDURANCE": {
+    allowCardioBodyPart: true,
+    preferred: [/walk|run|jog|step|jump\s*rope|rope|mountain\s*climber|jumping\s*jack|high\s*knee|burpee|bear\s*crawl|squat|lunge|push\s*up|skater|fast\s*feet|bike|row|elliptical|ski\s*erg|cardio/i],
+    forbidden: [/sissy\s*squat|bench\s*press|deadlift|max|heavy|curl|triceps?\s*extension|calf\s*raise/i],
+  },
+  "WEIGHT LOSS": {
+    allowCardioBodyPart: true,
+    preferred: [/squat|lunge|push\s*up|incline\s*push|step|mountain\s*climber|jumping\s*jack|high\s*knee|burpee|bear\s*crawl|dead\s*bug|glute\s*bridge|plank|skater|fast\s*feet|walk|run|jog|bike|row|swing|thruster|crawl/i],
+    forbidden: [/sissy\s*squat|max|heavy|one\s*rep|bench\s*press|leg\s*press|preacher\s*curl|concentration\s*curl/i],
+  },
+  "FUNCTIONAL STRENGTH": {
+    rejectCardioBodyPart: true,
+    preferred: [/push\s*up|pull\s*up|chin\s*up|\bdip\b|split\s*squat|lunge|single\s*leg\s*rdl|rdl|deadlift|plank|side\s*plank|bear\s*crawl|goblet\s*squat|kettlebell|dumbbell\s*row|row|bench\s*press|floor\s*press|shoulder\s*press|farmer|carry|squat|press|hinge/i],
+    forbidden: [/jumping\s*jack|high\s*knee|mountain\s*climber|burpee|skater|fast\s*feet|run|jog|elliptical|bike/i],
+  },
+  "MUSCLE HYPERTROPHY": {
+    rejectCardioBodyPart: true,
+    preferred: [/press|bench|row|pulldown|pull\s*up|chin\s*up|\bdip\b|squat|split\s*squat|bulgarian|rdl|deadlift|leg\s*press|shoulder\s*press|curl|extension|raise|fly|glute\s*bridge|push\s*up|lat|chest|biceps|triceps|quad|hamstring/i],
+    forbidden: [/tabata|amrap|emom|burpee|jumping\s*jack|high\s*knee|mountain\s*climber|skater|fast\s*feet|run|jog|bike|elliptical/i],
+  },
+  "LOW BACK PAIN": {
+    rejectCardioBodyPart: true,
+    preferred: [/dead\s*bug|bird\s*dog|mcgill|curl\s*up|glute\s*bridge|pallof|side\s*plank|cat\s*camel|cat\s*cow|hip|breathing|plank|stability|mobility|stretch|pelvic|child/i],
+    forbidden: [/burpee|jump|sprint|run|box|thruster|snatch|clean|swing|high\s*knee|mountain\s*climber|jack|heavy|deadlift|good\s*morning|hyperextension/i],
+  },
+  "MOBILITY & STABILITY": {
+    rejectCardioBodyPart: true,
+    preferred: [/world.?s\s*greatest\s*stretch|90\/?90|thoracic|rotation|deep\s*squat|single\s*leg\s*balance|bird\s*dog|dead\s*bug|hip\s*airplane|shoulder|ankle|mobility|stretch|balance|cat\s*cow|cat\s*camel|circle|cars?|plank|stability/i],
+    forbidden: [/burpee|sprint|run|jump|box|thruster|snatch|clean|swing|high\s*knee|mountain\s*climber|jack|heavy/i],
+  },
+};
 
 const DAY_FOCUS_KEYWORDS: Record<string, { body_part?: string[]; target?: string[]; name?: string[] }> = {
   "lower body": { body_part: ["upper legs", "lower legs", "legs", "hips"] },
