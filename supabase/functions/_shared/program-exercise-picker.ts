@@ -97,6 +97,7 @@ function matchesFocus(ex: LibExercise, focus: string): boolean {
 
   for (const key of activeKeys) {
     const def = DAY_FOCUS_KEYWORDS[key];
+    if (!def.body_part && !def.target && !def.name) return true;
     if (fieldMatchesAny(ex.body_part, def.body_part)) return true;
     if (fieldMatchesAny(ex.target, def.target)) return true;
     if (fieldMatchesAny(ex.name, def.name)) return true;
