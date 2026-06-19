@@ -115,6 +115,7 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
         weeks: program.weeks || 4,
         days_per_week: program.days_per_week || 4,
         equipment: program.equipment || '',
+        overview: program.overview || '',
         training_program: program.weekly_schedule || '',
         program_description: program.description || '',
         construction: program.program_structure || '',
