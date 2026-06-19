@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -11,16 +11,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Sparkles, CheckCircle, XCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { Link } from "react-router-dom";
 import { A4Container } from "@/components/ui/a4-container";
 
@@ -54,9 +44,6 @@ export const ArticleEditDialog = ({ article, open, onOpenChange, onSave }: Artic
     conflicts: any[];
     checked: boolean;
   }>({ isUnique: true, conflicts: [], checked: false });
-  const [draftTimestamp, setDraftTimestamp] = useState<number | null>(null);
-  const [showDraftDialog, setShowDraftDialog] = useState(false);
-  const [savedDraft, setSavedDraft] = useState<any>(null);
 
   useEffect(() => {
     if (article) {
@@ -76,20 +63,6 @@ export const ArticleEditDialog = ({ article, open, onOpenChange, onSave }: Artic
         checkImageUniqueness(article.image_url);
       }
     } else {
-      // Check for draft
-      const draftKey = `blog-article-draft-${article?.id || 'new'}`;
-      const savedDraftStr = localStorage.getItem(draftKey);
-      
-      if (savedDraftStr) {
-        try {
-          const draft = JSON.parse(savedDraftStr);
-          setSavedDraft(draft);
-          setShowDraftDialog(true);
-        } catch (e) {
-          console.error("Failed to parse draft", e);
-        }
-      }
-      
       setFormData({
         title: '',
         slug: '',
@@ -105,68 +78,16 @@ export const ArticleEditDialog = ({ article, open, onOpenChange, onSave }: Artic
     }
   }, [article, open]);
 
-  // Draft management
-  const saveDraft = (data: typeof formData) => {
-    const draftKey = `blog-article-draft-${article?.id || 'new'}`;
-    const draft = {
-      ...data,
-      timestamp: Date.now(),
-    };
-    localStorage.setItem(draftKey, JSON.stringify(draft));
-    setDraftTimestamp(Date.now());
-  };
-
-  const clearDraft = () => {
-    const draftKey = `blog-article-draft-${article?.id || 'new'}`;
-    localStorage.removeItem(draftKey);
-    setDraftTimestamp(null);
-  };
-
-  const restoreDraft = () => {
-    if (savedDraft) {
-      setFormData(savedDraft);
-      setDraftTimestamp(savedDraft.timestamp);
-      setShowDraftDialog(false);
-    }
-  };
-
-  const discardDraft = () => {
-    clearDraft();
-    setShowDraftDialog(false);
-    setSavedDraft(null);
-  };
-
-  // Auto-save every 30 seconds
+  // One-time cleanup of any legacy localStorage drafts from the old autosave system.
   useEffect(() => {
-    if (!open) return;
-    
-    const interval = setInterval(() => {
-      if (formData.title || formData.content) {
-        saveDraft(formData);
-      }
-    }, 30000);
-
-    return () => clearInterval(interval);
-  }, [formData, open]);
-
-  // Debounced save on content changes
-  const debouncedSave = useMemo(() => {
-    let timeout: NodeJS.Timeout;
-    return (data: typeof formData) => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        if (data.title || data.content) {
-          saveDraft(data);
-        }
-      }, 3000);
-    };
+    try {
+      Object.keys(localStorage)
+        .filter((k) => k.startsWith('blog-article-draft-'))
+        .forEach((k) => localStorage.removeItem(k));
+    } catch {
+      // ignore
+    }
   }, []);
-
-  useEffect(() => {
-    if (formData.title || formData.content) {
-      debouncedSave(formData);
-    }
-  }, [formData.content, formData.title]);
 
   const generateSlug = (title: string) => {
     return title
