@@ -184,8 +184,8 @@ export const Navigation = () => {
         return;
       }
 
-      const isSubscribed = dbData?.status === 'active' && 
-                         (dbData?.plan_type === 'gold' || dbData?.plan_type === 'platinum');
+      const isSubscribed = dbData?.status === 'active' &&
+                         ['premium', 'lifetime', 'legacy_premium'].includes(dbData?.plan_type ?? '');
 
       setSubscriptionInfo({
         subscribed: isSubscribed,
@@ -250,11 +250,11 @@ export const Navigation = () => {
 
   const getPlanName = (productId: string | null) => {
     if (!productId) return null;
-    // productId is the plan_type from database ('gold', 'platinum', or 'free')
+    // productId mirrors plan_type from the database.
     const planType = productId.toLowerCase();
-    if (planType === "gold") return "Gold";
-    if (planType === "platinum") return "Platinum";
     if (planType === "free") return null; // Don't show "Free" as a plan name
+    if (planType === "lifetime") return "Lifetime Premium";
+    // Legacy gold/platinum holders (and any future 'premium' / 'legacy_premium') all surface as Premium.
     return "Premium";
   };
 

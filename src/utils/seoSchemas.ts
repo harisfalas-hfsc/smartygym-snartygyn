@@ -203,26 +203,14 @@ export const generateHarisFalasSchema = () => ({
   ]
 });
 
-// Subscription/Product Schema with more detail
-export const generateSubscriptionProductSchema = (plan: 'gold' | 'platinum') => {
-  const plans = {
-    gold: {
-      name: "SmartyGym Gold Plan",
-      description: "Monthly premium membership with unlimited access to 500+ workouts, all training programs, Daily Smarty Ritual, fitness calculators, and exercise library. 100% human-designed by Sports Scientist Haris Falas. Cancel anytime.",
-      price: "9.99",
-      billingDuration: "P1M",
-      features: ["Unlimited Workouts", "All Training Programs", "Daily Smarty Ritual", "Fitness Calculators", "Exercise Library", "Flexible Monthly Billing"]
-    },
-    platinum: {
-      name: "SmartyGym Platinum Plan",
-      description: "Yearly premium membership with unlimited access to everything in Gold plus 25% savings. Best value for committed fitness enthusiasts. 100% human-designed content.",
-      price: "89.99",
-      billingDuration: "P1Y",
-      features: ["Everything in Gold", "25% Savings", "Lock in Rate for 12 Months", "Priority Support", "Best Value"]
-    }
+// Lifetime Premium product schema — the only membership currently offered.
+export const generateSubscriptionProductSchema = (_plan?: 'lifetime') => {
+  const p = {
+    name: "SmartyGym Lifetime Premium",
+    description: "One-time payment for lifetime premium access to 500+ workouts, all training programs, Daily Smarty Ritual, fitness calculators, and exercise library. 100% human-designed by Sports Scientist Haris Falas. No recurring subscription.",
+    price: "89.99",
+    features: ["Lifetime Access", "Unlimited Workouts", "All Training Programs", "Daily Smarty Ritual", "Fitness Calculators", "Exercise Library", "One-Time Payment"]
   };
-
-  const p = plans[plan];
 
   return {
     "@context": "https://schema.org",

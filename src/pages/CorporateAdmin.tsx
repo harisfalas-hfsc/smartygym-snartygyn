@@ -427,7 +427,7 @@ export default function CorporateAdmin() {
                 Team Member Slots ({subscription.current_users_count}/{subscription.max_users === 9999 ? '∞' : subscription.max_users} used)
               </CardTitle>
               <CardDescription>
-                Manage your team members. Each slot represents one Platinum access account.
+                Manage your team members. Each slot represents one Premium access account.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -477,7 +477,7 @@ export default function CorporateAdmin() {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <Crown className="h-3 w-3 text-primary" />
-                            <span className="text-xs text-muted-foreground">Platinum Access</span>
+                            <span className="text-xs text-muted-foreground">Premium Access</span>
                           </div>
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
@@ -490,7 +490,7 @@ export default function CorporateAdmin() {
                               <AlertDialogHeader>
                                 <AlertDialogTitle>Remove Team Member?</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  This will remove {member.email} from your team. Their account will remain but they will lose Platinum access.
+                                  This will remove {member.email} from your team. Their account will remain but they will lose Premium access.
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>

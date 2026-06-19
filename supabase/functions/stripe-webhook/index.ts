@@ -39,10 +39,13 @@ const periodIso = (ts: number | null): string | null =>
 
 // Map a Stripe price ID to our internal plan_type. Mirrors the logic in
 // check-subscription so upgrades/downgrades via Customer Portal stay in sync.
-const planTypeFromPriceId = (priceId: string | undefined | null): 'gold' | 'platinum' | null => {
+// Gold/Platinum recurring products are LEGACY and are surfaced as
+// 'legacy_premium' so historical events (refunds, chargebacks, portal edits)
+// still resolve to a valid premium tier without re-advertising those plans.
+const planTypeFromPriceId = (priceId: string | undefined | null): 'legacy_premium' | null => {
   if (!priceId) return null;
-  if (priceId === 'price_1SJ9q1IxQYg9inGKZzxxqPbD') return 'gold';
-  if (priceId === 'price_1SJ9qGIxQYg9inGKFbgqVRjj') return 'platinum';
+  if (priceId === 'price_1SJ9q1IxQYg9inGKZzxxqPbD') return 'legacy_premium'; // [LEGACY] Gold Monthly
+  if (priceId === 'price_1SJ9qGIxQYg9inGKFbgqVRjj') return 'legacy_premium'; // [LEGACY] Platinum Yearly
   return null;
 };
 
@@ -338,14 +341,14 @@ async function handleCorporateSubscriptionCheckout(
 
   logStep("Corporate subscription created", { corpSubId: corpSub.id });
 
-  // Also create/update the admin's personal subscription to platinum
+  // Also create/update the admin's personal subscription as premium
   await supabase
     .from('user_subscriptions')
     .upsert({
       user_id: userId,
       stripe_customer_id: customerId,
       stripe_subscription_id: subscriptionId,
-      plan_type: 'platinum',
+      plan_type: 'premium',
       status: 'active',
       current_period_start: periodIso(corpPeriod.start),
       current_period_end: periodIso(corpPeriod.end),
@@ -353,7 +356,7 @@ async function handleCorporateSubscriptionCheckout(
       onConflict: 'user_id'
     });
 
-  logStep("Admin user subscription set to platinum");
+  logStep("Admin user subscription set to premium");
 
   // Get user email for sending welcome email
   const { data: userData } = await supabase.auth.admin.getUserById(userId);
@@ -386,7 +389,7 @@ async function handleCorporateSubscriptionCheckout(
               <p style="margin: 0 0 10px;"><strong>Plan:</strong> Smarty ${planType.charAt(0).toUpperCase() + planType.slice(1)}</p>
               <p style="margin: 0;"><strong>Team Limit:</strong> ${maxUsers === 9999 ? 'Unlimited' : maxUsers} members</p>
             </div>
-            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">All your team members will receive Platinum-level access to the entire SmartyGym platform.</p>
+            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">All your team members will receive Premium-level access to the entire SmartyGym platform.</p>
             <p style="margin-top: 24px;">
               <a href="https://smartygym.com/corporate-admin" style="display: inline-block; background: #29B6D2; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Add Team Members →</a>
             </p>
@@ -426,13 +429,17 @@ async function handleSubscriptionCheckout(
   const productId = subscription.items.data[0].price.product as string;
   const localStatus = mapStripeSubscriptionStatus(subscription.status);
   
-  // Get product details to determine plan type (prefer product metadata,
-  // fall back to known price-ID mapping for Gold/Platinum)
+  // Get product details to determine plan type. Prefer Stripe product
+  // metadata (kept in sync when we create products), and fall back to the
+  // legacy Gold/Platinum price-ID mapping so historical recurring events
+  // (refunds/chargebacks/customer portal edits) still resolve to a real
+  // plan. As a final safety net, treat anything unknown as legacy_premium —
+  // a paying customer should never silently drop to free.
   const product = await stripe.products.retrieve(productId);
   const planType =
     product.metadata?.plan_type ||
     planTypeFromPriceId(priceId) ||
-    'gold';
+    'legacy_premium';
 
   logStep("Creating subscription record", { userId, planType, subscriptionId });
 
@@ -541,8 +548,10 @@ async function handleSubscriptionCheckout(
       logStep("ERROR: Failed to track subscription in analytics", { error: analyticsError });
     }
     
-    // Capitalize plan type for display (gold -> Gold, platinum -> Platinum)
-    const planName = planType.charAt(0).toUpperCase() + planType.slice(1);
+    // Display name for the subscription tier (e.g. "Premium", "Lifetime").
+    const planName = planType === 'legacy_premium'
+      ? 'Premium'
+      : planType.charAt(0).toUpperCase() + planType.slice(1);
     
     // Get user email
     const { data: userData } = await supabase.auth.admin.getUserById(userId);

@@ -87,8 +87,8 @@ export function BusinessReportExport({ dashboardRef }: BusinessReportExportProps
 
     // Use the same premium-counting rules as the dashboard
     const premium = computePremiumCounts(subscriptions as any);
-    const activeGold = subscriptions?.filter(s => s.status === "active" && s.plan_type === "gold").length || 0;
-    const activePlatinum = subscriptions?.filter(s => s.status === "active" && s.plan_type === "platinum").length || 0;
+    const activeLifetime = subscriptions?.filter(s => s.status === "active" && s.plan_type === "lifetime").length || 0;
+    const activeLegacyMembers = subscriptions?.filter(s => s.status === "active" && ["gold", "platinum", "premium", "legacy_premium"].includes(s.plan_type ?? "")).length || 0;
 
     // Fetch revenue from Stripe
     let stripeRevenue = { totalRevenue: 0, subscriptionRevenue: 0 };
@@ -147,8 +147,8 @@ export function BusinessReportExport({ dashboardRef }: BusinessReportExportProps
       users: {
         total: totalUsers || 0,
         new: newUsers || 0,
-        goldSubscribers: activeGold,
-        platinumSubscribers: activePlatinum,
+        lifetimeSubscribers: activeLifetime,
+        legacyPremiumSubscribers: activeLegacyMembers,
         paidSubscribers: premium.paidSubscribers,
         manualSubscribers: premium.manualSubscribers,
       },
@@ -238,12 +238,12 @@ export function BusinessReportExport({ dashboardRef }: BusinessReportExportProps
               <td style="padding: 12px; border: 1px solid #e0e0e0; text-align: right; font-weight: bold;">${data.users.new}</td>
             </tr>
             <tr style="background: #f8f9fa;">
-              <td style="padding: 12px; border: 1px solid #e0e0e0;">Gold Subscribers</td>
-              <td style="padding: 12px; border: 1px solid #e0e0e0; text-align: right; font-weight: bold;">${data.users.goldSubscribers}</td>
+              <td style="padding: 12px; border: 1px solid #e0e0e0;">Lifetime Premium Subscribers</td>
+              <td style="padding: 12px; border: 1px solid #e0e0e0; text-align: right; font-weight: bold;">${data.users.lifetimeSubscribers}</td>
             </tr>
             <tr>
-              <td style="padding: 12px; border: 1px solid #e0e0e0;">Platinum Subscribers</td>
-              <td style="padding: 12px; border: 1px solid #e0e0e0; text-align: right; font-weight: bold;">${data.users.platinumSubscribers}</td>
+              <td style="padding: 12px; border: 1px solid #e0e0e0;">Legacy Premium Subscribers (historical)</td>
+              <td style="padding: 12px; border: 1px solid #e0e0e0; text-align: right; font-weight: bold;">${data.users.legacyPremiumSubscribers}</td>
             </tr>
           </table>
         </div>

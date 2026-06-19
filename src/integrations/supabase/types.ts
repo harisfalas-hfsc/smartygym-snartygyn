@@ -3978,7 +3978,13 @@ export type Database = {
         | "checkin_reminder_evening"
         | "goal_achievement"
         | "welcome_onboarding"
-      plan_type: "free" | "gold" | "platinum" | "lifetime"
+      plan_type:
+        | "free"
+        | "gold"
+        | "platinum"
+        | "lifetime"
+        | "legacy_premium"
+        | "premium"
       subscription_status: "active" | "canceled" | "past_due"
     }
     CompositeTypes: {
@@ -4148,7 +4154,14 @@ export const Constants = {
         "goal_achievement",
         "welcome_onboarding",
       ],
-      plan_type: ["free", "gold", "platinum", "lifetime"],
+      plan_type: [
+        "free",
+        "gold",
+        "platinum",
+        "lifetime",
+        "legacy_premium",
+        "premium",
+      ],
       subscription_status: ["active", "canceled", "past_due"],
     },
   },

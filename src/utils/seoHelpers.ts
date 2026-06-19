@@ -657,11 +657,10 @@ export const generateMobileApplicationSchema = () => ({
     "lowPrice": "0",
     "highPrice": "89.99",
     "priceCurrency": "EUR",
-    "offerCount": 3,
+    "offerCount": 2,
     "offers": [
       { "@type": "Offer", "name": "Free Plan", "price": "0", "priceCurrency": "EUR" },
-      { "@type": "Offer", "name": "Gold Plan", "price": "9.99", "priceCurrency": "EUR" },
-      { "@type": "Offer", "name": "Platinum Plan", "price": "89.99", "priceCurrency": "EUR" }
+      { "@type": "Offer", "name": "SmartyGym Lifetime Premium", "price": "89.99", "priceCurrency": "EUR" }
     ]
   },
   "creator": {
@@ -785,7 +784,7 @@ export const generateCorporateServiceSchema = () => ({
   "@type": "Service",
   "name": "Smarty Corporate - Team Fitness Solutions",
   "alternateName": "SmartyGym Corporate Wellness",
-  "description": "Corporate fitness subscription plans for teams, businesses, and organizations. Centralized billing, team management, and full Platinum access for all members.",
+  "description": "Corporate fitness subscription plans for teams, businesses, and organizations. Centralized billing, team management, and full Premium access for all members.",
   "serviceType": "Corporate Wellness Program",
   "provider": {
     "@type": "Organization",

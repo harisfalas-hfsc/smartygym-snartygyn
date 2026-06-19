@@ -130,7 +130,7 @@ export const IndividualBrochure = () => {
       <div className="p-8 md:p-12 max-w-[21cm] mx-auto" style={{ minHeight: '29.7cm' }}>
         {/* Pricing Table */}
         <h3 className="text-xl font-bold mb-6 text-[#29B6D2] border-b-2 border-[#29B6D2] pb-2">Membership Plans</h3>
-        <div className="grid grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-2 gap-4 mb-8">
           <div className="border-2 border-gray-200 rounded-xl p-6 text-center">
             <h4 className="font-bold text-lg mb-2">Free</h4>
             <p className="text-3xl font-bold mb-4">€0<span className="text-sm text-gray-500">/mo</span></p>
@@ -142,27 +142,17 @@ export const IndividualBrochure = () => {
             </ul>
           </div>
           
-          <div className="border-2 border-[#29B6D2] rounded-xl p-6 text-center bg-[#E8F7FA]">
-            <div className="bg-[#29B6D2] text-white text-xs px-2 py-1 rounded mb-2 inline-block">POPULAR</div>
-            <h4 className="font-bold text-lg mb-2 text-[#29B6D2]">Gold</h4>
-            <p className="text-3xl font-bold mb-4">€9.99<span className="text-sm text-gray-500">/mo</span></p>
+          <div className="border-2 border-gray-800 rounded-xl p-6 text-center bg-[#1a1a1a] text-white">
+            <div className="bg-white text-gray-900 text-xs px-2 py-1 rounded mb-2 inline-block">LIFETIME ACCESS</div>
+            <h4 className="font-bold text-lg mb-2">Lifetime Premium</h4>
+            <p className="text-3xl font-bold mb-4">€89.99<span className="text-sm text-gray-400"> one-time</span></p>
             <ul className="text-sm text-left space-y-2">
               <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#29B6D2]" /> All Free features</li>
-              <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#29B6D2]" /> ALL premium workouts</li>
-              <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#29B6D2]" /> Training programs</li>
+              <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#29B6D2]" /> ALL premium workouts forever</li>
+              <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#29B6D2]" /> All training programs</li>
+              <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#29B6D2]" /> Smarty Rituals + Check-ins</li>
               <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#29B6D2]" /> Priority support</li>
-            </ul>
-          </div>
-          
-          <div className="border-2 border-gray-800 rounded-xl p-6 text-center bg-[#1a1a1a] text-white">
-            <div className="bg-white text-gray-900 text-xs px-2 py-1 rounded mb-2 inline-block">PREMIUM</div>
-            <h4 className="font-bold text-lg mb-2">Platinum</h4>
-            <p className="text-3xl font-bold mb-4">€19.99<span className="text-sm text-gray-400">/mo</span></p>
-            <ul className="text-sm text-left space-y-2">
-              <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#29B6D2]" /> All Gold features</li>
-              <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#29B6D2]" /> Smarty Ritual</li>
-              <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#29B6D2]" /> Workout generator</li>
-              <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#29B6D2]" /> Exclusive content</li>
+              <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#29B6D2]" /> One payment — yours for life</li>
             </ul>
           </div>
         </div>

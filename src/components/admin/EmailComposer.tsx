@@ -141,7 +141,7 @@ export function EmailComposer() {
     if (userTypeFilter !== "all") {
       if (userTypeFilter === "registered_with_plan") {
         filtered = filtered.filter(user => 
-          user.plan_type === 'gold' || user.plan_type === 'platinum'
+          ['premium', 'lifetime', 'legacy_premium', 'gold', 'platinum'].includes(user.plan_type)
         );
       } else if (userTypeFilter === "registered_without_plan") {
         filtered = filtered.filter(user => 
@@ -347,8 +347,7 @@ export function EmailComposer() {
                 <SelectContent>
                   <SelectItem value="all">All Plans</SelectItem>
                   <SelectItem value="free">Free Users</SelectItem>
-                  <SelectItem value="gold">Gold Members</SelectItem>
-                  <SelectItem value="platinum">Platinum Members</SelectItem>
+                  <SelectItem value="premium">Premium Members</SelectItem>
                 </SelectContent>
               </Select>
               
@@ -463,7 +462,7 @@ export function EmailComposer() {
                           <span className="text-muted-foreground ml-2">({user.email})</span>
                         </div>
                         <div className="flex items-center gap-2 ml-4 flex-wrap justify-end">
-                          <Badge variant={user.plan_type === 'gold' || user.plan_type === 'platinum' ? 'default' : 'outline'} className="text-xs">
+                          <Badge variant={['premium', 'lifetime', 'legacy_premium', 'gold', 'platinum'].includes(user.plan_type) ? 'default' : 'outline'} className="text-xs">
                             {user.plan_type.charAt(0).toUpperCase() + user.plan_type.slice(1)}
                           </Badge>
                           {renderCorporateBadge(user)}

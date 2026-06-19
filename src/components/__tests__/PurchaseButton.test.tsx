@@ -30,7 +30,7 @@ describe('PurchaseButton', () => {
       hasPurchased: vi.fn(() => false),
       user: { id: '123' } as any,
       isLoading: false,
-      productId: 'gold',
+      productId: 'lifetime',
       purchasedContent: new Set(),
       canAccessContent: vi.fn(() => true),
       canInteract: vi.fn(() => true),

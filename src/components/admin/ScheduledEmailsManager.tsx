@@ -370,8 +370,7 @@ export const ScheduledEmailsManager = () => {
                   <SelectContent>
                     <SelectItem value="all">All Registered Users</SelectItem>
                     <SelectItem value="free">Free Users</SelectItem>
-                    <SelectItem value="gold">Gold Members</SelectItem>
-                    <SelectItem value="platinum">Platinum Members</SelectItem>
+                    <SelectItem value="premium">Premium Members</SelectItem>
                     <SelectItem value="subscribers">All Premium Subscribers</SelectItem>
                     <SelectItem value="purchasers">Users with Purchases</SelectItem>
                   </SelectContent>

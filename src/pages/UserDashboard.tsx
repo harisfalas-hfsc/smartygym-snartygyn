@@ -552,7 +552,9 @@ export default function UserDashboard() {
         });
         return;
       }
-      const isSubscribed = dbData?.status === 'active' && ['gold', 'platinum', 'premium', 'lifetime'].includes(dbData.plan_type);
+      // Note: 'gold'/'platinum' are legacy plan types no longer offered for purchase.
+      // 'legacy_premium' is used by the webhook for historical Stripe events.
+      const isSubscribed = dbData?.status === 'active' && ['premium', 'lifetime', 'legacy_premium'].includes(dbData.plan_type);
       setSubscriptionInfo({
         subscribed: isSubscribed,
         product_id: dbData?.plan_type || null,
@@ -690,7 +692,7 @@ export default function UserDashboard() {
         <div className="animate-pulse text-lg">Loading dashboard...</div>
       </div>;
   }
-  // Premium members have Gold/Platinum subscription
+  // Premium members have an active Lifetime / Premium / legacy subscription
   const hasActivePlan = subscriptionInfo?.subscribed && subscriptionInfo?.product_id;
 
   // Separate flag for standalone purchases (only count non-deleted content)
@@ -1047,7 +1049,7 @@ export default function UserDashboard() {
                     <div className="bg-white/50 dark:bg-gray-800/50 rounded-md p-2 border border-blue-500/10 hover:border-blue-500/30 transition-colors">
                       <div className="flex flex-col items-center text-center gap-1">
                         <Crown className="h-5 w-5 text-blue-500" />
-                        <span className="text-xs font-semibold">Platinum</span>
+                        <span className="text-xs font-semibold">Premium</span>
                         <span className="text-xs font-medium">Access</span>
                       </div>
                     </div>
@@ -1140,7 +1142,7 @@ export default function UserDashboard() {
                   <Crown className="h-12 w-12 text-primary mx-auto mb-4" />
                   <h3 className="text-xl font-bold mb-2">Premium Feature</h3>
                   <p className="text-muted-foreground mb-6">
-                    Track your workouts, mark favorites, and monitor your progress with a Gold or Platinum plan.
+                    Track your workouts, mark favorites, and monitor your progress with SmartyGym Lifetime Premium.
                   </p>
                   <Button onClick={() => navigate("/smarty-premium")} className="cta-button">
                     Upgrade to Premium
@@ -1195,7 +1197,7 @@ export default function UserDashboard() {
                   <Crown className="h-12 w-12 text-primary mx-auto mb-4" />
                   <h3 className="text-xl font-bold mb-2">Premium Feature</h3>
                   <p className="text-muted-foreground mb-6">
-                    Access structured training programs, track your progress, and achieve your fitness goals with a Gold or Platinum plan.
+                    Access structured training programs, track your progress, and achieve your fitness goals with SmartyGym Lifetime Premium.
                   </p>
                   <Button onClick={() => navigate("/smarty-premium")} className="cta-button">
                     Upgrade to Premium
@@ -1358,7 +1360,7 @@ export default function UserDashboard() {
                   <Crown className="h-12 w-12 text-primary mx-auto mb-4" />
                   <h3 className="text-xl font-bold mb-2">Premium Feature</h3>
                   <p className="text-muted-foreground mb-6">
-                    Smarty Check-ins are available with a Gold or Platinum plan.
+                    Smarty Check-ins are available with SmartyGym Lifetime Premium.
                   </p>
                   <Button onClick={() => navigate("/smarty-premium")} className="cta-button">
                     Upgrade to Premium
@@ -1384,7 +1386,7 @@ export default function UserDashboard() {
                   <Crown className="h-12 w-12 text-primary mx-auto mb-4" />
                   <h3 className="text-xl font-bold mb-2">Premium Feature</h3>
                   <p className="text-muted-foreground mb-6">
-                    Track all your fitness activities in one place with a Gold or Platinum plan.
+                    Track all your fitness activities in one place with SmartyGym Lifetime Premium.
                   </p>
                   <Button onClick={() => navigate("/smarty-premium")} className="cta-button">
                     Upgrade to Premium

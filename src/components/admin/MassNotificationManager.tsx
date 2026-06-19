@@ -63,9 +63,8 @@ export function MassNotificationManager() {
 
   const recipientFilters = [
     { value: "all", label: "All Users" },
-    { value: "subscribers", label: "Subscribers Only (Gold + Platinum)" },
-    { value: "gold", label: "Gold Members Only" },
-    { value: "platinum", label: "Platinum Members Only" },
+    { value: "subscribers", label: "Premium Subscribers Only" },
+    { value: "lifetime", label: "Lifetime Members Only" },
     { value: "purchasers", label: "Users with Purchases" },
     { value: "free", label: "Free Users Only" },
     { value: "corporate_admins", label: "🏢 Corporate Admins Only" },

@@ -7,10 +7,14 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// SmartyGym subscription price IDs
-const SMARTYGYM_PRICE_IDS = [
-  "price_1SJ9q1IxQYg9inGKZzxxqPbD",  // Gold Monthly (€9.99/mo)
-  "price_1SJ9qGIxQYg9inGKFbgqVRjj",  // Platinum Yearly (€89.89/yr)
+// SmartyGym recurring-subscription price IDs (LEGACY).
+// Gold/Platinum subscriptions are no longer offered. The current product
+// is Lifetime Premium, which uses a separate one-off checkout function
+// (create-lifetime-checkout). These IDs are kept here only to detect
+// historical recurring subs when blocking duplicate checkouts.
+const LEGACY_SMARTYGYM_SUBSCRIPTION_PRICE_IDS = [
+  "price_1SJ9q1IxQYg9inGKZzxxqPbD", // [LEGACY] Gold Monthly
+  "price_1SJ9qGIxQYg9inGKFbgqVRjj", // [LEGACY] Platinum Yearly
 ];
 
 const logStep = (step: string, details?: unknown) => {
@@ -31,9 +35,23 @@ serve(async (req) => {
   try {
     const { priceId, cancelPath } = await req.json();
     logStep("Request received", { priceId, cancelPath });
-    
+
     if (!priceId) {
       throw new Error("Price ID is required");
+    }
+
+    // Block any attempt to create a NEW Gold/Platinum subscription.
+    // The recurring subscription products were retired; only Lifetime Premium
+    // (one-time) and Corporate plans are offered going forward.
+    if (LEGACY_SMARTYGYM_SUBSCRIPTION_PRICE_IDS.includes(priceId)) {
+      logStep("Blocked attempt to checkout a retired subscription tier", { priceId });
+      return new Response(JSON.stringify({
+        error: "This subscription plan is no longer offered. Please choose SmartyGym Lifetime Premium instead.",
+        code: "TIER_RETIRED",
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 410,
+      });
     }
 
     const authHeader = req.headers.get("Authorization")!;
@@ -68,10 +86,10 @@ serve(async (req) => {
         expand: ['data.items.data.price']
       });
       
-      // Filter to only SmartyGym subscriptions
+      // Filter to only SmartyGym subscriptions (legacy recurring products).
       const activeSmartyGymSubs = activeSubscriptions.data.filter((sub: { items: { data: { price?: { id?: string } }[] } }) => {
-        const priceId = sub.items.data[0]?.price?.id;
-        return priceId && SMARTYGYM_PRICE_IDS.includes(priceId);
+        const subPriceId = sub.items.data[0]?.price?.id;
+        return subPriceId && LEGACY_SMARTYGYM_SUBSCRIPTION_PRICE_IDS.includes(subPriceId);
       });
       
       if (activeSmartyGymSubs.length > 0) {

@@ -132,7 +132,7 @@ export default function SmartyCorporate() {
     text: "Admin dashboard to manage team members"
   }, {
     icon: Crown,
-    text: "Platinum-level access for all members"
+    text: "Premium access for all members"
   }, {
     icon: Shield,
     text: "1-year subscription period"
@@ -148,18 +148,18 @@ export default function SmartyCorporate() {
   return <>
       <Helmet>
         <title>Smarty Corporate | Team & Business Plans | SmartyGym</title>
-        <meta name="description" content="SmartyGym Corporate plans for teams, businesses, and organizations. Get Platinum access for 10-unlimited team members. Centralized billing, admin dashboard, priority support." />
+        <meta name="description" content="SmartyGym Corporate plans for teams, businesses, and organizations. Get Premium access for 10-unlimited team members. Centralized billing, admin dashboard, priority support." />
         <meta name="keywords" content="corporate fitness, team fitness plan, business gym membership, organization fitness, group fitness subscription, corporate wellness, team training, SmartyGym corporate" />
         
         <meta property="og:title" content="Smarty Corporate | Team & Business Plans | SmartyGym" />
-        <meta property="og:description" content="Corporate fitness plans for teams and businesses. Platinum access for all members with centralized billing." />
+        <meta property="og:description" content="Corporate fitness plans for teams and businesses. Premium access for all members with centralized billing." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://smartygym.com/corporate" />
         
         <link rel="canonical" href="https://smartygym.com/corporate" />
       </Helmet>
 
-      <SEOEnhancer entities={["Corporate Fitness", "Team Membership", "Business Wellness"]} topics={["corporate fitness plans", "team training", "business wellness programs"]} expertise={["corporate wellness", "team fitness management"]} contentType="Corporate Plans" aiSummary="SmartyGym Corporate: Premium fitness access for teams and organizations. Plans from €399/year (10 users) to €699/year (unlimited). All members get Platinum access with admin dashboard for team management." aiKeywords={["corporate fitness", "team membership", "business wellness", "group fitness"]} relatedContent={["Premium Benefits", "Workout Library", "Training Programs"]} targetAudience="businesses and organizations seeking team fitness solutions" pageType="Product" />
+      <SEOEnhancer entities={["Corporate Fitness", "Team Membership", "Business Wellness"]} topics={["corporate fitness plans", "team training", "business wellness programs"]} expertise={["corporate wellness", "team fitness management"]} contentType="Corporate Plans" aiSummary="SmartyGym Corporate: Premium fitness access for teams and organizations. Plans from €399/year (10 users) to €699/year (unlimited). All members get Premium access with admin dashboard for team management." aiKeywords={["corporate fitness", "team membership", "business wellness", "group fitness"]} relatedContent={["Premium Benefits", "Workout Library", "Training Programs"]} targetAudience="businesses and organizations seeking team fitness solutions" pageType="Product" />
 
       <div className="min-h-screen bg-background">
         <main className="container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6 pb-8">
@@ -192,11 +192,11 @@ export default function SmartyCorporate() {
             <CardContent className="prose prose-sm dark:prose-invert max-w-none">
               <p>
                 <span className="text-primary font-semibold">Smarty Corporate</span> is designed for teams, businesses, and organizations that want to provide premium fitness access to their members.
-                With one master account, an administrator can create and manage multiple user accounts, each receiving full Platinum-level access
+                With one master account, an administrator can create and manage multiple user accounts, each receiving full Premium-level access
                 to all <span className="text-primary font-semibold">SmartyGym</span> features including workouts, training programs, daily rituals, and fitness tools.
               </p>
               <p>
-                All team members enjoy the same benefits as individual Platinum subscribers for the duration of the subscription.
+                All team members enjoy the same benefits as individual Premium subscribers for the duration of the subscription.
                 The administrator has access to a dedicated dashboard to manage team members, monitor usage, and control access.
               </p>
               <div className="text-center mt-4 not-prose">
@@ -246,7 +246,7 @@ export default function SmartyCorporate() {
             </CardHeader>
             <CardContent className="text-center">
               <p className="text-sm text-muted-foreground">
-                <strong>All plans include 1-year subscription.</strong> Team members receive Platinum access from the date the administrator purchases the plan until the subscription expires.
+                <strong>All plans include 1-year subscription.</strong> Team members receive Premium access from the date the administrator purchases the plan until the subscription expires.
               </p>
             </CardContent>
           </Card>
@@ -276,7 +276,7 @@ export default function SmartyCorporate() {
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
-                    <span className="text-sm">Platinum access for all</span>
+                    <span className="text-sm">Premium access for all</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
@@ -316,7 +316,7 @@ export default function SmartyCorporate() {
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
-                    <span className="text-sm">Platinum access for all</span>
+                    <span className="text-sm">Premium access for all</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
@@ -356,7 +356,7 @@ export default function SmartyCorporate() {
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
-                    <span className="text-sm">Platinum access for all</span>
+                    <span className="text-sm">Premium access for all</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
@@ -399,7 +399,7 @@ export default function SmartyCorporate() {
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
-                    <span className="text-sm">Platinum access for all</span>
+                    <span className="text-sm">Premium access for all</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />

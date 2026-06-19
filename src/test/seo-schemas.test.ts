@@ -128,13 +128,11 @@ describe("SEO schema generators", () => {
     assertValidSchema(generateHarisFalasSchema(), ["name", "hasCredential"]);
   });
 
-  it("Subscription Product (gold + platinum): valid with offers", () => {
-    for (const plan of ["gold", "platinum"] as const) {
-      const schema = generateSubscriptionProductSchema(plan);
-      assertValidSchema(schema, ["name", "offers"]);
-      expect(schema.offers.priceCurrency).toBe("EUR");
-      expect(Number(schema.offers.price)).toBeGreaterThan(0);
-    }
+  it("Subscription Product (lifetime): valid with offers", () => {
+    const schema = generateSubscriptionProductSchema("lifetime");
+    assertValidSchema(schema, ["name", "offers"]);
+    expect(schema.offers.priceCurrency).toBe("EUR");
+    expect(Number(schema.offers.price)).toBeGreaterThan(0);
   });
 
   it("VideoObject: valid", () => {

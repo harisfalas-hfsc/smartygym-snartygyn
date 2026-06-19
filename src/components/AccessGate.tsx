@@ -159,7 +159,7 @@ export const AccessGate = ({
             </div>
             <h2 className="text-2xl font-bold">Premium Content</h2>
             <p className="text-muted-foreground">
-              This {contentType} is available to Gold and Platinum subscribers.
+              This {contentType} is included with SmartyGym Lifetime Premium.
               {isStandalonePurchase && " You can also purchase it individually."}
             </p>
             <div className="space-y-2 pt-4">

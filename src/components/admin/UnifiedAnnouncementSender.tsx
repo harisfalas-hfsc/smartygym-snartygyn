@@ -98,7 +98,7 @@ export function UnifiedAnnouncementSender() {
     if (userTypeFilter !== "all") {
       if (userTypeFilter === "premium") {
         filtered = filtered.filter(user => 
-          user.plan_type === 'gold' || user.plan_type === 'platinum'
+          ['premium', 'lifetime', 'legacy_premium', 'gold', 'platinum'].includes(user.plan_type)
         );
       } else if (userTypeFilter === "free") {
         filtered = filtered.filter(user => user.plan_type === 'free');
@@ -254,8 +254,8 @@ export function UnifiedAnnouncementSender() {
               <SelectContent>
                 <SelectItem value="all">All Plans</SelectItem>
                 <SelectItem value="free">Free</SelectItem>
-                <SelectItem value="gold">Gold</SelectItem>
-                <SelectItem value="platinum">Platinum</SelectItem>
+                <SelectItem value="premium">Premium</SelectItem>
+                <SelectItem value="lifetime">Lifetime</SelectItem>
               </SelectContent>
             </Select>
 
