@@ -304,8 +304,8 @@ export const ScheduledNotificationsManager = () => {
                   <SelectContent>
                     <SelectItem value="all">All Users</SelectItem>
                     <SelectItem value="subscribers">All Subscribers</SelectItem>
-                    <SelectItem value="gold">Gold Members</SelectItem>
-                    <SelectItem value="platinum">Platinum Members</SelectItem>
+                    <SelectItem value="premium">Premium Members</SelectItem>
+                    <SelectItem value="lifetime">Lifetime Members</SelectItem>
                     <SelectItem value="purchasers">Users with Purchases</SelectItem>
                   </SelectContent>
                 </Select>
