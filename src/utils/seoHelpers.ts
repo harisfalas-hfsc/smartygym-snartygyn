@@ -784,7 +784,7 @@ export const generateCorporateServiceSchema = () => ({
   "@type": "Service",
   "name": "Smarty Corporate - Team Fitness Solutions",
   "alternateName": "SmartyGym Corporate Wellness",
-  "description": "Corporate fitness subscription plans for teams, businesses, and organizations. Centralized billing, team management, and full Platinum access for all members.",
+  "description": "Corporate fitness subscription plans for teams, businesses, and organizations. Centralized billing, team management, and full Premium access for all members.",
   "serviceType": "Corporate Wellness Program",
   "provider": {
     "@type": "Organization",
