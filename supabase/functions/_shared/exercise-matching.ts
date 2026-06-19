@@ -39,7 +39,7 @@ export function repairStaticHoldPrescriptions(
   if (!content) return { processedContent: content || '', repaired };
 
   const processedContent = content.replace(
-    /(\{\{exercise:[^:}]+:([^}]+)\}\}\s*[–-]\s*)(?:(\d+)\s*[×x]\s*(\d+)(?:\s*reps?)?(?!\s*(?:sec|secs|seconds?|s\b|min|mins|minutes?|holds?\b))|(\d+)\s*sets?\s*(?:of|x|×)?\s*(\d+)(?:\s*reps?)?(?!\s*(?:sec|secs|seconds?|s\b|min|mins|minutes?|holds?\b)))/gi,
+    /(\{\{exercise:[^:}]+:([^}]+)\}\}\s*[–-]\s*)(?:(\d+)\s*[×x]\s*(\d+)(?:\s*reps?)?(?!\s*-?\s*(?:sec|secs|seconds?|s\b|min|mins|minutes?|holds?\b))|(\d+)\s*sets?\s*(?:of|x|×)?\s*(\d+)(?:\s*reps?)?(?!\s*-?\s*(?:sec|secs|seconds?|s\b|min|mins|minutes?|holds?\b)))/gi,
     (full, prefix: string, name: string, setsA: string, countA: string, setsB: string, countB: string) => {
       if (!isStaticHoldExerciseName(name)) return full;
       const sets = setsA || setsB;
