@@ -11,6 +11,7 @@ import {
   guaranteeAllExercisesLinked,
   rejectNonLibraryExercises,
   logUnmatchedExercises,
+  repairStaticHoldPrescriptions,
 } from "../_shared/exercise-matching.ts";
 import { normalizeWorkoutHtml, validateWorkoutHtml } from "../_shared/html-normalizer.ts";
 import { validateWodSections } from "../_shared/section-validator.ts";
@@ -612,6 +613,7 @@ serve(async (req) => {
         const reject = rejectNonLibraryExercises(content.main_workout, library, `[WIZ-REJECT]`);
         content.main_workout = reject.processedContent;
         content.main_workout = relinkPlainMinuteParagraphs(content.main_workout, library);
+        content.main_workout = repairStaticHoldPrescriptions(content.main_workout, `[WIZ-HOLD-RX]`).processedContent;
 
         const trulyUnmatched = [...new Set(matched.unmatched)].filter(n =>
           !sweep.forcedMatches.some(f => f.original.toLowerCase() === n.toLowerCase()) &&

@@ -12,6 +12,7 @@ import {
   logUnmatchedExercises,
   guaranteeAllExercisesLinked,
   rejectNonLibraryExercises,
+  repairStaticHoldPrescriptions,
   type ExerciseBasic,
 } from "../_shared/exercise-matching.ts";
 import { normalizeWorkoutHtml } from "../_shared/html-normalizer.ts";
@@ -184,6 +185,7 @@ Deno.serve(async (req) => {
             `${LOG_PREFIX}[${field}-REJECT]`
           );
           updates[field] = rejection.processedContent;
+          updates[field] = repairStaticHoldPrescriptions(updates[field], `${LOG_PREFIX}[${field}-HOLD-RX]`).processedContent;
         }
       }
 

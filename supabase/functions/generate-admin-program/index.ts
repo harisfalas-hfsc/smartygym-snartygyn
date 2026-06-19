@@ -11,6 +11,7 @@ import {
   fetchAndBuildExerciseReference,
   guaranteeAllExercisesLinked,
   rejectNonLibraryExercises,
+  repairStaticHoldPrescriptions,
   type ExerciseBasic,
 } from "../_shared/exercise-matching.ts";
 import { normalizeWorkoutHtml } from "../_shared/html-normalizer.ts";
@@ -142,6 +143,7 @@ RULES:
 - NEVER use <ul>, <li>, or bullet lists. Use <p> with <br> only.
 - EVERY exercise MUST use {{exercise:ID:Name}} from the library — no plain names, no invented exercises.
 - Use the × multiplication sign for sets/reps, not "x".
+- Isometric/static holds MUST be prescribed with seconds (for example 3 × 10-sec holds), never plain reps.
 - Vary exercises week-to-week for proper periodization.
 - Include 1RM Calculator links where percentage-based loading is used.`;
 }
@@ -298,6 +300,7 @@ serve(async (req) => {
     fullSchedule = sweep.processedContent;
     const reject = rejectNonLibraryExercises(fullSchedule, library as ExerciseBasic[], `${LOG}[REJECT]`);
     fullSchedule = reject.processedContent;
+    fullSchedule = repairStaticHoldPrescriptions(fullSchedule, `${LOG}[HOLD-RX]`).processedContent;
 
     // ── 5. Phase instructions + tips (deterministic, no AI) ────────────────
     const construction = buildPhaseInstructions(weeks, body.category);

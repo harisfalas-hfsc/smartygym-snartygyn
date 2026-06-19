@@ -12,6 +12,7 @@ import {
   guaranteeAllExercisesLinked,
   rejectNonLibraryExercises,
   logUnmatchedExercises,
+  repairStaticHoldPrescriptions,
   type ExerciseBasic,
 } from "../_shared/exercise-matching.ts";
 import { normalizeWorkoutHtml, validateWorkoutHtml } from "../_shared/html-normalizer.ts";
@@ -348,6 +349,7 @@ async function generateOne(
 
       const reject = rejectNonLibraryExercises(content.main_workout, library, `[FREE-REJECT][${equipment}]`);
       content.main_workout = reject.processedContent;
+      content.main_workout = repairStaticHoldPrescriptions(content.main_workout, `[FREE-HOLD-RX][${equipment}]`).processedContent;
 
       const trulyUnmatched = [...new Set(matched.unmatched)].filter(n =>
         !sweep.forcedMatches.some(f => f.original.toLowerCase() === n.toLowerCase()) &&
