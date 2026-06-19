@@ -128,10 +128,13 @@ Deno.serve(async (req) => {
         if (dn <= daysPerWeek) titles.push(mm[2].trim());
       }
 
-      // Build exercisesPerDay: prefer reused exercises (rotated across days) then pad
+      // Build compact Week A/B templates: prefer reused exercises (rotated across days) then pad.
+      // The weekly progression rules make this a 4/6/8+ week program; we do NOT
+      // create a new workout for every week.
       const exercisesPerDay: string[][][] = [];
       let bulletTotal = 0;
-      for (let w = 1; w <= weeks; w++) {
+      const templateCount = 2;
+      for (let w = 1; w <= templateCount; w++) {
         const wk: string[][] = [];
         for (let d = 1; d <= daysPerWeek; d++) {
           const title = titles[d - 1] || "Training Day";
