@@ -53,7 +53,31 @@ Deno.test("program picker: static holds are excluded from primary program exerci
   const sidePlankFly = LIBRARY.find((ex) => ex.id === "eq-adv-side-plank-row")!;
 
   assertEquals(equipmentAdvanced.some((ex) => ex.id === "eq-adv-back-lever"), false);
-  assertEquals(buildExerciseBullet(sidePlankFly, "MUSCLE HYPERTROPHY", "Back & Biceps"), "• {{exercise:eq-adv-side-plank-row:dumbbell side plank with rear fly}} – 3 × 10 reps");
+  assertEquals(buildExerciseBullet(sidePlankFly, "MUSCLE HYPERTROPHY", "Back & Biceps"), "• {{exercise:eq-adv-side-plank-row:dumbbell side plank with rear fly}} – 4 × 8–12 reps, tempo 3-1-1, rest 75–90 sec");
+});
+
+Deno.test("program picker: category-first rules block cardio exercises from hypertrophy", () => {
+  const library: LibExercise[] = [
+    { id: "cardio-1", name: "burpee", body_part: "cardio", equipment: "body weight", target: "cardiovascular system", difficulty: "Intermediate" },
+    { id: "chest-1", name: "push up", body_part: "chest", equipment: "body weight", target: "pectorals", difficulty: "Intermediate" },
+    { id: "legs-1", name: "bulgarian split squat", body_part: "upper legs", equipment: "body weight", target: "quads", difficulty: "Intermediate" },
+  ];
+  const pool = filterLibraryForProgram(library, "Bodyweight", "Intermediate", "MUSCLE HYPERTROPHY");
+
+  assertEquals(pool.some((ex) => ex.id === "cardio-1"), false);
+  assertEquals(pool.map((ex) => ex.id).sort(), ["chest-1", "legs-1"]);
+});
+
+Deno.test("program picker: category-first rules keep weight-loss work realistic and skill-free", () => {
+  const library: LibExercise[] = [
+    { id: "skill-1", name: "one arm push up", body_part: "chest", equipment: "body weight", target: "pectorals", difficulty: "Advanced" },
+    { id: "skill-2", name: "full planche", body_part: "chest", equipment: "body weight", target: "pectorals", difficulty: "Advanced" },
+    { id: "wl-1", name: "mountain climber", body_part: "cardio", equipment: "body weight", target: "cardiovascular system", difficulty: "Advanced" },
+    { id: "wl-2", name: "glute bridge", body_part: "upper legs", equipment: "body weight", target: "glutes", difficulty: "Advanced" },
+  ];
+  const pool = filterLibraryForProgram(library, "Bodyweight", "Advanced", "WEIGHT LOSS");
+
+  assertEquals(pool.map((ex) => ex.id).sort(), ["wl-1", "wl-2"]);
 });
 
 Deno.test("exercise matching: post-processing repairs static hold prescriptions only", () => {
