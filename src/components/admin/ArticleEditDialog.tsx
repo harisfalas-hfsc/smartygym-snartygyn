@@ -314,9 +314,6 @@ export const ArticleEditDialog = ({ article, open, onOpenChange, onSave }: Artic
         }
       }
 
-      // Clear draft on successful save
-      clearDraft();
-
       toast({
         title: "Success",
         description: `Article ${article?.id ? "updated" : "created"} successfully`,
@@ -335,22 +332,6 @@ export const ArticleEditDialog = ({ article, open, onOpenChange, onSave }: Artic
 
   return (
     <>
-      <AlertDialog open={showDraftDialog} onOpenChange={setShowDraftDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Draft Found</AlertDialogTitle>
-            <AlertDialogDescription>
-              A draft was found from {savedDraft?.timestamp && new Date(savedDraft.timestamp).toLocaleString()}. 
-              Would you like to restore it?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={discardDraft}>Discard Draft</AlertDialogCancel>
-            <AlertDialogAction onClick={restoreDraft}>Restore Draft</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="w-[95vw] max-w-5xl max-h-[95vh] overflow-y-auto overflow-x-hidden">
           <DialogHeader>
@@ -361,12 +342,6 @@ export const ArticleEditDialog = ({ article, open, onOpenChange, onSave }: Artic
           </DialogHeader>
 
           <div className="space-y-4 pb-4">
-            {draftTimestamp && (
-              <p className="text-xs text-muted-foreground">
-                Draft saved at {new Date(draftTimestamp).toLocaleTimeString()}
-              </p>
-            )}
-            
             <div>
               <Label htmlFor="title">Title *</Label>
               <Input
