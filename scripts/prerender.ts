@@ -127,7 +127,15 @@ function writeLegacyRedirectStubs(
   // refresh + canonical pointing at the new slug URL. Google treats meta
   // refresh 0 with a canonical link as a redirect signal, and visitors get
   // moved instantly client-side.
-  const canonicalPaths = new Set(routePaths.map((p) => (p === "/" ? "/" : `${p}.html`)));
+  const canonicalPaths = new Set<string>();
+  for (const p of routePaths) {
+    if (p === "/") {
+      canonicalPaths.add("/");
+    } else {
+      canonicalPaths.add(`${p}.html`);
+      canonicalPaths.add(`${p}/index.html`);
+    }
+  }
   const written = new Set<string>();
   let count = 0;
   for (const rule of redirects) {
@@ -138,6 +146,7 @@ function writeLegacyRedirectStubs(
       stubSources.add(rule.from);
     } else {
       stubSources.add(`${rule.from}.html`);
+      stubSources.add(`${rule.from}/index.html`);
     }
     for (const src of stubSources) {
       if (canonicalPaths.has(src)) continue; // never overwrite a real canonical page
