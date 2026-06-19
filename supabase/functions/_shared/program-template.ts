@@ -189,12 +189,20 @@ export function buildProgramSkeleton(input: SkeletonInput): string {
   const sep = '<hr class="program-divider" />';
   const out: string[] = [];
 
-  for (let w = 1; w <= weeks; w++) {
-    const objective = weeklyObjectiveFor(category, w, weeks);
-    const phase = phaseLabel(w, weeks);
-    out.push(`<p class="tiptap-paragraph"><strong>📅 WEEK ${w}</strong> <em>(${phase})</em></p>`);
+  out.push(`<p class="tiptap-paragraph"><strong>🎯 Program Goal</strong></p>`);
+  out.push(`<p class="tiptap-paragraph">Complete ${weeks} weeks by repeating only the Week A and Week B workout templates. The weekly progression rules create the full program; the app must not list a brand-new workout for every calendar week.</p>`);
+  out.push(`<p class="tiptap-paragraph"><strong>🧭 Program Instructions</strong></p>`);
+  out.push(`<p class="tiptap-paragraph">${categoryProgressionRule(category)}</p>`);
+  out.push(`<p class="tiptap-paragraph"><strong>📈 Program Progression</strong></p>`);
+  for (const line of progressionLines(weeks, category)) out.push(`<p class="tiptap-paragraph">${line}</p>`);
+  out.push(sep);
+
+  const templates = templateDefinitions(weeks);
+  for (let t = 0; t < templates.length; t++) {
+    const template = templates[t];
+    out.push(`<p class="tiptap-paragraph"><strong>📅 WEEK ${template.key} TEMPLATE</strong> <em>(${template.range})</em></p>`);
     out.push(`<p class="tiptap-paragraph"><strong>🎯 Objective</strong></p>`);
-    out.push(`<p class="tiptap-paragraph">${objective}</p>`);
+    out.push(`<p class="tiptap-paragraph">${template.objective}</p>`);
     out.push(sep);
 
     for (let d = 1; d <= trainingDays; d++) {
@@ -203,8 +211,8 @@ export function buildProgramSkeleton(input: SkeletonInput): string {
       out.push(`<p class="tiptap-paragraph"><strong>${numeral} DAY ${d} – ${title}</strong></p>`);
 
       const dayBullets =
-        exercisesPerDay?.[w - 1]?.[d - 1] && exercisesPerDay[w - 1][d - 1].length
-          ? exercisesPerDay[w - 1][d - 1]
+        exercisesPerDay?.[t]?.[d - 1] && exercisesPerDay[t][d - 1].length
+          ? exercisesPerDay[t][d - 1]
           : defaultSessionTemplate();
 
       for (const line of dayBullets) {
@@ -230,7 +238,7 @@ export function buildProgramSkeleton(input: SkeletonInput): string {
       out.push(sep);
     }
 
-    if (w < weeks) out.push(`<p class="tiptap-paragraph"></p>`);
+    if (t < templates.length - 1) out.push(`<p class="tiptap-paragraph"></p>`);
   }
 
   return out.join("\n");
