@@ -149,10 +149,12 @@ export function RevenueAnalytics() {
               revenueByMonth[month] = { premium: 0, standalone: 0, personal_training: 0, corporate: 0 };
             }
 
+            // Legacy gold/platinum revenue: use the historical Stripe prices
+            // for analytics only (those products are no longer offered).
             const monthlyRevenue = isPaid
               ? (sub.plan_type === "lifetime" ? SUBSCRIPTION_PRICES.lifetime
-                : sub.plan_type === "gold" ? SUBSCRIPTION_PRICES.gold
-                : sub.plan_type === "platinum" ? SUBSCRIPTION_PRICES.platinum : 0)
+                : sub.plan_type === "gold" ? 9.99
+                : sub.plan_type === "platinum" ? 89.89 : 0)
               : 0;
 
             if (isPaid) {
