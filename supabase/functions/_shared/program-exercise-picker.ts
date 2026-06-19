@@ -474,10 +474,8 @@ export function buildDayBullets(
   const tier = tierOf(difficulty);
   const counts = exerciseCountsFor(tier);
   const totalNeeded = counts.main + counts.finisher;
-  const selectionPool = category.toUpperCase().includes("WEIGHT LOSS")
-    ? weightLossSelectionPool(library, totalNeeded)
-    : library;
-  const picks = pickExercisesForDay(selectionPool, dayTitle, weekIndex, dayIndex, totalNeeded);
+  const selectionPool = categorySelectionPool(library, category, totalNeeded, difficulty);
+  const picks = pickExercisesForDay(selectionPool, dayTitle, weekIndex, dayIndex, totalNeeded, category, difficulty);
   const mainPicks = picks.slice(0, counts.main);
   const finisherPicks = picks.slice(counts.main, counts.main + counts.finisher);
 
@@ -518,6 +516,7 @@ export function filterLibraryForProgram(
   library: LibExercise[],
   equipment: string,
   difficulty?: string,
+  category = "",
 ): LibExercise[] {
   const equipLower = (equipment || "").toLowerCase();
   let pool = library;
@@ -527,9 +526,10 @@ export function filterLibraryForProgram(
     pool = pool.filter((ex) => !isBodyweightExercise(ex));
   }
   pool = pool.filter(excludesStaticHolds);
+  pool = pool.filter((ex) => excludesSkillExercises(ex, difficulty));
   if (difficulty) {
     const targetDiff = difficulty.toLowerCase();
     pool = pool.filter((ex) => (ex.difficulty || "").toLowerCase() === targetDiff);
   }
-  return pool;
+  return categorySelectionPool(pool, category, 1, difficulty);
 }
