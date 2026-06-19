@@ -39,7 +39,7 @@ export const socialMediaStrategy: StrategyDay[] = [
   { day: 15, instagram: "Expert Design", facebook: "Why Expert Design", tiktok: "Expert vs Random", contentTitle: "Why Expert-Designed?" },
   { day: 16, instagram: "Problem Post", facebook: "The Fitness Problem", tiktok: "Fitness Confusion", contentTitle: "The Problem We Solve" },
   { day: 17, instagram: "WOD Philosophy", facebook: "WOD Science", tiktok: "WOD Deep Dive", contentTitle: "WOD Philosophy" },
-  { day: 18, instagram: "Plans Comparison", facebook: "Gold vs Platinum", tiktok: "Which Plan?", contentTitle: "Gold vs Platinum" },
+  { day: 18, instagram: "Lifetime Premium", facebook: "Lifetime Premium", tiktok: "Why Lifetime?", contentTitle: "Lifetime Premium" },
   { day: 19, instagram: "Exercise Library", facebook: "Library Preview", tiktok: "Exercise Library Tour", contentTitle: "Exercise Library" },
   { day: 20, instagram: "Goals Feature", facebook: "Goal Setting", tiktok: "Goals Tutorial", contentTitle: "Set Your Goals" },
   { day: 21, instagram: "Community Love", facebook: "Leaderboards", tiktok: "Community Vibe", contentTitle: "Join the Community" },
