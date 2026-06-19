@@ -87,6 +87,13 @@ function formatSessionLine(line: string): string {
   return `• ${text}`;
 }
 
+const BLANK = `<p class="tiptap-paragraph"></p>`;
+
+function pushSection(out: string[], html: string) {
+  if (out.length > 0 && out[out.length - 1] !== BLANK) out.push(BLANK);
+  out.push(html);
+}
+
 function defaultSessionTemplate(): string[] {
   return [
     "<em>Template session — coach the intent, execution standard, and fatigue target for this day.</em>",
@@ -193,26 +200,28 @@ export function buildProgramSkeleton(input: SkeletonInput): string {
   const sep = '<hr class="program-divider" />';
   const out: string[] = [];
 
-  out.push(`<p class="tiptap-paragraph"><strong>🎯 Program Goal</strong></p>`);
+  pushSection(out, `<p class="tiptap-paragraph"><strong>🎯 Program Goal</strong></p>`);
   out.push(`<p class="tiptap-paragraph">Complete ${weeks} weeks by repeating only the Week A and Week B workout templates. The weekly progression rules create the full program; the app must not list a brand-new workout for every calendar week.</p>`);
-  out.push(`<p class="tiptap-paragraph"><strong>🧭 Program Instructions</strong></p>`);
+  pushSection(out, `<p class="tiptap-paragraph"><strong>🧭 Program Instructions</strong></p>`);
   out.push(`<p class="tiptap-paragraph">${categoryProgressionRule(category)}</p>`);
-  out.push(`<p class="tiptap-paragraph"><strong>📈 Program Progression</strong></p>`);
+  pushSection(out, `<p class="tiptap-paragraph"><strong>📈 Program Progression</strong></p>`);
   for (const line of progressionLines(weeks, category)) out.push(`<p class="tiptap-paragraph">${line}</p>`);
+  out.push(BLANK);
   out.push(sep);
 
   const templates = templateDefinitions(weeks);
   for (let t = 0; t < templates.length; t++) {
     const template = templates[t];
-    out.push(`<p class="tiptap-paragraph"><strong>📅 WEEK ${template.key} TEMPLATE</strong> <em>(${template.range})</em></p>`);
-    out.push(`<p class="tiptap-paragraph"><strong>🎯 Objective</strong></p>`);
+    pushSection(out, `<p class="tiptap-paragraph"><strong>📅 WEEK ${template.key} TEMPLATE</strong> <em>(${template.range})</em></p>`);
+    pushSection(out, `<p class="tiptap-paragraph"><strong>🎯 Objective</strong></p>`);
     out.push(`<p class="tiptap-paragraph">${template.objective}</p>`);
+    out.push(BLANK);
     out.push(sep);
 
     for (let d = 1; d <= trainingDays; d++) {
       const numeral = DAY_NUMERALS[d - 1] || `${d}.`;
       const title = titles[d - 1] || "Training Day";
-      out.push(`<p class="tiptap-paragraph"><strong>${numeral} DAY ${d} – ${title}</strong></p>`);
+      pushSection(out, `<p class="tiptap-paragraph"><strong>${numeral} DAY ${d} – ${title}</strong></p>`);
 
       const dayBullets =
         exercisesPerDay?.[t]?.[d - 1] && exercisesPerDay[t][d - 1].length
@@ -221,24 +230,28 @@ export function buildProgramSkeleton(input: SkeletonInput): string {
 
       for (const line of dayBullets) {
         const text = formatSessionLine(line);
+        if (text.startsWith("<strong>") && out[out.length - 1] !== BLANK) out.push(BLANK);
         out.push(`<p class="tiptap-paragraph">${text}</p>`);
       }
+      out.push(BLANK);
       out.push(sep);
     }
 
     // Recovery day (always present if trainingDays < 7)
     const recoveryDay = trainingDays + 1;
     if (recoveryDay <= totalDays) {
-      out.push(`<p class="tiptap-paragraph"><strong>😴 DAY ${recoveryDay} – Active Recovery</strong></p>`);
+      pushSection(out, `<p class="tiptap-paragraph"><strong>😴 DAY ${recoveryDay} – Active Recovery</strong></p>`);
       out.push(`<p class="tiptap-paragraph">• Walking</p>`);
       out.push(`<p class="tiptap-paragraph">• Mobility</p>`);
       out.push(`<p class="tiptap-paragraph">• Stretching</p>`);
+      out.push(BLANK);
       out.push(sep);
     }
 
     // Rest days
     for (let r = recoveryDay + 1; r <= totalDays; r++) {
-      out.push(`<p class="tiptap-paragraph"><strong>🏁 DAY ${r} – Rest</strong></p>`);
+      pushSection(out, `<p class="tiptap-paragraph"><strong>🏁 DAY ${r} – Rest</strong></p>`);
+      out.push(BLANK);
       out.push(sep);
     }
 
