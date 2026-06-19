@@ -88,7 +88,7 @@ export function normalizeWorkoutHtml(content: string): string {
 
 function enforceProgramSectionSpacing(html: string): string {
   if (!html) return html;
-  const majorHeaderPattern = /<p class="tiptap-paragraph"><strong>(?:🎯 Program Goal|🧭 Program Instructions|📈 Program Progression|📅 WEEK [AB] TEMPLATE|🎯 Objective|[①②③④⑤⑥] DAY \d+|😴 DAY \d+|🏁 DAY \d+|🔥 Soft Tissue Preparation|⚡ Activation \/ Warm-Up|🏋 Main Workout|💥 Finisher|🧘 Cool Down)/gi;
+  const majorHeaderPattern = /<p class="tiptap-paragraph"><strong>(?:🎯 Program Goal|🧭 Program Instructions|📈 Program Progression|📅 WEEK [AB] TEMPLATE|🎯 Objective|[①②③④⑤⑥] DAY \d+|😴 DAY \d+|🏁 DAY \d+|Estimated session time|🔥 Soft Tissue Preparation|⚡ Activation \/ Warm-Up|🏋 Main Workout|💥 Finisher|🧘 Cool Down)/gi;
   let result = html.replace(majorHeaderPattern, (match, offset, full) => {
     if (offset === 0) return match;
     const before = full.slice(Math.max(0, offset - CANONICAL_EMPTY_P.length), offset);
