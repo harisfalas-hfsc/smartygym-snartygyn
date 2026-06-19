@@ -24,7 +24,7 @@ const APPARATUS_DEPENDENT_BODYWEIGHT: RegExp[] = [
   /chin-?up/i,
   /front\s*lever/i,
   /hanging/i,
-  /muscle-?up/i,
+  /muscle[-\s]*up/i,
   /\bdip(s)?\b/i,
   /parallel\s*bars?/i,
   /\brings?\b/i,
@@ -36,23 +36,69 @@ const APPARATUS_DEPENDENT_BODYWEIGHT: RegExp[] = [
   /\bbox\b/i,
 ];
 
-const ELITE_SKILL_PATTERNS: RegExp[] = [
-  /muscle-?up/i,
+const ABSOLUTE_SKILL_PATTERNS: RegExp[] = [
+  /muscle[-\s]*up/i,
   /planche/i,
   /maltese/i,
   /one\s*arm\s*push/i,
   /handstand\s*push/i,
-  /pistol/i,
+  /^handstand$/i,
   /iron\s*cross/i,
   /front\s*lever/i,
   /back\s*lever/i,
-  /flag/i,
+  /human\s*flag|\bflag\b/i,
   /archer\s*push/i,
+  /clock\s*push/i,
+  /single\s*arm\s*push|one\s*hand\s*push/i,
+  /one\s*hand\s*pull/i,
+  /sissy\s*squat/i,
+  /stalder/i,
+  /skin\s*the\s*cat/i,
+  /\bv-?sit\b/i,
+  /pike\s*push/i,
 ];
 
-const REALISTIC_WEIGHT_LOSS_PATTERNS: RegExp[] = [
-  /squat|lunge|push\s*up|incline\s*push|glute\s*bridge|mountain\s*climber|plank|jumping\s*jack|high\s*knee|bear\s*crawl|burpee|dead\s*bug|bird\s*dog|step|walk|run|crunch|sit\s*up|bridge|crawl/i,
-];
+const CONDITIONAL_ADVANCED_SKILL_PATTERNS: RegExp[] = [/pistol|one\s*leg\s*squat/i];
+
+type CategoryRule = {
+  preferred: RegExp[];
+  forbidden: RegExp[];
+  allowCardioBodyPart?: boolean;
+  rejectCardioBodyPart?: boolean;
+};
+
+const CATEGORY_RULES: Record<string, CategoryRule> = {
+  "CARDIO ENDURANCE": {
+    allowCardioBodyPart: true,
+    preferred: [/walk|run|jog|step|jump\s*rope|rope|mountain\s*climber|jumping\s*jack|high\s*knee|burpee|bear\s*crawl|squat|lunge|push\s*up|skater|fast\s*feet|bike|row|elliptical|ski\s*erg|cardio/i],
+    forbidden: [/sissy\s*squat|pistol|one\s*leg\s*squat|bench\s*press|deadlift|max|heavy|curl|triceps?\s*extension|calf\s*raise/i],
+  },
+  "WEIGHT LOSS": {
+    allowCardioBodyPart: true,
+    preferred: [/squat|lunge|push\s*up|incline\s*push|step|mountain\s*climber|jumping\s*jack|high\s*knee|burpee|bear\s*crawl|dead\s*bug|glute\s*bridge|plank|skater|fast\s*feet|walk|run|jog|bike|row|swing|thruster|crawl/i],
+    forbidden: [/sissy\s*squat|pistol|one\s*leg\s*squat|max|heavy|one\s*rep|bench\s*press|leg\s*press|preacher\s*curl|concentration\s*curl/i],
+  },
+  "FUNCTIONAL STRENGTH": {
+    rejectCardioBodyPart: true,
+    preferred: [/push\s*up|pull\s*up|chin\s*up|\bdip\b|split\s*squat|lunge|single\s*leg\s*rdl|rdl|deadlift|plank|side\s*plank|bear\s*crawl|goblet\s*squat|kettlebell|dumbbell\s*row|row|bench\s*press|floor\s*press|shoulder\s*press|farmer|carry|squat|press|hinge/i],
+    forbidden: [/jumping\s*jack|high\s*knee|mountain\s*climber|burpee|skater|fast\s*feet|run|jog|elliptical|bike/i],
+  },
+  "MUSCLE HYPERTROPHY": {
+    rejectCardioBodyPart: true,
+    preferred: [/press|bench|row|pulldown|pull\s*up|chin\s*up|\bdip\b|squat|split\s*squat|bulgarian|rdl|deadlift|leg\s*press|shoulder\s*press|curl|extension|raise|fly|glute\s*bridge|push\s*up|lat|chest|biceps|triceps|quad|hamstring/i],
+    forbidden: [/tabata|amrap|emom|burpee|jumping\s*jack|high\s*knee|mountain\s*climber|skater|fast\s*feet|run|jog|bike|elliptical|pistol|one\s*leg\s*squat/i],
+  },
+  "LOW BACK PAIN": {
+    rejectCardioBodyPart: true,
+    preferred: [/dead\s*bug|bird\s*dog|mcgill|curl\s*up|glute\s*bridge|pallof|side\s*plank|cat\s*camel|cat\s*cow|hip|breathing|plank|stability|mobility|stretch|pelvic|child/i],
+    forbidden: [/burpee|jump|sprint|run|box|thruster|snatch|clean|swing|high\s*knee|mountain\s*climber|jack|heavy|deadlift|good\s*morning|hyperextension/i],
+  },
+  "MOBILITY & STABILITY": {
+    rejectCardioBodyPart: true,
+    preferred: [/world.?s\s*greatest\s*stretch|90\/?90|thoracic|rotation|deep\s*squat|single\s*leg\s*balance|bird\s*dog|dead\s*bug|hip\s*airplane|shoulder|ankle|mobility|stretch|balance|cat\s*cow|cat\s*camel|circle|cars?|plank|stability/i],
+    forbidden: [/burpee|sprint|run|jump|box|thruster|snatch|clean|swing|high\s*knee|mountain\s*climber|jack|heavy/i],
+  },
+};
 
 const DAY_FOCUS_KEYWORDS: Record<string, { body_part?: string[]; target?: string[]; name?: string[] }> = {
   "lower body": { body_part: ["upper legs", "lower legs", "legs", "hips"] },
@@ -159,14 +205,46 @@ function excludesStaticHolds(ex: LibExercise): boolean {
   return !isStaticHoldExercise(ex);
 }
 
-function excludesEliteSkills(ex: LibExercise): boolean {
-  return !ELITE_SKILL_PATTERNS.some((pattern) => pattern.test(ex.name || ""));
+function isAdvancedTier(difficulty?: string | null): boolean {
+  return tierOf(difficulty) === "Advanced";
 }
 
-function weightLossSelectionPool(library: LibExercise[], needed: number): LibExercise[] {
-  const safe = library.filter(excludesEliteSkills);
-  const realistic = safe.filter((ex) => REALISTIC_WEIGHT_LOSS_PATTERNS.some((pattern) => pattern.test(ex.name || "")));
-  return realistic.length >= needed ? realistic : safe;
+function isSkillExercise(ex: LibExercise, difficulty?: string | null): boolean {
+  const name = ex.name || "";
+  if (ABSOLUTE_SKILL_PATTERNS.some((pattern) => pattern.test(name))) return true;
+  if (CONDITIONAL_ADVANCED_SKILL_PATTERNS.some((pattern) => pattern.test(name))) return true;
+  return false;
+}
+
+function excludesSkillExercises(ex: LibExercise, difficulty?: string | null): boolean {
+  return !isSkillExercise(ex, difficulty);
+}
+
+function ruleForCategory(category: string): CategoryRule | null {
+  const cat = (category || "").toUpperCase();
+  const key = Object.keys(CATEGORY_RULES).find((k) => cat.includes(k));
+  return key ? CATEGORY_RULES[key] : null;
+}
+
+function exerciseSearchText(ex: LibExercise): string {
+  return `${ex.name || ""} ${ex.body_part || ""} ${ex.target || ""} ${ex.description || ""}`;
+}
+
+function matchesCategoryRule(ex: LibExercise, category: string): boolean {
+  const rule = ruleForCategory(category);
+  if (!rule) return true;
+  const text = exerciseSearchText(ex);
+  if (rule.forbidden.some((pattern) => pattern.test(text))) return false;
+  if (rule.rejectCardioBodyPart && (ex.body_part || "").toLowerCase() === "cardio") return false;
+  if (rule.allowCardioBodyPart && (ex.body_part || "").toLowerCase() === "cardio") return true;
+  return rule.preferred.some((pattern) => pattern.test(text));
+}
+
+function categorySelectionPool(library: LibExercise[], category: string, needed: number, difficulty?: string | null): LibExercise[] {
+  const safe = library.filter((ex) => excludesSkillExercises(ex, difficulty));
+  if (!ruleForCategory(category)) return safe;
+  const categoryMatched = safe.filter((ex) => matchesCategoryRule(ex, category));
+  return categoryMatched;
 }
 
 function defaultPrescription(category: string, dayTitle: string): string {
@@ -174,8 +252,8 @@ function defaultPrescription(category: string, dayTitle: string): string {
   const title = dayTitle.toLowerCase();
   if (cat.includes("HYPERTROPHY")) return "4 × 8–12 reps, tempo 3-1-1, rest 75–90 sec";
   if (cat.includes("FUNCTIONAL STRENGTH")) return "4 × 6–10 reps, rest 90 sec";
-  if (cat.includes("CARDIO") || title.includes("interval") || title.includes("conditioning")) return "3 rounds × 45 sec work / 15 sec transition, rest 90 sec after each round";
   if (cat.includes("WEIGHT LOSS") || title.includes("metabolic")) return "3 rounds × 40 sec work / 20 sec transition, rest 90 sec after each round";
+  if (cat.includes("CARDIO") || title.includes("interval") || title.includes("conditioning")) return "3 rounds × 45 sec work / 15 sec transition, rest 90 sec after each round";
   if (cat.includes("MOBILITY") || cat.includes("LOW BACK")) return "2–3 × 10–12 controlled reps, rest 45 sec";
   return "3 × 10–12 reps, rest 60 sec";
 }
@@ -207,10 +285,14 @@ export function pickExercisesForDay(
   weekIndex: number,
   dayIndex: number,
   n: number,
+  category = "",
+  difficulty?: string | null,
 ): LibExercise[] {
   if (!library.length) return [];
-  const matched = library.filter((ex) => matchesFocus(ex, dayTitle));
-  const pool = matched.length >= n ? matched : [...matched, ...library.filter((ex) => !matched.some((m) => m.id === ex.id))];
+  const categoryPool = categorySelectionPool(library, category, n, difficulty);
+  const matched = categoryPool.filter((ex) => matchesFocus(ex, dayTitle));
+  const fallbackPool = categoryPool.length ? categoryPool : library.filter((ex) => excludesSkillExercises(ex, difficulty));
+  const pool = matched.length > 0 ? matched : fallbackPool;
   // Deterministic rotation so weeks vary but stay stable for the same input
   const seed = (weekIndex * 31 + dayIndex * 7) % Math.max(pool.length, 1);
   const candidates = Array.from({ length: pool.length }, (_, i) => pool[(seed + i) % pool.length]);
@@ -402,10 +484,8 @@ export function buildDayBullets(
   const tier = tierOf(difficulty);
   const counts = exerciseCountsFor(tier);
   const totalNeeded = counts.main + counts.finisher;
-  const selectionPool = category.toUpperCase().includes("WEIGHT LOSS")
-    ? weightLossSelectionPool(library, totalNeeded)
-    : library;
-  const picks = pickExercisesForDay(selectionPool, dayTitle, weekIndex, dayIndex, totalNeeded);
+  const selectionPool = categorySelectionPool(library, category, totalNeeded, difficulty);
+  const picks = pickExercisesForDay(selectionPool, dayTitle, weekIndex, dayIndex, totalNeeded, category, difficulty);
   const mainPicks = picks.slice(0, counts.main);
   const finisherPicks = picks.slice(counts.main, counts.main + counts.finisher);
 
@@ -446,6 +526,7 @@ export function filterLibraryForProgram(
   library: LibExercise[],
   equipment: string,
   difficulty?: string,
+  category = "",
 ): LibExercise[] {
   const equipLower = (equipment || "").toLowerCase();
   let pool = library;
@@ -455,9 +536,17 @@ export function filterLibraryForProgram(
     pool = pool.filter((ex) => !isBodyweightExercise(ex));
   }
   pool = pool.filter(excludesStaticHolds);
-  if (difficulty) {
-    const targetDiff = difficulty.toLowerCase();
-    pool = pool.filter((ex) => (ex.difficulty || "").toLowerCase() === targetDiff);
-  }
-  return pool;
+  pool = pool.filter((ex) => excludesSkillExercises(ex, difficulty));
+  const hasCategoryRule = !!ruleForCategory(category);
+  const categoryPool = categorySelectionPool(pool, category, 1, difficulty);
+  const intentPool = categoryPool.length ? categoryPool : pool;
+  if (!difficulty) return intentPool;
+
+  const targetDiff = difficulty.toLowerCase();
+  const exactDifficultyPool = intentPool.filter((ex) => (ex.difficulty || "").toLowerCase() === targetDiff);
+  if (!hasCategoryRule) return exactDifficultyPool;
+  // Category intent is safer than forcing an exact DB difficulty label. If the
+  // exact-level pool is too small, use same-category movements from easier
+  // tiers and progress them with volume, density, load, or control.
+  return exactDifficultyPool.length >= 24 ? exactDifficultyPool : intentPool;
 }

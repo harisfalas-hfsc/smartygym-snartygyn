@@ -170,7 +170,7 @@ serve(async (req) => {
     const { exercises: rawLibrary } =
       await fetchAndBuildExerciseReference(supabase, "[WIZ-PROG]", equipFilter, difficultyText.toLowerCase());
     if (!rawLibrary || rawLibrary.length === 0) throw new Error("No exercises available for this equipment/difficulty.");
-    const library: LibExercise[] = filterLibraryForProgram(rawLibrary as LibExercise[], equipment, difficultyText);
+    const library: LibExercise[] = filterLibraryForProgram(rawLibrary as LibExercise[], equipment, difficultyText, body.category);
     log("Library filtered", { remaining: library.length });
 
     // ── 1. Name (cheap AI) ─────────────────────────────────────────────────
