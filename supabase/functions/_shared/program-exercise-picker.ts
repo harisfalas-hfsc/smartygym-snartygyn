@@ -535,12 +535,14 @@ export function filterLibraryForProgram(
   }
   pool = pool.filter(excludesStaticHolds);
   pool = pool.filter((ex) => excludesSkillExercises(ex, difficulty));
+  const hasCategoryRule = !!ruleForCategory(category);
   const categoryPool = categorySelectionPool(pool, category, 1, difficulty);
   const intentPool = categoryPool.length ? categoryPool : pool;
   if (!difficulty) return intentPool;
 
   const targetDiff = difficulty.toLowerCase();
   const exactDifficultyPool = intentPool.filter((ex) => (ex.difficulty || "").toLowerCase() === targetDiff);
+  if (!hasCategoryRule) return exactDifficultyPool;
   // Category intent is safer than forcing an exact DB difficulty label. If the
   // exact-level pool is too small, use same-category movements from easier
   // tiers and progress them with volume, density, load, or control.
