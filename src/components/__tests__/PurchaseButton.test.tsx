@@ -132,7 +132,8 @@ describe('PurchaseButton', () => {
         price={29.99}
       /></TestWrapper>);
 
-    expect(getByText(/Sign in to Purchase/i)).toBeInTheDocument();
+    // Guest sees the regular purchase button; clicking it triggers auth redirect.
+    expect(getByText(/Purchase for €29.99/i)).toBeInTheDocument();
   });
 
   it('formats price correctly', () => {
