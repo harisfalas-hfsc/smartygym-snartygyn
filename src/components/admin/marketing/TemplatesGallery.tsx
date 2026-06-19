@@ -11,8 +11,6 @@ import { exportToInstagram, INSTAGRAM_SIZES, InstagramSize } from "@/utils/insta
 import { HumanNotAICompositeTemplate } from "../instagram/composite/HumanNotAICompositeTemplate";
 import { HomeHeroCompositeTemplate } from "../instagram/composite/HomeHeroCompositeTemplate";
 import { FullHeroCompositeTemplate } from "../instagram/composite/FullHeroCompositeTemplate";
-import { GoldPlanCompositeTemplate } from "../instagram/composite/GoldPlanCompositeTemplate";
-import { PlatinumPlanCompositeTemplate } from "../instagram/composite/PlatinumPlanCompositeTemplate";
 import { ServicesOverviewCompositeTemplate } from "../instagram/composite/ServicesOverviewCompositeTemplate";
 import { WorkoutCategoriesCompositeTemplate } from "../instagram/composite/WorkoutCategoriesCompositeTemplate";
 import { ProgramCategoriesCompositeTemplate } from "../instagram/composite/ProgramCategoriesCompositeTemplate";
@@ -23,8 +21,6 @@ import { ExerciseLibraryCardTemplate } from "../instagram/services/ExerciseLibra
 import { OneRMCardTemplate } from "../instagram/services/OneRMCardTemplate";
 import { BMRCardTemplate } from "../instagram/services/BMRCardTemplate";
 import { MacroCardTemplate } from "../instagram/services/MacroCardTemplate";
-import { GoldPlanCardTemplate } from "../instagram/services/GoldPlanCardTemplate";
-import { PlatinumPlanCardTemplate } from "../instagram/services/PlatinumPlanCardTemplate";
 import { RealExpertiseCardTemplate } from "../instagram/brand/RealExpertiseCardTemplate";
 import { PersonalTouchCardTemplate } from "../instagram/brand/PersonalTouchCardTemplate";
 import { NotARobotCardTemplate } from "../instagram/brand/NotARobotCardTemplate";
@@ -98,8 +94,6 @@ const allTemplates: Template[] = [
   { id: "full-hero", name: "Complete Hero", component: FullHeroCompositeTemplate },
   { id: "home-hero", name: "Homepage Hero", component: HomeHeroCompositeTemplate },
   { id: "human-not-ai", name: "100% Human. 0% AI.", component: HumanNotAICompositeTemplate },
-  { id: "gold-plan-composite", name: "Gold Plan (Full)", component: GoldPlanCompositeTemplate },
-  { id: "platinum-plan-composite", name: "Platinum Plan (Full)", component: PlatinumPlanCompositeTemplate },
   { id: "services-overview", name: "Services Overview", component: ServicesOverviewCompositeTemplate },
   { id: "workout-categories", name: "Workout Categories", component: WorkoutCategoriesCompositeTemplate },
   { id: "program-categories", name: "Program Categories", component: ProgramCategoriesCompositeTemplate },
@@ -127,8 +121,6 @@ const allTemplates: Template[] = [
   { id: "1rm-calc", name: "1RM Calculator", component: OneRMCardTemplate },
   { id: "bmr-calc", name: "BMR Calculator", component: BMRCardTemplate },
   { id: "macro-tracker", name: "Macro Tracker", component: MacroCardTemplate },
-  { id: "gold-plan", name: "Gold Plan", component: GoldPlanCardTemplate },
-  { id: "platinum-plan", name: "Platinum Plan", component: PlatinumPlanCardTemplate },
   // Brand
   { id: "real-expertise", name: "Real Expertise", component: RealExpertiseCardTemplate },
   { id: "personal-touch", name: "Personal Touch", component: PersonalTouchCardTemplate },
