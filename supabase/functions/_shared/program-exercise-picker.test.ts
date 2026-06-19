@@ -1,5 +1,5 @@
 import { assert, assertEquals } from "https://deno.land/std@0.224.0/assert/mod.ts";
-import { buildExerciseReferenceList } from "./exercise-matching.ts";
+import { buildExerciseReferenceList, repairStaticHoldPrescriptions } from "./exercise-matching.ts";
 import { buildExerciseBullet, filterLibraryForProgram, pickExercisesForDay, type LibExercise } from "./program-exercise-picker.ts";
 
 const LIBRARY: LibExercise[] = [
@@ -54,4 +54,12 @@ Deno.test("program picker: static holds use timed hold prescriptions, not plain 
 
   assertEquals(buildExerciseBullet(backLever, "MUSCLE HYPERTROPHY", "Back & Biceps"), "• {{exercise:eq-adv-back-lever:back lever}} – 3 × 10-sec holds");
   assertEquals(buildExerciseBullet(sidePlankFly, "MUSCLE HYPERTROPHY", "Back & Biceps"), "• {{exercise:eq-adv-side-plank-row:dumbbell side plank with rear fly}} – 3 × 10 reps");
+});
+
+Deno.test("exercise matching: post-processing repairs static hold prescriptions only", () => {
+  const html = `<p>• {{exercise:3297:back lever}} – 3 × 10</p><p>• {{exercise:3664:dumbbell side plank with rear fly}} – 3 × 10</p>`;
+  const repaired = repairStaticHoldPrescriptions(html).processedContent;
+
+  assert(repaired.includes("{{exercise:3297:back lever}} – 3 × 10-sec holds"));
+  assert(repaired.includes("{{exercise:3664:dumbbell side plank with rear fly}} – 3 × 10"));
 });
