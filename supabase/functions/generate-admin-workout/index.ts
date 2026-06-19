@@ -709,7 +709,7 @@ serve(async (req) => {
           generate_unique_image: true,
           is_free: access === "free",
           is_premium: access === "premium",
-          tier_required: access === "premium" ? (body.tier_required || "gold") : "",
+          tier_required: access === "premium" ? (body.tier_required || "premium") : "",
           is_standalone_purchase: access === "standalone",
           price: access === "standalone" ? String(body.price ?? "") : "",
           stripe_product_id: "",

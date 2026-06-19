@@ -1,73 +1,75 @@
-# Welcome to your Lovable project
+# SmartyGym
 
-## Project info
+100% Human, 0% AI. Expert-led fitness platform designed by Haris Falas.
 
-**URL**: https://lovable.dev/projects/f0bf7ae7-990c-4724-b9e4-b9150ef73d37
+## Tech Stack
+- **Frontend:** React 18, Vite 5, Tailwind CSS v3, TypeScript 5.
+- **Backend:** Supabase (Auth, DB, Storage, Edge Functions).
+- **Payments:** Stripe (Checkouts, Webhooks, Customer Portal).
+- **Mobile:** Capacitor (Native iOS/Android shells).
+- **Deployment:** Lovable Cloud / Netlify.
 
-## How can I edit this code?
+## Getting Started
 
-There are several ways of editing your application.
+### Local Development
+1. **Clone & Install:**
+   ```bash
+   git clone <repo-url>
+   cd smartygym
+   bun install
+   ```
+2. **Environment Variables:**
+   The project uses auto-managed Supabase variables. For local overrides, create a `.env.local`:
+   ```env
+   VITE_SUPABASE_URL=...
+   VITE_SUPABASE_ANON_KEY=...
+   ```
+3. **Run Dev Server:**
+   ```bash
+   bun run dev
+   ```
 
-**Use Lovable**
+## Key Infrastructure
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/f0bf7ae7-990c-4724-b9e4-b9150ef73d37) and start prompting.
+### Stripe Configuration
+The project uses a **Lifetime Premium** model (€89.99).
+- Active Price ID: `price_1ThP4MIxQYg9inGKAUQEJ0tD`
+- Webhooks must be pointed to: `https://<project>.supabase.co/functions/v1/stripe-webhook`
 
-Changes made via Lovable will be committed automatically to this repo.
+### Admin Management
+Roles are managed via the `user_roles` table. To grant admin access:
+```sql
+INSERT INTO user_roles (user_id, role) VALUES ('user-uuid', 'admin');
+```
+Admins gain access to the `/admin` dashboard and bypass most RLS restrictions via the `has_role` and `has_premium_subscription` functions.
 
-**Use your preferred IDE**
+### Edge Functions
+Deploy functions via Supabase CLI:
+```bash
+supabase functions deploy <function-name>
+```
+Remember to set secrets for `STRIPE_SECRET_KEY`, `RESEND_API_KEY`, and `STRIPE_WEBHOOK_SECRET`.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Mobile Support
+The app is Capacitor-ready.
+- **Build:** `npm run build`
+- **Sync:** `npx cap sync`
+- **Checkout:** Note that mobile checkouts open in the system browser to comply with platform policies.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## Security
+- **RLS:** Row Level Security is enabled on EVERY table. No data is accessible without a valid JWT matching the policy.
+- **Secrets:** Never commit `.env` files. Private keys live only in Supabase Edge Function secrets.
 
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+## Testing
+Run the test suite:
+```bash
+bunx vitest run
 ```
 
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/f0bf7ae7-990c-4724-b9e4-b9150ef73d37) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## Launch Readiness Audit Documentation
+For a deep dive into the system's architecture and readiness for production, see the following audit files:
+- [SECURITY_AUDIT.md](./SECURITY_AUDIT.md) — Secrets, RLS, and logging posture.
+- [PAYMENT_FLOW.md](./PAYMENT_FLOW.md) — Stripe products, webhooks, and legacy support.
+- [BACKEND_FUNCTION_MAP.md](./BACKEND_FUNCTION_MAP.md) — Comprehensive list of Edge Functions and triggers.
+- [MOBILE_READINESS_REPORT.md](./MOBILE_READINESS_REPORT.md) — Capacitor, PWA, and Mobile Checkout strategy.
+- [LAUNCH_CHECKLIST.md](./LAUNCH_CHECKLIST.md) — Final Go/No-Go verification list.

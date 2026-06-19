@@ -128,13 +128,8 @@ serve(async (req) => {
 
       switch (recipientFilter) {
         case 'subscribers':
-          recipientQuery = recipientQuery.in('plan_type', ['gold', 'platinum']);
-          break;
-        case 'gold':
-          recipientQuery = recipientQuery.eq('plan_type', 'gold');
-          break;
-        case 'platinum':
-          recipientQuery = recipientQuery.eq('plan_type', 'platinum');
+        case 'premium':
+          recipientQuery = recipientQuery.in('plan_type', ['lifetime','premium','legacy_premium']);
           break;
         case 'free':
           recipientQuery = recipientQuery.eq('plan_type', 'free');

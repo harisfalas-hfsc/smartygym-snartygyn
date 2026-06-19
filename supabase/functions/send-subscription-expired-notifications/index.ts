@@ -81,7 +81,8 @@ serve(async (req) => {
 
       const userEmail = userData.user.email;
       const userName = userData.user.user_metadata?.full_name || "Smarty";
-      const planName = plan_type === "gold" ? "Gold" : "Platinum";
+      const getPlanName = (pt: string) => "Premium";
+      const planName = getPlanName(plan_type);
       const expiredDate = new Date(current_period_end).toLocaleDateString("en-US", {
         year: "numeric",
         month: "long",

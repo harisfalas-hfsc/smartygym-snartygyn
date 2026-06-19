@@ -85,13 +85,13 @@ serve(async (req: Request) => {
             const { data: usersData } = await supabase.functions.invoke('get-users-with-emails');
             const allUsers = usersData?.users || [];
             recipientEmails = allUsers
-              .filter((u: any) => u.plan_type === 'gold' || u.plan_type === 'platinum')
+              .filter((u: any) => ['lifetime','premium','legacy_premium'].includes(u.plan_type))
               .map((u: any) => u.email);
-          } else if (email.target_audience === "gold" || email.target_audience === "platinum") {
+          } else if (email.target_audience === "premium") {
             const { data: usersData } = await supabase.functions.invoke('get-users-with-emails');
             const allUsers = usersData?.users || [];
             recipientEmails = allUsers
-              .filter((u: any) => u.plan_type === email.target_audience)
+              .filter((u: any) => ['lifetime','premium','legacy_premium'].includes(u.plan_type))
               .map((u: any) => u.email);
           } else if (email.target_audience === "purchasers") {
             // Get users with purchases
