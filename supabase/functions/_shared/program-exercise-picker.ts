@@ -274,6 +274,186 @@ export function buildExerciseBullet(ex: LibExercise, category: string, dayTitle:
   return `• {{exercise:${ex.id}:${ex.name}}} – ${prescriptionForExercise(ex, category, dayTitle)}`;
 }
 
+// ═══════════════════════════════════════════════════════════════════════════════
+// CATEGORY-DRIVEN WORKOUT PROTOCOL (AMRAP / CIRCUIT / TABATA / EMOM / SETS & REPS / HOLDS)
+// Each daily Main Workout inside a training program must follow a real workout
+// protocol selected from the program category — exactly like our standalone
+// workouts. Prescription ALWAYS appears BEFORE the {{exercise:ID:Name}} token.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export type ProtocolStyle =
+  | "AMRAP"
+  | "CIRCUIT"
+  | "TABATA"
+  | "EMOM"
+  | "FOR TIME"
+  | "INTERVALS"
+  | "REPS & SETS"
+  | "HOLDS";
+
+interface CategoryProtocol {
+  main: ProtocolStyle;
+  mainIntro: string;
+  finisher: ProtocolStyle;
+  finisherIntro: string;
+}
+
+function rotate<T>(list: T[], index: number): T {
+  return list[(index - 1 + list.length) % list.length];
+}
+
+/**
+ * Pick the protocol the daily Main Workout must follow.
+ * Rotates across Week A vs Week B for variety, but never violates the
+ * category's "Never use" rules (LOW BACK / MOBILITY = SETS & REPS / HOLDS only).
+ */
+export function categoryProtocol(category: string, weekIndex: number): CategoryProtocol {
+  const cat = (category || "").toUpperCase();
+
+  if (cat.includes("CARDIO")) {
+    const main = rotate<ProtocolStyle>(["AMRAP", "EMOM", "INTERVALS", "CIRCUIT"], weekIndex);
+    return {
+      main,
+      mainIntro:
+        main === "AMRAP"
+          ? "20-minute AMRAP — complete as many rounds as possible at a sustainable aerobic pace."
+          : main === "EMOM"
+            ? "20-minute EMOM — at the top of every minute perform the prescribed reps, rest the remainder."
+            : main === "INTERVALS"
+              ? "6 rounds × 3 min work / 1 min easy recovery — hold a strong-but-sustainable Zone 3–4 effort."
+              : "5 rounds for quality — 60 sec work / 30 sec transition, rest 90 sec after each full round.",
+      finisher: "FOR TIME",
+      finisherIntro: "Finisher for time (10-minute cap) — steady aerobic pace, scale reps before scaling form.",
+    };
+  }
+
+  if (cat.includes("WEIGHT LOSS")) {
+    const main = rotate<ProtocolStyle>(["CIRCUIT", "TABATA", "EMOM", "AMRAP"], weekIndex);
+    return {
+      main,
+      mainIntro:
+        main === "TABATA"
+          ? "Tabata blocks — 8 rounds × 20 sec work / 10 sec rest per exercise, 60 sec rest between exercises."
+          : main === "EMOM"
+            ? "16-minute EMOM — alternate exercises every minute, hit prescribed reps, rest the remainder."
+            : main === "AMRAP"
+              ? "18-minute AMRAP — keep moving, scale reps before form, breathe steadily."
+              : "5 rounds × 40 sec work / 20 sec rest per station, rest 90 sec between rounds.",
+        finisher: "TABATA",
+        finisherIntro: "Finisher Tabata — 4-minute block, 8 rounds × 20 sec work / 10 sec rest, alternate the two exercises.",
+    };
+  }
+
+  if (cat.includes("HYPERTROPHY")) {
+    return {
+      main: "REPS & SETS",
+      mainIntro: "Hypertrophy block — controlled tempo, 1–2 reps in reserve on every working set.",
+      finisher: "REPS & SETS",
+      finisherIntro: "Accessory finisher — high-rep pump work, focus on the working muscle, strict form.",
+    };
+  }
+
+  if (cat.includes("FUNCTIONAL STRENGTH")) {
+    const main = rotate<ProtocolStyle>(["REPS & SETS", "REPS & SETS", "CIRCUIT"], weekIndex);
+    return {
+      main,
+      mainIntro:
+        main === "CIRCUIT"
+          ? "Strength circuit — 4 rounds, perform every exercise back-to-back, rest 90 sec after each full round."
+          : "Sets and reps — heavy compound work, full rest, every rep technically perfect.",
+      finisher: "FOR TIME",
+      finisherIntro: "Finisher for time (8-minute cap) — practical strength density, stop if form breaks.",
+    };
+  }
+
+  if (cat.includes("LOW BACK")) {
+    return {
+      main: "REPS & SETS",
+      mainIntro: "Sets and reps only — every rep must be pain-free. Reduce range before reducing load. No circuits, AMRAPs, EMOMs, Tabata, HIIT, jumps, sprints, burpees, or box jumps.",
+      finisher: "REPS & SETS",
+      finisherIntro: "Stability finisher — sets and reps only, breathe through every rep, stop the moment quality drops.",
+    };
+  }
+
+  if (cat.includes("MOBILITY")) {
+    return {
+      main: "HOLDS",
+      mainIntro: "Sets, reps, and timed holds only — never AMRAP, EMOM, circuit, Tabata, HIIT, burpees, sprints, jumps, or metabolic circuits.",
+      finisher: "HOLDS",
+      finisherIntro: "Cool-down holds — controlled breathing, no forcing depth or speed.",
+    };
+  }
+
+  // Default: balanced strength + conditioning
+  return {
+    main: "REPS & SETS",
+    mainIntro: "Sets and reps — controlled tempo, full rest between working sets.",
+    finisher: "AMRAP",
+    finisherIntro: "Finisher AMRAP (6-minute cap) — sustainable pace, stop the round if form breaks.",
+  };
+}
+
+function protocolMainPrescription(style: ProtocolStyle, ex: LibExercise, slotIndex: number, category: string, dayTitle: string): string {
+  const token = `{{exercise:${ex.id}:${ex.name}}}`;
+  const isHold = isStaticHoldExercise(ex);
+
+  switch (style) {
+    case "AMRAP":
+      if (isHold) return `• 20 sec ${token}`;
+      return `• 12 reps ${token}`;
+    case "CIRCUIT":
+      if (isHold) return `• 30 sec ${token}`;
+      return `• 40 sec ${token}`;
+    case "TABATA":
+      if (isHold) return `• 8 rounds × 20 sec hold ${token} / 10 sec rest`;
+      return `• 8 rounds × 20 sec ${token} / 10 sec rest`;
+    case "EMOM":
+      if (isHold) return `• Min ${slotIndex} — 30 sec hold ${token}`;
+      return `• Min ${slotIndex} — 12 reps ${token}`;
+    case "FOR TIME":
+      if (isHold) return `• 60 sec accumulated hold ${token}`;
+      return `• 30 reps ${token}`;
+    case "INTERVALS":
+      if (isHold) return `• 3 min × 30 sec hold ${token} / 30 sec easy`;
+      return `• 3 min steady effort ${token}`;
+    case "HOLDS":
+      return `• 2 × 30 sec ${token}`;
+    case "REPS & SETS":
+    default:
+      if (isHold) {
+        const cat = category.toUpperCase();
+        if (cat.includes("FUNCTIONAL STRENGTH")) return `• 4 sets × 15 sec hold ${token} — rest 60 sec`;
+        if (cat.includes("HYPERTROPHY")) return `• 3 sets × 20 sec hold ${token} — rest 45 sec`;
+        if (cat.includes("LOW BACK") || cat.includes("MOBILITY")) return `• 2 sets × 30 sec ${token} — rest 45 sec`;
+        return `• 3 sets × 20 sec hold ${token} — rest 45 sec`;
+      }
+      const cat = category.toUpperCase();
+      if (cat.includes("HYPERTROPHY")) return `• 4 sets × 10 reps ${token} — tempo 3-1-1, rest 75 sec`;
+      if (cat.includes("FUNCTIONAL STRENGTH")) return `• 4 sets × 6 reps ${token} — rest 120 sec`;
+      if (cat.includes("LOW BACK")) return `• 3 sets × 10 reps ${token} — pain-free range, rest 60 sec`;
+      if (cat.includes("MOBILITY")) return `• 2 sets × 10 reps ${token} — full controlled range, rest 45 sec`;
+      return `• 3 sets × 10 reps ${token} — rest 60 sec`;
+  }
+}
+
+function protocolFinisherPrescription(style: ProtocolStyle, ex: LibExercise, category: string): string {
+  const token = `{{exercise:${ex.id}:${ex.name}}}`;
+  const isHold = isStaticHoldExercise(ex);
+  switch (style) {
+    case "AMRAP":
+      return isHold ? `• 20 sec ${token}` : `• 10 reps ${token}`;
+    case "TABATA":
+      return isHold ? `• 8 rounds × 20 sec hold ${token} / 10 sec rest` : `• 8 rounds × 20 sec ${token} / 10 sec rest`;
+    case "FOR TIME":
+      return isHold ? `• 45 sec accumulated hold ${token}` : `• 20 reps ${token}`;
+    case "HOLDS":
+      return `• 2 × 30 sec ${token}`;
+    case "REPS & SETS":
+    default:
+      return isHold ? `• 3 × 20 sec hold ${token} — rest 30 sec` : `• 3 × 12 reps ${token} — rest 45 sec`;
+  }
+}
+
 /**
  * Pick `n` exercises from `library` that best match `dayTitle`.
  * Deterministic seed: uses (week, day) indices to vary picks across weeks while
@@ -491,12 +671,16 @@ export function buildDayBullets(
 
   const mainTimeWindow = tier === "Beginner" ? "22–28 minutes" : tier === "Advanced" ? "40–50 minutes" : "30–38 minutes";
 
+  // Category-driven workout protocol (AMRAP / CIRCUIT / TABATA / EMOM / SETS & REPS / HOLDS)
+  // chosen exactly like our standalone workouts. Prescription always BEFORE the token.
+  const proto = categoryProtocol(category, weekIndex);
+
   const mainBullets = mainPicks.length
-    ? mainPicks.map((ex) => buildExerciseBullet(ex, category, dayTitle))
+    ? mainPicks.map((ex, i) => protocolMainPrescription(proto.main, ex, i + 1, category, dayTitle))
     : Array.from({ length: counts.main }, (_, i) => `• Exercise ${i + 1} — sets × reps, rest period`);
 
   const finisherBullets = finisherPicks.length
-    ? finisherPicks.map((ex) => buildExerciseBullet(ex, category, dayTitle))
+    ? finisherPicks.map((ex) => protocolFinisherPrescription(proto.finisher, ex, category))
     : [sessionFinisher(category, dayTitle)];
 
   return [
@@ -506,9 +690,11 @@ export function buildDayBullets(
     ...softTissueLines(category),
     "<strong>⚡ Activation / Warm-Up — 6–8 minutes</strong>",
     ...activationLines(category, dayTitle),
-    `<strong>🏋 Main Workout — ${mainTimeWindow}</strong>`,
+    `<strong>🏋 Main Workout (${proto.main}) — ${mainTimeWindow}</strong>`,
+    `<em>${proto.mainIntro}</em>`,
     ...mainBullets,
-    "<strong>💥 Finisher — 4–8 minutes</strong>",
+    `<strong>💥 Finisher (${proto.finisher}) — 4–8 minutes</strong>`,
+    `<em>${proto.finisherIntro}</em>`,
     ...finisherBullets,
     "<strong>🧘 Cool Down — 5 minutes</strong>",
     ...coolDownLines(category),
