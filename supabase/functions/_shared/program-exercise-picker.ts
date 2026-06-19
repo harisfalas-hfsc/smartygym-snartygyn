@@ -36,6 +36,24 @@ const APPARATUS_DEPENDENT_BODYWEIGHT: RegExp[] = [
   /\bbox\b/i,
 ];
 
+const ELITE_SKILL_PATTERNS: RegExp[] = [
+  /muscle-?up/i,
+  /planche/i,
+  /maltese/i,
+  /one\s*arm\s*push/i,
+  /handstand\s*push/i,
+  /pistol/i,
+  /iron\s*cross/i,
+  /front\s*lever/i,
+  /back\s*lever/i,
+  /flag/i,
+  /archer\s*push/i,
+];
+
+const REALISTIC_WEIGHT_LOSS_PATTERNS: RegExp[] = [
+  /squat|lunge|push\s*up|incline\s*push|glute\s*bridge|mountain\s*climber|plank|jumping\s*jack|high\s*knee|bear\s*crawl|burpee|dead\s*bug|bird\s*dog|step|walk|run|crunch|sit\s*up|bridge|crawl/i,
+];
+
 const DAY_FOCUS_KEYWORDS: Record<string, { body_part?: string[]; target?: string[]; name?: string[] }> = {
   "lower body": { body_part: ["upper legs", "lower legs", "legs", "hips"] },
   "upper body": { body_part: ["chest", "back", "upper arms", "shoulders"] },
@@ -139,6 +157,16 @@ function isStaticHoldExercise(ex: LibExercise): boolean {
 
 function excludesStaticHolds(ex: LibExercise): boolean {
   return !isStaticHoldExercise(ex);
+}
+
+function excludesEliteSkills(ex: LibExercise): boolean {
+  return !ELITE_SKILL_PATTERNS.some((pattern) => pattern.test(ex.name || ""));
+}
+
+function weightLossSelectionPool(library: LibExercise[], needed: number): LibExercise[] {
+  const safe = library.filter(excludesEliteSkills);
+  const realistic = safe.filter((ex) => REALISTIC_WEIGHT_LOSS_PATTERNS.some((pattern) => pattern.test(ex.name || "")));
+  return realistic.length >= needed ? realistic : safe;
 }
 
 function defaultPrescription(category: string, dayTitle: string): string {
@@ -374,7 +402,10 @@ export function buildDayBullets(
   const tier = tierOf(difficulty);
   const counts = exerciseCountsFor(tier);
   const totalNeeded = counts.main + counts.finisher;
-  const picks = pickExercisesForDay(library, dayTitle, weekIndex, dayIndex, totalNeeded);
+  const selectionPool = category.toUpperCase().includes("WEIGHT LOSS")
+    ? weightLossSelectionPool(library, totalNeeded)
+    : library;
+  const picks = pickExercisesForDay(selectionPool, dayTitle, weekIndex, dayIndex, totalNeeded);
   const mainPicks = picks.slice(0, counts.main);
   const finisherPicks = picks.slice(counts.main, counts.main + counts.finisher);
 
