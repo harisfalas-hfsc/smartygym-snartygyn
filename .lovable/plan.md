@@ -1,45 +1,91 @@
-I can fix this. The current system is too weak because it only adds review warnings; it still lets a bad generated draft reach the editor and be saved.
+## Goal
 
-Revised plan:
+Make every Training Program — existing, AI-generated, and admin-created — follow ONE standardized structure that mirrors the attached gold-standard `90-Day Mass Protocol` document.
 
-1. Add a hard generation contract for the full workout structure
-- Validate every required section before delivery: Soft Tissue Preparation, Activation, Main Workout, Finisher, Cool Down.
-- Soft Tissue Preparation must be foam rolling / lacrosse ball / tennis ball / trigger-point / self-massage / release work only.
-- Soft Tissue Preparation must not contain `{{exercise:...}}` tokens and must not contain stretches, mobility drills, squats, presses, lunges, bridges, jumps, or other exercise movements.
-- Activation, Main Workout, Finisher, and Cool Down must use valid library exercise tokens where exercises appear.
+## The Standardized Format
 
-2. Add strict exercise-token validation
-- Fail the draft if any exercise-bearing section still contains plain exercise names instead of `{{exercise:ID:Name}}`.
-- Fail the draft if any token uses a fake/slug ID like `bird-dog`, `glute-bridge`, or `jumping-jacks` instead of a real exercise-library ID.
-- Fail the draft if a token ID exists but the name does not match the actual library exercise.
-- Fail Main Workout and Finisher if any exercise has no measurable prescription before the token.
+Each program will follow this exact skeleton, generated once and stored in `weekly_schedule`:
 
-3. Make generation self-repair before returning
-- Keep the existing matcher, final sweep, and non-library replacement.
-- After repair, run the new hard contract.
-- If the contract fails, return an error and do not deliver the workout draft as “ready”.
-- This prevents a broken workout from being accepted silently after credits are spent.
+```
+📅 WEEK 1
+🎯 Objective
+<one sentence specific to category + week phase>
 
-4. Block saving broken generated workouts
-- Add the same contract check in the admin workout save flow before inserting into `admin_workouts`.
-- If a generated or manually edited workout still has missing/broken exercise links, invalid Soft Tissue content, fake IDs, or unsafe prescription structure, the save stops with a clear error.
-- This closes the current gap where `needs_review` is deleted before saving.
+① DAY 1 – <Day Title>
+• {{exercise:ID:Name}} – sets × reps
+• ...
 
-5. Tighten the exact failure cases from these two workouts
-- Cover prescriptions before exercise names like `5 sets × 5 reps Handstand Push-up`.
-- Cover activation/cooldown fake IDs like `{{exercise:bird-dog:Bird Dog}}`.
-- Cover glued output like `{{exercise:forearm-plank:Forearm Plank}}30 sec`.
-- Cover finisher/main plain exercise names that should have eye buttons.
-- Cover Soft Tissue lines that accidentally contain exercise movements instead of foam/ball release work.
+② DAY 2 – <Day Title>
+• ...
 
-6. Add regression tests
-- Edge-function tests for the generation contract and exercise linker.
-- Tests proving Soft Tissue is foam-only and rejects exercise markup/movement content.
-- Tests proving fake exercise IDs are rejected.
-- Tests proving Main Workout and Finisher cannot pass with plain exercise names or missing prescriptions.
-- Existing reader eye test remains, but the main protection moves upstream where bad content is created.
+(...up to days_per_week, with circled numbers ①②③④⑤⑥)
 
-7. Deploy and verify
-- Run the relevant frontend tests and edge-function tests.
-- Deploy the changed edge function(s).
-- Test `generate-admin-workout` directly and confirm broken drafts are rejected instead of delivered.
+😴 DAY <N+1> – Active Recovery
+• Walking
+• Mobility
+• Stretching
+
+🏁 DAY 7 – Rest
+(repeat rest lines if fewer training days)
+```
+
+- Repeated for every week (1 → `weeks`).
+- `program_structure` becomes a clean phase summary (Foundation → Progressive Overload → Peak → Final Challenge), NOT exercises.
+- `progression_plan` becomes the `📝 INSTRUCTIONS` block (general guidelines + periodization explanation).
+- A new optional `tips` paragraph (already supported via existing fields) holds the `💡 TIPS` block.
+- Exercises ALWAYS use `{{exercise:ID:Name}}` markup so the eye icon appears. Bodyweight programs → only `equipment = body weight` library exercises. Equipment programs → prioritize matching equipment.
+
+## Scope of Changes
+
+### 1. New shared module `supabase/functions/_shared/program-template.ts`
+- `buildProgramSkeleton({ category, weeks, daysPerWeek, equipment, difficulty })` → returns the WEEK/DAY/RECOVERY/REST skeleton as a string with placeholders.
+- `buildPhaseInstructions(weeks)` → returns the periodization block (`Foundation` 1‑3, `Progressive Overload` mid, `Deload` near 2/3, `Peak`, `Final Challenge`).
+- Category → day-title presets (Functional Strength, Hypertrophy, Cardio Endurance, Weight Loss, Mobility & Stability, Low Back Pain). The titles are *suggestions* the AI/admin can overwrite.
+- Equipment filter helper used by both AI generation and library selection.
+
+### 2. AI generator (`supabase/functions/generate-admin-program/index.ts`)
+- Replace freeform prompt with a STRICT contract: model receives the pre-built week-by-week skeleton and must fill in exercises ONLY using a pre-selected pool of `{{exercise:ID:Name}}` tokens (filtered by category + equipment + difficulty from `public.exercises`).
+- Post-process: validate every line in `weekly_schedule` matches `^• \{\{exercise:.+?\}\} – .+$` OR is a recovery/rest bullet. Strip stray prose. Run `guaranteeAllExercisesLinked` + `rejectNonLibraryExercises`.
+- Write outputs to: `weekly_schedule` (the weeks), `program_structure` (phase summary), `progression_plan` (instructions), and append tips to `progression_plan` under a `💡 TIPS` heading.
+
+### 3. Admin editor (`src/components/admin/ProgramEditDialog.tsx`)
+- Add a "Standardized Training Program Format" button (sibling of any existing template button, mirroring the Workout Editor).
+- Clicking it reads `weeks` + `days_per_week` from the current form values and inserts the skeleton (same builder, ported to TS in `src/utils/programTemplate.ts`) into the `weekly_schedule` field. Other fields remain fully editable.
+- Exercise insertion already uses the existing rich-text exercise picker → the eye icon is preserved.
+
+### 4. Frontend display (`src/pages/IndividualTrainingProgram.tsx` + `WorkoutDisplay` reuse)
+- Ensure the renderer respects line breaks, bullets, and the WEEK/DAY headings so spacing matches the gold standard on desktop and mobile. Reuse the existing `workout-content` wrapper styles for typography rhythm.
+
+### 5. Migration of the 28 existing programs
+- New edge function `restructure-training-programs` (admin-only):
+  - For each program in `admin_training_programs`, read existing `weekly_schedule`/`program_structure`.
+  - Extract any already-linked `{{exercise:ID:Name}}` tokens (preserve all current library links — no exercise loss).
+  - Rebuild `weekly_schedule` using the skeleton; redistribute the preserved exercises across the days, padding with library picks (filtered by category + equipment) if a day has fewer than 4 exercises.
+  - Rebuild `program_structure` (phases) and `progression_plan` (instructions + tips).
+  - Run `reprocess-program-exercises` pipeline at the end so every exercise stays linked.
+- Triggered once from the admin panel (or via curl) — no auto-cron.
+
+### 6. Tests
+- `supabase/functions/_shared/program-template.test.ts`: skeleton shape per (weeks × days_per_week) matrix, category title presets, equipment filter rejects non-bodyweight when category is bodyweight.
+- Generator contract test: invalid exercises are stripped; freeform prose is rejected.
+
+## What is NOT changing
+
+- Database schema (no migration needed — same columns).
+- North-Star copy, hero, navigation, theme, WOD pipeline, HFSC, workouts pipeline.
+- Pricing, access control, Stripe, leaderboards.
+
+## Verification
+
+- Run `supabase--test_edge_functions` on `generate-admin-program` + `_shared/program-template`.
+- Vitest on `src/utils/programTemplate.ts` and the editor template insertion.
+- Manually trigger `restructure-training-programs` for one program (`90-Day Mass Protocol` or whichever Hypertrophy/12-week exists), screenshot the result, then run it for all 28.
+
+## Order of execution
+
+1. Build `_shared/program-template.ts` + `src/utils/programTemplate.ts` + tests.
+2. Wire the editor button.
+3. Update `generate-admin-program` to use the skeleton + strict contract.
+4. Build `restructure-training-programs` edge function.
+5. Run it on ONE program → verify visually → run on all 28.
+6. Deploy + smoke test.

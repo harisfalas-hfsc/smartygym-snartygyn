@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { A4Container } from "@/components/ui/a4-container";
 import { normalizeWorkoutHtml } from "@/utils/htmlNormalizer";
+import { buildProgramSkeleton, buildPhaseInstructions, buildDefaultTips } from "@/utils/programTemplate";
 
 const PROGRAM_CATEGORIES = [
   "CARDIO ENDURANCE",
@@ -667,9 +668,38 @@ export const ProgramEditDialog = ({ program, open, onOpenChange, onSave }: Progr
 
           {/* 7. Training Program Content - Single Box with Exercise Search */}
           <div className="space-y-2">
-            <Label htmlFor="training_program">7. Training Program</Label>
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+              <Label htmlFor="training_program">7. Training Program</Label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const skeleton = buildProgramSkeleton({
+                    category: formData.category,
+                    weeks: formData.weeks,
+                    daysPerWeek: formData.days_per_week,
+                  });
+                  const instructions = buildPhaseInstructions(formData.weeks, formData.category);
+                  const tips = buildDefaultTips(formData.category);
+                  setFormData({
+                    ...formData,
+                    training_program: skeleton,
+                    construction: formData.construction?.trim() ? formData.construction : instructions,
+                    final_tips: formData.final_tips?.trim() ? formData.final_tips : tips,
+                  });
+                  toast({
+                    title: "Standardized template applied",
+                    description: `${formData.weeks} weeks × ${formData.days_per_week} training days. Replace each "Exercise" bullet with a library exercise.`,
+                  });
+                }}
+                disabled={!formData.category || !formData.weeks || !formData.days_per_week}
+              >
+                Standardized Training Program Format
+              </Button>
+            </div>
             <p className="text-sm text-muted-foreground">
-              Enter the complete training program content. Use the Exercises button in toolbar to add linked exercises.
+              Enter the complete training program content. Click "Standardized Training Program Format" to insert the WEEK/OBJECTIVE/DAYS skeleton, then use the Exercises button in the toolbar to add linked exercises from the library.
             </p>
             <A4Container>
               <RichTextEditor
