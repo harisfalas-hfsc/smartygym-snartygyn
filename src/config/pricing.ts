@@ -1,20 +1,20 @@
-// CORRECT PRICES from actual Stripe products
-// These are the REAL prices - not invented numbers
+// ============================================================
+// SmartyGym pricing — single source of truth.
+// We sell ONE membership today: Lifetime Premium (€89.99 one-time).
+// Plus standalone purchases and Corporate plans.
+//
+// Gold (€9.99/mo) and Platinum (€89.89/yr) are LEGACY products that
+// remain in Stripe for historical/refund handling but are NOT offered
+// for new purchases. Never reference them in new code paths.
+// ============================================================
 
 export const SUBSCRIPTION_PRICES = {
-  gold: 9.99,        // €9.99/month
-  platinum: 89.89,   // €89.89/year (NOT monthly!)
-  lifetime: 89.99,   // €89.99 one-time lifetime membership
+  lifetime: 89.99, // €89.99 one-time lifetime membership
 } as const;
 
-// ============================================================
-// STRIPE PRICE IDs — single source of truth
-// Update here when prices change in Stripe.
+// Stripe price IDs — single source of truth.
 // Edge functions have their own copy (Deno cannot import from src/).
-// ============================================================
 export const STRIPE_PRICE_IDS = {
-  gold:     'price_1SJ9q1IxQYg9inGKZzxxqPbD', // Gold Monthly €9.99
-  platinum: 'price_1SJ9qGIxQYg9inGKFbgqVRjj', // Platinum Yearly €89.89
   lifetime: 'price_1ThP4MIxQYg9inGKAUQEJ0tD', // Lifetime One-Time €89.99
 
   // Corporate plans
@@ -27,9 +27,14 @@ export const STRIPE_PRICE_IDS = {
 export type StripePlanKey = keyof typeof STRIPE_PRICE_IDS;
 
 export const SUBSCRIPTION_BILLING_PERIODS = {
-  gold: 'monthly',
-  platinum: 'yearly',
   lifetime: 'one-time',
+} as const;
+
+// Legacy Stripe price IDs — kept for webhook/refund recognition only.
+// Do NOT use these to initiate new checkouts.
+export const LEGACY_STRIPE_PRICE_IDS = {
+  gold:     'price_1SJ9q1IxQYg9inGKZzxxqPbD',
+  platinum: 'price_1SJ9qGIxQYg9inGKFbgqVRjj',
 } as const;
 
 export const CORPORATE_PRICES = {
@@ -42,9 +47,9 @@ export const CORPORATE_PRICES = {
 // Stripe Product IDs for SmartyGym products only
 // Used to filter Stripe revenue to only SmartyGym sales
 export const OUR_STRIPE_PRODUCT_IDS = [
-  // Subscription products
-  'prod_TFfAcybp438BH6', // Smarty Gym Gold Plan
-  'prod_TFfAPp1tq7RdUk', // Smarty Gym Platinum Plan
+  // Legacy subscription products (no longer offered; kept for revenue/refund analytics)
+  'prod_TFfAcybp438BH6', // [LEGACY] Smarty Gym Gold Plan
+  'prod_TFfAPp1tq7RdUk', // [LEGACY] Smarty Gym Platinum Plan
   // Lifetime membership (one-time)
   'prod_UgmdX60UPJxWeS', // Smarty Gym Lifetime Membership
   // Corporate products
