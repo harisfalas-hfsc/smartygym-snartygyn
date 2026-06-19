@@ -10,7 +10,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import { requireAdminOrServiceRole } from "../_shared/admin-or-service-auth.ts";
 import { buildProgramSkeleton, buildPhaseInstructions, buildDefaultTips } from "../_shared/program-template.ts";
-import { buildDayBullets, filterLibraryForProgram, type LibExercise } from "../_shared/program-exercise-picker.ts";
+import { buildDayBullets, buildExerciseBullet, filterLibraryForProgram, type LibExercise } from "../_shared/program-exercise-picker.ts";
 import { normalizeWorkoutHtml } from "../_shared/html-normalizer.ts";
 import {
   guaranteeAllExercisesLinked,
@@ -76,7 +76,7 @@ Deno.serve(async (req) => {
     while (true) {
       const { data, error } = await supabase
         .from("exercises")
-        .select("id, name, body_part, equipment, target, difficulty")
+        .select("id, name, body_part, equipment, target, difficulty, description")
         .range(from, from + 999);
       if (error) throw error;
       if (!data || !data.length) break;
@@ -133,7 +133,7 @@ Deno.serve(async (req) => {
           if (usedQueue.length) {
             const swap = usedQueue.shift()!;
             reusedUsed++;
-            picks[0] = `• {{exercise:${swap.id}:${swap.name}}} – ${picks[0].split("–")[1]?.trim() || "3 × 10"}`;
+            picks[0] = buildExerciseBullet(swap, p.category, title);
           }
           wk.push(picks);
           bulletTotal += picks.length;
