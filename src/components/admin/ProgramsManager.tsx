@@ -11,6 +11,7 @@ import { Plus, Edit, Trash2, Eye, EyeOff, Search, Download, Filter, Bot, User, C
 import { useToast } from "@/hooks/use-toast";
 import { ProgramEditDialog } from "./ProgramEditDialog";
 import { ContentCreationWizard, WizardResult } from "./ContentCreationWizard";
+import { getProgramCategorySlug } from "@/lib/seo-slugs";
 
 interface Program {
   id: string;
@@ -630,7 +631,7 @@ export const ProgramsManager = ({ externalDialog, setExternalDialog }: ProgramsM
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => window.open(`/training-program/${program.id}`, '_blank')}
+                          onClick={() => window.open(`/trainingprogram/${getProgramCategorySlug(program.category)}/${program.id}`, '_blank')}
                           title="Preview"
                         >
                           <Eye className="h-4 w-4" />
