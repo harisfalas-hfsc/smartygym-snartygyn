@@ -68,26 +68,6 @@ function difficultyLabel(stars: number) {
   return "Beginner";
 }
 
-function buildCondensedReference(exercises: ExerciseBasic[]): string {
-  const grouped: Record<string, Array<{ id: string; name: string }>> = {};
-  for (const ex of exercises) {
-    const key = `${ex.target || "GENERAL"} / ${ex.body_part || "GENERAL"}`.toUpperCase();
-    (grouped[key] ||= []).push({ id: ex.id, name: ex.name });
-  }
-  const lines: string[] = [
-    "EXERCISE LIBRARY (use ONLY these — format {{exercise:ID:Exact Name}}):",
-    "═══════════════════════════════════════════════════════════════════════",
-  ];
-  for (const key of Object.keys(grouped).sort()) {
-    lines.push(`[${key}]`);
-    for (const ex of grouped[key].sort((a, b) => a.name.localeCompare(b.name))) {
-      lines.push(`  ${ex.id} | ${ex.name}`);
-    }
-  }
-  lines.push("", "Write EVERY exercise as {{exercise:ID:Exact Name}}. No plain names.");
-  return lines.join("\n");
-}
-
 // Admin wizard uses Pro for stronger instruction-following on long prompts
 // (library-first rules, sets×reps math, M-3 format). Flash kept as fallback
 // only if Pro rate-limits/errors. All prompts/rules unchanged.
@@ -122,63 +102,6 @@ async function callAI(apiKey: string, system: string, user: string, maxTokens = 
     }
   }
   return null;
-}
-
-function buildScheduleSystemPrompt(exerciseRef: string, philosophy: string): string {
-  return `You are an expert fitness coach building a training program in the M-3 GOLD STANDARD format.
-
-${exerciseRef}
-
-${philosophy}
-
-=== OUTPUT FORMAT (NON-NEGOTIABLE) ===
-WEEK HEADERS: <p class="tiptap-paragraph"><strong><u>Week 1-2 (Phase – Intensity):</u></strong></p>
-DAY HEADERS:  <p class="tiptap-paragraph"><strong><u>Day 1 - Focus:</u></strong></p>
-EXERCISES inside ONE <p> per day, numbered, separated by <br>:
-<p class="tiptap-paragraph"><br>1. {{exercise:ID:Name}}– 4 sets × 10 reps @ 70% 1RM (<a href="/1rmcalculator">calculate</a>)<br>2. {{exercise:ID:Name}}– 4 sets × 12 reps</p>
-SEPARATORS: one empty <p class="tiptap-paragraph"></p> between days.
-REST DAYS: include explicit "Day X - Rest & Recovery" entries to fill the week.
-
-RULES:
-- NEVER use <ul>, <li>, or bullet lists. Use <p> with <br> only.
-- EVERY exercise MUST use {{exercise:ID:Name}} from the library — no plain names, no invented exercises.
-- Use the × multiplication sign for sets/reps, not "x".
-- Isometric/static holds MUST be prescribed with seconds (for example 3 × 10-sec holds), never plain reps.
-- Vary exercises week-to-week for proper periodization.
-- Include 1RM Calculator links where percentage-based loading is used.`;
-}
-
-function buildScheduleUserPrompt(args: {
-  name: string;
-  category: string;
-  totalWeeks: number;
-  daysPerWeek: number;
-  difficulty: number;
-  equipment: string;
-  startWeek: number;
-  endWeek: number;
-}): string {
-  const { name, category, totalWeeks, daysPerWeek, difficulty, equipment, startWeek, endWeek } = args;
-  const phase = startWeek <= 2 ? "Foundation/Adaptation"
-    : startWeek <= Math.ceil(totalWeeks * 0.6) ? "Building/Progressive Overload"
-    : startWeek <= Math.ceil(totalWeeks * 0.85) ? "Peak/Intensification" : "Peak/Taper";
-
-  return `Generate COMPLETE content for Week ${startWeek}–${endWeek} of this program.
-PROGRAM: "${name}"
-CATEGORY: ${category}
-TOTAL DURATION: ${totalWeeks} weeks
-DAYS PER WEEK: ${daysPerWeek} training days (fill the other days as rest)
-DIFFICULTY: ${difficulty}/6 stars
-EQUIPMENT: ${equipment}
-CURRENT PHASE (Weeks ${startWeek}-${endWeek} of ${totalWeeks}): ${phase}
-
-Each training day MUST list 4-8 library exercises with sets × reps and rest.
-Difficulty ${difficulty}/6: ${difficulty <= 2 ? "Beginner — simple movements, longer rest." : difficulty <= 4 ? "Intermediate — moderate complexity, balanced rest." : "Advanced — complex movements, shorter rest, higher volume."}
-
-OUTPUT — start exactly with the Week header and end after the last day's <p></p>:
-<p class="tiptap-paragraph"><strong><u>Week ${startWeek}${startWeek !== endWeek ? `-${endWeek}` : ""} (${phase}):</u></strong></p>
-<p class="tiptap-paragraph"></p>
-...`;
 }
 
 async function generateProse(
