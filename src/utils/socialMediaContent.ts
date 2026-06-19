@@ -2250,12 +2250,11 @@ Duration: 20-30 seconds`,
 
 Launch special ending soon:
 
-🥇 Gold: 7-day FREE trial
-👑 Platinum: €79.99/year (save €10)
+💎 SmartyGym Lifetime Premium — €89.99 one-time
+(Yours forever. No renewals.)
 
 After Sunday:
-❌ No more free trial
-❌ Back to regular pricing
+❌ Launch pricing ends
 ❌ This opportunity... gone
 
 What you're getting:
@@ -2274,17 +2273,12 @@ If you've been thinking about starting with SmartyGym, this is your moment.
 
 Our launch special ends Sunday at midnight. Here's what disappears:
 
-🥇 GOLD PLAN
-Current: 7-Day FREE Trial
-After Sunday: No free trial available
-Regular price: €9.99/month
+💎 SMARTYGYM LIFETIME PREMIUM
+One-time payment: €89.99
+Yours for life. No monthly bills. No renewals.
+After Sunday: launch pricing ends
 
-👑 PLATINUM PLAN  
-Current: €79.99/year (Save €10!)
-After Sunday: €89.89/year
-That's €10 extra you didn't need to spend
-
-WHAT YOU'RE GETTING:
+WHAT YOU'RE GETTING — EVERYTHING INCLUDED:
 
 The same expert-designed content that took years to build:
 ✅ 500+ workouts by Sports Scientist Haris Falas
@@ -2293,8 +2287,6 @@ The same expert-designed content that took years to build:
 ✅ Exercise Library
 ✅ Professional calculators
 ✅ Community features
-
-PLATINUM adds:
 ✨ Smarty Rituals
 📊 Smarty Check-ins
 🎯 Goal tracking
@@ -2305,11 +2297,11 @@ WHY START NOW?
 • January is coming. Beat the resolution crowd.
 • Expert programming from day one.
 • Best price we've ever offered.
-• No risk with free trial (Gold) or satisfaction guarantee (Platinum).
+• One payment. No subscription. No surprises.
 
 THE MATH:
-Platinum at €79.99/year = €6.67/month
-That's less than a coffee a week for world-class fitness programming.
+€89.99 once vs. years of monthly fitness app bills.
+World-class programming for the price of one weekend out.
 
 ⏰ Offer ends Sunday at midnight.
 
