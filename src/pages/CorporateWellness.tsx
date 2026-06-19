@@ -772,7 +772,7 @@ export default function CorporateWellness() {
                   </div>
                   <p className="text-muted-foreground max-w-xl mx-auto">
                     Join the forward-thinking companies that recognize the power of employee wellness. 
-                    SmartyGym Corporate plans provide Platinum-level fitness access for your entire team.
+                    SmartyGym Corporate plans provide Premium fitness access for your entire team.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <Button asChild size="lg" className="bg-green-600 hover:bg-green-700">
