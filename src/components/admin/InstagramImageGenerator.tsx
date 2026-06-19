@@ -12,8 +12,6 @@ import { exportToInstagram, INSTAGRAM_SIZES, InstagramSize } from "@/utils/insta
 import { HumanNotAICompositeTemplate } from "./instagram/composite/HumanNotAICompositeTemplate";
 import { HomeHeroCompositeTemplate } from "./instagram/composite/HomeHeroCompositeTemplate";
 import { FullHeroCompositeTemplate } from "./instagram/composite/FullHeroCompositeTemplate";
-import { GoldPlanCompositeTemplate } from "./instagram/composite/GoldPlanCompositeTemplate";
-import { PlatinumPlanCompositeTemplate } from "./instagram/composite/PlatinumPlanCompositeTemplate";
 import { ServicesOverviewCompositeTemplate } from "./instagram/composite/ServicesOverviewCompositeTemplate";
 import { WorkoutCategoriesCompositeTemplate } from "./instagram/composite/WorkoutCategoriesCompositeTemplate";
 import { ProgramCategoriesCompositeTemplate } from "./instagram/composite/ProgramCategoriesCompositeTemplate";
@@ -26,8 +24,6 @@ import { ExerciseLibraryCardTemplate } from "./instagram/services/ExerciseLibrar
 import { OneRMCardTemplate } from "./instagram/services/OneRMCardTemplate";
 import { BMRCardTemplate } from "./instagram/services/BMRCardTemplate";
 import { MacroCardTemplate } from "./instagram/services/MacroCardTemplate";
-import { GoldPlanCardTemplate } from "./instagram/services/GoldPlanCardTemplate";
-import { PlatinumPlanCardTemplate } from "./instagram/services/PlatinumPlanCardTemplate";
 
 // Brand & Values
 import { RealExpertiseCardTemplate } from "./instagram/brand/RealExpertiseCardTemplate";
