@@ -77,7 +77,7 @@ export interface SkeletonInput {
   weeks: number;
   daysPerWeek: number;
   /** Optional library exercises to pre-fill training day bullets. */
-  exercisesPerDay?: string[][][]; // exercisesPerDay[weekIndex0][dayIndex0] => list of session lines (headings + {{exercise:ID:Name}} bullets)
+  exercisesPerDay?: string[][][]; // exercisesPerDay[templateIndex0][dayIndex0] => Week A/B session lines
 }
 
 function formatSessionLine(line: string): string {
@@ -89,7 +89,7 @@ function formatSessionLine(line: string): string {
 
 function defaultSessionTemplate(): string[] {
   return [
-    "<em>Foundation week — describe today's focus and what to avoid in one short sentence.</em>",
+    "<em>Template session — coach the intent, execution standard, and fatigue target for this day.</em>",
     "<strong>Estimated session time: 55–65 minutes</strong>",
     "<strong>🔥 Soft Tissue Preparation — 3–5 minutes</strong>",
     "• 1–2 min foam roll quads, glutes, lats, t-spine",
@@ -114,6 +114,73 @@ function defaultSessionTemplate(): string[] {
   ];
 }
 
+function templateDefinitions(totalWeeks: number): Array<{ key: "A" | "B"; range: string; objective: string }> {
+  if (totalWeeks <= 4) {
+    return [
+      { key: "A", range: "Weeks 1–2", objective: "Foundation template: learn the workouts, establish baseline loads, and repeat the same sessions with controlled progression." },
+      { key: "B", range: `Weeks 3–${totalWeeks}`, objective: "Build template: use the second set of workouts and progress through density, load, volume, or complexity rules." },
+    ];
+  }
+  if (totalWeeks <= 6) {
+    return [
+      { key: "A", range: "Weeks 1–2", objective: "Foundation template: repeat the same workouts for two weeks while technique, pacing, and baseline capacity are built." },
+      { key: "B", range: `Weeks 3–${totalWeeks}`, objective: "Progressive template: repeat these workouts for the remaining weeks while the progression rules create the overload." },
+    ];
+  }
+  return [
+    { key: "A", range: "Weeks 1–2", objective: "Foundation template: repeat the same workouts, build quality, and set conservative baselines." },
+    { key: "B", range: `Weeks 3–${totalWeeks}`, objective: "Build and peak template: repeat these workouts while progressing load, density, volume, or difficulty according to the weekly rules." },
+  ];
+}
+
+function categoryProgressionRule(category: string): string {
+  const cat = category.toUpperCase();
+  if (cat.includes("HYPERTROPHY")) return "Progress primarily by load: Week 1 uses about 65% 1RM, Week 2 about 70%, Week 3 about 75%, Week 4 about 80%; later weeks repeat Week B with small load, set, or rep increases without breaking tempo.";
+  if (cat.includes("WEIGHT LOSS")) return "Progress primarily by density: increase work periods by about 10%, reduce rest by about 10%, then add one round or choose the harder listed variation while keeping movement quality realistic.";
+  if (cat.includes("CARDIO")) return "Progress primarily by aerobic volume and interval quality: extend work intervals, reduce recovery slightly, or add one interval while preserving sustainable pacing.";
+  if (cat.includes("FUNCTIONAL STRENGTH")) return "Progress primarily by load and movement quality: add 2–5% load when all reps are clean, then add one set or carry distance before increasing complexity.";
+  if (cat.includes("LOW BACK")) return "Progress only through pain-free control: increase range, time under tension, and stability demand before adding load; never chase fatigue or pain.";
+  if (cat.includes("MOBILITY")) return "Progress through range, control, hold duration, and balance complexity; never force depth or speed.";
+  return "Progress by repeating the same templates and applying small weekly increases in load, volume, density, or movement quality.";
+}
+
+function progressionLines(totalWeeks: number, category: string): string[] {
+  const cat = category.toUpperCase();
+  const hypertrophy = cat.includes("HYPERTROPHY");
+  const weightLoss = cat.includes("WEIGHT LOSS");
+  const base = [
+    "• Week 1 — Perform Week A exactly as written. Learn pacing, technique, and baseline loads.",
+    hypertrophy
+      ? "• Week 2 — Repeat Week A with load raised toward 70% 1RM where form allows."
+      : weightLoss
+        ? "• Week 2 — Repeat Week A; increase work periods by 10% or reduce rest by 10%."
+        : "• Week 2 — Repeat Week A; add a small load, rep, time, or control increase only where quality stays high.",
+    hypertrophy
+      ? "• Week 3 — Move to Week B at roughly 75% 1RM on the main lifts."
+      : "• Week 3 — Move to Week B. New workouts, same professional session structure.",
+    hypertrophy
+      ? "• Week 4 — Repeat Week B at roughly 80% 1RM or add one controlled set to the first main movement."
+      : weightLoss
+        ? "• Week 4 — Repeat Week B; add one round to each main circuit or reduce rest slightly."
+        : "• Week 4 — Repeat Week B; progress load, total reps, time under tension, or density.",
+  ];
+  if (totalWeeks >= 6) {
+    base.push(weightLoss
+      ? "• Week 5 — Repeat Week B with harder-but-realistic variations or another small density increase."
+      : "• Week 5 — Repeat Week B with advanced progression: add one set, add 2–5% load, or increase the hardest safe variation.");
+    base.push("• Week 6 — Repeat Week B as peak week: complete the maximum planned volume without technical failure.");
+  }
+  if (totalWeeks > 6) {
+    for (let week = 7; week <= totalWeeks; week++) {
+      const finalWeek = week === totalWeeks;
+      base.push(finalWeek
+        ? `• Week ${week} — Repeat Week B as final peak/testing week, then evaluate results after recovery.`
+        : `• Week ${week} — Repeat Week B with the strongest sustainable progression; reduce volume if recovery drops.`);
+    }
+  }
+  return base;
+}
+
 /**
  * Build the standardized program skeleton.
  * Output is a clean HTML string compatible with the existing RichTextEditor / WorkoutDisplay renderer.
@@ -126,12 +193,20 @@ export function buildProgramSkeleton(input: SkeletonInput): string {
   const sep = '<hr class="program-divider" />';
   const out: string[] = [];
 
-  for (let w = 1; w <= weeks; w++) {
-    const objective = weeklyObjectiveFor(category, w, weeks);
-    const phase = phaseLabel(w, weeks);
-    out.push(`<p class="tiptap-paragraph"><strong>📅 WEEK ${w}</strong> <em>(${phase})</em></p>`);
+  out.push(`<p class="tiptap-paragraph"><strong>🎯 Program Goal</strong></p>`);
+  out.push(`<p class="tiptap-paragraph">Complete ${weeks} weeks by repeating only the Week A and Week B workout templates. The weekly progression rules create the full program; the app must not list a brand-new workout for every calendar week.</p>`);
+  out.push(`<p class="tiptap-paragraph"><strong>🧭 Program Instructions</strong></p>`);
+  out.push(`<p class="tiptap-paragraph">${categoryProgressionRule(category)}</p>`);
+  out.push(`<p class="tiptap-paragraph"><strong>📈 Program Progression</strong></p>`);
+  for (const line of progressionLines(weeks, category)) out.push(`<p class="tiptap-paragraph">${line}</p>`);
+  out.push(sep);
+
+  const templates = templateDefinitions(weeks);
+  for (let t = 0; t < templates.length; t++) {
+    const template = templates[t];
+    out.push(`<p class="tiptap-paragraph"><strong>📅 WEEK ${template.key} TEMPLATE</strong> <em>(${template.range})</em></p>`);
     out.push(`<p class="tiptap-paragraph"><strong>🎯 Objective</strong></p>`);
-    out.push(`<p class="tiptap-paragraph">${objective}</p>`);
+    out.push(`<p class="tiptap-paragraph">${template.objective}</p>`);
     out.push(sep);
 
     for (let d = 1; d <= trainingDays; d++) {
@@ -140,8 +215,8 @@ export function buildProgramSkeleton(input: SkeletonInput): string {
       out.push(`<p class="tiptap-paragraph"><strong>${numeral} DAY ${d} – ${title}</strong></p>`);
 
       const dayBullets =
-        exercisesPerDay?.[w - 1]?.[d - 1] && exercisesPerDay[w - 1][d - 1].length
-          ? exercisesPerDay[w - 1][d - 1]
+        exercisesPerDay?.[t]?.[d - 1] && exercisesPerDay[t][d - 1].length
+          ? exercisesPerDay[t][d - 1]
           : defaultSessionTemplate();
 
       for (const line of dayBullets) {
@@ -167,7 +242,7 @@ export function buildProgramSkeleton(input: SkeletonInput): string {
       out.push(sep);
     }
 
-    if (w < weeks) out.push(`<p class="tiptap-paragraph"></p>`);
+    if (t < templates.length - 1) out.push(`<p class="tiptap-paragraph"></p>`);
   }
 
   return out.join("\n");
@@ -178,30 +253,11 @@ export function buildProgramSkeleton(input: SkeletonInput): string {
  */
 export function buildPhaseInstructions(weeks: number, category: string): string {
   const lines: string[] = [];
-  lines.push(`<p class="tiptap-paragraph"><strong>📝 Program Periodization</strong></p>`);
-
-  const phases: Array<{ range: string; name: string; desc: string }> = [];
-  if (weeks >= 12) {
-    phases.push({ range: "Weeks 1–3", name: "Foundation Phase", desc: "Focus on movement quality, exercise mastery, and building a foundation for future progression." });
-    phases.push({ range: "Weeks 4–7", name: "Progressive Overload Phase", desc: "Gradually increase loads, repetitions, or total volume whenever all prescribed sets can be completed with excellent technique." });
-    phases.push({ range: "Week 8", name: "Recovery & Deload Phase", desc: "Reduce training volume by approximately 40–50% while maintaining movement quality and technique." });
-    phases.push({ range: "Weeks 9–11", name: "Peak Phase", desc: "Increase training density, intensity, and total workload to maximize adaptations." });
-    phases.push({ range: "Week 12", name: "Final Challenge Phase", desc: "Apply all previous adaptations and complete the highest-performance training week of the program." });
-  } else if (weeks >= 8) {
-    phases.push({ range: "Weeks 1–2", name: "Foundation Phase", desc: "Build technique and baseline volume." });
-    phases.push({ range: `Weeks 3–${Math.ceil(weeks * 0.6)}`, name: "Progressive Overload Phase", desc: "Increase loads and volume with quality technique." });
-    phases.push({ range: `Weeks ${Math.ceil(weeks * 0.6) + 1}–${weeks - 1}`, name: "Peak Phase", desc: "Maximize training intensity and stimulus." });
-    phases.push({ range: `Week ${weeks}`, name: "Final Challenge Phase", desc: "Highest-performance week — apply all adaptations." });
-  } else {
-    phases.push({ range: "Week 1", name: "Foundation Phase", desc: "Establish technique and baseline volume." });
-    phases.push({ range: `Weeks 2–${weeks - 1}`, name: "Progressive Overload Phase", desc: "Increase loads and volume progressively." });
-    phases.push({ range: `Week ${weeks}`, name: "Final Challenge Phase", desc: "Highest performance week of the program." });
-  }
-
-  for (const p of phases) {
-    lines.push(`<p class="tiptap-paragraph"><strong>${p.range} — ${p.name}</strong></p>`);
-    lines.push(`<p class="tiptap-paragraph">${p.desc}</p>`);
-  }
+  lines.push(`<p class="tiptap-paragraph"><strong>📝 Compact Program Instructions</strong></p>`);
+  lines.push(`<p class="tiptap-paragraph">This is a professional repeat-and-progress training plan. It contains Week A and Week B templates only; the athlete repeats those workouts and follows the progression rules instead of scrolling through a brand-new workout for every calendar week.</p>`);
+  lines.push(`<p class="tiptap-paragraph">${categoryProgressionRule(category)}</p>`);
+  lines.push(`<p class="tiptap-paragraph"><strong>Weekly Progression Rules</strong></p>`);
+  for (const line of progressionLines(weeks, category)) lines.push(`<p class="tiptap-paragraph">${line}</p>`);
 
   lines.push(`<p class="tiptap-paragraph"></p>`);
   lines.push(`<p class="tiptap-paragraph"><strong>General Guidelines</strong></p>`);
