@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, Search, Pencil, Trash2, Download, AlertTriangle, CheckCircle, ExternalLink, Bot, User, Copy, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { ArticleEditDialog } from "./ArticleEditDialog";
+import { ArticleCreationWizard, type ArticleWizardDraft } from "./ArticleCreationWizard";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,6 +29,7 @@ export function BlogManager() {
   const [sortOrder, setSortOrder] = useState("newest");
   const [selectedArticle, setSelectedArticle] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isWizardOpen, setIsWizardOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [articleToDelete, setArticleToDelete] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -136,6 +138,18 @@ export function BlogManager() {
   };
 
   const handleCreate = () => {
+    setSelectedArticle(null);
+    setIsWizardOpen(true);
+  };
+
+  const handleWizardComplete = (draft: ArticleWizardDraft) => {
+    // Open the existing edit dialog pre-filled with the AI draft — admin
+    // reviews, then clicks Save in the dialog to publish/save to DB.
+    setSelectedArticle({ ...draft, id: undefined });
+    setIsDialogOpen(true);
+  };
+
+  const handleSkipWizard = () => {
     setSelectedArticle(null);
     setIsDialogOpen(true);
   };
@@ -532,6 +546,13 @@ export function BlogManager() {
           setIsDialogOpen(false);
           fetchArticles();
         }}
+      />
+
+      <ArticleCreationWizard
+        open={isWizardOpen}
+        onOpenChange={setIsWizardOpen}
+        onComplete={handleWizardComplete}
+        onSkipToManual={handleSkipWizard}
       />
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
