@@ -530,7 +530,7 @@ serve(async (req) => {
     const bannedNames = (allNames || []).map((w: any) => w.name);
 
     // Library
-    const equipFilter = equipment === "BODYWEIGHT" ? "body weight" : undefined;
+    const equipFilter = equipment === "BODYWEIGHT" ? "body weight" : "non-bodyweight";
     const { exercises: library, referenceList } =
       await fetchAndBuildExerciseReference(supabase, "[WIZ]", equipFilter, difficulty.toLowerCase());
 

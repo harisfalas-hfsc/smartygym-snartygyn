@@ -12,6 +12,13 @@ export interface ExerciseBasic {
   difficulty?: string | null;
 }
 
+const NON_BODYWEIGHT_FILTER = 'non-bodyweight';
+
+function isBodyweightEquipmentValue(equipment: string | null | undefined): boolean {
+  const eq = (equipment || '').toLowerCase().trim();
+  return eq === 'body weight' || eq === 'bodyweight';
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // HOME-BODYWEIGHT GUARDRAIL
 // Some exercises are tagged equipment="body weight" but still require apparatus
@@ -41,8 +48,7 @@ const HOME_BODYWEIGHT_FORBIDDEN_PATTERNS: RegExp[] = [
 ];
 
 export function isHomeBodyweightFriendly(exercise: ExerciseBasic): boolean {
-  const equip = (exercise.equipment || '').toLowerCase().trim();
-  if (equip !== 'body weight') return false;
+  if (!isBodyweightEquipmentValue(exercise.equipment)) return false;
   const name = (exercise.name || '').toLowerCase();
   return !HOME_BODYWEIGHT_FORBIDDEN_PATTERNS.some((re) => re.test(name));
 }
@@ -867,17 +873,27 @@ export async function logUnmatchedExercises(
  */
 export function buildExerciseReferenceList(exercises: ExerciseBasic[], equipmentFilter?: string, difficultyLevel?: string): string {
   // Apply equipment filter if specified
-  let filtered = equipmentFilter
-    ? exercises.filter(ex => (ex.equipment || '').toLowerCase() === equipmentFilter.toLowerCase())
-    : exercises;
+  const normalizedEquipmentFilter = (equipmentFilter || '').toLowerCase();
+  let filtered = normalizedEquipmentFilter === NON_BODYWEIGHT_FILTER
+    ? exercises.filter(ex => !isBodyweightEquipmentValue(ex.equipment))
+    : equipmentFilter
+      ? exercises.filter(ex => (ex.equipment || '').toLowerCase() === normalizedEquipmentFilter)
+      : exercises;
 
   // HOME-BODYWEIGHT GUARDRAIL: when this is a bodyweight-only prompt, strip
   // exercises that need a bench, pull-up bar, dip station, GHD bench, rings,
   // parallel bars, box, captain's chair, etc. — even though they are tagged
   // "body weight" in the database.
-  const isBodyweightFilter = (equipmentFilter || '').toLowerCase() === 'body weight';
+  const isBodyweightFilter = normalizedEquipmentFilter === 'body weight';
   if (isBodyweightFilter) {
     filtered = filterToHomeBodyweight(filtered);
+  }
+
+  if (difficultyLevel) {
+    const dl = difficultyLevel.toLowerCase();
+    if (['beginner', 'intermediate', 'advanced'].includes(dl)) {
+      filtered = filtered.filter(ex => (ex.difficulty || '').toLowerCase() === dl);
+    }
   }
 
   // Group by TARGET MUSCLE → BODY PART for structured browsing
@@ -935,9 +951,11 @@ export function buildExerciseReferenceList(exercises: ExerciseBasic[], equipment
     '',
     isBodyweightFilter
       ? `This is a BODYWEIGHT (no-equipment / home / hotel / travel) workout. ${filtered.length} exercises are available. NO benches, NO pull-up bars, NO dip stations, NO glute-ham/GHD benches, NO rings, NO parallel bars, NO boxes, NO captain's chair, NO gym apparatus of any kind. Pick exercises a user can perform on a flat floor with their own bodyweight only. A wall, a doorway, or a sturdy chair for support is acceptable only when explicitly part of the listed exercise.`
-      : equipmentFilter
-        ? `This is a BODYWEIGHT workout. ONLY bodyweight exercises are available (${filtered.length} exercises).`
-        : `Full exercise library available (${filtered.length} exercises — bodyweight + all equipment).`,
+      : normalizedEquipmentFilter === NON_BODYWEIGHT_FILTER
+        ? `This is an EQUIPMENT workout. ONLY non-bodyweight equipment exercises are available (${filtered.length} exercises).`
+        : equipmentFilter
+          ? `This workout may use ONLY ${equipmentFilter} exercises (${filtered.length} exercises).`
+        : `This is an EQUIPMENT workout. ONLY non-bodyweight equipment exercises are available (${filtered.length} exercises).`,
     '',
   ];
 
@@ -949,14 +967,11 @@ export function buildExerciseReferenceList(exercises: ExerciseBasic[], equipment
     lines.push('═══════════════════════════════════════════════════════════════════════════════');
     lines.push('');
     if (dl === 'beginner') {
-      lines.push('Use ONLY exercises marked [beginner]. Do NOT use [intermediate] or [advanced] exercises.');
-      lines.push('Exercises with no difficulty tag may be used.');
+      lines.push('Use ONLY exercises marked [beginner]. Do NOT use blank, [intermediate], or [advanced] exercises.');
     } else if (dl === 'intermediate') {
-      lines.push('Use exercises marked [beginner] or [intermediate]. Do NOT use [advanced] exercises.');
-      lines.push('Exercises with no difficulty tag may be used.');
+      lines.push('Use ONLY exercises marked [intermediate]. Do NOT use blank, [beginner], or [advanced] exercises.');
     } else if (dl === 'advanced') {
-      lines.push('All difficulty levels are allowed. Prioritize [intermediate] and [advanced] exercises.');
-      lines.push('Exercises with no difficulty tag may be used.');
+      lines.push('Use ONLY exercises marked [advanced]. Do NOT use blank, [beginner], or [intermediate] exercises.');
     }
     lines.push('');
   } else {
@@ -1357,13 +1372,23 @@ export async function fetchAndBuildExerciseReference(
   const referenceList = buildExerciseReferenceList(allExercises, equipmentFilter, difficultyLevel);
   
   // Return filtered exercises for post-processing matching too
-  let exercisesForMatching = equipmentFilter
-    ? allExercises.filter(ex => (ex.equipment || '').toLowerCase() === equipmentFilter.toLowerCase())
-    : allExercises;
+  const normalizedEquipmentFilter = (equipmentFilter || '').toLowerCase();
+  let exercisesForMatching = normalizedEquipmentFilter === NON_BODYWEIGHT_FILTER
+    ? allExercises.filter(ex => !isBodyweightEquipmentValue(ex.equipment))
+    : equipmentFilter
+      ? allExercises.filter(ex => (ex.equipment || '').toLowerCase() === normalizedEquipmentFilter)
+      : allExercises;
   if ((equipmentFilter || '').toLowerCase() === 'body weight') {
     const before = exercisesForMatching.length;
     exercisesForMatching = filterToHomeBodyweight(exercisesForMatching);
     console.log(`${logPrefix} Home-bodyweight guardrail removed ${before - exercisesForMatching.length} apparatus-dependent exercises (${exercisesForMatching.length} remain)`);
+  }
+  if (difficultyLevel) {
+    const dl = difficultyLevel.toLowerCase();
+    if (['beginner', 'intermediate', 'advanced'].includes(dl)) {
+      exercisesForMatching = exercisesForMatching.filter(ex => (ex.difficulty || '').toLowerCase() === dl);
+      console.log(`${logPrefix} Strict difficulty filter (${dl}) leaves ${exercisesForMatching.length} exercises`);
+    }
   }
   
   return { exercises: exercisesForMatching, referenceList };
