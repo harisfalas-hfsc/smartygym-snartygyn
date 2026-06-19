@@ -351,7 +351,7 @@ export const ArticleEditDialog = ({ article, open, onOpenChange, onSave }: Artic
         author_credentials: formData.author_credentials || null,
       };
 
-      if (article) {
+      if (article?.id) {
         const { error } = await supabase
           .from('blog_articles')
           .update(dataToSave)
@@ -398,7 +398,7 @@ export const ArticleEditDialog = ({ article, open, onOpenChange, onSave }: Artic
 
       toast({
         title: "Success",
-        description: `Article ${article ? "updated" : "created"} successfully`,
+        description: `Article ${article?.id ? "updated" : "created"} successfully`,
       });
       onSave();
       onOpenChange(false);
@@ -433,9 +433,9 @@ export const ArticleEditDialog = ({ article, open, onOpenChange, onSave }: Artic
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="w-[95vw] max-w-5xl max-h-[95vh] overflow-y-auto overflow-x-hidden">
           <DialogHeader>
-            <DialogTitle>{article ? 'Edit Article' : 'Create New Article'}</DialogTitle>
+            <DialogTitle>{article?.id ? 'Edit Article' : 'Create New Article'}</DialogTitle>
             <DialogDescription>
-              {article ? 'Update the article details' : 'Fill in the article information'}
+              {article?.id ? 'Update the article details' : 'Review the AI draft and fill in any missing details'}
             </DialogDescription>
           </DialogHeader>
 
