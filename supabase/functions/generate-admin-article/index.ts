@@ -109,11 +109,15 @@ async function generateBlogImage(
   excerpt: string,
   content: string,
 ): Promise<string | null> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 45000);
+
   try {
     const response = await fetch(`${supabaseUrl}/functions/v1/generate-blog-image`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${serviceKey}` },
       body: JSON.stringify({ title, category, slug, excerpt, content }),
+      signal: controller.signal,
     });
     if (!response.ok) {
       console.error(`Image generation failed: ${response.status}`);
@@ -124,6 +128,8 @@ async function generateBlogImage(
   } catch (error) {
     console.error("Image generation error:", error);
     return null;
+  } finally {
+    clearTimeout(timeout);
   }
 }
 
@@ -275,7 +281,7 @@ RESPOND WITH EXACTLY THIS JSON FORMAT (no markdown, no code blocks, just raw JSO
       excerpt: parsed.excerpt || "",
       content: parsed.content,
       author_name: "Haris Falas",
-      author_credentials: "BSc Sports Science\nEXOS Specialist\nCSCS",
+      author_credentials: "Sports Scientist | CSCS Certified | 20+ Years Experience",
       is_ai_generated: true,
       is_published: false,
       read_time: readTime,
