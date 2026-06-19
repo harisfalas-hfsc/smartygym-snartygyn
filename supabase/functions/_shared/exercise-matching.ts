@@ -12,6 +12,51 @@ export interface ExerciseBasic {
   difficulty?: string | null;
 }
 
+export function isStaticHoldExerciseName(name: string): boolean {
+  const normalized = (name || '').toLowerCase().trim();
+  if (!normalized || /\breps?\b|tap|twist|row|fly|raise|press|push|pull|wiper|walk|crawl/i.test(normalized)) return false;
+
+  return [
+    /^back\s+lever$/i,
+    /^front\s+lever$/i,
+    /\bl-?sit\b/i,
+    /\bwall\s+sit\b/i,
+    /\bdead\s+hang\b/i,
+    /\bsupport\s+hold\b/i,
+    /\bhollow\s+(?:body\s+)?hold\b/i,
+    /\barch\s+hold\b/i,
+    /\bforearm\s+plank\b/i,
+    /^bodyweight\s+incline\s+side\s+plank$/i,
+    /\bisometric\s+chest\s+squeeze\b/i,
+  ].some((pattern) => pattern.test(normalized));
+}
+
+export function repairStaticHoldPrescriptions(
+  content: string,
+  logPrefix = '[HOLD-RX]'
+): { processedContent: string; repaired: Array<{ exercise: string; from: string; to: string }> } {
+  const repaired: Array<{ exercise: string; from: string; to: string }> = [];
+  if (!content) return { processedContent: content || '', repaired };
+
+  const processedContent = content.replace(
+    /(\{\{exercise:[^:}]+:([^}]+)\}\}\s*[–-]\s*)(?:(\d+)\s*[×x]\s*(\d+)(?:\s*reps?)?(?!\s*(?:sec|secs|seconds?|s\b|min|mins|minutes?|holds?\b))|(\d+)\s*sets?\s*(?:of|x|×)?\s*(\d+)(?:\s*reps?)?(?!\s*(?:sec|secs|seconds?|s\b|min|mins|minutes?|holds?\b)))/gi,
+    (full, prefix: string, name: string, setsA: string, countA: string, setsB: string, countB: string) => {
+      if (!isStaticHoldExerciseName(name)) return full;
+      const sets = setsA || setsB;
+      const seconds = countA || countB;
+      const replacement = `${sets} × ${seconds}-sec holds`;
+      repaired.push({ exercise: name, from: full.replace(prefix, '').trim(), to: replacement });
+      return `${prefix}${replacement}`;
+    },
+  );
+
+  if (repaired.length > 0) {
+    console.log(`${logPrefix} Repaired ${repaired.length} static-hold prescriptions`);
+  }
+
+  return { processedContent, repaired };
+}
+
 const NON_BODYWEIGHT_FILTER = 'non-bodyweight';
 
 function isBodyweightEquipmentValue(equipment: string | null | undefined): boolean {
