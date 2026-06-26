@@ -70,7 +70,7 @@ export const MobileBottomNav = () => {
                 active ? "text-primary" : "text-foreground/75 hover:text-primary"
               )}
             >
-              <span className={cn("flex h-9 w-9 items-center justify-center rounded-full bg-secondary", iconClass)}>
+              <span className={cn("flex h-9 w-9 items-center justify-center rounded-sm border-2 border-primary/60", iconClass)}>
                 <Icon className="h-5 w-5" />
               </span>
               <span className="text-[10px] font-medium leading-none">{label}</span>
