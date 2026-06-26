@@ -622,17 +622,6 @@ const Index = () => {
                 <span className="block">Blog Insights · Smarty Tools</span>
                 <span className="block text-primary">All In Your Pocket.</span>
               </p>
-              <p className="text-lg font-extrabold tracking-tight mt-3 mb-1">
-                100% Human. <span className="text-red-500">0% AI.</span>
-              </p>
-              <Link
-                to="/about"
-                className="inline-flex items-center gap-1.5 mt-2 text-base font-semibold text-green-500 hover:text-green-600 hover:underline transition-colors"
-              >
-                <Info className="w-5 h-5" />
-                About SmartyGym
-                <ChevronRight className="w-5 h-5" />
-              </Link>
             </div>
 
             {/* Workouts carousel title */}
