@@ -70,7 +70,7 @@ export const MobileBottomNav = () => {
                 active ? "text-primary" : "text-foreground/75 hover:text-primary"
               )}
             >
-              <span className={cn("flex h-9 w-9 items-center justify-center rounded-full bg-primary/10", iconClass)}>
+              <span className={cn("flex h-9 w-9 items-center justify-center rounded-full bg-secondary", iconClass)}>
                 <Icon className="h-5 w-5" />
               </span>
               <span className="text-[10px] font-medium leading-none">{label}</span>
@@ -85,7 +85,7 @@ export const MobileBottomNav = () => {
               title="Discover"
               className="flex flex-1 flex-col items-center justify-center gap-0.5 rounded-lg py-1 text-foreground/75 transition-all duration-150 active:scale-95 hover:text-primary"
             >
-              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary text-primary">
                 <Compass className="h-5 w-5" />
               </span>
               <span className="text-[10px] font-medium leading-none">Discover</span>
