@@ -8,6 +8,15 @@ import { Capacitor } from "@capacitor/core";
 // Configure native status bar on app launch
 configureStatusBar();
 
+// Suppress the browser's PWA "Install this app" prompt.
+// SmartyGym ships as a native app on Google Play (iOS coming) so we don't want
+// browsers to nag users to install the web app on top of that.
+if (typeof window !== "undefined") {
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+  });
+}
+
 
 const clearLovableDeploymentPinCookie = () => {
   if (typeof document === "undefined") return;
