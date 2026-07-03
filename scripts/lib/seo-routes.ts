@@ -21,19 +21,23 @@ export const BASE_URL = "https://smartygym.com";
 /**
  * Canonical URL for a route path.
  *
- * Option B (current): we write the prerendered HTML to BOTH `<path>.html`
- * AND `<path>/index.html`. The nested `index.html` resolves the clean URL
- * directly on the host without needing `_redirects` (which Lovable hosting
- * does not honor). Canonical points at the clean URL.
+ * Option A (current): Lovable hosting does not reliably serve the nested
+ * `<path>/index.html` when the browser requests the clean URL — it falls
+ * back to the SPA shell (which carries `noindex`). To guarantee Google
+ * sees the prerendered HTML on first fetch, canonical points at the
+ * `.html` sibling (which the host DOES serve as a real static file).
+ * The clean URL still redirects to the `.html` URL client-side.
  */
 export function canonicalUrlFor(path: string): string {
   if (path === "/" || path === "") return `${BASE_URL}/`;
-  return `${BASE_URL}${path}`;
+  if (path.endsWith(".html")) return `${BASE_URL}${path}`;
+  return `${BASE_URL}${path}.html`;
 }
 
 export function canonicalPathFor(path: string): string {
   if (path === "/" || path === "") return "/";
-  return path;
+  if (path.endsWith(".html")) return path;
+  return `${path}.html`;
 }
 
 const SUPABASE_URL =
