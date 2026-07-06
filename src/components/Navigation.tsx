@@ -51,6 +51,7 @@ export const Navigation = () => {
   const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo | null>(null);
   const [corporateSubscription, setCorporateSubscription] = useState<CorporateSubscriptionInfo | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [desktopMenuOpen, setDesktopMenuOpen] = useState(false);
   const [smartyCoachOpen, setSmartyCoachOpen] = useState(false);
   const isMobile = useIsMobile();
@@ -302,7 +303,7 @@ export const Navigation = () => {
       >
         <div className="flex h-11 items-center justify-between gap-2 px-3">
           <div className="flex items-center gap-2">
-            <Sheet>
+            <Sheet open={mobileDrawerOpen} onOpenChange={setMobileDrawerOpen}>
               <SheetTrigger asChild>
                 <button
                   type="button"
