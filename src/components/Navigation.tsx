@@ -314,60 +314,33 @@ export const Navigation = () => {
                   <Menu className="h-5 w-5" />
                 </button>
               </SheetTrigger>
-              <SheetContent
-                side="left"
-                className="flex h-full w-[85%] max-w-[340px] flex-col bg-background p-0"
-                style={{ paddingTop: "env(safe-area-inset-top)" }}
-              >
-                <div className="flex h-12 items-center px-4">
-                  <div className="text-base font-extrabold">
-                    <span className="text-primary">SMARTY</span>
-                    <span className="text-green-500">GYM</span>
-                  </div>
+              <SheetContent side="left" hideClose className="left-4 top-1/2 bottom-auto flex h-auto max-h-[calc(100vh-2rem)] w-[calc(100vw-2rem)] max-w-none -translate-y-1/2 flex-col overflow-hidden rounded-2xl border-2 border-primary/40 p-3 shadow-xl !animate-none transition-opacity duration-200 ease-out data-[state=closed]:opacity-0 data-[state=open]:opacity-100">
+                <SheetClose asChild>
+                  <Button variant="ghost" className="mb-1 h-8 shrink-0 gap-2 self-start rounded-full border-2 border-primary px-3 text-sm text-primary hover:bg-primary hover:text-primary-foreground">
+                    <ArrowLeft className="h-3.5 w-3.5" />
+                    Back
+                  </Button>
+                </SheetClose>
+                <div className="mb-2 shrink-0">
+                  <h2 className="text-lg font-bold leading-tight text-foreground">Explore SmartyGym</h2>
                 </div>
-                <nav className="flex-1 overflow-y-auto px-3 pb-6">
-                  <div className="mt-2">
-                    <div className="px-2 pb-1.5 pt-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">SmartyGym</div>
-                    <ul className="space-y-1">
-                      {discoveryItems.map(({ label, path, icon: Icon, iconClass }) => (
-                        <li key={path}>
-                          <button
-                            type="button"
-                            onClick={() => handleNavigate(path)}
-                            className="flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left text-sm font-semibold text-foreground hover:bg-primary/10"
-                          >
-                            <span className={`grid h-9 w-9 place-items-center rounded-xl bg-primary/10 ${iconClass}`}>
-                              <Icon className="h-4 w-4" />
-                            </span>
-                            {label}
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div className="mt-2">
-                    <div className="px-2 pb-1.5 pt-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Legal</div>
-                    <ul className="space-y-1">
-                      {[
-                        { to: "/privacy-policy", label: "Privacy Policy", Icon: Shield },
-                        { to: "/termsofservice", label: "Terms of Service", Icon: FileText },
-                        { to: "/disclaimer", label: "Disclaimer", Icon: AlertTriangle },
-                      ].map(({ to, label, Icon }) => (
-                        <li key={to}>
-                          <button
-                            type="button"
-                            onClick={() => handleNavigate(to)}
-                            className="flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left text-sm font-semibold text-foreground hover:bg-primary/10"
-                          >
-                            <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary">
-                              <Icon className="h-4 w-4" />
-                            </span>
-                            {label}
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                <nav className="grid grid-cols-2 gap-2 overflow-y-auto">
+                  {discoveryItems.map(({ label, path, icon: Icon, iconClass }) => {
+                    const active = location.pathname === path;
+                    return (
+                      <button
+                        key={path}
+                        type="button"
+                        onClick={() => handleNavigate(path)}
+                        className={`flex flex-col items-center justify-center rounded-2xl border-2 p-2 text-center font-semibold transition-all duration-200 ${active ? 'border-primary bg-primary/15 text-primary shadow-sm' : 'border-primary/25 bg-card text-foreground hover:border-primary hover:bg-primary/10'}`}
+                      >
+                        <span className={`mx-auto mb-1 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 ${iconClass}`}>
+                          <Icon className="h-5 w-5" />
+                        </span>
+                        <span className="block text-xs leading-tight">{label}</span>
+                      </button>
+                    );
+                  })}
                 </nav>
               </SheetContent>
             </Sheet>
