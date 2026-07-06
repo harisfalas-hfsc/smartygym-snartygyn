@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User as UserIcon, Settings, LogOut, LayoutDashboard, Crown, Bell, Facebook, Instagram, Youtube, ShoppingBag, Info, Dumbbell, ListChecks, Wrench, BookOpen, Users, Newspaper, Mail, Sparkles, Building2, Shield, HelpCircle, Compass, ArrowLeft, Menu, Home } from "lucide-react";
+import { User as UserIcon, Settings, LogOut, LayoutDashboard, Crown, Bell, Facebook, Instagram, Youtube, ShoppingBag, Info, Dumbbell, ListChecks, Wrench, BookOpen, Users, Newspaper, Mail, Sparkles, Building2, Shield, HelpCircle, Compass, ArrowLeft, Menu, Home, FileText, AlertTriangle } from "lucide-react";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useToast } from "@/hooks/use-toast";
@@ -302,8 +302,7 @@ export const Navigation = () => {
       >
         <div className="flex h-11 items-center justify-between gap-2 px-3">
           <div className="flex items-center gap-2">
-            <Sheet open={mobileMenuOpen && !user ? false : undefined /* independent */} />
-            <Sheet open={desktopMenuOpen} onOpenChange={setDesktopMenuOpen}>
+            <Sheet>
               <SheetTrigger asChild>
                 <button
                   type="button"
