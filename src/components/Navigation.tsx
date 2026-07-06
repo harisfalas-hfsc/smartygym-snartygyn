@@ -263,6 +263,7 @@ export const Navigation = () => {
     navigate(path);
     setMobileMenuOpen(false);
     setDesktopMenuOpen(false);
+    setMobileDrawerOpen(false);
     // Scroll to top after navigation
     setTimeout(() => window.scrollTo(0, 0), 0);
   };
