@@ -1041,21 +1041,21 @@ const Index = () => {
           </section> : <>
             {/* Desktop: Compact hero with 4 stacked pillar rows */}
             <div className="hidden md:block container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6 pt-1 pb-4">
-              <div className="text-center mb-4">
-                <p className="text-sm font-bold tracking-[0.2em] uppercase text-primary mb-3">
+              <div className="text-center mb-3">
+                <p className="text-[11px] font-bold tracking-[0.2em] uppercase text-primary mb-2">
                   Science-Backed · Expert-Designed
                 </p>
-                <h1 className="text-6xl lg:text-7xl font-extrabold tracking-tight uppercase leading-[1.05] text-foreground">
+                <h1 className="text-[2.8125rem] lg:text-[3.375rem] font-extrabold tracking-tight uppercase leading-[1.05] text-foreground">
                   Train <span className="text-primary">Smarter.</span>
                   <br />
                   Not Harder.
                 </h1>
-                <p className="text-sm font-semibold tracking-[0.15em] uppercase text-muted-foreground mt-4 leading-snug">
+                <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-muted-foreground mt-3 leading-snug">
                   Expert Workouts · Training Programs · Blog Insights · Smarty Tools
                   <br />
                   <span className="text-primary">All In Your Pocket.</span>
                 </p>
-                <p className="mt-6 text-2xl lg:text-3xl font-extrabold tracking-tight text-center">
+                <p className="mt-[18px] text-lg lg:text-[1.4rem] font-extrabold tracking-tight text-center">
                   100% Human. <span className="text-red-500">0% AI.</span>
                 </p>
                 <p className="text-sm text-muted-foreground mt-2 max-w-xl mx-auto">
