@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
 // (STRIPE_PRICE_IDS no longer needed here — Lifetime checkout lives on /smartypremium)
@@ -602,10 +601,6 @@ const Index = () => {
       </section>
 
       <div className="min-h-screen bg-background overflow-x-hidden">
-        <div className="container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6">
-          <PageBreadcrumbs items={[{ label: "Home" }]} />
-        </div>
-
         {isMobile ? <section className="pt-0 pb-2 px-4">
             {/* Mobile hero tagline */}
             <div className="text-center mb-4 mt-2">
@@ -1040,8 +1035,8 @@ const Index = () => {
 
           </section> : <>
             {/* Desktop: Compact hero with 4 stacked pillar rows */}
-            <div className="hidden md:block container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6 pt-1 pb-4">
-              <div className="text-center mb-3">
+            <div className="hidden md:block container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6 pt-0 pb-2">
+              <div className="text-center mb-2">
                 <p className="text-[11px] font-bold tracking-[0.2em] uppercase text-primary mb-2">
                   Science-Backed · Expert-Designed
                 </p>
