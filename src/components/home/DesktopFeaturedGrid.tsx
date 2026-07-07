@@ -205,9 +205,9 @@ export const DesktopFeaturedGrid = ({ workouts, programs, articles, workoutCateg
               src={heroCommunityCelebratingImage}
               alt="SmartyGym community celebrating together"
               loading="lazy"
-              className="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-40 group-hover:scale-105 transition-all duration-500"
+              className="absolute inset-0 w-full h-full object-cover opacity-100 group-hover:scale-105 transition-transform duration-500"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-card via-card/85 to-card/40" />
+            <div className="absolute inset-0 bg-gradient-to-r from-card/95 via-card/60 via-45% to-transparent/10" />
             <div className="relative h-full flex flex-col justify-between p-5 lg:p-6">
               <div>
                 <div className="flex items-center gap-2 mb-3">
