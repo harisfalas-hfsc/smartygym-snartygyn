@@ -74,8 +74,15 @@ const PrivacyPolicy = () => {
           <Card className="p-8 space-y-8">
             <div className="prose dark:prose-invert max-w-none">
               <div className="bg-muted/50 p-4 rounded-lg mb-6">
-                <p className="text-sm text-muted-foreground mb-2"><strong>Last Updated:</strong> January 14, 2025</p>
-                <p className="text-sm text-muted-foreground mb-2"><strong>Data Controller:</strong> SmartyGym (smartygym.com)</p>
+                <p className="text-sm text-muted-foreground mb-2"><strong>Last Updated:</strong> July 2026</p>
+                <p className="text-sm text-muted-foreground mb-2">
+                  <strong>Operator:</strong> SmartyGym (smartygym.com), part of the{" "}
+                  <a href="https://smartywellness.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Smarty Wellness</a>{" "}
+                  family of brands (with{" "}
+                  <a href="https://smartymove.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">SmartyMove</a>{" "}
+                  and{" "}
+                  <a href="https://smartydiet.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">SmartyDiet</a>)
+                </p>
                 <p className="text-sm text-muted-foreground"><strong>Contact:</strong> smartygym@outlook.com</p>
               </div>
 
@@ -84,6 +91,17 @@ const PrivacyPolicy = () => {
                 This Privacy Policy explains how our <strong>Online Fitness Platform</strong> collects, uses, stores, and protects your information when you visit our
                 website or use our services. Our practices comply with the General Data Protection Regulation (GDPR) 
                 (EU) 2016/679, the ePrivacy Directive 2002/58/EC, and applicable data protection laws worldwide.
+              </p>
+
+              <p className="text-lg text-muted-foreground">
+                SmartyGym is part of the{" "}
+                <a href="https://smartywellness.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Smarty Wellness</a>{" "}
+                family of brands — a complete, science-based ecosystem for everyday human wellness. It includes SmartyGym (train —{" "}
+                <a href="https://smartygym.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">smartygym.com</a>),{" "}
+                <a href="https://smartymove.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">SmartyMove</a> (assess —{" "}
+                <a href="https://smartymove.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">smartymove.com</a>), and{" "}
+                <a href="https://smartydiet.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">SmartyDiet</a> (fuel —{" "}
+                <a href="https://smartydiet.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">smartydiet.com</a>).
               </p>
 
               <div className="flex items-start gap-3 mt-6">
@@ -392,7 +410,7 @@ const PrivacyPolicy = () => {
                     If you have any questions about this Privacy Policy, wish to exercise your rights, or have concerns about how we handle your data, please contact us:
                   </p>
                   <div className="text-muted-foreground space-y-1">
-                    <p><strong>Smarty Gym</strong></p>
+                    <p><strong>SmartyGym</strong> (smartygym.com), part of Smarty Wellness, alongside sister brands SmartyMove and SmartyDiet.</p>
                     <p><strong>Data Controller:</strong> Haris Falas</p>
                     <p>Email: <a href="mailto:smartygym@outlook.com" className="text-primary hover:underline">smartygym@outlook.com</a></p>
                   </div>
@@ -405,7 +423,7 @@ const PrivacyPolicy = () => {
           </Card>
 
           <p className="text-center text-sm text-muted-foreground mt-8">
-            Last updated: January 14, 2025
+            Last updated: July 2026
           </p>
         </div>
       </div>

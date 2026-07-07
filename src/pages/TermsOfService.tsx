@@ -78,15 +78,30 @@ const TermsOfService = () => {
           <Card className="p-8 space-y-8">
             <div className="prose dark:prose-invert max-w-none">
               <div className="bg-muted/50 p-4 rounded-lg mb-6">
-                <p className="text-sm text-muted-foreground mb-2"><strong>Effective Date:</strong> January 14, 2025</p>
-                <p className="text-sm text-muted-foreground mb-2"><strong>Website:</strong> smartygym.com</p>
-                <p className="text-sm text-muted-foreground"><strong>Company:</strong> SmartyGym | Founded by Haris Falas</p>
+                <p className="text-sm text-muted-foreground mb-2"><strong>Last updated:</strong> July 2026</p>
+                <p className="text-sm text-muted-foreground mb-2">
+                  <strong>Operator:</strong> SmartyGym (smartygym.com), part of the{" "}
+                  <a href="https://smartywellness.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Smarty Wellness</a>{" "}
+                  family of brands (with{" "}
+                  <a href="https://smartymove.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">SmartyMove</a>{" "}
+                  and{" "}
+                  <a href="https://smartydiet.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">SmartyDiet</a>)
+                </p>
+                <p className="text-sm text-muted-foreground"><strong>Contact:</strong> smartygym@outlook.com</p>
               </div>
 
               <p className="text-lg text-muted-foreground">
                 Welcome to <strong>SmartyGym</strong> (smartygym.com)! By accessing or using our <strong>Online Fitness Platform</strong>, services, and subscription-based fitness programs designed by <strong>Haris Falas</strong>, 
                 you agree to comply with and be bound by the following Terms & Conditions. Please read them carefully before 
                 using our online fitness services.
+              </p>
+
+              <p className="text-lg text-muted-foreground">
+                SmartyGym is part of the{" "}
+                <a href="https://smartywellness.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Smarty Wellness</a>{" "}
+                family of brands — a complete, science-based ecosystem for everyday human wellness — alongside{" "}
+                <a href="https://smartymove.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">SmartyMove</a> (assess) and{" "}
+                <a href="https://smartydiet.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">SmartyDiet</a> (fuel).
               </p>
 
               <div className="flex items-start gap-3 mt-6">
@@ -117,6 +132,15 @@ const TermsOfService = () => {
                   <h2 className="text-2xl font-bold mb-3">3. Services Provided</h2>
                   <p className="text-muted-foreground mb-3">
                     <strong>SmartyGym</strong> (smartygym.com) provides the following <strong>Online Fitness Platform</strong> services:
+                  </p>
+
+                  <h3 className="text-lg font-semibold mt-4 mb-2">What SmartyGym Is</h3>
+                  <p className="text-muted-foreground mb-3">
+                    SmartyGym is the <strong>train</strong> pillar of the Smarty Wellness ecosystem, which is built on three pillars:{" "}
+                    <a href="https://smartygym.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">SmartyGym</a> (train),{" "}
+                    <a href="https://smartymove.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">SmartyMove</a> (assess), and{" "}
+                    <a href="https://smartydiet.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">SmartyDiet</a> (fuel).
+                    Each brand is a separate app with a separate account — using one does not create or grant access to accounts on the others.
                   </p>
                   
                   <h3 className="text-lg font-semibold mt-4 mb-2">Core Fitness Services</h3>
@@ -331,7 +355,7 @@ const TermsOfService = () => {
                 <div>
                   <h2 className="text-2xl font-bold mb-3">12. Intellectual Property</h2>
                   <ul className="space-y-2 text-muted-foreground">
-                    <li>All content on the Website (programs, workouts, videos, graphics, text, and logos) is the property of Smarty Gym and its founder Haris Falas, or its licensors.</li>
+                    <li>All content on the Website (programs, workouts, videos, graphics, text, and logos) is the property of SmartyGym and its parent, Smarty Wellness, together with its founder Haris Falas, or its licensors.</li>
                     <li>Content may not be copied, distributed, or reproduced without prior written permission.</li>
                     <li>Users are granted a limited, personal, non-transferable license to access the content for personal use only.</li>
                     <li>You may not use automated tools to scrape, copy, or download content from our platform.</li>
@@ -480,7 +504,7 @@ const TermsOfService = () => {
                     If you have questions about these Terms & Conditions, please contact us:
                   </p>
                   <div className="text-muted-foreground space-y-1">
-                    <p><strong>Smarty Gym</strong></p>
+                    <p><strong>SmartyGym</strong> — part of Smarty Wellness</p>
                     <p><strong>Owner:</strong> Haris Falas</p>
                     <p>📩 Email: <a href="mailto:smartygym@outlook.com" className="text-primary hover:underline">smartygym@outlook.com</a></p>
                     <p>🌐 Website: <a href="https://smartygym.com" className="text-primary hover:underline">smartygym.com</a></p>
@@ -491,7 +515,7 @@ const TermsOfService = () => {
           </Card>
 
           <p className="text-center text-sm text-muted-foreground mt-8">
-            Effective Date: January 14, 2025
+            Last updated: July 2026
           </p>
         </div>
       </div>
