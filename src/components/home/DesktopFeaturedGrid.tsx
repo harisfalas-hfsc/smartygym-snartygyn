@@ -131,7 +131,7 @@ export const DesktopFeaturedGrid = ({ workouts, programs, articles, workoutCateg
   ) => (
     <article
       key={key}
-      className={`rounded-2xl border-2 ${borderClass} bg-card p-4 lg:p-5 flex flex-col h-full`}
+      className={`rounded-2xl border-2 ${borderClass} bg-card p-5 lg:p-6 flex flex-col h-full`}
     >
       <div className="flex items-center gap-2 mb-3 min-h-[24px]">
         <Icon className="h-4 w-4 text-primary" />
@@ -178,7 +178,7 @@ export const DesktopFeaturedGrid = ({ workouts, programs, articles, workoutCateg
       <button
         type="button"
         onClick={() => navigate(route)}
-        className="mt-auto pt-3 inline-flex h-9 items-center gap-1 text-xs font-semibold text-primary hover:underline self-start"
+        className="mt-auto pt-4 inline-flex h-9 items-center justify-center gap-1 text-sm font-semibold text-primary hover:underline self-start"
       >
         {ctaLabel}
         <ChevronRight className="h-3.5 w-3.5" />
