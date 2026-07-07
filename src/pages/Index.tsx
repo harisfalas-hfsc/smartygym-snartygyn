@@ -196,7 +196,7 @@ const Index = () => {
     refetchOnWindowFocus: false, // Don't refetch on tab focus
   });
 
-  // Latest 3 workouts for mobile "Featured Workouts" section
+  // Latest 4 workouts for homepage featured sections
   const { data: latestWorkouts = [] } = useQuery({
     queryKey: ["home-featured-latest-workouts"],
     queryFn: async () => {
@@ -205,12 +205,12 @@ const Index = () => {
         .filter((w) => w.is_workout_of_day !== true || w.wod_source === "library")
         .filter((w) => !!w.created_at)
         .sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""))
-        .slice(0, 3);
+        .slice(0, 4);
     },
     staleTime: 1000 * 60 * 5,
   });
 
-  // Latest 3 programs for mobile "Featured Training Programs" section
+  // Latest 4 programs for homepage featured sections
   const { data: latestPrograms = [] } = useQuery({
     queryKey: ["home-featured-latest-programs"],
     queryFn: async () => {
@@ -218,7 +218,7 @@ const Index = () => {
       return (data || [])
         .filter((p) => p.is_visible !== false && !!p.created_at)
         .sort((a, b) => String(b.created_at || "").localeCompare(String(a.created_at || "")))
-        .slice(0, 3);
+        .slice(0, 4);
     },
     staleTime: 1000 * 60 * 5,
   });
