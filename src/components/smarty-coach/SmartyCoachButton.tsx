@@ -25,8 +25,9 @@ export const SmartyCoachButton = ({ className }: SmartyCoachButtonProps) => {
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   const getDefaultTop = useCallback(() => {
-    const headerH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--app-header-h') || '100');
-    return headerH + 8;
+    const headerH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--app-header-h') || '44');
+    // Align with hero heading ("Train Smarter") — ~100px below the header.
+    return headerH + 100;
   }, []);
 
   useEffect(() => {
