@@ -205,10 +205,9 @@ export const DesktopFeaturedGrid = ({ workouts, programs, articles, workoutCateg
               src={heroCommunityCelebratingImage}
               alt="SmartyGym community celebrating together"
               loading="lazy"
-              className="absolute inset-0 w-full h-full object-cover opacity-100 group-hover:scale-105 transition-transform duration-500"
+              className="absolute inset-0 w-full h-full object-cover opacity-100 [mask-image:linear-gradient(to_right,transparent_0%,transparent_16%,black_82%,black_100%)] [-webkit-mask-image:linear-gradient(to_right,transparent_0%,transparent_16%,black_82%,black_100%)] group-hover:scale-105 transition-transform duration-500"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent/10 via-card/60 via-55% to-card/95" />
-            <div className="relative h-full flex flex-col justify-between items-end text-right p-5 lg:p-6">
+            <div className="relative h-full flex flex-col justify-between p-5 lg:p-6">
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <Users className="h-5 w-5 text-primary" />
@@ -219,7 +218,7 @@ export const DesktopFeaturedGrid = ({ workouts, programs, articles, workoutCateg
                 <p className="text-sm lg:text-base text-foreground/80 max-w-xl leading-snug">
                   Share progress, climb the leaderboards, and stay accountable with real people on the same journey.
                 </p>
-                <div className="mt-4 flex flex-wrap gap-2 justify-end">
+                <div className="mt-4 flex flex-wrap gap-2">
                   <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/70 px-3 py-1 text-xs font-semibold text-foreground">
                     <Trophy className="h-3.5 w-3.5 text-primary" /> Leaderboards
                   </span>
@@ -231,7 +230,7 @@ export const DesktopFeaturedGrid = ({ workouts, programs, articles, workoutCateg
                   </span>
                 </div>
               </div>
-              <span className="mt-4 inline-flex h-9 items-center gap-1 text-sm font-semibold text-primary group-hover:underline self-end">
+              <span className="mt-4 inline-flex h-9 items-center gap-1 text-sm font-semibold text-primary group-hover:underline self-start">
                 Join the community
                 <ChevronRight className="h-4 w-4" />
               </span>
