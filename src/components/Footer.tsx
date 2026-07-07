@@ -41,14 +41,18 @@ export const Footer = () => {
             <button onClick={() => navigate("/disclaimer")} className="hover:text-primary transition-colors">
               Disclaimer
             </button>
-            <button onClick={() => navigate("/smarty-premium")} className="hover:text-primary transition-colors">
-              Pricing
-            </button>
-            <button onClick={() => navigate("/contact")} className="hidden md:block hover:text-primary transition-colors">
-              Contact
-            </button>
           </div>
-          
+
+          {/* Sister Brands */}
+          <div className="flex items-center justify-center gap-x-4 text-sm text-muted-foreground">
+            <a href="https://smartymove.com" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
+              Smarty Move
+            </a>
+            <a href="https://smartydiet.com" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
+              Smarty Diet
+            </a>
+          </div>
+
           {/* Copyright */}
           <div className="text-center text-sm text-muted-foreground">
             <p>© 2025 <span className="text-primary font-semibold">SmartyGym</span><span className="hidden md:inline"> - Your Gym Re-imagined. Anywhere, Anytime.</span></p>
