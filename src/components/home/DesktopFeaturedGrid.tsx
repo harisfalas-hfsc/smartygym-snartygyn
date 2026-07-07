@@ -1,9 +1,10 @@
 import { useNavigate } from "react-router-dom";
-import { ChevronRight, Dumbbell, Calendar, Newspaper, Wrench } from "lucide-react";
+import { ChevronRight, Dumbbell, Calendar, Newspaper, Wrench, Users, Trophy, MessageCircle, Star } from "lucide-react";
 import { getBlogArticleImage } from "@/utils/blogImages";
 import toolTimerImage from "@/assets/tools/timer-card-mobile.jpg";
 import tool1RmImage from "@/assets/tools/1rm-card-mobile.jpg";
 import toolMacroImage from "@/assets/tools/macro-card-mobile.jpg";
+import heroCommunityCelebratingImage from "@/assets/hero-community-celebrating.jpg";
 
 type FeaturedItem = {
   id: string;
@@ -65,7 +66,7 @@ export const DesktopFeaturedGrid = ({ workouts, programs, articles, workoutCateg
   ) => (
     <article
       key={key}
-      className={`col-span-1 rounded-2xl border-2 ${borderClass} bg-card p-5 lg:p-6 flex flex-col h-full`}
+      className={`rounded-2xl border-2 ${borderClass} bg-card p-5 lg:p-6 flex flex-col`}
     >
       <div className="flex items-center gap-2 mb-4 min-h-[28px]">
         <Icon className="h-5 w-5 text-primary" />
@@ -73,7 +74,7 @@ export const DesktopFeaturedGrid = ({ workouts, programs, articles, workoutCateg
           Featured {title}
         </h2>
       </div>
-      <div className="flex flex-col gap-3 flex-1">
+      <div className="flex flex-col gap-3">
         {(items.length > 0 ? items : Array.from({ length: 4 }).map(() => null)).map((item, idx) =>
           item ? (
             <button
@@ -112,7 +113,7 @@ export const DesktopFeaturedGrid = ({ workouts, programs, articles, workoutCateg
       <button
         type="button"
         onClick={() => navigate(route)}
-        className="mt-auto pt-4 inline-flex h-9 items-center justify-center gap-1 text-sm font-semibold text-primary hover:underline self-start"
+        className="mt-4 inline-flex h-9 items-center justify-center gap-1 text-sm font-semibold text-primary hover:underline self-start"
       >
         {ctaLabel}
         <ChevronRight className="h-4 w-4" />
@@ -189,8 +190,54 @@ export const DesktopFeaturedGrid = ({ workouts, programs, articles, workoutCateg
   return (
     <section className="hidden md:block container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6 pt-3 pb-6">
       <div className="grid grid-cols-3 gap-4 lg:gap-5 items-stretch">
-        {bigCard("workouts", "Workouts", Dumbbell, workoutItems, "/workout", "Explore all workouts", "border-primary/40")}
-        {bigCard("programs", "Programs", Calendar, programItems, "/trainingprogram", "Explore all programs", "border-primary/40")}
+        <div className="col-span-2 flex flex-col gap-4 lg:gap-5 h-full">
+          <div className="grid grid-cols-2 gap-4 lg:gap-5 items-start">
+            {bigCard("workouts", "Workouts", Dumbbell, workoutItems, "/workout", "Explore all workouts", "border-primary/40")}
+            {bigCard("programs", "Programs", Calendar, programItems, "/trainingprogram", "Explore all programs", "border-primary/40")}
+          </div>
+          <button
+            type="button"
+            onClick={() => navigate("/community")}
+            className="group relative flex-1 min-h-[180px] rounded-2xl border-2 border-green-500/50 bg-card overflow-hidden text-left hover:border-green-500 hover:shadow-lg transition-all"
+            aria-label="Join the SmartyGym Community"
+          >
+            <img
+              src={heroCommunityCelebratingImage}
+              alt="SmartyGym community celebrating together"
+              loading="lazy"
+              className="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-40 group-hover:scale-105 transition-all duration-500"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-card via-card/85 to-card/40" />
+            <div className="relative h-full flex flex-col justify-between p-5 lg:p-6">
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <Users className="h-5 w-5 text-primary" />
+                  <h2 className="text-lg lg:text-xl font-extrabold tracking-tight text-primary uppercase">
+                    Featured Community
+                  </h2>
+                </div>
+                <p className="text-sm lg:text-base text-foreground/80 max-w-xl leading-snug">
+                  Share progress, climb the leaderboards, and stay accountable with real people on the same journey.
+                </p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/70 px-3 py-1 text-xs font-semibold text-foreground">
+                    <Trophy className="h-3.5 w-3.5 text-primary" /> Leaderboards
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/70 px-3 py-1 text-xs font-semibold text-foreground">
+                    <Star className="h-3.5 w-3.5 text-primary" /> Member reviews
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/70 px-3 py-1 text-xs font-semibold text-foreground">
+                    <MessageCircle className="h-3.5 w-3.5 text-primary" /> Real support
+                  </span>
+                </div>
+              </div>
+              <span className="mt-4 inline-flex h-9 items-center gap-1 text-sm font-semibold text-primary group-hover:underline self-start">
+                Join the community
+                <ChevronRight className="h-4 w-4" />
+              </span>
+            </div>
+          </button>
+        </div>
         <div className="col-span-1 flex flex-col gap-4 lg:gap-5 h-full">
           {smallCard("blog", "Blog", Newspaper, articleItems, "/blog", "Read the blog", "border-green-500/50")}
           {smallCard("tools", "Tools", Wrench, toolsFeatured, "/tools", "Open all tools", "border-green-500/50")}
