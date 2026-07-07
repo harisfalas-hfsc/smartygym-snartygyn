@@ -208,7 +208,7 @@ export const DesktopFeaturedGrid = ({ workouts, programs, articles, workoutCateg
               className="absolute inset-0 w-full h-full object-cover opacity-100 group-hover:scale-105 transition-transform duration-500"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-transparent/10 via-card/60 via-55% to-card/95" />
-            <div className="relative h-full flex flex-col justify-between p-5 lg:p-6">
+            <div className="relative h-full flex flex-col justify-between items-end text-right p-5 lg:p-6">
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <Users className="h-5 w-5 text-primary" />
