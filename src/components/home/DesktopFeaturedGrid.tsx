@@ -205,7 +205,7 @@ export const DesktopFeaturedGrid = ({ workouts, programs, articles, workoutCateg
               src={heroCommunityCelebratingImage}
               alt="SmartyGym community celebrating together"
               loading="lazy"
-              className="absolute inset-0 w-full h-full object-cover opacity-100 [mask-image:linear-gradient(to_right,transparent_0%,transparent_16%,black_82%,black_100%)] [-webkit-mask-image:linear-gradient(to_right,transparent_0%,transparent_16%,black_82%,black_100%)] group-hover:scale-105 transition-transform duration-500"
+              className="absolute inset-0 w-full h-full object-cover opacity-100 [mask-image:linear-gradient(to_right,transparent_0%,rgba(0,0,0,0.3)_50%,black_100%)] [-webkit-mask-image:linear-gradient(to_right,transparent_0%,rgba(0,0,0,0.3)_50%,black_100%)] group-hover:scale-105 transition-transform duration-500"
             />
             <div className="relative h-full flex flex-col justify-between p-5 lg:p-6">
               <div>
@@ -215,22 +215,22 @@ export const DesktopFeaturedGrid = ({ workouts, programs, articles, workoutCateg
                     Featured Community
                   </h2>
                 </div>
-                <p className="text-sm lg:text-base text-foreground/80 max-w-xl leading-snug">
+                <p className="text-sm lg:text-base font-semibold text-foreground max-w-xl leading-snug [text-shadow:0_1px_3px_hsl(var(--background))]">
                   Share progress, climb the leaderboards, and stay accountable with real people on the same journey.
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/70 px-3 py-1 text-xs font-semibold text-foreground">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/85 px-3 py-1 text-xs font-semibold text-foreground">
                     <Trophy className="h-3.5 w-3.5 text-primary" /> Leaderboards
                   </span>
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/70 px-3 py-1 text-xs font-semibold text-foreground">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/85 px-3 py-1 text-xs font-semibold text-foreground">
                     <Star className="h-3.5 w-3.5 text-primary" /> Member reviews
                   </span>
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/70 px-3 py-1 text-xs font-semibold text-foreground">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/85 px-3 py-1 text-xs font-semibold text-foreground">
                     <MessageCircle className="h-3.5 w-3.5 text-primary" /> Real support
                   </span>
                 </div>
               </div>
-              <span className="mt-4 inline-flex h-9 items-center gap-1 text-sm font-semibold text-primary group-hover:underline self-start">
+              <span className="mt-4 inline-flex h-9 items-center gap-1 text-sm font-bold text-primary group-hover:underline self-start [text-shadow:0_1px_3px_hsl(var(--background))]">
                 Join the community
                 <ChevronRight className="h-4 w-4" />
               </span>
