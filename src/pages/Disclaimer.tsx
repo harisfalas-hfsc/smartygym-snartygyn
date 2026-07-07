@@ -47,8 +47,19 @@ const Disclaimer = () => {
               </div>
 
               <div className="bg-primary/10 border border-primary/20 p-4 rounded-lg mb-6">
-                <p className="text-sm font-semibold">
-                  <strong>Last updated:</strong> January 2025
+                <p className="text-sm font-semibold mb-2">
+                  <strong>Last updated:</strong> July 2026
+                </p>
+                <p className="text-sm text-muted-foreground mb-2">
+                  <strong>Operator:</strong> SmartyGym (smartygym.com), part of the{" "}
+                  <a href="https://smartywellness.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Smarty Wellness</a>{" "}
+                  family of brands (with{" "}
+                  <a href="https://smartymove.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">SmartyMove</a>{" "}
+                  and{" "}
+                  <a href="https://smartydiet.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">SmartyDiet</a>)
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  <strong>Contact:</strong> smartygym@outlook.com
                 </p>
               </div>
 
@@ -57,6 +68,14 @@ const Disclaimer = () => {
                 solely for <strong>general educational and informational purposes</strong>. While every effort has been made by our <strong>Online Fitness Platform</strong> experts 
                 to provide safe and effective guidance, <strong>SmartyGym is not a substitute for professional medical
                 advice, diagnosis, or treatment</strong>.
+              </p>
+
+              <p className="text-lg text-muted-foreground">
+                SmartyGym is part of the{" "}
+                <a href="https://smartywellness.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Smarty Wellness</a>{" "}
+                family of brands — a complete, science-based ecosystem for everyday human wellness — alongside sister brands{" "}
+                <a href="https://smartymove.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">SmartyMove</a> (assess) and{" "}
+                <a href="https://smartydiet.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">SmartyDiet</a> (fuel).
               </p>
 
               <div className="flex items-start gap-3 mt-6">
@@ -149,8 +168,9 @@ const Disclaimer = () => {
                     <li>
                       <strong>Complete Release:</strong> By using Smarty Gym services, you voluntarily and knowingly 
                       assume all risks associated with physical activity and hereby <strong>RELEASE, WAIVE, DISCHARGE, 
-                      and COVENANT NOT TO SUE</strong> Smarty Gym, Haris Falas, its owners, trainers, employees, 
-                      contractors, affiliates, and agents from any and all liability.
+                      and COVENANT NOT TO SUE</strong> SmartyGym, Haris Falas, its parent Smarty Wellness, its
+                      affiliated brands (SmartyMove and SmartyDiet), and their respective operators, owners, trainers,
+                      contributors, employees, contractors, affiliates, and agents from any and all liability.
                     </li>
                     <li>
                       <strong>No Liability:</strong> SmartyGym and its representatives <strong>shall not be held 
@@ -250,7 +270,7 @@ const Disclaimer = () => {
           </div>
 
           <p className="text-center text-sm text-muted-foreground mt-8">
-            Last updated: January 2025
+            Last updated: July 2026
           </p>
         </div>
       </div>
