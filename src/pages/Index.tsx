@@ -1035,29 +1035,43 @@ const Index = () => {
 
           </section> : <>
             {/* Desktop: Compact hero with 4 stacked pillar rows */}
-            <div className="hidden md:block container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6 pt-0 pb-2">
-              <div className="text-center mb-2">
-                <p className="text-[11px] font-bold tracking-[0.2em] uppercase text-primary mb-2">
-                  Science-Backed · Expert-Designed
-                </p>
-                <h1 className="text-[2.1rem] lg:text-[2.5rem] font-extrabold tracking-tight uppercase leading-[1.05] text-foreground whitespace-nowrap">
-                  Train <span className="text-primary">Smarter,</span> Not <span className="text-green-500">Harder.</span>
-                </h1>
-                <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-muted-foreground mt-3 leading-snug">
-                  Expert Workouts · Training Programs · Blog Insights · Smarty Tools
-                  <br />
-                  <span className="text-primary">All In Your Pocket.</span>
-                </p>
-                <p className="mt-[18px] text-lg lg:text-[1.4rem] font-extrabold tracking-tight text-center">
-                  100% Human. <span className="text-red-500">0% AI.</span>
-                </p>
-                <p className="text-sm text-muted-foreground mt-2 max-w-xl mx-auto">
-                  Every workout and program designed by{" "}
-                  <Link to="/coach-profile" className="text-primary hover:underline font-medium">
-                    Haris Falas
-                  </Link>
-                  {" "}— never by algorithms.
-                </p>
+            <div className="hidden md:block container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6 pt-0 pb-4">
+              <div className="grid grid-cols-3 gap-4 lg:gap-5">
+                {/* Big card: Train Smarter, Not Harder */}
+                <div className="col-span-2 rounded-2xl border-2 border-primary/40 bg-card p-8 lg:p-10 flex flex-col justify-center min-h-[280px]">
+                  <span className="inline-flex self-start items-center rounded-full border border-primary/40 px-3 py-1 text-[10px] font-bold tracking-[0.2em] uppercase text-primary mb-4">
+                    Science-Backed · Expert-Designed
+                  </span>
+                  <h1 className="text-[2.4rem] lg:text-[3rem] font-extrabold tracking-tight uppercase leading-[1.05] text-foreground">
+                    Train <span className="text-primary">Smarter,</span>
+                    <br />
+                    Not <span className="text-green-500">Harder.</span>
+                  </h1>
+                  <p className="text-xs lg:text-sm font-semibold tracking-[0.15em] uppercase text-muted-foreground mt-4 leading-snug">
+                    Expert Workouts · Training Programs · Blog Insights · Smarty Tools
+                    <br />
+                    <span className="text-primary">All In Your Pocket.</span>
+                  </p>
+                </div>
+
+                {/* Smaller card: 100% Human, 0% AI */}
+                <div className="col-span-1 rounded-2xl border-2 border-green-500/50 bg-card p-6 lg:p-8 flex flex-col justify-center min-h-[280px]">
+                  <span className="inline-flex self-start items-center rounded-full border border-green-500/40 px-3 py-1 text-[10px] font-bold tracking-[0.2em] uppercase text-green-500 mb-4">
+                    Who We Are
+                  </span>
+                  <p className="text-2xl lg:text-[1.9rem] font-extrabold tracking-tight leading-tight">
+                    100% Human.
+                    <br />
+                    <span className="text-red-500">0% AI.</span>
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-3 leading-relaxed">
+                    Every workout and program designed by{" "}
+                    <Link to="/coach-profile" className="text-primary hover:underline font-medium">
+                      Haris Falas
+                    </Link>
+                    {" "}— never by algorithms.
+                  </p>
+                </div>
               </div>
             </div>
             <DesktopHeroRows
