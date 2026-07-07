@@ -219,7 +219,7 @@ export const DesktopFeaturedGrid = ({ workouts, programs, articles, workoutCateg
                 <p className="text-sm lg:text-base text-foreground/80 max-w-xl leading-snug">
                   Share progress, climb the leaderboards, and stay accountable with real people on the same journey.
                 </p>
-                <div className="mt-4 flex flex-wrap gap-2">
+                <div className="mt-4 flex flex-wrap gap-2 justify-end">
                   <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/70 px-3 py-1 text-xs font-semibold text-foreground">
                     <Trophy className="h-3.5 w-3.5 text-primary" /> Leaderboards
                   </span>
