@@ -1,96 +1,38 @@
-## Goal
 
-Restructure all 30 visible training programs so each scheduled day contains a **full SmartyGym workout** (not 5–6 bullet lines), and update the program generator to do the same for every future program.
+## Cross-Promo Popup — SmartyGym → SmartyMove + SmartyDiet
 
-## What Changes
+Add a popup that appears **5 seconds after every page load**, on every route (desktop and mobile), promoting the two sister apps in the Smarty Wellness family.
 
-### 1. Per-Day Workout Structure (the core fix)
+### What appears in this project (SmartyGym)
 
-Each Day inside a program will render like an embedded SmartyGym workout, using the **same 5-section structure** as standalone workouts:
+A centered modal with two side-by-side clickable cards (stacked on mobile):
 
-```
-DAY 1 — [Session Title]
-[1-paragraph coaching note: why this session today, what to focus on, what to avoid]
+1. **SmartyMove** — https://smarty-motion-pro.lovable.app
+   - Tagline: *"Check your posture. Correct your movement. Live better."*
+2. **SmartyDiet** — https://smarty-meals-hub.lovable.app
+   - Tagline: *"Eat smart. Fuel your body. Live longer."*
 
-🔥 Soft Tissue Preparation (3–5 min)
-• [exercises with prescriptions]
+Small header: *"Complete your Smarty Wellness journey"*
+Each card = image + app name + tagline + "Visit →" button. Clicking anywhere on a card opens the target URL in a **new tab**. A small close (×) button dismisses.
 
-⚡ Activation / Warm-Up (5–8 min)
-• [exercises]
+### Behavior
 
-🏋 Main Workout (20–45 min depending on difficulty)
-• {{exercise:ID:Name}} — sets × reps, rest, %1RM/load cue
-• ...
+- Fires exactly 5 seconds after mount, every visit (per user's answer).
+- Shows on every route including auth/checkout/admin (per user's answer).
+- Same component/behavior on desktop and mobile (responsive: 2 columns ≥640px, stacked below).
+- No dependency on auth state — works for logged-out visitors too.
 
-💥 Finisher (4–8 min)
-• [conditioning/density block]
+### Files
 
-🧘 Cool Down (5 min)
-• [stretches/breathing]
-```
+- **New:** `src/components/growth/SisterAppsPopup.tsx` — the modal component (uses existing shadcn `Dialog`).
+- **New:** `src/assets/promo-smartymove.jpg` — generated placeholder (athletic person doing a mobility/movement assessment, bright, clean).
+- **New:** `src/assets/promo-smartydiet.jpg` — generated placeholder (fresh healthy meal / nutrition theme, bright, clean).
+- **Edit:** `src/App.tsx` — mount `<SisterAppsPopup />` globally alongside existing popups (`FreeTrialPopup`, `SmartyCoachWelcomePopup`).
 
-No per-day "Description / Tips / Instructions" headings — just the single coaching paragraph + the 5 workout sections. Program-level Description, Goal, Phases, Progression Instructions, Tips stay where they are.
+### Reusable across the three projects
 
-### 2. Realistic Durations (by difficulty)
+The component will be self-contained (no project-specific imports beyond shadcn `Dialog` + `Button` + `lucide-react`, all present in all three projects). It exports a small `SISTER_APPS` config array. To port to SmartyMove and SmartyDiet, the user (or agent, in those projects) copies the file + two images and swaps which two entries the popup shows — a single `CURRENT_APP = "gym" | "move" | "diet"` constant at the top controls that.
 
-| Difficulty | Total session target |
-|---|---|
-| Beginner | 40–50 min |
-| Intermediate | 55–65 min |
-| Advanced | 70–80 min |
+### Verification
 
-Exercise count and set volume scale to hit those windows. No more "5 exercises × 60 sec = 5 min" sessions.
-
-### 3. Phased Periodization with Workout Reuse
-
-Generator picks 1–4 phases based on program length:
-- 4 wk → 2 phases
-- 6 wk → 3 phases (2+2+2)
-- 8 wk → 3 phases (3+2+3) or 4 phases
-- 12 wk → 4 phases (3+4+1 deload+4)
-
-Within a phase, the **same daily workouts repeat** week-to-week with progression applied (load %, volume, density, intensity, complexity — chosen by category).
-
-### 4. Category-Specific Progression Models
-
-- **Muscle Hypertrophy** — %1RM ladder (65→70→75→80), volume waves
-- **Functional Strength** — load + sets/reps + complexity
-- **Cardio Endurance** — distance / duration / pace / intervals / work:rest
-- **Weight Loss** — volume, density, work capacity, circuit difficulty
-- **Low Back Pain** — quality / stability / pain-free, no aggressive jumps
-- **Mobility & Stability** — ROM, control, balance, complexity
-
-### 5. Backfill All 30 Existing Programs
-
-Run the new generator's "rebuild weekly schedule" path against every visible program (excluding HFSC, per project rule). Preserve: name, category, description, overview, target audience, difficulty, weeks, days/week, image, price, Stripe links, visibility. Only the `weekly_schedule` field is rewritten.
-
-### 6. Library-First Exercise Selection (unchanged)
-
-Continue using `{{exercise:ID:Name}}` markup from the existing library, filtered by category → equipment → difficulty → muscle/focus, with family-diversity (no repeating push/pull/hinge in same session unless pool exhausted).
-
-## Technical Details
-
-**Files to edit:**
-- `supabase/functions/_shared/program-template.ts` — replace `defaultSessionTemplate()` with new 5-section full-workout template; add `buildFullSessionWorkout(category, difficulty, phase, dayFocus, libraryExercises)`
-- `supabase/functions/_shared/program-exercise-picker.ts` — return enough exercises per day for a full session (8–14 depending on difficulty), grouped by section
-- `supabase/functions/generate-admin-program/index.ts` — call new builder; add phase planning step and per-category progression rules; remove the bullet-line skeleton path for daily workouts
-- `supabase/functions/restructure-training-programs/index.ts` — switch to new builder; iterate all 30 visible non-HFSC programs and overwrite `weekly_schedule`
-- `src/utils/programTemplate.ts` — mirror the shared template (admin editor "Standardized Format" button)
-
-**Validation:**
-- Density check: each Day must have ≥ minimum exercises for its difficulty tier (Beginner 6, Intermediate 8, Advanced 10) across all sections combined
-- Total-time check: estimated minutes within the difficulty window
-- Reject and retry if either fails (existing retry harness in `wod-generation-reliability` style)
-
-**Deployment order:**
-1. Update shared templates + picker
-2. Update generator + restructure function
-3. Invoke `restructure-training-programs` to rebuild all 30
-4. Verify with `htmlNormalizer.test.ts` + spot-check 2 programs via DB read
-
-**What is NOT changing:**
-- Standalone workout generator (untouched, per your rule)
-- Program-level metadata (description/overview/etc.)
-- HFSC content (locked, per core memory)
-- Visual layout / CSS / week & day headings / dividers
-- Exercise library data
+After implementing, run the project build to confirm no TS/build errors, then use Playwright against `http://localhost:8080` to load `/`, wait ~6s, screenshot, and confirm the modal appears with both cards and links resolve to the correct URLs.
