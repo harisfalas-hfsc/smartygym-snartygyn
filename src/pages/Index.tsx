@@ -1040,10 +1040,8 @@ const Index = () => {
                 <p className="text-[11px] font-bold tracking-[0.2em] uppercase text-primary mb-2">
                   Science-Backed · Expert-Designed
                 </p>
-                <h1 className="text-[2.8125rem] lg:text-[3.375rem] font-extrabold tracking-tight uppercase leading-[1.05] text-foreground">
-                  Train <span className="text-primary">Smarter.</span>
-                  <br />
-                  Not Harder.
+                <h1 className="text-[2.1rem] lg:text-[2.5rem] font-extrabold tracking-tight uppercase leading-[1.05] text-foreground whitespace-nowrap">
+                  Train <span className="text-primary">Smarter,</span> Not <span className="text-green-500">Harder.</span>
                 </h1>
                 <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-muted-foreground mt-3 leading-snug">
                   Expert Workouts · Training Programs · Blog Insights · Smarty Tools
