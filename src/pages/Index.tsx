@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
 // (STRIPE_PRICE_IDS no longer needed here — Lifetime checkout lives on /smartypremium)
