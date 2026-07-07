@@ -8,9 +8,9 @@ export const Footer = () => {
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
 
   return (
-    <footer className="bg-background mt-auto py-8 px-4">
+    <footer className="bg-background mt-auto py-4 px-4">
       <div className="container mx-auto max-w-7xl">
-        <div className="flex flex-col items-center gap-6">
+        <div className="flex flex-col items-center gap-2">
           {/* Social Media Links */}
           <div className="flex items-center gap-4">
             <a href="https://www.facebook.com/profile.php?id=61579302997368" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors" aria-label="Facebook">
