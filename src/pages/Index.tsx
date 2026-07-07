@@ -713,7 +713,7 @@ const Index = () => {
                   <div className="h-px flex-1 bg-primary/20" />
                 </div>
                 <div className="flex flex-col gap-3">
-                  {latestWorkouts.map((w: WorkoutData) => {
+                  {latestWorkouts.slice(0, 3).map((w: WorkoutData) => {
                     const slug = workoutCategoryToSlug(w.category);
                     const image = w.image_url || "/images/workouts/wod-card-mobile.jpg";
                     return (
@@ -809,7 +809,7 @@ const Index = () => {
                   <div className="h-px flex-1 bg-primary/20" />
                 </div>
                 <div className="flex flex-col gap-3">
-                  {latestPrograms.map((p: VisibleProgramMetadata) => {
+                  {latestPrograms.slice(0, 3).map((p: VisibleProgramMetadata) => {
                     const slug = programCategoryToSlug(p.category);
                     const image = getProgramCardImage(p.category, p.image_url);
                     return (
