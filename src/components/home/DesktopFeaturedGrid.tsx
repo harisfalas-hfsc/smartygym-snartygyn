@@ -231,7 +231,7 @@ export const DesktopFeaturedGrid = ({ workouts, programs, articles, workoutCateg
                   </span>
                 </div>
               </div>
-              <span className="mt-4 inline-flex h-9 items-center gap-1 text-sm font-semibold text-primary group-hover:underline self-start">
+              <span className="mt-4 inline-flex h-9 items-center gap-1 text-sm font-semibold text-primary group-hover:underline self-end">
                 Join the community
                 <ChevronRight className="h-4 w-4" />
               </span>
