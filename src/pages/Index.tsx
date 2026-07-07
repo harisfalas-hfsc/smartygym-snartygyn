@@ -30,6 +30,7 @@ import { fetchVisibleWorkoutMetadata } from "@/hooks/useTodayWods";
 import type { WorkoutData } from "@/hooks/useWorkoutData";
 import { getDifficultyColorClasses } from "@/lib/wodCycle";
 import { DesktopHeroRows } from "@/components/home/DesktopHeroRows";
+import { DesktopFeaturedGrid } from "@/components/home/DesktopFeaturedGrid";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
 
 import heroWodImage from "@/assets/hero-wod.jpg";
