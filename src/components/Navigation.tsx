@@ -25,7 +25,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { SafeNotificationBadge } from "@/components/NotificationBadge";
 
 import { useAdminRole } from "@/hooks/useAdminRole";
-import { SmartyCoachModal } from "@/components/smarty-coach";
+import { SmartyCoachModal, SmartyCoachButton } from "@/components/smarty-coach";
 import smartyCoachIcon from "@/assets/smarty-coach-icon.png";
 import { cn } from "@/lib/utils";
 
@@ -479,7 +479,8 @@ export const Navigation = () => {
       )}
     >
       <div className="relative flex h-[3.75rem] items-center px-4">
-        {/* Far-left: Hamburger menu */}
+        {/* Left: Hamburger + SMARTYGYM wordmark */}
+        <div className="flex items-center gap-3">
         <Sheet open={desktopMenuOpen} onOpenChange={setDesktopMenuOpen}>
           <SheetTrigger asChild>
             <button
@@ -524,9 +525,6 @@ export const Navigation = () => {
             </nav>
           </SheetContent>
         </Sheet>
-
-        {/* Center: SMARTYGYM wordmark + Smarty Coach grouped, centered as one */}
-        <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2">
           <button
             type="button"
             onClick={() => {
@@ -542,14 +540,6 @@ export const Navigation = () => {
           >
             <span className="text-primary">SMARTY</span>
             <span className="text-green-500">GYM</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setSmartyCoachOpen(true)}
-            aria-label="Smarty Coach"
-            className="inline-flex h-[2.734375rem] w-[2.734375rem] items-center justify-center rounded-full border-2 border-primary bg-background hover:bg-primary/10 transition-colors"
-          >
-            <img src={smartyCoachIcon} alt="" aria-hidden="true" className="h-[2.734375rem] w-[2.734375rem] rounded-full" width={44} height={44} />
           </button>
         </div>
 
@@ -682,6 +672,7 @@ export const Navigation = () => {
     </header>
     )}
     <SmartyCoachModal isOpen={smartyCoachOpen} onClose={() => setSmartyCoachOpen(false)} />
+    {!isMobile && <SmartyCoachButton />}
     </>
   );
 };
