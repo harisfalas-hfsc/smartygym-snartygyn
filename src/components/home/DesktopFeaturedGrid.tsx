@@ -30,7 +30,7 @@ const toolsFeatured: FeaturedItem[] = [
 export const DesktopFeaturedGrid = ({ workouts, programs, articles, workoutCategoryToSlug, programCategoryToSlug }: Props) => {
   const navigate = useNavigate();
 
-  const workoutItems: FeaturedItem[] = (workouts || []).slice(0, 3).map((w: any) => ({
+  const workoutItems: FeaturedItem[] = (workouts || []).slice(0, 4).map((w: any) => ({
     id: w.id,
     title: w.name,
     meta: [w.duration, w.difficulty].filter(Boolean).join(" · ") || w.category,
@@ -38,7 +38,7 @@ export const DesktopFeaturedGrid = ({ workouts, programs, articles, workoutCateg
     route: `/workout/${workoutCategoryToSlug(w.category)}/${w.id}`,
   }));
 
-  const programItems: FeaturedItem[] = (programs || []).slice(0, 3).map((p: any) => ({
+  const programItems: FeaturedItem[] = (programs || []).slice(0, 4).map((p: any) => ({
     id: p.id,
     title: p.name,
     meta: [p.weeks ? `${p.weeks} weeks` : null, p.difficulty].filter(Boolean).join(" · ") || p.category,
@@ -67,23 +67,23 @@ export const DesktopFeaturedGrid = ({ workouts, programs, articles, workoutCateg
       key={key}
       className={`col-span-1 rounded-2xl border-2 ${borderClass} bg-card p-5 lg:p-6 flex flex-col h-full`}
     >
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex items-center gap-2 mb-4 min-h-[28px]">
         <Icon className="h-5 w-5 text-primary" />
         <h2 className="text-lg lg:text-xl font-extrabold tracking-tight text-primary uppercase">
           Featured {title}
         </h2>
       </div>
-      <div className="flex flex-col gap-4 flex-1">
-        {(items.length > 0 ? items : Array.from({ length: 3 }).map(() => null)).map((item, idx) =>
+      <div className="flex flex-col gap-3 flex-1">
+        {(items.length > 0 ? items : Array.from({ length: 4 }).map(() => null)).map((item, idx) =>
           item ? (
             <button
               key={item.id}
               type="button"
               onClick={() => navigate(item.route)}
-              className="group flex items-stretch bg-background border border-border rounded-xl overflow-hidden hover:border-green-500 hover:shadow-md transition-all text-left flex-1 min-h-[120px]"
+              className="group flex items-stretch bg-background border border-border rounded-xl overflow-hidden hover:border-green-500 hover:shadow-md transition-all text-left min-h-[88px]"
               aria-label={item.title}
             >
-              <div className="relative w-40 lg:w-48 flex-shrink-0 bg-muted overflow-hidden">
+              <div className="relative w-28 lg:w-36 flex-shrink-0 bg-muted overflow-hidden">
                 <img
                   src={item.image}
                   alt={item.title}
@@ -91,17 +91,17 @@ export const DesktopFeaturedGrid = ({ workouts, programs, articles, workoutCateg
                   className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
               </div>
-              <div className="flex-1 min-w-0 p-4 flex flex-col justify-center">
-                <h3 className="text-base lg:text-lg font-bold text-foreground leading-snug line-clamp-2">{item.title}</h3>
+              <div className="flex-1 min-w-0 p-3 flex flex-col justify-center">
+                <h3 className="text-sm lg:text-base font-bold text-foreground leading-snug line-clamp-2">{item.title}</h3>
                 {item.meta && (
                   <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{item.meta}</p>
                 )}
               </div>
             </button>
           ) : (
-            <div key={idx} className="flex items-stretch bg-background border border-border rounded-xl overflow-hidden flex-1 min-h-[120px]">
-              <div className="w-40 lg:w-48 bg-muted animate-pulse flex-shrink-0" />
-              <div className="flex-1 p-4">
+            <div key={idx} className="flex items-stretch bg-background border border-border rounded-xl overflow-hidden min-h-[88px]">
+              <div className="w-28 lg:w-36 bg-muted animate-pulse flex-shrink-0" />
+              <div className="flex-1 p-3">
                 <div className="h-4 w-3/4 bg-muted animate-pulse rounded" />
                 <div className="h-3 w-1/2 bg-muted animate-pulse rounded mt-2" />
               </div>
@@ -112,7 +112,7 @@ export const DesktopFeaturedGrid = ({ workouts, programs, articles, workoutCateg
       <button
         type="button"
         onClick={() => navigate(route)}
-        className="mt-4 inline-flex items-center justify-center gap-1 text-sm font-semibold text-primary hover:underline self-start"
+        className="mt-auto pt-4 inline-flex h-9 items-center justify-center gap-1 text-sm font-semibold text-primary hover:underline self-start"
       >
         {ctaLabel}
         <ChevronRight className="h-4 w-4" />
@@ -131,25 +131,25 @@ export const DesktopFeaturedGrid = ({ workouts, programs, articles, workoutCateg
   ) => (
     <article
       key={key}
-      className={`rounded-2xl border-2 ${borderClass} bg-card p-4 lg:p-5 flex flex-col h-full`}
+      className={`rounded-2xl border-2 ${borderClass} bg-card p-5 lg:p-6 flex flex-col h-full`}
     >
-      <div className="flex items-center gap-2 mb-3">
+      <div className="flex items-center gap-2 mb-3 min-h-[24px]">
         <Icon className="h-4 w-4 text-primary" />
         <h2 className="text-sm lg:text-base font-extrabold tracking-tight text-primary uppercase">
           Featured {title}
         </h2>
       </div>
-      <div className="flex flex-col gap-3 flex-1">
-        {(items.length > 0 ? items.slice(0, 2) : Array.from({ length: 2 }).map(() => null)).map((item, idx) =>
+      <div className="flex flex-col gap-2 flex-1">
+        {(items.length > 0 ? items.slice(0, 3) : Array.from({ length: 3 }).map(() => null)).map((item, idx) =>
           item ? (
             <button
               key={item.id}
               type="button"
               onClick={() => navigate(item.route)}
-              className="group flex items-stretch bg-background border border-border rounded-lg overflow-hidden hover:border-green-500 hover:shadow-md transition-all text-left flex-1 min-h-[90px]"
+              className="group flex items-stretch bg-background border border-border rounded-lg overflow-hidden hover:border-green-500 hover:shadow-md transition-all text-left min-h-[66px]"
               aria-label={item.title}
             >
-              <div className="relative w-28 lg:w-32 flex-shrink-0 bg-muted overflow-hidden">
+              <div className="relative w-20 lg:w-24 flex-shrink-0 bg-muted overflow-hidden">
                 <img
                   src={item.image}
                   alt={item.title}
@@ -157,17 +157,17 @@ export const DesktopFeaturedGrid = ({ workouts, programs, articles, workoutCateg
                   className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
               </div>
-              <div className="flex-1 min-w-0 p-3 flex flex-col justify-center">
-                <h3 className="text-sm font-bold text-foreground leading-snug line-clamp-2">{item.title}</h3>
+              <div className="flex-1 min-w-0 p-2.5 flex flex-col justify-center">
+                <h3 className="text-xs lg:text-sm font-bold text-foreground leading-snug line-clamp-2">{item.title}</h3>
                 {item.meta && (
                   <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-1">{item.meta}</p>
                 )}
               </div>
             </button>
           ) : (
-            <div key={idx} className="flex items-stretch bg-background border border-border rounded-lg overflow-hidden flex-1 min-h-[90px]">
-              <div className="w-28 lg:w-32 bg-muted animate-pulse flex-shrink-0" />
-              <div className="flex-1 p-3">
+            <div key={idx} className="flex items-stretch bg-background border border-border rounded-lg overflow-hidden min-h-[66px]">
+              <div className="w-20 lg:w-24 bg-muted animate-pulse flex-shrink-0" />
+              <div className="flex-1 p-2.5">
                 <div className="h-3 w-3/4 bg-muted animate-pulse rounded" />
                 <div className="h-2.5 w-1/2 bg-muted animate-pulse rounded mt-1" />
               </div>
@@ -178,7 +178,7 @@ export const DesktopFeaturedGrid = ({ workouts, programs, articles, workoutCateg
       <button
         type="button"
         onClick={() => navigate(route)}
-        className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline self-start"
+        className="mt-auto pt-4 inline-flex h-9 items-center justify-center gap-1 text-sm font-semibold text-primary hover:underline self-start"
       >
         {ctaLabel}
         <ChevronRight className="h-3.5 w-3.5" />

@@ -196,7 +196,7 @@ const Index = () => {
     refetchOnWindowFocus: false, // Don't refetch on tab focus
   });
 
-  // Latest 3 workouts for mobile "Featured Workouts" section
+  // Latest 4 workouts for homepage featured sections
   const { data: latestWorkouts = [] } = useQuery({
     queryKey: ["home-featured-latest-workouts"],
     queryFn: async () => {
@@ -205,12 +205,12 @@ const Index = () => {
         .filter((w) => w.is_workout_of_day !== true || w.wod_source === "library")
         .filter((w) => !!w.created_at)
         .sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""))
-        .slice(0, 3);
+        .slice(0, 4);
     },
     staleTime: 1000 * 60 * 5,
   });
 
-  // Latest 3 programs for mobile "Featured Training Programs" section
+  // Latest 4 programs for homepage featured sections
   const { data: latestPrograms = [] } = useQuery({
     queryKey: ["home-featured-latest-programs"],
     queryFn: async () => {
@@ -218,7 +218,7 @@ const Index = () => {
       return (data || [])
         .filter((p) => p.is_visible !== false && !!p.created_at)
         .sort((a, b) => String(b.created_at || "").localeCompare(String(a.created_at || "")))
-        .slice(0, 3);
+        .slice(0, 4);
     },
     staleTime: 1000 * 60 * 5,
   });
@@ -1039,39 +1039,41 @@ const Index = () => {
             <div className="hidden md:block container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6 pt-0 pb-4">
               <div className="grid grid-cols-3 gap-4 lg:gap-5 items-stretch">
                 {/* Big card: Train Smarter, Not Harder */}
-                <div className="col-span-2 rounded-2xl border-2 border-primary/40 bg-card p-8 lg:p-10 flex flex-col h-full min-h-[280px]">
-                  <span className="inline-flex self-start items-center rounded-full border border-primary/40 px-3 py-1 text-[10px] font-bold tracking-[0.2em] uppercase text-primary mb-4">
+                <div className="col-span-2 rounded-2xl border-2 border-primary/40 bg-card p-8 lg:p-10 grid grid-rows-[auto_1fr] h-full min-h-[280px]">
+                  <span className="inline-flex self-start justify-self-start items-center rounded-full border border-primary/40 px-3 py-1 text-[10px] font-bold tracking-[0.2em] uppercase text-primary mb-4">
                     Our Philosophy
                   </span>
-                  <h1 className="text-[2.4rem] lg:text-[3rem] font-extrabold tracking-tight uppercase leading-[1.05] text-foreground mt-auto">
-                    Train <span className="text-primary">Smarter,</span>
-                    <br />
-                    Not <span className="text-green-500">Harder.</span>
-                  </h1>
-                  <p className="text-xs lg:text-sm font-semibold tracking-[0.15em] uppercase text-muted-foreground mt-4 leading-snug mb-auto">
-                    Expert Workouts · Training Programs · Blog Insights · Smarty Tools
-                    <br />
-                    <span className="text-primary">All In Your Pocket.</span>
-                  </p>
+                  <div className="flex flex-col justify-start min-h-0 pt-3">
+                    <h1 className="text-[2.4rem] lg:text-[3rem] font-extrabold tracking-tight uppercase leading-[1.05] text-foreground">
+                      Train <span className="text-primary">Smarter,</span> Not <span className="text-green-500">Harder.</span>
+                    </h1>
+                    <p className="text-xs lg:text-sm font-semibold tracking-[0.15em] uppercase text-muted-foreground mt-4 leading-snug">
+                      Expert Workouts · Training Programs · Blog Insights · Smarty Tools
+                      <br />
+                      <span className="text-primary">All In Your Pocket.</span>
+                    </p>
+                  </div>
                 </div>
 
                 {/* Smaller card: 100% Human, 0% AI */}
-                <div className="col-span-1 rounded-2xl border-2 border-green-500/50 bg-card p-6 lg:p-8 flex flex-col h-full min-h-[280px]">
-                  <span className="inline-flex self-start items-center rounded-full border border-green-500/40 px-3 py-1 text-[10px] font-bold tracking-[0.2em] uppercase text-green-500 mb-4">
+                <div className="col-span-1 rounded-2xl border-2 border-green-500/50 bg-card p-8 lg:p-10 grid grid-rows-[auto_1fr] h-full min-h-[280px]">
+                  <span className="inline-flex self-start justify-self-start items-center rounded-full border border-green-500/40 px-3 py-1 text-[10px] font-bold tracking-[0.2em] uppercase text-green-500 mb-4">
                     Our Promise
                   </span>
-                  <p className="text-2xl lg:text-[1.9rem] font-extrabold tracking-tight leading-tight mt-auto">
-                    100% Human.
-                    <br />
-                    <span className="text-red-500">0% AI.</span>
-                  </p>
-                  <p className="text-sm text-muted-foreground mt-3 leading-relaxed mb-auto">
-                    Every workout and program designed by{" "}
-                    <Link to="/coach-profile" className="text-primary hover:underline font-medium">
-                      Haris Falas
-                    </Link>
-                    {" "}— never by algorithms.
-                  </p>
+                  <div className="flex flex-col justify-start min-h-0 pt-3">
+                    <p className="text-2xl lg:text-[1.9rem] font-extrabold tracking-tight leading-tight">
+                      100% Human.
+                      <br />
+                      <span className="text-red-500">0% AI.</span>
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-3 leading-relaxed">
+                      Every workout and program designed by{" "}
+                      <Link to="/coach-profile" className="text-primary hover:underline font-medium">
+                        Haris Falas
+                      </Link>
+                      {" "}— never by algorithms.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
