@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, Sparkles } from "lucide-react";
-import logoMove from "@/assets/smartymove-logo.png";
+import logoMoveAsset from "@/assets/smartymove-logo.png.asset.json";
 import logoDiet from "@/assets/smartydiet-logo.png";
 import logoGym from "@/assets/smarty-gym-logo.png";
+const logoMove = logoMoveAsset.url;
 
 // Change this constant when porting the component to the other two projects.
 const CURRENT_APP: "gym" | "move" | "diet" = "gym";
