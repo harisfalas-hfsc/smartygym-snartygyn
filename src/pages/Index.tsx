@@ -1036,11 +1036,11 @@ const Index = () => {
           </section> : <>
             {/* Desktop: Compact hero with 4 stacked pillar rows */}
             <div className="hidden md:block container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6 pt-0 pb-4">
-              <div className="grid grid-cols-3 gap-4 lg:gap-5">
+              <div className="grid grid-cols-3 gap-4 lg:gap-5 items-stretch">
                 {/* Big card: Train Smarter, Not Harder */}
-                <div className="col-span-2 rounded-2xl border-2 border-primary/40 bg-card p-8 lg:p-10 flex flex-col justify-center min-h-[280px]">
+                <div className="col-span-2 rounded-2xl border-2 border-primary/40 bg-card p-8 lg:p-10 flex flex-col justify-center h-full min-h-[280px]">
                   <span className="inline-flex self-start items-center rounded-full border border-primary/40 px-3 py-1 text-[10px] font-bold tracking-[0.2em] uppercase text-primary mb-4">
-                    Science-Backed · Expert-Designed
+                    Our Philosophy
                   </span>
                   <h1 className="text-[2.4rem] lg:text-[3rem] font-extrabold tracking-tight uppercase leading-[1.05] text-foreground">
                     Train <span className="text-primary">Smarter,</span>
@@ -1055,9 +1055,9 @@ const Index = () => {
                 </div>
 
                 {/* Smaller card: 100% Human, 0% AI */}
-                <div className="col-span-1 rounded-2xl border-2 border-green-500/50 bg-card p-6 lg:p-8 flex flex-col justify-center min-h-[280px]">
+                <div className="col-span-1 rounded-2xl border-2 border-green-500/50 bg-card p-6 lg:p-8 flex flex-col justify-center h-full min-h-[280px]">
                   <span className="inline-flex self-start items-center rounded-full border border-green-500/40 px-3 py-1 text-[10px] font-bold tracking-[0.2em] uppercase text-green-500 mb-4">
-                    Who We Are
+                    Our Promise
                   </span>
                   <p className="text-2xl lg:text-[1.9rem] font-extrabold tracking-tight leading-tight">
                     100% Human.
@@ -1074,7 +1074,7 @@ const Index = () => {
                 </div>
               </div>
             </div>
-            <DesktopHeroRows
+            <DesktopFeaturedGrid
               workouts={latestWorkouts}
               programs={latestPrograms}
               articles={latestArticles}
