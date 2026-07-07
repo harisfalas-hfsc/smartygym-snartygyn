@@ -601,10 +601,6 @@ const Index = () => {
       </section>
 
       <div className="min-h-screen bg-background overflow-x-hidden">
-        <div className="container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6">
-          <PageBreadcrumbs items={[{ label: "Home" }]} />
-        </div>
-
         {isMobile ? <section className="pt-0 pb-2 px-4">
             {/* Mobile hero tagline */}
             <div className="text-center mb-4 mt-2">
