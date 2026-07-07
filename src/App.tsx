@@ -98,6 +98,7 @@ import { AnnouncementManager } from "./components/announcements/AnnouncementMana
 // Kept dormant for easy re-enable later.
 // import { FreeTrialPopup } from "./components/growth/FreeTrialPopup";
 import { SmartyCoachWelcomePopup } from "./components/smarty-coach/SmartyCoachWelcomePopup";
+import { SisterAppsPopup } from "./components/growth/SisterAppsPopup";
 
 
 // Redirect component for /dashboard to /userdashboard
@@ -204,6 +205,7 @@ const AppContent = () => {
         <AnnouncementManager />
         {/* <FreeTrialPopup /> */}
         <SmartyCoachWelcomePopup />
+        <SisterAppsPopup />
         <ScrollToTop />
         <AnalyticsTracker />
         <BackgroundSEO />
