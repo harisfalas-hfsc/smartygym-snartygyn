@@ -1,7 +1,8 @@
 // PORTABLE COPY FOR SMARTYDIET PROJECT
 // Copy this file into SmartyDiet as: src/components/growth/SisterAppsPopup.tsx
-// Also copy these 3 logos into SmartyDiet's src/assets/:
-//   smarty-gym-logo.png, smartymove-logo.png, smartydiet-logo.png
+// Also copy these 3 images into SmartyDiet's src/assets/:
+//   smartygym-icon.png (from SmartyGym's public/icon-512.png — the brain+barbell PWA icon)
+//   smartymove-logo.png, smartydiet-logo.png
 // Then in SmartyDiet's src/App.tsx add:
 //   import { SisterAppsPopup } from "@/components/growth/SisterAppsPopup";
 //   and render <SisterAppsPopup /> inside <BrowserRouter> (before </BrowserRouter>).
@@ -11,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { ExternalLink, Sparkles } from "lucide-react";
 import logoMove from "@/assets/smartymove-logo.png";
 import logoDiet from "@/assets/smartydiet-logo.png";
-import logoGym from "@/assets/smarty-gym-logo.png";
+import logoGym from "@/assets/smartygym-icon.png";
 
 const CURRENT_APP: "gym" | "move" | "diet" = "diet";
 
@@ -21,6 +22,7 @@ type SisterApp = {
   tagline: string;
   url: string;
   image: string;
+  darkImage?: boolean;
 };
 
 const SISTER_APPS: SisterApp[] = [
@@ -30,6 +32,7 @@ const SISTER_APPS: SisterApp[] = [
     tagline: "Train smart. Get stronger. Feel younger.",
     url: "https://smartygym.com",
     image: logoGym,
+    darkImage: true,
   },
   {
     id: "move",
@@ -84,7 +87,7 @@ export const SisterAppsPopup = () => {
                 rel="noopener noreferrer"
                 className="group flex flex-row sm:flex-col items-center sm:items-stretch rounded-lg border border-border bg-background overflow-hidden hover:border-primary/60 hover:shadow-lg transition-all"
               >
-                <div className="w-20 h-20 shrink-0 sm:w-full sm:h-auto sm:aspect-[4/3] overflow-hidden bg-white flex items-center justify-center p-3 sm:p-6">
+                <div className={`w-20 h-20 shrink-0 sm:w-full sm:h-auto sm:aspect-[4/3] overflow-hidden flex items-center justify-center ${app.darkImage ? "bg-[#0F172A] p-2 sm:p-4" : "bg-white p-3 sm:p-6"}`}>
                   <img
                     src={app.image}
                     alt={app.name}
