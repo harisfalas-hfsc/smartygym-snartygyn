@@ -60,6 +60,9 @@ const Blog = lazy(() => import("./pages/Blog"));
 const About = lazy(() => import("./pages/About"));
 const FAQ = lazy(() => import("./pages/FAQ"));
 const CoachProfile = lazy(() => import("./pages/CoachProfile"));
+const FitnessTraining = lazy(() => import("./pages/FitnessTraining"));
+const Glossary = lazy(() => import("./pages/Glossary"));
+const Research = lazy(() => import("./pages/Research"));
 const CoachCV = lazy(() => import("./pages/CoachCV"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Shop = lazy(() => import("./pages/Shop"));
@@ -240,6 +243,12 @@ const AppContent = () => {
                   <Route path="/smarty-plans" element={<Navigate to="/smarty-premium" replace />} />
                   <Route path="/about" element={<About />} />
                   <Route path="/faq" element={<FAQ />} />
+                  <Route path="/fitness-training" element={<FitnessTraining />} />
+                  <Route path="/fitness-training.html" element={<FitnessTraining />} />
+                  <Route path="/glossary" element={<Glossary />} />
+                  <Route path="/glossary.html" element={<Glossary />} />
+                  <Route path="/research" element={<Research />} />
+                  <Route path="/research.html" element={<Research />} />
                 
                 <Route path="/newsletter-thank-you" element={<NewsletterThankYou />} />
                 <Route path="/unsubscribe" element={<Unsubscribe />} />

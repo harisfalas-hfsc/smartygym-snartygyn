@@ -168,6 +168,30 @@ const STATIC_ROUTES: Array<
     priority: "0.6",
   },
   {
+    path: "/fitness-training",
+    title: "Human-Designed Fitness Training Platform | SmartyGym",
+    description:
+      "A complete human-designed fitness training platform — workouts, programs, exercise library, tools, rituals, check-ins and community, all coach-crafted by Haris Falas.",
+    changefreq: "weekly",
+    priority: "0.95",
+  },
+  {
+    path: "/glossary",
+    title: "Fitness Training Glossary | SmartyGym",
+    description:
+      "Plain-language definitions of real strength, hypertrophy, conditioning and mobility terms — coach-written, not auto-generated.",
+    changefreq: "monthly",
+    priority: "0.75",
+  },
+  {
+    path: "/research",
+    title: "Training Research Digest | SmartyGym",
+    description:
+      "Evidence behind SmartyGym programming — progressive overload, volume, frequency, Zone 2, mobility, protein, sleep and adherence, in plain English.",
+    changefreq: "monthly",
+    priority: "0.7",
+  },
+  {
     path: "/blog",
     title: "Fitness Blog Articles by Haris Falas | SmartyGym",
     description:
