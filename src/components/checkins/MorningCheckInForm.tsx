@@ -100,8 +100,8 @@ export function MorningCheckInForm({
   }
 
   return (
-    <Card className="border-amber-200 dark:border-amber-800 overflow-hidden">
-      <CardHeader className="pb-4 px-4 sm:px-6">
+    <Card className="border-amber-200 dark:border-amber-800 overflow-hidden flex flex-col max-h-[90dvh]">
+      <CardHeader className="pb-4 px-4 sm:px-6 flex-shrink-0">
         <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
           <Sun className="h-5 w-5 text-amber-500 flex-shrink-0" />
           Morning Check-in
@@ -110,7 +110,7 @@ export function MorningCheckInForm({
           Window open until {windowEnd}. Takes 30 seconds.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-5 px-4 sm:px-6 pb-4 sm:pb-6">
+      <CardContent className="space-y-5 px-4 sm:px-6 pb-4 sm:pb-6 overflow-y-auto flex-1 min-h-0">
         {/* Sleep Duration */}
         <div className="space-y-2">
           <label className="text-sm font-medium">
