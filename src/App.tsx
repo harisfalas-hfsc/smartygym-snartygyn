@@ -216,7 +216,6 @@ const AppContent = () => {
           className={`flex flex-col min-h-screen ${isMobile ? "pb-[calc(3.5rem+env(safe-area-inset-bottom,0px))]" : "pb-0"}`}
         >
           <Navigation />
-          <FixedBackButton />
             <main
               id="main-content"
               className="flex-1"
