@@ -870,12 +870,27 @@ export default function UserDashboard() {
 
                     {/* Subscription Details */}
                     <div className="space-y-2 text-sm">
-                      <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300">
-                        Lifetime Access
-                      </Badge>
-                      <p className="text-xs text-muted-foreground">
-                        Your membership has no expiration date
-                      </p>
+                      {['lifetime', 'legacy_premium'].includes(subscriptionInfo.product_id || '') ? (
+                        <>
+                          <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300">
+                            Lifetime Access
+                          </Badge>
+                          <p className="text-xs text-muted-foreground">
+                            Your grandfathered membership has no expiration date
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300">
+                            Monthly — €6.99
+                          </Badge>
+                          <p className="text-xs text-muted-foreground">
+                            {subscriptionInfo.subscription_end
+                              ? `Renews on ${new Date(subscriptionInfo.subscription_end).toLocaleDateString()}`
+                              : 'Billed monthly. Cancel anytime.'}
+                          </p>
+                        </>
+                      )}
                     </div>
 
                     {/* Action Buttons */}
@@ -886,6 +901,23 @@ export default function UserDashboard() {
                             Refresh
                           </>}
                       </Button>
+                      {!['lifetime', 'legacy_premium'].includes(subscriptionInfo.product_id || '') && (
+                        <Button
+                          onClick={async () => {
+                            try {
+                              const { data, error } = await supabase.functions.invoke('customer-portal');
+                              if (error) throw error;
+                              if (data?.url) window.location.href = data.url;
+                            } catch (err) {
+                              console.error('Portal error:', err);
+                            }
+                          }}
+                          variant="outline"
+                          className="h-7 px-2 text-xs"
+                        >
+                          Manage / Cancel
+                        </Button>
+                      )}
                     </div>
 
                     {/* Motivational Message from Coach */}
