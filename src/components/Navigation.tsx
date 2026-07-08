@@ -527,6 +527,7 @@ export const Navigation = () => {
             </nav>
           </SheetContent>
         </Sheet>
+          <HeaderBackButton />
           <button
             type="button"
             onClick={() => {
