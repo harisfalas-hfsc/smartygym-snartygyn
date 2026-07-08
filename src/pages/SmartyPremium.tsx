@@ -31,8 +31,8 @@ import {
   Flame,
   CircleMinus,
   FileText,
-  Infinity as InfinityIcon,
   Rocket,
+  RefreshCw,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
@@ -52,7 +52,7 @@ export default function SmartyPremium() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const lifetimePrice = 89.99;
+  const monthlyPrice = 6.99;
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -87,10 +87,10 @@ export default function SmartyPremium() {
         body: { cancelPath: window.location.pathname + window.location.search }
       });
 
-      if (data?.hasActiveSubscription) {
+      if (data?.alreadyPremium || data?.hasActiveSubscription) {
         toast({
           title: "You're Already Premium!",
-          description: "You already have lifetime access.",
+          description: "Your Premium Membership is already active.",
         });
         navigate('/userdashboard');
         return;
@@ -155,18 +155,21 @@ export default function SmartyPremium() {
     { icon: Rocket, title: "Future Content", description: "All new workouts, programs & features — no extra cost", highlight: true }
   ];
 
-  const LifetimeCard = (
+  const PremiumCard = (
     <Card className="relative overflow-hidden border-2 border-[#D4AF37] shadow-lg flex flex-col h-full bg-gradient-to-br from-[#D4AF37]/5 to-[#F5D87A]/10 w-full">
       <CardHeader className="text-center pb-2 sm:pb-4 pt-4 sm:pt-6">
         <div className="flex items-center justify-center gap-2 mb-2">
           <Crown className="h-6 w-6 sm:h-7 sm:w-7 text-[#D4AF37]" />
           <h2 className="text-2xl sm:text-3xl font-bold text-[#D4AF37]">Premium Membership</h2>
         </div>
-        <Badge className="bg-[#D4AF37] text-white mx-auto mb-3 sm:mb-4">ONE-TIME PAYMENT</Badge>
-        <CardTitle className="text-3xl sm:text-4xl font-bold">€{lifetimePrice.toFixed(2)}</CardTitle>
-        <p className="text-xs sm:text-sm text-muted-foreground">Pay once. Train for life.</p>
+        <Badge className="bg-[#D4AF37] text-white mx-auto mb-3 sm:mb-4">MONTHLY MEMBERSHIP</Badge>
+        <CardTitle className="text-3xl sm:text-4xl font-bold">
+          €{monthlyPrice.toFixed(2)}
+          <span className="text-base sm:text-lg font-medium text-muted-foreground">/month</span>
+        </CardTitle>
+        <p className="text-xs sm:text-sm text-muted-foreground">Billed monthly. Cancel anytime.</p>
         <p className="text-xs text-[#D4AF37] font-semibold mt-2 flex items-center justify-center gap-1">
-          <InfinityIcon className="h-3.5 w-3.5" /> Unlock everything, forever
+          <RefreshCw className="h-3.5 w-3.5" /> Full premium access, renewed monthly
         </p>
       </CardHeader>
       <CardContent className="space-y-2 sm:space-y-4 flex-1 flex flex-col">
@@ -178,7 +181,7 @@ export default function SmartyPremium() {
             "Premium access to Smarty Tools",
             "Smarty Check-ins included",
             "All future content included — no extra cost",
-            "No subscriptions. No renewals. Ever.",
+            "Cancel anytime from your account — no lock-in",
           ].map((item, i) => (
             <div key={i} className="flex items-start gap-2">
               <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 shrink-0 mt-0.5" />
@@ -197,10 +200,10 @@ export default function SmartyPremium() {
               onClick={handleSubscribe}
               disabled={loading}
             >
-              {loading ? "Processing..." : "Get Premium Access"}
+              {loading ? "Processing..." : "Start Premium — €6.99/month"}
             </Button>
           )}
-          <p className="text-xs text-center text-muted-foreground">One single payment. Premium for life.</p>
+          <p className="text-xs text-center text-muted-foreground">Recurring monthly payment. Cancel anytime.</p>
         </div>
       </CardContent>
     </Card>
@@ -209,34 +212,34 @@ export default function SmartyPremium() {
   return (
     <>
       <Helmet>
-        <title>Premium Membership | SmartyGym | One Payment. Train for Life.</title>
-        <meta name="description" content="Unlock SmartyGym forever with a single €89.99 Premium Membership. 500+ human-designed workouts, training programs, and fitness tools. No subscriptions. No renewals." />
-        <meta name="keywords" content="SmartyGym lifetime, lifetime gym membership, one-time payment fitness, no subscription gym, smartygym pricing, lifetime fitness access" />
+        <title>Premium Membership | SmartyGym | €6.99/month, Cancel Anytime</title>
+        <meta name="description" content="Unlock SmartyGym Premium for €6.99/month. 500+ human-designed workouts, training programs, and fitness tools. Cancel anytime from your account." />
+        <meta name="keywords" content="SmartyGym premium, monthly gym membership, fitness subscription, smartygym pricing, online fitness membership" />
 
         <meta property="og:title" content="Premium Membership | SmartyGym" />
-        <meta property="og:description" content="One payment of €89.99. Premium access to every SmartyGym workout, program and tool." />
+        <meta property="og:description" content="€6.99/month. Premium access to every SmartyGym workout, program and tool. Cancel anytime." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://smartygym.com/smarty-premium" />
 
         <meta name="twitter:card" content="summary" />
         <meta name="twitter:title" content="Premium Membership | SmartyGym" />
-        <meta name="twitter:description" content="One payment. Train for life." />
+        <meta name="twitter:description" content="€6.99/month. Cancel anytime." />
 
         <link rel="canonical" href="https://smartygym.com/smarty-premium" />
 
-        <meta name="ai-pricing-lifetime" content="€89.99 one-time payment, lifetime access" />
-        <meta name="ai-value-proposition" content="100% human-designed workouts by certified Sports Scientist Haris Falas — one payment, lifetime access" />
+        <meta name="ai-pricing-premium" content="€6.99/month recurring subscription, cancel anytime" />
+        <meta name="ai-value-proposition" content="100% human-designed workouts by certified Sports Scientist Haris Falas — €6.99/month, cancel anytime" />
 
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Product",
             "name": "SmartyGym Premium Membership",
-            "description": "One-time payment for lifetime premium access to all SmartyGym workouts, programs, and tools.",
+            "description": "Monthly subscription with full premium access to all SmartyGym workouts, programs, and tools. Cancel anytime.",
             "brand": { "@type": "Brand", "name": "SmartyGym" },
             "offers": {
               "@type": "Offer",
-              "price": lifetimePrice.toString(),
+              "price": monthlyPrice.toString(),
               "priceCurrency": "EUR",
               "availability": "https://schema.org/InStock",
               "url": "https://smartygym.com/smarty-premium"
@@ -258,14 +261,14 @@ export default function SmartyPremium() {
       </Helmet>
 
       <SEOEnhancer
-        entities={["Premium Membership", "One-Time Payment", "SmartyGym"]}
-        topics={["lifetime gym membership", "one-time fitness payment", "no-subscription fitness platform"]}
-        expertise={["membership pricing", "lifetime access"]}
+        entities={["Premium Membership", "Monthly Subscription", "SmartyGym"]}
+        topics={["monthly gym membership", "fitness subscription", "cancel anytime fitness platform"]}
+        expertise={["membership pricing", "monthly premium access"]}
         contentType="Product"
-        aiSummary="SmartyGym Premium Membership: a single €89.99 payment unlocks every workout, program, ritual, check-in, and tool — forever. No subscriptions, no renewals."
-        aiKeywords={["lifetime gym membership", "one-time payment fitness", "smartygym lifetime"]}
+        aiSummary="SmartyGym Premium Membership: €6.99/month unlocks every workout, program, ritual, check-in, and tool. Cancel anytime from your account."
+        aiKeywords={["monthly gym membership", "fitness subscription", "smartygym premium"]}
         relatedContent={["Premium Benefits", "Workout Library", "Training Programs", "Fitness Tools"]}
-        targetAudience="fitness enthusiasts looking for a one-time lifetime gym membership"
+        targetAudience="fitness enthusiasts looking for a flexible monthly premium gym membership"
         pageType="Product"
       />
 
@@ -283,23 +286,23 @@ export default function SmartyPremium() {
             <h1 className="font-extrabold tracking-tight uppercase mb-4">
               <span className="block text-3xl sm:text-4xl">Transform your fitness journey.</span>
               <span className="block text-base sm:text-lg font-semibold mt-2 text-muted-foreground normal-case tracking-normal">
-                Unlock everything for life
+                Unlock everything with Premium
               </span>
             </h1>
             <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 max-w-2xl mx-auto">
               <p className="text-sm text-muted-foreground">
-                Join thousands of members who unlocked SmartyGym for life with one single payment.
+                Join thousands of members unlocking SmartyGym with a Premium Monthly Membership.
               </p>
               <p className="text-sm font-semibold text-primary mt-2">
-                One payment. Premium access. No renewals.
+                €6.99/month. Full premium access. Cancel anytime.
               </p>
             </div>
           </div>
 
-          {/* What You Get for Life */}
+          {/* What You Get with Premium */}
           <Card className="mb-8 bg-white dark:bg-card border-2 border-primary/40 shadow-primary">
             <CardHeader>
-              <CardTitle className="text-2xl">What's Included for Life</CardTitle>
+              <CardTitle className="text-2xl">What's Included with Premium</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-2 md:hidden">
@@ -327,10 +330,10 @@ export default function SmartyPremium() {
             </CardContent>
           </Card>
 
-          {/* Lifetime card (after What's Included) */}
+          {/* Premium card (after What's Included) */}
           {!isPremium && (
             <div className="mb-8">
-              {LifetimeCard}
+              {PremiumCard}
             </div>
           )}
 
@@ -408,7 +411,7 @@ export default function SmartyPremium() {
                             <Crown className="w-6 h-6 text-primary" />
                             <h3 className="text-2xl font-bold">Premium</h3>
                           </div>
-                          <div className="text-center text-sm font-semibold text-primary mb-4">Lifetime</div>
+                          <div className="text-center text-sm font-semibold text-primary mb-4">€6.99/mo</div>
                           <div className="space-y-3">
                             {comparisonFeatures.map((feature, idx) => {
                               const Icon = feature.icon;
@@ -461,7 +464,7 @@ export default function SmartyPremium() {
                           <Crown className="w-5 h-5 text-primary" />
                           <div className="text-lg">Premium</div>
                         </div>
-                        <div className="text-sm font-semibold text-primary">Lifetime</div>
+                        <div className="text-sm font-semibold text-primary">€6.99/mo</div>
                       </th>
                     </tr>
                   </thead>
@@ -488,10 +491,10 @@ export default function SmartyPremium() {
             </CardContent>
           </Card>
 
-          {/* Lifetime card (after Compare Access Levels) */}
+          {/* Premium card (after Compare Access Levels) */}
           {!isPremium && (
             <div className="mb-8">
-              {LifetimeCard}
+              {PremiumCard}
             </div>
           )}
 

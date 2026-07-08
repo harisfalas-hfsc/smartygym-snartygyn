@@ -42,8 +42,9 @@ const periodIso = (ts: number | null): string | null =>
 // Gold/Platinum recurring products are LEGACY and are surfaced as
 // 'legacy_premium' so historical events (refunds, chargebacks, portal edits)
 // still resolve to a valid premium tier without re-advertising those plans.
-const planTypeFromPriceId = (priceId: string | undefined | null): 'legacy_premium' | null => {
+const planTypeFromPriceId = (priceId: string | undefined | null): 'premium' | 'legacy_premium' | null => {
   if (!priceId) return null;
+  if (priceId === 'price_1Tqn9EIxQYg9inGKWXTdr3bS') return 'premium';        // Premium Monthly €6.99/mo (active)
   if (priceId === 'price_1SJ9q1IxQYg9inGKZzxxqPbD') return 'legacy_premium'; // [LEGACY] Gold Monthly
   if (priceId === 'price_1SJ9qGIxQYg9inGKFbgqVRjj') return 'legacy_premium'; // [LEGACY] Platinum Yearly
   return null;

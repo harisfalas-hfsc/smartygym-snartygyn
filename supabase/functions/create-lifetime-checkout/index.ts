@@ -7,12 +7,14 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const LIFETIME_PRICE_ID = "price_1ThP4MIxQYg9inGKAUQEJ0tD";
-const LIFETIME_PRODUCT_ID = "prod_UgmdX60UPJxWeS";
+// Premium Monthly subscription — €6.99/month recurring.
+// (Function name kept for backward compatibility with existing clients.)
+const PREMIUM_MONTHLY_PRICE_ID = "price_1Tqn9EIxQYg9inGKWXTdr3bS";
+const PREMIUM_MONTHLY_PRODUCT_ID = "prod_UqU78UzgA2ckcP";
 
 const logStep = (step: string, details?: unknown) => {
   const d = details ? ` - ${JSON.stringify(details)}` : "";
-  console.log(`[CREATE-LIFETIME-CHECKOUT] ${step}${d}`);
+  console.log(`[CREATE-PREMIUM-CHECKOUT] ${step}${d}`);
 };
 
 serve(async (req) => {
@@ -66,26 +68,26 @@ serve(async (req) => {
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
-      mode: "payment",
-      line_items: [{ price: LIFETIME_PRICE_ID, quantity: 1 }],
+      mode: "subscription",
+      line_items: [{ price: PREMIUM_MONTHLY_PRICE_ID, quantity: 1 }],
       success_url: `${origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}${safeCancel}`,
-      payment_intent_data: {
+      subscription_data: {
         metadata: {
           project: "SMARTYGYM",
-          purchase_type: "lifetime_membership",
+          purchase_type: "premium_monthly",
           user_id: user.id,
         },
       },
       metadata: {
         project: "SMARTYGYM",
-        purchase_type: "lifetime_membership",
+        purchase_type: "premium_monthly",
         user_id: user.id,
-        product_id: LIFETIME_PRODUCT_ID,
+        product_id: PREMIUM_MONTHLY_PRODUCT_ID,
       },
     });
 
-    logStep("Lifetime checkout session created", { sessionId: session.id });
+    logStep("Premium monthly checkout session created", { sessionId: session.id });
 
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

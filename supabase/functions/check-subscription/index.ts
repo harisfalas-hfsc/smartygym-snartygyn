@@ -177,14 +177,18 @@ serve(async (req) => {
       // Map any active legacy subscription to `legacy_premium` so the user
       // keeps premium access while we honor what they already paid for, and
       // so analytics can still distinguish them from new Lifetime members.
-      if (productMetaPlan === 'gold' || productMetaPlan === 'platinum' ||
+      if (priceId === 'price_1Tqn9EIxQYg9inGKWXTdr3bS' || productMetaPlan === 'premium') {
+        // Active Premium Monthly subscription (€6.99/mo)
+        planType = 'premium';
+        logStep("Matched active Premium Monthly subscription", { priceId });
+      } else if (productMetaPlan === 'gold' || productMetaPlan === 'platinum' ||
           priceId === 'price_1SJ9q1IxQYg9inGKZzxxqPbD' ||
           priceId === 'price_1SJ9qGIxQYg9inGKFbgqVRjj') {
         planType = 'legacy_premium';
         logStep("Matched legacy premium subscription", { priceId, productMetaPlan });
-      } else if (productMetaPlan === 'premium' || productMetaPlan === 'lifetime') {
-        planType = productMetaPlan;
-        logStep("Matched plan via product metadata", { priceId, planType });
+      } else if (productMetaPlan === 'lifetime') {
+        planType = 'lifetime';
+        logStep("Matched lifetime plan via product metadata", { priceId, planType });
       } else {
         // Unknown recurring price — preserve premium access for the user
         // rather than dropping them to free, but flag for investigation.
