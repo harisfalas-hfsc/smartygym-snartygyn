@@ -10,6 +10,7 @@
 
 export const SUBSCRIPTION_PRICES = {
   premium_monthly: 6.99, // €6.99/month recurring
+  lifetime: 89.99,       // [LEGACY] historical grandfathered price — kept for analytics/revenue calcs
 } as const;
 
 // Stripe price IDs — single source of truth.
