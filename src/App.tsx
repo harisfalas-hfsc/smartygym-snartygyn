@@ -243,6 +243,12 @@ const AppContent = () => {
                   <Route path="/smarty-plans" element={<Navigate to="/smarty-premium" replace />} />
                   <Route path="/about" element={<About />} />
                   <Route path="/faq" element={<FAQ />} />
+                  <Route path="/fitness-training" element={<FitnessTraining />} />
+                  <Route path="/fitness-training.html" element={<FitnessTraining />} />
+                  <Route path="/glossary" element={<Glossary />} />
+                  <Route path="/glossary.html" element={<Glossary />} />
+                  <Route path="/research" element={<Research />} />
+                  <Route path="/research.html" element={<Research />} />
                 
                 <Route path="/newsletter-thank-you" element={<NewsletterThankYou />} />
                 <Route path="/unsubscribe" element={<Unsubscribe />} />
