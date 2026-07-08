@@ -199,12 +199,13 @@ const TermsOfService = () => {
                 <div>
                   <h2 className="text-2xl font-bold mb-3">5. Membership & Payments</h2>
                   <ul className="space-y-2 text-muted-foreground">
-                    <li>Smarty Gym offers a single <strong>Premium Membership</strong> — a one-time payment that unlocks all premium content for life.</li>
-                    <li>There are no recurring charges, no monthly or yearly subscriptions, and no automatic renewals.</li>
+                    <li>Smarty Gym offers a <strong>Premium Monthly Membership</strong> at <strong>€6.99/month</strong> that unlocks all premium content.</li>
+                    <li>The membership renews automatically each month until you cancel. You can cancel anytime from your account and access continues until the end of the current paid period.</li>
                     <li>Payments are processed securely via <strong>Stripe</strong>, a PCI DSS compliant payment processor.</li>
                     <li>All fees are stated in Euros (€) and include VAT where applicable.</li>
                     <li>Individual workouts and programs may also be available as standalone purchases.</li>
                     <li>Corporate/team memberships are available with custom pricing.</li>
+                    <li>Existing lifetime members who purchased before the switch to monthly billing keep their access at no additional cost.</li>
                   </ul>
                 </div>
               </div>
@@ -214,10 +215,10 @@ const TermsOfService = () => {
                 <div>
                   <h2 className="text-2xl font-bold mb-3">6. Refunds & Withdrawal</h2>
                   <ul className="space-y-2 text-muted-foreground">
-                    <li>The Premium Membership is a one-time purchase. There is nothing to cancel and no recurring billing.</li>
+                    <li>The Premium Membership renews monthly. You can cancel anytime from your account; access continues until the end of the paid period and no further charges occur.</li>
                     <li>If required by applicable consumer protection laws (EU Directive 2011/83/EU), you may have a <strong>14-day right of withdrawal</strong> for digital services that have not yet started.</li>
-                    <li>By starting to use premium content immediately after purchase, you acknowledge that you waive your withdrawal right.</li>
-                    <li>No refunds will be provided once premium content has been accessed.</li>
+                    <li>By starting to use premium content immediately after purchase, you acknowledge that you waive your withdrawal right for the current billing period.</li>
+                    <li>No refunds will be provided for the current billing period once premium content has been accessed.</li>
                   </ul>
                 </div>
               </div>
