@@ -123,12 +123,15 @@ serve(async (req) => {
 
     logStep("Found Stripe customer", { customerId });
 
-    // Get all subscriptions with expanded data
+    // Get all subscriptions with expanded price data.
+    // NOTE: Stripe rejects >4 levels of expand, so we intentionally do NOT
+    // expand `data.items.data.price.product` here — we fetch the product
+    // separately below only when needed.
     const subscriptions = await stripe.subscriptions.list({
       customer: customerId,
       status: 'all',
       limit: 10,
-      expand: ['data.items.data.price', 'data.items.data.price.product']
+      expand: ['data.items.data.price']
     });
     
     logStep("Found subscriptions", { count: subscriptions.data.length });
@@ -168,10 +171,18 @@ serve(async (req) => {
       // 1) Prefer product metadata.plan_type (set when we create products).
       //    Works for any future price (promos, regional pricing, etc.).
       const priceObj: any = activeSubscription.items.data[0]?.price;
-      const productMetaPlan: string | undefined =
-        priceObj?.product && typeof priceObj.product === 'object'
-          ? priceObj.product?.metadata?.plan_type
-          : undefined;
+      let productMetaPlan: string | undefined;
+      try {
+        const productRef = priceObj?.product;
+        if (productRef && typeof productRef === 'object') {
+          productMetaPlan = productRef?.metadata?.plan_type;
+        } else if (typeof productRef === 'string') {
+          const product = await stripe.products.retrieve(productRef);
+          productMetaPlan = product?.metadata?.plan_type as string | undefined;
+        }
+      } catch (e) {
+        logStep('Product metadata lookup failed (non-fatal)', { error: String(e) });
+      }
 
       // Legacy recurring subscriptions (Gold/Platinum) are no longer sold.
       // Map any active legacy subscription to `legacy_premium` so the user
