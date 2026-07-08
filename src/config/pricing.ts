@@ -1,21 +1,21 @@
 // ============================================================
 // SmartyGym pricing — single source of truth.
-// We sell ONE membership today: Lifetime Premium (€89.99 one-time).
+// Active membership: Premium Monthly (€6.99/month, recurring).
 // Plus standalone purchases and Corporate plans.
 //
-// Gold (€9.99/mo) and Platinum (€89.89/yr) are LEGACY products that
-// remain in Stripe for historical/refund handling but are NOT offered
-// for new purchases. Never reference them in new code paths.
+// Lifetime (€89.99 one-time), Gold (€9.99/mo) and Platinum (€89.89/yr) are
+// LEGACY products retained in Stripe for historical / refund / grandfather
+// handling only. Never offer them for new purchases.
 // ============================================================
 
 export const SUBSCRIPTION_PRICES = {
-  lifetime: 89.99, // €89.99 one-time lifetime membership
+  premium_monthly: 6.99, // €6.99/month recurring
 } as const;
 
 // Stripe price IDs — single source of truth.
 // Edge functions have their own copy (Deno cannot import from src/).
 export const STRIPE_PRICE_IDS = {
-  lifetime: 'price_1ThP4MIxQYg9inGKAUQEJ0tD', // Lifetime One-Time €89.99
+  premium_monthly: 'price_1Tqn9EIxQYg9inGKWXTdr3bS', // Premium Monthly €6.99/mo
 
   // Corporate plans
   corporate_dynamic:    'price_1Sc28CIxQYg9inGKfoqZgtXZ',
@@ -27,12 +27,13 @@ export const STRIPE_PRICE_IDS = {
 export type StripePlanKey = keyof typeof STRIPE_PRICE_IDS;
 
 export const SUBSCRIPTION_BILLING_PERIODS = {
-  lifetime: 'one-time',
+  premium_monthly: 'monthly',
 } as const;
 
-// Legacy Stripe price IDs — kept for webhook/refund recognition only.
+// Legacy Stripe price IDs — kept for webhook/refund/grandfather recognition only.
 // Do NOT use these to initiate new checkouts.
 export const LEGACY_STRIPE_PRICE_IDS = {
+  lifetime: 'price_1ThP4MIxQYg9inGKAUQEJ0tD', // [LEGACY] Lifetime €89.99 one-time
   gold:     'price_1SJ9q1IxQYg9inGKZzxxqPbD',
   platinum: 'price_1SJ9qGIxQYg9inGKFbgqVRjj',
 } as const;
@@ -47,11 +48,12 @@ export const CORPORATE_PRICES = {
 // Stripe Product IDs for SmartyGym products only
 // Used to filter Stripe revenue to only SmartyGym sales
 export const OUR_STRIPE_PRODUCT_IDS = [
-  // Legacy subscription products (no longer offered; kept for revenue/refund analytics)
+  // Active subscription product
+  'prod_UqU78UzgA2ckcP', // SmartyGym Premium Monthly (€6.99/mo)
+  // Legacy products (no longer offered; kept for revenue/refund analytics)
   'prod_TFfAcybp438BH6', // [LEGACY] Smarty Gym Gold Plan
   'prod_TFfAPp1tq7RdUk', // [LEGACY] Smarty Gym Platinum Plan
-  // Lifetime membership (one-time)
-  'prod_UgmdX60UPJxWeS', // Smarty Gym Lifetime Membership
+  'prod_UgmdX60UPJxWeS', // [LEGACY] Smarty Gym Lifetime Membership
   // Corporate products
   'prod_TZATAcAlqgc1P7', // Smarty Dynamic
   'prod_TZATDsKcDvMtHc', // Smarty Power
