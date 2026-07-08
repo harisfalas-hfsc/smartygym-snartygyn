@@ -39,7 +39,7 @@ export const socialMediaStrategy: StrategyDay[] = [
   { day: 15, instagram: "Expert Design", facebook: "Why Expert Design", tiktok: "Expert vs Random", contentTitle: "Why Expert-Designed?" },
   { day: 16, instagram: "Problem Post", facebook: "The Fitness Problem", tiktok: "Fitness Confusion", contentTitle: "The Problem We Solve" },
   { day: 17, instagram: "WOD Philosophy", facebook: "WOD Science", tiktok: "WOD Deep Dive", contentTitle: "WOD Philosophy" },
-  { day: 18, instagram: "Lifetime Premium", facebook: "Lifetime Premium", tiktok: "Why Lifetime?", contentTitle: "Lifetime Premium" },
+  { day: 18, instagram: "Premium Monthly", facebook: "Premium Monthly", tiktok: "Why Premium?", contentTitle: "Premium Monthly" },
   { day: 19, instagram: "Exercise Library", facebook: "Library Preview", tiktok: "Exercise Library Tour", contentTitle: "Exercise Library" },
   { day: 20, instagram: "Goals Feature", facebook: "Goal Setting", tiktok: "Goals Tutorial", contentTitle: "Set Your Goals" },
   { day: 21, instagram: "Community Love", facebook: "Leaderboards", tiktok: "Community Vibe", contentTitle: "Join the Community" },
@@ -867,7 +867,7 @@ Each ritual is designed by Coach Haris, drawing from sports science and wellness
 
 The result? Not just a fitter body—a better life.
 
-This is premium content, included with SmartyGym Lifetime Premium.
+This is premium content, included with SmartyGym Premium.
 
 Ready to level up your entire day?
 
@@ -1399,11 +1399,11 @@ Duration: 25-35 seconds`,
   },
   {
     day: 18,
-    title: "Lifetime Premium",
+    title: "Premium Monthly",
     theme: "Plans",
-    instagram: `💎 SmartyGym Lifetime Premium
+    instagram: `💎 SmartyGym Premium
 
-ONE payment. €89.99. Lifetime access.
+€6.99/month. Full premium access.
 
 ✅ All 500+ Workouts
 ✅ All Training Programs
@@ -1415,14 +1415,14 @@ ONE payment. €89.99. Lifetime access.
 
 🎯 Expert-designed content
 🧠 100% Human, 0% AI
-💪 Real results, forever
+💪 Real results, cancel anytime
 
-No monthly fees. No renewals. Yours for life. 🛤️
+Monthly membership. No lock-in. Cancel anytime. 🛤️
 
 👉 Link in bio`,
-    facebook: `💎 SmartyGym Lifetime Premium — One Payment, Lifetime Access
+    facebook: `💎 SmartyGym Premium — Full Access Monthly
 
-€89.99 one-time. No monthly bills. No renewals. Yours forever.
+€6.99/month. Full premium access. Cancel anytime.
 
 WHAT YOU GET:
 ✅ Full access to 500+ expert workouts
@@ -1445,26 +1445,26 @@ EVERY FEATURE INCLUDED:
 💪 Real, structured programming
 📱 Full mobile access
 
-One payment is all it takes.
+One monthly membership unlocks it all.
 
-👉 Get Lifetime Premium at smartygym.com/smartypremium`,
+👉 Join Premium at smartygym.com/smarty-premium`,
     tiktok: `🎬 TIKTOK SCRIPT:
 
-Hook (0-3 sec): "What if you paid once and got fitness for life?"
+Hook (0-3 sec): "What if your full gym backup cost €6.99/month?"
 
 Main Content:
 - Subscription fatigue montage
-- SmartyGym Lifetime Premium reveal
+- SmartyGym Premium reveal
 - Feature list appearing
-- €89.99 one-time payment emphasis
-- "Yours forever" message
+- €6.99/month emphasis
+- "Cancel anytime" message
 
-CTA: "Lifetime access. Link in bio."
+CTA: "Join Premium. Link in bio."
 
 Audio suggestion: Empowering/decision sound
 
 Duration: 20-30 seconds`,
-    hashtags: "#LifetimePremium #SmartyGym #OnePaymentLifetimeAccess #NoSubscription #PremiumFitness #ValueForMoney #FitnessInvestment #HumanDesigned"
+    hashtags: "#PremiumFitness #SmartyGym #MonthlyMembership #CancelAnytime #PremiumFitness #ValueForMoney #FitnessInvestment #HumanDesigned"
   },
   {
     day: 19,
@@ -2000,8 +2000,8 @@ Duration: 20-30 seconds`,
     theme: "Conversion",
     instagram: `🎉 LAUNCH SPECIAL! 🎉
 
-SmartyGym Lifetime Premium
-ONE payment. €89.99. Yours forever.
+SmartyGym Premium
+€6.99/month. Full access. Cancel anytime.
 
 ✅ 500+ Expert Workouts
 ✅ Multi-Week Programs
@@ -2012,12 +2012,12 @@ ONE payment. €89.99. Yours forever.
 📊 Smarty Check-ins
 🎯 Goal Tracking
 
-No monthly bills. No renewals. ⏰
+No lock-in. Cancel anytime. ⏰
 
-👉 Link in bio - Get Lifetime access!`,
-    facebook: `🎉 LAUNCH SPECIAL — SmartyGym Lifetime Premium
+👉 Link in bio - Join Premium!`,
+    facebook: `🎉 LAUNCH SPECIAL — SmartyGym Premium
 
-One payment. €89.99. Lifetime access. No renewals, ever.
+€6.99/month. Full premium access. Cancel anytime.
 
 EVERYTHING INCLUDED:
 ✅ 500+ Expert-Designed Workouts
@@ -2033,9 +2033,9 @@ EVERYTHING INCLUDED:
 🏆 Monday Motivation Reports
 ✅ Priority support
 
-No contracts. No hidden fees. No monthly bills. Just expert fitness programming, yours for life.
+No contracts. No hidden fees. Just expert fitness programming with monthly flexibility.
 
-👉 Get Lifetime Premium at smartygym.com/smartypremium`,
+👉 Join Premium at smartygym.com/smarty-premium`,
     tiktok: `🎬 TIKTOK SCRIPT:
 
 Hook (0-3 sec): "POV: You find out about this deal..."
@@ -2250,8 +2250,8 @@ Duration: 20-30 seconds`,
 
 Launch special ending soon:
 
-💎 SmartyGym Lifetime Premium — €89.99 one-time
-(Yours forever. No renewals.)
+💎 SmartyGym Premium — €6.99/month
+(Full access. Cancel anytime.)
 
 After Sunday:
 ❌ Launch pricing ends
@@ -2273,9 +2273,9 @@ If you've been thinking about starting with SmartyGym, this is your moment.
 
 Our launch special ends Sunday at midnight. Here's what disappears:
 
-💎 SMARTYGYM LIFETIME PREMIUM
-One-time payment: €89.99
-Yours for life. No monthly bills. No renewals.
+💎 SMARTYGYM PREMIUM
+Monthly membership: €6.99/month
+Full access. Cancel anytime.
 After Sunday: launch pricing ends
 
 WHAT YOU'RE GETTING — EVERYTHING INCLUDED:
@@ -2297,11 +2297,11 @@ WHY START NOW?
 • January is coming. Beat the resolution crowd.
 • Expert programming from day one.
 • Best price we've ever offered.
-• One payment. No subscription. No surprises.
+• Monthly access. No lock-in. No surprises.
 
 THE MATH:
-€89.99 once vs. years of monthly fitness app bills.
-World-class programming for the price of one weekend out.
+€6.99/month vs. expensive fitness app bills.
+World-class programming for less than one coffee run.
 
 ⏰ Offer ends Sunday at midnight.
 

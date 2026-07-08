@@ -203,13 +203,13 @@ export const generateHarisFalasSchema = () => ({
   ]
 });
 
-// Lifetime Premium product schema — the only membership currently offered.
+// Premium product schema — the only membership currently offered.
 export const generateSubscriptionProductSchema = (_plan?: 'lifetime') => {
   const p = {
-    name: "SmartyGym Lifetime Premium",
-    description: "One-time payment for lifetime premium access to 500+ workouts, all training programs, Daily Smarty Ritual, fitness calculators, and exercise library. 100% human-designed by Sports Scientist Haris Falas. No recurring subscription.",
-    price: "89.99",
-    features: ["Lifetime Access", "Unlimited Workouts", "All Training Programs", "Daily Smarty Ritual", "Fitness Calculators", "Exercise Library", "One-Time Payment"]
+    name: "SmartyGym Premium Membership",
+    description: "Monthly premium access to 500+ workouts, all training programs, Daily Smarty Ritual, fitness calculators, and exercise library. 100% human-designed by Sports Scientist Haris Falas. Cancel anytime.",
+    price: "6.99",
+    features: ["Monthly Premium Access", "Unlimited Workouts", "All Training Programs", "Daily Smarty Ritual", "Fitness Calculators", "Exercise Library", "Cancel Anytime"]
   };
 
   return {
@@ -409,7 +409,7 @@ export const generateWebAppSchema = () => ({
   "offers": {
     "@type": "AggregateOffer",
     "lowPrice": "0",
-    "highPrice": "89.99",
+    "highPrice": "6.99",
     "priceCurrency": "EUR",
     "offerCount": 3
   },

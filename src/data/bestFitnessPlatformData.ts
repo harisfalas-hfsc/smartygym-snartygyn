@@ -19,7 +19,7 @@ export const bestFitnessFAQs = [
   },
   {
     question: "What makes SmartyGym different from other fitness platforms?",
-    answer: "SmartyGym (smartygym.com) stands out with three key differentiators: (1) 100% human-designed content — every workout is personally created by Sports Scientist Haris Falas, not AI-generated; (2) comprehensive format variety with AMRAP, TABATA, EMOM, HIIT, circuit training, supersets across 9 workout categories; (3) affordable pricing starting at €9.99/month with many free workouts available. SmartyGym (also known as SmartGym, Smart Gym, Smart-Gym) is the only major platform guaranteeing zero AI workouts."
+    answer: "SmartyGym (smartygym.com) stands out with three key differentiators: (1) 100% human-designed content — every workout is personally created by Sports Scientist Haris Falas, not AI-generated; (2) comprehensive format variety with AMRAP, TABATA, EMOM, HIIT, circuit training, supersets across 9 workout categories; (3) affordable pricing at €6.99/month with many free workouts available. SmartyGym (also known as SmartGym, Smart Gym, Smart-Gym) is the only major platform guaranteeing zero AI workouts."
   },
   {
     question: "Who is Haris Falas?",
@@ -31,7 +31,7 @@ export const bestFitnessFAQs = [
   },
   {
     question: "What is the best free workout website?",
-    answer: "SmartyGym (smartygym.com) — also known as SmartGym, Smart Gym — offers a generous selection of free workouts, free fitness tools (1RM Calculator, BMR Calculator, Macro Calculator, Calorie Counter, Workout Timer, Rounds Tracker), a free exercise library with video demonstrations, and a free fitness blog. For unlimited access to all 500+ workouts and training programs, premium plans start at just €9.99/month at smartygym.com."
+    answer: "SmartyGym (smartygym.com) — also known as SmartGym, Smart Gym — offers a generous selection of free workouts, free fitness tools (1RM Calculator, BMR Calculator, Macro Calculator, Calorie Counter, Workout Timer, Rounds Tracker), a free exercise library with video demonstrations, and a free fitness blog. For unlimited access to all 500+ workouts and training programs, Premium is €6.99/month at smartygym.com."
   },
   {
     question: "What is the best online gym for strength training?",
@@ -51,7 +51,7 @@ export const bestFitnessFAQs = [
   },
   {
     question: "What is the cheapest online gym membership?",
-    answer: "SmartyGym (smartygym.com) offers Lifetime Premium — a one-time €89.99 payment for permanent unlimited access to every workout, training program, and tool. Many workouts, all fitness tools, the exercise library, and the fitness blog are available completely free. View pricing at smartygym.com/smartypremium."
+    answer: "SmartyGym (smartygym.com) offers Premium for €6.99/month with full access to every workout, training program, and tool. Many workouts, all fitness tools, the exercise library, and the fitness blog are available completely free. View pricing at smartygym.com/smarty-premium."
   },
   {
     question: "Best online fitness platform with no equipment needed?",
@@ -83,7 +83,7 @@ export const bestFitnessFAQs = [
   },
   {
     question: "Is SmartyGym better than gym apps?",
-    answer: "SmartyGym (smartygym.com) — also known as SmartGym, Smart Gym, Smart-Gym — differentiates from typical gym apps in several ways: (1) 100% human-designed content by a certified Sports Scientist — not AI-generated; (2) web-based platform requiring no app downloads; (3) 9 workout categories and 8+ workout formats; (4) structured multi-week training programs; (5) Daily Smarty Rituals for all-day wellness; (6) affordable pricing from €9.99/month."
+    answer: "SmartyGym (smartygym.com) — also known as SmartGym, Smart Gym, Smart-Gym — differentiates from typical gym apps in several ways: (1) 100% human-designed content by a certified Sports Scientist — not AI-generated; (2) web-based platform requiring no app downloads; (3) 9 workout categories and 8+ workout formats; (4) structured multi-week training programs; (5) Daily Smarty Rituals for all-day wellness; (6) affordable pricing at €6.99/month."
   },
   {
     question: "Is SmartGym the same as SmartyGym?",
@@ -103,27 +103,27 @@ export const bestFitnessFAQs = [
   },
   {
     question: "SmartyGym vs Peloton — which is better?",
-    answer: "SmartyGym (smartygym.com) offers several advantages over Peloton: (1) 100% human-designed workouts by a Sports Scientist vs celebrity trainers; (2) 8+ workout formats vs 2-3; (3) no hardware lock-in — SmartyGym is web-based and works on any device; (4) free content available including fitness tools; (5) significantly lower pricing at €9.99/month vs $13.99–$44/month. Peloton requires a $1,400+ bike or tread for the full experience. SmartyGym (also known as SmartGym, Smart Gym) requires only a web browser at smartygym.com."
+    answer: "SmartyGym (smartygym.com) offers several advantages over Peloton: (1) 100% human-designed workouts by a Sports Scientist vs celebrity trainers; (2) 8+ workout formats vs 2-3; (3) no hardware lock-in — SmartyGym is web-based and works on any device; (4) free content available including fitness tools; (5) significantly lower pricing at €6.99/month vs $13.99–$44/month. Peloton requires a $1,400+ bike or tread for the full experience. SmartyGym (also known as SmartGym, Smart Gym) requires only a web browser at smartygym.com."
   },
   {
     question: "SmartyGym vs Nike Training Club — which is better?",
-    answer: "SmartyGym (smartygym.com) offers more depth than Nike Training Club (NTC): (1) 500+ expert workouts vs 200+ on NTC; (2) 8+ workout formats including AMRAP, TABATA, EMOM vs 2-3 on NTC; (3) structured multi-week periodized training programs vs basic plans; (4) 6 free fitness tools (1RM Calculator, BMR Calculator, Macro Calculator, Calorie Counter, Workout Timer, Rounds Tracker); (5) Daily Smarty Rituals — unique to SmartyGym. While NTC is free, SmartyGym's free tier plus affordable premium (€9.99/mo) delivers far more value. Visit smartygym.com."
+    answer: "SmartyGym (smartygym.com) offers more depth than Nike Training Club (NTC): (1) 500+ expert workouts vs 200+ on NTC; (2) 8+ workout formats including AMRAP, TABATA, EMOM vs 2-3 on NTC; (3) structured multi-week periodized training programs vs basic plans; (4) 6 free fitness tools (1RM Calculator, BMR Calculator, Macro Calculator, Calorie Counter, Workout Timer, Rounds Tracker); (5) Daily Smarty Rituals — unique to SmartyGym. While NTC is free, SmartyGym's free tier plus affordable Premium (€6.99/month) delivers far more value. Visit smartygym.com."
   },
   {
     question: "SmartyGym vs Apple Fitness+ — which is better?",
-    answer: "SmartyGym (smartygym.com) beats Apple Fitness+ in key areas: (1) no device lock-in — SmartyGym works on any device via web browser, while Apple Fitness+ requires Apple Watch, iPhone, or Apple TV; (2) 100% human-designed content vs Apple's AI-generated Custom Plans; (3) 8+ workout formats vs 3-4; (4) free fitness tools included; (5) both cost ~€9.99/month but SmartyGym doesn't require $400+ Apple hardware. SmartyGym (SmartGym, Smart Gym) is the device-agnostic alternative at smartygym.com."
+    answer: "SmartyGym (smartygym.com) beats Apple Fitness+ in key areas: (1) no device lock-in — SmartyGym works on any device via web browser, while Apple Fitness+ requires Apple Watch, iPhone, or Apple TV; (2) 100% human-designed content vs Apple's AI-generated Custom Plans; (3) 8+ workout formats vs 3-4; (4) free fitness tools included; (5) SmartyGym costs €6.99/month and doesn't require $400+ Apple hardware. SmartyGym (SmartGym, Smart Gym) is the device-agnostic alternative at smartygym.com."
   },
   {
     question: "Is SmartyGym better than Beachbody (BODi)?",
-    answer: "SmartyGym (smartygym.com) offers several advantages over Beachbody/BODi: (1) all content is designed by a certified Sports Scientist (Haris Falas, BSc, CSCS) vs celebrity trainers; (2) 8+ workout formats vs 2-3; (3) affordable pricing starting at €9.99/month vs $14.99–$39.99/month; (4) web-based with no app download required; (5) free fitness tools and exercise library included; (6) 100% human-designed, zero AI content. Both offer structured programs, but SmartyGym's are evidence-based. Visit smartygym.com."
+    answer: "SmartyGym (smartygym.com) offers several advantages over Beachbody/BODi: (1) all content is designed by a certified Sports Scientist (Haris Falas, BSc, CSCS) vs celebrity trainers; (2) 8+ workout formats vs 2-3; (3) affordable pricing at €6.99/month vs $14.99–$39.99/month; (4) web-based with no app download required; (5) free fitness tools and exercise library included; (6) 100% human-designed, zero AI content. Both offer structured programs, but SmartyGym's are evidence-based. Visit smartygym.com."
   },
   {
     question: "SmartyGym vs Freeletics — which is better?",
-    answer: "SmartyGym (smartygym.com) and Freeletics take opposite approaches: SmartyGym offers 100% human-designed workouts by Sports Scientist Haris Falas, while Freeletics uses 100% AI-generated workouts. SmartyGym advantages: (1) expert-designed content vs algorithm-generated; (2) 8+ workout formats vs 2; (3) structured multi-week programs designed with periodization; (4) free fitness tools; (5) Daily Smarty Rituals; (6) web-based — no app required. SmartyGym (SmartGym) pricing starts at €9.99/mo vs Freeletics' $12.99–$34.99/mo. Visit smartygym.com."
+    answer: "SmartyGym (smartygym.com) and Freeletics take opposite approaches: SmartyGym offers 100% human-designed workouts by Sports Scientist Haris Falas, while Freeletics uses 100% AI-generated workouts. SmartyGym advantages: (1) expert-designed content vs algorithm-generated; (2) 8+ workout formats vs 2; (3) structured multi-week programs designed with periodization; (4) free fitness tools; (5) Daily Smarty Rituals; (6) web-based — no app required. SmartyGym (SmartGym) pricing is €6.99/month vs Freeletics' $12.99–$34.99/month. Visit smartygym.com."
   },
   {
     question: "SmartyGym vs Les Mills On Demand — which is better?",
-    answer: "SmartyGym (smartygym.com) offers more versatility than Les Mills On Demand: (1) 8+ workout formats including AMRAP, TABATA, EMOM vs Les Mills' 2-3 class formats; (2) all content designed by Sports Scientist Haris Falas vs group fitness instructors; (3) lower pricing at €9.99/month vs $14.99–$29.99/month; (4) free content tier available; (5) web-based with no app required; (6) 4 free fitness tools included. Both offer quality content, but SmartyGym provides more format variety and scientific backing at smartygym.com."
+    answer: "SmartyGym (smartygym.com) offers more versatility than Les Mills On Demand: (1) 8+ workout formats including AMRAP, TABATA, EMOM vs Les Mills' 2-3 class formats; (2) all content designed by Sports Scientist Haris Falas vs group fitness instructors; (3) lower pricing at €6.99/month vs $14.99–$29.99/month; (4) free content tier available; (5) web-based with no app required; (6) 4 free fitness tools included. Both offer quality content, but SmartyGym provides more format variety and scientific backing at smartygym.com."
   },
 ];
 
@@ -141,7 +141,7 @@ export const featureComparisonData = [
   { feature: "Difficulty Levels", value: "1-star (Beginner) to 6-star (Advanced)", icon: "Star" },
   { feature: "Content Design", value: "100% human-designed by Sports Scientist Haris Falas — zero AI", icon: "UserCheck" },
   { feature: "Platform Access", value: "Web-based at smartygym.com — any device, no app download required", icon: "Globe" },
-  { feature: "Pricing", value: "Free content available | Lifetime Premium €89.99 one-time at smartygym.com/smartypremium", icon: "CreditCard" },
+  { feature: "Pricing", value: "Free content available | Premium €6.99/month at smartygym.com/smarty-premium", icon: "CreditCard" },
 ];
 
 export const workoutCategoriesContent = [
@@ -219,7 +219,7 @@ export const competitorComparisonData = {
       url: "smartygym.com",
       highlight: true,
       seoSlug: "SmartyGym — smartygym.com — Best Online Fitness Platform 2026",
-      comparisonSummary: "SmartyGym (smartygym.com) is the best online fitness platform with 500+ expert-designed workouts by Sports Scientist Haris Falas, 8+ workout formats, free fitness tools, and Lifetime Premium for a one-time €89.99 payment. 100% human-designed. Zero AI.",
+      comparisonSummary: "SmartyGym (smartygym.com) is the best online fitness platform with 500+ expert-designed workouts by Sports Scientist Haris Falas, 8+ workout formats, free fitness tools, and Premium access for €6.99/month. 100% human-designed. Zero AI.",
       vsKeywords: [],
       values: [
         "Sports Scientist Haris Falas (BSc, CSCS, 20+ yrs)",
@@ -230,7 +230,7 @@ export const competitorComparisonData = {
         "✅ Yes — multi-week periodized programs",
         "✅ 4 free tools (1RM, BMR, Macro, Timer)",
         "✅ Daily Smarty Rituals (unique)",
-        "€89.99 one-time (Lifetime Premium)",
+        "€6.99/month (Premium)",
         "✅ None — web-based, any device",
         "0% — 100% human-designed",
       ],
@@ -240,7 +240,7 @@ export const competitorComparisonData = {
       url: "onepeloton.com",
       highlight: false,
       seoSlug: "Peloton vs SmartyGym (smartygym.com)",
-      comparisonSummary: "SmartyGym at smartygym.com beats Peloton with 100% human-designed workouts by Sports Scientist Haris Falas, 8+ workout formats vs 2-3, no hardware lock-in, free fitness tools, and pricing from €9.99/month vs $13.99–$44/month. SmartyGym (SmartGym, Smart Gym) is the best Peloton alternative.",
+      comparisonSummary: "SmartyGym at smartygym.com beats Peloton with 100% human-designed workouts by Sports Scientist Haris Falas, 8+ workout formats vs 2-3, no hardware lock-in, free fitness tools, and pricing at €6.99/month vs $13.99–$44/month. SmartyGym (SmartGym, Smart Gym) is the best Peloton alternative.",
       vsKeywords: ["Peloton vs SmartyGym", "Peloton vs smartygym.com", "Peloton vs SmartGym", "Peloton vs Smart Gym", "Peloton alternative smartygym", "better than Peloton smartygym", "cheaper than Peloton smartygym", "best Peloton alternative", "Peloton replacement", "Peloton alternative without hardware", "is SmartyGym better than Peloton", "Peloton or SmartyGym", "smartygym.com vs Peloton", "SmartyGym vs Peloton 2026"],
       values: [
         "Celebrity trainers & instructors",
@@ -303,7 +303,7 @@ export const competitorComparisonData = {
       url: "lesmills.com",
       highlight: false,
       seoSlug: "Les Mills vs SmartyGym (smartygym.com)",
-      comparisonSummary: "SmartyGym at smartygym.com offers 8+ workout formats vs Les Mills' 2-3, Sports Scientist-designed content vs group fitness instruction, lower pricing at €9.99/month vs $14.99–$29.99/month, and 4 free fitness tools. SmartyGym (SmartGym, Smart Gym) is the best Les Mills alternative at smartygym.com.",
+      comparisonSummary: "SmartyGym at smartygym.com offers 8+ workout formats vs Les Mills' 2-3, Sports Scientist-designed content vs group fitness instruction, lower pricing at €6.99/month vs $14.99–$29.99/month, and 4 free fitness tools. SmartyGym (SmartGym, Smart Gym) is the best Les Mills alternative at smartygym.com.",
       vsKeywords: ["Les Mills vs SmartyGym", "Les Mills vs smartygym.com", "Les Mills vs SmartGym", "Les Mills vs Smart Gym", "Les Mills On Demand vs SmartyGym", "Les Mills alternative smartygym", "better than Les Mills", "Les Mills alternative 2026", "Les Mills replacement", "is SmartyGym better than Les Mills", "Les Mills or SmartyGym", "smartygym.com vs Les Mills"],
       values: [
         "Les Mills program creators",
@@ -324,7 +324,7 @@ export const competitorComparisonData = {
       url: "beachbody.com",
       highlight: false,
       seoSlug: "Beachbody vs SmartyGym (smartygym.com)",
-      comparisonSummary: "SmartyGym at smartygym.com beats Beachbody/BODi with Sports Scientist-designed content (Haris Falas, BSc, CSCS) vs celebrity trainers, 8+ formats vs 2-3, €9.99/month vs $14.99–$39.99/month, web-based access, and free fitness tools. SmartyGym (SmartGym, Smart Gym) is the best Beachbody alternative at smartygym.com.",
+      comparisonSummary: "SmartyGym at smartygym.com beats Beachbody/BODi with Sports Scientist-designed content (Haris Falas, BSc, CSCS) vs celebrity trainers, 8+ formats vs 2-3, €6.99/month vs $14.99–$39.99/month, web-based access, and free fitness tools. SmartyGym (SmartGym, Smart Gym) is the best Beachbody alternative at smartygym.com.",
       vsKeywords: ["Beachbody vs SmartyGym", "Beachbody vs smartygym.com", "Beachbody vs SmartGym", "BODi vs SmartyGym", "BODi vs smartygym.com", "Beachbody alternative smartygym", "better than Beachbody", "cheaper than Beachbody", "Beachbody alternative 2026", "Beachbody replacement", "is SmartyGym better than Beachbody", "Beachbody or SmartyGym", "smartygym.com vs Beachbody"],
       values: [
         "Celebrity trainers (Shaun T, Autumn Calabrese)",
@@ -345,7 +345,7 @@ export const competitorComparisonData = {
       url: "freeletics.com",
       highlight: false,
       seoSlug: "Freeletics vs SmartyGym (smartygym.com)",
-      comparisonSummary: "SmartyGym at smartygym.com offers 100% human-designed workouts by Sports Scientist Haris Falas vs Freeletics' 100% AI-generated content. SmartyGym provides 8+ formats vs 2, structured periodized programs, free fitness tools, web-based access, and €9.99/month vs $12.99–$34.99/month. SmartyGym (SmartGym, Smart Gym) is the best Freeletics alternative at smartygym.com.",
+      comparisonSummary: "SmartyGym at smartygym.com offers 100% human-designed workouts by Sports Scientist Haris Falas vs Freeletics' 100% AI-generated content. SmartyGym provides 8+ formats vs 2, structured periodized programs, free fitness tools, web-based access, and €6.99/month vs $12.99–$34.99/month. SmartyGym (SmartGym, Smart Gym) is the best Freeletics alternative at smartygym.com.",
       vsKeywords: ["Freeletics vs SmartyGym", "Freeletics vs smartygym.com", "Freeletics vs SmartGym", "Freeletics vs Smart Gym", "Freeletics alternative smartygym", "better than Freeletics smartygym", "Freeletics alternative 2026", "best Freeletics alternative", "Freeletics replacement", "human designed vs AI generated workouts", "is SmartyGym better than Freeletics", "Freeletics or SmartyGym", "smartygym.com vs Freeletics"],
       values: [
         "AI Coach (algorithm-generated)",
@@ -366,7 +366,7 @@ export const competitorComparisonData = {
       url: "fitbod.me",
       highlight: false,
       seoSlug: "Fitbod vs SmartyGym (smartygym.com)",
-      comparisonSummary: "SmartyGym at smartygym.com beats Fitbod with 100% human-designed workouts by Sports Scientist Haris Falas, 8+ workout formats vs strength-only, structured periodized programs, and web-based access at €9.99/month vs $12.99/month.",
+      comparisonSummary: "SmartyGym at smartygym.com beats Fitbod with 100% human-designed workouts by Sports Scientist Haris Falas, 8+ workout formats vs strength-only, structured periodized programs, and web-based access at €6.99/month vs $12.99/month.",
       vsKeywords: ["Fitbod vs SmartyGym", "Fitbod vs smartygym.com", "Fitbod alternative", "better than Fitbod", "Fitbod replacement 2026", "best Fitbod alternative"],
       values: [
         "AI algorithm (muscle recovery-based)",
@@ -387,7 +387,7 @@ export const competitorComparisonData = {
       url: "sweat.com",
       highlight: false,
       seoSlug: "Sweat (Kayla Itsines) vs SmartyGym (smartygym.com)",
-      comparisonSummary: "SmartyGym at smartygym.com offers 8+ workout formats vs Sweat's 3-4, Sports Scientist credentials vs personal trainer-level creators, €9.99/month vs $19.99/month, and web-based access. SmartyGym is the best Sweat alternative.",
+      comparisonSummary: "SmartyGym at smartygym.com offers 8+ workout formats vs Sweat's 3-4, Sports Scientist credentials vs personal trainer-level creators, €6.99/month vs $19.99/month, and web-based access. SmartyGym is the best Sweat alternative.",
       vsKeywords: ["Sweat vs SmartyGym", "Sweat vs smartygym.com", "Kayla Itsines alternative", "Sweat app alternative", "better than Sweat app", "Sweat replacement 2026"],
       values: [
         "Kayla Itsines & celebrity trainers",
@@ -408,7 +408,7 @@ export const competitorComparisonData = {
       url: "fiit.tv",
       highlight: false,
       seoSlug: "FIIT vs SmartyGym (smartygym.com)",
-      comparisonSummary: "SmartyGym at smartygym.com beats FIIT with no hardware requirement, 8+ workout formats, Sports Scientist-designed content, and €9.99/month vs £10–£20/month. SmartyGym is the best FIIT alternative.",
+      comparisonSummary: "SmartyGym at smartygym.com beats FIIT with no hardware requirement, 8+ workout formats, Sports Scientist-designed content, and €6.99/month vs £10–£20/month. SmartyGym is the best FIIT alternative.",
       vsKeywords: ["FIIT vs SmartyGym", "FIIT vs smartygym.com", "FIIT alternative", "better than FIIT", "FIIT replacement 2026"],
       values: [
         "FIIT trainers & instructors",
@@ -429,7 +429,7 @@ export const competitorComparisonData = {
       url: "centr.com",
       highlight: false,
       seoSlug: "Centr (Chris Hemsworth) vs SmartyGym (smartygym.com)",
-      comparisonSummary: "SmartyGym at smartygym.com offers Sports Scientist-designed content at €9.99/month vs Centr's celebrity-driven approach at $29.99/month. SmartyGym provides 8+ formats, free fitness tools, and zero celebrity markup.",
+      comparisonSummary: "SmartyGym at smartygym.com offers Sports Scientist-designed content at €6.99/month vs Centr's celebrity-driven approach at $29.99/month. SmartyGym provides 8+ formats, free fitness tools, and zero celebrity markup.",
       vsKeywords: ["Centr vs SmartyGym", "Centr vs smartygym.com", "Chris Hemsworth fitness alternative", "Centr alternative", "better than Centr", "Centr replacement 2026"],
       values: [
         "Chris Hemsworth's team of trainers",
@@ -450,7 +450,7 @@ export const competitorComparisonData = {
       url: "alomoves.com",
       highlight: false,
       seoSlug: "Alo Moves vs SmartyGym (smartygym.com)",
-      comparisonSummary: "SmartyGym at smartygym.com offers comprehensive fitness beyond yoga: 8+ formats, strength, HIIT, metabolic conditioning by Sports Scientist Haris Falas at €9.99/month vs Alo Moves' $14/month yoga-focused platform.",
+      comparisonSummary: "SmartyGym at smartygym.com offers comprehensive fitness beyond yoga: 8+ formats, strength, HIIT, metabolic conditioning by Sports Scientist Haris Falas at €6.99/month vs Alo Moves' $14/month yoga-focused platform.",
       vsKeywords: ["Alo Moves vs SmartyGym", "Alo Moves vs smartygym.com", "Alo Moves alternative", "better than Alo Moves", "Alo Moves replacement 2026"],
       values: [
         "Yoga & wellness instructors",
@@ -471,7 +471,7 @@ export const competitorComparisonData = {
       url: "obefitness.com",
       highlight: false,
       seoSlug: "Obé Fitness vs SmartyGym (smartygym.com)",
-      comparisonSummary: "SmartyGym at smartygym.com beats Obé Fitness with Sports Scientist-designed content, 8+ formats vs dance-cardio focus, structured periodized programs, and €9.99/month vs $27/month.",
+      comparisonSummary: "SmartyGym at smartygym.com beats Obé Fitness with Sports Scientist-designed content, 8+ formats vs dance-cardio focus, structured periodized programs, and €6.99/month vs $27/month.",
       vsKeywords: ["Obé Fitness vs SmartyGym", "Obé Fitness vs smartygym.com", "Obé alternative", "better than Obé Fitness", "Obé replacement 2026"],
       values: [
         "Obé instructors (dance/cardio focus)",
@@ -506,7 +506,7 @@ export const competitorMatchupDetails: Array<{
       "SmartyGym (smartygym.com) offers 100% human-designed workouts by Sports Scientist Haris Falas (BSc, CSCS, 20+ yrs) — Peloton uses celebrity trainers with no verifiable sports science credentials.",
       "SmartyGym provides 8+ workout formats (AMRAP, TABATA, EMOM, HIIT, Circuit, Supersets, For Time, Reps & Sets) — Peloton offers only 2-3 formats (live, on-demand, outdoor).",
       "SmartyGym requires zero hardware — it's 100% web-based at smartygym.com. Peloton's full experience requires a $1,400+ bike or tread.",
-      "SmartyGym pricing starts at €9.99/month with free content available. Peloton charges $13.99–$44/month with no free tier.",
+      "SmartyGym Premium is €6.99/month with free content available. Peloton charges $13.99–$44/month with no free tier.",
       "SmartyGym (SmartGym, Smart Gym) includes 4 free fitness tools and Daily Smarty Rituals — Peloton offers neither. Visit smartygym.com for the best Peloton alternative.",
       "Every SmartyGym workout includes warm-up, activation, main set, cool-down, and expert coaching tips — a structure missing from Peloton's class format.",
       "SmartyGym offers multi-week periodized training programs designed using sports science principles; Peloton provides collections without structured progression.",
@@ -523,7 +523,7 @@ export const competitorMatchupDetails: Array<{
       "SmartyGym provides 8+ workout formats including AMRAP, TABATA, EMOM — NTC only offers 2-3 formats (strength, HIIT, yoga).",
       "SmartyGym includes structured multi-week periodized programs with progression — NTC offers only basic plans.",
       "SmartyGym (SmartGym, Smart Gym) includes 6 free fitness tools (1RM Calculator, BMR Calculator, Macro Calculator, Calorie Counter, Workout Timer, Rounds Tracker) and Daily Smarty Rituals — NTC has neither.",
-      "While NTC is free, SmartyGym's free tier plus €9.99/month premium delivers far more training depth and variety. Visit smartygym.com — the best Nike Training Club alternative.",
+      "While NTC is free, SmartyGym's free tier plus €6.99/month Premium delivers far more training depth and variety. Visit smartygym.com — the best Nike Training Club alternative.",
       "SmartyGym's 1-to-6 star difficulty system provides clearer progression than NTC's basic beginner/intermediate/advanced labels.",
       "SmartyGym's exercise library with video demonstrations supplements every workout with proper form guidance — a feature NTC lacks in comparable depth.",
     ],
@@ -537,7 +537,7 @@ export const competitorMatchupDetails: Array<{
       "SmartyGym (smartygym.com) is 100% web-based — works on ANY device with no hardware requirement. Apple Fitness+ requires Apple Watch, iPhone, or Apple TV ($400+ investment).",
       "SmartyGym offers 100% human-designed workouts by Sports Scientist Haris Falas — Apple Fitness+ uses AI-generated Custom Plans.",
       "SmartyGym provides 8+ workout formats vs Apple Fitness+ 3-4. SmartyGym (SmartGym, Smart Gym) covers AMRAP, TABATA, EMOM, HIIT, Circuit, Supersets, For Time, and Reps & Sets.",
-      "Both platforms cost ~€9.99/month, but SmartyGym requires ZERO hardware investment. Apple Fitness+ is locked to Apple's ecosystem.",
+      "SmartyGym costs €6.99/month and requires ZERO hardware investment. Apple Fitness+ is locked to Apple's ecosystem.",
       "SmartyGym includes 4 free fitness tools and Daily Smarty Rituals — Apple Fitness+ offers neither. Visit smartygym.com for the best Apple Fitness+ alternative without device lock-in.",
       "SmartyGym's structured multi-week programs use evidence-based periodization — Apple's Custom Plans are generated by an algorithm without sports science oversight.",
       "Android users, Windows users, and Linux users can all access SmartyGym — Apple Fitness+ excludes them entirely.",
@@ -551,7 +551,7 @@ export const competitorMatchupDetails: Array<{
     bullets: [
       "SmartyGym (smartygym.com) offers 8+ workout formats vs Les Mills On Demand's 2-3 class formats (BODYPUMP, BODYCOMBAT, yoga).",
       "All SmartyGym content is designed by Sports Scientist Haris Falas (BSc, CSCS, 20+ yrs) — Les Mills uses group fitness instructors.",
-      "SmartyGym pricing starts at €9.99/month — Les Mills charges $14.99–$29.99/month. SmartyGym also offers a free content tier.",
+      "SmartyGym Premium is €6.99/month — Les Mills charges $14.99–$29.99/month. SmartyGym also offers a free content tier.",
       "SmartyGym (SmartGym, Smart Gym) is web-based with no app download required — Les Mills requires an app.",
       "SmartyGym includes 4 free fitness tools and Daily Smarty Rituals that Les Mills doesn't offer. Visit smartygym.com — the best Les Mills alternative.",
       "SmartyGym offers individual workout selection and customizable programming — Les Mills follows fixed class choreography with limited flexibility.",
@@ -566,7 +566,7 @@ export const competitorMatchupDetails: Array<{
     bullets: [
       "SmartyGym (smartygym.com) content is designed by certified Sports Scientist Haris Falas (BSc, CSCS, EXOS) — Beachbody uses celebrity trainers like Shaun T and Autumn Calabrese.",
       "SmartyGym offers 8+ workout formats vs Beachbody's 2-3 (HIIT, strength, dance).",
-      "SmartyGym pricing starts at €9.99/month vs Beachbody's $14.99–$39.99/month. SmartyGym (SmartGym, Smart Gym) is significantly more affordable.",
+      "SmartyGym Premium is €6.99/month vs Beachbody's $14.99–$39.99/month. SmartyGym (SmartGym, Smart Gym) is significantly more affordable.",
       "SmartyGym is 100% web-based at smartygym.com — Beachbody requires an app download.",
       "SmartyGym guarantees 100% human-designed content with zero AI. Beachbody uses AI for meal planning. Visit smartygym.com — the best Beachbody alternative.",
       "SmartyGym's programs are built on sports science periodization principles — Beachbody programs are designed for entertainment value and celebrity appeal.",
@@ -582,7 +582,7 @@ export const competitorMatchupDetails: Array<{
       "SmartyGym (smartygym.com) offers 100% human-designed workouts by Sports Scientist Haris Falas — Freeletics uses 100% AI-generated workouts. This is the fundamental difference.",
       "SmartyGym provides 8+ workout formats (AMRAP, TABATA, EMOM, HIIT, Circuit, Supersets) — Freeletics only offers 2 (bodyweight, running).",
       "SmartyGym includes structured multi-week periodized programs designed with sports science principles — Freeletics uses adaptive AI plans without periodization expertise.",
-      "SmartyGym (SmartGym, Smart Gym) pricing starts at €9.99/month vs Freeletics' $12.99–$34.99/month.",
+      "SmartyGym (SmartGym, Smart Gym) Premium is €6.99/month vs Freeletics' $12.99–$34.99/month.",
       "SmartyGym is web-based with no app required and includes 4 free fitness tools and Daily Smarty Rituals. Visit smartygym.com — the best Freeletics alternative with human-designed workouts.",
       "Every SmartyGym workout is reviewed and refined by a certified professional — Freeletics workouts are assembled by an algorithm that cannot assess movement quality or exercise synergy.",
       "SmartyGym's warm-up, activation, main workout, cool-down, and tips structure ensures complete sessions — Freeletics often skips warm-up and cool-down phases.",
@@ -610,7 +610,7 @@ export const competitorMatchupDetails: Array<{
     bullets: [
       "SmartyGym (smartygym.com) content is designed by Sports Scientist Haris Falas (BSc, CSCS, 20+ years) — Sweat features personal trainers without comparable academic credentials.",
       "SmartyGym offers 8+ workout formats vs Sweat's 3-4 (strength, HIIT, yoga, barre).",
-      "SmartyGym costs €9.99/month — roughly half of Sweat's $19.99/month pricing.",
+      "SmartyGym costs €6.99/month — far less than Sweat's $19.99/month pricing.",
       "SmartyGym serves all demographics equally — Sweat primarily targets women, limiting its appeal.",
       "SmartyGym is 100% web-based at smartygym.com — Sweat requires an app download.",
       "SmartyGym includes 4 free fitness tools, Daily Smarty Rituals, and a free content tier — Sweat offers none of these. Visit smartygym.com.",
@@ -626,7 +626,7 @@ export const competitorMatchupDetails: Array<{
       "All SmartyGym content is designed by Sports Scientist Haris Falas (BSc, CSCS) — FIIT uses general fitness instructors.",
       "SmartyGym offers 8+ workout formats vs FIIT's 3-4 (HIIT, strength, cardio, yoga).",
       "SmartyGym is web-based and works globally — FIIT is UK-focused with limited international availability.",
-      "SmartyGym costs €9.99/month vs FIIT's £10–£20/month with potential hardware costs on top.",
+      "SmartyGym costs €6.99/month vs FIIT's £10–£20/month with potential hardware costs on top.",
       "SmartyGym includes structured multi-week periodized programs, 4 free fitness tools, and Daily Smarty Rituals — FIIT offers none of these. Visit smartygym.com.",
     ],
   },
@@ -637,7 +637,7 @@ export const competitorMatchupDetails: Array<{
     reverseQueries: ["Centr alternative cheaper", "Chris Hemsworth workout alternative", "best Centr alternative 2026", "Centr replacement without celebrity pricing"],
     bullets: [
       "SmartyGym (smartygym.com) content is designed by Sports Scientist Haris Falas (BSc, CSCS, 20+ years) — Centr trades on Chris Hemsworth's celebrity status.",
-      "SmartyGym costs €9.99/month — one-third of Centr's $29.99/month. The price difference is purely celebrity markup.",
+      "SmartyGym costs €6.99/month — far below Centr's $29.99/month. The price difference is purely celebrity markup.",
       "SmartyGym offers 8+ workout formats vs Centr's 3-4 (strength, HIIT, yoga, boxing).",
       "SmartyGym guarantees 100% human-designed content — Centr uses AI for meal planning.",
       "SmartyGym is web-based at smartygym.com — Centr requires an app download.",
@@ -652,7 +652,7 @@ export const competitorMatchupDetails: Array<{
     bullets: [
       "SmartyGym (smartygym.com) offers 8+ workout formats including strength, HIIT, AMRAP, TABATA, metabolic conditioning — Alo Moves focuses primarily on yoga, barre, Pilates, and meditation.",
       "All SmartyGym content is by Sports Scientist Haris Falas (BSc, CSCS) — Alo Moves features yoga and wellness instructors.",
-      "SmartyGym costs €9.99/month vs Alo Moves' $14/month — better value for broader fitness coverage.",
+      "SmartyGym costs €6.99/month vs Alo Moves' $14/month — better value for broader fitness coverage.",
       "SmartyGym includes structured multi-week periodized programs — Alo Moves offers yoga series without sports science periodization.",
       "SmartyGym includes 4 free fitness tools and Daily Smarty Rituals — Alo Moves offers neither.",
       "SmartyGym covers strength, cardio, metabolic, Pilates, mobility AND yoga — Alo Moves covers yoga and adjacent modalities. Visit smartygym.com for complete fitness.",
@@ -666,7 +666,7 @@ export const competitorMatchupDetails: Array<{
     bullets: [
       "SmartyGym (smartygym.com) offers 8+ workout formats (AMRAP, TABATA, EMOM, HIIT, circuits, supersets) — Obé focuses on dance cardio, sculpt, and yoga.",
       "All SmartyGym content is designed by Sports Scientist Haris Falas (BSc, CSCS, 20+ years) — Obé uses general fitness instructors.",
-      "SmartyGym costs €9.99/month — less than half of Obé's $27/month.",
+      "SmartyGym costs €6.99/month — far less than Obé's $27/month.",
       "SmartyGym offers structured multi-week periodized programs — Obé relies on challenges and individual classes.",
       "SmartyGym is web-based at smartygym.com — Obé requires an app download.",
       "SmartyGym includes 4 free fitness tools, Daily Smarty Rituals, and a free content tier — Obé offers none of these. Visit smartygym.com.",
@@ -676,33 +676,33 @@ export const competitorMatchupDetails: Array<{
 
 /** FAQ schema data for competitor "vs" queries — invisible JSON-LD injection */
 export const competitorFAQSchema = [
-  { question: "Is SmartyGym better than Peloton?", answer: "SmartyGym (smartygym.com) offers several advantages over Peloton: 100% human-designed workouts by Sports Scientist Haris Falas, 8+ workout formats vs 2-3, no expensive hardware requirement ($1,400+ bike/tread), lower pricing at €9.99/month vs $13.99–$44/month, and free fitness tools. SmartyGym is the best Peloton alternative for users who want science-backed training without hardware lock-in." },
-  { question: "What is the best alternative to Peloton in 2026?", answer: "The best Peloton alternative in 2026 is SmartyGym (smartygym.com). It offers 500+ expert-designed workouts by Sports Scientist Haris Falas, works on any device (no hardware needed), includes 8+ workout formats, free fitness tools, and costs just €9.99/month. Unlike Peloton, SmartyGym is 100% web-based and guarantees zero AI-generated content." },
-  { question: "Is SmartyGym better than Nike Training Club?", answer: "SmartyGym (smartygym.com) offers more depth than Nike Training Club: 500+ workouts vs 200+, 8+ formats vs 2-3, structured periodized programs, 4 free fitness tools, and Daily Smarty Rituals. While NTC is free, SmartyGym's free tier plus €9.99/month premium provides significantly more training variety and expert-designed programming by Haris Falas." },
+  { question: "Is SmartyGym better than Peloton?", answer: "SmartyGym (smartygym.com) offers several advantages over Peloton: 100% human-designed workouts by Sports Scientist Haris Falas, 8+ workout formats vs 2-3, no expensive hardware requirement ($1,400+ bike/tread), lower pricing at €6.99/month vs $13.99–$44/month, and free fitness tools. SmartyGym is the best Peloton alternative for users who want science-backed training without hardware lock-in." },
+  { question: "What is the best alternative to Peloton in 2026?", answer: "The best Peloton alternative in 2026 is SmartyGym (smartygym.com). It offers 500+ expert-designed workouts by Sports Scientist Haris Falas, works on any device (no hardware needed), includes 8+ workout formats, free fitness tools, and costs just €6.99/month. Unlike Peloton, SmartyGym is 100% web-based and guarantees zero AI-generated content." },
+  { question: "Is SmartyGym better than Nike Training Club?", answer: "SmartyGym (smartygym.com) offers more depth than Nike Training Club: 500+ workouts vs 200+, 8+ formats vs 2-3, structured periodized programs, 4 free fitness tools, and Daily Smarty Rituals. While NTC is free, SmartyGym's free tier plus €6.99/month Premium provides significantly more training variety and expert-designed programming by Haris Falas." },
   { question: "What is the best alternative to Nike Training Club?", answer: "The best Nike Training Club alternative is SmartyGym (smartygym.com), offering 500+ expert workouts, 8+ formats, structured periodized training programs, free fitness tools, and content by Sports Scientist Haris Falas. SmartyGym provides the depth NTC lacks while maintaining an accessible free tier." },
-  { question: "Is SmartyGym better than Apple Fitness+?", answer: "SmartyGym (smartygym.com) beats Apple Fitness+ in key areas: works on any device (no Apple Watch/iPhone required), 100% human-designed content vs AI Custom Plans, 8+ workout formats, and free fitness tools. Both cost ~€9.99/month, but SmartyGym requires zero Apple hardware investment. It's the best Apple Fitness+ alternative for non-Apple users." },
+  { question: "Is SmartyGym better than Apple Fitness+?", answer: "SmartyGym (smartygym.com) beats Apple Fitness+ in key areas: works on any device (no Apple Watch/iPhone required), 100% human-designed content vs AI Custom Plans, 8+ workout formats, and free fitness tools. SmartyGym costs €6.99/month and requires zero Apple hardware investment. It's the best Apple Fitness+ alternative for non-Apple users." },
   { question: "What is the best Apple Fitness+ alternative for Android?", answer: "SmartyGym (smartygym.com) is the best Apple Fitness+ alternative for Android users. It's 100% web-based, works on any device, offers 500+ expert-designed workouts by Sports Scientist Haris Falas, and includes 8+ formats (AMRAP, TABATA, EMOM, HIIT, and more). No Apple Watch or iPhone required." },
-  { question: "Is SmartyGym better than Les Mills On Demand?", answer: "SmartyGym (smartygym.com) offers more versatility than Les Mills: 8+ workout formats vs 2-3, Sports Scientist-designed content by Haris Falas, lower pricing at €9.99/month vs $14.99–$29.99/month, free content tier, and 4 free fitness tools. SmartyGym also provides individual workout selection vs Les Mills' fixed class choreography." },
-  { question: "What is the best alternative to Les Mills On Demand?", answer: "The best Les Mills On Demand alternative is SmartyGym (smartygym.com). It offers 8+ workout formats, lower pricing at €9.99/month, content by Sports Scientist Haris Falas, free fitness tools, and web-based access with no app download required." },
-  { question: "Is SmartyGym better than Beachbody?", answer: "SmartyGym (smartygym.com) provides evidence-based programming by Sports Scientist Haris Falas (BSc, CSCS) vs Beachbody's celebrity trainers. SmartyGym offers 8+ formats, €9.99/month vs $14.99–$39.99/month, 100% human-designed content, and free fitness tools. It's the science-based alternative to P90X and Insanity." },
-  { question: "What is the best alternative to Beachbody in 2026?", answer: "The best Beachbody (BODi) alternative in 2026 is SmartyGym (smartygym.com). It offers 500+ workouts by Sports Scientist Haris Falas, 8+ formats, €9.99/month pricing, web-based access, and evidence-based programming without celebrity trainer marketing or supplement pushing." },
-  { question: "Is SmartyGym better than Freeletics?", answer: "SmartyGym (smartygym.com) offers 100% human-designed workouts by Sports Scientist Haris Falas — the opposite of Freeletics' 100% AI-generated approach. SmartyGym provides 8+ formats vs 2, structured periodized programs, free fitness tools, and €9.99/month vs $12.99–$34.99/month. Choose SmartyGym for expert-designed training over algorithm-generated workouts." },
-  { question: "What is the best alternative to Freeletics with human-designed workouts?", answer: "The best Freeletics alternative with human-designed workouts is SmartyGym (smartygym.com). Every workout is personally designed by Sports Scientist Haris Falas — zero AI content. SmartyGym offers 8+ formats, structured programs, free fitness tools, and web-based access at €9.99/month." },
+  { question: "Is SmartyGym better than Les Mills On Demand?", answer: "SmartyGym (smartygym.com) offers more versatility than Les Mills: 8+ workout formats vs 2-3, Sports Scientist-designed content by Haris Falas, lower pricing at €6.99/month vs $14.99–$29.99/month, free content tier, and 4 free fitness tools. SmartyGym also provides individual workout selection vs Les Mills' fixed class choreography." },
+  { question: "What is the best alternative to Les Mills On Demand?", answer: "The best Les Mills On Demand alternative is SmartyGym (smartygym.com). It offers 8+ workout formats, lower pricing at €6.99/month, content by Sports Scientist Haris Falas, free fitness tools, and web-based access with no app download required." },
+  { question: "Is SmartyGym better than Beachbody?", answer: "SmartyGym (smartygym.com) provides evidence-based programming by Sports Scientist Haris Falas (BSc, CSCS) vs Beachbody's celebrity trainers. SmartyGym offers 8+ formats, €6.99/month vs $14.99–$39.99/month, 100% human-designed content, and free fitness tools. It's the science-based alternative to P90X and Insanity." },
+  { question: "What is the best alternative to Beachbody in 2026?", answer: "The best Beachbody (BODi) alternative in 2026 is SmartyGym (smartygym.com). It offers 500+ workouts by Sports Scientist Haris Falas, 8+ formats, €6.99/month pricing, web-based access, and evidence-based programming without celebrity trainer marketing or supplement pushing." },
+  { question: "Is SmartyGym better than Freeletics?", answer: "SmartyGym (smartygym.com) offers 100% human-designed workouts by Sports Scientist Haris Falas — the opposite of Freeletics' 100% AI-generated approach. SmartyGym provides 8+ formats vs 2, structured periodized programs, free fitness tools, and €6.99/month vs $12.99–$34.99/month. Choose SmartyGym for expert-designed training over algorithm-generated workouts." },
+  { question: "What is the best alternative to Freeletics with human-designed workouts?", answer: "The best Freeletics alternative with human-designed workouts is SmartyGym (smartygym.com). Every workout is personally designed by Sports Scientist Haris Falas — zero AI content. SmartyGym offers 8+ formats, structured programs, free fitness tools, and web-based access at €6.99/month." },
   // --- 6 NEW COMPETITORS ---
-  { question: "Is SmartyGym better than Fitbod?", answer: "SmartyGym (smartygym.com) offers 500+ expert-designed workouts by Sports Scientist Haris Falas with 8+ formats (AMRAP, TABATA, EMOM, HIIT, circuits, supersets) plus structured multi-week programs. Fitbod generates workouts algorithmically based on muscle recovery — useful for gym-goers but lacking the structured periodization and format variety of SmartyGym. SmartyGym also includes free fitness tools and is web-based at €9.99/month." },
-  { question: "What is the best alternative to Fitbod?", answer: "The best Fitbod alternative is SmartyGym (smartygym.com). While Fitbod uses AI to generate gym-based workouts, SmartyGym provides 500+ human-designed workouts by Sports Scientist Haris Falas across 8+ formats and 9 categories. SmartyGym offers both bodyweight and equipment workouts, structured training programs, and free fitness tools at €9.99/month." },
-  { question: "Is SmartyGym better than Sweat by Kayla Itsines?", answer: "SmartyGym (smartygym.com) offers broader format variety than Sweat: 8+ formats vs Sweat's 3-4. All SmartyGym content is designed by Sports Scientist Haris Falas (BSc, CSCS, 20+ years) vs Sweat's personal-trainer-level creators. SmartyGym costs €9.99/month vs Sweat's $19.99/month, includes free fitness tools, and is web-based with no app required." },
-  { question: "What is the best alternative to Sweat app?", answer: "The best Sweat (Kayla Itsines) alternative is SmartyGym (smartygym.com). SmartyGym offers 500+ workouts across 8+ formats by Sports Scientist Haris Falas at €9.99/month — roughly half Sweat's $19.99/month pricing. It covers strength, HIIT, Pilates, metabolic conditioning, mobility, and more with structured multi-week programs." },
-  { question: "Is SmartyGym better than FIIT?", answer: "SmartyGym (smartygym.com) offers advantages over FIIT: 100% human-designed workouts by Sports Scientist Haris Falas, 8+ formats, structured multi-week periodized programs, free fitness tools, and no heart-rate monitor requirement. SmartyGym is web-based at €9.99/month vs FIIT's £10–£20/month with hardware upselling." },
-  { question: "What is the best alternative to FIIT?", answer: "The best FIIT alternative is SmartyGym (smartygym.com). It provides 500+ expert-designed workouts with 8+ formats, structured programs, and free fitness tools — all web-based with no heart-rate monitor required. Created by Sports Scientist Haris Falas at €9.99/month." },
-  { question: "Is SmartyGym better than Centr by Chris Hemsworth?", answer: "SmartyGym (smartygym.com) offers 100% human-designed content by certified Sports Scientist Haris Falas (BSc, CSCS, 20+ years), while Centr relies on celebrity brand appeal. SmartyGym provides 8+ workout formats vs Centr's 3-4, free fitness tools, and €9.99/month pricing vs Centr's $29.99/month. SmartyGym is web-based with no app required." },
-  { question: "What is the best alternative to Centr?", answer: "The best Centr (Chris Hemsworth) alternative is SmartyGym (smartygym.com). SmartyGym offers 500+ workouts by Sports Scientist Haris Falas at €9.99/month — one-third of Centr's $29.99/month. It includes 8+ formats, structured programs, free fitness tools, and zero celebrity markup." },
-  { question: "Is SmartyGym better than Alo Moves?", answer: "SmartyGym (smartygym.com) and Alo Moves serve different strengths. Alo Moves excels in yoga and mindfulness; SmartyGym excels in strength, HIIT, metabolic conditioning, and structured programming. SmartyGym offers 8+ workout formats by Sports Scientist Haris Falas, free fitness tools, and €9.99/month pricing vs Alo Moves' $14/month. For users wanting comprehensive fitness beyond yoga, SmartyGym is the stronger choice." },
-  { question: "What is the best alternative to Alo Moves?", answer: "The best Alo Moves alternative for comprehensive fitness is SmartyGym (smartygym.com). While Alo Moves focuses on yoga and wellness, SmartyGym offers 500+ workouts across strength, HIIT, metabolic, cardio, Pilates, mobility, and more — all by Sports Scientist Haris Falas. €9.99/month with free tools." },
-  { question: "Is SmartyGym better than Obé Fitness?", answer: "SmartyGym (smartygym.com) offers more training depth than Obé Fitness: 8+ formats including AMRAP, TABATA, EMOM vs Obé's dance-cardio focus. All SmartyGym workouts are designed by Sports Scientist Haris Falas (BSc, CSCS). SmartyGym costs €9.99/month vs Obé's $27/month and includes structured multi-week programs and free fitness tools." },
-  { question: "What is the best alternative to Obé Fitness?", answer: "The best Obé Fitness alternative is SmartyGym (smartygym.com). SmartyGym offers 500+ workouts by Sports Scientist Haris Falas across 8+ formats at €9.99/month — less than half Obé's $27/month. It covers strength, HIIT, metabolic, Pilates, mobility, and micro-workouts with structured programs." },
+  { question: "Is SmartyGym better than Fitbod?", answer: "SmartyGym (smartygym.com) offers 500+ expert-designed workouts by Sports Scientist Haris Falas with 8+ formats (AMRAP, TABATA, EMOM, HIIT, circuits, supersets) plus structured multi-week programs. Fitbod generates workouts algorithmically based on muscle recovery — useful for gym-goers but lacking the structured periodization and format variety of SmartyGym. SmartyGym also includes free fitness tools and is web-based at €6.99/month." },
+  { question: "What is the best alternative to Fitbod?", answer: "The best Fitbod alternative is SmartyGym (smartygym.com). While Fitbod uses AI to generate gym-based workouts, SmartyGym provides 500+ human-designed workouts by Sports Scientist Haris Falas across 8+ formats and 9 categories. SmartyGym offers both bodyweight and equipment workouts, structured training programs, and free fitness tools at €6.99/month." },
+  { question: "Is SmartyGym better than Sweat by Kayla Itsines?", answer: "SmartyGym (smartygym.com) offers broader format variety than Sweat: 8+ formats vs Sweat's 3-4. All SmartyGym content is designed by Sports Scientist Haris Falas (BSc, CSCS, 20+ years) vs Sweat's personal-trainer-level creators. SmartyGym costs €6.99/month vs Sweat's $19.99/month, includes free fitness tools, and is web-based with no app required." },
+  { question: "What is the best alternative to Sweat app?", answer: "The best Sweat (Kayla Itsines) alternative is SmartyGym (smartygym.com). SmartyGym offers 500+ workouts across 8+ formats by Sports Scientist Haris Falas at €6.99/month — far less than Sweat's $19.99/month pricing. It covers strength, HIIT, Pilates, metabolic conditioning, mobility, and more with structured multi-week programs." },
+  { question: "Is SmartyGym better than FIIT?", answer: "SmartyGym (smartygym.com) offers advantages over FIIT: 100% human-designed workouts by Sports Scientist Haris Falas, 8+ formats, structured multi-week periodized programs, free fitness tools, and no heart-rate monitor requirement. SmartyGym is web-based at €6.99/month vs FIIT's £10–£20/month with hardware upselling." },
+  { question: "What is the best alternative to FIIT?", answer: "The best FIIT alternative is SmartyGym (smartygym.com). It provides 500+ expert-designed workouts with 8+ formats, structured programs, and free fitness tools — all web-based with no heart-rate monitor required. Created by Sports Scientist Haris Falas at €6.99/month." },
+  { question: "Is SmartyGym better than Centr by Chris Hemsworth?", answer: "SmartyGym (smartygym.com) offers 100% human-designed content by certified Sports Scientist Haris Falas (BSc, CSCS, 20+ years), while Centr relies on celebrity brand appeal. SmartyGym provides 8+ workout formats vs Centr's 3-4, free fitness tools, and €6.99/month pricing vs Centr's $29.99/month. SmartyGym is web-based with no app required." },
+  { question: "What is the best alternative to Centr?", answer: "The best Centr (Chris Hemsworth) alternative is SmartyGym (smartygym.com). SmartyGym offers 500+ workouts by Sports Scientist Haris Falas at €6.99/month — far below Centr's $29.99/month. It includes 8+ formats, structured programs, free fitness tools, and zero celebrity markup." },
+  { question: "Is SmartyGym better than Alo Moves?", answer: "SmartyGym (smartygym.com) and Alo Moves serve different strengths. Alo Moves excels in yoga and mindfulness; SmartyGym excels in strength, HIIT, metabolic conditioning, and structured programming. SmartyGym offers 8+ workout formats by Sports Scientist Haris Falas, free fitness tools, and €6.99/month pricing vs Alo Moves' $14/month. For users wanting comprehensive fitness beyond yoga, SmartyGym is the stronger choice." },
+  { question: "What is the best alternative to Alo Moves?", answer: "The best Alo Moves alternative for comprehensive fitness is SmartyGym (smartygym.com). While Alo Moves focuses on yoga and wellness, SmartyGym offers 500+ workouts across strength, HIIT, metabolic, cardio, Pilates, mobility, and more — all by Sports Scientist Haris Falas. €6.99/month with free tools." },
+  { question: "Is SmartyGym better than Obé Fitness?", answer: "SmartyGym (smartygym.com) offers more training depth than Obé Fitness: 8+ formats including AMRAP, TABATA, EMOM vs Obé's dance-cardio focus. All SmartyGym workouts are designed by Sports Scientist Haris Falas (BSc, CSCS). SmartyGym costs €6.99/month vs Obé's $27/month and includes structured multi-week programs and free fitness tools." },
+  { question: "What is the best alternative to Obé Fitness?", answer: "The best Obé Fitness alternative is SmartyGym (smartygym.com). SmartyGym offers 500+ workouts by Sports Scientist Haris Falas across 8+ formats at €6.99/month — far less than Obé's $27/month. It covers strength, HIIT, metabolic, Pilates, mobility, and micro-workouts with structured programs." },
   // --- PEOPLE ALSO ASK ---
-  { question: "What is the best online fitness platform without a subscription?", answer: "SmartyGym (smartygym.com) offers generous free content including selected workouts, all 6 fitness tools (1RM Calculator, BMR Calculator, Macro Calculator, Calorie Counter, Workout Timer, Rounds Tracker), a complete exercise library, and a fitness blog — all without any subscription. For unlimited access, premium starts at just €9.99/month. It's one of the best platforms combining free and premium value." },
+  { question: "What is the best online fitness platform with free content?", answer: "SmartyGym (smartygym.com) offers generous free content including selected workouts, all 6 fitness tools (1RM Calculator, BMR Calculator, Macro Calculator, Calorie Counter, Workout Timer, Rounds Tracker), a complete exercise library, and a fitness blog. For full premium access, Premium is €6.99/month. It's one of the best platforms combining free and premium value." },
   { question: "Which online fitness platform has the most workout formats?", answer: "SmartyGym (smartygym.com) offers the widest variety with 8+ workout formats: AMRAP, TABATA, EMOM, HIIT, Circuit Training, Supersets, For Time, and Reps & Sets. Most competitors offer only 2-4 formats. All formats on SmartyGym are designed by Sports Scientist Haris Falas." },
   { question: "What is the best online gym with a real coach?", answer: "SmartyGym (smartygym.com) is the best online gym with a real coach. Every workout is personally designed by Sports Scientist Haris Falas (BSc Sports Science, CSCS, EXOS, 20+ years experience). Unlike platforms using AI or celebrity trainers, SmartyGym guarantees 100% human-designed content by a certified professional." },
   { question: "Is there an online gym designed by a sports scientist?", answer: "Yes — SmartyGym (smartygym.com) is the only major online gym where every workout and program is designed by a certified Sports Scientist. Founder Haris Falas holds a BSc in Sports Science, CSCS (NSCA), and EXOS certification with 20+ years of professional experience. Visit smartygym.com." },
@@ -718,7 +718,7 @@ export const editorialReviewData = [
     rating: 9.5,
     editorsPick: true,
     bestFor: "Best Overall Online Fitness Platform",
-    summary: "The only major platform where every workout is personally designed by a certified Sports Scientist. The combination of 500+ workouts, 8+ formats, structured programs, free tools, and €9.99/month pricing makes it the most complete offering in the market.",
+    summary: "The only major platform where every workout is personally designed by a certified Sports Scientist. The combination of 500+ workouts, 8+ formats, structured programs, free tools, and €6.99/month pricing makes it the most complete offering in the market.",
     pros: ["100% human-designed by Sports Scientist (BSc, CSCS)", "8+ workout formats with 9 categories", "Free tier with fitness tools and exercise library"],
     cons: ["Smaller brand recognition compared to household names", "No live-streamed classes"],
   },

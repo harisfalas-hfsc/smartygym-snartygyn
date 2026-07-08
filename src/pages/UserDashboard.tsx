@@ -1174,7 +1174,7 @@ export default function UserDashboard() {
                   <Crown className="h-12 w-12 text-primary mx-auto mb-4" />
                   <h3 className="text-xl font-bold mb-2">Premium Feature</h3>
                   <p className="text-muted-foreground mb-6">
-                    Track your workouts, mark favorites, and monitor your progress with SmartyGym Lifetime Premium.
+                    Track your workouts, mark favorites, and monitor your progress with SmartyGym Premium.
                   </p>
                   <Button onClick={() => navigate("/smarty-premium")} className="cta-button">
                     Upgrade to Premium
@@ -1229,7 +1229,7 @@ export default function UserDashboard() {
                   <Crown className="h-12 w-12 text-primary mx-auto mb-4" />
                   <h3 className="text-xl font-bold mb-2">Premium Feature</h3>
                   <p className="text-muted-foreground mb-6">
-                    Access structured training programs, track your progress, and achieve your fitness goals with SmartyGym Lifetime Premium.
+                    Access structured training programs, track your progress, and achieve your fitness goals with SmartyGym Premium.
                   </p>
                   <Button onClick={() => navigate("/smarty-premium")} className="cta-button">
                     Upgrade to Premium
@@ -1392,7 +1392,7 @@ export default function UserDashboard() {
                   <Crown className="h-12 w-12 text-primary mx-auto mb-4" />
                   <h3 className="text-xl font-bold mb-2">Premium Feature</h3>
                   <p className="text-muted-foreground mb-6">
-                    Smarty Check-ins are available with SmartyGym Lifetime Premium.
+                    Smarty Check-ins are available with SmartyGym Premium.
                   </p>
                   <Button onClick={() => navigate("/smarty-premium")} className="cta-button">
                     Upgrade to Premium
@@ -1418,7 +1418,7 @@ export default function UserDashboard() {
                   <Crown className="h-12 w-12 text-primary mx-auto mb-4" />
                   <h3 className="text-xl font-bold mb-2">Premium Feature</h3>
                   <p className="text-muted-foreground mb-6">
-                    Track all your fitness activities in one place with SmartyGym Lifetime Premium.
+                    Track all your fitness activities in one place with SmartyGym Premium.
                   </p>
                   <Button onClick={() => navigate("/smarty-premium")} className="cta-button">
                     Upgrade to Premium

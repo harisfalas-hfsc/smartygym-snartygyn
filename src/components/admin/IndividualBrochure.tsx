@@ -143,16 +143,16 @@ export const IndividualBrochure = () => {
           </div>
           
           <div className="border-2 border-gray-800 rounded-xl p-6 text-center bg-[#1a1a1a] text-white">
-            <div className="bg-white text-gray-900 text-xs px-2 py-1 rounded mb-2 inline-block">LIFETIME ACCESS</div>
-            <h4 className="font-bold text-lg mb-2">Lifetime Premium</h4>
-            <p className="text-3xl font-bold mb-4">€89.99<span className="text-sm text-gray-400"> one-time</span></p>
+            <div className="bg-white text-gray-900 text-xs px-2 py-1 rounded mb-2 inline-block">MONTHLY ACCESS</div>
+            <h4 className="font-bold text-lg mb-2">Premium</h4>
+            <p className="text-3xl font-bold mb-4">€6.99<span className="text-sm text-gray-400"> / month</span></p>
             <ul className="text-sm text-left space-y-2">
               <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#29B6D2]" /> All Free features</li>
-              <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#29B6D2]" /> ALL premium workouts forever</li>
+              <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#29B6D2]" /> ALL premium workouts</li>
               <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#29B6D2]" /> All training programs</li>
               <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#29B6D2]" /> Smarty Rituals + Check-ins</li>
               <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#29B6D2]" /> Priority support</li>
-              <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#29B6D2]" /> One payment — yours for life</li>
+              <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#29B6D2]" /> Cancel anytime</li>
             </ul>
           </div>
         </div>

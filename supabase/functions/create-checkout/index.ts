@@ -9,8 +9,8 @@ const corsHeaders = {
 
 // SmartyGym recurring-subscription price IDs (LEGACY).
 // Gold/Platinum subscriptions are no longer offered. The current product
-// is Lifetime Premium, which uses a separate one-off checkout function
-// (create-lifetime-checkout). These IDs are kept here only to detect
+// is Premium Monthly, which uses the create-lifetime-checkout function name
+// for backward compatibility. These IDs are kept here only to detect
 // historical recurring subs when blocking duplicate checkouts.
 const LEGACY_SMARTYGYM_SUBSCRIPTION_PRICE_IDS = [
   "price_1SJ9q1IxQYg9inGKZzxxqPbD", // [LEGACY] Gold Monthly
@@ -41,12 +41,11 @@ serve(async (req) => {
     }
 
     // Block any attempt to create a NEW Gold/Platinum subscription.
-    // The recurring subscription products were retired; only Lifetime Premium
-    // (one-time) and Corporate plans are offered going forward.
+    // The old tiers were retired; only Premium Monthly and Corporate plans are offered going forward.
     if (LEGACY_SMARTYGYM_SUBSCRIPTION_PRICE_IDS.includes(priceId)) {
       logStep("Blocked attempt to checkout a retired subscription tier", { priceId });
       return new Response(JSON.stringify({
-        error: "This subscription plan is no longer offered. Please choose SmartyGym Lifetime Premium instead.",
+          error: "This subscription plan is no longer offered. Please choose SmartyGym Premium Monthly instead.",
         code: "TIER_RETIRED",
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },

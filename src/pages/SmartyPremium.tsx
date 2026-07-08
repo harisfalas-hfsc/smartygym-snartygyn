@@ -163,9 +163,9 @@ export default function SmartyPremium() {
           <h2 className="text-2xl sm:text-3xl font-bold text-[#D4AF37]">Premium Membership</h2>
         </div>
         <Badge className="bg-[#D4AF37] text-white mx-auto mb-3 sm:mb-4">MONTHLY MEMBERSHIP</Badge>
-        <CardTitle className="text-3xl sm:text-4xl font-bold">
-          €{monthlyPrice.toFixed(2)}
-          <span className="text-base sm:text-lg font-medium text-muted-foreground">/month</span>
+        <CardTitle className="flex items-end justify-center gap-2 text-3xl sm:text-4xl font-bold leading-none">
+          <span>€{monthlyPrice.toFixed(2)}</span>
+          <span className="pb-0.5 text-base sm:text-lg font-medium leading-none text-muted-foreground">/ month</span>
         </CardTitle>
         <p className="text-xs sm:text-sm text-muted-foreground">Billed monthly. Cancel anytime.</p>
         <p className="text-xs text-[#D4AF37] font-semibold mt-2 flex items-center justify-center gap-1">
@@ -203,7 +203,7 @@ export default function SmartyPremium() {
               {loading ? "Processing..." : "Start Premium — €6.99/month"}
             </Button>
           )}
-          <p className="text-xs text-center text-muted-foreground">Recurring monthly payment. Cancel anytime.</p>
+          <p className="text-xs text-center text-muted-foreground">Recurring monthly payment. Cancel anytime from My Account.</p>
         </div>
       </CardContent>
     </Card>
@@ -411,7 +411,7 @@ export default function SmartyPremium() {
                             <Crown className="w-6 h-6 text-primary" />
                             <h3 className="text-2xl font-bold">Premium</h3>
                           </div>
-                          <div className="text-center text-sm font-semibold text-primary mb-4">€6.99/mo</div>
+                          <div className="text-center text-sm font-semibold text-primary mb-4">€6.99 / month</div>
                           <div className="space-y-3">
                             {comparisonFeatures.map((feature, idx) => {
                               const Icon = feature.icon;
@@ -464,7 +464,7 @@ export default function SmartyPremium() {
                           <Crown className="w-5 h-5 text-primary" />
                           <div className="text-lg">Premium</div>
                         </div>
-                        <div className="text-sm font-semibold text-primary">€6.99/mo</div>
+                        <div className="text-sm font-semibold text-primary">€6.99 / month</div>
                       </th>
                     </tr>
                   </thead>

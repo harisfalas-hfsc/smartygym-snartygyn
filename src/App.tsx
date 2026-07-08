@@ -233,6 +233,7 @@ const AppContent = () => {
                   <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/joinpremium" element={<Navigate to="/smarty-premium" replace />} />
                   <Route path="/join-premium" element={<Navigate to="/smarty-premium" replace />} />
+                  <Route path="/smartypremium" element={<Navigate to="/smarty-premium" replace />} />
                   <Route path="/premium-comparison" element={<PremiumComparisonRedirect />} />
                   <Route path="/premiumcomparison" element={<PremiumComparisonRedirect />} />
                   <Route path="/smarty-premium" element={<SmartyPremium />} />

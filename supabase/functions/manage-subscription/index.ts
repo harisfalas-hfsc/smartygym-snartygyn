@@ -72,15 +72,15 @@ serve(async (req) => {
       throw new Error('Invalid action. Must be "grant" or "revoke"');
     }
 
-    // Only one plan exists now: lifetime Premium Membership.
-    // We still accept legacy 'gold'/'platinum' values from older clients but
-    // normalize them to 'lifetime' so the database holds a single value.
+    // Only one offered plan exists now: Premium Membership.
+    // We still accept legacy 'lifetime'/'gold'/'platinum' values from older clients but
+    // normalize manual grants to 'premium'.
     let normalizedPlan = plan_type;
     if (action === 'grant') {
       if (['lifetime', 'premium', 'legacy_premium', 'gold', 'platinum'].includes(plan_type)) {
-        normalizedPlan = 'lifetime';
+        normalizedPlan = 'premium';
       } else {
-        throw new Error('Invalid plan_type for grant. Must be "lifetime"');
+        throw new Error('Invalid plan_type for grant. Must be "premium"');
       }
     }
 
@@ -101,10 +101,10 @@ serve(async (req) => {
         .from('user_subscriptions')
         .upsert({
           user_id,
-          plan_type: 'lifetime',
+          plan_type: 'premium',
           status: 'active',
           current_period_start: nowISO,
-          current_period_end: null, // Lifetime — no expiration
+          current_period_end: null, // Manual grant — no automatic expiration
           cancel_at_period_end: false,
           stripe_customer_id: null,
           stripe_subscription_id: null,
@@ -169,7 +169,7 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ 
           success: true, 
-          message: 'Premium Membership granted (lifetime access).',
+          message: 'Premium Membership granted.',
           expires: null
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

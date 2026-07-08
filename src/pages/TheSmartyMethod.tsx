@@ -301,16 +301,16 @@ const TheSmartyMethod = () => {
             <section className="mb-16">
               <h2 className="text-2xl sm:text-3xl font-bold mb-2 text-center">One Smarty Plan</h2>
               <p className="text-muted-foreground text-center mb-8 max-w-2xl mx-auto">
-                One payment unlocks the entire <SG /> ecosystem forever.
+                One flexible monthly membership unlocks the entire <SG /> ecosystem.
               </p>
               <div className="max-w-md mx-auto">
                 <Card className="border-primary hover:shadow-lg hover:shadow-primary/10 transition-all">
                   <CardContent className="p-6 text-center">
                     <Crown className="w-8 h-8 text-primary mx-auto mb-3" />
-                    <h3 className="text-xl font-bold mb-1">Lifetime Membership</h3>
-                    <p className="text-2xl font-bold text-primary mb-1">€{SUBSCRIPTION_PRICES.lifetime}<span className="text-sm font-normal text-muted-foreground"> one-time</span></p>
+                    <h3 className="text-xl font-bold mb-1">Premium Membership</h3>
+                    <p className="text-2xl font-bold text-primary mb-1">€{SUBSCRIPTION_PRICES.premium_monthly}<span className="text-sm font-normal text-muted-foreground"> / month</span></p>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Full access to every workout, training program, ritual, tool, and future update. No subscription, no renewals, nothing to cancel.
+                      Full access to every workout, training program, ritual, tool, and future update. Cancel anytime from My Account.
                     </p>
                     <Button asChild size="sm">
                       <Link to="/smarty-premium">Unlock Premium</Link>

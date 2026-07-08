@@ -1057,7 +1057,7 @@ const handler = async (req: Request): Promise<Response> => {
         
         addCheck('Stripe', 'Products Configured', `${products.data?.length || 0} active products`, 
           products.data?.length > 0 ? 'pass' : 'warning',
-          'Lifetime Premium and Corporate plans should exist'
+          'Premium Monthly and Corporate plans should exist'
         );
 
         const priceResponse = await fetch('https://api.stripe.com/v1/prices?active=true&limit=100', {

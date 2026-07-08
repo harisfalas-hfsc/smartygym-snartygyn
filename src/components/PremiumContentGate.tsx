@@ -51,7 +51,7 @@ export const PremiumContentGate = ({ children }: PremiumContentGateProps) => {
             <p className="text-muted-foreground">
               {isLoading 
                 ? "Please wait while we verify your subscription..."
-                : "This workout/program is included with SmartyGym Lifetime Premium. Unlock every workout and training program with a single one-time payment."}
+                : "This workout/program is included with SmartyGym Premium. Join monthly to unlock every workout and training program, and cancel anytime from My Account."}
             </p>
             {!isLoading && (
               <div className="space-y-2 pt-4">

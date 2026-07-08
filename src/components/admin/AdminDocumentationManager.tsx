@@ -255,7 +255,7 @@ WHY SMARTYGYM?
 • Progress Tracking & Analytics
 
 MEMBERSHIP:
-• SmartyGym Lifetime Premium: €89.99 one-time payment — lifetime access to every workout, training program, and tool. No monthly fees.
+• SmartyGym Premium: €6.99/month — full access to every workout, training program, and tool. Cancel anytime.
 
 Start your transformation at smartygym.com`;
 
