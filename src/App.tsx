@@ -21,7 +21,6 @@ import { useSessionExpiry } from "./hooks/useSessionExpiry";
 import { AccessControlProvider } from "./contexts/AccessControlContext";
 import { NavigationHistoryProvider } from "./contexts/NavigationHistoryContext";
 import { Navigation } from "./components/Navigation";
-import { FixedBackButton } from "./components/FixedBackButton";
 import { Footer } from "./components/Footer";
 import { MobileBottomNav } from "./components/MobileBottomNav";
 import { useIsMobile } from "./hooks/use-mobile";
@@ -217,7 +216,6 @@ const AppContent = () => {
           className={`flex flex-col min-h-screen ${isMobile ? "pb-[calc(3.5rem+env(safe-area-inset-bottom,0px))]" : "pb-0"}`}
         >
           <Navigation />
-          <FixedBackButton />
             <main
               id="main-content"
               className="flex-1"

@@ -19,6 +19,7 @@ import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
+import { HeaderBackButton } from "@/components/HeaderBackButton";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -344,6 +345,7 @@ export const Navigation = () => {
                 </nav>
               </SheetContent>
             </Sheet>
+            <HeaderBackButton />
             <button
               type="button"
               onClick={() => {
@@ -525,6 +527,7 @@ export const Navigation = () => {
             </nav>
           </SheetContent>
         </Sheet>
+          <HeaderBackButton />
           <button
             type="button"
             onClick={() => {
