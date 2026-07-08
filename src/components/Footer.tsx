@@ -31,15 +31,6 @@ export const Footer = () => {
           
           {/* Legal Links */}
           <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 md:gap-4 text-sm text-muted-foreground">
-            <button onClick={() => navigate("/fitness-training")} className="hover:text-primary transition-colors">
-              Fitness Training
-            </button>
-            <button onClick={() => navigate("/glossary")} className="hover:text-primary transition-colors">
-              Glossary
-            </button>
-            <button onClick={() => navigate("/research")} className="hover:text-primary transition-colors">
-              Research
-            </button>
             <button onClick={() => navigate("/privacy-policy")} className="hover:text-primary transition-colors">
               Privacy Policy
             </button>
