@@ -37,12 +37,41 @@ serve(async (req) => {
     // Retrieve checkout session
     const session = await stripe.checkout.sessions.retrieve(sessionId);
 
+    // Subscription checkouts (Premium Monthly) are handled by check-subscription
+    // and the Stripe webhook — they do NOT belong in user_purchases
+    // (which requires a content_type). Short-circuit here so the client can
+    // safely call verify-purchase for any success redirect.
+    if (session.mode === "subscription") {
+      return new Response(JSON.stringify({
+        success: true,
+        purchased: true,
+        subscription: true,
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
+
     if (session.payment_status === "paid" && session.metadata) {
       const { user_id, content_type, content_id, content_name } = session.metadata;
       if (user_id !== userData.user.id) {
         return new Response(JSON.stringify({ error: "Forbidden" }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
           status: 403,
+        });
+      }
+
+      // Guard: standalone purchases must carry content_type in metadata.
+      // Without it, the DB insert violates NOT NULL and the whole flow errors.
+      if (!content_type || !content_id) {
+        console.warn("verify-purchase: missing content metadata on session", { sessionId });
+        return new Response(JSON.stringify({
+          success: true,
+          purchased: true,
+          skipped: "missing_content_metadata",
+        }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
         });
       }
       
