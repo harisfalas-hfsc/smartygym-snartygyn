@@ -21,7 +21,6 @@ import { useSessionExpiry } from "./hooks/useSessionExpiry";
 import { AccessControlProvider } from "./contexts/AccessControlContext";
 import { NavigationHistoryProvider } from "./contexts/NavigationHistoryContext";
 import { Navigation } from "./components/Navigation";
-import { FixedBackButton } from "./components/FixedBackButton";
 import { Footer } from "./components/Footer";
 import { MobileBottomNav } from "./components/MobileBottomNav";
 import { useIsMobile } from "./hooks/use-mobile";
