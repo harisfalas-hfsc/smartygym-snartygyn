@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
-// (STRIPE_PRICE_IDS no longer needed here — Lifetime checkout lives on /smartypremium)
+// (STRIPE_PRICE_IDS no longer needed here — Premium checkout lives on /smarty-premium)
 import { ServiceCard } from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
@@ -408,7 +408,7 @@ const Index = () => {
     }
   };
   // Legacy Gold/Platinum subscribe handler removed.
-  // Lifetime Premium checkout lives on /smartypremium via create-lifetime-checkout.
+  // Premium Monthly checkout lives on /smarty-premium.
   return <>
       <Helmet>
         <title>SmartyGym, Online Gym — Expert Workouts and Training Programs by Haris Falas</title>
@@ -1104,7 +1104,7 @@ const Index = () => {
                   </p>
                   <Link to="/smarty-premium" className="inline-flex items-center gap-2 text-base font-semibold text-green-500 hover:text-green-600 hover:underline mt-2">
                     <Crown className="w-5 h-5" />
-                    Unlock Everything for Life
+                    Join Premium
                     <ChevronRight className="w-5 h-5" />
                   </Link>
 

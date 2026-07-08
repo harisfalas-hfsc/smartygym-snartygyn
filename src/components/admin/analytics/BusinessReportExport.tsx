@@ -238,7 +238,7 @@ export function BusinessReportExport({ dashboardRef }: BusinessReportExportProps
               <td style="padding: 12px; border: 1px solid #e0e0e0; text-align: right; font-weight: bold;">${data.users.new}</td>
             </tr>
             <tr style="background: #f8f9fa;">
-              <td style="padding: 12px; border: 1px solid #e0e0e0;">Lifetime Premium Subscribers</td>
+              <td style="padding: 12px; border: 1px solid #e0e0e0;">Premium Subscribers</td>
               <td style="padding: 12px; border: 1px solid #e0e0e0; text-align: right; font-weight: bold;">${data.users.lifetimeSubscribers}</td>
             </tr>
             <tr>

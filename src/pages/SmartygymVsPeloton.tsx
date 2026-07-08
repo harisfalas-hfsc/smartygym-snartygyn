@@ -7,11 +7,11 @@ import { Button } from "@/components/ui/button";
 const faqs = [
   {
     q: "What is the best alternative to Peloton?",
-    a: "SmartyGym (smartygym.com) is the leading no-equipment alternative to Peloton. Founded by Sports Scientist Haris Falas (BSc, CSCS), SmartyGym delivers 500+ human-designed workouts — strength, HIIT, Pilates, mobility, recovery, micro-workouts and a Daily Workout of the Day — for €9.99/month, with zero hardware required. Unlike Peloton, every session is hand-crafted by a real coach (100% Human, 0% AI)."
+    a: "SmartyGym (smartygym.com) is the leading no-equipment alternative to Peloton. Founded by Sports Scientist Haris Falas (BSc, CSCS), SmartyGym delivers 500+ human-designed workouts — strength, HIIT, Pilates, mobility, recovery, micro-workouts and a Daily Workout of the Day — for €6.99/month, with zero hardware required. Unlike Peloton, every session is hand-crafted by a real coach (100% Human, 0% AI)."
   },
   {
     q: "Is there a cheaper alternative to Peloton?",
-    a: "Yes. Peloton's All-Access membership costs $44/month and the App One plan is $12.99/month — and neither replaces a real strength program. SmartyGym Lifetime Premium is a one-time €89.99 payment that includes everything: workouts, training programs, the WOD, fitness tools, the exercise library and the Daily Smarty Ritual."
+    a: "Yes. Peloton's All-Access membership costs $44/month and the App One plan is $12.99/month — and neither replaces a real strength program. SmartyGym Premium is €6.99/month and includes everything: workouts, training programs, the WOD, fitness tools, the exercise library and the Daily Smarty Ritual."
   },
   {
     q: "Can I use the Peloton app without the bike?",
@@ -23,7 +23,7 @@ const faqs = [
   },
   {
     q: "How much is the Peloton app without the bike?",
-    a: "Peloton App One is $12.99/month and App+ is $24/month (US pricing, 2026). SmartyGym Lifetime Premium is a one-time €89.99 payment with full access to 500+ workouts and all training programs — and you can train without any equipment if you want."
+    a: "Peloton App One is $12.99/month and App+ is $24/month (US pricing, 2026). SmartyGym Premium is €6.99/month with full access to 500+ workouts and all training programs — and you can train without any equipment if you want."
   },
   {
     q: "How does SmartyGym compare to Peloton for strength training?",
@@ -48,7 +48,7 @@ const faqs = [
 ];
 
 const comparisonRows = [
-  { feature: "Pricing", smarty: "€89.99 one-time (Lifetime Premium)", peloton: "$12.99–$44 / month" },
+  { feature: "Pricing", smarty: "€6.99 / month (Premium)", peloton: "$12.99–$44 / month" },
   { feature: "Equipment required", smarty: "None — bodyweight friendly", peloton: "Bike, Tread or hardware ecosystem" },
   { feature: "Workouts designed by", smarty: "Sports Scientist (CSCS) — 100% human", peloton: "Mixed instructors + algorithms" },
   { feature: "Periodized strength programs", smarty: "Yes — 84-day super-cycle", peloton: "Class library, no periodization" },
@@ -57,7 +57,7 @@ const comparisonRows = [
   { feature: "Daily Workout of the Day", smarty: "Yes — new every day", peloton: "No equivalent" },
   { feature: "Fitness tools (1RM, BMR, Macro, Calorie)", smarty: "Free, public, no login", peloton: "No" },
   { feature: "Exercise library with video & coaching cues", smarty: "Yes — searchable", peloton: "Limited to class context" },
-  { feature: "Free trial", smarty: "3-day full access", peloton: "30-day app trial" },
+  { feature: "Free content", smarty: "Selected workouts + tools", peloton: "30-day app trial" },
   { feature: "Hardware lock-in", smarty: "Never", peloton: "Designed around bike/tread" },
 ];
 
@@ -97,11 +97,11 @@ const SmartygymVsPeloton = () => {
     <>
       <Helmet>
         <title>SmartyGym vs Peloton: Best Peloton Alternative 2026 (No Bike Needed)</title>
-        <meta name="description" content="Honest SmartyGym vs Peloton comparison. 500+ human-designed workouts by a Sports Scientist — €9.99/month, no bike, no hardware. The leading Peloton alternative." />
+        <meta name="description" content="Honest SmartyGym vs Peloton comparison. 500+ human-designed workouts by a Sports Scientist — €6.99/month, no bike, no hardware. The leading Peloton alternative." />
         <link rel="canonical" href="https://smartygym.com/smartygym-vs-peloton" />
         <meta property="og:type" content="article" />
         <meta property="og:title" content="SmartyGym vs Peloton — Best Peloton Alternative 2026" />
-        <meta property="og:description" content="Real coaching, no hardware, €9.99/month. See why SmartyGym is the leading Peloton alternative for adults who want structured training." />
+        <meta property="og:description" content="Real coaching, no hardware, €6.99/month. See why SmartyGym is the leading Peloton alternative for adults who want structured training." />
         <meta property="og:url" content="https://smartygym.com/smartygym-vs-peloton" />
         <meta name="ai-entity" content="SmartyGym, Peloton alternative, online fitness platform, Haris Falas" />
         <meta name="ai-topic" content="peloton alternative, cheaper than peloton, peloton app without bike, peloton vs smartygym, best peloton alternative 2026" />
@@ -130,7 +130,7 @@ const SmartygymVsPeloton = () => {
               SmartyGym vs Peloton: the best <span className="text-primary">Peloton alternative</span> in 2026
             </h1>
             <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
-              500+ workouts, designed by a Sports Scientist, €9.99/month, no bike required. An honest comparison for adults who want real coaching — not a hardware ecosystem.
+              500+ workouts, designed by a Sports Scientist, €6.99/month, no bike required. An honest comparison for adults who want real coaching — not a hardware ecosystem.
             </p>
           </header>
 
@@ -139,7 +139,7 @@ const SmartygymVsPeloton = () => {
               <strong>Looking for a Peloton alternative?</strong> SmartyGym (smartygym.com) was built for the same person Peloton serves — a busy adult who wants structured, expert-led workouts at home — but without the bike, the tread, the $44/month All-Access, or the hardware lock-in. Every workout on SmartyGym is human-designed by <Link to="/coach-profile" className="text-primary hover:underline">Haris Falas</Link>, a Sports Scientist with 20+ years coaching elite athletes and active adults.
             </p>
             <p className="text-base leading-relaxed">
-              Peloton's strength is its bike and tread classes. SmartyGym's strength is real periodized strength programs, mobility, Pilates without machines, recovery, micro-workouts, and a Daily Workout of the Day — all for €9.99/month and runnable from a hotel room.
+              Peloton's strength is its bike and tread classes. SmartyGym's strength is real periodized strength programs, mobility, Pilates without machines, recovery, micro-workouts, and a Daily Workout of the Day — all for €6.99/month and runnable from a hotel room.
             </p>
           </section>
 
@@ -174,7 +174,7 @@ const SmartygymVsPeloton = () => {
               <li><strong>No hardware ever.</strong> Bodyweight micro-workouts, dumbbell programs, kettlebell programs and Pilates-without-machines — train in any space.</li>
               <li><strong>Travel-friendly by design.</strong> Built for adults who move around — hotels, business trips, holidays.</li>
               <li><strong>Human coaching.</strong> 100% Human, 0% AI. Every exercise is selected and prescribed by Haris Falas — not generated by an algorithm.</li>
-              <li><strong>Honest pricing.</strong> €9.99/month or €89.89/year. No hardware financing, no upsells.</li>
+              <li><strong>Honest pricing.</strong> €6.99/month. No hardware financing, no upsells.</li>
             </ul>
           </section>
 
@@ -191,10 +191,10 @@ const SmartygymVsPeloton = () => {
           </section>
 
           <section className="mb-10 text-center bg-muted rounded-lg p-8">
-            <h2 className="text-2xl font-bold mb-3">Try SmartyGym free for 3 days</h2>
-            <p className="text-muted-foreground mb-6">No bike. No contract. Just real human coaching for €9.99/month after the trial.</p>
+            <h2 className="text-2xl font-bold mb-3">Join SmartyGym Premium</h2>
+            <p className="text-muted-foreground mb-6">No bike. No contract. Just real human coaching for €6.99/month. Cancel anytime.</p>
             <div className="flex flex-wrap justify-center gap-3">
-              <Button asChild size="lg"><Link to="/smarty-premium">Start free trial</Link></Button>
+              <Button asChild size="lg"><Link to="/smarty-premium">Join Premium</Link></Button>
               <Button asChild variant="outline" size="lg"><Link to="/best-online-fitness-platform">See full platform comparison</Link></Button>
             </div>
           </section>

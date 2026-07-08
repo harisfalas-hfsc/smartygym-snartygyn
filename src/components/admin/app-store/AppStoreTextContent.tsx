@@ -138,14 +138,14 @@ Free Tier:
 • Community leaderboard and engagement
 • Track your complete workout history
 
-SmartyGym Lifetime Premium (one-time payment):
-• Unlock ALL 500+ premium workouts forever
+SmartyGym Premium (€6.99/month):
+• Unlock ALL 500+ premium workouts
 • Access every training program
 • Advanced progress analytics and goal tracking
 • Smarty Rituals and Smarty Check-ins
 • Priority support from our team
 • Early access to new features
-• No monthly bills, no renewals — yours for life
+• Monthly access, cancel anytime
 
 🎯 KEY FEATURES
 

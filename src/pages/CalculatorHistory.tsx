@@ -243,7 +243,7 @@ export default function CalculatorHistory() {
     if (!accessLoading && !isPremium) {
       toast({
         title: "Premium Feature",
-        description: "Calculator History is included with SmartyGym Lifetime Premium.",
+        description: "Calculator History is included with SmartyGym Premium.",
         variant: "destructive"
       });
       navigate("/userdashboard");

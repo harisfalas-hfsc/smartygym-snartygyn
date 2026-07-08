@@ -543,7 +543,7 @@ export const smartyGymConceptContent: ContentSection[] = [
   
   { type: 'heading', content: '👑 MEMBERSHIP', level: 1 },
   { type: 'bullet', content: '🆓 Free - Access to free workouts and basic features' },
-  { type: 'bullet', content: '💎 SmartyGym Lifetime Premium (€89.99 one-time) - Lifetime access to all workouts, training programs, Smarty Rituals, Check-ins, and every premium feature' },
+  { type: 'bullet', content: '💎 SmartyGym Premium (€6.99/month) - Monthly access to all workouts, training programs, Smarty Rituals, Check-ins, and every premium feature. Cancel anytime.' },
   
   { type: 'heading', content: '🎯 OUR PROMISE', level: 1 },
   { type: 'paragraph', content: 'SmartyGym promises:' },

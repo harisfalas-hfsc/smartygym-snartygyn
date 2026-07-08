@@ -342,7 +342,7 @@ const TermsOfService = () => {
                       <strong>What may be retained:</strong> Anonymized analytics data, transaction records (required by law for 7 years), and data required for legal compliance.
                     </li>
                     <li>
-                      <strong>Premium Membership:</strong> Deleting your account permanently removes your access to premium content. The Premium Membership is a one-time purchase and is non-refundable once content has been accessed.
+                      <strong>Premium Membership:</strong> Deleting your account permanently removes your access to premium content. If you have an active monthly membership, cancel it from My Account before deleting your account; access continues until the end of the paid period.
                     </li>
                     <li>
                       <strong>Irreversible:</strong> Account deletion is permanent and cannot be undone. You will need to create a new account to use our services again.

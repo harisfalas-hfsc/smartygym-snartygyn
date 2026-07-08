@@ -41,7 +41,7 @@ export const PremiumBenefitsTemplate = () => {
           <div className="text-center space-y-4">
             <div className="inline-block px-8 py-4 bg-primary rounded-lg">
               <p className="text-4xl font-bold text-primary-foreground">
-                Starting at €9.99/month
+                €6.99/month
               </p>
             </div>
           </div>

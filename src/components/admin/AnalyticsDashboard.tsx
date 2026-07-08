@@ -181,8 +181,8 @@ export function AnalyticsDashboard() {
       // subscription row, undercounting free users dramatically.)
       const freeUsers = computeNonPremiumUsers(totalUsers, premiumCounts.distinctPremiumUsers);
 
-      // Calculate revenue from Premium memberships (lifetime €89.99 one-time).
-      // Only count REAL Stripe-paid lifetimes — admin grants are €0.
+      // Calculate fallback revenue from historical lifetime memberships only.
+      // Prefer real Stripe revenue below for current monthly subscriptions.
       const lifetimePaid = subscriptions?.filter(s => s.status === "active" && s.plan_type === "lifetime" && isPaidSub(s)).length || 0;
       let totalRevenue = lifetimePaid * SUBSCRIPTION_PRICES.lifetime;
 

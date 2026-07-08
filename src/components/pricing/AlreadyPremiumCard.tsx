@@ -34,8 +34,8 @@ export function AlreadyPremiumCard({ className }: AlreadyPremiumCardProps) {
         </h2>
         
         <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-          You have full access to all premium features, workouts, and training programs. 
-          Premium for life — nothing to renew, nothing to manage.
+          You have full access to all premium features, workouts, and training programs.
+          Monthly members can manage or cancel their membership from My Account.
         </p>
         
         <div className="flex flex-col sm:flex-row gap-3 justify-center">

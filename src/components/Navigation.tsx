@@ -254,7 +254,7 @@ export const Navigation = () => {
     // productId mirrors plan_type from the database.
     const planType = productId.toLowerCase();
     if (planType === "free") return null; // Don't show "Free" as a plan name
-    if (planType === "lifetime") return "Lifetime Premium";
+    if (planType === "lifetime") return "Grandfathered Premium";
     // Legacy gold/platinum holders (and any future 'premium' / 'legacy_premium') all surface as Premium.
     return "Premium";
   };

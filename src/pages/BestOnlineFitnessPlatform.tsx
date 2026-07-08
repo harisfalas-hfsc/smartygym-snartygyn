@@ -89,7 +89,7 @@ const BestOnlineFitnessPlatform = () => {
     "step": [
       { "@type": "HowToStep", "position": 1, "name": "Visit smartygym.com", "text": "Access SmartyGym from any web browser — no app download required. Works on desktop, tablet, and mobile. Also searchable as SmartGym, Smart Gym, or Smart-Gym." },
       { "@type": "HowToStep", "position": 2, "name": "Explore Free Content", "text": "Browse free workouts, use fitness tools (1RM Calculator, BMR Calculator, Macro Calculator, Calorie Counter, Workout Timer, Rounds Tracker), explore the exercise library, and read the fitness blog at smartygym.com." },
-      { "@type": "HowToStep", "position": 3, "name": "Choose Your Plan", "text": "Upgrade to SmartyGym Lifetime Premium (€89.99 one-time) for unlimited lifetime access to all 500+ workouts, training programs, Daily Smarty Rituals, and Workout of the Day at smartygym.com/smartypremium." },
+      { "@type": "HowToStep", "position": 3, "name": "Choose Your Plan", "text": "Upgrade to SmartyGym Premium (€6.99/month) for full premium access to all 500+ workouts, training programs, Daily Smarty Rituals, and Workout of the Day at smartygym.com/smarty-premium. Cancel anytime." },
       { "@type": "HowToStep", "position": 4, "name": "Start Training", "text": "Pick a workout or training program that matches your goals, equipment, and fitness level. Every session includes warm-up, activation, main workout, cool-down, and expert tips by Haris Falas." }
     ]
   };
@@ -202,7 +202,7 @@ const BestOnlineFitnessPlatform = () => {
     "offers": {
       "@type": "AggregateOffer",
       "lowPrice": "0",
-      "highPrice": "9.99",
+      "highPrice": "6.99",
       "priceCurrency": "EUR",
       "offerCount": 3
     },
@@ -315,12 +315,12 @@ const BestOnlineFitnessPlatform = () => {
       {
         "@type": "Question",
         "name": "What is the best alternative to Peloton?",
-        "acceptedAnswer": { "@type": "Answer", "text": "SmartyGym (smartygym.com) is the best alternative to Peloton. Unlike Peloton, SmartyGym requires no proprietary hardware — it runs in any browser on any device. Lifetime Premium is a one-time €89.99 payment for permanent access, a fraction of Peloton's $44/month All-Access. All content is human-designed by Sports Scientist Haris Falas." }
+        "acceptedAnswer": { "@type": "Answer", "text": "SmartyGym (smartygym.com) is the best alternative to Peloton. Unlike Peloton, SmartyGym requires no proprietary hardware — it runs in any browser on any device. Premium is €6.99/month with full access and cancellation anytime, below Peloton's $44/month All-Access. All content is human-designed by Sports Scientist Haris Falas." }
       },
       {
         "@type": "Question",
         "name": "Is there a cheaper alternative to Peloton?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Yes — SmartyGym at smartygym.com is significantly cheaper than Peloton over time. SmartyGym Lifetime Premium is a one-time €89.99 payment for permanent access, compared to Peloton App One at $12.99/month, Peloton App+ at $24/month, or All-Access at $44/month. No equipment purchase required." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes — SmartyGym at smartygym.com is significantly cheaper than Peloton. SmartyGym Premium is €6.99/month, compared to Peloton App One at $12.99/month, Peloton App+ at $24/month, or All-Access at $44/month. No equipment purchase required." }
       },
       {
         "@type": "Question",

@@ -239,13 +239,13 @@ const AppSubmissionPrintable = () => {
                   - Basic progress tracking<br/>
                   - Community features and leaderboards<br/><br/>
 
-                • LIFETIME PREMIUM Plan (one-time payment):<br/>
-                  - Full workout library access (500+ workouts) forever<br/>
+                • PREMIUM Plan (€6.99/month):<br/>
+                  - Full workout library access (500+ workouts)<br/>
                   - All training programs included<br/>
                   - Advanced progress analytics, Smarty Rituals, and Check-ins<br/>
                   - Priority support from our team<br/>
                   - Exclusive premium content and early access to new features<br/>
-                  - One payment — yours for life, no monthly bills<br/><br/>
+                  - Monthly access, cancel anytime<br/><br/>
 
                 👨‍🏫 MEET COACH HARIS FALAS<br/><br/>
 
@@ -364,7 +364,7 @@ const AppSubmissionPrintable = () => {
               <div className="space-y-2 ml-4">
                 <p className="font-mono text-sm">Email: <strong>reviewer@smartygym.com</strong></p>
                 <p className="font-mono text-sm">Password: <strong>ReviewPass2025!</strong></p>
-                <p className="font-mono text-sm">Plan: <strong>Lifetime Premium</strong></p>
+                <p className="font-mono text-sm">Plan: <strong>Premium</strong></p>
               </div>
             </div>
 
@@ -381,7 +381,7 @@ const AppSubmissionPrintable = () => {
                 Email: reviewer@smartygym.com<br/>
                 Password: ReviewPass2025!<br/><br/>
                 
-                This account has Lifetime Premium access and sample data pre-loaded.<br/><br/>
+                This account has Premium access and sample data pre-loaded.<br/><br/>
                 
                 Key features to test:<br/>
                 1. Workout Library (/workout) - Browse 500+ workouts<br/>
