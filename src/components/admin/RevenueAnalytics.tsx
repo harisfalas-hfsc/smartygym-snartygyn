@@ -11,7 +11,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import html2canvas from "html2canvas";
-import { CORPORATE_PRICES } from "@/config/pricing";
 import { StripeRevenueTruth } from "./analytics/StripeRevenueTruth";
 import { fetchStripeRevenueTruth } from "@/lib/admin-analytics";
 
@@ -284,14 +283,6 @@ export function RevenueAnalytics() {
             revenueByMonth[month] = { premium: 0, standalone: 0, personal_training: 0, corporate: 0 };
           }
 
-          // Only count revenue for PAID corporate plans
-          const annualRevenue = isPaid ? (CORPORATE_PRICES[corp.plan_type as keyof typeof CORPORATE_PRICES] || 0) : 0;
-          
-          if (isPaid) {
-            revenueByMonth[month].corporate += annualRevenue;
-            total += annualRevenue;
-          }
-
           corpDetails.push({
             id: corp.id,
             organization_name: corp.organization_name,
@@ -300,7 +291,7 @@ export function RevenueAnalytics() {
             current_users_count: corp.current_users_count,
             status: corp.status,
             current_period_end: corp.current_period_end,
-            annual_revenue: annualRevenue,
+            annual_revenue: 0,
             is_paid: isPaid,
           });
         });
@@ -637,7 +628,7 @@ export function RevenueAnalytics() {
                             <TableHead>Payment</TableHead>
                             <TableHead>Start Date</TableHead>
                             <TableHead>Renewal</TableHead>
-                            <TableHead className="text-right">Revenue</TableHead>
+                            <TableHead className="text-right">DB Estimate</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -779,7 +770,7 @@ export function RevenueAnalytics() {
                               </TableCell>
                               <TableCell>{new Date(corp.current_period_end).toLocaleDateString()}</TableCell>
                               <TableCell className="text-right font-medium">
-                                {corp.is_paid ? `€${corp.annual_revenue.toFixed(2)}` : "€0.00"}
+                                €0.00
                               </TableCell>
                             </TableRow>
                           ))}
