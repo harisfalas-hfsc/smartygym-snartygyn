@@ -1,185 +1,77 @@
-## Plan: clean admin analytics to match the current SmartyGym business
+# Plan: Test Messages + Full Communications Audit
 
-### Goal
-Make the admin panel stop showing obsolete business logic like Gold, Platinum, Trial, Lifetime-as-plan, fake complimentary counts, DB-estimated revenue, and empty DB purchase history.
+## Part 1 — Trigger 3 test messages to hfsc.nicosia@gmail.com
 
-The admin panel should reflect the current business:
+Send one-time, real deliveries so you can verify content and layout in inbox + dashboard:
 
-- One membership: **SmartyGym Premium**
-- Standalone purchases: **workouts** and **training programs**
-- Revenue truth: **Stripe payments only**, filtered by SmartyGym product metadata
-- Free users are users, not subscriptions
-- Admin-granted access is manual access, not revenue and not “20 complimentary subscribers”
+1. **Premium subscription welcome** — email + dashboard notification (template: `purchase_subscription` / welcome flow).
+2. **Standalone workout purchase confirmation** — email + dashboard notification (template: `purchase_workout`).
+3. **Standalone training program purchase confirmation** — email + dashboard notification (template: `purchase_program`).
 
-### What I found
-- Revenue has been partially fixed, but `RevenueAnalytics` still loads every active subscription row, including `plan_type = free`, so free rows can be shown as “free subscriptions”. That is why the numbers feel fake.
-- The users screen still contains `Trial`, old tier grouping, and legacy wording.
-- Growth analytics still groups subscriptions by raw `plan_type`, so old plans can appear.
-- Purchase analytics still reads `user_purchases`, but that table currently has **0 rows**, while real payments are in Stripe.
-- The business report still mentions lifetime/legacy premium subscribers and uses stale revenue field names.
-- Stripe revenue function still contains old known product IDs for legacy lifetime/gold/platinum. Since SmartyGym products are tagged in Stripe metadata, the cleaner rule should be metadata-first.
+For each: resolve the user's `user_id`, render the template with sample content values (e.g. sample workout/program name), insert a row into `user_system_messages` (dashboard), and invoke `send-automated-messages` / the direct email sender with the rendered template so a real email is delivered. Log each in `email_delivery_log` for traceability.
 
-### Implementation steps
+## Part 2 — Full Communications Center audit
 
-#### 1. Create one canonical admin business model helper
-Add/extend shared admin analytics helpers so every admin screen uses the same rules:
+Verify every tab in `CommunicationsManager` maps to a working backend and that every listed automation exists, is active, and is on cron.
 
-- `isCurrentPremiumSubscription(row)`
-  - active paid Premium only when it has Stripe billing evidence and is not an admin grant
-- `isManualPremiumAccess(row)`
-  - active admin/manual access, shown separately as manual access
-- `isFreeUser(row)`
-  - free account, not counted as subscription
-- `normalizePlanLabel(row)`
-  - `premium`, `lifetime`, old `gold`, old `platinum`, and `legacy_premium` display as **Premium Access** only when still active
-  - never display Gold/Platinum as active plan options
-- `normalizeRevenueCategory(payment)`
-  - Premium Membership
-  - Standalone Workout
-  - Standalone Training Program
-  - Other SmartyGym Product, only if metadata says so
+### 2a. Registry audit (DB)
+Query `automated_message_templates` and confirm each of these has an active row with `automation_key`, `dashboard_content`, `email_content`, and correct `target_audience`:
+- first_purchase_welcome
+- welcome_new_users
+- welcome_onboarding_guide (day 1/3/7)
+- morning_check_in_reminder
+- evening_check_in_reminder
+- morning_digest
+- monday_motivational
+- weekly_activity_report
+- re_engagement
+- scheduled_workout_reminder
+- scheduled_program_reminder
+- new_content_notification
+- direct_coach_email
+- renewal_thank_you / subscription_expired / cancellation (new premium lifecycle)
+- purchase_workout / purchase_program / purchase_subscription
 
-#### 2. Clean Stripe revenue source of truth
-Update `get-stripe-revenue` so revenue inclusion is based on Stripe metadata:
+Report any missing/inactive templates and re-seed them.
 
-- Count charges only when product or charge metadata identifies SmartyGym, e.g. `project=SMARTYGYM` / equivalent existing tag.
-- Use Stripe product metadata to classify:
-  - Premium membership
-  - Standalone workout
-  - Standalone training program
-- Stop presenting legacy Gold/Platinum/Lifetime as active revenue categories.
-- Keep refunds/net collected logic.
-- Keep admin-only security.
-- Return clearer fields:
-  - `totalCollected`
-  - `totalRefunded`
-  - `paymentCount`
-  - `byCategory`
-  - `payments`
-  - `excludedNonSmartyGym`
-  - `unmatchedSmartyGymMetadataWarnings`
+### 2b. Cron audit
+Query `cron_job_metadata` + live `cron.job` and confirm each of these is scheduled + last ran successfully:
+- send-automated-messages-job (every 10 min)
+- send-scheduled-notifications-job (every 10 min)
+- send-renewal-reminders-daily (09:00)
+- process-pending-notifications
+- send-new-content-notifications
+- send-scheduled-emails
+- process-email-queue
+- daily health audit + WOD crons (spot-check only)
 
-#### 3. Redesign Revenue Analytics around real Stripe payments
-Update `RevenueAnalytics` to show:
+Fix any missing entries via `ensure_cron_jobs()` and add missing schedules.
 
-- **Total collected**: Stripe net collected
-- **Premium membership revenue**: Stripe payments classified as Premium
-- **Standalone workout revenue**
-- **Standalone training program revenue**
-- **Refunds**
-- **Payment count**
+### 2c. Edge function audit
+Confirm each function exists, deploys clean, and returns 200 on a dry ping:
+- send-automated-messages
+- send-welcome-email
+- send-scheduled-notifications
+- send-renewal-reminders
+- send-new-content-notifications
+- process-pending-notifications
+- send-scheduled-emails
+- verify-purchase (mandatory purchase confirmations)
 
-Remove or hide misleading items:
+### 2d. Admin UI sync
+Confirm `AutomatedMessagesManager`, `AutomationRulesManager`, `MessagingMonitoringDashboard`, `MobileAppPushManager`, and Email tabs each read from the same `automated_message_templates` + `cron_job_metadata` tables so what you see in the admin panel matches what actually runs. Fix any tab reading from a stale/legacy source.
 
-- “DB Estimate” column
-- “free subscriptions” in Premium Memberships
-- old plan filters that imply multiple membership tiers
-- standalone revenue from `user_purchases`
-- corporate/personal-training revenue sections unless Stripe metadata returns actual current SmartyGym payments for them
+### 2e. Report
+Produce a single audit table:
 
-Add functional controls:
+```text
+Template | DB Active | Cron Scheduled | Last Run | Edge OK | Admin UI Visible
+```
 
-- Refresh Stripe revenue
-- Export filtered Stripe payments CSV
-- Filter by Premium / Workout / Training Program
-- Search by email, product, or charge ID
-- Date range filter applied to Stripe payments client-side from returned payments
+Anything red gets fixed in the same turn (re-seed template, re-schedule cron, or re-deploy function).
 
-#### 4. Clean Purchase Analytics
-Make Purchase Analytics read from Stripe truth instead of `user_purchases` revenue.
+## Notes
 
-It should show:
-
-- Standalone workouts sold
-- Standalone training programs sold
-- Standalone revenue from Stripe
-- Top purchased standalone items
-- Top standalone customers
-- Average order value
-
-If there are no standalone Stripe payments, it should clearly show zero instead of pretending the DB purchase table is the business source.
-
-#### 5. Clean Users Management
-Update `UsersManager`:
-
-- Remove **Trial** filter and Trial stats card.
-- Remove old Gold/Platinum/Lifetime plan concepts from filters and visible sorting.
-- Replace filters with current options:
-  - All users
-  - Free users
-  - Paid Premium
-  - Manual Premium Access
-  - Standalone Purchase Only
-  - Admins
-  - Corporate, only if still needed by existing admin tools
-- Update user cards:
-  - Paid Premium = Stripe active Premium
-  - Manual Premium Access = admin/manual access, not revenue
-  - Free = no premium and no standalone purchases
-  - Purchase Only = standalone purchase but no active premium
-- Change summary cards to:
-  - Total users
-  - Paid Premium
-  - Manual Premium Access
-  - Free users
-  - Purchase-only users
-  - Admins
-
-#### 6. Clean User Detail Modal
-Update user details so it no longer displays old plan branding:
-
-- Show “Premium Access” instead of Lifetime/Gold/Platinum.
-- Show “Paid via Stripe” or “Manual admin access”.
-- Payment history should show real Stripe invoices/payments when available.
-- DB purchases tab should be renamed or clarified as “Standalone Access Records” if it is not payment history.
-- Keep Stripe sync/manage buttons for real paid users.
-
-#### 7. Clean Growth Analytics
-Update `GrowthAnalytics`:
-
-- Remove raw plan distribution by `plan_type`.
-- Show current buckets only:
-  - Free users
-  - Paid Premium
-  - Manual Premium Access
-  - Purchase-only users
-- Keep real user growth from profiles.
-- Add conversion metrics from Stripe truth where possible:
-  - registered users to paying customers
-  - registered users to paid premium
-
-#### 8. Clean Popular Analytics
-Keep Popular based on real usage interactions, but tighten it:
-
-- Use only current visible workouts/programs where possible.
-- Keep separate views for workouts and programs.
-- Make labels clear: popular means usage engagement, not sales.
-- Export CSV remains.
-
-#### 9. Clean dashboard overview and business report
-Update `AnalyticsDashboard` and `BusinessReportExport`:
-
-- Remove legacy/lifetime/gold/platinum wording.
-- Remove complimentary/free subscription language that counts free rows as subscriptions.
-- Revenue in reports comes only from Stripe truth.
-- Business report sections use current buckets only.
-- If a number cannot be verified from Stripe or current database rules, show zero or “not available”, not an estimate.
-
-#### 10. Data handling policy
-I will not delete payment or user history.
-
-Instead:
-
-- Old rows remain for audit/access safety.
-- Admin analytics will ignore obsolete rows unless they represent real current Premium access or real Stripe payments.
-- Free subscription rows will not be counted as subscriptions.
-- Manual/admin grants will be counted only as manual access, never revenue.
-
-#### 11. Verification
-After implementation:
-
-- Run TypeScript verification.
-- Run targeted searches to confirm no admin UI still exposes Gold/Platinum/Trial as current filters or labels.
-- Verify dashboard logic against read-only database aggregates.
-- Verify Stripe revenue endpoint still requires admin auth and returns Stripe-only revenue.
-- Use the live preview/admin page where possible to confirm the updated labels and filters render correctly.
+- Part 1 sends real emails/notifications to hfsc.nicosia@gmail.com only.
+- No structural UI changes; audit is backend + registry only.
+- HFSC data is read-only (not modified) per project rule — only sends to that address.
