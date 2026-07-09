@@ -70,6 +70,16 @@ interface Purchase {
   purchased_at: string;
 }
 
+interface StripeInvoice {
+  id: string;
+  number: string | null;
+  amount_paid: number;
+  currency: string;
+  created: number;
+  description: string;
+  hosted_invoice_url: string | null;
+}
+
 interface UserDetailModalProps {
   user: UserData | null;
   isOpen: boolean;
@@ -89,6 +99,9 @@ export function UserDetailModal({
 }: UserDetailModalProps) {
   const [purchases, setPurchases] = useState<Purchase[]>([]);
   const [loadingPurchases, setLoadingPurchases] = useState(false);
+  const [stripeInvoices, setStripeInvoices] = useState<StripeInvoice[]>([]);
+  const [stripeFirstSubscribedAt, setStripeFirstSubscribedAt] = useState<string | null>(null);
+  const [loadingStripe, setLoadingStripe] = useState(false);
   const [copied, setCopied] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [syncLoading, setSyncLoading] = useState(false);
@@ -101,6 +114,7 @@ export function UserDetailModal({
   useEffect(() => {
     if (user && isOpen) {
       fetchPurchases();
+      fetchStripeHistory();
       if (corporateInfo?.memberPlanType || corporateInfo?.adminPlanType) {
         fetchCorporateDetails();
       }
@@ -118,6 +132,34 @@ export function UserDetailModal({
         .order('purchased_at', { ascending: false });
       
       setPurchases(data || []);
+    } finally {
+      setLoadingPurchases(false);
+    }
+  };
+
+  const fetchStripeHistory = async () => {
+    if (!user) return;
+    setLoadingStripe(true);
+    setStripeInvoices([]);
+    setStripeFirstSubscribedAt(null);
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-get-stripe-history', {
+        body: { target_user_id: user.user_id }
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setStripeInvoices(data?.invoices || []);
+      setStripeFirstSubscribedAt(data?.first_subscribed_at || null);
+    } catch (e) {
+      console.error('Stripe history fetch failed:', e);
+    } finally {
+      setLoadingStripe(false);
+    }
+  };
+
+  // Silence old fetchPurchases catch — keep original error handling minimal
+  // (retain previous finally behavior via wrapper above).
+  const _noop = () => {
     } catch (error) {
       console.error('Error fetching purchases:', error);
     } finally {
