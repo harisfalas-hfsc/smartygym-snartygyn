@@ -602,488 +602,74 @@ const Index = () => {
       </section>
 
       <div className="min-h-screen bg-background overflow-x-hidden">
-        {isMobile ? <section className="pt-0 pb-2 px-4">
-            {/* Mobile hero tagline */}
-            <div className="text-center mb-4 mt-2">
-              <p className="text-[11px] font-bold tracking-[0.2em] uppercase text-primary mb-2">
-                Science-Backed · Expert-Designed
-              </p>
-              <h1 className="text-4xl font-extrabold tracking-tight uppercase leading-[1.05] text-foreground">
-                Train <span className="text-primary">Smarter.</span>
-                <br />
-                Not Harder.
-              </h1>
-              <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-muted-foreground mt-3 leading-snug">
-                <span className="block">Expert Workouts · Training Programs</span>
-                <span className="block">Blog Insights · Smarty Tools</span>
-                <span className="block text-primary">All In Your Pocket.</span>
-              </p>
+        {/* Unified SmartyMove-style hero (mobile + desktop) */}
+        <section className="container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6 pt-4 md:pt-8 pb-4">
+          <div className="text-center max-w-3xl mx-auto mb-6 md:mb-10">
+            <div className="flex justify-center mb-4">
+              <img
+                src="/icon-512.png"
+                alt="SmartyGym"
+                className="w-16 h-16 md:w-20 md:h-20 rounded-2xl shadow-lg"
+                loading="eager"
+              />
             </div>
+            <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight uppercase leading-[1.05] text-foreground">
+              Train <span className="text-primary">Smarter,</span> Not <span className="text-green-500">Harder.</span>
+            </h1>
+            <p className="text-sm md:text-base text-muted-foreground mt-4 leading-relaxed">
+              Your gym, in your pocket. Expert-designed workouts, structured training programs, blog insights and smart tools — 100% human-designed by Sports Scientist Haris Falas. Zero AI-generated fitness.
+            </p>
+          </div>
 
-            {/* Workouts carousel title */}
-            <div className="flex items-center justify-center gap-4 mb-4">
-              <button
-                type="button"
-                onClick={() => carouselApi?.scrollPrev()}
-                className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors"
-                aria-label="Previous card"
-              >
-                <ChevronLeft className="h-5 w-5 text-primary" />
-              </button>
-              <button
-                type="button"
-                onClick={() => navigate('/workout')}
-                className="text-lg sm:text-2xl font-extrabold tracking-tight text-primary uppercase whitespace-nowrap hover:underline"
-                aria-label="Open Smarty Workouts"
-              >
-                Smarty Workouts
-              </button>
-              <button
-                type="button"
-                onClick={() => carouselApi?.scrollNext()}
-                className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors"
-                aria-label="Next card"
-              >
-                <ChevronRight className="h-5 w-5 text-primary" />
-              </button>
-            </div>
-
-            <Carousel className="w-full" opts={{ align: "center", loop: true }} setApi={setCarouselApi}>
-              <CarouselContent className="-ml-3">
-                {heroCards.map((card, index) => {
-                  const Icon = card.icon;
-                  return (
-                    <CarouselItem key={card.id} className="pl-3 basis-[75%] sm:basis-[60%]">
-                      <div onClick={() => navigate(card.route)} className="border-2 border-green-500/60 rounded-xl overflow-hidden hover:border-green-500 hover:scale-[1.02] hover:shadow-xl transition-all duration-300 cursor-pointer bg-card flex flex-col">
-                        <div className="relative aspect-[16/8] w-full overflow-hidden flex-shrink-0">
-                          <img
-                            src={card.image}
-                            alt={card.title}
-                            loading={index === 0 ? "eager" : "lazy"}
-                            decoding="async"
-                            className="absolute inset-0 w-full h-full object-cover object-[center_top]"
-                          />
+          {/* One outer card containing sub-cards */}
+          <div className="rounded-2xl border-2 border-primary/40 bg-card p-4 md:p-6 shadow-sm">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+              {([
+                { route: '/workout', title: 'Featured Workouts', description: 'Expert-designed sessions for every goal', icon: Dumbbell, image: heroWorkoutsImage },
+                { route: '/trainingprogram', title: 'Featured Programs', description: 'Structured multi-week training plans', icon: Calendar, image: heroProgramsImage },
+                { route: '/blog', title: 'Featured Blog', description: 'Fitness, nutrition & wellness insights', icon: FileText, image: heroBlogImage },
+                { route: '/tools', title: 'Featured Tools', description: 'Calculators, timers & trackers', icon: Wrench, image: heroToolsImage },
+                { route: '/exerciselibrary', title: 'Exercise Library', description: 'Video demos for every exercise', icon: Video, image: heroLibraryBookImage },
+                { route: '/community', title: 'Community', description: 'Share progress and connect', icon: Users, image: heroCommunityCelebratingImage },
+              ]).map((card) => {
+                const Icon = card.icon;
+                return (
+                  <button
+                    key={card.route}
+                    type="button"
+                    onClick={() => navigate(card.route)}
+                    className="group flex flex-col bg-background border-2 border-green-500/50 rounded-xl overflow-hidden hover:border-green-500 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 text-left"
+                    aria-label={card.title}
+                  >
+                    <div className="relative aspect-[16/9] w-full overflow-hidden bg-muted">
+                      <img
+                        src={card.image}
+                        alt={card.title}
+                        loading="lazy"
+                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    </div>
+                    <div className="p-3 flex-1 flex flex-col">
+                      <div className="flex items-center gap-2 mb-1">
+                        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <Icon className="w-3.5 h-3.5 text-primary" />
                         </div>
-                        <div className="flex flex-col justify-center flex-1 p-2 text-center">
-                          <div className="flex items-center justify-center gap-1.5 mb-0.5">
-                            <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                              <Icon className="w-3 h-3 text-primary" />
-                            </div>
-                            <h3 className="text-xs font-bold text-foreground leading-tight whitespace-nowrap">
-                              {card.title}
-                            </h3>
-                          </div>
-                          <p className="text-[10px] text-muted-foreground leading-snug line-clamp-2">
-                            {card.description}
-                          </p>
-                          <div className="flex items-center justify-center gap-1 text-primary text-[9px] font-medium mt-0.5">
-                            Explore
-                            <ChevronRight className="w-2.5 h-2.5" />
-                          </div>
-                        </div>
+                        <h3 className="text-sm md:text-base font-bold text-foreground leading-tight">{card.title}</h3>
                       </div>
-                    </CarouselItem>
-                  );
-                })}
-              </CarouselContent>
-              <CarouselPrevious className="hidden -left-12 bg-background border-2 border-primary shadow-lg" />
-              <CarouselNext className="hidden -right-12 bg-background border-2 border-primary shadow-lg" />
-            </Carousel>
-
-            {/* Carousel Dots */}
-            <div className="flex justify-center gap-2 mt-4">
-              {heroCards.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => carouselApi?.scrollTo(index)}
-                  className={cn(
-                    "w-2.5 h-2.5 rounded-full transition-all duration-300",
-                    currentSlide === index ? "bg-primary scale-125" : "bg-primary/30 hover:bg-primary/50"
-                  )}
-                  aria-label={`Go to slide ${index + 1}`}
-                />
-              ))}
-            </div>
-
-            {/* Mobile: Featured Workouts (latest 3) */}
-            {latestWorkouts.length > 0 && (
-              <div className="mt-6">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="text-sm font-extrabold tracking-tight text-primary uppercase">Featured Workouts</span>
-                  <div className="h-px flex-1 bg-primary/20" />
-                </div>
-                <div className="flex flex-col gap-3">
-                  {latestWorkouts.slice(0, 3).map((w: WorkoutData) => {
-                    const slug = workoutCategoryToSlug(w.category);
-                    const image = w.image_url || "/images/workouts/wod-card-mobile.jpg";
-                    return (
-                      <button
-                        key={w.id}
-                        type="button"
-                        onClick={() => navigate(`/workout/${slug}/${w.id}`)}
-                        className="flex items-stretch bg-card border-2 border-green-500/60 rounded-xl overflow-hidden hover:border-green-500 hover:shadow-xl transition-all duration-300 text-left"
-                      >
-                        <div className="relative w-28 flex-shrink-0 bg-muted">
-                          <img
-                            src={image}
-                            alt={w.name}
-                            loading="lazy"
-                            className="absolute inset-0 w-full h-full object-cover"
-                          />
-                        </div>
-                        <div className="flex-1 min-w-0 p-3 flex flex-col justify-center">
-                          <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">{w.category}</span>
-                          <h3 className="text-sm font-bold text-foreground leading-tight line-clamp-2 mt-0.5">{w.name}</h3>
-                          {(w.duration || w.difficulty) && (
-                            <p className="text-[11px] text-muted-foreground mt-1 line-clamp-1">
-                              {[w.duration, w.difficulty].filter(Boolean).join(" · ")}
-                            </p>
-                          )}
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-        {/* Quick Access Menu */}
-        <div className="mt-8 space-y-6">
-          {/* Training Programs Carousel */}
-          <div className="pt-2">
-            <div className="flex items-center justify-center gap-4 mb-4">
-              <button type="button" onClick={() => programsCarouselApi?.scrollPrev()} className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Previous program">
-                <ChevronLeft className="h-5 w-5 text-primary" />
-              </button>
-              <button
-                type="button"
-                onClick={() => navigate('/trainingprogram')}
-                className="text-lg sm:text-2xl font-extrabold tracking-tight text-primary uppercase whitespace-nowrap hover:underline"
-                aria-label="Open Smarty Programs"
-              >
-                Smarty Programs
-              </button>
-              <button type="button" onClick={() => programsCarouselApi?.scrollNext()} className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Next program">
-                <ChevronRight className="h-5 w-5 text-primary" />
-              </button>
-            </div>
-            <Carousel className="w-full" opts={{ align: "center", loop: true }} setApi={setProgramsCarouselApi}>
-              <CarouselContent className="-ml-3">
-                {programCards.map((card) => {
-                  const Icon = card.icon;
-                  return (
-                    <CarouselItem key={card.id} className="pl-3 basis-[75%] sm:basis-[60%]">
-                      <div onClick={() => navigate(card.route)} className="border-2 border-green-500/60 rounded-xl overflow-hidden hover:border-green-500 hover:scale-[1.02] hover:shadow-xl transition-all duration-300 cursor-pointer bg-card flex flex-col">
-                        <div className="relative aspect-[16/8] w-full overflow-hidden flex-shrink-0">
-                          <img src={card.image} alt={card.title} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover object-center" />
-                        </div>
-                        <div className="flex flex-col justify-center flex-1 p-2 text-center">
-                          <div className="flex items-center justify-center gap-1.5 mb-0.5">
-                            <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                              <Icon className="w-3 h-3 text-primary" />
-                            </div>
-                            <h3 className="text-xs font-bold text-foreground leading-tight whitespace-nowrap">{card.title}</h3>
-                          </div>
-                          <p className="text-[10px] text-muted-foreground leading-snug line-clamp-2">{card.description}</p>
-                          <div className="flex items-center justify-center gap-1 text-primary text-[9px] font-medium mt-0.5">
-                            Explore<ChevronRight className="w-2.5 h-2.5" />
-                          </div>
-                        </div>
+                      <p className="text-[11px] md:text-xs text-muted-foreground leading-snug line-clamp-2">
+                        {card.description}
+                      </p>
+                      <div className="flex items-center gap-1 text-primary text-[11px] font-semibold mt-2 group-hover:gap-2 transition-all">
+                        Explore <ChevronRight className="w-3 h-3" />
                       </div>
-                    </CarouselItem>
-                  );
-                })}
-              </CarouselContent>
-            </Carousel>
-            <div className="flex justify-center gap-2 mt-3">
-              {programCards.map((_, index) => (
-                <button key={index} onClick={() => programsCarouselApi?.scrollTo(index)} className={cn("w-2.5 h-2.5 rounded-full transition-all duration-300", programsSlide === index ? "bg-primary scale-125" : "bg-primary/30 hover:bg-primary/50")} aria-label={`Go to program ${index + 1}`} />
-              ))}
-            </div>
-
-            {/* Mobile: Featured Training Programs (latest 3) */}
-            {latestPrograms.length > 0 && (
-              <div className="mt-6">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="text-sm font-extrabold tracking-tight text-primary uppercase">Featured Training Programs</span>
-                  <div className="h-px flex-1 bg-primary/20" />
-                </div>
-                <div className="flex flex-col gap-3">
-                  {latestPrograms.slice(0, 3).map((p: VisibleProgramMetadata) => {
-                    const slug = programCategoryToSlug(p.category);
-                    const image = getProgramCardImage(p.category, p.image_url);
-                    return (
-                      <button
-                        key={p.id}
-                        type="button"
-                        onClick={() => navigate(`/trainingprogram/${slug}/${p.id}`)}
-                        className="group flex h-[96px] items-stretch overflow-hidden rounded-xl border-2 border-green-500/60 bg-card text-left transition-all duration-300 hover:border-green-500 hover:shadow-xl"
-                      >
-                        <div className="relative h-full w-28 flex-shrink-0 overflow-hidden bg-muted">
-                          <img
-                            src={image}
-                            alt={p.name}
-                            loading="lazy"
-                            className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
-                          />
-                        </div>
-                        <div className="flex-1 min-w-0 p-3 flex flex-col justify-center">
-                          <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">{p.category}</span>
-                          <h3 className="text-sm font-bold text-foreground leading-tight line-clamp-2 mt-0.5">{p.name}</h3>
-                          {(p.weeks || p.difficulty) && (
-                            <p className="text-[11px] text-muted-foreground mt-1 line-clamp-1">
-                              {[p.weeks ? `${p.weeks} weeks` : null, p.difficulty].filter(Boolean).join(" · ")}
-                            </p>
-                          )}
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Blog Categories Carousel */}
-          <div className="pt-2">
-            <div className="flex items-center justify-center gap-4 mb-4">
-              <button type="button" onClick={() => blogCarouselApi?.scrollPrev()} className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Previous category">
-                <ChevronLeft className="h-5 w-5 text-primary" />
-              </button>
-              <button
-                type="button"
-                onClick={() => navigate('/blog')}
-                className="text-lg sm:text-2xl font-extrabold tracking-tight text-primary uppercase whitespace-nowrap hover:underline"
-                aria-label="Open Smarty Blog"
-              >
-                Smarty Blog
-              </button>
-              <button type="button" onClick={() => blogCarouselApi?.scrollNext()} className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Next category">
-                <ChevronRight className="h-5 w-5 text-primary" />
-              </button>
-            </div>
-            <Carousel className="w-full" opts={{ align: "center", loop: true }} setApi={setBlogCarouselApi}>
-              <CarouselContent className="-ml-3">
-                {blogCards.map((card) => {
-                  const Icon = card.icon;
-                  return (
-                    <CarouselItem key={card.id} className="pl-3 basis-[75%] sm:basis-[60%]">
-                      <div onClick={() => navigate(card.route)} className="border-2 border-green-500/60 rounded-xl overflow-hidden hover:border-green-500 hover:scale-[1.02] hover:shadow-xl transition-all duration-300 cursor-pointer bg-card flex flex-col">
-                        <div className="relative aspect-[16/8] w-full overflow-hidden flex-shrink-0">
-                          <img src={card.image} alt={card.title} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover object-center" />
-                        </div>
-                        <div className="flex flex-col justify-center flex-1 p-2 text-center">
-                          <div className="flex items-center justify-center gap-1.5 mb-0.5">
-                            <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                              <Icon className="w-3 h-3 text-primary" />
-                            </div>
-                            <h3 className="text-xs font-bold text-foreground leading-tight whitespace-nowrap">{card.title}</h3>
-                          </div>
-                          <p className="text-[10px] text-muted-foreground leading-snug line-clamp-2">{card.description}</p>
-                          <div className="flex items-center justify-center gap-1 text-primary text-[9px] font-medium mt-0.5">
-                            Read<ChevronRight className="w-2.5 h-2.5" />
-                          </div>
-                        </div>
-                      </div>
-                    </CarouselItem>
-                  );
-                })}
-              </CarouselContent>
-            </Carousel>
-            <div className="flex justify-center gap-2 mt-3">
-              {blogCards.map((_, index) => (
-                <button key={index} onClick={() => blogCarouselApi?.scrollTo(index)} className={cn("w-2.5 h-2.5 rounded-full transition-all duration-300", blogSlide === index ? "bg-primary scale-125" : "bg-primary/30 hover:bg-primary/50")} aria-label={`Go to blog category ${index + 1}`} />
-              ))}
-            </div>
-
-            {/* Mobile: Featured Articles (latest 3) */}
-            {latestArticles.length > 0 && (
-              <div className="mt-6">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="text-sm font-extrabold tracking-tight text-primary uppercase">Featured Articles</span>
-                  <div className="h-px flex-1 bg-primary/20" />
-                </div>
-                <div className="flex flex-col gap-3">
-                  {latestArticles.map((a: BlogArticleCard) => {
-                    const image = getBlogArticleImage(a.image_url, a.slug);
-                    return (
-                      <button
-                        key={a.id}
-                        type="button"
-                        onClick={() => navigate(`/blog/${a.slug}.html`)}
-                        className="flex items-stretch bg-card border-2 border-green-500/60 rounded-xl overflow-hidden hover:border-green-500 hover:shadow-xl transition-all duration-300 text-left"
-                        aria-label={a.title}
-                      >
-                        <div className="relative w-28 flex-shrink-0 bg-muted">
-                          <img
-                            src={image}
-                            alt={a.title}
-                            loading="lazy"
-                            className="absolute inset-0 w-full h-full object-cover"
-                          />
-                        </div>
-                        <div className="flex-1 min-w-0 p-3 flex flex-col justify-center">
-                          <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">{a.category}</span>
-                          <h3 className="text-sm font-bold text-foreground leading-tight line-clamp-2 mt-0.5">{a.title}</h3>
-                          {(a.read_time || a.published_at || a.created_at) && (
-                            <p className="text-[11px] text-muted-foreground mt-1 line-clamp-1">
-                              {[a.read_time, new Date(a.published_at || a.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })].filter(Boolean).join(" · ")}
-                            </p>
-                          )}
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Smarty Tools Carousel */}
-          <div className="pt-2">
-            <div className="flex items-center justify-center gap-4 mb-4">
-              <button type="button" onClick={() => toolsCarouselApi?.scrollPrev()} className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Previous tool">
-                <ChevronLeft className="h-5 w-5 text-primary" />
-              </button>
-              <button
-                type="button"
-                onClick={() => navigate('/tools')}
-                className="text-lg sm:text-2xl font-extrabold tracking-tight text-primary uppercase whitespace-nowrap hover:underline"
-                aria-label="Open Smarty Tools"
-              >
-                Smarty Tools
-              </button>
-              <button type="button" onClick={() => toolsCarouselApi?.scrollNext()} className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Next tool">
-                <ChevronRight className="h-5 w-5 text-primary" />
-              </button>
-            </div>
-            <Carousel className="w-full" opts={{ align: "center", loop: true }} setApi={setToolsCarouselApi}>
-              <CarouselContent className="-ml-3">
-                {toolsCards.map((card) => {
-                  const Icon = card.icon;
-                  return (
-                    <CarouselItem key={card.id} className="pl-3 basis-[75%] sm:basis-[60%]">
-                      <div onClick={() => navigate(card.route)} className="border-2 border-green-500/60 rounded-xl overflow-hidden hover:border-green-500 hover:scale-[1.02] hover:shadow-xl transition-all duration-300 cursor-pointer bg-card flex flex-col">
-                        <div className="relative aspect-[16/8] w-full overflow-hidden flex-shrink-0">
-                          <img src={card.image} alt={card.title} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover object-center" />
-                        </div>
-                        <div className="flex flex-col justify-center flex-1 p-2 text-center">
-                          <div className="flex items-center justify-center gap-1.5 mb-0.5">
-                            <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                              <Icon className="w-3 h-3 text-primary" />
-                            </div>
-                            <h3 className="text-xs font-bold text-foreground leading-tight whitespace-nowrap">{card.title}</h3>
-                          </div>
-                          <p className="text-[10px] text-muted-foreground leading-snug line-clamp-2">{card.description}</p>
-                          <div className="flex items-center justify-center gap-1 text-primary text-[9px] font-medium mt-0.5">
-                            Open<ChevronRight className="w-2.5 h-2.5" />
-                          </div>
-                        </div>
-                      </div>
-                    </CarouselItem>
-                  );
-                })}
-              </CarouselContent>
-            </Carousel>
-            <div className="flex justify-center gap-2 mt-3">
-              {toolsCards.map((_, index) => (
-                <button key={index} onClick={() => toolsCarouselApi?.scrollTo(index)} className={cn("w-2.5 h-2.5 rounded-full transition-all duration-300", toolsSlide === index ? "bg-primary scale-125" : "bg-primary/30 hover:bg-primary/50")} aria-label={`Go to tool ${index + 1}`} />
-              ))}
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
+        </section>
 
-          {/* Exercise Library + Community quick access (2 taller image cards) */}
-          <div className="flex items-center gap-2 mb-2 mt-1">
-            <span className="text-sm font-extrabold tracking-tight text-primary uppercase">Explore</span>
-            <div className="h-px flex-1 bg-primary/20" />
-          </div>
-          <div className="flex flex-col gap-3">
-            {([
-              { route: '/exerciselibrary', title: 'Exercise Library', label: 'Library', description: 'Video demonstrations for every exercise', image: heroLibraryBookImage },
-              { route: '/daily-ritual', title: 'Smarty Ritual', label: 'Daily', description: 'Your morning, midday and evening micro-routine', image: ritualWellbeingImage },
-              { route: '/community', title: 'Community', label: 'Connect', description: 'Share progress, leaderboards and challenges', image: heroCommunityCelebratingImage },
-              { route: '/faq', title: 'Frequently Asked Questions', label: 'Help', description: 'Answers about plans, training and access', image: faqPlacardImage },
-              { route: '/coach-profile', title: 'Meet the Coach', label: 'Coach', description: 'Haris Falas — Sports Scientist & Founder', image: harisPhoto },
-            ] as Array<{ route: string; title: string; label: string; description: string; image?: string }>).map((card) => (
-              <button
-                key={card.route}
-                type="button"
-                onClick={() => navigate(card.route)}
-                className="flex items-stretch bg-card border-2 border-green-500/60 rounded-xl overflow-hidden hover:border-green-500 hover:shadow-xl transition-all duration-300 text-left"
-                aria-label={card.title}
-              >
-                <div className="relative w-28 flex-shrink-0 bg-muted">
-                  {card.image ? (
-                    <img
-                      src={card.image}
-                      alt={card.title}
-                      loading="lazy"
-                      className="absolute inset-0 w-full h-full object-cover"
-                    />
-                  ) : null}
-                </div>
-                <div className="flex-1 min-w-0 p-3 flex flex-col justify-center">
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">{card.label}</span>
-                  <h3 className="text-sm font-bold text-foreground leading-tight line-clamp-2 mt-0.5">{card.title}</h3>
-                  <p className="text-[11px] text-muted-foreground mt-1 line-clamp-1">{card.description}</p>
-                </div>
-              </button>
-            ))}
-          </div>
-
-        </div>
-
-
-          </section> : <>
-            {/* Desktop: Compact hero with 4 stacked pillar rows */}
-            <div className="hidden md:block container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6 pt-0 pb-4">
-              <div className="grid grid-cols-3 gap-4 lg:gap-5 items-stretch">
-                {/* Big card: Train Smarter, Not Harder */}
-                <div className="col-span-2 rounded-2xl border-2 border-primary/40 bg-card p-8 lg:p-10 grid grid-rows-[auto_1fr] h-full min-h-[280px]">
-                  <span className="inline-flex self-start justify-self-start items-center rounded-full border border-primary/40 px-3 py-1 text-[10px] font-bold tracking-[0.2em] uppercase text-primary mb-4">
-                    Our Philosophy
-                  </span>
-                  <div className="flex flex-col justify-start min-h-0 pt-3">
-                    <h1 className="text-[2.4rem] lg:text-[3rem] font-extrabold tracking-tight uppercase leading-[1.05] text-foreground">
-                      Train <span className="text-primary">Smarter,</span> Not <span className="text-green-500">Harder.</span>
-                    </h1>
-                    <p className="text-xs lg:text-sm font-semibold tracking-[0.15em] uppercase text-muted-foreground mt-4 leading-snug">
-                      Expert Workouts · Training Programs · Blog Insights · Smarty Tools
-                      <br />
-                      <span className="text-primary">All In Your Pocket.</span>
-                    </p>
-                  </div>
-                </div>
-
-                {/* Smaller card: 100% Human, 0% AI */}
-                <div className="col-span-1 rounded-2xl border-2 border-green-500/50 bg-card p-8 lg:p-10 grid grid-rows-[auto_1fr] h-full min-h-[280px]">
-                  <span className="inline-flex self-start justify-self-start items-center rounded-full border border-green-500/40 px-3 py-1 text-[10px] font-bold tracking-[0.2em] uppercase text-green-500 mb-4">
-                    Our Promise
-                  </span>
-                  <div className="flex flex-col justify-start min-h-0 pt-3">
-                    <p className="text-2xl lg:text-[1.9rem] font-extrabold tracking-tight leading-tight">
-                      100% Human.
-                      <br />
-                      <span className="text-red-500">0% AI.</span>
-                    </p>
-                    <p className="text-sm text-muted-foreground mt-3 leading-relaxed">
-                      Every workout and program designed by{" "}
-                      <Link to="/coach-profile" className="text-primary hover:underline font-medium">
-                        Haris Falas
-                      </Link>
-                      {" "}— never by algorithms.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <DesktopFeaturedGrid
-              workouts={latestWorkouts}
-              programs={latestPrograms}
-              articles={latestArticles}
-              workoutCategoryToSlug={workoutCategoryToSlug}
-              programCategoryToSlug={programCategoryToSlug}
-            />
 
             {/* Desktop: "Your Gym Re-imagined" content block (no hero picture) */}
             <section className="hidden md:block bg-background mt-8">
@@ -1554,8 +1140,6 @@ const Index = () => {
         </section>
       </div>
         </LazySection>
-          </>}
-
     </div>
     </>;
 };
