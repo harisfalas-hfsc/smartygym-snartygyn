@@ -559,7 +559,8 @@ export default function UserDashboard() {
       setSubscriptionInfo({
         subscribed: isSubscribed,
         product_id: dbData?.plan_type || null,
-        subscription_end: dbData?.current_period_end || null
+        subscription_end: dbData?.current_period_end || null,
+        status: dbData?.status || null
       });
       if (dbData?.current_period_start && dbData?.current_period_end) {
         setStripeDetails({
