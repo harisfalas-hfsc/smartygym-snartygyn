@@ -700,7 +700,7 @@ const Index = () => {
                           className="group flex items-stretch text-left bg-background border border-border/60 rounded-lg overflow-hidden hover:border-primary/60 hover:shadow-md transition-all"
                           aria-label={item.title}
                         >
-                          <div className="relative w-16 md:w-20 flex-shrink-0 bg-muted overflow-hidden">
+                          <div className="relative w-16 md:w-20 h-14 md:h-16 flex-shrink-0 bg-muted overflow-hidden">
                             <img
                               src={item.image}
                               alt={item.title}
@@ -709,7 +709,10 @@ const Index = () => {
                             />
                           </div>
                           <div className="flex-1 min-w-0 px-2.5 py-2 flex flex-col justify-center">
-                            <h4 className="text-[12px] md:text-[13px] font-semibold text-foreground leading-tight line-clamp-2">{item.title}</h4>
+                            <h4 className={cn(
+                              "text-[12px] md:text-[13px] font-semibold text-foreground leading-tight",
+                              section.key === 'blog' ? "truncate" : "line-clamp-2"
+                            )}>{item.title}</h4>
                             {item.meta && (
                               <p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-1">{item.meta}</p>
                             )}
