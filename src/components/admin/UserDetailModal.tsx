@@ -454,9 +454,11 @@ export function UserDetailModal({
                     </div>
                     <div>
                       <p className="text-muted-foreground">First Subscribed</p>
-                      <p>{user.subscription_created_at 
-                        ? format(new Date(user.subscription_created_at), 'MMM d, yyyy')
-                        : 'N/A'}</p>
+                      <p>{stripeFirstSubscribedAt
+                        ? format(new Date(stripeFirstSubscribedAt), 'MMM d, yyyy')
+                        : user.subscription_created_at
+                          ? format(new Date(user.subscription_created_at), 'MMM d, yyyy') + ' (DB)'
+                          : 'N/A'}</p>
                     </div>
                     <div>
                       <p className="text-muted-foreground">Current Plan Since</p>
