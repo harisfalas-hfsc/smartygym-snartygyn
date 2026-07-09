@@ -3978,6 +3978,8 @@ export type Database = {
         | "checkin_reminder_evening"
         | "goal_achievement"
         | "welcome_onboarding"
+        | "payment_failed_attempt"
+        | "payment_failed_final"
       plan_type:
         | "free"
         | "gold"
@@ -4153,6 +4155,8 @@ export const Constants = {
         "checkin_reminder_evening",
         "goal_achievement",
         "welcome_onboarding",
+        "payment_failed_attempt",
+        "payment_failed_final",
       ],
       plan_type: [
         "free",
