@@ -112,6 +112,7 @@ interface SubscriptionInfo {
   subscribed: boolean;
   product_id: string | null;
   subscription_end: string | null;
+  status?: string | null;
 }
 interface CorporateSubscriptionInfo {
   id: string;
