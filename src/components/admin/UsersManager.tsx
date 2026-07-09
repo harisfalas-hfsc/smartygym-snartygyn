@@ -532,6 +532,36 @@ export function UsersManager() {
             <AlertDialogTitle>{getDialogTitle()}</AlertDialogTitle>
             <AlertDialogDescription>{getDialogDescription()}</AlertDialogDescription>
           </AlertDialogHeader>
+          {pendingAction?.action === 'grant' && (
+            <div className="py-2">
+              <label className="text-sm font-medium mb-2 block">Duration</label>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { label: '1 month', value: 1 },
+                  { label: '3 months', value: 3 },
+                  { label: '6 months', value: 6 },
+                  { label: '1 year', value: 12 },
+                  { label: 'Indefinite', value: 0 },
+                ].map(opt => {
+                  const selected = (pendingAction.durationMonths ?? 0) === opt.value;
+                  return (
+                    <Button
+                      key={opt.value}
+                      type="button"
+                      variant={selected ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setPendingAction({ ...pendingAction, durationMonths: opt.value === 0 ? null : opt.value })}
+                    >
+                      {opt.label}
+                    </Button>
+                  );
+                })}
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                A fixed duration triggers the standard renewal reminder (3 days before expiry) and expiry notification, just like a paid subscription. "Indefinite" grants never expire and do not send reminders.
+              </p>
+            </div>
+          )}
           <AlertDialogFooter>
             <AlertDialogCancel disabled={actionLoading}>Cancel</AlertDialogCancel>
             <AlertDialogAction 
