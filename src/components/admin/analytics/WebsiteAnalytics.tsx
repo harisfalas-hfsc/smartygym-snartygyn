@@ -12,6 +12,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { format, subDays } from "date-fns";
 import html2canvas from "html2canvas";
 import { cn } from "@/lib/utils";
+import { applyBotFilter } from "@/lib/admin-analytics";
 
 interface PageViewData {
   page: string;
@@ -145,6 +146,23 @@ export function WebsiteAnalytics() {
     return { prevStartDate, prevEndDate };
   };
 
+  const fetchAllAnalyticsRows = async (buildQuery: () => any) => {
+    const pageSize = 1000;
+    let from = 0;
+    const rows: any[] = [];
+
+    while (true) {
+      const { data, error } = await buildQuery().range(from, from + pageSize - 1);
+      if (error) throw error;
+      const page = data || [];
+      rows.push(...page);
+      if (page.length < pageSize) break;
+      from += pageSize;
+    }
+
+    return rows;
+  };
+
   const fetchWebsiteAnalytics = async () => {
     try {
       setLoading(true);
@@ -190,43 +208,31 @@ export function WebsiteAnalytics() {
         prevBounceRate: 0,
       });
 
-      // Fetch row-level data for charts (with extended range to get more data)
-      let query = supabase
-        .from("social_media_analytics")
-        .select("*")
-        .gte("created_at", startDate.toISOString())
-        .lte("created_at", endDate.toISOString())
-        .order("created_at", { ascending: true })
-        .range(0, 9999); // Fetch up to 10,000 rows
+      // Fetch all row-level data for charts with the same real-traffic filter as the summary.
+      const analyticsData = await fetchAllAnalyticsRows(() => {
+        let query = supabase
+          .from("social_media_analytics")
+          .select("*")
+          .gte("created_at", startDate.toISOString())
+          .lte("created_at", endDate.toISOString())
+          .order("created_at", { ascending: true });
 
-      // Exclude preview/sandbox visits and bots/crawlers
-      query = query
-        .not("browser_info", "ilike", "%lovable%")
-        .not("browser_info", "ilike", "%bot%")
-        .not("browser_info", "ilike", "%crawler%")
-        .not("browser_info", "ilike", "%spider%")
-        .not("browser_info", "ilike", "%meta-external%")
-        .not("browser_info", "ilike", "%adsbot%")
-        .not("browser_info", "ilike", "%facebookexternalhit%")
-        .not("browser_info", "ilike", "%semrush%")
-        .not("browser_info", "ilike", "%ahrefs%");
-      
-      if (sourceFilter !== "all") {
-        query = query.eq("referral_source", sourceFilter);
-      }
-      if (deviceFilter !== "all") {
-        query = query.eq("device_type", deviceFilter);
-      }
-
-      const { data: analyticsData, error } = await query;
-      if (error) throw error;
+        query = applyBotFilter(query as any) as typeof query;
+        if (sourceFilter !== "all") query = query.eq("referral_source", sourceFilter);
+        if (deviceFilter !== "all") query = query.eq("device_type", deviceFilter);
+        return query;
+      });
 
       // Get available filters
-      const { data: allSourcesData } = await supabase
-        .from("social_media_analytics")
-        .select("referral_source, device_type")
-        .gte("created_at", startDate.toISOString())
-        .lte("created_at", endDate.toISOString());
+      const allSourcesData = await fetchAllAnalyticsRows(() => {
+        let query = supabase
+          .from("social_media_analytics")
+          .select("referral_source, device_type")
+          .gte("created_at", startDate.toISOString())
+          .lte("created_at", endDate.toISOString());
+        query = applyBotFilter(query as any) as typeof query;
+        return query;
+      });
       
       const uniqueSources = [...new Set(allSourcesData?.map(d => d.referral_source) || [])].filter(Boolean).sort();
       const uniqueDevices = [...new Set(allSourcesData?.map(d => d.device_type) || [])].filter(Boolean).sort();
@@ -270,21 +276,16 @@ export function WebsiteAnalytics() {
         .sort((a, b) => b.count - a.count);
       setDeviceData(deviceDataArray);
 
-      // Traffic sources - fetch with bot filtering
-      const { data: allTrafficData } = await supabase
-        .from("social_media_analytics")
-        .select("*")
-        .gte("created_at", startDate.toISOString())
-        .lte("created_at", endDate.toISOString())
-        .not("browser_info", "ilike", "%lovable%")
-        .not("browser_info", "ilike", "%bot%")
-        .not("browser_info", "ilike", "%crawler%")
-        .not("browser_info", "ilike", "%spider%")
-        .not("browser_info", "ilike", "%meta-external%")
-        .not("browser_info", "ilike", "%adsbot%")
-        .not("browser_info", "ilike", "%facebookexternalhit%")
-        .not("browser_info", "ilike", "%semrush%")
-        .not("browser_info", "ilike", "%ahrefs%");
+      // Traffic sources - fetch with canonical real-traffic filtering
+      const allTrafficData = await fetchAllAnalyticsRows(() => {
+        let query = supabase
+          .from("social_media_analytics")
+          .select("*")
+          .gte("created_at", startDate.toISOString())
+          .lte("created_at", endDate.toISOString());
+        query = applyBotFilter(query as any) as typeof query;
+        return query;
+      });
 
       // All tracked social platforms - always show these
       const allTrackedSources = [
@@ -345,17 +346,16 @@ export function WebsiteAnalytics() {
       setDailyVisitors(dailyData);
 
       // ===== ENHANCED ANALYTICS: Fetch new event types =====
-      const enhancedQuery = supabase
-        .from("social_media_analytics")
-        .select("event_type, landing_page, event_value, utm_content, session_id, created_at")
-        .gte("created_at", startDate.toISOString())
-        .lte("created_at", endDate.toISOString())
-        .in("event_type", ["page_view", "scroll_depth", "cta_click", "time_on_page", "exit"])
-        .not("browser_info", "ilike", "%lovable%")
-        .not("browser_info", "ilike", "%bot%")
-        .range(0, 9999);
-
-      const { data: enhancedData } = await enhancedQuery;
+      const enhancedData = await fetchAllAnalyticsRows(() => {
+        let query = supabase
+          .from("social_media_analytics")
+          .select("event_type, landing_page, event_value, utm_content, session_id, created_at")
+          .gte("created_at", startDate.toISOString())
+          .lte("created_at", endDate.toISOString())
+          .in("event_type", ["page_view", "scroll_depth", "cta_click", "time_on_page", "exit"]);
+        query = applyBotFilter(query as any) as typeof query;
+        return query;
+      });
 
       if (enhancedData && enhancedData.length > 0) {
         // 1. Page Flow (user journeys) - group page_views by session, find transitions

@@ -19,6 +19,12 @@ const BOT_PATTERNS = [
   "%ahrefs%",
 ] as const;
 
+const ADMIN_PATH_PATTERNS = [
+  "/admin%",
+  "%/admin%",
+  "/corporate-admin%",
+] as const;
+
 /**
  * Apply the canonical bot/preview filter to a social_media_analytics query.
  */
@@ -27,7 +33,63 @@ export function applyBotFilter<T extends { not: (col: string, op: string, val: s
   for (const p of BOT_PATTERNS) {
     q = q.not("browser_info", "ilike", p);
   }
+  for (const p of ADMIN_PATH_PATTERNS) {
+    q = q.not("landing_page", "ilike", p);
+  }
   return q;
+}
+
+export const TRACKING_EXCLUDED_ADMIN_PATH_PREFIXES = ["/admin", "/corporate-admin"] as const;
+
+export interface StripePaymentTruth {
+  id: string;
+  amount: number;
+  gross?: number;
+  refunded?: number;
+  currency?: string;
+  date: string;
+  productName?: string | null;
+  productId?: string | null;
+  contentType?: string | null;
+  recurring?: boolean;
+  category?: "premium" | "standalone" | "personal_training" | "corporate";
+}
+
+export interface StripeRevenueTruthData {
+  totalCollected: number;
+  totalRefunded: number;
+  paymentCount: number;
+  byMonth: Record<string, number>;
+  byMonthByCategory: Record<string, Record<"premium" | "standalone" | "personal_training" | "corporate", number>>;
+  byCategory: Record<"premium" | "standalone" | "personal_training" | "corporate", { amount: number; count: number }>;
+  payments: StripePaymentTruth[];
+}
+
+export async function fetchStripeRevenueTruth(): Promise<StripeRevenueTruthData | null> {
+  try {
+    const { data, error } = await supabase.functions.invoke("get-stripe-revenue");
+    if (error || !data || typeof data.totalCollected !== "number") {
+      console.error("Failed to fetch Stripe revenue truth", error || data);
+      return null;
+    }
+    return {
+      totalCollected: Number(data.totalCollected) || 0,
+      totalRefunded: Number(data.totalRefunded) || 0,
+      paymentCount: Number(data.paymentCount) || 0,
+      byMonth: data.byMonth || {},
+      byMonthByCategory: data.byMonthByCategory || {},
+      byCategory: data.byCategory || {
+        premium: { amount: 0, count: 0 },
+        standalone: { amount: 0, count: 0 },
+        personal_training: { amount: 0, count: 0 },
+        corporate: { amount: 0, count: 0 },
+      },
+      payments: data.payments || [],
+    };
+  } catch (error) {
+    console.error("Failed to fetch Stripe revenue truth", error);
+    return null;
+  }
 }
 
 // ---------- Workout library counting ----------
@@ -123,8 +185,8 @@ export interface PremiumCounts {
 
 export function computePremiumCounts(subs: SubscriptionRow[] | null | undefined): PremiumCounts {
   const list = subs ?? [];
-  // Include all paid plan types: current "lifetime"/"premium" and legacy "gold"/"platinum" (retired).
-  const PREMIUM_PLANS = new Set(["lifetime", "premium", "gold", "platinum"]);
+  // Include all paid plan types: current "premium", historical lifetime, and retired legacy premium tiers.
+  const PREMIUM_PLANS = new Set(["lifetime", "premium", "legacy_premium", "gold", "platinum"]);
   const isActivePremium = (s: SubscriptionRow) =>
     s.status === "active" && !!s.plan_type && PREMIUM_PLANS.has(s.plan_type);
 

@@ -12,6 +12,41 @@ const logStep = (step: string, details?: any) => {
   console.log(`[GET-STRIPE-REVENUE] ${step}${detailsStr}`);
 };
 
+const KNOWN_SMARTYGYM_PRODUCT_IDS = new Set([
+  // Active + grandfathered SmartyGym subscriptions
+  "prod_UqU78UzgA2ckcP", // SmartyGym Premium Monthly (€9.99/mo, old €6.99 subscribers remain grandfathered)
+  "prod_UgmdX60UPJxWeS", // Legacy lifetime membership
+  "prod_TFfAcybp438BH6", // Legacy Gold monthly
+  "prod_TFfAPp1tq7RdUk", // Legacy Platinum yearly
+  // Corporate plans
+  "prod_TZATAcAlqgc1P7",
+  "prod_TZATDsKcDvMtHc",
+  "prod_TZATGTAsKalmCn",
+  "prod_TZATUtaS2jhgtK",
+]);
+
+type RevenueCategory = "premium" | "standalone" | "personal_training" | "corporate";
+
+const classifyRevenue = (product: any, charge: any): RevenueCategory => {
+  const productId = typeof product?.id === "string" ? product.id : "";
+  const contentType = String(product?.metadata?.content_type ?? charge.metadata?.content_type ?? "").toLowerCase();
+  const productName = String(product?.name ?? charge.description ?? "").toLowerCase();
+
+  if (contentType === "personal_training" || productName.includes("personal training")) return "personal_training";
+  if (
+    contentType === "corporate" ||
+    productName.includes("smarty dynamic") ||
+    productName.includes("smarty power") ||
+    productName.includes("smarty elite") ||
+    productName.includes("smarty enterprise") ||
+    ["prod_TZATAcAlqgc1P7", "prod_TZATDsKcDvMtHc", "prod_TZATGTAsKalmCn", "prod_TZATUtaS2jhgtK"].includes(productId)
+  ) return "corporate";
+  if (contentType === "workout" || contentType === "program" || contentType === "training_program" || contentType === "shop_product" || contentType === "ritual") {
+    return "standalone";
+  }
+  return "premium";
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -105,7 +140,7 @@ serve(async (req) => {
       return false;
     };
     const isSmartyGymProduct = (product: any) =>
-      !!product && product.metadata?.project === "SMARTYGYM" && !isTestProduct(product);
+      !!product && (product.metadata?.project === "SMARTYGYM" || KNOWN_SMARTYGYM_PRODUCT_IDS.has(product.id)) && !isTestProduct(product);
 
     const invoiceCache = new Map<string, string | null>();
     const resolveProductId = async (charge: any): Promise<string | null> => {
@@ -133,6 +168,13 @@ serve(async (req) => {
     let totalCollected = 0;
     let totalRefunded = 0;
     const byMonth: { [month: string]: number } = {};
+    const byMonthByCategory: Record<string, Record<RevenueCategory, number>> = {};
+    const byCategory: Record<RevenueCategory, { amount: number; count: number }> = {
+      premium: { amount: 0, count: 0 },
+      standalone: { amount: 0, count: 0 },
+      personal_training: { amount: 0, count: 0 },
+      corporate: { amount: 0, count: 0 },
+    };
     const payments: any[] = [];
     let skippedNonSmartyGym = 0;
     let unattributed = 0;
@@ -160,7 +202,8 @@ serve(async (req) => {
       }
       const chargeIsSmartyGym = charge.metadata?.project === "SMARTYGYM";
       const productIsSmartyGym = isSmartyGymProduct(product);
-      if (!productIsSmartyGym && !chargeIsSmartyGym) {
+      const productIdIsKnownSmartyGym = !!productId && KNOWN_SMARTYGYM_PRODUCT_IDS.has(productId);
+      if (!productIsSmartyGym && !chargeIsSmartyGym && !productIdIsKnownSmartyGym) {
         skippedNonSmartyGym++;
         if (!productId) {
           unattributed++;
@@ -174,6 +217,11 @@ serve(async (req) => {
 
       const month = new Date(charge.created * 1000).toISOString().slice(0, 7);
       byMonth[month] = (byMonth[month] || 0) + net;
+      const category = classifyRevenue(product, charge);
+      byMonthByCategory[month] = byMonthByCategory[month] || { premium: 0, standalone: 0, personal_training: 0, corporate: 0 };
+      byMonthByCategory[month][category] += net;
+      byCategory[category].amount += net;
+      byCategory[category].count += 1;
 
       payments.push({
         id: charge.id,
@@ -187,6 +235,7 @@ serve(async (req) => {
         description: charge.description ?? null,
         productName: product?.name ?? null,
         productId: productId ?? null,
+        category,
         contentType: (product?.metadata?.content_type as string) ?? (charge.metadata?.content_type as string) ?? null,
         recurring: !!charge.invoice,
       });
@@ -205,6 +254,8 @@ serve(async (req) => {
         totalRefunded: Math.round(totalRefunded * 100) / 100,
         paymentCount: payments.length,
         byMonth,
+        byMonthByCategory,
+        byCategory,
         payments,
         skippedNonSmartyGym,
         unattributed,

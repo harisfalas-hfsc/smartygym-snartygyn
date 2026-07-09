@@ -11,8 +11,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import html2canvas from "html2canvas";
-import { SUBSCRIPTION_PRICES, CORPORATE_PRICES } from "@/config/pricing";
+import { CORPORATE_PRICES } from "@/config/pricing";
 import { StripeRevenueTruth } from "./analytics/StripeRevenueTruth";
+import { fetchStripeRevenueTruth } from "@/lib/admin-analytics";
 
 interface RevenueData {
   period: string;
@@ -106,6 +107,7 @@ export function RevenueAnalytics() {
       const subDetails: SubscriptionDetail[] = [];
       const purDetails: PurchaseDetail[] = [];
       const corpDetails: CorporateDetail[] = [];
+      const stripeTruth = await fetchStripeRevenueTruth();
 
       // Fetch subscriptions with user emails — use ACTIVE-OVERLAP semantics so
       // recurring revenue created before the window but still active in it is
@@ -149,18 +151,10 @@ export function RevenueAnalytics() {
               revenueByMonth[month] = { premium: 0, standalone: 0, personal_training: 0, corporate: 0 };
             }
 
-            // Legacy gold/platinum revenue: use the historical Stripe prices
-            // for analytics only (those products are no longer offered).
-            const monthlyRevenue = isPaid
-              ? (sub.plan_type === "lifetime" ? SUBSCRIPTION_PRICES.lifetime
-                : sub.plan_type === "gold" ? 9.99
-                : sub.plan_type === "platinum" ? 89.89 : 0)
-              : 0;
+            // Revenue is not estimated from subscription rows anymore; Stripe payments below are the truth.
+            const monthlyRevenue = 0;
 
-            if (isPaid) {
-              revenueByMonth[month].premium += monthlyRevenue;
-              total += monthlyRevenue;
-            }
+            if (isPaid) revenueByMonth[month].premium += monthlyRevenue;
 
             subDetails.push({
               id: sub.id,
@@ -312,6 +306,20 @@ export function RevenueAnalytics() {
         });
       }
 
+      if (stripeTruth) {
+        total = stripeTruth.totalCollected;
+        Object.keys(revenueByMonth).forEach(key => delete revenueByMonth[key]);
+        Object.entries(stripeTruth.byMonthByCategory || {}).forEach(([monthKey, values]) => {
+          const month = new Date(`${monthKey}-01T00:00:00Z`).toLocaleDateString("en-US", { year: "numeric", month: "short" });
+          revenueByMonth[month] = {
+            premium: values.premium || 0,
+            standalone: values.standalone || 0,
+            personal_training: values.personal_training || 0,
+            corporate: values.corporate || 0,
+          };
+        });
+      }
+
       // Convert to chart data - sorted by date
       const sortedMonths = Object.keys(revenueByMonth).sort((a, b) => 
         new Date(a).getTime() - new Date(b).getTime()
@@ -383,7 +391,7 @@ export function RevenueAnalytics() {
   }), { premium: 0, standalone: 0, personal_training: 0, corporate: 0 });
 
   const pieData = [
-    { name: `Premium (€${SUBSCRIPTION_PRICES.lifetime})`, value: totals.premium },
+    { name: "Premium", value: totals.premium },
     { name: "Standalone", value: totals.standalone },
     { name: "Personal Training", value: totals.personal_training },
     { name: "Corporate", value: totals.corporate },

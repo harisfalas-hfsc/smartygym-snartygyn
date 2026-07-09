@@ -94,6 +94,10 @@ const shouldExcludeFromTracking = (): boolean => {
       window.self !== window.top) {
     return true;
   }
+
+  if (window.location.pathname.startsWith('/admin') || window.location.pathname.startsWith('/corporate-admin')) {
+    return true;
+  }
   
   if (document.cookie.includes('sm_exclude_tracking=true')) {
     return true;
