@@ -157,16 +157,6 @@ export function UserDetailModal({
     }
   };
 
-  // Silence old fetchPurchases catch — keep original error handling minimal
-  // (retain previous finally behavior via wrapper above).
-  const _noop = () => {
-    } catch (error) {
-      console.error('Error fetching purchases:', error);
-    } finally {
-      setLoadingPurchases(false);
-    }
-  };
-
   const fetchCorporateDetails = async () => {
     if (!user || !corporateInfo?.corporateSubscriptionId) return;
     
