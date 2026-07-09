@@ -221,7 +221,12 @@ export function UsersManager() {
     setActionLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke('manage-subscription', {
-        body: { user_id: action.userId, action: action.action, plan_type: action.planType }
+        body: {
+          user_id: action.userId,
+          action: action.action,
+          plan_type: action.planType,
+          duration_months: action.durationMonths ?? null,
+        }
       });
       if (error) throw error;
       if (!data?.success) throw new Error(data?.error || 'Unknown error');
@@ -499,7 +504,9 @@ export function UsersManager() {
   const getDialogDescription = () => {
     if (!pendingAction) return '';
     if (pendingAction.action === 'grant') {
-      return `Are you sure you want to grant Premium access to "${pendingAction.userName}"? This gives full access as a manual admin grant and is not counted as paid revenue.`;
+      const d = pendingAction.durationMonths;
+      const period = !d ? 'with no expiration (indefinite)' : `for ${d} month${d === 1 ? '' : 's'}`;
+      return `Grant Premium access to "${pendingAction.userName}" ${period}. This is a manual admin grant (not counted as paid revenue). Renewal reminders and expiry notifications will be sent automatically if a duration is set.`;
     }
     return `Are you sure you want to revoke premium access from "${pendingAction.userName}"? This will set them to the FREE plan and remove their premium benefits.`;
   };
