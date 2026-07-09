@@ -1239,49 +1239,108 @@ async function handleInvoicePaymentFailed(
   const { data: userData } = await supabase.auth.admin.getUserById(existingSub.user_id);
   const userEmail = userData?.user?.email;
 
-  // Update subscription status to past_due
+  // Idempotency: skip if we already sent for this invoice
+  const idemKey = `payment_failed:${invoice.id}`;
+  const { data: already } = await supabase
+    .from('notification_audit_log')
+    .select('id')
+    .eq('notification_type', idemKey)
+    .limit(1)
+    .maybeSingle();
+  if (already) {
+    logStep("Skipping — already notified for this invoice", { invoiceId: invoice.id });
+    return;
+  }
+
+  // Determine which template to use based on Stripe's retry state
+  const isFinal = !invoice.next_payment_attempt;
+  const automationKey = isFinal ? 'payment_failed_final' : 'payment_failed_attempt';
+
+  // Update subscription status
   await supabase
     .from('user_subscriptions')
-    .update({ status: 'past_due' })
+    .update({ status: isFinal ? 'canceled' : 'past_due' })
     .eq('user_id', existingSub.user_id);
 
-  // Send payment failure dashboard notification
-  await supabase
-    .from('user_system_messages')
-    .insert({
-      user_id: existingSub.user_id,
-      subject: '⚠️ Payment Failed',
-      content: '<p class="tiptap-paragraph">We were unable to process your subscription payment.</p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph">Please update your payment method to continue your subscription and maintain access to your premium features.</p><p class="tiptap-paragraph"></p><p class="tiptap-paragraph"><a href="/pricing" style="color: #D4AF37;">Update Payment Method →</a></p>',
-      message_type: MESSAGE_TYPES.PAYMENT_FAILED,
-      is_read: false,
-    });
-  logStep("Payment failure dashboard notification sent");
+  // Load template from admin panel (single source of truth, editable)
+  const { data: tpl } = await supabase
+    .from('automated_message_templates')
+    .select('dashboard_subject, dashboard_content, email_subject, email_content, subject, content')
+    .eq('automation_key', automationKey)
+    .eq('is_active', true)
+    .maybeSingle();
 
-  // Send payment failure email
+  if (!tpl) {
+    logStep("ERROR: template not found", { automationKey });
+    return;
+  }
+
+  // Personalization
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('full_name')
+    .eq('user_id', existingSub.user_id)
+    .maybeSingle();
+  const name = (profile?.full_name || '').split(' ')[0] || 'there';
+  const attempt = invoice.attempt_count ?? 1;
+  const nextRetry = invoice.next_payment_attempt
+    ? new Date(invoice.next_payment_attempt * 1000).toLocaleDateString()
+    : '';
+  const render = (s: string) =>
+    (s || '')
+      .replaceAll('{{name}}', name)
+      .replaceAll('{{attempt}}', String(attempt))
+      .replaceAll('{{next_retry}}', nextRetry);
+
+  const dashSubject = render(tpl.dashboard_subject || tpl.subject || 'Payment failed');
+  const dashContent = render(tpl.dashboard_content || tpl.content || '');
+  const mailSubject = render(tpl.email_subject || tpl.subject || 'Payment failed');
+  const mailContent = render(tpl.email_content || tpl.content || '');
+
+  // Dashboard notification (mandatory — bypasses opt-out)
+  await supabase.from('user_system_messages').insert({
+    user_id: existingSub.user_id,
+    subject: dashSubject,
+    content: dashContent,
+    message_type: MESSAGE_TYPES.PAYMENT_FAILED,
+    is_read: false,
+  });
+  logStep("Payment failure dashboard notification sent", { automationKey });
+
+  // Email (mandatory — bypasses opt-out)
+  let emailOk = false;
   if (userEmail) {
     try {
       const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
       await resend.emails.send({
         from: 'SmartyGym <notifications@smartygym.com>',
         to: [userEmail],
-        subject: '⚠️ Payment Failed - Action Required',
+        subject: mailSubject,
         headers: getEmailHeaders(userEmail),
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <h1 style="color: #d4af37; margin-bottom: 20px;">Payment Failed</h1>
-            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">We were unable to process your subscription payment.</p>
-            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">To continue enjoying your premium features and avoid any interruption to your service, please update your payment method as soon as possible.</p>
-            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">If you have any questions or need assistance, please don't hesitate to contact us.</p>
-            <p style="margin-top: 24px;">
-              <a href="https://smartygym.com/pricing" style="display: inline-block; background: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">Update Payment Method →</a>
-            </p>
-            ${getEmailFooter(userEmail)}
-          </div>
-        `,
+        html: mailContent + getEmailFooter(userEmail),
       });
+      emailOk = true;
       logStep("✅ Payment failure email sent", { email: userEmail });
     } catch (emailError) {
       logStep("ERROR sending payment failure email", { error: emailError });
     }
   }
+
+  // Audit for idempotency
+  await supabase.from('notification_audit_log').insert({
+    notification_type: idemKey,
+    message_type: MESSAGE_TYPES.PAYMENT_FAILED,
+    recipient_count: 1,
+    success_count: emailOk ? 1 : 0,
+    failed_count: emailOk ? 0 : 1,
+    subject: mailSubject,
+    content: mailContent,
+    metadata: {
+      invoice_id: invoice.id,
+      attempt_count: attempt,
+      is_final: isFinal,
+      user_id: existingSub.user_id,
+      source: 'stripe-webhook',
+    },
+  });
 }

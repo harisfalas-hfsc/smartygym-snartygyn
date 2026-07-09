@@ -140,6 +140,12 @@ serve(async (req) => {
     const activeSubscription = subscriptions.data.find((sub: any) => 
       sub.status === 'active' || sub.status === 'trialing'
     );
+    const pastDueSubscription = subscriptions.data.find((sub: any) =>
+      sub.status === 'past_due' || sub.status === 'unpaid'
+    );
+    const responseStatus = activeSubscription
+      ? activeSubscription.status
+      : (pastDueSubscription ? pastDueSubscription.status : null);
     
     let planType = 'free';
     let subscriptionEnd = null;
@@ -349,7 +355,8 @@ serve(async (req) => {
     return new Response(JSON.stringify({
       subscribed: !!activeSubscription,
       plan_type: planType,
-      subscription_end: subscriptionEnd
+      subscription_end: subscriptionEnd,
+      status: responseStatus
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,

@@ -112,6 +112,7 @@ interface SubscriptionInfo {
   subscribed: boolean;
   product_id: string | null;
   subscription_end: string | null;
+  status?: string | null;
 }
 interface CorporateSubscriptionInfo {
   id: string;
@@ -558,7 +559,8 @@ export default function UserDashboard() {
       setSubscriptionInfo({
         subscribed: isSubscribed,
         product_id: dbData?.plan_type || null,
-        subscription_end: dbData?.current_period_end || null
+        subscription_end: dbData?.current_period_end || null,
+        status: dbData?.status || null
       });
       if (dbData?.current_period_start && dbData?.current_period_end) {
         setStripeDetails({
@@ -845,6 +847,28 @@ export default function UserDashboard() {
                 </div>}
 
               {/* Premium Plan - Two Column Layout with Title in Left Column - Only show if not admin */}
+            {!isAdmin && subscriptionInfo.status === 'past_due' && !subscriptionInfo.subscribed && (
+              <div className="rounded-md border border-red-300 bg-red-50 dark:bg-red-950/30 dark:border-red-800 p-3 mb-3">
+                <p className="text-sm font-semibold text-red-700 dark:text-red-300">
+                  ⚠️ Your last renewal payment failed
+                </p>
+                <p className="text-xs text-red-700/80 dark:text-red-300/80 mt-1">
+                  Update your card in the Stripe portal to retry the charge and restore Premium.
+                </p>
+                <button
+                  onClick={async () => {
+                    try {
+                      const { data, error } = await supabase.functions.invoke('customer-portal');
+                      if (error) throw error;
+                      if (data?.url) window.location.href = data.url;
+                    } catch (err) { console.error('Portal error:', err); }
+                  }}
+                  className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-white bg-red-600 hover:bg-red-700 rounded px-3 py-1.5"
+                >
+                  Update payment & retry →
+                </button>
+              </div>
+            )}
             {!isAdmin && subscriptionInfo.subscribed && <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                   {/* LEFT COLUMN - Title + Plan Info & Actions */}
                   <div className="col-span-1 md:col-span-2 space-y-3">
@@ -870,6 +894,28 @@ export default function UserDashboard() {
 
                     {/* Subscription Details */}
                     <div className="space-y-2 text-sm">
+                      {subscriptionInfo.status === 'past_due' && (
+                        <div className="rounded-md border border-red-300 bg-red-50 dark:bg-red-950/30 dark:border-red-800 p-2 mb-2">
+                          <p className="text-xs font-semibold text-red-700 dark:text-red-300">
+                            ⚠️ Your last renewal payment failed
+                          </p>
+                          <p className="text-[11px] text-red-700/80 dark:text-red-300/80 mt-0.5">
+                            Update your card to restore Premium and retry now.
+                          </p>
+                          <button
+                            onClick={async () => {
+                              try {
+                                const { data, error } = await supabase.functions.invoke('customer-portal');
+                                if (error) throw error;
+                                if (data?.url) window.location.href = data.url;
+                              } catch (err) { console.error('Portal error:', err); }
+                            }}
+                            className="mt-1.5 inline-flex items-center gap-1 text-[11px] font-semibold text-white bg-red-600 hover:bg-red-700 rounded px-2 py-1"
+                          >
+                            Update payment & retry →
+                          </button>
+                        </div>
+                      )}
                       {['lifetime', 'legacy_premium'].includes(subscriptionInfo.product_id || '') ? (
                         <>
                           <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300">
