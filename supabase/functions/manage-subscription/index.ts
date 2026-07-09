@@ -61,8 +61,8 @@ serve(async (req) => {
     logStep("Admin verified");
 
     // Parse request body
-    const { user_id, action, plan_type } = await req.json();
-    logStep("Request params", { user_id, action, plan_type });
+    const { user_id, action, plan_type, duration_months } = await req.json();
+    logStep("Request params", { user_id, action, plan_type, duration_months });
 
     if (!user_id || !action) {
       throw new Error('Missing required parameters: user_id and action');
@@ -95,7 +95,15 @@ serve(async (req) => {
     const nowISO = now.toISOString();
 
     if (action === 'grant') {
-      logStep("Granting Premium Membership", { user_id });
+      // Optional duration in months. Omit / 0 / null = indefinite (no auto-expiry).
+      let periodEndISO: string | null = null;
+      const months = Number(duration_months);
+      if (Number.isFinite(months) && months > 0) {
+        const end = new Date(now);
+        end.setMonth(end.getMonth() + months);
+        periodEndISO = end.toISOString();
+      }
+      logStep("Granting Premium Membership", { user_id, months, periodEndISO });
 
       const { error: upsertError } = await supabaseAdmin
         .from('user_subscriptions')
@@ -104,7 +112,7 @@ serve(async (req) => {
           plan_type: 'premium',
           status: 'active',
           current_period_start: nowISO,
-          current_period_end: null, // Manual grant — no automatic expiration
+          current_period_end: periodEndISO, // null = indefinite; otherwise auto-expires
           cancel_at_period_end: false,
           stripe_customer_id: null,
           stripe_subscription_id: null,
@@ -169,8 +177,10 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ 
           success: true, 
-          message: 'Premium Membership granted.',
-          expires: null
+          message: periodEndISO
+            ? `Premium Membership granted for ${months} month${months === 1 ? '' : 's'}.`
+            : 'Premium Membership granted (no expiration).',
+          expires: periodEndISO
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
