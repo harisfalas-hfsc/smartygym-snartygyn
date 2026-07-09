@@ -16,7 +16,7 @@ import { User as SupabaseUser } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import smartyGymIcon from "@/assets/smarty-gym-icon.png";
-import smartyGymIconTransparent from "@/assets/smarty-gym-icon-transparent.png";
+import smartyGymIconTransparent from "@/assets/smarty-gym-icon-noborder.png";
 import harisPhoto from "@/assets/haris-falas-coach.png";
 import { MobilePhoneIllustration } from "@/components/MobilePhoneIllustration";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -956,9 +956,9 @@ const Index = () => {
             </p>
           </div>
 
-          {/* Featured sub-sections — no outer card, breathable spacing */}
+          {/* Featured sub-sections — wrapped in blue-bordered card */}
           <div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            <div className="rounded-2xl border-2 border-primary/60 bg-card/50 p-4 md:p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
               {([
                 {
                   key: 'workouts',
