@@ -548,19 +548,39 @@ export function UserDetailModal({
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm flex items-center gap-2">
                     <ShoppingBag className="h-4 w-4" />
-                    Purchase History ({purchases.length})
+                    Payment History ({stripeInvoices.length + purchases.length})
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {loadingPurchases ? (
-                    <p className="text-muted-foreground text-sm">Loading...</p>
-                  ) : purchases.length === 0 ? (
-                    <p className="text-muted-foreground text-sm">No purchases found</p>
+                  {(loadingPurchases || loadingStripe) ? (
+                    <p className="text-muted-foreground text-sm">Loading…</p>
+                  ) : stripeInvoices.length === 0 && purchases.length === 0 ? (
+                    <p className="text-muted-foreground text-sm">No payments found</p>
                   ) : (
                     <div className="space-y-2">
+                      {stripeInvoices.map((inv) => (
+                        <div
+                          key={inv.id}
+                          className="flex items-center justify-between p-2 bg-muted/50 rounded-lg text-sm"
+                        >
+                          <div>
+                            <p className="font-medium">
+                              {inv.hosted_invoice_url ? (
+                                <a href={inv.hosted_invoice_url} target="_blank" rel="noreferrer" className="underline">
+                                  {inv.description}
+                                </a>
+                              ) : inv.description}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Stripe invoice{inv.number ? ` #${inv.number}` : ''} • {format(new Date(inv.created * 1000), 'MMM d, yyyy')}
+                            </p>
+                          </div>
+                          <Badge variant="default">{inv.currency === 'EUR' ? '€' : inv.currency + ' '}{inv.amount_paid.toFixed(2)}</Badge>
+                        </div>
+                      ))}
                       {purchases.map((purchase) => (
-                        <div 
-                          key={purchase.id} 
+                        <div
+                          key={purchase.id}
                           className="flex items-center justify-between p-2 bg-muted/50 rounded-lg text-sm"
                         >
                           <div>
