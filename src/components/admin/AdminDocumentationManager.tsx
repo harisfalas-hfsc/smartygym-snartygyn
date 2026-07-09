@@ -255,7 +255,7 @@ WHY SMARTYGYM?
 • Progress Tracking & Analytics
 
 MEMBERSHIP:
-• SmartyGym Premium: €6.99/month — full access to every workout, training program, and tool. Cancel anytime.
+• SmartyGym Premium: €9.99/month — full access to every workout, training program, and tool. Cancel anytime.
 
 Start your transformation at smartygym.com`;
 

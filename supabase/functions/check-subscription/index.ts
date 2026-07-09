@@ -188,8 +188,8 @@ serve(async (req) => {
       // Map any active legacy subscription to `legacy_premium` so the user
       // keeps premium access while we honor what they already paid for, and
       // so analytics can still distinguish them from new Lifetime members.
-      if (priceId === 'price_1Tqn9EIxQYg9inGKWXTdr3bS' || productMetaPlan === 'premium') {
-        // Active Premium Monthly subscription (€6.99/mo)
+      if (priceId === 'price_1Tr93GIxQYg9inGKhIZLvoB2' || productMetaPlan === 'premium') {
+        // Active Premium Monthly subscription (€9.99/mo)
         planType = 'premium';
         logStep("Matched active Premium Monthly subscription", { priceId });
       } else if (productMetaPlan === 'gold' || productMetaPlan === 'platinum' ||

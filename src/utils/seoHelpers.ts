@@ -655,12 +655,12 @@ export const generateMobileApplicationSchema = () => ({
   "offers": {
     "@type": "AggregateOffer",
     "lowPrice": "0",
-    "highPrice": "6.99",
+    "highPrice": "9.99",
     "priceCurrency": "EUR",
     "offerCount": 2,
     "offers": [
       { "@type": "Offer", "name": "Free Plan", "price": "0", "priceCurrency": "EUR" },
-      { "@type": "Offer", "name": "SmartyGym Premium Membership", "price": "6.99", "priceCurrency": "EUR" }
+      { "@type": "Offer", "name": "SmartyGym Premium Membership", "price": "9.99", "priceCurrency": "EUR" }
     ]
   },
   "creator": {
@@ -924,7 +924,7 @@ export const generateTestimonialsSchema = (testimonials: Array<{
     "offers": {
       "@type": "AggregateOffer",
       "lowPrice": "0",
-      "highPrice": "6.99",
+      "highPrice": "9.99",
       "priceCurrency": "EUR",
       "offerCount": 3
     },

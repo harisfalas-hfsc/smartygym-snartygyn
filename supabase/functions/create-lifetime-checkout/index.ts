@@ -7,9 +7,9 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Premium Monthly subscription — €6.99/month recurring.
+// Premium Monthly subscription — €9.99/month recurring.
 // (Function name kept for backward compatibility with existing clients.)
-const PREMIUM_MONTHLY_PRICE_ID = "price_1Tqn9EIxQYg9inGKWXTdr3bS";
+const PREMIUM_MONTHLY_PRICE_ID = "price_1Tr93GIxQYg9inGKhIZLvoB2";
 const PREMIUM_MONTHLY_PRODUCT_ID = "prod_UqU78UzgA2ckcP";
 
 const logStep = (step: string, details?: unknown) => {

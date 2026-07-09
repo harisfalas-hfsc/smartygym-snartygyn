@@ -882,7 +882,7 @@ export default function UserDashboard() {
                       ) : (
                         <>
                           <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300">
-                            Monthly — €6.99
+                            Monthly — €9.99
                           </Badge>
                           <p className="text-xs text-muted-foreground">
                             {subscriptionInfo.subscription_end
