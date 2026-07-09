@@ -1140,8 +1140,6 @@ const Index = () => {
         </section>
       </div>
         </LazySection>
-          }
-
     </div>
     </>;
 };
