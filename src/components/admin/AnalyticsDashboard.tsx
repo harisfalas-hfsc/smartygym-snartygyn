@@ -23,7 +23,6 @@ import { GrowthAnalytics } from "./analytics/GrowthAnalytics";
 import { PopularAnalytics } from "./analytics/PopularAnalytics";
 import { BusinessReportExport } from "./analytics/BusinessReportExport";
 import html2canvas from "html2canvas";
-import { CORPORATE_PRICES } from "@/config/pricing";
 import {
   fetchWorkoutLibraryCounts,
   fetchAvailableProgramsCount,
@@ -43,6 +42,7 @@ interface AnalyticsData {
   premiumPaid: number;
   freeUsers: number;
   totalRevenue: number;          // Only from PAID subscriptions
+  stripePaymentCount: number;
   avgWorkoutCompletionRate: number;
   avgProgramCompletionRate: number;
   totalWorkouts: number;
@@ -85,6 +85,7 @@ export function AnalyticsDashboard() {
     premiumPaid: 0,
     freeUsers: 0,
     totalRevenue: 0,
+    stripePaymentCount: 0,
     avgWorkoutCompletionRate: 0,
     avgProgramCompletionRate: 0,
     totalWorkouts: 0,
@@ -368,6 +369,7 @@ export function AnalyticsDashboard() {
         premiumPaid,
         freeUsers,
         totalRevenue,
+        stripePaymentCount,
         avgWorkoutCompletionRate,
         avgProgramCompletionRate,
         totalWorkouts: workoutCounts.availableWorkouts,
@@ -502,7 +504,7 @@ export function AnalyticsDashboard() {
         <AnalyticsMetricCard 
           title="Paid Revenue" 
           value={`€${analytics.totalRevenue.toFixed(2)}`} 
-          subtitle={`${stripePaymentCount} Stripe payments • net of refunds`}
+          subtitle={`${analytics.stripePaymentCount} Stripe payments • net of refunds`}
           icon={DollarSign}
         />
       </div>

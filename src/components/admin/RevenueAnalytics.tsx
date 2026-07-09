@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import html2canvas from "html2canvas";
-import { SUBSCRIPTION_PRICES, CORPORATE_PRICES } from "@/config/pricing";
+import { CORPORATE_PRICES } from "@/config/pricing";
 import { StripeRevenueTruth } from "./analytics/StripeRevenueTruth";
 import { fetchStripeRevenueTruth } from "@/lib/admin-analytics";
 
