@@ -608,9 +608,9 @@ const Index = () => {
           <div className="text-center max-w-3xl mx-auto mb-6 md:mb-10">
             <div className="flex justify-center mb-4">
               <img
-                src="/icon-512.png"
+                src={smartyGymIconTransparent}
                 alt="SmartyGym"
-                className="w-16 h-16 md:w-20 md:h-20 rounded-2xl shadow-lg"
+                className="w-20 h-20 md:w-24 md:h-24 object-contain"
                 loading="eager"
               />
             </div>
@@ -622,16 +622,131 @@ const Index = () => {
             </p>
           </div>
 
-          {/* One outer card containing sub-cards */}
+          {/* One outer card containing sub-cards with real featured items */}
           <div className="rounded-2xl border-2 border-primary/40 bg-card p-4 md:p-6 shadow-sm">
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
               {([
-                { route: '/workout', title: 'Featured Workouts', description: 'Expert-designed sessions for every goal', icon: Dumbbell, image: heroWorkoutsImage },
-                { route: '/trainingprogram', title: 'Featured Programs', description: 'Structured multi-week training plans', icon: Calendar, image: heroProgramsImage },
-                { route: '/blog', title: 'Featured Blog', description: 'Fitness, nutrition & wellness insights', icon: FileText, image: heroBlogImage },
-                { route: '/tools', title: 'Featured Tools', description: 'Calculators, timers & trackers', icon: Wrench, image: heroToolsImage },
+                {
+                  key: 'workouts',
+                  route: '/workout',
+                  title: 'Featured Workouts',
+                  icon: Dumbbell,
+                  cta: 'Explore all workouts',
+                  items: (latestWorkouts as WorkoutData[]).slice(0, 3).map((w) => ({
+                    id: w.id,
+                    title: w.name,
+                    meta: [w.duration, w.difficulty].filter(Boolean).join(' · ') || w.category,
+                    image: w.image_url || '/images/workouts/wod-card-mobile.jpg',
+                    route: `/workout/${workoutCategoryToSlug(w.category)}/${w.id}`,
+                  })),
+                },
+                {
+                  key: 'programs',
+                  route: '/trainingprogram',
+                  title: 'Featured Programs',
+                  icon: Calendar,
+                  cta: 'Explore all programs',
+                  items: (latestPrograms as VisibleProgramMetadata[]).slice(0, 3).map((p) => ({
+                    id: p.id,
+                    title: p.name,
+                    meta: [p.weeks ? `${p.weeks} weeks` : null, p.difficulty].filter(Boolean).join(' · ') || p.category,
+                    image: getProgramCardImage(p.category, p.image_url),
+                    route: `/trainingprogram/${programCategoryToSlug(p.category)}/${p.id}`,
+                  })),
+                },
+                {
+                  key: 'blog',
+                  route: '/blog',
+                  title: 'Featured Blog',
+                  icon: FileText,
+                  cta: 'Read the blog',
+                  items: (latestArticles as BlogArticleCard[]).slice(0, 3).map((a) => ({
+                    id: a.id,
+                    title: a.title,
+                    meta: [a.read_time, a.category].filter(Boolean).join(' · '),
+                    image: getBlogArticleImage(a.image_url, a.slug),
+                    route: `/blog/${a.slug}.html`,
+                  })),
+                },
+                {
+                  key: 'tools',
+                  route: '/tools',
+                  title: 'Featured Tools',
+                  icon: Wrench,
+                  cta: 'Open all tools',
+                  items: [
+                    { id: 'timer', title: 'Workout Timer', meta: 'HIIT · Tabata · EMOM', image: heroToolsImage, route: '/tools/workout-timer' },
+                    { id: '1rm', title: '1RM Calculator', meta: 'Find your one-rep max', image: heroToolsImage, route: '/tools/1rm-calculator' },
+                    { id: 'macro', title: 'Macro Calculator', meta: 'Personalized nutrition', image: heroToolsImage, route: '/tools/macro-calculator' },
+                  ],
+                },
+              ]).map((section) => {
+                const SectionIcon = section.icon;
+                return (
+                  <div
+                    key={section.key}
+                    className="flex flex-col bg-background border-2 border-green-500/50 rounded-xl overflow-hidden hover:border-green-500 hover:shadow-lg transition-all duration-300"
+                  >
+                    <div className="flex items-center gap-2 px-3 py-2.5 border-b border-border/50 bg-muted/30">
+                      <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <SectionIcon className="w-3.5 h-3.5 text-primary" />
+                      </div>
+                      <h3 className="text-sm md:text-base font-bold text-foreground leading-tight">{section.title}</h3>
+                    </div>
+                    <div className="flex flex-col divide-y divide-border/40 flex-1">
+                      {section.items.length > 0 ? section.items.map((item) => (
+                        <button
+                          key={item.id}
+                          type="button"
+                          onClick={() => navigate(item.route)}
+                          className="group flex items-stretch text-left hover:bg-muted/40 transition-colors"
+                          aria-label={item.title}
+                        >
+                          <div className="relative w-16 md:w-20 flex-shrink-0 bg-muted overflow-hidden">
+                            <img
+                              src={item.image}
+                              alt={item.title}
+                              loading="lazy"
+                              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0 px-2.5 py-2 flex flex-col justify-center">
+                            <h4 className="text-[12px] md:text-[13px] font-semibold text-foreground leading-tight line-clamp-2">{item.title}</h4>
+                            {item.meta && (
+                              <p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-1">{item.meta}</p>
+                            )}
+                          </div>
+                        </button>
+                      )) : (
+                        Array.from({ length: 3 }).map((_, i) => (
+                          <div key={i} className="flex items-stretch">
+                            <div className="w-16 md:w-20 h-14 bg-muted animate-pulse flex-shrink-0" />
+                            <div className="flex-1 px-2.5 py-2 space-y-1">
+                              <div className="h-3 w-3/4 bg-muted animate-pulse rounded" />
+                              <div className="h-2 w-1/2 bg-muted animate-pulse rounded" />
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => navigate(section.route)}
+                      className="flex items-center justify-center gap-1 px-3 py-2 text-[11px] md:text-xs font-semibold text-primary hover:bg-primary/5 border-t border-border/50 transition-colors"
+                    >
+                      {section.cta}
+                      <ChevronRight className="w-3 h-3" />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Second row: Exercise Library + Community (wider promo cards) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 mt-3 md:mt-4">
+              {([
                 { route: '/exerciselibrary', title: 'Exercise Library', description: 'Video demos for every exercise', icon: Video, image: heroLibraryBookImage },
-                { route: '/community', title: 'Community', description: 'Share progress and connect', icon: Users, image: heroCommunityCelebratingImage },
+                { route: '/community', title: 'Community', description: 'Share progress, leaderboards & challenges', icon: Users, image: heroCommunityCelebratingImage },
               ]).map((card) => {
                 const Icon = card.icon;
                 return (
@@ -639,10 +754,10 @@ const Index = () => {
                     key={card.route}
                     type="button"
                     onClick={() => navigate(card.route)}
-                    className="group flex flex-col bg-background border-2 border-green-500/50 rounded-xl overflow-hidden hover:border-green-500 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 text-left"
+                    className="group flex items-stretch bg-background border-2 border-green-500/50 rounded-xl overflow-hidden hover:border-green-500 hover:shadow-lg transition-all duration-300 text-left"
                     aria-label={card.title}
                   >
-                    <div className="relative aspect-[16/9] w-full overflow-hidden bg-muted">
+                    <div className="relative w-28 md:w-36 flex-shrink-0 bg-muted overflow-hidden">
                       <img
                         src={card.image}
                         alt={card.title}
@@ -650,16 +765,14 @@ const Index = () => {
                         className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                     </div>
-                    <div className="p-3 flex-1 flex flex-col">
+                    <div className="flex-1 min-w-0 p-3 md:p-4 flex flex-col justify-center">
                       <div className="flex items-center gap-2 mb-1">
                         <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                           <Icon className="w-3.5 h-3.5 text-primary" />
                         </div>
                         <h3 className="text-sm md:text-base font-bold text-foreground leading-tight">{card.title}</h3>
                       </div>
-                      <p className="text-[11px] md:text-xs text-muted-foreground leading-snug line-clamp-2">
-                        {card.description}
-                      </p>
+                      <p className="text-[11px] md:text-xs text-muted-foreground leading-snug line-clamp-2">{card.description}</p>
                       <div className="flex items-center gap-1 text-primary text-[11px] font-semibold mt-2 group-hover:gap-2 transition-all">
                         Explore <ChevronRight className="w-3 h-3" />
                       </div>
