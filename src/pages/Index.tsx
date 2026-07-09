@@ -603,8 +603,341 @@ const Index = () => {
       </section>
 
       <div className="min-h-screen bg-background overflow-x-hidden">
-        {/* Unified SmartyMove-style hero (mobile + desktop) */}
-        <section className="container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6 pt-4 md:pt-8 pb-4">
+        {/* Mobile hero (restored original) */}
+        <section className="md:hidden pt-0 pb-2 px-4">
+            {/* Mobile hero tagline */}
+            <div className="text-center mb-4 mt-2">
+              <p className="text-[11px] font-bold tracking-[0.2em] uppercase text-primary mb-2">
+                Science-Backed · Expert-Designed
+              </p>
+              <h1 className="text-4xl font-extrabold tracking-tight uppercase leading-[1.05] text-foreground">
+                Train <span className="text-primary">Smarter.</span>
+                <br />
+                Not Harder.
+              </h1>
+              <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-muted-foreground mt-3 leading-snug">
+                <span className="block">Expert Workouts · Training Programs</span>
+                <span className="block">Blog Insights · Smarty Tools</span>
+                <span className="block text-primary">All In Your Pocket.</span>
+              </p>
+            </div>
+
+            {/* Workouts carousel title */}
+            <div className="flex items-center justify-center gap-4 mb-4">
+              <button type="button" onClick={() => carouselApi?.scrollPrev()} className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Previous card">
+                <ChevronLeft className="h-5 w-5 text-primary" />
+              </button>
+              <button type="button" onClick={() => navigate('/workout')} className="text-lg sm:text-2xl font-extrabold tracking-tight text-primary uppercase whitespace-nowrap hover:underline" aria-label="Open Smarty Workouts">
+                Smarty Workouts
+              </button>
+              <button type="button" onClick={() => carouselApi?.scrollNext()} className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Next card">
+                <ChevronRight className="h-5 w-5 text-primary" />
+              </button>
+            </div>
+
+            <Carousel className="w-full" opts={{ align: "center", loop: true }} setApi={setCarouselApi}>
+              <CarouselContent className="-ml-3">
+                {heroCards.map((card, index) => {
+                  const Icon = card.icon;
+                  return (
+                    <CarouselItem key={card.id} className="pl-3 basis-[75%] sm:basis-[60%]">
+                      <div onClick={() => navigate(card.route)} className="border-2 border-green-500/60 rounded-xl overflow-hidden hover:border-green-500 hover:scale-[1.02] hover:shadow-xl transition-all duration-300 cursor-pointer bg-card flex flex-col">
+                        <div className="relative aspect-[16/8] w-full overflow-hidden flex-shrink-0">
+                          <img src={card.image} alt={card.title} loading={index === 0 ? "eager" : "lazy"} decoding="async" className="absolute inset-0 w-full h-full object-cover object-[center_top]" />
+                        </div>
+                        <div className="flex flex-col justify-center flex-1 p-2 text-center">
+                          <div className="flex items-center justify-center gap-1.5 mb-0.5">
+                            <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                              <Icon className="w-3 h-3 text-primary" />
+                            </div>
+                            <h3 className="text-xs font-bold text-foreground leading-tight whitespace-nowrap">{card.title}</h3>
+                          </div>
+                          <p className="text-[10px] text-muted-foreground leading-snug line-clamp-2">{card.description}</p>
+                          <div className="flex items-center justify-center gap-1 text-primary text-[9px] font-medium mt-0.5">
+                            Explore<ChevronRight className="w-2.5 h-2.5" />
+                          </div>
+                        </div>
+                      </div>
+                    </CarouselItem>
+                  );
+                })}
+              </CarouselContent>
+            </Carousel>
+
+            <div className="flex justify-center gap-2 mt-4">
+              {heroCards.map((_, index) => (
+                <button key={index} onClick={() => carouselApi?.scrollTo(index)} className={cn("w-2.5 h-2.5 rounded-full transition-all duration-300", currentSlide === index ? "bg-primary scale-125" : "bg-primary/30 hover:bg-primary/50")} aria-label={`Go to slide ${index + 1}`} />
+              ))}
+            </div>
+
+            {latestWorkouts.length > 0 && (
+              <div className="mt-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-sm font-extrabold tracking-tight text-primary uppercase">Featured Workouts</span>
+                  <div className="h-px flex-1 bg-primary/20" />
+                </div>
+                <div className="flex flex-col gap-3">
+                  {latestWorkouts.slice(0, 3).map((w: WorkoutData) => {
+                    const slug = workoutCategoryToSlug(w.category);
+                    const image = w.image_url || "/images/workouts/wod-card-mobile.jpg";
+                    return (
+                      <button key={w.id} type="button" onClick={() => navigate(`/workout/${slug}/${w.id}`)} className="flex items-stretch bg-card border-2 border-green-500/60 rounded-xl overflow-hidden hover:border-green-500 hover:shadow-xl transition-all duration-300 text-left">
+                        <div className="relative w-28 flex-shrink-0 bg-muted">
+                          <img src={image} alt={w.name} loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
+                        </div>
+                        <div className="flex-1 min-w-0 p-3 flex flex-col justify-center">
+                          <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">{w.category}</span>
+                          <h3 className="text-sm font-bold text-foreground leading-tight line-clamp-2 mt-0.5">{w.name}</h3>
+                          {(w.duration || w.difficulty) && (
+                            <p className="text-[11px] text-muted-foreground mt-1 line-clamp-1">
+                              {[w.duration, w.difficulty].filter(Boolean).join(" · ")}
+                            </p>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            <div className="mt-8 space-y-6">
+              {/* Training Programs Carousel */}
+              <div className="pt-2">
+                <div className="flex items-center justify-center gap-4 mb-4">
+                  <button type="button" onClick={() => programsCarouselApi?.scrollPrev()} className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Previous program">
+                    <ChevronLeft className="h-5 w-5 text-primary" />
+                  </button>
+                  <button type="button" onClick={() => navigate('/trainingprogram')} className="text-lg sm:text-2xl font-extrabold tracking-tight text-primary uppercase whitespace-nowrap hover:underline" aria-label="Open Smarty Programs">
+                    Smarty Programs
+                  </button>
+                  <button type="button" onClick={() => programsCarouselApi?.scrollNext()} className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Next program">
+                    <ChevronRight className="h-5 w-5 text-primary" />
+                  </button>
+                </div>
+                <Carousel className="w-full" opts={{ align: "center", loop: true }} setApi={setProgramsCarouselApi}>
+                  <CarouselContent className="-ml-3">
+                    {programCards.map((card) => {
+                      const Icon = card.icon;
+                      return (
+                        <CarouselItem key={card.id} className="pl-3 basis-[75%] sm:basis-[60%]">
+                          <div onClick={() => navigate(card.route)} className="border-2 border-green-500/60 rounded-xl overflow-hidden hover:border-green-500 hover:scale-[1.02] hover:shadow-xl transition-all duration-300 cursor-pointer bg-card flex flex-col">
+                            <div className="relative aspect-[16/8] w-full overflow-hidden flex-shrink-0">
+                              <img src={card.image} alt={card.title} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover object-center" />
+                            </div>
+                            <div className="flex flex-col justify-center flex-1 p-2 text-center">
+                              <div className="flex items-center justify-center gap-1.5 mb-0.5">
+                                <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                  <Icon className="w-3 h-3 text-primary" />
+                                </div>
+                                <h3 className="text-xs font-bold text-foreground leading-tight whitespace-nowrap">{card.title}</h3>
+                              </div>
+                              <p className="text-[10px] text-muted-foreground leading-snug line-clamp-2">{card.description}</p>
+                              <div className="flex items-center justify-center gap-1 text-primary text-[9px] font-medium mt-0.5">
+                                Explore<ChevronRight className="w-2.5 h-2.5" />
+                              </div>
+                            </div>
+                          </div>
+                        </CarouselItem>
+                      );
+                    })}
+                  </CarouselContent>
+                </Carousel>
+                <div className="flex justify-center gap-2 mt-3">
+                  {programCards.map((_, index) => (
+                    <button key={index} onClick={() => programsCarouselApi?.scrollTo(index)} className={cn("w-2.5 h-2.5 rounded-full transition-all duration-300", programsSlide === index ? "bg-primary scale-125" : "bg-primary/30 hover:bg-primary/50")} aria-label={`Go to program ${index + 1}`} />
+                  ))}
+                </div>
+
+                {latestPrograms.length > 0 && (
+                  <div className="mt-6">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-sm font-extrabold tracking-tight text-primary uppercase">Featured Training Programs</span>
+                      <div className="h-px flex-1 bg-primary/20" />
+                    </div>
+                    <div className="flex flex-col gap-3">
+                      {latestPrograms.slice(0, 3).map((p: VisibleProgramMetadata) => {
+                        const slug = programCategoryToSlug(p.category);
+                        const image = getProgramCardImage(p.category, p.image_url);
+                        return (
+                          <button key={p.id} type="button" onClick={() => navigate(`/trainingprogram/${slug}/${p.id}`)} className="group flex h-[96px] items-stretch overflow-hidden rounded-xl border-2 border-green-500/60 bg-card text-left transition-all duration-300 hover:border-green-500 hover:shadow-xl">
+                            <div className="relative h-full w-28 flex-shrink-0 overflow-hidden bg-muted">
+                              <img src={image} alt={p.name} loading="lazy" className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105" />
+                            </div>
+                            <div className="flex-1 min-w-0 p-3 flex flex-col justify-center">
+                              <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">{p.category}</span>
+                              <h3 className="text-sm font-bold text-foreground leading-tight line-clamp-2 mt-0.5">{p.name}</h3>
+                              {(p.weeks || p.difficulty) && (
+                                <p className="text-[11px] text-muted-foreground mt-1 line-clamp-1">
+                                  {[p.weeks ? `${p.weeks} weeks` : null, p.difficulty].filter(Boolean).join(" · ")}
+                                </p>
+                              )}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Blog Categories Carousel */}
+              <div className="pt-2">
+                <div className="flex items-center justify-center gap-4 mb-4">
+                  <button type="button" onClick={() => blogCarouselApi?.scrollPrev()} className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Previous category">
+                    <ChevronLeft className="h-5 w-5 text-primary" />
+                  </button>
+                  <button type="button" onClick={() => navigate('/blog')} className="text-lg sm:text-2xl font-extrabold tracking-tight text-primary uppercase whitespace-nowrap hover:underline" aria-label="Open Smarty Blog">
+                    Smarty Blog
+                  </button>
+                  <button type="button" onClick={() => blogCarouselApi?.scrollNext()} className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Next category">
+                    <ChevronRight className="h-5 w-5 text-primary" />
+                  </button>
+                </div>
+                <Carousel className="w-full" opts={{ align: "center", loop: true }} setApi={setBlogCarouselApi}>
+                  <CarouselContent className="-ml-3">
+                    {blogCards.map((card) => {
+                      const Icon = card.icon;
+                      return (
+                        <CarouselItem key={card.id} className="pl-3 basis-[75%] sm:basis-[60%]">
+                          <div onClick={() => navigate(card.route)} className="border-2 border-green-500/60 rounded-xl overflow-hidden hover:border-green-500 hover:scale-[1.02] hover:shadow-xl transition-all duration-300 cursor-pointer bg-card flex flex-col">
+                            <div className="relative aspect-[16/8] w-full overflow-hidden flex-shrink-0">
+                              <img src={card.image} alt={card.title} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover object-center" />
+                            </div>
+                            <div className="flex flex-col justify-center flex-1 p-2 text-center">
+                              <div className="flex items-center justify-center gap-1.5 mb-0.5">
+                                <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                  <Icon className="w-3 h-3 text-primary" />
+                                </div>
+                                <h3 className="text-xs font-bold text-foreground leading-tight whitespace-nowrap">{card.title}</h3>
+                              </div>
+                              <p className="text-[10px] text-muted-foreground leading-snug line-clamp-2">{card.description}</p>
+                              <div className="flex items-center justify-center gap-1 text-primary text-[9px] font-medium mt-0.5">
+                                Read<ChevronRight className="w-2.5 h-2.5" />
+                              </div>
+                            </div>
+                          </div>
+                        </CarouselItem>
+                      );
+                    })}
+                  </CarouselContent>
+                </Carousel>
+                <div className="flex justify-center gap-2 mt-3">
+                  {blogCards.map((_, index) => (
+                    <button key={index} onClick={() => blogCarouselApi?.scrollTo(index)} className={cn("w-2.5 h-2.5 rounded-full transition-all duration-300", blogSlide === index ? "bg-primary scale-125" : "bg-primary/30 hover:bg-primary/50")} aria-label={`Go to blog category ${index + 1}`} />
+                  ))}
+                </div>
+
+                {latestArticles.length > 0 && (
+                  <div className="mt-6">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-sm font-extrabold tracking-tight text-primary uppercase">Featured Articles</span>
+                      <div className="h-px flex-1 bg-primary/20" />
+                    </div>
+                    <div className="flex flex-col gap-3">
+                      {latestArticles.map((a: BlogArticleCard) => {
+                        const image = getBlogArticleImage(a.image_url, a.slug);
+                        return (
+                          <button key={a.id} type="button" onClick={() => navigate(`/blog/${a.slug}.html`)} className="flex items-stretch bg-card border-2 border-green-500/60 rounded-xl overflow-hidden hover:border-green-500 hover:shadow-xl transition-all duration-300 text-left" aria-label={a.title}>
+                            <div className="relative w-28 flex-shrink-0 bg-muted">
+                              <img src={image} alt={a.title} loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
+                            </div>
+                            <div className="flex-1 min-w-0 p-3 flex flex-col justify-center">
+                              <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">{a.category}</span>
+                              <h3 className="text-sm font-bold text-foreground leading-tight line-clamp-2 mt-0.5">{a.title}</h3>
+                              {(a.read_time || a.published_at || a.created_at) && (
+                                <p className="text-[11px] text-muted-foreground mt-1 line-clamp-1">
+                                  {[a.read_time, new Date(a.published_at || a.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })].filter(Boolean).join(" · ")}
+                                </p>
+                              )}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Smarty Tools Carousel */}
+              <div className="pt-2">
+                <div className="flex items-center justify-center gap-4 mb-4">
+                  <button type="button" onClick={() => toolsCarouselApi?.scrollPrev()} className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Previous tool">
+                    <ChevronLeft className="h-5 w-5 text-primary" />
+                  </button>
+                  <button type="button" onClick={() => navigate('/tools')} className="text-lg sm:text-2xl font-extrabold tracking-tight text-primary uppercase whitespace-nowrap hover:underline" aria-label="Open Smarty Tools">
+                    Smarty Tools
+                  </button>
+                  <button type="button" onClick={() => toolsCarouselApi?.scrollNext()} className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Next tool">
+                    <ChevronRight className="h-5 w-5 text-primary" />
+                  </button>
+                </div>
+                <Carousel className="w-full" opts={{ align: "center", loop: true }} setApi={setToolsCarouselApi}>
+                  <CarouselContent className="-ml-3">
+                    {toolsCards.map((card) => {
+                      const Icon = card.icon;
+                      return (
+                        <CarouselItem key={card.id} className="pl-3 basis-[75%] sm:basis-[60%]">
+                          <div onClick={() => navigate(card.route)} className="border-2 border-green-500/60 rounded-xl overflow-hidden hover:border-green-500 hover:scale-[1.02] hover:shadow-xl transition-all duration-300 cursor-pointer bg-card flex flex-col">
+                            <div className="relative aspect-[16/8] w-full overflow-hidden flex-shrink-0">
+                              <img src={card.image} alt={card.title} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover object-center" />
+                            </div>
+                            <div className="flex flex-col justify-center flex-1 p-2 text-center">
+                              <div className="flex items-center justify-center gap-1.5 mb-0.5">
+                                <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                  <Icon className="w-3 h-3 text-primary" />
+                                </div>
+                                <h3 className="text-xs font-bold text-foreground leading-tight whitespace-nowrap">{card.title}</h3>
+                              </div>
+                              <p className="text-[10px] text-muted-foreground leading-snug line-clamp-2">{card.description}</p>
+                              <div className="flex items-center justify-center gap-1 text-primary text-[9px] font-medium mt-0.5">
+                                Open<ChevronRight className="w-2.5 h-2.5" />
+                              </div>
+                            </div>
+                          </div>
+                        </CarouselItem>
+                      );
+                    })}
+                  </CarouselContent>
+                </Carousel>
+                <div className="flex justify-center gap-2 mt-3">
+                  {toolsCards.map((_, index) => (
+                    <button key={index} onClick={() => toolsCarouselApi?.scrollTo(index)} className={cn("w-2.5 h-2.5 rounded-full transition-all duration-300", toolsSlide === index ? "bg-primary scale-125" : "bg-primary/30 hover:bg-primary/50")} aria-label={`Go to tool ${index + 1}`} />
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 mb-2 mt-1">
+                <span className="text-sm font-extrabold tracking-tight text-primary uppercase">Explore</span>
+                <div className="h-px flex-1 bg-primary/20" />
+              </div>
+              <div className="flex flex-col gap-3">
+                {([
+                  { route: '/exerciselibrary', title: 'Exercise Library', label: 'Library', description: 'Video demonstrations for every exercise', image: heroLibraryBookImage },
+                  { route: '/daily-ritual', title: 'Smarty Ritual', label: 'Daily', description: 'Your morning, midday and evening micro-routine', image: ritualWellbeingImage },
+                  { route: '/community', title: 'Community', label: 'Connect', description: 'Share progress, leaderboards and challenges', image: heroCommunityCelebratingImage },
+                  { route: '/faq', title: 'Frequently Asked Questions', label: 'Help', description: 'Answers about plans, training and access', image: faqPlacardImage },
+                  { route: '/coach-profile', title: 'Meet the Coach', label: 'Coach', description: 'Haris Falas — Sports Scientist & Founder', image: harisPhoto },
+                ] as Array<{ route: string; title: string; label: string; description: string; image?: string }>).map((card) => (
+                  <button key={card.route} type="button" onClick={() => navigate(card.route)} className="flex items-stretch bg-card border-2 border-green-500/60 rounded-xl overflow-hidden hover:border-green-500 hover:shadow-xl transition-all duration-300 text-left" aria-label={card.title}>
+                    <div className="relative w-28 flex-shrink-0 bg-muted">
+                      {card.image ? (
+                        <img src={card.image} alt={card.title} loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
+                      ) : null}
+                    </div>
+                    <div className="flex-1 min-w-0 p-3 flex flex-col justify-center">
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">{card.label}</span>
+                      <h3 className="text-sm font-bold text-foreground leading-tight line-clamp-2 mt-0.5">{card.title}</h3>
+                      <p className="text-[11px] text-muted-foreground mt-1 line-clamp-1">{card.description}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+        </section>
+
+        {/* Desktop hero (SmartyMove-style) */}
+        <section className="hidden md:block container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6 pt-4 md:pt-8 pb-4">
           <div className="text-center max-w-3xl mx-auto mb-6 md:mb-10">
             <div className="flex justify-center mb-4">
               <img
