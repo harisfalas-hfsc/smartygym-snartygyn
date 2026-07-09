@@ -210,7 +210,10 @@ serve(async (req) => {
       if (productId) {
         try {
           const product = await stripe.products.retrieve(productId);
-          planType = product.metadata?.plan_type || planType;
+          const metadataPlanType = product.metadata?.plan_type;
+          if (metadataPlanType === 'premium' || metadataPlanType === 'legacy_premium') {
+            planType = metadataPlanType;
+          }
         } catch (productError) {
           console.warn('[VERIFY-PURCHASE] Product metadata lookup failed:', productError);
         }
