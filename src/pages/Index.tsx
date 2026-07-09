@@ -602,23 +602,77 @@ const Index = () => {
       </section>
 
       <div className="min-h-screen bg-background overflow-x-hidden">
-        {isMobile ? <section className="pt-0 pb-2 px-4">
-            {/* Mobile hero tagline */}
-            <div className="text-center mb-4 mt-2">
-              <p className="text-[11px] font-bold tracking-[0.2em] uppercase text-primary mb-2">
-                Science-Backed · Expert-Designed
-              </p>
-              <h1 className="text-4xl font-extrabold tracking-tight uppercase leading-[1.05] text-foreground">
-                Train <span className="text-primary">Smarter.</span>
-                <br />
-                Not Harder.
-              </h1>
-              <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-muted-foreground mt-3 leading-snug">
-                <span className="block">Expert Workouts · Training Programs</span>
-                <span className="block">Blog Insights · Smarty Tools</span>
-                <span className="block text-primary">All In Your Pocket.</span>
-              </p>
+        {/* Unified SmartyMove-style hero (mobile + desktop) */}
+        <section className="container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6 pt-4 md:pt-8 pb-4">
+          <div className="text-center max-w-3xl mx-auto mb-6 md:mb-10">
+            <div className="flex justify-center mb-4">
+              <img
+                src="/icon-512.png"
+                alt="SmartyGym"
+                className="w-16 h-16 md:w-20 md:h-20 rounded-2xl shadow-lg"
+                loading="eager"
+              />
             </div>
+            <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight uppercase leading-[1.05] text-foreground">
+              Train <span className="text-primary">Smarter,</span> Not <span className="text-green-500">Harder.</span>
+            </h1>
+            <p className="text-sm md:text-base text-muted-foreground mt-4 leading-relaxed">
+              Your gym, in your pocket. Expert-designed workouts, structured training programs, blog insights and smart tools — 100% human-designed by Sports Scientist Haris Falas. Zero AI-generated fitness.
+            </p>
+          </div>
+
+          {/* One outer card containing sub-cards */}
+          <div className="rounded-2xl border-2 border-primary/40 bg-card p-4 md:p-6 shadow-sm">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+              {([
+                { route: '/workout', title: 'Featured Workouts', description: 'Expert-designed sessions for every goal', icon: Dumbbell, image: heroWorkoutsImage },
+                { route: '/trainingprogram', title: 'Featured Programs', description: 'Structured multi-week training plans', icon: Calendar, image: heroProgramsImage },
+                { route: '/blog', title: 'Featured Blog', description: 'Fitness, nutrition & wellness insights', icon: FileText, image: heroBlogImage },
+                { route: '/tools', title: 'Featured Tools', description: 'Calculators, timers & trackers', icon: Wrench, image: heroToolsImage },
+                { route: '/exerciselibrary', title: 'Exercise Library', description: 'Video demos for every exercise', icon: Video, image: heroLibraryBookImage },
+                { route: '/community', title: 'Community', description: 'Share progress and connect', icon: Users, image: heroCommunityCelebratingImage },
+              ]).map((card) => {
+                const Icon = card.icon;
+                return (
+                  <button
+                    key={card.route}
+                    type="button"
+                    onClick={() => navigate(card.route)}
+                    className="group flex flex-col bg-background border-2 border-green-500/50 rounded-xl overflow-hidden hover:border-green-500 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 text-left"
+                    aria-label={card.title}
+                  >
+                    <div className="relative aspect-[16/9] w-full overflow-hidden bg-muted">
+                      <img
+                        src={card.image}
+                        alt={card.title}
+                        loading="lazy"
+                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    </div>
+                    <div className="p-3 flex-1 flex flex-col">
+                      <div className="flex items-center gap-2 mb-1">
+                        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <Icon className="w-3.5 h-3.5 text-primary" />
+                        </div>
+                        <h3 className="text-sm md:text-base font-bold text-foreground leading-tight">{card.title}</h3>
+                      </div>
+                      <p className="text-[11px] md:text-xs text-muted-foreground leading-snug line-clamp-2">
+                        {card.description}
+                      </p>
+                      <div className="flex items-center gap-1 text-primary text-[11px] font-semibold mt-2 group-hover:gap-2 transition-all">
+                        Explore <ChevronRight className="w-3 h-3" />
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* Legacy mobile-only extra rails kept hidden — original design retained below for reference */}
+        {false && isMobile ? <section className="pt-0 pb-2 px-4">
+            <div className="text-center mb-4 mt-2" />
 
             {/* Workouts carousel title */}
             <div className="flex items-center justify-center gap-4 mb-4">
