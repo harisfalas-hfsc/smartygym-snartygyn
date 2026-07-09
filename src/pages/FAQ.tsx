@@ -80,7 +80,7 @@ const FAQ = () => {
                 "name": "Is there a free trial?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "We don't offer a free trial, but you can explore a selection of free workouts, free training programs, and our fitness tools at no cost before deciding to upgrade. SmartyGym Premium is €6.99/month and unlocks every workout, program, ritual and tool, with all future updates included. Cancel anytime from your account."
+                  "text": "We don't offer a free trial, but you can explore a selection of free workouts, free training programs, and our fitness tools at no cost before deciding to upgrade. SmartyGym Premium is €9.99/month and unlocks every workout, program, ritual and tool, with all future updates included. Cancel anytime from your account."
                 }
               },
               {
@@ -336,7 +336,7 @@ const FAQ = () => {
                   <AccordionItem value="item-8">
                     <AccordionTrigger className="text-left">Is there a free trial?</AccordionTrigger>
                     <AccordionContent className="py-2 leading-relaxed">
-                      We don't offer a free trial, but you can explore a selection of <strong>free workouts</strong>, <strong>free training programs</strong>, and our <strong>fitness tools</strong> at no cost before deciding to upgrade. SmartyGym <strong>Premium Membership</strong> is <strong>€6.99/month</strong> and unlocks every workout, program, ritual and tool, with all future updates included. <strong>Cancel anytime</strong> from your account. You can also buy individual workouts and programs as standalone purchases. Check out our <a href="/smarty-premium" className="text-primary hover:underline font-medium">Smarty Plans</a> to see what's included.
+                      We don't offer a free trial, but you can explore a selection of <strong>free workouts</strong>, <strong>free training programs</strong>, and our <strong>fitness tools</strong> at no cost before deciding to upgrade. SmartyGym <strong>Premium Membership</strong> is <strong>€9.99/month</strong> and unlocks every workout, program, ritual and tool, with all future updates included. <strong>Cancel anytime</strong> from your account. You can also buy individual workouts and programs as standalone purchases. Check out our <a href="/smarty-premium" className="text-primary hover:underline font-medium">Smarty Plans</a> to see what's included.
                     </AccordionContent>
                   </AccordionItem>
 
@@ -365,7 +365,7 @@ const FAQ = () => {
                       Getting started is simple:<br/>
                       1. <strong>Browse</strong> our free workouts and tools to get a feel for the platform.<br/>
                       2. <a href="/auth?mode=signup" className="text-primary hover:underline font-medium"><strong>Sign up</strong></a> for a free account to save your progress and track your training.<br/>
-                      3. <a href="/smarty-premium" className="text-primary hover:underline font-medium"><strong>Become a Premium Member</strong></a> for €6.99/month and unlock everything — every workout, every training program, the Smarty Ritual, Smarty Tools, check-ins and all future content. Cancel anytime.<br/>
+                      3. <a href="/smarty-premium" className="text-primary hover:underline font-medium"><strong>Become a Premium Member</strong></a> for €9.99/month and unlock everything — every workout, every training program, the Smarty Ritual, Smarty Tools, check-ins and all future content. Cancel anytime.<br/>
                       4. <strong>Start training</strong> — pick a workout or program and get moving!<br/><br/>
                       
                       If you need guidance, <a href="/contact" className="text-primary hover:underline font-medium">contact us</a> directly.

@@ -138,7 +138,7 @@ Free Tier:
 • Community leaderboard and engagement
 • Track your complete workout history
 
-SmartyGym Premium (€6.99/month):
+SmartyGym Premium (€9.99/month):
 • Unlock ALL 500+ premium workouts
 • Access every training program
 • Advanced progress analytics and goal tracking

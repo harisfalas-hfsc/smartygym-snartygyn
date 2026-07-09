@@ -1,6 +1,6 @@
 // ============================================================
 // SmartyGym pricing — single source of truth.
-// Active membership: Premium Monthly (€6.99/month, recurring).
+// Active membership: Premium Monthly (€9.99/month, recurring).
 // Plus standalone purchases and Corporate plans.
 //
 // Lifetime (€89.99 one-time), Gold (€9.99/mo) and Platinum (€89.89/yr) are
@@ -9,14 +9,14 @@
 // ============================================================
 
 export const SUBSCRIPTION_PRICES = {
-  premium_monthly: 6.99, // €6.99/month recurring
+  premium_monthly: 9.99, // €9.99/month recurring
   lifetime: 89.99,       // [LEGACY] historical grandfathered price — kept for analytics/revenue calcs
 } as const;
 
 // Stripe price IDs — single source of truth.
 // Edge functions have their own copy (Deno cannot import from src/).
 export const STRIPE_PRICE_IDS = {
-  premium_monthly: 'price_1Tqn9EIxQYg9inGKWXTdr3bS', // Premium Monthly €6.99/mo
+  premium_monthly: 'price_1Tr93GIxQYg9inGKhIZLvoB2', // Premium Monthly €9.99/mo
 
   // Corporate plans
   corporate_dynamic:    'price_1Sc28CIxQYg9inGKfoqZgtXZ',
@@ -50,7 +50,7 @@ export const CORPORATE_PRICES = {
 // Used to filter Stripe revenue to only SmartyGym sales
 export const OUR_STRIPE_PRODUCT_IDS = [
   // Active subscription product
-  'prod_UqU78UzgA2ckcP', // SmartyGym Premium Monthly (€6.99/mo)
+  'prod_UqU78UzgA2ckcP', // SmartyGym Premium Monthly (€9.99/mo)
   // Legacy products (no longer offered; kept for revenue/refund analytics)
   'prod_TFfAcybp438BH6', // [LEGACY] Smarty Gym Gold Plan
   'prod_TFfAPp1tq7RdUk', // [LEGACY] Smarty Gym Platinum Plan

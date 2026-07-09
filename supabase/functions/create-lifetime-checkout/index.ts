@@ -7,9 +7,9 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Premium Monthly subscription — €6.99/month recurring.
+// Premium Monthly subscription — €9.99/month recurring.
 // (Function name kept for backward compatibility with existing clients.)
-const PREMIUM_MONTHLY_PRICE_ID = "price_1Tqn9EIxQYg9inGKWXTdr3bS";
+const PREMIUM_MONTHLY_PRICE_ID = "price_1Tr93GIxQYg9inGKhIZLvoB2";
 const PREMIUM_MONTHLY_PRODUCT_ID = "prod_UqU78UzgA2ckcP";
 
 const logStep = (step: string, details?: unknown) => {
@@ -72,11 +72,15 @@ serve(async (req) => {
       line_items: [{ price: PREMIUM_MONTHLY_PRICE_ID, quantity: 1 }],
       success_url: `${origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}${safeCancel}`,
+      payment_method_collection: "always",
       subscription_data: {
         metadata: {
           project: "SMARTYGYM",
           purchase_type: "premium_monthly",
           user_id: user.id,
+        },
+        payment_settings: {
+          save_default_payment_method: "on_subscription",
         },
       },
       metadata: {

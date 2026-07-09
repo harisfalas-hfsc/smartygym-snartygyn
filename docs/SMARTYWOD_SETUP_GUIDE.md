@@ -21,7 +21,7 @@ A streamlined fitness platform focused exclusively on the Workout of the Day (WO
 8. **Auth Pages** - Login/Signup
 
 ### Pricing Structure
-- **Gold Plan**: €6.99/month
+- **Gold Plan**: €9.99/month
 - **Platinum Plan**: €59.99/year
 - **Standalone Workout Purchase**: €2.99 per workout
 
@@ -442,7 +442,7 @@ smartywod.com
 ## 10. STRIPE INTEGRATION
 
 ### Products to Create
-1. **SmartyWOD Gold** - €6.99/month recurring
+1. **SmartyWOD Gold** - €9.99/month recurring
 2. **SmartyWOD Platinum** - €59.99/year recurring
 3. **Standalone Workout** - €2.99 one-time
 

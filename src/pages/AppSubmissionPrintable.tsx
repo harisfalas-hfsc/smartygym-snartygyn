@@ -239,7 +239,7 @@ const AppSubmissionPrintable = () => {
                   - Basic progress tracking<br/>
                   - Community features and leaderboards<br/><br/>
 
-                • PREMIUM Plan (€6.99/month):<br/>
+                • PREMIUM Plan (€9.99/month):<br/>
                   - Full workout library access (500+ workouts)<br/>
                   - All training programs included<br/>
                   - Advanced progress analytics, Smarty Rituals, and Check-ins<br/>

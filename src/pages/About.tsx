@@ -298,9 +298,9 @@ const About = () => {
                  <Crown className="w-12 h-12 text-primary mx-auto" />
                  <h2 className="text-2xl font-bold text-foreground">Get the Full Experience</h2>
                  <p className="text-sm text-muted-foreground leading-relaxed">
-                   Every workout, program, ritual and tool — designed 100% by humans. €6.99/month, cancel anytime.
+                   Every workout, program, ritual and tool — designed 100% by humans. €9.99/month, cancel anytime.
                  </p>
-                 <p className="text-3xl font-extrabold text-primary">€6.99<span className="text-lg font-medium text-muted-foreground">/month</span></p>
+                 <p className="text-3xl font-extrabold text-primary">€9.99<span className="text-lg font-medium text-muted-foreground">/month</span></p>
                   <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-green-500">
                     Unlock Smarty Premium
                     <ChevronRight className="w-4 h-4" />

@@ -199,7 +199,7 @@ const TermsOfService = () => {
                 <div>
                   <h2 className="text-2xl font-bold mb-3">5. Membership & Payments</h2>
                   <ul className="space-y-2 text-muted-foreground">
-                    <li>Smarty Gym offers a <strong>Premium Monthly Membership</strong> at <strong>€6.99/month</strong> that unlocks all premium content.</li>
+                    <li>Smarty Gym offers a <strong>Premium Monthly Membership</strong> at <strong>€9.99/month</strong> that unlocks all premium content.</li>
                     <li>The membership renews automatically each month until you cancel. You can cancel anytime from your account and access continues until the end of the current paid period.</li>
                     <li>Payments are processed securely via <strong>Stripe</strong>, a PCI DSS compliant payment processor.</li>
                     <li>All fees are stated in Euros (€) and include VAT where applicable.</li>

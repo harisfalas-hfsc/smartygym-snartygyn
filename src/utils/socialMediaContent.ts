@@ -1403,7 +1403,7 @@ Duration: 25-35 seconds`,
     theme: "Plans",
     instagram: `💎 SmartyGym Premium
 
-€6.99/month. Full premium access.
+€9.99/month. Full premium access.
 
 ✅ All 500+ Workouts
 ✅ All Training Programs
@@ -1422,7 +1422,7 @@ Monthly membership. No lock-in. Cancel anytime. 🛤️
 👉 Link in bio`,
     facebook: `💎 SmartyGym Premium — Full Access Monthly
 
-€6.99/month. Full premium access. Cancel anytime.
+€9.99/month. Full premium access. Cancel anytime.
 
 WHAT YOU GET:
 ✅ Full access to 500+ expert workouts
@@ -1450,13 +1450,13 @@ One monthly membership unlocks it all.
 👉 Join Premium at smartygym.com/smarty-premium`,
     tiktok: `🎬 TIKTOK SCRIPT:
 
-Hook (0-3 sec): "What if your full gym backup cost €6.99/month?"
+Hook (0-3 sec): "What if your full gym backup cost €9.99/month?"
 
 Main Content:
 - Subscription fatigue montage
 - SmartyGym Premium reveal
 - Feature list appearing
-- €6.99/month emphasis
+- €9.99/month emphasis
 - "Cancel anytime" message
 
 CTA: "Join Premium. Link in bio."
@@ -2001,7 +2001,7 @@ Duration: 20-30 seconds`,
     instagram: `🎉 LAUNCH SPECIAL! 🎉
 
 SmartyGym Premium
-€6.99/month. Full access. Cancel anytime.
+€9.99/month. Full access. Cancel anytime.
 
 ✅ 500+ Expert Workouts
 ✅ Multi-Week Programs
@@ -2017,7 +2017,7 @@ No lock-in. Cancel anytime. ⏰
 👉 Link in bio - Join Premium!`,
     facebook: `🎉 LAUNCH SPECIAL — SmartyGym Premium
 
-€6.99/month. Full premium access. Cancel anytime.
+€9.99/month. Full premium access. Cancel anytime.
 
 EVERYTHING INCLUDED:
 ✅ 500+ Expert-Designed Workouts
@@ -2250,7 +2250,7 @@ Duration: 20-30 seconds`,
 
 Launch special ending soon:
 
-💎 SmartyGym Premium — €6.99/month
+💎 SmartyGym Premium — €9.99/month
 (Full access. Cancel anytime.)
 
 After Sunday:
@@ -2274,7 +2274,7 @@ If you've been thinking about starting with SmartyGym, this is your moment.
 Our launch special ends Sunday at midnight. Here's what disappears:
 
 💎 SMARTYGYM PREMIUM
-Monthly membership: €6.99/month
+Monthly membership: €9.99/month
 Full access. Cancel anytime.
 After Sunday: launch pricing ends
 
@@ -2300,7 +2300,7 @@ WHY START NOW?
 • Monthly access. No lock-in. No surprises.
 
 THE MATH:
-€6.99/month vs. expensive fitness app bills.
+€9.99/month vs. expensive fitness app bills.
 World-class programming for less than one coffee run.
 
 ⏰ Offer ends Sunday at midnight.

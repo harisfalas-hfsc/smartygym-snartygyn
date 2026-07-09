@@ -52,7 +52,7 @@ export default function SmartyPremium() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const monthlyPrice = 6.99;
+  const monthlyPrice = 9.99;
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -200,7 +200,7 @@ export default function SmartyPremium() {
               onClick={handleSubscribe}
               disabled={loading}
             >
-              {loading ? "Processing..." : "Start Premium — €6.99/month"}
+              {loading ? "Processing..." : "Start Premium — €9.99/month"}
             </Button>
           )}
           <p className="text-xs text-center text-muted-foreground">Recurring monthly payment. Cancel anytime from My Account.</p>
@@ -212,23 +212,23 @@ export default function SmartyPremium() {
   return (
     <>
       <Helmet>
-        <title>Premium Membership | SmartyGym | €6.99/month, Cancel Anytime</title>
-        <meta name="description" content="Unlock SmartyGym Premium for €6.99/month. 500+ human-designed workouts, training programs, and fitness tools. Cancel anytime from your account." />
+        <title>Premium Membership | SmartyGym | €9.99/month, Cancel Anytime</title>
+        <meta name="description" content="Unlock SmartyGym Premium for €9.99/month. 500+ human-designed workouts, training programs, and fitness tools. Cancel anytime from your account." />
         <meta name="keywords" content="SmartyGym premium, monthly gym membership, fitness subscription, smartygym pricing, online fitness membership" />
 
         <meta property="og:title" content="Premium Membership | SmartyGym" />
-        <meta property="og:description" content="€6.99/month. Premium access to every SmartyGym workout, program and tool. Cancel anytime." />
+        <meta property="og:description" content="€9.99/month. Premium access to every SmartyGym workout, program and tool. Cancel anytime." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://smartygym.com/smarty-premium" />
 
         <meta name="twitter:card" content="summary" />
         <meta name="twitter:title" content="Premium Membership | SmartyGym" />
-        <meta name="twitter:description" content="€6.99/month. Cancel anytime." />
+        <meta name="twitter:description" content="€9.99/month. Cancel anytime." />
 
         <link rel="canonical" href="https://smartygym.com/smarty-premium" />
 
-        <meta name="ai-pricing-premium" content="€6.99/month recurring subscription, cancel anytime" />
-        <meta name="ai-value-proposition" content="100% human-designed workouts by certified Sports Scientist Haris Falas — €6.99/month, cancel anytime" />
+        <meta name="ai-pricing-premium" content="€9.99/month recurring subscription, cancel anytime" />
+        <meta name="ai-value-proposition" content="100% human-designed workouts by certified Sports Scientist Haris Falas — €9.99/month, cancel anytime" />
 
         <script type="application/ld+json">
           {JSON.stringify({
@@ -265,7 +265,7 @@ export default function SmartyPremium() {
         topics={["monthly gym membership", "fitness subscription", "cancel anytime fitness platform"]}
         expertise={["membership pricing", "monthly premium access"]}
         contentType="Product"
-        aiSummary="SmartyGym Premium Membership: €6.99/month unlocks every workout, program, ritual, check-in, and tool. Cancel anytime from your account."
+        aiSummary="SmartyGym Premium Membership: €9.99/month unlocks every workout, program, ritual, check-in, and tool. Cancel anytime from your account."
         aiKeywords={["monthly gym membership", "fitness subscription", "smartygym premium"]}
         relatedContent={["Premium Benefits", "Workout Library", "Training Programs", "Fitness Tools"]}
         targetAudience="fitness enthusiasts looking for a flexible monthly premium gym membership"
@@ -294,7 +294,7 @@ export default function SmartyPremium() {
                 Join thousands of members unlocking SmartyGym with a Premium Monthly Membership.
               </p>
               <p className="text-sm font-semibold text-primary mt-2">
-                €6.99/month. Full premium access. Cancel anytime.
+                €9.99/month. Full premium access. Cancel anytime.
               </p>
             </div>
           </div>
@@ -411,7 +411,7 @@ export default function SmartyPremium() {
                             <Crown className="w-6 h-6 text-primary" />
                             <h3 className="text-2xl font-bold">Premium</h3>
                           </div>
-                          <div className="text-center text-sm font-semibold text-primary mb-4">€6.99 / month</div>
+                          <div className="text-center text-sm font-semibold text-primary mb-4">€9.99 / month</div>
                           <div className="space-y-3">
                             {comparisonFeatures.map((feature, idx) => {
                               const Icon = feature.icon;
@@ -464,7 +464,7 @@ export default function SmartyPremium() {
                           <Crown className="w-5 h-5 text-primary" />
                           <div className="text-lg">Premium</div>
                         </div>
-                        <div className="text-sm font-semibold text-primary">€6.99 / month</div>
+                        <div className="text-sm font-semibold text-primary">€9.99 / month</div>
                       </th>
                     </tr>
                   </thead>

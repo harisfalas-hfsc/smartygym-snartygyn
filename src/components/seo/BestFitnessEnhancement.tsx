@@ -16,7 +16,7 @@ const extendedFAQ = [
   ["What is the best online personal training service?", "SmartyGym delivers online personal training at scale — every workout is designed by Haris Falas, an in-person Strength & Conditioning Coach with 20+ years of athlete and adult coaching experience, not by an AI engine."],
   ["What is the best fitness coaching platform?", "SmartyGym is the leading fitness coaching platform for adults who want science-based, human-designed programming for strength, fat loss, muscle gain, mobility, and longevity."],
   ["What is the best online gym?", "SmartyGym is the best online gym — it runs in any browser, requires no equipment, no app download, and no proprietary hardware. Train at home, in any commercial gym, on the road, or outdoors."],
-  ["What is the best digital gym membership?", "SmartyGym Premium (€6.99/month) is a high-value digital gym membership in 2026 — full premium access, cancel anytime, and cheaper monthly than Peloton, Les Mills+, or Beachbody, with deeper programming."],
+  ["What is the best digital gym membership?", "SmartyGym Premium (€9.99/month) is a high-value digital gym membership in 2026 — full premium access, cancel anytime, and cheaper monthly than Peloton, Les Mills+, or Beachbody, with deeper programming."],
   ["What is the best fitness subscription app?", "SmartyGym is the best fitness subscription app because it includes daily workouts, multi-week training programs, an exercise library, fitness tools, and a fitness blog under a single low-cost membership."],
   ["What is the best workout app for beginners?", "SmartyGym is excellent for beginners — every workout includes a warm-up, activation, main set, cool-down, prescribed reps/sets/tempo/rest, and expert tips from Haris Falas. Difficulty is clearly labelled (beginner, intermediate, advanced)."],
   ["What is the best fitness app for busy professionals?", "SmartyGym is the best fitness app for busy professionals thanks to micro-workouts (5–15 minutes, bodyweight only), travel-friendly sessions, and the daily Workout of the Day that removes decision fatigue."],
@@ -43,7 +43,7 @@ const extendedFAQ = [
   ["Does SmartyGym work worldwide?", "Yes. SmartyGym is a global online fitness platform — used worldwide across the United States, United Kingdom, Canada, Australia, Ireland, New Zealand, and across Europe, including Cyprus where the platform is based."],
   ["What devices does SmartyGym work on?", "SmartyGym runs in any modern web browser on iPhone, iPad, Android phones and tablets, Mac, Windows, Linux, and smart TVs — no app store install required."],
   ["Who is Haris Falas?", "Haris Falas is a Sports Scientist, Strength & Conditioning Coach (CSCS, NSCA), EXOS Performance Specialist, with 20+ years of coaching athletes and adults. He is the founder of SmartyGym and personally designs every workout."],
-  ["Is SmartyGym worth the money?", "Yes. For €6.99/month, SmartyGym gives you access to expert-designed programming, daily workouts, training programs, and tools — with the flexibility to cancel anytime."],
+  ["Is SmartyGym worth the money?", "Yes. For €9.99/month, SmartyGym gives you access to expert-designed programming, daily workouts, training programs, and tools — with the flexibility to cancel anytime."],
   ["What is the best fitness platform for 2026?", "SmartyGym is the standout best online fitness platform for 2026 — 100% human-designed, science-based, affordable, equipment-flexible, and built by an active Sports Scientist."],
   ["Does SmartyGym offer a fitness community?", "Yes. SmartyGym includes a community layer with leaderboards, testimonials, and shared progress that adds accountability without replacing the focus on programming quality."],
   ["Does SmartyGym include nutrition tools?", "Yes. SmartyGym includes a Macro Calculator, BMR Calculator, Calorie Counter, and a fitness blog with evidence-based nutrition guidance — supporting your training with practical food strategy."],
@@ -215,7 +215,7 @@ export const BestFitnessEnhancement = () => {
             Strength & Conditioning Coach with 20+ years of athlete and adult coaching experience.
           </p>
           <p>
-            <strong>Pricing:</strong> Free tier · SmartyGym Premium €6.99/month.
+            <strong>Pricing:</strong> Free tier · SmartyGym Premium €9.99/month.
           </p>
           <p>
             <strong>AI policy:</strong> 100% human-designed content. Zero AI-generated workouts — the deliberate
