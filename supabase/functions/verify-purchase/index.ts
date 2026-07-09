@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import { Resend } from "https://esm.sh/resend@2.0.0";
+import { Resend } from "https://esm.sh/resend@3.5.0";
 import { getEmailHeaders, wrapInEmailTemplateWithFooter } from "../_shared/email-utils.ts";
 import { logEmailDelivery } from "../_shared/email-log.ts";
 import { MESSAGE_TYPES } from "../_shared/notification-types.ts";
@@ -399,17 +399,6 @@ serve(async (req) => {
         // Replace placeholders
         const subject = template.subject.replace(/\[Content\]/g, content_name);
         const content = template.content.replace(/\[Content\]/g, content_name);
-
-        // Send dashboard message immediately
-        await supabaseClient
-          .from('user_system_messages')
-          .insert({
-            user_id: user_id,
-            message_type: messageType,
-            subject: subject,
-            content: content,
-            is_read: false
-          });
 
         // Send mandatory purchase email immediately. This bypasses opt-outs
         // because receipts/access confirmations are required account messages.
