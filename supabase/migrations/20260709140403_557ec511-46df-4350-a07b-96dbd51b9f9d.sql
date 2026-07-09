@@ -1,0 +1,2 @@
+GRANT EXECUTE ON FUNCTION public.get_website_analytics_summary(timestamp with time zone, timestamp with time zone) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.get_website_analytics_summary(timestamp with time zone, timestamp with time zone) TO service_role;
