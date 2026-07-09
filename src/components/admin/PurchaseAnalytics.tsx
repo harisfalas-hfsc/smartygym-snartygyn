@@ -13,16 +13,7 @@ import {
   Users, Target, RefreshCw 
 } from "lucide-react";
 import { toast } from "sonner";
-
-interface PurchaseData {
-  id: string;
-  user_id: string;
-  content_type: string;
-  content_id: string;
-  content_name: string;
-  price: number;
-  purchased_at: string;
-}
+import { fetchStripeRevenueTruth } from "@/lib/admin-analytics";
 
 interface ChartData {
   name: string;
@@ -36,7 +27,7 @@ interface MetricsData {
   averageOrderValue: number;
   uniqueCustomers: number;
   conversionRate: number;
-  customerLifetimeValue: number;
+  averageCustomerValue: number;
 }
 
 export function PurchaseAnalytics() {
@@ -48,7 +39,7 @@ export function PurchaseAnalytics() {
     averageOrderValue: 0,
     uniqueCustomers: 0,
     conversionRate: 0,
-    customerLifetimeValue: 0,
+    averageCustomerValue: 0,
   });
   const [revenueByDay, setRevenueByDay] = useState<ChartData[]>([]);
   const [popularItems, setPopularItems] = useState<ChartData[]>([]);
@@ -68,21 +59,25 @@ export function PurchaseAnalytics() {
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - parseInt(timeFilter));
 
-      // Fetch all purchases within date range
-      let query = supabase
-        .from("user_purchases")
-        .select("*")
-        .gte("purchased_at", startDate.toISOString())
-        .lte("purchased_at", endDate.toISOString());
-
-      // Apply content type filter
-      if (contentTypeFilter !== "all") {
-        query = query.eq("content_type", contentTypeFilter);
-      }
-
-      const { data: purchases, error } = await query;
-
-      if (error) throw error;
+      const stripeTruth = await fetchStripeRevenueTruth();
+      const purchases = (stripeTruth?.payments || [])
+        .filter((payment) => payment.category === "standalone_workout" || payment.category === "standalone_program")
+        .filter((payment) => new Date(payment.date) >= startDate && new Date(payment.date) <= endDate)
+        .filter((payment) => {
+          if (contentTypeFilter === "all") return true;
+          if (contentTypeFilter === "workout") return payment.category === "standalone_workout";
+          if (contentTypeFilter === "program") return payment.category === "standalone_program";
+          return true;
+        })
+        .map((payment) => ({
+          id: payment.id,
+          user_id: payment.customer || payment.email || payment.id,
+          content_type: payment.category === "standalone_workout" ? "workout" : "program",
+          content_name: payment.productName || payment.description || "SmartyGym purchase",
+          price: Number(payment.amount) || 0,
+          purchased_at: payment.date,
+          customer_name: payment.email || payment.customer || "Stripe customer",
+        }));
 
       if (!purchases || purchases.length === 0) {
         // Reset all data if no purchases
@@ -92,7 +87,7 @@ export function PurchaseAnalytics() {
           averageOrderValue: 0,
           uniqueCustomers: 0,
           conversionRate: 0,
-          customerLifetimeValue: 0,
+          averageCustomerValue: 0,
         });
         setRevenueByDay([]);
         setPopularItems([]);
@@ -103,7 +98,7 @@ export function PurchaseAnalytics() {
       }
 
       // Calculate total revenue
-      const totalRevenue = purchases.reduce((sum, p) => sum + parseFloat(p.price.toString()), 0);
+      const totalRevenue = purchases.reduce((sum, p) => sum + p.price, 0);
 
       // Calculate unique customers
       const uniqueUserIds = new Set(purchases.map(p => p.user_id));
@@ -113,14 +108,12 @@ export function PurchaseAnalytics() {
       const averageOrderValue = totalRevenue / purchases.length;
 
       // Fetch total registered users for conversion rate
-      const { count: totalUsers } = await supabase
-        .from("profiles")
-        .select("*", { count: 'exact', head: true });
+      const { count: totalUsers } = await supabase.from("profiles").select("*", { count: 'exact', head: true });
 
       const conversionRate = totalUsers ? (uniqueCustomers / totalUsers) * 100 : 0;
 
-      // Calculate customer lifetime value (total revenue / unique customers)
-      const customerLifetimeValue = uniqueCustomers > 0 ? totalRevenue / uniqueCustomers : 0;
+      // Calculate average customer value (total revenue / unique customers)
+      const averageCustomerValue = uniqueCustomers > 0 ? totalRevenue / uniqueCustomers : 0;
 
       setMetrics({
         totalRevenue,
@@ -128,7 +121,7 @@ export function PurchaseAnalytics() {
         averageOrderValue,
         uniqueCustomers,
         conversionRate,
-        customerLifetimeValue,
+        averageCustomerValue,
       });
 
       // Revenue by day
@@ -138,7 +131,7 @@ export function PurchaseAnalytics() {
           month: "short", 
           day: "numeric" 
         });
-        revenueByDayMap[day] = (revenueByDayMap[day] || 0) + parseFloat(purchase.price.toString());
+        revenueByDayMap[day] = (revenueByDayMap[day] || 0) + purchase.price;
       });
       
       const revenueByDayData: ChartData[] = Object.entries(revenueByDayMap)
@@ -158,7 +151,7 @@ export function PurchaseAnalytics() {
         if (!itemSalesMap[key]) {
           itemSalesMap[key] = { revenue: 0, count: 0 };
         }
-        itemSalesMap[key].revenue += parseFloat(purchase.price.toString());
+        itemSalesMap[key].revenue += purchase.price;
         itemSalesMap[key].count += 1;
       });
 
@@ -191,24 +184,18 @@ export function PurchaseAnalytics() {
       const customerSpendingMap: { [key: string]: number } = {};
       purchases.forEach(purchase => {
         customerSpendingMap[purchase.user_id] = 
-          (customerSpendingMap[purchase.user_id] || 0) + parseFloat(purchase.price.toString());
+          (customerSpendingMap[purchase.user_id] || 0) + purchase.price;
       });
 
-      // Fetch user emails for display
       const topCustomerIds = Object.entries(customerSpendingMap)
         .sort((a, b) => b[1] - a[1])
         .slice(0, 10)
         .map(([userId]) => userId);
 
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("user_id, full_name")
-        .in("user_id", topCustomerIds);
-
       const topCustomersData: ChartData[] = topCustomerIds.map(userId => {
-        const profile = profiles?.find(p => p.user_id === userId);
+        const purchase = purchases.find((p) => p.user_id === userId);
         return {
-          name: profile?.full_name || `Customer ${userId.substring(0, 8)}`,
+          name: purchase?.customer_name || `Customer ${userId.substring(0, 8)}`,
           value: Math.round(customerSpendingMap[userId] * 100) / 100,
         };
       });
@@ -239,7 +226,7 @@ export function PurchaseAnalytics() {
             <ShoppingCart className="h-5 w-5" />
             Purchase Analytics
           </CardTitle>
-          <CardDescription>Analyze standalone purchase performance and customer behavior</CardDescription>
+            <CardDescription>Stripe-only standalone workout and program purchases</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -284,7 +271,7 @@ export function PurchaseAnalytics() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">€{metrics.totalRevenue.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">From standalone purchases</p>
+            <p className="text-xs text-muted-foreground">From Stripe standalone purchases</p>
           </CardContent>
         </Card>
 
@@ -334,11 +321,11 @@ export function PurchaseAnalytics() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Customer Lifetime Value</CardTitle>
+            <CardTitle className="text-sm font-medium">Average Customer Value</CardTitle>
             <Award className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">€{metrics.customerLifetimeValue.toFixed(2)}</div>
+            <div className="text-2xl font-bold">€{metrics.averageCustomerValue.toFixed(2)}</div>
             <p className="text-xs text-muted-foreground">Average per customer</p>
           </CardContent>
         </Card>

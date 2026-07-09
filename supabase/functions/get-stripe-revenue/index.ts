@@ -13,38 +13,22 @@ const logStep = (step: string, details?: any) => {
 };
 
 const KNOWN_SMARTYGYM_PRODUCT_IDS = new Set([
-  // Active + grandfathered SmartyGym subscriptions
-  "prod_UqU78UzgA2ckcP", // SmartyGym Premium Monthly (€9.99/mo, old €6.99 subscribers remain grandfathered)
-  "prod_UgmdX60UPJxWeS", // Legacy lifetime membership
-  "prod_TFfAcybp438BH6", // Legacy Gold monthly
-  "prod_TFfAPp1tq7RdUk", // Legacy Platinum yearly
-  // Corporate plans
-  "prod_TZATAcAlqgc1P7",
-  "prod_TZATDsKcDvMtHc",
-  "prod_TZATGTAsKalmCn",
-  "prod_TZATUtaS2jhgtK",
+  "prod_UqU78UzgA2ckcP", // SmartyGym Premium Monthly (€9.99/mo, grandfathered subscribers remain Premium)
+  "prod_UgmdX60UPJxWeS", // Retired SmartyGym paid membership product, normalized to Premium Membership
+  "prod_TFfAcybp438BH6", // Retired SmartyGym paid membership product, normalized to Premium Membership
+  "prod_TFfAPp1tq7RdUk", // Retired SmartyGym paid membership product, normalized to Premium Membership
 ]);
 
-type RevenueCategory = "premium" | "standalone" | "personal_training" | "corporate";
+type RevenueCategory = "premium_membership" | "standalone_workout" | "standalone_program" | "other_smartygym";
 
 const classifyRevenue = (product: any, charge: any): RevenueCategory => {
-  const productId = typeof product?.id === "string" ? product.id : "";
-  const contentType = String(product?.metadata?.content_type ?? charge.metadata?.content_type ?? "").toLowerCase();
+  const contentType = String(product?.metadata?.content_type ?? charge.metadata?.content_type ?? "").toLowerCase().replace(/[\s-]+/g, "_");
   const productName = String(product?.name ?? charge.description ?? "").toLowerCase();
 
-  if (contentType === "personal_training" || productName.includes("personal training")) return "personal_training";
-  if (
-    contentType === "corporate" ||
-    productName.includes("smarty dynamic") ||
-    productName.includes("smarty power") ||
-    productName.includes("smarty elite") ||
-    productName.includes("smarty enterprise") ||
-    ["prod_TZATAcAlqgc1P7", "prod_TZATDsKcDvMtHc", "prod_TZATGTAsKalmCn", "prod_TZATUtaS2jhgtK"].includes(productId)
-  ) return "corporate";
-  if (contentType === "workout" || contentType === "program" || contentType === "training_program" || contentType === "shop_product" || contentType === "ritual") {
-    return "standalone";
-  }
-  return "premium";
+  if (contentType === "workout" || productName.includes("workout")) return "standalone_workout";
+  if (contentType === "program" || contentType === "training_program" || productName.includes("program")) return "standalone_program";
+  if (charge.invoice || productName.includes("premium") || productName.includes("membership")) return "premium_membership";
+  return "other_smartygym";
 };
 
 serve(async (req) => {
@@ -168,12 +152,18 @@ serve(async (req) => {
     let totalCollected = 0;
     let totalRefunded = 0;
     const byMonth: { [month: string]: number } = {};
+    const emptyCategoryTotals = (): Record<RevenueCategory, number> => ({
+      premium_membership: 0,
+      standalone_workout: 0,
+      standalone_program: 0,
+      other_smartygym: 0,
+    });
     const byMonthByCategory: Record<string, Record<RevenueCategory, number>> = {};
     const byCategory: Record<RevenueCategory, { amount: number; count: number }> = {
-      premium: { amount: 0, count: 0 },
-      standalone: { amount: 0, count: 0 },
-      personal_training: { amount: 0, count: 0 },
-      corporate: { amount: 0, count: 0 },
+      premium_membership: { amount: 0, count: 0 },
+      standalone_workout: { amount: 0, count: 0 },
+      standalone_program: { amount: 0, count: 0 },
+      other_smartygym: { amount: 0, count: 0 },
     };
     const payments: any[] = [];
     let skippedNonSmartyGym = 0;
@@ -218,7 +208,7 @@ serve(async (req) => {
       const month = new Date(charge.created * 1000).toISOString().slice(0, 7);
       byMonth[month] = (byMonth[month] || 0) + net;
       const category = classifyRevenue(product, charge);
-      byMonthByCategory[month] = byMonthByCategory[month] || { premium: 0, standalone: 0, personal_training: 0, corporate: 0 };
+      byMonthByCategory[month] = byMonthByCategory[month] || emptyCategoryTotals();
       byMonthByCategory[month][category] += net;
       byCategory[category].amount += net;
       byCategory[category].count += 1;

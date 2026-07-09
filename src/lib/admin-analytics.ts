@@ -48,11 +48,51 @@ export interface StripePaymentTruth {
   refunded?: number;
   currency?: string;
   date: string;
+  customer?: string | null;
+  email?: string | null;
+  description?: string | null;
   productName?: string | null;
   productId?: string | null;
   contentType?: string | null;
   recurring?: boolean;
-  category?: "premium" | "standalone" | "personal_training" | "corporate";
+  category?: CurrentRevenueCategory | "premium" | "standalone" | "personal_training" | "corporate";
+}
+
+export type CurrentRevenueCategory = "premium_membership" | "standalone_workout" | "standalone_program" | "other_smartygym";
+
+export const CURRENT_REVENUE_CATEGORY_LABELS: Record<CurrentRevenueCategory, string> = {
+  premium_membership: "Premium Membership",
+  standalone_workout: "Standalone Workout",
+  standalone_program: "Standalone Training Program",
+  other_smartygym: "Other SmartyGym Product",
+};
+
+export const CURRENT_REVENUE_CATEGORIES: CurrentRevenueCategory[] = [
+  "premium_membership",
+  "standalone_workout",
+  "standalone_program",
+  "other_smartygym",
+];
+
+export function normalizeRevenueCategory(payment: Pick<StripePaymentTruth, "category" | "contentType" | "productName" | "recurring">): CurrentRevenueCategory {
+  const category = String(payment.category || "").toLowerCase();
+  const contentType = String(payment.contentType || "").toLowerCase().replace(/[-\s]+/g, "_");
+  const productName = String(payment.productName || "").toLowerCase();
+
+  if (category === "standalone_workout" || contentType === "workout" || contentType === "micro_workout") return "standalone_workout";
+  if (
+    category === "standalone_program" ||
+    contentType === "program" ||
+    contentType === "training_program" ||
+    productName.includes("training program")
+  ) return "standalone_program";
+  if (category === "other_smartygym") return "other_smartygym";
+  if (category === "standalone") {
+    if (productName.includes("workout")) return "standalone_workout";
+    if (productName.includes("program")) return "standalone_program";
+    return "other_smartygym";
+  }
+  return "premium_membership";
 }
 
 export interface StripeRevenueTruthData {
@@ -60,9 +100,14 @@ export interface StripeRevenueTruthData {
   totalRefunded: number;
   paymentCount: number;
   byMonth: Record<string, number>;
-  byMonthByCategory: Record<string, Record<"premium" | "standalone" | "personal_training" | "corporate", number>>;
-  byCategory: Record<"premium" | "standalone" | "personal_training" | "corporate", { amount: number; count: number }>;
+  byMonthByCategory: Record<string, Record<CurrentRevenueCategory, number>>;
+  byCategory: Record<CurrentRevenueCategory, { amount: number; count: number }>;
   payments: StripePaymentTruth[];
+  excludedNonSmartyGym?: number;
+  skippedNonSmartyGym?: number;
+  unmatchedSmartyGymMetadataWarnings?: number;
+  unattributed?: number;
+  unattributedAmount?: number;
 }
 
 export async function fetchStripeRevenueTruth(): Promise<StripeRevenueTruthData | null> {
@@ -72,19 +117,43 @@ export async function fetchStripeRevenueTruth(): Promise<StripeRevenueTruthData 
       console.error("Failed to fetch Stripe revenue truth", error || data);
       return null;
     }
+    const payments = (data.payments || []).map((payment: StripePaymentTruth) => ({
+      ...payment,
+      category: normalizeRevenueCategory(payment),
+    }));
+    const byCategory = CURRENT_REVENUE_CATEGORIES.reduce((acc, category) => {
+      acc[category] = { amount: 0, count: 0 };
+      return acc;
+    }, {} as Record<CurrentRevenueCategory, { amount: number; count: number }>);
+    const byMonthByCategory: Record<string, Record<CurrentRevenueCategory, number>> = {};
+
+    payments.forEach((payment) => {
+      const category = normalizeRevenueCategory(payment);
+      byCategory[category].amount += Number(payment.amount) || 0;
+      byCategory[category].count += 1;
+      const month = payment.date?.slice(0, 7);
+      if (month) {
+        byMonthByCategory[month] = byMonthByCategory[month] || CURRENT_REVENUE_CATEGORIES.reduce((acc, c) => {
+          acc[c] = 0;
+          return acc;
+        }, {} as Record<CurrentRevenueCategory, number>);
+        byMonthByCategory[month][category] += Number(payment.amount) || 0;
+      }
+    });
+
     return {
       totalCollected: Number(data.totalCollected) || 0,
       totalRefunded: Number(data.totalRefunded) || 0,
       paymentCount: Number(data.paymentCount) || 0,
       byMonth: data.byMonth || {},
-      byMonthByCategory: data.byMonthByCategory || {},
-      byCategory: data.byCategory || {
-        premium: { amount: 0, count: 0 },
-        standalone: { amount: 0, count: 0 },
-        personal_training: { amount: 0, count: 0 },
-        corporate: { amount: 0, count: 0 },
-      },
-      payments: data.payments || [],
+      byMonthByCategory,
+      byCategory,
+      payments,
+      excludedNonSmartyGym: Number(data.excludedNonSmartyGym ?? data.skippedNonSmartyGym) || 0,
+      skippedNonSmartyGym: Number(data.skippedNonSmartyGym ?? data.excludedNonSmartyGym) || 0,
+      unmatchedSmartyGymMetadataWarnings: Number(data.unmatchedSmartyGymMetadataWarnings ?? data.unattributed) || 0,
+      unattributed: Number(data.unattributed ?? data.unmatchedSmartyGymMetadataWarnings) || 0,
+      unattributedAmount: Number(data.unattributedAmount) || 0,
     };
   } catch (error) {
     console.error("Failed to fetch Stripe revenue truth", error);
@@ -169,37 +238,49 @@ export interface SubscriptionRow {
   plan_type: string | null;
   status: string | null;
   stripe_subscription_id?: string | null;
+  stripe_customer_id?: string | null;
   subscription_source?: string | null;
+  stripe_status?: string | null;
 }
 
 export interface PremiumCounts {
-  /** All active premium subscribers including legacy gold/platinum tiers (retired). */
+  /** Active Premium access rows, including manual/admin access. */
   activePremiumSubscribers: number;
-  /** Active premium with a real Stripe subscription id. */
+  /** Active Premium with real Stripe billing evidence. */
   paidSubscribers: number;
-  /** Active premium WITHOUT a Stripe subscription id (manual / comp). */
+  /** Active Premium access granted manually/admin-side. */
   manualSubscribers: number;
   /** Distinct user_ids that hold an active premium subscription. */
   distinctPremiumUsers: number;
 }
 
+export const CURRENT_PREMIUM_PLAN_TYPES = new Set(["premium", "legacy_premium", "lifetime", "gold", "platinum"]);
+
+export function isCurrentPremiumAccess(s: SubscriptionRow | null | undefined): boolean {
+  return !!s && s.status === "active" && !!s.plan_type && CURRENT_PREMIUM_PLAN_TYPES.has(s.plan_type);
+}
+
+export function isCurrentPremiumSubscription(s: SubscriptionRow | null | undefined): boolean {
+  if (!isCurrentPremiumAccess(s)) return false;
+  return s?.subscription_source !== "admin_grant" && (!!s?.stripe_subscription_id || (!!s?.stripe_customer_id && s?.subscription_source === "stripe"));
+}
+
+export function isManualPremiumAccess(s: SubscriptionRow | null | undefined): boolean {
+  return isCurrentPremiumAccess(s) && !isCurrentPremiumSubscription(s);
+}
+
+export function normalizePlanLabel(s: Pick<SubscriptionRow, "plan_type" | "status"> | null | undefined): string {
+  if (!s?.plan_type || s.plan_type === "free") return "Free";
+  if (s.status === "active" && CURRENT_PREMIUM_PLAN_TYPES.has(s.plan_type)) return "Premium Access";
+  if (CURRENT_PREMIUM_PLAN_TYPES.has(s.plan_type)) return "Former Premium";
+  return s.plan_type.replace(/_/g, " ").replace(/\b\w/g, (m) => m.toUpperCase());
+}
+
 export function computePremiumCounts(subs: SubscriptionRow[] | null | undefined): PremiumCounts {
   const list = subs ?? [];
-  // Include all paid plan types: current "premium", historical lifetime, and retired legacy premium tiers.
-  const PREMIUM_PLANS = new Set(["lifetime", "premium", "legacy_premium", "gold", "platinum"]);
-  const isActivePremium = (s: SubscriptionRow) =>
-    s.status === "active" && !!s.plan_type && PREMIUM_PLANS.has(s.plan_type);
-
-  const active = list.filter(isActivePremium);
-  // PAID = real Stripe money only. Admin-granted memberships (subscription_source
-  // = 'admin_grant') are complimentary, even if plan_type is 'lifetime'.
-  const isPaidSub = (s: SubscriptionRow) =>
-    s.subscription_source !== "admin_grant" &&
-    (!!s.stripe_subscription_id ||
-      ((s.plan_type === "lifetime" || s.plan_type === "premium") &&
-        s.subscription_source === "stripe" && !!(s as any).stripe_customer_id));
-  const paid = active.filter(isPaidSub);
-  const manual = active.filter((s) => !isPaidSub(s));
+  const active = list.filter(isCurrentPremiumAccess);
+  const paid = active.filter(isCurrentPremiumSubscription);
+  const manual = active.filter(isManualPremiumAccess);
   const distinctUsers = new Set(active.map((s) => s.user_id).filter(Boolean));
 
   return {

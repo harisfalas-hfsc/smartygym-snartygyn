@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { 
   Users, DollarSign, TrendingUp, Star, Activity, RefreshCw, 
-  ShoppingCart, Building2, CheckCircle, MessageCircle, 
+  ShoppingCart, CheckCircle, MessageCircle, 
   Dumbbell, Calendar, Heart, Download, Globe, Award
 } from "lucide-react";
 import { toast } from "sonner";
@@ -16,7 +16,6 @@ import { PurchaseAnalytics } from "./PurchaseAnalytics";
 import { ContactAnalytics } from "./ContactAnalytics";
 import { ShopAnalytics } from "./ShopAnalytics";
 import { WebsiteAnalytics } from "./analytics/WebsiteAnalytics";
-import { CorporateAnalytics } from "./analytics/CorporateAnalytics";
 import { AnalyticsMetricCard } from "./analytics/AnalyticsMetricCard";
 import { CompletionAnalytics } from "./analytics/CompletionAnalytics";
 import { GrowthAnalytics } from "./analytics/GrowthAnalytics";
@@ -31,13 +30,14 @@ import {
   computePremiumCounts,
   computeNonPremiumUsers,
   fetchStripeRevenueTruth,
+  CURRENT_REVENUE_CATEGORY_LABELS,
 } from "@/lib/admin-analytics";
 
 interface AnalyticsData {
   totalUsers: number;
   activeSubscribers: number;
   paidSubscribers: number;       // Only with stripe_subscription_id
-  manualSubscribers: number;     // Manual/complimentary (no stripe_subscription_id)
+  manualSubscribers: number;     // Manual access (no Stripe subscription)
   premiumSubscribers: number;
   premiumPaid: number;
   freeUsers: number;
@@ -57,12 +57,8 @@ interface AnalyticsData {
   websiteVisitors: number;
   standaloneWorkoutsSold: number;
   standaloneProgramsSold: number;
-  corporatePlansSold: number;
-  corporatePaid: number;         // Only with stripe_subscription_id
-  corporateFree: number;         // Complimentary
   bestSellingWorkout: string;
   bestSellingProgram: string;
-  bestSellingCorporatePlan: string;
   workoutInteractions: number;
   programInteractions: number;
   totalRatings: number;
@@ -99,12 +95,8 @@ export function AnalyticsDashboard() {
     websiteVisitors: 0,
     standaloneWorkoutsSold: 0,
     standaloneProgramsSold: 0,
-    corporatePlansSold: 0,
-    corporatePaid: 0,
-    corporateFree: 0,
     bestSellingWorkout: "-",
     bestSellingProgram: "-",
-    bestSellingCorporatePlan: "-",
     workoutInteractions: 0,
     programInteractions: 0,
     totalRatings: 0,
@@ -170,13 +162,8 @@ export function AnalyticsDashboard() {
       const paidSubscribers = premiumCounts.paidSubscribers;
       const manualSubscribers = premiumCounts.manualSubscribers;
 
-      const premiumPlans = new Set(["lifetime", "gold", "platinum", "legacy_premium", "premium"]);
-      const premiumSubscribers = subscriptions?.filter(s => s.status === "active" && premiumPlans.has(s.plan_type)).length || 0;
-      // PAID = real Stripe payments only — admin-granted memberships are complimentary.
-      const isPaidSub = (s: any) =>
-        s.subscription_source !== "admin_grant" &&
-        (!!s.stripe_subscription_id || (s.plan_type === "lifetime" && s.subscription_source === "stripe" && !!s.stripe_customer_id));
-      const premiumPaid = subscriptions?.filter(s => s.status === "active" && premiumPlans.has(s.plan_type) && isPaidSub(s)).length || 0;
+      const premiumSubscribers = premiumCounts.activePremiumSubscribers;
+      const premiumPaid = premiumCounts.paidSubscribers;
       
       // Non-premium users = total profiles minus distinct active premium users.
       // (Counting only `user_subscriptions` rows missed all profiles without any
@@ -188,35 +175,32 @@ export function AnalyticsDashboard() {
       const totalRevenue = stripeTruth?.totalCollected ?? 0;
       const stripePaymentCount = stripeTruth?.paymentCount ?? 0;
 
-      // Fetch purchases for standalone sales
-      const { data: purchases } = await supabase
-        .from("user_purchases")
-        .select("*");
+      const stripeStandalonePurchases = stripeTruth?.payments?.filter(
+        (payment) => payment.category === "standalone_workout" || payment.category === "standalone_program"
+      ) || [];
+      const standaloneWorkoutsSold = stripeStandalonePurchases.filter(p => p.category === "standalone_workout").length;
+      const standaloneProgramsSold = stripeStandalonePurchases.filter(p => p.category === "standalone_program").length;
 
-      const standaloneRevenue = purchases?.reduce((sum, p) => sum + Number(p.price || 0), 0) || 0;
-      const standaloneWorkoutsSold = purchases?.filter(p => p.content_type === "workout").length || 0;
-      const standaloneProgramsSold = purchases?.filter(p => p.content_type === "program").length || 0;
-
-      // Best selling workout
       const workoutSales: { [key: string]: number } = {};
-      purchases?.filter(p => p.content_type === "workout").forEach(p => {
-        workoutSales[p.content_name] = (workoutSales[p.content_name] || 0) + 1;
+      stripeStandalonePurchases.filter(p => p.category === "standalone_workout").forEach(p => {
+        const name = p.productName || p.description || "SmartyGym workout";
+        workoutSales[name] = (workoutSales[name] || 0) + 1;
       });
       const bestSellingWorkout = Object.entries(workoutSales).sort((a, b) => b[1] - a[1])[0]?.[0] || "-";
 
-      // Best selling program
       const programSales: { [key: string]: number } = {};
-      purchases?.filter(p => p.content_type === "program").forEach(p => {
-        programSales[p.content_name] = (programSales[p.content_name] || 0) + 1;
+      stripeStandalonePurchases.filter(p => p.category === "standalone_program").forEach(p => {
+        const name = p.productName || p.description || "SmartyGym program";
+        programSales[name] = (programSales[name] || 0) + 1;
       });
       const bestSellingProgram = Object.entries(programSales).sort((a, b) => b[1] - a[1])[0]?.[0] || "-";
 
       const stripeCategory = stripeTruth?.byCategory;
       const revenueChartData = stripeCategory ? [
-        { name: "Premium Memberships", value: stripeCategory.premium?.amount || 0 },
-        { name: "Standalone Purchases", value: stripeCategory.standalone?.amount || 0 },
-        { name: "Personal Training", value: stripeCategory.personal_training?.amount || 0 },
-        { name: "Corporate Plans", value: stripeCategory.corporate?.amount || 0 },
+        { name: CURRENT_REVENUE_CATEGORY_LABELS.premium_membership, value: stripeCategory.premium_membership?.amount || 0 },
+        { name: CURRENT_REVENUE_CATEGORY_LABELS.standalone_workout, value: stripeCategory.standalone_workout?.amount || 0 },
+        { name: CURRENT_REVENUE_CATEGORY_LABELS.standalone_program, value: stripeCategory.standalone_program?.amount || 0 },
+        { name: CURRENT_REVENUE_CATEGORY_LABELS.other_smartygym, value: stripeCategory.other_smartygym?.amount || 0 },
       ].filter(item => item.value > 0) : [];
 
       // Revenue distribution
@@ -238,10 +222,10 @@ export function AnalyticsDashboard() {
 
         trendsData.push({
           name: monthName,
-          "Premium Memberships": monthStripe?.premium || 0,
-          "Standalone Purchases": monthStripe?.standalone || 0,
-          "Personal Training": monthStripe?.personal_training || 0,
-          "Corporate Plans": monthStripe?.corporate || 0,
+          [CURRENT_REVENUE_CATEGORY_LABELS.premium_membership]: monthStripe?.premium_membership || 0,
+          [CURRENT_REVENUE_CATEGORY_LABELS.standalone_workout]: monthStripe?.standalone_workout || 0,
+          [CURRENT_REVENUE_CATEGORY_LABELS.standalone_program]: monthStripe?.standalone_program || 0,
+          [CURRENT_REVENUE_CATEGORY_LABELS.other_smartygym]: monthStripe?.other_smartygym || 0,
         });
       }
 
@@ -339,27 +323,6 @@ export function AnalyticsDashboard() {
       // Filtered visitor count (excludes bots / Lovable preview / scrapers)
       const websiteVisitorsCount = await fetchFilteredVisitorCount(startDate);
 
-      // Fetch corporate subscriptions - include stripe fields to identify paid vs free
-      const { data: corporateSubs } = await supabase
-        .from("corporate_subscriptions")
-        .select("plan_type, status, stripe_subscription_id, stripe_customer_id");
-
-      const corporatePlansSold = corporateSubs?.filter(c => c.status === "active").length || 0;
-      // PAID = has stripe_subscription_id AND stripe_customer_id
-      const corporatePaid = corporateSubs?.filter(c => c.status === "active" && c.stripe_subscription_id && c.stripe_customer_id).length || 0;
-      const corporateFree = corporateSubs?.filter(c => c.status === "active" && (!c.stripe_subscription_id || !c.stripe_customer_id)).length || 0;
-      
-      // Corporate paid/free counts stay database-based; revenue stays Stripe-based above.
-      const paidCorporatePlans = corporateSubs?.filter(c => c.status === "active" && c.stripe_subscription_id && c.stripe_customer_id) || [];
-      
-      // Best selling corporate plan (only count PAID)
-      const corporatePlanCounts: { [key: string]: number } = {};
-      paidCorporatePlans.forEach(c => {
-        corporatePlanCounts[c.plan_type] = (corporatePlanCounts[c.plan_type] || 0) + 1;
-      });
-      const bestSellingCorporatePlan = Object.entries(corporatePlanCounts)
-        .sort((a, b) => b[1] - a[1])[0]?.[0]?.toUpperCase() || "-";
-
       setAnalytics({
         totalUsers,
         activeSubscribers,
@@ -383,12 +346,8 @@ export function AnalyticsDashboard() {
         websiteVisitors: websiteVisitorsCount || 0,
         standaloneWorkoutsSold,
         standaloneProgramsSold,
-        corporatePlansSold,
-        corporatePaid,
-        corporateFree,
         bestSellingWorkout,
         bestSellingProgram,
-        bestSellingCorporatePlan,
         workoutInteractions: totalWorkoutInteractions,
         programInteractions: totalProgramInteractions,
         totalRatings,
@@ -486,13 +445,13 @@ export function AnalyticsDashboard() {
         <AnalyticsMetricCard 
           title="Active Subscribers" 
           value={analytics.activeSubscribers} 
-          subtitle={`${analytics.paidSubscribers} paid • ${analytics.manualSubscribers} comp`}
+          subtitle={`${analytics.paidSubscribers} paid • ${analytics.manualSubscribers} manual`}
           icon={TrendingUp}
         />
         <AnalyticsMetricCard 
           title="Premium Members"
           value={`${analytics.premiumPaid} paid`}
-          subtitle={`€9.99 monthly • ${Math.max(analytics.premiumSubscribers - analytics.premiumPaid, 0)} comp`}
+          subtitle={`€9.99 monthly • ${Math.max(analytics.premiumSubscribers - analytics.premiumPaid, 0)} manual`}
           icon={Star}
         />
         <AnalyticsMetricCard 
@@ -550,7 +509,7 @@ export function AnalyticsDashboard() {
       </div>
 
       {/* Key Metrics Cards - Row 3: Completion & Sales */}
-      <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
+      <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
         <AnalyticsMetricCard 
           title="Workout Completion" 
           value={`${analytics.avgWorkoutCompletionRate}%`} 
@@ -574,12 +533,6 @@ export function AnalyticsDashboard() {
           value={analytics.standaloneProgramsSold} 
           subtitle="Standalone purchases"
           icon={ShoppingCart}
-        />
-        <AnalyticsMetricCard 
-          title="Corporate Plans" 
-          value={analytics.corporatePlansSold} 
-          subtitle="Active subscriptions"
-          icon={Building2}
         />
         <AnalyticsMetricCard 
           title="Avg. Rating" 
@@ -609,10 +562,10 @@ export function AnalyticsDashboard() {
         </Card>
         <Card className="bg-primary/5 border-primary/20">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Best Corporate Plan</CardTitle>
+            <CardTitle className="text-sm font-medium">Stripe Payments</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-lg font-bold">{analytics.bestSellingCorporatePlan}</div>
+            <div className="text-lg font-bold">{analytics.stripePaymentCount}</div>
           </CardContent>
         </Card>
       </div>
@@ -662,12 +615,6 @@ export function AnalyticsDashboard() {
               className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-3 sm:px-4 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md"
             >
               Website
-            </TabsTrigger>
-            <TabsTrigger 
-              value="corporate" 
-              className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-3 sm:px-4 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md"
-            >
-              Corporate
             </TabsTrigger>
             <TabsTrigger 
               value="shop" 
@@ -809,10 +756,10 @@ export function AnalyticsDashboard() {
                     itemStyle={{ color: "hsl(var(--popover-foreground))" }}
                   />
                   <Legend wrapperStyle={{ fontSize: 11 }} />
-                  <Line type="monotone" dataKey="Premium Memberships" stroke="hsl(var(--primary))" strokeWidth={2} />
-                  <Line type="monotone" dataKey="Standalone Purchases" stroke="hsl(var(--accent))" strokeWidth={2} />
-                  <Line type="monotone" dataKey="Personal Training" stroke="hsl(var(--chart-3))" strokeWidth={2} />
-                  <Line type="monotone" dataKey="Corporate Plans" stroke="hsl(var(--chart-4))" strokeWidth={2} />
+                  <Line type="monotone" dataKey={CURRENT_REVENUE_CATEGORY_LABELS.premium_membership} stroke="hsl(var(--primary))" strokeWidth={2} />
+                  <Line type="monotone" dataKey={CURRENT_REVENUE_CATEGORY_LABELS.standalone_workout} stroke="hsl(var(--accent))" strokeWidth={2} />
+                  <Line type="monotone" dataKey={CURRENT_REVENUE_CATEGORY_LABELS.standalone_program} stroke="hsl(var(--chart-3))" strokeWidth={2} />
+                  <Line type="monotone" dataKey={CURRENT_REVENUE_CATEGORY_LABELS.other_smartygym} stroke="hsl(var(--chart-4))" strokeWidth={2} />
                 </LineChart>
               </ResponsiveContainer>
             </CardContent>
@@ -847,10 +794,6 @@ export function AnalyticsDashboard() {
 
         <TabsContent value="website" className="space-y-4">
           <WebsiteAnalytics />
-        </TabsContent>
-
-        <TabsContent value="corporate" className="space-y-4">
-          <CorporateAnalytics />
         </TabsContent>
       </Tabs>
     </div>

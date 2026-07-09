@@ -26,15 +26,21 @@ interface Payment {
   recurring: boolean;
 }
 
-type Category = "Premium Plan" | "Standalone Workout" | "Standalone Training Program";
+type Category = "Premium Membership" | "Standalone Workout" | "Standalone Training Program" | "Other SmartyGym Product";
 
 const CATEGORY_COLORS: Record<Category, string> = {
-  "Premium Plan": "hsl(var(--primary))",
+  "Premium Membership": "hsl(var(--primary))",
   "Standalone Workout": "hsl(var(--chart-2))",
   "Standalone Training Program": "hsl(var(--chart-3))",
+  "Other SmartyGym Product": "hsl(var(--chart-4))",
 };
 
 function categorize(p: Payment): Category {
+  const category = (p as any).category;
+  if (category === "premium_membership") return "Premium Membership";
+  if (category === "standalone_workout") return "Standalone Workout";
+  if (category === "standalone_program") return "Standalone Training Program";
+  if (category === "other_smartygym") return "Other SmartyGym Product";
   const ct = (p.contentType || "").toLowerCase();
   const name = (p.productName || "").toLowerCase();
   if (ct.includes("training program") || ct === "program" || /training program/.test(name)) {
@@ -43,8 +49,7 @@ function categorize(p: Payment): Category {
   if (ct === "workout" || ct === "micro-workout" || /\bworkout\b/.test(name)) {
     return "Standalone Workout";
   }
-  // Everything else (recurring subscriptions, lifetime, gold, platinum, premium) = Premium Plan
-  return "Premium Plan";
+  return p.recurring ? "Premium Membership" : "Other SmartyGym Product";
 }
 
 export function StripeRevenueTruth() {
@@ -107,9 +112,10 @@ export function StripeRevenueTruth() {
     }
     const all = Array.from(m.values());
     const grouped: Record<Category, typeof all> = {
-      "Premium Plan": [],
+      "Premium Membership": [],
       "Standalone Workout": [],
       "Standalone Training Program": [],
+      "Other SmartyGym Product": [],
     };
     for (const item of all) grouped[item.category].push(item);
     (Object.keys(grouped) as Category[]).forEach(k =>

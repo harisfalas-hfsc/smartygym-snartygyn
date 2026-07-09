@@ -32,6 +32,7 @@ import {
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { UserParQHistoryTab } from "./UserParQHistoryTab";
+import { isCurrentPremiumAccess, normalizePlanLabel } from "@/lib/admin-analytics";
 
 interface UserData {
   user_id: string;
@@ -339,7 +340,7 @@ export function UserDetailModal({
 
   if (!user) return null;
 
-  const isPremium = user.status === 'active' && ['gold','platinum','lifetime','premium'].includes(user.plan_type);
+  const isPremium = isCurrentPremiumAccess(user as any);
   const isCorporateAdmin = !!corporateInfo?.adminPlanType;
   const isCorporateMember = !!corporateInfo?.memberPlanType;
   const hasEndedStripePlan = !!user.stripe_subscription_id && !!user.current_period_end && new Date(user.current_period_end).getTime() < Date.now();
@@ -368,11 +369,11 @@ export function UserDetailModal({
                   <Badge variant="destructive">👑 Admin</Badge>
                 )}
                 <Badge variant={isPremium ? 'default' : 'outline'}>
-                  {isPremium ? 'PREMIUM' : user.plan_type.toUpperCase()}
+                  {normalizePlanLabel(user as any).toUpperCase()}
                 </Badge>
                 {user.subscription_source === 'admin_grant' && (
                   <Badge variant="secondary" className="bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300">
-                    Complimentary
+                    Manual Access
                   </Badge>
                 )}
                 {user.subscription_source === 'stripe' && (
@@ -431,7 +432,7 @@ export function UserDetailModal({
                     <div>
                       <p className="text-muted-foreground">Plan</p>
                       <p className="font-medium">
-                        {isPremium ? 'PREMIUM' : (user.plan_type || 'FREE').toUpperCase()}
+                        {normalizePlanLabel(user as any)}
                       </p>
                     </div>
                     <div>
@@ -457,7 +458,7 @@ export function UserDetailModal({
                       <p>{stripeFirstSubscribedAt
                         ? format(new Date(stripeFirstSubscribedAt), 'MMM d, yyyy')
                         : user.subscription_created_at
-                          ? format(new Date(user.subscription_created_at), 'MMM d, yyyy') + ' (DB)'
+                          ? format(new Date(user.subscription_created_at), 'MMM d, yyyy')
                           : 'N/A'}</p>
                     </div>
                     <div>
@@ -471,7 +472,7 @@ export function UserDetailModal({
                       <p>{user.current_period_end 
                         ? format(new Date(user.current_period_end), 'MMM d, yyyy')
                         : (!user.stripe_subscription_id && user.plan_type !== 'free' 
-                          ? 'Never (Admin Granted)' 
+                          ? 'Manual access' 
                           : 'N/A')}</p>
                     </div>
                     <div>

@@ -37,7 +37,6 @@ export function BusinessReportExport({ dashboardRef }: BusinessReportExportProps
     { id: "content", label: "Content Performance", checked: true },
     { id: "completion", label: "Completion Rates", checked: true },
     { id: "website", label: "Website Traffic", checked: true },
-    { id: "corporate", label: "Corporate Plans", checked: true },
   ]);
 
   const toggleSection = (id: string) => {
@@ -87,11 +86,8 @@ export function BusinessReportExport({ dashboardRef }: BusinessReportExportProps
 
     // Use the same premium-counting rules as the dashboard
     const premium = computePremiumCounts(subscriptions as any);
-    const activeLifetime = subscriptions?.filter(s => s.status === "active" && s.plan_type === "lifetime").length || 0;
-    const activeLegacyMembers = subscriptions?.filter(s => s.status === "active" && ["gold", "platinum", "premium", "legacy_premium"].includes(s.plan_type ?? "")).length || 0;
-
     // Fetch revenue from Stripe
-    let stripeRevenue = { totalRevenue: 0, subscriptionRevenue: 0 };
+    let stripeRevenue: any = { totalCollected: 0, byCategory: {}, payments: [] };
     try {
       const { data } = await supabase.functions.invoke('get-stripe-revenue');
       if (data) stripeRevenue = data;
@@ -99,15 +95,9 @@ export function BusinessReportExport({ dashboardRef }: BusinessReportExportProps
       console.error("Error fetching Stripe revenue:", e);
     }
 
-    // Fetch purchases
-    const { data: purchases } = await supabase
-      .from("user_purchases")
-      .select("*")
-      .gte("purchased_at", startISO)
-      .lte("purchased_at", endISO);
-
-    const standalonePurchases = purchases?.length || 0;
-    const standaloneRevenue = purchases?.reduce((sum, p) => sum + Number(p.price || 0), 0) || 0;
+    const standalonePayments = stripeRevenue.payments?.filter((p: any) => p.category === "standalone_workout" || p.category === "standalone_program") || [];
+    const standalonePurchases = standalonePayments.length;
+    const standaloneRevenue = standalonePayments.reduce((sum: number, p: any) => sum + Number(p.amount || 0), 0);
 
     // Fetch interactions
     const { data: workoutInteractions } = await supabase
@@ -128,13 +118,6 @@ export function BusinessReportExport({ dashboardRef }: BusinessReportExportProps
     // Filtered visitor count — same logic as overview card and Website tab
     const websiteVisitors = await fetchFilteredVisitorCount(startDate, endDate);
 
-    // Fetch corporate subscriptions
-    const { data: corporateSubs } = await supabase
-      .from("corporate_subscriptions")
-      .select("plan_type, status, current_users_count, max_users");
-
-    const activeCorporate = corporateSubs?.filter(c => c.status === "active") || [];
-
     // Fetch check-ins
     const { count: checkinsCount } = await supabase
       .from("smarty_checkins")
@@ -147,14 +130,13 @@ export function BusinessReportExport({ dashboardRef }: BusinessReportExportProps
       users: {
         total: totalUsers || 0,
         new: newUsers || 0,
-        lifetimeSubscribers: activeLifetime,
-        legacyPremiumSubscribers: activeLegacyMembers,
+        premiumSubscribers: premium.activePremiumSubscribers,
         paidSubscribers: premium.paidSubscribers,
         manualSubscribers: premium.manualSubscribers,
       },
       revenue: {
-        total: stripeRevenue.totalRevenue,
-        subscriptions: stripeRevenue.subscriptionRevenue,
+        total: stripeRevenue.totalCollected || 0,
+        subscriptions: stripeRevenue.byCategory?.premium_membership?.amount || 0,
         standalone: standaloneRevenue,
         standalonePurchases,
       },
@@ -165,10 +147,6 @@ export function BusinessReportExport({ dashboardRef }: BusinessReportExportProps
       },
       website: {
         visitors: websiteVisitors || 0,
-      },
-      corporate: {
-        active: activeCorporate.length,
-        totalUsers: activeCorporate.reduce((sum, c) => sum + (c.current_users_count || 0), 0),
       },
       checkins: checkinsCount || 0,
     };
@@ -238,12 +216,12 @@ export function BusinessReportExport({ dashboardRef }: BusinessReportExportProps
               <td style="padding: 12px; border: 1px solid #e0e0e0; text-align: right; font-weight: bold;">${data.users.new}</td>
             </tr>
             <tr style="background: #f8f9fa;">
-              <td style="padding: 12px; border: 1px solid #e0e0e0;">Premium Subscribers</td>
-              <td style="padding: 12px; border: 1px solid #e0e0e0; text-align: right; font-weight: bold;">${data.users.lifetimeSubscribers}</td>
+              <td style="padding: 12px; border: 1px solid #e0e0e0;">Premium Access</td>
+              <td style="padding: 12px; border: 1px solid #e0e0e0; text-align: right; font-weight: bold;">${data.users.premiumSubscribers}</td>
             </tr>
             <tr>
-              <td style="padding: 12px; border: 1px solid #e0e0e0;">Legacy Premium Subscribers (historical)</td>
-              <td style="padding: 12px; border: 1px solid #e0e0e0; text-align: right; font-weight: bold;">${data.users.legacyPremiumSubscribers}</td>
+              <td style="padding: 12px; border: 1px solid #e0e0e0;">Paid Premium / Manual Access</td>
+              <td style="padding: 12px; border: 1px solid #e0e0e0; text-align: right; font-weight: bold;">${data.users.paidSubscribers} / ${data.users.manualSubscribers}</td>
             </tr>
           </table>
         </div>
@@ -303,23 +281,6 @@ export function BusinessReportExport({ dashboardRef }: BusinessReportExportProps
             <tr style="background: #f8f9fa;">
               <td style="padding: 12px; border: 1px solid #e0e0e0;">Total Visitors (Period)</td>
               <td style="padding: 12px; border: 1px solid #e0e0e0; text-align: right; font-weight: bold;">${data.website.visitors}</td>
-            </tr>
-          </table>
-        </div>
-        ` : ''}
-
-        ${selectedSections.includes("corporate") ? `
-        <!-- Corporate Section -->
-        <div style="margin-bottom: 30px;">
-          <h2 style="margin: 0 0 15px 0; font-size: 16px; color: #1a1a1a; border-bottom: 2px solid #D4AF37; padding-bottom: 8px;">Corporate Plans</h2>
-          <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-            <tr style="background: #f8f9fa;">
-              <td style="padding: 12px; border: 1px solid #e0e0e0;">Active Corporate Subscriptions</td>
-              <td style="padding: 12px; border: 1px solid #e0e0e0; text-align: right; font-weight: bold;">${data.corporate.active}</td>
-            </tr>
-            <tr>
-              <td style="padding: 12px; border: 1px solid #e0e0e0;">Total Corporate Users</td>
-              <td style="padding: 12px; border: 1px solid #e0e0e0; text-align: right; font-weight: bold;">${data.corporate.totalUsers}</td>
             </tr>
           </table>
         </div>
