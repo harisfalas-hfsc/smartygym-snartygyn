@@ -185,8 +185,8 @@ export interface PremiumCounts {
 
 export function computePremiumCounts(subs: SubscriptionRow[] | null | undefined): PremiumCounts {
   const list = subs ?? [];
-  // Include all paid plan types: current "lifetime"/"premium" and legacy "gold"/"platinum" (retired).
-  const PREMIUM_PLANS = new Set(["lifetime", "premium", "gold", "platinum"]);
+  // Include all paid plan types: current "premium", historical lifetime, and retired legacy premium tiers.
+  const PREMIUM_PLANS = new Set(["lifetime", "premium", "legacy_premium", "gold", "platinum"]);
   const isActivePremium = (s: SubscriptionRow) =>
     s.status === "active" && !!s.plan_type && PREMIUM_PLANS.has(s.plan_type);
 

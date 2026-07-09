@@ -23,7 +23,7 @@ import { GrowthAnalytics } from "./analytics/GrowthAnalytics";
 import { PopularAnalytics } from "./analytics/PopularAnalytics";
 import { BusinessReportExport } from "./analytics/BusinessReportExport";
 import html2canvas from "html2canvas";
-import { SUBSCRIPTION_PRICES, SUBSCRIPTION_BILLING_PERIODS, CORPORATE_PRICES } from "@/config/pricing";
+import { CORPORATE_PRICES } from "@/config/pricing";
 import {
   fetchWorkoutLibraryCounts,
   fetchAvailableProgramsCount,
@@ -31,6 +31,7 @@ import {
   fetchFilteredVisitorCount,
   computePremiumCounts,
   computeNonPremiumUsers,
+  fetchStripeRevenueTruth,
 } from "@/lib/admin-analytics";
 
 interface AnalyticsData {
@@ -168,7 +169,7 @@ export function AnalyticsDashboard() {
       const paidSubscribers = premiumCounts.paidSubscribers;
       const manualSubscribers = premiumCounts.manualSubscribers;
 
-      const premiumPlans = new Set(["lifetime", "gold", "platinum", "premium"]);
+      const premiumPlans = new Set(["lifetime", "gold", "platinum", "legacy_premium", "premium"]);
       const premiumSubscribers = subscriptions?.filter(s => s.status === "active" && premiumPlans.has(s.plan_type)).length || 0;
       // PAID = real Stripe payments only — admin-granted memberships are complimentary.
       const isPaidSub = (s: any) =>
@@ -181,28 +182,10 @@ export function AnalyticsDashboard() {
       // subscription row, undercounting free users dramatically.)
       const freeUsers = computeNonPremiumUsers(totalUsers, premiumCounts.distinctPremiumUsers);
 
-      // Calculate fallback revenue from historical lifetime memberships only.
-      // Prefer real Stripe revenue below for current monthly subscriptions.
-      const lifetimePaid = subscriptions?.filter(s => s.status === "active" && s.plan_type === "lifetime" && isPaidSub(s)).length || 0;
-      let totalRevenue = lifetimePaid * SUBSCRIPTION_PRICES.lifetime;
-
-      // REAL collected revenue from Stripe charges (net of refunds) — includes
-      // historical payments from since-canceled subscriptions (e.g. old monthly plans).
-      let stripeCollected: number | null = null;
-      let stripePaymentCount = 0;
-      try {
-        const { data: stripeRev, error: stripeRevError } = await supabase.functions.invoke('get-stripe-revenue');
-        if (!stripeRevError && stripeRev && typeof stripeRev.totalCollected === "number") {
-          stripeCollected = stripeRev.totalCollected;
-          stripePaymentCount = stripeRev.paymentCount || 0;
-        }
-      } catch (e) {
-        console.error("Failed to fetch real Stripe revenue:", e);
-      }
-      // Prefer the real Stripe number when available.
-      if (stripeCollected !== null) {
-        totalRevenue = stripeCollected;
-      }
+      // Revenue is live Stripe truth only: successful SmartyGym charges net of refunds.
+      const stripeTruth = await fetchStripeRevenueTruth();
+      const totalRevenue = stripeTruth?.totalCollected ?? 0;
+      const stripePaymentCount = stripeTruth?.paymentCount ?? 0;
 
       // Fetch purchases for standalone sales
       const { data: purchases } = await supabase
@@ -227,10 +210,13 @@ export function AnalyticsDashboard() {
       });
       const bestSellingProgram = Object.entries(programSales).sort((a, b) => b[1] - a[1])[0]?.[0] || "-";
 
-      const revenueChartData = [
-        { name: `Premium Memberships (€${SUBSCRIPTION_PRICES.lifetime})`, value: lifetimePaid * SUBSCRIPTION_PRICES.lifetime },
-        { name: "Standalone Purchases", value: standaloneRevenue }
-      ];
+      const stripeCategory = stripeTruth?.byCategory;
+      const revenueChartData = stripeCategory ? [
+        { name: "Premium Memberships", value: stripeCategory.premium?.amount || 0 },
+        { name: "Standalone Purchases", value: stripeCategory.standalone?.amount || 0 },
+        { name: "Personal Training", value: stripeCategory.personal_training?.amount || 0 },
+        { name: "Corporate Plans", value: stripeCategory.corporate?.amount || 0 },
+      ].filter(item => item.value > 0) : [];
 
       // Revenue distribution
       const totalRevenueSum = revenueChartData.reduce((sum, item) => sum + item.value, 0);
@@ -240,31 +226,21 @@ export function AnalyticsDashboard() {
         percentage: totalRevenueSum > 0 ? ((item.value / totalRevenueSum) * 100).toFixed(1) : 0
       }));
 
-      // 6-month revenue trends
+      // 6-month revenue trends from real Stripe payments
       const trendsData: any[] = [];
       const now = new Date();
       for (let i = 5; i >= 0; i--) {
         const monthDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
         const monthName = monthDate.toLocaleDateString("en-US", { year: "numeric", month: "short" });
-        const monthStart = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1);
-        const monthEnd = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0);
-
-        const premiumCount = subscriptions?.filter(s => {
-          const startDate = new Date(s.created_at);
-          return premiumPlans.has(s.plan_type) && isPaidSub(s) && startDate <= monthEnd &&
-                 (!s.current_period_end || new Date(s.current_period_end) >= monthStart);
-        }).length || 0;
-
-        const monthPurchases = purchases?.filter(p => {
-          const purchaseDate = new Date(p.purchased_at);
-          return purchaseDate >= monthStart && purchaseDate <= monthEnd;
-        }) || [];
-        const monthPurchaseRevenue = monthPurchases.reduce((sum, p) => sum + Number(p.price || 0), 0);
+        const monthKey = monthDate.toISOString().slice(0, 7);
+        const monthStripe = stripeTruth?.byMonthByCategory?.[monthKey];
 
         trendsData.push({
           name: monthName,
-          "Premium Memberships": premiumCount * SUBSCRIPTION_PRICES.lifetime,
-          "Standalone Purchases": monthPurchaseRevenue
+          "Premium Memberships": monthStripe?.premium || 0,
+          "Standalone Purchases": monthStripe?.standalone || 0,
+          "Personal Training": monthStripe?.personal_training || 0,
+          "Corporate Plans": monthStripe?.corporate || 0,
         });
       }
 
@@ -372,13 +348,8 @@ export function AnalyticsDashboard() {
       const corporatePaid = corporateSubs?.filter(c => c.status === "active" && c.stripe_subscription_id && c.stripe_customer_id).length || 0;
       const corporateFree = corporateSubs?.filter(c => c.status === "active" && (!c.stripe_subscription_id || !c.stripe_customer_id)).length || 0;
       
-      // Add corporate revenue only for PAID corporate plans.
-      // Skip when real Stripe collected revenue is used — those charges are already included.
+      // Corporate paid/free counts stay database-based; revenue stays Stripe-based above.
       const paidCorporatePlans = corporateSubs?.filter(c => c.status === "active" && c.stripe_subscription_id && c.stripe_customer_id) || [];
-      const corporateRevenue = paidCorporatePlans.reduce((sum, c) => sum + (CORPORATE_PRICES[c.plan_type as keyof typeof CORPORATE_PRICES] || 0), 0);
-      if (stripeCollected === null) {
-        totalRevenue += corporateRevenue;
-      }
       
       // Best selling corporate plan (only count PAID)
       const corporatePlanCounts: { [key: string]: number } = {};
@@ -519,7 +490,7 @@ export function AnalyticsDashboard() {
         <AnalyticsMetricCard 
           title="Premium Members"
           value={`${analytics.premiumPaid} paid`}
-          subtitle={`€${SUBSCRIPTION_PRICES.lifetime} lifetime • ${Math.max(analytics.premiumSubscribers - analytics.premiumPaid, 0)} comp`}
+          subtitle={`€9.99 monthly • ${Math.max(analytics.premiumSubscribers - analytics.premiumPaid, 0)} comp`}
           icon={Star}
         />
         <AnalyticsMetricCard 
@@ -531,7 +502,7 @@ export function AnalyticsDashboard() {
         <AnalyticsMetricCard 
           title="Paid Revenue" 
           value={`€${analytics.totalRevenue.toFixed(2)}`} 
-          subtitle={`${analytics.paidSubscribers} paid subs • ${analytics.manualSubscribers} comp`}
+          subtitle={`${stripePaymentCount} Stripe payments • net of refunds`}
           icon={DollarSign}
         />
       </div>
@@ -838,6 +809,8 @@ export function AnalyticsDashboard() {
                   <Legend wrapperStyle={{ fontSize: 11 }} />
                   <Line type="monotone" dataKey="Premium Memberships" stroke="hsl(var(--primary))" strokeWidth={2} />
                   <Line type="monotone" dataKey="Standalone Purchases" stroke="hsl(var(--accent))" strokeWidth={2} />
+                  <Line type="monotone" dataKey="Personal Training" stroke="hsl(var(--chart-3))" strokeWidth={2} />
+                  <Line type="monotone" dataKey="Corporate Plans" stroke="hsl(var(--chart-4))" strokeWidth={2} />
                 </LineChart>
               </ResponsiveContainer>
             </CardContent>
