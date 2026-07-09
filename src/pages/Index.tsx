@@ -952,7 +952,7 @@ const Index = () => {
             </h1>
             <p className="text-sm md:text-base text-muted-foreground mt-4 leading-relaxed">
               Your gym, in your pocket. Expert-designed workouts, structured training programs, blog insights and smart tools — <span className="font-semibold text-foreground">100% Human</span>, <span className="font-semibold text-red-500">0% AI</span>. Designed by Sports Scientist{' '}
-              <Link to="/about" className="font-semibold text-primary hover:underline">Haris Falas</Link>.
+              <Link to="/coach-profile" className="font-semibold text-primary hover:underline">Haris Falas</Link>.
             </p>
           </div>
 
