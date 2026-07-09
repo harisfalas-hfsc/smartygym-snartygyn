@@ -72,11 +72,15 @@ serve(async (req) => {
       line_items: [{ price: PREMIUM_MONTHLY_PRICE_ID, quantity: 1 }],
       success_url: `${origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}${safeCancel}`,
+      payment_method_collection: "always",
       subscription_data: {
         metadata: {
           project: "SMARTYGYM",
           purchase_type: "premium_monthly",
           user_id: user.id,
+        },
+        payment_settings: {
+          save_default_payment_method: "on_subscription",
         },
       },
       metadata: {
